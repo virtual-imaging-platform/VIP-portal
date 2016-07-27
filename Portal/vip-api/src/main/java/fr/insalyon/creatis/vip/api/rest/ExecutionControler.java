@@ -29,35 +29,44 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL-B license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.api;
+package fr.insalyon.creatis.vip.api.rest;
 
+import fr.insalyon.creatis.vip.api.bean.Execution;
+import fr.insalyon.creatis.vip.api.business.ApiContext;
+import fr.insalyon.creatis.vip.api.business.ApiException;
+import fr.insalyon.creatis.vip.api.business.ApiUtils;
+import fr.insalyon.creatis.vip.api.business.ExecutionBusiness;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 
-import static fr.insalyon.creatis.vip.api.CarminProperties.SECURITY_REALM_NAME;
+import javax.servlet.http.HttpServletRequest;
 
 /**
- * Created by abonnet on 7/22/16.
+ * Created by abonnet on 7/13/16.
  */
-@EnableWebSecurity
-public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
+@RestController
+@RequestMapping("/execution")
+public class ExecutionControler {
 
-    // authentication done by bean LimitigDaoAuthenticationProvider
+    public static final Logger logger = Logger.getLogger(ExecutionControler.class);
 
+    // although the controler is a singleton, these are proxies that always point on the current request
     @Autowired
-    private VipBasicAuthenticationEntryPoint vipBasicAuthenticationEntryPoint;
+    HttpServletRequest httpServletRequest;
 
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
-        http
-            .authorizeRequests()
-                .anyRequest().authenticated()
-            .and()
-            .httpBasic().realmName(SECURITY_REALM_NAME).authenticationEntryPoint(vipBasicAuthenticationEntryPoint)
-            .and()
-            .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+    @RequestMapping("/{executionId}")
+    @ResponseBody
+    public void getExecution(@PathVariable String executionId) throws ApiException {
+        ApiUtils.methodInvocationLog("getExecution", executionId);
+        ApiUtils.throwIfNull(executionId, "Execution id");
+        ApiContext apiContext = new RestApiBusiness().getApiContext(httpServletRequest, true);
+        ExecutionBusiness eb = new ExecutionBusiness(apiContext);
+        eb.checkIfUserCanAccessExecution(executionId);
+        Execution e = eb.getExecution(executionId,false);
     }
+
 }

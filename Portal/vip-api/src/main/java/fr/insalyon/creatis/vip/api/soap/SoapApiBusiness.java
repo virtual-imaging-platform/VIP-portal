@@ -29,8 +29,10 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL-B license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.api.business;
+package fr.insalyon.creatis.vip.api.soap;
 
+import fr.insalyon.creatis.vip.api.business.ApiContext;
+import fr.insalyon.creatis.vip.api.business.ApiException;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.server.auth.AbstractAuthenticationService;
@@ -53,18 +55,18 @@ import org.apache.log4j.PropertyConfigurator;
  *
  * @author Tristan Glatard
  */
-public class ApiBusiness {
+public class SoapApiBusiness {
 
-    private final static Logger logger = Logger.getLogger(ApiBusiness.class);
+    private final static Logger logger = Logger.getLogger(SoapApiBusiness.class);
     private final String authFailedMessage = "API user is not logged in.";
 
     private final ConfigurationBusiness configurationBusiness;
 
-    public ApiBusiness() {
+    public SoapApiBusiness() {
         this.configurationBusiness = new ConfigurationBusiness();
     }
 
-    public ApiBusiness(ConfigurationBusiness configurationBusiness) {
+    public SoapApiBusiness(ConfigurationBusiness configurationBusiness) {
         this.configurationBusiness = configurationBusiness;
     }
 
@@ -100,7 +102,7 @@ public class ApiBusiness {
             if (authenticate) {
                 user = authenticateSession(request, response);
             }
-            return new ApiContext(session, request, response, user);
+            return new ApiContext(request, response, user);
         } catch (DAOException ex) {
             throw new ApiException(ex);
         }

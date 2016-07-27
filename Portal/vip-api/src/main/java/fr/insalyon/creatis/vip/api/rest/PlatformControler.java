@@ -57,8 +57,6 @@ public class PlatformControler {
     // although the controler is a singleton, these are proxies that always point on the current request
     @Autowired
     HttpServletRequest httpServletRequest;
-    @Autowired
-    HttpServletResponse httpServletResponse;
 
     @RequestMapping
     public PlatformProperties getPlatformProperties() {

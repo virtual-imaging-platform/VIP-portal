@@ -31,44 +31,52 @@
  */
 package fr.insalyon.creatis.vip.api.rest;
 
-import fr.insalyon.creatis.vip.api.CarminAPITestConstants;
-import fr.insalyon.creatis.vip.api.SpringWebConfig;
+import fr.insalyon.creatis.vip.api.SpringTestConfig;
+import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
+import fr.insalyon.creatis.vip.core.server.dao.UserDAO;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-import org.springframework.test.web.servlet.result.ModelResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.anonymous;
+import static fr.insalyon.creatis.vip.api.UserTestUtils.baseUser1;
+import static fr.insalyon.creatis.vip.api.UserTestUtils.baseUser1Password;
+import static org.mockito.Mockito.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 /**
  * Created by abonnet on 7/22/16.
+ *
+ * These tests check the login authentication with the spring test tools.
+ *
+ * The spring test tools allow to simulate the http layer but everything else
+ * is the same as production configuration
+ *
+ * The interaction sur VIP outside vip-api are mocked ({@link SpringTestConfig}
+ *
  */
 @RunWith(SpringRunner.class)
 @WebAppConfiguration
-@ContextConfiguration(classes = SpringWebConfig.class)
+@ContextConfiguration(classes = SpringTestConfig.class)
 public class AuthenticationITest {
 
     @Autowired
     private WebApplicationContext wac;
     private MockMvc mockMvc;
+    @Autowired
+    private UserDAO userDAO;
+    @Autowired
+    private ConfigurationBusiness configurationBusiness;
 
     @Before
     public void setup() {
@@ -79,10 +87,36 @@ public class AuthenticationITest {
     }
 
     @Test
-    public void testAuthentication() throws Exception {
-        mockMvc.perform(get("/login").with(httpBasic("plip", "plop")))
+    public void authenticationOK() throws Exception {
+        when(userDAO.getUser(baseUser1.getEmail())).thenReturn(baseUser1);
+        when(configurationBusiness.getUser(baseUser1.getEmail())).thenReturn(baseUser1);
+        mockMvc.perform(get("/login").with(httpBasic(baseUser1.getEmail(), baseUser1Password)))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().string("SUCCESS"));
+    }
+
+    @Test
+    public void authenticationWithWrongPassport() throws Exception {
+        when(userDAO.getUser(baseUser1.getEmail())).thenReturn(baseUser1);
+        when(configurationBusiness.getUser(baseUser1.getEmail())).thenReturn(baseUser1);
+        mockMvc.perform(get("/login").with(httpBasic(baseUser1.getEmail(), "WRONG")))
+                .andDo(print())
+                .andExpect(status().isUnauthorized())
+                .andExpect(content().contentType(RestTestUtils.JSON_CONTENT_TYPE_UTF8))
+                .andExpect(jsonPath("$.code")
+                        .value(RestErrorCodes.BAD_CREDENTIALS.getCode()));
+    }
+
+    @Test
+    public void authenticationWithoutCredentials() throws Exception {
+        when(userDAO.getUser(baseUser1.getEmail())).thenReturn(baseUser1);
+        when(configurationBusiness.getUser(baseUser1.getEmail())).thenReturn(baseUser1);
+        mockMvc.perform(get("/login"))
+                .andDo(print())
+                .andExpect(status().isUnauthorized())
+                .andExpect(content().contentType(RestTestUtils.JSON_CONTENT_TYPE_UTF8))
+                .andExpect(jsonPath("$.code")
+                        .value(RestErrorCodes.INSUFFICIENT_AUTH.getCode()));
     }
 }

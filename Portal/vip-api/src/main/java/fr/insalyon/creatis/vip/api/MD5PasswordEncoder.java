@@ -31,33 +31,37 @@
  */
 package fr.insalyon.creatis.vip.api;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.config.http.SessionCreationPolicy;
+import fr.insalyon.creatis.devtools.MD5;
+import org.apache.log4j.Logger;
+import org.springframework.security.authentication.encoding.PasswordEncoder;
+import org.springframework.stereotype.Service;
 
-import static fr.insalyon.creatis.vip.api.CarminProperties.SECURITY_REALM_NAME;
+import java.io.UnsupportedEncodingException;
+import java.security.NoSuchAlgorithmException;
 
 /**
- * Created by abonnet on 7/22/16.
+ * Created by abonnet on 7/26/16.
  */
-@EnableWebSecurity
-public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
+@Service
+public class MD5PasswordEncoder implements PasswordEncoder {
 
-    // authentication done by bean LimitigDaoAuthenticationProvider
-
-    @Autowired
-    private VipBasicAuthenticationEntryPoint vipBasicAuthenticationEntryPoint;
+    public static final Logger logger = Logger.getLogger(LimitingDaoAuthenticationProvider.class);
 
     @Override
-    protected void configure(HttpSecurity http) throws Exception {
-        http
-            .authorizeRequests()
-                .anyRequest().authenticated()
-            .and()
-            .httpBasic().realmName(SECURITY_REALM_NAME).authenticationEntryPoint(vipBasicAuthenticationEntryPoint)
-            .and()
-            .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+    public String encodePassword(String rawPass, Object salt) {
+        try {
+            return MD5.get(rawPass);
+        } catch (NoSuchAlgorithmException e) {
+            logger.error("Error encoding password", e);
+            throw new RuntimeException(e);
+        } catch (UnsupportedEncodingException e) {
+            logger.error("Error encoding password", e);
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public boolean isPasswordValid(String encPass, String rawPass, Object salt) {
+        return encodePassword(rawPass, salt).equals(encPass);
     }
 }

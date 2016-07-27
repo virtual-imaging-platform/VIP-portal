@@ -29,35 +29,38 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL-B license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.api;
+package fr.insalyon.creatis.vip.api.rest;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.config.http.SessionCreationPolicy;
+import fr.insalyon.creatis.vip.api.SpringCompatibleUser;
+import fr.insalyon.creatis.vip.api.business.ApiContext;
+import fr.insalyon.creatis.vip.api.business.ApiException;
+import fr.insalyon.creatis.vip.core.client.bean.User;
+import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
+import fr.insalyon.creatis.vip.core.server.dao.DAOException;
+import fr.insalyon.creatis.vip.core.server.dao.mysql.PlatformConnection;
+import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
+import org.springframework.security.core.Authentication;
 
-import static fr.insalyon.creatis.vip.api.CarminProperties.SECURITY_REALM_NAME;
+import javax.servlet.http.HttpServletRequest;
 
 /**
- * Created by abonnet on 7/22/16.
+ * Created by abonnet on 7/25/16.
  */
-@EnableWebSecurity
-public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
+public class RestApiBusiness {
 
-    // authentication done by bean LimitigDaoAuthenticationProvider
+    private final static Logger logger = Logger.getLogger(RestApiBusiness.class);
 
-    @Autowired
-    private VipBasicAuthenticationEntryPoint vipBasicAuthenticationEntryPoint;
-
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
-        http
-            .authorizeRequests()
-                .anyRequest().authenticated()
-            .and()
-            .httpBasic().realmName(SECURITY_REALM_NAME).authenticationEntryPoint(vipBasicAuthenticationEntryPoint)
-            .and()
-            .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+    public ApiContext getApiContext(HttpServletRequest request, boolean isAuthenticated) throws ApiException {
+        // TODO verify things done in session authentication that should be added in spring authentication
+        // IE locking support
+        User vipUser = null;
+        if (!isAuthenticated) {
+            Authentication authentication = (Authentication) request.getUserPrincipal();
+            SpringCompatibleUser springCompatibleUser =
+                    (SpringCompatibleUser) authentication.getPrincipal();
+            vipUser = springCompatibleUser.getVipUser();
+        }
+        return new ApiContext(request, null, vipUser);
     }
 }

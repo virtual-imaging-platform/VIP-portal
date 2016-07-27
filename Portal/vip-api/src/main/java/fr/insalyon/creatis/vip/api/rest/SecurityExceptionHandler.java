@@ -29,35 +29,26 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL-B license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.api;
+package fr.insalyon.creatis.vip.api.rest;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.config.http.SessionCreationPolicy;
-
-import static fr.insalyon.creatis.vip.api.CarminProperties.SECURITY_REALM_NAME;
+import fr.insalyon.creatis.vip.api.rest.model.ErrorCodesAndMessage;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 /**
- * Created by abonnet on 7/22/16.
+ * Created by abonnet on 7/26/16.
  */
-@EnableWebSecurity
-public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
+@ControllerAdvice
+public class SecurityExceptionHandler {
 
-    // authentication done by bean LimitigDaoAuthenticationProvider
-
-    @Autowired
-    private VipBasicAuthenticationEntryPoint vipBasicAuthenticationEntryPoint;
-
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
-        http
-            .authorizeRequests()
-                .anyRequest().authenticated()
-            .and()
-            .httpBasic().realmName(SECURITY_REALM_NAME).authenticationEntryPoint(vipBasicAuthenticationEntryPoint)
-            .and()
-            .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+    @ExceptionHandler(AuthenticationException.class)
+    @ResponseBody
+    public ErrorCodesAndMessage handleAuthenticationExceptions(AuthenticationException e) {
+        ErrorCodesAndMessage errorCodesAndMessage = new ErrorCodesAndMessage();
+        errorCodesAndMessage.setCode(40101);
+        errorCodesAndMessage.setMessage("Access denied");
+        return errorCodesAndMessage;
     }
 }

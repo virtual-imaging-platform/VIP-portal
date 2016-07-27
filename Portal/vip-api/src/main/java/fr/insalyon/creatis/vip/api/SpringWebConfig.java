@@ -31,21 +31,44 @@
  */
 package fr.insalyon.creatis.vip.api;
 
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.PropertySource;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
+import fr.insalyon.creatis.vip.core.server.dao.CoreDAOFactory;
+import fr.insalyon.creatis.vip.core.server.dao.DAOException;
+import fr.insalyon.creatis.vip.core.server.dao.UserDAO;
+import org.apache.log4j.Logger;
+import org.springframework.context.annotation.*;
+import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
-import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
-import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
 /**
  * Created by abonnet on 7/13/16.
  */
-@Configuration
+@EnableWebMvc
 @ComponentScan
 @PropertySource("classpath:carmin.properties")
 public class SpringWebConfig {
 
+    public static final Logger logger = Logger.getLogger(SpringWebConfig.class);
+
+    @Bean
+    public ConfigurationBusiness configurationBusiness() {
+        return new ConfigurationBusiness();
+    }
+
+    @Bean
+    @Scope("prototype")
+    public UserDAO userDAO() {
+        try {
+            return CoreDAOFactory.getDAOFactory().getUserDAO();
+        } catch (DAOException e) {
+            logger.error("error creating user dao bean", e);
+            throw new RuntimeException("Cannot create user dao", e);
+        }
+    }
+
+    @Bean
+    public ObjectMapper objectMapper() {
+        return Jackson2ObjectMapperBuilder.json().build();
+    }
 }

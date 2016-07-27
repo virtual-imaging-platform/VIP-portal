@@ -31,33 +31,34 @@
  */
 package fr.insalyon.creatis.vip.api;
 
+import fr.insalyon.creatis.vip.core.server.dao.DAOException;
+import fr.insalyon.creatis.vip.core.server.dao.UserDAO;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.config.http.SessionCreationPolicy;
-
-import static fr.insalyon.creatis.vip.api.CarminProperties.SECURITY_REALM_NAME;
+import org.springframework.context.ApplicationListener;
+import org.springframework.security.authentication.event.AuthenticationSuccessEvent;
+import org.springframework.stereotype.Component;
 
 /**
- * Created by abonnet on 7/22/16.
+ * Created by abonnet on 7/25/16.
  */
-@EnableWebSecurity
-public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
+@Component
+public class AuthenticationEventsListener implements ApplicationListener<AuthenticationSuccessEvent> {
 
-    // authentication done by bean LimitigDaoAuthenticationProvider
+    public static final Logger logger = Logger.getLogger(AuthenticationEventsListener.class);
 
     @Autowired
-    private VipBasicAuthenticationEntryPoint vipBasicAuthenticationEntryPoint;
+    private UserDAO userDAO;
 
     @Override
-    protected void configure(HttpSecurity http) throws Exception {
-        http
-            .authorizeRequests()
-                .anyRequest().authenticated()
-            .and()
-            .httpBasic().realmName(SECURITY_REALM_NAME).authenticationEntryPoint(vipBasicAuthenticationEntryPoint)
-            .and()
-            .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+    public void onApplicationEvent(AuthenticationSuccessEvent event) {
+        try {
+            String username = event.getAuthentication().getName();
+            logger.info("successful logging for " + username);
+            userDAO.resetNFailedAuthentications(username);
+        } catch (DAOException e) {
+            logger.error("Error reseting failed auth attemps ", e);
+        }
     }
+
 }

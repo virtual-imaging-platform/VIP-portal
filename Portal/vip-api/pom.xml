@@ -88,6 +88,15 @@ knowledge of the CeCILL-B license and that you accept its terms.
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <systemPropertyVariables>
+                        <log4j.configuration>log4j.properties</log4j.configuration>
+                    </systemPropertyVariables>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
     <properties>
@@ -107,14 +116,14 @@ knowledge of the CeCILL-B license and that you accept its terms.
 
         <dependency>
             <groupId>fr.insalyon.creatis</groupId>
-            <artifactId>vip-application</artifactId>
-            <version>${vip.application.version}</version>
+            <artifactId>vip-core</artifactId>
+            <version>${vip.core.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>fr.insalyon.creatis</groupId>
-            <artifactId>vip-core</artifactId>
-            <version>${vip.core.version}</version>
+            <artifactId>vip-application</artifactId>
+            <version>${vip.application.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -185,6 +194,12 @@ knowledge of the CeCILL-B license and that you accept its terms.
             <artifactId>json-path</artifactId>
             <version>2.2.0</version>
             <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <artifactId>slf4j-api</artifactId>
+                    <groupId>org.slf4j</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>

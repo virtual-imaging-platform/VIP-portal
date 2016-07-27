@@ -35,20 +35,11 @@ import fr.insalyon.creatis.vip.application.client.bean.Simulation;
 import fr.insalyon.creatis.vip.application.client.view.monitor.SimulationStatus;
 import fr.insalyon.creatis.vip.application.server.business.WorkflowBusiness;
 import fr.insalyon.creatis.vip.core.client.bean.User;
-import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.user.UserLevel;
-import fr.insalyon.creatis.vip.core.server.business.BusinessException;
-import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.mockito.Mockito;
-
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-import javax.xml.ws.WebServiceContext;
-import javax.xml.ws.handler.MessageContext;
 
 /**
  * Created by abonnet on 7/6/16.
@@ -65,7 +56,7 @@ public class ExecutionBusinessTest {
 
     @Test
     public void checkIfAdminCanAccessAnyExecution() throws Exception {
-        ApiContext apiContext = new ApiContext(null, null, null, prepareTestUser(0, true));
+        ApiContext apiContext = new ApiContext(null, null, prepareTestUser(0, true));
         WorkflowBusiness mockedWb = prepareMockedWorkflowBusiness(EXEC_ID, new Simulation());
         ExecutionBusiness sut = new ExecutionBusiness(apiContext, null, mockedWb, null, null, null);
         sut.checkIfUserCanAccessExecution(EXEC_ID);
@@ -73,7 +64,7 @@ public class ExecutionBusinessTest {
 
     @Test
     public void checkIfBasicUserCannotAccessAnyExecution() throws Exception {
-        ApiContext apiContext = new ApiContext(null, null, null, prepareTestUser(0, false));
+        ApiContext apiContext = new ApiContext(null, null, prepareTestUser(0, false));
         Simulation simulation = prepareSimulation(EXEC_ID, 1); // choose a different user
         WorkflowBusiness mockedWb = prepareMockedWorkflowBusiness(EXEC_ID, simulation);
         ExecutionBusiness sut = new ExecutionBusiness(apiContext, null, mockedWb, null, null, null);
@@ -84,7 +75,7 @@ public class ExecutionBusinessTest {
 
     //@Test
     public void checkIfBasicUserCanAccessItsExecution() throws Exception {
-        ApiContext apiContext = new ApiContext(null, null, null, prepareTestUser(0, false));
+        ApiContext apiContext = new ApiContext(null, null, prepareTestUser(0, false));
         Simulation simulation = prepareSimulation(EXEC_ID, 0); // the creator of the execution is the same user
         WorkflowBusiness mockedWb = prepareMockedWorkflowBusiness(EXEC_ID, simulation);
         ExecutionBusiness sut = new ExecutionBusiness(apiContext, null, mockedWb, null, null, null);

@@ -44,22 +44,16 @@ import java.util.List;
  */
 public class ApiContext {
 
-    private final HttpSession session;
     private final HttpServletRequest request;
     private final HttpServletResponse response;
     private User user;
     private List<String> warnings;
 
-    public ApiContext(HttpSession session, HttpServletRequest request, HttpServletResponse response, User user) {
-        this.session = session;
+    public ApiContext(HttpServletRequest request, HttpServletResponse response, User user) {
         this.request = request;
         this.response = response;
         this.user = user;
         this.warnings = new ArrayList<>();
-    }
-
-    public HttpSession getSession() {
-        return session;
     }
 
     public HttpServletRequest getRequest() {

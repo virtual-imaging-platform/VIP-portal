@@ -31,33 +31,47 @@
  */
 package fr.insalyon.creatis.vip.api;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import fr.insalyon.creatis.vip.api.rest.RestErrorCodes;
+import fr.insalyon.creatis.vip.api.rest.model.ErrorCodesAndMessage;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.InsufficientAuthenticationException;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.web.AuthenticationEntryPoint;
+import org.springframework.stereotype.Component;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
 import static fr.insalyon.creatis.vip.api.CarminProperties.SECURITY_REALM_NAME;
 
 /**
- * Created by abonnet on 7/22/16.
+ * Created by abonnet on 7/26/16.
  */
-@EnableWebSecurity
-public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
-
-    // authentication done by bean LimitigDaoAuthenticationProvider
+@Component
+public class VipBasicAuthenticationEntryPoint implements AuthenticationEntryPoint {
 
     @Autowired
-    private VipBasicAuthenticationEntryPoint vipBasicAuthenticationEntryPoint;
+    private ObjectMapper objectMapper;
 
     @Override
-    protected void configure(HttpSecurity http) throws Exception {
-        http
-            .authorizeRequests()
-                .anyRequest().authenticated()
-            .and()
-            .httpBasic().realmName(SECURITY_REALM_NAME).authenticationEntryPoint(vipBasicAuthenticationEntryPoint)
-            .and()
-            .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+    public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
+        response.addHeader("WWW-Authenticate", "Basic realm=\"" + SECURITY_REALM_NAME + "\"");
+        response.setContentType("application/json;charset=UTF-8");
+        ErrorCodesAndMessage error = new ErrorCodesAndMessage();
+        if (authException instanceof BadCredentialsException) {
+            error.setCode(RestErrorCodes.BAD_CREDENTIALS.getCode());
+        } else if (authException instanceof InsufficientAuthenticationException) {
+            error.setCode(RestErrorCodes.INSUFFICIENT_AUTH.getCode());
+        } else {
+            error.setCode(RestErrorCodes.AUTHENTICATION_ERROR.getCode());
+        }
+        error.setMessage(authException.getMessage());
+        objectMapper.writeValue(response.getOutputStream(), error);
+        response.sendError(HttpServletResponse.SC_UNAUTHORIZED, authException.getMessage());
     }
+
 }

@@ -29,35 +29,35 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL-B license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.api;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.config.http.SessionCreationPolicy;
-
-import static fr.insalyon.creatis.vip.api.CarminProperties.SECURITY_REALM_NAME;
+package fr.insalyon.creatis.vip.api.rest;
 
 /**
- * Created by abonnet on 7/22/16.
+ * Created by abonnet on 7/27/16.
  */
-@EnableWebSecurity
-public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
+public enum RestErrorCodes {
 
-    // authentication done by bean LimitigDaoAuthenticationProvider
+    BAD_CREDENTIALS(40101),
+    INSUFFICIENT_AUTH(40102),
+    AUTHENTICATION_ERROR(40103)
+    ;
 
-    @Autowired
-    private VipBasicAuthenticationEntryPoint vipBasicAuthenticationEntryPoint;
+    RestErrorCodes(Integer code) {
+        this.code = code;
+    }
 
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
-        http
-            .authorizeRequests()
-                .anyRequest().authenticated()
-            .and()
-            .httpBasic().realmName(SECURITY_REALM_NAME).authenticationEntryPoint(vipBasicAuthenticationEntryPoint)
-            .and()
-            .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+    RestErrorCodes(Integer code, String message) {
+        this.code = code;
+        this.message = message;
+    }
+
+    private Integer code;
+    private String message;
+
+    public Integer getCode() {
+        return code;
+    }
+
+    public String getMessage() {
+        return message;
     }
 }

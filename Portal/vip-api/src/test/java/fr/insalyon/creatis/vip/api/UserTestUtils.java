@@ -31,33 +31,34 @@
  */
 package fr.insalyon.creatis.vip.api;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.config.http.SessionCreationPolicy;
+import fr.insalyon.creatis.devtools.MD5;
+import fr.insalyon.creatis.vip.core.client.bean.User;
+import fr.insalyon.creatis.vip.core.client.view.user.UserLevel;
 
-import static fr.insalyon.creatis.vip.api.CarminProperties.SECURITY_REALM_NAME;
+import java.io.UnsupportedEncodingException;
+import java.security.NoSuchAlgorithmException;
 
 /**
- * Created by abonnet on 7/22/16.
+ * Created by abonnet on 7/26/16.
  */
-@EnableWebSecurity
-public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
+public class UserTestUtils {
 
-    // authentication done by bean LimitigDaoAuthenticationProvider
+    static public User baseUser1;
+    static public String baseUser1Password = "baseUser1password";
 
-    @Autowired
-    private VipBasicAuthenticationEntryPoint vipBasicAuthenticationEntryPoint;
+    static {
+        baseUser1 = new User("base1", "User1", "baseuser@test.tst", null, null,
+                UserLevel.Beginner, null);
+        baseUser1.setPassword(getPassword(baseUser1Password));
+    }
 
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
-        http
-            .authorizeRequests()
-                .anyRequest().authenticated()
-            .and()
-            .httpBasic().realmName(SECURITY_REALM_NAME).authenticationEntryPoint(vipBasicAuthenticationEntryPoint)
-            .and()
-            .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+    private static String getPassword(String clearpassword) {
+        try {
+            return MD5.get(clearpassword);
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
+        } catch (UnsupportedEncodingException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

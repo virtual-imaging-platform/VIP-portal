@@ -31,33 +31,33 @@
  */
 package fr.insalyon.creatis.vip.api;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.config.http.SessionCreationPolicy;
-
-import static fr.insalyon.creatis.vip.api.CarminProperties.SECURITY_REALM_NAME;
+import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
+import fr.insalyon.creatis.vip.core.server.dao.DAOException;
+import fr.insalyon.creatis.vip.core.server.dao.mysql.PlatformConnection;
+import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
+import org.springframework.context.ApplicationListener;
+import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.stereotype.Component;
 
 /**
- * Created by abonnet on 7/22/16.
+ * Created by abonnet on 7/26/16.
  */
-@EnableWebSecurity
-public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
+@Component
+public class VipInitializer implements ApplicationListener<ContextRefreshedEvent> {
 
-    // authentication done by bean LimitigDaoAuthenticationProvider
+    public static final Logger logger = Logger.getLogger(VipInitializer.class);
 
-    @Autowired
-    private VipBasicAuthenticationEntryPoint vipBasicAuthenticationEntryPoint;
 
     @Override
-    protected void configure(HttpSecurity http) throws Exception {
-        http
-            .authorizeRequests()
-                .anyRequest().authenticated()
-            .and()
-            .httpBasic().realmName(SECURITY_REALM_NAME).authenticationEntryPoint(vipBasicAuthenticationEntryPoint)
-            .and()
-            .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+    public void onApplicationEvent(ContextRefreshedEvent event) {
+        PropertyConfigurator.configure(ConfigurationBusiness.class.getClassLoader().getResource("vipLog4j.properties"));
+        logger.info("Init VIP : setting logging and initiaizing DB");
+        // set logging properties and DB connection
+        try {
+            PlatformConnection.getInstance();
+        } catch (DAOException e) {
+            throw new RuntimeException("Cannot init VIP", e);
+        }
     }
 }

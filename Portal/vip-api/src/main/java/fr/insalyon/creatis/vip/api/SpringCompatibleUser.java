@@ -31,33 +31,60 @@
  */
 package fr.insalyon.creatis.vip.api;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.config.http.SessionCreationPolicy;
+import fr.insalyon.creatis.vip.core.client.bean.User;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
-import static fr.insalyon.creatis.vip.api.CarminProperties.SECURITY_REALM_NAME;
+import java.util.ArrayList;
+import java.util.Collection;
 
 /**
- * Created by abonnet on 7/22/16.
+ * Created by abonnet on 7/25/16.
  */
-@EnableWebSecurity
-public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
+public class SpringCompatibleUser implements UserDetails {
 
-    // authentication done by bean LimitigDaoAuthenticationProvider
+    private final User vipUser;
 
-    @Autowired
-    private VipBasicAuthenticationEntryPoint vipBasicAuthenticationEntryPoint;
+    public SpringCompatibleUser(User vipUser) {
+        this.vipUser = vipUser;
+    }
+
+    public User getVipUser() {
+        return vipUser;
+    }
 
     @Override
-    protected void configure(HttpSecurity http) throws Exception {
-        http
-            .authorizeRequests()
-                .anyRequest().authenticated()
-            .and()
-            .httpBasic().realmName(SECURITY_REALM_NAME).authenticationEntryPoint(vipBasicAuthenticationEntryPoint)
-            .and()
-            .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return new ArrayList<>(); // not used at the moment
+    }
+
+    @Override
+    public String getPassword() {
+        return vipUser.getPassword();
+    }
+
+    @Override
+    public String getUsername() {
+        return vipUser.getEmail();
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true; // not used at the moment
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return !vipUser.isAccountLocked();
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true; // not used at the moment
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true; // not used at the moment
     }
 }

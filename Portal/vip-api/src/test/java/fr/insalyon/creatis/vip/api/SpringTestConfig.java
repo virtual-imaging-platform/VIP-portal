@@ -31,33 +31,36 @@
  */
 package fr.insalyon.creatis.vip.api;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.config.http.SessionCreationPolicy;
-
-import static fr.insalyon.creatis.vip.api.CarminProperties.SECURITY_REALM_NAME;
+import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
+import fr.insalyon.creatis.vip.core.server.dao.UserDAO;
+import org.mockito.Mockito;
+import org.springframework.context.ApplicationListener;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
+import org.springframework.context.event.ContextRefreshedEvent;
 
 /**
- * Created by abonnet on 7/22/16.
+ * Created by abonnet on 7/26/16.
  */
-@EnableWebSecurity
-public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
+@Configuration
+@Import(SpringWebConfig.class)
+public class SpringTestConfig {
 
-    // authentication done by bean LimitigDaoAuthenticationProvider
-
-    @Autowired
-    private VipBasicAuthenticationEntryPoint vipBasicAuthenticationEntryPoint;
-
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
-        http
-            .authorizeRequests()
-                .anyRequest().authenticated()
-            .and()
-            .httpBasic().realmName(SECURITY_REALM_NAME).authenticationEntryPoint(vipBasicAuthenticationEntryPoint)
-            .and()
-            .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+    @Bean
+    public ApplicationListener<ContextRefreshedEvent> vipInitializer() {
+        return (ApplicationListener<ContextRefreshedEvent>)
+                Mockito.mock(ApplicationListener.class);
     }
+
+    @Bean
+    public UserDAO userDAO() {
+        return Mockito.mock(UserDAO.class);
+    }
+
+    @Bean
+    public ConfigurationBusiness configurationBusiness() {
+        return Mockito.mock(ConfigurationBusiness.class);
+    }
+
 }

@@ -37,4 +37,5 @@ package fr.insalyon.creatis.vip.api;
 public interface CarminProperties {
     String PLATFORM_NAME = "carmin.platform.name";
     String PLATFORM_DESCRIPTION = "carmin.platform.description";
+    String SECURITY_REALM_NAME = "VIP";
 }

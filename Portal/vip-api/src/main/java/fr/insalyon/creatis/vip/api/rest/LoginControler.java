@@ -55,13 +55,10 @@ public class LoginControler {
     // although the controler is a singleton, these are proxies that always point on the current request
     @Autowired
     HttpServletRequest httpServletRequest;
-    @Autowired
-    HttpServletResponse httpServletResponse;
 
     @RequestMapping("login")
     @ResponseBody
     public String login() {
-        logger.debug("user : " + httpServletRequest.getUserPrincipal().getName());
         return "SUCCESS";
     }
 
