@@ -29,37 +29,60 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL-B license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.api;
+package fr.insalyon.creatis.vip.api.rest.itest.config;
 
+import fr.insalyon.creatis.vip.api.*;
+import fr.insalyon.creatis.vip.api.bean.Module;
+import fr.insalyon.creatis.vip.api.rest.model.SupportedTransferProtocol;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.*;
 import org.springframework.core.env.Environment;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.util.Assert;
-import org.springframework.web.context.WebApplicationContext;
 
-import static fr.insalyon.creatis.vip.api.CarminProperties.PLATFORM_DESCRIPTION;
-import static fr.insalyon.creatis.vip.api.CarminProperties.PLATFORM_NAME;
+import static fr.insalyon.creatis.vip.api.CarminProperties.*;
 
 /**
  * Created by abonnet on 7/21/16.
+ *
+ * Test the the global spring configuration
+ *
+ * The less mock should be used to be as close as possible to the production
+ * environment.
+ *
  */
 @RunWith(SpringRunner.class)
 @WebAppConfiguration
-@ContextConfiguration(classes = SpringWebConfig.class)
+@ContextConfiguration
 public class SpringConfigurationITest {
 
-    @Autowired
-    private WebApplicationContext wac;
+    // Need to override vipInitializer that operate on the database
+    @Configuration
+    @Import(SpringWebConfig.class)
+    static class TestConfig {
+        @Bean
+        public VipInitializer vipInitializer() {
+            return Mockito.mock(VipInitializer.class);
+        }
+    }
+
     @Autowired
     private Environment env;
+
 
     @Test
     public void propertiesShouldBePresent() {
         Assert.notNull(env.getProperty(PLATFORM_NAME));
         Assert.notNull(env.getProperty(PLATFORM_DESCRIPTION));
+        Assert.notEmpty(env.getProperty(SUPPORTED_TRANSFER_PROTOCOLS, SupportedTransferProtocol[].class));
+        Assert.notEmpty(env.getProperty(SUPPORTED_MODULES, Module[].class));
+        Assert.notNull(env.getProperty(DEFAULT_LIMIT_LIST_EXECUTION, Long.class));
+        Assert.isInstanceOf(String[].class, env.getProperty(UNSUPPORTED_METHODS, String[].class));
+        Assert.notNull(env.getProperty(SUPPORTED_API_VERSION));
     }
 }

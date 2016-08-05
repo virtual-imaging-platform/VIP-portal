@@ -29,22 +29,11 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL-B license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.api.rest;
+package fr.insalyon.creatis.vip.api.rest.itest;
 
-import fr.insalyon.creatis.vip.api.SpringTestConfig;
-import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
-import fr.insalyon.creatis.vip.core.server.dao.UserDAO;
-import org.junit.Before;
+import fr.insalyon.creatis.vip.api.rest.RestErrorCodes;
+import fr.insalyon.creatis.vip.api.rest.itest.config.*;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.test.context.web.WebAppConfiguration;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.context.WebApplicationContext;
 
 import static fr.insalyon.creatis.vip.api.UserTestUtils.baseUser1;
 import static fr.insalyon.creatis.vip.api.UserTestUtils.baseUser1Password;
@@ -59,32 +48,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  *
  * These tests check the login authentication with the spring test tools.
  *
- * The spring test tools allow to simulate the http layer but everything else
- * is the same as production configuration
- *
- * The interaction sur VIP outside vip-api are mocked ({@link SpringTestConfig}
+ * Use common vip spring test configuration ({@link BaseVIPSpringITest}
  *
  */
-@RunWith(SpringRunner.class)
-@WebAppConfiguration
-@ContextConfiguration(classes = SpringTestConfig.class)
-public class AuthenticationITest {
+public class AuthenticationITest extends BaseVIPSpringITest {
 
-    @Autowired
-    private WebApplicationContext wac;
-    private MockMvc mockMvc;
-    @Autowired
-    private UserDAO userDAO;
-    @Autowired
-    private ConfigurationBusiness configurationBusiness;
-
-    @Before
-    public void setup() {
-        mockMvc = MockMvcBuilders
-                .webAppContextSetup(wac)
-                .apply(SecurityMockMvcConfigurers.springSecurity())
-                .build();
-    }
+    // TODO : login method may have to return 200 OK on authentication error
 
     @Test
     public void authenticationOK() throws Exception {

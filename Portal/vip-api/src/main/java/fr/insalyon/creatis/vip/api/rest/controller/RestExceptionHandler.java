@@ -29,26 +29,51 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL-B license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.api.rest;
+package fr.insalyon.creatis.vip.api.rest.controller;
 
+import fr.insalyon.creatis.vip.api.business.ApiException;
+import fr.insalyon.creatis.vip.api.rest.RestErrorCodes;
 import fr.insalyon.creatis.vip.api.rest.model.ErrorCodesAndMessage;
-import org.springframework.security.core.AuthenticationException;
-import org.springframework.web.bind.annotation.ControllerAdvice;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.apache.log4j.Logger;
+import org.springframework.core.annotation.AnnotationUtils;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.ModelAndView;
+
+import javax.servlet.http.HttpServletRequest;
 
 /**
- * Created by abonnet on 7/26/16.
+ * Created by abonnet on 7/28/16.
  */
 @ControllerAdvice
-public class SecurityExceptionHandler {
+public class RestExceptionHandler {
 
-    @ExceptionHandler(AuthenticationException.class)
+    public static final Logger logger = Logger.getLogger(RestExceptionHandler.class);
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(ApiException.class)
     @ResponseBody
-    public ErrorCodesAndMessage handleAuthenticationExceptions(AuthenticationException e) {
-        ErrorCodesAndMessage errorCodesAndMessage = new ErrorCodesAndMessage();
-        errorCodesAndMessage.setCode(40101);
-        errorCodesAndMessage.setMessage("Access denied");
-        return errorCodesAndMessage;
+    public ErrorCodesAndMessage handleApiException() {
+        return new ErrorCodesAndMessage(RestErrorCodes.API_ERROR.getCode(),
+                RestErrorCodes.API_ERROR.getMessage());
     }
+
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ExceptionHandler(value = Exception.class)
+    @ResponseBody
+    public ErrorCodesAndMessage defaultErrorHandler(HttpServletRequest req, Exception e)
+            throws Exception {
+        // If the exception is annotated with @ResponseStatus rethrow it and let
+        // the framework handle it - like the OrderNotFoundException example
+        // at the start of this post.
+        // AnnotationUtils is a Spring Framework utility class.
+        logger.info("Unexpected exception", e);
+        if (AnnotationUtils.findAnnotation
+                (e.getClass(), ResponseStatus.class) != null)
+            throw e;
+
+        return new ErrorCodesAndMessage(RestErrorCodes.UNEXPECTED_ERROR.getCode(),
+                RestErrorCodes.UNEXPECTED_ERROR.getMessage());
+    }
+
 }

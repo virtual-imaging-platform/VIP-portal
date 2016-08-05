@@ -29,71 +29,33 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL-B license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.api.rest.model;
+package fr.insalyon.creatis.vip.api.rest.controller;
 
-import javax.validation.constraints.NotNull;
+import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
+
+import javax.servlet.http.HttpServletRequest;
 
 /**
- * Created by abonnet on 7/19/16.
+ * Created by abonnet on 7/13/16.
  */
-public class PipelineParameter {
+@RestController
+@RequestMapping("/")
+public class LoginControler {
 
-    @NotNull
-    private String name;
-    @NotNull
-    private String type;
-    @NotNull
-    private Boolean isOptionnal;
-    @NotNull
-    private Boolean isReturnedValue;
-    private String defaultValue; // TODO type should be dynamic
-    private String description;
+    public static final Logger logger = Logger.getLogger(LoginControler.class);
 
-    public String getName() {
-        return name;
+    // although the controller is a singleton, these are proxies that always point on the current request
+    @Autowired
+    HttpServletRequest httpServletRequest;
+
+    @RequestMapping("login")
+    @ResponseBody
+    public String login() {
+        return "SUCCESS";
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
-    }
-
-    public Boolean getOptionnal() {
-        return isOptionnal;
-    }
-
-    public void setOptionnal(Boolean optionnal) {
-        isOptionnal = optionnal;
-    }
-
-    public Boolean getReturnedValue() {
-        return isReturnedValue;
-    }
-
-    public void setReturnedValue(Boolean returnedValue) {
-        isReturnedValue = returnedValue;
-    }
-
-    public String getDefaultValue() {
-        return defaultValue;
-    }
-
-    public void setDefaultValue(String defaultValue) {
-        this.defaultValue = defaultValue;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
 }

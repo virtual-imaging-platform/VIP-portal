@@ -31,15 +31,11 @@
  */
 package fr.insalyon.creatis.vip.api.rest;
 
-import fr.insalyon.creatis.vip.api.SpringCompatibleUser;
+import fr.insalyon.creatis.vip.api.rest.security.SpringCompatibleUser;
 import fr.insalyon.creatis.vip.api.business.ApiContext;
 import fr.insalyon.creatis.vip.api.business.ApiException;
 import fr.insalyon.creatis.vip.core.client.bean.User;
-import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
-import fr.insalyon.creatis.vip.core.server.dao.DAOException;
-import fr.insalyon.creatis.vip.core.server.dao.mysql.PlatformConnection;
 import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
 import org.springframework.security.core.Authentication;
 
 import javax.servlet.http.HttpServletRequest;
@@ -51,11 +47,9 @@ public class RestApiBusiness {
 
     private final static Logger logger = Logger.getLogger(RestApiBusiness.class);
 
-    public ApiContext getApiContext(HttpServletRequest request, boolean isAuthenticated) throws ApiException {
-        // TODO verify things done in session authentication that should be added in spring authentication
-        // IE locking support
+    public ApiContext getApiContext(HttpServletRequest request, boolean isAuthenticated) {
         User vipUser = null;
-        if (!isAuthenticated) {
+        if (isAuthenticated) {
             Authentication authentication = (Authentication) request.getUserPrincipal();
             SpringCompatibleUser springCompatibleUser =
                     (SpringCompatibleUser) authentication.getPrincipal();

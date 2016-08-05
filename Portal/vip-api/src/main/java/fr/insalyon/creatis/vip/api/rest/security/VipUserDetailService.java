@@ -29,35 +29,45 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL-B license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.api;
+package fr.insalyon.creatis.vip.api.rest.security;
 
+import fr.insalyon.creatis.vip.api.SpringWebConfig;
+import fr.insalyon.creatis.vip.core.client.bean.Group;
+import fr.insalyon.creatis.vip.core.client.bean.User;
+import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
+import fr.insalyon.creatis.vip.core.server.business.BusinessException;
+import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.stereotype.Service;
 
-import static fr.insalyon.creatis.vip.api.CarminProperties.SECURITY_REALM_NAME;
+import java.util.Map;
 
 /**
- * Created by abonnet on 7/22/16.
+ * Created by abonnet on 7/25/16.
  */
-@EnableWebSecurity
-public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
+@Service
+public class VipUserDetailService implements UserDetailsService {
 
-    // authentication done by bean LimitigDaoAuthenticationProvider
+    public static final Logger logger = Logger.getLogger(SpringWebConfig.class);
 
     @Autowired
-    private VipBasicAuthenticationEntryPoint vipBasicAuthenticationEntryPoint;
+    private ConfigurationBusiness configurationBusiness;
 
     @Override
-    protected void configure(HttpSecurity http) throws Exception {
-        http
-            .authorizeRequests()
-                .anyRequest().authenticated()
-            .and()
-            .httpBasic().realmName(SECURITY_REALM_NAME).authenticationEntryPoint(vipBasicAuthenticationEntryPoint)
-            .and()
-            .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        try {
+            User vipUser = configurationBusiness.getUser(username);
+            Map<Group, CoreConstants.GROUP_ROLE> groups = configurationBusiness.getUserGroups(username);
+            vipUser.setGroups(groups);
+            return new SpringCompatibleUser(vipUser);
+        } catch (BusinessException e) {
+            // actually it could also another BDD related error
+            logger.info("cant find user " + username);
+            throw new UsernameNotFoundException("cant find user:" + username, e);
+        }
     }
 }

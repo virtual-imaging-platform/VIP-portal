@@ -31,14 +31,16 @@
  */
 package fr.insalyon.creatis.vip.api;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import fr.insalyon.creatis.vip.api.business.PipelineBusiness;
+import fr.insalyon.creatis.vip.application.server.business.*;
 import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
 import fr.insalyon.creatis.vip.core.server.dao.CoreDAOFactory;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import fr.insalyon.creatis.vip.core.server.dao.UserDAO;
+import fr.insalyon.creatis.vip.datamanager.server.business.TransferPoolBusiness;
 import org.apache.log4j.Logger;
+import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.*;
-import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 /**
@@ -51,13 +53,10 @@ public class SpringWebConfig {
 
     public static final Logger logger = Logger.getLogger(SpringWebConfig.class);
 
-    @Bean
-    public ConfigurationBusiness configurationBusiness() {
-        return new ConfigurationBusiness();
-    }
+
 
     @Bean
-    @Scope("prototype")
+    @Scope(proxyMode = ScopedProxyMode.TARGET_CLASS, value = BeanDefinition.SCOPE_PROTOTYPE)
     public UserDAO userDAO() {
         try {
             return CoreDAOFactory.getDAOFactory().getUserDAO();
@@ -68,7 +67,32 @@ public class SpringWebConfig {
     }
 
     @Bean
-    public ObjectMapper objectMapper() {
-        return Jackson2ObjectMapperBuilder.json().build();
+    public WorkflowBusiness workflowBusiness() {
+        return new WorkflowBusiness();
+    }
+
+    @Bean
+    public ApplicationBusiness applicationBusiness() {
+        return new ApplicationBusiness();
+    }
+
+    @Bean
+    public ClassBusiness classBusiness() {
+        return  new ClassBusiness();
+    }
+
+    @Bean
+    public SimulationBusiness simulationBusiness() {
+        return new SimulationBusiness();
+    }
+
+    @Bean
+    public ConfigurationBusiness configurationBusiness() {
+        return new ConfigurationBusiness();
+    }
+
+    @Bean
+    public TransferPoolBusiness transferPoolBusiness() {
+        return new TransferPoolBusiness();
     }
 }

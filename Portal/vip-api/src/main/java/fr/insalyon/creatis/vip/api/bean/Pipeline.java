@@ -31,8 +31,10 @@
  */
 package fr.insalyon.creatis.vip.api.bean;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import fr.insalyon.creatis.vip.api.bean.pairs.IntKeyStringValuePair;
 import java.util.ArrayList;
+import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
@@ -43,19 +45,24 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlType(name = "Pipeline")
 public class Pipeline extends Object {
-    
+
     @XmlElement(name = "identifier", required=true)
     private String identifier;
+    @NotNull
     @XmlElement(name = "name", required=true)
     private String name;
     @XmlElement(name = "description")
     private String description;
+    @NotNull
     @XmlElement(name = "version")
     private String version;
+    @JsonIgnore
     @XmlElement(name = "parameters")
     ArrayList<PipelineParameter> parameters;
+    @JsonIgnore
     @XmlElement(name = "errorCodesAndMessages")
     private ArrayList<IntKeyStringValuePair> errorCodesAndMessages;
+    @NotNull
     @XmlElement(name = "canExecute")
     private boolean canExecute;
 

@@ -29,23 +29,40 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL-B license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.api.rest.model;
+package fr.insalyon.creatis.vip.api;
 
-import javax.validation.constraints.NotNull;
+import fr.insalyon.creatis.devtools.MD5;
+import fr.insalyon.creatis.vip.api.rest.security.SpringCompatibleUser;
+import fr.insalyon.creatis.vip.application.client.bean.Application;
+import fr.insalyon.creatis.vip.core.client.bean.User;
+import fr.insalyon.creatis.vip.core.client.view.user.UserLevel;
+import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
+import org.springframework.test.web.servlet.request.RequestPostProcessor;
+
+import java.io.UnsupportedEncodingException;
+import java.security.NoSuchAlgorithmException;
+import java.util.*;
+
+import static fr.insalyon.creatis.vip.api.ClassesTestUtils.class1;
+import static fr.insalyon.creatis.vip.api.ClassesTestUtils.class2;
+import static fr.insalyon.creatis.vip.api.UserTestUtils.*;
+import static fr.insalyon.creatis.vip.core.client.view.util.CountryCode.cl;
 
 /**
- * Created by abonnet on 7/18/16.
+ * Created by abonnet on 7/26/16.
  */
-public class Study extends NewStudy {
+public class ApplicationTestUtils {
 
-    @NotNull
-    private String identifier;
+    static public Application app1;
+    static public Application app2;
+    static public Application app3;
 
-    public String getIdentifier() {
-        return identifier;
-    }
-
-    public void setIdentifier(String identifier) {
-        this.identifier = identifier;
+    static {
+        app1 = new Application("application 1", new ArrayList<>(),
+                baseUser1.getEmail(), baseUser1.getFullName(), "citation application 1");
+        app2 = new Application("application 2", Arrays.asList(class1.getName()),
+                baseUser1.getEmail(), baseUser1.getFullName(), "citation application 2");
+        app3 = new Application("application 3", Arrays.asList(class1.getName(), class2.getName()),
+                baseUser2.getEmail(), baseUser2.getFullName(), "citation application 3");
     }
 }

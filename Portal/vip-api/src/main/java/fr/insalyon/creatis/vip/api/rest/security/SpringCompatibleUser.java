@@ -29,36 +29,62 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL-B license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.api;
+package fr.insalyon.creatis.vip.api.rest.security;
 
-import fr.insalyon.creatis.vip.core.server.dao.DAOException;
-import fr.insalyon.creatis.vip.core.server.dao.UserDAO;
-import org.apache.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationListener;
-import org.springframework.security.authentication.event.AuthenticationSuccessEvent;
-import org.springframework.stereotype.Component;
+import fr.insalyon.creatis.vip.core.client.bean.User;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
+import java.util.ArrayList;
+import java.util.Collection;
 
 /**
  * Created by abonnet on 7/25/16.
  */
-@Component
-public class AuthenticationEventsListener implements ApplicationListener<AuthenticationSuccessEvent> {
+public class SpringCompatibleUser implements UserDetails {
 
-    public static final Logger logger = Logger.getLogger(AuthenticationEventsListener.class);
+    private final User vipUser;
 
-    @Autowired
-    private UserDAO userDAO;
-
-    @Override
-    public void onApplicationEvent(AuthenticationSuccessEvent event) {
-        try {
-            String username = event.getAuthentication().getName();
-            logger.info("successful logging for " + username);
-            userDAO.resetNFailedAuthentications(username);
-        } catch (DAOException e) {
-            logger.error("Error reseting failed auth attemps ", e);
-        }
+    public SpringCompatibleUser(User vipUser) {
+        this.vipUser = vipUser;
     }
 
+    public User getVipUser() {
+        return vipUser;
+    }
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return new ArrayList<>(); // not used at the moment
+    }
+
+    @Override
+    public String getPassword() {
+        return vipUser.getPassword();
+    }
+
+    @Override
+    public String getUsername() {
+        return vipUser.getEmail();
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true; // not used at the moment
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return !vipUser.isAccountLocked();
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true; // not used at the moment
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true; // not used at the moment
+    }
 }

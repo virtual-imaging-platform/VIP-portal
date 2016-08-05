@@ -29,41 +29,22 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL-B license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.api.rest;
+package fr.insalyon.creatis.vip.api.bean;
 
-import fr.insalyon.creatis.vip.api.CarminProperties;
-import fr.insalyon.creatis.vip.api.rest.model.PlatformProperties;
-import org.apache.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import javax.xml.bind.annotation.adapters.XmlAdapter;
 
 /**
- * Created by abonnet on 7/13/16.
+ * Created by abonnet on 8/4/16.
  */
-@RestController
-@RequestMapping("/platform")
-public class PlatformControler {
+public class ModuleXmlAdapter extends XmlAdapter<String,Module> {
 
-    public static final Logger logger = Logger.getLogger(PlatformControler.class);
-
-    @Autowired
-    private Environment env;
-
-    // although the controler is a singleton, these are proxies that always point on the current request
-    @Autowired
-    HttpServletRequest httpServletRequest;
-
-    @RequestMapping
-    public PlatformProperties getPlatformProperties() {
-        PlatformProperties platformProperties = new PlatformProperties();
-        platformProperties.setPlatformName(env.getProperty(CarminProperties.PLATFORM_NAME));
-        platformProperties.setPlatformDescription(env.getProperty(CarminProperties.PLATFORM_DESCRIPTION));
-        return platformProperties;
+    @Override
+    public Module unmarshal(String v) throws Exception {
+        return Module.fromLabel(v);
     }
 
+    @Override
+    public String marshal(Module module) throws Exception {
+        return module.getLabel();
+    }
 }

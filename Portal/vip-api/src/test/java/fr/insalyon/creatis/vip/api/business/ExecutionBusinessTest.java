@@ -58,7 +58,7 @@ public class ExecutionBusinessTest {
     public void checkIfAdminCanAccessAnyExecution() throws Exception {
         ApiContext apiContext = new ApiContext(null, null, prepareTestUser(0, true));
         WorkflowBusiness mockedWb = prepareMockedWorkflowBusiness(EXEC_ID, new Simulation());
-        ExecutionBusiness sut = new ExecutionBusiness(apiContext, null, mockedWb, null, null, null);
+        ExecutionBusiness sut = new ExecutionBusiness(apiContext, null, mockedWb, null, null, null, null);
         sut.checkIfUserCanAccessExecution(EXEC_ID);
     }
 
@@ -67,7 +67,7 @@ public class ExecutionBusinessTest {
         ApiContext apiContext = new ApiContext(null, null, prepareTestUser(0, false));
         Simulation simulation = prepareSimulation(EXEC_ID, 1); // choose a different user
         WorkflowBusiness mockedWb = prepareMockedWorkflowBusiness(EXEC_ID, simulation);
-        ExecutionBusiness sut = new ExecutionBusiness(apiContext, null, mockedWb, null, null, null);
+        ExecutionBusiness sut = new ExecutionBusiness(apiContext, null, mockedWb, null, null, null, null);
         exception.expect(ApiException.class);
         exception.expectMessage("Permission denied");
         sut.checkIfUserCanAccessExecution(EXEC_ID);
@@ -78,7 +78,7 @@ public class ExecutionBusinessTest {
         ApiContext apiContext = new ApiContext(null, null, prepareTestUser(0, false));
         Simulation simulation = prepareSimulation(EXEC_ID, 0); // the creator of the execution is the same user
         WorkflowBusiness mockedWb = prepareMockedWorkflowBusiness(EXEC_ID, simulation);
-        ExecutionBusiness sut = new ExecutionBusiness(apiContext, null, mockedWb, null, null, null);
+        ExecutionBusiness sut = new ExecutionBusiness(apiContext, null, mockedWb, null, null, null, null);
         sut.checkIfUserCanAccessExecution(EXEC_ID);
     }
 

@@ -29,39 +29,36 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL-B license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.api;
+package fr.insalyon.creatis.vip.api.rest.security;
 
-import fr.insalyon.creatis.devtools.MD5;
+import fr.insalyon.creatis.vip.core.server.dao.DAOException;
+import fr.insalyon.creatis.vip.core.server.dao.UserDAO;
 import org.apache.log4j.Logger;
-import org.springframework.security.authentication.encoding.PasswordEncoder;
-import org.springframework.stereotype.Service;
-
-import java.io.UnsupportedEncodingException;
-import java.security.NoSuchAlgorithmException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationListener;
+import org.springframework.security.authentication.event.AuthenticationSuccessEvent;
+import org.springframework.stereotype.Component;
 
 /**
- * Created by abonnet on 7/26/16.
+ * Created by abonnet on 7/25/16.
  */
-@Service
-public class MD5PasswordEncoder implements PasswordEncoder {
+@Component
+public class AuthenticationEventsListener implements ApplicationListener<AuthenticationSuccessEvent> {
 
-    public static final Logger logger = Logger.getLogger(LimitingDaoAuthenticationProvider.class);
+    public static final Logger logger = Logger.getLogger(AuthenticationEventsListener.class);
+
+    @Autowired
+    private UserDAO userDAO;
 
     @Override
-    public String encodePassword(String rawPass, Object salt) {
+    public void onApplicationEvent(AuthenticationSuccessEvent event) {
         try {
-            return MD5.get(rawPass);
-        } catch (NoSuchAlgorithmException e) {
-            logger.error("Error encoding password", e);
-            throw new RuntimeException(e);
-        } catch (UnsupportedEncodingException e) {
-            logger.error("Error encoding password", e);
-            throw new RuntimeException(e);
+            String username = event.getAuthentication().getName();
+            logger.info("successful logging for " + username);
+            userDAO.resetNFailedAuthentications(username);
+        } catch (DAOException e) {
+            logger.error("Error reseting failed auth attemps ", e);
         }
     }
 
-    @Override
-    public boolean isPasswordValid(String encPass, String rawPass, Object salt) {
-        return encodePassword(rawPass, salt).equals(encPass);
-    }
 }

@@ -31,10 +31,26 @@
  */
 package fr.insalyon.creatis.vip.api;
 
+import fr.insalyon.creatis.vip.api.bean.Module;
+import fr.insalyon.creatis.vip.api.rest.model.SupportedTransferProtocol;
+
+import static fr.insalyon.creatis.vip.api.bean.Module.*;
+import static fr.insalyon.creatis.vip.api.rest.model.SupportedTransferProtocol.*;
+
 /**
  * Created by abonnet on 7/21/16.
  */
 public interface CarminAPITestConstants {
     String TEST_PLATFORM_NAME = "TestPlatform";
     String TEST_PLATFORM_DESCRIPTION = "Test Platform description";
+    String TEST_DEFAULT_LIST_LIMIT = "42";
+    String TEST_SUPPORTED_API_VERSION = "Version 4.2";
+
+    /* WARNING : keep following properties consistant */
+    SupportedTransferProtocol[] TEST_SUPPORTED_PROTOCOLS = {HTTP, WEBDAV};
+    String TEST_SUPPORTED_TRANSFER_PROTOCOLS_STRING = "HTTP,WEBDAV";
+    Module[] TEST_SUPPORTED_MODULES = {DATA, COMMERCIAL};
+    String TEST_SUPPORTED_MODULES_STRING = "COMMERCIAL,DATA";
+    String[] TEST_UNSUPPORTED_METHOD = {"method1", "method2"};
+    String TEST_UNSUPPORTED_METHODS_STRING = "method1,method2";
 }

@@ -36,9 +36,13 @@ package fr.insalyon.creatis.vip.api.rest;
  */
 public enum RestErrorCodes {
 
+    API_ERROR(40001, "An error has been encountered on the API"),
+
     BAD_CREDENTIALS(40101),
     INSUFFICIENT_AUTH(40102),
-    AUTHENTICATION_ERROR(40103)
+    AUTHENTICATION_ERROR(40103)                                      ,
+
+    UNEXPECTED_ERROR(50001, "An unexpected error has been encountered")
     ;
 
     RestErrorCodes(Integer code) {

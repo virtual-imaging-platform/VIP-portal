@@ -29,37 +29,55 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL-B license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.api.rest;
+package fr.insalyon.creatis.vip.api.rest.controller;
 
+import fr.insalyon.creatis.vip.api.bean.Pipeline;
 import fr.insalyon.creatis.vip.api.business.*;
-import fr.insalyon.creatis.vip.core.client.bean.User;
+import fr.insalyon.creatis.vip.api.rest.RestApiBusiness;
+import fr.insalyon.creatis.vip.api.rest.model.*;
+import fr.insalyon.creatis.vip.application.server.business.*;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.core.env.Environment;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import java.util.List;
 
 /**
- * Created by abonnet on 7/13/16.
+ * Created by abonnet on 7/28/16.
  */
 @RestController
-@RequestMapping("/")
-public class LoginControler {
+@RequestMapping("pipelines")
+public class PipelineController {
 
-    public static final Logger logger = Logger.getLogger(LoginControler.class);
+    public static final Logger logger = Logger.getLogger(PipelineController.class);
 
-    // although the controler is a singleton, these are proxies that always point on the current request
+    @Autowired
+    private WorkflowBusiness workflowBusiness;
+    @Autowired
+    private ApplicationBusiness applicationBusiness;
+    @Autowired
+    private ClassBusiness classBusiness;
+
+    // although the controller is a singleton, this is a proxy that always point on the current request
     @Autowired
     HttpServletRequest httpServletRequest;
 
-    @RequestMapping("login")
-    @ResponseBody
-    public String login() {
-        return "SUCCESS";
+    @RequestMapping
+    public Pipeline[] listPipelines(@RequestParam(required = false) String studyIdentifier) throws ApiException {
+        ApiUtils.methodInvocationLog("listPipelines");
+        ApiContext apiContext = new RestApiBusiness().getApiContext(httpServletRequest, true);
+        PipelineBusiness pb = new PipelineBusiness(apiContext, workflowBusiness, applicationBusiness, classBusiness);
+        return pb.listPipelines(studyIdentifier);
     }
 
+    @RequestMapping("{pipelineId}")
+    public Pipeline getPipeline(@PathVariable String pipelineId) throws ApiException {
+        ApiUtils.methodInvocationLog("getPipeline", pipelineId);
+        ApiContext apiContext = new RestApiBusiness().getApiContext(httpServletRequest, true);
+        PipelineBusiness pb = new PipelineBusiness(apiContext, workflowBusiness, applicationBusiness, classBusiness);
+        pb.checkIfUserCanAccessPipeline(pipelineId);
+        return pb.getPipeline(pipelineId);
+    }
 }

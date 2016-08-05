@@ -29,17 +29,39 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL-B license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.api;
+package fr.insalyon.creatis.vip.api.rest.security;
+
+import fr.insalyon.creatis.devtools.MD5;
+import org.apache.log4j.Logger;
+import org.springframework.security.authentication.encoding.PasswordEncoder;
+import org.springframework.stereotype.Service;
+
+import java.io.UnsupportedEncodingException;
+import java.security.NoSuchAlgorithmException;
 
 /**
- * Created by abonnet on 7/21/16.
+ * Created by abonnet on 7/26/16.
  */
-public interface CarminProperties {
-    String PLATFORM_NAME = "carmin.platform.name";
-    String PLATFORM_DESCRIPTION = "carmin.platform.description";
-    String SUPPORTED_TRANSFER_PROTOCOLS = "carmin.platform.supported_transfer_protocols";
-    String SUPPORTED_MODULES = "carmin.platform.supported_modules";
-    String DEFAULT_LIMIT_LIST_EXECUTION = "carmin.platform.default_limit_list_execution";
-    String UNSUPPORTED_METHODS = "carmin.platform.unsupported_methods";
-    String SUPPORTED_API_VERSION = "carmin.platform.supportedAPIVersion";
+@Service
+public class MD5PasswordEncoder implements PasswordEncoder {
+
+    public static final Logger logger = Logger.getLogger(LimitingDaoAuthenticationProvider.class);
+
+    @Override
+    public String encodePassword(String rawPass, Object salt) {
+        try {
+            return MD5.get(rawPass);
+        } catch (NoSuchAlgorithmException e) {
+            logger.error("Error encoding password", e);
+            throw new RuntimeException(e);
+        } catch (UnsupportedEncodingException e) {
+            logger.error("Error encoding password", e);
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public boolean isPasswordValid(String encPass, String rawPass, Object salt) {
+        return encodePassword(rawPass, salt).equals(encPass);
+    }
 }

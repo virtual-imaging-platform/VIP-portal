@@ -31,60 +31,18 @@
  */
 package fr.insalyon.creatis.vip.api;
 
-import fr.insalyon.creatis.vip.core.client.bean.User;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
-
-import java.util.ArrayList;
-import java.util.Collection;
+import fr.insalyon.creatis.vip.api.bean.Pipeline;
+import fr.insalyon.creatis.vip.api.business.ApiUtils;
+import fr.insalyon.creatis.vip.application.client.bean.*;
 
 /**
- * Created by abonnet on 7/25/16.
+ * Created by abonnet on 8/3/16.
  */
-public class SpringCompatibleUser implements UserDetails {
+public class PipelineTestUtils {
 
-    private final User vipUser;
-
-    public SpringCompatibleUser(User vipUser) {
-        this.vipUser = vipUser;
+    public static Pipeline getPipeline(Application app, AppVersion version) {
+        return new Pipeline(ApiUtils.getPipelineIdentifier(app.getName(), version.getVersion()),
+                app.getName(), version.getVersion(), true);
     }
 
-    public User getVipUser() {
-        return vipUser;
-    }
-
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return new ArrayList<>(); // not used at the moment
-    }
-
-    @Override
-    public String getPassword() {
-        return vipUser.getPassword();
-    }
-
-    @Override
-    public String getUsername() {
-        return vipUser.getEmail();
-    }
-
-    @Override
-    public boolean isAccountNonExpired() {
-        return true; // not used at the moment
-    }
-
-    @Override
-    public boolean isAccountNonLocked() {
-        return !vipUser.isAccountLocked();
-    }
-
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return true; // not used at the moment
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return true; // not used at the moment
-    }
 }

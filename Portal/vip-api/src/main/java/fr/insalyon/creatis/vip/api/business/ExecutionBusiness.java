@@ -32,36 +32,19 @@
 package fr.insalyon.creatis.vip.api.business;
 
 import fr.insalyon.creatis.moteur.plugins.workflowsdb.bean.Workflow;
-import fr.insalyon.creatis.moteur.plugins.workflowsdb.dao.WorkflowDAO;
-import fr.insalyon.creatis.moteur.plugins.workflowsdb.dao.WorkflowsDBDAOException;
-import fr.insalyon.creatis.moteur.plugins.workflowsdb.dao.WorkflowsDBDAOFactory;
-import fr.insalyon.creatis.vip.api.bean.Execution;
-import fr.insalyon.creatis.vip.api.bean.Execution.ExecutionStatus;
-import fr.insalyon.creatis.vip.api.bean.ParameterTypedValue;
-import fr.insalyon.creatis.vip.api.bean.Pipeline;
-import fr.insalyon.creatis.vip.api.bean.PipelineParameter;
-import fr.insalyon.creatis.vip.api.bean.pairs.StringKeyParameterValuePair;
-import fr.insalyon.creatis.vip.api.bean.pairs.StringKeyValuePair;
-import fr.insalyon.creatis.vip.application.client.bean.InOutData;
-import fr.insalyon.creatis.vip.application.client.bean.Simulation;
+import fr.insalyon.creatis.moteur.plugins.workflowsdb.dao.*;
+import fr.insalyon.creatis.vip.api.bean.*;
+import fr.insalyon.creatis.vip.api.bean.pairs.*;
+import fr.insalyon.creatis.vip.application.client.bean.*;
 import fr.insalyon.creatis.vip.application.client.view.monitor.SimulationStatus;
-import fr.insalyon.creatis.vip.application.server.business.ApplicationBusiness;
-import fr.insalyon.creatis.vip.application.server.business.ClassBusiness;
-import fr.insalyon.creatis.vip.application.server.business.SimulationBusiness;
-import fr.insalyon.creatis.vip.application.server.business.WorkflowBusiness;
-import fr.insalyon.creatis.vip.core.client.bean.Group;
-import fr.insalyon.creatis.vip.core.client.bean.User;
-import fr.insalyon.creatis.vip.core.server.business.BusinessException;
-import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
+import fr.insalyon.creatis.vip.application.server.business.*;
+import fr.insalyon.creatis.vip.core.client.bean.*;
+import fr.insalyon.creatis.vip.core.server.business.*;
 import fr.insalyon.creatis.vip.datamanager.server.business.TransferPoolBusiness;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import java.net.*;
+import java.util.*;
+import java.util.logging.*;
 
 /**
  *
@@ -77,6 +60,7 @@ public class ExecutionBusiness {
     private final PipelineBusiness pipelineBusiness;
     private final ConfigurationBusiness configurationBusiness;
     private final ApplicationBusiness applicationBusiness;
+    private final TransferPoolBusiness transferPoolBusiness;
 
 
     public ExecutionBusiness(ApiContext apiContext) {
@@ -87,6 +71,7 @@ public class ExecutionBusiness {
         this.workflowBusiness = workflowBusiness;
         this.configurationBusiness = new ConfigurationBusiness();
         this.applicationBusiness = applicationBusiness;
+        this.transferPoolBusiness = new TransferPoolBusiness();
         this.pipelineBusiness = new PipelineBusiness(apiContext, workflowBusiness, applicationBusiness, new ClassBusiness());
     }
 
@@ -95,13 +80,15 @@ public class ExecutionBusiness {
                              WorkflowBusiness workflowBusiness,
                              ConfigurationBusiness configurationBusiness,
                              ApplicationBusiness applicationBusiness,
-                             PipelineBusiness pipelineBusiness) {
+                             PipelineBusiness pipelineBusiness,
+                             TransferPoolBusiness transferPoolBusiness) {
         this.apiContext = apiContext;
         this.simulationBusiness = simulationBusiness;
         this.workflowBusiness = workflowBusiness;
         this.configurationBusiness = configurationBusiness;
         this.applicationBusiness = applicationBusiness;
         this.pipelineBusiness = pipelineBusiness;
+        this.transferPoolBusiness = transferPoolBusiness;
     }
 
     public String getStdOut(String executionId) throws ApiException {
@@ -168,7 +155,7 @@ public class ExecutionBusiness {
                 e.getReturnedFiles().add(skpv);
             }
 
-            if (!(e.getStatus() == Execution.ExecutionStatus.Finished) && !(e.getStatus() == Execution.ExecutionStatus.Killed) && e.getReturnedFiles().isEmpty()) {
+            if (!(e.getStatus() == ExecutionStatus.FINISHED) && !(e.getStatus() == ExecutionStatus.KILLED) && e.getReturnedFiles().isEmpty()) {
                 e.clearReturnedFiles();
             }
 
@@ -370,11 +357,10 @@ public class ExecutionBusiness {
 
             ArrayList<String> urls = new ArrayList<>();
 
-            TransferPoolBusiness tpb = new TransferPoolBusiness();
             List<InOutData> outputs = workflowBusiness.getOutputData(executionId, apiContext.getUser().getFolder());
             for (InOutData output : outputs) {
 
-                String operationId = tpb.downloadFile(apiContext.getUser(), output.getPath());
+                String operationId = transferPoolBusiness.downloadFile(apiContext.getUser(), output.getPath());
 
                 String url = apiContext.getRequest().getRequestURL() + "/../fr.insalyon.creatis.vip.portal.Main/filedownloadservice?operationid=" + operationId;
                 URL u = new URL(url); // just to check that it is a well-formed URL
@@ -393,19 +379,19 @@ public class ExecutionBusiness {
 
         switch (s) {
             case Running:
-                return ExecutionStatus.Running;
+                return ExecutionStatus.RUNNING;
             case Completed:
-                return ExecutionStatus.Finished;
+                return ExecutionStatus.FINISHED;
             case Killed:
-                return ExecutionStatus.Killed;
+                return ExecutionStatus.KILLED;
             case Cleaned:
-                return ExecutionStatus.Unknown;
+                return ExecutionStatus.UNKOWN;
             case Queued:
-                return ExecutionStatus.Ready;
+                return ExecutionStatus.READY;
             case Unknown:
-                return ExecutionStatus.Unknown;
+                return ExecutionStatus.UNKOWN;
             default:
-                return ExecutionStatus.Unknown;
+                return ExecutionStatus.UNKOWN;
         }
     }
 

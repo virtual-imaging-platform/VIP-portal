@@ -31,6 +31,8 @@
  */
 package fr.insalyon.creatis.vip.api.rest.model;
 
+import fr.insalyon.creatis.vip.api.bean.Module;
+
 import javax.validation.constraints.NotNull;
 import java.util.List;
 
@@ -45,9 +47,9 @@ public class PlatformProperties {
     @NotNull
     private List<SupportedTransferProtocol> supportedTransferProtocols;
     @NotNull
-    private List<SupportedModule> supportedModules;
+    private List<Module> supportedModules;
     @NotNull
-    private Long defaultLimitsListExecutions;
+    private Long defaultLimitListExecutions;
     private String email;
     private String platformDescription;
     private Long minAuthorizedExecutionTimeout;
@@ -58,7 +60,7 @@ public class PlatformProperties {
     private String defaultStudy;
     private Boolean isKillExecutionSupported;
     @NotNull
-    private String supportedApiVersion;
+    private String supportedAPIVersion;
 
     public String getPlatformName() {
         return platformName;
@@ -84,20 +86,20 @@ public class PlatformProperties {
         this.supportedTransferProtocols = supportedTransferProtocols;
     }
 
-    public List<SupportedModule> getSupportedModules() {
+    public List<Module> getSupportedModules() {
         return supportedModules;
     }
 
-    public void setSupportedModules(List<SupportedModule> supportedModules) {
+    public void setSupportedModules(List<Module> supportedModules) {
         this.supportedModules = supportedModules;
     }
 
-    public Long getDefaultLimitsListExecutions() {
-        return defaultLimitsListExecutions;
+    public Long getDefaultLimitListExecutions() {
+        return defaultLimitListExecutions;
     }
 
-    public void setDefaultLimitsListExecutions(Long defaultLimitsListExecutions) {
-        this.defaultLimitsListExecutions = defaultLimitsListExecutions;
+    public void setDefaultLimitListExecutions(Long defaultLimitListExecutions) {
+        this.defaultLimitListExecutions = defaultLimitListExecutions;
     }
 
     public String getEmail() {
@@ -164,11 +166,11 @@ public class PlatformProperties {
         isKillExecutionSupported = killExecutionSupported;
     }
 
-    public String getSupportedApiVersion() {
-        return supportedApiVersion;
+    public String getSupportedAPIVersion() {
+        return supportedAPIVersion;
     }
 
-    public void setSupportedApiVersion(String supportedApiVersion) {
-        this.supportedApiVersion = supportedApiVersion;
+    public void setSupportedAPIVersion(String supportedAPIVersion) {
+        this.supportedAPIVersion = supportedAPIVersion;
     }
 }

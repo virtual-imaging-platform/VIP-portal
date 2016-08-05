@@ -29,24 +29,23 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL-B license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.api;
+package fr.insalyon.creatis.vip.api.rest.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.insalyon.creatis.vip.api.rest.RestErrorCodes;
 import fr.insalyon.creatis.vip.api.rest.model.ErrorCodesAndMessage;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.InsufficientAuthenticationException;
+import org.springframework.core.env.Environment;
+import org.springframework.security.authentication.*;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.*;
 import java.io.IOException;
 
-import static fr.insalyon.creatis.vip.api.CarminProperties.SECURITY_REALM_NAME;
+import static fr.insalyon.creatis.vip.api.CarminProperties.PLATFORM_NAME;
 
 /**
  * Created by abonnet on 7/26/16.
@@ -57,9 +56,13 @@ public class VipBasicAuthenticationEntryPoint implements AuthenticationEntryPoin
     @Autowired
     private ObjectMapper objectMapper;
 
+    @Autowired
+    private Environment environment;
+
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
-        response.addHeader("WWW-Authenticate", "Basic realm=\"" + SECURITY_REALM_NAME + "\"");
+        response.addHeader("WWW-Authenticate", "Basic realm=\""
+                + environment.getProperty(PLATFORM_NAME) + "\"");
         response.setContentType("application/json;charset=UTF-8");
         ErrorCodesAndMessage error = new ErrorCodesAndMessage();
         if (authException instanceof BadCredentialsException) {

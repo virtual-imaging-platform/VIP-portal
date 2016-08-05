@@ -29,35 +29,56 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL-B license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.api.rest.model;
+package fr.insalyon.creatis.vip.api.rest.itest.config;
 
-import com.fasterxml.jackson.annotation.JsonValue;
+import fr.insalyon.creatis.vip.api.SpringWebConfig;
+import fr.insalyon.creatis.vip.application.server.business.*;
+import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
+import fr.insalyon.creatis.vip.core.server.dao.UserDAO;
+import org.mockito.Mockito;
+import org.springframework.context.ApplicationListener;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Import;
+import org.springframework.context.event.ContextRefreshedEvent;
 
 /**
- * Created by abonnet on 7/19/16.
+ * Created by abonnet on 7/26/16.
+ *
+ * Spring test config that mock bean that interacts with vip outside vip-api
+ * Should not be annotated with @Configuration or other to avoid it
+ * being package scanned and automatically taken in account.
  */
-public enum SupportedModule {
+@Import(SpringWebConfig.class)
+public class SpringTestConfig {
 
-    PROCESSING("Processing"),
-    DATA("Data"),
-    MANAGEMENT("Management"),
-    COMMERCIAL("Commercial");
-
-    private String value;
-
-    SupportedModule(String value) {
-        this.value = value;
+    @Bean
+    public ApplicationListener<ContextRefreshedEvent> vipInitializer() {
+        return (ApplicationListener<ContextRefreshedEvent>)
+                Mockito.mock(ApplicationListener.class);
     }
 
-    public static SupportedModule forValue(String value) {
-        for (SupportedModule module : values()) {
-            if (module.value.equals(value)) { return module; }
-        }
-        throw new IllegalArgumentException("Unknown value for SupportedModuel : " + value);
+    @Bean
+    public UserDAO userDAO() {
+        return Mockito.mock(UserDAO.class);
     }
 
-    @JsonValue
-    public String getValue() {
-        return value;
+    @Bean
+    public ConfigurationBusiness configurationBusiness() {
+        return Mockito.mock(ConfigurationBusiness.class);
+    }
+
+    @Bean
+    public WorkflowBusiness workflowBusiness() {
+        return Mockito.mock(WorkflowBusiness.class);
+    }
+
+    @Bean
+    public ApplicationBusiness applicationBusiness() {
+        return Mockito.mock(ApplicationBusiness.class);
+    }
+
+    @Bean
+    public ClassBusiness classBusiness() {
+        return Mockito.mock(ClassBusiness.class);
     }
 }

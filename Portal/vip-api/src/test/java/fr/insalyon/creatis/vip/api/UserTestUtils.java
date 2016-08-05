@@ -32,8 +32,11 @@
 package fr.insalyon.creatis.vip.api;
 
 import fr.insalyon.creatis.devtools.MD5;
+import fr.insalyon.creatis.vip.api.rest.security.SpringCompatibleUser;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.user.UserLevel;
+import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
+import org.springframework.test.web.servlet.request.RequestPostProcessor;
 
 import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
@@ -44,21 +47,28 @@ import java.security.NoSuchAlgorithmException;
 public class UserTestUtils {
 
     static public User baseUser1;
+    static public User baseUser2;
     static public String baseUser1Password = "baseUser1password";
+    static public String baseUser2Password = "baseUser2password";
 
     static {
-        baseUser1 = new User("base1", "User1", "baseuser@test.tst", null, null,
+        baseUser1 = new User("base1", "User1", "baseuser1@test.tst", null, null,
                 UserLevel.Beginner, null);
         baseUser1.setPassword(getPassword(baseUser1Password));
+        baseUser2 = new User("base2", "User2", "baseuser2@test.tst", null, null,
+                UserLevel.Advanced, null);
+        baseUser2.setPassword(getPassword(baseUser2Password));
     }
 
     private static String getPassword(String clearpassword) {
         try {
             return MD5.get(clearpassword);
-        } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException(e);
-        } catch (UnsupportedEncodingException e) {
+        } catch (NoSuchAlgorithmException | UnsupportedEncodingException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public static RequestPostProcessor baseUser1() {
+        return SecurityMockMvcRequestPostProcessors.user(new SpringCompatibleUser(baseUser1));
     }
 }

@@ -29,58 +29,76 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL-B license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.api.rest;
+package fr.insalyon.creatis.vip.api.rest.itest.config;
 
-import fr.insalyon.creatis.vip.api.CarminAPITestConstants;
-import fr.insalyon.creatis.vip.api.SpringWebConfig;
+import fr.insalyon.creatis.vip.application.server.business.*;
+import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
+import fr.insalyon.creatis.vip.core.server.dao.UserDAO;
 import org.junit.Before;
-import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.TestPropertySource;
+import org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers;
+import org.springframework.test.context.*;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
-import static fr.insalyon.creatis.vip.api.CarminProperties.PLATFORM_DESCRIPTION;
-import static fr.insalyon.creatis.vip.api.CarminProperties.PLATFORM_NAME;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static fr.insalyon.creatis.vip.api.CarminAPITestConstants.*;
+import static fr.insalyon.creatis.vip.api.CarminProperties.*;
 
 /**
- * Created by abonnet on 7/20/16.
+ * Created by abonnet on 7/28/16.
+ *
+ * Base test config that allow spring integration testing for vip API
+ *
+ * The spring test tools allow to simulate the http layer but everything else
+ * is the same as production configuration
+ *
+ * To authenticate, tests should either
+ * * login via wirth(httpbasic(user, password)
+ * * use {@link WithMockUser} annotation
+ *
+ * The interaction with VIP outside vip-api are mocked (see {@link SpringTestConfig} )
  */
 @RunWith(SpringRunner.class)
 @WebAppConfiguration
-@ContextConfiguration(classes = SpringWebConfig.class)
+@ContextConfiguration(classes = SpringTestConfig.class)
 @TestPropertySource(properties = {
-        PLATFORM_NAME + "=" + CarminAPITestConstants.TEST_PLATFORM_NAME,
-        PLATFORM_DESCRIPTION + "=" + CarminAPITestConstants.TEST_PLATFORM_DESCRIPTION
+        PLATFORM_NAME + "=" + TEST_PLATFORM_NAME,
+        PLATFORM_DESCRIPTION + "=" + TEST_PLATFORM_DESCRIPTION,
+        SUPPORTED_TRANSFER_PROTOCOLS + "=" + TEST_SUPPORTED_TRANSFER_PROTOCOLS_STRING,
+        SUPPORTED_MODULES + "=" + TEST_SUPPORTED_MODULES_STRING,
+        DEFAULT_LIMIT_LIST_EXECUTION + "=" + TEST_DEFAULT_LIST_LIMIT,
+        UNSUPPORTED_METHODS + "=" + TEST_UNSUPPORTED_METHODS_STRING,
+        SUPPORTED_API_VERSION + "=" + TEST_SUPPORTED_API_VERSION
 })
-public class PlatformControllerITest {
+abstract public class BaseVIPSpringITest {
 
     @Autowired
-    private WebApplicationContext wac;
-    private MockMvc mockMvc;
+    protected WebApplicationContext wac;
+    protected MockMvc mockMvc;
+    @Autowired
+    protected UserDAO userDAO;
+    @Autowired
+    protected ConfigurationBusiness configurationBusiness;
+    @Autowired
+    protected WorkflowBusiness workflowBusiness;
+    @Autowired
+    protected ApplicationBusiness applicationBusiness;
+    @Autowired
+    protected ClassBusiness classBusiness;
 
     @Before
-    public void setup() {
-        mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
-    }
-
-    @Test
-    @WithMockUser
-    public void testPlatformProperties() throws Exception {
-        mockMvc.perform(get("/platform"))
-                .andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(RestTestUtils.JSON_CONTENT_TYPE_UTF8))
-                .andExpect(jsonPath("$.platformName").value(CarminAPITestConstants.TEST_PLATFORM_NAME))
-                .andExpect(jsonPath("$.platformDescription").value(CarminAPITestConstants.TEST_PLATFORM_DESCRIPTION));
+    public final void setup() {
+        mockMvc = MockMvcBuilders
+                .webAppContextSetup(wac)
+                .apply(SecurityMockMvcConfigurers.springSecurity())
+                .build();
+        Mockito.reset(userDAO, configurationBusiness, workflowBusiness, applicationBusiness,
+                classBusiness);
     }
 }

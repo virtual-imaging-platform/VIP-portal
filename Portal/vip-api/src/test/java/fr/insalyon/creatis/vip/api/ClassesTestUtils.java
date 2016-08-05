@@ -29,11 +29,32 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL-B license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.api.rest;
+package fr.insalyon.creatis.vip.api;
+
+import fr.insalyon.creatis.devtools.MD5;
+import fr.insalyon.creatis.vip.api.rest.security.SpringCompatibleUser;
+import fr.insalyon.creatis.vip.application.client.bean.AppClass;
+import fr.insalyon.creatis.vip.core.client.bean.User;
+import fr.insalyon.creatis.vip.core.client.view.user.UserLevel;
+import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
+import org.springframework.test.web.servlet.request.RequestPostProcessor;
+
+import java.io.UnsupportedEncodingException;
+import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+
+import static fr.insalyon.creatis.vip.api.UserTestUtils.*;
 
 /**
- * Created by abonnet on 7/21/16.
+ * Created by abonnet on 7/26/16.
  */
-public class RestTestUtils {
-    public static final String JSON_CONTENT_TYPE_UTF8 ="application/json;charset=UTF-8";
+public class ClassesTestUtils {
+
+    static public AppClass class1;
+    static public AppClass class2;
+
+    static {
+        class1 = new AppClass("classe 1", new ArrayList<>());
+        class2 = new AppClass("classe 2", new ArrayList<>());
+    }
 }

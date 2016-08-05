@@ -31,22 +31,15 @@
  */
 package fr.insalyon.creatis.vip.api.soap;
 
-import fr.insalyon.creatis.vip.api.bean.Execution;
-import fr.insalyon.creatis.vip.api.bean.Execution.ExecutionStatus;
-import fr.insalyon.creatis.vip.api.bean.GlobalProperties;
-import fr.insalyon.creatis.vip.api.bean.Pipeline;
-import fr.insalyon.creatis.vip.api.bean.pairs.StringKeyParameterValuePair;
-import fr.insalyon.creatis.vip.api.bean.pairs.StringKeyValuePair;
-import fr.insalyon.creatis.vip.api.bean.Response;
+import fr.insalyon.creatis.vip.api.bean.*;
+import fr.insalyon.creatis.vip.api.bean.pairs.*;
 import fr.insalyon.creatis.vip.api.business.*;
 
-import java.util.ArrayList;
 import javax.annotation.Resource;
-import javax.jws.WebService;
-import javax.jws.WebMethod;
-import javax.jws.WebParam;
+import javax.jws.*;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.ws.WebServiceContext;
+import java.util.ArrayList;
 
 /**
  *

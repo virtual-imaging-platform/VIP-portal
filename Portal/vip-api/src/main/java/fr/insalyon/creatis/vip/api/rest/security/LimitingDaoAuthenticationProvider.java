@@ -29,7 +29,7 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL-B license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.api;
+package fr.insalyon.creatis.vip.api.rest.security;
 
 import fr.insalyon.creatis.vip.core.server.dao.UserDAO;
 import org.apache.log4j.Logger;

@@ -31,42 +31,27 @@
  */
 package fr.insalyon.creatis.vip.api;
 
-import fr.insalyon.creatis.vip.core.client.bean.Group;
-import fr.insalyon.creatis.vip.core.client.bean.User;
-import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
-import fr.insalyon.creatis.vip.core.server.business.BusinessException;
-import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
-import org.apache.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.stereotype.Service;
-
-import java.util.Map;
+import fr.insalyon.creatis.vip.application.client.bean.*;
 
 /**
- * Created by abonnet on 7/25/16.
+ * Created by abonnet on 7/29/16.
  */
-@Service
-public class VipUserDetailService implements UserDetailsService {
+public class AppVersionTestUtils {
 
-    public static final Logger logger = Logger.getLogger(SpringWebConfig.class);
+    static final public AppVersion version42;
+    static final public AppVersion version01;
 
-    @Autowired
-    private ConfigurationBusiness configurationBusiness;
+    static {
+        version42 = new AppVersion("application (TOCHANGE)", "4.2", "lfn????", true);
+        version01 = new AppVersion("application (TOCHANGE)", "0.1", "lfn????", true);
+    }
 
-    @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        try {
-            User vipUser = configurationBusiness.getUser(username);
-            Map<Group, CoreConstants.GROUP_ROLE> groups = configurationBusiness.getUserGroups(username);
-            vipUser.setGroups(groups);
-            return new SpringCompatibleUser(vipUser);
-        } catch (BusinessException e) {
-            // actually it could also another BDD related error
-            logger.info("cant find user " + username);
-            throw new UsernameNotFoundException("cant find user:" + username, e);
-        }
+    static public AppVersion getVersion(AppVersion base, Application app) {
+        return new AppVersion(
+                app.getName(),
+                base.getVersion(),
+                base.getLfn(),
+                base.isVisible()
+        );
     }
 }

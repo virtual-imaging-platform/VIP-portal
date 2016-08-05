@@ -41,6 +41,17 @@ public class ErrorCodesAndMessage {
     @NotNull private Integer code;
     @NotNull private String message;
 
+    public ErrorCodesAndMessage() {}
+
+    public ErrorCodesAndMessage(Integer code) {
+        this.code = code;
+    }
+
+    public ErrorCodesAndMessage(Integer code, String message) {
+        this.code = code;
+        this.message = message;
+    }
+
     public Integer getCode() {
         return code;
     }

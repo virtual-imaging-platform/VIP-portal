@@ -29,61 +29,22 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL-B license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.api.rest.model;
+package fr.insalyon.creatis.vip.api.bean;
 
-import javax.validation.constraints.NotNull;
+import javax.xml.bind.annotation.adapters.XmlAdapter;
 
 /**
- * Created by abonnet on 7/19/16.
+ * Created by abonnet on 8/4/16.
  */
-public class Execution {
+public class ExecutionStatusXmlAdapter extends XmlAdapter<String,ExecutionStatus> {
 
-    @NotNull
-    private String executionId;
-    private String name;
-    @NotNull
-    private String pipelineIdentifier;
-    private String pipelineName;
-    @NotNull
-    private ExecutionStatus status;
-
-    public String getExecutionId() {
-        return executionId;
+    @Override
+    public ExecutionStatus unmarshal(String v) throws Exception {
+        return ExecutionStatus.fromSoapLabel(v);
     }
 
-    public void setExecutionId(String executionId) {
-        this.executionId = executionId;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getPipelineIdentifier() {
-        return pipelineIdentifier;
-    }
-
-    public void setPipelineIdentifier(String pipelineIdentifier) {
-        this.pipelineIdentifier = pipelineIdentifier;
-    }
-
-    public String getPipelineName() {
-        return pipelineName;
-    }
-
-    public void setPipelineName(String pipelineName) {
-        this.pipelineName = pipelineName;
-    }
-
-    public ExecutionStatus getStatus() {
-        return status;
-    }
-
-    public void setStatus(ExecutionStatus status) {
-        this.status = status;
+    @Override
+    public String marshal(ExecutionStatus executionStatus) throws Exception {
+        return executionStatus.getSoapLabel();
     }
 }

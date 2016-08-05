@@ -31,11 +31,10 @@
  */
 package fr.insalyon.creatis.vip.api.rest.model;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonValue;
+import com.fasterxml.jackson.annotation.*;
 
 /**
- * Created by abonnet on 7/19/16.
+ * Created by abonnet on 8/5/16.
  */
 public enum SupportedTransferProtocol {
 

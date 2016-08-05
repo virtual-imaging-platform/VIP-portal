@@ -29,38 +29,11 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL-B license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.api;
-
-import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
-import fr.insalyon.creatis.vip.core.server.dao.UserDAO;
-import org.mockito.Mockito;
-import org.springframework.context.ApplicationListener;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
-import org.springframework.context.event.ContextRefreshedEvent;
+package fr.insalyon.creatis.vip.api.rest.itest.config;
 
 /**
- * Created by abonnet on 7/26/16.
+ * Created by abonnet on 7/21/16.
  */
-@Configuration
-@Import(SpringWebConfig.class)
-public class SpringTestConfig {
-
-    @Bean
-    public ApplicationListener<ContextRefreshedEvent> vipInitializer() {
-        return (ApplicationListener<ContextRefreshedEvent>)
-                Mockito.mock(ApplicationListener.class);
-    }
-
-    @Bean
-    public UserDAO userDAO() {
-        return Mockito.mock(UserDAO.class);
-    }
-
-    @Bean
-    public ConfigurationBusiness configurationBusiness() {
-        return Mockito.mock(ConfigurationBusiness.class);
-    }
-
+public class RestTestUtils {
+    public static final String JSON_CONTENT_TYPE_UTF8 ="application/json;charset=UTF-8";
 }

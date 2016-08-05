@@ -29,13 +29,14 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL-B license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.api.rest;
+package fr.insalyon.creatis.vip.api.rest.controller;
 
 import fr.insalyon.creatis.vip.api.bean.Execution;
-import fr.insalyon.creatis.vip.api.business.ApiContext;
-import fr.insalyon.creatis.vip.api.business.ApiException;
-import fr.insalyon.creatis.vip.api.business.ApiUtils;
-import fr.insalyon.creatis.vip.api.business.ExecutionBusiness;
+import fr.insalyon.creatis.vip.api.business.*;
+import fr.insalyon.creatis.vip.api.rest.RestApiBusiness;
+import fr.insalyon.creatis.vip.application.server.business.*;
+import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
+import fr.insalyon.creatis.vip.datamanager.server.business.TransferPoolBusiness;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -49,24 +50,44 @@ import javax.servlet.http.HttpServletRequest;
  * Created by abonnet on 7/13/16.
  */
 @RestController
-@RequestMapping("/execution")
+@RequestMapping("/executions")
 public class ExecutionControler {
 
     public static final Logger logger = Logger.getLogger(ExecutionControler.class);
 
-    // although the controler is a singleton, these are proxies that always point on the current request
+    @Autowired
+    private WorkflowBusiness workflowBusiness;
+    @Autowired
+    private ApplicationBusiness applicationBusiness;
+    @Autowired
+    private ClassBusiness classBusiness;
+    @Autowired
+    private SimulationBusiness simulationBusiness;
+    @Autowired
+    private ConfigurationBusiness configurationBusiness;
+    @Autowired
+    private TransferPoolBusiness transferPoolBusiness;
+
+    // although the controller is a singleton, these are proxies that always point on the current request
     @Autowired
     HttpServletRequest httpServletRequest;
 
+    private ExecutionBusiness buildExecutionBusiness(ApiContext apiContext) {
+        PipelineBusiness pipelineBusiness = new PipelineBusiness(apiContext, workflowBusiness,
+                applicationBusiness, classBusiness);
+        return new ExecutionBusiness(apiContext,
+                simulationBusiness, workflowBusiness, configurationBusiness, applicationBusiness,
+                pipelineBusiness, transferPoolBusiness);
+    }
+
     @RequestMapping("/{executionId}")
     @ResponseBody
-    public void getExecution(@PathVariable String executionId) throws ApiException {
+    public Execution getExecution(@PathVariable String executionId) throws ApiException {
         ApiUtils.methodInvocationLog("getExecution", executionId);
-        ApiUtils.throwIfNull(executionId, "Execution id");
         ApiContext apiContext = new RestApiBusiness().getApiContext(httpServletRequest, true);
         ExecutionBusiness eb = new ExecutionBusiness(apiContext);
         eb.checkIfUserCanAccessExecution(executionId);
-        Execution e = eb.getExecution(executionId,false);
+        return eb.getExecution(executionId,false);
     }
 
 }
