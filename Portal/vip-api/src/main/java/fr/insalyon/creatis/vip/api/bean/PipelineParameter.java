@@ -31,8 +31,10 @@
  */
 package fr.insalyon.creatis.vip.api.bean;
 
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlType;
+import com.fasterxml.jackson.annotation.*;
+
+import javax.xml.bind.annotation.*;
+import java.lang.*;
 
 /**
  *
@@ -50,18 +52,23 @@ public class PipelineParameter {
     @XmlElement(name = "isReturnedValue", required = true)
     private Boolean isReturnedValue;
     @XmlElement(name = "defaultValue")
+    @JsonIgnore
     private ParameterTypedValue defaultValue;
+    @XmlTransient
+    @JsonProperty("defaultValue")
+    private java.lang.Object restDefaultValue;
     @XmlElement(name = "description")
     private String description;
 
     public PipelineParameter(){}
     
-    public PipelineParameter(String name, ParameterType type, Boolean isOptional, Boolean isReturnedValue, ParameterTypedValue defaultValue, String description) {
+    public PipelineParameter(String name, ParameterType type, Boolean isOptional, Boolean isReturnedValue, ParameterTypedValue defaultValue, java.lang.Object restDefaultValue, String description) {
         this.name = name;
         this.type = type;
         this.isOptional = isOptional;
         this.isReturnedValue = isReturnedValue;
         this.defaultValue = defaultValue;
+        this.restDefaultValue = restDefaultValue;
         this.description = description;
     }
 
@@ -88,6 +95,16 @@ public class PipelineParameter {
     public String getDescription() {
         return description;
     }
-    
-    
+
+    public Boolean getOptional() {
+        return isOptional;
+    }
+
+    public Boolean getReturnedValue() {
+        return isReturnedValue;
+    }
+
+    public java.lang.Object getRestDefaultValue() {
+        return restDefaultValue;
+    }
 }

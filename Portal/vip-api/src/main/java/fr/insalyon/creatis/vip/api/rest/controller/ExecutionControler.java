@@ -34,17 +34,18 @@ package fr.insalyon.creatis.vip.api.rest.controller;
 import fr.insalyon.creatis.vip.api.bean.Execution;
 import fr.insalyon.creatis.vip.api.business.*;
 import fr.insalyon.creatis.vip.api.rest.RestApiBusiness;
+import fr.insalyon.creatis.vip.api.rest.model.DeleteExecutionConfiguration;
 import fr.insalyon.creatis.vip.application.server.business.*;
 import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
 import fr.insalyon.creatis.vip.datamanager.server.business.TransferPoolBusiness;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
+
+import static jdk.nashorn.internal.runtime.regexp.joni.constants.StackType.POS;
 
 /**
  * Created by abonnet on 7/13/16.
@@ -72,22 +73,101 @@ public class ExecutionControler {
     @Autowired
     HttpServletRequest httpServletRequest;
 
+    private PipelineBusiness buildPipelineBusiness(ApiContext apiContext) {
+        return new PipelineBusiness(apiContext,
+                workflowBusiness, applicationBusiness, classBusiness);
+    }
+
+
     private ExecutionBusiness buildExecutionBusiness(ApiContext apiContext) {
-        PipelineBusiness pipelineBusiness = new PipelineBusiness(apiContext, workflowBusiness,
+        return buildExecutionBusiness(apiContext, null);
+    }
+
+    private ExecutionBusiness buildExecutionBusiness(ApiContext apiContext,
+                                                     PipelineBusiness pipelineBusiness) {
+        if (pipelineBusiness == null) {pipelineBusiness = new PipelineBusiness(apiContext, workflowBusiness,
                 applicationBusiness, classBusiness);
+        }
         return new ExecutionBusiness(apiContext,
                 simulationBusiness, workflowBusiness, configurationBusiness, applicationBusiness,
                 pipelineBusiness, transferPoolBusiness);
     }
 
     @RequestMapping("/{executionId}")
-    @ResponseBody
     public Execution getExecution(@PathVariable String executionId) throws ApiException {
         ApiUtils.methodInvocationLog("getExecution", executionId);
         ApiContext apiContext = new RestApiBusiness().getApiContext(httpServletRequest, true);
-        ExecutionBusiness eb = new ExecutionBusiness(apiContext);
+        ExecutionBusiness eb = buildExecutionBusiness(apiContext);
         eb.checkIfUserCanAccessExecution(executionId);
         return eb.getExecution(executionId,false);
     }
 
+    @RequestMapping(value = "/{executionId}", method = RequestMethod.PUT)
+    public Execution updateExecution(@PathVariable String executionId,
+                                     @RequestBody @Valid Execution execution) throws ApiException {
+        ApiUtils.methodInvocationLog("updateExecution", executionId);
+        execution.setIdentifier(executionId);
+        ApiContext apiContext = new RestApiBusiness().getApiContext(httpServletRequest, true);
+        ExecutionBusiness eb = buildExecutionBusiness(apiContext);
+        eb.checkIfUserCanAccessExecution(executionId);
+        eb.updateExecution(execution);
+        return eb.getExecution(executionId,false);
+    }
+
+    @RequestMapping(method = RequestMethod.POST)
+    public Execution initExecution(@RequestBody @Valid Execution execution) throws ApiException {
+        ApiUtils.methodInvocationLog("initExecution", execution);
+        ApiContext apiContext = new RestApiBusiness().getApiContext(httpServletRequest, true);
+        PipelineBusiness pb = buildPipelineBusiness(apiContext);
+        pb.checkIfUserCanAccessPipeline(execution.getPipelineIdentifier());
+        ExecutionBusiness executionBusiness = buildExecutionBusiness(apiContext, pb);
+        String execId = executionBusiness.initExecution(execution);
+        return executionBusiness.getExecution(execId,false);
+    }
+
+    @RequestMapping("/{executionId}/stdout")
+    public String getStdout(@PathVariable String executionId) throws ApiException {
+        ApiUtils.methodInvocationLog("getStdout", executionId);
+        ApiContext apiContext = new RestApiBusiness().getApiContext(httpServletRequest, true);
+        ExecutionBusiness eb = buildExecutionBusiness(apiContext);
+        eb.checkIfUserCanAccessExecution(executionId);
+        return eb.getStdOut(executionId);
+    }
+
+    @RequestMapping("/{executionId}/stderr")
+    public String getStderr(@PathVariable String executionId) throws ApiException {
+        ApiUtils.methodInvocationLog("getStderr", executionId);
+        ApiContext apiContext = new RestApiBusiness().getApiContext(httpServletRequest, true);
+        ExecutionBusiness eb = buildExecutionBusiness(apiContext);
+        eb.checkIfUserCanAccessExecution(executionId);
+        return eb.getStdErr(executionId);
+    }
+
+    @RequestMapping(value = "/{executionId}/play", method = RequestMethod.PUT)
+    public void playExecution(@PathVariable String executionId) throws ApiException {
+        ApiUtils.methodInvocationLog("playExecution", executionId);
+        ApiContext apiContext = new RestApiBusiness().getApiContext(httpServletRequest, true);
+        ExecutionBusiness eb = buildExecutionBusiness(apiContext);
+        eb.checkIfUserCanAccessExecution(executionId);
+        eb.playExecution(executionId);
+    }
+
+    @RequestMapping(value = "/{executionId}/kill", method = RequestMethod.PUT)
+    public void killExecution(@PathVariable String executionId) throws ApiException {
+        ApiUtils.methodInvocationLog("killExecution", executionId);
+        ApiContext apiContext = new RestApiBusiness().getApiContext(httpServletRequest, true);
+        ExecutionBusiness eb = buildExecutionBusiness(apiContext);
+        eb.checkIfUserCanAccessExecution(executionId);
+        eb.killExecution(executionId);
+    }
+
+    @RequestMapping(value = "/{executionId}/delete", method = RequestMethod.PUT)
+    public void deleteExecution(@PathVariable String executionId,
+                                @RequestBody @Valid DeleteExecutionConfiguration delConfig) throws ApiException {
+        ApiUtils.methodInvocationLog("deleteExecution", executionId);
+        ApiContext apiContext = new RestApiBusiness().getApiContext(httpServletRequest, true);
+        ExecutionBusiness eb = buildExecutionBusiness(apiContext);
+        eb.checkIfUserCanAccessExecution(executionId);
+        eb.deleteExecution(executionId, delConfig.getDeleteFiles());
+    }
 }

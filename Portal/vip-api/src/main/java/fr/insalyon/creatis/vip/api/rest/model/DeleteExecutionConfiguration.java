@@ -31,10 +31,13 @@
  */
 package fr.insalyon.creatis.vip.api.rest.model;
 
+import javax.validation.constraints.NotNull;
+
 /**
  * Created by abonnet on 7/19/16.
  */
-public class DelConfig {
+public class DeleteExecutionConfiguration {
+    @NotNull
     private Boolean deleteFiles;
 
     public Boolean getDeleteFiles() {

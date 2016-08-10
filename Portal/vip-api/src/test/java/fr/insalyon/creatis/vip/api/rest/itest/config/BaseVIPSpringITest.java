@@ -34,10 +34,12 @@ package fr.insalyon.creatis.vip.api.rest.itest.config;
 import fr.insalyon.creatis.vip.application.server.business.*;
 import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
 import fr.insalyon.creatis.vip.core.server.dao.UserDAO;
+import org.apache.commons.io.IOUtils;
 import org.junit.Before;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.*;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers;
 import org.springframework.test.context.*;
@@ -45,7 +47,11 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.util.FileCopyUtils;
 import org.springframework.web.context.WebApplicationContext;
+
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 
 import static fr.insalyon.creatis.vip.api.CarminAPITestConstants.*;
 import static fr.insalyon.creatis.vip.api.CarminProperties.*;
@@ -82,6 +88,8 @@ abstract public class BaseVIPSpringITest {
     protected WebApplicationContext wac;
     protected MockMvc mockMvc;
     @Autowired
+    protected ResourceLoader resourceLoader;
+    @Autowired
     protected UserDAO userDAO;
     @Autowired
     protected ConfigurationBusiness configurationBusiness;
@@ -100,5 +108,10 @@ abstract public class BaseVIPSpringITest {
                 .build();
         Mockito.reset(userDAO, configurationBusiness, workflowBusiness, applicationBusiness,
                 classBusiness);
+    }
+
+    protected String getResourceAsString(String pathFromClasspath) throws IOException {
+        Resource resource = resourceLoader.getResource("classpath:"+pathFromClasspath);
+        return IOUtils.toString(resource.getInputStream(), StandardCharsets.UTF_8);
     }
 }

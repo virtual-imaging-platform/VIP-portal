@@ -92,6 +92,7 @@ public class PipelineBusiness {
                                                              s.isOptional(),
                                                              false,
                                                              defaultValue,
+                                                             s.getDefaultValue(),
                                                              s.getDescription());
                 p.getParameters().add(pp);
             }

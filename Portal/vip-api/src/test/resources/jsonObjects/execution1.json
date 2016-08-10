@@ -1,0 +1,10 @@
+{
+  "name" : "execution test 1",
+  "pipelineIdentifier" : "identifier test",
+  "version" : "version test",
+  "inputValues" : {
+    "paramString" : "texte test",
+    "paramInt" : 42,
+    "paramDouble" : 42.42
+  }
+}

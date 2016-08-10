@@ -34,15 +34,40 @@ package fr.insalyon.creatis.vip.api;
 import fr.insalyon.creatis.vip.api.bean.Pipeline;
 import fr.insalyon.creatis.vip.api.business.ApiUtils;
 import fr.insalyon.creatis.vip.application.client.bean.*;
+import org.hamcrest.Matcher;
+
+import java.nio.channels.Pipe;
+import java.util.*;
+import java.util.function.*;
 
 /**
  * Created by abonnet on 8/3/16.
  */
 public class PipelineTestUtils {
 
+    public static final Map<String,Function<Pipeline,?>> descriptors;
+
+    static {
+        descriptors = getPipelineSuppliers();
+    }
+
     public static Pipeline getPipeline(Application app, AppVersion version) {
         return new Pipeline(ApiUtils.getPipelineIdentifier(app.getName(), version.getVersion()),
                 app.getName(), version.getVersion(), true);
     }
 
+    public static Map<String,Function<Pipeline,?>> getPipelineSuppliers() {
+        return MapHasSamePropertyAs.formatSuppliers(
+                Arrays.asList("identifier", "name", "version", "description", "canExecute", "parameters"),
+                Pipeline::getIdentifier,
+                Pipeline::getName,
+                Pipeline::getVersion,
+                Pipeline::getDescription,
+                Pipeline::canExecute,
+                Pipeline::getParameters);
+    }
+
+    public static Matcher<Map<String,?>> mapCorrespondsToPipeline(Pipeline pipeline) {
+           return MapHasSamePropertyAs.mapHasSamePropertyAs(pipeline, descriptors);
+    }
 }

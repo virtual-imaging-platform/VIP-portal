@@ -48,21 +48,17 @@ public class Pipeline extends Object {
 
     @XmlElement(name = "identifier", required=true)
     private String identifier;
-    @NotNull
     @XmlElement(name = "name", required=true)
     private String name;
     @XmlElement(name = "description")
     private String description;
-    @NotNull
     @XmlElement(name = "version")
     private String version;
-    @JsonIgnore
     @XmlElement(name = "parameters")
-    ArrayList<PipelineParameter> parameters;
+    private ArrayList<PipelineParameter> parameters;
     @JsonIgnore
     @XmlElement(name = "errorCodesAndMessages")
     private ArrayList<IntKeyStringValuePair> errorCodesAndMessages;
-    @NotNull
     @XmlElement(name = "canExecute")
     private boolean canExecute;
 
@@ -110,5 +106,9 @@ public class Pipeline extends Object {
     public boolean canExecute(){
         return canExecute;
     }
-   
+
+    // need getter style to be formated to json
+    public boolean isCanExecute() {
+        return canExecute;
+    }
 }

@@ -34,6 +34,7 @@ package fr.insalyon.creatis.vip.api.rest.itest.config;
 import fr.insalyon.creatis.vip.api.*;
 import fr.insalyon.creatis.vip.api.bean.Module;
 import fr.insalyon.creatis.vip.api.rest.model.SupportedTransferProtocol;
+import fr.insalyon.creatis.vip.application.server.business.WorkflowBusiness;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
@@ -68,6 +69,11 @@ public class SpringConfigurationITest {
         @Bean
         public VipInitializer vipInitializer() {
             return Mockito.mock(VipInitializer.class);
+        }
+
+        @Bean
+        public WorkflowBusiness workflowBusiness() {
+            return Mockito.mock(WorkflowBusiness.class);
         }
     }
 

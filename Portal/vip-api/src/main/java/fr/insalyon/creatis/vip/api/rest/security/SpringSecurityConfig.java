@@ -58,7 +58,9 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
             .and()
             .httpBasic().authenticationEntryPoint(vipBasicAuthenticationEntryPoint)
             .and()
-            .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+            .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+            .and()
+            .csrf().disable();
     }
 
 

@@ -42,9 +42,14 @@ import fr.insalyon.creatis.vip.core.client.bean.*;
 import fr.insalyon.creatis.vip.core.server.business.*;
 import fr.insalyon.creatis.vip.datamanager.server.business.TransferPoolBusiness;
 
+import java.lang.Object;
 import java.net.*;
 import java.util.*;
+import java.util.Map.Entry;
 import java.util.logging.*;
+
+import static fr.insalyon.creatis.vip.core.client.view.util.CountryCode.pm;
+import static fr.insalyon.creatis.vip.core.client.view.util.CountryCode.re;
 
 /**
  *
@@ -145,6 +150,7 @@ public class ExecutionBusiness {
                 StringKeyParameterValuePair skpv = new StringKeyParameterValuePair(iod.getProcessor(), value);
                 logger.info("Adding input " + skpv.toString());
                 e.getInputValues().add(skpv);
+                e.getRestInputValues().put(iod.getProcessor(), iod.getPath());
             }
 
             // Outputs
@@ -199,6 +205,22 @@ public class ExecutionBusiness {
         }
     }
 
+    public void updateExecution(Execution execution) throws ApiException {
+        try {
+            WorkflowDAO wd = WorkflowsDBDAOFactory.getInstance().getWorkflowDAO();
+            Workflow w = wd.get(execution.getIdentifier());
+            if (execution.getTimeout() > 0) {
+                throw new ApiException("Update of execution timeout is not supported.");
+            }
+            logger.info("updating execution "+ execution.getIdentifier()
+                    +" name to " + execution.getName());
+            w.setDescription(execution.getName());
+            wd.update(w);
+        } catch (WorkflowsDBDAOException ex) {
+            Logger.getLogger(ExecutionBusiness.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
     public void updateExecution(String executionId, ArrayList<StringKeyValuePair> values) throws ApiException {
         try {
             WorkflowDAO wd = WorkflowsDBDAOFactory.getInstance().getWorkflowDAO();
@@ -221,8 +243,34 @@ public class ExecutionBusiness {
         }
     }
 
+
+    public String initExecution(Execution execution) throws ApiException {
+        Map<String, String> inputMap = new HashMap<>();
+        for (Entry<String,Object> restInput : execution.getRestInputValues().entrySet()) {
+            inputMap.put(restInput.getKey(), restInput.getValue().toString());
+        }
+        return initExecution(execution.getPipelineIdentifier(), inputMap, execution.getTimeout(),
+                execution.getName(), execution.getStudyIdentifier(), true);
+    }
+
+
     public String initExecution(String pipelineId,
                                 ArrayList<StringKeyParameterValuePair> inputValues,
+                                Integer timeoutInSeconds,
+                                String executionName,
+                                String studyId,
+                                Boolean playExecution) throws ApiException {// Build input parameter map
+        Map<String, String> inputMap = new HashMap<>();
+        for (StringKeyParameterValuePair skpvp : inputValues) {
+            logger.info("Adding value " + skpvp.getValue().getValue() + " to input " + skpvp.getName());
+            inputMap.put(skpvp.getName(), skpvp.getValue().getValue());
+        }
+        return initExecution(pipelineId, inputMap, timeoutInSeconds, executionName, studyId,
+                playExecution);
+    }
+
+    public String initExecution(String pipelineId,
+                                Map<String,String> inputValues,
                                 Integer timeoutInSeconds,
                                 String executionName,
                                 String studyId,
@@ -239,13 +287,6 @@ public class ExecutionBusiness {
                 apiContext.getWarnings().add("Timeout value (" + timeoutInSeconds.toString() + ") was ignored.");
             }
 
-            // Build input parameter map
-            Map<String, String> pm = new HashMap<>();
-            for (StringKeyParameterValuePair skpvp : inputValues) {
-                logger.info("Adding value " + skpvp.getValue().getValue() + " to input " + skpvp.getName());
-                pm.put(skpvp.getName(), skpvp.getValue().getValue());
-            }
-
             // Check that all pipeline inputs are present
             Pipeline p = pipelineBusiness.getPipeline(pipelineId);
             for (PipelineParameter pp : p.getParameters()) {
@@ -253,17 +294,17 @@ public class ExecutionBusiness {
                     continue;
                 }
                 // pp is an input
-                if (!(pm.get(pp.getName()) == null)) {
+                if (!(inputValues.get(pp.getName()) == null)) {
                     continue;
                 }
                 // pp is an empty input
                 if (pp.getDefaultValue() != null) {
-                    pm.put(pp.getName(), pp.getDefaultValue().getValue());
+                    inputValues.put(pp.getName(), pp.getDefaultValue().getValue());
                     continue;
                 }
                 // pp is an empty input with no default value
                 if (pp.isOptional()) {
-                    pm.put("no", pp.getDefaultValue().getValue());//that's how optional values are handled in VIP
+                    inputValues.put("no", pp.getDefaultValue().getValue());//that's how optional values are handled in VIP
                     continue;
                 }
                 // pp is an empty input with no default value and it is not optional
@@ -289,7 +330,7 @@ public class ExecutionBusiness {
             logger.info("Launching workflow with the following parameters: ");
             logger.info(apiContext.getUser());
             logger.info(groupNames);
-            logger.info(pm);
+            logger.info(inputValues);
             logger.info(applicationName);
             logger.info(applicationVersion);
             logger.info(classes.get(0));
@@ -298,7 +339,7 @@ public class ExecutionBusiness {
             // Launch the workflow
             String executionId = workflowBusiness.launch(apiContext.getUser(),
                                            groupNames,
-                                           pm,
+                                           inputValues,
                                            applicationName,
                                            applicationVersion,
                                            classes.get(0),

@@ -34,7 +34,7 @@ package fr.insalyon.creatis.vip.api.bean;
 import com.fasterxml.jackson.annotation.*;
 import fr.insalyon.creatis.vip.api.bean.pairs.StringKeyParameterValuePair;
 
-import java.util.ArrayList;
+import java.util.*;
 import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.*;
 
@@ -46,7 +46,7 @@ import javax.xml.bind.annotation.*;
 public class Execution extends Object {
 
     // mandatory arguments
-    @NotNull
+    // mandatory in output, not in output
     @XmlElement(name = "identifier", required=true)
     private String identifier;
     @NotNull
@@ -58,10 +58,15 @@ public class Execution extends Object {
     @XmlElement(name = "timeout")
     private int timeout;
     @XmlElement(name = "status", required = true)
+    // mandatory in output, not in output
     private ExecutionStatus status;
     @XmlElement(name = "inputValue", required = true)
     @JsonIgnore
     private ArrayList<StringKeyParameterValuePair> inputValues; // TODO minOccur shouldn't be 0;
+    @JsonProperty("inputValues")
+    @NotNull
+    @XmlTransient
+    private Map<String, java.lang.Object> restInputValues;
     @XmlElement(name = "returnedFile")
     @JsonIgnore
     private ArrayList<StringKeyParameterValuePair> returnedFiles;
@@ -80,6 +85,7 @@ public class Execution extends Object {
     public Execution() {
         inputValues = new ArrayList<>();
         returnedFiles = new ArrayList<>();
+        restInputValues = new HashMap<>();
     }
 
     public Execution(String identifier,
@@ -149,6 +155,14 @@ public class Execution extends Object {
 
     public void setInputValues(ArrayList<StringKeyParameterValuePair> inputValues) {
         this.inputValues = inputValues;
+    }
+
+    public Map<String, java.lang.Object> getRestInputValues() {
+        return restInputValues;
+    }
+
+    public void setRestInputValues(Map<String, java.lang.Object> restInputValues) {
+        this.restInputValues = restInputValues;
     }
 
     public ArrayList<StringKeyParameterValuePair> getReturnedFiles() {

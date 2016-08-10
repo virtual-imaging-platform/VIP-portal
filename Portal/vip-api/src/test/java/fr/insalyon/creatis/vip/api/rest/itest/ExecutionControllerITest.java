@@ -33,24 +33,24 @@ package fr.insalyon.creatis.vip.api.rest.itest;
 
 import fr.insalyon.creatis.vip.api.rest.itest.config.*;
 import org.junit.Test;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.util.ResourceUtils;
 
-import java.util.*;
+import java.util.Arrays;
 
-import static com.hp.hpl.jena.util.iterator.Filter.any;
 import static fr.insalyon.creatis.vip.api.AppVersionTestUtils.*;
-import static fr.insalyon.creatis.vip.api.AppVersionTestUtils.version42;
 import static fr.insalyon.creatis.vip.api.ApplicationTestUtils.*;
-import static fr.insalyon.creatis.vip.api.ClassesTestUtils.class1;
-import static fr.insalyon.creatis.vip.api.ClassesTestUtils.class2;
+import static fr.insalyon.creatis.vip.api.ClassesTestUtils.*;
 import static fr.insalyon.creatis.vip.api.PipelineTestUtils.*;
-import static fr.insalyon.creatis.vip.api.UserTestUtils.*;
-import static fr.insalyon.creatis.vip.api.MapHasSamePropertyAs.*;
-import static java.util.Collections.*;
-import static net.jcores.CoreKeeper.$;
+import static fr.insalyon.creatis.vip.api.UserTestUtils.baseUser1;
+import static java.util.Collections.singletonList;
 import static org.hamcrest.Matchers.*;
-import static org.mockito.Matchers.*;
+import static org.mockito.Matchers.anyBoolean;
+import static org.mockito.Matchers.anyListOf;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -59,35 +59,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  *
  * Test method on platform path
  */
-public class PipelineControllerITest extends BaseVIPSpringITest {
+public class ExecutionControllerITest extends BaseVIPSpringITest {
 
     @Test
-    public void pipelineMethodShouldBeSecured() throws Exception {
-        mockMvc.perform(get("/pipelines"))
-                .andExpect(status().isUnauthorized());
-    }
-
-    @Test
-    public void shouldReturnPipelines() throws Exception {
-        when(classBusiness.getUserClasses(eq(baseUser1.getEmail()), anyBoolean()))
-                .thenReturn(Arrays.asList(class1, class2));
-        when(applicationBusiness.getApplications(anyListOf(String.class)))
-                .thenReturn(Arrays.asList(app1, app2, app3));
-        when(applicationBusiness.getVersions(app1.getName()))
-                .thenReturn(singletonList(getVersion(version42, app1)));
-        when(applicationBusiness.getVersions(app2.getName()))
-                .thenReturn(singletonList(getVersion(version01, app2)));
-        when(applicationBusiness.getVersions(app3.getName()))
-                .thenReturn(Arrays.asList(getVersion(version42, app3), getVersion(version01, app3)));
-        mockMvc.perform(get("/pipelines").with(baseUser1()))
+    @WithMockUser
+    public void testInitExecution() throws Exception {
+        mockMvc.perform(post("/executions").contentType("application/json")
+                            .content(getResourceAsString("jsonObjects/execution1.json")))
                 .andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(RestTestUtils.JSON_CONTENT_TYPE_UTF8))
-                .andExpect(jsonPath("$[*]", hasSize(4)))
-                .andExpect(jsonPath("$[*]", containsInAnyOrder(
-                        mapCorrespondsToPipeline(getPipeline(app1, version42)),
-                        mapCorrespondsToPipeline(getPipeline(app2, version01)),
-                        mapCorrespondsToPipeline(getPipeline(app3, version01)),
-                        mapCorrespondsToPipeline(getPipeline(app3, version42)))));
+                .andExpect(status().isOk());
     }
 }
