@@ -37,6 +37,7 @@ import java.util.*;
 import java.util.Map.Entry;
 import java.util.function.Function;
 
+import static org.bouncycastle.asn1.x500.style.RFC4519Style.o;
 import static org.hamcrest.Matchers.*;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.springframework.util.ClassUtils.isPrimitiveOrWrapper;
@@ -50,16 +51,23 @@ import static org.springframework.util.ClassUtils.isPrimitiveOrWrapper;
 public class MapHasSamePropertyAs<T> extends TypeSafeDiagnosingMatcher<Map<String,?>> {
 
     private final T expectedBean;
-    private final List<PropertyMatcher> propertyMatchers;
+    private final List<PropertyMatcher<T>> propertyMatchers;
+
 
     public MapHasSamePropertyAs(T expectedBean,
                                 Map<String, Function<T,?>> suppliers) {
+        this(expectedBean, suppliers, null);
+    }
+
+    public MapHasSamePropertyAs(T expectedBean,
+                                Map<String, Function<T,?>> suppliers,
+                                Map<Class<?>,Map<String,Function<Object,?>>> suppliersRegistry) {
         super(Map.class);
         this.expectedBean = expectedBean;
         propertyMatchers = new ArrayList<>(suppliers.size());
         for (Entry<String,Function<T,?>> supplierEntry : suppliers.entrySet()) {
-            propertyMatchers.add(new PropertyMatcher(expectedBean,
-                    supplierEntry.getKey(), supplierEntry.getValue()));
+            propertyMatchers.add(new PropertyMatcher<T>(expectedBean,
+                    supplierEntry.getKey(), supplierEntry.getValue(), suppliersRegistry));
         }
     }
 
@@ -85,7 +93,9 @@ public class MapHasSamePropertyAs<T> extends TypeSafeDiagnosingMatcher<Map<Strin
         private final Matcher<?> matcher;
         private final String key;
 
-        public PropertyMatcher(T expectedBean, String key, Function<T,?> supplier) {
+        public PropertyMatcher(T expectedBean,
+                               String key, Function<T, ?> supplier,
+                               Map<Class<?>, Map<String, Function<Object, ?>>> suppliersRegistry) {
             this.key = key;
             Object value = supplier.apply(expectedBean);
             if (value == null) {
@@ -97,14 +107,29 @@ public class MapHasSamePropertyAs<T> extends TypeSafeDiagnosingMatcher<Map<Strin
                 } else if (Iterable.class.isAssignableFrom(propertyType)) {
                     Iterable iterable = (Iterable) value;
                     if (iterable.iterator().hasNext()) {
-                        matcher = equalTo(value);
+                        List<Matcher<? super Map<String,?>>> collectionItemMatchers = new ArrayList<>();
+                        for (Object o : iterable) {
+                            collectionItemMatchers.add(getMatcherFromRegistry(o, suppliersRegistry));
+                        }
+                        matcher = Matchers.containsInAnyOrder(collectionItemMatchers);
                     } else {
                         matcher = anyOf(empty(), nullValue());
                     }
+                } else if (Enum.class.isAssignableFrom(propertyType)) {
+                    this.matcher = equalTo(value.toString());
                 } else {
                     throw new RuntimeException("nested object not implemented yet");
                 }
             }
+        }
+
+        private Matcher<Map<String, ?>> getMatcherFromRegistry(Object o, Map<Class<?>, Map<String, Function<Object, ?>>> suppliersRegistry) {
+            for (Entry<Class<?>, Map<String,Function<Object,?>>> supplierEntry : suppliersRegistry.entrySet()) {
+                if (supplierEntry.getKey().isAssignableFrom(o.getClass())) {
+                    return mapHasSamePropertyAs(o, supplierEntry.getValue(), suppliersRegistry);
+                }
+            }
+            throw new RuntimeException("cant find supplier for type " + o.getClass().getSimpleName());
         }
 
         @Override
@@ -127,7 +152,14 @@ public class MapHasSamePropertyAs<T> extends TypeSafeDiagnosingMatcher<Map<Strin
     @Factory
     public static <T> Matcher<Map<String,?>> mapHasSamePropertyAs(T expectedBean,
                                                                   Map<String, Function<T,?>> suppliers) {
-        return new MapHasSamePropertyAs(expectedBean, suppliers);
+        return new MapHasSamePropertyAs<T>(expectedBean, suppliers);
+    }
+
+    @Factory
+    public static <T> Matcher<Map<String,?>> mapHasSamePropertyAs(T expectedBean,
+                                                                  Map<String, Function<T,?>> suppliers,
+                                                                  Map<Class<?>, Map<String, Function<Object, ?>>> suppliersRegistry) {
+        return new MapHasSamePropertyAs<T>(expectedBean, suppliers, suppliersRegistry);
     }
 
     public static <T> Map<String, Function<T,?>> formatSuppliers(

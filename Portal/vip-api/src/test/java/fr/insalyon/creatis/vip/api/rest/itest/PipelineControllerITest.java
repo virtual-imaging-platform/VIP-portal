@@ -31,9 +31,14 @@
  */
 package fr.insalyon.creatis.vip.api.rest.itest;
 
+import fr.insalyon.creatis.vip.api.business.ApiUtils;
+import fr.insalyon.creatis.vip.api.rest.RestErrorCodes;
 import fr.insalyon.creatis.vip.api.rest.itest.config.*;
+import fr.insalyon.creatis.vip.api.rest.model.ErrorCodesAndMessage;
+import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import org.junit.Test;
 
+import java.net.URLEncoder;
 import java.util.*;
 
 import static com.hp.hpl.jena.util.iterator.Filter.any;
@@ -68,6 +73,28 @@ public class PipelineControllerITest extends BaseVIPSpringITest {
     }
 
     @Test
+    public void shouldReturnErrorOnAPIException() throws Exception {
+        when(classBusiness.getUserClasses(eq(baseUser1.getEmail()), anyBoolean()))
+                .thenThrow(new BusinessException("test exception"));
+        mockMvc.perform(get("/pipelines").with(baseUser1()))
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentType(RestTestUtils.JSON_CONTENT_TYPE_UTF8))
+                .andExpect(jsonPath("$.code").value(RestErrorCodes.API_ERROR.getCode()));
+    }
+
+    @Test
+    public void shouldReturnErrorOnUnexpectedException() throws Exception {
+        when(classBusiness.getUserClasses(eq(baseUser1.getEmail()), anyBoolean()))
+                .thenThrow(new RuntimeException("test exception"));
+        mockMvc.perform(get("/pipelines").with(baseUser1()))
+                .andDo(print())
+                .andExpect(status().isInternalServerError())
+                .andExpect(content().contentType(RestTestUtils.JSON_CONTENT_TYPE_UTF8))
+                .andExpect(jsonPath("$.code").value(RestErrorCodes.UNEXPECTED_ERROR.getCode()));
+    }
+
+    @Test
     public void shouldReturnPipelines() throws Exception {
         when(classBusiness.getUserClasses(eq(baseUser1.getEmail()), anyBoolean()))
                 .thenReturn(Arrays.asList(class1, class2));
@@ -89,5 +116,26 @@ public class PipelineControllerITest extends BaseVIPSpringITest {
                         mapCorrespondsToPipeline(getPipeline(app2, version01)),
                         mapCorrespondsToPipeline(getPipeline(app3, version01)),
                         mapCorrespondsToPipeline(getPipeline(app3, version42)))));
+    }
+
+    @Test
+    public void userGetAPipeline() throws Exception {
+        when(classBusiness.getUserClassesName(eq(baseUser1.getEmail()), anyBoolean()))
+                .thenReturn(Arrays.asList(class1.getName(), class2.getName()));
+        when(classBusiness.getUserClasses(eq(baseUser1.getEmail()), anyBoolean()))
+                .thenReturn(Arrays.asList(class1, class2));
+        when(applicationBusiness.getApplication(app2.getName())).thenReturn(app2);
+        when(applicationBusiness.getApplications(anyListOf(String.class)))
+                .thenReturn(Arrays.asList(app2));
+        when(applicationBusiness.getVersions(app2.getName()))
+                .thenReturn(singletonList(getVersion(version42, app2)));
+        when(workflowBusiness.getApplicationDescriptor(baseUser1, app2.getName(), version42.getVersion()))
+                .thenReturn(getDescriptor("desc test", 0, 1));
+        String pipelineId = ApiUtils.getPipelineIdentifier(app2.getName(), version42.getVersion());
+        mockMvc.perform(get("/pipelines").param("pipelineId", pipelineId)
+                    .with(baseUser1()))
+                .andDo(print())
+                .andExpect(content().contentType(RestTestUtils.JSON_CONTENT_TYPE_UTF8))
+                .andExpect(jsonPath("$", mapCorrespondsToPipeline(getFullPipeline(app2, version42, "desc test", 0, 1))));
     }
 }

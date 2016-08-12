@@ -80,10 +80,12 @@ public class PipelineParameter {
         return type;
     }
 
+    @JsonProperty("isOptional")
     public Boolean isOptional() {
         return isOptional;
     }
 
+    @JsonProperty("isReturnedValue")
     public Boolean isReturnedValue() {
         return isReturnedValue;
     }
@@ -94,14 +96,6 @@ public class PipelineParameter {
 
     public String getDescription() {
         return description;
-    }
-
-    public Boolean getOptional() {
-        return isOptional;
-    }
-
-    public Boolean getReturnedValue() {
-        return isReturnedValue;
     }
 
     public java.lang.Object getRestDefaultValue() {

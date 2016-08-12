@@ -42,7 +42,11 @@ import org.springframework.core.env.Environment;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.List;
+
+import static fr.insalyon.creatis.vip.core.client.view.util.CountryCode.th;
 
 /**
  * Created by abonnet on 7/28/16.
@@ -74,6 +78,21 @@ public class PipelineController {
 
     @RequestMapping("{pipelineId}")
     public Pipeline getPipeline(@PathVariable String pipelineId) throws ApiException {
+        // TODO : correct that !
+        try {
+            pipelineId = URLDecoder.decode(pipelineId, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            throw new ApiException("Cannot decode input " + pipelineId);
+        }
+        ApiUtils.methodInvocationLog("getPipeline", pipelineId);
+        ApiContext apiContext = new RestApiBusiness().getApiContext(httpServletRequest, true);
+        PipelineBusiness pb = new PipelineBusiness(apiContext, workflowBusiness, applicationBusiness, classBusiness);
+        pb.checkIfUserCanAccessPipeline(pipelineId);
+        return pb.getPipeline(pipelineId);
+    }
+
+    @RequestMapping(params = "pipelineId")
+    public Pipeline getPipelineWithRequestParam(@RequestParam String pipelineId) throws ApiException {
         ApiUtils.methodInvocationLog("getPipeline", pipelineId);
         ApiContext apiContext = new RestApiBusiness().getApiContext(httpServletRequest, true);
         PipelineBusiness pb = new PipelineBusiness(apiContext, workflowBusiness, applicationBusiness, classBusiness);

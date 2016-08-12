@@ -31,13 +31,15 @@
  */
 package fr.insalyon.creatis.vip.api;
 
-import fr.insalyon.creatis.vip.api.bean.Pipeline;
+import fr.insalyon.creatis.vip.api.bean.*;
 import fr.insalyon.creatis.vip.api.business.ApiUtils;
 import fr.insalyon.creatis.vip.application.client.bean.*;
 import org.hamcrest.Matcher;
 
-import java.nio.channels.Pipe;
+import java.lang.Object;
 import java.util.*;
+import java.util.AbstractMap.SimpleEntry;
+import java.util.Map.Entry;
 import java.util.function.*;
 
 /**
@@ -45,15 +47,54 @@ import java.util.function.*;
  */
 public class PipelineTestUtils {
 
-    public static final Map<String,Function<Pipeline,?>> descriptors;
+    public static final Map<String,Function<Pipeline,?>> pipelineSuppliers;
+    public static final Map<String,Function<PipelineParameter,?>> pipelineParameterSuppliers;
+
+    // sourceParamx and pipelineParamx must be the same
+
+    public static final Source sourceParam1, sourceParam2;
+    public static final PipelineParameter pipelineParam1, pipelineParam2;
+
+    public static final Entry<Source, PipelineParameter>[] paramPairs;
 
     static {
-        descriptors = getPipelineSuppliers();
+        sourceParam1 = new Source("param 1", "type param 1", "user level 1", "desc param 1",
+                "true", "default value 1");
+        pipelineParam1 = new PipelineParameter(sourceParam1.getName(), ParameterType.String,
+                true, false, new ParameterTypedValue(ParameterType.String,sourceParam1.getDefaultValue()),
+                sourceParam1.getDefaultValue(), sourceParam1.getDescription());
+        sourceParam2 = new Source("param 2", "URI", "user level 2", "desc param 2");
+        pipelineParam2 = new PipelineParameter(sourceParam2.getName(), ParameterType.File,
+                false, false, new ParameterTypedValue(ParameterType.File, sourceParam2.getDefaultValue()),
+                sourceParam2.getDefaultValue(), sourceParam2.getDescription());
+        paramPairs = new Entry[] {new SimpleEntry(sourceParam1, pipelineParam1),
+            new SimpleEntry(sourceParam2, pipelineParam2)};
+
+
+        pipelineSuppliers = getPipelineSuppliers();
+        pipelineParameterSuppliers = getPipelineParameterSuppliers();
     }
 
     public static Pipeline getPipeline(Application app, AppVersion version) {
         return new Pipeline(ApiUtils.getPipelineIdentifier(app.getName(), version.getVersion()),
                 app.getName(), version.getVersion(), true);
+    }
+
+    public static Descriptor getDescriptor(String desc, Integer... paramIndexes) {
+        List<Source> sources = new ArrayList<>();
+        for (Integer paramIndex : paramIndexes) {
+            sources.add(paramPairs[paramIndex].getKey());
+        }
+        return new Descriptor(sources, desc);
+    }
+
+    public static Pipeline getFullPipeline(Application app, AppVersion version, String desc, Integer... paramIndexes) {
+        Pipeline pipeline = getPipeline(app, version);
+        pipeline.setDescription(desc);
+        for (Integer paramIndex : paramIndexes) {
+            pipeline.getParameters().add(paramPairs[paramIndex].getValue());
+        }
+        return pipeline;
     }
 
     public static Map<String,Function<Pipeline,?>> getPipelineSuppliers() {
@@ -67,7 +108,21 @@ public class PipelineTestUtils {
                 Pipeline::getParameters);
     }
 
+    public static Map<String,Function<PipelineParameter,?>> getPipelineParameterSuppliers() {
+        return MapHasSamePropertyAs.formatSuppliers(
+                Arrays.asList("name", "type", "isOptional", "isReturnedValue", "defaultValue", "description"),
+                PipelineParameter::getName,
+                PipelineParameter::getType,
+                PipelineParameter::isOptional,
+                PipelineParameter::isReturnedValue,
+                PipelineParameter::getRestDefaultValue,
+                PipelineParameter::getDescription);
+    }
+
     public static Matcher<Map<String,?>> mapCorrespondsToPipeline(Pipeline pipeline) {
-           return MapHasSamePropertyAs.mapHasSamePropertyAs(pipeline, descriptors);
+        Map<Class<?>, Map<String, Function<Object, ?>>> suppliersRegistry = new HashMap<>();
+        Map<String, Function<Object, ?>> suppliers = (Map) pipelineParameterSuppliers;
+        suppliersRegistry.put(PipelineParameter.class, suppliers);
+        return MapHasSamePropertyAs.mapHasSamePropertyAs(pipeline, pipelineSuppliers, suppliersRegistry);
     }
 }
