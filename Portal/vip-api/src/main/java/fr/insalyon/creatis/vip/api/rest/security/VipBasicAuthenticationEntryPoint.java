@@ -72,9 +72,10 @@ public class VipBasicAuthenticationEntryPoint implements AuthenticationEntryPoin
         } else {
             error.setCode(RestErrorCodes.AUTHENTICATION_ERROR.getCode());
         }
+        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         error.setMessage(authException.getMessage());
         objectMapper.writeValue(response.getOutputStream(), error);
-        response.sendError(HttpServletResponse.SC_UNAUTHORIZED, authException.getMessage());
+        //response.sendError(HttpServletResponse.SC_UNAUTHORIZED, authException.getMessage());
     }
 
 }
