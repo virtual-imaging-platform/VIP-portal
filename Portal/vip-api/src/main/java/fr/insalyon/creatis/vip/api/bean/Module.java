@@ -34,12 +34,14 @@ package fr.insalyon.creatis.vip.api.bean;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 import javax.xml.bind.annotation.XmlType;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 /**
  *
  * @author Tristan Glatard tristan.glatard@creatis.insa-lyon.fr
  */
 @XmlType(name = "Module")
+@XmlJavaTypeAdapter(ModuleXmlAdapter.class)
 public enum Module {
     PROCESSING("Processing"),
     DATA("Data"),
