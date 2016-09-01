@@ -149,6 +149,7 @@ public class DisplayTab extends Tab {
                 try {
                     bts.put("metric", JSONUtil.parseBoutiquesTool(JSONParser.parseStrict(jsonFileContent).isObject()));
                     bts.get("metric").setApplicationLFN(vipLayout.getApplicationLocation() + "/" + boutiquesTool.getName());
+                    
                     //second callback to get metadata descripotr
                     final AsyncCallback<String> callback2 = new AsyncCallback<String>() {
                         @Override
