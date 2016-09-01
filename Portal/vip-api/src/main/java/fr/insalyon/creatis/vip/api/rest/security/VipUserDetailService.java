@@ -52,7 +52,7 @@ import java.util.Map;
 @Service
 public class VipUserDetailService implements UserDetailsService {
 
-    public static final Logger logger = Logger.getLogger(SpringWebConfig.class);
+    public static final Logger logger = Logger.getLogger(VipUserDetailService.class);
 
     @Autowired
     private ConfigurationBusiness configurationBusiness;

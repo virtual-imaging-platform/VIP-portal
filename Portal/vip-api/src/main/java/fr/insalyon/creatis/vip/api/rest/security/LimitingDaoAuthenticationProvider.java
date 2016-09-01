@@ -31,16 +31,20 @@
  */
 package fr.insalyon.creatis.vip.api.rest.security;
 
-import fr.insalyon.creatis.vip.core.server.dao.UserDAO;
+import fr.insalyon.creatis.devtools.MD5;
+import fr.insalyon.creatis.vip.core.server.dao.*;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.*;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.*;
 import org.springframework.stereotype.Service;
+
+import java.io.UnsupportedEncodingException;
+import java.security.NoSuchAlgorithmException;
 
 /**
  * Created by abonnet on 7/25/16.
@@ -63,10 +67,37 @@ public class LimitingDaoAuthenticationProvider extends DaoAuthenticationProvider
     }
 
     @Override
-    @Autowired
-    @Qualifier(value = "MD5PasswordEncoder")
-    public void setPasswordEncoder(Object passwordEncoder) {
-        super.setPasswordEncoder(passwordEncoder);
+    protected void additionalAuthenticationChecks(UserDetails userDetails, UsernamePasswordAuthenticationToken authentication) throws AuthenticationException {
+        // we should not rely on the password from the user loaded (whcih does not include it)
+        // the only acceptable method is userDao.authenticate.
+        try {
+            String encodedpassword = MD5.get(authentication.getCredentials().toString());
+            if (!userDAO.authenticate(
+                    userDetails.getUsername(),
+                    encodedpassword)) {
+                throw new BadCredentialsException(messages.getMessage(
+                        "AbstractUserDetailsAuthenticationProvider.badCredentials",
+                        "Bad credentials"));
+            }
+        } catch (DAOException e) {
+            logger.error("error authenticating user " + userDetails.getUsername(), e);
+            logger.error("Doing as if there is an auth error");
+            throw new BadCredentialsException(messages.getMessage(
+                    "AbstractUserDetailsAuthenticationProvider.badCredentials",
+                    "Bad credentials"));
+        } catch (NoSuchAlgorithmException e) {
+            logger.error("error authenticating user " + userDetails.getUsername(), e);
+            logger.error("Doing as if there is an auth error");
+            throw new BadCredentialsException(messages.getMessage(
+                    "AbstractUserDetailsAuthenticationProvider.badCredentials",
+                    "Bad credentials"));
+        } catch (UnsupportedEncodingException e) {
+            logger.error("error authenticating user " + userDetails.getUsername(), e);
+            logger.error("Doing as if there is an auth error");
+            throw new BadCredentialsException(messages.getMessage(
+                    "AbstractUserDetailsAuthenticationProvider.badCredentials",
+                    "Bad credentials"));
+        }
     }
 
     @Override
