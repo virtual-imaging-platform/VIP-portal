@@ -33,7 +33,7 @@ package fr.insalyon.creatis.vip.api.bean;
 
 import com.fasterxml.jackson.annotation.*;
 
-import javax.xml.bind.annotation.XmlType;
+import javax.xml.bind.annotation.*;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 
@@ -41,23 +41,28 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
  * Created by abonnet on 8/4/16.
  */
 @XmlType(name="ExecutionStatus")
-@XmlJavaTypeAdapter(ExecutionStatusXmlAdapter.class)
 public enum ExecutionStatus {
 
-    INITIALIZING("Initializing", "initializing"),
-    READY("Ready", "ready"),
-    RUNNING("Running", "running"),
-    FINISHED("Finished", "finished"),
-    INITIALIZATION_FAILED("InitializationFailed", "initialization_failed"),
-    EXECUTION_FAILED("ExecutionFailed", "execution_failed"),
-    UNKOWN("Unknown", "unknown"),
-    KILLED("Killed", "killed");
+    @XmlEnumValue("Initializing")
+    INITIALIZING("initializing"),
+    @XmlEnumValue("Ready")
+    READY("ready"),
+    @XmlEnumValue("Running")
+    RUNNING("running"),
+    @XmlEnumValue("Finished")
+    FINISHED("finished"),
+    @XmlEnumValue("InitializationFailed")
+    INITIALIZATION_FAILED("initialization_failed"),
+    @XmlEnumValue("ExecutionFailed")
+    EXECUTION_FAILED("execution_failed"),
+    @XmlEnumValue("Unknown")
+    UNKOWN("unknown"),
+    @XmlEnumValue("Killed")
+    KILLED("killed");
 
-    private String soapLabel;
     private String restLabel;
 
-    ExecutionStatus(String soapLabel, String restLabel) {
-        this.soapLabel = soapLabel;
+    ExecutionStatus(String restLabel) {
         this.restLabel = restLabel;
     }
 
@@ -67,17 +72,6 @@ public enum ExecutionStatus {
             if (status.restLabel.equals(restlabel)) { return status; }
         }
         throw new IllegalArgumentException("Unknown execution status : " + restlabel);
-    }
-
-    public static ExecutionStatus fromSoapLabel(String soapLabel) {
-        for (ExecutionStatus status : values()) {
-            if (status.soapLabel.equals(soapLabel)) { return status; }
-        }
-        throw new IllegalArgumentException("Unknown execution status : " + soapLabel);
-    }
-
-    public String getSoapLabel() {
-        return soapLabel;
     }
 
     @JsonValue
