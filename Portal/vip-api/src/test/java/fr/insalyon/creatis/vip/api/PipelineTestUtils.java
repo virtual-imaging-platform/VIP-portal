@@ -59,7 +59,7 @@ public class PipelineTestUtils {
 
     static {
         sourceParam1 = new Source("param 1", "type param 1", "user level 1", "desc param 1",
-                "true", "default value 1");
+                "true", "default value 1", "", "");
         pipelineParam1 = new PipelineParameter(sourceParam1.getName(), ParameterType.String,
                 true, false, new ParameterTypedValue(ParameterType.String,sourceParam1.getDefaultValue()),
                 sourceParam1.getDefaultValue(), sourceParam1.getDescription());
