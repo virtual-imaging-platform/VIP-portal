@@ -43,7 +43,7 @@ public class PlatformProperties {
 
     @NotNull
     private String platformName;
-    private List<ErrorCodesAndMessage> apiErrorCodesAnsMessages;
+    private List<ErrorCodesAndMessage> apiErrorCodesAndMessages;
     @NotNull
     private List<SupportedTransferProtocol> supportedTransferProtocols;
     @NotNull
@@ -70,12 +70,12 @@ public class PlatformProperties {
         this.platformName = platformName;
     }
 
-    public List<ErrorCodesAndMessage> getApiErrorCodesAnsMessages() {
-        return apiErrorCodesAnsMessages;
+    public List<ErrorCodesAndMessage> getApiErrorCodesAndMessages() {
+        return apiErrorCodesAndMessages;
     }
 
-    public void setApiErrorCodesAnsMessages(List<ErrorCodesAndMessage> apiErrorCodesAnsMessages) {
-        this.apiErrorCodesAnsMessages = apiErrorCodesAnsMessages;
+    public void setApiErrorCodesAndMessages(List<ErrorCodesAndMessage> apiErrorCodesAndMessages) {
+        this.apiErrorCodesAndMessages = apiErrorCodesAndMessages;
     }
 
     public List<SupportedTransferProtocol> getSupportedTransferProtocols() {
