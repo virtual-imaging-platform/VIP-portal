@@ -41,7 +41,7 @@ import fr.insalyon.creatis.vip.datamanager.server.business.TransferPoolBusiness;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.*;
-import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import org.springframework.web.servlet.config.annotation.*;
 
 /**
  * Created by abonnet on 7/13/16.
@@ -49,11 +49,14 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 @EnableWebMvc
 @ComponentScan
 @PropertySource("classpath:carmin.properties")
-public class SpringWebConfig {
+public class SpringWebConfig extends WebMvcConfigurerAdapter {
 
     public static final Logger logger = Logger.getLogger(SpringWebConfig.class);
 
-
+    @Override
+    public void configurePathMatch(PathMatchConfigurer matcher) {
+        matcher.setUseRegisteredSuffixPatternMatch(true);
+    }
 
     @Bean
     @Scope(proxyMode = ScopedProxyMode.TARGET_CLASS, value = BeanDefinition.SCOPE_PROTOTYPE)
