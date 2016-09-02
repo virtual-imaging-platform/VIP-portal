@@ -31,11 +31,12 @@
  */
 package fr.insalyon.creatis.vip.api;
 
-import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
+import fr.insalyon.creatis.vip.core.server.business.*;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import fr.insalyon.creatis.vip.core.server.dao.mysql.PlatformConnection;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Component;
@@ -48,15 +49,19 @@ public class VipInitializer implements ApplicationListener<ContextRefreshedEvent
 
     public static final Logger logger = Logger.getLogger(VipInitializer.class);
 
+    @Autowired
+    private ConfigurationBusiness configurationBusiness;
 
     @Override
     public void onApplicationEvent(ContextRefreshedEvent event) {
-        PropertyConfigurator.configure(ConfigurationBusiness.class.getClassLoader().getResource("vipLog4j.properties"));
         logger.info("Init VIP : setting logging and initiaizing DB");
         // set logging properties and DB connection
         try {
+            configurationBusiness.configure();
             PlatformConnection.getInstance();
         } catch (DAOException e) {
+            throw new RuntimeException("Cannot init VIP", e);
+        } catch (BusinessException e) {
             throw new RuntimeException("Cannot init VIP", e);
         }
     }
