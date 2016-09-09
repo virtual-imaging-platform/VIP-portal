@@ -37,6 +37,7 @@ import fr.insalyon.creatis.vip.api.rest.model.ErrorCodesAndMessage;
 import org.apache.log4j.Logger;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -53,9 +54,17 @@ public class RestExceptionHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(ApiException.class)
     @ResponseBody
-    public ErrorCodesAndMessage handleApiException() {
+    public ErrorCodesAndMessage handleApiException(ApiException e) {
+        logger.error(e);
         return new ErrorCodesAndMessage(RestErrorCodes.API_ERROR.getCode(),
                 RestErrorCodes.API_ERROR.getMessage());
+    }
+
+    @ExceptionHandler(value = HttpRequestMethodNotSupportedException.class)
+    public void methodNotSupportedHandler(Exception e)
+            throws Exception {
+        logger.info("HttpRequestMethodNotSupportedException", e);
+            throw e;
     }
 
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -63,10 +72,6 @@ public class RestExceptionHandler {
     @ResponseBody
     public ErrorCodesAndMessage defaultErrorHandler(HttpServletRequest req, Exception e)
             throws Exception {
-        // If the exception is annotated with @ResponseStatus rethrow it and let
-        // the framework handle it - like the OrderNotFoundException example
-        // at the start of this post.
-        // AnnotationUtils is a Spring Framework utility class.
         logger.info("Unexpected exception", e);
         if (AnnotationUtils.findAnnotation
                 (e.getClass(), ResponseStatus.class) != null)
