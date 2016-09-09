@@ -34,17 +34,22 @@ package fr.insalyon.creatis.vip.api.rest.controller;
 import fr.insalyon.creatis.vip.api.bean.Execution;
 import fr.insalyon.creatis.vip.api.business.*;
 import fr.insalyon.creatis.vip.api.rest.RestApiBusiness;
-import fr.insalyon.creatis.vip.api.rest.model.DeleteExecutionConfiguration;
+import fr.insalyon.creatis.vip.api.rest.model.*;
 import fr.insalyon.creatis.vip.application.server.business.*;
 import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
 import fr.insalyon.creatis.vip.datamanager.server.business.TransferPoolBusiness;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
+import java.util.List;
+
+import static fr.insalyon.creatis.vip.api.CarminProperties.DEFAULT_LIMIT_LIST_EXECUTION;
 import static jdk.nashorn.internal.runtime.regexp.joni.constants.StackType.POS;
 
 /**
@@ -69,6 +74,9 @@ public class ExecutionControler {
     @Autowired
     private TransferPoolBusiness transferPoolBusiness;
 
+    @Autowired
+    private Environment environment;
+
     // although the controller is a singleton, these are proxies that always point on the current request
     @Autowired
     HttpServletRequest httpServletRequest;
@@ -91,6 +99,14 @@ public class ExecutionControler {
         return new ExecutionBusiness(apiContext,
                 simulationBusiness, workflowBusiness, configurationBusiness, applicationBusiness,
                 pipelineBusiness, transferPoolBusiness);
+    }
+
+    @RequestMapping
+    public Execution[] listExecutions() throws ApiException {
+        ApiUtils.methodInvocationLog("listExecutions");
+        ApiContext apiContext = new RestApiBusiness().getApiContext(httpServletRequest, true);
+        ExecutionBusiness eb = buildExecutionBusiness(apiContext);
+        return eb.listExecutions(environment.getProperty(DEFAULT_LIMIT_LIST_EXECUTION, Integer.class));
     }
 
     @RequestMapping("/{executionId}")
@@ -125,6 +141,16 @@ public class ExecutionControler {
         return executionBusiness.getExecution(execId,false);
     }
 
+    @RequestMapping("/{executionId}/results")
+    public String[] getExecutionResults(@PathVariable String executionId,
+                                        @RequestParam(defaultValue = "https") String protocol) throws ApiException {
+        ApiUtils.methodInvocationLog("getExecutionResults", executionId);
+        ApiContext apiContext = new RestApiBusiness().getApiContext(httpServletRequest, true);
+        ExecutionBusiness eb = buildExecutionBusiness(apiContext);
+        eb.checkIfUserCanAccessExecution(executionId);
+        return eb.getExecutionResults(executionId, protocol, true);
+    }
+
     @RequestMapping("/{executionId}/stdout")
     public String getStdout(@PathVariable String executionId) throws ApiException {
         ApiUtils.methodInvocationLog("getStdout", executionId);
@@ -144,6 +170,7 @@ public class ExecutionControler {
     }
 
     @RequestMapping(value = "/{executionId}/play", method = RequestMethod.PUT)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void playExecution(@PathVariable String executionId) throws ApiException {
         ApiUtils.methodInvocationLog("playExecution", executionId);
         ApiContext apiContext = new RestApiBusiness().getApiContext(httpServletRequest, true);
@@ -153,6 +180,7 @@ public class ExecutionControler {
     }
 
     @RequestMapping(value = "/{executionId}/kill", method = RequestMethod.PUT)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void killExecution(@PathVariable String executionId) throws ApiException {
         ApiUtils.methodInvocationLog("killExecution", executionId);
         ApiContext apiContext = new RestApiBusiness().getApiContext(httpServletRequest, true);
@@ -162,6 +190,7 @@ public class ExecutionControler {
     }
 
     @RequestMapping(value = "/{executionId}/delete", method = RequestMethod.PUT)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteExecution(@PathVariable String executionId,
                                 @RequestBody @Valid DeleteExecutionConfiguration delConfig) throws ApiException {
         ApiUtils.methodInvocationLog("deleteExecution", executionId);

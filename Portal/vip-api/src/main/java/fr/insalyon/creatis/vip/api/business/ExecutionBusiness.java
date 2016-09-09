@@ -385,8 +385,11 @@ public class ExecutionBusiness {
         }
     }
 
-    ;
     public String[] getExecutionResults(String executionId, String protocol) throws ApiException {
+        return getExecutionResults(executionId, protocol, false);
+    }
+
+    public String[] getExecutionResults(String executionId, String protocol, boolean baseUrlOnHost) throws ApiException {
         try {
             if (protocol == null) {
                 protocol = "https";
@@ -403,7 +406,13 @@ public class ExecutionBusiness {
 
                 String operationId = transferPoolBusiness.downloadFile(apiContext.getUser(), output.getPath());
 
-                String url = apiContext.getRequest().getRequestURL() + "/../fr.insalyon.creatis.vip.portal.Main/filedownloadservice?operationid=" + operationId;
+                String url;
+                if (baseUrlOnHost) {
+                    String requestUrl = apiContext.getRequest().getRequestURL().toString();
+                    url = requestUrl.substring(0, requestUrl.indexOf('/')) + "/fr.insalyon.creatis.vip.portal.Main/filedownloadservice?operationid=" + operationId;
+                } else {
+                    url = apiContext.getRequest().getRequestURL() + "/../fr.insalyon.creatis.vip.portal.Main/filedownloadservice?operationid=" + operationId;
+                }
                 URL u = new URL(url); // just to check that it is a well-formed URL
                 urls.add(url);
             }
