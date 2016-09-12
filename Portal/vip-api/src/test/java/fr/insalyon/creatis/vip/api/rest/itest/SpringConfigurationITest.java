@@ -29,7 +29,7 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL-B license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.api.rest.itest.config;
+package fr.insalyon.creatis.vip.api.rest.itest;
 
 import fr.insalyon.creatis.vip.api.*;
 import fr.insalyon.creatis.vip.api.bean.Module;
@@ -90,5 +90,6 @@ public class SpringConfigurationITest {
         Assert.notNull(env.getProperty(DEFAULT_LIMIT_LIST_EXECUTION, Long.class));
         Assert.isInstanceOf(String[].class, env.getProperty(UNSUPPORTED_METHODS, String[].class));
         Assert.notNull(env.getProperty(SUPPORTED_API_VERSION));
+        Assert.notNull(env.getProperty(IS_KILL_EXECUTION_SUPPORTED, Boolean.class));
     }
 }

@@ -31,6 +31,7 @@
  */
 package fr.insalyon.creatis.vip.api.rest.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import fr.insalyon.creatis.vip.api.bean.Module;
 
 import javax.validation.constraints.NotNull;
@@ -58,6 +59,7 @@ public class PlatformProperties {
     private List<String> unsupportedMethods;
     private Long maxSizeDirectTransfer;
     private String defaultStudy;
+    @JsonProperty("isKillExecutionSupported")
     private Boolean isKillExecutionSupported;
     @NotNull
     private String supportedAPIVersion;

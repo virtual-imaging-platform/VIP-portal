@@ -62,10 +62,7 @@ public class PlatformControllerITest extends BaseVIPSpringITest {
                 .andExpect(status().isOk());
     }
 
-    // TODO remove @WithMockUser to the folowing tests when the first test is OK
-
     @Test
-    @WithMockUser
     public void testPlatformProperties() throws Exception {
         // the test properties are set in BaseVIPSpringITest (with @TestPropertySource)
         mockMvc.perform(get("/platform"))
@@ -85,7 +82,9 @@ public class PlatformControllerITest extends BaseVIPSpringITest {
                 .andExpect(jsonPath("$.unsupportedMethods[*]",
                         isArray(TEST_UNSUPPORTED_METHOD, String::toString)))
                 .andExpect(jsonPath("$.supportedAPIVersion")
-                        .value(TEST_SUPPORTED_API_VERSION));
+                        .value(TEST_SUPPORTED_API_VERSION))
+                .andExpect(jsonPath("$.isKillExecutionSupported")
+                        .value(Boolean.valueOf(TEST_SUPPORTED_API_VERSION)));
     }
 
     private <T> Matcher<Collection<String>> isArray(T[] values, Function<T,String> mapper) {

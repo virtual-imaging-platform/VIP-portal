@@ -32,6 +32,7 @@
 package fr.insalyon.creatis.vip.api.rest.controller;
 
 import fr.insalyon.creatis.vip.api.bean.Module;
+import fr.insalyon.creatis.vip.api.business.ApiUtils;
 import fr.insalyon.creatis.vip.api.rest.model.*;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,6 +64,7 @@ public class PlatformController {
 
     @RequestMapping
     public PlatformProperties getPlatformProperties() {
+        ApiUtils.methodInvocationLog("getPlatformProperties");
         PlatformProperties platformProperties = new PlatformProperties();
         platformProperties.setPlatformName(env.getProperty(PLATFORM_NAME));
         platformProperties.setPlatformDescription(env.getProperty(PLATFORM_DESCRIPTION));
@@ -77,6 +79,8 @@ public class PlatformController {
         platformProperties.setUnsupportedMethods(Arrays.asList(
                 env.getProperty(UNSUPPORTED_METHODS, String[].class)
         ));
+        platformProperties.setKillExecutionSupported(
+                env.getProperty(IS_KILL_EXECUTION_SUPPORTED, Boolean.class));
         platformProperties.setSupportedAPIVersion(env.getProperty(SUPPORTED_API_VERSION));
         return platformProperties;
     }

@@ -47,7 +47,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.util.FileCopyUtils;
 import org.springframework.web.context.WebApplicationContext;
 
 import java.io.*;
@@ -80,7 +79,8 @@ import static fr.insalyon.creatis.vip.api.CarminProperties.*;
         SUPPORTED_MODULES + "=" + TEST_SUPPORTED_MODULES_STRING,
         DEFAULT_LIMIT_LIST_EXECUTION + "=" + TEST_DEFAULT_LIST_LIMIT,
         UNSUPPORTED_METHODS + "=" + TEST_UNSUPPORTED_METHODS_STRING,
-        SUPPORTED_API_VERSION + "=" + TEST_SUPPORTED_API_VERSION
+        SUPPORTED_API_VERSION + "=" + TEST_SUPPORTED_API_VERSION,
+        IS_KILL_EXECUTION_SUPPORTED + "=" + TEST_IS_KILL_SUPPORTED
 })
 abstract public class BaseVIPSpringITest {
 

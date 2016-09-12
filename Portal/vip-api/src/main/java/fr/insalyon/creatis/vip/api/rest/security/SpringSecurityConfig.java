@@ -54,6 +54,7 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http
             .authorizeRequests()
+                .antMatchers("/platform").permitAll()
                 .anyRequest().authenticated()
             .and()
             .httpBasic().authenticationEntryPoint(vipBasicAuthenticationEntryPoint)
