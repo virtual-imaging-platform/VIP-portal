@@ -54,18 +54,8 @@ public class UserTestUtils {
     static {
         baseUser1 = new User("base1", "User1", "baseuser1@test.tst", null, null,
                 UserLevel.Beginner, null);
-        baseUser1.setPassword(getPassword(baseUser1Password));
         baseUser2 = new User("base2", "User2", "baseuser2@test.tst", null, null,
                 UserLevel.Advanced, null);
-        baseUser2.setPassword(getPassword(baseUser2Password));
-    }
-
-    private static String getPassword(String clearpassword) {
-        try {
-            return MD5.get(clearpassword);
-        } catch (NoSuchAlgorithmException | UnsupportedEncodingException e) {
-            throw new RuntimeException(e);
-        }
     }
 
     public static RequestPostProcessor baseUser1() {

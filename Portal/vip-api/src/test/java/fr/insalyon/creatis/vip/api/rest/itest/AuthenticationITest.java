@@ -31,9 +31,15 @@
  */
 package fr.insalyon.creatis.vip.api.rest.itest;
 
+import fr.insalyon.creatis.devtools.MD5;
 import fr.insalyon.creatis.vip.api.rest.RestErrorCodes;
 import fr.insalyon.creatis.vip.api.rest.itest.config.*;
+import fr.insalyon.creatis.vip.core.server.business.BusinessException;
+import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import org.junit.Test;
+
+import java.io.UnsupportedEncodingException;
+import java.security.NoSuchAlgorithmException;
 
 import static fr.insalyon.creatis.vip.api.UserTestUtils.baseUser1;
 import static fr.insalyon.creatis.vip.api.UserTestUtils.baseUser1Password;
@@ -46,30 +52,27 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 /**
  * Created by abonnet on 7/22/16.
  *
- * These tests check the login authentication with the spring test tools.
+ * These tests check the authentication with the spring test tools.
+ * It requests a wrong url that should be secured and expects a 404 when OK
  *
  * Use common vip spring test configuration ({@link BaseVIPSpringITest}
  *
  */
 public class AuthenticationITest extends BaseVIPSpringITest {
 
-    // TODO : login method may have to return 200 OK on authentication error
-
     @Test
     public void authenticationOK() throws Exception {
-        when(userDAO.getUser(baseUser1.getEmail())).thenReturn(baseUser1);
-        when(configurationBusiness.getUser(baseUser1.getEmail())).thenReturn(baseUser1);
-        mockMvc.perform(get("/login").with(httpBasic(baseUser1.getEmail(), baseUser1Password)))
+        prepareUser1Configuration();
+        mockMvc.perform(get("/wrongUrl")
+                .with(httpBasic(baseUser1.getEmail(), baseUser1Password)))
                 .andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(content().string("SUCCESS"));
+                .andExpect(status().isNotFound());
     }
 
     @Test
     public void authenticationWithWrongPassport() throws Exception {
-        when(userDAO.getUser(baseUser1.getEmail())).thenReturn(baseUser1);
-        when(configurationBusiness.getUser(baseUser1.getEmail())).thenReturn(baseUser1);
-        mockMvc.perform(get("/login").with(httpBasic(baseUser1.getEmail(), "WRONG")))
+        prepareUser1Configuration();
+        mockMvc.perform(get("/wrongUrl").with(httpBasic(baseUser1.getEmail(), "WRONG")))
                 .andDo(print())
                 .andExpect(status().isUnauthorized())
                 .andExpect(content().contentType(RestTestUtils.JSON_CONTENT_TYPE_UTF8))
@@ -79,13 +82,19 @@ public class AuthenticationITest extends BaseVIPSpringITest {
 
     @Test
     public void authenticationWithoutCredentials() throws Exception {
-        when(userDAO.getUser(baseUser1.getEmail())).thenReturn(baseUser1);
-        when(configurationBusiness.getUser(baseUser1.getEmail())).thenReturn(baseUser1);
-        mockMvc.perform(get("/login"))
+        prepareUser1Configuration();
+        mockMvc.perform(get("/wrongUrl"))
                 .andDo(print())
                 .andExpect(status().isUnauthorized())
                 .andExpect(content().contentType(RestTestUtils.JSON_CONTENT_TYPE_UTF8))
                 .andExpect(jsonPath("$.code")
                         .value(RestErrorCodes.INSUFFICIENT_AUTH.getCode()));
+    }
+
+    private void prepareUser1Configuration() throws DAOException, BusinessException, UnsupportedEncodingException, NoSuchAlgorithmException {
+        when(userDAO.getUser(baseUser1.getEmail())).thenReturn(baseUser1);
+        when(configurationBusiness.getUser(baseUser1.getEmail())).thenReturn(baseUser1);
+        when(userDAO.authenticate(baseUser1.getEmail(),
+                MD5.get(baseUser1Password))).thenReturn(true);
     }
 }
