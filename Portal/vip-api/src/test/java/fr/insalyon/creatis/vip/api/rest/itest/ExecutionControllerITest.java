@@ -31,22 +31,18 @@
  */
 package fr.insalyon.creatis.vip.api.rest.itest;
 
+import fr.insalyon.creatis.vip.api.ExecutionTestUtils;
 import fr.insalyon.creatis.vip.api.rest.itest.config.*;
 import org.junit.Test;
-import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.util.ResourceUtils;
 
 import java.util.Arrays;
 
 import static fr.insalyon.creatis.vip.api.AppVersionTestUtils.*;
 import static fr.insalyon.creatis.vip.api.ApplicationTestUtils.*;
-import static fr.insalyon.creatis.vip.api.ClassesTestUtils.*;
+import static fr.insalyon.creatis.vip.api.ExecutionTestUtils.*;
 import static fr.insalyon.creatis.vip.api.PipelineTestUtils.*;
 import static fr.insalyon.creatis.vip.api.UserTestUtils.baseUser1;
-import static java.util.Collections.singletonList;
 import static org.hamcrest.Matchers.*;
-import static org.mockito.Matchers.anyBoolean;
-import static org.mockito.Matchers.anyListOf;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -56,16 +52,35 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 /**
  * Created by abonnet on 7/20/16.
- *
+ * <p>
  * Test method on platform path
  */
 public class ExecutionControllerITest extends BaseVIPSpringITest {
 
+    // TODO finish tests
+
     @Test
-    @WithMockUser
+    public void shouldListExecutions() throws Exception {
+        when(workflowBusiness.getSimulations(baseUser1.getFullName(),null,null, null,null,null))
+                .thenReturn(Arrays.asList(ExecutionTestUtils.getSimulation(execution1)));
+        when(workflowBusiness.getSimulation(execution1.getIdentifier()))
+                .thenReturn(ExecutionTestUtils.getSimulation(execution1));
+        mockMvc.perform(
+                get("/executions").with(baseUser1()))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(RestTestUtils.JSON_CONTENT_TYPE_UTF8))
+                .andExpect(jsonPath("[*]", hasSize(1)))
+                .andExpect(jsonPath("$[0]",
+                        mapCorrespondsToExecution(summariseExecution(execution1))));
+    }
+
+    //@Test
     public void testInitExecution() throws Exception {
-        mockMvc.perform(post("/executions").contentType("application/json")
-                            .content(getResourceAsString("jsonObjects/execution1.json")))
+        mockMvc.perform(
+                post("/executions").contentType("application/json")
+                        .content(getResourceAsString("jsonObjects/execution1.json"))
+                        .with(baseUser1()))
                 .andDo(print())
                 .andExpect(status().isOk());
     }

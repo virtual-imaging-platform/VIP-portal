@@ -60,13 +60,18 @@ public class PipelineTestUtils {
     static {
         sourceParam1 = new Source("param 1", "type param 1", "user level 1", "desc param 1",
                 "true", "default value 1", "", "");
+
         pipelineParam1 = new PipelineParameter(sourceParam1.getName(), ParameterType.String,
                 true, false, new ParameterTypedValue(ParameterType.String,sourceParam1.getDefaultValue()),
                 sourceParam1.getDefaultValue(), sourceParam1.getDescription());
+
         sourceParam2 = new Source("param 2", "URI", "user level 2", "desc param 2");
+
         pipelineParam2 = new PipelineParameter(sourceParam2.getName(), ParameterType.File,
+
                 false, false, new ParameterTypedValue(ParameterType.File, sourceParam2.getDefaultValue()),
                 sourceParam2.getDefaultValue(), sourceParam2.getDescription());
+
         paramPairs = new Entry[] {new SimpleEntry(sourceParam1, pipelineParam1),
             new SimpleEntry(sourceParam2, pipelineParam2)};
 

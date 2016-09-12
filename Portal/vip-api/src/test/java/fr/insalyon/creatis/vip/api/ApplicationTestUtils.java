@@ -33,7 +33,7 @@ package fr.insalyon.creatis.vip.api;
 
 import fr.insalyon.creatis.devtools.MD5;
 import fr.insalyon.creatis.vip.api.rest.security.SpringCompatibleUser;
-import fr.insalyon.creatis.vip.application.client.bean.Application;
+import fr.insalyon.creatis.vip.application.client.bean.*;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.user.UserLevel;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
@@ -57,12 +57,21 @@ public class ApplicationTestUtils {
     static public Application app2;
     static public Application app3;
 
+    static public Map<AppClass, List<Application>> applicationsPerClass = new HashMap<>();
+
     static {
-        app1 = new Application("application 1", new ArrayList<>(),
+        // init class->application map
+        applicationsPerClass.put(class1, new ArrayList<>());
+        applicationsPerClass.put(class2, new ArrayList<>());
+
+        app1 = new Application("application 1", Arrays.asList(class1.getName()),
                 baseUser1.getEmail(), baseUser1.getFullName(), "citation application 1");
         app2 = new Application("application 2", Arrays.asList(class1.getName()),
                 baseUser1.getEmail(), baseUser1.getFullName(), "citation application 2");
+        applicationsPerClass.get(class1).add(app2);
         app3 = new Application("application 3", Arrays.asList(class1.getName(), class2.getName()),
                 baseUser2.getEmail(), baseUser2.getFullName(), "citation application 3");
+        applicationsPerClass.get(class1).add(app3);
+        applicationsPerClass.get(class2).add(app3);
     }
 }

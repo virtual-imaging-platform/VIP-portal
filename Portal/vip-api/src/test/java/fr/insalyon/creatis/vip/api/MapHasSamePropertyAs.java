@@ -103,7 +103,7 @@ public class MapHasSamePropertyAs<T> extends TypeSafeDiagnosingMatcher<Map<Strin
             } else {
                 Class<?> propertyType = value.getClass();
                 if (propertyType.equals(String.class) || isPrimitiveOrWrapper(propertyType)) {
-                    this.matcher = equalTo(value);
+                    matcher = equalTo(value);
                 } else if (Iterable.class.isAssignableFrom(propertyType)) {
                     Iterable iterable = (Iterable) value;
                     if (iterable.iterator().hasNext()) {
@@ -116,7 +116,10 @@ public class MapHasSamePropertyAs<T> extends TypeSafeDiagnosingMatcher<Map<Strin
                         matcher = anyOf(empty(), nullValue());
                     }
                 } else if (Enum.class.isAssignableFrom(propertyType)) {
-                    this.matcher = equalTo(value.toString());
+                    matcher = equalTo(value.toString());
+                } else if (Map.class.isAssignableFrom(propertyType)) {
+                    Map map = (Map) value;
+                    matcher = equalTo(map);
                 } else {
                     throw new RuntimeException("nested object not implemented yet");
                 }

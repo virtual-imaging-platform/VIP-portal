@@ -34,12 +34,14 @@ package fr.insalyon.creatis.vip.api.rest.itest;
 import fr.insalyon.creatis.vip.api.business.ApiUtils;
 import fr.insalyon.creatis.vip.api.rest.RestErrorCodes;
 import fr.insalyon.creatis.vip.api.rest.itest.config.*;
-import fr.insalyon.creatis.vip.api.rest.model.ErrorCodesAndMessage;
+import fr.insalyon.creatis.vip.application.client.bean.*;
+import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import org.junit.Test;
 
-import java.net.URLEncoder;
 import java.util.*;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import static com.hp.hpl.jena.util.iterator.Filter.any;
 import static fr.insalyon.creatis.vip.api.AppVersionTestUtils.*;
@@ -49,7 +51,6 @@ import static fr.insalyon.creatis.vip.api.ClassesTestUtils.class1;
 import static fr.insalyon.creatis.vip.api.ClassesTestUtils.class2;
 import static fr.insalyon.creatis.vip.api.PipelineTestUtils.*;
 import static fr.insalyon.creatis.vip.api.UserTestUtils.*;
-import static fr.insalyon.creatis.vip.api.MapHasSamePropertyAs.*;
 import static java.util.Collections.*;
 import static net.jcores.CoreKeeper.$;
 import static org.hamcrest.Matchers.*;
@@ -61,8 +62,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 /**
  * Created by abonnet on 7/20/16.
- *
- * Test method on platform path
+ * <p>
+ * Test methods on pipeline path
+ * <p>
+ * Include 2 tests on error handling
  */
 public class PipelineControllerITest extends BaseVIPSpringITest {
 
@@ -96,16 +99,10 @@ public class PipelineControllerITest extends BaseVIPSpringITest {
 
     @Test
     public void shouldReturnPipelines() throws Exception {
-        when(classBusiness.getUserClasses(eq(baseUser1.getEmail()), anyBoolean()))
-                .thenReturn(Arrays.asList(class1, class2));
-        when(applicationBusiness.getApplications(anyListOf(String.class)))
-                .thenReturn(Arrays.asList(app1, app2, app3));
-        when(applicationBusiness.getVersions(app1.getName()))
-                .thenReturn(singletonList(getVersion(version42, app1)));
-        when(applicationBusiness.getVersions(app2.getName()))
-                .thenReturn(singletonList(getVersion(version01, app2)));
-        when(applicationBusiness.getVersions(app3.getName()))
-                .thenReturn(Arrays.asList(getVersion(version42, app3), getVersion(version01, app3)));
+        configureApplications(baseUser1, Arrays.asList(class1, class2),
+                app1, version42,
+                app2, version01,
+                app3, version42, version01);
         mockMvc.perform(get("/pipelines").with(baseUser1()))
                 .andDo(print())
                 .andExpect(status().isOk())
@@ -120,22 +117,64 @@ public class PipelineControllerITest extends BaseVIPSpringITest {
 
     @Test
     public void userGetAPipeline() throws Exception {
-        when(classBusiness.getUserClassesName(eq(baseUser1.getEmail()), anyBoolean()))
-                .thenReturn(Arrays.asList(class1.getName(), class2.getName()));
-        when(classBusiness.getUserClasses(eq(baseUser1.getEmail()), anyBoolean()))
-                .thenReturn(Arrays.asList(class1, class2));
-        when(applicationBusiness.getApplication(app2.getName())).thenReturn(app2);
-        when(applicationBusiness.getApplications(anyListOf(String.class)))
-                .thenReturn(Arrays.asList(app2));
-        when(applicationBusiness.getVersions(app2.getName()))
-                .thenReturn(singletonList(getVersion(version42, app2)));
-        when(workflowBusiness.getApplicationDescriptor(baseUser1, app2.getName(), version42.getVersion()))
-                .thenReturn(getDescriptor("desc test", 0, 1));
-        String pipelineId = ApiUtils.getPipelineIdentifier(app2.getName(), version42.getVersion());
+        configureApplications(baseUser1, Arrays.asList(class1, class2),
+                app2, version42);
+        String pipelineId = configureAnApplication(baseUser1, app2, version42, 0, 1);
         mockMvc.perform(get("/pipelines").param("pipelineId", pipelineId)
-                    .with(baseUser1()))
+                .with(baseUser1()))
                 .andDo(print())
                 .andExpect(content().contentType(RestTestUtils.JSON_CONTENT_TYPE_UTF8))
                 .andExpect(jsonPath("$", mapCorrespondsToPipeline(getFullPipeline(app2, version42, "desc test", 0, 1))));
+    }
+
+    // UTILS
+
+    /**
+     * Should take only Application and AppVersion classes in the sequence :
+     * Application AppVersion+
+     * (an application followed by one or more version)
+     */
+    private void configureApplications(User user, List<AppClass> classes, Object... args) throws BusinessException {
+        // parse the args to map the application to the versions
+        Application currentApplication = null;
+        Map<Application, List<AppVersion>> applicationVersions = new HashMap<>();
+        for (Object currentArg : args) {
+            if (currentArg instanceof Application) {
+                currentApplication = (Application) currentArg;
+                applicationVersions.put(currentApplication, new ArrayList<>());
+            } else {
+                applicationVersions.get(currentApplication).
+                        add(getVersion((AppVersion) currentArg, currentApplication));
+            }
+        }
+        List<String> classNames = classes.stream().map(AppClass::getName).collect(Collectors.toList());
+        // verify the classes given are good
+        Predicate<Application> isAppNotOK =
+                application -> Collections.disjoint(application.getApplicationClasses(), classNames);
+        if (applicationVersions.keySet().stream().anyMatch(isAppNotOK)) {
+            throw new RuntimeException("misconfiguration of test class>app config");
+        }
+        // configure mocks
+        // 1 return user classes
+        when(classBusiness.getUserClasses(user.getEmail(), false)).thenReturn(classes);
+        when(classBusiness.getUserClassesName(user.getEmail(), false)).thenReturn(classNames);
+        // 2 return apps for the classes
+        when(applicationBusiness.getApplications(anyListOf(String.class))).
+                thenReturn(new ArrayList<>(applicationVersions.keySet()));
+        // 3 return versions for each app
+        for (Application app : applicationVersions.keySet()) {
+            when(applicationBusiness.getVersions(app.getName())).
+                    thenReturn(applicationVersions.get(app));
+            when(applicationBusiness.getApplication(app.getName()))
+                    .thenReturn(app);
+        }
+    }
+
+    private String configureAnApplication(
+            User user, Application app, AppVersion version,
+            Integer... appParamsIndexes) throws BusinessException {
+        when(workflowBusiness.getApplicationDescriptor(user, app.getName(), version.getVersion()))
+                .thenReturn(getDescriptor("desc test", appParamsIndexes));
+        return ApiUtils.getPipelineIdentifier(app.getName(), version.getVersion());
     }
 }
