@@ -42,6 +42,7 @@ import static fr.insalyon.creatis.vip.api.ApplicationTestUtils.*;
 import static fr.insalyon.creatis.vip.api.ExecutionTestUtils.*;
 import static fr.insalyon.creatis.vip.api.PipelineTestUtils.*;
 import static fr.insalyon.creatis.vip.api.UserTestUtils.baseUser1;
+import static fr.insalyon.creatis.vip.api.UserTestUtils.baseUser2;
 import static org.hamcrest.Matchers.*;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.*;
@@ -62,17 +63,57 @@ public class ExecutionControllerITest extends BaseVIPSpringITest {
     @Test
     public void shouldListExecutions() throws Exception {
         when(workflowBusiness.getSimulations(baseUser1.getFullName(),null,null, null,null,null))
-                .thenReturn(Arrays.asList(ExecutionTestUtils.getSimulation(execution1)));
-        when(workflowBusiness.getSimulation(execution1.getIdentifier()))
-                .thenReturn(ExecutionTestUtils.getSimulation(execution1));
+                .thenReturn(Arrays.asList(simulation1, simulation2));
+        when(workflowBusiness.getSimulation(simulation1.getID()))
+                .thenReturn(simulation1);
+        when(workflowBusiness.getSimulation(simulation2.getID()))
+                .thenReturn(simulation2);
         mockMvc.perform(
                 get("/executions").with(baseUser1()))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(RestTestUtils.JSON_CONTENT_TYPE_UTF8))
-                .andExpect(jsonPath("[*]", hasSize(1)))
-                .andExpect(jsonPath("$[0]",
-                        mapCorrespondsToExecution(summariseExecution(execution1))));
+                .andExpect(jsonPath("[*]", hasSize(2)))
+                .andExpect(jsonPath("$[*]", containsInAnyOrder(
+                            mapCorrespondsToExecution(summariseExecution(execution1)),
+                            mapCorrespondsToExecution(summariseExecution(execution2))
+                        )));
+    }
+
+    @Test
+    public void shouldGetExecution1() throws Exception {
+        when(workflowBusiness.getSimulation(simulation1.getID()))
+                .thenReturn(simulation1);
+        when(workflowBusiness.getInputData(simulation1.getID(), baseUser1.getFolder()))
+                .thenReturn(simulation1InData);
+        when(workflowBusiness.getOutputData(simulation1.getID(), baseUser1.getFolder()))
+                .thenReturn(simulation1OutData);
+        mockMvc.perform(
+                get("/executions/" + simulation1.getID()).with(baseUser1()))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(RestTestUtils.JSON_CONTENT_TYPE_UTF8))
+                .andExpect(jsonPath("$",
+                        mapCorrespondsToExecution(execution1)
+                ));
+    }
+
+    @Test
+    public void shouldGetExecution2() throws Exception {
+        when(workflowBusiness.getSimulation(simulation2.getID()))
+                .thenReturn(simulation2);
+        when(workflowBusiness.getInputData(simulation2.getID(), baseUser1.getFolder()))
+                .thenReturn(simulation2InData);
+        when(workflowBusiness.getOutputData(simulation2.getID(), baseUser1.getFolder()))
+                .thenReturn(simulation2OutData);
+        mockMvc.perform(
+                get("/executions/" + simulation2.getID()).with(baseUser1()))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(RestTestUtils.JSON_CONTENT_TYPE_UTF8))
+                .andExpect(jsonPath("$",
+                        mapCorrespondsToExecution(execution2)
+                ));
     }
 
     //@Test

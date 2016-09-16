@@ -52,6 +52,7 @@ public class MapHasSamePropertyAs<T> extends TypeSafeDiagnosingMatcher<Map<Strin
 
     private final T expectedBean;
     private final List<PropertyMatcher<T>> propertyMatchers;
+    private int expectedNonNullProperties;
 
 
     public MapHasSamePropertyAs(T expectedBean,
@@ -69,10 +70,14 @@ public class MapHasSamePropertyAs<T> extends TypeSafeDiagnosingMatcher<Map<Strin
             propertyMatchers.add(new PropertyMatcher<T>(expectedBean,
                     supplierEntry.getKey(), supplierEntry.getValue(), suppliersRegistry));
         }
+        expectedNonNullProperties = countExpectedNonNullValue(expectedBean, suppliers);
     }
 
     @Override
     public boolean matchesSafely(Map<String,?> map, Description mismatch) {
+        if (expectedNonNullProperties != countNonNullValue(map)) {
+            return false;
+        }
         for (PropertyMatcher propertyMatcher : propertyMatchers) {
             if (!propertyMatcher.matches(map)) {
                 propertyMatcher.describeMismatch(map, mismatch);
@@ -87,6 +92,27 @@ public class MapHasSamePropertyAs<T> extends TypeSafeDiagnosingMatcher<Map<Strin
         description.appendText("same property values as :")
                 .appendValue(expectedBean.getClass().getSimpleName())
                 .appendList(" [", ", ", "]", propertyMatchers);
+    }
+
+    public int countExpectedNonNullValue(T expectedBean,
+                                         Map<String, Function<T,?>> suppliers) {
+        int counter = 0;
+        for (Entry<String, Function<T,?>> entry : suppliers.entrySet()) {
+            if (entry.getValue().apply(expectedBean) != null) {
+                counter++;
+            }
+        }
+        return counter;
+    }
+
+    public int countNonNullValue(Map<String,?> map) {
+        int counter = 0;
+        for (Entry<String,?> entry : map.entrySet()) {
+            if (entry.getValue() != null) {
+                counter++;
+            }
+        }
+        return counter;
     }
 
     public static class PropertyMatcher<T> extends TypeSafeDiagnosingMatcher<Map<String,Object>> {

@@ -53,26 +53,50 @@ public class ExecutionTestUtils {
 
     public static final Map<String,Function<Execution,?>> executionSuppliers;
 
-    public static final Execution execution1;
+    public static final Execution execution1,   execution2;
+    public static final Simulation simulation1, simulation2;
+    public static final List<InOutData> simulation1InData, simulation2InData;
+    public static final List<InOutData> simulation1OutData, simulation2OutData;
 
     static {
-        // TODO : startDate should be in seconds
-        execution1 = new Execution("execTest1", "exec test 1", "pipelineTest1/3", 0, ExecutionStatus.RUNNING,
-                null, null, new GregorianCalendar(2016, 9, 2).getTimeInMillis(), null);
+        // TODO Test with int or float params
+        simulation1 = new Simulation("pipelineTest1", "3", null, "execId1",
+                UserTestUtils.baseUser1.getFullName(), new GregorianCalendar(2016, 9, 2).getTime(),
+                "Exec test 1", SimulationStatus.Running.toString(), "engine 1");
+        execution1 = getExecution(simulation1, ExecutionStatus.RUNNING);
         execution1.setRestInputValues(new HashMap<String,Object>() {{
                 put("param 1", "value 1");
-                put("param 2", 42);
+                put("param 2", "42");
             }}
         );
+
+        simulation1InData = Arrays.asList(
+                new InOutData("value 1", "param 1", "String"),
+                new InOutData("42", "param 2", "Integer"));
+        simulation1OutData = Collections.emptyList();
+
+        simulation2 = new Simulation("pipelineTest2", "4.2", null, "execId2",
+                UserTestUtils.baseUser1.getFullName(), new GregorianCalendar(2016, 4, 29).getTime(),
+                "Exec test 2", SimulationStatus.Completed.toString(), "engine 1");
+        execution2 = getExecution(simulation2, ExecutionStatus.FINISHED);
+        execution2.setRestInputValues(new HashMap<String,Object>() {{
+                                          put("param2-1", "5.3");
+                                      }}
+        );
+        execution2.setRestReturnedFiles(new HashMap<String,List<Object>>() {{
+            put("param2-res", Collections.singletonList("/File/res"));
+        }});
+        simulation2InData = Collections.singletonList(new InOutData("5.3", "param2-1", "Float"));
+        simulation2OutData = Collections.singletonList(new InOutData("/File/res", "param2-res", "URI"));
 
         executionSuppliers = getExecutionSuppliers();
     }
 
-    public static Simulation getSimulation(Execution execution) {
-        return new Simulation("pipelineTest1", "3", null, execution.getIdentifier(),
-                null, new Date(execution.getStartDate()), execution.getName(),
-                SimulationStatus.Running.toString(),
-                null);
+    public static Execution getExecution(Simulation simulation, ExecutionStatus executionStatus) {
+        // TODO : startDate should be in seconds
+        return new Execution(simulation.getID(), simulation.getSimulationName(),
+                simulation.getApplicationName() + "/" + simulation.getApplicationVersion(),
+                0, executionStatus, null, null, simulation.getDate().getTime(), null);
     }
 
     public static Execution summariseExecution(Execution execution) {
@@ -92,17 +116,17 @@ public class ExecutionTestUtils {
     }
 
     public static Map<String,Function<Execution,?>> getExecutionSuppliers() {
-        // TODO : add returnedFiles
         return MapHasSamePropertyAs.formatSuppliers(
                 Arrays.asList(
                         "identifier", "name", "pipelineIdentifier", "timeout", "status", "inputValues",
-                        "studyIdentifier", "errorCode", "startDate", "endDate"),
+                        "returnedFiles", "studyIdentifier", "errorCode", "startDate", "endDate"),
                 Execution::getIdentifier,
                 Execution::getName,
                 Execution::getPipelineIdentifier,
                 Execution::getTimeout,
                 execution -> execution.getStatus().getRestLabel(),
                 Execution::getRestInputValues,
+                Execution::getRestReturnedFiles,
                 Execution::getStudyIdentifier,
                 Execution::getErrorCode,
                 Execution::getStartDate,

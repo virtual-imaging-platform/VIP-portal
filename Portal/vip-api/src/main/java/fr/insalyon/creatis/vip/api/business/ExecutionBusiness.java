@@ -159,6 +159,10 @@ public class ExecutionBusiness {
                 ParameterTypedValue value = new ParameterTypedValue(ApiUtils.getCarminType(iod.getType()), iod.getPath());
                 StringKeyParameterValuePair skpv = new StringKeyParameterValuePair(iod.getProcessor(), value);
                 e.getReturnedFiles().add(skpv);
+                if (!e.getRestReturnedFiles().containsKey(iod.getProcessor())) {
+                     e.getRestReturnedFiles().put(iod.getProcessor(), new ArrayList<>());
+                }
+                e.getRestReturnedFiles().get(iod.getProcessor()).add(iod.getPath());
             }
 
             if (!(e.getStatus() == ExecutionStatus.FINISHED) && !(e.getStatus() == ExecutionStatus.KILLED) && e.getReturnedFiles().isEmpty()) {

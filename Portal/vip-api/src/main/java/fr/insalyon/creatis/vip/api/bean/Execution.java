@@ -70,6 +70,9 @@ public class Execution extends Object {
     @XmlElement(name = "returnedFile")
     @JsonIgnore
     private ArrayList<StringKeyParameterValuePair> returnedFiles;
+    @JsonProperty("returnedFiles")
+    @XmlTransient
+    private Map<String, List<java.lang.Object>> restReturnedFiles;
 
     // optional arguments
     @XmlElement(name = "studyIdentifier")
@@ -86,6 +89,7 @@ public class Execution extends Object {
         inputValues = new ArrayList<>();
         returnedFiles = new ArrayList<>();
         restInputValues = new HashMap<>();
+        restReturnedFiles = new HashMap<>();
     }
 
     public Execution(String identifier,
@@ -171,6 +175,14 @@ public class Execution extends Object {
 
     public void setReturnedFiles(ArrayList<StringKeyParameterValuePair> returnedFiles) {
         this.returnedFiles = returnedFiles;
+    }
+
+    public Map<String, List<java.lang.Object>> getRestReturnedFiles() {
+        return restReturnedFiles;
+    }
+
+    public void setRestReturnedFiles(Map<String, List<java.lang.Object>> restReturnedFiles) {
+        this.restReturnedFiles = restReturnedFiles;
     }
 
     public void clearReturnedFiles() {
