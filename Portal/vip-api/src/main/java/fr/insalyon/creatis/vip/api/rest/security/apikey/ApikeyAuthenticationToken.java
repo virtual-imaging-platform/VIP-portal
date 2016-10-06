@@ -29,36 +29,62 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL-B license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.api.rest.security;
+package fr.insalyon.creatis.vip.api.rest.security.apikey;
 
-import fr.insalyon.creatis.vip.core.server.dao.DAOException;
-import fr.insalyon.creatis.vip.core.server.dao.UserDAO;
-import org.apache.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationListener;
-import org.springframework.security.authentication.event.AuthenticationSuccessEvent;
-import org.springframework.stereotype.Component;
+import org.springframework.security.authentication.AbstractAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
+import java.util.Collection;
 
 /**
- * Created by abonnet on 7/25/16.
+ * Created by abonnet on 10/6/16.
+ *
+ * Used to store the apikey
+ * Does not contain user info, because we dont know it at first
  */
-@Component
-public class AuthenticationEventsListener implements ApplicationListener<AuthenticationSuccessEvent> {
+public class ApikeyAuthenticationToken extends AbstractAuthenticationToken {
 
-    public static final Logger logger = Logger.getLogger(AuthenticationEventsListener.class);
+    private UserDetails principal;
+    private String apikey;
 
-    @Autowired
-    private UserDAO userDAO;
-
-    @Override
-    public void onApplicationEvent(AuthenticationSuccessEvent event) {
-        try {
-            String username = event.getAuthentication().getName();
-            logger.info("successful logging for " + username);
-            userDAO.resetNFailedAuthentications(username);
-        } catch (DAOException e) {
-            logger.error("Error reseting failed auth attemps ", e);
-        }
+    public ApikeyAuthenticationToken(String apikey) {
+        super(null);
+        this.principal = null;
+        this.apikey = apikey;
+        setAuthenticated(false);
     }
 
+    public ApikeyAuthenticationToken(UserDetails principal, String apikey) {
+        super(null);
+        this.principal = principal;
+        this.apikey = apikey;
+        super.setAuthenticated(true);
+    }
+
+    @Override
+    public Object getCredentials() {
+        return apikey;
+    }
+
+    @Override
+    public Object getPrincipal() {
+        return principal;
+    }
+
+    @Override
+    public void setAuthenticated(boolean isAuthenticated) throws IllegalArgumentException {
+        if (isAuthenticated) {
+            throw new IllegalArgumentException(
+                    "Cannot set this token to trusted - use constructor which takes a GrantedAuthority list instead");
+        }
+
+        super.setAuthenticated(false);
+    }
+
+    @Override
+    public void eraseCredentials() {
+        super.eraseCredentials();
+        apikey = null;
+    }
 }

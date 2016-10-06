@@ -43,6 +43,8 @@ import java.util.Date;
 import java.util.List;
 import org.apache.log4j.Logger;
 
+import static fr.insalyon.creatis.vip.core.client.CoreModule.user;
+
 /**
  *
  * @author Rafael Ferreira da Silva, Tristan Glatard
@@ -60,7 +62,6 @@ public class UserData implements UserDAO {
      * Adds a user
      *
      * @param user
-     * @param code
      * @return
      */
     @Override
@@ -914,4 +915,85 @@ public class UserData implements UserDAO {
         }
     }
 
+    @Override
+    public User getUserByApikey(String apikey) throws DAOException {
+        try {
+            PreparedStatement ps = connection.prepareStatement(
+                    "SELECT email FROM VIPUsers WHERE apikey=?");
+
+            ps.setString(1, apikey);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                String email = rs.getString("apikey");
+                ps.close();
+                return getUser(email);
+            }
+            ps.close();
+            logger.info("There is no user registered with the key: " + apikey);
+            return user;
+
+        } catch (SQLException ex) {
+            logger.error(ex);
+            throw new DAOException(ex);
+        }
+    }
+
+    @Override
+    public String getUserApikey(String email) throws DAOException {
+        return new SQLRunnable<String>() {
+            @Override
+            protected String runSQL() throws SQLException, DAOException {
+                PreparedStatement ps = connection.prepareStatement(
+                        "SELECT apikey FROM VIPUsers WHERE email=?");
+
+                ps.setString(1, email);
+                ResultSet rs = ps.executeQuery();
+                if (rs.next()) {
+                    ps.close();
+                    return rs.getString("apikey");
+                }
+
+                ps.close();
+                logger.error("Looking for apikey, there is no user registered with the email: " + email);
+                throw new DAOException("Looking for apikey, there is no user registered with the email: " + email);
+            }
+        }.run();
+    }
+
+    @Override
+    public void updateUserApikey(String email, String newApikey) throws DAOException {
+        new SQLRunnable<Void>() {
+            @Override
+            protected Void runSQL() throws SQLException, DAOException {
+                PreparedStatement ps = connection.prepareStatement("UPDATE "
+                        + "VIPUsers SET apikey = ? WHERE email = ?");
+
+                ps.setString(1, newApikey);
+                ps.setString(2, email);
+                int rowsUpdatedNb = ps.executeUpdate();
+                ps.close();
+
+                if (rowsUpdatedNb == 0) {
+                    logger.error("Looking for apikey, there is no user registered with the email: " + email);
+                    throw new DAOException("Looking for apikey, there is no user registered with the email: " + email);
+                }
+                return null;
+            }
+        }.run();
+    }
+
+    private abstract class SQLRunnable<T> {
+
+        public final T run() throws DAOException {
+            try {
+                return runSQL();
+            } catch (SQLException ex) {
+                logger.error(ex);
+                throw new DAOException(ex);
+            }
+        }
+
+        protected abstract T runSQL() throws SQLException, DAOException;
+
+    }
 }

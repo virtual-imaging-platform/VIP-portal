@@ -29,45 +29,29 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL-B license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.api.rest.security;
+package fr.insalyon.creatis.vip.api;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import fr.insalyon.creatis.vip.api.rest.security.apikey.*;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
-import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
-import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.*;
-import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.test.web.servlet.request.RequestPostProcessor;
 
 /**
- * Created by abonnet on 7/22/16.
+ * Created by abonnet on 10/6/16.
  */
-@EnableWebSecurity
-public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
+public class ApikeyRequestPostProcessor implements RequestPostProcessor {
+    private String apikeyHeader, apikeyValue;
 
-    // authentication done by bean LimitigDaoAuthenticationProvider
-
-    @Autowired
-    private ApikeyAuthenticationEntryPoint apikeyAuthenticationEntryPoint;
-
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
-        http
-            .authorizeRequests()
-                .antMatchers("/platform").permitAll()
-                .anyRequest().authenticated()
-            .and()
-            .apply(new ApikeyAuthentificationConfigurer<>("apikey", apikeyAuthenticationEntryPoint))
-            .and()
-            .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-            .and()
-            .csrf().disable();
+    public ApikeyRequestPostProcessor(String apikeyHeader, String apikeyValue) {
+        this.apikeyHeader = apikeyHeader;
+        this.apikeyValue = apikeyValue;
     }
 
+    @Override
+    public MockHttpServletRequest postProcessRequest(MockHttpServletRequest request) {
+        request.addHeader(apikeyHeader, apikeyValue);
+        return request;
+    }
 
-    @Bean
-    public ObjectMapper objectMapper() {
-        return Jackson2ObjectMapperBuilder.json().build();
+    public static RequestPostProcessor apikey(String apikeyHeader, String apikeyValue) {
+        return new ApikeyRequestPostProcessor(apikeyHeader, apikeyValue);
     }
 }

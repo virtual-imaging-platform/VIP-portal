@@ -29,7 +29,7 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL-B license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.api.rest.security;
+package fr.insalyon.creatis.vip.api.rest.security.apikey;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.insalyon.creatis.vip.api.rest.RestErrorCodes;
@@ -51,7 +51,7 @@ import static fr.insalyon.creatis.vip.api.CarminProperties.PLATFORM_NAME;
  * Created by abonnet on 7/26/16.
  */
 @Component
-public class VipBasicAuthenticationEntryPoint implements AuthenticationEntryPoint {
+public class ApikeyAuthenticationEntryPoint implements AuthenticationEntryPoint {
 
     @Autowired
     private ObjectMapper objectMapper;

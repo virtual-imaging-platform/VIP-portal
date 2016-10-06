@@ -32,6 +32,7 @@
 package fr.insalyon.creatis.vip.api.rest.itest;
 
 import fr.insalyon.creatis.devtools.MD5;
+import fr.insalyon.creatis.vip.api.ApikeyRequestPostProcessor;
 import fr.insalyon.creatis.vip.api.rest.RestErrorCodes;
 import fr.insalyon.creatis.vip.api.rest.itest.config.*;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
@@ -64,15 +65,28 @@ public class AuthenticationITest extends BaseVIPSpringITest {
     public void authenticationOK() throws Exception {
         prepareUser1Configuration();
         mockMvc.perform(get("/wrongUrl")
-                .with(httpBasic(baseUser1.getEmail(), baseUser1Password)))
+                .with(ApikeyRequestPostProcessor.apikey("apikey", "apikeyvalue")))
                 .andDo(print())
                 .andExpect(status().isNotFound());
     }
 
     @Test
-    public void authenticationWithWrongPassport() throws Exception {
+    public void authenticationWithBasicShouldBeKo() throws Exception {
         prepareUser1Configuration();
-        mockMvc.perform(get("/wrongUrl").with(httpBasic(baseUser1.getEmail(), "WRONG")))
+        mockMvc.perform(get("/wrongUrl")
+                .with(httpBasic(baseUser1.getEmail(), baseUser1Password)))
+                .andDo(print())
+                .andExpect(status().isUnauthorized())
+                .andExpect(content().contentType(RestTestUtils.JSON_CONTENT_TYPE_UTF8))
+                .andExpect(jsonPath("$.code")
+                        .value(RestErrorCodes.INSUFFICIENT_AUTH.getCode()));
+    }
+
+    @Test
+    public void authenticationWithWrongApikey() throws Exception {
+        prepareUser1Configuration();
+        mockMvc.perform(get("/wrongUrl")
+                .with(ApikeyRequestPostProcessor.apikey("apikey", "WRONG")))
                 .andDo(print())
                 .andExpect(status().isUnauthorized())
                 .andExpect(content().contentType(RestTestUtils.JSON_CONTENT_TYPE_UTF8))
@@ -92,9 +106,6 @@ public class AuthenticationITest extends BaseVIPSpringITest {
     }
 
     private void prepareUser1Configuration() throws DAOException, BusinessException, UnsupportedEncodingException, NoSuchAlgorithmException {
-        when(userDAO.getUser(baseUser1.getEmail())).thenReturn(baseUser1);
-        when(configurationBusiness.getUser(baseUser1.getEmail())).thenReturn(baseUser1);
-        when(userDAO.authenticate(baseUser1.getEmail(),
-                MD5.get(baseUser1Password))).thenReturn(true);
+        when(userDAO.getUserByApikey("apikeyvalue")).thenReturn(baseUser1);
     }
 }
