@@ -49,8 +49,9 @@ import fr.insalyon.creatis.vip.core.server.dao.CoreDAOFactory;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import fr.insalyon.creatis.vip.core.server.dao.UserDAO;
 import java.io.UnsupportedEncodingException;
+import java.math.BigInteger;
 import java.net.URL;
-import java.security.NoSuchAlgorithmException;
+import java.security.*;
 import java.sql.Timestamp;
 import java.text.Normalizer;
 import java.util.*;
@@ -59,6 +60,11 @@ import org.apache.log4j.PropertyConfigurator;
 import org.jasig.cas.client.validation.Assertion;
 import org.jasig.cas.client.validation.Saml11TicketValidator;
 import org.jasig.cas.client.validation.TicketValidationException;
+
+import javax.crypto.*;
+import javax.xml.bind.DatatypeConverter;
+
+import static fr.insalyon.creatis.vip.core.client.view.util.CountryCode.re;
 
 /**
  *
@@ -1284,6 +1290,41 @@ public class ConfigurationBusiness {
         } catch (DAOException ex) {
             logger.error(ex);
             throw new BusinessException(ex);
+        }
+    }
+
+    // api key management
+
+    public String getUserApikey(String email) throws BusinessException {
+        try {
+            UserDAO userDAO = CoreDAOFactory.getDAOFactory().getUserDAO();
+            return userDAO.getUserApikey(email);
+        } catch (DAOException e) {
+            logger.error("Error getting apikey for " + email);
+            throw new BusinessException(e);
+        }
+    }
+
+    public void deleteUserApikey(String email) throws BusinessException {
+        try {
+            UserDAO userDAO = CoreDAOFactory.getDAOFactory().getUserDAO();
+            userDAO.updateUserApikey(email, null);
+        } catch (DAOException e) {
+            logger.error("Error deleting apikey for " + email);
+            throw new BusinessException(e);
+        }
+    }
+
+    public String generateNewUserApikey(String email) throws BusinessException {
+        try {
+            SecureRandom random = new SecureRandom();
+            String apikey = new BigInteger(130, random).toString(32);
+            UserDAO userDAO = CoreDAOFactory.getDAOFactory().getUserDAO();
+            userDAO.updateUserApikey(email, apikey);
+            return apikey;
+        } catch (DAOException e) {
+            logger.error("Error generating apikey for " + email);
+            throw new BusinessException(e);
         }
     }
 

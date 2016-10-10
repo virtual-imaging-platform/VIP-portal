@@ -29,8 +29,9 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL-B license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.api.rest.security;
+package fr.insalyon.creatis.vip.api.rest.security.apikey;
 
+import fr.insalyon.creatis.vip.api.rest.security.SpringCompatibleUser;
 import fr.insalyon.creatis.vip.api.rest.security.apikey.ApikeyAuthenticationToken;
 import fr.insalyon.creatis.vip.core.client.bean.*;
 import fr.insalyon.creatis.vip.core.client.bean.User;
@@ -97,7 +98,7 @@ public class ApikeyAuthenticationProvider implements
                     "Bad credentials"));
         }
         if (vipUser == null) {
-            logger.error("Cant authenticate because apikey not found:" + apikey);
+            logger.info("Cant authenticate because apikey not found:" + apikey);
             throw new BadCredentialsException(messages.getMessage(
                     "AbstractUserDetailsAuthenticationProvider.badCredentials",
                     "Bad credentials"));

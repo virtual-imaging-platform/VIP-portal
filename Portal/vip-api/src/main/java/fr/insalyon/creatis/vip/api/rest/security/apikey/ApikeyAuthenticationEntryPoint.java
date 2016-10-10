@@ -61,8 +61,7 @@ public class ApikeyAuthenticationEntryPoint implements AuthenticationEntryPoint 
 
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
-        response.addHeader("WWW-Authenticate", "Basic realm=\""
-                + environment.getProperty(PLATFORM_NAME) + "\"");
+        response.addHeader("WWW-Authenticate", "API-key");
         response.setContentType("application/json;charset=UTF-8");
         ErrorCodesAndMessage error = new ErrorCodesAndMessage();
         if (authException instanceof BadCredentialsException) {

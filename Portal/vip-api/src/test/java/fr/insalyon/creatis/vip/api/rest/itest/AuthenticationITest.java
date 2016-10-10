@@ -71,6 +71,19 @@ public class AuthenticationITest extends BaseVIPSpringITest {
     }
 
     @Test
+    public void authenticationWithCoreKo() throws Exception {
+        when(userDAO.getUserByApikey("apikeyvalue"))
+                .thenThrow(new RuntimeException("hey hey"));
+        mockMvc.perform(get("/wrongUrl")
+                .with(ApikeyRequestPostProcessor.apikey("apikey", "apikeyvalue")))
+                .andDo(print())
+                .andExpect(status().isUnauthorized())
+                .andExpect(content().contentType(RestTestUtils.JSON_CONTENT_TYPE_UTF8))
+                .andExpect(jsonPath("$.code")
+                        .value(RestErrorCodes.AUTHENTICATION_ERROR.getCode()));
+    }
+
+    @Test
     public void authenticationWithBasicShouldBeKo() throws Exception {
         prepareUser1Configuration();
         mockMvc.perform(get("/wrongUrl")
@@ -108,4 +121,5 @@ public class AuthenticationITest extends BaseVIPSpringITest {
     private void prepareUser1Configuration() throws DAOException, BusinessException, UnsupportedEncodingException, NoSuchAlgorithmException {
         when(userDAO.getUserByApikey("apikeyvalue")).thenReturn(baseUser1);
     }
+
 }

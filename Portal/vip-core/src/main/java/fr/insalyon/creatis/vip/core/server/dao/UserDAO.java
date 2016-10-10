@@ -165,11 +165,11 @@ public interface UserDAO {
     /**
      * Read the apikey of a specific user, identified by its mail address
      *
-     * @param apikey the email idenfier of the user
+     * @param email the email idenfier of the user
      * @return the key, or null if the user doesn't have any
      * @throws DAOException if there isn't any user for the given email
      */
-    String getUserApikey(String apikey) throws DAOException;
+    String getUserApikey(String email) throws DAOException;
 
     /**
      * change the api key of a specific user, identified by its mail address

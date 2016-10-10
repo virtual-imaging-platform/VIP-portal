@@ -924,16 +924,16 @@ public class UserData implements UserDAO {
             ps.setString(1, apikey);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
-                String email = rs.getString("apikey");
+                String email = rs.getString("email");
                 ps.close();
                 return getUser(email);
             }
             ps.close();
             logger.info("There is no user registered with the key: " + apikey);
-            return user;
+            return null;
 
         } catch (SQLException ex) {
-            logger.error(ex);
+            logger.error(ex, ex);
             throw new DAOException(ex);
         }
     }
@@ -949,13 +949,15 @@ public class UserData implements UserDAO {
                 ps.setString(1, email);
                 ResultSet rs = ps.executeQuery();
                 if (rs.next()) {
+                    String apikey = rs.getString("apikey");
                     ps.close();
-                    return rs.getString("apikey");
+                    return apikey;
                 }
 
                 ps.close();
-                logger.error("Looking for apikey, there is no user registered with the email: " + email);
-                throw new DAOException("Looking for apikey, there is no user registered with the email: " + email);
+                logger.error("Looking for an apikey, but there is no user registered with the email: " + email);
+                throw new DAOException(
+                        "Looking for an apikey, but there is no user registered with the email: " + email);
             }
         }.run();
     }
@@ -974,8 +976,9 @@ public class UserData implements UserDAO {
                 ps.close();
 
                 if (rowsUpdatedNb == 0) {
-                    logger.error("Looking for apikey, there is no user registered with the email: " + email);
-                    throw new DAOException("Looking for apikey, there is no user registered with the email: " + email);
+                    logger.error("Updating an apikey, but there is no user registered with the email: " + email);
+                    throw new DAOException(
+                            "Updating an apikey, but there is no user registered with the email: " + email);
                 }
                 return null;
             }
@@ -988,7 +991,7 @@ public class UserData implements UserDAO {
             try {
                 return runSQL();
             } catch (SQLException ex) {
-                logger.error(ex);
+                logger.error(ex, ex);
                 throw new DAOException(ex);
             }
         }

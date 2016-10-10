@@ -97,8 +97,17 @@ public class ApikeyAuthenticationFilter extends OncePerRequestFilter {
         catch (AuthenticationException failed) {
             SecurityContextHolder.clearContext();
 
-            this.logger.debug("Authentication request for failed: " + failed);
+            this.logger.debug("Authentication request failed", failed);
             this.authenticationEntryPoint.commence(request, response, failed);
+        }
+        catch (Exception failed) {
+            SecurityContextHolder.clearContext();
+
+            this.logger.error("Unexpected error while authenticating ", failed);
+            this.authenticationEntryPoint.commence(
+                    request,
+                    response,
+                    new AuthenticationServiceException("Internal Authentication error"));
         }
 
         filterChain.doFilter(request, response);

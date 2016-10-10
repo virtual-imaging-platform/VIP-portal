@@ -171,4 +171,12 @@ public interface ConfigurationService extends RemoteService {
     public int getMaxConfiguredPlatformSimulation() throws CoreException;
 
     public void changeMaxConfiguredPlatformSimulation(int maxPlatformRunningSimulations) throws CoreException;
+
+    // api key management
+
+    String getUserApikey(String email) throws CoreException;
+
+    void deleteUserApikey(String email) throws CoreException;
+
+    String generateNewUserApikey(String email) throws CoreException;
 }
