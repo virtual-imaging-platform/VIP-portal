@@ -75,8 +75,8 @@ public class ExecutionControllerITest extends BaseVIPSpringITest {
                 .andExpect(content().contentType(RestTestUtils.JSON_CONTENT_TYPE_UTF8))
                 .andExpect(jsonPath("[*]", hasSize(2)))
                 .andExpect(jsonPath("$[*]", containsInAnyOrder(
-                            mapCorrespondsToExecution(summariseExecution(execution1)),
-                            mapCorrespondsToExecution(summariseExecution(execution2))
+                            jsonCorrespondsToExecution(summariseExecution(execution1)),
+                            jsonCorrespondsToExecution(summariseExecution(execution2))
                         )));
     }
 
@@ -94,7 +94,7 @@ public class ExecutionControllerITest extends BaseVIPSpringITest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(RestTestUtils.JSON_CONTENT_TYPE_UTF8))
                 .andExpect(jsonPath("$",
-                        mapCorrespondsToExecution(execution1)
+                        jsonCorrespondsToExecution(execution1)
                 ));
     }
 
@@ -112,7 +112,7 @@ public class ExecutionControllerITest extends BaseVIPSpringITest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(RestTestUtils.JSON_CONTENT_TYPE_UTF8))
                 .andExpect(jsonPath("$",
-                        mapCorrespondsToExecution(execution2)
+                        jsonCorrespondsToExecution(execution2)
                 ));
     }
 

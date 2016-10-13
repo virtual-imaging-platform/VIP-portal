@@ -109,10 +109,10 @@ public class PipelineControllerITest extends BaseVIPSpringITest {
                 .andExpect(content().contentType(RestTestUtils.JSON_CONTENT_TYPE_UTF8))
                 .andExpect(jsonPath("$[*]", hasSize(4)))
                 .andExpect(jsonPath("$[*]", containsInAnyOrder(
-                        mapCorrespondsToPipeline(getPipeline(app1, version42)),
-                        mapCorrespondsToPipeline(getPipeline(app2, version01)),
-                        mapCorrespondsToPipeline(getPipeline(app3, version01)),
-                        mapCorrespondsToPipeline(getPipeline(app3, version42)))));
+                        jsonCorrespondsToPipeline(getPipeline(app1, version42)),
+                        jsonCorrespondsToPipeline(getPipeline(app2, version01)),
+                        jsonCorrespondsToPipeline(getPipeline(app3, version01)),
+                        jsonCorrespondsToPipeline(getPipeline(app3, version42)))));
     }
 
     @Test
@@ -124,7 +124,7 @@ public class PipelineControllerITest extends BaseVIPSpringITest {
                 .with(baseUser1()))
                 .andDo(print())
                 .andExpect(content().contentType(RestTestUtils.JSON_CONTENT_TYPE_UTF8))
-                .andExpect(jsonPath("$", mapCorrespondsToPipeline(getFullPipeline(app2, version42, "desc test", 0, 1))));
+                .andExpect(jsonPath("$", jsonCorrespondsToPipeline(getFullPipeline(app2, version42, "desc test", 0, 1))));
     }
 
     // UTILS

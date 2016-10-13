@@ -47,8 +47,8 @@ import java.util.function.*;
  */
 public class PipelineTestUtils {
 
-    public static final Map<String,Function<Pipeline,?>> pipelineSuppliers;
-    public static final Map<String,Function<PipelineParameter,?>> pipelineParameterSuppliers;
+    public static final Map<String,Function> pipelineSuppliers;
+    public static final Map<String,Function> pipelineParameterSuppliers;
 
     // sourceParamx and pipelineParamx must be the same
 
@@ -102,8 +102,8 @@ public class PipelineTestUtils {
         return pipeline;
     }
 
-    public static Map<String,Function<Pipeline,?>> getPipelineSuppliers() {
-        return MapHasSamePropertyAs.formatSuppliers(
+    public static Map<String,Function> getPipelineSuppliers() {
+        return JsonCustomObjectMatcher.formatSuppliers(
                 Arrays.asList("identifier", "name", "version", "description", "canExecute", "parameters"),
                 Pipeline::getIdentifier,
                 Pipeline::getName,
@@ -113,8 +113,8 @@ public class PipelineTestUtils {
                 Pipeline::getParameters);
     }
 
-    public static Map<String,Function<PipelineParameter,?>> getPipelineParameterSuppliers() {
-        return MapHasSamePropertyAs.formatSuppliers(
+    public static Map<String,Function> getPipelineParameterSuppliers() {
+        return JsonCustomObjectMatcher.formatSuppliers(
                 Arrays.asList("name", "type", "isOptional", "isReturnedValue", "defaultValue", "description"),
                 PipelineParameter::getName,
                 PipelineParameter::getType,
@@ -124,10 +124,9 @@ public class PipelineTestUtils {
                 PipelineParameter::getDescription);
     }
 
-    public static Matcher<Map<String,?>> mapCorrespondsToPipeline(Pipeline pipeline) {
-        Map<Class<?>, Map<String, Function<Object, ?>>> suppliersRegistry = new HashMap<>();
-        Map<String, Function<Object, ?>> suppliers = (Map) pipelineParameterSuppliers;
-        suppliersRegistry.put(PipelineParameter.class, suppliers);
-        return MapHasSamePropertyAs.mapHasSamePropertyAs(pipeline, pipelineSuppliers, suppliersRegistry);
+    public static Matcher<Map<String,?>> jsonCorrespondsToPipeline(Pipeline pipeline) {
+        Map<Class, Map<String, Function>> suppliersRegistry = new HashMap<>();
+        suppliersRegistry.put(PipelineParameter.class, pipelineParameterSuppliers);
+        return JsonCustomObjectMatcher.jsonCorrespondsTo(pipeline, pipelineSuppliers, suppliersRegistry);
     }
 }

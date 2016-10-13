@@ -31,27 +31,21 @@
  */
 package fr.insalyon.creatis.vip.api;
 
-import fr.insalyon.creatis.vip.api.MapHasSamePropertyAs;
 import fr.insalyon.creatis.vip.api.bean.*;
-import fr.insalyon.creatis.vip.api.business.ApiUtils;
 import fr.insalyon.creatis.vip.application.client.bean.*;
 import fr.insalyon.creatis.vip.application.client.view.monitor.SimulationStatus;
-import fr.insalyon.creatis.vip.core.client.bean.User;
 import org.hamcrest.Matcher;
 
 import java.lang.Object;
 import java.util.*;
 import java.util.function.Function;
 
-import static fr.insalyon.creatis.vip.api.PipelineTestUtils.*;
-import static fr.insalyon.creatis.vip.core.client.view.util.CountryCode.re;
-
 /**
  * Created by abonnet on 8/3/16.
  */
 public class ExecutionTestUtils {
 
-    public static final Map<String,Function<Execution,?>> executionSuppliers;
+    public static final Map<String,Function> executionSuppliers;
 
     public static final Execution execution1,   execution2;
     public static final Simulation simulation1, simulation2;
@@ -115,8 +109,8 @@ public class ExecutionTestUtils {
         return newExecution;
     }
 
-    public static Map<String,Function<Execution,?>> getExecutionSuppliers() {
-        return MapHasSamePropertyAs.formatSuppliers(
+    public static Map<String,Function> getExecutionSuppliers() {
+        return JsonCustomObjectMatcher.formatSuppliers(
                 Arrays.asList(
                         "identifier", "name", "pipelineIdentifier", "timeout", "status", "inputValues",
                         "returnedFiles", "studyIdentifier", "errorCode", "startDate", "endDate"),
@@ -134,8 +128,8 @@ public class ExecutionTestUtils {
         );
     }
 
-    public static Matcher<Map<String,?>> mapCorrespondsToExecution(Execution execution) {
-        Map<Class<?>, Map<String, Function<Object, ?>>> suppliersRegistry = new HashMap<>();
-        return MapHasSamePropertyAs.mapHasSamePropertyAs(execution, executionSuppliers, suppliersRegistry);
+    public static Matcher<Map<String,?>> jsonCorrespondsToExecution(Execution execution) {
+        Map<Class, Map<String, Function>> suppliersRegistry = new HashMap<>();
+        return JsonCustomObjectMatcher.jsonCorrespondsTo(execution, executionSuppliers, suppliersRegistry);
     }
 }
