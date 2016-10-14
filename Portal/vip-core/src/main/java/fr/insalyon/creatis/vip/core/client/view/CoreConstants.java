@@ -175,7 +175,6 @@ public class CoreConstants implements IsSerializable {
     public static final String UNDESIRED_COUNTRIES = "account.undesiredCountries";
     public static final String SAML_TRUSTED_CERTIFICATE = "saml.trustedcertificate";
     public static final String SAML_ACCOUNT_TYPE = "saml.accounttype";
-    public static String MOZILLA_PERSONA_VALIDATION_URL = "mozilla.persona.validation.url";
     //query
     public static String TreeQuery = "query.classes";
     //Boutiques
