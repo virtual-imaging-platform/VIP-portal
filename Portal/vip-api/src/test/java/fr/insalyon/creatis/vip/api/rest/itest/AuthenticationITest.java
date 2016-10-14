@@ -31,10 +31,9 @@
  */
 package fr.insalyon.creatis.vip.api.rest.itest;
 
-import fr.insalyon.creatis.devtools.MD5;
-import fr.insalyon.creatis.vip.api.ApikeyRequestPostProcessor;
+import fr.insalyon.creatis.vip.api.tools.spring.ApikeyRequestPostProcessor;
 import fr.insalyon.creatis.vip.api.rest.RestErrorCodes;
-import fr.insalyon.creatis.vip.api.rest.itest.config.*;
+import fr.insalyon.creatis.vip.api.rest.config.*;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import org.junit.Test;
@@ -42,8 +41,8 @@ import org.junit.Test;
 import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
 
-import static fr.insalyon.creatis.vip.api.UserTestUtils.baseUser1;
-import static fr.insalyon.creatis.vip.api.UserTestUtils.baseUser1Password;
+import static fr.insalyon.creatis.vip.api.data.UserTestUtils.baseUser1;
+import static fr.insalyon.creatis.vip.api.data.UserTestUtils.baseUser1Password;
 import static org.mockito.Mockito.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;

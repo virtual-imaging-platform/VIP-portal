@@ -29,7 +29,7 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL-B license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.api.rest.itest.config;
+package fr.insalyon.creatis.vip.api.rest.config;
 
 import fr.insalyon.creatis.vip.api.SpringWebConfig;
 import fr.insalyon.creatis.vip.application.server.business.*;

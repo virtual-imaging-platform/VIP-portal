@@ -29,29 +29,29 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL-B license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.api;
+package fr.insalyon.creatis.vip.api.data;
 
-import org.springframework.mock.web.MockHttpServletRequest;
-import org.springframework.test.web.servlet.request.RequestPostProcessor;
+import fr.insalyon.creatis.vip.api.bean.Module;
+import fr.insalyon.creatis.vip.api.rest.model.SupportedTransferProtocol;
+
+import static fr.insalyon.creatis.vip.api.bean.Module.*;
+import static fr.insalyon.creatis.vip.api.rest.model.SupportedTransferProtocol.*;
 
 /**
- * Created by abonnet on 10/6/16.
+ * Created by abonnet on 7/21/16.
  */
-public class ApikeyRequestPostProcessor implements RequestPostProcessor {
-    private String apikeyHeader, apikeyValue;
+public interface CarminAPITestConstants {
+    String TEST_PLATFORM_NAME = "TestPlatform";
+    String TEST_PLATFORM_DESCRIPTION = "Test Platform description";
+    String TEST_DEFAULT_LIST_LIMIT = "42";
+    String TEST_SUPPORTED_API_VERSION = "Version 4.2";
+    String TEST_IS_KILL_SUPPORTED = "false";
 
-    public ApikeyRequestPostProcessor(String apikeyHeader, String apikeyValue) {
-        this.apikeyHeader = apikeyHeader;
-        this.apikeyValue = apikeyValue;
-    }
-
-    @Override
-    public MockHttpServletRequest postProcessRequest(MockHttpServletRequest request) {
-        request.addHeader(apikeyHeader, apikeyValue);
-        return request;
-    }
-
-    public static RequestPostProcessor apikey(String apikeyHeader, String apikeyValue) {
-        return new ApikeyRequestPostProcessor(apikeyHeader, apikeyValue);
-    }
+    /* WARNING : keep following properties consistant */
+    SupportedTransferProtocol[] TEST_SUPPORTED_PROTOCOLS = {HTTP, WEBDAV};
+    String TEST_SUPPORTED_TRANSFER_PROTOCOLS_STRING = "HTTP,WEBDAV";
+    Module[] TEST_SUPPORTED_MODULES = {DATA, COMMERCIAL};
+    String TEST_SUPPORTED_MODULES_STRING = "COMMERCIAL,DATA";
+    String[] TEST_UNSUPPORTED_METHOD = {"method1", "method2"};
+    String TEST_UNSUPPORTED_METHODS_STRING = "method1,method2";
 }

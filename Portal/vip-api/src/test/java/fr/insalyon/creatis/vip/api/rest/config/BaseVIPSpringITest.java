@@ -29,7 +29,7 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL-B license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.api.rest.itest.config;
+package fr.insalyon.creatis.vip.api.rest.config;
 
 import fr.insalyon.creatis.vip.application.server.business.*;
 import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
@@ -52,7 +52,7 @@ import org.springframework.web.context.WebApplicationContext;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 
-import static fr.insalyon.creatis.vip.api.CarminAPITestConstants.*;
+import static fr.insalyon.creatis.vip.api.data.CarminAPITestConstants.*;
 import static fr.insalyon.creatis.vip.api.CarminProperties.*;
 
 /**
@@ -113,5 +113,37 @@ abstract public class BaseVIPSpringITest {
     protected String getResourceAsString(String pathFromClasspath) throws IOException {
         Resource resource = resourceLoader.getResource("classpath:"+pathFromClasspath);
         return IOUtils.toString(resource.getInputStream(), StandardCharsets.UTF_8);
+    }
+
+    public WebApplicationContext getWac() {
+        return wac;
+    }
+
+    public MockMvc getMockMvc() {
+        return mockMvc;
+    }
+
+    public ResourceLoader getResourceLoader() {
+        return resourceLoader;
+    }
+
+    public UserDAO getUserDAO() {
+        return userDAO;
+    }
+
+    public ConfigurationBusiness getConfigurationBusiness() {
+        return configurationBusiness;
+    }
+
+    public WorkflowBusiness getWorkflowBusiness() {
+        return workflowBusiness;
+    }
+
+    public ApplicationBusiness getApplicationBusiness() {
+        return applicationBusiness;
+    }
+
+    public ClassBusiness getClassBusiness() {
+        return classBusiness;
     }
 }

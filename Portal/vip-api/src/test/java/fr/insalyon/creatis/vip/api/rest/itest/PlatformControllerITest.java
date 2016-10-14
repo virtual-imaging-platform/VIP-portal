@@ -32,17 +32,15 @@
 package fr.insalyon.creatis.vip.api.rest.itest;
 
 import fr.insalyon.creatis.vip.api.bean.*;
-import fr.insalyon.creatis.vip.api.bean.Object;
-import fr.insalyon.creatis.vip.api.rest.itest.config.*;
+import fr.insalyon.creatis.vip.api.rest.config.*;
 import fr.insalyon.creatis.vip.api.rest.model.*;
 import org.hamcrest.*;
 import org.junit.Test;
-import org.springframework.security.test.context.support.WithMockUser;
 
 import java.util.*;
 import java.util.function.Function;
 
-import static fr.insalyon.creatis.vip.api.CarminAPITestConstants.*;
+import static fr.insalyon.creatis.vip.api.data.CarminAPITestConstants.*;
 import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;

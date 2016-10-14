@@ -29,11 +29,10 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL-B license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.api;
+package fr.insalyon.creatis.vip.api.data;
 
 import fr.insalyon.creatis.devtools.MD5;
 import fr.insalyon.creatis.vip.api.rest.security.SpringCompatibleUser;
-import fr.insalyon.creatis.vip.application.client.bean.*;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.user.UserLevel;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
@@ -41,37 +40,25 @@ import org.springframework.test.web.servlet.request.RequestPostProcessor;
 
 import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
-import java.util.*;
-
-import static fr.insalyon.creatis.vip.api.ClassesTestUtils.class1;
-import static fr.insalyon.creatis.vip.api.ClassesTestUtils.class2;
-import static fr.insalyon.creatis.vip.api.UserTestUtils.*;
-import static fr.insalyon.creatis.vip.core.client.view.util.CountryCode.cl;
 
 /**
  * Created by abonnet on 7/26/16.
  */
-public class ApplicationTestUtils {
+public class UserTestUtils {
 
-    static public Application app1;
-    static public Application app2;
-    static public Application app3;
-
-    static public Map<AppClass, List<Application>> applicationsPerClass = new HashMap<>();
+    static public User baseUser1;
+    static public User baseUser2;
+    static public String baseUser1Password = "baseUser1password";
+    static public String baseUser2Password = "baseUser2password";
 
     static {
-        // init class->application map
-        applicationsPerClass.put(class1, new ArrayList<>());
-        applicationsPerClass.put(class2, new ArrayList<>());
+        baseUser1 = new User("base1", "User1", "baseuser1@test.tst", null, null,
+                UserLevel.Beginner, null);
+        baseUser2 = new User("base2", "User2", "baseuser2@test.tst", null, null,
+                UserLevel.Advanced, null);
+    }
 
-        app1 = new Application("application 1", Arrays.asList(class1.getName()),
-                baseUser1.getEmail(), baseUser1.getFullName(), "citation application 1");
-        app2 = new Application("application 2", Arrays.asList(class1.getName()),
-                baseUser1.getEmail(), baseUser1.getFullName(), "citation application 2");
-        applicationsPerClass.get(class1).add(app2);
-        app3 = new Application("application 3", Arrays.asList(class1.getName(), class2.getName()),
-                baseUser2.getEmail(), baseUser2.getFullName(), "citation application 3");
-        applicationsPerClass.get(class1).add(app3);
-        applicationsPerClass.get(class2).add(app3);
+    public static RequestPostProcessor baseUser1() {
+        return SecurityMockMvcRequestPostProcessors.user(new SpringCompatibleUser(baseUser1));
     }
 }

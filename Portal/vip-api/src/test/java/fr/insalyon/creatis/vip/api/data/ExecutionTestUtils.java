@@ -29,9 +29,10 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL-B license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.api;
+package fr.insalyon.creatis.vip.api.data;
 
 import fr.insalyon.creatis.vip.api.bean.*;
+import fr.insalyon.creatis.vip.api.tools.spring.JsonCustomObjectMatcher;
 import fr.insalyon.creatis.vip.application.client.bean.*;
 import fr.insalyon.creatis.vip.application.client.view.monitor.SimulationStatus;
 import org.hamcrest.Matcher;
@@ -39,6 +40,8 @@ import org.hamcrest.Matcher;
 import java.lang.Object;
 import java.util.*;
 import java.util.function.Function;
+
+import static fr.insalyon.creatis.vip.api.tools.spring.JsonCustomObjectMatcher.jsonCorrespondsTo;
 
 /**
  * Created by abonnet on 8/3/16.
@@ -55,7 +58,8 @@ public class ExecutionTestUtils {
     static {
         // TODO Test with int or float params
         simulation1 = new Simulation("pipelineTest1", "3", null, "execId1",
-                UserTestUtils.baseUser1.getFullName(), new GregorianCalendar(2016, 9, 2).getTime(),
+                UserTestUtils.baseUser1.getFullName(),
+                new GregorianCalendar(2016, 9, 2).getTime(),
                 "Exec test 1", SimulationStatus.Running.toString(), "engine 1");
         execution1 = getExecution(simulation1, ExecutionStatus.RUNNING);
         execution1.setRestInputValues(new HashMap<String,Object>() {{
@@ -70,18 +74,21 @@ public class ExecutionTestUtils {
         simulation1OutData = Collections.emptyList();
 
         simulation2 = new Simulation("pipelineTest2", "4.2", null, "execId2",
-                UserTestUtils.baseUser1.getFullName(), new GregorianCalendar(2016, 4, 29).getTime(),
+                UserTestUtils.baseUser1.getFullName(),
+                new GregorianCalendar(2016, 4, 29).getTime(),
                 "Exec test 2", SimulationStatus.Completed.toString(), "engine 1");
         execution2 = getExecution(simulation2, ExecutionStatus.FINISHED);
         execution2.setRestInputValues(new HashMap<String,Object>() {{
-                                          put("param2-1", "5.3");
-                                      }}
+                  put("param2-1", "5.3");
+              }}
         );
         execution2.setRestReturnedFiles(new HashMap<String,List<Object>>() {{
             put("param2-res", Collections.singletonList("/File/res"));
         }});
-        simulation2InData = Collections.singletonList(new InOutData("5.3", "param2-1", "Float"));
-        simulation2OutData = Collections.singletonList(new InOutData("/File/res", "param2-res", "URI"));
+        simulation2InData = Collections.singletonList(
+                new InOutData("5.3", "param2-1", "Float"));
+        simulation2OutData = Collections.singletonList(
+                new InOutData("/File/res", "param2-res", "URI"));
 
         executionSuppliers = getExecutionSuppliers();
     }
@@ -105,15 +112,16 @@ public class ExecutionTestUtils {
                 execution.getStartDate(),
                 execution.getEndDate()
         );
-        // strip input values;
+        // strip input values (so do not add them);
         return newExecution;
     }
 
     public static Map<String,Function> getExecutionSuppliers() {
         return JsonCustomObjectMatcher.formatSuppliers(
                 Arrays.asList(
-                        "identifier", "name", "pipelineIdentifier", "timeout", "status", "inputValues",
-                        "returnedFiles", "studyIdentifier", "errorCode", "startDate", "endDate"),
+                        "identifier", "name", "pipelineIdentifier", "timeout",
+                        "status", "inputValues", "returnedFiles", "studyIdentifier",
+                        "errorCode", "startDate", "endDate"),
                 Execution::getIdentifier,
                 Execution::getName,
                 Execution::getPipelineIdentifier,
@@ -130,6 +138,6 @@ public class ExecutionTestUtils {
 
     public static Matcher<Map<String,?>> jsonCorrespondsToExecution(Execution execution) {
         Map<Class, Map<String, Function>> suppliersRegistry = new HashMap<>();
-        return JsonCustomObjectMatcher.jsonCorrespondsTo(execution, executionSuppliers, suppliersRegistry);
+        return jsonCorrespondsTo(execution, executionSuppliers, suppliersRegistry);
     }
 }

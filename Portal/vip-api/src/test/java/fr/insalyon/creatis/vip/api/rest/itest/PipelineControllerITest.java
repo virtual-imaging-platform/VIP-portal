@@ -31,30 +31,22 @@
  */
 package fr.insalyon.creatis.vip.api.rest.itest;
 
-import fr.insalyon.creatis.vip.api.business.ApiUtils;
 import fr.insalyon.creatis.vip.api.rest.RestErrorCodes;
-import fr.insalyon.creatis.vip.api.rest.itest.config.*;
-import fr.insalyon.creatis.vip.application.client.bean.*;
-import fr.insalyon.creatis.vip.core.client.bean.User;
+import fr.insalyon.creatis.vip.api.rest.config.*;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import org.junit.Test;
 
-import java.util.*;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
+import java.util.Arrays;
 
-import static com.hp.hpl.jena.util.iterator.Filter.any;
-import static fr.insalyon.creatis.vip.api.AppVersionTestUtils.*;
-import static fr.insalyon.creatis.vip.api.AppVersionTestUtils.version42;
-import static fr.insalyon.creatis.vip.api.ApplicationTestUtils.*;
-import static fr.insalyon.creatis.vip.api.ClassesTestUtils.class1;
-import static fr.insalyon.creatis.vip.api.ClassesTestUtils.class2;
-import static fr.insalyon.creatis.vip.api.PipelineTestUtils.*;
-import static fr.insalyon.creatis.vip.api.UserTestUtils.*;
-import static java.util.Collections.*;
-import static net.jcores.CoreKeeper.$;
+import static fr.insalyon.creatis.vip.api.data.AppVersionTestUtils.*;
+import static fr.insalyon.creatis.vip.api.data.ApplicationTestUtils.*;
+import static fr.insalyon.creatis.vip.api.data.ClassesTestUtils.*;
+import static fr.insalyon.creatis.vip.api.data.PipelineTestUtils.*;
+import static fr.insalyon.creatis.vip.api.data.UserTestUtils.baseUser1;
+import static fr.insalyon.creatis.vip.api.rest.mockconfig.ApplicationsConfigurator.*;
 import static org.hamcrest.Matchers.*;
-import static org.mockito.Matchers.*;
+import static org.mockito.Matchers.anyBoolean;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -99,7 +91,7 @@ public class PipelineControllerITest extends BaseVIPSpringITest {
 
     @Test
     public void shouldReturnPipelines() throws Exception {
-        configureApplications(baseUser1, Arrays.asList(class1, class2),
+        configureApplications(this, baseUser1, Arrays.asList(class1, class2),
                 app1, version42,
                 app2, version01,
                 app3, version42, version01);
@@ -117,64 +109,13 @@ public class PipelineControllerITest extends BaseVIPSpringITest {
 
     @Test
     public void userGetAPipeline() throws Exception {
-        configureApplications(baseUser1, Arrays.asList(class1, class2),
+        configureApplications(this, baseUser1, Arrays.asList(class1, class2),
                 app2, version42);
-        String pipelineId = configureAnApplication(baseUser1, app2, version42, 0, 1);
+        String pipelineId = configureAnApplication(this, baseUser1, app2, version42, 0, 1);
         mockMvc.perform(get("/pipelines").param("pipelineId", pipelineId)
                 .with(baseUser1()))
                 .andDo(print())
                 .andExpect(content().contentType(RestTestUtils.JSON_CONTENT_TYPE_UTF8))
                 .andExpect(jsonPath("$", jsonCorrespondsToPipeline(getFullPipeline(app2, version42, "desc test", 0, 1))));
-    }
-
-    // UTILS
-
-    /**
-     * Should take only Application and AppVersion classes in the sequence :
-     * Application AppVersion+
-     * (an application followed by one or more version)
-     */
-    private void configureApplications(User user, List<AppClass> classes, Object... args) throws BusinessException {
-        // parse the args to map the application to the versions
-        Application currentApplication = null;
-        Map<Application, List<AppVersion>> applicationVersions = new HashMap<>();
-        for (Object currentArg : args) {
-            if (currentArg instanceof Application) {
-                currentApplication = (Application) currentArg;
-                applicationVersions.put(currentApplication, new ArrayList<>());
-            } else {
-                applicationVersions.get(currentApplication).
-                        add(getVersion((AppVersion) currentArg, currentApplication));
-            }
-        }
-        List<String> classNames = classes.stream().map(AppClass::getName).collect(Collectors.toList());
-        // verify the classes given are good
-        Predicate<Application> isAppNotOK =
-                application -> Collections.disjoint(application.getApplicationClasses(), classNames);
-        if (applicationVersions.keySet().stream().anyMatch(isAppNotOK)) {
-            throw new RuntimeException("misconfiguration of test class>app config");
-        }
-        // configure mocks
-        // 1 return user classes
-        when(classBusiness.getUserClasses(user.getEmail(), false)).thenReturn(classes);
-        when(classBusiness.getUserClassesName(user.getEmail(), false)).thenReturn(classNames);
-        // 2 return apps for the classes
-        when(applicationBusiness.getApplications(anyListOf(String.class))).
-                thenReturn(new ArrayList<>(applicationVersions.keySet()));
-        // 3 return versions for each app
-        for (Application app : applicationVersions.keySet()) {
-            when(applicationBusiness.getVersions(app.getName())).
-                    thenReturn(applicationVersions.get(app));
-            when(applicationBusiness.getApplication(app.getName()))
-                    .thenReturn(app);
-        }
-    }
-
-    private String configureAnApplication(
-            User user, Application app, AppVersion version,
-            Integer... appParamsIndexes) throws BusinessException {
-        when(workflowBusiness.getApplicationDescriptor(user, app.getName(), version.getVersion()))
-                .thenReturn(getDescriptor("desc test", appParamsIndexes));
-        return ApiUtils.getPipelineIdentifier(app.getName(), version.getVersion());
     }
 }

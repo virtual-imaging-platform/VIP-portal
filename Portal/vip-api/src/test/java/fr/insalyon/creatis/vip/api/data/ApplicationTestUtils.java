@@ -29,29 +29,36 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL-B license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.api;
+package fr.insalyon.creatis.vip.api.data;
 
 import fr.insalyon.creatis.vip.application.client.bean.*;
 
-/**
- * Created by abonnet on 7/29/16.
- */
-public class AppVersionTestUtils {
+import java.util.*;
 
-    static final public AppVersion version42;
-    static final public AppVersion version01;
+/**
+ * Created by abonnet on 7/26/16.
+ */
+public class ApplicationTestUtils {
+
+    static public Application app1;
+    static public Application app2;
+    static public Application app3;
+
+    static public Map<AppClass, List<Application>> applicationsPerClass = new HashMap<>();
 
     static {
-        version42 = new AppVersion("application (TOCHANGE)", "4.2", "lfn????", true);
-        version01 = new AppVersion("application (TOCHANGE)", "0.1", "lfn????", true);
-    }
+        // init class->application map
+        applicationsPerClass.put(ClassesTestUtils.class1, new ArrayList<>());
+        applicationsPerClass.put(ClassesTestUtils.class2, new ArrayList<>());
 
-    static public AppVersion getVersion(AppVersion base, Application app) {
-        return new AppVersion(
-                app.getName(),
-                base.getVersion(),
-                base.getLfn(),
-                base.isVisible()
-        );
+        app1 = new Application("application 1", Arrays.asList(ClassesTestUtils.class1.getName()),
+                UserTestUtils.baseUser1.getEmail(), UserTestUtils.baseUser1.getFullName(), "citation application 1");
+        app2 = new Application("application 2", Arrays.asList(ClassesTestUtils.class1.getName()),
+                UserTestUtils.baseUser1.getEmail(), UserTestUtils.baseUser1.getFullName(), "citation application 2");
+        applicationsPerClass.get(ClassesTestUtils.class1).add(app2);
+        app3 = new Application("application 3", Arrays.asList(ClassesTestUtils.class1.getName(), ClassesTestUtils.class2.getName()),
+                UserTestUtils.baseUser2.getEmail(), UserTestUtils.baseUser2.getFullName(), "citation application 3");
+        applicationsPerClass.get(ClassesTestUtils.class1).add(app3);
+        applicationsPerClass.get(ClassesTestUtils.class2).add(app3);
     }
 }

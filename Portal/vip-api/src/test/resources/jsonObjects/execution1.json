@@ -1,10 +1,8 @@
 {
-  "name" : "execution test 1",
-  "pipelineIdentifier" : "identifier test",
-  "version" : "version test",
+  "name" : "Exec test 1",
+  "pipelineIdentifier" : "application 1/4.2",
   "inputValues" : {
-    "paramString" : "texte test",
-    "paramInt" : 42,
-    "paramDouble" : 42.42
+    "param 1" : "test text",
+    "param 2" : "/path/test"
   }
 }

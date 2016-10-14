@@ -29,29 +29,11 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL-B license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.api;
-
-import fr.insalyon.creatis.vip.api.bean.Module;
-import fr.insalyon.creatis.vip.api.rest.model.SupportedTransferProtocol;
-
-import static fr.insalyon.creatis.vip.api.bean.Module.*;
-import static fr.insalyon.creatis.vip.api.rest.model.SupportedTransferProtocol.*;
+package fr.insalyon.creatis.vip.api.rest.config;
 
 /**
  * Created by abonnet on 7/21/16.
  */
-public interface CarminAPITestConstants {
-    String TEST_PLATFORM_NAME = "TestPlatform";
-    String TEST_PLATFORM_DESCRIPTION = "Test Platform description";
-    String TEST_DEFAULT_LIST_LIMIT = "42";
-    String TEST_SUPPORTED_API_VERSION = "Version 4.2";
-    String TEST_IS_KILL_SUPPORTED = "false";
-
-    /* WARNING : keep following properties consistant */
-    SupportedTransferProtocol[] TEST_SUPPORTED_PROTOCOLS = {HTTP, WEBDAV};
-    String TEST_SUPPORTED_TRANSFER_PROTOCOLS_STRING = "HTTP,WEBDAV";
-    Module[] TEST_SUPPORTED_MODULES = {DATA, COMMERCIAL};
-    String TEST_SUPPORTED_MODULES_STRING = "COMMERCIAL,DATA";
-    String[] TEST_UNSUPPORTED_METHOD = {"method1", "method2"};
-    String TEST_UNSUPPORTED_METHODS_STRING = "method1,method2";
+public class RestTestUtils {
+    public static final String JSON_CONTENT_TYPE_UTF8 ="application/json;charset=UTF-8";
 }

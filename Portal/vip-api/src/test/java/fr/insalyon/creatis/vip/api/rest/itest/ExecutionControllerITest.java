@@ -31,18 +31,24 @@
  */
 package fr.insalyon.creatis.vip.api.rest.itest;
 
-import fr.insalyon.creatis.vip.api.ExecutionTestUtils;
-import fr.insalyon.creatis.vip.api.rest.itest.config.*;
-import org.junit.Test;
+import fr.insalyon.creatis.vip.api.rest.config.*;
+import fr.insalyon.creatis.vip.api.rest.mockconfig.ApplicationsConfigurator;
+import fr.insalyon.creatis.vip.core.client.bean.Group;
+import fr.insalyon.creatis.vip.core.client.view.CoreConstants.GROUP_ROLE;
+import org.hamcrest.Matcher;
+import org.junit.*;
+import org.mockito.*;
 
-import java.util.Arrays;
+import java.util.*;
 
-import static fr.insalyon.creatis.vip.api.AppVersionTestUtils.*;
-import static fr.insalyon.creatis.vip.api.ApplicationTestUtils.*;
-import static fr.insalyon.creatis.vip.api.ExecutionTestUtils.*;
-import static fr.insalyon.creatis.vip.api.PipelineTestUtils.*;
-import static fr.insalyon.creatis.vip.api.UserTestUtils.baseUser1;
-import static fr.insalyon.creatis.vip.api.UserTestUtils.baseUser2;
+import static fr.insalyon.creatis.vip.api.data.AppVersionTestUtils.version42;
+import static fr.insalyon.creatis.vip.api.data.ApplicationTestUtils.app1;
+import static fr.insalyon.creatis.vip.api.data.ClassesTestUtils.class1;
+import static fr.insalyon.creatis.vip.api.data.ExecutionTestUtils.*;
+import static fr.insalyon.creatis.vip.api.data.UserTestUtils.baseUser1;
+import static fr.insalyon.creatis.vip.api.rest.mockconfig.ApplicationsConfigurator.configureAnApplication;
+import static fr.insalyon.creatis.vip.api.rest.mockconfig.ApplicationsConfigurator.configureApplications;
+import static java.awt.SystemColor.text;
 import static org.hamcrest.Matchers.*;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.*;
@@ -116,13 +122,45 @@ public class ExecutionControllerITest extends BaseVIPSpringITest {
                 ));
     }
 
-    //@Test
+    @Test
     public void testInitExecution() throws Exception {
+        // configure pipeline access right
+        configureApplications(
+                this, baseUser1, Collections.singletonList(class1),
+                app1, version42);
+        // configure pipeline input
+        configureAnApplication(this, baseUser1, app1, version42, 0 ,1);
+        // configure lauch
+        when(workflowBusiness.launch(eq(baseUser1), anyList(), anyMap(), eq(app1.getName()),
+                eq(version42.getVersion()), eq(class1.getName()), eq(execution1.getName())))
+            .thenReturn(execution1.getIdentifier());
+        // configure returne execution
+        when(workflowBusiness.getSimulation(execution1.getIdentifier()))
+                .thenReturn(simulation1);
+        when(workflowBusiness.getInputData(simulation1.getID(), baseUser1.getFolder()))
+                .thenReturn(simulation1InData);
+        when(workflowBusiness.getOutputData(simulation1.getID(), baseUser1.getFolder()))
+                .thenReturn(simulation1OutData);
+        // misc config
+        when(configurationBusiness.getUserGroups(baseUser1.getEmail()))
+                .thenReturn(new HashMap<>());
         mockMvc.perform(
                 post("/executions").contentType("application/json")
                         .content(getResourceAsString("jsonObjects/execution1.json"))
                         .with(baseUser1()))
                 .andDo(print())
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(RestTestUtils.JSON_CONTENT_TYPE_UTF8))
+                .andExpect(jsonPath("$",
+                        jsonCorrespondsToExecution(execution1)
+                ));
+        ArgumentCaptor<Map> inputCaptor =
+                ArgumentCaptor.forClass(Map.class);
+        verify(workflowBusiness).launch(eq(baseUser1), anyList(), inputCaptor.capture(), eq(app1.getName()),
+                eq(version42.getVersion()), eq(class1.getName()), eq(execution1.getName()));
+        Assert.assertEquals(inputCaptor.getValue().size(), 2);
+        Assert.<Map<?,?>>assertThat(inputCaptor.getValue(), allOf(
+                hasEntry("param 1", "test text"),
+                hasEntry("param 2", "/path/test")));
     }
 }

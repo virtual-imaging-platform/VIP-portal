@@ -29,14 +29,14 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL-B license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.api;
+package fr.insalyon.creatis.vip.api.data;
 
 import fr.insalyon.creatis.vip.api.bean.*;
 import fr.insalyon.creatis.vip.api.business.ApiUtils;
+import fr.insalyon.creatis.vip.api.tools.spring.JsonCustomObjectMatcher;
 import fr.insalyon.creatis.vip.application.client.bean.*;
 import org.hamcrest.Matcher;
 
-import java.lang.Object;
 import java.util.*;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.Map.Entry;

@@ -29,36 +29,29 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL-B license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.api;
+package fr.insalyon.creatis.vip.api.data;
 
-import fr.insalyon.creatis.devtools.MD5;
-import fr.insalyon.creatis.vip.api.rest.security.SpringCompatibleUser;
-import fr.insalyon.creatis.vip.core.client.bean.User;
-import fr.insalyon.creatis.vip.core.client.view.user.UserLevel;
-import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
-import org.springframework.test.web.servlet.request.RequestPostProcessor;
-
-import java.io.UnsupportedEncodingException;
-import java.security.NoSuchAlgorithmException;
+import fr.insalyon.creatis.vip.application.client.bean.*;
 
 /**
- * Created by abonnet on 7/26/16.
+ * Created by abonnet on 7/29/16.
  */
-public class UserTestUtils {
+public class AppVersionTestUtils {
 
-    static public User baseUser1;
-    static public User baseUser2;
-    static public String baseUser1Password = "baseUser1password";
-    static public String baseUser2Password = "baseUser2password";
+    static final public AppVersion version42;
+    static final public AppVersion version01;
 
     static {
-        baseUser1 = new User("base1", "User1", "baseuser1@test.tst", null, null,
-                UserLevel.Beginner, null);
-        baseUser2 = new User("base2", "User2", "baseuser2@test.tst", null, null,
-                UserLevel.Advanced, null);
+        version42 = new AppVersion("application (TOCHANGE)", "4.2", "lfn????", true);
+        version01 = new AppVersion("application (TOCHANGE)", "0.1", "lfn????", true);
     }
 
-    public static RequestPostProcessor baseUser1() {
-        return SecurityMockMvcRequestPostProcessors.user(new SpringCompatibleUser(baseUser1));
+    static public AppVersion getVersion(AppVersion base, Application app) {
+        return new AppVersion(
+                app.getName(),
+                base.getVersion(),
+                base.getLfn(),
+                base.isVisible()
+        );
     }
 }

@@ -29,32 +29,29 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL-B license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.api;
+package fr.insalyon.creatis.vip.api.tools.spring;
 
-import fr.insalyon.creatis.devtools.MD5;
-import fr.insalyon.creatis.vip.api.rest.security.SpringCompatibleUser;
-import fr.insalyon.creatis.vip.application.client.bean.AppClass;
-import fr.insalyon.creatis.vip.core.client.bean.User;
-import fr.insalyon.creatis.vip.core.client.view.user.UserLevel;
-import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
+import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.test.web.servlet.request.RequestPostProcessor;
 
-import java.io.UnsupportedEncodingException;
-import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
-
-import static fr.insalyon.creatis.vip.api.UserTestUtils.*;
-
 /**
- * Created by abonnet on 7/26/16.
+ * Created by abonnet on 10/6/16.
  */
-public class ClassesTestUtils {
+public class ApikeyRequestPostProcessor implements RequestPostProcessor {
+    private String apikeyHeader, apikeyValue;
 
-    static public AppClass class1;
-    static public AppClass class2;
+    public ApikeyRequestPostProcessor(String apikeyHeader, String apikeyValue) {
+        this.apikeyHeader = apikeyHeader;
+        this.apikeyValue = apikeyValue;
+    }
 
-    static {
-        class1 = new AppClass("classe 1", new ArrayList<>());
-        class2 = new AppClass("classe 2", new ArrayList<>());
+    @Override
+    public MockHttpServletRequest postProcessRequest(MockHttpServletRequest request) {
+        request.addHeader(apikeyHeader, apikeyValue);
+        return request;
+    }
+
+    public static RequestPostProcessor apikey(String apikeyHeader, String apikeyValue) {
+        return new ApikeyRequestPostProcessor(apikeyHeader, apikeyValue);
     }
 }
