@@ -211,24 +211,19 @@ public class ExecutionBusiness {
 
     public void updateExecution(Execution execution) throws ApiException {
         try {
-            WorkflowDAO wd = WorkflowsDBDAOFactory.getInstance().getWorkflowDAO();
-            Workflow w = wd.get(execution.getIdentifier());
             if (execution.getTimeout() > 0) {
                 throw new ApiException("Update of execution timeout is not supported.");
             }
-            logger.info("updating execution "+ execution.getIdentifier()
-                    +" name to " + execution.getName());
-            w.setDescription(execution.getName());
-            wd.update(w);
-        } catch (WorkflowsDBDAOException ex) {
-            Logger.getLogger(ExecutionBusiness.class.getName()).log(Level.SEVERE, null, ex);
+            logger.info("updating execution " + execution.getIdentifier()
+                    + " name to " + execution.getName());
+            workflowBusiness.updateDescription(execution.getIdentifier(), execution.getName());
+        } catch (BusinessException e) {
+            throw new ApiException(e);
         }
     }
 
     public void updateExecution(String executionId, ArrayList<StringKeyValuePair> values) throws ApiException {
         try {
-            WorkflowDAO wd = WorkflowsDBDAOFactory.getInstance().getWorkflowDAO();
-            Workflow w = wd.get(executionId);
             for (StringKeyValuePair skvp : values) {
                 if (!skvp.getName().equals("name")) // in the current spec, update can only deal with the timeout (unsupported here) or the name.
                 {
@@ -238,12 +233,11 @@ public class ExecutionBusiness {
                         throw new ApiException("Value of parameter " + skvp.getName() + " is empty.");
                     }
                     logger.info("Updating parameter " + skvp.getName() + " with value \"" + skvp.getValue().toString() + "\"");
-                    w.setDescription(skvp.getValue().toString());
+                    workflowBusiness.updateDescription(executionId, skvp.getValue().toString());
                 }
             }
-            wd.update(w);
-        } catch (WorkflowsDBDAOException ex) {
-            Logger.getLogger(ExecutionBusiness.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (BusinessException e) {
+            throw new ApiException(e);
         }
     }
 
