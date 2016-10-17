@@ -35,13 +35,13 @@ import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
+import fr.insalyon.creatis.vip.core.server.dao.*;
 import fr.insalyon.creatis.vip.core.server.rpc.ConfigurationServiceImpl;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.Date;
-import java.util.List;
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import javax.servlet.ServletException;
@@ -91,6 +91,7 @@ public abstract class AbstractAuthenticationService extends HttpServlet {
         try { 
             checkValidRequest(request);
             email = getEmail();
+            resetFailedAuthenticationCount(email);
         } catch (BusinessException ex) {
             logger.info(ex.getMessage());
             authFailedResponse(request, response);
@@ -104,6 +105,17 @@ public abstract class AbstractAuthenticationService extends HttpServlet {
         }
         //authenticate email in VIP
         authSuccessResponse(request, response, email);
+    }
+
+    private void resetFailedAuthenticationCount(String email) {
+        try {
+            UserDAO userDAO = CoreDAOFactory.getDAOFactory().getUserDAO();
+            userDAO.resetNFailedAuthentications(email);
+            logger.debug("Reset auth count for " + email);
+        } catch (DAOException e) {
+            logger.error("Error resetting failed auth counter for :" + email);
+            logger.error("ignoring it");
+        }
     }
 
     private String getBaseURL(HttpServletRequest request) {
