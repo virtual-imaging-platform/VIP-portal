@@ -33,6 +33,7 @@ package fr.insalyon.creatis.vip.api.rest.controller;
 
 import fr.insalyon.creatis.vip.api.bean.Execution;
 import fr.insalyon.creatis.vip.api.business.*;
+import fr.insalyon.creatis.vip.api.exception.NotImplementedException;
 import fr.insalyon.creatis.vip.api.rest.RestApiBusiness;
 import fr.insalyon.creatis.vip.api.rest.model.*;
 import fr.insalyon.creatis.vip.application.server.business.*;
@@ -132,6 +133,11 @@ public class ExecutionControler {
 
     @RequestMapping(method = RequestMethod.POST)
     public Execution initExecution(@RequestBody @Valid Execution execution) throws ApiException {
+        throw new NotImplementedException("Use POST /executions/create-and-start instead");
+    }
+
+    @RequestMapping(value="/create-and-start", method = RequestMethod.POST)
+    public Execution initExecutionAndStart(@RequestBody @Valid Execution execution) throws ApiException {
         ApiUtils.methodInvocationLog("initExecution", execution);
         ApiContext apiContext = new RestApiBusiness().getApiContext(httpServletRequest, true);
         PipelineBusiness pb = buildPipelineBusiness(apiContext);
@@ -151,7 +157,7 @@ public class ExecutionControler {
         return eb.getExecutionResults(executionId, protocol, true);
     }
 
-    @RequestMapping("/{executionId}/stdout")
+    @RequestMapping(value = "/{executionId}/stdout", produces = "text/plain;charset=UTF-8")
     public String getStdout(@PathVariable String executionId) throws ApiException {
         ApiUtils.methodInvocationLog("getStdout", executionId);
         ApiContext apiContext = new RestApiBusiness().getApiContext(httpServletRequest, true);
@@ -160,7 +166,7 @@ public class ExecutionControler {
         return eb.getStdOut(executionId);
     }
 
-    @RequestMapping("/{executionId}/stderr")
+    @RequestMapping(value= "/{executionId}/stderr", produces = "text/plain;charset=UTF-8")
     public String getStderr(@PathVariable String executionId) throws ApiException {
         ApiUtils.methodInvocationLog("getStderr", executionId);
         ApiContext apiContext = new RestApiBusiness().getApiContext(httpServletRequest, true);

@@ -29,40 +29,20 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL-B license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.api.rest;
+package fr.insalyon.creatis.vip.api.exception;
+
+import fr.insalyon.creatis.vip.api.business.ApiException;
 
 /**
- * Created by abonnet on 7/27/16.
+ * Created by abonnet on 10/17/16.
  */
-public enum RestErrorCodes {
+public class NotImplementedException extends ApiException {
 
-    API_ERROR(40001, "An error has been encountered on the API."),
-    NOT_IMPLEMENTED(40002, "Unfortunately this method is not implemented.")    ,
-
-    BAD_CREDENTIALS(40101),
-    INSUFFICIENT_AUTH(40102),
-    AUTHENTICATION_ERROR(40103)                                      ,
-
-    UNEXPECTED_ERROR(50001, "An unexpected error has been encountered")
-    ;
-
-    RestErrorCodes(Integer code) {
-        this.code = code;
+    public NotImplementedException(String message) {
+        super(message);
     }
 
-    RestErrorCodes(Integer code, String message) {
-        this.code = code;
-        this.message = message;
-    }
-
-    private Integer code;
-    private String message;
-
-    public Integer getCode() {
-        return code;
-    }
-
-    public String getMessage() {
-        return message;
+    public NotImplementedException(Throwable thrwbl) {
+        super(thrwbl);
     }
 }

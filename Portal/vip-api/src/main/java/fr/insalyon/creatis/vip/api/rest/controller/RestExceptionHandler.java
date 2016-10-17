@@ -32,6 +32,7 @@
 package fr.insalyon.creatis.vip.api.rest.controller;
 
 import fr.insalyon.creatis.vip.api.business.ApiException;
+import fr.insalyon.creatis.vip.api.exception.NotImplementedException;
 import fr.insalyon.creatis.vip.api.rest.RestErrorCodes;
 import fr.insalyon.creatis.vip.api.rest.model.ErrorCodesAndMessage;
 import org.apache.log4j.Logger;
@@ -50,6 +51,15 @@ import javax.servlet.http.HttpServletRequest;
 public class RestExceptionHandler {
 
     public static final Logger logger = Logger.getLogger(RestExceptionHandler.class);
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(NotImplementedException.class)
+    @ResponseBody
+    public ErrorCodesAndMessage handleNotImplementedException(NotImplementedException e) {
+        logger.error(e);
+        return new ErrorCodesAndMessage(RestErrorCodes.NOT_IMPLEMENTED.getCode(),
+                RestErrorCodes.NOT_IMPLEMENTED.getMessage());
+    }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(ApiException.class)
