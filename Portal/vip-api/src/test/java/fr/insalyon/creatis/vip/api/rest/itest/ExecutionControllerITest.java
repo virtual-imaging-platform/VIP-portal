@@ -31,13 +31,18 @@
  */
 package fr.insalyon.creatis.vip.api.rest.itest;
 
+import fr.insalyon.creatis.vip.api.bean.Execution;
+import fr.insalyon.creatis.vip.api.data.ExecutionTestUtils;
+import fr.insalyon.creatis.vip.api.rest.RestErrorCodes;
 import fr.insalyon.creatis.vip.api.rest.config.*;
 import fr.insalyon.creatis.vip.api.rest.mockconfig.ApplicationsConfigurator;
+import fr.insalyon.creatis.vip.application.client.bean.Simulation;
 import fr.insalyon.creatis.vip.core.client.bean.Group;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants.GROUP_ROLE;
 import org.hamcrest.Matcher;
 import org.junit.*;
 import org.mockito.*;
+import org.springframework.http.MediaType;
 
 import java.util.*;
 
@@ -52,8 +57,7 @@ import static java.awt.SystemColor.text;
 import static org.hamcrest.Matchers.*;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -123,6 +127,45 @@ public class ExecutionControllerITest extends BaseVIPSpringITest {
     }
 
     @Test
+    public void shouldUpdateExecution1() throws Exception {
+        String newName = "Exec test 1 - modified";
+        Execution modifiedExecution =
+                ExecutionTestUtils.copyExecutionWithNewName(execution1, newName);
+        Simulation modifiedSimulation =
+                ExecutionTestUtils.copySimulationWithNewName(simulation1, newName);
+        when(workflowBusiness.getSimulation(simulation1.getID()))
+                .thenReturn(simulation1, modifiedSimulation);
+        when(workflowBusiness.getInputData(simulation1.getID(), baseUser1.getFolder()))
+                .thenReturn(simulation1InData);
+        when(workflowBusiness.getOutputData(simulation1.getID(), baseUser1.getFolder()))
+                .thenReturn(simulation1OutData);
+        mockMvc.perform(
+                put("/executions/" + simulation1.getID())
+                        .contentType("application/json")
+                        .content(getResourceAsString("jsonObjects/execution1-name-updated.json"))
+                        .with(baseUser1()))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(RestTestUtils.JSON_CONTENT_TYPE_UTF8))
+                .andExpect(jsonPath("$",
+                        jsonCorrespondsToExecution(modifiedExecution)
+                ));
+        verify(workflowBusiness).updateDescription(simulation1.getID(), newName);
+    }
+
+    @Test
+    public void testInitExecutionIsNotImplemented() throws Exception {
+        mockMvc.perform(
+                post("/executions").contentType("application/json")
+                        .content(getResourceAsString("jsonObjects/execution1.json"))
+                        .with(baseUser1()))
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentType(RestTestUtils.JSON_CONTENT_TYPE_UTF8))
+                .andExpect(jsonPath("$.code").value(RestErrorCodes.NOT_IMPLEMENTED.getCode()));
+    }
+
+    @Test
     public void testInitExecution() throws Exception {
         // configure pipeline access right
         configureApplications(
@@ -145,7 +188,7 @@ public class ExecutionControllerITest extends BaseVIPSpringITest {
         when(configurationBusiness.getUserGroups(baseUser1.getEmail()))
                 .thenReturn(new HashMap<>());
         mockMvc.perform(
-                post("/executions").contentType("application/json")
+                post("/executions/create-and-start").contentType("application/json")
                         .content(getResourceAsString("jsonObjects/execution1.json"))
                         .with(baseUser1()))
                 .andDo(print())
@@ -162,5 +205,54 @@ public class ExecutionControllerITest extends BaseVIPSpringITest {
         Assert.<Map<?,?>>assertThat(inputCaptor.getValue(), allOf(
                 hasEntry("param 1", "test text"),
                 hasEntry("param 2", "/path/test")));
+    }
+
+    @Test
+    public void shouldGetExecution2Results() throws Exception {
+        when(workflowBusiness.getSimulation(simulation2.getID()))
+                .thenReturn(simulation2);
+        when(workflowBusiness.getOutputData(simulation2.getID(), baseUser1.getFolder()))
+                .thenReturn(simulation2OutData);
+        String operationId = "testOpId";
+        when(transferPoolBusiness.downloadFile(baseUser1, simulation2OutData.get(0).getPath()))
+                .thenReturn(operationId);
+        mockMvc.perform(
+                get("/executions/" + simulation2.getID() + "/results").with(baseUser1()))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(RestTestUtils.JSON_CONTENT_TYPE_UTF8))
+                .andExpect(jsonPath("$[*]", hasSize(1)))
+                .andExpect(jsonPath("$[0]",
+                        org.hamcrest.Matchers.endsWith("operationid=" + operationId)));
+    }
+
+    @Test
+    public void shouldGetExecution2Stdout() throws Exception {
+        when(workflowBusiness.getSimulation(simulation2.getID()))
+                .thenReturn(simulation2);
+        String testOutput = "blablabla";
+        when(simulationBusiness.readFile(simulation2.getID(), "", "workflow", ".out"))
+                .thenReturn(testOutput);
+        mockMvc.perform(
+                get("/executions/" + simulation2.getID() + "/stdout").with(baseUser1()))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(RestTestUtils.TEXT_CONTENT_TYPE_UTF8))
+                .andExpect(content().string(testOutput));
+    }
+
+    @Test
+    public void shouldGetExecution2Stderr() throws Exception {
+        when(workflowBusiness.getSimulation(simulation2.getID()))
+                .thenReturn(simulation2);
+        String testOutput = "blablabla";
+        when(simulationBusiness.readFile(simulation2.getID(), "", "workflow", ".err"))
+                .thenReturn(testOutput);
+        mockMvc.perform(
+                get("/executions/" + simulation2.getID() + "/stderr").with(baseUser1()))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(RestTestUtils.TEXT_CONTENT_TYPE_UTF8))
+                .andExpect(content().string(testOutput));
     }
 }

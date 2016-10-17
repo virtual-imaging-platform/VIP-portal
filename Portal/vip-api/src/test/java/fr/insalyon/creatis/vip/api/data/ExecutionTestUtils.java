@@ -93,7 +93,7 @@ public class ExecutionTestUtils {
         executionSuppliers = getExecutionSuppliers();
     }
 
-    public static Execution getExecution(Simulation simulation, ExecutionStatus executionStatus) {
+    private static Execution getExecution(Simulation simulation, ExecutionStatus executionStatus) {
         // TODO : startDate should be in seconds
         return new Execution(simulation.getID(), simulation.getSimulationName(),
                 simulation.getApplicationName() + "/" + simulation.getApplicationVersion(),
@@ -114,6 +114,39 @@ public class ExecutionTestUtils {
         );
         // strip input values (so do not add them);
         return newExecution;
+    }
+
+    public static Execution copyExecutionWithNewName(Execution execution, String newName) {
+        Execution newExecution = new Execution(
+                execution.getIdentifier(),
+                newName,
+                execution.getPipelineIdentifier(),
+                execution.getTimeout(),
+                execution.getStatus(),
+                execution.getStudyIdentifier(),
+                execution.getErrorCode(),
+                execution.getStartDate(),
+                execution.getEndDate()
+        );
+        // WARNING, do not copy input value and returned files objects
+        newExecution.setRestInputValues(execution.getRestInputValues());
+        newExecution.setRestReturnedFiles(execution.getRestReturnedFiles());
+        return newExecution;
+    }
+
+    public static Simulation copySimulationWithNewName(Simulation simu, String newName) {
+        Simulation newSimulation = new Simulation(
+                simu.getApplicationName(),
+                simu.getApplicationVersion(),
+                simu.getApplicationClass(),
+                simu.getID(),
+                simu.getUserName(),
+                simu.getDate(),
+                newName,
+                simu.getStatus().toString(),
+                simu.getEngine()
+        );
+        return newSimulation;
     }
 
     public static Map<String,Function> getExecutionSuppliers() {

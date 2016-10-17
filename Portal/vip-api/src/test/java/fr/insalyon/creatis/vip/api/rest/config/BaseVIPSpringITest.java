@@ -34,6 +34,7 @@ package fr.insalyon.creatis.vip.api.rest.config;
 import fr.insalyon.creatis.vip.application.server.business.*;
 import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
 import fr.insalyon.creatis.vip.core.server.dao.UserDAO;
+import fr.insalyon.creatis.vip.datamanager.server.business.TransferPoolBusiness;
 import org.apache.commons.io.IOUtils;
 import org.junit.Before;
 import org.junit.runner.RunWith;
@@ -99,6 +100,10 @@ abstract public class BaseVIPSpringITest {
     protected ApplicationBusiness applicationBusiness;
     @Autowired
     protected ClassBusiness classBusiness;
+    @Autowired
+    protected TransferPoolBusiness transferPoolBusiness;
+    @Autowired
+    protected SimulationBusiness simulationBusiness;
 
     @Before
     public final void setup() {
@@ -145,5 +150,13 @@ abstract public class BaseVIPSpringITest {
 
     public ClassBusiness getClassBusiness() {
         return classBusiness;
+    }
+
+    public TransferPoolBusiness getTransferPoolBusiness() {
+        return transferPoolBusiness;
+    }
+
+    public SimulationBusiness getSimulationBusiness() {
+        return simulationBusiness;
     }
 }
