@@ -51,7 +51,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  *
  * Test method on platform path
  */
-public class PlatformControllerITest extends BaseVIPSpringITest {
+public class PlatformControllerIT extends BaseVIPSpringIT {
 
     @Test
     public void platformShouldNotBeSecured() throws Exception {
@@ -62,7 +62,7 @@ public class PlatformControllerITest extends BaseVIPSpringITest {
 
     @Test
     public void testPlatformProperties() throws Exception {
-        // the test properties are set in BaseVIPSpringITest (with @TestPropertySource)
+        // the test properties are set in BaseVIPSpringIT (with @TestPropertySource)
         mockMvc.perform(get("/platform"))
                 .andDo(print())
                 .andExpect(status().isOk())

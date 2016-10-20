@@ -55,10 +55,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * These tests check the authentication with the spring test tools.
  * It requests a wrong url that should be secured and expects a 404 when OK
  *
- * Use common vip spring test configuration ({@link BaseVIPSpringITest}
+ * Use common vip spring test configuration ({@link BaseVIPSpringIT}
  *
  */
-public class AuthenticationITest extends BaseVIPSpringITest {
+public class AuthenticationIT extends BaseVIPSpringIT {
 
     @Test
     public void authenticationOK() throws Exception {

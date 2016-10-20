@@ -59,7 +59,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * <p>
  * Include 2 tests on error handling
  */
-public class PipelineControllerITest extends BaseVIPSpringITest {
+public class PipelineControllerIT extends BaseVIPSpringIT {
 
     @Test
     public void pipelineMethodShouldBeSecured() throws Exception {

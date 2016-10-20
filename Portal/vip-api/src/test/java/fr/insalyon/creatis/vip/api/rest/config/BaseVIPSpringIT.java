@@ -83,7 +83,7 @@ import static fr.insalyon.creatis.vip.api.CarminProperties.*;
         SUPPORTED_API_VERSION + "=" + TEST_SUPPORTED_API_VERSION,
         IS_KILL_EXECUTION_SUPPORTED + "=" + TEST_IS_KILL_SUPPORTED
 })
-abstract public class BaseVIPSpringITest {
+abstract public class BaseVIPSpringIT {
 
     @Autowired
     protected WebApplicationContext wac;

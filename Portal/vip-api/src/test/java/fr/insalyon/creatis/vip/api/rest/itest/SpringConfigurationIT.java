@@ -60,7 +60,7 @@ import static fr.insalyon.creatis.vip.api.CarminProperties.*;
 @RunWith(SpringRunner.class)
 @WebAppConfiguration
 @ContextConfiguration
-public class SpringConfigurationITest {
+public class SpringConfigurationIT {
 
     // Need to override vipInitializer that operate on the database
     @Configuration

@@ -35,14 +35,9 @@ import fr.insalyon.creatis.vip.api.bean.Execution;
 import fr.insalyon.creatis.vip.api.data.ExecutionTestUtils;
 import fr.insalyon.creatis.vip.api.rest.RestErrorCodes;
 import fr.insalyon.creatis.vip.api.rest.config.*;
-import fr.insalyon.creatis.vip.api.rest.mockconfig.ApplicationsConfigurator;
 import fr.insalyon.creatis.vip.application.client.bean.Simulation;
-import fr.insalyon.creatis.vip.core.client.bean.Group;
-import fr.insalyon.creatis.vip.core.client.view.CoreConstants.GROUP_ROLE;
-import org.hamcrest.Matcher;
 import org.junit.*;
 import org.mockito.*;
-import org.springframework.http.MediaType;
 
 import java.util.*;
 
@@ -53,7 +48,6 @@ import static fr.insalyon.creatis.vip.api.data.ExecutionTestUtils.*;
 import static fr.insalyon.creatis.vip.api.data.UserTestUtils.baseUser1;
 import static fr.insalyon.creatis.vip.api.rest.mockconfig.ApplicationsConfigurator.configureAnApplication;
 import static fr.insalyon.creatis.vip.api.rest.mockconfig.ApplicationsConfigurator.configureApplications;
-import static java.awt.SystemColor.text;
 import static org.hamcrest.Matchers.*;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.*;
@@ -66,13 +60,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * <p>
  * Test method on platform path
  */
-public class ExecutionControllerITest extends BaseVIPSpringITest {
+public class ExecutionControllerIT extends BaseVIPSpringIT {
 
     // TODO finish tests
 
     @Test
     public void shouldListExecutions() throws Exception {
-        when(workflowBusiness.getSimulations(baseUser1.getFullName(),null,null, null,null,null))
+        when(workflowBusiness.getSimulations(baseUser1.getFullName(), null, null, null, null, null))
                 .thenReturn(Arrays.asList(simulation1, simulation2));
         when(workflowBusiness.getSimulation(simulation1.getID()))
                 .thenReturn(simulation1);
@@ -85,9 +79,9 @@ public class ExecutionControllerITest extends BaseVIPSpringITest {
                 .andExpect(content().contentType(RestTestUtils.JSON_CONTENT_TYPE_UTF8))
                 .andExpect(jsonPath("[*]", hasSize(2)))
                 .andExpect(jsonPath("$[*]", containsInAnyOrder(
-                            jsonCorrespondsToExecution(summariseExecution(execution1)),
-                            jsonCorrespondsToExecution(summariseExecution(execution2))
-                        )));
+                        jsonCorrespondsToExecution(summariseExecution(execution1)),
+                        jsonCorrespondsToExecution(summariseExecution(execution2))
+                )));
     }
 
     @Test
@@ -172,11 +166,11 @@ public class ExecutionControllerITest extends BaseVIPSpringITest {
                 this, baseUser1, Collections.singletonList(class1),
                 app1, version42);
         // configure pipeline input
-        configureAnApplication(this, baseUser1, app1, version42, 0 ,1);
+        configureAnApplication(this, baseUser1, app1, version42, 0, 1);
         // configure lauch
         when(workflowBusiness.launch(eq(baseUser1), anyList(), anyMap(), eq(app1.getName()),
                 eq(version42.getVersion()), eq(class1.getName()), eq(execution1.getName())))
-            .thenReturn(execution1.getIdentifier());
+                .thenReturn(execution1.getIdentifier());
         // configure returne execution
         when(workflowBusiness.getSimulation(execution1.getIdentifier()))
                 .thenReturn(simulation1);
@@ -202,7 +196,7 @@ public class ExecutionControllerITest extends BaseVIPSpringITest {
         verify(workflowBusiness).launch(eq(baseUser1), anyList(), inputCaptor.capture(), eq(app1.getName()),
                 eq(version42.getVersion()), eq(class1.getName()), eq(execution1.getName()));
         Assert.assertEquals(inputCaptor.getValue().size(), 2);
-        Assert.<Map<?,?>>assertThat(inputCaptor.getValue(), allOf(
+        Assert.<Map<?, ?>>assertThat(inputCaptor.getValue(), allOf(
                 hasEntry("param 1", "test text"),
                 hasEntry("param 2", "/path/test")));
     }
@@ -254,5 +248,45 @@ public class ExecutionControllerITest extends BaseVIPSpringITest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(RestTestUtils.TEXT_CONTENT_TYPE_UTF8))
                 .andExpect(content().string(testOutput));
+    }
+
+    @Test
+    public void testPlayExecutionIsNotImplemented() throws Exception {
+        mockMvc.perform(
+                put("/executions/" + simulation1.getID() + "/play")
+                        .with(baseUser1()))
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentType(RestTestUtils.JSON_CONTENT_TYPE_UTF8))
+                .andExpect(jsonPath("$.code").value(RestErrorCodes.NOT_IMPLEMENTED.getCode()));
+    }
+
+    @Test
+    public void shouldKillExecution2() throws Exception {
+        when(workflowBusiness.getSimulation(simulation2.getID()))
+                .thenReturn(simulation2);
+        mockMvc.perform(
+                put("/executions/" + simulation2.getID() + "/kill").with(baseUser1()))
+                .andDo(print())
+                .andExpect(status().isNoContent())
+                .andExpect(content().string(""));
+        verify(workflowBusiness).kill(simulation2.getID());
+
+    }
+
+    @Test
+    public void shouldDeleteExecution2() throws Exception {
+        when(workflowBusiness.getSimulation(simulation2.getID()))
+                .thenReturn(simulation2);
+        mockMvc.perform(
+                put("/executions/" + simulation2.getID() + "/delete")
+                        .contentType("application/json")
+                        .content("{deleteFiles:true}")
+                        .with(baseUser1()))
+                .andDo(print())
+                .andExpect(status().isNoContent())
+                .andExpect(content().string(""));
+        verify(workflowBusiness).kill(simulation2.getID());
+
     }
 }

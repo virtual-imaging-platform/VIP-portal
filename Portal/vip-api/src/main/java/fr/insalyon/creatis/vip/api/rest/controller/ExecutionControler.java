@@ -133,6 +133,7 @@ public class ExecutionControler {
 
     @RequestMapping(method = RequestMethod.POST)
     public Execution initExecution(@RequestBody @Valid Execution execution) throws ApiException {
+        ApiUtils.methodInvocationLog("initExecution", execution.getPipelineIdentifier());
         throw new NotImplementedException("Use POST /executions/create-and-start instead");
     }
 
@@ -179,10 +180,7 @@ public class ExecutionControler {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void playExecution(@PathVariable String executionId) throws ApiException {
         ApiUtils.methodInvocationLog("playExecution", executionId);
-        ApiContext apiContext = new RestApiBusiness().getApiContext(httpServletRequest, true);
-        ExecutionBusiness eb = buildExecutionBusiness(apiContext);
-        eb.checkIfUserCanAccessExecution(executionId);
-        eb.playExecution(executionId);
+        throw new NotImplementedException("Executions are started on creation");
     }
 
     @RequestMapping(value = "/{executionId}/kill", method = RequestMethod.PUT)
