@@ -407,9 +407,20 @@ public class ExecutionBusiness {
                 String url;
                 if (baseUrlOnHost) {
                     String requestUrl = apiContext.getRequest().getRequestURL().toString();
-                    url = requestUrl.substring(0, requestUrl.indexOf('/')) + "/fr.insalyon.creatis.vip.portal.Main/filedownloadservice?operationid=" + operationId;
+                    if (requestUrl.startsWith("http://")) {
+                        requestUrl = requestUrl.substring(0, requestUrl.indexOf('/', 7));
+                    } else if (requestUrl.startsWith("https://")) {
+                        requestUrl = requestUrl.substring(0, requestUrl.indexOf('/', 8));
+                    } else {
+                        requestUrl = requestUrl.substring(0, requestUrl.indexOf('/'));
+                    }
+                    url = requestUrl
+                            + "/fr.insalyon.creatis.vip.portal.Main/filedownloadservice?operationid="
+                            + operationId;
                 } else {
-                    url = apiContext.getRequest().getRequestURL() + "/../fr.insalyon.creatis.vip.portal.Main/filedownloadservice?operationid=" + operationId;
+                    url = apiContext.getRequest().getRequestURL()
+                            + "/../fr.insalyon.creatis.vip.portal.Main/filedownloadservice?operationid="
+                            + operationId;
                 }
                 URL u = new URL(url); // just to check that it is a well-formed URL
                 urls.add(url);
