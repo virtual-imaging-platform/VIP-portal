@@ -32,7 +32,7 @@
 package fr.insalyon.creatis.vip.api.data;
 
 import fr.insalyon.creatis.vip.api.bean.Module;
-import fr.insalyon.creatis.vip.api.rest.model.SupportedTransferProtocol;
+import fr.insalyon.creatis.vip.api.rest.model.*;
 
 import static fr.insalyon.creatis.vip.api.bean.Module.*;
 import static fr.insalyon.creatis.vip.api.rest.model.SupportedTransferProtocol.*;
@@ -43,6 +43,7 @@ import static fr.insalyon.creatis.vip.api.rest.model.SupportedTransferProtocol.*
 public interface CarminAPITestConstants {
     String TEST_PLATFORM_NAME = "TestPlatform";
     String TEST_PLATFORM_DESCRIPTION = "Test Platform description";
+    String TEST_PLATFORM_EMAIL = "test@email.tst";
     String TEST_DEFAULT_LIST_LIMIT = "42";
     String TEST_SUPPORTED_API_VERSION = "Version 4.2";
     String TEST_IS_KILL_SUPPORTED = "false";
@@ -54,4 +55,9 @@ public interface CarminAPITestConstants {
     String TEST_SUPPORTED_MODULES_STRING = "COMMERCIAL,DATA";
     String[] TEST_UNSUPPORTED_METHOD = {"method1", "method2"};
     String TEST_UNSUPPORTED_METHODS_STRING = "method1,method2";
+    ErrorCodeAndMessage[] TEST_ERROR_CODES_AND_MESSAGES = {
+        new ErrorCodeAndMessage(42, "Test message"),
+        new ErrorCodeAndMessage(103, "Other test message")
+    };
+    String TEST_ERROR_CODES_AND_MESSAGE_STRING = "42:Test message,103:Other test message";
 }

@@ -29,26 +29,42 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL-B license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.api.rest.security;
+package fr.insalyon.creatis.vip.api.rest.model;
 
-import fr.insalyon.creatis.vip.api.rest.model.ErrorCodeAndMessage;
-import org.springframework.security.core.AuthenticationException;
-import org.springframework.web.bind.annotation.ControllerAdvice;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseBody;
+import javax.validation.constraints.NotNull;
 
 /**
- * Created by abonnet on 7/26/16.
+ * Created by abonnet on 7/19/16.
  */
-@ControllerAdvice
-public class SecurityExceptionHandler {
+public class ErrorCodeAndMessage {
 
-    @ExceptionHandler(AuthenticationException.class)
-    @ResponseBody
-    public ErrorCodeAndMessage handleAuthenticationExceptions(AuthenticationException e) {
-        ErrorCodeAndMessage errorCodeAndMessage = new ErrorCodeAndMessage();
-        errorCodeAndMessage.setCode(40101);
-        errorCodeAndMessage.setMessage("Access denied");
-        return errorCodeAndMessage;
+    @NotNull private Integer code;
+    @NotNull private String message;
+
+    public ErrorCodeAndMessage() {}
+
+    public ErrorCodeAndMessage(Integer code) {
+        this.code = code;
+    }
+
+    public ErrorCodeAndMessage(Integer code, String message) {
+        this.code = code;
+        this.message = message;
+    }
+
+    public Integer getCode() {
+        return code;
+    }
+
+    public void setCode(Integer code) {
+        this.code = code;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
     }
 }

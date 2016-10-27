@@ -42,7 +42,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 
-import java.util.Arrays;
+import java.util.*;
 
 import static fr.insalyon.creatis.vip.api.CarminProperties.*;
 
@@ -82,7 +82,25 @@ public class PlatformController {
         platformProperties.setKillExecutionSupported(
                 env.getProperty(IS_KILL_EXECUTION_SUPPORTED, Boolean.class));
         platformProperties.setSupportedAPIVersion(env.getProperty(SUPPORTED_API_VERSION));
+        platformProperties.setEmail(env.getProperty(PLATFORM_EMAIL));
+        platformProperties.setAPIErrorCodesAndMessages(getErrorCodesAndMessages());
         return platformProperties;
+    }
+
+    private List<ErrorCodeAndMessage> getErrorCodesAndMessages() {
+        List<ErrorCodeAndMessage> res = new ArrayList<>();
+        String[] codesAndMessagesAsStrings = env.getProperty(
+                PLATFORM_ERROR_CODES_AND_MESSAGES, String[].class);
+        for (String codeAndMessageAsString : codesAndMessagesAsStrings) {
+            String[] parts = codeAndMessageAsString.split(":");
+            if (parts.length != 2) {
+                logger.error("Malformed api code and message in properties:"+codeAndMessageAsString);
+                throw new RuntimeException("Malformed api code and message in properties");
+            }
+            Integer code = Integer.parseInt(parts[0]);
+            res.add(new ErrorCodeAndMessage(code, parts[1]));
+        }
+        return res;
     }
 
 }

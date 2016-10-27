@@ -41,6 +41,7 @@ import java.util.*;
 import java.util.function.Function;
 
 import static fr.insalyon.creatis.vip.api.data.CarminAPITestConstants.*;
+import static fr.insalyon.creatis.vip.api.data.ErrorCodeAndMessageTestUtils.jsonCorrespondsToErrorCodeAndMessage;
 import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -71,6 +72,8 @@ public class PlatformControllerIT extends BaseVIPSpringIT {
                         .value(TEST_PLATFORM_NAME))
                 .andExpect(jsonPath("$.platformDescription")
                         .value(TEST_PLATFORM_DESCRIPTION))
+                .andExpect(jsonPath("$.email")
+                        .value(TEST_PLATFORM_EMAIL))
                 .andExpect(jsonPath("$.supportedTransferProtocols[*]",
                         isArray(TEST_SUPPORTED_PROTOCOLS, SupportedTransferProtocol::toValue)))
                 .andExpect(jsonPath("$.supportedModules[*]",
@@ -82,7 +85,12 @@ public class PlatformControllerIT extends BaseVIPSpringIT {
                 .andExpect(jsonPath("$.supportedAPIVersion")
                         .value(TEST_SUPPORTED_API_VERSION))
                 .andExpect(jsonPath("$.isKillExecutionSupported")
-                        .value(Boolean.valueOf(TEST_SUPPORTED_API_VERSION)));
+                        .value(Boolean.valueOf(TEST_SUPPORTED_API_VERSION)))
+                .andExpect(jsonPath("$.APIErrorCodesAndMessages[*]",
+                        containsInAnyOrder(
+                                jsonCorrespondsToErrorCodeAndMessage(TEST_ERROR_CODES_AND_MESSAGES[0]),
+                                jsonCorrespondsToErrorCodeAndMessage(TEST_ERROR_CODES_AND_MESSAGES[1]))));
+
     }
 
     private <T> Matcher<Collection<String>> isArray(T[] values, Function<T,String> mapper) {

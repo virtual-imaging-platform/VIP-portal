@@ -33,6 +33,8 @@ package fr.insalyon.creatis.vip.api.rest;
 
 /**
  * Created by abonnet on 7/27/16.
+ *
+ * TODO : see if wa can import the messages from carmin.proprerties instead of copy/pasting it
  */
 public enum RestErrorCodes {
 
@@ -41,7 +43,7 @@ public enum RestErrorCodes {
 
     BAD_CREDENTIALS(40101),
     INSUFFICIENT_AUTH(40102),
-    AUTHENTICATION_ERROR(40103)                                      ,
+    AUTHENTICATION_ERROR(40103),
 
     UNEXPECTED_ERROR(50001, "An unexpected error has been encountered")
     ;

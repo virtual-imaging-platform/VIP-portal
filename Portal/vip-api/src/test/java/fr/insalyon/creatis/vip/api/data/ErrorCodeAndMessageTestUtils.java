@@ -29,42 +29,37 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL-B license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.api.rest.model;
+package fr.insalyon.creatis.vip.api.data;
 
-import javax.validation.constraints.NotNull;
+import fr.insalyon.creatis.vip.api.rest.model.ErrorCodeAndMessage;
+import fr.insalyon.creatis.vip.api.tools.spring.JsonCustomObjectMatcher;
+import org.hamcrest.Matcher;
+
+import java.util.*;
+import java.util.function.Function;
 
 /**
- * Created by abonnet on 7/19/16.
+ * Created by abonnet on 8/3/16.
  */
-public class ErrorCodesAndMessage {
+public class ErrorCodeAndMessageTestUtils {
 
-    @NotNull private Integer code;
-    @NotNull private String message;
+    public static final Map<String,Function> errorCodeAndMessageSuppliers;
 
-    public ErrorCodesAndMessage() {}
-
-    public ErrorCodesAndMessage(Integer code) {
-        this.code = code;
+    static {
+        errorCodeAndMessageSuppliers = getErrorCodeAndMessageSuppliers();
     }
 
-    public ErrorCodesAndMessage(Integer code, String message) {
-        this.code = code;
-        this.message = message;
+    public static Map<String,Function> getErrorCodeAndMessageSuppliers() {
+        return JsonCustomObjectMatcher.formatSuppliers(
+                Arrays.asList("code", "message"),
+                ErrorCodeAndMessage::getCode,
+                ErrorCodeAndMessage::getMessage);
     }
 
-    public Integer getCode() {
-        return code;
-    }
-
-    public void setCode(Integer code) {
-        this.code = code;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
+    public static Matcher<Map<String,?>> jsonCorrespondsToErrorCodeAndMessage(
+            ErrorCodeAndMessage errorCodeAndMessage
+    ) {
+        Map<Class, Map<String, Function>> suppliersRegistry = new HashMap<>();
+        return JsonCustomObjectMatcher.jsonCorrespondsTo(errorCodeAndMessage, errorCodeAndMessageSuppliers, suppliersRegistry);
     }
 }

@@ -33,7 +33,7 @@ package fr.insalyon.creatis.vip.api.rest.security.apikey;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.insalyon.creatis.vip.api.rest.RestErrorCodes;
-import fr.insalyon.creatis.vip.api.rest.model.ErrorCodesAndMessage;
+import fr.insalyon.creatis.vip.api.rest.model.ErrorCodeAndMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.security.authentication.*;
@@ -44,8 +44,6 @@ import org.springframework.stereotype.Component;
 import javax.servlet.ServletException;
 import javax.servlet.http.*;
 import java.io.IOException;
-
-import static fr.insalyon.creatis.vip.api.CarminProperties.PLATFORM_NAME;
 
 /**
  * Created by abonnet on 7/26/16.
@@ -63,7 +61,7 @@ public class ApikeyAuthenticationEntryPoint implements AuthenticationEntryPoint 
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
         response.addHeader("WWW-Authenticate", "API-key");
         response.setContentType("application/json;charset=UTF-8");
-        ErrorCodesAndMessage error = new ErrorCodesAndMessage();
+        ErrorCodeAndMessage error = new ErrorCodeAndMessage();
         if (authException instanceof BadCredentialsException) {
             error.setCode(RestErrorCodes.BAD_CREDENTIALS.getCode());
         } else if (authException instanceof InsufficientAuthenticationException) {

@@ -44,7 +44,8 @@ public class PlatformProperties {
 
     @NotNull
     private String platformName;
-    private List<ErrorCodesAndMessage> apiErrorCodesAndMessages;
+    @JsonProperty("APIErrorCodesAndMessages")
+    private List<ErrorCodeAndMessage> APIErrorCodesAndMessages;
     @NotNull
     private List<SupportedTransferProtocol> supportedTransferProtocols;
     @NotNull
@@ -60,7 +61,7 @@ public class PlatformProperties {
     private Long maxSizeDirectTransfer;
     private String defaultStudy;
     @JsonProperty("isKillExecutionSupported")
-    private Boolean isKillExecutionSupported;
+    private Boolean killExecutionSupported;
     @NotNull
     private String supportedAPIVersion;
 
@@ -72,12 +73,12 @@ public class PlatformProperties {
         this.platformName = platformName;
     }
 
-    public List<ErrorCodesAndMessage> getApiErrorCodesAndMessages() {
-        return apiErrorCodesAndMessages;
+    public List<ErrorCodeAndMessage> getAPIErrorCodesAndMessages() {
+        return APIErrorCodesAndMessages;
     }
 
-    public void setApiErrorCodesAndMessages(List<ErrorCodesAndMessage> apiErrorCodesAndMessages) {
-        this.apiErrorCodesAndMessages = apiErrorCodesAndMessages;
+    public void setAPIErrorCodesAndMessages(List<ErrorCodeAndMessage> APIErrorCodesAndMessages) {
+        this.APIErrorCodesAndMessages = APIErrorCodesAndMessages;
     }
 
     public List<SupportedTransferProtocol> getSupportedTransferProtocols() {
@@ -160,12 +161,12 @@ public class PlatformProperties {
         this.defaultStudy = defaultStudy;
     }
 
-    public Boolean getKillExecutionSupported() {
-        return isKillExecutionSupported;
+    public Boolean isKillExecutionSupported() {
+        return killExecutionSupported;
     }
 
     public void setKillExecutionSupported(Boolean killExecutionSupported) {
-        isKillExecutionSupported = killExecutionSupported;
+        this.killExecutionSupported = killExecutionSupported;
     }
 
     public String getSupportedAPIVersion() {

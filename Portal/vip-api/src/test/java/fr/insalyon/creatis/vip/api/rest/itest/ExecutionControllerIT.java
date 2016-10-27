@@ -275,18 +275,34 @@ public class ExecutionControllerIT extends BaseVIPSpringIT {
     }
 
     @Test
-    public void shouldDeleteExecution2() throws Exception {
+    public void shouldDeleteWithFilesExecution2() throws Exception {
         when(workflowBusiness.getSimulation(simulation2.getID()))
                 .thenReturn(simulation2);
         mockMvc.perform(
                 put("/executions/" + simulation2.getID() + "/delete")
                         .contentType("application/json")
-                        .content("{deleteFiles:true}")
+                        .content("{\"deleteFiles\":true}")
                         .with(baseUser1()))
                 .andDo(print())
                 .andExpect(status().isNoContent())
                 .andExpect(content().string(""));
-        verify(workflowBusiness).kill(simulation2.getID());
+        verify(workflowBusiness).clean(simulation2.getID(), baseUser1.getEmail(), true);
+
+    }
+
+    @Test
+    public void shouldDeleteWithoutExecution2() throws Exception {
+        when(workflowBusiness.getSimulation(simulation2.getID()))
+                .thenReturn(simulation2);
+        mockMvc.perform(
+                put("/executions/" + simulation2.getID() + "/delete")
+                        .contentType("application/json")
+                        .content("{\"deleteFiles\":false}")
+                        .with(baseUser1()))
+                .andDo(print())
+                .andExpect(status().isNoContent())
+                .andExpect(content().string(""));
+        verify(workflowBusiness).clean(simulation2.getID(), baseUser1.getEmail(), false);
 
     }
 }

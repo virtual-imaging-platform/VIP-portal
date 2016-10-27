@@ -34,13 +34,12 @@ package fr.insalyon.creatis.vip.api.rest.controller;
 import fr.insalyon.creatis.vip.api.business.ApiException;
 import fr.insalyon.creatis.vip.api.exception.NotImplementedException;
 import fr.insalyon.creatis.vip.api.rest.RestErrorCodes;
-import fr.insalyon.creatis.vip.api.rest.model.ErrorCodesAndMessage;
+import fr.insalyon.creatis.vip.api.rest.model.ErrorCodeAndMessage;
 import org.apache.log4j.Logger;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -55,18 +54,18 @@ public class RestExceptionHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(NotImplementedException.class)
     @ResponseBody
-    public ErrorCodesAndMessage handleNotImplementedException(NotImplementedException e) {
+    public ErrorCodeAndMessage handleNotImplementedException(NotImplementedException e) {
         logger.error(e);
-        return new ErrorCodesAndMessage(RestErrorCodes.NOT_IMPLEMENTED.getCode(),
+        return new ErrorCodeAndMessage(RestErrorCodes.NOT_IMPLEMENTED.getCode(),
                 RestErrorCodes.NOT_IMPLEMENTED.getMessage());
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(ApiException.class)
     @ResponseBody
-    public ErrorCodesAndMessage handleApiException(ApiException e) {
+    public ErrorCodeAndMessage handleApiException(ApiException e) {
         logger.error(e);
-        return new ErrorCodesAndMessage(RestErrorCodes.API_ERROR.getCode(),
+        return new ErrorCodeAndMessage(RestErrorCodes.API_ERROR.getCode(),
                 RestErrorCodes.API_ERROR.getMessage());
     }
 
@@ -80,14 +79,14 @@ public class RestExceptionHandler {
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler(value = Exception.class)
     @ResponseBody
-    public ErrorCodesAndMessage defaultErrorHandler(HttpServletRequest req, Exception e)
+    public ErrorCodeAndMessage defaultErrorHandler(HttpServletRequest req, Exception e)
             throws Exception {
         logger.info("Unexpected exception", e);
         if (AnnotationUtils.findAnnotation
                 (e.getClass(), ResponseStatus.class) != null)
             throw e;
 
-        return new ErrorCodesAndMessage(RestErrorCodes.UNEXPECTED_ERROR.getCode(),
+        return new ErrorCodeAndMessage(RestErrorCodes.UNEXPECTED_ERROR.getCode(),
                 RestErrorCodes.UNEXPECTED_ERROR.getMessage());
     }
 
