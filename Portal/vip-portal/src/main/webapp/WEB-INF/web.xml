@@ -58,14 +58,6 @@ knowledge of the CeCILL-B license and that you accept its terms.
         <servlet-name>SamlAuthenticationService</servlet-name>
         <url-pattern>/fr.insalyon.creatis.vip.portal.Main/samlauthenticationservice</url-pattern>
     </servlet-mapping>
-    <servlet>
-        <servlet-name>PersonaAuthenticationService</servlet-name>
-        <servlet-class>fr.insalyon.creatis.vip.core.server.auth.PersonaAuthenticationService</servlet-class>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>PersonaAuthenticationService</servlet-name>
-        <url-pattern>/fr.insalyon.creatis.vip.portal.Main/personaauthenticationservice</url-pattern>
-    </servlet-mapping>
     <!-- End Core Module -->
     <!-- Data Manager Module -->
     <servlet>

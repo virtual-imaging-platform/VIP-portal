@@ -68,13 +68,11 @@ import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
 public class SignInTab extends Tab {
 
     private VLayout signinLayout;
-    private VLayout orLayout;
     private DynamicForm newForm;
     private TextItem emailField;
     private PasswordItem passwordField;
     private CheckboxItem remembermeField;
     private IButton signinButton;
-    private Img personaImage;
 
     public SignInTab() {
 
@@ -91,11 +89,6 @@ public class SignInTab extends Tab {
 
         configureNewForm();
         configureSigninLayout();
-
-        injectMozillaPersonaScripts();
-
-        vLayout.addMember(personaImage);
-        vLayout.addMember(orLayout);
         vLayout.addMember(signinLayout);
         vLayout.addMember(newForm);
 
@@ -140,23 +133,6 @@ public class SignInTab extends Tab {
                 signin();
             }
         });
-
-        personaImage = new Img(CoreConstants.ICON_MOZILLA_PERSONA, 205, 30);
-        personaImage.setImageWidth(205);
-        personaImage.setImageHeight(30);
-        personaImage.setImageType(ImageStyle.CENTER);
-        personaImage.setBorder("0px solid gray");
-        personaImage.addClickHandler(new ClickHandler() {
-            @Override
-            public void onClick(ClickEvent event) {
-                personaLogin();
-            }
-        });
-
-        orLayout = new VLayout();
-        orLayout.setWidth(250);
-        orLayout.setHeight(70);
-        orLayout.addMember(new Label("<center><b>or</b></center>"));
 
         signinLayout = WidgetUtil.getVIPLayout(250, 150);
         WidgetUtil.addFieldToVIPLayout(signinLayout, "Email", emailField);
@@ -235,29 +211,5 @@ public class SignInTab extends Tab {
                     passwordField.getValueAsString(), callback);
             WidgetUtil.setLoadingIButton(signinButton, "Signing in...");
         }
-    }
-
-    private static native void personaLogin() /*-{
-     loginPersona();
-     }-*/;
-
-    private void injectMozillaPersonaScripts() {
-        //put that in CoreConstants
-        final String personaUrl = "https://login.persona.org/include.js";
-        final String localUrl = "/js/login-persona.js";
-        injectScript(personaUrl);
-        injectScript(localUrl);
-    }
-
-    private void injectScript(final String url) {
-        ScriptInjector.fromUrl(url).setCallback(
-                new Callback() {
-            public void onFailure(Object reason) {
-                Window.alert("Script load failed: " + url);
-            }
-
-            public void onSuccess(Object result) {
-            }
-        }).inject();
     }
 }

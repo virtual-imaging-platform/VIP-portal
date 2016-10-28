@@ -93,7 +93,9 @@ public class CoreModule extends Module {
         // Home Tab
         Layout.getInstance().addTab(homeTab);
 
-        // For users with no group (e.g. they just signed in using Mozilla Persona)
+        // open account tab to accept the terms of use if necessary
+        // Also open the tab for users with no group :
+        // It was possible with former Mozilla Persona but keep it just in case
 
         if (!user.hasGroups() || !user.hasAcceptTermsOfUse()) {
             final AccountTab accountTab = new AccountTab();
