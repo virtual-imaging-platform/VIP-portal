@@ -36,10 +36,13 @@ import fr.insalyon.creatis.vip.api.exception.NotImplementedException;
 import fr.insalyon.creatis.vip.api.rest.RestErrorCodes;
 import fr.insalyon.creatis.vip.api.rest.model.ErrorCodeAndMessage;
 import org.apache.log4j.Logger;
+import org.apache.log4j.spi.ErrorCode;
 import org.springframework.core.annotation.AnnotationUtils;
-import org.springframework.http.HttpStatus;
+import org.springframework.http.*;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -47,7 +50,7 @@ import javax.servlet.http.HttpServletRequest;
  * Created by abonnet on 7/28/16.
  */
 @ControllerAdvice
-public class RestExceptionHandler {
+public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
     public static final Logger logger = Logger.getLogger(RestExceptionHandler.class);
 
@@ -69,25 +72,21 @@ public class RestExceptionHandler {
                 RestErrorCodes.API_ERROR.getMessage());
     }
 
-    @ExceptionHandler(value = HttpRequestMethodNotSupportedException.class)
-    public void methodNotSupportedHandler(Exception e)
-            throws Exception {
-        logger.info("HttpRequestMethodNotSupportedException", e);
-            throw e;
+    @Override
+    protected ResponseEntity<Object> handleExceptionInternal(Exception ex, Object body, HttpHeaders headers, HttpStatus status, WebRequest request) {
+        ErrorCodeAndMessage codeAndmessage =
+                new ErrorCodeAndMessage(
+                        status.value()*100,
+                        ex.getMessage());
+        return new ResponseEntity<Object>(codeAndmessage, headers, status);
     }
 
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    @ExceptionHandler(value = Exception.class)
+    @ExceptionHandler(Exception.class)
     @ResponseBody
-    public ErrorCodeAndMessage defaultErrorHandler(HttpServletRequest req, Exception e)
-            throws Exception {
-        logger.info("Unexpected exception", e);
-        if (AnnotationUtils.findAnnotation
-                (e.getClass(), ResponseStatus.class) != null)
-            throw e;
-
-        return new ErrorCodeAndMessage(RestErrorCodes.UNEXPECTED_ERROR.getCode(),
-                RestErrorCodes.UNEXPECTED_ERROR.getMessage());
+    public ErrorCodeAndMessage handleallException(Exception e) {
+        logger.error(e);
+        return new ErrorCodeAndMessage(50000,
+                "Internal Error");
     }
-
 }

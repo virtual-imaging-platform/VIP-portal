@@ -62,8 +62,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  */
 public class ExecutionControllerIT extends BaseVIPSpringIT {
 
-    // TODO finish tests
-
     @Test
     public void shouldListExecutions() throws Exception {
         when(workflowBusiness.getSimulations(baseUser1.getFullName(), null, null, null, null, null))
@@ -304,5 +302,27 @@ public class ExecutionControllerIT extends BaseVIPSpringIT {
                 .andExpect(content().string(""));
         verify(workflowBusiness).clean(simulation2.getID(), baseUser1.getEmail(), false);
 
+    }
+
+    @Test
+    public void shouldReturn400() throws Exception {
+        mockMvc.perform(
+                put("/executions/whynotthisid").with(baseUser1()))
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentType(RestTestUtils.JSON_CONTENT_TYPE_UTF8))
+                .andExpect(jsonPath("$.code").value(40000));
+    }
+
+    @Test
+    public void shouldReturn500() throws Exception {
+        when(workflowBusiness.getSimulations(baseUser1.getFullName(), null, null, null, null, null))
+                .thenThrow(new RuntimeException("test exception"));
+        mockMvc.perform(
+                get("/executions").with(baseUser1()))
+                .andDo(print())
+                .andExpect(status().isInternalServerError())
+                .andExpect(content().contentType(RestTestUtils.JSON_CONTENT_TYPE_UTF8))
+                .andExpect(jsonPath("$.code").value(50000));
     }
 }

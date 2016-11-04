@@ -43,9 +43,7 @@ public enum RestErrorCodes {
 
     BAD_CREDENTIALS(40101),
     INSUFFICIENT_AUTH(40102),
-    AUTHENTICATION_ERROR(40103),
-
-    UNEXPECTED_ERROR(50001, "An unexpected error has been encountered")
+    AUTHENTICATION_ERROR(40103)
     ;
 
     RestErrorCodes(Integer code) {

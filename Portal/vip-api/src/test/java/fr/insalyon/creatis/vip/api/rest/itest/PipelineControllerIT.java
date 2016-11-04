@@ -86,7 +86,7 @@ public class PipelineControllerIT extends BaseVIPSpringIT {
                 .andDo(print())
                 .andExpect(status().isInternalServerError())
                 .andExpect(content().contentType(RestTestUtils.JSON_CONTENT_TYPE_UTF8))
-                .andExpect(jsonPath("$.code").value(RestErrorCodes.UNEXPECTED_ERROR.getCode()));
+                .andExpect(jsonPath("$.code").value(50000));
     }
 
     @Test
