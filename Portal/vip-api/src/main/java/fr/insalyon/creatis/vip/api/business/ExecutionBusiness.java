@@ -54,14 +54,17 @@ import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
 import fr.insalyon.creatis.vip.datamanager.server.business.TransferPoolBusiness;
-import java.net.MalformedURLException;
-import java.net.URL;
+
+import java.io.UnsupportedEncodingException;
+import java.net.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import static jdk.nashorn.internal.objects.NativeArray.lastIndexOf;
 
 /**
  *
@@ -377,6 +380,17 @@ public class ExecutionBusiness {
                 String operationId = tpb.downloadFile(apiContext.getUser(), output.getPath());
 
                 String url = apiContext.getRequest().getRequestURL() + "/../fr.insalyon.creatis.vip.portal.Main/filedownloadservice?operationid=" + operationId;
+
+                String filename = extractFileNameFromOutput(output);
+                logger.debug("adding filename to url :" + filename);
+                try {
+                    url += "&outputname=" + URLEncoder.encode(output.getProcessor(), "UTF-8");
+                    url += "&filename=" + URLEncoder.encode(filename, "UTF-8");
+                } catch (UnsupportedEncodingException e) {
+                    logger.error("Error while encoding filename :" + filename);
+                    logger.error("Do not add it in execution results link");
+                }
+
                 URL u = new URL(url); // just to check that it is a well-formed URL
                 urls.add(url);
             }
@@ -385,6 +399,23 @@ public class ExecutionBusiness {
             return urls.toArray(array_urls);
         } catch (BusinessException | MalformedURLException ex) {
             throw new ApiException(ex);
+        }
+    }
+
+    private String extractFileNameFromOutput(InOutData output) {
+        logger.debug("Extracting filename from path :" + output.getPath());
+        String path = output.getPath();
+        int lastSlashIndex = path.lastIndexOf("/");
+        if (lastSlashIndex >= 0 && lastSlashIndex >= (path.length() -1 )) {
+            // there is a final slash, take the one before
+            lastSlashIndex = path.lastIndexOf("/", lastSlashIndex-1);
+        }
+        if (lastSlashIndex >= 0) {
+            // there is non final slash
+            return path.substring(lastSlashIndex+1);
+        } else {
+            // no slash
+            return path;
         }
     }
 
