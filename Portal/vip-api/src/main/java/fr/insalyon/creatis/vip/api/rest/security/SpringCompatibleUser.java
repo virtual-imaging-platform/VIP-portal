@@ -39,6 +39,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 /**
+ * Vip user proxy that is conform to spring security (must implement a specific class)
+ *
  * Created by abonnet on 7/25/16.
  */
 public class SpringCompatibleUser implements UserDetails {

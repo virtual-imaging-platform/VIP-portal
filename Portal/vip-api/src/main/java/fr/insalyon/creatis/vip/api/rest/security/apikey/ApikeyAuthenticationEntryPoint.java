@@ -47,6 +47,8 @@ import java.io.IOException;
 
 /**
  * Created by abonnet on 7/26/16.
+ *
+ * Entry point that writes error response in json with a Jackson object mapper.
  */
 @Component
 public class ApikeyAuthenticationEntryPoint implements AuthenticationEntryPoint {

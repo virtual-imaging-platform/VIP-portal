@@ -44,6 +44,15 @@ import org.springframework.context.annotation.*;
 import org.springframework.web.servlet.config.annotation.*;
 
 /**
+ * Configuration class for spring web.
+ *
+ * It declares all the business beans from vip-core etc used in vip-api. All are singleton
+ * (spring default) except UserDao which is created at each reference by a factory.
+ *
+ * It enables annotation configuration by subpackage scan.
+ *
+ * It declares the carmin.properties file.
+ *
  * Created by abonnet on 7/13/16.
  */
 @EnableWebMvc
@@ -55,6 +64,8 @@ public class SpringWebConfig extends WebMvcConfigurerAdapter {
 
     @Override
     public void configurePathMatch(PathMatchConfigurer matcher) {
+        // Otherwise all that follow a dot in an URL is considered an extension and removed
+        // It's a problem for URL like "/pipelines/gate/3.2
         matcher.setUseRegisteredSuffixPatternMatch(true);
     }
 

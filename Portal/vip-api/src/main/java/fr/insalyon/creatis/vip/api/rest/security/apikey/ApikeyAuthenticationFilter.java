@@ -44,6 +44,8 @@ import java.io.IOException;
 
 /**
  * Created by abonnet on 10/6/16.
+ *
+ * Servlet filter that creates the api key token and calls the authentication.
  */
 public class ApikeyAuthenticationFilter extends OncePerRequestFilter {
 

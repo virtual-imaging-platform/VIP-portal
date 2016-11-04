@@ -78,6 +78,9 @@ public class ExecutionControler {
     @Autowired
     private Environment environment;
 
+    @Autowired
+    private RestApiBusiness restApiBusiness;
+
     // although the controller is a singleton, these are proxies that always point on the current request
     @Autowired
     HttpServletRequest httpServletRequest;
@@ -105,7 +108,7 @@ public class ExecutionControler {
     @RequestMapping
     public Execution[] listExecutions() throws ApiException {
         ApiUtils.methodInvocationLog("listExecutions");
-        ApiContext apiContext = new RestApiBusiness().getApiContext(httpServletRequest, true);
+        ApiContext apiContext = restApiBusiness.getApiContext(httpServletRequest, true);
         ExecutionBusiness eb = buildExecutionBusiness(apiContext);
         return eb.listExecutions(environment.getProperty(DEFAULT_LIMIT_LIST_EXECUTION, Integer.class));
     }
@@ -113,7 +116,7 @@ public class ExecutionControler {
     @RequestMapping("/{executionId}")
     public Execution getExecution(@PathVariable String executionId) throws ApiException {
         ApiUtils.methodInvocationLog("getExecution", executionId);
-        ApiContext apiContext = new RestApiBusiness().getApiContext(httpServletRequest, true);
+        ApiContext apiContext = restApiBusiness.getApiContext(httpServletRequest, true);
         ExecutionBusiness eb = buildExecutionBusiness(apiContext);
         eb.checkIfUserCanAccessExecution(executionId);
         return eb.getExecution(executionId,false);
@@ -124,7 +127,7 @@ public class ExecutionControler {
                                      @RequestBody @Valid Execution execution) throws ApiException {
         ApiUtils.methodInvocationLog("updateExecution", executionId);
         execution.setIdentifier(executionId);
-        ApiContext apiContext = new RestApiBusiness().getApiContext(httpServletRequest, true);
+        ApiContext apiContext = restApiBusiness.getApiContext(httpServletRequest, true);
         ExecutionBusiness eb = buildExecutionBusiness(apiContext);
         eb.checkIfUserCanAccessExecution(executionId);
         eb.updateExecution(execution);
@@ -140,7 +143,7 @@ public class ExecutionControler {
     @RequestMapping(value="/create-and-start", method = RequestMethod.POST)
     public Execution initExecutionAndStart(@RequestBody @Valid Execution execution) throws ApiException {
         ApiUtils.methodInvocationLog("initExecution", execution);
-        ApiContext apiContext = new RestApiBusiness().getApiContext(httpServletRequest, true);
+        ApiContext apiContext = restApiBusiness.getApiContext(httpServletRequest, true);
         PipelineBusiness pb = buildPipelineBusiness(apiContext);
         pb.checkIfUserCanAccessPipeline(execution.getPipelineIdentifier());
         ExecutionBusiness executionBusiness = buildExecutionBusiness(apiContext, pb);
@@ -152,7 +155,7 @@ public class ExecutionControler {
     public String[] getExecutionResults(@PathVariable String executionId,
                                         @RequestParam(defaultValue = "https") String protocol) throws ApiException {
         ApiUtils.methodInvocationLog("getExecutionResults", executionId);
-        ApiContext apiContext = new RestApiBusiness().getApiContext(httpServletRequest, true);
+        ApiContext apiContext = restApiBusiness.getApiContext(httpServletRequest, true);
         ExecutionBusiness eb = buildExecutionBusiness(apiContext);
         eb.checkIfUserCanAccessExecution(executionId);
         return eb.getExecutionResults(executionId, protocol, true);
@@ -161,7 +164,7 @@ public class ExecutionControler {
     @RequestMapping(value = "/{executionId}/stdout", produces = "text/plain;charset=UTF-8")
     public String getStdout(@PathVariable String executionId) throws ApiException {
         ApiUtils.methodInvocationLog("getStdout", executionId);
-        ApiContext apiContext = new RestApiBusiness().getApiContext(httpServletRequest, true);
+        ApiContext apiContext = restApiBusiness.getApiContext(httpServletRequest, true);
         ExecutionBusiness eb = buildExecutionBusiness(apiContext);
         eb.checkIfUserCanAccessExecution(executionId);
         return eb.getStdOut(executionId);
@@ -170,7 +173,7 @@ public class ExecutionControler {
     @RequestMapping(value= "/{executionId}/stderr", produces = "text/plain;charset=UTF-8")
     public String getStderr(@PathVariable String executionId) throws ApiException {
         ApiUtils.methodInvocationLog("getStderr", executionId);
-        ApiContext apiContext = new RestApiBusiness().getApiContext(httpServletRequest, true);
+        ApiContext apiContext = restApiBusiness.getApiContext(httpServletRequest, true);
         ExecutionBusiness eb = buildExecutionBusiness(apiContext);
         eb.checkIfUserCanAccessExecution(executionId);
         return eb.getStdErr(executionId);
@@ -187,7 +190,7 @@ public class ExecutionControler {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void killExecution(@PathVariable String executionId) throws ApiException {
         ApiUtils.methodInvocationLog("killExecution", executionId);
-        ApiContext apiContext = new RestApiBusiness().getApiContext(httpServletRequest, true);
+        ApiContext apiContext = restApiBusiness.getApiContext(httpServletRequest, true);
         ExecutionBusiness eb = buildExecutionBusiness(apiContext);
         eb.checkIfUserCanAccessExecution(executionId);
         eb.killExecution(executionId);
@@ -198,7 +201,7 @@ public class ExecutionControler {
     public void deleteExecution(@PathVariable String executionId,
                                 @RequestBody @Valid DeleteExecutionConfiguration delConfig) throws ApiException {
         ApiUtils.methodInvocationLog("deleteExecution", executionId);
-        ApiContext apiContext = new RestApiBusiness().getApiContext(httpServletRequest, true);
+        ApiContext apiContext = restApiBusiness.getApiContext(httpServletRequest, true);
         ExecutionBusiness eb = buildExecutionBusiness(apiContext);
         eb.checkIfUserCanAccessExecution(executionId);
         eb.deleteExecution(executionId, delConfig.getDeleteFiles());

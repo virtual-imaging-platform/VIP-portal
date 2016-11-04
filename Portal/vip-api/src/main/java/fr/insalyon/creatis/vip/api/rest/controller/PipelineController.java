@@ -64,14 +64,17 @@ public class PipelineController {
     @Autowired
     private ClassBusiness classBusiness;
 
+    @Autowired
+    private RestApiBusiness restApiBusiness;
+
     // although the controller is a singleton, this is a proxy that always point on the current request
     @Autowired
-    HttpServletRequest httpServletRequest;
+    private HttpServletRequest httpServletRequest;
 
     @RequestMapping
     public Pipeline[] listPipelines(@RequestParam(required = false) String studyIdentifier) throws ApiException {
         ApiUtils.methodInvocationLog("listPipelines");
-        ApiContext apiContext = new RestApiBusiness().getApiContext(httpServletRequest, true);
+        ApiContext apiContext = restApiBusiness.getApiContext(httpServletRequest, true);
         PipelineBusiness pb = new PipelineBusiness(apiContext, workflowBusiness, applicationBusiness, classBusiness);
         return pb.listPipelines(studyIdentifier);
     }
@@ -79,7 +82,7 @@ public class PipelineController {
     @RequestMapping("{pipelineId}")
     public Pipeline getPipeline(@PathVariable String pipelineId) throws ApiException {
         ApiUtils.methodInvocationLog("getPipeline", pipelineId);
-        ApiContext apiContext = new RestApiBusiness().getApiContext(httpServletRequest, true);
+        ApiContext apiContext = restApiBusiness.getApiContext(httpServletRequest, true);
         PipelineBusiness pb = new PipelineBusiness(apiContext, workflowBusiness, applicationBusiness, classBusiness);
         pb.checkIfUserCanAccessPipeline(pipelineId);
         return pb.getPipeline(pipelineId);

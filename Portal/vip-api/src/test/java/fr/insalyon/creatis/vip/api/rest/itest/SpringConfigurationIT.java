@@ -63,13 +63,13 @@ import static fr.insalyon.creatis.vip.api.CarminProperties.*;
 @ContextConfiguration
 public class SpringConfigurationIT {
 
-    // Need to override vipInitializer that operate on the database
+    // Need to override vipConfigurer that operate on the database
     @Configuration
     @Import(SpringWebConfig.class)
     static class TestConfig {
         @Bean
-        public VipInitializer vipInitializer() {
-            return Mockito.mock(VipInitializer.class);
+        public VipConfigurer vipConfigurer() {
+            return Mockito.mock(VipConfigurer.class);
         }
 
         @Bean

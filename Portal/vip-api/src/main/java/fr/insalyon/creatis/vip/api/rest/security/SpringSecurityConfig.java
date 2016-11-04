@@ -41,6 +41,13 @@ import org.springframework.security.config.annotation.web.configuration.*;
 import org.springframework.security.config.http.SessionCreationPolicy;
 
 /**
+ * Spring security configuration.
+ *
+ * It secures by api key all rest requests (except /platform)
+ * General configuration is done here (what is secured, session management etc).
+ *
+ * The custom api key configuration is done in {@link ApikeyAuthentificationConfigurer}
+ *
  * Created by abonnet on 7/22/16.
  */
 @EnableWebSecurity

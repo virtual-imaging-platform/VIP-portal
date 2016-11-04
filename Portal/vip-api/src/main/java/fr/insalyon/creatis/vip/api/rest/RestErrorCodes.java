@@ -34,7 +34,7 @@ package fr.insalyon.creatis.vip.api.rest;
 /**
  * Created by abonnet on 7/27/16.
  *
- * TODO : see if wa can import the messages from carmin.proprerties instead of copy/pasting it
+ * TODO : see if we can import the messages from carmin.proprerties instead of copy/pasting them
  */
 public enum RestErrorCodes {
 

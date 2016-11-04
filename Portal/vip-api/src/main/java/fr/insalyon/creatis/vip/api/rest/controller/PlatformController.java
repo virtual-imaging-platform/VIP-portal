@@ -33,6 +33,7 @@ package fr.insalyon.creatis.vip.api.rest.controller;
 
 import fr.insalyon.creatis.vip.api.bean.Module;
 import fr.insalyon.creatis.vip.api.business.ApiUtils;
+import fr.insalyon.creatis.vip.api.rest.RestApiBusiness;
 import fr.insalyon.creatis.vip.api.rest.model.*;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;

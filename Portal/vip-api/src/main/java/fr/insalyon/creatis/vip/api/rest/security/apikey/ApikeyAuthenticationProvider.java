@@ -54,6 +54,8 @@ import java.util.Map;
 /**
  * Created by abonnet on 7/25/16.
  *
+ * Authenticate a user with its api key.
+ * Automaticaly taken into account by spring security by implementing {@link AuthenticationProvider}
  */
 @Service
 public class ApikeyAuthenticationProvider implements

@@ -31,7 +31,7 @@
  */
 package fr.insalyon.creatis.vip.api.rest.config;
 
-import fr.insalyon.creatis.vip.api.SpringWebConfig;
+import fr.insalyon.creatis.vip.api.*;
 import fr.insalyon.creatis.vip.application.server.business.*;
 import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
 import fr.insalyon.creatis.vip.core.server.dao.UserDAO;
@@ -53,9 +53,8 @@ import org.springframework.context.event.ContextRefreshedEvent;
 public class SpringTestConfig {
 
     @Bean
-    public ApplicationListener<ContextRefreshedEvent> vipInitializer() {
-        return (ApplicationListener<ContextRefreshedEvent>)
-                Mockito.mock(ApplicationListener.class);
+    public VipConfigurer vipConfigurer() {
+        return Mockito.mock(VipConfigurer.class);
     }
 
     @Bean

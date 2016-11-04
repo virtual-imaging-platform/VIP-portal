@@ -35,34 +35,64 @@ import fr.insalyon.creatis.vip.core.server.business.*;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import fr.insalyon.creatis.vip.core.server.dao.mysql.PlatformConnection;
 import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Component;
 
+import java.util.Calendar;
+
 /**
+ * Used to configure vip on startup and daily
+ *
+ * On startup, test database
+ * Daily, renew the grida proxy
+ *
  * Created by abonnet on 7/26/16.
  */
 @Component
-public class VipInitializer implements ApplicationListener<ContextRefreshedEvent> {
+public class VipConfigurer implements ApplicationListener<ContextRefreshedEvent> {
 
-    public static final Logger logger = Logger.getLogger(VipInitializer.class);
+    public static final Logger logger = Logger.getLogger(VipConfigurer.class);
 
     @Autowired
     private ConfigurationBusiness configurationBusiness;
 
+    private Calendar lastConfiguration = null;
+
     @Override
     public void onApplicationEvent(ContextRefreshedEvent event) {
-        logger.info("Init VIP : setting logging and initiaizing DB");
+        logger.info("Init VIP : configure logging and initialize DB");
         // set logging properties and DB connection
         try {
-            configurationBusiness.configure();
             PlatformConnection.getInstance();
         } catch (DAOException e) {
             throw new RuntimeException("Cannot init VIP", e);
+        }
+        configureIfNecessary();
+    }
+
+    public synchronized void configureIfNecessary() {
+        if (!shouldConfigure()) {
+            logger.debug("no need to reconfigure");
+            return;
+        }
+        try {
+            logger.info("New VIP configuration necessary");
+            configurationBusiness.configure();
+            lastConfiguration = Calendar.getInstance();
         } catch (BusinessException e) {
             throw new RuntimeException("Cannot init VIP", e);
         }
+    }
+
+    private boolean shouldConfigure() {
+        if (lastConfiguration == null) {
+            logger.debug("first check : configure VIP");
+            return true;
+        }
+        Calendar now = Calendar.getInstance();
+        logger.debug("comparing {" + lastConfiguration +"} to now {" + now + "} to check configuration");
+        return now.get(Calendar.DAY_OF_YEAR) != lastConfiguration.get(Calendar.DAY_OF_YEAR);
     }
 }

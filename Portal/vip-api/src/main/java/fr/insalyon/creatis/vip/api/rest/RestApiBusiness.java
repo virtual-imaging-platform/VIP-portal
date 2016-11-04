@@ -31,30 +31,42 @@
  */
 package fr.insalyon.creatis.vip.api.rest;
 
+import fr.insalyon.creatis.vip.api.VipConfigurer;
 import fr.insalyon.creatis.vip.api.rest.security.SpringCompatibleUser;
 import fr.insalyon.creatis.vip.api.business.ApiContext;
 import fr.insalyon.creatis.vip.api.business.ApiException;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
+import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
 
 /**
+ * Used to create an ApiContext in REST requests
+ *
  * Created by abonnet on 7/25/16.
  */
+@Service
 public class RestApiBusiness {
 
     private final static Logger logger = Logger.getLogger(RestApiBusiness.class);
 
+    @Autowired
+    private VipConfigurer vipConfigurer;
+
     public ApiContext getApiContext(HttpServletRequest request, boolean isAuthenticated) {
         User vipUser = null;
         if (isAuthenticated) {
+            // if the user is authenticated, fetch it in the request info
             Authentication authentication = (Authentication) request.getUserPrincipal();
             SpringCompatibleUser springCompatibleUser =
                     (SpringCompatibleUser) authentication.getPrincipal();
             vipUser = springCompatibleUser.getVipUser();
         }
+        // configure VIP if it has not been done today
+        vipConfigurer.configureIfNecessary();
         return new ApiContext(request, null, vipUser);
     }
 }
