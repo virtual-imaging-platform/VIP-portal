@@ -42,6 +42,7 @@ import fr.insalyon.creatis.vip.core.client.bean.*;
 import fr.insalyon.creatis.vip.core.server.business.*;
 import fr.insalyon.creatis.vip.datamanager.server.business.TransferPoolBusiness;
 
+import java.io.UnsupportedEncodingException;
 import java.lang.Object;
 import java.net.*;
 import java.util.*;
@@ -50,6 +51,8 @@ import java.util.logging.*;
 
 import static fr.insalyon.creatis.vip.core.client.view.util.CountryCode.pm;
 import static fr.insalyon.creatis.vip.core.client.view.util.CountryCode.re;
+
+import static jdk.nashorn.internal.objects.NativeArray.lastIndexOf;
 
 /**
  *
@@ -406,6 +409,8 @@ public class ExecutionBusiness {
 
                 String url;
                 if (baseUrlOnHost) {
+                    // if only the host is used, remove what follow the first slash
+                    // (excluding the slash from the protocol)
                     String requestUrl = apiContext.getRequest().getRequestURL().toString();
                     if (requestUrl.startsWith("http://")) {
                         requestUrl = requestUrl.substring(0, requestUrl.indexOf('/', 7));
@@ -422,6 +427,16 @@ public class ExecutionBusiness {
                             + "/../fr.insalyon.creatis.vip.portal.Main/filedownloadservice?operationid="
                             + operationId;
                 }
+                // add filename and parameter name to URL
+                String filename = extractFileNameFromOutput(output);
+                logger.debug("adding filename to url :" + filename);
+                try {
+                    url += "&outputname=" + URLEncoder.encode(output.getProcessor(), "UTF-8");
+                    url += "&filename=" + URLEncoder.encode(filename, "UTF-8");
+                } catch (UnsupportedEncodingException e) {
+                    logger.error("Error while encoding filename :" + filename);
+                    logger.error("Do not add it in execution results link");
+                }
                 URL u = new URL(url); // just to check that it is a well-formed URL
                 urls.add(url);
             }
@@ -430,6 +445,23 @@ public class ExecutionBusiness {
             return urls.toArray(array_urls);
         } catch (BusinessException | MalformedURLException ex) {
             throw new ApiException(ex);
+        }
+    }
+
+    private String extractFileNameFromOutput(InOutData output) {
+        logger.debug("Extracting filename from path :" + output.getPath());
+        String path = output.getPath();
+        int lastSlashIndex = path.lastIndexOf("/");
+        if (lastSlashIndex >= 0 && lastSlashIndex >= (path.length() -1 )) {
+            // there is a final slash, take the one before
+            lastSlashIndex = path.lastIndexOf("/", lastSlashIndex-1);
+        }
+        if (lastSlashIndex >= 0) {
+            // there is non final slash
+            return path.substring(lastSlashIndex+1);
+        } else {
+            // no slash
+            return path;
         }
     }
 
