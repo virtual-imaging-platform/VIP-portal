@@ -228,7 +228,12 @@ public class ExecutionControllerIT extends BaseVIPSpringIT {
                 .andExpect(content().contentType(RestTestUtils.JSON_CONTENT_TYPE_UTF8))
                 .andExpect(jsonPath("$[*]", hasSize(1)))
                 .andExpect(jsonPath("$[0]",
-                        org.hamcrest.Matchers.endsWith("operationid=" + operationId)));
+                        org.hamcrest.Matchers.containsString("operationid=" + operationId)))
+                .andExpect(jsonPath("$[0]",
+                        org.hamcrest.Matchers.containsString("filename=res"))) // TODO it would be great to parametize that
+                .andExpect(jsonPath("$[0]",
+                        org.hamcrest.Matchers.containsString(
+                                "outputname=" + simulation2OutData.get(0).getProcessor())));
     }
 
     @Test
