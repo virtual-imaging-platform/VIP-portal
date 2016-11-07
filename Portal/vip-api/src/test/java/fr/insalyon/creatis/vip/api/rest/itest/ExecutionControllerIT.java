@@ -36,6 +36,7 @@ import fr.insalyon.creatis.vip.api.data.ExecutionTestUtils;
 import fr.insalyon.creatis.vip.api.rest.RestErrorCodes;
 import fr.insalyon.creatis.vip.api.rest.config.*;
 import fr.insalyon.creatis.vip.application.client.bean.Simulation;
+import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import org.junit.*;
 import org.mockito.*;
 
@@ -117,6 +118,18 @@ public class ExecutionControllerIT extends BaseVIPSpringIT {
                         jsonCorrespondsToExecution(execution2)
                 ));
     }
+
+    @Test
+    public void shouldGetErrorWhenGettingUnknownExecution() throws Exception {
+        when(workflowBusiness.getSimulation(anyString()))
+                .thenThrow(new BusinessException("no test execution"));
+            mockMvc.perform(
+                    get("/executions/WrongExecId").with(baseUser1()))
+                    .andDo(print())
+                    .andExpect(status().isBadRequest())
+                    .andExpect(content().contentType(RestTestUtils.JSON_CONTENT_TYPE_UTF8))
+                    .andExpect(jsonPath("$.code").value(RestErrorCodes.API_ERROR.getCode()));
+        }
 
     @Test
     public void shouldUpdateExecution1() throws Exception {

@@ -67,7 +67,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(ApiException.class)
     @ResponseBody
     public ErrorCodeAndMessage handleApiException(ApiException e) {
-        logger.error(e);
+        logger.error("Api Exception catched", e);
         return new ErrorCodeAndMessage(RestErrorCodes.API_ERROR.getCode(),
                 RestErrorCodes.API_ERROR.getMessage());
     }
@@ -84,8 +84,8 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler(Exception.class)
     @ResponseBody
-    public ErrorCodeAndMessage handleallException(Exception e) {
-        logger.error(e);
+    public ErrorCodeAndMessage handleAllException(Exception e) {
+        logger.error("Unexpected exception catched", e);
         return new ErrorCodeAndMessage(50000,
                 "Internal Error");
     }
