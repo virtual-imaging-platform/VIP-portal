@@ -77,8 +77,8 @@ public class InputLayout extends AbstractSourceLayout {
     private DynamicForm stepItemForm;
     private CheckboxItem cbOptionalInputItem;
 
-    public InputLayout(String name, String comment, boolean optional, String defaultValue) {
-        super(name, comment,optional);
+    public InputLayout(String name, String comment, boolean optional, String defaultValue, String prettyName) {
+        super(name, comment,optional, prettyName);
         
         if (optional == true) {
             configureOptionalInputCheckbox();
@@ -106,7 +106,7 @@ public class InputLayout extends AbstractSourceLayout {
 
     
     public InputLayout(String name, String comment) {
-        this(name,comment,false,"");
+        this(name, comment, false, "", "");
     }
 
     private void configureTypeSelectItem() {
@@ -130,7 +130,7 @@ public class InputLayout extends AbstractSourceLayout {
     }
     
     private void configureOptionalInputCheckbox() {
-        cbOptionalInputItem = new CheckboxItem("Activate this optional field");
+        cbOptionalInputItem = new CheckboxItem("");
         cbOptionalInputItem.setValue(true);
         cbOptionalInputItem.addChangeHandler(new ChangeHandler() {  
 
@@ -142,7 +142,7 @@ public class InputLayout extends AbstractSourceLayout {
                 // List
                 listLayout.setDisabled(selected);
                 listLayout.removeMembers(listLayout.getMembers());
-                listLayout.addMember(new ListHLayout(listLayout, true, "Empty_optional_input"));
+                listLayout.addMember(new ListHLayout(listLayout, true, "Disabled_optional_input"));
                 
                 // Range
                 // TODO reset item values when Redmine feature 2980 will be realize.

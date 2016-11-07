@@ -151,7 +151,7 @@ public class LaunchFormLayout extends AbstractFormLayout {
             if (canvas instanceof AbstractSourceLayout) {
                 AbstractSourceLayout source = (AbstractSourceLayout) canvas;
                 if (source.isOptional() && (source.getValue() == null || source.getValue().equals("") || source.getValue().equals("null"))) {
-                    source.setValue("Empty_optional_input");
+                    source.setValue("Disabled_optional_input");
                 } else if (!source.validate()) {
                     valid = false;
                 }

@@ -2,7 +2,7 @@
 <workflow name="$tool.getName()" version="$tool.getToolVersion()">
   <description>$esc.xml($tool.getDescription())</description>
   <interface>
-    <source name="results-directory" type="URI" optional="false" default="/vip/Home">
+    <source name="results-directory" type="URI" optional="false" default="/vip/Home" pretty-name="Results directory">
         <source-comment>$esc.xml("<b><font color=blue>results-directory</font></b> (<b><font color=green>Directory</font></b>):") Directory where the results will be stored.</source-comment>
     </source>
 #foreach( $input in $tool.getInputs() )
@@ -15,13 +15,13 @@
     #set($extraComment="Select the check box to activate the flag " + "<b><font color=green>" + $input.getCommandLineFlag() +  "</font></b>."))
   #else
     #if($input.getDefaultValue()!="null" && $input.getDefaultValue()!="")
-    <source name="$input.getId()" type="$type" optional="$input.isOptional()" default="$input.getDefaultValue()">
+    <source name="$input.getId()" type="$type" optional="$input.isOptional()" default="$input.getDefaultValue()" pretty-name="$input.getName()">
     #else
       #if($input.isOptional()==true)
-    <source name="$input.getId()" type="$type" optional="$input.isOptional()" default="Empty_optional_input">
+    <source name="$input.getId()" type="$type" optional="$input.isOptional()" default="Disabled_optional_input" pretty-name="$input.getName()">
         #set($extraComment="Put '<b>no</b>' to ignore this optional input.")
       #else
-    <source name="$input.getId()" type="$type" optional="$input.isOptional()">
+    <source name="$input.getId()" type="$type" optional="$input.isOptional()" pretty-name="$input.getName()">
         #set($extraComment="")
       #end
     #end

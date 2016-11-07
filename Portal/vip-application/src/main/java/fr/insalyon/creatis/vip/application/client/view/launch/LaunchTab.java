@@ -127,7 +127,7 @@ public class LaunchTab extends AbstractLaunchTab {
                         launchFormLayout.addSource(new InputFlagLayout(source.getName(), source.getDescription(),source.isOptional(),source.getDefaultValue(), source.getVipTypeRestriction(), source.getPrettyName()), disabled);
                     }
                     else {
-                        launchFormLayout.addSource(new InputLayout(source.getName(), source.getDescription(),source.isOptional(),source.getDefaultValue()), disabled);
+                        launchFormLayout.addSource(new InputLayout(source.getName(), source.getDescription(),source.isOptional(),source.getDefaultValue(), source.getPrettyName()), disabled);
                     }
                 }
 
