@@ -31,7 +31,10 @@
  */
 package fr.insalyon.creatis.vip.application.client.view.launch;
 
+import com.google.gwt.user.client.ui.TextArea;
+import com.google.gwt.user.client.ui.TextBox;
 import com.smartgwt.client.widgets.Canvas;
+import com.smartgwt.client.widgets.Label;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
@@ -90,7 +93,26 @@ public class InputLayout extends AbstractSourceLayout {
         // List
         listLayout = new VLayout();
         listLayout.addMember(new ListHLayout(listLayout, true));
+        
+        // To delete
+        for(int i =0 ; i < listLayout.getMembers().length ; i++) {
+            listLayout.getMember(i).setBorder("2px solid red");
+            String tex = listLayout.getMember(i).getContents();
+//            if (tex != null && tex != "") {
+//                TextBox tb = new TextBox();
+//                tb.setText(tex);
+//                listLayout.addMember(tb);
+//            }
+
+        }
+        listLayout.setBorder("4px solid blue");
+        // END delete
+        
         hLayout.addMember(listLayout);
+        
+        // To delete
+        hLayout.setBorder("4px solid black");
+        // END delete
 
         // Range
         startItem = FieldUtil.getTextItem(70, true, "Start", "[0-9.]");
@@ -142,7 +164,7 @@ public class InputLayout extends AbstractSourceLayout {
                 // List
                 listLayout.setDisabled(selected);
                 listLayout.removeMembers(listLayout.getMembers());
-                listLayout.addMember(new ListHLayout(listLayout, true, "Disabled_optional_input"));
+                listLayout.addMember(new ListHLayout(listLayout, true, "No_value_provided"));
                 
                 // Range
                 // TODO reset item values when Redmine feature 2980 will be realize.
