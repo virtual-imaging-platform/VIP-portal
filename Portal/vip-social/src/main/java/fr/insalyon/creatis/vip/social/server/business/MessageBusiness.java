@@ -190,7 +190,10 @@ public class MessageBusiness {
                 ConfigurationBusiness configurationBusiness = new ConfigurationBusiness();
                 List<String> users = new ArrayList<String>();
                 for (User u : configurationBusiness.getUsers()) {
-                    users.add(u.getEmail());
+                    // Dont send mail to locked users
+                    if (!u.isAccountLocked()) {
+                        users.add(u.getEmail());
+                    }
                 }
                 recipients = users.toArray(new String[]{});
             }
@@ -279,7 +282,9 @@ public class MessageBusiness {
                     + "</html>";
 
             for (User u : users) {
-                if (!u.getEmail().equals(user.getEmail())) {
+                // Dont send mail to locked users and to itself
+                if (!u.isAccountLocked() &&
+                        !u.getEmail().equals(user.getEmail())) {
                     CoreUtil.sendEmail("VIP Message: " + subject + " (" + groupName + ")",
                             emailContent, new String[]{u.getEmail()}, true, user.getEmail());
                 }
