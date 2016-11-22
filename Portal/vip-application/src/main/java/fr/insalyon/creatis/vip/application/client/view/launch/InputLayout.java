@@ -33,6 +33,7 @@ package fr.insalyon.creatis.vip.application.client.view.launch;
 
 import com.google.gwt.user.client.ui.TextArea;
 import com.google.gwt.user.client.ui.TextBox;
+import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.Label;
 import com.smartgwt.client.widgets.form.DynamicForm;
@@ -43,6 +44,8 @@ import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.form.fields.CheckboxItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangeEvent;
 import com.smartgwt.client.widgets.form.fields.events.ChangeHandler;
+import com.smartgwt.client.widgets.layout.HLayout;
+import com.smartgwt.client.widgets.layout.LayoutSpacer;
 import com.smartgwt.client.widgets.layout.VLayout;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
 import fr.insalyon.creatis.vip.application.client.view.common.AbstractSourceLayout;
@@ -79,12 +82,19 @@ public class InputLayout extends AbstractSourceLayout {
     private DynamicForm stopItemForm;
     private DynamicForm stepItemForm;
     private CheckboxItem cbOptionalInputItem;
+    private LayoutSpacer layoutSpacer;
 
     public InputLayout(String name, String comment, boolean optional, String defaultValue, String prettyName) {
-        super(name, comment,optional, prettyName);
+        super(name, comment, optional, prettyName, "");
         
         if (optional == true) {
             configureOptionalInputCheckbox();
+        }
+        else {
+            layoutSpacer = new LayoutSpacer();
+            layoutSpacer.setWidth("24");
+            leftVLayout.addMember(layoutSpacer);
+//                    leftVLayout.setBorder("2px solid green");
         }
         
         configureTypeSelectItem();
@@ -93,26 +103,8 @@ public class InputLayout extends AbstractSourceLayout {
         // List
         listLayout = new VLayout();
         listLayout.addMember(new ListHLayout(listLayout, true));
-        
-        // To delete
-        for(int i =0 ; i < listLayout.getMembers().length ; i++) {
-            listLayout.getMember(i).setBorder("2px solid red");
-            String tex = listLayout.getMember(i).getContents();
-//            if (tex != null && tex != "") {
-//                TextBox tb = new TextBox();
-//                tb.setText(tex);
-//                listLayout.addMember(tb);
-//            }
-
-        }
-        listLayout.setBorder("4px solid blue");
-        // END delete
-        
+//        listLayout.setBorder("2px solid red");
         hLayout.addMember(listLayout);
-        
-        // To delete
-        hLayout.setBorder("4px solid black");
-        // END delete
 
         // Range
         startItem = FieldUtil.getTextItem(70, true, "Start", "[0-9.]");
@@ -122,6 +114,8 @@ public class InputLayout extends AbstractSourceLayout {
         stopItemForm = FieldUtil.getForm(stopItem);
         stepItemForm = FieldUtil.getForm(stepItem);
         
+//        this.setBorder("2px solid black");
+       
         if(defaultValue != null)
             setValue(defaultValue);
     }
@@ -134,6 +128,7 @@ public class InputLayout extends AbstractSourceLayout {
     private void configureTypeSelectItem() {
 
         selectItem = new SelectItem();
+        selectItem.setWidth(75);
         selectItem.setShowTitle(false);
         selectItem.setValueMap(InputType.valuesAsString());
         selectItem.setValue(InputType.List.name());
@@ -154,6 +149,11 @@ public class InputLayout extends AbstractSourceLayout {
     private void configureOptionalInputCheckbox() {
         cbOptionalInputItem = new CheckboxItem("");
         cbOptionalInputItem.setValue(true);
+        cbOptionalInputItem.setShowLabel(false);
+        cbOptionalInputItem.setShowTitle(false);
+        cbOptionalInputItem.setCellHeight(0);
+        cbOptionalInputItem.setWidth(0);
+        
         cbOptionalInputItem.addChangeHandler(new ChangeHandler() {  
 
             @Override
@@ -174,7 +174,8 @@ public class InputLayout extends AbstractSourceLayout {
             }  
         });
 
-        hLayout.addMember(FieldUtil.getForm(cbOptionalInputItem));
+        leftVLayout.addMember(FieldUtil.getForm(cbOptionalInputItem));
+//        hLayout.addMember(FieldUtil.getForm(cbOptionalInputItem));
     }
 
     private void setList() {

@@ -124,10 +124,10 @@ public class LaunchTab extends AbstractLaunchTab {
                     
                     // If the source type is a flag type (one of the boutiques types), InputFlagLayout creation instead of InputLayout.
                     if (source.getVipTypeRestriction() != null && source.getVipTypeRestriction().equals("flag")) {
-                        launchFormLayout.addSource(new InputFlagLayout(source.getName(), source.getDescription(),source.isOptional(),source.getDefaultValue(), source.getVipTypeRestriction(), source.getPrettyName()), disabled);
+                        launchFormLayout.addSource(new InputFlagLayout(source.getName(), source.getDescription(), source.isOptional(), source.getDefaultValue(), source.getVipTypeRestriction(), source.getPrettyName()), disabled);
                     }
                     else {
-                        launchFormLayout.addSource(new InputLayout(source.getName(), source.getDescription(),source.isOptional(),source.getDefaultValue(), source.getPrettyName()), disabled);
+                        launchFormLayout.addSource(new InputLayout(source.getName(), source.getDescription(), source.isOptional(), source.getDefaultValue(), source.getPrettyName()), disabled);
                     }
                 }
 

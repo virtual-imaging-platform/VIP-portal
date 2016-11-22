@@ -81,6 +81,8 @@ public class LaunchFormLayout extends AbstractFormLayout {
 
         simulationNameItem = FieldUtil.getTextItem(400, "[0-9A-Za-z-_ ]");
         simulationNameItem.setValidators(ValidatorUtil.getStringValidator());
+        simulationNameItem.setEditPendingCSSText("padding-left: 30px");
+//        simulationNameItem.
         addField("Execution Name", simulationNameItem);
 
         sourcesLayout = new VLayout(5);
