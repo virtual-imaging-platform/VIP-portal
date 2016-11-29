@@ -44,16 +44,13 @@ knowledge of the CeCILL-B license and that you accept its terms.
  */
 package fr.insalyon.creatis.vip.application.client.view.launch;
 
-import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.widgets.Label;
+import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.CheckboxItem;
 import fr.insalyon.creatis.vip.application.client.view.common.AbstractSourceLayout;
 import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
 import com.smartgwt.client.widgets.form.fields.events.ChangeEvent;  
 import com.smartgwt.client.widgets.form.fields.events.ChangeHandler; 
-import com.smartgwt.client.widgets.layout.HLayout;
-import com.smartgwt.client.widgets.layout.VLayout;
-import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
 
 /**
  *
@@ -65,6 +62,8 @@ import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
 public class InputFlagLayout extends AbstractSourceLayout{
     
     private CheckboxItem cbFlagInputItem ;
+    private DynamicForm cbFlagInputForm;
+    protected Label heightLabel;
   
     public InputFlagLayout(String name, String comment, boolean optional, String defaultValue, String vipTypeRestriction, String prettyName) {
         super(name, comment,optional, prettyName, defaultValue);
@@ -86,10 +85,9 @@ public class InputFlagLayout extends AbstractSourceLayout{
                     }  
                 });
          
-//        Label  ll = (Label) rightVLayout.getMember(0);
-//     Label  ll = (Label) rightVLayout.getMemberNumber(comment);
+        cbFlagInputForm = FieldUtil.getForm(cbFlagInputItem);
 
-        leftVLayout.addMember(FieldUtil.getForm(cbFlagInputItem));
+        leftVLayout.addMember(cbFlagInputForm);
     }
     
     @Override
@@ -113,71 +111,3 @@ public class InputFlagLayout extends AbstractSourceLayout{
     }
     
 }
-
-//    private VLayout labelAndCommentVLayout;
-//    protected Label sourceComment;
-//    protected Label infoHLayoutLabel;
-
-
-
-
-//        hLayout = new HLayout(3);
-////                        hLayout.setBorder("4px solid blue");
-//        hLayout.setAutoWidth();
-        // Flag checkbox
-
-//        hLayout.addMember(FieldUtil.getForm(cbFlagInputItem));
-
-
-
-
-       // VLayout for the flag name, value and comment
-//        labelAndCommentVLayout = new VLayout();
-//        
-//        String labelText = "<b>" + prettyName + " ("+ "<font color=\"blue\">" + defaultValue + "</font>" + ")";
-//        if(!optional)
-//            labelText += "<font color=\"red\">*</font>";
-//        labelText += "</b>";
-//        sourceLabel = WidgetUtil.getLabel(labelText, 15);
-//        sourceLabel.setWidth(500);
-////                    sourceLabel.setBorder("2px solid aqua");
-//        labelAndCommentVLayout.addMember(sourceLabel);
-//        
-//        String commentText = comment;
-//        sourceComment = WidgetUtil.getLabel(commentText, 15);
-//        sourceComment.setWidth(500);
-////        sourceComment.setBorder("2px solid aqua");
-//        labelAndCommentVLayout.addMember(sourceComment);
-//        
-//        hLayout.setAutoWidth();
-//        hLayout.addMember(labelAndCommentVLayout);
-
-//        addMember(hLayout);
-
-
-
-
-        //hLayout.setAutoWidth();
-//        hLayout.addMember(labelAndCommentVLayout);
-//        addMember(hLayout);
-
-//        hLayout.getMember(0).getLeftAsString()
-        
-//        String infoHLayout = "getCellHeight() :  " + String.valueOf(cbFlagInputItem.getCellHeight()) 
-//                + "        getHeight() : " + String.valueOf(cbFlagInputItem.getHeight()) + "      getWidth() :  " + String.valueOf(cbFlagInputItem.getWidth()) 
-//                + "     getVisibleHeight : " + String.valueOf(cbFlagInputItem.getVisibleHeight()) +  "     getVisibleWidth() : " + String.valueOf(cbFlagInputItem.getVisibleWidth())
-//                +  "     getPageLeft : " + String.valueOf(cbFlagInputItem.getPageLeft()) +  "     getPageTop : " + String.valueOf(cbFlagInputItem.getPageTop());
-        
-//        String infoHLayout = "getAbsoluteLeft() :  " + String.valueOf(hLayout.getAbsoluteLeft()) + "        getLayoutLeftMargin() : " + String.valueOf(hLayout.getLayoutLeftMargin()) + "  getMember(0).getMargin() : " + hLayout.getMember(0).getMargin() 
-//                + "    getLeftAsString() : " + hLayout.getMember(0).getLeftAsString() + "    sourceLabel.getMargin() : " + String.valueOf(sourceLabel.getMargin()) ;
-//        + "    getAbsoluteTop :  " + String.valueOf(hLayout.getAbsoluteTop()) + "    getHPolicy : " + hLayout.getHPolicy().toString() ;
-               // + "       getLayoutLeftMargin : " + hLayout.getLayoutLeftMargin().toString()
-               //+ "        getLayoutTopMargin : " +  hLayout.getLayoutTopMargin().toString() + "     getVPolicy().getValue() : " +  hLayout.getVPolicy().getValue()  ;
-               
-               //ko + "       getLayoutLeftMargin : " + hLayout.getLayoutLeftMargin().toString();
-//        infoHLayoutLabel = WidgetUtil.getLabel(infoHLayout, 15);
-//        infoHLayoutLabel.setWidth(500);
-//        infoHLayoutLabel.setBorder("2px solid aqua");
-//                labelAndCommentVLayout.addMember(infoHLayoutLabel);
-
-//        labelAndCommentVLayout.addMember(infoHLayout);

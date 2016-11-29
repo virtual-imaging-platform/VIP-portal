@@ -94,15 +94,11 @@ public abstract class AbstractSourceLayout extends VLayout {
      */
     public AbstractSourceLayout(String name, String comment, boolean optional, String prettyName, String defaultValue) {
         this.setVertical(false);
-        
         this.leftVLayout = new VLayout(3); 
         this.leftVLayout.setAutoWidth();
-//                        this.leftVLayout.setBorder("2px solid blue");
-        
+        this.leftVLayout.setPadding(0);
         this.rightVLayout = new VLayout(3); 
         this.rightVLayout.setAutoWidth();
-//                        this.rightVLayout.setBorder("2px solid black");
-                       
         this.name = name;
         this.optional = optional;
         String labelText = "<b>" + prettyName;
@@ -115,28 +111,20 @@ public abstract class AbstractSourceLayout extends VLayout {
         labelText += "</b>";
         this.sourceLabel = WidgetUtil.getLabel(labelText, 15);
         this.sourceLabel.setWidth(300);
-//        this.sourceLabel.setBorder("2px solid aqua");
-//        this.setAutoWidth();
         this.rightVLayout.addMember(sourceLabel);
-//        this.addMember(sourceLabel);
 
         if (comment != null && !comment.isEmpty()) {
             this.sourceComment = WidgetUtil.getLabel(comment,15);
             this.sourceComment.setWidth(500);
-//            this.sourceComment.setBorder("2px solid green");
             this.rightVLayout.addMember(sourceComment);
-//                        this.addMember(sourceComment);
         }
         this.setAutoWidth();
 
         this.hLayout = new HLayout(3); 
-//                this.setBorder("4px solid black");
         this.hLayout.setAutoWidth();
-//                        this.hLayout.setBorder("4px solid blue");
         this.rightVLayout.addMember(hLayout);
         this.addMember(leftVLayout);
         this.addMember(rightVLayout);        
-
     }
 
     public String getName() {
