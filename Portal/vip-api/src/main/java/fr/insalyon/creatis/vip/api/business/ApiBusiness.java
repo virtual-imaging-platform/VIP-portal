@@ -110,7 +110,6 @@ public class ApiBusiness {
                 logger.info("API successfully authenticated user " + email);
                 User user = configurationBusiness.getUser(email);
                 AbstractAuthenticationService.setVIPSession(request, response, user);
-                configurationBusiness.updateUserLastLogin(email);
                 return user;
             }
             throw new ApiException(authFailedMessage);
