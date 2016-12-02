@@ -62,6 +62,8 @@ public class MessageComposerWindow extends AbstractComposeWindow {
     private SelectItem usersPickList;
     private TextItem subjectItem;
 
+    private Boolean sendCopyToSupport = false;
+
     public MessageComposerWindow() {
 
         super("Compose New Message");
@@ -170,7 +172,11 @@ public class MessageComposerWindow extends AbstractComposeWindow {
                 Layout.getInstance().setNoticeMessage("Message successfully sent.");
             }
         };
-        service.sendMessage(recipients, subject, message, callback);
+        if (sendCopyToSupport) {
+            service.sendMessageWithSupportCopy(recipients, subject, message, callback);
+        } else {
+            service.sendMessage(recipients, subject, message, callback);
+        }
         modal.show("Sending message...", true);
     }
 
@@ -180,6 +186,9 @@ public class MessageComposerWindow extends AbstractComposeWindow {
 
     public void setTextMessage(String message) {
         richTextEditor.setValue(message);
+    }
 
+    public void setSendCopyToSupport(Boolean sendCopyToSupport) {
+        this.sendCopyToSupport = sendCopyToSupport;
     }
 }

@@ -278,8 +278,12 @@ public class SimulationsToolStrip extends ToolStrip {
                 public void onSuccess(Void result) {
                     modal.hide();
                     getSimulationsTab().loadData();
-                    openWindowToSendMail("Your " + "\""+applicationName+"\"" + " execution", "Dear " + user + ",<br><br>"
-                            + " I had to kill your " + "\""+ applicationName+ "\"" + " execution " + "\""+ simulationName+ "\""+ " submitted on " + date + " because all the jobs were failing with the following error:<br><br><br><br>",user);
+                    openWindowToSendMail("Your " + "\""+applicationName+"\"" + " execution",
+                            "Dear " + user + ",<br /><br />"
+                                    + " I had to kill your " + "\""+ applicationName+ "\"" + " execution "
+                                    + "\""+ simulationName+ "\""+ " submitted on " + date
+                                    + " because all the jobs were failing with the following error:"
+                                    + "<br /><br /><br /><br />",user);
 
 
 
@@ -405,6 +409,7 @@ public class SimulationsToolStrip extends ToolStrip {
         messageWindow.setSubjectValue(subjectValue);
         messageWindow.setUsersPickerListValue(userFullName);
         messageWindow.setTextMessage(message);
+        messageWindow.setSendCopyToSupport(true);
 
     }
 
