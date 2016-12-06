@@ -82,6 +82,11 @@ public class PipelineController {
     @RequestMapping("{pipelineId}")
     public Pipeline getPipeline(@PathVariable String pipelineId) throws ApiException {
         ApiUtils.methodInvocationLog("getPipeline", pipelineId);
+        try {
+            pipelineId = URLDecoder.decode(pipelineId, "UTF8");
+        } catch (UnsupportedEncodingException e) {
+            throw new ApiException("cannot decode pipelineId : " + pipelineId);
+        }
         ApiContext apiContext = restApiBusiness.getApiContext(httpServletRequest, true);
         PipelineBusiness pb = new PipelineBusiness(apiContext, workflowBusiness, applicationBusiness, classBusiness);
         pb.checkIfUserCanAccessPipeline(pipelineId);

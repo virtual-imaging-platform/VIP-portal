@@ -36,6 +36,7 @@ import fr.insalyon.creatis.vip.api.rest.config.*;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import org.junit.Test;
 
+import java.net.URLEncoder;
 import java.util.Arrays;
 
 import static fr.insalyon.creatis.vip.api.data.AppVersionTestUtils.*;
@@ -109,7 +110,31 @@ public class PipelineControllerIT extends BaseVIPSpringIT {
     }
 
     @Test
-    public void userGetAPipeline() throws Exception {
+    public void userGetAPipelineWithPathParameterEncoded() throws Exception {
+        configureApplications(this, baseUser1, Arrays.asList(class1, class2),
+                app2, version42);
+        String pipelineId = configureAnApplication(this, baseUser1, app2, version42, 0, 1);
+        mockMvc.perform(get("/rest/pipelines/" + URLEncoder.encode(pipelineId, "UTF8"))
+                .with(baseUser1()))
+                .andDo(print())
+                .andExpect(content().contentType(RestTestUtils.JSON_CONTENT_TYPE_UTF8))
+                .andExpect(jsonPath("$", jsonCorrespondsToPipeline(getFullPipeline(app2, version42, "desc test", 0, 1))));
+    }
+
+    @Test
+    public void userGetAPipelineWithPathParameterNonEncoded() throws Exception {
+        configureApplications(this, baseUser1, Arrays.asList(class1, class2),
+                app2, version42);
+        String pipelineId = configureAnApplication(this, baseUser1, app2, version42, 0, 1);
+        mockMvc.perform(get("/rest/pipelines/" + pipelineId)
+                .with(baseUser1()))
+                .andDo(print())
+                .andExpect(content().contentType(RestTestUtils.JSON_CONTENT_TYPE_UTF8))
+                .andExpect(jsonPath("$", jsonCorrespondsToPipeline(getFullPipeline(app2, version42, "desc test", 0, 1))));
+    }
+
+    @Test
+    public void userGetAPipelineWithQueryParameter() throws Exception {
         configureApplications(this, baseUser1, Arrays.asList(class1, class2),
                 app2, version42);
         String pipelineId = configureAnApplication(this, baseUser1, app2, version42, 0, 1);
