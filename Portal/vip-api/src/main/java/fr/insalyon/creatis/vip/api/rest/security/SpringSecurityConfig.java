@@ -62,7 +62,7 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http
             .authorizeRequests()
-                .antMatchers("/platform").permitAll()
+                .antMatchers("/rest/platform").permitAll()
                 .anyRequest().authenticated()
             .and()
             .apply(new ApikeyAuthentificationConfigurer<>("apikey", apikeyAuthenticationEntryPoint))

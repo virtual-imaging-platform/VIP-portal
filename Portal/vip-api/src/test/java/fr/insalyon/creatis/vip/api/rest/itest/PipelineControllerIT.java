@@ -63,7 +63,8 @@ public class PipelineControllerIT extends BaseVIPSpringIT {
 
     @Test
     public void pipelineMethodShouldBeSecured() throws Exception {
-        mockMvc.perform(get("/pipelines"))
+        mockMvc.perform(get("/rest/pipelines"))
+                .andDo(print())
                 .andExpect(status().isUnauthorized());
     }
 
@@ -71,7 +72,7 @@ public class PipelineControllerIT extends BaseVIPSpringIT {
     public void shouldReturnErrorOnAPIException() throws Exception {
         when(classBusiness.getUserClasses(eq(baseUser1.getEmail()), anyBoolean()))
                 .thenThrow(new BusinessException("test exception"));
-        mockMvc.perform(get("/pipelines").with(baseUser1()))
+        mockMvc.perform(get("/rest/pipelines").with(baseUser1()))
                 .andDo(print())
                 .andExpect(status().isBadRequest())
                 .andExpect(content().contentType(RestTestUtils.JSON_CONTENT_TYPE_UTF8))
@@ -82,7 +83,7 @@ public class PipelineControllerIT extends BaseVIPSpringIT {
     public void shouldReturnErrorOnUnexpectedException() throws Exception {
         when(classBusiness.getUserClasses(eq(baseUser1.getEmail()), anyBoolean()))
                 .thenThrow(new RuntimeException("test exception"));
-        mockMvc.perform(get("/pipelines").with(baseUser1()))
+        mockMvc.perform(get("/rest/pipelines").with(baseUser1()))
                 .andDo(print())
                 .andExpect(status().isInternalServerError())
                 .andExpect(content().contentType(RestTestUtils.JSON_CONTENT_TYPE_UTF8))
@@ -95,7 +96,7 @@ public class PipelineControllerIT extends BaseVIPSpringIT {
                 app1, version42,
                 app2, version01,
                 app3, version42, version01);
-        mockMvc.perform(get("/pipelines").with(baseUser1()))
+        mockMvc.perform(get("/rest/pipelines").with(baseUser1()))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(RestTestUtils.JSON_CONTENT_TYPE_UTF8))
@@ -112,7 +113,7 @@ public class PipelineControllerIT extends BaseVIPSpringIT {
         configureApplications(this, baseUser1, Arrays.asList(class1, class2),
                 app2, version42);
         String pipelineId = configureAnApplication(this, baseUser1, app2, version42, 0, 1);
-        mockMvc.perform(get("/pipelines").param("pipelineId", pipelineId)
+        mockMvc.perform(get("/rest/pipelines").param("pipelineId", pipelineId)
                 .with(baseUser1()))
                 .andDo(print())
                 .andExpect(content().contentType(RestTestUtils.JSON_CONTENT_TYPE_UTF8))

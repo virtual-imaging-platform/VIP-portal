@@ -63,7 +63,7 @@ public class AuthenticationIT extends BaseVIPSpringIT {
     @Test
     public void authenticationOK() throws Exception {
         prepareUser1Configuration();
-        mockMvc.perform(get("/wrongUrl")
+        mockMvc.perform(get("/rest/wrongUrl")
                 .with(ApikeyRequestPostProcessor.apikey("apikey", "apikeyvalue")))
                 .andDo(print())
                 .andExpect(status().isNotFound());
@@ -73,7 +73,7 @@ public class AuthenticationIT extends BaseVIPSpringIT {
     public void authenticationWithCoreKo() throws Exception {
         when(userDAO.getUserByApikey("apikeyvalue"))
                 .thenThrow(new RuntimeException("hey hey"));
-        mockMvc.perform(get("/wrongUrl")
+        mockMvc.perform(get("/rest/wrongUrl")
                 .with(ApikeyRequestPostProcessor.apikey("apikey", "apikeyvalue")))
                 .andDo(print())
                 .andExpect(status().isUnauthorized())
@@ -85,7 +85,7 @@ public class AuthenticationIT extends BaseVIPSpringIT {
     @Test
     public void authenticationWithBasicShouldBeKo() throws Exception {
         prepareUser1Configuration();
-        mockMvc.perform(get("/wrongUrl")
+        mockMvc.perform(get("/rest/wrongUrl")
                 .with(httpBasic(baseUser1.getEmail(), baseUser1Password)))
                 .andDo(print())
                 .andExpect(status().isUnauthorized())
@@ -97,7 +97,7 @@ public class AuthenticationIT extends BaseVIPSpringIT {
     @Test
     public void authenticationWithWrongApikey() throws Exception {
         prepareUser1Configuration();
-        mockMvc.perform(get("/wrongUrl")
+        mockMvc.perform(get("/rest/wrongUrl")
                 .with(ApikeyRequestPostProcessor.apikey("apikey", "WRONG")))
                 .andDo(print())
                 .andExpect(status().isUnauthorized())
@@ -109,7 +109,7 @@ public class AuthenticationIT extends BaseVIPSpringIT {
     @Test
     public void authenticationWithoutCredentials() throws Exception {
         prepareUser1Configuration();
-        mockMvc.perform(get("/wrongUrl"))
+        mockMvc.perform(get("/rest/wrongUrl"))
                 .andDo(print())
                 .andExpect(status().isUnauthorized())
                 .andExpect(content().contentType(RestTestUtils.JSON_CONTENT_TYPE_UTF8))

@@ -56,7 +56,7 @@ public class PlatformControllerIT extends BaseVIPSpringIT {
 
     @Test
     public void platformShouldNotBeSecured() throws Exception {
-        mockMvc.perform(get("/platform"))
+        mockMvc.perform(get("/rest/platform"))
                 .andDo(print())
                 .andExpect(status().isOk());
     }
@@ -64,7 +64,7 @@ public class PlatformControllerIT extends BaseVIPSpringIT {
     @Test
     public void testPlatformProperties() throws Exception {
         // the test properties are set in BaseVIPSpringIT (with @TestPropertySource)
-        mockMvc.perform(get("/platform"))
+        mockMvc.perform(get("/rest/platform"))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(RestTestUtils.JSON_CONTENT_TYPE_UTF8))

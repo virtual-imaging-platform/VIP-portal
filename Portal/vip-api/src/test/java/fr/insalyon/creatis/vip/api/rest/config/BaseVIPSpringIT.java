@@ -47,6 +47,7 @@ import org.springframework.test.context.*;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
@@ -111,10 +112,11 @@ abstract public class BaseVIPSpringIT {
     public final void setup() {
         mockMvc = MockMvcBuilders
                 .webAppContextSetup(wac)
+                .defaultRequest(MockMvcRequestBuilders.get("/").servletPath("/rest"))
                 .apply(SecurityMockMvcConfigurers.springSecurity())
                 .build();
         Mockito.reset(userDAO, configurationBusiness, workflowBusiness, applicationBusiness,
-                classBusiness);
+                classBusiness, transferPoolBusiness, simulationBusiness);
     }
 
     protected String getResourceAsString(String pathFromClasspath) throws IOException {
