@@ -98,7 +98,7 @@ public class LaunchTab extends AbstractLaunchTab {
 
             @Override
             public void onSuccess(Descriptor descriptor) {
-                launchFormLayout = new LaunchFormLayout(applicationName + " " + applicationVersion, null, descriptor.getDescription());
+                launchFormLayout = new LaunchFormLayout(applicationName + " " + applicationVersion, null, descriptor.getDescription(), true);
                 layout.addMember(launchFormLayout);
                 
                 // Put mandatory sources first

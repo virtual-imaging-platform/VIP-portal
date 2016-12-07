@@ -31,6 +31,7 @@
  */
 package fr.insalyon.creatis.vip.application.client.view.launch;
 
+import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
@@ -40,6 +41,7 @@ import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.form.fields.CheckboxItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangeEvent;
 import com.smartgwt.client.widgets.form.fields.events.ChangeHandler;
+import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.LayoutSpacer;
 import com.smartgwt.client.widgets.layout.VLayout;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
@@ -79,29 +81,34 @@ public class InputLayout extends AbstractSourceLayout {
     // Checbox for optional input
     private CheckboxItem cbOptionalInputItem;
     private DynamicForm cbOptionalInputForm;
-    // Layouts
-    private LayoutSpacer layoutSpacerIfNoCb;
-    private LayoutSpacer layoutSpacerAboveCb;
+    private LayoutSpacer sourceFieldLayoutSpacer;
 
     public InputLayout(String name, String comment, boolean optional, String defaultValue, String prettyName) {
         super(name, comment, optional, prettyName, "");
         
+        fieldHLayout = new HLayout(3);
+        fieldHLayout.setAutoWidth();
+        fieldHLayout.setPadding(0);
+        fieldHLayout.setLayoutMargin(0);
         if (optional == true) {
             configureOptionalInputCheckbox();
         }
         else {
-            layoutSpacerIfNoCb = new LayoutSpacer();
-            layoutSpacerIfNoCb.setWidth("24");
-            leftVLayout.addMember(layoutSpacerIfNoCb);
+            sourceFieldLayoutSpacer = new LayoutSpacer();
+            sourceFieldLayoutSpacer.setWidth(25);
+            sourceFieldLayoutSpacer.setMaxWidth(25);
+            sourceFieldHLayout.addMember(sourceFieldLayoutSpacer);
         }
         
         configureTypeSelectItem();
-        hLayout.addMember(FieldUtil.getForm(selectItem));
+//        DynamicForm selectItemDynamic = FieldUtil.getForm(selectItem);
+        fieldHLayout.addMember(FieldUtil.getForm(selectItem));
         
         // List
         listLayout = new VLayout();
         listLayout.addMember(new ListHLayout(listLayout, true));
-        hLayout.addMember(listLayout);
+        fieldHLayout.addMember(listLayout);
+         sourceFieldHLayout.addMember(fieldHLayout);
 
         // Range
         startItem = FieldUtil.getTextItem(70, true, "Start", "[0-9.]");
@@ -115,7 +122,6 @@ public class InputLayout extends AbstractSourceLayout {
             setValue(defaultValue);
     }
 
-    
     public InputLayout(String name, String comment) {
         this(name, comment, false, "", "");
     }
@@ -142,14 +148,14 @@ public class InputLayout extends AbstractSourceLayout {
     }
     
     private void configureOptionalInputCheckbox() {
-        cbOptionalInputItem = new CheckboxItem("");
+        cbOptionalInputItem = new CheckboxItem();
         cbOptionalInputItem.setValue(true);
         cbOptionalInputItem.setShowLabel(false);
         cbOptionalInputItem.setShowTitle(false);
         cbOptionalInputItem.setTop(0);
-        cbOptionalInputItem.setHeight(0);
-        cbOptionalInputItem.setWidth(0);
-//      cbOptionalInputItem.setShowValueIconOnly(true);
+        cbOptionalInputItem.setHeight(26);
+        cbOptionalInputItem.setWidth(25);
+        cbOptionalInputItem.setAlign(Alignment.CENTER);
 
         cbOptionalInputItem.addChangeHandler(new ChangeHandler() {  
 
@@ -171,36 +177,33 @@ public class InputLayout extends AbstractSourceLayout {
             }  
         });
 
-        layoutSpacerAboveCb = new LayoutSpacer();
-
-        int heightOfLayoutSpacerAboveCb = rightVLayout.getMember(0).getHeight() + rightVLayout.getMember(1).getHeight() ;
-        layoutSpacerAboveCb.setHeight(heightOfLayoutSpacerAboveCb+10);
-        
-        leftVLayout.addMember(layoutSpacerAboveCb);
-
-        cbOptionalInputForm = FieldUtil.getForm(cbOptionalInputItem);
-     
+        cbOptionalInputForm = FieldUtil.getForm(cbOptionalInputItem);        
         cbOptionalInputForm.setTop(0);
+        cbOptionalInputForm.setHeight(15);
+        cbOptionalInputForm.setWidth(25);
+        cbOptionalInputForm.setMaxWidth(25);
+        cbOptionalInputForm.setMaxHeight(25);
         cbOptionalInputForm.setPadding(0);
         cbOptionalInputForm.setCellPadding(0);
-        
-        leftVLayout.addMember(cbOptionalInputForm);
+        cbOptionalInputForm.setMargin(0);
+        sourceFieldHLayout.addMember(cbOptionalInputForm);
+
     }
 
     private void setList() {
 
-        hLayout.addMember(listLayout);
-        hLayout.removeMember(startItemForm);
-        hLayout.removeMember(stopItemForm);
-        hLayout.removeMember(stepItemForm);
+        fieldHLayout.addMember(listLayout);
+        fieldHLayout.removeMember(startItemForm);
+        fieldHLayout.removeMember(stopItemForm);
+        fieldHLayout.removeMember(stepItemForm);
     }
 
     private void setRange() {
 
-        hLayout.removeMember(listLayout);
-        hLayout.addMember(startItemForm);
-        hLayout.addMember(stopItemForm);
-        hLayout.addMember(stepItemForm);
+        fieldHLayout.removeMember(listLayout);
+        fieldHLayout.addMember(startItemForm);
+        fieldHLayout.addMember(stopItemForm);
+        fieldHLayout.addMember(stepItemForm);
     }
 
     @Override

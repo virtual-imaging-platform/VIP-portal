@@ -31,12 +31,11 @@
  */
 package fr.insalyon.creatis.vip.application.client.view.common;
 
-import com.google.gwt.dom.client.Style;
 import com.smartgwt.client.widgets.Label;
 import com.smartgwt.client.widgets.layout.HLayout;
+import com.smartgwt.client.widgets.layout.LayoutSpacer;
 import com.smartgwt.client.widgets.layout.VLayout;
 import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
-import com.smartgwt.client.widgets.Canvas;
 
 /**
  *
@@ -48,17 +47,17 @@ public abstract class AbstractSourceLayout extends VLayout {
     protected Label sourceLabel;
     protected Label sourceName;
     protected Label sourceComment;
-    protected VLayout leftVLayout;
-    protected VLayout rightVLayout;
-    protected HLayout hLayout;
-    protected boolean optional;
-    protected HLayout sourceGlobalLayout;
+    protected HLayout sourceLabelHLayout; // 
+    protected HLayout sourceCommentHLayout;
+    protected HLayout sourceFieldHLayout;
+    protected HLayout fieldHLayout;
     
+    protected HLayout flagCbHLayout; // Layout in which a checkbox (flag input) can be add. This layout is on the left of the sourceLabelHLayout.
+    protected LayoutSpacer sourceCommentLayoutSpacer; // Empty layout on the left of the sourceCommentHLayout, to horizontaly align it with sourceLabelHLayout and sourceFieldHLayout.
+    protected boolean optional;
+
     /**
-     * TODO
-     * This construtor will be deprecated during the realisation of the redmine feature 2803.
-     * It will be replaced by the constructor (see below) with a fourth argument : prettyName
-     * Currently InputLayout and GateLabSourceLayout classes use it.
+     * Currently GateLabSourceLayout object use it.
      */
     public AbstractSourceLayout(String name, String comment, boolean optional) {
         this.name = name;
@@ -71,60 +70,74 @@ public abstract class AbstractSourceLayout extends VLayout {
         this.sourceLabel.setWidth(300);
         if (comment != null) {
             this.sourceLabel.setTooltip(comment);
-            this.sourceLabel.setHoverWidth(500);
+            this.sourceLabel.setHoverWidth(450);
         }
         this.setAutoWidth();
         this.addMember(sourceLabel);
         
-        this.hLayout = new HLayout(3);
-        this.hLayout.setAutoWidth();
-        this.addMember(hLayout);   
+        this.sourceFieldHLayout = new HLayout(3);
+        this.sourceFieldHLayout.setAutoWidth();
+        this.addMember(sourceFieldHLayout);   
     }
         
     public AbstractSourceLayout(String name, String comment) {
         this(name,comment,false);
     }
     
-    
      /**
-     * TODO
-     * This construtor will replace the constructor (see above) with 3 arguments, during the redmine feature 2803.
-     * Currently this constructor is called only by InputFlagLayout object. 
+     * Currently this constructor is called by InputFlagLayout and InputFlagLayout objects. 
      * It allows to display an input name which value is contained in prettyName variable and not in name variable.
      */
     public AbstractSourceLayout(String name, String comment, boolean optional, String prettyName, String defaultValue) {
-        this.setVertical(false);
-        this.leftVLayout = new VLayout(3); 
-        this.leftVLayout.setAutoWidth();
-        this.leftVLayout.setPadding(0);
-        this.rightVLayout = new VLayout(3); 
-        this.rightVLayout.setAutoWidth();
+        flagCbHLayout = new HLayout(0);
+        flagCbHLayout.setWidth(25);
+        flagCbHLayout.setMaxWidth(25);
+        flagCbHLayout.setHeight(15);
+        flagCbHLayout.setPadding(0);
+        flagCbHLayout.setMargin(0);
+       
+        sourceLabelHLayout = new HLayout(0); 
+        sourceLabelHLayout.addMember(flagCbHLayout);
+
         this.name = name;
         this.optional = optional;
-        String labelText = "<b>" + prettyName;
-        if (!defaultValue.isEmpty()) {
-            labelText += " ("+ "<font color=\"blue\">" + defaultValue + "</font>" + ")";
+        String labelText;
+        if (prettyName != null && !prettyName.isEmpty()) {
+            labelText = "<b>" + prettyName;
+        }
+        else {
+            labelText = "<b>" + name;
         }
         
-        if(!optional)
+        if (!defaultValue.isEmpty()) { // Add the flag value (command-line-flag in json descriptor).
+            labelText += " ("+ "<font color=\"blue\">" + defaultValue + "</font>" + ")";
+        }
+        if(!optional) {
             labelText += "<font color=\"red\">*</font>";
+        }
         labelText += "</b>";
-        this.sourceLabel = WidgetUtil.getLabel(labelText, 15);
-        this.sourceLabel.setWidth(300);
-        this.rightVLayout.addMember(sourceLabel);
+        sourceLabel = WidgetUtil.getLabel(labelText, 15);
+        sourceLabel.setWidth(300);
+        setAutoWidth();
+        sourceLabelHLayout.addMember(sourceLabel);
+        addMember(sourceLabelHLayout);
 
         if (comment != null && !comment.isEmpty()) {
-            this.sourceComment = WidgetUtil.getLabel(comment,15);
-            this.sourceComment.setWidth(500);
-            this.rightVLayout.addMember(sourceComment);
+            sourceCommentLayoutSpacer = new LayoutSpacer();
+            sourceCommentLayoutSpacer.setWidth(25);
+            sourceCommentLayoutSpacer.setMaxWidth(25);
+            sourceCommentHLayout = new HLayout(0); 
+            sourceCommentHLayout.setWidth(460);
+            sourceCommentHLayout.addMember(sourceCommentLayoutSpacer);
+            sourceComment = WidgetUtil.getLabel(comment,15);
+            sourceComment.setWidth(460);
+            sourceCommentHLayout.addMember(sourceComment);
+            addMember(sourceCommentHLayout);
         }
-        this.setAutoWidth();
 
-        this.hLayout = new HLayout(3); 
-        this.hLayout.setAutoWidth();
-        this.rightVLayout.addMember(hLayout);
-        this.addMember(leftVLayout);
-        this.addMember(rightVLayout);        
+        sourceFieldHLayout = new HLayout(0); 
+        sourceFieldHLayout.setAutoWidth();
+        addMember(sourceFieldHLayout);       
     }
 
     public String getName() {

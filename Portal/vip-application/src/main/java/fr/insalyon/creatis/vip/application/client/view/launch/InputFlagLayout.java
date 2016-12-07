@@ -44,7 +44,7 @@ knowledge of the CeCILL-B license and that you accept its terms.
  */
 package fr.insalyon.creatis.vip.application.client.view.launch;
 
-import com.smartgwt.client.widgets.Label;
+import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.CheckboxItem;
 import fr.insalyon.creatis.vip.application.client.view.common.AbstractSourceLayout;
@@ -56,26 +56,27 @@ import com.smartgwt.client.widgets.form.fields.events.ChangeHandler;
  *
  * @author pgirard
  * 
- * Class for display an flag type input as a checkbox following by the flag value (command-line-flag in json descriptor). 
+ * Class for display a flag type input as a checkbox following by its name (prettyName) and its value (command-line-flag in json descriptor). 
  * With this checkbox the user can add or not the flag value on the command line.
  */
 public class InputFlagLayout extends AbstractSourceLayout{
     
     private CheckboxItem cbFlagInputItem ;
     private DynamicForm cbFlagInputForm;
-    protected Label heightLabel;
   
     public InputFlagLayout(String name, String comment, boolean optional, String defaultValue, String vipTypeRestriction, String prettyName) {
         super(name, comment,optional, prettyName, defaultValue);
 
-        cbFlagInputItem = new CheckboxItem("");
+        cbFlagInputItem = new CheckboxItem();
         cbFlagInputItem.setValue(false);
         cbFlagInputItem.setValueField(defaultValue);
         cbFlagInputItem.setShowLabel(false);
         cbFlagInputItem.setShowTitle(false);
-        cbFlagInputItem.setWidth(0);
-        cbFlagInputItem.setHeight(0);
-        
+        cbFlagInputItem.setTop(0);
+        cbFlagInputItem.setHeight(15);
+        cbFlagInputItem.setWidth(25);
+        cbFlagInputItem.setAlign(Alignment.CENTER);
+
         cbFlagInputItem.addChangeHandler(new ChangeHandler() {  
             
                     @Override
@@ -84,10 +85,18 @@ public class InputFlagLayout extends AbstractSourceLayout{
                         cbFlagInputItem.setValue(!selected);  
                     }  
                 });
-         
+        
         cbFlagInputForm = FieldUtil.getForm(cbFlagInputItem);
-
-        leftVLayout.addMember(cbFlagInputForm);
+        cbFlagInputForm.setTop(0);
+        cbFlagInputForm.setHeight(15);
+        cbFlagInputForm.setWidth(25);
+        cbFlagInputForm.setMaxWidth(25);
+        cbFlagInputForm.setMaxHeight(25);
+        cbFlagInputForm.setPadding(0);
+        cbFlagInputForm.setCellPadding(0);
+        cbFlagInputForm.setMargin(0);
+        
+        flagCbHLayout.addMember(cbFlagInputForm);
     }
     
     @Override
