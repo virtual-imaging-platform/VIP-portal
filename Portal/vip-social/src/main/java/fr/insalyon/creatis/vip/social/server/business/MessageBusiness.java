@@ -44,10 +44,10 @@ import fr.insalyon.creatis.vip.social.client.bean.Message;
 import fr.insalyon.creatis.vip.social.server.dao.GroupMessageDAO;
 import fr.insalyon.creatis.vip.social.server.dao.MessageDAO;
 import fr.insalyon.creatis.vip.social.server.dao.SocialDAOFactory;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
+
+import java.util.*;
+
+import static fr.insalyon.creatis.vip.core.client.CoreModule.user;
 
 /**
  *
@@ -210,9 +210,9 @@ public class MessageBusiness {
                     + "<body>"
                     + "<p>Hello,</p>"
                     + "<p><b>" + user.getFullName() + "</b> sent you a message on VIP:</p>"
-                    + "<p style=\"background-color: #F2F2F2\"><br />"
-                    + "<b>Subject:</b> " + subject + "<br />"
-                    + "<em>" + message + "</em><br /></p>"
+                    + "<div style=\"background-color: #F2F2F2\">"
+                    + "<br /><b>Subject:</b> " + subject + "<br />"
+                    + "<em>" + message + "</em><br /></div>"
                     + "<p>Best Regards,</p>"
                     + "<p>VIP Team</p>"
                     + "</body>"
@@ -227,6 +227,37 @@ public class MessageBusiness {
         }
     }
 
+    public void copyMessageToVipSupport(User sender, String[] recipients,
+                                        String subject, String message) throws BusinessException {
+
+        try {
+            String emailContent = "<html>"
+                    + "<head></head>"
+                    + "<body>"
+                    + "<p><b>" + sender.getFullName() + "</b> sent a message to <b>"
+                    + Arrays.asList(recipients) + "</b> on VIP:</p>"
+                    + "<div style=\"background-color: #F2F2F2\">"
+                    + "<br /><b>Subject:</b> " + subject + "<br />"
+                    + "<em>" + message + "</em><br /></div>"
+                    + "</body>"
+                    + "</html>";
+
+            // if there is only one receiver, name it in subject, otherwise name the sender
+            String subjectInfo = recipients.length == 1 ?
+                    "to " + recipients[0] : "from " + sender.getFullName();
+
+            for (User u : CoreDAOFactory.getDAOFactory().getUsersGroupsDAO().getUsersFromGroup(CoreConstants.GROUP_SUPPORT)) {
+                CoreUtil.sendEmail(
+                        "[VIP Support Copy] " + subject + "(" + subjectInfo + ")",
+                        emailContent,
+                        new String[]{u.getEmail()}, true, sender.getEmail());
+            }
+
+        } catch (DAOException ex) {
+            throw new BusinessException(ex);
+        }
+    }
+
     public void sendMessageToVipSupport(User user, String subject, String message, List<String> workflowIDs, List<String> simulationNames) throws BusinessException {
 
         try {
@@ -234,9 +265,9 @@ public class MessageBusiness {
                     + "<head></head>"
                     + "<body>"
                     + "<p><b>" + user.getFullName() + "</b> sent you a message on VIP:</p>"
-                    + "<p style=\"background-color: #F2F2F2\"><br />"
-                    + "<b>Subject:</b> " + subject + "<br />"
-                    + "<em>" + message + "</em><br /></p>"
+                    + "<div style=\"background-color: #F2F2F2\">"
+                    + "<br /><b>Subject:</b> " + subject + "<br />"
+                    + "<em>" + message + "</em><br /></div>"
                     + "<p>Workflow ID " + workflowIDs + "</p>"
                     + "<p>Simulation Name " + simulationNames + "</p>"
                     + "</body>"
