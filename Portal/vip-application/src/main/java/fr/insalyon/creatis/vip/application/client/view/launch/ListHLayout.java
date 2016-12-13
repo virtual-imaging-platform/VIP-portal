@@ -54,10 +54,14 @@ public class ListHLayout extends HLayout {
     private DynamicForm listItemForm;
 
     public ListHLayout(final VLayout parent, boolean master) {
-        this(parent, master, "");
+        this(parent, master, "", false);
+    }
+    
+    public ListHLayout(final VLayout parent, boolean master, String value) {
+        this(parent, master, value, false);
     }
 
-    public ListHLayout(final VLayout parent, boolean master, String value) {
+    public ListHLayout(final VLayout parent, boolean master, String value, boolean optional) {
 
         this.instance = this;
         this.setMembersMargin(3);
@@ -65,6 +69,10 @@ public class ListHLayout extends HLayout {
         listItem = FieldUtil.getTextItem(400, false, "", "[0-9.,A-Za-z-+/_(){} ]");
         listItem.setValue(value);
         listItem.setValidators(ValidatorUtil.getStringValidator());
+        
+        if (optional) {
+            listItem.setRequiredMessage(ApplicationConstants.INPUT_WITHOUT_VALUE_REQUIRED_MESSAGE);
+        }
         
         PickerIcon browsePicker = new PickerIcon(PickerIcon.SEARCH, new FormItemClickHandler() {
 
@@ -79,7 +87,12 @@ public class ListHLayout extends HLayout {
 
             @Override
             public void onFormItemClick(FormItemIconClickEvent event) {
-                parent.addMember(new ListHLayout(parent, false));
+                if (optional) {
+                    parent.addMember(new ListHLayout(parent, false, "", optional));
+                }
+                else {
+                     parent.addMember(new ListHLayout(parent, false));
+                }
             }
         });
         morePicker.setPrompt("Add");

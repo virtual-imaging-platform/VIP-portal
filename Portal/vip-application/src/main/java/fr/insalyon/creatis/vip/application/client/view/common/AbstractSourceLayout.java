@@ -47,17 +47,16 @@ public abstract class AbstractSourceLayout extends VLayout {
     protected Label sourceLabel;
     protected Label sourceName;
     protected Label sourceComment;
-    protected HLayout sourceLabelHLayout; // 
+    protected HLayout sourceLabelHLayout;
     protected HLayout sourceCommentHLayout;
     protected HLayout sourceFieldHLayout;
     protected HLayout fieldHLayout;
-    
     protected HLayout flagCbHLayout; // Layout in which a checkbox (flag input) can be add. This layout is on the left of the sourceLabelHLayout.
     protected LayoutSpacer sourceCommentLayoutSpacer; // Empty layout on the left of the sourceCommentHLayout, to horizontaly align it with sourceLabelHLayout and sourceFieldHLayout.
     protected boolean optional;
 
     /**
-     * Currently GateLabSourceLayout object use it.
+     * Parent constructor of an input layout for GateLab application.
      */
     public AbstractSourceLayout(String name, String comment, boolean optional) {
         this.name = name;
@@ -85,7 +84,7 @@ public abstract class AbstractSourceLayout extends VLayout {
     }
     
      /**
-     * Currently this constructor is called by InputFlagLayout and InputFlagLayout objects. 
+     * Parent constructor of a flag input layout or a (non-flag) input layout for all applications except GateLab application. 
      * It allows to display an input name which value is contained in prettyName variable and not in name variable.
      */
     public AbstractSourceLayout(String name, String comment, boolean optional, String prettyName, String defaultValue) {
@@ -105,7 +104,7 @@ public abstract class AbstractSourceLayout extends VLayout {
         if (prettyName != null && !prettyName.isEmpty()) {
             labelText = "<b>" + prettyName;
         }
-        else {
+        else {// For applications imported with a gwendia.wm which not use prettyName attribut 
             labelText = "<b>" + name;
         }
         
