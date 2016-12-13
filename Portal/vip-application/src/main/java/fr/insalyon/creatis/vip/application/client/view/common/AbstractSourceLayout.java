@@ -57,7 +57,7 @@ public abstract class AbstractSourceLayout extends VLayout {
     protected boolean optional;
 
     /**
-     * Currently GateLabSourceLayout object use it.
+     * Parent constructor of an input layout for GateLab application.
      */
     public AbstractSourceLayout(String name, String comment, boolean optional) {
         this.name = name;
@@ -85,7 +85,7 @@ public abstract class AbstractSourceLayout extends VLayout {
     }
     
      /**
-     * Currently this constructor is called by InputFlagLayout and InputFlagLayout objects. 
+     * Parent constructor of a flag input layout or a (non-flag) input layout for all applications except GateLab application.
      * It allows to display an input name which value is contained in prettyName variable and not in name variable.
      */
     public AbstractSourceLayout(String name, String comment, boolean optional, String prettyName, String defaultValue) {
