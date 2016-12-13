@@ -31,8 +31,10 @@
  */
 package fr.insalyon.creatis.vip.api.bean;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import fr.insalyon.creatis.vip.api.bean.pairs.IntKeyStringValuePair;
 import java.util.ArrayList;
+import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
@@ -43,7 +45,7 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlType(name = "Pipeline")
 public class Pipeline extends Object {
-    
+
     @XmlElement(name = "identifier", required=true)
     private String identifier;
     @XmlElement(name = "name", required=true)
@@ -53,7 +55,8 @@ public class Pipeline extends Object {
     @XmlElement(name = "version")
     private String version;
     @XmlElement(name = "parameters")
-    ArrayList<PipelineParameter> parameters;
+    private ArrayList<PipelineParameter> parameters;
+    @JsonIgnore
     @XmlElement(name = "errorCodesAndMessages")
     private ArrayList<IntKeyStringValuePair> errorCodesAndMessages;
     @XmlElement(name = "canExecute")
@@ -103,5 +106,9 @@ public class Pipeline extends Object {
     public boolean canExecute(){
         return canExecute;
     }
-   
+
+    // need getter style to be formated to json
+    public boolean isCanExecute() {
+        return canExecute;
+    }
 }

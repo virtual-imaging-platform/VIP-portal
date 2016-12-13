@@ -31,8 +31,8 @@
  */
 package fr.insalyon.creatis.vip.api.bean.pairs;
 
-import fr.insalyon.creatis.vip.api.bean.Execution;
-import fr.insalyon.creatis.vip.api.bean.ParameterTypedValue;
+import fr.insalyon.creatis.vip.api.bean.*;
+
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlType;
@@ -48,7 +48,7 @@ public class StringKeyValuePair {
     @XmlElements(value = { 
         @XmlElement(name = "valueStr", type=String.class, required=true),
         @XmlElement(name = "valueInt", type=int.class, required=true),
-        @XmlElement(name = "valueStatus", type=Execution.ExecutionStatus.class, required=true),
+        @XmlElement(name = "valueStatus", type=ExecutionStatus.class, required=true),
         @XmlElement(name = "valueParamType", type=ParameterTypedValue.class, required=true)
     } )
     private java.lang.Object value;

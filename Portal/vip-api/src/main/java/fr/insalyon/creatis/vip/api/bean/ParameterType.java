@@ -39,5 +39,6 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlType(name = "ParameterType")
 public enum ParameterType {
+    // TODO improve (de)serialisation (enums should be in capital)
     File, String, Boolean, Int64, Double, List
 }

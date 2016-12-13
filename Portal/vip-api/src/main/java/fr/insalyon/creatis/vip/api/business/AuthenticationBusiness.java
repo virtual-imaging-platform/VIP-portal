@@ -48,18 +48,10 @@ public class AuthenticationBusiness {
     private final ApiContext apiContext;
 
     private final ConfigurationBusiness configurationBusiness;
-    private final ApiBusiness apiBusiness;
 
     public AuthenticationBusiness(ApiContext apiContext) {
         this.apiContext = apiContext;
         this.configurationBusiness = new ConfigurationBusiness();
-        this.apiBusiness = new ApiBusiness(configurationBusiness);
-    }
-
-    public AuthenticationBusiness(ApiContext apiContext, ConfigurationBusiness configurationBusiness, ApiBusiness apiBusiness) {
-        this.apiContext = apiContext;
-        this.configurationBusiness = configurationBusiness;
-        this.apiBusiness = apiBusiness;
     }
     
     public void authenticateSession(String userName, String password) throws ApiException {

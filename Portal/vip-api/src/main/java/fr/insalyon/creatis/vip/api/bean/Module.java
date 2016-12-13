@@ -31,13 +31,40 @@
  */
 package fr.insalyon.creatis.vip.api.bean;
 
+import com.fasterxml.jackson.annotation.JsonValue;
+
 import javax.xml.bind.annotation.XmlType;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 /**
  *
  * @author Tristan Glatard tristan.glatard@creatis.insa-lyon.fr
  */
 @XmlType(name = "Module")
+@XmlJavaTypeAdapter(ModuleXmlAdapter.class)
 public enum Module {
-    Processing, Data, Management, Commercial
+    PROCESSING("Processing"),
+    DATA("Data"),
+    MANAGEMENT("Management"),
+    COMMERCIAL("Commercial");
+
+    private String label;
+
+    Module(String label) {
+        this.label = label;
+    }
+
+    public static Module fromLabel(String label) {
+        for (Module module : values()) {
+            if (label.equals(module.label)) {
+                return module;
+            }
+        }
+        throw new IllegalArgumentException("Unknown module : " + label);
+    }
+
+    @JsonValue
+    public String getLabel() {
+        return label;
+    }
 }
