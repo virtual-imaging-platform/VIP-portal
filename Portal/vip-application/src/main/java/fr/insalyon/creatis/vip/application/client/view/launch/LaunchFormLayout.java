@@ -63,9 +63,9 @@ public class LaunchFormLayout extends AbstractFormLayout {
 
     private TextItem simulationNameItem;
     private VLayout sourcesLayout;
-
-    public LaunchFormLayout(String title, String icon, final String description) {
-
+    private VLayout executionNameLayout;
+    
+    public LaunchFormLayout(String title, String icon, final String description, boolean executionNamePadding) {
         super("600", "*");
         addTitle(title, icon);
 
@@ -81,11 +81,28 @@ public class LaunchFormLayout extends AbstractFormLayout {
 
         simulationNameItem = FieldUtil.getTextItem(400, "[0-9A-Za-z-_ ]");
         simulationNameItem.setValidators(ValidatorUtil.getStringValidator());
-        addField("Execution Name", simulationNameItem);
+        simulationNameItem.setEditPendingCSSText("padding-left: 30px");
+        
+        if (executionNamePadding) { // To align horizontaly "Execution name" and the text field on the others comboBoxes (inputs comboBoxes) of the screen
+                executionNameLayout = new VLayout(0);
+                executionNameLayout.setLayoutLeftMargin(25);
+                executionNameLayout.setWidth(300);
+                executionNameLayout.addMember(WidgetUtil.getLabel("<b>Execution Name</b>", 15));
+                executionNameLayout.addMember(FieldUtil.getForm(simulationNameItem));
+                this.addMember(executionNameLayout);    
+        }
+        else {
+             addField("Execution Name", simulationNameItem);
+        }
 
         sourcesLayout = new VLayout(5);
         sourcesLayout.setAutoHeight();
         this.addMember(sourcesLayout);
+    }
+    
+    // Constructor called by GateLab application
+    public LaunchFormLayout(String title, String icon, final String description) {
+        this(title, icon, description, false);
     }
 
     public void addSource(AbstractSourceLayout sourceLayout) {
@@ -151,7 +168,7 @@ public class LaunchFormLayout extends AbstractFormLayout {
             if (canvas instanceof AbstractSourceLayout) {
                 AbstractSourceLayout source = (AbstractSourceLayout) canvas;
                 if (source.isOptional() && (source.getValue() == null || source.getValue().equals("") || source.getValue().equals("null"))) {
-                    source.setValue("no");
+                    source.setValue("No_value_provided");
                 } else if (!source.validate()) {
                     valid = false;
                 }
