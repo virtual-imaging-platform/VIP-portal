@@ -61,7 +61,17 @@ public class ListHLayout extends HLayout {
         this(parent, master, value, false);
     }
 
-    public ListHLayout(final VLayout parent, boolean master, String value, boolean optional) {
+    /**
+     * Constructs a ListHLayout instance which can be included in an optional input.
+     * In that case, the required message of the ListHLayout object has to be different from a classical ListHLayout object.
+     * And the ListHLayout object (in an optional input) has to be able to create a new "optional" ListHLayout object : see below, onFormItemClick(..) method from morePicker object.
+     * 
+     * @param parent
+     * @param master
+     * @param value
+     * @param optional 
+     */
+    public ListHLayout(final VLayout parent, boolean master, String value, final boolean optional) {
 
         this.instance = this;
         this.setMembersMargin(3);

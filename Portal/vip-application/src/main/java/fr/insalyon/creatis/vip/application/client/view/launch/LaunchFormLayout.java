@@ -167,9 +167,6 @@ public class LaunchFormLayout extends AbstractFormLayout {
         for (Canvas canvas : sourcesLayout.getMembers()) {
             if (canvas instanceof AbstractSourceLayout) {
                 AbstractSourceLayout source = (AbstractSourceLayout) canvas;
-//                if (source.isOptional() && (source.getValue() == null || source.getValue().equals("") || source.getValue().equals("null"))) {
-//                    source.setValue("No_value_provided");
-//                } else 
                    if (!source.validate()) {
                     valid = false;
                 }

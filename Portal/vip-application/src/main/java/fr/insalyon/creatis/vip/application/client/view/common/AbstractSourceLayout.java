@@ -51,7 +51,7 @@ public abstract class AbstractSourceLayout extends VLayout {
     protected HLayout sourceCommentHLayout;
     protected HLayout sourceFieldHLayout;
     protected HLayout fieldHLayout;
-    protected HLayout flagCbHLayout; // Layout in which a checkbox (flag input) can be add. This layout is on the left of the sourceLabelHLayout.
+    protected HLayout flagCbHLayout; // Layout in which a checkbox (flag input) can be added. This layout is on the left of the sourceLabelHLayout.
     protected LayoutSpacer sourceCommentLayoutSpacer; // Empty layout on the left of the sourceCommentHLayout, to horizontaly align it with sourceLabelHLayout and sourceFieldHLayout.
     protected boolean optional;
 
