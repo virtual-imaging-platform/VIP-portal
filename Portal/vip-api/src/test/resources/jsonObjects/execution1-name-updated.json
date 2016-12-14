@@ -1,0 +1,8 @@
+{
+  "name" : "Exec test 1 - modified",
+  "pipelineIdentifier" : "application 1/4.2",
+  "inputValues" : {
+    "param 1" : "test text",
+    "param 2" : "/path/test"
+  }
+}

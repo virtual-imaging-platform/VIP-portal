@@ -84,7 +84,7 @@ public abstract class AbstractSourceLayout extends VLayout {
     }
     
      /**
-     * Parent constructor of a flag input layout or a (non-flag) input layout for all applications except GateLab application. 
+     * Parent constructor of a flag input layout or a (non-flag) input layout for all applications except GateLab application.
      * It allows to display an input name which value is contained in prettyName variable and not in name variable.
      */
     public AbstractSourceLayout(String name, String comment, boolean optional, String prettyName, String defaultValue) {

@@ -1017,4 +1017,37 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
             throw new CoreException(ex);
         }
     }
+
+    // api key management
+
+
+    @Override
+    public String getUserApikey(String email) throws CoreException {
+        try {
+            return configurationBusiness.getUserApikey(getSessionUser().getEmail());
+        } catch (BusinessException e) {
+            logger.error("Error getting apikey for " + email, e);
+            throw new CoreException(e);
+        }
+    }
+
+    @Override
+    public void deleteUserApikey(String email) throws CoreException {
+        try {
+            configurationBusiness.deleteUserApikey(getSessionUser().getEmail());
+        } catch (BusinessException e) {
+            logger.error("Error deleting apikey for " + email, e);
+            throw new CoreException(e);
+        }
+    }
+
+    @Override
+    public String generateNewUserApikey(String email) throws CoreException {
+        try {
+            return configurationBusiness.generateNewUserApikey(getSessionUser().getEmail());
+        } catch (BusinessException e) {
+            logger.error("Error generating apikey for " + email, e);
+            throw new CoreException(e);
+        }
+    }
 }
