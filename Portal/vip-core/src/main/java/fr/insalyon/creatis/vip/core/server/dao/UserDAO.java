@@ -155,4 +155,30 @@ public interface UserDAO {
      * @throws DAOException 
      */
     public boolean isLocked(String email) throws DAOException;
+
+    /**
+     * Return the user linked to the specified apikey
+     * If there isn't any, return null
+     */
+    User getUserByApikey(String apikey) throws DAOException;
+
+    /**
+     * Read the apikey of a specific user, identified by its mail address
+     *
+     * @param email the email idenfier of the user
+     * @return the key, or null if the user doesn't have any
+     * @throws DAOException if there isn't any user for the given email
+     */
+    String getUserApikey(String email) throws DAOException;
+
+    /**
+     * change the api key of a specific user, identified by its mail address
+     * no validation is done on the new key which should be secure
+     *
+     * @param email email the email idenfier of the user
+     * @param newApikey the new key to link to the user
+     * @throws DAOException if there isn't any user for the given email
+     * or if there is already a user with this key
+     */
+    void updateUserApikey(String email, String newApikey) throws DAOException;
 }

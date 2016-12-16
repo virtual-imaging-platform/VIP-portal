@@ -77,7 +77,9 @@ public interface SocialService extends RemoteService {
     public List<User> getUsers() throws SocialException;
     
     public void sendMessage(String[] recipients, String subject, String message) throws SocialException;
-    
+
+    public void sendMessageWithSupportCopy(String[] recipients, String subject, String message) throws SocialException;
+
     public void sendMessageToVipSupport( String subject, String message,List<String> workflowID,List<String> simulationNames)throws SocialException;
     
     public void sendGroupMessage(String groupName, String subject, String message) throws SocialException;

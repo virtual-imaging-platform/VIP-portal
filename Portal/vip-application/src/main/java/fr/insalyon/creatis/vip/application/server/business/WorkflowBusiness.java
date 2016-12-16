@@ -765,6 +765,17 @@ public class WorkflowBusiness {
         }
     }
 
+    public void updateDescription(String simulationID, String newDescription) throws BusinessException {
+        try {
+            Workflow w= workflowDAO.get(simulationID);
+            w.setDescription(newDescription);
+            workflowDAO.update(w);
+        } catch (WorkflowsDBDAOException ex) {
+            logger.error(ex);
+            throw new BusinessException(ex);
+        }
+    }
+
     /**
      *
      * @return @throws BusinessException

@@ -33,6 +33,7 @@ package fr.insalyon.creatis.vip.application.client.view.common;
 
 import com.smartgwt.client.widgets.Label;
 import com.smartgwt.client.widgets.layout.HLayout;
+import com.smartgwt.client.widgets.layout.LayoutSpacer;
 import com.smartgwt.client.widgets.layout.VLayout;
 import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
 
@@ -44,14 +45,19 @@ public abstract class AbstractSourceLayout extends VLayout {
 
     protected String name;
     protected Label sourceLabel;
-    protected HLayout hLayout;
+    protected Label sourceName;
+    protected Label sourceComment;
+    protected HLayout sourceLabelHLayout; // 
+    protected HLayout sourceCommentHLayout;
+    protected HLayout sourceFieldHLayout;
+    protected HLayout fieldHLayout;
+    
+    protected HLayout flagCbHLayout; // Layout in which a checkbox (flag input) can be add. This layout is on the left of the sourceLabelHLayout.
+    protected LayoutSpacer sourceCommentLayoutSpacer; // Empty layout on the left of the sourceCommentHLayout, to horizontaly align it with sourceLabelHLayout and sourceFieldHLayout.
     protected boolean optional;
 
     /**
-     * TODO
-     * This construtor will be deprecated during the realisation of the redmine feature 2803.
-     * It will be replaced by the constructor (see below) with a fourth argument : prettyName
-     * Currently InputLayout and GateLabSourceLayout classes use it.
+     * Parent constructor of an input layout for GateLab application.
      */
     public AbstractSourceLayout(String name, String comment, boolean optional) {
         this.name = name;
@@ -64,14 +70,14 @@ public abstract class AbstractSourceLayout extends VLayout {
         this.sourceLabel.setWidth(300);
         if (comment != null) {
             this.sourceLabel.setTooltip(comment);
-            this.sourceLabel.setHoverWidth(500);
+            this.sourceLabel.setHoverWidth(450);
         }
         this.setAutoWidth();
         this.addMember(sourceLabel);
         
-        this.hLayout = new HLayout(3);
-        this.hLayout.setAutoWidth();
-        this.addMember(hLayout);        
+        this.sourceFieldHLayout = new HLayout(3);
+        this.sourceFieldHLayout.setAutoWidth();
+        this.addMember(sourceFieldHLayout);   
     }
         
     public AbstractSourceLayout(String name, String comment) {
@@ -79,30 +85,59 @@ public abstract class AbstractSourceLayout extends VLayout {
     }
     
      /**
-     * TODO
-     * This construtor will replace the constructor (see above) with 3 arguments, during the redmine feature 2803.
-     * Currently this constructor is called only by InputFlagLayout object. 
+     * Parent constructor of a flag input layout or a (non-flag) input layout for all applications except GateLab application.
      * It allows to display an input name which value is contained in prettyName variable and not in name variable.
      */
-    public AbstractSourceLayout(String name, String comment, boolean optional, String prettyName) {
+    public AbstractSourceLayout(String name, String comment, boolean optional, String prettyName, String defaultValue) {
+        flagCbHLayout = new HLayout(0);
+        flagCbHLayout.setWidth(25);
+        flagCbHLayout.setMaxWidth(25);
+        flagCbHLayout.setHeight(15);
+        flagCbHLayout.setPadding(0);
+        flagCbHLayout.setMargin(0);
+       
+        sourceLabelHLayout = new HLayout(0); 
+        sourceLabelHLayout.addMember(flagCbHLayout);
+
         this.name = name;
         this.optional = optional;
-        String labelText = "<b>" + prettyName;
-        if(!optional)
-            labelText += "<font color=\"red\">*</font>";
-        labelText += "</b>";
-        this.sourceLabel = WidgetUtil.getLabel(labelText, 15);
-        this.sourceLabel.setWidth(300);
-        if (comment != null) {
-            this.sourceLabel.setTooltip(comment);
-            this.sourceLabel.setHoverWidth(500);
+        String labelText;
+        if (prettyName != null && !prettyName.isEmpty()) {
+            labelText = "<b>" + prettyName;
         }
-        this.setAutoWidth();
-        this.addMember(sourceLabel);
+        else {
+            labelText = "<b>" + name;
+        }
         
-        this.hLayout = new HLayout(3);
-        this.hLayout.setAutoWidth();
-        this.addMember(hLayout);        
+        if (!defaultValue.isEmpty()) { // Add the flag value (command-line-flag in json descriptor).
+            labelText += " ("+ "<font color=\"blue\">" + defaultValue + "</font>" + ")";
+        }
+        if(!optional) {
+            labelText += "<font color=\"red\">*</font>";
+        }
+        labelText += "</b>";
+        sourceLabel = WidgetUtil.getLabel(labelText, 15);
+        sourceLabel.setWidth(300);
+        setAutoWidth();
+        sourceLabelHLayout.addMember(sourceLabel);
+        addMember(sourceLabelHLayout);
+
+        if (comment != null && !comment.isEmpty()) {
+            sourceCommentLayoutSpacer = new LayoutSpacer();
+            sourceCommentLayoutSpacer.setWidth(25);
+            sourceCommentLayoutSpacer.setMaxWidth(25);
+            sourceCommentHLayout = new HLayout(0); 
+            sourceCommentHLayout.setWidth(460);
+            sourceCommentHLayout.addMember(sourceCommentLayoutSpacer);
+            sourceComment = WidgetUtil.getLabel(comment,15);
+            sourceComment.setWidth(460);
+            sourceCommentHLayout.addMember(sourceComment);
+            addMember(sourceCommentHLayout);
+        }
+
+        sourceFieldHLayout = new HLayout(0); 
+        sourceFieldHLayout.setAutoWidth();
+        addMember(sourceFieldHLayout);       
     }
 
     public String getName() {

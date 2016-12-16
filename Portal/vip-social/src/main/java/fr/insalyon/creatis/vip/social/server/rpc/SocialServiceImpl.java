@@ -164,10 +164,27 @@ public class SocialServiceImpl extends AbstractRemoteServiceServlet implements S
         }
     }
 
+    public void sendMessageWithSupportCopy(String[] recipients, String subject, String message) throws SocialException {
+
+        try {
+            trace(logger, "Sending message '" + subject + "' to '" + Arrays.asList(recipients) + "'.");
+            messageBusiness.sendMessage(getSessionUser(), recipients,
+                    subject, message);
+            trace(logger, "Sending message '" + subject + "' to 'vip-support' as copy.");
+            messageBusiness.copyMessageToVipSupport(getSessionUser(), recipients,
+                    subject, message);
+
+        } catch (CoreException ex) {
+            throw new SocialException(ex);
+        } catch (BusinessException ex) {
+            throw new SocialException(ex);
+        }
+    }
+
     public void sendMessageToVipSupport(String subject, String message, List<String> workflowID, List<String> simulationNames) throws SocialException {
 
         try {
-            trace(logger, "Sending message '" + subject + "' to '" + "vip-support" + "'.");
+            trace(logger, "Sending message '" + subject + "' to 'vip-support'.");
             messageBusiness.sendMessageToVipSupport(getSessionUser(),
                     subject, message, workflowID, simulationNames);
 

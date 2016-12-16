@@ -155,4 +155,12 @@ public interface ConfigurationServiceAsync {
     public void getMaxConfiguredPlatformSimulation(AsyncCallback<Integer> asyncCallback);
 
     public void changeMaxConfiguredPlatformSimulation(int maxPlatformRunningSimulations, AsyncCallback<Void> asyncCallback);
+
+    // api key management
+
+    void getUserApikey(String email, AsyncCallback<String> async);
+
+    void deleteUserApikey(String email, AsyncCallback<Void> async);
+
+    void generateNewUserApikey(String email, AsyncCallback<String> async);
 }
