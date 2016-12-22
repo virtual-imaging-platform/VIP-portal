@@ -44,6 +44,7 @@ import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
+import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
 import fr.insalyon.creatis.vip.application.client.rpc.ApplicationService;
 import fr.insalyon.creatis.vip.application.client.view.common.AbstractSourceLayout;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
@@ -255,11 +256,24 @@ public class LaunchFormLayout extends AbstractFormLayout {
     public Map<String, String> getParametersMap() {
 
         Map<String, String> paramsMap = new HashMap<String, String>();
-
+        
         for (Canvas canvas : sourcesLayout.getMembers()) {
             if (canvas instanceof AbstractSourceLayout) {
                 AbstractSourceLayout source = (AbstractSourceLayout) canvas;
-                paramsMap.put(source.getName(), source.getValue());
+                 if (source.isOptional()) {
+                    if (source instanceof InputLayout) {
+                        InputLayout inputLayoutSource = (InputLayout) source;
+                        if (inputLayoutSource.isOptionalChecked()) {
+                             paramsMap.put(source.getName(), source.getValue());
+                        } else {
+                             paramsMap.put(source.getName(), ApplicationConstants.INPUT_WITHOUT_VALUE);
+                        }
+                    } else {
+                       paramsMap.put(source.getName(), source.getValue());
+                    }          
+                 } else {
+                     paramsMap.put(source.getName(), source.getValue());
+                 }
             }
         }
         return paramsMap;

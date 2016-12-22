@@ -120,7 +120,7 @@ BOUTIQUES_COMMAND_LINE=$${ob}BOUTIQUES_COMMAND_LINE//'$outputFile.getCommandLine
 
 #foreach($input in $tool.getInputs())
   #if($input.isOptional())
-if [ "$$input.getId().toUpperCase()" != "no" ]
+if [ "$$input.getId().toUpperCase()" != "no" ] && [ "$$input.getId().toUpperCase()" != "No_value_provided" ]
 then
   # Optional input is active.
   #end

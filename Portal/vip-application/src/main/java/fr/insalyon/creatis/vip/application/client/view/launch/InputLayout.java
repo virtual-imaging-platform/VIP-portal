@@ -168,6 +168,10 @@ public class InputLayout extends AbstractSourceLayout {
         });
     }
     
+    public boolean isOptionalChecked() {
+        return cbOptionalInputItem.getValueAsBoolean();
+    }
+    
     private void configureOptionalInputCheckbox() {
         cbOptionalInputItem = new CheckboxItem();
         cbOptionalInputItem.setValue(false);
@@ -254,8 +258,9 @@ public class InputLayout extends AbstractSourceLayout {
                 }
             }
             return valid;
-        } else {
-            return startItem.validate() & stopItem.validate() & stepItem.validate();
+        } 
+        else {
+                    return startItem.validate() & stopItem.validate() & stepItem.validate();
         }
     }
 

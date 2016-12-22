@@ -185,7 +185,7 @@ public abstract class AbstractLaunchTab extends Tab {
                     }
                 });
     }
-
+    
     /**
      * Resets the launch button to its initial state.
      */
