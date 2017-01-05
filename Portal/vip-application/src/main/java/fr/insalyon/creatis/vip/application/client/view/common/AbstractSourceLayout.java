@@ -104,7 +104,7 @@ public abstract class AbstractSourceLayout extends VLayout {
         if (prettyName != null && !prettyName.isEmpty()) {
             labelText = "<b>" + prettyName;
         }
-        else {// For applications imported with a gwendia.wm which not use prettyName attribut 
+        else {// For workflows which do not use prettyName. 
             labelText = "<b>" + name;
         }
         
