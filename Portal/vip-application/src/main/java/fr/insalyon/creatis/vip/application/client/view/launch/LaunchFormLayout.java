@@ -88,12 +88,12 @@ public class LaunchFormLayout extends AbstractFormLayout {
                 executionNameLayout = new VLayout(0);
                 executionNameLayout.setLayoutLeftMargin(25);
                 executionNameLayout.setWidth(300);
-                executionNameLayout.addMember(WidgetUtil.getLabel("<b>Execution Name</b>", 15));
+                executionNameLayout.addMember(WidgetUtil.getLabel("<b>Execution Name<font color=\"red\">*</font></b>", 15));
                 executionNameLayout.addMember(FieldUtil.getForm(simulationNameItem));
                 this.addMember(executionNameLayout);    
         }
         else {
-             addField("Execution Name", simulationNameItem);
+             addField("Execution Name<font color=\"red\">*</font>", simulationNameItem);
         }
 
         sourcesLayout = new VLayout(5);
