@@ -91,7 +91,6 @@ public abstract class AbstractAuthenticationService extends HttpServlet {
         try { 
             checkValidRequest(request);
             email = getEmail();
-            resetFailedAuthenticationCount(email);
         } catch (BusinessException ex) {
             logger.info(ex.getMessage());
             authFailedResponse(request, response);
@@ -103,6 +102,7 @@ public abstract class AbstractAuthenticationService extends HttpServlet {
             authFailedResponse(request, response);
             return;
         }
+        resetFailedAuthenticationCount(email);
         //authenticate email in VIP
         authSuccessResponse(request, response, email);
     }

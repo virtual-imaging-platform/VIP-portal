@@ -62,7 +62,6 @@ public class AuthenticationBusiness {
              User user = configurationBusiness.signin(userName, password);
              
              AbstractAuthenticationService.setVIPSession(apiContext.getRequest(), apiContext.getResponse(), user);
-             configurationBusiness.updateUserLastLogin(userName);
              
          } catch (BusinessException ex) {
              throw new ApiException(ex);

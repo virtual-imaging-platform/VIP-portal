@@ -106,8 +106,6 @@ public class ConfigurationBusiness {
             if (email != null && session != null) {
                 UserDAO userDAO = CoreDAOFactory.getDAOFactory().getUserDAO();
                 if (userDAO.verifySession(email, session) && !userDAO.isLocked(email)) {
-                    String newSession = UUID.randomUUID().toString();
-                    userDAO.updateSession(email, newSession);
                     return true;
                 }
                 userDAO.incNFailedAuthentications(email); //just in case...
