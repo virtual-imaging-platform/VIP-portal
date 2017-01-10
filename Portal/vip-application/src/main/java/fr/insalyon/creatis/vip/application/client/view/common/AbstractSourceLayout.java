@@ -47,12 +47,11 @@ public abstract class AbstractSourceLayout extends VLayout {
     protected Label sourceLabel;
     protected Label sourceName;
     protected Label sourceComment;
-    protected HLayout sourceLabelHLayout; // 
+    protected HLayout sourceLabelHLayout;
     protected HLayout sourceCommentHLayout;
     protected HLayout sourceFieldHLayout;
     protected HLayout fieldHLayout;
-    
-    protected HLayout flagCbHLayout; // Layout in which a checkbox (flag input) can be add. This layout is on the left of the sourceLabelHLayout.
+    protected HLayout flagCbHLayout; // Layout in which a checkbox (flag input) can be added. This layout is on the left of the sourceLabelHLayout.
     protected LayoutSpacer sourceCommentLayoutSpacer; // Empty layout on the left of the sourceCommentHLayout, to horizontaly align it with sourceLabelHLayout and sourceFieldHLayout.
     protected boolean optional;
 
@@ -105,7 +104,7 @@ public abstract class AbstractSourceLayout extends VLayout {
         if (prettyName != null && !prettyName.isEmpty()) {
             labelText = "<b>" + prettyName;
         }
-        else {
+        else {// For workflows which do not use prettyName. 
             labelText = "<b>" + name;
         }
         

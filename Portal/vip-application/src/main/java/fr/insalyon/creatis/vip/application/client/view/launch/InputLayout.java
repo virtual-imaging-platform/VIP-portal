@@ -82,7 +82,15 @@ public class InputLayout extends AbstractSourceLayout {
     private CheckboxItem cbOptionalInputItem;
     private DynamicForm cbOptionalInputForm;
     private LayoutSpacer sourceFieldLayoutSpacer;
-
+    
+    /**
+     * 
+     * @param name
+     * @param comment
+     * @param optional
+     * @param defaultValue
+     * @param prettyName 
+     */
     public InputLayout(String name, String comment, boolean optional, String defaultValue, String prettyName) {
         super(name, comment, optional, prettyName, "");
         
@@ -90,7 +98,8 @@ public class InputLayout extends AbstractSourceLayout {
         fieldHLayout.setAutoWidth();
         fieldHLayout.setPadding(0);
         fieldHLayout.setLayoutMargin(0);
-        if (optional == true) {
+        
+        if (optional) {
             configureOptionalInputCheckbox();
         }
         else {
@@ -101,14 +110,18 @@ public class InputLayout extends AbstractSourceLayout {
         }
         
         configureTypeSelectItem();
-//        DynamicForm selectItemDynamic = FieldUtil.getForm(selectItem);
         fieldHLayout.addMember(FieldUtil.getForm(selectItem));
         
         // List
         listLayout = new VLayout();
-        listLayout.addMember(new ListHLayout(listLayout, true));
+        if (optional) {
+            listLayout.addMember(new ListHLayout(listLayout, true, "", optional));
+        }
+        else {
+            listLayout.addMember(new ListHLayout(listLayout, true));
+        }
         fieldHLayout.addMember(listLayout);
-         sourceFieldHLayout.addMember(fieldHLayout);
+        sourceFieldHLayout.addMember(fieldHLayout);
 
         // Range
         startItem = FieldUtil.getTextItem(70, true, "Start", "[0-9.]");
@@ -117,6 +130,14 @@ public class InputLayout extends AbstractSourceLayout {
         startItemForm = FieldUtil.getForm(startItem);
         stopItemForm = FieldUtil.getForm(stopItem);
         stepItemForm = FieldUtil.getForm(stepItem);
+
+        if (optional) { // If optional input, it has to be desactivate by default, and the classical required message has to be adapted 
+            selectItem.setDisabled(true);
+            listLayout.setDisabled(true);
+            startItem.setRequiredMessage(ApplicationConstants.INPUT_WITHOUT_VALUE_REQUIRED_MESSAGE);
+            stopItem.setRequiredMessage(ApplicationConstants.INPUT_WITHOUT_VALUE_REQUIRED_MESSAGE);
+            stepItem.setRequiredMessage(ApplicationConstants.INPUT_WITHOUT_VALUE_REQUIRED_MESSAGE);
+        }
  
         if(defaultValue != null)
             setValue(defaultValue);
@@ -147,9 +168,13 @@ public class InputLayout extends AbstractSourceLayout {
         });
     }
     
+    public boolean isOptionalChecked() {
+        return cbOptionalInputItem.getValueAsBoolean();
+    }
+    
     private void configureOptionalInputCheckbox() {
         cbOptionalInputItem = new CheckboxItem();
-        cbOptionalInputItem.setValue(true);
+        cbOptionalInputItem.setValue(false);
         cbOptionalInputItem.setShowLabel(false);
         cbOptionalInputItem.setShowTitle(false);
         cbOptionalInputItem.setTop(0);
@@ -158,25 +183,38 @@ public class InputLayout extends AbstractSourceLayout {
         cbOptionalInputItem.setAlign(Alignment.CENTER);
 
         cbOptionalInputItem.addChangeHandler(new ChangeHandler() {  
-
+            
             @Override
             public void onChange(ChangeEvent event) {  
-                boolean selected = cbOptionalInputItem.getValueAsBoolean();  
+                boolean selected = cbOptionalInputItem.getValueAsBoolean(); // Return the checkbox value as it was just before the user click on it.
                 cbOptionalInputItem.setValue(!selected);  
                 selectItem.setDisabled(selected);
                 // List
                 listLayout.setDisabled(selected);
                 listLayout.removeMembers(listLayout.getMembers());
-                listLayout.addMember(new ListHLayout(listLayout, true, "No_value_provided"));
-                
                 // Range
-                // TODO reset item values when Redmine feature 2980 will be realize.
-                startItem.setDisabled(selected);        
+                startItem.setDisabled(selected);
                 stopItem.setDisabled(selected);
                 stepItem.setDisabled(selected);
+
+                 if (selected) {
+                    listLayout.addMember(new ListHLayout(listLayout, true, ApplicationConstants.INPUT_WITHOUT_VALUE, true));
+                    startItemForm.clearErrors(selected);
+                    stopItemForm.clearErrors(selected);
+                    stepItemForm.clearErrors(selected);
+                    startItem.setValue(ApplicationConstants.INPUT_WITHOUT_VALUE);
+                    stopItem.setValue(ApplicationConstants.INPUT_WITHOUT_VALUE);
+                    stepItem.setValue(ApplicationConstants.INPUT_WITHOUT_VALUE); 
+                }
+                else {
+                    listLayout.addMember(new ListHLayout(listLayout, true, "", true));
+                    startItem.clearValue();
+                    stopItem.clearValue();
+                    stepItem.clearValue();
+                }
             }  
         });
-
+     
         cbOptionalInputForm = FieldUtil.getForm(cbOptionalInputItem);        
         cbOptionalInputForm.setTop(0);
         cbOptionalInputForm.setHeight(15);
@@ -187,7 +225,6 @@ public class InputLayout extends AbstractSourceLayout {
         cbOptionalInputForm.setCellPadding(0);
         cbOptionalInputForm.setMargin(0);
         sourceFieldHLayout.addMember(cbOptionalInputForm);
-
     }
 
     private void setList() {
@@ -221,9 +258,9 @@ public class InputLayout extends AbstractSourceLayout {
                 }
             }
             return valid;
-
-        } else {
-            return startItem.validate() & stopItem.validate() & stepItem.validate();
+        } 
+        else {
+                    return startItem.validate() & stopItem.validate() & stepItem.validate();
         }
     }
 
@@ -263,7 +300,7 @@ public class InputLayout extends AbstractSourceLayout {
             startItem.setValue(v[1].trim());
             stopItem.setValue(v[3].trim());
             stepItem.setValue(v[5].trim());
-
+            
         } else { // List
             selectItem.setValue(InputType.List.name());
             setList();

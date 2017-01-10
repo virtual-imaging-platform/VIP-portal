@@ -55,7 +55,7 @@ import java.util.Map;
 public class LaunchTab extends AbstractLaunchTab {
 
     private ArrayList<String> disabledSources;
-
+    
     public LaunchTab(String applicationName, String applicationVersion, String applicationClass) {
         this(applicationName, applicationVersion, applicationClass, null, null, null);
     }
@@ -164,7 +164,7 @@ public class LaunchTab extends AbstractLaunchTab {
     protected void launch() {
 
         WidgetUtil.setLoadingIButton(launchButton, "Launching...");
-
+        
         // Input data verification
         List<String> inputData = new ArrayList<String>();
         for (String input : getParametersMap().values()) {

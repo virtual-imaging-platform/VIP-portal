@@ -54,10 +54,24 @@ public class ListHLayout extends HLayout {
     private DynamicForm listItemForm;
 
     public ListHLayout(final VLayout parent, boolean master) {
-        this(parent, master, "");
+        this(parent, master, "", false);
+    }
+    
+    public ListHLayout(final VLayout parent, boolean master, String value) {
+        this(parent, master, value, false);
     }
 
-    public ListHLayout(final VLayout parent, boolean master, String value) {
+    /**
+     * Constructs a ListHLayout instance which can be included in an optional input.
+     * In that case, the required message of the ListHLayout object has to be different from a classical ListHLayout object.
+     * And the ListHLayout object (in an optional input) has to be able to create a new "optional" ListHLayout object : see below, onFormItemClick(..) method from morePicker object.
+     * 
+     * @param parent
+     * @param master
+     * @param value
+     * @param optional 
+     */
+    public ListHLayout(final VLayout parent, boolean master, String value, final boolean optional) {
 
         this.instance = this;
         this.setMembersMargin(3);
@@ -65,6 +79,10 @@ public class ListHLayout extends HLayout {
         listItem = FieldUtil.getTextItem(400, false, "", "[0-9.,A-Za-z-+/_(){} ]");
         listItem.setValue(value);
         listItem.setValidators(ValidatorUtil.getStringValidator());
+        
+        if (optional) {
+            listItem.setRequiredMessage(ApplicationConstants.INPUT_WITHOUT_VALUE_REQUIRED_MESSAGE);
+        }
         
         PickerIcon browsePicker = new PickerIcon(PickerIcon.SEARCH, new FormItemClickHandler() {
 
@@ -79,7 +97,12 @@ public class ListHLayout extends HLayout {
 
             @Override
             public void onFormItemClick(FormItemIconClickEvent event) {
-                parent.addMember(new ListHLayout(parent, false));
+                if (optional) {
+                    parent.addMember(new ListHLayout(parent, false, "", optional));
+                }
+                else {
+                     parent.addMember(new ListHLayout(parent, false));
+                }
             }
         });
         morePicker.setPrompt("Add");
