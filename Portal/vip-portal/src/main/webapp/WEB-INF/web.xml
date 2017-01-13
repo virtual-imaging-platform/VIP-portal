@@ -186,21 +186,31 @@ knowledge of the CeCILL-B license and that you accept its terms.
     </servlet-mapping>
     <!--End Application Importer Module-->
     <!-- REST API -->
-    <!--    <servlet>
+    <servlet>
         <servlet-name>RestAPI</servlet-name>
-        <servlet-class>com.sun.jersey.spi.container.servlet.ServletContainer</servlet-class>
+        <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
         <init-param>
-            <param-name>jersey.config.server.provider.packages</param-name>
-            <param-value>
-                fr.insalyon.creatis.vip.api.rest
-            </param-value>
+            <param-name>contextClass</param-name>
+            <param-value>org.springframework.web.context.support.AnnotationConfigWebApplicationContext</param-value>
+        </init-param>
+         <init-param>
+            <param-name>contextConfigLocation</param-name>
+            <param-value>fr.insalyon.creatis.vip.api.SpringWebConfig</param-value>
         </init-param>
         <load-on-startup>1</load-on-startup>
     </servlet>
     <servlet-mapping>
         <servlet-name>RestAPI</servlet-name>
         <url-pattern>/rest/*</url-pattern>
-    </servlet-mapping>-->
+    </servlet-mapping>
+    <filter>
+        <filter-name>springSecurityFilterChain</filter-name>
+        <filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>springSecurityFilterChain</filter-name>
+        <url-pattern>/rest/*</url-pattern>
+    </filter-mapping>
     <!-- END REST API -->
     <!-- SOAP API -->
     <listener>
@@ -248,6 +258,10 @@ knowledge of the CeCILL-B license and that you accept its terms.
     <filter>
       <filter-name>CorsFilter</filter-name>
       <filter-class>org.apache.catalina.filters.CorsFilter</filter-class>
+      <init-param>
+        <param-name>cors.allowed.methods</param-name>
+        <param-value>GET, POST, PUT, DELETE, OPTIONS, HEAD</param-value>
+      </init-param>
     </filter>
     <filter-mapping>
       <filter-name>CorsFilter</filter-name>

@@ -55,7 +55,7 @@ import java.util.Map;
 public class LaunchTab extends AbstractLaunchTab {
 
     private ArrayList<String> disabledSources;
-
+    
     public LaunchTab(String applicationName, String applicationVersion, String applicationClass) {
         this(applicationName, applicationVersion, applicationClass, null, null, null);
     }
@@ -98,7 +98,7 @@ public class LaunchTab extends AbstractLaunchTab {
 
             @Override
             public void onSuccess(Descriptor descriptor) {
-                launchFormLayout = new LaunchFormLayout(applicationName + " " + applicationVersion, null, descriptor.getDescription());
+                launchFormLayout = new LaunchFormLayout(applicationName + " " + applicationVersion, null, descriptor.getDescription(), true);
                 layout.addMember(launchFormLayout);
                 
                 // Put mandatory sources first
@@ -122,12 +122,12 @@ public class LaunchTab extends AbstractLaunchTab {
                     }
                     modal.show("Adding source "+source.getName()+"...", true);
                     
-                    // If the source type is an flag type (one of the boutiques types), InputFlagLayout creation instead of InputLayout.
+                    // If the source type is a flag type (one of the boutiques types), InputFlagLayout creation instead of InputLayout.
                     if (source.getVipTypeRestriction() != null && source.getVipTypeRestriction().equals("flag")) {
-                        launchFormLayout.addSource(new InputFlagLayout(source.getName(), source.getDescription(),source.isOptional(),source.getDefaultValue(), source.getVipTypeRestriction(), source.getPrettyName()), disabled);
+                        launchFormLayout.addSource(new InputFlagLayout(source.getName(), source.getDescription(), source.isOptional(), source.getDefaultValue(), source.getVipTypeRestriction(), source.getPrettyName()), disabled);
                     }
                     else {
-                        launchFormLayout.addSource(new InputLayout(source.getName(), source.getDescription(),source.isOptional(),source.getDefaultValue()), disabled);
+                        launchFormLayout.addSource(new InputLayout(source.getName(), source.getDescription(), source.isOptional(), source.getDefaultValue(), source.getPrettyName()), disabled);
                     }
                 }
 
@@ -164,7 +164,7 @@ public class LaunchTab extends AbstractLaunchTab {
     protected void launch() {
 
         WidgetUtil.setLoadingIButton(launchButton, "Launching...");
-
+        
         // Input data verification
         List<String> inputData = new ArrayList<String>();
         for (String input : getParametersMap().values()) {

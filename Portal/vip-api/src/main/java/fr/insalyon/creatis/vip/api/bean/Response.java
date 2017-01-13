@@ -57,7 +57,7 @@ public class Response {
         @XmlElement(name = "returnedValueGlobalProp", type = GlobalProperties.class),
         @XmlElement(name = "returnedValueStr", type = String.class),
         @XmlElement(name = "returnedValueListStrings", type = String[].class),
-        @XmlElement(name = "returnedValueStatus", type = Execution.ExecutionStatus.class),
+        @XmlElement(name = "returnedValueStatus", type = ExecutionStatus.class),
         @XmlElement(name = "returnedValuePairPipeline", type = PairOfPipelineAndBooleanLists.class),})
     java.lang.Object returnedValue; // java.lang.Object so that Strings can be returned too
 

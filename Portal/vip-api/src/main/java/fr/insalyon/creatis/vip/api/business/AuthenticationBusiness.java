@@ -48,18 +48,10 @@ public class AuthenticationBusiness {
     private final ApiContext apiContext;
 
     private final ConfigurationBusiness configurationBusiness;
-    private final ApiBusiness apiBusiness;
 
     public AuthenticationBusiness(ApiContext apiContext) {
         this.apiContext = apiContext;
         this.configurationBusiness = new ConfigurationBusiness();
-        this.apiBusiness = new ApiBusiness(configurationBusiness);
-    }
-
-    public AuthenticationBusiness(ApiContext apiContext, ConfigurationBusiness configurationBusiness, ApiBusiness apiBusiness) {
-        this.apiContext = apiContext;
-        this.configurationBusiness = configurationBusiness;
-        this.apiBusiness = apiBusiness;
     }
     
     public void authenticateSession(String userName, String password) throws ApiException {
@@ -70,7 +62,6 @@ public class AuthenticationBusiness {
              User user = configurationBusiness.signin(userName, password);
              
              AbstractAuthenticationService.setVIPSession(apiContext.getRequest(), apiContext.getResponse(), user);
-             configurationBusiness.updateUserLastLogin(userName);
              
          } catch (BusinessException ex) {
              throw new ApiException(ex);

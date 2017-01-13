@@ -31,10 +31,12 @@
  */
 package fr.insalyon.creatis.vip.api.bean;
 
+import com.fasterxml.jackson.annotation.*;
 import fr.insalyon.creatis.vip.api.bean.pairs.StringKeyParameterValuePair;
-import java.util.ArrayList;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlType;
+
+import java.util.*;
+import javax.validation.constraints.NotNull;
+import javax.xml.bind.annotation.*;
 
 /**
  *
@@ -44,39 +46,50 @@ import javax.xml.bind.annotation.XmlType;
 public class Execution extends Object {
 
     // mandatory arguments
+    // mandatory in output, not in output
     @XmlElement(name = "identifier", required=true)
     private String identifier;
+    @NotNull
     @XmlElement(name = "name", required=true)
     private String name;
+    @NotNull
     @XmlElement(name = "pipelineIdentifier", required = true)
     private String pipelineIdentifier;
     @XmlElement(name = "timeout")
-    int timeout;
+    private int timeout;
     @XmlElement(name = "status", required = true)
-    ExecutionStatus status;
+    // mandatory in output, not in output
+    private ExecutionStatus status;
     @XmlElement(name = "inputValue", required = true)
-    ArrayList<StringKeyParameterValuePair> inputValues; // TODO minOccur shouldn't be 0;
+    @JsonIgnore
+    private ArrayList<StringKeyParameterValuePair> inputValues; // TODO minOccur shouldn't be 0;
+    @JsonProperty("inputValues")
+    @NotNull
+    @XmlTransient
+    private Map<String, java.lang.Object> restInputValues;
     @XmlElement(name = "returnedFile")
-    ArrayList<StringKeyParameterValuePair> returnedFiles;
+    @JsonIgnore
+    private ArrayList<StringKeyParameterValuePair> returnedFiles;
+    @JsonProperty("returnedFiles")
+    @XmlTransient
+    private Map<String, List<java.lang.Object>> restReturnedFiles;
 
     // optional arguments
     @XmlElement(name = "studyIdentifier")
-    String studyIdentifier;
+    private String studyIdentifier;
     @XmlElement(name = "errorCode")
-    Integer errorCode;
+    private Integer errorCode;
     @XmlElement(name = "startDate")
-    Long startDate;
+    private Long startDate;
     @XmlElement(name = "endDate")
-    Long endDate;
+    private Long endDate;
 
-    @XmlType(name = "ExecutionStatus")
-    public static enum ExecutionStatus {
-        Initializing, Ready, Running, Finished, InitializationFailed, ExecutionFailed, Unknown, Killed
-    }
     
     public Execution() {
         inputValues = new ArrayList<>();
         returnedFiles = new ArrayList<>();
+        restInputValues = new HashMap<>();
+        restReturnedFiles = new HashMap<>();
     }
 
     public Execution(String identifier,
@@ -104,48 +117,107 @@ public class Execution extends Object {
         return identifier;
     }
 
+    public void setIdentifier(String identifier) {
+        this.identifier = identifier;
+    }
+
     public String getName() {
         return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getPipelineIdentifier() {
         return pipelineIdentifier;
     }
 
+    public void setPipelineIdentifier(String pipelineIdentifier) {
+        this.pipelineIdentifier = pipelineIdentifier;
+    }
+
     public int getTimeout() {
         return timeout;
+    }
+
+    public void setTimeout(int timeout) {
+        this.timeout = timeout;
     }
 
     public ExecutionStatus getStatus() {
         return status;
     }
 
+    public void setStatus(ExecutionStatus status) {
+        this.status = status;
+    }
+
     public ArrayList<StringKeyParameterValuePair> getInputValues() {
         return inputValues;
+    }
+
+    public void setInputValues(ArrayList<StringKeyParameterValuePair> inputValues) {
+        this.inputValues = inputValues;
+    }
+
+    public Map<String, java.lang.Object> getRestInputValues() {
+        return restInputValues;
+    }
+
+    public void setRestInputValues(Map<String, java.lang.Object> restInputValues) {
+        this.restInputValues = restInputValues;
     }
 
     public ArrayList<StringKeyParameterValuePair> getReturnedFiles() {
         return returnedFiles;
     }
 
+    public void setReturnedFiles(ArrayList<StringKeyParameterValuePair> returnedFiles) {
+        this.returnedFiles = returnedFiles;
+    }
+
+    public Map<String, List<java.lang.Object>> getRestReturnedFiles() {
+        return restReturnedFiles;
+    }
+
+    public void setRestReturnedFiles(Map<String, List<java.lang.Object>> restReturnedFiles) {
+        this.restReturnedFiles = restReturnedFiles;
+    }
+
+    public void clearReturnedFiles() {
+        returnedFiles = null;
+    }
+
     public String getStudyIdentifier() {
         return studyIdentifier;
+    }
+
+    public void setStudyIdentifier(String studyIdentifier) {
+        this.studyIdentifier = studyIdentifier;
     }
 
     public Integer getErrorCode() {
         return errorCode;
     }
 
+    public void setErrorCode(Integer errorCode) {
+        this.errorCode = errorCode;
+    }
+
     public Long getStartDate() {
         return startDate;
+    }
+
+    public void setStartDate(Long startDate) {
+        this.startDate = startDate;
     }
 
     public Long getEndDate() {
         return endDate;
     }
-    
-    public void clearReturnedFiles() {
-        returnedFiles = null;
-    }
 
+    public void setEndDate(Long endDate) {
+        this.endDate = endDate;
+    }
 }

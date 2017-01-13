@@ -44,6 +44,7 @@ import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
+import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
 import fr.insalyon.creatis.vip.application.client.rpc.ApplicationService;
 import fr.insalyon.creatis.vip.application.client.view.common.AbstractSourceLayout;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
@@ -63,9 +64,9 @@ public class LaunchFormLayout extends AbstractFormLayout {
 
     private TextItem simulationNameItem;
     private VLayout sourcesLayout;
-
-    public LaunchFormLayout(String title, String icon, final String description) {
-
+    private VLayout executionNameLayout;
+    
+    public LaunchFormLayout(String title, String icon, final String description, boolean executionNamePadding) {
         super("600", "*");
         addTitle(title, icon);
 
@@ -81,11 +82,28 @@ public class LaunchFormLayout extends AbstractFormLayout {
 
         simulationNameItem = FieldUtil.getTextItem(400, "[0-9A-Za-z-_ ]");
         simulationNameItem.setValidators(ValidatorUtil.getStringValidator());
-        addField("Execution Name", simulationNameItem);
+        simulationNameItem.setEditPendingCSSText("padding-left: 30px");
+        
+        if (executionNamePadding) { // To align horizontaly "Execution name" and the text field on the others comboBoxes (inputs comboBoxes) of the screen
+                executionNameLayout = new VLayout(0);
+                executionNameLayout.setLayoutLeftMargin(25);
+                executionNameLayout.setWidth(300);
+                executionNameLayout.addMember(WidgetUtil.getLabel("<b>Execution Name<font color=\"red\">*</font></b>", 15));
+                executionNameLayout.addMember(FieldUtil.getForm(simulationNameItem));
+                this.addMember(executionNameLayout);    
+        }
+        else {
+             addField("Execution Name<font color=\"red\">*</font>", simulationNameItem);
+        }
 
         sourcesLayout = new VLayout(5);
         sourcesLayout.setAutoHeight();
         this.addMember(sourcesLayout);
+    }
+    
+    // Constructor called by GateLab application
+    public LaunchFormLayout(String title, String icon, final String description) {
+        this(title, icon, description, false);
     }
 
     public void addSource(AbstractSourceLayout sourceLayout) {
@@ -150,9 +168,7 @@ public class LaunchFormLayout extends AbstractFormLayout {
         for (Canvas canvas : sourcesLayout.getMembers()) {
             if (canvas instanceof AbstractSourceLayout) {
                 AbstractSourceLayout source = (AbstractSourceLayout) canvas;
-                if (source.isOptional() && (source.getValue() == null || source.getValue().equals("") || source.getValue().equals("null"))) {
-                    source.setValue("no");
-                } else if (!source.validate()) {
+                   if (!source.validate()) {
                     valid = false;
                 }
             }
@@ -240,11 +256,24 @@ public class LaunchFormLayout extends AbstractFormLayout {
     public Map<String, String> getParametersMap() {
 
         Map<String, String> paramsMap = new HashMap<String, String>();
-
+        
         for (Canvas canvas : sourcesLayout.getMembers()) {
             if (canvas instanceof AbstractSourceLayout) {
                 AbstractSourceLayout source = (AbstractSourceLayout) canvas;
-                paramsMap.put(source.getName(), source.getValue());
+                 if (source.isOptional()) {
+                    if (source instanceof InputLayout) {
+                        InputLayout inputLayoutSource = (InputLayout) source;
+                        if (inputLayoutSource.isOptionalChecked()) {
+                             paramsMap.put(source.getName(), source.getValue());
+                        } else {
+                             paramsMap.put(source.getName(), ApplicationConstants.INPUT_WITHOUT_VALUE);
+                        }
+                    } else {
+                       paramsMap.put(source.getName(), source.getValue());
+                    }          
+                 } else {
+                     paramsMap.put(source.getName(), source.getValue());
+                 }
             }
         }
         return paramsMap;

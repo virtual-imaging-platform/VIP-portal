@@ -117,7 +117,10 @@ public class PlatformConnection {
                     + "lastUpdatePublications TIMESTAMP,"
                     + "failed_authentications int(11),"
                     + "account_locked BOOLEAN,"
-                    + "PRIMARY KEY(email), UNIQUE KEY(first_name,last_name)")) {
+                    + "apikey VARCHAR(255),"
+                    + "PRIMARY KEY(email),"
+                    + "UNIQUE KEY(first_name,last_name),"
+                    + "UNIQUE KEY(apikey)")) {
 
                 Server server = Server.getInstance();
                 String folder = server.getAdminFirstName().toLowerCase() + "_"

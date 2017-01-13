@@ -63,7 +63,7 @@ public class GlobalPropertiesBusiness {
         );
         gp.getSupportedTransferProtocols().add("http");
         gp.getSupportedTransferProtocols().add("https");
-        gp.getSupportedModules().add(Module.Processing);
+        gp.getSupportedModules().add(Module.PROCESSING);
         return gp;
     }
 

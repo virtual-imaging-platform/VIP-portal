@@ -29,8 +29,10 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL-B license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.api.business;
+package fr.insalyon.creatis.vip.api.soap;
 
+import fr.insalyon.creatis.vip.api.business.ApiContext;
+import fr.insalyon.creatis.vip.api.business.ApiException;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.server.auth.AbstractAuthenticationService;
@@ -53,23 +55,35 @@ import org.apache.log4j.PropertyConfigurator;
  *
  * @author Tristan Glatard
  */
-public class ApiBusiness {
+public class SoapApiBusiness {
 
-    private final static Logger logger = Logger.getLogger(ApiBusiness.class);
+    private final static Logger logger = Logger.getLogger(SoapApiBusiness.class);
     private final String authFailedMessage = "API user is not logged in.";
 
     private final ConfigurationBusiness configurationBusiness;
 
-    public ApiBusiness() {
+    public SoapApiBusiness() {
         this.configurationBusiness = new ConfigurationBusiness();
     }
 
-    public ApiBusiness(ConfigurationBusiness configurationBusiness) {
+    public SoapApiBusiness(ConfigurationBusiness configurationBusiness) {
         this.configurationBusiness = configurationBusiness;
     }
 
     public ApiContext getApiContext(
             WebServiceContext wsContext,
+            boolean authenticate) throws ApiException {
+
+        MessageContext mc = wsContext.getMessageContext();
+        HttpServletRequest request = (HttpServletRequest) mc.get(MessageContext.SERVLET_REQUEST);
+        HttpServletResponse response = (HttpServletResponse) mc.get(MessageContext.SERVLET_RESPONSE);
+
+        return getApiContext(request, response, authenticate);
+    }
+
+    public ApiContext getApiContext(
+            HttpServletRequest request,
+            HttpServletResponse response,
             boolean authenticate) throws ApiException {
 
         try {
@@ -78,9 +92,6 @@ public class ApiBusiness {
             PlatformConnection.getInstance();
 
             //set request and response
-            MessageContext mc = wsContext.getMessageContext();
-            HttpServletRequest request = (HttpServletRequest) mc.get(MessageContext.SERVLET_REQUEST);
-            HttpServletResponse response = (HttpServletResponse) mc.get(MessageContext.SERVLET_RESPONSE);
             HttpSession session = request.getSession();
             if (session == null) {
                 throw new ApiException("No session in WebServiceContext");
@@ -91,7 +102,7 @@ public class ApiBusiness {
             if (authenticate) {
                 user = authenticateSession(request, response);
             }
-            return new ApiContext(session, request, response, user);
+            return new ApiContext(request, response, user);
         } catch (DAOException ex) {
             throw new ApiException(ex);
         }
@@ -110,7 +121,6 @@ public class ApiBusiness {
                 logger.info("API successfully authenticated user " + email);
                 User user = configurationBusiness.getUser(email);
                 AbstractAuthenticationService.setVIPSession(request, response, user);
-                configurationBusiness.updateUserLastLogin(email);
                 return user;
             }
             throw new ApiException(authFailedMessage);

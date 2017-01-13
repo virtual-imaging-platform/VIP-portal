@@ -148,14 +148,14 @@ public class GateLabSourceLayout extends AbstractSourceLayout {
         selectItem.setShowTitle(false);
         selectItem.setWidth(200);
         selectItem.setRequired(true);
-        hLayout.addMember(FieldUtil.getForm(selectItem));
+        sourceFieldHLayout.addMember(FieldUtil.getForm(selectItem));
         isSelectItem = true;
     }
 
     private void configureTextItem() {
 
         textItem = FieldUtil.getTextItem(400, false, "", null);
-        hLayout.addMember(FieldUtil.getForm(textItem));
+        sourceFieldHLayout.addMember(FieldUtil.getForm(textItem));
         isSelectItem = false;
     }
     
@@ -172,7 +172,7 @@ public class GateLabSourceLayout extends AbstractSourceLayout {
         
         textItem = FieldUtil.getTextItem(400, false, "", null);
         textItem.setIcons(browsePicker);
-        hLayout.addMember(FieldUtil.getForm(textItem));
+        sourceFieldHLayout.addMember(FieldUtil.getForm(textItem));
         isSelectItem = false;
     }
 

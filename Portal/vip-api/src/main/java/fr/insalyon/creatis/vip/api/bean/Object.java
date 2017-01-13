@@ -31,14 +31,14 @@
  */
 package fr.insalyon.creatis.vip.api.bean;
 
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlType;
+import javax.xml.bind.annotation.*;
 
 /**
  *
  * @author Tristan Glatard
  */
 @XmlType(name = "Object")
+@XmlAccessorType(XmlAccessType.FIELD)
 public class Object {
     public Object() {
     }

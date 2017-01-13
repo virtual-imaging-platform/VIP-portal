@@ -2,8 +2,8 @@
 <workflow name="$tool.getName()" version="$tool.getToolVersion()">
   <description>$esc.xml($tool.getDescription())</description>
   <interface>
-    <source name="results-directory" type="URI" optional="false" default="/vip/Home">
-        <source-comment>$esc.xml("<b><font color=blue>results-directory</font></b> (<b><font color=green>Directory</font></b>):") Directory where the results will be stored.</source-comment>
+    <source name="results-directory" type="URI" optional="false" default="/vip/Home" pretty-name="Results directory">
+        <source-comment>Directory where the results will be stored.</source-comment>
     </source>
 #foreach( $input in $tool.getInputs() )
   #set($type="string")
@@ -12,21 +12,18 @@
   #end
   #if($input.getType()=="Flag")
     <source name="$input.getId()" type="string" optional="$input.isOptional()" default="$input.getCommandLineFlag()" vip-type-restriction="flag" pretty-name="$input.getName()">
-    #set($extraComment="Select the check box to activate the flag " + "<b><font color=green>" + $input.getCommandLineFlag() +  "</font></b>."))
   #else
     #if($input.getDefaultValue()!="null" && $input.getDefaultValue()!="")
-    <source name="$input.getId()" type="$type" optional="$input.isOptional()" default="$input.getDefaultValue()">
+    <source name="$input.getId()" type="$type" optional="$input.isOptional()" default="$input.getDefaultValue()" pretty-name="$input.getName()">
     #else
       #if($input.isOptional()==true)
-    <source name="$input.getId()" type="$type" optional="$input.isOptional()" default="no">
-        #set($extraComment="Put '<b>no</b>' to ignore this optional input.")
+    <source name="$input.getId()" type="$type" optional="$input.isOptional()" default="No_value_provided" pretty-name="$input.getName()">
       #else
-    <source name="$input.getId()" type="$type" optional="$input.isOptional()">
-        #set($extraComment="")
+    <source name="$input.getId()" type="$type" optional="$input.isOptional()" pretty-name="$input.getName()">
       #end
     #end
   #end
-      <source-comment>$esc.xml("<b><font color=blue>$input.getId()</font></b> (<b><font color=green>$input.getType()</font></b>):") $esc.xml($input.getDescription()) $esc.xml(${extraComment})</source-comment>
+      <source-comment>$esc.xml($input.getDescription())</source-comment>
     </source>
 #end
 #foreach($output in $tool.getOutputFiles())

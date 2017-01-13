@@ -38,12 +38,7 @@ import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.tab.Tab;
 import fr.insalyon.creatis.vip.core.client.CoreModule;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
-import fr.insalyon.creatis.vip.core.client.view.user.account.DropboxLayout;
-import fr.insalyon.creatis.vip.core.client.view.user.account.GroupLayout;
-import fr.insalyon.creatis.vip.core.client.view.user.account.PasswordLayout;
-import fr.insalyon.creatis.vip.core.client.view.user.account.PersonalLayout;
-import fr.insalyon.creatis.vip.core.client.view.user.account.RemoveAccountLayout;
-import fr.insalyon.creatis.vip.core.client.view.user.account.TermsOfUseLayout;
+import fr.insalyon.creatis.vip.core.client.view.user.account.*;
 
 /**
  *
@@ -73,6 +68,7 @@ public class AccountTab extends Tab {
 
         leftLayout.addMember(new PersonalLayout());
         leftLayout.addMember(new PasswordLayout());
+        leftLayout.addMember(new ApikeyLayout());
 
         // Right column
         VLayout rightLayout = new VLayout(14);

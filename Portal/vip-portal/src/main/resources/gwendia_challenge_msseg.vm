@@ -39,13 +39,13 @@
             <source name="$input.getId()" type="string" optional="$input.isOptional()" default="$input.getDefaultValue()">
 #else
 #if($input.isOptional()==true )
-                <source name="$input.getId()" type="string" optional="$input.isOptional()" default="no">
+                <source name="$input.getId()" type="string" optional="$input.isOptional()" default="No_value_provided">
 #set($extraComment="Put '<b>no</b>' to ignore this optional input.")
 #else
 #set($extraComment="")
 #end
 #if($input.isOptional()==true)
-                <source name="$input.getId()" type="string" optional="$input.isOptional()" default="no">
+                <source name="$input.getId()" type="string" optional="$input.isOptional()" default="No_value_provided">
 #set($extraComment="Put '<b>no</b>' to ignore this optional input.")
 #else
                 <source name="$input.getId()" type="string" optional="$input.isOptional()">
