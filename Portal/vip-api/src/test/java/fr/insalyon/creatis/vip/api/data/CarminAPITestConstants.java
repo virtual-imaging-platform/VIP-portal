@@ -60,4 +60,5 @@ public interface CarminAPITestConstants {
         new ErrorCodeAndMessage(103, "Other test message")
     };
     String TEST_ERROR_CODES_AND_MESSAGE_STRING = "42:Test message,103:Other test message";
+    String TEST_API_URI_PREFIX = "test://";
 }

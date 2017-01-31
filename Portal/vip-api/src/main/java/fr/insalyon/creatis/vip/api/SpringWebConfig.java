@@ -31,13 +31,13 @@
  */
 package fr.insalyon.creatis.vip.api;
 
-import fr.insalyon.creatis.vip.api.business.PipelineBusiness;
+import fr.insalyon.creatis.vip.api.business.*;
 import fr.insalyon.creatis.vip.application.server.business.*;
 import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
 import fr.insalyon.creatis.vip.core.server.dao.CoreDAOFactory;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import fr.insalyon.creatis.vip.core.server.dao.UserDAO;
-import fr.insalyon.creatis.vip.datamanager.server.business.TransferPoolBusiness;
+import fr.insalyon.creatis.vip.datamanager.server.business.*;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.*;
@@ -81,6 +81,12 @@ public class SpringWebConfig extends WebMvcConfigurerAdapter {
     }
 
     @Bean
+    @Scope(proxyMode = ScopedProxyMode.TARGET_CLASS, value = "request")
+    public ApiContext apiContext() {
+        return new ApiContext();
+    }
+
+    @Bean
     public WorkflowBusiness workflowBusiness() {
         return new WorkflowBusiness();
     }
@@ -108,5 +114,10 @@ public class SpringWebConfig extends WebMvcConfigurerAdapter {
     @Bean
     public TransferPoolBusiness transferPoolBusiness() {
         return new TransferPoolBusiness();
+    }
+
+    @Bean
+    public LFCBusiness lfcBusiness() {
+        return new LFCBusiness();
     }
 }

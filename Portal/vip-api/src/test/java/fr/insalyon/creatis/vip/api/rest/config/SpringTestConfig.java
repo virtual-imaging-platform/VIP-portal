@@ -35,7 +35,7 @@ import fr.insalyon.creatis.vip.api.*;
 import fr.insalyon.creatis.vip.application.server.business.*;
 import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
 import fr.insalyon.creatis.vip.core.server.dao.UserDAO;
-import fr.insalyon.creatis.vip.datamanager.server.business.TransferPoolBusiness;
+import fr.insalyon.creatis.vip.datamanager.server.business.*;
 import org.mockito.Mockito;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Bean;
@@ -90,5 +90,10 @@ public class SpringTestConfig {
     @Bean
     public SimulationBusiness simulationBusiness() {
         return Mockito.mock(SimulationBusiness.class);
+    }
+
+    @Bean
+    public LFCBusiness lfcBusiness() {
+        return Mockito.mock(LFCBusiness.class);
     }
 }

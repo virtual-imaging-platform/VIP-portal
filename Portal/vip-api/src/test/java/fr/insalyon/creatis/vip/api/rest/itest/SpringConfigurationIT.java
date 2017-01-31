@@ -98,5 +98,6 @@ public class SpringConfigurationIT {
         Assert.notEmpty(env.getProperty(PLATFORM_ERROR_CODES_AND_MESSAGES, String[].class));
         // test platform properties generation
         Assert.notNull(platformController.getPlatformProperties());
+        Assert.notNull(env.getProperty(API_URI_PREFIX));
     }
 }

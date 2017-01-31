@@ -29,56 +29,74 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL-B license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.api.business;
-
-import fr.insalyon.creatis.vip.core.client.bean.User;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-import java.util.ArrayList;
-import java.util.List;
+package fr.insalyon.creatis.vip.api.rest.model;
 
 /**
- * Created by abonnet on 7/6/16.
+ * Created by abonnet on 1/13/17.
  */
-public class ApiContext {
+public class Path {
 
-    private HttpServletRequest request;
-    private HttpServletResponse response;
-    private User user;
-    private List<String> warnings;
+    private String platformURI;
+    private Long lastModificationDate;
+    private Boolean isDirectory;
+    private Boolean exists;
+    private Long size;
+    private String executionId;
+    private String mimeType;
 
-    public ApiContext() {
-        this.warnings = new ArrayList<>();
+    public String getPlatformURI() {
+        return platformURI;
     }
 
-    public ApiContext(HttpServletRequest request, HttpServletResponse response, User user) {
-        this.request = request;
-        this.response = response;
-        this.user = user;
-        this.warnings = new ArrayList<>();
+    public void setPlatformURI(String platformURI) {
+        this.platformURI = platformURI;
     }
 
-    public void init(HttpServletRequest request, HttpServletResponse response, User user) {
-        this.request = request;
-        this.response = response;
-        this.user = user;
+    public Long getLastModificationDate() {
+        return lastModificationDate;
     }
 
-    public HttpServletRequest getRequest() {
-        return request;
+    public void setLastModificationDate(Long lastModificationDate) {
+        this.lastModificationDate = lastModificationDate;
     }
 
-    public HttpServletResponse getResponse() {
-        return response;
+    public Boolean getIsDirectory() {
+        return isDirectory;
     }
 
-    public User getUser() {
-        return user;
+    public void setIsDirectory(Boolean directory) {
+        isDirectory = directory;
     }
 
-    public List<String> getWarnings() {
-        return warnings;
+    public Boolean getExists() {
+        return exists;
+    }
+
+    public void setExists(Boolean exists) {
+        this.exists = exists;
+    }
+
+    public Long getSize() {
+        return size;
+    }
+
+    public void setSize(Long size) {
+        this.size = size;
+    }
+
+    public String getExecutionId() {
+        return executionId;
+    }
+
+    public void setExecutionId(String executionId) {
+        this.executionId = executionId;
+    }
+
+    public String getMimeType() {
+        return mimeType;
+    }
+
+    public void setMimeType(String mimeType) {
+        this.mimeType = mimeType;
     }
 }

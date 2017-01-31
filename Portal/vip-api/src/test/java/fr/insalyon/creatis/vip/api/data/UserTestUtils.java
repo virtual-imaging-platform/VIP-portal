@@ -61,4 +61,8 @@ public class UserTestUtils {
     public static RequestPostProcessor baseUser1() {
         return SecurityMockMvcRequestPostProcessors.user(new SpringCompatibleUser(baseUser1));
     }
+
+    public static RequestPostProcessor baseUser2() {
+        return SecurityMockMvcRequestPostProcessors.user(new SpringCompatibleUser(baseUser2));
+    }
 }

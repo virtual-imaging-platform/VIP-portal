@@ -37,6 +37,7 @@ import java.util.*;
 import java.util.Map.Entry;
 import java.util.function.Function;
 
+import static org.bouncycastle.asn1.x500.style.RFC4519Style.o;
 import static org.hamcrest.Matchers.*;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.springframework.util.ClassUtils.isPrimitiveOrWrapper;
@@ -165,7 +166,14 @@ public class JsonCustomObjectMatcher<T> extends TypeSafeDiagnosingMatcher<Map<St
             Class<?> expectedValueType = expectedValue.getClass();
             // if its a primitive,the actual value must be equal
             if (expectedValueType.equals(String.class) || isPrimitiveOrWrapper(expectedValueType)) {
-                return equalTo(expectedValue);
+                if (expectedValue instanceof Long) {
+                    Number longExpectedValue = (Long) expectedValue;
+                    Matcher<Integer> integerMatcher =
+                            both(isA(Integer.class)).and(is(longExpectedValue.intValue()));
+                    return anyOf(is(longExpectedValue), integerMatcher);
+                } else {
+                    return equalTo(expectedValue);
+                }
             } else if (Iterable.class.isAssignableFrom(expectedValueType)) {
                 // if it's iterable, the actual collection should contain in any order the same elements
                 Iterable iterable = (Iterable) expectedValue;
