@@ -48,12 +48,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
+import javax.activation.MimetypesFileTypeMap;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
+import java.nio.file.*;
+import java.text.*;
 import java.util.*;
 import java.util.concurrent.*;
 
+import static fr.insalyon.creatis.vip.core.client.view.util.CountryCode.re;
 import static java.util.Base64.getEncoder;
 import static sun.java2d.cmm.ColorTransform.Out;
 
@@ -81,49 +84,52 @@ public class DataApiBusiness {
     public DataApiBusiness() {
     }
 
-    public DataApiBusiness(ApiContext apiContext) {
-        this.apiContext = apiContext;
-    }
 
     public boolean doesFileExist(String apiUri) throws ApiException {
         String lfcPath = getLFCPathFromApiUri(apiUri);
-        try {
-            return lfcBusiness.exists(apiContext.getUser(), lfcPath);
-        } catch (BusinessException e) {
-            logger.error("Error testing lfc file existence", e);
-            throw new ApiException("Error testing file existence");
-        }
+        return baseDoesFileExist(lfcPath);
     }
 
     public void deletePath(String apiUri) throws ApiException {
         String lfcPath = getLFCPathFromApiUri(apiUri);
-        if (!doesFileExist(apiUri)) {
+        if (!baseDoesFileExist(lfcPath)) {
             logger.error("trying to delete a non-existing file : " + apiUri);
             throw new ApiException("trying to delete a non-existing dile");
         }
-        try {
-            transferPoolBusiness.delete(apiContext.getUser(), lfcPath);
-        } catch (BusinessException e) {
-            logger.error("Error deleting lfc file", e);
-            throw new ApiException("Error deleting lfc file");
-        }
+        baseDeletePath(lfcPath);
     }
 
     public Path getFileApiPath(String apiUri) throws ApiException {
+        String lfcPath = getLFCPathFromApiUri(apiUri);
         Path path = new Path();
         path.setPlatformURI(apiUri);
-        if (!doesFileExist(apiUri)) {
+        if (!baseDoesFileExist(lfcPath)) {
             path.setExists(false);
             return path;
         }
         path.setExists(true);
-        List<Data> fileData = getFileData(apiUri);
-        buildApiPathFromFileData(path, fileData);
+        List<Data> fileData = baseGetFileData(lfcPath);
+        if (fileData.size() == 1 && fileData.get(0).getName().startsWith("/")) {
+            // this is a file, not a directory
+            Data fileInfo = fileData.get(0);
+            path.setIsDirectory(false);
+            path.setSize(fileInfo.getLength());
+            path.setLastModificationDate(
+                    getTimeStampFromGridaDateFormat(fileInfo.getModificationDate()));
+            path.setMimeType(getMimeType(lfcPath));
+        } else {
+            // its a directory
+            path.setIsDirectory(true);
+            path.setSize(Long.valueOf(fileData.size()));
+            path.setLastModificationDate(baseGetFileModificationDate(lfcPath) / 1000);
+            path.setMimeType(env.getProperty(CarminProperties.API_DIRECTORY_MIME_TYPE));
+        }
         return path;
     }
 
     public List<Path> listDirectory(String apiUri) throws ApiException {
-        List<Data> directoryData = getFileData(apiUri);
+        String lfcPath = getLFCPathFromApiUri(apiUri);
+        List<Data> directoryData = baseGetFileData(lfcPath);
         if (directoryData.size() == 1 && directoryData.get(0).getName().startsWith("/")) {
             logger.error("Trying to list a directory, but is a file :" + apiUri);
             throw new ApiException("Error listing a directory");
@@ -135,24 +141,17 @@ public class DataApiBusiness {
         return res;
     }
 
-    public Long getFileModificationDate(String apiUri) throws ApiException {
-        String lfcPath = getLFCPathFromApiUri(apiUri);
-        try {
-            return lfcBusiness.getModificationDate(apiContext.getUser(), lfcPath);
-        } catch (BusinessException e) {
-            logger.error("Error getting lfc file modification date", e);
-            throw new ApiException("Error getting lfc modification");
-        }
-    }
-
     public String getFileContent(String apiUri) throws ApiException {
-        String downloadOperationId = downloadFile(apiUri);
+        String lfcPath = getLFCPathFromApiUri(apiUri);
+        String downloadOperationId = baseDownloadFile(lfcPath);
         Callable<Boolean> isDownloadOverCall = () -> isDownloadOver(downloadOperationId);
 
+        Integer retryDelay =
+                env.getProperty(CarminProperties.API_DOWNLOAD_RETRY_IN_SECONDS, Integer.class);
         Callable<Boolean> waitForDownloadCall = () -> {
             while (true) {
                 Future<Boolean> isDownloadOverFuture =
-                        scheduler.schedule(isDownloadOverCall, 2, TimeUnit.SECONDS);
+                        scheduler.schedule(isDownloadOverCall, retryDelay, TimeUnit.SECONDS);
                 if (isDownloadOverFuture.get()) {
                     return true;
                 }
@@ -161,8 +160,10 @@ public class DataApiBusiness {
         Future<Boolean> waitForDownloadFuture =
                 scheduler.submit(waitForDownloadCall);
         try {
-            // wait for 45 seconds or abort
-            waitForDownloadFuture.get(45, TimeUnit.SECONDS);
+            // wait for n seconds or abort
+            Integer timeout =
+                    env.getProperty(CarminProperties.API_DOWNLOAD_TIMEOUT_IN_SECONDS, Integer.class);
+            waitForDownloadFuture.get(timeout, TimeUnit.SECONDS);
         } catch (InterruptedException e) {
             logger.error("Waiting for download interrupted :" + apiUri, e);
             throw new ApiException("Waiting for download interrupted");
@@ -176,37 +177,11 @@ public class DataApiBusiness {
         return getDownloadContent(downloadOperationId);
     }
 
-    private String downloadFile(String apiUri) throws ApiException {
-        // it return the operation id
-        String lfcPath = getLFCPathFromApiUri(apiUri);
-        try {
-            return transferPoolBusiness.downloadFile(apiContext.getUser(), lfcPath);
-        } catch (BusinessException e) {
-            logger.error("Error downloading lfc file :" + lfcPath);
-            throw new ApiException("Error download LFC file");
-        }
-    }
-    private Path buildPathFromLfcData(String rootApiUri, Data lfcData) {
-        Path path = new Path();
-        path.setExists(true);
-        path.setSize(lfcData.getLength());
-        path.setMimeType(lfcData.getModificationDate());
-        // TODO : set modification date and mime type
-        boolean isDirectory = lfcData.getType().equals(Type.folder)
-                || lfcData.getType().equals(Type.folderSync);
-        path.setIsDirectory(isDirectory);
-        path.setPlatformURI(rootApiUri + "/" + lfcData.getName());
-        return path;
-    }
+    // #### DOWNLOAD STUFF
 
     private boolean isDownloadOver(String operationId) throws ApiException {
-        PoolOperation operation;
-        try {
-            operation = transferPoolBusiness.getDownloadPoolOperation(operationId);
-        } catch (BusinessException e) {
-            logger.error("Error getting download operation", e);
-            throw new ApiException("Error getting download operation");
-        }
+        PoolOperation operation = baseGetPoolOperation(operationId);
+
         switch (operation.getStatus()) {
             case Queued:
             case Running:
@@ -223,13 +198,7 @@ public class DataApiBusiness {
     }
 
     private String getDownloadContent(String operationId) throws ApiException {
-        PoolOperation operation = null;
-        try {
-            operation = transferPoolBusiness.getDownloadPoolOperation(operationId);
-        } catch (BusinessException e) {
-            logger.error("Error getting download operation", e);
-            throw new ApiException("Error getting download operation");
-        }
+        PoolOperation operation = baseGetPoolOperation(operationId);
 
         File file = new File(operation.getDest());
         if (file.isDirectory()) {
@@ -246,15 +215,7 @@ public class DataApiBusiness {
         return baos.toString();
     }
 
-    private List<Data> getFileData(String apiUri) throws ApiException {
-        String lfcPath = getLFCPathFromApiUri(apiUri);
-        try {
-            return lfcBusiness.listDir(apiContext.getUser(), lfcPath, true); // TODO always refresh ??
-        } catch (BusinessException e) {
-            logger.error("Error getting lfc file information", e);
-            throw new ApiException("Error getting lfc information");
-        }
-    }
+    // #### DATA UTILS
 
     private String getLFCPathFromApiUri(String apiUri) throws ApiException {
         String uriPrefix = env.getRequiredProperty(CarminProperties.API_URI_PREFIX);
@@ -265,20 +226,110 @@ public class DataApiBusiness {
         return apiUri.substring(uriPrefix.length());
     }
 
-    private void buildApiPathFromFileData(Path path, List<Data> fileData) {
-        if (fileData.size() == 1 && fileData.get(0).getName().startsWith("/")) {
-            // this is a file, not a directory
-            Data fileInfo = fileData.get(0);
-            // it's a file
-            path.setIsDirectory(false);
-            path.setSize(fileInfo.getLength());
-            path.setMimeType(fileInfo.getModificationDate());
-            // TODO set modification date and mime type
+    private Path buildPathFromLfcData(String rootApiUri, Data lfcData) {
+        Path path = new Path();
+        path.setExists(true);
+        path.setSize(lfcData.getLength());
+        if (lfcData.getModificationDate() != null) {
+            path.setLastModificationDate(
+                    getTimeStampFromGridaDateFormat(lfcData.getModificationDate()));
+        }
+        boolean isDirectory = lfcData.getType().equals(Type.folder)
+                || lfcData.getType().equals(Type.folderSync);
+        path.setIsDirectory(isDirectory);
+        if (isDirectory) {
+            path.setMimeType(env.getProperty(CarminProperties.API_DIRECTORY_MIME_TYPE));
         } else {
-            // its a directory
-            path.setIsDirectory(true);
-            path.setSize(Long.valueOf(fileData.size()));
-            // TODO set modification date and mime type
+            path.setMimeType(getMimeType(lfcData.getName()));
+        }
+        path.setPlatformURI(rootApiUri + "/" + lfcData.getName());
+        return path;
+    }
+
+    /* returns timestamp in seconds from format "Jan 12 2016" */
+    private Long getTimeStampFromGridaDateFormat(String gridaDateFormat) {
+        DateFormat dateFormat = new SimpleDateFormat("MMM dd yyyy", Locale.US);
+        try {
+            return dateFormat.parse(gridaDateFormat).getTime() / 1000;
+        } catch (ParseException e) {
+            logger.warn("Error with grida date format :" + gridaDateFormat);
+            logger.warn("Ignoring it");
+            return null;
+        }
+    }
+
+    private String getMimeType(String lfcPath) {
+        /* MimetypesFileTypeMap solution. Need activation.jar
+        String fileName = Paths.get(lfcPath).getFileName().toString();
+        return new MimetypesFileTypeMap().getContentType(fileName);
+        */
+        try {
+            String contentType = Files.probeContentType(Paths.get(lfcPath));
+            return contentType == null ?
+                    env.getProperty(CarminProperties.API_DEFAULT_MIME_TYPE) :
+                    contentType;
+        } catch (IOException e) {
+            logger.warn("Cant detect mime type of " + lfcPath);
+            logger.warn("Ignoring and returning application/octet-stream");
+            return "application/octet-stream";
+        }
+    }
+
+    // #### LOWER LEVELS CALLS, all prefixed with "base"
+
+    private boolean baseDoesFileExist(String lfcPath) throws ApiException {
+        try {
+            return lfcBusiness.exists(apiContext.getUser(), lfcPath);
+        } catch (BusinessException e) {
+            logger.error("Error testing lfc file existence", e);
+            throw new ApiException("Error testing file existence");
+        }
+    }
+
+    private List<Data> baseGetFileData(String lfcPath) throws ApiException {
+        try {
+            return lfcBusiness.listDir(apiContext.getUser(), lfcPath, true);
+            // TODO always refresh ??
+        } catch (BusinessException e) {
+            logger.error("Error getting lfc file information", e);
+            throw new ApiException("Error getting lfc information");
+        }
+    }
+
+    /* return the operation id */
+    private String baseDownloadFile(String lfcPath) throws ApiException {
+        try {
+            return transferPoolBusiness.downloadFile(apiContext.getUser(), lfcPath);
+        } catch (BusinessException e) {
+            logger.error("Error downloading lfc file :" + lfcPath);
+            throw new ApiException("Error download LFC file");
+        }
+    }
+
+    private PoolOperation baseGetPoolOperation(String operationId) throws ApiException {
+        try {
+            return transferPoolBusiness.getDownloadPoolOperation(operationId);
+        } catch (BusinessException e) {
+            logger.error("Error getting download operation", e);
+            throw new ApiException("Error getting download operation");
+        }
+    }
+
+    private Long baseGetFileModificationDate(String lfcPath) throws ApiException {
+        try {
+            return lfcBusiness.getModificationDate(apiContext.getUser(), lfcPath);
+        } catch (BusinessException e) {
+            logger.error("Error getting lfc file modification date", e);
+            throw new ApiException("Error getting lfc modification");
+        }
+    }
+
+    private void baseDeletePath(String lfcPath) throws ApiException {
+        try {
+            transferPoolBusiness.delete(apiContext.getUser(), lfcPath);
+        } catch (BusinessException e) {
+            logger.error("Error deleting lfc file", e);
+            throw new ApiException("Error deleting lfc file");
         }
     }
 

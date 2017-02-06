@@ -65,7 +65,7 @@ public class DataController {
 
     // although the controller is a singleton, these are proxies that always point on the current request
     @Autowired
-    HttpServletRequest httpServletRequest;
+    private HttpServletRequest httpServletRequest;
 
     @RequestMapping(params = "uri")
     public Path getPath(@RequestParam String uri) throws ApiException {
@@ -101,13 +101,6 @@ public class DataController {
         restApiBusiness.getApiContext(httpServletRequest, true);
         // business call
         return  dataApiBusiness.listDirectory(uri);
-    }
-
-    @RequestMapping(path="modificationDate", params="uri")
-    public Long getModificationDate(@RequestParam String uri) throws ApiException {
-        // TODO test purpose, to remove
-        restApiBusiness.getApiContext(httpServletRequest, true);
-        return dataApiBusiness.getFileModificationDate(uri);
     }
 
     @RequestMapping(path="download", params="uri")

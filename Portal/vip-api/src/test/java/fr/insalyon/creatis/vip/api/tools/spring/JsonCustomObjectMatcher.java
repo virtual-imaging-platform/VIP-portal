@@ -46,6 +46,7 @@ import static org.springframework.util.ClassUtils.isPrimitiveOrWrapper;
  * Created by abonnet on 8/3/16
  *
  * // TODO verify generic types of suppliers
+ * // TODO study and correct error message
  */
 public class JsonCustomObjectMatcher<T> extends TypeSafeDiagnosingMatcher<Map<String,?>> {
 
@@ -84,7 +85,9 @@ public class JsonCustomObjectMatcher<T> extends TypeSafeDiagnosingMatcher<Map<St
 
     @Override
     public boolean matchesSafely(Map<String,?> map, Description mismatch) {
-        if (!nonNullPropertiesCountMatcher.matches(countNonNullValue(map))) {
+        Integer nonNullValues = countNonNullValue(map);
+        if (!nonNullPropertiesCountMatcher.matches(nonNullValues)) {
+            nonNullPropertiesCountMatcher.describeMismatch(nonNullValues, mismatch);
             return false;
         }
         for (Matcher<?> propertyMatcher : propertyMatchers) {

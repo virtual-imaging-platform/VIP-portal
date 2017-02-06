@@ -31,7 +31,7 @@
  */
 package fr.insalyon.creatis.vip.api.rest.itest.data;
 
-import fr.insalyon.creatis.vip.api.data.CarminAPITestConstants;
+import fr.insalyon.creatis.vip.api.data.PathTestUtils;
 import fr.insalyon.creatis.vip.api.rest.config.*;
 import fr.insalyon.creatis.vip.api.rest.model.Path;
 import fr.insalyon.creatis.vip.datamanager.client.bean.PoolOperation;
@@ -40,15 +40,13 @@ import org.hamcrest.Matchers;
 import org.junit.Test;
 
 import java.nio.file.Paths;
-import java.util.Arrays;
+import java.text.*;
+import java.util.*;
 
+import static fr.insalyon.creatis.vip.api.VipConfigurer.logger;
 import static fr.insalyon.creatis.vip.api.data.CarminAPITestConstants.TEST_API_URI_PREFIX;
 import static fr.insalyon.creatis.vip.api.data.PathTestUtils.*;
-import static fr.insalyon.creatis.vip.api.data.UserTestUtils.baseUser1;
-import static fr.insalyon.creatis.vip.api.data.UserTestUtils.baseUser2;
-import static fr.insalyon.creatis.vip.core.client.view.util.CountryCode.sv;
-import static fr.insalyon.creatis.vip.core.client.view.util.CountryCode.tr;
-import static org.bouncycastle.asn1.x500.style.RFC4519Style.o;
+import static fr.insalyon.creatis.vip.api.data.UserTestUtils.*;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -107,12 +105,14 @@ public class DataControllerIT extends BaseVIPSpringIT {
                 .thenReturn(true);
         when(lfcBusiness.listDir(baseUser1, testLfcPath, true))
                 .thenReturn(Arrays.asList(testFile2, testDir2));
+        when(lfcBusiness.getModificationDate(baseUser1, testLfcPath))
+                .thenReturn(PathTestUtils.getDataModitTS(testDir1)*1000);
         mockMvc.perform(
                 get("/rest/path").param("uri", uri).with(baseUser1()))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(RestTestUtils.JSON_CONTENT_TYPE_UTF8))
-                .andExpect(jsonPath("$", jsonCorrespondsToPath(testDir1Path)));
+                .andExpect(jsonPath("$", jsonCorrespondsToPath(getPathWithTS(testDir1Path))));
     }
 
     @Test
@@ -133,7 +133,7 @@ public class DataControllerIT extends BaseVIPSpringIT {
     }
 
     @Test
-    public void shouldListDirectory() throws Exception {
+    public void shouldListDirectory1() throws Exception {
         String lfcPath = getAbsolutePath(testDir1);
         String uri = TEST_API_URI_PREFIX + lfcPath;
         when(lfcBusiness.listDir(baseUser1, lfcPath, true))
@@ -148,6 +148,25 @@ public class DataControllerIT extends BaseVIPSpringIT {
                         jsonCorrespondsToPath(testFile2Path)
                 ))
         );
+    }
+
+    @Test
+    public void shouldListDirectory2() throws Exception {
+        String lfcPath = getAbsolutePath(testDir2);
+        String uri = TEST_API_URI_PREFIX + lfcPath;
+        when(lfcBusiness.listDir(baseUser1, lfcPath, true))
+                .thenReturn(Arrays.asList(testFile3, testFile4, testFile5));
+        mockMvc.perform(
+                get("/rest/path/listDirectory").param("uri", uri).with(baseUser1()))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(RestTestUtils.JSON_CONTENT_TYPE_UTF8))
+                .andExpect(jsonPath("$[*]", Matchers.containsInAnyOrder(
+                        jsonCorrespondsToPath(testFile3Path),
+                        jsonCorrespondsToPath(testFile4Path),
+                        jsonCorrespondsToPath(testFile5Path)
+                        ))
+                );
     }
 
     @Test

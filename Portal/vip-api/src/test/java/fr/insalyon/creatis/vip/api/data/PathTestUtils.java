@@ -41,6 +41,7 @@ import java.util.*;
 import java.util.function.Function;
 
 import static fr.insalyon.creatis.vip.api.data.CarminAPITestConstants.TEST_API_URI_PREFIX;
+import static fr.insalyon.creatis.vip.core.client.view.util.CountryCode.re;
 
 /**
  * Created by abonnet on 1/23/17.
@@ -62,27 +63,34 @@ public class PathTestUtils {
     public static Data testFile1, testFile2, testFile3, testFile4, testFile5;
     public static Data root, testDir1, testDir2;
 
-    public static Path testFile1Path;
-    public static Path testDir1Path;
-    public static Path testFile2Path;
-    public static Path testDir2Path;
+    public static Path testRootPath, testDir1Path, testDir2Path;
+    public static Path testFile1Path, testFile2Path, testFile3Path, testFile4Path, testFile5Path;
 
     static {
         root = new Data("root", Type.folder, 2, null, null, null);
         testDir1 = new Data("testDir1", Type.folder, 2, null, null, null);
         testDir2 = new Data("testDir2", Type.folderSync, 3, null, null, null);
-        testFile1 = new Data("testFile1", Type.file, 42004, null, null, null);
-        testFile2 = new Data("testFile2", Type.fileSync, 42005, null, null, null);
-        testFile3 = new Data("testFile3", Type.file, 42006, null, null, null);
-        testFile4 = new Data("testFile4", Type.file, 42007, null, null, null);
-        testFile5 = new Data("testFile5", Type.file, 42008, null, null, null);
+        testFile1 = new Data("testFile1.xml", Type.file, 42004, "Apr 04 2015", null, null);
+        testFile2 = new Data("testFile2.json", Type.fileSync, 42005, "Dec 21 2016 ", null, null);
+        testFile3 = new Data("testFile3", Type.file, 42006, "Jan 01 2001", null, null);
+        testFile4 = new Data("testFile4.pdf", Type.file, 42007, "Jul 30 2014", null, null);
+        testFile5 = new Data("testFile5.zip", Type.file, 42008, "Jun 15 1999", null, null);
 
-        testFile1Path = getPath(TEST_API_URI_PREFIX, testFile1, false, null, null, null);
-        testDir1Path = getPath(TEST_API_URI_PREFIX, testDir1, true, null, null, null);
-        testFile2Path = getPath(TEST_API_URI_PREFIX, testFile2, false, null, null, null);
-        testDir2Path = getPath(TEST_API_URI_PREFIX, testDir2, true, null, null, null);
+        testRootPath = getPath(TEST_API_URI_PREFIX, root, true, null, null, "text/directory");
+        testDir1Path = getPath(TEST_API_URI_PREFIX, testDir1, true, null, null, "text/directory");
+        testDir2Path = getPath(TEST_API_URI_PREFIX, testDir2, true, null, null, "text/directory");
+        testFile1Path = getPath(TEST_API_URI_PREFIX, testFile1, false, getTS(4,4,2015), null, "application/xml");
+        testFile2Path = getPath(TEST_API_URI_PREFIX, testFile2, false, getTS(21,12,2016), null, "application/json");
+        testFile3Path = getPath(TEST_API_URI_PREFIX, testFile3, false, getTS(1,1,2001), null, "application/octet-stream");
+        testFile4Path = getPath(TEST_API_URI_PREFIX, testFile4, false, getTS(30,07,2014), null, "application/pdf");
+        testFile5Path = getPath(TEST_API_URI_PREFIX, testFile5, false, getTS(15,06,1999), null, "application/zip");
 
         pathSuppliers = getPathSuppliers();
+    }
+
+    private static Long getTS(int day, int month, int year) {
+        // return timestamp in seconds
+        return new GregorianCalendar(year, month-1, day).getTimeInMillis() / 1000;
     }
 
     public static Data getAbsoluteData(Data data) {
@@ -96,16 +104,46 @@ public class PathTestUtils {
         );
     }
 
+    public static Long getDataModitTS(Data data) {
+        if (data == root) return getTS(13,2,2015);
+        if (data == testDir1) return getTS(7,3,2016);
+        if (data == testDir2) return getTS(23,5,2016);
+        throw new RuntimeException("Getting modif date of invalid data");
+    }
+
+    public static String getDataModifDate(Data data) {
+        if (data == root) return "Feb 13 2015";
+        if (data == testDir1) return "Mar 07 2016";
+        if (data == testDir2) return "May 23 2016";
+        throw new RuntimeException("Getting modif date of invalid data");
+    }
+
     public static String getAbsolutePath(Data data) {
         if (data == root) return "/root";
         if (data == testDir1) return "/root/testDir1";
         if (data == testDir2) return "/root/testDir1/testDir2";
-        if (data == testFile1) return "/root/testFile1";
-        if (data == testFile2) return "/root/testDir1/testFile2";
+        if (data == testFile1) return "/root/testFile1.xml";
+        if (data == testFile2) return "/root/testDir1/testFile2.json";
         if (data == testFile3) return "/root/testDir1/testDir2/testFile3";
-        if (data == testFile4) return "/root/testDir1/testDir2/testFile4";
-        if (data == testFile5) return "/root/testDir1/testDir2/testFile5";
+        if (data == testFile4) return "/root/testDir1/testDir2/testFile4.pdf";
+        if (data == testFile5) return "/root/testDir1/testDir2/testFile5.zip";
         throw new RuntimeException("Wrong test data");
+    }
+
+    public static Path getPathWithTS(Path path) {
+        Long modifDate = path.getLastModificationDate();
+        if (path == testRootPath) modifDate = getDataModitTS(root);
+        if (path == testDir1Path) modifDate = getDataModitTS(testDir1);
+        if (path == testDir2Path) modifDate = getDataModitTS(testDir2);
+        Path newPath = new Path();
+        newPath.setPlatformURI(path.getPlatformURI());
+        newPath.setIsDirectory(path.getIsDirectory());
+        newPath.setLastModificationDate(modifDate);
+        newPath.setExecutionId(path.getExecutionId());
+        newPath.setExists(path.getExists());
+        newPath.setMimeType(path.getMimeType());
+        newPath.setSize(path.getSize());
+        return newPath;
     }
 
     private static Path getPath(

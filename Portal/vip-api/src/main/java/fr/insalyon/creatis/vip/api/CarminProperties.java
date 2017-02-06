@@ -51,4 +51,8 @@ public interface CarminProperties {
     // CARMIN DATA
 
     String API_URI_PREFIX = "carmin.data.uri_prefix";
+    String API_DIRECTORY_MIME_TYPE = "carmin.data.mime_type.directory";
+    String API_DEFAULT_MIME_TYPE = "carmin.data.mime_type.default";
+    String API_DOWNLOAD_RETRY_IN_SECONDS = "carmin.data.download.retry";
+    String API_DOWNLOAD_TIMEOUT_IN_SECONDS = "carmin.data.download.timeout";
 }
