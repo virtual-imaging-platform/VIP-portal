@@ -35,11 +35,18 @@ import fr.insalyon.creatis.grida.client.*;
 import fr.insalyon.creatis.grida.common.bean.Operation;
 import fr.insalyon.creatis.vip.api.CarminProperties;
 import fr.insalyon.creatis.vip.api.rest.model.Path;
-import fr.insalyon.creatis.vip.core.client.bean.User;
+import fr.insalyon.creatis.vip.core.client.bean.*;
+import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationService;
+import fr.insalyon.creatis.vip.core.client.view.CoreConstants.GROUP_ROLE;
+import fr.insalyon.creatis.vip.core.client.view.CoreException;
+import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
+import fr.insalyon.creatis.vip.core.client.view.user.UserLevel;
 import fr.insalyon.creatis.vip.core.server.business.*;
 import fr.insalyon.creatis.vip.datamanager.client.bean.*;
 import fr.insalyon.creatis.vip.datamanager.client.bean.Data.Type;
 import fr.insalyon.creatis.vip.datamanager.client.bean.PoolOperation.Status;
+import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerException;
+import fr.insalyon.creatis.vip.datamanager.server.DataManagerUtil;
 import fr.insalyon.creatis.vip.datamanager.server.business.*;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.output.ByteArrayOutputStream;
@@ -56,13 +63,17 @@ import java.text.*;
 import java.util.*;
 import java.util.concurrent.*;
 
-import static fr.insalyon.creatis.vip.core.client.view.util.CountryCode.re;
+import static fr.insalyon.creatis.vip.core.client.view.util.CountryCode.*;
+import static fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants.*;
 import static java.util.Base64.getEncoder;
 import static sun.java2d.cmm.ColorTransform.Out;
 
 
 /**
  * Created by abonnet on 1/18/17.
+ *
+ * // TODO  : include specific root case
+ * // TODO : seperate delete and upload permissions
  */
 @Service
 public class DataApiBusiness {
@@ -78,6 +89,10 @@ public class DataApiBusiness {
     private LFCBusiness lfcBusiness;
     @Autowired
     private TransferPoolBusiness transferPoolBusiness;
+    @Autowired
+    private ConfigurationBusiness configurationBusiness;
+    @Autowired
+    private DataManagerBusiness dataManagerBusiness;
 
     private ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(2);
 
@@ -87,11 +102,13 @@ public class DataApiBusiness {
 
     public boolean doesFileExist(String apiUri) throws ApiException {
         String lfcPath = getLFCPathFromApiUri(apiUri);
+        checkPermission(lfcPath, true);
         return baseDoesFileExist(lfcPath);
     }
 
     public void deletePath(String apiUri) throws ApiException {
         String lfcPath = getLFCPathFromApiUri(apiUri);
+        checkPermission(lfcPath, false);
         if (!baseDoesFileExist(lfcPath)) {
             logger.error("trying to delete a non-existing file : " + apiUri);
             throw new ApiException("trying to delete a non-existing dile");
@@ -101,6 +118,7 @@ public class DataApiBusiness {
 
     public Path getFileApiPath(String apiUri) throws ApiException {
         String lfcPath = getLFCPathFromApiUri(apiUri);
+        checkPermission(lfcPath, true);
         Path path = new Path();
         path.setPlatformURI(apiUri);
         if (!baseDoesFileExist(lfcPath)) {
@@ -129,6 +147,7 @@ public class DataApiBusiness {
 
     public List<Path> listDirectory(String apiUri) throws ApiException {
         String lfcPath = getLFCPathFromApiUri(apiUri);
+        checkPermission(lfcPath, true);
         List<Data> directoryData = baseGetFileData(lfcPath);
         if (directoryData.size() == 1 && directoryData.get(0).getName().startsWith("/")) {
             logger.error("Trying to list a directory, but is a file :" + apiUri);
@@ -143,6 +162,8 @@ public class DataApiBusiness {
 
     public String getFileContent(String apiUri) throws ApiException {
         String lfcPath = getLFCPathFromApiUri(apiUri);
+        checkPermission(lfcPath, true);
+        // TODO : verify it's a file. Or check what it does on a folder
         String downloadOperationId = baseDownloadFile(lfcPath);
         Callable<Boolean> isDownloadOverCall = () -> isDownloadOver(downloadOperationId);
 
@@ -175,6 +196,114 @@ public class DataApiBusiness {
             throw new ApiException("Aborting dowload : too long");
         }
         return getDownloadContent(downloadOperationId);
+    }
+
+    // #### PERMISSION STUFF
+
+    private void checkPermission(String lfcPath, boolean isRead) throws ApiException {
+        // TODO : look for ".."
+        checkRootPermission(lfcPath, isRead);
+        // Root is always filtered so always permited
+        if (lfcPath.equals(ROOT)) return;
+        // else it all depends of the first directory
+        String firstDir = getFirstDirectoryName(lfcPath);
+        // always can access its home and its trash
+        if (firstDir.equals(USERS_HOME)) return;
+        if (firstDir.equals(TRASH_HOME)) return;
+        // currently no admin access is possible via the api for security reasons
+        if (firstDir.equals(USERS_FOLDER) || firstDir.equals(BIOMED_HOME)) {
+            logger.error("Trying to access admin folders from api");
+            throw new ApiException("Unauthorized API access");
+        }
+        // else it should be a group folder
+        if (!firstDir.endsWith(GROUP_APPEND)) {
+            logger.error("Unexpected api access to: " + firstDir);
+            throw new ApiException("Unexpected API access");
+        }
+        String groupname = firstDir.substring(0,firstDir.length()-GROUP_APPEND.length());
+        checkGroupPermission(groupname, isRead);
+        if (!isRead) {
+            checkAdditionalDeletePermission(lfcPath);
+        }
+        // all check passed : all good !
+    }
+
+    private void checkGroupPermission(String groupname, boolean isRead) throws ApiException {
+        User user = apiContext.getUser();
+        // beginner cant write/delete in groups folder
+        if (!isRead && user.getLevel() == UserLevel.Beginner) {
+            logger.error("beginner user try to upload/delete in a group:" + user.getEmail() +"/" + groupname);
+            throw new ApiException("Unauthorized data API access");
+        }
+        // otherwise it must have access to this group
+        if (!apiContext.getUser().hasGroupAccess(groupname)) {
+            logger.error("Trying to access an unauthorized goup");
+            throw new ApiException("Unauthorized API access");
+        }
+    }
+
+    private void checkRootPermission(String lfcPath, boolean isRead) throws ApiException {
+        // verify path begins with the root
+        if (!lfcPath.startsWith(ROOT)) {
+            logger.error("Access to a lfc not starting with the root:" + lfcPath);
+            throw new ApiException("Illegal data API access");
+        }
+        // read always possible
+        if (isRead) return;
+        // else it cannot be THE root nor a direct subdirectory of root
+        if (lfcPath.equals(ROOT) ||
+                lfcPath.lastIndexOf('/') == ROOT.length()) {
+            logger.error("Illegal upload/delete data API access");
+            throw new ApiException("Illegal data API access");
+        }
+    }
+
+    private void checkAdditionalDeletePermission(String lfcPath) throws ApiException {
+        checkSynchronizedDirectories(lfcPath);
+        if(lfcPath.endsWith("Dropbox")){
+            logger.error("Trying to delete a dropbox directory :" + lfcPath);
+            throw new ApiException("Illegal data API access");
+        }
+    }
+
+    private void checkSynchronizedDirectories(String lfcPath) throws ApiException {
+        List<SSH> sshs;
+        try {
+            sshs = dataManagerBusiness.getSSHConnections();
+        } catch (BusinessException e) {
+            logger.error("Error listing synchronized directories");
+            throw new ApiException("Error listing synchronized directories");
+        }
+        List<String> lfcDirSSHSynchronization = new ArrayList<String>();
+        for (SSH ssh : sshs) {
+            if (ssh.getTransferType().equals(TransferType.Synchronization)) {
+                lfcDirSSHSynchronization.add(ssh.getLfcDir());
+            }
+        }
+
+        String lfcBaseDir;
+        try {
+            lfcBaseDir = DataManagerUtil.parseBaseDir(apiContext.getUser(), lfcPath);
+        } catch (DataManagerException e) {
+            logger.error("Error parsing api path :" + lfcPath);
+            throw new ApiException("Internal error in data API");
+        }
+        for (String s : lfcDirSSHSynchronization) {
+            if (lfcBaseDir.startsWith(s)) {
+                logger.error("Try to delete  synchronized file :" + lfcPath);
+                throw new ApiException("Illegal data API access");
+            }
+        }
+    }
+
+    private String getFirstDirectoryName(String lfcPath) {
+        lfcPath = lfcPath.substring(ROOT.length() + 1); // remove trailing slash
+        int nextSlashIndex = lfcPath.indexOf('/');
+        if (nextSlashIndex > 0) {
+            return lfcPath.substring(0, nextSlashIndex);
+        } else {
+            return lfcPath;
+        }
     }
 
     // #### DOWNLOAD STUFF
@@ -213,6 +342,12 @@ public class DataApiBusiness {
             e.printStackTrace();
         }
         return baos.toString();
+    }
+
+    // #### ROOT folder STUFF
+
+    private List<String> getRootDirectories() {
+
     }
 
     // #### DATA UTILS
