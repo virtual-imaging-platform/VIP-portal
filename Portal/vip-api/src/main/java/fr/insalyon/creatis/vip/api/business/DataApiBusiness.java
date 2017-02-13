@@ -31,20 +31,13 @@
  */
 package fr.insalyon.creatis.vip.api.business;
 
-import fr.insalyon.creatis.grida.client.*;
-import fr.insalyon.creatis.grida.common.bean.Operation;
 import fr.insalyon.creatis.vip.api.CarminProperties;
 import fr.insalyon.creatis.vip.api.rest.model.Path;
 import fr.insalyon.creatis.vip.core.client.bean.*;
-import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationService;
-import fr.insalyon.creatis.vip.core.client.view.CoreConstants.GROUP_ROLE;
-import fr.insalyon.creatis.vip.core.client.view.CoreException;
-import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.core.client.view.user.UserLevel;
 import fr.insalyon.creatis.vip.core.server.business.*;
 import fr.insalyon.creatis.vip.datamanager.client.bean.*;
 import fr.insalyon.creatis.vip.datamanager.client.bean.Data.Type;
-import fr.insalyon.creatis.vip.datamanager.client.bean.PoolOperation.Status;
 import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerException;
 import fr.insalyon.creatis.vip.datamanager.server.DataManagerUtil;
 import fr.insalyon.creatis.vip.datamanager.server.business.*;
@@ -55,18 +48,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
-import javax.activation.MimetypesFileTypeMap;
 import java.io.*;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.text.*;
 import java.util.*;
 import java.util.concurrent.*;
 
-import static fr.insalyon.creatis.vip.core.client.view.util.CountryCode.*;
+import static fr.insalyon.creatis.vip.core.client.view.util.CountryCode.re;
 import static fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants.*;
-import static java.util.Base64.getEncoder;
-import static sun.java2d.cmm.ColorTransform.Out;
 
 
 /**
@@ -99,10 +88,10 @@ public class DataApiBusiness {
     public DataApiBusiness() {
     }
 
-
     public boolean doesFileExist(String apiUri) throws ApiException {
         String lfcPath = getLFCPathFromApiUri(apiUri);
         checkPermission(lfcPath, true);
+        if (lfcPath.equals(ROOT)) return true;
         return baseDoesFileExist(lfcPath);
     }
 
@@ -119,6 +108,9 @@ public class DataApiBusiness {
     public Path getFileApiPath(String apiUri) throws ApiException {
         String lfcPath = getLFCPathFromApiUri(apiUri);
         checkPermission(lfcPath, true);
+        if (lfcPath.equals(ROOT)) {
+            return getRootPath();
+        }
         Path path = new Path();
         path.setPlatformURI(apiUri);
         if (!baseDoesFileExist(lfcPath)) {
@@ -148,6 +140,9 @@ public class DataApiBusiness {
     public List<Path> listDirectory(String apiUri) throws ApiException {
         String lfcPath = getLFCPathFromApiUri(apiUri);
         checkPermission(lfcPath, true);
+        if (lfcPath.equals(ROOT)) {
+            return getRootDirectories();
+        }
         List<Data> directoryData = baseGetFileData(lfcPath);
         if (directoryData.size() == 1 && directoryData.get(0).getName().startsWith("/")) {
             logger.error("Trying to list a directory, but is a file :" + apiUri);
@@ -163,7 +158,12 @@ public class DataApiBusiness {
     public String getFileContent(String apiUri) throws ApiException {
         String lfcPath = getLFCPathFromApiUri(apiUri);
         checkPermission(lfcPath, true);
+        if (lfcPath.equals(ROOT)) {
+            logger.error("cannot download root");
+            throw new ApiException("Illegal data API access");
+        }
         // TODO : verify it's a file. Or check what it does on a folder
+        // TODO : check size
         String downloadOperationId = baseDownloadFile(lfcPath);
         Callable<Boolean> isDownloadOverCall = () -> isDownloadOver(downloadOperationId);
 
@@ -346,8 +346,44 @@ public class DataApiBusiness {
 
     // #### ROOT folder STUFF
 
-    private List<String> getRootDirectories() {
+    private Path getRootPath() {
+        Path rootPath = new Path();
+        rootPath.setExists(true);
+        rootPath.setMimeType(env.getProperty(CarminProperties.API_DIRECTORY_MIME_TYPE));
+        rootPath.setIsDirectory(true);
+        rootPath.setSize(Long.valueOf(getRootDirectoriesName().size()));
+        rootPath.setPlatformURI(env.getProperty(CarminProperties.API_URI_PREFIX) + ROOT);
+        return rootPath;
+    }
 
+    private List<Path> getRootDirectories() {
+        List<Path> directories = new ArrayList<>();
+        for (String dirName : getRootDirectoriesName()) {
+            directories.add(getRootDirPath(dirName));
+        }
+        return directories;
+    }
+
+    private Path getRootDirPath(String name) {
+        Path rootPath = new Path();
+        rootPath.setExists(true);
+        rootPath.setMimeType(env.getProperty(CarminProperties.API_DIRECTORY_MIME_TYPE));
+        rootPath.setIsDirectory(true);
+        rootPath.setPlatformURI(
+                env.getProperty(CarminProperties.API_URI_PREFIX)
+                    + ROOT + "/" + name);
+        return rootPath;
+    }
+
+    private List<String> getRootDirectoriesName() {
+        // Home + Trash + users groups
+        List<String> rootDir = new ArrayList<>();
+        rootDir.add(USERS_HOME);
+        rootDir.add(TRASH_HOME);
+        for (Group group : apiContext.getUser().getGroups()) {
+            rootDir.add(group.getName() + GROUP_APPEND);
+        }
+        return rootDir;
     }
 
     // #### DATA UTILS
