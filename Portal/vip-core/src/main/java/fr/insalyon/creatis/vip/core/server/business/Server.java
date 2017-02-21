@@ -310,11 +310,11 @@ PropertiesConfiguration config;
     }
     
     public String getServerProxy(String vo){
-    return setPath(configurationFolder + PROXIES_DIR+vo)+ "/x509up_server";
+        return getServerProxyFolder(vo) + "x509up_server";
     }
     
     public String getServerProxyFolder(String vo){
-    return setPath(configurationFolder + PROXIES_DIR+vo+"/");
+        return setPath(configurationFolder + PROXIES_DIR + vo + "/");
     }
 
     public String getMyProxyHost() {
