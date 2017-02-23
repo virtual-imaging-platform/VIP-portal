@@ -46,7 +46,8 @@ import org.opensaml.saml2.core.Issuer;
  * @author Rafael Ferreira da Silva
  */
 public class Server {
-PropertiesConfiguration config;
+    // Configuration File
+    PropertiesConfiguration config;
     // Constants
     private static final Logger logger = Logger.getLogger(Server.class);
     private static Server instance;
