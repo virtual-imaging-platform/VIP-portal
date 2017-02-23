@@ -180,7 +180,7 @@ knowledge of the CeCILL-B license and that you accept its terms.
                 </exclusion>
             </exclusions>
         </dependency>
-     <dependency>
+        <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient</artifactId>
             <version>4.3.1</version>
