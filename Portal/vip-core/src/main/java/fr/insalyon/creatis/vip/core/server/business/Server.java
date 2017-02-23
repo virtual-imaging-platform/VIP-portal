@@ -187,8 +187,8 @@ PropertiesConfiguration config;
             workflowsPort = config.getInt(CoreConstants.LAB_SIMULATION_DB_PORT, 1527);
             workflowsExecuctionMode = config.getString(CoreConstants.LAB_SIMULATION_EXEC_MODE, "ws");
 
-            apacheHost = config.getString("apache.host", apacheHost);
-            apacheSSLPort = config.getInt("apache.ssl.port", apacheSSLPort);
+            apacheHost = config.getString(CoreConstants.LAB_APACHE_HOST, apacheHost);
+            apacheSSLPort = config.getInt(CoreConstants.LAB_APACHE_SSL_PORT, apacheSSLPort);
 
             casURL = config.getString(CoreConstants.LAB_CAS_URL, "https://ng-cas.maatg.fr/pandora-gateway-sl-cas");
 
@@ -265,8 +265,8 @@ PropertiesConfiguration config;
             config.setProperty(CoreConstants.LAB_SIMULATION_DB_HOST, workflowsHost);
             config.setProperty(CoreConstants.LAB_SIMULATION_DB_PORT, workflowsPort);
             config.setProperty(CoreConstants.LAB_SIMULATION_EXEC_MODE, workflowsExecuctionMode);
-            config.setProperty("apache.host", apacheHost);
-            config.setProperty("apache.ssl.port", apacheSSLPort);
+            config.setProperty(CoreConstants.LAB_APACHE_HOST, apacheHost);
+            config.setProperty(CoreConstants.LAB_APACHE_SSL_PORT, apacheSSLPort);
             config.setProperty(CoreConstants.LAB_CAS_URL, casURL);
             config.setProperty(CoreConstants.SSH_PUBLIC_KEY, sshPublicKey);
             config.setProperty(CoreConstants.TreeQuery, queryTree);
