@@ -77,7 +77,6 @@ public class CoreConstants implements IsSerializable {
     public static final String LAB_SIMULATION_PLATFORM_MAX = "simulation.max.platfrom";
     public static final String LAB_SIMULATION_BEGINNER_MAX = "simulation.max.beginner";
     public static final String LAB_SIMULATION_DB_HOST = "workflows.db.host";
-    public static final String LAB_SIMULATION_DB_NAME = "workflows.db.name";
     public static final String LAB_SIMULATION_DB_PORT = "workflows.db.port";
     public static final String LAB_SIMULATION_FOLDER = "workflows.directory";
     public static final String LAB_SIMULATION_EXEC_MODE = "workflows.exec.mode";
