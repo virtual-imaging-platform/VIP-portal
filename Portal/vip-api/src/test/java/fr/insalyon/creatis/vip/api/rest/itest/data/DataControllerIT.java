@@ -58,37 +58,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class DataControllerIT extends BaseVIPSpringIT {
 
     @Test
-    public void userShouldBeIsolated() throws Exception {
-        String lfcPath1 = "/WRONG/PATH1", lfcPath2 = "/WRONG/PATH2";
-        String uri1 = TEST_API_URI_PREFIX + lfcPath1;
-        String uri2 = TEST_API_URI_PREFIX + lfcPath2;
-        when(lfcBusiness.exists(baseUser1, lfcPath1)).thenReturn(true);
-        when(lfcBusiness.exists(baseUser2, lfcPath2)).thenReturn(true);
-        mockMvc.perform(
-                get("/rest/path/exists").param("uri", uri1).with(baseUser1()))
-                .andExpect(status().isOk())
-                .andExpect(content().string("true"));
-        mockMvc.perform(
-                get("/rest/path/exists").param("uri", uri2).with(baseUser2()))
-                .andExpect(status().isOk())
-                .andExpect(content().string("true"));
-        mockMvc.perform(
-                get("/rest/path/exists").param("uri", uri2).with(baseUser1()))
-                .andExpect(status().isOk())
-                .andExpect(content().string("false"));
-        mockMvc.perform(
-                get("/rest/path/exists").param("uri", uri1).with(baseUser2()))
-                .andExpect(status().isOk())
-                .andExpect(content().string("false"));
-    }
-
-    @Test
     public void shouldReturnFilePath() throws Exception {
+        configureDataFS();
         String testLfcPath = getAbsolutePath(testFile1);
-        when(lfcBusiness.exists(baseUser1, testLfcPath))
-                .thenReturn(true);
-        when(lfcBusiness.listDir(baseUser1, testLfcPath, true))
-                .thenReturn(Arrays.asList(getAbsoluteData(testFile1)));
         mockMvc.perform(
                 get("/rest/path").param("uri", TEST_API_URI_PREFIX + testLfcPath).with(baseUser1()))
                 .andDo(print())
@@ -99,16 +71,11 @@ public class DataControllerIT extends BaseVIPSpringIT {
 
     @Test
     public void shouldReturnDirectoryPath() throws Exception {
+        configureDataFS();
         String testLfcPath = getAbsolutePath(testDir1);
         String uri = TEST_API_URI_PREFIX + testLfcPath;
-        when(lfcBusiness.exists(baseUser1, testLfcPath))
-                .thenReturn(true);
-        when(lfcBusiness.listDir(baseUser1, testLfcPath, true))
-                .thenReturn(Arrays.asList(testFile2, testDir2));
-        when(lfcBusiness.getModificationDate(baseUser1, testLfcPath))
-                .thenReturn(PathTestUtils.getDataModitTS(testDir1)*1000);
         mockMvc.perform(
-                get("/rest/path").param("uri", uri).with(baseUser1()))
+                get("/rest/path").param("uri", uri).with(baseUser2()))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(RestTestUtils.JSON_CONTENT_TYPE_UTF8))
@@ -117,7 +84,7 @@ public class DataControllerIT extends BaseVIPSpringIT {
 
     @Test
     public void shouldReturnNonExistingPath() throws Exception {
-        String testLfcPath = "/WRONG/PATH";
+        String testLfcPath = "/vip/Home/WRONG/PATH";
         String uri = TEST_API_URI_PREFIX + testLfcPath;
         when(lfcBusiness.exists(baseUser1, testLfcPath))
                 .thenReturn(false);
@@ -133,31 +100,29 @@ public class DataControllerIT extends BaseVIPSpringIT {
     }
 
     @Test
-    public void shouldListDirectory1() throws Exception {
-        String lfcPath = getAbsolutePath(testDir1);
+    public void shouldListuser2Dir() throws Exception {
+        configureDataFS();
+        String lfcPath = getAbsolutePath(user2Dir);
         String uri = TEST_API_URI_PREFIX + lfcPath;
-        when(lfcBusiness.listDir(baseUser1, lfcPath, true))
-                .thenReturn(Arrays.asList(testDir2, testFile2));
         mockMvc.perform(
-                get("/rest/path/listDirectory").param("uri", uri).with(baseUser1()))
+                get("/rest/path/listDirectory").param("uri", uri).with(baseUser2()))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(RestTestUtils.JSON_CONTENT_TYPE_UTF8))
                 .andExpect(jsonPath("$[*]", Matchers.containsInAnyOrder(
-                        jsonCorrespondsToPath(testDir2Path),
+                        jsonCorrespondsToPath(testDir1Path),
                         jsonCorrespondsToPath(testFile2Path)
                 ))
         );
     }
 
     @Test
-    public void shouldListDirectory2() throws Exception {
-        String lfcPath = getAbsolutePath(testDir2);
+    public void shouldListDirectory1() throws Exception {
+        configureDataFS();
+        String lfcPath = getAbsolutePath(testDir1);
         String uri = TEST_API_URI_PREFIX + lfcPath;
-        when(lfcBusiness.listDir(baseUser1, lfcPath, true))
-                .thenReturn(Arrays.asList(testFile3, testFile4, testFile5));
         mockMvc.perform(
-                get("/rest/path/listDirectory").param("uri", uri).with(baseUser1()))
+                get("/rest/path/listDirectory").param("uri", uri).with(baseUser2()))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(RestTestUtils.JSON_CONTENT_TYPE_UTF8))
@@ -171,7 +136,8 @@ public class DataControllerIT extends BaseVIPSpringIT {
 
     @Test
     public void shouldDownload() throws Exception {
-        String lfcPath = "/root/testFile1";
+        configureDataFS();
+        String lfcPath = getAbsolutePath(testFile1);
         String uri = TEST_API_URI_PREFIX + lfcPath;
         String operationId = "testOpId";
         String testFile = Paths.get(ClassLoader.getSystemResource("testFile.txt").toURI())

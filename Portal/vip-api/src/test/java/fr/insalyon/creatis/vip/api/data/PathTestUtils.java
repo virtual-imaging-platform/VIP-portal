@@ -41,7 +41,6 @@ import java.util.*;
 import java.util.function.Function;
 
 import static fr.insalyon.creatis.vip.api.data.CarminAPITestConstants.TEST_API_URI_PREFIX;
-import static fr.insalyon.creatis.vip.core.client.view.util.CountryCode.re;
 
 /**
  * Created by abonnet on 1/23/17.
@@ -51,39 +50,50 @@ public class PathTestUtils {
     private static Map<String,Function> pathSuppliers;
 
     /*
-       root /testFile1
-            /testDir1   /testFile2
-                        /testDir2   /testFile3
+       vip  /user1      /testFile1
+            /user2      /testFile2
+                        /testDir1   /testFile3
                                     /testFile4
                                     /testFile5
+            /grouptest  /testFile6
 
 
      */
 
-    public static Data testFile1, testFile2, testFile3, testFile4, testFile5;
-    public static Data root, testDir1, testDir2;
+    public static Data vipRoot, user1Dir, user2Dir, groupTestDir, testDir1;
+    public static Data testFile1, testFile2, testFile3, testFile4, testFile5, testFile6;
 
-    public static Path testRootPath, testDir1Path, testDir2Path;
-    public static Path testFile1Path, testFile2Path, testFile3Path, testFile4Path, testFile5Path;
+    public static Path testVipRootPath, testUser1DirPath, testUser2DirPath,
+            testGroupTestDiPath, testDir1Path;
+    public static Path testFile1Path, testFile2Path, testFile3Path,
+            testFile4Path, testFile5Path, testFile6Path;
 
     static {
-        root = new Data("root", Type.folder, 2, null, null, null);
-        testDir1 = new Data("testDir1", Type.folder, 2, null, null, null);
-        testDir2 = new Data("testDir2", Type.folderSync, 3, null, null, null);
+        vipRoot = new Data("vip", Type.folder, 3, null, null, null);
+        user1Dir = new Data("Home", Type.folder, 1, null, null, null);
+        user2Dir = new Data("Home", Type.folder, 2, null, null, null);
+        groupTestDir = new Data("groupTest (group)", Type.folder, 1, null, null, null);
+        testDir1 = new Data("testDir1", Type.folder, 3, null, null, null);
+
         testFile1 = new Data("testFile1.xml", Type.file, 42004, "Apr 04 2015", null, null);
         testFile2 = new Data("testFile2.json", Type.fileSync, 42005, "Dec 21 2016 ", null, null);
         testFile3 = new Data("testFile3", Type.file, 42006, "Jan 01 2001", null, null);
         testFile4 = new Data("testFile4.pdf", Type.file, 42007, "Jul 30 2014", null, null);
         testFile5 = new Data("testFile5.zip", Type.file, 42008, "Jun 15 1999", null, null);
+        testFile6 = new Data("testFile6.unknown", Type.file, 42009, "Aug 28 2014", null, null);
 
-        testRootPath = getPath(TEST_API_URI_PREFIX, root, true, null, null, "text/directory");
+        testVipRootPath = getPath(TEST_API_URI_PREFIX, vipRoot, true, null, null, "text/directory");
+        testUser1DirPath = getPath(TEST_API_URI_PREFIX, user1Dir, true, null, null, "text/directory");
+        testUser2DirPath = getPath(TEST_API_URI_PREFIX, user2Dir, true, null, null, "text/directory");
+        testGroupTestDiPath = getPath(TEST_API_URI_PREFIX, groupTestDir, true, null, null, "text/directory");
         testDir1Path = getPath(TEST_API_URI_PREFIX, testDir1, true, null, null, "text/directory");
-        testDir2Path = getPath(TEST_API_URI_PREFIX, testDir2, true, null, null, "text/directory");
-        testFile1Path = getPath(TEST_API_URI_PREFIX, testFile1, false, getTS(4,4,2015), null, "application/xml");
+
+        testFile1Path = getPath(TEST_API_URI_PREFIX, testFile1, false, getTS(4,4,2015), null, "text/xml");
         testFile2Path = getPath(TEST_API_URI_PREFIX, testFile2, false, getTS(21,12,2016), null, "application/json");
         testFile3Path = getPath(TEST_API_URI_PREFIX, testFile3, false, getTS(1,1,2001), null, "application/octet-stream");
-        testFile4Path = getPath(TEST_API_URI_PREFIX, testFile4, false, getTS(30,07,2014), null, "application/pdf");
-        testFile5Path = getPath(TEST_API_URI_PREFIX, testFile5, false, getTS(15,06,1999), null, "application/zip");
+        testFile4Path = getPath(TEST_API_URI_PREFIX, testFile4, false, getTS(30,7,2014), null, "application/pdf");
+        testFile5Path = getPath(TEST_API_URI_PREFIX, testFile5, false, getTS(15,6,1999), null, "application/zip");
+        testFile6Path = getPath(TEST_API_URI_PREFIX, testFile6, false, getTS(28,8,2014), null, "application/octet-stream");
 
         pathSuppliers = getPathSuppliers();
     }
@@ -105,36 +115,46 @@ public class PathTestUtils {
     }
 
     public static Long getDataModitTS(Data data) {
-        if (data == root) return getTS(13,2,2015);
+        if (data == vipRoot) return getTS(13,2,2015);
+        if (data == user1Dir) return getTS(21,9,2011);
+        if (data == user2Dir) return getTS(1,10,2012);
+        if (data == groupTestDir) return getTS(3,11,2010);
         if (data == testDir1) return getTS(7,3,2016);
-        if (data == testDir2) return getTS(23,5,2016);
         throw new RuntimeException("Getting modif date of invalid data");
     }
 
     public static String getDataModifDate(Data data) {
-        if (data == root) return "Feb 13 2015";
+        if (data == vipRoot) return "Feb 13 2015";
+        if (data == user1Dir) return "Sep 21 2011";
+        if (data == user2Dir) return "Oct 1 2012";
+        if (data == groupTestDir) return "Nov 3 2010";
         if (data == testDir1) return "Mar 07 2016";
-        if (data == testDir2) return "May 23 2016";
         throw new RuntimeException("Getting modif date of invalid data");
     }
 
     public static String getAbsolutePath(Data data) {
-        if (data == root) return "/root";
-        if (data == testDir1) return "/root/testDir1";
-        if (data == testDir2) return "/root/testDir1/testDir2";
-        if (data == testFile1) return "/root/testFile1.xml";
-        if (data == testFile2) return "/root/testDir1/testFile2.json";
-        if (data == testFile3) return "/root/testDir1/testDir2/testFile3";
-        if (data == testFile4) return "/root/testDir1/testDir2/testFile4.pdf";
-        if (data == testFile5) return "/root/testDir1/testDir2/testFile5.zip";
+        if (data == vipRoot) return "/vip";
+        if (data == user1Dir) return "/vip/Home";
+        if (data == user2Dir) return "/vip/Home";
+        if (data == groupTestDir) return "/vip/groupTest (group)";
+        if (data == testDir1) return "/vip/Home/testDir1";
+
+        if (data == testFile1) return "/vip/Home/testFile1.xml";
+        if (data == testFile2) return "/vip/Home/testFile2.json";
+        if (data == testFile3) return "/vip/Home/testDir1/testFile3";
+        if (data == testFile4) return "/vip/Home/testDir1/testFile4.pdf";
+        if (data == testFile5) return "/vip/Home/testDir1/testFile5.zip";
+        if (data == testFile6) return "/vip/groupTest (group)/testFile6.zip";
         throw new RuntimeException("Wrong test data");
     }
 
     public static Path getPathWithTS(Path path) {
         Long modifDate = path.getLastModificationDate();
-        if (path == testRootPath) modifDate = getDataModitTS(root);
+        if (path == testVipRootPath) modifDate = getDataModitTS(vipRoot);
+        if (path == testUser1DirPath) modifDate = getDataModitTS(user1Dir);
+        if (path == testUser2DirPath) modifDate = getDataModitTS(user2Dir);
+        if (path == testGroupTestDiPath) modifDate = getDataModitTS(groupTestDir);
         if (path == testDir1Path) modifDate = getDataModitTS(testDir1);
-        if (path == testDir2Path) modifDate = getDataModitTS(testDir2);
         Path newPath = new Path();
         newPath.setPlatformURI(path.getPlatformURI());
         newPath.setIsDirectory(path.getIsDirectory());

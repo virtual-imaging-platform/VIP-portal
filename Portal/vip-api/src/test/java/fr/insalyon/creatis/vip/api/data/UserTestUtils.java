@@ -54,8 +54,10 @@ public class UserTestUtils {
     static {
         baseUser1 = new User("base1", "User1", "baseuser1@test.tst", null, null,
                 UserLevel.Beginner, null);
+        baseUser1.setFolder("user1");
         baseUser2 = new User("base2", "User2", "baseuser2@test.tst", null, null,
                 UserLevel.Advanced, null);
+        baseUser2.setFolder("user2");
     }
 
     public static RequestPostProcessor baseUser1() {

@@ -31,8 +31,9 @@
  */
 package fr.insalyon.creatis.vip.api.rest.config;
 
+import fr.insalyon.creatis.vip.api.rest.mockconfig.DataConfigurator;
 import fr.insalyon.creatis.vip.application.server.business.*;
-import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
+import fr.insalyon.creatis.vip.core.server.business.*;
 import fr.insalyon.creatis.vip.core.server.dao.UserDAO;
 import fr.insalyon.creatis.vip.datamanager.server.business.*;
 import org.apache.commons.io.IOUtils;
@@ -174,5 +175,9 @@ abstract public class BaseVIPSpringIT {
 
     public LFCBusiness getLfcBusiness() {
         return lfcBusiness;
+    }
+
+    protected void configureDataFS() throws BusinessException {
+        DataConfigurator.configureFS(this);
     }
 }
