@@ -253,6 +253,7 @@ public class ProxyClient {
             throw new ProtocolException("Unknown MyProxy protocol RESPONSE string: " + line);
         }
         while ((line = readLine(this.socketIn)) != null) {
+            // Drain potentially stale data incoming from socket
         }
     }
 
