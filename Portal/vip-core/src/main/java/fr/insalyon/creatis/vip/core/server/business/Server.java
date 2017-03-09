@@ -226,7 +226,7 @@ public class Server {
             applicationImporterFileRepository = config.getString(CoreConstants.APPLICATION_FILES_REPOSITORY, "/tmp/boutiques-cache");
             deleteFilesAfterUpload = config.getString(CoreConstants.APP_DELETE_FILES_AFTER_UPLOAD, "yes");
             
-           //Publication
+            //Publication
             numberMonthsToTestLastPublicationUpdates=config.getInt(CoreConstants.PUB_MONTHS_UPDATES, 6);
 
             config.setProperty(CoreConstants.LAB_DB_HOST, databaseServerHost);
