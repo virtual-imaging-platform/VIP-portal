@@ -196,7 +196,7 @@ public class PlatformConnection {
             
             createTable("VIPTermsOfuse",
                     "idTermsOfuse INT(11) NOT NULL AUTO_INCREMENT, "
-                    + "date TIMESTAMP NULL, "
+                    +"date TIMESTAMP NULL, "
                     + "text TEXT NULL, "
                     + "PRIMARY KEY (idTermsOfuse)");
 
