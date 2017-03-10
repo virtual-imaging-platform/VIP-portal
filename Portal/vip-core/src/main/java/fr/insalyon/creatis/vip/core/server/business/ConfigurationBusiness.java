@@ -143,21 +143,25 @@ public class ConfigurationBusiness {
         message.append(user.getEmail());
         message.append(". List of undesired mail domains: ");
         for (String s : Server.getInstance().getUndesiredMailDomains()) {
-            message.append(" ");
-            message.append(s);
+            if (!s.trim().isEmpty()) {
+                message.append(" ");
+                message.append(s);
+            }
         }
         message.append(". ");
         message.append("List of undesired countries: ");
         for (String s : Server.getInstance().getUndesiredCountries()) {
-            message.append(" ");
-            message.append(s);
+            if (!s.trim().isEmpty()) {
+                message.append(" ");
+                message.append(s);
+            }
         }
         message.append(".");
         logger.info(message.toString());
 
         // Check if email domain is undesired
         for (String udm : Server.getInstance().getUndesiredMailDomains()) {
-            if (user.getEmail().endsWith(udm)) {
+            if (!udm.trim().isEmpty() && user.getEmail().endsWith(udm)) {
                 logger.info("Undesired Mail Domain for " + user.getEmail());
                 throw new BusinessException("Error");
             }
@@ -165,7 +169,7 @@ public class ConfigurationBusiness {
         
         // Check if country is undesired
         for (String udc : Server.getInstance().getUndesiredCountries()){
-            if(user.getCountryCode().toString().equals(udc)){
+            if (!udc.trim().isEmpty() && user.getCountryCode().toString().equals(udc)){
                 logger.info("Undesired country for " + user.getEmail());
                 throw new BusinessException("Error");
             }
