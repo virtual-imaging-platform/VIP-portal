@@ -157,7 +157,13 @@ public class ConfigurationBusiness {
 
         // Check if email domain is undesired
         for (String udm : Server.getInstance().getUndesiredMailDomains()) {
-            if (user.getEmail().endsWith(udm)) {
+            String[] useremail = user.getEmail().split("@");
+            if (useremail.length != 2) {
+                logger.info("User Mail address is incorrect : " + user.getEmail());
+                throw new BusinessException("Error");
+            }
+            // Only check against the domain part of the user's email address
+            if (useremail[1].endsWith(udm)) {
                 logger.info("Undesired Mail Domain for " + user.getEmail());
                 throw new BusinessException("Error");
             }
