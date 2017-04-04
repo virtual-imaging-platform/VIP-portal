@@ -74,12 +74,7 @@ import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerException;
 import fr.insalyon.creatis.vip.datamanager.server.DataManagerUtil;
 import fr.insalyon.creatis.vip.datamanager.server.business.DataManagerBusiness;
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 import java.util.logging.Level;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
@@ -538,6 +533,8 @@ public class WorkflowBusiness {
                     workflow.getDescription(),
                     workflow.getStatus().name(),
                     workflow.getEngine());
+
+             checkRunningSimulations(Collections.singletonList(simulation));
 
         } catch (WorkflowsDBDAOException ex) {
             logger.error(ex);

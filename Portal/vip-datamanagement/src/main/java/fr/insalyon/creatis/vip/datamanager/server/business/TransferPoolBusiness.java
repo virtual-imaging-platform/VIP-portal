@@ -351,20 +351,18 @@ public class TransferPoolBusiness {
     /**
      * 
      * @param user
-     * @param localFile
+     * @param localFilePath
      * @param remoteFile
      * @return Operation ID
      * @throws BusinessException 
      */
-    public String uploadFile(User user, String localFile, String remoteFile) 
+    public String uploadFile(User user, String localFilePath, String remoteFile)
             throws BusinessException {
 
         try {
             GRIDAPoolClient poolClient = CoreUtil.getGRIDAPoolClient();
-            String localPath = serverConfiguration.getDataManagerPath()
-                    + "/uploads/" + localFile;
             String remotePath = DataManagerUtil.parseBaseDir(user, remoteFile);
-            return poolClient.uploadFile(localPath, remotePath, user.getEmail());
+            return poolClient.uploadFile(localFilePath, remotePath, user.getEmail());
 
         } catch (DataManagerException ex) {
             logger.error(ex);

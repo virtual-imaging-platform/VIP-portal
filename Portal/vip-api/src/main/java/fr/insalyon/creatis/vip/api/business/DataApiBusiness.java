@@ -33,15 +33,17 @@ package fr.insalyon.creatis.vip.api.business;
 
 import fr.insalyon.creatis.vip.api.CarminProperties;
 import fr.insalyon.creatis.vip.api.rest.model.Path;
+import fr.insalyon.creatis.vip.api.rest.model.*;
 import fr.insalyon.creatis.vip.core.client.bean.*;
 import fr.insalyon.creatis.vip.core.client.view.user.UserLevel;
-import fr.insalyon.creatis.vip.core.server.business.*;
+import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.datamanager.client.bean.*;
 import fr.insalyon.creatis.vip.datamanager.client.bean.Data.Type;
 import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerException;
 import fr.insalyon.creatis.vip.datamanager.server.DataManagerUtil;
 import fr.insalyon.creatis.vip.datamanager.server.business.*;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.input.ReaderInputStream;
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,20 +51,19 @@ import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.text.*;
 import java.util.*;
 import java.util.concurrent.*;
 
-import static fr.insalyon.creatis.vip.core.client.view.util.CountryCode.re;
 import static fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants.*;
 
 
 /**
  * Created by abonnet on 1/18/17.
  *
- * // TODO  : include specific root case
- * // TODO : seperate delete and upload permissions
+ * // TODO : should we move files to the Trash FOlder before deleting ?
  */
 @Service
 public class DataApiBusiness {
@@ -79,8 +80,6 @@ public class DataApiBusiness {
     @Autowired
     private TransferPoolBusiness transferPoolBusiness;
     @Autowired
-    private ConfigurationBusiness configurationBusiness;
-    @Autowired
     private DataManagerBusiness dataManagerBusiness;
 
     private ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(2);
@@ -90,14 +89,14 @@ public class DataApiBusiness {
 
     public boolean doesFileExist(String apiUri) throws ApiException {
         String lfcPath = getLFCPathFromApiUri(apiUri);
-        checkPermission(lfcPath, true);
+        checkReadPermission(lfcPath);
         if (lfcPath.equals(ROOT)) return true;
         return baseDoesFileExist(lfcPath);
     }
 
     public void deletePath(String apiUri) throws ApiException {
         String lfcPath = getLFCPathFromApiUri(apiUri);
-        checkPermission(lfcPath, false);
+        checkPermission(lfcPath, AccessType.DELETE);
         if (!baseDoesFileExist(lfcPath)) {
             logger.error("trying to delete a non-existing file : " + apiUri);
             throw new ApiException("trying to delete a non-existing dile");
@@ -107,7 +106,7 @@ public class DataApiBusiness {
 
     public Path getFileApiPath(String apiUri) throws ApiException {
         String lfcPath = getLFCPathFromApiUri(apiUri);
-        checkPermission(lfcPath, true);
+        checkReadPermission(lfcPath);
         if (lfcPath.equals(ROOT)) {
             return getRootPath();
         }
@@ -139,7 +138,7 @@ public class DataApiBusiness {
 
     public List<Path> listDirectory(String apiUri) throws ApiException {
         String lfcPath = getLFCPathFromApiUri(apiUri);
-        checkPermission(lfcPath, true);
+        checkReadPermission(lfcPath);
         if (lfcPath.equals(ROOT)) {
             return getRootDirectories();
         }
@@ -157,7 +156,7 @@ public class DataApiBusiness {
 
     public String getFileContent(String apiUri) throws ApiException {
         String lfcPath = getLFCPathFromApiUri(apiUri);
-        checkPermission(lfcPath, true);
+        checkReadPermission(lfcPath);
         if (lfcPath.equals(ROOT)) {
             logger.error("cannot download root");
             throw new ApiException("Illegal data API access");
@@ -198,11 +197,48 @@ public class DataApiBusiness {
         return getDownloadContent(downloadOperationId);
     }
 
+    public Path uploadData(UploadData uploadData) throws ApiException {
+        String lfcPath = getLFCPathFromApiUri(uploadData.getUri());
+        java.nio.file.Path javaPath = Paths.get(lfcPath);
+        String parentLfcPath = javaPath.getParent().toString();
+        checkPermission(lfcPath, AccessType.UPLOAD);
+        // check if parent dir exists
+        if (baseDoesFileExist(parentLfcPath)) {
+            logger.error("parent directory of upload does not exist :" + lfcPath);
+            throw new ApiException("Upload Directory doest not exist");
+        }
+        // TODO : support archive upload
+        String uploadDirectory = DataManagerUtil.getUploadRootDirectory(false);
+        logger.debug("LFC path of new upload :" + lfcPath);
+        // TODO : normalize file name
+        String fileName = Paths.get(lfcPath).getFileName().toString();
+        String localPath = uploadDirectory + fileName;
+        logger.debug("storing upload file in :" + localPath);
+        // transform base64 string to a new file
+        writeFileFromBase64(uploadData.getPathContent(), localPath);
+        // transfer it
+        String operationId = baseUploadFile(localPath, parentLfcPath);
+        logger.info("File upload asked. Operation id : " + operationId);
+        // get new path
+        Path newPath = new Path();
+        newPath.setPlatformURI(uploadData.getUri());
+        newPath.setIsDirectory(false);
+        newPath.setMimeType(getMimeType(lfcPath));
+        newPath.setExists(false); // not created yet because asynchronous
+        return newPath;
+    }
+
     // #### PERMISSION STUFF
 
-    private void checkPermission(String lfcPath, boolean isRead) throws ApiException {
+    private enum AccessType {READ, UPLOAD, DELETE}
+
+    private void checkReadPermission(String lfcPath) throws ApiException {
+        checkPermission(lfcPath, AccessType.READ);
+    }
+
+    private void checkPermission(String lfcPath, AccessType accessType) throws ApiException {
         // TODO : look for ".."
-        checkRootPermission(lfcPath, isRead);
+        checkRootPermission(lfcPath, accessType);
         // Root is always filtered so always permited
         if (lfcPath.equals(ROOT)) return;
         // else it all depends of the first directory
@@ -221,17 +257,17 @@ public class DataApiBusiness {
             throw new ApiException("Unexpected API access");
         }
         String groupname = firstDir.substring(0,firstDir.length()-GROUP_APPEND.length());
-        checkGroupPermission(groupname, isRead);
-        if (!isRead) {
+        checkGroupPermission(groupname, accessType);
+        if (accessType == AccessType.DELETE) {
             checkAdditionalDeletePermission(lfcPath);
         }
         // all check passed : all good !
     }
 
-    private void checkGroupPermission(String groupname, boolean isRead) throws ApiException {
+    private void checkGroupPermission(String groupname, AccessType accessType) throws ApiException {
         User user = apiContext.getUser();
         // beginner cant write/delete in groups folder
-        if (!isRead && user.getLevel() == UserLevel.Beginner) {
+        if (accessType != AccessType.READ && user.getLevel() == UserLevel.Beginner) {
             logger.error("beginner user try to upload/delete in a group:" + user.getEmail() +"/" + groupname);
             throw new ApiException("Unauthorized data API access");
         }
@@ -242,14 +278,14 @@ public class DataApiBusiness {
         }
     }
 
-    private void checkRootPermission(String lfcPath, boolean isRead) throws ApiException {
+    private void checkRootPermission(String lfcPath, AccessType accessType) throws ApiException {
         // verify path begins with the root
         if (!lfcPath.startsWith(ROOT)) {
             logger.error("Access to a lfc not starting with the root:" + lfcPath);
             throw new ApiException("Illegal data API access");
         }
         // read always possible
-        if (isRead) return;
+        if (accessType == AccessType.READ) return;
         // else it cannot be THE root nor a direct subdirectory of root
         if (lfcPath.equals(ROOT) ||
                 lfcPath.lastIndexOf('/') == ROOT.length()) {
@@ -339,9 +375,22 @@ public class DataApiBusiness {
         try (OutputStream outputStream = encoder.wrap(baos)) {
             Files.copy(file.toPath(), outputStream);
         } catch (IOException e) {
-            e.printStackTrace();
+            e.printStackTrace(); // TODO : improve that
         }
         return baos.toString();
+    }
+
+    // #### UPLOAD STUFF
+
+    private void writeFileFromBase64(String base64Content, String localFilePath) throws ApiException {
+        Base64.Decoder decoder = Base64.getDecoder();
+        StringReader stringReader = new StringReader(base64Content);
+        InputStream inputStream = new ReaderInputStream(stringReader, StandardCharsets.UTF_8);
+        try (InputStream base64InputStream = decoder.wrap(inputStream)) {
+            Files.copy(base64InputStream, Paths.get(localFilePath));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     // #### ROOT folder STUFF
@@ -474,6 +523,15 @@ public class DataApiBusiness {
         } catch (BusinessException e) {
             logger.error("Error downloading lfc file :" + lfcPath);
             throw new ApiException("Error download LFC file");
+        }
+    }
+
+    private String baseUploadFile(String localPath, String lfcPath) throws ApiException {
+        try {
+            return transferPoolBusiness.uploadFile(apiContext.getUser(), localPath, lfcPath);
+        } catch (BusinessException e) {
+            logger.error("Error uploading lfc file : " + lfcPath);
+            throw new ApiException("Error uploading a flc fiel");
         }
     }
 

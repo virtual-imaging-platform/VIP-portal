@@ -34,7 +34,7 @@ package fr.insalyon.creatis.vip.api.rest.controller.data;
 import fr.insalyon.creatis.vip.api.business.*;
 import fr.insalyon.creatis.vip.api.rest.RestApiBusiness;
 import fr.insalyon.creatis.vip.api.rest.controller.processing.ExecutionControler;
-import fr.insalyon.creatis.vip.api.rest.model.Path;
+import fr.insalyon.creatis.vip.api.rest.model.*;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.datamanager.client.bean.Data;
 import fr.insalyon.creatis.vip.datamanager.server.business.LFCBusiness;
@@ -110,5 +110,12 @@ public class DataController {
         restApiBusiness.getApiContext(httpServletRequest, true);
         // business call
         return dataApiBusiness.getFileContent(uri);
+    }
+
+    @RequestMapping(path="upload", method = RequestMethod.PUT)
+    public Path uploadPath(@RequestBody UploadData uploadData) throws ApiException {
+        ApiUtils.methodInvocationLog("uploadPath", uploadData.getUri());
+        restApiBusiness.getApiContext(httpServletRequest, true);
+        return dataApiBusiness.uploadData(uploadData);
     }
 }

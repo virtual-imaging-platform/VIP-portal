@@ -370,16 +370,16 @@ public class DataManagerServiceImpl extends AbstractRemoteServiceServlet impleme
                 + "/uploads/" + localFile);
         f.renameTo(new File(Server.getInstance().getDataManagerPath()
                 + "/uploads/" + remoteName));
-        uploadFile(remoteName, remoteDir);
+        uploadFile(f.getAbsolutePath(), remoteDir);
     }
 
     @Override
-    public void uploadFile(String localFile, String remoteFile) throws DataManagerException {
+    public void uploadFile(String localFilePath, String remoteFile) throws DataManagerException {
 
         try {
-            trace(logger, "Uploading file '" + localFile + "' to '" + remoteFile + "'.");
+            trace(logger, "Uploading file '" + localFilePath + "' to '" + remoteFile + "'.");
             User user = getSessionUser();
-            transferPoolBusiness.uploadFile(user, localFile, remoteFile);
+            transferPoolBusiness.uploadFile(user, localFilePath, remoteFile);
 
         } catch (CoreException ex) {
             throw new DataManagerException(ex);
