@@ -81,6 +81,11 @@ public class SpringWebConfig extends WebMvcConfigurerAdapter {
     }
 
     @Bean
+    @Override
+    public void addCorsMappings(CorsRegistry registry) {
+        registry.addMapping("/**");
+    }
+
     public WorkflowBusiness workflowBusiness() {
         return new WorkflowBusiness();
     }
