@@ -45,6 +45,8 @@ import java.net.URLDecoder;
 
 /**
  * Created by abonnet on 7/28/16.
+ *
+ * TODO :  make apicontext dynamic as in datacontroller
  */
 @RestController
 @RequestMapping("pipelines")

@@ -69,6 +69,7 @@ public class RestApiBusiness {
         }
         // configure VIP if it has not been done today
         vipConfigurer.configureIfNecessary();
+        // populate the request scoped ApiContext
         if (apiContext != null) {
             apiContext.init(request, null, vipUser);
         }

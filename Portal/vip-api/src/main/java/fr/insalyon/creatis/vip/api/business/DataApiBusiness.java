@@ -63,7 +63,7 @@ import static fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants.*;
 /**
  * Created by abonnet on 1/18/17.
  *
- * // TODO : should we move files to the Trash FOlder before deleting ?
+ * // TODO : should we move files to the Trash Folder before deleting ?
  */
 @Service
 public class DataApiBusiness {
@@ -90,8 +90,7 @@ public class DataApiBusiness {
     public boolean doesFileExist(String apiUri) throws ApiException {
         String lfcPath = getLFCPathFromApiUri(apiUri);
         checkReadPermission(lfcPath);
-        if (lfcPath.equals(ROOT)) return true;
-        return baseDoesFileExist(lfcPath);
+        return lfcPath.equals(ROOT) || baseDoesFileExist(lfcPath);
     }
 
     public void deletePath(String apiUri) throws ApiException {
@@ -118,7 +117,7 @@ public class DataApiBusiness {
         }
         path.setExists(true);
         List<Data> fileData = baseGetFileData(lfcPath);
-        if (fileData.size() == 1 && fileData.get(0).getName().startsWith("/")) {
+        if (doesLFCDataCorrespondToAFile(fileData)) {
             // this is a file, not a directory
             Data fileInfo = fileData.get(0);
             path.setIsDirectory(false);
@@ -161,8 +160,17 @@ public class DataApiBusiness {
             logger.error("cannot download root");
             throw new ApiException("Illegal data API access");
         }
-        // TODO : verify it's a file. Or check what it does on a folder
-        // TODO : check size
+        List<Data> fileData = baseGetFileData(lfcPath);
+        if (!doesLFCDataCorrespondToAFile(fileData)) {
+            // it works on a directory and return a zip, but we cant check the download size
+            logger.error("Trying to download a directory : " + lfcPath);
+            throw new ApiException("Illegal data API access");
+        }
+        Long maxSize = env.getProperty(CarminProperties.API_DATA_TRANSFERT_MAX_SIZE, Long.class);
+        if (fileData.get(0).getLength() > maxSize) {
+            logger.error("Trying to download a file too big : " + lfcPath);
+            throw new ApiException("Illegal data API access");
+        }
         String downloadOperationId = baseDownloadFile(lfcPath);
         Callable<Boolean> isDownloadOverCall = () -> isDownloadOver(downloadOperationId);
 
@@ -198,19 +206,20 @@ public class DataApiBusiness {
     }
 
     public Path uploadData(UploadData uploadData) throws ApiException {
+        // TODO : check upload size ?
         String lfcPath = getLFCPathFromApiUri(uploadData.getUri());
         java.nio.file.Path javaPath = Paths.get(lfcPath);
         String parentLfcPath = javaPath.getParent().toString();
         checkPermission(lfcPath, AccessType.UPLOAD);
         // check if parent dir exists
-        if (baseDoesFileExist(parentLfcPath)) {
+        if (!baseDoesFileExist(parentLfcPath)) {
             logger.error("parent directory of upload does not exist :" + lfcPath);
             throw new ApiException("Upload Directory doest not exist");
         }
         // TODO : support archive upload
         String uploadDirectory = DataManagerUtil.getUploadRootDirectory(false);
         logger.debug("LFC path of new upload :" + lfcPath);
-        // TODO : normalize file name
+        // TODO : normalize file name to avoid weird characters
         String fileName = Paths.get(lfcPath).getFileName().toString();
         String localPath = uploadDirectory + fileName;
         logger.debug("storing upload file in :" + localPath);
@@ -228,6 +237,30 @@ public class DataApiBusiness {
         return newPath;
     }
 
+    public Path mkdir(String uri) throws ApiException {
+        String lfcPath = getLFCPathFromApiUri(uri);
+        java.nio.file.Path javaPath = Paths.get(lfcPath);
+        String parentLfcPath = javaPath.getParent().toString();
+        checkPermission(lfcPath, AccessType.UPLOAD);
+        // check if parent dir exists
+        if (!baseDoesFileExist(parentLfcPath)) {
+            logger.error("parent directory of upload does not exist :" + lfcPath);
+            throw new ApiException("Upload Directory doest not exist");
+        }
+        if (baseDoesFileExist(lfcPath)) {
+            logger.error("Trying do create an existing directory :" + lfcPath);
+            throw new ApiException("Upload error");
+        }
+        baseMkdir(parentLfcPath, javaPath.getFileName().toString());
+        Path newPath = new Path();
+        newPath.setPlatformURI(uri);
+        newPath.setIsDirectory(true);
+        newPath.setMimeType(env.getProperty(CarminProperties.API_DIRECTORY_MIME_TYPE));
+        newPath.setSize(0L);
+        newPath.setExists(true);
+        return newPath;
+    }
+
     // #### PERMISSION STUFF
 
     private enum AccessType {READ, UPLOAD, DELETE}
@@ -237,7 +270,6 @@ public class DataApiBusiness {
     }
 
     private void checkPermission(String lfcPath, AccessType accessType) throws ApiException {
-        // TODO : look for ".."
         checkRootPermission(lfcPath, accessType);
         // Root is always filtered so always permited
         if (lfcPath.equals(ROOT)) return;
@@ -350,7 +382,7 @@ public class DataApiBusiness {
         switch (operation.getStatus()) {
             case Queued:
             case Running:
-                logger.info("status of operation {" + operationId + "} : "  + operation.getStatus());
+                logger.debug("status of operation {" + operationId + "} : "  + operation.getStatus());
                 return false;
             case Done:
                 return true;
@@ -375,7 +407,8 @@ public class DataApiBusiness {
         try (OutputStream outputStream = encoder.wrap(baos)) {
             Files.copy(file.toPath(), outputStream);
         } catch (IOException e) {
-            e.printStackTrace(); // TODO : improve that
+            logger.error("Error encoding download file for operation :" + operationId , e);
+            throw new ApiException("Download operation failed");
         }
         return baos.toString();
     }
@@ -437,13 +470,19 @@ public class DataApiBusiness {
 
     // #### DATA UTILS
 
+    private boolean doesLFCDataCorrespondToAFile(List<Data> lfcData) {
+        return lfcData.size() == 1 && lfcData.get(0).getName().startsWith("/");
+    }
+
     private String getLFCPathFromApiUri(String apiUri) throws ApiException {
         String uriPrefix = env.getRequiredProperty(CarminProperties.API_URI_PREFIX);
         if (!apiUri.startsWith(uriPrefix)) {
             logger.error("Wrong uri prefix. Should start with :" + uriPrefix);
             throw new ApiException("Wrong URI scheme");
         }
-        return apiUri.substring(uriPrefix.length());
+        String notNormalizedPath = apiUri.substring(uriPrefix.length());
+        // needed to remove ".." and potential security leeks
+        return Paths.get(notNormalizedPath).normalize().toString();
     }
 
     private Path buildPathFromLfcData(String rootApiUri, Data lfcData) {
@@ -479,10 +518,6 @@ public class DataApiBusiness {
     }
 
     private String getMimeType(String lfcPath) {
-        /* MimetypesFileTypeMap solution. Need activation.jar
-        String fileName = Paths.get(lfcPath).getFileName().toString();
-        return new MimetypesFileTypeMap().getContentType(fileName);
-        */
         try {
             String contentType = Files.probeContentType(Paths.get(lfcPath));
             return contentType == null ?
@@ -509,7 +544,6 @@ public class DataApiBusiness {
     private List<Data> baseGetFileData(String lfcPath) throws ApiException {
         try {
             return lfcBusiness.listDir(apiContext.getUser(), lfcPath, true);
-            // TODO always refresh ??
         } catch (BusinessException e) {
             logger.error("Error getting lfc file information", e);
             throw new ApiException("Error getting lfc information");
@@ -559,6 +593,15 @@ public class DataApiBusiness {
         } catch (BusinessException e) {
             logger.error("Error deleting lfc file", e);
             throw new ApiException("Error deleting lfc file");
+        }
+    }
+
+    private void baseMkdir(String lfcPath, String dirName) throws ApiException {
+        try {
+            lfcBusiness.createDir(apiContext.getUser(), lfcPath, dirName);
+        } catch (BusinessException e) {
+            logger.error("Error creating directory :" + lfcPath, e);
+            throw new ApiException("Error creating LFC directory");
         }
     }
 

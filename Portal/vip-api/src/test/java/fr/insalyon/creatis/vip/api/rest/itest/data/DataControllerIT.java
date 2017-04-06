@@ -105,7 +105,7 @@ public class DataControllerIT extends BaseVIPSpringIT {
         String lfcPath = getAbsolutePath(user2Dir);
         String uri = TEST_API_URI_PREFIX + lfcPath;
         mockMvc.perform(
-                get("/rest/path/listDirectory").param("uri", uri).with(baseUser2()))
+                get("/rest/path/directory").param("uri", uri).with(baseUser2()))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(RestTestUtils.JSON_CONTENT_TYPE_UTF8))
@@ -122,7 +122,7 @@ public class DataControllerIT extends BaseVIPSpringIT {
         String lfcPath = getAbsolutePath(testDir1);
         String uri = TEST_API_URI_PREFIX + lfcPath;
         mockMvc.perform(
-                get("/rest/path/listDirectory").param("uri", uri).with(baseUser2()))
+                get("/rest/path/directory").param("uri", uri).with(baseUser2()))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(RestTestUtils.JSON_CONTENT_TYPE_UTF8))
@@ -151,8 +151,28 @@ public class DataControllerIT extends BaseVIPSpringIT {
         when (transferPoolBusiness.getDownloadPoolOperation(operationId))
                 .thenReturn(runningPoolOperation, runningPoolOperation, donePoolOperation);
         mockMvc.perform(
-                get("/rest/path/download").param("uri", uri).with(baseUser1()))
+                get("/rest/path/content").param("uri", uri).with(baseUser1()))
                 .andDo(print())
                 .andExpect(status().isOk());
+    }
+
+    @Test
+    public void shouldHaveDownloadTimeout() throws Exception {
+        configureDataFS();
+        String lfcPath = getAbsolutePath(testFile1);
+        String uri = TEST_API_URI_PREFIX + lfcPath;
+        String operationId = "testOpId";
+        String testFile = Paths.get(ClassLoader.getSystemResource("testFile.txt").toURI())
+                .toAbsolutePath().toString();
+        PoolOperation runningPoolOperation = new PoolOperation(operationId,
+                null, null, null, null, Type.Download, Status.Running, baseUser1.getEmail(), 0);
+        when (transferPoolBusiness.downloadFile(baseUser1, lfcPath))
+                .thenReturn(operationId);
+        when (transferPoolBusiness.getDownloadPoolOperation(operationId))
+                .thenReturn(runningPoolOperation, runningPoolOperation);
+        mockMvc.perform(
+                get("/rest/path/content").param("uri", uri).with(baseUser1()))
+                .andDo(print())
+                .andExpect(status().isBadRequest());
     }
 }

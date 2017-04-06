@@ -40,6 +40,7 @@ import fr.insalyon.creatis.vip.datamanager.client.bean.Data;
 import fr.insalyon.creatis.vip.datamanager.server.business.LFCBusiness;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -70,7 +71,7 @@ public class DataController {
     @RequestMapping(params = "uri")
     public Path getPath(@RequestParam String uri) throws ApiException {
         // common stuff
-        ApiUtils.methodInvocationLog("getPath", uri);
+        ApiUtils.methodInvocationLog("getPath", getCurrentUserEmail(), uri);
         restApiBusiness.getApiContext(httpServletRequest, true);
         // business call
         return dataApiBusiness.getFileApiPath(uri);
@@ -79,7 +80,7 @@ public class DataController {
     @RequestMapping(path = "exists", params = "uri")
     public Boolean doesPathExists(@RequestParam String uri) throws ApiException {
         // common stuff
-        ApiUtils.methodInvocationLog("doesPathExists", uri);
+        ApiUtils.methodInvocationLog("doesPathExists", getCurrentUserEmail(), uri);
         restApiBusiness.getApiContext(httpServletRequest, true);
         // business call
         return dataApiBusiness.doesFileExist(uri);
@@ -88,34 +89,47 @@ public class DataController {
     @RequestMapping(method = RequestMethod.DELETE, params = "uri")
     public void deletePath(@RequestParam String uri) throws ApiException {
         // common stuff
-        ApiUtils.methodInvocationLog("deletePath", uri);
+        ApiUtils.methodInvocationLog("deletePath", getCurrentUserEmail(), uri);
         restApiBusiness.getApiContext(httpServletRequest, true);
         // business call
         dataApiBusiness.deletePath(uri);
     }
 
-    @RequestMapping(path="listDirectory", params = "uri")
+    @RequestMapping(path="directory", params = "uri")
     public List<Path> listDirectory(@RequestParam String uri) throws ApiException {
         // common stuff
-        ApiUtils.methodInvocationLog("listDirectory", uri);
+        ApiUtils.methodInvocationLog("listDirectory", getCurrentUserEmail(), uri);
         restApiBusiness.getApiContext(httpServletRequest, true);
         // business call
         return  dataApiBusiness.listDirectory(uri);
     }
 
-    @RequestMapping(path="download", params="uri")
+    @RequestMapping(path="directory", method = RequestMethod.POST, params="uri")
+    public Path mkdir(@RequestParam String uri) throws ApiException {
+        // common stuff
+        ApiUtils.methodInvocationLog("mkdir", getCurrentUserEmail(), uri);
+        restApiBusiness.getApiContext(httpServletRequest, true);
+        // business call
+        return dataApiBusiness.mkdir(uri);
+    }
+
+    @RequestMapping(path="content", params="uri")
     public String downloadFile(@RequestParam String uri) throws ApiException {
         // common stuff
-        ApiUtils.methodInvocationLog("downloadFile", uri);
+        ApiUtils.methodInvocationLog("downloadFile", getCurrentUserEmail(), uri);
         restApiBusiness.getApiContext(httpServletRequest, true);
         // business call
         return dataApiBusiness.getFileContent(uri);
     }
 
-    @RequestMapping(path="upload", method = RequestMethod.PUT)
+    @RequestMapping(path="content", method = RequestMethod.PUT)
     public Path uploadPath(@RequestBody UploadData uploadData) throws ApiException {
-        ApiUtils.methodInvocationLog("uploadPath", uploadData.getUri());
+        ApiUtils.methodInvocationLog("uploadPath", getCurrentUserEmail(), uploadData.getUri());
         restApiBusiness.getApiContext(httpServletRequest, true);
         return dataApiBusiness.uploadData(uploadData);
+    }
+
+    private String getCurrentUserEmail() {
+        return SecurityContextHolder.getContext().getAuthentication().getName();
     }
 }

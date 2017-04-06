@@ -90,7 +90,8 @@ import static fr.insalyon.creatis.vip.api.CarminProperties.*;
         API_DEFAULT_MIME_TYPE + "=" + TEST_DEFAULT_MIMETYPE,
         API_DIRECTORY_MIME_TYPE + "=" + TEST_DIR_MIMETYPE,
         API_DOWNLOAD_TIMEOUT_IN_SECONDS + "=" + TEST_DATA_DOWNLOAD_TIMEOUT,
-        API_DOWNLOAD_RETRY_IN_SECONDS + "=" + Test_DATA_DOWNLOAD_RETRY
+        API_DOWNLOAD_RETRY_IN_SECONDS + "=" + Test_DATA_DOWNLOAD_RETRY,
+        API_DATA_TRANSFERT_MAX_SIZE + "=" + TEST_DATA_MAX_SIZE
 })
 abstract public class BaseVIPSpringIT {
 
