@@ -187,13 +187,13 @@ PropertiesConfiguration config;
             workflowsPort = config.getInt(CoreConstants.LAB_SIMULATION_DB_PORT, 1527);
             workflowsExecuctionMode = config.getString(CoreConstants.LAB_SIMULATION_EXEC_MODE, "ws");
 
-            apacheHost = config.getString("apache.host", apacheHost);
-            apacheSSLPort = config.getInt("apache.ssl.port", apacheSSLPort);
+            apacheHost = config.getString(CoreConstants.LAB_APACHE_HOST, apacheHost);
+            apacheSSLPort = config.getInt(CoreConstants.LAB_APACHE_SSL_PORT, apacheSSLPort);
 
             casURL = config.getString(CoreConstants.LAB_CAS_URL, "https://ng-cas.maatg.fr/pandora-gateway-sl-cas");
 
             sshPublicKey = config.getString(CoreConstants.SSH_PUBLIC_KEY, "ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAuNjIXlgjuBR+WfjGtkieecZfe/ZL6EyNJTbL14bn3/Soof0kFSshDJvFgSH1hNwMMU1hynLbzcEbLTyVMoGQKfQkq7mJPajy9g8878WCKxCRbXv3W1/HT9iab/qqt2dcRYnDEruHwgyELBhQuMAe2W2/mgjd7Y5PxE01bwDcenYl3cU3iJk1sAOHao6P+3xU6Ov+TD8K9aC0LzZpM+rzAmS9HOZ9nvzERExd7k4TUpyffQV9Dpb5jEnEViF3VHqplB8AbWDdcJbiVkUBUe4hQb7nmWP0kHl1+v5SQJ1B4mWCZ+35Rc/9b1GsmPnXg3qqhjeKbrim/NbcUwKr9NPWjQ== vip-services@kingkong.grid.creatis.insa-lyon.fr");
-            //
+
             List<String> appletGateLabCl = new ArrayList<String>();
             appletGateLabCl.add("GateLab");
             appletGateLabClasses = config.getList(CoreConstants.APPLET_GATELAB_CLASSES, appletGateLabCl);
@@ -265,8 +265,8 @@ PropertiesConfiguration config;
             config.setProperty(CoreConstants.LAB_SIMULATION_DB_HOST, workflowsHost);
             config.setProperty(CoreConstants.LAB_SIMULATION_DB_PORT, workflowsPort);
             config.setProperty(CoreConstants.LAB_SIMULATION_EXEC_MODE, workflowsExecuctionMode);
-            config.setProperty("apache.host", apacheHost);
-            config.setProperty("apache.ssl.port", apacheSSLPort);
+            config.setProperty(CoreConstants.LAB_APACHE_HOST, apacheHost);
+            config.setProperty(CoreConstants.LAB_APACHE_SSL_PORT, apacheSSLPort);
             config.setProperty(CoreConstants.LAB_CAS_URL, casURL);
             config.setProperty(CoreConstants.SSH_PUBLIC_KEY, sshPublicKey);
             config.setProperty(CoreConstants.TreeQuery, queryTree);
@@ -310,11 +310,11 @@ PropertiesConfiguration config;
     }
     
     public String getServerProxy(String vo){
-    return setPath(configurationFolder + PROXIES_DIR+vo)+ "/x509up_server";
+        return getServerProxyFolder(vo) + "x509up_server";
     }
     
     public String getServerProxyFolder(String vo){
-    return setPath(configurationFolder + PROXIES_DIR+vo+"/");
+        return setPath(configurationFolder + PROXIES_DIR + vo + "/");
     }
 
     public String getMyProxyHost() {
@@ -520,7 +520,6 @@ PropertiesConfiguration config;
     }
 
     public void setMaxPlatformRunningSimulations(int maxPlatformRunningSimulations) throws ConfigurationException {
-        
         this.maxPlatformRunningSimulations = maxPlatformRunningSimulations;
         config.setProperty(CoreConstants.LAB_SIMULATION_PLATFORM_MAX, maxPlatformRunningSimulations);
         config.save();
