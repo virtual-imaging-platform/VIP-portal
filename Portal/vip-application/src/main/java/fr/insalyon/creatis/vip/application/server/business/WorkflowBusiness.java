@@ -534,8 +534,6 @@ public class WorkflowBusiness {
                     workflow.getStatus().name(),
                     workflow.getEngine());
 
-             checkRunningSimulations(Collections.singletonList(simulation));
-
         } catch (WorkflowsDBDAOException ex) {
             logger.error(ex);
             throw new BusinessException(ex);
