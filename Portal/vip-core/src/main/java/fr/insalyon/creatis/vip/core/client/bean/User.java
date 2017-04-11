@@ -35,10 +35,9 @@ import com.google.gwt.user.client.rpc.IsSerializable;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants.GROUP_ROLE;
 import fr.insalyon.creatis.vip.core.client.view.user.UserLevel;
 import fr.insalyon.creatis.vip.core.client.view.util.CountryCode;
+
 import java.sql.Timestamp;
 import java.util.*;
-
-import static fr.insalyon.creatis.vip.core.client.view.util.CountryCode.gr;
 
 
 /**

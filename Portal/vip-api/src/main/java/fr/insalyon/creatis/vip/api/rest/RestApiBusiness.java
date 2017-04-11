@@ -73,6 +73,6 @@ public class RestApiBusiness {
         if (apiContext != null) {
             apiContext.init(request, null, vipUser);
         }
-        return new ApiContext(request, null, vipUser);
+        return new ApiContext(request, null, vipUser); // TODO is it necessary to always create a new instance ?
     }
 }
