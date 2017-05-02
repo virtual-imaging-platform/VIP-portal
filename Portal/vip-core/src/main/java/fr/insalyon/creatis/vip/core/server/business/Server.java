@@ -46,7 +46,8 @@ import org.opensaml.saml2.core.Issuer;
  * @author Rafael Ferreira da Silva
  */
 public class Server {
-PropertiesConfiguration config;
+    // Configuration File
+    PropertiesConfiguration config;
     // Constants
     private static final Logger logger = Logger.getLogger(Server.class);
     private static Server instance;
@@ -225,7 +226,7 @@ PropertiesConfiguration config;
             applicationImporterFileRepository = config.getString(CoreConstants.APPLICATION_FILES_REPOSITORY, "/tmp/boutiques-cache");
             deleteFilesAfterUpload = config.getString(CoreConstants.APP_DELETE_FILES_AFTER_UPLOAD, "yes");
             
-           //Publication
+            //Publication
             numberMonthsToTestLastPublicationUpdates=config.getInt(CoreConstants.PUB_MONTHS_UPDATES, 6);
 
             config.setProperty(CoreConstants.LAB_DB_HOST, databaseServerHost);
