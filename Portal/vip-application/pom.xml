@@ -131,6 +131,30 @@ knowledge of the CeCILL-B license and that you accept its terms.
         </dependency>
 
         <dependency>
+            <groupId>org.jivesoftware</groupId>
+            <artifactId>smack</artifactId>
+            <version>3.2.2</version>
+        </dependency>
+
+        <dependency>
+            <groupId>fr.insalyon.creatis.shiwapool</groupId>
+            <artifactId>shiwa-desktop-gui</artifactId>
+            <version>1.5.1</version>
+        </dependency>
+
+        <dependency>
+            <groupId>fr.insalyon.creatis.shiwapool</groupId>
+            <artifactId>shiwa-desktop-data</artifactId>
+            <version>1.5.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>fr.insalyon.creatis.shiwapool</groupId>
+            <artifactId>shiwa-pool-common</artifactId>
+            <version>0.9</version>
+        </dependency>
+
+        <dependency>
             <groupId>fr.insalyon.creatis.shiwapool</groupId>
             <artifactId>shiwa-pool-client</artifactId>
             <version>0.9</version>
