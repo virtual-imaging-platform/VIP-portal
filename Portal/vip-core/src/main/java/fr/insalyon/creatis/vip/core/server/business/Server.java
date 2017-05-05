@@ -310,11 +310,11 @@ public class Server {
         return serverProxy;
     }
     
-    public String getServerProxy(String vo){
+    public String getServerProxy(String vo) {
         return getServerProxyFolder(vo) + "x509up_server";
     }
     
-    public String getServerProxyFolder(String vo){
+    public String getServerProxyFolder(String vo) {
         return setPath(configurationFolder + PROXIES_DIR + vo + "/");
     }
 
