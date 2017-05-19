@@ -113,7 +113,11 @@ BOUTIQUES_COMMAND_LINE='$tool.getCommandLine()'
 #foreach($outputFile in $tool.getOutputFiles())
 ## Replace command-line keys
 #if($outputFile.getCommandLineKey())
-#set($newValue="""$outputFile.getCommandLineFlag() $$outputFile.getId().toUpperCase()""")
+	#if($outputFile.getCommandLineFlag() && $outputFile.getCommandLineFlag() != "")
+		#set($newValue="""$outputFile.getCommandLineFlag() $$outputFile.getId().toUpperCase()""")
+	#else
+		#set($newValue="""$$outputFile.getId().toUpperCase()""")
+	#end
 BOUTIQUES_COMMAND_LINE=$${ob}BOUTIQUES_COMMAND_LINE//'$outputFile.getCommandLineKey()'/$newValue}
 #end
 #end 
@@ -125,12 +129,20 @@ then
   # Optional input is active.
   #end
   #if($input.getType() != "Flag")
-    #set($newValue="""$input.getCommandLineFlag() $$input.getId().toUpperCase()""")
+	#if($input.getCommandLineFlag() && $input.getCommandLineFlag() != "")
+		#set($newValue="""$input.getCommandLineFlag() $$input.getId().toUpperCase()""")
+	#else
+		#set($newValue="""$$input.getId().toUpperCase()""")
+	#end
     #if($input.getType() == "File" && $input.isOptional())
   # Optional input is active and it is a file. The file needs to be downloaded (optional files are not handled by GASW).
   downloadLFN $$input.getId().toUpperCase()
   LOCAL_FILE_NAME=`basename $$input.getId().toUpperCase()`
-  BOUTIQUES_COMMAND_LINE=$${ob}BOUTIQUES_COMMAND_LINE//'$input.getCommandLineKey()'/"$input.getCommandLineFlag() ${LOCAL_FILE_NAME}"}
+		#if($input.getCommandLineFlag() && $input.getCommandLineFlag() != "")
+			BOUTIQUES_COMMAND_LINE=$${ob}BOUTIQUES_COMMAND_LINE//'$input.getCommandLineKey()'/"$input.getCommandLineFlag() ${LOCAL_FILE_NAME}"}
+		#else
+			BOUTIQUES_COMMAND_LINE=$${ob}BOUTIQUES_COMMAND_LINE//'$input.getCommandLineKey()'/"${LOCAL_FILE_NAME}"}
+		#end
     #else
   BOUTIQUES_COMMAND_LINE=$${ob}BOUTIQUES_COMMAND_LINE//'$input.getCommandLineKey()'/$newValue}
     #end
