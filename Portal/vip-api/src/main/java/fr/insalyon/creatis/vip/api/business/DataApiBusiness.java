@@ -88,14 +88,12 @@ public class DataApiBusiness {
     }
 
     public boolean doesFileExist(String apiUri) throws ApiException {
-        String lfcPath = getLFCPathFromApiUri(apiUri);
-        checkReadPermission(lfcPath);
+        String lfcPath = checkReadPermission(apiUri);
         return lfcPath.equals(ROOT) || baseDoesFileExist(lfcPath);
     }
 
     public void deletePath(String apiUri) throws ApiException {
-        String lfcPath = getLFCPathFromApiUri(apiUri);
-        checkPermission(lfcPath, AccessType.DELETE);
+        String lfcPath = checkPermission(apiUri, AccessType.DELETE);
         if (!baseDoesFileExist(lfcPath)) {
             logger.error("trying to delete a non-existing file : " + apiUri);
             throw new ApiException("trying to delete a non-existing dile");
@@ -104,8 +102,7 @@ public class DataApiBusiness {
     }
 
     public Path getFileApiPath(String apiUri) throws ApiException {
-        String lfcPath = getLFCPathFromApiUri(apiUri);
-        checkReadPermission(lfcPath);
+        String lfcPath = checkReadPermission(apiUri);
         if (lfcPath.equals(ROOT)) {
             return getRootPath();
         }
@@ -136,8 +133,7 @@ public class DataApiBusiness {
     }
 
     public List<Path> listDirectory(String apiUri) throws ApiException {
-        String lfcPath = getLFCPathFromApiUri(apiUri);
-        checkReadPermission(lfcPath);
+        String lfcPath = checkReadPermission(apiUri);
         if (lfcPath.equals(ROOT)) {
             return getRootDirectories();
         }
@@ -154,8 +150,7 @@ public class DataApiBusiness {
     }
 
     public String getFileContent(String apiUri) throws ApiException {
-        String lfcPath = getLFCPathFromApiUri(apiUri);
-        checkReadPermission(lfcPath);
+        String lfcPath = checkReadPermission(apiUri);
         if (lfcPath.equals(ROOT)) {
             logger.error("cannot download root");
             throw new ApiException("Illegal data API access");
@@ -207,10 +202,9 @@ public class DataApiBusiness {
 
     public Path uploadData(UploadData uploadData) throws ApiException {
         // TODO : check upload size ?
-        String lfcPath = getLFCPathFromApiUri(uploadData.getUri());
+        String lfcPath = checkPermission(uploadData.getUri(), AccessType.UPLOAD);
         java.nio.file.Path javaPath = Paths.get(lfcPath);
         String parentLfcPath = javaPath.getParent().toString();
-        checkPermission(lfcPath, AccessType.UPLOAD);
         // check if parent dir exists
         if (!baseDoesFileExist(parentLfcPath)) {
             logger.error("parent directory of upload does not exist :" + lfcPath);
@@ -237,11 +231,11 @@ public class DataApiBusiness {
         return newPath;
     }
 
-    public Path mkdir(String uri) throws ApiException {
-        String lfcPath = getLFCPathFromApiUri(uri);
+    public Path mkdir(String apiUri) throws ApiException {
+        String lfcPath = checkPermission(apiUri, AccessType.UPLOAD);
         java.nio.file.Path javaPath = Paths.get(lfcPath);
         String parentLfcPath = javaPath.getParent().toString();
-        checkPermission(lfcPath, AccessType.UPLOAD);
+
         // check if parent dir exists
         if (!baseDoesFileExist(parentLfcPath)) {
             logger.error("parent directory of upload does not exist :" + lfcPath);
@@ -253,7 +247,7 @@ public class DataApiBusiness {
         }
         baseMkdir(parentLfcPath, javaPath.getFileName().toString());
         Path newPath = new Path();
-        newPath.setPlatformURI(uri);
+        newPath.setPlatformURI(apiUri);
         newPath.setIsDirectory(true);
         newPath.setMimeType(env.getProperty(CarminProperties.API_DIRECTORY_MIME_TYPE));
         newPath.setSize(0L);
@@ -265,19 +259,20 @@ public class DataApiBusiness {
 
     private enum AccessType {READ, UPLOAD, DELETE}
 
-    private void checkReadPermission(String lfcPath) throws ApiException {
-        checkPermission(lfcPath, AccessType.READ);
+    private String checkReadPermission(String apiUri) throws ApiException {
+        return checkPermission(apiUri, AccessType.READ);
     }
 
-    private void checkPermission(String lfcPath, AccessType accessType) throws ApiException {
+    private String checkPermission(String apiUri, AccessType accessType) throws ApiException {
+        String lfcPath = getLFCPathFromApiUri(apiUri);
         checkRootPermission(lfcPath, accessType);
         // Root is always filtered so always permited
-        if (lfcPath.equals(ROOT)) return;
+        if (lfcPath.equals(ROOT)) return lfcPath;
         // else it all depends of the first directory
         String firstDir = getFirstDirectoryName(lfcPath);
         // always can access its home and its trash
-        if (firstDir.equals(USERS_HOME)) return;
-        if (firstDir.equals(TRASH_HOME)) return;
+        if (firstDir.equals(USERS_HOME)) return lfcPath;
+        if (firstDir.equals(TRASH_HOME)) return lfcPath;
         // currently no admin access is possible via the api for security reasons
         if (firstDir.equals(USERS_FOLDER) || firstDir.equals(BIOMED_HOME)) {
             logger.error("Trying to access admin folders from api");
@@ -294,6 +289,7 @@ public class DataApiBusiness {
             checkAdditionalDeletePermission(lfcPath);
         }
         // all check passed : all good !
+        return lfcPath;
     }
 
     private void checkGroupPermission(String groupname, AccessType accessType) throws ApiException {
