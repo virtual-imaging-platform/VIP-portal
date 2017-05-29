@@ -125,4 +125,9 @@ public class SpringWebConfig extends WebMvcConfigurerAdapter {
     public DataManagerBusiness dataManagerBusiness() {
         return new DataManagerBusiness();
     }
+
+    @Bean
+    public LFCPermissionBusiness lfcPermissionBusiness() {
+        return new LFCPermissionBusiness();
+    }
 }

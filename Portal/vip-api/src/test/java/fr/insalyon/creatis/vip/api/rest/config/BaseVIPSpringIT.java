@@ -57,6 +57,7 @@ import java.nio.charset.StandardCharsets;
 
 import static fr.insalyon.creatis.vip.api.data.CarminAPITestConstants.*;
 import static fr.insalyon.creatis.vip.api.CarminProperties.*;
+import static fr.insalyon.creatis.vip.core.client.view.util.CountryCode.re;
 
 /**
  * Created by abonnet on 7/28/16.
@@ -116,6 +117,8 @@ abstract public class BaseVIPSpringIT {
     protected SimulationBusiness simulationBusiness;
     @Autowired
     protected LFCBusiness lfcBusiness;
+    @Autowired
+    protected LFCPermissionBusiness lfcPermissionBusiness;
 
     @Before
     public final void setup() {
@@ -177,6 +180,8 @@ abstract public class BaseVIPSpringIT {
     public LFCBusiness getLfcBusiness() {
         return lfcBusiness;
     }
+
+    public LFCPermissionBusiness lfcPermissionBusiness() {return lfcPermissionBusiness;}
 
     protected void configureDataFS() throws BusinessException {
         DataConfigurator.configureFS(this);

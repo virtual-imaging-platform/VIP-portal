@@ -96,4 +96,9 @@ public class SpringTestConfig {
     public LFCBusiness lfcBusiness() {
         return Mockito.mock(LFCBusiness.class);
     }
+
+    @Bean
+    public LFCPermissionBusiness lfcPermissionBusiness() {
+        return Mockito.mock(LFCPermissionBusiness.class);
+    }
 }

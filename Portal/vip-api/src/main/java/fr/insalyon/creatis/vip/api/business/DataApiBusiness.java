@@ -42,6 +42,7 @@ import fr.insalyon.creatis.vip.datamanager.client.bean.Data.Type;
 import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerException;
 import fr.insalyon.creatis.vip.datamanager.server.DataManagerUtil;
 import fr.insalyon.creatis.vip.datamanager.server.business.*;
+import fr.insalyon.creatis.vip.datamanager.server.business.LFCPermissionBusiness.LFCAccessType;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.input.ReaderInputStream;
 import org.apache.commons.io.output.ByteArrayOutputStream;
@@ -81,6 +82,8 @@ public class DataApiBusiness {
     private TransferPoolBusiness transferPoolBusiness;
     @Autowired
     private DataManagerBusiness dataManagerBusiness;
+    @Autowired
+    private LFCPermissionBusiness lfcPermissionBusiness;
 
     private ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(2);
 
@@ -93,7 +96,7 @@ public class DataApiBusiness {
     }
 
     public void deletePath(String apiUri) throws ApiException {
-        String lfcPath = checkPermission(apiUri, AccessType.DELETE);
+        String lfcPath = checkPermission(apiUri, LFCAccessType.DELETE);
         if (!baseDoesFileExist(lfcPath)) {
             logger.error("trying to delete a non-existing file : " + apiUri);
             throw new ApiException("trying to delete a non-existing dile");
@@ -202,7 +205,7 @@ public class DataApiBusiness {
 
     public Path uploadData(UploadData uploadData) throws ApiException {
         // TODO : check upload size ?
-        String lfcPath = checkPermission(uploadData.getUri(), AccessType.UPLOAD);
+        String lfcPath = checkPermission(uploadData.getUri(), LFCAccessType.UPLOAD);
         java.nio.file.Path javaPath = Paths.get(lfcPath);
         String parentLfcPath = javaPath.getParent().toString();
         // check if parent dir exists
@@ -232,7 +235,7 @@ public class DataApiBusiness {
     }
 
     public Path mkdir(String apiUri) throws ApiException {
-        String lfcPath = checkPermission(apiUri, AccessType.UPLOAD);
+        String lfcPath = checkPermission(apiUri, LFCAccessType.UPLOAD);
         java.nio.file.Path javaPath = Paths.get(lfcPath);
         String parentLfcPath = javaPath.getParent().toString();
 
@@ -257,117 +260,20 @@ public class DataApiBusiness {
 
     // #### PERMISSION STUFF
 
-    private enum AccessType {READ, UPLOAD, DELETE}
-
     private String checkReadPermission(String apiUri) throws ApiException {
-        return checkPermission(apiUri, AccessType.READ);
+        return checkPermission(apiUri, LFCAccessType.READ);
     }
 
-    private String checkPermission(String apiUri, AccessType accessType) throws ApiException {
+    private String checkPermission(String apiUri, LFCAccessType accessType) throws ApiException {
         String lfcPath = getLFCPathFromApiUri(apiUri);
-        checkRootPermission(lfcPath, accessType);
-        // Root is always filtered so always permited
-        if (lfcPath.equals(ROOT)) return lfcPath;
-        // else it all depends of the first directory
-        String firstDir = getFirstDirectoryName(lfcPath);
-        // always can access its home and its trash
-        if (firstDir.equals(USERS_HOME)) return lfcPath;
-        if (firstDir.equals(TRASH_HOME)) return lfcPath;
-        // currently no admin access is possible via the api for security reasons
-        if (firstDir.equals(USERS_FOLDER) || firstDir.equals(BIOMED_HOME)) {
-            logger.error("Trying to access admin folders from api");
-            throw new ApiException("Unauthorized API access");
-        }
-        // else it should be a group folder
-        if (!firstDir.endsWith(GROUP_APPEND)) {
-            logger.error("Unexpected api access to: " + firstDir);
-            throw new ApiException("Unexpected API access");
-        }
-        String groupname = firstDir.substring(0,firstDir.length()-GROUP_APPEND.length());
-        checkGroupPermission(groupname, accessType);
-        if (accessType == AccessType.DELETE) {
-            checkAdditionalDeletePermission(lfcPath);
+        try {
+            lfcPermissionBusiness.checkPermission(apiContext.getUser(), lfcPath, accessType);
+        } catch (BusinessException e) {
+            logger.error("API Permission error");
+            throw new ApiException(e);
         }
         // all check passed : all good !
         return lfcPath;
-    }
-
-    private void checkGroupPermission(String groupname, AccessType accessType) throws ApiException {
-        User user = apiContext.getUser();
-        // beginner cant write/delete in groups folder
-        if (accessType != AccessType.READ && user.getLevel() == UserLevel.Beginner) {
-            logger.error("beginner user try to upload/delete in a group:" + user.getEmail() +"/" + groupname);
-            throw new ApiException("Unauthorized data API access");
-        }
-        // otherwise it must have access to this group
-        if (!apiContext.getUser().hasGroupAccess(groupname)) {
-            logger.error("Trying to access an unauthorized goup");
-            throw new ApiException("Unauthorized API access");
-        }
-    }
-
-    private void checkRootPermission(String lfcPath, AccessType accessType) throws ApiException {
-        // verify path begins with the root
-        if (!lfcPath.startsWith(ROOT)) {
-            logger.error("Access to a lfc not starting with the root:" + lfcPath);
-            throw new ApiException("Illegal data API access");
-        }
-        // read always possible
-        if (accessType == AccessType.READ) return;
-        // else it cannot be THE root nor a direct subdirectory of root
-        if (lfcPath.equals(ROOT) ||
-                lfcPath.lastIndexOf('/') == ROOT.length()) {
-            logger.error("Illegal upload/delete data API access");
-            throw new ApiException("Illegal data API access");
-        }
-    }
-
-    private void checkAdditionalDeletePermission(String lfcPath) throws ApiException {
-        checkSynchronizedDirectories(lfcPath);
-        if(lfcPath.endsWith("Dropbox")){
-            logger.error("Trying to delete a dropbox directory :" + lfcPath);
-            throw new ApiException("Illegal data API access");
-        }
-    }
-
-    private void checkSynchronizedDirectories(String lfcPath) throws ApiException {
-        List<SSH> sshs;
-        try {
-            sshs = dataManagerBusiness.getSSHConnections();
-        } catch (BusinessException e) {
-            logger.error("Error listing synchronized directories");
-            throw new ApiException("Error listing synchronized directories");
-        }
-        List<String> lfcDirSSHSynchronization = new ArrayList<String>();
-        for (SSH ssh : sshs) {
-            if (ssh.getTransferType().equals(TransferType.Synchronization)) {
-                lfcDirSSHSynchronization.add(ssh.getLfcDir());
-            }
-        }
-
-        String lfcBaseDir;
-        try {
-            lfcBaseDir = DataManagerUtil.parseBaseDir(apiContext.getUser(), lfcPath);
-        } catch (DataManagerException e) {
-            logger.error("Error parsing api path :" + lfcPath);
-            throw new ApiException("Internal error in data API");
-        }
-        for (String s : lfcDirSSHSynchronization) {
-            if (lfcBaseDir.startsWith(s)) {
-                logger.error("Try to delete  synchronized file :" + lfcPath);
-                throw new ApiException("Illegal data API access");
-            }
-        }
-    }
-
-    private String getFirstDirectoryName(String lfcPath) {
-        lfcPath = lfcPath.substring(ROOT.length() + 1); // remove trailing slash
-        int nextSlashIndex = lfcPath.indexOf('/');
-        if (nextSlashIndex > 0) {
-            return lfcPath.substring(0, nextSlashIndex);
-        } else {
-            return lfcPath;
-        }
     }
 
     // #### DOWNLOAD STUFF
