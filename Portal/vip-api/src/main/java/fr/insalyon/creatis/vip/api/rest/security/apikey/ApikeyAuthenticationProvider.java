@@ -105,7 +105,7 @@ public class ApikeyAuthenticationProvider implements
                     "AbstractUserDetailsAuthenticationProvider.badCredentials",
                     "Bad credentials"));
         }
-        logger.info("apikey OK for " + vipUser.getEmail());
+        logger.debug("apikey OK for " + vipUser.getEmail());
         UserDetails springUser;
         try {
             Map<Group, CoreConstants.GROUP_ROLE> groups =

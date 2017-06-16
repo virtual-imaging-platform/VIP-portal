@@ -85,6 +85,7 @@ public class PlatformController {
         platformProperties.setSupportedAPIVersion(env.getProperty(SUPPORTED_API_VERSION));
         platformProperties.setEmail(env.getProperty(PLATFORM_EMAIL));
         platformProperties.setAPIErrorCodesAndMessages(getErrorCodesAndMessages());
+        platformProperties.setMaxSizeDirectTransfer(env.getProperty(API_DATA_TRANSFERT_MAX_SIZE, Long.class));
         return platformProperties;
     }
 
