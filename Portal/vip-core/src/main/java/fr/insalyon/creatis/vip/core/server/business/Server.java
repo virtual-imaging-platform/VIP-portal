@@ -183,7 +183,6 @@ public class Server {
             advancedMaxRunningSimulations = config.getInt(CoreConstants.LAB_SIMULATION_ADVANCED_MAX, Integer.MAX_VALUE);
             maxPlatformRunningSimulations=config.getInt(CoreConstants.LAB_SIMULATION_PLATFORM_MAX, Integer.MAX_VALUE);
             workflowsPath = config.getString(CoreConstants.LAB_SIMULATION_FOLDER, "/var/www/html/workflows");
-            workflowsDB = config.getString(CoreConstants.LAB_SIMULATION_DB_NAME, "/var/www/workflows.db");
             workflowsHost = config.getString(CoreConstants.LAB_SIMULATION_DB_HOST, "localhost");
             workflowsPort = config.getInt(CoreConstants.LAB_SIMULATION_DB_PORT, 1527);
             workflowsExecuctionMode = config.getString(CoreConstants.LAB_SIMULATION_EXEC_MODE, "ws");
@@ -262,7 +261,6 @@ public class Server {
             config.setProperty(CoreConstants.LAB_SIMULATION_PLATFORM_MAX, maxPlatformRunningSimulations);
            
             config.setProperty(CoreConstants.LAB_SIMULATION_FOLDER, workflowsPath);
-            config.setProperty(CoreConstants.LAB_SIMULATION_DB_NAME, workflowsDB);
             config.setProperty(CoreConstants.LAB_SIMULATION_DB_HOST, workflowsHost);
             config.setProperty(CoreConstants.LAB_SIMULATION_DB_PORT, workflowsPort);
             config.setProperty(CoreConstants.LAB_SIMULATION_EXEC_MODE, workflowsExecuctionMode);
@@ -360,10 +358,6 @@ public class Server {
 
     public int getN4uGridaPort() {
         return n4uGridaPort;
-    }
-
-    public String getWorkflowsDB() {
-        return workflowsDB;
     }
 
     public String getWorkflowsHost() {
