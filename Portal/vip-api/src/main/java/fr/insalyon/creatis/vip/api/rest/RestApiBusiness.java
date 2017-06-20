@@ -55,6 +55,8 @@ public class RestApiBusiness {
 
     @Autowired
     private VipConfigurer vipConfigurer;
+    @Autowired
+    private ApiContext apiContext;
 
     public ApiContext getApiContext(HttpServletRequest request, boolean isAuthenticated) {
         User vipUser = null;
@@ -67,6 +69,10 @@ public class RestApiBusiness {
         }
         // configure VIP if it has not been done today
         vipConfigurer.configureIfNecessary();
-        return new ApiContext(request, null, vipUser);
+        // populate the request scoped ApiContext
+        if (apiContext != null) {
+            apiContext.init(request, null, vipUser);
+        }
+        return new ApiContext(request, null, vipUser); // TODO is it necessary to always create a new instance ?
     }
 }

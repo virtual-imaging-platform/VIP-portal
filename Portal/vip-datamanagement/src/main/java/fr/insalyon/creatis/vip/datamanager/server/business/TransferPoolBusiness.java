@@ -40,6 +40,7 @@ import fr.insalyon.creatis.vip.core.server.business.CoreUtil;
 import fr.insalyon.creatis.vip.core.server.business.Server;
 import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
 import fr.insalyon.creatis.vip.datamanager.client.bean.PoolOperation;
+import fr.insalyon.creatis.vip.datamanager.client.bean.PoolOperation.Type;
 import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerException;
 import fr.insalyon.creatis.vip.datamanager.server.DataManagerUtil;
 import java.text.SimpleDateFormat;
@@ -141,6 +142,24 @@ public class TransferPoolBusiness {
         } catch (DataManagerException ex) {
             logger.error(ex);
             throw new BusinessException(ex);
+        } catch (GRIDAClientException ex) {
+            logger.error(ex);
+            throw new BusinessException(ex);
+        }
+    }
+
+    public PoolOperation getDownloadPoolOperation(String operationId) throws BusinessException {
+        try {
+            GRIDAPoolClient client = CoreUtil.getGRIDAPoolClient();
+            Operation operation = client.getOperationById(operationId);
+            if (operation.getType() != Operation.Type.Download) {
+                throw new BusinessException("Wrong operation type for download");
+            }
+            SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM d, yyyy HH:mm");
+            PoolOperation.Status status = PoolOperation.Status.valueOf(operation.getStatus().name());
+            return new PoolOperation(operation.getId(), operation.getRegistration(),
+                    dateFormat.format(operation.getRegistration()), operation.getSource(), operation.getDest(),
+                    Type.Download, status, operation.getUser(), operation.getProgress());
         } catch (GRIDAClientException ex) {
             logger.error(ex);
             throw new BusinessException(ex);
@@ -332,20 +351,18 @@ public class TransferPoolBusiness {
     /**
      * 
      * @param user
-     * @param localFile
+     * @param localFilePath
      * @param remoteFile
      * @return Operation ID
      * @throws BusinessException 
      */
-    public String uploadFile(User user, String localFile, String remoteFile) 
+    public String uploadFile(User user, String localFilePath, String remoteFile)
             throws BusinessException {
 
         try {
             GRIDAPoolClient poolClient = CoreUtil.getGRIDAPoolClient();
-            String localPath = serverConfiguration.getDataManagerPath()
-                    + "/uploads/" + localFile;
             String remotePath = DataManagerUtil.parseBaseDir(user, remoteFile);
-            return poolClient.uploadFile(localPath, remotePath, user.getEmail());
+            return poolClient.uploadFile(localFilePath, remotePath, user.getEmail());
 
         } catch (DataManagerException ex) {
             logger.error(ex);

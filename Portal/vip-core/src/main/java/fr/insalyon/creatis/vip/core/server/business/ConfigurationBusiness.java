@@ -143,20 +143,29 @@ public class ConfigurationBusiness {
         message.append(user.getEmail());
         message.append(". List of undesired mail domains: ");
         for (String s : Server.getInstance().getUndesiredMailDomains()) {
-            message.append(" ");
-            message.append(s);
+            if (!s.trim().isEmpty()) {
+                message.append(" ");
+                message.append(s);
+            }
         }
         message.append(". ");
         message.append("List of undesired countries: ");
         for (String s : Server.getInstance().getUndesiredCountries()) {
-            message.append(" ");
-            message.append(s);
+            if (!s.trim().isEmpty()) {
+                message.append(" ");
+                message.append(s);
+            }
         }
         message.append(".");
         logger.info(message.toString());
 
         // Check if email domain is undesired
         for (String udm : Server.getInstance().getUndesiredMailDomains()) {
+            if (udm.trim().isEmpty()) {
+                // An empty config file entry gets here as an empty or
+                // whitespace-only string, skip it
+                continue;
+            }
             String[] useremail = user.getEmail().split("@");
             if (useremail.length != 2) {
                 logger.info("User Mail address is incorrect : " + user.getEmail());
@@ -170,8 +179,13 @@ public class ConfigurationBusiness {
         }
         
         // Check if country is undesired
-        for (String udc : Server.getInstance().getUndesiredCountries()){
-            if(user.getCountryCode().toString().equals(udc)){
+        for (String udc : Server.getInstance().getUndesiredCountries()) {
+            if (udc.trim().isEmpty()) {
+                // An empty config file entry gets here as an empty or
+                // whitespace-only string, skip it
+                continue;
+            }
+            if (user.getCountryCode().toString().equals(udc)) {
                 logger.info("Undesired country for " + user.getEmail());
                 throw new BusinessException("Error");
             }

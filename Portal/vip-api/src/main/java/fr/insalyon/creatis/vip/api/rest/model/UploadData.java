@@ -29,42 +29,29 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL-B license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.api.data;
-
-import fr.insalyon.creatis.devtools.MD5;
-import fr.insalyon.creatis.vip.api.rest.security.SpringCompatibleUser;
-import fr.insalyon.creatis.vip.core.client.bean.User;
-import fr.insalyon.creatis.vip.core.client.view.user.UserLevel;
-import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
-import org.springframework.test.web.servlet.request.RequestPostProcessor;
-
-import java.io.UnsupportedEncodingException;
-import java.security.NoSuchAlgorithmException;
+package fr.insalyon.creatis.vip.api.rest.model;
 
 /**
- * Created by abonnet on 7/26/16.
+ * Created by abonnet on 3/8/17.
  */
-public class UserTestUtils {
+public class UploadData {
 
-    static public User baseUser1;
-    static public User baseUser2;
-    static public String baseUser1Password = "baseUser1password";
-    static public String baseUser2Password = "baseUser2password";
+    private String uri;
+    private String pathContent;
 
-    static {
-        baseUser1 = new User("base1", "User1", "baseuser1@test.tst", null, null,
-                UserLevel.Beginner, null);
-        baseUser1.setFolder("user1");
-        baseUser2 = new User("base2", "User2", "baseuser2@test.tst", null, null,
-                UserLevel.Advanced, null);
-        baseUser2.setFolder("user2");
+    public String getUri() {
+        return uri;
     }
 
-    public static RequestPostProcessor baseUser1() {
-        return SecurityMockMvcRequestPostProcessors.user(new SpringCompatibleUser(baseUser1));
+    public void setUri(String uri) {
+        this.uri = uri;
     }
 
-    public static RequestPostProcessor baseUser2() {
-        return SecurityMockMvcRequestPostProcessors.user(new SpringCompatibleUser(baseUser2));
+    public String getPathContent() {
+        return pathContent;
+    }
+
+    public void setPathContent(String pathContent) {
+        this.pathContent = pathContent;
     }
 }

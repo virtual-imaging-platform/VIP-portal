@@ -33,6 +33,24 @@ public class ApiUtils {
         logger.info(message);
     }
 
+    public static void methodInvocationLog(String methodName, String email, Object... parameters) {
+        String message = "("+ email +") Calling API method " + methodName + "(";
+        boolean first = true;
+        for (Object o : parameters) {
+            if (!first) {
+                message += ", ";
+            }
+            first = false;
+            if (o == null) {
+                message += "null";
+            } else {
+                message += "\""+o.toString()+"\"";
+            }
+        }
+        message += ")";
+        logger.info(message);
+    }
+
     public static void throwIfNull(Object parameter, String name) throws ApiException {
         if (parameter == null) {
             throw new ApiException(name + " cannot be empty.");
