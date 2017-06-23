@@ -29,27 +29,24 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL-B license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.api.rest.controller;
+package fr.insalyon.creatis.vip.api.rest.controller.processing;
 
 import fr.insalyon.creatis.vip.api.bean.Pipeline;
 import fr.insalyon.creatis.vip.api.business.*;
 import fr.insalyon.creatis.vip.api.rest.RestApiBusiness;
-import fr.insalyon.creatis.vip.api.rest.model.*;
 import fr.insalyon.creatis.vip.application.server.business.*;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
-import java.util.List;
-
-import static fr.insalyon.creatis.vip.core.client.view.util.CountryCode.th;
 
 /**
  * Created by abonnet on 7/28/16.
+ *
+ * TODO :  make apicontext dynamic as in datacontroller
  */
 @RestController
 @RequestMapping("pipelines")

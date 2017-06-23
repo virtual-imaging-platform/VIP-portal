@@ -141,7 +141,7 @@ public class MessageViewerWindow extends Window {
         AsyncCallback<Void> callback = new AsyncCallback<Void>() {
 
             public void onFailure(Throwable caught) {
-                Layout.getInstance().setWarningMessage("Unable to get list of messages:<br />" + caught.getMessage());
+                Layout.getInstance().setWarningMessage("Unable to mark message as read:<br />" + caught.getMessage());
             }
 
             public void onSuccess(Void result) {

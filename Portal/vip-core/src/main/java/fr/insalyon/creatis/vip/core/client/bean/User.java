@@ -35,10 +35,9 @@ import com.google.gwt.user.client.rpc.IsSerializable;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants.GROUP_ROLE;
 import fr.insalyon.creatis.vip.core.client.view.user.UserLevel;
 import fr.insalyon.creatis.vip.core.client.view.util.CountryCode;
-import java.sql.Timestamp;
-import java.util.Date;
-import java.util.Map;
 
+import java.sql.Timestamp;
+import java.util.*;
 
 
 /**
@@ -63,6 +62,7 @@ public class User implements IsSerializable {
     private int maxRunningSimulations;
     private CountryCode countryCode;
     private Map<Group, GROUP_ROLE> groups;
+    private boolean hasGroups;
     private Timestamp termsOfUse;
     private Timestamp lastUpdatePublications;
     private int failedAuthentications;
@@ -234,7 +234,8 @@ public class User implements IsSerializable {
 
     public void setGroups(Map<Group, GROUP_ROLE> groups) {
         this.groups = groups;
-        
+        this.hasGroups = !groups.isEmpty();
+        filterGroups();
     }
 
     public Timestamp getTermsOfUse() {
@@ -272,11 +273,25 @@ public class User implements IsSerializable {
     public boolean hasGroupAccess(String groupName) {
 
         for (Group group : groups.keySet()) {
-            if (group.getName().equals(groupName) && groups.get(group) != GROUP_ROLE.None) {
+            if (group.getName().equals(groupName)) {
                 return true;
             }
         }
         return false;
+    }
+
+    public Set<Group> getGroups() {
+        return groups.keySet();
+    }
+
+    private void filterGroups() {
+        Iterator<Group> it = groups.keySet().iterator();
+        while (it.hasNext()) {
+            Group group = it.next();
+            if (groups.get(group) == GROUP_ROLE.None) {
+                it.remove();
+            }
+        }
     }
 
     public boolean isGroupAdmin() {
@@ -299,15 +314,15 @@ public class User implements IsSerializable {
         }
         return false;
     }
-    
+
     public boolean hasAcceptTermsOfUse(){
         return getTermsOfUse()!=null;
        }
 
     public boolean hasGroups(){
-        return !groups.isEmpty();
+        return hasGroups;
     }
-    
+
     public int getFailedAuthentications() {
         return this.failedAuthentications;
     }
