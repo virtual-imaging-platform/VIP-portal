@@ -54,7 +54,7 @@ public class DataUploadWindow extends Window {
         this.centerInPage();
         this.setPadding(5);
 
-        this.addItem(new AppletHTMLPane(
+        this.addItem(new DataUploadHTMLPane(
                 "DataUpload", 
                 "fr.insalyon.creatis.vip.datamanager.applet.upload.UploadFiles", 
                 "vip-datamanager-applet.jar", 550, 335, 
