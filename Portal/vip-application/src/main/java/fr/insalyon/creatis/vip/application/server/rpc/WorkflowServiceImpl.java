@@ -31,6 +31,7 @@
  */
 package fr.insalyon.creatis.vip.application.server.rpc;
 
+import com.google.gwt.logging.shared.RemoteLoggingService;
 import fr.insalyon.creatis.devtools.FileUtils;
 import fr.insalyon.creatis.moteur.plugins.workflowsdb.dao.WorkflowsDBDAOException;
 import fr.insalyon.creatis.vip.application.client.bean.*;
@@ -64,7 +65,7 @@ import org.apache.log4j.Logger;
  *
  * @author Rafael Ferreira da Silva
  */
-public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements WorkflowService {
+public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements WorkflowService  {
 
     private static final Logger logger = Logger.getLogger(WorkflowServiceImpl.class);
     private WorkflowBusiness workflowBusiness;
@@ -75,7 +76,7 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
         workflowBusiness = new WorkflowBusiness();
         inputBusiness = new InputBusiness();
     }
-
+    
     /**
      * Gets a list of recently launched simulations.
      *
@@ -160,7 +161,7 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
         try {
             trace(logger, "Launching simulation '" + simulationName + "' (" + applicationName + ").");
             User user = getSessionUser();
-
+            
             List<String> groups = new ArrayList<String>();
             for (Group group : getSessionUserGroups().keySet()) {
                 groups.add(group.getName());

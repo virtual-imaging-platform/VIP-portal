@@ -89,6 +89,7 @@ public abstract class AbstractLaunchTab extends Tab {
         layout.setMargin(5);
 
         modal = new ModalWindow(layout);
+//        modalLogs = new ModalWindow(layout);
 
         this.setPane(layout);
     }

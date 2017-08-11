@@ -114,7 +114,7 @@ public class WorkflowBusiness {
             logger.error(ex);
         }
     }
-
+    
     private Engine selectEngine(String applicationClass) throws BusinessException {
         long min = Integer.MAX_VALUE;
         Engine engineBean = null;
@@ -192,10 +192,10 @@ public class WorkflowBusiness {
                         "Max number of running executions reached.<br />You already have "
                         + runningWorkflows + " running executions.");
             }
-
+                
             List<ParameterSweep> parameters = new ArrayList<ParameterSweep>();
             for (String name : parametersMap.keySet()) {
-
+                
                 ParameterSweep ps = new ParameterSweep(name);
                 String valuesStr = parametersMap.get(name);
                 if (valuesStr.contains(ApplicationConstants.SEPARATOR_INPUT)) {
@@ -505,6 +505,19 @@ public class WorkflowBusiness {
         //TODO fix
         Map<String, String> inputs = new InputM2Parser(currentUserFolder).parse(
                 Server.getInstance().getWorkflowsPath() + "/" + simulationID + "/input-m2.xml");
+        
+        
+//        String parameterList2 = new String();
+//        for (String name : inputs.values()) {
+//            parameterList2 += "name : " + name + " ********************* ";
+//        }
+//
+//        parameterList2 += "$$$$$$$  KEYS $$$$$$$$";
+//        for (String keyName : inputs.keySet()) {
+//            parameterList2 += "keyName : " + keyName + " $$$$$$$$ " ;
+//        }
+//            
+//        logger.info(parameterList2);
 
         return inputs;
     }
