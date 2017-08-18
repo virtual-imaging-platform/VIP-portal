@@ -44,7 +44,10 @@ knowledge of the CeCILL-B license and that you accept its terms.
  */
 package fr.insalyon.creatis.vip.datamanager.client.view.browser;
 
+import com.google.gwt.core.client.Callback;
+import com.google.gwt.core.client.ScriptInjector;
 import com.google.gwt.user.client.Cookies;
+import com.google.gwt.user.client.Window;
 import com.smartgwt.client.widgets.HTMLPane;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 
@@ -61,7 +64,7 @@ public class DataUploadHTMLPane extends HTMLPane {
         this.setWidth100();
         this.setHeight100();
         this.setShowEdges(true);
-
+     
         this.setContents(
                 "<html>"
                 + "<head>"
@@ -71,8 +74,8 @@ public class DataUploadHTMLPane extends HTMLPane {
                 + "<body>"
                 + "<form>\n"
                 + "<div>\n"
-                + "  <label for=\"data_uploads\">Choose files and folder to upload</label>\n"
-                + "  <input type=\"file\" id=\"data_uploads\" name=\"data_uploads\" webkitdirectory  multiple>\n"
+                + "  <label for=\"data_uploads\">Choose folder</label>\n"
+                + "  <input type=\"file\" id=\"data_uploads\" name=\"data_uploads\" webkitdirectory  multiple onchange=\"handleFiles(this.files)\">\n"
                 + "</div>\n"
                 + "<div class=\"preview\">\n"
                 + "  <p>No files currently selected for upload</p>\n"
@@ -90,8 +93,9 @@ public class DataUploadHTMLPane extends HTMLPane {
                 + "<div id=\"progressNumber\"></div>\n"
                 + "<pre id=\"serverResponse\"></pre>\n"
                 + "\n"
-                + "<script type=\"text/javascript\" src=\"dataUpload.js\"> </script>"
                 + "</body>"
                 + "</html>");
     }
+    
+    
 }

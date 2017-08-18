@@ -46,14 +46,13 @@
 //view-source:https://dior.ics.muni.cz/~makub/massupload.html
 //https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/file
 
-     var input = document.getElementById('data_uploads');
-     var preview = document.querySelector('.preview');
-     input.addEventListener('change', updateDataDisplay);
-     function updateDataDisplay() {
+
+     function handleFiles(files) {
+          var preview = document.querySelector('.preview');
           while(preview.firstChild) {
             preview.removeChild(preview.firstChild);
           }
-          var curFiles = input.files;
+          var curFiles = files;
           if(curFiles.length === 0) {
             var para = document.createElement('p');
             para.textContent = 'No files currently selected for upload';
