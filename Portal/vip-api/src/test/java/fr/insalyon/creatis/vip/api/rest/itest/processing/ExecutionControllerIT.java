@@ -165,18 +165,6 @@ public class ExecutionControllerIT extends BaseVIPSpringIT {
     }
 
     @Test
-    public void testInitExecutionIsNotImplemented() throws Exception {
-        mockMvc.perform(
-                post("/rest/executions").contentType("application/json")
-                        .content(getResourceAsString("jsonObjects/execution1.json"))
-                        .with(baseUser1()))
-                .andDo(print())
-                .andExpect(status().isBadRequest())
-                .andExpect(content().contentType(RestTestUtils.JSON_CONTENT_TYPE_UTF8))
-                .andExpect(jsonPath("$.code").value(RestErrorCodes.NOT_IMPLEMENTED.getCode()));
-    }
-
-    @Test
     public void testInitExecution() throws Exception {
         // configure pipeline access right
         configureApplications(
@@ -199,7 +187,7 @@ public class ExecutionControllerIT extends BaseVIPSpringIT {
         when(configurationBusiness.getUserGroups(baseUser1.getEmail()))
                 .thenReturn(new HashMap<>());
         mockMvc.perform(
-                post("/rest/executions/create-and-start").contentType("application/json")
+                post("/rest/executions").contentType("application/json")
                         .content(getResourceAsString("jsonObjects/execution1.json"))
                         .with(baseUser1()))
                 .andDo(print())

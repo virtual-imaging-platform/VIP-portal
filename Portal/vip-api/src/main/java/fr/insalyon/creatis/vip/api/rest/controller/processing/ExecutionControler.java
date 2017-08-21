@@ -105,9 +105,9 @@ public class ExecutionControler {
 
     @RequestMapping
     public Execution[] listExecutions(
-            @RequestParam String studyIdentifier,
-            @RequestParam Integer offset,
-            @RequestParam Integer limit
+            @RequestParam(required = false) String studyIdentifier,
+            @RequestParam(required = false) Integer offset,
+            @RequestParam(required = false) Integer limit
     ) throws ApiException {
         ApiUtils.methodInvocationLog("listExecutions", studyIdentifier, offset, limit);
         ApiContext apiContext = restApiBusiness.getApiContext(httpServletRequest, true);
@@ -143,12 +143,6 @@ public class ExecutionControler {
 
     @RequestMapping(method = RequestMethod.POST)
     public Execution initExecution(@RequestBody @Valid Execution execution) throws ApiException {
-        ApiUtils.methodInvocationLog("initExecution", execution.getPipelineIdentifier());
-        throw new NotImplementedException("Use POST /executions/create-and-start instead");
-    }
-
-    @RequestMapping(value="/create-and-start", method = RequestMethod.POST)
-    public Execution initExecutionAndStart(@RequestBody @Valid Execution execution) throws ApiException {
         ApiUtils.methodInvocationLog("initExecution", execution);
         ApiContext apiContext = restApiBusiness.getApiContext(httpServletRequest, true);
         PipelineBusiness pb = buildPipelineBusiness(apiContext);
