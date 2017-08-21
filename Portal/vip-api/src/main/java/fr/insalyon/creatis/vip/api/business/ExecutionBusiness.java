@@ -212,6 +212,31 @@ public class ExecutionBusiness {
         }
     }
 
+    public int countExecutions() throws ApiException {
+        try {
+
+            List<Simulation> simulations = workflowBusiness.getSimulations(
+                    apiContext.getUser().getFullName(),
+                    null, // application
+                    null, // status
+                    null, // class
+                    null, // startDate
+                    null // endDate
+            );
+            logger.info("Counting executions, found "+simulations.size()+" simulations.");
+            int count = 0;
+            for (Simulation s : simulations) {
+                if (!(s == null) && !(s.getStatus() == SimulationStatus.Cleaned)) {
+                    count++;
+                }
+            }
+            logger.info("After removing null and cleaned, found "+count);
+            return count;
+        } catch (BusinessException ex) {
+            throw new ApiException(ex);
+        }
+    }
+
     public void updateExecution(Execution execution) throws ApiException {
         try {
             if (execution.getTimeout() > 0) {

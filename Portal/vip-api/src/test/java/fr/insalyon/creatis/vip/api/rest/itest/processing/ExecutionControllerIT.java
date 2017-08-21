@@ -84,6 +84,18 @@ public class ExecutionControllerIT extends BaseVIPSpringIT {
     }
 
     @Test
+    public void shouldCountExecutions() throws Exception {
+        when(workflowBusiness.getSimulations(baseUser1.getFullName(), null, null, null, null, null))
+                .thenReturn(Arrays.asList(simulation1, simulation2));
+        mockMvc.perform(
+                get("/rest/executions/count").with(baseUser1()))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(RestTestUtils.TEXT_CONTENT_TYPE_UTF8))
+                .andExpect(content().string("2"));
+    }
+
+    @Test
     public void shouldGetExecution1() throws Exception {
         when(workflowBusiness.getSimulation(simulation1.getID()))
                 .thenReturn(simulation1);

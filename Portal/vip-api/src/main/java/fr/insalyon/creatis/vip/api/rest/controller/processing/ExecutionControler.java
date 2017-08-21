@@ -120,6 +120,17 @@ public class ExecutionControler {
         return eb.listExecutions(limit);
     }
 
+    @RequestMapping(value = "count", produces = "text/plain;charset=UTF-8")
+    public String countExecutions(
+            @RequestParam(required = false) String studyIdentifier
+    ) throws ApiException {
+        ApiUtils.methodInvocationLog("countExecutions");
+        ApiContext apiContext = restApiBusiness.getApiContext(httpServletRequest, true);
+        if (studyIdentifier != null) throw new ApiException("studyIdentifier not supportet yet");
+        ExecutionBusiness eb = buildExecutionBusiness(apiContext);
+        return String.valueOf(eb.countExecutions());
+    }
+
     @RequestMapping("/{executionId}")
     public Execution getExecution(@PathVariable String executionId) throws ApiException {
         ApiUtils.methodInvocationLog("getExecution", executionId);
