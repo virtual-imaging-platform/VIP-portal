@@ -78,7 +78,7 @@ public class SpringAuthenticationIT extends BaseVIPSpringIT {
                 .andDo(print())
                 .andExpect(status().isUnauthorized())
                 .andExpect(content().contentType(RestTestUtils.JSON_CONTENT_TYPE_UTF8))
-                .andExpect(jsonPath("$.code")
+                .andExpect(jsonPath("$.errorCode")
                         .value(RestErrorCodes.AUTHENTICATION_ERROR.getCode()));
     }
 
@@ -90,7 +90,7 @@ public class SpringAuthenticationIT extends BaseVIPSpringIT {
                 .andDo(print())
                 .andExpect(status().isUnauthorized())
                 .andExpect(content().contentType(RestTestUtils.JSON_CONTENT_TYPE_UTF8))
-                .andExpect(jsonPath("$.code")
+                .andExpect(jsonPath("$.errorCode")
                         .value(RestErrorCodes.INSUFFICIENT_AUTH.getCode()));
     }
 
@@ -102,7 +102,7 @@ public class SpringAuthenticationIT extends BaseVIPSpringIT {
                 .andDo(print())
                 .andExpect(status().isUnauthorized())
                 .andExpect(content().contentType(RestTestUtils.JSON_CONTENT_TYPE_UTF8))
-                .andExpect(jsonPath("$.code")
+                .andExpect(jsonPath("$.errorCode")
                         .value(RestErrorCodes.BAD_CREDENTIALS.getCode()));
     }
 
@@ -113,7 +113,7 @@ public class SpringAuthenticationIT extends BaseVIPSpringIT {
                 .andDo(print())
                 .andExpect(status().isUnauthorized())
                 .andExpect(content().contentType(RestTestUtils.JSON_CONTENT_TYPE_UTF8))
-                .andExpect(jsonPath("$.code")
+                .andExpect(jsonPath("$.errorCode")
                         .value(RestErrorCodes.INSUFFICIENT_AUTH.getCode()));
     }
 

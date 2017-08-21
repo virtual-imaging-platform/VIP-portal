@@ -60,8 +60,6 @@ public class PlatformProperties {
     private List<String> unsupportedMethods;
     private Long maxSizeDirectTransfer;
     private String defaultStudy;
-    @JsonProperty("isKillExecutionSupported")
-    private Boolean killExecutionSupported;
     @NotNull
     private String supportedAPIVersion;
 
@@ -159,14 +157,6 @@ public class PlatformProperties {
 
     public void setDefaultStudy(String defaultStudy) {
         this.defaultStudy = defaultStudy;
-    }
-
-    public Boolean isKillExecutionSupported() {
-        return killExecutionSupported;
-    }
-
-    public void setKillExecutionSupported(Boolean killExecutionSupported) {
-        this.killExecutionSupported = killExecutionSupported;
     }
 
     public String getSupportedAPIVersion() {

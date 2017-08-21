@@ -91,8 +91,6 @@ public class PlatformControllerIT extends BaseVIPSpringIT {
                         isArray(TEST_UNSUPPORTED_METHOD, String::toString)))
                 .andExpect(jsonPath("$.supportedAPIVersion")
                         .value(TEST_SUPPORTED_API_VERSION))
-                .andExpect(jsonPath("$.isKillExecutionSupported")
-                        .value(Boolean.valueOf(TEST_SUPPORTED_API_VERSION)))
                 .andExpect(jsonPath("$.maxSizeDirectTransfer")
                         .value(Integer.valueOf(TEST_DATA_MAX_SIZE)))
                 // it should be a long, be the test value being small it's actually an int

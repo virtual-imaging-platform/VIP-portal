@@ -51,9 +51,9 @@ public class ErrorCodeAndMessageTestUtils {
 
     public static Map<String,Function> getErrorCodeAndMessageSuppliers() {
         return JsonCustomObjectMatcher.formatSuppliers(
-                Arrays.asList("code", "message"),
-                ErrorCodeAndMessage::getCode,
-                ErrorCodeAndMessage::getMessage);
+                Arrays.asList("errorCode", "errorMessage"),
+                ErrorCodeAndMessage::getErrorCode,
+                ErrorCodeAndMessage::getErrorMessage);
     }
 
     public static Matcher<Map<String,?>> jsonCorrespondsToErrorCodeAndMessage(

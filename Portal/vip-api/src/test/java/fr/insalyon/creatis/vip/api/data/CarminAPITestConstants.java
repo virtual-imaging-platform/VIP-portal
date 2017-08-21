@@ -46,7 +46,6 @@ public interface CarminAPITestConstants {
     String TEST_PLATFORM_EMAIL = "test@email.tst";
     String TEST_DEFAULT_LIST_LIMIT = "42";
     String TEST_SUPPORTED_API_VERSION = "Version 4.2";
-    String TEST_IS_KILL_SUPPORTED = "false";
 
     /* WARNING : keep following properties consistant */
     SupportedTransferProtocol[] TEST_SUPPORTED_PROTOCOLS = {HTTP, WEBDAV};

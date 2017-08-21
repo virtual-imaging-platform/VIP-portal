@@ -144,7 +144,7 @@ public class ExecutionControllerIT extends BaseVIPSpringIT {
                     .andDo(print())
                     .andExpect(status().isBadRequest())
                     .andExpect(content().contentType(RestTestUtils.JSON_CONTENT_TYPE_UTF8))
-                    .andExpect(jsonPath("$.code").value(RestErrorCodes.API_ERROR.getCode()));
+                    .andExpect(jsonPath("$.errorCode").value(RestErrorCodes.API_ERROR.getCode()));
         }
 
     @Test
@@ -280,7 +280,7 @@ public class ExecutionControllerIT extends BaseVIPSpringIT {
                 .andDo(print())
                 .andExpect(status().isBadRequest())
                 .andExpect(content().contentType(RestTestUtils.JSON_CONTENT_TYPE_UTF8))
-                .andExpect(jsonPath("$.code").value(RestErrorCodes.NOT_IMPLEMENTED.getCode()));
+                .andExpect(jsonPath("$.errorCode").value(RestErrorCodes.NOT_IMPLEMENTED.getCode()));
     }
 
     @Test
@@ -335,7 +335,7 @@ public class ExecutionControllerIT extends BaseVIPSpringIT {
                 .andDo(print())
                 .andExpect(status().isBadRequest())
                 .andExpect(content().contentType(RestTestUtils.JSON_CONTENT_TYPE_UTF8))
-                .andExpect(jsonPath("$.code").value(40000));
+                .andExpect(jsonPath("$.errorCode").value(40000));
     }
 
     @Test
@@ -347,6 +347,6 @@ public class ExecutionControllerIT extends BaseVIPSpringIT {
                 .andDo(print())
                 .andExpect(status().isInternalServerError())
                 .andExpect(content().contentType(RestTestUtils.JSON_CONTENT_TYPE_UTF8))
-                .andExpect(jsonPath("$.code").value(50000));
+                .andExpect(jsonPath("$.errorCode").value(50000));
     }
 }

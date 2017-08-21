@@ -47,7 +47,6 @@ public interface CarminProperties {
     String DEFAULT_LIMIT_LIST_EXECUTION = "carmin.platform.default_limit_list_execution";
     String UNSUPPORTED_METHODS = "carmin.platform.unsupported_methods";
     String SUPPORTED_API_VERSION = "carmin.platform.supported_API_Version";
-    String IS_KILL_EXECUTION_SUPPORTED = "carmin.platform.is_kill_supported";
     String PLATFORM_ERROR_CODES_AND_MESSAGES = "carmin.platform.error_codes_and_message";
 
     // CARMIN auth

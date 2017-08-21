@@ -80,8 +80,6 @@ public class PlatformController {
         platformProperties.setUnsupportedMethods(Arrays.asList(
                 env.getProperty(UNSUPPORTED_METHODS, String[].class)
         ));
-        platformProperties.setKillExecutionSupported(
-                env.getProperty(IS_KILL_EXECUTION_SUPPORTED, Boolean.class));
         platformProperties.setSupportedAPIVersion(env.getProperty(SUPPORTED_API_VERSION));
         platformProperties.setEmail(env.getProperty(PLATFORM_EMAIL));
         platformProperties.setAPIErrorCodesAndMessages(getErrorCodesAndMessages());

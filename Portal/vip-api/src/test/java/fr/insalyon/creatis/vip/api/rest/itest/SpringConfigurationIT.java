@@ -94,7 +94,6 @@ public class SpringConfigurationIT {
         Assert.notNull(env.getProperty(DEFAULT_LIMIT_LIST_EXECUTION, Long.class));
         Assert.isInstanceOf(String[].class, env.getProperty(UNSUPPORTED_METHODS, String[].class));
         Assert.notNull(env.getProperty(SUPPORTED_API_VERSION));
-        Assert.notNull(env.getProperty(IS_KILL_EXECUTION_SUPPORTED, Boolean.class));
         Assert.notEmpty(env.getProperty(PLATFORM_ERROR_CODES_AND_MESSAGES, String[].class));
         // test platform properties generation
         Assert.notNull(platformController.getPlatformProperties());

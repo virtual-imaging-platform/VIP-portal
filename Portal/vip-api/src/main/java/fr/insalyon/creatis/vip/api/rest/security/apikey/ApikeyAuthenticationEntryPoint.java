@@ -65,14 +65,14 @@ public class ApikeyAuthenticationEntryPoint implements AuthenticationEntryPoint 
         response.setContentType("application/json;charset=UTF-8");
         ErrorCodeAndMessage error = new ErrorCodeAndMessage();
         if (authException instanceof BadCredentialsException) {
-            error.setCode(RestErrorCodes.BAD_CREDENTIALS.getCode());
+            error.setErrorCode(RestErrorCodes.BAD_CREDENTIALS.getCode());
         } else if (authException instanceof InsufficientAuthenticationException) {
-            error.setCode(RestErrorCodes.INSUFFICIENT_AUTH.getCode());
+            error.setErrorCode(RestErrorCodes.INSUFFICIENT_AUTH.getCode());
         } else {
-            error.setCode(RestErrorCodes.AUTHENTICATION_ERROR.getCode());
+            error.setErrorCode(RestErrorCodes.AUTHENTICATION_ERROR.getCode());
         }
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-        error.setMessage(authException.getMessage());
+        error.setErrorMessage(authException.getMessage());
         objectMapper.writeValue(response.getOutputStream(), error);
         //response.sendError(HttpServletResponse.SC_UNAUTHORIZED, authException.getMessage());
     }
