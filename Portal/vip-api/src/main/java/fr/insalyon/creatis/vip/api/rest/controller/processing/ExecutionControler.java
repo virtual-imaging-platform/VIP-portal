@@ -49,6 +49,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 import static fr.insalyon.creatis.vip.api.CarminProperties.DEFAULT_LIMIT_LIST_EXECUTION;
+import static fr.insalyon.creatis.vip.core.client.view.util.CountryCode.li;
 
 /**
  * Created by abonnet on 7/13/16.
@@ -103,11 +104,20 @@ public class ExecutionControler {
     }
 
     @RequestMapping
-    public Execution[] listExecutions() throws ApiException {
-        ApiUtils.methodInvocationLog("listExecutions");
+    public Execution[] listExecutions(
+            @RequestParam String studyIdentifier,
+            @RequestParam Integer offset,
+            @RequestParam Integer limit
+    ) throws ApiException {
+        ApiUtils.methodInvocationLog("listExecutions", studyIdentifier, offset, limit);
         ApiContext apiContext = restApiBusiness.getApiContext(httpServletRequest, true);
+        if (studyIdentifier != null) throw new ApiException("studyIdentifier not supportet yet");
+        if (offset != null) throw new ApiException("offset not supported yet");
+        int executionMaxNb = environment.getProperty(DEFAULT_LIMIT_LIST_EXECUTION, Integer.class);
+        if (limit == null) limit = executionMaxNb;
+        if (limit > executionMaxNb) throw new ApiException("limit parameter too high");
         ExecutionBusiness eb = buildExecutionBusiness(apiContext);
-        return eb.listExecutions(environment.getProperty(DEFAULT_LIMIT_LIST_EXECUTION, Integer.class));
+        return eb.listExecutions(limit);
     }
 
     @RequestMapping("/{executionId}")
