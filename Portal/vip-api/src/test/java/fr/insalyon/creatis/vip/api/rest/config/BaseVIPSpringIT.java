@@ -92,7 +92,9 @@ import static fr.insalyon.creatis.vip.core.client.view.util.CountryCode.re;
         API_DIRECTORY_MIME_TYPE + "=" + TEST_DIR_MIMETYPE,
         API_DOWNLOAD_TIMEOUT_IN_SECONDS + "=" + TEST_DATA_DOWNLOAD_TIMEOUT,
         API_DOWNLOAD_RETRY_IN_SECONDS + "=" + Test_DATA_DOWNLOAD_RETRY,
-        API_DATA_TRANSFERT_MAX_SIZE + "=" + TEST_DATA_MAX_SIZE
+        API_DATA_TRANSFERT_MAX_SIZE + "=" + TEST_DATA_MAX_SIZE,
+        APIKEY_HEADER_NAME + "=" + TEST_APIKEY_HEADER,
+        APIKEY_GENERATE_NEW_EACH_TIME + "=" + TEST_GENERATE_NEW_APIKEY_EACH_TIME
 })
 abstract public class BaseVIPSpringIT {
 

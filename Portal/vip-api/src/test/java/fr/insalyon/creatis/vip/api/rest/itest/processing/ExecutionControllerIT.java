@@ -67,9 +67,9 @@ public class ExecutionControllerIT extends BaseVIPSpringIT {
     public void shouldListExecutions() throws Exception {
         when(workflowBusiness.getSimulations(baseUser1.getFullName(), null, null, null, null, null))
                 .thenReturn(Arrays.asList(simulation1, simulation2));
-        when(workflowBusiness.getSimulation(simulation1.getID()))
+        when(workflowBusiness.getSimulation(simulation1.getID(), true))
                 .thenReturn(simulation1);
-        when(workflowBusiness.getSimulation(simulation2.getID()))
+        when(workflowBusiness.getSimulation(simulation2.getID(), true))
                 .thenReturn(simulation2);
         mockMvc.perform(
                 get("/rest/executions").with(baseUser1()))
@@ -86,6 +86,8 @@ public class ExecutionControllerIT extends BaseVIPSpringIT {
     @Test
     public void shouldGetExecution1() throws Exception {
         when(workflowBusiness.getSimulation(simulation1.getID()))
+                .thenReturn(simulation1);
+        when(workflowBusiness.getSimulation(simulation1.getID(), true))
                 .thenReturn(simulation1);
         when(workflowBusiness.getInputData(simulation1.getID(), baseUser1.getFolder()))
                 .thenReturn(simulation1InData);
@@ -104,6 +106,8 @@ public class ExecutionControllerIT extends BaseVIPSpringIT {
     @Test
     public void shouldGetExecution2() throws Exception {
         when(workflowBusiness.getSimulation(simulation2.getID()))
+                .thenReturn(simulation2);
+        when(workflowBusiness.getSimulation(simulation2.getID(), true))
                 .thenReturn(simulation2);
         when(workflowBusiness.getInputData(simulation2.getID(), baseUser1.getFolder()))
                 .thenReturn(simulation2InData);
@@ -138,8 +142,10 @@ public class ExecutionControllerIT extends BaseVIPSpringIT {
                 ExecutionTestUtils.copyExecutionWithNewName(execution1, newName);
         Simulation modifiedSimulation =
                 ExecutionTestUtils.copySimulationWithNewName(simulation1, newName);
+        when(workflowBusiness.getSimulation(simulation1.getID(), true))
+                .thenReturn(modifiedSimulation).thenThrow(new RuntimeException());
         when(workflowBusiness.getSimulation(simulation1.getID()))
-                .thenReturn(simulation1, modifiedSimulation);
+                .thenReturn(simulation1).thenThrow(new RuntimeException());
         when(workflowBusiness.getInputData(simulation1.getID(), baseUser1.getFolder()))
                 .thenReturn(simulation1InData);
         when(workflowBusiness.getOutputData(simulation1.getID(), baseUser1.getFolder()))
@@ -183,7 +189,7 @@ public class ExecutionControllerIT extends BaseVIPSpringIT {
                 eq(version42.getVersion()), eq(class1.getName()), eq(execution1.getName())))
                 .thenReturn(execution1.getIdentifier());
         // configure returne execution
-        when(workflowBusiness.getSimulation(execution1.getIdentifier()))
+        when(workflowBusiness.getSimulation(execution1.getIdentifier(), true))
                 .thenReturn(simulation1);
         when(workflowBusiness.getInputData(simulation1.getID(), baseUser1.getFolder()))
                 .thenReturn(simulation1InData);

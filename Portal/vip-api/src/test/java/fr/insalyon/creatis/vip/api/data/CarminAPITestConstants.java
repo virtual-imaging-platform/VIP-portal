@@ -68,4 +68,7 @@ public interface CarminAPITestConstants {
     String TEST_DATA_DOWNLOAD_TIMEOUT = "30";
     String Test_DATA_DOWNLOAD_RETRY = "1";
     String TEST_DATA_MAX_SIZE = "42300";
+
+    String TEST_APIKEY_HEADER = "testapikey";
+    String TEST_GENERATE_NEW_APIKEY_EACH_TIME = "false";
 }

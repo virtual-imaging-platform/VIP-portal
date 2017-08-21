@@ -104,5 +104,7 @@ public class SpringConfigurationIT {
         Assert.notNull(env.getProperty(API_DOWNLOAD_TIMEOUT_IN_SECONDS, Integer.class));
         Assert.notNull(env.getProperty(API_DOWNLOAD_RETRY_IN_SECONDS, Integer.class));
         Assert.notNull(env.getProperty(API_DATA_TRANSFERT_MAX_SIZE, Long.class));
+        Assert.notNull(env.getProperty(APIKEY_HEADER_NAME));
+        Assert.notNull(env.getProperty(APIKEY_GENERATE_NEW_EACH_TIME, Boolean.class));
     }
 }
