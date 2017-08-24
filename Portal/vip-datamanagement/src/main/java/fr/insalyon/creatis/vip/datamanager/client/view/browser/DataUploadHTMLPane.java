@@ -81,7 +81,7 @@ public class DataUploadHTMLPane extends HTMLPane {
                 + "  <p>No files currently selected for upload</p>\n"
                 + "</div>\n"
                 + "<div>\n"
-                + "  <input type=\"button\" onclick=\"zipAndUploadFiles(" + path + ")\" value=\"Upload\"/>\n"
+                + "  <input type=\"button\" onclick=\"zipAndUploadFiles(\'" + path + "\')\" value=\"Upload\"/>\n"
                 + "</div>\n"
                 + "</form>\n"
                 + "\n"

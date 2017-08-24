@@ -75,18 +75,19 @@ function previewFiles(files) {
 
 
 //function zipAndUploadFiles(destPath) {
-function zipAndUploadFiles() {
+function zipAndUploadFiles(destPath) {
     var fileList = document.getElementById('data_uploads').files;
     var zip = new JSZip();
     var reader = new FileReader();
+    //TODO handle single file use-case: no need for zipping + set single=true
     function zipFile(index) {
         //upload zipped file when finished zipping all files (index == fileList.length) 
         if (index == fileList.length) {
             var blobLink = document.getElementById('blob');
             if (JSZip.support.blob) {
                 // TODO : use a real destPath
-                uploadZip(zip, "/vip/Home/testFolder");
-                //uploadZip(zip, destPath);
+                //uploadZip(zip, "/vip/Home/testFolder");
+                uploadZip(zip, destPath);
             } else {
                 blobLink.innerHTML += " (not supported on this browser)";
             }
@@ -100,7 +101,7 @@ function zipAndUploadFiles() {
                 zip.file(path, data);
                 // zip next file
                 zipFile(index + 1);
-            }
+            };
             reader.readAsArrayBuffer(file);
         }
     }
@@ -119,11 +120,16 @@ function uploadZip(zip, destPath) {
     xhr.addEventListener("load", uploadComplete, false);
     xhr.addEventListener("error", uploadFailed, false);
     xhr.addEventListener("abort", uploadCanceled, false);
+    var getTimestamp = function() {  return new Date().getTime(); };
+    var filename="file-"+getTimestamp()+".zip";
     zip.generateAsync({type: "blob"}).then(function (blob) {
-        fd.append("file", blob, 'filename.zip');
+        fd.append("file", blob, filename);
         fd.append("path", destPath);
-        fd.append("target", "dataManagerUploadComplete");
-        //todo : check if files are uploaded one by one; if not, check if they can be compressed and sent to /fr.insalyon.creatis.vip.portal.Main/uploadfilesservice
+        fd.append("single", 'false');
+        fd.append("unzip", 'true');
+        fd.append("pool", 'false');
+        fd.append("target", "dataManagerUploadComplete"); 
+        //todo : change service path so that it is always available (even for deployments other that ROOT)
         xhr.open("POST", "/fr.insalyon.creatis.vip.portal.Main/fileuploadservice");
         xhr.send(fd);
     }, function (err) {
