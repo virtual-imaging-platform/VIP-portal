@@ -45,77 +45,114 @@
 
 //view-source:https://dior.ics.muni.cz/~makub/massupload.html
 //https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/file
+//https://stuk.github.io/jszip/documentation/examples/download-zip-file.html
 
-
-     function handleFiles(files) {
-          var preview = document.querySelector('.preview');
-          while(preview.firstChild) {
-            preview.removeChild(preview.firstChild);
-          }
-          var curFiles = files;
-          if(curFiles.length === 0) {
+function previewFiles(files) {
+    var preview = document.querySelector('.preview');
+    while (preview.firstChild) {
+        preview.removeChild(preview.firstChild);
+    }
+    var curFiles = files;
+    if (curFiles.length === 0) {
+        var para = document.createElement('p');
+        para.textContent = 'No files currently selected for upload';
+        preview.appendChild(para);
+    } else {
+        var list = document.createElement('ol');
+        preview.appendChild(list);
+        for (var i = 0; i < curFiles.length; i++) {
+            var listItem = document.createElement('li');
             var para = document.createElement('p');
-            para.textContent = 'No files currently selected for upload';
-            preview.appendChild(para);
-          } else {
-            var list = document.createElement('ol');
-            preview.appendChild(list);
-            for(var i = 0; i < curFiles.length; i++) {
-              var listItem = document.createElement('li');
-              var para = document.createElement('p');
-              para.textContent = 'File name ' + curFiles[i].name ;
-              //var image = document.createElement('img');
-              //image.src = window.URL.createObjectURL(curFiles[i]);
-              //listItem.appendChild(image);
-              listItem.appendChild(para);
-              list.appendChild(listItem);
-            }
-          }
-     }
-
-//upload files
-    function uploadFiles() {
-        //todo: check empty list ?
-        var xhr = new XMLHttpRequest();
-        var fileList = document.getElementById('data_uploads').files;
-        var fd = new FormData();
-        for (var i = 0, file; file = fileList[i]; i++) {
-            fd.append("file", file);
+            para.textContent = 'File name ' + curFiles[i].name;
+            //var image = document.createElement('img');
+            //image.src = window.URL.createObjectURL(curFiles[i]);
+            //listItem.appendChild(image);
+            listItem.appendChild(para);
+            list.appendChild(listItem);
         }
-        /* event listeners */
-        // http://www.w3.org/TR/XMLHttpRequest2/#xmlhttprequestupload
-        // http://www.w3.org/TR/progress-events/#interface-progressevent
-        xhr.upload.addEventListener("progress", uploadProgress, false);
-        xhr.addEventListener("load", uploadComplete, false);
-        xhr.addEventListener("error", uploadFailed, false);
-        xhr.addEventListener("abort", uploadCanceled, false);
+    }
+}
+
+
+//function zipAndUploadFiles(destPath) {
+function zipAndUploadFiles() {
+    var fileList = document.getElementById('data_uploads').files;
+    var zip = new JSZip();
+    var reader = new FileReader();
+    function zipFile(index) {
+        //upload zipped file when finished zipping all files (index == fileList.length) 
+        if (index == fileList.length) {
+            var blobLink = document.getElementById('blob');
+            if (JSZip.support.blob) {
+                // TODO : use a real destPath
+                uploadZip(zip, "/vip/Home/testFolder");
+                //uploadZip(zip, destPath);
+            } else {
+                blobLink.innerHTML += " (not supported on this browser)";
+            }
+            return;
+        } else {
+            var file = fileList[index];
+            var path = file.webkitRelativePath;
+            reader.onload = function (e) {
+                // get file content and add it to zip
+                var data = e.target.result;
+                zip.file(path, data);
+                // zip next file
+                zipFile(index + 1);
+            }
+            reader.readAsArrayBuffer(file);
+        }
+    }
+    zipFile(0);
+
+}
+
+// upload generated zip file
+function uploadZip(zip, destPath) {
+    var xhr = new XMLHttpRequest();
+    var fd = new FormData();
+    /* event listeners */
+    // http://www.w3.org/TR/XMLHttpRequest2/#xmlhttprequestupload
+    // http://www.w3.org/TR/progress-events/#interface-progressevent
+    xhr.upload.addEventListener("progress", uploadProgress, false);
+    xhr.addEventListener("load", uploadComplete, false);
+    xhr.addEventListener("error", uploadFailed, false);
+    xhr.addEventListener("abort", uploadCanceled, false);
+    zip.generateAsync({type: "blob"}).then(function (blob) {
+        fd.append("file", blob, 'filename.zip');
+        fd.append("path", destPath);
+        fd.append("target", "dataManagerUploadComplete");
         //todo : check if files are uploaded one by one; if not, check if they can be compressed and sent to /fr.insalyon.creatis.vip.portal.Main/uploadfilesservice
         xhr.open("POST", "/fr.insalyon.creatis.vip.portal.Main/fileuploadservice");
         xhr.send(fd);
-    }
+    }, function (err) {
+        blobLink.innerHTML += " " + err;
+    });
 
-    //callbacks for upload
-    function uploadProgress(evt) {
-        if (evt.lengthComputable) {
-            var percentComplete = Math.round(evt.loaded * 100 / evt.total);
-            document.getElementById('progressNumber').innerHTML = percentComplete.toString() + '%';
-        }
-        else {
-            document.getElementById('progressNumber').innerHTML = 'unable to compute';
-        }
-    }
+}
 
-    function uploadComplete(evt) {
-        /* This event is raised when the server send back a response */
-        document.getElementById('serverResponse').innerHTML = evt.target.responseText;
+//callbacks for upload
+function uploadProgress(evt) {
+    if (evt.lengthComputable) {
+        var percentComplete = Math.round(evt.loaded * 100 / evt.total);
+        document.getElementById('progressNumber').innerHTML = percentComplete.toString() + '%';
+    } else {
+        document.getElementById('progressNumber').innerHTML = 'unable to compute';
     }
+}
 
-    function uploadFailed(evt) {
-        alert("There was an error attempting to upload the file.");
-    }
+function uploadComplete(evt) {
+    /* This event is raised when the server send back a response */
+    document.getElementById('serverResponse').innerHTML = evt.target.responseText;
+}
 
-    function uploadCanceled(evt) {
-        alert("The upload has been canceled by the user or the browser dropped the connection.");
-    }
+function uploadFailed(evt) {
+    alert("There was an error attempting to upload the file.");
+}
+
+function uploadCanceled(evt) {
+    alert("The upload has been canceled by the user or the browser dropped the connection.");
+}
 
 
