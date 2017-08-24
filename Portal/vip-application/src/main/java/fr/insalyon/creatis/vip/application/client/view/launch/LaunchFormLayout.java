@@ -65,7 +65,7 @@ public class LaunchFormLayout extends AbstractFormLayout {
     private TextItem simulationNameItem;
     private VLayout sourcesLayout;
     private VLayout executionNameLayout;
-    
+        
     public LaunchFormLayout(String title, String icon, final String description, boolean executionNamePadding) {
         super("600", "*");
         addTitle(title, icon);
@@ -182,7 +182,7 @@ public class LaunchFormLayout extends AbstractFormLayout {
      * @param valuesMap
      */
     public void loadInputs(String simulationName, Map<String, String> valuesMap) {
-
+        
         this.simulationNameItem.setValue(simulationName);
                         
         final Map<String, String> conflictMap = new HashMap<String, String>();

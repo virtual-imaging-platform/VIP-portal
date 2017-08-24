@@ -45,37 +45,29 @@ knowledge of the CeCILL-B license and that you accept its terms.
 package fr.insalyon.creatis.vip.application.server.rpc;
 
 import com.google.gwt.logging.shared.RemoteLoggingService;
-import fr.insalyon.creatis.vip.core.client.view.CoreException;
 import fr.insalyon.creatis.vip.core.server.rpc.AbstractRemoteServiceServlet;
-import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import org.apache.log4j.Logger;
 
 /**
- *
+ * Minimalist Servlet allowing to write logs (from the client side) in vip.log file on server side.
+ * 
+ * Please see servlet configuration in Application.gwt.xml file from VIP-Application module, and in web.xml from VIP-portal module WEB-INF folder.
+ * To use it, create a Logger object in a client side class : "private static final Logger logger = Logger.getLogger(my_class_name.class.getName());"
+ * Then use it in methods. For instance : "logger.info("log_name : " + valueMapResult);
+ * 
  * @author pgirard
  */
 public class LoggerServlet extends AbstractRemoteServiceServlet implements RemoteLoggingService  {
     
-        private static final Logger logger = Logger.getLogger(LoggerServlet.class);
+    private static final Logger logger = Logger.getLogger(LoggerServlet.class);
 
-       @Override
-        public String logOnServer(LogRecord record) {
+    @Override
+     public String logOnServer(LogRecord record) {
 
-           final Level level = record.getLevel();
-           final String message = record.getMessage();
-      //   final Throwable thrown = record.getThrown();
-      //   final Logger logger = LoggerFactory.getLogger(record.getLoggerName());
-
-          logger.info(message);
-
-//            try {
-//                this.trace(logger, "   ");
-//            } catch (CoreException ex) {
-//                java.util.logging.Logger.getLogger(LoggerServlet.class.getName()).log(Level.SEVERE, null, ex);
-//            }
-
-      return null;
-  }
+         final String message = record.getMessage();
+         logger.info(message);
+         return null;
+    }
         
 }
