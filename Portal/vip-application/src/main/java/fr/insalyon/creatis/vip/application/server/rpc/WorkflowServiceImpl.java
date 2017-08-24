@@ -31,7 +31,6 @@
  */
 package fr.insalyon.creatis.vip.application.server.rpc;
 
-import com.google.gwt.logging.shared.RemoteLoggingService;
 import fr.insalyon.creatis.devtools.FileUtils;
 import fr.insalyon.creatis.moteur.plugins.workflowsdb.dao.WorkflowsDBDAOException;
 import fr.insalyon.creatis.vip.application.client.bean.*;
@@ -65,7 +64,7 @@ import org.apache.log4j.Logger;
  *
  * @author Rafael Ferreira da Silva
  */
-public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements WorkflowService  {
+public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements WorkflowService {
 
     private static final Logger logger = Logger.getLogger(WorkflowServiceImpl.class);
     private WorkflowBusiness workflowBusiness;
