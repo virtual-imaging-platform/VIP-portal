@@ -118,5 +118,5 @@ public class InputFlagLayout extends AbstractSourceLayout{
     public boolean validate() {
         return cbFlagInputItem.validate();
     }
-    
+
 }

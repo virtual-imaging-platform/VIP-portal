@@ -292,7 +292,7 @@ public class InputLayout extends AbstractSourceLayout {
 
     @Override
     public void setValue(String value) {
-
+        
         if (value.contains("Start: ")) { // Range
             selectItem.setValue(InputType.Range.name());
             setRange();
@@ -314,4 +314,20 @@ public class InputLayout extends AbstractSourceLayout {
             }
         }
     }
+
+    @Override
+    public void enableInputRelaunchedSimulation() {
+        cbOptionalInputItem.setValue(true);  
+        selectItem.setDisabled(false);
+        listLayout.setDisabled(false);
+    }
+    
+    @Override
+    public boolean isModifiableRelaunchedSimulation() {
+        if (getValue().equalsIgnoreCase(ApplicationConstants.INPUT_WITHOUT_VALUE) || getValue().equalsIgnoreCase(ApplicationConstants.DEFAULT_RESULT_DIRECTORY)) {
+            return true;
+        } 
+        return false;
+    }
+    
 }

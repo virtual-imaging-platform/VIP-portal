@@ -47,7 +47,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Logger;
 
 /**
  *
@@ -56,9 +55,7 @@ import java.util.logging.Logger;
 public class LaunchTab extends AbstractLaunchTab {
 
     private ArrayList<String> disabledSources;
-    
-    private static final Logger logger = Logger.getLogger(LaunchTab.class.getName());
-    
+        
     public LaunchTab(String applicationName, String applicationVersion, String applicationClass) {
         this(applicationName, applicationVersion, applicationClass, null, null, null);
     }
@@ -75,9 +72,7 @@ public class LaunchTab extends AbstractLaunchTab {
             Map<String, String> inputs, String[] disabled) {
 
         super(applicationName, applicationVersion, applicationClass);
-        
-        logger.info("LOG VENANT classe LaunchTab.java **************** : CONTRUCTEUR :  " + this.applicationName);
-        
+                
         layout.clear();
         disabledSources = new ArrayList<String>();
         if (disabled != null) {
@@ -95,8 +90,6 @@ public class LaunchTab extends AbstractLaunchTab {
      */
     private void loadData(final String simulationName, final Map<String, String> inputs) {
         
-        logger.info("LOG VENANT classe LaunchTab.java **************** : DEBUT methode loadData ");
-
         final AsyncCallback<Descriptor> callback = new AsyncCallback<Descriptor>() {
             @Override
             public void onFailure(Throwable caught) {
@@ -109,41 +102,18 @@ public class LaunchTab extends AbstractLaunchTab {
                 launchFormLayout = new LaunchFormLayout(applicationName + " " + applicationVersion, null, descriptor.getDescription(), true);
                 layout.addMember(launchFormLayout);
                 
-//                SC.say("ONSUCCESS ******************** ");
-                
-//                if (descriptor.getDescription() != null && descriptor.getSources() != null ) {
-//                    SC.say("ONSUCCESS : descriptor : " + descriptor.getDescription() + " ********* SOURCES SIZE : " + descriptor.getSources().size());
-//                }
-//                else {
-//                    SC.say("PB : descriptor or sources ");
-//                }
-                
                 // Put mandatory sources first
-                String lesSources = new String();
                 List<Source> mandatorySources = new ArrayList<Source>();
                 List<Source> optionalSources = new ArrayList<Source>();
-                for (Source source : descriptor.getSources()) {
-                    
-//                    lesSources += " source name : " + source.getName() +" ***** source type : "+ source.getType() ;
-                    
+                for (Source source : descriptor.getSources()) {         
                     if (source.isOptional()) {
                         optionalSources.add(source);
                     } else {
                         mandatorySources.add(source);
                     }
                 }
-                
-//                if (lesSources != null) {
-//                    SC.say(" carac lesSources  : " + lesSources);
-//                }
-//                else {
-//                    SC.say("lesSources sont NULL");
-//                }
-                
-                
+
                 mandatorySources.addAll(optionalSources);
-                
-//                int nbAddSource = 0;
                 
                 for (Source source : mandatorySources) {
                     boolean disabled = false;
@@ -159,14 +129,10 @@ public class LaunchTab extends AbstractLaunchTab {
                         launchFormLayout.addSource(new InputFlagLayout(source.getName(), source.getDescription(), source.isOptional(), source.getDefaultValue(), source.getVipTypeRestriction(), source.getPrettyName()), disabled);
                     }
                     else {
-//                        SC.say("lesSources sont NULL");
-//                        nbAddSource ++;
                         launchFormLayout.addSource(new InputLayout(source.getName(), source.getDescription(), source.isOptional(), source.getDefaultValue(), source.getPrettyName()), disabled);
                     }
                 }
                 
-//              SC.say("NB passages dans launchFormLayout.addSource : " + nbAddSource);
-
                 configureLaunchButton();
                 configureSaveInputsButton();
 
@@ -185,26 +151,12 @@ public class LaunchTab extends AbstractLaunchTab {
                 configureInputsLayout(true);
                 
                 if (simulationName != null) {
-//                    SC.say("PASSAGE simulationName != null : " + simulationName);
                     launchFormLayout.loadInputs(simulationName, inputs);
                 }
             }
         };
         modal.show("Loading launch panel...", true);
         WorkflowService.Util.getInstance().getApplicationDescriptor(applicationName, applicationVersion, callback);
-        
-        logger.info("LOG VENANT classe LaunchTab.java **************** : FIN methode loadData : ");
-        
-        
-          // this log hides tab on GUI ???
-//        logger.info("LOG VENANT classe LaunchTab.java **************** : FIN methode loadData : " + launchFormLayout.getSimulationName());
-  
-//        consoleLog.log(Level.ALL, "test **********************************");
-
-//        GWT.log("WorkflowService in the browser + application name ****** : " + this.applicationName);
-
-//        SC.say("WorkflowService ******************** ");
-        
     }
 
     /**
@@ -214,25 +166,6 @@ public class LaunchTab extends AbstractLaunchTab {
     protected void launch() {
 
         WidgetUtil.setLoadingIButton(launchButton, "Launching...");
-        
-//        String parameterto = new String();
-//        String parameterList = new String();
-//            for (String name : getParametersMap().keySet()) {
-//                
-//                parameterList += ".keySet() : " + name + "          get(name) : " +  getParametersMap().get(name) + "               ";
-//            }
-//            
-//            String parameterList2 = new String();
-//            for (String name : getParametersMap().values()) {
-//                
-//                parameterList2 += "name via values : " + name + "             ";
-//            }
-//            
-//            parameterto = parameterList + parameterList2;
-//            
-//            SC.say(parameterto);
-//        
-//        
         
         // Input data verification
         List<String> inputData = new ArrayList<String>();

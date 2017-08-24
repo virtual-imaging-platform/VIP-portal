@@ -55,7 +55,6 @@ import fr.insalyon.creatis.vip.core.client.view.util.ValidatorUtil;
 import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Logger;
 
 /**
  *
@@ -67,8 +66,6 @@ public class LaunchFormLayout extends AbstractFormLayout {
     private VLayout sourcesLayout;
     private VLayout executionNameLayout;
     
-    private static final Logger logger = Logger.getLogger(LaunchFormLayout.class.getName());
-
     public LaunchFormLayout(String title, String icon, final String description, boolean executionNamePadding) {
         super("600", "*");
         addTitle(title, icon);
@@ -187,65 +184,27 @@ public class LaunchFormLayout extends AbstractFormLayout {
     public void loadInputs(String simulationName, Map<String, String> valuesMap) {
 
         this.simulationNameItem.setValue(simulationName);
-        
-        logger.info("LOG VENANT LaunchFormLayout ****************");
-        
+                        
         final Map<String, String> conflictMap = new HashMap<String, String>();
         StringBuilder sb = new StringBuilder();
-        
-        String valueMapResult = new String(" ##### valueMapResult : ");
-        
+                
         for (Canvas canvas : sourcesLayout.getMembers()) {
             if (canvas instanceof AbstractSourceLayout) {
                 final AbstractSourceLayout source = (AbstractSourceLayout) canvas;
                 final String inputValue = valuesMap.get(source.getName());
-
+                
                 if (inputValue != null) {
-                                    valueMapResult += "source.getName() : " + source.getName() + " source.getValue()" + source.getValue() + " ********* ";
-
-                    if (source.getValue() == null || source.getValue().isEmpty()) {                     
-                        // TODO
-                        source.setValue(inputValue);
-
-                    } else {
-                        // TODO
-                        conflictMap.put(source.getName(), inputValue);
-                    }
+                        if (source.getValue() == null || source.getValue().isEmpty() || source.isModifiableRelaunchedSimulation()) {      
+                            if (source.isOptional()) {
+                                    source.enableInputRelaunchedSimulation();
+                            } 
+                            source.setValue(inputValue);
+                       } else {
+                           conflictMap.put(source.getName(), inputValue);
+                       }
                 }
             }
         }
-        
-        logger.info("LOG VENANT LaunchFormLayout **************** : " + valueMapResult);
-
-        
-//        SC.say("valueMapResult : " + valueMapResult);
-        
-//        String conflictMapLogs = new String("conflictMapLogs : ");
-
-
-//            Label logs = WidgetUtil.getLabel("test **************", 20);
-//            executionNameLayout.addMember(logs);
-
-        String conflictMapLogs = new String(" ##### valueMapResult : ");
-
-        if (!conflictMap.isEmpty()) {
-            for (Canvas canvas : sourcesLayout.getMembers()) {
-                if (canvas instanceof AbstractSourceLayout) {
-                    AbstractSourceLayout source = (AbstractSourceLayout) canvas;
-                    conflictMapLogs += "SOURCE name : " + source.getName() + "value : " + conflictMap.get(source.getName()) + " ******** ";
-                }
-            }
-        }
-        
-        logger.info("LOG VENANT LaunchFormLayout **************** : " + conflictMapLogs);
-
-//        SC.say(conflictMapLogs);
-        
-//        try {
-//            TimeUnit.SECONDS.sleep(10);
-//        } catch (InterruptedException ex) {
-//            //Logger.getLogger(LaunchTab.class.getName()).log(Level.SEVERE, null, ex);
-//        }
         
         if (!conflictMap.isEmpty()) {
             SC.ask("The following fields already have a value.<br />"

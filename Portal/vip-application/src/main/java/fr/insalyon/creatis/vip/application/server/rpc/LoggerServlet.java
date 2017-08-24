@@ -69,11 +69,11 @@ public class LoggerServlet extends AbstractRemoteServiceServlet implements Remot
 
           logger.info(message);
 
-            try {
-                this.trace(logger, "VENANT LOGGER SERVLET **********************");
-            } catch (CoreException ex) {
-                java.util.logging.Logger.getLogger(LoggerServlet.class.getName()).log(Level.SEVERE, null, ex);
-            }
+//            try {
+//                this.trace(logger, "   ");
+//            } catch (CoreException ex) {
+//                java.util.logging.Logger.getLogger(LoggerServlet.class.getName()).log(Level.SEVERE, null, ex);
+//            }
 
       return null;
   }
