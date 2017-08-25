@@ -292,7 +292,7 @@ public class InputLayout extends AbstractSourceLayout {
 
     @Override
     public void setValue(String value) {
-        
+
         if (value.contains("Start: ")) { // Range
             selectItem.setValue(InputType.Range.name());
             setRange();

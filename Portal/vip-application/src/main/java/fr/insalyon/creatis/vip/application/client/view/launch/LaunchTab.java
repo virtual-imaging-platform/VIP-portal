@@ -55,7 +55,7 @@ import java.util.Map;
 public class LaunchTab extends AbstractLaunchTab {
 
     private ArrayList<String> disabledSources;
-        
+    
     public LaunchTab(String applicationName, String applicationVersion, String applicationClass) {
         this(applicationName, applicationVersion, applicationClass, null, null, null);
     }
@@ -72,7 +72,6 @@ public class LaunchTab extends AbstractLaunchTab {
             Map<String, String> inputs, String[] disabled) {
 
         super(applicationName, applicationVersion, applicationClass);
-                
         layout.clear();
         disabledSources = new ArrayList<String>();
         if (disabled != null) {
@@ -89,7 +88,7 @@ public class LaunchTab extends AbstractLaunchTab {
      * Loads simulation sources list.
      */
     private void loadData(final String simulationName, final Map<String, String> inputs) {
-        
+
         final AsyncCallback<Descriptor> callback = new AsyncCallback<Descriptor>() {
             @Override
             public void onFailure(Throwable caught) {
@@ -105,16 +104,15 @@ public class LaunchTab extends AbstractLaunchTab {
                 // Put mandatory sources first
                 List<Source> mandatorySources = new ArrayList<Source>();
                 List<Source> optionalSources = new ArrayList<Source>();
-                for (Source source : descriptor.getSources()) {         
+                for (Source source : descriptor.getSources()) {
                     if (source.isOptional()) {
                         optionalSources.add(source);
                     } else {
                         mandatorySources.add(source);
                     }
                 }
-
                 mandatorySources.addAll(optionalSources);
-                
+                                                
                 for (Source source : mandatorySources) {
                     boolean disabled = false;
                     for (String name : disabledSources) {
@@ -132,7 +130,7 @@ public class LaunchTab extends AbstractLaunchTab {
                         launchFormLayout.addSource(new InputLayout(source.getName(), source.getDescription(), source.isOptional(), source.getDefaultValue(), source.getPrettyName()), disabled);
                     }
                 }
-                
+
                 configureLaunchButton();
                 configureSaveInputsButton();
 

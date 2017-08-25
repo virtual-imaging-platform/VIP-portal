@@ -65,7 +65,7 @@ public class LaunchFormLayout extends AbstractFormLayout {
     private TextItem simulationNameItem;
     private VLayout sourcesLayout;
     private VLayout executionNameLayout;
-        
+    
     public LaunchFormLayout(String title, String icon, final String description, boolean executionNamePadding) {
         super("600", "*");
         addTitle(title, icon);
@@ -182,17 +182,17 @@ public class LaunchFormLayout extends AbstractFormLayout {
      * @param valuesMap
      */
     public void loadInputs(String simulationName, Map<String, String> valuesMap) {
-        
+
         this.simulationNameItem.setValue(simulationName);
-                        
+
         final Map<String, String> conflictMap = new HashMap<String, String>();
         StringBuilder sb = new StringBuilder();
-                
+
         for (Canvas canvas : sourcesLayout.getMembers()) {
             if (canvas instanceof AbstractSourceLayout) {
                 final AbstractSourceLayout source = (AbstractSourceLayout) canvas;
                 final String inputValue = valuesMap.get(source.getName());
-                
+
                 if (inputValue != null) {
                         if (source.getValue() == null || source.getValue().isEmpty() || source.isModifiableRelaunchedSimulation()) {      
                             if (source.isOptional()) {
@@ -205,7 +205,6 @@ public class LaunchFormLayout extends AbstractFormLayout {
                 }
             }
         }
-        
         if (!conflictMap.isEmpty()) {
             SC.ask("The following fields already have a value.<br />"
                    + "Do you want to replace them?<br />"
