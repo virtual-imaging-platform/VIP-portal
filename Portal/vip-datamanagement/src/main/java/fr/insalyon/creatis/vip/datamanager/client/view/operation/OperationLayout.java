@@ -166,6 +166,7 @@ public class OperationLayout extends VLayout {
      */
     public void addOperation(final String operationID) {
 
+        Layout.getInstance().setWarningMessage("Adding opperation ID "+operationID);
         DataManagerServiceAsync service = DataManagerService.Util.getInstance();
         AsyncCallback<PoolOperation> asyncCallback = new AsyncCallback<PoolOperation>() {
 

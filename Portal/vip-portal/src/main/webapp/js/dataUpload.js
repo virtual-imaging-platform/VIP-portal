@@ -43,7 +43,8 @@
  knowledge of the CeCILL-B license and that you accept its terms.
  */
 
-//view-source:https://dior.ics.muni.cz/~makub/massupload.html
+/* Internet sources used */
+//https://dior.ics.muni.cz/~makub/massupload.html
 //https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/file
 //https://stuk.github.io/jszip/documentation/examples/download-zip-file.html
 
@@ -58,38 +59,43 @@ function previewFiles(files) {
         para.textContent = 'No files currently selected for upload';
         preview.appendChild(para);
     } else {
+        //TODO: add a scrollable item if we want to preview the list of files
+        /*
         var list = document.createElement('ol');
         preview.appendChild(list);
         for (var i = 0; i < curFiles.length; i++) {
             var listItem = document.createElement('li');
             var para = document.createElement('p');
             para.textContent = 'File name ' + curFiles[i].name;
-            //var image = document.createElement('img');
-            //image.src = window.URL.createObjectURL(curFiles[i]);
-            //listItem.appendChild(image);
             listItem.appendChild(para);
             list.appendChild(listItem);
         }
+        */
+        var para = document.createElement('p');
+        para.textContent = " " + curFiles.length + " files selected for upload. Click on the upload button to proceed.";
+        preview.appendChild(para);
     }
 }
 
 
-//function zipAndUploadFiles(destPath) {
-function zipAndUploadFiles(destPath) {
-    var fileList = document.getElementById('data_uploads').files;
+
+//zip a list of files and call uploadZip to send the final zip to the given url (which is a file upload service)
+function zipAndUploadFiles(url, destPath, target, usePool) {
     var zip = new JSZip();
     var reader = new FileReader();
+    var fileList = document.getElementById('data_uploads').files;
+    if (fileList.length === 0) {
+        alert("No folder selected for upload");
+        return;
+    }
     //TODO handle single file use-case: no need for zipping + set single=true
     function zipFile(index) {
-        //upload zipped file when finished zipping all files (index == fileList.length) 
-        if (index == fileList.length) {
-            var blobLink = document.getElementById('blob');
+        //upload zipped file when finished zipping all files (index == fileList.length)
+        if (index === fileList.length) {
             if (JSZip.support.blob) {
-                // TODO : use a real destPath
-                //uploadZip(zip, "/vip/Home/testFolder");
-                uploadZip(zip, destPath);
+                uploadZip(zip, url, destPath, target, usePool);
             } else {
-                blobLink.innerHTML += " (not supported on this browser)";
+                alert("JSZip blob not supported on this browser.");
             }
             return;
         } else {
@@ -106,36 +112,29 @@ function zipAndUploadFiles(destPath) {
         }
     }
     zipFile(0);
-
 }
 
-// upload generated zip file
-function uploadZip(zip, destPath) {
-    var xhr = new XMLHttpRequest();
+// upload generated zip file to destPath using the given url (which is a file upload service)
+function uploadZip(zip, url, destPath, target, usePool) {
     var fd = new FormData();
-    /* event listeners */
-    // http://www.w3.org/TR/XMLHttpRequest2/#xmlhttprequestupload
-    // http://www.w3.org/TR/progress-events/#interface-progressevent
+    var xhr = new XMLHttpRequest();
     xhr.upload.addEventListener("progress", uploadProgress, false);
     xhr.addEventListener("load", uploadComplete, false);
     xhr.addEventListener("error", uploadFailed, false);
     xhr.addEventListener("abort", uploadCanceled, false);
     var getTimestamp = function() {  return new Date().getTime(); };
-    var filename="file-"+getTimestamp()+".zip";
     zip.generateAsync({type: "blob"}).then(function (blob) {
-        fd.append("file", blob, filename);
+        fd.append("file", blob, "file-"+getTimestamp()+".zip");
         fd.append("path", destPath);
         fd.append("single", 'false');
         fd.append("unzip", 'true');
-        fd.append("pool", 'false');
-        fd.append("target", "dataManagerUploadComplete"); 
-        //todo : change service path so that it is always available (even for deployments other that ROOT)
-        xhr.open("POST", "/fr.insalyon.creatis.vip.portal.Main/fileuploadservice");
+        fd.append("pool", usePool);
+        fd.append("target", target);
+        xhr.open("POST", url);
         xhr.send(fd);
     }, function (err) {
-        blobLink.innerHTML += " " + err;
+        alert("An error occured:" + err);
     });
-
 }
 
 //callbacks for upload
@@ -149,8 +148,12 @@ function uploadProgress(evt) {
 }
 
 function uploadComplete(evt) {
-    /* This event is raised when the server send back a response */
+    //This event is raised when the server sends back a response 
     document.getElementById('serverResponse').innerHTML = evt.target.responseText;
+    //the following is used in order to execute the script from the response, which look like this: 
+    //"if (parent.dataManagerUploadComplete) parent.dataManagerUploadComplete('Upload-2092952139087909##Upload-2092952141816446##');"
+    //TODO: check whether this could be a security issue
+    eval(document.getElementById("runscript").innerHTML);
 }
 
 function uploadFailed(evt) {

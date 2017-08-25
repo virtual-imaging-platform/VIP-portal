@@ -160,7 +160,7 @@ public class FileUploadServiceImpl extends HttpServlet {
                 PrintWriter out = response.getWriter();
                 out.println("<html>");
                 out.println("<body>");
-                out.println("<script type=\"text/javascript\">");
+                out.println("<script type=\"text/javascript\" id=\"runscript\">");
                 out.println("if (parent." + target + ") parent." + target + "('"
                         + operationID + "');");
                 out.println("</script>");
@@ -187,9 +187,8 @@ public class FileUploadServiceImpl extends HttpServlet {
                         f.getAbsolutePath(),
                         DataManagerUtil.parseBaseDir(user, baseDir),
                         user.getEmail()));
-
-            }
-            ids.append("##");
+                ids.append("##");
+            }           
         }
         return ids.toString();
     }
