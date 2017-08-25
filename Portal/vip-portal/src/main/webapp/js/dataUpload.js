@@ -153,6 +153,7 @@ function uploadComplete(evt) {
     //the following is used in order to execute the script from the response, which look like this: 
     //"if (parent.dataManagerUploadComplete) parent.dataManagerUploadComplete('Upload-2092952139087909##Upload-2092952141816446##');"
     //TODO: check whether this could be a security issue
+    //TODO: when GateLab is also replaced, change the HTML response to XML data that could be directly processed here
     eval(document.getElementById("runscript").innerHTML);
 }
 

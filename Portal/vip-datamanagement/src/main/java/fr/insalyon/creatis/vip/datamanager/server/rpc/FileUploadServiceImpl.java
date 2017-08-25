@@ -152,7 +152,7 @@ public class FileUploadServiceImpl extends HttpServlet {
                         logger.error(ex);
                     }
                 }
-
+                //TODO: when GateLab is also replaced change the HTML/JS response to XML data that could be directly processed in JS
                 response.setContentType("text/html");
                 response.setHeader("Pragma", "No-cache");
                 response.setDateHeader("Expires", 0);
