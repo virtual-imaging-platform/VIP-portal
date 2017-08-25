@@ -158,14 +158,14 @@ public abstract class AbstractSourceLayout extends VLayout {
      * Avoids implementation in subtypes which are not concerned.
      * 
      */
-    public void enableInputRelaunchedSimulation() {
+    public void enableInput() {
     }
     
     /**
      * If true, the input value can be modifiable by loadInputs(...) method of LaunchFormLayout.java.
      * This is in a relaunched simulation context.
      */
-    public boolean isModifiableRelaunchedSimulation() {
+    public boolean isValueModifiable() {
         return true;
     }
  

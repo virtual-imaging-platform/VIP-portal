@@ -117,9 +117,6 @@ public class ApplicationConstants {
     public static final String SESSION_CLASSES = "vip-classes";
     public static final String SEPARATOR_INPUT = "##";
     public static final String SEPARATOR_LIST = "@@";
-    
-    // Default result directory
-    public static final String DEFAULT_RESULT_DIRECTORY = "/vip/Home";
 
     public static String getLaunchTabID(String applicationName) {
 

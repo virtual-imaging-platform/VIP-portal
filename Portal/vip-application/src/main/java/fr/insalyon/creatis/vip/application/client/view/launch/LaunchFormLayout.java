@@ -194,14 +194,14 @@ public class LaunchFormLayout extends AbstractFormLayout {
                 final String inputValue = valuesMap.get(source.getName());
 
                 if (inputValue != null) {
-                        if (source.getValue() == null || source.getValue().isEmpty() || source.isModifiableRelaunchedSimulation()) {      
-                            if (source.isOptional()) {
-                                    source.enableInputRelaunchedSimulation();
-                            } 
-                            source.setValue(inputValue);
-                       } else {
-                           conflictMap.put(source.getName(), inputValue);
-                       }
+                    if (source.getValue() == null || source.getValue().isEmpty() || source.isValueModifiable()) {      
+                        if (source.isOptional()) {
+                            source.enableInput();
+                        } 
+                        source.setValue(inputValue);
+                    } else {
+                        conflictMap.put(source.getName(), inputValue);
+                    }
                 }
             }
         }
