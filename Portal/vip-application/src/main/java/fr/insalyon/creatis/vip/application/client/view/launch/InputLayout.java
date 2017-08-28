@@ -325,7 +325,7 @@ public class InputLayout extends AbstractSourceLayout {
     
     @Override
     public boolean isValueModifiable() {
-        if (getValue().equalsIgnoreCase(ApplicationConstants.INPUT_WITHOUT_VALUE) || getValue().equalsIgnoreCase(DataManagerConstants.ROOT.concat(DataManagerConstants.USERS_HOME))) {
+        if (getValue().equalsIgnoreCase(ApplicationConstants.INPUT_WITHOUT_VALUE) || getValue().equalsIgnoreCase(DataManagerConstants.ROOT + "/" + DataManagerConstants.USERS_HOME)) {
             return true;
         } 
         return false;
