@@ -37,9 +37,18 @@ knowledge of the CeCILL-B license and that you accept its terms.
     <inherits name='fr.insalyon.creatis.vip.core.Core'/>
     <inherits name='fr.insalyon.creatis.vip.datamanager.DataManager'/>
     <inherits name='com.googlecode.gflot.GFlot'/>
+    <inherits name="com.google.gwt.logging.Logging" />
+        <set-property name="gwt.logging.enabled" value="TRUE" />
+        <set-property name="gwt.logging.logLevel" value="FINEST" />
+        <set-property name="gwt.logging.simpleRemoteHandler" value="ENABLED" />
+        <set-property name="gwt.logging.consoleHandler" value="DISABLED" />
+        <set-property name="gwt.logging.developmentModeHandler" value="DISABLED" />
+        <set-property name="gwt.logging.popupHandler" value="DISABLED" />
+        <set-property name="gwt.logging.systemHandler" value="DISABLED" />
 
     <!-- Servlets -->
     <servlet class="fr.insalyon.creatis.vip.application.server.rpc.ApplicationServiceImpl" path="/applicationservice"/>
     <servlet class="fr.insalyon.creatis.vip.application.server.rpc.WorkflowServiceImpl" path="/workflowservice"/>
     <servlet class="fr.insalyon.creatis.vip.application.server.rpc.JobServiceImpl" path="/jobservice"/>
+    <servlet class="fr.insalyon.creatis.vip.application.server.rpc.LoggerServlet" path="/remote_logging"/>
 </module>
