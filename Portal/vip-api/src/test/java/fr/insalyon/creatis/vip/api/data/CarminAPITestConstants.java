@@ -62,6 +62,7 @@ public interface CarminAPITestConstants {
     /* End of consistant properties */
 
     String TEST_API_URI_PREFIX = "test://";
+    String TEST_DOWNLOAD_PATH = "path/test/download";
     String TEST_DEFAULT_MIMETYPE = "application/octet-stream";
     String TEST_DIR_MIMETYPE = "text/directory";
     String TEST_DATA_DOWNLOAD_TIMEOUT = "30";

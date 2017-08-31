@@ -64,6 +64,7 @@ public class AuthenticationController {
         // TODO : improve this apiContext stuff. Verify that it is initialized somewhere.
         // TODO : Do not call it "get" if it does not return anything
         restApiBusiness.getApiContext(httpServletRequest, false);
+        // TODO verify the presence of credentials
         // business call
         return restApiBusiness.authenticate(authenticationCredentials);
     }

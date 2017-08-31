@@ -48,11 +48,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 /**
  *
  * @author Tristan Glatard
  */
+@Service
 public class PipelineBusiness {
 
     private final static Logger logger = Logger.getLogger(PipelineBusiness.class);
@@ -67,6 +70,7 @@ public class PipelineBusiness {
         this(apiContext, new WorkflowBusiness(), new ApplicationBusiness(), new ClassBusiness());
     }
 
+    @Autowired
     public PipelineBusiness(ApiContext apiContext, WorkflowBusiness workflowBusiness, ApplicationBusiness applicationBusiness, ClassBusiness classBusiness) {
         this.apiContext = apiContext;
         this.workflowBusiness = workflowBusiness;

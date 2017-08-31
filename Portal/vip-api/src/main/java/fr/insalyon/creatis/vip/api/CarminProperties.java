@@ -62,4 +62,5 @@ public interface CarminProperties {
     String API_DOWNLOAD_RETRY_IN_SECONDS = "carmin.data.download.retry";
     String API_DOWNLOAD_TIMEOUT_IN_SECONDS = "carmin.data.download.timeout";
     String API_DATA_TRANSFERT_MAX_SIZE = "carmin.data.max_size";
+    String API_DATA_DOWNLOAD_RELATIVE_PATH = "carmin.data.path.download";
 }

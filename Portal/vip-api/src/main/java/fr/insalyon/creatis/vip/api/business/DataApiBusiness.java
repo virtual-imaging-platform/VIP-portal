@@ -35,11 +35,9 @@ import fr.insalyon.creatis.vip.api.CarminProperties;
 import fr.insalyon.creatis.vip.api.rest.model.Path;
 import fr.insalyon.creatis.vip.api.rest.model.*;
 import fr.insalyon.creatis.vip.core.client.bean.*;
-import fr.insalyon.creatis.vip.core.client.view.user.UserLevel;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.datamanager.client.bean.*;
 import fr.insalyon.creatis.vip.datamanager.client.bean.Data.Type;
-import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerException;
 import fr.insalyon.creatis.vip.datamanager.server.DataManagerUtil;
 import fr.insalyon.creatis.vip.datamanager.server.business.*;
 import fr.insalyon.creatis.vip.datamanager.server.business.LFCPermissionBusiness.LFCAccessType;
@@ -123,7 +121,7 @@ public class DataApiBusiness {
             path.setIsDirectory(false);
             path.setSize(fileInfo.getLength());
             path.setLastModificationDate(
-                    getTimeStampFromGridaDateFormat(fileInfo.getModificationDate()));
+                    getTimeStampFromGridaFormatDate(fileInfo.getModificationDate()));
             path.setMimeType(getMimeType(lfcPath));
         } else {
             // its a directory
@@ -152,7 +150,19 @@ public class DataApiBusiness {
         return res;
     }
 
-    public String getFileContent(String apiUri) throws ApiException {
+    public String getFileContentInBase64(String apiUri) throws ApiException {
+        checkDownloadPermission(apiUri);
+        String downloadOperationId = downloadFileToLocalStorage(apiUri);
+        return getDownloadContentInBase64(downloadOperationId);
+    }
+
+    public File getFile(String apiUri) throws ApiException {
+        checkDownloadPermission(apiUri);
+        String downloadOperationId = downloadFileToLocalStorage(apiUri);
+        return getDownloadFile(downloadOperationId);
+    }
+
+    private void checkDownloadPermission(String apiUri) throws ApiException {
         String lfcPath = checkReadPermission(apiUri);
         if (lfcPath.equals(ROOT)) {
             logger.error("cannot download root");
@@ -169,38 +179,6 @@ public class DataApiBusiness {
             logger.error("Trying to download a file too big : " + lfcPath);
             throw new ApiException("Illegal data API access");
         }
-        String downloadOperationId = baseDownloadFile(lfcPath);
-        Callable<Boolean> isDownloadOverCall = () -> isDownloadOver(downloadOperationId);
-
-        Integer retryDelay =
-                env.getProperty(CarminProperties.API_DOWNLOAD_RETRY_IN_SECONDS, Integer.class);
-        Callable<Boolean> waitForDownloadCall = () -> {
-            while (true) {
-                Future<Boolean> isDownloadOverFuture =
-                        scheduler.schedule(isDownloadOverCall, retryDelay, TimeUnit.SECONDS);
-                if (isDownloadOverFuture.get()) {
-                    return true;
-                }
-            }
-        };
-        Future<Boolean> waitForDownloadFuture =
-                scheduler.submit(waitForDownloadCall);
-        try {
-            // wait for n seconds or abort
-            Integer timeout =
-                    env.getProperty(CarminProperties.API_DOWNLOAD_TIMEOUT_IN_SECONDS, Integer.class);
-            waitForDownloadFuture.get(timeout, TimeUnit.SECONDS);
-        } catch (InterruptedException e) {
-            logger.error("Waiting for download interrupted :" + apiUri, e);
-            throw new ApiException("Waiting for download interrupted");
-        } catch (ExecutionException e) {
-            logger.error("Error waiting for download :" + apiUri, e);
-            throw new ApiException("Error waiting for download");
-        } catch (TimeoutException e) {
-            logger.error("Aborting download too long :" + apiUri, e);
-            throw new ApiException("Aborting dowload : too long");
-        }
-        return getDownloadContent(downloadOperationId);
     }
 
     public Path uploadData(UploadData uploadData) throws ApiException {
@@ -278,6 +256,57 @@ public class DataApiBusiness {
 
     // #### DOWNLOAD STUFF
 
+    private String downloadFileToLocalStorage(String apiUri) throws ApiException {
+        String lfcPath = checkReadPermission(apiUri);
+        if (lfcPath.equals(ROOT)) {
+            logger.error("cannot download root");
+            throw new ApiException("Illegal data API access");
+        }
+        List<Data> fileData = baseGetFileData(lfcPath);
+        if (!doesLFCDataCorrespondToAFile(fileData)) {
+            // it works on a directory and return a zip, but we cant check the download size
+            logger.error("Trying to download a directory : " + lfcPath);
+            throw new ApiException("Illegal data API access");
+        }
+        Long maxSize = env.getProperty(CarminProperties.API_DATA_TRANSFERT_MAX_SIZE, Long.class);
+        if (fileData.get(0).getLength() > maxSize) {
+            logger.error("Trying to download a file too big : " + lfcPath);
+            throw new ApiException("Illegal data API access");
+        }
+        String downloadOperationId = baseDownloadFile(lfcPath);
+        Callable<Boolean> isDownloadOverCall = () -> isDownloadOver(downloadOperationId);
+
+        Integer retryDelay =
+                env.getProperty(CarminProperties.API_DOWNLOAD_RETRY_IN_SECONDS, Integer.class);
+        Callable<Boolean> waitForDownloadCall = () -> {
+            while (true) {
+                Future<Boolean> isDownloadOverFuture =
+                        scheduler.schedule(isDownloadOverCall, retryDelay, TimeUnit.SECONDS);
+                if (isDownloadOverFuture.get()) {
+                    return true;
+                }
+            }
+        };
+        Future<Boolean> waitForDownloadFuture =
+                scheduler.submit(waitForDownloadCall);
+        try {
+            // wait for n seconds or abort
+            Integer timeout =
+                    env.getProperty(CarminProperties.API_DOWNLOAD_TIMEOUT_IN_SECONDS, Integer.class);
+            waitForDownloadFuture.get(timeout, TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
+            logger.error("Waiting for download interrupted :" + apiUri, e);
+            throw new ApiException("Waiting for download interrupted");
+        } catch (ExecutionException e) {
+            logger.error("Error waiting for download :" + apiUri, e);
+            throw new ApiException("Error waiting for download");
+        } catch (TimeoutException e) {
+            logger.error("Aborting download too long :" + apiUri, e);
+            throw new ApiException("Aborting dowload : too long");
+        }
+        return downloadOperationId;
+    }
+
     private boolean isDownloadOver(String operationId) throws ApiException {
         PoolOperation operation = baseGetPoolOperation(operationId);
 
@@ -296,14 +325,8 @@ public class DataApiBusiness {
         }
     }
 
-    private String getDownloadContent(String operationId) throws ApiException {
-        PoolOperation operation = baseGetPoolOperation(operationId);
-
-        File file = new File(operation.getDest());
-        if (file.isDirectory()) {
-            file = new File(operation.getDest() + "/"
-                    + FilenameUtils.getName(operation.getSource()));
-        }
+    private String getDownloadContentInBase64(String operationId) throws ApiException {
+        File file = getDownloadFile(operationId);
         Base64.Encoder encoder = Base64.getEncoder();
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try (OutputStream outputStream = encoder.wrap(baos)) {
@@ -313,6 +336,16 @@ public class DataApiBusiness {
             throw new ApiException("Download operation failed");
         }
         return baos.toString();
+    }
+
+    private File getDownloadFile(String operationId) throws ApiException {
+        PoolOperation operation = baseGetPoolOperation(operationId);
+        File file = new File(operation.getDest());
+        if (file.isDirectory()) {
+            file = new File(operation.getDest() + "/"
+                    + FilenameUtils.getName(operation.getSource()));
+        }
+        return file;
     }
 
     // #### UPLOAD STUFF
@@ -391,10 +424,8 @@ public class DataApiBusiness {
         Path path = new Path();
         path.setExists(true);
         path.setSize(lfcData.getLength());
-        if (lfcData.getModificationDate() != null) {
-            path.setLastModificationDate(
-                    getTimeStampFromGridaDateFormat(lfcData.getModificationDate()));
-        }
+        path.setLastModificationDate(
+                getTimeStampFromGridaFormatDate(lfcData.getModificationDate()));
         boolean isDirectory = lfcData.getType().equals(Type.folder)
                 || lfcData.getType().equals(Type.folderSync);
         path.setIsDirectory(isDirectory);
@@ -408,12 +439,13 @@ public class DataApiBusiness {
     }
 
     /* returns timestamp in seconds from format "Jan 12 2016" */
-    private Long getTimeStampFromGridaDateFormat(String gridaDateFormat) {
+    private Long getTimeStampFromGridaFormatDate(String gridaFormatDate) {
+        if (gridaFormatDate == null || gridaFormatDate.isEmpty()) return null;
         DateFormat dateFormat = new SimpleDateFormat("MMM dd yyyy", Locale.US);
         try {
-            return dateFormat.parse(gridaDateFormat).getTime() / 1000;
+            return dateFormat.parse(gridaFormatDate).getTime() / 1000;
         } catch (ParseException e) {
-            logger.warn("Error with grida date format :" + gridaDateFormat);
+            logger.warn("Error with grida date format :" + gridaFormatDate);
             logger.warn("Ignoring it");
             return null;
         }

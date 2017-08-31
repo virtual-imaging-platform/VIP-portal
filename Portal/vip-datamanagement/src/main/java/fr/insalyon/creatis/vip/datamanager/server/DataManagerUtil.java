@@ -129,12 +129,18 @@ public class DataManagerUtil {
     public static String parseRealDir(String baseDir, String currentUserFolder)
             throws DataManagerException {
 
+
         if (baseDir.startsWith("lfn://")) {
             baseDir = URI.create(baseDir).getPath();
         }
 
         if (baseDir.contains(Server.getInstance().getDataManagerUsersHome())) {
             baseDir = baseDir.replace(Server.getInstance().getDataManagerUsersHome() + "/", "");
+
+            // sometimes there's still a leading "/" left
+            while (baseDir.startsWith("/")) {
+                baseDir = baseDir.substring(1);
+            }
 
             int index = baseDir.indexOf("/");
 

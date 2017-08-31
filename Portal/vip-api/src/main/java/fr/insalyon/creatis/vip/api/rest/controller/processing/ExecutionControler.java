@@ -49,7 +49,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 import static fr.insalyon.creatis.vip.api.CarminProperties.DEFAULT_LIMIT_LIST_EXECUTION;
-import static fr.insalyon.creatis.vip.core.client.view.util.CountryCode.li;
 
 /**
  * Created by abonnet on 7/13/16.
@@ -61,47 +60,18 @@ public class ExecutionControler {
     public static final Logger logger = Logger.getLogger(ExecutionControler.class);
 
     @Autowired
-    private WorkflowBusiness workflowBusiness;
-    @Autowired
-    private ApplicationBusiness applicationBusiness;
-    @Autowired
-    private ClassBusiness classBusiness;
-    @Autowired
-    private SimulationBusiness simulationBusiness;
-    @Autowired
-    private ConfigurationBusiness configurationBusiness;
-    @Autowired
-    private TransferPoolBusiness transferPoolBusiness;
-
-    @Autowired
     private Environment environment;
 
     @Autowired
     private RestApiBusiness restApiBusiness;
+    @Autowired
+    private ExecutionBusiness executionBusiness;
+    @Autowired
+    private PipelineBusiness pipelineBusiness;
 
     // although the controller is a singleton, these are proxies that always point on the current request
     @Autowired
     HttpServletRequest httpServletRequest;
-
-    private PipelineBusiness buildPipelineBusiness(ApiContext apiContext) {
-        return new PipelineBusiness(apiContext,
-                workflowBusiness, applicationBusiness, classBusiness);
-    }
-
-
-    private ExecutionBusiness buildExecutionBusiness(ApiContext apiContext) {
-        return buildExecutionBusiness(apiContext, null);
-    }
-
-    private ExecutionBusiness buildExecutionBusiness(ApiContext apiContext,
-                                                     PipelineBusiness pipelineBusiness) {
-        if (pipelineBusiness == null) {pipelineBusiness = new PipelineBusiness(apiContext, workflowBusiness,
-                applicationBusiness, classBusiness);
-        }
-        return new ExecutionBusiness(apiContext,
-                simulationBusiness, workflowBusiness, configurationBusiness, applicationBusiness,
-                pipelineBusiness, transferPoolBusiness);
-    }
 
     @RequestMapping
     public Execution[] listExecutions(
@@ -110,14 +80,13 @@ public class ExecutionControler {
             @RequestParam(required = false) Integer limit
     ) throws ApiException {
         ApiUtils.methodInvocationLog("listExecutions", studyIdentifier, offset, limit);
-        ApiContext apiContext = restApiBusiness.getApiContext(httpServletRequest, true);
+        restApiBusiness.getApiContext(httpServletRequest, true);
         if (studyIdentifier != null) throw new ApiException("studyIdentifier not supportet yet");
         if (offset != null) throw new ApiException("offset not supported yet");
         int executionMaxNb = environment.getProperty(DEFAULT_LIMIT_LIST_EXECUTION, Integer.class);
         if (limit == null) limit = executionMaxNb;
         if (limit > executionMaxNb) throw new ApiException("limit parameter too high");
-        ExecutionBusiness eb = buildExecutionBusiness(apiContext);
-        return eb.listExecutions(limit);
+        return executionBusiness.listExecutions(limit);
     }
 
     @RequestMapping(value = "count", produces = "text/plain;charset=UTF-8")
@@ -125,19 +94,17 @@ public class ExecutionControler {
             @RequestParam(required = false) String studyIdentifier
     ) throws ApiException {
         ApiUtils.methodInvocationLog("countExecutions");
-        ApiContext apiContext = restApiBusiness.getApiContext(httpServletRequest, true);
+        restApiBusiness.getApiContext(httpServletRequest, true);
         if (studyIdentifier != null) throw new ApiException("studyIdentifier not supportet yet");
-        ExecutionBusiness eb = buildExecutionBusiness(apiContext);
-        return String.valueOf(eb.countExecutions());
+        return String.valueOf(executionBusiness.countExecutions());
     }
 
     @RequestMapping("/{executionId}")
     public Execution getExecution(@PathVariable String executionId) throws ApiException {
         ApiUtils.methodInvocationLog("getExecution", executionId);
-        ApiContext apiContext = restApiBusiness.getApiContext(httpServletRequest, true);
-        ExecutionBusiness eb = buildExecutionBusiness(apiContext);
-        eb.checkIfUserCanAccessExecution(executionId);
-        return eb.getExecution(executionId,false);
+        restApiBusiness.getApiContext(httpServletRequest, true);
+        executionBusiness.checkIfUserCanAccessExecution(executionId);
+        return executionBusiness.getExecution(executionId,false);
     }
 
     @RequestMapping(value = "/{executionId}", method = RequestMethod.PUT)
@@ -145,20 +112,17 @@ public class ExecutionControler {
                                      @RequestBody @Valid Execution execution) throws ApiException {
         ApiUtils.methodInvocationLog("updateExecution", executionId);
         execution.setIdentifier(executionId);
-        ApiContext apiContext = restApiBusiness.getApiContext(httpServletRequest, true);
-        ExecutionBusiness eb = buildExecutionBusiness(apiContext);
-        eb.checkIfUserCanAccessExecution(executionId);
-        eb.updateExecution(execution);
-        return eb.getExecution(executionId,false);
+        restApiBusiness.getApiContext(httpServletRequest, true);
+        executionBusiness.checkIfUserCanAccessExecution(executionId);
+        executionBusiness.updateExecution(execution);
+        return executionBusiness.getExecution(executionId,false);
     }
 
     @RequestMapping(method = RequestMethod.POST)
     public Execution initExecution(@RequestBody @Valid Execution execution) throws ApiException {
         ApiUtils.methodInvocationLog("initExecution", execution);
-        ApiContext apiContext = restApiBusiness.getApiContext(httpServletRequest, true);
-        PipelineBusiness pb = buildPipelineBusiness(apiContext);
-        pb.checkIfUserCanAccessPipeline(execution.getPipelineIdentifier());
-        ExecutionBusiness executionBusiness = buildExecutionBusiness(apiContext, pb);
+        restApiBusiness.getApiContext(httpServletRequest, true);
+        pipelineBusiness.checkIfUserCanAccessPipeline(execution.getPipelineIdentifier());
         String execId = executionBusiness.initExecution(execution);
         return executionBusiness.getExecution(execId,false);
     }
@@ -167,28 +131,25 @@ public class ExecutionControler {
     public String[] getExecutionResults(@PathVariable String executionId,
                                         @RequestParam(defaultValue = "https") String protocol) throws ApiException {
         ApiUtils.methodInvocationLog("getExecutionResults", executionId);
-        ApiContext apiContext = restApiBusiness.getApiContext(httpServletRequest, true);
-        ExecutionBusiness eb = buildExecutionBusiness(apiContext);
-        eb.checkIfUserCanAccessExecution(executionId);
-        return eb.getExecutionResults(executionId, protocol, true);
+        restApiBusiness.getApiContext(httpServletRequest, true);
+        executionBusiness.checkIfUserCanAccessExecution(executionId);
+        return executionBusiness.getRestExecutionResultsURLs(executionId, protocol);
     }
 
     @RequestMapping(value = "/{executionId}/stdout", produces = "text/plain;charset=UTF-8")
     public String getStdout(@PathVariable String executionId) throws ApiException {
         ApiUtils.methodInvocationLog("getStdout", executionId);
-        ApiContext apiContext = restApiBusiness.getApiContext(httpServletRequest, true);
-        ExecutionBusiness eb = buildExecutionBusiness(apiContext);
-        eb.checkIfUserCanAccessExecution(executionId);
-        return eb.getStdOut(executionId);
+        restApiBusiness.getApiContext(httpServletRequest, true);
+        executionBusiness.checkIfUserCanAccessExecution(executionId);
+        return executionBusiness.getStdOut(executionId);
     }
 
     @RequestMapping(value= "/{executionId}/stderr", produces = "text/plain;charset=UTF-8")
     public String getStderr(@PathVariable String executionId) throws ApiException {
         ApiUtils.methodInvocationLog("getStderr", executionId);
-        ApiContext apiContext = restApiBusiness.getApiContext(httpServletRequest, true);
-        ExecutionBusiness eb = buildExecutionBusiness(apiContext);
-        eb.checkIfUserCanAccessExecution(executionId);
-        return eb.getStdErr(executionId);
+        restApiBusiness.getApiContext(httpServletRequest, true);
+        executionBusiness.checkIfUserCanAccessExecution(executionId);
+        return executionBusiness.getStdErr(executionId);
     }
 
     @RequestMapping(value = "/{executionId}/play", method = RequestMethod.PUT)
@@ -202,10 +163,9 @@ public class ExecutionControler {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void killExecution(@PathVariable String executionId) throws ApiException {
         ApiUtils.methodInvocationLog("killExecution", executionId);
-        ApiContext apiContext = restApiBusiness.getApiContext(httpServletRequest, true);
-        ExecutionBusiness eb = buildExecutionBusiness(apiContext);
-        eb.checkIfUserCanAccessExecution(executionId);
-        eb.killExecution(executionId);
+        restApiBusiness.getApiContext(httpServletRequest, true);
+        executionBusiness.checkIfUserCanAccessExecution(executionId);
+        executionBusiness.killExecution(executionId);
     }
 
     @RequestMapping(value = "/{executionId}/delete", method = RequestMethod.PUT)
@@ -213,9 +173,8 @@ public class ExecutionControler {
     public void deleteExecution(@PathVariable String executionId,
                                 @RequestBody @Valid DeleteExecutionConfiguration delConfig) throws ApiException {
         ApiUtils.methodInvocationLog("deleteExecution", executionId);
-        ApiContext apiContext = restApiBusiness.getApiContext(httpServletRequest, true);
-        ExecutionBusiness eb = buildExecutionBusiness(apiContext);
-        eb.checkIfUserCanAccessExecution(executionId);
-        eb.deleteExecution(executionId, delConfig.getDeleteFiles());
+        restApiBusiness.getApiContext(httpServletRequest, true);
+        executionBusiness.checkIfUserCanAccessExecution(executionId);
+        executionBusiness.deleteExecution(executionId, delConfig.getDeleteFiles());
     }
 }

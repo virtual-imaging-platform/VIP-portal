@@ -32,22 +32,18 @@
 package fr.insalyon.creatis.vip.api.rest.controller.data;
 
 import fr.insalyon.creatis.vip.api.business.*;
-import fr.insalyon.creatis.vip.api.rest.RestApiBusiness;
-import fr.insalyon.creatis.vip.api.rest.controller.processing.ExecutionControler;
+import fr.insalyon.creatis.vip.api.rest.*;
 import fr.insalyon.creatis.vip.api.rest.model.*;
-import fr.insalyon.creatis.vip.core.server.business.BusinessException;
-import fr.insalyon.creatis.vip.datamanager.client.bean.Data;
-import fr.insalyon.creatis.vip.datamanager.server.business.LFCBusiness;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.http.*;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.File;
 import java.util.List;
-
-import static org.bouncycastle.asn1.ua.DSTU4145NamedCurves.params;
 
 /**
  * Created by abonnet on 1/13/17.
@@ -113,13 +109,26 @@ public class DataController {
         return dataApiBusiness.mkdir(uri);
     }
 
-    @RequestMapping(path="content", params="uri")
-    public String downloadFile(@RequestParam String uri) throws ApiException {
+    @RequestMapping(path="content/base64", params="uri")
+    public String downloadFileInBase64(@RequestParam String uri) throws ApiException {
         // common stuff
         ApiUtils.methodInvocationLog("downloadFile", getCurrentUserEmail(), uri);
         restApiBusiness.getApiContext(httpServletRequest, true);
         // business call
-        return dataApiBusiness.getFileContent(uri);
+        return dataApiBusiness.getFileContentInBase64(uri);
+    }
+
+    @RequestMapping(path="content", params="uri")
+    public ResponseEntity<FileSystemResource> downloadRawFile(@RequestParam String uri) throws ApiException {
+        // common stuff
+        ApiUtils.methodInvocationLog("downloadFile", getCurrentUserEmail(), uri);
+        restApiBusiness.getApiContext(httpServletRequest, true);
+        // business call
+        File file = dataApiBusiness.getFile(uri);
+        FileSystemResource res = new FileSystemResource(file);
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+        return new ResponseEntity<>(res, headers, HttpStatus.OK);
     }
 
     @RequestMapping(path="content", method = RequestMethod.PUT)
@@ -133,3 +142,4 @@ public class DataController {
         return SecurityContextHolder.getContext().getAuthentication().getName();
     }
 }
+

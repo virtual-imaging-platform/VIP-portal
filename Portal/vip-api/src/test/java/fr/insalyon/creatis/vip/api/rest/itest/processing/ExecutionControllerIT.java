@@ -32,7 +32,7 @@
 package fr.insalyon.creatis.vip.api.rest.itest.processing;
 
 import fr.insalyon.creatis.vip.api.bean.Execution;
-import fr.insalyon.creatis.vip.api.data.ExecutionTestUtils;
+import fr.insalyon.creatis.vip.api.data.*;
 import fr.insalyon.creatis.vip.api.rest.RestErrorCodes;
 import fr.insalyon.creatis.vip.api.rest.config.*;
 import fr.insalyon.creatis.vip.application.client.bean.Simulation;
@@ -225,21 +225,19 @@ public class ExecutionControllerIT extends BaseVIPSpringIT {
         when(workflowBusiness.getOutputData(simulation2.getID(), baseUser1.getFolder()))
                 .thenReturn(simulation2OutData);
         String operationId = "testOpId";
-        when(transferPoolBusiness.downloadFile(baseUser1, simulation2OutData.get(0).getPath()))
-                .thenReturn(operationId);
+        when(transferPoolBusiness.downloadFile(any(), any()))
+                .thenThrow(new RuntimeException());
         mockMvc.perform(
                 get("/rest/executions/" + simulation2.getID() + "/results").with(baseUser1()))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(RestTestUtils.JSON_CONTENT_TYPE_UTF8))
                 .andExpect(jsonPath("$[*]", hasSize(1)))
-                .andExpect(jsonPath("$[0]",
-                        org.hamcrest.Matchers.containsString("operationid=" + operationId)))
-                .andExpect(jsonPath("$[0]",
-                        org.hamcrest.Matchers.containsString("filename=res"))) // TODO it would be great to parametize that
-                .andExpect(jsonPath("$[0]",
-                        org.hamcrest.Matchers.containsString(
-                                "outputname=" + simulation2OutData.get(0).getProcessor())));
+                .andExpect(jsonPath("$[0]",org.hamcrest.Matchers.endsWith(
+                                CarminAPITestConstants.TEST_DOWNLOAD_PATH
+                                        + "?uri="
+                                        + CarminAPITestConstants.TEST_API_URI_PREFIX
+                                        + simulation2OutData.get(0).getPath())));
     }
 
     @Test
