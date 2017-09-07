@@ -152,4 +152,21 @@ public abstract class AbstractSourceLayout extends VLayout {
     public abstract void setValue(String value);
     
     public abstract boolean validate();
+    
+    /**
+     * Activates all fields of an optional input, in a relaunched simulation context.
+     * Avoids implementation in subtypes which are not concerned.
+     * 
+     */
+    public void enableInput() {
+    }
+    
+    /**
+     * If true, the input value can be modifiable by loadInputs(...) method of LaunchFormLayout.java.
+     * This is in a relaunched simulation context.
+     */
+    public boolean isValueModifiable() {
+        return true;
+    }
+ 
 }
