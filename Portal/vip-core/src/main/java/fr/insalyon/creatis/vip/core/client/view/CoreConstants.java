@@ -40,7 +40,7 @@ import java.util.Date;
  */
 public class CoreConstants implements IsSerializable {
 
-    public static final String VERSION = "v1.20";
+    public static final String VERSION = "v1.21";
     // Configuration Labels
     public static final String VO_BIOMED = "biomed";
     public static final String VO_NEUGRID = "vo.neugrid.eu";
@@ -77,10 +77,11 @@ public class CoreConstants implements IsSerializable {
     public static final String LAB_SIMULATION_PLATFORM_MAX = "simulation.max.platfrom";
     public static final String LAB_SIMULATION_BEGINNER_MAX = "simulation.max.beginner";
     public static final String LAB_SIMULATION_DB_HOST = "workflows.db.host";
-    public static final String LAB_SIMULATION_DB_NAME = "workflows.db.name";
     public static final String LAB_SIMULATION_DB_PORT = "workflows.db.port";
     public static final String LAB_SIMULATION_FOLDER = "workflows.directory";
     public static final String LAB_SIMULATION_EXEC_MODE = "workflows.exec.mode";
+    public static final String LAB_APACHE_HOST = "apache.host";
+    public static final String LAB_APACHE_SSL_PORT = "apache.ssl.port";
     // Tabs
     public static final String TAB_ACCOUNT = "account-tab";
     public static final String TAB_PUBLICATION = "publications-tab";

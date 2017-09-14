@@ -42,6 +42,7 @@ import java.util.function.Function;
 
 import static fr.insalyon.creatis.vip.api.data.CarminAPITestConstants.*;
 import static fr.insalyon.creatis.vip.api.data.ErrorCodeAndMessageTestUtils.jsonCorrespondsToErrorCodeAndMessage;
+import static net.jcores.CoreKeeper.$;
 import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -86,6 +87,9 @@ public class PlatformControllerIT extends BaseVIPSpringIT {
                         .value(TEST_SUPPORTED_API_VERSION))
                 .andExpect(jsonPath("$.isKillExecutionSupported")
                         .value(Boolean.valueOf(TEST_SUPPORTED_API_VERSION)))
+                .andExpect(jsonPath("$.maxSizeDirectTransfer")
+                        .value(Integer.valueOf(TEST_DATA_MAX_SIZE)))
+                // it should be a long, be the test value being small it's actually an int
                 .andExpect(jsonPath("$.APIErrorCodesAndMessages[*]",
                         containsInAnyOrder(
                                 jsonCorrespondsToErrorCodeAndMessage(TEST_ERROR_CODES_AND_MESSAGES[0]),

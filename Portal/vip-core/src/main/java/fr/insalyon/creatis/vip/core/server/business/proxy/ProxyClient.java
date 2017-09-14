@@ -188,7 +188,7 @@ public class ProxyClient {
 
     private void connect() throws Exception {
 
-        SSLContext sc = SSLContext.getInstance("SSL");
+        SSLContext sc = SSLContext.getInstance("TLS");
         sc.init(new KeyManager[]{}, new TrustManager[]{new ProxyClient.MyTrustManager()}, new SecureRandom());
         SSLSocketFactory sf = sc.getSocketFactory();
 
@@ -196,7 +196,7 @@ public class ProxyClient {
                 Server.getInstance().getMyProxyHost(),
                 Server.getInstance().getMyProxyPort());
 
-        this.socket.setEnabledProtocols(new String[]{"SSLv3"});
+        this.socket.setEnabledProtocols(new String[]{"TLSv1.2"});
         this.socket.startHandshake();
         this.socketIn = new BufferedInputStream(this.socket.getInputStream());
         this.socketOut = new BufferedOutputStream(this.socket.getOutputStream());
@@ -253,6 +253,7 @@ public class ProxyClient {
             throw new ProtocolException("Unknown MyProxy protocol RESPONSE string: " + line);
         }
         while ((line = readLine(this.socketIn)) != null) {
+            // Drain potentially stale data incoming from socket
         }
     }
 

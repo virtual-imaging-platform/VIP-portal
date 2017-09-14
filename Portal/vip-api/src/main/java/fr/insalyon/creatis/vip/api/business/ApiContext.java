@@ -44,16 +44,26 @@ import java.util.List;
  */
 public class ApiContext {
 
-    private final HttpServletRequest request;
-    private final HttpServletResponse response;
+    private HttpServletRequest request;
+    private HttpServletResponse response;
     private User user;
     private List<String> warnings;
+
+    public ApiContext() {
+        this.warnings = new ArrayList<>();
+    }
 
     public ApiContext(HttpServletRequest request, HttpServletResponse response, User user) {
         this.request = request;
         this.response = response;
         this.user = user;
         this.warnings = new ArrayList<>();
+    }
+
+    public void init(HttpServletRequest request, HttpServletResponse response, User user) {
+        this.request = request;
+        this.response = response;
+        this.user = user;
     }
 
     public HttpServletRequest getRequest() {

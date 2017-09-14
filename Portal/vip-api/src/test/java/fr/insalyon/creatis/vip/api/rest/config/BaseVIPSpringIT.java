@@ -31,10 +31,11 @@
  */
 package fr.insalyon.creatis.vip.api.rest.config;
 
+import fr.insalyon.creatis.vip.api.rest.mockconfig.DataConfigurator;
 import fr.insalyon.creatis.vip.application.server.business.*;
-import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
+import fr.insalyon.creatis.vip.core.server.business.*;
 import fr.insalyon.creatis.vip.core.server.dao.UserDAO;
-import fr.insalyon.creatis.vip.datamanager.server.business.TransferPoolBusiness;
+import fr.insalyon.creatis.vip.datamanager.server.business.*;
 import org.apache.commons.io.IOUtils;
 import org.junit.Before;
 import org.junit.runner.RunWith;
@@ -56,6 +57,7 @@ import java.nio.charset.StandardCharsets;
 
 import static fr.insalyon.creatis.vip.api.data.CarminAPITestConstants.*;
 import static fr.insalyon.creatis.vip.api.CarminProperties.*;
+import static fr.insalyon.creatis.vip.core.client.view.util.CountryCode.re;
 
 /**
  * Created by abonnet on 7/28/16.
@@ -84,7 +86,13 @@ import static fr.insalyon.creatis.vip.api.CarminProperties.*;
         UNSUPPORTED_METHODS + "=" + TEST_UNSUPPORTED_METHODS_STRING,
         SUPPORTED_API_VERSION + "=" + TEST_SUPPORTED_API_VERSION,
         IS_KILL_EXECUTION_SUPPORTED + "=" + TEST_IS_KILL_SUPPORTED,
-        PLATFORM_ERROR_CODES_AND_MESSAGES + "=" + TEST_ERROR_CODES_AND_MESSAGE_STRING
+        PLATFORM_ERROR_CODES_AND_MESSAGES + "=" + TEST_ERROR_CODES_AND_MESSAGE_STRING,
+        API_URI_PREFIX + "=" + TEST_API_URI_PREFIX,
+        API_DEFAULT_MIME_TYPE + "=" + TEST_DEFAULT_MIMETYPE,
+        API_DIRECTORY_MIME_TYPE + "=" + TEST_DIR_MIMETYPE,
+        API_DOWNLOAD_TIMEOUT_IN_SECONDS + "=" + TEST_DATA_DOWNLOAD_TIMEOUT,
+        API_DOWNLOAD_RETRY_IN_SECONDS + "=" + Test_DATA_DOWNLOAD_RETRY,
+        API_DATA_TRANSFERT_MAX_SIZE + "=" + TEST_DATA_MAX_SIZE
 })
 abstract public class BaseVIPSpringIT {
 
@@ -107,6 +115,10 @@ abstract public class BaseVIPSpringIT {
     protected TransferPoolBusiness transferPoolBusiness;
     @Autowired
     protected SimulationBusiness simulationBusiness;
+    @Autowired
+    protected LFCBusiness lfcBusiness;
+    @Autowired
+    protected LFCPermissionBusiness lfcPermissionBusiness;
 
     @Before
     public final void setup() {
@@ -116,7 +128,8 @@ abstract public class BaseVIPSpringIT {
                 .apply(SecurityMockMvcConfigurers.springSecurity())
                 .build();
         Mockito.reset(userDAO, configurationBusiness, workflowBusiness, applicationBusiness,
-                classBusiness, transferPoolBusiness, simulationBusiness);
+                classBusiness, transferPoolBusiness, simulationBusiness,
+                lfcBusiness);
     }
 
     protected String getResourceAsString(String pathFromClasspath) throws IOException {
@@ -162,5 +175,15 @@ abstract public class BaseVIPSpringIT {
 
     public SimulationBusiness getSimulationBusiness() {
         return simulationBusiness;
+    }
+
+    public LFCBusiness getLfcBusiness() {
+        return lfcBusiness;
+    }
+
+    public LFCPermissionBusiness lfcPermissionBusiness() {return lfcPermissionBusiness;}
+
+    protected void configureDataFS() throws BusinessException {
+        DataConfigurator.configureFS(this);
     }
 }

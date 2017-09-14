@@ -122,7 +122,7 @@ public class ExecutionBusiness {
     public Execution getExecution(String executionId, boolean summarize) throws ApiException {
         try {
             // Get main execution object
-            Simulation s = workflowBusiness.getSimulation(executionId);
+            Simulation s = workflowBusiness.getSimulation(executionId, true); // check running execution for update
 
             // Return null if execution doesn't exist or is cleaned (cleaned status is not supported in Carmin)
             if (s == null || s.getStatus() == SimulationStatus.Cleaned) {

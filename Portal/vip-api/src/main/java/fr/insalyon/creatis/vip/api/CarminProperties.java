@@ -35,6 +35,8 @@ package fr.insalyon.creatis.vip.api;
  * Created by abonnet on 7/21/16.
  */
 public interface CarminProperties {
+
+    // CARMIN COMMON
     String PLATFORM_NAME = "carmin.platform.name";
     String PLATFORM_DESCRIPTION = "carmin.platform.description";
     String PLATFORM_EMAIL = "carmin.platform.email";
@@ -45,4 +47,13 @@ public interface CarminProperties {
     String SUPPORTED_API_VERSION = "carmin.platform.supported_API_Version";
     String IS_KILL_EXECUTION_SUPPORTED = "carmin.platform.is_kill_supported";
     String PLATFORM_ERROR_CODES_AND_MESSAGES = "carmin.platform.error_codes_and_message";
+
+    // CARMIN DATA
+
+    String API_URI_PREFIX = "carmin.data.uri_prefix";
+    String API_DIRECTORY_MIME_TYPE = "carmin.data.mime_type.directory";
+    String API_DEFAULT_MIME_TYPE = "carmin.data.mime_type.default";
+    String API_DOWNLOAD_RETRY_IN_SECONDS = "carmin.data.download.retry";
+    String API_DOWNLOAD_TIMEOUT_IN_SECONDS = "carmin.data.download.timeout";
+    String API_DATA_TRANSFERT_MAX_SIZE = "carmin.data.max_size";
 }
