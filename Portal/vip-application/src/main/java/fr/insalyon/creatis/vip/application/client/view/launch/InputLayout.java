@@ -47,6 +47,7 @@ import com.smartgwt.client.widgets.layout.VLayout;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
 import fr.insalyon.creatis.vip.application.client.view.common.AbstractSourceLayout;
 import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
+import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -314,4 +315,20 @@ public class InputLayout extends AbstractSourceLayout {
             }
         }
     }
+
+    @Override
+    public void enableInput() {
+        cbOptionalInputItem.setValue(true);  
+        selectItem.setDisabled(false);
+        listLayout.setDisabled(false);
+    }
+    
+    @Override
+    public boolean isValueModifiable() {
+        if (getValue().equalsIgnoreCase(ApplicationConstants.INPUT_WITHOUT_VALUE) || getValue().equalsIgnoreCase(DataManagerConstants.ROOT + "/" + DataManagerConstants.USERS_HOME)) {
+            return true;
+        } 
+        return false;
+    }
+    
 }
