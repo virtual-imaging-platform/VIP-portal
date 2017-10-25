@@ -66,7 +66,12 @@ public class SpringWebConfig extends WebMvcConfigurerAdapter {
     public void configurePathMatch(PathMatchConfigurer matcher) {
         // Otherwise all that follow a dot in an URL is considered an extension and removed
         // It's a problem for URL like "/pipelines/gate/3.2
-        matcher.setUseRegisteredSuffixPatternMatch(true);
+        matcher.setUseSuffixPatternMatch(false);
+    }
+
+    @Override
+    public void configureContentNegotiation(ContentNegotiationConfigurer configurer) {
+        configurer.favorPathExtension(false);
     }
 
     @Bean

@@ -34,9 +34,9 @@ package fr.insalyon.creatis.vip.api.rest.model;
 /**
  * Created by abonnet on 1/13/17.
  */
-public class Path {
+public class PathProperties {
 
-    private String platformURI;
+    private String path;
     private Long lastModificationDate;
     private Boolean isDirectory;
     private Boolean exists;
@@ -44,12 +44,12 @@ public class Path {
     private String executionId;
     private String mimeType;
 
-    public String getPlatformURI() {
-        return platformURI;
+    public String getPath() {
+        return path;
     }
 
-    public void setPlatformURI(String platformURI) {
-        this.platformURI = platformURI;
+    public void setPath(String path) {
+        this.path = path;
     }
 
     public Long getLastModificationDate() {

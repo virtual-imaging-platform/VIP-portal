@@ -31,20 +31,15 @@
  */
 package fr.insalyon.creatis.vip.api.rest.itest.data;
 
-import fr.insalyon.creatis.vip.api.data.PathTestUtils;
 import fr.insalyon.creatis.vip.api.rest.config.*;
-import fr.insalyon.creatis.vip.api.rest.model.Path;
+import fr.insalyon.creatis.vip.api.rest.model.PathProperties;
 import fr.insalyon.creatis.vip.datamanager.client.bean.PoolOperation;
 import fr.insalyon.creatis.vip.datamanager.client.bean.PoolOperation.*;
 import org.hamcrest.Matchers;
 import org.junit.Test;
 
 import java.nio.file.Paths;
-import java.text.*;
-import java.util.*;
 
-import static fr.insalyon.creatis.vip.api.VipConfigurer.logger;
-import static fr.insalyon.creatis.vip.api.data.CarminAPITestConstants.TEST_API_URI_PREFIX;
 import static fr.insalyon.creatis.vip.api.data.PathTestUtils.*;
 import static fr.insalyon.creatis.vip.api.data.UserTestUtils.*;
 import static org.mockito.Mockito.*;
@@ -62,56 +57,53 @@ public class DataControllerIT extends BaseVIPSpringIT {
         configureDataFS();
         String testLfcPath = getAbsolutePath(testFile1);
         mockMvc.perform(
-                get("/rest/path").param("uri", TEST_API_URI_PREFIX + testLfcPath).with(baseUser1()))
+                get("/rest/path" + testLfcPath).param("action", "properties").with(baseUser1()))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(RestTestUtils.JSON_CONTENT_TYPE_UTF8))
-                .andExpect(jsonPath("$", jsonCorrespondsToPath(testFile1Path)));
+                .andExpect(jsonPath("$", jsonCorrespondsToPath(testFile1PathProperties)));
     }
 
     @Test
     public void shouldReturnDirectoryPath() throws Exception {
         configureDataFS();
         String testLfcPath = getAbsolutePath(testDir1);
-        String uri = TEST_API_URI_PREFIX + testLfcPath;
         mockMvc.perform(
-                get("/rest/path").param("uri", uri).with(baseUser2()))
+                get("/rest/path" + testLfcPath).param("action", "properties").with(baseUser2()))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(RestTestUtils.JSON_CONTENT_TYPE_UTF8))
-                .andExpect(jsonPath("$", jsonCorrespondsToPath(getPathWithTS(testDir1Path))));
+                .andExpect(jsonPath("$", jsonCorrespondsToPath(getPathWithTS(testDir1PathProperties))));
     }
 
     @Test
     public void shouldReturnNonExistingPath() throws Exception {
         String testLfcPath = "/vip/Home/WRONG/PATH";
-        String uri = TEST_API_URI_PREFIX + testLfcPath;
         when(lfcBusiness.exists(baseUser1, testLfcPath))
                 .thenReturn(false);
-        Path expectedPath = new Path();
-        expectedPath.setExists(false);
-        expectedPath.setPlatformURI(uri);
+        PathProperties expectedPathProperties = new PathProperties();
+        expectedPathProperties.setExists(false);
+        expectedPathProperties.setPath(testLfcPath);
         mockMvc.perform(
-                get("/rest/path").param("uri", uri).with(baseUser1()))
+                get("/rest/path" + testLfcPath).param("action", "exists").with(baseUser1()))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(RestTestUtils.JSON_CONTENT_TYPE_UTF8))
-                .andExpect(jsonPath("$", jsonCorrespondsToPath(expectedPath)));
+                .andExpect(jsonPath("$.exists").value(false));
     }
 
     @Test
     public void shouldListuser2Dir() throws Exception {
         configureDataFS();
         String lfcPath = getAbsolutePath(user2Dir);
-        String uri = TEST_API_URI_PREFIX + lfcPath;
         mockMvc.perform(
-                get("/rest/path/directory").param("uri", uri).with(baseUser2()))
+                get("/rest/path" + lfcPath).param("action", "list").with(baseUser2()))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(RestTestUtils.JSON_CONTENT_TYPE_UTF8))
                 .andExpect(jsonPath("$[*]", Matchers.containsInAnyOrder(
-                        jsonCorrespondsToPath(testDir1Path),
-                        jsonCorrespondsToPath(testFile2Path)
+                        jsonCorrespondsToPath(testDir1PathProperties),
+                        jsonCorrespondsToPath(testFile2PathProperties)
                 ))
         );
     }
@@ -120,16 +112,15 @@ public class DataControllerIT extends BaseVIPSpringIT {
     public void shouldListDirectory1() throws Exception {
         configureDataFS();
         String lfcPath = getAbsolutePath(testDir1);
-        String uri = TEST_API_URI_PREFIX + lfcPath;
         mockMvc.perform(
-                get("/rest/path/directory").param("uri", uri).with(baseUser2()))
+                get("/rest/path" + lfcPath).param("action", "list").with(baseUser2()))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(RestTestUtils.JSON_CONTENT_TYPE_UTF8))
                 .andExpect(jsonPath("$[*]", Matchers.containsInAnyOrder(
-                        jsonCorrespondsToPath(testFile3Path),
-                        jsonCorrespondsToPath(testFile4Path),
-                        jsonCorrespondsToPath(testFile5Path)
+                        jsonCorrespondsToPath(testFile3PathProperties),
+                        jsonCorrespondsToPath(testFile4PathProperties),
+                        jsonCorrespondsToPath(testFile5PathProperties)
                         ))
                 );
     }
@@ -138,7 +129,6 @@ public class DataControllerIT extends BaseVIPSpringIT {
     public void shouldDownload() throws Exception {
         configureDataFS();
         String lfcPath = getAbsolutePath(testFile1);
-        String uri = TEST_API_URI_PREFIX + lfcPath;
         String operationId = "testOpId";
         String testFile = Paths.get(ClassLoader.getSystemResource("testFile.txt").toURI())
                 .toAbsolutePath().toString();
@@ -151,7 +141,7 @@ public class DataControllerIT extends BaseVIPSpringIT {
         when (transferPoolBusiness.getDownloadPoolOperation(operationId))
                 .thenReturn(runningPoolOperation, runningPoolOperation, donePoolOperation);
         mockMvc.perform(
-                get("/rest/path/content").param("uri", uri).with(baseUser1()))
+                get("/rest/path" + lfcPath).param("action", "content").with(baseUser1()))
                 .andDo(print())
                 .andExpect(status().isOk());
     }
@@ -160,10 +150,7 @@ public class DataControllerIT extends BaseVIPSpringIT {
     public void shouldHaveDownloadTimeout() throws Exception {
         configureDataFS();
         String lfcPath = getAbsolutePath(testFile1);
-        String uri = TEST_API_URI_PREFIX + lfcPath;
         String operationId = "testOpId";
-        String testFile = Paths.get(ClassLoader.getSystemResource("testFile.txt").toURI())
-                .toAbsolutePath().toString();
         PoolOperation runningPoolOperation = new PoolOperation(operationId,
                 null, null, null, null, Type.Download, Status.Running, baseUser1.getEmail(), 0);
         when (transferPoolBusiness.downloadFile(baseUser1, lfcPath))
@@ -171,7 +158,7 @@ public class DataControllerIT extends BaseVIPSpringIT {
         when (transferPoolBusiness.getDownloadPoolOperation(operationId))
                 .thenReturn(runningPoolOperation, runningPoolOperation);
         mockMvc.perform(
-                get("/rest/path/content").param("uri", uri).with(baseUser1()))
+                get("/rest/path" + lfcPath).param("action", "content").with(baseUser1()))
                 .andDo(print())
                 .andExpect(status().isBadRequest());
     }

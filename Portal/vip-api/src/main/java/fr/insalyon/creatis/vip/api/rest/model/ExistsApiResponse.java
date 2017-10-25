@@ -32,26 +32,24 @@
 package fr.insalyon.creatis.vip.api.rest.model;
 
 /**
- * Created by abonnet on 3/8/17.
+ * Created by abonnet on 10/25/17.
  */
-public class UploadData {
+public class ExistsApiResponse {
 
-    private String uri;
-    private String pathContent;
+    private Boolean exists;
 
-    public String getUri() {
-        return uri;
+    public ExistsApiResponse() {
     }
 
-    public void setUri(String uri) {
-        this.uri = uri;
+    public ExistsApiResponse(Boolean exists) {
+        this.exists = exists;
     }
 
-    public String getPathContent() {
-        return pathContent;
+    public Boolean getExists() {
+        return exists;
     }
 
-    public void setPathContent(String pathContent) {
-        this.pathContent = pathContent;
+    public void setExists(Boolean exists) {
+        this.exists = exists;
     }
 }

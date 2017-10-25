@@ -224,7 +224,6 @@ public class ExecutionControllerIT extends BaseVIPSpringIT {
                 .thenReturn(simulation2);
         when(workflowBusiness.getOutputData(simulation2.getID(), baseUser1.getFolder()))
                 .thenReturn(simulation2OutData);
-        String operationId = "testOpId";
         when(transferPoolBusiness.downloadFile(any(), any()))
                 .thenThrow(new RuntimeException());
         mockMvc.perform(
@@ -235,9 +234,8 @@ public class ExecutionControllerIT extends BaseVIPSpringIT {
                 .andExpect(jsonPath("$[*]", hasSize(1)))
                 .andExpect(jsonPath("$[0]",org.hamcrest.Matchers.endsWith(
                                 CarminAPITestConstants.TEST_DOWNLOAD_PATH
-                                        + "?uri="
-                                        + CarminAPITestConstants.TEST_API_URI_PREFIX
-                                        + simulation2OutData.get(0).getPath())));
+                                        + simulation2OutData.get(0).getPath()
+                                        + "?action=content")));
     }
 
     @Test

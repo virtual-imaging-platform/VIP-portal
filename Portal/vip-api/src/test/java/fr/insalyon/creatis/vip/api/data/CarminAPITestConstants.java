@@ -61,7 +61,6 @@ public interface CarminAPITestConstants {
     String TEST_ERROR_CODES_AND_MESSAGE_STRING = "42:Test message,103:Other test message";
     /* End of consistant properties */
 
-    String TEST_API_URI_PREFIX = "test://";
     String TEST_DOWNLOAD_PATH = "path/test/download";
     String TEST_DEFAULT_MIMETYPE = "application/octet-stream";
     String TEST_DIR_MIMETYPE = "text/directory";

@@ -457,11 +457,10 @@ public class ExecutionBusiness {
             throw new ApiException("Results URL called from unknown URL");
         }
         String baseUrl = requestUrl.substring(0, restStringIndex + 5); // "http(s)://host[/...]/rest
-        String fileUri = env.getRequiredProperty(CarminProperties.API_URI_PREFIX)
-                + output.getPath();
+        String filePath = output.getPath();
         return baseUrl
                 + env.getRequiredProperty(CarminProperties.API_DATA_DOWNLOAD_RELATIVE_PATH)
-                + "?uri=" + fileUri;
+                + filePath + "?action=content"; // TODO ; parametize the end
     }
 
     private String getSoapExecutionResultURL(InOutData output) throws ApiException {
