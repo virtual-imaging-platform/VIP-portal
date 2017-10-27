@@ -31,10 +31,13 @@
  */
 package fr.insalyon.creatis.vip.datamanager.server.rpc;
 
+import fr.insalyon.creatis.devtools.zip.UnZipper;
+import fr.insalyon.creatis.grida.client.GRIDAClientException;
 import fr.insalyon.creatis.grida.client.GRIDAPoolClient;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.server.business.CoreUtil;
+import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerException;
 import fr.insalyon.creatis.vip.datamanager.server.DataManagerUtil;
 import java.io.File;
 import java.io.IOException;
@@ -77,19 +80,39 @@ public class FileUploadServiceImpl extends HttpServlet {
                 FileItem fileItem = null;
                 String path = null;
                 String target = "uploadComplete";
+                boolean single = true;
+                boolean unzip = true;
+                //TODO : do we really need usePool ? If yes, use it (see UploadFilesServiceImpl)
+                boolean usePool = true;
                 String operationID = "no-id";
 
                 while (iter.hasNext()) {
                     FileItem item = (FileItem) iter.next();
 
-                    if (item.getFieldName().equals("path")) {
-                        path = item.getString();
-                    } else if (item.getFieldName().equals("file")) {
-                        fileName = item.getName();
-                        fileItem = item;
-                    } else if (item.getFieldName().equals("target")) {
-                        target = item.getString();
+                    switch (item.getFieldName()) {
+                        case "path":
+                            path = item.getString();
+                            break;
+                        case "file":
+                            fileName = item.getName();
+                            fileItem = item;
+                            break;
+                        case "target":
+                            target = item.getString();
+                            break;
+                        case "single":
+                            single = Boolean.valueOf(item.getString());
+                            break;
+                        case "unzip":
+                            unzip = Boolean.valueOf(item.getString());
+                            break;
+                        case "pool":
+                            usePool = Boolean.valueOf(item.getString());
+                            break;
+                        default:
+                            throw new IllegalArgumentException("Invalid FieldName: " + item.getFieldName());
                     }
+
                 }
                 if (fileName != null && !fileName.equals("")) {
 
@@ -106,11 +129,20 @@ public class FileUploadServiceImpl extends HttpServlet {
                         if (!local) {
                             // GRIDA Pool Client
                             logger.info("(" + user.getEmail() + ") Uploading '" + uploadedFile.getAbsolutePath() + "' to '" + path + "'.");
-                            GRIDAPoolClient client = CoreUtil.getGRIDAPoolClient();
-                            operationID = client.uploadFile(
-                                    uploadedFile.getAbsolutePath(),
-                                    DataManagerUtil.parseBaseDir(user, path),
-                                    user.getEmail());
+                            
+                            if (single || !unzip) {
+                                GRIDAPoolClient client = CoreUtil.getGRIDAPoolClient();
+                                operationID = client.uploadFile(
+                                        uploadedFile.getAbsolutePath(),
+                                        DataManagerUtil.parseBaseDir(user, path),
+                                        user.getEmail());
+
+                            } else {
+                                UnZipper.unzip(uploadedFile.getAbsolutePath());
+                                String dir = uploadedFile.getParent();
+                                uploadedFile.delete();
+                                operationID = processDir(dir, path, user);
+                            }
 
                         } else {
                             operationID = fileName;
@@ -120,7 +152,7 @@ public class FileUploadServiceImpl extends HttpServlet {
                         logger.error(ex);
                     }
                 }
-
+                //TODO: when GateLab is also replaced change the HTML/JS response to XML data that could be directly processed in JS
                 response.setContentType("text/html");
                 response.setHeader("Pragma", "No-cache");
                 response.setDateHeader("Expires", 0);
@@ -128,7 +160,7 @@ public class FileUploadServiceImpl extends HttpServlet {
                 PrintWriter out = response.getWriter();
                 out.println("<html>");
                 out.println("<body>");
-                out.println("<script type=\"text/javascript\">");
+                out.println("<script type=\"text/javascript\" id=\"runscript\">");
                 out.println("if (parent." + target + ") parent." + target + "('"
                         + operationID + "');");
                 out.println("</script>");
@@ -140,5 +172,24 @@ public class FileUploadServiceImpl extends HttpServlet {
                 logger.error(ex);
             }
         }
+    }
+
+    private String processDir(String dir, String baseDir, User user)
+            throws GRIDAClientException, DataManagerException {
+
+        GRIDAPoolClient client = CoreUtil.getGRIDAPoolClient();
+        StringBuilder ids = new StringBuilder();
+        for (File f : new File(dir).listFiles()) {
+            if (f.isDirectory()) {
+                ids.append(processDir(f.getAbsolutePath(), baseDir + "/" + f.getName(), user));
+            } else {
+                ids.append(client.uploadFile(
+                        f.getAbsolutePath(),
+                        DataManagerUtil.parseBaseDir(user, baseDir),
+                        user.getEmail()));
+                ids.append("##");
+            }           
+        }
+        return ids.toString();
     }
 }
