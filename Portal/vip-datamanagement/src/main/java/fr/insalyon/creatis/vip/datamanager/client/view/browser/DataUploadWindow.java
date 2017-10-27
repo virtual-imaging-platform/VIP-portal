@@ -36,7 +36,6 @@ import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.Window;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
-import fr.insalyon.creatis.vip.datamanager.client.view.common.AppletHTMLPane;
 
 /**
  *
@@ -46,7 +45,7 @@ public class DataUploadWindow extends Window {
 
     public DataUploadWindow(ModalWindow modal, String baseDir, String target) {
 
-        this.setTitle(Canvas.imgHTML(DataManagerConstants.ICON_UPLOAD_MULTIPLE) + " Upload folder to: " + baseDir);
+        this.setTitle(Canvas.imgHTML(DataManagerConstants.ICON_UPLOAD_MULTIPLE) + " Upload files and folders to: " + baseDir);
         this.setWidth(450);
         this.setHeight(200);
         this.setShowMinimizeButton(false);
