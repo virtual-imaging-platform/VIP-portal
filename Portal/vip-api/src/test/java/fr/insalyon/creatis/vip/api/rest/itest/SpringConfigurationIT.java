@@ -36,16 +36,23 @@ import fr.insalyon.creatis.vip.api.bean.Module;
 import fr.insalyon.creatis.vip.api.rest.controller.PlatformController;
 import fr.insalyon.creatis.vip.api.rest.model.SupportedTransferProtocol;
 import fr.insalyon.creatis.vip.application.server.business.WorkflowBusiness;
-import org.junit.Test;
+import org.junit.*;
+import org.junit.contrib.java.lang.system.EnvironmentVariables;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.*;
 import org.springframework.core.env.Environment;
+import org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.util.Assert;
+
+import java.net.URISyntaxException;
+import java.nio.file.Paths;
 
 import static fr.insalyon.creatis.vip.api.CarminProperties.*;
 
@@ -83,6 +90,16 @@ public class SpringConfigurationIT {
 
     @Autowired
     private PlatformController platformController;
+
+    @ClassRule
+    public static final EnvironmentVariables environmentVariables = new EnvironmentVariables();
+
+    @BeforeClass
+    public static void setup() throws URISyntaxException {
+        String fakeHomePath = Paths.get(ClassLoader.getSystemResource("fakeHome").toURI())
+                .toAbsolutePath().toString();
+        environmentVariables.set("HOME", fakeHomePath);
+    }
 
     @Test
     public void propertiesShouldBePresent() {

@@ -45,6 +45,8 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.*;
 import java.util.List;
 
+import static org.bouncycastle.asn1.x500.style.RFC4519Style.c;
+
 /**
  * Created by abonnet on 1/13/17.
  */
@@ -144,6 +146,16 @@ public class DataController {
         restApiBusiness.getApiContext(httpServletRequest, true);
         // business call
         dataApiBusiness.uploadRawFileFromInputStream(completePath, requestInputStream);
+    }
+
+    @RequestMapping(path = "/**", method = RequestMethod.PUT, consumes = "application/carmin+json")
+    @ResponseStatus(HttpStatus.CREATED)
+    public void uploadCustomData(@RequestBody UploadData uploadData) throws ApiException {
+        String completePath = extractWildcardPath(httpServletRequest);
+        ApiUtils.methodInvocationLog("uploadCustomData", getCurrentUserEmail(), completePath);
+        restApiBusiness.getApiContext(httpServletRequest, true);
+        // business call
+        dataApiBusiness.uploadCustomData(completePath, uploadData);
     }
 
     private String getCurrentUserEmail() {

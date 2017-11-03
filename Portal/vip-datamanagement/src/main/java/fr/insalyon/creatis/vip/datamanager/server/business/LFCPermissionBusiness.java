@@ -56,6 +56,7 @@ public class LFCPermissionBusiness {
     }
 
     public void checkPermission(User user, String path, LFCAccessType LFCAccessType) throws BusinessException {
+        // TODO : verify there is no problem with ".." (normalize if its the case)
         checkRootPermission(path, LFCAccessType);
         // Root is always filtered so always permited
         if (path.equals(ROOT)) return;

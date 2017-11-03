@@ -37,7 +37,8 @@ import fr.insalyon.creatis.vip.core.server.business.*;
 import fr.insalyon.creatis.vip.core.server.dao.UserDAO;
 import fr.insalyon.creatis.vip.datamanager.server.business.*;
 import org.apache.commons.io.IOUtils;
-import org.junit.Before;
+import org.junit.*;
+import org.junit.contrib.java.lang.system.EnvironmentVariables;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,7 +54,9 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 import java.io.*;
+import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Paths;
 
 import static fr.insalyon.creatis.vip.api.data.CarminAPITestConstants.*;
 import static fr.insalyon.creatis.vip.api.CarminProperties.*;
@@ -121,8 +124,17 @@ abstract public class BaseVIPSpringIT {
     @Autowired
     protected LFCPermissionBusiness lfcPermissionBusiness;
 
+    @ClassRule
+    public static final EnvironmentVariables environmentVariables = new EnvironmentVariables();
+
+    @BeforeClass
+    public static void setupEnvVariables() throws URISyntaxException {
+        String fakeHomePath = Paths.get(ClassLoader.getSystemResource("fakeHome").toURI())
+                .toAbsolutePath().toString();
+        environmentVariables.set("HOME", fakeHomePath);
+    }
     @Before
-    public final void setup() {
+    public final void setup() throws URISyntaxException {
         mockMvc = MockMvcBuilders
                 .webAppContextSetup(wac)
                 .defaultRequest(MockMvcRequestBuilders.get("/").servletPath("/rest"))
@@ -134,8 +146,12 @@ abstract public class BaseVIPSpringIT {
     }
 
     protected String getResourceAsString(String pathFromClasspath) throws IOException {
-        Resource resource = resourceLoader.getResource("classpath:"+pathFromClasspath);
+        Resource resource = getResourceFromClasspath(pathFromClasspath);
         return IOUtils.toString(resource.getInputStream(), StandardCharsets.UTF_8);
+    }
+
+    protected Resource getResourceFromClasspath(String pathFromClasspath) {
+        return resourceLoader.getResource("classpath:"+pathFromClasspath);
     }
 
     public WebApplicationContext getWac() {

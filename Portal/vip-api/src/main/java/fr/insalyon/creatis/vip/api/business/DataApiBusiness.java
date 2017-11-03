@@ -32,7 +32,7 @@
 package fr.insalyon.creatis.vip.api.business;
 
 import fr.insalyon.creatis.vip.api.CarminProperties;
-import fr.insalyon.creatis.vip.api.rest.model.PathProperties;
+import fr.insalyon.creatis.vip.api.rest.model.*;
 import fr.insalyon.creatis.vip.core.client.bean.*;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.datamanager.client.bean.*;
@@ -55,6 +55,8 @@ import java.text.*;
 import java.util.*;
 import java.util.concurrent.*;
 
+import static fr.insalyon.creatis.vip.core.client.CoreModule.user;
+import static fr.insalyon.creatis.vip.core.client.view.util.CountryCode.pa;
 import static fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants.*;
 
 
@@ -147,68 +149,66 @@ public class DataApiBusiness {
         return res;
     }
 
-    public String getFileContentInBase64(String path) throws ApiException {
-        checkDownloadPermission(path);
-        String downloadOperationId = downloadFileToLocalStorage(path);
-        return getDownloadContentInBase64(downloadOperationId);
-    }
-
     public File getFile(String path) throws ApiException {
         checkDownloadPermission(path);
         String downloadOperationId = downloadFileToLocalStorage(path);
         return getDownloadFile(downloadOperationId);
     }
 
-    private void checkDownloadPermission(String path) throws ApiException {
-        checkReadPermission(path);
-        if (path.equals(ROOT)) {
-            logger.error("cannot download root");
-            throw new ApiException("Illegal data API access");
-        }
-        List<Data> fileData = baseGetFileData(path);
-        if (!doesLFCDataCorrespondToAFile(fileData)) {
-            // it works on a directory and return a zip, but we cant check the download size
-            logger.error("Trying to download a directory : " + path);
-            throw new ApiException("Illegal data API access");
-        }
-        Long maxSize = env.getProperty(CarminProperties.API_DATA_TRANSFERT_MAX_SIZE, Long.class);
-        if (fileData.get(0).getLength() > maxSize) {
-            logger.error("Trying to download a file too big : " + path);
-            throw new ApiException("Illegal data API access");
-        }
-    }
-
-    public void uploadRawFileFromInputStream(String path, InputStream is) throws ApiException {
+    public void uploadRawFileFromInputStream(String lfcPath, InputStream is) throws ApiException {
         // TODO : check upload size ?
-        checkPermission(path, LFCAccessType.UPLOAD);
-        java.nio.file.Path javaPath = Paths.get(path);
+        checkPermission(lfcPath, LFCAccessType.UPLOAD);
+        java.nio.file.Path javaPath = Paths.get(lfcPath);
         String parentLfcPath = javaPath.getParent().toString();
         // check if parent dir exists
         if (!baseDoesFileExist(parentLfcPath)) {
-            logger.error("parent directory of upload does not exist :" + path);
+            logger.error("parent directory of upload does not exist :" + lfcPath);
             throw new ApiException("Upload Directory doest not exist");
         }
+        // TODO : check if it already exists
         // TODO : support archive upload
         String uploadDirectory = DataManagerUtil.getUploadRootDirectory(false);
-        logger.debug("LFC path of new upload :" + path);
         // TODO : normalize file name to avoid weird characters
-        String fileName = Paths.get(path).getFileName().toString();
+        String fileName = Paths.get(lfcPath).getFileName().toString();
         String localPath = uploadDirectory + fileName;
         logger.debug("storing upload file in :" + localPath);
-        try (FileOutputStream fos = new FileOutputStream(localPath);) {
-            byte[] buffer = new byte[1024];
-            int bytesRead;
-            while ((bytesRead = is.read(buffer)) != -1) {
-                fos.write(buffer, 0, bytesRead);
-            }
-            fos.flush();
-        } catch (FileNotFoundException e) {
-            logger.error("Error creating new file " + localPath);
-            throw new ApiException("Upload error");
-        } catch (IOException e) {
-            logger.error("IO Error storing file " + localPath);
-            throw new ApiException("Upload error");
+        boolean isFileEmpty = saveInputStreamToFile(is, localPath);
+        if (isFileEmpty) {
+            logger.info("no content in upload, creating dir : " + lfcPath);
+            baseMkdir(parentLfcPath, fileName);
+        } else {
+            String opId = baseUploadFile(localPath, parentLfcPath);
+            // wait for it to be over
+            waitForOperationOrTimeout(opId);
         }
+    }
+
+    public void uploadCustomData(String lfcPath, UploadData uploadData) throws ApiException {
+        // TODO : check upload size ?
+        // TODO : factorize with previous method
+        checkPermission(lfcPath, LFCAccessType.UPLOAD);
+        java.nio.file.Path javaPath = Paths.get(lfcPath);
+        String parentLfcPath = javaPath.getParent().toString();
+        // check if parent dir exists
+        if (!baseDoesFileExist(parentLfcPath)) {
+            logger.error("parent directory of upload does not exist :" + lfcPath);
+            throw new ApiException("Upload Directory doest not exist");
+        }
+        if (uploadData.getType().equals(UploadDataType.ARCHIVE)) {
+            logger.error("archive upload not supported yet");
+            throw new ApiException("archive upload not supported yet");
+        }
+        // TODO : check if it already exists
+        // TODO : support archive upload
+        String uploadDirectory = DataManagerUtil.getUploadRootDirectory(false);
+        // TODO : normalize file name to avoid weird characters
+        String fileName = Paths.get(lfcPath).getFileName().toString();
+        String localPath = uploadDirectory + fileName;
+        logger.debug("storing upload file in :" + localPath);
+        writeFileFromBase64(uploadData.getBase64Content(), localPath);
+        String opId = baseUploadFile(localPath, parentLfcPath);
+        // wait for it to be over
+        waitForOperationOrTimeout(opId);
     }
 
     public PathProperties mkdir(String path) throws ApiException {
@@ -241,6 +241,25 @@ public class DataApiBusiness {
         return checkPermission(path, LFCAccessType.READ);
     }
 
+    private void checkDownloadPermission(String path) throws ApiException {
+        checkReadPermission(path);
+        if (path.equals(ROOT)) {
+            logger.error("cannot download root");
+            throw new ApiException("Illegal data API access");
+        }
+        List<Data> fileData = baseGetFileData(path);
+        if (!doesLFCDataCorrespondToAFile(fileData)) {
+            // it works on a directory and return a zip, but we cant check the download size
+            logger.error("Trying to download a directory : " + path);
+            throw new ApiException("Illegal data API access");
+        }
+        Long maxSize = env.getProperty(CarminProperties.API_DATA_TRANSFERT_MAX_SIZE, Long.class);
+        if (fileData.get(0).getLength() > maxSize) {
+            logger.error("Trying to download a file too big : " + path);
+            throw new ApiException("Illegal data API access");
+        }
+    }
+
     private String checkPermission(String path, LFCAccessType accessType) throws ApiException {
         try {
             lfcPermissionBusiness.checkPermission(apiContext.getUser(), path, accessType);
@@ -256,55 +275,8 @@ public class DataApiBusiness {
 
     private String downloadFileToLocalStorage(String path) throws ApiException {
         String downloadOperationId = baseDownloadFile(path);
-        Callable<Boolean> isDownloadOverCall = () -> isDownloadOver(downloadOperationId);
-
-        Integer retryDelay =
-                env.getProperty(CarminProperties.API_DOWNLOAD_RETRY_IN_SECONDS, Integer.class);
-        Callable<Boolean> waitForDownloadCall = () -> {
-            while (true) {
-                Future<Boolean> isDownloadOverFuture =
-                        scheduler.schedule(isDownloadOverCall, retryDelay, TimeUnit.SECONDS);
-                if (isDownloadOverFuture.get()) {
-                    return true;
-                }
-            }
-        };
-        Future<Boolean> waitForDownloadFuture =
-                scheduler.submit(waitForDownloadCall);
-        try {
-            // wait for n seconds or abort
-            Integer timeout =
-                    env.getProperty(CarminProperties.API_DOWNLOAD_TIMEOUT_IN_SECONDS, Integer.class);
-            waitForDownloadFuture.get(timeout, TimeUnit.SECONDS);
-        } catch (InterruptedException e) {
-            logger.error("Waiting for download interrupted :" + path, e);
-            throw new ApiException("Waiting for download interrupted");
-        } catch (ExecutionException e) {
-            logger.error("Error waiting for download :" + path, e);
-            throw new ApiException("Error waiting for download");
-        } catch (TimeoutException e) {
-            logger.error("Aborting download too long :" + path, e);
-            throw new ApiException("Aborting dowload : too long");
-        }
+        waitForOperationOrTimeout(downloadOperationId);
         return downloadOperationId;
-    }
-
-    private boolean isDownloadOver(String operationId) throws ApiException {
-        PoolOperation operation = baseGetPoolOperation(operationId);
-
-        switch (operation.getStatus()) {
-            case Queued:
-            case Running:
-                logger.debug("status of operation {" + operationId + "} : "  + operation.getStatus());
-                return false;
-            case Done:
-                return true;
-            case Failed:
-            case Rescheduled:
-            default:
-                logger.error("Download operation failed : " + operation.getStatus());
-                throw new ApiException("Download operation failed");
-        }
     }
 
     private String getDownloadContentInBase64(String operationId) throws ApiException {
@@ -321,13 +293,81 @@ public class DataApiBusiness {
     }
 
     private File getDownloadFile(String operationId) throws ApiException {
-        PoolOperation operation = baseGetPoolOperation(operationId);
+        PoolOperation operation = baseGetDownloadOperation(operationId);
         File file = new File(operation.getDest());
         if (file.isDirectory()) {
             file = new File(operation.getDest() + "/"
                     + FilenameUtils.getName(operation.getSource()));
         }
         return file;
+    }
+
+    // #### Operation stuff
+
+    private void waitForOperationOrTimeout(String operationId) throws ApiException {
+        // get user before launching thread : apiContext is not available from threads
+        User user = apiContext.getUser();
+        Callable<Boolean> isDownloadOverCall = () -> isOperationOver(operationId, user);
+
+        // task that check every x seconds if the operation is over.
+        // return true when OK or goes on indefinitly
+        Callable<Boolean> waitForDownloadCall = () -> {
+            while (true) {
+                Future<Boolean> isDownloadOverFuture =
+                        scheduler.schedule(isDownloadOverCall, getRetryDelay(), TimeUnit.SECONDS);
+                if (isDownloadOverFuture.get()) {
+                    return true;
+                }
+            }
+        };
+        // launch checking task
+        Future<Boolean> completionFuture =
+                scheduler.submit(waitForDownloadCall);
+        timeoutOperationCompletionFuture(operationId, completionFuture, getTimeout());
+    }
+
+    private void timeoutOperationCompletionFuture (
+            String operationId,
+            Future<Boolean> completionFuture, int timeoutInSeconds) throws ApiException {
+        try {
+            completionFuture.get(timeoutInSeconds, TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
+            logger.error("Waiting for operation completion interrupted :" + operationId, e);
+            throw new ApiException("Waiting for operation completion interrupted");
+        } catch (ExecutionException e) {
+            logger.error("Error waiting for operation completion :" + operationId, e);
+            throw new ApiException("Error waiting for operation completion");
+        } catch (TimeoutException e) {
+            completionFuture.cancel(true);
+            logger.error("Timeout operation completion :" + operationId, e);
+            throw new ApiException("Aborting operation : too long");
+        }
+    }
+
+    private Integer getRetryDelay() {
+        return env.getProperty(CarminProperties.API_DOWNLOAD_RETRY_IN_SECONDS, Integer.class);
+    }
+
+    private Integer getTimeout() {
+        return env.getProperty(CarminProperties.API_DOWNLOAD_TIMEOUT_IN_SECONDS, Integer.class);
+    }
+
+    private boolean isOperationOver(String operationId, User user) throws ApiException {
+        PoolOperation operation = baseGetPoolOperation(operationId, user);
+
+        switch (operation.getStatus()) {
+            case Queued:
+            case Running:
+                logger.debug("status of operation {" + operationId + "} : "  + operation.getStatus());
+                return false;
+            case Done:
+                return true;
+            case Failed:
+            case Rescheduled:
+            default:
+                logger.error("IO LFC Operation failed : " + operationId + " : " + operation.getStatus());
+                throw new ApiException("IO LFC Operation operation failed");
+        }
     }
 
     // #### UPLOAD STUFF
@@ -339,7 +379,28 @@ public class DataApiBusiness {
         try (InputStream base64InputStream = decoder.wrap(inputStream)) {
             Files.copy(base64InputStream, Paths.get(localFilePath));
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("Error writing base64 file");
+            throw new ApiException("Error writing base64 file");
+        }
+    }
+
+    private boolean saveInputStreamToFile(InputStream is, String path) throws ApiException {
+        try (FileOutputStream fos = new FileOutputStream(path);) {
+            byte[] buffer = new byte[1024];
+            int bytesRead;
+            boolean isFileEmpty = true;
+            while ((bytesRead = is.read(buffer)) != -1) {
+                isFileEmpty = false;
+                fos.write(buffer, 0, bytesRead);
+            }
+            fos.flush();
+            return isFileEmpty;
+        } catch (FileNotFoundException e) {
+            logger.error("Error creating new file " + path);   // TODO check exception bubbling
+            throw new ApiException("Upload error");
+        } catch (IOException e) {
+            logger.error("IO Error storing file " + path);
+            throw new ApiException("Upload error");
         }
     }
 
@@ -473,7 +534,17 @@ public class DataApiBusiness {
         }
     }
 
-    private PoolOperation baseGetPoolOperation(String operationId) throws ApiException {
+    private PoolOperation baseGetPoolOperation(String operationId, User user) throws ApiException {
+        // need to specify the user to avoid accessing apiContext from another thread
+        try {
+            return transferPoolBusiness.getOperationById(operationId, user.getFolder());
+        } catch (BusinessException e) {
+            logger.error("Error getting download operation", e);
+            throw new ApiException("Error getting download operation");
+        }
+    }
+
+    private PoolOperation baseGetDownloadOperation(String operationId) throws ApiException {
         try {
             return transferPoolBusiness.getDownloadPoolOperation(operationId);
         } catch (BusinessException e) {
