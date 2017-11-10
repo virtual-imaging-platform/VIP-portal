@@ -216,14 +216,14 @@ knowledge of the CeCILL-B license and that you accept its terms.
 
     <repositories>
         <repository>
-            <id>creatis-releases</id>
-            <name>Creatis Releases Repository</name>
-            <url>http://vip.creatis.insa-lyon.fr:9007/nexus/content/repositories/releases</url>
+            <id>i3s-releases</id>
+            <name>I3S Releases Repository</name>
+            <url>http://nyx.unice.fr:9007/nexus/content/repositories/releases</url>
         </repository>
         <repository>
-            <id>creatis-thirdparty</id>
-            <name>Creatis Third-party Repository</name>
-            <url>http://vip.creatis.insa-lyon.fr:9007/nexus/content/repositories/thirdparty</url>
+            <id>i3s-thirdparty</id>
+            <name>I3S Third-party Repository</name>
+            <url>http://nyx.unice.fr:9007/nexus/content/repositories/thirdparty</url>
         </repository>
     </repositories>
 
