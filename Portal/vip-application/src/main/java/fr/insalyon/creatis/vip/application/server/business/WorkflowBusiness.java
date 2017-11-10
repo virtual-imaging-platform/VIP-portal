@@ -74,11 +74,14 @@ import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerException;
 import fr.insalyon.creatis.vip.datamanager.server.DataManagerUtil;
 import fr.insalyon.creatis.vip.datamanager.server.business.DataManagerBusiness;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.*;
 import java.util.logging.Level;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.log4j.Logger;
+import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 
 /**
  *
@@ -193,6 +196,12 @@ public class WorkflowBusiness {
                         + runningWorkflows + " running executions.");
             }
 
+            StringBuilder inputsJsonFile = new StringBuilder("{\n");
+            int parametersMapSize = parametersMap.size() ;
+            int treatedParameters = 0 ;
+            boolean isLastParameter = false ;
+            
+
             List<ParameterSweep> parameters = new ArrayList<ParameterSweep>();
             for (String name : parametersMap.keySet()) {
 
@@ -232,7 +241,22 @@ public class WorkflowBusiness {
                     ps.addValue(parsedPath);
                 }
                 parameters.add(ps);
+         
+                treatedParameters +=1;
+                
+                if(treatedParameters == parametersMapSize) {
+                    isLastParameter = true;
+                }
+                logger.info("************* ParameterName : " +  ps.getParameterName() + " ps.getValues().get(0) : " + ps.getValues().get(0));
+                addInputLineInJson(ps, inputsJsonFile, isLastParameter);
+
             }
+            
+            inputsJsonFile.append("}");
+            
+            String inputsJsonFileString = new String(inputsJsonFile.toString());
+            logger.info("************* JSON : " +  inputsJsonFileString);
+            String inputFieldJson = new String(applicationName + "_inputs.json");
 
             AppVersion version = applicationDB.getVersion(applicationName, applicationVersion);
             DataManagerBusiness dmBusiness = new DataManagerBusiness();
@@ -240,6 +264,19 @@ public class WorkflowBusiness {
                     Server.getInstance().getConfigurationFolder() + "workflows/"
                     + FilenameUtils.getName(version.getLfn()));
 
+            // Write application json 
+             try {
+                    File jsonFile = new File(inputFieldJson);
+                     PrintWriter writer = new PrintWriter(jsonFile, "UTF-8");
+                    writer.write(inputsJsonFileString);
+                    writer.close();
+            
+                    uploadFile(inputFieldJson, workflowPath);
+             } catch (FileNotFoundException | UnsupportedEncodingException ex) {
+                    logger.error(ex);
+                     throw new BusinessException(ex);     
+             }
+            
             //selectRandomEngine could also be used; TODO: make this choice configurable
             Engine engine = selectEngine(applicationClass);
             WorkflowExecutionBusiness executionBusiness = new WorkflowExecutionBusiness(engine.getEndpoint());
@@ -911,4 +948,43 @@ public class WorkflowBusiness {
             throw new BusinessException(ex);
         }
     }
+    
+    public StringBuilder addInputLineInJson(ParameterSweep ps, StringBuilder inputsJsonFile, boolean isLastParameter) {
+        StringBuilder inputLine = new StringBuilder();
+         if(!ps.getParameterName().equals("results-directory")) {
+            StringBuilder value;
+            if(ps.getValues().get(0).contains("/")) {
+                int index = ps.getValues().get(0).lastIndexOf("/");
+                logger.info("****************** INDEX : "+ index);
+                value = new StringBuilder(".");
+                value.append(ps.getValues().get(0).substring(index));
+                logger.info("****************** ps.getValues().get(0).substring(index) : "+ ps.getValues().get(0).substring(index));
+            }
+            else {
+                value = new StringBuilder(ps.getValues().get(0));
+            }
+            
+            inputLine = new StringBuilder("\t\"" + ps.getParameterName() + "\"" + " : " + "\"" + value + "\"");
+            if (!isLastParameter) {
+                inputLine.append(",");
+            }
+            inputLine.append("\n");
+        }
+        return inputsJsonFile.append(inputLine);
+    }
+    
+     private void uploadFile(String localFile, String lfn) throws BusinessException {
+        try {
+            GRIDAClient gc = CoreUtil.getGRIDAClient();
+            logger.info("Uploading file " + localFile + " to " + lfn);
+            if (gc.exist(lfn)) {
+                gc.delete(lfn);
+            }
+            gc.uploadFile(localFile, (new File(lfn)).getParent());
+        } catch (GRIDAClientException ex) {
+            logger.error(ex);
+            throw new BusinessException(ex);
+        }
+    }
+    
 }
