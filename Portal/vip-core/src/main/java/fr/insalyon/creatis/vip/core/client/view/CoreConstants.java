@@ -44,7 +44,6 @@ public class CoreConstants implements IsSerializable {
     // Configuration Labels
     public static final String VO_NAME = "vo.name";
     public static final String VO_ROOT = "vo.root";
-    public static final String VO_NEUGRID = "vo.neugrid.eu";
     public static final String LAB_DB_HOST = "database.server.host";
     public static final String LAB_DB_PORT = "database.server.port";
     public static final String LAB_ADMIN_FIRST_NAME = "admin.first.name";

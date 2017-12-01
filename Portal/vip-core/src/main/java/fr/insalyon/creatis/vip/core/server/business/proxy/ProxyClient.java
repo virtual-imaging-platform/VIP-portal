@@ -138,9 +138,7 @@ public class ProxyClient {
             Server server = Server.getInstance();
             String voName = server.getVoName();
             copyFile(server.getServerProxy(), server.getServerProxyFolder(voName));
-            copyFile(server.getServerProxy(), server.getServerProxyFolder(CoreConstants.VO_NEUGRID));
             addVomsExtension(voName);
-            addVomsExtension(CoreConstants.VO_NEUGRID);
 
             return new Proxy(proxyFileName, endDate);
 

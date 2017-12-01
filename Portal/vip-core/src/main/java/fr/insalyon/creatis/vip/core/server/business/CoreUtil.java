@@ -69,14 +69,6 @@ public class CoreUtil {
             server.getServerProxy(server.getVoName()));
     }
 
-    public static GRIDAClient getGRIDAN4uClient() {
-
-        return new GRIDAClient(
-                Server.getInstance().getN4uGridaHost(),
-                Server.getInstance().getN4uGridaPort(),
-                Server.getInstance().getServerProxy(CoreConstants.VO_NEUGRID));
-    }
-
     public static GRIDAPoolClient getGRIDAPoolClient() {
         Server server = Server.getInstance();
         return new GRIDAPoolClient(
