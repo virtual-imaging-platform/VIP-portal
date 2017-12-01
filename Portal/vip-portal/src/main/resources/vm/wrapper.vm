@@ -144,6 +144,8 @@ then
 			BOUTIQUES_COMMAND_LINE=$${ob}BOUTIQUES_COMMAND_LINE//'$input.getCommandLineKey()'/"${LOCAL_FILE_NAME}"}
 		#end
     #else
+  ## In the application wrapper script, an input field value will be surrounded by simple quotes. This will allow spaces in the input field value.
+  $input.getId().toUpperCase()="'$$input.getId().toUpperCase()'"
   BOUTIQUES_COMMAND_LINE=$${ob}BOUTIQUES_COMMAND_LINE//'$input.getCommandLineKey()'/$newValue}
     #end
   #else

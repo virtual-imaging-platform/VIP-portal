@@ -4,16 +4,16 @@
  * This software is a web portal for pipeline execution on distributed systems.
  *
  * This software is governed by the CeCILL-B license under French law and
- * abiding by the rules of distribution of free software.  You can  use, 
+ * abiding by the rules of distribution of free software.  You can  use,
  * modify and/ or redistribute the software under the terms of the CeCILL-B
  * license as circulated by CEA, CNRS and INRIA at the following URL
- * "http://www.cecill.info". 
+ * "http://www.cecill.info".
  *
  * As a counterpart to the access to the source code and  rights to copy,
  * modify and redistribute granted by the license, users are provided only
  * with a limited warranty  and the software's author,  the holder of the
  * economic rights,  and the successive licensors  have only  limited
- * liability. 
+ * liability.
  *
  * In this respect, the user's attention is drawn to the risks associated
  * with loading,  using,  modifying and/or developing or reproducing the
@@ -22,9 +22,9 @@
  * therefore means  that it is reserved for developers  and  experienced
  * professionals having in-depth computer knowledge. Users are therefore
  * encouraged to load and test the software's suitability as regards their
- * requirements in conditions enabling the security of their systems and/or 
- * data to be ensured and,  more generally, to use and operate it in the 
- * same conditions as regards security. 
+ * requirements in conditions enabling the security of their systems and/or
+ * data to be ensured and,  more generally, to use and operate it in the
+ * same conditions as regards security.
  *
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL-B license and that you accept its terms.
@@ -57,32 +57,32 @@ public class DataManagerUtil {
      * @throws DataManagerException
      */
     public static String parseBaseDir(User user, String baseDir) throws DataManagerException {
-
+        Server server = Server.getInstance();
         baseDir = parsePath(baseDir, DataManagerConstants.USERS_HOME,
-                Server.getInstance().getDataManagerUsersHome()
+                server.getDataManagerUsersHome()
                 + "/" + user.getFolder());
 
         baseDir = parsePath(baseDir, DataManagerConstants.TRASH_HOME,
-                Server.getInstance().getDataManagerUsersHome()
+                server.getDataManagerUsersHome()
                 + "/" + user.getFolder()
                 + "_" + DataManagerConstants.TRASH_HOME);
 
         baseDir = parsePath(baseDir, DataManagerConstants.USERS_FOLDER,
-                Server.getInstance().getDataManagerUsersHome());
+                server.getDataManagerUsersHome());
 
-        baseDir = parsePath(baseDir, DataManagerConstants.BIOMED_HOME,
-                "/grid/biomed");
+        baseDir = parsePath(baseDir, DataManagerConstants.VO_ROOT_FOLDER,
+                            server.getVoRoot());
 
         try {
             for (Group group : CoreDAOFactory.getDAOFactory().getGroupDAO().getGroups()) {
                 String folderName = group.getName().replaceAll(" ", "_");
 
                 baseDir = parsePath(baseDir, group.getName() + DataManagerConstants.GROUP_APPEND,
-                        Server.getInstance().getDataManagerGroupsHome()
+                        server.getDataManagerGroupsHome()
                         + "/" + folderName);
 
                 baseDir = parsePath(baseDir, group.getName(),
-                        Server.getInstance().getDataManagerGroupsHome()
+                        server.getDataManagerGroupsHome()
                         + "/" + folderName);
             }
         } catch (DAOException ex) {
@@ -103,7 +103,7 @@ public class DataManagerUtil {
             paths.add(s.replaceAll(" ", "_"));
         return paths;
     }
-    
+
     /**
      *
      * @param baseDir
@@ -129,12 +129,14 @@ public class DataManagerUtil {
     public static String parseRealDir(String baseDir, String currentUserFolder)
             throws DataManagerException {
 
+        Server server = Server.getInstance();
+
         if (baseDir.startsWith("lfn://")) {
             baseDir = URI.create(baseDir).getPath();
         }
 
-        if (baseDir.contains(Server.getInstance().getDataManagerUsersHome())) {
-            baseDir = baseDir.replace(Server.getInstance().getDataManagerUsersHome() + "/", "");
+        if (baseDir.contains(server.getDataManagerUsersHome())) {
+            baseDir = baseDir.replace(server.getDataManagerUsersHome() + "/", "");
 
             int index = baseDir.indexOf("/");
 
@@ -157,7 +159,7 @@ public class DataManagerUtil {
         try {
             for (Group group : CoreDAOFactory.getDAOFactory().getGroupDAO().getGroups()) {
                 baseDir = baseDir.replace(
-                        Server.getInstance().getDataManagerGroupsHome()
+                        server.getDataManagerGroupsHome()
                         + "/" + group.getName().replaceAll(" ", "_"),
                         DataManagerConstants.ROOT + "/" + group.getName()
                         + DataManagerConstants.GROUP_APPEND);
@@ -166,8 +168,9 @@ public class DataManagerUtil {
             throw new DataManagerException(ex);
         }
 
-        baseDir = baseDir.replace("/grid/biomed",
-                DataManagerConstants.ROOT + "/" + DataManagerConstants.BIOMED_HOME);
+        baseDir = baseDir.replace(
+            server.getVoRoot(),
+            DataManagerConstants.ROOT + "/" + DataManagerConstants.VO_ROOT_FOLDER);
 
         return baseDir;
     }

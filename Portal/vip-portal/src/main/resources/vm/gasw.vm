@@ -1,24 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <description>
   <executable name="$tool.getWrapperName()">
-    <access type="LFN" cached="true"/> 
+    <access type="LFN" cached="true"/>
     <retrycount value="1"/>
     <value value="$tool.getWrapperLFN()"/>
+#if($isRunOnGrid == false)
     <executor value="LOCAL"/>
-    <input name="results-directory" option="no1"> 
+#end
+    <input name="results-directory" option="no1">
     </input>
 #foreach($input in $tool.getInputs())
 #set($option="--$input.getId().toLowerCase()")
-    <input name="${input.getId()}" option="${option}"> 
+    <input name="${input.getId()}" option="${option}">
 #if($input.getType() == "File" && !$input.isOptional())
-      <access type="LFN"/> 
+      <access type="LFN"/>
 #end
     </input>
 #end
 #foreach($outputFile in $tool.getOutputFiles())
 #set($option="--$outputFile.getId().toLowerCase()")
     <output name="$outputFile.getId()" option="$option">
-#set ($value=$outputFile.getPathTemplate()) 
+#set ($value=$outputFile.getPathTemplate())
 #set ($i=1)
 #foreach($input in $tool.getInputs())
 #set ($i=$i+1)
