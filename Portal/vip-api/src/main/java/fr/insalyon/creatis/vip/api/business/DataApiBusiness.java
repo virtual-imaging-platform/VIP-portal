@@ -55,8 +55,6 @@ import java.text.*;
 import java.util.*;
 import java.util.concurrent.*;
 
-import static fr.insalyon.creatis.vip.core.client.CoreModule.user;
-import static fr.insalyon.creatis.vip.core.client.view.util.CountryCode.pa;
 import static fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants.*;
 
 
