@@ -163,7 +163,7 @@ public class DataController {
     }
 
     private static String extractWildcardPath(HttpServletRequest request) {
-        String prefixToSearch = "/rest/path/";
+        String prefixToSearch = "/rest/path/"; // TODO : parametize that
         int index = request.getRequestURI().indexOf(prefixToSearch);
         // "-1" at the end to keep the beginning slash
         return request.getRequestURI().substring(index + prefixToSearch.length() - 1);
