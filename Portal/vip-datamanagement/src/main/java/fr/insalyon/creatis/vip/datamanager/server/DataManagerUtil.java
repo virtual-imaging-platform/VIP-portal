@@ -114,7 +114,16 @@ public class DataManagerUtil {
     private static String parsePath(String baseDir, String pattern, String toReplace) {
         pattern = DataManagerConstants.ROOT + "/" + pattern;
         if (baseDir.contains(pattern)) {
-            return baseDir.replace(pattern, toReplace);
+            /* the directory should correspond perfectly, not partially
+            * So either the path ends after the root subdirectory, either there is a slash
+            * and another path element after.
+            * */
+            int nextCharIndex = baseDir.indexOf(pattern) + pattern.length();
+            if (baseDir.length() == nextCharIndex || baseDir.charAt(nextCharIndex) == '/') {
+                return baseDir.replace(pattern, toReplace);
+            } else {
+                return baseDir;
+            }
         }
         return baseDir;
     }
