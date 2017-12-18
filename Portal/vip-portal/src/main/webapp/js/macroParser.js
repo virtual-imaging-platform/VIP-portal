@@ -46,9 +46,8 @@
 
 //https://www.html5rocks.com/en/tutorials/file/dndfiles/
 
-function parseMacFile(mainMacFileID, macFilesListID) {
-    var mainMacFile = document.getElementById(mainMacFileID).files[0];
-    //var macFilesList = document.getElementById(macFilesListID).files;
+function parseMacFile(macId, parentFolderId) {
+    var mainMacFile = document.getElementById(macId).files[0];
     var ret =
             {
                 macFilesArray: [],
@@ -85,7 +84,7 @@ function parseMacFile(mainMacFileID, macFilesListID) {
             return;
         } else {
             macFileName = ret["macFilesArray"][fileIndex];
-            var macFile = getFileByName(macFileName, macFilesListID);
+            var macFile = getFileByName(macFileName, parentFolderId);
             if (macFile === null) {
                 alert("Macro file " + macFileName + " not found in the mac folder");
                 return;
@@ -128,16 +127,60 @@ function parseMacFile(mainMacFileID, macFilesListID) {
 
 //retrieve the file object corresponding to fileName from listOfFilesID
 //TODO add something like getFileByNameWithoutExt for input files (e.g., .hdr/.img files, since only .hdr file will be parsed)
-function getFileByName(fileName, listOfFilesID) {
-    var listOfFiles = document.getElementById(listOfFilesID).files;
+function getFileByName(fileName, parentFolderId) {
+    var listOfFiles = document.getElementById(parentFolderId).files;
     //var myFile = listOfFiles[listOfFiles.map(function(x){return x.name}).indexOf(myFileName)];
     //For some reason, map doesn't seem to work, so looking for the file name ourselves
     var myFile = null;
     for (var searchIndex = 0; searchIndex < listOfFiles.length; searchIndex++) {
         if (listOfFiles[searchIndex].name === fileName) {
             myFile = listOfFiles[searchIndex];
-            break;
+            console.log("getting file "+myFile.name);
+            return myFile;
         }
     }
     return myFile;
+}
+
+//Get coupled files (e.g., .hdr/.img files, since only .hdr file will be parsed)
+function getFilesByNameWithoutExtension (fileName, parentFolderId) {
+    var listOfFiles = document.getElementById(parentFolderId).files;
+    var myFiles = [];
+    for (var searchIndex = 0; searchIndex < listOfFiles.length; searchIndex++) {
+        if (listOfFiles[searchIndex].name.replace(/\.[^/.]+$/, "") === fileName.replace(/\.[^/.]+$/, "")) {
+            console.log("pushing file "+listOfFiles[searchIndex].name);
+            myFiles.push(listOfFiles[searchIndex]);
+        }
+    }
+    return myFiles;
+}
+
+function getListOfFiles(dataArray, parentFolderId) {
+    var myListOfFiles = [];
+    var myFile = null;
+    var myFiles = [];
+
+    //add macro files
+    for (var parseIndex = 0; parseIndex < dataArray.macFilesArray.length; parseIndex++) {
+        var fileName = dataArray.macFilesArray[parseIndex];
+        myFile = getFileByName(fileName, parentFolderId);
+        //add file only if it doesn't exist
+        if (myListOfFiles.indexOf(myFile) === -1) {
+            //console.log("element " + m[1] + " doesn't exist, adding it");
+            myListOfFiles.push(myFile);
+        }
+    }
+
+    //add input files, knowing that .hdr/.img files are coupled
+    for (var parseIndex = 0; parseIndex < dataArray.inputFilesArray.length; parseIndex++) {
+        var fileName = dataArray.inputFilesArray[parseIndex];
+        myFiles = getFilesByNameWithoutExtension(fileName, parentFolderId);
+        //add file only if it doesn't exist
+        if (myListOfFiles.indexOf(myFiles[0]) === -1) {
+            //pushing a list to myListOfFiles
+            myListOfFiles.push.apply(myListOfFiles, myFiles);
+        }
+    }
+    
+    return myListOfFiles;
 }

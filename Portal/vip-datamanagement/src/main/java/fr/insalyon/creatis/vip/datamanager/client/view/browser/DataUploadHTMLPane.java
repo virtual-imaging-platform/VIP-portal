@@ -57,7 +57,7 @@ import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
  */
 public class DataUploadHTMLPane extends HTMLPane {
 
-    public DataUploadHTMLPane(String title, String code, 
+    public DataUploadHTMLPane(String title, String code, String inputId,
             String path, String target, boolean usePool) {
 
         this.setWidth100();
@@ -74,15 +74,13 @@ public class DataUploadHTMLPane extends HTMLPane {
                 + "<form>\n"
                 + "<div>\n"
                 + "  <label for=\"folder_upload\">Choose folder for upload</label>\n"
-                + "  <input type=\"file\" id=\"folder_upload\" name=\"folder_upload\" webkitdirectory  multiple onchange=\"previewFiles(this.files)\">\n"
-                + "  <label for=\"files_upload\">Choose files for upload</label>\n"
-                + "  <input type=\"file\" id=\"files_upload\" name=\"files_upload\" multiple=\"multiple\" onchange=\"previewFiles(this.files)\">\n"
+                + "  <input type=\"file\" id=\""+inputId+"\" name=\"folder_upload\" webkitdirectory  multiple onchange=\"previewFiles(this.files)\">\n"
                 + "</div>\n"
                 + "<div class=\"preview\">\n"
                 + "  <p>No files currently selected for upload</p>\n"
                 + "</div>\n"
                 + "<div>\n"
-                + "  <input type=\"button\" onclick=\"zipAndUploadFiles(\'" + code + "\', \'" + path + "\', \'" + target  + "\', \'" + usePool + "\')\" value=\"Upload\"/>\n"
+                + "  <input type=\"button\" onclick=\"zipAndUploadFiles(\'" + inputId + "\',\'" + code + "\', \'" + path + "\', \'" + target  + "\', \'" + usePool + "\')\" value=\"Upload\"/>\n"
                 + "</div>\n"
                 + "</form>\n"
                 + "\n"

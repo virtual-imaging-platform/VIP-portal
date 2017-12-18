@@ -52,12 +52,9 @@ public class LoadMacWindow extends Window {
         this.centerInPage();
         this.setPadding(5);
         
-        //TODO Sorina: set this correctly
-        String target="dataManagerUploadComplete";
-
         this.addItem(new LoadMacHTMLPane(
                 "DataUpload", 
                 GWT.getModuleBaseURL() + "/fileuploadservice", 
-                baseDir, target, true));
+                "gateParentFolderID", "macFileID", baseDir, "dataManagerUploadComplete", true));
     }
 }

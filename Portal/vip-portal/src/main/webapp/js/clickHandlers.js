@@ -57,16 +57,16 @@ function previewFiles(files) {
     } else {
         //TODO: add a scrollable item if we want to preview the list of files
         /*
-        var list = document.createElement('ol');
-        preview.appendChild(list);
-        for (var i = 0; i < curFiles.length; i++) {
-            var listItem = document.createElement('li');
-            var para = document.createElement('p');
-            para.textContent = 'File name ' + curFiles[i].name;
-            listItem.appendChild(para);
-            list.appendChild(listItem);
-        }
-        */
+         var list = document.createElement('ol');
+         preview.appendChild(list);
+         for (var i = 0; i < curFiles.length; i++) {
+         var listItem = document.createElement('li');
+         var para = document.createElement('p');
+         para.textContent = 'File name ' + curFiles[i].name;
+         listItem.appendChild(para);
+         list.appendChild(listItem);
+         }
+         */
         var para = document.createElement('p');
         para.textContent = " " + curFiles.length + " files selected for upload. Click on the upload button to proceed.";
         preview.appendChild(para);
@@ -74,18 +74,23 @@ function previewFiles(files) {
 }
 
 
-//TODO: take out the document.getElementById('data_uploads').files and give it as input param
 //zip a list of files and call uploadZip to send the final zip to the given url (which is a file upload service)
-function zipAndUploadFiles(url, destPath, target, usePool) {
+//data can be a fileList or the id of of a fileList element
+function zipAndUploadFiles(data, url, destPath, target, usePool) {
     var zip = new JSZip();
     var reader = new FileReader();
-    var fileList = document.getElementById('data_uploads').files;
+    var fileList;
+    if (Array.isArray(data)) {
+        fileList = data;
+    } else {
+        fileList = document.getElementById(data).files;
+    }
     if (fileList.length === 0) {
         alert("No folder selected for upload");
         return;
     }
     //TODO handle single file use-case: no need for zipping + set single=true
-	//TODO make the uploadZip function a callback given as input to zipFile
+    //TODO make the uploadZip function a callback given as input to zipFile
     function zipFile(index) {
         //upload zipped file when finished zipping all files (index == fileList.length)
         if (index === fileList.length) {
@@ -111,6 +116,11 @@ function zipAndUploadFiles(url, destPath, target, usePool) {
     zipFile(0);
 }
 
-function parseAndUploadMac(url, destPath, target, usePool) {
-	return;
+function parseAndUploadMac(parentFolderId, macId, url, destPath, target, usePool) {
+    //TODO : have the following code execute sequentially
+    console.log("Getting data array "+listOfFiles[searchIndex].name);
+    var dataArray = parseMacFile(macId, parentFolderId);
+    console.log("Getting list of files to upload "+listOfFiles[searchIndex].name);
+    var filesToUpload = getListOfFiles(dataArray, parentFolderId);
+    zipAndUploadFiles(filesToUpload, url, destPath, target, usePool);
 }
