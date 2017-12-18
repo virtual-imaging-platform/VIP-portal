@@ -4,16 +4,16 @@
  * This software is a web portal for pipeline execution on distributed systems.
  *
  * This software is governed by the CeCILL-B license under French law and
- * abiding by the rules of distribution of free software.  You can  use, 
+ * abiding by the rules of distribution of free software.  You can  use,
  * modify and/ or redistribute the software under the terms of the CeCILL-B
  * license as circulated by CEA, CNRS and INRIA at the following URL
- * "http://www.cecill.info". 
+ * "http://www.cecill.info".
  *
  * As a counterpart to the access to the source code and  rights to copy,
  * modify and redistribute granted by the license, users are provided only
  * with a limited warranty  and the software's author,  the holder of the
  * economic rights,  and the successive licensors  have only  limited
- * liability. 
+ * liability.
  *
  * In this respect, the user's attention is drawn to the risks associated
  * with loading,  using,  modifying and/or developing or reproducing the
@@ -22,9 +22,9 @@
  * therefore means  that it is reserved for developers  and  experienced
  * professionals having in-depth computer knowledge. Users are therefore
  * encouraged to load and test the software's suitability as regards their
- * requirements in conditions enabling the security of their systems and/or 
- * data to be ensured and,  more generally, to use and operate it in the 
- * same conditions as regards security. 
+ * requirements in conditions enabling the security of their systems and/or
+ * data to be ensured and,  more generally, to use and operate it in the
+ * same conditions as regards security.
  *
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL-B license and that you accept its terms.
@@ -67,6 +67,9 @@ public class Server {
     private String adminInstitution;
     private String adminPhone;
     private String adminPassword;
+    // VO
+    private String voName;
+    private String voRoot;
     // MyProxy
     private String myProxyHost;
     private int myProxyPort;
@@ -137,7 +140,7 @@ public class Server {
             // Directories
             configurationFolder = setPath(System.getenv("HOME") + VIP_DIR);
             serverProxy = setPath(configurationFolder + PROXIES_DIR) + "/x509up_server";
-            
+
             // Configuration File
             String confFilePath = configurationFolder + CONF_FILE;
             config = new PropertiesConfiguration(confFilePath);
@@ -152,6 +155,9 @@ public class Server {
             adminInstitution = config.getString(CoreConstants.LAB_ADMIN_INSTITUTION, "");
             adminPhone = config.getString(CoreConstants.LAB_ADMIN_PHONE, "");
             adminPassword = config.getString(CoreConstants.LAB_ADMIN_PASS, "admin");
+
+            voName = config.getString(CoreConstants.VO_NAME, "");
+            voRoot = config.getString(CoreConstants.VO_ROOT, "");
 
             myProxyHost = config.getString(CoreConstants.LAB_MYPROXY_HOST, "localhost");
             myProxyPort = config.getInt(CoreConstants.LAB_MYPROXY_PORT, 7211);
@@ -197,11 +203,11 @@ public class Server {
             List<String> appletGateLabCl = new ArrayList<String>();
             appletGateLabCl.add("GateLab");
             appletGateLabClasses = config.getList(CoreConstants.APPLET_GATELAB_CLASSES, appletGateLabCl);
-            
+
             List<String> appletGateLabTestCl = new ArrayList<String>();
             appletGateLabTestCl.add("GateLab Test");
             appletGateLabTestClasses = config.getList(CoreConstants.APPLET_GATELABTEST_CLASSES, appletGateLabTestCl);
-           
+
             reservedClasses = new HashMap<String, Integer>();
             for (final String gateClass : appletGateLabClasses) {
                 this.reservedClasses.put(gateClass, 0);
@@ -209,7 +215,7 @@ public class Server {
             for (final String gateTestClass : appletGateLabTestClasses) {
                 this.reservedClasses.put(gateTestClass, 1);
             }
-           
+
             //undesired Mail Domains
             List<String> listUndesiredEmailDomains = new ArrayList<>();
             undesiredMailDomains = config.getList(CoreConstants.UNDESIRED_MAIL_DOMAINS, listUndesiredEmailDomains);
@@ -217,14 +223,14 @@ public class Server {
             //undesired countries
             List<String> listUndesiredCountries = new ArrayList<>();
             undesiredCountries = config.getList(CoreConstants.UNDESIRED_COUNTRIES, listUndesiredCountries);
-            
+
             //queryTree
             queryTree = config.getString(CoreConstants.TreeQuery, "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> select * from <http://e-ginseng.org/graph/ontology/semEHR> where {?x a rdfs:Class . ?x rdfs:label ?label}");
 
             //Applicatoin importer
             applicationImporterFileRepository = config.getString(CoreConstants.APPLICATION_FILES_REPOSITORY, "/tmp/boutiques-cache");
             deleteFilesAfterUpload = config.getString(CoreConstants.APP_DELETE_FILES_AFTER_UPLOAD, "yes");
-            
+
             //Publication
             numberMonthsToTestLastPublicationUpdates=config.getInt(CoreConstants.PUB_MONTHS_UPDATES, 6);
 
@@ -236,6 +242,8 @@ public class Server {
             config.setProperty(CoreConstants.LAB_ADMIN_INSTITUTION, adminInstitution);
             config.setProperty(CoreConstants.LAB_ADMIN_PHONE, adminPhone);
             config.setProperty(CoreConstants.LAB_ADMIN_PASS, adminPassword);
+            config.setProperty(CoreConstants.VO_NAME, voName);
+            config.setProperty(CoreConstants.VO_ROOT, voRoot);
             config.setProperty(CoreConstants.LAB_MYPROXY_HOST, myProxyHost);
             config.setProperty(CoreConstants.LAB_MYPROXY_PORT, myProxyPort);
             config.setProperty(CoreConstants.LAB_MYPROXY_USER, myProxyUser);
@@ -259,7 +267,7 @@ public class Server {
             config.setProperty(CoreConstants.LAB_SIMULATION_BEGINNER_MAX, beginnerMaxRunningSimulations);
             config.setProperty(CoreConstants.LAB_SIMULATION_ADVANCED_MAX, advancedMaxRunningSimulations);
             config.setProperty(CoreConstants.LAB_SIMULATION_PLATFORM_MAX, maxPlatformRunningSimulations);
-           
+
             config.setProperty(CoreConstants.LAB_SIMULATION_FOLDER, workflowsPath);
             config.setProperty(CoreConstants.LAB_SIMULATION_DB_HOST, workflowsHost);
             config.setProperty(CoreConstants.LAB_SIMULATION_DB_PORT, workflowsPort);
@@ -269,7 +277,7 @@ public class Server {
             config.setProperty(CoreConstants.LAB_CAS_URL, casURL);
             config.setProperty(CoreConstants.SSH_PUBLIC_KEY, sshPublicKey);
             config.setProperty(CoreConstants.TreeQuery, queryTree);
-       
+
             config.setProperty(CoreConstants.APPLICATION_FILES_REPOSITORY, applicationImporterFileRepository);
             config.setProperty(CoreConstants.APP_DELETE_FILES_AFTER_UPLOAD, deleteFilesAfterUpload);
             config.setProperty(CoreConstants.APPLET_GATELAB_CLASSES, appletGateLabClasses);
@@ -304,14 +312,22 @@ public class Server {
         return configurationFolder;
     }
 
+    public String getVoName() {
+        return voName;
+    }
+
+    public String getVoRoot() {
+        return voRoot;
+    }
+
     public String getServerProxy() {
         return serverProxy;
     }
-    
+
     public String getServerProxy(String vo) {
         return getServerProxyFolder(vo) + "x509up_server";
     }
-    
+
     public String getServerProxyFolder(String vo) {
         return setPath(configurationFolder + PROXIES_DIR + vo + "/");
     }
@@ -458,7 +474,7 @@ public class Server {
         logger.info("Returning "+result);
         return result;
     }
-    
+
     public String getSAMLAccountType(String issuer) {
         logger.info("Getting account type for issuer "+issuer);
         String result = config.getString(CoreConstants.SAML_ACCOUNT_TYPE+"."+issuer);
@@ -485,15 +501,15 @@ public class Server {
     public void setAppletGateLabClasses(List<String> appletGateLabClasses) {
         this.appletGateLabClasses = appletGateLabClasses;
     }
-   
+
     public List<String> getAppletGateLabTestClasses() {
         return appletGateLabTestClasses;
     }
-   
+
     public void setAppletGateLabTestClasses(List<String> appletGateLabTestClasses) {
         this.appletGateLabTestClasses = appletGateLabTestClasses;
     }
-    
+
     public HashMap<String, Integer> getReservedClasses() {
         return reservedClasses;
     }
@@ -505,11 +521,11 @@ public class Server {
     public List<String> getUndesiredCountries() {
         return undesiredCountries;
     }
-    
+
     public int getMaxPlatformRunningSimulations() {
         return maxPlatformRunningSimulations;
     }
-    
+
      public int getNumberMonthsToTestLastPublicationUpdates() {
         return numberMonthsToTestLastPublicationUpdates;
     }
