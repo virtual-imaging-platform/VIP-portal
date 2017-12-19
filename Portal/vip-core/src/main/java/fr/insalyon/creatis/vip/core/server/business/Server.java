@@ -156,8 +156,8 @@ public class Server {
             adminPhone = config.getString(CoreConstants.LAB_ADMIN_PHONE, "");
             adminPassword = config.getString(CoreConstants.LAB_ADMIN_PASS, "admin");
 
-            voName = config.getString(CoreConstants.VO_NAME, "");
-            voRoot = config.getString(CoreConstants.VO_ROOT, "");
+            voName = config.getString(CoreConstants.VO_NAME, "biomed");
+            voRoot = config.getString(CoreConstants.VO_ROOT, "/grid/biomed");
 
             myProxyHost = config.getString(CoreConstants.LAB_MYPROXY_HOST, "localhost");
             myProxyPort = config.getInt(CoreConstants.LAB_MYPROXY_PORT, 7211);
