@@ -102,6 +102,15 @@ shift # past argument or value
 shift
 done
 
+cat << JSONPARAMETERS  > input_param_file.json
+{
+
+
+
+
+}
+JSONPARAMETERS
+
 #############################
 # Command-line construction #
 #############################
