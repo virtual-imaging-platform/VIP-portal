@@ -79,13 +79,22 @@ fi
 
 shift # first parameter is always results directory
 
+cat << JSONPARAMETERS  > input_param_file.json
+{
+JSONPARAMETERS
+
 while [[ $# > 0 ]]
 do
 key="$1"
 case $key in
     #foreach($input in $tool.getInputs())
 --$input.getId().toLowerCase())
-    $input.getId().toUpperCase()="$2"
+    $input.getId().toUpperCase()="$2" && \ 
+       #if($tool.hasNextInput($input))
+            echo "\"$input.getId()\" : \"$2\"," >> input_param_file.json
+        #else
+            echo "\"$input.getId()\" : \"$2\"" >> input_param_file.json
+        #end
     ;;
     #end
     #foreach($outputFile in $tool.getOutputFiles())
@@ -102,95 +111,15 @@ shift # past argument or value
 shift
 done
 
-cat << JSONPARAMETERS  > input_param_file.json
-{
-
-
-
-
+cat << JSONPARAMETERS  >> input_param_file.json
 }
 JSONPARAMETERS
-
-#############################
-# Command-line construction #
-#############################
-
-BOUTIQUES_COMMAND_LINE='$tool.getCommandLine()'
-
-## Start with outputs so that input command line keys are replaced in path templates.
-#set($ob="{")
-#foreach($outputFile in $tool.getOutputFiles())
-## Replace command-line keys
-#if($outputFile.getCommandLineKey())
-	#if($outputFile.getCommandLineFlag() && $outputFile.getCommandLineFlag() != "")
-		#set($newValue="""$outputFile.getCommandLineFlag() $$outputFile.getId().toUpperCase()""")
-	#else
-		#set($newValue="""$$outputFile.getId().toUpperCase()""")
-	#end
-BOUTIQUES_COMMAND_LINE=$${ob}BOUTIQUES_COMMAND_LINE//'$outputFile.getCommandLineKey()'/$newValue}
-#end
-#end 
-
-#foreach($input in $tool.getInputs())
-  #if($input.isOptional())
-if [ "$$input.getId().toUpperCase()" != "no" ] && [ "$$input.getId().toUpperCase()" != "No_value_provided" ]
-then
-  # Optional input is active.
-  #end
-  #if($input.getType() != "Flag")
-	#if($input.getCommandLineFlag() && $input.getCommandLineFlag() != "")
-		#set($newValue="""$input.getCommandLineFlag() $$input.getId().toUpperCase()""")
-	#else
-		#set($newValue="""$$input.getId().toUpperCase()""")
-	#end
-    #if($input.getType() == "File" && $input.isOptional())
-  # Optional input is active and it is a file. The file needs to be downloaded (optional files are not handled by GASW).
-  downloadLFN $$input.getId().toUpperCase()
-  LOCAL_FILE_NAME=`basename $$input.getId().toUpperCase()`
-		#if($input.getCommandLineFlag() && $input.getCommandLineFlag() != "")
-			BOUTIQUES_COMMAND_LINE=$${ob}BOUTIQUES_COMMAND_LINE//'$input.getCommandLineKey()'/"$input.getCommandLineFlag() ${LOCAL_FILE_NAME}"}
-		#else
-			BOUTIQUES_COMMAND_LINE=$${ob}BOUTIQUES_COMMAND_LINE//'$input.getCommandLineKey()'/"${LOCAL_FILE_NAME}"}
-		#end
-    #else
-  ## In the application wrapper script, an input field value will be surrounded by simple quotes. This will allow spaces in the input field value.
-  $input.getId().toUpperCase()="'$$input.getId().toUpperCase()'"
-  BOUTIQUES_COMMAND_LINE=$${ob}BOUTIQUES_COMMAND_LINE//'$input.getCommandLineKey()'/$newValue}
-    #end
-  #else
-if [ "$$input.getId().toUpperCase()" = "true" ]
-then
-  # flag is set: replace command-line key by flag value
-  BOUTIQUES_COMMAND_LINE=$${ob}BOUTIQUES_COMMAND_LINE//'$input.getCommandLineKey()'/$input.getCommandLineFlag()}
-else
-  # flag is unset: remove command-line key from command-line. 
-  BOUTIQUES_COMMAND_LINE=$${ob}BOUTIQUES_COMMAND_LINE//'$input.getCommandLineKey()'/""}
-fi
-#end
-#if($input.isOptional())
-else
-  # Optional input is not active: remove command-line key from command-line. 
-  BOUTIQUES_COMMAND_LINE=$${ob}BOUTIQUES_COMMAND_LINE//'$input.getCommandLineKey()'/""}
-fi
-#end
-#end
 
 ##########################
 # Command-line execution #
 ##########################
 
-#if($tool.getDockerImage())
-cat << DOCKERJOB > .dockerjob.sh
-#!/bin/bash -l
-${BOUTIQUES_COMMAND_LINE}
-DOCKERJOB
-
-chmod 755 .dockerjob.sh
-docker pull $tool.getDockerImage()
-docker run --rm -v $PWD:/gasw-execution-dir -v $PWD/../cache:$PWD/../cache -w /gasw-execution-dir -u `id -u`:`id -g` $tool.getDockerImage()  ./.dockerjob.sh 
-#else
-${BOUTIQUES_COMMAND_LINE}
-#end
+bosh -i ./input_param_file.json -e ./$tool.getName().json -v $PWD:/gasw-execution-dir $PWD/../cache:$PWD/../cache
 
 if [ $? != 0 ]
 then

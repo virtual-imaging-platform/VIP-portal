@@ -177,5 +177,14 @@ public class BoutiquesTool implements IsSerializable {
     public String getApplicationLFN() {
         return applicationLFN;
     }
+    
+    public boolean hasNextInput(BoutiquesInput input) {
+        int totalNumberOfInputs = inputs.size();
+        int inputIndex = inputs.lastIndexOf(input);
+        if((inputIndex + 1) == totalNumberOfInputs ) {
+            return false;
+        }
+        return true;
+    }
 
 }

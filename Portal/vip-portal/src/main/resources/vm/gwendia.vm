@@ -66,32 +66,12 @@ String result = dir.toString()+"/"+(dateFormat.format(System.currentTimeMillis()
         </iterationstrategy>
         <gasw descriptor="$tool.getGASWLFN()"/>
     </processor>
-## Provides as many processors as input of string type
-#foreach( $input in $tool.getInputs() )
-  #if ($input.getType()=="String" )
-    <processor name="append-quote_$input.getId()" >
-        <in name="initial_value" type="string" depth="0"/>
-        <out name="value_double_quote" type="string" depth="0" />
-        <beanshell>/*----------Beginning of Beanshell------------*/
-                        import java.lang.String;
-String value_double_quote = "\""+ initial_value.toString()+"\"";
-/*------------End of Beanshell------------*/
-        </beanshell>
-    </processor>
-  #end
-#end
- 
   </processors>
   <links>
     <link from="results-directory" to="append-date:dir" />
     <link from="append-date:result" to="$tool.getName():results-directory" />
 #foreach( $input in $tool.getInputs() )
-  #if ($input.getType()=="String" )
-    <link from="$input.getId()" to="append-quote_$input.getId():initial_value" />
-    <link from="append-quote_$input.getId():value_double_quote" to="$tool.getName():$input.getId()" />
-  #else
     <link from="$input.getId()" to="$tool.getName():$input.getId()" />
-  #end
 #end
 #foreach($output in $tool.getOutputFiles())
     <link from="$tool.getName():$output.getId()" to="$output.getId()" />
