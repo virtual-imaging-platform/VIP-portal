@@ -51,13 +51,14 @@ import com.smartgwt.client.widgets.HTMLPane;
  * @author camarasu
  */
 public class LoadMacHTMLPane extends HTMLPane {
+
     public LoadMacHTMLPane(String title, String code, String parentFolderId,
-            String macId, String path, String target, boolean usePool) {
+            String macId, String path, String target, boolean usePool, boolean doUnzip) {
 
         this.setWidth100();
         this.setHeight100();
         this.setShowEdges(true);
-     
+
         this.setContents(
                 "<html>"
                 + "<head>"
@@ -68,15 +69,19 @@ public class LoadMacHTMLPane extends HTMLPane {
                 + "<form>\n"
                 + "<div>\n"
                 + "  <label for=\"folder_upload\">Choose parent folder (containing mac and data folders)</label>\n"
-                + "  <input type=\"file\" id=\""+parentFolderId+"\" name=\"parent_folder\" webkitdirectory  multiple onchange=\"previewFiles(this.files)\">\n"
+                + "  <input type=\"file\" id=\"" + parentFolderId
+                + "\" name=\"parent_folder\" webkitdirectory  multiple onchange=\"previewFiles(this.files)\">\n"
                 + "  <label for=\"mac_file\">Choose main macro from mac folder</label>\n"
-                + "  <input type=\"file\" id=\""+macId+"\" name=\"mac_file\" onchange=\"previewFiles(this.files)\">\n"
+                + "  <input type=\"file\" id=\"" + macId + "\" name=\"mac_file\" onchange=\"previewFiles(this.files)\">\n"
                 + "</div>\n"
                 + "<div class=\"preview\">\n"
                 + "  <p>No files selected</p>\n"
                 + "</div>\n"
                 + "<div>\n"
-                + "  <input type=\"button\" onclick=\"parseAndUploadMac(\'" + parentFolderId + "\',\'" + macId + "\',\'" + code + "\', \'" + path + "\', \'" + target  + "\', \'" + usePool + "\')\" value=\"Parse macro file\"/>\n"
+                + "  <input type=\"button\" onclick=\"parseAndUploadMac(\'"
+                + parentFolderId + "\',\'" + macId + "\',\'" + code + "\', \'"
+                + path + "\', \'" + target + "\', \'" + usePool + "\', \'" + doUnzip
+                + "\')\" value=\"Parse macro file\"/>\n"
                 + "</div>\n"
                 + "</form>\n"
                 + "\n"
@@ -91,6 +96,5 @@ public class LoadMacHTMLPane extends HTMLPane {
                 + "</body>"
                 + "</html>");
     }
-    
-    
+
 }

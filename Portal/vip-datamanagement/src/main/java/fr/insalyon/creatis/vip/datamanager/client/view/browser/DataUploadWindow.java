@@ -57,6 +57,6 @@ public class DataUploadWindow extends Window {
         this.addItem(new DataUploadHTMLPane(
                 "DataUpload", 
                 GWT.getModuleBaseURL() + "/fileuploadservice", 
-                "folderToUpload", baseDir, target, true));
+                "folderToUpload", baseDir, target, true, true));
     }
 }

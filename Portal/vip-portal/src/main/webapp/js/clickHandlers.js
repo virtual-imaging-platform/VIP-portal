@@ -76,7 +76,7 @@ function previewFiles(files) {
 
 //zip a list of files and call uploadZip to send the final zip to the given url (which is a file upload service)
 //data can be a fileList or the id of of a fileList element
-function zipAndUploadFiles(data, url, destPath, target, usePool) {
+function zipAndUploadFiles(data, url, destPath, target, usePool, doUnzip) {
     var zip = new JSZip();
     var reader = new FileReader();
     var fileList;
@@ -95,7 +95,7 @@ function zipAndUploadFiles(data, url, destPath, target, usePool) {
         //upload zipped file when finished zipping all files (index == fileList.length)
         if (index === fileList.length) {
             if (JSZip.support.blob) {
-                uploadZip(zip, url, destPath, target, usePool);
+                uploadZip(zip, url, destPath, target, usePool, doUnzip);
             } else {
                 alert("JSZip blob not supported on this browser.");
             }
@@ -116,7 +116,7 @@ function zipAndUploadFiles(data, url, destPath, target, usePool) {
     zipFile(0);
 }
 
-function parseAndUploadMac(parentFolderId, macId, url, destPath, target, usePool) {
+function parseAndUploadMac(parentFolderId, macId, url, destPath, target, usePool, doUnzip) {
 
    var promise = parseMacFile(macId, parentFolderId);
     //parseMacFile returns a promise that is resolved to the value dataArray when finished
@@ -126,7 +126,7 @@ function parseAndUploadMac(parentFolderId, macId, url, destPath, target, usePool
     //Note: only parseMacFile returns a promise; getListOfFiles is synchronous so the following would also work without "then" 
     }).then(function(filesToUpload) {
         console.log("Start of Promise zipAndUploadFiles");
-        return zipAndUploadFiles(filesToUpload, url, destPath, target, usePool);
+        return zipAndUploadFiles(filesToUpload, url, destPath, target, usePool, doUnzip);
     });
 
 }
