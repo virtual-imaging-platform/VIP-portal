@@ -117,10 +117,16 @@ function zipAndUploadFiles(data, url, destPath, target, usePool) {
 }
 
 function parseAndUploadMac(parentFolderId, macId, url, destPath, target, usePool) {
-    //TODO : have the following code execute sequentially
-    console.log("Getting data array "+listOfFiles[searchIndex].name);
-    var dataArray = parseMacFile(macId, parentFolderId);
-    console.log("Getting list of files to upload "+listOfFiles[searchIndex].name);
-    var filesToUpload = getListOfFiles(dataArray, parentFolderId);
-    zipAndUploadFiles(filesToUpload, url, destPath, target, usePool);
+
+   var promise = parseMacFile(macId, parentFolderId);
+    //parseMacFile returns a promise that is resolved to the value dataArray when finished
+    promise.then(function(dataArray) {
+        console.log("Start of Promise getListOfFiles");
+        return getListOfFiles(dataArray, parentFolderId);
+    //Note: only parseMacFile returns a promise; getListOfFiles is synchronous so the following would also work without "then" 
+    }).then(function(filesToUpload) {
+        console.log("Start of Promise zipAndUploadFiles");
+        return zipAndUploadFiles(filesToUpload, url, destPath, target, usePool);
+    });
+
 }
