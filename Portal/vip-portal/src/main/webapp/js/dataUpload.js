@@ -50,16 +50,15 @@
 
 
 // upload generated zip file to destPath using the given url (which is a file upload service)
-function uploadZip(zip, url, destPath, target, usePool, doUnzip) {
+function uploadZip(fileName, zip, url, destPath, target, usePool, doUnzip) {
     var fd = new FormData();
     var xhr = new XMLHttpRequest();
     xhr.upload.addEventListener("progress", uploadProgress, false);
     xhr.addEventListener("load", uploadComplete, false);
     xhr.addEventListener("error", uploadFailed, false);
     xhr.addEventListener("abort", uploadCanceled, false);
-    var getTimestamp = function() {  return new Date().getTime(); };
     zip.generateAsync({type: "blob"}).then(function (blob) {
-        fd.append("file", blob, "file-"+getTimestamp()+".zip");
+        fd.append("file", blob, fileName);
         fd.append("path", destPath);
         fd.append("single", 'false');
         fd.append("unzip", doUnzip);

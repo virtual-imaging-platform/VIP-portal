@@ -186,3 +186,22 @@ function getListOfFiles(dataArray, parentFolderId) {
 
     return myListOfFiles;
 }
+
+function isStatic() {
+    //TODO implement the correct use-cases; 
+    return false;
+}
+function fillInInputs(fileName, dataArray) {
+
+    var type = isStatic() ? "stat" : "dyn";
+    //TODO handle phaseSpace use-case
+    var ps = "dummy";
+    var parts = dataArray.totalNumberOfPrimaries;
+    if (parts === "") {
+        parts = "100";
+    }
+
+    var inputsList = "GateInput = " + fileName + ", ParallelizationType = " + type + ", NumberOfParticles = " + parts + ", phaseSpace = " + ps;
+    console.log("************FIlled in inputsList " + inputsList);
+    return inputsList;
+}

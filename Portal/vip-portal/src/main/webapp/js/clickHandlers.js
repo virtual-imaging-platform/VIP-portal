@@ -89,13 +89,19 @@ function zipAndUploadFiles(data, url, destPath, target, usePool, doUnzip) {
         alert("No folder selected for upload");
         return;
     }
+    
+    var getTimestamp = function() {  return new Date().getTime(); };
+    var fileName = "file-"+getTimestamp()+".zip";
+    
+    return new Promise(function (resolve, reject) {
     //TODO handle single file use-case: no need for zipping + set single=true
     //TODO make the uploadZip function a callback given as input to zipFile
     function zipFile(index) {
         //upload zipped file when finished zipping all files (index == fileList.length)
         if (index === fileList.length) {
             if (JSZip.support.blob) {
-                uploadZip(zip, url, destPath, target, usePool, doUnzip);
+                uploadZip(fileName, zip, url, destPath, target, usePool, doUnzip);
+                resolve(fileName);
             } else {
                 alert("JSZip blob not supported on this browser.");
             }
@@ -114,19 +120,26 @@ function zipAndUploadFiles(data, url, destPath, target, usePool, doUnzip) {
         }
     }
     zipFile(0);
+    });
 }
 
 function parseAndUploadMac(parentFolderId, macId, url, destPath, target, usePool, doUnzip) {
 
    var promise = parseMacFile(macId, parentFolderId);
+   var macroData;
     //parseMacFile returns a promise that is resolved to the value dataArray when finished
     promise.then(function(dataArray) {
+        macroData=dataArray;
         console.log("Start of Promise getListOfFiles");
         return getListOfFiles(dataArray, parentFolderId);
     //Note: only parseMacFile returns a promise; getListOfFiles is synchronous so the following would also work without "then" 
     }).then(function(filesToUpload) {
         console.log("Start of Promise zipAndUploadFiles");
         return zipAndUploadFiles(filesToUpload, url, destPath, target, usePool, doUnzip);
+    }).then(function(fileName){
+        //TODO: wait for the upload to finish before calling uploadMacComplete
+        var inputs=fillInInputs(fileName, macroData);
+        uploadMacComplete(inputs);
     });
 
 }

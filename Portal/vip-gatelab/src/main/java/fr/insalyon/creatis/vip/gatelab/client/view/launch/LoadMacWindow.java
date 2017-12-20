@@ -55,7 +55,7 @@ public class LoadMacWindow extends Window {
         this.addItem(new LoadMacHTMLPane(
                 "MacUpload", 
                 GWT.getModuleBaseURL() + "/fileuploadservice", 
-                "gateParentFolderID", "macFileID", baseDir, "uploadMacComplete",
+                "gateParentFolderID", "macFileID", baseDir, "dataManagerUploadComplete",
                 true, false));
     }
 }
