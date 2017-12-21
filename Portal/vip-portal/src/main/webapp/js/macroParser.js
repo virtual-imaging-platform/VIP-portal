@@ -137,9 +137,11 @@ function getFileByName(fileName, parentFolderId) {
     for (var searchIndex = 0; searchIndex < listOfFiles.length; searchIndex++) {
         if (listOfFiles[searchIndex].name === fileName) {
             myFile = listOfFiles[searchIndex];
-            console.log("getting file " + myFile.name);
             return myFile;
         }
+    }
+    if(myFile === null){
+        alert("Warning: file "+fileName+" not found in folder "+parentFolderId);
     }
     return myFile;
 }
@@ -150,9 +152,11 @@ function getFilesByNameWithoutExtension(fileName, parentFolderId) {
     var myFiles = [];
     for (var searchIndex = 0; searchIndex < listOfFiles.length; searchIndex++) {
         if (listOfFiles[searchIndex].name.replace(/\.[^/.]+$/, "") === fileName.replace(/\.[^/.]+$/, "")) {
-            console.log("pushing file " + listOfFiles[searchIndex].name);
             myFiles.push(listOfFiles[searchIndex]);
         }
+    }
+    if(myFiles.length===0){
+        alert("Warning: file "+fileName+" not found in folder "+parentFolderId);
     }
     return myFiles;
 }

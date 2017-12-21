@@ -89,56 +89,66 @@ function zipAndUploadFiles(data, url, destPath, target, usePool, doUnzip) {
         alert("No folder selected for upload");
         return;
     }
-    
-    var getTimestamp = function() {  return new Date().getTime(); };
-    var fileName = "file-"+getTimestamp()+".zip";
-    
+
+    var getTimestamp = function () {
+        return new Date().getTime();
+    };
+    var fileName = "file-" + getTimestamp() + ".zip";
+
     return new Promise(function (resolve, reject) {
-    //TODO handle single file use-case: no need for zipping + set single=true
-    //TODO make the uploadZip function a callback given as input to zipFile
-    function zipFile(index) {
-        //upload zipped file when finished zipping all files (index == fileList.length)
-        if (index === fileList.length) {
-            if (JSZip.support.blob) {
-                uploadZip(fileName, zip, url, destPath, target, usePool, doUnzip);
-                resolve(fileName);
+        //TODO handle single file use-case: no need for zipping + set single=true
+        //TODO make the uploadZip function a callback given as input to zipFile
+        function zipFile(index) {
+            //upload zipped file when finished zipping all files (index == fileList.length)
+            if (index === fileList.length) {
+                if (JSZip.support.blob) {
+                    uploadZip(fileName, zip, url, destPath, target, usePool, doUnzip);
+                    resolve(fileName);
+                } else {
+                    alert("JSZip blob not supported on this browser.");
+                }
+                return;
             } else {
-                alert("JSZip blob not supported on this browser.");
+                var file = fileList[index];
+                var path = file.webkitRelativePath;
+                //if we don't unzip => we are using the GateLab and we should keep a single folder level
+                //TODO improve this folder level handling for the GateLab
+                if (doUnzip !== true) {
+                    var pathArray = path.split('/');
+                    if (pathArray.length > 2) {
+                        path = pathArray[pathArray.length - 2] + "/" + pathArray[pathArray.length - 1];
+                    }
+                }
+                reader.onload = function (e) {
+                    // get file content and add it to zip
+                    var data = e.target.result;
+                    zip.file(path, data);
+                    // zip next file
+                    zipFile(index + 1);
+                };
+                reader.readAsArrayBuffer(file);
             }
-            return;
-        } else {
-            var file = fileList[index];
-            var path = file.webkitRelativePath;
-            reader.onload = function (e) {
-                // get file content and add it to zip
-                var data = e.target.result;
-                zip.file(path, data);
-                // zip next file
-                zipFile(index + 1);
-            };
-            reader.readAsArrayBuffer(file);
         }
-    }
-    zipFile(0);
+        zipFile(0);
     });
 }
 
 function parseAndUploadMac(parentFolderId, macId, url, destPath, target, usePool, doUnzip) {
 
-   var promise = parseMacFile(macId, parentFolderId);
-   var macroData;
+    var promise = parseMacFile(macId, parentFolderId);
+    var macroData;
     //parseMacFile returns a promise that is resolved to the value dataArray when finished
-    promise.then(function(dataArray) {
-        macroData=dataArray;
+    promise.then(function (dataArray) {
+        macroData = dataArray;
         console.log("Start of Promise getListOfFiles");
         return getListOfFiles(dataArray, parentFolderId);
-    //Note: only parseMacFile returns a promise; getListOfFiles is synchronous so the following would also work without "then" 
-    }).then(function(filesToUpload) {
+        //Note: only parseMacFile returns a promise; getListOfFiles is synchronous so the following would also work without "then" 
+    }).then(function (filesToUpload) {
         console.log("Start of Promise zipAndUploadFiles");
         return zipAndUploadFiles(filesToUpload, url, destPath, target, usePool, doUnzip);
-    }).then(function(fileName){
+    }).then(function (fileName) {
         //TODO: wait for the upload to finish before calling uploadMacComplete
-        var inputs=fillInInputs(fileName, macroData);
+        var inputs = fillInInputs(fileName, macroData);
         uploadMacComplete(inputs);
     });
 
