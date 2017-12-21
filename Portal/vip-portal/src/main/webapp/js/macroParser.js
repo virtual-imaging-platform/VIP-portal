@@ -191,13 +191,15 @@ function getListOfFiles(dataArray, parentFolderId) {
     return myListOfFiles;
 }
 
-function isStatic() {
-    //TODO implement the correct use-cases; 
+function isStatic(dataArray) {
+    if (dataArray.timeSimu === "timeSimu") {
+        return true;
+    }
     return false;
 }
 function fillInInputs(fileName, dataArray) {
 
-    var type = isStatic() ? "stat" : "dyn";
+    var type = isStatic(dataArray) ? "stat" : "dyn";
     //TODO handle phaseSpace use-case
     var ps = "dummy";
     var parts = dataArray.totalNumberOfPrimaries;
