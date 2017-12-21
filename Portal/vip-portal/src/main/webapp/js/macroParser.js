@@ -141,7 +141,7 @@ function getFileByName(fileName, parentFolderId) {
         }
     }
     if(myFile === null){
-        alert("Warning: file "+fileName+" not found in folder "+parentFolderId);
+        alert("Warning: file "+fileName+" not found in parent folder");
     }
     return myFile;
 }
@@ -156,7 +156,7 @@ function getFilesByNameWithoutExtension(fileName, parentFolderId) {
         }
     }
     if(myFiles.length===0){
-        alert("Warning: file "+fileName+" not found in folder "+parentFolderId);
+        alert("Warning: file "+fileName+" not found in parent folder");
     }
     return myFiles;
 }
@@ -198,7 +198,6 @@ function isStatic(dataArray) {
     return false;
 }
 function fillInInputs(fileName, dataArray) {
-
     var type = isStatic(dataArray) ? "stat" : "dyn";
     //TODO handle phaseSpace use-case
     var ps = "dummy";
@@ -206,8 +205,14 @@ function fillInInputs(fileName, dataArray) {
     if (parts === "") {
         parts = "100";
     }
-
+    if(dataArray.engineSeed !== "auto"){
+        alert("SetEngineSeed is not auto. Please set the auto engine seed mode.");
+        return;
+    }
+    if(dataArray.visu === "visu"){
+        alert("Vizualisation found in the GATE macro files. Please remove any vis commands and start again.");
+        return;
+    }
     var inputsList = "GateInput = " + fileName + ", ParallelizationType = " + type + ", NumberOfParticles = " + parts + ", phaseSpace = " + ps;
-    console.log("************FIlled in inputsList " + inputsList);
     return inputsList;
 }
