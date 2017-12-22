@@ -74,6 +74,7 @@ public class DataUploadHTMLPane extends HTMLPane {
                 + "<form>\n"
                 + "<div>\n"
                 + "  <label for=\"folder_upload\">Choose folder for upload</label>\n"
+                //Note:  "webkitdirectory  multiple" works with Chrome, Firefox and Edge, but is unsupported in Internet Explorer.
                 + "  <input type=\"file\" id=\"" + inputId + "\" name=\"folder_upload\" webkitdirectory  multiple onchange=\"previewFiles(this.files)\">\n"
                 + "</div>\n"
                 + "<div class=\"preview\">\n"

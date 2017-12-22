@@ -70,6 +70,7 @@ public class LoadMacHTMLPane extends HTMLPane {
                 + "<div>\n"
                 + "  <label for=\"folder_upload\">Choose parent folder (containing mac and data folders)</label>\n"
                 + "  <input type=\"file\" id=\"" + parentFolderId
+                //Note:  "webkitdirectory  multiple" works with Chrome, Firefox and Edge, but is unsupported in Internet Explorer.
                 + "\" name=\"parent_folder\" webkitdirectory  multiple onchange=\"previewFiles(this.files)\">\n"
                 + "  <label for=\"mac_file\">Choose main macro from mac folder</label>\n"
                 + "  <input type=\"file\" id=\"" + macId + "\" name=\"mac_file\" onchange=\"previewFiles(this.files)\">\n"
