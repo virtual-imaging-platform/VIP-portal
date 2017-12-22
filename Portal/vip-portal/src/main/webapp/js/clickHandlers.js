@@ -113,7 +113,7 @@ function zipAndUploadFiles(data, url, destPath, target, usePool, doUnzip) {
                 var path = file.webkitRelativePath;
                 //if we don't unzip => we are using the GateLab and we should keep a single folder level
                 //TODO improve this folder level handling for the GateLab
-                if (doUnzip !== true) {
+                if (doUnzip !== "true") {
                     //the workflow config file has no path, setting it to the file name
                     if (path === "") {
                         path = file.name;
