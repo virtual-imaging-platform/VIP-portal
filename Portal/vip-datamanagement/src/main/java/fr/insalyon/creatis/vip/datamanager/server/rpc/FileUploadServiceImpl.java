@@ -32,6 +32,7 @@
 package fr.insalyon.creatis.vip.datamanager.server.rpc;
 
 import fr.insalyon.creatis.devtools.zip.UnZipper;
+import fr.insalyon.creatis.grida.client.GRIDAClient;
 import fr.insalyon.creatis.grida.client.GRIDAClientException;
 import fr.insalyon.creatis.grida.client.GRIDAPoolClient;
 import fr.insalyon.creatis.vip.core.client.bean.User;
@@ -63,13 +64,18 @@ import org.apache.log4j.Logger;
 public class FileUploadServiceImpl extends HttpServlet {
 
     private static Logger logger = Logger.getLogger(FileUploadServiceImpl.class);
+    private GRIDAClient client;
+    private GRIDAPoolClient poolClient;
+    private User user;
+    private String path;
+    private boolean usePool;
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        User user = (User) request.getSession().getAttribute(CoreConstants.SESSION_USER);
-        if (user != null && ServletFileUpload.isMultipartContent(request)) {
+        this.user = (User) request.getSession().getAttribute(CoreConstants.SESSION_USER);
+        if (this.user != null && ServletFileUpload.isMultipartContent(request)) {
 
             FileItemFactory factory = new DiskFileItemFactory();
             ServletFileUpload upload = new ServletFileUpload(factory);
@@ -78,12 +84,11 @@ public class FileUploadServiceImpl extends HttpServlet {
                 Iterator iter = items.iterator();
                 String fileName = null;
                 FileItem fileItem = null;
-                String path = null;
+                this.path = null;
                 String target = "uploadComplete";
                 boolean single = true;
                 boolean unzip = true;
-                //TODO : do we really need usePool ? If yes, use it (see UploadFilesServiceImpl)
-                boolean usePool = true;
+                this.usePool = true;
                 String operationID = "no-id";
 
                 while (iter.hasNext()) {
@@ -91,7 +96,7 @@ public class FileUploadServiceImpl extends HttpServlet {
 
                     switch (item.getFieldName()) {
                         case "path":
-                            path = item.getString();
+                            this.path = item.getString();
                             break;
                         case "file":
                             fileName = item.getName();
@@ -107,7 +112,7 @@ public class FileUploadServiceImpl extends HttpServlet {
                             unzip = Boolean.valueOf(item.getString());
                             break;
                         case "pool":
-                            usePool = Boolean.valueOf(item.getString());
+                            this.usePool = Boolean.valueOf(item.getString());
                             break;
                         default:
                             throw new IllegalArgumentException("Invalid FieldName: " + item.getFieldName());
@@ -116,7 +121,7 @@ public class FileUploadServiceImpl extends HttpServlet {
                 }
                 if (fileName != null && !fileName.equals("")) {
 
-                    boolean local = path.equals("local") ? true : false;
+                    boolean local = this.path.equals("local") ? true : false;
                     String rootDirectory = DataManagerUtil.getUploadRootDirectory(local);
                     fileName = new File(fileName).getName().trim().replaceAll(" ", "_");
                     fileName = Normalizer.normalize(fileName, Normalizer.Form.NFD).replaceAll("\\p{InCombiningDiacriticalMarks}+", "");
@@ -127,21 +132,20 @@ public class FileUploadServiceImpl extends HttpServlet {
                         response.getWriter().write(fileName);
 
                         if (!local) {
-                            // GRIDA Pool Client
+                            // GRIDA Client
                             logger.info("(" + user.getEmail() + ") Uploading '" + uploadedFile.getAbsolutePath() + "' to '" + path + "'.");
-                            
+                            if (usePool) {
+                                poolClient = CoreUtil.getGRIDAPoolClient();
+                            } else {
+                                client = CoreUtil.getGRIDAClient();
+                            }
                             if (single || !unzip) {
-                                GRIDAPoolClient client = CoreUtil.getGRIDAPoolClient();
-                                operationID = client.uploadFile(
-                                        uploadedFile.getAbsolutePath(),
-                                        DataManagerUtil.parseBaseDir(user, path),
-                                        user.getEmail());
-
+                                operationID = uploadFile(uploadedFile.getAbsolutePath(), path);
                             } else {
                                 UnZipper.unzip(uploadedFile.getAbsolutePath());
                                 String dir = uploadedFile.getParent();
                                 uploadedFile.delete();
-                                operationID = processDir(dir, path, user);
+                                operationID = processDir(dir, path);
                             }
 
                         } else {
@@ -152,7 +156,7 @@ public class FileUploadServiceImpl extends HttpServlet {
                         logger.error(ex);
                     }
                 }
-                //TODO: when GateLab is also replaced change the HTML/JS response to XML data that could be directly processed in JS
+                //TODO: change the HTML/JS response to XML data that could be directly processed in JS
                 response.setContentType("text/html");
                 response.setHeader("Pragma", "No-cache");
                 response.setDateHeader("Expires", 0);
@@ -174,22 +178,38 @@ public class FileUploadServiceImpl extends HttpServlet {
         }
     }
 
-    private String processDir(String dir, String baseDir, User user)
+    private String processDir(String dir, String baseDir)
             throws GRIDAClientException, DataManagerException {
 
-        GRIDAPoolClient client = CoreUtil.getGRIDAPoolClient();
         StringBuilder ids = new StringBuilder();
         for (File f : new File(dir).listFiles()) {
             if (f.isDirectory()) {
-                ids.append(processDir(f.getAbsolutePath(), baseDir + "/" + f.getName(), user));
+                ids.append(processDir(f.getAbsolutePath(), baseDir + "/" + f.getName()));
             } else {
-                ids.append(client.uploadFile(
-                        f.getAbsolutePath(),
-                        DataManagerUtil.parseBaseDir(user, baseDir),
-                        user.getEmail()));
-                ids.append("##");
-            }           
+                ids.append(uploadFile(f.getAbsolutePath(), baseDir));
+            }
+            ids.append("##");
         }
         return ids.toString();
+    }
+
+    private String uploadFile(String fileName, String dir)
+            throws GRIDAClientException, DataManagerException {
+
+        String parsed = fileName.trim().replaceAll(" ", "_");
+        parsed = Normalizer.normalize(parsed, Normalizer.Form.NFD).replaceAll("\\p{InCombiningDiacriticalMarks}+", "");
+        if (!parsed.equals(fileName)) {
+            new File(fileName).renameTo(new File(parsed));
+            fileName = parsed;
+        }
+
+        logger.info("(" + user.getEmail() + ") Uploading '" + fileName + "' to '" + dir + "'.");
+        if (usePool) {
+            return poolClient.uploadFile(fileName,
+                    DataManagerUtil.parseBaseDir(user, dir), user.getEmail());
+        } else {
+            client.uploadFile(fileName, DataManagerUtil.parseBaseDir(user, dir));
+            return "no-id";
+        }
     }
 }

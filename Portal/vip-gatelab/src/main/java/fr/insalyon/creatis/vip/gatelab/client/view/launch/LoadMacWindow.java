@@ -56,6 +56,6 @@ public class LoadMacWindow extends Window {
                 "MacUpload", 
                 GWT.getModuleBaseURL() + "/fileuploadservice", 
                 "gateParentFolderID", "macFileID", baseDir, "dataManagerUploadComplete",
-                true, false));
+                false, false));
     }
 }
