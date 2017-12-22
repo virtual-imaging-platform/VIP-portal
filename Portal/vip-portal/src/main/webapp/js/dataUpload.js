@@ -72,13 +72,9 @@ function uploadZip(fileName, zip, url, destPath, target, usePool, doUnzip) {
 }
 
 //callbacks for upload
+//TODO: could be improved by printing the uploaded % (or nb of files)
 function uploadProgress(evt) {
-    if (evt.lengthComputable) {
-        var percentComplete = Math.round(evt.loaded * 100 / evt.total);
-        document.getElementById('progressNumber').innerHTML = percentComplete.toString() + '%';
-    } else {
-        document.getElementById('progressNumber').innerHTML = 'unable to compute';
-    }
+    document.getElementById('progressNumber').innerHTML = 'Uploading...';
 }
 
 function uploadComplete(evt) {
@@ -87,7 +83,7 @@ function uploadComplete(evt) {
     //the following is used in order to execute the script from the response, which look like this: 
     //"if (parent.dataManagerUploadComplete) parent.dataManagerUploadComplete('Upload-2092952139087909##Upload-2092952141816446##');"
     //TODO: check whether this could be a security issue
-    //TODO: when GateLab is also replaced, change the HTML response to XML data that could be directly processed here
+    //TODO: change the HTML response to XML data that could be directly processed here
     eval(document.getElementById("runscript").innerHTML);
 }
 

@@ -43,37 +43,6 @@
  knowledge of the CeCILL-B license and that you accept its terms.
  */
 
-//TODO: take out the preview and give it as input param
-function previewFiles(files) {
-    var preview = document.querySelector('.preview');
-    while (preview.firstChild) {
-        preview.removeChild(preview.firstChild);
-    }
-    var curFiles = files;
-    if (curFiles.length === 0) {
-        var para = document.createElement('p');
-        para.textContent = 'No files currently selected for upload';
-        preview.appendChild(para);
-    } else {
-        //TODO: add a scrollable item if we want to preview the list of files
-        /*
-         var list = document.createElement('ol');
-         preview.appendChild(list);
-         for (var i = 0; i < curFiles.length; i++) {
-         var listItem = document.createElement('li');
-         var para = document.createElement('p');
-         para.textContent = 'File name ' + curFiles[i].name;
-         listItem.appendChild(para);
-         list.appendChild(listItem);
-         }
-         */
-        var para = document.createElement('p');
-        para.textContent = " " + curFiles.length + " files selected for upload. Click on the upload button to proceed.";
-        preview.appendChild(para);
-    }
-}
-
-
 //zip a list of files and call uploadZip to send the final zip to the given url (which is a file upload service)
 //data can be a fileList or the id of of a fileList element
 function zipAndUploadFiles(data, url, destPath, target, usePool, doUnzip) {
