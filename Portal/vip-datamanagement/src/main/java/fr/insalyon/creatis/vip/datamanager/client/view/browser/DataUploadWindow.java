@@ -45,7 +45,7 @@ public class DataUploadWindow extends Window {
 
     public DataUploadWindow(ModalWindow modal, String baseDir, String target) {
 
-        this.setTitle(Canvas.imgHTML(DataManagerConstants.ICON_UPLOAD_MULTIPLE) + " Upload files and folders to: " + baseDir);
+        this.setTitle(Canvas.imgHTML(DataManagerConstants.ICON_UPLOAD_MULTIPLE) + " Upload folder to: " + baseDir);
         this.setWidth(450);
         this.setHeight(200);
         this.setShowMinimizeButton(false);

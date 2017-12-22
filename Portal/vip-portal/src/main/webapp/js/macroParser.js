@@ -187,6 +187,12 @@ function getListOfFiles(dataArray, parentFolderId) {
             myListOfFiles.push.apply(myListOfFiles, myFiles);
         }
     }
+    
+    //Add Wfl config file containing the name of the main Mac file. 
+    //Note that the created file has a name and a content, but no path
+    var mainMacFileName = dataArray.macFilesArray[0];
+    var configFile = new File([mainMacFileName], "wfl_config.txt", {type: "text/plain"});
+    myListOfFiles.push(configFile);
 
     return myListOfFiles;
 }

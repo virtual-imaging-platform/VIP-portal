@@ -114,9 +114,15 @@ function zipAndUploadFiles(data, url, destPath, target, usePool, doUnzip) {
                 //if we don't unzip => we are using the GateLab and we should keep a single folder level
                 //TODO improve this folder level handling for the GateLab
                 if (doUnzip !== true) {
-                    var pathArray = path.split('/');
-                    if (pathArray.length > 2) {
-                        path = pathArray[pathArray.length - 2] + "/" + pathArray[pathArray.length - 1];
+                    //the workflow config file has no path, setting it to the file name
+                    if (path === "") {
+                        path = file.name;
+                    } else {
+                        var pathArray = path.split('/');
+                        //removing parent folders for the GateLab
+                        if (pathArray.length > 2) {
+                            path = pathArray[pathArray.length - 2] + "/" + pathArray[pathArray.length - 1];
+                        }
                     }
                 }
                 reader.onload = function (e) {
