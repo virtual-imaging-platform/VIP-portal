@@ -86,46 +86,27 @@ public class ProxyClient {
     }
 
     /**
-     *
-     * @param userDN User distinguished name
-     * @param proxyName Name of the proxy to be stored
-     * @return Proxy file name
+     * @return Proxy file name and end date
      * @throws BusinessException
      */
     public Proxy getProxy() throws BusinessException {
 
         try {
-
             String proxyFileName = Server.getInstance().getServerProxy();
-            if (new File(proxyFileName).exists()) {
-                FileInputStream fis = new FileInputStream(proxyFileName);
-                CertificateFactory cf = CertificateFactory.getInstance("X.509");
-                boolean valid = true;
-                Date endDate = null;
+            File proxyFile = new File(proxyFileName);
+            if (proxyFile.exists()) {
+                X509Certificate certificate = readCertificate(proxyFile);
 
-                //Parsing the certificate while (fis.available() > 0) gives a "CertificateParsingException: signed overrun"; the same code (with the while loop) works perfectly fine in a independent JavaTest class
-                //while (fis.available() > 0) {
-                    X509Certificate certificate = (X509Certificate) cf.generateCertificate(fis);
-                    Calendar currentDate = Calendar.getInstance();
-                    currentDate.setTime(new Date());
-                    currentDate.add(Calendar.HOUR, Server.getInstance().getMyProxyMinHours());
-                    try {
-                        certificate.checkValidity(currentDate.getTime());
-                        if (endDate != null && certificate.getNotAfter().getTime() < endDate.getTime()) {
-                            endDate = certificate.getNotAfter();
-                        } else {
-                            endDate = certificate.getNotAfter();
-                        }
-                    } catch (Exception ex1) {
-                        valid = false;
-                        //break;
-                    }
-                //}
-                if (valid) {
+                Calendar currentDate = Calendar.getInstance();
+                currentDate.setTime(new Date());
+                currentDate.add(Calendar.HOUR, Server.getInstance().getMyProxyMinHours());
+                try {
+                    certificate.checkValidity(currentDate.getTime());
+                    Date endDate = certificate.getNotAfter();
                     logger.info("Server proxy still valid until: " + endDate);
                     return new Proxy(proxyFileName, endDate);
-                } else {
-                    new File(proxyFileName).delete();
+                } catch (Exception ex1) {
+                    proxyFile.delete();
                 }
             }
             logger.info("Fetching server proxy from MyProxy server.");
@@ -144,13 +125,23 @@ public class ProxyClient {
 
         } catch (Exception ex) {
             logger.error(ex);
-            try {
-                disconnect();
-            } catch (IOException ex1) {
-                logger.error(ex);
-                throw new BusinessException(ex1.getMessage());
+            if (this.socket != null) {
+                try {
+                    disconnect();
+                } catch (IOException ioe) {
+                    logger.error(ioe);
+                    throw new BusinessException(ioe.getMessage());
+                }
             }
             throw new BusinessException(ex.getMessage());
+        }
+    }
+
+    private X509Certificate readCertificate(File proxyFile)
+        throws FileNotFoundException, IOException, CertificateException {
+        try (FileInputStream fis = new FileInputStream(proxyFile)) {
+            CertificateFactory cf = CertificateFactory.getInstance("X.509");
+            return (X509Certificate) cf.generateCertificate(fis);
         }
     }
 
