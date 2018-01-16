@@ -140,8 +140,9 @@ function getFileByName(fileName, parentFolderId) {
             return myFile;
         }
     }
-    if(myFile === null){
-        alert("Warning: file "+fileName+" not found in parent folder");
+    if (myFile === null) {
+        alert("Warning: file " + fileName + " not found in parent folder");
+        return null;
     }
     return myFile;
 }
@@ -155,8 +156,9 @@ function getFilesByNameWithoutExtension(fileName, parentFolderId) {
             myFiles.push(listOfFiles[searchIndex]);
         }
     }
-    if(myFiles.length===0){
-        alert("Warning: file "+fileName+" not found in parent folder");
+    if (myFiles.length === 0) {
+        alert("Warning: file " + fileName + " not found in parent folder");
+        return null;
     }
     return myFiles;
 }
@@ -171,9 +173,14 @@ function getListOfFiles(dataArray, parentFolderId) {
     for (var parseIndex = 0; parseIndex < dataArray.macFilesArray.length; parseIndex++) {
         var fileName = dataArray.macFilesArray[parseIndex];
         myFile = getFileByName(fileName, parentFolderId);
-        //add file only if it doesn't exist
-        if (myListOfFiles.indexOf(myFile) === -1) {
-            myListOfFiles.push(myFile);
+        if ((myFile !== null) && (isFileInFolder(myFile, "mac") === true)) {
+            //add file only if it doesn't exist
+            if (myListOfFiles.indexOf(myFile) === -1) {
+                myListOfFiles.push(myFile);
+            }
+        } else {
+            //alert("Warning: file "+fileName+" should be placed in the mac folder");
+            return null;
         }
     }
 
@@ -182,12 +189,17 @@ function getListOfFiles(dataArray, parentFolderId) {
         var fileName = dataArray.inputFilesArray[parseIndex];
         myFiles = getFilesByNameWithoutExtension(fileName, parentFolderId);
         //add file only if it doesn't exist
-        if (myListOfFiles.indexOf(myFiles[0]) === -1) {
-            //pushing a list to myListOfFiles
-            myListOfFiles.push.apply(myListOfFiles, myFiles);
+        if ((myFiles !== null) && (isFileInFolder(myFiles[0], "data") === true)) {
+            if (myListOfFiles.indexOf(myFiles[0]) === -1) {
+                //pushing a list to myListOfFiles
+                myListOfFiles.push.apply(myListOfFiles, myFiles);
+            }
+        } else {
+            //alert("Warning: file "+fileName+" should be placed in the data folder");
+            return null;
         }
     }
-    
+
     //Add Wfl config file containing the name of the main Mac file. 
     //Note that the created file has a name and a content, but no path
     var mainMacFileName = dataArray.macFilesArray[0];
@@ -211,14 +223,31 @@ function fillInInputs(fileName, dataArray) {
     if (parts === "") {
         parts = "100";
     }
-    if(dataArray.engineSeed !== "auto"){
+    if (dataArray.engineSeed !== "auto") {
         alert("SetEngineSeed is not auto. Please set the auto engine seed mode.");
         return;
     }
-    if(dataArray.visu === "visu"){
+    if (dataArray.visu === "visu") {
         alert("Vizualisation found in the GATE macro files. Please remove any vis commands and start again.");
         return;
     }
     var inputsList = "GateInput = " + fileName + ", ParallelizationType = " + type + ", NumberOfParticles = " + parts + ", phaseSpace = " + ps;
     return inputsList;
+}
+
+//checks if file (file object) is located at the base of the folder given as arg (String)
+function isFileInFolder(file, folder) {
+    var path = file.webkitRelativePath;
+    console.log("path is " + path + " , filename is " + file.name);
+    var pathArray = path.split('/');
+    if (pathArray.length === 3) {
+        //only consider the first level folder
+        if (pathArray[pathArray.length - 2] === folder) {
+            return true;
+        }
+    } else {
+        alert("File " + file.name + " should be placed in " + folder + " folder, which should be placed at the base of the parent folder");
+        return false;
+    }
+    return false;
 }

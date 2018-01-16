@@ -120,11 +120,21 @@ function parseAndUploadMac(parentFolderId, macId, url, destPath, target, usePool
         //Note: only parseMacFile returns a promise; getListOfFiles is synchronous so the following would also work without "then" 
     }).then(function (filesToUpload) {
         console.log("Start of Promise zipAndUploadFiles");
-        return zipAndUploadFiles(filesToUpload, url, destPath, target, usePool, doUnzip);
+        if (filesToUpload !== null) {
+            return zipAndUploadFiles(filesToUpload, url, destPath, target, usePool, doUnzip);
+        } else {
+            return null;
+        }
     }).then(function (fileName) {
         //TODO: wait for the upload to finish before calling uploadMacComplete
-        var inputs = fillInInputs(fileName, macroData);
-        uploadMacComplete(inputs);
+        if (fileName !== null) {
+            var inputs = fillInInputs(fileName, macroData);
+            uploadMacComplete(inputs);
+        } else {
+            alert("An error occured: please start over");
+            window.close();
+            return null;
+        }
     });
 
 }
