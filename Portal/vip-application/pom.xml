@@ -38,7 +38,7 @@ knowledge of the CeCILL-B license and that you accept its terms.
     <parent>
         <groupId>fr.insalyon.creatis</groupId>
         <artifactId>vip</artifactId>
-        <version>1.21</version>
+        <version>1.21.1</version>
         <relativePath>..</relativePath>
     </parent>
     
@@ -216,14 +216,14 @@ knowledge of the CeCILL-B license and that you accept its terms.
 
     <repositories>
         <repository>
-            <id>i3s-releases</id>
-            <name>I3S Releases Repository</name>
-            <url>http://nyx.unice.fr:9007/nexus/content/repositories/releases</url>
+            <id>creatis-releases</id>
+            <name>Creatis Releases Repository</name>
+            <url>http://vip.creatis.insa-lyon.fr:9007/nexus/content/repositories/releases</url>
         </repository>
         <repository>
-            <id>i3s-thirdparty</id>
-            <name>I3S Third-party Repository</name>
-            <url>http://nyx.unice.fr:9007/nexus/content/repositories/thirdparty</url>
+            <id>creatis-thirdparty</id>
+            <name>Creatis Third-party Repository</name>
+            <url>http://vip.creatis.insa-lyon.fr:9007/nexus/content/repositories/thirdparty</url>
         </repository>
     </repositories>
 

@@ -66,7 +66,7 @@ public class LFCPermissionBusiness {
         if (firstDir.equals(USERS_HOME)) return;
         if (firstDir.equals(TRASH_HOME)) return;
         // currently no admin access is possible via the api for security reasons
-        if (firstDir.equals(USERS_FOLDER) || firstDir.equals(BIOMED_HOME)) {
+        if (firstDir.equals(USERS_FOLDER) || firstDir.equals(VO_ROOT_FOLDER)) {
             logger.error("Trying to access admin folders from api");
             throw new BusinessException("Unauthorized LFC access");
         }
