@@ -32,7 +32,7 @@
 package fr.insalyon.creatis.vip.api.rest.controller.data;
 
 import fr.insalyon.creatis.vip.api.business.*;
-import fr.insalyon.creatis.vip.api.rest.*;
+import fr.insalyon.creatis.vip.api.rest.RestApiBusiness;
 import fr.insalyon.creatis.vip.api.rest.model.*;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,8 +44,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import java.io.*;
 import java.util.List;
-
-import static org.bouncycastle.asn1.x500.style.RFC4519Style.c;
 
 /**
  * Created by abonnet on 1/13/17.
@@ -146,6 +144,7 @@ public class DataController {
         restApiBusiness.getApiContext(httpServletRequest, true);
         // business call
         dataApiBusiness.uploadRawFileFromInputStream(completePath, requestInputStream);
+        // TODO : think about returning the PahtProperties of the created Path, to be informed of a filename change
     }
 
     @RequestMapping(path = "/**", method = RequestMethod.PUT, consumes = "application/carmin+json")

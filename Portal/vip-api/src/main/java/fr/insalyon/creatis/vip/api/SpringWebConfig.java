@@ -71,6 +71,7 @@ public class SpringWebConfig extends WebMvcConfigurerAdapter {
 
     @Override
     public void configureContentNegotiation(ContentNegotiationConfigurer configurer) {
+        // necessary in the content negotiation stuff of carmin data
         configurer.favorPathExtension(false);
     }
 

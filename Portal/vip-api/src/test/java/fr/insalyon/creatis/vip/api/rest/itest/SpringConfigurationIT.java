@@ -112,15 +112,17 @@ public class SpringConfigurationIT {
         Assert.isInstanceOf(String[].class, env.getProperty(UNSUPPORTED_METHODS, String[].class));
         Assert.notNull(env.getProperty(SUPPORTED_API_VERSION));
         Assert.notEmpty(env.getProperty(PLATFORM_ERROR_CODES_AND_MESSAGES, String[].class));
-        // test platform properties generation
-        Assert.notNull(platformController.getPlatformProperties());
-        Assert.notNull(env.getProperty(API_DEFAULT_MIME_TYPE));
-        Assert.notNull(env.getProperty(API_DIRECTORY_MIME_TYPE));
-        Assert.notNull(env.getProperty(API_DOWNLOAD_TIMEOUT_IN_SECONDS, Integer.class));
-        Assert.notNull(env.getProperty(API_DOWNLOAD_RETRY_IN_SECONDS, Integer.class));
-        Assert.notNull(env.getProperty(API_DATA_TRANSFERT_MAX_SIZE, Long.class));
+
         Assert.notNull(env.getProperty(APIKEY_HEADER_NAME));
         Assert.notNull(env.getProperty(APIKEY_GENERATE_NEW_EACH_TIME, Boolean.class));
+
+        Assert.notNull(env.getProperty(API_DIRECTORY_MIME_TYPE));
+        Assert.notNull(env.getProperty(API_DEFAULT_MIME_TYPE));
+        Assert.notNull(env.getProperty(API_DOWNLOAD_RETRY_IN_SECONDS, Integer.class));
+        Assert.notNull(env.getProperty(API_DOWNLOAD_TIMEOUT_IN_SECONDS, Integer.class));
+        Assert.notNull(env.getProperty(API_DATA_TRANSFERT_MAX_SIZE, Long.class));
         Assert.notNull(env.getProperty(API_DATA_DOWNLOAD_RELATIVE_PATH));
+        // test that the platform properties generation does not throw any exception
+        Assert.notNull(platformController.getPlatformProperties());
     }
 }

@@ -36,7 +36,7 @@ package fr.insalyon.creatis.vip.api;
  */
 public interface CarminProperties {
 
-    // TODO : verify they're present on sprint init
+    // TODO : verify they're present on spring init
 
     // CARMIN COMMON
     String PLATFORM_NAME = "carmin.platform.name";
@@ -56,7 +56,6 @@ public interface CarminProperties {
 
     // CARMIN DATA
 
-    String API_URI_PREFIX = "carmin.data.uri_prefix";
     String API_DIRECTORY_MIME_TYPE = "carmin.data.mime_type.directory";
     String API_DEFAULT_MIME_TYPE = "carmin.data.mime_type.default";
     String API_DOWNLOAD_RETRY_IN_SECONDS = "carmin.data.download.retry";
