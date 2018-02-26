@@ -48,87 +48,93 @@
 //asynchronous function that returns a promise resolved to ret (array of parsed values) once the parsing is finished
 function parseMacFile(macId, parentFolderId) {
     return new Promise(function (resolve, reject) {
-        var mainMacFile = document.getElementById(macId).files[0];
-        var ret =
-                {
-                    macFilesArray: [],
-                    inputFilesArray: [],
-                    outputFilesArray: [],
-                    engineSeed: "",
-                    visu: "",
-                    beamOnEvents: "",
-                    totalNumberOfPrimaries: "",
-                    timeSimu: "",
-                    otherFilesArray: []
-                };
+        try {
+            var mainMacFile = document.getElementById(macId).files[0];
+            var parsedValuesArray = {
+                macFilesArray: [],
+                inputFilesArray: [],
+                outputFilesArray: [],
+                engineSeed: "",
+                visu: "",
+                beamOnEvents: "",
+                totalNumberOfPrimaries: "",
+                timeSimu: "",
+                otherFilesArray: []
+            };
+            var parserArray = [
+                {reg: ".* mac/(.*\.mac)", val: "macFilesArray"},
+                {reg: ".* data/(.*)", val: "inputFilesArray"},
+                {reg: ".* output/(.*)", val: "outputFilesArray"},
+                {reg: "/gate/random/setEngineSeed (.*)", val: "engineSeed"},
+                {reg: "^/vis.* (.*)", val: "visu"},
+                {reg: "/run/beamOn (.*)", val: "beamOnEvents"},
+                {reg: "/gate/application/setTotalNumberOfPrimaries (.*)", val: "totalNumberOfPrimaries"},
+                {reg: "/gate/application/setTimeSlice (.*)", val: "timeSimu"},
+                {reg: "[_a-zA-Z0-9\\-\\./]+\\.[_a-zA-Z][_a-zA-Z0-9\\-\\.]+", val: "otherFilesArray"}
+            ];
 
-        var parserArray = [
-            {reg: ".* mac/(.*\.mac)", val: "macFilesArray"},
-            {reg: ".* data/(.*)", val: "inputFilesArray"},
-            {reg: ".* output/(.*)", val: "outputFilesArray"},
-            {reg: "/gate/random/setEngineSeed (.*)", val: "engineSeed"},
-            {reg: "^/vis.* (.*)", val: "visu"},
-            {reg: "/run/beamOn (.*)", val: "beamOnEvents"},
-            {reg: "/gate/application/setTotalNumberOfPrimaries (.*)", val: "totalNumberOfPrimaries"},
-            {reg: "/gate/application/setTimeSlice (.*)", val: "timeSimu"},
-            {reg: "[_a-zA-Z0-9\\-\\./]+\\.[_a-zA-Z][_a-zA-Z0-9\\-\\.]+", val: "otherFilesArray"}
-        ];
-
-
-        //init the ret[macFilesArray] with the mainMacFile
-        ret["macFilesArray"].push(mainMacFile.name);
-        function parseFile(fileIndex) {
-            if (fileIndex === ret["macFilesArray"].length) {
-                //we reached the end: resolve ret and return
-                console.log("macFilesArray has " + ret["macFilesArray"].length + "elements");
-                resolve(ret);
-                return;
-
-            } else {
-                macFileName = ret["macFilesArray"][fileIndex];
-                var macFile = getFileByName(macFileName, parentFolderId);
-                if (macFile === null) {
-                    alert("Macro file " + macFileName + " not found in the mac folder");
+            //init the ret[macFilesArray] with the mainMacFile
+            parsedValuesArray["macFilesArray"].push(mainMacFile.name);
+            function parseFile(fileIndex) {
+                if (fileIndex === parsedValuesArray["macFilesArray"].length) {
+                    //we reached the end: resolve parsedValuesArray and return
+                    console.log("macFilesArray has " + parsedValuesArray["macFilesArray"].length + "elements");
+                    resolve(parsedValuesArray);
                     return;
-                }
-                var reader = new FileReader();
-                reader.onload = function (e) {
-                    console.log("Parsing macro file " + macFile.name);
-                    // Read by lines
-                    var lines = e.target.result.split('\n');
-                    for (var lineIndex = 0; lineIndex < lines.length; lineIndex++) {
-                        trimmedLine = lines[lineIndex].trim();
-                        //if the line is not a comment, i.e. it doesn't start with #
-                        if (!trimmedLine.match("^#")) {
-                            for (var parseIndex = 0; parseIndex < parserArray.length; parseIndex++) {
-                                var m = trimmedLine.match(parserArray[parseIndex].reg);
-                                if (m) {
-                                    //console.log("Found match " + m[1] + "for " + parserArray[parseIndex].val + " at line " + lineIndex);
-                                    if (Array.isArray(ret[parserArray[parseIndex].val])) {
-                                        //add element only if it does not exist
-                                        if (ret[parserArray[parseIndex].val].indexOf(m[1]) === -1) {
-                                            //console.log("element " + m[1] + " doesn't exist, adding it");
-                                            ret[parserArray[parseIndex].val].push(m[1]);
-                                        }
-                                    } else
-                                        ret[parserArray[parseIndex].val] = m[1];
-                                    //each line contains max one match, i.e. max one value m to add to ret; if m found, go to next line
-                                    break;
-                                }
-                            }
-                        }//end if not a comment
+                } else {
+                    var macFileName = parsedValuesArray["macFilesArray"][fileIndex];
+                    var macFile = getFileByName(macFileName, parentFolderId);
+                    if (macFile === null) {
+                        alertAndThrow("Macro file " + macFileName + " not found in the mac folder");
                     }
-                    parseFile(fileIndex + 1);
-                };
-                reader.readAsText(macFile);
-            }//end else
-        }// end function parseFile
-        parseFile(0);
+                    var reader = new FileReader();
+                    reader.onload = function (e) {
+                        console.log("Parsing macro file " + macFile.name);
+                        // Read by lines
+                        var lines = e.target.result.split('\n');
+                        for (var lineIndex = 0; lineIndex < lines.length; lineIndex++) {
+                            parseLine(lines[lineIndex], parserArray, parsedValuesArray);
+                        }
+                        parseFile(fileIndex + 1);
+                    };
+                    reader.readAsText(macFile);
+                }//end else
+            }// end function parseFile
+            parseFile(0);
+
+        } catch (err) {
+            return reject(err);
+        }
     });
 }
 
-//retrieve the file object corresponding to fileName from listOfFilesID
-//TODO add something like getFileByNameWithoutExt for input files (e.g., .hdr/.img files, since only .hdr file will be parsed)
+function alertAndThrow(message) {
+    alert(message);
+    throw message;
+}
+
+function parseLine(line, regexpArray, resultArray) {
+    var trimmedLine = line.trim();
+    //if the line is not a comment, i.e. it doesn't start with #
+    if (!trimmedLine.match("^#")) {
+        for (var parseIndex = 0; parseIndex < regexpArray.length; parseIndex++) {
+            var m = trimmedLine.match(regexpArray[parseIndex].reg);
+            if (m) {
+                if (Array.isArray(resultArray[regexpArray[parseIndex].val])) {
+                    //add element only if it does not exist
+                    if (resultArray[regexpArray[parseIndex].val].indexOf(m[1]) === -1) {
+                        resultArray[regexpArray[parseIndex].val].push(m[1]);
+                    }
+                } else
+                    resultArray[regexpArray[parseIndex].val] = m[1];
+                //each line contains max one match, i.e. max one value m to add to resultArray; if m found, go to next line
+                break;
+            }
+        }
+    }//end if not a comment
+}
+
+//retrieve the file object corresponding to the exact fileName from listOfFilesID
 function getFileByName(fileName, parentFolderId) {
     var listOfFiles = document.getElementById(parentFolderId).files;
     //var myFile = listOfFiles[listOfFiles.map(function(x){return x.name}).indexOf(myFileName)];
@@ -141,8 +147,7 @@ function getFileByName(fileName, parentFolderId) {
         }
     }
     if (myFile === null) {
-        alert("Warning: file " + fileName + " not found in parent folder");
-        return null;
+        alertAndThrow("Warning: file " + fileName + " not found in parent folder");
     }
     return myFile;
 }
@@ -157,8 +162,7 @@ function getFilesByNameWithoutExtension(fileName, parentFolderId) {
         }
     }
     if (myFiles.length === 0) {
-        alert("Warning: file " + fileName + " not found in parent folder");
-        return null;
+        alertAndThrow("Warning: file " + fileName + " not found in parent folder");
     }
     return myFiles;
 }
@@ -179,8 +183,7 @@ function getListOfFiles(dataArray, parentFolderId) {
                 myListOfFiles.push(myFile);
             }
         } else {
-            //alert("Warning: file "+fileName+" should be placed in the mac folder");
-            return null;
+            alertAndThrow("File " + myFile + " not found");
         }
     }
 
@@ -195,8 +198,7 @@ function getListOfFiles(dataArray, parentFolderId) {
                 myListOfFiles.push.apply(myListOfFiles, myFiles);
             }
         } else {
-            //alert("Warning: file "+fileName+" should be placed in the data folder");
-            return null;
+            alertAndThrow("File " + fileName + " not found");
         }
     }
 
@@ -224,12 +226,10 @@ function fillInInputs(fileName, dataArray) {
         parts = "100";
     }
     if (dataArray.engineSeed !== "auto") {
-        alert("SetEngineSeed is not auto. Please set the auto engine seed mode.");
-        return;
+        alertAndThrow("SetEngineSeed is not auto. Please set the auto engine seed mode.");
     }
     if (dataArray.visu === "visu") {
-        alert("Vizualisation found in the GATE macro files. Please remove any vis commands and start again.");
-        return;
+        alertAndThrow("Vizualisation found in the GATE macro files. Please remove any vis commands and start again.");
     }
     var inputsList = "GateInput = " + fileName + ", ParallelizationType = " + type + ", NumberOfParticles = " + parts + ", phaseSpace = " + ps;
     return inputsList;
