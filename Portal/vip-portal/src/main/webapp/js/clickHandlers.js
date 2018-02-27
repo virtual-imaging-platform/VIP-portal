@@ -79,26 +79,13 @@ function zipAndUploadFiles(data, url, destPath, target, usePool, doUnzip) {
                 return;
             } else {
                 var file = fileList[index];
-                var path = file.webkitRelativePath;
-                //if we don't unzip => we are using the GateLab and we should keep a single folder level
-                //TODO improve this folder level handling for the GateLab
-                if (doUnzip !== "true") {
-                    //the workflow config file has no path, setting it to the file name
-                    if (path === "") {
-                        path = file.name;
-                    } else {
-                        var pathArray = path.split('/');
-                        //removing parent folders for the GateLab
-                        if (pathArray.length > 2) {
-                            path = pathArray[pathArray.length - 2] + "/" + pathArray[pathArray.length - 1];
-                        }
-                    }
-                }
+                //if we don't unzip => we are using the GateLab 
+                //TODO improve this handling for the GateLab
+                var path = getPathForZip(file, !doUnzip)
                 reader.onload = function (e) {
                     // get file content and add it to zip
                     var data = e.target.result;
                     zip.file(path, data);
-                    // zip next file
                     zipFile(index + 1);
                 };
                 reader.readAsArrayBuffer(file);
@@ -108,16 +95,31 @@ function zipAndUploadFiles(data, url, destPath, target, usePool, doUnzip) {
     });
 }
 
+function getPathForZip(file, isGateLab) {
+    var path = file.webkitRelativePath;
+    if (isGateLab === "true") {
+        //the workflow config file (wfl_config.txt) has no path, setting it to the file name
+        if (path === "") {
+            path = file.name;
+        }
+        var pathArray = path.split('/');
+        //removing parent folders for the GateLab
+        if (pathArray.length > 2) {
+            path = pathArray[pathArray.length - 2] + "/" + pathArray[pathArray.length - 1];
+        }
+    }
+    return path;
+}
+
 function parseAndUploadMac(parentFolderId, macId, url, destPath, target, usePool, doUnzip) {
 
     var promise = parseMacFile(macId, parentFolderId);
     var macroData;
-    //parseMacFile returns a promise that is resolved to the value dataArray when finished 
-    promise.then(function (dataArray) {
-        //macroData = dataArray;
-        //console.log("Start of Promise getListOfFiles");
-        return getListOfFiles(dataArray, parentFolderId);
-        //Note: only parseMacFile returns a promise; getListOfFiles is synchronous so the following would also work without "then" 
+    //parseMacFile returns a promise that is resolved to the value localMacroData when finished 
+    promise.then(function (localMacroData) {
+        //localMacroData is only acessible in this block, but fillInInputs() also needs access to it
+        macroData = localMacroData;
+        return getListOfFiles(localMacroData, parentFolderId);
     }).then(function (filesToUpload) {
         return zipAndUploadFiles(filesToUpload, url, destPath, target, usePool, doUnzip);
     }).then(function (fileName) {
@@ -125,7 +127,7 @@ function parseAndUploadMac(parentFolderId, macId, url, destPath, target, usePool
         uploadMacComplete(inputs);
     }).catch(function (error) {
         console.log("Failed!", error);
-        alert("An error occured: please start over");
+        alert(error + " Please start over.");
         window.close();
         return null;
     });

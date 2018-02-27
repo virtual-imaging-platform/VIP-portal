@@ -48,69 +48,66 @@
 //asynchronous function that returns a promise resolved to ret (array of parsed values) once the parsing is finished
 function parseMacFile(macId, parentFolderId) {
     return new Promise(function (resolve, reject) {
-        try {
-            var mainMacFile = document.getElementById(macId).files[0];
-            var parsedValuesArray = {
-                macFilesArray: [],
-                inputFilesArray: [],
-                outputFilesArray: [],
-                engineSeed: "",
-                visu: "",
-                beamOnEvents: "",
-                totalNumberOfPrimaries: "",
-                timeSimu: "",
-                otherFilesArray: []
-            };
-            var parserArray = [
-                {reg: ".* mac/(.*\.mac)", val: "macFilesArray"},
-                {reg: ".* data/(.*)", val: "inputFilesArray"},
-                {reg: ".* output/(.*)", val: "outputFilesArray"},
-                {reg: "/gate/random/setEngineSeed (.*)", val: "engineSeed"},
-                {reg: "^/vis.* (.*)", val: "visu"},
-                {reg: "/run/beamOn (.*)", val: "beamOnEvents"},
-                {reg: "/gate/application/setTotalNumberOfPrimaries (.*)", val: "totalNumberOfPrimaries"},
-                {reg: "/gate/application/setTimeSlice (.*)", val: "timeSimu"},
-                {reg: "[_a-zA-Z0-9\\-\\./]+\\.[_a-zA-Z][_a-zA-Z0-9\\-\\.]+", val: "otherFilesArray"}
-            ];
+        var mainMacFile = document.getElementById(macId).files[0];
+        var parsedValuesArray = {
+            macFilesArray: [],
+            inputFilesArray: [],
+            outputFilesArray: [],
+            engineSeed: "",
+            visu: "",
+            beamOnEvents: "",
+            totalNumberOfPrimaries: "",
+            timeSimu: "",
+            otherFilesArray: []
+        };
+        var parserArray = [
+            {reg: ".* mac/(.*\.mac)", val: "macFilesArray"},
+            {reg: ".* data/(.*)", val: "inputFilesArray"},
+            {reg: ".* output/(.*)", val: "outputFilesArray"},
+            {reg: "/gate/random/setEngineSeed (.*)", val: "engineSeed"},
+            {reg: "^/vis.* (.*)", val: "visu"},
+            {reg: "/run/beamOn (.*)", val: "beamOnEvents"},
+            {reg: "/gate/application/setTotalNumberOfPrimaries (.*)", val: "totalNumberOfPrimaries"},
+            {reg: "/gate/application/setTimeSlice (.*)", val: "timeSimu"},
+            {reg: "[_a-zA-Z0-9\\-\\./]+\\.[_a-zA-Z][_a-zA-Z0-9\\-\\.]+", val: "otherFilesArray"}
+        ];
 
-            //init the ret[macFilesArray] with the mainMacFile
-            parsedValuesArray["macFilesArray"].push(mainMacFile.name);
-            function parseFile(fileIndex) {
-                if (fileIndex === parsedValuesArray["macFilesArray"].length) {
-                    //we reached the end: resolve parsedValuesArray and return
-                    console.log("macFilesArray has " + parsedValuesArray["macFilesArray"].length + "elements");
-                    resolve(parsedValuesArray);
-                    return;
-                } else {
-                    var macFileName = parsedValuesArray["macFilesArray"][fileIndex];
-                    var macFile = getFileByName(macFileName, parentFolderId);
-                    if (macFile === null) {
-                        alertAndThrow("Macro file " + macFileName + " not found in the mac folder");
+        //init the ret[macFilesArray] with the mainMacFile
+        parsedValuesArray["macFilesArray"].push(mainMacFile.name);
+        function parseFile(fileIndex) {
+            if (fileIndex === parsedValuesArray["macFilesArray"].length) {
+                //we reached the end: resolve parsedValuesArray and return
+                resolve(parsedValuesArray);
+            } else {
+                var macFileName = parsedValuesArray["macFilesArray"][fileIndex];
+                var macFile = getFileByName(macFileName, parentFolderId);
+                checkAndThrow(macFile, "Macro file " + macFileName + " not found in the mac folder");
+                var reader = new FileReader();
+                reader.onload = function (e) {
+                    // Read by lines
+                    var lines = e.target.result.split('\n');
+                    for (var lineIndex = 0; lineIndex < lines.length; lineIndex++) {
+                        parseLine(lines[lineIndex], parserArray, parsedValuesArray);
                     }
-                    var reader = new FileReader();
-                    reader.onload = function (e) {
-                        console.log("Parsing macro file " + macFile.name);
-                        // Read by lines
-                        var lines = e.target.result.split('\n');
-                        for (var lineIndex = 0; lineIndex < lines.length; lineIndex++) {
-                            parseLine(lines[lineIndex], parserArray, parsedValuesArray);
-                        }
-                        parseFile(fileIndex + 1);
-                    };
-                    reader.readAsText(macFile);
-                }//end else
-            }// end function parseFile
-            parseFile(0);
-
-        } catch (err) {
-            return reject(err);
-        }
+                    parseFile(fileIndex + 1);
+                };
+                reader.readAsText(macFile);
+            }//end else
+        }// end function parseFile
+        parseFile(0);
     });
 }
 
-function alertAndThrow(message) {
-    alert(message);
-    throw message;
+function checkAndThrow(varToCkeck, message) {
+    if (varToCkeck === null) {
+        throw message;
+    }
+    if (Array.isArray(varToCkeck)) {
+        if (varToCkeck.length === 0) {
+            throw message;
+        }
+    }
+
 }
 
 function parseLine(line, regexpArray, resultArray) {
@@ -146,9 +143,7 @@ function getFileByName(fileName, parentFolderId) {
             return myFile;
         }
     }
-    if (myFile === null) {
-        alertAndThrow("Warning: file " + fileName + " not found in parent folder");
-    }
+    checkAndThrow(myFile, "Warning: file " + fileName + " not found in parent folder");
     return myFile;
 }
 
@@ -161,9 +156,7 @@ function getFilesByNameWithoutExtension(fileName, parentFolderId) {
             myFiles.push(listOfFiles[searchIndex]);
         }
     }
-    if (myFiles.length === 0) {
-        alertAndThrow("Warning: file " + fileName + " not found in parent folder");
-    }
+    checkAndThrow(myFiles, "Warning: file " + fileName + " not found in parent folder");
     return myFiles;
 }
 
@@ -177,13 +170,10 @@ function getListOfFiles(dataArray, parentFolderId) {
     for (var parseIndex = 0; parseIndex < dataArray.macFilesArray.length; parseIndex++) {
         var fileName = dataArray.macFilesArray[parseIndex];
         myFile = getFileByName(fileName, parentFolderId);
-        if ((myFile !== null) && (isFileInFolder(myFile, "mac") === true)) {
-            //add file only if it doesn't exist
-            if (myListOfFiles.indexOf(myFile) === -1) {
-                myListOfFiles.push(myFile);
-            }
-        } else {
-            alertAndThrow("File " + myFile + " not found");
+        checkFileIsInFolder(myFile, "mac");
+        //add file only if it doesn't exist
+        if (myListOfFiles.indexOf(myFile) === -1) {
+            myListOfFiles.push(myFile);
         }
     }
 
@@ -191,14 +181,10 @@ function getListOfFiles(dataArray, parentFolderId) {
     for (var parseIndex = 0; parseIndex < dataArray.inputFilesArray.length; parseIndex++) {
         var fileName = dataArray.inputFilesArray[parseIndex];
         myFiles = getFilesByNameWithoutExtension(fileName, parentFolderId);
-        //add file only if it doesn't exist
-        if ((myFiles !== null) && (isFileInFolder(myFiles[0], "data") === true)) {
-            if (myListOfFiles.indexOf(myFiles[0]) === -1) {
-                //pushing a list to myListOfFiles
-                myListOfFiles.push.apply(myListOfFiles, myFiles);
-            }
-        } else {
-            alertAndThrow("File " + fileName + " not found");
+        checkFileIsInFolder(myFiles[0], "data");
+        if (myListOfFiles.indexOf(myFiles[0]) === -1) {
+            //pushing a list to myListOfFiles
+            myListOfFiles.push.apply(myListOfFiles, myFiles);
         }
     }
 
@@ -211,14 +197,14 @@ function getListOfFiles(dataArray, parentFolderId) {
     return myListOfFiles;
 }
 
-function isStatic(dataArray) {
+function isSimuStatic(dataArray) {
     if (dataArray.timeSimu === "timeSimu") {
         return true;
     }
     return false;
 }
 function fillInInputs(fileName, dataArray) {
-    var type = isStatic(dataArray) ? "stat" : "dyn";
+    var type = isSimuStatic(dataArray) ? "stat" : "dyn";
     //TODO handle phaseSpace use-case
     var ps = "dummy";
     var parts = dataArray.totalNumberOfPrimaries;
@@ -226,28 +212,27 @@ function fillInInputs(fileName, dataArray) {
         parts = "100";
     }
     if (dataArray.engineSeed !== "auto") {
-        alertAndThrow("SetEngineSeed is not auto. Please set the auto engine seed mode.");
+        throw "SetEngineSeed is not auto. Please set the auto engine seed mode.";
     }
     if (dataArray.visu === "visu") {
-        alertAndThrow("Vizualisation found in the GATE macro files. Please remove any vis commands and start again.");
+        throw "Vizualisation found in the GATE macro files. Please remove any vis commands and start again.";
     }
     var inputsList = "GateInput = " + fileName + ", ParallelizationType = " + type + ", NumberOfParticles = " + parts + ", phaseSpace = " + ps;
     return inputsList;
 }
 
 //checks if file (file object) is located at the base of the folder given as arg (String)
-function isFileInFolder(file, folder) {
+function checkFileIsInFolder(file, folder) {
+    checkAndThrow(file, "File not found");
     var path = file.webkitRelativePath;
-    console.log("path is " + path + " , filename is " + file.name);
     var pathArray = path.split('/');
-    if (pathArray.length === 3) {
-        //only consider the first level folder
-        if (pathArray[pathArray.length - 2] === folder) {
-            return true;
-        }
-    } else {
-        alert("File " + file.name + " should be placed in " + folder + " folder, which should be placed at the base of the parent folder");
-        return false;
+    if (pathArray.length !== 3) {
+        var message = "Folder " + folder + " should be placed at the base of the parent folder";
+        throw message;
     }
-    return false;
+    //only consider the first level folder
+    if (pathArray[1] !== folder) {
+        var message = "File " + file.name + " was not found in " + folder + " folder";
+        throw message;
+    }
 }
