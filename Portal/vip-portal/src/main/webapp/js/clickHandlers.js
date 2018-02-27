@@ -43,26 +43,18 @@
  knowledge of the CeCILL-B license and that you accept its terms.
  */
 
+function zipAndUploadFiles(data, url, destPath, target, usePool, doUnzip) {
+    var isGateLab = "false";
+    zipAndUpload(data, url, destPath, target, usePool, doUnzip, isGateLab);
+}
+
 //zip a list of files and call uploadZip to send the final zip to the given url (which is a file upload service)
 //data can be a fileList or the id of of a fileList element
-function zipAndUploadFiles(data, url, destPath, target, usePool, doUnzip) {
+function zipAndUpload(data, url, destPath, target, usePool, doUnzip, isGateLab) {
     var zip = new JSZip();
     var reader = new FileReader();
-    var fileList;
-    if (Array.isArray(data)) {
-        fileList = data;
-    } else {
-        fileList = document.getElementById(data).files;
-    }
-    if (fileList.length === 0) {
-        alert("No folder selected for upload");
-        return;
-    }
-
-    var getTimestamp = function () {
-        return new Date().getTime();
-    };
-    var fileName = "file-" + getTimestamp() + ".zip";
+    var fileList = getFileList(data);
+    var fileName = getZipName();
 
     return new Promise(function (resolve, reject) {
         //TODO handle single file use-case: no need for zipping + set single=true
@@ -79,9 +71,7 @@ function zipAndUploadFiles(data, url, destPath, target, usePool, doUnzip) {
                 return;
             } else {
                 var file = fileList[index];
-                //if we don't unzip => we are using the GateLab 
-                //TODO improve this handling for the GateLab
-                var path = getPathForZip(file, !doUnzip)
+                var path = getPathForZip(file, isGateLab);
                 reader.onload = function (e) {
                     // get file content and add it to zip
                     var data = e.target.result;
@@ -93,6 +83,25 @@ function zipAndUploadFiles(data, url, destPath, target, usePool, doUnzip) {
         }
         zipFile(0);
     });
+}
+
+function getFileList(data) {
+    var fileList;
+    if (Array.isArray(data)) {
+        fileList = data;
+    } else {
+        fileList = document.getElementById(data).files;
+    }
+    if (fileList.length === 0) {
+        alert("No folder selected for upload");
+        return;
+    }
+    return fileList;
+}
+
+function getZipName() {
+    var timestamp = new Date().getTime();
+    return "file-" + timestamp + ".zip";
 }
 
 function getPathForZip(file, isGateLab) {
@@ -115,13 +124,14 @@ function parseAndUploadMac(parentFolderId, macId, url, destPath, target, usePool
 
     var promise = parseMacFile(macId, parentFolderId);
     var macroData;
+    var isGateLab = "true";
     //parseMacFile returns a promise that is resolved to the value localMacroData when finished 
     promise.then(function (localMacroData) {
         //localMacroData is only acessible in this block, but fillInInputs() also needs access to it
         macroData = localMacroData;
         return getListOfFiles(localMacroData, parentFolderId);
     }).then(function (filesToUpload) {
-        return zipAndUploadFiles(filesToUpload, url, destPath, target, usePool, doUnzip);
+        return zipAndUpload(filesToUpload, url, destPath, target, usePool, doUnzip, isGateLab);
     }).then(function (fileName) {
         var inputs = fillInInputs(fileName, macroData);
         uploadMacComplete(inputs);
