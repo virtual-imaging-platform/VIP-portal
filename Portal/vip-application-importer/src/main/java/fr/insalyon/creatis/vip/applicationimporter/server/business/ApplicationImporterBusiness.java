@@ -140,6 +140,18 @@ public class ApplicationImporterBusiness {
             System.out.print(gwendiaFileName + "\n");
             writeString(gwendiaString, gwendiaFileName);
             uploadFile(gwendiaFileName, bt.getGwendiaLFN());
+            
+            // Write application json descriptor
+            String jsonFileName = Server.getInstance().getApplicationImporterFileRepository() + bt.getJSONLFN();
+            System.out.print(jsonFileName + "\n");
+            writeString(bt.getJsonFileContent(), jsonFileName);
+            
+            String jsonArchiveName = new String(jsonFileName + ".tar.gz");
+            ArrayList<File> jsonFile = new ArrayList<File>();
+            jsonFile.add(new File(jsonFileName));
+            TargzUtils.createTargz(jsonFile, jsonArchiveName);
+            uploadFile(jsonArchiveName, bt.getJSONLFN() + ".tar.gz");
+            uploadFile(jsonFileName, bt.getJSONLFN());
 
             String wrapperArchiveName;
             // Write files for each GASW and script file

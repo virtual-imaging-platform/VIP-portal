@@ -4,6 +4,7 @@
     <access type="LFN" cached="true"/>
     <retrycount value="1"/>
     <value value="$tool.getWrapperLFN()"/>
+    <value value="$tool.getJSONLFN()"/>
 #if($isRunOnGrid == false)
     <executor value="LOCAL"/>
 #end
