@@ -87,7 +87,7 @@ public class RestApiBusiness {
     public AuthenticationInfo authenticate(AuthenticationCredentials authCreds) throws ApiException {
         String username = authCreds.getUsername(), password = authCreds.getPassword();
         logger.debug("Verifying credential for " + username);
-        verifyCredentials(username, password);
+        signin(username, password);
         logger.debug("Constructing authentication info for " + username);
         AuthenticationInfo authInfo = new AuthenticationInfo();
         String headerName = env.getProperty(CarminProperties.APIKEY_HEADER_NAME);
@@ -97,9 +97,10 @@ public class RestApiBusiness {
         return authInfo;
     }
 
-    private void verifyCredentials(String username, String password) throws ApiException {
+    private void signin(String username, String password) throws ApiException {
         try {
-            configurationBusiness.signin(username, password);
+            // we do not care about the session, we're not in browser action
+            configurationBusiness.signinWithoutResetingSession(username, password);
             logger.info("Credentials OK for " + username);
         } catch (BusinessException e) {
             logger.error("Error authenticating {" + username + "}. Considered as bad credentials", e);

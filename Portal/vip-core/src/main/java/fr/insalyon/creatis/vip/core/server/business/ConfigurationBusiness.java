@@ -343,6 +343,14 @@ public class ConfigurationBusiness {
      * @throws BusinessException
      */
     public User signin(String email, String password) throws BusinessException {
+        return signin(email, password, true);
+    }
+
+    public User signinWithoutResetingSession(String email, String password) throws BusinessException {
+        return signin(email, password, false);
+    }
+
+    private User signin(String email, String password, boolean resetSession) throws BusinessException {
 
         try {
             password = MD5.get(password);
@@ -351,7 +359,12 @@ public class ConfigurationBusiness {
             if (userDAO.authenticate(email, password)) {
 
                 userDAO.resetNFailedAuthentications(email);
-                return getUserWithSession(email);
+
+                if (resetSession) {
+                    return getUserWithSession(email);
+                } else {
+                    return CoreDAOFactory.getDAOFactory().getUserDAO().getUser(email);
+                }
 
             } else {
                 userDAO.incNFailedAuthentications(email);
