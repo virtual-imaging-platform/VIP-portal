@@ -101,7 +101,7 @@ public class UserData implements UserDAO {
         } catch (SQLException ex) {
             if (ex.getMessage().contains("Duplicate entry")) {
                 logger.error("There is an existing account associated with the email: " + user.getEmail() + " or with this {first name,last name} (" + ex.getMessage() + ")");
-                throw new DAOException("There is an existing account associated with this email or with this {first name,last name}.");
+                throw new DAOException("There is an existing account associated with this email or with this {first name,last name}.", ex);
             } else {
                 logger.error(ex);
                 throw new DAOException(ex);
@@ -689,7 +689,7 @@ public class UserData implements UserDAO {
         } catch (SQLException ex) {
             if (ex.getMessage().contains("Duplicate entry")) {
                 logger.error("There is an existing Dropbox account associated with the email: " + email);
-                throw new DAOException("There is an existing Dropbox account associated with this email.");
+                throw new DAOException("There is an existing Dropbox account associated with this email.", ex);
             } else {
                 logger.error(ex);
                 throw new DAOException(ex);

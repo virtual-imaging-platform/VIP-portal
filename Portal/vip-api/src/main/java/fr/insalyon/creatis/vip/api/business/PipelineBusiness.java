@@ -128,7 +128,7 @@ public class PipelineBusiness {
             Pipeline[] array_pipelines = new Pipeline[pipelines.size()];
             return pipelines.toArray(array_pipelines);
         } catch (BusinessException ex) {
-            logger.error(ex);
+            logger.error("Error listing pipelines" + ex);
             throw new ApiException(ex);
         }
     }

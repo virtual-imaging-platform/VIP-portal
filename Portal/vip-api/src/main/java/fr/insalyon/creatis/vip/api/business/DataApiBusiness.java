@@ -191,14 +191,14 @@ public class DataApiBusiness {
                     env.getProperty(CarminProperties.API_DOWNLOAD_TIMEOUT_IN_SECONDS, Integer.class);
             waitForDownloadFuture.get(timeout, TimeUnit.SECONDS);
         } catch (InterruptedException e) {
-            logger.error("Waiting for download interrupted :" + apiUri, e);
-            throw new ApiException("Waiting for download interrupted");
+            logger.error("Waiting for download interrupted :" + apiUri);
+            throw new ApiException("Waiting for download interrupted", e);
         } catch (ExecutionException e) {
-            logger.error("Error waiting for download :" + apiUri, e);
-            throw new ApiException("Error waiting for download");
+            logger.error("Error waiting for download :" + apiUri);
+            throw new ApiException("Error waiting for download", e);
         } catch (TimeoutException e) {
-            logger.error("Aborting download too long :" + apiUri, e);
-            throw new ApiException("Aborting dowload : too long");
+            logger.error("Aborting download too long :" + apiUri);
+            throw new ApiException("Aborting dowload : too long", e);
         }
         return getDownloadContent(downloadOperationId);
     }
@@ -270,7 +270,7 @@ public class DataApiBusiness {
             lfcPermissionBusiness.checkPermission(apiContext.getUser(), lfcPath, accessType);
         } catch (BusinessException e) {
             logger.error("API Permission error");
-            throw new ApiException(e);
+            throw new ApiException("API Permission error", e);
         }
         // all check passed : all good !
         return lfcPath;
@@ -309,8 +309,8 @@ public class DataApiBusiness {
         try (OutputStream outputStream = encoder.wrap(baos)) {
             Files.copy(file.toPath(), outputStream);
         } catch (IOException e) {
-            logger.error("Error encoding download file for operation :" + operationId , e);
-            throw new ApiException("Download operation failed");
+            logger.error("Error encoding download file for operation :" + operationId );
+            throw new ApiException("Download operation failed", e);
         }
         return baos.toString();
     }
@@ -438,8 +438,8 @@ public class DataApiBusiness {
         try {
             return lfcBusiness.exists(apiContext.getUser(), lfcPath);
         } catch (BusinessException e) {
-            logger.error("Error testing lfc file existence", e);
-            throw new ApiException("Error testing file existence");
+            logger.error("Error testing lfc file existence");
+            throw new ApiException("Error testing file existence", e);
         }
     }
 
@@ -447,8 +447,8 @@ public class DataApiBusiness {
         try {
             return lfcBusiness.listDir(apiContext.getUser(), lfcPath, true);
         } catch (BusinessException e) {
-            logger.error("Error getting lfc file information", e);
-            throw new ApiException("Error getting lfc information");
+            logger.error("Error getting lfc file information");
+            throw new ApiException("Error getting lfc information", e);
         }
     }
 
@@ -458,7 +458,7 @@ public class DataApiBusiness {
             return transferPoolBusiness.downloadFile(apiContext.getUser(), lfcPath);
         } catch (BusinessException e) {
             logger.error("Error downloading lfc file :" + lfcPath);
-            throw new ApiException("Error download LFC file");
+            throw new ApiException("Error download LFC file", e);
         }
     }
 
@@ -467,7 +467,7 @@ public class DataApiBusiness {
             return transferPoolBusiness.uploadFile(apiContext.getUser(), localPath, lfcPath);
         } catch (BusinessException e) {
             logger.error("Error uploading lfc file : " + lfcPath);
-            throw new ApiException("Error uploading a flc fiel");
+            throw new ApiException("Error uploading a lfc file", e);
         }
     }
 
@@ -475,8 +475,8 @@ public class DataApiBusiness {
         try {
             return transferPoolBusiness.getDownloadPoolOperation(operationId);
         } catch (BusinessException e) {
-            logger.error("Error getting download operation", e);
-            throw new ApiException("Error getting download operation");
+            logger.error("Error getting download operation");
+            throw new ApiException("Error getting download operation", e);
         }
     }
 
@@ -484,8 +484,8 @@ public class DataApiBusiness {
         try {
             return lfcBusiness.getModificationDate(apiContext.getUser(), lfcPath);
         } catch (BusinessException e) {
-            logger.error("Error getting lfc file modification date", e);
-            throw new ApiException("Error getting lfc modification");
+            logger.error("Error getting lfc file modification date");
+            throw new ApiException("Error getting lfc modification", e);
         }
     }
 
@@ -493,8 +493,8 @@ public class DataApiBusiness {
         try {
             transferPoolBusiness.delete(apiContext.getUser(), lfcPath);
         } catch (BusinessException e) {
-            logger.error("Error deleting lfc file", e);
-            throw new ApiException("Error deleting lfc file");
+            logger.error("Error deleting lfc file");
+            throw new ApiException("Error deleting lfc file", e);
         }
     }
 
@@ -502,8 +502,8 @@ public class DataApiBusiness {
         try {
             lfcBusiness.createDir(apiContext.getUser(), lfcPath, dirName);
         } catch (BusinessException e) {
-            logger.error("Error creating directory :" + lfcPath, e);
-            throw new ApiException("Error creating LFC directory");
+            logger.error("Error creating directory :" + lfcPath);
+            throw new ApiException("Error creating LFC directory", e);
         }
     }
 

@@ -435,7 +435,7 @@ public class ExecutionBusiness {
                     url += "&filename=" + URLEncoder.encode(filename, "UTF-8");
                 } catch (UnsupportedEncodingException e) {
                     logger.error("Error while encoding filename :" + filename);
-                    logger.error("Do not add it in execution results link");
+                    logger.error("Do not add it in execution results link", e);
                 }
                 URL u = new URL(url); // just to check that it is a well-formed URL
                 urls.add(url);

@@ -64,9 +64,9 @@ public abstract class WorkflowEngineInstantiator {
                 engine = new ShiwaPoolEngine(ShiwaPoolXMPPConnection.getInstance());
 
             } catch (fr.insalyon.creatis.vip.core.server.business.BusinessException ex) {
-                logger.error(ex);
+                logger.error("Error creating a workflow engine", ex);
             } catch (org.jivesoftware.smack.XMPPException ex) {
-                logger.error(ex);
+                logger.error("Error creating a workflow engine", ex);
             }
 
             List<SHIWAProperty> settings = new ArrayList<SHIWAProperty>();

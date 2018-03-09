@@ -44,4 +44,8 @@ public class BusinessException extends Exception {
     public BusinessException(Throwable thrwbl) {
         super(thrwbl);
     }
+
+    public BusinessException(String message, Throwable cause) {
+        super(message, cause);
+    }
 }

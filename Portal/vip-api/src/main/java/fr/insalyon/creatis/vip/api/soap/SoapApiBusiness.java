@@ -87,8 +87,7 @@ public class SoapApiBusiness {
             boolean authenticate) throws ApiException {
 
         try {
-            // set logging properties and DB connection
-            PropertyConfigurator.configure(ConfigurationBusiness.class.getClassLoader().getResource("vipLog4j.properties"));
+            // set DB connection
             PlatformConnection.getInstance();
 
             //set request and response

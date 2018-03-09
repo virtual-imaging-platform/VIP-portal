@@ -82,7 +82,7 @@ public class ApplicationInputData implements ApplicationInputDAO {
         } catch (SQLException ex) {
             if (ex.getMessage().contains("Duplicate entry")) {
                 logger.error("An input named \"" + SimulationInput.getName() + "\" already exists.");
-                throw new DAOException("An input named \"" + SimulationInput.getName() + "\" already exists.");
+                throw new DAOException("An input named \"" + SimulationInput.getName() + "\" already exists.", ex);
             } else {
                 logger.error(ex);
                 throw new DAOException(ex);
@@ -267,7 +267,7 @@ public class ApplicationInputData implements ApplicationInputDAO {
         } catch (SQLException ex) {
             if (ex.getMessage().contains("Duplicate entry")) {
                 logger.error("An input named \"" + simulationInput.getName() + "\" already exists.");
-                throw new DAOException("An input named \"" + simulationInput.getName() + "\" already exists.");
+                throw new DAOException("An input named \"" + simulationInput.getName() + "\" already exists.", ex);
             } else {
                 logger.error(ex);
                 throw new DAOException(ex);

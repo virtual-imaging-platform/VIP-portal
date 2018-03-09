@@ -97,9 +97,9 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
     public User configure(String email, String session) throws CoreException {
 
         try {
-            logger.info("Initializing VIP configuration.");
+            logger.debug("Initializing VIP configuration.");
             configurationBusiness.configure();
-            logger.info("VIP successfully configured.");
+            logger.debug("VIP successfully configured.");
 
             if (configurationBusiness.validateSession(email, session)) {
 

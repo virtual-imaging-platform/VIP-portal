@@ -71,7 +71,7 @@ public abstract class AbstractAuthenticationService extends HttpServlet {
         try {
             processRequest(request, response);
         } catch (BusinessException ex) {
-            logger.error(ex.getMessage());
+            logger.error("Error handling a request", ex);
         }
     }
 
@@ -81,7 +81,7 @@ public abstract class AbstractAuthenticationService extends HttpServlet {
         try {
             processRequest(request, response);
         } catch (BusinessException ex) {
-            logger.error(ex.getMessage());
+            logger.error("Error handling a request", ex);
         }
     }
 
@@ -113,7 +113,7 @@ public abstract class AbstractAuthenticationService extends HttpServlet {
             userDAO.resetNFailedAuthentications(email);
             logger.debug("Reset auth count for " + email);
         } catch (DAOException e) {
-            logger.error("Error resetting failed auth counter for :" + email);
+            logger.error("Error resetting failed auth counter for :" + email, e);
             logger.error("ignoring it");
         }
     }

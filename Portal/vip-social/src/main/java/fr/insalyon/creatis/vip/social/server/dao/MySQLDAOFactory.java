@@ -90,7 +90,7 @@ public class MySQLDAOFactory extends SocialDAOFactory {
                     + "ON DELETE CASCADE ON UPDATE RESTRICT");
 
         } catch (DAOException ex) {
-            logger.error(ex);
+            logger.error("Error creating VIP social databases", ex);
         }
     }
 
