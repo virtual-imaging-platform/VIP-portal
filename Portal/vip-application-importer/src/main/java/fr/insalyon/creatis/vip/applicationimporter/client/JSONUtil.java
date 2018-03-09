@@ -70,6 +70,9 @@ public class JSONUtil {
                 bt.getOutputFiles().add(parseBoutiquesOutputFile(outputJSONArray.get(i).isObject()));
             }
         }
+        
+        bt.setJsonFileContent(jsonObject.toString());
+        
         return bt;
     }
 
