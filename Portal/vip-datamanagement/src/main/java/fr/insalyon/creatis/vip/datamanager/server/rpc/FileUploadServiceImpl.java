@@ -117,7 +117,7 @@ public class FileUploadServiceImpl extends HttpServlet {
                             logger.info("(" + user.getEmail() + ") Uploaded '" + uploadedFile.getAbsolutePath() + "'.");
                         }
                     } catch (Exception ex) {
-                        logger.error(ex);
+                        logger.error("Error uploading a file", ex);
                     }
                 }
 
@@ -137,7 +137,7 @@ public class FileUploadServiceImpl extends HttpServlet {
                 out.flush();
 
             } catch (FileUploadException ex) {
-                logger.error(ex);
+                logger.error("Error uploading a file", ex);
             }
         }
     }

@@ -103,9 +103,11 @@ public class ProxyClient {
                 try {
                     certificate.checkValidity(currentDate.getTime());
                     Date endDate = certificate.getNotAfter();
-                    logger.info("Server proxy still valid until: " + endDate);
+                    logger.debug("Server proxy still valid until: " + endDate);
                     return new Proxy(proxyFileName, endDate);
                 } catch (Exception ex1) {
+                    logger.warn("Proxy server expired, deleting it");
+                    logger.warn("End date :" + certificate.getNotAfter());
                     proxyFile.delete();
                 }
             }
@@ -130,10 +132,10 @@ public class ProxyClient {
                     disconnect();
                 } catch (IOException ioe) {
                     logger.error(ioe);
-                    throw new BusinessException(ioe.getMessage());
+                    throw new BusinessException("Error disconecting proxy client", ioe);
                 }
             }
-            throw new BusinessException(ex.getMessage());
+            throw new BusinessException("Error getting a proxy", ex);
         }
     }
 

@@ -65,7 +65,7 @@ public class ProxyUtil {
             return new String(data, CHARSET_UTF8);
 
         } catch (IOException ex) {
-            logger.error(ex);
+            logger.error("Error reading proxy file" + proxyFileName, ex);
         }
         return null;
     }
