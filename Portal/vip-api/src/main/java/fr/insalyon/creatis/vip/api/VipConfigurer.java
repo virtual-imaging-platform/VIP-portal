@@ -62,8 +62,7 @@ public class VipConfigurer implements ApplicationListener<ContextRefreshedEvent>
 
     @Override
     public void onApplicationEvent(ContextRefreshedEvent event) {
-        logger.info("Init VIP : configure logging and initialize DB");
-        // set logging properties and DB connection
+        logger.info("Init VIP : initialize database");
         try {
             PlatformConnection.getInstance();
         } catch (DAOException e) {
