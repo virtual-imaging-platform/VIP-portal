@@ -55,6 +55,7 @@ public class BoutiquesTool implements IsSerializable {
     private String challengerTeam;
     private List<BoutiquesInput> inputs;
     private List<BoutiquesOutputFile> outputFiles;
+    private String jsonFile;
 
     public BoutiquesTool() {
         inputs = new ArrayList<BoutiquesInput>();
@@ -105,6 +106,14 @@ public class BoutiquesTool implements IsSerializable {
         return outputFiles;
     }
 
+    public String getJsonFile() {
+        return jsonFile;
+    }
+
+    public void setJsonFile(String jsonFile) {
+        this.jsonFile = jsonFile;
+    }
+    
     public void setApplicationLFN(String applicationLFN) {
         this.applicationLFN = applicationLFN;
     }
@@ -124,7 +133,10 @@ public class BoutiquesTool implements IsSerializable {
     public String getGwendiaLFN() {
         return this.applicationLFN + "/workflow/" + getName() + ".gwendia";
     }
-
+ 
+    public String getJsonLFN() {
+        return this.applicationLFN + "/json/" + getName() + ".json";
+    }
     public void setName(String name) {
         this.name = name;
     }

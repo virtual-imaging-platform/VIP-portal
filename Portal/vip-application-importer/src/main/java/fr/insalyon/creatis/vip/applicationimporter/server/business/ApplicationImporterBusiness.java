@@ -140,7 +140,13 @@ public class ApplicationImporterBusiness {
             System.out.print(gwendiaFileName + "\n");
             writeString(gwendiaString, gwendiaFileName);
             uploadFile(gwendiaFileName, bt.getGwendiaLFN());
-
+            
+            // Write application json descriptor
+            String jsonFileName = Server.getInstance().getApplicationImporterFileRepository() + bt.getJsonLFN();
+            System.out.print(jsonFileName + "\n");
+            writeString(bt.getJsonFile(), jsonFileName);
+            uploadFile(jsonFileName, bt.getJsonLFN());
+  
             String wrapperArchiveName;
             // Write files for each GASW and script file
             for (Map.Entry<String, BoutiquesTool> e : btMaps.entrySet()) {
@@ -162,8 +168,8 @@ public class ApplicationImporterBusiness {
 
                 uploadFile(wrapperArchiveName, bt.getWrapperLFN() + ".tar.gz");
             }
-
-            // Register application
+        
+// Register application
             registerApplicationVersion(bt.getName(), bt.getToolVersion(), user.getEmail(), bt.getGwendiaLFN());
 
         } catch (FileNotFoundException ex) {
