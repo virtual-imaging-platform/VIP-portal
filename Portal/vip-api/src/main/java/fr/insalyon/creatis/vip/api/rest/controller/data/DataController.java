@@ -33,21 +33,17 @@ package fr.insalyon.creatis.vip.api.rest.controller.data;
 
 import fr.insalyon.creatis.vip.api.business.*;
 import fr.insalyon.creatis.vip.api.rest.RestApiBusiness;
-import fr.insalyon.creatis.vip.api.rest.controller.processing.ExecutionControler;
 import fr.insalyon.creatis.vip.api.rest.model.*;
-import fr.insalyon.creatis.vip.core.server.business.BusinessException;
-import fr.insalyon.creatis.vip.datamanager.client.bean.Data;
-import fr.insalyon.creatis.vip.datamanager.server.business.LFCBusiness;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.http.*;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.*;
 import java.util.List;
-
-import static org.bouncycastle.asn1.ua.DSTU4145NamedCurves.params;
 
 /**
  * Created by abonnet on 1/13/17.
@@ -68,68 +64,108 @@ public class DataController {
     @Autowired
     private HttpServletRequest httpServletRequest;
 
-    @RequestMapping(params = "uri")
-    public Path getPath(@RequestParam String uri) throws ApiException {
-        // common stuff
-        ApiUtils.methodInvocationLog("getPath", getCurrentUserEmail(), uri);
+    @RequestMapping(path = "/**", params = "action=properties")
+    public PathProperties getPathProperties()
+            throws ApiException {
+        String completePath = extractWildcardPath(httpServletRequest);
+        ApiUtils.methodInvocationLog("getPathProperties", getCurrentUserEmail(), completePath);
         restApiBusiness.getApiContext(httpServletRequest, true);
         // business call
-        return dataApiBusiness.getFileApiPath(uri);
+        return dataApiBusiness.getPathProperties(completePath);
     }
 
-    @RequestMapping(path = "exists", params = "uri")
-    public Boolean doesPathExists(@RequestParam String uri) throws ApiException {
-        // common stuff
-        ApiUtils.methodInvocationLog("doesPathExists", getCurrentUserEmail(), uri);
+    @RequestMapping(path = "/**", params = "action=exists")
+    public ExistsApiResponse doesPathExists() throws ApiException {
+        String completePath = extractWildcardPath(httpServletRequest);
+        ApiUtils.methodInvocationLog("doesPathExists", getCurrentUserEmail(), completePath);
         restApiBusiness.getApiContext(httpServletRequest, true);
         // business call
-        return dataApiBusiness.doesFileExist(uri);
+        return new ExistsApiResponse(dataApiBusiness.doesFileExist(completePath));
     }
 
-    @RequestMapping(method = RequestMethod.DELETE, params = "uri")
-    public void deletePath(@RequestParam String uri) throws ApiException {
-        // common stuff
-        ApiUtils.methodInvocationLog("deletePath", getCurrentUserEmail(), uri);
+    @RequestMapping(path = "/**", params = "action=list")
+    public List<PathProperties> listDirectory() throws ApiException {
+        String completePath = extractWildcardPath(httpServletRequest);
+        ApiUtils.methodInvocationLog("listDirectory", getCurrentUserEmail(), completePath);
         restApiBusiness.getApiContext(httpServletRequest, true);
         // business call
-        dataApiBusiness.deletePath(uri);
+        return dataApiBusiness.listDirectory(completePath);
     }
 
-    @RequestMapping(path="directory", params = "uri")
-    public List<Path> listDirectory(@RequestParam String uri) throws ApiException {
-        // common stuff
-        ApiUtils.methodInvocationLog("listDirectory", getCurrentUserEmail(), uri);
+    @RequestMapping(path = "/**", params = "action=md5")
+    public void getFileMD5() throws ApiException {
+        String completePath = extractWildcardPath(httpServletRequest);
+        ApiUtils.methodInvocationLog("getFileMD5", getCurrentUserEmail(), completePath);
         restApiBusiness.getApiContext(httpServletRequest, true);
         // business call
-        return  dataApiBusiness.listDirectory(uri);
+        // TODO implement that
+        throw new ApiException("Not implemented");
     }
 
+    @RequestMapping(path = "/**", params = "action=content")
+    public ResponseEntity<FileSystemResource> downloadRawFile() throws ApiException {
+        String completePath = extractWildcardPath(httpServletRequest);
+        ApiUtils.methodInvocationLog("downloadFile", getCurrentUserEmail(), completePath);
+        restApiBusiness.getApiContext(httpServletRequest, true);
+        // business call
+        File file = dataApiBusiness.getFile(completePath);
+        FileSystemResource res = new FileSystemResource(file);
+        HttpHeaders headers = new HttpHeaders();
+        // TODO improve mime-type
+        headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+        return new ResponseEntity<>(res, headers, HttpStatus.OK);
+    }
+
+    @RequestMapping(path = "/**", method = RequestMethod.DELETE)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deletePath() throws ApiException {
+        String completePath = extractWildcardPath(httpServletRequest);
+        ApiUtils.methodInvocationLog("deletePath", getCurrentUserEmail(), completePath);
+        restApiBusiness.getApiContext(httpServletRequest, true);
+        // business call
+        dataApiBusiness.deletePath(completePath);
+    }
+
+    /*
     @RequestMapping(path="directory", method = RequestMethod.POST, params="uri")
-    public Path mkdir(@RequestParam String uri) throws ApiException {
+    public PathProperties mkdir(@RequestParam String uri) throws ApiException {
         // common stuff
         ApiUtils.methodInvocationLog("mkdir", getCurrentUserEmail(), uri);
         restApiBusiness.getApiContext(httpServletRequest, true);
         // business call
         return dataApiBusiness.mkdir(uri);
-    }
+    }      */
 
-    @RequestMapping(path="content", params="uri")
-    public String downloadFile(@RequestParam String uri) throws ApiException {
-        // common stuff
-        ApiUtils.methodInvocationLog("downloadFile", getCurrentUserEmail(), uri);
+    @RequestMapping(path = "/**", method = RequestMethod.PUT)
+    @ResponseStatus(HttpStatus.CREATED)
+    public void uploadFile(InputStream requestInputStream) throws ApiException {
+        String completePath = extractWildcardPath(httpServletRequest);
+        ApiUtils.methodInvocationLog("uploadFile", getCurrentUserEmail(), completePath);
         restApiBusiness.getApiContext(httpServletRequest, true);
         // business call
-        return dataApiBusiness.getFileContent(uri);
+        dataApiBusiness.uploadRawFileFromInputStream(completePath, requestInputStream);
+        // TODO : think about returning the PahtProperties of the created Path, to be informed of a filename change
     }
 
-    @RequestMapping(path="content", method = RequestMethod.PUT)
-    public Path uploadPath(@RequestBody UploadData uploadData) throws ApiException {
-        ApiUtils.methodInvocationLog("uploadPath", getCurrentUserEmail(), uploadData.getUri());
+    @RequestMapping(path = "/**", method = RequestMethod.PUT, consumes = "application/carmin+json")
+    @ResponseStatus(HttpStatus.CREATED)
+    public void uploadCustomData(@RequestBody UploadData uploadData) throws ApiException {
+        String completePath = extractWildcardPath(httpServletRequest);
+        ApiUtils.methodInvocationLog("uploadCustomData", getCurrentUserEmail(), completePath);
         restApiBusiness.getApiContext(httpServletRequest, true);
-        return dataApiBusiness.uploadData(uploadData);
+        // business call
+        dataApiBusiness.uploadCustomData(completePath, uploadData);
     }
 
     private String getCurrentUserEmail() {
         return SecurityContextHolder.getContext().getAuthentication().getName();
     }
+
+    private static String extractWildcardPath(HttpServletRequest request) {
+        String prefixToSearch = "/rest/path/"; // TODO : parametize that
+        int index = request.getRequestURI().indexOf(prefixToSearch);
+        // "-1" at the end to keep the beginning slash
+        return request.getRequestURI().substring(index + prefixToSearch.length() - 1);
+    }
 }
+

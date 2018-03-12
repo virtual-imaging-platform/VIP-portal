@@ -38,33 +38,33 @@ import javax.validation.constraints.NotNull;
  */
 public class ErrorCodeAndMessage {
 
-    @NotNull private Integer code;
-    @NotNull private String message;
+    @NotNull private Integer errorCode;
+    @NotNull private String errorMessage;
 
     public ErrorCodeAndMessage() {}
 
-    public ErrorCodeAndMessage(Integer code) {
-        this.code = code;
+    public ErrorCodeAndMessage(Integer errorCode) {
+        this.errorCode = errorCode;
     }
 
-    public ErrorCodeAndMessage(Integer code, String message) {
-        this.code = code;
-        this.message = message;
+    public ErrorCodeAndMessage(Integer errorCode, String errorMessage) {
+        this.errorCode = errorCode;
+        this.errorMessage = errorMessage;
     }
 
-    public Integer getCode() {
-        return code;
+    public Integer getErrorCode() {
+        return errorCode;
     }
 
-    public void setCode(Integer code) {
-        this.code = code;
+    public void setErrorCode(Integer errorCode) {
+        this.errorCode = errorCode;
     }
 
-    public String getMessage() {
-        return message;
+    public String getErrorMessage() {
+        return errorMessage;
     }
 
-    public void setMessage(String message) {
-        this.message = message;
+    public void setErrorMessage(String errorMessage) {
+        this.errorMessage = errorMessage;
     }
 }

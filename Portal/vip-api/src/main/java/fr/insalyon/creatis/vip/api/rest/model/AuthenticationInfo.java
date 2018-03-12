@@ -29,37 +29,29 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL-B license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.api;
+package fr.insalyon.creatis.vip.api.rest.model;
 
 /**
- * Created by abonnet on 7/21/16.
+ * Created by abonnet on 8/21/17.
  */
-public interface CarminProperties {
+public class AuthenticationInfo {
 
-    // TODO : verify they're present on spring init
+    private String httpHeader;
+    private String httpHeaderValue;
 
-    // CARMIN COMMON
-    String PLATFORM_NAME = "carmin.platform.name";
-    String PLATFORM_DESCRIPTION = "carmin.platform.description";
-    String PLATFORM_EMAIL = "carmin.platform.email";
-    String SUPPORTED_TRANSFER_PROTOCOLS = "carmin.platform.supported_transfer_protocols";
-    String SUPPORTED_MODULES = "carmin.platform.supported_modules";
-    String DEFAULT_LIMIT_LIST_EXECUTION = "carmin.platform.default_limit_list_execution";
-    String UNSUPPORTED_METHODS = "carmin.platform.unsupported_methods";
-    String SUPPORTED_API_VERSION = "carmin.platform.supported_API_Version";
-    String PLATFORM_ERROR_CODES_AND_MESSAGES = "carmin.platform.error_codes_and_message";
+    public String getHttpHeader() {
+        return httpHeader;
+    }
 
-    // CARMIN auth
+    public void setHttpHeader(String httpHeader) {
+        this.httpHeader = httpHeader;
+    }
 
-    String APIKEY_HEADER_NAME = "carmin.authentication.apikey.header.name";
-    String APIKEY_GENERATE_NEW_EACH_TIME = "carmin.authentication.apikey.generate_new_key_on_each_authentication";
+    public String getHttpHeaderValue() {
+        return httpHeaderValue;
+    }
 
-    // CARMIN DATA
-
-    String API_DIRECTORY_MIME_TYPE = "carmin.data.mime_type.directory";
-    String API_DEFAULT_MIME_TYPE = "carmin.data.mime_type.default";
-    String API_DOWNLOAD_RETRY_IN_SECONDS = "carmin.data.download.retry";
-    String API_DOWNLOAD_TIMEOUT_IN_SECONDS = "carmin.data.download.timeout";
-    String API_DATA_TRANSFERT_MAX_SIZE = "carmin.data.max_size";
-    String API_DATA_DOWNLOAD_RELATIVE_PATH = "carmin.data.path.download";
+    public void setHttpHeaderValue(String httpHeaderValue) {
+        this.httpHeaderValue = httpHeaderValue;
+    }
 }

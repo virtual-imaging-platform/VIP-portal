@@ -32,7 +32,7 @@
 package fr.insalyon.creatis.vip.api.rest.itest.processing;
 
 import fr.insalyon.creatis.vip.api.bean.Execution;
-import fr.insalyon.creatis.vip.api.data.ExecutionTestUtils;
+import fr.insalyon.creatis.vip.api.data.*;
 import fr.insalyon.creatis.vip.api.rest.RestErrorCodes;
 import fr.insalyon.creatis.vip.api.rest.config.*;
 import fr.insalyon.creatis.vip.application.client.bean.Simulation;
@@ -67,9 +67,9 @@ public class ExecutionControllerIT extends BaseVIPSpringIT {
     public void shouldListExecutions() throws Exception {
         when(workflowBusiness.getSimulations(baseUser1.getFullName(), null, null, null, null, null))
                 .thenReturn(Arrays.asList(simulation1, simulation2));
-        when(workflowBusiness.getSimulation(simulation1.getID()))
+        when(workflowBusiness.getSimulation(simulation1.getID(), true))
                 .thenReturn(simulation1);
-        when(workflowBusiness.getSimulation(simulation2.getID()))
+        when(workflowBusiness.getSimulation(simulation2.getID(), true))
                 .thenReturn(simulation2);
         mockMvc.perform(
                 get("/rest/executions").with(baseUser1()))
@@ -84,8 +84,22 @@ public class ExecutionControllerIT extends BaseVIPSpringIT {
     }
 
     @Test
+    public void shouldCountExecutions() throws Exception {
+        when(workflowBusiness.getSimulations(baseUser1.getFullName(), null, null, null, null, null))
+                .thenReturn(Arrays.asList(simulation1, simulation2));
+        mockMvc.perform(
+                get("/rest/executions/count").with(baseUser1()))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(RestTestUtils.TEXT_CONTENT_TYPE_UTF8))
+                .andExpect(content().string("2"));
+    }
+
+    @Test
     public void shouldGetExecution1() throws Exception {
         when(workflowBusiness.getSimulation(simulation1.getID()))
+                .thenReturn(simulation1);
+        when(workflowBusiness.getSimulation(simulation1.getID(), true))
                 .thenReturn(simulation1);
         when(workflowBusiness.getInputData(simulation1.getID(), baseUser1.getFolder()))
                 .thenReturn(simulation1InData);
@@ -104,6 +118,8 @@ public class ExecutionControllerIT extends BaseVIPSpringIT {
     @Test
     public void shouldGetExecution2() throws Exception {
         when(workflowBusiness.getSimulation(simulation2.getID()))
+                .thenReturn(simulation2);
+        when(workflowBusiness.getSimulation(simulation2.getID(), true))
                 .thenReturn(simulation2);
         when(workflowBusiness.getInputData(simulation2.getID(), baseUser1.getFolder()))
                 .thenReturn(simulation2InData);
@@ -128,7 +144,7 @@ public class ExecutionControllerIT extends BaseVIPSpringIT {
                     .andDo(print())
                     .andExpect(status().isBadRequest())
                     .andExpect(content().contentType(RestTestUtils.JSON_CONTENT_TYPE_UTF8))
-                    .andExpect(jsonPath("$.code").value(RestErrorCodes.API_ERROR.getCode()));
+                    .andExpect(jsonPath("$.errorCode").value(RestErrorCodes.API_ERROR.getCode()));
         }
 
     @Test
@@ -138,8 +154,10 @@ public class ExecutionControllerIT extends BaseVIPSpringIT {
                 ExecutionTestUtils.copyExecutionWithNewName(execution1, newName);
         Simulation modifiedSimulation =
                 ExecutionTestUtils.copySimulationWithNewName(simulation1, newName);
+        when(workflowBusiness.getSimulation(simulation1.getID(), true))
+                .thenReturn(modifiedSimulation).thenThrow(new RuntimeException());
         when(workflowBusiness.getSimulation(simulation1.getID()))
-                .thenReturn(simulation1, modifiedSimulation);
+                .thenReturn(simulation1).thenThrow(new RuntimeException());
         when(workflowBusiness.getInputData(simulation1.getID(), baseUser1.getFolder()))
                 .thenReturn(simulation1InData);
         when(workflowBusiness.getOutputData(simulation1.getID(), baseUser1.getFolder()))
@@ -159,18 +177,6 @@ public class ExecutionControllerIT extends BaseVIPSpringIT {
     }
 
     @Test
-    public void testInitExecutionIsNotImplemented() throws Exception {
-        mockMvc.perform(
-                post("/rest/executions").contentType("application/json")
-                        .content(getResourceAsString("jsonObjects/execution1.json"))
-                        .with(baseUser1()))
-                .andDo(print())
-                .andExpect(status().isBadRequest())
-                .andExpect(content().contentType(RestTestUtils.JSON_CONTENT_TYPE_UTF8))
-                .andExpect(jsonPath("$.code").value(RestErrorCodes.NOT_IMPLEMENTED.getCode()));
-    }
-
-    @Test
     public void testInitExecution() throws Exception {
         // configure pipeline access right
         configureApplications(
@@ -183,7 +189,7 @@ public class ExecutionControllerIT extends BaseVIPSpringIT {
                 eq(version42.getVersion()), eq(class1.getName()), eq(execution1.getName())))
                 .thenReturn(execution1.getIdentifier());
         // configure returne execution
-        when(workflowBusiness.getSimulation(execution1.getIdentifier()))
+        when(workflowBusiness.getSimulation(execution1.getIdentifier(), true))
                 .thenReturn(simulation1);
         when(workflowBusiness.getInputData(simulation1.getID(), baseUser1.getFolder()))
                 .thenReturn(simulation1InData);
@@ -193,7 +199,7 @@ public class ExecutionControllerIT extends BaseVIPSpringIT {
         when(configurationBusiness.getUserGroups(baseUser1.getEmail()))
                 .thenReturn(new HashMap<>());
         mockMvc.perform(
-                post("/rest/executions/create-and-start").contentType("application/json")
+                post("/rest/executions").contentType("application/json")
                         .content(getResourceAsString("jsonObjects/execution1.json"))
                         .with(baseUser1()))
                 .andDo(print())
@@ -218,22 +224,18 @@ public class ExecutionControllerIT extends BaseVIPSpringIT {
                 .thenReturn(simulation2);
         when(workflowBusiness.getOutputData(simulation2.getID(), baseUser1.getFolder()))
                 .thenReturn(simulation2OutData);
-        String operationId = "testOpId";
-        when(transferPoolBusiness.downloadFile(baseUser1, simulation2OutData.get(0).getPath()))
-                .thenReturn(operationId);
+        when(transferPoolBusiness.downloadFile(any(), any()))
+                .thenThrow(new RuntimeException());
         mockMvc.perform(
                 get("/rest/executions/" + simulation2.getID() + "/results").with(baseUser1()))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(RestTestUtils.JSON_CONTENT_TYPE_UTF8))
                 .andExpect(jsonPath("$[*]", hasSize(1)))
-                .andExpect(jsonPath("$[0]",
-                        org.hamcrest.Matchers.containsString("operationid=" + operationId)))
-                .andExpect(jsonPath("$[0]",
-                        org.hamcrest.Matchers.containsString("filename=res"))) // TODO it would be great to parametize that
-                .andExpect(jsonPath("$[0]",
-                        org.hamcrest.Matchers.containsString(
-                                "outputname=" + simulation2OutData.get(0).getProcessor())));
+                .andExpect(jsonPath("$[0]",org.hamcrest.Matchers.endsWith(
+                                CarminAPITestConstants.TEST_DOWNLOAD_PATH
+                                        + simulation2OutData.get(0).getPath()
+                                        + "?action=content")));
     }
 
     @Test
@@ -274,7 +276,7 @@ public class ExecutionControllerIT extends BaseVIPSpringIT {
                 .andDo(print())
                 .andExpect(status().isBadRequest())
                 .andExpect(content().contentType(RestTestUtils.JSON_CONTENT_TYPE_UTF8))
-                .andExpect(jsonPath("$.code").value(RestErrorCodes.NOT_IMPLEMENTED.getCode()));
+                .andExpect(jsonPath("$.errorCode").value(RestErrorCodes.NOT_IMPLEMENTED.getCode()));
     }
 
     @Test
@@ -329,7 +331,7 @@ public class ExecutionControllerIT extends BaseVIPSpringIT {
                 .andDo(print())
                 .andExpect(status().isBadRequest())
                 .andExpect(content().contentType(RestTestUtils.JSON_CONTENT_TYPE_UTF8))
-                .andExpect(jsonPath("$.code").value(40000));
+                .andExpect(jsonPath("$.errorCode").value(40000));
     }
 
     @Test
@@ -341,6 +343,6 @@ public class ExecutionControllerIT extends BaseVIPSpringIT {
                 .andDo(print())
                 .andExpect(status().isInternalServerError())
                 .andExpect(content().contentType(RestTestUtils.JSON_CONTENT_TYPE_UTF8))
-                .andExpect(jsonPath("$.code").value(50000));
+                .andExpect(jsonPath("$.errorCode").value(50000));
     }
 }

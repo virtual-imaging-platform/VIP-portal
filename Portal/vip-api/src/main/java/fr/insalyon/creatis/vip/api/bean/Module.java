@@ -45,6 +45,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 public enum Module {
     PROCESSING("Processing"),
     DATA("Data"),
+    ADVANCED_DATA("AdvancedData"),
     MANAGEMENT("Management"),
     COMMERCIAL("Commercial");
 

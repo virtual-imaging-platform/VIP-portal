@@ -37,6 +37,7 @@ import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.datamanager.client.bean.*;
 import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerException;
 import fr.insalyon.creatis.vip.datamanager.server.DataManagerUtil;
+import fr.insalyon.creatis.vip.datamanager.server.business.LFCPermissionBusiness.LFCAccessType;
 import org.apache.log4j.Logger;
 
 import java.util.*;
@@ -54,12 +55,13 @@ public class LFCPermissionBusiness {
         READ, UPLOAD, DELETE
     }
 
-    public void checkPermission(User user, String lfcPath, LFCAccessType LFCAccessType) throws BusinessException {
-        checkRootPermission(lfcPath, LFCAccessType);
+    public void checkPermission(User user, String path, LFCAccessType LFCAccessType) throws BusinessException {
+        // TODO : verify there is no problem with ".." (normalize if its the case)
+        checkRootPermission(path, LFCAccessType);
         // Root is always filtered so always permited
-        if (lfcPath.equals(ROOT)) return;
+        if (path.equals(ROOT)) return;
         // else it all depends of the first directory
-        String firstDir = getFirstDirectoryName(lfcPath);
+        String firstDir = getFirstDirectoryName(path);
         // always can access its home and its trash
         if (firstDir.equals(USERS_HOME)) return;
         if (firstDir.equals(TRASH_HOME)) return;
@@ -76,40 +78,40 @@ public class LFCPermissionBusiness {
         String groupName = firstDir.substring(0,firstDir.length()-GROUP_APPEND.length());
         checkGroupPermission(user, groupName, LFCAccessType);
         if (LFCAccessType == LFCPermissionBusiness.LFCAccessType.DELETE) {
-            checkAdditionalDeletePermission(user, lfcPath);
+            checkAdditionalDeletePermission(user, path);
         }
         // all check passed : all good !
     }
 
-    private String getFirstDirectoryName(String lfcPath) {
-        lfcPath = lfcPath.substring(ROOT.length() + 1); // remove trailing slash
-        int nextSlashIndex = lfcPath.indexOf('/');
+    private String getFirstDirectoryName(String path) {
+        path = path.substring(ROOT.length() + 1); // remove trailing slash
+        int nextSlashIndex = path.indexOf('/');
         if (nextSlashIndex > 0) {
-            return lfcPath.substring(0, nextSlashIndex);
+            return path.substring(0, nextSlashIndex);
         } else {
-            return lfcPath;
+            return path;
         }
     }
 
-    private void checkRootPermission(String lfcPath, LFCAccessType LFCAccessType) throws BusinessException {
+    private void checkRootPermission(String path, LFCAccessType LFCAccessType) throws BusinessException {
         // verify path begins with the root
-        if (!lfcPath.startsWith(ROOT)) {
-            logger.error("Access to a lfc not starting with the root:" + lfcPath);
+        if (!path.startsWith(ROOT)) {
+            logger.error("Access to a lfc not starting with the root:" + path);
             throw new BusinessException("Unauthorized LFC access");
         }
         // read always possible
         if (LFCAccessType == LFCPermissionBusiness.LFCAccessType.READ) return;
         // else it cannot be THE root nor a direct subdirectory of root
-        if (lfcPath.equals(ROOT) ||
-                lfcPath.lastIndexOf('/') == ROOT.length()) {
-            logger.error("Unexpected lfc access to: " + lfcPath);
+        if (path.equals(ROOT) ||
+                path.lastIndexOf('/') == ROOT.length()) {
+            logger.error("Unexpected lfc access to: " + path);
             throw new BusinessException("Unauthorized LFC access");
         }
     }
 
     private void checkGroupPermission(User user, String groupname, LFCAccessType LFCAccessType) throws BusinessException {
         // beginner cant write/delete in groups folder
-        if (LFCAccessType != LFCAccessType.READ && user.getLevel() == UserLevel.Beginner) {
+        if (LFCAccessType != LFCPermissionBusiness.LFCAccessType.READ && user.getLevel() == UserLevel.Beginner) {
             logger.error("beginner user try to upload/delete in a group:" + user.getEmail() +"/" + groupname);
             throw new BusinessException("Unauthorized LFC access");
         }
@@ -120,15 +122,15 @@ public class LFCPermissionBusiness {
         }
     }
 
-    private void checkAdditionalDeletePermission(User user, String lfcPath) throws BusinessException {
-        checkSynchronizedDirectories(user, lfcPath);
-        if(lfcPath.endsWith("Dropbox")){
-            logger.error("Trying to delete a dropbox directory :" + lfcPath);
+    private void checkAdditionalDeletePermission(User user, String path) throws BusinessException {
+        checkSynchronizedDirectories(user, path);
+        if(path.endsWith("Dropbox")){
+            logger.error("Trying to delete a dropbox directory :" + path);
             throw new BusinessException("Unauthorized LFC access");
         }
     }
 
-    private void checkSynchronizedDirectories(User user, String lfcPath) throws BusinessException {
+    private void checkSynchronizedDirectories(User user, String path) throws BusinessException {
         List<SSH> sshs;
         try {
             sshs = new DataManagerBusiness().getSSHConnections();
@@ -145,14 +147,14 @@ public class LFCPermissionBusiness {
 
         String lfcBaseDir;
         try {
-            lfcBaseDir = DataManagerUtil.parseBaseDir(user, lfcPath);
+            lfcBaseDir = DataManagerUtil.parseBaseDir(user, path);
         } catch (DataManagerException e) {
-            logger.error("Error parsing api path :" + lfcPath);
+            logger.error("Error parsing api path :" + path);
             throw new BusinessException("Internal error in data API");
         }
         for (String s : lfcDirSSHSynchronization) {
             if (lfcBaseDir.startsWith(s)) {
-                logger.error("Try to delete  synchronized file :" + lfcPath);
+                logger.error("Try to delete  synchronized file :" + path);
                 throw new BusinessException("Illegal data API access");
             }
         }

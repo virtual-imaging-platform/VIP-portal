@@ -29,37 +29,44 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL-B license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.api;
+package fr.insalyon.creatis.vip.api.rest.controller;
+
+import fr.insalyon.creatis.vip.api.business.*;
+import fr.insalyon.creatis.vip.api.rest.RestApiBusiness;
+import fr.insalyon.creatis.vip.api.rest.model.*;
+import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletRequest;
 
 /**
- * Created by abonnet on 7/21/16.
+ * Created by abonnet on 8/21/17.
  */
-public interface CarminProperties {
+@RestController
+@RequestMapping("/authenticate")
+public class AuthenticationController {
 
-    // TODO : verify they're present on spring init
+    private static final Logger logger = Logger.getLogger(AuthenticationController.class);
 
-    // CARMIN COMMON
-    String PLATFORM_NAME = "carmin.platform.name";
-    String PLATFORM_DESCRIPTION = "carmin.platform.description";
-    String PLATFORM_EMAIL = "carmin.platform.email";
-    String SUPPORTED_TRANSFER_PROTOCOLS = "carmin.platform.supported_transfer_protocols";
-    String SUPPORTED_MODULES = "carmin.platform.supported_modules";
-    String DEFAULT_LIMIT_LIST_EXECUTION = "carmin.platform.default_limit_list_execution";
-    String UNSUPPORTED_METHODS = "carmin.platform.unsupported_methods";
-    String SUPPORTED_API_VERSION = "carmin.platform.supported_API_Version";
-    String PLATFORM_ERROR_CODES_AND_MESSAGES = "carmin.platform.error_codes_and_message";
+    // although the controller is a singleton, these are proxies that always point on the current request
+    @Autowired
+    HttpServletRequest httpServletRequest;
 
-    // CARMIN auth
+    @Autowired
+    private RestApiBusiness restApiBusiness;
 
-    String APIKEY_HEADER_NAME = "carmin.authentication.apikey.header.name";
-    String APIKEY_GENERATE_NEW_EACH_TIME = "carmin.authentication.apikey.generate_new_key_on_each_authentication";
+    @RequestMapping(method = RequestMethod.POST)
+    public AuthenticationInfo authenticate(
+            @RequestBody AuthenticationCredentials authenticationCredentials) throws ApiException {
+        // common stuff
+        ApiUtils.methodInvocationLog("authenticate", authenticationCredentials.getUsername());
+        // TODO : improve this apiContext stuff. Verify that it is initialized somewhere.
+        // TODO : Do not call it "get" if it does not return anything
+        restApiBusiness.getApiContext(httpServletRequest, false);
+        // TODO verify the presence of credentials
+        // business call
+        return restApiBusiness.authenticate(authenticationCredentials);
+    }
 
-    // CARMIN DATA
-
-    String API_DIRECTORY_MIME_TYPE = "carmin.data.mime_type.directory";
-    String API_DEFAULT_MIME_TYPE = "carmin.data.mime_type.default";
-    String API_DOWNLOAD_RETRY_IN_SECONDS = "carmin.data.download.retry";
-    String API_DOWNLOAD_TIMEOUT_IN_SECONDS = "carmin.data.download.timeout";
-    String API_DATA_TRANSFERT_MAX_SIZE = "carmin.data.max_size";
-    String API_DATA_DOWNLOAD_RELATIVE_PATH = "carmin.data.path.download";
 }

@@ -32,26 +32,35 @@
 package fr.insalyon.creatis.vip.api.rest.model;
 
 /**
- * Created by abonnet on 3/8/17.
+ * Created by abonnet on 11/2/17.
  */
 public class UploadData {
 
-    private String uri;
-    private String pathContent;
+    private String base64Content;
+    private UploadDataType type;
+    private String md5;
 
-    public String getUri() {
-        return uri;
+    public String getBase64Content() {
+        return base64Content;
     }
 
-    public void setUri(String uri) {
-        this.uri = uri;
+    public void setBase64Content(String base64Content) {
+        this.base64Content = base64Content;
     }
 
-    public String getPathContent() {
-        return pathContent;
+    public UploadDataType getType() {
+        return type;
     }
 
-    public void setPathContent(String pathContent) {
-        this.pathContent = pathContent;
+    public void setType(UploadDataType type) {
+        this.type = type;
+    }
+
+    public String getMd5() {
+        return md5;
+    }
+
+    public void setMd5(String md5) {
+        this.md5 = md5;
     }
 }

@@ -46,7 +46,6 @@ public interface CarminAPITestConstants {
     String TEST_PLATFORM_EMAIL = "test@email.tst";
     String TEST_DEFAULT_LIST_LIMIT = "42";
     String TEST_SUPPORTED_API_VERSION = "Version 4.2";
-    String TEST_IS_KILL_SUPPORTED = "false";
 
     /* WARNING : keep following properties consistant */
     SupportedTransferProtocol[] TEST_SUPPORTED_PROTOCOLS = {HTTP, WEBDAV};
@@ -62,10 +61,13 @@ public interface CarminAPITestConstants {
     String TEST_ERROR_CODES_AND_MESSAGE_STRING = "42:Test message,103:Other test message";
     /* End of consistant properties */
 
-    String TEST_API_URI_PREFIX = "test://";
+    String TEST_DOWNLOAD_PATH = "path/test/download";
     String TEST_DEFAULT_MIMETYPE = "application/octet-stream";
     String TEST_DIR_MIMETYPE = "text/directory";
     String TEST_DATA_DOWNLOAD_TIMEOUT = "30";
     String Test_DATA_DOWNLOAD_RETRY = "1";
     String TEST_DATA_MAX_SIZE = "42300";
+
+    String TEST_APIKEY_HEADER = "testapikey";
+    String TEST_GENERATE_NEW_APIKEY_EACH_TIME = "false";
 }

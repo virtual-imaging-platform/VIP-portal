@@ -147,6 +147,11 @@ public class DataManagerUtil {
         if (baseDir.contains(server.getDataManagerUsersHome())) {
             baseDir = baseDir.replace(server.getDataManagerUsersHome() + "/", "");
 
+            // sometimes there's still a leading "/" left
+            while (baseDir.startsWith("/")) {
+                baseDir = baseDir.substring(1);
+            }
+
             int index = baseDir.indexOf("/");
 
             if (index != -1) {
