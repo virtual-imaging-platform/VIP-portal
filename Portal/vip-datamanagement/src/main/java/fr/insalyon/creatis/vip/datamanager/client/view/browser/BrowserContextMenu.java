@@ -78,7 +78,7 @@ public class BrowserContextMenu extends Menu {
                 if (ValidatorUtil.validateRootPath(baseDir, "upload a file in")
                         && ValidatorUtil.validateUserLevel(baseDir, "upload a file to")) {
 
-                    DataUploadWindow window = new DataUploadWindow(modal, baseDir);
+                    DataUploadWindow window = new DataUploadWindow(modal, baseDir, "dataManagerUploadComplete");
                     BrowserLayout.getInstance().setDataUploadWindow(window);
                     window.show();
                 }
