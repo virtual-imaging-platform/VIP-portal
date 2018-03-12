@@ -74,7 +74,7 @@ public abstract class AbstractJobData {
         try {
             connection.close();
         } catch (SQLException ex) {
-            logger.error(ex);
+            logger.error("Error closing connection", ex);
         }
     }
 }

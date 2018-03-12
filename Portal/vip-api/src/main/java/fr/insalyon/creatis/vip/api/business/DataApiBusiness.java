@@ -263,7 +263,7 @@ public class DataApiBusiness {
             lfcPermissionBusiness.checkPermission(apiContext.getUser(), path, accessType);
         } catch (BusinessException e) {
             logger.error("API Permission error");
-            throw new ApiException(e);
+            throw new ApiException("API Permission error", e);
         }
         // all check passed : all good !
         return path;
@@ -284,8 +284,8 @@ public class DataApiBusiness {
         try (OutputStream outputStream = encoder.wrap(baos)) {
             Files.copy(file.toPath(), outputStream);
         } catch (IOException e) {
-            logger.error("Error encoding download file for operation :" + operationId , e);
-            throw new ApiException("Download operation failed");
+            logger.error("Error encoding download file for operation :" + operationId);
+            throw new ApiException("Download operation failed", e);
         }
         return baos.toString();
     }
@@ -330,15 +330,15 @@ public class DataApiBusiness {
         try {
             completionFuture.get(timeoutInSeconds, TimeUnit.SECONDS);
         } catch (InterruptedException e) {
-            logger.error("Waiting for operation completion interrupted :" + operationId, e);
-            throw new ApiException("Waiting for operation completion interrupted");
+            logger.error("Waiting for operation completion interrupted :" + operationId);
+            throw new ApiException("Waiting for operation completion interrupted", e);
         } catch (ExecutionException e) {
-            logger.error("Error waiting for operation completion :" + operationId, e);
-            throw new ApiException("Error waiting for operation completion");
+            logger.error("Error waiting for operation completion :" + operationId);
+            throw new ApiException("Error waiting for operation completion", e);
         } catch (TimeoutException e) {
             completionFuture.cancel(true);
-            logger.error("Timeout operation completion :" + operationId, e);
-            throw new ApiException("Aborting operation : too long");
+            logger.error("Timeout operation completion :" + operationId);
+            throw new ApiException("Aborting operation : too long", e);
         }
     }
 
@@ -378,7 +378,7 @@ public class DataApiBusiness {
             Files.copy(base64InputStream, Paths.get(localFilePath));
         } catch (IOException e) {
             logger.error("Error writing base64 file");
-            throw new ApiException("Error writing base64 file");
+            throw new ApiException("Error writing base64 file", e);
         }
     }
 
@@ -395,10 +395,10 @@ public class DataApiBusiness {
             return isFileEmpty;
         } catch (FileNotFoundException e) {
             logger.error("Error creating new file " + path);   // TODO check exception bubbling
-            throw new ApiException("Upload error");
+            throw new ApiException("Upload error", e);
         } catch (IOException e) {
             logger.error("IO Error storing file " + path);
-            throw new ApiException("Upload error");
+            throw new ApiException("Upload error", e);
         }
     }
 
@@ -499,8 +499,8 @@ public class DataApiBusiness {
         try {
             return lfcBusiness.exists(apiContext.getUser(), path);
         } catch (BusinessException e) {
-            logger.error("Error testing lfc file existence", e);
-            throw new ApiException("Error testing file existence");
+            logger.error("Error testing lfc file existence");
+            throw new ApiException("Error testing file existence", e);
         }
     }
 
@@ -508,8 +508,8 @@ public class DataApiBusiness {
         try {
             return lfcBusiness.listDir(apiContext.getUser(), path, true);
         } catch (BusinessException e) {
-            logger.error("Error getting lfc file information", e);
-            throw new ApiException("Error getting lfc information");
+            logger.error("Error getting lfc file information");
+            throw new ApiException("Error getting lfc information", e);
         }
     }
 
@@ -519,7 +519,7 @@ public class DataApiBusiness {
             return transferPoolBusiness.downloadFile(apiContext.getUser(), path);
         } catch (BusinessException e) {
             logger.error("Error downloading lfc file :" + path);
-            throw new ApiException("Error download LFC file");
+            throw new ApiException("Error download LFC file", e);
         }
     }
 
@@ -528,7 +528,7 @@ public class DataApiBusiness {
             return transferPoolBusiness.uploadFile(apiContext.getUser(), localPath, lfcPath);
         } catch (BusinessException e) {
             logger.error("Error uploading lfc file : " + lfcPath);
-            throw new ApiException("Error uploading a flc fiel");
+            throw new ApiException("Error uploading a lfc file", e);
         }
     }
 
@@ -537,8 +537,8 @@ public class DataApiBusiness {
         try {
             return transferPoolBusiness.getOperationById(operationId, user.getFolder());
         } catch (BusinessException e) {
-            logger.error("Error getting download operation", e);
-            throw new ApiException("Error getting download operation");
+            logger.error("Error getting download operation");
+            throw new ApiException("Error getting download operation", e);
         }
     }
 
@@ -546,8 +546,8 @@ public class DataApiBusiness {
         try {
             return transferPoolBusiness.getDownloadPoolOperation(operationId);
         } catch (BusinessException e) {
-            logger.error("Error getting download operation", e);
-            throw new ApiException("Error getting download operation");
+            logger.error("Error getting download operation");
+            throw new ApiException("Error getting download operation", e);
         }
     }
 
@@ -555,8 +555,8 @@ public class DataApiBusiness {
         try {
             return lfcBusiness.getModificationDate(apiContext.getUser(), path);
         } catch (BusinessException e) {
-            logger.error("Error getting lfc file modification date", e);
-            throw new ApiException("Error getting lfc modification");
+            logger.error("Error getting lfc file modification date");
+            throw new ApiException("Error getting lfc modification", e);
         }
     }
 
@@ -564,8 +564,8 @@ public class DataApiBusiness {
         try {
             transferPoolBusiness.delete(apiContext.getUser(), path);
         } catch (BusinessException e) {
-            logger.error("Error deleting lfc file", e);
-            throw new ApiException("Error deleting lfc file");
+            logger.error("Error deleting lfc file");
+            throw new ApiException("Error deleting lfc file", e);
         }
     }
 
@@ -573,8 +573,8 @@ public class DataApiBusiness {
         try {
             lfcBusiness.createDir(apiContext.getUser(), path, dirName);
         } catch (BusinessException e) {
-            logger.error("Error creating directory :" + path, e);
-            throw new ApiException("Error creating LFC directory");
+            logger.error("Error creating directory :" + path);
+            throw new ApiException("Error creating LFC directory", e);
         }
     }
 

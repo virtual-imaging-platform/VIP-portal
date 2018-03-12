@@ -63,7 +63,7 @@ class MySQLDAOFactory extends SSHDAOFactory {
                     + "FOREIGN KEY (email) REFERENCES VIPUsers(email) "
                     + "ON DELETE CASCADE ON UPDATE CASCADE");
         } catch (DAOException ex) {
-            logger.error(ex);
+            logger.error("Error configuring SSH database", ex);
         }
 
     }

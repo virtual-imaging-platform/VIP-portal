@@ -288,7 +288,7 @@ public class Server {
             config.save();
 
         } catch (ConfigurationException ex) {
-            logger.error(ex);
+            logger.error("Error configuring server", ex);
         }
     }
 

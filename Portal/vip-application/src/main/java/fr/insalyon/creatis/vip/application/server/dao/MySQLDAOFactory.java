@@ -129,7 +129,7 @@ public class MySQLDAOFactory extends ApplicationDAOFactory {
                     + "PRIMARY KEY (application, name)");
 
         } catch (DAOException ex) {
-            logger.error(ex);
+            logger.error("Error initialising database", ex);
         }
     }
 

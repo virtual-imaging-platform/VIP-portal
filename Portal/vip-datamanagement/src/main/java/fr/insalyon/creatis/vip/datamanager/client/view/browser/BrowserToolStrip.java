@@ -123,7 +123,7 @@ public class BrowserToolStrip extends BasicBrowserToolStrip {
                         if (ValidatorUtil.validateRootPath(path, "upload data in")
                         && ValidatorUtil.validateUserLevel(path, "upload data to")) {
 
-                            DataUploadWindow window = new DataUploadWindow(modal, path);
+                            DataUploadWindow window = new DataUploadWindow(modal, path, "dataManagerUploadComplete");
                             BrowserLayout.getInstance().setDataUploadWindow(window);
                             window.show();
                         }

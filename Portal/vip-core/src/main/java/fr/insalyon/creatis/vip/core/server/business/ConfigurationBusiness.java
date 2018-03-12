@@ -80,10 +80,8 @@ public class ConfigurationBusiness {
      */
     public void configure() throws BusinessException {
 
-        PropertyConfigurator.configure(ConfigurationBusiness.class.getClassLoader().getResource("vipLog4j.properties"));
-
         try {
-            logger.info("Configuring VIP server proxy.");
+            logger.debug("Configuring VIP server proxy.");
             ProxyClient myproxy = new ProxyClient();
             myproxy.getProxy();
 

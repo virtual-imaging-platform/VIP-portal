@@ -44,4 +44,8 @@ public class ApiException extends Exception {
     public ApiException(Throwable thrwbl) {
         super(thrwbl);
     }
+
+    public ApiException(String message, Throwable cause) {
+        super(message, cause);
+    }
 }

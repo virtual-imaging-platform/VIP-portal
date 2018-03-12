@@ -99,7 +99,7 @@ public class FileDownloadServiceImpl extends HttpServlet {
                 op.flush();
                 op.close();
             } catch (GRIDAClientException ex) {
-                logger.error(ex);
+                logger.error("Error downloading a file", ex);
             }
         }
     }
