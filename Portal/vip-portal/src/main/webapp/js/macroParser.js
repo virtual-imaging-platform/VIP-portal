@@ -61,7 +61,7 @@ function parseMacFile(macId, parentFolderId) {
             otherFilesArray: []
         };
         var parserArray = [
-           {reg: ".*\\s*mac/(.*\.mac)", val: "macFilesArray"},
+            {reg: ".*\\s*mac/(.*\.mac)", val: "macFilesArray"},
             {reg: ".*\\s*data/(.*)", val: "inputFilesArray"},
             {reg: ".*\\s*output/(.*)", val: "outputFilesArray"},
             {reg: "/gate/random/setEngineSeed\\s*(.*)", val: "engineSeed"},
