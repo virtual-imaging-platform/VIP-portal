@@ -44,21 +44,21 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 public enum ExecutionStatus {
 
     @XmlEnumValue("Initializing")
-    INITIALIZING("initializing"),
+    INITIALIZING("Initializing"),
     @XmlEnumValue("Ready")
-    READY("ready"),
+    READY("Ready"),
     @XmlEnumValue("Running")
-    RUNNING("running"),
+    RUNNING("Running"),
     @XmlEnumValue("Finished")
-    FINISHED("finished"),
+    FINISHED("Finished"),
     @XmlEnumValue("InitializationFailed")
-    INITIALIZATION_FAILED("initialization_failed"),
+    INITIALIZATION_FAILED("InitializationFailed"),
     @XmlEnumValue("ExecutionFailed")
-    EXECUTION_FAILED("execution_failed"),
+    EXECUTION_FAILED("ExecutionFailed"),
     @XmlEnumValue("Unknown")
-    UNKOWN("unknown"),
+    UNKOWN("Unknown"),
     @XmlEnumValue("Killed")
-    KILLED("killed");
+    KILLED("Killed");
 
     private String restLabel;
 

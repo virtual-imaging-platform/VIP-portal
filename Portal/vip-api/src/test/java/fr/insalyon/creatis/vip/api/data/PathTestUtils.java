@@ -31,7 +31,7 @@
  */
 package fr.insalyon.creatis.vip.api.data;
 
-import fr.insalyon.creatis.vip.api.rest.model.Path;
+import fr.insalyon.creatis.vip.api.rest.model.PathProperties;
 import fr.insalyon.creatis.vip.api.tools.spring.JsonCustomObjectMatcher;
 import fr.insalyon.creatis.vip.datamanager.client.bean.Data;
 import fr.insalyon.creatis.vip.datamanager.client.bean.Data.Type;
@@ -39,8 +39,6 @@ import org.hamcrest.Matcher;
 
 import java.util.*;
 import java.util.function.Function;
-
-import static fr.insalyon.creatis.vip.api.data.CarminAPITestConstants.TEST_API_URI_PREFIX;
 
 /**
  * Created by abonnet on 1/23/17.
@@ -63,10 +61,10 @@ public class PathTestUtils {
     public static Data vipRoot, user1Dir, user2Dir, groupTestDir, testDir1;
     public static Data testFile1, testFile2, testFile3, testFile4, testFile5, testFile6;
 
-    public static Path testVipRootPath, testUser1DirPath, testUser2DirPath,
-            testGroupTestDiPath, testDir1Path;
-    public static Path testFile1Path, testFile2Path, testFile3Path,
-            testFile4Path, testFile5Path, testFile6Path;
+    public static PathProperties testVipRootPathProperties, testUser1DirPathProperties, testUser2DirPathProperties,
+            testGroupTestDiPathProperties, testDir1PathProperties;
+    public static PathProperties testFile1PathProperties, testFile2PathProperties, testFile3PathProperties,
+            testFile4PathProperties, testFile5PathProperties, testFile6PathProperties;
 
     static {
         vipRoot = new Data("vip", Type.folder, 3, null, null, null);
@@ -82,18 +80,18 @@ public class PathTestUtils {
         testFile5 = new Data("testFile5.zip", Type.file, 42008, "Jun 15 1999", null, null);
         testFile6 = new Data("testFile6.unknown", Type.file, 42009, "Aug 28 2014", null, null);
 
-        testVipRootPath = getPath(TEST_API_URI_PREFIX, vipRoot, true, null, null, "text/directory");
-        testUser1DirPath = getPath(TEST_API_URI_PREFIX, user1Dir, true, null, null, "text/directory");
-        testUser2DirPath = getPath(TEST_API_URI_PREFIX, user2Dir, true, null, null, "text/directory");
-        testGroupTestDiPath = getPath(TEST_API_URI_PREFIX, groupTestDir, true, null, null, "text/directory");
-        testDir1Path = getPath(TEST_API_URI_PREFIX, testDir1, true, null, null, "text/directory");
+        testVipRootPathProperties = getPath(vipRoot, true, null, null, "text/directory");
+        testUser1DirPathProperties = getPath(user1Dir, true, null, null, "text/directory");
+        testUser2DirPathProperties = getPath(user2Dir, true, null, null, "text/directory");
+        testGroupTestDiPathProperties = getPath(groupTestDir, true, null, null, "text/directory");
+        testDir1PathProperties = getPath(testDir1, true, null, null, "text/directory");
 
-        testFile1Path = getPath(TEST_API_URI_PREFIX, testFile1, false, getTS(4,4,2015), null, "text/xml");
-        testFile2Path = getPath(TEST_API_URI_PREFIX, testFile2, false, getTS(21,12,2016), null, "application/json");
-        testFile3Path = getPath(TEST_API_URI_PREFIX, testFile3, false, getTS(1,1,2001), null, "application/octet-stream");
-        testFile4Path = getPath(TEST_API_URI_PREFIX, testFile4, false, getTS(30,7,2014), null, "application/pdf");
-        testFile5Path = getPath(TEST_API_URI_PREFIX, testFile5, false, getTS(15,6,1999), null, "application/zip");
-        testFile6Path = getPath(TEST_API_URI_PREFIX, testFile6, false, getTS(28,8,2014), null, "application/octet-stream");
+        testFile1PathProperties = getPath(testFile1, false, getTS(4,4,2015), null, "text/xml");
+        testFile2PathProperties = getPath(testFile2, false, getTS(21,12,2016), null, "application/json");
+        testFile3PathProperties = getPath(testFile3, false, getTS(1,1,2001), null, "application/octet-stream");
+        testFile4PathProperties = getPath(testFile4, false, getTS(30,7,2014), null, "application/pdf");
+        testFile5PathProperties = getPath(testFile5, false, getTS(15,6,1999), null, "application/zip");
+        testFile6PathProperties = getPath(testFile6, false, getTS(28,8,2014), null, "application/octet-stream");
 
         pathSuppliers = getPathSuppliers();
     }
@@ -148,54 +146,53 @@ public class PathTestUtils {
         throw new RuntimeException("Wrong test data");
     }
 
-    public static Path getPathWithTS(Path path) {
-        Long modifDate = path.getLastModificationDate();
-        if (path == testVipRootPath) modifDate = getDataModitTS(vipRoot);
-        if (path == testUser1DirPath) modifDate = getDataModitTS(user1Dir);
-        if (path == testUser2DirPath) modifDate = getDataModitTS(user2Dir);
-        if (path == testGroupTestDiPath) modifDate = getDataModitTS(groupTestDir);
-        if (path == testDir1Path) modifDate = getDataModitTS(testDir1);
-        Path newPath = new Path();
-        newPath.setPlatformURI(path.getPlatformURI());
-        newPath.setIsDirectory(path.getIsDirectory());
-        newPath.setLastModificationDate(modifDate);
-        newPath.setExecutionId(path.getExecutionId());
-        newPath.setExists(path.getExists());
-        newPath.setMimeType(path.getMimeType());
-        newPath.setSize(path.getSize());
-        return newPath;
+    public static PathProperties getPathWithTS(PathProperties pathProperties) {
+        Long modifDate = pathProperties.getLastModificationDate();
+        if (pathProperties == testVipRootPathProperties) modifDate = getDataModitTS(vipRoot);
+        if (pathProperties == testUser1DirPathProperties) modifDate = getDataModitTS(user1Dir);
+        if (pathProperties == testUser2DirPathProperties) modifDate = getDataModitTS(user2Dir);
+        if (pathProperties == testGroupTestDiPathProperties) modifDate = getDataModitTS(groupTestDir);
+        if (pathProperties == testDir1PathProperties) modifDate = getDataModitTS(testDir1);
+        PathProperties newPathProperties = new PathProperties();
+        newPathProperties.setPath(pathProperties.getPath());
+        newPathProperties.setIsDirectory(pathProperties.getIsDirectory());
+        newPathProperties.setLastModificationDate(modifDate);
+        newPathProperties.setExecutionId(pathProperties.getExecutionId());
+        newPathProperties.setExists(pathProperties.getExists());
+        newPathProperties.setMimeType(pathProperties.getMimeType());
+        newPathProperties.setSize(pathProperties.getSize());
+        return newPathProperties;
     }
 
-    private static Path getPath(
-            String prefix, Data data, boolean isDirectory,
+    private static PathProperties getPath(Data data, boolean isDirectory,
             Long modificationDate, String executionId, String mimeType) {
-        Path path = new Path();
-        path.setPlatformURI(prefix + getAbsolutePath(data));
-        path.setIsDirectory(isDirectory);
-        path.setLastModificationDate(modificationDate);
-        path.setExecutionId(executionId);
-        path.setExists(true);
-        path.setMimeType(mimeType);
-        path.setSize(data.getLength());
-        return path;
+        PathProperties pathProperties = new PathProperties();
+        pathProperties.setPath(getAbsolutePath(data));
+        pathProperties.setIsDirectory(isDirectory);
+        pathProperties.setLastModificationDate(modificationDate);
+        pathProperties.setExecutionId(executionId);
+        pathProperties.setExists(true);
+        pathProperties.setMimeType(mimeType);
+        pathProperties.setSize(data.getLength());
+        return pathProperties;
     }
 
     private static Map<String,Function> getPathSuppliers() {
         return JsonCustomObjectMatcher.formatSuppliers(
-                Arrays.asList("platformURI", "lastModificationDate", "isDirectory", "exists",
+                Arrays.asList("path", "lastModificationDate", "isDirectory", "exists",
                         "size", "executionId", "mimeType"),
-                Path::getPlatformURI,
-                Path::getLastModificationDate,
-                Path::getIsDirectory,
-                Path::getExists,
-                Path::getSize,
-                Path::getExecutionId,
-                Path::getMimeType);
+                PathProperties::getPath,
+                PathProperties::getLastModificationDate,
+                PathProperties::getIsDirectory,
+                PathProperties::getExists,
+                PathProperties::getSize,
+                PathProperties::getExecutionId,
+                PathProperties::getMimeType);
     }
 
-    public static Matcher<Map<String,?>> jsonCorrespondsToPath(Path path) {
+    public static Matcher<Map<String,?>> jsonCorrespondsToPath(PathProperties pathProperties) {
         Map<Class, Map<String, Function>> suppliersRegistry = new HashMap<>();
-        return JsonCustomObjectMatcher.jsonCorrespondsTo(path, pathSuppliers, suppliersRegistry);
+        return JsonCustomObjectMatcher.jsonCorrespondsTo(pathProperties, pathSuppliers, suppliersRegistry);
     }
 
 }

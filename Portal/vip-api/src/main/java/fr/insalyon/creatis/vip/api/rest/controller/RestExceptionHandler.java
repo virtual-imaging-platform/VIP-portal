@@ -58,7 +58,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(NotImplementedException.class)
     @ResponseBody
     public ErrorCodeAndMessage handleNotImplementedException(NotImplementedException e) {
-        logger.error(e);
+        logger.error("Using a non implemented method", e);
         return new ErrorCodeAndMessage(RestErrorCodes.NOT_IMPLEMENTED.getCode(),
                 RestErrorCodes.NOT_IMPLEMENTED.getMessage());
     }
@@ -67,7 +67,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(ApiException.class)
     @ResponseBody
     public ErrorCodeAndMessage handleApiException(ApiException e) {
-        logger.error("Api Exception catched", e);
+        logger.error("ApiException catched", e);
         return new ErrorCodeAndMessage(RestErrorCodes.API_ERROR.getCode(),
                 RestErrorCodes.API_ERROR.getMessage());
     }

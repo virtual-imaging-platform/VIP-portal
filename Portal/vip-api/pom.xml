@@ -38,7 +38,7 @@ knowledge of the CeCILL-B license and that you accept its terms.
     <parent>
         <groupId>fr.insalyon.creatis</groupId>
         <artifactId>vip</artifactId>
-        <version>1.21</version>
+        <version>1.22</version>
     </parent>
     <groupId>fr.insalyon.creatis</groupId>
     <artifactId>vip-api</artifactId>
@@ -200,6 +200,12 @@ knowledge of the CeCILL-B license and that you accept its terms.
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>4.12</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.github.stefanbirkner</groupId>
+            <artifactId>system-rules</artifactId>
+            <version>1.16.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>

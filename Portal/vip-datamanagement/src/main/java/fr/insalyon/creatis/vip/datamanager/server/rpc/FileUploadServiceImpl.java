@@ -31,10 +31,14 @@
  */
 package fr.insalyon.creatis.vip.datamanager.server.rpc;
 
+import fr.insalyon.creatis.devtools.zip.UnZipper;
+import fr.insalyon.creatis.grida.client.GRIDAClient;
+import fr.insalyon.creatis.grida.client.GRIDAClientException;
 import fr.insalyon.creatis.grida.client.GRIDAPoolClient;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.server.business.CoreUtil;
+import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerException;
 import fr.insalyon.creatis.vip.datamanager.server.DataManagerUtil;
 import java.io.File;
 import java.io.IOException;
@@ -60,13 +64,18 @@ import org.apache.log4j.Logger;
 public class FileUploadServiceImpl extends HttpServlet {
 
     private static Logger logger = Logger.getLogger(FileUploadServiceImpl.class);
+    private GRIDAClient client;
+    private GRIDAPoolClient poolClient;
+    private User user;
+    private String path;
+    private boolean usePool;
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        User user = (User) request.getSession().getAttribute(CoreConstants.SESSION_USER);
-        if (user != null && ServletFileUpload.isMultipartContent(request)) {
+        this.user = (User) request.getSession().getAttribute(CoreConstants.SESSION_USER);
+        if (this.user != null && ServletFileUpload.isMultipartContent(request)) {
 
             FileItemFactory factory = new DiskFileItemFactory();
             ServletFileUpload upload = new ServletFileUpload(factory);
@@ -75,25 +84,44 @@ public class FileUploadServiceImpl extends HttpServlet {
                 Iterator iter = items.iterator();
                 String fileName = null;
                 FileItem fileItem = null;
-                String path = null;
+                this.path = null;
                 String target = "uploadComplete";
+                boolean single = true;
+                boolean unzip = true;
+                this.usePool = true;
                 String operationID = "no-id";
 
                 while (iter.hasNext()) {
                     FileItem item = (FileItem) iter.next();
 
-                    if (item.getFieldName().equals("path")) {
-                        path = item.getString();
-                    } else if (item.getFieldName().equals("file")) {
-                        fileName = item.getName();
-                        fileItem = item;
-                    } else if (item.getFieldName().equals("target")) {
-                        target = item.getString();
+                    switch (item.getFieldName()) {
+                        case "path":
+                            this.path = item.getString();
+                            break;
+                        case "file":
+                            fileName = item.getName();
+                            fileItem = item;
+                            break;
+                        case "target":
+                            target = item.getString();
+                            break;
+                        case "single":
+                            single = Boolean.valueOf(item.getString());
+                            break;
+                        case "unzip":
+                            unzip = Boolean.valueOf(item.getString());
+                            break;
+                        case "pool":
+                            this.usePool = Boolean.valueOf(item.getString());
+                            break;
+                        default:
+                            throw new IllegalArgumentException("Invalid FieldName: " + item.getFieldName());
                     }
+
                 }
                 if (fileName != null && !fileName.equals("")) {
 
-                    boolean local = path.equals("local") ? true : false;
+                    boolean local = this.path.equals("local") ? true : false;
                     String rootDirectory = DataManagerUtil.getUploadRootDirectory(local);
                     fileName = new File(fileName).getName().trim().replaceAll(" ", "_");
                     fileName = Normalizer.normalize(fileName, Normalizer.Form.NFD).replaceAll("\\p{InCombiningDiacriticalMarks}+", "");
@@ -104,23 +132,31 @@ public class FileUploadServiceImpl extends HttpServlet {
                         response.getWriter().write(fileName);
 
                         if (!local) {
-                            // GRIDA Pool Client
+                            // GRIDA Client
                             logger.info("(" + user.getEmail() + ") Uploading '" + uploadedFile.getAbsolutePath() + "' to '" + path + "'.");
-                            GRIDAPoolClient client = CoreUtil.getGRIDAPoolClient();
-                            operationID = client.uploadFile(
-                                    uploadedFile.getAbsolutePath(),
-                                    DataManagerUtil.parseBaseDir(user, path),
-                                    user.getEmail());
+                            if (usePool) {
+                                poolClient = CoreUtil.getGRIDAPoolClient();
+                            } else {
+                                client = CoreUtil.getGRIDAClient();
+                            }
+                            if (single || !unzip) {
+                                operationID = uploadFile(uploadedFile.getAbsolutePath(), path);
+                            } else {
+                                UnZipper.unzip(uploadedFile.getAbsolutePath());
+                                String dir = uploadedFile.getParent();
+                                uploadedFile.delete();
+                                operationID = processDir(dir, path);
+                            }
 
                         } else {
                             operationID = fileName;
                             logger.info("(" + user.getEmail() + ") Uploaded '" + uploadedFile.getAbsolutePath() + "'.");
                         }
                     } catch (Exception ex) {
-                        logger.error(ex);
+                        logger.error("Error uploading a file", ex);
                     }
                 }
-
+                //TODO: change the HTML/JS response to XML data that could be directly processed in JS
                 response.setContentType("text/html");
                 response.setHeader("Pragma", "No-cache");
                 response.setDateHeader("Expires", 0);
@@ -128,7 +164,7 @@ public class FileUploadServiceImpl extends HttpServlet {
                 PrintWriter out = response.getWriter();
                 out.println("<html>");
                 out.println("<body>");
-                out.println("<script type=\"text/javascript\">");
+                out.println("<script type=\"text/javascript\" id=\"runscript\">");
                 out.println("if (parent." + target + ") parent." + target + "('"
                         + operationID + "');");
                 out.println("</script>");
@@ -137,8 +173,43 @@ public class FileUploadServiceImpl extends HttpServlet {
                 out.flush();
 
             } catch (FileUploadException ex) {
-                logger.error(ex);
+                logger.error("Error uploading a file", ex);
             }
+        }
+    }
+
+    private String processDir(String dir, String baseDir)
+            throws GRIDAClientException, DataManagerException {
+
+        StringBuilder ids = new StringBuilder();
+        for (File f : new File(dir).listFiles()) {
+            if (f.isDirectory()) {
+                ids.append(processDir(f.getAbsolutePath(), baseDir + "/" + f.getName()));
+            } else {
+                ids.append(uploadFile(f.getAbsolutePath(), baseDir));
+            }
+            ids.append("##");
+        }
+        return ids.toString();
+    }
+
+    private String uploadFile(String fileName, String dir)
+            throws GRIDAClientException, DataManagerException {
+
+        String parsed = fileName.trim().replaceAll(" ", "_");
+        parsed = Normalizer.normalize(parsed, Normalizer.Form.NFD).replaceAll("\\p{InCombiningDiacriticalMarks}+", "");
+        if (!parsed.equals(fileName)) {
+            new File(fileName).renameTo(new File(parsed));
+            fileName = parsed;
+        }
+
+        logger.info("(" + user.getEmail() + ") Uploading '" + fileName + "' to '" + dir + "'.");
+        if (usePool) {
+            return poolClient.uploadFile(fileName,
+                    DataManagerUtil.parseBaseDir(user, dir), user.getEmail());
+        } else {
+            client.uploadFile(fileName, DataManagerUtil.parseBaseDir(user, dir));
+            return "no-id";
         }
     }
 }

@@ -58,7 +58,7 @@ public class FileUtil {
 
             buffer.close();
         } catch (java.io.IOException ex) {
-            logger.error(ex);
+            logger.error("Error reading file" + file, ex);
         }
 
         return (content.length() == 0) ? null : content.toString();

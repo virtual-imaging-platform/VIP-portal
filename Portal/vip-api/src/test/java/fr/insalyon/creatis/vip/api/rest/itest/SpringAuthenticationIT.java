@@ -58,13 +58,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * Use common vip spring test configuration ({@link BaseVIPSpringIT}
  *
  */
-public class AuthenticationIT extends BaseVIPSpringIT {
+public class SpringAuthenticationIT extends BaseVIPSpringIT {
 
     @Test
     public void authenticationOK() throws Exception {
         prepareUser1Configuration();
         mockMvc.perform(get("/rest/wrongUrl")
-                .with(ApikeyRequestPostProcessor.apikey("apikey", "apikeyvalue")))
+                .with(ApikeyRequestPostProcessor.apikey("testapikey", "apikeyvalue")))
                 .andDo(print())
                 .andExpect(status().isNotFound());
     }
@@ -74,11 +74,11 @@ public class AuthenticationIT extends BaseVIPSpringIT {
         when(userDAO.getUserByApikey("apikeyvalue"))
                 .thenThrow(new RuntimeException("hey hey"));
         mockMvc.perform(get("/rest/wrongUrl")
-                .with(ApikeyRequestPostProcessor.apikey("apikey", "apikeyvalue")))
+                .with(ApikeyRequestPostProcessor.apikey("testapikey", "apikeyvalue")))
                 .andDo(print())
                 .andExpect(status().isUnauthorized())
                 .andExpect(content().contentType(RestTestUtils.JSON_CONTENT_TYPE_UTF8))
-                .andExpect(jsonPath("$.code")
+                .andExpect(jsonPath("$.errorCode")
                         .value(RestErrorCodes.AUTHENTICATION_ERROR.getCode()));
     }
 
@@ -90,7 +90,7 @@ public class AuthenticationIT extends BaseVIPSpringIT {
                 .andDo(print())
                 .andExpect(status().isUnauthorized())
                 .andExpect(content().contentType(RestTestUtils.JSON_CONTENT_TYPE_UTF8))
-                .andExpect(jsonPath("$.code")
+                .andExpect(jsonPath("$.errorCode")
                         .value(RestErrorCodes.INSUFFICIENT_AUTH.getCode()));
     }
 
@@ -98,11 +98,11 @@ public class AuthenticationIT extends BaseVIPSpringIT {
     public void authenticationWithWrongApikey() throws Exception {
         prepareUser1Configuration();
         mockMvc.perform(get("/rest/wrongUrl")
-                .with(ApikeyRequestPostProcessor.apikey("apikey", "WRONG")))
+                .with(ApikeyRequestPostProcessor.apikey("testapikey", "WRONG")))
                 .andDo(print())
                 .andExpect(status().isUnauthorized())
                 .andExpect(content().contentType(RestTestUtils.JSON_CONTENT_TYPE_UTF8))
-                .andExpect(jsonPath("$.code")
+                .andExpect(jsonPath("$.errorCode")
                         .value(RestErrorCodes.BAD_CREDENTIALS.getCode()));
     }
 
@@ -113,7 +113,7 @@ public class AuthenticationIT extends BaseVIPSpringIT {
                 .andDo(print())
                 .andExpect(status().isUnauthorized())
                 .andExpect(content().contentType(RestTestUtils.JSON_CONTENT_TYPE_UTF8))
-                .andExpect(jsonPath("$.code")
+                .andExpect(jsonPath("$.errorCode")
                         .value(RestErrorCodes.INSUFFICIENT_AUTH.getCode()));
     }
 

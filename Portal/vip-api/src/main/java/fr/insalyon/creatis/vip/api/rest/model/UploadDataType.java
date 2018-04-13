@@ -31,72 +31,23 @@
  */
 package fr.insalyon.creatis.vip.api.rest.model;
 
+import com.fasterxml.jackson.annotation.*;
+
 /**
- * Created by abonnet on 1/13/17.
+ * Created by abonnet on 8/5/16.
  */
-public class Path {
+public enum UploadDataType {
 
-    private String platformURI;
-    private Long lastModificationDate;
-    private Boolean isDirectory;
-    private Boolean exists;
-    private Long size;
-    private String executionId;
-    private String mimeType;
+    FILE,
+    ARCHIVE;
 
-    public String getPlatformURI() {
-        return platformURI;
+    @JsonCreator
+    public static UploadDataType forValue(String value) {
+        return UploadDataType.valueOf(value.toUpperCase());
     }
 
-    public void setPlatformURI(String platformURI) {
-        this.platformURI = platformURI;
-    }
-
-    public Long getLastModificationDate() {
-        return lastModificationDate;
-    }
-
-    public void setLastModificationDate(Long lastModificationDate) {
-        this.lastModificationDate = lastModificationDate;
-    }
-
-    public Boolean getIsDirectory() {
-        return isDirectory;
-    }
-
-    public void setIsDirectory(Boolean directory) {
-        isDirectory = directory;
-    }
-
-    public Boolean getExists() {
-        return exists;
-    }
-
-    public void setExists(Boolean exists) {
-        this.exists = exists;
-    }
-
-    public Long getSize() {
-        return size;
-    }
-
-    public void setSize(Long size) {
-        this.size = size;
-    }
-
-    public String getExecutionId() {
-        return executionId;
-    }
-
-    public void setExecutionId(String executionId) {
-        this.executionId = executionId;
-    }
-
-    public String getMimeType() {
-        return mimeType;
-    }
-
-    public void setMimeType(String mimeType) {
-        this.mimeType = mimeType;
+    @JsonValue
+    public String toValue() {
+        return this.name().charAt(0) + this.name().substring(1).toLowerCase();
     }
 }

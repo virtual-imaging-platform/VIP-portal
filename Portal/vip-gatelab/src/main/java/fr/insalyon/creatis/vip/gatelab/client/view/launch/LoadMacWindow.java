@@ -31,9 +31,9 @@
  */
 package fr.insalyon.creatis.vip.gatelab.client.view.launch;
 
+import com.google.gwt.core.client.GWT;
 import com.smartgwt.client.widgets.Window;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
-import fr.insalyon.creatis.vip.datamanager.client.view.common.AppletHTMLPane;
 
 /**
  *
@@ -51,11 +51,11 @@ public class LoadMacWindow extends Window {
         this.setShowModalMask(true);
         this.centerInPage();
         this.setPadding(5);
-
-        this.addItem(new AppletHTMLPane(
-                "DataUpload",
-                "fr.insalyon.creatis.vip.gatelab.applet.loadmac.Main",
-                "vip-gatelab-applet.jar", 550, 280,
-                baseDir, false, false));
+        
+        this.addItem(new LoadMacHTMLPane(
+                "MacUpload", 
+                GWT.getModuleBaseURL() + "/fileuploadservice", 
+                "gateParentFolderID", "macFileID", baseDir, "dataManagerUploadComplete",
+                false, false));
     }
 }

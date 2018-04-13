@@ -141,7 +141,7 @@ public class SSHData implements SSHDAO {
         } catch (SQLException ex) {
             if (ex.getMessage().contains("Duplicate entry")) {
                 logger.error("An ssh connection with this LFC Directory \"" + ssh.getLfcDir() + "\" already exists for user " + ssh.getEmail() + ".");
-                throw new DAOException("An ssh connection with this LFC Directory \"" + ssh.getLfcDir() + "\" already exists for user " + ssh.getEmail() + ".");
+                throw new DAOException("An ssh connection with this LFC Directory \"" + ssh.getLfcDir() + "\" already exists for user " + ssh.getEmail() + ".", ex);
             } else {
                 logger.error(ex);
                 throw new DAOException(ex);

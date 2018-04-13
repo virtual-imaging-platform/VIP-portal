@@ -86,9 +86,9 @@ public class PlatformConnection {
             connection.setAutoCommit(true);
 
         } catch (SQLException ex) {
-            logger.error(ex);
+            logger.error("Error connecting database", ex);
         } catch (NamingException ex) {
-            logger.error(ex);
+            logger.error("Error connecting database", ex);
         }
     }
 
@@ -139,7 +139,7 @@ public class PlatformConnection {
                             CountryCode.fr, 100, null,null,0,false));
 
                 } catch (DAOException ex) {
-                    logger.error(ex);
+                    logger.error("Error creating VIPUserstable", ex);
                 }
             }
 
@@ -154,7 +154,7 @@ public class PlatformConnection {
                     CoreDAOFactory.getDAOFactory().getGroupDAO().add(
                             new Group(CoreConstants.GROUP_SUPPORT, false, true, true));
                 } catch (DAOException ex) {
-                    logger.error(ex);
+                    logger.error("Error creating VIPGroups table", ex);
                 }
             }
 
@@ -227,7 +227,7 @@ public class PlatformConnection {
 
         } catch (SQLException ex) {
             if (!ex.getMessage().contains("already exists")) {
-                logger.error(ex);
+                logger.error("Error creating db table" + name, ex);
             }
             return false;
         }

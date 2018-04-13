@@ -32,9 +32,11 @@
 package fr.insalyon.creatis.vip.api.rest.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import fr.insalyon.creatis.vip.api.CarminProperties;
 import fr.insalyon.creatis.vip.api.rest.security.apikey.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
+import org.springframework.core.env.Environment;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.*;
@@ -58,14 +60,20 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     private ApikeyAuthenticationEntryPoint apikeyAuthenticationEntryPoint;
 
+    @Autowired
+    private Environment env;
+
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
             .authorizeRequests()
                 .antMatchers("/rest/platform").permitAll()
+                .antMatchers("/rest/authenticate").permitAll()
                 .anyRequest().authenticated()
             .and()
-            .apply(new ApikeyAuthentificationConfigurer<>("apikey", apikeyAuthenticationEntryPoint))
+            .apply(new ApikeyAuthentificationConfigurer<>(
+                    env.getProperty(CarminProperties.APIKEY_HEADER_NAME),
+                    apikeyAuthenticationEntryPoint))
             .and()
             .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             .and()

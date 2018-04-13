@@ -76,7 +76,7 @@ public class GroupData implements GroupDAO {
         } catch (SQLException ex) {
             if (ex.getMessage().contains("Duplicate entry")) {
                 logger.error("A group named \"" + group.getName() + "\" already exists.");
-                throw new DAOException("A group named \"" + group.getName() + "\" already exists.");
+                throw new DAOException("A group named \"" + group.getName() + "\" already exists.", ex);
             } else {
                 logger.error(ex);
                 throw new DAOException(ex);

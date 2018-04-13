@@ -37,7 +37,8 @@ import fr.insalyon.creatis.vip.core.server.business.*;
 import fr.insalyon.creatis.vip.core.server.dao.UserDAO;
 import fr.insalyon.creatis.vip.datamanager.server.business.*;
 import org.apache.commons.io.IOUtils;
-import org.junit.Before;
+import org.junit.*;
+import org.junit.contrib.java.lang.system.EnvironmentVariables;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,7 +54,9 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 import java.io.*;
+import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Paths;
 
 import static fr.insalyon.creatis.vip.api.data.CarminAPITestConstants.*;
 import static fr.insalyon.creatis.vip.api.CarminProperties.*;
@@ -85,14 +88,15 @@ import static fr.insalyon.creatis.vip.core.client.view.util.CountryCode.re;
         DEFAULT_LIMIT_LIST_EXECUTION + "=" + TEST_DEFAULT_LIST_LIMIT,
         UNSUPPORTED_METHODS + "=" + TEST_UNSUPPORTED_METHODS_STRING,
         SUPPORTED_API_VERSION + "=" + TEST_SUPPORTED_API_VERSION,
-        IS_KILL_EXECUTION_SUPPORTED + "=" + TEST_IS_KILL_SUPPORTED,
         PLATFORM_ERROR_CODES_AND_MESSAGES + "=" + TEST_ERROR_CODES_AND_MESSAGE_STRING,
-        API_URI_PREFIX + "=" + TEST_API_URI_PREFIX,
         API_DEFAULT_MIME_TYPE + "=" + TEST_DEFAULT_MIMETYPE,
         API_DIRECTORY_MIME_TYPE + "=" + TEST_DIR_MIMETYPE,
         API_DOWNLOAD_TIMEOUT_IN_SECONDS + "=" + TEST_DATA_DOWNLOAD_TIMEOUT,
         API_DOWNLOAD_RETRY_IN_SECONDS + "=" + Test_DATA_DOWNLOAD_RETRY,
-        API_DATA_TRANSFERT_MAX_SIZE + "=" + TEST_DATA_MAX_SIZE
+        API_DATA_TRANSFERT_MAX_SIZE + "=" + TEST_DATA_MAX_SIZE,
+        APIKEY_HEADER_NAME + "=" + TEST_APIKEY_HEADER,
+        APIKEY_GENERATE_NEW_EACH_TIME + "=" + TEST_GENERATE_NEW_APIKEY_EACH_TIME,
+        API_DATA_DOWNLOAD_RELATIVE_PATH + "=" + TEST_DOWNLOAD_PATH
 })
 abstract public class BaseVIPSpringIT {
 
@@ -120,8 +124,17 @@ abstract public class BaseVIPSpringIT {
     @Autowired
     protected LFCPermissionBusiness lfcPermissionBusiness;
 
+    @ClassRule
+    public static final EnvironmentVariables environmentVariables = new EnvironmentVariables();
+
+    @BeforeClass
+    public static void setupEnvVariables() throws URISyntaxException {
+        String fakeHomePath = Paths.get(ClassLoader.getSystemResource("fakeHome").toURI())
+                .toAbsolutePath().toString();
+        environmentVariables.set("HOME", fakeHomePath);
+    }
     @Before
-    public final void setup() {
+    public final void setup() throws URISyntaxException {
         mockMvc = MockMvcBuilders
                 .webAppContextSetup(wac)
                 .defaultRequest(MockMvcRequestBuilders.get("/").servletPath("/rest"))
@@ -133,8 +146,12 @@ abstract public class BaseVIPSpringIT {
     }
 
     protected String getResourceAsString(String pathFromClasspath) throws IOException {
-        Resource resource = resourceLoader.getResource("classpath:"+pathFromClasspath);
+        Resource resource = getResourceFromClasspath(pathFromClasspath);
         return IOUtils.toString(resource.getInputStream(), StandardCharsets.UTF_8);
+    }
+
+    protected Resource getResourceFromClasspath(String pathFromClasspath) {
+        return resourceLoader.getResource("classpath:"+pathFromClasspath);
     }
 
     public WebApplicationContext getWac() {

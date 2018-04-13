@@ -100,9 +100,9 @@ public class ShiwaPoolEngine extends WorkflowEngineInstantiator {
             BundleHelpers.createGwendiaInputBundle(workflowFile, inputFile, bundle.getAbsolutePath(), settings);
             id = service.submit(bundle);
         } catch (org.jivesoftware.smack.XMPPException ex) {
-            logger.error(ex);
+            logger.error("Error launching a workflow", ex);
         } catch (java.io.IOException ex) {
-            logger.error(ex);
+            logger.error("Error launching a workflow", ex);
         }
 
         return id;
@@ -123,7 +123,7 @@ public class ShiwaPoolEngine extends WorkflowEngineInstantiator {
         try {
             service.cancel(id);
         } catch (org.jivesoftware.smack.XMPPException ex) {
-            logger.error(ex);
+            logger.error("Error killing workflow", ex);
         }
 
     }
@@ -140,7 +140,7 @@ public class ShiwaPoolEngine extends WorkflowEngineInstantiator {
 
             workflowStatus = service.getStatus(workflowID);
         } catch (org.jivesoftware.smack.XMPPException ex) {
-            logger.error(ex);
+            logger.error("Error getting simulation status", ex);
         }
 
         PoolStatus poolStatus = PoolStatus.valueOf(workflowStatus);

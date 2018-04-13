@@ -38,7 +38,7 @@ knowledge of the CeCILL-B license and that you accept its terms.
     <parent>
         <groupId>fr.insalyon.creatis</groupId>
         <artifactId>vip</artifactId>
-        <version>1.21</version>
+        <version>1.22</version>
         <relativePath>..</relativePath>
     </parent>
     <groupId>fr.insalyon.creatis</groupId>
@@ -85,13 +85,6 @@ knowledge of the CeCILL-B license and that you accept its terms.
             <artifactId>vip-datamanager</artifactId>
             <version>${vip.datamanager.version}</version>
         </dependency>
-        
-        <dependency>
-            <groupId>fr.insalyon.creatis</groupId>
-            <artifactId>vip-datamanager-applet</artifactId>
-            <version>${vip.datamanager-applet.version}</version>
-            <classifier>jar-with-dependencies</classifier>
-        </dependency>
 
         <dependency>
             <groupId>fr.insalyon.creatis</groupId>
@@ -103,13 +96,6 @@ knowledge of the CeCILL-B license and that you accept its terms.
             <groupId>fr.insalyon.creatis</groupId>
             <artifactId>vip-gatelab</artifactId>
             <version>${vip.gatelab.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>fr.insalyon.creatis</groupId>
-            <artifactId>vip-gatelab-applet</artifactId>
-            <version>${vip.gatelab-applet.version}</version>
-            <classifier>jar-with-dependencies</classifier>
         </dependency>
 
         <dependency>
@@ -192,39 +178,6 @@ knowledge of the CeCILL-B license and that you accept its terms.
                 </configuration>
             </plugin>
             
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <version>2.1</version>
-                <executions>
-                    <execution>
-                        <id>copy</id>
-                        <phase>compile</phase>
-                        <goals>
-                            <goal>copy</goal>
-                        </goals>
-                        <configuration>
-                            <artifactItems>
-                                <artifactItem>
-                                    <groupId>fr.insalyon.creatis</groupId>
-                                    <artifactId>vip-datamanager-applet</artifactId>
-                                    <overWrite>true</overWrite>
-                                    <classifier>jar-with-dependencies</classifier>
-                                    <destFileName>vip-datamanager-applet.jar</destFileName>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>fr.insalyon.creatis</groupId>
-                                    <artifactId>vip-gatelab-applet</artifactId>
-                                    <overWrite>true</overWrite>
-                                    <classifier>jar-with-dependencies</classifier>
-                                    <destFileName>vip-gatelab-applet.jar</destFileName>
-                                </artifactItem>
-                            </artifactItems>
-                            <outputDirectory>${project.build.directory}/${project.artifactId}-${project.version}/applets</outputDirectory>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
         </plugins>
     </build>
 

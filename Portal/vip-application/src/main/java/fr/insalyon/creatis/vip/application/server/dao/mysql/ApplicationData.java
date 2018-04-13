@@ -85,7 +85,7 @@ public class ApplicationData implements ApplicationDAO {
         } catch (SQLException ex) {
             if (ex.getMessage().contains("Duplicate entry")) {
                 logger.error("An application named \"" + application.getName() + "\" already exists.");
-                throw new DAOException("An application named \"" + application.getName() + "\" already exists.");
+                throw new DAOException("An application named \"" + application.getName() + "\" already exists.", ex);
             } else {
                 logger.error(ex);
                 throw new DAOException(ex);
@@ -402,7 +402,7 @@ public class ApplicationData implements ApplicationDAO {
             return applications;
 
         } catch (SQLException ex) {
-            logger.error(ex);
+            logger.error("Error getting applications name " + applicationClass, ex);
         }
         return null;
     }
@@ -429,7 +429,7 @@ public class ApplicationData implements ApplicationDAO {
         } catch (SQLException ex) {
             if (ex.getMessage().contains("Duplicate entry")) {
                 logger.error("An application named \"" + applicationName + "\" is already associated with clas \"" + className + "\".");
-                throw new DAOException("An application named \"" + applicationName + "\" is already associated with clas \"" + className + "\".");
+                throw new DAOException("An application named \"" + applicationName + "\" is already associated with clas \"" + className + "\".", ex);
             } else {
                 logger.error(ex);
                 throw new DAOException(ex);
@@ -531,7 +531,7 @@ public class ApplicationData implements ApplicationDAO {
         } catch (SQLException ex) {
             if (ex.getMessage().contains("Duplicate entry")) {
                 logger.error("A version named \"" + version.getApplicationName() + "\" already exists.");
-                throw new DAOException("A version named \"" + version.getApplicationName() + "\" already exists.");
+                throw new DAOException("A version named \"" + version.getApplicationName() + "\" already exists.", ex);
             } else {
                 logger.error(ex);
                 throw new DAOException(ex);

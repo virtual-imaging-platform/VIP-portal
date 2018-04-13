@@ -31,8 +31,7 @@
  */
 package fr.insalyon.creatis.vip.api.business;
 
-import fr.insalyon.creatis.moteur.plugins.workflowsdb.bean.Workflow;
-import fr.insalyon.creatis.moteur.plugins.workflowsdb.dao.*;
+import fr.insalyon.creatis.vip.api.CarminProperties;
 import fr.insalyon.creatis.vip.api.bean.*;
 import fr.insalyon.creatis.vip.api.bean.pairs.*;
 import fr.insalyon.creatis.vip.application.client.bean.*;
@@ -41,23 +40,21 @@ import fr.insalyon.creatis.vip.application.server.business.*;
 import fr.insalyon.creatis.vip.core.client.bean.*;
 import fr.insalyon.creatis.vip.core.server.business.*;
 import fr.insalyon.creatis.vip.datamanager.server.business.TransferPoolBusiness;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
+import org.springframework.stereotype.Service;
 
 import java.io.UnsupportedEncodingException;
 import java.lang.Object;
 import java.net.*;
 import java.util.*;
 import java.util.Map.Entry;
-import java.util.logging.*;
-
-import static fr.insalyon.creatis.vip.core.client.view.util.CountryCode.pm;
-import static fr.insalyon.creatis.vip.core.client.view.util.CountryCode.re;
-
-import static jdk.nashorn.internal.objects.NativeArray.lastIndexOf;
 
 /**
  *
  * @author Tristan Glatard
  */
+@Service
 public class ExecutionBusiness {
 
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(ExecutionBusiness.class);
@@ -70,6 +67,8 @@ public class ExecutionBusiness {
     private final ApplicationBusiness applicationBusiness;
     private final TransferPoolBusiness transferPoolBusiness;
 
+    @Autowired
+    private Environment env; // only use in a Spring context (aka from REST api, not SOAP)
 
     public ExecutionBusiness(ApiContext apiContext) {
         WorkflowBusiness workflowBusiness = new WorkflowBusiness();
@@ -83,6 +82,7 @@ public class ExecutionBusiness {
         this.pipelineBusiness = new PipelineBusiness(apiContext, workflowBusiness, applicationBusiness, new ClassBusiness());
     }
 
+    @Autowired
     public ExecutionBusiness(ApiContext apiContext,
                              SimulationBusiness simulationBusiness,
                              WorkflowBusiness workflowBusiness,
@@ -207,6 +207,31 @@ public class ExecutionBusiness {
             logger.info("Returning " + executions.size() + " executions");
             Execution[] array_executions = new Execution[executions.size()];
             return executions.toArray(array_executions);
+        } catch (BusinessException ex) {
+            throw new ApiException(ex);
+        }
+    }
+
+    public int countExecutions() throws ApiException {
+        try {
+
+            List<Simulation> simulations = workflowBusiness.getSimulations(
+                    apiContext.getUser().getFullName(),
+                    null, // application
+                    null, // status
+                    null, // class
+                    null, // startDate
+                    null // endDate
+            );
+            logger.info("Counting executions, found "+simulations.size()+" simulations.");
+            int count = 0;
+            for (Simulation s : simulations) {
+                if (!(s == null) && !(s.getStatus() == SimulationStatus.Cleaned)) {
+                    count++;
+                }
+            }
+            logger.info("After removing null and cleaned, found "+count);
+            return count;
         } catch (BusinessException ex) {
             throw new ApiException(ex);
         }
@@ -386,64 +411,72 @@ public class ExecutionBusiness {
         }
     }
 
-    public String[] getExecutionResults(String executionId, String protocol) throws ApiException {
-        return getExecutionResults(executionId, protocol, false);
+    public String[] getSoapExecutionResultsURLs(String executionId, String protocol) throws ApiException {
+        return getExecutionResultsURLs(executionId, protocol, false);
     }
 
-    public String[] getExecutionResults(String executionId, String protocol, boolean baseUrlOnHost) throws ApiException {
+    public String[] getRestExecutionResultsURLs(String executionId, String protocol) throws ApiException {
+        return getExecutionResultsURLs(executionId, protocol, true);
+    }
+
+    private String[] getExecutionResultsURLs(String executionId, String protocol, boolean generateRestUrl) throws ApiException {
+        if (protocol == null) {
+            protocol = "https";
+        }
+
+        if (!protocol.equals("https") && !protocol.equals("http")) {
+            throw new ApiException("Unsupported protocol: " + protocol);
+        }
+
+        ArrayList<String> urls = new ArrayList<>();
+
+        List<InOutData> outputs = null;
         try {
-            if (protocol == null) {
-                protocol = "https";
+            outputs = workflowBusiness.getOutputData(executionId, apiContext.getUser().getFolder());
+        } catch (BusinessException e) {
+            throw new ApiException(e);
+        }
+        for (InOutData output : outputs) {
+            if (generateRestUrl) {
+                urls.add(getRestExecutionResultUrl(output));
+            } else {
+                urls.add(getSoapExecutionResultURL(output));
             }
+        }
 
-            if (!protocol.equals("https") && !protocol.equals("http")) {
-                throw new ApiException("Unsupported protocol: " + protocol);
-            }
+        String[] array_urls = new String[urls.size()];
+        return urls.toArray(array_urls);
+    }
 
-            ArrayList<String> urls = new ArrayList<>();
+    private String getRestExecutionResultUrl(InOutData output) throws ApiException {
+        // search for the "/rest/" keyword determine the instance path
+        String requestUrl = apiContext.getRequest().getRequestURL().toString();
+        Integer restStringIndex = requestUrl.indexOf("/rest/");
+        if (restStringIndex < 0) {
+            logger.error("Results URL called from unknown URL : " + requestUrl);
+            throw new ApiException("Results URL called from unknown URL");
+        }
+        String baseUrl = requestUrl.substring(0, restStringIndex + 5); // "http(s)://host[/...]/rest
+        String filePath = output.getPath();
+        return baseUrl
+                + env.getRequiredProperty(CarminProperties.API_DATA_DOWNLOAD_RELATIVE_PATH)
+                + filePath + "?action=content"; // TODO ; parametize the end
+    }
 
-            List<InOutData> outputs = workflowBusiness.getOutputData(executionId, apiContext.getUser().getFolder());
-            for (InOutData output : outputs) {
-
-                String operationId = transferPoolBusiness.downloadFile(apiContext.getUser(), output.getPath());
-
-                String url;
-                if (baseUrlOnHost) {
-                    // if only the host is used, remove what follow the first slash
-                    // (excluding the slash from the protocol)
-                    String requestUrl = apiContext.getRequest().getRequestURL().toString();
-                    if (requestUrl.startsWith("http://")) {
-                        requestUrl = requestUrl.substring(0, requestUrl.indexOf('/', 7));
-                    } else if (requestUrl.startsWith("https://")) {
-                        requestUrl = requestUrl.substring(0, requestUrl.indexOf('/', 8));
-                    } else {
-                        requestUrl = requestUrl.substring(0, requestUrl.indexOf('/'));
-                    }
-                    url = requestUrl
-                            + "/fr.insalyon.creatis.vip.portal.Main/filedownloadservice?operationid="
-                            + operationId;
-                } else {
-                    url = apiContext.getRequest().getRequestURL()
-                            + "/../fr.insalyon.creatis.vip.portal.Main/filedownloadservice?operationid="
-                            + operationId;
-                }
-                // add filename and parameter name to URL
-                String filename = extractFileNameFromOutput(output);
-                logger.debug("adding filename to url :" + filename);
-                try {
-                    url += "&outputname=" + URLEncoder.encode(output.getProcessor(), "UTF-8");
-                    url += "&filename=" + URLEncoder.encode(filename, "UTF-8");
-                } catch (UnsupportedEncodingException e) {
-                    logger.error("Error while encoding filename :" + filename);
-                    logger.error("Do not add it in execution results link");
-                }
-                URL u = new URL(url); // just to check that it is a well-formed URL
-                urls.add(url);
-            }
-
-            String[] array_urls = new String[urls.size()];
-            return urls.toArray(array_urls);
-        } catch (BusinessException | MalformedURLException ex) {
+    private String getSoapExecutionResultURL(InOutData output) throws ApiException {
+        try {
+            String operationId = transferPoolBusiness.downloadFile(apiContext.getUser(), output.getPath());
+            String url = apiContext.getRequest().getRequestURL()
+                    + "/../fr.insalyon.creatis.vip.portal.Main/filedownloadservice?operationid="
+                    + operationId;
+            // add filename and parameter name to URL
+            String filename = extractFileNameFromOutput(output);
+            logger.debug("adding filename to url :" + filename);
+            url += "&outputname=" + URLEncoder.encode(output.getProcessor(), "UTF-8");
+            url += "&filename=" + URLEncoder.encode(filename, "UTF-8");
+            new URL(url); // just to check that it is a well-formed URL
+            return url;
+        } catch (BusinessException | MalformedURLException | UnsupportedEncodingException ex) {
             throw new ApiException(ex);
         }
     }

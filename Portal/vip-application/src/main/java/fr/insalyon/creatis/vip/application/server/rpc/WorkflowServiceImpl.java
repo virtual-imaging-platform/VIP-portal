@@ -595,7 +595,7 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
             return sb.toString();
 
         } catch (IOException ex) {
-            logger.error(ex);
+            logger.error("Error getting workflow file" + fileName, ex);
         }
         return null;
     }

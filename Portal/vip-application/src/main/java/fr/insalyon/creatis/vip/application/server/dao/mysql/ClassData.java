@@ -311,7 +311,7 @@ public class ClassData implements ClassDAO {
             } catch (SQLException ex) {
                 if (ex.getMessage().contains("Duplicate entry")) {
                     logger.error("a "+objectType+" named \"" + name + "\" is already associated with the class.");
-                    throw new DAOException("a "+objectType+" named \"" + name + "\" is already associated with the class.");
+                    throw new DAOException("a "+objectType+" named \"" + name + "\" is already associated with the class.", ex);
                 } else {
                     logger.error(ex);
                     throw new DAOException(ex);
@@ -349,7 +349,7 @@ public class ClassData implements ClassDAO {
 
         } catch (SQLException ex) {
             logger.error(ex);
-            throw new DAOException(ex.getMessage());
+            throw new DAOException(ex);
         }
     }
 }

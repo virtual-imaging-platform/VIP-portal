@@ -264,7 +264,7 @@ public class Carmin {
             ApiContext apiContext = new SoapApiBusiness().getApiContext(wsContext, true);
             ExecutionBusiness eb = new ExecutionBusiness(apiContext);
             eb.checkIfUserCanAccessExecution(executionId);
-            String[] results = eb.getExecutionResults(executionId, protocol);
+            String[] results = eb.getSoapExecutionResultsURLs(executionId, protocol);
             r = new Response(0, ApiUtils.getMessage(apiContext), results);
         } catch (ApiException ex) {
             logger.error(ex);

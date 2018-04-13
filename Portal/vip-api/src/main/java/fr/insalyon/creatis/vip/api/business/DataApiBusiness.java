@@ -32,14 +32,11 @@
 package fr.insalyon.creatis.vip.api.business;
 
 import fr.insalyon.creatis.vip.api.CarminProperties;
-import fr.insalyon.creatis.vip.api.rest.model.Path;
 import fr.insalyon.creatis.vip.api.rest.model.*;
 import fr.insalyon.creatis.vip.core.client.bean.*;
-import fr.insalyon.creatis.vip.core.client.view.user.UserLevel;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.datamanager.client.bean.*;
 import fr.insalyon.creatis.vip.datamanager.client.bean.Data.Type;
-import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerException;
 import fr.insalyon.creatis.vip.datamanager.server.DataManagerUtil;
 import fr.insalyon.creatis.vip.datamanager.server.business.*;
 import fr.insalyon.creatis.vip.datamanager.server.business.LFCPermissionBusiness.LFCAccessType;
@@ -81,8 +78,6 @@ public class DataApiBusiness {
     @Autowired
     private TransferPoolBusiness transferPoolBusiness;
     @Autowired
-    private DataManagerBusiness dataManagerBusiness;
-    @Autowired
     private LFCPermissionBusiness lfcPermissionBusiness;
 
     private ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(2);
@@ -90,196 +85,273 @@ public class DataApiBusiness {
     public DataApiBusiness() {
     }
 
-    public boolean doesFileExist(String apiUri) throws ApiException {
-        String lfcPath = checkReadPermission(apiUri);
-        return lfcPath.equals(ROOT) || baseDoesFileExist(lfcPath);
+    public boolean doesFileExist(String path) throws ApiException {
+        checkReadPermission(path);
+        return path.equals(ROOT) || baseDoesFileExist(path);
     }
 
-    public void deletePath(String apiUri) throws ApiException {
-        String lfcPath = checkPermission(apiUri, LFCAccessType.DELETE);
-        if (!baseDoesFileExist(lfcPath)) {
-            logger.error("trying to delete a non-existing file : " + apiUri);
+    public void deletePath(String path) throws ApiException {
+        checkPermission(path, LFCAccessType.DELETE);
+        if (!baseDoesFileExist(path)) {
+            logger.error("trying to delete a non-existing file : " + path);
             throw new ApiException("trying to delete a non-existing dile");
         }
-        baseDeletePath(lfcPath);
+        baseDeletePath(path);
     }
 
-    public Path getFileApiPath(String apiUri) throws ApiException {
-        String lfcPath = checkReadPermission(apiUri);
-        if (lfcPath.equals(ROOT)) {
-            return getRootPath();
+    public PathProperties getPathProperties(String path) throws ApiException {
+        checkReadPermission(path);
+        if (path.equals(ROOT)) {
+            return getRootPathProperties();
         }
-        Path path = new Path();
-        path.setPlatformURI(apiUri);
-        if (!baseDoesFileExist(lfcPath)) {
-            path.setExists(false);
-            return path;
+        PathProperties pathProperties = new PathProperties();
+        pathProperties.setPath(path);
+        if (!baseDoesFileExist(path)) {
+            pathProperties.setExists(false);
+            return pathProperties;
         }
-        path.setExists(true);
-        List<Data> fileData = baseGetFileData(lfcPath);
+        pathProperties.setExists(true);
+        List<Data> fileData = baseGetFileData(path);
         if (doesLFCDataCorrespondToAFile(fileData)) {
             // this is a file, not a directory
             Data fileInfo = fileData.get(0);
-            path.setIsDirectory(false);
-            path.setSize(fileInfo.getLength());
-            path.setLastModificationDate(
-                    getTimeStampFromGridaDateFormat(fileInfo.getModificationDate()));
-            path.setMimeType(getMimeType(lfcPath));
+            pathProperties.setIsDirectory(false);
+            pathProperties.setSize(fileInfo.getLength());
+            pathProperties.setLastModificationDate(
+                    getTimeStampFromGridaFormatDate(fileInfo.getModificationDate()));
+            pathProperties.setMimeType(getMimeType(path));
         } else {
             // its a directory
-            path.setIsDirectory(true);
-            path.setSize(Long.valueOf(fileData.size()));
-            path.setLastModificationDate(baseGetFileModificationDate(lfcPath) / 1000);
-            path.setMimeType(env.getProperty(CarminProperties.API_DIRECTORY_MIME_TYPE));
+            pathProperties.setIsDirectory(true);
+            pathProperties.setSize(Long.valueOf(fileData.size()));
+            pathProperties.setLastModificationDate(baseGetFileModificationDate(path) / 1000);
+            pathProperties.setMimeType(env.getProperty(CarminProperties.API_DIRECTORY_MIME_TYPE));
         }
-        return path;
+        return pathProperties;
     }
 
-    public List<Path> listDirectory(String apiUri) throws ApiException {
-        String lfcPath = checkReadPermission(apiUri);
-        if (lfcPath.equals(ROOT)) {
-            return getRootDirectories();
+    public List<PathProperties> listDirectory(String path) throws ApiException {
+        checkReadPermission(path);
+        if (path.equals(ROOT)) {
+            return getRootSubDirectoriesPathProps();
         }
-        List<Data> directoryData = baseGetFileData(lfcPath);
-        if (directoryData.size() == 1 && directoryData.get(0).getName().startsWith("/")) {
-            logger.error("Trying to list a directory, but is a file :" + apiUri);
+        List<Data> directoryData = baseGetFileData(path);
+        if (doesLFCDataCorrespondToAFile(directoryData)) {
+            logger.error("Trying to list a directory, but is a file :" + path);
             throw new ApiException("Error listing a directory");
         }
-        List<Path> res = new ArrayList<>();
+        List<PathProperties> res = new ArrayList<>();
         for (Data fileData : directoryData) {
-            res.add(buildPathFromLfcData(apiUri, fileData));
+            res.add(buildPathFromLfcData(path, fileData));
         }
         return res;
     }
 
-    public String getFileContent(String apiUri) throws ApiException {
-        String lfcPath = checkReadPermission(apiUri);
-        if (lfcPath.equals(ROOT)) {
+    public File getFile(String path) throws ApiException {
+        checkDownloadPermission(path);
+        String downloadOperationId = downloadFileToLocalStorage(path);
+        return getDownloadFile(downloadOperationId);
+    }
+
+    public void uploadRawFileFromInputStream(String lfcPath, InputStream is) throws ApiException {
+        // TODO : check upload size ?
+        checkPermission(lfcPath, LFCAccessType.UPLOAD);
+        java.nio.file.Path javaPath = Paths.get(lfcPath);
+        String parentLfcPath = javaPath.getParent().toString();
+        // check if parent dir exists
+        if (!baseDoesFileExist(parentLfcPath)) {
+            logger.error("parent directory of upload does not exist :" + lfcPath);
+            throw new ApiException("Upload Directory doest not exist");
+        }
+        // TODO : check if it already exists
+        // TODO : support archive upload
+        String uploadDirectory = DataManagerUtil.getUploadRootDirectory(false);
+        // TODO : normalize file name to avoid weird characters
+        String fileName = Paths.get(lfcPath).getFileName().toString();
+        String localPath = uploadDirectory + fileName;
+        logger.debug("storing upload file in :" + localPath);
+        boolean isFileEmpty = saveInputStreamToFile(is, localPath);
+        if (isFileEmpty) {
+            logger.info("no content in upload, creating dir : " + lfcPath);
+            baseMkdir(parentLfcPath, fileName);
+        } else {
+            String opId = baseUploadFile(localPath, parentLfcPath);
+            // wait for it to be over
+            waitForOperationOrTimeout(opId);
+        }
+    }
+
+    public void uploadCustomData(String lfcPath, UploadData uploadData) throws ApiException {
+        // TODO : check upload size ?
+        // TODO : factorize with previous method
+        checkPermission(lfcPath, LFCAccessType.UPLOAD);
+        java.nio.file.Path javaPath = Paths.get(lfcPath);
+        String parentLfcPath = javaPath.getParent().toString();
+        // check if parent dir exists
+        if (!baseDoesFileExist(parentLfcPath)) {
+            logger.error("parent directory of upload does not exist :" + lfcPath);
+            throw new ApiException("Upload Directory doest not exist");
+        }
+        if (uploadData.getType().equals(UploadDataType.ARCHIVE)) {
+            logger.error("archive upload not supported yet");
+            throw new ApiException("archive upload not supported yet");
+        }
+        // TODO : check if it already exists
+        // TODO : support archive upload
+        String uploadDirectory = DataManagerUtil.getUploadRootDirectory(false);
+        // TODO : normalize file name to avoid weird characters
+        String fileName = Paths.get(lfcPath).getFileName().toString();
+        String localPath = uploadDirectory + fileName;
+        logger.debug("storing upload file in :" + localPath);
+        writeFileFromBase64(uploadData.getBase64Content(), localPath);
+        String opId = baseUploadFile(localPath, parentLfcPath);
+        // wait for it to be over
+        waitForOperationOrTimeout(opId);
+    }
+
+    public PathProperties mkdir(String path) throws ApiException {
+        checkPermission(path, LFCAccessType.UPLOAD);
+        java.nio.file.Path javaPath = Paths.get(path);
+        String parentLfcPath = javaPath.getParent().toString();
+
+        // check if parent dir exists
+        if (!baseDoesFileExist(parentLfcPath)) {
+            logger.error("parent directory of upload does not exist :" + path);
+            throw new ApiException("Upload Directory doest not exist");
+        }
+        if (baseDoesFileExist(path)) {
+            logger.error("Trying do create an existing directory :" + path);
+            throw new ApiException("Upload error");
+        }
+        baseMkdir(parentLfcPath, javaPath.getFileName().toString());
+        PathProperties newPathProperties = new PathProperties();
+        newPathProperties.setPath(path);
+        newPathProperties.setIsDirectory(true);
+        newPathProperties.setMimeType(env.getProperty(CarminProperties.API_DIRECTORY_MIME_TYPE));
+        newPathProperties.setSize(0L);
+        newPathProperties.setExists(true);
+        return newPathProperties;
+    }
+
+    // #### PERMISSION STUFF
+
+    private String checkReadPermission(String path) throws ApiException {
+        return checkPermission(path, LFCAccessType.READ);
+    }
+
+    private void checkDownloadPermission(String path) throws ApiException {
+        checkReadPermission(path);
+        if (path.equals(ROOT)) {
             logger.error("cannot download root");
             throw new ApiException("Illegal data API access");
         }
-        List<Data> fileData = baseGetFileData(lfcPath);
+        List<Data> fileData = baseGetFileData(path);
         if (!doesLFCDataCorrespondToAFile(fileData)) {
             // it works on a directory and return a zip, but we cant check the download size
-            logger.error("Trying to download a directory : " + lfcPath);
+            logger.error("Trying to download a directory : " + path);
             throw new ApiException("Illegal data API access");
         }
         Long maxSize = env.getProperty(CarminProperties.API_DATA_TRANSFERT_MAX_SIZE, Long.class);
         if (fileData.get(0).getLength() > maxSize) {
-            logger.error("Trying to download a file too big : " + lfcPath);
+            logger.error("Trying to download a file too big : " + path);
             throw new ApiException("Illegal data API access");
         }
-        String downloadOperationId = baseDownloadFile(lfcPath);
-        Callable<Boolean> isDownloadOverCall = () -> isDownloadOver(downloadOperationId);
+    }
 
-        Integer retryDelay =
-                env.getProperty(CarminProperties.API_DOWNLOAD_RETRY_IN_SECONDS, Integer.class);
+    private String checkPermission(String path, LFCAccessType accessType) throws ApiException {
+        try {
+            lfcPermissionBusiness.checkPermission(apiContext.getUser(), path, accessType);
+        } catch (BusinessException e) {
+            logger.error("API Permission error");
+            throw new ApiException("API Permission error", e);
+        }
+        // all check passed : all good !
+        return path;
+    }
+
+    // #### DOWNLOAD STUFF
+
+    private String downloadFileToLocalStorage(String path) throws ApiException {
+        String downloadOperationId = baseDownloadFile(path);
+        waitForOperationOrTimeout(downloadOperationId);
+        return downloadOperationId;
+    }
+
+    private String getDownloadContentInBase64(String operationId) throws ApiException {
+        File file = getDownloadFile(operationId);
+        Base64.Encoder encoder = Base64.getEncoder();
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        try (OutputStream outputStream = encoder.wrap(baos)) {
+            Files.copy(file.toPath(), outputStream);
+        } catch (IOException e) {
+            logger.error("Error encoding download file for operation :" + operationId);
+            throw new ApiException("Download operation failed", e);
+        }
+        return baos.toString();
+    }
+
+    private File getDownloadFile(String operationId) throws ApiException {
+        PoolOperation operation = baseGetDownloadOperation(operationId);
+        File file = new File(operation.getDest());
+        if (file.isDirectory()) {
+            file = new File(operation.getDest() + "/"
+                    + FilenameUtils.getName(operation.getSource()));
+        }
+        return file;
+    }
+
+    // #### Operation stuff
+
+    private void waitForOperationOrTimeout(String operationId) throws ApiException {
+        // get user before launching thread : apiContext is not available from threads
+        User user = apiContext.getUser();
+        Callable<Boolean> isDownloadOverCall = () -> isOperationOver(operationId, user);
+
+        // task that check every x seconds if the operation is over.
+        // return true when OK or goes on indefinitly
         Callable<Boolean> waitForDownloadCall = () -> {
             while (true) {
                 Future<Boolean> isDownloadOverFuture =
-                        scheduler.schedule(isDownloadOverCall, retryDelay, TimeUnit.SECONDS);
+                        scheduler.schedule(isDownloadOverCall, getRetryDelay(), TimeUnit.SECONDS);
                 if (isDownloadOverFuture.get()) {
                     return true;
                 }
             }
         };
-        Future<Boolean> waitForDownloadFuture =
+        // launch checking task
+        Future<Boolean> completionFuture =
                 scheduler.submit(waitForDownloadCall);
+        timeoutOperationCompletionFuture(operationId, completionFuture, getTimeout());
+    }
+
+    private void timeoutOperationCompletionFuture (
+            String operationId,
+            Future<Boolean> completionFuture, int timeoutInSeconds) throws ApiException {
         try {
-            // wait for n seconds or abort
-            Integer timeout =
-                    env.getProperty(CarminProperties.API_DOWNLOAD_TIMEOUT_IN_SECONDS, Integer.class);
-            waitForDownloadFuture.get(timeout, TimeUnit.SECONDS);
+            completionFuture.get(timeoutInSeconds, TimeUnit.SECONDS);
         } catch (InterruptedException e) {
-            logger.error("Waiting for download interrupted :" + apiUri, e);
-            throw new ApiException("Waiting for download interrupted");
+            logger.error("Waiting for operation completion interrupted :" + operationId);
+            throw new ApiException("Waiting for operation completion interrupted", e);
         } catch (ExecutionException e) {
-            logger.error("Error waiting for download :" + apiUri, e);
-            throw new ApiException("Error waiting for download");
+            logger.error("Error waiting for operation completion :" + operationId);
+            throw new ApiException("Error waiting for operation completion", e);
         } catch (TimeoutException e) {
-            logger.error("Aborting download too long :" + apiUri, e);
-            throw new ApiException("Aborting dowload : too long");
+            completionFuture.cancel(true);
+            logger.error("Timeout operation completion :" + operationId);
+            throw new ApiException("Aborting operation : too long", e);
         }
-        return getDownloadContent(downloadOperationId);
     }
 
-    public Path uploadData(UploadData uploadData) throws ApiException {
-        // TODO : check upload size ?
-        String lfcPath = checkPermission(uploadData.getUri(), LFCAccessType.UPLOAD);
-        java.nio.file.Path javaPath = Paths.get(lfcPath);
-        String parentLfcPath = javaPath.getParent().toString();
-        // check if parent dir exists
-        if (!baseDoesFileExist(parentLfcPath)) {
-            logger.error("parent directory of upload does not exist :" + lfcPath);
-            throw new ApiException("Upload Directory doest not exist");
-        }
-        // TODO : support archive upload
-        String uploadDirectory = DataManagerUtil.getUploadRootDirectory(false);
-        logger.debug("LFC path of new upload :" + lfcPath);
-        // TODO : normalize file name to avoid weird characters
-        String fileName = Paths.get(lfcPath).getFileName().toString();
-        String localPath = uploadDirectory + fileName;
-        logger.debug("storing upload file in :" + localPath);
-        // transform base64 string to a new file
-        writeFileFromBase64(uploadData.getPathContent(), localPath);
-        // transfer it
-        String operationId = baseUploadFile(localPath, parentLfcPath);
-        logger.info("File upload asked. Operation id : " + operationId);
-        // get new path
-        Path newPath = new Path();
-        newPath.setPlatformURI(uploadData.getUri());
-        newPath.setIsDirectory(false);
-        newPath.setMimeType(getMimeType(lfcPath));
-        newPath.setExists(false); // not created yet because asynchronous
-        return newPath;
+    private Integer getRetryDelay() {
+        return env.getProperty(CarminProperties.API_DOWNLOAD_RETRY_IN_SECONDS, Integer.class);
     }
 
-    public Path mkdir(String apiUri) throws ApiException {
-        String lfcPath = checkPermission(apiUri, LFCAccessType.UPLOAD);
-        java.nio.file.Path javaPath = Paths.get(lfcPath);
-        String parentLfcPath = javaPath.getParent().toString();
-
-        // check if parent dir exists
-        if (!baseDoesFileExist(parentLfcPath)) {
-            logger.error("parent directory of upload does not exist :" + lfcPath);
-            throw new ApiException("Upload Directory doest not exist");
-        }
-        if (baseDoesFileExist(lfcPath)) {
-            logger.error("Trying do create an existing directory :" + lfcPath);
-            throw new ApiException("Upload error");
-        }
-        baseMkdir(parentLfcPath, javaPath.getFileName().toString());
-        Path newPath = new Path();
-        newPath.setPlatformURI(apiUri);
-        newPath.setIsDirectory(true);
-        newPath.setMimeType(env.getProperty(CarminProperties.API_DIRECTORY_MIME_TYPE));
-        newPath.setSize(0L);
-        newPath.setExists(true);
-        return newPath;
+    private Integer getTimeout() {
+        return env.getProperty(CarminProperties.API_DOWNLOAD_TIMEOUT_IN_SECONDS, Integer.class);
     }
 
-    // #### PERMISSION STUFF
-
-    private String checkReadPermission(String apiUri) throws ApiException {
-        return checkPermission(apiUri, LFCAccessType.READ);
-    }
-
-    private String checkPermission(String apiUri, LFCAccessType accessType) throws ApiException {
-        String lfcPath = getLFCPathFromApiUri(apiUri);
-        try {
-            lfcPermissionBusiness.checkPermission(apiContext.getUser(), lfcPath, accessType);
-        } catch (BusinessException e) {
-            logger.error("API Permission error");
-            throw new ApiException(e);
-        }
-        // all check passed : all good !
-        return lfcPath;
-    }
-
-    // #### DOWNLOAD STUFF
-
-    private boolean isDownloadOver(String operationId) throws ApiException {
-        PoolOperation operation = baseGetPoolOperation(operationId);
+    private boolean isOperationOver(String operationId, User user) throws ApiException {
+        PoolOperation operation = baseGetPoolOperation(operationId, user);
 
         switch (operation.getStatus()) {
             case Queued:
@@ -291,28 +363,9 @@ public class DataApiBusiness {
             case Failed:
             case Rescheduled:
             default:
-                logger.error("Download operation failed : " + operation.getStatus());
-                throw new ApiException("Download operation failed");
+                logger.error("IO LFC Operation failed : " + operationId + " : " + operation.getStatus());
+                throw new ApiException("IO LFC Operation operation failed");
         }
-    }
-
-    private String getDownloadContent(String operationId) throws ApiException {
-        PoolOperation operation = baseGetPoolOperation(operationId);
-
-        File file = new File(operation.getDest());
-        if (file.isDirectory()) {
-            file = new File(operation.getDest() + "/"
-                    + FilenameUtils.getName(operation.getSource()));
-        }
-        Base64.Encoder encoder = Base64.getEncoder();
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        try (OutputStream outputStream = encoder.wrap(baos)) {
-            Files.copy(file.toPath(), outputStream);
-        } catch (IOException e) {
-            logger.error("Error encoding download file for operation :" + operationId , e);
-            throw new ApiException("Download operation failed");
-        }
-        return baos.toString();
     }
 
     // #### UPLOAD STUFF
@@ -324,39 +377,49 @@ public class DataApiBusiness {
         try (InputStream base64InputStream = decoder.wrap(inputStream)) {
             Files.copy(base64InputStream, Paths.get(localFilePath));
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("Error writing base64 file");
+            throw new ApiException("Error writing base64 file", e);
+        }
+    }
+
+    private boolean saveInputStreamToFile(InputStream is, String path) throws ApiException {
+        try (FileOutputStream fos = new FileOutputStream(path);) {
+            byte[] buffer = new byte[1024];
+            int bytesRead;
+            boolean isFileEmpty = true;
+            while ((bytesRead = is.read(buffer)) != -1) {
+                isFileEmpty = false;
+                fos.write(buffer, 0, bytesRead);
+            }
+            fos.flush();
+            return isFileEmpty;
+        } catch (FileNotFoundException e) {
+            logger.error("Error creating new file " + path);   // TODO check exception bubbling
+            throw new ApiException("Upload error", e);
+        } catch (IOException e) {
+            logger.error("IO Error storing file " + path);
+            throw new ApiException("Upload error", e);
         }
     }
 
     // #### ROOT folder STUFF
 
-    private Path getRootPath() {
-        Path rootPath = new Path();
-        rootPath.setExists(true);
-        rootPath.setMimeType(env.getProperty(CarminProperties.API_DIRECTORY_MIME_TYPE));
-        rootPath.setIsDirectory(true);
-        rootPath.setSize(Long.valueOf(getRootDirectoriesName().size()));
-        rootPath.setPlatformURI(env.getProperty(CarminProperties.API_URI_PREFIX) + ROOT);
-        return rootPath;
+    private PathProperties getRootPathProperties() {
+        PathProperties rootPathProperties = new PathProperties();
+        rootPathProperties.setExists(true);
+        rootPathProperties.setMimeType(env.getProperty(CarminProperties.API_DIRECTORY_MIME_TYPE));
+        rootPathProperties.setIsDirectory(true);
+        rootPathProperties.setSize(Long.valueOf(getRootDirectoriesName().size()));
+        rootPathProperties.setPath(ROOT);
+        return rootPathProperties;
     }
 
-    private List<Path> getRootDirectories() {
-        List<Path> directories = new ArrayList<>();
+    private List<PathProperties> getRootSubDirectoriesPathProps() {
+        List<PathProperties> directories = new ArrayList<>();
         for (String dirName : getRootDirectoriesName()) {
-            directories.add(getRootDirPath(dirName));
+            directories.add(getRootSubDirPathProperties(dirName));
         }
         return directories;
-    }
-
-    private Path getRootDirPath(String name) {
-        Path rootPath = new Path();
-        rootPath.setExists(true);
-        rootPath.setMimeType(env.getProperty(CarminProperties.API_DIRECTORY_MIME_TYPE));
-        rootPath.setIsDirectory(true);
-        rootPath.setPlatformURI(
-                env.getProperty(CarminProperties.API_URI_PREFIX)
-                    + ROOT + "/" + name);
-        return rootPath;
     }
 
     private List<String> getRootDirectoriesName() {
@@ -370,63 +433,61 @@ public class DataApiBusiness {
         return rootDir;
     }
 
+    private PathProperties getRootSubDirPathProperties(String name) {
+        PathProperties rootPathProperties = new PathProperties();
+        rootPathProperties.setExists(true);
+        rootPathProperties.setMimeType(env.getProperty(CarminProperties.API_DIRECTORY_MIME_TYPE));
+        rootPathProperties.setIsDirectory(true);
+        // TODO : size ?
+        rootPathProperties.setPath(ROOT + "/" + name);
+        return rootPathProperties;
+    }
+
     // #### DATA UTILS
 
     private boolean doesLFCDataCorrespondToAFile(List<Data> lfcData) {
         return lfcData.size() == 1 && lfcData.get(0).getName().startsWith("/");
     }
 
-    private String getLFCPathFromApiUri(String apiUri) throws ApiException {
-        String uriPrefix = env.getRequiredProperty(CarminProperties.API_URI_PREFIX);
-        if (!apiUri.startsWith(uriPrefix)) {
-            logger.error("Wrong uri prefix. Should start with :" + uriPrefix);
-            throw new ApiException("Wrong URI scheme");
-        }
-        String notNormalizedPath = apiUri.substring(uriPrefix.length());
-        // needed to remove ".." and potential security leeks
-        return Paths.get(notNormalizedPath).normalize().toString();
-    }
-
-    private Path buildPathFromLfcData(String rootApiUri, Data lfcData) {
-        Path path = new Path();
-        path.setExists(true);
-        path.setSize(lfcData.getLength());
-        if (lfcData.getModificationDate() != null) {
-            path.setLastModificationDate(
-                    getTimeStampFromGridaDateFormat(lfcData.getModificationDate()));
-        }
+    private PathProperties buildPathFromLfcData(String path, Data lfcData) {
+        PathProperties pathProperties = new PathProperties();
+        pathProperties.setExists(true);
+        pathProperties.setSize(lfcData.getLength());
+        pathProperties.setLastModificationDate(
+                getTimeStampFromGridaFormatDate(lfcData.getModificationDate()));
         boolean isDirectory = lfcData.getType().equals(Type.folder)
                 || lfcData.getType().equals(Type.folderSync);
-        path.setIsDirectory(isDirectory);
+        pathProperties.setIsDirectory(isDirectory);
         if (isDirectory) {
-            path.setMimeType(env.getProperty(CarminProperties.API_DIRECTORY_MIME_TYPE));
+            pathProperties.setMimeType(env.getProperty(CarminProperties.API_DIRECTORY_MIME_TYPE));
         } else {
-            path.setMimeType(getMimeType(lfcData.getName()));
+            pathProperties.setMimeType(getMimeType(lfcData.getName()));
         }
-        path.setPlatformURI(rootApiUri + "/" + lfcData.getName());
-        return path;
+        pathProperties.setPath(path + "/" + lfcData.getName());
+        return pathProperties;
     }
 
     /* returns timestamp in seconds from format "Jan 12 2016" */
-    private Long getTimeStampFromGridaDateFormat(String gridaDateFormat) {
+    private Long getTimeStampFromGridaFormatDate(String gridaFormatDate) {
+        if (gridaFormatDate == null || gridaFormatDate.isEmpty()) return null;
         DateFormat dateFormat = new SimpleDateFormat("MMM dd yyyy", Locale.US);
         try {
-            return dateFormat.parse(gridaDateFormat).getTime() / 1000;
+            return dateFormat.parse(gridaFormatDate).getTime() / 1000;
         } catch (ParseException e) {
-            logger.warn("Error with grida date format :" + gridaDateFormat);
+            logger.warn("Error with grida date format :" + gridaFormatDate);
             logger.warn("Ignoring it");
             return null;
         }
     }
 
-    private String getMimeType(String lfcPath) {
+    private String getMimeType(String path) {
         try {
-            String contentType = Files.probeContentType(Paths.get(lfcPath));
+            String contentType = Files.probeContentType(Paths.get(path));
             return contentType == null ?
                     env.getProperty(CarminProperties.API_DEFAULT_MIME_TYPE) :
                     contentType;
         } catch (IOException e) {
-            logger.warn("Cant detect mime type of " + lfcPath);
+            logger.warn("Cant detect mime type of " + path);
             logger.warn("Ignoring and returning application/octet-stream");
             return "application/octet-stream";
         }
@@ -434,31 +495,31 @@ public class DataApiBusiness {
 
     // #### LOWER LEVELS CALLS, all prefixed with "base"
 
-    private boolean baseDoesFileExist(String lfcPath) throws ApiException {
+    private boolean baseDoesFileExist(String path) throws ApiException {
         try {
-            return lfcBusiness.exists(apiContext.getUser(), lfcPath);
+            return lfcBusiness.exists(apiContext.getUser(), path);
         } catch (BusinessException e) {
-            logger.error("Error testing lfc file existence", e);
-            throw new ApiException("Error testing file existence");
+            logger.error("Error testing lfc file existence");
+            throw new ApiException("Error testing file existence", e);
         }
     }
 
-    private List<Data> baseGetFileData(String lfcPath) throws ApiException {
+    private List<Data> baseGetFileData(String path) throws ApiException {
         try {
-            return lfcBusiness.listDir(apiContext.getUser(), lfcPath, true);
+            return lfcBusiness.listDir(apiContext.getUser(), path, true);
         } catch (BusinessException e) {
-            logger.error("Error getting lfc file information", e);
-            throw new ApiException("Error getting lfc information");
+            logger.error("Error getting lfc file information");
+            throw new ApiException("Error getting lfc information", e);
         }
     }
 
     /* return the operation id */
-    private String baseDownloadFile(String lfcPath) throws ApiException {
+    private String baseDownloadFile(String path) throws ApiException {
         try {
-            return transferPoolBusiness.downloadFile(apiContext.getUser(), lfcPath);
+            return transferPoolBusiness.downloadFile(apiContext.getUser(), path);
         } catch (BusinessException e) {
-            logger.error("Error downloading lfc file :" + lfcPath);
-            throw new ApiException("Error download LFC file");
+            logger.error("Error downloading lfc file :" + path);
+            throw new ApiException("Error download LFC file", e);
         }
     }
 
@@ -467,43 +528,53 @@ public class DataApiBusiness {
             return transferPoolBusiness.uploadFile(apiContext.getUser(), localPath, lfcPath);
         } catch (BusinessException e) {
             logger.error("Error uploading lfc file : " + lfcPath);
-            throw new ApiException("Error uploading a flc fiel");
+            throw new ApiException("Error uploading a lfc file", e);
         }
     }
 
-    private PoolOperation baseGetPoolOperation(String operationId) throws ApiException {
+    private PoolOperation baseGetPoolOperation(String operationId, User user) throws ApiException {
+        // need to specify the user to avoid accessing apiContext from another thread
+        try {
+            return transferPoolBusiness.getOperationById(operationId, user.getFolder());
+        } catch (BusinessException e) {
+            logger.error("Error getting download operation");
+            throw new ApiException("Error getting download operation", e);
+        }
+    }
+
+    private PoolOperation baseGetDownloadOperation(String operationId) throws ApiException {
         try {
             return transferPoolBusiness.getDownloadPoolOperation(operationId);
         } catch (BusinessException e) {
-            logger.error("Error getting download operation", e);
-            throw new ApiException("Error getting download operation");
+            logger.error("Error getting download operation");
+            throw new ApiException("Error getting download operation", e);
         }
     }
 
-    private Long baseGetFileModificationDate(String lfcPath) throws ApiException {
+    private Long baseGetFileModificationDate(String path) throws ApiException {
         try {
-            return lfcBusiness.getModificationDate(apiContext.getUser(), lfcPath);
+            return lfcBusiness.getModificationDate(apiContext.getUser(), path);
         } catch (BusinessException e) {
-            logger.error("Error getting lfc file modification date", e);
-            throw new ApiException("Error getting lfc modification");
+            logger.error("Error getting lfc file modification date");
+            throw new ApiException("Error getting lfc modification", e);
         }
     }
 
-    private void baseDeletePath(String lfcPath) throws ApiException {
+    private void baseDeletePath(String path) throws ApiException {
         try {
-            transferPoolBusiness.delete(apiContext.getUser(), lfcPath);
+            transferPoolBusiness.delete(apiContext.getUser(), path);
         } catch (BusinessException e) {
-            logger.error("Error deleting lfc file", e);
-            throw new ApiException("Error deleting lfc file");
+            logger.error("Error deleting lfc file");
+            throw new ApiException("Error deleting lfc file", e);
         }
     }
 
-    private void baseMkdir(String lfcPath, String dirName) throws ApiException {
+    private void baseMkdir(String path, String dirName) throws ApiException {
         try {
-            lfcBusiness.createDir(apiContext.getUser(), lfcPath, dirName);
+            lfcBusiness.createDir(apiContext.getUser(), path, dirName);
         } catch (BusinessException e) {
-            logger.error("Error creating directory :" + lfcPath, e);
-            throw new ApiException("Error creating LFC directory");
+            logger.error("Error creating directory :" + path);
+            throw new ApiException("Error creating LFC directory", e);
         }
     }
 

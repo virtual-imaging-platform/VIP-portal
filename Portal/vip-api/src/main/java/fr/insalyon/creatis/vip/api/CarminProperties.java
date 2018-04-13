@@ -36,6 +36,8 @@ package fr.insalyon.creatis.vip.api;
  */
 public interface CarminProperties {
 
+    // TODO : verify they're present on spring init
+
     // CARMIN COMMON
     String PLATFORM_NAME = "carmin.platform.name";
     String PLATFORM_DESCRIPTION = "carmin.platform.description";
@@ -45,15 +47,19 @@ public interface CarminProperties {
     String DEFAULT_LIMIT_LIST_EXECUTION = "carmin.platform.default_limit_list_execution";
     String UNSUPPORTED_METHODS = "carmin.platform.unsupported_methods";
     String SUPPORTED_API_VERSION = "carmin.platform.supported_API_Version";
-    String IS_KILL_EXECUTION_SUPPORTED = "carmin.platform.is_kill_supported";
     String PLATFORM_ERROR_CODES_AND_MESSAGES = "carmin.platform.error_codes_and_message";
+
+    // CARMIN auth
+
+    String APIKEY_HEADER_NAME = "carmin.authentication.apikey.header.name";
+    String APIKEY_GENERATE_NEW_EACH_TIME = "carmin.authentication.apikey.generate_new_key_on_each_authentication";
 
     // CARMIN DATA
 
-    String API_URI_PREFIX = "carmin.data.uri_prefix";
     String API_DIRECTORY_MIME_TYPE = "carmin.data.mime_type.directory";
     String API_DEFAULT_MIME_TYPE = "carmin.data.mime_type.default";
     String API_DOWNLOAD_RETRY_IN_SECONDS = "carmin.data.download.retry";
     String API_DOWNLOAD_TIMEOUT_IN_SECONDS = "carmin.data.download.timeout";
     String API_DATA_TRANSFERT_MAX_SIZE = "carmin.data.max_size";
+    String API_DATA_DOWNLOAD_RELATIVE_PATH = "carmin.data.path.download";
 }

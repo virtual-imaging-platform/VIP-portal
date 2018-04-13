@@ -110,6 +110,14 @@ knowledge of the CeCILL-B license and that you accept its terms.
         <servlet-name>WorkflowService</servlet-name>
         <url-pattern>/fr.insalyon.creatis.vip.portal.Main/workflowservice</url-pattern>
     </servlet-mapping>
+     <servlet>
+        <servlet-name>LoggerServlet</servlet-name>
+        <servlet-class>fr.insalyon.creatis.vip.application.server.rpc.LoggerServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>LoggerServlet</servlet-name>
+        <url-pattern>/fr.insalyon.creatis.vip.portal.Main/remote_logging</url-pattern>
+    </servlet-mapping>
     <servlet>
         <servlet-name>JobService</servlet-name>
         <servlet-class>fr.insalyon.creatis.vip.application.server.rpc.JobServiceImpl</servlet-class>

@@ -282,7 +282,7 @@ public class SimulationBusiness {
             return sb.toString();
 
         } catch (IOException ex) {
-            logger.error(ex);
+            logger.error("Error reading Simulation file", ex);
             throw new BusinessException(ex);
         }
     }
