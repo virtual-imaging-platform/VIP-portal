@@ -72,11 +72,12 @@ public class GateLabProgressLayout extends ProgressLayout {
 
                 double completed = 0;
                 double active = 0;
+                boolean singleGateCompleted = false;
                 StringBuilder sb = new StringBuilder();
 
                 for (Activity processor : result) {
 
-                    if (processor.getName().toLowerCase().contains("gate")) {
+                    if (processor.getName().matches("gate")) {
 
                         if (processor.getStatus() == ProcessorStatus.Completed || runnedParticles >= particles) {
                             completed += gateFactor;
@@ -87,6 +88,11 @@ public class GateLabProgressLayout extends ProgressLayout {
                             active += gateFactor * ((particles - runnedParticles) / particles);
                         }
 
+                    } else if (processor.getName().matches("singleGate")) {
+                        if (processor.getStatus() == ProcessorStatus.Completed) {
+                            singleGateCompleted = true;
+                        }
+                        
                     } else if (processor.getStatus() == ProcessorStatus.Completed) {
                         completed++;
 
@@ -111,7 +117,13 @@ public class GateLabProgressLayout extends ProgressLayout {
                         barLayout.setWidth100();
                         statusLabel.setContents("<font color=\"#666666\">Simulation completed! ("
                                 + runnedParticles + " out of " + particles + " particles)</font>");
-                    } else {
+                    } else if (singleGateCompleted) {
+                        progress = 100;
+                        barLayout.setBackgroundColor(JobStatus.Completed.getColor());
+                        barLayout.setWidth100();
+                        statusLabel.setContents("<font color=\"#666666\">Simulation completed!</font>");
+                    }
+                    else {
                         if (status == SimulationStatus.Killed) {
                             barLayout.setBackgroundColor(JobStatus.Failed.getColor());
                             sb.append(". <b>Simulation killed!</b>");
