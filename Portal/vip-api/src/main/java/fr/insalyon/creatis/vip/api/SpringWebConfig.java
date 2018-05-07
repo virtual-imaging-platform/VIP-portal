@@ -51,13 +51,12 @@ import org.springframework.web.servlet.config.annotation.*;
  *
  * It enables annotation configuration by subpackage scan.
  *
- * It declares the carmin.properties file.
+ * It declares an api conf file which location is configured from the main vip conf file
  *
  * Created by abonnet on 7/13/16.
  */
 @EnableWebMvc
 @ComponentScan
-@PropertySource("classpath:carmin.properties")
 public class SpringWebConfig extends WebMvcConfigurerAdapter {
 
     public static final Logger logger = Logger.getLogger(SpringWebConfig.class);
