@@ -32,29 +32,23 @@
 package fr.insalyon.creatis.vip.api.rest.itest;
 
 import fr.insalyon.creatis.vip.api.*;
-import fr.insalyon.creatis.vip.api.bean.Module;
 import fr.insalyon.creatis.vip.api.rest.controller.PlatformController;
-import fr.insalyon.creatis.vip.api.rest.model.SupportedTransferProtocol;
 import fr.insalyon.creatis.vip.application.server.business.WorkflowBusiness;
 import org.junit.*;
 import org.junit.contrib.java.lang.system.EnvironmentVariables;
+import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.*;
 import org.springframework.core.env.Environment;
-import org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.util.Assert;
 
 import java.net.URISyntaxException;
 import java.nio.file.Paths;
-
-import static fr.insalyon.creatis.vip.api.CarminProperties.*;
 
 /**
  * Created by abonnet on 7/21/16.
@@ -67,8 +61,8 @@ import static fr.insalyon.creatis.vip.api.CarminProperties.*;
  */
 @RunWith(SpringRunner.class)
 @WebAppConfiguration
-@ContextConfiguration
-public class SpringConfigurationIT {
+@ContextConfiguration(initializers = ApiPropertiesInitializer.class)
+public class MissingPropertySpringConfigurationIT {
 
     // Need to override vipConfigurer that operate on the database
     @Configuration
@@ -96,33 +90,13 @@ public class SpringConfigurationIT {
 
     @BeforeClass
     public static void setup() throws URISyntaxException {
-        String fakeHomePath = Paths.get(ClassLoader.getSystemResource("fakeHome").toURI())
+        String fakeHomePath = Paths.get(ClassLoader.getSystemResource("TestHomeMissingAProperty").toURI())
                 .toAbsolutePath().toString();
         environmentVariables.set("HOME", fakeHomePath);
     }
 
-    @Test
+    @Test(expected = IllegalStateException.class)
+    @Ignore // would be nice to test configuration error but doesn't work with the junit spring runner
     public void propertiesShouldBePresent() {
-        Assert.notNull(env.getProperty(PLATFORM_NAME));
-        Assert.notNull(env.getProperty(PLATFORM_DESCRIPTION));
-        Assert.notNull(env.getProperty(PLATFORM_EMAIL));
-        Assert.notEmpty(env.getProperty(SUPPORTED_TRANSFER_PROTOCOLS, SupportedTransferProtocol[].class));
-        Assert.notEmpty(env.getProperty(SUPPORTED_MODULES, Module[].class));
-        Assert.notNull(env.getProperty(DEFAULT_LIMIT_LIST_EXECUTION, Long.class));
-        Assert.isInstanceOf(String[].class, env.getProperty(UNSUPPORTED_METHODS, String[].class));
-        Assert.notNull(env.getProperty(SUPPORTED_API_VERSION));
-        Assert.notEmpty(env.getProperty(PLATFORM_ERROR_CODES_AND_MESSAGES, String[].class));
-
-        Assert.notNull(env.getProperty(APIKEY_HEADER_NAME));
-        Assert.notNull(env.getProperty(APIKEY_GENERATE_NEW_EACH_TIME, Boolean.class));
-
-        Assert.notNull(env.getProperty(API_DIRECTORY_MIME_TYPE));
-        Assert.notNull(env.getProperty(API_DEFAULT_MIME_TYPE));
-        Assert.notNull(env.getProperty(API_DOWNLOAD_RETRY_IN_SECONDS, Integer.class));
-        Assert.notNull(env.getProperty(API_DOWNLOAD_TIMEOUT_IN_SECONDS, Integer.class));
-        Assert.notNull(env.getProperty(API_DATA_TRANSFERT_MAX_SIZE, Long.class));
-        Assert.notNull(env.getProperty(API_DATA_DOWNLOAD_RELATIVE_PATH));
-        // test that the platform properties generation does not throw any exception
-        Assert.notNull(platformController.getPlatformProperties());
     }
 }

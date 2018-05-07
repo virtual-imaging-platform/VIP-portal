@@ -60,7 +60,6 @@ import java.nio.file.Paths;
 
 import static fr.insalyon.creatis.vip.api.data.CarminAPITestConstants.*;
 import static fr.insalyon.creatis.vip.api.CarminProperties.*;
-import static fr.insalyon.creatis.vip.core.client.view.util.CountryCode.re;
 
 /**
  * Created by abonnet on 7/28/16.
@@ -129,7 +128,7 @@ abstract public class BaseVIPSpringIT {
 
     @BeforeClass
     public static void setupEnvVariables() throws URISyntaxException {
-        String fakeHomePath = Paths.get(ClassLoader.getSystemResource("fakeHome").toURI())
+        String fakeHomePath = Paths.get(ClassLoader.getSystemResource("fakehome").toURI())
                 .toAbsolutePath().toString();
         environmentVariables.set("HOME", fakeHomePath);
     }
