@@ -221,7 +221,7 @@ knowledge of the CeCILL-B license and that you accept its terms.
     </filter>
     <filter-mapping>
         <filter-name>springSecurityFilterChain</filter-name>
-        <url-pattern>/rest/*</url-pattern>
+        <url-pattern>/*</url-pattern>
     </filter-mapping>
     <!-- END REST API -->
     <!-- SOAP API -->
@@ -267,16 +267,4 @@ knowledge of the CeCILL-B license and that you accept its terms.
         <res-type>javax.sql.DataSource</res-type>
         <res-auth>Container</res-auth>
     </resource-ref>
-    <!--filter>
-      <filter-name>CorsFilter</filter-name>
-      <filter-class>org.apache.catalina.filters.CorsFilter</filter-class>
-      <init-param>
-        <param-name>cors.allowed.methods</param-name>
-        <param-value>GET, POST, PUT, DELETE, OPTIONS, HEAD</param-value>
-      </init-param>
-    </filter>
-    <filter-mapping>
-      <filter-name>CorsFilter</filter-name>
-      <url-pattern>/*</url-pattern>
-    </filter-mapping-->
 </web-app>

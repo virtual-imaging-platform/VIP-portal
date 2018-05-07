@@ -31,17 +31,22 @@
  */
 package fr.insalyon.creatis.vip.api;
 
-import fr.insalyon.creatis.vip.api.business.*;
+import fr.insalyon.creatis.vip.api.business.ApiContext;
 import fr.insalyon.creatis.vip.application.server.business.*;
-import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
-import fr.insalyon.creatis.vip.core.server.dao.CoreDAOFactory;
-import fr.insalyon.creatis.vip.core.server.dao.DAOException;
-import fr.insalyon.creatis.vip.core.server.dao.UserDAO;
+import fr.insalyon.creatis.vip.core.server.business.*;
+import fr.insalyon.creatis.vip.core.server.dao.*;
 import fr.insalyon.creatis.vip.datamanager.server.business.*;
 import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.*;
+import org.springframework.core.env.Environment;
+import org.springframework.core.io.support.ResourcePropertySource;
 import org.springframework.web.servlet.config.annotation.*;
+
+import java.io.IOException;
+
+import static fr.insalyon.creatis.vip.api.CarminProperties.CORS_AUTHORIZED_DOMAINS;
 
 /**
  * Configuration class for spring web.
@@ -60,6 +65,9 @@ import org.springframework.web.servlet.config.annotation.*;
 public class SpringWebConfig extends WebMvcConfigurerAdapter {
 
     public static final Logger logger = Logger.getLogger(SpringWebConfig.class);
+
+    @Autowired
+    private Environment env;
 
     @Override
     public void configurePathMatch(PathMatchConfigurer matcher) {
@@ -88,7 +96,8 @@ public class SpringWebConfig extends WebMvcConfigurerAdapter {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
-                .allowedMethods("GET", "POST", "PUT", "DELETE", "HEAD");
+            .allowedMethods("GET", "POST", "PUT", "DELETE", "HEAD")
+            .allowedOrigins(env.getProperty(CORS_AUTHORIZED_DOMAINS, String[].class));
     }
 
     @Bean

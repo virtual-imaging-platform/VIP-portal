@@ -46,6 +46,7 @@ public class CoreConstants implements IsSerializable {
     public static final String VO_ROOT = "vo.root";
     public static final String LAB_DB_HOST = "database.server.host";
     public static final String LAB_DB_PORT = "database.server.port";
+    public static final String LAB_API_CONF_LOCATION = "api.conf-file.location";
     public static final String LAB_ADMIN_FIRST_NAME = "admin.first.name";
     public static final String LAB_ADMIN_LAST_NAME = "admin.last.name";
     public static final String LAB_ADMIN_EMAIL = "admin.email";
