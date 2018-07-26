@@ -19,6 +19,18 @@ function error {
   echo [ ERROR - $D ] $* >&2
 }
 
+function checkBosh {
+  export PATH=$PATH:$HOME/.local/bin
+  BOSH=`which bosh`
+  if [ -z "$BOSH" ]
+    then
+      info "Installing Boutiques locally"
+      pip install boutiques --user    
+    else
+      info "Bosh exists in $BOSH, nothing to do"
+  fi
+}
+
 function downloadLFN {
 
   local LFN=$1
@@ -89,7 +101,6 @@ key="$1"
 case $key in
     #foreach($input in $tool.getInputs())
 --$input.getId().toLowerCase())
-    $input.getId().toUpperCase()="$2" && \ 
        #if($tool.hasNextInput($input))
             echo "\"$input.getId()\" : \"$2\"," >> input_param_file.json
        #else
@@ -97,15 +108,6 @@ case $key in
        #end
     ;;
     #end
-    #foreach($outputFile in $tool.getOutputFiles())
---$outputFile.getId().toLowerCase())
-    $outputFile.getId().toUpperCase()="$2"
-    ;;
-    #end
-*) # unknown option
-    echo "Unknown option: $1"
-    exit 1
-    ;;
 esac
 shift # past argument or value
 shift
@@ -119,8 +121,11 @@ JSONPARAMETERS
 # Command-line execution #
 ##########################
 
-pip install boutiques --user
-$HOME/.local/bin/bosh exec launch ./$tool.getName().json ./input_param_file.json -v $PWD:/gasw-execution-dir $PWD/../cache:$PWD/../cache
+TOOLNAME="$tool.getName()"
+JSONFILE="${TOOLNAME}.json"
+
+checkBosh
+bosh exec launch $JSONFILE input_param_file.json -v $PWD:/gasw-execution-dir $PWD/../cache:$PWD/../cache
 
 if [ $? != 0 ]
 then
