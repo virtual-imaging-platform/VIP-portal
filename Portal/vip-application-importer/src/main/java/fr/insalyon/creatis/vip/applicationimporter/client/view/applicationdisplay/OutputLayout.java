@@ -67,8 +67,8 @@ public class OutputLayout extends InputOutputLayout {
             generalLayout.setMembersMargin(membersMargin);
 
             HLayout commandLayout = new HLayout();
-            if (bof.getCommandLineKey() != null) {
-                commandLayout.addMember(new LocalTextField("Command-line key", false, false, bof.getCommandLineKey()));
+            if (bof.getValueKey() != null) {
+                commandLayout.addMember(new LocalTextField("Value key", false, false, bof.getValueKey()));
             }
             if (bof.getCommandLineFlag() != null && !bof.getCommandLineFlag().equals("")) {
                 commandLayout.addMember(new LocalTextField("Command-line Flag", false, false, bof.getCommandLineFlag()));
