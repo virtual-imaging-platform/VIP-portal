@@ -26,6 +26,11 @@ function checkBosh {
     then
       info "Installing Boutiques locally"
       pip install boutiques --user    
+      if [ $? != 0 ]
+      then
+        error "pip install boutiques failed, exiting"
+        return 1
+      fi
     else
       info "Bosh exists in $BOSH, nothing to do"
   fi
@@ -108,6 +113,7 @@ case $key in
        #end
     ;;
     #end
+*) # unknown option
 esac
 shift # past argument or value
 shift
@@ -125,7 +131,7 @@ TOOLNAME="$tool.getName()"
 JSONFILE="${TOOLNAME}.json"
 
 checkBosh
-bosh exec launch $JSONFILE input_param_file.json -v $PWD:/gasw-execution-dir $PWD/../cache:$PWD/../cache
+bosh exec launch $JSONFILE input_param_file.json -v $PWD/../cache:$PWD/../cache
 
 if [ $? != 0 ]
 then
