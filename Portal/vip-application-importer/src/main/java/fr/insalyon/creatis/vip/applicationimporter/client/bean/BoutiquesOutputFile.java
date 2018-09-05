@@ -42,7 +42,7 @@ public class BoutiquesOutputFile implements IsSerializable {
     private String id;
     private String name;
     private String description;
-    private String commandLineKey;
+    private String valueKey;
     private String pathTemplate;
     private boolean list;
     private boolean optional;
@@ -60,8 +60,8 @@ public class BoutiquesOutputFile implements IsSerializable {
         return description;
     }
 
-    public String getCommandLineKey() {
-        return commandLineKey;
+    public String getValueKey() {
+        return valueKey;
     }
 
     public String getPathTemplate() {
@@ -92,8 +92,8 @@ public class BoutiquesOutputFile implements IsSerializable {
         this.description = description;
     }
 
-    public void setCommandLineKey(String commandLineKey) {
-        this.commandLineKey = commandLineKey;
+    public void setValueKey(String valueKey) {
+        this.valueKey = valueKey;
     }
 
     public void setPathTemplate(String pathTemplate) {

@@ -43,7 +43,7 @@ public class BoutiquesInput implements IsSerializable {
     private String name;
     private String type;
     private String description;
-    private String commandLineKey;
+    private String valueKey;
     private boolean list;
     private boolean optional;
     private String commandLineFlag;
@@ -65,8 +65,8 @@ public class BoutiquesInput implements IsSerializable {
         return description;
     }
 
-    public String getCommandLineKey() {
-        return commandLineKey;
+    public String getValueKey() {
+        return valueKey;
     }
 
     public boolean isList() {
@@ -101,8 +101,8 @@ public class BoutiquesInput implements IsSerializable {
         this.description = description;
     }
 
-    public void setCommandLineKey(String commandLineKey) {
-        this.commandLineKey = commandLineKey;
+    public void setValueKey(String valueKey) {
+        this.valueKey = valueKey;
     }
 
     public void setList(boolean list) {
