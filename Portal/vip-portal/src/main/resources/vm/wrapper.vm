@@ -19,23 +19,6 @@ function error {
   echo [ ERROR - $D ] $* >&2
 }
 
-function checkBosh {
-  export PATH=$PATH:$HOME/.local/bin
-  BOSH=`which bosh`
-  if [ -z "$BOSH" ]
-    then
-      info "Installing Boutiques locally"
-      pip install boutiques --user    
-      if [ $? != 0 ]
-      then
-        error "pip install boutiques failed, exiting"
-        return 1
-      fi
-    else
-      info "Bosh exists in $BOSH, nothing to do"
-  fi
-}
-
 function downloadLFN {
 
   local LFN=$1
@@ -129,15 +112,17 @@ JSONPARAMETERS
 
 TOOLNAME="$tool.getName()"
 JSONFILE="${TOOLNAME}.json"
+export PATH=$PATH:$HOME/.local/bin
 
-checkBosh
+#check bosh and install it if needed
+bosh create foo.sh || pip install boutiques --user || error "pip install boutiques failed"
 bosh exec launch $JSONFILE input_param_file.json -v $PWD/../cache:$PWD/../cache
 
 if [ $? != 0 ]
 then
-    echo "$tool.name execution failed!"
+    error "$tool.name execution failed!"
     exit 1
 fi
 
-echo "Execution of $tool.getName() completed."
+info "Execution of $tool.getName() completed."
 
