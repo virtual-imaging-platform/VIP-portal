@@ -92,7 +92,7 @@ public class ApplicationImporterBusiness {
         }
     }
 
-    public void createApplication(BoutiquesTool bt, String type, HashMap<String, BoutiquesTool> bts, boolean isRunOnGrid, boolean overwriteApplicationVersion, User user, boolean challenge)
+    public void createApplication(BoutiquesTool bt, String type, String tag, HashMap<String, BoutiquesTool> bts, boolean isRunOnGrid, boolean overwriteApplicationVersion, User user, boolean challenge)
         throws BusinessException, ApplicationImporterException, JSONException {
 
         try {
@@ -129,8 +129,8 @@ public class ApplicationImporterBusiness {
             HashMap<String, String> wrapperFileName = new HashMap();
             // for each component we have to generate GASW and script files
             for (Map.Entry<String, BoutiquesTool> e : btMaps.entrySet()) {
-                gaswString.put(e.getKey(), VelocityUtils.getInstance().createDocument(e.getValue(), isRunOnGrid, gaswTemplate));
-                wrapperString.put(e.getKey(), VelocityUtils.getInstance().createDocument(e.getValue(), isRunOnGrid, wrapperTemplate));
+                gaswString.put(e.getKey(), VelocityUtils.getInstance().createDocument(tag, e.getValue(), isRunOnGrid, gaswTemplate));
+                wrapperString.put(e.getKey(), VelocityUtils.getInstance().createDocument(tag, e.getValue(), isRunOnGrid, wrapperTemplate));
                 gaswFileName.put(e.getKey(), Server.getInstance().getApplicationImporterFileRepository() + e.getValue().getGASWLFN());
                 wrapperFileName.put(e.getKey(), Server.getInstance().getApplicationImporterFileRepository() + e.getValue().getWrapperLFN());
             }
