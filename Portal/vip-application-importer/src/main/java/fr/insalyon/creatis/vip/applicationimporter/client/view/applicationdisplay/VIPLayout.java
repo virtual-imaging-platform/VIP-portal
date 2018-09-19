@@ -161,7 +161,7 @@ public class VIPLayout extends AbstractFormLayout {
         tagsCb.setTitle("<b>Dirac tag</b>");
         tagsCb.setType("comboBox");
 
-        tagsCb.setValueMap("None", "creatisGPU");
+        tagsCb.setValueMap("None", "diracTag:creatisGPU");
         tagsCb.setValue("None");
 
         return tagsCb;
