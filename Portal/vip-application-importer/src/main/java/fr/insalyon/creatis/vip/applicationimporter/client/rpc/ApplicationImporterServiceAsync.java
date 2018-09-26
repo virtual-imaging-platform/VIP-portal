@@ -39,5 +39,5 @@ public interface ApplicationImporterServiceAsync {
 
     public void readFileAsString(String fileLFN, AsyncCallback<String> callback);
 
-    public void createApplication(BoutiquesTool bt, String type, HashMap<String, BoutiquesTool> bts, boolean isRunOnGrid, boolean overwriteVersion, boolean challenge, AsyncCallback<Void> callback);
+    public void createApplication(BoutiquesTool bt, String type, String tag, HashMap<String, BoutiquesTool> bts, boolean isRunOnGrid, boolean overwriteVersion, boolean challenge, AsyncCallback<Void> callback);
 }

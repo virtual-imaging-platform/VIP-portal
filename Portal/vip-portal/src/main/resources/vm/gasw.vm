@@ -4,6 +4,9 @@
     <access type="LFN" cached="true"/>
     <retrycount value="1"/>
     <value value="$tool.getWrapperLFN()"/>
+#if($tag != "None")
+    <requirement value="${tag}" />
+#end
 #if($isRunOnGrid == false)
     <executor value="LOCAL"/>
 #end

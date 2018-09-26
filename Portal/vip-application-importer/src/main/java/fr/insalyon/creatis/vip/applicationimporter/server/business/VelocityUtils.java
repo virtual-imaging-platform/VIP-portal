@@ -79,8 +79,9 @@ public class VelocityUtils {
         return stringWriter.toString();
     }
 
-    public String createDocument( BoutiquesTool bt, Boolean isRunOnGrid, String vmTemplate) {
+    public String createDocument( String tag, BoutiquesTool bt, Boolean isRunOnGrid, String vmTemplate) {
         VelocityContext context = new VelocityContext();
+        context.put("tag", tag);
         context.put("tool", bt);
         context.put("isRunOnGrid", isRunOnGrid);
         context.put("esc", new EscapeTool());
