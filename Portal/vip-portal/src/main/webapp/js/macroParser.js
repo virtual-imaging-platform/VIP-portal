@@ -61,14 +61,14 @@ function parseMacFile(macId, parentFolderId) {
             otherFilesArray: []
         };
         var parserArray = [
-            {reg: ".* mac/(.*\.mac)", val: "macFilesArray"},
-            {reg: ".* data/(.*)", val: "inputFilesArray"},
-            {reg: ".* output/(.*)", val: "outputFilesArray"},
-            {reg: "/gate/random/setEngineSeed (.*)", val: "engineSeed"},
-            {reg: "^/vis.* (.*)", val: "visu"},
-            {reg: "/run/beamOn (.*)", val: "beamOnEvents"},
-            {reg: "/gate/application/setTotalNumberOfPrimaries (.*)", val: "totalNumberOfPrimaries"},
-            {reg: "/gate/application/setTimeSlice (.*)", val: "timeSimu"},
+            {reg: ".*\\s*mac/(.*\.mac)", val: "macFilesArray"},
+            {reg: ".*\\s*data/(.*)", val: "inputFilesArray"},
+            {reg: ".*\\s*output/(.*)", val: "outputFilesArray"},
+            {reg: "/gate/random/setEngineSeed\\s*(.*)", val: "engineSeed"},
+            {reg: "^/vis.*\\s*(.*)", val: "visu"},
+            {reg: "/run/beamOn\\s*(.*)", val: "beamOnEvents"},
+            {reg: "/gate/application/setTotalNumberOfPrimaries\\s*(.*)", val: "totalNumberOfPrimaries"},
+            {reg: "/gate/application/setTimeSlice\\s*(.*)", val: "timeSimu"},
             {reg: "[_a-zA-Z0-9\\-\\./]+\\.[_a-zA-Z][_a-zA-Z0-9\\-\\.]+", val: "otherFilesArray"}
         ];
 
