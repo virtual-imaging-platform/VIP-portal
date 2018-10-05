@@ -75,7 +75,7 @@ public class ValidatorUtil {
         
         RegExpValidator validator = new RegExpValidator();  
         validator.setErrorMessage("Invalid string");  
-        validator.setExpression("^([0-9.,A-Za-z-+@/_() ])+$:");
+        validator.setExpression("^([0-9.,A-Za-z-+@/_(): ])+$");
         return validator;
     }
     
