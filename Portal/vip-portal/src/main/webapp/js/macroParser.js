@@ -112,7 +112,7 @@ function checkAndThrow(varToCkeck, message) {
 
 function parseLine(line, regexpArray, resultArray) {
     //remove all comments starting with #, then trim
-    var trimmedLine = line.replace(/#[^/.]+$/, "").trim();
+    var trimmedLine = line.replace(/#.*/, "").trim();
     //if trimmedLine not empty after removing comments 
     if (trimmedLine) {
         for (var parseIndex = 0; parseIndex < regexpArray.length; parseIndex++) {
