@@ -31,17 +31,22 @@
  */
 package fr.insalyon.creatis.vip.api;
 
-import fr.insalyon.creatis.vip.api.business.*;
+import fr.insalyon.creatis.vip.api.business.ApiContext;
 import fr.insalyon.creatis.vip.application.server.business.*;
-import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
-import fr.insalyon.creatis.vip.core.server.dao.CoreDAOFactory;
-import fr.insalyon.creatis.vip.core.server.dao.DAOException;
-import fr.insalyon.creatis.vip.core.server.dao.UserDAO;
+import fr.insalyon.creatis.vip.core.server.business.*;
+import fr.insalyon.creatis.vip.core.server.dao.*;
 import fr.insalyon.creatis.vip.datamanager.server.business.*;
 import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.*;
+import org.springframework.core.env.Environment;
+import org.springframework.core.io.support.ResourcePropertySource;
 import org.springframework.web.servlet.config.annotation.*;
+
+import java.io.IOException;
+
+import static fr.insalyon.creatis.vip.api.CarminProperties.CORS_AUTHORIZED_DOMAINS;
 
 /**
  * Configuration class for spring web.
@@ -51,16 +56,18 @@ import org.springframework.web.servlet.config.annotation.*;
  *
  * It enables annotation configuration by subpackage scan.
  *
- * It declares the carmin.properties file.
+ * It declares an api conf file which location is configured from the main vip conf file
  *
  * Created by abonnet on 7/13/16.
  */
 @EnableWebMvc
 @ComponentScan
-@PropertySource("classpath:carmin.properties")
 public class SpringWebConfig extends WebMvcConfigurerAdapter {
 
     public static final Logger logger = Logger.getLogger(SpringWebConfig.class);
+
+    @Autowired
+    private Environment env;
 
     @Override
     public void configurePathMatch(PathMatchConfigurer matcher) {
@@ -84,6 +91,13 @@ public class SpringWebConfig extends WebMvcConfigurerAdapter {
             logger.error("error creating user dao bean", e);
             throw new RuntimeException("Cannot create user dao", e);
         }
+    }
+
+    @Override
+    public void addCorsMappings(CorsRegistry registry) {
+        registry.addMapping("/**")
+            .allowedMethods("GET", "POST", "PUT", "DELETE", "HEAD")
+            .allowedOrigins(env.getProperty(CORS_AUTHORIZED_DOMAINS, String[].class));
     }
 
     @Bean

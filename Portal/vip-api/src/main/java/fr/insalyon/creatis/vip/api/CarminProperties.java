@@ -36,7 +36,7 @@ package fr.insalyon.creatis.vip.api;
  */
 public interface CarminProperties {
 
-    // TODO : verify they're present on spring init
+    String CORS_AUTHORIZED_DOMAINS = "cors.autorized-domains";
 
     // CARMIN COMMON
     String PLATFORM_NAME = "carmin.platform.name";
