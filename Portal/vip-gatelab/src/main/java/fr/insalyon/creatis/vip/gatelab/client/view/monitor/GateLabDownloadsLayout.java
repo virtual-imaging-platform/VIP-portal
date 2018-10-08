@@ -118,7 +118,7 @@ public class GateLabDownloadsLayout extends HLayout {
 
             public void onSuccess(List<InOutData> result) {
                 for (InOutData data : result) {
-                    if (data.getProcessor().equals("merged_result")) {
+                    if (data.getProcessor().toLowerCase().contains("result")) {
                         output = data.getPath();
                         outputLabel.setContents("<font color=\"#666666\">" + output + "</font>");
                         outputLayout.setDisabled(false);
