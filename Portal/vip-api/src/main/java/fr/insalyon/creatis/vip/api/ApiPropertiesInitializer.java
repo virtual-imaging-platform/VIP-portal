@@ -42,6 +42,7 @@ import org.springframework.util.Assert;
 import org.springframework.web.context.*;
 
 import java.io.IOException;
+import java.lang.reflect.Array;
 
 import static fr.insalyon.creatis.vip.api.CarminProperties.*;
 
@@ -69,44 +70,36 @@ public class ApiPropertiesInitializer implements ApplicationContextInitializer<C
     }
 
     private void verifyProperties(Environment env) {
-        Assert.notNull(env.getProperty(CORS_AUTHORIZED_DOMAINS, String[].class),
-                CORS_AUTHORIZED_DOMAINS + " required in api conf file");
 
-        Assert.notNull(env.getProperty(PLATFORM_NAME),
-                PLATFORM_NAME + " required in api conf file");
-        Assert.notNull(env.getProperty(PLATFORM_DESCRIPTION),
-                PLATFORM_DESCRIPTION + " required in api conf file");
-        Assert.notNull(env.getProperty(PLATFORM_EMAIL),
-                PLATFORM_EMAIL + " required in api conf file");
+        verifyPropertyNotNull(env, CORS_AUTHORIZED_DOMAINS, String[].class);
+        verifyPropertyNotNull(env, PLATFORM_NAME, String.class);
+        verifyPropertyNotNull(env, PLATFORM_DESCRIPTION, String.class);
+        verifyPropertyNotNull(env, PLATFORM_EMAIL, String.class);
+        verifyPropertyNotNull(env, DEFAULT_LIMIT_LIST_EXECUTION, Long.class);
+        verifyPropertyNotNull(env, SUPPORTED_API_VERSION, String.class);
+        verifyPropertyNotNull(env, APIKEY_HEADER_NAME, String.class);
+        verifyPropertyNotNull(env, APIKEY_GENERATE_NEW_EACH_TIME, Boolean.class);
+        verifyPropertyNotNull(env, API_DIRECTORY_MIME_TYPE, String.class);
+        verifyPropertyNotNull(env, API_DEFAULT_MIME_TYPE, String.class);
+        verifyPropertyNotNull(env, API_DOWNLOAD_RETRY_IN_SECONDS, Integer.class);
+        verifyPropertyNotNull(env, API_DOWNLOAD_TIMEOUT_IN_SECONDS, Integer.class);
+        verifyPropertyNotNull(env, API_DATA_TRANSFERT_MAX_SIZE, Long.class);
+        verifyPropertyNotNull(env, API_DATA_DOWNLOAD_RELATIVE_PATH, String.class);
+
+        // due to arrays and generics, this verification aren't easy to factorize
         Assert.notEmpty(env.getProperty(SUPPORTED_TRANSFER_PROTOCOLS, SupportedTransferProtocol[].class),
                 SUPPORTED_TRANSFER_PROTOCOLS + " required in api conf file");
         Assert.notEmpty(env.getProperty(SUPPORTED_MODULES, Module[].class),
                 SUPPORTED_MODULES + " required in api conf file");
-        Assert.notNull(env.getProperty(DEFAULT_LIMIT_LIST_EXECUTION, Long.class),
-                DEFAULT_LIMIT_LIST_EXECUTION + " required in api conf file");
         Assert.isInstanceOf(String[].class, env.getProperty(UNSUPPORTED_METHODS, String[].class),
-                UNSUPPORTED_METHODS + "r equired in api conf file");
-        Assert.notNull(env.getProperty(SUPPORTED_API_VERSION),
-                SUPPORTED_API_VERSION + " required in api conf file");
+                UNSUPPORTED_METHODS + " required in api conf file");
         Assert.notEmpty(env.getProperty(PLATFORM_ERROR_CODES_AND_MESSAGES, String[].class),
                 PLATFORM_ERROR_CODES_AND_MESSAGES + " required in api conf file");
 
-        Assert.notNull(env.getProperty(APIKEY_HEADER_NAME),
-                APIKEY_HEADER_NAME + " required in api conf file");
-        Assert.notNull(env.getProperty(APIKEY_GENERATE_NEW_EACH_TIME, Boolean.class),
-                APIKEY_GENERATE_NEW_EACH_TIME + " required in api conf file");
+    }
 
-        Assert.notNull(env.getProperty(API_DIRECTORY_MIME_TYPE),
-                API_DIRECTORY_MIME_TYPE + " required in api conf file");
-        Assert.notNull(env.getProperty(API_DEFAULT_MIME_TYPE),
-                API_DEFAULT_MIME_TYPE + " required in api conf file");
-        Assert.notNull(env.getProperty(API_DOWNLOAD_RETRY_IN_SECONDS, Integer.class),
-                API_DOWNLOAD_RETRY_IN_SECONDS + " required in api conf file");
-        Assert.notNull(env.getProperty(API_DOWNLOAD_TIMEOUT_IN_SECONDS, Integer.class),
-                API_DOWNLOAD_TIMEOUT_IN_SECONDS + " required in api conf file");
-        Assert.notNull(env.getProperty(API_DATA_TRANSFERT_MAX_SIZE, Long.class),
-                API_DATA_TRANSFERT_MAX_SIZE + " required in api conf file");
-        Assert.notNull(env.getProperty(API_DATA_DOWNLOAD_RELATIVE_PATH),
-                API_DATA_DOWNLOAD_RELATIVE_PATH + " required in api conf file");
+    private void verifyPropertyNotNull(Environment env, String propertyKey, Class<?> targetType) {
+        Assert.notNull(env.getProperty(propertyKey, targetType),
+                propertyKey + " required in api conf file");
     }
 }
