@@ -111,9 +111,10 @@ function checkAndThrow(varToCkeck, message) {
 }
 
 function parseLine(line, regexpArray, resultArray) {
-    var trimmedLine = line.trim();
-    //if the line is not a comment, i.e. it doesn't start with #
-    if (!trimmedLine.match("^#")) {
+    //remove all comments starting with #, then trim
+    var trimmedLine = line.replace(/#.*/, "").trim();
+    //if trimmedLine not empty after removing comments 
+    if (trimmedLine) {
         for (var parseIndex = 0; parseIndex < regexpArray.length; parseIndex++) {
             var m = trimmedLine.match(regexpArray[parseIndex].reg);
             if (m) {
