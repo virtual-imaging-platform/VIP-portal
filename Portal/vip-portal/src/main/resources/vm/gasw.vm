@@ -31,7 +31,7 @@
 #set ($value=$value.replace($input.getValueKey(),"$na$i"))
 #end
 #end
-      <template value="$dir1/$na1/$value"/>
+      <template value="$prefix1$dir1/$na1/$value$options1" />
       <access type="LFN"/>
     </output>
 #end
