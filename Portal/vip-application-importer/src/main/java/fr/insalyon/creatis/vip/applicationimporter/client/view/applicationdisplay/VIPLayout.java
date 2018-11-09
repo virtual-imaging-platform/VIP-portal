@@ -30,7 +30,6 @@
  * knowledge of the CeCILL-B license and that you accept its terms.
  */
 package fr.insalyon.creatis.vip.applicationimporter.client.view.applicationdisplay;
-
 import com.google.gwt.json.client.JSONObject;
 import com.google.gwt.json.client.JSONParser;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -63,6 +62,7 @@ public class VIPLayout extends AbstractFormLayout {
     private final CheckboxItem overwriteIfexists;
     private final TextItem tbAddDescriptor;
     private final SelectItem appCbItem;
+    private final SelectItem tagsCbItem;
 
     public VIPLayout(String width, String height) {
         super(width, height);
@@ -111,10 +111,13 @@ public class VIPLayout extends AbstractFormLayout {
         tbAddDescriptor.setValue("");
         tbAddDescriptor.setDisabled(false);
 
+        tagsCbItem = createTagsSelect();
+
         this.addMember(FieldUtil.getForm(appCbItem));
         this.addMember(FieldUtil.getForm(tbAddDescriptor));
         this.addMember(FieldUtil.getForm(isRunOnGrid));
         this.addMember(FieldUtil.getForm(overwriteIfexists));
+        this.addMember(FieldUtil.getForm(tagsCbItem));
     }
 
     /**
@@ -150,5 +153,21 @@ public class VIPLayout extends AbstractFormLayout {
      */
     public String getApplicationType() {
         return appCbItem._getValue().toString();
+    }
+
+    private SelectItem createTagsSelect() {
+        // ComboBox to select tags.
+        SelectItem tagsCb = new SelectItem();
+        tagsCb.setTitle("<b>Dirac tag</b>");
+        tagsCb.setType("comboBox");
+
+        tagsCb.setValueMap("None", "diracTag:nvidiaGPU");
+        tagsCb.setValue("None");
+
+        return tagsCb;
+    }
+
+    public String getTag() {
+        return tagsCbItem._getValue().toString();
     }
 }

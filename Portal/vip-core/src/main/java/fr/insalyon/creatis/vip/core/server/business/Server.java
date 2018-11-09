@@ -54,6 +54,7 @@ public class Server {
     private final String CONF_FILE = "vip.conf";
     private final String VIP_DIR = "/.vip/";
     private final String PROXIES_DIR = "proxies/";
+    private final String DEFAULT_API_CONF_FILENAME  = "vip-api.conf";
     // Portal
     private String configurationFolder;
     private String serverProxy;
@@ -77,6 +78,8 @@ public class Server {
     private String myProxyPass;
     private String myProxyLifeTime;
     private int myProxyMinHours;
+    // API
+    private String apiConfFileLocation;
     // Mail
     private String SMAHost;
     private int SMAPort;
@@ -145,6 +148,9 @@ public class Server {
             String confFilePath = configurationFolder + CONF_FILE;
             config = new PropertiesConfiguration(confFilePath);
             logger.info("Loading config file: " + confFilePath);
+
+            // API conf file
+            apiConfFileLocation = config.getString(CoreConstants.LAB_API_CONF_LOCATION, DEFAULT_API_CONF_FILENAME);
 
             databaseServerHost = config.getString(CoreConstants.LAB_DB_HOST, "localhost");
             databaseServerPort = config.getInt(CoreConstants.LAB_DB_PORT, 9092);
@@ -236,6 +242,7 @@ public class Server {
 
             config.setProperty(CoreConstants.LAB_DB_HOST, databaseServerHost);
             config.setProperty(CoreConstants.LAB_DB_PORT, databaseServerPort);
+            config.setProperty(CoreConstants.LAB_API_CONF_LOCATION, apiConfFileLocation);
             config.setProperty(CoreConstants.LAB_ADMIN_FIRST_NAME, adminFirstName);
             config.setProperty(CoreConstants.LAB_ADMIN_LAST_NAME, adminLastName);
             config.setProperty(CoreConstants.LAB_ADMIN_EMAIL, adminEmail);
@@ -310,6 +317,21 @@ public class Server {
 
     public String getConfigurationFolder() {
         return configurationFolder;
+    }
+
+    public String getApiConfFileLocation() {
+        String customLocation = apiConfFileLocation;
+        if (customLocation.startsWith("classpath:") ||
+                customLocation.startsWith("file:")) {
+            // already in location format location, nothing to do
+            return customLocation;
+        } else if (customLocation.startsWith("/")) {
+            // absolute file
+            return "file:" + customLocation;
+        } else {
+            // it's a relative path, take it from the configuration folder
+            return "file:" + configurationFolder + customLocation;
+        }
     }
 
     public String getVoName() {

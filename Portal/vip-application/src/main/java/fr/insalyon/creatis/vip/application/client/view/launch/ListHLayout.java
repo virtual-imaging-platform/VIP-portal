@@ -76,7 +76,7 @@ public class ListHLayout extends HLayout {
         this.instance = this;
         this.setMembersMargin(3);
 
-        listItem = FieldUtil.getTextItem(400, false, "", "[0-9.,A-Za-z-+/_(){} ]");
+        listItem = FieldUtil.getTextItem(400, false, "", "[0-9.,A-Za-z-+/_(){}: ]");
         listItem.setValue(value);
         listItem.setValidators(ValidatorUtil.getStringValidator());
         

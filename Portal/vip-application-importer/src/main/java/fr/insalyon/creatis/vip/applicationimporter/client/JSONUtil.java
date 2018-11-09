@@ -83,7 +83,7 @@ public class JSONUtil {
         bi.setName(getPropertyAsString(input, "name"));
         bi.setType(getPropertyAsString(input, "type"));
         bi.setDescription(getPropertyAsString(input, "description", ""));
-        bi.setCommandLineKey(getPropertyAsString(input, "command-line-key"));
+        bi.setValueKey(getPropertyAsString(input, "value-key"));
         bi.setList(getPropertyAsBoolean(input, "list"));
         bi.setOptional(getPropertyAsBoolean(input, "optional"));
         bi.setCommandLineFlag(getPropertyAsString(input, "command-line-flag", ""));
@@ -99,7 +99,7 @@ public class JSONUtil {
         bof.setId(getPropertyAsString(outputFile, "id"));
         bof.setName(getPropertyAsString(outputFile, "name"));
         bof.setDescription(getPropertyAsString(outputFile, "description"));
-        bof.setCommandLineKey(getPropertyAsString(outputFile, "command-line-key"));
+        bof.setValueKey(getPropertyAsString(outputFile, "value-key"));
         bof.setPathTemplate(getPropertyAsString(outputFile, "path-template"));
         bof.setList(getPropertyAsBoolean(outputFile, "list"));
         bof.setOptional(getPropertyAsBoolean(outputFile, "optional"));

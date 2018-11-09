@@ -69,7 +69,8 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
             .authorizeRequests()
                 .antMatchers("/rest/platform").permitAll()
                 .antMatchers("/rest/authenticate").permitAll()
-                .anyRequest().authenticated()
+                .antMatchers("/rest/**").authenticated()
+                .anyRequest().permitAll()
             .and()
             .apply(new ApikeyAuthentificationConfigurer<>(
                     env.getProperty(CarminProperties.APIKEY_HEADER_NAME),
@@ -77,6 +78,8 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
             .and()
             .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             .and()
+            .cors().and()
+            .headers().frameOptions().sameOrigin().and()
             .csrf().disable();
     }
 

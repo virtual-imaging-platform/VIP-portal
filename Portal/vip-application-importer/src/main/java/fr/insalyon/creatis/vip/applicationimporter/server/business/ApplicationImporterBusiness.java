@@ -92,7 +92,7 @@ public class ApplicationImporterBusiness {
         }
     }
 
-    public void createApplication(BoutiquesTool bt, String type, HashMap<String, BoutiquesTool> bts, boolean isRunOnGrid, boolean overwriteApplicationVersion, User user, boolean challenge)
+    public void createApplication(BoutiquesTool bt, String type, String tag, HashMap<String, BoutiquesTool> bts, boolean isRunOnGrid, boolean overwriteApplicationVersion, User user, boolean challenge)
         throws BusinessException, ApplicationImporterException, JSONException {
 
         try {
@@ -129,8 +129,8 @@ public class ApplicationImporterBusiness {
             HashMap<String, String> wrapperFileName = new HashMap();
             // for each component we have to generate GASW and script files
             for (Map.Entry<String, BoutiquesTool> e : btMaps.entrySet()) {
-                gaswString.put(e.getKey(), VelocityUtils.getInstance().createDocument(e.getValue(), isRunOnGrid, gaswTemplate));
-                wrapperString.put(e.getKey(), VelocityUtils.getInstance().createDocument(e.getValue(), isRunOnGrid, wrapperTemplate));
+                gaswString.put(e.getKey(), VelocityUtils.getInstance().createDocument(tag, e.getValue(), isRunOnGrid, gaswTemplate));
+                wrapperString.put(e.getKey(), VelocityUtils.getInstance().createDocument(tag, e.getValue(), isRunOnGrid, wrapperTemplate));
                 gaswFileName.put(e.getKey(), Server.getInstance().getApplicationImporterFileRepository() + e.getValue().getGASWLFN());
                 wrapperFileName.put(e.getKey(), Server.getInstance().getApplicationImporterFileRepository() + e.getValue().getWrapperLFN());
             }
@@ -143,9 +143,7 @@ public class ApplicationImporterBusiness {
             
             // Write application json descriptor
             String jsonFileName = Server.getInstance().getApplicationImporterFileRepository() + bt.getJsonLFN();
-            System.out.print(jsonFileName + "\n");
-            writeString(bt.getJsonFile(), jsonFileName);
-            uploadFile(jsonFileName, bt.getJsonLFN());
+            writeString(bt.getJsonFile(), jsonFileName);         
   
             String wrapperArchiveName;
             // Write files for each GASW and script file
@@ -156,6 +154,8 @@ public class ApplicationImporterBusiness {
 
                 ArrayList<File> dependencies = new ArrayList<File>();
                 dependencies.add(new File(wrapperFileName.get(e.getKey())));
+                //Add json file to archive so that it is downloaded on WN for Boutiques exec
+                dependencies.add(new File(jsonFileName));
                 TargzUtils.createTargz(dependencies, wrapperArchiveName);
 
                 // Transfer files
@@ -168,6 +168,8 @@ public class ApplicationImporterBusiness {
 
                 uploadFile(wrapperArchiveName, bt.getWrapperLFN() + ".tar.gz");
             }
+            //Upload the JSON file at the end, so that it is not deleted before adding it as dependency to wrapperArchiveName
+            uploadFile(jsonFileName, bt.getJsonLFN());
         
 // Register application
             registerApplicationVersion(bt.getName(), bt.getToolVersion(), user.getEmail(), bt.getGwendiaLFN());
