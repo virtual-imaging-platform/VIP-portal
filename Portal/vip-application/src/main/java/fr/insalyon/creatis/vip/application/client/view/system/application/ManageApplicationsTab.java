@@ -31,7 +31,7 @@
  */
 package fr.insalyon.creatis.vip.application.client.view.system.application;
 
-import com.smartgwt.client.widgets.layout.HLayout;
+import com.smartgwt.client.widgets.layout.*;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
 import fr.insalyon.creatis.vip.core.client.view.common.AbstractManageTab;
 
@@ -45,6 +45,7 @@ public class ManageApplicationsTab extends AbstractManageTab {
     private EditApplicationLayout editLayout;
     private VersionsLayout versionsLayout;
     private EditVersionLayout editVersionLayout;
+    private PublishVersionLayout publishVersionLayout;
 
     public ManageApplicationsTab() {
 
@@ -60,12 +61,17 @@ public class ManageApplicationsTab extends AbstractManageTab {
         vLayout.addMember(appLayout);
 
         versionsLayout = new VersionsLayout();
+        VLayout versionInfoLayout = new VLayout(5);
         editVersionLayout = new EditVersionLayout();
+        publishVersionLayout = new PublishVersionLayout();
 
         HLayout versionLayout = new HLayout(5);
         versionLayout.setHeight("50%");
         versionLayout.addMember(versionsLayout);
-        versionLayout.addMember(editVersionLayout);
+
+        versionInfoLayout.addMember(editVersionLayout);
+        versionInfoLayout.addMember(publishVersionLayout);
+        versionLayout.addMember(versionInfoLayout);
         vLayout.addMember(versionLayout);
     }
 
