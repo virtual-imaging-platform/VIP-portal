@@ -172,7 +172,7 @@ public class ApplicationImporterBusiness {
             uploadFile(jsonFileName, bt.getJsonLFN());
         
 // Register application
-            registerApplicationVersion(bt.getName(), bt.getToolVersion(), user.getEmail(), bt.getGwendiaLFN());
+            registerApplicationVersion(bt.getName(), bt.getToolVersion(), user.getEmail(), bt.getGwendiaLFN(), bt.getJsonLFN());
 
         } catch (FileNotFoundException ex) {
             logger.error(ex);
@@ -212,10 +212,10 @@ public class ApplicationImporterBusiness {
         writer.close();
     }
 
-    private void registerApplicationVersion(String vipApplicationName, String vipVersion, String owner, String lfnGwendiaFile) throws BusinessException {
+    private void registerApplicationVersion(String vipApplicationName, String vipVersion, String owner, String lfnGwendiaFile, String lfnJsonFile) throws BusinessException {
         ApplicationBusiness ab = new ApplicationBusiness();
         Application app = ab.getApplication(vipApplicationName);
-        AppVersion newVersion = new AppVersion(vipApplicationName, vipVersion, lfnGwendiaFile, true);
+        AppVersion newVersion = new AppVersion(vipApplicationName, vipVersion, lfnGwendiaFile, lfnJsonFile, true);
         if (app == null) {
             // If application doesn't exist, create it.
             // New applications are not associated with any class (admins may add classes independently).

@@ -31,32 +31,22 @@
  */
 package fr.insalyon.creatis.vip.applicationimporter.client.view.applicationdisplay;
 
-import com.google.gwt.json.client.JSONObject;
-import com.google.gwt.json.client.JSONParser;
+import com.google.gwt.json.client.*;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.TextBox;
-import com.smartgwt.client.util.SC;
-import com.smartgwt.client.widgets.Canvas;
-import com.smartgwt.client.widgets.IButton;
-import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
-import com.smartgwt.client.widgets.layout.HLayout;
-import com.smartgwt.client.widgets.layout.VLayout;
+import com.smartgwt.client.widgets.*;
+import com.smartgwt.client.widgets.events.*;
+import com.smartgwt.client.widgets.layout.*;
 import com.smartgwt.client.widgets.tab.Tab;
-
-import fr.insalyon.creatis.vip.applicationimporter.client.ApplicationImporterException;
-import fr.insalyon.creatis.vip.applicationimporter.client.JSONUtil;
+import fr.insalyon.creatis.vip.applicationimporter.client.*;
 import fr.insalyon.creatis.vip.applicationimporter.client.bean.BoutiquesTool;
 import fr.insalyon.creatis.vip.applicationimporter.client.rpc.ApplicationImporterService;
 import fr.insalyon.creatis.vip.applicationimporter.client.view.Constants;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
-import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
+
 import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.logging.*;
 
 public class DisplayTab extends Tab {
 
@@ -189,10 +179,26 @@ public class DisplayTab extends Tab {
      */
     public void parseJSON(JSONObject jsonObject) throws ApplicationImporterException {
         boutiquesTool = JSONUtil.parseBoutiquesTool(jsonObject);
+        verifyBoutiquesTool();
         this.setTitle(boutiquesTool.getName());
         generalLayout.setTool(boutiquesTool);
         inputsLayout.setInputs(boutiquesTool.getInputs());
         outputsLayout.setOutputFiles(boutiquesTool.getOutputFiles());
+    }
+
+    private void verifyBoutiquesTool() throws ApplicationImporterException {
+        if (boutiquesTool.getName() == null) {
+            throw new ApplicationImporterException("Boutiques file must have a name property");
+        }
+        if (boutiquesTool.getToolVersion() == null) {
+            throw new ApplicationImporterException("Boutiques file must have a tool-version property");
+        }
+        if (boutiquesTool.getAuthor() == null) {
+            throw new ApplicationImporterException("Boutiques file must have an author");
+        }
+        if (boutiquesTool.getTags() == null || boutiquesTool.getTags().isEmpty()) {
+            throw new ApplicationImporterException("Boutiques file must have at least one tag");
+        }
     }
 
     /**

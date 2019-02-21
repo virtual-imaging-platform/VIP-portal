@@ -86,6 +86,8 @@ public interface ApplicationService extends RemoteService {
 
     public void removeVersion(String applicationName, String version) throws ApplicationException;
 
+    public String publishVersion(String applicationName, String version) throws ApplicationException;
+
     public void addClass(AppClass c) throws ApplicationException;
 
     public void updateClass(AppClass c) throws ApplicationException;

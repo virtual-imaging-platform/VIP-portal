@@ -31,12 +31,15 @@
  */
 package fr.insalyon.creatis.vip.application.client.view.system.application;
 
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.widgets.*;
 import com.smartgwt.client.widgets.events.*;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
+import fr.insalyon.creatis.vip.application.client.rpc.ApplicationService;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.common.AbstractFormLayout;
-import fr.insalyon.creatis.vip.core.client.view.util.*;
+import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
+import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
 
 /**
  *
@@ -44,7 +47,9 @@ import fr.insalyon.creatis.vip.core.client.view.util.*;
  */
 public class PublishVersionLayout extends AbstractFormLayout {
 
-    private boolean isPublished;
+    private String applicationName;
+    private String applicationVersion;
+
     private Label statusLabel;
     private Label doiLabel;
     private IButton publishButton;
@@ -59,9 +64,9 @@ public class PublishVersionLayout extends AbstractFormLayout {
 
     private void configure() {
 
-        isPublished = true;
-        statusLabel = WidgetUtil.getLabel("<b>Status :</b> Not Published", 15);
+        statusLabel = WidgetUtil.getLabel("<b>Status:</b>", 15);
         doiLabel = WidgetUtil.getLabel("", 15);
+        doiLabel.setVisible(false);
 
         publishButton = WidgetUtil.getIButton("Publish", CoreConstants.ICON_SAVE,
                 new ClickHandler() {
@@ -69,9 +74,57 @@ public class PublishVersionLayout extends AbstractFormLayout {
             public void onClick(ClickEvent event) {
             }
         });
+        publishButton.setDisabled(true);
 
         this.addMember(statusLabel);
         this.addMember(doiLabel);
         addButtons(publishButton);
+    }
+
+    private void publishVersion() {
+        WidgetUtil.setLoadingIButton(publishButton, "Publishing...");
+
+        AsyncCallback<String> publishCallback = new AsyncCallback<String>() {
+            @Override
+            public void onFailure(Throwable caught) {
+                WidgetUtil.resetIButton(publishButton, "Publish", CoreConstants.ICON_SAVE);
+                Layout.getInstance().setWarningMessage("Unable to publih this version.<br />Please verify it has an author configured.<br />" + caught.getMessage());
+            }
+
+            @Override
+            public void onSuccess(String doi) {
+                WidgetUtil.resetIButton(publishButton, "Publish", CoreConstants.ICON_SAVE);
+                Layout.getInstance().setNoticeMessage("Version published with success. DOI : " + doi);
+                publishButton.setDisabled(true);
+                doiLabel.setContents("<b>DOI:</b> " + doi);
+                statusLabel.setContents("<b>Status:</b> Published");
+            }
+        };
+
+        ApplicationService.Util.getInstance().publishVersion(applicationName, applicationVersion, publishCallback);
+    }
+
+    public void setApplication(String applicationName) {
+        this.applicationName = applicationName;
+    }
+
+    public void setVersion(String applicationVersion, String jsonLfn, String doi) {
+        this.applicationVersion = applicationVersion;
+
+        boolean isPublished = doi != null;
+        boolean canBePublished = !isPublished && jsonLfn != null;
+        doiLabel.setVisible(isPublished);
+        if (isPublished) {
+            doiLabel.setContents("<b>DOI:</b> " + doi);
+            statusLabel.setContents("<b>Status:</b> Published");
+        } else {
+            statusLabel.setContents("<b>Status:</b> Not published");
+        }
+        publishButton.setDisabled( ! canBePublished);
+        if (!isPublished && !canBePublished) {
+            publishButton.setTooltip("This version must have a json configured to be be published");
+        } else {
+            publishButton.setTooltip(null);
+        }
     }
 }

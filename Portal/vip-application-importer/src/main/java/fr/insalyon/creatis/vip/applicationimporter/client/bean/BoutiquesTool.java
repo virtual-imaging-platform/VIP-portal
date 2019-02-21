@@ -32,8 +32,8 @@
 package fr.insalyon.creatis.vip.applicationimporter.client.bean;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
-import java.util.ArrayList;
-import java.util.List;
+
+import java.util.*;
 
 /**
  *
@@ -45,6 +45,7 @@ public class BoutiquesTool implements IsSerializable {
 
     // Fields parsed from the JSON object.
     private String name;
+    private String author;
     private String toolVersion;
     private String description;
     private String commandLine;
@@ -55,15 +56,21 @@ public class BoutiquesTool implements IsSerializable {
     private String challengerTeam;
     private List<BoutiquesInput> inputs;
     private List<BoutiquesOutputFile> outputFiles;
+    private Map<String,String> tags;
     private String jsonFile;
 
     public BoutiquesTool() {
         inputs = new ArrayList<BoutiquesInput>();
         outputFiles = new ArrayList<BoutiquesOutputFile>();
+        tags = new HashMap<String,String>();
     }
 
     public String getName() {
         return name;
+    }
+
+    public String getAuthor() {
+        return author;
     }
 
     public String getToolVersion() {
@@ -141,6 +148,10 @@ public class BoutiquesTool implements IsSerializable {
         this.name = name;
     }
 
+    public void setAuthor(String author) {
+        this.author = author;
+    }
+
     public void setToolVersion(String toolVersion) {
         this.toolVersion = toolVersion;
     }
@@ -175,6 +186,14 @@ public class BoutiquesTool implements IsSerializable {
 
     public String getApplicationLFN() {
         return applicationLFN;
+    }
+
+    public void addTag(String key, String value) {
+        tags.put(key, value);
+    }
+
+    public Map<String, String> getTags() {
+        return tags;
     }
 
     public boolean hasNextInput(BoutiquesInput input) {

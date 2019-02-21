@@ -40,11 +40,7 @@ import fr.insalyon.creatis.vip.application.client.bean.Engine;
 import fr.insalyon.creatis.vip.application.client.bean.Simulation;
 import fr.insalyon.creatis.vip.application.client.rpc.ApplicationService;
 import fr.insalyon.creatis.vip.application.client.view.ApplicationException;
-import fr.insalyon.creatis.vip.application.server.business.ApplicationBusiness;
-import fr.insalyon.creatis.vip.application.server.business.ClassBusiness;
-import fr.insalyon.creatis.vip.application.server.business.EngineBusiness;
-import fr.insalyon.creatis.vip.application.server.business.SimulationBusiness;
-import fr.insalyon.creatis.vip.application.server.business.WorkflowBusiness;
+import fr.insalyon.creatis.vip.application.server.business.*;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.CoreException;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
@@ -65,12 +61,14 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
     private final ClassBusiness classBusiness;
     private final ApplicationBusiness applicationBusiness;
     private final EngineBusiness engineBusiness;
+    private final PublicationBusiness publicationBusiness;
 
     public ApplicationServiceImpl() {
 
         engineBusiness = new EngineBusiness();
         classBusiness = new ClassBusiness();
         applicationBusiness = new ApplicationBusiness();
+        publicationBusiness = new PublicationBusiness();
     }
 
     @Override
@@ -183,6 +181,15 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
             }
         } catch (CoreException ex) {
             throw new ApplicationException(ex);
+        } catch (BusinessException ex) {
+            throw new ApplicationException(ex);
+        }
+    }
+
+    @Override
+    public String publishVersion(String applicationName, String version) throws ApplicationException {
+        try {
+            return publicationBusiness.publishVersion(applicationName, version);
         } catch (BusinessException ex) {
             throw new ApplicationException(ex);
         }
