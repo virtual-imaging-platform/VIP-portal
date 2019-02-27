@@ -31,7 +31,11 @@
  */
 package fr.insalyon.creatis.vip.application.server.business;
 
-import fr.insalyon.creatis.vip.core.server.business.BusinessException;
+import fr.insalyon.creatis.vip.application.client.bean.AppVersion;
+import fr.insalyon.creatis.vip.core.client.bean.User;
+import fr.insalyon.creatis.vip.core.server.business.*;
+import fr.insalyon.creatis.vip.datamanager.server.business.DataManagerBusiness;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.log4j.Logger;
 
 import java.io.*;
@@ -44,16 +48,57 @@ public class PublicationBusiness {
 
     private static final Logger logger = Logger.getLogger(PublicationBusiness.class);
 
-    public String publishVersion(String applicationName, String version) throws BusinessException {
-        // fetch json file
+    public String publishVersion(User user, String applicationName, String version) throws BusinessException {
+        DataManagerBusiness dmBusiness = new DataManagerBusiness();
 
-        // TODO : verify it has an author
+        // fetch json file
+        String jsonLfn = getJsonLfn(applicationName, version);
+        String localDirectory = Server.getInstance().getConfigurationFolder()
+                + "jsons/" + applicationName + "/" + version;
+        String localFile = dmBusiness.getRemoteFile(user, jsonLfn, localDirectory);
+
+        // TODO : verify it has an author (refactor boutique parser from application-importer
 
         // call publish command
+        String command = "FILE=" + localFile + "; " + Server.getInstance().getPublicationCommandLine();
+        List<String> output = runCommand(command);
 
-        // get the doi and return it
-        String doi = "";
+        // get the doi
+        // There should be only one line with the DOI
+        String doi = getDoiFromPublishOutput(output);
+
+        // save the doi in database
+        saveDoiForVersion(doi, applicationName, version);
+
         return doi;
+    }
+
+    private String getJsonLfn(String applicationName, String applicationVersion) throws BusinessException {
+        ApplicationBusiness applicationBusiness = new ApplicationBusiness();
+        AppVersion appVersion = applicationBusiness.getVersion(applicationName, applicationVersion);
+        if (appVersion.getJsonLfn() == null) {
+            logger.error("No json lfn for this application : " + applicationName + "/" + applicationVersion);
+            throw new BusinessException("There is no json lfn for this application version.");
+        }
+        return appVersion.getJsonLfn();
+    }
+
+    private void saveDoiForVersion(
+            String doi,
+            String applicationName,
+            String applicationVersion) throws BusinessException {
+
+        ApplicationBusiness applicationBusiness = new ApplicationBusiness();
+        applicationBusiness.updateDoiForVersion(doi, applicationName, applicationVersion);
+    }
+
+    private String getDoiFromPublishOutput(List<String> publishOutput) throws BusinessException {
+        if (publishOutput.size() != 1) {
+            logger.error("Wrong publication output, there should be only one line : "
+                    + String.join("\n", publishOutput));
+            throw new BusinessException("Wrong publication output.");
+        }
+        return publishOutput.get(0);
     }
 
     private List<String> runCommand(String command) throws BusinessException {
@@ -63,6 +108,7 @@ public class PublicationBusiness {
         List<String> cout = new ArrayList<>();
 
         try {
+            logger.info("Executing command : " + command);
             process = builder.start();
             BufferedReader r = new BufferedReader(
                 new InputStreamReader(process.getInputStream()));

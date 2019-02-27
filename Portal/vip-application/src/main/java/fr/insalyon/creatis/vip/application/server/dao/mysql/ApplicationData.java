@@ -568,6 +568,26 @@ public class ApplicationData implements ApplicationDAO {
     }
 
     @Override
+    public void updateDoiForVersion(String doi, String applicationName, String version) throws DAOException {
+        try {
+            PreparedStatement ps = connection.prepareStatement("UPDATE "
+                    + "VIPAppVersions "
+                    + "SET doi=? "
+                    + "WHERE application=? AND version=?");
+
+            ps.setString(1, doi);
+            ps.setString(2, applicationName);
+            ps.setString(3, version);
+            ps.executeUpdate();
+            ps.close();
+
+        } catch (SQLException ex) {
+            logger.error(ex);
+            throw new DAOException(ex);
+        }
+    }
+
+    @Override
     public void removeVersion(String applicationName, String version) throws DAOException {
 
         try {

@@ -189,8 +189,13 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
     @Override
     public String publishVersion(String applicationName, String version) throws ApplicationException {
         try {
-            return publicationBusiness.publishVersion(applicationName, version);
-        } catch (BusinessException ex) {
+            if (isSystemAdministrator() || isGroupAdministrator()) {
+                trace(logger, "Publishing version " + version + "' ('" + applicationName + "').");
+                return publicationBusiness.publishVersion(getSessionUser(), applicationName, version);
+            } else {
+                throw new ApplicationException("You have no administrator rights.");
+            }
+        } catch (BusinessException | CoreException ex) {
             throw new ApplicationException(ex);
         }
     }

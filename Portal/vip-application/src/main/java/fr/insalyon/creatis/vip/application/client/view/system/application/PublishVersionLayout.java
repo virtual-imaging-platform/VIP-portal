@@ -72,6 +72,7 @@ public class PublishVersionLayout extends AbstractFormLayout {
                 new ClickHandler() {
             @Override
             public void onClick(ClickEvent event) {
+                publishVersion();
             }
         });
         publishButton.setDisabled(true);
@@ -88,16 +89,18 @@ public class PublishVersionLayout extends AbstractFormLayout {
             @Override
             public void onFailure(Throwable caught) {
                 WidgetUtil.resetIButton(publishButton, "Publish", CoreConstants.ICON_SAVE);
-                Layout.getInstance().setWarningMessage("Unable to publih this version.<br />Please verify it has an author configured.<br />" + caught.getMessage());
+                Layout.getInstance().setWarningMessage("Unable to publish this version.<br />Please verify it has an author configured.<br />" + caught.getMessage());
             }
 
             @Override
             public void onSuccess(String doi) {
                 WidgetUtil.resetIButton(publishButton, "Publish", CoreConstants.ICON_SAVE);
                 Layout.getInstance().setNoticeMessage("Version published with success. DOI : " + doi);
-                publishButton.setDisabled(true);
-                doiLabel.setContents("<b>DOI:</b> " + doi);
-                statusLabel.setContents("<b>Status:</b> Published");
+                // reload all version to avoid cache issues
+                setVersion(null,null, null);
+                ManageApplicationsTab tab = (ManageApplicationsTab) Layout.getInstance().
+                        getTab(ApplicationConstants.TAB_MANAGE_APPLICATION);
+                tab.loadVersions(applicationName);
             }
         };
 
