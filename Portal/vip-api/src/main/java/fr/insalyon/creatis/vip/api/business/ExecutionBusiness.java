@@ -34,6 +34,8 @@ package fr.insalyon.creatis.vip.api.business;
 import fr.insalyon.creatis.vip.api.CarminProperties;
 import fr.insalyon.creatis.vip.api.bean.*;
 import fr.insalyon.creatis.vip.api.bean.pairs.*;
+import fr.insalyon.creatis.vip.api.rest.model.PathProperties;
+import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
 import fr.insalyon.creatis.vip.application.client.bean.*;
 import fr.insalyon.creatis.vip.application.client.view.monitor.SimulationStatus;
 import fr.insalyon.creatis.vip.application.server.business.*;
@@ -46,6 +48,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.UnsupportedEncodingException;
 import java.lang.Object;
+import java.lang.reflect.Array;
 import java.net.*;
 import java.util.*;
 import java.util.Map.Entry;
@@ -67,8 +70,11 @@ public class ExecutionBusiness {
     private final ApplicationBusiness applicationBusiness;
     private final TransferPoolBusiness transferPoolBusiness;
 
+    // only used in a Spring context (aka from REST api, not SOAP)
     @Autowired
-    private Environment env; // only use in a Spring context (aka from REST api, not SOAP)
+    private DataApiBusiness dataApiBusiness;
+    @Autowired
+    private Environment env;
 
     public ExecutionBusiness(ApiContext apiContext) {
         WorkflowBusiness workflowBusiness = new WorkflowBusiness();
@@ -80,6 +86,7 @@ public class ExecutionBusiness {
         this.applicationBusiness = applicationBusiness;
         this.transferPoolBusiness = new TransferPoolBusiness();
         this.pipelineBusiness = new PipelineBusiness(apiContext, workflowBusiness, applicationBusiness, new ClassBusiness());
+        this.dataApiBusiness = new DataApiBusiness();
     }
 
     @Autowired
@@ -273,10 +280,29 @@ public class ExecutionBusiness {
     public String initExecution(Execution execution) throws ApiException {
         Map<String, String> inputMap = new HashMap<>();
         for (Entry<String,Object> restInput : execution.getRestInputValues().entrySet()) {
-            inputMap.put(restInput.getKey(), restInput.getValue().toString());
+            inputMap.put(restInput.getKey(),
+                    handleRestParameter(restInput.getKey(), restInput.getValue()));
         }
         return initExecution(execution.getPipelineIdentifier(), inputMap, execution.getTimeout(),
                 execution.getName(), execution.getStudyIdentifier(), true);
+    }
+
+    private String handleRestParameter(String parameterName, Object restParameterValue) {
+        if (restParameterValue instanceof List) {
+            StringBuilder paramBuilder = new StringBuilder();
+            boolean isFirst = true;
+            for (Object listElement : (List) restParameterValue) {
+                if (!isFirst) {
+                    paramBuilder.append(ApplicationConstants.SEPARATOR_LIST);
+                }
+                paramBuilder.append(listElement.toString());
+                isFirst = false;
+            }
+            logger.info("Handling list parameter for parameter [" + parameterName +"]");
+            return paramBuilder.toString();
+        } else {
+            return  restParameterValue.toString();
+        }
     }
 
 
@@ -411,12 +437,23 @@ public class ExecutionBusiness {
         }
     }
 
-    public String[] getSoapExecutionResultsURLs(String executionId, String protocol) throws ApiException {
-        return getExecutionResultsURLs(executionId, protocol, false);
+    public List<PathProperties> getExecutionResultsPaths(String executionId) throws ApiException {
+        List<PathProperties> pathResults = new ArrayList<>();
+        List<InOutData> outputs;
+        try {
+            outputs = workflowBusiness.getOutputData(executionId, apiContext.getUser().getFolder());
+        } catch (BusinessException e) {
+            throw new ApiException(e);
+        }
+        for (InOutData output : outputs) {
+            String outputPath = output.getPath();
+            pathResults.add(dataApiBusiness.getPathProperties(outputPath));
+        }
+        return pathResults;
     }
 
-    public String[] getRestExecutionResultsURLs(String executionId, String protocol) throws ApiException {
-        return getExecutionResultsURLs(executionId, protocol, true);
+    public String[] getSoapExecutionResultsURLs(String executionId, String protocol) throws ApiException {
+        return getExecutionResultsURLs(executionId, protocol, false);
     }
 
     private String[] getExecutionResultsURLs(String executionId, String protocol, boolean generateRestUrl) throws ApiException {
