@@ -186,7 +186,7 @@ public class EditVersionLayout extends AbstractFormLayout {
      * @param applicationName
      */
     public void setApplication(String applicationName) {
-
+        setVersion(null, null, null, true);
         this.applicationName = applicationName;
         this.applicationLabel.setContents("<b>Application:</b> " + applicationName);
         this.versionField.setDisabled(false);

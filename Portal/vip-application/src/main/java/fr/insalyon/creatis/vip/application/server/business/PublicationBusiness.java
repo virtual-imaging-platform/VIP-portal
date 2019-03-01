@@ -53,8 +53,8 @@ public class PublicationBusiness {
 
         // fetch json file
         String jsonLfn = getJsonLfn(applicationName, version);
-        String localDirectory = Server.getInstance().getConfigurationFolder()
-                + "jsons/" + applicationName + "/" + version;
+        String localDirectory = Server.getInstance().getApplicationImporterFileRepository()
+                + "/publications/" + applicationName + "/" + version;
         String localFile = dmBusiness.getRemoteFile(user, jsonLfn, localDirectory);
 
         // TODO : verify it has an author (refactor boutique parser from application-importer

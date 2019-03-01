@@ -549,15 +549,14 @@ public class ApplicationData implements ApplicationDAO {
         try {
             PreparedStatement ps = connection.prepareStatement("UPDATE "
                                                                + "VIPAppVersions "
-                                                               + "SET lfn=?, json_lfn=?, doi=?, visible=? "
+                                                               + "SET lfn=?, json_lfn=?, visible=? "
                                                                + "WHERE application=? AND version=?");
 
             ps.setString(1, version.getLfn());
             ps.setString(2, version.getJsonLfn());
-            ps.setString(3, version.getDoi());
-            ps.setBoolean(4, version.isVisible());
-            ps.setString(5, version.getApplicationName());
-            ps.setString(6, version.getVersion());
+            ps.setBoolean(3, version.isVisible());
+            ps.setString(4, version.getApplicationName());
+            ps.setString(5, version.getVersion());
             ps.executeUpdate();
             ps.close();
 

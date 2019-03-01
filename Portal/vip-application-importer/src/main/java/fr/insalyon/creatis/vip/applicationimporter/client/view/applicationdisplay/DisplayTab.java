@@ -196,9 +196,6 @@ public class DisplayTab extends Tab {
         if (boutiquesTool.getAuthor() == null) {
             throw new ApplicationImporterException("Boutiques file must have an author");
         }
-        if (boutiquesTool.getTags() == null || boutiquesTool.getTags().isEmpty()) {
-            throw new ApplicationImporterException("Boutiques file must have at least one tag");
-        }
     }
 
     /**

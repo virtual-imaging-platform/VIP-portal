@@ -108,6 +108,7 @@ public class PublishVersionLayout extends AbstractFormLayout {
     }
 
     public void setApplication(String applicationName) {
+        setVersion(null,null, null);
         this.applicationName = applicationName;
     }
 
