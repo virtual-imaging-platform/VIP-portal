@@ -160,7 +160,7 @@ public class DisplayTab extends Tab {
 
                         }
                     };
-                    ApplicationImporterService.Util.getInstance().readFileAsString(vipLayout.getDescriptorLocation() + "/" + Constants.APP_IMPORTER_CHALLENGE_METADATA,
+                    ApplicationImporterService.Util.getInstance().readAndValidateBoutiquesFile(vipLayout.getDescriptorLocation() + "/" + Constants.APP_IMPORTER_CHALLENGE_METADATA,
                             callback2);
                 } catch (ApplicationImporterException ex) {
                     Logger.getLogger(DisplayTab.class.getName()).log(Level.SEVERE, null, ex);
@@ -168,7 +168,7 @@ public class DisplayTab extends Tab {
 
             }
         };
-        ApplicationImporterService.Util.getInstance().readFileAsString(vipLayout.getDescriptorLocation() + "/" + Constants.APP_IMPORTER_CHALLENGE_METRIC, callback);
+        ApplicationImporterService.Util.getInstance().readAndValidateBoutiquesFile(vipLayout.getDescriptorLocation() + "/" + Constants.APP_IMPORTER_CHALLENGE_METRIC, callback);
     }
 
     /**

@@ -61,14 +61,14 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
     private final ClassBusiness classBusiness;
     private final ApplicationBusiness applicationBusiness;
     private final EngineBusiness engineBusiness;
-    private final PublicationBusiness publicationBusiness;
+    private final BoutiquesBusiness boutiquesBusiness;
 
     public ApplicationServiceImpl() {
 
         engineBusiness = new EngineBusiness();
         classBusiness = new ClassBusiness();
         applicationBusiness = new ApplicationBusiness();
-        publicationBusiness = new PublicationBusiness();
+        boutiquesBusiness = new BoutiquesBusiness();
     }
 
     @Override
@@ -191,7 +191,7 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
         try {
             if (isSystemAdministrator() || isGroupAdministrator()) {
                 trace(logger, "Publishing version " + version + "' ('" + applicationName + "').");
-                return publicationBusiness.publishVersion(getSessionUser(), applicationName, version);
+                return boutiquesBusiness.publishVersion(getSessionUser(), applicationName, version);
             } else {
                 throw new ApplicationException("You have no administrator rights.");
             }

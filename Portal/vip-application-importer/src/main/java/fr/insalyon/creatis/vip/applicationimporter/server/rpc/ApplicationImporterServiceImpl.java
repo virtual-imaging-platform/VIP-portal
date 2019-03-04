@@ -48,11 +48,11 @@ public class ApplicationImporterServiceImpl extends fr.insalyon.creatis.vip.core
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(ApplicationImporterServiceImpl.class);
 
     @Override
-    public String readFileAsString(String fileLFN) throws ApplicationImporterException {
+    public String readAndValidateBoutiquesFile(String fileLFN) throws ApplicationImporterException {
         try {
             trace(logger, "Reading file "+fileLFN+" as string.");
             ApplicationImporterBusiness abi = new ApplicationImporterBusiness();
-            return abi.readFileAsString(fileLFN, getSessionUser());
+            return abi.readAndValidationBoutiquesFile(fileLFN, getSessionUser());
         } catch (CoreException ex) {
             logger.error(ex);
             throw new ApplicationImporterException(ex);

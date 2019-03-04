@@ -35,18 +35,19 @@ import fr.insalyon.creatis.vip.application.client.bean.AppVersion;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.server.business.*;
 import fr.insalyon.creatis.vip.datamanager.server.business.DataManagerBusiness;
-import org.apache.commons.io.FilenameUtils;
 import org.apache.log4j.Logger;
 
 import java.io.*;
 import java.util.*;
 
+import static com.hp.hpl.jena.vocabulary.OWLResults.output;
+
 /**
  * Created by abonnet on 2/21/19.
  */
-public class PublicationBusiness {
+public class BoutiquesBusiness {
 
-    private static final Logger logger = Logger.getLogger(PublicationBusiness.class);
+    private static final Logger logger = Logger.getLogger(BoutiquesBusiness.class);
 
     public String publishVersion(User user, String applicationName, String version) throws BusinessException {
         DataManagerBusiness dmBusiness = new DataManagerBusiness();
@@ -61,7 +62,7 @@ public class PublicationBusiness {
 
         // call publish command
         String command = "FILE=" + localFile + "; " + Server.getInstance().getPublicationCommandLine();
-        List<String> output = runCommand(command);
+        List<String> output = runCommandAndFailOnError(command);
 
         // get the doi
         // There should be only one line with the DOI
@@ -71,6 +72,19 @@ public class PublicationBusiness {
         saveDoiForVersion(doi, applicationName, version);
 
         return doi;
+    }
+
+    public void validateBoutiqueFile(String localPath) throws BusinessException {
+        // call validate command
+        String command = "bosh validate " + localPath;
+        try {
+            // if no exception : the command was  successful
+            runCommand(command);
+        } catch (CommandErrorException e) {
+            // if there's an error, only keep the first line
+            String firstLine = e.getCout().isEmpty() ? "< No Information> " : e.getCout().get(0);
+            throw new BusinessException("Boutiques file not valid : " + firstLine);
+        }
     }
 
     private String getJsonLfn(String applicationName, String applicationVersion) throws BusinessException {
@@ -101,7 +115,29 @@ public class PublicationBusiness {
         return publishOutput.get(0);
     }
 
-    private List<String> runCommand(String command) throws BusinessException {
+    private class CommandErrorException extends Exception {
+
+        private List<String> cout;
+
+        public CommandErrorException(List<String> cout) {
+            this.cout = cout;
+        }
+
+        public List<String> getCout() {
+            return cout;
+        }
+    }
+
+
+    private List<String> runCommandAndFailOnError(String command) throws BusinessException {
+        try {
+            return runCommand(command);
+        } catch (CommandErrorException e) {
+            throw new BusinessException("Command {" + command + "} failed : " + String.join("\n", e.getCout()));
+        }
+    }
+
+    private List<String> runCommand(String command) throws CommandErrorException {
         ProcessBuilder builder = new ProcessBuilder("bash", "-c", command);
         builder.redirectErrorStream(true);
         Process process = null;
@@ -125,9 +161,13 @@ public class PublicationBusiness {
         }
 
         if (process.exitValue() != 0) {
+            List<String> traceToKeep =
+                    cout.size() < 21 ?
+                        cout :
+                        cout.subList(0,20) ;
             logger.error(
-                    "Command failed : " + String.join("\n", cout));
-            throw new BusinessException("Command " + command + "failed : " + String.join("\n", cout));
+                    "Command failed : " + String.join("\n", traceToKeep));
+            throw new CommandErrorException(traceToKeep);
         }
         process = null;
         return cout;
