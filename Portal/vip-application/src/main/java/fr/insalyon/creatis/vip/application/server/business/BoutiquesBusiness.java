@@ -81,7 +81,8 @@ public class BoutiquesBusiness {
             // if no exception : the command was  successful
             runCommand(command);
         } catch (CommandErrorException e) {
-            // if there's an error, only keep the first line
+            // if there's an error, only keep the first line because the output can be very long
+            // and the first line contains the json validation error message
             String firstLine = e.getCout().isEmpty() ? "< No Information> " : e.getCout().get(0);
             throw new BusinessException("Boutiques file not valid : " + firstLine);
         }
@@ -137,7 +138,7 @@ public class BoutiquesBusiness {
         }
     }
 
-    private List<String> runCommand(String command) throws CommandErrorException {
+    private List<String> runCommand(String command) throws CommandErrorException, BusinessException {
         ProcessBuilder builder = new ProcessBuilder("bash", "-c", command);
         builder.redirectErrorStream(true);
         Process process = null;
@@ -155,19 +156,17 @@ public class BoutiquesBusiness {
             process.waitFor();
             closeProcess(process);
         } catch (IOException | InterruptedException e) {
-            e.printStackTrace();
+            logger.error(
+                    "Unexpected error in a boutiques command : " + String.join("\n", cout), e);
+            throw new BusinessException("Unexpected error in a boutiques command", e);
         } finally {
             closeProcess(process);
         }
 
         if (process.exitValue() != 0) {
-            List<String> traceToKeep =
-                    cout.size() < 21 ?
-                        cout :
-                        cout.subList(0,20) ;
             logger.error(
-                    "Command failed : " + String.join("\n", traceToKeep));
-            throw new CommandErrorException(traceToKeep);
+                    "Command failed : " + String.join("\n", cout));
+            throw new CommandErrorException(cout);
         }
         process = null;
         return cout;
