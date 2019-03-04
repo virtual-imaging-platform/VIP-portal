@@ -31,9 +31,10 @@
  */
 package fr.insalyon.creatis.vip.application.client.view.system.application;
 
-import com.smartgwt.client.widgets.layout.HLayout;
+import com.smartgwt.client.widgets.layout.*;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
 import fr.insalyon.creatis.vip.core.client.view.common.AbstractManageTab;
+import jena.version;
 
 /**
  *
@@ -45,6 +46,7 @@ public class ManageApplicationsTab extends AbstractManageTab {
     private EditApplicationLayout editLayout;
     private VersionsLayout versionsLayout;
     private EditVersionLayout editVersionLayout;
+    private PublishVersionLayout publishVersionLayout;
 
     public ManageApplicationsTab() {
 
@@ -60,12 +62,17 @@ public class ManageApplicationsTab extends AbstractManageTab {
         vLayout.addMember(appLayout);
 
         versionsLayout = new VersionsLayout();
+        VLayout versionInfoLayout = new VLayout(5);
         editVersionLayout = new EditVersionLayout();
+        publishVersionLayout = new PublishVersionLayout();
 
         HLayout versionLayout = new HLayout(5);
         versionLayout.setHeight("50%");
         versionLayout.addMember(versionsLayout);
-        versionLayout.addMember(editVersionLayout);
+
+        versionInfoLayout.addMember(editVersionLayout);
+        versionInfoLayout.addMember(publishVersionLayout);
+        versionLayout.addMember(versionInfoLayout);
         vLayout.addMember(versionLayout);
     }
 
@@ -76,13 +83,15 @@ public class ManageApplicationsTab extends AbstractManageTab {
     public void loadVersions(String applicationName) {
         versionsLayout.setApplication(applicationName);
         editVersionLayout.setApplication(applicationName);
+        publishVersionLayout.setApplication(applicationName);
     }
 
     public void setApplication(String name, String owner, String classes, String citation) {
         editLayout.setApplication(name, owner, classes, citation);
     }
 
-    public void setVersion(String version, String lfn, boolean isVisible) {
-        editVersionLayout.setVersion(version, lfn, isVisible);
+    public void setVersion(String version, String lfn, String jsonLfn, String doi, boolean isVisible) {
+        editVersionLayout.setVersion(version, lfn, jsonLfn, isVisible);
+        publishVersionLayout.setVersion(version, jsonLfn, doi);
     }
 }

@@ -32,30 +32,17 @@
 package fr.insalyon.creatis.vip.application.client.view.system.application;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.smartgwt.client.util.BooleanCallback;
-import com.smartgwt.client.util.SC;
-import com.smartgwt.client.widgets.IButton;
-import com.smartgwt.client.widgets.Label;
-import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
-import com.smartgwt.client.widgets.form.fields.CheckboxItem;
-import com.smartgwt.client.widgets.form.fields.SelectItem;
-import com.smartgwt.client.widgets.form.fields.TextItem;
-import com.smartgwt.client.widgets.grid.ListGridField;
+import com.smartgwt.client.util.*;
+import com.smartgwt.client.widgets.*;
+import com.smartgwt.client.widgets.events.*;
+import com.smartgwt.client.widgets.form.fields.*;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
 import fr.insalyon.creatis.vip.application.client.bean.AppVersion;
 import fr.insalyon.creatis.vip.application.client.rpc.ApplicationService;
-import fr.insalyon.creatis.vip.core.client.CoreModule;
-import fr.insalyon.creatis.vip.core.client.bean.User;
-import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationService;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.common.AbstractFormLayout;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
-import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
-import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
+import fr.insalyon.creatis.vip.core.client.view.util.*;
 
 /**
  *
@@ -68,6 +55,7 @@ public class EditVersionLayout extends AbstractFormLayout {
     private Label applicationLabel;
     private TextItem versionField;
     private TextItem lfnField;
+    private TextItem jsonLfnField;
     private CheckboxItem isVisibleField;
     private IButton saveButton;
     private IButton removeButton;
@@ -91,6 +79,10 @@ public class EditVersionLayout extends AbstractFormLayout {
         lfnField = FieldUtil.getTextItem(450, null);
         lfnField.setDisabled(true);
 
+        jsonLfnField = FieldUtil.getTextItem(450, null);
+        jsonLfnField.setDisabled(true);
+        jsonLfnField.setRequired(false);
+
         isVisibleField = new CheckboxItem();
         isVisibleField.setTitle("Visible");
         isVisibleField.setWidth(450);
@@ -100,15 +92,12 @@ public class EditVersionLayout extends AbstractFormLayout {
                 new ClickHandler() {
             @Override
             public void onClick(ClickEvent event) {
-                if (versionField.validate() & lfnField.validate()) {
-                    if (newVersion) {
-                        save(new AppVersion(applicationName, versionField.getValueAsString().trim(),
-                                lfnField.getValueAsString().trim(), isVisibleField.getValueAsBoolean()));
-                    } else {
-                        save(new AppVersion(applicationName, versionField.getValueAsString().trim(),
-                                lfnField.getValueAsString().trim(), isVisibleField.getValueAsBoolean()));
-
-                    }
+                if (versionField.validate() && lfnField.validate() && jsonLfnField.validate()) {
+                    String jsonLfn = jsonLfnField.getValueAsString();
+                    if (jsonLfn != null) jsonLfn.trim();
+                    save(new AppVersion(applicationName, versionField.getValueAsString().trim(),
+                            lfnField.getValueAsString().trim(), jsonLfn,
+                            isVisibleField.getValueAsBoolean()));
                 }
             }
         });
@@ -132,7 +121,8 @@ public class EditVersionLayout extends AbstractFormLayout {
 
         this.addMember(applicationLabel);
         addField("Version", versionField);
-        addField("LFN", lfnField);
+        addField("Gwendia LFN", lfnField);
+        addField("JSON LFN", jsonLfnField);
         this.addMember(FieldUtil.getForm(isVisibleField));
         addButtons(saveButton, removeButton);
     }
@@ -183,7 +173,7 @@ public class EditVersionLayout extends AbstractFormLayout {
             public void onSuccess(Void result) {
                 WidgetUtil.resetIButton(saveButton, "Save", CoreConstants.ICON_SAVED);
                 WidgetUtil.resetIButton(removeButton, "Remove", CoreConstants.ICON_DELETE);
-                setVersion(null, null, true);
+                setVersion(null, null, null, true);
                 ManageApplicationsTab tab = (ManageApplicationsTab) Layout.getInstance().
                         getTab(ApplicationConstants.TAB_MANAGE_APPLICATION);
                 tab.loadVersions(applicationName);
@@ -196,11 +186,12 @@ public class EditVersionLayout extends AbstractFormLayout {
      * @param applicationName
      */
     public void setApplication(String applicationName) {
-
+        setVersion(null, null, null, true);
         this.applicationName = applicationName;
         this.applicationLabel.setContents("<b>Application:</b> " + applicationName);
         this.versionField.setDisabled(false);
         this.lfnField.setDisabled(false);
+        this.jsonLfnField.setDisabled(false);
         this.saveButton.setDisabled(false);
     }
 
@@ -211,12 +202,13 @@ public class EditVersionLayout extends AbstractFormLayout {
      * @param lfn
      * @param isVisible
      */
-    public void setVersion(String version, String lfn, boolean isVisible) {
+    public void setVersion(String version, String lfn, String jsonLfn, boolean isVisible) {
 
         if (version != null) {
             this.versionField.setValue(version);
             this.versionField.setDisabled(true);
             this.lfnField.setValue(lfn);
+            this.jsonLfnField.setValue(jsonLfn);
             this.isVisibleField.setValue(isVisible);
             this.newVersion = false;
             this.removeButton.setDisabled(false);
@@ -226,6 +218,7 @@ public class EditVersionLayout extends AbstractFormLayout {
             this.versionField.setValue("");
             this.versionField.setDisabled(false);
             this.lfnField.setValue("");
+            this.jsonLfnField.setValue("");
             this.isVisibleField.setValue(true);
             this.newVersion = true;
             this.removeButton.setDisabled(true);

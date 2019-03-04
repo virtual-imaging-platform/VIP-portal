@@ -226,6 +226,23 @@ public class ApplicationBusiness {
 
     /**
      *
+     * @param doi
+     * @param applicationName
+     * @param version
+     * @throws BusinessException
+     */
+    public void updateDoiForVersion(String doi,String applicationName, String version) throws BusinessException {
+
+        try {
+            ApplicationDAOFactory.getDAOFactory().getApplicationDAO().updateDoiForVersion(doi, applicationName, version);
+
+        } catch (DAOException ex) {
+            throw new BusinessException(ex);
+        }
+    }
+
+    /**
+     *
      * @param applicationName
      * @param version
      * @throws BusinessException

@@ -52,7 +52,7 @@ public interface ApplicationImporterService extends RemoteService {
         }
     }
 
-    String readFileAsString(String fileLFN) throws ApplicationImporterException;
+    String readAndValidateBoutiquesFile(String fileLFN) throws ApplicationImporterException;
 
     void createApplication(BoutiquesTool bt, String type, String tag, HashMap<String, BoutiquesTool> bts, boolean isRunOnGrid, boolean overwriteVersion, boolean challenge) throws ApplicationImporterException;
 }

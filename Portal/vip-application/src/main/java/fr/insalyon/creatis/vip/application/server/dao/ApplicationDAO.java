@@ -54,6 +54,8 @@ public interface ApplicationDAO {
 
     public void updateVersion(AppVersion version) throws DAOException;
 
+    void updateDoiForVersion(String doi, String applicationName, String version) throws DAOException;
+
     public void removeVersion(String applicationName, String version) throws DAOException;
 
     public List<Application> getApplications() throws DAOException;

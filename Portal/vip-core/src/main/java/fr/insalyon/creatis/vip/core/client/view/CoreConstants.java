@@ -186,6 +186,8 @@ public class CoreConstants implements IsSerializable {
     public static String APP_DELETE_FILES_AFTER_UPLOAD = "boutiques.upload.deleteFile";
     //Publiction
     public static final String  PUB_MONTHS_UPDATES = "last.publication.update";
+    //Zenodo publication
+    public static final String PUBLICATION_SYSTEM_COMMAND = "publication.system-command";
 
     public static enum GROUP_ROLE implements IsSerializable {
 
