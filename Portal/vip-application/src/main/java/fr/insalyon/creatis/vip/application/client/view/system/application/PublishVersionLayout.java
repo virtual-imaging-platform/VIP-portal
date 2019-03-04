@@ -43,7 +43,7 @@ import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
 
 /**
  *
- * @author Rafael Ferreira da Silva
+ * @author Axel Bonnet
  */
 public class PublishVersionLayout extends AbstractFormLayout {
 
