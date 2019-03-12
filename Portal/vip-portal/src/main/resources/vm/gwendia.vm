@@ -67,7 +67,7 @@ if ( result.startsWith("/") || result.startsWith("lfn:") ) {
 #end
           </cross>
         </iterationstrategy>
-        <gasw descriptor="$tool.getGASWLFN()"/>
+        <gasw descriptor="lfn:$tool.getGASWLFN()"/>
     </processor>
   </processors>
   <links>
