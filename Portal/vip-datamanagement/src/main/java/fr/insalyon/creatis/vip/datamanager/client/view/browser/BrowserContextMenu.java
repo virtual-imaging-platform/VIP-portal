@@ -245,11 +245,8 @@ public class BrowserContextMenu extends Menu {
                                 BrowserLayout.getInstance().loadData(baseDir, true);
                             }
                         };
-                        modal.show("Moving " + name + " to Trash...", true);
-                        service.rename(baseDir + "/" + name,
-                                DataManagerConstants.ROOT + "/"
-                                + DataManagerConstants.TRASH_HOME + "/" + name,
-                                true, callback);
+                        modal.show("Deleting " + name + "...", true);
+                        service.delete(baseDir + "/" + name, callback);
                     }
                 }
             });
