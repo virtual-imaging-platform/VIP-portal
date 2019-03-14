@@ -198,9 +198,9 @@ knowledge of the CeCILL-B license and that you accept its terms.
             <type>jar</type>
         </dependency>
         <dependency>
-            <groupId>com.smartgwt</groupId>
-            <artifactId>smartgwt</artifactId>
-            <version>3.1</version>
+            <groupId>com.isomorphic.smartgwt.lgpl</groupId>
+            <artifactId>smartgwt-lgpl</artifactId>
+            <version>4.0</version>
         </dependency>
     </dependencies>
     <build>
