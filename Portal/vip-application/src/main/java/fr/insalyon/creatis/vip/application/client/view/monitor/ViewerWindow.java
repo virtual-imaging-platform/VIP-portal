@@ -78,6 +78,13 @@ public class ViewerWindow extends Window {
         pane.setPadding(10);
         pane.setOverflow(Overflow.AUTO);
         pane.setStyleName("defaultBorder");
+        // We set explicitely the size of the pane, a little smaller than the
+        // parent window, to avoid a bug in Firefox, where scrollbars are
+        // flickering indefinitely.  This may disapear in more recent versions
+        // of smartgwt.  When upgrading smartgwt above version 4.0, remove the 2
+        // following lines, and check the Executions Logs.
+        pane.setWidth(680);
+        pane.setHeight(390);
 
         modal = new ModalWindow(pane);
 
