@@ -144,13 +144,13 @@ public class DataManagerUtil {
 
         baseDir = replaceLfnUserPrefix(baseDir, currentUserFolder,
                 Server.getInstance().getDataManagerUsersHome(),
-                Server.getInstance().getOldDataManagerUsersHome());
+                Server.getInstance().getAltDataManagerUsersHome());
 
         try {
             for (Group group : CoreDAOFactory.getDAOFactory().getGroupDAO().getGroups()) {
                 baseDir = replaceLfnGroupPrefix(baseDir, group.getName(),
                         server.getDataManagerGroupsHome(),
-                        server.getOldDataManagerGroupsHome());
+                        server.getAltDataManagerGroupsHome());
             }
         } catch (DAOException ex) {
             throw new DataManagerException(ex);
@@ -166,7 +166,8 @@ public class DataManagerUtil {
     private static String replaceLfnUserPrefix(String path, String currentUserFolder, String... prefixesToReplace) {
         String prefixToReplace = null;
         for (String prefixToTest : prefixesToReplace) {
-            if (path.contains(prefixToTest)) {
+            if (prefixToTest != null && !prefixToTest.isEmpty()
+                    && path.contains(prefixToTest)) {
                 prefixToReplace = prefixToTest;
                 break;
             }
@@ -201,16 +202,17 @@ public class DataManagerUtil {
     }
 
     private static String replaceLfnGroupPrefix(String path, String groupName, String... prefixesToReplace) {
-        Server server = Server.getInstance();
         for (String prefixToTest : prefixesToReplace) {
-            // the prefix used in the catalog
-            String realPrefix = prefixToTest + "/" + groupName.replaceAll(" ", "_");
-            // the prefix shown to the user
-            String userPrefix = DataManagerConstants.ROOT
-                    + "/" + groupName
-                    + DataManagerConstants.GROUP_APPEND;
+            if (prefixToTest != null && !prefixToTest.isEmpty()) {
+                // the prefix used in the catalog
+                String realPrefix = prefixToTest + "/" + groupName.replaceAll(" ", "_");
+                // the prefix shown to the user
+                String userPrefix = DataManagerConstants.ROOT
+                        + "/" + groupName
+                        + DataManagerConstants.GROUP_APPEND;
 
-            path = path.replace(realPrefix, userPrefix);
+                path = path.replace(realPrefix, userPrefix);
+            }
         }
         return path;
     }
