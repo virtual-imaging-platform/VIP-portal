@@ -242,6 +242,7 @@ public class BrowserContextMenu extends Menu {
                             @Override
                             public void onSuccess(Void result) {
                                 modal.hide();
+                                Layout.getInstance().setNoticeMessage("The file/folder was successfully scheduled to be permanentely deleted.");
                                 BrowserLayout.getInstance().loadData(baseDir, true);
                             }
                         };
