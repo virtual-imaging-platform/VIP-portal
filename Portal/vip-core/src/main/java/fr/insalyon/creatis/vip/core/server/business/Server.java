@@ -95,6 +95,9 @@ public class Server {
     private String dataManagerPath;
     private String dataManagerLFCHost;
     private int dataManagerLFCPort;
+    // old lfn directories prefixes on the LFC
+    private String altDataManagerUsersHome;
+    private String altDataManagerGroupsHome;
     // Moteur
     private String moteurServer;
     private String truststoreFile;
@@ -189,6 +192,9 @@ public class Server {
             dataManagerLFCHost = config.getString(CoreConstants.LAB_DATA_LFC_HOST, "lfc-biomed.in2p3.fr");
             dataManagerLFCPort = config.getInt(CoreConstants.LAB_DATA_LFC_PORT, 5010);
 
+            altDataManagerUsersHome = config.getString(CoreConstants.LAB_DATA_ALT_USERS_HOME, "");
+            altDataManagerGroupsHome = config.getString(CoreConstants.LAB_DATA_ALT_GROUPS_HOME, "");
+
             moteurServer = config.getString(CoreConstants.LAB_MOTEUR_HOST, "https://localhost:443/cgi-bin/moteurServer/moteur_server");
             truststoreFile = config.getString(CoreConstants.LAB_TRUSTSTORE_FILE, "/usr/local/apache-tomcat-6.0.29/conf/truststore.jks");
             truststorePass = config.getString(CoreConstants.LAB_TRUSTSTORE_PASS, "");
@@ -273,6 +279,8 @@ public class Server {
             config.setProperty(CoreConstants.LAB_DATA_PATH, dataManagerPath);
             config.setProperty(CoreConstants.LAB_DATA_LFC_HOST, dataManagerLFCHost);
             config.setProperty(CoreConstants.LAB_DATA_LFC_PORT, dataManagerLFCPort);
+            config.setProperty(CoreConstants.LAB_DATA_ALT_USERS_HOME, altDataManagerUsersHome);
+            config.setProperty(CoreConstants.LAB_DATA_ALT_GROUPS_HOME, altDataManagerGroupsHome);
             config.setProperty(CoreConstants.LAB_MOTEUR_HOST, moteurServer);
             config.setProperty(CoreConstants.LAB_TRUSTSTORE_FILE, truststoreFile);
             config.setProperty(CoreConstants.LAB_TRUSTSTORE_PASS, truststorePass);
@@ -454,6 +462,14 @@ public class Server {
 
     public String getDataManagerGroupsHome() {
         return dataManagerGroupsHome;
+    }
+
+    public String getAltDataManagerUsersHome() {
+        return altDataManagerUsersHome;
+    }
+
+    public String getAltDataManagerGroupsHome() {
+        return altDataManagerGroupsHome;
     }
 
     public String getTruststoreFile() {
