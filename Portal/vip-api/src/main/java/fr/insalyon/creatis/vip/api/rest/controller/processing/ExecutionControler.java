@@ -48,6 +48,8 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
+import java.util.List;
+
 import static fr.insalyon.creatis.vip.api.CarminProperties.DEFAULT_LIMIT_LIST_EXECUTION;
 
 /**
@@ -128,12 +130,11 @@ public class ExecutionControler {
     }
 
     @RequestMapping("/{executionId}/results")
-    public String[] getExecutionResults(@PathVariable String executionId,
-                                        @RequestParam(defaultValue = "https") String protocol) throws ApiException {
+    public List<PathProperties> getExecutionResults(@PathVariable String executionId) throws ApiException {
         ApiUtils.methodInvocationLog("getExecutionResults", executionId);
         restApiBusiness.getApiContext(httpServletRequest, true);
         executionBusiness.checkIfUserCanAccessExecution(executionId);
-        return executionBusiness.getRestExecutionResultsURLs(executionId, protocol);
+        return executionBusiness.getExecutionResultsPaths(executionId);
     }
 
     @RequestMapping(value = "/{executionId}/stdout", produces = "text/plain;charset=UTF-8")

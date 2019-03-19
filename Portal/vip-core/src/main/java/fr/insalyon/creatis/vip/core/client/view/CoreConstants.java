@@ -40,7 +40,7 @@ import java.util.Date;
  */
 public class CoreConstants implements IsSerializable {
 
-    public static final String VERSION = "v1.23";
+    public static final String VERSION = "v1.24";
     // Configuration Labels
     public static final String VO_NAME = "vo.name";
     public static final String VO_ROOT = "vo.root";
@@ -69,6 +69,8 @@ public class CoreConstants implements IsSerializable {
     public static final String LAB_DATA_PATH = "datamanager.path";
     public static final String LAB_DATA_LFC_HOST = "datamanager.lfc.host";
     public static final String LAB_DATA_LFC_PORT = "datamanager.lfc.port";
+    public static final String LAB_DATA_ALT_USERS_HOME = "datamanager.users.home.alternative";
+    public static final String LAB_DATA_ALT_GROUPS_HOME = "datamanager.groups.home.alternative";
     public static final String LAB_MOTEUR_HOST = "moteur.host";
     public static final String LAB_SMA_HOST = "sma.host";
     public static final String LAB_SMA_PORT = "sma.port";
@@ -186,6 +188,8 @@ public class CoreConstants implements IsSerializable {
     public static String APP_DELETE_FILES_AFTER_UPLOAD = "boutiques.upload.deleteFile";
     //Publiction
     public static final String  PUB_MONTHS_UPDATES = "last.publication.update";
+    //Zenodo publication
+    public static final String PUBLICATION_SYSTEM_COMMAND = "publication.system-command";
 
     public static enum GROUP_ROLE implements IsSerializable {
 

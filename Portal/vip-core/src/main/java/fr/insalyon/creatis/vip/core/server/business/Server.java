@@ -39,9 +39,9 @@ import java.util.List;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.log4j.Logger;
-import org.opensaml.saml2.core.Issuer;
 
-/**
+/**ip
+ *
  *
  * @author Rafael Ferreira da Silva
  */
@@ -95,6 +95,9 @@ public class Server {
     private String dataManagerPath;
     private String dataManagerLFCHost;
     private int dataManagerLFCPort;
+    // old lfn directories prefixes on the LFC
+    private String altDataManagerUsersHome;
+    private String altDataManagerGroupsHome;
     // Moteur
     private String moteurServer;
     private String truststoreFile;
@@ -129,6 +132,8 @@ public class Server {
     private String deleteFilesAfterUpload;
     //Publication
     private int numberMonthsToTestLastPublicationUpdates;
+    //Zenodo publication
+    private String publicationCommandLine;
 
     public static Server getInstance() {
         if (instance == null) {
@@ -187,6 +192,9 @@ public class Server {
             dataManagerLFCHost = config.getString(CoreConstants.LAB_DATA_LFC_HOST, "lfc-biomed.in2p3.fr");
             dataManagerLFCPort = config.getInt(CoreConstants.LAB_DATA_LFC_PORT, 5010);
 
+            altDataManagerUsersHome = config.getString(CoreConstants.LAB_DATA_ALT_USERS_HOME, "");
+            altDataManagerGroupsHome = config.getString(CoreConstants.LAB_DATA_ALT_GROUPS_HOME, "");
+
             moteurServer = config.getString(CoreConstants.LAB_MOTEUR_HOST, "https://localhost:443/cgi-bin/moteurServer/moteur_server");
             truststoreFile = config.getString(CoreConstants.LAB_TRUSTSTORE_FILE, "/usr/local/apache-tomcat-6.0.29/conf/truststore.jks");
             truststorePass = config.getString(CoreConstants.LAB_TRUSTSTORE_PASS, "");
@@ -238,7 +246,10 @@ public class Server {
             deleteFilesAfterUpload = config.getString(CoreConstants.APP_DELETE_FILES_AFTER_UPLOAD, "yes");
 
             //Publication
-            numberMonthsToTestLastPublicationUpdates=config.getInt(CoreConstants.PUB_MONTHS_UPDATES, 6);
+            numberMonthsToTestLastPublicationUpdates = config.getInt(CoreConstants.PUB_MONTHS_UPDATES, 6);
+
+            //Zenodo publication
+            publicationCommandLine = config.getString(CoreConstants.PUBLICATION_SYSTEM_COMMAND, "bosh publish --sandbox --no-int $FILE");
 
             config.setProperty(CoreConstants.LAB_DB_HOST, databaseServerHost);
             config.setProperty(CoreConstants.LAB_DB_PORT, databaseServerPort);
@@ -268,6 +279,8 @@ public class Server {
             config.setProperty(CoreConstants.LAB_DATA_PATH, dataManagerPath);
             config.setProperty(CoreConstants.LAB_DATA_LFC_HOST, dataManagerLFCHost);
             config.setProperty(CoreConstants.LAB_DATA_LFC_PORT, dataManagerLFCPort);
+            config.setProperty(CoreConstants.LAB_DATA_ALT_USERS_HOME, altDataManagerUsersHome);
+            config.setProperty(CoreConstants.LAB_DATA_ALT_GROUPS_HOME, altDataManagerGroupsHome);
             config.setProperty(CoreConstants.LAB_MOTEUR_HOST, moteurServer);
             config.setProperty(CoreConstants.LAB_TRUSTSTORE_FILE, truststoreFile);
             config.setProperty(CoreConstants.LAB_TRUSTSTORE_PASS, truststorePass);
@@ -292,6 +305,7 @@ public class Server {
             config.setProperty(CoreConstants.UNDESIRED_MAIL_DOMAINS, undesiredMailDomains);
             config.setProperty(CoreConstants.UNDESIRED_COUNTRIES, undesiredCountries);
             config.setProperty(CoreConstants.PUB_MONTHS_UPDATES, numberMonthsToTestLastPublicationUpdates);
+            config.setProperty(CoreConstants.PUBLICATION_SYSTEM_COMMAND, publicationCommandLine);
             config.save();
 
         } catch (ConfigurationException ex) {
@@ -450,6 +464,14 @@ public class Server {
         return dataManagerGroupsHome;
     }
 
+    public String getAltDataManagerUsersHome() {
+        return altDataManagerUsersHome;
+    }
+
+    public String getAltDataManagerGroupsHome() {
+        return altDataManagerGroupsHome;
+    }
+
     public String getTruststoreFile() {
         return truststoreFile;
     }
@@ -550,6 +572,10 @@ public class Server {
 
      public int getNumberMonthsToTestLastPublicationUpdates() {
         return numberMonthsToTestLastPublicationUpdates;
+    }
+
+    public String getPublicationCommandLine() {
+        return publicationCommandLine;
     }
 
     public void setMaxPlatformRunningSimulations(int maxPlatformRunningSimulations) throws ConfigurationException {

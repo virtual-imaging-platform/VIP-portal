@@ -31,17 +31,15 @@
  */
 package fr.insalyon.creatis.vip.datamanager.server;
 
-import fr.insalyon.creatis.vip.core.client.bean.Group;
-import fr.insalyon.creatis.vip.core.client.bean.User;
+import fr.insalyon.creatis.vip.core.client.bean.*;
 import fr.insalyon.creatis.vip.core.server.business.Server;
-import fr.insalyon.creatis.vip.core.server.dao.CoreDAOFactory;
-import fr.insalyon.creatis.vip.core.server.dao.DAOException;
+import fr.insalyon.creatis.vip.core.server.dao.*;
 import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
 import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerException;
+
 import java.io.File;
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /**
  *
@@ -144,39 +142,15 @@ public class DataManagerUtil {
             baseDir = URI.create(baseDir).getPath();
         }
 
-        if (baseDir.contains(server.getDataManagerUsersHome())) {
-            baseDir = baseDir.replace(server.getDataManagerUsersHome() + "/", "");
-
-            // sometimes there's still a leading "/" left
-            while (baseDir.startsWith("/")) {
-                baseDir = baseDir.substring(1);
-            }
-
-            int index = baseDir.indexOf("/");
-
-            if (index != -1) {
-                if (baseDir.substring(0, index).equals(currentUserFolder)) {
-                    return DataManagerConstants.ROOT + "/"
-                            + DataManagerConstants.USERS_HOME
-                            + baseDir.substring(index, baseDir.length());
-                } else {
-                    return DataManagerConstants.ROOT + "/"
-                            + DataManagerConstants.USERS_FOLDER + "/"
-                            + baseDir;
-                }
-            } else {
-                return DataManagerConstants.ROOT + "/"
-                        + DataManagerConstants.USERS_HOME;
-            }
-        }
+        baseDir = replaceLfnUserPrefix(baseDir, currentUserFolder,
+                Server.getInstance().getDataManagerUsersHome(),
+                Server.getInstance().getAltDataManagerUsersHome());
 
         try {
             for (Group group : CoreDAOFactory.getDAOFactory().getGroupDAO().getGroups()) {
-                baseDir = baseDir.replace(
-                        server.getDataManagerGroupsHome()
-                        + "/" + group.getName().replaceAll(" ", "_"),
-                        DataManagerConstants.ROOT + "/" + group.getName()
-                        + DataManagerConstants.GROUP_APPEND);
+                baseDir = replaceLfnGroupPrefix(baseDir, group.getName(),
+                        server.getDataManagerGroupsHome(),
+                        server.getAltDataManagerGroupsHome());
             }
         } catch (DAOException ex) {
             throw new DataManagerException(ex);
@@ -187,6 +161,60 @@ public class DataManagerUtil {
             DataManagerConstants.ROOT + "/" + DataManagerConstants.VO_ROOT_FOLDER);
 
         return baseDir;
+    }
+
+    private static String replaceLfnUserPrefix(String path, String currentUserFolder, String... prefixesToReplace) {
+        String prefixToReplace = null;
+        for (String prefixToTest : prefixesToReplace) {
+            if (prefixToTest != null && !prefixToTest.isEmpty()
+                    && path.contains(prefixToTest)) {
+                prefixToReplace = prefixToTest;
+                break;
+            }
+        }
+        if (prefixToReplace != null) {
+            path = path.replace(prefixToReplace + "/", "");
+
+            // sometimes there's still a leading "/" left
+            while (path.startsWith("/")) {
+                path = path.substring(1);
+            }
+
+            int index = path.indexOf("/");
+
+            if (index != -1) {
+                if (path.substring(0, index).equals(currentUserFolder)) {
+                    return DataManagerConstants.ROOT + "/"
+                            + DataManagerConstants.USERS_HOME
+                            + path.substring(index);
+                } else {
+                    return DataManagerConstants.ROOT + "/"
+                            + DataManagerConstants.USERS_FOLDER + "/"
+                            + path;
+                }
+            } else {
+                return DataManagerConstants.ROOT + "/"
+                        + DataManagerConstants.USERS_HOME;
+            }
+        } else {
+            return path;
+        }
+    }
+
+    private static String replaceLfnGroupPrefix(String path, String groupName, String... prefixesToReplace) {
+        for (String prefixToTest : prefixesToReplace) {
+            if (prefixToTest != null && !prefixToTest.isEmpty()) {
+                // the prefix used in the catalog
+                String realPrefix = prefixToTest + "/" + groupName.replaceAll(" ", "_");
+                // the prefix shown to the user
+                String userPrefix = DataManagerConstants.ROOT
+                        + "/" + groupName
+                        + DataManagerConstants.GROUP_APPEND;
+
+                path = path.replace(realPrefix, userPrefix);
+            }
+        }
+        return path;
     }
 
     /**

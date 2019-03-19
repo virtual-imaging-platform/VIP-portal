@@ -490,7 +490,7 @@ public class ApplicationData implements ApplicationDAO {
 
         try {
             PreparedStatement ps = connection.prepareStatement("SELECT "
-                                                               + "version, lfn, visible FROM "
+                                                               + "version, lfn, json_lfn, doi, visible FROM "
                                                                + "VIPAppVersions "
                                                                + "WHERE application = ? "
                                                                + "ORDER BY version");
@@ -501,8 +501,12 @@ public class ApplicationData implements ApplicationDAO {
 
             while (rs.next()) {
                 versions.add(new AppVersion(
-                        name, rs.getString("version"),
-                        rs.getString("lfn"), rs.getBoolean("visible")));
+                        name,
+                        rs.getString("version"),
+                        rs.getString("lfn"),
+                        rs.getString("json_lfn"),
+                        rs.getString("doi"),
+                        rs.getBoolean("visible")));
             }
             ps.close();
             return versions;
@@ -518,13 +522,14 @@ public class ApplicationData implements ApplicationDAO {
 
         try {
             PreparedStatement ps = connection.prepareStatement(
-                    "INSERT INTO VIPAppVersions(application, version, lfn, visible) "
-                    + "VALUES (?, ?, ?, ?)");
+                    "INSERT INTO VIPAppVersions(application, version, lfn, json_lfn, visible) "
+                    + "VALUES (?, ?, ?, ?, ?)");
 
             ps.setString(1, version.getApplicationName());
             ps.setString(2, version.getVersion());
             ps.setString(3, version.getLfn());
-            ps.setBoolean(4, version.isVisible());
+            ps.setString(4, version.getJsonLfn());
+            ps.setBoolean(5, version.isVisible());
             ps.execute();
             ps.close();
 
@@ -544,13 +549,34 @@ public class ApplicationData implements ApplicationDAO {
         try {
             PreparedStatement ps = connection.prepareStatement("UPDATE "
                                                                + "VIPAppVersions "
-                                                               + "SET lfn=?, visible=? "
+                                                               + "SET lfn=?, json_lfn=?, visible=? "
                                                                + "WHERE application=? AND version=?");
 
             ps.setString(1, version.getLfn());
-            ps.setBoolean(2, version.isVisible());
-            ps.setString(3, version.getApplicationName());
-            ps.setString(4, version.getVersion());
+            ps.setString(2, version.getJsonLfn());
+            ps.setBoolean(3, version.isVisible());
+            ps.setString(4, version.getApplicationName());
+            ps.setString(5, version.getVersion());
+            ps.executeUpdate();
+            ps.close();
+
+        } catch (SQLException ex) {
+            logger.error(ex);
+            throw new DAOException(ex);
+        }
+    }
+
+    @Override
+    public void updateDoiForVersion(String doi, String applicationName, String version) throws DAOException {
+        try {
+            PreparedStatement ps = connection.prepareStatement("UPDATE "
+                    + "VIPAppVersions "
+                    + "SET doi=? "
+                    + "WHERE application=? AND version=?");
+
+            ps.setString(1, doi);
+            ps.setString(2, applicationName);
+            ps.setString(3, version);
             ps.executeUpdate();
             ps.close();
 
@@ -583,7 +609,7 @@ public class ApplicationData implements ApplicationDAO {
 
         try {
             PreparedStatement ps = connection.prepareStatement("SELECT "
-                                                               + "application, version, lfn, visible "
+                                                               + "application, version, lfn, json_lfn, doi, visible "
                                                                + "FROM VIPAppVersions WHERE "
                                                                + "application = ? AND version = ?");
             ps.setString(1, applicationName);
@@ -593,7 +619,10 @@ public class ApplicationData implements ApplicationDAO {
             rs.next();
 
             AppVersion version = new AppVersion(rs.getString("application"),
-                                                rs.getString("version"), rs.getString("lfn"),
+                                                rs.getString("version"),
+                                                rs.getString("lfn"),
+                                                rs.getString("json_lfn"),
+                                                rs.getString("doi"),
                                                 rs.getBoolean("visible"));
             ps.close();
 

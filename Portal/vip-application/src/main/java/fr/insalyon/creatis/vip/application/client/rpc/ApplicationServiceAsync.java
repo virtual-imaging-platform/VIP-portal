@@ -71,6 +71,8 @@ public interface ApplicationServiceAsync {
 
     public void removeVersion(String applicationName, String version, AsyncCallback<Void> asyncCallback);
 
+    public void publishVersion(String applicationName, String version, AsyncCallback<String> asyncCallback);
+
     public void removeClass(String name, AsyncCallback<Void> asyncCallback);
 
     public void getClasses(AsyncCallback<List<AppClass>> asyncCallback);

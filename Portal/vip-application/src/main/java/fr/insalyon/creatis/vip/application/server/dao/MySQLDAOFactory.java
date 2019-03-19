@@ -99,6 +99,8 @@ public class MySQLDAOFactory extends ApplicationDAOFactory {
                     "application VARCHAR(255), "
                     + "version VARCHAR(255), "
                     + "lfn VARCHAR(255), "
+                    + "json_lfn VARCHAR(255), "
+                    + "doi VARCHAR(255), "
                     + "visible BOOLEAN, "
                     + "PRIMARY KEY (application, version), "
                     + "FOREIGN KEY (application) REFERENCES VIPApplications(name) "

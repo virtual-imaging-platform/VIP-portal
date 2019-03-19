@@ -31,12 +31,8 @@
  */
 package fr.insalyon.creatis.vip.applicationimporter.client;
 
-import com.google.gwt.json.client.JSONArray;
-import com.google.gwt.json.client.JSONObject;
-import com.google.gwt.json.client.JSONValue;
-import fr.insalyon.creatis.vip.applicationimporter.client.bean.BoutiquesInput;
-import fr.insalyon.creatis.vip.applicationimporter.client.bean.BoutiquesOutputFile;
-import fr.insalyon.creatis.vip.applicationimporter.client.bean.BoutiquesTool;
+import com.google.gwt.json.client.*;
+import fr.insalyon.creatis.vip.applicationimporter.client.bean.*;
 
 /**
  *
@@ -48,6 +44,7 @@ public class JSONUtil {
 
         BoutiquesTool bt = new BoutiquesTool();
         bt.setName(getPropertyAsString(jsonObject, "name"));
+        bt.setAuthor(getPropertyAsString(jsonObject, "author"));
         bt.setToolVersion(getPropertyAsString(jsonObject, "tool-version"));
         bt.setDescription(getPropertyAsString(jsonObject, "description"));
         bt.setCommandLine(getPropertyAsString(jsonObject, "command-line"));
@@ -70,7 +67,15 @@ public class JSONUtil {
                 bt.getOutputFiles().add(parseBoutiquesOutputFile(outputJSONArray.get(i).isObject()));
             }
         }
-        
+
+        JSONObject tagsJSONObject = getPropertyAsObject(jsonObject, "tags");
+        if (tagsJSONObject != null) {
+            for (String key : tagsJSONObject.keySet()) {
+                String value = getPropertyAsString(tagsJSONObject, key);
+                bt.addTag(key, value);
+            }
+        }
+
         bt.setJsonFile(jsonObject.toString());
         
         return bt;
@@ -131,6 +136,17 @@ public class JSONUtil {
             throw new ApplicationImporterException(value.toString() + " is not an array!");
         }
         return value.isArray();
+    }
+
+    public static JSONObject getPropertyAsObject(JSONObject jo, String property) throws ApplicationImporterException {
+        JSONValue value = jo.get(property);
+        if (value == null) {
+            return null;
+        }
+        if (value.isObject() == null) {
+            throw new ApplicationImporterException(value.toString() + " is not an object!");
+        }
+        return value.isObject();
     }
 
     public static String getPropertyAsString(JSONObject jo, String property, String valueIfAbsent) throws ApplicationImporterException {

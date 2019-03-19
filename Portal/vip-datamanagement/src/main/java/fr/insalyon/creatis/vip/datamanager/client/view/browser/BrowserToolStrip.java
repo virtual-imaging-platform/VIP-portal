@@ -154,6 +154,12 @@ public class BrowserToolStrip extends BasicBrowserToolStrip {
                     }
                 }));
 
+        /*
+
+        /* With the dfc migration, there is no direct rename.
+        The rename is currently replaced with an heavy dowload / re-upload
+        mechanism that is too heavy to be used in the delete
+
         // Trash Button
         this.addSeparator();
         this.addButton(WidgetUtil.getToolStripButton(
@@ -173,6 +179,7 @@ public class BrowserToolStrip extends BasicBrowserToolStrip {
                         emptyTrash();
                     }
                 }));
+        */
     }
 
     private void download() {
@@ -323,7 +330,7 @@ public class BrowserToolStrip extends BasicBrowserToolStrip {
                             if (data.getType().equals(Data.Type.folderSync) || data.getType().equals(Data.Type.fileSync)) {
                                 Layout.getInstance().setWarningMessage("could not delete a synchronized files/folders <br />");
                             } else {
-                                paths.add(data.getName());
+                                paths.add(baseDir + "/" + data.getName());
                             }
                         }
                         if (!paths.isEmpty()) {
@@ -337,13 +344,13 @@ public class BrowserToolStrip extends BasicBrowserToolStrip {
                                 @Override
                                 public void onSuccess(Void result) {
                                     modal.hide();
+                                    Layout.getInstance().setNoticeMessage("The selected files/folders were successfully scheduled to be permanentely deleted.");
                                     BrowserLayout.getInstance().loadData(baseDir, true);
                                 }
                             };
-                            modal.show("Moving files/folders to Trash...", true);
-                            service.rename(baseDir, paths,
-                                    DataManagerConstants.ROOT + "/"
-                                    + DataManagerConstants.TRASH_HOME, true, callback);
+                            // trash desactivated : raw delete
+                            modal.show("Deleting files/folders...", true);
+                            service.delete(paths, callback);
                         }
                     }
                 }

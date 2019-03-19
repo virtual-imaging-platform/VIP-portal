@@ -31,12 +31,12 @@
  */
 package fr.insalyon.creatis.vip.applicationimporter.server.business;
 
+import fr.insalyon.creatis.vip.application.server.business.*;
 import org.json.JSONObject;
 import fr.insalyon.creatis.grida.client.GRIDAClient;
 import fr.insalyon.creatis.grida.client.GRIDAClientException;
 import fr.insalyon.creatis.vip.application.client.bean.AppVersion;
 import fr.insalyon.creatis.vip.application.client.bean.Application;
-import fr.insalyon.creatis.vip.application.server.business.ApplicationBusiness;
 import fr.insalyon.creatis.vip.applicationimporter.client.ApplicationImporterException;
 import fr.insalyon.creatis.vip.applicationimporter.client.JSONUtil;
 import fr.insalyon.creatis.vip.applicationimporter.client.bean.BoutiquesTool;
@@ -66,7 +66,7 @@ public class ApplicationImporterBusiness {
 
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(ApplicationImporterBusiness.class);
 
-    public String readFileAsString(String fileLFN, User user) throws BusinessException {
+    public String readAndValidationBoutiquesFile(String fileLFN, User user) throws BusinessException {
         try {
 
             File localDir = new File(Server.getInstance().getApplicationImporterFileRepository() + "/" + (new File(DataManagerUtil.parseBaseDir(user, fileLFN))).getParent());
@@ -75,6 +75,7 @@ public class ApplicationImporterBusiness {
                 throw new BusinessException("Cannot create directory " + localDir.getCanonicalPath());
             }
             String localFilePath = CoreUtil.getGRIDAClient().getRemoteFile(DataManagerUtil.parseBaseDir(user, fileLFN), localDir.getCanonicalPath());
+            new BoutiquesBusiness().validateBoutiqueFile(localFilePath);
             String fileContent = new Scanner(new File(localFilePath)).useDelimiter("\\Z").next();
             return fileContent;
         } catch (GRIDAClientException ex) {
@@ -172,7 +173,7 @@ public class ApplicationImporterBusiness {
             uploadFile(jsonFileName, bt.getJsonLFN());
         
 // Register application
-            registerApplicationVersion(bt.getName(), bt.getToolVersion(), user.getEmail(), bt.getGwendiaLFN());
+            registerApplicationVersion(bt.getName(), bt.getToolVersion(), user.getEmail(), bt.getGwendiaLFN(), bt.getJsonLFN());
 
         } catch (FileNotFoundException ex) {
             logger.error(ex);
@@ -212,10 +213,10 @@ public class ApplicationImporterBusiness {
         writer.close();
     }
 
-    private void registerApplicationVersion(String vipApplicationName, String vipVersion, String owner, String lfnGwendiaFile) throws BusinessException {
+    private void registerApplicationVersion(String vipApplicationName, String vipVersion, String owner, String lfnGwendiaFile, String lfnJsonFile) throws BusinessException {
         ApplicationBusiness ab = new ApplicationBusiness();
         Application app = ab.getApplication(vipApplicationName);
-        AppVersion newVersion = new AppVersion(vipApplicationName, vipVersion, lfnGwendiaFile, true);
+        AppVersion newVersion = new AppVersion(vipApplicationName, vipVersion, lfnGwendiaFile, lfnJsonFile, true);
         if (app == null) {
             // If application doesn't exist, create it.
             // New applications are not associated with any class (admins may add classes independently).
