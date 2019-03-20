@@ -55,8 +55,12 @@ public class LoadMacHTMLPane extends HTMLPane {
     public LoadMacHTMLPane(String title, String code, String parentFolderId,
             String macId, String path, String target, boolean usePool, boolean doUnzip) {
 
-        this.setWidth100();
-        this.setHeight100();
+        // We set explicitely the size of the pane, a little smaller than the
+        // LoadMacWindow, to avoid a bug in Firefox, where scrollbars are
+        // flickering indefinitely.  This may disapear in more recent versions
+        // of smartgwt.  When upgrading smartgwt above version 4.0, remove the 2
+        this.setWidth(580);
+        this.setHeight(310);
         this.setShowEdges(true);
 
         this.setContents(
