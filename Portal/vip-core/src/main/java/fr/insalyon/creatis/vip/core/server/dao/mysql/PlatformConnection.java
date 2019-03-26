@@ -192,7 +192,7 @@ public class PlatformConnection {
                     + "VIPAuthor VARCHAR(255) NULL, "
                     + "PRIMARY KEY (id), "
                     + "FOREIGN KEY (VIPAuthor) REFERENCES VIPUsers(email) "
-                    + "ON DELETE CASCADE ON UPDATE NO ACTION");
+                    + "ON DELETE CASCADE ON UPDATE CASCADE");
             
             createTable("VIPTermsOfuse",
                     "idTermsOfuse INT(11) NOT NULL AUTO_INCREMENT, "
