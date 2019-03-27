@@ -52,7 +52,7 @@ public class ApikeyLayout extends AbstractFormLayout {
     private IButton generateNewApikey;
 
     public ApikeyLayout() {
-        super();
+        super("100%", "115");
         addTitle("API key", CoreConstants.ICON_PASSWORD);
 
         configure();

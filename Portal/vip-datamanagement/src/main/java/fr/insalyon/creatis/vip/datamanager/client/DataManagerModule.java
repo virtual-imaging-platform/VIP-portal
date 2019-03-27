@@ -31,12 +31,9 @@
  */
 package fr.insalyon.creatis.vip.datamanager.client;
 
-import fr.insalyon.creatis.vip.core.client.CoreModule;
-import fr.insalyon.creatis.vip.core.client.Module;
+import fr.insalyon.creatis.vip.core.client.*;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
-import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerHomeParser;
-import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerSection;
-import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerSystemParser;
+import fr.insalyon.creatis.vip.datamanager.client.view.*;
 import fr.insalyon.creatis.vip.datamanager.client.view.browser.BrowserLayout;
 import fr.insalyon.creatis.vip.datamanager.client.view.operation.OperationLayout;
 

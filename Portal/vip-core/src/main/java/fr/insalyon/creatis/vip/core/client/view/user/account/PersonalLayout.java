@@ -61,19 +61,17 @@ import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
 public class PersonalLayout extends AbstractFormLayout {
 
     private Label levelLabel;
-    private Label emailLabel;
     private Label firstNameField;
     private Label lastNameField;
     private TextItem institutionField;
     private TextItem phoneField;
     private SelectItem countryField;
-    private String folder;
     private IButton saveButton;
     private Label messageLabel;
 
     public PersonalLayout() {
 
-        super("330", "430");
+        super("100%", "400");
         addTitle("Account Information", CoreConstants.ICON_PERSONAL);
 
         configure();
@@ -86,7 +84,6 @@ public class PersonalLayout extends AbstractFormLayout {
         messageLabel.setBackgroundColor("#F79191");
         
         levelLabel = WidgetUtil.getLabel("", 15);
-        emailLabel = WidgetUtil.getLabel("", 15);
         firstNameField = WidgetUtil.getLabel("", 15);
         lastNameField = WidgetUtil.getLabel("", 15);
         institutionField = FieldUtil.getTextItem(200, null);
@@ -101,50 +98,45 @@ public class PersonalLayout extends AbstractFormLayout {
         countryField.setRequired(true);
         countryField.setWidth("150");
         saveButton = WidgetUtil.getIButton("Save Changes", CoreConstants.ICON_SAVED,
-                new ClickHandler() {
-                    @Override
-                    public void onClick(ClickEvent event) {
+                event -> {
 
-                        if (institutionField.validate() & phoneField.validate()
-                                & countryField.validate()) {
+                    if (institutionField.validate() & phoneField.validate()
+                            & countryField.validate()) {
 
-                            User user = new User(
-                                    firstNameField.getContents(),
-                                    lastNameField.getContents(),
-                                    emailLabel.getContents(),
-                                    institutionField.getValueAsString().trim(),
-                                    phoneField.getValueAsString().trim(),
-                                    UserLevel.valueOf(levelLabel.getContents()),
-                                    CountryCode.valueOf(countryField.getValueAsString()));
-                                     user.setFolder(folder);
+                        User user = new User(
+                                CoreModule.user.getFirstName(),
+                                CoreModule.user.getLastName(),
+                                CoreModule.user.getEmail(),
+                                institutionField.getValueAsString().trim(),
+                                phoneField.getValueAsString().trim(),
+                                UserLevel.valueOf(levelLabel.getContents()),
+                                CountryCode.valueOf(countryField.getValueAsString()));
+                        user.setFolder(CoreModule.user.getFolder());
 
-                            ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();
-                            final AsyncCallback<User> callback = new AsyncCallback<User>() {
-                                @Override
-                                public void onFailure(Throwable caught) {
-                                    WidgetUtil.resetIButton(saveButton, "Save Changes", CoreConstants.ICON_SAVED);
-                                    Layout.getInstance().setWarningMessage("Unable to save changes:<br />" + caught.getMessage());
-                                }
+                        ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();
+                        final AsyncCallback<User> callback = new AsyncCallback<User>() {
+                            @Override
+                            public void onFailure(Throwable caught) {
+                                WidgetUtil.resetIButton(saveButton, "Save Changes", CoreConstants.ICON_SAVED);
+                                Layout.getInstance().setWarningMessage("Unable to save changes:<br />" + caught.getMessage());
+                            }
 
-                                @Override
-                                public void onSuccess(User result) {
-                                    Modules.getInstance().userUpdated(CoreModule.user, result);
-                                    CoreModule.user = result;
-                                    WidgetUtil.resetIButton(saveButton, "Save Changes", CoreConstants.ICON_SAVED);
-                                    Layout.getInstance().setNoticeMessage("User information successfully updated.");
-                                }
-                            };
-                            WidgetUtil.setLoadingIButton(saveButton, "Saving...");
-                            service.updateUser(user, callback);
-                        }
+                            @Override
+                            public void onSuccess(User result) {
+                                Modules.getInstance().userUpdated(CoreModule.user, result);
+                                CoreModule.user = result;
+                                WidgetUtil.resetIButton(saveButton, "Save Changes", CoreConstants.ICON_SAVED);
+                                Layout.getInstance().setNoticeMessage("User information successfully updated.");
+                            }
+                        };
+                        WidgetUtil.setLoadingIButton(saveButton, "Saving...");
+                        service.updateUser(user, callback);
                     }
                 });
         saveButton.setWidth(150);
         this.addMember(messageLabel);
         this.addMember(WidgetUtil.getLabel("<b>Level</b>", 15));
         this.addMember(levelLabel);
-        this.addMember(WidgetUtil.getLabel("<b>Email</b>", 15));
-        this.addMember(emailLabel);
         this.addMember(WidgetUtil.getLabel("<b>First Name</b>", 15));
         this.addMember(firstNameField);
         this.addMember(WidgetUtil.getLabel("<b>Last Name</b>", 15));
@@ -156,43 +148,25 @@ public class PersonalLayout extends AbstractFormLayout {
     }
 
     private void loadData() {
+        User user = CoreModule.user;
 
-        ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();
-        final AsyncCallback<User> callback = new AsyncCallback<User>() {
-            @Override
-            public void onFailure(Throwable caught) {
-                Layout.getInstance().setWarningMessage("Unable to get user data:<br />" + caught.getMessage());
-            }
+        levelLabel.setContents(user.getLevel().name());
+        if (user.getLevel() == UserLevel.Beginner) {
+            levelLabel.addClickHandler(event -> new UpgradeLevelLayout(event.getX(), event.getY()).show());
+            levelLabel.setPrompt("Upgrade your Account!");
+            levelLabel.setCursor(Cursor.HAND);
+        }
+        firstNameField.setContents(user.getFirstName());
+        lastNameField.setContents(user.getLastName());
+        institutionField.setValue(user.getInstitution());
+        phoneField.setValue(user.getPhone());
+        countryField.setValue(user.getCountryCode().name());
 
-            @Override
-            public void onSuccess(User result) {
-
-                levelLabel.setContents(result.getLevel().name());
-                if (result.getLevel() == UserLevel.Beginner) {
-                    levelLabel.addClickHandler(new ClickHandler() {
-                        @Override
-                        public void onClick(ClickEvent event) {
-                            new UpgradeLevelLayout(event.getX(), event.getY()).show();
-                        }
-                    });
-                    levelLabel.setPrompt("Upgrade your Account!");
-                    levelLabel.setCursor(Cursor.HAND);
-                }
-                emailLabel.setContents(result.getEmail());
-                firstNameField.setContents(result.getFirstName());
-                lastNameField.setContents(result.getLastName());
-                institutionField.setValue(result.getInstitution());
-                phoneField.setValue(result.getPhone());
-                countryField.setValue(result.getCountryCode().name());
-                folder = result.getFolder();
-                
-                if(institutionField.getDisplayValue().equals("Unknown") || phoneField.getDisplayValue().equals("0000")){
-                    messageLabel.setVisible(true);
-                    messageLabel.setContents("Please review your account information");
-                } else
-                    messageLabel.setVisible(false);
-            }
-        };
-        service.getUserData(callback);
+        if(institutionField.getDisplayValue().equals("Unknown") || phoneField.getDisplayValue().equals("0000")){
+            messageLabel.setVisible(true);
+            messageLabel.setContents("Please review your account information");
+        } else {
+            messageLabel.setVisible(false);
+        }
     }
 }

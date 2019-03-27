@@ -96,7 +96,7 @@ public interface ConfigurationServiceAsync {
 
     void updateUserPassword(String currentPassword, String newPassword, AsyncCallback<Void> asyncCallback);
 
-    void updateCurrentUserEmail(String newEmail, AsyncCallback<Void> async);
+    void updateCurrentUserEmail(String newEmail, AsyncCallback<User> async);
 
     void updateUserEmail(String currentEmail, String newEmail, AsyncCallback<Void> async);
 

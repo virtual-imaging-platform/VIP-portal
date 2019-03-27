@@ -67,6 +67,7 @@ public class AccountTab extends Tab {
         leftLayout.setHeight100();
 
         leftLayout.addMember(new PersonalLayout());
+        leftLayout.addMember(new EmailLayout());
         leftLayout.addMember(new PasswordLayout());
         leftLayout.addMember(new ApikeyLayout());
 

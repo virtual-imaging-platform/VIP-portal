@@ -112,7 +112,7 @@ public interface ConfigurationService extends RemoteService {
 
     void updateUserPassword(String currentPassword, String newPassword) throws CoreException;
 
-    void updateCurrentUserEmail(String newEmail) throws CoreException;
+    User updateCurrentUserEmail(String newEmail) throws CoreException;
 
     void updateUserEmail(String currentEmail, String newEmail) throws CoreException;
 
