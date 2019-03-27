@@ -34,6 +34,7 @@ package fr.insalyon.creatis.vip.core.client.view.user.account;
 import com.google.gwt.user.client.Cookies;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.widgets.*;
+import com.smartgwt.client.widgets.events.*;
 import com.smartgwt.client.widgets.form.fields.*;
 import fr.insalyon.creatis.vip.core.client.*;
 import fr.insalyon.creatis.vip.core.client.bean.User;
@@ -54,7 +55,7 @@ public class EmailLayout extends AbstractFormLayout {
 
     public EmailLayout() {
 
-        super("100%", "150");
+        super("100%", "135");
         addTitle("Email", CoreConstants.ICON_PERSONAL);
 
         configure();
@@ -69,35 +70,37 @@ public class EmailLayout extends AbstractFormLayout {
         emailField.setValidators(ValidatorUtil.getEmailValidator());
 
         saveButton = WidgetUtil.getIButton("Save new email", CoreConstants.ICON_SAVED,
-                event -> {
+                new ClickHandler() {
+                    @Override
+                    public void onClick(ClickEvent clickEvent) {
+                        if (emailField.validate()) {
 
-                    if (emailField.validate()) {
-
-                        ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();
-                        final AsyncCallback<User> callback = new AsyncCallback<User>() {
-                            @Override
-                            public void onFailure(Throwable caught) {
-                                WidgetUtil.resetIButton(saveButton, "Save new email", CoreConstants.ICON_SAVED);
-                                Layout.getInstance().setWarningMessage("Unable to save new email:<br />" + caught.getMessage());
-                            }
-
-                            @Override
-                            public void onSuccess(User result) {
-                                Modules.getInstance().userUpdated(CoreModule.user, result);
-                                CoreModule.user = result;
-
-                                if (Cookies.isCookieEnabled()) {
-                                    Cookies.setCookie(CoreConstants.COOKIES_USER, result.getEmail(),
-                                            CoreConstants.COOKIES_EXPIRATION_DATE, null, "/", false);
+                            ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();
+                            final AsyncCallback<User> callback = new AsyncCallback<User>() {
+                                @Override
+                                public void onFailure(Throwable caught) {
+                                    WidgetUtil.resetIButton(saveButton, "Save new email", CoreConstants.ICON_SAVED);
+                                    Layout.getInstance().setWarningMessage("Unable to save new email:<br />" + caught.getMessage());
                                 }
 
-                                WidgetUtil.resetIButton(saveButton, "Save new email", CoreConstants.ICON_SAVED);
-                                Layout.getInstance().setNoticeMessage("Email successfully updated.");
-                            }
-                        };
-                        WidgetUtil.setLoadingIButton(saveButton, "Saving...");
-                        service.updateCurrentUserEmail(
-                                emailField.getValueAsString().trim(), callback);
+                                @Override
+                                public void onSuccess(User result) {
+                                    Modules.getInstance().userUpdated(CoreModule.user, result);
+                                    CoreModule.user = result;
+
+                                    if (Cookies.isCookieEnabled()) {
+                                        Cookies.setCookie(CoreConstants.COOKIES_USER, result.getEmail(),
+                                                CoreConstants.COOKIES_EXPIRATION_DATE, null, "/", false);
+                                    }
+
+                                    WidgetUtil.resetIButton(saveButton, "Save new email", CoreConstants.ICON_SAVED);
+                                    Layout.getInstance().setNoticeMessage("Email successfully updated.");
+                                }
+                            };
+                            WidgetUtil.setLoadingIButton(saveButton, "Saving...");
+                            service.updateCurrentUserEmail(
+                                    emailField.getValueAsString().trim(), callback);
+                        }
                     }
                 });
         saveButton.setWidth(150);

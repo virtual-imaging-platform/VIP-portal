@@ -283,7 +283,7 @@ public class ConfigurationBusiness {
 
     private void verifyEmail(String email) throws BusinessException {
         // Build log message
-        StringBuilder message = new StringBuilder("Signing up ");
+        StringBuilder message = new StringBuilder("verifying ");
         message.append(email);
         message.append(". List of undesired mail domains: ");
         for (String s : Server.getInstance().getUndesiredMailDomains()) {
