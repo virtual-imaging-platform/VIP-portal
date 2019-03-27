@@ -522,7 +522,7 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
         }
     }
 
-    public void updateCurrentUserEmail(String newEmail) throws CoreException {
+    public User updateCurrentUserEmail(String newEmail) throws CoreException {
 
         try {
             User currentUser = getSessionUser();
@@ -533,6 +533,7 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
 
             currentUser = configurationBusiness.getUserData(newEmail);
             setUserSession(currentUser);
+            return currentUser;
         } catch (BusinessException ex) {
             throw new CoreException(ex);
         }

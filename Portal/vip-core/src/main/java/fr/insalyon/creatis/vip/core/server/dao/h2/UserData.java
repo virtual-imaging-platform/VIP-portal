@@ -43,8 +43,6 @@ import java.util.Date;
 import java.util.List;
 import org.apache.log4j.Logger;
 
-import static fr.insalyon.creatis.vip.core.client.CoreModule.user;
-
 /**
  *
  * @author Rafael Silva
@@ -283,6 +281,28 @@ public class UserData implements UserDAO {
         } catch (SQLException ex) {
             logger.error(ex);
             throw new DAOException(ex);
+        }
+    }
+
+    @Override
+    public void updateEmail(String oldEmail, String newEmail) throws DAOException {
+        try {
+            PreparedStatement ps = connection.prepareStatement("UPDATE "
+                    + "VIPUsers SET email = ? WHERE email = ?");
+
+            ps.setString(1, newEmail);
+            ps.setString(2, oldEmail);
+
+            ps.executeUpdate();
+            ps.close();
+        } catch (SQLException ex) {
+            if (ex.getMessage().contains("Duplicate entry")) {
+                logger.error("There is an existing account associated with the email: " + newEmail);
+                throw new DAOException("There is an existing account associated with this email.", ex);
+            } else {
+                logger.error(ex);
+                throw new DAOException(ex);
+            }
         }
     }
 
