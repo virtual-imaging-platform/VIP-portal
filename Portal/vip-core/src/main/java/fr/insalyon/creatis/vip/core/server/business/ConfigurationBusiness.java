@@ -32,22 +32,17 @@
 package fr.insalyon.creatis.vip.core.server.business;
 
 import fr.insalyon.creatis.devtools.MD5;
-import fr.insalyon.creatis.grida.client.GRIDAClient;
-import fr.insalyon.creatis.grida.client.GRIDAClientException;
-import fr.insalyon.creatis.grida.client.GRIDAPoolClient;
-import fr.insalyon.creatis.vip.core.client.bean.Account;
-import fr.insalyon.creatis.vip.core.client.bean.Group;
-import fr.insalyon.creatis.vip.core.client.bean.Publication;
-import fr.insalyon.creatis.vip.core.client.bean.TermsOfUse;
-import fr.insalyon.creatis.vip.core.client.bean.User;
+import fr.insalyon.creatis.grida.client.*;
+import fr.insalyon.creatis.vip.core.client.bean.*;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants.GROUP_ROLE;
 import fr.insalyon.creatis.vip.core.client.view.user.UserLevel;
 import fr.insalyon.creatis.vip.core.client.view.util.CountryCode;
 import fr.insalyon.creatis.vip.core.server.business.proxy.ProxyClient;
-import fr.insalyon.creatis.vip.core.server.dao.CoreDAOFactory;
-import fr.insalyon.creatis.vip.core.server.dao.DAOException;
-import fr.insalyon.creatis.vip.core.server.dao.UserDAO;
+import fr.insalyon.creatis.vip.core.server.dao.*;
+import org.apache.log4j.Logger;
+import org.jasig.cas.client.validation.*;
+
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.net.URL;
@@ -55,16 +50,6 @@ import java.security.*;
 import java.sql.Timestamp;
 import java.text.Normalizer;
 import java.util.*;
-import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
-import org.jasig.cas.client.validation.Assertion;
-import org.jasig.cas.client.validation.Saml11TicketValidator;
-import org.jasig.cas.client.validation.TicketValidationException;
-
-import javax.crypto.*;
-import javax.xml.bind.DatatypeConverter;
-
-import static fr.insalyon.creatis.vip.core.client.view.util.CountryCode.re;
 
 /**
  *
@@ -136,18 +121,12 @@ public class ConfigurationBusiness {
 
     public void signup(User user, String comments, boolean automaticCreation, boolean mapPrivateGroups, String... accountType) throws BusinessException {
 
+        verifyEmail(user.getEmail());
+
         // Build log message
         StringBuilder message = new StringBuilder("Signing up ");
         message.append(user.getEmail());
-        message.append(". List of undesired mail domains: ");
-        for (String s : Server.getInstance().getUndesiredMailDomains()) {
-            if (!s.trim().isEmpty()) {
-                message.append(" ");
-                message.append(s);
-            }
-        }
-        message.append(". ");
-        message.append("List of undesired countries: ");
+        message.append(". List of undesired countries: ");
         for (String s : Server.getInstance().getUndesiredCountries()) {
             if (!s.trim().isEmpty()) {
                 message.append(" ");
@@ -156,25 +135,6 @@ public class ConfigurationBusiness {
         }
         message.append(".");
         logger.info(message.toString());
-
-        // Check if email domain is undesired
-        for (String udm : Server.getInstance().getUndesiredMailDomains()) {
-            if (udm.trim().isEmpty()) {
-                // An empty config file entry gets here as an empty or
-                // whitespace-only string, skip it
-                continue;
-            }
-            String[] useremail = user.getEmail().split("@");
-            if (useremail.length != 2) {
-                logger.info("User Mail address is incorrect : " + user.getEmail());
-                throw new BusinessException("Error");
-            }
-            // Only check against the domain part of the user's email address
-            if (useremail[1].endsWith(udm)) {
-                logger.info("Undesired Mail Domain for " + user.getEmail());
-                throw new BusinessException("Error");
-            }
-        }
         
         // Check if country is undesired
         for (String udc : Server.getInstance().getUndesiredCountries()) {
@@ -318,6 +278,40 @@ public class ConfigurationBusiness {
         } catch (UnsupportedEncodingException ex) {
             logger.error(ex);
             throw new BusinessException(ex);
+        }
+    }
+
+    private void verifyEmail(String email) throws BusinessException {
+        // Build log message
+        StringBuilder message = new StringBuilder("Signing up ");
+        message.append(email);
+        message.append(". List of undesired mail domains: ");
+        for (String s : Server.getInstance().getUndesiredMailDomains()) {
+            if (!s.trim().isEmpty()) {
+                message.append(" ");
+                message.append(s);
+            }
+        }
+        message.append(". ");
+        logger.info(message.toString());
+
+        // Check if email domain is undesired
+        for (String udm : Server.getInstance().getUndesiredMailDomains()) {
+            if (udm.trim().isEmpty()) {
+                // An empty config file entry gets here as an empty or
+                // whitespace-only string, skip it
+                continue;
+            }
+            String[] useremail = email.split("@");
+            if (useremail.length != 2) {
+                logger.info("User Mail address is incorrect : " + email);
+                throw new BusinessException("Error");
+            }
+            // Only check against the domain part of the user's email address
+            if (useremail[1].endsWith(udm)) {
+                logger.info("Undesired Mail Domain for " + email);
+                throw new BusinessException("Error");
+            }
         }
     }
 
@@ -930,6 +924,15 @@ public class ConfigurationBusiness {
         }
     }
 
+    public void updateUserEmail(String oldEmail, String newEmail) throws BusinessException {
+        verifyEmail(newEmail);
+        try {
+            CoreDAOFactory.getDAOFactory().getUserDAO().updateEmail(oldEmail, newEmail);
+        } catch (DAOException e) {
+            throw new BusinessException(e);
+        }
+    }
+
     public void updateTermsOfUse(String email) throws BusinessException {
         try {
             CoreDAOFactory.getDAOFactory().getUserDAO().updateTermsOfUse(email, getCurrentTimeStamp());
@@ -1264,6 +1267,16 @@ public class ConfigurationBusiness {
 
         try {
             CoreDAOFactory.getDAOFactory().getPublicationDAO().update(pub);
+        } catch (DAOException ex) {
+            logger.error(ex);
+            throw new BusinessException(ex);
+        }
+    }
+
+    public void updatePublicationOwner(String oldOwnerEmail, String newOwnerEmail) throws BusinessException {
+
+        try {
+            CoreDAOFactory.getDAOFactory().getPublicationDAO().updateOwnerEmail(oldOwnerEmail, newOwnerEmail);
         } catch (DAOException ex) {
             logger.error(ex);
             throw new BusinessException(ex);

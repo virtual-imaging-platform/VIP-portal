@@ -31,19 +31,15 @@
  */
 package fr.insalyon.creatis.vip.core.server.dao.mysql;
 
-import fr.insalyon.creatis.vip.core.client.bean.DropboxAccountStatus;
-import fr.insalyon.creatis.vip.core.client.bean.User;
+import fr.insalyon.creatis.vip.core.client.bean.*;
 import fr.insalyon.creatis.vip.core.client.view.user.UserLevel;
 import fr.insalyon.creatis.vip.core.client.view.util.CountryCode;
-import fr.insalyon.creatis.vip.core.server.dao.DAOException;
-import fr.insalyon.creatis.vip.core.server.dao.UserDAO;
-import java.sql.*;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import fr.insalyon.creatis.vip.core.server.dao.*;
 import org.apache.log4j.Logger;
 
-import static fr.insalyon.creatis.vip.core.client.CoreModule.user;
+import java.sql.*;
+import java.util.*;
+import java.util.Date;
 
 /**
  *
@@ -359,6 +355,28 @@ public class UserData implements UserDAO {
         } else {
             logger.error("The current password mismatch for '" + email + "'.");
             throw new DAOException("The current password mismatch.");
+        }
+    }
+
+    @Override
+    public void updateEmail(String oldEmail, String newEmail) throws DAOException {
+        try {
+            PreparedStatement ps = connection.prepareStatement("UPDATE "
+                    + "VIPUsers SET email = ? WHERE email = ?");
+
+            ps.setString(1, newEmail);
+            ps.setString(2, oldEmail);
+
+            ps.executeUpdate();
+            ps.close();
+        } catch (SQLException ex) {
+            if (ex.getMessage().contains("Duplicate entry")) {
+                logger.error("There is an existing account associated with the email: " + newEmail);
+                throw new DAOException("There is an existing account associated with this email.", ex);
+            } else {
+                logger.error(ex);
+                throw new DAOException(ex);
+            }
         }
     }
 

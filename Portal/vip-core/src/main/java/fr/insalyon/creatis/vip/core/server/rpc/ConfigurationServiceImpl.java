@@ -522,6 +522,35 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
         }
     }
 
+    public void updateCurrentUserEmail(String newEmail) throws CoreException {
+
+        try {
+            User currentUser = getSessionUser();
+            String currentEmail = currentUser.getEmail();
+            trace(logger, "Updating user email from " + currentEmail + " to " + newEmail);
+            configurationBusiness.updateUserEmail(currentEmail, newEmail);
+            configurationBusiness.updatePublicationOwner(currentEmail, newEmail);
+
+            currentUser = configurationBusiness.getUserData(newEmail);
+            setUserSession(currentUser);
+        } catch (BusinessException ex) {
+            throw new CoreException(ex);
+        }
+    }
+
+    public void updateUserEmail(String currentEmail, String newEmail) throws CoreException {
+
+        try {
+            trace(logger, "Updating user email from " + currentEmail + " to " + newEmail);
+            authenticateSystemAdministrator(logger);
+
+            configurationBusiness.updateUserEmail(currentEmail, newEmail);
+            configurationBusiness.updatePublicationOwner(currentEmail, newEmail);
+        } catch (BusinessException ex) {
+            throw new CoreException(ex);
+        }
+    }
+
     /**
      *
      * @param category
