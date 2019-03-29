@@ -150,12 +150,16 @@ public class SimulationsTab extends Tab {
             @Override
             public void onRowMouseDown(RowMouseDownEvent event) {
                 if (event.getColNum() != 1) {
-                    Layout.getInstance().addTab(MonitorParser.getInstance().parse(
+                    Layout.TabFactoryAndId factoryAndId =
+                        MonitorParser.getInstance().parse(
                             event.getRecord().getAttribute("simulationId"),
                             event.getRecord().getAttribute("simulationName"),
                             event.getRecord().getAttribute("application"),
-                            SimulationStatus.valueOf(event.getRecord().getAttribute("status")),
-                            event.getRecord().getAttributeAsDate("date")));
+                            SimulationStatus.valueOf(
+                                event.getRecord().getAttribute("status")),
+                            event.getRecord().getAttributeAsDate("date"));
+                    Layout.getInstance().addTab(
+                        factoryAndId.id, factoryAndId.factory);
                 }
             }
         });

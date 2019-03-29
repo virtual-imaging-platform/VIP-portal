@@ -82,8 +82,4 @@ public abstract class AbstractViewTab extends Tab {
     }
 
     public abstract void displayFile(VisualizationItem url);
-
-    public abstract boolean isFileSupported(String fileName);
-
-    public abstract String fileTypeName();
 }

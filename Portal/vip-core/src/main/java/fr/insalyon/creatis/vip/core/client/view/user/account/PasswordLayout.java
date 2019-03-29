@@ -36,6 +36,7 @@ import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.fields.PasswordItem;
+import com.smartgwt.client.widgets.tab.Tab;
 import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationService;
 import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationServiceAsync;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
@@ -115,7 +116,11 @@ public class PasswordLayout extends AbstractFormLayout {
         recoverButton = WidgetUtil.getIButton("Forgot Password?", CoreConstants.ICON_HELP, new ClickHandler() {
             @Override
             public void onClick(ClickEvent event) {
-                Layout.getInstance().addTab(new RecoveryTab());
+                Layout.getInstance().addTab(
+                    CoreConstants.TAB_RECOVERY,
+                    new Layout.TabFactory() {
+                        public Tab create() { return new RecoveryTab(); }
+                    });
             }
         });
 

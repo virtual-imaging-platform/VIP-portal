@@ -43,6 +43,7 @@ import com.smartgwt.client.widgets.form.fields.PickerIcon;
 import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.form.fields.events.FormItemClickHandler;
 import com.smartgwt.client.widgets.form.fields.events.FormItemIconClickEvent;
+import com.smartgwt.client.widgets.tab.Tab;
 import fr.insalyon.creatis.vip.core.client.view.common.AbstractFormLayout;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
@@ -136,10 +137,19 @@ public class BoutiquesImportLayout extends AbstractFormLayout {
             public void onSuccess(String jsonFileContent) {
                 modal.hide();
                 JSONObject json = JSONParser.parseStrict(jsonFileContent).isObject();
-                DisplayTab tabImporter = new DisplayTab(Constants.ICON_BOUTIQUES, Constants.TAB_ID_BOUTIQUES_APPLICATION, Constants.TAB_NAME_BOUTIQUES);
+                Layout layout = Layout.getInstance();
+                layout.removeTab(Constants.TAB_ID_BOUTIQUES_APPLICATION);
+                final DisplayTab tabImporter = new DisplayTab(
+                    Constants.ICON_BOUTIQUES,
+                    Constants.TAB_ID_BOUTIQUES_APPLICATION,
+                    Constants.TAB_NAME_BOUTIQUES);
                 try {
                     tabImporter.parseJSON(json);
-                    Layout.getInstance().addTab(tabImporter);
+                    Layout.getInstance().addTab(
+                        Constants.TAB_ID_BOUTIQUES_APPLICATION,
+                        new Layout.TabFactory() {
+                            public Tab create() { return tabImporter; }
+                        });
                 } catch (ApplicationImporterException ex) {
                     Layout.getInstance().setWarningMessage("Unable to parse JSON file :" + ex.getMessage());
                 }

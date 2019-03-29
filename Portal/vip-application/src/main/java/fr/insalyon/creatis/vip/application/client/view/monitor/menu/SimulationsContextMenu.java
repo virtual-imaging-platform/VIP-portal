@@ -39,6 +39,7 @@ import com.smartgwt.client.widgets.menu.MenuItem;
 import com.smartgwt.client.widgets.menu.MenuItemSeparator;
 import com.smartgwt.client.widgets.menu.events.ClickHandler;
 import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
+import com.smartgwt.client.widgets.tab.Tab;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
 import fr.insalyon.creatis.vip.application.client.rpc.WorkflowService;
 import fr.insalyon.creatis.vip.application.client.view.launch.LaunchTab;
@@ -87,8 +88,14 @@ public class SimulationsContextMenu extends Menu {
         viewItem.addClickHandler(new ClickHandler() {
             @Override
             public void onClick(MenuItemClickEvent event) {
-                Layout.getInstance().addTab(new SimulationTab(simulationID,
-                        title, status));
+                Layout.getInstance().addTab(
+                    simulationID + "-tab",
+                    new Layout.TabFactory() {
+                        public Tab create() {
+                            return new SimulationTab(
+                                simulationID, title, status);
+                        }
+                    });
             }
         });
 
@@ -311,12 +318,23 @@ public class SimulationsContextMenu extends Menu {
             }
 
             @Override
-            public void onSuccess(Map<String, String> result) {
+            public void onSuccess(final Map<String, String> result) {
                 modal.hide();
-                Layout.getInstance().removeTab(ApplicationConstants.getLaunchTabID(applicationName));
-                LaunchTab launchTab = new LaunchTab(applicationName,
-                        applicationVersion, applicationClass, simulationName, result);
-                Layout.getInstance().addTab(launchTab);
+                String tabId =
+                    ApplicationConstants.getLaunchTabID(applicationName);
+                Layout.getInstance().removeTab(tabId);
+                Layout.getInstance().addTab(
+                    tabId,
+                    new Layout.TabFactory() {
+                        public Tab create() {
+                            return new LaunchTab(
+                                applicationName,
+                                applicationVersion,
+                                applicationClass,
+                                simulationName,
+                                result);
+                        }
+                    });
             }
         };
         WorkflowService.Util.getInstance().relaunchSimulation(simulationID, callback);

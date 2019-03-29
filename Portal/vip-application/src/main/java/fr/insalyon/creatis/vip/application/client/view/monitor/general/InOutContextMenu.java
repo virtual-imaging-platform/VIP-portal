@@ -36,6 +36,7 @@ import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
 import com.smartgwt.client.widgets.menu.events.ClickHandler;
 import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
+import com.smartgwt.client.widgets.tab.Tab;
 import com.smartgwt.client.widgets.tree.Tree;
 import com.smartgwt.client.widgets.tree.TreeNode;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
@@ -84,10 +85,15 @@ public class InOutContextMenu extends Menu {
         MenuItem viewImageItem = new MenuItem("View Image");
         viewImageItem.setIcon(DataManagerConstants.ICON_VIEW);
         viewImageItem.addClickHandler(new ClickHandler() {
-
             @Override
             public void onClick(MenuItemClickEvent event) {
-                Layout.getInstance().addTab(new ImageViewTab(node.getName()));
+                Layout.getInstance().addTab(
+                    ImageViewTab.tabId(node.getName()),
+                    new Layout.TabFactory() {
+                        public Tab create() {
+                            return new ImageViewTab(node.getName());
+                        }
+                    });
             }
         });
 
@@ -97,7 +103,13 @@ public class InOutContextMenu extends Menu {
 
             @Override
             public void onClick(MenuItemClickEvent event) {
-                Layout.getInstance().addTab(new BrainBrowserViewTab(node.getName()));
+                Layout.getInstance().addTab(
+                    BrainBrowserViewTab.ID,
+                    new Layout.TabFactory() {
+                        public Tab create() {
+                            return new BrainBrowserViewTab(node.getName());
+                        }
+                    });
             }
         });
 

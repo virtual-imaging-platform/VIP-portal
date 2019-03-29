@@ -32,6 +32,7 @@
 package fr.insalyon.creatis.vip.application.client.view;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.smartgwt.client.widgets.tab.Tab;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
 import fr.insalyon.creatis.vip.application.client.rpc.ApplicationService;
 import fr.insalyon.creatis.vip.application.client.view.launch.LaunchTab;
@@ -56,11 +57,21 @@ public class ApplicationTileGrid extends ApplicationsTileGrid {
     }
 
     @Override
-    public void parse(String applicationName, String applicationVersion) {
+    public void parse(
+        final String applicationName, final String applicationVersion) {
 
         String appName = applicationVersion == null ? applicationName : applicationName + " " + applicationVersion;
         if (applicationNames.contains(appName)) {
-            Layout.getInstance().addTab(new LaunchTab(applicationName, applicationVersion, tileName));
+            Layout.getInstance().addTab(
+                ApplicationConstants.getLaunchTabID(applicationName),
+                new Layout.TabFactory() {
+                    public Tab create() {
+                        return new LaunchTab(
+                            applicationName,
+                            applicationVersion,
+                            tileName);
+                    }
+                });
         }
     }
 

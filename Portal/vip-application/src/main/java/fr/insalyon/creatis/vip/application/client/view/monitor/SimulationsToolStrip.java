@@ -37,6 +37,7 @@ import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
+import com.smartgwt.client.widgets.tab.Tab;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
 import fr.insalyon.creatis.vip.application.client.rpc.WorkflowService;
@@ -190,8 +191,11 @@ public class SimulationsToolStrip extends ToolStrip {
                     ApplicationConstants.ICON_CHART, null, new ClickHandler() {
                 @Override
                 public void onClick(ClickEvent event) {
-                    Layout.getInstance().addTab(new StatsTab());
-                    StatsTab statsTab = (StatsTab) Layout.getInstance().getTab(ApplicationConstants.TAB_STATS);
+                    StatsTab statsTab = (StatsTab) Layout.getInstance().addTab(
+                        ApplicationConstants.TAB_STATS,
+                        new Layout.TabFactory() {
+                            public Tab create() { return new StatsTab(); }
+                        });
                     statsTab.setSimulationsList(getSimulationsTab().getSimulationsList());
                 }
             }));
