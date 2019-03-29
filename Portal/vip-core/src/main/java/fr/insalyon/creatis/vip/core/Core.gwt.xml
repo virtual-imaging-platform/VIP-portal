@@ -41,6 +41,11 @@ knowledge of the CeCILL-B license and that you accept its terms.
     <inherits name="com.google.gwt.i18n.I18N" />
     <inherits name='com.google.gwt.user.theme.standard.Standard' />
 
+    <inherits name="com.google.gwt.logging.Logging"/>
+    <set-property name="gwt.logging.enabled" value="TRUE" />
+    <set-property name="gwt.logging.logLevel" value="FINEST" />
+    <set-property name="gwt.logging.consoleHandler" value="ENABLED" />
+
     <!-- Servlets -->
     <servlet class="fr.insalyon.creatis.vip.core.server.rpc.GetFileServiceImpl" path="/getfileservice"/>
     <servlet class="fr.insalyon.creatis.vip.core.server.rpc.ConfigurationServiceImpl" path="/configurationservice"/>
