@@ -50,6 +50,7 @@ import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
 import fr.insalyon.creatis.vip.core.client.view.util.ValidatorUtil;
 import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
 import fr.insalyon.creatis.vip.datamanager.client.view.selection.PathSelectionWindow;
+import fr.insalyon.creatis.vip.applicationimporter.client.bean.BoutiquesTool;
 import fr.insalyon.creatis.vip.applicationimporter.client.rpc.ApplicationImporterService;
 import com.google.gwt.json.client.JSONParser;
 import fr.insalyon.creatis.vip.applicationimporter.client.ApplicationImporterException;
@@ -136,22 +137,25 @@ public class BoutiquesImportLayout extends AbstractFormLayout {
             @Override
             public void onSuccess(String jsonFileContent) {
                 modal.hide();
-                JSONObject json = JSONParser.parseStrict(jsonFileContent).isObject();
-                Layout layout = Layout.getInstance();
-                layout.removeTab(Constants.TAB_ID_BOUTIQUES_APPLICATION);
-                final DisplayTab tabImporter = new DisplayTab(
-                    Constants.ICON_BOUTIQUES,
-                    Constants.TAB_ID_BOUTIQUES_APPLICATION,
-                    Constants.TAB_NAME_BOUTIQUES);
+                JSONObject json =
+                    JSONParser.parseStrict(jsonFileContent).isObject();
                 try {
-                    tabImporter.parseJSON(json);
-                    Layout.getInstance().addTab(
-                        Constants.TAB_ID_BOUTIQUES_APPLICATION,
-                        new Layout.TabFactory() {
-                            public Tab create() { return tabImporter; }
-                        });
+                    BoutiquesTool boutiquesTool = DisplayTab.parseJSON(json);
+                    DisplayTab displayTab =
+                        (DisplayTab) Layout.getInstance().addTab(
+                            Constants.TAB_ID_BOUTIQUES_APPLICATION,
+                            new Layout.TabFactory() {
+                                public Tab create() {
+                                    return new DisplayTab(
+                                        Constants.ICON_BOUTIQUES,
+                                        Constants.TAB_ID_BOUTIQUES_APPLICATION,
+                                        Constants.TAB_NAME_BOUTIQUES);
+                                }
+                            });
+                    displayTab.setBoutiqueTool(boutiquesTool);
                 } catch (ApplicationImporterException ex) {
-                    Layout.getInstance().setWarningMessage("Unable to parse JSON file :" + ex.getMessage());
+                    Layout.getInstance().setWarningMessage(
+                        "Unable to parse JSON file :" + ex.getMessage());
                 }
             }
         };
