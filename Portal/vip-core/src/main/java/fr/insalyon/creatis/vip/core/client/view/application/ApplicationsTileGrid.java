@@ -104,13 +104,6 @@ public abstract class ApplicationsTileGrid extends TileGrid {
 
         this.setFields(imageField, commonNameField, applicationVersion);
         this.setData(new ApplicationTileRecord[]{});
-//       if( this.isElementSet==false){
-//           this.setHeight("100%");
-//       }
-//        this.redraw();
-
-
-
 
         this.addRecordClickHandler(new RecordClickHandler() {
             @Override

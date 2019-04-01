@@ -358,11 +358,6 @@ public class BrowserContextMenu extends Menu {
 
         MenuItemSeparator separator = new MenuItemSeparator();
         boolean sepView = false;
-        /*
-        ArrayList<AbstractViewTab> viewTabs = new ArrayList<AbstractViewTab>();
-        viewTabs.add(new BrainBrowserViewTab(fileName));
-        viewTabs.add(new ImageViewTab(fileName));
-        */
 
         if (BrainBrowserViewTab.isFileSupported(fileName)) {
             MenuItem viewItem =
@@ -389,23 +384,6 @@ public class BrowserContextMenu extends Menu {
             menuItems.add(viewItem);
             sepView = true;
         }
-        /*
-        for(final AbstractViewTab avt : viewTabs){
-           MenuItem viewItem = new MenuItem("View "+avt.fileTypeName());
-           viewItem.setIcon(DataManagerConstants.ICON_VIEW);
-            viewItem.addClickHandler(new ClickHandler() {
-                @Override
-                public void onClick(MenuItemClickEvent event) {
-                    Layout.getInstance().addTab(avt);
-                    avt.load();
-                }
-            });
-            if(avt.isFileSupported(fileName)){
-                menuItems.add(viewItem);
-                sepView = true;
-            }
-        }
-        */
         if(sepView)
             menuItems.add(separator);
     }
