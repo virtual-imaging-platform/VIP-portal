@@ -180,8 +180,6 @@ public class CoreConstants implements IsSerializable {
     public static final String UNDESIRED_COUNTRIES = "account.undesiredCountries";
     public static final String SAML_TRUSTED_CERTIFICATE = "saml.trustedcertificate";
     public static final String SAML_ACCOUNT_TYPE = "saml.accounttype";
-    //query
-    public static String TreeQuery = "query.classes";
     //Boutiques
     public static String APP_CLASS = "boutiques.application.class";
     public static String APPLICATION_FILES_REPOSITORY = "boutiques.upload.repository";

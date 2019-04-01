@@ -179,8 +179,8 @@ public class Layout {
     /**
      * Add a tab.
      *
-     * @deprecated Left for legacy code, in vip-query.  You should use the other
-     *             variant of the addTab method.
+     * @deprecated Left for legacy code, in vip-query and vip-cardiac.  You
+     *             should use the other variant of the addTab method.
      */
     @Deprecated
     public void addTab(Tab tab) {
