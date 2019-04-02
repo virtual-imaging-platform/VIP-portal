@@ -100,12 +100,6 @@ knowledge of the CeCILL-B license and that you accept its terms.
 
         <dependency>
             <groupId>fr.insalyon.creatis</groupId>
-            <artifactId>vip-cardiac</artifactId>
-            <version>${vip.cardiac.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>fr.insalyon.creatis</groupId>
             <artifactId>vip-social</artifactId>
             <version>${vip.social.version}</version>
         </dependency>

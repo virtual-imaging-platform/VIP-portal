@@ -176,22 +176,6 @@ public class Layout {
         ConfigurationService.Util.getInstance().signout(callback);
     }
 
-    /**
-     * Add a tab.
-     *
-     * @deprecated Left for legacy code, in vip-query and vip-cardiac.  You
-     *             should use the other variant of the addTab method.
-     */
-    @Deprecated
-    public void addTab(Tab tab) {
-        String id = tab.getID();
-        if (centerTabSet.getTab(id) != null) {
-            centerTabSet.removeTab(id);
-        }
-        centerTabSet.addTab(tab);
-        centerTabSet.selectTab(id);
-     }
-
     public Tab addTab(String id, TabFactory factory) {
         Tab tab = centerTabSet.getTab(id);
         if (tab == null) {

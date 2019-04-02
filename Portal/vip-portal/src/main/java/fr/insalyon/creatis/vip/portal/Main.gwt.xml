@@ -43,7 +43,6 @@ knowledge of the CeCILL-B license and that you accept its terms.
     <inherits name="fr.insalyon.creatis.vip.application.Application" />
     <inherits name="fr.insalyon.creatis.vip.gatelab.GateLab" />
     <inherits name="fr.insalyon.creatis.vip.social.Social" />
-    <inherits name="fr.insalyon.creatis.vip.cardiac.Cardiac" />
     <inherits name="fr.insalyon.creatis.vip.applicationimporter.ApplicationImporter" />
     <!-- Specify the app entry point class.-->
     <entry-point class="fr.insalyon.creatis.vip.portal.client.Main"/>

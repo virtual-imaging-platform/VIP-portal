@@ -147,16 +147,6 @@ knowledge of the CeCILL-B license and that you accept its terms.
         <url-pattern>/fr.insalyon.creatis.vip.portal.Main/socialservice</url-pattern>
     </servlet-mapping>
     <!-- End Social Module -->
-    <!-- Cardiac Module -->
-    <servlet>
-        <servlet-name>CardiacService</servlet-name>
-        <servlet-class>fr.insalyon.creatis.vip.cardiac.server.rpc.CardiacServiceImpl</servlet-class>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>CardiacService</servlet-name>
-        <url-pattern>/fr.insalyon.creatis.vip.portal.Main/cardiacservice</url-pattern>
-    </servlet-mapping>
-    <!-- End Cardiac Module -->
     <!-- Application Importer Module-->
     <servlet>
         <servlet-name>ApplicationImporterService</servlet-name>

@@ -40,7 +40,6 @@ import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.Label;
 import fr.insalyon.creatis.vip.applicationimporter.client.ApplicationImporterModule;
 import fr.insalyon.creatis.vip.application.client.ApplicationModule;
-import fr.insalyon.creatis.vip.cardiac.client.CardiacModule;
 
 import fr.insalyon.creatis.vip.core.client.CoreModule;
 import fr.insalyon.creatis.vip.core.client.Modules;
@@ -80,7 +79,6 @@ public class Main implements EntryPoint {
         modulesInit.add(new DocsModule());
         modulesInit.add(new SocialModule());
         modulesInit.add(new GateLabModule());
-        modulesInit.add(new CardiacModule());
         modulesInit.add(new ApplicationImporterModule());
 
         configureVIP();
