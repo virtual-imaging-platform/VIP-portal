@@ -207,14 +207,8 @@ public class Layout {
     }
 
     public void removeTab(String id) {
-        Tab tab = getTab(id);
+        Tab tab = centerTabSet.getTab(id);
         if (tab != null) {
-            removeTab(tab);
-        }
-    }
-
-    public void removeTab(Tab tab) {
-        if (centerTabSet.getTab(tab.getID()) != null) {
             centerTabSet.removeTab(tab);
         }
     }
