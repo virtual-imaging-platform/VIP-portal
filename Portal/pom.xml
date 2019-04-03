@@ -50,6 +50,7 @@ knowledge of the CeCILL-B license and that you accept its terms.
         <vip.gatelab.version>1.24.1</vip.gatelab.version>
         <vip.docs.version>1.15</vip.docs.version>
         <vip.social.version>1.21</vip.social.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
     <description>VIP</description>
