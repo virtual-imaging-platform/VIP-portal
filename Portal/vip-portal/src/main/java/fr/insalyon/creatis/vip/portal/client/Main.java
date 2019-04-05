@@ -65,7 +65,8 @@ public class Main implements EntryPoint {
 
         String login = Window.Location.getParameter("login");
 
-        if (login.equals("stats")) {
+        // login might be null.
+        if ("stats".equals(login)) {
             configureStats();
             return;
         }
