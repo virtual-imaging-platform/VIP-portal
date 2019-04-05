@@ -52,7 +52,7 @@ public abstract class ApplicationsTileGrid extends TileGrid {
 
     public ApplicationsTileGrid(String tileName) {
 
-        this.setID("application-" + tileName + "-tilegrid");
+        this.setID("application_" + tileName + "_tilegrid");
         this.tileName = tileName;
         this.setTileWidth(120);
         this.setTileHeight(130);
