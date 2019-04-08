@@ -127,17 +127,8 @@ knowledge of the CeCILL-B license and that you accept its terms.
         <cxf.version>2.2.3</cxf.version>
         <skip.itests>true</skip.itests>
     </properties>
+
     <dependencies>
-
-        <!-- spring testing requires servlet api 3.0 min.
-         Need to be first because of conflict with servlet api 2.5 present as transitive dependency-->
-        <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>javax.servlet-api</artifactId>
-            <version>3.0.1</version>
-            <scope>test</scope>
-        </dependency>
-
         <dependency>
             <groupId>fr.insalyon.creatis</groupId>
             <artifactId>vip-core</artifactId>
