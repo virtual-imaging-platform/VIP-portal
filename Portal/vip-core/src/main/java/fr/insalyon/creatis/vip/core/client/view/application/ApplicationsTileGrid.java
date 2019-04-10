@@ -52,6 +52,8 @@ public abstract class ApplicationsTileGrid extends TileGrid {
 
     public ApplicationsTileGrid(String tileName) {
 
+        if (tileName.length() == 0)
+            throw new IllegalArgumentException("ApplicationsTileGrid: tileName is empty");
         this.setID("application_" + tileName + "_tilegrid");
         this.tileName = tileName;
         this.setTileWidth(120);
@@ -63,8 +65,10 @@ public abstract class ApplicationsTileGrid extends TileGrid {
         this.setCanReorderTiles(true);
         this.setAnimateTileChange(true);
         this.setShowEdges(false);
-
-
+        // The message can be seen even if there are tiles, maybe because tiles
+        // are addes later, after the grid is created.  So we remove it
+        // completely.
+        this.setEmptyMessage("");
 
         DetailViewerField imageField = new DetailViewerField("picture");
         imageField.setType("image");
