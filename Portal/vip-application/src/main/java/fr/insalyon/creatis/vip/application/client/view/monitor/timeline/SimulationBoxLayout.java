@@ -129,8 +129,14 @@ public class SimulationBoxLayout extends HLayout {
         handler = mainLayout.addClickHandler(new ClickHandler() {
             @Override
             public void onClick(ClickEvent event) {
-                Layout.getInstance().addTab(new SimulationTab(simulationID,
-                        simulationName, simulationStatus));
+                Layout.getInstance().addTab(
+                    simulationID + "-tab",
+                    new Layout.TabFactory() {
+                        public Tab create() {
+                            return new SimulationTab(
+                                simulationID, simulationName, simulationStatus);
+                        }
+                    });
             }
         });
         this.addMember(mainLayout);
@@ -319,13 +325,24 @@ public class SimulationBoxLayout extends HLayout {
             }
 
             @Override
-            public void onSuccess(Map<String, String> result) {
+            public void onSuccess(final Map<String, String> result) {
                 setLoading(false, null);
-                Tab tab = Layout.getInstance().getTab(ApplicationConstants.getLaunchTabID(applicationName));
+                String tabId =
+                    ApplicationConstants.getLaunchTabID(applicationName);
+                Tab tab = Layout.getInstance().getTab(tabId);
                 if (tab == null) {
-                    LaunchTab launchTab = new LaunchTab(applicationName, 
-                            applicationVersion, applicationClass, simulationName, result);
-                    Layout.getInstance().addTab(launchTab);
+                    Layout.getInstance().addTab(
+                        tabId,
+                        new Layout.TabFactory() {
+                            public Tab create() {
+                                return new LaunchTab(
+                                    applicationName,
+                                    applicationVersion,
+                                    applicationClass,
+                                    simulationName,
+                                    result);
+                            }
+                        });
                 } else {
                     ((LaunchTab) tab).loadInput(simulationName, result);
                 }

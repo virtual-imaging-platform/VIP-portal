@@ -4,16 +4,16 @@
  * This software is a web portal for pipeline execution on distributed systems.
  *
  * This software is governed by the CeCILL-B license under French law and
- * abiding by the rules of distribution of free software.  You can  use, 
+ * abiding by the rules of distribution of free software.  You can  use,
  * modify and/ or redistribute the software under the terms of the CeCILL-B
  * license as circulated by CEA, CNRS and INRIA at the following URL
- * "http://www.cecill.info". 
+ * "http://www.cecill.info".
  *
  * As a counterpart to the access to the source code and  rights to copy,
  * modify and redistribute granted by the license, users are provided only
  * with a limited warranty  and the software's author,  the holder of the
  * economic rights,  and the successive licensors  have only  limited
- * liability. 
+ * liability.
  *
  * In this respect, the user's attention is drawn to the risks associated
  * with loading,  using,  modifying and/or developing or reproducing the
@@ -22,9 +22,9 @@
  * therefore means  that it is reserved for developers  and  experienced
  * professionals having in-depth computer knowledge. Users are therefore
  * encouraged to load and test the software's suitability as regards their
- * requirements in conditions enabling the security of their systems and/or 
- * data to be ensured and,  more generally, to use and operate it in the 
- * same conditions as regards security. 
+ * requirements in conditions enabling the security of their systems and/or
+ * data to be ensured and,  more generally, to use and operate it in the
+ * same conditions as regards security.
  *
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL-B license and that you accept its terms.
@@ -41,6 +41,7 @@ import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.events.CloseClickEvent;
 import com.smartgwt.client.widgets.events.CloseClickHandler;
 import com.smartgwt.client.widgets.layout.VLayout;
+import com.smartgwt.client.widgets.tab.Tab;
 import com.smartgwt.client.widgets.toolbar.ToolStripButton;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationService;
@@ -87,19 +88,27 @@ public class CoreModule extends Module {
             homeTab.addTileGrid(systemTileGrid);
         }
 
-        // Configure User's toolstrip        
+        // Configure User's toolstrip
         MainToolStrip.getInstance().addMenuButton(new UserMenuButton(user));
 
         // Home Tab
-        Layout.getInstance().addTab(homeTab);
+        Layout.getInstance().addTab(
+            CoreConstants.TAB_HOME,
+            new Layout.TabFactory() {
+                public Tab create() { return homeTab; }
+            });
 
         // open account tab to accept the terms of use if necessary
         // Also open the tab for users with no group :
         // It was possible with former Mozilla Persona but keep it just in case
 
         if (!user.hasGroups() || !user.hasAcceptTermsOfUse()) {
-            final AccountTab accountTab = new AccountTab();
-            Layout.getInstance().addTab(accountTab);
+            final AccountTab accountTab =
+                (AccountTab) Layout.getInstance().addTab(
+                    CoreConstants.TAB_ACCOUNT,
+                    new Layout.TabFactory() {
+                        public Tab create() { return new AccountTab(); }
+                    });
             if (!user.hasAcceptTermsOfUse()) {
                 showDialog("Please accept our Terms of Use", accountTab);
             }
@@ -118,8 +127,12 @@ public class CoreModule extends Module {
             @Override
             public void onSuccess(Boolean result) {
                 if (result) {
-                    final AccountTab accountTab = new AccountTab();
-                    Layout.getInstance().addTab(accountTab);
+                    final AccountTab accountTab =
+                        (AccountTab) Layout.getInstance().addTab(
+                            CoreConstants.TAB_ACCOUNT,
+                            new Layout.TabFactory() {
+                                public Tab create() { return new AccountTab(); }
+                            });
                     showDialog("Our Terms of Use have changed. Please accept them again.", accountTab);
 
                 }
@@ -158,7 +171,11 @@ public class CoreModule extends Module {
         helpButton.addClickHandler(new ClickHandler() {
             @Override
             public void onClick(ClickEvent event) {
-                Layout.getInstance().addTab(new ContactTab());
+                Layout.getInstance().addTab(
+                    CoreConstants.TAB_CONTACT,
+                    new Layout.TabFactory() {
+                        public Tab create() { return new ContactTab(); }
+                    });
             }
         });
 
@@ -316,7 +333,11 @@ public class CoreModule extends Module {
         ok.addClickHandler(new ClickHandler() {
             @Override
             public void onClick(ClickEvent event) {
-                Layout.getInstance().addTab(new PublicationTab());
+                Layout.getInstance().addTab(
+                    CoreConstants.TAB_PUBLICATION,
+                    new Layout.TabFactory() {
+                        public Tab create() { return new PublicationTab(); }
+                    });
                 dialog.destroy();
             }
         });

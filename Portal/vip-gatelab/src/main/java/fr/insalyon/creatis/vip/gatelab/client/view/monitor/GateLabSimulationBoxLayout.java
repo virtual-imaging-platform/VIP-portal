@@ -33,6 +33,7 @@ package fr.insalyon.creatis.vip.gatelab.client.view.monitor;
 
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
+import com.smartgwt.client.widgets.tab.Tab;
 import fr.insalyon.creatis.vip.application.client.view.monitor.SimulationStatus;
 import fr.insalyon.creatis.vip.application.client.view.monitor.timeline.SimulationBoxLayout;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
@@ -55,8 +56,14 @@ public class GateLabSimulationBoxLayout extends SimulationBoxLayout {
         mainLayout.addClickHandler(new ClickHandler() {
             @Override
             public void onClick(ClickEvent event) {
-                Layout.getInstance().addTab(new GateLabSimulationTab(simulationID,
-                        simulationName, simulationStatus, launchedDate.toString()));
+                Layout.getInstance().addTab(
+                    simulationID + "-tab",
+                    new Layout.TabFactory() {
+                        public Tab create() {
+                            return new GateLabSimulationTab(
+                                simulationID, simulationName, simulationStatus, launchedDate.toString());
+                        }
+                    });
             }
         });
     }

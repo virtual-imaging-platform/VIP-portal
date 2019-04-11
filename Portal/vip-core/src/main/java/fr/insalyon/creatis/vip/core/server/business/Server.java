@@ -126,8 +126,7 @@ public class Server {
     //undesired email domains and countries
     private List<String> undesiredMailDomains;
     private List<String> undesiredCountries;
-    //treeQuery
-    private String queryTree;
+    // Application importer
     private String applicationImporterFileRepository;
     private String deleteFilesAfterUpload;
     //Publication
@@ -238,9 +237,6 @@ public class Server {
             List<String> listUndesiredCountries = new ArrayList<>();
             undesiredCountries = config.getList(CoreConstants.UNDESIRED_COUNTRIES, listUndesiredCountries);
 
-            //queryTree
-            queryTree = config.getString(CoreConstants.TreeQuery, "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> select * from <http://e-ginseng.org/graph/ontology/semEHR> where {?x a rdfs:Class . ?x rdfs:label ?label}");
-
             //Applicatoin importer
             applicationImporterFileRepository = config.getString(CoreConstants.APPLICATION_FILES_REPOSITORY, "/tmp/boutiques-cache");
             deleteFilesAfterUpload = config.getString(CoreConstants.APP_DELETE_FILES_AFTER_UPLOAD, "yes");
@@ -296,7 +292,6 @@ public class Server {
             config.setProperty(CoreConstants.LAB_APACHE_SSL_PORT, apacheSSLPort);
             config.setProperty(CoreConstants.LAB_CAS_URL, casURL);
             config.setProperty(CoreConstants.SSH_PUBLIC_KEY, sshPublicKey);
-            config.setProperty(CoreConstants.TreeQuery, queryTree);
 
             config.setProperty(CoreConstants.APPLICATION_FILES_REPOSITORY, applicationImporterFileRepository);
             config.setProperty(CoreConstants.APP_DELETE_FILES_AFTER_UPLOAD, deleteFilesAfterUpload);
@@ -524,10 +519,6 @@ public class Server {
         String result = config.getString(CoreConstants.SAML_ACCOUNT_TYPE+"."+issuer);
         logger.info("Returning "+result);
         return result;
-    }
-
-    public String getQueryTree() {
-        return queryTree;
     }
 
     public String getApplicationImporterFileRepository() {
