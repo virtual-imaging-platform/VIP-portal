@@ -190,7 +190,7 @@ public class UserData implements UserDAO {
 
         try {
             PreparedStatement ps = connection.prepareStatement("SELECT "
-                    + "email, first_name, last_name, institution, phone, "
+                    + "email, next_email, first_name, last_name, institution, phone, "
                     + "code, confirmed, folder, session, registration, "
                     + "last_login, level, country_code, max_simulations,termsUse,lastUpdatePublications,failed_authentications,account_locked "
                     + "FROM VIPUsers "
@@ -202,7 +202,8 @@ public class UserData implements UserDAO {
             if (rs.next()) {
                 User user = new User(
                         rs.getString("first_name"), rs.getString("last_name"),
-                        rs.getString("email"), rs.getString("institution"),
+                        rs.getString("email"), rs.getString("next_email"),
+                        rs.getString("institution"),
                         "", rs.getString("phone"), rs.getBoolean("confirmed"),
                         rs.getString("code"), rs.getString("folder"),
                         rs.getString("session"),
@@ -238,7 +239,7 @@ public class UserData implements UserDAO {
 
         try {
             PreparedStatement ps = connection.prepareStatement("SELECT "
-                    + "email, first_name, last_name, institution, phone, "
+                    + "email, next_email, first_name, last_name, institution, phone, "
                     + "code, confirmed, folder, registration, last_login, "
                     + "level, country_code, max_simulations, termsUse, lastUpdatePublications,"
                     + "failed_authentications, account_locked "
@@ -251,7 +252,8 @@ public class UserData implements UserDAO {
             while (rs.next()) {
                 users.add(new User(
                         rs.getString("first_name"), rs.getString("last_name"),
-                        rs.getString("email"), rs.getString("institution"),
+                        rs.getString("email"), rs.getString("next_email"),
+                        rs.getString("institution"),
                         "", rs.getString("phone"), rs.getBoolean("confirmed"),
                         rs.getString("code"), rs.getString("folder"), "",
                         new Date(rs.getTimestamp("registration").getTime()),
@@ -380,6 +382,24 @@ public class UserData implements UserDAO {
         }
     }
 
+    @Override
+    public void updateNextEmail(String currentEmail, String nextEmail) throws DAOException {
+        try {
+            PreparedStatement ps = connection.prepareStatement("UPDATE "
+                    + "VIPUsers SET next_email = ? WHERE email = ?");
+
+
+            ps.setString(1, nextEmail); // work even if it's null
+            ps.setString(2, currentEmail);
+
+            ps.executeUpdate();
+            ps.close();
+        } catch (SQLException ex) {
+            logger.error(ex);
+            throw new DAOException(ex);
+        }
+    }
+
     /**
      *
      * @param email
@@ -491,7 +511,7 @@ public class UserData implements UserDAO {
 
         try {
             PreparedStatement ps = connection.prepareStatement("SELECT "
-                    + "email, first_name, last_name, institution, phone, "
+                    + "email, next_email, first_name, last_name, institution, phone, "
                     + "code, confirmed, folder, session, registration, "
                     + "last_login, level, country_code, max_simulations,"
                     + "termsUse, lastUpdatePublications, failed_authentications, account_locked "
@@ -504,7 +524,8 @@ public class UserData implements UserDAO {
             if (rs.next()) {
                 User user = new User(
                         rs.getString("first_name"), rs.getString("last_name"),
-                        rs.getString("email"), rs.getString("institution"),
+                        rs.getString("email"), rs.getString("next_email"),
+                        rs.getString("institution"),
                         "", rs.getString("phone"), rs.getBoolean("confirmed"),
                         rs.getString("code"), rs.getString("folder"),
                         rs.getString("session"),
@@ -539,7 +560,7 @@ public class UserData implements UserDAO {
 
         try {
             PreparedStatement ps = connection.prepareStatement("SELECT "
-                    + "email, first_name, last_name, institution, phone, "
+                    + "email, next_email, first_name, last_name, institution, phone, "
                     + "code, confirmed, folder, registration, last_login, "
                     + "level, country_code, max_simulations, termsUse, "
                     + " lastUpdatePublications, failed_authentications, account_locked "
@@ -553,7 +574,8 @@ public class UserData implements UserDAO {
             while (rs.next()) {
                 users.add(new User(
                         rs.getString("first_name"), rs.getString("last_name"),
-                        rs.getString("email"), rs.getString("institution"),
+                        rs.getString("email"), rs.getString("next_email"),
+                        rs.getString("institution"),
                         "", rs.getString("phone"), rs.getBoolean("confirmed"),
                         rs.getString("code"), rs.getString("folder"), "",
                         new Date(rs.getTimestamp("registration").getTime()),

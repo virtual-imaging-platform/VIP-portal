@@ -589,6 +589,33 @@ public class ConfigurationBusiness {
         }
     }
 
+    public void requestNewEmail(User user, String newEmail) throws BusinessException {
+
+        try {
+            String code = UUID.randomUUID().toString();
+            CoreDAOFactory.getDAOFactory().getUserDAO().updateCode(user.getEmail(), code);
+            CoreDAOFactory.getDAOFactory().getUserDAO().updateNextEmail(user.getEmail(), newEmail);
+
+            String emailContent = "<html>"
+                    + "<head></head>"
+                    + "<body>"
+                    + "<p>Dear " + user.getFullName() + ",</p>"
+                    + "<p>You requested us link your VIP account to a new email address.</p>"
+                    + "<p>Please use the following code to activate it in your VIP account page:</p>"
+                    + "<p><b>" + code + "</b></p>"
+                    + "<p>Best Regards,</p>"
+                    + "<p>VIP Team</p>"
+                    + "</body>"
+                    + "</html>";
+
+            CoreUtil.sendEmail("Code to change your VIP email address", emailContent,
+                    new String[]{newEmail}, true, newEmail);
+
+        } catch (DAOException ex) {
+            throw new BusinessException(ex);
+        }
+    }
+
     /**
      *
      * @param email
@@ -928,6 +955,17 @@ public class ConfigurationBusiness {
         verifyEmail(newEmail);
         try {
             CoreDAOFactory.getDAOFactory().getUserDAO().updateEmail(oldEmail, newEmail);
+            // need to update publication separately as the table does not
+            // support foreign keys
+            updatePublicationOwner(oldEmail, newEmail);
+        } catch (DAOException e) {
+            throw new BusinessException(e);
+        }
+    }
+
+    public void resetNextEmail(String currentEmail) throws BusinessException {
+        try {
+            CoreDAOFactory.getDAOFactory().getUserDAO().updateNextEmail(currentEmail, null);
         } catch (DAOException e) {
             throw new BusinessException(e);
         }

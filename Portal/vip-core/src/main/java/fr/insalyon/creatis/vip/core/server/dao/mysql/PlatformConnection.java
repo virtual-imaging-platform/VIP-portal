@@ -99,6 +99,7 @@ public class PlatformConnection {
 
             if (createTable("VIPUsers",
                     "email VARCHAR(255), "
+                    + "next_email VARCHAR(255), "
                     + "pass VARCHAR(40), "
                     + "first_name VARCHAR(255), "
                     + "last_name VARCHAR(255), "

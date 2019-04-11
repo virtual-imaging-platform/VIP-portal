@@ -1,8 +1,8 @@
--- v1.14
+-- v1.24
 alter table VIPAppVersions ADD json_lfn VARCHAR(255);
 alter table VIPAppVersions ADD doi VARCHAR(255);
 
--- v1.15
+-- v1.25
 ALTER TABLE `VIPSocialGroupMessage` DROP FOREIGN KEY `VIPSocialGroupMessage_ibfk_1`;
 ALTER TABLE `VIPSocialGroupMessage` ADD FOREIGN KEY (`sender`) REFERENCES `VIPUsers` (`email`) ON DELETE CASCADE ON UPDATE CASCADE;
 
@@ -17,3 +17,5 @@ ALTER TABLE `VIPApplications` ADD FOREIGN KEY (`owner`) REFERENCES `VIPUsers` (`
 
 ALTER TABLE `VIPAppInputs` DROP FOREIGN KEY `VIPAppInputs_ibfk_1`;
 ALTER TABLE `VIPAppInputs` ADD FOREIGN KEY (`email`) REFERENCES `VIPUsers` (`email`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE `VIPUsers` ADD next_email VARCHAR(255);

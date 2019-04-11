@@ -522,18 +522,50 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
         }
     }
 
-    public User updateCurrentUserEmail(String newEmail) throws CoreException {
+    public User requestNewEmail(String newEmail) throws CoreException {
 
         try {
             User currentUser = getSessionUser();
             String currentEmail = currentUser.getEmail();
-            trace(logger, "Updating user email from " + currentEmail + " to " + newEmail);
+            trace(logger, "Requesting email change from " + currentEmail + " to " + newEmail);
+
+            configurationBusiness.requestNewEmail(currentUser, newEmail);
+
+            currentUser = configurationBusiness.getUserData(currentUser.getEmail());
+            return setUserSession(currentUser);
+        } catch (BusinessException ex) {
+            throw new CoreException(ex);
+        }
+    }
+
+    public User confirmNewEmail() throws CoreException {
+
+        try {
+            User currentUser = getSessionUser();
+            String currentEmail = currentUser.getEmail();
+            String newEmail = currentUser.getNextEmail();
+            trace(logger, "Confirming email change from " + currentEmail + " to " + newEmail);
             configurationBusiness.updateUserEmail(currentEmail, newEmail);
-            configurationBusiness.updatePublicationOwner(currentEmail, newEmail);
+            configurationBusiness.resetNextEmail(newEmail);
 
             currentUser = configurationBusiness.getUserData(newEmail);
-            setUserSession(currentUser);
-            return currentUser;
+            return setUserSession(currentUser);
+        } catch (BusinessException ex) {
+            throw new CoreException(ex);
+        }
+    }
+
+    public User cancelNewEmail() throws CoreException {
+
+        try {
+            User currentUser = getSessionUser();
+            String currentEmail = currentUser.getEmail();
+            String newEmail = currentUser.getNextEmail();
+            trace(logger, "Canceling email change from " + currentEmail + " to " + newEmail);
+            configurationBusiness.resetNextEmail(currentEmail);
+
+            currentUser = configurationBusiness.getUserData(currentEmail);
+            return setUserSession(currentUser);
         } catch (BusinessException ex) {
             throw new CoreException(ex);
         }
@@ -544,9 +576,7 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
         try {
             trace(logger, "Updating user email from " + currentEmail + " to " + newEmail);
             authenticateSystemAdministrator(logger);
-
             configurationBusiness.updateUserEmail(currentEmail, newEmail);
-            configurationBusiness.updatePublicationOwner(currentEmail, newEmail);
         } catch (BusinessException ex) {
             throw new CoreException(ex);
         }
