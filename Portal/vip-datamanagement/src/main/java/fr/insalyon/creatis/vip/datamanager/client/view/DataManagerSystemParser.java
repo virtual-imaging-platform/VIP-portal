@@ -31,6 +31,7 @@
  */
 package fr.insalyon.creatis.vip.datamanager.client.view;
 
+import com.smartgwt.client.widgets.tab.Tab;
 import fr.insalyon.creatis.vip.core.client.CoreModule;
 import fr.insalyon.creatis.vip.core.client.view.application.ApplicationParser;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
@@ -61,21 +62,37 @@ public class DataManagerSystemParser extends ApplicationParser {
     public boolean parse(String applicationName, String applicationVersion) {
 
         if (applicationName.equals(DataManagerConstants.APP_OPERATIONS)) {
-            Layout.getInstance().addTab(new ManageOperationsTab());
+            Layout.getInstance().addTab(
+                DataManagerConstants.TAB_MANAGE_OPERATIONS,
+                new Layout.TabFactory() {
+                    public Tab create() { return new ManageOperationsTab(); }
+                });
             return true;
 
         } else if (applicationName.equals(DataManagerConstants.APP_CACHED_FILES)) {
-            Layout.getInstance().addTab(new ManageCachedFilesTab());
+            Layout.getInstance().addTab(
+                DataManagerConstants.TAB_MANAGE_CACHED_FILES,
+                new Layout.TabFactory() {
+                    public Tab create() { return new ManageCachedFilesTab(); }
+                });
             return true;
 
         } else if (applicationName.equals(DataManagerConstants.APP_ZOMBIE_FILES)) {
-            Layout.getInstance().addTab(new ManageZombieFilesTab());
+            Layout.getInstance().addTab(
+                DataManagerConstants.TAB_MANAGE_ZOMBIE_FILES,
+                new Layout.TabFactory() {
+                    public Tab create() { return new ManageZombieFilesTab(); }
+                });
             return true;
 
         }
         
         else if (applicationName.equals(DataManagerConstants.APP_SSH)) {
-            Layout.getInstance().addTab(new ManageSSHTab());
+            Layout.getInstance().addTab(
+                DataManagerConstants.TAB_MANAGE_SSH,
+                new Layout.TabFactory() {
+                    public Tab create() { return new ManageSSHTab(); }
+                });
             return true;
 
         }

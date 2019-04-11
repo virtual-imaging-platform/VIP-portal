@@ -171,22 +171,29 @@ public class DisplayTab extends Tab {
         ApplicationImporterService.Util.getInstance().readAndValidateBoutiquesFile(vipLayout.getDescriptorLocation() + "/" + Constants.APP_IMPORTER_CHALLENGE_METRIC, callback);
     }
 
+    public static BoutiquesTool parseJSON(JSONObject jsonObject)
+        throws ApplicationImporterException {
+
+        BoutiquesTool boutiquesTool = JSONUtil.parseBoutiquesTool(jsonObject);
+        verifyBoutiquesTool(boutiquesTool);
+        return boutiquesTool;
+    }
+
     /**
      * Populates the class with instance variables containing values in the JSON
      * object, and refreshes the display.
-     *
-     * @param jsonObject
      */
-    public void parseJSON(JSONObject jsonObject) throws ApplicationImporterException {
-        boutiquesTool = JSONUtil.parseBoutiquesTool(jsonObject);
-        verifyBoutiquesTool();
+    public void setBoutiqueTool(BoutiquesTool boutiquesTool) {
+        this.boutiquesTool = boutiquesTool;
         this.setTitle(boutiquesTool.getName());
         generalLayout.setTool(boutiquesTool);
         inputsLayout.setInputs(boutiquesTool.getInputs());
         outputsLayout.setOutputFiles(boutiquesTool.getOutputFiles());
     }
 
-    private void verifyBoutiquesTool() throws ApplicationImporterException {
+    private static void verifyBoutiquesTool(BoutiquesTool boutiquesTool)
+        throws ApplicationImporterException {
+
         if (boutiquesTool.getName() == null) {
             throw new ApplicationImporterException("Boutiques file must have a name property");
         }
@@ -228,5 +235,4 @@ public class DisplayTab extends Tab {
             false,
             callback);
     }
-
 }
