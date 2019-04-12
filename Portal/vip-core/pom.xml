@@ -46,6 +46,18 @@ knowledge of the CeCILL-B license and that you accept its terms.
     <version>${vip.core.version}</version>
     <name>VIP-Core</name>
 
+    <dependencyManagement>
+      <dependencies>
+        <dependency>
+          <groupId>com.google.gwt</groupId>
+          <artifactId>gwt</artifactId>
+          <version>2.8.2</version>
+          <type>pom</type>
+          <scope>import</scope>
+        </dependency>
+      </dependencies>
+    </dependencyManagement>
+
     <dependencies>
         <dependency>
             <groupId>javax.servlet</groupId>
@@ -70,15 +82,12 @@ knowledge of the CeCILL-B license and that you accept its terms.
 
         <dependency>
             <groupId>com.google.gwt</groupId>
-            <artifactId>gwt-servlet</artifactId>
-            <version>2.8.2</version>
-            <scope>runtime</scope>
+            <artifactId>gwt-user</artifactId>
         </dependency>
 
         <dependency>
-            <groupId>com.google.gwt</groupId>
-            <artifactId>gwt-user</artifactId>
-            <version>2.8.2</version>
+          <groupId>com.google.gwt</groupId>
+          <artifactId>gwt-dev</artifactId>
         </dependency>
 
         <dependency>
