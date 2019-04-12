@@ -48,12 +48,12 @@ import fr.insalyon.creatis.vip.core.client.view.util.*;
  *
  * @author Axel Bonnet
  */
-public class EmailLayout extends AbstractFormLayout {
+public class RequestNewEmailLayout extends AbstractFormLayout {
 
     private TextItem emailField;
     private IButton saveButton;
 
-    public EmailLayout() {
+    public RequestNewEmailLayout() {
 
         super("100%", "135");
         addTitle("Email", CoreConstants.ICON_PERSONAL);
@@ -69,7 +69,7 @@ public class EmailLayout extends AbstractFormLayout {
 
         emailField.setValidators(ValidatorUtil.getEmailValidator());
 
-        saveButton = WidgetUtil.getIButton("Save new email", CoreConstants.ICON_SAVED,
+        saveButton = WidgetUtil.getIButton("Change email", CoreConstants.ICON_SAVED,
                 new ClickHandler() {
                     @Override
                     public void onClick(ClickEvent clickEvent) {
@@ -79,8 +79,8 @@ public class EmailLayout extends AbstractFormLayout {
                             final AsyncCallback<User> callback = new AsyncCallback<User>() {
                                 @Override
                                 public void onFailure(Throwable caught) {
-                                    WidgetUtil.resetIButton(saveButton, "Save new email", CoreConstants.ICON_SAVED);
-                                    Layout.getInstance().setWarningMessage("Unable to save new email:<br />" + caught.getMessage());
+                                    WidgetUtil.resetIButton(saveButton, "Change email", CoreConstants.ICON_SAVED);
+                                    Layout.getInstance().setWarningMessage("Unable to change email:<br />" + caught.getMessage());
                                 }
 
                                 @Override
@@ -88,17 +88,15 @@ public class EmailLayout extends AbstractFormLayout {
                                     Modules.getInstance().userUpdated(CoreModule.user, result);
                                     CoreModule.user = result;
 
-                                    if (Cookies.isCookieEnabled()) {
-                                        Cookies.setCookie(CoreConstants.COOKIES_USER, result.getEmail(),
-                                                CoreConstants.COOKIES_EXPIRATION_DATE, null, "/", false);
-                                    }
-
-                                    WidgetUtil.resetIButton(saveButton, "Save new email", CoreConstants.ICON_SAVED);
-                                    Layout.getInstance().setNoticeMessage("Email successfully updated.");
+                                    WidgetUtil.resetIButton(saveButton, "Change email", CoreConstants.ICON_SAVED);
+                                    Layout.getInstance().setNoticeMessage(
+                                            "Your email change has been taken into account. "
+                                                    +" You will receive a mail with a code to validate it.<br />"
+                                                    + "Please refresh VIP to enter the code in your account");
                                 }
                             };
                             WidgetUtil.setLoadingIButton(saveButton, "Saving...");
-                            service.updateCurrentUserEmail(
+                            service.requestNewEmail(
                                     emailField.getValueAsString().trim(), callback);
                         }
                     }

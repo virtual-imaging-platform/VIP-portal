@@ -114,7 +114,7 @@ public interface ConfigurationService extends RemoteService {
 
     User requestNewEmail(String newEmail) throws CoreException;
 
-    User confirmNewEmail() throws CoreException;
+    User confirmNewEmail(String code) throws CoreException;
 
     User cancelNewEmail() throws CoreException;
 

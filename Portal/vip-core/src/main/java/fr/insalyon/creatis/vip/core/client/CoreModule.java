@@ -114,6 +114,11 @@ public class CoreModule extends Module {
             }
         }
 
+        // check if the user has requested an email change
+        if (user.getNextEmail() != null) {
+            Layout.getInstance().setNoticeMessage("You have requested an email address change. Please validate it in your account page", 10);
+        }
+
         //call to terms of use
          if (user.hasAcceptTermsOfUse()) {
         final AsyncCallback<Boolean> callback = new AsyncCallback<Boolean>() {

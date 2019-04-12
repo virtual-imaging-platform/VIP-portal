@@ -67,11 +67,13 @@ public class ApikeyLayout extends AbstractFormLayout {
                 "Delete key",
                 CoreConstants.ICON_DELETE,
                 new DeleteApikeyClickHandler());
+        deleteApikey.setWidth(150);
         deleteApikey.disable();
         generateNewApikey = WidgetUtil.getIButton(
                 "Generate new key",
                 CoreConstants.ICON_EDIT,
                 new GenerateNewKeyClickHandler());
+        generateNewApikey.setWidth(150);
         generateNewApikey.disable();
         addButtons(deleteApikey, generateNewApikey);
         ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();

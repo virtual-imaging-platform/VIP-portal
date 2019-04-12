@@ -600,15 +600,17 @@ public class ConfigurationBusiness {
                     + "<head></head>"
                     + "<body>"
                     + "<p>Dear " + user.getFullName() + ",</p>"
-                    + "<p>You requested us link your VIP account to a new email address.</p>"
+                    + "<p>You requested to link your VIP account to this email address.</p>"
                     + "<p>Please use the following code to activate it in your VIP account page:</p>"
                     + "<p><b>" + code + "</b></p>"
+                    + "<p>Please note that your login email is still "
+                    + user.getEmail()  + " until you validate it.</p>"
                     + "<p>Best Regards,</p>"
                     + "<p>VIP Team</p>"
                     + "</body>"
                     + "</html>";
 
-            CoreUtil.sendEmail("Code to change your VIP email address", emailContent,
+            CoreUtil.sendEmail("Code to confirm your VIP email address", emailContent,
                     new String[]{newEmail}, true, newEmail);
 
         } catch (DAOException ex) {

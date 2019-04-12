@@ -98,7 +98,7 @@ public interface ConfigurationServiceAsync {
 
     void requestNewEmail(String newEmail, AsyncCallback<User> async);
 
-    void confirmNewEmail(AsyncCallback<User> async);
+    void confirmNewEmail(String code, AsyncCallback<User> async);
 
     void cancelNewEmail(AsyncCallback<User> async);
 

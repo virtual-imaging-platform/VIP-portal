@@ -538,13 +538,17 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
         }
     }
 
-    public User confirmNewEmail() throws CoreException {
+    public User confirmNewEmail(String code) throws CoreException {
 
         try {
             User currentUser = getSessionUser();
             String currentEmail = currentUser.getEmail();
             String newEmail = currentUser.getNextEmail();
             trace(logger, "Confirming email change from " + currentEmail + " to " + newEmail);
+            if (code == null || !code.equals(currentUser.getCode())) {
+                trace(logger, "Wrong validation code for " + currentEmail);
+                throw new CoreException("Wrong validation code");
+            }
             configurationBusiness.updateUserEmail(currentEmail, newEmail);
             configurationBusiness.resetNextEmail(newEmail);
 
