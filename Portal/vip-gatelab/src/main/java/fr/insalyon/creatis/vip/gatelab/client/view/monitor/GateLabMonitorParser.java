@@ -77,6 +77,6 @@ public class GateLabMonitorParser implements MonitorParserInterface {
                         simulationId, simulatioName, status, launchedDate.toString());
                 }
             },
-            simulationId + "-tab");
+            AbstractSimulationTab.tabIdFrom(simulationId));
     }
 }

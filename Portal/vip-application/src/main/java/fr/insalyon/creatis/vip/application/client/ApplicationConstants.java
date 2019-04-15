@@ -119,8 +119,8 @@ public class ApplicationConstants {
     public static final String SEPARATOR_LIST = "@@";
 
     public static String getLaunchTabID(String applicationName) {
-
-        return "launch_" + applicationName.replaceAll(" ", "_").toLowerCase()
-                + "_tab";
+        return "launch_"
+            + applicationName.replaceAll("[ -]", "_").toLowerCase()
+            + "_tab";
     }
 }

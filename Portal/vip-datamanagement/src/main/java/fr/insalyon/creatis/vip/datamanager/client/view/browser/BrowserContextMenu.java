@@ -375,7 +375,7 @@ public class BrowserContextMenu extends Menu {
         if (ImageViewTab.isFileSupported(fileName)) {
             MenuItem viewItem =
                 menuItemFor(ImageViewTab.fileTypeName(),
-                            ImageViewTab.tabId(fileName),
+                            ImageViewTab.tabIdFrom(fileName),
                             new Layout.TabFactory() {
                                 public Tab create() {
                                     return new ImageViewTab(fileName);

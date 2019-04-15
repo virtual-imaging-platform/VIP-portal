@@ -57,7 +57,7 @@ public abstract class AbstractSimulationTab extends Tab {
     public AbstractSimulationTab(String simulationID, String simulationName, SimulationStatus status) {
 
         this.setTitle(Canvas.imgHTML(ApplicationConstants.ICON_APPLICATION_MONITOR) + " " + simulationName);
-        this.setID(simulationID + "_tab");
+        this.setID(tabIdFrom(simulationID));
         this.setCanClose(true);
 
         this.completed = status == SimulationStatus.Running ? false : true;
@@ -122,5 +122,9 @@ public abstract class AbstractSimulationTab extends Tab {
         if (!completed) {
             timer.cancel();
         }
+    }
+
+    public static String tabIdFrom(String simulationId) {
+        return simulationId.replaceAll("[ -]", "_").toLowerCase() + "_tab";
     }
 }

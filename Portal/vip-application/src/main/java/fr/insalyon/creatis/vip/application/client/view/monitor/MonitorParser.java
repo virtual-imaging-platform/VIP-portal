@@ -84,6 +84,6 @@ public class MonitorParser {
                         simulationId, simulationName, status);
                 }
             },
-            simulationId + "-tab");
+            AbstractSimulationTab.tabIdFrom(simulationId));
     }
 }

@@ -80,7 +80,7 @@ public class ImageViewTab extends AbstractViewTab {
     public ImageViewTab(final String imageLFN) {
         super(imageLFN);
 
-        this.setID(tabId(imageLFN));
+        this.setID(tabIdFrom(imageLFN));
         imageCanvas = new Canvas();
         VLayout vLayout = new VLayout();
         form = new DynamicForm();
@@ -282,11 +282,11 @@ public class ImageViewTab extends AbstractViewTab {
         return "image";
     }
 
-    public static String tabId(String fileName) {
+    public static String tabIdFrom(String fileName) {
         return
-            "image-view-" +
-            fileName.replaceAll(" ", "-").toLowerCase() +
-            "-tab";
+            "image_view_"
+            + fileName.replaceAll("[ -]", "_").toLowerCase()
+            + "_tab";
     }
 
     private String getURLofSlice(Image image, int sliceNumber) {
