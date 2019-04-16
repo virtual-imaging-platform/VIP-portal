@@ -59,12 +59,11 @@ public class GateLabSimulationBoxLayout extends SimulationBoxLayout {
             public void onClick(ClickEvent event) {
                 Layout.getInstance().addTab(
                     AbstractSimulationTab.tabIdFrom(simulationID),
-                    new Layout.TabFactory() {
-                        public Tab create() {
-                            return new GateLabSimulationTab(
-                                simulationID, simulationName, simulationStatus, launchedDate.toString());
-                        }
-                    });
+                    () -> new GateLabSimulationTab(
+                        simulationID,
+                        simulationName,
+                        simulationStatus,
+                        launchedDate.toString()));
             }
         });
     }

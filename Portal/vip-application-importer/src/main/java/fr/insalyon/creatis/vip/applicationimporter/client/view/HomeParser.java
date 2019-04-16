@@ -55,10 +55,7 @@ public class HomeParser extends ApplicationParser {
 
         if (applicationName.equals(Constants.APP_APPLICATION_IMPORTER)) {
             Layout.getInstance().addTab(
-                Constants.TAB_ID_BOUTIQUES,
-                new Layout.TabFactory() {
-                    public Tab create() { return new ImportTab(); }
-                });
+                Constants.TAB_ID_BOUTIQUES, ImportTab::new);
             return true;
         }
         return false;

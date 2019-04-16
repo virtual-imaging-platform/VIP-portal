@@ -52,6 +52,7 @@ import fr.insalyon.creatis.vip.core.client.view.auth.SignInTab;
 import fr.insalyon.creatis.vip.core.client.view.common.MessageWindow;
 import fr.insalyon.creatis.vip.core.client.view.layout.toolstrip.MainToolStrip;
 import java.util.Date;
+import java.util.function.Supplier;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -130,20 +131,14 @@ public class Layout {
             if (user.isConfirmed()) {
                 Modules.getInstance().initializeModules(user);
             } else {
-                addTab(CoreConstants.TAB_ACTIVATION,
-                       new Layout.TabFactory() {
-                           public Tab create() { return new ActivationTab(); }
-                       });
+                addTab(CoreConstants.TAB_ACTIVATION, ActivationTab::new);
             }
         } else {
             if (!Cookies.isCookieEnabled()) {
                 setWarningMessage(
                     "Unable to sign in: cookies must be enabled.");
             }
-            addTab(CoreConstants.TAB_SIGNIN,
-                   new Layout.TabFactory() {
-                       public Tab create() { return new SignInTab(); }
-                   });
+            addTab(CoreConstants.TAB_SIGNIN, SignInTab::new);
         }
     }
 
@@ -176,10 +171,10 @@ public class Layout {
         ConfigurationService.Util.getInstance().signout(callback);
     }
 
-    public Tab addTab(String id, TabFactory factory) {
+    public Tab addTab(String id, Supplier<Tab> factory) {
         Tab tab = centerTabSet.getTab(id);
         if (tab == null) {
-            tab = factory.create();
+            tab = factory.get();
             centerTabSet.addTab(tab);
         }
         centerTabSet.selectTab(id);
@@ -256,15 +251,11 @@ public class Layout {
         messageWindow.setMessage(message, "#F79191", CoreConstants.ICON_WARNING, delay);
     }
 
-    public static interface TabFactory {
-        Tab create();
-    }
-
     public static class TabFactoryAndId {
-        public final TabFactory factory;
+        public final Supplier<Tab> factory;
         public final String id;
 
-        public TabFactoryAndId(TabFactory factory, String id) {
+        public TabFactoryAndId(Supplier<Tab> factory, String id) {
             this.factory = factory;
             this.id = id;
         }

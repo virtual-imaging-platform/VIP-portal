@@ -55,10 +55,7 @@ public class ApplicationHomeParser extends ApplicationParser {
 
         if (applicationName.equals(ApplicationConstants.APP_MONITOR)) {
             Layout.getInstance().addTab(
-                ApplicationConstants.TAB_MONITOR,
-                new Layout.TabFactory() {
-                    public Tab create() { return new SimulationsTab(); }
-                });
+                ApplicationConstants.TAB_MONITOR, SimulationsTab::new);
             return true;
         }
         return false;

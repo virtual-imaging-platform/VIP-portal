@@ -89,11 +89,7 @@ public class InOutContextMenu extends Menu {
             public void onClick(MenuItemClickEvent event) {
                 Layout.getInstance().addTab(
                     ImageViewTab.tabIdFrom(node.getName()),
-                    new Layout.TabFactory() {
-                        public Tab create() {
-                            return new ImageViewTab(node.getName());
-                        }
-                    });
+                    () -> new ImageViewTab(node.getName()));
             }
         });
 
@@ -105,11 +101,7 @@ public class InOutContextMenu extends Menu {
             public void onClick(MenuItemClickEvent event) {
                 Layout.getInstance().addTab(
                     BrainBrowserViewTab.ID,
-                    new Layout.TabFactory() {
-                        public Tab create() {
-                            return new BrainBrowserViewTab(node.getName());
-                        }
-                    });
+                    () -> new BrainBrowserViewTab(node.getName()));
             }
         });
 

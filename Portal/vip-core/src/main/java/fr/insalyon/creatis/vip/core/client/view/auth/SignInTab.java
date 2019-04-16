@@ -148,10 +148,7 @@ public class SignInTab extends Tab {
             @Override
             public void onClick(com.smartgwt.client.widgets.form.fields.events.ClickEvent event) {
                 Layout.getInstance().addTab(
-                    CoreConstants.TAB_SIGNUP,
-                    new Layout.TabFactory() {
-                        public Tab create() { return new SignUpTab(); }
-                    });
+                    CoreConstants.TAB_SIGNUP, SignUpTab::new);
             }
         });
 
@@ -160,10 +157,7 @@ public class SignInTab extends Tab {
             @Override
             public void onClick(com.smartgwt.client.widgets.form.fields.events.ClickEvent event) {
                 Layout.getInstance().addTab(
-                    CoreConstants.TAB_RECOVERY,
-                    new Layout.TabFactory() {
-                        public Tab create() { return new RecoveryTab(); }
-                    });
+                    CoreConstants.TAB_RECOVERY, RecoveryTab::new);
             }
         });
 

@@ -78,12 +78,7 @@ public class MonitorParser {
             }
         }
         return new Layout.TabFactoryAndId(
-            new Layout.TabFactory() {
-                public Tab create() {
-                    return new SimulationTab(
-                        simulationId, simulationName, status);
-                }
-            },
+            () -> new SimulationTab(simulationId, simulationName, status),
             AbstractSimulationTab.tabIdFrom(simulationId));
     }
 }

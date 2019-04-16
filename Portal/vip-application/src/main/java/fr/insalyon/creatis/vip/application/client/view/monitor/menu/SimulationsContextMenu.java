@@ -91,12 +91,7 @@ public class SimulationsContextMenu extends Menu {
             public void onClick(MenuItemClickEvent event) {
                 Layout.getInstance().addTab(
                     AbstractSimulationTab.tabIdFrom(simulationID),
-                    new Layout.TabFactory() {
-                        public Tab create() {
-                            return new SimulationTab(
-                                simulationID, title, status);
-                        }
-                    });
+                    () -> new SimulationTab(simulationID, title, status));
             }
         });
 
@@ -326,16 +321,12 @@ public class SimulationsContextMenu extends Menu {
                 Layout.getInstance().removeTab(tabId);
                 Layout.getInstance().addTab(
                     tabId,
-                    new Layout.TabFactory() {
-                        public Tab create() {
-                            return new LaunchTab(
-                                applicationName,
-                                applicationVersion,
-                                applicationClass,
-                                simulationName,
-                                result);
-                        }
-                    });
+                    () -> new LaunchTab(
+                        applicationName,
+                        applicationVersion,
+                        applicationClass,
+                        simulationName,
+                        result));
             }
         };
         WorkflowService.Util.getInstance().relaunchSimulation(simulationID, callback);

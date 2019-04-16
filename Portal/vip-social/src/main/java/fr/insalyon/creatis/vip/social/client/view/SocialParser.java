@@ -53,10 +53,7 @@ public class SocialParser extends ApplicationParser {
 
         if (applicationName.equals(SocialConstants.APP_SOCIAL)) {
             Layout.getInstance().addTab(
-                SocialConstants.TAB_SOCIAL,
-                new Layout.TabFactory() {
-                    public Tab create() { return new SocialTab(); }
-                });
+                SocialConstants.TAB_SOCIAL, SocialTab::new);
             return true;
         }
         return false;

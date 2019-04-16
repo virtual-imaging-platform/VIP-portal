@@ -132,12 +132,8 @@ public class SimulationBoxLayout extends HLayout {
             public void onClick(ClickEvent event) {
                 Layout.getInstance().addTab(
                     AbstractSimulationTab.tabIdFrom(simulationID),
-                    new Layout.TabFactory() {
-                        public Tab create() {
-                            return new SimulationTab(
-                                simulationID, simulationName, simulationStatus);
-                        }
-                    });
+                    () -> new SimulationTab(
+                        simulationID, simulationName, simulationStatus));
             }
         });
         this.addMember(mainLayout);
@@ -334,16 +330,12 @@ public class SimulationBoxLayout extends HLayout {
                 if (tab == null) {
                     Layout.getInstance().addTab(
                         tabId,
-                        new Layout.TabFactory() {
-                            public Tab create() {
-                                return new LaunchTab(
-                                    applicationName,
-                                    applicationVersion,
-                                    applicationClass,
-                                    simulationName,
-                                    result);
-                            }
-                        });
+                        () -> new LaunchTab(
+                            applicationName,
+                            applicationVersion,
+                            applicationClass,
+                            simulationName,
+                            result));
                 } else {
                     ((LaunchTab) tab).loadInput(simulationName, result);
                 }

@@ -85,12 +85,8 @@ public class GateLabTileGrid extends ApplicationsTileGrid {
         if (applicationNames.contains(appName)) {
             Layout.getInstance().addTab(
                 ApplicationConstants.getLaunchTabID(applicationName),
-                new Layout.TabFactory() {
-                    public Tab create() {
-                        return new GateLabLaunchTab(
-                            applicationName, applicationVersion, tileName);
-                    }
-                });
+                () -> new GateLabLaunchTab(
+                    applicationName, applicationVersion, tileName));
         }
     }
 }
