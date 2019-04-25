@@ -91,8 +91,8 @@ public class RequestNewEmailLayout extends AbstractFormLayout {
                                     WidgetUtil.resetIButton(saveButton, "Change email", CoreConstants.ICON_SAVED);
                                     Layout.getInstance().setNoticeMessage(
                                             "Your email change has been taken into account. "
-                                                    +" You will receive a mail with a code to validate it.<br />"
-                                                    + "Please refresh VIP to enter the code in your account");
+                                                    +" Please use the validation code sent to your new email address in order to validate it. <br />"
+                                                    + "Note that your login email will not change until you validate the new address");
                                 }
                             };
                             WidgetUtil.setLoadingIButton(saveButton, "Saving...");

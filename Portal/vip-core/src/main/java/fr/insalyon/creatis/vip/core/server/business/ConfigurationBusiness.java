@@ -603,6 +603,7 @@ public class ConfigurationBusiness {
                     + "<p>You requested to link your VIP account to this email address.</p>"
                     + "<p>Please use the following code to activate it in your VIP account page:</p>"
                     + "<p><b>" + code + "</b></p>"
+                    + "<p>You will have to refresh your VIP web page if you have not done it since you requested the change.</p>"
                     + "<p>Please note that your login email is still "
                     + user.getEmail()  + " until you validate it.</p>"
                     + "<p>Best Regards,</p>"
@@ -961,6 +962,9 @@ public class ConfigurationBusiness {
             // support foreign keys
             updatePublicationOwner(oldEmail, newEmail);
         } catch (DAOException e) {
+            String errorMessage = "Error changing email from " + newEmail + " to " + newEmail;
+            logger.error(errorMessage, e);
+            sendErrorEmailToAdmins(errorMessage, e, oldEmail);
             throw new BusinessException(e);
         }
     }
@@ -1407,6 +1411,35 @@ public class ConfigurationBusiness {
         } catch (DAOException e) {
             logger.error("Error generating apikey for " + email);
             throw new BusinessException(e);
+        }
+    }
+
+    private void sendErrorEmailToAdmins(String errorMessage, Exception exception, String userEmail) {
+        try {
+            StringBuilder emailContent = new StringBuilder("<html><head></head><body>");
+            emailContent.append("<p>Dear Administrator,</p>");
+
+            emailContent.append("<p>An error has been encountered in VIP with the following user:");
+            emailContent.append("<b>" + userEmail + "</b></p>");
+
+            emailContent.append("<p><b>" + errorMessage + "</b></p>");
+
+            if (exception != null) {
+                emailContent.append("The exception was:");
+                emailContent.append(exception);
+            }
+
+            emailContent.append("<p>Please check the logs for more information</p>");
+            emailContent.append("<p>&nbsp;</p>");
+            emailContent.append("<p>Best Regards,</p><p>VIP Team</p>");
+            emailContent.append("</body></html>");
+
+            for (String email : getAdministratorsEmails()) {
+                CoreUtil.sendEmail("[VIP Admin] VIP error", emailContent.toString(),
+                        new String[]{email}, true, userEmail);
+            }
+        } catch (BusinessException | DAOException e) {
+            logger.error("Cannot sent mail to admin", e);
         }
     }
 
