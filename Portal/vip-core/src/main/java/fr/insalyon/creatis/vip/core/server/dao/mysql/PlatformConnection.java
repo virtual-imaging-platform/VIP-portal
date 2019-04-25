@@ -99,6 +99,7 @@ public class PlatformConnection {
 
             if (createTable("VIPUsers",
                     "email VARCHAR(255), "
+                    + "next_email VARCHAR(255), "
                     + "pass VARCHAR(40), "
                     + "first_name VARCHAR(255), "
                     + "last_name VARCHAR(255), "
@@ -131,6 +132,7 @@ public class PlatformConnection {
                             new User(server.getAdminFirstName(),
                             server.getAdminLastName(),
                             server.getAdminEmail(),
+                            null,
                             server.getAdminInstitution(),
                             server.getAdminPassword(),
                             server.getAdminPhone(), true,
@@ -192,7 +194,7 @@ public class PlatformConnection {
                     + "VIPAuthor VARCHAR(255) NULL, "
                     + "PRIMARY KEY (id), "
                     + "FOREIGN KEY (VIPAuthor) REFERENCES VIPUsers(email) "
-                    + "ON DELETE CASCADE ON UPDATE NO ACTION");
+                    + "ON DELETE CASCADE ON UPDATE CASCADE");
             
             createTable("VIPTermsOfuse",
                     "idTermsOfuse INT(11) NOT NULL AUTO_INCREMENT, "

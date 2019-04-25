@@ -32,22 +32,17 @@
 package fr.insalyon.creatis.vip.core.server.business;
 
 import fr.insalyon.creatis.devtools.MD5;
-import fr.insalyon.creatis.grida.client.GRIDAClient;
-import fr.insalyon.creatis.grida.client.GRIDAClientException;
-import fr.insalyon.creatis.grida.client.GRIDAPoolClient;
-import fr.insalyon.creatis.vip.core.client.bean.Account;
-import fr.insalyon.creatis.vip.core.client.bean.Group;
-import fr.insalyon.creatis.vip.core.client.bean.Publication;
-import fr.insalyon.creatis.vip.core.client.bean.TermsOfUse;
-import fr.insalyon.creatis.vip.core.client.bean.User;
+import fr.insalyon.creatis.grida.client.*;
+import fr.insalyon.creatis.vip.core.client.bean.*;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants.GROUP_ROLE;
 import fr.insalyon.creatis.vip.core.client.view.user.UserLevel;
 import fr.insalyon.creatis.vip.core.client.view.util.CountryCode;
 import fr.insalyon.creatis.vip.core.server.business.proxy.ProxyClient;
-import fr.insalyon.creatis.vip.core.server.dao.CoreDAOFactory;
-import fr.insalyon.creatis.vip.core.server.dao.DAOException;
-import fr.insalyon.creatis.vip.core.server.dao.UserDAO;
+import fr.insalyon.creatis.vip.core.server.dao.*;
+import org.apache.log4j.Logger;
+import org.jasig.cas.client.validation.*;
+
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.net.URL;
@@ -55,16 +50,6 @@ import java.security.*;
 import java.sql.Timestamp;
 import java.text.Normalizer;
 import java.util.*;
-import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
-import org.jasig.cas.client.validation.Assertion;
-import org.jasig.cas.client.validation.Saml11TicketValidator;
-import org.jasig.cas.client.validation.TicketValidationException;
-
-import javax.crypto.*;
-import javax.xml.bind.DatatypeConverter;
-
-import static fr.insalyon.creatis.vip.core.client.view.util.CountryCode.re;
 
 /**
  *
@@ -136,18 +121,12 @@ public class ConfigurationBusiness {
 
     public void signup(User user, String comments, boolean automaticCreation, boolean mapPrivateGroups, String... accountType) throws BusinessException {
 
+        verifyEmail(user.getEmail());
+
         // Build log message
         StringBuilder message = new StringBuilder("Signing up ");
         message.append(user.getEmail());
-        message.append(". List of undesired mail domains: ");
-        for (String s : Server.getInstance().getUndesiredMailDomains()) {
-            if (!s.trim().isEmpty()) {
-                message.append(" ");
-                message.append(s);
-            }
-        }
-        message.append(". ");
-        message.append("List of undesired countries: ");
+        message.append(". List of undesired countries: ");
         for (String s : Server.getInstance().getUndesiredCountries()) {
             if (!s.trim().isEmpty()) {
                 message.append(" ");
@@ -156,25 +135,6 @@ public class ConfigurationBusiness {
         }
         message.append(".");
         logger.info(message.toString());
-
-        // Check if email domain is undesired
-        for (String udm : Server.getInstance().getUndesiredMailDomains()) {
-            if (udm.trim().isEmpty()) {
-                // An empty config file entry gets here as an empty or
-                // whitespace-only string, skip it
-                continue;
-            }
-            String[] useremail = user.getEmail().split("@");
-            if (useremail.length != 2) {
-                logger.info("User Mail address is incorrect : " + user.getEmail());
-                throw new BusinessException("Error");
-            }
-            // Only check against the domain part of the user's email address
-            if (useremail[1].endsWith(udm)) {
-                logger.info("Undesired Mail Domain for " + user.getEmail());
-                throw new BusinessException("Error");
-            }
-        }
         
         // Check if country is undesired
         for (String udc : Server.getInstance().getUndesiredCountries()) {
@@ -318,6 +278,40 @@ public class ConfigurationBusiness {
         } catch (UnsupportedEncodingException ex) {
             logger.error(ex);
             throw new BusinessException(ex);
+        }
+    }
+
+    private void verifyEmail(String email) throws BusinessException {
+        // Build log message
+        StringBuilder message = new StringBuilder("verifying ");
+        message.append(email);
+        message.append(". List of undesired mail domains: ");
+        for (String s : Server.getInstance().getUndesiredMailDomains()) {
+            if (!s.trim().isEmpty()) {
+                message.append(" ");
+                message.append(s);
+            }
+        }
+        message.append(". ");
+        logger.info(message.toString());
+
+        // Check if email domain is undesired
+        for (String udm : Server.getInstance().getUndesiredMailDomains()) {
+            if (udm.trim().isEmpty()) {
+                // An empty config file entry gets here as an empty or
+                // whitespace-only string, skip it
+                continue;
+            }
+            String[] useremail = email.split("@");
+            if (useremail.length != 2) {
+                logger.info("User Mail address is incorrect : " + email);
+                throw new BusinessException("Error");
+            }
+            // Only check against the domain part of the user's email address
+            if (useremail[1].endsWith(udm)) {
+                logger.info("Undesired Mail Domain for " + email);
+                throw new BusinessException("Error");
+            }
         }
     }
 
@@ -589,6 +583,36 @@ public class ConfigurationBusiness {
 
             CoreUtil.sendEmail("Code to reset your VIP password", emailContent,
                                new String[]{user.getEmail()}, true, user.getEmail());
+
+        } catch (DAOException ex) {
+            throw new BusinessException(ex);
+        }
+    }
+
+    public void requestNewEmail(User user, String newEmail) throws BusinessException {
+
+        try {
+            String code = UUID.randomUUID().toString();
+            CoreDAOFactory.getDAOFactory().getUserDAO().updateCode(user.getEmail(), code);
+            CoreDAOFactory.getDAOFactory().getUserDAO().updateNextEmail(user.getEmail(), newEmail);
+
+            String emailContent = "<html>"
+                    + "<head></head>"
+                    + "<body>"
+                    + "<p>Dear " + user.getFullName() + ",</p>"
+                    + "<p>You requested to link your VIP account to this email address.</p>"
+                    + "<p>Please use the following code to activate it in your VIP account page:</p>"
+                    + "<p><b>" + code + "</b></p>"
+                    + "<p>You will have to refresh your VIP web page if you have not done it since you requested the change.</p>"
+                    + "<p>Please note that your login email is still "
+                    + user.getEmail()  + " until you validate it.</p>"
+                    + "<p>Best Regards,</p>"
+                    + "<p>VIP Team</p>"
+                    + "</body>"
+                    + "</html>";
+
+            CoreUtil.sendEmail("Code to confirm your VIP email address", emailContent,
+                    new String[]{newEmail}, true, newEmail);
 
         } catch (DAOException ex) {
             throw new BusinessException(ex);
@@ -927,6 +951,40 @@ public class ConfigurationBusiness {
             throw new BusinessException(ex);
         } catch (DAOException ex) {
             throw new BusinessException(ex);
+        }
+    }
+
+    public void updateUserEmail(String oldEmail, String newEmail) throws BusinessException {
+        verifyEmail(newEmail);
+        try {
+            CoreDAOFactory.getDAOFactory().getUserDAO().updateEmail(oldEmail, newEmail);
+        } catch (DAOException e) {
+            String errorMessage = "Error changing email from " + newEmail + " to " + newEmail;
+            logger.error(errorMessage, e);
+            sendErrorEmailToAdmins(errorMessage, e, oldEmail);
+            throw new BusinessException("Error changing email address", e);
+        }
+
+        try {
+            // need to update publication separately as the table does not
+            // support foreign keys
+            updatePublicationOwner(oldEmail, newEmail);
+        } catch (BusinessException e) {
+            // ignore the error as the email has been successfully
+            // changed and the user user should not have an error
+            // but send a message to admins
+            String errorMessage = "Error changing email from " + newEmail + " to " + newEmail
+                    + "in the Publication table";
+            logger.error(errorMessage, e);
+            sendErrorEmailToAdmins(errorMessage, e, oldEmail);
+        }
+    }
+
+    public void resetNextEmail(String currentEmail) throws BusinessException {
+        try {
+            CoreDAOFactory.getDAOFactory().getUserDAO().updateNextEmail(currentEmail, null);
+        } catch (DAOException e) {
+            throw new BusinessException(e);
         }
     }
 
@@ -1270,6 +1328,16 @@ public class ConfigurationBusiness {
         }
     }
 
+    public void updatePublicationOwner(String oldOwnerEmail, String newOwnerEmail) throws BusinessException {
+
+        try {
+            CoreDAOFactory.getDAOFactory().getPublicationDAO().updateOwnerEmail(oldOwnerEmail, newOwnerEmail);
+        } catch (DAOException ex) {
+            logger.error(ex);
+            throw new BusinessException(ex);
+        }
+    }
+
     public Publication getPublication(Long id) throws BusinessException {
 
         try {
@@ -1354,6 +1422,35 @@ public class ConfigurationBusiness {
         } catch (DAOException e) {
             logger.error("Error generating apikey for " + email);
             throw new BusinessException(e);
+        }
+    }
+
+    private void sendErrorEmailToAdmins(String errorMessage, Exception exception, String userEmail) {
+        try {
+            StringBuilder emailContent = new StringBuilder("<html><head></head><body>");
+            emailContent.append("<p>Dear Administrator,</p>");
+
+            emailContent.append("<p>An error has been encountered in VIP with the following user:");
+            emailContent.append("<b>" + userEmail + "</b></p>");
+
+            emailContent.append("<p><b>" + errorMessage + "</b></p>");
+
+            if (exception != null) {
+                emailContent.append("The exception was:");
+                emailContent.append(exception);
+            }
+
+            emailContent.append("<p>Please check the logs for more information</p>");
+            emailContent.append("<p>&nbsp;</p>");
+            emailContent.append("<p>Best Regards,</p><p>VIP Team</p>");
+            emailContent.append("</body></html>");
+
+            for (String email : getAdministratorsEmails()) {
+                CoreUtil.sendEmail("[VIP Admin] VIP error", emailContent.toString(),
+                        new String[]{email}, true, userEmail);
+            }
+        } catch (BusinessException | DAOException e) {
+            logger.error("Cannot sent mail to admin", e);
         }
     }
 

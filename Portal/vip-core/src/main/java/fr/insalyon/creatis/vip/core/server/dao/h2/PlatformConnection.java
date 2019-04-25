@@ -138,6 +138,7 @@ public class PlatformConnection {
                             new User(server.getAdminFirstName(),
                             server.getAdminLastName(),
                             server.getAdminEmail(),
+                            null,
                             server.getAdminInstitution(),
                             server.getAdminPassword(),
                             server.getAdminPhone(), true,

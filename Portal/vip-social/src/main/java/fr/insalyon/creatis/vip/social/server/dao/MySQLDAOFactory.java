@@ -65,7 +65,7 @@ public class MySQLDAOFactory extends SocialDAOFactory {
                     + "message TEXT, "
                     + "posted TIMESTAMP, "
                     + "FOREIGN KEY (sender) REFERENCES VIPUsers(email) "
-                    + "ON DELETE CASCADE ON UPDATE RESTRICT");
+                    + "ON DELETE CASCADE ON UPDATE CASCADE");
 
             PlatformConnection.getInstance().createTable("VIPSocialMessageSenderReceiver",
                     "message_id BIGINT, "
@@ -73,7 +73,7 @@ public class MySQLDAOFactory extends SocialDAOFactory {
                     + "user_read BOOLEAN, "
                     + "PRIMARY KEY (message_id, receiver), "
                     + "FOREIGN KEY (receiver) REFERENCES VIPUsers(email) "
-                    + "ON DELETE CASCADE ON UPDATE RESTRICT, "
+                    + "ON DELETE CASCADE ON UPDATE CASCADE, "
                     + "FOREIGN KEY (message_id) REFERENCES VIPSocialMessage(id) "
                     + "ON DELETE CASCADE ON UPDATE RESTRICT");
             
@@ -85,7 +85,7 @@ public class MySQLDAOFactory extends SocialDAOFactory {
                     + "message TEXT, "
                     + "posted TIMESTAMP, "
                     + "FOREIGN KEY (sender) REFERENCES VIPUsers(email) "
-                    + "ON DELETE CASCADE ON UPDATE RESTRICT, "
+                    + "ON DELETE CASCADE ON UPDATE CASCADE, "
                     + "FOREIGN KEY(groupname) REFERENCES VIPGroups(groupname) "
                     + "ON DELETE CASCADE ON UPDATE RESTRICT");
 

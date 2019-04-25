@@ -55,122 +55,130 @@ import java.util.Map;
  */
 public interface ConfigurationService extends RemoteService {
 
-    public static final String SERVICE_URI = "/configurationservice";
+    String SERVICE_URI = "/configurationservice";
 
-    public static class Util {
+    class Util {
 
         public static ConfigurationServiceAsync getInstance() {
 
-            ConfigurationServiceAsync instance = (ConfigurationServiceAsync) GWT.create(ConfigurationService.class);
+            ConfigurationServiceAsync instance = GWT.create(ConfigurationService.class);
             ServiceDefTarget target = (ServiceDefTarget) instance;
             target.setServiceEntryPoint(GWT.getModuleBaseURL() + SERVICE_URI);
             return instance;
         }
     }
 
-    public User configure(String email, String session) throws CoreException;
+    User configure(String email, String session) throws CoreException;
 
-    public void signup(User user, String comments, String[] accountType) throws CoreException;
+    void signup(User user, String comments, String[] accountType) throws CoreException;
 
-    public User signin(String email, String password) throws CoreException;
+    User signin(String email, String password) throws CoreException;
 
-    public void signout() throws CoreException;
+    void signout() throws CoreException;
 
-    public User activate(String code) throws CoreException;
+    User activate(String code) throws CoreException;
 
-    public String sendActivationCode() throws CoreException;
+    String sendActivationCode() throws CoreException;
 
-    public void sendResetCode(String email) throws CoreException;
+    void sendResetCode(String email) throws CoreException;
 
-    public List<User> getUsers() throws CoreException;
+    List<User> getUsers() throws CoreException;
 
-    public void addGroup(Group group) throws CoreException;
+    void addGroup(Group group) throws CoreException;
 
-    public void updateGroup(String name, Group group) throws CoreException;
+    void updateGroup(String name, Group group) throws CoreException;
 
-    public void removeGroup(String groupName) throws CoreException;
+    void removeGroup(String groupName) throws CoreException;
 
-    public List<Group> getGroups() throws CoreException;
+    List<Group> getGroups() throws CoreException;
 
-    public List<Group> getPublicGroups() throws CoreException;
+    List<Group> getPublicGroups() throws CoreException;
 
-    public User removeUser(String email) throws CoreException;
+    User removeUser(String email) throws CoreException;
 
-    public Map<Group, CoreConstants.GROUP_ROLE> getUserGroups(String email) throws CoreException;
+    Map<Group, CoreConstants.GROUP_ROLE> getUserGroups(String email) throws CoreException;
 
-    public List<Boolean> getUserPropertiesGroups() throws CoreException;
+    List<Boolean> getUserPropertiesGroups() throws CoreException;
 
-    public List<String> getUserGroups() throws CoreException;
+    List<String> getUserGroups() throws CoreException;
 
-    public void updateUser(String email, UserLevel level, CountryCode countryCode, int maxRunningSimulations, Map<String, CoreConstants.GROUP_ROLE> groups, boolean locked) throws CoreException;
+    void updateUser(String email, UserLevel level, CountryCode countryCode, int maxRunningSimulations, Map<String, CoreConstants.GROUP_ROLE> groups, boolean locked) throws CoreException;
 
-    public User getUserData() throws CoreException;
+    User getUserData() throws CoreException;
 
-    public User updateUser(User user) throws CoreException;
+    User updateUser(User user) throws CoreException;
 
-    public void updateTermsOfUse() throws CoreException;
+    void updateTermsOfUse() throws CoreException;
 
-    public void updateUserPassword(String currentPassword, String newPassword) throws CoreException;
+    void updateUserPassword(String currentPassword, String newPassword) throws CoreException;
 
-    public void sendContactMail(String category, String subject, String comment) throws CoreException;
+    User requestNewEmail(String newEmail) throws CoreException;
 
-    public void activateUser(String email) throws CoreException;
+    User confirmNewEmail(String code) throws CoreException;
 
-    public void addUserToGroup(String groupName) throws CoreException;
+    User cancelNewEmail() throws CoreException;
 
-    public List<User> getUsersFromGroup(String groupName) throws CoreException;
+    void updateUserEmail(String currentEmail, String newEmail) throws CoreException;
 
-    public void removeUserFromGroup(String email, String groupName) throws CoreException;
+    void sendContactMail(String category, String subject, String comment) throws CoreException;
 
-    public void resetPassword(String email, String code, String password) throws CoreException;
+    void activateUser(String email) throws CoreException;
 
-    public void updateLastUpdatePublication() throws CoreException;
+    void addUserToGroup(String groupName) throws CoreException;
+
+    List<User> getUsersFromGroup(String groupName) throws CoreException;
+
+    void removeUserFromGroup(String email, String groupName) throws CoreException;
+
+    void resetPassword(String email, String code, String password) throws CoreException;
+
+    void updateLastUpdatePublication() throws CoreException;
 
     // Accounts
-    public List<Account> getAccounts() throws CoreException;
+    List<Account> getAccounts() throws CoreException;
 
-    public void addAccount(String name, List<String> groups) throws CoreException;
+    void addAccount(String name, List<String> groups) throws CoreException;
 
-    public void updateAccount(String oldName, String newName, List<String> groups) throws CoreException;
+    void updateAccount(String oldName, String newName, List<String> groups) throws CoreException;
 
-    public void removeAccount(String name) throws CoreException;
+    void removeAccount(String name) throws CoreException;
 
-    public String getCASLoginPageUrl() throws CoreException;
+    String getCASLoginPageUrl() throws CoreException;
 
-    public UsageStats getUsageStats() throws CoreException;
+    UsageStats getUsageStats() throws CoreException;
 
-    public String linkDropboxAccount() throws CoreException;
+    String linkDropboxAccount() throws CoreException;
 
-    public void activateDropboxAccount(String oauth_token) throws CoreException;
+    void activateDropboxAccount(String oauth_token) throws CoreException;
 
-    public DropboxAccountStatus.AccountStatus getDropboxAccountStatus() throws CoreException;
+    DropboxAccountStatus.AccountStatus getDropboxAccountStatus() throws CoreException;
 
-    public void unlinkDropboxAccount() throws CoreException;
+    void unlinkDropboxAccount() throws CoreException;
 
-    public boolean testLastUpdatePublication() throws CoreException;
+    boolean testLastUpdatePublication() throws CoreException;
 
     // public void getPostParameters() throws CoreException;
     //Publications
-    public List<Publication> getPublications() throws CoreException;
+    List<Publication> getPublications() throws CoreException;
 
-    public void removePublication(Long id) throws CoreException;
+    void removePublication(Long id) throws CoreException;
 
-    public void addPublication(Publication pub) throws CoreException;
+    void addPublication(Publication pub) throws CoreException;
 
-    public void updatePublication(Publication pub) throws CoreException;
+    void updatePublication(Publication pub) throws CoreException;
 
-    public List<Publication> parseBibtexText(String text) throws CoreException;
+    List<Publication> parseBibtexText(String text) throws CoreException;
 
     //TermsOfUse
-    public void addTermsUse(TermsOfUse termsofUse) throws CoreException;
+    void addTermsUse(TermsOfUse termsofUse) throws CoreException;
 
-    public Timestamp getLastUpdateTermsOfUse() throws CoreException;
+    Timestamp getLastUpdateTermsOfUse() throws CoreException;
 
-    public boolean compare() throws CoreException;
+    boolean compare() throws CoreException;
 
-    public int getMaxConfiguredPlatformSimulation() throws CoreException;
+    int getMaxConfiguredPlatformSimulation() throws CoreException;
 
-    public void changeMaxConfiguredPlatformSimulation(int maxPlatformRunningSimulations) throws CoreException;
+    void changeMaxConfiguredPlatformSimulation(int maxPlatformRunningSimulations) throws CoreException;
 
     // api key management
 

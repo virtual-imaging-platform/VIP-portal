@@ -110,6 +110,27 @@ public class PublicationData implements PublicationDAO {
     }
 
     @Override
+    public void updateOwnerEmail(String oldOwnerEmail, String newOwnerEmail) throws DAOException {
+        try {
+
+            PreparedStatement ps = connection.prepareStatement("UPDATE "
+                    + "VIPPublication "
+                    + "SET vipAuthor=? "
+                    + "WHERE vipAuthor=?");
+
+            ps.setString(1, newOwnerEmail);
+            ps.setString(2, oldOwnerEmail);
+            ps.executeUpdate();
+            ps.close();
+
+        } catch (SQLException ex) {
+            logger.error(ex);
+            throw new DAOException(ex);
+        }
+
+    }
+
+    @Override
     public void remove(Long id) throws DAOException {
         try {
             PreparedStatement ps = connection.prepareStatement("DELETE "

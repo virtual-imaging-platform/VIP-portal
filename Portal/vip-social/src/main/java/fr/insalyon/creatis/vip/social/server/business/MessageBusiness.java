@@ -47,8 +47,6 @@ import fr.insalyon.creatis.vip.social.server.dao.SocialDAOFactory;
 
 import java.util.*;
 
-import static fr.insalyon.creatis.vip.core.client.CoreModule.user;
-
 /**
  *
  * @author Rafael Ferreira da Silva
