@@ -555,7 +555,7 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
             currentUser = configurationBusiness.getUserData(newEmail);
             return setUserSession(currentUser);
         } catch (BusinessException ex) {
-            throw new CoreException(ex);
+            throw new CoreException("Error changing email address. Please contact VIP support.", ex);
         }
     }
 

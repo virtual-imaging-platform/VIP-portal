@@ -107,7 +107,7 @@ public class ConfirmNewEmailLayout extends AbstractFormLayout {
                             @Override
                             public void onFailure(Throwable caught) {
                                 WidgetUtil.resetIButton(validateButton, "Validate", CoreConstants.ICON_SAVED);
-                                Layout.getInstance().setWarningMessage("Unable to validate new email. Your code may be wrong :<br />" + caught.getMessage());
+                                Layout.getInstance().setWarningMessage("Unable to validate new email.<br />" + caught.getMessage());
                             }
 
                             @Override

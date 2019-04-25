@@ -962,7 +962,7 @@ public class ConfigurationBusiness {
             String errorMessage = "Error changing email from " + newEmail + " to " + newEmail;
             logger.error(errorMessage, e);
             sendErrorEmailToAdmins(errorMessage, e, oldEmail);
-            throw new BusinessException(e);
+            throw new BusinessException("Error changing email address", e);
         }
 
         try {
