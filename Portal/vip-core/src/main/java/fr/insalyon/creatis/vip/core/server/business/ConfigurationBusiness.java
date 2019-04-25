@@ -958,14 +958,25 @@ public class ConfigurationBusiness {
         verifyEmail(newEmail);
         try {
             CoreDAOFactory.getDAOFactory().getUserDAO().updateEmail(oldEmail, newEmail);
-            // need to update publication separately as the table does not
-            // support foreign keys
-            updatePublicationOwner(oldEmail, newEmail);
         } catch (DAOException e) {
             String errorMessage = "Error changing email from " + newEmail + " to " + newEmail;
             logger.error(errorMessage, e);
             sendErrorEmailToAdmins(errorMessage, e, oldEmail);
             throw new BusinessException(e);
+        }
+
+        try {
+            // need to update publication separately as the table does not
+            // support foreign keys
+            updatePublicationOwner(oldEmail, newEmail);
+        } catch (BusinessException e) {
+            // ignore the error as the email has been successfully
+            // changed and the user user should not have an error
+            // but send a message to admins
+            String errorMessage = "Error changing email from " + newEmail + " to " + newEmail
+                    + "in the Publication table";
+            logger.error(errorMessage, e);
+            sendErrorEmailToAdmins(errorMessage, e, oldEmail);
         }
     }
 
