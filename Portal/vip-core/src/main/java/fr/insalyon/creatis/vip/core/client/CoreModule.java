@@ -92,11 +92,7 @@ public class CoreModule extends Module {
         MainToolStrip.getInstance().addMenuButton(new UserMenuButton(user));
 
         // Home Tab
-        Layout.getInstance().addTab(
-            CoreConstants.TAB_HOME,
-            new Layout.TabFactory() {
-                public Tab create() { return homeTab; }
-            });
+        Layout.getInstance().addTab(CoreConstants.TAB_HOME, () -> homeTab);
 
         // open account tab to accept the terms of use if necessary
         // Also open the tab for users with no group :
@@ -105,10 +101,7 @@ public class CoreModule extends Module {
         if (!user.hasGroups() || !user.hasAcceptTermsOfUse()) {
             final AccountTab accountTab =
                 (AccountTab) Layout.getInstance().addTab(
-                    CoreConstants.TAB_ACCOUNT,
-                    new Layout.TabFactory() {
-                        public Tab create() { return new AccountTab(); }
-                    });
+                    CoreConstants.TAB_ACCOUNT, AccountTab::new);
             if (!user.hasAcceptTermsOfUse()) {
                 showDialog("Please accept our Terms of Use", accountTab);
             }
@@ -134,10 +127,7 @@ public class CoreModule extends Module {
                 if (result) {
                     final AccountTab accountTab =
                         (AccountTab) Layout.getInstance().addTab(
-                            CoreConstants.TAB_ACCOUNT,
-                            new Layout.TabFactory() {
-                                public Tab create() { return new AccountTab(); }
-                            });
+                            CoreConstants.TAB_ACCOUNT, AccountTab::new);
                     showDialog("Our Terms of Use have changed. Please accept them again.", accountTab);
 
                 }
@@ -177,10 +167,7 @@ public class CoreModule extends Module {
             @Override
             public void onClick(ClickEvent event) {
                 Layout.getInstance().addTab(
-                    CoreConstants.TAB_CONTACT,
-                    new Layout.TabFactory() {
-                        public Tab create() { return new ContactTab(); }
-                    });
+                    CoreConstants.TAB_CONTACT, ContactTab::new);
             }
         });
 
@@ -339,10 +326,7 @@ public class CoreModule extends Module {
             @Override
             public void onClick(ClickEvent event) {
                 Layout.getInstance().addTab(
-                    CoreConstants.TAB_PUBLICATION,
-                    new Layout.TabFactory() {
-                        public Tab create() { return new PublicationTab(); }
-                    });
+                    CoreConstants.TAB_PUBLICATION, PublicationTab::new);
                 dialog.destroy();
             }
         });

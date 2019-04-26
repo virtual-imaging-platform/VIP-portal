@@ -62,31 +62,19 @@ public class SystemParser extends ApplicationParser {
     public boolean parse(String applicationName, String applicationVersion) {
         if (applicationName.equals(CoreConstants.APP_USER)) {
             Layout.getInstance().addTab(
-                CoreConstants.TAB_MANAGE_USERS,
-                new Layout.TabFactory() {
-                    public Tab create() { return new ManageUsersTab(); }
-                });
+                CoreConstants.TAB_MANAGE_USERS, ManageUsersTab::new);
             return true;
         } else if (applicationName.equals(CoreConstants.APP_GROUP)) {
             Layout.getInstance().addTab(
-                CoreConstants.TAB_MANAGE_GROUPS,
-                new Layout.TabFactory() {
-                    public Tab create() { return new ManageGroupsTab(); }
-                });
+                CoreConstants.TAB_MANAGE_GROUPS, ManageGroupsTab::new);
             return true;
         } else if (applicationName.equals(CoreConstants.APP_ACCOUNT_MANAGER)) {
             Layout.getInstance().addTab(
-                CoreConstants.TAB_MANAGE_ACCOUNTS,
-                new Layout.TabFactory() {
-                    public Tab create() { return new ManageAccountsTab(); }
-                });
+                CoreConstants.TAB_MANAGE_ACCOUNTS, ManageAccountsTab::new);
             return true;
         } else if (applicationName.equals(CoreConstants.APP_SETTING)) {
             Layout.getInstance().addTab(
-                CoreConstants.TAB_MANAGE_SETTING,
-                new Layout.TabFactory() {
-                    public Tab create() { return new ManageSettingTab(); }
-                });
+                CoreConstants.TAB_MANAGE_SETTING, ManageSettingTab::new);
             return true;
         }
         return false;

@@ -63,19 +63,13 @@ public class GeneralTileGrid extends ApplicationsTileGrid {
 
         if (applicationName.equals(CoreConstants.APP_ACCOUNT)) {
             Layout.getInstance().addTab(
-                CoreConstants.TAB_ACCOUNT,
-                new Layout.TabFactory() {
-                    public Tab create() { return new AccountTab(); }
-                });
+                CoreConstants.TAB_ACCOUNT, AccountTab::new);
             return;
         }
 
         if (applicationName.equals(CoreConstants.APP_PUBLICATIONS)) {
             Layout.getInstance().addTab(
-                CoreConstants.TAB_PUBLICATION,
-                new Layout.TabFactory() {
-                    public Tab create() { return new PublicationTab(); }
-                });
+                CoreConstants.TAB_PUBLICATION, PublicationTab::new);
             return;
         }
 

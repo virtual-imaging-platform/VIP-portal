@@ -71,12 +71,8 @@ public class GateLabMonitorParser implements MonitorParserInterface {
         final Date launchedDate) {
 
         return new Layout.TabFactoryAndId(
-            new Layout.TabFactory() {
-                public Tab create() {
-                    return new GateLabSimulationTab(
-                        simulationId, simulatioName, status, launchedDate.toString());
-                }
-            },
-            simulationId + "-tab");
+            () -> new GateLabSimulationTab(
+                simulationId, simulatioName, status, launchedDate.toString()),
+            AbstractSimulationTab.tabIdFrom(simulationId));
     }
 }

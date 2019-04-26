@@ -64,23 +64,15 @@ public class ApplicationSystemParser extends ApplicationParser {
         if (applicationName.equals(ApplicationConstants.APP_APPLICATION)) {
             Layout.getInstance().addTab(
                 ApplicationConstants.TAB_MANAGE_APPLICATION,
-                new Layout.TabFactory() {
-                    public Tab create() { return new ManageApplicationsTab(); }
-                });
+                ManageApplicationsTab::new);
             return true;
         } else if (applicationName.equals(ApplicationConstants.APP_CLASSES)) {
             Layout.getInstance().addTab(
-                ApplicationConstants.TAB_MANAGE_CLASSES,
-                new Layout.TabFactory() {
-                    public Tab create() { return new ManageClassesTab(); }
-                });
+                ApplicationConstants.TAB_MANAGE_CLASSES, ManageClassesTab::new);
             return true;
         } else if (applicationName.equals(ApplicationConstants.APP_ENGINE)) {
             Layout.getInstance().addTab(
-                ApplicationConstants.TAB_MANAGE_ENGINE,
-                new Layout.TabFactory() {
-                    public Tab create() { return new ManageEnginesTab(); }
-                });
+                ApplicationConstants.TAB_MANAGE_ENGINE, ManageEnginesTab::new);
             return true;
         }
         return false;

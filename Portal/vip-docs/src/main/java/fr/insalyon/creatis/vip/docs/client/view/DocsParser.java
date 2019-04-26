@@ -53,18 +53,12 @@ public class DocsParser extends ApplicationParser {
 
         if (applicationName.equals(DocsConstants.APP_DOCUMENTATION)) {
             Layout.getInstance().addTab(
-                DocsConstants.TAB_DOCUMENTATION,
-                new Layout.TabFactory() {
-                    public Tab create() { return new DocumentationTab(); }
-                });
+                DocsConstants.TAB_DOCUMENTATION, DocumentationTab::new);
             return true;
 
         } else if (applicationName.equals(DocsConstants.APP_GALLERY)) {
             Layout.getInstance().addTab(
-                DocsConstants.TAB_GALLERY,
-                new Layout.TabFactory() {
-                    public Tab create() { return new GalleryTab(); }
-                });
+                DocsConstants.TAB_GALLERY, GalleryTab::new);
             return true;
         }
         return false;

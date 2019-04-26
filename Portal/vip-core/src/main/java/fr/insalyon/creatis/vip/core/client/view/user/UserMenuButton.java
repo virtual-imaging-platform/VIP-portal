@@ -77,10 +77,7 @@ public class UserMenuButton extends ToolStripMenuButton {
             @Override
             public void onClick(MenuItemClickEvent event) {
                 Layout.getInstance().addTab(
-                    CoreConstants.TAB_ACCOUNT,
-                    new Layout.TabFactory() {
-                        public Tab create() { return new AccountTab(); }
-                    });
+                    CoreConstants.TAB_ACCOUNT, AccountTab::new);
             }
         });
 

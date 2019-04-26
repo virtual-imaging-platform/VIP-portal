@@ -42,7 +42,7 @@ public class BrainBrowserViewTab extends AbstractViewTab {
 
     private final HTMLPane htmlPane;
 
-    public static final String ID = "brain-browser-tab";
+    public static final String ID = "brain_browser_tab";
 
     public BrainBrowserViewTab(String lfn) {
         super(lfn);

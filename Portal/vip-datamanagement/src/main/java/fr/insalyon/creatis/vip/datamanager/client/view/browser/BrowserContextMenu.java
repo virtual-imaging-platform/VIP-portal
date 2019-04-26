@@ -56,6 +56,7 @@ import fr.insalyon.creatis.vip.datamanager.client.view.visualization.ImageViewTa
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.function.Supplier;
 
 /**
  *
@@ -363,11 +364,7 @@ public class BrowserContextMenu extends Menu {
             MenuItem viewItem =
                 menuItemFor(BrainBrowserViewTab.fileTypeName(),
                             BrainBrowserViewTab.ID,
-                            new Layout.TabFactory() {
-                                public Tab create() {
-                                    return new BrainBrowserViewTab(fileName);
-                                }
-                            });
+                            () -> new BrainBrowserViewTab(fileName));
             menuItems.add(viewItem);
             sepView = true;
         }
@@ -375,12 +372,8 @@ public class BrowserContextMenu extends Menu {
         if (ImageViewTab.isFileSupported(fileName)) {
             MenuItem viewItem =
                 menuItemFor(ImageViewTab.fileTypeName(),
-                            ImageViewTab.tabId(fileName),
-                            new Layout.TabFactory() {
-                                public Tab create() {
-                                    return new ImageViewTab(fileName);
-                                }
-                            });
+                            ImageViewTab.tabIdFrom(fileName),
+                            () -> new ImageViewTab(fileName));
             menuItems.add(viewItem);
             sepView = true;
         }
@@ -391,7 +384,7 @@ public class BrowserContextMenu extends Menu {
     private static MenuItem menuItemFor(
         final String fileTypeName,
         final String tabId,
-        final Layout.TabFactory factory) {
+        final Supplier<Tab> factory) {
 
         MenuItem viewItem = new MenuItem("View " + fileTypeName);
         viewItem.setIcon(DataManagerConstants.ICON_VIEW);
