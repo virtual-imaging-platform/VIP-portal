@@ -88,6 +88,28 @@ knowledge of the CeCILL-B license and that you accept its terms.
         <dependency>
           <groupId>com.google.gwt</groupId>
           <artifactId>gwt-dev</artifactId>
+          <exclusions>
+            <exclusion>
+              <groupId>org.eclipse.jetty</groupId>
+              <artifactId>jetty-webapp</artifactId>
+            </exclusion>
+            <exclusion>
+              <groupId>org.eclipse.jetty</groupId>
+              <artifactId>jetty-servlets</artifactId>
+            </exclusion>
+            <exclusion>
+              <groupId>org.eclipse.jetty</groupId>
+              <artifactId>jetty-annotations</artifactId>
+            </exclusion>
+            <exclusion>
+              <groupId>org.eclipse.jetty</groupId>
+              <artifactId>apache-jsp</artifactId>
+            </exclusion>
+            <exclusion>
+              <groupId>org.eclipse.jetty.websocket</groupId>
+              <artifactId>websocket-client</artifactId>
+            </exclusion>
+          </exclusions>
         </dependency>
 
         <dependency>
