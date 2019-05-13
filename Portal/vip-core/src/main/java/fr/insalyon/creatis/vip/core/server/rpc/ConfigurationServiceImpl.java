@@ -495,7 +495,7 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
 
         try {
             trace(logger, "Updating user data '" + user.getEmail() + "'.");
-            user = configurationBusiness.updateUser(getSessionUser(), user);
+            user = configurationBusiness.updateUser(user);
             return setUserSession(user);
 
         } catch (BusinessException ex) {
