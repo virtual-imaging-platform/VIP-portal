@@ -897,31 +897,11 @@ public class ConfigurationBusiness {
      * @return
      * @throws BusinessException
      */
-    public User updateUser(User oldData, User user) throws BusinessException {
+    public User updateUser(User user) throws BusinessException {
 
         try {
-
-            user.setFolder(user.getFirstName().replaceAll(" ", "_").toLowerCase() + "_"
-                           + user.getLastName().replaceAll(" ", "_").toLowerCase());
-
             CoreDAOFactory.getDAOFactory().getUserDAO().update(user);
-
-            if (!oldData.getFolder().equals(user.getFolder())) {
-                GRIDAClient client = CoreUtil.getGRIDAClient();
-                client.rename(
-                        Server.getInstance().getDataManagerUsersHome() + "/" + oldData.getFolder(),
-                        Server.getInstance().getDataManagerUsersHome() + "/" + user.getFolder());
-
-                client.rename(
-                        Server.getInstance().getDataManagerUsersHome() + "/" + oldData.getFolder() + "_" + CoreConstants.FOLDER_TRASH,
-                        Server.getInstance().getDataManagerUsersHome() + "/" + user.getFolder() + "_" + CoreConstants.FOLDER_TRASH);
-            }
-
             return user;
-
-        } catch (GRIDAClientException ex) {
-            logger.error(ex);
-            throw new BusinessException(ex);
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }
