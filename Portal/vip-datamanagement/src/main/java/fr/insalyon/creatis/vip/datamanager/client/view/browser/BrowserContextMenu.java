@@ -39,7 +39,6 @@ import com.smartgwt.client.widgets.menu.MenuItem;
 import com.smartgwt.client.widgets.menu.MenuItemSeparator;
 import com.smartgwt.client.widgets.menu.events.ClickHandler;
 import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
-import com.smartgwt.client.widgets.tab.Tab;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
@@ -50,18 +49,14 @@ import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerService;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerServiceAsync;
 import fr.insalyon.creatis.vip.datamanager.client.view.ValidatorUtil;
 import fr.insalyon.creatis.vip.datamanager.client.view.operation.OperationLayout;
-import fr.insalyon.creatis.vip.datamanager.client.view.visualization.AbstractViewTab;
-import fr.insalyon.creatis.vip.datamanager.client.view.visualization.BrainBrowserViewTab;
-import fr.insalyon.creatis.vip.datamanager.client.view.visualization.ImageViewTab;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.function.Supplier;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.function.Consumer;
 
-/**
- *
- * @author Rafael Ferreira da Silva
- */
+/** @author Rafael Ferreira da Silva */
 public class BrowserContextMenu extends Menu {
 
     public BrowserContextMenu(final ModalWindow modal, final String baseDir,
@@ -354,49 +349,51 @@ public class BrowserContextMenu extends Menu {
     }
 
     public static void addVizualisers(
-        ArrayList<MenuItem> menuItems,
+        final ArrayList<MenuItem> menuItems,
         final String fileName) {
 
-        MenuItemSeparator separator = new MenuItemSeparator();
-        boolean sepView = false;
+        boolean hasVisualizers = visualizers.stream()
+            .filter(v -> v.isFileSupported(fileName))
+            .mapToInt(
+                // Creating the menu item as a side-effect.
+                v -> {
+                    MenuItem viewItem = menuItemFor(
+                        fileName, v.fileTypeName(), v.viewStarter());
+                    menuItems.add(viewItem);
+                    return 1;
+                })
+            // Using sum to be sure to consume the whole stream.
+            .sum() > 0;
 
-        if (BrainBrowserViewTab.isFileSupported(fileName)) {
-            MenuItem viewItem =
-                menuItemFor(BrainBrowserViewTab.fileTypeName(),
-                            BrainBrowserViewTab.ID,
-                            () -> new BrainBrowserViewTab(fileName));
-            menuItems.add(viewItem);
-            sepView = true;
-        }
-
-        if (ImageViewTab.isFileSupported(fileName)) {
-            MenuItem viewItem =
-                menuItemFor(ImageViewTab.fileTypeName(),
-                            ImageViewTab.tabIdFrom(fileName),
-                            () -> new ImageViewTab(fileName));
-            menuItems.add(viewItem);
-            sepView = true;
-        }
-        if(sepView)
-            menuItems.add(separator);
+        if (hasVisualizers)
+            menuItems.add(new MenuItemSeparator());
     }
 
     private static MenuItem menuItemFor(
+        final String fileName,
         final String fileTypeName,
-        final String tabId,
-        final Supplier<Tab> factory) {
+        final Consumer<String> viewStarter) {
 
         MenuItem viewItem = new MenuItem("View " + fileTypeName);
         viewItem.setIcon(DataManagerConstants.ICON_VIEW);
         viewItem.addClickHandler(new ClickHandler() {
             @Override
             public void onClick(MenuItemClickEvent event) {
-                AbstractViewTab tab =
-                    (AbstractViewTab) Layout.getInstance().addTab(
-                        tabId, factory);
-                tab.load();
+                viewStarter.accept(fileName);
             }
         });
         return viewItem;
+    }
+
+    public static interface Visualizer {
+        boolean isFileSupported(String filename);
+        String fileTypeName();
+        Consumer<String> viewStarter();
+    }
+
+    private static List<Visualizer> visualizers = new LinkedList<>();
+
+    public static void addVisualizer(Visualizer v) {
+        visualizers.add(v);
     }
 }

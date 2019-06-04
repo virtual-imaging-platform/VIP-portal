@@ -29,21 +29,20 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL-B license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.datamanager.client.view.visualization;
+package fr.insalyon.creatis.vip.visualization.client.view;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.smartgwt.client.widgets.form.fields.CheckboxItem;
-
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.util.SC;
+import com.smartgwt.client.widgets.Button;
 import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.ImgButton;
 import com.smartgwt.client.widgets.Label;
-import com.smartgwt.client.widgets.Button;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.DynamicForm;
+import com.smartgwt.client.widgets.form.fields.CheckboxItem;
 import com.smartgwt.client.widgets.form.fields.SpinnerItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
 import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
@@ -53,17 +52,16 @@ import fr.insalyon.creatis.vip.core.client.view.common.ToolstripLayout;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
 import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
-import fr.insalyon.creatis.vip.datamanager.client.bean.Image;
-import fr.insalyon.creatis.vip.datamanager.client.bean.VisualizationItem;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerService;
-import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerServiceAsync;
 import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerSection;
 import fr.insalyon.creatis.vip.datamanager.client.view.operation.OperationLayout;
+import fr.insalyon.creatis.vip.visualization.client.bean.Image;
+import fr.insalyon.creatis.vip.visualization.client.bean.VisualizationItem;
+import fr.insalyon.creatis.vip.visualization.client.rpc.VisualizationService;
+import fr.insalyon.creatis.vip.visualization.client.rpc.VisualizationServiceAsync;
+import java.util.Optional;
 
-/**
- *
- * @author glatard
- */
+/** @author glatard */
 public class ImageViewTab extends AbstractViewTab {
 
     private final Canvas imageCanvas;
@@ -88,7 +86,8 @@ public class ImageViewTab extends AbstractViewTab {
         Canvas canvas = new Canvas();
         canvas.addChild(imageCanvas);
         direction ="z";
-        LabelButton download = new LabelButton("Download Image", DataManagerConstants.ICON_DOWNLOAD);
+        LabelButton download = new LabelButton(
+            "Download Image", DataManagerConstants.ICON_DOWNLOAD);
         download.addClickHandler(new ClickHandler() {
 
             public void onClick(ClickEvent event) {
@@ -97,7 +96,7 @@ public class ImageViewTab extends AbstractViewTab {
         });
         ToolstripLayout toolstrip = new ToolstripLayout();
         toolstrip.addMember(download);
-     toolstrip.addMember(form);
+        toolstrip.addMember(form);
         toolstrip.addMember(formx);
 
         spinner = new SpinnerItem();
@@ -109,7 +108,7 @@ public class ImageViewTab extends AbstractViewTab {
                 updateImageDisplay();
             }
         });
-         checkX = new CheckboxItem();
+        checkX = new CheckboxItem();
         checkX.setName("X");
         checkX.setValue(false);
         checkX.addChangedHandler(new ChangedHandler(){
@@ -141,12 +140,10 @@ public class ImageViewTab extends AbstractViewTab {
                 updateDirectionDisplay("z");
             }});
 
-      //  form.setWidth100();
         form.setHeight(10);
         form.setItems(spinner);
         form.disable();
 
-        //formx.setWidth100();
         formx.setHeight(20);
         formx.setItems(checkX,checkY,checkZ);
         formx.disable();
@@ -154,7 +151,9 @@ public class ImageViewTab extends AbstractViewTab {
         canvas.setHeight100();
 
         vLayout.setWidth100();
-        Label warning = WidgetUtil.getLabel("<u>Warning:</u> this is an experimental viewer to be used only for preview. It creates png slices from 3D images using <a href='http://www.itksnap.org/pmwiki/pmwiki.php?n=Convert3D.Documentation'>ITKSnap's convert3D</a>.", 10);
+        Label warning = WidgetUtil.getLabel(
+            "<u>Warning:</u> this is an experimental viewer to be used only for preview. It creates png slices from 3D images using <a href='http://www.itksnap.org/pmwiki/pmwiki.php?n=Convert3D.Documentation'>ITKSnap's convert3D</a>.",
+            10);
         warning.setWidth100();
         vLayout.addMember(warning);
         vLayout.addMember(toolstrip);
@@ -180,28 +179,38 @@ public class ImageViewTab extends AbstractViewTab {
     private void updateDirectionDisplay(String dir)
     {
         direction = dir;
-        final  String localPath = visualizationItem.getLocalPath();
-        DataManagerServiceAsync dmsa = DataManagerService.Util.getInstance();
-            modal.show("Slicing image...", true);
-            dmsa.getImageSlicesURL(localPath, direction, new AsyncCallback<Image>() {
+        final String localPath = visualizationItem.getLocalPath();
+        getImageSlicesURL(localPath, dir, Optional.empty());
+    }
 
+    private void getImageSlicesURL(
+        final String localPath,
+        String dir,
+        final Optional<Runnable> additionnalCode) {
+
+        VisualizationServiceAsync vsa = VisualizationService.Util.getInstance();
+        modal.show("Slicing image...", true);
+        vsa.getImageSlicesURL(
+            localPath,
+            dir,
+            new AsyncCallback<Image>() {
                 @Override
                 public void onFailure(Throwable caught) {
                     modal.hide();
-                    Layout.getInstance().setWarningMessage("Unable to slice image " + localPath + ":<br />" + caught.getMessage());
+                    Layout.getInstance().setWarningMessage(
+                        "Unable to slice image " + localPath + ":<br />"
+                        + caught.getMessage());
                 }
 
                 @Override
                 public void onSuccess(Image result) {
                     modal.hide();
                     image = result;
+                    additionnalCode.ifPresent(r -> r.run());
                     spinner.setValue(image.getZdim()/2 );
                     showSliceURL(getURLofSlice(image, image.getZdim()/2 ));
                 }
             });
-
-
-
     }
 
     private void showSliceURL(String url) {
@@ -212,30 +221,12 @@ public class ImageViewTab extends AbstractViewTab {
 
     private void showSlice(final String localPath, final int sliceNumber) {
         if (image == null) {
-            DataManagerServiceAsync dmsa = DataManagerService.Util.getInstance();
-            modal.show("Slicing image...", true);
-            dmsa.getImageSlicesURL(localPath, direction , new AsyncCallback<Image>() {
-
-                @Override
-                public void onFailure(Throwable caught) {
-                    modal.hide();
-                    Layout.getInstance().setWarningMessage("Unable to slice image " + localPath + ":<br />" + caught.getMessage());
-                }
-
-                @Override
-                public void onSuccess(Image result) {
-                    modal.hide();
-                    image = result;
-                    formx.enable();
-                     spinner.setValue(image.getZdim()/2 );
-                    showSliceURL(getURLofSlice(image, image.getZdim()/2 ));
-                }
-            });
+            getImageSlicesURL(
+                localPath, direction, Optional.of(() -> formx.enable()));
         } else {
             showSliceURL(getURLofSlice(image, sliceNumber));
         }
         spinner.setValue(sliceNumber);
-
     }
 
     private ImgButton getImgButton(String imgSrc, String prompt) {
@@ -252,17 +243,22 @@ public class ImageViewTab extends AbstractViewTab {
 
     private void downloadFile(final String lfn) {
         AsyncCallback<String> callback = new AsyncCallback<String>() {
-
             @Override
             public void onFailure(Throwable caught) {
-                Layout.getInstance().setWarningMessage("Unable to download file " + lfn + ":<br />" + caught.getMessage());
+                Layout.getInstance().setWarningMessage(
+                    "Unable to download file " + lfn + ":<br />"
+                    + caught.getMessage());
             }
 
             @Override
             public void onSuccess(String result) {
-                Layout.getInstance().setNoticeMessage("File " + lfn.substring(lfn.lastIndexOf("/") + 1) + " added to transfer queue.");
+                Layout.getInstance().setNoticeMessage(
+                    "File " + lfn.substring(lfn.lastIndexOf("/") + 1)
+                    + " added to transfer queue.");
                 OperationLayout.getInstance().addOperation(result);
-                ((DataManagerSection) Layout.getInstance().getMainSection(DataManagerConstants.SECTION_FILE_TRANSFER)).expand();
+                ((DataManagerSection) Layout.getInstance()
+                 .getMainSection(DataManagerConstants.SECTION_FILE_TRANSFER))
+                .expand();
             }
         };
         DataManagerService.Util.getInstance().downloadFile(lfn, callback);
@@ -290,6 +286,7 @@ public class ImageViewTab extends AbstractViewTab {
     }
 
     private String getURLofSlice(Image image, int sliceNumber) {
-        return GWT.getModuleBaseURL() + "../" + image.getRelativeURL() + "/slice" + sliceNumber + ".png";
+        return GWT.getModuleBaseURL() + "../" + image.getRelativeURL()
+            + "/slice" + sliceNumber + ".png";
     }
 }

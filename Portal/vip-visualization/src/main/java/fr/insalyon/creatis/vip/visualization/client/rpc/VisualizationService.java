@@ -29,47 +29,33 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL-B license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.datamanager.client.view.visualization;
+package fr.insalyon.creatis.vip.visualization.client.rpc;
 
-import com.smartgwt.client.widgets.HTMLPane;
-import fr.insalyon.creatis.vip.datamanager.client.bean.VisualizationItem;
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.user.client.rpc.RemoteService;
+import com.google.gwt.user.client.rpc.ServiceDefTarget;
+import fr.insalyon.creatis.vip.visualization.client.bean.Image;
+import fr.insalyon.creatis.vip.visualization.client.bean.VisualizationItem;
+import fr.insalyon.creatis.vip.visualization.client.view.VisualizationException;
 
-/**
- *
- * @author glatard
- */
-public class BrainBrowserViewTab extends AbstractViewTab {
+public interface VisualizationService extends RemoteService {
 
-    private final HTMLPane htmlPane;
+    public static final String SERVICE_URI = "/visualizationservice";
 
-    public static final String ID = "brain_browser_tab";
-
-    public BrainBrowserViewTab(String lfn) {
-        super(lfn);
-        htmlPane = new HTMLPane();
-        htmlPane.setShowEdges(false);
-        htmlPane.setContents("<div id=\"brain-browser\"></div>");
-        htmlPane.setWidth100();
-        htmlPane.setHeight100();
-        this.setID(ID);
-        this.getPane().addChild(htmlPane);
+    public static class Util {
+        public static VisualizationServiceAsync getInstance() {
+            VisualizationServiceAsync instance =
+                (VisualizationServiceAsync)
+                GWT.create(VisualizationService.class);
+            ServiceDefTarget target = (ServiceDefTarget) instance;
+            target.setServiceEntryPoint(GWT.getModuleBaseURL() + SERVICE_URI);
+            return instance;
+        }
     }
 
-    public static boolean isFileSupported(String fileName) {
-        return fileName.endsWith(".obj") || fileName.endsWith(".asc");
-    }
+    public Image getImageSlicesURL(String localPath, String direction)
+        throws VisualizationException;
 
-    public static String fileTypeName(){
-        return "surface";
-    }
-
-    @Override
-    public void displayFile(VisualizationItem item) {
-        showBrainBrowser(item.getURL());
-    }
-
-    public native void showBrainBrowser(String fileName) /*-{
-           $wnd.$("#brain-browser").load("https://brainbrowser.cbrain.mcgill.ca/surface-viewer-widget?version=2.1.1&nothreejs=true&model="+fileName);
-    }-*/;
-
+    public VisualizationItem getVisualizationItemFromLFN(String lfn)
+        throws VisualizationException;
 }

@@ -117,7 +117,21 @@ knowledge of the CeCILL-B license and that you accept its terms.
              <version>${vip.api.version}</version>
         </dependency>
 
+        <dependency>
+          <groupId>fr.insalyon.creatis</groupId>
+          <artifactId>vip-visualization</artifactId>
+          <version>${vip.visualization.version}</version>
+        </dependency>
+        <dependency>
+          <groupId>fr.insalyon.creatis</groupId>
+          <artifactId>vip-visualization</artifactId>
+          <type>jar</type>
+          <version>${vip.visualization.version}</version>
+          <classifier>sources</classifier>
+          <scope>provided</scope>
+        </dependency>
         <!-- END VIP MODULES -->
+
         <dependency>
             <groupId>org.glassfish.metro</groupId>
             <artifactId>webservices-rt</artifactId>
@@ -146,6 +160,14 @@ knowledge of the CeCILL-B license and that you accept its terms.
               <configuration>
                 <moduleName>fr.insalyon.creatis.vip.portal.Main</moduleName>
                 <skipModule>true</skipModule>
+              </configuration>
+            </plugin>
+
+            <plugin>
+              <artifactId>maven-war-plugin</artifactId>
+              <version>3.2.3</version>
+              <configuration>
+                <packagingExcludes>WEB-INF/lib/*-sources.jar</packagingExcludes>
               </configuration>
             </plugin>
         </plugins>
