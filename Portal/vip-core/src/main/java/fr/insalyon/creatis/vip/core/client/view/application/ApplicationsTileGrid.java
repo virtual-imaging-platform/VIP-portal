@@ -42,11 +42,15 @@ import com.smartgwt.client.widgets.tile.events.RecordClickHandler;
 import com.smartgwt.client.widgets.viewer.DetailFormatter;
 import com.smartgwt.client.widgets.viewer.DetailViewerField;
 
+import java.util.logging.Logger;
+
 /**
  *
  * @author Rafael Ferreira da Silva
  */
 public abstract class ApplicationsTileGrid extends TileGrid {
+
+    private static Logger logger = Logger.getLogger(ApplicationsTileGrid.class.getName());
 
     protected String tileName;
 
@@ -74,10 +78,12 @@ public abstract class ApplicationsTileGrid extends TileGrid {
         imageField.setType("image");
 
         DetailViewerField commonNameField = new DetailViewerField("applicationName");
+        commonNameField.setCellStyle("normal");
+        commonNameField.setCanHilite(false);
 
 
         DetailViewerField applicationVersion = new DetailViewerField("applicationVersion");
-        commonNameField.setCanHilite(false);
+        applicationVersion.setCellStyle("normal");
 
         commonNameField.setDetailFormatter(new DetailFormatter() {
             public String format(Object value, Record record, DetailViewerField field) {
