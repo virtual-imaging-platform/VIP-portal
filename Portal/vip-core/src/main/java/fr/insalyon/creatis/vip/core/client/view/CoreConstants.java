@@ -193,15 +193,4 @@ public class CoreConstants implements IsSerializable {
 
         Admin, User, None
     };
-
-
-    public static String getTileGridId(String tileName) {
-        return "application_"
-                + replaceSpacesInIds(tileName)
-                + "_tilegrid";
-    }
-
-    public static String replaceSpacesInIds(String baseName) {
-        return baseName.replaceAll("[ -]", "_").toLowerCase();
-    }
 }
