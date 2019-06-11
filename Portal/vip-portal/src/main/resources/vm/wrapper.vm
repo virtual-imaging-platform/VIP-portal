@@ -112,13 +112,12 @@ JSONPARAMETERS
 
 TOOLNAME="$tool.getName()"
 JSONFILE="${TOOLNAME}.json"
-export PATH=$PATH:$HOME/.local/bin
 
 #check bosh and install it if needed
 bosh create foo.sh || pip install --trusted-host pypi.org --trusted-host pypi.python.org --trusted-host files.pythonhosted.org boutiques --prefix $PWD || error "pip install boutiques failed"
 #we need to export PYTHONPATH and PATH because of the prefix installation
 export PYTHONPATH=$PYTHONPATH:$PWD/lib/python2.7/site-packages
-export PATH=$PATH:$PWD/bin
+export PATH=$PWD/bin:$PATH
 bosh exec launch $JSONFILE input_param_file.json -v $PWD/../cache:$PWD/../cache
 
 if [ $? != 0 ]
