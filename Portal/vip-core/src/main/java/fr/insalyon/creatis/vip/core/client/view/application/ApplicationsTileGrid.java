@@ -32,15 +32,12 @@
 package fr.insalyon.creatis.vip.core.client.view.application;
 
 import com.smartgwt.client.data.Record;
-import com.smartgwt.client.types.*;
-
+import com.smartgwt.client.types.Overflow;
 import com.smartgwt.client.widgets.tile.TileGrid;
-import com.smartgwt.client.widgets.tile.events.RecordClickEvent;
-import com.smartgwt.client.widgets.tile.events.RecordClickHandler;
-import com.smartgwt.client.widgets.viewer.DetailFormatter;
-import com.smartgwt.client.widgets.viewer.DetailViewerField;
+import com.smartgwt.client.widgets.tile.events.*;
+import com.smartgwt.client.widgets.viewer.*;
+import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 
-import java.util.Iterator;
 import java.util.logging.Logger;
 
 /**
@@ -57,7 +54,7 @@ public abstract class ApplicationsTileGrid extends TileGrid {
 
         if (tileName.length() == 0)
             throw new IllegalArgumentException("ApplicationsTileGrid: tileName is empty");
-        this.setID("application_" + tileName + "_tilegrid");
+        this.setID(CoreConstants.getTileGridId(tileName));
         this.tileName = tileName;
         this.setTileWidth(120);
         this.setTileHeight(130);
@@ -83,8 +80,6 @@ public abstract class ApplicationsTileGrid extends TileGrid {
 
         DetailViewerField applicationVersion = new DetailViewerField("applicationVersion");
         applicationVersion.setCellStyle("normal");
-
-
 
         commonNameField.setDetailFormatter(new DetailFormatter() {
 
@@ -136,9 +131,10 @@ public abstract class ApplicationsTileGrid extends TileGrid {
         this.setFields(imageField, commonNameField, applicationVersion);
         this.setData(new ApplicationTileRecord[]{});
 
-        this.addRecordClickHandler(new RecordClickHandler() {
+        handlerRegistration = this.addRecordClickHandler(new RecordClickHandler() {
             @Override
             public void onRecordClick(RecordClickEvent event) {
+                logger.info("on click handler for : " + tileName);
                 ApplicationTileRecord record = (ApplicationTileRecord) event.getRecord();
 
                 parse(record.getApplicationName(), record.getApplicationVersion());
