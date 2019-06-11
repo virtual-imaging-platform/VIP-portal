@@ -32,13 +32,15 @@
 package fr.insalyon.creatis.vip.core.client.view.application;
 
 import com.smartgwt.client.data.Record;
+import com.smartgwt.client.types.BackgroundRepeat;
+import com.smartgwt.client.types.DateDisplayFormat;
 import com.smartgwt.client.types.Overflow;
-import com.smartgwt.client.widgets.tile.TileGrid;
-import com.smartgwt.client.widgets.tile.events.*;
-import com.smartgwt.client.widgets.viewer.*;
-import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 
-import java.util.logging.Logger;
+import com.smartgwt.client.widgets.tile.TileGrid;
+import com.smartgwt.client.widgets.tile.events.RecordClickEvent;
+import com.smartgwt.client.widgets.tile.events.RecordClickHandler;
+import com.smartgwt.client.widgets.viewer.DetailFormatter;
+import com.smartgwt.client.widgets.viewer.DetailViewerField;
 
 /**
  *
@@ -46,15 +48,13 @@ import java.util.logging.Logger;
  */
 public abstract class ApplicationsTileGrid extends TileGrid {
 
-    private static Logger logger = Logger.getLogger(ApplicationsTileGrid.class.getName());
-
     protected String tileName;
 
     public ApplicationsTileGrid(String tileName) {
 
         if (tileName.length() == 0)
             throw new IllegalArgumentException("ApplicationsTileGrid: tileName is empty");
-        this.setID(CoreConstants.getTileGridId(tileName));
+        this.setID("application_" + tileName + "_tilegrid");
         this.tileName = tileName;
         this.setTileWidth(120);
         this.setTileHeight(130);
@@ -74,56 +74,35 @@ public abstract class ApplicationsTileGrid extends TileGrid {
         imageField.setType("image");
 
         DetailViewerField commonNameField = new DetailViewerField("applicationName");
-        commonNameField.setCellStyle("normal");
-        commonNameField.setCanHilite(false);
 
 
         DetailViewerField applicationVersion = new DetailViewerField("applicationVersion");
-        applicationVersion.setCellStyle("normal");
+        commonNameField.setCanHilite(false);
 
         commonNameField.setDetailFormatter(new DetailFormatter() {
-
-            private int LINE_MAX_CHAR = 18;
-
             public String format(Object value, Record record, DetailViewerField field) {
 
                 String[] words = value.toString().split(" ");
-                StringBuilder finalName = new StringBuilder();
-                StringBuilder currentLine = new StringBuilder();
-                int lineNumber = 0;
-                int wordIndex = 0;
-                while (lineNumber < 3 && wordIndex < words.length) {
-                    String s = words[wordIndex];
-                    if (currentLine.length() + s.length() > (LINE_MAX_CHAR - 1)) {
-                        if (currentLine.length() > 0) {
-                            if (lineNumber > 0) {
-                                finalName.append("<br/>");
-                            }
-                            finalName.append(buildLine(currentLine));
-                            lineNumber++;
-                        }
-                        currentLine = new StringBuilder(s);
+                int length = words.length;
+                int max = 18;
+                String tile = new String();
+                for (String s : words) {
+                    int l = tile.length() + s.length() + 1;
+                    if (l > max) {
+                        tile += "<br>";
+                        max += 18;
+                        tile += s + " ";
                     } else {
-                        currentLine.append(" ");
-                        currentLine.append(s);
+                        tile += s + " ";
                     }
-                    wordIndex++;
                 }
-                if (lineNumber < 3) {
-                    if (lineNumber > 0) {
-                        finalName.append("<br/>");
-                    }
-                    finalName.append(buildLine(currentLine));
+                String[] wordss = tile.toString().split("<br>");
+                if (wordss.length > 3) {
+                    return wordss[0] + "<br>" + wordss[1] + "<br>" + wordss[2] + "<br>" + wordss[3];
+                } else {
+                    return tile;
                 }
-                return finalName.toString();
-            }
 
-            private String buildLine(StringBuilder stringBuilder) {
-                if (stringBuilder.length() > (LINE_MAX_CHAR)) {
-                    stringBuilder.setLength(LINE_MAX_CHAR - 1);
-                    stringBuilder.append('\u2026');
-                }
-                return stringBuilder.toString();
             }
         });
 
@@ -131,10 +110,9 @@ public abstract class ApplicationsTileGrid extends TileGrid {
         this.setFields(imageField, commonNameField, applicationVersion);
         this.setData(new ApplicationTileRecord[]{});
 
-        handlerRegistration = this.addRecordClickHandler(new RecordClickHandler() {
+        this.addRecordClickHandler(new RecordClickHandler() {
             @Override
             public void onRecordClick(RecordClickEvent event) {
-                logger.info("on click handler for : " + tileName);
                 ApplicationTileRecord record = (ApplicationTileRecord) event.getRecord();
 
                 parse(record.getApplicationName(), record.getApplicationVersion());
