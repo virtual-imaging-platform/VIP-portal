@@ -267,7 +267,7 @@ public class UsersGroupsData implements UsersGroupsDAO {
         
         try {
             PreparedStatement ps = connection.prepareStatement("SELECT "
-                    + "us.email AS uemail, first_name, last_name, institution, "
+                    + "us.email AS uemail, next_email, first_name, last_name, institution, "
                     + "phone, code, confirmed, folder, registration, last_login, "
                     + "level, country_code, max_simulations, termsUse, lastUpdatePublications, "
                     + "failed_authentications, account_locked "
@@ -283,7 +283,8 @@ public class UsersGroupsData implements UsersGroupsDAO {
             while (rs.next()) {
                 users.add(new User(
                         rs.getString("first_name"), rs.getString("last_name"),
-                        rs.getString("uemail"), rs.getString("institution"),
+                        rs.getString("uemail"), rs.getString("next_email"),
+                        rs.getString("institution"),
                         "", rs.getString("phone"), rs.getBoolean("confirmed"),
                         rs.getString("code"), rs.getString("folder"), "",
                         new Date(rs.getTimestamp("registration").getTime()),

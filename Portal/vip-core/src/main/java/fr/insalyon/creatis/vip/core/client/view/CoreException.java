@@ -42,6 +42,10 @@ public class CoreException extends Exception implements IsSerializable {
     public CoreException() {
     }
 
+    public CoreException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
     public CoreException(Throwable thrwbl) {
         super(thrwbl);
     }

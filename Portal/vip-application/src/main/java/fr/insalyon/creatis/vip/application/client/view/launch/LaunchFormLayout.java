@@ -4,16 +4,16 @@
  * This software is a web portal for pipeline execution on distributed systems.
  *
  * This software is governed by the CeCILL-B license under French law and
- * abiding by the rules of distribution of free software.  You can  use, 
+ * abiding by the rules of distribution of free software.  You can  use,
  * modify and/ or redistribute the software under the terms of the CeCILL-B
  * license as circulated by CEA, CNRS and INRIA at the following URL
- * "http://www.cecill.info". 
+ * "http://www.cecill.info".
  *
  * As a counterpart to the access to the source code and  rights to copy,
  * modify and redistribute granted by the license, users are provided only
  * with a limited warranty  and the software's author,  the holder of the
  * economic rights,  and the successive licensors  have only  limited
- * liability. 
+ * liability.
  *
  * In this respect, the user's attention is drawn to the risks associated
  * with loading,  using,  modifying and/or developing or reproducing the
@@ -22,9 +22,9 @@
  * therefore means  that it is reserved for developers  and  experienced
  * professionals having in-depth computer knowledge. Users are therefore
  * encouraged to load and test the software's suitability as regards their
- * requirements in conditions enabling the security of their systems and/or 
- * data to be ensured and,  more generally, to use and operate it in the 
- * same conditions as regards security. 
+ * requirements in conditions enabling the security of their systems and/or
+ * data to be ensured and,  more generally, to use and operate it in the
+ * same conditions as regards security.
  *
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL-B license and that you accept its terms.
@@ -53,8 +53,14 @@ import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
 import fr.insalyon.creatis.vip.core.client.view.util.ValidatorUtil;
 import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  *
@@ -62,10 +68,12 @@ import java.util.Map;
  */
 public class LaunchFormLayout extends AbstractFormLayout {
 
+    private static Logger logger = Logger.getLogger(LaunchFormLayout.class.getName());
+
     private TextItem simulationNameItem;
     private VLayout sourcesLayout;
     private VLayout executionNameLayout;
-    
+
     public LaunchFormLayout(String title, String icon, final String description, boolean executionNamePadding) {
         super("600", "*");
         addTitle(title, icon);
@@ -83,14 +91,14 @@ public class LaunchFormLayout extends AbstractFormLayout {
         simulationNameItem = FieldUtil.getTextItem(400, "[0-9A-Za-z-_ ]");
         simulationNameItem.setValidators(ValidatorUtil.getStringValidator());
         simulationNameItem.setEditPendingCSSText("padding-left: 30px");
-        
+
         if (executionNamePadding) { // To align horizontaly "Execution name" and the text field on the others comboBoxes (inputs comboBoxes) of the screen
                 executionNameLayout = new VLayout(0);
                 executionNameLayout.setLayoutLeftMargin(25);
                 executionNameLayout.setWidth(300);
                 executionNameLayout.addMember(WidgetUtil.getLabel("<b>Execution Name<font color=\"red\">*</font></b>", 15));
                 executionNameLayout.addMember(FieldUtil.getForm(simulationNameItem));
-                this.addMember(executionNameLayout);    
+                this.addMember(executionNameLayout);
         }
         else {
              addField("Execution Name<font color=\"red\">*</font>", simulationNameItem);
@@ -100,7 +108,7 @@ public class LaunchFormLayout extends AbstractFormLayout {
         sourcesLayout.setAutoHeight();
         this.addMember(sourcesLayout);
     }
-    
+
     // Constructor called by GateLab application
     public LaunchFormLayout(String title, String icon, final String description) {
         this(title, icon, description, false);
@@ -177,54 +185,55 @@ public class LaunchFormLayout extends AbstractFormLayout {
     }
 
     /**
-     *
      * @param simulationName
      * @param valuesMap
      */
-    public void loadInputs(String simulationName, Map<String, String> valuesMap) {
+    public void loadInputs(
+        String simulationName, Map<String, String> valuesMap) {
 
         this.simulationNameItem.setValue(simulationName);
 
-        final Map<String, String> conflictMap = new HashMap<String, String>();
-        StringBuilder sb = new StringBuilder();
+        List<AbstractSourceLayout> asls =
+            Arrays.stream(sourcesLayout.getMembers())
+                .filter(c -> c instanceof AbstractSourceLayout)
+                .map(c -> (AbstractSourceLayout) c)
+                .collect(Collectors.toList());
 
-        for (Canvas canvas : sourcesLayout.getMembers()) {
-            if (canvas instanceof AbstractSourceLayout) {
-                final AbstractSourceLayout source = (AbstractSourceLayout) canvas;
-                final String inputValue = valuesMap.get(source.getName());
+        String conflicts = asls.stream()
+            .filter(
+                asl -> {
+                    String curValue = asl.getValue();
+                    String newValue = valuesMap.get(asl.getName());
+                    return newValue != null
+                        && curValue != null
+                        && !curValue.isEmpty()
+                        && !curValue.equals(newValue)
+                        && !asl.isValueModifiable();
+                })
+            .map(AbstractSourceLayout::getName)
+            .collect(Collectors.joining(", "));
 
-                if (inputValue != null) {
-                    if (source.getValue() == null || source.getValue().isEmpty() || source.isValueModifiable()) {      
-                        if (source.isOptional()) {
-                            source.enableInput();
-                        } 
-                        source.setValue(inputValue);
-                    } else {
-                        conflictMap.put(source.getName(), inputValue);
-                    }
-                }
-            }
-        }
-        if (!conflictMap.isEmpty()) {
+        if (conflicts.length() > 0) {
             SC.ask("The following fields already have a value.<br />"
                    + "Do you want to replace them?<br />"
-                   + "Fields: " + conflictMap.keySet(), new BooleanCallback() {
-                        @Override
-                        public void execute(Boolean value) {
-                            if (value) {
-                                for (Canvas canvas : sourcesLayout.getMembers()) {
-                                    if (canvas instanceof AbstractSourceLayout) {
-                                        AbstractSourceLayout source = (AbstractSourceLayout) canvas;
-                                        source.setValue(conflictMap.get(source.getName()));
-                                    }
-                                }
-                            }
-                        }
-                    });
+                   + "Fields: " + conflicts,
+                   b -> { if (b) updateInputs(asls, valuesMap); });
+        } else {
+            updateInputs(asls, valuesMap);
         }
-        if (sb.length() > 0) {
-            Layout.getInstance().setWarningMessage(sb.toString());
-        }
+    }
+
+    private void updateInputs(
+        List<AbstractSourceLayout> asls, Map<String, String> valuesMap) {
+
+        asls.stream().forEach(
+            asl -> {
+                if (asl.isOptional()) {
+                    asl.enableInput();
+                }
+                String newValue = valuesMap.get(asl.getName());
+                asl.setValue(newValue);
+            });
     }
 
     /**
@@ -258,7 +267,7 @@ public class LaunchFormLayout extends AbstractFormLayout {
     public Map<String, String> getParametersMap() {
 
         Map<String, String> paramsMap = new HashMap<String, String>();
-        
+
         for (Canvas canvas : sourcesLayout.getMembers()) {
             if (canvas instanceof AbstractSourceLayout) {
                 AbstractSourceLayout source = (AbstractSourceLayout) canvas;
@@ -272,7 +281,7 @@ public class LaunchFormLayout extends AbstractFormLayout {
                         }
                     } else {
                        paramsMap.put(source.getName(), source.getValue());
-                    }          
+                    }
                  } else {
                      paramsMap.put(source.getName(), source.getValue());
                  }

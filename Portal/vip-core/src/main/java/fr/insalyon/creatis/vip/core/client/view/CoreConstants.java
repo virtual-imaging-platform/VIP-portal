@@ -40,7 +40,7 @@ import java.util.Date;
  */
 public class CoreConstants implements IsSerializable {
 
-    public static final String VERSION = "v1.24";
+    public static final String VERSION = "v1.25";
     // Configuration Labels
     public static final String VO_NAME = "vo.name";
     public static final String VO_ROOT = "vo.root";
@@ -86,20 +86,20 @@ public class CoreConstants implements IsSerializable {
     public static final String LAB_APACHE_HOST = "apache.host";
     public static final String LAB_APACHE_SSL_PORT = "apache.ssl.port";
     // Tabs
-    public static final String TAB_ACCOUNT = "account-tab";
-    public static final String TAB_PUBLICATION = "publications-tab";
-    public static final String TAB_ACTIVATION = "activation-tab";
-    public static final String TAB_CONTACT = "contact-tab";
-    public static final String TAB_HOME = "home-tab";
-    public static final String TAB_RECOVERY = "recovery-tab";
-    public static final String TAB_SIGNIN = "signin-tab";
-    public static final String TAB_SIGNUP = "signup-tab";
-    public static final String TAB_SYSTEM = "system-tab";
-    public static final String TAB_MANAGE_ACCOUNTS = "manage-accounts-tab";
-    public static final String TAB_MANAGE_GROUPS = "manage-groups-tab";
-    public static final String TAB_MANAGE_TIPS = "manage-tips-tab";
-    public static final String TAB_MANAGE_USERS = "manage-users-tab";
-    public static final String TAB_MANAGE_SETTING = "manage-setting-tab";
+    public static final String TAB_ACCOUNT = "account_tab";
+    public static final String TAB_PUBLICATION = "publications_tab";
+    public static final String TAB_ACTIVATION = "activation_tab";
+    public static final String TAB_CONTACT = "contact_tab";
+    public static final String TAB_HOME = "home_tab";
+    public static final String TAB_RECOVERY = "recovery_tab";
+    public static final String TAB_SIGNIN = "signin_tab";
+    public static final String TAB_SIGNUP = "signup_tab";
+    public static final String TAB_SYSTEM = "system_tab";
+    public static final String TAB_MANAGE_ACCOUNTS = "manage_accounts_tab";
+    public static final String TAB_MANAGE_GROUPS = "manage_groups_tab";
+    public static final String TAB_MANAGE_TIPS = "manage_tips_tab";
+    public static final String TAB_MANAGE_USERS = "manage_users_tab";
+    public static final String TAB_MANAGE_SETTING = "manage_setting_tab";
     // Icons
     private static final String IMG_FOLDER = "core/";
     public static final String ICON_SEARCH = "icon-search.png";
@@ -180,8 +180,6 @@ public class CoreConstants implements IsSerializable {
     public static final String UNDESIRED_COUNTRIES = "account.undesiredCountries";
     public static final String SAML_TRUSTED_CERTIFICATE = "saml.trustedcertificate";
     public static final String SAML_ACCOUNT_TYPE = "saml.accounttype";
-    //query
-    public static String TreeQuery = "query.classes";
     //Boutiques
     public static String APP_CLASS = "boutiques.application.class";
     public static String APPLICATION_FILES_REPOSITORY = "boutiques.upload.repository";
@@ -195,4 +193,15 @@ public class CoreConstants implements IsSerializable {
 
         Admin, User, None
     };
+
+
+    public static String getTileGridId(String tileName) {
+        return "application_"
+                + replaceSpacesInIds(tileName)
+                + "_tilegrid";
+    }
+
+    public static String replaceSpacesInIds(String baseName) {
+        return baseName.replaceAll("[ -]", "_").toLowerCase();
+    }
 }

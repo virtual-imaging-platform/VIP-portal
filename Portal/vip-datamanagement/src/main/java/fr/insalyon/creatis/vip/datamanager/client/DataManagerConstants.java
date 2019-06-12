@@ -38,10 +38,10 @@ package fr.insalyon.creatis.vip.datamanager.client;
 public class DataManagerConstants {
 
     // Tabs
-    public final static String TAB_MANAGE_OPERATIONS = "manage-operations-tab";
-    public final static String TAB_MANAGE_CACHED_FILES = "manage-cached-files-tab";
-    public final static String TAB_MANAGE_ZOMBIE_FILES = "manage-zombie-files-tab";
-    public final static String TAB_MANAGE_SSH = "manage-ssh-tab";
+    public final static String TAB_MANAGE_OPERATIONS = "manage_operations_tab";
+    public final static String TAB_MANAGE_CACHED_FILES = "manage_cached_files_tab";
+    public final static String TAB_MANAGE_ZOMBIE_FILES = "manage_zombie_files_tab";
+    public final static String TAB_MANAGE_SSH = "manage_ssh_tab";
     // Sections
     public final static String SECTION_FILE_TRANSFER = "file-transfer-section";
     // Layouts

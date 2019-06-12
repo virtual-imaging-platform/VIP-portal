@@ -62,16 +62,21 @@ public class AccountTab extends Tab {
         hLayout.setPadding(10);
 
         // Left column
-        VLayout leftLayout = new VLayout(14);
+        VLayout leftLayout = new VLayout(15);
         leftLayout.setWidth(350);
         leftLayout.setHeight100();
 
         leftLayout.addMember(new PersonalLayout());
+        if (CoreModule.user.getNextEmail() != null) {
+            leftLayout.addMember(new ConfirmNewEmailLayout());
+        } else {
+            leftLayout.addMember(new RequestNewEmailLayout());
+        }
         leftLayout.addMember(new PasswordLayout());
         leftLayout.addMember(new ApikeyLayout());
 
         // Right column
-        VLayout rightLayout = new VLayout(14);
+        VLayout rightLayout = new VLayout(15);
         rightLayout.setWidth("*");
         rightLayout.setHeight100();
 

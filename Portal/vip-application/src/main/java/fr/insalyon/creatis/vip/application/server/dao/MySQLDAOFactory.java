@@ -93,7 +93,10 @@ public class MySQLDAOFactory extends ApplicationDAOFactory {
             PlatformConnection.getInstance().createTable("VIPApplications",
                     "name VARCHAR(255), "
                     + "citation TEXT, "
-                    + "PRIMARY KEY (name)");
+                    + "owner VARCHAR(255), "
+                    + "PRIMARY KEY (name), "
+                    + "FOREIGN KEY (owner) REFERENCES VIPUsers(email) "
+                    + "ON DELETE SET NULL ON UPDATE CASCADE");
 
             PlatformConnection.getInstance().createTable("VIPAppVersions",
                     "application VARCHAR(255), "
@@ -122,7 +125,7 @@ public class MySQLDAOFactory extends ApplicationDAOFactory {
                     + "inputs VARCHAR(32000), "
                     + "PRIMARY KEY (email, application, name), "
                     + "FOREIGN KEY (email) REFERENCES VIPUsers(email) "
-                    + "ON DELETE CASCADE ON UPDATE RESTRICT");
+                    + "ON DELETE CASCADE ON UPDATE CASCADE");
 
             PlatformConnection.getInstance().createTable("VIPAppExamples",
                     "application VARCHAR(255), "
