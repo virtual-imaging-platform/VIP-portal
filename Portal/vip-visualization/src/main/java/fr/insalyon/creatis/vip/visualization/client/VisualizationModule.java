@@ -37,6 +37,7 @@ import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.datamanager.client.view.browser.BrowserContextMenu;
 import fr.insalyon.creatis.vip.datamanager.client.view.browser.BrowserContextMenu.Visualizer;
 import fr.insalyon.creatis.vip.visualization.client.view.AbstractViewTab;
+import fr.insalyon.creatis.vip.visualization.client.view.AmiImageViewTab;
 import fr.insalyon.creatis.vip.visualization.client.view.BrainBrowserViewTab;
 import fr.insalyon.creatis.vip.visualization.client.view.ImageViewTab;
 import java.util.function.Consumer;
@@ -45,7 +46,7 @@ public class VisualizationModule extends Module {
 
     @Override
     public void load() {
-        BrowserContextMenu.addVisualizer(imageVisualizer);
+        BrowserContextMenu.addVisualizer(amiImageVisualizer);
         BrowserContextMenu.addVisualizer(brainBrowserVisualizer);
     }
 
@@ -103,6 +104,33 @@ public class VisualizationModule extends Module {
                             (AbstractViewTab) Layout.getInstance().addTab(
                                 BrainBrowserViewTab.ID,
                                 () -> new BrainBrowserViewTab(filename));
+                        tab.load();
+                    }
+                };
+            }
+        };
+
+    private Visualizer amiImageVisualizer =
+        new Visualizer() {
+            @Override
+            public boolean isFileSupported(String filename) {
+                return AmiImageViewTab.isFileSupported(filename);
+            }
+
+            @Override
+            public String fileTypeName() {
+                return AmiImageViewTab.fileTypeName();
+            }
+
+            @Override
+            public Consumer<String> viewStarter() {
+                return new Consumer<String>() {
+                    @Override
+                    public void accept(String filename) {
+                        AbstractViewTab tab =
+                            (AbstractViewTab) Layout.getInstance().addTab(
+                                AmiImageViewTab.tabIdFrom(filename),
+                                () -> new AmiImageViewTab(filename));
                         tab.load();
                     }
                 };

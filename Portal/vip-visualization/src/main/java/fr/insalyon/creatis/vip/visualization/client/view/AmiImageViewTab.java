@@ -31,55 +31,53 @@
  */
 package fr.insalyon.creatis.vip.visualization.client.view;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.smartgwt.client.widgets.Canvas;
-import com.smartgwt.client.widgets.tab.Tab;
-import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
-import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
+import com.smartgwt.client.widgets.HTMLPane;
 import fr.insalyon.creatis.vip.visualization.client.bean.VisualizationItem;
-import fr.insalyon.creatis.vip.visualization.client.rpc.VisualizationService;
-import fr.insalyon.creatis.vip.visualization.client.rpc.VisualizationServiceAsync;
 
-/** @author Tristan Glatard */
-public abstract class AbstractViewTab extends Tab {
+public class AmiImageViewTab extends AbstractViewTab {
 
-    protected final ModalWindow modal;
-    protected final String filename;
-    private final String lfn;
+    private final HTMLPane htmlPane;
+    private final String divId;
 
-    public AbstractViewTab(String lfn) {
-        this.filename = lfn.substring(lfn.lastIndexOf('/') + 1);
-        this.setTitle(filename);
-        this.setCanClose(true);
-        this.setPane(new Canvas());
-        modal = new ModalWindow(this.getPane());
-        this.lfn = lfn;
+    public AmiImageViewTab(String lfn) {
+        super(lfn);
+        htmlPane = new HTMLPane();
+        htmlPane.setShowEdges(false);
+        this.divId = "id_" + sanitize(filename);
+        htmlPane.setContents(
+            "<div id=\"" + divId + "\" class=\"ami-container\"></div>" +
+            "<div id=\"gui_" + divId + "\" class=\"ami-gui-container\"></div>");
+        htmlPane.setWidth100();
+        htmlPane.setHeight100();
+        this.setID(tabIdFrom(filename));
+        this.getPane().addChild(htmlPane);
     }
 
-    public void load() {
-        loadLFN(lfn);
+    public static boolean isFileSupported(String filename) {
+        return filename.endsWith(".nii") || filename.endsWith(".nii.gz");
     }
 
-    private void loadLFN(String lfn) {
-        VisualizationServiceAsync vsa = VisualizationService.Util.getInstance();
-        modal.show("Loading data file...", true);
-        vsa.getVisualizationItemFromLFN(
-            lfn,
-            new AsyncCallback<VisualizationItem>() {
-                @Override
-                public void onFailure(Throwable caught) {
-                    modal.hide();
-                    Layout.getInstance().setWarningMessage(
-                        "Cannot load file: " + caught.getMessage());
-                }
-
-                @Override
-                public void onSuccess(VisualizationItem result) {
-                    modal.hide();
-                    displayFile(result);
-                }
-            });
+    public static String fileTypeName(){
+        return "image";
     }
 
-    public abstract void displayFile(VisualizationItem url);
+    public static String tabIdFrom(String filename) {
+        int i = filename.lastIndexOf('/');
+        String name = filename.substring(i + 1);
+        return "ami_view_" + sanitize(name) + "_tab";
+    }
+
+    @Override
+    public void displayFile(VisualizationItem item) {
+        String name = item.getURL();
+        showAmiImage(name, divId);
+    }
+
+    public native void showAmiImage(String filename, String divId) /*-{
+        $wnd.amiViewer(filename, divId);
+    }-*/;
+
+    private static String sanitize(String filename) {
+        return filename.replaceAll("[ -./]", "_").toLowerCase();
+    }
 }
