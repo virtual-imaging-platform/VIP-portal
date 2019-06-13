@@ -35,7 +35,7 @@ function amiViewer(url, divId) {
   controls.noRotate = true;
   camera.controls = controls;
 
-  const onWindowResize = () => {
+  const onWindowResize = function() {
     camera.canvas = {
       width: container.offsetWidth,
       height: container.offsetHeight,
@@ -49,7 +49,7 @@ function amiViewer(url, divId) {
   const loader = new window.AMI.VolumeLoader(container);
   loader
     .load(url)
-    .then(() => {
+    .then(function() {
       const series = loader.data[0].mergeSeries(loader.data);
       const stack = series[0].stack[0];
       loader.free();
@@ -88,12 +88,12 @@ function amiViewer(url, divId) {
       camera.update();
       camera.fitBox(2);
     })
-    .catch(error => {
+    .catch(function(error) {
       window.console.log('oops... something went wrong...');
       window.console.log(error);
     });
 
-  const animate = () => {
+  const animate = function() {
     controls.update();
     renderer.render(scene, camera);
 
@@ -104,7 +104,7 @@ function amiViewer(url, divId) {
 
   animate();
 
-  const gui = stackHelper => {
+  const gui = function(stackHelper) {
     const gui = new window.dat.GUI({
       autoPlace: false,
     });
@@ -123,17 +123,17 @@ function amiViewer(url, divId) {
     // camera
     const cameraFolder = gui.addFolder('Camera');
     const invertRows = cameraFolder.add(camUtils, 'invertRows');
-    invertRows.onChange(() => {
+    invertRows.onChange(function() {
       camera.invertRows();
     });
 
     const invertColumns = cameraFolder.add(camUtils, 'invertColumns');
-    invertColumns.onChange(() => {
+    invertColumns.onChange(function() {
       camera.invertColumns();
     });
 
     const rotate45 = cameraFolder.add(camUtils, 'rotate45');
-    rotate45.onChange(() => {
+    rotate45.onChange(function() {
       camera.rotate();
     });
 
@@ -148,7 +148,7 @@ function amiViewer(url, divId) {
       'coronal',
       'sagittal',
     ]);
-    orientationUpdate.onChange(value => {
+    orientationUpdate.onChange(function(value) {
       camera.orientation = value;
       camera.update();
       camera.fitBox(2);
@@ -156,7 +156,7 @@ function amiViewer(url, divId) {
     });
 
     const conventionUpdate = cameraFolder.add(camUtils, 'convention', ['radio', 'neuro']);
-    conventionUpdate.onChange(value => {
+    conventionUpdate.onChange(function(value) {
       camera.convention = value;
       camera.update();
       camera.fitBox(2);
