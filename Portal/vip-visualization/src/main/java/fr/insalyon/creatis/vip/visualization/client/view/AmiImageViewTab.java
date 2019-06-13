@@ -31,13 +31,20 @@
  */
 package fr.insalyon.creatis.vip.visualization.client.view;
 
+import com.google.gwt.core.client.JavaScriptObject;
 import com.smartgwt.client.widgets.HTMLPane;
 import fr.insalyon.creatis.vip.visualization.client.bean.VisualizationItem;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class AmiImageViewTab extends AbstractViewTab {
 
+    private static Logger logger =
+        Logger.getLogger(AmiImageViewTab.class.getName());
+
     private final HTMLPane htmlPane;
     private final String divId;
+    private JavaScriptObject amiJsViewer;
 
     public AmiImageViewTab(String lfn) {
         super(lfn);
@@ -49,6 +56,13 @@ public class AmiImageViewTab extends AbstractViewTab {
             "<div id=\"gui_" + divId + "\" class=\"ami-gui-container\"></div>");
         htmlPane.setWidth100();
         htmlPane.setHeight100();
+        htmlPane.addResizedHandler((event) -> {
+                // The check for null is needed because some resize events are
+                // received before the image has been loaded.
+                if (amiJsViewer != null) {
+                    resizeCanvas(amiJsViewer);
+                }
+            });
         this.setID(tabIdFrom(filename));
         this.getPane().addChild(htmlPane);
     }
@@ -70,11 +84,16 @@ public class AmiImageViewTab extends AbstractViewTab {
     @Override
     public void displayFile(VisualizationItem item) {
         String name = item.getURL();
-        showAmiImage(name, divId);
+        amiJsViewer = showAmiImage(name, divId);
     }
 
-    public native void showAmiImage(String filename, String divId) /*-{
-        $wnd.amiViewer(filename, divId);
+    public native JavaScriptObject
+        showAmiImage(String filename, String divId) /*-{
+        return $wnd.amiViewer(filename, divId);
+    }-*/;
+
+    public native void resizeCanvas(JavaScriptObject amiViewer) /*-{
+        $wnd.amiViewerResizeCanvas(amiViewer);
     }-*/;
 
     private static String sanitize(String filename) {

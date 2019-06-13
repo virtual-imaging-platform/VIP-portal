@@ -175,4 +175,25 @@ function amiViewer(url, divId) {
       .listen();
     stackFolder.open();
   };
+
+  let timeoutId = null
+  function amiViewerResizeCanvas() {
+    if (timeoutId != null)
+      clearTimeout(timeoutId)
+
+    // To coalesce multiple resize events happenning in less than
+    // 200ms.
+    timeoutId = setTimeout(function() {
+      timeoutId = null
+      onWindowResize()
+    }, 200)
+  }
+
+  return {
+    amiViewerResizeCanvas
+  }
+}
+
+function amiViewerResizeCanvas(amiViewer) {
+  amiViewer.amiViewerResizeCanvas()
 }
