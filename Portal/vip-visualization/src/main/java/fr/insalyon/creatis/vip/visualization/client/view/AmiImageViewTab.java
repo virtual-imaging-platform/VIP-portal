@@ -68,7 +68,12 @@ public class AmiImageViewTab extends AbstractViewTab {
     }
 
     public static boolean isFileSupported(String filename) {
-        return filename.endsWith(".nii") || filename.endsWith(".nii.gz");
+        String[] allowedExtensions =
+            {"nii", "nii_", "dcm", "dic", "dicom", "ima", "mhd", "nrrd", "mgh"};
+        String n = filename.toLowerCase();
+        return n.endsWith(".mgz")
+            || java.util.Arrays.stream(allowedExtensions).anyMatch(
+                s -> n.endsWith("." + s) || n.endsWith("." + s + ".gz"));
     }
 
     public static String fileTypeName(){
