@@ -89,8 +89,8 @@ function amiViewer(url, divId) {
       camera.fitBox(2);
     })
     .catch(function(error) {
-      window.console.log('oops... something went wrong...');
-      window.console.log(error);
+      window.console.log('Error loading ' + url, error);
+      window.setWarningMessage('Error loading ' + url + '<br />' + error);
     });
 
   const animate = function() {

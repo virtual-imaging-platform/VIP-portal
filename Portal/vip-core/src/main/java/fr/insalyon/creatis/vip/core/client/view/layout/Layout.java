@@ -251,6 +251,25 @@ public class Layout {
         messageWindow.setMessage(message, "#F79191", CoreConstants.ICON_WARNING, delay);
     }
 
+    //--------------------------------------------------------------------
+    // Make function setWarningMessage accessible from code written in
+    // javascript with: window.setWarningMessage(msg)
+    public static void setWarningMessageFromJS(String error) {
+        Layout.getInstance().setWarningMessage(error);
+    }
+
+    public static native void exportSetWarningMessage() /*-{
+        $wnd.setWarningMessage = $entry(
+           @fr.insalyon.creatis.vip.core.client.view.layout.Layout::setWarningMessageFromJS(Ljava/lang/String;));
+    }-*/;
+//           @fr.insalyon.creatis.vip.visualization.client.view.AmiImageViewTab::setWarningMessage(Ljava/lang/String;));
+
+    static {
+        Layout.exportSetWarningMessage();
+    }
+
+    //--------------------------------------------------------------------
+
     public static class TabFactoryAndId {
         public final Supplier<Tab> factory;
         public final String id;
