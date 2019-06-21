@@ -47,8 +47,19 @@ function amiViewer(url, divId) {
   window.addEventListener('resize', onWindowResize, false);
 
   const loader = new window.AMI.VolumeLoader(container);
+
+  // Adapt to double files for mhd/raw format.  Many images can be
+  // loaded at once.  So the loader accepts either a single url, or a
+  // table of urls.  In the case of mhd/raw, the one url must be
+  // replaced by a table with the 2 urls.  But to not make ami think
+  // that these are 2 urls for 2 different images, this table must be
+  // included in the main table listing all images.  Hence the 2
+  // imbricated tables in the following line.
+  const urlsToLoad =
+        url.endsWith('.mhd') ? [ [ url, url.replace(/\.mhd$/, '.raw') ] ] : url
+
   loader
-    .load(url)
+    .load(urlsToLoad)
     .then(function() {
       const series = loader.data[0].mergeSeries(loader.data);
       const stack = series[0].stack[0];
@@ -73,7 +84,8 @@ function amiViewer(url, divId) {
 
       const box = {
         center: stack.worldCenter().clone(),
-        halfDimensions: new window.THREE.Vector3(lpsDims.x + 10, lpsDims.y + 10, lpsDims.z + 10),
+        halfDimensions: new window.THREE.Vector3(
+          lpsDims.x + 10, lpsDims.y + 10, lpsDims.z + 10),
       };
 
       // init and zoom
@@ -155,7 +167,8 @@ function amiViewer(url, divId) {
       stackHelper.orientation = camera.stackOrientation;
     });
 
-    const conventionUpdate = cameraFolder.add(camUtils, 'convention', ['radio', 'neuro']);
+    const conventionUpdate =
+          cameraFolder.add(camUtils, 'convention', ['radio', 'neuro']);
     conventionUpdate.onChange(function(value) {
       camera.convention = value;
       camera.update();

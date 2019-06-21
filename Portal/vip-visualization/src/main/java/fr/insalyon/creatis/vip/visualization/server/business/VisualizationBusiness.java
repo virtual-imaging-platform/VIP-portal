@@ -165,7 +165,24 @@ public class VisualizationBusiness {
             } catch (DataManagerException ex) {
                 throw new BusinessException(ex);
             }
+
+            // Hack: if it is a .mhd file, download also the .raw file with the
+            // same name.
+            if (fileName.endsWith(".mhd")) {
+                try {
+                    CoreUtil.getGRIDAClient().getRemoteFile(
+                        DataManagerUtil.parseBaseDir(
+                            user, lfn.replaceAll("\\.mhd$", ".raw")),
+                        fileDir.getAbsolutePath());
+                } catch (GRIDAClientException ex) {
+                    fileDir.delete();
+                    throw new BusinessException(ex);
+                } catch (DataManagerException ex) {
+                    throw new BusinessException(ex);
+                }
+            }
         }
+
         String url = relativeDirString
             + separator
             + lfn.substring(lfn.lastIndexOf('/') + 1);

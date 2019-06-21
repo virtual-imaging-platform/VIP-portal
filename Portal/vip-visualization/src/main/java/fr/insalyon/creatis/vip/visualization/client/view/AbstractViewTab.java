@@ -61,9 +61,9 @@ public abstract class AbstractViewTab extends Tab {
     }
 
     private void loadLFN(String lfn) {
-        VisualizationServiceAsync vsa = VisualizationService.Util.getInstance();
+        VisualizationServiceAsync vs = VisualizationService.Util.getInstance();
         modal.show("Loading data file...", true);
-        vsa.getVisualizationItemFromLFN(
+        vs.getVisualizationItemFromLFN(
             lfn,
             new AsyncCallback<VisualizationItem>() {
                 @Override
