@@ -31,6 +31,7 @@
  */
 package fr.insalyon.creatis.vip.visualization.server.business;
 
+import fr.insalyon.creatis.grida.client.GRIDAClient;
 import fr.insalyon.creatis.grida.client.GRIDAClientException;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
@@ -44,6 +45,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.Optional;
 import org.apache.log4j.Logger;
 
 public class VisualizationBusiness {
@@ -154,6 +156,8 @@ public class VisualizationBusiness {
             }
         }
         fileDir.setWritable(true, false);
+
+        String rawFileExtension = "";
         if (!(new File(fileName)).exists()) {
             try {
                 CoreUtil.getGRIDAClient().getRemoteFile(
@@ -166,19 +170,16 @@ public class VisualizationBusiness {
                 throw new BusinessException(ex);
             }
 
-            // Hack: if it is a .mhd file, download also the .raw file with the
-            // same name.
+            // Hack: if it is a .mhd file, download also the raw file with the
+            // same name, testing multiple possible extensions.
             if (fileName.endsWith(".mhd")) {
-                try {
-                    CoreUtil.getGRIDAClient().getRemoteFile(
-                        DataManagerUtil.parseBaseDir(
-                            user, lfn.replaceAll("\\.mhd$", ".raw")),
-                        fileDir.getAbsolutePath());
-                } catch (GRIDAClientException ex) {
-                    fileDir.delete();
-                    throw new BusinessException(ex);
-                } catch (DataManagerException ex) {
-                    throw new BusinessException(ex);
+                Optional<String> rawExtension =
+                    rawFileForMhdFile(lfn, user, fileDir);
+                if (rawExtension.isPresent()) {
+                    rawFileExtension = rawExtension.get();
+                } else {
+                    throw new BusinessException(
+                        "Could not find raw file associated to mhd file.");
                 }
             }
         }
@@ -186,6 +187,70 @@ public class VisualizationBusiness {
         String url = relativeDirString
             + separator
             + lfn.substring(lfn.lastIndexOf('/') + 1);
-        return new VisualizationItem(url, fileName);
+        return new VisualizationItem(url, fileName, rawFileExtension);
+    }
+
+    private Optional<String> rawFileForMhdFile(
+        String lfn, User user, File localDir) {
+
+        String[] extensions = {".raw", ".zraw", ".raw.gz"};
+        GRIDAClient gridaClient = CoreUtil.getGRIDAClient();
+
+        return java.util.Arrays.stream(extensions)
+            .map(extension -> buildLfnName(user, lfn, extension))
+            .filter(Optional::isPresent)
+            .map(Optional::get)
+            .filter(fe -> checkIfExists(gridaClient, fe.filename))
+            .findFirst()
+            .filter(fe -> downloadFile(gridaClient, fe.filename, localDir))
+            .map(fe -> fe.extension);
+    }
+
+    private Optional<FilenameAndExtension> buildLfnName(
+        User user, String lfn, String extension) {
+        try {
+            return Optional.of(
+                new FilenameAndExtension(
+                    DataManagerUtil.parseBaseDir(
+                        user, lfn.replaceAll("\\.mhd$", extension)),
+                    extension));
+        } catch (DataManagerException dme) {
+            logger.warn(
+                "Error while building lfn name with new extension: " + lfn);
+            logger.warn(dme);
+            return Optional.empty();
+        }
+    }
+
+    private boolean checkIfExists(GRIDAClient gridaClient, String filename) {
+        try {
+            return gridaClient.exist(filename);
+        } catch (GRIDAClientException gce) {
+            logger.warn("Error while grida checked existance of: " + filename);
+            logger.warn(gce);
+            return false;
+        }
+    }
+
+    private boolean downloadFile(
+        GRIDAClient gridaClient, String filename, File localDir) {
+        try {
+            logger.info("downloading file: " + filename);
+            gridaClient.getRemoteFile(filename, localDir.getAbsolutePath());
+            return true;
+        } catch (GRIDAClientException gce) {
+            logger.warn("Error while grida downloading file: " + filename);
+            logger.warn(gce);
+            return false;
+        }
+    }
+
+    private static class FilenameAndExtension {
+        public final String filename;
+        public final String extension;
+        public FilenameAndExtension(String filename, String extension) {
+            this.filename = filename;
+            this.extension = extension;
+        }
     }
 }

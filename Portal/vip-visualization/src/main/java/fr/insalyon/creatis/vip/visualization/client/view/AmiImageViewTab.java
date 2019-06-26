@@ -89,12 +89,12 @@ public class AmiImageViewTab extends AbstractViewTab {
     @Override
     public void displayFile(VisualizationItem item) {
         String name = item.getURL();
-        amiJsViewer = showAmiImage(name, divId);
+        amiJsViewer = showAmiImage(name, item.getExtension(), divId);
     }
 
     public native JavaScriptObject
-        showAmiImage(String filename, String divId) /*-{
-        return $wnd.amiViewer(filename, divId);
+        showAmiImage(String filename, String extension, String divId) /*-{
+        return $wnd.amiViewer(filename, extension, divId);
     }-*/;
 
     public native void resizeCanvas(JavaScriptObject amiViewer) /*-{

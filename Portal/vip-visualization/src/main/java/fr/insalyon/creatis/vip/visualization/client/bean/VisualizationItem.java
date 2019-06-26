@@ -38,11 +38,15 @@ public class VisualizationItem implements IsSerializable{
     String URL;
     String localPath;
 
-    public VisualizationItem(){}
+    // Extension of raw file if url is a mhd file.  Empty string otherwise.
+    String extension;
 
-    public VisualizationItem(String URL, String localPath) {
+    public VisualizationItem() {}
+
+    public VisualizationItem(String URL, String localPath, String extension) {
         this.URL = URL;
         this.localPath = localPath;
+        this.extension = extension;
     }
 
     public String getURL() {
@@ -59,5 +63,13 @@ public class VisualizationItem implements IsSerializable{
 
     public void setLocalPath(String localPath) {
         this.localPath = localPath;
+    }
+
+    public String getExtension() {
+        return extension;
+    }
+
+    public void setExtension(String extension) {
+        this.extension = extension;
     }
 }

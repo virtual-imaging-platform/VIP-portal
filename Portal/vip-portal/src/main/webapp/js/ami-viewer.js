@@ -1,7 +1,7 @@
 // Code taken from AMI lesson 3:
 // https://codesandbox.io/s/github/FNNDSC/ami/tree/master/lessons/03
 
-function amiViewer(url, divId) {
+function amiViewer(url, rawExtension, divId) {
   const colors = {
     red: 0xff0000,
     darkGrey: 0x353535
@@ -54,9 +54,10 @@ function amiViewer(url, divId) {
   // replaced by a table with the 2 urls.  But to not make ami think
   // that these are 2 urls for 2 different images, this table must be
   // included in the main table listing all images.  Hence the 2
-  // imbricated tables in the following line.
-  const urlsToLoad =
-        url.endsWith('.mhd') ? [ [ url, url.replace(/\.mhd$/, '.raw') ] ] : url
+  // imbricated tables in the following expression.
+  const urlsToLoad = url.endsWith('.mhd')
+        ? [ [ url, url.replace(/\.mhd$/, rawExtension) ] ]
+        : url
 
   loader
     .load(urlsToLoad)
