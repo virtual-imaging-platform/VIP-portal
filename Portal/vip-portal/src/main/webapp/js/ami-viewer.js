@@ -48,6 +48,11 @@ function amiViewer(url, rawExtension, divId) {
 
   const loader = new window.AMI.VolumeLoader(container);
 
+  if (url.endsWith('.mhd') && rawExtension.length == 0) {
+    window.setWarningMessage('Could not find raw file associated to mhd file.  Tried extensions .raw, .zraw and .raw.gz.')
+    return
+  }
+
   // Adapt to double files for mhd/raw format.  Many images can be
   // loaded at once.  So the loader accepts either a single url, or a
   // table of urls.  In the case of mhd/raw, the one url must be
