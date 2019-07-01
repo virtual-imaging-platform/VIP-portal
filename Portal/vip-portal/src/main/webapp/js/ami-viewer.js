@@ -49,24 +49,33 @@ function amiViewer(url, rawExtension, divId) {
   const loader = new window.AMI.VolumeLoader(container);
 
   if (url.endsWith('.mhd') && rawExtension.length == 0) {
-    window.setWarningMessage('Could not find raw file associated to mhd file.  Tried extensions .raw, .zraw and .raw.gz.')
+    const nameWithExtension = url.substring(url.lastIndexOf('/') + 1)
+    const name = nameWithExtension.substring(
+      0, nameWithExtension.lastIndexOf('.'))
+    window.setWarningMessage(
+      'Could not find raw file associated to mhd file: ' +
+        nameWithExtension +
+        '.  Tried to find a file with the name ' +
+        name +
+        ' and extensions .raw, .zraw and .raw.gz.')
     return
   }
 
   // Adapt to double files for mhd/raw format.  Many images can be
-  // loaded at once.  So the loader accepts either a single url, or a
-  // table of urls.  In the case of mhd/raw, the one url must be
-  // replaced by a table with the 2 urls.  But to not make ami think
-  // that these are 2 urls for 2 different images, this table must be
-  // included in the main table listing all images.  Hence the 2
-  // imbricated tables in the following expression.
+  // loaded in a single call to the loader (feature not used here).
+  // So the loader accepts either a single url, or a table of urls.
+  // In the case of mhd/raw, the single url must be replaced by a
+  // table with the 2 urls.  But to not make ami think that these are
+  // 2 urls for 2 different images, this table must be included in the
+  // main table listing all images.  Hence the 2 imbricated tables in
+  // the following expression.
   const urlsToLoad = url.endsWith('.mhd')
         ? [ [ url, url.replace(/\.mhd$/, rawExtension) ] ]
         : url
 
   loader
     .load(urlsToLoad)
-    .then(function() {
+    .then(function(e) {
       const series = loader.data[0].mergeSeries(loader.data);
       const stack = series[0].stack[0];
       loader.free();
