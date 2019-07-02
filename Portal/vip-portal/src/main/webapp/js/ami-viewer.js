@@ -5,7 +5,7 @@ function amiViewer(url, rawExtension, divId) {
   window.setNoticeMessage(
     'Loading and parsing image ' +
       url.substring(url.lastIndexOf('/') + 1) +
-      '.  Please wait …')
+      '.  Please wait, this may take a while …')
 
   const colors = {
     red: 0xff0000,

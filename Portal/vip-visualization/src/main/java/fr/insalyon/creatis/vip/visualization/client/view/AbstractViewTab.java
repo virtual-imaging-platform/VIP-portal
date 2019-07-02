@@ -62,7 +62,7 @@ public abstract class AbstractViewTab extends Tab {
         Layout.getInstance().setNoticeMessage(
             "Downloading file "
             + lfn.substring(lfn.lastIndexOf('/') + 1)
-            + " from storage element.  Please wait …", 0);
+            + " from storage element.  Please wait, this may take a while …", 0);
 
         vs.getVisualizationItemFromLFN(
             lfn,
