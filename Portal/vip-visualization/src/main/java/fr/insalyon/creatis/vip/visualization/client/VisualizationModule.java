@@ -39,7 +39,6 @@ import fr.insalyon.creatis.vip.datamanager.client.view.browser.BrowserContextMen
 import fr.insalyon.creatis.vip.visualization.client.view.AbstractViewTab;
 import fr.insalyon.creatis.vip.visualization.client.view.AmiImageViewTab;
 import fr.insalyon.creatis.vip.visualization.client.view.BrainBrowserViewTab;
-import fr.insalyon.creatis.vip.visualization.client.view.ImageViewTab;
 import java.util.function.Consumer;
 
 public class VisualizationModule extends Module {
@@ -55,33 +54,6 @@ public class VisualizationModule extends Module {
 
     @Override
     public void terminate() {}
-
-    private Visualizer imageVisualizer =
-        new Visualizer() {
-            @Override
-            public boolean isFileSupported(String filename) {
-                return ImageViewTab.isFileSupported(filename);
-            }
-
-            @Override
-            public String fileTypeName() {
-                return ImageViewTab.fileTypeName();
-            }
-
-            @Override
-            public Consumer<String> viewStarter() {
-                return new Consumer<String>() {
-                    @Override
-                    public void accept(String filename) {
-                        AbstractViewTab tab =
-                            (AbstractViewTab) Layout.getInstance().addTab(
-                                ImageViewTab.tabIdFrom(filename),
-                                () -> new ImageViewTab(filename));
-                        tab.load();
-                    }
-                };
-            }
-        };
 
     private Visualizer brainBrowserVisualizer =
         new Visualizer() {
