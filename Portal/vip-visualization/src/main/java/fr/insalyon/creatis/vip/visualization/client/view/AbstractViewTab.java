@@ -34,7 +34,6 @@ package fr.insalyon.creatis.vip.visualization.client.view;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.tab.Tab;
-import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.visualization.client.bean.VisualizationItem;
 import fr.insalyon.creatis.vip.visualization.client.rpc.VisualizationService;
@@ -43,7 +42,6 @@ import fr.insalyon.creatis.vip.visualization.client.rpc.VisualizationServiceAsyn
 /** @author Tristan Glatard */
 public abstract class AbstractViewTab extends Tab {
 
-    protected final ModalWindow modal;
     protected final String filename;
     private final String lfn;
 
@@ -52,7 +50,6 @@ public abstract class AbstractViewTab extends Tab {
         this.setTitle(filename);
         this.setCanClose(true);
         this.setPane(new Canvas());
-        modal = new ModalWindow(this.getPane());
         this.lfn = lfn;
     }
 
@@ -62,20 +59,22 @@ public abstract class AbstractViewTab extends Tab {
 
     private void loadLFN(String lfn) {
         VisualizationServiceAsync vs = VisualizationService.Util.getInstance();
-        modal.show("Loading data file...", true);
+        Layout.getInstance().setNoticeMessage(
+            "Downloading file "
+            + lfn.substring(lfn.lastIndexOf('/') + 1)
+            + " from storage element.  Please wait …", 0);
+
         vs.getVisualizationItemFromLFN(
             lfn,
             new AsyncCallback<VisualizationItem>() {
                 @Override
                 public void onFailure(Throwable caught) {
-                    modal.hide();
                     Layout.getInstance().setWarningMessage(
                         "Cannot load file: " + caught.getMessage());
                 }
 
                 @Override
                 public void onSuccess(VisualizationItem result) {
-                    modal.hide();
                     displayFile(result);
                 }
             });
