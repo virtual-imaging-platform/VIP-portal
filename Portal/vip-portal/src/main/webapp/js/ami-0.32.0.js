@@ -34935,6 +34935,7 @@ var LoadersBase = function (_EventEmitter) {
       }
       window.console.log('oops... something went wrong...');
       window.console.log(error);
+      throw error;
     });
   };
 
@@ -34960,6 +34961,7 @@ var LoadersBase = function (_EventEmitter) {
       }
       window.console.log('oops... something went wrong...');
       window.console.log(error);
+      throw error;
     });
   };
 
@@ -39851,6 +39853,7 @@ var ParsersMHD = function (_ParsersVolume) {
       _this._buffer = data.rawBuffer;
     } catch (error) {
       window.console.log('ooops... :(');
+      throw error;
     }
     return _this;
   }
@@ -40491,6 +40494,7 @@ var ParsersNifti = function (_ParsersVolume) {
       _this._dataSet = NrrdReader.parse(_this._arrayBuffer);
     } catch (error) {
       window.console.log('ooops... :(');
+      throw error;
     }
     return _this;
   }
