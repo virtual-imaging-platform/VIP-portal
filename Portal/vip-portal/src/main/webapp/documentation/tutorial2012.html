@@ -11,14 +11,9 @@
         <p>
 	  <ul>
 	    <li>Make sure that you are registered as a tutorial user. Your home page should look like this:</li> <img alt="login-page" src="./tutorial/login.png"/>
-	    <li>Two exercises are proposed in this tutorial:
-	      <ol>
-		<li><a href="#one">Execution of an MRI simulation</a> (approx. 20 minutes)</li>
-		<li><a href="#two">Browsing and interaction with the model repository</a> (approx. 20 minutes)</li>
-	      </ol>
           </ul>
 	</p>    
-        <h2><a name="one">Exercise 1: MRI simulation</a></h2>
+        <h2><a name="one">MRI simulation</a></h2>
 	In this exercise we will simulate a spin-echo MR image of the brain using SimuBloch, a code developed by Fang Cao, Olivier Commowick and Christian Barillot at IRISA in Rennes.
 	<ol>
 	  <li>In your home page, open MRI simulator "SimuBloch v0.2" </li>
@@ -39,51 +34,7 @@
 		  <li>To visualize the result, download and install <a href="http://www.creatis.insa-lyon.fr/rio/vv?action=AttachFile&amp;do=get&amp;target=vv-1.3-win64.exe">VV</a>, and open the .nii.gz file that you have just downloaded:<img alt="result" src="tutorial/result.png"/></li>
 		    
 	</ol>
-        <h2><a name="two">Exercice 2: model repository</a></h2>
-        
- <h3>2.1 - Explore model repository</h3>       <p><ul><li>To open the model repository, click on <b>Models</b> in your home page:</li>
-            <img alt="home_models" src="tutorial2012/home.png"/>
-            <li>You will see three models:
-                <ol><li>Adam</li>
-                <li>Extended Adam</li>
-                <li>Zubal</li></ol>
-            </li>
-            <img alt="repository" src="tutorial2012/repository.png"/>
-        </ul>
-        <ul><li>Right click on model "adam" and select <b>View model annotations</b>.</li> <img alt="view_model" src="tutorial2012/view_model.png"/>
-            <li>Explore through the different layers (timepoint, instant, object layers) to look at the different objects composing a model.
-                The first model <b>Adam</b> only contains voxels and meshes objects.
-            <li> Come back to the model repository and inspect model <b>Extended Adam</b>.  You will see <b>physical parameters layers</b> used for the simulations.</li>
-          <img alt="view_extended_adam" src="tutorial2012/view_extended_adam.png"/></li>
-             <li>Now, download a model by clicking the download button in the annotation panel.</li><img alt="download_models" src="tutorial2012/download_models.png"/>
-             <li>Inspect the downloaded archive to control that voxel and meshes files are present. Note the rdf file containing semantic annotations.</li>
-             
-        <li>Vizualize  model "adam" by right-clicking on launch simulation GUI.</li><img alt="launch_GUI" src="tutorial/visu-1.png"/><br/><img alt="launch_GUI" src="tutorial/visu-2.png"/>
-        <li> You can also interact with the 3D model</li>
-        </ul> 
-         <h3>2.2 - Import your own model</h3>
-         <p>
-         <ul><li>Download one a test mesh object from <a href="http://vip.creatis.insa-lyon.fr/tutorialEMSP2012/">here.</a>
-        </li>
-         </ul>
-         <ul><li>In the models repository tab, click on button "New model":</li><img alt="create_button_models" src="tutorial/new-1.png"/>.
-             <li>An empty model is created with one time-point and one instant.
-                 <br>The page is divided in two sections: the left panel contains the files to be added to the model. 
-                The right panel contains the current status of your annotated model.</li><img alt="create_model" src="tutorial2012/create_model.png"/>  
-        
-            <li>Add your test mesh object.</li> <img alt="add_file" src="tutorial2012/add_file.png"/>.
-            <li>The selected file is displayed in the left panel.
-                <br>You can add several files in the same way.</li><img alt="file_added" src="tutorial2012/file_added.png"/>
-            <li>To annotate a file in your model, drag and drop the file from the left panel to the proper instant on the right. 
-            A dialog box appears. It allows to associate the name of an organ to your object.</li>
-            <!-- <li>Search for the appropriate semantic (e.g. "heart") term in text field:</li><img alt="dialog" src="tutorial2012/dialog.png"/> -->
-            <!-- <li>Available terms appear. You can try several terms.</li> -->
-            <li>Select the right term validate it with button OK.</li><img alt="results" src="tutorial2012/results.png"/>
-            <li>Rename your model by right clicking on the right bar and select <b>Change model name</b>.</li> <img alt="rename" src="tutorial2012/change_name.png"/>
-            <li>Now, you can commit your model with the commit button. It is added in the model repository.</li><img alt="commit" src="tutorial2012/commit.png"/>            <li>Your model is now displayed in the model repository.</li>
-            
-        </ul>        
-        </p>
+
          </body>
 </html>
 
