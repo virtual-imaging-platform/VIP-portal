@@ -36,7 +36,6 @@ import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
 import com.smartgwt.client.widgets.menu.events.ClickHandler;
 import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
-import com.smartgwt.client.widgets.tab.Tab;
 import com.smartgwt.client.widgets.tree.Tree;
 import com.smartgwt.client.widgets.tree.TreeNode;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
@@ -46,8 +45,6 @@ import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerService;
 import fr.insalyon.creatis.vip.datamanager.client.view.browser.BrowserContextMenu;
 import fr.insalyon.creatis.vip.datamanager.client.view.browser.BrowserLayout;
 import fr.insalyon.creatis.vip.datamanager.client.view.operation.OperationLayout;
-import fr.insalyon.creatis.vip.datamanager.client.view.visualization.BrainBrowserViewTab;
-import fr.insalyon.creatis.vip.datamanager.client.view.visualization.ImageViewTab;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -81,39 +78,6 @@ public class InOutContextMenu extends Menu {
                 download();
             }
         });
-
-        MenuItem viewImageItem = new MenuItem("View Image");
-        viewImageItem.setIcon(DataManagerConstants.ICON_VIEW);
-        viewImageItem.addClickHandler(new ClickHandler() {
-            @Override
-            public void onClick(MenuItemClickEvent event) {
-                Layout.getInstance().addTab(
-                    ImageViewTab.tabIdFrom(node.getName()),
-                    () -> new ImageViewTab(node.getName()));
-            }
-        });
-
-        MenuItem viewSurfaceItem = new MenuItem("View Surface");
-        viewSurfaceItem.setIcon(DataManagerConstants.ICON_VIEW);
-        viewSurfaceItem.addClickHandler(new ClickHandler() {
-
-            @Override
-            public void onClick(MenuItemClickEvent event) {
-                Layout.getInstance().addTab(
-                    BrainBrowserViewTab.ID,
-                    () -> new BrainBrowserViewTab(node.getName()));
-            }
-        });
-
-     /*   MenuItem viewDicomItem = new MenuItem("View DICOM");
-        viewDicomItem.setIcon(DataManagerConstants.ICON_VIEW);
-        viewDicomItem.addClickHandler(new ClickHandler() {
-
-            @Override
-            public void onClick(MenuItemClickEvent event) {
-                Layout.getInstance().addTab(new DicomViewTab(node.getName()));
-            }
-        });*/
 
         MenuItem downloadFileItem = new MenuItem("Download");
         downloadFileItem.setIcon(DataManagerConstants.ICON_DOWNLOAD);

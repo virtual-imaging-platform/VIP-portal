@@ -166,12 +166,16 @@ public class MessageWindow {
             new Timer() {
                 @Override
                 public void run() {
-                    panel.animateFade(0);
+                    hideMessage();
                 }
             }.schedule(delay * 1000);
         }
         panel.setBackgroundColor(bgColor);
         panel.show();
         panel.animateFade(100);
+    }
+
+    public void hideMessage() {
+        panel.animateFade(0);
     }
 }
