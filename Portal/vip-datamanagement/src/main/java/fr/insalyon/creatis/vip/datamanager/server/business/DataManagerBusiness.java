@@ -44,7 +44,6 @@ import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
 import fr.insalyon.creatis.vip.core.server.business.CoreUtil;
 import fr.insalyon.creatis.vip.core.server.business.Server;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
-import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
 import fr.insalyon.creatis.vip.datamanager.client.bean.DMCachedFile;
 import fr.insalyon.creatis.vip.datamanager.client.bean.DMZombieFile;
 import fr.insalyon.creatis.vip.datamanager.client.bean.Image;
@@ -52,13 +51,15 @@ import fr.insalyon.creatis.vip.datamanager.client.bean.SSH;
 import fr.insalyon.creatis.vip.datamanager.client.bean.VisualizationItem;
 import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerException;
 import fr.insalyon.creatis.vip.datamanager.server.DataManagerUtil;
-import fr.insalyon.creatis.vip.datamanager.server.dao.SSHDAOFactory;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.List;
+
+import fr.insalyon.creatis.vip.datamanager.server.dao.DataManagerDAOFactory;
 import org.apache.log4j.Logger;
 
 /**
@@ -245,7 +246,7 @@ public class DataManagerBusiness {
 
     public List<SSH> getSSHConnections() throws BusinessException {
         try {
-            return SSHDAOFactory.getDAOFactory().getSSHDAO().getSSHConnections();
+            return DataManagerDAOFactory.getInstance().getSSHDAO().getSSHConnections();
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }
@@ -257,7 +258,7 @@ public class DataManagerBusiness {
             ConfigurationBusiness conf = new ConfigurationBusiness();
             User user = conf.getUser(ssh.getEmail());
             ssh.setLfcDir(DataManagerUtil.parseBaseDir(user, ssh.getLfcDir()));
-            SSHDAOFactory.getDAOFactory().getSSHDAO().addSSH(ssh);
+            DataManagerDAOFactory.getInstance().getSSHDAO().addSSH(ssh);
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         } catch (DataManagerException ex) {
@@ -268,7 +269,7 @@ public class DataManagerBusiness {
 
     public void removeSSH(String email, String name) throws BusinessException {
         try {
-            SSHDAOFactory.getDAOFactory().getSSHDAO().removeSSH(email, name);
+            DataManagerDAOFactory.getInstance().getSSHDAO().removeSSH(email, name);
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }
@@ -277,7 +278,7 @@ public class DataManagerBusiness {
     public void resetSSHs(List<List<String>> sshConnections) throws BusinessException {
         try {
 
-            SSHDAOFactory.getDAOFactory().getSSHDAO().resetSSHConnections(sshConnections);
+            DataManagerDAOFactory.getInstance().getSSHDAO().resetSSHConnections(sshConnections);
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }
@@ -285,7 +286,7 @@ public class DataManagerBusiness {
 
     public void updateSSH(SSH ssh) throws BusinessException {
         try {
-            SSHDAOFactory.getDAOFactory().getSSHDAO().updateSSH(ssh);
+            DataManagerDAOFactory.getInstance().getSSHDAO().updateSSH(ssh);
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }

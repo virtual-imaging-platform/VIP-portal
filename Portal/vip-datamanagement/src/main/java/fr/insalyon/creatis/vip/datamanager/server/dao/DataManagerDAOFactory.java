@@ -40,20 +40,20 @@ import org.apache.log4j.Logger;
  *
  * @author glatard
  */
-class MySQLDAOFactory extends SSHDAOFactory {
+public class DataManagerDAOFactory {
 
-    private final static Logger logger = Logger.getLogger(MySQLDAOFactory.class);
-    private static MySQLDAOFactory instance;
+    private final static Logger logger = Logger.getLogger(DataManagerDAOFactory.class);
+    private static DataManagerDAOFactory instance;
 
     // Singleton
-    protected static MySQLDAOFactory getInstance() {
+    public static DataManagerDAOFactory getInstance() {
         if (instance == null) {
-            instance = new MySQLDAOFactory();
+            instance = new DataManagerDAOFactory();
         }
         return instance;
     }
 
-    private MySQLDAOFactory() {
+    private DataManagerDAOFactory() {
         try {
             logger.info("Configuring VIP SSH database.");
             PlatformConnection.getInstance().createTable("VIPSSHAccounts", "email VARCHAR(255), LFCDir VARCHAR(255), "
@@ -62,15 +62,26 @@ class MySQLDAOFactory extends SSHDAOFactory {
                     + "transferType VARCHAR(255), deleteFilesFromSource BOOLEAN DEFAULT 0, active BOOLEAN DEFAULT 1, PRIMARY KEY(email,LFCDir), "
                     + "FOREIGN KEY (email) REFERENCES VIPUsers(email) "
                     + "ON DELETE CASCADE ON UPDATE CASCADE");
+
+            logger.info("Configuring VIP External Platforms database.");
+            PlatformConnection.getInstance().createTable("VIPExternalPlatforms",
+                    "identifier VARCHAR(50) NOT NULL, "
+                    + "type VARCHAR(50) NOT NULL, "
+                    + "description VARCHAR(1000), "
+                    + "url VARCHAR(255), "
+                    + "PRIMARY KEY (identifier)");
         } catch (DAOException ex) {
             logger.error("Error configuring SSH database", ex);
         }
 
     }
 
-    @Override
     public SSHDAO getSSHDAO() throws DAOException {
         return new SSHData();
+    }
+
+    public ExternalPlatformsDAO getExternalPlatformsDAO() throws DAOException {
+        return null; // TODO, add implementation
     }
 
 }
