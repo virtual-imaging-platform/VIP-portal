@@ -72,7 +72,8 @@ import fr.insalyon.creatis.vip.core.server.dao.CoreDAOFactory;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerException;
 import fr.insalyon.creatis.vip.datamanager.server.DataManagerUtil;
-import fr.insalyon.creatis.vip.datamanager.server.business.DataManagerBusiness;
+import fr.insalyon.creatis.vip.datamanager.server.business.*;
+
 import java.io.File;
 import java.util.*;
 import java.util.logging.Level;
@@ -217,19 +218,12 @@ public class WorkflowBusiness {
                     String[] values = valuesStr.split(ApplicationConstants.SEPARATOR_LIST);
                     for (String v : values) {
 
-                        String parsedPath = DataManagerUtil.parseBaseDir(user, v.trim());
-                        if (!user.isSystemAdministrator()) {
-                            checkFolderACL(user, groups, parsedPath);
-                        }
-                        ps.addValue(parsedPath);
+                        String parsedParameter = parseParameter(user, groups, v.trim());
+                        ps.addValue(parsedParameter);
                     }
                 } else {
-
-                    String parsedPath = DataManagerUtil.parseBaseDir(user, valuesStr.trim());
-                    if (!user.isSystemAdministrator()) {
-                        checkFolderACL(user, groups, parsedPath);
-                    }
-                    ps.addValue(parsedPath);
+                    String parsedParameter = parseParameter(user, groups, valuesStr.trim());
+                    ps.addValue(parsedParameter);
                 }
                 parameters.add(ps);
             }
@@ -274,6 +268,23 @@ public class WorkflowBusiness {
             logger.error(ex);
             throw new BusinessException(ex);
         } 
+    }
+
+    private String parseParameter(
+            User user, List<String> groups, String value)
+            throws DataManagerException, BusinessException {
+        ExternalPlatformBusiness externalPlatformBusiness =
+                new ExternalPlatformBusiness(new GirderStorageBusiness());
+        ExternalPlatformBusiness.ParseResult parseResult =
+                externalPlatformBusiness.parse(value);
+        if (parseResult.isUri) {
+            return parseResult.result;
+        }
+        String parsedPath = DataManagerUtil.parseBaseDir(user, parseResult.result);
+        if (!user.isSystemAdministrator()) {
+            checkFolderACL(user, groups, parsedPath);
+        }
+        return parsedPath;
     }
 
     /**
