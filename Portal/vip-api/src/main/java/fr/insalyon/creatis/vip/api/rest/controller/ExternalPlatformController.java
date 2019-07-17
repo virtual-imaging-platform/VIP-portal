@@ -31,8 +31,12 @@
  */
 package fr.insalyon.creatis.vip.api.rest.controller;
 
-import fr.insalyon.creatis.vip.api.rest.model.ExternalPlatform;
+import fr.insalyon.creatis.vip.api.business.*;
+import fr.insalyon.creatis.vip.core.server.business.BusinessException;
+import fr.insalyon.creatis.vip.datamanager.client.bean.ExternalPlatform;
+import fr.insalyon.creatis.vip.datamanager.server.business.ExternalPlatformBusiness;
 import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -46,8 +50,21 @@ public class ExternalPlatformController {
 
     private static final Logger logger = Logger.getLogger(ExternalPlatformController.class);
 
+    private ExternalPlatformBusiness externalPlatformBusiness;
 
-    public List<ExternalPlatform> listExternalPlatforms() {
-        return null;
+    @Autowired
+    public ExternalPlatformController(ExternalPlatformBusiness externalPlatformBusiness) {
+        this.externalPlatformBusiness = externalPlatformBusiness;
+    }
+
+    @GetMapping
+    public List<ExternalPlatform> listExternalPlatforms() throws ApiException {
+        ApiUtils.methodInvocationLog("listExternalPlatforms");
+        try {
+            return externalPlatformBusiness.listAll();
+        } catch (BusinessException e) {
+            logger.error("Error listing all external platforms");
+            throw new ApiException(e);
+        }
     }
 }
