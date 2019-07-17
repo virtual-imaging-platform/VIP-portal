@@ -29,14 +29,20 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL-B license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.api.rest.model;
+package fr.insalyon.creatis.vip.datamanager.client.bean;
 
 /**
- * Created by abonnet on 7/4/19.
+ * @author abonnet
  */
 public class ExternalPlatform {
 
+    public enum Type {
+        GIRDER
+    }
+
     private String identifier;
+    private Type type;
+    private String description;
     private String url;
 
     public String getIdentifier() {
@@ -45,6 +51,22 @@ public class ExternalPlatform {
 
     public void setIdentifier(String identifier) {
         this.identifier = identifier;
+    }
+
+    public Type getType() {
+        return type;
+    }
+
+    public void setType(Type type) {
+        this.type = type;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public String getUrl() {
