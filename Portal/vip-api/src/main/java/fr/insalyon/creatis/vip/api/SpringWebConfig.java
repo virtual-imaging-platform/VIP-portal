@@ -97,7 +97,7 @@ public class SpringWebConfig extends WebMvcConfigurerAdapter {
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
             .allowedMethods("GET", "POST", "PUT", "DELETE", "HEAD")
-            .allowedOrigins(env.getProperty(CORS_AUTHORIZED_DOMAINS, String[].class));
+            .allowedOrigins(env.getProperty(CORS_AUTHORIZED_DOMAINS, String[].class, new String[0]));
     }
 
     @Bean
