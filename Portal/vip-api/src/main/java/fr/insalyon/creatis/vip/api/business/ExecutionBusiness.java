@@ -4,16 +4,16 @@
  * This software is a web portal for pipeline execution on distributed systems.
  *
  * This software is governed by the CeCILL-B license under French law and
- * abiding by the rules of distribution of free software.  You can  use, 
+ * abiding by the rules of distribution of free software.  You can  use,
  * modify and/ or redistribute the software under the terms of the CeCILL-B
  * license as circulated by CEA, CNRS and INRIA at the following URL
- * "http://www.cecill.info". 
+ * "http://www.cecill.info".
  *
  * As a counterpart to the access to the source code and  rights to copy,
  * modify and redistribute granted by the license, users are provided only
  * with a limited warranty  and the software's author,  the holder of the
  * economic rights,  and the successive licensors  have only  limited
- * liability. 
+ * liability.
  *
  * In this respect, the user's attention is drawn to the risks associated
  * with loading,  using,  modifying and/or developing or reproducing the
@@ -22,9 +22,9 @@
  * therefore means  that it is reserved for developers  and  experienced
  * professionals having in-depth computer knowledge. Users are therefore
  * encouraged to load and test the software's suitability as regards their
- * requirements in conditions enabling the security of their systems and/or 
- * data to be ensured and,  more generally, to use and operate it in the 
- * same conditions as regards security. 
+ * requirements in conditions enabling the security of their systems and/or
+ * data to be ensured and,  more generally, to use and operate it in the
+ * same conditions as regards security.
  *
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL-B license and that you accept its terms.
@@ -41,6 +41,7 @@ import fr.insalyon.creatis.vip.application.client.view.monitor.SimulationStatus;
 import fr.insalyon.creatis.vip.application.server.business.*;
 import fr.insalyon.creatis.vip.core.client.bean.*;
 import fr.insalyon.creatis.vip.core.server.business.*;
+import fr.insalyon.creatis.vip.core.server.dao.mysql.PlatformConnection;
 import fr.insalyon.creatis.vip.datamanager.server.business.TransferPoolBusiness;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
@@ -50,6 +51,8 @@ import java.io.UnsupportedEncodingException;
 import java.lang.Object;
 import java.lang.reflect.Array;
 import java.net.*;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.*;
 import java.util.Map.Entry;
 
@@ -151,7 +154,7 @@ public class ExecutionBusiness {
 
             if(summarize) // don't look into inputs and outputs
                 return e;
-            
+
             // Inputs
             List<InOutData> inputs = workflowBusiness.getInputData(executionId, apiContext.getUser().getFolder());
             logger.info("Execution has " + inputs.size() + " inputs ");
@@ -327,8 +330,7 @@ public class ExecutionBusiness {
                                 String executionName,
                                 String studyId,
                                 Boolean playExecution) throws ApiException {
-        try {
-
+        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
             // We cannot easily initialize an execution without starting it.
             // So we will just launch the execution, and launch an error in case playExecution is not true.
             // Set warnings
@@ -365,7 +367,9 @@ public class ExecutionBusiness {
 
             // Get user groups
             List<String> groupNames = new ArrayList<>();
-            for (Group g : configurationBusiness.getUserGroups(apiContext.getUser().getEmail()).keySet()) {
+            for (Group g : configurationBusiness
+                     .getUserGroups(apiContext.getUser().getEmail(),
+                                    connection).keySet()) {
                 groupNames.add(g.getName());
             }
 
@@ -389,16 +393,17 @@ public class ExecutionBusiness {
             logger.info(executionName);
 
             // Launch the workflow
-            String executionId = workflowBusiness.launch(apiContext.getUser(),
-                                           groupNames,
-                                           inputValues,
-                                           applicationName,
-                                           applicationVersion,
-                                           classes.get(0),
-                                           executionName
-            );
+            String executionId = workflowBusiness.launch(
+                apiContext.getUser(),
+                groupNames,
+                inputValues,
+                applicationName,
+                applicationVersion,
+                classes.get(0),
+                executionName,
+                connection);
             return executionId;
-        } catch (BusinessException ex) {
+        } catch (BusinessException | SQLException ex) {
             throw new ApiException(ex);
         }
     }

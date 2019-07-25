@@ -34,11 +34,14 @@ package fr.insalyon.creatis.vip.datamanager.server;
 import fr.insalyon.creatis.vip.core.client.bean.*;
 import fr.insalyon.creatis.vip.core.server.business.Server;
 import fr.insalyon.creatis.vip.core.server.dao.*;
+import fr.insalyon.creatis.vip.core.server.dao.mysql.PlatformConnection;
 import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
 import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerException;
 
 import java.io.File;
 import java.net.URI;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.*;
 
 /**
@@ -71,8 +74,9 @@ public class DataManagerUtil {
         baseDir = parsePath(baseDir, DataManagerConstants.VO_ROOT_FOLDER,
                             server.getVoRoot());
 
-        try {
-            for (Group group : CoreDAOFactory.getDAOFactory().getGroupDAO().getGroups()) {
+        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
+            for (Group group : CoreDAOFactory.getDAOFactory()
+                     .getGroupDAO(connection).getGroups()) {
                 String folderName = group.getName().replaceAll(" ", "_");
 
                 baseDir = parsePath(baseDir, group.getName() + DataManagerConstants.GROUP_APPEND,
@@ -83,7 +87,7 @@ public class DataManagerUtil {
                         server.getDataManagerGroupsHome()
                         + "/" + folderName);
             }
-        } catch (DAOException ex) {
+        } catch (DAOException | SQLException ex) {
             throw new DataManagerException(ex);
         }
 
@@ -146,13 +150,14 @@ public class DataManagerUtil {
                 Server.getInstance().getDataManagerUsersHome(),
                 Server.getInstance().getAltDataManagerUsersHome());
 
-        try {
-            for (Group group : CoreDAOFactory.getDAOFactory().getGroupDAO().getGroups()) {
+        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
+            for (Group group : CoreDAOFactory.getDAOFactory()
+                     .getGroupDAO(connection).getGroups()) {
                 baseDir = replaceLfnGroupPrefix(baseDir, group.getName(),
                         server.getDataManagerGroupsHome(),
                         server.getAltDataManagerGroupsHome());
             }
-        } catch (DAOException ex) {
+        } catch (DAOException | SQLException ex) {
             throw new DataManagerException(ex);
         }
 

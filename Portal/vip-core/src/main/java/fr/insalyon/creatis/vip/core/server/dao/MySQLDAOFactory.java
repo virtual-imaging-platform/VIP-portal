@@ -37,6 +37,7 @@ import fr.insalyon.creatis.vip.core.server.dao.mysql.PublicationData;
 import fr.insalyon.creatis.vip.core.server.dao.mysql.TermsUseData;
 import fr.insalyon.creatis.vip.core.server.dao.mysql.UserData;
 import fr.insalyon.creatis.vip.core.server.dao.mysql.UsersGroupsData;
+import java.sql.Connection;
 
 /**
  *
@@ -63,27 +64,30 @@ public class MySQLDAOFactory extends CoreDAOFactory {
     }
 
     @Override
-    public GroupDAO getGroupDAO() throws DAOException {
-        return new GroupData();
+    public GroupDAO getGroupDAO(Connection connection) throws DAOException {
+        return new GroupData(connection);
     }
 
     @Override
-    public UsersGroupsDAO getUsersGroupsDAO() throws DAOException {
-        return new UsersGroupsData();
+    public UsersGroupsDAO getUsersGroupsDAO(Connection connection)
+        throws DAOException {
+        return new UsersGroupsData(connection);
     }
 
     @Override
-    public AccountDAO getAccountDAO() throws DAOException {
-        return new AccountData();
+    public AccountDAO getAccountDAO(Connection connection) throws DAOException {
+        return new AccountData(connection);
     }
 
     @Override
-    public PublicationDAO getPublicationDAO() throws DAOException {
-        return new PublicationData();
+    public PublicationDAO getPublicationDAO(Connection connection)
+        throws DAOException {
+        return new PublicationData(connection);
     }
 
     @Override
-    public TermsUseDAO getTermsUseDAO() throws DAOException {
-        return new TermsUseData();
+    public TermsUseDAO getTermsUseDAO(Connection connection)
+        throws DAOException {
+        return new TermsUseData(connection);
     }
 }

@@ -4,16 +4,16 @@
  * This software is a web portal for pipeline execution on distributed systems.
  *
  * This software is governed by the CeCILL-B license under French law and
- * abiding by the rules of distribution of free software.  You can  use, 
+ * abiding by the rules of distribution of free software.  You can  use,
  * modify and/ or redistribute the software under the terms of the CeCILL-B
  * license as circulated by CEA, CNRS and INRIA at the following URL
- * "http://www.cecill.info". 
+ * "http://www.cecill.info".
  *
  * As a counterpart to the access to the source code and  rights to copy,
  * modify and redistribute granted by the license, users are provided only
  * with a limited warranty  and the software's author,  the holder of the
  * economic rights,  and the successive licensors  have only  limited
- * liability. 
+ * liability.
  *
  * In this respect, the user's attention is drawn to the risks associated
  * with loading,  using,  modifying and/or developing or reproducing the
@@ -22,9 +22,9 @@
  * therefore means  that it is reserved for developers  and  experienced
  * professionals having in-depth computer knowledge. Users are therefore
  * encouraged to load and test the software's suitability as regards their
- * requirements in conditions enabling the security of their systems and/or 
- * data to be ensured and,  more generally, to use and operate it in the 
- * same conditions as regards security. 
+ * requirements in conditions enabling the security of their systems and/or
+ * data to be ensured and,  more generally, to use and operate it in the
+ * same conditions as regards security.
  *
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL-B license and that you accept its terms.
@@ -47,6 +47,7 @@ import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.net.URL;
 import java.security.*;
+import java.sql.Connection;
 import java.sql.Timestamp;
 import java.text.Normalizer;
 import java.util.*;
@@ -119,7 +120,10 @@ public class ConfigurationBusiness {
         }
     }
 
-    public void signup(User user, String comments, boolean automaticCreation, boolean mapPrivateGroups, String... accountType) throws BusinessException {
+    public void signup(User user, String comments, boolean automaticCreation,
+                       boolean mapPrivateGroups, Connection connection,
+                       String... accountType)
+        throws BusinessException {
 
         verifyEmail(user.getEmail());
 
@@ -135,7 +139,7 @@ public class ConfigurationBusiness {
         }
         message.append(".");
         logger.info(message.toString());
-        
+
         // Check if country is undesired
         for (String udc : Server.getInstance().getUndesiredCountries()) {
             if (udc.trim().isEmpty()) {
@@ -173,10 +177,13 @@ public class ConfigurationBusiness {
             // Adding user to groups
             List<Group> groups = null;
             if (accountType != null) {
-                groups = CoreDAOFactory.getDAOFactory().getAccountDAO().getGroups(accountType);
+                groups = CoreDAOFactory.getDAOFactory().getAccountDAO(connection)
+                    .getGroups(accountType);
                 for (Group group : groups) {
                     if (mapPrivateGroups || automaticCreation || group.isPublicGroup()) {
-                        CoreDAOFactory.getDAOFactory().getUsersGroupsDAO().add(user.getEmail(), group.getName(), GROUP_ROLE.User);
+                        CoreDAOFactory.getDAOFactory()
+                            .getUsersGroupsDAO(connection)
+                            .add(user.getEmail(), group.getName(), GROUP_ROLE.User);
                     } else {
                         logger.info("Don't map user " + user.getEmail() + " to private group " + group.getName());
                     }
@@ -322,9 +329,10 @@ public class ConfigurationBusiness {
      * @param accountType
      * @throws BusinessException
      */
-    public void signup(User user, String comments, String... accountType) throws BusinessException {
-        signup(user, comments, false, false, accountType);
-
+    public void signup(User user, String comments, Connection connection,
+                       String... accountType)
+        throws BusinessException {
+        signup(user, comments, false, false, connection, accountType);
     }
 
     /**
@@ -726,15 +734,14 @@ public class ConfigurationBusiness {
      * @return
      * @throws BusinessException
      */
-    public void addGroup(Group group) throws BusinessException {
-
+    public void addGroup(Group group, Connection connection)
+        throws BusinessException {
         try {
             GRIDAClient client = CoreUtil.getGRIDAClient();
             client.createFolder(Server.getInstance().getDataManagerGroupsHome(),
                                 group.getName().replaceAll(" ", "_"));
 
-            CoreDAOFactory.getDAOFactory().getGroupDAO().add(group);
-
+            CoreDAOFactory.getDAOFactory().getGroupDAO(connection).add(group);
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         } catch (GRIDAClientException ex) {
@@ -749,14 +756,14 @@ public class ConfigurationBusiness {
      * @param groupName
      * @throws BusinessException
      */
-    public void removeGroup(String user, String groupName) throws BusinessException {
-
+    public void removeGroup(String user, String groupName, Connection connection)
+        throws BusinessException {
         try {
             GRIDAPoolClient client = CoreUtil.getGRIDAPoolClient();
             client.delete(Server.getInstance().getDataManagerGroupsHome() + "/"
                           + groupName.replaceAll(" ", "_"), user);
-            CoreDAOFactory.getDAOFactory().getGroupDAO().remove(groupName);
-
+            CoreDAOFactory.getDAOFactory().getGroupDAO(connection)
+                .remove(groupName);
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         } catch (GRIDAClientException ex) {
@@ -771,8 +778,8 @@ public class ConfigurationBusiness {
      * @param group
      * @throws BusinessException
      */
-    public void updateGroup(String name, Group group) throws BusinessException {
-
+    public void updateGroup(String name, Group group, Connection connection)
+        throws BusinessException {
         try {
             GRIDAClient client = CoreUtil.getGRIDAClient();
             if (!name.equals(group.getName())) {
@@ -780,9 +787,8 @@ public class ConfigurationBusiness {
                         Server.getInstance().getDataManagerGroupsHome() + "/" + name.replaceAll(" ", "_"),
                         Server.getInstance().getDataManagerGroupsHome() + "/" + group.getName().replaceAll(" ", "_"));
             }
-
-            CoreDAOFactory.getDAOFactory().getGroupDAO().update(name, group);
-
+            CoreDAOFactory.getDAOFactory().getGroupDAO(connection)
+                .update(name, group);
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         } catch (GRIDAClientException ex) {
@@ -795,30 +801,30 @@ public class ConfigurationBusiness {
      *
      * @return @throws BusinessException
      */
-    public List<Group> getGroups() throws BusinessException {
-
+    public List<Group> getGroups(Connection connection)
+        throws BusinessException {
         try {
-            return CoreDAOFactory.getDAOFactory().getGroupDAO().getGroups();
-
+            return CoreDAOFactory.getDAOFactory().getGroupDAO(connection)
+                .getGroups();
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }
     }
 
-    public List<Group> getPublicGroups() throws BusinessException {
+    public List<Group> getPublicGroups(Connection connection)
+        throws BusinessException {
         try {
             List<Group> publicGroups = new ArrayList<Group>();
-            for (Group g : CoreDAOFactory.getDAOFactory().getGroupDAO().getGroups()) {
+            for (Group g : CoreDAOFactory.getDAOFactory().getGroupDAO(connection)
+                     .getGroups()) {
                 if (g.isPublicGroup()) {
                     publicGroups.add(g);
                 }
             }
             return publicGroups;
-
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }
-
     }
 
     /**
@@ -827,20 +833,24 @@ public class ConfigurationBusiness {
      * @return
      * @throws BusinessException
      */
-    public Map<Group, CoreConstants.GROUP_ROLE> getUserGroups(String email) throws BusinessException {
-
+    public Map<Group, CoreConstants.GROUP_ROLE> getUserGroups(
+        String email, Connection connection)
+        throws BusinessException {
         try {
-            return CoreDAOFactory.getDAOFactory().getUsersGroupsDAO().getUserGroups(email);
+            return CoreDAOFactory.getDAOFactory().getUsersGroupsDAO(connection)
+                .getUserGroups(email);
 
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }
     }
 
-    public List<Boolean> getUserPropertiesGroups(String email) throws BusinessException {
-
+    public List<Boolean> getUserPropertiesGroups(
+        String email, Connection connection)
+        throws BusinessException {
         try {
-            return CoreDAOFactory.getDAOFactory().getUsersGroupsDAO().getUserPropertiesGroups(email);
+            return CoreDAOFactory.getDAOFactory().getUsersGroupsDAO(connection)
+                .getUserPropertiesGroups(email);
 
         } catch (DAOException ex) {
             throw new BusinessException(ex);
@@ -864,12 +874,13 @@ public class ConfigurationBusiness {
      * @param groups
      * @throws BusinessException
      */
-    public void setUserGroups(String email, Map<String, CoreConstants.GROUP_ROLE> groups)
-            throws BusinessException {
-
+    public void setUserGroups(
+        String email, Map<String, CoreConstants.GROUP_ROLE> groups,
+        Connection connection)
+        throws BusinessException {
         try {
-            CoreDAOFactory.getDAOFactory().getUsersGroupsDAO().setUserGroups(email, groups);
-
+            CoreDAOFactory.getDAOFactory().getUsersGroupsDAO(connection)
+                .setUserGroups(email, groups);
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }
@@ -934,7 +945,9 @@ public class ConfigurationBusiness {
         }
     }
 
-    public void updateUserEmail(String oldEmail, String newEmail) throws BusinessException {
+    public void updateUserEmail(
+        String oldEmail, String newEmail, Connection connection)
+        throws BusinessException {
         verifyEmail(newEmail);
         try {
             CoreDAOFactory.getDAOFactory().getUserDAO().updateEmail(oldEmail, newEmail);
@@ -948,7 +961,7 @@ public class ConfigurationBusiness {
         try {
             // need to update publication separately as the table does not
             // support foreign keys
-            updatePublicationOwner(oldEmail, newEmail);
+            updatePublicationOwner(oldEmail, newEmail, connection);
         } catch (BusinessException e) {
             // ignore the error as the email has been successfully
             // changed and the user user should not have an error
@@ -997,8 +1010,8 @@ public class ConfigurationBusiness {
      * @throws BusinessException
      */
     public void sendContactMail(User user, String category, String subject,
-                                String comment) throws BusinessException {
-
+                                String comment, Connection connection)
+        throws BusinessException {
         try {
             String emailContent = "<html>"
                                   + "<head></head>"
@@ -1015,7 +1028,9 @@ public class ConfigurationBusiness {
                                   + "</body>"
                                   + "</html>";
 
-            for (User u : CoreDAOFactory.getDAOFactory().getUsersGroupsDAO().getUsersFromGroup(CoreConstants.GROUP_SUPPORT)) {
+            for (User u : CoreDAOFactory.getDAOFactory()
+                     .getUsersGroupsDAO(connection)
+                     .getUsersFromGroup(CoreConstants.GROUP_SUPPORT)) {
                 CoreUtil.sendEmail("[VIP Contact] " + category, emailContent,
                                    new String[]{u.getEmail()}, true, user.getEmail());
             }
@@ -1045,11 +1060,12 @@ public class ConfigurationBusiness {
      * @param groupName
      * @throws BusinessException
      */
-    public void addUserToGroup(String email, String groupName) throws BusinessException {
-
+    public void addUserToGroup(
+        String email, String groupName, Connection connection)
+        throws BusinessException {
         try {
-            CoreDAOFactory.getDAOFactory().getUsersGroupsDAO().add(email, groupName, GROUP_ROLE.User);
-
+            CoreDAOFactory.getDAOFactory().getUsersGroupsDAO(connection)
+                .add(email, groupName, GROUP_ROLE.User);
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }
@@ -1082,10 +1098,11 @@ public class ConfigurationBusiness {
      * @return
      * @throws BusinessException
      */
-    public List<User> getUsersFromGroup(String groupName) throws BusinessException {
-
+    public List<User> getUsersFromGroup(String groupName, Connection connection)
+        throws BusinessException {
         try {
-            return CoreDAOFactory.getDAOFactory().getUsersGroupsDAO().getUsersFromGroup(groupName);
+            return CoreDAOFactory.getDAOFactory().getUsersGroupsDAO(connection)
+                .getUsersFromGroup(groupName);
 
         } catch (DAOException ex) {
             throw new BusinessException(ex);
@@ -1098,10 +1115,12 @@ public class ConfigurationBusiness {
      * @param groupName
      * @throws BusinessException
      */
-    public void removeUserFromGroup(String email, String groupName) throws BusinessException {
-
+    public void removeUserFromGroup(
+        String email, String groupName, Connection connection)
+        throws BusinessException {
         try {
-            CoreDAOFactory.getDAOFactory().getUsersGroupsDAO().removeUserFromGroup(email, groupName);
+            CoreDAOFactory.getDAOFactory().getUsersGroupsDAO(connection)
+                .removeUserFromGroup(email, groupName);
 
         } catch (DAOException ex) {
             throw new BusinessException(ex);
@@ -1156,10 +1175,11 @@ public class ConfigurationBusiness {
      *
      * @return @throws BusinessException
      */
-    public List<Account> getAccounts() throws BusinessException {
-
+    public List<Account> getAccounts(Connection connection)
+        throws BusinessException {
         try {
-            return CoreDAOFactory.getDAOFactory().getAccountDAO().getList();
+            return CoreDAOFactory.getDAOFactory().getAccountDAO(connection)
+                .getList();
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }
@@ -1171,10 +1191,12 @@ public class ConfigurationBusiness {
      * @param groups
      * @throws BusinessException
      */
-    public void addAccount(String name, List<String> groups) throws BusinessException {
-
+    public void addAccount(
+        String name, List<String> groups, Connection connection)
+        throws BusinessException {
         try {
-            CoreDAOFactory.getDAOFactory().getAccountDAO().add(name, groups);
+            CoreDAOFactory.getDAOFactory().getAccountDAO(connection)
+                .add(name, groups);
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }
@@ -1187,10 +1209,12 @@ public class ConfigurationBusiness {
      * @param groups
      * @throws BusinessException
      */
-    public void updateAccount(String oldName, String newName, List<String> groups) throws BusinessException {
-
+    public void updateAccount(
+        String oldName, String newName, List<String> groups, Connection connection)
+        throws BusinessException {
         try {
-            CoreDAOFactory.getDAOFactory().getAccountDAO().update(oldName, newName, groups);
+            CoreDAOFactory.getDAOFactory().getAccountDAO(connection)
+                .update(oldName, newName, groups);
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }
@@ -1201,10 +1225,11 @@ public class ConfigurationBusiness {
      * @param name
      * @throws BusinessException
      */
-    public void removeAccount(String name) throws BusinessException {
-
+    public void removeAccount(String name, Connection connection)
+        throws BusinessException {
         try {
-            CoreDAOFactory.getDAOFactory().getAccountDAO().remove(name);
+            CoreDAOFactory.getDAOFactory().getAccountDAO(connection)
+                .remove(name);
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }
@@ -1223,12 +1248,15 @@ public class ConfigurationBusiness {
         return Server.getInstance().getCasURL() + "/login?service=" + serviceURL;
     }
 
-    public User getOrCreateUser(String email, String defaultAccountType) throws BusinessException {
+    public User getOrCreateUser(
+        String email, String defaultAccountType, Connection connection)
+        throws BusinessException {
+
         User user;
         try {
             user = getUserWithSession(email);
         } catch (DAOException ex) {
-            //User doesn't exist: let's create an account 
+            //User doesn't exist: let's create an account
             String name = email.substring(0, email.indexOf('@'));
             String firstName = name, lastName = name;
 
@@ -1243,13 +1271,15 @@ public class ConfigurationBusiness {
 
             user = getNewUser(email, firstName, lastName);
             try {
-                signup(user, "Generated automatically", true, true, defaultAccountType);
+                signup(user, "Generated automatically", true, true, connection,
+                       defaultAccountType);
             } catch (BusinessException ex2) {
                 if (ex2.getMessage().contains("existing")) {
                     //try with a different last name
                     lastName += "_" + System.currentTimeMillis();
                     user = getNewUser(email, firstName, lastName);
-                    signup(user, "Generated automatically", true, true, defaultAccountType);
+                    signup(user, "Generated automatically", true, true,
+                           connection, defaultAccountType);
                 }
             }
             activateUser(user.getEmail());
@@ -1268,84 +1298,90 @@ public class ConfigurationBusiness {
      *
      * @return @throws BusinessException
      */
-    public List<Publication> getPublications() throws BusinessException {
-
+    public List<Publication> getPublications(Connection connection)
+        throws BusinessException {
         try {
-            return CoreDAOFactory.getDAOFactory().getPublicationDAO().getList();
+            return CoreDAOFactory.getDAOFactory().getPublicationDAO(connection)
+                .getList();
         } catch (DAOException ex) {
             logger.error(ex);
             throw new BusinessException(ex);
         }
     }
 
-    public void removePublication(Long id) throws BusinessException {
-
+    public void removePublication(Long id, Connection connection)
+        throws BusinessException {
         try {
-            CoreDAOFactory.getDAOFactory().getPublicationDAO().remove(id);
+            CoreDAOFactory.getDAOFactory().getPublicationDAO(connection)
+                .remove(id);
         } catch (DAOException ex) {
             logger.error(ex);
             throw new BusinessException(ex);
         }
     }
 
-    public void addPublication(Publication pub) throws BusinessException {
-
+    public void addPublication(Publication pub, Connection connection)
+        throws BusinessException {
         try {
-            CoreDAOFactory.getDAOFactory().getPublicationDAO().add(pub);
+            CoreDAOFactory.getDAOFactory().getPublicationDAO(connection)
+                .add(pub);
         } catch (DAOException ex) {
             logger.error(ex);
             throw new BusinessException(ex);
         }
     }
 
-    public void updatePublication(Publication pub) throws BusinessException {
-
+    public void updatePublication(Publication pub, Connection connection)
+        throws BusinessException {
         try {
-            CoreDAOFactory.getDAOFactory().getPublicationDAO().update(pub);
+            CoreDAOFactory.getDAOFactory().getPublicationDAO(connection)
+                .update(pub);
         } catch (DAOException ex) {
             logger.error(ex);
             throw new BusinessException(ex);
         }
     }
 
-    public void updatePublicationOwner(String oldOwnerEmail, String newOwnerEmail) throws BusinessException {
-
+    public void updatePublicationOwner(
+        String oldOwnerEmail, String newOwnerEmail, Connection connection)
+        throws BusinessException {
         try {
-            CoreDAOFactory.getDAOFactory().getPublicationDAO().updateOwnerEmail(oldOwnerEmail, newOwnerEmail);
+            CoreDAOFactory.getDAOFactory().getPublicationDAO(connection)
+                .updateOwnerEmail(oldOwnerEmail, newOwnerEmail);
         } catch (DAOException ex) {
             logger.error(ex);
             throw new BusinessException(ex);
         }
     }
 
-    public Publication getPublication(Long id) throws BusinessException {
-
+    public Publication getPublication(Long id, Connection connection)
+        throws BusinessException {
         try {
-
-            return CoreDAOFactory.getDAOFactory().getPublicationDAO().getPublication(id);
+            return CoreDAOFactory.getDAOFactory().getPublicationDAO(connection)
+                .getPublication(id);
         } catch (DAOException ex) {
             logger.error(ex);
             throw new BusinessException(ex);
         }
     }
 
-    public void addTermsUse(TermsOfUse termsOfUse) throws BusinessException {
-
+    public void addTermsUse(TermsOfUse termsOfUse, Connection connection)
+        throws BusinessException {
         try {
-
             termsOfUse.setDate(getCurrentTimeStamp());
-            CoreDAOFactory.getDAOFactory().getTermsUseDAO().add(termsOfUse);
+            CoreDAOFactory.getDAOFactory().getTermsUseDAO(connection)
+                .add(termsOfUse);
         } catch (DAOException ex) {
             logger.error(ex);
             throw new BusinessException(ex);
         }
     }
 
-    public Timestamp getLastUpdateTermsOfUse() throws BusinessException {
-
+    public Timestamp getLastUpdateTermsOfUse(Connection connection)
+        throws BusinessException {
         try {
-
-            return CoreDAOFactory.getDAOFactory().getTermsUseDAO().getLastUpdateTermsOfUse();
+            return CoreDAOFactory.getDAOFactory().getTermsUseDAO(connection)
+                .getLastUpdateTermsOfUse();
         } catch (DAOException ex) {
             logger.error(ex);
             throw new BusinessException(ex);

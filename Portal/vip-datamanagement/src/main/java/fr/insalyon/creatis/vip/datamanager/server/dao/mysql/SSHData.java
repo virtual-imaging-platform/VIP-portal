@@ -60,7 +60,11 @@ public class SSHData implements SSHDAO {
     private Connection connection;
 
     public SSHData() throws DAOException {
-        connection = PlatformConnection.getInstance().getConnection();
+        try {
+            connection = PlatformConnection.getInstance().getConnection();
+        } catch (SQLException ex) {
+            throw new DAOException(ex);
+        }
     }
 
     @Override

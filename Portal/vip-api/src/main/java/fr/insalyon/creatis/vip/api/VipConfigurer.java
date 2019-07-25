@@ -32,7 +32,6 @@
 package fr.insalyon.creatis.vip.api;
 
 import fr.insalyon.creatis.vip.core.server.business.*;
-import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import fr.insalyon.creatis.vip.core.server.dao.mysql.PlatformConnection;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,11 +62,7 @@ public class VipConfigurer implements ApplicationListener<ContextRefreshedEvent>
     @Override
     public void onApplicationEvent(ContextRefreshedEvent event) {
         logger.info("Init VIP : initialize database");
-        try {
-            PlatformConnection.getInstance();
-        } catch (DAOException e) {
-            throw new RuntimeException("Cannot init VIP", e);
-        }
+        PlatformConnection.getInstance();
         configureIfNecessary();
     }
 

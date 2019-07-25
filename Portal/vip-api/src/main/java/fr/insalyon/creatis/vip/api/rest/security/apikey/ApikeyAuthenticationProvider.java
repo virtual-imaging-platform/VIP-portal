@@ -38,6 +38,7 @@ import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.server.business.*;
 import fr.insalyon.creatis.vip.core.server.dao.*;
+import fr.insalyon.creatis.vip.core.server.dao.mysql.PlatformConnection;
 import org.apache.commons.logging.*;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,6 +50,8 @@ import org.springframework.security.core.userdetails.*;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.Map;
 
 /**
@@ -107,12 +110,13 @@ public class ApikeyAuthenticationProvider implements
         }
         logger.debug("apikey OK for " + vipUser.getEmail());
         UserDetails springUser;
-        try {
+        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
             Map<Group, CoreConstants.GROUP_ROLE> groups =
-                    configurationBusiness.getUserGroups(vipUser.getEmail());
+                configurationBusiness.getUserGroups(
+                    vipUser.getEmail(), connection);
             vipUser.setGroups(groups);
             springUser = new SpringCompatibleUser(vipUser);
-        } catch (BusinessException e) {
+        } catch (BusinessException | SQLException e) {
             logger.error("error when getting user groups" + vipUser.getEmail(), e);
             logger.error("Doing as if there is an auth error");
             throw new BadCredentialsException(messages.getMessage(

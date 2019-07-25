@@ -4,16 +4,16 @@
  * This software is a web portal for pipeline execution on distributed systems.
  *
  * This software is governed by the CeCILL-B license under French law and
- * abiding by the rules of distribution of free software.  You can  use, 
+ * abiding by the rules of distribution of free software.  You can  use,
  * modify and/ or redistribute the software under the terms of the CeCILL-B
  * license as circulated by CEA, CNRS and INRIA at the following URL
- * "http://www.cecill.info". 
+ * "http://www.cecill.info".
  *
  * As a counterpart to the access to the source code and  rights to copy,
  * modify and redistribute granted by the license, users are provided only
  * with a limited warranty  and the software's author,  the holder of the
  * economic rights,  and the successive licensors  have only  limited
- * liability. 
+ * liability.
  *
  * In this respect, the user's attention is drawn to the risks associated
  * with loading,  using,  modifying and/or developing or reproducing the
@@ -22,9 +22,9 @@
  * therefore means  that it is reserved for developers  and  experienced
  * professionals having in-depth computer knowledge. Users are therefore
  * encouraged to load and test the software's suitability as regards their
- * requirements in conditions enabling the security of their systems and/or 
- * data to be ensured and,  more generally, to use and operate it in the 
- * same conditions as regards security. 
+ * requirements in conditions enabling the security of their systems and/or
+ * data to be ensured and,  more generally, to use and operate it in the
+ * same conditions as regards security.
  *
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL-B license and that you accept its terms.
@@ -74,6 +74,7 @@ import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerException;
 import fr.insalyon.creatis.vip.datamanager.server.DataManagerUtil;
 import fr.insalyon.creatis.vip.datamanager.server.business.DataManagerBusiness;
 import java.io.File;
+import java.sql.Connection;
 import java.util.*;
 import java.util.logging.Level;
 import org.apache.commons.io.FileUtils;
@@ -120,7 +121,7 @@ public class WorkflowBusiness {
         Engine engineBean = null;
         try {
             List<Engine> availableEngines = ApplicationDAOFactory.getDAOFactory().getEngineDAO().getByClass(applicationClass);
-            for (Engine engine : availableEngines) {                
+            for (Engine engine : availableEngines) {
                 long runningWorkflows = workflowDAO.getNumberOfRunningPerEngine(engine.getEndpoint());
                 if (runningWorkflows < min) {
                     min = runningWorkflows;
@@ -137,11 +138,11 @@ public class WorkflowBusiness {
             throw new BusinessException("No available engines for class " + applicationClass);
         } else {
             return engineBean;
-        }      
+        }
     }
-    
+
     private Engine selectRandomEngine(String applicationClass) throws BusinessException {
-        
+
         Engine engineBean = null;
         try {
             List<Engine> availableEngines = ApplicationDAOFactory.getDAOFactory().getEngineDAO().getByClass(applicationClass);
@@ -153,11 +154,11 @@ public class WorkflowBusiness {
         }
         if (engineBean == null || engineBean.getEndpoint().isEmpty()) {
             throw new BusinessException("No available engines for class " + applicationClass);
-        } 
-        
-        return engineBean;   
+        }
+
+        return engineBean;
     }
-    
+
     /**
      *
      * @param user
@@ -170,10 +171,11 @@ public class WorkflowBusiness {
      * @return
      * @throws BusinessException
      */
-    public synchronized String launch(User user, List<String> groups,
-            Map<String, String> parametersMap, String applicationName,
-            String applicationVersion, String applicationClass,
-            String simulationName) throws BusinessException {
+    public synchronized String launch(
+        User user, List<String> groups,
+        Map<String, String> parametersMap, String applicationName,
+        String applicationVersion, String applicationClass,
+        String simulationName, Connection connection) throws BusinessException {
 
         try {
             long runningWorkflows = workflowDAO.getNumberOfRunning(user.getFullName());
@@ -255,7 +257,9 @@ public class WorkflowBusiness {
                 if (workflow == null) {
                     engine.setStatus("disabled");
                     this.engineBusiness.update(engine);
-                    for (User u : CoreDAOFactory.getDAOFactory().getUsersGroupsDAO().getUsersFromGroup(CoreConstants.GROUP_SUPPORT)) {
+                    for (User u : CoreDAOFactory.getDAOFactory()
+                             .getUsersGroupsDAO(connection)
+                             .getUsersFromGroup(CoreConstants.GROUP_SUPPORT)) {
                         logger.info("Sending warning email to user " + u.toString() + " having email address " + u.getEmail());
                         CoreUtil.sendEmail("Urgent: VIP engine disabled",
                                 "Engine " + engine.getName() + " has just been disabled. Please check that there is at least one active engine left.",
@@ -273,7 +277,7 @@ public class WorkflowBusiness {
         } catch (WorkflowsDBDAOException | DAOException | DataManagerException ex) {
             logger.error(ex);
             throw new BusinessException(ex);
-        } 
+        }
     }
 
     /**
@@ -458,7 +462,7 @@ public class WorkflowBusiness {
             throw new BusinessException(ex);
         }
     }
-    
+
     /**
      *
      * @param simulationId
@@ -651,7 +655,7 @@ public class WorkflowBusiness {
                 if (processor.getCompleted() + processor.getQueued() + processor.getFailed() > 0) {
 //                    if (failed > 0) {
 //                        status = ProcessorStatus.Failed;
-//                    } else 
+//                    } else
                     if (processor.getQueued() > 0) {
                         status = ProcessorStatus.Active;
                     } else {
@@ -834,8 +838,8 @@ public class WorkflowBusiness {
         }
     }
 
-   
-    
+
+
     /**
      *
      * @param list
@@ -875,7 +879,7 @@ public class WorkflowBusiness {
                 WorkflowExecutionBusiness executionBusiness = new WorkflowExecutionBusiness(simulation.getEngine());
                 SimulationStatus simulationStatus = executionBusiness.getStatus(simulation.getID());
 
-                if (simulationStatus != SimulationStatus.Running 
+                if (simulationStatus != SimulationStatus.Running
                         && simulationStatus != SimulationStatus.Unknown) {
                     simulation.setStatus(simulationStatus);
                     Workflow workflow = workflowDAO.get(simulation.getID());

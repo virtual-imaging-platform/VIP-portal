@@ -38,7 +38,6 @@ import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.server.auth.AbstractAuthenticationService;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
-import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import fr.insalyon.creatis.vip.core.server.dao.mysql.PlatformConnection;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
@@ -86,25 +85,21 @@ public class SoapApiBusiness {
             HttpServletResponse response,
             boolean authenticate) throws ApiException {
 
-        try {
-            // set DB connection
-            PlatformConnection.getInstance();
+        // set DB connection
+        PlatformConnection.getInstance();
 
-            //set request and response
-            HttpSession session = request.getSession();
-            if (session == null) {
-                throw new ApiException("No session in WebServiceContext");
-            }
-
-            // Authentication
-            User user = null;
-            if (authenticate) {
-                user = authenticateSession(request, response);
-            }
-            return new ApiContext(request, response, user);
-        } catch (DAOException ex) {
-            throw new ApiException(ex);
+        //set request and response
+        HttpSession session = request.getSession();
+        if (session == null) {
+            throw new ApiException("No session in WebServiceContext");
         }
+
+        // Authentication
+        User user = null;
+        if (authenticate) {
+            user = authenticateSession(request, response);
+        }
+        return new ApiContext(request, response, user);
     }
 
     protected final User authenticateSession(HttpServletRequest request, HttpServletResponse response) throws ApiException {

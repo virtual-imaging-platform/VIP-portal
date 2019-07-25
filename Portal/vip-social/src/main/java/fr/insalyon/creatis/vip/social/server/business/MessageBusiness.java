@@ -4,16 +4,16 @@
  * This software is a web portal for pipeline execution on distributed systems.
  *
  * This software is governed by the CeCILL-B license under French law and
- * abiding by the rules of distribution of free software.  You can  use, 
+ * abiding by the rules of distribution of free software.  You can  use,
  * modify and/ or redistribute the software under the terms of the CeCILL-B
  * license as circulated by CEA, CNRS and INRIA at the following URL
- * "http://www.cecill.info". 
+ * "http://www.cecill.info".
  *
  * As a counterpart to the access to the source code and  rights to copy,
  * modify and redistribute granted by the license, users are provided only
  * with a limited warranty  and the software's author,  the holder of the
  * economic rights,  and the successive licensors  have only  limited
- * liability. 
+ * liability.
  *
  * In this respect, the user's attention is drawn to the risks associated
  * with loading,  using,  modifying and/or developing or reproducing the
@@ -22,9 +22,9 @@
  * therefore means  that it is reserved for developers  and  experienced
  * professionals having in-depth computer knowledge. Users are therefore
  * encouraged to load and test the software's suitability as regards their
- * requirements in conditions enabling the security of their systems and/or 
- * data to be ensured and,  more generally, to use and operate it in the 
- * same conditions as regards security. 
+ * requirements in conditions enabling the security of their systems and/or
+ * data to be ensured and,  more generally, to use and operate it in the
+ * same conditions as regards security.
  *
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL-B license and that you accept its terms.
@@ -46,6 +46,7 @@ import fr.insalyon.creatis.vip.social.server.dao.MessageDAO;
 import fr.insalyon.creatis.vip.social.server.dao.SocialDAOFactory;
 
 import java.util.*;
+import java.sql.Connection;
 
 /**
  *
@@ -225,8 +226,10 @@ public class MessageBusiness {
         }
     }
 
-    public void copyMessageToVipSupport(User sender, String[] recipients,
-                                        String subject, String message) throws BusinessException {
+    public void copyMessageToVipSupport(
+        User sender, String[] recipients, String subject, String message,
+        Connection connection)
+        throws BusinessException {
 
         try {
             String emailContent = "<html>"
@@ -244,19 +247,23 @@ public class MessageBusiness {
             String subjectInfo = recipients.length == 1 ?
                     "to " + recipients[0] : "from " + sender.getFullName();
 
-            for (User u : CoreDAOFactory.getDAOFactory().getUsersGroupsDAO().getUsersFromGroup(CoreConstants.GROUP_SUPPORT)) {
+            for (User u : CoreDAOFactory.getDAOFactory()
+                     .getUsersGroupsDAO(connection)
+                     .getUsersFromGroup(CoreConstants.GROUP_SUPPORT)) {
                 CoreUtil.sendEmail(
-                        "[VIP Support Copy] " + subject + "(" + subjectInfo + ")",
-                        emailContent,
-                        new String[]{u.getEmail()}, true, sender.getEmail());
+                    "[VIP Support Copy] " + subject + "(" + subjectInfo + ")",
+                    emailContent,
+                    new String[]{u.getEmail()}, true, sender.getEmail());
             }
-
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }
     }
 
-    public void sendMessageToVipSupport(User user, String subject, String message, List<String> workflowIDs, List<String> simulationNames) throws BusinessException {
+    public void sendMessageToVipSupport(
+        User user, String subject, String message, List<String> workflowIDs,
+        List<String> simulationNames, Connection connection)
+        throws BusinessException {
 
         try {
             String emailContent = "<html>"
@@ -271,11 +278,14 @@ public class MessageBusiness {
                     + "</body>"
                     + "</html>";
 
-            for (User u : CoreDAOFactory.getDAOFactory().getUsersGroupsDAO().getUsersFromGroup(CoreConstants.GROUP_SUPPORT)) {
-                CoreUtil.sendEmail("[VIP Contact] " + subject + " (" + user.getFullName() + ")", emailContent,
-                        new String[]{u.getEmail()}, true, user.getEmail());
+            for (User u : CoreDAOFactory.getDAOFactory()
+                     .getUsersGroupsDAO(connection)
+                     .getUsersFromGroup(CoreConstants.GROUP_SUPPORT)) {
+                CoreUtil.sendEmail(
+                    "[VIP Contact] " + subject + " (" + user.getFullName() + ")",
+                    emailContent,
+                    new String[]{u.getEmail()}, true, user.getEmail());
             }
-
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }

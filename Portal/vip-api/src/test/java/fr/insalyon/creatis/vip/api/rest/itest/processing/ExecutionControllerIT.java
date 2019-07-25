@@ -185,8 +185,10 @@ public class ExecutionControllerIT extends BaseVIPSpringIT {
         // configure pipeline input
         configureAnApplication(this, baseUser1, app1, version42, 0, 1);
         // configure lauch
-        when(workflowBusiness.launch(eq(baseUser1), anyList(), anyMap(), eq(app1.getName()),
-                eq(version42.getVersion()), eq(class1.getName()), eq(execution1.getName())))
+        when(workflowBusiness.launch(
+                 eq(baseUser1), anyList(), anyMap(), eq(app1.getName()),
+                 eq(version42.getVersion()), eq(class1.getName()),
+                 eq(execution1.getName()), any()))
                 .thenReturn(execution1.getIdentifier());
         // configure returne execution
         when(workflowBusiness.getSimulation(execution1.getIdentifier(), true))
@@ -196,7 +198,7 @@ public class ExecutionControllerIT extends BaseVIPSpringIT {
         when(workflowBusiness.getOutputData(simulation1.getID(), baseUser1.getFolder()))
                 .thenReturn(simulation1OutData);
         // misc config
-        when(configurationBusiness.getUserGroups(baseUser1.getEmail()))
+        when(configurationBusiness.getUserGroups(baseUser1.getEmail(), any()))
                 .thenReturn(new HashMap<>());
         mockMvc.perform(
                 post("/rest/executions").contentType("application/json")
@@ -210,8 +212,10 @@ public class ExecutionControllerIT extends BaseVIPSpringIT {
                 ));
         ArgumentCaptor<Map> inputCaptor =
                 ArgumentCaptor.forClass(Map.class);
-        verify(workflowBusiness).launch(eq(baseUser1), anyList(), inputCaptor.capture(), eq(app1.getName()),
-                eq(version42.getVersion()), eq(class1.getName()), eq(execution1.getName()));
+        verify(workflowBusiness).launch(
+            eq(baseUser1), anyList(), inputCaptor.capture(), eq(app1.getName()),
+            eq(version42.getVersion()), eq(class1.getName()),
+            eq(execution1.getName()), null);
         Assert.assertEquals(inputCaptor.getValue().size(), 2);
         Assert.<Map<?, ?>>assertThat(inputCaptor.getValue(), allOf(
                 hasEntry("param 1", "test text"),
