@@ -73,8 +73,7 @@ class MySQLDAOFactory extends SSHDAOFactory {
     }
 
     @Override
-    public SSHDAO getSSHDAO() throws DAOException {
-        return new SSHData();
+    public SSHDAO getSSHDAO(Connection connection) throws DAOException {
+        return new SSHData(connection);
     }
-
 }

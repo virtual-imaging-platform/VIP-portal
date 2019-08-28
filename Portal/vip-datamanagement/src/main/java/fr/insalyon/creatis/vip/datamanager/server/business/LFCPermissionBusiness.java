@@ -40,6 +40,7 @@ import fr.insalyon.creatis.vip.datamanager.server.DataManagerUtil;
 import fr.insalyon.creatis.vip.datamanager.server.business.LFCPermissionBusiness.LFCAccessType;
 import org.apache.log4j.Logger;
 
+import java.sql.Connection;
 import java.util.*;
 
 import static fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants.*;
@@ -55,7 +56,12 @@ public class LFCPermissionBusiness {
         READ, UPLOAD, DELETE
     }
 
-    public void checkPermission(User user, String path, LFCAccessType LFCAccessType) throws BusinessException {
+    public void checkPermission(
+        User user,
+        String path,
+        LFCAccessType LFCAccessType,
+        Connection connection)
+        throws BusinessException {
         // TODO : verify there is no problem with ".." (normalize if its the case)
         checkRootPermission(path, LFCAccessType);
         // Root is always filtered so always permited
@@ -78,7 +84,7 @@ public class LFCPermissionBusiness {
         String groupName = firstDir.substring(0,firstDir.length()-GROUP_APPEND.length());
         checkGroupPermission(user, groupName, LFCAccessType);
         if (LFCAccessType == LFCPermissionBusiness.LFCAccessType.DELETE) {
-            checkAdditionalDeletePermission(user, path);
+            checkAdditionalDeletePermission(user, path, connection);
         }
         // all check passed : all good !
     }
@@ -122,18 +128,22 @@ public class LFCPermissionBusiness {
         }
     }
 
-    private void checkAdditionalDeletePermission(User user, String path) throws BusinessException {
-        checkSynchronizedDirectories(user, path);
+    private void checkAdditionalDeletePermission(
+        User user, String path, Connection connection)
+        throws BusinessException {
+        checkSynchronizedDirectories(user, path, connection);
         if(path.endsWith("Dropbox")){
             logger.error("Trying to delete a dropbox directory :" + path);
             throw new BusinessException("Unauthorized LFC access");
         }
     }
 
-    private void checkSynchronizedDirectories(User user, String path) throws BusinessException {
+    private void checkSynchronizedDirectories(
+        User user, String path, Connection connection)
+        throws BusinessException {
         List<SSH> sshs;
         try {
-            sshs = new DataManagerBusiness().getSSHConnections();
+            sshs = new DataManagerBusiness().getSSHConnections(connection);
         } catch (BusinessException e) {
             logger.error("Error listing synchronized directories");
             throw new BusinessException("Error listing synchronized directories");

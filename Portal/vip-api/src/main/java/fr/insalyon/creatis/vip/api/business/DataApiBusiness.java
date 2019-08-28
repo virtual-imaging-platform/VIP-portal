@@ -51,6 +51,7 @@ import org.springframework.stereotype.Service;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
+import java.sql.Connection;
 import java.text.*;
 import java.util.*;
 import java.util.concurrent.*;
@@ -85,13 +86,15 @@ public class DataApiBusiness {
     public DataApiBusiness() {
     }
 
-    public boolean doesFileExist(String path) throws ApiException {
-        checkReadPermission(path);
+    public boolean doesFileExist(String path, Connection connection)
+        throws ApiException {
+        checkReadPermission(path, connection);
         return path.equals(ROOT) || baseDoesFileExist(path);
     }
 
-    public void deletePath(String path) throws ApiException {
-        checkPermission(path, LFCAccessType.DELETE);
+    public void deletePath(String path, Connection connection)
+        throws ApiException {
+        checkPermission(path, LFCAccessType.DELETE, connection);
         if (!baseDoesFileExist(path)) {
             logger.error("trying to delete a non-existing file : " + path);
             throw new ApiException("trying to delete a non-existing dile");
@@ -99,8 +102,9 @@ public class DataApiBusiness {
         baseDeletePath(path);
     }
 
-    public PathProperties getPathProperties(String path) throws ApiException {
-        checkReadPermission(path);
+    public PathProperties getPathProperties(String path, Connection connection)
+        throws ApiException {
+        checkReadPermission(path, connection);
         if (path.equals(ROOT)) {
             return getRootPathProperties();
         }
@@ -130,8 +134,9 @@ public class DataApiBusiness {
         return pathProperties;
     }
 
-    public List<PathProperties> listDirectory(String path) throws ApiException {
-        checkReadPermission(path);
+    public List<PathProperties> listDirectory(String path, Connection connection)
+        throws ApiException {
+        checkReadPermission(path, connection);
         if (path.equals(ROOT)) {
             return getRootSubDirectoriesPathProps();
         }
@@ -147,15 +152,17 @@ public class DataApiBusiness {
         return res;
     }
 
-    public File getFile(String path) throws ApiException {
-        checkDownloadPermission(path);
+    public File getFile(String path, Connection connection) throws ApiException {
+        checkDownloadPermission(path, connection);
         String downloadOperationId = downloadFileToLocalStorage(path);
         return getDownloadFile(downloadOperationId);
     }
 
-    public void uploadRawFileFromInputStream(String lfcPath, InputStream is) throws ApiException {
+    public void uploadRawFileFromInputStream(
+        String lfcPath, InputStream is, Connection connection)
+        throws ApiException {
         // TODO : check upload size ?
-        checkPermission(lfcPath, LFCAccessType.UPLOAD);
+        checkPermission(lfcPath, LFCAccessType.UPLOAD, connection);
         java.nio.file.Path javaPath = Paths.get(lfcPath);
         String parentLfcPath = javaPath.getParent().toString();
         // check if parent dir exists
@@ -181,10 +188,12 @@ public class DataApiBusiness {
         }
     }
 
-    public void uploadCustomData(String lfcPath, UploadData uploadData) throws ApiException {
+    public void uploadCustomData(
+        String lfcPath, UploadData uploadData, Connection connection)
+        throws ApiException {
         // TODO : check upload size ?
         // TODO : factorize with previous method
-        checkPermission(lfcPath, LFCAccessType.UPLOAD);
+        checkPermission(lfcPath, LFCAccessType.UPLOAD, connection);
         java.nio.file.Path javaPath = Paths.get(lfcPath);
         String parentLfcPath = javaPath.getParent().toString();
         // check if parent dir exists
@@ -209,8 +218,9 @@ public class DataApiBusiness {
         waitForOperationOrTimeout(opId);
     }
 
-    public PathProperties mkdir(String path) throws ApiException {
-        checkPermission(path, LFCAccessType.UPLOAD);
+    public PathProperties mkdir(String path, Connection connection)
+        throws ApiException {
+        checkPermission(path, LFCAccessType.UPLOAD, connection);
         java.nio.file.Path javaPath = Paths.get(path);
         String parentLfcPath = javaPath.getParent().toString();
 
@@ -235,12 +245,14 @@ public class DataApiBusiness {
 
     // #### PERMISSION STUFF
 
-    private String checkReadPermission(String path) throws ApiException {
-        return checkPermission(path, LFCAccessType.READ);
+    private String checkReadPermission(String path, Connection connection)
+        throws ApiException {
+        return checkPermission(path, LFCAccessType.READ, connection);
     }
 
-    private void checkDownloadPermission(String path) throws ApiException {
-        checkReadPermission(path);
+    private void checkDownloadPermission(String path, Connection connection)
+        throws ApiException {
+        checkReadPermission(path, connection);
         if (path.equals(ROOT)) {
             logger.error("cannot download root");
             throw new ApiException("Illegal data API access");
@@ -258,9 +270,12 @@ public class DataApiBusiness {
         }
     }
 
-    private String checkPermission(String path, LFCAccessType accessType) throws ApiException {
+    private String checkPermission(
+        String path, LFCAccessType accessType, Connection connection)
+        throws ApiException {
         try {
-            lfcPermissionBusiness.checkPermission(apiContext.getUser(), path, accessType);
+            lfcPermissionBusiness.checkPermission(
+                apiContext.getUser(), path, accessType, connection);
         } catch (BusinessException e) {
             logger.error("API Permission error");
             throw new ApiException("API Permission error", e);

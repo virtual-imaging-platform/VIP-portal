@@ -34,6 +34,7 @@ package fr.insalyon.creatis.vip.api.rest.controller.processing;
 import fr.insalyon.creatis.vip.api.bean.Execution;
 import fr.insalyon.creatis.vip.api.business.*;
 import fr.insalyon.creatis.vip.api.exception.NotImplementedException;
+import fr.insalyon.creatis.vip.api.exception.SQLRuntimeException;
 import fr.insalyon.creatis.vip.api.rest.RestApiBusiness;
 import fr.insalyon.creatis.vip.api.rest.model.*;
 import fr.insalyon.creatis.vip.application.server.business.*;
@@ -133,7 +134,7 @@ public class ExecutionControler {
         try(Connection connection = connectionSupplier.get()) {
             pipelineBusiness.checkIfUserCanAccessPipeline(
                 execution.getPipelineIdentifier(), connection);
-        } catch (SQLException | RuntimeException ex) {
+        } catch (SQLException | SQLRuntimeException ex) {
             throw new ApiException(ex);
         }
         String execId = executionBusiness.initExecution(execution);
@@ -145,7 +146,12 @@ public class ExecutionControler {
         ApiUtils.methodInvocationLog("getExecutionResults", executionId);
         restApiBusiness.getApiContext(httpServletRequest, true);
         executionBusiness.checkIfUserCanAccessExecution(executionId);
-        return executionBusiness.getExecutionResultsPaths(executionId);
+        try(Connection connection = connectionSupplier.get()) {
+            return executionBusiness.getExecutionResultsPaths(
+                executionId, connection);
+        } catch (SQLException | SQLRuntimeException ex) {
+            throw new ApiException(ex);
+        }
     }
 
     @RequestMapping(value = "/{executionId}/stdout", produces = "text/plain;charset=UTF-8")

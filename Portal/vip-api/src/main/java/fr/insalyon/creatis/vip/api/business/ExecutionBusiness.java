@@ -444,7 +444,9 @@ public class ExecutionBusiness {
         }
     }
 
-    public List<PathProperties> getExecutionResultsPaths(String executionId) throws ApiException {
+    public List<PathProperties> getExecutionResultsPaths(
+        String executionId, Connection connection) throws ApiException {
+
         List<PathProperties> pathResults = new ArrayList<>();
         List<InOutData> outputs;
         try {
@@ -454,7 +456,8 @@ public class ExecutionBusiness {
         }
         for (InOutData output : outputs) {
             String outputPath = output.getPath();
-            pathResults.add(dataApiBusiness.getPathProperties(outputPath));
+            pathResults.add(
+                dataApiBusiness.getPathProperties(outputPath, connection));
         }
         return pathResults;
     }
