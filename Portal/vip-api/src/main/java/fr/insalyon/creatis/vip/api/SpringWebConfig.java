@@ -32,6 +32,7 @@
 package fr.insalyon.creatis.vip.api;
 
 import fr.insalyon.creatis.vip.api.business.ApiContext;
+import fr.insalyon.creatis.vip.api.exception.SQLRuntimeException;
 import fr.insalyon.creatis.vip.application.server.business.*;
 import fr.insalyon.creatis.vip.core.server.business.*;
 import fr.insalyon.creatis.vip.core.server.dao.*;
@@ -115,7 +116,7 @@ public class SpringWebConfig extends WebMvcConfigurerAdapter {
             try {
                 return PlatformConnection.getInstance().getConnection();
             } catch (SQLException e) {
-                throw new RuntimeException(e);
+                throw new SQLRuntimeException(e);
             }
         };
     }

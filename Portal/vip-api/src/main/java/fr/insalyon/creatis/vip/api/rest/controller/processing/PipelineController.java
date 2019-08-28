@@ -33,6 +33,7 @@ package fr.insalyon.creatis.vip.api.rest.controller.processing;
 
 import fr.insalyon.creatis.vip.api.bean.Pipeline;
 import fr.insalyon.creatis.vip.api.business.*;
+import fr.insalyon.creatis.vip.api.exception.SQLRuntimeException;
 import fr.insalyon.creatis.vip.api.rest.RestApiBusiness;
 import fr.insalyon.creatis.vip.application.server.business.*;
 import org.apache.log4j.Logger;
@@ -81,7 +82,7 @@ public class PipelineController {
         PipelineBusiness pb = new PipelineBusiness(apiContext, workflowBusiness, applicationBusiness, classBusiness);
         try(Connection connection = connectionSupplier.get()) {
             return pb.listPipelines(studyIdentifier, connection);
-        } catch (SQLException | RuntimeException ex) {
+        } catch (SQLException | SQLRuntimeException ex) {
             throw new ApiException(ex);
         }
     }
@@ -99,7 +100,7 @@ public class PipelineController {
         try(Connection connection = connectionSupplier.get()) {
             pb.checkIfUserCanAccessPipeline(pipelineId, connection);
             return pb.getPipeline(pipelineId, connection);
-        } catch (SQLException | RuntimeException ex) {
+        } catch (SQLException | SQLRuntimeException ex) {
             throw new ApiException(ex);
         }
     }
