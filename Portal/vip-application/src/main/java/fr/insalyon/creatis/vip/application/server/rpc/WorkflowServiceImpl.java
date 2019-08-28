@@ -133,14 +133,13 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
      */
     @Override
     public Descriptor getApplicationDescriptor(String applicationName, String applicationVersion) throws ApplicationException {
-
-        try {
-            return workflowBusiness.getApplicationDescriptor(getSessionUser(),
-                    applicationName, applicationVersion);
-
-        } catch (CoreException ex) {
-            throw new ApplicationException(ex);
-        } catch (BusinessException ex) {
+        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
+            return workflowBusiness.getApplicationDescriptor(
+                getSessionUser(),
+                applicationName,
+                applicationVersion,
+                connection);
+        } catch (BusinessException | CoreException | SQLException ex) {
             throw new ApplicationException(ex);
         }
     }
@@ -190,15 +189,11 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
      */
     @Override
     public SimulationInput getInputByNameUserApp(String name, String appName)
-            throws ApplicationException {
-
-        try {
+        throws ApplicationException {
+        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
             return inputBusiness.getInputByUserAndName(
-                    getSessionUser().getEmail(), name, appName);
-
-        } catch (CoreException ex) {
-            throw new ApplicationException(ex);
-        } catch (BusinessException ex) {
+                getSessionUser().getEmail(), name, appName, connection);
+        } catch (BusinessException | CoreException | SQLException ex) {
             throw new ApplicationException(ex);
         }
     }
@@ -210,14 +205,10 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
      */
     public void addSimulationInput(SimulationInput simulationInput)
             throws ApplicationException {
-
-        try {
-            inputBusiness.addSimulationInput(getSessionUser().getEmail(),
-                    simulationInput);
-
-        } catch (CoreException ex) {
-            throw new ApplicationException(ex);
-        } catch (BusinessException ex) {
+        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
+            inputBusiness.addSimulationInput(
+                getSessionUser().getEmail(), simulationInput, connection);
+        } catch (BusinessException | CoreException | SQLException ex) {
             throw new ApplicationException(ex);
         }
     }
@@ -229,14 +220,10 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
      */
     public void updateSimulationInput(SimulationInput simulationInput)
             throws ApplicationException {
-
-        try {
-            inputBusiness.updateSimulationInput(getSessionUser().getEmail(),
-                    simulationInput);
-
-        } catch (CoreException ex) {
-            throw new ApplicationException(ex);
-        } catch (BusinessException ex) {
+        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
+            inputBusiness.updateSimulationInput(
+                getSessionUser().getEmail(), simulationInput, connection);
+        } catch (BusinessException | CoreException | SQLException ex) {
             throw new ApplicationException(ex);
         }
     }
@@ -265,14 +252,11 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
      */
     public void removeSimulationInput(String inputName, String applicationName)
             throws ApplicationException {
-
-        try {
-            inputBusiness.removeSimulationInput(getSessionUser().getEmail(),
-                    inputName, applicationName);
-
-        } catch (CoreException ex) {
-            throw new ApplicationException(ex);
-        } catch (BusinessException ex) {
+        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
+            inputBusiness.removeSimulationInput(
+                getSessionUser().getEmail(), inputName, applicationName,
+                connection);
+        } catch (BusinessException | CoreException | SQLException ex) {
             throw new ApplicationException(ex);
         }
     }
@@ -283,13 +267,13 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
      * @param applicationName
      * @throws ApplicationException
      */
-    public void removeSimulationInputExample(String inputName, String applicationName)
-            throws ApplicationException {
-
-        try {
-            inputBusiness.removeSimulationInputExample(inputName, applicationName);
-
-        } catch (BusinessException ex) {
+    public void removeSimulationInputExample(
+        String inputName, String applicationName)
+        throws ApplicationException {
+        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
+            inputBusiness.removeSimulationInputExample(
+                inputName, applicationName, connection);
+        } catch (BusinessException | SQLException ex) {
             throw new ApplicationException(ex);
         }
     }
@@ -298,14 +282,12 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
      *
      * @return @throws ApplicationException
      */
-    public List<SimulationInput> getSimulationInputByUser() throws ApplicationException {
-
-        try {
-            return inputBusiness.getSimulationInputByUser(getSessionUser().getEmail());
-
-        } catch (CoreException ex) {
-            throw new ApplicationException(ex);
-        } catch (BusinessException ex) {
+    public List<SimulationInput> getSimulationInputByUser()
+        throws ApplicationException {
+        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
+            return inputBusiness.getSimulationInputByUser(
+                getSessionUser().getEmail(), connection);
+        } catch (BusinessException | CoreException | SQLException ex) {
             throw new ApplicationException(ex);
         }
     }
@@ -315,12 +297,12 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
      * @param simulationInput
      * @throws ApplicationException
      */
-    public void saveInputsAsExamples(SimulationInput simulationInput) throws ApplicationException {
-
-        try {
-            inputBusiness.saveSimulationInputAsExample(simulationInput);
-
-        } catch (BusinessException ex) {
+    public void saveInputsAsExamples(SimulationInput simulationInput)
+        throws ApplicationException {
+        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
+            inputBusiness.saveSimulationInputAsExample(
+                simulationInput, connection);
+        } catch (BusinessException | SQLException ex) {
             throw new ApplicationException(ex);
         }
     }
@@ -332,12 +314,12 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
      * @throws ApplicationException
      */
     @Override
-    public List<SimulationInput> getSimulationInputExamples(String applicationName) throws ApplicationException {
-
-        try {
-            return inputBusiness.getSimulationInputExamples(applicationName);
-
-        } catch (BusinessException ex) {
+    public List<SimulationInput> getSimulationInputExamples(
+        String applicationName) throws ApplicationException {
+        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
+            return inputBusiness.getSimulationInputExamples(
+                applicationName, connection);
+        } catch (BusinessException | SQLException ex) {
             throw new ApplicationException(ex);
         }
     }
@@ -644,10 +626,13 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
         }
     }
 
-    public List<SimulationInput> getWorkflowsInputByUserAndAppName(String user, String appName) {
-        try {
-            return ApplicationDAOFactory.getDAOFactory().getApplicationInputDAO().getWorkflowInputByUserAndAppName(user, appName);
-        } catch (DAOException ex) {
+    public List<SimulationInput> getWorkflowsInputByUserAndAppName(
+        String user, String appName) {
+        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
+            return ApplicationDAOFactory.getDAOFactory()
+                .getApplicationInputDAO(connection)
+                .getWorkflowInputByUserAndAppName(user, appName);
+        } catch (DAOException | SQLException ex) {
             return null;
         }
     }

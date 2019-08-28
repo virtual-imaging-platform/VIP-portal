@@ -37,7 +37,6 @@ import fr.insalyon.creatis.vip.application.client.bean.Application;
 import fr.insalyon.creatis.vip.application.server.dao.ApplicationDAO;
 import fr.insalyon.creatis.vip.application.server.dao.ApplicationDAOFactory;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
-import fr.insalyon.creatis.vip.core.server.dao.mysql.PlatformConnection;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -55,12 +54,8 @@ public class ApplicationData implements ApplicationDAO {
     private final static Logger logger = Logger.getLogger(ApplicationData.class);
     private Connection connection;
 
-    public ApplicationData() throws DAOException {
-        try {
-            connection = PlatformConnection.getInstance().getConnection();
-        } catch (SQLException ex) {
-            throw new DAOException(ex);
-        }
+    public ApplicationData(Connection connection) throws DAOException {
+        this.connection = connection;
     }
 
     /**
@@ -161,7 +156,9 @@ public class ApplicationData implements ApplicationDAO {
     public void remove(String email, String name) throws DAOException {
 
         try {
-            for (AppClass c : ApplicationDAOFactory.getDAOFactory().getClassDAO().getUserClasses(email, true)) {
+            for (AppClass c : ApplicationDAOFactory.getDAOFactory()
+                     .getClassDAO(connection)
+                     .getUserClasses(email, true)) {
                 PreparedStatement ps = connection.prepareStatement("DELETE "
                                                                    + "FROM VIPApplicationClasses "
                                                                    + "WHERE class=? AND application=?");

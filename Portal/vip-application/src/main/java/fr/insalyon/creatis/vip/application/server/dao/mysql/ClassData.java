@@ -35,7 +35,6 @@ import fr.insalyon.creatis.vip.application.client.bean.AppClass;
 import fr.insalyon.creatis.vip.application.server.dao.ClassDAO;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants.GROUP_ROLE;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
-import fr.insalyon.creatis.vip.core.server.dao.mysql.PlatformConnection;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -53,12 +52,8 @@ public class ClassData implements ClassDAO {
     private final static Logger logger = Logger.getLogger(ClassData.class);
     private Connection connection;
 
-    public ClassData() throws DAOException {
-        try {
-            connection = PlatformConnection.getInstance().getConnection();
-        } catch (SQLException ex) {
-            throw new DAOException(ex);
-        }
+    public ClassData(Connection connection) throws DAOException {
+        this.connection = connection;
     }
 
     /**

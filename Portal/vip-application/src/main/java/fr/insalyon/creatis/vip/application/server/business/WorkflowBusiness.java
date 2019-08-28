@@ -88,7 +88,6 @@ import org.apache.log4j.Logger;
 public class WorkflowBusiness {
 
     private static final Logger logger = Logger.getLogger(WorkflowBusiness.class);
-    private static ApplicationDAO applicationDB;
     private static SimulationStatsDAO simulationStatsDAO;
     private static WorkflowDAO workflowDAO;
     private static ProcessorDAO processorDAO;
@@ -98,17 +97,14 @@ public class WorkflowBusiness {
     private final EngineBusiness engineBusiness;
 
     public WorkflowBusiness() {
-
         engineBusiness = new EngineBusiness();
         try {
-            applicationDB = ApplicationDAOFactory.getDAOFactory().getApplicationDAO();
             simulationStatsDAO = SimulationStatsDAOFactory.getInstance().getSimulationStatsDAO();
             workflowDAO = WorkflowsDBDAOFactory.getInstance().getWorkflowDAO();
             processorDAO = WorkflowsDBDAOFactory.getInstance().getProcessorDAO();
             outputDAO = WorkflowsDBDAOFactory.getInstance().getOutputDAO();
             inputDAO = WorkflowsDBDAOFactory.getInstance().getInputDAO();
             statsDAO = WorkflowsDBDAOFactory.getInstance().getStatsDAO();
-
         } catch (DAOException ex) {
             logger.error(ex);
         } catch (WorkflowsDBDAOException ex) {
@@ -116,11 +112,14 @@ public class WorkflowBusiness {
         }
     }
 
-    private Engine selectEngine(String applicationClass) throws BusinessException {
+    private Engine selectEngine(String applicationClass, Connection connection)
+        throws BusinessException {
         long min = Integer.MAX_VALUE;
         Engine engineBean = null;
         try {
-            List<Engine> availableEngines = ApplicationDAOFactory.getDAOFactory().getEngineDAO().getByClass(applicationClass);
+            List<Engine> availableEngines = ApplicationDAOFactory.getDAOFactory()
+                .getEngineDAO(connection)
+                .getByClass(applicationClass);
             for (Engine engine : availableEngines) {
                 long runningWorkflows = workflowDAO.getNumberOfRunningPerEngine(engine.getEndpoint());
                 if (runningWorkflows < min) {
@@ -128,7 +127,6 @@ public class WorkflowBusiness {
                     engineBean = engine;
                 }
             }
-
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         } catch (WorkflowsDBDAOException ex) {
@@ -141,11 +139,14 @@ public class WorkflowBusiness {
         }
     }
 
-    private Engine selectRandomEngine(String applicationClass) throws BusinessException {
-
+    private Engine selectRandomEngine(
+        String applicationClass, Connection connection)
+        throws BusinessException {
         Engine engineBean = null;
         try {
-            List<Engine> availableEngines = ApplicationDAOFactory.getDAOFactory().getEngineDAO().getByClass(applicationClass);
+            List<Engine> availableEngines = ApplicationDAOFactory.getDAOFactory()
+                .getEngineDAO(connection)
+                .getByClass(applicationClass);
             Random randomizer = new Random();
             engineBean = availableEngines.get(randomizer.nextInt(availableEngines.size()));
 
@@ -236,14 +237,16 @@ public class WorkflowBusiness {
                 parameters.add(ps);
             }
 
-            AppVersion version = applicationDB.getVersion(applicationName, applicationVersion);
+            AppVersion version = ApplicationDAOFactory.getDAOFactory()
+                .getApplicationDAO(connection)
+                .getVersion(applicationName, applicationVersion);
             DataManagerBusiness dmBusiness = new DataManagerBusiness();
             String workflowPath = dmBusiness.getRemoteFile(user, version.getLfn(),
                     Server.getInstance().getConfigurationFolder() + "workflows/"
                     + FilenameUtils.getName(version.getLfn()));
 
             //selectRandomEngine could also be used; TODO: make this choice configurable
-            Engine engine = selectEngine(applicationClass);
+            Engine engine = selectEngine(applicationClass, connection);
             WorkflowExecutionBusiness executionBusiness = new WorkflowExecutionBusiness(engine.getEndpoint());
             Workflow workflow = null;
             try {
@@ -256,7 +259,7 @@ public class WorkflowBusiness {
             } finally {
                 if (workflow == null) {
                     engine.setStatus("disabled");
-                    this.engineBusiness.update(engine);
+                    this.engineBusiness.update(engine, connection);
                     for (User u : CoreDAOFactory.getDAOFactory()
                              .getUsersGroupsDAO(connection)
                              .getUsersFromGroup(CoreConstants.GROUP_SUPPORT)) {
@@ -384,12 +387,17 @@ public class WorkflowBusiness {
      * @return
      * @throws BusinessException
      */
-    public Descriptor getApplicationDescriptor(User user, String applicationName,
-            String applicationVersion) throws BusinessException {
+    public Descriptor getApplicationDescriptor(
+        User user,
+        String applicationName,
+        String applicationVersion,
+        Connection connection)
+        throws BusinessException {
 
         try {
-
-            AppVersion version = applicationDB.getVersion(applicationName, applicationVersion);
+            AppVersion version = ApplicationDAOFactory.getDAOFactory()
+                .getApplicationDAO(connection)
+                .getVersion(applicationName, applicationVersion);
             DataManagerBusiness dmBusiness = new DataManagerBusiness();
             String localDirectory = Server.getInstance().getConfigurationFolder()
                     + "workflows/"

@@ -38,6 +38,7 @@ import fr.insalyon.creatis.vip.datamanager.server.business.DataManagerBusiness;
 import org.apache.log4j.Logger;
 
 import java.io.*;
+import java.sql.Connection;
 import java.util.*;
 
 import static com.hp.hpl.jena.vocabulary.OWLResults.output;
@@ -49,11 +50,13 @@ public class BoutiquesBusiness {
 
     private static final Logger logger = Logger.getLogger(BoutiquesBusiness.class);
 
-    public String publishVersion(User user, String applicationName, String version) throws BusinessException {
+    public String publishVersion(
+        User user, String applicationName, String version, Connection connection)
+        throws BusinessException {
         DataManagerBusiness dmBusiness = new DataManagerBusiness();
 
         // fetch json file
-        String jsonLfn = getJsonLfn(applicationName, version);
+        String jsonLfn = getJsonLfn(applicationName, version, connection);
         String localDirectory = Server.getInstance().getApplicationImporterFileRepository()
                 + "/publications/" + applicationName + "/" + version;
         String localFile = dmBusiness.getRemoteFile(user, jsonLfn, localDirectory);
@@ -69,7 +72,7 @@ public class BoutiquesBusiness {
         String doi = getDoiFromPublishOutput(output);
 
         // save the doi in database
-        saveDoiForVersion(doi, applicationName, version);
+        saveDoiForVersion(doi, applicationName, version, connection);
 
         return doi;
     }
@@ -88,9 +91,12 @@ public class BoutiquesBusiness {
         }
     }
 
-    private String getJsonLfn(String applicationName, String applicationVersion) throws BusinessException {
+    private String getJsonLfn(
+        String applicationName, String applicationVersion, Connection connection)
+        throws BusinessException {
         ApplicationBusiness applicationBusiness = new ApplicationBusiness();
-        AppVersion appVersion = applicationBusiness.getVersion(applicationName, applicationVersion);
+        AppVersion appVersion = applicationBusiness.getVersion(
+            applicationName, applicationVersion, connection);
         if (appVersion.getJsonLfn() == null) {
             logger.error("No json lfn for this application : " + applicationName + "/" + applicationVersion);
             throw new BusinessException("There is no json lfn for this application version.");
@@ -99,12 +105,15 @@ public class BoutiquesBusiness {
     }
 
     private void saveDoiForVersion(
-            String doi,
-            String applicationName,
-            String applicationVersion) throws BusinessException {
+        String doi,
+        String applicationName,
+        String applicationVersion,
+        Connection connection)
+        throws BusinessException {
 
         ApplicationBusiness applicationBusiness = new ApplicationBusiness();
-        applicationBusiness.updateDoiForVersion(doi, applicationName, applicationVersion);
+        applicationBusiness.updateDoiForVersion(
+            doi, applicationName, applicationVersion, connection);
     }
 
     private String getDoiFromPublishOutput(List<String> publishOutput) throws BusinessException {

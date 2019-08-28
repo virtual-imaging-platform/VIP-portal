@@ -51,6 +51,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
+import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -93,7 +94,7 @@ public class ApplicationImporterBusiness {
         }
     }
 
-    public void createApplication(BoutiquesTool bt, String type, String tag, HashMap<String, BoutiquesTool> bts, boolean isRunOnGrid, boolean overwriteApplicationVersion, User user, boolean challenge)
+    public void createApplication(BoutiquesTool bt, String type, String tag, HashMap<String, BoutiquesTool> bts, boolean isRunOnGrid, boolean overwriteApplicationVersion, User user, boolean challenge, Connection connection)
         throws BusinessException, ApplicationImporterException, JSONException {
 
         try {
@@ -115,7 +116,7 @@ public class ApplicationImporterBusiness {
                 gwendiaTemplate = "vm/gwendia_challenge_petseg.vm";
             } else {}
             // Check rights
-            checkEditionRights(bt.getName(), bt.getToolVersion(), overwriteApplicationVersion, user);
+            checkEditionRights(bt.getName(), bt.getToolVersion(), overwriteApplicationVersion, user, connection);
             // set the correct LFN for each component of the application
             for (Map.Entry<String, BoutiquesTool> e : btMaps.entrySet()) {
                 e.getValue().setApplicationLFN(DataManagerUtil.parseBaseDir(user, e.getValue().getApplicationLFN()));
@@ -173,7 +174,7 @@ public class ApplicationImporterBusiness {
             uploadFile(jsonFileName, bt.getJsonLFN());
         
 // Register application
-            registerApplicationVersion(bt.getName(), bt.getToolVersion(), user.getEmail(), bt.getGwendiaLFN(), bt.getJsonLFN());
+            registerApplicationVersion(bt.getName(), bt.getToolVersion(), user.getEmail(), bt.getGwendiaLFN(), bt.getJsonLFN(), connection);
 
         } catch (FileNotFoundException ex) {
             logger.error(ex);
@@ -213,31 +214,40 @@ public class ApplicationImporterBusiness {
         writer.close();
     }
 
-    private void registerApplicationVersion(String vipApplicationName, String vipVersion, String owner, String lfnGwendiaFile, String lfnJsonFile) throws BusinessException {
+    private void registerApplicationVersion(
+        String vipApplicationName,
+        String vipVersion,
+        String owner,
+        String lfnGwendiaFile,
+        String lfnJsonFile,
+        Connection connection)
+        throws BusinessException {
         ApplicationBusiness ab = new ApplicationBusiness();
-        Application app = ab.getApplication(vipApplicationName);
+        Application app = ab.getApplication(vipApplicationName, connection);
         AppVersion newVersion = new AppVersion(vipApplicationName, vipVersion, lfnGwendiaFile, lfnJsonFile, true);
         if (app == null) {
             // If application doesn't exist, create it.
             // New applications are not associated with any class (admins may add classes independently).
-            ab.add(new Application(vipApplicationName, new ArrayList<String>(), owner, ""));
+            ab.add(new Application(vipApplicationName, new ArrayList<String>(), owner, ""), connection);
         }
         // If version exists, update it
-        List<AppVersion> versions = ab.getVersions(vipApplicationName);
+        List<AppVersion> versions = ab.getVersions(
+            vipApplicationName, connection);
         for (AppVersion existingVersion : versions) {
             if (existingVersion.getVersion().equals(newVersion.getVersion())) {
-                ab.updateVersion(newVersion);
+                ab.updateVersion(newVersion, connection);
                 return;
             }
         }
         // add new version
-        ab.addVersion(newVersion);
+        ab.addVersion(newVersion, connection);
     }
 
-    private void checkEditionRights(String vipApplicationName, String vipVersion, boolean overwrite, User user) throws BusinessException {
+    private void checkEditionRights(String vipApplicationName, String vipVersion, boolean overwrite, User user, Connection connection)
+        throws BusinessException {
 
         ApplicationBusiness ab = new ApplicationBusiness();
-        Application app = ab.getApplication(vipApplicationName);
+        Application app = ab.getApplication(vipApplicationName, connection);
         if (app == null) {
             return; // any user may create an application (nobody could run it unless an admin adds it to a class
         }
@@ -248,7 +258,8 @@ public class ApplicationImporterBusiness {
         }
         // Refuse to overwrite an application version silently if the version overwrite parameter is not set.
         if (!overwrite) {
-            List<AppVersion> versions = ab.getVersions(vipApplicationName);
+            List<AppVersion> versions = ab.getVersions(
+                vipApplicationName, connection);
             for (AppVersion v : versions) {
                 if (v.getVersion().equals(vipVersion)) {
                     logger.error(user.getEmail() + " tried to overwrite version " + vipVersion + " of application " + vipApplicationName + " without setting the overwrite flag.");

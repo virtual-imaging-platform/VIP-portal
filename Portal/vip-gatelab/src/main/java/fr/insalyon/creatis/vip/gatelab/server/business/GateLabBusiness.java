@@ -61,19 +61,21 @@ public class GateLabBusiness {
      *
      * @return @throws BusinessException
      */
-    public List<String[]> getApplications() throws BusinessException {
-
+    public List<String[]> getApplications(Connection connection)
+        throws BusinessException {
         try {
-            ApplicationDAOFactory.getDAOFactory().getClassDAO().add(new AppClass(
+            ApplicationDAOFactory.getDAOFactory()
+                .getClassDAO(connection)
+                .add(new AppClass(
                     GateLabConstants.GATELAB_CLASS, new ArrayList<String>()));
-
         } catch (DAOException ex) {
             if (!ex.getMessage().contains("A class named \"" + GateLabConstants.GATELAB_CLASS + "\" already exists")) {
                 logger.error(ex);
                 throw new BusinessException(ex);
             }
         }
-        return new ApplicationBusiness().getApplications(GateLabConstants.GATELAB_CLASS);
+        return new ApplicationBusiness().getApplications(
+            GateLabConstants.GATELAB_CLASS, connection);
     }
 
     /**

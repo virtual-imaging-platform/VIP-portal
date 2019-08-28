@@ -35,6 +35,7 @@ import fr.insalyon.creatis.vip.api.business.ApiContext;
 import fr.insalyon.creatis.vip.application.server.business.*;
 import fr.insalyon.creatis.vip.core.server.business.*;
 import fr.insalyon.creatis.vip.core.server.dao.*;
+import fr.insalyon.creatis.vip.core.server.dao.mysql.PlatformConnection;
 import fr.insalyon.creatis.vip.datamanager.server.business.*;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,7 +45,9 @@ import org.springframework.core.env.Environment;
 import org.springframework.core.io.support.ResourcePropertySource;
 import org.springframework.web.servlet.config.annotation.*;
 
-import java.io.IOException;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.function.Supplier;
 
 import static fr.insalyon.creatis.vip.api.CarminProperties.CORS_AUTHORIZED_DOMAINS;
 
@@ -104,6 +107,17 @@ public class SpringWebConfig extends WebMvcConfigurerAdapter {
     @Scope(proxyMode = ScopedProxyMode.TARGET_CLASS, value = "request")
     public ApiContext apiContext() {
         return new ApiContext();
+    }
+
+    @Bean
+    public Supplier<Connection> connectionSupplier() {
+        return () -> {
+            try {
+                return PlatformConnection.getInstance().getConnection();
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        };
     }
 
     @Bean

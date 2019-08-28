@@ -34,7 +34,6 @@ package fr.insalyon.creatis.vip.application.server.dao.mysql;
 import fr.insalyon.creatis.vip.application.client.bean.Engine;
 import fr.insalyon.creatis.vip.application.server.dao.EngineDAO;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
-import fr.insalyon.creatis.vip.core.server.dao.mysql.PlatformConnection;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -52,12 +51,8 @@ public class EngineData implements EngineDAO {
     private final static Logger logger = Logger.getLogger(EngineData.class);
     private Connection connection;
 
-    public EngineData() throws DAOException {
-        try {
-            connection = PlatformConnection.getInstance().getConnection();
-        } catch (SQLException ex) {
-            throw new DAOException(ex);
-        }
+    public EngineData(Connection connection) throws DAOException {
+        this.connection = connection;
     }
 
     @Override

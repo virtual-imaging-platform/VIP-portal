@@ -48,7 +48,10 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.List;
+import java.util.function.Supplier;
 
 import static fr.insalyon.creatis.vip.api.CarminProperties.DEFAULT_LIMIT_LIST_EXECUTION;
 
@@ -74,6 +77,9 @@ public class ExecutionControler {
     // although the controller is a singleton, these are proxies that always point on the current request
     @Autowired
     HttpServletRequest httpServletRequest;
+
+    @Autowired
+    private Supplier<Connection> connectionSupplier;
 
     @RequestMapping
     public Execution[] listExecutions(
@@ -124,7 +130,12 @@ public class ExecutionControler {
     public Execution initExecution(@RequestBody @Valid Execution execution) throws ApiException {
         ApiUtils.methodInvocationLog("initExecution", execution);
         restApiBusiness.getApiContext(httpServletRequest, true);
-        pipelineBusiness.checkIfUserCanAccessPipeline(execution.getPipelineIdentifier());
+        try(Connection connection = connectionSupplier.get()) {
+            pipelineBusiness.checkIfUserCanAccessPipeline(
+                execution.getPipelineIdentifier(), connection);
+        } catch (SQLException | RuntimeException ex) {
+            throw new ApiException(ex);
+        }
         String execId = executionBusiness.initExecution(execution);
         return executionBusiness.getExecution(execId,false);
     }

@@ -342,7 +342,7 @@ public class ExecutionBusiness {
             }
 
             // Check that all pipeline inputs are present
-            Pipeline p = pipelineBusiness.getPipeline(pipelineId);
+            Pipeline p = pipelineBusiness.getPipeline(pipelineId, connection);
             for (PipelineParameter pp : p.getParameters()) {
                 if (pp.isReturnedValue()) {
                     continue;
@@ -378,7 +378,9 @@ public class ExecutionBusiness {
             String applicationVersion = ApiUtils.getApplicationVersion(pipelineId);
 
             // Get application classes
-            List<String> classes = applicationBusiness.getApplication(applicationName).getApplicationClasses();
+            List<String> classes = applicationBusiness
+                .getApplication(applicationName, connection)
+                .getApplicationClasses();
             if (classes.isEmpty()) {
                 throw new ApiException("Application " + applicationName + " cannot be launched because it doesn't belong to any VIP class.");
             }

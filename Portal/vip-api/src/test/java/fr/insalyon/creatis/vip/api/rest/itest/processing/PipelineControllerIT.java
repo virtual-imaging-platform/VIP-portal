@@ -47,6 +47,7 @@ import static fr.insalyon.creatis.vip.api.data.UserTestUtils.baseUser1;
 import static fr.insalyon.creatis.vip.api.rest.mockconfig.ApplicationsConfigurator.*;
 import static org.hamcrest.Matchers.*;
 import static org.mockito.Matchers.anyBoolean;
+import static org.mockito.Matchers.anyObject;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -71,8 +72,9 @@ public class PipelineControllerIT extends BaseVIPSpringIT {
 
     @Test
     public void shouldReturnErrorOnAPIException() throws Exception {
-        when(classBusiness.getUserClasses(eq(baseUser1.getEmail()), anyBoolean()))
-                .thenThrow(new BusinessException("test exception"));
+        when(classBusiness.getUserClasses(
+                 eq(baseUser1.getEmail()), anyBoolean(), anyObject()))
+            .thenThrow(new BusinessException("test exception"));
         mockMvc.perform(get("/rest/pipelines").with(baseUser1()))
                 .andDo(print())
                 .andExpect(status().isBadRequest())
@@ -82,8 +84,9 @@ public class PipelineControllerIT extends BaseVIPSpringIT {
 
     @Test
     public void shouldReturnErrorOnUnexpectedException() throws Exception {
-        when(classBusiness.getUserClasses(eq(baseUser1.getEmail()), anyBoolean()))
-                .thenThrow(new RuntimeException("test exception"));
+        when(classBusiness.getUserClasses(
+                 eq(baseUser1.getEmail()), anyBoolean(), anyObject()))
+            .thenThrow(new RuntimeException("test exception"));
         mockMvc.perform(get("/rest/pipelines").with(baseUser1()))
                 .andDo(print())
                 .andExpect(status().isInternalServerError())

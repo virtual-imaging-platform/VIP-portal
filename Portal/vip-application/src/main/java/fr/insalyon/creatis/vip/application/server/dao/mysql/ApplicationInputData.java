@@ -34,7 +34,6 @@ package fr.insalyon.creatis.vip.application.server.dao.mysql;
 import fr.insalyon.creatis.vip.application.client.bean.SimulationInput;
 import fr.insalyon.creatis.vip.application.server.dao.ApplicationInputDAO;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
-import fr.insalyon.creatis.vip.core.server.dao.mysql.PlatformConnection;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -52,12 +51,8 @@ public class ApplicationInputData implements ApplicationInputDAO {
     private static final Logger logger = Logger.getLogger(ApplicationInputData.class);
     private Connection connection;
 
-    public ApplicationInputData() throws DAOException {
-        try {
-            connection = PlatformConnection.getInstance().getConnection();
-        } catch (SQLException ex) {
-            throw new DAOException(ex);
-        }
+    public ApplicationInputData(Connection connection) throws DAOException {
+        this.connection = connection;
     }
 
     /**

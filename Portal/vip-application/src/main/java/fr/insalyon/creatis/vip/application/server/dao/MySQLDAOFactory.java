@@ -159,32 +159,37 @@ public class MySQLDAOFactory extends ApplicationDAOFactory {
     }
 
     @Override
-    public ApplicationDAO getApplicationDAO() throws DAOException {
-        return new ApplicationData();
+    public ApplicationDAO getApplicationDAO(Connection connection)
+        throws DAOException {
+        return new ApplicationData(connection);
     }
 
     @Override
-    public ClassDAO getClassDAO() throws DAOException {
-        return new ClassData();
+    public ClassDAO getClassDAO(Connection connection) throws DAOException {
+        return new ClassData(connection);
     }
 
     @Override
-    public EngineDAO getEngineDAO() throws DAOException {
-        return new EngineData();
+    public EngineDAO getEngineDAO(Connection connection) throws DAOException {
+        return new EngineData(connection);
     }
 
     @Override
-    public ApplicationInputDAO getApplicationInputDAO() throws DAOException {
-        return new ApplicationInputData();
+    public ApplicationInputDAO getApplicationInputDAO(Connection connection)
+        throws DAOException {
+        return new ApplicationInputData(connection);
     }
 
+    // Below function are using h2 database, not main database.  So we don't
+    // give them a connection.  They have there own.
     @Override
     public SimulationDAO getSimulationDAO(String dbPath) throws DAOException {
         return new SimulationData(dbPath);
     }
 
     @Override
-    public ExecutionNodeDAO getExecutionNodeDAO(String dbPath) throws DAOException {
+    public ExecutionNodeDAO getExecutionNodeDAO(String dbPath)
+        throws DAOException {
         return new ExecutionNodeData(dbPath);
     }
 }

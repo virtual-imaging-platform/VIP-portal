@@ -42,6 +42,9 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.function.Supplier;
 
 /**
  * Created by abonnet on 7/28/16.
@@ -68,12 +71,19 @@ public class PipelineController {
     @Autowired
     private HttpServletRequest httpServletRequest;
 
+    @Autowired
+    private Supplier<Connection> connectionSupplier;
+
     @RequestMapping
     public Pipeline[] listPipelines(@RequestParam(required = false) String studyIdentifier) throws ApiException {
         ApiUtils.methodInvocationLog("listPipelines");
         ApiContext apiContext = restApiBusiness.getApiContext(httpServletRequest, true);
         PipelineBusiness pb = new PipelineBusiness(apiContext, workflowBusiness, applicationBusiness, classBusiness);
-        return pb.listPipelines(studyIdentifier);
+        try(Connection connection = connectionSupplier.get()) {
+            return pb.listPipelines(studyIdentifier, connection);
+        } catch (SQLException | RuntimeException ex) {
+            throw new ApiException(ex);
+        }
     }
 
     @RequestMapping("{pipelineId}")
@@ -86,8 +96,12 @@ public class PipelineController {
         }
         ApiContext apiContext = restApiBusiness.getApiContext(httpServletRequest, true);
         PipelineBusiness pb = new PipelineBusiness(apiContext, workflowBusiness, applicationBusiness, classBusiness);
-        pb.checkIfUserCanAccessPipeline(pipelineId);
-        return pb.getPipeline(pipelineId);
+        try(Connection connection = connectionSupplier.get()) {
+            pb.checkIfUserCanAccessPipeline(pipelineId, connection);
+            return pb.getPipeline(pipelineId, connection);
+        } catch (SQLException | RuntimeException ex) {
+            throw new ApiException(ex);
+        }
     }
 
     @RequestMapping("{pipelineIdFirstPart}/{pipelineIdSecondPart}")
