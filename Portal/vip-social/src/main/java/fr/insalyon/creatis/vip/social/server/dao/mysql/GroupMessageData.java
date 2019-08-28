@@ -53,12 +53,8 @@ public class GroupMessageData implements GroupMessageDAO {
     private static final Logger logger = Logger.getLogger(GroupMessageData.class);
     private Connection connection;
 
-    public GroupMessageData() throws DAOException {
-        try {
-            connection = PlatformConnection.getInstance().getConnection();
-        } catch (SQLException ex) {
-            throw new DAOException(ex);
-        }
+    public GroupMessageData(Connection connection) {
+        this.connection = connection;
     }
 
     public long add(String sender, String groupName, String title, String message) throws DAOException {

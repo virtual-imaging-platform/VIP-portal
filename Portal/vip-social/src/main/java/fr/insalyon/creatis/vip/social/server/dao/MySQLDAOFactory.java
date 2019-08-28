@@ -102,12 +102,13 @@ public class MySQLDAOFactory extends SocialDAOFactory {
     }
 
     @Override
-    public MessageDAO getMessageDAO() throws DAOException {
-        return new MessageData();
+    public MessageDAO getMessageDAO(Connection connection) throws DAOException {
+        return new MessageData(connection);
     }
 
     @Override
-    public GroupMessageDAO getGroupMessageDAO() throws DAOException {
-        return new GroupMessageData();
+    public GroupMessageDAO getGroupMessageDAO(Connection connection)
+        throws DAOException {
+        return new GroupMessageData(connection);
     }
 }

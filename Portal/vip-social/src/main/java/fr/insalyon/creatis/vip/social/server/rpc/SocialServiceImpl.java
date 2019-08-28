@@ -58,82 +58,65 @@ public class SocialServiceImpl extends AbstractRemoteServiceServlet implements S
     private MessageBusiness messageBusiness;
 
     public SocialServiceImpl() {
-
         messageBusiness = new MessageBusiness();
     }
 
     public List<Message> getMessagesByUser(Date startDate) throws SocialException {
-
-        try {
-            return messageBusiness.getMessagesByUser(getSessionUser().getEmail(), startDate);
-
-        } catch (CoreException ex) {
-            throw new SocialException(ex);
-        } catch (BusinessException ex) {
+        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
+            return messageBusiness.getMessagesByUser(
+                getSessionUser().getEmail(), startDate, connection);
+        } catch (BusinessException | CoreException | SQLException ex) {
             throw new SocialException(ex);
         }
     }
 
     public List<Message> getSentMessagesByUser(Date startDate) throws SocialException {
-
-        try {
-            return messageBusiness.getSentMessagesByUser(getSessionUser().getEmail(), startDate);
-
-        } catch (CoreException ex) {
-            throw new SocialException(ex);
-        } catch (BusinessException ex) {
+        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
+            return messageBusiness.getSentMessagesByUser(
+                getSessionUser().getEmail(), startDate, connection);
+        } catch (BusinessException | CoreException | SQLException ex) {
             throw new SocialException(ex);
         }
     }
 
     public List<GroupMessage> getGroupMessages(String groupName, Date startDate) throws SocialException {
-
-        try {
-            return messageBusiness.getGroupMessages(groupName, startDate);
-
-        } catch (BusinessException ex) {
+        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
+            return messageBusiness.getGroupMessages(
+                groupName, startDate, connection);
+        } catch (BusinessException | SQLException ex) {
             throw new SocialException(ex);
         }
     }
 
     public void markMessageAsRead(long id, String receiver) throws SocialException {
-
-        try {
-            messageBusiness.markAsRead(id, receiver);
-
-        } catch (BusinessException ex) {
+        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
+            messageBusiness.markAsRead(id, receiver, connection);
+        } catch (BusinessException | SQLException ex) {
             throw new SocialException(ex);
         }
     }
 
     public void removeMessage(long id) throws SocialException {
-
-        try {
-            messageBusiness.remove(id);
-
-        } catch (BusinessException ex) {
+        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
+            messageBusiness.remove(id, connection);
+        } catch (BusinessException | SQLException ex) {
             throw new SocialException(ex);
         }
     }
 
     public void removeMessageByReceiver(long id) throws SocialException {
-
-        try {
-            messageBusiness.removeByReceiver(id, getSessionUser().getEmail());
-
-        } catch (CoreException ex) {
-            throw new SocialException(ex);
-        } catch (BusinessException ex) {
+        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
+            messageBusiness.removeByReceiver(
+                id, getSessionUser().getEmail(), connection);
+        } catch (BusinessException | CoreException | SQLException ex) {
             throw new SocialException(ex);
         }
     }
 
     public void removeGroupMessage(long id) throws SocialException {
-
-        try {
-            messageBusiness.removeGroupMessage(id);
-
-        } catch (BusinessException ex) {
+        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
+            messageBusiness.removeGroupMessage(id, connection);
+        } catch (BusinessException | SQLException ex) {
             throw new SocialException(ex);
         }
     }
@@ -154,15 +137,11 @@ public class SocialServiceImpl extends AbstractRemoteServiceServlet implements S
     }
 
     public void sendMessage(String[] recipients, String subject, String message) throws SocialException {
-
-        try {
+        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
             trace(logger, "Sending message '" + subject + "' to '" + Arrays.asList(recipients) + "'.");
-            messageBusiness.sendMessage(getSessionUser(), recipients,
-                    subject, message);
-
-        } catch (CoreException ex) {
-            throw new SocialException(ex);
-        } catch (BusinessException ex) {
+            messageBusiness.sendMessage(
+                getSessionUser(), recipients, subject, message, connection);
+        } catch (BusinessException | CoreException | SQLException ex) {
             throw new SocialException(ex);
         }
     }
@@ -173,8 +152,8 @@ public class SocialServiceImpl extends AbstractRemoteServiceServlet implements S
 
         try(Connection connection = PlatformConnection.getInstance().getConnection()) {
             trace(logger, "Sending message '" + subject + "' to '" + Arrays.asList(recipients) + "'.");
-            messageBusiness.sendMessage(getSessionUser(), recipients,
-                    subject, message);
+            messageBusiness.sendMessage(
+                getSessionUser(), recipients, subject, message, connection);
             trace(logger, "Sending message '" + subject + "' to 'vip-support' as copy.");
             messageBusiness.copyMessageToVipSupport(
                 getSessionUser(), recipients,
@@ -210,20 +189,18 @@ public class SocialServiceImpl extends AbstractRemoteServiceServlet implements S
                 groupName,
                 configurationBusiness.getUsersFromGroup(groupName, connection),
                 subject,
-                message);
+                message,
+                connection);
         } catch (CoreException | BusinessException | SQLException ex) {
             throw new SocialException(ex);
         }
     }
 
     public int verifyMessages() throws SocialException {
-
-        try {
-            return messageBusiness.verifyMessages(getSessionUser().getEmail());
-
-        } catch (CoreException ex) {
-            throw new SocialException(ex);
-        } catch (BusinessException ex) {
+        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
+            return messageBusiness.verifyMessages(
+                getSessionUser().getEmail(), connection);
+        } catch (BusinessException | CoreException | SQLException ex) {
             throw new SocialException(ex);
         }
     }

@@ -58,12 +58,8 @@ public class MessageData implements MessageDAO {
     private static final Logger logger = Logger.getLogger(MessageData.class);
     private Connection connection;
 
-    public MessageData() throws DAOException {
-        try {
-            connection = PlatformConnection.getInstance().getConnection();
-        } catch (SQLException ex) {
-            throw new DAOException(ex);
-        }
+    public MessageData(Connection connection) {
+        this.connection = connection;
     }
 
     public long add(String sender, String title, String message) throws DAOException {

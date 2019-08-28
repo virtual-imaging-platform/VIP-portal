@@ -61,13 +61,15 @@ public class MessageBusiness {
      * @return
      * @throws BusinessException
      */
-    public List<Message> getMessagesByUser(String email, Date startDate)
-            throws BusinessException {
+    public List<Message> getMessagesByUser(
+        String email, Date startDate, Connection connection)
+        throws BusinessException {
 
         try {
-            return SocialDAOFactory.getDAOFactory().getMessageDAO().getMessagesByUser(
+            return SocialDAOFactory.getDAOFactory()
+                .getMessageDAO(connection)
+                .getMessagesByUser(
                     email, SocialConstants.MESSAGE_MAX_DISPLAY, startDate);
-
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }
@@ -80,13 +82,15 @@ public class MessageBusiness {
      * @return
      * @throws BusinessException
      */
-    public List<Message> getSentMessagesByUser(String email, Date startDate)
-            throws BusinessException {
+    public List<Message> getSentMessagesByUser(
+        String email, Date startDate, Connection connection)
+        throws BusinessException {
 
         try {
-            return SocialDAOFactory.getDAOFactory().getMessageDAO().getSentMessagesByUser(
+            return SocialDAOFactory.getDAOFactory()
+                .getMessageDAO(connection)
+                .getSentMessagesByUser(
                     email, SocialConstants.MESSAGE_MAX_DISPLAY, startDate);
-
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }
@@ -99,11 +103,14 @@ public class MessageBusiness {
      * @return
      * @throws BusinessException
      */
-    public List<GroupMessage> getGroupMessages(String groupName, Date startDate)
-            throws BusinessException {
+    public List<GroupMessage> getGroupMessages(
+        String groupName, Date startDate, Connection connection)
+        throws BusinessException {
 
         try {
-            return SocialDAOFactory.getDAOFactory().getGroupMessageDAO().getMessageByGroup(
+            return SocialDAOFactory.getDAOFactory()
+                .getGroupMessageDAO(connection)
+                .getMessageByGroup(
                     groupName, SocialConstants.MESSAGE_MAX_DISPLAY, startDate);
 
         } catch (DAOException ex) {
@@ -117,11 +124,12 @@ public class MessageBusiness {
      * @param receiver
      * @throws BusinessException
      */
-    public void markAsRead(long id, String receiver) throws BusinessException {
+    public void markAsRead(long id, String receiver, Connection connection)
+        throws BusinessException {
 
         try {
-            SocialDAOFactory.getDAOFactory().getMessageDAO().markAsRead(id, receiver);
-
+            SocialDAOFactory.getDAOFactory()
+                .getMessageDAO(connection).markAsRead(id, receiver);
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }
@@ -132,11 +140,10 @@ public class MessageBusiness {
      * @param id
      * @throws BusinessException
      */
-    public void remove(long id) throws BusinessException {
-
+    public void remove(long id, Connection connection) throws BusinessException {
         try {
-            SocialDAOFactory.getDAOFactory().getMessageDAO().remove(id);
-
+            SocialDAOFactory.getDAOFactory()
+                .getMessageDAO(connection).remove(id);
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }
@@ -148,11 +155,11 @@ public class MessageBusiness {
      * @param receiver
      * @throws BusinessException
      */
-    public void removeByReceiver(long id, String receiver) throws BusinessException {
-
+    public void removeByReceiver(long id, String receiver, Connection connection)
+        throws BusinessException {
         try {
-            SocialDAOFactory.getDAOFactory().getMessageDAO().removeByReceiver(id, receiver);
-
+            SocialDAOFactory.getDAOFactory()
+                .getMessageDAO(connection).removeByReceiver(id, receiver);
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }
@@ -163,11 +170,11 @@ public class MessageBusiness {
      * @param id
      * @throws BusinessException
      */
-    public void removeGroupMessage(long id) throws BusinessException {
-
+    public void removeGroupMessage(long id, Connection connection)
+        throws BusinessException {
         try {
-            SocialDAOFactory.getDAOFactory().getGroupMessageDAO().remove(id);
-
+            SocialDAOFactory.getDAOFactory()
+                .getGroupMessageDAO(connection).remove(id);
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }
@@ -181,8 +188,13 @@ public class MessageBusiness {
      * @param message
      * @throws BusinessException
      */
-    public void sendMessage(User user, String[] recipients,
-            String subject, String message) throws BusinessException {
+    public void sendMessage(
+        User user,
+        String[] recipients,
+        String subject,
+        String message,
+        Connection connection)
+        throws BusinessException {
 
         try {
             if (recipients[0].equals("All")) {
@@ -197,7 +209,8 @@ public class MessageBusiness {
                 recipients = users.toArray(new String[]{});
             }
 
-            MessageDAO messageDAO = SocialDAOFactory.getDAOFactory().getMessageDAO();
+            MessageDAO messageDAO = SocialDAOFactory.getDAOFactory()
+                .getMessageDAO(connection);
             long messageId = messageDAO.add(user.getEmail(), subject, message);
 
             for (String recipient : recipients) {
@@ -299,11 +312,14 @@ public class MessageBusiness {
      * @param message
      * @throws BusinessException
      */
-    public void sendGroupMessage(User user, String groupName, List<User> users,
-            String subject, String message) throws BusinessException {
+    public void sendGroupMessage(
+        User user, String groupName, List<User> users,
+        String subject, String message, Connection connection)
+        throws BusinessException {
 
         try {
-            GroupMessageDAO groupMessageDAO = SocialDAOFactory.getDAOFactory().getGroupMessageDAO();
+            GroupMessageDAO groupMessageDAO = SocialDAOFactory.getDAOFactory()
+                .getGroupMessageDAO(connection);
             groupMessageDAO.add(user.getEmail(), groupName, subject, message);
 
             String emailContent = "<html>"
@@ -339,11 +355,12 @@ public class MessageBusiness {
      * @return
      * @throws BusinessException
      */
-    public int verifyMessages(String email) throws BusinessException {
+    public int verifyMessages(String email, Connection connection)
+        throws BusinessException {
 
         try {
-            return SocialDAOFactory.getDAOFactory().getMessageDAO().verifyMessages(email);
-
+            return SocialDAOFactory.getDAOFactory()
+                .getMessageDAO(connection).verifyMessages(email);
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }
