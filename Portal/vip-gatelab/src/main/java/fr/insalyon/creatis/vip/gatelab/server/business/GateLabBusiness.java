@@ -146,7 +146,8 @@ public class GateLabBusiness {
         throws BusinessException {
 
         try {
-            User user = CoreDAOFactory.getDAOFactory().getUserDAO().getUser(email);
+            User user = CoreDAOFactory.getDAOFactory()
+                .getUserDAO(connection).getUser(email);
 
             String adminsEmailContents = "<html>"
                     + "<head></head>"

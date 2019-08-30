@@ -122,16 +122,12 @@ public class SocialServiceImpl extends AbstractRemoteServiceServlet implements S
     }
 
     public List<User> getUsers() throws SocialException {
-
-        try {
+        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
             if (isSystemAdministrator()) {
-                return configurationBusiness.getUsers();
+                return configurationBusiness.getUsers(connection);
             }
             throw new SocialException("Only administrators can send message.");
-
-        } catch (CoreException ex) {
-            throw new SocialException(ex);
-        } catch (BusinessException ex) {
+        } catch (BusinessException | CoreException | SQLException ex) {
             throw new SocialException(ex);
         }
     }

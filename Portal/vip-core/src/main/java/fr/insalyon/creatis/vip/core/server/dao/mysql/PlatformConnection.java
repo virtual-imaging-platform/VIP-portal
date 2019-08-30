@@ -121,7 +121,8 @@ public class PlatformConnection {
                         + server.getAdminLastName().toLowerCase();
 
                     try {
-                        CoreDAOFactory.getDAOFactory().getUserDAO().add(
+                        CoreDAOFactory.getDAOFactory()
+                            .getUserDAO(connection).add(
                             new User(server.getAdminFirstName(),
                                      server.getAdminLastName(),
                                      server.getAdminEmail(),
@@ -213,6 +214,8 @@ public class PlatformConnection {
     // This avoids him to have to catch 2 types of exceptions.
     public Connection getConnection() throws SQLException {
         Connection connection = dataSource.getConnection();
+        Connection actual = ((javax.sql.PooledConnection)connection).getConnection();
+        logger.info("actual connection : " + actual.toString());
         connection.setAutoCommit(true);
         return connection;
     }

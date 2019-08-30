@@ -76,15 +76,16 @@ public class Carmin {
     Response getExecution(
             @XmlElement(required = true) @WebParam(name = "executionId") String executionId) {
         Response r;
-        try {
+        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
             ApiUtils.methodInvocationLog("getExecution", executionId);
             ApiUtils.throwIfNull(executionId, "Execution id");
-            ApiContext apiContext = new SoapApiBusiness().getApiContext(wsContext, true);
+            ApiContext apiContext = new SoapApiBusiness().getApiContext(
+                wsContext, true, connection);
             ExecutionBusiness eb = new ExecutionBusiness(apiContext);
             eb.checkIfUserCanAccessExecution(executionId);
             Execution e = eb.getExecution(executionId,false);
             r = new Response(0, ApiUtils.getMessage(apiContext), e);
-        } catch (ApiException ex) {
+        } catch (ApiException | SQLException ex) {
             logger.error(ex);
             r = new Response(1, ex.getMessage(), null);
         }
@@ -95,13 +96,14 @@ public class Carmin {
     public @XmlElement(required = true)
     Response listExecutions() {
         Response r;
-        try {
+        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
             ApiUtils.methodInvocationLog("listExecutions");
-            ApiContext apiContext = new SoapApiBusiness().getApiContext(wsContext, true);
+            ApiContext apiContext = new SoapApiBusiness().getApiContext(
+                wsContext, true, connection);
             ExecutionBusiness eb = new ExecutionBusiness(apiContext);
             Execution[] executions = eb.listExecutions(500); // will not return more than 500 executions.
             r = new Response(0, ApiUtils.getMessage(apiContext), executions);
-        } catch (ApiException ex) {
+        } catch (ApiException | SQLException ex) {
             logger.error(ex);
             r = new Response(1, ex.getMessage(), null);
         }
@@ -112,13 +114,14 @@ public class Carmin {
     public @XmlElement(required = true)
     Response getStdOut(@XmlElement(required = true) @WebParam(name = "executionId") String executionId) {
         Response r;
-        try {
+        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
             ApiUtils.methodInvocationLog("getStdOut",executionId);
-            ApiContext apiContext = new SoapApiBusiness().getApiContext(wsContext, true);
+            ApiContext apiContext = new SoapApiBusiness().getApiContext(
+                wsContext, true, connection);
             ExecutionBusiness eb = new ExecutionBusiness(apiContext);
             String stdout = eb.getStdOut(executionId);
             r = new Response(0, ApiUtils.getMessage(apiContext), stdout);
-        } catch (ApiException ex) {
+        } catch (ApiException | SQLException ex) {
             logger.error(ex);
             r = new Response(1, ex.getMessage(), null);
         }
@@ -129,13 +132,14 @@ public class Carmin {
     public @XmlElement(required = true)
     Response getStdErr(@XmlElement(required = true) @WebParam(name = "executionId") String executionId) {
         Response r;
-        try {
+        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
             ApiUtils.methodInvocationLog("getStdErr",executionId);
-            ApiContext apiContext = new SoapApiBusiness().getApiContext(wsContext, true);
+            ApiContext apiContext = new SoapApiBusiness().getApiContext(
+                wsContext, true, connection);
             ExecutionBusiness eb = new ExecutionBusiness(apiContext);
             String stderr = eb.getStdErr(executionId);
             r = new Response(0, ApiUtils.getMessage(apiContext), stderr);
-        } catch (ApiException ex) {
+        } catch (ApiException | SQLException ex) {
             logger.error(ex);
             r = new Response(1, ex.getMessage(), null);
         }
@@ -148,16 +152,17 @@ public class Carmin {
             @XmlElement(required = true) @WebParam(name = "executionId") String executionId,
             @XmlElement(required = true) @WebParam(name = "keyValuePair") ArrayList<StringKeyValuePair> keyValuePairs) {
         Response r;
-        try {
+        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
             ApiUtils.methodInvocationLog("updateExecution", executionId, keyValuePairs);
             ApiUtils.throwIfNull(executionId, "Execution id");
             ApiUtils.throwIfNull(keyValuePairs, "Values");
-            ApiContext apiContext = new SoapApiBusiness().getApiContext(wsContext, true);
+            ApiContext apiContext = new SoapApiBusiness().getApiContext(
+                wsContext, true, connection);
             ExecutionBusiness eb = new ExecutionBusiness(apiContext);
             eb.checkIfUserCanAccessExecution(executionId);
             eb.updateExecution(executionId, keyValuePairs);
             r = new Response(0, ApiUtils.getMessage(apiContext), null);
-        } catch (ApiException ex) {
+        } catch (ApiException | SQLException ex) {
             logger.error(ex);
             r = new Response(1, ex.getMessage(), null);
         }
@@ -183,11 +188,14 @@ public class Carmin {
             }
             if(executionName == null)
                 executionName = "Untitled";
-            ApiContext apiContext = new SoapApiBusiness().getApiContext(wsContext, true);
+            ApiContext apiContext = new SoapApiBusiness().getApiContext(
+                wsContext, true, connection);
             PipelineBusiness pb = new PipelineBusiness(apiContext);
             pb.checkIfUserCanAccessPipeline(pipelineId, connection);
             ExecutionBusiness eb = new ExecutionBusiness(apiContext);
-            String id = eb.initExecution(pipelineId, inputValues, timeout, executionName, studyId, playExecution);
+            String id = eb.initExecution(
+                pipelineId, inputValues, timeout, executionName, studyId,
+                playExecution, connection);
             r = new Response(0, ApiUtils.getMessage(apiContext), id);
         } catch (ApiException | SQLException ex) {
             logger.error(ex);
@@ -200,15 +208,16 @@ public class Carmin {
     public @XmlElement(required = true)
     Response playExecution(@XmlElement(required = true) @WebParam(name = "executionId") String executionId) {
         Response r;
-        try {
+        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
             ApiUtils.methodInvocationLog("playExecution", executionId);
             ApiUtils.throwIfNull(executionId, "Execution id");
-            ApiContext apiContext = new SoapApiBusiness().getApiContext(wsContext, true);
+            ApiContext apiContext = new SoapApiBusiness().getApiContext(
+                wsContext, true, connection);
             ExecutionBusiness eb = new ExecutionBusiness(apiContext);
             eb.checkIfUserCanAccessExecution(executionId);
             ExecutionStatus s = eb.playExecution(executionId);
             r = new Response(0, ApiUtils.getMessage(apiContext), s);
-        } catch (ApiException ex) {
+        } catch (ApiException | SQLException ex) {
             logger.error(ex);
             r = new Response(1, ex.getMessage(), null);
         }
@@ -219,15 +228,16 @@ public class Carmin {
     public @XmlElement(required = true)
     Response killExecution(@XmlElement(required = true) @WebParam(name = "executionId") String executionId) {
         Response r;
-        try {
+        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
             ApiUtils.methodInvocationLog("killExecution", executionId);
             ApiUtils.throwIfNull(executionId, "Execution id");
-            ApiContext apiContext = new SoapApiBusiness().getApiContext(wsContext, true);
+            ApiContext apiContext = new SoapApiBusiness().getApiContext(
+                wsContext, true, connection);
             ExecutionBusiness eb = new ExecutionBusiness(apiContext);
             eb.checkIfUserCanAccessExecution(executionId);
             eb.killExecution(executionId);
             r = new Response(0, ApiUtils.getMessage(apiContext), null);
-        } catch (ApiException ex) {
+        } catch (ApiException | SQLException ex) {
             logger.error(ex);
             r = new Response(1, ex.getMessage(), null);
         }
@@ -240,15 +250,16 @@ public class Carmin {
             @XmlElement(required = true) @WebParam(name = "executionId") String executionId,
             @XmlElement(required = true) @WebParam(name = "deleteFiles") Boolean deleteFiles) {
         Response r;
-        try {
+        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
             ApiUtils.methodInvocationLog("deleteExecution", executionId, deleteFiles);
             ApiUtils.throwIfNull(executionId, "Execution id");
-            ApiContext apiContext = new SoapApiBusiness().getApiContext(wsContext, true);
+            ApiContext apiContext = new SoapApiBusiness().getApiContext(
+                wsContext, true, connection);
             ExecutionBusiness eb = new ExecutionBusiness(apiContext);
             eb.checkIfUserCanAccessExecution(executionId);
             eb.deleteExecution(executionId, deleteFiles);
             r = new Response(0, ApiUtils.getMessage(apiContext), null);
-        } catch (ApiException ex) {
+        } catch (ApiException | SQLException ex) {
             logger.error(ex);
             r = new Response(1, ex.getMessage(), null);
         }
@@ -261,15 +272,16 @@ public class Carmin {
             @XmlElement(required = true) @WebParam(name = "executionId") String executionId,
             @WebParam(name = "protocol") String protocol) {
         Response r;
-        try {
+        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
             ApiUtils.methodInvocationLog("getExecutionResults", executionId, protocol);
             ApiUtils.throwIfNull(executionId, "Execution id");
-            ApiContext apiContext = new SoapApiBusiness().getApiContext(wsContext, true);
+            ApiContext apiContext = new SoapApiBusiness().getApiContext(
+                wsContext, true, connection);
             ExecutionBusiness eb = new ExecutionBusiness(apiContext);
             eb.checkIfUserCanAccessExecution(executionId);
             String[] results = eb.getSoapExecutionResultsURLs(executionId, protocol);
             r = new Response(0, ApiUtils.getMessage(apiContext), results);
-        } catch (ApiException ex) {
+        } catch (ApiException | SQLException ex) {
             logger.error(ex);
             r = new Response(1, ex.getMessage(), null);
         }
@@ -285,13 +297,14 @@ public class Carmin {
     public @XmlElement(required = true)
     Response getGlobalProperties() {
         Response r;
-        try {
+        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
             ApiUtils.methodInvocationLog("getGlobalProperties");
-            ApiContext apiContext = new SoapApiBusiness().getApiContext(wsContext, false);
+            ApiContext apiContext = new SoapApiBusiness().getApiContext(
+                wsContext, false, connection);
             GlobalPropertiesBusiness bpb = new GlobalPropertiesBusiness(apiContext);
             GlobalProperties gp = bpb.getGlobalProperties();
             r = new Response(0, ApiUtils.getMessage(apiContext), gp);
-        } catch (ApiException ex) {
+        } catch (ApiException | SQLException ex) {
             logger.error(ex);
             r = new Response(1, ex.getMessage(), null);
         }
@@ -310,7 +323,8 @@ public class Carmin {
         try(Connection connection = PlatformConnection.getInstance().getConnection()) {
             ApiUtils.methodInvocationLog("getPipeline", pipelineId);
             ApiUtils.throwIfNull(pipelineId, "Pipeline id");
-            ApiContext apiContext = new SoapApiBusiness().getApiContext(wsContext, true);
+            ApiContext apiContext = new SoapApiBusiness().getApiContext(
+                wsContext, true, connection);
             PipelineBusiness pb = new PipelineBusiness(apiContext);
             pb.checkIfUserCanAccessPipeline(pipelineId, connection);
             Pipeline p = pb.getPipeline(pipelineId, connection);
@@ -328,7 +342,8 @@ public class Carmin {
         Response r;
         try(Connection connection = PlatformConnection.getInstance().getConnection()) {
             ApiUtils.methodInvocationLog("listPipelines", studyIdentifier);
-            ApiContext apiContext = new SoapApiBusiness().getApiContext(wsContext, true);
+            ApiContext apiContext = new SoapApiBusiness().getApiContext(
+                wsContext, true, connection);
             PipelineBusiness pb = new PipelineBusiness(apiContext);
             Pipeline[] pipelines = pb.listPipelines(studyIdentifier, connection);
             r = new Response(0, ApiUtils.getMessage(apiContext),pipelines);
@@ -348,15 +363,16 @@ public class Carmin {
     public @XmlElement(required = true)
     Response authenticateSession(@XmlElement(required = true) @WebParam(name = "userName") String userName, @XmlElement(required = true) @WebParam(name = "password") String password) {
         Response r;
-        try {
+        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
             ApiUtils.methodInvocationLog("authenticateSession", userName, "*****");
             ApiUtils.throwIfNull(userName, "User name");
             ApiUtils.throwIfNull(password, "Password");
-            ApiContext apiContext = new SoapApiBusiness().getApiContext(wsContext, false);
+            ApiContext apiContext = new SoapApiBusiness().getApiContext(
+                wsContext, false, connection);
             AuthenticationBusiness ab = new AuthenticationBusiness(apiContext);
-            ab.authenticateSession(userName, password);
+            ab.authenticateSession(userName, password, connection);
             r = new Response(0, ApiUtils.getMessage(apiContext), null);
-        } catch (ApiException ex) {
+        } catch (ApiException | SQLException ex) {
             logger.error(ex);
             r = new Response(1, ex.getMessage(), null);
         }
@@ -367,12 +383,13 @@ public class Carmin {
     public @XmlElement(required = true)
     Response authenticateHTTP(@XmlElement(required = true) @WebParam(name = "userName") String userName) {
         Response r;
-        try {
-            ApiContext apiContext = new SoapApiBusiness().getApiContext(wsContext, false);
+        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
+            ApiContext apiContext = new SoapApiBusiness().getApiContext(
+                wsContext, false, connection);
             AuthenticationBusiness ab = new AuthenticationBusiness(apiContext);
             ab.authenticateHTTP(userName);
             r = new Response(0, ApiUtils.getMessage(apiContext), null);
-        } catch (ApiException ex) {
+        } catch (ApiException | SQLException ex) {
             logger.error(ex);
             r = new Response(1, ex.getMessage(), null);
         }
@@ -383,13 +400,14 @@ public class Carmin {
     public @XmlElement(required = true)
     Response logout() {
         Response r;
-        try {
+        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
             ApiUtils.methodInvocationLog("logout");
-            ApiContext apiContext = new SoapApiBusiness().getApiContext(wsContext, true);
+            ApiContext apiContext = new SoapApiBusiness().getApiContext(
+                wsContext, true, connection);
             AuthenticationBusiness ab = new AuthenticationBusiness(apiContext);
-            ab.logout();
+            ab.logout(connection);
             r = new Response(0, ApiUtils.getMessage(apiContext), null);
-        } catch (ApiException ex) {
+        } catch (ApiException | SQLException ex) {
             logger.error(ex);
             r = new Response(1, ex.getMessage(), null);
         }

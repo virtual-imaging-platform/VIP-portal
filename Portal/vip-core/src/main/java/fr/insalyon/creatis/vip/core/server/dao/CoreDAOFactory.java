@@ -43,7 +43,8 @@ public abstract class CoreDAOFactory {
         return MySQLDAOFactory.getInstance();
     }
 
-    public abstract UserDAO getUserDAO() throws DAOException;
+    public abstract UserDAO getUserDAO(Connection connection)
+        throws DAOException;
 
     public abstract GroupDAO getGroupDAO(Connection connection)
         throws DAOException;

@@ -84,11 +84,13 @@ public class ConfigurationBusiness {
      * @return
      * @throws BusinessException
      */
-    public boolean validateSession(String email, String session) throws BusinessException {
-
+    public boolean validateSession(
+        String email, String session, Connection connection)
+        throws BusinessException {
         try {
             if (email != null && session != null) {
-                UserDAO userDAO = CoreDAOFactory.getDAOFactory().getUserDAO();
+                UserDAO userDAO = CoreDAOFactory.getDAOFactory()
+                    .getUserDAO(connection);
                 if (userDAO.verifySession(email, session) && !userDAO.isLocked(email)) {
                     return true;
                 }
@@ -98,7 +100,6 @@ public class ConfigurationBusiness {
                 }
             }
             return false;
-
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }
@@ -110,11 +111,11 @@ public class ConfigurationBusiness {
      * @return
      * @throws BusinessException
      */
-    public User getUser(String email) throws BusinessException {
-
+    public User getUser(String email, Connection connection)
+        throws BusinessException {
         try {
-            return CoreDAOFactory.getDAOFactory().getUserDAO().getUser(email);
-
+            return CoreDAOFactory.getDAOFactory()
+                .getUserDAO(connection).getUser(email);
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }
@@ -172,7 +173,7 @@ public class ConfigurationBusiness {
             user.setFolder(folder);
             user.setLevel(UserLevel.Beginner);
 
-            CoreDAOFactory.getDAOFactory().getUserDAO().add(user);
+            CoreDAOFactory.getDAOFactory().getUserDAO(connection).add(user);
 
             // Adding user to groups
             List<Group> groups = null;
@@ -238,7 +239,7 @@ public class ConfigurationBusiness {
                                              + "</body>"
                                              + "</html>";
 
-                for (String email : getAdministratorsEmails()) {
+                for (String email : getAdministratorsEmails(connection)) {
                     CoreUtil.sendEmail("[VIP Admin] Account Requested", adminsEmailContents,
                                        new String[]{email}, true, user.getEmail());
                 }
@@ -269,7 +270,7 @@ public class ConfigurationBusiness {
                                              + "</body>"
                                              + "</html>";
 
-                for (String email : getAdministratorsEmails()) {
+                for (String email : getAdministratorsEmails(connection)) {
                     CoreUtil.sendEmail("[VIP Admin] Automatic Account Creation", adminsEmailContents,
                                        new String[]{email}, false, user.getEmail());
                 }
@@ -342,28 +343,38 @@ public class ConfigurationBusiness {
      * @return
      * @throws BusinessException
      */
-    public User signin(String email, String password) throws BusinessException {
-        return signin(email, password, true);
+    public User signin(String email, String password, Connection connection)
+        throws BusinessException {
+        return signin(email, password, true, connection);
     }
 
-    public User signinWithoutResetingSession(String email, String password) throws BusinessException {
-        return signin(email, password, false);
+    public User signinWithoutResetingSession(
+        String email, String password, Connection connection)
+        throws BusinessException {
+        return signin(email, password, false, connection);
     }
 
-    private User signin(String email, String password, boolean resetSession) throws BusinessException {
+    private User signin(
+        String email,
+        String password,
+        boolean resetSession,
+        Connection connection)
+        throws BusinessException {
 
         try {
             password = MD5.get(password);
-            UserDAO userDAO = CoreDAOFactory.getDAOFactory().getUserDAO();
+            UserDAO userDAO = CoreDAOFactory.getDAOFactory()
+                .getUserDAO(connection);
 
             if (userDAO.authenticate(email, password)) {
 
                 userDAO.resetNFailedAuthentications(email);
 
                 if (resetSession) {
-                    return getUserWithSession(email);
+                    return getUserWithSession(email, connection);
                 } else {
-                    return CoreDAOFactory.getDAOFactory().getUserDAO().getUser(email);
+                    return CoreDAOFactory.getDAOFactory()
+                        .getUserDAO(connection).getUser(email);
                 }
 
             } else {
@@ -453,12 +464,12 @@ public class ConfigurationBusiness {
      * @param email
      * @throws BusinessException
      */
-    public void signout(String email) throws BusinessException {
-
+    public void signout(String email, Connection connection)
+        throws BusinessException {
         try {
             String session = UUID.randomUUID().toString();
-            CoreDAOFactory.getDAOFactory().getUserDAO().updateSession(email, session);
-
+            CoreDAOFactory.getDAOFactory()
+                .getUserDAO(connection).updateSession(email, session);
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }
@@ -471,10 +482,11 @@ public class ConfigurationBusiness {
      * @return
      * @throws BusinessException
      */
-    public User activate(String email, String code) throws BusinessException {
-
+    public User activate(String email, String code, Connection connection)
+        throws BusinessException {
         try {
-            UserDAO userDAO = CoreDAOFactory.getDAOFactory().getUserDAO();
+            UserDAO userDAO = CoreDAOFactory.getDAOFactory()
+                .getUserDAO(connection);
             if (userDAO.isLocked(email)) {
                 logger.error("Activation failed to '" + email + "' (user is locked).");
                 throw new BusinessException("User is locked.");
@@ -515,12 +527,12 @@ public class ConfigurationBusiness {
      * @param email
      * @throws BusinessException
      */
-    public void activateUser(String email) throws BusinessException {
-
+    public void activateUser(String email, Connection connection)
+        throws BusinessException {
         try {
-            User user = CoreDAOFactory.getDAOFactory().getUserDAO().getUser(email);
-            activate(email, user.getCode());
-
+            User user = CoreDAOFactory.getDAOFactory()
+                .getUserDAO(connection).getUser(email);
+            activate(email, user.getCode(), connection);
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }
@@ -531,12 +543,14 @@ public class ConfigurationBusiness {
      * @param email
      * @throws BusinessException
      */
-    public void sendActivationCode(String email) throws BusinessException {
-
+    public void sendActivationCode(String email, Connection connection)
+        throws BusinessException {
         try {
-            User user = CoreDAOFactory.getDAOFactory().getUserDAO().getUser(email);
+            User user = CoreDAOFactory.getDAOFactory()
+                .getUserDAO(connection).getUser(email);
 
-            if (CoreDAOFactory.getDAOFactory().getUserDAO().isLocked(email)) {
+            if (CoreDAOFactory.getDAOFactory()
+                .getUserDAO(connection).isLocked(email)) {
                 throw new BusinessException("User is locked.");
             }
 
@@ -565,17 +579,20 @@ public class ConfigurationBusiness {
      * @param email
      * @throws BusinessException
      */
-    public void sendResetCode(String email) throws BusinessException {
-
+    public void sendResetCode(String email, Connection connection)
+        throws BusinessException {
         try {
-            User user = CoreDAOFactory.getDAOFactory().getUserDAO().getUser(email);
+            User user = CoreDAOFactory.getDAOFactory()
+                .getUserDAO(connection).getUser(email);
 
-            if (CoreDAOFactory.getDAOFactory().getUserDAO().isLocked(email)) {
+            if (CoreDAOFactory.getDAOFactory()
+                .getUserDAO(connection).isLocked(email)) {
                 throw new BusinessException("User is locked.");
             }
 
             String code = UUID.randomUUID().toString();
-            CoreDAOFactory.getDAOFactory().getUserDAO().updateCode(email, code);
+            CoreDAOFactory.getDAOFactory()
+                .getUserDAO(connection).updateCode(email, code);
 
             String emailContent = "<html>"
                                   + "<head></head>"
@@ -597,12 +614,17 @@ public class ConfigurationBusiness {
         }
     }
 
-    public void requestNewEmail(User user, String newEmail) throws BusinessException {
+    public void requestNewEmail(
+        User user, String newEmail, Connection connection)
+        throws BusinessException {
 
         try {
             String code = UUID.randomUUID().toString();
-            CoreDAOFactory.getDAOFactory().getUserDAO().updateCode(user.getEmail(), code);
-            CoreDAOFactory.getDAOFactory().getUserDAO().updateNextEmail(user.getEmail(), newEmail);
+            CoreDAOFactory.getDAOFactory()
+                .getUserDAO(connection).updateCode(user.getEmail(), code);
+            CoreDAOFactory.getDAOFactory()
+                .getUserDAO(connection)
+                .updateNextEmail(user.getEmail(), newEmail);
 
             String emailContent = "<html>"
                     + "<head></head>"
@@ -633,10 +655,12 @@ public class ConfigurationBusiness {
      * @param sendNotificationEmail
      * @throws BusinessException
      */
-    public void removeUser(String email, boolean sendNotificationEmail) throws BusinessException {
+    public void removeUser(
+        String email, boolean sendNotificationEmail, Connection connection)
+        throws BusinessException {
 
         try {
-            User user = getUser(email);
+            User user = getUser(email, connection);
             GRIDAPoolClient client = CoreUtil.getGRIDAPoolClient();
 
             client.removeOperationsByUser(email);
@@ -646,7 +670,7 @@ public class ConfigurationBusiness {
             client.delete(Server.getInstance().getDataManagerUsersHome() + "/"
                           + user.getFolder() + "_" + CoreConstants.FOLDER_TRASH, user.getEmail());
 
-            CoreDAOFactory.getDAOFactory().getUserDAO().remove(email);
+            CoreDAOFactory.getDAOFactory().getUserDAO(connection).remove(email);
 
             if (sendNotificationEmail) {
 
@@ -666,7 +690,7 @@ public class ConfigurationBusiness {
                                              + "</body>"
                                              + "</html>";
 
-                for (String adminEmail : getAdministratorsEmails()) {
+                for (String adminEmail : getAdministratorsEmails(connection)) {
                     CoreUtil.sendEmail("[VIP Admin] Account Removed", adminsEmailContents,
                                        new String[]{adminEmail}, true, user.getEmail());
                 }
@@ -683,11 +707,10 @@ public class ConfigurationBusiness {
      *
      * @return @throws BusinessException
      */
-    public List<User> getUsers() throws BusinessException {
-
+    public List<User> getUsers(Connection connection) throws BusinessException {
         try {
-            return CoreDAOFactory.getDAOFactory().getUserDAO().getUsers();
-
+            return CoreDAOFactory.getDAOFactory()
+                .getUserDAO(connection).getUsers();
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }
@@ -699,17 +722,19 @@ public class ConfigurationBusiness {
      * @param validGroup
      * @return @throws BusinessException
      */
-    public List<String> getUserNames(String email, boolean validGroup)
-            throws BusinessException {
-
+    public List<String> getUserNames(
+        String email, boolean validGroup, Connection connection)
+        throws BusinessException {
         try {
             if (validGroup) {
-
                 // Discarded the effect of validGroups as this has several side effects (see #2669)
                 //List<String> groups = CoreDAOFactory.getDAOFactory().getUsersGroupsDAO().getUserAdminGroups(email);
                 // if (groups.isEmpty()) {
                 List<String> userNames = new ArrayList<String>();
-                userNames.add(CoreDAOFactory.getDAOFactory().getUserDAO().getUser(email).getFullName());
+                userNames.add(CoreDAOFactory.getDAOFactory()
+                              .getUserDAO(connection)
+                              .getUser(email)
+                              .getFullName());
                 return userNames;
 
 //                } else {
@@ -717,7 +742,7 @@ public class ConfigurationBusiness {
 //                }
             } else {
                 List<String> userNames = new ArrayList<String>();
-                for (User user : getUsers()) {
+                for (User user : getUsers(connection)) {
                     userNames.add(user.getFullName());
                 }
 
@@ -891,11 +916,11 @@ public class ConfigurationBusiness {
      * @param email
      * @return
      */
-    public User getUserData(String email) throws BusinessException {
-
+    public User getUserData(String email, Connection connection)
+        throws BusinessException {
         try {
-            return CoreDAOFactory.getDAOFactory().getUserDAO().getUser(email);
-
+            return CoreDAOFactory.getDAOFactory()
+                .getUserDAO(connection).getUser(email);
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }
@@ -908,10 +933,10 @@ public class ConfigurationBusiness {
      * @return
      * @throws BusinessException
      */
-    public User updateUser(User user) throws BusinessException {
-
+    public User updateUser(User user, Connection connection)
+        throws BusinessException {
         try {
-            CoreDAOFactory.getDAOFactory().getUserDAO().update(user);
+            CoreDAOFactory.getDAOFactory().getUserDAO(connection).update(user);
             return user;
         } catch (DAOException ex) {
             throw new BusinessException(ex);
@@ -925,15 +950,19 @@ public class ConfigurationBusiness {
      * @param newPassword
      * @throws BusinessException
      */
-    public void updateUserPassword(String email, String currentPassword,
-                                   String newPassword) throws BusinessException {
+    public void updateUserPassword(
+        String email,
+        String currentPassword,
+        String newPassword,
+        Connection connection)
+        throws BusinessException {
 
         try {
             currentPassword = MD5.get(currentPassword);
             newPassword = MD5.get(newPassword);
-            CoreDAOFactory.getDAOFactory().getUserDAO().updatePassword(
-                    email, currentPassword, newPassword);
-
+            CoreDAOFactory.getDAOFactory()
+                .getUserDAO(connection)
+                .updatePassword(email, currentPassword, newPassword);
         } catch (NoSuchAlgorithmException ex) {
             logger.error(ex);
             throw new BusinessException(ex);
@@ -950,11 +979,12 @@ public class ConfigurationBusiness {
         throws BusinessException {
         verifyEmail(newEmail);
         try {
-            CoreDAOFactory.getDAOFactory().getUserDAO().updateEmail(oldEmail, newEmail);
+            CoreDAOFactory.getDAOFactory()
+                .getUserDAO(connection).updateEmail(oldEmail, newEmail);
         } catch (DAOException e) {
             String errorMessage = "Error changing email from " + newEmail + " to " + newEmail;
             logger.error(errorMessage, e);
-            sendErrorEmailToAdmins(errorMessage, e, oldEmail);
+            sendErrorEmailToAdmins(errorMessage, e, oldEmail, connection);
             throw new BusinessException("Error changing email address", e);
         }
 
@@ -969,32 +999,38 @@ public class ConfigurationBusiness {
             String errorMessage = "Error changing email from " + newEmail + " to " + newEmail
                     + "in the Publication table";
             logger.error(errorMessage, e);
-            sendErrorEmailToAdmins(errorMessage, e, oldEmail);
+            sendErrorEmailToAdmins(errorMessage, e, oldEmail, connection);
         }
     }
 
-    public void resetNextEmail(String currentEmail) throws BusinessException {
+    public void resetNextEmail(String currentEmail, Connection connection)
+        throws BusinessException {
         try {
-            CoreDAOFactory.getDAOFactory().getUserDAO().updateNextEmail(currentEmail, null);
+            CoreDAOFactory.getDAOFactory()
+                .getUserDAO(connection).updateNextEmail(currentEmail, null);
         } catch (DAOException e) {
             throw new BusinessException(e);
         }
     }
 
-    public void updateTermsOfUse(String email) throws BusinessException {
+    public void updateTermsOfUse(String email, Connection connection)
+        throws BusinessException {
         try {
-            CoreDAOFactory.getDAOFactory().getUserDAO().updateTermsOfUse(email, getCurrentTimeStamp());
-
+            CoreDAOFactory.getDAOFactory()
+                .getUserDAO(connection)
+                .updateTermsOfUse(email, getCurrentTimeStamp());
         } catch (DAOException ex) {
             logger.error(ex);
             throw new BusinessException(ex);
         }
     }
 
-    public void updateLastUpdatePublication(String email) throws BusinessException {
+    public void updateLastUpdatePublication(String email, Connection connection)
+        throws BusinessException {
         try {
-            CoreDAOFactory.getDAOFactory().getUserDAO().updateLastUpdatePublication(email, getCurrentTimeStamp());
-
+            CoreDAOFactory.getDAOFactory()
+                .getUserDAO(connection)
+                .updateLastUpdatePublication(email, getCurrentTimeStamp());
         } catch (DAOException ex) {
             logger.error(ex);
             throw new BusinessException(ex);
@@ -1044,11 +1080,11 @@ public class ConfigurationBusiness {
      * @param email
      * @throws BusinessException
      */
-    public void updateUserLastLogin(String email) throws BusinessException {
-
+    public void updateUserLastLogin(String email, Connection connection)
+        throws BusinessException {
         try {
-            CoreDAOFactory.getDAOFactory().getUserDAO().updateLastLogin(email, new Date());
-
+            CoreDAOFactory.getDAOFactory()
+                .getUserDAO(connection).updateLastLogin(email, new Date());
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }
@@ -1080,13 +1116,16 @@ public class ConfigurationBusiness {
      * @param locked
      * @throws BusinessException
      */
-    public void updateUser(String email, UserLevel level, CountryCode countryCode,
-                           int maxRunningSimulations, boolean locked) throws BusinessException {
+    public void updateUser(
+        String email, UserLevel level, CountryCode countryCode,
+        int maxRunningSimulations, boolean locked, Connection connection)
+        throws BusinessException {
 
         try {
-            CoreDAOFactory.getDAOFactory().getUserDAO().update(email, level,
-                                                               countryCode, maxRunningSimulations, locked);
-
+            CoreDAOFactory.getDAOFactory()
+                .getUserDAO(connection)
+                .update(
+                    email, level, countryCode, maxRunningSimulations, locked);
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }
@@ -1134,14 +1173,18 @@ public class ConfigurationBusiness {
      * @param password
      * @throws BusinessException
      */
-    public void resetPassword(String email, String code, String password) throws BusinessException {
+    public void resetPassword(
+        String email, String code, String password, Connection connection)
+        throws BusinessException {
 
         try {
-            User user = CoreDAOFactory.getDAOFactory().getUserDAO().getUser(email);
+            User user = CoreDAOFactory.getDAOFactory()
+                .getUserDAO(connection).getUser(email);
 
             if (code.equals(user.getCode())) {
-                CoreDAOFactory.getDAOFactory().getUserDAO().resetPassword(email, MD5.get(password));
-
+                CoreDAOFactory.getDAOFactory()
+                    .getUserDAO(connection)
+                    .resetPassword(email, MD5.get(password));
             } else {
                 throw new BusinessException("Wrong reset code.");
             }
@@ -1162,10 +1205,11 @@ public class ConfigurationBusiness {
      * @return
      * @throws DAOException
      */
-    private String[] getAdministratorsEmails() throws DAOException {
-
+    private String[] getAdministratorsEmails(Connection connection)
+        throws DAOException {
         List<String> emails = new ArrayList<String>();
-        for (User admin : CoreDAOFactory.getDAOFactory().getUserDAO().getAdministrators()) {
+        for (User admin : CoreDAOFactory.getDAOFactory()
+                 .getUserDAO(connection).getAdministrators()) {
             emails.add(admin.getEmail());
         }
         return emails.toArray(new String[]{});
@@ -1235,8 +1279,9 @@ public class ConfigurationBusiness {
         }
     }
 
-    public User getUserWithSession(String email) throws DAOException {
-        UserDAO userDAO = CoreDAOFactory.getDAOFactory().getUserDAO();
+    public User getUserWithSession(String email, Connection connection)
+        throws DAOException {
+        UserDAO userDAO = CoreDAOFactory.getDAOFactory().getUserDAO(connection);
 
         String session = UUID.randomUUID().toString();
         userDAO.updateSession(email, session);
@@ -1254,7 +1299,7 @@ public class ConfigurationBusiness {
 
         User user;
         try {
-            user = getUserWithSession(email);
+            user = getUserWithSession(email, connection);
         } catch (DAOException ex) {
             //User doesn't exist: let's create an account
             String name = email.substring(0, email.indexOf('@'));
@@ -1282,9 +1327,9 @@ public class ConfigurationBusiness {
                            connection, defaultAccountType);
                 }
             }
-            activateUser(user.getEmail());
+            activateUser(user.getEmail(), connection);
             try {
-                user = getUserWithSession(email);
+                user = getUserWithSession(email, connection);
             } catch (DAOException ex1) {
                 throw new BusinessException(ex1);
             }
@@ -1388,14 +1433,17 @@ public class ConfigurationBusiness {
         }
     }
 
-    public boolean testLastUpdatePublication(String email) throws BusinessException {
-
+    public boolean testLastUpdatePublication(String email, Connection connection)
+        throws BusinessException {
         try {
-            if (CoreDAOFactory.getDAOFactory().getUserDAO().getLastPublicationUpdate(email) == null) {
+            if (CoreDAOFactory.getDAOFactory()
+                .getUserDAO(connection).getLastPublicationUpdate(email) == null) {
                 return true;
             } else {
                 Calendar cal = Calendar.getInstance();
-                cal.setTime(CoreDAOFactory.getDAOFactory().getUserDAO().getLastPublicationUpdate(email));
+                cal.setTime(CoreDAOFactory.getDAOFactory()
+                            .getUserDAO(connection)
+                            .getLastPublicationUpdate(email));
                 cal.add(Calendar.MONTH, Server.getInstance().getNumberMonthsToTestLastPublicationUpdates());
                 Timestamp ts = new Timestamp(cal.getTime().getTime());
                 return ts.before(getCurrentTimeStamp());
@@ -1408,9 +1456,11 @@ public class ConfigurationBusiness {
 
     // api key management
 
-    public String getUserApikey(String email) throws BusinessException {
+    public String getUserApikey(String email, Connection connection)
+        throws BusinessException {
         try {
-            UserDAO userDAO = CoreDAOFactory.getDAOFactory().getUserDAO();
+            UserDAO userDAO = CoreDAOFactory.getDAOFactory()
+                .getUserDAO(connection);
             return userDAO.getUserApikey(email);
         } catch (DAOException e) {
             logger.error("Error getting apikey for " + email);
@@ -1418,9 +1468,11 @@ public class ConfigurationBusiness {
         }
     }
 
-    public void deleteUserApikey(String email) throws BusinessException {
+    public void deleteUserApikey(String email, Connection connection)
+        throws BusinessException {
         try {
-            UserDAO userDAO = CoreDAOFactory.getDAOFactory().getUserDAO();
+            UserDAO userDAO = CoreDAOFactory.getDAOFactory()
+                .getUserDAO(connection);
             userDAO.updateUserApikey(email, null);
         } catch (DAOException e) {
             logger.error("Error deleting apikey for " + email);
@@ -1428,11 +1480,13 @@ public class ConfigurationBusiness {
         }
     }
 
-    public String generateNewUserApikey(String email) throws BusinessException {
+    public String generateNewUserApikey(String email, Connection connection)
+        throws BusinessException {
         try {
             SecureRandom random = new SecureRandom();
             String apikey = new BigInteger(130, random).toString(32);
-            UserDAO userDAO = CoreDAOFactory.getDAOFactory().getUserDAO();
+            UserDAO userDAO = CoreDAOFactory.getDAOFactory()
+                .getUserDAO(connection);
             userDAO.updateUserApikey(email, apikey);
             return apikey;
         } catch (DAOException e) {
@@ -1441,7 +1495,11 @@ public class ConfigurationBusiness {
         }
     }
 
-    private void sendErrorEmailToAdmins(String errorMessage, Exception exception, String userEmail) {
+    private void sendErrorEmailToAdmins(
+        String errorMessage,
+        Exception exception,
+        String userEmail,
+        Connection connection) {
         try {
             StringBuilder emailContent = new StringBuilder("<html><head></head><body>");
             emailContent.append("<p>Dear Administrator,</p>");
@@ -1461,7 +1519,7 @@ public class ConfigurationBusiness {
             emailContent.append("<p>Best Regards,</p><p>VIP Team</p>");
             emailContent.append("</body></html>");
 
-            for (String email : getAdministratorsEmails()) {
+            for (String email : getAdministratorsEmails(connection)) {
                 CoreUtil.sendEmail("[VIP Admin] VIP error", emailContent.toString(),
                         new String[]{email}, true, userEmail);
             }

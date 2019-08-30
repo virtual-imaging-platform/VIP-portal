@@ -167,7 +167,10 @@ public class SSHData implements SSHDAO {
             ps.setString(9, ssh.getEmail());
 
             try {
-                ps.setString(10, DataManagerBusiness.generateLFCDir(ssh.getName(), ssh.getEmail()));
+                ps.setString(
+                    10,
+                    DataManagerBusiness.generateLFCDir(
+                        ssh.getName(), ssh.getEmail(), connection));
             } catch (DataManagerException ex) {
                 logger.error(ex);
                 throw new DAOException(ex);
@@ -192,8 +195,10 @@ public class SSHData implements SSHDAO {
 
             ps.setString(1, email);
             try {
-                ps.setString(2, DataManagerBusiness.generateLFCDir(name, email));
-                logger.info("Removing connection " + email + " " + DataManagerBusiness.generateLFCDir(name, email));
+                ps.setString(
+                    2,
+                    DataManagerBusiness.generateLFCDir(name, email, connection));
+                logger.info("Removing connection " + email + " " + DataManagerBusiness.generateLFCDir(name, email, connection));
             } catch (DataManagerException ex) {
                 logger.error(ex);
                 throw new DAOException(ex);
@@ -222,8 +227,11 @@ public class SSHData implements SSHDAO {
                 ps.setTimestamp(1, new Timestamp(Calendar.getInstance().getTime().getTime()));
                 ps.setString(2, sshC.get(0));
                 try {
-                    ps.setString(3, DataManagerBusiness.generateLFCDir(sshC.get(1), sshC.get(0)));
-                    logger.info("Reset connection " + sshC.get(0) + " " + DataManagerBusiness.generateLFCDir(sshC.get(1), sshC.get(0)));
+                    ps.setString(
+                        3,
+                        DataManagerBusiness.generateLFCDir(
+                            sshC.get(1), sshC.get(0), connection));
+                    logger.info("Reset connection " + sshC.get(0) + " " + DataManagerBusiness.generateLFCDir(sshC.get(1), sshC.get(0), connection));
                 } catch (DataManagerException ex) {
                     logger.error(ex);
                     throw new DAOException(ex);

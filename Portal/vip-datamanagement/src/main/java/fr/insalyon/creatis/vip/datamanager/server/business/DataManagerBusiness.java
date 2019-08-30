@@ -193,7 +193,7 @@ public class DataManagerBusiness {
         try {
             //create LFC dir
             ConfigurationBusiness conf = new ConfigurationBusiness();
-            User user = conf.getUser(ssh.getEmail());
+            User user = conf.getUser(ssh.getEmail(), connection);
             ssh.setLfcDir(DataManagerUtil.parseBaseDir(user, ssh.getLfcDir()));
             SSHDAOFactory.getDAOFactory().getSSHDAO(connection).addSSH(ssh);
         } catch (DAOException ex) {
@@ -201,7 +201,6 @@ public class DataManagerBusiness {
         } catch (DataManagerException ex) {
             throw new BusinessException(ex);
         }
-
     }
 
     public void removeSSH(String email, String name, Connection connection)
@@ -239,10 +238,12 @@ public class DataManagerBusiness {
         return bruteName;
     }
 
-    public static String generateLFCDir(String name, String email) throws DataManagerException, BusinessException {
+    public static String generateLFCDir(
+        String name, String email, Connection connection)
+        throws DataManagerException, BusinessException {
 
         ConfigurationBusiness conf = new ConfigurationBusiness();
-        User user = conf.getUser(email);
+        User user = conf.getUser(email, connection);
         String homeDir = Server.getInstance().getDataManagerUsersHome() + "/" + user.getFolder();
 
         return (homeDir + "/" + name);

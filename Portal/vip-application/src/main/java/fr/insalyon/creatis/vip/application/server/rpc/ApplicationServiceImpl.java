@@ -278,7 +278,8 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
             if (isSystemAdministrator()) {
                 List<String> classes = classBusiness.getClassesName(connection);
                 return new List[]{
-                    configurationBusiness.getUserNames(user.getEmail(), false),
+                    configurationBusiness.getUserNames(
+                        user.getEmail(), false, connection),
                     applicationBusiness.getApplicationNames(connection),
                     classes
                 };
@@ -287,7 +288,8 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
                     user.getEmail(), !user.isSystemAdministrator(), connection);
                 classes.removeAll(reservedClasses);
                 return new List[] {
-                    configurationBusiness.getUserNames(user.getEmail(), true),
+                    configurationBusiness.getUserNames(
+                        user.getEmail(), true, connection),
                     applicationBusiness.getApplicationNames(classes, connection),
                     classes
                 };

@@ -105,14 +105,22 @@ public abstract class AbstractAuthenticationService extends HttpServlet {
             authFailedResponse(request, response);
             return;
         }
-        resetFailedAuthenticationCount(email);
+        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
+            resetFailedAuthenticationCount(email, connection);
+        } catch (SQLException ex) {
+            logger.info(ex.getMessage());
+            authFailedResponse(request, response);
+            return;
+        }
         //authenticate email in VIP
         authSuccessResponse(request, response, email);
     }
 
-    private void resetFailedAuthenticationCount(String email) {
+    private void resetFailedAuthenticationCount(
+        String email, Connection connection) {
         try {
-            UserDAO userDAO = CoreDAOFactory.getDAOFactory().getUserDAO();
+            UserDAO userDAO = CoreDAOFactory.getDAOFactory()
+                .getUserDAO(connection);
             userDAO.resetNFailedAuthentications(email);
             logger.debug("Reset auth count for " + email);
         } catch (DAOException e) {
@@ -170,11 +178,11 @@ public abstract class AbstractAuthenticationService extends HttpServlet {
     }
 
     public static void setVIPSession(HttpServletRequest request, HttpServletResponse response, User user) throws BusinessException {
-        try {
+        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
             ConfigurationServiceImpl csi = new ConfigurationServiceImpl();
             user = csi.setUserSession(user, request.getSession());
             ConfigurationBusiness cb = new ConfigurationBusiness();
-            cb.updateUserLastLogin(user.getEmail());
+            cb.updateUserLastLogin(user.getEmail(), connection);
             Cookie userCookie = new Cookie(CoreConstants.COOKIES_USER, URLEncoder.encode(user.getEmail(), "UTF-8"));
             userCookie.setMaxAge((int) (CoreConstants.COOKIES_EXPIRATION_DATE.getTime() - new Date().getTime()));
             userCookie.setPath("/");
@@ -183,7 +191,7 @@ public abstract class AbstractAuthenticationService extends HttpServlet {
             userCookie.setMaxAge((int) (CoreConstants.COOKIES_EXPIRATION_DATE.getTime() - new Date().getTime()));
             sessionCookie.setPath("/");
             response.addCookie(sessionCookie);
-        } catch (UnsupportedEncodingException ex) {
+        } catch (SQLException | UnsupportedEncodingException ex) {
             throw new BusinessException(ex);
         }
     }

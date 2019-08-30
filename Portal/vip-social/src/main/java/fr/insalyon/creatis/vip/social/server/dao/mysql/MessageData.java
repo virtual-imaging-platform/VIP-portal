@@ -105,7 +105,9 @@ public class MessageData implements MessageDAO {
         }
     }
 
-    public List<Message> getMessagesByUser(String email, int limit, Date startDate) throws DAOException {
+    public List<Message> getMessagesByUser(
+        String email, int limit, Date startDate)
+        throws DAOException {
 
         try {
             PreparedStatement ps = connection.prepareStatement("SELECT "
@@ -122,8 +124,10 @@ public class MessageData implements MessageDAO {
             SimpleDateFormat f = new SimpleDateFormat("MMMM d, yyyy HH:mm");
 
             while (rs.next()) {
-                User from = CoreDAOFactory.getDAOFactory().getUserDAO().getUser(rs.getString("sender"));
-                User to = CoreDAOFactory.getDAOFactory().getUserDAO().getUser(email);
+                User from = CoreDAOFactory.getDAOFactory()
+                    .getUserDAO(connection).getUser(rs.getString("sender"));
+                User to = CoreDAOFactory.getDAOFactory()
+                    .getUserDAO(connection).getUser(email);
                 Date posted = new Date(rs.getTimestamp("posted").getTime());
                 messages.add(new Message(rs.getLong("id"), from, to, rs.getString("title"),
                         rs.getString("message"), f.format(posted), posted,
@@ -139,7 +143,9 @@ public class MessageData implements MessageDAO {
         }
     }
 
-    public List<Message> getSentMessagesByUser(String email, int limit, Date startDate) throws DAOException {
+    public List<Message> getSentMessagesByUser(
+        String email, int limit, Date startDate)
+        throws DAOException {
 
         try {
             PreparedStatement ps = connection.prepareStatement("SELECT "
@@ -157,7 +163,8 @@ public class MessageData implements MessageDAO {
 
             while (rs.next()) {
 
-                User sender = CoreDAOFactory.getDAOFactory().getUserDAO().getUser(email);
+                User sender = CoreDAOFactory.getDAOFactory()
+                    .getUserDAO(connection).getUser(email);
 
                 PreparedStatement ps2 = connection.prepareStatement("SELECT "
                         + "receiver FROM VIPSocialMessageSenderReceiver "
@@ -168,7 +175,9 @@ public class MessageData implements MessageDAO {
                 List<User> receivers = new ArrayList<User>();
 
                 while (rs2.next()) {
-                    receivers.add(CoreDAOFactory.getDAOFactory().getUserDAO().getUser(rs2.getString("receiver")));
+                    receivers.add(CoreDAOFactory.getDAOFactory()
+                                  .getUserDAO(connection)
+                                  .getUser(rs2.getString("receiver")));
                 }
                 Date posted = new Date(rs.getTimestamp("posted").getTime());
                 messages.add(new Message(rs.getLong("id"), sender,

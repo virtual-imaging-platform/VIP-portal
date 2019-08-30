@@ -200,7 +200,7 @@ public class MessageBusiness {
             if (recipients[0].equals("All")) {
                 ConfigurationBusiness configurationBusiness = new ConfigurationBusiness();
                 List<String> users = new ArrayList<String>();
-                for (User u : configurationBusiness.getUsers()) {
+                for (User u : configurationBusiness.getUsers(connection)) {
                     // Dont send mail to locked users
                     if (!u.isAccountLocked()) {
                         users.add(u.getEmail());

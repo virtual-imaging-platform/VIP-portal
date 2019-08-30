@@ -59,8 +59,8 @@ public class MySQLDAOFactory extends CoreDAOFactory {
     }
 
     @Override
-    public UserDAO getUserDAO() throws DAOException {
-        return new UserData();
+    public UserDAO getUserDAO(Connection connection) throws DAOException {
+        return new UserData(connection);
     }
 
     @Override

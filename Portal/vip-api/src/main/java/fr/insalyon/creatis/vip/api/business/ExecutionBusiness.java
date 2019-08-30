@@ -280,14 +280,17 @@ public class ExecutionBusiness {
     }
 
 
-    public String initExecution(Execution execution) throws ApiException {
+    public String initExecution(Execution execution, Connection connection)
+        throws ApiException {
         Map<String, String> inputMap = new HashMap<>();
         for (Entry<String,Object> restInput : execution.getRestInputValues().entrySet()) {
             inputMap.put(restInput.getKey(),
                     handleRestParameter(restInput.getKey(), restInput.getValue()));
         }
-        return initExecution(execution.getPipelineIdentifier(), inputMap, execution.getTimeout(),
-                execution.getName(), execution.getStudyIdentifier(), true);
+        return initExecution(
+            execution.getPipelineIdentifier(), inputMap, execution.getTimeout(),
+            execution.getName(), execution.getStudyIdentifier(), true,
+            connection);
     }
 
     private String handleRestParameter(String parameterName, Object restParameterValue) {
@@ -314,14 +317,16 @@ public class ExecutionBusiness {
                                 Integer timeoutInSeconds,
                                 String executionName,
                                 String studyId,
-                                Boolean playExecution) throws ApiException {// Build input parameter map
+                                Boolean playExecution,
+                                Connection connection) throws ApiException {// Build input parameter map
         Map<String, String> inputMap = new HashMap<>();
         for (StringKeyParameterValuePair skpvp : inputValues) {
             logger.info("Adding value " + skpvp.getValue().getValue() + " to input " + skpvp.getName());
             inputMap.put(skpvp.getName(), skpvp.getValue().getValue());
         }
-        return initExecution(pipelineId, inputMap, timeoutInSeconds, executionName, studyId,
-                playExecution);
+        return initExecution(
+            pipelineId, inputMap, timeoutInSeconds, executionName, studyId,
+            playExecution, connection);
     }
 
     public String initExecution(String pipelineId,
@@ -329,8 +334,9 @@ public class ExecutionBusiness {
                                 Integer timeoutInSeconds,
                                 String executionName,
                                 String studyId,
-                                Boolean playExecution) throws ApiException {
-        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
+                                Boolean playExecution,
+                                Connection connection) throws ApiException {
+        try {
             // We cannot easily initialize an execution without starting it.
             // So we will just launch the execution, and launch an error in case playExecution is not true.
             // Set warnings
@@ -405,7 +411,7 @@ public class ExecutionBusiness {
                 executionName,
                 connection);
             return executionId;
-        } catch (BusinessException | SQLException ex) {
+        } catch (BusinessException ex) {
             throw new ApiException(ex);
         }
     }

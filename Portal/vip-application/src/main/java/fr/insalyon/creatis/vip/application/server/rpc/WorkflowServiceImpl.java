@@ -514,8 +514,7 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
     @Override
     public List<Simulation> getSimulations(String userName, String application,
             String status, String appClass, Date startDate, Date endDate) throws ApplicationException {
-
-        try {
+        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
             User user = getSessionUser();
             if (user.isSystemAdministrator()) {
                 return workflowBusiness.getSimulations(userName, application,
@@ -528,16 +527,14 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
                             application, status, appClass, startDate, endDate);
 
                 } else {
-                    List<String> users = configurationBusiness.getUserNames(user.getEmail(), true);
+                    List<String> users = configurationBusiness
+                        .getUserNames(user.getEmail(), true, connection);
 
                     return workflowBusiness.getSimulations(users,
                             application, status, appClass, startDate, endDate);
                 }
             }
-
-        } catch (CoreException ex) {
-            throw new ApplicationException(ex);
-        } catch (BusinessException ex) {
+        } catch (BusinessException | CoreException | SQLException ex) {
             throw new ApplicationException(ex);
         }
     }

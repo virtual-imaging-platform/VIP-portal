@@ -134,11 +134,12 @@ public class ExecutionControler {
         try(Connection connection = connectionSupplier.get()) {
             pipelineBusiness.checkIfUserCanAccessPipeline(
                 execution.getPipelineIdentifier(), connection);
+            String execId = executionBusiness.initExecution(
+                execution, connection);
+            return executionBusiness.getExecution(execId,false);
         } catch (SQLException | SQLRuntimeException ex) {
             throw new ApiException(ex);
         }
-        String execId = executionBusiness.initExecution(execution);
-        return executionBusiness.getExecution(execId,false);
     }
 
     @RequestMapping("/{executionId}/results")

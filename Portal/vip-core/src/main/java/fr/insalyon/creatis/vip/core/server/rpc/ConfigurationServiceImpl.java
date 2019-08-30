@@ -98,24 +98,23 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
      */
     @Override
     public User configure(String email, String session) throws CoreException {
-
-        try {
+        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
             logger.debug("Initializing VIP configuration.");
             configurationBusiness.configure();
             logger.debug("VIP successfully configured.");
 
-            if (configurationBusiness.validateSession(email, session)) {
+            if (configurationBusiness
+                .validateSession(email, session, connection)) {
 
-                User user = configurationBusiness.getUser(email);
+                User user = configurationBusiness.getUser(email, connection);
                 user = setUserSession(user);
-                configurationBusiness.updateUserLastLogin(email);
+                configurationBusiness.updateUserLastLogin(email, connection);
                 trace(logger, "Connected.");
 
                 return user;
             }
             return null;
-
-        } catch (BusinessException ex) {
+        } catch (BusinessException | SQLException ex) {
             throw new CoreException(ex);
         }
     }
@@ -148,17 +147,16 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
      */
     @Override
     public User signin(String email, String password) throws CoreException {
-
-        try {
+        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
             logger.info("Authenticating '" + email + "'.");
-            User user = configurationBusiness.signin(email, password);
+            User user = configurationBusiness
+                .signin(email, password, connection);
             user = setUserSession(user);
-            configurationBusiness.updateUserLastLogin(email);
+            configurationBusiness.updateUserLastLogin(email, connection);
             logger.info("Connected.");
 
             return user;
-
-        } catch (BusinessException ex) {
+        } catch (BusinessException | SQLException ex) {
             throw new CoreException(ex);
         }
     }
@@ -169,14 +167,13 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
      */
     @Override
     public void signout() throws CoreException {
-
-        try {
-            configurationBusiness.signout(getSessionUser().getEmail());
+        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
+            configurationBusiness
+                .signout(getSessionUser().getEmail(), connection);
             trace(logger, "Signed out.");
             getSession().removeAttribute(CoreConstants.SESSION_USER);
             getSession().removeAttribute(CoreConstants.SESSION_GROUPS);
-
-        } catch (BusinessException ex) {
+        } catch (BusinessException | SQLException ex) {
             throw new CoreException(ex);
         }
     }
@@ -189,15 +186,14 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
      */
     @Override
     public User activate(String code) throws CoreException {
-
-        try {
+        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
             User user = getSessionUser();
             logger.info("Activating '" + user.getEmail() + "'.");
-            user = configurationBusiness.activate(user.getEmail(), code);
+            user = configurationBusiness
+                .activate(user.getEmail(), code, connection);
 
             return setUserSession(user);
-
-        } catch (BusinessException ex) {
+        } catch (BusinessException | SQLException ex) {
             throw new CoreException(ex);
         }
     }
@@ -209,15 +205,14 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
      */
     @Override
     public String sendActivationCode() throws CoreException {
-
-        try {
+        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
             User user = getSessionUser();
             logger.info("Sending activation code to: " + user.getEmail() + ".");
-            configurationBusiness.sendActivationCode(user.getEmail());
+            configurationBusiness
+                .sendActivationCode(user.getEmail(), connection);
 
             return user.getEmail();
-
-        } catch (BusinessException ex) {
+        } catch (BusinessException | SQLException ex) {
             throw new CoreException(ex);
         }
     }
@@ -229,12 +224,10 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
      */
     @Override
     public void sendResetCode(String email) throws CoreException {
-
-        try {
+        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
             //do not add a trace here: it should be reachable without authentication (#2632)
-            configurationBusiness.sendResetCode(email);
-
-        } catch (BusinessException ex) {
+            configurationBusiness.sendResetCode(email, connection);
+        } catch (BusinessException | SQLException ex) {
             throw new CoreException(ex);
         }
     }
@@ -245,12 +238,10 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
      * @return
      */
     public List<User> getUsers() throws CoreException {
-
-        try {
+        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
             authenticateSystemAdministrator(logger);
-            return configurationBusiness.getUsers();
-
-        } catch (BusinessException ex) {
+            return configurationBusiness.getUsers(connection);
+        } catch (BusinessException | SQLException ex) {
             throw new CoreException(ex);
         }
     }
@@ -340,18 +331,18 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
      */
     @Override
     public User removeUser(String email) throws CoreException {
-
-        try {
-            User user = email != null ? configurationBusiness.getUser(email) : getSessionUser();
+        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
+            User user = email != null
+                ? configurationBusiness.getUser(email, connection)
+                : getSessionUser();
             if (email != null) {
                 authenticateSystemAdministrator(logger);
             }
             trace(logger, "Removing user '" + user.getEmail() + "'.");
-            configurationBusiness.removeUser(user.getEmail(), true);
+            configurationBusiness.removeUser(user.getEmail(), true, connection);
 
             return user;
-
-        } catch (BusinessException ex) {
+        } catch (BusinessException | SQLException ex) {
             throw new CoreException(ex);
         }
     }
@@ -458,7 +449,13 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
         try(Connection connection = PlatformConnection.getInstance().getConnection()) {
             authenticateSystemAdministrator(logger);
             trace(logger, "Updating user '" + email + "'.");
-            configurationBusiness.updateUser(email, level, countryCode, maxRunningSimulations, locked);
+            configurationBusiness.updateUser(
+                email,
+                level,
+                countryCode,
+                maxRunningSimulations,
+                locked,
+                connection);
             configurationBusiness.setUserGroups(email, groups, connection);
         } catch (BusinessException | SQLException ex) {
             throw new CoreException(ex);
@@ -471,11 +468,10 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
      */
     @Override
     public User getUserData() throws CoreException {
-
-        try {
-            return configurationBusiness.getUserData(getSessionUser().getEmail());
-
-        } catch (BusinessException ex) {
+        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
+            return configurationBusiness
+                .getUserData(getSessionUser().getEmail(), connection);
+        } catch (BusinessException | SQLException ex) {
             throw new CoreException(ex);
         }
     }
@@ -487,13 +483,11 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
      */
     @Override
     public User updateUser(User user) throws CoreException {
-
-        try {
+        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
             trace(logger, "Updating user data '" + user.getEmail() + "'.");
-            user = configurationBusiness.updateUser(user);
+            user = configurationBusiness.updateUser(user, connection);
             return setUserSession(user);
-
-        } catch (BusinessException ex) {
+        } catch (BusinessException | SQLException ex) {
             throw new CoreException(ex);
         }
     }
@@ -506,29 +500,31 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
      */
     public void updateUserPassword(String currentPassword, String newPassword)
             throws CoreException {
-
-        try {
+        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
             trace(logger, "Updating user password.");
-            configurationBusiness.updateUserPassword(getSessionUser().getEmail(),
-                    currentPassword, newPassword);
-
-        } catch (BusinessException ex) {
+            configurationBusiness.updateUserPassword(
+                getSessionUser().getEmail(),
+                currentPassword,
+                newPassword,
+                connection);
+        } catch (BusinessException | SQLException ex) {
             throw new CoreException(ex);
         }
     }
 
     public User requestNewEmail(String newEmail) throws CoreException {
-
-        try {
+        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
             User currentUser = getSessionUser();
             String currentEmail = currentUser.getEmail();
             trace(logger, "Requesting email change from " + currentEmail + " to " + newEmail);
 
-            configurationBusiness.requestNewEmail(currentUser, newEmail);
+            configurationBusiness
+                .requestNewEmail(currentUser, newEmail, connection);
 
-            currentUser = configurationBusiness.getUserData(currentUser.getEmail());
+            currentUser = configurationBusiness
+                .getUserData(currentUser.getEmail(), connection);
             return setUserSession(currentUser);
-        } catch (BusinessException ex) {
+        } catch (BusinessException | SQLException ex) {
             throw new CoreException(ex);
         }
     }
@@ -545,9 +541,10 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
             }
             configurationBusiness.updateUserEmail(
                 currentEmail, newEmail, connection);
-            configurationBusiness.resetNextEmail(newEmail);
+            configurationBusiness.resetNextEmail(newEmail, connection);
 
-            currentUser = configurationBusiness.getUserData(newEmail);
+            currentUser = configurationBusiness
+                .getUserData(newEmail, connection);
             return setUserSession(currentUser);
         } catch (BusinessException | SQLException ex) {
             throw new CoreException("Error changing email address. Please contact VIP support.", ex);
@@ -555,16 +552,17 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
     }
 
     public User cancelNewEmail() throws CoreException {
-        try {
+        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
             User currentUser = getSessionUser();
             String currentEmail = currentUser.getEmail();
             String newEmail = currentUser.getNextEmail();
             trace(logger, "Canceling email change from " + currentEmail + " to " + newEmail);
-            configurationBusiness.resetNextEmail(currentEmail);
+            configurationBusiness.resetNextEmail(currentEmail, connection);
 
-            currentUser = configurationBusiness.getUserData(currentEmail);
+            currentUser = configurationBusiness
+                .getUserData(currentEmail, connection);
             return setUserSession(currentUser);
-        } catch (BusinessException ex) {
+        } catch (BusinessException | SQLException ex) {
             throw new CoreException(ex);
         }
     }
@@ -630,12 +628,11 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
      * @throws CoreException
      */
     public void activateUser(String email) throws CoreException {
-        try {
+        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
             authenticateSystemAdministrator(logger);
             trace(logger, "Activating user: " + email);
-            configurationBusiness.activateUser(email);
-
-        } catch (BusinessException ex) {
+            configurationBusiness.activateUser(email, connection);
+        } catch (BusinessException | SQLException ex) {
             throw new CoreException(ex);
         }
     }
@@ -707,10 +704,11 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
     @Override
     public void resetPassword(String email, String code, String password)
         throws CoreException {
-        try {
+        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
             logger.info("(" + email + ") Reseting password.");
-            configurationBusiness.resetPassword(email, code, password);
-        } catch (BusinessException ex) {
+            configurationBusiness.resetPassword(
+                email, code, password, connection);
+        } catch (BusinessException | SQLException ex) {
             throw new CoreException(ex);
         }
     }
@@ -798,11 +796,13 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
 
     @Override
     public UsageStats getUsageStats() throws CoreException {
-        try {
-            Integer users = CoreDAOFactory.getDAOFactory().getUserDAO().getNUsers();
-            Integer countries = CoreDAOFactory.getDAOFactory().getUserDAO().getNCountries();
+        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
+            Integer users = CoreDAOFactory.getDAOFactory()
+                .getUserDAO(connection).getNUsers();
+            Integer countries = CoreDAOFactory.getDAOFactory()
+                .getUserDAO(connection).getNCountries();
             return new UsageStats(users, countries);
-        } catch (DAOException ex) {
+        } catch (DAOException | SQLException ex) {
             throw new CoreException(ex);
         }
 
@@ -819,29 +819,33 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
             //TODO: put server URL instead
             WebAuthInfo wai = session.getAuthInfo("REDIRECT");
 
-            try {
+            try(Connection connection = PlatformConnection.getInstance().getConnection()) {
                 String dir = Server.getInstance().getDataManagerUsersHome() + "/" + user.getFolder();
                 CoreUtil.getGRIDAClient().createFolder(dir, "Dropbox");
-                CoreDAOFactory.getDAOFactory().getUserDAO().linkDropboxAccount(user.getEmail(), dir + "/Dropbox", wai.requestTokenPair.key, wai.requestTokenPair.secret);
-            } catch (DAOException ex) {
-                throw new CoreException(ex);
-            } catch (GRIDAClientException ex) {
+                CoreDAOFactory.getDAOFactory()
+                    .getUserDAO(connection).linkDropboxAccount(
+                        user.getEmail(),
+                        dir + "/Dropbox",
+                        wai.requestTokenPair.key,
+                        wai.requestTokenPair.secret);
+            } catch (DAOException | GRIDAClientException | SQLException ex) {
                 throw new CoreException(ex);
             }
             return wai.url;
         } catch (DropboxException ex) {
             throw new CoreException(ex);
         }
-
     }
 
     @Override
     public void activateDropboxAccount(String oauth_token) throws CoreException {
         trace(logger, "Activating Dropbox account.");
         User user = getSessionUser();
-        try {
-            CoreDAOFactory.getDAOFactory().getUserDAO().activateDropboxAccount(user.getEmail(), oauth_token);
-        } catch (DAOException ex) {
+        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
+            CoreDAOFactory.getDAOFactory()
+                .getUserDAO(connection)
+                .activateDropboxAccount(user.getEmail(), oauth_token);
+        } catch (DAOException | SQLException ex) {
             throw new CoreException(ex);
         }
     }
@@ -850,9 +854,11 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
     public DropboxAccountStatus.AccountStatus getDropboxAccountStatus() throws CoreException {
         trace(logger, "Getting Dropbox account status.");
         User user = getSessionUser();
-        try {
-            return CoreDAOFactory.getDAOFactory().getUserDAO().getDropboxAccountStatus(user.getEmail());
-        } catch (DAOException ex) {
+        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
+            return CoreDAOFactory.getDAOFactory()
+                .getUserDAO(connection)
+                .getDropboxAccountStatus(user.getEmail());
+        } catch (DAOException | SQLException ex) {
             throw new CoreException(ex);
         }
     }
@@ -861,9 +867,10 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
     public void unlinkDropboxAccount() throws CoreException {
         trace(logger, "Unlinking Dropbox account.");
         User user = getSessionUser();
-        try {
-            CoreDAOFactory.getDAOFactory().getUserDAO().unlinkDropboxAccount(user.getEmail());
-        } catch (DAOException ex) {
+        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
+            CoreDAOFactory.getDAOFactory()
+                .getUserDAO(connection).unlinkDropboxAccount(user.getEmail());
+        } catch (DAOException | SQLException ex) {
             throw new CoreException(ex);
         }
     }
@@ -872,9 +879,9 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
     public void updateTermsOfUse() throws CoreException {
         trace(logger, "Updating terms of use.");
         User user = getSessionUser();
-        try {
-            configurationBusiness.updateTermsOfUse(user.getEmail());
-        } catch (BusinessException ex) {
+        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
+            configurationBusiness.updateTermsOfUse(user.getEmail(), connection);
+        } catch (BusinessException | SQLException ex) {
             throw new CoreException(ex);
         }
     }
@@ -1045,11 +1052,10 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
 
     @Override
     public boolean testLastUpdatePublication() throws CoreException {
-        try {
-
-            return configurationBusiness.testLastUpdatePublication(getSessionUser().getEmail());
-
-        } catch (BusinessException ex) {
+        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
+            return configurationBusiness.testLastUpdatePublication(
+                getSessionUser().getEmail(), connection);
+        } catch (BusinessException | SQLException ex) {
             throw new CoreException(ex);
         }
     }
@@ -1058,10 +1064,10 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
     public void updateLastUpdatePublication() throws CoreException {
         trace(logger, "Updating Last Update Publication.");
         User user = getSessionUser();
-        try {
-            configurationBusiness.updateLastUpdatePublication(user.getEmail());
-
-        } catch (BusinessException ex) {
+        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
+            configurationBusiness
+                .updateLastUpdatePublication(user.getEmail(), connection);
+        } catch (BusinessException | SQLException ex) {
             throw new CoreException(ex);
         }
     }
@@ -1071,31 +1077,34 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
 
     @Override
     public String getUserApikey(String email) throws CoreException {
-        try {
-            return configurationBusiness.getUserApikey(getSessionUser().getEmail());
-        } catch (BusinessException e) {
-            logger.error("Error getting apikey for " + email, e);
-            throw new CoreException(e);
+        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
+            return configurationBusiness
+                .getUserApikey(getSessionUser().getEmail(), connection);
+        } catch (BusinessException | SQLException ex) {
+            logger.error("Error getting apikey for " + email, ex);
+            throw new CoreException(ex);
         }
     }
 
     @Override
     public void deleteUserApikey(String email) throws CoreException {
-        try {
-            configurationBusiness.deleteUserApikey(getSessionUser().getEmail());
-        } catch (BusinessException e) {
-            logger.error("Error deleting apikey for " + email, e);
-            throw new CoreException(e);
+        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
+            configurationBusiness
+                .deleteUserApikey(getSessionUser().getEmail(), connection);
+        } catch (BusinessException | SQLException ex) {
+            logger.error("Error deleting apikey for " + email, ex);
+            throw new CoreException(ex);
         }
     }
 
     @Override
     public String generateNewUserApikey(String email) throws CoreException {
-        try {
-            return configurationBusiness.generateNewUserApikey(getSessionUser().getEmail());
-        } catch (BusinessException e) {
-            logger.error("Error generating apikey for " + email, e);
-            throw new CoreException(e);
+        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
+            return configurationBusiness
+                .generateNewUserApikey(getSessionUser().getEmail(), connection);
+        } catch (BusinessException | SQLException ex) {
+            logger.error("Error generating apikey for " + email, ex);
+            throw new CoreException(ex);
         }
     }
 }

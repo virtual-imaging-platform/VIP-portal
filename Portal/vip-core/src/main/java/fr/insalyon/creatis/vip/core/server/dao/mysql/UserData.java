@@ -50,12 +50,8 @@ public class UserData implements UserDAO {
     private final static Logger logger = Logger.getLogger(UserData.class);
     private Connection connection;
 
-    public UserData() throws DAOException {
-        try {
-            connection = PlatformConnection.getInstance().getConnection();
-        } catch (SQLException ex) {
-            throw new DAOException(ex);
-        }
+    public UserData(Connection connection) throws DAOException {
+        this.connection = connection;
     }
 
     /**

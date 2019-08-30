@@ -34,10 +34,13 @@ package fr.insalyon.creatis.vip.api.rest.controller;
 import fr.insalyon.creatis.vip.api.business.*;
 import fr.insalyon.creatis.vip.api.rest.RestApiBusiness;
 import fr.insalyon.creatis.vip.api.rest.model.*;
+import fr.insalyon.creatis.vip.core.server.dao.mysql.PlatformConnection;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.sql.Connection;
+import java.sql.SQLException;
 import javax.servlet.http.HttpServletRequest;
 
 /**
@@ -65,8 +68,13 @@ public class AuthenticationController {
         // TODO : Do not call it "get" if it does not return anything
         restApiBusiness.getApiContext(httpServletRequest, false);
         // TODO verify the presence of credentials
-        // business call
-        return restApiBusiness.authenticate(authenticationCredentials);
+        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
+            // business call
+            return restApiBusiness
+                .authenticate(authenticationCredentials, connection);
+        } catch (SQLException ex) {
+            throw new ApiException(ex);
+        }
     }
 
 }

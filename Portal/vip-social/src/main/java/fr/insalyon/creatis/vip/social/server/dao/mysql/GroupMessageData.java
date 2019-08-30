@@ -115,7 +115,8 @@ public class GroupMessageData implements GroupMessageDAO {
             SimpleDateFormat f = new SimpleDateFormat("MMMM d, yyyy HH:mm");
 
             while (rs.next()) {
-                User from = CoreDAOFactory.getDAOFactory().getUserDAO().getUser(rs.getString("sender"));
+                User from = CoreDAOFactory.getDAOFactory()
+                    .getUserDAO(connection).getUser(rs.getString("sender"));
                 Date posted = new Date(rs.getTimestamp("posted").getTime());
                 messages.add(new GroupMessage(rs.getLong("id"), from, groupName, rs.getString("title"),
                         rs.getString("message"), f.format(posted), posted));
