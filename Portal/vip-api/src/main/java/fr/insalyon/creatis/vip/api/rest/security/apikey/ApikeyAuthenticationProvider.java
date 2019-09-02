@@ -31,6 +31,7 @@
  */
 package fr.insalyon.creatis.vip.api.rest.security.apikey;
 
+import fr.insalyon.creatis.vip.api.exception.SQLRuntimeException;
 import fr.insalyon.creatis.vip.api.rest.security.SpringCompatibleUser;
 import fr.insalyon.creatis.vip.api.rest.security.apikey.ApikeyAuthenticationToken;
 import fr.insalyon.creatis.vip.core.client.bean.*;
@@ -38,7 +39,6 @@ import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.server.business.*;
 import fr.insalyon.creatis.vip.core.server.dao.*;
-import fr.insalyon.creatis.vip.core.server.dao.mysql.PlatformConnection;
 import org.apache.commons.logging.*;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,6 +53,7 @@ import org.springframework.util.Assert;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Map;
+import java.util.function.Supplier;
 
 /**
  * Created by abonnet on 7/25/16.
@@ -76,6 +77,9 @@ public class ApikeyAuthenticationProvider implements
 
     @Autowired
     private ConfigurationBusiness configurationBusiness;
+
+    @Autowired
+    private Supplier<Connection> connectionSupplier;
 
     public final void afterPropertiesSet() throws Exception {
         Assert.notNull(this.messages, "A message source must be set");
@@ -110,13 +114,13 @@ public class ApikeyAuthenticationProvider implements
         }
         logger.debug("apikey OK for " + vipUser.getEmail());
         UserDetails springUser;
-        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
+        try(Connection connection = connectionSupplier.get()) {
             Map<Group, CoreConstants.GROUP_ROLE> groups =
                 configurationBusiness.getUserGroups(
                     vipUser.getEmail(), connection);
             vipUser.setGroups(groups);
             springUser = new SpringCompatibleUser(vipUser);
-        } catch (BusinessException | SQLException e) {
+        } catch (BusinessException | SQLException | SQLRuntimeException e) {
             logger.error("error when getting user groups" + vipUser.getEmail(), e);
             logger.error("Doing as if there is an auth error");
             throw new BadCredentialsException(messages.getMessage(
