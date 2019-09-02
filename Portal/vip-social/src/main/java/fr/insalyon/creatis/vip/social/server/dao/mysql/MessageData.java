@@ -34,7 +34,6 @@ package fr.insalyon.creatis.vip.social.server.dao.mysql;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.server.dao.CoreDAOFactory;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
-import fr.insalyon.creatis.vip.core.server.dao.mysql.PlatformConnection;
 import fr.insalyon.creatis.vip.social.client.bean.Message;
 import fr.insalyon.creatis.vip.social.server.dao.MessageDAO;
 import java.sql.Connection;

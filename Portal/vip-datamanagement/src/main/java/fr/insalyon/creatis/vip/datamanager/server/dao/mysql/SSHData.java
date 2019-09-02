@@ -33,7 +33,6 @@ package fr.insalyon.creatis.vip.datamanager.server.dao.mysql;
 
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
-import fr.insalyon.creatis.vip.core.server.dao.mysql.PlatformConnection;
 import fr.insalyon.creatis.vip.datamanager.client.bean.SSH;
 import fr.insalyon.creatis.vip.datamanager.client.bean.TransferType;
 import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerException;

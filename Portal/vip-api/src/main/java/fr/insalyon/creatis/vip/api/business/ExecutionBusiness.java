@@ -41,7 +41,6 @@ import fr.insalyon.creatis.vip.application.client.view.monitor.SimulationStatus;
 import fr.insalyon.creatis.vip.application.server.business.*;
 import fr.insalyon.creatis.vip.core.client.bean.*;
 import fr.insalyon.creatis.vip.core.server.business.*;
-import fr.insalyon.creatis.vip.core.server.dao.mysql.PlatformConnection;
 import fr.insalyon.creatis.vip.datamanager.server.business.TransferPoolBusiness;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
