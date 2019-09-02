@@ -65,8 +65,11 @@ public class AuthenticationBusiness {
              User user = configurationBusiness
                  .signin(userName, password, connection);
 
-             AbstractAuthenticationService.setVIPSession(apiContext.getRequest(), apiContext.getResponse(), user);
-
+             AbstractAuthenticationService.setVIPSession(
+                 apiContext.getRequest(),
+                 apiContext.getResponse(),
+                 user,
+                 connection);
          } catch (BusinessException ex) {
              throw new ApiException(ex);
          }

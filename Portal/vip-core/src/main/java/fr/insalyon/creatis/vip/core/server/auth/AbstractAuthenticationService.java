@@ -71,9 +71,9 @@ public abstract class AbstractAuthenticationService extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        try {
-            processRequest(request, response);
-        } catch (BusinessException ex) {
+        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
+            processRequest(request, response, connection);
+        } catch (BusinessException | SQLException ex) {
             logger.error("Error handling a request", ex);
         }
     }
@@ -81,14 +81,19 @@ public abstract class AbstractAuthenticationService extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        try {
-            processRequest(request, response);
-        } catch (BusinessException ex) {
+        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
+            processRequest(request, response, connection);
+        } catch (BusinessException | SQLException ex) {
             logger.error("Error handling a request", ex);
         }
     }
 
-    private void processRequest(HttpServletRequest request, HttpServletResponse response) throws BusinessException {
+    private void processRequest(
+        HttpServletRequest request,
+        HttpServletResponse response,
+        Connection connection)
+        throws BusinessException {
+
         logger.info("Third-party authentication request.");
         String email = null;
         try {
@@ -105,15 +110,9 @@ public abstract class AbstractAuthenticationService extends HttpServlet {
             authFailedResponse(request, response);
             return;
         }
-        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
-            resetFailedAuthenticationCount(email, connection);
-        } catch (SQLException ex) {
-            logger.info(ex.getMessage());
-            authFailedResponse(request, response);
-            return;
-        }
+        resetFailedAuthenticationCount(email, connection);
         //authenticate email in VIP
-        authSuccessResponse(request, response, email);
+        authSuccessResponse(request, response, email, connection);
     }
 
     private void resetFailedAuthenticationCount(
@@ -133,22 +132,22 @@ public abstract class AbstractAuthenticationService extends HttpServlet {
         return "/";
     }
 
-    private void authSuccessResponse(HttpServletRequest request, HttpServletResponse response, String email) throws BusinessException {
-        //   try {
+    private void authSuccessResponse(
+        HttpServletRequest request,
+        HttpServletResponse response,
+        String email,
+        Connection connection) throws BusinessException {
+
         ConfigurationBusiness cb = new ConfigurationBusiness();
         String accountType = getDefaultAccountType();
         User user;
-        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
-            user = cb.getOrCreateUser(email, accountType, connection);
-        } catch (SQLException ex) {
-            throw new BusinessException(ex);
-        }
+        user = cb.getOrCreateUser(email, accountType, connection);
         //third-party authentication services will *not* be trusted to let admins in
         if (user.isSystemAdministrator()) {
             authFailedResponse(request, response);
             return;
         }
-        setVIPSession(request, response, user);
+        setVIPSession(request, response, user, connection);
         try {
             response.sendRedirect(getBaseURL(request));
         } catch (IOException ex) {
@@ -177,8 +176,13 @@ public abstract class AbstractAuthenticationService extends HttpServlet {
         }
     }
 
-    public static void setVIPSession(HttpServletRequest request, HttpServletResponse response, User user) throws BusinessException {
-        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
+    public static void setVIPSession(
+        HttpServletRequest request,
+        HttpServletResponse response,
+        User user,
+        Connection connection)
+        throws BusinessException {
+        try {
             ConfigurationServiceImpl csi = new ConfigurationServiceImpl();
             user = csi.setUserSession(user, request.getSession());
             ConfigurationBusiness cb = new ConfigurationBusiness();
@@ -191,7 +195,7 @@ public abstract class AbstractAuthenticationService extends HttpServlet {
             userCookie.setMaxAge((int) (CoreConstants.COOKIES_EXPIRATION_DATE.getTime() - new Date().getTime()));
             sessionCookie.setPath("/");
             response.addCookie(sessionCookie);
-        } catch (SQLException | UnsupportedEncodingException ex) {
+        } catch (UnsupportedEncodingException ex) {
             throw new BusinessException(ex);
         }
     }

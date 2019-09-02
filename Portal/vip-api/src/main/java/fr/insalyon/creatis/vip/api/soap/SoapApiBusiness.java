@@ -118,7 +118,8 @@ public class SoapApiBusiness {
                 .validateSession(email, sessionId, connection)) {
                 logger.info("API successfully authenticated user " + email);
                 User user = configurationBusiness.getUser(email, connection);
-                AbstractAuthenticationService.setVIPSession(request, response, user);
+                AbstractAuthenticationService.setVIPSession(
+                    request, response, user, connection);
                 return user;
             }
             throw new ApiException(authFailedMessage);
