@@ -122,13 +122,14 @@ public class DataManagerBusiness {
      * @return
      * @throws BusinessException
      */
-    public String getRemoteFile(User user, String remoteFile, String localDir)
-            throws BusinessException {
+    public String getRemoteFile(
+        User user, String remoteFile, String localDir, Connection connection)
+        throws BusinessException {
 
         try {
             return CoreUtil.getGRIDAClient().getRemoteFile(
-                    DataManagerUtil.parseBaseDir(user, remoteFile), localDir);
-
+                DataManagerUtil.parseBaseDir(user, remoteFile, connection),
+                localDir);
         } catch (DataManagerException ex) {
             logger.error(ex);
             throw new BusinessException(ex);
@@ -194,7 +195,8 @@ public class DataManagerBusiness {
             //create LFC dir
             ConfigurationBusiness conf = new ConfigurationBusiness();
             User user = conf.getUser(ssh.getEmail(), connection);
-            ssh.setLfcDir(DataManagerUtil.parseBaseDir(user, ssh.getLfcDir()));
+            ssh.setLfcDir(
+                DataManagerUtil.parseBaseDir(user, ssh.getLfcDir(), connection));
             SSHDAOFactory.getDAOFactory().getSSHDAO(connection).addSSH(ssh);
         } catch (DAOException ex) {
             throw new BusinessException(ex);

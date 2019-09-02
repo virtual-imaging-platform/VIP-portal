@@ -220,7 +220,8 @@ public class WorkflowBusiness {
                     String[] values = valuesStr.split(ApplicationConstants.SEPARATOR_LIST);
                     for (String v : values) {
 
-                        String parsedPath = DataManagerUtil.parseBaseDir(user, v.trim());
+                        String parsedPath = DataManagerUtil.parseBaseDir(
+                            user, v.trim(), connection);
                         if (!user.isSystemAdministrator()) {
                             checkFolderACL(user, groups, parsedPath);
                         }
@@ -228,7 +229,8 @@ public class WorkflowBusiness {
                     }
                 } else {
 
-                    String parsedPath = DataManagerUtil.parseBaseDir(user, valuesStr.trim());
+                    String parsedPath = DataManagerUtil.parseBaseDir(
+                        user, valuesStr.trim(), connection);
                     if (!user.isSystemAdministrator()) {
                         checkFolderACL(user, groups, parsedPath);
                     }
@@ -241,9 +243,12 @@ public class WorkflowBusiness {
                 .getApplicationDAO(connection)
                 .getVersion(applicationName, applicationVersion);
             DataManagerBusiness dmBusiness = new DataManagerBusiness();
-            String workflowPath = dmBusiness.getRemoteFile(user, version.getLfn(),
-                    Server.getInstance().getConfigurationFolder() + "workflows/"
-                    + FilenameUtils.getName(version.getLfn()));
+            String workflowPath = dmBusiness.getRemoteFile(
+                user,
+                version.getLfn(),
+                Server.getInstance().getConfigurationFolder() + "workflows/"
+                + FilenameUtils.getName(version.getLfn()),
+                connection);
 
             //selectRandomEngine could also be used; TODO: make this choice configurable
             Engine engine = selectEngine(applicationClass, connection);
@@ -403,7 +408,8 @@ public class WorkflowBusiness {
                     + "workflows/"
                     + FilenameUtils.getPath(version.getLfn()) + "/"
                     + FilenameUtils.getName(version.getLfn());
-            String workflowPath = dmBusiness.getRemoteFile(user, version.getLfn(), localDirectory);
+            String workflowPath = dmBusiness.getRemoteFile(
+                user, version.getLfn(), localDirectory, connection);
             return workflowPath.endsWith(".gwendia")
                     ? new GwendiaParser().parse(workflowPath)
                     : new ScuflParser().parse(workflowPath);
@@ -511,11 +517,13 @@ public class WorkflowBusiness {
      * @return
      * @throws BusinessException
      */
-    public Map<String, String> relaunch(String simulationID, String currentUserFolder)
-            throws BusinessException {
+    public Map<String, String> relaunch(
+        String simulationID, String currentUserFolder, Connection connection)
+        throws BusinessException {
 
         //TODO fix
-        Map<String, String> inputs = new InputM2Parser(currentUserFolder).parse(
+        Map<String, String> inputs =
+            new InputM2Parser(currentUserFolder, connection).parse(
                 Server.getInstance().getWorkflowsPath() + "/" + simulationID + "/input-m2.xml");
 
         return inputs;
@@ -575,13 +583,17 @@ public class WorkflowBusiness {
      * @return
      * @throws BusinessException
      */
-    public List<InOutData> getOutputData(String simulationID, String currentUserFolder)
-            throws BusinessException {
+    public List<InOutData> getOutputData(
+        String simulationID, String currentUserFolder, Connection connection)
+        throws BusinessException {
 
         List<InOutData> list = new ArrayList<InOutData>();
         try {
             for (Output output : outputDAO.get(simulationID)) {
-                String path = DataManagerUtil.parseRealDir(output.getOutputID().getPath(), currentUserFolder);
+                String path = DataManagerUtil.parseRealDir(
+                    output.getOutputID().getPath(),
+                    currentUserFolder,
+                    connection);
                 list.add(new InOutData(path, output.getOutputID().getProcessor(),
                         output.getType().name()));
             }
@@ -603,13 +615,15 @@ public class WorkflowBusiness {
      * @return
      * @throws BusinessException
      */
-    public List<InOutData> getInputData(String simulationID, String currentUserFolder)
-            throws BusinessException {
+    public List<InOutData> getInputData(
+        String simulationID, String currentUserFolder, Connection connection)
+        throws BusinessException {
 
         try {
             List<InOutData> list = new ArrayList<InOutData>();
             for (Input input : inputDAO.get(simulationID)) {
-                String path = DataManagerUtil.parseRealDir(input.getInputID().getPath(), currentUserFolder);
+                String path = DataManagerUtil.parseRealDir(
+                    input.getInputID().getPath(), currentUserFolder, connection);
                 list.add(new InOutData(path, input.getInputID().getProcessor(),
                         input.getType().name()));
             }
@@ -738,20 +752,23 @@ public class WorkflowBusiness {
      * @param inputs
      * @throws BusinessException
      */
-    public void validateInputs(User user, List<String> inputs)
-            throws BusinessException {
+    public void validateInputs(
+        User user, List<String> inputs, Connection connection)
+        throws BusinessException {
 
         try {
 
             GRIDAClient client = CoreUtil.getGRIDAClient();
             StringBuilder sb = new StringBuilder();
             for (String input : inputs) {
-                if (!client.exist(DataManagerUtil.parseBaseDir(user, input))) {
+                if (!client.exist(
+                        DataManagerUtil.parseBaseDir(user, input, connection))) {
                     if (sb.length() > 0) {
                         sb.append(", ");
                     }
 
-                    sb.append(DataManagerUtil.parseBaseDir(user, input));
+                    sb.append(
+                        DataManagerUtil.parseBaseDir(user, input, connection));
                 }
             }
 

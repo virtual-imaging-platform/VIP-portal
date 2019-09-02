@@ -489,14 +489,11 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
      */
     @Override
     public Map<String, String> relaunchSimulation(String simulationID) throws ApplicationException {
-
-        try {
+        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
             trace(logger, "Relaunching simulation '" + simulationID + "'.");
-            return workflowBusiness.relaunch(simulationID, getSessionUser().getFolder());
-
-        } catch (CoreException ex) {
-            throw new ApplicationException(ex);
-        } catch (BusinessException ex) {
+            return workflowBusiness.relaunch(
+                simulationID, getSessionUser().getFolder(), connection);
+        } catch (CoreException | BusinessException | SQLException ex) {
             throw new ApplicationException(ex);
         }
     }
@@ -661,13 +658,10 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
      */
     @Override
     public List<InOutData> getOutputData(String simulationID) throws ApplicationException {
-
-        try {
-            return workflowBusiness.getOutputData(simulationID, getSessionUser().getFolder());
-
-        } catch (CoreException ex) {
-            throw new ApplicationException(ex);
-        } catch (BusinessException ex) {
+        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
+            return workflowBusiness.getOutputData(
+                simulationID, getSessionUser().getFolder(), connection);
+        } catch (CoreException | BusinessException | SQLException ex) {
             throw new ApplicationException(ex);
         }
     }
@@ -680,13 +674,10 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
      */
     @Override
     public List<InOutData> getInputData(String simulationID) throws ApplicationException {
-
-        try {
-            return workflowBusiness.getInputData(simulationID, getSessionUser().getFolder());
-
-        } catch (CoreException ex) {
-            throw new ApplicationException(ex);
-        } catch (BusinessException ex) {
+        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
+            return workflowBusiness.getInputData(
+                simulationID, getSessionUser().getFolder(), connection);
+        } catch (CoreException | BusinessException | SQLException ex) {
             throw new ApplicationException(ex);
         }
     }
@@ -714,13 +705,9 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
      */
     @Override
     public void validateInputs(List<String> inputs) throws ApplicationException {
-
-        try {
-            workflowBusiness.validateInputs(getSessionUser(), inputs);
-
-        } catch (CoreException ex) {
-            throw new ApplicationException(ex);
-        } catch (BusinessException ex) {
+        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
+            workflowBusiness.validateInputs(getSessionUser(), inputs, connection);
+        } catch (CoreException | BusinessException | SQLException ex) {
             throw new ApplicationException(ex);
         }
     }
@@ -757,14 +744,6 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
             throw new ApplicationException(baseDir + "is not a directory");
         }
         return null;
-    }
-
-    private String cleanse(String s) throws DataManagerException {
-        if (s.startsWith("lfn://") || s.startsWith("/grid")) {
-            return DataManagerUtil.parseBaseDir(CoreModule.user, s);
-        } else {
-            return s;
-        }
     }
 
     @Override

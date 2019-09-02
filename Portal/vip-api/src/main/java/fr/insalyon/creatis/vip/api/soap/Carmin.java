@@ -83,7 +83,7 @@ public class Carmin {
                 wsContext, true, connection);
             ExecutionBusiness eb = new ExecutionBusiness(apiContext);
             eb.checkIfUserCanAccessExecution(executionId);
-            Execution e = eb.getExecution(executionId,false);
+            Execution e = eb.getExecution(executionId, false, connection);
             r = new Response(0, ApiUtils.getMessage(apiContext), e);
         } catch (ApiException | SQLException ex) {
             logger.error(ex);
@@ -101,7 +101,7 @@ public class Carmin {
             ApiContext apiContext = new SoapApiBusiness().getApiContext(
                 wsContext, true, connection);
             ExecutionBusiness eb = new ExecutionBusiness(apiContext);
-            Execution[] executions = eb.listExecutions(500); // will not return more than 500 executions.
+            Execution[] executions = eb.listExecutions(500, connection); // will not return more than 500 executions.
             r = new Response(0, ApiUtils.getMessage(apiContext), executions);
         } catch (ApiException | SQLException ex) {
             logger.error(ex);
@@ -279,7 +279,8 @@ public class Carmin {
                 wsContext, true, connection);
             ExecutionBusiness eb = new ExecutionBusiness(apiContext);
             eb.checkIfUserCanAccessExecution(executionId);
-            String[] results = eb.getSoapExecutionResultsURLs(executionId, protocol);
+            String[] results = eb.getSoapExecutionResultsURLs(
+                executionId, protocol, connection);
             r = new Response(0, ApiUtils.getMessage(apiContext), results);
         } catch (ApiException | SQLException ex) {
             logger.error(ex);

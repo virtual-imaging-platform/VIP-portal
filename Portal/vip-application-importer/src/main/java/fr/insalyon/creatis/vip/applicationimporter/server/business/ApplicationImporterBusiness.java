@@ -67,15 +67,23 @@ public class ApplicationImporterBusiness {
 
     private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(ApplicationImporterBusiness.class);
 
-    public String readAndValidationBoutiquesFile(String fileLFN, User user) throws BusinessException {
+    public String readAndValidationBoutiquesFile(
+        String fileLFN, User user, Connection connection)
+        throws BusinessException {
         try {
 
-            File localDir = new File(Server.getInstance().getApplicationImporterFileRepository() + "/" + (new File(DataManagerUtil.parseBaseDir(user, fileLFN))).getParent());
+            File localDir = new File(
+                Server.getInstance().getApplicationImporterFileRepository() +
+                "/" +
+                (new File(DataManagerUtil.parseBaseDir(
+                              user, fileLFN, connection))).getParent());
 
             if (!localDir.exists() && !localDir.mkdirs()) {
                 throw new BusinessException("Cannot create directory " + localDir.getCanonicalPath());
             }
-            String localFilePath = CoreUtil.getGRIDAClient().getRemoteFile(DataManagerUtil.parseBaseDir(user, fileLFN), localDir.getCanonicalPath());
+            String localFilePath = CoreUtil.getGRIDAClient().getRemoteFile(
+                DataManagerUtil.parseBaseDir(user, fileLFN, connection),
+                localDir.getCanonicalPath());
             new BoutiquesBusiness().validateBoutiqueFile(localFilePath);
             String fileContent = new Scanner(new File(localFilePath)).useDelimiter("\\Z").next();
             return fileContent;
@@ -119,7 +127,9 @@ public class ApplicationImporterBusiness {
             checkEditionRights(bt.getName(), bt.getToolVersion(), overwriteApplicationVersion, user, connection);
             // set the correct LFN for each component of the application
             for (Map.Entry<String, BoutiquesTool> e : btMaps.entrySet()) {
-                e.getValue().setApplicationLFN(DataManagerUtil.parseBaseDir(user, e.getValue().getApplicationLFN()));
+                e.getValue().setApplicationLFN(
+                    DataManagerUtil.parseBaseDir(
+                        user, e.getValue().getApplicationLFN(), connection));
             }
 
             // Generate strings

@@ -128,7 +128,9 @@ public class ExecutionBusiness {
         }
     }
 
-    public Execution getExecution(String executionId, boolean summarize) throws ApiException {
+    public Execution getExecution(
+        String executionId, boolean summarize, Connection connection)
+        throws ApiException {
         try {
             // Get main execution object
             Simulation s = workflowBusiness.getSimulation(executionId, true); // check running execution for update
@@ -155,7 +157,8 @@ public class ExecutionBusiness {
                 return e;
 
             // Inputs
-            List<InOutData> inputs = workflowBusiness.getInputData(executionId, apiContext.getUser().getFolder());
+            List<InOutData> inputs = workflowBusiness.getInputData(
+                executionId, apiContext.getUser().getFolder(), connection);
             logger.info("Execution has " + inputs.size() + " inputs ");
             for (InOutData iod : inputs) {
                 ParameterTypedValue value = new ParameterTypedValue(ApiUtils.getCarminType(iod.getType()), iod.getPath());
@@ -166,7 +169,8 @@ public class ExecutionBusiness {
             }
 
             // Outputs
-            List<InOutData> outputs = workflowBusiness.getOutputData(executionId, apiContext.getUser().getFolder());
+            List<InOutData> outputs = workflowBusiness.getOutputData(
+                executionId, apiContext.getUser().getFolder(), connection);
             for (InOutData iod : outputs) {
                 ParameterTypedValue value = new ParameterTypedValue(ApiUtils.getCarminType(iod.getType()), iod.getPath());
                 StringKeyParameterValuePair skpv = new StringKeyParameterValuePair(iod.getProcessor(), value);
@@ -189,7 +193,8 @@ public class ExecutionBusiness {
 
     }
 
-    public Execution[] listExecutions(int maxReturned) throws ApiException {
+    public Execution[] listExecutions(int maxReturned, Connection connection)
+        throws ApiException {
         try {
 
             List<Simulation> simulations = workflowBusiness.getSimulations(
@@ -206,7 +211,7 @@ public class ExecutionBusiness {
             for (Simulation s : simulations) {
                 if (!(s == null) && !(s.getStatus() == SimulationStatus.Cleaned)) {
                     count++;
-                    executions.add(getExecution(s.getID(),true));
+                    executions.add(getExecution(s.getID(), true, connection));
                     if(count >= maxReturned){
                         apiContext.getWarnings().add("Only the "+maxReturned+" most recent pipelines were returned.");
                         break;
@@ -455,7 +460,8 @@ public class ExecutionBusiness {
         List<PathProperties> pathResults = new ArrayList<>();
         List<InOutData> outputs;
         try {
-            outputs = workflowBusiness.getOutputData(executionId, apiContext.getUser().getFolder());
+            outputs = workflowBusiness.getOutputData(
+                executionId, apiContext.getUser().getFolder(), connection);
         } catch (BusinessException e) {
             throw new ApiException(e);
         }
@@ -467,11 +473,16 @@ public class ExecutionBusiness {
         return pathResults;
     }
 
-    public String[] getSoapExecutionResultsURLs(String executionId, String protocol) throws ApiException {
-        return getExecutionResultsURLs(executionId, protocol, false);
+    public String[] getSoapExecutionResultsURLs(
+        String executionId, String protocol, Connection connection)
+        throws ApiException {
+        return getExecutionResultsURLs(executionId, protocol, false, connection);
     }
 
-    private String[] getExecutionResultsURLs(String executionId, String protocol, boolean generateRestUrl) throws ApiException {
+    private String[] getExecutionResultsURLs(
+        String executionId, String protocol, boolean generateRestUrl,
+        Connection connection)
+        throws ApiException {
         if (protocol == null) {
             protocol = "https";
         }
@@ -484,7 +495,8 @@ public class ExecutionBusiness {
 
         List<InOutData> outputs = null;
         try {
-            outputs = workflowBusiness.getOutputData(executionId, apiContext.getUser().getFolder());
+            outputs = workflowBusiness.getOutputData(
+                executionId, apiContext.getUser().getFolder(), connection);
         } catch (BusinessException e) {
             throw new ApiException(e);
         }
@@ -492,7 +504,7 @@ public class ExecutionBusiness {
             if (generateRestUrl) {
                 urls.add(getRestExecutionResultUrl(output));
             } else {
-                urls.add(getSoapExecutionResultURL(output));
+                urls.add(getSoapExecutionResultURL(output, connection));
             }
         }
 
@@ -515,9 +527,11 @@ public class ExecutionBusiness {
                 + filePath + "?action=content"; // TODO ; parametize the end
     }
 
-    private String getSoapExecutionResultURL(InOutData output) throws ApiException {
+    private String getSoapExecutionResultURL(
+        InOutData output, Connection connection) throws ApiException {
         try {
-            String operationId = transferPoolBusiness.downloadFile(apiContext.getUser(), output.getPath());
+            String operationId = transferPoolBusiness.downloadFile(
+                apiContext.getUser(), output.getPath(), connection);
             String url = apiContext.getRequest().getRequestURL()
                     + "/../fr.insalyon.creatis.vip.portal.Main/filedownloadservice?operationid="
                     + operationId;

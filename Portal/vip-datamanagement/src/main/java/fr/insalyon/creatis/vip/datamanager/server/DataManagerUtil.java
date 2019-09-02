@@ -57,7 +57,9 @@ public class DataManagerUtil {
      * @return
      * @throws DataManagerException
      */
-    public static String parseBaseDir(User user, String baseDir) throws DataManagerException {
+    public static String parseBaseDir(
+        User user, String baseDir, Connection connection2)
+        throws DataManagerException {
         Server server = Server.getInstance();
         baseDir = parsePath(baseDir, DataManagerConstants.USERS_HOME,
                 server.getDataManagerUsersHome()
@@ -137,8 +139,9 @@ public class DataManagerUtil {
      * @return
      * @throws DataManagerException
      */
-    public static String parseRealDir(String baseDir, String currentUserFolder)
-            throws DataManagerException {
+    public static String parseRealDir(
+        String baseDir, String currentUserFolder, Connection connection2)
+        throws DataManagerException {
 
         Server server = Server.getInstance();
 

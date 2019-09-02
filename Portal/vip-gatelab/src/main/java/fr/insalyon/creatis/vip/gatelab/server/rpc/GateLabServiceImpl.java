@@ -62,13 +62,10 @@ public class GateLabServiceImpl extends AbstractRemoteServiceServlet implements 
 
     @Override
     public Map<String, String> getGatelabWorkflowInputs(String simulationID) throws GateLabException {
-
-        try {
-            return gatelabBusiness.getGatelabWorkflowInputs(simulationID, getSessionUser().getFolder());
-
-        } catch (CoreException ex) {
-            throw new GateLabException(ex);
-        } catch (BusinessException ex) {
+        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
+            return gatelabBusiness.getGatelabWorkflowInputs(
+                simulationID, getSessionUser().getFolder(), connection);
+        } catch (CoreException | BusinessException | SQLException ex) {
             throw new GateLabException(ex);
         }
     }

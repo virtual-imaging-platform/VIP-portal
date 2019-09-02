@@ -85,12 +85,16 @@ public class GateLabBusiness {
      * @return
      * @throws BusinessException
      */
-    public Map<String, String> getGatelabWorkflowInputs(String workflowID,
-            String currentUserFolder) throws BusinessException {
+    public Map<String, String> getGatelabWorkflowInputs(
+        String workflowID,
+        String currentUserFolder,
+        Connection connection)
+        throws BusinessException {
 
         try {
             GateLabInputs gateinputs = new GateLabInputs(workflowID);
-            Map<String, String> inputMap = gateinputs.getWorkflowInputs(currentUserFolder);
+            Map<String, String> inputMap =
+                gateinputs.getWorkflowInputs(currentUserFolder, connection);
 
             long nb = DAOFactory.getDAOFactory().getGatelabDAO(workflowID).getNumberParticles();
             inputMap.put("runnedparticles", "" + nb);

@@ -157,7 +157,7 @@ public class LFCPermissionBusiness {
 
         String lfcBaseDir;
         try {
-            lfcBaseDir = DataManagerUtil.parseBaseDir(user, path);
+            lfcBaseDir = DataManagerUtil.parseBaseDir(user, path, connection);
         } catch (DataManagerException e) {
             logger.error("Error parsing api path :" + path);
             throw new BusinessException("Internal error in data API");

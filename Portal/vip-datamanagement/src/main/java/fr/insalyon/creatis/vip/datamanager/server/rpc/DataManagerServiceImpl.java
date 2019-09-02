@@ -85,9 +85,11 @@ public class DataManagerServiceImpl extends AbstractRemoteServiceServlet impleme
                     LfcDirSSHSynchronization.add(ssh.getLfcDir());
                 }
             }
-            List<Data> data = lfcBusiness.listDir(getSessionUser(), baseDir, refresh);
+            List<Data> data = lfcBusiness.listDir(
+                getSessionUser(), baseDir, refresh, connection);
 
-            String lfcBaseDir = DataManagerUtil.parseBaseDir(getSessionUser(), baseDir);
+            String lfcBaseDir = DataManagerUtil.parseBaseDir(
+                getSessionUser(), baseDir, connection);
             for (Data d : data) {
                 String dataPath = lfcBaseDir + "/" + d.getName();
                 for (String s : LfcDirSSHSynchronization) {
@@ -108,44 +110,33 @@ public class DataManagerServiceImpl extends AbstractRemoteServiceServlet impleme
 
     @Override
     public void delete(String path) throws DataManagerException {
-
-        try {
+        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
             trace(logger, "Deleting: " + path);
             User user = getSessionUser();
-            transferPoolBusiness.delete(user, path);
-
-        } catch (CoreException ex) {
-            throw new DataManagerException(ex);
-        } catch (BusinessException ex) {
+            transferPoolBusiness.delete(user, connection, path);
+        } catch (CoreException | BusinessException | SQLException ex) {
             throw new DataManagerException(ex);
         }
     }
 
     @Override
     public void delete(List<String> paths) throws DataManagerException {
-
-        try {
+        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
             trace(logger, "Deleting: " + paths);
             User user = getSessionUser();
-            transferPoolBusiness.delete(user, paths.toArray(new String[]{}));
-
-        } catch (CoreException ex) {
-            throw new DataManagerException(ex);
-        } catch (BusinessException ex) {
+            transferPoolBusiness.delete(
+                user, connection, paths.toArray(new String[]{}));
+        } catch (CoreException | BusinessException | SQLException ex) {
             throw new DataManagerException(ex);
         }
     }
 
     @Override
     public void createDir(String baseDir, String name) throws DataManagerException {
-
-        try {
+        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
             trace(logger, "Creating folder: " + baseDir + "/" + name);
-            lfcBusiness.createDir(getSessionUser(), baseDir, name);
-
-        } catch (CoreException ex) {
-            throw new DataManagerException(ex);
-        } catch (BusinessException ex) {
+            lfcBusiness.createDir(getSessionUser(), baseDir, name, connection);
+        } catch (CoreException | BusinessException | SQLException ex) {
             throw new DataManagerException(ex);
         }
     }
@@ -153,14 +144,11 @@ public class DataManagerServiceImpl extends AbstractRemoteServiceServlet impleme
     @Override
     public void rename(String oldPath, String newPath, boolean extendPath)
             throws DataManagerException {
-
-        try {
+        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
             trace(logger, "Renaming '" + oldPath + "' to '" + newPath + "'");
-            lfcBusiness.rename(getSessionUser(), oldPath, newPath, extendPath);
-
-        } catch (CoreException ex) {
-            throw new DataManagerException(ex);
-        } catch (BusinessException ex) {
+            lfcBusiness.rename(
+                getSessionUser(), oldPath, newPath, extendPath, connection);
+        } catch (CoreException | BusinessException | SQLException ex) {
             throw new DataManagerException(ex);
         }
     }
@@ -168,14 +156,11 @@ public class DataManagerServiceImpl extends AbstractRemoteServiceServlet impleme
     @Override
     public void rename(String baseDir, List<String> paths, String newBaseDir,
             boolean extendPath) throws DataManagerException {
-
-        try {
-            lfcBusiness.rename(getSessionUser(), baseDir, paths,
-                    newBaseDir, extendPath);
-
-        } catch (CoreException ex) {
-            throw new DataManagerException(ex);
-        } catch (BusinessException ex) {
+        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
+            lfcBusiness.rename(
+                getSessionUser(), baseDir, paths,
+                newBaseDir, extendPath, connection);
+        } catch (CoreException | BusinessException | SQLException ex) {
             throw new DataManagerException(ex);
         }
     }
@@ -214,55 +199,43 @@ public class DataManagerServiceImpl extends AbstractRemoteServiceServlet impleme
 
     @Override
     public List<PoolOperation> getPoolOperationsByUser() throws DataManagerException {
-
-        try {
+        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
             User user = getSessionUser();
-            return transferPoolBusiness.getOperations(user.getEmail(), new Date(), user.getFolder());
-
-        } catch (CoreException ex) {
-            throw new DataManagerException(ex);
-        } catch (BusinessException ex) {
+            return transferPoolBusiness.getOperations(
+                user.getEmail(), new Date(), user.getFolder(), connection);
+        } catch (CoreException | BusinessException | SQLException ex) {
             throw new DataManagerException(ex);
         }
     }
 
     @Override
     public List<PoolOperation> getPoolOperationsByUserAndDate(Date startDate) throws DataManagerException {
-
-        try {
+        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
             User user = getSessionUser();
-            return transferPoolBusiness.getOperations(user.getEmail(), startDate, user.getFolder());
-
-        } catch (CoreException ex) {
-            throw new DataManagerException(ex);
-        } catch (BusinessException ex) {
+            return transferPoolBusiness.getOperations(
+                user.getEmail(), startDate, user.getFolder(), connection);
+        } catch (CoreException | BusinessException | SQLException ex) {
             throw new DataManagerException(ex);
         }
     }
 
     @Override
     public List<PoolOperation> getPoolOperations() throws DataManagerException {
-
-        try {
+        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
             authenticateSystemAdministrator(logger);
-            return transferPoolBusiness.getOperations(getSessionUser().getFolder());
-
-        } catch (CoreException ex) {
-            throw new DataManagerException(ex);
-        } catch (BusinessException ex) {
+            return transferPoolBusiness.getOperations(
+                getSessionUser().getFolder(), connection);
+        } catch (CoreException | BusinessException | SQLException ex) {
             throw new DataManagerException(ex);
         }
     }
 
     @Override
     public PoolOperation getPoolOperationById(String operationId) throws DataManagerException {
-
-        try {
-            return transferPoolBusiness.getOperationById(operationId, getSessionUser().getFolder());
-
-        } catch (CoreException ex) {
-            throw new DataManagerException(ex);
-        } catch (BusinessException ex) {
+        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
+            return transferPoolBusiness.getOperationById(
+                operationId, getSessionUser().getFolder(), connection);
+        } catch (CoreException | BusinessException | SQLException ex) {
             throw new DataManagerException(ex);
         }
     }
@@ -308,15 +281,12 @@ public class DataManagerServiceImpl extends AbstractRemoteServiceServlet impleme
 
     @Override
     public String downloadFile(String remoteFile) throws DataManagerException {
-
-        try {
+        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
             trace(logger, "Adding file to transfer queue: " + remoteFile);
             User user = getSessionUser();
-            return transferPoolBusiness.downloadFile(user, remoteFile);
-
-        } catch (CoreException ex) {
-            throw new DataManagerException(ex);
-        } catch (BusinessException ex) {
+            return transferPoolBusiness.downloadFile(
+                user, remoteFile, connection);
+        } catch (CoreException | BusinessException | SQLException ex) {
             throw new DataManagerException(ex);
         }
     }
@@ -324,30 +294,23 @@ public class DataManagerServiceImpl extends AbstractRemoteServiceServlet impleme
     @Override
     public String downloadFiles(List<String> remoteFiles, String packName)
             throws DataManagerException {
-
-        try {
+        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
             trace(logger, "Adding files to transfer queue: " + remoteFiles);
             User user = getSessionUser();
-            return transferPoolBusiness.downloadFiles(user, remoteFiles, packName);
-
-        } catch (CoreException ex) {
-            throw new DataManagerException(ex);
-        } catch (BusinessException ex) {
+            return transferPoolBusiness.downloadFiles(user, remoteFiles, packName, connection);
+        } catch (CoreException | BusinessException | SQLException ex) {
             throw new DataManagerException(ex);
         }
     }
 
     @Override
     public String downloadFolder(String remoteFolder) throws DataManagerException {
-
-        try {
+        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
             trace(logger, "Adding folder to transfer queue: " + remoteFolder);
             User user = getSessionUser();
-            return transferPoolBusiness.downloadFolder(user, remoteFolder);
-
-        } catch (CoreException ex) {
-            throw new DataManagerException(ex);
-        } catch (BusinessException ex) {
+            return transferPoolBusiness.downloadFolder(
+                user, remoteFolder, connection);
+        } catch (CoreException | BusinessException | SQLException ex) {
             throw new DataManagerException(ex);
         }
     }
@@ -372,29 +335,23 @@ public class DataManagerServiceImpl extends AbstractRemoteServiceServlet impleme
 
     @Override
     public void uploadFile(String localFilePath, String remoteFile) throws DataManagerException {
-
-        try {
+        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
             trace(logger, "Uploading file '" + localFilePath + "' to '" + remoteFile + "'.");
             User user = getSessionUser();
-            transferPoolBusiness.uploadFile(user, localFilePath, remoteFile);
-
-        } catch (CoreException ex) {
-            throw new DataManagerException(ex);
-        } catch (BusinessException ex) {
+            transferPoolBusiness.uploadFile(
+                user, localFilePath, remoteFile, connection);
+        } catch (CoreException | BusinessException | SQLException ex) {
             throw new DataManagerException(ex);
         }
     }
 
     @Override
     public boolean exists(String remoteFile) throws DataManagerException {
-        try {
+        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
             trace(logger, "Test if file '" + remoteFile + " exists");
             User user = getSessionUser();
-            return lfcBusiness.exists(user, remoteFile);
-
-        } catch (CoreException ex) {
-            throw new DataManagerException(ex);
-        } catch (BusinessException ex) {
+            return lfcBusiness.exists(user, remoteFile, connection);
+        } catch (CoreException | BusinessException | SQLException ex) {
             throw new DataManagerException(ex);
         }
 

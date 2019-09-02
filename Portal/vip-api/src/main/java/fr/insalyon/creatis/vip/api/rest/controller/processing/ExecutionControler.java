@@ -95,7 +95,11 @@ public class ExecutionControler {
         int executionMaxNb = environment.getProperty(DEFAULT_LIMIT_LIST_EXECUTION, Integer.class);
         if (limit == null) limit = executionMaxNb;
         if (limit > executionMaxNb) throw new ApiException("limit parameter too high");
-        return executionBusiness.listExecutions(limit);
+        try(Connection connection = connectionSupplier.get()) {
+            return executionBusiness.listExecutions(limit, connection);
+        } catch (SQLException | SQLRuntimeException ex) {
+            throw new ApiException(ex);
+        }
     }
 
     @RequestMapping(value = "count", produces = "text/plain;charset=UTF-8")
@@ -113,7 +117,12 @@ public class ExecutionControler {
         ApiUtils.methodInvocationLog("getExecution", executionId);
         restApiBusiness.getApiContext(httpServletRequest, true);
         executionBusiness.checkIfUserCanAccessExecution(executionId);
-        return executionBusiness.getExecution(executionId,false);
+        try(Connection connection = connectionSupplier.get()) {
+            return executionBusiness.getExecution(
+                executionId, false, connection);
+        } catch (SQLException | SQLRuntimeException ex) {
+            throw new ApiException(ex);
+        }
     }
 
     @RequestMapping(value = "/{executionId}", method = RequestMethod.PUT)
@@ -124,7 +133,12 @@ public class ExecutionControler {
         restApiBusiness.getApiContext(httpServletRequest, true);
         executionBusiness.checkIfUserCanAccessExecution(executionId);
         executionBusiness.updateExecution(execution);
-        return executionBusiness.getExecution(executionId,false);
+        try(Connection connection = connectionSupplier.get()) {
+            return executionBusiness.getExecution(
+                executionId, false, connection);
+        } catch (SQLException | SQLRuntimeException ex) {
+            throw new ApiException(ex);
+        }
     }
 
     @RequestMapping(method = RequestMethod.POST)
@@ -136,7 +150,7 @@ public class ExecutionControler {
                 execution.getPipelineIdentifier(), connection);
             String execId = executionBusiness.initExecution(
                 execution, connection);
-            return executionBusiness.getExecution(execId,false);
+            return executionBusiness.getExecution(execId, false, connection);
         } catch (SQLException | SQLRuntimeException ex) {
             throw new ApiException(ex);
         }
