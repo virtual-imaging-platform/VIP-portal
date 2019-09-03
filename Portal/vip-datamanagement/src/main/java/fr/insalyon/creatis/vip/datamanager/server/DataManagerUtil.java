@@ -34,7 +34,6 @@ package fr.insalyon.creatis.vip.datamanager.server;
 import fr.insalyon.creatis.vip.core.client.bean.*;
 import fr.insalyon.creatis.vip.core.server.business.Server;
 import fr.insalyon.creatis.vip.core.server.dao.*;
-import fr.insalyon.creatis.vip.core.server.dao.mysql.PlatformConnection;
 import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
 import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerException;
 
@@ -58,7 +57,7 @@ public class DataManagerUtil {
      * @throws DataManagerException
      */
     public static String parseBaseDir(
-        User user, String baseDir, Connection connection2)
+        User user, String baseDir, Connection connection)
         throws DataManagerException {
         Server server = Server.getInstance();
         baseDir = parsePath(baseDir, DataManagerConstants.USERS_HOME,
@@ -76,7 +75,7 @@ public class DataManagerUtil {
         baseDir = parsePath(baseDir, DataManagerConstants.VO_ROOT_FOLDER,
                             server.getVoRoot());
 
-        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
+        try {
             for (Group group : CoreDAOFactory.getDAOFactory()
                      .getGroupDAO(connection).getGroups()) {
                 String folderName = group.getName().replaceAll(" ", "_");
@@ -89,7 +88,7 @@ public class DataManagerUtil {
                         server.getDataManagerGroupsHome()
                         + "/" + folderName);
             }
-        } catch (DAOException | SQLException ex) {
+        } catch (DAOException ex) {
             throw new DataManagerException(ex);
         }
 
@@ -140,7 +139,7 @@ public class DataManagerUtil {
      * @throws DataManagerException
      */
     public static String parseRealDir(
-        String baseDir, String currentUserFolder, Connection connection2)
+        String baseDir, String currentUserFolder, Connection connection)
         throws DataManagerException {
 
         Server server = Server.getInstance();
@@ -153,14 +152,14 @@ public class DataManagerUtil {
                 Server.getInstance().getDataManagerUsersHome(),
                 Server.getInstance().getAltDataManagerUsersHome());
 
-        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
+        try {
             for (Group group : CoreDAOFactory.getDAOFactory()
                      .getGroupDAO(connection).getGroups()) {
                 baseDir = replaceLfnGroupPrefix(baseDir, group.getName(),
                         server.getDataManagerGroupsHome(),
                         server.getAltDataManagerGroupsHome());
             }
-        } catch (DAOException | SQLException ex) {
+        } catch (DAOException ex) {
             throw new DataManagerException(ex);
         }
 
