@@ -85,7 +85,7 @@ public class ExternalPlatformBusiness {
         }
         switch (externalPlatform.getType()) {
             case GIRDER:
-                String girderUri = girderStorageBusiness.parse(parameter);
+                String girderUri = girderStorageBusiness.generateUri(externalPlatform, parameter);
                 return new ParseResult(true, girderUri);
             default:
                 String error = "Only girder external storage are supported. "

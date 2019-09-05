@@ -31,11 +31,63 @@
  */
 package fr.insalyon.creatis.vip.datamanager.server.business;
 
+import fr.insalyon.creatis.vip.core.server.business.*;
+import fr.insalyon.creatis.vip.datamanager.client.bean.ExternalPlatform;
+import fr.insalyon.creatis.vip.datamanager.client.bean.ExternalPlatform.Type;
+import org.apache.log4j.Logger;
+
 /**
  * Created by abonnet on 7/17/19.
  */
 public class GirderStorageBusiness {
-    public String parse(String value) {
-        return null; // TODO
+
+    private static final Logger logger = Logger.getLogger(GirderStorageBusiness.class);
+
+    /* GASW regexps in 3.2.0 version
+        local fileName=`echo $URI | sed -r 's#^girder:/(//)?([^/].*)\?.*$#\2#i'`
+        local apiUrl=`echo $URI | sed -r 's/^.*[?&]apiurl=([^&]*)(&.*)?$/\1/i'`
+        local fileId=`echo $URI | sed -r 's/^.*[?&]fileid=([^&]*)(&.*)?$/\1/i'`
+        local token=`echo $URI | sed -r 's/^.*[?&]token=([^&]*)(&.*)?$/\1/i'`
+
+        So objective : generate "girder:/filename?apiurl=[...]&fileId=[...]&token=[...]
+     */
+    public String generateUri(ExternalPlatform externalPlatform, String parameter) throws BusinessException {
+        verifyExternalPlatform(externalPlatform);
+
+        // consider parameter is in the format "id/filename
+        String[] parameterSplitted = parameter.split("/");
+        String filename = parameterSplitted[1];
+        String fileId = parameterSplitted[0];
+        String apiUrl = externalPlatform.getUrl() + "/api/v2";
+        String token = Server.getInstance().getGirderTestToken();
+
+        return builUri(filename, apiUrl, fileId, token);
     }
+
+    private void verifyExternalPlatform(ExternalPlatform externalPlatform) throws BusinessException {
+        if ( ! externalPlatform.getType().equals(Type.GIRDER)) {
+            logger.error("Trying to generate a girder URI for a non girder storage" +
+                    "{" + externalPlatform.getType() + "}");
+            throw new BusinessException("Cannot generate girder uri");
+        }
+        if (externalPlatform.getUrl() == null) {
+            logger.error("A girder external storage must have an URL to generate an URI");
+            throw new BusinessException("Cannot generate girder uri");
+        }
+    }
+
+    private String builUri(String filename, String apiUrl, String fileId, String token) {
+        StringBuilder uriBuilder = new StringBuilder();
+        uriBuilder.append("girder:/");
+        uriBuilder.append(filename);
+        uriBuilder.append("?apiurl=");
+        uriBuilder.append(apiUrl);
+        uriBuilder.append("&fileId=");
+        uriBuilder.append(fileId);
+        uriBuilder.append("&token=");
+        uriBuilder.append(token);
+        return uriBuilder.toString();
+    }
+
+
 }
