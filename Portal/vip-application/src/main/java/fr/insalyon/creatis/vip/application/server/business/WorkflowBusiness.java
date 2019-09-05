@@ -96,6 +96,7 @@ public class WorkflowBusiness {
     private static InputDAO inputDAO;
     private static StatsDAO statsDAO;
     private final EngineBusiness engineBusiness;
+    private final ExternalPlatformBusiness externalPlatformBusiness;
 
     public WorkflowBusiness() {
 
@@ -114,6 +115,7 @@ public class WorkflowBusiness {
         } catch (WorkflowsDBDAOException ex) {
             logger.error(ex);
         }
+        externalPlatformBusiness = new ExternalPlatformBusiness(new GirderStorageBusiness());
     }
 
     private Engine selectEngine(String applicationClass) throws BusinessException {
@@ -271,15 +273,16 @@ public class WorkflowBusiness {
     }
 
     private String parseParameter(
-            User user, List<String> groups, String value)
+            User user, List<String> groups, String parameter)
             throws DataManagerException, BusinessException {
-        ExternalPlatformBusiness externalPlatformBusiness =
-                new ExternalPlatformBusiness(new GirderStorageBusiness());
+
         ExternalPlatformBusiness.ParseResult parseResult =
-                externalPlatformBusiness.parse(value);
+                externalPlatformBusiness.parseParameter(parameter);
         if (parseResult.isUri) {
+            // The uri has been generated
             return parseResult.result;
         }
+        // not an external platform parameter, use legacy format
         String parsedPath = DataManagerUtil.parseBaseDir(user, parseResult.result);
         if (!user.isSystemAdministrator()) {
             checkFolderACL(user, groups, parsedPath);
