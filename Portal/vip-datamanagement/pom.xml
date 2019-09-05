@@ -67,6 +67,13 @@ knowledge of the CeCILL-B license and that you accept its terms.
             <version>1.2.2</version>
         </dependency>
 
+        <!-- Json mapping library. Necessary to add mapping on model objects -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
+
     </dependencies>
     <build>
         <finalName>vip-datamanager</finalName>

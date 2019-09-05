@@ -52,6 +52,11 @@ knowledge of the CeCILL-B license and that you accept its terms.
         <vip.social.version>1.25</vip.social.version>
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+        <!-- dependencies version -->
+        <springmvc.version>4.3.1.RELEASE</springmvc.version>
+        <springsecurity.version>4.1.1.RELEASE</springsecurity.version>
+        <jackson.version>2.8.0.rc2</jackson.version>
     </properties>
 
     <description>VIP</description>

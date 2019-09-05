@@ -31,6 +31,8 @@
  */
 package fr.insalyon.creatis.vip.datamanager.client.bean;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 /**
  * @author abonnet
  */
@@ -53,6 +55,7 @@ public class ExternalPlatform {
         this.identifier = identifier;
     }
 
+    @JsonIgnore
     public Type getType() {
         return type;
     }
