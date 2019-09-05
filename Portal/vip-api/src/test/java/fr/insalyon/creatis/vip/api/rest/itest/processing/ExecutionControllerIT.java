@@ -35,8 +35,10 @@ import fr.insalyon.creatis.vip.api.bean.Execution;
 import fr.insalyon.creatis.vip.api.data.*;
 import fr.insalyon.creatis.vip.api.rest.RestErrorCodes;
 import fr.insalyon.creatis.vip.api.rest.config.*;
+import fr.insalyon.creatis.vip.api.rest.model.PathProperties;
 import fr.insalyon.creatis.vip.application.client.bean.Simulation;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
+import fr.insalyon.creatis.vip.datamanager.client.bean.Data;
 import org.junit.*;
 import org.mockito.*;
 
@@ -224,18 +226,23 @@ public class ExecutionControllerIT extends BaseVIPSpringIT {
                 .thenReturn(simulation2);
         when(workflowBusiness.getOutputData(simulation2.getID(), baseUser1.getFolder()))
                 .thenReturn(simulation2OutData);
+        String resultPath = simulation2OutData.get(0).getPath();
+        when(lfcBusiness.exists(baseUser1, resultPath))
+                .thenReturn(true);
+        when(lfcBusiness.listDir(baseUser1, resultPath, true))
+                .thenReturn(Collections.singletonList(
+                        PathTestUtils.getAbsoluteData(PathTestUtils.testFile1)));
         when(transferPoolBusiness.downloadFile(any(), any()))
                 .thenThrow(new RuntimeException());
+
         mockMvc.perform(
                 get("/rest/executions/" + simulation2.getID() + "/results").with(baseUser1()))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(RestTestUtils.JSON_CONTENT_TYPE_UTF8))
                 .andExpect(jsonPath("$[*]", hasSize(1)))
-                .andExpect(jsonPath("$[0]",org.hamcrest.Matchers.endsWith(
-                                CarminAPITestConstants.TEST_DOWNLOAD_PATH
-                                        + simulation2OutData.get(0).getPath()
-                                        + "?action=content")));
+                .andExpect(jsonPath("$[0]",
+                        PathTestUtils.jsonCorrespondsToPath(PathTestUtils.testFile1PathProperties)));
     }
 
     @Test

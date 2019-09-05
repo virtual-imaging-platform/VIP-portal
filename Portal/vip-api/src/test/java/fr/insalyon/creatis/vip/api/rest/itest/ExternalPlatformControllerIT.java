@@ -32,11 +32,14 @@
 package fr.insalyon.creatis.vip.api.rest.itest;
 
 import fr.insalyon.creatis.vip.api.rest.config.BaseVIPSpringIT;
+import org.junit.Ignore;
 
 /**
  * Created by abonnet on 7/4/19.
  */
+@Ignore
 public class ExternalPlatformControllerIT extends BaseVIPSpringIT {
+
 
 
 }
