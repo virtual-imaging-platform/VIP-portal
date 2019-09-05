@@ -33,7 +33,7 @@ package fr.insalyon.creatis.vip.datamanager.server.dao;
 
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import fr.insalyon.creatis.vip.core.server.dao.mysql.PlatformConnection;
-import fr.insalyon.creatis.vip.datamanager.server.dao.mysql.SSHData;
+import fr.insalyon.creatis.vip.datamanager.server.dao.mysql.*;
 import org.apache.log4j.Logger;
 
 /**
@@ -81,7 +81,7 @@ public class DataManagerDAOFactory {
     }
 
     public ExternalPlatformsDAO getExternalPlatformsDAO() throws DAOException {
-        return null; // TODO, add implementation
+        return new ExternalPlatformData();
     }
 
 }
