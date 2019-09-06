@@ -70,11 +70,11 @@ public class PlatformConnection {
 
     private PlatformConnection() {
         firstExecution = true;
-        connect();
+        initDatasource();
         createTables();
     }
 
-    private void connect() {
+    private void initDatasource() {
         try {
             Context initCtx = new InitialContext();
             Context envCtx = (Context) initCtx.lookup("java:comp/env");
