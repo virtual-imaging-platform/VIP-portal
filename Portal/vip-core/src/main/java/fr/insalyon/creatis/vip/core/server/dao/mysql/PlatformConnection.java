@@ -204,7 +204,7 @@ public class PlatformConnection {
 
                 firstExecution = false;
             } catch (SQLException e) {
-                logger.error("Error closing database connection", e);
+                logger.error("Error while getting the connection or closing it", e);
             }
         }
     }
