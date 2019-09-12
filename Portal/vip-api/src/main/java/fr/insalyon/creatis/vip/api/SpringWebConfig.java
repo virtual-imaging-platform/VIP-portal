@@ -86,17 +86,6 @@ public class SpringWebConfig extends WebMvcConfigurerAdapter {
         configurer.favorPathExtension(false);
     }
 
-    @Bean
-    @Scope(proxyMode = ScopedProxyMode.TARGET_CLASS, value = BeanDefinition.SCOPE_PROTOTYPE)
-    public UserDAO userDAO() {
-        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
-            return CoreDAOFactory.getDAOFactory().getUserDAO(connection);
-        } catch (DAOException | SQLException ex) {
-            logger.error("error creating user dao bean", ex);
-            throw new RuntimeException("Cannot create user dao", ex);
-        }
-    }
-
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
