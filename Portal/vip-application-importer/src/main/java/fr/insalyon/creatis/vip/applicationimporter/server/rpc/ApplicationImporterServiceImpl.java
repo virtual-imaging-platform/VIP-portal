@@ -31,12 +31,15 @@
  */
 package fr.insalyon.creatis.vip.applicationimporter.server.rpc;
 
-import fr.insalyon.creatis.vip.applicationimporter.server.business.ApplicationImporterBusiness;
 import fr.insalyon.creatis.vip.applicationimporter.client.ApplicationImporterException;
 import fr.insalyon.creatis.vip.applicationimporter.client.bean.BoutiquesTool;
-import fr.insalyon.creatis.vip.core.client.view.CoreException;
 import fr.insalyon.creatis.vip.applicationimporter.client.rpc.ApplicationImporterService;
+import fr.insalyon.creatis.vip.applicationimporter.server.business.ApplicationImporterBusiness;
+import fr.insalyon.creatis.vip.core.client.view.CoreException;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
+import fr.insalyon.creatis.vip.core.server.dao.mysql.PlatformConnection;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -49,14 +52,12 @@ public class ApplicationImporterServiceImpl extends fr.insalyon.creatis.vip.core
 
     @Override
     public String readAndValidateBoutiquesFile(String fileLFN) throws ApplicationImporterException {
-        try {
+        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
             trace(logger, "Reading file "+fileLFN+" as string.");
             ApplicationImporterBusiness abi = new ApplicationImporterBusiness();
-            return abi.readAndValidationBoutiquesFile(fileLFN, getSessionUser());
-        } catch (CoreException ex) {
-            logger.error(ex);
-            throw new ApplicationImporterException(ex);
-        } catch (BusinessException ex) {
+            return abi.readAndValidationBoutiquesFile(
+                fileLFN, getSessionUser(), connection);
+        } catch (CoreException | BusinessException | SQLException ex) {
             logger.error(ex);
             throw new ApplicationImporterException(ex);
         }
@@ -64,11 +65,11 @@ public class ApplicationImporterServiceImpl extends fr.insalyon.creatis.vip.core
 
     @Override
     public void createApplication(BoutiquesTool bt, String type, String tag, HashMap<String, BoutiquesTool> bts, boolean isRunOnGrid, boolean overwriteVersion, boolean challenge) throws ApplicationImporterException {
-        try {
+        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
             trace(logger, "Creating application");
             ApplicationImporterBusiness abi = new ApplicationImporterBusiness();
-            abi.createApplication(bt, type, tag, bts, isRunOnGrid, overwriteVersion, getSessionUser(), challenge);
-        } catch (CoreException | BusinessException ex) {
+            abi.createApplication(bt, type, tag, bts, isRunOnGrid, overwriteVersion, getSessionUser(), challenge, connection);
+        } catch (BusinessException | CoreException | SQLException ex) {
             logger.error(ex);
             throw new ApplicationImporterException(ex);
         } catch (JSONException ex) {

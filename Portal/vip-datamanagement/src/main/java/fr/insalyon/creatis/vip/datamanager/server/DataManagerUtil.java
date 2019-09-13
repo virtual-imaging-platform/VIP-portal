@@ -39,6 +39,8 @@ import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerException;
 
 import java.io.File;
 import java.net.URI;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.*;
 
 /**
@@ -54,7 +56,9 @@ public class DataManagerUtil {
      * @return
      * @throws DataManagerException
      */
-    public static String parseBaseDir(User user, String baseDir) throws DataManagerException {
+    public static String parseBaseDir(
+        User user, String baseDir, Connection connection)
+        throws DataManagerException {
         Server server = Server.getInstance();
         baseDir = parsePath(baseDir, DataManagerConstants.USERS_HOME,
                 server.getDataManagerUsersHome()
@@ -72,7 +76,8 @@ public class DataManagerUtil {
                             server.getVoRoot());
 
         try {
-            for (Group group : CoreDAOFactory.getDAOFactory().getGroupDAO().getGroups()) {
+            for (Group group : CoreDAOFactory.getDAOFactory()
+                     .getGroupDAO(connection).getGroups()) {
                 String folderName = group.getName().replaceAll(" ", "_");
 
                 baseDir = parsePath(baseDir, group.getName() + DataManagerConstants.GROUP_APPEND,
@@ -133,8 +138,9 @@ public class DataManagerUtil {
      * @return
      * @throws DataManagerException
      */
-    public static String parseRealDir(String baseDir, String currentUserFolder)
-            throws DataManagerException {
+    public static String parseRealDir(
+        String baseDir, String currentUserFolder, Connection connection)
+        throws DataManagerException {
 
         Server server = Server.getInstance();
 
@@ -147,7 +153,8 @@ public class DataManagerUtil {
                 Server.getInstance().getAltDataManagerUsersHome());
 
         try {
-            for (Group group : CoreDAOFactory.getDAOFactory().getGroupDAO().getGroups()) {
+            for (Group group : CoreDAOFactory.getDAOFactory()
+                     .getGroupDAO(connection).getGroups()) {
                 baseDir = replaceLfnGroupPrefix(baseDir, group.getName(),
                         server.getDataManagerGroupsHome(),
                         server.getAltDataManagerGroupsHome());

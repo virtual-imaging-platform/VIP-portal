@@ -32,6 +32,7 @@
 package fr.insalyon.creatis.vip.api.rest.controller.data;
 
 import fr.insalyon.creatis.vip.api.business.*;
+import fr.insalyon.creatis.vip.api.exception.SQLRuntimeException;
 import fr.insalyon.creatis.vip.api.rest.RestApiBusiness;
 import fr.insalyon.creatis.vip.api.rest.model.*;
 import org.apache.log4j.Logger;
@@ -43,7 +44,10 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.*;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.List;
+import java.util.function.Supplier;
 
 /**
  * Created by abonnet on 1/13/17.
@@ -64,14 +68,21 @@ public class DataController {
     @Autowired
     private HttpServletRequest httpServletRequest;
 
+    @Autowired
+    private Supplier<Connection> connectionSupplier;
+
     @RequestMapping(path = "/**", params = "action=properties")
     public PathProperties getPathProperties()
             throws ApiException {
         String completePath = extractWildcardPath(httpServletRequest);
         ApiUtils.methodInvocationLog("getPathProperties", getCurrentUserEmail(), completePath);
         restApiBusiness.getApiContext(httpServletRequest, true);
-        // business call
-        return dataApiBusiness.getPathProperties(completePath);
+        try(Connection connection = connectionSupplier.get()) {
+            // business call
+            return dataApiBusiness.getPathProperties(completePath, connection);
+        } catch (SQLException | SQLRuntimeException ex) {
+            throw new ApiException(ex);
+        }
     }
 
     @RequestMapping(path = "/**", params = "action=exists")
@@ -79,8 +90,13 @@ public class DataController {
         String completePath = extractWildcardPath(httpServletRequest);
         ApiUtils.methodInvocationLog("doesPathExists", getCurrentUserEmail(), completePath);
         restApiBusiness.getApiContext(httpServletRequest, true);
-        // business call
-        return new ExistsApiResponse(dataApiBusiness.doesFileExist(completePath));
+        try(Connection connection = connectionSupplier.get()) {
+            // business call
+            return new ExistsApiResponse(
+                dataApiBusiness.doesFileExist(completePath, connection));
+        } catch (SQLException | SQLRuntimeException ex) {
+            throw new ApiException(ex);
+        }
     }
 
     @RequestMapping(path = "/**", params = "action=list")
@@ -88,8 +104,12 @@ public class DataController {
         String completePath = extractWildcardPath(httpServletRequest);
         ApiUtils.methodInvocationLog("listDirectory", getCurrentUserEmail(), completePath);
         restApiBusiness.getApiContext(httpServletRequest, true);
-        // business call
-        return dataApiBusiness.listDirectory(completePath);
+        try(Connection connection = connectionSupplier.get()) {
+            // business call
+            return dataApiBusiness.listDirectory(completePath, connection);
+        } catch (SQLException | SQLRuntimeException ex) {
+            throw new ApiException(ex);
+        }
     }
 
     @RequestMapping(path = "/**", params = "action=md5")
@@ -107,13 +127,17 @@ public class DataController {
         String completePath = extractWildcardPath(httpServletRequest);
         ApiUtils.methodInvocationLog("downloadFile", getCurrentUserEmail(), completePath);
         restApiBusiness.getApiContext(httpServletRequest, true);
-        // business call
-        File file = dataApiBusiness.getFile(completePath);
-        FileSystemResource res = new FileSystemResource(file);
-        HttpHeaders headers = new HttpHeaders();
-        // TODO improve mime-type
-        headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
-        return new ResponseEntity<>(res, headers, HttpStatus.OK);
+        try(Connection connection = connectionSupplier.get()) {
+            // business call
+            File file = dataApiBusiness.getFile(completePath, connection);
+            FileSystemResource res = new FileSystemResource(file);
+            HttpHeaders headers = new HttpHeaders();
+            // TODO improve mime-type
+            headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+            return new ResponseEntity<>(res, headers, HttpStatus.OK);
+        } catch (SQLException | SQLRuntimeException ex) {
+            throw new ApiException(ex);
+        }
     }
 
     @RequestMapping(path = "/**", method = RequestMethod.DELETE)
@@ -122,8 +146,12 @@ public class DataController {
         String completePath = extractWildcardPath(httpServletRequest);
         ApiUtils.methodInvocationLog("deletePath", getCurrentUserEmail(), completePath);
         restApiBusiness.getApiContext(httpServletRequest, true);
-        // business call
-        dataApiBusiness.deletePath(completePath);
+        try(Connection connection = connectionSupplier.get()) {
+            // business call
+            dataApiBusiness.deletePath(completePath, connection);
+        } catch (SQLException | SQLRuntimeException ex) {
+            throw new ApiException(ex);
+        }
     }
 
     /*
@@ -142,8 +170,13 @@ public class DataController {
         String completePath = extractWildcardPath(httpServletRequest);
         ApiUtils.methodInvocationLog("uploadFile", getCurrentUserEmail(), completePath);
         restApiBusiness.getApiContext(httpServletRequest, true);
-        // business call
-        dataApiBusiness.uploadRawFileFromInputStream(completePath, requestInputStream);
+        try(Connection connection = connectionSupplier.get()) {
+            // business call
+            dataApiBusiness.uploadRawFileFromInputStream(
+                completePath, requestInputStream, connection);
+        } catch (SQLException | SQLRuntimeException ex) {
+            throw new ApiException(ex);
+        }
         // TODO : think about returning the PahtProperties of the created Path, to be informed of a filename change
     }
 
@@ -153,8 +186,13 @@ public class DataController {
         String completePath = extractWildcardPath(httpServletRequest);
         ApiUtils.methodInvocationLog("uploadCustomData", getCurrentUserEmail(), completePath);
         restApiBusiness.getApiContext(httpServletRequest, true);
-        // business call
-        dataApiBusiness.uploadCustomData(completePath, uploadData);
+        try(Connection connection = connectionSupplier.get()) {
+            // business call
+            dataApiBusiness.uploadCustomData(
+                completePath, uploadData, connection);
+        } catch (SQLException | SQLRuntimeException ex) {
+            throw new ApiException(ex);
+        }
     }
 
     private String getCurrentUserEmail() {
