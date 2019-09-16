@@ -67,8 +67,17 @@ class MySQLDAOFactory extends SSHDAOFactory {
                     + "transferType VARCHAR(255), deleteFilesFromSource BOOLEAN DEFAULT 0, active BOOLEAN DEFAULT 1, PRIMARY KEY(email,LFCDir), "
                     + "FOREIGN KEY (email) REFERENCES VIPUsers(email) "
                     + "ON DELETE CASCADE ON UPDATE CASCADE");
+
+            PlatformConnection.getInstance().createTable(
+                connection,
+                "VIPApiKeys",
+                "email VARCHAR(255),"
+                + "identifier VARCHAR(50) NOT NULL,"
+                + "apiKey VARCHAR(255)"
+                + "FOREIGN KEY (email) REFERENCES VIPUsers(email) "
+                + "ON DELETE CASCADE ON UPDATE CASCADE");
         } catch (SQLException ex) {
-            logger.error("Error configuring SSH database", ex);
+            logger.error("Error configuring DataManager database", ex);
         }
     }
 
