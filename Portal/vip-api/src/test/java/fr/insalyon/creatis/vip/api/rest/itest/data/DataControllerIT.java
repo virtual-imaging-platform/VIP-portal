@@ -90,7 +90,7 @@ public class DataControllerIT extends BaseVIPSpringIT {
     @Test
     public void shouldReturnNonExistingPath() throws Exception {
         String testLfcPath = "/vip/Home/WRONG/PATH";
-        when(lfcBusiness.exists(baseUser1, testLfcPath, anyObject()))
+        when(lfcBusiness.exists(eq(baseUser1), eq(testLfcPath), anyObject()))
             .thenReturn(false);
         PathProperties expectedPathProperties = new PathProperties();
         expectedPathProperties.setExists(false);
@@ -147,10 +147,10 @@ public class DataControllerIT extends BaseVIPSpringIT {
                 null, null, null, testFile, Type.Download, Status.Done, baseUser1.getEmail(), 100);
         PoolOperation runningPoolOperation = new PoolOperation(operationId,
                 null, null, null, null, Type.Download, Status.Running, baseUser1.getEmail(), 0);
-        when (transferPoolBusiness.downloadFile(baseUser1, lfcPath, anyObject()))
+        when (transferPoolBusiness.downloadFile(eq(baseUser1), eq(lfcPath), anyObject()))
             .thenReturn(operationId);
         when (transferPoolBusiness.getOperationById(
-                  operationId, baseUser1.getFolder(), anyObject()))
+                  eq(operationId), eq(baseUser1.getFolder()), anyObject()))
             .thenReturn(runningPoolOperation, runningPoolOperation, donePoolOperation);
         when (transferPoolBusiness.getDownloadPoolOperation(operationId))
                 .thenReturn(donePoolOperation);
@@ -167,10 +167,10 @@ public class DataControllerIT extends BaseVIPSpringIT {
         String operationId = "testOpId";
         PoolOperation runningPoolOperation = new PoolOperation(operationId,
                 null, null, null, null, Type.Download, Status.Running, baseUser1.getEmail(), 0);
-        when (transferPoolBusiness.downloadFile(baseUser1, lfcPath, anyObject()))
+        when (transferPoolBusiness.downloadFile(eq(baseUser1), eq(lfcPath), anyObject()))
             .thenReturn(operationId);
         when (transferPoolBusiness.getOperationById(
-                  operationId, baseUser1.getFolder(), anyObject()))
+                  eq(operationId), eq(baseUser1.getFolder()), anyObject()))
             .thenReturn(runningPoolOperation, runningPoolOperation);
         mockMvc.perform(
                 get("/rest/path" + lfcPath).param("action", "content").with(baseUser1()))
@@ -196,7 +196,7 @@ public class DataControllerIT extends BaseVIPSpringIT {
                   anyObject()))
                 .thenReturn(operationId);
         when (transferPoolBusiness.getOperationById(
-                  operationId, baseUser2.getFolder(), anyObject()))
+                  eq(operationId), eq(baseUser2.getFolder()), anyObject()))
             .thenReturn(runningPoolOperation, runningPoolOperation, donePoolOperation);
         mockMvc.perform(
                 put("/rest/path" + path)
@@ -234,7 +234,7 @@ public class DataControllerIT extends BaseVIPSpringIT {
                   anyObject()))
             .thenReturn(operationId);
         when (transferPoolBusiness.getOperationById(
-                  operationId, baseUser2.getFolder(), anyObject()))
+                  eq(operationId), eq(baseUser2.getFolder()), anyObject()))
             .thenReturn(runningPoolOperation, runningPoolOperation, donePoolOperation);
         mockMvc.perform(
                 put("/rest/path" + path)

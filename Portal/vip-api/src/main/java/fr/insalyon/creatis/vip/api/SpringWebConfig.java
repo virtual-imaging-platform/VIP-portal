@@ -39,6 +39,7 @@ import fr.insalyon.creatis.vip.core.server.dao.*;
 import fr.insalyon.creatis.vip.core.server.dao.mysql.PlatformConnection;
 import fr.insalyon.creatis.vip.datamanager.server.business.*;
 import org.apache.log4j.Logger;
+import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.*;
@@ -48,7 +49,7 @@ import org.springframework.web.servlet.config.annotation.*;
 
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.function.Supplier;
+import java.util.function.*;
 
 import static fr.insalyon.creatis.vip.api.CarminProperties.CORS_AUTHORIZED_DOMAINS;
 
@@ -72,6 +73,8 @@ public class SpringWebConfig extends WebMvcConfigurerAdapter {
 
     @Autowired
     private Environment env;
+    @Autowired
+    private BeanFactory beanFactory;
 
     @Override
     public void configurePathMatch(PathMatchConfigurer matcher) {
@@ -84,6 +87,22 @@ public class SpringWebConfig extends WebMvcConfigurerAdapter {
     public void configureContentNegotiation(ContentNegotiationConfigurer configurer) {
         // necessary in the content negotiation stuff of carmin data
         configurer.favorPathExtension(false);
+    }
+
+    @Bean
+    public Function<Connection, UserDAO> userDaoFactory() {
+        return connection -> beanFactory.getBean(UserDAO.class, connection);
+    }
+
+    @Bean
+    @Scope(proxyMode = ScopedProxyMode.TARGET_CLASS, value = BeanDefinition.SCOPE_PROTOTYPE)
+    public UserDAO userDAO(Connection connection) {
+        try {
+            return CoreDAOFactory.getDAOFactory().getUserDAO(connection);
+        } catch (DAOException e) {
+            logger.error("error creating user dao bean", e);
+            throw new RuntimeException("Cannot create user dao", e);
+        }
     }
 
     @Override

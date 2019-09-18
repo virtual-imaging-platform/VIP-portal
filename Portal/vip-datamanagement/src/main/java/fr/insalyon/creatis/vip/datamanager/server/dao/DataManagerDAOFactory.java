@@ -59,21 +59,23 @@ public class DataManagerDAOFactory {
         try(Connection connection = PlatformConnection.getInstance().getConnection()) {
             logger.info("Configuring VIP SSH database.");
             PlatformConnection.getInstance().createTable(
-                connection,
-                "VIPSSHAccounts",
-                "email VARCHAR(255), LFCDir VARCHAR(255), "
-                    + "sshUser VARCHAR(255), sshHost VARCHAR(255), sshDir VARCHAR(255), sshPort INT, validated BOOLEAN, "
-                    + "auth_failed BOOLEAN, theEarliestNextSynchronistation TIMESTAMP, numberSynchronizationFailed BIGINT, "
-                    + "transferType VARCHAR(255), deleteFilesFromSource BOOLEAN DEFAULT 0, active BOOLEAN DEFAULT 1, PRIMARY KEY(email,LFCDir), "
-                    + "FOREIGN KEY (email) REFERENCES VIPUsers(email) "
-                    + "ON DELETE CASCADE ON UPDATE CASCADE");
+                    connection,
+                    "VIPSSHAccounts",
+                    "email VARCHAR(255), LFCDir VARCHAR(255), "
+                            + "sshUser VARCHAR(255), sshHost VARCHAR(255), sshDir VARCHAR(255), sshPort INT, validated BOOLEAN, "
+                            + "auth_failed BOOLEAN, theEarliestNextSynchronistation TIMESTAMP, numberSynchronizationFailed BIGINT, "
+                            + "transferType VARCHAR(255), deleteFilesFromSource BOOLEAN DEFAULT 0, active BOOLEAN DEFAULT 1, PRIMARY KEY(email,LFCDir), "
+                            + "FOREIGN KEY (email) REFERENCES VIPUsers(email) "
+                            + "ON DELETE CASCADE ON UPDATE CASCADE");
             logger.info("Configuring VIP External Platforms database.");
-            PlatformConnection.getInstance().createTable("VIPExternalPlatforms",
+            PlatformConnection.getInstance().createTable(
+                    connection,
+                    "VIPExternalPlatforms",
                     "identifier VARCHAR(50) NOT NULL, "
-                    + "type VARCHAR(50) NOT NULL, "
-                    + "description VARCHAR(1000), "
-                    + "url VARCHAR(255), "
-                    + "PRIMARY KEY (identifier)");
+                            + "type VARCHAR(50) NOT NULL, "
+                            + "description VARCHAR(1000), "
+                            + "url VARCHAR(255), "
+                            + "PRIMARY KEY (identifier)");
         } catch (SQLException ex) {
             logger.error("Error configuring SSH database", ex);
         }
@@ -83,7 +85,7 @@ public class DataManagerDAOFactory {
         return new SSHData(connection);
     }
 
-    public ExternalPlatformsDAO getExternalPlatformsDAO() throws DAOException {
-        return new ExternalPlatformData();
+    public ExternalPlatformsDAO getExternalPlatformsDAO(Connection connection) throws DAOException {
+        return new ExternalPlatformData(connection);
     }
 }

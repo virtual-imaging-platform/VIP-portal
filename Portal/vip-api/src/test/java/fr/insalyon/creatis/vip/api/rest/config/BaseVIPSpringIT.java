@@ -41,7 +41,7 @@ import org.junit.*;
 import org.junit.contrib.java.lang.system.EnvironmentVariables;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.*;
 import org.springframework.core.io.*;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers;
@@ -106,7 +106,8 @@ abstract public class BaseVIPSpringIT {
     @Autowired
     protected ResourceLoader resourceLoader;
     @Autowired
-    protected UserDAO userDAO;
+    @Qualifier("testUserDAO")
+    protected UserDAO testUserDAO;
     @Autowired
     protected ConfigurationBusiness configurationBusiness;
     @Autowired
@@ -140,7 +141,7 @@ abstract public class BaseVIPSpringIT {
                 .defaultRequest(MockMvcRequestBuilders.get("/").servletPath("/rest"))
                 .apply(SecurityMockMvcConfigurers.springSecurity())
                 .build();
-        Mockito.reset(userDAO, configurationBusiness, workflowBusiness, applicationBusiness,
+        Mockito.reset(testUserDAO, configurationBusiness, workflowBusiness, applicationBusiness,
                 classBusiness, transferPoolBusiness, simulationBusiness,
                 lfcBusiness);
     }
@@ -167,7 +168,7 @@ abstract public class BaseVIPSpringIT {
     }
 
     public UserDAO getUserDAO() {
-        return userDAO;
+        return testUserDAO;
     }
 
     public ConfigurationBusiness getConfigurationBusiness() {

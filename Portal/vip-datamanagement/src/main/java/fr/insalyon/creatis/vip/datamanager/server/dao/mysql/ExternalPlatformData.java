@@ -48,8 +48,8 @@ public class ExternalPlatformData implements ExternalPlatformsDAO {
     private static final Logger logger = Logger.getLogger(ExternalPlatformData.class);
     private Connection connection;
 
-    public ExternalPlatformData() throws DAOException {
-        this.connection = PlatformConnection.getInstance().getConnection();
+    public ExternalPlatformData(Connection connection) throws DAOException {
+        this.connection = connection;
     }
 
     @Override

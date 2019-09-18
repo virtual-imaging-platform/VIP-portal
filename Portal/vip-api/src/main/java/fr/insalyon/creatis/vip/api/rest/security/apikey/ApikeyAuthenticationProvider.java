@@ -53,7 +53,7 @@ import org.springframework.util.Assert;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Map;
-import java.util.function.Supplier;
+import java.util.function.*;
 
 /**
  * Created by abonnet on 7/25/16.
@@ -78,6 +78,9 @@ public class ApikeyAuthenticationProvider implements
     @Autowired
     private Supplier<Connection> connectionSupplier;
 
+    @Autowired
+    private Function<Connection,UserDAO> userDAOFactory;
+
     public final void afterPropertiesSet() throws Exception {
         Assert.notNull(this.messages, "A message source must be set");
     }
@@ -95,11 +98,11 @@ public class ApikeyAuthenticationProvider implements
                 "Only ApikeyAuthenticationToken is supported");
 
         try(Connection connection = connectionSupplier.get()) {
+            UserDAO userDAO =  userDAOFactory.apply(connection);
             User vipUser;
             String apikey = authentication.getCredentials().toString();
             try {
-                vipUser = CoreDAOFactory.getDAOFactory()
-                    .getUserDAO(connection).getUserByApikey(apikey);
+                vipUser = userDAO.getUserByApikey(apikey);
             } catch (DAOException e) {
                 logger.error("error when getting user by apikey", e);
                 logger.error("Doing as if there is an auth error");
@@ -137,9 +140,7 @@ public class ApikeyAuthenticationProvider implements
             try {
                 logger.info(
                     "successful logging for " + springUser.getUsername());
-                CoreDAOFactory.getDAOFactory()
-                    .getUserDAO(connection)
-                    .resetNFailedAuthentications(springUser.getUsername());
+                userDAO.resetNFailedAuthentications(springUser.getUsername());
             } catch (DAOException e) {
                 logger.error("Error reseting failed auth attemps ", e);
             }

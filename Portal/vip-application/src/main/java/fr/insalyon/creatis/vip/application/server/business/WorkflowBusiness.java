@@ -223,11 +223,11 @@ public class WorkflowBusiness {
                     String[] values = valuesStr.split(ApplicationConstants.SEPARATOR_LIST);
                     for (String v : values) {
 
-                        String parsedParameter = parseParameter(user, groups, v.trim());
+                        String parsedParameter = parseParameter(user, groups, v.trim(), connection);
                         ps.addValue(parsedParameter);
                     }
                 } else {
-                    String parsedParameter = parseParameter(user, groups, valuesStr.trim());
+                    String parsedParameter = parseParameter(user, groups, valuesStr.trim(), connection);
                     ps.addValue(parsedParameter);
                 }
                 parameters.add(ps);
@@ -283,17 +283,19 @@ public class WorkflowBusiness {
     }
 
     private String parseParameter(
-            User user, List<String> groups, String parameter)
+            User user, List<String> groups,
+            String parameter, Connection connection)
             throws DataManagerException, BusinessException {
 
         ExternalPlatformBusiness.ParseResult parseResult =
-                externalPlatformBusiness.parseParameter(parameter);
+                externalPlatformBusiness.parseParameter(parameter, connection);
         if (parseResult.isUri) {
             // The uri has been generated
             return parseResult.result;
         }
         // not an external platform parameter, use legacy format
-        String parsedPath = DataManagerUtil.parseBaseDir(user, parseResult.result);
+        String parsedPath = DataManagerUtil.parseBaseDir(
+                user, parseResult.result, connection);
         if (!user.isSystemAdministrator()) {
             checkFolderACL(user, groups, parsedPath);
         }

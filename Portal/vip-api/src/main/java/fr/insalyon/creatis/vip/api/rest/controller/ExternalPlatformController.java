@@ -32,6 +32,7 @@
 package fr.insalyon.creatis.vip.api.rest.controller;
 
 import fr.insalyon.creatis.vip.api.business.*;
+import fr.insalyon.creatis.vip.api.exception.SQLRuntimeException;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.datamanager.client.bean.ExternalPlatform;
 import fr.insalyon.creatis.vip.datamanager.server.business.ExternalPlatformBusiness;
@@ -39,7 +40,9 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.sql.*;
 import java.util.List;
+import java.util.function.Supplier;
 
 /**
  * Created by abonnet on 7/4/19.
@@ -52,17 +55,22 @@ public class ExternalPlatformController {
 
     private ExternalPlatformBusiness externalPlatformBusiness;
 
+    private final Supplier<Connection> connectionSupplier;
+
     @Autowired
-    public ExternalPlatformController(ExternalPlatformBusiness externalPlatformBusiness) {
+    public ExternalPlatformController(
+            ExternalPlatformBusiness externalPlatformBusiness,
+            Supplier<Connection> connectionSupplier) {
         this.externalPlatformBusiness = externalPlatformBusiness;
+        this.connectionSupplier = connectionSupplier;
     }
 
     @GetMapping
     public List<ExternalPlatform> listExternalPlatforms() throws ApiException {
         ApiUtils.methodInvocationLog("listExternalPlatforms");
-        try {
-            return externalPlatformBusiness.listAll();
-        } catch (BusinessException e) {
+        try(Connection connection = connectionSupplier.get()) {
+            return externalPlatformBusiness.listAll(connection);
+        } catch (SQLException | SQLRuntimeException | BusinessException e) {
             logger.error("Error listing all external platforms");
             throw new ApiException(e);
         }

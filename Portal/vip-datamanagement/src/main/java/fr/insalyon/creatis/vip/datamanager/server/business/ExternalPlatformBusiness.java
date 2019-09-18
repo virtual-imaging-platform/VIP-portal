@@ -37,6 +37,7 @@ import fr.insalyon.creatis.vip.datamanager.client.bean.ExternalPlatform;
 import fr.insalyon.creatis.vip.datamanager.server.dao.*;
 import org.apache.log4j.Logger;
 
+import java.sql.Connection;
 import java.util.List;
 
 /**
@@ -52,9 +53,9 @@ public class ExternalPlatformBusiness {
         this.girderStorageBusiness = girderStorageBusiness;
     }
 
-    public List<ExternalPlatform> listAll() throws BusinessException {
+    public List<ExternalPlatform> listAll(Connection connection) throws BusinessException {
         try {
-            return DataManagerDAOFactory.getInstance().getExternalPlatformsDAO().getAll();
+            return getExternalPlatformDAO(connection).getAll();
         } catch (DAOException e) {
             logger.error("Error listing all external platforms");
             throw new BusinessException(e);
@@ -71,13 +72,14 @@ public class ExternalPlatformBusiness {
         }
     }
 
-    public ParseResult parseParameter(String parameter) throws BusinessException {
+    public ParseResult parseParameter(String parameter, Connection connection) throws BusinessException {
         if (!parameter.matches("^\\w+:.*")) {
              return new ParseResult(false, parameter);
         }
         int indexOfColon = parameter.indexOf(':');
         String platformIdentifier = parameter.substring(0, indexOfColon);
-        ExternalPlatform externalPlatform = getById(platformIdentifier);
+        ExternalPlatform externalPlatform =
+                getById(platformIdentifier, connection);
         if (externalPlatform == null) {
             String error = "Cannot find external platform : " + platformIdentifier;
             logger.error(error);
@@ -95,20 +97,22 @@ public class ExternalPlatformBusiness {
         }
     }
 
-    private ExternalPlatformsDAO getExternalPlatformDAO() throws BusinessException {
+    private ExternalPlatform getById(String identifier, Connection connection) throws BusinessException {
         try {
-            return DataManagerDAOFactory.getInstance().getExternalPlatformsDAO();
+            return getExternalPlatformDAO(connection).getById(identifier);
         } catch (DAOException e) {
-            logger.error("Error on ExternalPlatformsDAO creation");
+            logger.error("Error getting external platform : " + identifier);
             throw new BusinessException(e);
         }
     }
 
-    private ExternalPlatform getById(String identifier) throws BusinessException {
+    private ExternalPlatformsDAO getExternalPlatformDAO(Connection connection)
+            throws BusinessException {
         try {
-            return getExternalPlatformDAO().getById(identifier);
+            return DataManagerDAOFactory.getInstance()
+                    .getExternalPlatformsDAO(connection);
         } catch (DAOException e) {
-            logger.error("Error getting external platform : " + identifier);
+            logger.error("Error on ExternalPlatformsDAO creation");
             throw new BusinessException(e);
         }
     }
