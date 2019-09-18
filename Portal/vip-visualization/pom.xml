@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Copyright and authors: see LICENSE.txt in base repository.
+
+This software is a web portal for pipeline execution on distributed systems.
+
+This software is governed by the CeCILL-B license under French law and
+abiding by the rules of distribution of free software.  You can  use,
+modify and/ or redistribute the software under the terms of the CeCILL-B
+license as circulated by CEA, CNRS and INRIA at the following URL
+"http://www.cecill.info".
+
+As a counterpart to the access to the source code and  rights to copy,
+modify and redistribute granted by the license, users are provided only
+with a limited warranty  and the software's author,  the holder of the
+economic rights,  and the successive licensors  have only  limited
+liability.
+
+In this respect, the user's attention is drawn to the risks associated
+with loading,  using,  modifying and/or developing or reproducing the
+software by the user in light of its specific status of free software,
+that may mean  that it is complicated to manipulate,  and  that  also
+therefore means  that it is reserved for developers  and  experienced
+professionals having in-depth computer knowledge. Users are therefore
+encouraged to load and test the software's suitability as regards their
+requirements in conditions enabling the security of their systems and/or
+data to be ensured and,  more generally, to use and operate it in the
+same conditions as regards security.
+
+The fact that you are presently reading this means that you have had
+knowledge of the CeCILL-B license and that you accept its terms.
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>fr.insalyon.creatis</groupId>
+    <artifactId>vip</artifactId>
+    <version>1.26</version>
+  </parent>
+
+  <groupId>fr.insalyon.creatis</groupId>
+  <artifactId>vip-visualization</artifactId>
+  <packaging>jar</packaging>
+  <version>${vip.visualization.version}</version>
+  <name>VIP-Visualization</name>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <systemPropertyVariables>
+            <log4j.configuration>
+              log4j.properties
+            </log4j.configuration>
+          </systemPropertyVariables>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-source-plugin</artifactId>
+        <version>3.1.0</version>
+        <executions>
+          <execution>
+            <id>attach-sources</id>
+            <goals>
+              <goal>jar-no-fork</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+
+  <dependencies>
+    <dependency>
+      <groupId>fr.insalyon.creatis</groupId>
+      <artifactId>vip-core</artifactId>
+      <version>${vip.core.version}</version>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>fr.insalyon.creatis</groupId>
+      <artifactId>vip-datamanager</artifactId>
+      <version>${vip.datamanager.version}</version>
+      <scope>provided</scope>
+    </dependency>
+
+    <!-- Test dependencies -->
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.12</version>
+      <scope>test</scope>
+    </dependency>
+    <!-- End test dependencies -->
+
+  </dependencies>
+</project>

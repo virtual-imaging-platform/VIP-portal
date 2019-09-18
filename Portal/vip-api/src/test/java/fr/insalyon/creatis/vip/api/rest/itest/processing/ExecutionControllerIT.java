@@ -103,10 +103,12 @@ public class ExecutionControllerIT extends BaseVIPSpringIT {
                 .thenReturn(simulation1);
         when(workflowBusiness.getSimulation(simulation1.getID(), true))
                 .thenReturn(simulation1);
-        when(workflowBusiness.getInputData(simulation1.getID(), baseUser1.getFolder()))
-                .thenReturn(simulation1InData);
-        when(workflowBusiness.getOutputData(simulation1.getID(), baseUser1.getFolder()))
-                .thenReturn(simulation1OutData);
+        when(workflowBusiness.getInputData(
+                 simulation1.getID(), baseUser1.getFolder(), anyObject()))
+            .thenReturn(simulation1InData);
+        when(workflowBusiness.getOutputData(
+                 simulation1.getID(), baseUser1.getFolder(), anyObject()))
+            .thenReturn(simulation1OutData);
         mockMvc.perform(
                 get("/rest/executions/" + simulation1.getID()).with(baseUser1()))
                 .andDo(print())
@@ -123,10 +125,12 @@ public class ExecutionControllerIT extends BaseVIPSpringIT {
                 .thenReturn(simulation2);
         when(workflowBusiness.getSimulation(simulation2.getID(), true))
                 .thenReturn(simulation2);
-        when(workflowBusiness.getInputData(simulation2.getID(), baseUser1.getFolder()))
-                .thenReturn(simulation2InData);
-        when(workflowBusiness.getOutputData(simulation2.getID(), baseUser1.getFolder()))
-                .thenReturn(simulation2OutData);
+        when(workflowBusiness.getInputData(
+                 simulation2.getID(), baseUser1.getFolder(), anyObject()))
+            .thenReturn(simulation2InData);
+        when(workflowBusiness.getOutputData(
+                 simulation2.getID(), baseUser1.getFolder(), anyObject()))
+            .thenReturn(simulation2OutData);
         mockMvc.perform(
                 get("/rest/executions/" + simulation2.getID()).with(baseUser1()))
                 .andDo(print())
@@ -160,10 +164,12 @@ public class ExecutionControllerIT extends BaseVIPSpringIT {
                 .thenReturn(modifiedSimulation).thenThrow(new RuntimeException());
         when(workflowBusiness.getSimulation(simulation1.getID()))
                 .thenReturn(simulation1).thenThrow(new RuntimeException());
-        when(workflowBusiness.getInputData(simulation1.getID(), baseUser1.getFolder()))
-                .thenReturn(simulation1InData);
-        when(workflowBusiness.getOutputData(simulation1.getID(), baseUser1.getFolder()))
-                .thenReturn(simulation1OutData);
+        when(workflowBusiness.getInputData(
+                 simulation1.getID(), baseUser1.getFolder(), anyObject()))
+            .thenReturn(simulation1InData);
+        when(workflowBusiness.getOutputData(
+                 simulation1.getID(), baseUser1.getFolder(), anyObject()))
+            .thenReturn(simulation1OutData);
         mockMvc.perform(
                 put("/rest/executions/" + simulation1.getID())
                         .contentType("application/json")
@@ -187,18 +193,22 @@ public class ExecutionControllerIT extends BaseVIPSpringIT {
         // configure pipeline input
         configureAnApplication(this, baseUser1, app1, version42, 0, 1);
         // configure lauch
-        when(workflowBusiness.launch(eq(baseUser1), anyList(), anyMap(), eq(app1.getName()),
-                eq(version42.getVersion()), eq(class1.getName()), eq(execution1.getName())))
+        when(workflowBusiness.launch(
+                 eq(baseUser1), anyList(), anyMap(), eq(app1.getName()),
+                 eq(version42.getVersion()), eq(class1.getName()),
+                 eq(execution1.getName()), any()))
                 .thenReturn(execution1.getIdentifier());
         // configure returne execution
         when(workflowBusiness.getSimulation(execution1.getIdentifier(), true))
                 .thenReturn(simulation1);
-        when(workflowBusiness.getInputData(simulation1.getID(), baseUser1.getFolder()))
-                .thenReturn(simulation1InData);
-        when(workflowBusiness.getOutputData(simulation1.getID(), baseUser1.getFolder()))
-                .thenReturn(simulation1OutData);
+        when(workflowBusiness.getInputData(
+                 simulation1.getID(), baseUser1.getFolder(), anyObject()))
+            .thenReturn(simulation1InData);
+        when(workflowBusiness.getOutputData(
+                 simulation1.getID(), baseUser1.getFolder(), anyObject()))
+            .thenReturn(simulation1OutData);
         // misc config
-        when(configurationBusiness.getUserGroups(baseUser1.getEmail()))
+        when(configurationBusiness.getUserGroups(baseUser1.getEmail(), any()))
                 .thenReturn(new HashMap<>());
         mockMvc.perform(
                 post("/rest/executions").contentType("application/json")
@@ -212,8 +222,10 @@ public class ExecutionControllerIT extends BaseVIPSpringIT {
                 ));
         ArgumentCaptor<Map> inputCaptor =
                 ArgumentCaptor.forClass(Map.class);
-        verify(workflowBusiness).launch(eq(baseUser1), anyList(), inputCaptor.capture(), eq(app1.getName()),
-                eq(version42.getVersion()), eq(class1.getName()), eq(execution1.getName()));
+        verify(workflowBusiness).launch(
+            eq(baseUser1), anyList(), inputCaptor.capture(), eq(app1.getName()),
+            eq(version42.getVersion()), eq(class1.getName()),
+            eq(execution1.getName()), null);
         Assert.assertEquals(inputCaptor.getValue().size(), 2);
         Assert.<Map<?, ?>>assertThat(inputCaptor.getValue(), allOf(
                 hasEntry("param 1", "test text"),
@@ -224,15 +236,16 @@ public class ExecutionControllerIT extends BaseVIPSpringIT {
     public void shouldGetExecution2Results() throws Exception {
         when(workflowBusiness.getSimulation(simulation2.getID()))
                 .thenReturn(simulation2);
-        when(workflowBusiness.getOutputData(simulation2.getID(), baseUser1.getFolder()))
-                .thenReturn(simulation2OutData);
+        when(workflowBusiness.getOutputData(
+                 simulation2.getID(), baseUser1.getFolder(), anyObject()))
+            .thenReturn(simulation2OutData);
         String resultPath = simulation2OutData.get(0).getPath();
         when(lfcBusiness.exists(baseUser1, resultPath))
                 .thenReturn(true);
         when(lfcBusiness.listDir(baseUser1, resultPath, true))
                 .thenReturn(Collections.singletonList(
                         PathTestUtils.getAbsoluteData(PathTestUtils.testFile1)));
-        when(transferPoolBusiness.downloadFile(any(), any()))
+        when(transferPoolBusiness.downloadFile(any(), any(), anyObject()))
                 .thenThrow(new RuntimeException());
 
         mockMvc.perform(

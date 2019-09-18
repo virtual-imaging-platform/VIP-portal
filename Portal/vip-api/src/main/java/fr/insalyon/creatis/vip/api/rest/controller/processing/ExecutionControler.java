@@ -34,6 +34,7 @@ package fr.insalyon.creatis.vip.api.rest.controller.processing;
 import fr.insalyon.creatis.vip.api.bean.Execution;
 import fr.insalyon.creatis.vip.api.business.*;
 import fr.insalyon.creatis.vip.api.exception.NotImplementedException;
+import fr.insalyon.creatis.vip.api.exception.SQLRuntimeException;
 import fr.insalyon.creatis.vip.api.rest.RestApiBusiness;
 import fr.insalyon.creatis.vip.api.rest.model.*;
 import fr.insalyon.creatis.vip.application.server.business.*;
@@ -48,7 +49,10 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.List;
+import java.util.function.Supplier;
 
 import static fr.insalyon.creatis.vip.api.CarminProperties.DEFAULT_LIMIT_LIST_EXECUTION;
 
@@ -75,6 +79,9 @@ public class ExecutionControler {
     @Autowired
     HttpServletRequest httpServletRequest;
 
+    @Autowired
+    private Supplier<Connection> connectionSupplier;
+
     @RequestMapping
     public Execution[] listExecutions(
             @RequestParam(required = false) String studyIdentifier,
@@ -88,7 +95,11 @@ public class ExecutionControler {
         int executionMaxNb = environment.getProperty(DEFAULT_LIMIT_LIST_EXECUTION, Integer.class);
         if (limit == null) limit = executionMaxNb;
         if (limit > executionMaxNb) throw new ApiException("limit parameter too high");
-        return executionBusiness.listExecutions(limit);
+        try(Connection connection = connectionSupplier.get()) {
+            return executionBusiness.listExecutions(limit, connection);
+        } catch (SQLException | SQLRuntimeException ex) {
+            throw new ApiException(ex);
+        }
     }
 
     @RequestMapping(value = "count", produces = "text/plain;charset=UTF-8")
@@ -106,7 +117,12 @@ public class ExecutionControler {
         ApiUtils.methodInvocationLog("getExecution", executionId);
         restApiBusiness.getApiContext(httpServletRequest, true);
         executionBusiness.checkIfUserCanAccessExecution(executionId);
-        return executionBusiness.getExecution(executionId,false);
+        try(Connection connection = connectionSupplier.get()) {
+            return executionBusiness.getExecution(
+                executionId, false, connection);
+        } catch (SQLException | SQLRuntimeException ex) {
+            throw new ApiException(ex);
+        }
     }
 
     @RequestMapping(value = "/{executionId}", method = RequestMethod.PUT)
@@ -117,16 +133,27 @@ public class ExecutionControler {
         restApiBusiness.getApiContext(httpServletRequest, true);
         executionBusiness.checkIfUserCanAccessExecution(executionId);
         executionBusiness.updateExecution(execution);
-        return executionBusiness.getExecution(executionId,false);
+        try(Connection connection = connectionSupplier.get()) {
+            return executionBusiness.getExecution(
+                executionId, false, connection);
+        } catch (SQLException | SQLRuntimeException ex) {
+            throw new ApiException(ex);
+        }
     }
 
     @RequestMapping(method = RequestMethod.POST)
     public Execution initExecution(@RequestBody @Valid Execution execution) throws ApiException {
         ApiUtils.methodInvocationLog("initExecution", execution);
         restApiBusiness.getApiContext(httpServletRequest, true);
-        pipelineBusiness.checkIfUserCanAccessPipeline(execution.getPipelineIdentifier());
-        String execId = executionBusiness.initExecution(execution);
-        return executionBusiness.getExecution(execId,false);
+        try(Connection connection = connectionSupplier.get()) {
+            pipelineBusiness.checkIfUserCanAccessPipeline(
+                execution.getPipelineIdentifier(), connection);
+            String execId = executionBusiness.initExecution(
+                execution, connection);
+            return executionBusiness.getExecution(execId, false, connection);
+        } catch (SQLException | SQLRuntimeException ex) {
+            throw new ApiException(ex);
+        }
     }
 
     @RequestMapping("/{executionId}/results")
@@ -134,7 +161,12 @@ public class ExecutionControler {
         ApiUtils.methodInvocationLog("getExecutionResults", executionId);
         restApiBusiness.getApiContext(httpServletRequest, true);
         executionBusiness.checkIfUserCanAccessExecution(executionId);
-        return executionBusiness.getExecutionResultsPaths(executionId);
+        try(Connection connection = connectionSupplier.get()) {
+            return executionBusiness.getExecutionResultsPaths(
+                executionId, connection);
+        } catch (SQLException | SQLRuntimeException ex) {
+            throw new ApiException(ex);
+        }
     }
 
     @RequestMapping(value = "/{executionId}/stdout", produces = "text/plain;charset=UTF-8")

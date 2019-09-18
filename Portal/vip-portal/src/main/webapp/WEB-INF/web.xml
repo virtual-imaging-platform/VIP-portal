@@ -188,6 +188,16 @@ knowledge of the CeCILL-B license and that you accept its terms.
         <url-pattern>/*</url-pattern>
     </filter-mapping>
     <!-- END REST API -->
+    <!-- Visualization API -->
+    <servlet>
+        <servlet-name>VisualizationService</servlet-name>
+        <servlet-class>fr.insalyon.creatis.vip.visualization.server.rpc.VisualizationServiceImpl</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>VisualizationService</servlet-name>
+        <url-pattern>/fr.insalyon.creatis.vip.portal.Main/visualizationservice</url-pattern>
+    </servlet-mapping>
+    <!-- END Visualization API -->
     <!-- SOAP API -->
     <listener>
         <listener-class>com.sun.xml.ws.transport.http.servlet.WSServletContextListener</listener-class>

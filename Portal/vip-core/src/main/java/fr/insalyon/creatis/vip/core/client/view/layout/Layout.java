@@ -251,6 +251,50 @@ public class Layout {
         messageWindow.setMessage(message, "#F79191", CoreConstants.ICON_WARNING, delay);
     }
 
+    public void hideMessage() {
+        messageWindow.hideMessage();
+    }
+
+    //-------------------------------------------------------------------- Make
+    // some function for showing messages accessible from code written in
+    // javascript.  Examples:
+    //    window.setWarningMessage(msg)
+    //    window.setNoticeMessage(msg)
+    //    window.hideMessage()
+
+    // The default delay is used, so the warning automatically disappears after
+    // some time.
+    public static void setWarningMessageFromJS(String error) {
+        Layout.getInstance().setWarningMessage(error);
+    }
+
+    // The delay is set to 0, so the message stays until it is overwritten by a
+    // new message or the hideMessage function is called.  This behavior is
+    // different from the warning case.  This is what is currently needed by the
+    // javascript code.
+    public static void setNoticeMessageFromJS(String message) {
+        Layout.getInstance().setNoticeMessage(message, 0);
+    }
+
+    public static void hideMessageFromJS() {
+        Layout.getInstance().hideMessage();
+    }
+
+    public static native void exportMessageFunctionsToJS() /*-{
+        $wnd.setWarningMessage = $entry(
+           @fr.insalyon.creatis.vip.core.client.view.layout.Layout::setWarningMessageFromJS(Ljava/lang/String;));
+        $wnd.setNoticeMessage = $entry(
+           @fr.insalyon.creatis.vip.core.client.view.layout.Layout::setNoticeMessageFromJS(Ljava/lang/String;));
+        $wnd.hideMessage = $entry(
+           @fr.insalyon.creatis.vip.core.client.view.layout.Layout::hideMessageFromJS());
+    }-*/;
+
+    static {
+        Layout.exportMessageFunctionsToJS();
+    }
+
+    //--------------------------------------------------------------------
+
     public static class TabFactoryAndId {
         public final Supplier<Tab> factory;
         public final String id;
