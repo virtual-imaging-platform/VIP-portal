@@ -46,4 +46,7 @@ public abstract class SSHDAOFactory {
     }
 
     public abstract SSHDAO getSSHDAO(Connection connection) throws DAOException;
+
+    public abstract ApiKeysDAO getApiKeysDao(Connection connection)
+        throws DAOException;
 }

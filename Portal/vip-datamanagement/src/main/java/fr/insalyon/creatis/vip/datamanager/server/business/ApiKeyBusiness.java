@@ -32,28 +32,66 @@
 package fr.insalyon.creatis.vip.datamanager.server.business;
 
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
+import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import fr.insalyon.creatis.vip.datamanager.client.bean.UserApiKey;
+import fr.insalyon.creatis.vip.datamanager.server.dao.ApiKeysDAO;
+import fr.insalyon.creatis.vip.datamanager.server.dao.SSHDAOFactory;
 
+import java.sql.Connection;
 import java.util.List;
 import org.apache.log4j.Logger;
 
 public class ApiKeyBusiness {
     private final static Logger logger = Logger.getLogger(ApiKeyBusiness.class);
 
-    public List<UserApiKey> listkeysFor(String userEmail)
+    public List<UserApiKey> apiKeysFor(String userEmail, Connection connection)
         throws BusinessException {
-        return null;
+
+        try {
+            return SSHDAOFactory.getDAOFactory()
+                .getApiKeysDao(connection).getByUser(userEmail);
+        } catch (DAOException e) {
+            throw new BusinessException(e);
+        }
     }
 
     public void addOrUpdateApiKey(
-        String useremail,
         String storageIdentifier,
-        String apikey) throws BusinessException {
-        
+        String userEmail,
+        String apiKey,
+        Connection connection) throws BusinessException {
+
+        try {
+            ApiKeysDAO dao = SSHDAOFactory.getDAOFactory()
+                .getApiKeysDao(connection);
+
+            List<UserApiKey> keys = dao.getByUser(userEmail);
+            UserApiKey newKey =
+                new UserApiKey(storageIdentifier, userEmail, apiKey);
+
+            if (keys.stream().anyMatch(
+                    k ->
+                    k.getStorageIdentifier().equals(storageIdentifier)
+                    && k.getUserEmail().equals(userEmail))) {
+                dao.updateKey(newKey);
+            } else {
+                dao.addKey(newKey);
+            }
+        } catch (DAOException e) {
+            throw new BusinessException(e);
+        }
     }
 
-    public void deleteApiKey(String useremail, String storageIdentifier)
+    public void deleteApiKey(
+        String storageIdentifier, String userEmail, Connection connection)
         throws BusinessException {
-        
+
+        try {
+            SSHDAOFactory.getDAOFactory()
+                .getApiKeysDao(connection)
+                .deleteKeyFor(userEmail, storageIdentifier);
+        } catch (DAOException e) {
+            throw new BusinessException(e);
+        }
     }
 }

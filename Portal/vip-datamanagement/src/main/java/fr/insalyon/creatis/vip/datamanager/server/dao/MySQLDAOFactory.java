@@ -33,6 +33,7 @@ package fr.insalyon.creatis.vip.datamanager.server.dao;
 
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import fr.insalyon.creatis.vip.core.server.dao.mysql.PlatformConnection;
+import fr.insalyon.creatis.vip.datamanager.server.dao.mysql.ApiKeysData;
 import fr.insalyon.creatis.vip.datamanager.server.dao.mysql.SSHData;
 import org.apache.log4j.Logger;
 import java.sql.Connection;
@@ -84,5 +85,10 @@ class MySQLDAOFactory extends SSHDAOFactory {
     @Override
     public SSHDAO getSSHDAO(Connection connection) throws DAOException {
         return new SSHData(connection);
+    }
+
+    @Override
+    public ApiKeysDAO getApiKeysDao(Connection connection) throws DAOException {
+        return new ApiKeysData(connection);
     }
 }

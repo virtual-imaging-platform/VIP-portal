@@ -31,7 +31,9 @@
  */
 package fr.insalyon.creatis.vip.api.rest.controller;
 
-import fr.insalyon.creatis.vip.api.business.*;
+import fr.insalyon.creatis.vip.api.business.ApiException;
+import fr.insalyon.creatis.vip.api.business.ApiUtils;
+import fr.insalyon.creatis.vip.api.exception.SQLRuntimeException;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.datamanager.client.bean.UserApiKey;
 import fr.insalyon.creatis.vip.datamanager.server.business.ApiKeyBusiness;
@@ -39,7 +41,6 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -47,7 +48,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.List;
+import java.util.function.Supplier;
 import javax.validation.Valid;
 
 @RestController
@@ -58,19 +62,23 @@ public class ApiKeyController {
         Logger.getLogger(ApiKeyController.class);
 
     private ApiKeyBusiness apiKeyBusiness;
+    private Supplier<Connection> connectionSupplier;
 
     @Autowired
-    public ApiKeyController(ApiKeyBusiness apiKeyBusiness) {
+    public ApiKeyController(
+        ApiKeyBusiness apiKeyBusiness,
+        Supplier<Connection> connectionSupplier) {
         this.apiKeyBusiness = apiKeyBusiness;
+        this.connectionSupplier = connectionSupplier;
     }
 
     @GetMapping
     public List<UserApiKey> listUserApiKeys() throws ApiException {
         ApiUtils.methodInvocationLog("listUserApiKeys");
         String userEmail = getCurrentUserEmail();
-        try {
-            return apiKeyBusiness.listkeysFor(userEmail);
-        } catch (BusinessException e) {
+        try(Connection connection = connectionSupplier.get()) {
+            return apiKeyBusiness.apiKeysFor(userEmail, connection);
+        } catch (BusinessException | SQLException | SQLRuntimeException e) {
             logger.error("Error listing api keys for " + userEmail);
             throw new ApiException(e);
         }
@@ -81,10 +89,13 @@ public class ApiKeyController {
         throws ApiException {
         ApiUtils.methodInvocationLog("addOrUpdateApiKey");
         String userEmail = getCurrentUserEmail();
-        try {
+        try(Connection connection = connectionSupplier.get()) {
             apiKeyBusiness.addOrUpdateApiKey(
-                userEmail, keyInfo.storageIdentifier, keyInfo.apiKey);
-        } catch (BusinessException e) {
+                keyInfo.storageIdentifier,
+                userEmail,
+                keyInfo.apiKey,
+                connection);
+        } catch (BusinessException | SQLException | SQLRuntimeException e) {
             logger.error("Error add or updating api keys for " + userEmail
                          + "for storage: " + keyInfo.storageIdentifier);
             throw new ApiException(e);
@@ -97,9 +108,10 @@ public class ApiKeyController {
         throws ApiException {
         ApiUtils.methodInvocationLog("deleteApiKey");
         String userEmail = getCurrentUserEmail();
-        try {
-            apiKeyBusiness.deleteApiKey(userEmail, storageIdentifier);
-        } catch (BusinessException e) {
+        try(Connection connection = connectionSupplier.get()) {
+            apiKeyBusiness.deleteApiKey(
+                storageIdentifier, userEmail, connection);
+        } catch (BusinessException | SQLException | SQLRuntimeException e) {
             logger.error("Error deleting api keys for " + userEmail
                          + "for storage: " + storageIdentifier);
             throw new ApiException(e);
