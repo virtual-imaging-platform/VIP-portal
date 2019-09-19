@@ -44,7 +44,7 @@ import org.springframework.context.annotation.*;
 import org.springframework.context.event.ContextRefreshedEvent;
 
 import java.sql.Connection;
-import java.util.function.Supplier;
+import java.util.function.*;
 
 /**
  * Created by abonnet on 7/26/16.
@@ -57,25 +57,19 @@ import java.util.function.Supplier;
 @Configuration
 public class SpringTestConfig {
 
-    @Autowired
-    @Qualifier("testUserDAO")
-    protected UserDAO testUserDAO;
-
     @Bean
     public VipConfigurer vipConfigurer() {
         return Mockito.mock(VipConfigurer.class);
     }
 
-    @Bean(name = "testUserDAO")
+    @Bean
     public UserDAO testUserDAO() {
         return Mockito.mock(UserDAO.class);
     }
 
     @Bean
-    @Primary
-    @Scope(BeanDefinition.SCOPE_PROTOTYPE)
-    public UserDAO userDAO(Connection connection) {
-        return testUserDAO;
+    public Function<Connection, UserDAO> userDaoFactory(UserDAO userDAO) {
+        return connection -> userDAO;
     }
 
     @Bean

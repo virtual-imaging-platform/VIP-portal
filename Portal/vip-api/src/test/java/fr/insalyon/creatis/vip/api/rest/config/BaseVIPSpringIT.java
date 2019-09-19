@@ -106,7 +106,6 @@ abstract public class BaseVIPSpringIT {
     @Autowired
     protected ResourceLoader resourceLoader;
     @Autowired
-    @Qualifier("testUserDAO")
     protected UserDAO testUserDAO;
     @Autowired
     protected ConfigurationBusiness configurationBusiness;

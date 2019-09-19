@@ -91,18 +91,14 @@ public class SpringWebConfig extends WebMvcConfigurerAdapter {
 
     @Bean
     public Function<Connection, UserDAO> userDaoFactory() {
-        return connection -> beanFactory.getBean(UserDAO.class, connection);
-    }
-
-    @Bean
-    @Scope(proxyMode = ScopedProxyMode.TARGET_CLASS, value = BeanDefinition.SCOPE_PROTOTYPE)
-    public UserDAO userDAO(Connection connection) {
-        try {
-            return CoreDAOFactory.getDAOFactory().getUserDAO(connection);
-        } catch (DAOException e) {
-            logger.error("error creating user dao bean", e);
-            throw new RuntimeException("Cannot create user dao", e);
-        }
+        return connection -> {
+            try {
+                return CoreDAOFactory.getDAOFactory().getUserDAO(connection);
+            } catch (DAOException e) {
+                logger.error("error creating user dao bean", e);
+                throw new RuntimeException("Cannot create user dao", e);
+            }
+        };
     }
 
     @Override
