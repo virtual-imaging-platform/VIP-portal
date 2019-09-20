@@ -56,16 +56,14 @@ public class ApiKeysData implements ApiKeysDAO {
     @Override
     public void addKey(UserApiKey apiKey)
         throws DAOException {
-        try {
-            PreparedStatement ps = connection.prepareStatement(
-                "insert into VIPApiKeys(email, identifier, apiKey) "
-                + "values(?, ?, ?)");
+        try (PreparedStatement ps = connection.prepareStatement(
+                 "insert into VIPApiKeys(email, identifier, apiKey) "
+                 + "values(?, ?, ?)")) {
             ps.setString(1, apiKey.getUserEmail());
             ps.setString(2, apiKey.getStorageIdentifier());
             ps.setString(3, apiKey.getApiKey());
 
             ps.execute();
-            ps.close();
         } catch (SQLException e) {
             logger.error("Error inserting api key: " + apiKey.toString(), e);
             throw new DAOException(e);
@@ -75,16 +73,14 @@ public class ApiKeysData implements ApiKeysDAO {
     @Override
     public void updateKey(UserApiKey apiKey)
         throws DAOException {
-        try {
-            PreparedStatement ps = connection.prepareStatement(
-                "update VIPApiKeys set apiKey = ? "
-                + "where email = ? and identifier = ?");
+        try (PreparedStatement ps = connection.prepareStatement(
+                 "update VIPApiKeys set apiKey = ? "
+                 + "where email = ? and identifier = ?")) {
             ps.setString(1, apiKey.getApiKey());
             ps.setString(2, apiKey.getUserEmail());
             ps.setString(3, apiKey.getStorageIdentifier());
 
             ps.execute();
-            ps.close();
         } catch (SQLException e) {
             logger.error("Error updating api key: " + apiKey.toString(), e);
             throw new DAOException(e);
@@ -93,10 +89,9 @@ public class ApiKeysData implements ApiKeysDAO {
 
     @Override
     public List<UserApiKey> getByUser(String userEmail) throws DAOException {
-        try {
-            PreparedStatement ps = connection.prepareStatement(
-                "select * from VIPApiKeys " +
-                "where email=?");
+        try (PreparedStatement ps = connection.prepareStatement(
+                 "select * from VIPApiKeys " +
+                 "where email=?")) {
             ps.setString(1, userEmail);
             ResultSet rs = ps.executeQuery();
 
@@ -120,16 +115,13 @@ public class ApiKeysData implements ApiKeysDAO {
     @Override
     public void deleteKeyFor(String userEmail, String storageIdentifier)
         throws DAOException {
-        try {
-            PreparedStatement ps = connection.prepareStatement(
-                "delete from VIPApiKeys "
-                + "where email = ? and identifier = ?");
+        try (PreparedStatement ps = connection.prepareStatement(
+                 "delete from VIPApiKeys "
+                 + "where email = ? and identifier = ?")) {
             ps.setString(1, userEmail);
             ps.setString(2, storageIdentifier);
 
             int nbRows = ps.executeUpdate();
-            ps.close();
-
             if (nbRows != 1) {
                 throw new DAOException(
                     "Number of deleted rows ("
