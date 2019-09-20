@@ -154,4 +154,9 @@ public class SpringWebConfig extends WebMvcConfigurerAdapter {
     public LFCPermissionBusiness lfcPermissionBusiness() {
         return new LFCPermissionBusiness();
     }
+
+    @Bean
+    public ApiKeyBusiness apiKeyBusiness() {
+        return new ApiKeyBusiness();
+    }
 }
