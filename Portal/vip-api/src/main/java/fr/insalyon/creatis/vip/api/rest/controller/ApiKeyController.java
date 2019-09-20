@@ -39,6 +39,7 @@ import fr.insalyon.creatis.vip.datamanager.client.bean.UserApiKey;
 import fr.insalyon.creatis.vip.datamanager.server.business.ApiKeyBusiness;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -46,6 +47,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.sql.Connection;
@@ -85,6 +87,7 @@ public class ApiKeyController {
     }
 
     @PutMapping
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void addOrUpdateApiKey(@RequestBody @Valid KeyInfo keyInfo)
         throws ApiException {
         ApiUtils.methodInvocationLog("addOrUpdateApiKey");
@@ -104,6 +107,7 @@ public class ApiKeyController {
 
     @RequestMapping(value = "/{storageIdentifier}",
                     method = RequestMethod.DELETE)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteApiKey(@PathVariable String storageIdentifier)
         throws ApiException {
         ApiUtils.methodInvocationLog("deleteApiKey");
