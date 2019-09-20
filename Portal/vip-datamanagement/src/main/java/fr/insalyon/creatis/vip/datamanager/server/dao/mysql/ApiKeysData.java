@@ -127,12 +127,21 @@ public class ApiKeysData implements ApiKeysDAO {
             ps.setString(1, userEmail);
             ps.setString(2, storageIdentifier);
 
-            ps.execute();
+            int nbRows = ps.executeUpdate();
             ps.close();
+
+            if (nbRows != 1) {
+                throw new DAOException(
+                    "Number of deleted rows ("
+                    + nbRows
+                    + ") not equal to 1, for params: "
+                    + "userEmail=" + userEmail
+                    + ", storageIdentifier=" + storageIdentifier);
+            }
         } catch (SQLException e) {
             logger.error(
-                "Error deleting api key for: userEmail="
-                + userEmail + ", storageIdentifier=" + storageIdentifier,
+                "Error deleting api key for: userEmail=" + userEmail
+                + ", storageIdentifier=" + storageIdentifier,
                 e);
             throw new DAOException(e);
         }
