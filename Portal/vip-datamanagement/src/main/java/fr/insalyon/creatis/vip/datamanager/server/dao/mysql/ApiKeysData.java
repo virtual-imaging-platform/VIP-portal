@@ -103,8 +103,8 @@ public class ApiKeysData implements ApiKeysDAO {
             List<UserApiKey> apiKeys = new LinkedList<>();
             while (rs.next()) {
                 UserApiKey apiKey = new UserApiKey(
-                    rs.getString("email"),
                     rs.getString("identifier"),
+                    rs.getString("email"),
                     rs.getString("apiKey"));
             }
 

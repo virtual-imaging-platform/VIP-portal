@@ -33,16 +33,16 @@ package fr.insalyon.creatis.vip.datamanager.client.bean;
 
 public class UserApiKey {
 
-    private String userEmail;
     private String storageIdentifier;
+    private String userEmail;
     private String apiKey;
 
     public UserApiKey() {}
 
     public UserApiKey(
-        String userEmail, String storageIdentifier, String apiKey) {
-        this.userEmail = userEmail;
+        String storageIdentifier, String userEmail, String apiKey) {
         this.storageIdentifier = storageIdentifier;
+        this.userEmail = userEmail;
         this.apiKey = apiKey;
     }
 
@@ -73,8 +73,8 @@ public class UserApiKey {
     @Override
     public String toString() {
         return "UserApiKey@" + Integer.toHexString(hashCode())
-            + "[userEmail=" + userEmail
-            + ",storageIdentifier=" + storageIdentifier
+            + "[storageIdentifier=" + storageIdentifier
+            + ",userEmail=" + userEmail
             + ",apiKey=" + apiKey
             + "]";
     }
