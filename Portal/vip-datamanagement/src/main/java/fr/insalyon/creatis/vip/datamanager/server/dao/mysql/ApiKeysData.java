@@ -106,6 +106,7 @@ public class ApiKeysData implements ApiKeysDAO {
                     rs.getString("identifier"),
                     rs.getString("email"),
                     rs.getString("apiKey"));
+                apiKeys.add(apiKey);
             }
 
             return apiKeys;
