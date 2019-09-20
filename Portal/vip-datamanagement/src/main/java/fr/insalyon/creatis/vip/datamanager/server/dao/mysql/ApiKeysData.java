@@ -78,7 +78,7 @@ public class ApiKeysData implements ApiKeysDAO {
         try {
             PreparedStatement ps = connection.prepareStatement(
                 "update VIPApiKeys set apiKey = ? "
-                + "where userEmail = ? and storageIdentifier = ?");
+                + "where email = ? and identifier = ?");
             ps.setString(1, apiKey.getApiKey());
             ps.setString(2, apiKey.getUserEmail());
             ps.setString(3, apiKey.getStorageIdentifier());
@@ -96,15 +96,15 @@ public class ApiKeysData implements ApiKeysDAO {
         try {
             PreparedStatement ps = connection.prepareStatement(
                 "select * from VIPApiKeys " +
-                "where userEmail=?");
+                "where email=?");
             ps.setString(1, userEmail);
             ResultSet rs = ps.executeQuery();
 
             List<UserApiKey> apiKeys = new LinkedList<>();
             while (rs.next()) {
                 UserApiKey apiKey = new UserApiKey(
-                    rs.getString("userEmail"),
-                    rs.getString("storageIdentifier"),
+                    rs.getString("email"),
+                    rs.getString("identifier"),
                     rs.getString("apiKey"));
             }
 
@@ -122,7 +122,7 @@ public class ApiKeysData implements ApiKeysDAO {
         try {
             PreparedStatement ps = connection.prepareStatement(
                 "delete from VIPApiKeys "
-                + "where userEmail = ? and storageIdentifier = ?");
+                + "where email = ? and identifier = ?");
             ps.setString(1, userEmail);
             ps.setString(2, storageIdentifier);
 
