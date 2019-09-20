@@ -74,7 +74,7 @@ class MySQLDAOFactory extends SSHDAOFactory {
                 "VIPApiKeys",
                 "email VARCHAR(255),"
                 + "identifier VARCHAR(50) NOT NULL,"
-                + "apiKey VARCHAR(255)"
+                + "apiKey VARCHAR(255),"
                 + "FOREIGN KEY (email) REFERENCES VIPUsers(email) "
                 + "ON DELETE CASCADE ON UPDATE CASCADE");
         } catch (SQLException ex) {
