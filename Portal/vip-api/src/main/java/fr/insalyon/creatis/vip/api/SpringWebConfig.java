@@ -174,4 +174,9 @@ public class SpringWebConfig extends WebMvcConfigurerAdapter {
     public ExternalPlatformBusiness externalPlatformBusiness() {
         return new ExternalPlatformBusiness(new GirderStorageBusiness());
     }
+
+    @Bean
+    public ApiKeyBusiness apiKeyBusiness() {
+        return new ApiKeyBusiness();
+    }
 }

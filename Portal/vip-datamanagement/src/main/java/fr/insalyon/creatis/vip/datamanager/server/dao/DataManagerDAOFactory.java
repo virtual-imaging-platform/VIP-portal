@@ -67,6 +67,7 @@ public class DataManagerDAOFactory {
                             + "transferType VARCHAR(255), deleteFilesFromSource BOOLEAN DEFAULT 0, active BOOLEAN DEFAULT 1, PRIMARY KEY(email,LFCDir), "
                             + "FOREIGN KEY (email) REFERENCES VIPUsers(email) "
                             + "ON DELETE CASCADE ON UPDATE CASCADE");
+
             logger.info("Configuring VIP External Platforms database.");
             PlatformConnection.getInstance().createTable(
                     connection,
@@ -76,8 +77,18 @@ public class DataManagerDAOFactory {
                             + "description VARCHAR(1000), "
                             + "url VARCHAR(255), "
                             + "PRIMARY KEY (identifier)");
+
+            logger.info("Configuring VIP api keys database.");
+            PlatformConnection.getInstance().createTable(
+                connection,
+                "VIPApiKeys",
+                "email VARCHAR(255),"
+                + "identifier VARCHAR(50) NOT NULL,"
+                + "apiKey VARCHAR(255),"
+                + "FOREIGN KEY (email) REFERENCES VIPUsers(email) "
+                + "ON DELETE CASCADE ON UPDATE CASCADE");
         } catch (SQLException ex) {
-            logger.error("Error configuring SSH database", ex);
+            logger.error("Error configuring DataManager database", ex);
         }
     }
 
@@ -87,5 +98,9 @@ public class DataManagerDAOFactory {
 
     public ExternalPlatformsDAO getExternalPlatformsDAO(Connection connection) throws DAOException {
         return new ExternalPlatformData(connection);
+    }
+
+    public ApiKeysDAO getApiKeysDao(Connection connection) throws DAOException {
+        return new ApiKeysData(connection);
     }
 }
