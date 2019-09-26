@@ -33,6 +33,7 @@ package fr.insalyon.creatis.vip.datamanager.server.dao;
 
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import fr.insalyon.creatis.vip.core.server.dao.mysql.PlatformConnection;
+import fr.insalyon.creatis.vip.datamanager.server.dao.mysql.ApiKeysData;
 import fr.insalyon.creatis.vip.datamanager.server.dao.mysql.SSHData;
 import org.apache.log4j.Logger;
 import java.sql.Connection;
@@ -67,13 +68,27 @@ class MySQLDAOFactory extends SSHDAOFactory {
                     + "transferType VARCHAR(255), deleteFilesFromSource BOOLEAN DEFAULT 0, active BOOLEAN DEFAULT 1, PRIMARY KEY(email,LFCDir), "
                     + "FOREIGN KEY (email) REFERENCES VIPUsers(email) "
                     + "ON DELETE CASCADE ON UPDATE CASCADE");
+
+            PlatformConnection.getInstance().createTable(
+                connection,
+                "VIPApiKeys",
+                "email VARCHAR(255),"
+                + "identifier VARCHAR(50) NOT NULL,"
+                + "apiKey VARCHAR(255),"
+                + "FOREIGN KEY (email) REFERENCES VIPUsers(email) "
+                + "ON DELETE CASCADE ON UPDATE CASCADE");
         } catch (SQLException ex) {
-            logger.error("Error configuring SSH database", ex);
+            logger.error("Error configuring DataManager database", ex);
         }
     }
 
     @Override
     public SSHDAO getSSHDAO(Connection connection) throws DAOException {
         return new SSHData(connection);
+    }
+
+    @Override
+    public ApiKeysDAO getApiKeysDao(Connection connection) throws DAOException {
+        return new ApiKeysData(connection);
     }
 }

@@ -32,21 +32,16 @@
 package fr.insalyon.creatis.vip.datamanager.server.dao;
 
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
-import java.sql.Connection;
+import fr.insalyon.creatis.vip.datamanager.client.bean.UserApiKey;
+import java.util.List;
 
-/**
- *
- * @author glatard
- */
-public abstract class SSHDAOFactory {
+public interface ApiKeysDAO {
+    void addKey(UserApiKey apiKey) throws DAOException;
 
-    public static SSHDAOFactory getDAOFactory() {
+    void updateKey(UserApiKey apiKey) throws DAOException;
 
-        return MySQLDAOFactory.getInstance();
-    }
+    List<UserApiKey> getByUser(String userEmail) throws DAOException;
 
-    public abstract SSHDAO getSSHDAO(Connection connection) throws DAOException;
-
-    public abstract ApiKeysDAO getApiKeysDao(Connection connection)
+    void deleteKeyFor(String userEmail, String storageIdentifier)
         throws DAOException;
 }
