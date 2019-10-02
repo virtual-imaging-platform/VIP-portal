@@ -53,10 +53,9 @@ public class ExternalPlatformData implements ExternalPlatformsDAO {
 
     @Override
     public ExternalPlatform getById(String identifier) throws DAOException {
-        try {
-            PreparedStatement ps = connection.prepareStatement(
+        try (PreparedStatement ps = connection.prepareStatement(
                     "SELECT * FROM VIPExternalPlatforms " +
-                    "WHERE identifier=?");
+                    "WHERE identifier=?")) {
             ps.setString(1, identifier);
             ResultSet rs = ps.executeQuery();
 
@@ -68,7 +67,6 @@ public class ExternalPlatformData implements ExternalPlatformsDAO {
                         getExternalPlatformTypeFromBDDString(rs.getString("type")));
                 externalPlatform.setUrl(rs.getString("url"));
                 externalPlatform.setDescription(rs.getString("description"));
-                ps.close();
                 return externalPlatform;
             }
 
@@ -83,9 +81,8 @@ public class ExternalPlatformData implements ExternalPlatformsDAO {
 
     @Override
     public List<ExternalPlatform> getAll() throws DAOException {
-        try {
-            PreparedStatement ps = connection.prepareStatement(
-                    "SELECT * FROM VIPExternalPlatforms ");
+        try (PreparedStatement ps = connection.prepareStatement(
+                    "SELECT * FROM VIPExternalPlatforms ")) {
 
             ResultSet rs = ps.executeQuery();
             List<ExternalPlatform> externalPlatformsList = new ArrayList<>();
