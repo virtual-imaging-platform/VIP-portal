@@ -68,6 +68,8 @@ public class ExternalPlatformData implements ExternalPlatformsDAO {
                         getExternalPlatformTypeFromBDDString(rs.getString("type")));
                 externalPlatform.setUrl(rs.getString("url"));
                 externalPlatform.setDescription(rs.getString("description"));
+                ps.close();
+                return externalPlatform;
             }
 
             logger.error("Cannot find external plaform {" + identifier + "}");
