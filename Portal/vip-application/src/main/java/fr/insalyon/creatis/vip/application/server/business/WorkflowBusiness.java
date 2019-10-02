@@ -223,11 +223,11 @@ public class WorkflowBusiness {
                     String[] values = valuesStr.split(ApplicationConstants.SEPARATOR_LIST);
                     for (String v : values) {
 
-                        String parsedParameter = parseParameter(user, groups, v.trim(), connection);
+                        String parsedParameter = parseParameter(user, groups, v, connection);
                         ps.addValue(parsedParameter);
                     }
                 } else {
-                    String parsedParameter = parseParameter(user, groups, valuesStr.trim(), connection);
+                    String parsedParameter = parseParameter(user, groups, valuesStr, connection);
                     ps.addValue(parsedParameter);
                 }
                 parameters.add(ps);
@@ -286,6 +286,8 @@ public class WorkflowBusiness {
             User user, List<String> groups,
             String parameter, Connection connection)
             throws DataManagerException, BusinessException {
+
+        parameter = parameter.trim();
 
         ExternalPlatformBusiness.ParseResult parseResult =
                 externalPlatformBusiness.parseParameter(parameter, connection);

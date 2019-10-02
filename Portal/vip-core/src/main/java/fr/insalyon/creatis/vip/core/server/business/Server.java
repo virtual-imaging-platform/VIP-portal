@@ -250,7 +250,7 @@ public class Server {
             publicationCommandLine = config.getString(CoreConstants.PUBLICATION_SYSTEM_COMMAND, "bosh publish --sandbox --no-int $FILE");
 
             //External Storage
-            girderTestToken = config.getString("test.externalStorage.girder.token", "TokenToChangeInConfigFile");
+            girderTestToken = config.getString(CoreConstants.TEST_GIRDER_TOKEN, "TokenToChangeInConfigFile");
 
             config.setProperty(CoreConstants.LAB_DB_HOST, databaseServerHost);
             config.setProperty(CoreConstants.LAB_DB_PORT, databaseServerPort);
@@ -306,7 +306,7 @@ public class Server {
             config.setProperty(CoreConstants.UNDESIRED_COUNTRIES, undesiredCountries);
             config.setProperty(CoreConstants.PUB_MONTHS_UPDATES, numberMonthsToTestLastPublicationUpdates);
             config.setProperty(CoreConstants.PUBLICATION_SYSTEM_COMMAND, publicationCommandLine);
-            config.setProperty("test.externalStorage.girder.token", girderTestToken);
+            config.setProperty(CoreConstants.TEST_GIRDER_TOKEN, girderTestToken);
             config.save();
 
         } catch (ConfigurationException ex) {

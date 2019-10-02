@@ -63,8 +63,8 @@ public class ExternalPlatformBusiness {
     }
 
     public static class ParseResult {
-        public Boolean isUri;
-        public String result;
+        final public Boolean isUri;
+        final public String result;
 
         public ParseResult(Boolean isUri, String result) {
             this.isUri = isUri;

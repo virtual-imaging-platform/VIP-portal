@@ -61,7 +61,7 @@ public class GirderStorageBusiness {
         String apiUrl = externalPlatform.getUrl() + "/api/v1";
         String token = Server.getInstance().getGirderTestToken();
 
-        return builUri(filename, apiUrl, fileId, token);
+        return buildUri(filename, apiUrl, fileId, token);
     }
 
     private void verifyExternalPlatform(ExternalPlatform externalPlatform) throws BusinessException {
@@ -76,17 +76,17 @@ public class GirderStorageBusiness {
         }
     }
 
-    private String builUri(String filename, String apiUrl, String fileId, String token) {
-        StringBuilder uriBuilder = new StringBuilder();
-        uriBuilder.append("girder:/");
-        uriBuilder.append(filename);
-        uriBuilder.append("?apiurl=");
-        uriBuilder.append(apiUrl);
-        uriBuilder.append("&amp;fileId=");
-        uriBuilder.append(fileId);
-        uriBuilder.append("&amp;token=");
-        uriBuilder.append(token);
-        return uriBuilder.toString();
+    private String buildUri(String filename, String apiUrl, String fileId, String token) {
+        return new StringBuilder()
+                .append("girder:/")
+                .append(filename)
+                .append("?apiurl=")
+                .append(apiUrl)
+                .append("&amp;fileId=")
+                .append(fileId)
+                .append("&amp;token=")
+                .append(token)
+                .toString();
     }
 
 

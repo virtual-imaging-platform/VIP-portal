@@ -79,7 +79,6 @@ import static fr.insalyon.creatis.vip.api.CarminProperties.*;
 @WebAppConfiguration
 @ContextConfiguration(classes = SpringTestConfig.class)
 @TestPropertySource(properties = {
-        //CORS_AUTHORIZED_DOMAINS + "=",
         PLATFORM_NAME + "=" + TEST_PLATFORM_NAME,
         PLATFORM_DESCRIPTION + "=" + TEST_PLATFORM_DESCRIPTION,
         PLATFORM_EMAIL + "=" + TEST_PLATFORM_EMAIL,
