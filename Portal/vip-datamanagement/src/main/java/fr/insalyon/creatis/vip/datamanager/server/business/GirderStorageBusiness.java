@@ -51,14 +51,14 @@ public class GirderStorageBusiness {
 
         So objective : generate "girder:/filename?apiurl=[...]&fileId=[...]&token=[...]
      */
-    public String generateUri(ExternalPlatform externalPlatform, String parameter) throws BusinessException {
+    public String generateUri(ExternalPlatform externalPlatform, String fileIdentifier) throws BusinessException {
         verifyExternalPlatform(externalPlatform);
 
-        // consider parameter is in the format "id/filename
-        String[] parameterSplitted = parameter.split("/");
+        // consider fileIdentifier is in the format "id/filename
+        String[] parameterSplitted = fileIdentifier.split("/");
         String filename = parameterSplitted[1];
         String fileId = parameterSplitted[0];
-        String apiUrl = externalPlatform.getUrl() + "/api/v2";
+        String apiUrl = externalPlatform.getUrl() + "/api/v1";
         String token = Server.getInstance().getGirderTestToken();
 
         return builUri(filename, apiUrl, fileId, token);
@@ -82,9 +82,9 @@ public class GirderStorageBusiness {
         uriBuilder.append(filename);
         uriBuilder.append("?apiurl=");
         uriBuilder.append(apiUrl);
-        uriBuilder.append("&fileId=");
+        uriBuilder.append("&amp;fileId=");
         uriBuilder.append(fileId);
-        uriBuilder.append("&token=");
+        uriBuilder.append("&amp;token=");
         uriBuilder.append(token);
         return uriBuilder.toString();
     }

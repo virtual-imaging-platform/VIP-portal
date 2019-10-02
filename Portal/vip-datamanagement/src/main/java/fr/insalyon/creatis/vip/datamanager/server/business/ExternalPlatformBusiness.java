@@ -78,6 +78,7 @@ public class ExternalPlatformBusiness {
         }
         int indexOfColon = parameter.indexOf(':');
         String platformIdentifier = parameter.substring(0, indexOfColon);
+        String fileIdentifier = parameter.substring(indexOfColon + 1);
         ExternalPlatform externalPlatform =
                 getById(platformIdentifier, connection);
         if (externalPlatform == null) {
@@ -87,7 +88,7 @@ public class ExternalPlatformBusiness {
         }
         switch (externalPlatform.getType()) {
             case GIRDER:
-                String girderUri = girderStorageBusiness.generateUri(externalPlatform, parameter);
+                String girderUri = girderStorageBusiness.generateUri(externalPlatform, fileIdentifier);
                 return new ParseResult(true, girderUri);
             default:
                 String error = "Only girder external storage are supported. "
