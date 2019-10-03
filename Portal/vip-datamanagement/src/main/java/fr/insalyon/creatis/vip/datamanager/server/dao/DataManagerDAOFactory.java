@@ -33,8 +33,7 @@ package fr.insalyon.creatis.vip.datamanager.server.dao;
 
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import fr.insalyon.creatis.vip.core.server.dao.mysql.PlatformConnection;
-import fr.insalyon.creatis.vip.datamanager.server.dao.mysql.ApiKeysData;
-import fr.insalyon.creatis.vip.datamanager.server.dao.mysql.SSHData;
+import fr.insalyon.creatis.vip.datamanager.server.dao.mysql.*;
 import org.apache.log4j.Logger;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -43,32 +42,43 @@ import java.sql.SQLException;
  *
  * @author glatard
  */
-class MySQLDAOFactory extends SSHDAOFactory {
+public class DataManagerDAOFactory {
 
-    private final static Logger logger = Logger.getLogger(MySQLDAOFactory.class);
-    private static MySQLDAOFactory instance;
+    private final static Logger logger = Logger.getLogger(DataManagerDAOFactory.class);
+    private static DataManagerDAOFactory instance;
 
     // Singleton
-    protected static MySQLDAOFactory getInstance() {
+    public static DataManagerDAOFactory getInstance() {
         if (instance == null) {
-            instance = new MySQLDAOFactory();
+            instance = new DataManagerDAOFactory();
         }
         return instance;
     }
 
-    private MySQLDAOFactory() {
+    private DataManagerDAOFactory() {
         try(Connection connection = PlatformConnection.getInstance().getConnection()) {
             logger.info("Configuring VIP SSH database.");
             PlatformConnection.getInstance().createTable(
-                connection,
-                "VIPSSHAccounts",
-                "email VARCHAR(255), LFCDir VARCHAR(255), "
-                    + "sshUser VARCHAR(255), sshHost VARCHAR(255), sshDir VARCHAR(255), sshPort INT, validated BOOLEAN, "
-                    + "auth_failed BOOLEAN, theEarliestNextSynchronistation TIMESTAMP, numberSynchronizationFailed BIGINT, "
-                    + "transferType VARCHAR(255), deleteFilesFromSource BOOLEAN DEFAULT 0, active BOOLEAN DEFAULT 1, PRIMARY KEY(email,LFCDir), "
-                    + "FOREIGN KEY (email) REFERENCES VIPUsers(email) "
-                    + "ON DELETE CASCADE ON UPDATE CASCADE");
+                    connection,
+                    "VIPSSHAccounts",
+                    "email VARCHAR(255), LFCDir VARCHAR(255), "
+                            + "sshUser VARCHAR(255), sshHost VARCHAR(255), sshDir VARCHAR(255), sshPort INT, validated BOOLEAN, "
+                            + "auth_failed BOOLEAN, theEarliestNextSynchronistation TIMESTAMP, numberSynchronizationFailed BIGINT, "
+                            + "transferType VARCHAR(255), deleteFilesFromSource BOOLEAN DEFAULT 0, active BOOLEAN DEFAULT 1, PRIMARY KEY(email,LFCDir), "
+                            + "FOREIGN KEY (email) REFERENCES VIPUsers(email) "
+                            + "ON DELETE CASCADE ON UPDATE CASCADE");
 
+            logger.info("Configuring VIP External Platforms database.");
+            PlatformConnection.getInstance().createTable(
+                    connection,
+                    "VIPExternalPlatforms",
+                    "identifier VARCHAR(50) NOT NULL, "
+                            + "type VARCHAR(50) NOT NULL, "
+                            + "description VARCHAR(1000), "
+                            + "url VARCHAR(255), "
+                            + "PRIMARY KEY (identifier)");
+
+            logger.info("Configuring VIP api keys database.");
             PlatformConnection.getInstance().createTable(
                 connection,
                 "VIPApiKeys",
@@ -82,12 +92,14 @@ class MySQLDAOFactory extends SSHDAOFactory {
         }
     }
 
-    @Override
     public SSHDAO getSSHDAO(Connection connection) throws DAOException {
         return new SSHData(connection);
     }
 
-    @Override
+    public ExternalPlatformsDAO getExternalPlatformsDAO(Connection connection) throws DAOException {
+        return new ExternalPlatformData(connection);
+    }
+
     public ApiKeysDAO getApiKeysDao(Connection connection) throws DAOException {
         return new ApiKeysData(connection);
     }

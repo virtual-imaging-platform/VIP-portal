@@ -59,8 +59,8 @@ public class AuthenticationControllerIT extends BaseVIPSpringIT {
             .thenThrow(new RuntimeException());
         doReturn(UserTestUtils.baseUser1)
             .when(configBness)
-            .signin(email,"coucou", anyObject());
-        when(configBness.getUserApikey(email, anyObject())).thenReturn(apikey);
+            .signin(eq(email),eq("coucou"), anyObject());
+        when(configBness.getUserApikey(eq(email), anyObject())).thenReturn(apikey);
         mockMvc.perform(
                 post("/rest/authenticate")
                         .contentType("application/json")

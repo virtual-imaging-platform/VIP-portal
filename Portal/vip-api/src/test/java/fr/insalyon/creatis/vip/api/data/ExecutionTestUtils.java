@@ -83,12 +83,12 @@ public class ExecutionTestUtils {
               }}
         );
         execution2.setRestReturnedFiles(new HashMap<String,List<Object>>() {{
-            put("param2-res", Collections.singletonList("/File/res"));
+            put("param2-res", Collections.singletonList("/vip/Home/testFile1.xml"));
         }});
         simulation2InData = Collections.singletonList(
                 new InOutData("5.3", "param2-1", "Float"));
         simulation2OutData = Collections.singletonList(
-                new InOutData("/File/res", "param2-res", "URI"));
+                new InOutData("/vip/Home/testFile1.xml", "param2-res", "URI"));
 
         executionSuppliers = getExecutionSuppliers();
     }

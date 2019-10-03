@@ -34,12 +34,11 @@ package fr.insalyon.creatis.vip.datamanager.server.business;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import fr.insalyon.creatis.vip.datamanager.client.bean.UserApiKey;
-import fr.insalyon.creatis.vip.datamanager.server.dao.ApiKeysDAO;
-import fr.insalyon.creatis.vip.datamanager.server.dao.SSHDAOFactory;
+import fr.insalyon.creatis.vip.datamanager.server.dao.*;
+import org.apache.log4j.Logger;
 
 import java.sql.Connection;
 import java.util.List;
-import org.apache.log4j.Logger;
 
 public class ApiKeyBusiness {
     private final static Logger logger = Logger.getLogger(ApiKeyBusiness.class);
@@ -48,7 +47,7 @@ public class ApiKeyBusiness {
         throws BusinessException {
 
         try {
-            return SSHDAOFactory.getDAOFactory()
+            return DataManagerDAOFactory.getInstance()
                 .getApiKeysDao(connection).getByUser(userEmail);
         } catch (DAOException e) {
             throw new BusinessException(e);
@@ -62,7 +61,7 @@ public class ApiKeyBusiness {
         Connection connection) throws BusinessException {
 
         try {
-            ApiKeysDAO dao = SSHDAOFactory.getDAOFactory()
+            ApiKeysDAO dao = DataManagerDAOFactory.getInstance()
                 .getApiKeysDao(connection);
 
             List<UserApiKey> keys = dao.getByUser(userEmail);
@@ -87,7 +86,7 @@ public class ApiKeyBusiness {
         throws BusinessException {
 
         try {
-            SSHDAOFactory.getDAOFactory()
+            DataManagerDAOFactory.getInstance()
                 .getApiKeysDao(connection)
                 .deleteKeyFor(userEmail, storageIdentifier);
         } catch (DAOException e) {

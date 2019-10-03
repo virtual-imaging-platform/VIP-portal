@@ -72,7 +72,8 @@ import fr.insalyon.creatis.vip.core.server.dao.CoreDAOFactory;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerException;
 import fr.insalyon.creatis.vip.datamanager.server.DataManagerUtil;
-import fr.insalyon.creatis.vip.datamanager.server.business.DataManagerBusiness;
+import fr.insalyon.creatis.vip.datamanager.server.business.*;
+
 import java.io.File;
 import java.sql.Connection;
 import java.util.*;
@@ -95,6 +96,7 @@ public class WorkflowBusiness {
     private static InputDAO inputDAO;
     private static StatsDAO statsDAO;
     private final EngineBusiness engineBusiness;
+    private final ExternalPlatformBusiness externalPlatformBusiness;
 
     public WorkflowBusiness() {
         engineBusiness = new EngineBusiness();
@@ -110,6 +112,7 @@ public class WorkflowBusiness {
         } catch (WorkflowsDBDAOException ex) {
             logger.error(ex);
         }
+        externalPlatformBusiness = new ExternalPlatformBusiness(new GirderStorageBusiness());
     }
 
     private Engine selectEngine(String applicationClass, Connection connection)
@@ -220,21 +223,12 @@ public class WorkflowBusiness {
                     String[] values = valuesStr.split(ApplicationConstants.SEPARATOR_LIST);
                     for (String v : values) {
 
-                        String parsedPath = DataManagerUtil.parseBaseDir(
-                            user, v.trim(), connection);
-                        if (!user.isSystemAdministrator()) {
-                            checkFolderACL(user, groups, parsedPath);
-                        }
-                        ps.addValue(parsedPath);
+                        String parsedParameter = parseParameter(user, groups, v, connection);
+                        ps.addValue(parsedParameter);
                     }
                 } else {
-
-                    String parsedPath = DataManagerUtil.parseBaseDir(
-                        user, valuesStr.trim(), connection);
-                    if (!user.isSystemAdministrator()) {
-                        checkFolderACL(user, groups, parsedPath);
-                    }
-                    ps.addValue(parsedPath);
+                    String parsedParameter = parseParameter(user, groups, valuesStr, connection);
+                    ps.addValue(parsedParameter);
                 }
                 parameters.add(ps);
             }
@@ -286,6 +280,28 @@ public class WorkflowBusiness {
             logger.error(ex);
             throw new BusinessException(ex);
         }
+    }
+
+    private String parseParameter(
+            User user, List<String> groups,
+            String parameter, Connection connection)
+            throws DataManagerException, BusinessException {
+
+        parameter = parameter.trim();
+
+        ExternalPlatformBusiness.ParseResult parseResult =
+                externalPlatformBusiness.parseParameter(parameter, connection);
+        if (parseResult.isUri) {
+            // The uri has been generated
+            return parseResult.result;
+        }
+        // not an external platform parameter, use legacy format
+        String parsedPath = DataManagerUtil.parseBaseDir(
+                user, parseResult.result, connection);
+        if (!user.isSystemAdministrator()) {
+            checkFolderACL(user, groups, parsedPath);
+        }
+        return parsedPath;
     }
 
     /**

@@ -32,21 +32,19 @@
 package fr.insalyon.creatis.vip.datamanager.server.dao;
 
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
+import fr.insalyon.creatis.vip.datamanager.client.bean.*;
 import java.sql.Connection;
+
+import java.util.List;
 
 /**
  *
- * @author glatard
+ * @author abonnet
  */
-public abstract class SSHDAOFactory {
+public interface ExternalPlatformsDAO {
 
-    public static SSHDAOFactory getDAOFactory() {
+    ExternalPlatform getById(String identifier) throws DAOException;
 
-        return MySQLDAOFactory.getInstance();
-    }
+    List<ExternalPlatform> getAll() throws DAOException;
 
-    public abstract SSHDAO getSSHDAO(Connection connection) throws DAOException;
-
-    public abstract ApiKeysDAO getApiKeysDao(Connection connection)
-        throws DAOException;
 }

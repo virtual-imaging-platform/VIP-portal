@@ -133,6 +133,8 @@ public class Server {
     private int numberMonthsToTestLastPublicationUpdates;
     //Zenodo publication
     private String publicationCommandLine;
+    //External platform
+    private String girderTestToken;
 
     public static Server getInstance() {
         if (instance == null) {
@@ -247,6 +249,9 @@ public class Server {
             //Zenodo publication
             publicationCommandLine = config.getString(CoreConstants.PUBLICATION_SYSTEM_COMMAND, "bosh publish --sandbox --no-int $FILE");
 
+            //External Storage
+            girderTestToken = config.getString(CoreConstants.TEST_GIRDER_TOKEN, "TokenToChangeInConfigFile");
+
             config.setProperty(CoreConstants.LAB_DB_HOST, databaseServerHost);
             config.setProperty(CoreConstants.LAB_DB_PORT, databaseServerPort);
             config.setProperty(CoreConstants.LAB_API_CONF_LOCATION, apiConfFileLocation);
@@ -301,6 +306,7 @@ public class Server {
             config.setProperty(CoreConstants.UNDESIRED_COUNTRIES, undesiredCountries);
             config.setProperty(CoreConstants.PUB_MONTHS_UPDATES, numberMonthsToTestLastPublicationUpdates);
             config.setProperty(CoreConstants.PUBLICATION_SYSTEM_COMMAND, publicationCommandLine);
+            config.setProperty(CoreConstants.TEST_GIRDER_TOKEN, girderTestToken);
             config.save();
 
         } catch (ConfigurationException ex) {
@@ -567,6 +573,10 @@ public class Server {
 
     public String getPublicationCommandLine() {
         return publicationCommandLine;
+    }
+
+    public String getGirderTestToken() {
+        return girderTestToken;
     }
 
     public void setMaxPlatformRunningSimulations(int maxPlatformRunningSimulations) throws ConfigurationException {

@@ -164,7 +164,7 @@ public class PathTestUtils {
         return newPathProperties;
     }
 
-    private static PathProperties getPath(Data data, boolean isDirectory,
+    public static PathProperties getPath(Data data, boolean isDirectory,
             Long modificationDate, String executionId, String mimeType) {
         PathProperties pathProperties = new PathProperties();
         pathProperties.setPath(getAbsolutePath(data));
