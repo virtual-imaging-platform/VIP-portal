@@ -112,7 +112,10 @@ public class WorkflowBusiness {
         } catch (WorkflowsDBDAOException ex) {
             logger.error(ex);
         }
-        externalPlatformBusiness = new ExternalPlatformBusiness(new GirderStorageBusiness());
+        externalPlatformBusiness =
+            new ExternalPlatformBusiness(
+                new GirderStorageBusiness(
+                    new ApiKeyBusiness()));
     }
 
     private Engine selectEngine(String applicationClass, Connection connection)

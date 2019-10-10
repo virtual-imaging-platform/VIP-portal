@@ -31,17 +31,38 @@
  */
 package fr.insalyon.creatis.vip.datamanager.server.business;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import fr.insalyon.creatis.vip.core.client.view.CoreException;
 import fr.insalyon.creatis.vip.core.server.business.*;
+import fr.insalyon.creatis.vip.core.server.rpc.AbstractRemoteServiceServlet;
 import fr.insalyon.creatis.vip.datamanager.client.bean.ExternalPlatform;
 import fr.insalyon.creatis.vip.datamanager.client.bean.ExternalPlatform.Type;
 import org.apache.log4j.Logger;
 
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.sql.Connection;
+import java.util.Optional;
+import java.util.function.Consumer;
+
 /**
  * Created by abonnet on 7/17/19.
  */
-public class GirderStorageBusiness {
-
+public class GirderStorageBusiness
+    extends AbstractRemoteServiceServlet {
     private static final Logger logger = Logger.getLogger(GirderStorageBusiness.class);
+
+    private ApiKeyBusiness apiKeyBusiness;
+
+    public GirderStorageBusiness(ApiKeyBusiness apiKeyBusiness) {
+        this.apiKeyBusiness = apiKeyBusiness;
+    }
 
     /* GASW regexps in 3.2.0 version
         local fileName=`echo $URI | sed -r 's#^girder:/(//)?([^/].*)\?.*$#\2#i'`
@@ -51,15 +72,27 @@ public class GirderStorageBusiness {
 
         So objective : generate "girder:/filename?apiurl=[...]&fileId=[...]&token=[...]
      */
-    public String generateUri(ExternalPlatform externalPlatform, String fileIdentifier) throws BusinessException {
+    public String generateUri(
+        ExternalPlatform externalPlatform,
+        String fileIdentifier,
+        Connection connection)
+        throws BusinessException {
+
         verifyExternalPlatform(externalPlatform);
 
         // consider fileIdentifier is in the format "id/filename
         String[] parameterSplitted = fileIdentifier.split("/");
-        String filename = parameterSplitted[1];
         String fileId = parameterSplitted[0];
+
         String apiUrl = externalPlatform.getUrl() + "/api/v1";
-        String token = Server.getInstance().getGirderTestToken();
+
+        String token = getToken(
+            getCurrentUserEmail(),
+            apiUrl,
+            externalPlatform.getIdentifier(),
+            connection);
+
+        String filename = getFilename(apiUrl, fileId, token);
 
         return buildUri(filename, apiUrl, fileId, token);
     }
@@ -89,5 +122,138 @@ public class GirderStorageBusiness {
                 .toString();
     }
 
+    private String getToken(
+        String userEmail,
+        String apiUrl,
+        String storageId,
+        Connection connection) throws BusinessException {
 
+        String key = apiKeyBusiness.apiKeysFor(userEmail, connection)
+            .stream()
+            .filter(k -> storageId.equals(k.getStorageIdentifier()))
+            .findFirst()
+            .map(k -> k.getApiKey())
+            .orElseThrow(() -> new BusinessException(
+                             "No api key found for storageId: " + storageId));
+
+        try {
+            HttpResult res = makeHttpRequest(
+                apiUrl + "/api_key/token?key=" + key,
+                METHOD_POST,
+                Optional.empty());
+
+            if (res.code >= 400) {
+                throw new BusinessException(
+                    "Unable to get token from api key: " + res.response);
+            }
+
+            ObjectMapper om = new ObjectMapper();
+            Token token = om.readValue(res.response, Token.class);
+
+            return token.token;
+        } catch (IOException ex) {
+            throw new BusinessException("Unable to get token from api key", ex);
+        }
+    }
+
+    private String getFilename(
+        String apiUrl,
+        String fileId,
+        String token) throws BusinessException {
+
+        try {
+            HttpResult res = makeHttpRequest(
+                apiUrl + "/file/" + fileId,
+                METHOD_GET,
+                Optional.of(
+                    con -> con.setRequestProperty("Girder-Token", token)));
+
+            if (res.code >= 400) {
+                throw new BusinessException(
+                    "Unable to get file info: " + res.response);
+            }
+
+            ObjectMapper om = new ObjectMapper();
+            FileInfo info = om.readValue(res.response, FileInfo.class);
+
+            return info.name;
+        } catch (IOException ex) {
+            throw new BusinessException("Unable to get file info", ex);
+        }
+    }
+
+    private String getCurrentUserEmail() throws BusinessException {
+        try {
+            return getSessionUser().getEmail();
+        } catch (CoreException e) {
+            throw new BusinessException(e);
+        }
+    }
+
+    private static final String METHOD_GET = "GET";
+    private static final String METHOD_POST = "POST";
+    private HttpResult makeHttpRequest(
+        String surl,
+        String method,
+        Optional<Consumer<HttpURLConnection>> connectionUpdater)
+        throws IOException {
+
+        URL url = new URL(surl);
+
+        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+        con.setRequestMethod(method);
+        con.setRequestProperty("Content-Type", "application/json");
+        con.setRequestProperty("Accept", "application/json");
+
+        connectionUpdater.ifPresent(f -> f.accept(con));
+
+        con.setDoOutput(true);
+        con.setFixedLengthStreamingMode(0);
+
+        InputStream is = con.getResponseCode() >= 400
+            ? con.getErrorStream()
+            : con.getInputStream();
+
+        StringBuilder response = new StringBuilder();
+        try (BufferedReader br1 =
+                 new BufferedReader(new InputStreamReader(is))) {
+
+            String line = null;
+            while ((line = br1.readLine()) != null) {
+                response.append(line);
+            }
+        }
+
+        return new HttpResult(con.getResponseCode(), response.toString());
+    }
+
+    private static class HttpResult {
+        final int code;
+        final String response;
+
+        public HttpResult(int code, String response) {
+            this.code = code;
+            this.response = response;
+        }
+    }
+
+    private static class Token {
+        private String token;
+        public String getToken() {
+            return token;
+        }
+        public void setToken(String token) {
+            this.token = token;
+        }
+    }
+
+    private static class FileInfo {
+        private String name;
+        public String getName() {
+            return name;
+        }
+        public void setName(String name) {
+            this.name = name;
+        }
+    }
 }
