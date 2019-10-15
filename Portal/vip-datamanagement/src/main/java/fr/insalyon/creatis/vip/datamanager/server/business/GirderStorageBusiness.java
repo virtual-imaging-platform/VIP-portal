@@ -32,6 +32,7 @@
 package fr.insalyon.creatis.vip.datamanager.server.business;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import fr.insalyon.creatis.vip.core.client.view.CoreException;
 import fr.insalyon.creatis.vip.core.server.business.*;
@@ -147,11 +148,12 @@ public class GirderStorageBusiness
                     "Unable to get token from api key: " + res.response);
             }
 
-            ObjectMapper om = new ObjectMapper();
-            Token token = om.readValue(res.response, Token.class);
+            ObjectNode node =
+                new ObjectMapper().readValue(res.response, ObjectNode.class);
+            String token = node.get("authToken").get("token").asText();
 
-            return token.token;
-        } catch (IOException ex) {
+            return token;
+        } catch (IOException | NullPointerException ex) {
             throw new BusinessException("Unable to get token from api key", ex);
         }
     }
@@ -173,10 +175,11 @@ public class GirderStorageBusiness
                     "Unable to get file info: " + res.response);
             }
 
-            ObjectMapper om = new ObjectMapper();
-            FileInfo info = om.readValue(res.response, FileInfo.class);
+            ObjectNode node =
+                new ObjectMapper().readValue(res.response, ObjectNode.class);
+            String name = node.get("name").asText();
 
-            return info.name;
+            return name;
         } catch (IOException ex) {
             throw new BusinessException("Unable to get file info", ex);
         }
@@ -202,13 +205,14 @@ public class GirderStorageBusiness
 
         HttpURLConnection con = (HttpURLConnection) url.openConnection();
         con.setRequestMethod(method);
+        if (METHOD_POST.equals(method)) {
+            con.setDoOutput(true);
+            con.setFixedLengthStreamingMode(0);
+        }
         con.setRequestProperty("Content-Type", "application/json");
         con.setRequestProperty("Accept", "application/json");
 
         connectionUpdater.ifPresent(f -> f.accept(con));
-
-        con.setDoOutput(true);
-        con.setFixedLengthStreamingMode(0);
 
         InputStream is = con.getResponseCode() >= 400
             ? con.getErrorStream()
@@ -216,13 +220,15 @@ public class GirderStorageBusiness
 
         StringBuilder response = new StringBuilder();
         try (BufferedReader br1 =
-                 new BufferedReader(new InputStreamReader(is))) {
+             new BufferedReader(new InputStreamReader(is))) {
 
             String line = null;
             while ((line = br1.readLine()) != null) {
                 response.append(line);
             }
         }
+
+        con.disconnect();
 
         return new HttpResult(con.getResponseCode(), response.toString());
     }
@@ -234,26 +240,6 @@ public class GirderStorageBusiness
         public HttpResult(int code, String response) {
             this.code = code;
             this.response = response;
-        }
-    }
-
-    private static class Token {
-        private String token;
-        public String getToken() {
-            return token;
-        }
-        public void setToken(String token) {
-            this.token = token;
-        }
-    }
-
-    private static class FileInfo {
-        private String name;
-        public String getName() {
-            return name;
-        }
-        public void setName(String name) {
-            this.name = name;
         }
     }
 }
