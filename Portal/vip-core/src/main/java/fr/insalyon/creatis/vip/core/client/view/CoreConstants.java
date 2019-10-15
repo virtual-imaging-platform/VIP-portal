@@ -188,8 +188,6 @@ public class CoreConstants implements IsSerializable {
     public static final String  PUB_MONTHS_UPDATES = "last.publication.update";
     //Zenodo publication
     public static final String PUBLICATION_SYSTEM_COMMAND = "publication.system-command";
-    //External storage
-    public static final String TEST_GIRDER_TOKEN = "test.externalStorage.girder.token";
 
     public static enum GROUP_ROLE implements IsSerializable {
 
