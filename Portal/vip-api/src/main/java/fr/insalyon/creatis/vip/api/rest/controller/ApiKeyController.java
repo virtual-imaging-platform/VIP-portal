@@ -37,6 +37,7 @@ import fr.insalyon.creatis.vip.api.exception.SQLRuntimeException;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.datamanager.client.bean.UserApiKey;
 import fr.insalyon.creatis.vip.datamanager.server.business.ApiKeyBusiness;
+import fr.insalyon.creatis.vip.datamanager.server.business.ExternalPlatformBusiness;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -64,13 +65,16 @@ public class ApiKeyController {
         Logger.getLogger(ApiKeyController.class);
 
     private ApiKeyBusiness apiKeyBusiness;
+    private ExternalPlatformBusiness externalPlatformBusiness;
     private Supplier<Connection> connectionSupplier;
 
     @Autowired
     public ApiKeyController(
         ApiKeyBusiness apiKeyBusiness,
+        ExternalPlatformBusiness externalPlatformBusiness,
         Supplier<Connection> connectionSupplier) {
         this.apiKeyBusiness = apiKeyBusiness;
+        this.externalPlatformBusiness = externalPlatformBusiness;
         this.connectionSupplier = connectionSupplier;
     }
 
@@ -93,6 +97,13 @@ public class ApiKeyController {
         ApiUtils.methodInvocationLog("addOrUpdateApiKey");
         String userEmail = getCurrentUserEmail();
         try(Connection connection = connectionSupplier.get()) {
+            if (!externalPlatformBusiness.listAll(connection).stream()
+                .anyMatch(ep -> ep.getIdentifier()
+                          .equals(keyInfo.storageIdentifier))) {
+                throw new ApiException(
+                    "Storage does not exist: " + keyInfo.storageIdentifier);
+            }
+
             apiKeyBusiness.addOrUpdateApiKey(
                 keyInfo.storageIdentifier,
                 userEmail,
