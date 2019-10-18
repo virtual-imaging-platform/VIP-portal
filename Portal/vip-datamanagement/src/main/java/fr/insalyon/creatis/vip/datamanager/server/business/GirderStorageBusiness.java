@@ -139,7 +139,10 @@ public class GirderStorageBusiness
 
         try {
             HttpResult res = makeHttpRequest(
-                apiUrl + "/api_key/token?key=" + key,
+                apiUrl
+                  + "/api_key/token?key=" + key
+                  + "&duration="
+                    + Server.getInstance().getGirderTokenDurationInDays(),
                 METHOD_POST,
                 Optional.empty());
 

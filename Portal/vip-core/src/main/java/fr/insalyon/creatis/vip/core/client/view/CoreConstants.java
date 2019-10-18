@@ -189,6 +189,9 @@ public class CoreConstants implements IsSerializable {
     //Zenodo publication
     public static final String PUBLICATION_SYSTEM_COMMAND = "publication.system-command";
 
+    // External storage, girder.
+    public static final String GIRDER_TOKEN_DURATION_IN_DAYS = "girder.token.duration-in-days";
+
     public static enum GROUP_ROLE implements IsSerializable {
 
         Admin, User, None

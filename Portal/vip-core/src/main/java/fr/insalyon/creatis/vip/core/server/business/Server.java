@@ -134,6 +134,9 @@ public class Server {
     //Zenodo publication
     private String publicationCommandLine;
 
+    // External storage, girder.
+    private float girderTokenDurationInDays;
+
     public static Server getInstance() {
         if (instance == null) {
             instance = new Server();
@@ -247,6 +250,12 @@ public class Server {
             //Zenodo publication
             publicationCommandLine = config.getString(CoreConstants.PUBLICATION_SYSTEM_COMMAND, "bosh publish --sandbox --no-int $FILE");
 
+            // External storage, girder.
+            // 1.0 is for one day.  A half day, for example, can be set with the
+            // value 0.5.
+            girderTokenDurationInDays = config.getFloat(
+                CoreConstants.GIRDER_TOKEN_DURATION_IN_DAYS, 1.0f);
+
             config.setProperty(CoreConstants.LAB_DB_HOST, databaseServerHost);
             config.setProperty(CoreConstants.LAB_DB_PORT, databaseServerPort);
             config.setProperty(CoreConstants.LAB_API_CONF_LOCATION, apiConfFileLocation);
@@ -301,6 +310,10 @@ public class Server {
             config.setProperty(CoreConstants.UNDESIRED_COUNTRIES, undesiredCountries);
             config.setProperty(CoreConstants.PUB_MONTHS_UPDATES, numberMonthsToTestLastPublicationUpdates);
             config.setProperty(CoreConstants.PUBLICATION_SYSTEM_COMMAND, publicationCommandLine);
+            config.setProperty(
+                CoreConstants.GIRDER_TOKEN_DURATION_IN_DAYS,
+                girderTokenDurationInDays);
+
             config.save();
 
         } catch (ConfigurationException ex) {
@@ -575,4 +588,7 @@ public class Server {
         config.save();
     }
 
+    public float getGirderTokenDurationInDays() {
+        return girderTokenDurationInDays;
+    }
 }
