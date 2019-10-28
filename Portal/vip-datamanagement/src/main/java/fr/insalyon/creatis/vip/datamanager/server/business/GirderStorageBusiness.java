@@ -34,9 +34,9 @@ package fr.insalyon.creatis.vip.datamanager.server.business;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.CoreException;
 import fr.insalyon.creatis.vip.core.server.business.*;
-import fr.insalyon.creatis.vip.core.server.rpc.AbstractRemoteServiceServlet;
 import fr.insalyon.creatis.vip.datamanager.client.bean.ExternalPlatform;
 import fr.insalyon.creatis.vip.datamanager.client.bean.ExternalPlatform.Type;
 import org.apache.log4j.Logger;
@@ -55,8 +55,7 @@ import java.util.function.Consumer;
 /**
  * Created by abonnet on 7/17/19.
  */
-public class GirderStorageBusiness
-    extends AbstractRemoteServiceServlet {
+public class GirderStorageBusiness {
     private static final Logger logger = Logger.getLogger(GirderStorageBusiness.class);
 
     private ApiKeyBusiness apiKeyBusiness;
@@ -76,6 +75,7 @@ public class GirderStorageBusiness
     public String generateUri(
         ExternalPlatform externalPlatform,
         String fileIdentifier,
+        User user,
         Connection connection)
         throws BusinessException {
 
@@ -88,7 +88,7 @@ public class GirderStorageBusiness
         String apiUrl = externalPlatform.getUrl() + "/api/v1";
 
         String token = getToken(
-            getCurrentUserEmail(),
+            user.getEmail(),
             apiUrl,
             externalPlatform.getIdentifier(),
             connection);
@@ -185,14 +185,6 @@ public class GirderStorageBusiness
             return name;
         } catch (IOException ex) {
             throw new BusinessException("Unable to get file info", ex);
-        }
-    }
-
-    private String getCurrentUserEmail() throws BusinessException {
-        try {
-            return getSessionUser().getEmail();
-        } catch (CoreException e) {
-            throw new BusinessException(e);
         }
     }
 

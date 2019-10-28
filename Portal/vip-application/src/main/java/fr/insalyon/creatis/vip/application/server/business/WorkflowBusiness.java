@@ -293,7 +293,7 @@ public class WorkflowBusiness {
         parameter = parameter.trim();
 
         ExternalPlatformBusiness.ParseResult parseResult =
-                externalPlatformBusiness.parseParameter(parameter, connection);
+            externalPlatformBusiness.parseParameter(parameter, user, connection);
         if (parseResult.isUri) {
             // The uri has been generated
             return parseResult.result;
