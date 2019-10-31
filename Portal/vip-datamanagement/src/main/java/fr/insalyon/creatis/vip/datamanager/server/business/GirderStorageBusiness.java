@@ -81,10 +81,6 @@ public class GirderStorageBusiness {
 
         verifyExternalPlatform(externalPlatform);
 
-        // consider fileIdentifier is in the format "id/filename
-        String[] parameterSplitted = fileIdentifier.split("/");
-        String fileId = parameterSplitted[0];
-
         String apiUrl = externalPlatform.getUrl() + "/api/v1";
 
         String token = getToken(
@@ -93,9 +89,9 @@ public class GirderStorageBusiness {
             externalPlatform.getIdentifier(),
             connection);
 
-        String filename = getFilename(apiUrl, fileId, token);
+        String filename = getFilename(apiUrl, fileIdentifier, token);
 
-        return buildUri(filename, apiUrl, fileId, token);
+        return buildUri(filename, apiUrl, fileIdentifier, token);
     }
 
     private void verifyExternalPlatform(ExternalPlatform externalPlatform) throws BusinessException {
