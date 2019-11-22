@@ -31,6 +31,7 @@
  */
 package fr.insalyon.creatis.vip.datamanager.server.business;
 
+import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import fr.insalyon.creatis.vip.datamanager.client.bean.ExternalPlatform;
@@ -72,7 +73,9 @@ public class ExternalPlatformBusiness {
         }
     }
 
-    public ParseResult parseParameter(String parameter, Connection connection) throws BusinessException {
+    public ParseResult parseParameter(
+        String parameter, User user, Connection connection)
+        throws BusinessException {
         if (!parameter.matches("^\\w+:.*")) {
              return new ParseResult(false, parameter);
         }
@@ -88,7 +91,8 @@ public class ExternalPlatformBusiness {
         }
         switch (externalPlatform.getType()) {
             case GIRDER:
-                String girderUri = girderStorageBusiness.generateUri(externalPlatform, fileIdentifier);
+                String girderUri = girderStorageBusiness.generateUri(
+                    externalPlatform, fileIdentifier, user, connection);
                 return new ParseResult(true, girderUri);
             default:
                 String error = "Only girder external storage are supported. "

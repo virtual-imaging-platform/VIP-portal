@@ -31,17 +31,38 @@
  */
 package fr.insalyon.creatis.vip.datamanager.server.business;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
+import fr.insalyon.creatis.vip.core.client.bean.User;
+import fr.insalyon.creatis.vip.core.client.view.CoreException;
 import fr.insalyon.creatis.vip.core.server.business.*;
 import fr.insalyon.creatis.vip.datamanager.client.bean.ExternalPlatform;
 import fr.insalyon.creatis.vip.datamanager.client.bean.ExternalPlatform.Type;
 import org.apache.log4j.Logger;
 
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.sql.Connection;
+import java.util.Optional;
+import java.util.function.Consumer;
+
 /**
  * Created by abonnet on 7/17/19.
  */
 public class GirderStorageBusiness {
-
     private static final Logger logger = Logger.getLogger(GirderStorageBusiness.class);
+
+    private ApiKeyBusiness apiKeyBusiness;
+
+    public GirderStorageBusiness(ApiKeyBusiness apiKeyBusiness) {
+        this.apiKeyBusiness = apiKeyBusiness;
+    }
 
     /* GASW regexps in 3.2.0 version
         local fileName=`echo $URI | sed -r 's#^girder:/(//)?([^/].*)\?.*$#\2#i'`
@@ -51,17 +72,26 @@ public class GirderStorageBusiness {
 
         So objective : generate "girder:/filename?apiurl=[...]&fileId=[...]&token=[...]
      */
-    public String generateUri(ExternalPlatform externalPlatform, String fileIdentifier) throws BusinessException {
+    public String generateUri(
+        ExternalPlatform externalPlatform,
+        String fileIdentifier,
+        User user,
+        Connection connection)
+        throws BusinessException {
+
         verifyExternalPlatform(externalPlatform);
 
-        // consider fileIdentifier is in the format "id/filename
-        String[] parameterSplitted = fileIdentifier.split("/");
-        String filename = parameterSplitted[1];
-        String fileId = parameterSplitted[0];
         String apiUrl = externalPlatform.getUrl() + "/api/v1";
-        String token = Server.getInstance().getGirderTestToken();
 
-        return buildUri(filename, apiUrl, fileId, token);
+        String token = getToken(
+            user.getEmail(),
+            apiUrl,
+            externalPlatform.getIdentifier(),
+            connection);
+
+        String filename = getFilename(apiUrl, fileIdentifier, token);
+
+        return buildUri(filename, apiUrl, fileIdentifier, token);
     }
 
     private void verifyExternalPlatform(ExternalPlatform externalPlatform) throws BusinessException {
@@ -89,5 +119,118 @@ public class GirderStorageBusiness {
                 .toString();
     }
 
+    private String getToken(
+        String userEmail,
+        String apiUrl,
+        String storageId,
+        Connection connection) throws BusinessException {
 
+        String key = apiKeyBusiness.apiKeysFor(userEmail, connection)
+            .stream()
+            .filter(k -> storageId.equals(k.getStorageIdentifier()))
+            .findFirst()
+            .map(k -> k.getApiKey())
+            .orElseThrow(() -> new BusinessException(
+                             "No api key found for storageId: " + storageId));
+
+        try {
+            HttpResult res = makeHttpRequest(
+                apiUrl
+                  + "/api_key/token?key=" + key
+                  + "&duration="
+                    + Server.getInstance().getGirderTokenDurationInDays(),
+                METHOD_POST,
+                Optional.empty());
+
+            if (res.code >= 400) {
+                throw new BusinessException(
+                    "Unable to get token from api key: " + res.response);
+            }
+
+            ObjectNode node =
+                new ObjectMapper().readValue(res.response, ObjectNode.class);
+            String token = node.get("authToken").get("token").asText();
+
+            return token;
+        } catch (IOException | NullPointerException ex) {
+            throw new BusinessException("Unable to get token from api key", ex);
+        }
+    }
+
+    private String getFilename(
+        String apiUrl,
+        String fileId,
+        String token) throws BusinessException {
+
+        try {
+            HttpResult res = makeHttpRequest(
+                apiUrl + "/file/" + fileId,
+                METHOD_GET,
+                Optional.of(
+                    con -> con.setRequestProperty("Girder-Token", token)));
+
+            if (res.code >= 400) {
+                throw new BusinessException(
+                    "Unable to get file info: " + res.response);
+            }
+
+            ObjectNode node =
+                new ObjectMapper().readValue(res.response, ObjectNode.class);
+            String name = node.get("name").asText();
+
+            return name;
+        } catch (IOException ex) {
+            throw new BusinessException("Unable to get file info", ex);
+        }
+    }
+
+    private static final String METHOD_GET = "GET";
+    private static final String METHOD_POST = "POST";
+    private HttpResult makeHttpRequest(
+        String surl,
+        String method,
+        Optional<Consumer<HttpURLConnection>> connectionUpdater)
+        throws IOException {
+
+        URL url = new URL(surl);
+
+        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+        con.setRequestMethod(method);
+        if (METHOD_POST.equals(method)) {
+            con.setDoOutput(true);
+            con.setFixedLengthStreamingMode(0);
+        }
+        con.setRequestProperty("Content-Type", "application/json");
+        con.setRequestProperty("Accept", "application/json");
+
+        connectionUpdater.ifPresent(f -> f.accept(con));
+
+        InputStream is = con.getResponseCode() >= 400
+            ? con.getErrorStream()
+            : con.getInputStream();
+
+        StringBuilder response = new StringBuilder();
+        try (BufferedReader br1 =
+             new BufferedReader(new InputStreamReader(is))) {
+
+            String line = null;
+            while ((line = br1.readLine()) != null) {
+                response.append(line);
+            }
+        }
+
+        con.disconnect();
+
+        return new HttpResult(con.getResponseCode(), response.toString());
+    }
+
+    private static class HttpResult {
+        final int code;
+        final String response;
+
+        public HttpResult(int code, String response) {
+            this.code = code;
+            this.response = response;
+        }
+    }
 }

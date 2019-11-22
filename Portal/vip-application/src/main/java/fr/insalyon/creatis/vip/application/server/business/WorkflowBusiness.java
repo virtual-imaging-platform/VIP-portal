@@ -112,7 +112,10 @@ public class WorkflowBusiness {
         } catch (WorkflowsDBDAOException ex) {
             logger.error(ex);
         }
-        externalPlatformBusiness = new ExternalPlatformBusiness(new GirderStorageBusiness());
+        externalPlatformBusiness =
+            new ExternalPlatformBusiness(
+                new GirderStorageBusiness(
+                    new ApiKeyBusiness()));
     }
 
     private Engine selectEngine(String applicationClass, Connection connection)
@@ -290,7 +293,7 @@ public class WorkflowBusiness {
         parameter = parameter.trim();
 
         ExternalPlatformBusiness.ParseResult parseResult =
-                externalPlatformBusiness.parseParameter(parameter, connection);
+            externalPlatformBusiness.parseParameter(parameter, user, connection);
         if (parseResult.isUri) {
             // The uri has been generated
             return parseResult.result;
