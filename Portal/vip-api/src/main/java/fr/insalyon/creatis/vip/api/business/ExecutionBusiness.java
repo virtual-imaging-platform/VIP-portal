@@ -141,6 +141,7 @@ public class ExecutionBusiness {
             }
 
             // Build Carmin's execution object
+            String resultsDirectory = null; // not available
             Execution e = new Execution(
                     s.getID(),
                     s.getSimulationName(),
@@ -150,7 +151,8 @@ public class ExecutionBusiness {
                     null, // study identifier (not available in VIP yet)
                     null, // error codes and mesasges (not available in VIP yet)
                     s.getDate().getTime(),
-                    null // last status modification date (not available in VIP yet)
+                    null, // last status modification date (not available in VIP yet)
+                    resultsDirectory
             );
 
             if(summarize) // don't look into inputs and outputs
@@ -291,6 +293,7 @@ public class ExecutionBusiness {
             inputMap.put(restInput.getKey(),
                     handleRestParameter(restInput.getKey(), restInput.getValue()));
         }
+        inputMap.put("results-directory", execution.getResultsLocation());
         return initExecution(
             execution.getPipelineIdentifier(), inputMap, execution.getTimeout(),
             execution.getName(), execution.getStudyIdentifier(), true,

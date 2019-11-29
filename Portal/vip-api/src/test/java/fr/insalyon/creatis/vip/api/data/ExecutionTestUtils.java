@@ -95,9 +95,13 @@ public class ExecutionTestUtils {
 
     private static Execution getExecution(Simulation simulation, ExecutionStatus executionStatus) {
         // TODO : startDate should be in seconds
-        return new Execution(simulation.getID(), simulation.getSimulationName(),
-                simulation.getApplicationName() + "/" + simulation.getApplicationVersion(),
-                0, executionStatus, null, null, simulation.getDate().getTime(), null);
+        String resultsDirectory = null;
+        return new Execution(
+            simulation.getID(),
+            simulation.getSimulationName(),
+            simulation.getApplicationName() + "/" + simulation.getApplicationVersion(),
+            0, executionStatus, null, null, simulation.getDate().getTime(), null,
+            resultsDirectory);
     }
 
     public static Execution summariseExecution(Execution execution) {
@@ -110,7 +114,8 @@ public class ExecutionTestUtils {
                 execution.getStudyIdentifier(),
                 execution.getErrorCode(),
                 execution.getStartDate(),
-                execution.getEndDate()
+                execution.getEndDate(),
+                execution.getResultsLocation()
         );
         // strip input values (so do not add them);
         return newExecution;
@@ -126,7 +131,8 @@ public class ExecutionTestUtils {
                 execution.getStudyIdentifier(),
                 execution.getErrorCode(),
                 execution.getStartDate(),
-                execution.getEndDate()
+                execution.getEndDate(),
+                execution.getResultsLocation()
         );
         // WARNING, do not copy input value and returned files objects
         newExecution.setRestInputValues(execution.getRestInputValues());
