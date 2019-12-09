@@ -19,3 +19,8 @@ ALTER TABLE `VIPAppInputs` DROP FOREIGN KEY `VIPAppInputs_ibfk_1`;
 ALTER TABLE `VIPAppInputs` ADD FOREIGN KEY (`email`) REFERENCES `VIPUsers` (`email`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE `VIPUsers` ADD next_email VARCHAR(255);
+
+-- v1.27
+alter table VIPApiKeys
+  add foreign key (identifier) references VIPExternalPlatforms (identifier)
+  on delete cascade on update cascade;

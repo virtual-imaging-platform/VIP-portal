@@ -4,16 +4,16 @@
  * This software is a web portal for pipeline execution on distributed systems.
  *
  * This software is governed by the CeCILL-B license under French law and
- * abiding by the rules of distribution of free software.  You can  use, 
+ * abiding by the rules of distribution of free software.  You can  use,
  * modify and/ or redistribute the software under the terms of the CeCILL-B
  * license as circulated by CEA, CNRS and INRIA at the following URL
- * "http://www.cecill.info". 
+ * "http://www.cecill.info".
  *
  * As a counterpart to the access to the source code and  rights to copy,
  * modify and redistribute granted by the license, users are provided only
  * with a limited warranty  and the software's author,  the holder of the
  * economic rights,  and the successive licensors  have only  limited
- * liability. 
+ * liability.
  *
  * In this respect, the user's attention is drawn to the risks associated
  * with loading,  using,  modifying and/or developing or reproducing the
@@ -22,9 +22,9 @@
  * therefore means  that it is reserved for developers  and  experienced
  * professionals having in-depth computer knowledge. Users are therefore
  * encouraged to load and test the software's suitability as regards their
- * requirements in conditions enabling the security of their systems and/or 
- * data to be ensured and,  more generally, to use and operate it in the 
- * same conditions as regards security. 
+ * requirements in conditions enabling the security of their systems and/or
+ * data to be ensured and,  more generally, to use and operate it in the
+ * same conditions as regards security.
  *
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL-B license and that you accept its terms.
@@ -34,7 +34,6 @@ package fr.insalyon.creatis.vip.social.server.dao.mysql;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.server.dao.CoreDAOFactory;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
-import fr.insalyon.creatis.vip.core.server.dao.mysql.PlatformConnection;
 import fr.insalyon.creatis.vip.social.client.bean.Message;
 import fr.insalyon.creatis.vip.social.server.dao.MessageDAO;
 import java.sql.Connection;
@@ -58,9 +57,8 @@ public class MessageData implements MessageDAO {
     private static final Logger logger = Logger.getLogger(MessageData.class);
     private Connection connection;
 
-    public MessageData() throws DAOException {
-
-        connection = PlatformConnection.getInstance().getConnection();
+    public MessageData(Connection connection) {
+        this.connection = connection;
     }
 
     public long add(String sender, String title, String message) throws DAOException {
@@ -79,7 +77,7 @@ public class MessageData implements MessageDAO {
             rs.next();
             long id = rs.getLong(1);
             ps.close();
-            
+
             return id;
 
         } catch (SQLException ex) {
@@ -106,7 +104,9 @@ public class MessageData implements MessageDAO {
         }
     }
 
-    public List<Message> getMessagesByUser(String email, int limit, Date startDate) throws DAOException {
+    public List<Message> getMessagesByUser(
+        String email, int limit, Date startDate)
+        throws DAOException {
 
         try {
             PreparedStatement ps = connection.prepareStatement("SELECT "
@@ -123,8 +123,10 @@ public class MessageData implements MessageDAO {
             SimpleDateFormat f = new SimpleDateFormat("MMMM d, yyyy HH:mm");
 
             while (rs.next()) {
-                User from = CoreDAOFactory.getDAOFactory().getUserDAO().getUser(rs.getString("sender"));
-                User to = CoreDAOFactory.getDAOFactory().getUserDAO().getUser(email);
+                User from = CoreDAOFactory.getDAOFactory()
+                    .getUserDAO(connection).getUser(rs.getString("sender"));
+                User to = CoreDAOFactory.getDAOFactory()
+                    .getUserDAO(connection).getUser(email);
                 Date posted = new Date(rs.getTimestamp("posted").getTime());
                 messages.add(new Message(rs.getLong("id"), from, to, rs.getString("title"),
                         rs.getString("message"), f.format(posted), posted,
@@ -140,7 +142,9 @@ public class MessageData implements MessageDAO {
         }
     }
 
-    public List<Message> getSentMessagesByUser(String email, int limit, Date startDate) throws DAOException {
+    public List<Message> getSentMessagesByUser(
+        String email, int limit, Date startDate)
+        throws DAOException {
 
         try {
             PreparedStatement ps = connection.prepareStatement("SELECT "
@@ -158,7 +162,8 @@ public class MessageData implements MessageDAO {
 
             while (rs.next()) {
 
-                User sender = CoreDAOFactory.getDAOFactory().getUserDAO().getUser(email);
+                User sender = CoreDAOFactory.getDAOFactory()
+                    .getUserDAO(connection).getUser(email);
 
                 PreparedStatement ps2 = connection.prepareStatement("SELECT "
                         + "receiver FROM VIPSocialMessageSenderReceiver "
@@ -169,7 +174,9 @@ public class MessageData implements MessageDAO {
                 List<User> receivers = new ArrayList<User>();
 
                 while (rs2.next()) {
-                    receivers.add(CoreDAOFactory.getDAOFactory().getUserDAO().getUser(rs2.getString("receiver")));
+                    receivers.add(CoreDAOFactory.getDAOFactory()
+                                  .getUserDAO(connection)
+                                  .getUser(rs2.getString("receiver")));
                 }
                 Date posted = new Date(rs.getTimestamp("posted").getTime());
                 messages.add(new Message(rs.getLong("id"), sender,
@@ -178,7 +185,7 @@ public class MessageData implements MessageDAO {
                         true));
             }
             ps.close();
-            
+
             return messages;
 
         } catch (SQLException ex) {
@@ -221,7 +228,7 @@ public class MessageData implements MessageDAO {
             throw new DAOException(ex);
         }
     }
-    
+
     public void removeByReceiver(long id, String receiver) throws DAOException {
 
         try {
@@ -231,7 +238,7 @@ public class MessageData implements MessageDAO {
             ps.setLong(1, id);
             ps.setString(2, receiver);
             ps.executeUpdate();
-            
+
             ps = connection.prepareStatement("SELECT count(message_id) AS num "
                     + "FROM VIPSocialMessageSenderReceiver "
                     + "WHERE message_id = ?");
@@ -262,7 +269,7 @@ public class MessageData implements MessageDAO {
             ResultSet rs = ps.executeQuery();
             int result = rs.next() ? rs.getInt("num") : 0;
             ps.close();
-            
+
             return result;
 
         } catch (SQLException ex) {

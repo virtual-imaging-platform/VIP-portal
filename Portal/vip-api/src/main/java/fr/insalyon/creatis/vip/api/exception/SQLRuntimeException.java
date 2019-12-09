@@ -29,25 +29,15 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL-B license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.social.server.dao;
+package fr.insalyon.creatis.vip.api.exception;
 
-import fr.insalyon.creatis.vip.core.server.dao.DAOException;
-import java.sql.Connection;
+public class SQLRuntimeException extends RuntimeException {
 
-/**
- *
- * @author Rafael Ferreira da Silva
- */
-public abstract class SocialDAOFactory {
-
-    public static SocialDAOFactory getDAOFactory() {
-
-        return MySQLDAOFactory.getInstance();
+    public SQLRuntimeException(String message) {
+        super(message);
     }
 
-    public abstract MessageDAO getMessageDAO(Connection connection)
-        throws DAOException;
-
-    public abstract GroupMessageDAO getGroupMessageDAO(Connection connection)
-        throws DAOException;
+    public SQLRuntimeException(Throwable thrwbl) {
+        super(thrwbl);
+    }
 }

@@ -38,6 +38,7 @@ import org.junit.Test;
 
 import static fr.insalyon.creatis.vip.api.data.AuthenticationInfoTestUtils.jsonCorrespondsToAuthenticationInfo;
 import static fr.insalyon.creatis.vip.api.data.CarminAPITestConstants.TEST_APIKEY_HEADER;
+import static org.mockito.Matchers.anyObject;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -54,9 +55,12 @@ public class AuthenticationControllerIT extends BaseVIPSpringIT {
         ConfigurationBusiness configBness = getConfigurationBusiness();
         String email = UserTestUtils.baseUser1.getEmail();
         String apikey="plopplop";
-        when(configBness.signin(anyString(), anyString())).thenThrow(new RuntimeException());
-        doReturn(UserTestUtils.baseUser1).when(configBness).signin(email,"coucou");
-        when(configBness.getUserApikey(email)).thenReturn(apikey);
+        when(configBness.signin(anyString(), anyString(), anyObject()))
+            .thenThrow(new RuntimeException());
+        doReturn(UserTestUtils.baseUser1)
+            .when(configBness)
+            .signin(eq(email),eq("coucou"), anyObject());
+        when(configBness.getUserApikey(eq(email), anyObject())).thenReturn(apikey);
         mockMvc.perform(
                 post("/rest/authenticate")
                         .contentType("application/json")

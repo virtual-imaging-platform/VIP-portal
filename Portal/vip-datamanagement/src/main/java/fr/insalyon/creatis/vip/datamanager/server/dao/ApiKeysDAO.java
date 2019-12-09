@@ -29,25 +29,19 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL-B license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.social.server.dao;
+package fr.insalyon.creatis.vip.datamanager.server.dao;
 
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
-import java.sql.Connection;
+import fr.insalyon.creatis.vip.datamanager.client.bean.UserApiKey;
+import java.util.List;
 
-/**
- *
- * @author Rafael Ferreira da Silva
- */
-public abstract class SocialDAOFactory {
+public interface ApiKeysDAO {
+    void addKey(UserApiKey apiKey) throws DAOException;
 
-    public static SocialDAOFactory getDAOFactory() {
+    void updateKey(UserApiKey apiKey) throws DAOException;
 
-        return MySQLDAOFactory.getInstance();
-    }
+    List<UserApiKey> getByUser(String userEmail) throws DAOException;
 
-    public abstract MessageDAO getMessageDAO(Connection connection)
-        throws DAOException;
-
-    public abstract GroupMessageDAO getGroupMessageDAO(Connection connection)
+    void deleteKeyFor(String userEmail, String storageIdentifier)
         throws DAOException;
 }

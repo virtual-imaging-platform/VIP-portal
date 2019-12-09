@@ -33,52 +33,46 @@ package fr.insalyon.creatis.vip.api.rest.controller;
 
 import fr.insalyon.creatis.vip.api.business.*;
 import fr.insalyon.creatis.vip.api.exception.SQLRuntimeException;
-import fr.insalyon.creatis.vip.api.rest.RestApiBusiness;
-import fr.insalyon.creatis.vip.api.rest.model.*;
-import fr.insalyon.creatis.vip.core.server.dao.mysql.PlatformConnection;
+import fr.insalyon.creatis.vip.core.server.business.BusinessException;
+import fr.insalyon.creatis.vip.datamanager.client.bean.ExternalPlatform;
+import fr.insalyon.creatis.vip.datamanager.server.business.ExternalPlatformBusiness;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.sql.Connection;
-import java.sql.SQLException;
+import java.sql.*;
+import java.util.List;
 import java.util.function.Supplier;
-import javax.servlet.http.HttpServletRequest;
 
 /**
- * Created by abonnet on 8/21/17.
+ * Created by abonnet on 7/4/19.
  */
 @RestController
-@RequestMapping("/authenticate")
-public class AuthenticationController {
+@RequestMapping("/externalPlatforms")
+public class ExternalPlatformController {
 
-    private static final Logger logger = Logger.getLogger(AuthenticationController.class);
+    private static final Logger logger = Logger.getLogger(ExternalPlatformController.class);
 
-    // although the controller is a singleton, these are proxies that always point on the current request
-    @Autowired
-    HttpServletRequest httpServletRequest;
+    private ExternalPlatformBusiness externalPlatformBusiness;
 
-    @Autowired
-    private RestApiBusiness restApiBusiness;
+    private final Supplier<Connection> connectionSupplier;
 
     @Autowired
-    private Supplier<Connection> connectionSupplier;
+    public ExternalPlatformController(
+            ExternalPlatformBusiness externalPlatformBusiness,
+            Supplier<Connection> connectionSupplier) {
+        this.externalPlatformBusiness = externalPlatformBusiness;
+        this.connectionSupplier = connectionSupplier;
+    }
 
-    @RequestMapping(method = RequestMethod.POST)
-    public AuthenticationInfo authenticate(
-            @RequestBody AuthenticationCredentials authenticationCredentials) throws ApiException {
-        // common stuff
-        ApiUtils.methodInvocationLog("authenticate", authenticationCredentials.getUsername());
-        // TODO : improve this apiContext stuff. Verify that it is initialized somewhere.
-        // TODO : Do not call it "get" if it does not return anything
-        restApiBusiness.getApiContext(httpServletRequest, false);
-        // TODO verify the presence of credentials
+    @GetMapping
+    public List<ExternalPlatform> listExternalPlatforms() throws ApiException {
+        ApiUtils.methodInvocationLog("listExternalPlatforms");
         try(Connection connection = connectionSupplier.get()) {
-            // business call
-            return restApiBusiness
-                .authenticate(authenticationCredentials, connection);
-        } catch (SQLException | SQLRuntimeException ex) {
-            throw new ApiException(ex);
+            return externalPlatformBusiness.listAll(connection);
+        } catch (SQLException | SQLRuntimeException | BusinessException e) {
+            logger.error("Error listing all external platforms");
+            throw new ApiException(e);
         }
     }
 }

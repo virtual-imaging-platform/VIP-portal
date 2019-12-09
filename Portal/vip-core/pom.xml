@@ -234,13 +234,13 @@ knowledge of the CeCILL-B license and that you accept its terms.
             <version>12.0p</version>
         </dependency>
     </dependencies>
+
     <build>
         <finalName>vip-core</finalName>
         <resources>
             <resource>
                 <directory>src/main/java</directory>
                 <includes>
-                    <include>**/*.java</include>
                     <include>**/*.xml</include>
                 </includes>
             </resource>
@@ -248,6 +248,22 @@ knowledge of the CeCILL-B license and that you accept its terms.
                 <directory>src/main/resources</directory>
             </resource>
         </resources>
+
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-source-plugin</artifactId>
+            <version>3.1.0</version>
+            <executions>
+              <execution>
+                <id>attach-sources</id>
+                <goals>
+                  <goal>jar-no-fork</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
     </build>
 
     <repositories>

@@ -37,10 +37,14 @@ import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
 import fr.insalyon.creatis.vip.core.server.dao.UserDAO;
 import fr.insalyon.creatis.vip.datamanager.server.business.*;
 import org.mockito.Mockito;
+import org.springframework.beans.factory.annotation.*;
+import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.ApplicationListener;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.*;
 import org.springframework.context.event.ContextRefreshedEvent;
+
+import java.sql.Connection;
+import java.util.function.*;
 
 /**
  * Created by abonnet on 7/26/16.
@@ -50,6 +54,7 @@ import org.springframework.context.event.ContextRefreshedEvent;
  * being package scanned and automatically taken in account.
  */
 @Import(SpringWebConfig.class)
+@Configuration
 public class SpringTestConfig {
 
     @Bean
@@ -58,8 +63,18 @@ public class SpringTestConfig {
     }
 
     @Bean
-    public UserDAO userDAO() {
+    public UserDAO testUserDAO() {
         return Mockito.mock(UserDAO.class);
+    }
+
+    @Bean
+    public Function<Connection, UserDAO> userDaoFactory(UserDAO userDAO) {
+        return connection -> userDAO;
+    }
+
+    @Bean
+    public Supplier<Connection> connectionSupplier() {
+        return Mockito.mock(Supplier.class);
     }
 
     @Bean

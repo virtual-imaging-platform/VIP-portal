@@ -71,7 +71,7 @@ public class SpringAuthenticationIT extends BaseVIPSpringIT {
 
     @Test
     public void authenticationWithCoreKo() throws Exception {
-        when(userDAO.getUserByApikey("apikeyvalue"))
+        when(getUserDAO().getUserByApikey("apikeyvalue"))
                 .thenThrow(new RuntimeException("hey hey"));
         mockMvc.perform(get("/rest/wrongUrl")
                 .with(ApikeyRequestPostProcessor.apikey("testapikey", "apikeyvalue")))
@@ -118,7 +118,7 @@ public class SpringAuthenticationIT extends BaseVIPSpringIT {
     }
 
     private void prepareUser1Configuration() throws DAOException, BusinessException, UnsupportedEncodingException, NoSuchAlgorithmException {
-        when(userDAO.getUserByApikey("apikeyvalue")).thenReturn(baseUser1);
+        when(getUserDAO().getUserByApikey("apikeyvalue")).thenReturn(baseUser1);
     }
 
 }

@@ -41,7 +41,7 @@ import org.junit.*;
 import org.junit.contrib.java.lang.system.EnvironmentVariables;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.*;
 import org.springframework.core.io.*;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers;
@@ -88,13 +88,13 @@ import static fr.insalyon.creatis.vip.api.CarminProperties.*;
         UNSUPPORTED_METHODS + "=" + TEST_UNSUPPORTED_METHODS_STRING,
         SUPPORTED_API_VERSION + "=" + TEST_SUPPORTED_API_VERSION,
         PLATFORM_ERROR_CODES_AND_MESSAGES + "=" + TEST_ERROR_CODES_AND_MESSAGE_STRING,
-        API_DEFAULT_MIME_TYPE + "=" + TEST_DEFAULT_MIMETYPE,
-        API_DIRECTORY_MIME_TYPE + "=" + TEST_DIR_MIMETYPE,
-        API_DOWNLOAD_TIMEOUT_IN_SECONDS + "=" + TEST_DATA_DOWNLOAD_TIMEOUT,
-        API_DOWNLOAD_RETRY_IN_SECONDS + "=" + Test_DATA_DOWNLOAD_RETRY,
-        API_DATA_TRANSFERT_MAX_SIZE + "=" + TEST_DATA_MAX_SIZE,
         APIKEY_HEADER_NAME + "=" + TEST_APIKEY_HEADER,
         APIKEY_GENERATE_NEW_EACH_TIME + "=" + TEST_GENERATE_NEW_APIKEY_EACH_TIME,
+        API_DIRECTORY_MIME_TYPE + "=" + TEST_DIR_MIMETYPE,
+        API_DEFAULT_MIME_TYPE + "=" + TEST_DEFAULT_MIMETYPE,
+        API_DOWNLOAD_RETRY_IN_SECONDS + "=" + Test_DATA_DOWNLOAD_RETRY,
+        API_DOWNLOAD_TIMEOUT_IN_SECONDS + "=" + TEST_DATA_DOWNLOAD_TIMEOUT,
+        API_DATA_TRANSFERT_MAX_SIZE + "=" + TEST_DATA_MAX_SIZE,
         API_DATA_DOWNLOAD_RELATIVE_PATH + "=" + TEST_DOWNLOAD_PATH
 })
 abstract public class BaseVIPSpringIT {
@@ -105,7 +105,7 @@ abstract public class BaseVIPSpringIT {
     @Autowired
     protected ResourceLoader resourceLoader;
     @Autowired
-    protected UserDAO userDAO;
+    protected UserDAO testUserDAO;
     @Autowired
     protected ConfigurationBusiness configurationBusiness;
     @Autowired
@@ -139,7 +139,7 @@ abstract public class BaseVIPSpringIT {
                 .defaultRequest(MockMvcRequestBuilders.get("/").servletPath("/rest"))
                 .apply(SecurityMockMvcConfigurers.springSecurity())
                 .build();
-        Mockito.reset(userDAO, configurationBusiness, workflowBusiness, applicationBusiness,
+        Mockito.reset(testUserDAO, configurationBusiness, workflowBusiness, applicationBusiness,
                 classBusiness, transferPoolBusiness, simulationBusiness,
                 lfcBusiness);
     }
@@ -166,7 +166,7 @@ abstract public class BaseVIPSpringIT {
     }
 
     public UserDAO getUserDAO() {
-        return userDAO;
+        return testUserDAO;
     }
 
     public ConfigurationBusiness getConfigurationBusiness() {

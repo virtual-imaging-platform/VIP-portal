@@ -29,77 +29,68 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL-B license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.application.server.business;
+package fr.insalyon.creatis.vip.datamanager.server.business;
 
-import fr.insalyon.creatis.vip.application.client.bean.Engine;
-import fr.insalyon.creatis.vip.application.server.dao.ApplicationDAOFactory;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
+import fr.insalyon.creatis.vip.datamanager.client.bean.UserApiKey;
+import fr.insalyon.creatis.vip.datamanager.server.dao.*;
+import org.apache.log4j.Logger;
+
 import java.sql.Connection;
 import java.util.List;
 
-/**
- *
- * @author Rafael Ferreira da Silva
- */
-public class EngineBusiness {
+public class ApiKeyBusiness {
+    private final static Logger logger = Logger.getLogger(ApiKeyBusiness.class);
 
-    /**
-     *
-     * @param engine
-     * @throws BusinessException
-     */
-    public void add(Engine engine, Connection connection)
+    public List<UserApiKey> apiKeysFor(String userEmail, Connection connection)
         throws BusinessException {
+
         try {
-            ApplicationDAOFactory.getDAOFactory()
-                .getEngineDAO(connection).add(engine);
-        } catch (DAOException ex) {
-            throw new BusinessException(ex);
+            return DataManagerDAOFactory.getInstance()
+                .getApiKeysDao(connection).getByUser(userEmail);
+        } catch (DAOException e) {
+            throw new BusinessException(e);
         }
     }
 
-    /**
-     *
-     * @param engine
-     * @throws BusinessException
-     */
-    public void update(Engine engine, Connection connection)
-        throws BusinessException {
+    public void addOrUpdateApiKey(
+        String storageIdentifier,
+        String userEmail,
+        String apiKey,
+        Connection connection) throws BusinessException {
+
         try {
-            ApplicationDAOFactory.getDAOFactory()
-                .getEngineDAO(connection).update(engine);
-        } catch (DAOException ex) {
-            throw new BusinessException(ex);
+            ApiKeysDAO dao = DataManagerDAOFactory.getInstance()
+                .getApiKeysDao(connection);
+
+            List<UserApiKey> keys = dao.getByUser(userEmail);
+            UserApiKey newKey =
+                new UserApiKey(storageIdentifier, userEmail, apiKey);
+
+            if (keys.stream().anyMatch(
+                    k ->
+                    k.getStorageIdentifier().equals(storageIdentifier)
+                    && k.getUserEmail().equals(userEmail))) {
+                dao.updateKey(newKey);
+            } else {
+                dao.addKey(newKey);
+            }
+        } catch (DAOException e) {
+            throw new BusinessException(e);
         }
     }
 
-    /**
-     *
-     * @param name
-     * @throws BusinessException
-     */
-    public void remove(String name, Connection connection)
+    public void deleteApiKey(
+        String storageIdentifier, String userEmail, Connection connection)
         throws BusinessException {
-        try {
-            ApplicationDAOFactory.getDAOFactory()
-                .getEngineDAO(connection).remove(name);
-        } catch (DAOException ex) {
-            throw new BusinessException(ex);
-        }
-    }
 
-    /**
-     *
-     * @return
-     * @throws BusinessException
-     */
-    public List<Engine> get(Connection connection) throws BusinessException {
         try {
-            return ApplicationDAOFactory.getDAOFactory()
-                .getEngineDAO(connection).get();
-        } catch (DAOException ex) {
-            throw new BusinessException(ex);
+            DataManagerDAOFactory.getInstance()
+                .getApiKeysDao(connection)
+                .deleteKeyFor(userEmail, storageIdentifier);
+        } catch (DAOException e) {
+            throw new BusinessException(e);
         }
     }
 }

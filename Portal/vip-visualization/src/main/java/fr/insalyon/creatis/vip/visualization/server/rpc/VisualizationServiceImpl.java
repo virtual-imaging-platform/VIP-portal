@@ -34,12 +34,15 @@ package fr.insalyon.creatis.vip.visualization.server.rpc;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.CoreException;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
+import fr.insalyon.creatis.vip.core.server.dao.mysql.PlatformConnection;
 import fr.insalyon.creatis.vip.core.server.rpc.AbstractRemoteServiceServlet;
 import fr.insalyon.creatis.vip.visualization.client.bean.Image;
 import fr.insalyon.creatis.vip.visualization.client.bean.VisualizationItem;
 import fr.insalyon.creatis.vip.visualization.client.rpc.VisualizationService;
 import fr.insalyon.creatis.vip.visualization.client.view.VisualizationException;
 import fr.insalyon.creatis.vip.visualization.server.business.VisualizationBusiness;
+import java.sql.Connection;
+import java.sql.SQLException;
 import org.apache.log4j.Logger;
 
 public class VisualizationServiceImpl extends AbstractRemoteServiceServlet
@@ -72,15 +75,15 @@ public class VisualizationServiceImpl extends AbstractRemoteServiceServlet
     @Override
     public VisualizationItem getVisualizationItemFromLFN(String lfn)
         throws VisualizationException {
-
-        try {
+        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
             trace(logger, "Getting URL for file: " + lfn);
             User user = getSessionUser();
             return visualizationBusiness.getVisualizationItemFromLFN(
-                lfn, this.getServletContext().getRealPath("."), user);
-        } catch (CoreException ex) {
-            throw new VisualizationException(ex);
-        } catch (BusinessException ex) {
+                lfn,
+                this.getServletContext().getRealPath("."),
+                user,
+                connection);
+        } catch (CoreException | BusinessException | SQLException ex) {
             throw new VisualizationException(ex);
         }
     }

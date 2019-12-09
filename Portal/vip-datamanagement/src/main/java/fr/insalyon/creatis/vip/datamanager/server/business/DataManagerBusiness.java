@@ -36,7 +36,6 @@ import fr.insalyon.creatis.grida.client.GRIDACacheClient;
 import fr.insalyon.creatis.grida.client.GRIDAZombieClient;
 import fr.insalyon.creatis.grida.common.bean.CachedFile;
 import fr.insalyon.creatis.grida.common.bean.ZombieFile;
-import java.util.ArrayList;
 import fr.insalyon.creatis.grida.client.GRIDAClientException;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
@@ -44,19 +43,22 @@ import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
 import fr.insalyon.creatis.vip.core.server.business.CoreUtil;
 import fr.insalyon.creatis.vip.core.server.business.Server;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
-import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
 import fr.insalyon.creatis.vip.datamanager.client.bean.DMCachedFile;
 import fr.insalyon.creatis.vip.datamanager.client.bean.DMZombieFile;
 import fr.insalyon.creatis.vip.datamanager.client.bean.SSH;
 import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerException;
 import fr.insalyon.creatis.vip.datamanager.server.DataManagerUtil;
-import fr.insalyon.creatis.vip.datamanager.server.dao.SSHDAOFactory;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.sql.Connection;
+import java.util.ArrayList;
 import java.util.List;
+
+import fr.insalyon.creatis.vip.datamanager.server.dao.DataManagerDAOFactory;
 import org.apache.log4j.Logger;
 
 /**
@@ -99,7 +101,8 @@ public class DataManagerBusiness {
         }
     }
 
-    public void deleteCachedFiles(List<String> cachedFiles) throws BusinessException {
+    public void deleteCachedFiles(List<String> cachedFiles)
+            throws BusinessException {
 
         try {
             GRIDACacheClient client = CoreUtil.getGRIDACacheClient();
@@ -113,25 +116,15 @@ public class DataManagerBusiness {
         }
     }
 
-    /**
-     *
-     * @param user
-     * @param remoteFile
-     * @param localDir
-     * @return
-     * @throws BusinessException
-     */
-    public String getRemoteFile(User user, String remoteFile, String localDir)
-            throws BusinessException {
+    public String getRemoteFile(
+        User user, String remoteFile, String localDir, Connection connection)
+        throws BusinessException {
 
         try {
             return CoreUtil.getGRIDAClient().getRemoteFile(
-                    DataManagerUtil.parseBaseDir(user, remoteFile), localDir);
-
-        } catch (DataManagerException ex) {
-            logger.error(ex);
-            throw new BusinessException(ex);
-        } catch (GRIDAClientException ex) {
+                DataManagerUtil.parseBaseDir(user, remoteFile, connection),
+                localDir);
+        } catch (DataManagerException | GRIDAClientException ex) {
             logger.error(ex);
             throw new BusinessException(ex);
         }
@@ -139,9 +132,6 @@ public class DataManagerBusiness {
 
     /**
      * Gets the list of zombie files.
-     *
-     * @return
-     * @throws BusinessException
      */
     public List<DMZombieFile> getZombieFiles() throws BusinessException {
 
@@ -178,64 +168,73 @@ public class DataManagerBusiness {
         }
     }
 
-    public List<SSH> getSSHConnections() throws BusinessException {
+    public List<SSH> getSSHConnections(Connection connection)
+        throws BusinessException {
         try {
-            return SSHDAOFactory.getDAOFactory().getSSHDAO().getSSHConnections();
+            return DataManagerDAOFactory.getInstance()
+                .getSSHDAO(connection).getSSHConnections();
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }
     }
 
-    public void addSSH(SSH ssh) throws BusinessException {
+    public void addSSH(SSH ssh, Connection connection) throws BusinessException {
         try {
             //create LFC dir
             ConfigurationBusiness conf = new ConfigurationBusiness();
-            User user = conf.getUser(ssh.getEmail());
-            ssh.setLfcDir(DataManagerUtil.parseBaseDir(user, ssh.getLfcDir()));
-            SSHDAOFactory.getDAOFactory().getSSHDAO().addSSH(ssh);
-        } catch (DAOException ex) {
-            throw new BusinessException(ex);
-        } catch (DataManagerException ex) {
-            throw new BusinessException(ex);
-        }
-
-    }
-
-    public void removeSSH(String email, String name) throws BusinessException {
-        try {
-            SSHDAOFactory.getDAOFactory().getSSHDAO().removeSSH(email, name);
-        } catch (DAOException ex) {
+            User user = conf.getUser(ssh.getEmail(), connection);
+            ssh.setLfcDir(
+                DataManagerUtil.parseBaseDir(user, ssh.getLfcDir(), connection));
+            DataManagerDAOFactory.getInstance().getSSHDAO(connection).addSSH(ssh);
+        } catch (DAOException | DataManagerException ex) {
             throw new BusinessException(ex);
         }
     }
 
-    public void resetSSHs(List<List<String>> sshConnections) throws BusinessException {
+    public void removeSSH(String email, String name, Connection connection)
+        throws BusinessException {
         try {
-
-            SSHDAOFactory.getDAOFactory().getSSHDAO().resetSSHConnections(sshConnections);
+            DataManagerDAOFactory.getInstance()
+                .getSSHDAO(connection).removeSSH(email, name);
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }
     }
 
-    public void updateSSH(SSH ssh) throws BusinessException {
+    public void resetSSHs(
+        List<List<String>> sshConnections, Connection connection)
+        throws BusinessException {
         try {
-            SSHDAOFactory.getDAOFactory().getSSHDAO().updateSSH(ssh);
+
+            DataManagerDAOFactory.getInstance()
+                .getSSHDAO(connection).resetSSHConnections(sshConnections);
+        } catch (DAOException ex) {
+            throw new BusinessException(ex);
+        }
+    }
+
+    public void updateSSH(SSH ssh, Connection connection)
+        throws BusinessException {
+        try {
+            DataManagerDAOFactory.getInstance().getSSHDAO(connection)
+                    .updateSSH(ssh);
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }
     }
 
     public static String extractName(String lfcDir) {
-        String bruteName = lfcDir.substring(lfcDir.lastIndexOf("/") + 1);
-        return bruteName;
+        return lfcDir.substring(lfcDir.lastIndexOf("/") + 1);
     }
 
-    public static String generateLFCDir(String name, String email) throws DataManagerException, BusinessException {
+    public static String generateLFCDir(
+        String name, String email, Connection connection)
+        throws DataManagerException, BusinessException {
 
         ConfigurationBusiness conf = new ConfigurationBusiness();
-        User user = conf.getUser(email);
-        String homeDir = Server.getInstance().getDataManagerUsersHome() + "/" + user.getFolder();
+        User user = conf.getUser(email, connection);
+        String homeDir = Server.getInstance()
+                .getDataManagerUsersHome() + "/" + user.getFolder();
 
         return (homeDir + "/" + name);
     }

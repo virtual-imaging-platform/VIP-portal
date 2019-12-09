@@ -38,10 +38,10 @@ import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.server.auth.AbstractAuthenticationService;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
-import fr.insalyon.creatis.vip.core.server.dao.DAOException;
-import fr.insalyon.creatis.vip.core.server.dao.mysql.PlatformConnection;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.sql.Connection;
+import java.sql.SQLException;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -72,42 +72,40 @@ public class SoapApiBusiness {
 
     public ApiContext getApiContext(
             WebServiceContext wsContext,
-            boolean authenticate) throws ApiException {
-
+            boolean authenticate,
+            Connection connection) throws ApiException {
         MessageContext mc = wsContext.getMessageContext();
         HttpServletRequest request = (HttpServletRequest) mc.get(MessageContext.SERVLET_REQUEST);
         HttpServletResponse response = (HttpServletResponse) mc.get(MessageContext.SERVLET_RESPONSE);
 
-        return getApiContext(request, response, authenticate);
+        return getApiContext(request, response, authenticate, connection);
     }
 
     public ApiContext getApiContext(
             HttpServletRequest request,
             HttpServletResponse response,
-            boolean authenticate) throws ApiException {
+            boolean authenticate,
+            Connection connection) throws ApiException {
 
-        try {
-            // set DB connection
-            PlatformConnection.getInstance();
-
-            //set request and response
-            HttpSession session = request.getSession();
-            if (session == null) {
-                throw new ApiException("No session in WebServiceContext");
-            }
-
-            // Authentication
-            User user = null;
-            if (authenticate) {
-                user = authenticateSession(request, response);
-            }
-            return new ApiContext(request, response, user);
-        } catch (DAOException ex) {
-            throw new ApiException(ex);
+        //set request and response
+        HttpSession session = request.getSession();
+        if (session == null) {
+            throw new ApiException("No session in WebServiceContext");
         }
+
+        // Authentication
+        User user = null;
+        if (authenticate) {
+            user = authenticateSession(request, response, connection);
+        }
+        return new ApiContext(request, response, user);
     }
 
-    protected final User authenticateSession(HttpServletRequest request, HttpServletResponse response) throws ApiException {
+    protected final User authenticateSession(
+        HttpServletRequest request,
+        HttpServletResponse response,
+        Connection connection)
+        throws ApiException {
         try {
             //verify session
             String email = getCookieValue(request, CoreConstants.COOKIES_USER);
@@ -116,10 +114,12 @@ public class SoapApiBusiness {
                 throw new ApiException(this.authFailedMessage);
             }
             email = URLDecoder.decode(email, "UTF-8");
-            if (configurationBusiness.validateSession(email, sessionId)) {
+            if (configurationBusiness
+                .validateSession(email, sessionId, connection)) {
                 logger.info("API successfully authenticated user " + email);
-                User user = configurationBusiness.getUser(email);
-                AbstractAuthenticationService.setVIPSession(request, response, user);
+                User user = configurationBusiness.getUser(email, connection);
+                AbstractAuthenticationService.setVIPSession(
+                    request, response, user, connection);
                 return user;
             }
             throw new ApiException(authFailedMessage);
