@@ -132,7 +132,9 @@ public class PipelineBusiness {
                 for (AppVersion av : versions) {
                     if (av.isVisible()) {
                         pipelines.add(
-                                new Pipeline(ApiUtils.getPipelineIdentifier(a.getName(), av.getVersion()), a.getName(), av.getVersion(), true)
+                                new Pipeline(ApiUtils.getPipelineIdentifier(
+                                        a.getName(), av.getVersion()),
+                                        a.getName(), av.getVersion(), true)
                         );
                     }
                 }
