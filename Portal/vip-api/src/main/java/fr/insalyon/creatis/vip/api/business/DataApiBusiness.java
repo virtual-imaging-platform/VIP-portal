@@ -81,7 +81,8 @@ public class DataApiBusiness {
     @Autowired
     private LFCPermissionBusiness lfcPermissionBusiness;
 
-    private ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(2);
+    // 2 threads are needed for every download
+    private ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(2 * 5);
 
     public DataApiBusiness() {
     }
@@ -116,7 +117,7 @@ public class DataApiBusiness {
         }
         pathProperties.setExists(true);
         List<Data> fileData = baseGetFileData(path, connection);
-        if (doesLFCDataCorrespondToAFile(fileData)) {
+        if (doesPathCorrespondsToAFile(path, fileData)) {
             // this is a file, not a directory
             Data fileInfo = fileData.get(0);
             pathProperties.setIsDirectory(false);
@@ -142,7 +143,7 @@ public class DataApiBusiness {
             return getRootSubDirectoriesPathProps();
         }
         List<Data> directoryData = baseGetFileData(path, connection);
-        if (doesLFCDataCorrespondToAFile(directoryData)) {
+        if (doesPathCorrespondsToAFile(path, directoryData)) {
             logger.error("Trying to list a directory, but is a file :" + path);
             throw new ApiException("Error listing a directory");
         }
@@ -260,7 +261,7 @@ public class DataApiBusiness {
             throw new ApiException("Illegal data API access");
         }
         List<Data> fileData = baseGetFileData(path, connection);
-        if (!doesLFCDataCorrespondToAFile(fileData)) {
+        if (!doesPathCorrespondsToAFile(path, fileData)) {
             // it works on a directory and return a zip, but we cant check the download size
             logger.error("Trying to download a directory : " + path);
             throw new ApiException("Illegal data API access");
@@ -468,8 +469,14 @@ public class DataApiBusiness {
 
     // #### DATA UTILS
 
-    private boolean doesLFCDataCorrespondToAFile(List<Data> lfcData) {
-        return lfcData.size() == 1 && lfcData.get(0).getName().startsWith("/");
+    private boolean doesPathCorrespondsToAFile(String path, List<Data> pathDataList) {
+        // Currently, there is no perfect way to determine that
+        // TODO : add a isDirectory method in grida
+        if (pathDataList.size() != 1) {
+            return false;
+        }
+        String fileName = Paths.get(path).getFileName().toString();
+        return fileName.equals(pathDataList.get(0).getName());
     }
 
     private PathProperties buildPathFromLfcData(String path, Data lfcData) {
