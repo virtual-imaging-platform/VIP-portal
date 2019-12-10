@@ -44,7 +44,6 @@ import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
 import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
-import fr.insalyon.creatis.vip.datamanager.client.DataManagerContext;
 import fr.insalyon.creatis.vip.datamanager.client.bean.Data;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerService;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerServiceAsync;
@@ -66,38 +65,6 @@ public class BrowserToolStrip extends BasicBrowserToolStrip {
     public BrowserToolStrip(final ModalWindow modal, final ListGrid grid) {
 
         super(modal, grid);
-
-        // Cut Button
-        this.addSeparator();
-        this.addButton(WidgetUtil.getToolStripButton(
-                DataManagerConstants.ICON_CUT, "Cut", new ClickHandler() {
-                    @Override
-                    public void onClick(ClickEvent event) {
-                        String path = pathItem.getValueAsString();
-                        if (ValidatorUtil.validateRootPath(path, "cut from")
-                        && ValidatorUtil.validateUserLevel(path, "cut from")
-                        && ValidatorUtil.validateDropboxDir(path, "cut from")) {
-
-                            cut();
-                        }
-                    }
-                }));
-
-        // Paste Button
-        pasteButton = WidgetUtil.getToolStripButton(
-                DataManagerConstants.ICON_PASTE, "Paste", new ClickHandler() {
-                    @Override
-                    public void onClick(ClickEvent event) {
-                        String path = pathItem.getValueAsString();
-                        if (ValidatorUtil.validateRootPath(path, "paste in")
-                        && ValidatorUtil.validateUserLevel(path, "paste to")) {
-
-                            paste(modal, path);
-                        }
-                    }
-                });
-        pasteButton.setDisabled(true);
-        this.addButton(pasteButton);
 
         // Upload a File Button
         this.addSeparator();
@@ -153,33 +120,6 @@ public class BrowserToolStrip extends BasicBrowserToolStrip {
                         }
                     }
                 }));
-
-        /*
-
-        /* With the dfc migration, there is no direct rename.
-        The rename is currently replaced with an heavy dowload / re-upload
-        mechanism that is too heavy to be used in the delete
-
-        // Trash Button
-        this.addSeparator();
-        this.addButton(WidgetUtil.getToolStripButton(
-                DataManagerConstants.ICON_TRASH, "Trash", new ClickHandler() {
-                    @Override
-                    public void onClick(ClickEvent event) {
-                        BrowserLayout.getInstance().loadData(DataManagerConstants.ROOT
-                                + "/" + DataManagerConstants.TRASH_HOME, false);
-                    }
-                }));
-
-        // Empty Trash Button
-        this.addButton(WidgetUtil.getToolStripButton(
-                DataManagerConstants.ICON_EMPTY_TRASH, "Empty Trash", new ClickHandler() {
-                    @Override
-                    public void onClick(ClickEvent event) {
-                        emptyTrash();
-                    }
-                }));
-        */
     }
 
     private void download() {
@@ -228,57 +168,6 @@ public class BrowserToolStrip extends BasicBrowserToolStrip {
                         pathItem.getValueAsString() + "/" + data.getName(),
                         callback);
             }
-        }
-    }
-
-    private void cut() {
-
-        ListGridRecord[] records = BrowserLayout.getInstance().getGridSelection();
-        if (records.length > 0) {
-            final List<String> paths = new ArrayList<String>();
-
-            for (ListGridRecord record : records) {
-                paths.add(((DataRecord) record).getName());
-            }
-
-            DataManagerContext.getInstance().setCutAction(pathItem.getValueAsString(),
-                    paths.toArray(new String[]{}));
-
-            pasteButton.setDisabled(false);
-
-        } else {
-            Layout.getInstance().setWarningMessage("There are no data selected to cut.");
-        }
-    }
-
-    private void paste(final ModalWindow modal, final String baseDir) {
-
-        DataManagerServiceAsync service = DataManagerService.Util.getInstance();
-        AsyncCallback<Void> callback = new AsyncCallback<Void>() {
-            @Override
-            public void onFailure(Throwable caught) {
-                modal.hide();
-                Layout.getInstance().setWarningMessage("Unable to paste file/folder:<br />" + caught.getMessage());
-            }
-
-            @Override
-            public void onSuccess(Void result) {
-                modal.hide();
-                pasteButton.setDisabled(true);
-                DataManagerContext.getInstance().resetCutAction();
-                BrowserLayout.getInstance().loadData(baseDir, true);
-            }
-        };
-
-        if (!baseDir.equals(DataManagerContext.getInstance().getCutFolder())) {
-
-            modal.show("Moving data...", true);
-            service.rename(DataManagerContext.getInstance().getCutFolder(),
-                    new ArrayList(Arrays.asList(DataManagerContext.getInstance().getCutName())),
-                    baseDir, false, callback);
-
-        } else {
-            Layout.getInstance().setWarningMessage("Unable to move data into the same folder.");
         }
     }
 
@@ -356,64 +245,5 @@ public class BrowserToolStrip extends BasicBrowserToolStrip {
                 }
             });
         }
-    }
-
-    private void emptyTrash() {
-        SC.ask("Do you really want to remove the items in the trash permanently?", new BooleanCallback() {
-            @Override
-            public void execute(Boolean value) {
-                if (value) {
-
-                    final DataManagerServiceAsync service = DataManagerService.Util.getInstance();
-                    AsyncCallback<List<Data>> callback = new AsyncCallback<List<Data>>() {
-                        @Override
-                        public void onFailure(Throwable caught) {
-                            modal.hide();
-                            Layout.getInstance().setWarningMessage("Unable to delete files/folders:<br />" + caught.getMessage());
-                        }
-
-                        @Override
-                        public void onSuccess(List<Data> result) {
-
-                            List<String> paths = new ArrayList<String>();
-                            for (Data data : result) {
-                                paths.add(DataManagerConstants.ROOT + "/"
-                                        + DataManagerConstants.TRASH_HOME
-                                        + "/" + data.getName());
-                            }
-
-                            AsyncCallback<Void> callback = new AsyncCallback<Void>() {
-                                @Override
-                                public void onFailure(Throwable caught) {
-                                    modal.hide();
-                                    Layout.getInstance().setWarningMessage("Error executing empty trash: " + caught.getMessage());
-                                }
-
-                                @Override
-                                public void onSuccess(Void result) {
-                                    modal.hide();
-                                    Layout.getInstance().setNoticeMessage("Your Trash folder was successfully scheduled to be emptied.");
-                                    BrowserLayout.getInstance().loadData(
-                                            DataManagerConstants.ROOT + "/"
-                                            + DataManagerConstants.TRASH_HOME, true);
-                                }
-                            };
-                            service.delete(paths, callback);
-                        }
-                    };
-                    modal.show("Emptying Trash...", true);
-                    service.listDir(DataManagerConstants.ROOT + "/"
-                            + DataManagerConstants.TRASH_HOME, true, callback);
-                }
-            }
-        });
-    }
-
-    public void resetPasteButton() {
-        pasteButton.setDisabled(true);
-    }
-
-    public void enablePasteButton() {
-        pasteButton.setDisabled(false);
     }
 }

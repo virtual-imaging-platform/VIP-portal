@@ -43,7 +43,6 @@ import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
-import fr.insalyon.creatis.vip.datamanager.client.DataManagerContext;
 import fr.insalyon.creatis.vip.datamanager.client.bean.Data;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerService;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerServiceAsync;
@@ -92,51 +91,6 @@ public class BrowserContextMenu extends Menu {
             }
         });
 
-        MenuItem cutItem = new MenuItem("Cut");
-        cutItem.setIcon(DataManagerConstants.ICON_CUT);
-        cutItem.addClickHandler(new ClickHandler() {
-
-            @Override
-            public void onClick(MenuItemClickEvent event) {
-                if (ValidatorUtil.validateRootPath(baseDir, "cut from")
-                        && ValidatorUtil.validateUserLevel(baseDir, "cut from")
-                        && ValidatorUtil.validateDropboxDir(baseDir, "cut from")) {
-
-                    DataManagerContext.getInstance().setCutAction(baseDir, data.getName());
-                    BrowserLayout.getInstance().getToolStrip().enablePasteButton();
-                }
-            }
-        });
-
-        MenuItem pasteItem = new MenuItem("Paste");
-        pasteItem.setIcon(DataManagerConstants.ICON_PASTE);
-        pasteItem.addClickHandler(new ClickHandler() {
-
-            @Override
-            public void onClick(MenuItemClickEvent event) {
-                if (ValidatorUtil.validateRootPath(baseDir, "paste in")
-                        && ValidatorUtil.validateUserLevel(baseDir, "paste to")) {
-
-                    paste(modal, baseDir);
-                }
-            }
-        });
-
-        MenuItem renameItem = new MenuItem("Rename");
-        renameItem.setIcon(CoreConstants.ICON_EDIT);
-        renameItem.addClickHandler(new ClickHandler() {
-
-            @Override
-            public void onClick(MenuItemClickEvent event) {
-                if (ValidatorUtil.validateRootPath(baseDir, "rename from")
-                        && ValidatorUtil.validateUserLevel(baseDir, "rename from")
-                        && ValidatorUtil.validateDropboxDir(baseDir, "rename from")) {
-
-                    new RenameWindow(modal, baseDir, data.getName()).show();
-                }
-            }
-        });
-
         MenuItem deleteItem = new MenuItem("Delete");
         deleteItem.setIcon(CoreConstants.ICON_DELETE);
         deleteItem.addClickHandler(new ClickHandler() {
@@ -173,11 +127,6 @@ public class BrowserContextMenu extends Menu {
         menuItems.add(uploadItem);
         menuItems.add(downloadItem);
         menuItems.add(separator);
-        menuItems.add(cutItem);
-        if (DataManagerContext.getInstance().hasCutAction())
-            menuItems.add(pasteItem);
-        menuItems.add(separator);
-        menuItems.add(renameItem);
         menuItems.add(deleteItem);
         menuItems.add(separator);
         menuItems.add(propertiesItem);
@@ -309,42 +258,6 @@ public class BrowserContextMenu extends Menu {
             };
             modal.show("Adding folder to transfer queue...", true);
             service.downloadFolder(baseDir + "/" + data.getName(), callback);
-        }
-    }
-
-    /**
-     *
-     * @param modal
-     * @param baseDir
-     */
-    private void paste(final ModalWindow modal, final String baseDir) {
-
-        DataManagerServiceAsync service = DataManagerService.Util.getInstance();
-        AsyncCallback<Void> callback = new AsyncCallback<Void>() {
-
-            @Override
-            public void onFailure(Throwable caught) {
-                modal.hide();
-                Layout.getInstance().setWarningMessage("Unable to paste file/folder:<br />" + caught.getMessage());
-            }
-
-            @Override
-            public void onSuccess(Void result) {
-                modal.hide();
-                DataManagerContext.getInstance().resetCutAction();
-                BrowserLayout.getInstance().getToolStrip().resetPasteButton();
-                BrowserLayout.getInstance().loadData(baseDir, true);
-            }
-        };
-
-        if (!baseDir.equals(DataManagerContext.getInstance().getCutFolder())) {
-
-            modal.show("Moving data...", true);
-            service.rename(DataManagerContext.getInstance().getCutFolder(),
-                    new ArrayList(Arrays.asList(DataManagerContext.getInstance().getCutName())),
-                    baseDir, false, callback);
-        } else {
-            Layout.getInstance().setWarningMessage("Unable to move data into the same folder.");
         }
     }
 
