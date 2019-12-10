@@ -130,9 +130,11 @@ public class PipelineBusiness {
                 List<AppVersion> versions =
                     applicationBusiness.getVersions(a.getName(), connection);
                 for (AppVersion av : versions) {
-                    pipelines.add(
-                            new Pipeline(ApiUtils.getPipelineIdentifier(a.getName(), av.getVersion()), a.getName(), av.getVersion(), true)
-                    );
+                    if (av.isVisible()) {
+                        pipelines.add(
+                                new Pipeline(ApiUtils.getPipelineIdentifier(a.getName(), av.getVersion()), a.getName(), av.getVersion(), true)
+                        );
+                    }
                 }
             }
             Pipeline[] array_pipelines = new Pipeline[pipelines.size()];
