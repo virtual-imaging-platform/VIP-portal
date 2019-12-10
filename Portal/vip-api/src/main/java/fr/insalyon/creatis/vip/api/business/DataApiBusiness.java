@@ -81,7 +81,7 @@ public class DataApiBusiness {
     @Autowired
     private LFCPermissionBusiness lfcPermissionBusiness;
 
-    private ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(2);
+    private ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(10);
 
     public DataApiBusiness() {
     }

@@ -179,6 +179,39 @@ public class DataControllerIT extends BaseVIPSpringIT {
     }
 
     @Test
+    public void shouldDownloadAfterFirstTimeout() throws Exception {
+        configureDataFS();
+        String lfcPath = getAbsolutePath(testFile1);
+        String operationId = "testOpId";
+        String testFile = Paths.get(ClassLoader.getSystemResource("testFile.txt").toURI())
+                .toAbsolutePath().toString();
+        PoolOperation runningPoolOperation = new PoolOperation(operationId,
+                null, null, null, null, Type.Download, Status.Running, baseUser1.getEmail(), 0);
+        PoolOperation donePoolOperation = new PoolOperation(operationId,
+                null, null, null, testFile, Type.Download, Status.Done, baseUser1.getEmail(), 100);
+        when (transferPoolBusiness.downloadFile(eq(baseUser1), eq(lfcPath), anyObject()))
+                .thenReturn(operationId);
+        when (transferPoolBusiness.getOperationById(
+                eq(operationId), eq(baseUser1.getFolder()), anyObject()))
+                .thenReturn(runningPoolOperation);
+        when (transferPoolBusiness.getDownloadPoolOperation(operationId))
+              .thenReturn(donePoolOperation);
+        mockMvc.perform(
+                get("/rest/path" + lfcPath).param("action", "content").with(baseUser1()))
+                .andDo(print())
+                .andExpect(status().isBadRequest());
+        // now do an OK download
+        Thread.sleep(3*1000);
+          when (transferPoolBusiness.getOperationById(
+                  eq(operationId), eq(baseUser1.getFolder()), anyObject()))
+                  .thenReturn(runningPoolOperation, runningPoolOperation, donePoolOperation);
+        mockMvc.perform(
+                get("/rest/path" + lfcPath).param("action", "content").with(baseUser1()))
+                .andDo(print())
+                .andExpect(status().isOk());
+    }
+
+    @Test
     public void shouldUploadFile() throws Exception {
         configureDataFS();
         String path =  getAbsolutePath(testDir1) + "/uploaded.txt";
