@@ -35,7 +35,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import fr.insalyon.creatis.vip.core.client.bean.User;
-import fr.insalyon.creatis.vip.core.client.view.CoreException;
+import fr.insalyon.creatis.vip.core.client.view.*;
 import fr.insalyon.creatis.vip.core.server.business.*;
 import fr.insalyon.creatis.vip.datamanager.client.bean.ExternalPlatform;
 import fr.insalyon.creatis.vip.datamanager.client.bean.ExternalPlatform.Type;
@@ -74,6 +74,7 @@ public class GirderStorageBusiness {
      */
     public String generateUri(
         ExternalPlatform externalPlatform,
+        String parameterName,
         String fileIdentifier,
         User user,
         Connection connection)
@@ -89,8 +90,10 @@ public class GirderStorageBusiness {
             externalPlatform.getIdentifier(),
             connection);
 
-        String filename = getFilename(apiUrl, fileIdentifier, token);
-
+        String filename = "//";
+        if (! CoreConstants.RESULTS_DIRECTORY_PARAM_NAME.equals(parameterName)) {
+            filename = getFilename(apiUrl, fileIdentifier, token);
+        }
         return buildUri(filename, apiUrl, fileIdentifier, token);
     }
 

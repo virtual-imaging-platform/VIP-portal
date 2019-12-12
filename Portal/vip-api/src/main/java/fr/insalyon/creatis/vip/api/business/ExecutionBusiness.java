@@ -40,6 +40,7 @@ import fr.insalyon.creatis.vip.application.client.bean.*;
 import fr.insalyon.creatis.vip.application.client.view.monitor.SimulationStatus;
 import fr.insalyon.creatis.vip.application.server.business.*;
 import fr.insalyon.creatis.vip.core.client.bean.*;
+import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.server.business.*;
 import fr.insalyon.creatis.vip.datamanager.server.business.TransferPoolBusiness;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -293,7 +294,8 @@ public class ExecutionBusiness {
             inputMap.put(restInput.getKey(),
                     handleRestParameter(restInput.getKey(), restInput.getValue()));
         }
-        inputMap.put("results-directory", execution.getResultsLocation());
+        inputMap.put(CoreConstants.RESULTS_DIRECTORY_PARAM_NAME,
+                     execution.getResultsLocation());
         return initExecution(
             execution.getPipelineIdentifier(), inputMap, execution.getTimeout(),
             execution.getName(), execution.getStudyIdentifier(), true,

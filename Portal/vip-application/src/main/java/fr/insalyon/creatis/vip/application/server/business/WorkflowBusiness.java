@@ -226,11 +226,13 @@ public class WorkflowBusiness {
                     String[] values = valuesStr.split(ApplicationConstants.SEPARATOR_LIST);
                     for (String v : values) {
 
-                        String parsedParameter = parseParameter(user, groups, v, connection);
+                        String parsedParameter =
+                            parseParameter(user, groups, name, v, connection);
                         ps.addValue(parsedParameter);
                     }
                 } else {
-                    String parsedParameter = parseParameter(user, groups, valuesStr, connection);
+                    String parsedParameter =
+                        parseParameter(user, groups, name, valuesStr, connection);
                     ps.addValue(parsedParameter);
                 }
                 parameters.add(ps);
@@ -286,14 +288,18 @@ public class WorkflowBusiness {
     }
 
     private String parseParameter(
-            User user, List<String> groups,
-            String parameter, Connection connection)
-            throws DataManagerException, BusinessException {
+            User user,
+            List<String> groups,
+            String parameterName,
+            String parameterValue,
+            Connection connection)
+        throws DataManagerException, BusinessException {
 
-        parameter = parameter.trim();
+        parameterValue = parameterValue.trim();
 
         ExternalPlatformBusiness.ParseResult parseResult =
-            externalPlatformBusiness.parseParameter(parameter, user, connection);
+            externalPlatformBusiness.parseParameter(
+                parameterName, parameterValue, user, connection);
         if (parseResult.isUri) {
             // The uri has been generated
             return parseResult.result;
