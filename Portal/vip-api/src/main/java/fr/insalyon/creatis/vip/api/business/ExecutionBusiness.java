@@ -294,8 +294,11 @@ public class ExecutionBusiness {
             inputMap.put(restInput.getKey(),
                     handleRestParameter(restInput.getKey(), restInput.getValue()));
         }
-        inputMap.put(CoreConstants.RESULTS_DIRECTORY_PARAM_NAME,
-                     execution.getResultsLocation());
+        String resultsLocation = execution.getResultsLocation();
+        if (resultsLocation != null) {
+            inputMap.put(CoreConstants.RESULTS_DIRECTORY_PARAM_NAME,
+                         resultsLocation);
+        }
         return initExecution(
             execution.getPipelineIdentifier(), inputMap, execution.getTimeout(),
             execution.getName(), execution.getStudyIdentifier(), true,

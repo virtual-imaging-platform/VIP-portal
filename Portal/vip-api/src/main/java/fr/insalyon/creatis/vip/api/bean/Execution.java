@@ -83,8 +83,7 @@ public class Execution extends Object {
     private Long startDate;
     @XmlElement(name = "endDate")
     private Long endDate;
-    @NotNull
-    @XmlElement(name = "resultsLocation", required = true)
+    @XmlElement(name = "resultsLocation")
     private String resultsLocation;
 
 
