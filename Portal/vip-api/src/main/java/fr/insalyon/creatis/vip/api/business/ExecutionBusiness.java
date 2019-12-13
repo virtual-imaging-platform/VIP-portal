@@ -383,6 +383,19 @@ public class ExecutionBusiness {
                 throw new ApiException("Parameter " + pp.getName() + " is empty while it is not optional and it has no default value.");
             }
 
+            Boolean hasInputResultsDirectory =
+                inputValues.keySet().contains(
+                    CoreConstants.RESULTS_DIRECTORY_PARAM_NAME);
+
+            Boolean hasPipelineResultsDirectory =
+                p.getParameters().contains(
+                    CoreConstants.RESULTS_DIRECTORY_PARAM_NAME);
+
+            if (hasInputResultsDirectory && !hasPipelineResultsDirectory) {
+                throw new ApiException(
+                    "Input has parameter results-directory but it is not defined in pipeline.");
+            }
+
             // Get user groups
             List<String> groupNames = new ArrayList<>();
             for (Group g : configurationBusiness
