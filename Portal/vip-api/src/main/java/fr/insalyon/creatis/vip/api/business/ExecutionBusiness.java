@@ -360,7 +360,8 @@ public class ExecutionBusiness {
             }
 
             // Check that all pipeline inputs are present
-            Pipeline p = pipelineBusiness.getPipeline(pipelineId, connection);
+            Pipeline p = pipelineBusiness.getPipelineWithResultsDirectory(
+                pipelineId, connection);
             for (PipelineParameter pp : p.getParameters()) {
                 if (pp.isReturnedValue()) {
                     continue;
