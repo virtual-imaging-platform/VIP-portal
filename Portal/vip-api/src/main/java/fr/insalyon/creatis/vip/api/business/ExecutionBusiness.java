@@ -385,12 +385,13 @@ public class ExecutionBusiness {
             }
 
             Boolean hasInputResultsDirectory =
-                inputValues.keySet().contains(
+                inputValues.containsKey(
                     CoreConstants.RESULTS_DIRECTORY_PARAM_NAME);
 
             Boolean hasPipelineResultsDirectory =
-                p.getParameters().contains(
-                    CoreConstants.RESULTS_DIRECTORY_PARAM_NAME);
+                p.getParameters().stream().anyMatch(
+                        param ->
+                        param.getName().equals(CoreConstants.RESULTS_DIRECTORY_PARAM_NAME));
 
             if (hasInputResultsDirectory && !hasPipelineResultsDirectory) {
                 throw new ApiException(
