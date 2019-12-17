@@ -190,7 +190,7 @@ public class Carmin {
                 executionName = "Untitled";
             ApiContext apiContext = new SoapApiBusiness().getApiContext(
                 wsContext, true, connection);
-            PipelineBusiness pb = new PipelineBusiness(apiContext);
+            PipelineBusiness pb = new PipelineBusiness(apiContext, null);
             pb.checkIfUserCanAccessPipeline(pipelineId, connection);
             ExecutionBusiness eb = new ExecutionBusiness(apiContext);
             String id = eb.initExecution(
@@ -326,7 +326,7 @@ public class Carmin {
             ApiUtils.throwIfNull(pipelineId, "Pipeline id");
             ApiContext apiContext = new SoapApiBusiness().getApiContext(
                 wsContext, true, connection);
-            PipelineBusiness pb = new PipelineBusiness(apiContext);
+            PipelineBusiness pb = new PipelineBusiness(apiContext, null);
             pb.checkIfUserCanAccessPipeline(pipelineId, connection);
             Pipeline p = pb.getPipeline(pipelineId, connection);
             r = new Response(0, ApiUtils.getMessage(apiContext), p);
@@ -345,7 +345,7 @@ public class Carmin {
             ApiUtils.methodInvocationLog("listPipelines", studyIdentifier);
             ApiContext apiContext = new SoapApiBusiness().getApiContext(
                 wsContext, true, connection);
-            PipelineBusiness pb = new PipelineBusiness(apiContext);
+            PipelineBusiness pb = new PipelineBusiness(apiContext, null);
             Pipeline[] pipelines = pb.listPipelines(studyIdentifier, connection);
             r = new Response(0, ApiUtils.getMessage(apiContext),pipelines);
         } catch (ApiException | SQLException ex) {

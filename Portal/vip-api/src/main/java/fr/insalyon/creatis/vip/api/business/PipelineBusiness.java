@@ -31,6 +31,7 @@
  */
 package fr.insalyon.creatis.vip.api.business;
 
+import fr.insalyon.creatis.vip.api.CarminProperties;
 import fr.insalyon.creatis.vip.api.bean.ParameterType;
 import fr.insalyon.creatis.vip.api.bean.ParameterTypedValue;
 import fr.insalyon.creatis.vip.api.bean.Pipeline;
@@ -45,11 +46,11 @@ import fr.insalyon.creatis.vip.application.server.business.ClassBusiness;
 import fr.insalyon.creatis.vip.application.server.business.WorkflowBusiness;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import java.sql.Connection;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
 /**
@@ -62,18 +63,20 @@ public class PipelineBusiness {
     private final static Logger logger = Logger.getLogger(PipelineBusiness.class);
 
     private final ApiContext apiContext;
+    private Environment env;
 
     private final WorkflowBusiness workflowBusiness;
     private final ApplicationBusiness applicationBusiness;
     private final ClassBusiness classBusiness;
 
-    public PipelineBusiness(ApiContext apiContext) {
-        this(apiContext, new WorkflowBusiness(), new ApplicationBusiness(), new ClassBusiness());
+    public PipelineBusiness(ApiContext apiContext, Environment env) {
+        this(apiContext, env, new WorkflowBusiness(), new ApplicationBusiness(), new ClassBusiness());
     }
 
     @Autowired
-    public PipelineBusiness(ApiContext apiContext, WorkflowBusiness workflowBusiness, ApplicationBusiness applicationBusiness, ClassBusiness classBusiness) {
+    public PipelineBusiness(ApiContext apiContext, Environment env, WorkflowBusiness workflowBusiness, ApplicationBusiness applicationBusiness, ClassBusiness classBusiness) {
         this.apiContext = apiContext;
+        this.env = env;
         this.workflowBusiness = workflowBusiness;
         this.applicationBusiness = applicationBusiness;
         this.classBusiness = classBusiness;
@@ -130,7 +133,7 @@ public class PipelineBusiness {
                 List<AppVersion> versions =
                     applicationBusiness.getVersions(a.getName(), connection);
                 for (AppVersion av : versions) {
-                    if (av.isVisible()) {
+                    if (isApplicationVersionUsableInApi(av)) {
                         pipelines.add(
                                 new Pipeline(ApiUtils.getPipelineIdentifier(
                                         a.getName(), av.getVersion()),
@@ -145,6 +148,27 @@ public class PipelineBusiness {
             logger.error("Error listing pipelines" + ex);
             throw new ApiException(ex);
         }
+    }
+
+    private boolean isApplicationVersionUsableInApi(AppVersion appVersion) {
+        if (appVersion.isVisible()) {
+            return true;
+        }
+        if (env == null) {
+            // spring not present, so we're in soap context and the white list
+            // is not supported
+            return false;
+        }
+        List<String> whiteList = Arrays.asList(
+                env.getProperty(CarminProperties.API_PIPELINE_WHITE_LIST, String[].class));
+        return whiteList.stream().anyMatch(appString -> {
+            String[] splitAppString = appString.split("/");
+            if (splitAppString.length != 2) {
+                return false;
+            }
+            return splitAppString[0].equals(appVersion.getApplicationName())
+                    && splitAppString[1].equals(appVersion.getVersion());
+        });
     }
 
     public void checkIfUserCanAccessPipeline(

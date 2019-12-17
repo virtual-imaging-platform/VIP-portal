@@ -79,7 +79,7 @@ public class PipelineController {
     public Pipeline[] listPipelines(@RequestParam(required = false) String studyIdentifier) throws ApiException {
         ApiUtils.methodInvocationLog("listPipelines");
         ApiContext apiContext = restApiBusiness.getApiContext(httpServletRequest, true);
-        PipelineBusiness pb = new PipelineBusiness(apiContext, workflowBusiness, applicationBusiness, classBusiness);
+        PipelineBusiness pb = new PipelineBusiness(apiContext, null, workflowBusiness, applicationBusiness, classBusiness);
         try(Connection connection = connectionSupplier.get()) {
             return pb.listPipelines(studyIdentifier, connection);
         } catch (SQLException | SQLRuntimeException ex) {
@@ -96,7 +96,7 @@ public class PipelineController {
             throw new ApiException("cannot decode pipelineId : " + pipelineId);
         }
         ApiContext apiContext = restApiBusiness.getApiContext(httpServletRequest, true);
-        PipelineBusiness pb = new PipelineBusiness(apiContext, workflowBusiness, applicationBusiness, classBusiness);
+        PipelineBusiness pb = new PipelineBusiness(apiContext, null, workflowBusiness, applicationBusiness, classBusiness);
         try(Connection connection = connectionSupplier.get()) {
             pb.checkIfUserCanAccessPipeline(pipelineId, connection);
             return pb.getPipeline(pipelineId, connection);

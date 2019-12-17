@@ -95,6 +95,8 @@ public class ApiPropertiesInitializer implements ApplicationContextInitializer<C
                 UNSUPPORTED_METHODS + " required in api conf file");
         Assert.notEmpty(env.getProperty(PLATFORM_ERROR_CODES_AND_MESSAGES, String[].class),
                 PLATFORM_ERROR_CODES_AND_MESSAGES + " required in api conf file");
+        Assert.isInstanceOf(String[].class, env.getProperty(API_PIPELINE_WHITE_LIST, String[].class),
+                API_PIPELINE_WHITE_LIST + " required in api conf file");
 
     }
 
