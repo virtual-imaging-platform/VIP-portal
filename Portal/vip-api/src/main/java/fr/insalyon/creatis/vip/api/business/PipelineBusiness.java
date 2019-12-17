@@ -43,6 +43,7 @@ import fr.insalyon.creatis.vip.application.client.bean.Source;
 import fr.insalyon.creatis.vip.application.server.business.ApplicationBusiness;
 import fr.insalyon.creatis.vip.application.server.business.ClassBusiness;
 import fr.insalyon.creatis.vip.application.server.business.WorkflowBusiness;
+import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import java.sql.Connection;
 import java.util.ArrayList;
@@ -80,6 +81,18 @@ public class PipelineBusiness {
     }
 
     public Pipeline getPipeline(String pipelineId, Connection connection)
+        throws ApiException {
+        Pipeline p = getPipelineWithResultsDirectory(pipelineId, connection);
+
+        p.getParameters().removeIf(
+            param ->
+            param.getName().equals(CoreConstants.RESULTS_DIRECTORY_PARAM_NAME));
+
+        return p;
+    }
+
+    public Pipeline getPipelineWithResultsDirectory(
+        String pipelineId, Connection connection)
         throws ApiException {
         try {
             String applicationName = ApiUtils.getApplicationName(pipelineId);

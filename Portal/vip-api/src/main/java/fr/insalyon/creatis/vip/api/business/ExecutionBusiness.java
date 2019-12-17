@@ -40,6 +40,7 @@ import fr.insalyon.creatis.vip.application.client.bean.*;
 import fr.insalyon.creatis.vip.application.client.view.monitor.SimulationStatus;
 import fr.insalyon.creatis.vip.application.server.business.*;
 import fr.insalyon.creatis.vip.core.client.bean.*;
+import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.server.business.*;
 import fr.insalyon.creatis.vip.datamanager.server.business.TransferPoolBusiness;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -141,6 +142,7 @@ public class ExecutionBusiness {
             }
 
             // Build Carmin's execution object
+            String resultsDirectory = null; // not available
             Execution e = new Execution(
                     s.getID(),
                     s.getSimulationName(),
@@ -150,7 +152,8 @@ public class ExecutionBusiness {
                     null, // study identifier (not available in VIP yet)
                     null, // error codes and mesasges (not available in VIP yet)
                     s.getDate().getTime(),
-                    null // last status modification date (not available in VIP yet)
+                    null, // last status modification date (not available in VIP yet)
+                    resultsDirectory
             );
 
             if(summarize) // don't look into inputs and outputs
@@ -291,6 +294,11 @@ public class ExecutionBusiness {
             inputMap.put(restInput.getKey(),
                     handleRestParameter(restInput.getKey(), restInput.getValue()));
         }
+        String resultsLocation = execution.getResultsLocation();
+        if (resultsLocation != null) {
+            inputMap.put(CoreConstants.RESULTS_DIRECTORY_PARAM_NAME,
+                         resultsLocation);
+        }
         return initExecution(
             execution.getPipelineIdentifier(), inputMap, execution.getTimeout(),
             execution.getName(), execution.getStudyIdentifier(), true,
@@ -352,7 +360,8 @@ public class ExecutionBusiness {
             }
 
             // Check that all pipeline inputs are present
-            Pipeline p = pipelineBusiness.getPipeline(pipelineId, connection);
+            Pipeline p = pipelineBusiness.getPipelineWithResultsDirectory(
+                pipelineId, connection);
             for (PipelineParameter pp : p.getParameters()) {
                 if (pp.isReturnedValue()) {
                     continue;
@@ -373,6 +382,20 @@ public class ExecutionBusiness {
                 }
                 // pp is an empty input with no default value and it is not optional
                 throw new ApiException("Parameter " + pp.getName() + " is empty while it is not optional and it has no default value.");
+            }
+
+            Boolean hasInputResultsDirectory =
+                inputValues.containsKey(
+                    CoreConstants.RESULTS_DIRECTORY_PARAM_NAME);
+
+            Boolean hasPipelineResultsDirectory =
+                p.getParameters().stream().anyMatch(
+                        param ->
+                        param.getName().equals(CoreConstants.RESULTS_DIRECTORY_PARAM_NAME));
+
+            if (hasInputResultsDirectory && !hasPipelineResultsDirectory) {
+                throw new ApiException(
+                    "Input has parameter results-directory but it is not defined in pipeline.");
             }
 
             // Get user groups

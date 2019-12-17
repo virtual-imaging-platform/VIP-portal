@@ -74,14 +74,15 @@ public class ExternalPlatformBusiness {
     }
 
     public ParseResult parseParameter(
-        String parameter, User user, Connection connection)
+        String parameterName, String parameterValue,
+        User user, Connection connection)
         throws BusinessException {
-        if (!parameter.matches("^\\w+:.*")) {
-             return new ParseResult(false, parameter);
+        if (!parameterValue.matches("^\\w+:.*")) {
+             return new ParseResult(false, parameterValue);
         }
-        int indexOfColon = parameter.indexOf(':');
-        String platformIdentifier = parameter.substring(0, indexOfColon);
-        String fileIdentifier = parameter.substring(indexOfColon + 1);
+        int indexOfColon = parameterValue.indexOf(':');
+        String platformIdentifier = parameterValue.substring(0, indexOfColon);
+        String fileIdentifier = parameterValue.substring(indexOfColon + 1);
         ExternalPlatform externalPlatform =
                 getById(platformIdentifier, connection);
         if (externalPlatform == null) {
@@ -92,7 +93,8 @@ public class ExternalPlatformBusiness {
         switch (externalPlatform.getType()) {
             case GIRDER:
                 String girderUri = girderStorageBusiness.generateUri(
-                    externalPlatform, fileIdentifier, user, connection);
+                    externalPlatform, parameterName,
+                    fileIdentifier, user, connection);
                 return new ParseResult(true, girderUri);
             default:
                 String error = "Only girder external storage are supported. "
