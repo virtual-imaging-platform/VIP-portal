@@ -70,4 +70,6 @@ public interface CarminAPITestConstants {
 
     String TEST_APIKEY_HEADER = "testapikey";
     String TEST_GENERATE_NEW_APIKEY_EACH_TIME = "false";
+    
+    String TEST_PIPELINE_WHITELIST = "application 3/4.2";
 }

@@ -38,6 +38,7 @@ import fr.insalyon.creatis.vip.api.rest.RestApiBusiness;
 import fr.insalyon.creatis.vip.application.server.business.*;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -59,6 +60,8 @@ public class PipelineController {
     public static final Logger logger = Logger.getLogger(PipelineController.class);
 
     @Autowired
+    Environment env;
+    @Autowired
     private WorkflowBusiness workflowBusiness;
     @Autowired
     private ApplicationBusiness applicationBusiness;
@@ -79,7 +82,7 @@ public class PipelineController {
     public Pipeline[] listPipelines(@RequestParam(required = false) String studyIdentifier) throws ApiException {
         ApiUtils.methodInvocationLog("listPipelines");
         ApiContext apiContext = restApiBusiness.getApiContext(httpServletRequest, true);
-        PipelineBusiness pb = new PipelineBusiness(apiContext, null, workflowBusiness, applicationBusiness, classBusiness);
+        PipelineBusiness pb = new PipelineBusiness(apiContext, env, workflowBusiness, applicationBusiness, classBusiness);
         try(Connection connection = connectionSupplier.get()) {
             return pb.listPipelines(studyIdentifier, connection);
         } catch (SQLException | SQLRuntimeException ex) {
@@ -96,7 +99,7 @@ public class PipelineController {
             throw new ApiException("cannot decode pipelineId : " + pipelineId);
         }
         ApiContext apiContext = restApiBusiness.getApiContext(httpServletRequest, true);
-        PipelineBusiness pb = new PipelineBusiness(apiContext, null, workflowBusiness, applicationBusiness, classBusiness);
+        PipelineBusiness pb = new PipelineBusiness(apiContext, env, workflowBusiness, applicationBusiness, classBusiness);
         try(Connection connection = connectionSupplier.get()) {
             pb.checkIfUserCanAccessPipeline(pipelineId, connection);
             return pb.getPipeline(pipelineId, connection);

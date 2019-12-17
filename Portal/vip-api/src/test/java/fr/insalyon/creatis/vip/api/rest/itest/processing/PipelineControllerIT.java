@@ -97,19 +97,20 @@ public class PipelineControllerIT extends BaseVIPSpringIT {
     @Test
     public void shouldReturnPipelines() throws Exception {
         configureApplications(this, baseUser1, Arrays.asList(class1, class2),
-                app1, version42,
+                app1, version42, version43,
                 app2, version01,
-                app3, version42, version01);
+                app3, version01, version42, version43);
         mockMvc.perform(get("/rest/pipelines").with(baseUser1()))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(RestTestUtils.JSON_CONTENT_TYPE_UTF8))
-                .andExpect(jsonPath("$[*]", hasSize(4)))
+                .andExpect(jsonPath("$[*]", hasSize(5)))
                 .andExpect(jsonPath("$[*]", containsInAnyOrder(
                         jsonCorrespondsToPipeline(getPipeline(app1, version42)),
                         jsonCorrespondsToPipeline(getPipeline(app2, version01)),
                         jsonCorrespondsToPipeline(getPipeline(app3, version01)),
-                        jsonCorrespondsToPipeline(getPipeline(app3, version42)))));
+                        jsonCorrespondsToPipeline(getPipeline(app3, version42)),
+                        jsonCorrespondsToPipeline(getPipeline(app3, version43)))));
     }
 
     @Test

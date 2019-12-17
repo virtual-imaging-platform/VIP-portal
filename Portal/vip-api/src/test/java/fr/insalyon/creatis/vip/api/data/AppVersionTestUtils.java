@@ -38,12 +38,14 @@ import fr.insalyon.creatis.vip.application.client.bean.*;
  */
 public class AppVersionTestUtils {
 
-    static final public AppVersion version42;
     static final public AppVersion version01;
+    static final public AppVersion version42;
+    static final public AppVersion version43;
 
     static {
-        version42 = new AppVersion("application (TOCHANGE)", "4.2", "lfn????", "json-lfn????", true);
         version01 = new AppVersion("application (TOCHANGE)", "0.1", "lfn????", "json-lfn???", true);
+        version42 = new AppVersion("application (TOCHANGE)", "4.2", "lfn????", "json-lfn????", true);
+        version43 = new AppVersion("application (TOCHANGE)", "4.2", "lfn????", "json-lfn????", false);
     }
 
     static public AppVersion getVersion(AppVersion base, Application app) {
