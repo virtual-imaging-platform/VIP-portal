@@ -88,7 +88,7 @@ public class ExecutionBusiness {
         this.configurationBusiness = new ConfigurationBusiness();
         this.applicationBusiness = applicationBusiness;
         this.transferPoolBusiness = new TransferPoolBusiness();
-        this.pipelineBusiness = new PipelineBusiness(apiContext, workflowBusiness, applicationBusiness, new ClassBusiness());
+        this.pipelineBusiness = new PipelineBusiness(apiContext, env, workflowBusiness, applicationBusiness, new ClassBusiness());
         this.dataApiBusiness = new DataApiBusiness();
     }
 

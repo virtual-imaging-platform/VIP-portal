@@ -62,4 +62,8 @@ public interface CarminProperties {
     String API_DOWNLOAD_TIMEOUT_IN_SECONDS = "carmin.data.download.timeout";
     String API_DATA_TRANSFERT_MAX_SIZE = "carmin.data.max_size";
     String API_DATA_DOWNLOAD_RELATIVE_PATH = "carmin.data.path.download";
+
+    // CARMIN PROCESSING
+
+    String API_PIPELINE_WHITE_LIST = "carmin.processing.pipelines.whitelist";
 }
