@@ -950,11 +950,11 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
     }
 
     @Override
-    public void addTermsUse(TermsOfUse termsofUse) throws CoreException {
+    public void addTermsUse() throws CoreException {
         trace(logger, "adding new terms of Use.");
         try(Connection connection = PlatformConnection.getInstance().getConnection()) {
             authenticateSystemAdministrator(logger);
-            configurationBusiness.addTermsUse(termsofUse, connection);
+            configurationBusiness.addTermsUse(connection);
         } catch (BusinessException | SQLException ex) {
             throw new CoreException(ex);
         }

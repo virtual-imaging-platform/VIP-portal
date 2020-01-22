@@ -170,7 +170,7 @@ public interface ConfigurationService extends RemoteService {
     List<Publication> parseBibtexText(String text) throws CoreException;
 
     //TermsOfUse
-    void addTermsUse(TermsOfUse termsofUse) throws CoreException;
+    void addTermsUse() throws CoreException;
 
     Timestamp getLastUpdateTermsOfUse() throws CoreException;
 

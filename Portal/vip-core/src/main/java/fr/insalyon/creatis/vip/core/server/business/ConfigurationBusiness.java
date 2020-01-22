@@ -1410,10 +1410,10 @@ public class ConfigurationBusiness {
         }
     }
 
-    public void addTermsUse(TermsOfUse termsOfUse, Connection connection)
+    public void addTermsUse(Connection connection)
         throws BusinessException {
         try {
-            termsOfUse.setDate(getCurrentTimeStamp());
+            TermsOfUse termsOfUse = new TermsOfUse(getCurrentTimeStamp());
             CoreDAOFactory.getDAOFactory().getTermsUseDAO(connection)
                 .add(termsOfUse);
         } catch (DAOException ex) {

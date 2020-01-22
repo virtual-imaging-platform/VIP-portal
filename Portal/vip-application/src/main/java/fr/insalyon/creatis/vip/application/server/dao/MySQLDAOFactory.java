@@ -70,6 +70,7 @@ public class MySQLDAOFactory extends ApplicationDAOFactory {
                 "VIPEngines",
                 "name VARCHAR(255), "
                     + "endpoint VARCHAR(255), "
+                    + "status VARCHAR(255) DEFAULT NULL, "
                     + "PRIMARY KEY (name)");
 
             PlatformConnection.getInstance().createTable(
@@ -104,6 +105,7 @@ public class MySQLDAOFactory extends ApplicationDAOFactory {
                 connection,
                 "VIPApplications",
                 "name VARCHAR(255), "
+                    + "lfn varchar(255) DEFAULT NULL, "
                     + "citation TEXT, "
                     + "owner VARCHAR(255), "
                     + "PRIMARY KEY (name), "
