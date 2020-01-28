@@ -73,6 +73,35 @@ fi
 \rm lcg-log 
 }
 
+function checkBosh {
+  local BOSH_CVMFS_PATH=$1
+  #by default, use CVMFS bosh
+  ${BOSH_CVMFS_PATH}/bosh create foo.sh 
+  if [ $? != 0 ]
+  then
+    info "CVMFS bosh in ${BOSH_CVMFS_PATH} not working, checking for a local version"
+    bosh create foo.sh 
+    if [ $? != 0 ]
+    then
+        info "bosh is not found in PATH or it is does not work fine, searching for another local version"
+        local HOMEBOSH=`find $HOME -name bosh`
+        if [ -z "$HOMEBOSH" ]
+        then
+            info "bosh not found, trying to install it"
+            pip install --trusted-host pypi.org --trusted-host pypi.python.org --trusted-host files.pythonhosted.org boutiques --prefix $PWD || error "pip install boutiques failed"
+            export BOSHEXEC="$PWD/bin/bosh"
+        else
+            info "local bosh found in $HOMEBOSH"
+            export BOSHEXEC=$HOMEBOSH
+        fi
+    else # bosh is found in PATH and works fine
+        info "local bosh found in $PATH"
+        export BOSHEXEC="bosh"
+    fi
+  else # if bosh CVMFS works fine
+    export BOSHEXEC="${BOSH_CVMFS_PATH}/bosh"
+  fi
+}
 #####################
 # Arguments parsing #
 #####################
@@ -113,12 +142,9 @@ JSONPARAMETERS
 TOOLNAME="$tool.getName()"
 JSONFILE="${TOOLNAME}.json"
 
-#check bosh and install it if needed
-bosh create foo.sh || pip install --trusted-host pypi.org --trusted-host pypi.python.org --trusted-host files.pythonhosted.org boutiques --prefix $PWD || error "pip install boutiques failed"
-#we need to export PYTHONPATH and PATH because of the prefix installation
-export PYTHONPATH=$PYTHONPATH:$PWD/lib/python2.7/site-packages
-export PATH=$PWD/bin:$PATH
-bosh exec launch $JSONFILE input_param_file.json -v $PWD/../cache:$PWD/../cache
+# BOSH_CVMFS_PATH is defined by GASW from the settings file
+checkBosh $BOSH_CVMFS_PATH
+$BOSHEXEC exec launch $JSONFILE input_param_file.json -v $PWD/../cache:$PWD/../cache
 
 if [ $? != 0 ]
 then
