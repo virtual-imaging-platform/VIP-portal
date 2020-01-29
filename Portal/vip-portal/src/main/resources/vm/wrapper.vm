@@ -112,17 +112,23 @@ cat << JSONPARAMETERS  > input_param_file.json
 {
 JSONPARAMETERS
 
+count=0
 while [[ $# > 0 ]]
 do
 key="$1"
 case $key in
     #foreach($input in $tool.getInputs())
 --$input.getId().toLowerCase())
-       #if($tool.hasNextInput($input))
-            echo "\"$input.getId()\" : \"$2\"," >> input_param_file.json
-       #else
-            echo "\"$input.getId()\" : \"$2\"" >> input_param_file.json
-       #end
+        if [ "$2" != "No_value_provided" ]
+        then
+            if [ "$count" -gt "0" ]
+            then 
+                echo ",\"$input.getId()\" : \"$2\"" >> input_param_file.json
+            else
+                echo "\"$input.getId()\" : \"$2\"" >> input_param_file.json
+            fi
+        count=$((count+1))
+        fi
     ;;
     #end
 *) # unknown option
