@@ -273,7 +273,7 @@ public class ApplicationData implements ApplicationDAO {
     public Application getApplication(String applicationName) throws DAOException {
         try {
             PreparedStatement ps = connection.prepareStatement("SELECT "
-                                                               + "name, lfn, citation, owner FROM VIPApplications "
+                                                               + "name, citation, owner FROM VIPApplications "
                                                                + "WHERE name = ?");
             ps.setString(1, applicationName);
 
@@ -326,7 +326,7 @@ public class ApplicationData implements ApplicationDAO {
                 String clause = sb.length() > 0 ? " AND (" + sb.toString() + ")" : "";
 
                 PreparedStatement ps = connection.prepareStatement("SELECT DISTINCT "
-                                                                   + "name,owner, citation FROM "
+                                                                   + "name, owner, citation FROM "
                                                                    + "VIPApplications app, VIPApplicationClasses appc "
                                                                    + "WHERE app.name = appc.application " + clause + " "
                                                                    + "ORDER BY name");

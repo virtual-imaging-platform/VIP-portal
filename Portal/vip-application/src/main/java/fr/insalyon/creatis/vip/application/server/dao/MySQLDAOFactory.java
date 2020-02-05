@@ -105,7 +105,6 @@ public class MySQLDAOFactory extends ApplicationDAOFactory {
                 connection,
                 "VIPApplications",
                 "name VARCHAR(255), "
-                    + "lfn varchar(255) DEFAULT NULL, "
                     + "citation TEXT, "
                     + "owner VARCHAR(255), "
                     + "PRIMARY KEY (name), "
