@@ -60,10 +60,9 @@ public class TermsUseData implements TermsUseDAO {
 
         try {
 
-            PreparedStatement ps = connection.prepareStatement("INSERT INTO VIPTermsOfuse(date,text) "
-                    + "VALUES (?, ?)");
+            PreparedStatement ps = connection.prepareStatement("INSERT INTO VIPTermsOfuse(date) "
+                    + "VALUES (?)");
             ps.setTimestamp(1, termsOfUse.getDate());
-            ps.setString(2, termsOfUse.getText());
             ps.execute();
             ps.close();
 

@@ -31,17 +31,16 @@
  */
 package fr.insalyon.creatis.vip.core.server.dao.mysql;
 
-import fr.insalyon.creatis.vip.core.client.bean.Group;
-import fr.insalyon.creatis.vip.core.client.bean.User;
+import fr.insalyon.creatis.vip.core.client.bean.*;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
+import fr.insalyon.creatis.vip.core.client.view.CoreConstants.GROUP_ROLE;
 import fr.insalyon.creatis.vip.core.client.view.user.UserLevel;
 import fr.insalyon.creatis.vip.core.client.view.util.CountryCode;
 import fr.insalyon.creatis.vip.core.server.business.Server;
 import fr.insalyon.creatis.vip.core.server.dao.CoreDAOFactory;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.sql.Statement;
+
+import java.sql.*;
 import java.util.Date;
 import java.util.UUID;
 import javax.naming.Context;
@@ -155,7 +154,7 @@ public class PlatformConnection {
                     }
                 }
 
-                createTable(connection,
+                if (createTable(connection,
                             "VIPUsersGroups",
                             "email VARCHAR(255), "
                             + "groupname VARCHAR(100), "
@@ -164,7 +163,16 @@ public class PlatformConnection {
                             + "FOREIGN KEY (email) REFERENCES VIPUsers(email) "
                             + "ON DELETE CASCADE ON UPDATE CASCADE, "
                             + "FOREIGN KEY (groupname) REFERENCES VIPGroups(groupname) "
-                            + "ON DELETE CASCADE ON UPDATE CASCADE");
+                            + "ON DELETE CASCADE ON UPDATE CASCADE")) {
+                    try {
+                        CoreDAOFactory.getDAOFactory().getUsersGroupsDAO(connection).
+                                add(Server.getInstance().getAdminEmail(),
+                                        CoreConstants.GROUP_SUPPORT,
+                                        GROUP_ROLE.Admin);
+                    } catch (DAOException ex) {
+                        logger.error("Error adding admin user to admin group", ex);
+                    }
+                }
 
                 createTable(connection,
                             "VIPAccounts",
@@ -195,12 +203,19 @@ public class PlatformConnection {
                             + "FOREIGN KEY (VIPAuthor) REFERENCES VIPUsers(email) "
                             + "ON DELETE CASCADE ON UPDATE CASCADE");
 
-                createTable(connection,
+                if (createTable(connection,
                             "VIPTermsOfuse",
                             "idTermsOfuse INT(11) NOT NULL AUTO_INCREMENT, "
                             + "date TIMESTAMP NULL, "
-                            + "text TEXT NULL, "
-                            + "PRIMARY KEY (idTermsOfuse)");
+                            + "PRIMARY KEY (idTermsOfuse)")) {
+                    try {
+                        java.util.Date today = new java.util.Date();
+                        CoreDAOFactory.getDAOFactory().getTermsUseDAO(connection).add(
+                                new TermsOfUse(new java.sql.Timestamp(today.getTime())));
+                    } catch (DAOException ex) {
+                        logger.error("Error creating VIPGroups table", ex);
+                    }
+                }
 
                 firstExecution = false;
             } catch (SQLException e) {

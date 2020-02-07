@@ -41,26 +41,18 @@ import java.sql.Timestamp;
 public class TermsOfUse implements IsSerializable {
 
     private int id;
-    private String text;
     private Timestamp date;
 
     public TermsOfUse() {
     }
 
-    public TermsOfUse(int id, String text, Timestamp date) {
+    public TermsOfUse(int id, Timestamp date) {
         this.id = id;
-        this.text = text;
         this.date = date;
     }
 
-    public TermsOfUse( String text, Timestamp date) {
-        this.text = text;
+    public TermsOfUse(Timestamp date) {
         this.date = date;
-    }
-    
-    
-    public TermsOfUse( String text) {
-        this.text = text;
     }
 
     public int getId() {
@@ -69,14 +61,6 @@ public class TermsOfUse implements IsSerializable {
 
     public void setId(int id) {
         this.id = id;
-    }
-
-    public String getText() {
-        return text;
-    }
-
-    public void setText(String text) {
-        this.text = text;
     }
 
     public Timestamp getDate() {

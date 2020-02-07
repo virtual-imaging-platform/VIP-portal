@@ -154,7 +154,7 @@ public interface ConfigurationServiceAsync {
     void parseBibtexText(String text, AsyncCallback<List<Publication>> asyncCallback);
 
     //TermsOfUse
-    void addTermsUse(TermsOfUse termsofUse, AsyncCallback<Void> asyncCallback);
+    void addTermsUse(AsyncCallback<Void> asyncCallback);
 
     void getLastUpdateTermsOfUse(AsyncCallback<Timestamp> asyncCallback);
 

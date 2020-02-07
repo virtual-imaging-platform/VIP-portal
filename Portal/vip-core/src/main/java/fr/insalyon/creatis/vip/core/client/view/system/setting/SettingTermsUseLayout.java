@@ -66,7 +66,7 @@ public class SettingTermsUseLayout extends AbstractFormLayout {
             @Override
             public void onClick(ClickEvent event) {
 
-                ConfigurationService.Util.getInstance().addTermsUse(new TermsOfUse("the text"), getCallback("add"));
+                ConfigurationService.Util.getInstance().addTermsUse(getCallback("add"));
 
 
             }
