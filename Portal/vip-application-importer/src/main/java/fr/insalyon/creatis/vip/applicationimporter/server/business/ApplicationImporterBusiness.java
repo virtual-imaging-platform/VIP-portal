@@ -129,7 +129,7 @@ public class ApplicationImporterBusiness {
             for (Map.Entry<String, BoutiquesTool> e : btMaps.entrySet()) {
                 e.getValue().setApplicationLFN(
                     DataManagerUtil.parseBaseDir(
-                        user, e.getValue().getApplicationLFN(), connection));
+                        user, e.getValue().getApplicationLFN(), connection).concat("/").concat(bt.getToolVersion().replaceAll("\\s+","")));
             }
 
             // Generate strings
