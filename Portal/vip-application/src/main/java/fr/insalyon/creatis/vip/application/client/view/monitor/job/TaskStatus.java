@@ -46,6 +46,7 @@ public enum TaskStatus {
     ERROR("#d64949", "Failed"),
     STALLED("#1A767F", "Stalled"),
     REPLICATE("#8CC653", "Replicate"),
+    REPLICATED("#8CC653", "Replicated"),
     KILL("#8CC653", "Kill"),
     KILL_REPLICA("#8CC653", "Kill"),
     RESCHEDULE("#8CC653", "Reschedule"),
@@ -82,6 +83,7 @@ public enum TaskStatus {
                 || this == QUEUED
                 || this == RUNNING
                 || this == REPLICATE
+                || this == REPLICATED
                 || this == KILL
                 || this == KILL_REPLICA
                 || this == RESCHEDULE) {

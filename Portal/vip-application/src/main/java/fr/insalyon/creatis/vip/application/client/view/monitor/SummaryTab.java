@@ -271,6 +271,7 @@ public class SummaryTab extends AbstractCornerTab {
                         case RUNNING:
                         case KILL:
                         case REPLICATE:
+                        case REPLICATED:
                         case RESCHEDULE:
                             running++;
                             break;

@@ -100,6 +100,7 @@ public class SimulationBusiness {
                         break;
                     case RUNNING:
                     case REPLICATE:
+                    case REPLICATED:
                     case RESCHEDULE:
                     case KILL:
                     case KILL_REPLICA:
