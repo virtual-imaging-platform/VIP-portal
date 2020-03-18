@@ -270,7 +270,9 @@ public class SummaryTab extends AbstractCornerTab {
                             break;
                         case RUNNING:
                         case KILL:
+                        case KILL_REPLICA:
                         case REPLICATE:
+                        case REPLICATING:
                         case REPLICATED:
                         case RESCHEDULE:
                             running++;
@@ -279,12 +281,21 @@ public class SummaryTab extends AbstractCornerTab {
                             completed++;
                             break;
                         case ERROR:
+                        case UNHOLD_ERROR:
+                        case ERROR_HELD:
+                        case ERROR_FINISHING:
+                        case ERROR_RESUBMITTING:
                             failed++;
                             break;
                         case CANCELLED:
+                        case CANCELLED_REPLICA:
                             cancelled++;
                             break;
                         case STALLED:
+                        case UNHOLD_STALLED:
+                        case STALLED_HELD:
+                        case STALLED_FINISHING:
+                        case STALLED_RESUBMITTING:
                             stalled++;
                             break;
                     }

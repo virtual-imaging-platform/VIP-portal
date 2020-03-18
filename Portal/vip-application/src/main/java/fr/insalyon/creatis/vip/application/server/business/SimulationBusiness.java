@@ -76,9 +76,39 @@ public class SimulationBusiness {
             for (Task task : ApplicationDAOFactory.getDAOFactory().getSimulationDAO(simulationID).getTasks()) {
 
                 switch (task.getStatus()) {
+                    case QUEUED:
+                    case SUCCESSFULLY_SUBMITTED:
+                        if (jobsMap.containsKey(task.getJobID())) {
+                            Job job = jobsMap.get(task.getJobID());
+                            if (job.getStatus() == JobStatus.Failed || job.getStatus() == JobStatus.Held) {
+                                job.setStatus(JobStatus.Queued_with_errors);
+                            }
+                        } else {
+                            jobsMap.put(task.getJobID(), new Job(task.getJobID(), task.getCommand(), JobStatus.Queued));
+                        }
+                        break;
+                    case RUNNING:
+                    case REPLICATE:
+                    case REPLICATING:
+                    case REPLICATED:
+                    case RESCHEDULE:
+                    case KILL:
+                    case KILL_REPLICA:
+                        if (jobsMap.containsKey(task.getJobID())) {
+                            Job job = jobsMap.get(task.getJobID());
+                            if (job.getStatus() == JobStatus.Queued) {
+                                job.setStatus(JobStatus.Running);
+                            } else if (job.getStatus() == JobStatus.Queued_with_errors
+                                    || job.getStatus() == JobStatus.Failed
+                                    || job.getStatus() == JobStatus.Held) {
+                                job.setStatus(JobStatus.Running_with_erros);
+                            }
+                        } else {
+                            jobsMap.put(task.getJobID(), new Job(task.getJobID(), task.getCommand(), JobStatus.Running));
+                        }
+                        break;
                     case COMPLETED:
                     case CANCELLED:
-                    case CANCELLED_REPLICA:
                         if (jobsMap.containsKey(task.getJobID())) {
                             jobsMap.get(task.getJobID()).setStatus(JobStatus.Completed);
                         } else {
@@ -86,7 +116,13 @@ public class SimulationBusiness {
                         }
                         break;
                     case ERROR:
+                    case ERROR_FINISHING:
+                    case ERROR_RESUBMITTING:
+                    case STALLED_FINISHING:
+                    case STALLED_RESUBMITTING:
                     case STALLED:
+                    case UNHOLD_ERROR:
+                    case UNHOLD_STALLED:
                         if (jobsMap.containsKey(task.getJobID())) {
                             Job job = jobsMap.get(task.getJobID());
                             if (job.getStatus() == JobStatus.Queued) {
@@ -98,43 +134,21 @@ public class SimulationBusiness {
                             jobsMap.put(task.getJobID(), new Job(task.getJobID(), task.getCommand(), JobStatus.Failed));
                         }
                         break;
-                    case RUNNING:
-                    case REPLICATE:
-                    case REPLICATED:
-                    case RESCHEDULE:
-                    case KILL:
-                    case KILL_REPLICA:
-                        if (jobsMap.containsKey(task.getJobID())) {
-                            Job job = jobsMap.get(task.getJobID());
-                            if (job.getStatus() == JobStatus.Queued) {
-                                job.setStatus(JobStatus.Running);
-                            } else if (job.getStatus() == JobStatus.Queued_with_errors
-                                    || job.getStatus() == JobStatus.Failed) {
-                                job.setStatus(JobStatus.Running_with_erros);
-                            }
-                        } else {
-                            jobsMap.put(task.getJobID(), new Job(task.getJobID(), task.getCommand(), JobStatus.Running));
-                        }
-                        break;
-                    case QUEUED:
-                    case SUCCESSFULLY_SUBMITTED:
-                        if (jobsMap.containsKey(task.getJobID())) {
-                            Job job = jobsMap.get(task.getJobID());
-                            if (job.getStatus() == JobStatus.Failed) {
-                                job.setStatus(JobStatus.Queued_with_errors);
-                            }
-                        } else {
-                            jobsMap.put(task.getJobID(), new Job(task.getJobID(), task.getCommand(), JobStatus.Queued));
-                        }
-                        break;
                     case ERROR_HELD:
                     case STALLED_HELD:
                         if (jobsMap.containsKey(task.getJobID())) {
                             Job job = jobsMap.get(task.getJobID());
-                            job.setStatus(JobStatus.Held);
+                            if (job.getStatus() == JobStatus.Failed) {
+                                job.setStatus(JobStatus.Held);
+                            }
                         } else {
                             jobsMap.put(task.getJobID(), new Job(task.getJobID(), task.getCommand(), JobStatus.Held));
                         }
+                        break;
+                    case CANCELLED_REPLICA:
+                        // ignore, there should be at least on another task
+                        // for the same invocation
+                        break;
                 }
             }
 
