@@ -144,6 +144,7 @@ public class Server {
         return instance;
     }
 
+    @SuppressWarnings("unchecked")
     private Server() {
 
         try {

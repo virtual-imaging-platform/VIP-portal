@@ -37,12 +37,12 @@ import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants.GROUP_ROLE;
 import fr.insalyon.creatis.vip.core.client.view.CoreException;
-import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
-import java.util.Map;
+import org.apache.log4j.Logger;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import org.apache.log4j.Logger;
+import java.util.Map;
 
 /**
  *
@@ -68,19 +68,10 @@ public abstract class AbstractRemoteServiceServlet extends RemoteServiceServlet 
         }
     }
 
-    /**
-     * 
-     * @return 
-     */
     protected HttpSession getSession() {
         return this.getThreadLocalRequest().getSession();
     }
 
-    /**
-     * 
-     * @return
-     * @throws CoreException 
-     */
     public User getSessionUser() throws CoreException {
 
         User user = (User) getSession().getAttribute(CoreConstants.SESSION_USER);
@@ -90,13 +81,10 @@ public abstract class AbstractRemoteServiceServlet extends RemoteServiceServlet 
         throw new CoreException("User not logged in.");
     }
 
-    /**
-     * 
-     * @return
-     * @throws CoreException 
-     */
+
     protected Map<Group, GROUP_ROLE> getSessionUserGroups() throws CoreException {
 
+        @SuppressWarnings("unchecked")
         Map<Group, GROUP_ROLE> groups = (Map<Group, GROUP_ROLE>) getSession().getAttribute(CoreConstants.SESSION_GROUPS);
         if (groups != null) {
             return groups;
@@ -104,11 +92,6 @@ public abstract class AbstractRemoteServiceServlet extends RemoteServiceServlet 
         throw new CoreException("User has no groups defined.");
     }
 
-    /**
-     * 
-     * @param logger
-     * @throws CoreException 
-     */
     protected void authenticateSystemAdministrator(Logger logger) throws CoreException {
 
         User user = getSessionUser();
@@ -118,12 +101,6 @@ public abstract class AbstractRemoteServiceServlet extends RemoteServiceServlet 
         }
     }
 
-    /**
-     * 
-     * @param logger
-     * @throws CoreException
-     * @throws BusinessException 
-     */
     protected void authenticateGroupAdministrator(Logger logger) throws CoreException {
 
         User user = getSessionUser();
@@ -141,12 +118,6 @@ public abstract class AbstractRemoteServiceServlet extends RemoteServiceServlet 
         return getSessionUser().isGroupAdmin();
     }
 
-    /**
-     * 
-     * @param logger
-     * @param message
-     * @throws CoreException 
-     */
     protected void trace(Logger logger, String message) throws CoreException {
 
         try {

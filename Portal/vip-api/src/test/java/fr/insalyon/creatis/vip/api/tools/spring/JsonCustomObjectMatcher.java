@@ -33,11 +33,13 @@ package fr.insalyon.creatis.vip.api.tools.spring;
 
 import org.hamcrest.*;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.function.Function;
 
-import static org.bouncycastle.asn1.x500.style.RFC4519Style.o;
 import static org.hamcrest.Matchers.*;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.springframework.util.ClassUtils.isPrimitiveOrWrapper;

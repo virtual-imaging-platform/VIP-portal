@@ -32,21 +32,25 @@
 package fr.insalyon.creatis.vip.core.server.business;
 
 import fr.insalyon.creatis.devtools.MD5;
-import fr.insalyon.creatis.grida.client.*;
+import fr.insalyon.creatis.grida.client.GRIDAClient;
+import fr.insalyon.creatis.grida.client.GRIDAClientException;
+import fr.insalyon.creatis.grida.client.GRIDAPoolClient;
 import fr.insalyon.creatis.vip.core.client.bean.*;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants.GROUP_ROLE;
 import fr.insalyon.creatis.vip.core.client.view.user.UserLevel;
 import fr.insalyon.creatis.vip.core.client.view.util.CountryCode;
 import fr.insalyon.creatis.vip.core.server.business.proxy.ProxyClient;
-import fr.insalyon.creatis.vip.core.server.dao.*;
+import fr.insalyon.creatis.vip.core.server.dao.CoreDAOFactory;
+import fr.insalyon.creatis.vip.core.server.dao.DAOException;
+import fr.insalyon.creatis.vip.core.server.dao.UserDAO;
 import org.apache.log4j.Logger;
-import org.jasig.cas.client.validation.*;
 
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.net.URL;
-import java.security.*;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.sql.Connection;
 import java.sql.Timestamp;
 import java.text.Normalizer;
@@ -424,39 +428,6 @@ public class ConfigurationBusiness {
                 cc, getCurrentTimeStamp());
 
         return u;
-    }
-
-    private User getCASUser(String ticket, URL serviceURL) {
-        //  String userId = null;
-        if (ticket != null) {
-
-            Saml11TicketValidator sv = new Saml11TicketValidator(Server.getInstance().getCasURL());
-
-            Assertion a;
-            try {
-                a = sv.validate(ticket, serviceURL.toString());
-            } catch (TicketValidationException ex) {
-                return null;
-            }
-            String email = (a.getPrincipal().getAttributes().get("USER_EMAIL_ADDRESS")).toString();
-            String[] n = (a.getPrincipal().getAttributes().get("USER_FULL_NAME")).toString().split(" ");
-            String first = "";
-            String last = "";
-            if (n.length >= 2) {
-                first = n[0];
-                for (int i = 1; i < n.length; i++) {
-                    if (i > 1) {
-                        last += " ";
-                    }
-                    last += n[i];
-                }
-            } else {
-                last = n[0];
-            }
-
-            return getNewUser(email, first, last);
-        }
-        return null;
     }
 
     /**
@@ -926,13 +897,6 @@ public class ConfigurationBusiness {
         }
     }
 
-    /**
-     *
-     * @param oldData
-     * @param user
-     * @return
-     * @throws BusinessException
-     */
     public User updateUser(User user, Connection connection)
         throws BusinessException {
         try {
