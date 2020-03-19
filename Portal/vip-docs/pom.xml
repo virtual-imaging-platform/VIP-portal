@@ -40,7 +40,6 @@ knowledge of the CeCILL-B license and that you accept its terms.
         <version>1.27</version>
         <relativePath>..</relativePath>
     </parent>
-    <groupId>fr.insalyon.creatis</groupId>
     <artifactId>vip-docs</artifactId>
     <packaging>jar</packaging>
     <version>${vip.docs.version}</version>
@@ -63,17 +62,6 @@ knowledge of the CeCILL-B license and that you accept its terms.
 
     </dependencies>
     <build>
-        <finalName>vip-docs</finalName>
-
-        <resources>
-            <resource>
-                <directory>src/main/java</directory>
-                <includes>
-                    <include>**/*.xml</include>
-                </includes>
-            </resource>
-        </resources>
-
         <plugins>
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>

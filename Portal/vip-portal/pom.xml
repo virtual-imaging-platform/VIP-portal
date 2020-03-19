@@ -41,16 +41,11 @@ knowledge of the CeCILL-B license and that you accept its terms.
         <version>1.27</version>
         <relativePath>..</relativePath>
     </parent>
-    <groupId>fr.insalyon.creatis</groupId>
     <name>VIP-Portal</name>
     <artifactId>vip-portal</artifactId>
     <packaging>war</packaging>
     <version>${vip.portal.version}</version>
 
-    <properties>
-        <runTarget>index.html</runTarget>
-        <netbeans.hint.deploy.server>Tomcat</netbeans.hint.deploy.server>
-    </properties>
     <url>http://vip.creatis.insa-lyon.fr</url>
     <dependencies>
 
@@ -200,7 +195,7 @@ knowledge of the CeCILL-B license and that you accept its terms.
             <plugin>
               <groupId>net.ltgt.gwt.maven</groupId>
               <artifactId>gwt-maven-plugin</artifactId>
-              <version>1.0-rc-10</version>
+              <version>1.0.0</version>
               <extensions>true</extensions>
               <executions>
                 <execution>
@@ -228,31 +223,5 @@ knowledge of the CeCILL-B license and that you accept its terms.
             </plugin>
         </plugins>
     </build>
-
-    <pluginRepositories>
-
-        <pluginRepository>
-            <id>apache</id>
-            <name>Apache Repository</name>
-            <url>http://people.apache.org/repo/m2-ibiblio-rsync-repository</url>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-            <releases>
-            </releases>
-        </pluginRepository>
-
-        <pluginRepository>
-            <id>apache.snapshots</id>
-            <name>Apache Snapshots Repository</name>
-            <url>http://people.apache.org/repo/m2-snapshot-repository</url>
-            <snapshots>
-            </snapshots>
-            <releases>
-                <enabled>false</enabled>
-            </releases>
-        </pluginRepository>
-
-    </pluginRepositories>
 
 </project>

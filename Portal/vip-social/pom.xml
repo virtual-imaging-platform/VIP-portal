@@ -42,7 +42,6 @@ knowledge of the CeCILL-B license and that you accept its terms.
         <relativePath>..</relativePath>
     </parent>
 
-    <groupId>fr.insalyon.creatis</groupId>
     <artifactId>vip-social</artifactId>
     <packaging>jar</packaging>
     <version>${vip.social.version}</version>
@@ -67,20 +66,6 @@ knowledge of the CeCILL-B license and that you accept its terms.
     </dependencies>
 
     <build>
-        <resources>
-            <resource>
-                <directory>src/main/java</directory>
-                <includes>
-                    <include>**/*.xml</include>
-                    <include>**/*.txt</include>
-                    <include>**/*.png</include>
-                </includes>
-            </resource>
-            <resource>
-                <directory>src/resources</directory>
-            </resource>
-        </resources>
-
         <plugins>
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>

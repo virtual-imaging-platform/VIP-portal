@@ -42,7 +42,6 @@ knowledge of the CeCILL-B license and that you accept its terms.
         <relativePath>..</relativePath>
     </parent>
 
-    <groupId>fr.insalyon.creatis</groupId>
     <artifactId>vip-application</artifactId>
     <packaging>jar</packaging>
     <version>${vip.application.version}</version>
@@ -175,16 +174,6 @@ knowledge of the CeCILL-B license and that you accept its terms.
     </dependencies>
 
     <build>
-        <finalName>vip-application</finalName>
-        <resources>
-            <resource>
-                <directory>src/main/java</directory>
-                <includes>
-                    <include>**/*.xml</include>
-                </includes>
-            </resource>
-        </resources>
-
         <plugins>
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
@@ -201,18 +190,5 @@ knowledge of the CeCILL-B license and that you accept its terms.
           </plugin>
         </plugins>
     </build>
-
-    <repositories>
-        <repository>
-            <id>creatis-releases</id>
-            <name>Creatis Releases Repository</name>
-            <url>http://vip.creatis.insa-lyon.fr:9007/nexus/content/repositories/releases</url>
-        </repository>
-        <repository>
-            <id>creatis-thirdparty</id>
-            <name>Creatis Third-party Repository</name>
-            <url>http://vip.creatis.insa-lyon.fr:9007/nexus/content/repositories/thirdparty</url>
-        </repository>
-    </repositories>
 
 </project>

@@ -88,6 +88,18 @@ knowledge of the CeCILL-B license and that you accept its terms.
         <module>vip-visualization</module>
     </modules>
 
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>com.google.gwt</groupId>
+                <artifactId>gwt</artifactId>
+                <version>2.8.2</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
     <repositories>
 
         <repository>
@@ -111,9 +123,9 @@ knowledge of the CeCILL-B license and that you accept its terms.
     </repositories>
 
     <distributionManagement>
-
         <repository>
             <id>creatis-releases</id>
+            <name>Internal Releases</name>
             <url>http://vip.creatis.insa-lyon.fr:9007/nexus/content/repositories/releases</url>
         </repository>
 

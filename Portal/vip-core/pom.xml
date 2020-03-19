@@ -40,23 +40,10 @@ knowledge of the CeCILL-B license and that you accept its terms.
         <version>1.27</version>
         <relativePath>..</relativePath>
     </parent>
-    <groupId>fr.insalyon.creatis</groupId>
     <artifactId>vip-core</artifactId>
     <packaging>jar</packaging>
     <version>${vip.core.version}</version>
     <name>VIP-Core</name>
-
-    <dependencyManagement>
-      <dependencies>
-        <dependency>
-          <groupId>com.google.gwt</groupId>
-          <artifactId>gwt</artifactId>
-          <version>2.8.2</version>
-          <type>pom</type>
-          <scope>import</scope>
-        </dependency>
-      </dependencies>
-    </dependencyManagement>
 
     <dependencies>
         <dependency>
@@ -236,24 +223,10 @@ knowledge of the CeCILL-B license and that you accept its terms.
     </dependencies>
 
     <build>
-        <finalName>vip-core</finalName>
-        <resources>
-            <resource>
-                <directory>src/main/java</directory>
-                <includes>
-                    <include>**/*.xml</include>
-                </includes>
-            </resource>
-            <resource>
-                <directory>src/main/resources</directory>
-            </resource>
-        </resources>
-
         <plugins>
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-source-plugin</artifactId>
-            <version>3.1.0</version>
             <executions>
               <execution>
                 <id>attach-sources</id>
@@ -265,13 +238,4 @@ knowledge of the CeCILL-B license and that you accept its terms.
           </plugin>
         </plugins>
     </build>
-
-    <repositories>
-        <repository>
-            <id>JBoss</id>
-            <name>JBoss Repsitory</name>
-            <layout>default</layout>
-            <url>https://repository.jboss.org/nexus/content/groups/public</url>
-        </repository>
-    </repositories>
 </project>

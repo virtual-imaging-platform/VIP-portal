@@ -41,7 +41,6 @@ knowledge of the CeCILL-B license and that you accept its terms.
     <version>1.27</version>
   </parent>
 
-  <groupId>fr.insalyon.creatis</groupId>
   <artifactId>vip-visualization</artifactId>
   <packaging>jar</packaging>
   <version>${vip.visualization.version}</version>

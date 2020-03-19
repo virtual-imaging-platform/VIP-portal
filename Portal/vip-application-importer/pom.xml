@@ -40,31 +40,13 @@ knowledge of the CeCILL-B license and that you accept its terms.
         <version>1.27</version>
     </parent>
 
-    <groupId>fr.insalyon.creatis</groupId>
     <artifactId>vip-application-importer</artifactId>
     <version>${vip.application-importer.version}</version>
     <packaging>jar</packaging>
 
     <name>VIP-ApplicationImporter</name>
 
-    <repositories>
-        <repository>
-            <id>netbeans</id>
-            <name>NetBeans</name>
-            <url>http://bits.netbeans.org/maven2/</url>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-    </repositories>
-
     <dependencies>
-        <dependency>
-            <groupId>org.netbeans.api</groupId>
-            <artifactId>org-netbeans-api-annotations-common</artifactId>
-            <version>RELEASE80-BETA</version>
-        </dependency>
-
         <dependency>
             <groupId>fr.insalyon.creatis</groupId>
             <artifactId>vip-core</artifactId>
@@ -110,17 +92,6 @@ knowledge of the CeCILL-B license and that you accept its terms.
     </dependencies>
 
     <build>
-        <finalName>vip-application-importer</finalName>
-
-        <resources>
-            <resource>
-                <directory>src/main/java</directory>
-                <includes>
-                    <include>**/*.xml</include>
-                </includes>
-            </resource>
-        </resources>
-
         <plugins>
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
