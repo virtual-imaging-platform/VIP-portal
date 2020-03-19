@@ -201,7 +201,8 @@ knowledge of the CeCILL-B license and that you accept its terms.
                 <execution>
                   <id>compile-to-javascript</id>
                   <configuration>
-                    <extraJvmArgs>-Xms512M -Xmx1g</extraJvmArgs>
+                      <jvmArgs>-Xms512m</jvmArgs>
+                      <jvmArgs>-Xmx1024m</jvmArgs>
                   </configuration>
                   <goals>
                     <goal>compile</goal>
