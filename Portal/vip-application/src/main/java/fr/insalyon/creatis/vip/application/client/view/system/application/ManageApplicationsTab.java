@@ -31,10 +31,10 @@
  */
 package fr.insalyon.creatis.vip.application.client.view.system.application;
 
-import com.smartgwt.client.widgets.layout.*;
+import com.smartgwt.client.widgets.layout.HLayout;
+import com.smartgwt.client.widgets.layout.VLayout;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
 import fr.insalyon.creatis.vip.core.client.view.common.AbstractManageTab;
-import jena.version;
 
 /**
  *

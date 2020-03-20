@@ -91,9 +91,9 @@ public class WorkflowExecutionBusiness {
             String workflowID = engine.getSimulationId(launchID);
 
             return new Workflow(workflowID, user.getFullName(),
-                    engine.getMode().equalsIgnoreCase("pool") ? WorkflowStatus.Queued : WorkflowStatus.Running,
+                    WorkflowStatus.Running,
                     new Date(), null, simulationName, applicationName, applicationVersion, applicationClass,
-                    engine.getMode().equalsIgnoreCase("pool") ? "ShiwaPool" : ((WebServiceEngine)engine).getAddressWS());
+                    ((WebServiceEngine)engine).getAddressWS());
 
         } catch (javax.xml.rpc.ServiceException | java.rmi.RemoteException ex) {
             logger.error(ex);

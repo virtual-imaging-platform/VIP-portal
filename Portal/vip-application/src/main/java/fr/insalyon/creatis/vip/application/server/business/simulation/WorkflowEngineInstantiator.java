@@ -31,18 +31,13 @@
  */
 package fr.insalyon.creatis.vip.application.server.business.simulation;
 
-import fr.insalyon.creatis.vip.application.client.bean.Engine;
 import fr.insalyon.creatis.vip.application.client.view.monitor.SimulationStatus;
 import fr.insalyon.creatis.vip.application.server.business.util.FileUtil;
-import fr.insalyon.creatis.vip.application.server.dao.ApplicationDAOFactory;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
-import fr.insalyon.creatis.vip.core.server.business.Server;
-import fr.insalyon.creatis.vip.core.server.dao.DAOException;
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 import org.apache.log4j.Logger;
-import org.shiwa.desktop.data.description.workflow.SHIWAProperty;
+
+import java.io.File;
+import java.util.List;
 
 /**
  *
@@ -53,57 +48,26 @@ public abstract class WorkflowEngineInstantiator {
 
     private static Logger logger = Logger.getLogger(WorkflowEngineInstantiator.class);
 
-    public static WorkflowEngineInstantiator create(String engineEndpoint) throws BusinessException {
+    public static WorkflowEngineInstantiator create(String engineEndpoint) {
 
-        WorkflowEngineInstantiator engine = null;
-        if (Server.getInstance().getWorflowsExecMode().equalsIgnoreCase("pool")) {
-
-            try {
-                // setup the execution environment
-                ShiwaPoolEngineEnvironment.getInstance();
-                engine = new ShiwaPoolEngine(ShiwaPoolXMPPConnection.getInstance());
-
-            } catch (fr.insalyon.creatis.vip.core.server.business.BusinessException ex) {
-                logger.error("Error creating a workflow engine", ex);
-            } catch (org.jivesoftware.smack.XMPPException ex) {
-                logger.error("Error creating a workflow engine", ex);
-            }
-
-            List<SHIWAProperty> settings = new ArrayList<SHIWAProperty>();
-            // settings.add(new SHIWAProperty("DN", dn));
-            settings.add(new SHIWAProperty("GRID", "DIRAC"));
-            settings.add(new SHIWAProperty("SE", "ccsrm02.in2p3.fr"));
-            settings.add(new SHIWAProperty("TIMEOUT", "100000"));
-            // settings.add(new SHIWAProperty("RETRYCOUNT", "3"));
-            // settings.add(new SHIWAProperty("MULTIJOB", "1"));
-            ((ShiwaPoolEngine) engine).setSettings(settings);
-
-        } else {
-
-            engine = new WebServiceEngine();
-            ((WebServiceEngine) engine).setAddressWS(engineEndpoint);
-            String settings = "GRID=DIRAC\n"
-                    + "SE=ccsrm02.in2p3.fr\n"
-                    + "TIMEOUT=100000\n"
-                    + "RETRYCOUNT=3\n"
-                    + "MULTIJOB=1";
-            ((WebServiceEngine) engine).setSettings(settings);
-        }
-
+        WebServiceEngine engine = new WebServiceEngine();
+        engine.setAddressWS(engineEndpoint);
+        String settings = "GRID=DIRAC\n"
+                + "SE=ccsrm02.in2p3.fr\n"
+                + "TIMEOUT=100000\n"
+                + "RETRYCOUNT=3\n"
+                + "MULTIJOB=1";
+        engine.setSettings(settings);
         return engine;
     }
     // content of the xml file that describe the workflow (read on a file) */
     protected String workflow;
     // content of the input for the workflow (generated depending of the user)*/
     protected String input;
-    // execution mode WS or Pool
-    protected String mode;
 
     public String getSimulationId(String launchID) {
 
-        return mode.equalsIgnoreCase("pool")
-                ? launchID // SHIWA Pool ID
-                : launchID.substring(launchID.lastIndexOf("/") + 1, launchID.lastIndexOf("."));
+        return launchID.substring(launchID.lastIndexOf("/") + 1, launchID.lastIndexOf("."));
     }
 
     /**
@@ -149,10 +113,6 @@ public abstract class WorkflowEngineInstantiator {
     public void setInput(List<ParameterSweep> parameters) {
 
         this.input = WorkflowEngineInstantiator.setParametersAsXMLInput(parameters);
-    }
-
-    public String getMode() {
-        return mode;
     }
 
     private static String setParametersAsXMLInput(List<ParameterSweep> parameters) {

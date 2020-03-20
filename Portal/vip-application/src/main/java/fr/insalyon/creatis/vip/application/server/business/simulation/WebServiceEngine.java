@@ -74,7 +74,6 @@ public class WebServiceEngine extends WorkflowEngineInstantiator {
 
     WebServiceEngine(File workflow, List<ParameterSweep> parameters) {
         super(workflow, parameters);
-        mode = "ws";
     }
 
     /**

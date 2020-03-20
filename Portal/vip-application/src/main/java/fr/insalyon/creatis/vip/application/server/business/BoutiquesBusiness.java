@@ -33,15 +33,18 @@ package fr.insalyon.creatis.vip.application.server.business;
 
 import fr.insalyon.creatis.vip.application.client.bean.AppVersion;
 import fr.insalyon.creatis.vip.core.client.bean.User;
-import fr.insalyon.creatis.vip.core.server.business.*;
+import fr.insalyon.creatis.vip.core.server.business.BusinessException;
+import fr.insalyon.creatis.vip.core.server.business.Server;
 import fr.insalyon.creatis.vip.datamanager.server.business.DataManagerBusiness;
 import org.apache.log4j.Logger;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.Closeable;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.sql.Connection;
-import java.util.*;
-
-import static com.hp.hpl.jena.vocabulary.OWLResults.output;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by abonnet on 2/21/19.
