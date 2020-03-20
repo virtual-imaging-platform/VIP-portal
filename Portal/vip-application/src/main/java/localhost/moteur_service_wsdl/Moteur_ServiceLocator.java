@@ -132,11 +132,11 @@ public class Moteur_ServiceLocator extends org.apache.axis.client.Service implem
     public javax.xml.namespace.QName getServiceName() {
         return new javax.xml.namespace.QName("moteur_service/moteur_service.wsdl", "moteur_service");
     }
-    private java.util.HashSet ports = null;
+    private java.util.HashSet<javax.xml.namespace.QName> ports = null;
 
     public java.util.Iterator getPorts() {
         if (ports == null) {
-            ports = new java.util.HashSet();
+            ports = new java.util.HashSet<>();
             ports.add(new javax.xml.namespace.QName("moteur_service/moteur_service.wsdl", "moteur_service"));
         }
         return ports.iterator();

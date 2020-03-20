@@ -248,14 +248,14 @@ public class SimulationStatsData implements SimulationStatsDAO {
 
     @Override
     public List<String> getClasses(List<String> workflowsId) throws WorkflowsDBDAOException {
-        List<String> result = new ArrayList<String>();
         try {
             Session session = sessionFactory.openSession();
             session.beginTransaction();
             Criteria criteria = session.createCriteria(Workflow.class);
             criteria.add(Restrictions.in("id", workflowsId));
             criteria.setProjection(Projections.distinct(Projections.property("applicationClass")));
-            result = (List<String>) criteria.list();
+            @SuppressWarnings("unchecked")
+            List<String> result = (List<String>) criteria.list();
             session.getTransaction().commit();
             session.close();
             return result;

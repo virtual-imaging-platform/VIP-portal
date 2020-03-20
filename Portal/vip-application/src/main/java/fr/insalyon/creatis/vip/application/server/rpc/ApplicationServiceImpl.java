@@ -272,6 +272,7 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
         }
     }
 
+    @SuppressWarnings("unchecked")
     public List<String>[] getApplicationsAndUsers(List<String> reservedClasses) throws ApplicationException {
         try(Connection connection = PlatformConnection.getInstance().getConnection()) {
             User user = getSessionUser();
