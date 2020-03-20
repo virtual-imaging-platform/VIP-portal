@@ -38,12 +38,10 @@ import fr.insalyon.creatis.vip.applicationimporter.server.business.ApplicationIm
 import fr.insalyon.creatis.vip.core.client.view.CoreException;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.dao.mysql.PlatformConnection;
+
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.HashMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import org.json.JSONException;
 
 public class ApplicationImporterServiceImpl extends fr.insalyon.creatis.vip.core.server.rpc.AbstractRemoteServiceServlet
         implements ApplicationImporterService {
@@ -72,8 +70,6 @@ public class ApplicationImporterServiceImpl extends fr.insalyon.creatis.vip.core
         } catch (BusinessException | CoreException | SQLException ex) {
             logger.error(ex);
             throw new ApplicationImporterException(ex);
-        } catch (JSONException ex) {
-            Logger.getLogger(ApplicationImporterServiceImpl.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 }

@@ -31,14 +31,12 @@
  */
 package fr.insalyon.creatis.vip.applicationimporter.server.business;
 
-import fr.insalyon.creatis.vip.application.server.business.*;
-import org.json.JSONObject;
 import fr.insalyon.creatis.grida.client.GRIDAClient;
 import fr.insalyon.creatis.grida.client.GRIDAClientException;
 import fr.insalyon.creatis.vip.application.client.bean.AppVersion;
 import fr.insalyon.creatis.vip.application.client.bean.Application;
-import fr.insalyon.creatis.vip.applicationimporter.client.ApplicationImporterException;
-import fr.insalyon.creatis.vip.applicationimporter.client.JSONUtil;
+import fr.insalyon.creatis.vip.application.server.business.ApplicationBusiness;
+import fr.insalyon.creatis.vip.application.server.business.BoutiquesBusiness;
 import fr.insalyon.creatis.vip.applicationimporter.client.bean.BoutiquesTool;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
@@ -46,18 +44,10 @@ import fr.insalyon.creatis.vip.core.server.business.CoreUtil;
 import fr.insalyon.creatis.vip.core.server.business.Server;
 import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerException;
 import fr.insalyon.creatis.vip.datamanager.server.DataManagerUtil;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
+
+import java.io.*;
 import java.sql.Connection;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Scanner;
-import org.json.JSONException;
+import java.util.*;
 
 /**
  *
@@ -103,7 +93,7 @@ public class ApplicationImporterBusiness {
     }
 
     public void createApplication(BoutiquesTool bt, String type, String tag, HashMap<String, BoutiquesTool> bts, boolean isRunOnGrid, boolean overwriteApplicationVersion, User user, boolean challenge, Connection connection)
-        throws BusinessException, ApplicationImporterException, JSONException {
+        throws BusinessException {
 
         try {
 
@@ -135,10 +125,10 @@ public class ApplicationImporterBusiness {
             // Generate strings
             // gwendia String is unique: one entry point for the workflow
             String gwendiaString = VelocityUtils.getInstance().createDocument(btMaps, gwendiaTemplate);
-            HashMap<String, String> gaswString = new HashMap();
-            HashMap<String, String> wrapperString = new HashMap();
-            HashMap<String, String> gaswFileName = new HashMap();
-            HashMap<String, String> wrapperFileName = new HashMap();
+            HashMap<String, String> gaswString = new HashMap<>();
+            HashMap<String, String> wrapperString = new HashMap<>();
+            HashMap<String, String> gaswFileName = new HashMap<>();
+            HashMap<String, String> wrapperFileName = new HashMap<>();
             // for each component we have to generate GASW and script files
             for (Map.Entry<String, BoutiquesTool> e : btMaps.entrySet()) {
                 gaswString.put(e.getKey(), VelocityUtils.getInstance().createDocument(tag, e.getValue(), isRunOnGrid, gaswTemplate));

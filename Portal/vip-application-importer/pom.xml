@@ -50,44 +50,20 @@ knowledge of the CeCILL-B license and that you accept its terms.
         <dependency>
             <groupId>fr.insalyon.creatis</groupId>
             <artifactId>vip-core</artifactId>
-            <version>${vip.core.version}</version>
-            <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>fr.insalyon.creatis</groupId>
             <artifactId>vip-datamanager</artifactId>
-            <version>${vip.datamanager.version}</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>fr.insalyon.creatis</groupId>
             <artifactId>vip-application</artifactId>
-            <version>${vip.application.version}</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>org.jsoup</groupId>
-            <artifactId>jsoup</artifactId>
-            <version>1.7.2</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.codehaus.plexus</groupId>
-            <artifactId>plexus-archiver</artifactId>
-            <version>2.4.4</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.codesnippets4all</groupId>
-            <artifactId>quick-json</artifactId>
-            <version>1.0.4</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.json</groupId>
-            <artifactId>json</artifactId>
-            <version>20090211</version>
+          <groupId>org.apache.commons</groupId>
+          <artifactId>commons-compress</artifactId>
+          <version>1.5</version>
         </dependency>
 
         <dependency>
