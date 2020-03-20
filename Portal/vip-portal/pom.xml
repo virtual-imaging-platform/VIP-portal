@@ -201,6 +201,7 @@ knowledge of the CeCILL-B license and that you accept its terms.
                 <execution>
                   <id>compile-to-javascript</id>
                   <configuration>
+                      <moduleName>fr.insalyon.creatis.vip.portal.Main</moduleName>
                       <jvmArgs>-Xms512m</jvmArgs>
                       <jvmArgs>-Xmx1024m</jvmArgs>
                   </configuration>
@@ -209,10 +210,6 @@ knowledge of the CeCILL-B license and that you accept its terms.
                   </goals>
                 </execution>
               </executions>
-              <configuration>
-                <moduleName>fr.insalyon.creatis.vip.portal.Main</moduleName>
-                <skipModule>true</skipModule>
-              </configuration>
             </plugin>
 
             <plugin>
