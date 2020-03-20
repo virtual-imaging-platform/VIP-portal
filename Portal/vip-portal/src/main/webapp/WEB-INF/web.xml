@@ -84,14 +84,6 @@ knowledge of the CeCILL-B license and that you accept its terms.
         <servlet-name>FileDownloadService</servlet-name>
         <url-pattern>/fr.insalyon.creatis.vip.portal.Main/filedownloadservice</url-pattern>
     </servlet-mapping>
-    <servlet>
-        <servlet-name>UploadFilesService</servlet-name>
-        <servlet-class>fr.insalyon.creatis.vip.datamanager.server.rpc.UploadFilesServiceImpl</servlet-class>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>UploadFilesService</servlet-name>
-        <url-pattern>/fr.insalyon.creatis.vip.portal.Main/uploadfilesservice</url-pattern>
-    </servlet-mapping>
     <!-- End Data Manager Module -->
     <!-- Application Module -->
     <servlet>
@@ -198,20 +190,6 @@ knowledge of the CeCILL-B license and that you accept its terms.
         <url-pattern>/fr.insalyon.creatis.vip.portal.Main/visualizationservice</url-pattern>
     </servlet-mapping>
     <!-- END Visualization API -->
-    <!-- SOAP API -->
-    <listener>
-        <listener-class>com.sun.xml.ws.transport.http.servlet.WSServletContextListener</listener-class>
-    </listener>
-    <servlet>
-        <servlet-name>api</servlet-name>
-        <servlet-class>com.sun.xml.ws.transport.http.servlet.WSServlet</servlet-class>
-        <load-on-startup>1</load-on-startup>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>api</servlet-name>
-        <url-pattern>/api</url-pattern>
-    </servlet-mapping>
-    <!-- END SOAP API -->
     <session-config>
         <session-timeout>-1</session-timeout>
     </session-config>
