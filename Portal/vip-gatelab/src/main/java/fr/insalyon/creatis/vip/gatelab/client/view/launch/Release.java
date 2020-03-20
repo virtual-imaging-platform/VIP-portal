@@ -35,7 +35,7 @@ package fr.insalyon.creatis.vip.gatelab.client.view.launch;
  *
  * @author glatard
  */
-public class Release implements Comparable{
+public class Release implements Comparable<Release>{
    
     private class ReleaseNumber{
         public int major;
@@ -59,9 +59,9 @@ public class Release implements Comparable{
     }
     
     @Override
-    public int compareTo(Object o) {
+    public int compareTo(Release o) {
         ReleaseNumber _this = getReleaseNumber();
-        ReleaseNumber _it = ((Release) o).getReleaseNumber();
+        ReleaseNumber _it = o.getReleaseNumber();
         
         if( _this.major > _it.major)
             return -1;
