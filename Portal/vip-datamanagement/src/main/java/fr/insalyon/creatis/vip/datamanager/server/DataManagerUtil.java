@@ -101,7 +101,7 @@ public class DataManagerUtil {
      * @return
      */
      public static List<String> getPaths(List<String> groups){
-        ArrayList<String> paths = new ArrayList();
+        ArrayList<String> paths = new ArrayList<>();
         for(String s : groups)
             paths.add(s.replaceAll(" ", "_"));
         return paths;
