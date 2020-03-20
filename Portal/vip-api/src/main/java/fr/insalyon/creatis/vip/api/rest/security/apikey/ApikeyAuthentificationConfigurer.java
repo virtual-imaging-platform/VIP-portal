@@ -85,7 +85,7 @@ public class ApikeyAuthentificationConfigurer<B extends HttpSecurityBuilder<B>> 
                 new MediaTypeRequestMatcher(contentNegotiationStrategy,
                         MediaType.TEXT_HTML));
         RequestMatcher preferredMatcher = new AndRequestMatcher(
-                Arrays.<RequestMatcher>asList(notHtmlMatcher, restMatcher));
+                Arrays.asList(notHtmlMatcher, restMatcher));
 
         registerDefaultEntryPoint(http, preferredMatcher);
         registerDefaultLogoutSuccessHandler(http, preferredMatcher);

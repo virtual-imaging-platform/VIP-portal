@@ -79,9 +79,8 @@ public class GlobalProperties extends Object {
     public GlobalProperties() {
         this.APIErrorCodesAndMessages = new ArrayList<>();
         this.supportedModules = new ArrayList<>();
-        this.supportedTransferProtocols = new ArrayList();
+        this.supportedTransferProtocols = new ArrayList<>();
     }
-    
 
     public GlobalProperties(String email, String platformDescription, Integer minAuthorizedExecutionTimeout, Integer maxAuthorizedExecutionTimeout, Integer defaultExecutionTimeout, Boolean isKillExecutionSupported, String defaultStudy, String supportedAPIVersion) {
         this();
