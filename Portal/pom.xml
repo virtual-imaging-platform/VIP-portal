@@ -88,6 +88,16 @@ knowledge of the CeCILL-B license and that you accept its terms.
         <module>vip-visualization</module>
     </modules>
 
+    <dependencies>
+        <!-- empty jar to ensure commons logging is not used in project
+         and not present in final war -->
+        <dependency>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+            <version>99-empty</version>
+        </dependency>
+    </dependencies>
+
     <repositories>
 
         <repository>
@@ -107,7 +117,13 @@ knowledge of the CeCILL-B license and that you accept its terms.
             <name>Creatis Insa Lyon repository [creatis]</name>
             <url>http://vip.creatis.insa-lyon.fr:9007/nexus/content/repositories/snapshots</url>
         </repository>
-
+        
+        <!-- repo used to get empty jar for commons logging and log4j -->
+        <repository>
+            <id>version99</id>
+            <!-- highly available repository serving empty artifacts -->
+            <url>http://version99.qos.ch/</url>
+        </repository>
     </repositories>
 
     <distributionManagement>

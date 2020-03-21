@@ -33,27 +33,32 @@ package fr.insalyon.creatis.vip.api.rest.security.apikey;
 
 import fr.insalyon.creatis.vip.api.exception.SQLRuntimeException;
 import fr.insalyon.creatis.vip.api.rest.security.SpringCompatibleUser;
-import fr.insalyon.creatis.vip.api.rest.security.apikey.ApikeyAuthenticationToken;
-import fr.insalyon.creatis.vip.core.client.bean.*;
+import fr.insalyon.creatis.vip.core.client.bean.Group;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
-import fr.insalyon.creatis.vip.core.server.business.*;
-import fr.insalyon.creatis.vip.core.server.dao.*;
-import org.apache.commons.logging.*;
+import fr.insalyon.creatis.vip.core.server.business.BusinessException;
+import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
+import fr.insalyon.creatis.vip.core.server.dao.DAOException;
+import fr.insalyon.creatis.vip.core.server.dao.UserDAO;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.*;
+import org.springframework.context.MessageSource;
+import org.springframework.context.MessageSourceAware;
 import org.springframework.context.support.MessageSourceAccessor;
 import org.springframework.security.authentication.*;
-import org.springframework.security.core.*;
-import org.springframework.security.core.userdetails.*;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.SpringSecurityMessageSource;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Map;
-import java.util.function.*;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 /**
  * Created by abonnet on 7/25/16.
@@ -65,7 +70,7 @@ import java.util.function.*;
 public class ApikeyAuthenticationProvider implements
         AuthenticationProvider, InitializingBean, MessageSourceAware {
 
-    protected final Log logger = LogFactory.getLog(getClass());
+    protected final Logger logger = Logger.getLogger(getClass());
 
     // ~ Instance fields
     // ================================================================================================
