@@ -97,6 +97,12 @@ knowledge of the CeCILL-B license and that you accept its terms.
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
+            
+            <dependency>
+                <groupId>com.isomorphic.smartgwt.lgpl</groupId>
+                <artifactId>smartgwt-lgpl</artifactId>
+                <version>12.0p</version>
+            </dependency>
 
             <!-- VIP MODULES -->
             <dependency>
