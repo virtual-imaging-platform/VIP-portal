@@ -38,7 +38,8 @@ import fr.insalyon.creatis.vip.core.server.business.*;
 import fr.insalyon.creatis.vip.core.server.dao.*;
 import fr.insalyon.creatis.vip.core.server.dao.mysql.PlatformConnection;
 import fr.insalyon.creatis.vip.datamanager.server.business.*;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -69,7 +70,7 @@ import static fr.insalyon.creatis.vip.api.CarminProperties.CORS_AUTHORIZED_DOMAI
 @ComponentScan
 public class SpringWebConfig extends WebMvcConfigurerAdapter {
 
-    public static final Logger logger = Logger.getLogger(SpringWebConfig.class);
+    public static final Logger logger = LoggerFactory.getLogger(SpringWebConfig.class);
 
     @Autowired
     private Environment env;

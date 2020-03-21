@@ -40,7 +40,8 @@ import fr.insalyon.creatis.vip.core.client.view.user.UserLevel;
 import fr.insalyon.creatis.vip.core.client.view.util.CountryCode;
 import fr.insalyon.creatis.vip.core.server.business.proxy.ProxyClient;
 import fr.insalyon.creatis.vip.core.server.dao.*;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.jasig.cas.client.validation.*;
 
 import java.io.UnsupportedEncodingException;
@@ -58,7 +59,7 @@ import java.util.*;
  */
 public class ConfigurationBusiness {
 
-    private final static Logger logger = Logger.getLogger(ConfigurationBusiness.class);
+    private final static Logger logger = LoggerFactory.getLogger(ConfigurationBusiness.class);
 
     /**
      *
@@ -72,7 +73,7 @@ public class ConfigurationBusiness {
             myproxy.getProxy();
 
         } catch (Exception ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new BusinessException(ex);
         }
     }
@@ -276,15 +277,15 @@ public class ConfigurationBusiness {
                 }
             }
         } catch (GRIDAClientException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new BusinessException(ex);
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         } catch (NoSuchAlgorithmException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new BusinessException(ex);
         } catch (UnsupportedEncodingException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new BusinessException(ex);
         }
     }
@@ -386,10 +387,10 @@ public class ConfigurationBusiness {
                 throw new BusinessException("Authentication failed (email or password incorrect, or user is locked).");
             }
         } catch (NoSuchAlgorithmException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new BusinessException(ex);
         } catch (UnsupportedEncodingException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new BusinessException(ex);
         } catch (DAOException ex) {
             throw new BusinessException(ex);
@@ -515,7 +516,7 @@ public class ConfigurationBusiness {
             }
 
         } catch (GRIDAClientException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new BusinessException(ex);
         } catch (DAOException ex) {
             throw new BusinessException(ex);
@@ -698,7 +699,7 @@ public class ConfigurationBusiness {
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         } catch (GRIDAClientException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new BusinessException(ex);
         }
     }
@@ -770,7 +771,7 @@ public class ConfigurationBusiness {
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         } catch (GRIDAClientException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new BusinessException(ex);
         }
     }
@@ -792,7 +793,7 @@ public class ConfigurationBusiness {
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         } catch (GRIDAClientException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new BusinessException(ex);
         }
     }
@@ -817,7 +818,7 @@ public class ConfigurationBusiness {
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         } catch (GRIDAClientException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new BusinessException(ex);
         }
     }
@@ -964,10 +965,10 @@ public class ConfigurationBusiness {
                 .getUserDAO(connection)
                 .updatePassword(email, currentPassword, newPassword);
         } catch (NoSuchAlgorithmException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new BusinessException(ex);
         } catch (UnsupportedEncodingException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new BusinessException(ex);
         } catch (DAOException ex) {
             throw new BusinessException(ex);
@@ -1020,7 +1021,7 @@ public class ConfigurationBusiness {
                 .getUserDAO(connection)
                 .updateTermsOfUse(email, getCurrentTimeStamp());
         } catch (DAOException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new BusinessException(ex);
         }
     }
@@ -1032,7 +1033,7 @@ public class ConfigurationBusiness {
                 .getUserDAO(connection)
                 .updateLastUpdatePublication(email, getCurrentTimeStamp());
         } catch (DAOException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new BusinessException(ex);
         }
     }
@@ -1191,10 +1192,10 @@ public class ConfigurationBusiness {
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         } catch (NoSuchAlgorithmException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new BusinessException(ex);
         } catch (UnsupportedEncodingException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new BusinessException(ex);
         }
     }
@@ -1349,7 +1350,7 @@ public class ConfigurationBusiness {
             return CoreDAOFactory.getDAOFactory().getPublicationDAO(connection)
                 .getList();
         } catch (DAOException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new BusinessException(ex);
         }
     }
@@ -1360,7 +1361,7 @@ public class ConfigurationBusiness {
             CoreDAOFactory.getDAOFactory().getPublicationDAO(connection)
                 .remove(id);
         } catch (DAOException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new BusinessException(ex);
         }
     }
@@ -1371,7 +1372,7 @@ public class ConfigurationBusiness {
             CoreDAOFactory.getDAOFactory().getPublicationDAO(connection)
                 .add(pub);
         } catch (DAOException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new BusinessException(ex);
         }
     }
@@ -1382,7 +1383,7 @@ public class ConfigurationBusiness {
             CoreDAOFactory.getDAOFactory().getPublicationDAO(connection)
                 .update(pub);
         } catch (DAOException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new BusinessException(ex);
         }
     }
@@ -1394,7 +1395,7 @@ public class ConfigurationBusiness {
             CoreDAOFactory.getDAOFactory().getPublicationDAO(connection)
                 .updateOwnerEmail(oldOwnerEmail, newOwnerEmail);
         } catch (DAOException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new BusinessException(ex);
         }
     }
@@ -1405,7 +1406,7 @@ public class ConfigurationBusiness {
             return CoreDAOFactory.getDAOFactory().getPublicationDAO(connection)
                 .getPublication(id);
         } catch (DAOException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new BusinessException(ex);
         }
     }
@@ -1417,7 +1418,7 @@ public class ConfigurationBusiness {
             CoreDAOFactory.getDAOFactory().getTermsUseDAO(connection)
                 .add(termsOfUse);
         } catch (DAOException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new BusinessException(ex);
         }
     }
@@ -1428,7 +1429,7 @@ public class ConfigurationBusiness {
             return CoreDAOFactory.getDAOFactory().getTermsUseDAO(connection)
                 .getLastUpdateTermsOfUse();
         } catch (DAOException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new BusinessException(ex);
         }
     }
@@ -1449,7 +1450,7 @@ public class ConfigurationBusiness {
                 return ts.before(getCurrentTimeStamp());
             }
         } catch (DAOException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new BusinessException(ex);
         }
     }

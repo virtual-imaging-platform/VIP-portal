@@ -46,7 +46,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -54,7 +55,7 @@ import org.apache.log4j.Logger;
  */
 public class MessageData implements MessageDAO {
 
-    private static final Logger logger = Logger.getLogger(MessageData.class);
+    private static final Logger logger = LoggerFactory.getLogger(MessageData.class);
     private Connection connection;
 
     public MessageData(Connection connection) {
@@ -81,7 +82,7 @@ public class MessageData implements MessageDAO {
             return id;
 
         } catch (SQLException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new DAOException(ex);
         }
     }
@@ -99,7 +100,7 @@ public class MessageData implements MessageDAO {
             ps.close();
 
         } catch (SQLException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new DAOException(ex);
         }
     }
@@ -137,7 +138,7 @@ public class MessageData implements MessageDAO {
             return messages;
 
         } catch (SQLException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new DAOException(ex);
         }
     }
@@ -189,7 +190,7 @@ public class MessageData implements MessageDAO {
             return messages;
 
         } catch (SQLException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new DAOException(ex);
         }
     }
@@ -208,7 +209,7 @@ public class MessageData implements MessageDAO {
             ps.close();
 
         } catch (SQLException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new DAOException(ex);
         }
     }
@@ -224,7 +225,7 @@ public class MessageData implements MessageDAO {
             ps.close();
 
         } catch (SQLException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new DAOException(ex);
         }
     }
@@ -251,7 +252,7 @@ public class MessageData implements MessageDAO {
             ps.close();
 
         } catch (SQLException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new DAOException(ex);
         }
     }
@@ -273,7 +274,7 @@ public class MessageData implements MessageDAO {
             return result;
 
         } catch (SQLException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new DAOException(ex);
         }
     }

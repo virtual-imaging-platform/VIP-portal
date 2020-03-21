@@ -38,7 +38,8 @@ import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.datamanager.client.bean.UserApiKey;
 import fr.insalyon.creatis.vip.datamanager.server.business.ApiKeyBusiness;
 import fr.insalyon.creatis.vip.datamanager.server.business.ExternalPlatformBusiness;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -62,7 +63,7 @@ import javax.validation.Valid;
 public class ApiKeyController {
 
     private static final Logger logger =
-        Logger.getLogger(ApiKeyController.class);
+        LoggerFactory.getLogger(ApiKeyController.class);
 
     private ApiKeyBusiness apiKeyBusiness;
     private ExternalPlatformBusiness externalPlatformBusiness;

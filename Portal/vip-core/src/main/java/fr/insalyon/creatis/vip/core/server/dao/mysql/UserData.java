@@ -35,7 +35,8 @@ import fr.insalyon.creatis.vip.core.client.bean.*;
 import fr.insalyon.creatis.vip.core.client.view.user.UserLevel;
 import fr.insalyon.creatis.vip.core.client.view.util.CountryCode;
 import fr.insalyon.creatis.vip.core.server.dao.*;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.*;
 import java.util.*;
@@ -47,7 +48,7 @@ import java.util.Date;
  */
 public class UserData implements UserDAO {
 
-    private final static Logger logger = Logger.getLogger(UserData.class);
+    private final static Logger logger = LoggerFactory.getLogger(UserData.class);
     private Connection connection;
 
     public UserData(Connection connection) throws DAOException {
@@ -99,7 +100,7 @@ public class UserData implements UserDAO {
                 logger.error("There is an existing account associated with the email: " + user.getEmail() + " or with this {first name,last name} (" + ex.getMessage() + ")");
                 throw new DAOException("There is an existing account associated with this email or with this {first name,last name}.", ex);
             } else {
-                logger.error(ex);
+                logger.error(ex.toString());
                 throw new DAOException(ex);
             }
         }
@@ -133,7 +134,7 @@ public class UserData implements UserDAO {
             return false;
 
         } catch (SQLException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new DAOException(ex);
         }
     }
@@ -174,7 +175,7 @@ public class UserData implements UserDAO {
             return false;
 
         } catch (SQLException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new DAOException(ex);
         }
     }
@@ -225,7 +226,7 @@ public class UserData implements UserDAO {
             throw new DAOException("There is no user registered with the e-mail: " + email);
 
         } catch (SQLException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new DAOException(ex);
         }
     }
@@ -270,7 +271,7 @@ public class UserData implements UserDAO {
             return users;
 
         } catch (SQLException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new DAOException(ex);
         }
     }
@@ -291,7 +292,7 @@ public class UserData implements UserDAO {
             ps.close();
 
         } catch (SQLException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new DAOException(ex);
         }
     }
@@ -323,7 +324,7 @@ public class UserData implements UserDAO {
             ps.close();
 
         } catch (SQLException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new DAOException(ex);
         }
     }
@@ -351,7 +352,7 @@ public class UserData implements UserDAO {
                 ps.close();
 
             } catch (SQLException ex) {
-                logger.error(ex);
+                logger.error(ex.toString());
                 throw new DAOException(ex);
             }
         } else {
@@ -376,7 +377,7 @@ public class UserData implements UserDAO {
                 logger.error("There is an existing account associated with the email: " + newEmail);
                 throw new DAOException("There is an existing account associated with this email.", ex);
             } else {
-                logger.error(ex);
+                logger.error(ex.toString());
                 throw new DAOException(ex);
             }
         }
@@ -395,7 +396,7 @@ public class UserData implements UserDAO {
             ps.executeUpdate();
             ps.close();
         } catch (SQLException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new DAOException(ex);
         }
     }
@@ -420,7 +421,7 @@ public class UserData implements UserDAO {
             ps.close();
 
         } catch (SQLException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new DAOException(ex);
         }
     }
@@ -451,7 +452,7 @@ public class UserData implements UserDAO {
             return false;
 
         } catch (SQLException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new DAOException(ex);
         }
     }
@@ -476,7 +477,7 @@ public class UserData implements UserDAO {
             ps.close();
 
         } catch (SQLException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new DAOException(ex);
         }
     }
@@ -495,7 +496,7 @@ public class UserData implements UserDAO {
             ps.close();
 
         } catch (SQLException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new DAOException(ex);
         }
     }
@@ -546,7 +547,7 @@ public class UserData implements UserDAO {
             throw new DAOException("There is no user registered with the session: " + session);
 
         } catch (SQLException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new DAOException(ex);
         }
     }
@@ -592,7 +593,7 @@ public class UserData implements UserDAO {
             return users;
 
         } catch (SQLException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new DAOException(ex);
         }
     }
@@ -624,7 +625,7 @@ public class UserData implements UserDAO {
             ps.close();
 
         } catch (SQLException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new DAOException(ex);
         }
     }
@@ -648,7 +649,7 @@ public class UserData implements UserDAO {
             ps.close();
 
         } catch (SQLException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new DAOException(ex);
         }
     }
@@ -672,7 +673,7 @@ public class UserData implements UserDAO {
             ps.close();
 
         } catch (SQLException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new DAOException(ex);
         }
     }
@@ -687,7 +688,7 @@ public class UserData implements UserDAO {
             }
             ps.close();
         } catch (SQLException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new DAOException(ex);
         }
         return -1;
@@ -703,7 +704,7 @@ public class UserData implements UserDAO {
             }
             ps.close();
         } catch (SQLException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new DAOException(ex);
         }
         return -1;
@@ -731,7 +732,7 @@ public class UserData implements UserDAO {
                 logger.error("There is an existing Dropbox account associated with the email: " + email);
                 throw new DAOException("There is an existing Dropbox account associated with this email.", ex);
             } else {
-                logger.error(ex);
+                logger.error(ex.toString());
                 throw new DAOException(ex);
             }
         }
@@ -749,7 +750,7 @@ public class UserData implements UserDAO {
             ps.close();
 
         } catch (SQLException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new DAOException(ex);
         }
 
@@ -793,7 +794,7 @@ public class UserData implements UserDAO {
             ps.close();
 
         } catch (SQLException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new DAOException(ex);
         }
     }
@@ -815,7 +816,7 @@ public class UserData implements UserDAO {
             return lastupdatePublication;
 
         } catch (SQLException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new DAOException(ex);
         }
     }
@@ -832,7 +833,7 @@ public class UserData implements UserDAO {
             ps.close();
 
         } catch (SQLException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new DAOException(ex);
         }
     }
@@ -853,7 +854,7 @@ public class UserData implements UserDAO {
             return n;
 
         } catch (SQLException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new DAOException(ex);
         }
     }
@@ -872,7 +873,7 @@ public class UserData implements UserDAO {
             ps.close();
 
         } catch (SQLException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new DAOException(ex);
         }
     }
@@ -891,7 +892,7 @@ public class UserData implements UserDAO {
             ps.close();
 
         } catch (SQLException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new DAOException(ex);
         }
     }
@@ -910,7 +911,7 @@ public class UserData implements UserDAO {
             ps.close();
 
         } catch (SQLException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new DAOException(ex);
         }
     }
@@ -929,7 +930,7 @@ public class UserData implements UserDAO {
             ps.close();
 
         } catch (SQLException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new DAOException(ex);
         }
     }
@@ -950,7 +951,7 @@ public class UserData implements UserDAO {
             return locked;
 
         } catch (SQLException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new DAOException(ex);
         }
     }
@@ -973,7 +974,7 @@ public class UserData implements UserDAO {
             return null;
 
         } catch (SQLException ex) {
-            logger.error(ex, ex);
+            logger.error(ex.toString(), ex);
             throw new DAOException(ex);
         }
     }
@@ -1031,7 +1032,7 @@ public class UserData implements UserDAO {
             try {
                 return runSQL();
             } catch (SQLException ex) {
-                logger.error(ex, ex);
+                logger.error(ex.toString(), ex);
                 throw new DAOException(ex);
             }
         }

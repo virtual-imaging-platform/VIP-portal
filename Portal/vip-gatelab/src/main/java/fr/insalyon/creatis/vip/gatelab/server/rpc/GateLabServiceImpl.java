@@ -42,7 +42,8 @@ import fr.insalyon.creatis.vip.gatelab.server.business.GateLabBusiness;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Map;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -50,7 +51,7 @@ import org.apache.log4j.Logger;
  */
 public class GateLabServiceImpl extends AbstractRemoteServiceServlet implements GateLabService {
 
-    private final static Logger logger = Logger.getLogger(GateLabServiceImpl.class);
+    private final static Logger logger = LoggerFactory.getLogger(GateLabServiceImpl.class);
     private GateLabBusiness gatelabBusiness;
     private ClassBusiness classBusiness;
 

@@ -36,7 +36,8 @@ import fr.insalyon.creatis.vip.api.business.*;
 import fr.insalyon.creatis.vip.api.exception.SQLRuntimeException;
 import fr.insalyon.creatis.vip.api.rest.RestApiBusiness;
 import fr.insalyon.creatis.vip.application.server.business.*;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.web.bind.annotation.*;
@@ -57,7 +58,7 @@ import java.util.function.Supplier;
 @RequestMapping("pipelines")
 public class PipelineController {
 
-    public static final Logger logger = Logger.getLogger(PipelineController.class);
+    public static final Logger logger = LoggerFactory.getLogger(PipelineController.class);
 
     @Autowired
     Environment env;

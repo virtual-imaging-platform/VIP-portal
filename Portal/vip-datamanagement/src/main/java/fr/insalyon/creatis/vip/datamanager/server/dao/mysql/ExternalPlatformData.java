@@ -34,7 +34,8 @@ package fr.insalyon.creatis.vip.datamanager.server.dao.mysql;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import fr.insalyon.creatis.vip.datamanager.client.bean.ExternalPlatform;
 import fr.insalyon.creatis.vip.datamanager.server.dao.ExternalPlatformsDAO;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.*;
 import java.util.*;
@@ -44,7 +45,7 @@ import java.util.*;
  */
 public class ExternalPlatformData implements ExternalPlatformsDAO {
 
-    private static final Logger logger = Logger.getLogger(ExternalPlatformData.class);
+    private static final Logger logger = LoggerFactory.getLogger(ExternalPlatformData.class);
     private Connection connection;
 
     public ExternalPlatformData(Connection connection) throws DAOException {

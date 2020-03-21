@@ -33,7 +33,8 @@ package fr.insalyon.creatis.vip.api;
 
 import fr.insalyon.creatis.vip.core.server.business.*;
 import fr.insalyon.creatis.vip.core.server.dao.mysql.PlatformConnection;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
@@ -52,7 +53,7 @@ import java.util.Calendar;
 @Component
 public class VipConfigurer implements ApplicationListener<ContextRefreshedEvent> {
 
-    public static final Logger logger = Logger.getLogger(VipConfigurer.class);
+    public static final Logger logger = LoggerFactory.getLogger(VipConfigurer.class);
 
     @Autowired
     private ConfigurationBusiness configurationBusiness;

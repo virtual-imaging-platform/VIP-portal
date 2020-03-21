@@ -43,13 +43,14 @@ import fr.insalyon.creatis.vip.visualization.client.view.VisualizationException;
 import fr.insalyon.creatis.vip.visualization.server.business.VisualizationBusiness;
 import java.sql.Connection;
 import java.sql.SQLException;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class VisualizationServiceImpl extends AbstractRemoteServiceServlet
     implements VisualizationService {
 
     private static final Logger logger =
-        Logger.getLogger(VisualizationServiceImpl.class);
+        LoggerFactory.getLogger(VisualizationServiceImpl.class);
 
     private final VisualizationBusiness visualizationBusiness;
 

@@ -41,10 +41,10 @@ import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import java.security.spec.InvalidKeySpecException;
 import java.util.List;
-import java.util.logging.Level;
 import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.codec.binary.Base64;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.opensaml.saml2.core.Assertion;
 import org.opensaml.saml2.core.Issuer;
 import org.opensaml.saml2.core.Response;
@@ -59,7 +59,7 @@ import org.opensaml.xml.validation.ValidationException;
  */
 public class SamlAuthenticationService extends AbstractAuthenticationService {
 
-    private static final Logger logger = Logger.getLogger(SamlAuthenticationService.class);
+    private static final Logger logger = LoggerFactory.getLogger(SamlAuthenticationService.class);
     private Assertion assertion;
     private Issuer issuer;
 
@@ -93,7 +93,7 @@ public class SamlAuthenticationService extends AbstractAuthenticationService {
                 assertion = (Assertion) SamlTokenValidator.getSAMLObject(xmlAssertion);
             }
         } catch (UnsupportedEncodingException | ConfigurationException | XMLParserException | UnmarshallingException ex) {
-            java.util.logging.Logger.getLogger(SamlAuthenticationService.class.getName()).log(Level.SEVERE, null, ex);
+            LoggerFactory.getLogger(SamlAuthenticationService.class.getName()).error(ex.toString(), ex);
         }
         if (assertion == null) {
             throw new BusinessException("Cannot get assertion!");

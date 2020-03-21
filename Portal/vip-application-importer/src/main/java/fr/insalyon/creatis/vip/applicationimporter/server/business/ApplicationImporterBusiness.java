@@ -58,6 +58,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 import org.json.JSONException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -65,7 +67,7 @@ import org.json.JSONException;
  */
 public class ApplicationImporterBusiness {
 
-    private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(ApplicationImporterBusiness.class);
+    private final static Logger logger = LoggerFactory.getLogger(ApplicationImporterBusiness.class);
 
     public String readAndValidationBoutiquesFile(
         String fileLFN, User user, Connection connection)
@@ -88,16 +90,16 @@ public class ApplicationImporterBusiness {
             String fileContent = new Scanner(new File(localFilePath)).useDelimiter("\\Z").next();
             return fileContent;
         } catch (GRIDAClientException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new BusinessException(ex);
         } catch (DataManagerException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new BusinessException(ex);
         } catch (FileNotFoundException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new BusinessException(ex);
         } catch (IOException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new BusinessException(ex);
         }
     }
@@ -187,13 +189,13 @@ public class ApplicationImporterBusiness {
             registerApplicationVersion(bt.getName(), bt.getToolVersion(), user.getEmail(), bt.getGwendiaLFN(), bt.getJsonLFN(), connection);
 
         } catch (FileNotFoundException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new BusinessException(ex);
         } catch (IOException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new BusinessException(ex);
         } catch (DataManagerException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new BusinessException(ex);
         }
     }
@@ -207,7 +209,7 @@ public class ApplicationImporterBusiness {
             }
             gc.uploadFile(localFile, (new File(lfn)).getParent());
         } catch (GRIDAClientException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new BusinessException(ex);
         }
     }

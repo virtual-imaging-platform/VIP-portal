@@ -52,7 +52,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -60,7 +61,7 @@ import org.apache.log4j.Logger;
  */
 public class SimulationBusiness {
 
-    private static final Logger logger = Logger.getLogger(SimulationBusiness.class);
+    private static final Logger logger = LoggerFactory.getLogger(SimulationBusiness.class);
 
     /**
      *

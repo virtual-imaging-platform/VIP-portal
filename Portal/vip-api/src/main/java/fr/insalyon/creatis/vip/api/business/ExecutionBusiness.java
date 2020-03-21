@@ -43,6 +43,8 @@ import fr.insalyon.creatis.vip.core.client.bean.*;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.server.business.*;
 import fr.insalyon.creatis.vip.datamanager.server.business.TransferPoolBusiness;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
@@ -63,7 +65,7 @@ import java.util.Map.Entry;
 @Service
 public class ExecutionBusiness {
 
-    private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(ExecutionBusiness.class);
+    private final static Logger logger = LoggerFactory.getLogger(ExecutionBusiness.class);
 
     private final ApiContext apiContext;
     private final SimulationBusiness simulationBusiness;
@@ -419,9 +421,9 @@ public class ExecutionBusiness {
             }
 
             logger.info("Launching workflow with the following parameters: ");
-            logger.info(apiContext.getUser());
-            logger.info(groupNames);
-            logger.info(inputValues);
+            logger.info(apiContext.getUser().toString());
+            logger.info(groupNames.toString());
+            logger.info(inputValues.toString());
             logger.info(applicationName);
             logger.info(applicationVersion);
             logger.info(classes.get(0));

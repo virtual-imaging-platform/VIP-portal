@@ -51,7 +51,8 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.jsoup.Jsoup;
 
 /**
@@ -60,7 +61,7 @@ import org.jsoup.Jsoup;
  */
 public class ApplicationServiceImpl extends AbstractRemoteServiceServlet implements ApplicationService {
 
-    private static final Logger logger = Logger.getLogger(ApplicationServiceImpl.class);
+    private static final Logger logger = LoggerFactory.getLogger(ApplicationServiceImpl.class);
     private final ClassBusiness classBusiness;
     private final ApplicationBusiness applicationBusiness;
     private final EngineBusiness engineBusiness;

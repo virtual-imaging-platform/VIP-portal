@@ -39,7 +39,8 @@ import fr.insalyon.creatis.vip.application.server.dao.mysql.ClassData;
 import fr.insalyon.creatis.vip.application.server.dao.mysql.EngineData;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import fr.insalyon.creatis.vip.core.server.dao.mysql.PlatformConnection;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.sql.Connection;
 import java.sql.SQLException;
 
@@ -49,7 +50,7 @@ import java.sql.SQLException;
  */
 public class MySQLDAOFactory extends ApplicationDAOFactory {
 
-    private final static Logger logger = Logger.getLogger(MySQLDAOFactory.class);
+    private final static Logger logger = LoggerFactory.getLogger(MySQLDAOFactory.class);
     private static ApplicationDAOFactory instance;
 
     // Singleton

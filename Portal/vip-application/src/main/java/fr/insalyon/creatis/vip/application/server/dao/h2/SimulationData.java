@@ -43,7 +43,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -51,7 +52,7 @@ import org.apache.log4j.Logger;
  */
 public class SimulationData extends AbstractJobData implements SimulationDAO {
 
-    private static final Logger logger = Logger.getLogger(SimulationData.class);
+    private static final Logger logger = LoggerFactory.getLogger(SimulationData.class);
 
     public SimulationData(String dbPath) throws DAOException {
 
@@ -83,7 +84,7 @@ public class SimulationData extends AbstractJobData implements SimulationDAO {
 
         } catch (SQLException ex) {
             if (!ex.getMessage().contains("Table \"JOBS\" not found")) {
-                logger.error(ex);
+                logger.error(ex.toString());
                 throw new DAOException(ex);
             }
         } finally {
@@ -121,7 +122,7 @@ public class SimulationData extends AbstractJobData implements SimulationDAO {
             ps.close();
 
         } catch (SQLException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new DAOException(ex);
         } finally {
             close(logger);
@@ -156,7 +157,7 @@ public class SimulationData extends AbstractJobData implements SimulationDAO {
             return task;
 
         } catch (SQLException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new DAOException(ex);
         } finally {
             close(logger);
@@ -198,7 +199,7 @@ public class SimulationData extends AbstractJobData implements SimulationDAO {
             ps.close();
 
         } catch (SQLException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new DAOException(ex);
         } finally {
             close(logger);
@@ -239,7 +240,7 @@ public class SimulationData extends AbstractJobData implements SimulationDAO {
         } catch (SQLException ex) {
             if (!ex.getMessage().contains("Table \"JOBS\" not found")
                     && !ex.getMessage().contains("Table \"JOBSMINORSTATUS\" not found")) {
-                logger.error(ex);
+                logger.error(ex.toString());
                 throw new DAOException(ex);
             }
         } finally {
@@ -304,7 +305,7 @@ public class SimulationData extends AbstractJobData implements SimulationDAO {
             return list;
 
         } catch (SQLException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new DAOException(ex);
         } finally {
             close(logger);
@@ -331,7 +332,7 @@ public class SimulationData extends AbstractJobData implements SimulationDAO {
             return list;
 
         } catch (SQLException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new DAOException(ex);
         } finally {
             close(logger);
@@ -355,7 +356,7 @@ public class SimulationData extends AbstractJobData implements SimulationDAO {
             return list;
 
         } catch (SQLException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new DAOException(ex);
         } finally {
             close(logger);
@@ -375,7 +376,7 @@ public class SimulationData extends AbstractJobData implements SimulationDAO {
             ps.close();
 
         } catch (SQLException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new DAOException(ex);
         } finally {
             close(logger);
@@ -410,7 +411,7 @@ public class SimulationData extends AbstractJobData implements SimulationDAO {
             if (ex.getMessage().contains("Table \"JOBS\" not found")) {
                 return new int[]{0, 0};
             }
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new DAOException(ex);
         } finally {
             close(logger);
@@ -442,7 +443,7 @@ public class SimulationData extends AbstractJobData implements SimulationDAO {
             if (ex.getMessage().contains("Table \"JOBS\" not found")) {
                 return new HashMap<String, Integer>();
             }
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new DAOException(ex);
         } finally {
             close(logger);
@@ -487,7 +488,7 @@ public class SimulationData extends AbstractJobData implements SimulationDAO {
             return list;
 
         } catch (SQLException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new DAOException(ex);
         } finally {
             close(logger);

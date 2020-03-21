@@ -47,7 +47,8 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -55,7 +56,7 @@ import org.apache.log4j.Logger;
  */
 public class JobServiceImpl extends AbstractRemoteServiceServlet implements JobService {
 
-    private static Logger logger = Logger.getLogger(JobServiceImpl.class);
+    private static Logger logger = LoggerFactory.getLogger(JobServiceImpl.class);
     private SimulationBusiness simulationBusiness;
 
     public JobServiceImpl() {

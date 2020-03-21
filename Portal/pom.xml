@@ -88,15 +88,23 @@ knowledge of the CeCILL-B license and that you accept its terms.
         <module>vip-visualization</module>
     </modules>
 
-    <dependencies>
-        <!-- empty jar to ensure commons logging is not used in project
-         and not present in final war -->
-        <dependency>
-            <groupId>commons-logging</groupId>
-            <artifactId>commons-logging</artifactId>
-            <version>99-empty</version>
-        </dependency>
-    </dependencies>
+    <dependencyManagement>
+        <dependencies>
+            <!-- empty jar to ensure commons logging is not used in project
+             and not present in final war -->
+            <dependency>
+                <groupId>commons-logging</groupId>
+                <artifactId>commons-logging</artifactId>
+                <version>99-empty</version>
+            </dependency>
+
+            <dependency>
+                <groupId>log4j</groupId>
+                <artifactId>log4j</artifactId>
+                <version>99-empty</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <repositories>
 

@@ -6,6 +6,8 @@
 package fr.insalyon.creatis.vip.api.business;
 
 import fr.insalyon.creatis.vip.api.bean.ParameterType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -13,7 +15,7 @@ import fr.insalyon.creatis.vip.api.bean.ParameterType;
  */
 public class ApiUtils {
 
-    private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(ApiUtils.class);
+    private final static Logger logger = LoggerFactory.getLogger(ApiUtils.class);
     
     public static void methodInvocationLog(String methodName, Object... parameters) {
         String message = "Calling API method " + methodName + "(";

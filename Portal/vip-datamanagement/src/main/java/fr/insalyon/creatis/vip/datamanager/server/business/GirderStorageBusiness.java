@@ -39,7 +39,8 @@ import fr.insalyon.creatis.vip.core.client.view.*;
 import fr.insalyon.creatis.vip.core.server.business.*;
 import fr.insalyon.creatis.vip.datamanager.client.bean.ExternalPlatform;
 import fr.insalyon.creatis.vip.datamanager.client.bean.ExternalPlatform.Type;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
@@ -56,7 +57,7 @@ import java.util.function.Consumer;
  * Created by abonnet on 7/17/19.
  */
 public class GirderStorageBusiness {
-    private static final Logger logger = Logger.getLogger(GirderStorageBusiness.class);
+    private static final Logger logger = LoggerFactory.getLogger(GirderStorageBusiness.class);
 
     private ApiKeyBusiness apiKeyBusiness;
 

@@ -44,7 +44,8 @@ import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -52,7 +53,7 @@ import org.apache.log4j.Logger;
  */
 public class LFCBusiness {
 
-    private static final Logger logger = Logger.getLogger(LFCBusiness.class);
+    private static final Logger logger = LoggerFactory.getLogger(LFCBusiness.class);
 
     /**
      *
@@ -88,10 +89,10 @@ public class LFCBusiness {
             return dataList;
 
         } catch (DataManagerException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new BusinessException(ex);
         } catch (GRIDAClientException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new BusinessException(ex);
         }
     }
@@ -111,10 +112,10 @@ public class LFCBusiness {
             CoreUtil.getGRIDAClient().createFolder(
                 DataManagerUtil.parseBaseDir(user, baseDir, connection), name);
         } catch (DataManagerException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new BusinessException(ex);
         } catch (GRIDAClientException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new BusinessException(ex);
         }
     }
@@ -142,11 +143,11 @@ public class LFCBusiness {
                 String newExtPath = newPath + sdf.format(new Date());
                 rename(user, oldPath, newExtPath, false, connection);
             } else {
-                logger.error(ex);
+                logger.error(ex.toString());
                 throw new BusinessException(ex);
             }
         } catch (DataManagerException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new BusinessException(ex);
         }
     }
@@ -184,10 +185,10 @@ public class LFCBusiness {
             return CoreUtil.getGRIDAClient().exist(
                 DataManagerUtil.parseBaseDir(user, path, connection));
         } catch (GRIDAClientException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new BusinessException(ex);
         } catch (DataManagerException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new BusinessException(ex);
         }
     }
@@ -208,10 +209,10 @@ public class LFCBusiness {
                     getModificationDate(
                         DataManagerUtil.parseBaseDir(user, path, connection));
         } catch (GRIDAClientException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new BusinessException(ex);
         } catch (DataManagerException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new BusinessException(ex);
         }
     }
@@ -235,10 +236,10 @@ public class LFCBusiness {
 
             return CoreUtil.getGRIDAClient().getModificationDate(parsedPaths);
         } catch (GRIDAClientException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new BusinessException(ex);
         } catch (DataManagerException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new BusinessException(ex);
         }
     }

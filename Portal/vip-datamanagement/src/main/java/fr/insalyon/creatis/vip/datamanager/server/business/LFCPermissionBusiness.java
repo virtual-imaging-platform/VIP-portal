@@ -38,7 +38,8 @@ import fr.insalyon.creatis.vip.datamanager.client.bean.*;
 import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerException;
 import fr.insalyon.creatis.vip.datamanager.server.DataManagerUtil;
 import fr.insalyon.creatis.vip.datamanager.server.business.LFCPermissionBusiness.LFCAccessType;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
 import java.util.*;
@@ -50,7 +51,7 @@ import static fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants.*;
  */
 public class LFCPermissionBusiness {
 
-    private static final Logger logger = Logger.getLogger(LFCPermissionBusiness.class);
+    private static final Logger logger = LoggerFactory.getLogger(LFCPermissionBusiness.class);
 
     public enum LFCAccessType {
         READ, UPLOAD, DELETE

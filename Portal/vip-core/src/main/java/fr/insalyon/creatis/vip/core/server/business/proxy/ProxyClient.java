@@ -44,7 +44,8 @@ import java.util.*;
 import javax.net.ssl.*;
 import javax.security.auth.login.FailedLoginException;
 import javax.security.auth.x500.X500Principal;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.bouncycastle.asn1.ASN1InputStream;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.DEROutputStream;
@@ -63,7 +64,7 @@ import org.bouncycastle.pkcs.jcajce.JcaPKCS10CertificationRequestBuilder;
  */
 public class ProxyClient {
 
-    private final static Logger logger = Logger.getLogger(ProxyClient.class);
+    private final static Logger logger = LoggerFactory.getLogger(ProxyClient.class);
     private SSLSocket socket;
     private BufferedInputStream socketIn;
     private BufferedOutputStream socketOut;
@@ -126,12 +127,12 @@ public class ProxyClient {
             return new Proxy(proxyFileName, endDate);
 
         } catch (Exception ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             if (this.socket != null) {
                 try {
                     disconnect();
                 } catch (IOException ioe) {
-                    logger.error(ioe);
+                    logger.error(ioe.toString());
                     throw new BusinessException("Error disconecting proxy client", ioe);
                 }
             }

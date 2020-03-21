@@ -41,7 +41,8 @@ import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.shiwa.desktop.data.description.workflow.SHIWAProperty;
 
 /**
@@ -51,7 +52,7 @@ import org.shiwa.desktop.data.description.workflow.SHIWAProperty;
  */
 public abstract class WorkflowEngineInstantiator {
 
-    private static Logger logger = Logger.getLogger(WorkflowEngineInstantiator.class);
+    private static Logger logger = LoggerFactory.getLogger(WorkflowEngineInstantiator.class);
 
     public static WorkflowEngineInstantiator create(String engineEndpoint) throws BusinessException {
 

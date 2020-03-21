@@ -47,7 +47,8 @@ import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.sql.DataSource;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -55,7 +56,7 @@ import org.apache.log4j.Logger;
  */
 public class PlatformConnection {
 
-    private final static Logger logger = Logger.getLogger(PlatformConnection.class);
+    private final static Logger logger = LoggerFactory.getLogger(PlatformConnection.class);
     private static PlatformConnection instance;
     private boolean firstExecution;
     private DataSource dataSource;

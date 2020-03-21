@@ -36,7 +36,8 @@ import fr.insalyon.creatis.shiwapool.client.ClientMessageProcessor;
 import fr.insalyon.creatis.shiwapool.common.Connection;
 import fr.insalyon.creatis.shiwapool.common.FileTransfer;
 import fr.insalyon.creatis.shiwapool.common.Receiver;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -44,7 +45,7 @@ import org.apache.log4j.Logger;
  */
 public class ShiwaPoolEngineEnvironment {
 
-    private static Logger logger = Logger.getLogger(ShiwaPoolEngineEnvironment.class);
+    private static Logger logger = LoggerFactory.getLogger(ShiwaPoolEngineEnvironment.class);
     private static volatile ShiwaPoolEngineEnvironment instance;
     private Thread rthread;
     private Thread cthread;

@@ -47,7 +47,8 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -55,7 +56,7 @@ import org.apache.log4j.Logger;
  */
 public class SSHData implements SSHDAO {
 
-    private final static Logger logger = Logger.getLogger(SSHData.class);
+    private final static Logger logger = LoggerFactory.getLogger(SSHData.class);
     private Connection connection;
 
     public SSHData(Connection connection) {
@@ -110,7 +111,7 @@ public class SSHData implements SSHDAO {
             return ssh;
 
         } catch (SQLException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new DAOException(ex);
         }
     }
@@ -142,7 +143,7 @@ public class SSHData implements SSHDAO {
                 logger.error("An ssh connection with this LFC Directory \"" + ssh.getLfcDir() + "\" already exists for user " + ssh.getEmail() + ".");
                 throw new DAOException("An ssh connection with this LFC Directory \"" + ssh.getLfcDir() + "\" already exists for user " + ssh.getEmail() + ".", ex);
             } else {
-                logger.error(ex);
+                logger.error(ex.toString());
                 throw new DAOException(ex);
             }
         }
@@ -171,7 +172,7 @@ public class SSHData implements SSHDAO {
                     DataManagerBusiness.generateLFCDir(
                         ssh.getName(), ssh.getEmail(), connection));
             } catch (DataManagerException ex) {
-                logger.error(ex);
+                logger.error(ex.toString());
                 throw new DAOException(ex);
             } catch (BusinessException ex) {
                 throw new DAOException(ex);
@@ -181,7 +182,7 @@ public class SSHData implements SSHDAO {
             ps.close();
 
         } catch (SQLException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new DAOException(ex);
         }
     }
@@ -199,7 +200,7 @@ public class SSHData implements SSHDAO {
                     DataManagerBusiness.generateLFCDir(name, email, connection));
                 logger.info("Removing connection " + email + " " + DataManagerBusiness.generateLFCDir(name, email, connection));
             } catch (DataManagerException ex) {
-                logger.error(ex);
+                logger.error(ex.toString());
                 throw new DAOException(ex);
             } catch (BusinessException ex) {
                 throw new DAOException(ex);
@@ -209,7 +210,7 @@ public class SSHData implements SSHDAO {
             ps.close();
 
         } catch (SQLException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new DAOException(ex);
         }
     }
@@ -232,7 +233,7 @@ public class SSHData implements SSHDAO {
                             sshC.get(1), sshC.get(0), connection));
                     logger.info("Reset connection " + sshC.get(0) + " " + DataManagerBusiness.generateLFCDir(sshC.get(1), sshC.get(0), connection));
                 } catch (DataManagerException ex) {
-                    logger.error(ex);
+                    logger.error(ex.toString());
                     throw new DAOException(ex);
                 } catch (BusinessException ex) {
                     throw new DAOException(ex);
@@ -242,7 +243,7 @@ public class SSHData implements SSHDAO {
                 ps.close();
 
             } catch (SQLException ex) {
-                logger.error(ex);
+                logger.error(ex.toString());
                 throw new DAOException(ex);
             }
 

@@ -37,7 +37,8 @@ import fr.insalyon.creatis.vip.gatelab.server.dao.GateLabDAO;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * 
@@ -45,7 +46,7 @@ import org.apache.log4j.Logger;
  */
 public class GateLabData extends AbstractJobData implements GateLabDAO {
 
-    private static final Logger logger = Logger.getLogger(GateLabData.class);
+    private static final Logger logger = LoggerFactory.getLogger(GateLabData.class);
     
     public GateLabData(String dbPath) throws DAOException {
         

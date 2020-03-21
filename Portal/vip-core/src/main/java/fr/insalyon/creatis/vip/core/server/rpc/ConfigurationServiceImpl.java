@@ -72,7 +72,8 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import org.apache.commons.configuration.ConfigurationException;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.jbibtex.ParseException;
 import org.jbibtex.TokenMgrException;
 
@@ -82,7 +83,7 @@ import org.jbibtex.TokenMgrException;
  */
 public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet implements ConfigurationService {
 
-    private static Logger logger = Logger.getLogger(ConfigurationServiceImpl.class);
+    private static Logger logger = LoggerFactory.getLogger(ConfigurationServiceImpl.class);
 
     public ConfigurationServiceImpl() {
         super();
@@ -892,7 +893,7 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
         try(Connection connection = PlatformConnection.getInstance().getConnection()) {
             return configurationBusiness.getPublications(connection);
         } catch (BusinessException | SQLException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new CoreException(ex);
         }
     }
@@ -985,7 +986,7 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
         try {
             Server.getInstance().setMaxPlatformRunningSimulations(maxPlatformRunningSimulations);
         } catch (ConfigurationException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new CoreException(ex);
         }
     }
@@ -1017,10 +1018,10 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
             }
 
         } catch (ParseException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new CoreException(ex);
         } catch (TokenMgrException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new CoreException(ex);
         }
         return publications;

@@ -36,7 +36,8 @@ import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import fr.insalyon.creatis.vip.datamanager.client.bean.ExternalPlatform;
 import fr.insalyon.creatis.vip.datamanager.server.dao.*;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
 import java.util.List;
@@ -46,7 +47,7 @@ import java.util.List;
  */
 public class ExternalPlatformBusiness {
 
-    private static final Logger logger = Logger.getLogger(ExternalPlatformBusiness.class);
+    private static final Logger logger = LoggerFactory.getLogger(ExternalPlatformBusiness.class);
 
     private GirderStorageBusiness girderStorageBusiness;
 

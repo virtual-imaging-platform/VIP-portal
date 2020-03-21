@@ -40,7 +40,8 @@ import fr.insalyon.creatis.vip.api.rest.model.*;
 import fr.insalyon.creatis.vip.application.server.business.*;
 import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
 import fr.insalyon.creatis.vip.datamanager.server.business.TransferPoolBusiness;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
@@ -63,7 +64,7 @@ import static fr.insalyon.creatis.vip.api.CarminProperties.DEFAULT_LIMIT_LIST_EX
 @RequestMapping("/executions")
 public class ExecutionControler {
 
-    public static final Logger logger = Logger.getLogger(ExecutionControler.class);
+    public static final Logger logger = LoggerFactory.getLogger(ExecutionControler.class);
 
     @Autowired
     private Environment environment;

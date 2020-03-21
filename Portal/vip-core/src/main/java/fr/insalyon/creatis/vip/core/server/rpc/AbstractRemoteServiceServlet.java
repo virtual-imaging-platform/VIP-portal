@@ -42,7 +42,8 @@ import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -153,7 +154,7 @@ public abstract class AbstractRemoteServiceServlet extends RemoteServiceServlet 
             logger.info("(" + getSessionUser().getEmail() + ") " + message);
 
         } catch (CoreException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw ex;
         }
     }

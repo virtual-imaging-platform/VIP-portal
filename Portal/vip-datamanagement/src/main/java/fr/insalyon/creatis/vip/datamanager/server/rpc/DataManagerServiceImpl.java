@@ -55,7 +55,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -63,7 +64,7 @@ import org.apache.log4j.Logger;
  */
 public class DataManagerServiceImpl extends AbstractRemoteServiceServlet implements DataManagerService {
 
-    private static final Logger logger = Logger.getLogger(DataManagerServiceImpl.class);
+    private static final Logger logger = LoggerFactory.getLogger(DataManagerServiceImpl.class);
     private final DataManagerBusiness dataManagerBusiness;
     private final LFCBusiness lfcBusiness;
     private final TransferPoolBusiness transferPoolBusiness;

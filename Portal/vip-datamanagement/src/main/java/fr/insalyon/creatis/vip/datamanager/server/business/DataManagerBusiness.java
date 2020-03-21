@@ -59,7 +59,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import fr.insalyon.creatis.vip.datamanager.server.dao.DataManagerDAOFactory;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -67,7 +68,7 @@ import org.apache.log4j.Logger;
  */
 public class DataManagerBusiness {
 
-    private final static Logger logger = Logger.getLogger(DataManagerBusiness.class);
+    private final static Logger logger = LoggerFactory.getLogger(DataManagerBusiness.class);
 
     public void deleteLocalFile(String fileName) throws BusinessException {
 
@@ -96,7 +97,7 @@ public class DataManagerBusiness {
             return dmCachedFiles;
 
         } catch (GRIDAClientException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new BusinessException(ex);
         }
     }
@@ -111,7 +112,7 @@ public class DataManagerBusiness {
                 client.deleteCachedFile(path);
             }
         } catch (GRIDAClientException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new BusinessException(ex);
         }
     }
@@ -125,7 +126,7 @@ public class DataManagerBusiness {
                 DataManagerUtil.parseBaseDir(user, remoteFile, connection),
                 localDir);
         } catch (DataManagerException | GRIDAClientException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new BusinessException(ex);
         }
     }
@@ -143,7 +144,7 @@ public class DataManagerBusiness {
             return list;
 
         } catch (GRIDAClientException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new BusinessException(ex);
         }
     }
@@ -163,7 +164,7 @@ public class DataManagerBusiness {
                 client.delete(surl);
             }
         } catch (GRIDAClientException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new BusinessException(ex);
         }
     }

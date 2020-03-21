@@ -34,7 +34,8 @@ package fr.insalyon.creatis.vip.datamanager.server.dao;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import fr.insalyon.creatis.vip.core.server.dao.mysql.PlatformConnection;
 import fr.insalyon.creatis.vip.datamanager.server.dao.mysql.*;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.sql.Connection;
 import java.sql.SQLException;
 
@@ -44,7 +45,7 @@ import java.sql.SQLException;
  */
 public class DataManagerDAOFactory {
 
-    private final static Logger logger = Logger.getLogger(DataManagerDAOFactory.class);
+    private final static Logger logger = LoggerFactory.getLogger(DataManagerDAOFactory.class);
     private static DataManagerDAOFactory instance;
 
     // Singleton

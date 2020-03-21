@@ -40,7 +40,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -48,7 +49,7 @@ import org.apache.log4j.Logger;
  */
 public class EngineData implements EngineDAO {
 
-    private final static Logger logger = Logger.getLogger(EngineData.class);
+    private final static Logger logger = LoggerFactory.getLogger(EngineData.class);
     private Connection connection;
 
     public EngineData(Connection connection) throws DAOException {
@@ -72,7 +73,7 @@ public class EngineData implements EngineDAO {
             if (ex.getMessage().contains("Duplicate entry")) {
                 throw new DAOException("An engine named \"" + engine.getName() + "\" already exists.");
             } else {
-                logger.error(ex);
+                logger.error(ex.toString());
                 throw new DAOException(ex);
             }
         }
@@ -94,7 +95,7 @@ public class EngineData implements EngineDAO {
             ps.close();
 
         } catch (SQLException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new DAOException(ex);
         }
     }
@@ -111,7 +112,7 @@ public class EngineData implements EngineDAO {
             ps.close();
 
         } catch (SQLException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new DAOException(ex);
         }
     }
@@ -133,7 +134,7 @@ public class EngineData implements EngineDAO {
             return list;
 
         } catch (SQLException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new DAOException(ex);
         }
     }
@@ -162,7 +163,7 @@ public class EngineData implements EngineDAO {
             return list;
 
         } catch (SQLException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new DAOException(ex);
         }
     }

@@ -45,7 +45,8 @@ import fr.insalyon.creatis.vip.core.server.business.Server;
 import java.io.File;
 import java.util.Date;
 import java.util.List;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -53,7 +54,7 @@ import org.apache.log4j.Logger;
  */
 public class WorkflowExecutionBusiness {
 
-    private static final Logger logger = Logger.getLogger(WorkflowExecutionBusiness.class);
+    private static final Logger logger = LoggerFactory.getLogger(WorkflowExecutionBusiness.class);
     private WorkflowEngineInstantiator engine;
 
     public WorkflowExecutionBusiness(String engineEndpoint) throws BusinessException {
@@ -96,7 +97,7 @@ public class WorkflowExecutionBusiness {
                     engine.getMode().equalsIgnoreCase("pool") ? "ShiwaPool" : ((WebServiceEngine)engine).getAddressWS());
 
         } catch (javax.xml.rpc.ServiceException | java.rmi.RemoteException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new BusinessException(ex);
         }
     }
@@ -113,7 +114,7 @@ public class WorkflowExecutionBusiness {
         try {
             status = engine.getStatus(simulationID);
         } catch (javax.xml.rpc.ServiceException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new BusinessException(ex);
         } catch (java.rmi.RemoteException ex) {
             // do nothing!
@@ -133,7 +134,7 @@ public class WorkflowExecutionBusiness {
             engine.kill(simulationID);
 
         } catch (javax.xml.rpc.ServiceException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new BusinessException(ex);
         } catch (java.rmi.RemoteException ex) {
             // do nothing!

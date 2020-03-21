@@ -35,7 +35,8 @@ import fr.insalyon.creatis.vip.application.client.bean.AppVersion;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.server.business.*;
 import fr.insalyon.creatis.vip.datamanager.server.business.DataManagerBusiness;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.sql.Connection;
@@ -48,7 +49,7 @@ import static com.hp.hpl.jena.vocabulary.OWLResults.output;
  */
 public class BoutiquesBusiness {
 
-    private static final Logger logger = Logger.getLogger(BoutiquesBusiness.class);
+    private static final Logger logger = LoggerFactory.getLogger(BoutiquesBusiness.class);
 
     public String publishVersion(
         User user, String applicationName, String version, Connection connection)

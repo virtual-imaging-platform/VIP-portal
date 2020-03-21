@@ -60,8 +60,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -69,7 +69,7 @@ import org.apache.log4j.Logger;
  */
 public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements WorkflowService {
 
-    private static final Logger logger = Logger.getLogger(WorkflowServiceImpl.class);
+    private static final Logger logger = LoggerFactory.getLogger(WorkflowServiceImpl.class);
     private WorkflowBusiness workflowBusiness;
     private InputBusiness inputBusiness;
 
@@ -239,7 +239,7 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
             return inputBusiness.loadSimulationInput(fileName);
 
         } catch (BusinessException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new ApplicationException(ex);
         }
     }
@@ -643,7 +643,7 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
         try {
             return workflowBusiness.getPerformanceStats(simulationList, type);
         } catch (WorkflowsDBDAOException ex) {
-            java.util.logging.Logger.getLogger(WorkflowServiceImpl.class.getName()).log(Level.SEVERE, null, ex);
+            LoggerFactory.getLogger(WorkflowServiceImpl.class.getName()).error(ex.toString(), ex);
             throw new ApplicationException(ex);
         } catch (BusinessException ex) {
             throw new ApplicationException(ex);

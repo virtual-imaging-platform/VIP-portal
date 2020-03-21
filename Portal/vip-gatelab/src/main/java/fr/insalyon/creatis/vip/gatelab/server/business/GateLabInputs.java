@@ -38,7 +38,8 @@ import fr.insalyon.creatis.vip.datamanager.server.DataManagerUtil;
 import java.sql.Connection;
 import java.util.HashMap;
 import java.util.Map;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -46,7 +47,7 @@ import org.apache.log4j.Logger;
  */
 public class GateLabInputs {
 
-    private final static Logger logger = Logger.getLogger(GateLabInputs.class);
+    private final static Logger logger = LoggerFactory.getLogger(GateLabInputs.class);
     private Map<String, String> inputsMap;
     private String inputfile;
 
@@ -112,7 +113,7 @@ public class GateLabInputs {
             return inputMap;
 
         } catch (DataManagerException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new BusinessException(ex);
         }
     }

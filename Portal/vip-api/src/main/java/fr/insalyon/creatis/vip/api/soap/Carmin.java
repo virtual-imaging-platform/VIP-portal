@@ -35,6 +35,8 @@ import fr.insalyon.creatis.vip.api.bean.*;
 import fr.insalyon.creatis.vip.api.bean.pairs.*;
 import fr.insalyon.creatis.vip.api.business.*;
 import fr.insalyon.creatis.vip.core.server.dao.mysql.PlatformConnection;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.Resource;
 import javax.jws.*;
@@ -62,7 +64,7 @@ import java.util.ArrayList;
  */
 public class Carmin {
 
-    private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(Carmin.class);
+    private final static Logger logger = LoggerFactory.getLogger(Carmin.class);
 
     @Resource
     private WebServiceContext wsContext;
@@ -86,7 +88,7 @@ public class Carmin {
             Execution e = eb.getExecution(executionId, false, connection);
             r = new Response(0, ApiUtils.getMessage(apiContext), e);
         } catch (ApiException | SQLException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             r = new Response(1, ex.getMessage(), null);
         }
         return r;
@@ -104,7 +106,7 @@ public class Carmin {
             Execution[] executions = eb.listExecutions(500, connection); // will not return more than 500 executions.
             r = new Response(0, ApiUtils.getMessage(apiContext), executions);
         } catch (ApiException | SQLException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             r = new Response(1, ex.getMessage(), null);
         }
         return r;
@@ -122,7 +124,7 @@ public class Carmin {
             String stdout = eb.getStdOut(executionId);
             r = new Response(0, ApiUtils.getMessage(apiContext), stdout);
         } catch (ApiException | SQLException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             r = new Response(1, ex.getMessage(), null);
         }
         return r;
@@ -140,7 +142,7 @@ public class Carmin {
             String stderr = eb.getStdErr(executionId);
             r = new Response(0, ApiUtils.getMessage(apiContext), stderr);
         } catch (ApiException | SQLException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             r = new Response(1, ex.getMessage(), null);
         }
         return r;
@@ -163,7 +165,7 @@ public class Carmin {
             eb.updateExecution(executionId, keyValuePairs);
             r = new Response(0, ApiUtils.getMessage(apiContext), null);
         } catch (ApiException | SQLException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             r = new Response(1, ex.getMessage(), null);
         }
         return r;
@@ -198,7 +200,7 @@ public class Carmin {
                 playExecution, connection);
             r = new Response(0, ApiUtils.getMessage(apiContext), id);
         } catch (ApiException | SQLException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             r = new Response(1, ex.getMessage(), null);
         }
         return r;
@@ -218,7 +220,7 @@ public class Carmin {
             ExecutionStatus s = eb.playExecution(executionId);
             r = new Response(0, ApiUtils.getMessage(apiContext), s);
         } catch (ApiException | SQLException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             r = new Response(1, ex.getMessage(), null);
         }
         return r;
@@ -238,7 +240,7 @@ public class Carmin {
             eb.killExecution(executionId);
             r = new Response(0, ApiUtils.getMessage(apiContext), null);
         } catch (ApiException | SQLException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             r = new Response(1, ex.getMessage(), null);
         }
         return r;
@@ -260,7 +262,7 @@ public class Carmin {
             eb.deleteExecution(executionId, deleteFiles);
             r = new Response(0, ApiUtils.getMessage(apiContext), null);
         } catch (ApiException | SQLException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             r = new Response(1, ex.getMessage(), null);
         }
         return r;
@@ -283,7 +285,7 @@ public class Carmin {
                 executionId, protocol, connection);
             r = new Response(0, ApiUtils.getMessage(apiContext), results);
         } catch (ApiException | SQLException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             r = new Response(1, ex.getMessage(), null);
         }
         return r;
@@ -306,7 +308,7 @@ public class Carmin {
             GlobalProperties gp = bpb.getGlobalProperties();
             r = new Response(0, ApiUtils.getMessage(apiContext), gp);
         } catch (ApiException | SQLException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             r = new Response(1, ex.getMessage(), null);
         }
         return r;
@@ -331,7 +333,7 @@ public class Carmin {
             Pipeline p = pb.getPipeline(pipelineId, connection);
             r = new Response(0, ApiUtils.getMessage(apiContext), p);
         } catch (ApiException | SQLException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             r = new Response(1, ex.getMessage(), null);
         }
         return r;
@@ -349,7 +351,7 @@ public class Carmin {
             Pipeline[] pipelines = pb.listPipelines(studyIdentifier, connection);
             r = new Response(0, ApiUtils.getMessage(apiContext),pipelines);
         } catch (ApiException | SQLException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             r = new Response(1, ex.getMessage(), null);
         }
         return r;
@@ -374,7 +376,7 @@ public class Carmin {
             ab.authenticateSession(userName, password, connection);
             r = new Response(0, ApiUtils.getMessage(apiContext), null);
         } catch (ApiException | SQLException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             r = new Response(1, ex.getMessage(), null);
         }
         return r;
@@ -391,7 +393,7 @@ public class Carmin {
             ab.authenticateHTTP(userName);
             r = new Response(0, ApiUtils.getMessage(apiContext), null);
         } catch (ApiException | SQLException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             r = new Response(1, ex.getMessage(), null);
         }
         return r;
@@ -409,7 +411,7 @@ public class Carmin {
             ab.logout(connection);
             r = new Response(0, ApiUtils.getMessage(apiContext), null);
         } catch (ApiException | SQLException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             r = new Response(1, ex.getMessage(), null);
         }
         return r;

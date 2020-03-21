@@ -52,7 +52,8 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -60,7 +61,7 @@ import org.apache.log4j.Logger;
  */
 public abstract class AbstractAuthenticationService extends HttpServlet {
 
-    private static Logger logger = Logger.getLogger(AbstractAuthenticationService.class);
+    private static Logger logger = LoggerFactory.getLogger(AbstractAuthenticationService.class);
 
     protected abstract void checkValidRequest(HttpServletRequest request) throws BusinessException;
 

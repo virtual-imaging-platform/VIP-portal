@@ -48,8 +48,10 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.xml.ws.WebServiceContext;
 import javax.xml.ws.handler.MessageContext;
-import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -57,7 +59,7 @@ import org.apache.log4j.PropertyConfigurator;
  */
 public class SoapApiBusiness {
 
-    private final static Logger logger = Logger.getLogger(SoapApiBusiness.class);
+    private final static Logger logger = LoggerFactory.getLogger(SoapApiBusiness.class);
     private final String authFailedMessage = "API user is not logged in.";
 
     private final ConfigurationBusiness configurationBusiness;

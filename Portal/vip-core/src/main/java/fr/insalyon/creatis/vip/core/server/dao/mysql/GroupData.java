@@ -40,7 +40,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -48,7 +49,7 @@ import org.apache.log4j.Logger;
  */
 public class GroupData implements GroupDAO {
 
-    private final static Logger logger = Logger.getLogger(GroupData.class);
+    private final static Logger logger = LoggerFactory.getLogger(GroupData.class);
     private Connection connection;
 
     public GroupData(Connection connection) throws DAOException {
@@ -78,7 +79,7 @@ public class GroupData implements GroupDAO {
                 logger.error("A group named \"" + group.getName() + "\" already exists.");
                 throw new DAOException("A group named \"" + group.getName() + "\" already exists.", ex);
             } else {
-                logger.error(ex);
+                logger.error(ex.toString());
                 throw new DAOException(ex);
             }
         }
@@ -95,7 +96,7 @@ public class GroupData implements GroupDAO {
             ps.close();
 
         } catch (SQLException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new DAOException(ex);
         }
     }
@@ -117,7 +118,7 @@ public class GroupData implements GroupDAO {
             ps.close();
 
         } catch (SQLException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new DAOException(ex);
         }
     }
@@ -140,7 +141,7 @@ public class GroupData implements GroupDAO {
             return groups;
 
         } catch (SQLException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new DAOException(ex);
         }
     }

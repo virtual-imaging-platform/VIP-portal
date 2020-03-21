@@ -35,7 +35,8 @@ import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import fr.insalyon.creatis.vip.core.server.dao.mysql.PlatformConnection;
 import fr.insalyon.creatis.vip.datamanager.client.bean.UserApiKey;
 import fr.insalyon.creatis.vip.datamanager.server.dao.ApiKeysDAO;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -46,7 +47,7 @@ import java.util.List;
 
 public class ApiKeysData implements ApiKeysDAO {
 
-    private static final Logger logger = Logger.getLogger(ApiKeysData.class);
+    private static final Logger logger = LoggerFactory.getLogger(ApiKeysData.class);
     private Connection connection;
 
     public ApiKeysData(Connection connection) throws DAOException {

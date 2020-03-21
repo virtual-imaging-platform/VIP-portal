@@ -41,7 +41,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -55,7 +56,7 @@ import org.xml.sax.helpers.XMLReaderFactory;
  */
 public class InputM2Parser extends DefaultHandler {
 
-    private static final Logger logger = Logger.getLogger(InputM2Parser.class);
+    private static final Logger logger = LoggerFactory.getLogger(InputM2Parser.class);
     private XMLReader reader;
     private Map<String, String> inputs;
     private String name;
@@ -83,10 +84,10 @@ public class InputM2Parser extends DefaultHandler {
             return inputs;
 
         } catch (IOException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new BusinessException(ex);
         } catch (SAXException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new BusinessException(ex);
         }
     }

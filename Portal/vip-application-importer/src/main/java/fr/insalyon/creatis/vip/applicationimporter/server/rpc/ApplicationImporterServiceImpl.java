@@ -41,14 +41,14 @@ import fr.insalyon.creatis.vip.core.server.dao.mysql.PlatformConnection;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.HashMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.json.JSONException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ApplicationImporterServiceImpl extends fr.insalyon.creatis.vip.core.server.rpc.AbstractRemoteServiceServlet
         implements ApplicationImporterService {
 
-    private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(ApplicationImporterServiceImpl.class);
+    private final static Logger logger = LoggerFactory.getLogger(ApplicationImporterServiceImpl.class);
 
     @Override
     public String readAndValidateBoutiquesFile(String fileLFN) throws ApplicationImporterException {
@@ -58,7 +58,7 @@ public class ApplicationImporterServiceImpl extends fr.insalyon.creatis.vip.core
             return abi.readAndValidationBoutiquesFile(
                 fileLFN, getSessionUser(), connection);
         } catch (CoreException | BusinessException | SQLException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new ApplicationImporterException(ex);
         }
     }
@@ -70,10 +70,10 @@ public class ApplicationImporterServiceImpl extends fr.insalyon.creatis.vip.core
             ApplicationImporterBusiness abi = new ApplicationImporterBusiness();
             abi.createApplication(bt, type, tag, bts, isRunOnGrid, overwriteVersion, getSessionUser(), challenge, connection);
         } catch (BusinessException | CoreException | SQLException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new ApplicationImporterException(ex);
         } catch (JSONException ex) {
-            Logger.getLogger(ApplicationImporterServiceImpl.class.getName()).log(Level.SEVERE, null, ex);
+            LoggerFactory.getLogger(ApplicationImporterServiceImpl.class.getName()).error(ex.toString(), ex);
         }
     }
 }

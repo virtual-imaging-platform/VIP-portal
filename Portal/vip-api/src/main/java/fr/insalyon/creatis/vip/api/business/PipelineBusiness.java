@@ -49,7 +49,8 @@ import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import java.sql.Connection;
 import java.util.*;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
@@ -61,7 +62,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class PipelineBusiness {
 
-    private final static Logger logger = Logger.getLogger(PipelineBusiness.class);
+    private final static Logger logger = LoggerFactory.getLogger(PipelineBusiness.class);
 
     private final ApiContext apiContext;
     private Environment env;

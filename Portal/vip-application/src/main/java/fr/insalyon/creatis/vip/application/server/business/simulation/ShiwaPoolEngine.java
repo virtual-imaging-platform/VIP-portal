@@ -40,7 +40,8 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.PrintWriter;
 import java.util.List;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.shiwa.desktop.data.description.workflow.SHIWAProperty;
 
 /**
@@ -49,7 +50,7 @@ import org.shiwa.desktop.data.description.workflow.SHIWAProperty;
  */
 public class ShiwaPoolEngine extends WorkflowEngineInstantiator {
 
-    private static Logger logger = Logger.getLogger(ShiwaPoolEngine.class);
+    private static Logger logger = LoggerFactory.getLogger(ShiwaPoolEngine.class);
     private ShiwaClientService service;
     private List<SHIWAProperty> settings;
 

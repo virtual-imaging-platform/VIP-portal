@@ -39,8 +39,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.util.logging.Level;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -48,7 +48,7 @@ import org.apache.log4j.Logger;
  */
 public class TermsUseData implements TermsUseDAO {
 
-    private final static Logger logger = Logger.getLogger(TermsUseData.class);
+    private final static Logger logger = LoggerFactory.getLogger(TermsUseData.class);
     private Connection connection;
 
     public TermsUseData(Connection connection) throws DAOException {
@@ -68,7 +68,7 @@ public class TermsUseData implements TermsUseDAO {
 
 
         } catch (SQLException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new DAOException(ex);
         }
     }
@@ -88,7 +88,7 @@ public class TermsUseData implements TermsUseDAO {
             return date;
 
         } catch (SQLException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new DAOException(ex);
         }
 

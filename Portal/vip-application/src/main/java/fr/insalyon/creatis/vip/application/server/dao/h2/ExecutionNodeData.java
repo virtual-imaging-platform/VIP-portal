@@ -37,7 +37,8 @@ import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -45,7 +46,7 @@ import org.apache.log4j.Logger;
  */
 public class ExecutionNodeData extends AbstractJobData implements ExecutionNodeDAO {
 
-    private static Logger logger = Logger.getLogger(ExecutionNodeData.class);
+    private static Logger logger = LoggerFactory.getLogger(ExecutionNodeData.class);
 
     public ExecutionNodeData(String dbPath) throws DAOException {
 
@@ -83,7 +84,7 @@ public class ExecutionNodeData extends AbstractJobData implements ExecutionNodeD
             return node;
 
         } catch (SQLException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new DAOException(ex);
         } finally {
             close(logger);

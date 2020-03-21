@@ -40,7 +40,8 @@ import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import fr.insalyon.creatis.vip.core.server.dao.UserDAO;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
@@ -70,7 +71,7 @@ import java.util.function.Supplier;
 public class ApikeyAuthenticationProvider implements
         AuthenticationProvider, InitializingBean, MessageSourceAware {
 
-    protected final Logger logger = Logger.getLogger(getClass());
+    protected final Logger logger = LoggerFactory.getLogger(getClass());
 
     // ~ Instance fields
     // ================================================================================================

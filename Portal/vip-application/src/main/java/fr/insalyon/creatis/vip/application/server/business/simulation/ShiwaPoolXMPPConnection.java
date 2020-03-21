@@ -33,7 +33,8 @@ package fr.insalyon.creatis.vip.application.server.business.simulation;
 
 import fr.insalyon.creatis.shiwapool.client.ClientConfiguration;
 import fr.insalyon.creatis.shiwapool.common.Connection;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -41,7 +42,7 @@ import org.apache.log4j.Logger;
  */
 public class ShiwaPoolXMPPConnection {
 
-    private static final Logger logger = Logger.getLogger(ShiwaPoolXMPPConnection.class);
+    private static final Logger logger = LoggerFactory.getLogger(ShiwaPoolXMPPConnection.class);
     private static volatile ShiwaPoolXMPPConnection instance;
     private Connection connection;
 

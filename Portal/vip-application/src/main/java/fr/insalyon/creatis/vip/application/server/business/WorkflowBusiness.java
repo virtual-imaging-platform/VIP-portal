@@ -77,10 +77,10 @@ import fr.insalyon.creatis.vip.datamanager.server.business.*;
 import java.io.File;
 import java.sql.Connection;
 import java.util.*;
-import java.util.logging.Level;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -88,7 +88,7 @@ import org.apache.log4j.Logger;
  */
 public class WorkflowBusiness {
 
-    private static final Logger logger = Logger.getLogger(WorkflowBusiness.class);
+    private static final Logger logger = LoggerFactory.getLogger(WorkflowBusiness.class);
     private static SimulationStatsDAO simulationStatsDAO;
     private static WorkflowDAO workflowDAO;
     private static ProcessorDAO processorDAO;
@@ -108,9 +108,9 @@ public class WorkflowBusiness {
             inputDAO = WorkflowsDBDAOFactory.getInstance().getInputDAO();
             statsDAO = WorkflowsDBDAOFactory.getInstance().getStatsDAO();
         } catch (DAOException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
         } catch (WorkflowsDBDAOException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
         }
         externalPlatformBusiness =
             new ExternalPlatformBusiness(
@@ -136,7 +136,7 @@ public class WorkflowBusiness {
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         } catch (WorkflowsDBDAOException ex) {
-            java.util.logging.Logger.getLogger(WorkflowBusiness.class.getName()).log(Level.SEVERE, null, ex);
+            LoggerFactory.getLogger(WorkflowBusiness.class.getName()).error(ex.toString(), ex);
         }
         if (engineBean == null || engineBean.getEndpoint().isEmpty()) {
             throw new BusinessException("No available engines for class " + applicationClass);
@@ -282,7 +282,7 @@ public class WorkflowBusiness {
             return workflow.getId();
 
         } catch (WorkflowsDBDAOException | DAOException | DataManagerException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new BusinessException(ex);
         }
     }
@@ -326,7 +326,7 @@ public class WorkflowBusiness {
             return parseWorkflows(workflowDAO.get(user != null ? user.getFullName() : null, lastDate));
 
         } catch (WorkflowsDBDAOException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new BusinessException(ex);
         }
     }
@@ -365,7 +365,7 @@ public class WorkflowBusiness {
             return simulations;
 
         } catch (WorkflowsDBDAOException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new BusinessException(ex);
         }
     }
@@ -404,7 +404,7 @@ public class WorkflowBusiness {
             return simulations;
 
         } catch (WorkflowsDBDAOException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new BusinessException(ex);
         }
     }
@@ -440,13 +440,13 @@ public class WorkflowBusiness {
                     : new ScuflParser().parse(workflowPath);
 
         } catch (org.xml.sax.SAXException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new BusinessException(ex);
         } catch (fr.insalyon.creatis.vip.core.server.dao.DAOException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new BusinessException(ex);
         } catch (java.io.IOException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new BusinessException(ex);
         }
     }
@@ -466,7 +466,7 @@ public class WorkflowBusiness {
             executionBusiness.kill(simulationID);
 
         } catch (WorkflowsDBDAOException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new BusinessException(ex);
         }
     }
@@ -494,10 +494,10 @@ public class WorkflowBusiness {
             outputDAO.removeById(simulationID);
 
         } catch (WorkflowsDBDAOException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new BusinessException(ex);
         } catch (GRIDAClientException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new BusinessException(ex);
         }
     }
@@ -530,7 +530,7 @@ public class WorkflowBusiness {
             FileUtils.deleteQuietly(workflowDir);
 
         } catch (WorkflowsDBDAOException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new BusinessException(ex);
         }
     }
@@ -594,7 +594,7 @@ public class WorkflowBusiness {
             }
 
         } catch (WorkflowsDBDAOException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new BusinessException(ex);
         }
 
@@ -623,10 +623,10 @@ public class WorkflowBusiness {
                         output.getType().name()));
             }
         } catch (WorkflowsDBDAOException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new BusinessException(ex);
         } catch (DataManagerException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new BusinessException(ex);
         }
 
@@ -655,10 +655,10 @@ public class WorkflowBusiness {
             return list;
 
         } catch (WorkflowsDBDAOException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new BusinessException(ex);
         } catch (DataManagerException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new BusinessException(ex);
         }
     }
@@ -680,7 +680,7 @@ public class WorkflowBusiness {
                 throw new BusinessException("Unable to delete data: " + path);
             }
         } catch (java.io.IOException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new BusinessException(ex);
         }
     }
@@ -716,7 +716,7 @@ public class WorkflowBusiness {
             return list;
 
         } catch (WorkflowsDBDAOException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new BusinessException(ex);
         }
     }
@@ -761,7 +761,7 @@ public class WorkflowBusiness {
 
 
             } catch (DAOException ex) {
-                logger.error(ex);
+                logger.error(ex.toString());
                 throw new BusinessException(ex);
             }
 
@@ -803,10 +803,10 @@ public class WorkflowBusiness {
                         "The following data does not exist: " + sb.toString());
             }
         } catch (DataManagerException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new BusinessException(ex);
         } catch (GRIDAClientException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new BusinessException(ex);
         }
     }
@@ -823,7 +823,7 @@ public class WorkflowBusiness {
             workflowDAO.updateUsername(newUser, currentUser);
 
         } catch (WorkflowsDBDAOException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new BusinessException(ex);
         }
     }
@@ -834,7 +834,7 @@ public class WorkflowBusiness {
             w.setDescription(newDescription);
             workflowDAO.update(w);
         } catch (WorkflowsDBDAOException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new BusinessException(ex);
         }
     }
@@ -850,7 +850,7 @@ public class WorkflowBusiness {
             return parseWorkflows(workflowDAO.getRunning());
 
         } catch (WorkflowsDBDAOException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new BusinessException(ex);
         }
     }
@@ -948,7 +948,7 @@ public class WorkflowBusiness {
 
 
         } catch (WorkflowsDBDAOException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new BusinessException(ex);
         }
     }
@@ -961,7 +961,7 @@ public class WorkflowBusiness {
 
 
         } catch (WorkflowsDBDAOException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new BusinessException(ex);
         }
     }

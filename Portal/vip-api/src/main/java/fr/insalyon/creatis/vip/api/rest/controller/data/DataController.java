@@ -35,7 +35,8 @@ import fr.insalyon.creatis.vip.api.business.*;
 import fr.insalyon.creatis.vip.api.exception.SQLRuntimeException;
 import fr.insalyon.creatis.vip.api.rest.RestApiBusiness;
 import fr.insalyon.creatis.vip.api.rest.model.*;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.*;
@@ -56,7 +57,7 @@ import java.util.function.Supplier;
 @RequestMapping("path")
 public class DataController {
 
-    public static final Logger logger = Logger.getLogger(DataController.class);
+    public static final Logger logger = LoggerFactory.getLogger(DataController.class);
 
     @Autowired
     private RestApiBusiness restApiBusiness;

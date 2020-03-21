@@ -36,7 +36,8 @@ import fr.insalyon.creatis.vip.api.exception.SQLRuntimeException;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.datamanager.client.bean.ExternalPlatform;
 import fr.insalyon.creatis.vip.datamanager.server.business.ExternalPlatformBusiness;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -51,7 +52,7 @@ import java.util.function.Supplier;
 @RequestMapping("/externalPlatforms")
 public class ExternalPlatformController {
 
-    private static final Logger logger = Logger.getLogger(ExternalPlatformController.class);
+    private static final Logger logger = LoggerFactory.getLogger(ExternalPlatformController.class);
 
     private ExternalPlatformBusiness externalPlatformBusiness;
 

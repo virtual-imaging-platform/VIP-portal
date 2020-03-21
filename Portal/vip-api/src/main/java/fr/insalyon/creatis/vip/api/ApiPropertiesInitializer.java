@@ -34,7 +34,8 @@ package fr.insalyon.creatis.vip.api;
 import fr.insalyon.creatis.vip.api.bean.Module;
 import fr.insalyon.creatis.vip.api.rest.model.SupportedTransferProtocol;
 import fr.insalyon.creatis.vip.core.server.business.Server;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContextInitializer;
 import org.springframework.core.env.Environment;
 import org.springframework.core.io.support.ResourcePropertySource;
@@ -54,7 +55,7 @@ import static fr.insalyon.creatis.vip.api.CarminProperties.*;
  */
 public class ApiPropertiesInitializer implements ApplicationContextInitializer<ConfigurableWebApplicationContext> {
 
-    private static final Logger logger = Logger.getLogger(ApiPropertiesInitializer.class);
+    private static final Logger logger = LoggerFactory.getLogger(ApiPropertiesInitializer.class);
 
     @Override
     public void initialize(ConfigurableWebApplicationContext applicationContext) {

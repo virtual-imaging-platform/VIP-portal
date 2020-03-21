@@ -36,7 +36,8 @@ import fr.insalyon.creatis.vip.core.server.auth.AbstractAuthenticationService;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
 import java.sql.Connection;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -44,7 +45,7 @@ import org.apache.log4j.Logger;
  */
 public class AuthenticationBusiness {
 
-    private final static Logger logger = Logger.getLogger(AuthenticationBusiness.class);
+    private final static Logger logger = LoggerFactory.getLogger(AuthenticationBusiness.class);
 
     private final ApiContext apiContext;
 

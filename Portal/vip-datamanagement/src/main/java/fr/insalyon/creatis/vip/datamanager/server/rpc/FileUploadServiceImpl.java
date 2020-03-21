@@ -42,7 +42,8 @@ import fr.insalyon.creatis.vip.datamanager.server.DataManagerUtil;
 import org.apache.commons.fileupload.*;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.*;
@@ -58,7 +59,7 @@ import java.util.*;
  */
 public class FileUploadServiceImpl extends HttpServlet {
 
-    private static Logger logger = Logger.getLogger(FileUploadServiceImpl.class);
+    private static Logger logger = LoggerFactory.getLogger(FileUploadServiceImpl.class);
     private GRIDAClient client;
     private GRIDAPoolClient poolClient;
     private String path;

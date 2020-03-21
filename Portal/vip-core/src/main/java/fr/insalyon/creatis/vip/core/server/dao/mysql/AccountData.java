@@ -41,7 +41,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -49,7 +50,7 @@ import org.apache.log4j.Logger;
  */
 public class AccountData implements AccountDAO {
 
-    private final static Logger logger = Logger.getLogger(AccountData.class);
+    private final static Logger logger = LoggerFactory.getLogger(AccountData.class);
     private Connection connection;
 
     public AccountData(Connection connection) throws DAOException {
@@ -75,7 +76,7 @@ public class AccountData implements AccountDAO {
             addGroupsToAccount(name, groups);
 
         } catch (SQLException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new DAOException(ex);
         }
     }
@@ -104,7 +105,7 @@ public class AccountData implements AccountDAO {
             addGroupsToAccount(newName, groups);
 
         } catch (SQLException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new DAOException(ex);
         }
     }
@@ -126,7 +127,7 @@ public class AccountData implements AccountDAO {
             ps.close();
 
         } catch (SQLException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new DAOException(ex);
         }
     }
@@ -154,7 +155,7 @@ public class AccountData implements AccountDAO {
             return accounts;
 
         } catch (SQLException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new DAOException(ex);
         }
     }
@@ -193,7 +194,7 @@ public class AccountData implements AccountDAO {
             return groups;
 
         } catch (SQLException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new DAOException(ex);
         }
     }
@@ -217,7 +218,7 @@ public class AccountData implements AccountDAO {
             }
 
         } catch (SQLException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new DAOException(ex);
         }
     }
@@ -237,7 +238,7 @@ public class AccountData implements AccountDAO {
             ps.close();
 
         } catch (SQLException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new DAOException(ex);
         }
     }

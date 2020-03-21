@@ -47,12 +47,13 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.sql.Connection;
 import java.util.Optional;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class VisualizationBusiness {
 
     private final static Logger logger =
-        Logger.getLogger(VisualizationBusiness.class);
+        LoggerFactory.getLogger(VisualizationBusiness.class);
 
     public Image getImageSlicesURL(String imageFileName, String dir)
         throws BusinessException {
@@ -221,7 +222,7 @@ public class VisualizationBusiness {
         } catch (DataManagerException dme) {
             logger.warn(
                 "Error while building lfn name with new extension: " + lfn);
-            logger.warn(dme);
+            logger.warn(dme.toString());
             return Optional.empty();
         }
     }
@@ -231,7 +232,7 @@ public class VisualizationBusiness {
             return gridaClient.exist(filename);
         } catch (GRIDAClientException gce) {
             logger.warn("Error while grida checked existance of: " + filename);
-            logger.warn(gce);
+            logger.warn(gce.toString());
             return false;
         }
     }
@@ -248,7 +249,7 @@ public class VisualizationBusiness {
             return true;
         } catch (GRIDAClientException gce) {
             logger.warn("Error while grida downloading file: " + filename);
-            logger.warn(gce);
+            logger.warn(gce.toString());
             return false;
         }
     }

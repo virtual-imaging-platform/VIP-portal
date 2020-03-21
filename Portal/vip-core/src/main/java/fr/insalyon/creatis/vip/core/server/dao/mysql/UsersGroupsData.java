@@ -43,7 +43,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -51,7 +52,7 @@ import org.apache.log4j.Logger;
  */
 public class UsersGroupsData implements UsersGroupsDAO {
 
-    private final static Logger logger = Logger.getLogger(UsersGroupsData.class);
+    private final static Logger logger = LoggerFactory.getLogger(UsersGroupsData.class);
     private Connection connection;
 
     public UsersGroupsData(Connection connection) throws DAOException {
@@ -74,7 +75,7 @@ public class UsersGroupsData implements UsersGroupsDAO {
             ps.close();
 
         } catch (SQLException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new DAOException(ex);
         }
     }
@@ -111,7 +112,7 @@ public class UsersGroupsData implements UsersGroupsDAO {
             return groups;
 
         } catch (SQLException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new DAOException(ex);
         }
     }
@@ -142,7 +143,7 @@ public class UsersGroupsData implements UsersGroupsDAO {
             return groupsName;
 
         } catch (SQLException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new DAOException(ex);
         }
     }
@@ -171,7 +172,7 @@ public class UsersGroupsData implements UsersGroupsDAO {
             }
 
         } catch (SQLException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new DAOException(ex);
         }
     }
@@ -211,7 +212,7 @@ public class UsersGroupsData implements UsersGroupsDAO {
             return users;
 
         } catch (SQLException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new DAOException(ex);
         }
     }
@@ -253,7 +254,7 @@ public class UsersGroupsData implements UsersGroupsDAO {
             return proprties;
 
         } catch (SQLException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new DAOException(ex);
         }
     }
@@ -301,7 +302,7 @@ public class UsersGroupsData implements UsersGroupsDAO {
             return users;
 
         } catch (SQLException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new DAOException(ex);
         }
     }
@@ -324,7 +325,7 @@ public class UsersGroupsData implements UsersGroupsDAO {
             ps.close();
 
         } catch (SQLException ex) {
-            logger.error(ex);
+            logger.error(ex.toString());
             throw new DAOException(ex);
         }
     }

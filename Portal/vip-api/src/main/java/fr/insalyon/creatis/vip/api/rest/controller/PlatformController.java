@@ -35,7 +35,8 @@ import fr.insalyon.creatis.vip.api.bean.Module;
 import fr.insalyon.creatis.vip.api.business.ApiUtils;
 import fr.insalyon.creatis.vip.api.rest.RestApiBusiness;
 import fr.insalyon.creatis.vip.api.rest.model.*;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -54,7 +55,7 @@ import static fr.insalyon.creatis.vip.api.CarminProperties.*;
 @RequestMapping("/platform")
 public class PlatformController {
 
-    public static final Logger logger = Logger.getLogger(PlatformController.class);
+    public static final Logger logger = LoggerFactory.getLogger(PlatformController.class);
 
     @Autowired
     private Environment env;
