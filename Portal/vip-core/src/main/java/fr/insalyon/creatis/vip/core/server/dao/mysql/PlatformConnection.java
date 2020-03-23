@@ -254,7 +254,7 @@ public class PlatformConnection {
 
         } catch (SQLException ex) {
             if (!ex.getMessage().contains("already exists")) {
-                logger.error("Error creating db table" + name, ex);
+                logger.error("Error creating db table {}", name, ex);
             }
             return false;
         }

@@ -75,7 +75,7 @@ public class UsersGroupsData implements UsersGroupsDAO {
             ps.close();
 
         } catch (SQLException ex) {
-            logger.error(ex.toString());
+            logger.error("Error adding group {} to {}", groupname, email);
             throw new DAOException(ex);
         }
     }
@@ -112,7 +112,7 @@ public class UsersGroupsData implements UsersGroupsDAO {
             return groups;
 
         } catch (SQLException ex) {
-            logger.error(ex.toString());
+            logger.error("Error getting groups for {}", email);
             throw new DAOException(ex);
         }
     }
@@ -143,7 +143,7 @@ public class UsersGroupsData implements UsersGroupsDAO {
             return groupsName;
 
         } catch (SQLException ex) {
-            logger.error(ex.toString());
+            logger.error("Error getting user admin groups for {}", email);
             throw new DAOException(ex);
         }
     }
@@ -172,7 +172,7 @@ public class UsersGroupsData implements UsersGroupsDAO {
             }
 
         } catch (SQLException ex) {
-            logger.error(ex.toString());
+            logger.error("Error setting user groups for {}", email);
             throw new DAOException(ex);
         }
     }
@@ -212,7 +212,7 @@ public class UsersGroupsData implements UsersGroupsDAO {
             return users;
 
         } catch (SQLException ex) {
-            logger.error(ex.toString());
+            logger.error("Error getting users from ", groups);
             throw new DAOException(ex);
         }
     }
@@ -254,7 +254,7 @@ public class UsersGroupsData implements UsersGroupsDAO {
             return proprties;
 
         } catch (SQLException ex) {
-            logger.error(ex.toString());
+            logger.error("Error getting users properties groups for {} ", email);
             throw new DAOException(ex);
         }
     }
@@ -302,7 +302,7 @@ public class UsersGroupsData implements UsersGroupsDAO {
             return users;
 
         } catch (SQLException ex) {
-            logger.error(ex.toString());
+            logger.error("Error getting users from group {} ", groupName);
             throw new DAOException(ex);
         }
     }
@@ -325,7 +325,7 @@ public class UsersGroupsData implements UsersGroupsDAO {
             ps.close();
 
         } catch (SQLException ex) {
-            logger.error(ex.toString());
+            logger.error("Error removing {} from group {} ", email, groupName);
             throw new DAOException(ex);
         }
     }

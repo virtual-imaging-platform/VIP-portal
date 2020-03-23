@@ -115,6 +115,7 @@ public class GetFileServiceImpl extends HttpServlet {
                 }
             }
         } catch (DAOException | SQLException ex) {
+            logger.error("Error Downloading file", ex);
             throw new ServletException(ex);
         }
     }

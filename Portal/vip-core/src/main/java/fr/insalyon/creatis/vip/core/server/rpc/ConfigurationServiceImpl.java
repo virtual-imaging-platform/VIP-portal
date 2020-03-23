@@ -381,7 +381,7 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
         try{
             authenticateSystemAdministrator(logger);
             return;
-        } catch(CoreException ex){ } // The user is not a system administrator. Ignore the exception.
+        } catch(CoreException ignored){ } // The user is not a system administrator. Ignore the exception.
 
         User user = getSessionUser();
         Map<Group, GROUP_ROLE> userGroups = getUserGroups(null);
@@ -392,7 +392,7 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
             }
         }
 
-        logger.error("The user has no admin rights for group " + groupName + ": " + user.getEmail());
+        logger.error("The user {} has no admin rights for group {}", user.getEmail(), groupName);
         throw new CoreException("The user has no group administrator rights.");
     }
 
@@ -830,6 +830,7 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
                         wai.requestTokenPair.key,
                         wai.requestTokenPair.secret);
             } catch (DAOException | GRIDAClientException | SQLException ex) {
+                logger.error("Error linking dropbox account for {}", user.getEmail());
                 throw new CoreException(ex);
             }
             return wai.url;
@@ -893,7 +894,6 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
         try(Connection connection = PlatformConnection.getInstance().getConnection()) {
             return configurationBusiness.getPublications(connection);
         } catch (BusinessException | SQLException ex) {
-            logger.error(ex.toString());
             throw new CoreException(ex);
         }
     }
@@ -943,6 +943,8 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
                 pub.setVipAuthor(user.getEmail());
                 configurationBusiness.updatePublication(pub, connection);
             } else {
+                logger.error("{} cannot modify publication {} because its not his",
+                        user.getEmail(), pub.getId());
                 throw new CoreException("you can't modify a publication that is not yours");
             }
         } catch (BusinessException | SQLException ex) {
@@ -986,7 +988,8 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
         try {
             Server.getInstance().setMaxPlatformRunningSimulations(maxPlatformRunningSimulations);
         } catch (ConfigurationException ex) {
-            logger.error(ex.toString());
+            logger.error("Configuration error changing maxPlatformRunningSimulations to {}",
+                    maxPlatformRunningSimulations);
             throw new CoreException(ex);
         }
     }
@@ -1017,11 +1020,8 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
 
             }
 
-        } catch (ParseException ex) {
-            logger.error(ex.toString());
-            throw new CoreException(ex);
-        } catch (TokenMgrException ex) {
-            logger.error(ex.toString());
+        } catch (ParseException | TokenMgrException ex) {
+            logger.error("Error parsing publication {}", s);
             throw new CoreException(ex);
         }
         return publications;
@@ -1082,7 +1082,6 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
             return configurationBusiness
                 .getUserApikey(getSessionUser().getEmail(), connection);
         } catch (BusinessException | SQLException ex) {
-            logger.error("Error getting apikey for " + email, ex);
             throw new CoreException(ex);
         }
     }
@@ -1093,7 +1092,6 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
             configurationBusiness
                 .deleteUserApikey(getSessionUser().getEmail(), connection);
         } catch (BusinessException | SQLException ex) {
-            logger.error("Error deleting apikey for " + email, ex);
             throw new CoreException(ex);
         }
     }
@@ -1104,7 +1102,6 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
             return configurationBusiness
                 .generateNewUserApikey(getSessionUser().getEmail(), connection);
         } catch (BusinessException | SQLException ex) {
-            logger.error("Error generating apikey for " + email, ex);
             throw new CoreException(ex);
         }
     }

@@ -149,13 +149,6 @@ public abstract class AbstractRemoteServiceServlet extends RemoteServiceServlet 
      * @throws CoreException 
      */
     protected void trace(Logger logger, String message) throws CoreException {
-
-        try {
-            logger.info("(" + getSessionUser().getEmail() + ") " + message);
-
-        } catch (CoreException ex) {
-            logger.error(ex.toString());
-            throw ex;
-        }
+        logger.info("(" + getSessionUser().getEmail() + ") " + message);
     }
 }

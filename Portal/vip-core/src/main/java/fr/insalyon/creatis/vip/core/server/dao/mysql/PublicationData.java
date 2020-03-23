@@ -78,7 +78,7 @@ public class PublicationData implements PublicationDAO {
             ps.execute();
             ps.close();
         } catch (SQLException ex) {
-            logger.error(ex.toString());
+            logger.error("Error adding publication {} {}", pub.getTitle(), pub.getDoi());
             throw new DAOException(ex);
         }
     }
@@ -104,7 +104,7 @@ public class PublicationData implements PublicationDAO {
             ps.close();
 
         } catch (SQLException ex) {
-            logger.error(ex.toString());
+            logger.error("Error updating publication {}",publication.getId());
             throw new DAOException(ex);
         }
 
@@ -125,7 +125,7 @@ public class PublicationData implements PublicationDAO {
             ps.close();
 
         } catch (SQLException ex) {
-            logger.error(ex.toString());
+            logger.error("Error updating publications owner from {} to {}", oldOwnerEmail, newOwnerEmail);
             throw new DAOException(ex);
         }
 
@@ -142,7 +142,7 @@ public class PublicationData implements PublicationDAO {
             ps.close();
 
         } catch (SQLException ex) {
-            logger.error(ex.toString());
+            logger.error("Error removing publication {}", id);
             throw new DAOException(ex);
         }
     }
@@ -170,7 +170,7 @@ public class PublicationData implements PublicationDAO {
             return publications;
 
         } catch (SQLException ex) {
-            logger.error(ex.toString());
+            logger.error("Error getting all publications");
             throw new DAOException(ex);
         }
     }
@@ -197,7 +197,7 @@ public class PublicationData implements PublicationDAO {
             return p;
 
         } catch (SQLException ex) {
-            logger.error(ex.toString());
+            logger.error("Error getting publication {}", id);
             throw new DAOException(ex);
         }
     }

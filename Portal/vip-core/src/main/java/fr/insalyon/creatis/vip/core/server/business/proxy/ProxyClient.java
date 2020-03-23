@@ -127,13 +127,12 @@ public class ProxyClient {
             return new Proxy(proxyFileName, endDate);
 
         } catch (Exception ex) {
-            logger.error(ex.toString());
+            logger.error("Error getting proxy");
             if (this.socket != null) {
                 try {
                     disconnect();
                 } catch (IOException ioe) {
-                    logger.error(ioe.toString());
-                    throw new BusinessException("Error disconecting proxy client", ioe);
+                    logger.error("Error disconnecting proxy", ioe);
                 }
             }
             throw new BusinessException("Error getting a proxy", ex);
@@ -397,13 +396,13 @@ public class ProxyClient {
                     certData[i] = new String(buffer);
                     fileStream.close();
                 } catch (Exception e) {
-                    // ignore
+                    logger.error("Error certificate from {}", certFilenames[i]);
                 }
             }
             try {
                 issuers = getX509CertsFromStringList(certData);
             } catch (Exception e) {
-                // ignore
+                logger.error("Error getting X509 certificates from {}", Arrays.toString(certData));
             }
             return issuers;
         }
@@ -447,8 +446,6 @@ public class ProxyClient {
                 PKIXParameters pkixParameters = new PKIXParameters(trustAnchors);
                 pkixParameters.setRevocationEnabled(false);
                 validator.validate(certPath, pkixParameters);
-            } catch (CertificateException e) {
-                throw e;
             } catch (GeneralSecurityException e) {
                 throw new CertificateException(e);
             }
@@ -481,7 +478,7 @@ public class ProxyClient {
                 try {
                     myHostname = InetAddress.getLocalHost().getHostName();
                 } catch (Exception e) {
-                    // ignore
+                    logger.error("Error getting local hostname");
                 }
             }
             if (!CN.equals(myHostname)) {
@@ -569,18 +566,20 @@ public class ProxyClient {
             in.transferTo(0, in.size(), out);
 
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Error copying file from {} to {}", source, dest);
         } finally {
             if (in != null) {
                 try {
                     in.close();
                 } catch (IOException e) {
+                    logger.error("Error closing FileInputStream for file copy", e);
                 }
             }
             if (out != null) {
                 try {
                     out.close();
                 } catch (IOException e) {
+                    logger.error("Error closing FileInputStream for file copy", e);
                 }
             }
         }

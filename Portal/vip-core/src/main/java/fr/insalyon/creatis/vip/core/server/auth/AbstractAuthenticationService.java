@@ -171,6 +171,7 @@ public abstract class AbstractAuthenticationService extends HttpServlet {
             out.println(message);
             out.flush();
         } catch (IOException ex) {
+            logger.error("Error writing auth response " + message);
             throw new BusinessException(ex);
         } finally {
             out.close();

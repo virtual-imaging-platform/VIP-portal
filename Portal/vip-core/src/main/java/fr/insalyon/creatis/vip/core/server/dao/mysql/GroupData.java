@@ -76,8 +76,8 @@ public class GroupData implements GroupDAO {
 
         } catch (SQLException ex) {
             if (ex.getMessage().contains("Duplicate entry")) {
-                logger.error("A group named \"" + group.getName() + "\" already exists.");
-                throw new DAOException("A group named \"" + group.getName() + "\" already exists.", ex);
+                logger.error("A group named {} already exists", group.getName());
+                throw new DAOException("Error creating a group", ex);
             } else {
                 logger.error(ex.toString());
                 throw new DAOException(ex);
@@ -96,7 +96,7 @@ public class GroupData implements GroupDAO {
             ps.close();
 
         } catch (SQLException ex) {
-            logger.error(ex.toString());
+            logger.error("Error removing group {}", groupName);
             throw new DAOException(ex);
         }
     }
@@ -118,7 +118,7 @@ public class GroupData implements GroupDAO {
             ps.close();
 
         } catch (SQLException ex) {
-            logger.error(ex.toString());
+            logger.error("Error updating group {}", group.getName());
             throw new DAOException(ex);
         }
     }
@@ -141,7 +141,7 @@ public class GroupData implements GroupDAO {
             return groups;
 
         } catch (SQLException ex) {
-            logger.error(ex.toString());
+            logger.error("Error getting all groups");
             throw new DAOException(ex);
         }
     }

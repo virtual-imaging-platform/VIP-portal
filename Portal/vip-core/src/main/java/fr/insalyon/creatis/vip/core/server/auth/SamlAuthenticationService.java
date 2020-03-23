@@ -93,7 +93,7 @@ public class SamlAuthenticationService extends AbstractAuthenticationService {
                 assertion = (Assertion) SamlTokenValidator.getSAMLObject(xmlAssertion);
             }
         } catch (UnsupportedEncodingException | ConfigurationException | XMLParserException | UnmarshallingException ex) {
-            LoggerFactory.getLogger(SamlAuthenticationService.class.getName()).error(ex.toString(), ex);
+            logger.error("Error getting SAML assertion {}", new String(xmlAssertion), ex);
         }
         if (assertion == null) {
             throw new BusinessException("Cannot get assertion!");
@@ -111,7 +111,7 @@ public class SamlAuthenticationService extends AbstractAuthenticationService {
         try {
             SamlTokenValidator.isSignatureValid(certFile, assertion);
         } catch (CertificateException | IOException | NoSuchAlgorithmException | InvalidKeySpecException | ValidationException ex) {
-            throw new BusinessException("Assertion signature is not valid!");
+            throw new BusinessException("Assertion signature is not valid!", ex);
         }
         if (!SamlTokenValidator.isTimeValid(assertion)) {
             throw new BusinessException("Assertion is not time valid!");
