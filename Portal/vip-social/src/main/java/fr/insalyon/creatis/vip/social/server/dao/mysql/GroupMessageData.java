@@ -78,7 +78,7 @@ public class GroupMessageData implements GroupMessageDAO {
             return result;
 
         } catch (SQLException ex) {
-            logger.error(ex.toString());
+            logger.error("Error adding a group message {} by {}", title, sender, ex);
             throw new DAOException(ex);
         }
     }
@@ -94,7 +94,7 @@ public class GroupMessageData implements GroupMessageDAO {
             ps.close();
 
         } catch (SQLException ex) {
-            logger.error(ex.toString());
+            logger.error("Error removing group message {}", id, ex);
             throw new DAOException(ex);
         }
     }
@@ -126,7 +126,7 @@ public class GroupMessageData implements GroupMessageDAO {
             return messages;
 
         } catch (SQLException ex) {
-            logger.error(ex.toString());
+            logger.error("Error getting group messages for {}", groupName, ex);
             throw new DAOException(ex);
         }
     }

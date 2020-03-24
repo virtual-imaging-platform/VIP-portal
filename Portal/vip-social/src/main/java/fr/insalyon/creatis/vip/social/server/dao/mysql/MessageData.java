@@ -82,7 +82,7 @@ public class MessageData implements MessageDAO {
             return id;
 
         } catch (SQLException ex) {
-            logger.error(ex.toString());
+            logger.error("Error adding message {} by {}", title, sender, ex);
             throw new DAOException(ex);
         }
     }
@@ -100,7 +100,7 @@ public class MessageData implements MessageDAO {
             ps.close();
 
         } catch (SQLException ex) {
-            logger.error(ex.toString());
+            logger.error("Error associating message {} to {}", messageId, receiver, ex);
             throw new DAOException(ex);
         }
     }
@@ -138,7 +138,7 @@ public class MessageData implements MessageDAO {
             return messages;
 
         } catch (SQLException ex) {
-            logger.error(ex.toString());
+            logger.error("Error getting messages for {}", email, ex);
             throw new DAOException(ex);
         }
     }
@@ -190,7 +190,7 @@ public class MessageData implements MessageDAO {
             return messages;
 
         } catch (SQLException ex) {
-            logger.error(ex.toString());
+            logger.error("Error getting messages by {}", email, ex);
             throw new DAOException(ex);
         }
     }
@@ -209,7 +209,7 @@ public class MessageData implements MessageDAO {
             ps.close();
 
         } catch (SQLException ex) {
-            logger.error(ex.toString());
+            logger.error("Error marking message {} read by {}", id, receiver, ex);
             throw new DAOException(ex);
         }
     }
@@ -225,7 +225,7 @@ public class MessageData implements MessageDAO {
             ps.close();
 
         } catch (SQLException ex) {
-            logger.error(ex.toString());
+            logger.error("Error removing message {}", id, ex);
             throw new DAOException(ex);
         }
     }
@@ -252,7 +252,7 @@ public class MessageData implements MessageDAO {
             ps.close();
 
         } catch (SQLException ex) {
-            logger.error(ex.toString());
+            logger.error("Error removing message {} by {}", id, receiver, ex);
             throw new DAOException(ex);
         }
     }
@@ -274,7 +274,7 @@ public class MessageData implements MessageDAO {
             return result;
 
         } catch (SQLException ex) {
-            logger.error(ex.toString());
+            logger.error("Error verifying messages for {}", email, ex);
             throw new DAOException(ex);
         }
     }
