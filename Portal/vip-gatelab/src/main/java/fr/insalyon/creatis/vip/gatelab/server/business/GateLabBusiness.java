@@ -71,7 +71,6 @@ public class GateLabBusiness {
                     GateLabConstants.GATELAB_CLASS, new ArrayList<String>()));
         } catch (DAOException ex) {
             if (!ex.getMessage().contains("A class named \"" + GateLabConstants.GATELAB_CLASS + "\" already exists")) {
-                logger.error(ex.toString());
                 throw new BusinessException(ex);
             }
         }
@@ -103,7 +102,6 @@ public class GateLabBusiness {
             return inputMap;
 
         } catch (DAOException ex) {
-            logger.error(ex.toString());
             throw new BusinessException(ex);
         }
     }
@@ -135,7 +133,6 @@ public class GateLabBusiness {
             DAOFactory.getDAOFactory().getGatelabDAO(workflowID).StopWorkflowSimulation();
 
         } catch (DAOException ex) {
-            logger.error(ex.toString());
             throw new BusinessException(ex);
         }
     }

@@ -113,7 +113,6 @@ public class GateLabInputs {
             return inputMap;
 
         } catch (DataManagerException ex) {
-            logger.error(ex.toString());
             throw new BusinessException(ex);
         }
     }

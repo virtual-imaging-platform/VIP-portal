@@ -89,9 +89,7 @@ public class GateLabServiceImpl extends AbstractRemoteServiceServlet implements 
             trace(logger, "Stopping GateLab simulation: " + simulationID);
             gatelabBusiness.StopWorkflowSimulation(simulationID);
 
-        } catch (CoreException ex) {
-            throw new GateLabException(ex);
-        } catch (BusinessException ex) {
+        } catch (CoreException | BusinessException ex) {
             throw new GateLabException(ex);
         }
     }

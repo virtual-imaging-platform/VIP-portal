@@ -46,7 +46,7 @@ import org.slf4j.LoggerFactory;
  */
 public class GateLabData extends AbstractJobData implements GateLabDAO {
 
-    private static final Logger logger = LoggerFactory.getLogger(GateLabData.class);
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     
     public GateLabData(String dbPath) throws DAOException {
         
@@ -71,6 +71,7 @@ public class GateLabData extends AbstractJobData implements GateLabDAO {
             return sum;
 
         } catch (SQLException ex) {
+            logger.error("Error fetching simulation particle number", ex);
             return 0;
         } finally {
             close(logger);
@@ -89,6 +90,7 @@ public class GateLabData extends AbstractJobData implements GateLabDAO {
             ps.close();
             
         } catch (SQLException ex) {
+            logger.error("Error stopping a workflow", ex);
             throw new DAOException(ex);
         }
 
