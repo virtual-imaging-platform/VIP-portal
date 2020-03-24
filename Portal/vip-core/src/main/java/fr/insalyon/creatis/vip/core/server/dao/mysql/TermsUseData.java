@@ -68,7 +68,7 @@ public class TermsUseData implements TermsUseDAO {
 
 
         } catch (SQLException ex) {
-            logger.error("Error adding terms of use {}", termsOfUse.getDate());
+            logger.error("Error adding terms of use {}", termsOfUse.getDate(), ex);
             throw new DAOException(ex);
         }
     }
@@ -88,7 +88,7 @@ public class TermsUseData implements TermsUseDAO {
             return date;
 
         } catch (SQLException ex) {
-            logger.error("Error getting last terms of use");
+            logger.error("Error getting last terms of use", ex);
             throw new DAOException(ex);
         }
 

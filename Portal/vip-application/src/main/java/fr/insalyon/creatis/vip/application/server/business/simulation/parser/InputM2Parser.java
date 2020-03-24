@@ -57,6 +57,7 @@ import org.xml.sax.helpers.XMLReaderFactory;
 public class InputM2Parser extends DefaultHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(InputM2Parser.class);
+
     private XMLReader reader;
     private Map<String, String> inputs;
     private String name;
@@ -83,11 +84,8 @@ public class InputM2Parser extends DefaultHandler {
 
             return inputs;
 
-        } catch (IOException ex) {
-            logger.error(ex.toString());
-            throw new BusinessException(ex);
-        } catch (SAXException ex) {
-            logger.error(ex.toString());
+        } catch (IOException | SAXException ex) {
+            logger.error("Error parsing {}", fileName, ex);
             throw new BusinessException(ex);
         }
     }

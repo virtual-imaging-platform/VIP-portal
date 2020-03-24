@@ -77,7 +77,7 @@ public class ClassData implements ClassDAO {
             if (ex.getMessage().contains("Duplicate entry")) {
                 throw new DAOException("A class named \"" + appClass.getName() + "\" already exists.");
             } else {
-                logger.error(ex.toString());
+                logger.error("Error adding class {}", appClass.getName(), ex);
                 throw new DAOException(ex);
             }
         }
@@ -119,7 +119,7 @@ public class ClassData implements ClassDAO {
             ps.close();
 
         } catch (SQLException ex) {
-            logger.error(ex.toString());
+            logger.error("Error removing class {}", className, ex);
             throw new DAOException(ex);
         }
     }
@@ -171,7 +171,7 @@ public class ClassData implements ClassDAO {
             return classes;
 
         } catch (SQLException ex) {
-            logger.error(ex.toString());
+            logger.error("Error getting all classes", ex);
             throw new DAOException(ex);
         }
     }
@@ -224,7 +224,7 @@ public class ClassData implements ClassDAO {
             return null;
 
         } catch (SQLException ex) {
-            logger.error(ex.toString());
+              logger.error("Error getting class {}", className, ex);
             throw new DAOException(ex);
         }
     }
@@ -273,6 +273,7 @@ public class ClassData implements ClassDAO {
             return classes;
 
         } catch (SQLException ex) {
+            logger.error("Error getting classes for {} (validAdmin : {})", email, validAdmin, ex);
             throw new DAOException(ex);
         }
     }
@@ -313,7 +314,7 @@ public class ClassData implements ClassDAO {
                     logger.error("a "+objectType+" named \"" + name + "\" is already associated with the class.");
                     throw new DAOException("a "+objectType+" named \"" + name + "\" is already associated with the class.", ex);
                 } else {
-                    logger.error(ex.toString());
+                    logger.error("Error adding {} {} to class {}", objectType, objectList, className, ex);
                     throw new DAOException(ex);
                 }
             }
@@ -348,7 +349,7 @@ public class ClassData implements ClassDAO {
             ps.close();
 
         } catch (SQLException ex) {
-            logger.error(ex.toString());
+            logger.error("Error removing {} from class {}", objectType, className, ex);
             throw new DAOException(ex);
         }
     }

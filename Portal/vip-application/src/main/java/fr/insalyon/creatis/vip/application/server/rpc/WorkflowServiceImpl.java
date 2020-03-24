@@ -94,9 +94,7 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
             } else {
                 return workflowBusiness.getSimulations(getSessionUser(), null);
             }
-        } catch (CoreException ex) {
-            throw new ApplicationException(ex);
-        } catch (BusinessException ex) {
+        } catch (CoreException | BusinessException ex) {
             throw new ApplicationException(ex);
         }
     }
@@ -117,9 +115,7 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
             } else {
                 return workflowBusiness.getSimulations(getSessionUser(), lastDate);
             }
-        } catch (CoreException ex) {
-            throw new ApplicationException(ex);
-        } catch (BusinessException ex) {
+        } catch (CoreException | BusinessException ex) {
             throw new ApplicationException(ex);
         }
     }
@@ -239,7 +235,6 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
             return inputBusiness.loadSimulationInput(fileName);
 
         } catch (BusinessException ex) {
-            logger.error(ex.toString());
             throw new ApplicationException(ex);
         }
     }
@@ -440,6 +435,7 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
         } catch (CoreException ex) {
             throw new ApplicationException(ex);
         } catch (BusinessException ex) {
+
             throw new ApplicationException(ex);
         }
     }
@@ -455,9 +451,7 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
             trace(logger, "Cleaning simulation '" + simulationID + "'.");
             workflowBusiness.clean(simulationID, getSessionUser().getEmail());
 
-        } catch (CoreException ex) {
-            throw new ApplicationException(ex);
-        } catch (BusinessException ex) {
+        } catch (CoreException | BusinessException ex) {
             throw new ApplicationException(ex);
         }
     }
@@ -474,9 +468,7 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
             trace(logger, "Purging simulation '" + simulationID + "'.");
             workflowBusiness.purge(simulationID);
 
-        } catch (CoreException ex) {
-            throw new ApplicationException(ex);
-        } catch (BusinessException ex) {
+        } catch (CoreException | BusinessException ex) {
             throw new ApplicationException(ex);
         }
     }
@@ -573,7 +565,7 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
             return sb.toString();
 
         } catch (IOException ex) {
-            logger.error("Error getting workflow file" + fileName, ex);
+            logger.error("Error getting workflow file {}", fileName, ex);
         }
         return null;
     }
@@ -643,7 +635,7 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
         try {
             return workflowBusiness.getPerformanceStats(simulationList, type);
         } catch (WorkflowsDBDAOException ex) {
-            LoggerFactory.getLogger(WorkflowServiceImpl.class.getName()).error(ex.toString(), ex);
+            logger.error("Error getting perf stats for {}", simulationList, ex);
             throw new ApplicationException(ex);
         } catch (BusinessException ex) {
             throw new ApplicationException(ex);
@@ -724,9 +716,7 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
             trace(logger, "Updating user '" + currentUser + "' to '" + newUser + "'.");
             workflowBusiness.updateUser(currentUser, newUser);
 
-        } catch (CoreException ex) {
-            throw new ApplicationException(ex);
-        } catch (BusinessException ex) {
+        } catch (CoreException | BusinessException ex) {
             throw new ApplicationException(ex);
         }
     }
@@ -748,7 +738,7 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
 
     @Override
     public void markSimulationsCompleted(List<String> simulationIDs) throws ApplicationException {
-try {
+        try {
             trace(logger, "Marking simulations completed: " + simulationIDs);
             StringBuilder sb = new StringBuilder();
             for (String simulationID : simulationIDs) {
@@ -770,7 +760,8 @@ try {
             }
         } catch (CoreException ex) {
             throw new ApplicationException(ex);
-        }    }
+        }
+    }
 
     @Override
     public void markWorkflowCompleted(String simulationID) throws ApplicationException {
@@ -778,9 +769,7 @@ try {
             trace(logger, "Marking simulation '" + simulationID + "' completed.");
             workflowBusiness.markCompleted(simulationID);
 
-        } catch (CoreException ex) {
-            throw new ApplicationException(ex);
-        } catch (BusinessException ex) {
+        } catch (CoreException | BusinessException ex) {
             throw new ApplicationException(ex);
         }
     }
@@ -791,9 +780,7 @@ try {
             trace(logger, "Changing user of simulation '" + simulationId + "' to "+user+".");
             workflowBusiness.changeSimulationUser(simulationId,user);
 
-        } catch (CoreException ex) {
-            throw new ApplicationException(ex);
-        } catch (BusinessException ex) {
+        } catch (CoreException | BusinessException ex) {
             throw new ApplicationException(ex);
         }
     }

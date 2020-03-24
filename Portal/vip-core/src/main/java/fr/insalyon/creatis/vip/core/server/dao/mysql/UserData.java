@@ -100,7 +100,7 @@ public class UserData implements UserDAO {
                 logger.error("There is an existing account associated with the email: {} or with this {first name,last name} ({})", user.getEmail(), ex.getMessage());
                 throw new DAOException("There is an existing account associated with this email or with this {first name,last name}.", ex);
             } else {
-                logger.error("Error adding user {}", user.getEmail());
+                logger.error("Error adding user {}", user.getEmail(), ex);
                 throw new DAOException(ex);
             }
         }
@@ -134,7 +134,7 @@ public class UserData implements UserDAO {
             return false;
 
         } catch (SQLException ex) {
-            logger.error("Error authenticating user {}", email);
+            logger.error("Error authenticating user {}", email, ex);
             throw new DAOException(ex);
         }
     }
@@ -175,7 +175,7 @@ public class UserData implements UserDAO {
             return false;
 
         } catch (SQLException ex) {
-            logger.error("Error activating user {}", email);
+            logger.error("Error activating user {}", email, ex);
             throw new DAOException(ex);
         }
     }
@@ -226,7 +226,7 @@ public class UserData implements UserDAO {
             throw new DAOException("There is no user registered with the e-mail: " + email);
 
         } catch (SQLException ex) {
-            logger.error("Error getting user {}", email);
+            logger.error("Error getting user {}", email, ex);
             throw new DAOException(ex);
         }
     }
@@ -271,7 +271,7 @@ public class UserData implements UserDAO {
             return users;
 
         } catch (SQLException ex) {
-            logger.error("Error getting all users");
+            logger.error("Error getting all users", ex);
             throw new DAOException(ex);
         }
     }
@@ -292,7 +292,7 @@ public class UserData implements UserDAO {
             ps.close();
 
         } catch (SQLException ex) {
-            logger.error("Error removing user {}", email);
+            logger.error("Error removing user {}", email, ex);
             throw new DAOException(ex);
         }
     }
@@ -324,7 +324,7 @@ public class UserData implements UserDAO {
             ps.close();
 
         } catch (SQLException ex) {
-            logger.error("Error updating user {}", user.getEmail());
+            logger.error("Error updating user {}", user.getEmail(), ex);
             throw new DAOException(ex);
         }
     }
@@ -356,7 +356,7 @@ public class UserData implements UserDAO {
                 throw new DAOException(ex);
             }
         } else {
-            logger.error("The current password mismatch for {}", email);
+            logger.error("The current password mismatch for {}", email, ex);
             throw new DAOException("The current password mismatch.");
         }
     }
@@ -377,7 +377,7 @@ public class UserData implements UserDAO {
                 logger.error("There is an existing account associated with the email: {}", newEmail);
                 throw new DAOException("There is an existing account associated with this email.", ex);
             } else {
-                logger.error("Error updating email from {} to {}", oldEmail, newEmail);
+                logger.error("Error updating email from {} to {}", oldEmail, newEmail, ex);
                 throw new DAOException(ex);
             }
         }
@@ -396,7 +396,7 @@ public class UserData implements UserDAO {
             ps.executeUpdate();
             ps.close();
         } catch (SQLException ex) {
-            logger.error("Error updating next email from {} to {}", currentEmail, nextEmail);
+            logger.error("Error updating next email from {} to {}", currentEmail, nextEmail, ex);
             throw new DAOException(ex);
         }
     }
@@ -421,7 +421,7 @@ public class UserData implements UserDAO {
             ps.close();
 
         } catch (SQLException ex) {
-            logger.error("Error updating session for {}", email);
+            logger.error("Error updating session for {}", email, ex);
             throw new DAOException(ex);
         }
     }
@@ -452,7 +452,7 @@ public class UserData implements UserDAO {
             return false;
 
         } catch (SQLException ex) {
-            logger.error("Error verifying session for {}", email);
+            logger.error("Error verifying session for {}", email, ex);
             throw new DAOException(ex);
         }
     }
@@ -477,7 +477,7 @@ public class UserData implements UserDAO {
             ps.close();
 
         } catch (SQLException ex) {
-            logger.error("Error updating last login to {} for {}", lastLogin, email);
+            logger.error("Error updating last login to {} for {}", lastLogin, email, ex);
             throw new DAOException(ex);
         }
     }
@@ -496,7 +496,7 @@ public class UserData implements UserDAO {
             ps.close();
 
         } catch (SQLException ex) {
-            logger.error("Error updating terms of use to {} for {}", termsUse, email);
+            logger.error("Error updating terms of use to {} for {}", termsUse, email, ex);
             throw new DAOException(ex);
         }
     }
@@ -547,7 +547,7 @@ public class UserData implements UserDAO {
             throw new DAOException("There is no user registered with the session: " + session);
 
         } catch (SQLException ex) {
-            logger.error("Error getting user from session: {}", session);
+            logger.error("Error getting user from session: {}", session, ex);
             throw new DAOException(ex);
         }
     }
@@ -593,7 +593,7 @@ public class UserData implements UserDAO {
             return users;
 
         } catch (SQLException ex) {
-            logger.error("Error getting all administrators");
+            logger.error("Error getting all administrators", ex);
             throw new DAOException(ex);
         }
     }
@@ -625,7 +625,7 @@ public class UserData implements UserDAO {
             ps.close();
 
         } catch (SQLException ex) {
-            logger.error("Error updating user {}", email);
+            logger.error("Error updating user {}", email, ex);
             throw new DAOException(ex);
         }
     }
@@ -649,7 +649,7 @@ public class UserData implements UserDAO {
             ps.close();
 
         } catch (SQLException ex) {
-            logger.error("Error updating code to {} for user {}", code, email);
+            logger.error("Error updating code to {} for user {}", code, email, ex);
             throw new DAOException(ex);
         }
     }
@@ -673,7 +673,7 @@ public class UserData implements UserDAO {
             ps.close();
 
         } catch (SQLException ex) {
-            logger.error("Error resetting password for user {}", email);
+            logger.error("Error resetting password for user {}", email, ex);
             throw new DAOException(ex);
         }
     }
@@ -688,7 +688,7 @@ public class UserData implements UserDAO {
             }
             ps.close();
         } catch (SQLException ex) {
-            logger.error("Error getting users number");
+            logger.error("Error getting users number", ex);
             throw new DAOException(ex);
         }
         return -1;
@@ -704,7 +704,7 @@ public class UserData implements UserDAO {
             }
             ps.close();
         } catch (SQLException ex) {
-            logger.error("Error getting countries number");
+            logger.error("Error getting countries number", ex);
             throw new DAOException(ex);
         }
         return -1;
@@ -732,7 +732,7 @@ public class UserData implements UserDAO {
                 logger.error("There is an existing Dropbox account associated with the email: {}", email);
                 throw new DAOException("There is an existing Dropbox account associated with this email.", ex);
             } else {
-                logger.error("Error linking dropbox account for {} (directory : {})", email, directory);
+                logger.error("Error linking dropbox account for {} (directory : {})", email, directory, ex);
                 throw new DAOException(ex);
             }
         }
@@ -750,7 +750,7 @@ public class UserData implements UserDAO {
             ps.close();
 
         } catch (SQLException ex) {
-            logger.error("Error activating dropbox account for {}", email);
+            logger.error("Error activating dropbox account for {}", email, ex);
             throw new DAOException(ex);
         }
 
@@ -779,7 +779,7 @@ public class UserData implements UserDAO {
             }
             return DropboxAccountStatus.AccountStatus.UNLINKED;
         } catch (SQLException ex) {
-            logger.error("Error getting dropbox status for {}", email);
+            logger.error("Error getting dropbox status for {}", email, ex);
             throw new DAOException(ex);
         }
     }
@@ -795,7 +795,7 @@ public class UserData implements UserDAO {
             ps.close();
 
         } catch (SQLException ex) {
-            logger.error("Error removing dropbox account for {}", email);
+            logger.error("Error removing dropbox account for {}", email, ex);
             throw new DAOException(ex);
         }
     }
@@ -817,7 +817,7 @@ public class UserData implements UserDAO {
             return lastupdatePublication;
 
         } catch (SQLException ex) {
-            logger.error("Error getting last publication update for {}", email);
+            logger.error("Error getting last publication update for {}", email, ex);
             throw new DAOException(ex);
         }
     }
@@ -834,7 +834,7 @@ public class UserData implements UserDAO {
             ps.close();
 
         } catch (SQLException ex) {
-            logger.error("Error updating last publication to {} for {}", lastUpdatePublication, email);
+            logger.error("Error updating last publication to {} for {}", lastUpdatePublication, email, ex);
             throw new DAOException(ex);
         }
     }
@@ -855,7 +855,7 @@ public class UserData implements UserDAO {
             return n;
 
         } catch (SQLException ex) {
-            logger.error("Error getting failed auth number for {}", email);
+            logger.error("Error getting failed auth number for {}", email, ex);
             throw new DAOException(ex);
         }
     }
@@ -874,7 +874,7 @@ public class UserData implements UserDAO {
             ps.close();
 
         } catch (SQLException ex) {
-            logger.error("Error locking {}", email);
+            logger.error("Error locking {}", email, ex);
             throw new DAOException(ex);
         }
     }
@@ -893,7 +893,7 @@ public class UserData implements UserDAO {
             ps.close();
 
         } catch (SQLException ex) {
-             logger.error("Error unlocking {}", email);
+             logger.error("Error unlocking {}", email, ex);
              throw new DAOException(ex);
         }
     }
@@ -912,7 +912,7 @@ public class UserData implements UserDAO {
             ps.close();
 
         } catch (SQLException ex) {
-             logger.error("Error resetting failed auth number for {}", email);
+             logger.error("Error resetting failed auth number for {}", email, ex);
             throw new DAOException(ex);
         }
     }
@@ -931,7 +931,7 @@ public class UserData implements UserDAO {
             ps.close();
 
         } catch (SQLException ex) {
-             logger.error("Error increasing failed auth number for {}", email);
+             logger.error("Error increasing failed auth number for {}", email, ex);
             throw new DAOException(ex);
         }
     }
@@ -952,7 +952,7 @@ public class UserData implements UserDAO {
             return locked;
 
         } catch (SQLException ex) {
-            logger.error("Error checking if {} is locked", email);
+            logger.error("Error checking if {} is locked", email, ex);
             throw new DAOException(ex);
         }
     }
@@ -975,7 +975,7 @@ public class UserData implements UserDAO {
             return null;
 
         } catch (SQLException ex) {
-            logger.error("Error getting user by api key for {}", apikey);
+            logger.error("Error getting user by api key for {}", apikey, ex);
             throw new DAOException(ex);
         }
     }
@@ -999,7 +999,7 @@ public class UserData implements UserDAO {
             throw new DAOException(
                     "Looking for an apikey, but there is no user registered with the email");
         } catch (SQLException ex) {
-            logger.error("Error getting user api key for {}", email);
+            logger.error("Error getting user api key for {}", email, ex);
             throw new DAOException(ex);
         }
     }
@@ -1021,7 +1021,7 @@ public class UserData implements UserDAO {
                         "Updating an apikey, but there is no user registered with the email");
             }
         } catch (SQLException ex) {
-            logger.error("Error updating {} api key to {}", email, newApikey);
+            logger.error("Error updating {} api key to {}", email, newApikey, ex);
             throw new DAOException(ex);
         }
     }

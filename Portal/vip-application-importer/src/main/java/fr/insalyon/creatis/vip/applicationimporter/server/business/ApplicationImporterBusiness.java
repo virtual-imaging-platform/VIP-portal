@@ -89,17 +89,10 @@ public class ApplicationImporterBusiness {
             new BoutiquesBusiness().validateBoutiqueFile(localFilePath);
             String fileContent = new Scanner(new File(localFilePath)).useDelimiter("\\Z").next();
             return fileContent;
-        } catch (GRIDAClientException ex) {
-            logger.error(ex.toString());
+        } catch (GRIDAClientException | IOException ex) {
+            logger.error("Error validating boutiques file {}", fileLFN, ex);
             throw new BusinessException(ex);
         } catch (DataManagerException ex) {
-            logger.error(ex.toString());
-            throw new BusinessException(ex);
-        } catch (FileNotFoundException ex) {
-            logger.error(ex.toString());
-            throw new BusinessException(ex);
-        } catch (IOException ex) {
-            logger.error(ex.toString());
             throw new BusinessException(ex);
         }
     }
@@ -188,14 +181,10 @@ public class ApplicationImporterBusiness {
 // Register application
             registerApplicationVersion(bt.getName(), bt.getToolVersion(), user.getEmail(), bt.getGwendiaLFN(), bt.getJsonLFN(), connection);
 
-        } catch (FileNotFoundException ex) {
-            logger.error(ex.toString());
-            throw new BusinessException(ex);
         } catch (IOException ex) {
-            logger.error(ex.toString());
+            logger.error("Error creating app {}/{} from boutiques file", bt.getName(), bt.getToolVersion(), ex);
             throw new BusinessException(ex);
         } catch (DataManagerException ex) {
-            logger.error(ex.toString());
             throw new BusinessException(ex);
         }
     }
@@ -209,7 +198,7 @@ public class ApplicationImporterBusiness {
             }
             gc.uploadFile(localFile, (new File(lfn)).getParent());
         } catch (GRIDAClientException ex) {
-            logger.error(ex.toString());
+            logger.error("Error uploading file {} to {}", localFile, lfn, ex);
             throw new BusinessException(ex);
         }
     }

@@ -84,7 +84,7 @@ public class ExecutionNodeData extends AbstractJobData implements ExecutionNodeD
             return node;
 
         } catch (SQLException ex) {
-            logger.error(ex.toString());
+            logger.error("Error getting node {} from site {}", nodeName, siteID, ex);
             throw new DAOException(ex);
         } finally {
             close(logger);

@@ -75,12 +75,14 @@ import fr.insalyon.creatis.vip.datamanager.server.DataManagerUtil;
 import fr.insalyon.creatis.vip.datamanager.server.business.*;
 
 import java.io.File;
+import java.io.IOException;
 import java.sql.Connection;
 import java.util.*;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xml.sax.SAXException;
 
 /**
  *
@@ -107,10 +109,8 @@ public class WorkflowBusiness {
             outputDAO = WorkflowsDBDAOFactory.getInstance().getOutputDAO();
             inputDAO = WorkflowsDBDAOFactory.getInstance().getInputDAO();
             statsDAO = WorkflowsDBDAOFactory.getInstance().getStatsDAO();
-        } catch (DAOException ex) {
-            logger.error(ex.toString());
-        } catch (WorkflowsDBDAOException ex) {
-            logger.error(ex.toString());
+        } catch (DAOException | WorkflowsDBDAOException ex) {
+            logger.error("Error initialising WorkflowBusiness", ex);
         }
         externalPlatformBusiness =
             new ExternalPlatformBusiness(
@@ -136,7 +136,7 @@ public class WorkflowBusiness {
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         } catch (WorkflowsDBDAOException ex) {
-            LoggerFactory.getLogger(WorkflowBusiness.class.getName()).error(ex.toString(), ex);
+            logger.error("Error finding an engine for {}", applicationClass, ex);
         }
         if (engineBean == null || engineBean.getEndpoint().isEmpty()) {
             throw new BusinessException("No available engines for class " + applicationClass);
@@ -258,8 +258,7 @@ public class WorkflowBusiness {
                         applicationVersion, applicationClass, user, simulationName,
                         workflowPath, parameters);
             } catch (BusinessException be) {
-                be.printStackTrace();
-                logger.error("BusinessException caught on launch workflow, engine " + engine.getName() + " will be disabled");
+                logger.error("BusinessException caught on launch workflow, engine {} will be disabled", engine.getName());
             } finally {
                 if (workflow == null) {
                     engine.setStatus("disabled");
@@ -281,8 +280,10 @@ public class WorkflowBusiness {
             workflowDAO.add(workflow);
             return workflow.getId();
 
-        } catch (WorkflowsDBDAOException | DAOException | DataManagerException ex) {
-            logger.error(ex.toString());
+        } catch (WorkflowsDBDAOException ex) {
+            logger.error("Error launching simulation {}", simulationName, ex);
+            throw new BusinessException(ex);
+        } catch (DAOException | DataManagerException ex) {
             throw new BusinessException(ex);
         }
     }
@@ -326,7 +327,7 @@ public class WorkflowBusiness {
             return parseWorkflows(workflowDAO.get(user != null ? user.getFullName() : null, lastDate));
 
         } catch (WorkflowsDBDAOException ex) {
-            logger.error(ex.toString());
+            logger.error("Error getting simulations for {} since {}", user, lastDate, ex);
             throw new BusinessException(ex);
         }
     }
@@ -365,7 +366,7 @@ public class WorkflowBusiness {
             return simulations;
 
         } catch (WorkflowsDBDAOException ex) {
-            logger.error(ex.toString());
+            logger.error("Error searching simulations for {}", userName, ex);
             throw new BusinessException(ex);
         }
     }
@@ -404,7 +405,7 @@ public class WorkflowBusiness {
             return simulations;
 
         } catch (WorkflowsDBDAOException ex) {
-            logger.error(ex.toString());
+            logger.error("Error searching simulations for users {}", users, ex);
             throw new BusinessException(ex);
         }
     }
@@ -439,14 +440,11 @@ public class WorkflowBusiness {
                     ? new GwendiaParser().parse(workflowPath)
                     : new ScuflParser().parse(workflowPath);
 
-        } catch (org.xml.sax.SAXException ex) {
-            logger.error(ex.toString());
+        } catch (SAXException | IOException ex) {
+            logger.error("Error getting application descriptor for {}/{}",
+                    applicationName, applicationVersion, ex);
             throw new BusinessException(ex);
-        } catch (fr.insalyon.creatis.vip.core.server.dao.DAOException ex) {
-            logger.error(ex.toString());
-            throw new BusinessException(ex);
-        } catch (java.io.IOException ex) {
-            logger.error(ex.toString());
+        } catch (DAOException ex) {
             throw new BusinessException(ex);
         }
     }
@@ -466,7 +464,7 @@ public class WorkflowBusiness {
             executionBusiness.kill(simulationID);
 
         } catch (WorkflowsDBDAOException ex) {
-            logger.error(ex.toString());
+            logger.error("Error killing simulation {}", simulationID, ex);
             throw new BusinessException(ex);
         }
     }
@@ -493,11 +491,8 @@ public class WorkflowBusiness {
             inputDAO.removeById(simulationID);
             outputDAO.removeById(simulationID);
 
-        } catch (WorkflowsDBDAOException ex) {
-            logger.error(ex.toString());
-            throw new BusinessException(ex);
-        } catch (GRIDAClientException ex) {
-            logger.error(ex.toString());
+        } catch (WorkflowsDBDAOException | GRIDAClientException ex) {
+            logger.error("Error cleaning simulation {}", simulationID, ex);
             throw new BusinessException(ex);
         }
     }
@@ -530,7 +525,7 @@ public class WorkflowBusiness {
             FileUtils.deleteQuietly(workflowDir);
 
         } catch (WorkflowsDBDAOException ex) {
-            logger.error(ex.toString());
+            logger.error("Error purging simulation {}", simulationID, ex);
             throw new BusinessException(ex);
         }
     }
@@ -594,7 +589,7 @@ public class WorkflowBusiness {
             }
 
         } catch (WorkflowsDBDAOException ex) {
-            logger.error(ex.toString());
+            logger.error("Error getting simulation {}", simulationID, ex);
             throw new BusinessException(ex);
         }
 
@@ -623,10 +618,9 @@ public class WorkflowBusiness {
                         output.getType().name()));
             }
         } catch (WorkflowsDBDAOException ex) {
-            logger.error(ex.toString());
+            logger.error("Error getting output data for {}", simulationID, ex);
             throw new BusinessException(ex);
         } catch (DataManagerException ex) {
-            logger.error(ex.toString());
             throw new BusinessException(ex);
         }
 
@@ -655,10 +649,9 @@ public class WorkflowBusiness {
             return list;
 
         } catch (WorkflowsDBDAOException ex) {
-            logger.error(ex.toString());
+            logger.error("Error getting input data for {}", simulationID, ex);
             throw new BusinessException(ex);
         } catch (DataManagerException ex) {
-            logger.error(ex.toString());
             throw new BusinessException(ex);
         }
     }
@@ -680,7 +673,7 @@ public class WorkflowBusiness {
                 throw new BusinessException("Unable to delete data: " + path);
             }
         } catch (java.io.IOException ex) {
-            logger.error(ex.toString());
+            logger.error("Error deleting log data for {}", path, ex);
             throw new BusinessException(ex);
         }
     }
@@ -716,7 +709,7 @@ public class WorkflowBusiness {
             return list;
 
         } catch (WorkflowsDBDAOException ex) {
-            logger.error(ex.toString());
+            logger.error("Error getting processors for {}", simulationID, ex);
             throw new BusinessException(ex);
         }
     }
@@ -761,7 +754,6 @@ public class WorkflowBusiness {
 
 
             } catch (DAOException ex) {
-                logger.error(ex.toString());
                 throw new BusinessException(ex);
             }
 
@@ -803,10 +795,9 @@ public class WorkflowBusiness {
                         "The following data does not exist: " + sb.toString());
             }
         } catch (DataManagerException ex) {
-            logger.error(ex.toString());
             throw new BusinessException(ex);
         } catch (GRIDAClientException ex) {
-            logger.error(ex.toString());
+            logger.error("Error validating inputs for {}", user, ex);
             throw new BusinessException(ex);
         }
     }
@@ -823,7 +814,7 @@ public class WorkflowBusiness {
             workflowDAO.updateUsername(newUser, currentUser);
 
         } catch (WorkflowsDBDAOException ex) {
-            logger.error(ex.toString());
+            logger.error("Error updating username from {} to {}", currentUser, newUser, ex);
             throw new BusinessException(ex);
         }
     }
@@ -834,7 +825,7 @@ public class WorkflowBusiness {
             w.setDescription(newDescription);
             workflowDAO.update(w);
         } catch (WorkflowsDBDAOException ex) {
-            logger.error(ex.toString());
+            logger.error("Error updating description for {} to {}", simulationID, newDescription, ex);
             throw new BusinessException(ex);
         }
     }
@@ -850,7 +841,7 @@ public class WorkflowBusiness {
             return parseWorkflows(workflowDAO.getRunning());
 
         } catch (WorkflowsDBDAOException ex) {
-            logger.error(ex.toString());
+            logger.error("Error getting all running simulations", ex);
             throw new BusinessException(ex);
         }
     }
@@ -948,7 +939,7 @@ public class WorkflowBusiness {
 
 
         } catch (WorkflowsDBDAOException ex) {
-            logger.error(ex.toString());
+            logger.error("Error marking simulation {} completed", simulationID, ex);
             throw new BusinessException(ex);
         }
     }
@@ -961,7 +952,7 @@ public class WorkflowBusiness {
 
 
         } catch (WorkflowsDBDAOException ex) {
-            logger.error(ex.toString());
+            logger.error("Error changing simulation {} owner to {}", simulationId, user, ex);
             throw new BusinessException(ex);
         }
     }

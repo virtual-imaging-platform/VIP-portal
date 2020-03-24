@@ -77,7 +77,7 @@ public class AccountData implements AccountDAO {
             addGroupsToAccount(name, groups);
 
         } catch (SQLException ex) {
-            logger.error("Error adding account {}", name);
+            logger.error("Error adding account {}", name, ex);
             throw new DAOException(ex);
         }
     }
@@ -106,7 +106,7 @@ public class AccountData implements AccountDAO {
             addGroupsToAccount(newName, groups);
 
         } catch (SQLException ex) {
-            logger.error("Error updating account from {} to {}", oldName, newName);
+            logger.error("Error updating account from {} to {}", oldName, newName, ex);
             throw new DAOException(ex);
         }
     }
@@ -128,7 +128,7 @@ public class AccountData implements AccountDAO {
             ps.close();
 
         } catch (SQLException ex) {
-            logger.error("Error removing account {}", name);
+            logger.error("Error removing account {}", name, ex);
             throw new DAOException(ex);
         }
     }
@@ -156,7 +156,7 @@ public class AccountData implements AccountDAO {
             return accounts;
 
         } catch (SQLException ex) {
-            logger.error("Error getting all accounts");
+            logger.error("Error getting all accounts", ex);
             throw new DAOException(ex);
         }
     }
@@ -195,7 +195,7 @@ public class AccountData implements AccountDAO {
             return groups;
 
         } catch (SQLException ex) {
-            logger.error("Error getting groups for accounts {}", Arrays.toString(accounts));
+            logger.error("Error getting groups for accounts {}", Arrays.toString(accounts), ex);
             throw new DAOException(ex);
         }
     }
@@ -219,7 +219,7 @@ public class AccountData implements AccountDAO {
             }
 
         } catch (SQLException ex) {
-            logger.error("Error adding groups to account {}", name);
+            logger.error("Error adding groups to account {}", name, ex);
             throw new DAOException(ex);
         }
     }
@@ -239,7 +239,7 @@ public class AccountData implements AccountDAO {
             ps.close();
 
         } catch (SQLException ex) {
-            logger.error("Error removing groups from account {}", name);
+            logger.error("Error removing groups from account {}", name, ex);
             throw new DAOException(ex);
         }
     }

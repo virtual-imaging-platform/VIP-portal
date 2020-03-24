@@ -73,7 +73,7 @@ public class EngineData implements EngineDAO {
             if (ex.getMessage().contains("Duplicate entry")) {
                 throw new DAOException("An engine named \"" + engine.getName() + "\" already exists.");
             } else {
-                logger.error(ex.toString());
+                logger.error("Error adding engine {}", engine.getEndpoint(), ex);
                 throw new DAOException(ex);
             }
         }
@@ -95,7 +95,7 @@ public class EngineData implements EngineDAO {
             ps.close();
 
         } catch (SQLException ex) {
-            logger.error(ex.toString());
+            logger.error("Error updating engine {} to {}", engine.getName(), engine.getEndpoint(), ex);
             throw new DAOException(ex);
         }
     }
@@ -112,7 +112,7 @@ public class EngineData implements EngineDAO {
             ps.close();
 
         } catch (SQLException ex) {
-            logger.error(ex.toString());
+            logger.error("Error removing engine {}", name, ex);
             throw new DAOException(ex);
         }
     }
@@ -134,7 +134,7 @@ public class EngineData implements EngineDAO {
             return list;
 
         } catch (SQLException ex) {
-            logger.error(ex.toString());
+            logger.error("Error getting all engines", ex);
             throw new DAOException(ex);
         }
     }
@@ -163,7 +163,7 @@ public class EngineData implements EngineDAO {
             return list;
 
         } catch (SQLException ex) {
-            logger.error(ex.toString());
+            logger.error("Error getting engines by class {}", className, ex);
             throw new DAOException(ex);
         }
     }

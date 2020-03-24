@@ -58,7 +58,6 @@ public class ApplicationImporterServiceImpl extends fr.insalyon.creatis.vip.core
             return abi.readAndValidationBoutiquesFile(
                 fileLFN, getSessionUser(), connection);
         } catch (CoreException | BusinessException | SQLException ex) {
-            logger.error(ex.toString());
             throw new ApplicationImporterException(ex);
         }
     }
@@ -70,10 +69,9 @@ public class ApplicationImporterServiceImpl extends fr.insalyon.creatis.vip.core
             ApplicationImporterBusiness abi = new ApplicationImporterBusiness();
             abi.createApplication(bt, type, tag, bts, isRunOnGrid, overwriteVersion, getSessionUser(), challenge, connection);
         } catch (BusinessException | CoreException | SQLException ex) {
-            logger.error(ex.toString());
             throw new ApplicationImporterException(ex);
         } catch (JSONException ex) {
-            LoggerFactory.getLogger(ApplicationImporterServiceImpl.class.getName()).error(ex.toString(), ex);
+            logger.error("Error creating app {}/{} from boutiques file", bt.getName(), bt.getToolVersion(), ex);
         }
     }
 }

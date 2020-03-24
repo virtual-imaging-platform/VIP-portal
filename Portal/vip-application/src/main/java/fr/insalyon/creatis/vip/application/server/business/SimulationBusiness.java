@@ -172,11 +172,9 @@ public class SimulationBusiness {
             }
             return list;
 
-        } catch (DataManagerException ex) {
+        } catch (DataManagerException | DAOException ex) {
             throw new BusinessException(ex);
 
-        } catch (DAOException ex) {
-            throw new BusinessException(ex);
         }
     }
 
@@ -290,7 +288,7 @@ public class SimulationBusiness {
             return sb.toString();
 
         } catch (IOException ex) {
-            logger.error("Error reading Simulation file", ex);
+            logger.error("Error reading Simulation {} file {}", simulationID, fileName);
             throw new BusinessException(ex);
         }
     }

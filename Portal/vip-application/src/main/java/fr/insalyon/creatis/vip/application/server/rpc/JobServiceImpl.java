@@ -304,9 +304,7 @@ public class JobServiceImpl extends AbstractRemoteServiceServlet implements JobS
                     + "' (" + simulationID + ").");
             simulationBusiness.sendSignal(simulationID, jobID, TaskStatus.valueOf(status));
 
-        } catch (CoreException ex) {
-            throw new ApplicationException(ex);
-        } catch (BusinessException ex) {
+        } catch (CoreException | BusinessException ex) {
             throw new ApplicationException(ex);
         }
     }
@@ -344,9 +342,7 @@ public class JobServiceImpl extends AbstractRemoteServiceServlet implements JobS
                     + jobIDs.toString() + "' (" + simulationID + ").");
             simulationBusiness.sendSignal(simulationID, jobIDs, TaskStatus.valueOf(status));
 
-        } catch (CoreException ex) {
-            throw new ApplicationException(ex);
-        } catch (BusinessException ex) {
+        } catch (CoreException | BusinessException ex) {
             throw new ApplicationException(ex);
         }
     }

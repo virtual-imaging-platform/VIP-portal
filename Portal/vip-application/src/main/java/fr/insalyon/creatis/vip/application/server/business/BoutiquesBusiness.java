@@ -100,7 +100,7 @@ public class BoutiquesBusiness {
         AppVersion appVersion = applicationBusiness.getVersion(
             applicationName, applicationVersion, connection);
         if (appVersion.getJsonLfn() == null) {
-            logger.error("No json lfn for this application : " + applicationName + "/" + applicationVersion);
+            logger.error("No json lfn for this application : {} / {}", applicationName, applicationVersion);
             throw new BusinessException("There is no json lfn for this application version.");
         }
         return appVersion.getJsonLfn();
@@ -120,8 +120,8 @@ public class BoutiquesBusiness {
 
     private String getDoiFromPublishOutput(List<String> publishOutput) throws BusinessException {
         if (publishOutput.size() != 1) {
-            logger.error("Wrong publication output, there should be only one line : "
-                    + String.join("\n", publishOutput));
+            logger.error("Wrong publication output, there should be only one line : {}",
+                    String.join("\n", publishOutput));
             throw new BusinessException("Wrong publication output.");
         }
         return publishOutput.get(0);
@@ -167,16 +167,16 @@ public class BoutiquesBusiness {
             process.waitFor();
             closeProcess(process);
         } catch (IOException | InterruptedException e) {
-            logger.error(
-                    "Unexpected error in a boutiques command : " + String.join("\n", cout), e);
+            logger.error("Unexpected error in a boutiques command : {}",
+                    String.join("\n", cout), e);
             throw new BusinessException("Unexpected error in a boutiques command", e);
         } finally {
             closeProcess(process);
         }
 
         if (process.exitValue() != 0) {
-            logger.error(
-                    "Command failed : " + String.join("\n", cout));
+            logger.error("Command failed : {}",
+                    String.join("\n", cout));
             throw new CommandErrorException(cout);
         }
         process = null;
@@ -197,7 +197,7 @@ public class BoutiquesBusiness {
             try {
                 c.close();
             } catch (IOException ex) {
-                // ignored
+                logger.error("Error closing {}", c);
             }
         }
     }
