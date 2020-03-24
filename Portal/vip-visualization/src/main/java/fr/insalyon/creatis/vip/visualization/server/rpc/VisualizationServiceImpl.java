@@ -66,9 +66,7 @@ public class VisualizationServiceImpl extends AbstractRemoteServiceServlet
             trace(logger, "Slicing image: " + imageFileName);
             return visualizationBusiness.getImageSlicesURL(
                 imageFileName, direction);
-        } catch (CoreException ex) {
-            throw new VisualizationException(ex);
-        } catch (BusinessException ex) {
+        } catch (CoreException | BusinessException ex) {
             throw new VisualizationException(ex);
         }
     }
