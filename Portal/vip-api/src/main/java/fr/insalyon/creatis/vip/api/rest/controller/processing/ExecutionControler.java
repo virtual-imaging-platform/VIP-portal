@@ -99,6 +99,7 @@ public class ExecutionControler {
         try(Connection connection = connectionSupplier.get()) {
             return executionBusiness.listExecutions(limit, connection);
         } catch (SQLException | SQLRuntimeException ex) {
+            logger.error("Error listing executions (limit : {})", limit);
             throw new ApiException(ex);
         }
     }
@@ -122,6 +123,7 @@ public class ExecutionControler {
             return executionBusiness.getExecution(
                 executionId, false, connection);
         } catch (SQLException | SQLRuntimeException ex) {
+            logger.error("Error getting execution {}", executionId);
             throw new ApiException(ex);
         }
     }
@@ -138,6 +140,7 @@ public class ExecutionControler {
             return executionBusiness.getExecution(
                 executionId, false, connection);
         } catch (SQLException | SQLRuntimeException ex) {
+            logger.error("Error getting execution {} after updating it", executionId);
             throw new ApiException(ex);
         }
     }
@@ -153,6 +156,8 @@ public class ExecutionControler {
                 execution, connection);
             return executionBusiness.getExecution(execId, false, connection);
         } catch (SQLException | SQLRuntimeException ex) {
+            logger.error("Error starting execution for pipeline {}",
+                    execution.getPipelineIdentifier());
             throw new ApiException(ex);
         }
     }
@@ -166,6 +171,7 @@ public class ExecutionControler {
             return executionBusiness.getExecutionResultsPaths(
                 executionId, connection);
         } catch (SQLException | SQLRuntimeException ex) {
+            logger.error("Error getting execution {} results", executionId);
             throw new ApiException(ex);
         }
     }

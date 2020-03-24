@@ -96,7 +96,7 @@ public class SpringWebConfig extends WebMvcConfigurerAdapter {
             try {
                 return CoreDAOFactory.getDAOFactory().getUserDAO(connection);
             } catch (DAOException e) {
-                logger.error("error creating user dao bean", e);
+                logger.error("error creating user dao bean");
                 throw new RuntimeException("Cannot create user dao", e);
             }
         };
@@ -121,6 +121,7 @@ public class SpringWebConfig extends WebMvcConfigurerAdapter {
             try {
                 return PlatformConnection.getInstance().getConnection();
             } catch (SQLException e) {
+                logger.error("error getting a connection for spring context");
                 throw new SQLRuntimeException(e);
             }
         };

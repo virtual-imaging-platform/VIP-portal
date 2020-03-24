@@ -65,8 +65,8 @@ public class ApiPropertiesInitializer implements ApplicationContextInitializer<C
             );
             verifyProperties(applicationContext.getEnvironment());
         } catch (IOException e) {
-            logger.error("Cant't init api conf file " + Server.getInstance().getApiConfFileLocation());
-            throw new RuntimeException("Error initializing api conf");
+            logger.error("Cant't init api conf file {}", Server.getInstance().getApiConfFileLocation());
+            throw new RuntimeException("Error initializing api conf", e);
         }
     }
 

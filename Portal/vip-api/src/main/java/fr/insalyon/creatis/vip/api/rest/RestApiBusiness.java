@@ -109,7 +109,6 @@ public class RestApiBusiness {
                 .signinWithoutResetingSession(username, password, connection);
             logger.info("Credentials OK for " + username);
         } catch (BusinessException e) {
-            logger.error("Error authenticating {" + username + "}. Considered as bad credentials", e);
             throw new ApiException("Authentication Error");
         }
     }
@@ -128,7 +127,6 @@ public class RestApiBusiness {
                 return configurationBusiness.getUserApikey(email, connection);
             }
         } catch (BusinessException e) {
-            logger.error("Error dealing with api key");
             throw new ApiException(e);
         }
     }

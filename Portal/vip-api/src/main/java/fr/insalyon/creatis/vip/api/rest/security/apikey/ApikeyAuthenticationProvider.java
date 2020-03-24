@@ -110,8 +110,7 @@ public class ApikeyAuthenticationProvider implements
             try {
                 vipUser = userDAO.getUserByApikey(apikey);
             } catch (DAOException e) {
-                logger.error("error when getting user by apikey", e);
-                logger.error("Doing as if there is an auth error");
+                logger.error("error when getting user by apikey. Doing as if there is an auth error", e);
                 throw new BadCredentialsException(
                     messages.getMessage(
                         "AbstractUserDetailsAuthenticationProvider.badCredentials",
@@ -134,9 +133,8 @@ public class ApikeyAuthenticationProvider implements
                 vipUser.setGroups(groups);
                 springUser = new SpringCompatibleUser(vipUser);
             } catch (BusinessException e) {
-                logger.error(
-                    "error when getting user groups" + vipUser.getEmail(), e);
-                logger.error("Doing as if there is an auth error");
+                logger.error("error when getting user groups for {}. Doing as if there is an auth error",
+                        vipUser.getEmail(), e);
                 throw new BadCredentialsException(
                     messages.getMessage(
                         "AbstractUserDetailsAuthenticationProvider.badCredentials",
@@ -148,12 +146,11 @@ public class ApikeyAuthenticationProvider implements
                     "successful logging for " + springUser.getUsername());
                 userDAO.resetNFailedAuthentications(springUser.getUsername());
             } catch (DAOException e) {
-                logger.error("Error reseting failed auth attemps ", e);
+                logger.error("Error resetting failed auth attempts. Ignoring", e);
             }
             return new ApikeyAuthenticationToken(springUser, apikey);
         } catch (SQLException | SQLRuntimeException e) {
-            logger.error("error when getting or closing db connexion.", e);
-            logger.error("Doing as if there is an auth error");
+            logger.error("error when getting or closing db connexion. Doing as if there is an auth error",e);
             throw new BadCredentialsException(
                 messages.getMessage(
                     "AbstractUserDetailsAuthenticationProvider.badCredentials",
