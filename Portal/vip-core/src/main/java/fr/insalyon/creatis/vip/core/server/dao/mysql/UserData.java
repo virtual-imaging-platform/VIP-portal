@@ -352,11 +352,11 @@ public class UserData implements UserDAO {
                 ps.close();
 
             } catch (SQLException ex) {
-                logger.error("Error updating password for {}", email);
+                logger.error("Error updating password for {}", email,ex);
                 throw new DAOException(ex);
             }
         } else {
-            logger.error("The current password mismatch for {}", email, ex);
+            logger.error("The current password mismatch for {}", email);
             throw new DAOException("The current password mismatch.");
         }
     }
