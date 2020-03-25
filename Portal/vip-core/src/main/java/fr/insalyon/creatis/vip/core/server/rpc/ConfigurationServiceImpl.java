@@ -537,7 +537,8 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
             String newEmail = currentUser.getNextEmail();
             trace(logger, "Confirming email change from " + currentEmail + " to " + newEmail);
             if (code == null || !code.equals(currentUser.getCode())) {
-                trace(logger, "Wrong validation code for " + currentEmail);
+                logger.error("Wrong validation code for {} : {} vs {}",
+                        currentEmail, code, currentUser.getCode());
                 throw new CoreException("Wrong validation code");
             }
             configurationBusiness.updateUserEmail(
@@ -913,6 +914,8 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
                   .getVipAuthor().equals(user.getEmail())) {
                 configurationBusiness.removePublication(id, connection);
             } else {
+                logger.error("{} cannot remove publication {} because it's not his",
+                        user, id);
                 throw new CoreException("you can't remove a publication that is not yours");
             }
         } catch (BusinessException | SQLException ex) {

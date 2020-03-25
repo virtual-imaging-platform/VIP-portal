@@ -91,11 +91,20 @@ public class ExecutionControler {
     ) throws ApiException {
         ApiUtils.methodInvocationLog("listExecutions", studyIdentifier, offset, limit);
         restApiBusiness.getApiContext(httpServletRequest, true);
-        if (studyIdentifier != null) throw new ApiException("studyIdentifier not supportet yet");
-        if (offset != null) throw new ApiException("offset not supported yet");
+        if (studyIdentifier != null) {
+            logger.warn("studyIdentifier not supportet yet in listExecutions");
+            throw new ApiException("studyIdentifier not supportet yet");
+        }
+        if (offset != null) {
+            logger.warn("offset not supportet yet in listExecutions");
+            throw new ApiException("offset not supported yet");
+        }
         int executionMaxNb = environment.getProperty(DEFAULT_LIMIT_LIST_EXECUTION, Integer.class);
         if (limit == null) limit = executionMaxNb;
-        if (limit > executionMaxNb) throw new ApiException("limit parameter too high");
+        if (limit > executionMaxNb) {
+            logger.warn("limit parameter too high {}", limit);
+            throw new ApiException("limit parameter too high");
+        }
         try(Connection connection = connectionSupplier.get()) {
             return executionBusiness.listExecutions(limit, connection);
         } catch (SQLException | SQLRuntimeException ex) {
@@ -109,7 +118,10 @@ public class ExecutionControler {
     ) throws ApiException {
         ApiUtils.methodInvocationLog("countExecutions");
         restApiBusiness.getApiContext(httpServletRequest, true);
-        if (studyIdentifier != null) throw new ApiException("studyIdentifier not supportet yet");
+        if (studyIdentifier != null) {
+            logger.warn("studyIdentifier not supportet yet in countExecutions");
+            throw new ApiException("studyIdentifier not supportet yet");
+        }
         return String.valueOf(executionBusiness.countExecutions());
     }
 
@@ -190,6 +202,7 @@ public class ExecutionControler {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void playExecution(@PathVariable String executionId) throws ApiException {
         ApiUtils.methodInvocationLog("playExecution", executionId);
+        logger.warn("playExecution should not be used");
         throw new NotImplementedException("Executions are started on creation");
     }
 

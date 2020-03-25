@@ -196,6 +196,7 @@ public class PipelineBusiness {
             Application a = applicationBusiness.getApplication(
                 applicationName, connection);
             if (a == null) {
+                logger.error("Cannot find application {}", applicationName);
                 throw new ApiException("Cannot find application " + applicationName);
             }
             for (String applicationClassName : a.getApplicationClasses()) {
@@ -203,7 +204,9 @@ public class PipelineBusiness {
                     return;
                 }
             }
-            throw new ApiException("User " + apiContext.getUser().getEmail() + " not allowed to access application " + a.getName());
+            logger.error("User {} not allowed to access application {}",
+                    apiContext.getUser(), applicationName);
+            throw new ApiException("User " + apiContext.getUser().getEmail() + " not allowed to access application " + applicationName);
         } catch (BusinessException ex) {
             throw new ApiException(ex);
         }
@@ -218,6 +221,8 @@ public class PipelineBusiness {
                 return p;
             }
         }
+        logger.error("Pipeline {}/{} doesn't exist or user {} cannot access it",
+                applicationName, applicationVersion , apiContext.getUser());
         throw new ApiException("Pipeline '" + applicationName + "' (version '" + applicationVersion + "') doesn't exist or user '"
                 + apiContext.getUser().getEmail() + "' cannot access it");
     }

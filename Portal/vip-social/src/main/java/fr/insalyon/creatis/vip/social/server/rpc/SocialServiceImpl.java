@@ -127,6 +127,7 @@ public class SocialServiceImpl extends AbstractRemoteServiceServlet implements S
             if (isSystemAdministrator()) {
                 return configurationBusiness.getUsers(connection);
             }
+            logger.error("{} is not an admin, he cant access all users", getSessionUser());
             throw new SocialException("Only administrators can send message.");
         } catch (BusinessException | CoreException | SQLException ex) {
             throw new SocialException(ex);

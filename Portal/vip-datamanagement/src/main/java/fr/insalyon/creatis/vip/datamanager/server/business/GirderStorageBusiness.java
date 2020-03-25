@@ -147,6 +147,7 @@ public class GirderStorageBusiness {
                 Optional.empty());
 
             if (res.code >= 400) {
+                logger.error("Unable to get girder token from api key {} : {}", key, res.response);
                 throw new BusinessException(
                     "Unable to get token from api key: " + res.response);
             }
@@ -176,6 +177,7 @@ public class GirderStorageBusiness {
                     con -> con.setRequestProperty("Girder-Token", token)));
 
             if (res.code >= 400) {
+                logger.error("Unable to get girder filename for file {} : {}", fileId, res.response);
                 throw new BusinessException(
                     "Unable to get file info: " + res.response);
             }

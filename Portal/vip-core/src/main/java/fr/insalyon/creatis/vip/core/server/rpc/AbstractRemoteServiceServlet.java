@@ -51,6 +51,8 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class AbstractRemoteServiceServlet extends RemoteServiceServlet {
 
+    private final Logger logger = LoggerFactory.getLogger(getClass());
+
     protected ConfigurationBusiness configurationBusiness;
 
     public AbstractRemoteServiceServlet() {
@@ -88,6 +90,8 @@ public abstract class AbstractRemoteServiceServlet extends RemoteServiceServlet 
         if (user != null) {
             return user;
         }
+        logger.error("No VIP user found in session {}. Attributes : {}",
+                getSession().getId(), getSession().getAttributeNames());
         throw new CoreException("User not logged in.");
     }
 
@@ -102,6 +106,8 @@ public abstract class AbstractRemoteServiceServlet extends RemoteServiceServlet 
         if (groups != null) {
             return groups;
         }
+        logger.error("No VIP groups found in session {}. Attributes : {}",
+                getSession().getId(), getSession().getAttributeNames());
         throw new CoreException("User has no groups defined.");
     }
 

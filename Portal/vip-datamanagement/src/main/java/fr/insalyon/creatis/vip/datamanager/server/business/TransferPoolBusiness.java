@@ -158,6 +158,7 @@ public class TransferPoolBusiness {
             GRIDAPoolClient client = CoreUtil.getGRIDAPoolClient();
             Operation operation = client.getOperationById(operationId);
             if (operation.getType() != Operation.Type.Download) {
+                logger.error("Not a download operation {}", operationId);
                 throw new BusinessException("Wrong operation type for download");
             }
             SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM d, yyyy HH:mm");

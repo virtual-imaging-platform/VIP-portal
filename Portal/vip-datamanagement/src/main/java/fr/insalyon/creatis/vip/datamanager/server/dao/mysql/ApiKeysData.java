@@ -124,6 +124,8 @@ public class ApiKeysData implements ApiKeysDAO {
 
             int nbRows = ps.executeUpdate();
             if (nbRows != 1) {
+                logger.error("Error deleting api key for user {} and storage {} : {} rows deleted",
+                        userEmail, storageIdentifier, nbRows);
                 throw new DAOException(
                     "Number of deleted rows ("
                     + nbRows

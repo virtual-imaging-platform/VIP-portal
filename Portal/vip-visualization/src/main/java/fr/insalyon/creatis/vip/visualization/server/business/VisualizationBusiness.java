@@ -156,6 +156,7 @@ public class VisualizationBusiness {
         if (!fileDir.exists()) {
             fileDir.mkdirs();
             if (!fileDir.exists()) {
+                logger.error("Cannot create viewer dir: {}", fileDir.getAbsolutePath());
                 throw new BusinessException(
                     "Cannot create viewer dir: " + fileDir.getAbsolutePath());
             }

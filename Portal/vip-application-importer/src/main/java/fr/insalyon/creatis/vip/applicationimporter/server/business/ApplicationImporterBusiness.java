@@ -81,6 +81,8 @@ public class ApplicationImporterBusiness {
                               user, fileLFN, connection))).getParent());
 
             if (!localDir.exists() && !localDir.mkdirs()) {
+                logger.error("Error validating boutiques file {}, Cannot create directory {}",
+                        fileLFN, localDir);
                 throw new BusinessException("Cannot create directory " + localDir.getCanonicalPath());
             }
             String localFilePath = CoreUtil.getGRIDAClient().getRemoteFile(
@@ -207,6 +209,7 @@ public class ApplicationImporterBusiness {
         // Check if base file directory exists, otherwise create it.
         File directory = (new File(fileName)).getParentFile();
         if (!directory.exists() && !directory.mkdirs()) {
+            logger.error("Error importing an application : Cannot create directory {}", directory);
             throw new BusinessException("Cannot create directory " + directory.getAbsolutePath());
         }
 
@@ -254,7 +257,8 @@ public class ApplicationImporterBusiness {
         }
         // Only the owner of an existing application and a system administrator can modify it.
         if (!user.isSystemAdministrator() && !app.getOwner().equals(user.getEmail())) {
-            logger.error(user.getEmail() + " tried to modify application " + app.getName() + " which belongs to " + app.getOwner());
+            logger.error("{} tried to modify application {} which belongs to {}",
+                    user.getEmail(), app.getName(), app.getOwner());
             throw new BusinessException("Permission denied.");
         }
         // Refuse to overwrite an application version silently if the version overwrite parameter is not set.
@@ -263,7 +267,8 @@ public class ApplicationImporterBusiness {
                 vipApplicationName, connection);
             for (AppVersion v : versions) {
                 if (v.getVersion().equals(vipVersion)) {
-                    logger.error(user.getEmail() + " tried to overwrite version " + vipVersion + " of application " + vipApplicationName + " without setting the overwrite flag.");
+                    logger.error("{} tried to overwrite version {} of application {} without setting the overwrite flag.",
+                            user.getEmail(), vipVersion,vipApplicationName);
                     throw new BusinessException("Application version already exists.");
                 }
             }

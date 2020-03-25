@@ -75,6 +75,7 @@ public class ClassData implements ClassDAO {
 
         } catch (SQLException ex) {
             if (ex.getMessage().contains("Duplicate entry")) {
+                logger.error("A class named \"{}\" already exists.", appClass.getName());
                 throw new DAOException("A class named \"" + appClass.getName() + "\" already exists.");
             } else {
                 logger.error("Error adding class {}", appClass.getName(), ex);
@@ -302,6 +303,8 @@ public class ClassData implements ClassDAO {
                         + "VALUES(?, ?)");
                         break;
                     default:
+                        logger.error("Error adding something to class {} : invalid objectType {}",
+                                className, objectType);
                         throw new IllegalArgumentException("Invalid objectType: " + objectType);
                 }
                 ps.setString(1, className);
@@ -341,6 +344,8 @@ public class ClassData implements ClassDAO {
                     + "VIPClassesEngines WHERE class=?");
                     break;
                 default:
+                    logger.error("Error removing something from class {} : invalid objectType {}",
+                            className, objectType);
                     throw new IllegalArgumentException("Invalid objectType: " + objectType);
             }
 

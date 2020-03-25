@@ -69,6 +69,7 @@ public class SamlAuthenticationService extends AbstractAuthenticationService {
 
         String token = request.getParameter("_saml_token");
         if (token == null) {
+            logger.error("Error with SAML assertion : SAML token is null");
             throw new BusinessException("SAML token is null");
         }
 
@@ -96,12 +97,14 @@ public class SamlAuthenticationService extends AbstractAuthenticationService {
             logger.error("Error getting SAML assertion {}", new String(xmlAssertion), ex);
         }
         if (assertion == null) {
+            logger.error("Error getting SAML assertion {}", new String(xmlAssertion));
             throw new BusinessException("Cannot get assertion!");
         }
 
         // Find public key certificate to use from issuer
         issuer = assertion.getIssuer();
         if (issuer == null) {
+            logger.error("Error with SAML assertion {} : Cannot find issuer", new String(xmlAssertion));
             throw new BusinessException("Cannot find assertion issuer!");
         }
         logger.info("Received SAML assertion from issuer " + issuer.getValue());
@@ -111,16 +114,20 @@ public class SamlAuthenticationService extends AbstractAuthenticationService {
         try {
             SamlTokenValidator.isSignatureValid(certFile, assertion);
         } catch (CertificateException | IOException | NoSuchAlgorithmException | InvalidKeySpecException | ValidationException ex) {
+            logger.error("Error with SAML assertion {} : signature is not valid", new String(xmlAssertion), ex);
             throw new BusinessException("Assertion signature is not valid!", ex);
         }
         if (!SamlTokenValidator.isTimeValid(assertion)) {
+            logger.error("Error with SAML assertion {} : time not valid", new String(xmlAssertion));
             throw new BusinessException("Assertion is not time valid!");
         }
         try {
             if (!SamlTokenValidator.isAudienceValid(request.getRequestURL().toString(), assertion)) {
+                logger.error("Error with SAML assertion {} : audience is not valid", new String(xmlAssertion));
                 throw new BusinessException("Assertion audience is not valid!");
             }
         } catch (MalformedURLException ex) {
+            logger.error("Error with SAML assertion {}", new String(xmlAssertion), ex);
             throw new BusinessException(ex);
         }
     }

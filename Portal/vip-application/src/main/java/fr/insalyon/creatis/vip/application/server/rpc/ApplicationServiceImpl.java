@@ -32,12 +32,7 @@
 package fr.insalyon.creatis.vip.application.server.rpc;
 
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
-import fr.insalyon.creatis.vip.application.client.bean.AppClass;
-import fr.insalyon.creatis.vip.application.client.bean.AppVersion;
-import fr.insalyon.creatis.vip.application.client.bean.Application;
-import fr.insalyon.creatis.vip.application.client.bean.ApplicationStatus;
-import fr.insalyon.creatis.vip.application.client.bean.Engine;
-import fr.insalyon.creatis.vip.application.client.bean.Simulation;
+import fr.insalyon.creatis.vip.application.client.bean.*;
 import fr.insalyon.creatis.vip.application.client.rpc.ApplicationService;
 import fr.insalyon.creatis.vip.application.client.view.ApplicationException;
 import fr.insalyon.creatis.vip.application.server.business.*;
@@ -47,13 +42,14 @@ import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.business.Server;
 import fr.insalyon.creatis.vip.core.server.dao.mysql.PlatformConnection;
 import fr.insalyon.creatis.vip.core.server.rpc.AbstractRemoteServiceServlet;
+import org.jsoup.Jsoup;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.jsoup.Jsoup;
 
 /**
  *
@@ -90,6 +86,7 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
                 application.setOwner(getSessionUser().getEmail());
                 applicationBusiness.add(application, connection);
             } else {
+                logger.error("Unauthorized to add application {}", application.getName());
                 throw new ApplicationException("You have no administrator rights.");
             }
         } catch (BusinessException | CoreException | SQLException ex) {
@@ -105,6 +102,7 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
                 applicationBusiness.update(application, connection);
 
             } else {
+                logger.error("Unauthorized to update application {}", application.getName());
                 throw new ApplicationException("You have no administrator rights.");
             }
         } catch (BusinessException | CoreException | SQLException ex) {
@@ -136,6 +134,8 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
                 trace(logger, "Adding version '" + version.getVersion() + "' ('" + version.getApplicationName() + "').");
                 applicationBusiness.addVersion(version, connection);
             } else {
+                logger.error("Unauthorized to add version {} to {}",
+                        version.getVersion(), version.getApplicationName());
                 throw new ApplicationException("You have no administrator rights.");
             }
         } catch (BusinessException | CoreException | SQLException ex) {
@@ -151,6 +151,8 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
 
                 applicationBusiness.updateVersion(version, connection);
             } else {
+                logger.error("Unauthorized to update version {}/{}",
+                        version.getApplicationName(), version.getVersion());
                 throw new ApplicationException("You have no administrator rights.");
             }
         } catch (BusinessException | CoreException | SQLException ex) {
@@ -166,6 +168,8 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
                 applicationBusiness.removeVersion(
                     applicationName, version, connection);
             } else {
+                logger.error("Unauthorized to remove version {}/{}",
+                        applicationName, version);
                 throw new ApplicationException("You have no administrator rights.");
             }
         } catch (BusinessException | CoreException | SQLException ex) {
@@ -181,6 +185,8 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
                 return boutiquesBusiness.publishVersion(
                     getSessionUser(), applicationName, version, connection);
             } else {
+                logger.error("Unauthorized to publish version {}/{}",
+                        applicationName, version);
                 throw new ApplicationException("You have no administrator rights.");
             }
         } catch (BusinessException | CoreException | SQLException ex) {
@@ -198,6 +204,7 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
                     getSessionUser().getEmail(), true, connection);
                 return applicationBusiness.getApplications(classes, connection);
             }
+            logger.error("Unauthorized to get all applications");
             throw new ApplicationException("You have no administrator rights.");
         } catch (BusinessException | CoreException | SQLException ex) {
             throw new ApplicationException(ex);

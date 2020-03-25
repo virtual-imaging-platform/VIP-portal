@@ -74,7 +74,7 @@ public class LFCPermissionBusiness {
         if (firstDir.equals(TRASH_HOME)) return;
         // currently no admin access is possible via the api for security reasons
         if (firstDir.equals(USERS_FOLDER) || firstDir.equals(VO_ROOT_FOLDER)) {
-            logger.error("Trying to access admin folders from api");
+            logger.error("Trying to access admin folders from api : {}", path);
             throw new BusinessException("Unauthorized LFC access");
         }
         // else it should be a group folder

@@ -31,6 +31,8 @@
  */
 package fr.insalyon.creatis.vip.api.rest.security.apikey;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -44,6 +46,8 @@ import java.util.Collection;
  * Does not contain user info, because we dont know it at first
  */
 public class ApikeyAuthenticationToken extends AbstractAuthenticationToken {
+
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private UserDetails principal;
     private String apikey;

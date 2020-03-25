@@ -216,17 +216,21 @@ public class ProxyClient {
 
         String line = readLine(this.socketIn);
         if (line == null) {
+            logger.error("Error logging on MyProxy : nothing received");
             throw new EOFException();
         }
         if (!line.equals(VERSION)) {
+            logger.error("Error logging on MyProxy : bad protocol {}", line);
             throw new ProtocolException("bad MyProxy protocol VERSION string: " + line);
         }
         line = readLine(this.socketIn);
         if (line == null) {
+            logger.error("Error logging on MyProxy : no response");
             throw new EOFException();
         }
         if (!line.startsWith(RESPONSE)
                 || line.length() != RESPONSE.length() + 1) {
+            logger.error("Error logging on MyProxy : bad RESPONSE {}", line);
             throw new ProtocolException(
                     "bad MyProxy protocol RESPONSE string: " + line);
         }
@@ -239,10 +243,13 @@ public class ProxyClient {
                     errString.append(line.substring(ERROR.length()));
                 }
             }
+            logger.error("Error logging on MyProxy : error {}", errString);
             throw new FailedLoginException(errString.toString());
         } else if (response == '2') {
+            logger.error("Error logging on MyProxy : RESPONSE {} not implemented", response);
             throw new ProtocolException("MyProxy authorization RESPONSE not implemented");
         } else if (response != '0') {
+            logger.error("Error logging on MyProxy : RESPONSE {} Unknown", response);
             throw new ProtocolException("Unknown MyProxy protocol RESPONSE string: " + line);
         }
         while ((line = readLine(this.socketIn)) != null) {
@@ -269,8 +276,10 @@ public class ProxyClient {
 
         int numCertificates = this.socketIn.read();
         if (numCertificates == -1) {
+            logger.error("Error getting credentials for MyProxy : connection aborted");
             throw new Exception("connection aborted");
         } else if (numCertificates == 0 || numCertificates < 0) {
+            logger.error("bad number of certificates sent by server: {}", numCertificates);
             throw new Exception("bad number of certificates sent by server: " + numCertificates);
         }
 
@@ -411,6 +420,7 @@ public class ProxyClient {
         @Override
         public void checkClientTrusted(X509Certificate[] certs, String authType)
                 throws CertificateException {
+            logger.error("checkClientTrusted not implemented by edu.uiuc.ncsa.MyProxy.MyProxyLogon.MyTrustManager");
             throw new CertificateException(
                     "checkClientTrusted not implemented by edu.uiuc.ncsa.MyProxy.MyProxyLogon.MyTrustManager");
         }
@@ -432,6 +442,7 @@ public class ProxyClient {
                 if (acceptedIssuers == null) {
                     String certDir = getExistingTrustRootPath();
                     if (certDir != null) {
+                        logger.error("no CA certificates found in {}", certDir);
                         throw new CertificateException(
                                 "no CA certificates found in " + certDir);
                     }
@@ -458,6 +469,8 @@ public class ProxyClient {
             String subject = cert.getSubjectX500Principal().getName();
             int index = subject.indexOf("CN=");
             if (index == -1) {
+                logger.error("MyProxy : certificate subject {} does not contain a CN component",
+                        subject);
                 throw new CertificateException("Server certificate subject ("
                         + subject + "does not contain a CN component.");
             }
@@ -470,6 +483,8 @@ public class ProxyClient {
                 String service = CN.substring(0, index);
                 CN = CN.substring(index + 1);
                 if (!service.equals("host") && !service.equals("myproxy")) {
+                    logger.error("MyProxy : certificate subject {} contains unknown service element",
+                            subject);
                     throw new CertificateException(
                             "Server certificate subject CN contains unknown service element: "
                             + subject);
@@ -484,6 +499,8 @@ public class ProxyClient {
                 }
             }
             if (!CN.equals(myHostname)) {
+                logger.error("MyProxy : certificate CN {} does not match server hostname {}",
+                        CN, Server.getInstance().getMyProxyHost());
                 throw new CertificateException(
                         "Server certificate subject CN (" + CN
                         + ") does not match server hostname ("

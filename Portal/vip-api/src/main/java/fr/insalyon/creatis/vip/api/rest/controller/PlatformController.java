@@ -95,7 +95,8 @@ public class PlatformController {
         for (String codeAndMessageAsString : codesAndMessagesAsStrings) {
             String[] parts = codeAndMessageAsString.split(":");
             if (parts.length != 2) {
-                logger.error("Malformed api code and message in properties:"+codeAndMessageAsString);
+                logger.error("Malformed api code and message in properties: {}",
+                        codeAndMessageAsString);
                 throw new RuntimeException("Malformed api code and message in properties");
             }
             Integer code = Integer.parseInt(parts[0]);

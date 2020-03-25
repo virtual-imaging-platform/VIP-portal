@@ -259,6 +259,8 @@ public class ExecutionBusiness {
     public void updateExecution(Execution execution) throws ApiException {
         try {
             if (execution.getTimeout() > 0) {
+                logger.error("Unsupported change of execution timeout {}",
+                        execution.getIdentifier());
                 throw new ApiException("Update of execution timeout is not supported.");
             }
             logger.info("updating execution " + execution.getIdentifier()
@@ -274,9 +276,13 @@ public class ExecutionBusiness {
             for (StringKeyValuePair skvp : values) {
                 if (!skvp.getName().equals("name")) // in the current spec, update can only deal with the timeout (unsupported here) or the name.
                 {
+                    logger.error("Unsupported change of execution {} {}",
+                            executionId, skvp.getName());
                     throw new ApiException("Update of parameter " + skvp.getName() + " is not supported.");
                 } else {
                     if (skvp.getValue() == null) {
+                        logger.error("Change of execution {} {} to null",
+                                executionId, skvp.getName());
                         throw new ApiException("Value of parameter " + skvp.getName() + " is empty.");
                     }
                     logger.info("Updating parameter " + skvp.getName() + " with value \"" + skvp.getValue().toString() + "\"");
@@ -383,6 +389,8 @@ public class ExecutionBusiness {
                     continue;
                 }
                 // pp is an empty input with no default value and it is not optional
+                logger.error("Error initialising {}, missing {} parameter",
+                        pipelineId, pp.getName());
                 throw new ApiException("Parameter " + pp.getName() + " is empty while it is not optional and it has no default value.");
             }
 
@@ -396,6 +404,7 @@ public class ExecutionBusiness {
                         param.getName().equals(CoreConstants.RESULTS_DIRECTORY_PARAM_NAME));
 
             if (hasInputResultsDirectory && !hasPipelineResultsDirectory) {
+                logger.error("Missing results-directory for {}", pipelineId);
                 throw new ApiException(
                     "Input has parameter results-directory but it is not defined in pipeline.");
             }
@@ -417,6 +426,7 @@ public class ExecutionBusiness {
                 .getApplication(applicationName, connection)
                 .getApplicationClasses();
             if (classes.isEmpty()) {
+                logger.error("No class configured for {}", pipelineId);
                 throw new ApiException("Application " + applicationName + " cannot be launched because it doesn't belong to any VIP class.");
             }
 
@@ -469,6 +479,7 @@ public class ExecutionBusiness {
         try {
             Simulation s = workflowBusiness.getSimulation(executionId);
             if (s.getStatus() != SimulationStatus.Completed && s.getStatus() != SimulationStatus.Killed) {
+                logger.error("Cannot delete exec {}, it is {}", executionId, s.getStatus());
                 throw new ApiException("Cannot delete execution " + executionId + " because status is " + s.getStatus().toString());
             }
             // Note: this won't delete the intermediate files in case the execution was run locally, which violates the spec.
@@ -513,6 +524,7 @@ public class ExecutionBusiness {
         }
 
         if (!protocol.equals("https") && !protocol.equals("http")) {
+            logger.error("Unsupported protocol {}", protocol);
             throw new ApiException("Unsupported protocol: " + protocol);
         }
 
@@ -542,7 +554,7 @@ public class ExecutionBusiness {
         String requestUrl = apiContext.getRequest().getRequestURL().toString();
         Integer restStringIndex = requestUrl.indexOf("/rest/");
         if (restStringIndex < 0) {
-            logger.error("Results URL called from unknown URL : " + requestUrl);
+            logger.error("Results URL called from unknown URL : {}", requestUrl);
             throw new ApiException("Results URL called from unknown URL");
         }
         String baseUrl = requestUrl.substring(0, restStringIndex + 5); // "http(s)://host[/...]/rest
@@ -620,6 +632,7 @@ public class ExecutionBusiness {
             if (s.getUserName().equals(user.getFullName())) {
                 return;
             }
+            logger.error("Permission denied for {} on exec {}", user, executionId);
             throw new ApiException("Permission denied");
         } catch (BusinessException ex) {
             throw new ApiException(ex);

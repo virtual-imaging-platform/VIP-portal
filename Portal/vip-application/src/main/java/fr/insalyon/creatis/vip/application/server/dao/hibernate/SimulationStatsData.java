@@ -166,6 +166,7 @@ public class SimulationStatsData implements SimulationStatsDAO {
                     result.add("failedStalledJobs InputTime##" + String.valueOf(ob[28]) + "");
                     result.add("failedStalledJobs OutputTime##" + String.valueOf(ob[29]) + "");
                 }else{
+                    logger.error("getBySimulationID: Not enough data : {}", ob.length);
                     throw new DAOException("getBySimulationID: Not enough data");
                 }
 

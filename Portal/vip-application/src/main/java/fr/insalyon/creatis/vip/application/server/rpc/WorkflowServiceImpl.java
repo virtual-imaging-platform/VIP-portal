@@ -342,8 +342,7 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
                 }
             }
             if (sb.length() > 0) {
-                logger.error("Unable to kill the following "
-                        + "simulations: " + sb.toString());
+                logger.error("Unable to kill the following simulations: {}", sb.toString());
                 throw new ApplicationException("Unable to kill the following "
                         + "simulations: " + sb.toString());
             }
@@ -378,8 +377,7 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
             }
 
             if (sb.length() > 0) {
-                logger.error("Unable to clean the following "
-                        + "simulations: " + sb.toString());
+                logger.error("Unable to clean the following simulations: {}", sb.toString());
                 throw new ApplicationException("Unable to clean the following "
                         + "simulations: " + sb.toString());
             }
@@ -410,8 +408,7 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
             }
 
             if (sb.length() > 0) {
-                logger.error("Unable to purge the following "
-                        + "simulations: " + sb.toString());
+                logger.error("Unable to purge the following simulations: {}", sb.toString());
                 throw new ApplicationException("Unable to purge the following "
                         + "simulations: " + sb.toString());
             }
@@ -721,21 +718,6 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
         }
     }
 
-    private String getJenaDirName(String baseDir) throws ApplicationException {
-        File dir = new File(baseDir);
-
-        if (dir.isDirectory()) {
-            for (String names : dir.list()) {
-                if (names.startsWith("JENA-TDB-dir")) {
-                    return names;
-                }
-            }
-        } else {
-            throw new ApplicationException(baseDir + "is not a directory");
-        }
-        return null;
-    }
-
     @Override
     public void markSimulationsCompleted(List<String> simulationIDs) throws ApplicationException {
         try {
@@ -753,8 +735,7 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
             }
 
             if (sb.length() > 0) {
-                logger.error("Unable to mark completed the following "
-                        + "simulations: " + sb.toString());
+                logger.error("Unable to mark completed the following simulations: {}", sb.toString());
                 throw new ApplicationException("Unable to mark completed the following "
                         + "simulations: " + sb.toString());
             }

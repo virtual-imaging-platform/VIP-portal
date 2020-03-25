@@ -55,6 +55,7 @@ public class ApiUtils {
 
     public static void throwIfNull(Object parameter, String name) throws ApiException {
         if (parameter == null) {
+            logger.error("parameter {} cannot be empty", name);
             throw new ApiException(name + " cannot be empty.");
         }
     }
@@ -92,6 +93,7 @@ public class ApiUtils {
 
     public static void checkIfValidPipelineIdentifier(String identifier) throws ApiException {
         if (!identifier.contains("/")) {
+            logger.error("Invalid pipeline identifier {} : missing /", identifier);
             throw new ApiException("Invalid pipeline identifier: " + identifier);
         }
     }

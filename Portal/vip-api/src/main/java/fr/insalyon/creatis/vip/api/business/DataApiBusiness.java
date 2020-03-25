@@ -98,7 +98,7 @@ public class DataApiBusiness {
         throws ApiException {
         checkPermission(path, LFCAccessType.DELETE, connection);
         if (!baseDoesFileExist(path, connection)) {
-            logger.error("trying to delete a non-existing file : " + path);
+            logger.error("trying to delete a non-existing file : {}", path);
             throw new ApiException("trying to delete a non-existing dile");
         }
         baseDeletePath(path, connection);
@@ -145,7 +145,7 @@ public class DataApiBusiness {
         }
         List<Data> directoryData = baseGetFileData(path, connection);
         if (doesPathCorrespondsToAFile(path, directoryData)) {
-            logger.error("Trying to list a directory, but is a file :" + path);
+            logger.error("Trying to list {} , but is a file :", path);
             throw new ApiException("Error listing a directory");
         }
         List<PathProperties> res = new ArrayList<>();
@@ -171,7 +171,7 @@ public class DataApiBusiness {
         String parentLfcPath = javaPath.getParent().toString();
         // check if parent dir exists
         if (!baseDoesFileExist(parentLfcPath, connection)) {
-            logger.error("parent directory of upload does not exist :" + lfcPath);
+            logger.error("parent directory of upload {} does not exist :", lfcPath);
             throw new ApiException("Upload Directory doest not exist");
         }
         // TODO : check if it already exists
@@ -202,11 +202,11 @@ public class DataApiBusiness {
         String parentLfcPath = javaPath.getParent().toString();
         // check if parent dir exists
         if (!baseDoesFileExist(parentLfcPath, connection)) {
-            logger.error("parent directory of upload does not exist :" + lfcPath);
+            logger.error("parent directory of {} does not exist :", lfcPath);
             throw new ApiException("Upload Directory doest not exist");
         }
         if (uploadData.getType().equals(UploadDataType.ARCHIVE)) {
-            logger.error("archive upload not supported yet");
+            logger.error("archive upload not supported yet for ({})", lfcPath);
             throw new ApiException("archive upload not supported yet");
         }
         // TODO : check if it already exists
@@ -230,12 +230,12 @@ public class DataApiBusiness {
 
         // check if parent dir exists
         if (!baseDoesFileExist(parentLfcPath, connection)) {
-            logger.error("parent directory of upload does not exist :" + path);
-            throw new ApiException("Upload Directory doest not exist");
+            logger.error("parent directory of {} does not exist :", path);
+            throw new ApiException("Mkdir parent directory doest not exist");
         }
         if (baseDoesFileExist(path, connection)) {
-            logger.error("Trying do create an existing directory :" + path);
-            throw new ApiException("Upload error");
+            logger.error("Trying do create an existing directory : {}", path);
+            throw new ApiException("Mkdir error");
         }
         baseMkdir(parentLfcPath, javaPath.getFileName().toString(), connection);
         PathProperties newPathProperties = new PathProperties();
@@ -258,18 +258,18 @@ public class DataApiBusiness {
         throws ApiException {
         checkReadPermission(path, connection);
         if (path.equals(ROOT)) {
-            logger.error("cannot download root");
+            logger.error("cannot download root ({})", path);
             throw new ApiException("Illegal data API access");
         }
         List<Data> fileData = baseGetFileData(path, connection);
         if (!doesPathCorrespondsToAFile(path, fileData)) {
             // it works on a directory and return a zip, but we cant check the download size
-            logger.error("Trying to download a directory : " + path);
+            logger.error("Trying to download a directory ({})", path);
             throw new ApiException("Illegal data API access");
         }
         Long maxSize = env.getProperty(CarminProperties.API_DATA_TRANSFERT_MAX_SIZE, Long.class);
         if (fileData.get(0).getLength() > maxSize) {
-            logger.error("Trying to download a file too big : " + path);
+            logger.error("Trying to download a file too big ({})", path);
             throw new ApiException("Illegal data API access");
         }
     }

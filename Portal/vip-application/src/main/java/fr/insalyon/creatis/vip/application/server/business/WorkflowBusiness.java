@@ -139,6 +139,7 @@ public class WorkflowBusiness {
             logger.error("Error finding an engine for {}", applicationClass, ex);
         }
         if (engineBean == null || engineBean.getEndpoint().isEmpty()) {
+            logger.error("No available engines for class {}", applicationClass);
             throw new BusinessException("No available engines for class " + applicationClass);
         } else {
             return engineBean;
@@ -160,6 +161,7 @@ public class WorkflowBusiness {
             throw new BusinessException(ex);
         }
         if (engineBean == null || engineBean.getEndpoint().isEmpty()) {
+            logger.error("No available engines for class {}", applicationClass);
             throw new BusinessException("No available engines for class " + applicationClass);
         }
 
@@ -572,6 +574,7 @@ public class WorkflowBusiness {
         try {
             Workflow workflow = workflowDAO.get(simulationID);
             if (workflow == null) {
+                logger.error("Cannot find execution with id {}", simulationID);
                 throw new BusinessException("Cannot find execution with id " + simulationID);
             }
             simulation = new Simulation(
@@ -669,7 +672,7 @@ public class WorkflowBusiness {
                 FileUtils.deleteDirectory(file);
 
             } else if (!file.delete()) {
-                logger.error("Unable to delete data: " + path);
+                logger.error("Unable to delete log : {}", path);
                 throw new BusinessException("Unable to delete data: " + path);
             }
         } catch (java.io.IOException ex) {
@@ -732,6 +735,7 @@ public class WorkflowBusiness {
                 workflowIDList.add(simulationIDList.get(i).getID());
             }
         } else {
+            logger.error("Incorrect call of getPerformanceStats : Execution list is null");
             throw new BusinessException("Execution list is null!");
         }
 
@@ -758,6 +762,7 @@ public class WorkflowBusiness {
             }
 
         } else {
+            logger.error("Internall error in getPerformanceStats : workflowIDList is null");
             throw new BusinessException("Empty workflow list!");
         }
         return stats;
@@ -862,7 +867,7 @@ public class WorkflowBusiness {
             path = path.replace(Server.getInstance().getDataManagerUsersHome() + "/", "");
             if (!path.startsWith(user.getFolder())) {
 
-                logger.error("User '" + user + "' tried to access data from another user: " + path + "");
+                logger.error("User {} tried to access data from another user: {}", user, path);
                 throw new BusinessException("Access denied to another user's home.");
             }
         } else if (path.startsWith(Server.getInstance().getDataManagerGroupsHome())) {
@@ -873,7 +878,7 @@ public class WorkflowBusiness {
             }
 
             if (!DataManagerUtil.getPaths(groups).contains(path)) {
-                logger.error("User '" + user + "' tried to access data from a non-autorized group: " + path + "");
+                logger.error("User {} tried to access data from a non-autorized group: {}", user, path);
                 throw new BusinessException("Access denied to group '" + path + "'.");
             }
         }

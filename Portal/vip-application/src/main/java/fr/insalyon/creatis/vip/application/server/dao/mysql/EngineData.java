@@ -71,6 +71,7 @@ public class EngineData implements EngineDAO {
 
         } catch (SQLException ex) {
             if (ex.getMessage().contains("Duplicate entry")) {
+                logger.error("An engine named \"{}\" already exists.", engine.getName());
                 throw new DAOException("An engine named \"" + engine.getName() + "\" already exists.");
             } else {
                 logger.error("Error adding engine {}", engine.getEndpoint(), ex);

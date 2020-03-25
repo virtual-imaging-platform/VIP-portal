@@ -77,6 +77,7 @@ public class AuthenticationBusiness {
     }
 
     public void authenticateHTTP(String userName) throws ApiException {
+        logger.error("Unsupported authenticateHTTP called by {}", userName);
         throw new ApiException("Not supported."); // will *not* be supported soon. This doesn't violate the API specification.
     }
 

@@ -120,6 +120,7 @@ public class DataController {
         restApiBusiness.getApiContext(httpServletRequest, true);
         // business call
         // TODO implement that
+        logger.error("Unsupported getFileMD5 call");
         throw new ApiException("Not implemented");
     }
 

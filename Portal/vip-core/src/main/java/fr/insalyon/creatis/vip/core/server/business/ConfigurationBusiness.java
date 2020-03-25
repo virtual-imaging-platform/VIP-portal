@@ -150,7 +150,7 @@ public class ConfigurationBusiness {
                 continue;
             }
             if (user.getCountryCode().toString().equals(udc)) {
-                logger.info("Undesired country for " + user.getEmail());
+                logger.error("Undesired country for " + user.getEmail());
                 throw new BusinessException("Error");
             }
         }
@@ -312,7 +312,7 @@ public class ConfigurationBusiness {
             }
             // Only check against the domain part of the user's email address
             if (useremail[1].endsWith(udm)) {
-                logger.info("Undesired Mail Domain for " + email);
+                logger.error("Undesired Mail Domain for " + email);
                 throw new BusinessException("Error");
             }
         }
@@ -544,6 +544,7 @@ public class ConfigurationBusiness {
 
             if (CoreDAOFactory.getDAOFactory()
                 .getUserDAO(connection).isLocked(email)) {
+                logger.error("Cannot send activation code to {} : account locked", email);
                 throw new BusinessException("User is locked.");
             }
 
@@ -580,6 +581,7 @@ public class ConfigurationBusiness {
 
             if (CoreDAOFactory.getDAOFactory()
                 .getUserDAO(connection).isLocked(email)) {
+                logger.error("Cannot send reset code to {} : account locked", email);
                 throw new BusinessException("User is locked.");
             }
 
@@ -1166,6 +1168,7 @@ public class ConfigurationBusiness {
                     .getUserDAO(connection)
                     .resetPassword(email, MD5.get(password));
             } else {
+                logger.error("Wrong reset code for {} : {}", email, code);
                 throw new BusinessException("Wrong reset code.");
             }
         } catch (NoSuchAlgorithmException | UnsupportedEncodingException ex) {

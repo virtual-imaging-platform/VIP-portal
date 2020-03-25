@@ -99,6 +99,7 @@ public class ApiKeyController {
             if (!externalPlatformBusiness.listAll(connection).stream()
                 .anyMatch(ep -> ep.getIdentifier()
                           .equals(keyInfo.storageIdentifier))) {
+                logger.error("Storage does not exist: {}", keyInfo.storageIdentifier);
                 throw new ApiException(
                     "Storage does not exist: " + keyInfo.storageIdentifier);
             }

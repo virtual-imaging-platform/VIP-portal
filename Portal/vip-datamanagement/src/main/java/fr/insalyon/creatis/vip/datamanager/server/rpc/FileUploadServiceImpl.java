@@ -112,6 +112,7 @@ public class FileUploadServiceImpl extends HttpServlet {
                             this.usePool = Boolean.valueOf(item.getString());
                             break;
                         default:
+                            logger.error("File upload : invalid FieldName {}", item.getFieldName());
                             throw new IllegalArgumentException("Invalid FieldName: " + item.getFieldName());
                     }
 
