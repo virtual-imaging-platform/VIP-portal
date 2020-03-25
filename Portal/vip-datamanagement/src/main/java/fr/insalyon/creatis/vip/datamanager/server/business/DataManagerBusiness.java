@@ -97,7 +97,7 @@ public class DataManagerBusiness {
             return dmCachedFiles;
 
         } catch (GRIDAClientException ex) {
-            logger.error(ex.toString());
+            logger.error("Error getting cached files", ex);
             throw new BusinessException(ex);
         }
     }
@@ -112,7 +112,7 @@ public class DataManagerBusiness {
                 client.deleteCachedFile(path);
             }
         } catch (GRIDAClientException ex) {
-            logger.error(ex.toString());
+            logger.error("Error deleting cached files {}", cachedFiles, ex);
             throw new BusinessException(ex);
         }
     }
@@ -125,8 +125,11 @@ public class DataManagerBusiness {
             return CoreUtil.getGRIDAClient().getRemoteFile(
                 DataManagerUtil.parseBaseDir(user, remoteFile, connection),
                 localDir);
-        } catch (DataManagerException | GRIDAClientException ex) {
-            logger.error(ex.toString());
+        } catch (DataManagerException ex) {
+            throw new BusinessException(ex);
+        } catch (GRIDAClientException ex) {
+            logger.error("Error getting file {} to {} by {}",
+                    remoteFile, localDir, user, ex);
             throw new BusinessException(ex);
         }
     }
@@ -144,7 +147,7 @@ public class DataManagerBusiness {
             return list;
 
         } catch (GRIDAClientException ex) {
-            logger.error(ex.toString());
+            logger.error("Error getting zombie files", ex);
             throw new BusinessException(ex);
         }
     }
@@ -164,7 +167,7 @@ public class DataManagerBusiness {
                 client.delete(surl);
             }
         } catch (GRIDAClientException ex) {
-            logger.error(ex.toString());
+            logger.error("Error deleting zombie files {}", surls, ex);
             throw new BusinessException(ex);
         }
     }

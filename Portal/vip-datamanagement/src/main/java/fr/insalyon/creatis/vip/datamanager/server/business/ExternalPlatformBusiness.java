@@ -59,7 +59,6 @@ public class ExternalPlatformBusiness {
         try {
             return getExternalPlatformDAO(connection).getAll();
         } catch (DAOException e) {
-            logger.error("Error listing all external platforms");
             throw new BusinessException(e);
         }
     }
@@ -109,7 +108,6 @@ public class ExternalPlatformBusiness {
         try {
             return getExternalPlatformDAO(connection).getById(identifier);
         } catch (DAOException e) {
-            logger.error("Error getting external platform : " + identifier);
             throw new BusinessException(e);
         }
     }
@@ -120,7 +118,6 @@ public class ExternalPlatformBusiness {
             return DataManagerDAOFactory.getInstance()
                     .getExternalPlatformsDAO(connection);
         } catch (DAOException e) {
-            logger.error("Error on ExternalPlatformsDAO creation");
             throw new BusinessException(e);
         }
     }

@@ -172,9 +172,7 @@ public class DataManagerServiceImpl extends AbstractRemoteServiceServlet impleme
             authenticateSystemAdministrator(logger);
             return dataManagerBusiness.getCachedFiles();
 
-        } catch (CoreException ex) {
-            throw new DataManagerException(ex);
-        } catch (BusinessException ex) {
+        } catch (CoreException | BusinessException ex) {
             throw new DataManagerException(ex);
         }
     }
@@ -191,9 +189,7 @@ public class DataManagerServiceImpl extends AbstractRemoteServiceServlet impleme
             trace(logger, "Removing chached files: " + cachedFiles);
             dataManagerBusiness.deleteCachedFiles(cachedFiles);
 
-        } catch (CoreException ex) {
-            throw new DataManagerException(ex);
-        } catch (BusinessException ex) {
+        } catch (CoreException | BusinessException ex) {
             throw new DataManagerException(ex);
         }
     }
@@ -247,9 +243,7 @@ public class DataManagerServiceImpl extends AbstractRemoteServiceServlet impleme
             trace(logger, "Removing operations: " + ids);
             transferPoolBusiness.removeOperations(ids);
 
-        } catch (CoreException ex) {
-            throw new DataManagerException(ex);
-        } catch (BusinessException ex) {
+        } catch (CoreException | BusinessException ex) {
             throw new DataManagerException(ex);
         }
     }
@@ -260,9 +254,7 @@ public class DataManagerServiceImpl extends AbstractRemoteServiceServlet impleme
             trace(logger, "Removing all operations.");
             transferPoolBusiness.removeUserOperations(getSessionUser().getEmail());
 
-        } catch (CoreException ex) {
-            throw new DataManagerException(ex);
-        } catch (BusinessException ex) {
+        } catch (CoreException | BusinessException ex) {
             throw new DataManagerException(ex);
         }
     }
@@ -273,9 +265,7 @@ public class DataManagerServiceImpl extends AbstractRemoteServiceServlet impleme
             trace(logger, "Removing operation: " + id);
             transferPoolBusiness.removeOperationById(id);
 
-        } catch (CoreException ex) {
-            throw new DataManagerException(ex);
-        } catch (BusinessException ex) {
+        } catch (CoreException | BusinessException ex) {
             throw new DataManagerException(ex);
         }
     }
@@ -383,9 +373,7 @@ public class DataManagerServiceImpl extends AbstractRemoteServiceServlet impleme
             trace(logger, "Removing zombie files: " + surls);
             dataManagerBusiness.deleteZombieFiles(surls);
 
-        } catch (CoreException ex) {
-            throw new DataManagerException(ex);
-        } catch (BusinessException ex) {
+        } catch (CoreException | BusinessException ex) {
             throw new DataManagerException(ex);
         }
     }

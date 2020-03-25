@@ -157,6 +157,8 @@ public class GirderStorageBusiness {
 
             return token;
         } catch (IOException | NullPointerException ex) {
+            logger.error("Error getting girder token for {} with key {}",
+                    userEmail, key, ex);
             throw new BusinessException("Unable to get token from api key", ex);
         }
     }
@@ -184,6 +186,8 @@ public class GirderStorageBusiness {
 
             return name;
         } catch (IOException ex) {
+            logger.error("Error getting girder filename for {} with token {}",
+                    fileId, token, ex);
             throw new BusinessException("Unable to get file info", ex);
         }
     }

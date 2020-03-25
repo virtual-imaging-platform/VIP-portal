@@ -142,13 +142,7 @@ public class LFCPermissionBusiness {
     private void checkSynchronizedDirectories(
         User user, String path, Connection connection)
         throws BusinessException {
-        List<SSH> sshs;
-        try {
-            sshs = new DataManagerBusiness().getSSHConnections(connection);
-        } catch (BusinessException e) {
-            logger.error("Error listing synchronized directories");
-            throw new BusinessException("Error listing synchronized directories");
-        }
+        List<SSH> sshs = new DataManagerBusiness().getSSHConnections(connection);
         List<String> lfcDirSSHSynchronization = new ArrayList<String>();
         for (SSH ssh : sshs) {
             if (ssh.getTransferType().equals(TransferType.Synchronization)) {
@@ -160,7 +154,6 @@ public class LFCPermissionBusiness {
         try {
             lfcBaseDir = DataManagerUtil.parseBaseDir(user, path, connection);
         } catch (DataManagerException e) {
-            logger.error("Error parsing api path :" + path);
             throw new BusinessException("Internal error in data API");
         }
         for (String s : lfcDirSSHSynchronization) {

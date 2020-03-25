@@ -66,7 +66,7 @@ public class ApiKeysData implements ApiKeysDAO {
 
             ps.execute();
         } catch (SQLException e) {
-            logger.error("Error inserting api key: " + apiKey.toString(), e);
+            logger.error("Error inserting api key: {}", apiKey, e);
             throw new DAOException(e);
         }
     }
@@ -83,7 +83,7 @@ public class ApiKeysData implements ApiKeysDAO {
 
             ps.execute();
         } catch (SQLException e) {
-            logger.error("Error updating api key: " + apiKey.toString(), e);
+            logger.error("Error updating api key: {}", apiKey, e);
             throw new DAOException(e);
         }
     }
@@ -108,7 +108,7 @@ public class ApiKeysData implements ApiKeysDAO {
             return apiKeys;
         } catch (SQLException e) {
             logger.error(
-                "Error getting api keys for user userEmail=" + userEmail);
+                "Error getting api keys for user: {}", userEmail, e);
             throw new DAOException(e);
         }
     }
@@ -133,9 +133,8 @@ public class ApiKeysData implements ApiKeysDAO {
             }
         } catch (SQLException e) {
             logger.error(
-                "Error deleting api key for: userEmail=" + userEmail
-                + ", storageIdentifier=" + storageIdentifier,
-                e);
+                "Error deleting api key for user {} and storage {}",
+                    userEmail, storageIdentifier, e);
             throw new DAOException(e);
         }
     }

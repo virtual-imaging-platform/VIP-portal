@@ -75,7 +75,7 @@ public class ExternalPlatformData implements ExternalPlatformsDAO {
             throw new DAOException("Cannot find an external platform");
 
         } catch (SQLException e) {
-            logger.error("Error getting external platform {" + identifier + "}");
+            logger.error("Error getting external platform {} ", identifier, e);
             throw new DAOException(e);
         }
     }
@@ -101,7 +101,7 @@ public class ExternalPlatformData implements ExternalPlatformsDAO {
             return externalPlatformsList;
 
         } catch (SQLException e) {
-            logger.error("Error getting all external platforms");
+            logger.error("Error getting all external platforms", e);
             throw new DAOException(e);
         }
     }
@@ -110,8 +110,8 @@ public class ExternalPlatformData implements ExternalPlatformsDAO {
         try {
             return ExternalPlatform.Type.valueOf(bddString.toUpperCase());
         } catch (IllegalArgumentException e) {
-            logger.error("External platform type not found {" + bddString + "}");
-            throw new DAOException("Impossible to map an external platform type from database");
+            logger.error("External platform type not found {}", bddString, e);
+            throw new DAOException(e);
         }
     }
 

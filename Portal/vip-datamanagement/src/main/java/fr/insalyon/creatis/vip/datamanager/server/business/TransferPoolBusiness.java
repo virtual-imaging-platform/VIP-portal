@@ -31,6 +31,7 @@
  */
 package fr.insalyon.creatis.vip.datamanager.server.business;
 
+import cern.colt.Arrays;
 import fr.insalyon.creatis.grida.client.GRIDAClientException;
 import fr.insalyon.creatis.grida.client.GRIDAPoolClient;
 import fr.insalyon.creatis.grida.common.bean.Operation;
@@ -92,10 +93,9 @@ public class TransferPoolBusiness {
             return poolOperations;
 
         } catch (DataManagerException ex) {
-            logger.error(ex.toString());
             throw new BusinessException(ex);
         } catch (GRIDAClientException ex) {
-            logger.error(ex.toString());
+            logger.error("Error getting operations for {} since {}", email, date, ex);
             throw new BusinessException(ex);
         }
     }
@@ -121,10 +121,9 @@ public class TransferPoolBusiness {
 
             return poolOperations;
         } catch (DataManagerException ex) {
-            logger.error(ex.toString());
             throw new BusinessException(ex);
         } catch (GRIDAClientException ex) {
-            logger.error(ex.toString());
+            logger.error("Error getting all operations", ex);
             throw new BusinessException(ex);
         }
     }
@@ -147,10 +146,9 @@ public class TransferPoolBusiness {
                 currentUserFolder,
                 connection);
         } catch (DataManagerException ex) {
-            logger.error(ex.toString());
             throw new BusinessException(ex);
         } catch (GRIDAClientException ex) {
-            logger.error(ex.toString());
+            logger.error("Error getting operation {}", operationId, ex);
             throw new BusinessException(ex);
         }
     }
@@ -168,7 +166,7 @@ public class TransferPoolBusiness {
                     dateFormat.format(operation.getRegistration()), operation.getSource(), operation.getDest(),
                     Type.Download, status, operation.getUser(), operation.getProgress());
         } catch (GRIDAClientException ex) {
-            logger.error(ex.toString());
+            logger.error("Error getting download operation {}", operationId, ex);
             throw new BusinessException(ex);
         }
     }
@@ -228,7 +226,7 @@ public class TransferPoolBusiness {
             }
 
         } catch (GRIDAClientException ex) {
-            logger.error(ex.toString());
+            logger.error("Error removing operations {}", ids, ex);
             throw new BusinessException(ex);
         }
     }
@@ -245,7 +243,7 @@ public class TransferPoolBusiness {
             client.removeOperationsByUser(email);
 
         } catch (GRIDAClientException ex) {
-            logger.error(ex.toString());
+            logger.error("Error removing operations for {}", email, ex);
             throw new BusinessException(ex);
         }
     }
@@ -262,19 +260,11 @@ public class TransferPoolBusiness {
             client.removeOperationById(id);
 
         } catch (GRIDAClientException ex) {
-            logger.error(ex.toString());
+            logger.error("Error removing operations {}", id, ex);
             throw new BusinessException(ex);
         }
     }
 
-    /**
-     *
-     * @param user
-     * @param email
-     * @param remoteFile
-     * @return Operation ID
-     * @throws BusinessException
-     */
     public String downloadFile(
         User user, String remoteFile, Connection connection)
         throws BusinessException {
@@ -291,10 +281,9 @@ public class TransferPoolBusiness {
             return poolClient.downloadFile(remotePath, localDirPath, user.getEmail());
 
         } catch (DataManagerException ex) {
-            logger.error(ex.toString());
             throw new BusinessException(ex);
         } catch (GRIDAClientException ex) {
-            logger.error(ex.toString());
+            logger.error("Error downloading file {} for {}", remoteFile, user, ex);
             throw new BusinessException(ex);
         }
     }
@@ -327,10 +316,9 @@ public class TransferPoolBusiness {
                     localDirPath, user.getEmail());
 
         } catch (DataManagerException ex) {
-            logger.error(ex.toString());
             throw new BusinessException(ex);
         } catch (GRIDAClientException ex) {
-            logger.error(ex.toString());
+            logger.error("Error downloading files {} for {}", remoteFiles, user, ex);
             throw new BusinessException(ex);
         }
     }
@@ -357,10 +345,9 @@ public class TransferPoolBusiness {
             return poolClient.downloadFolder(remotePath, localDirPath, user.getEmail());
 
         } catch (DataManagerException ex) {
-            logger.error(ex.toString());
             throw new BusinessException(ex);
         } catch (GRIDAClientException ex) {
-            logger.error(ex.toString());
+            logger.error("Error downloading folder {} for {}", remoteFolder, user, ex);
             throw new BusinessException(ex);
         }
     }
@@ -384,10 +371,10 @@ public class TransferPoolBusiness {
                 user, remoteFile, connection);
             return poolClient.uploadFile(localFilePath, remotePath, user.getEmail());
         } catch (DataManagerException ex) {
-            logger.error(ex.toString());
             throw new BusinessException(ex);
         } catch (GRIDAClientException ex) {
-            logger.error(ex.toString());
+            logger.error("Error uploading file {} to {} for {}",
+                    localFilePath, remoteFile, user, ex);
             throw new BusinessException(ex);
         }
     }
@@ -410,10 +397,10 @@ public class TransferPoolBusiness {
                 poolClient.delete(remotePath, user.getEmail());
             }
         } catch (DataManagerException ex) {
-            logger.error(ex.toString());
             throw new BusinessException(ex);
         } catch (GRIDAClientException ex) {
-            logger.error(ex.toString());
+            logger.error("Error deleting files {} for {}",
+                    Arrays.toString(paths), user, ex);
             throw new BusinessException(ex);
         }
     }
