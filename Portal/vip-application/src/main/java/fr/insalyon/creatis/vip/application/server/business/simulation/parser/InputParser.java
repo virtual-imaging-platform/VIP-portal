@@ -67,11 +67,8 @@ public class InputParser extends DefaultHandler {
 
             return inputs.toString();
 
-        } catch (IOException ex) {
-            logger.error(ex.toString());
-            throw new BusinessException(ex);
-        } catch (SAXException ex) {
-            logger.error(ex.toString());
+        } catch (IOException | SAXException ex) {
+            logger.error("Error parsing file {}", fileName, ex);
             throw new BusinessException(ex);
         }
     }

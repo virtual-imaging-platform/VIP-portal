@@ -829,12 +829,15 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
                         dir + "/Dropbox",
                         wai.requestTokenPair.key,
                         wai.requestTokenPair.secret);
-            } catch (DAOException | GRIDAClientException | SQLException ex) {
-                logger.error("Error linking dropbox account for {}", user.getEmail());
+            } catch (DAOException ex) {
+                throw new CoreException(ex);
+            } catch (GRIDAClientException | SQLException ex) {
+                logger.error("Error linking dropbox account for {}", user.getEmail(), ex);
                 throw new CoreException(ex);
             }
             return wai.url;
         } catch (DropboxException ex) {
+            logger.error("Error linking dropbox account for {}", user.getEmail(), ex);
             throw new CoreException(ex);
         }
     }
@@ -989,7 +992,7 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
             Server.getInstance().setMaxPlatformRunningSimulations(maxPlatformRunningSimulations);
         } catch (ConfigurationException ex) {
             logger.error("Configuration error changing maxPlatformRunningSimulations to {}",
-                    maxPlatformRunningSimulations);
+                    maxPlatformRunningSimulations, ex);
             throw new CoreException(ex);
         }
     }
@@ -1021,7 +1024,7 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
             }
 
         } catch (ParseException | TokenMgrException ex) {
-            logger.error("Error parsing publication {}", s);
+            logger.error("Error parsing publication {}", s, ex);
             throw new CoreException(ex);
         }
         return publications;

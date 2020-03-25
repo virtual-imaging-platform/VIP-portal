@@ -61,7 +61,7 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class AbstractAuthenticationService extends HttpServlet {
 
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private static final Logger logger = LoggerFactory.getLogger(AbstractAuthenticationService.class);
 
     protected abstract void checkValidRequest(HttpServletRequest request) throws BusinessException;
 
@@ -75,7 +75,7 @@ public abstract class AbstractAuthenticationService extends HttpServlet {
         try(Connection connection = PlatformConnection.getInstance().getConnection()) {
             processRequest(request, response, connection);
         } catch (BusinessException | SQLException ex) {
-            logger.error("Error handling a request", ex);
+            logger.error("Error handling a request : {}", ex.getMessage());
         }
     }
 
@@ -85,7 +85,7 @@ public abstract class AbstractAuthenticationService extends HttpServlet {
         try(Connection connection = PlatformConnection.getInstance().getConnection()) {
             processRequest(request, response, connection);
         } catch (BusinessException | SQLException ex) {
-            logger.error("Error handling a request", ex);
+            logger.error("Error handling a request : {}", ex.getMessage());
         }
     }
 
@@ -124,8 +124,7 @@ public abstract class AbstractAuthenticationService extends HttpServlet {
             userDAO.resetNFailedAuthentications(email);
             logger.debug("Reset auth count for " + email);
         } catch (DAOException e) {
-            logger.error("Error resetting failed auth counter for :" + email, e);
-            logger.error("ignoring it");
+            logger.error("Error resetting failed auth counter for {}. Ignoring it", email, e);
         }
     }
 
@@ -171,7 +170,7 @@ public abstract class AbstractAuthenticationService extends HttpServlet {
             out.println(message);
             out.flush();
         } catch (IOException ex) {
-            logger.error("Error writing auth response " + message);
+            logger.error("Error writing auth response " + message, ex);
             throw new BusinessException(ex);
         } finally {
             out.close();
@@ -198,6 +197,7 @@ public abstract class AbstractAuthenticationService extends HttpServlet {
             sessionCookie.setPath("/");
             response.addCookie(sessionCookie);
         } catch (UnsupportedEncodingException ex) {
+            logger.error("Error setting VIP session for {} ",user, ex);
             throw new BusinessException(ex);
         }
     }

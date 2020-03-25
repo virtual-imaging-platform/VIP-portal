@@ -97,7 +97,7 @@ public class PipelineController {
         try {
             pipelineId = URLDecoder.decode(pipelineId, "UTF8");
         } catch (UnsupportedEncodingException e) {
-            logger.error("Error decoding pipelineid {}", pipelineId);
+            logger.error("Error decoding pipelineid {}", pipelineId, e);
             throw new ApiException("cannot decode pipelineId : " + pipelineId);
         }
         ApiContext apiContext = restApiBusiness.getApiContext(httpServletRequest, true);

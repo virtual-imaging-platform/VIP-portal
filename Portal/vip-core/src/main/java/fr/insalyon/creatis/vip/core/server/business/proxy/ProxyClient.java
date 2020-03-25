@@ -127,7 +127,7 @@ public class ProxyClient {
             return new Proxy(proxyFileName, endDate);
 
         } catch (Exception ex) {
-            logger.error("Error getting proxy");
+            logger.error("Error getting proxy : {}", ex.getMessage());
             if (this.socket != null) {
                 try {
                     disconnect();
@@ -402,7 +402,8 @@ public class ProxyClient {
             try {
                 issuers = getX509CertsFromStringList(certData);
             } catch (Exception e) {
-                logger.error("Error getting X509 certificates from {}", Arrays.toString(certData));
+                logger.error("Error getting X509 certificates from {} : {}",
+                        Arrays.toString(certData), e.getMessage());
             }
             return issuers;
         }
@@ -447,6 +448,7 @@ public class ProxyClient {
                 pkixParameters.setRevocationEnabled(false);
                 validator.validate(certPath, pkixParameters);
             } catch (GeneralSecurityException e) {
+                logger.error("Error in checkServerCertPath", e);
                 throw new CertificateException(e);
             }
         }
@@ -566,7 +568,7 @@ public class ProxyClient {
             in.transferTo(0, in.size(), out);
 
         } catch (Exception e) {
-            logger.error("Error copying file from {} to {}", source, dest);
+            logger.error("Error copying file from {} to {}", source, dest, e);
         } finally {
             if (in != null) {
                 try {

@@ -303,7 +303,8 @@ public class DataApiBusiness {
         try (OutputStream outputStream = encoder.wrap(baos)) {
             Files.copy(file.toPath(), outputStream);
         } catch (IOException e) {
-            logger.error("Error encoding download file for operation : {}", operationId);
+            logger.error("Error encoding download file for operation : {}",
+                    operationId, e);
             throw new ApiException("Download operation failed", e);
         }
         return baos.toString();
@@ -351,14 +352,14 @@ public class DataApiBusiness {
         try {
             completionFuture.get(timeoutInSeconds, TimeUnit.SECONDS);
         } catch (InterruptedException e) {
-            logger.error("Waiting for operation completion interrupted : {}", operationId);
+            logger.error("Waiting for operation completion interrupted : {}", operationId ,e);
             throw new ApiException("Waiting for operation completion interrupted", e);
         } catch (ExecutionException e) {
-            logger.error("Error waiting for operation completion : {}", operationId);
+            logger.error("Error waiting for operation completion : {}", operationId ,e);
             throw new ApiException("Error waiting for operation completion", e);
         } catch (TimeoutException e) {
             completionFuture.cancel(true);
-            logger.error("Timeout operation completion : {}", operationId);
+            logger.error("Timeout operation completion : {}", operationId, e);
             throw new ApiException("Aborting operation : too long", e);
         }
     }
@@ -401,7 +402,7 @@ public class DataApiBusiness {
         try (InputStream base64InputStream = decoder.wrap(inputStream)) {
             Files.copy(base64InputStream, Paths.get(localFilePath));
         } catch (IOException e) {
-            logger.error("Error writing base64 file in {}", localFilePath);
+            logger.error("Error writing base64 file in {}", localFilePath, e);
             throw new ApiException("Error writing base64 file", e);
         }
     }
@@ -418,10 +419,10 @@ public class DataApiBusiness {
             fos.flush();
             return isFileEmpty;
         } catch (FileNotFoundException e) {
-            logger.error("Error creating new file {}", path);
+            logger.error("Error creating new file {}", path ,e);
             throw new ApiException("Upload error", e);
         } catch (IOException e) {
-            logger.error("IO Error storing file {}", path);
+            logger.error("IO Error storing file {}", path, e);
             throw new ApiException("Upload error", e);
         }
     }
@@ -504,7 +505,7 @@ public class DataApiBusiness {
         try {
             return dateFormat.parse(gridaFormatDate).getTime() / 1000;
         } catch (ParseException e) {
-            logger.warn("Error with grida date format : {}. Ignoring it", gridaFormatDate);
+            logger.warn("Error with grida date format : {}. Ignoring it", gridaFormatDate, e);
             return null;
         }
     }
@@ -517,7 +518,7 @@ public class DataApiBusiness {
                     contentType;
         } catch (IOException e) {
             logger.warn("Cant detect mime type of {}. Ignoring and returning application/octet-stream",
-                    path);
+                    path, e);
             return "application/octet-stream";
         }
     }

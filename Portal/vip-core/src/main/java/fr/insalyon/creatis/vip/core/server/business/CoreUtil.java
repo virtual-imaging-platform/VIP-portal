@@ -57,7 +57,7 @@ public class CoreUtil {
             client.sendEmail(subject, content, recipients, direct, username);
 
         } catch (SMAClientException ex) {
-            logger.error("Error sending {} email to {}", subject, username);
+            logger.error("Error sending {} email to {}", subject, username, ex);
             throw new BusinessException(ex);
         }
     }
