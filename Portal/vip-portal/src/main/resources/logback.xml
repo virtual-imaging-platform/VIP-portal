@@ -37,7 +37,7 @@
     <!--See also http://logback.qos.ch/manual/appenders.html#RollingFileAppender-->
     <file>${user.home}/.vip/vip.log</file>
     <encoder>
-      <pattern>%d |%5p | %c{1}:%L - %m%n %ex</pattern>
+      <pattern>%d |%5p |%t | %c{1}:%L - %m%n %ex{5}</pattern>
     </encoder>
     <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
       <maxIndex>10</maxIndex>
@@ -62,7 +62,7 @@
       <maxHistory>12</maxHistory>
     </rollingPolicy>
     <encoder>
-      <pattern>%d |%5p | %c{1}:%M:%L - %m%n %caller</pattern>
+      <pattern>%d |%5p |%t | %c{1}:%M:%L - %m%n %caller</pattern>
     </encoder>
   </appender>
 
