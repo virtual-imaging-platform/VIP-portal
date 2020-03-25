@@ -56,11 +56,6 @@ public class GroupData implements GroupDAO {
         this.connection = connection;
     }
 
-    /**
-     *
-     * @param groupName
-     * @throws DAOException
-     */
     @Override
     public void add(Group group) throws DAOException {
 
@@ -79,7 +74,7 @@ public class GroupData implements GroupDAO {
                 logger.error("A group named {} already exists", group.getName());
                 throw new DAOException("Error creating a group", ex);
             } else {
-                logger.error(ex.toString(), ex);
+                logger.error("Error adding group {}", group.getName(), ex);
                 throw new DAOException(ex);
             }
         }
