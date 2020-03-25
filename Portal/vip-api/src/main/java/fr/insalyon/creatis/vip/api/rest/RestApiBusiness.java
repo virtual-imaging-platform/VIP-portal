@@ -109,7 +109,7 @@ public class RestApiBusiness {
                 .signinWithoutResetingSession(username, password, connection);
             logger.info("Credentials OK for " + username);
         } catch (BusinessException e) {
-            throw new ApiException("Authentication Error");
+            throw new ApiException("Authentication Error", e);
         }
     }
 

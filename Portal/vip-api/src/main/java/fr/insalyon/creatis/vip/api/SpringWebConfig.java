@@ -121,7 +121,10 @@ public class SpringWebConfig extends WebMvcConfigurerAdapter {
             try {
                 return PlatformConnection.getInstance().getConnection();
             } catch (SQLException e) {
-                logger.error("error getting a connection for spring context");
+                // Checked exceptions are not supported so use a runtime exception
+                // It will be caught in API controllers as a business exception
+                // so print the stack here
+                logger.error("error getting a connection for spring context", e);
                 throw new SQLRuntimeException(e);
             }
         };

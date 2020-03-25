@@ -87,7 +87,6 @@ public class PipelineController {
         try(Connection connection = connectionSupplier.get()) {
             return pb.listPipelines(studyIdentifier, connection);
         } catch (SQLException | SQLRuntimeException ex) {
-            logger.error("Error listing pipelines");
             throw new ApiException(ex);
         }
     }
@@ -107,7 +106,6 @@ public class PipelineController {
             pb.checkIfUserCanAccessPipeline(pipelineId, connection);
             return pb.getPipeline(pipelineId, connection);
         } catch (SQLException | SQLRuntimeException ex) {
-            logger.error("Error getting pipeline {}", pipelineId);
             throw new ApiException(ex);
         }
     }

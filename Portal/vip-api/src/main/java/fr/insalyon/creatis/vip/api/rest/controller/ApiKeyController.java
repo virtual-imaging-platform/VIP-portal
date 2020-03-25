@@ -85,7 +85,6 @@ public class ApiKeyController {
         try(Connection connection = connectionSupplier.get()) {
             return apiKeyBusiness.apiKeysFor(userEmail, connection);
         } catch (BusinessException | SQLException | SQLRuntimeException e) {
-            logger.error("Error listing api keys for {}", userEmail);
             throw new ApiException(e);
         }
     }
@@ -110,8 +109,6 @@ public class ApiKeyController {
                 keyInfo.apiKey,
                 connection);
         } catch (BusinessException | SQLException | SQLRuntimeException e) {
-            logger.error("Error add or updating api keys for {} for storage: {}",
-                    userEmail, keyInfo.storageIdentifier);
             throw new ApiException(e);
         }
     }
@@ -127,8 +124,6 @@ public class ApiKeyController {
             apiKeyBusiness.deleteApiKey(
                 storageIdentifier, userEmail, connection);
         } catch (BusinessException | SQLException | SQLRuntimeException e) {
-            logger.error("Error deleting api keys for {} for storage: {}",
-                    userEmail, storageIdentifier);
             throw new ApiException(e);
         }
     }

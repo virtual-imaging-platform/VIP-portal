@@ -72,7 +72,6 @@ public class ExternalPlatformController {
         try(Connection connection = connectionSupplier.get()) {
             return externalPlatformBusiness.listAll(connection);
         } catch (SQLException | SQLRuntimeException | BusinessException e) {
-            logger.error("Error listing all external platforms");
             throw new ApiException(e);
         }
     }

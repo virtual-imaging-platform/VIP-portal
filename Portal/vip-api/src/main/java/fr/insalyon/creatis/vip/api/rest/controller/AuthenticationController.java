@@ -79,8 +79,6 @@ public class AuthenticationController {
             return restApiBusiness
                 .authenticate(authenticationCredentials, connection);
         } catch (SQLException | SQLRuntimeException ex) {
-            logger.error("Error authenticating {}",
-                    authenticationCredentials.getUsername());
             throw new ApiException(ex);
         }
     }
