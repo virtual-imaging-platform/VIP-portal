@@ -50,7 +50,7 @@ import org.slf4j.LoggerFactory;
  */
 public class ClassData implements ClassDAO {
 
-    private final static Logger logger = LoggerFactory.getLogger(ClassData.class);
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     private Connection connection;
 
     public ClassData(Connection connection) throws DAOException {

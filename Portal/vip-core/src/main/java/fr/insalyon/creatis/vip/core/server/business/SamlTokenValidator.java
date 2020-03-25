@@ -78,7 +78,7 @@ import org.w3c.dom.Element;
  */
 public class SamlTokenValidator {
 
-    private static Logger logger = LoggerFactory.getLogger(SamlTokenValidator.class);
+    private static final Logger logger = LoggerFactory.getLogger(SamlTokenValidator.class);
 
     public SamlTokenValidator() {
     }

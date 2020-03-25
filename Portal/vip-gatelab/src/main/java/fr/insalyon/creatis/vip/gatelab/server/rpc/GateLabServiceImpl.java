@@ -51,7 +51,7 @@ import org.slf4j.LoggerFactory;
  */
 public class GateLabServiceImpl extends AbstractRemoteServiceServlet implements GateLabService {
 
-    private final static Logger logger = LoggerFactory.getLogger(GateLabServiceImpl.class);
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     private GateLabBusiness gatelabBusiness;
     private ClassBusiness classBusiness;
 

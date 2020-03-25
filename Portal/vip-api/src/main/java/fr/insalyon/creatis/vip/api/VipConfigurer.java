@@ -53,7 +53,7 @@ import java.util.Calendar;
 @Component
 public class VipConfigurer implements ApplicationListener<ContextRefreshedEvent> {
 
-    public static final Logger logger = LoggerFactory.getLogger(VipConfigurer.class);
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Autowired
     private ConfigurationBusiness configurationBusiness;

@@ -46,7 +46,7 @@ import org.slf4j.LoggerFactory;
  */
 public class ExecutionNodeData extends AbstractJobData implements ExecutionNodeDAO {
 
-    private static Logger logger = LoggerFactory.getLogger(ExecutionNodeData.class);
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     public ExecutionNodeData(String dbPath) throws DAOException {
 

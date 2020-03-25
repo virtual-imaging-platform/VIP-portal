@@ -57,7 +57,7 @@ import java.util.function.Consumer;
  * Created by abonnet on 7/17/19.
  */
 public class GirderStorageBusiness {
-    private static final Logger logger = LoggerFactory.getLogger(GirderStorageBusiness.class);
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private ApiKeyBusiness apiKeyBusiness;
 

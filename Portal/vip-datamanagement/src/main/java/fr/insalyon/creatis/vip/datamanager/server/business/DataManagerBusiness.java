@@ -68,7 +68,7 @@ import org.slf4j.LoggerFactory;
  */
 public class DataManagerBusiness {
 
-    private final static Logger logger = LoggerFactory.getLogger(DataManagerBusiness.class);
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     public void deleteLocalFile(String fileName) throws BusinessException {
 

@@ -59,7 +59,7 @@ import org.opensaml.xml.validation.ValidationException;
  */
 public class SamlAuthenticationService extends AbstractAuthenticationService {
 
-    private static final Logger logger = LoggerFactory.getLogger(SamlAuthenticationService.class);
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     private Assertion assertion;
     private Issuer issuer;
 

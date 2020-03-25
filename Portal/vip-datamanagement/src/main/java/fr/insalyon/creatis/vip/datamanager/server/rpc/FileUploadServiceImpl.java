@@ -59,7 +59,7 @@ import java.util.*;
  */
 public class FileUploadServiceImpl extends HttpServlet {
 
-    private static Logger logger = LoggerFactory.getLogger(FileUploadServiceImpl.class);
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     private GRIDAClient client;
     private GRIDAPoolClient poolClient;
     private String path;

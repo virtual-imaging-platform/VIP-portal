@@ -52,7 +52,7 @@ import org.slf4j.LoggerFactory;
  */
 public class SimulationData extends AbstractJobData implements SimulationDAO {
 
-    private static final Logger logger = LoggerFactory.getLogger(SimulationData.class);
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     public SimulationData(String dbPath) throws DAOException {
 

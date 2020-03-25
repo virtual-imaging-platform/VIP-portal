@@ -50,7 +50,7 @@ import org.slf4j.LoggerFactory;
  */
 public class GroupMessageData implements GroupMessageDAO {
 
-    private static final Logger logger = LoggerFactory.getLogger(GroupMessageData.class);
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     private Connection connection;
 
     public GroupMessageData(Connection connection) {

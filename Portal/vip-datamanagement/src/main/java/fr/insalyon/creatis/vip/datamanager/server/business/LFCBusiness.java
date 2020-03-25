@@ -53,7 +53,7 @@ import org.slf4j.LoggerFactory;
  */
 public class LFCBusiness {
 
-    private static final Logger logger = LoggerFactory.getLogger(LFCBusiness.class);
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     /**
      *

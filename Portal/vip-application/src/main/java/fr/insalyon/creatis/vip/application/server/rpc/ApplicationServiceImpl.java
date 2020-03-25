@@ -61,7 +61,7 @@ import org.jsoup.Jsoup;
  */
 public class ApplicationServiceImpl extends AbstractRemoteServiceServlet implements ApplicationService {
 
-    private static final Logger logger = LoggerFactory.getLogger(ApplicationServiceImpl.class);
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     private final ClassBusiness classBusiness;
     private final ApplicationBusiness applicationBusiness;
     private final EngineBusiness engineBusiness;

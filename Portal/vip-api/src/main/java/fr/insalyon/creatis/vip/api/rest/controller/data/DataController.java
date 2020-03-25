@@ -57,7 +57,7 @@ import java.util.function.Supplier;
 @RequestMapping("path")
 public class DataController {
 
-    public static final Logger logger = LoggerFactory.getLogger(DataController.class);
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Autowired
     private RestApiBusiness restApiBusiness;

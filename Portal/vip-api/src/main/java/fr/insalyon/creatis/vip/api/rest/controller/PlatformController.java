@@ -55,7 +55,7 @@ import static fr.insalyon.creatis.vip.api.CarminProperties.*;
 @RequestMapping("/platform")
 public class PlatformController {
 
-    public static final Logger logger = LoggerFactory.getLogger(PlatformController.class);
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Autowired
     private Environment env;

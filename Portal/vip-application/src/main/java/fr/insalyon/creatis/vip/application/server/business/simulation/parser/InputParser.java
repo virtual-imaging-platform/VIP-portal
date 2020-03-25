@@ -49,7 +49,7 @@ import org.xml.sax.helpers.XMLReaderFactory;
  */
 public class InputParser extends DefaultHandler {
 
-    private static final Logger logger = LoggerFactory.getLogger(InputParser.class);
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     private XMLReader reader;
     private StringBuilder inputs;
     private String name;

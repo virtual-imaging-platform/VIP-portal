@@ -46,7 +46,7 @@ import java.sql.SQLException;
  */
 public class MySQLDAOFactory extends SocialDAOFactory {
 
-    private final static Logger logger = LoggerFactory.getLogger(MySQLDAOFactory.class);
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     private static SocialDAOFactory instance;
 
     protected static SocialDAOFactory getInstance() {

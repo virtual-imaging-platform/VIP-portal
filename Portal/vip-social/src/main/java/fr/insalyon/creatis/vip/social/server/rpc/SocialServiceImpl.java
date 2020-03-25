@@ -55,7 +55,7 @@ import org.slf4j.LoggerFactory;
  */
 public class SocialServiceImpl extends AbstractRemoteServiceServlet implements SocialService {
 
-    private static final Logger logger = LoggerFactory.getLogger(SocialServiceImpl.class);
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     private MessageBusiness messageBusiness;
 
     public SocialServiceImpl() {

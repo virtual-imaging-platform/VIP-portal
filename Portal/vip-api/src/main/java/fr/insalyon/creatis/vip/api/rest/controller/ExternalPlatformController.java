@@ -52,7 +52,7 @@ import java.util.function.Supplier;
 @RequestMapping("/externalPlatforms")
 public class ExternalPlatformController {
 
-    private static final Logger logger = LoggerFactory.getLogger(ExternalPlatformController.class);
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private ExternalPlatformBusiness externalPlatformBusiness;
 

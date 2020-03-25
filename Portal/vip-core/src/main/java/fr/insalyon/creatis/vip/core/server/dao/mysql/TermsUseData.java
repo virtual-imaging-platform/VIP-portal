@@ -48,7 +48,7 @@ import org.slf4j.LoggerFactory;
  */
 public class TermsUseData implements TermsUseDAO {
 
-    private final static Logger logger = LoggerFactory.getLogger(TermsUseData.class);
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     private Connection connection;
 
     public TermsUseData(Connection connection) throws DAOException {

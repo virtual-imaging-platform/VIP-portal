@@ -48,7 +48,7 @@ import java.util.Date;
  */
 public class UserData implements UserDAO {
 
-    private final static Logger logger = LoggerFactory.getLogger(UserData.class);
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     private Connection connection;
 
     public UserData(Connection connection) throws DAOException {

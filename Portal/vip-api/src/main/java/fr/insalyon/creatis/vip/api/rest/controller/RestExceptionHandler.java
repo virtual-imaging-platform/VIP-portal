@@ -54,7 +54,7 @@ import javax.servlet.http.HttpServletRequest;
 @ControllerAdvice
 public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
-    public static final Logger logger = LoggerFactory.getLogger(RestExceptionHandler.class);
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(NotImplementedException.class)

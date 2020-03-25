@@ -43,7 +43,7 @@ import org.slf4j.LoggerFactory;
  */
 public class GlobalPropertiesBusiness {
 
-    private final static Logger logger = LoggerFactory.getLogger(GlobalPropertiesBusiness.class);
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private final ApiContext apiContext;
 

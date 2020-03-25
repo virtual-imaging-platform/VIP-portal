@@ -64,7 +64,7 @@ import static fr.insalyon.creatis.vip.api.CarminProperties.DEFAULT_LIMIT_LIST_EX
 @RequestMapping("/executions")
 public class ExecutionControler {
 
-    public static final Logger logger = LoggerFactory.getLogger(ExecutionControler.class);
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Autowired
     private Environment environment;

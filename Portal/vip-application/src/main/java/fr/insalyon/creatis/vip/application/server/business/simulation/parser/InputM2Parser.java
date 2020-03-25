@@ -56,7 +56,7 @@ import org.xml.sax.helpers.XMLReaderFactory;
  */
 public class InputM2Parser extends DefaultHandler {
 
-    private static final Logger logger = LoggerFactory.getLogger(InputM2Parser.class);
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private XMLReader reader;
     private Map<String, String> inputs;

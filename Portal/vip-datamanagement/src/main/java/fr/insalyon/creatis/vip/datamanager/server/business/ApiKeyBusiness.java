@@ -42,7 +42,7 @@ import java.sql.Connection;
 import java.util.List;
 
 public class ApiKeyBusiness {
-    private final static Logger logger = LoggerFactory.getLogger(ApiKeyBusiness.class);
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     public List<UserApiKey> apiKeysFor(String userEmail, Connection connection)
         throws BusinessException {

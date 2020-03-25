@@ -50,7 +50,7 @@ import java.sql.SQLException;
  */
 public class MySQLDAOFactory extends ApplicationDAOFactory {
 
-    private final static Logger logger = LoggerFactory.getLogger(MySQLDAOFactory.class);
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     private static ApplicationDAOFactory instance;
 
     // Singleton

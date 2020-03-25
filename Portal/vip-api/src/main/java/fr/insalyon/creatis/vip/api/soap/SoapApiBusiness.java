@@ -59,7 +59,7 @@ import org.slf4j.LoggerFactory;
  */
 public class SoapApiBusiness {
 
-    private final static Logger logger = LoggerFactory.getLogger(SoapApiBusiness.class);
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     private final String authFailedMessage = "API user is not logged in.";
 
     private final ConfigurationBusiness configurationBusiness;

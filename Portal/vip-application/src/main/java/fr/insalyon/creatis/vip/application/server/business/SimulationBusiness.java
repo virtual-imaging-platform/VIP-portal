@@ -61,7 +61,7 @@ import org.slf4j.LoggerFactory;
  */
 public class SimulationBusiness {
 
-    private static final Logger logger = LoggerFactory.getLogger(SimulationBusiness.class);
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     /**
      *

@@ -45,7 +45,8 @@ import org.slf4j.LoggerFactory;
  */
 public class ShiwaPoolEngineEnvironment {
 
-    private static Logger logger = LoggerFactory.getLogger(ShiwaPoolEngineEnvironment.class);
+    private static final Logger logger = LoggerFactory.getLogger(ShiwaPoolEngineEnvironment.class);
+
     private static volatile ShiwaPoolEngineEnvironment instance;
     private Thread rthread;
     private Thread cthread;

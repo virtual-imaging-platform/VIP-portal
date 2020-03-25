@@ -45,7 +45,7 @@ import java.util.*;
  */
 public class ExternalPlatformData implements ExternalPlatformsDAO {
 
-    private static final Logger logger = LoggerFactory.getLogger(ExternalPlatformData.class);
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     private Connection connection;
 
     public ExternalPlatformData(Connection connection) throws DAOException {

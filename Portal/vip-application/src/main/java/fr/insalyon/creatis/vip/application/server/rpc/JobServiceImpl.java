@@ -56,7 +56,7 @@ import org.slf4j.LoggerFactory;
  */
 public class JobServiceImpl extends AbstractRemoteServiceServlet implements JobService {
 
-    private static Logger logger = LoggerFactory.getLogger(JobServiceImpl.class);
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     private SimulationBusiness simulationBusiness;
 
     public JobServiceImpl() {

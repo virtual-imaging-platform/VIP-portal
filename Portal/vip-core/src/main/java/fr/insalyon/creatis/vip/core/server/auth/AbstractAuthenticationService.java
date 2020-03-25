@@ -61,7 +61,7 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class AbstractAuthenticationService extends HttpServlet {
 
-    private static Logger logger = LoggerFactory.getLogger(AbstractAuthenticationService.class);
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     protected abstract void checkValidRequest(HttpServletRequest request) throws BusinessException;
 

@@ -52,7 +52,7 @@ import org.slf4j.LoggerFactory;
  */
 public class UsersGroupsData implements UsersGroupsDAO {
 
-    private final static Logger logger = LoggerFactory.getLogger(UsersGroupsData.class);
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     private Connection connection;
 
     public UsersGroupsData(Connection connection) throws DAOException {

@@ -64,7 +64,7 @@ import org.bouncycastle.pkcs.jcajce.JcaPKCS10CertificationRequestBuilder;
  */
 public class ProxyClient {
 
-    private final static Logger logger = LoggerFactory.getLogger(ProxyClient.class);
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     private SSLSocket socket;
     private BufferedInputStream socketIn;
     private BufferedOutputStream socketOut;

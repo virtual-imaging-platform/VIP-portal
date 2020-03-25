@@ -45,7 +45,7 @@ import java.sql.SQLException;
  */
 public class DataManagerDAOFactory {
 
-    private final static Logger logger = LoggerFactory.getLogger(DataManagerDAOFactory.class);
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     private static DataManagerDAOFactory instance;
 
     // Singleton

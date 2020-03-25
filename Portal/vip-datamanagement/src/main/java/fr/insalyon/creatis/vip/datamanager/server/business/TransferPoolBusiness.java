@@ -59,7 +59,7 @@ import org.slf4j.LoggerFactory;
  */
 public class TransferPoolBusiness {
 
-    private static Logger logger = LoggerFactory.getLogger(TransferPoolBusiness.class);
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     private Server serverConfiguration = Server.getInstance();
     private LFCBusiness lfcBusiness;
 

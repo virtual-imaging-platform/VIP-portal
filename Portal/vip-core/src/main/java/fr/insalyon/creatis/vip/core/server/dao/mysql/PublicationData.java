@@ -52,7 +52,7 @@ import org.slf4j.LoggerFactory;
  */
 public class PublicationData implements PublicationDAO {
 
-    private final static Logger logger = LoggerFactory.getLogger(PublicationData.class);
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     private Connection connection;
 
     public PublicationData(Connection connection) throws DAOException {

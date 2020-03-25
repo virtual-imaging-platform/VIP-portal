@@ -49,7 +49,7 @@ import static com.hp.hpl.jena.vocabulary.OWLResults.output;
  */
 public class BoutiquesBusiness {
 
-    private static final Logger logger = LoggerFactory.getLogger(BoutiquesBusiness.class);
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     public String publishVersion(
         User user, String applicationName, String version, Connection connection)

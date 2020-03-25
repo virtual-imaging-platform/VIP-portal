@@ -47,7 +47,7 @@ import java.util.List;
 
 public class ApiKeysData implements ApiKeysDAO {
 
-    private static final Logger logger = LoggerFactory.getLogger(ApiKeysData.class);
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     private Connection connection;
 
     public ApiKeysData(Connection connection) throws DAOException {

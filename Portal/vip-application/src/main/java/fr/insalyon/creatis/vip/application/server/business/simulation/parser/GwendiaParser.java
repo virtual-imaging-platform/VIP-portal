@@ -47,7 +47,7 @@ public class GwendiaParser extends AbstractWorkflowParser {
     private Source currentSource = null;
     private String text = null;
     
-    private static final Logger logger = LoggerFactory.getLogger(GwendiaParser.class);
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     
     public GwendiaParser() {
         super();

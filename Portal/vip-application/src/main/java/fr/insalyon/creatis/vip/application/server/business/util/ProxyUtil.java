@@ -45,7 +45,7 @@ import org.slf4j.LoggerFactory;
  */
 public class ProxyUtil {
 
-    private static Logger logger = LoggerFactory.getLogger(ProxyUtil.class);
+    private static final Logger logger = LoggerFactory.getLogger(ProxyUtil.class);
     public static final String CHARSET_UTF8 = "UTF-8";
 
     public static String readAsString(String proxyFileName) {

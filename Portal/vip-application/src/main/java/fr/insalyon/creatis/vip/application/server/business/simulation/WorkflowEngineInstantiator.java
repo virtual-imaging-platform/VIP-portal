@@ -52,7 +52,7 @@ import org.shiwa.desktop.data.description.workflow.SHIWAProperty;
  */
 public abstract class WorkflowEngineInstantiator {
 
-    private static Logger logger = LoggerFactory.getLogger(WorkflowEngineInstantiator.class);
+    private static final Logger logger = LoggerFactory.getLogger(WorkflowEngineInstantiator.class);
 
     public static WorkflowEngineInstantiator create(String engineEndpoint) throws BusinessException {
 

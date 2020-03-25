@@ -65,7 +65,7 @@ import java.util.Map.Entry;
 @Service
 public class ExecutionBusiness {
 
-    private final static Logger logger = LoggerFactory.getLogger(ExecutionBusiness.class);
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private final ApiContext apiContext;
     private final SimulationBusiness simulationBusiness;

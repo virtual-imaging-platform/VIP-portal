@@ -69,7 +69,7 @@ import org.slf4j.LoggerFactory;
  */
 public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements WorkflowService {
 
-    private static final Logger logger = LoggerFactory.getLogger(WorkflowServiceImpl.class);
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     private WorkflowBusiness workflowBusiness;
     private InputBusiness inputBusiness;
 

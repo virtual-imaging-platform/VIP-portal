@@ -64,7 +64,7 @@ import java.util.ArrayList;
  */
 public class Carmin {
 
-    private final static Logger logger = LoggerFactory.getLogger(Carmin.class);
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Resource
     private WebServiceContext wsContext;

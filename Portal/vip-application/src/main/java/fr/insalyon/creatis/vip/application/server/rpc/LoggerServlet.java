@@ -54,14 +54,14 @@ import org.slf4j.LoggerFactory;
  * Minimalist Servlet allowing to write logs (from the client side) in vip.log file on server side.
  * 
  * Please see servlet configuration in Application.gwt.xml file from VIP-Application module, and in web.xml from VIP-portal module WEB-INF folder.
- * To use it, create a Logger object in a client side class : "private static final Logger logger = LoggerFactory.getLogger(my_class_name.class.getName());"
+ * To use it, create a Logger object in a client side class : "private final Logger logger = LoggerFactory.getLogger(getClass());"
  * Then use it in methods. For instance : "logger.info("log_name : " + valueMapResult);
  * 
  * @author pgirard
  */
 public class LoggerServlet extends AbstractRemoteServiceServlet implements RemoteLoggingService  {
     
-    private static final Logger logger = LoggerFactory.getLogger(LoggerServlet.class);
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Override
      public String logOnServer(LogRecord record) {

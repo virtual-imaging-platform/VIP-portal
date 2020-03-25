@@ -45,7 +45,7 @@ import org.slf4j.LoggerFactory;
  */
 public class AuthenticationBusiness {
 
-    private final static Logger logger = LoggerFactory.getLogger(AuthenticationBusiness.class);
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private final ApiContext apiContext;
 

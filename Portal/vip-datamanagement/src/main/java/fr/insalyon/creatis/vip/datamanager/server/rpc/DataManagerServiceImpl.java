@@ -64,7 +64,7 @@ import org.slf4j.LoggerFactory;
  */
 public class DataManagerServiceImpl extends AbstractRemoteServiceServlet implements DataManagerService {
 
-    private static final Logger logger = LoggerFactory.getLogger(DataManagerServiceImpl.class);
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     private final DataManagerBusiness dataManagerBusiness;
     private final LFCBusiness lfcBusiness;
     private final TransferPoolBusiness transferPoolBusiness;

@@ -71,7 +71,7 @@ import java.util.function.Supplier;
 public class ApikeyAuthenticationProvider implements
         AuthenticationProvider, InitializingBean, MessageSourceAware {
 
-    protected final Logger logger = LoggerFactory.getLogger(getClass());
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     // ~ Instance fields
     // ================================================================================================

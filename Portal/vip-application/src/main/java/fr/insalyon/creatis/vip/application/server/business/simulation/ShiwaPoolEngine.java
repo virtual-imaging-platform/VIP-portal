@@ -50,7 +50,7 @@ import org.shiwa.desktop.data.description.workflow.SHIWAProperty;
  */
 public class ShiwaPoolEngine extends WorkflowEngineInstantiator {
 
-    private static Logger logger = LoggerFactory.getLogger(ShiwaPoolEngine.class);
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     private ShiwaClientService service;
     private List<SHIWAProperty> settings;
 

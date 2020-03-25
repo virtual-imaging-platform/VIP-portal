@@ -49,7 +49,7 @@ import org.slf4j.LoggerFactory;
  */
 public class EngineData implements EngineDAO {
 
-    private final static Logger logger = LoggerFactory.getLogger(EngineData.class);
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     private Connection connection;
 
     public EngineData(Connection connection) throws DAOException {

@@ -49,7 +49,7 @@ import org.slf4j.LoggerFactory;
  */
 public class GroupData implements GroupDAO {
 
-    private final static Logger logger = LoggerFactory.getLogger(GroupData.class);
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     private Connection connection;
 
     public GroupData(Connection connection) throws DAOException {

@@ -47,7 +47,7 @@ import org.slf4j.LoggerFactory;
  */
 public class GateLabInputs {
 
-    private final static Logger logger = LoggerFactory.getLogger(GateLabInputs.class);
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     private Map<String, String> inputsMap;
     private String inputfile;
 

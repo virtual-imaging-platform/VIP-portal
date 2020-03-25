@@ -83,7 +83,7 @@ import org.jbibtex.TokenMgrException;
  */
 public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet implements ConfigurationService {
 
-    private static Logger logger = LoggerFactory.getLogger(ConfigurationServiceImpl.class);
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     public ConfigurationServiceImpl() {
         super();

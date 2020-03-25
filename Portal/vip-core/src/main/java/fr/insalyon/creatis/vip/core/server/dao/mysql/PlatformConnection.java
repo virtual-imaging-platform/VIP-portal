@@ -56,7 +56,7 @@ import org.slf4j.LoggerFactory;
  */
 public class PlatformConnection {
 
-    private final static Logger logger = LoggerFactory.getLogger(PlatformConnection.class);
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     private static PlatformConnection instance;
     private boolean firstExecution;
     private DataSource dataSource;

@@ -52,7 +52,7 @@ import org.slf4j.LoggerFactory;
  */
 public class ApplicationData implements ApplicationDAO {
 
-    private final static Logger logger = LoggerFactory.getLogger(ApplicationData.class);
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     private Connection connection;
 
     public ApplicationData(Connection connection) throws DAOException {

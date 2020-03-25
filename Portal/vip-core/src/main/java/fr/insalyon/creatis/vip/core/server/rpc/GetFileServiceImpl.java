@@ -60,7 +60,7 @@ import org.slf4j.LoggerFactory;
  */
 public class GetFileServiceImpl extends HttpServlet {
 
-    private static Logger logger = LoggerFactory.getLogger(GetFileServiceImpl.class);
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)

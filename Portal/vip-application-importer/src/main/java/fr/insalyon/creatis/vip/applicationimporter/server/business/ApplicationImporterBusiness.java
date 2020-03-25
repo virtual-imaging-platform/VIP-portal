@@ -67,7 +67,7 @@ import org.slf4j.LoggerFactory;
  */
 public class ApplicationImporterBusiness {
 
-    private final static Logger logger = LoggerFactory.getLogger(ApplicationImporterBusiness.class);
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     public String readAndValidationBoutiquesFile(
         String fileLFN, User user, Connection connection)

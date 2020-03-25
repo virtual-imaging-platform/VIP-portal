@@ -56,7 +56,7 @@ import org.slf4j.LoggerFactory;
  */
 public class SSHData implements SSHDAO {
 
-    private final static Logger logger = LoggerFactory.getLogger(SSHData.class);
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     private Connection connection;
 
     public SSHData(Connection connection) {

@@ -55,7 +55,7 @@ import static fr.insalyon.creatis.vip.api.CarminProperties.*;
  */
 public class ApiPropertiesInitializer implements ApplicationContextInitializer<ConfigurableWebApplicationContext> {
 
-    private static final Logger logger = LoggerFactory.getLogger(ApiPropertiesInitializer.class);
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Override
     public void initialize(ConfigurableWebApplicationContext applicationContext) {

@@ -62,8 +62,7 @@ import javax.validation.Valid;
 @RequestMapping("/user/externalKeys")
 public class ApiKeyController {
 
-    private static final Logger logger =
-        LoggerFactory.getLogger(ApiKeyController.class);
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private ApiKeyBusiness apiKeyBusiness;
     private ExternalPlatformBusiness externalPlatformBusiness;

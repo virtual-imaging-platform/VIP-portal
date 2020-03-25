@@ -70,7 +70,7 @@ import static fr.insalyon.creatis.vip.api.CarminProperties.CORS_AUTHORIZED_DOMAI
 @ComponentScan
 public class SpringWebConfig extends WebMvcConfigurerAdapter {
 
-    public static final Logger logger = LoggerFactory.getLogger(SpringWebConfig.class);
+    private final Logger logger = LoggerFactory.getLogger(getClass());;
 
     @Autowired
     private Environment env;

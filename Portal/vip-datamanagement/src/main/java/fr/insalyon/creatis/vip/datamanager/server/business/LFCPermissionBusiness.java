@@ -51,7 +51,7 @@ import static fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants.*;
  */
 public class LFCPermissionBusiness {
 
-    private static final Logger logger = LoggerFactory.getLogger(LFCPermissionBusiness.class);
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     public enum LFCAccessType {
         READ, UPLOAD, DELETE

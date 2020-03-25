@@ -68,7 +68,7 @@ import static fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants.*;
 @Service
 public class DataApiBusiness {
 
-    private final static Logger logger = LoggerFactory.getLogger(DataApiBusiness.class);
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Autowired
     private Environment env;

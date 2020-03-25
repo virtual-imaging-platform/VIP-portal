@@ -47,7 +47,7 @@ import java.util.List;
  */
 public class ExternalPlatformBusiness {
 
-    private static final Logger logger = LoggerFactory.getLogger(ExternalPlatformBusiness.class);
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private GirderStorageBusiness girderStorageBusiness;
 

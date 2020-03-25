@@ -56,7 +56,7 @@ import javax.servlet.http.HttpServletRequest;
 @Service
 public class RestApiBusiness {
 
-    private final static Logger logger = LoggerFactory.getLogger(RestApiBusiness.class);
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Autowired
     private VipConfigurer vipConfigurer;

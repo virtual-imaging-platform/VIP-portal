@@ -56,7 +56,7 @@ import org.slf4j.LoggerFactory;
  */
 public class GateLabBusiness {
 
-    private final static Logger logger = LoggerFactory.getLogger(GateLabBusiness.class);
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     /**
      *

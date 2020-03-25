@@ -50,7 +50,7 @@ public class Server {
     // Configuration File
     PropertiesConfiguration config;
     // Constants
-    private static final Logger logger = LoggerFactory.getLogger(Server.class);
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     private static Server instance;
     private final String CONF_FILE = "vip.conf";
     private final String VIP_DIR = "/.vip/";

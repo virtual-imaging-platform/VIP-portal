@@ -90,7 +90,7 @@ import org.xml.sax.SAXException;
  */
 public class WorkflowBusiness {
 
-    private static final Logger logger = LoggerFactory.getLogger(WorkflowBusiness.class);
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     private static SimulationStatsDAO simulationStatsDAO;
     private static WorkflowDAO workflowDAO;
     private static ProcessorDAO processorDAO;

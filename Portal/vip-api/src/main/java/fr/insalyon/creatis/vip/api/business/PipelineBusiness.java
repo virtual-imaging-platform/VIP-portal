@@ -62,7 +62,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class PipelineBusiness {
 
-    private final static Logger logger = LoggerFactory.getLogger(PipelineBusiness.class);
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private final ApiContext apiContext;
     private Environment env;

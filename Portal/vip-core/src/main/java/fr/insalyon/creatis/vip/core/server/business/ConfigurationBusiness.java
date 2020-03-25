@@ -59,7 +59,7 @@ import java.util.*;
  */
 public class ConfigurationBusiness {
 
-    private final static Logger logger = LoggerFactory.getLogger(ConfigurationBusiness.class);
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     /**
      *

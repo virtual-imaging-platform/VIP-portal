@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory;
  */
 public class ApiUtils {
 
-    private final static Logger logger = LoggerFactory.getLogger(ApiUtils.class);
+    private static final Logger logger = LoggerFactory.getLogger(ApiUtils.class);
     
     public static void methodInvocationLog(String methodName, Object... parameters) {
         String message = "Calling API method " + methodName + "(";

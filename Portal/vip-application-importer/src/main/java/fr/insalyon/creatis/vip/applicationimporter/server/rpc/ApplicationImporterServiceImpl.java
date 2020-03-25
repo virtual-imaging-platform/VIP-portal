@@ -48,7 +48,7 @@ import org.slf4j.LoggerFactory;
 public class ApplicationImporterServiceImpl extends fr.insalyon.creatis.vip.core.server.rpc.AbstractRemoteServiceServlet
         implements ApplicationImporterService {
 
-    private final static Logger logger = LoggerFactory.getLogger(ApplicationImporterServiceImpl.class);
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Override
     public String readAndValidateBoutiquesFile(String fileLFN) throws ApplicationImporterException {

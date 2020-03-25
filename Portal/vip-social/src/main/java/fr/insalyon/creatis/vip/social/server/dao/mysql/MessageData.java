@@ -55,7 +55,7 @@ import org.slf4j.LoggerFactory;
  */
 public class MessageData implements MessageDAO {
 
-    private static final Logger logger = LoggerFactory.getLogger(MessageData.class);
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     private Connection connection;
 
     public MessageData(Connection connection) {

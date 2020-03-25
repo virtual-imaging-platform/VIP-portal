@@ -53,7 +53,7 @@ import javax.servlet.http.HttpServletRequest;
 @RequestMapping("/authenticate")
 public class AuthenticationController {
 
-    private static final Logger logger = LoggerFactory.getLogger(AuthenticationController.class);
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     // although the controller is a singleton, these are proxies that always point on the current request
     @Autowired

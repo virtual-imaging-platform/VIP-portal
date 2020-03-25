@@ -51,7 +51,7 @@ import org.slf4j.LoggerFactory;
  */
 public class AccountData implements AccountDAO {
 
-    private final static Logger logger = LoggerFactory.getLogger(AccountData.class);
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     private Connection connection;
 
     public AccountData(Connection connection) throws DAOException {

@@ -54,7 +54,7 @@ import org.slf4j.LoggerFactory;
  */
 public class WorkflowExecutionBusiness {
 
-    private static final Logger logger = LoggerFactory.getLogger(WorkflowExecutionBusiness.class);
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     private WorkflowEngineInstantiator engine;
 
     public WorkflowExecutionBusiness(String engineEndpoint) throws BusinessException {
