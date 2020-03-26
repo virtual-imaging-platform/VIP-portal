@@ -83,7 +83,7 @@ knowledge of the CeCILL-B license and that you accept its terms.
         <dependency>
             <groupId>org.apache.axis</groupId>
             <artifactId>axis</artifactId>
-            <version>1.4</version>
+            <version>1.4.1-vip</version>
         </dependency>
 
         <dependency>
