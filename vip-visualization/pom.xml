@@ -38,12 +38,11 @@ knowledge of the CeCILL-B license and that you accept its terms.
   <parent>
     <groupId>fr.insalyon.creatis</groupId>
     <artifactId>vip</artifactId>
-    <version>1.27</version>
+    <version>${revision}${sha1}${changelist}</version>
   </parent>
 
   <artifactId>vip-visualization</artifactId>
   <packaging>jar</packaging>
-  <version>${vip.visualization.version}</version>
   <name>VIP-Visualization</name>
 
 
@@ -51,10 +50,12 @@ knowledge of the CeCILL-B license and that you accept its terms.
     <dependency>
       <groupId>fr.insalyon.creatis</groupId>
       <artifactId>vip-core</artifactId>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>fr.insalyon.creatis</groupId>
       <artifactId>vip-datamanager</artifactId>
+      <version>${project.version}</version>
     </dependency>
 
   </dependencies>

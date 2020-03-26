@@ -37,12 +37,10 @@ knowledge of the CeCILL-B license and that you accept its terms.
     <parent>
         <groupId>fr.insalyon.creatis</groupId>
         <artifactId>vip</artifactId>
-        <version>1.27</version>
-        <relativePath>..</relativePath>
+        <version>${revision}${sha1}${changelist}</version>
     </parent>
     <artifactId>vip-core</artifactId>
     <packaging>jar</packaging>
-    <version>${vip.core.version}</version>
     <name>VIP-Core</name>
 
     <dependencies>

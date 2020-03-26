@@ -38,13 +38,11 @@ knowledge of the CeCILL-B license and that you accept its terms.
     <parent>
         <groupId>fr.insalyon.creatis</groupId>
         <artifactId>vip</artifactId>
-        <version>1.27</version>
-        <relativePath>..</relativePath>
+        <version>${revision}${sha1}${changelist}</version>
     </parent>
     <name>VIP-Portal</name>
     <artifactId>vip-portal</artifactId>
     <packaging>war</packaging>
-    <version>${vip.portal.version}</version>
 
     <url>http://vip.creatis.insa-lyon.fr</url>
     <dependencies>
@@ -53,12 +51,13 @@ knowledge of the CeCILL-B license and that you accept its terms.
         <dependency>
             <groupId>fr.insalyon.creatis</groupId>
             <artifactId>vip-core</artifactId>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
           <groupId>fr.insalyon.creatis</groupId>
           <artifactId>vip-core</artifactId>
           <type>jar</type>
-          <version>${vip.core.version}</version>
+          <version>${project.version}</version>
           <classifier>sources</classifier>
           <scope>provided</scope>
         </dependency>
@@ -66,12 +65,13 @@ knowledge of the CeCILL-B license and that you accept its terms.
         <dependency>
             <groupId>fr.insalyon.creatis</groupId>
             <artifactId>vip-docs</artifactId>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
           <groupId>fr.insalyon.creatis</groupId>
           <artifactId>vip-docs</artifactId>
           <type>jar</type>
-          <version>${vip.docs.version}</version>
+          <version>${project.version}</version>
           <classifier>sources</classifier>
           <scope>provided</scope>
         </dependency>
@@ -79,12 +79,13 @@ knowledge of the CeCILL-B license and that you accept its terms.
          <dependency>
             <groupId>fr.insalyon.creatis</groupId>
             <artifactId>vip-application-importer</artifactId>
+             <version>${project.version}</version>
         </dependency>
         <dependency>
           <groupId>fr.insalyon.creatis</groupId>
           <artifactId>vip-application-importer</artifactId>
           <type>jar</type>
-          <version>${vip.application-importer.version}</version>
+          <version>${project.version}</version>
           <classifier>sources</classifier>
           <scope>provided</scope>
         </dependency>
@@ -92,12 +93,13 @@ knowledge of the CeCILL-B license and that you accept its terms.
         <dependency>
             <groupId>fr.insalyon.creatis</groupId>
             <artifactId>vip-datamanager</artifactId>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
           <groupId>fr.insalyon.creatis</groupId>
           <artifactId>vip-datamanager</artifactId>
           <type>jar</type>
-          <version>${vip.datamanager.version}</version>
+          <version>${project.version}</version>
           <classifier>sources</classifier>
           <scope>provided</scope>
         </dependency>
@@ -105,12 +107,13 @@ knowledge of the CeCILL-B license and that you accept its terms.
         <dependency>
             <groupId>fr.insalyon.creatis</groupId>
             <artifactId>vip-application</artifactId>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
           <groupId>fr.insalyon.creatis</groupId>
           <artifactId>vip-application</artifactId>
           <type>jar</type>
-          <version>${vip.application.version}</version>
+          <version>${project.version}</version>
           <classifier>sources</classifier>
           <scope>provided</scope>
         </dependency>
@@ -118,12 +121,13 @@ knowledge of the CeCILL-B license and that you accept its terms.
         <dependency>
             <groupId>fr.insalyon.creatis</groupId>
             <artifactId>vip-gatelab</artifactId>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
           <groupId>fr.insalyon.creatis</groupId>
           <artifactId>vip-gatelab</artifactId>
           <type>jar</type>
-          <version>${vip.gatelab.version}</version>
+          <version>${project.version}</version>
           <classifier>sources</classifier>
           <scope>provided</scope>
         </dependency>
@@ -131,12 +135,13 @@ knowledge of the CeCILL-B license and that you accept its terms.
         <dependency>
             <groupId>fr.insalyon.creatis</groupId>
             <artifactId>vip-social</artifactId>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
           <groupId>fr.insalyon.creatis</groupId>
           <artifactId>vip-social</artifactId>
           <type>jar</type>
-          <version>${vip.social.version}</version>
+          <version>${project.version}</version>
           <classifier>sources</classifier>
           <scope>provided</scope>
         </dependency>
@@ -144,17 +149,19 @@ knowledge of the CeCILL-B license and that you accept its terms.
         <dependency>
              <groupId>fr.insalyon.creatis</groupId>
              <artifactId>vip-api</artifactId>
+            <version>${project.version}</version>
         </dependency>
 
         <dependency>
           <groupId>fr.insalyon.creatis</groupId>
           <artifactId>vip-visualization</artifactId>
+          <version>${project.version}</version>
         </dependency>
         <dependency>
           <groupId>fr.insalyon.creatis</groupId>
           <artifactId>vip-visualization</artifactId>
           <type>jar</type>
-          <version>${vip.visualization.version}</version>
+          <version>${project.version}</version>
           <classifier>sources</classifier>
           <scope>provided</scope>
         </dependency>
