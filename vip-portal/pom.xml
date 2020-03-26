@@ -196,6 +196,13 @@ knowledge of the CeCILL-B license and that you accept its terms.
             <artifactId>gwt-dev</artifactId>
             <scope>provided</scope>
         </dependency>
+
+        <dependency>
+            <groupId>com.googlecode.gflot</groupId>
+            <artifactId>gflot</artifactId>
+            <version>3.0.2</version>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
 
     <build>
