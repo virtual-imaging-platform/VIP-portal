@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Copyright and authors: see LICENSE.txt in base repository.
+
+This software is a web portal for pipeline execution on distributed systems.
+
+This software is governed by the CeCILL-B license under French law and
+abiding by the rules of distribution of free software.  You can  use,
+modify and/ or redistribute the software under the terms of the CeCILL-B
+license as circulated by CEA, CNRS and INRIA at the following URL
+"http://www.cecill.info".
+
+As a counterpart to the access to the source code and  rights to copy,
+modify and redistribute granted by the license, users are provided only
+with a limited warranty  and the software's author,  the holder of the
+economic rights,  and the successive licensors  have only  limited
+liability.
+
+In this respect, the user's attention is drawn to the risks associated
+with loading,  using,  modifying and/or developing or reproducing the
+software by the user in light of its specific status of free software,
+that may mean  that it is complicated to manipulate,  and  that  also
+therefore means  that it is reserved for developers  and  experienced
+professionals having in-depth computer knowledge. Users are therefore
+encouraged to load and test the software's suitability as regards their
+requirements in conditions enabling the security of their systems and/or
+data to be ensured and,  more generally, to use and operate it in the
+same conditions as regards security.
+
+The fact that you are presently reading this means that you have had
+knowledge of the CeCILL-B license and that you accept its terms.
+
+-->
+<web-app version="2.5" xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
+    <display-name>VIP</display-name>
+    <!-- Core Module -->
+    <servlet>
+        <servlet-name>ConfigurationService</servlet-name>
+        <servlet-class>fr.insalyon.creatis.vip.core.server.rpc.ConfigurationServiceImpl</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>ConfigurationService</servlet-name>
+        <url-pattern>/fr.insalyon.creatis.vip.portal.Main/configurationservice</url-pattern>
+    </servlet-mapping>
+    <servlet>
+        <servlet-name>GetFileService</servlet-name>
+        <servlet-class>fr.insalyon.creatis.vip.core.server.rpc.GetFileServiceImpl</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>GetFileService</servlet-name>
+        <url-pattern>/fr.insalyon.creatis.vip.portal.Main/getfileservice</url-pattern>
+    </servlet-mapping>
+    <servlet>
+        <servlet-name>SamlAuthenticationService</servlet-name>
+        <servlet-class>fr.insalyon.creatis.vip.core.server.auth.SamlAuthenticationService</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>SamlAuthenticationService</servlet-name>
+        <url-pattern>/fr.insalyon.creatis.vip.portal.Main/samlauthenticationservice</url-pattern>
+    </servlet-mapping>
+    <!-- End Core Module -->
+    <!-- Data Manager Module -->
+    <servlet>
+        <servlet-name>DataManagerService</servlet-name>
+        <servlet-class>fr.insalyon.creatis.vip.datamanager.server.rpc.DataManagerServiceImpl</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>DataManagerService</servlet-name>
+        <url-pattern>/fr.insalyon.creatis.vip.portal.Main/datamanagerservice</url-pattern>
+    </servlet-mapping>
+    <servlet>
+        <servlet-name>FileUploadService</servlet-name>
+        <servlet-class>fr.insalyon.creatis.vip.datamanager.server.rpc.FileUploadServiceImpl</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>FileUploadService</servlet-name>
+        <url-pattern>/fr.insalyon.creatis.vip.portal.Main/fileuploadservice</url-pattern>
+    </servlet-mapping>
+    <servlet>
+        <servlet-name>FileDownloadService</servlet-name>
+        <servlet-class>fr.insalyon.creatis.vip.datamanager.server.rpc.FileDownloadServiceImpl</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>FileDownloadService</servlet-name>
+        <url-pattern>/fr.insalyon.creatis.vip.portal.Main/filedownloadservice</url-pattern>
+    </servlet-mapping>
+    <!-- End Data Manager Module -->
+    <!-- Application Module -->
+    <servlet>
+        <servlet-name>ApplicationService</servlet-name>
+        <servlet-class>fr.insalyon.creatis.vip.application.server.rpc.ApplicationServiceImpl</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>ApplicationService</servlet-name>
+        <url-pattern>/fr.insalyon.creatis.vip.portal.Main/applicationservice</url-pattern>
+    </servlet-mapping>
+    <servlet>
+        <servlet-name>WorkflowService</servlet-name>
+        <servlet-class>fr.insalyon.creatis.vip.application.server.rpc.WorkflowServiceImpl</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>WorkflowService</servlet-name>
+        <url-pattern>/fr.insalyon.creatis.vip.portal.Main/workflowservice</url-pattern>
+    </servlet-mapping>
+     <servlet>
+        <servlet-name>LoggerServlet</servlet-name>
+        <servlet-class>fr.insalyon.creatis.vip.application.server.rpc.LoggerServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>LoggerServlet</servlet-name>
+        <url-pattern>/fr.insalyon.creatis.vip.portal.Main/remote_logging</url-pattern>
+    </servlet-mapping>
+    <servlet>
+        <servlet-name>JobService</servlet-name>
+        <servlet-class>fr.insalyon.creatis.vip.application.server.rpc.JobServiceImpl</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>JobService</servlet-name>
+        <url-pattern>/fr.insalyon.creatis.vip.portal.Main/jobservice</url-pattern>
+    </servlet-mapping>
+    <!-- End Application Module -->
+    <!-- GateLab Module -->
+    <servlet>
+        <servlet-name>GatelabService</servlet-name>
+        <servlet-class>fr.insalyon.creatis.vip.gatelab.server.rpc.GateLabServiceImpl</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>GatelabService</servlet-name>
+        <url-pattern>/fr.insalyon.creatis.vip.portal.Main/gatelabservice</url-pattern>
+    </servlet-mapping>
+    <!-- End GateLab Module -->
+    <!-- Social Module -->
+    <servlet>
+        <servlet-name>SocialService</servlet-name>
+        <servlet-class>fr.insalyon.creatis.vip.social.server.rpc.SocialServiceImpl</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>SocialService</servlet-name>
+        <url-pattern>/fr.insalyon.creatis.vip.portal.Main/socialservice</url-pattern>
+    </servlet-mapping>
+    <!-- End Social Module -->
+    <!-- Application Importer Module-->
+    <servlet>
+        <servlet-name>ApplicationImporterService</servlet-name>
+        <servlet-class>fr.insalyon.creatis.vip.applicationimporter.server.rpc.ApplicationImporterServiceImpl</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>ApplicationImporterService</servlet-name>
+        <url-pattern>/fr.insalyon.creatis.vip.portal.Main/applicationimporterservice</url-pattern>
+    </servlet-mapping>
+    <!--End Application Importer Module-->
+    <!-- REST API -->
+    <servlet>
+        <servlet-name>RestAPI</servlet-name>
+        <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+        <init-param>
+            <param-name>contextClass</param-name>
+            <param-value>org.springframework.web.context.support.AnnotationConfigWebApplicationContext</param-value>
+        </init-param>
+         <init-param>
+            <param-name>contextConfigLocation</param-name>
+            <param-value>fr.insalyon.creatis.vip.api.SpringWebConfig</param-value>
+        </init-param>
+        <init-param>
+            <param-name>contextInitializerClasses</param-name>
+            <param-value>fr.insalyon.creatis.vip.api.ApiPropertiesInitializer</param-value>
+        </init-param>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>RestAPI</servlet-name>
+        <url-pattern>/rest/*</url-pattern>
+    </servlet-mapping>
+    <filter>
+        <filter-name>springSecurityFilterChain</filter-name>
+        <filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>springSecurityFilterChain</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+    <!-- END REST API -->
+    <!-- Visualization API -->
+    <servlet>
+        <servlet-name>VisualizationService</servlet-name>
+        <servlet-class>fr.insalyon.creatis.vip.visualization.server.rpc.VisualizationServiceImpl</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>VisualizationService</servlet-name>
+        <url-pattern>/fr.insalyon.creatis.vip.portal.Main/visualizationservice</url-pattern>
+    </servlet-mapping>
+    <!-- END Visualization API -->
+    <session-config>
+        <session-timeout>-1</session-timeout>
+    </session-config>
+    <welcome-file-list>
+        <welcome-file>index.html</welcome-file>
+    </welcome-file-list>
+    <!--    <security-constraint>
+        <web-resource-collection>
+            <web-resource-name>site</web-resource-name>
+            <description>Only HTTPS Access</description>
+            <url-pattern>/*</url-pattern>
+            <http-method>POST</http-method>
+            <http-method>GET</http-method>
+        </web-resource-collection>
+        <user-data-constraint>
+            <description>Use SSL</description>
+            <transport-guarantee>CONFIDENTIAL</transport-guarantee>
+        </user-data-constraint>
+    </security-constraint>-->
+    <!--    <login-config>
+        <auth-method>CLIENT-CERT</auth-method>
+        <realm-name>Client Cert Users-only Area</realm-name>
+    </login-config>-->
+    <resource-ref>
+        <description>VIP MySQL Connection</description>
+        <res-ref-name>jdbc/vip</res-ref-name>
+        <res-type>javax.sql.DataSource</res-type>
+        <res-auth>Container</res-auth>
+    </resource-ref>
+</web-app>
