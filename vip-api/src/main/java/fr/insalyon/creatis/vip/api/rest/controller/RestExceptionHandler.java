@@ -69,13 +69,14 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(ApiException.class)
     @ResponseBody
     public ErrorCodeAndMessage handleApiException(ApiException e) {
-        logger.error("ApiException catched", e);
+        // No need to log, VIP errors are logged when they are created
         return new ErrorCodeAndMessage(RestErrorCodes.API_ERROR.getCode(),
                 RestErrorCodes.API_ERROR.getMessage());
     }
 
     @Override
     protected ResponseEntity<Object> handleExceptionInternal(Exception ex, Object body, HttpHeaders headers, HttpStatus status, WebRequest request) {
+        logger.error("Internal spring exception catched", ex);
         ErrorCodeAndMessage codeAndmessage =
                 new ErrorCodeAndMessage(
                         status.value()*100,

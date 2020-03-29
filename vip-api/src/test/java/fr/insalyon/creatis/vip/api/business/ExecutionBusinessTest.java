@@ -64,9 +64,7 @@ public class ExecutionBusinessTest {
     }
 
     @Test
-    @Ignore("slf4j issue caused by shiwapool jar")
     public void checkIfBasicUserCannotAccessAnyExecution() throws Exception {
-        // TODO reactivate when shiwapool will be removed
         ApiContext apiContext = new ApiContext(null, null, prepareTestUser(0, false));
         Simulation simulation = prepareSimulation(EXEC_ID, 1); // choose a different user
         WorkflowBusiness mockedWb = prepareMockedWorkflowBusiness(EXEC_ID, simulation);

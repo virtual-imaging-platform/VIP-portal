@@ -62,7 +62,7 @@
       <maxHistory>12</maxHistory>
     </rollingPolicy>
     <encoder>
-      <pattern>%d |%5p |%t | %c{1}:%M:%L - %m%n %caller</pattern>
+      <pattern>%d |%5p |%t | %c{1}:%M:%L - %m%n %caller{10}</pattern>
     </encoder>
   </appender>
 
