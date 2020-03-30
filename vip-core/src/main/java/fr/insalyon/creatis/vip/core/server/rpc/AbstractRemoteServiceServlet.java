@@ -39,8 +39,12 @@ import fr.insalyon.creatis.vip.core.client.view.CoreConstants.GROUP_ROLE;
 import fr.insalyon.creatis.vip.core.client.view.CoreException;
 import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
 
+import javax.servlet.ServletConfig;
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import java.util.Arrays;
+import java.util.Enumeration;
 import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,8 +60,22 @@ public abstract class AbstractRemoteServiceServlet extends RemoteServiceServlet 
     protected ConfigurationBusiness configurationBusiness;
 
     public AbstractRemoteServiceServlet() {
-
         configurationBusiness = new ConfigurationBusiness();
+    }
+
+    // see http://blog.excilys.com/2011/05/12/gwt-google-wont-throw/
+    @Override
+    protected void doUnexpectedFailure(Throwable e) {
+        try {
+            super.doUnexpectedFailure(e);
+        } finally {
+            // log the error (otherwise only logged in container log files)
+            logger.error("Unexpected exception caught in a GWT service impl ", e);
+            // do not silence Error because some should stop the JVM
+            if (e instanceof Error) {
+                throw (Error) e;
+            }
+        }
     }
 
     @Override
@@ -82,7 +100,7 @@ public abstract class AbstractRemoteServiceServlet extends RemoteServiceServlet 
             return user;
         }
         logger.error("No VIP user found in session {}. Attributes : {}",
-                getSession().getId(), getSession().getAttributeNames());
+                getSession().getId(), enumerationToString(getSession().getAttributeNames()));
         throw new CoreException("User not logged in.");
     }
 
@@ -95,8 +113,16 @@ public abstract class AbstractRemoteServiceServlet extends RemoteServiceServlet 
             return groups;
         }
         logger.error("No VIP groups found in session {}. Attributes : {}",
-                getSession().getId(), getSession().getAttributeNames());
+                getSession().getId(), enumerationToString(getSession().getAttributeNames()));
         throw new CoreException("User has no groups defined.");
+    }
+
+    private String enumerationToString(Enumeration<String> enums) {
+        StringBuilder st = new StringBuilder();
+        while (enums.hasMoreElements()) {
+            st.append(enums.nextElement()).append(" ");
+        }
+        return st.toString();
     }
 
     protected void authenticateSystemAdministrator(Logger logger) throws CoreException {

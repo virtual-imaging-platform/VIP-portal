@@ -64,7 +64,7 @@ public class GetFileServiceImpl extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-            throws ServletException, IOException {
+            throws ServletException {
         try(Connection connection = PlatformConnection.getInstance().getConnection()) {
             User user = CoreDAOFactory.getDAOFactory()
                 .getUserDAO(connection)
@@ -114,7 +114,10 @@ public class GetFileServiceImpl extends HttpServlet {
                     FileUtils.deleteQuietly(file);
                 }
             }
-        } catch (DAOException | SQLException ex) {
+        } catch (DAOException ex) {
+            throw new ServletException(ex);
+        } catch (Exception ex) {
+            logger.error("Error downloading a file", ex);
             throw new ServletException(ex);
         }
     }
