@@ -43,9 +43,15 @@ public enum TaskStatus {
     COMPLETED("#287fd6", "Completed"),
     CANCELLED("#FF8575", "Cancelled"),
     CANCELLED_REPLICA("#287fd6", "Cancelled (Replica)"),
+    ERROR_FINISHING("#d64949", "Failed"), // not yet in gasw
+    ERROR_RESUBMITTING("#d64949", "Failed"), // not yet in gasw
     ERROR("#d64949", "Failed"),
     STALLED("#1A767F", "Stalled"),
+    STALLED_FINISHING("#1A767F", "Stalled"), // not yet in gasw
+    STALLED_RESUBMITTING("#1A767F", "Stalled"), // not yet in gasw
     REPLICATE("#8CC653", "Replicate"),
+    REPLICATING("#8CC653", "Replicating"), // not yet in gasw
+    REPLICATED("#8CC653", "Replicated"), // not yet in gasw
     KILL("#8CC653", "Kill"),
     KILL_REPLICA("#8CC653", "Kill"),
     RESCHEDULE("#8CC653", "Reschedule"),
@@ -82,6 +88,8 @@ public enum TaskStatus {
                 || this == QUEUED
                 || this == RUNNING
                 || this == REPLICATE
+                || this == REPLICATED
+                || this == REPLICATING
                 || this == KILL
                 || this == KILL_REPLICA
                 || this == RESCHEDULE) {
