@@ -89,7 +89,10 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
                 logger.error("Unauthorized to add application {}", application.getName());
                 throw new ApplicationException("You have no administrator rights.");
             }
-        } catch (BusinessException | CoreException | SQLException ex) {
+        } catch (BusinessException | CoreException ex) {
+            throw new ApplicationException(ex);
+        } catch (SQLException ex) {
+            logger.error("Error handling a connection", ex);
             throw new ApplicationException(ex);
         }
     }
@@ -105,7 +108,10 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
                 logger.error("Unauthorized to update application {}", application.getName());
                 throw new ApplicationException("You have no administrator rights.");
             }
-        } catch (BusinessException | CoreException | SQLException ex) {
+        } catch (BusinessException | CoreException ex) {
+            throw new ApplicationException(ex);
+        } catch (SQLException ex) {
+            logger.error("Error handling a connection", ex);
             throw new ApplicationException(ex);
         }
     }
@@ -122,7 +128,10 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
                 applicationBusiness.remove(
                     getSessionUser().getEmail(), name, connection);
             }
-        } catch (BusinessException | CoreException | SQLException ex) {
+        } catch (BusinessException | CoreException ex) {
+            throw new ApplicationException(ex);
+        } catch (SQLException ex) {
+            logger.error("Error handling a connection", ex);
             throw new ApplicationException(ex);
         }
     }
@@ -138,7 +147,10 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
                         version.getVersion(), version.getApplicationName());
                 throw new ApplicationException("You have no administrator rights.");
             }
-        } catch (BusinessException | CoreException | SQLException ex) {
+        } catch (BusinessException | CoreException ex) {
+            throw new ApplicationException(ex);
+        } catch (SQLException ex) {
+            logger.error("Error handling a connection", ex);
             throw new ApplicationException(ex);
         }
     }
@@ -155,7 +167,10 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
                         version.getApplicationName(), version.getVersion());
                 throw new ApplicationException("You have no administrator rights.");
             }
-        } catch (BusinessException | CoreException | SQLException ex) {
+        } catch (BusinessException | CoreException ex) {
+            throw new ApplicationException(ex);
+        } catch (SQLException ex) {
+            logger.error("Error handling a connection", ex);
             throw new ApplicationException(ex);
         }
     }
@@ -172,7 +187,10 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
                         applicationName, version);
                 throw new ApplicationException("You have no administrator rights.");
             }
-        } catch (BusinessException | CoreException | SQLException ex) {
+        } catch (BusinessException | CoreException ex) {
+            throw new ApplicationException(ex);
+        } catch (SQLException ex) {
+            logger.error("Error handling a connection", ex);
             throw new ApplicationException(ex);
         }
     }
@@ -189,7 +207,10 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
                         applicationName, version);
                 throw new ApplicationException("You have no administrator rights.");
             }
-        } catch (BusinessException | CoreException | SQLException ex) {
+        } catch (BusinessException | CoreException ex) {
+            throw new ApplicationException(ex);
+        } catch (SQLException ex) {
+            logger.error("Error handling a connection", ex);
             throw new ApplicationException(ex);
         }
     }
@@ -206,7 +227,10 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
             }
             logger.error("Unauthorized to get all applications");
             throw new ApplicationException("You have no administrator rights.");
-        } catch (BusinessException | CoreException | SQLException ex) {
+        } catch (BusinessException | CoreException ex) {
+            throw new ApplicationException(ex);
+        } catch (SQLException ex) {
+            logger.error("Error handling a connection", ex);
             throw new ApplicationException(ex);
         }
     }
@@ -215,7 +239,10 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
     public List<String[]> getApplications(String className) throws ApplicationException {
         try(Connection connection = PlatformConnection.getInstance().getConnection()) {
             return applicationBusiness.getApplications(className, connection);
-        } catch (BusinessException | SQLException ex) {
+        } catch (BusinessException ex) {
+            throw new ApplicationException(ex);
+        } catch (SQLException ex) {
+            logger.error("Error handling a connection", ex);
             throw new ApplicationException(ex);
         }
     }
@@ -231,7 +258,10 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
         try(Connection connection = PlatformConnection.getInstance().getConnection()) {
             return applicationBusiness.getApplications(
                 applicationClass, connection);
-        } catch (BusinessException | SQLException ex) {
+        } catch (BusinessException ex) {
+            throw new ApplicationException(ex);
+        } catch (SQLException ex) {
+            logger.error("Error handling a connection", ex);
             throw new ApplicationException(ex);
         }
     }
@@ -241,7 +271,10 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
             authenticateSystemAdministrator(logger);
             trace(logger, "Adding class '" + c.getName() + "'.");
             classBusiness.addClass(c, connection);
-        } catch (BusinessException | CoreException | SQLException ex) {
+        } catch (BusinessException | CoreException ex) {
+            throw new ApplicationException(ex);
+        } catch (SQLException ex) {
+            logger.error("Error handling a connection", ex);
             throw new ApplicationException(ex);
         }
     }
@@ -251,7 +284,10 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
             authenticateSystemAdministrator(logger);
             trace(logger, "Updating class '" + c.getName() + "'.");
             classBusiness.updateClass(c, connection);
-        } catch (BusinessException | CoreException | SQLException ex) {
+        } catch (BusinessException | CoreException ex) {
+            throw new ApplicationException(ex);
+        } catch (SQLException ex) {
+            logger.error("Error handling a connection", ex);
             throw new ApplicationException(ex);
         }
     }
@@ -262,7 +298,10 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
             authenticateSystemAdministrator(logger);
             trace(logger, "Removing class '" + name + "'.");
             classBusiness.removeClass(name, connection);
-        } catch (BusinessException | CoreException | SQLException ex) {
+        } catch (BusinessException | CoreException ex) {
+            throw new ApplicationException(ex);
+        } catch (SQLException ex) {
+            logger.error("Error handling a connection", ex);
             throw new ApplicationException(ex);
         }
     }
@@ -275,7 +314,10 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
             }
             return classBusiness.getUserClasses(
                 getSessionUser().getEmail(), false, connection);
-        } catch (BusinessException | CoreException | SQLException ex) {
+        } catch (BusinessException | CoreException ex) {
+            throw new ApplicationException(ex);
+        } catch (SQLException ex) {
+            logger.error("Error handling a connection", ex);
             throw new ApplicationException(ex);
         }
     }
@@ -303,7 +345,10 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
                     classes
                 };
             }
-        } catch (BusinessException | CoreException | SQLException ex) {
+        } catch (BusinessException | CoreException ex) {
+            throw new ApplicationException(ex);
+        } catch (SQLException ex) {
+            logger.error("Error handling a connection", ex);
             throw new ApplicationException(ex);
         }
     }
@@ -353,7 +398,10 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
                 return applicationBusiness.getCitation(
                     applicationName, connection);
             }
-        } catch (BusinessException | SQLException ex) {
+        } catch (BusinessException ex) {
+            throw new ApplicationException(ex);
+        } catch (SQLException ex) {
+            logger.error("Error handling a connection", ex);
             throw new ApplicationException(ex);
         }
     }
@@ -368,7 +416,10 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
     public List<AppVersion> getVersions(String applicationName) throws ApplicationException {
         try(Connection connection = PlatformConnection.getInstance().getConnection()) {
             return applicationBusiness.getVersions(applicationName, connection);
-        } catch (BusinessException | SQLException ex) {
+        } catch (BusinessException ex) {
+            throw new ApplicationException(ex);
+        } catch (SQLException ex) {
+            logger.error("Error handling a connection", ex);
             throw new ApplicationException(ex);
         }
     }
@@ -384,7 +435,10 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
             authenticateSystemAdministrator(logger);
             trace(logger, "Adding engine '" + engine.getName() + "'.");
             engineBusiness.add(engine, connection);
-        } catch (BusinessException | CoreException | SQLException ex) {
+        } catch (BusinessException | CoreException ex) {
+            throw new ApplicationException(ex);
+        } catch (SQLException ex) {
+            logger.error("Error handling a connection", ex);
             throw new ApplicationException(ex);
         }
     }
@@ -400,7 +454,10 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
             authenticateSystemAdministrator(logger);
             trace(logger, "Updating engine '" + engine.getName() + "'.");
             engineBusiness.update(engine, connection);
-        } catch (BusinessException | CoreException | SQLException ex) {
+        } catch (BusinessException | CoreException ex) {
+            throw new ApplicationException(ex);
+        } catch (SQLException ex) {
+            logger.error("Error handling a connection", ex);
             throw new ApplicationException(ex);
         }
     }
@@ -416,7 +473,10 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
             authenticateSystemAdministrator(logger);
             trace(logger, "Removing engine '" + engineName + "'.");
             engineBusiness.remove(engineName, connection);
-        } catch (BusinessException | CoreException | SQLException ex) {
+        } catch (BusinessException | CoreException ex) {
+            throw new ApplicationException(ex);
+        } catch (SQLException ex) {
+            logger.error("Error handling a connection", ex);
             throw new ApplicationException(ex);
         }
     }
@@ -430,7 +490,10 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
         try(Connection connection = PlatformConnection.getInstance().getConnection()) {
             authenticateSystemAdministrator(logger);
             return engineBusiness.get(connection);
-        } catch (BusinessException | CoreException | SQLException ex) {
+        } catch (BusinessException | CoreException ex) {
+            throw new ApplicationException(ex);
+        } catch (SQLException ex) {
+            logger.error("Error handling a connection", ex);
             throw new ApplicationException(ex);
         }
     }
@@ -446,7 +509,10 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
         try(Connection connection = PlatformConnection.getInstance().getConnection()) {
             return applicationBusiness.getVersion(
                 applicationName, applicationVersion, connection);
-        } catch (BusinessException | SQLException ex) {
+        } catch (BusinessException ex) {
+            throw new ApplicationException(ex);
+        } catch (SQLException ex) {
+            logger.error("Error handling a connection", ex);
             throw new ApplicationException(ex);
         }
     }

@@ -74,8 +74,10 @@ public abstract class AbstractAuthenticationService extends HttpServlet {
             throws ServletException, IOException {
         try(Connection connection = PlatformConnection.getInstance().getConnection()) {
             processRequest(request, response, connection);
-        } catch (BusinessException | SQLException ex) {
-            logger.error("Error handling a request : {}", ex.getMessage());
+        } catch (BusinessException ex) {
+            logger.error("Error handling a request : {}. Ignoring", ex.getMessage());
+        } catch (SQLException ex) {
+            logger.error("Error handling a connection. Ignoring", ex);
         }
     }
 
@@ -84,8 +86,10 @@ public abstract class AbstractAuthenticationService extends HttpServlet {
             throws ServletException, IOException {
         try(Connection connection = PlatformConnection.getInstance().getConnection()) {
             processRequest(request, response, connection);
-        } catch (BusinessException | SQLException ex) {
-            logger.error("Error handling a request : {}", ex.getMessage());
+        } catch (BusinessException ex) {
+            logger.error("Error handling a request : {}. Ignoring", ex.getMessage());
+        } catch (SQLException ex) {
+            logger.error("Error handling a connection. Ignoring", ex);
         }
     }
 

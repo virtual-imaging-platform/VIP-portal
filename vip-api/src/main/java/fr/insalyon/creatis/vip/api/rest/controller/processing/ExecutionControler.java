@@ -107,7 +107,10 @@ public class ExecutionControler {
         }
         try(Connection connection = connectionSupplier.get()) {
             return executionBusiness.listExecutions(limit, connection);
-        } catch (SQLException | SQLRuntimeException ex) {
+        } catch (SQLException ex) {
+            logger.error("Error handling a connection", ex);
+            throw new ApiException(ex);
+        } catch (SQLRuntimeException ex) {
             throw new ApiException(ex);
         }
     }
@@ -133,7 +136,10 @@ public class ExecutionControler {
         try(Connection connection = connectionSupplier.get()) {
             return executionBusiness.getExecution(
                 executionId, false, connection);
-        } catch (SQLException | SQLRuntimeException ex) {
+        } catch (SQLException ex) {
+            logger.error("Error handling a connection", ex);
+            throw new ApiException(ex);
+        } catch (SQLRuntimeException ex) {
             throw new ApiException(ex);
         }
     }
@@ -149,7 +155,10 @@ public class ExecutionControler {
         try(Connection connection = connectionSupplier.get()) {
             return executionBusiness.getExecution(
                 executionId, false, connection);
-        } catch (SQLException | SQLRuntimeException ex) {
+        } catch (SQLException ex) {
+            logger.error("Error handling a connection", ex);
+            throw new ApiException(ex);
+        } catch (SQLRuntimeException ex) {
             throw new ApiException(ex);
         }
     }
@@ -164,7 +173,10 @@ public class ExecutionControler {
             String execId = executionBusiness.initExecution(
                 execution, connection);
             return executionBusiness.getExecution(execId, false, connection);
-        } catch (SQLException | SQLRuntimeException ex) {
+        } catch (SQLException ex) {
+            logger.error("Error handling a connection", ex);
+            throw new ApiException(ex);
+        } catch (SQLRuntimeException ex) {
             throw new ApiException(ex);
         }
     }
@@ -177,7 +189,10 @@ public class ExecutionControler {
         try(Connection connection = connectionSupplier.get()) {
             return executionBusiness.getExecutionResultsPaths(
                 executionId, connection);
-        } catch (SQLException | SQLRuntimeException ex) {
+        } catch (SQLException ex) {
+            logger.error("Error handling a connection", ex);
+            throw new ApiException(ex);
+        } catch (SQLRuntimeException ex) {
             throw new ApiException(ex);
         }
     }

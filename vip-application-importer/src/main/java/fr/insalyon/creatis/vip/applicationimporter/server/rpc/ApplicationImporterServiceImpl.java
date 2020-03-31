@@ -57,7 +57,10 @@ public class ApplicationImporterServiceImpl extends fr.insalyon.creatis.vip.core
             ApplicationImporterBusiness abi = new ApplicationImporterBusiness();
             return abi.readAndValidationBoutiquesFile(
                 fileLFN, getSessionUser(), connection);
-        } catch (CoreException | BusinessException | SQLException ex) {
+        } catch (CoreException | BusinessException ex) {
+            throw new ApplicationImporterException(ex);
+        } catch (SQLException ex) {
+            logger.error("Error handling a connection", ex);
             throw new ApplicationImporterException(ex);
         }
     }
@@ -68,7 +71,10 @@ public class ApplicationImporterServiceImpl extends fr.insalyon.creatis.vip.core
             trace(logger, "Creating application");
             ApplicationImporterBusiness abi = new ApplicationImporterBusiness();
             abi.createApplication(bt, type, tag, bts, isRunOnGrid, overwriteVersion, getSessionUser(), challenge, connection);
-        } catch (BusinessException | CoreException | SQLException ex) {
+        } catch (CoreException | BusinessException ex) {
+            throw new ApplicationImporterException(ex);
+        } catch (SQLException ex) {
+            logger.error("Error handling a connection", ex);
             throw new ApplicationImporterException(ex);
         }
     }

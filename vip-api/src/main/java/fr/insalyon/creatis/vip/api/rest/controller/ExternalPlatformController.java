@@ -71,7 +71,10 @@ public class ExternalPlatformController {
         ApiUtils.methodInvocationLog("listExternalPlatforms");
         try(Connection connection = connectionSupplier.get()) {
             return externalPlatformBusiness.listAll(connection);
-        } catch (SQLException | SQLRuntimeException | BusinessException e) {
+        } catch (BusinessException | SQLRuntimeException e) {
+            throw new ApiException(e);
+        } catch (SQLException e) {
+            logger.error("Error handling a connection", e);
             throw new ApiException(e);
         }
     }

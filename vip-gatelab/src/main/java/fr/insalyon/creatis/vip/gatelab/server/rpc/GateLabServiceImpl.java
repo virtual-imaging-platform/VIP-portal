@@ -36,6 +36,7 @@ import fr.insalyon.creatis.vip.core.client.view.CoreException;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.dao.mysql.PlatformConnection;
 import fr.insalyon.creatis.vip.core.server.rpc.AbstractRemoteServiceServlet;
+import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerException;
 import fr.insalyon.creatis.vip.gatelab.client.rpc.GateLabService;
 import fr.insalyon.creatis.vip.gatelab.client.view.GateLabException;
 import fr.insalyon.creatis.vip.gatelab.server.business.GateLabBusiness;
@@ -66,7 +67,10 @@ public class GateLabServiceImpl extends AbstractRemoteServiceServlet implements 
         try(Connection connection = PlatformConnection.getInstance().getConnection()) {
             return gatelabBusiness.getGatelabWorkflowInputs(
                 simulationID, getSessionUser().getFolder(), connection);
-        } catch (CoreException | BusinessException | SQLException ex) {
+        } catch (BusinessException | CoreException ex) {
+            throw new GateLabException(ex);
+        } catch (SQLException ex) {
+            logger.error("Error handling a connection", ex);
             throw new GateLabException(ex);
         }
     }
@@ -100,7 +104,10 @@ public class GateLabServiceImpl extends AbstractRemoteServiceServlet implements 
             trace(logger, "Reporting simulation launch problem.");
             gatelabBusiness.reportProblem(getSessionUser().getEmail(), message, connection);
 
-        } catch (BusinessException | CoreException | SQLException ex) {
+        } catch (BusinessException | CoreException ex) {
+            throw new GateLabException(ex);
+        } catch (SQLException ex) {
+            logger.error("Error handling a connection", ex);
             throw new GateLabException(ex);
         }
     }

@@ -227,8 +227,7 @@ public class VisualizationBusiness {
                         user, lfn.replaceAll("\\.mhd$", extension), connection),
                     extension));
         } catch (DataManagerException dme) {
-            logger.warn(
-                "Error while building lfn name with new extension: {}", lfn, dme);
+            logger.warn("Error while building lfn name with new extension: {}. Ignoring", lfn);
             return Optional.empty();
         }
     }

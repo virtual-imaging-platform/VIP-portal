@@ -78,7 +78,10 @@ public class AuthenticationController {
             // business call
             return restApiBusiness
                 .authenticate(authenticationCredentials, connection);
-        } catch (SQLException | SQLRuntimeException ex) {
+        } catch (SQLException ex) {
+            logger.error("Error handling a connection", ex);
+            throw new ApiException(ex);
+        } catch (SQLRuntimeException ex) {
             throw new ApiException(ex);
         }
     }

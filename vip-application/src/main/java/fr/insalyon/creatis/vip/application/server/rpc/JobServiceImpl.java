@@ -95,7 +95,10 @@ public class JobServiceImpl extends AbstractRemoteServiceServlet implements JobS
         try(Connection connection = PlatformConnection.getInstance().getConnection()) {
             return simulationBusiness.getTasks(
                 simulationID, jobID, getSessionUser().getFolder(), connection);
-        } catch (CoreException | BusinessException | SQLException ex) {
+        } catch (BusinessException | CoreException ex) {
+            throw new ApplicationException(ex);
+        } catch (SQLException ex) {
+            logger.error("Error handling a connection", ex);
             throw new ApplicationException(ex);
         }
     }

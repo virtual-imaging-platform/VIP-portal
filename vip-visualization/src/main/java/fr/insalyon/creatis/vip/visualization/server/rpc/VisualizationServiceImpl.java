@@ -81,7 +81,10 @@ public class VisualizationServiceImpl extends AbstractRemoteServiceServlet
                 this.getServletContext().getRealPath("."),
                 user,
                 connection);
-        } catch (CoreException | BusinessException | SQLException ex) {
+        } catch (BusinessException | CoreException ex) {
+            throw new VisualizationException(ex);
+        } catch (SQLException ex) {
+            logger.error("Error handling a connection", ex);
             throw new VisualizationException(ex);
         }
     }

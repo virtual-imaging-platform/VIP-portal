@@ -84,7 +84,10 @@ public class ApiKeyController {
         String userEmail = getCurrentUserEmail();
         try(Connection connection = connectionSupplier.get()) {
             return apiKeyBusiness.apiKeysFor(userEmail, connection);
-        } catch (BusinessException | SQLException | SQLRuntimeException e) {
+        } catch (BusinessException | SQLRuntimeException e) {
+            throw new ApiException(e);
+        } catch (SQLException e) {
+            logger.error("Error handling a connection", e);
             throw new ApiException(e);
         }
     }
@@ -109,7 +112,10 @@ public class ApiKeyController {
                 userEmail,
                 keyInfo.apiKey,
                 connection);
-        } catch (BusinessException | SQLException | SQLRuntimeException e) {
+        } catch (BusinessException | SQLRuntimeException e) {
+            throw new ApiException(e);
+        } catch (SQLException e) {
+            logger.error("Error handling a connection", e);
             throw new ApiException(e);
         }
     }
@@ -124,7 +130,10 @@ public class ApiKeyController {
         try(Connection connection = connectionSupplier.get()) {
             apiKeyBusiness.deleteApiKey(
                 storageIdentifier, userEmail, connection);
-        } catch (BusinessException | SQLException | SQLRuntimeException e) {
+        } catch (BusinessException | SQLRuntimeException e) {
+            throw new ApiException(e);
+        } catch (SQLException e) {
+            logger.error("Error handling a connection", e);
             throw new ApiException(e);
         }
     }
