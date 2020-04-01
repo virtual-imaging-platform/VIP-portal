@@ -33,11 +33,11 @@ package fr.insalyon.creatis.vip.application.server.business.simulation;
 
 import fr.insalyon.creatis.vip.application.client.view.monitor.SimulationStatus;
 import fr.insalyon.creatis.vip.application.server.business.util.FileUtil;
-import fr.insalyon.creatis.vip.core.server.business.BusinessException;
-import org.apache.log4j.Logger;
 
 import java.io.File;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -45,8 +45,6 @@ import java.util.List;
  * @author kboulebiar
  */
 public abstract class WorkflowEngineInstantiator {
-
-    private static Logger logger = Logger.getLogger(WorkflowEngineInstantiator.class);
 
     public static WorkflowEngineInstantiator create(String engineEndpoint) {
 

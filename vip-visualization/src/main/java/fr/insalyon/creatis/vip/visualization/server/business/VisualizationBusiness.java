@@ -47,12 +47,12 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.sql.Connection;
 import java.util.Optional;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class VisualizationBusiness {
 
-    private final static Logger logger =
-        Logger.getLogger(VisualizationBusiness.class);
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     public Image getImageSlicesURL(String imageFileName, String dir)
         throws BusinessException {
@@ -79,10 +79,13 @@ public class VisualizationBusiness {
                     // slices ;)
                     Thread.currentThread().sleep(1000);
                 } catch (InterruptedException ex) {
+                    logger.error("slice.sh waiting interrupted", ex);
                     new File(imageDirName).delete();
                     throw new BusinessException(ex);
                 }
             } catch (IOException ex) {
+                logger.error("Error running slice.sh command for {}",
+                        imageFileName, ex);
                 new File(imageDirName).delete();
                 throw new BusinessException(ex);
             }
@@ -107,11 +110,14 @@ public class VisualizationBusiness {
                     number += line;
                 }
             } catch (InterruptedException ex) {
+                logger.error("getz.sh waiting interrupted", ex);
                 new File(imageDirName).delete();
                 throw new BusinessException(ex);
             }
 
         } catch (IOException ex) {
+            logger.error("Error running getz.sh command for {}",
+                    imageFileName, ex);
             new File(imageDirName).delete();
             throw new BusinessException(ex);
         }
@@ -150,6 +156,7 @@ public class VisualizationBusiness {
         if (!fileDir.exists()) {
             fileDir.mkdirs();
             if (!fileDir.exists()) {
+                logger.error("Cannot create viewer dir: {}", fileDir.getAbsolutePath());
                 throw new BusinessException(
                     "Cannot create viewer dir: " + fileDir.getAbsolutePath());
             }
@@ -165,6 +172,7 @@ public class VisualizationBusiness {
                     DataManagerUtil.parseBaseDir(user, lfn, connection),
                     fileDir.getAbsolutePath());
             } catch (GRIDAClientException ex) {
+                logger.error("Error getting file {}", lfn, ex);
                 fileDir.delete();
                 throw new BusinessException(ex);
             } catch (DataManagerException ex) {
@@ -219,9 +227,7 @@ public class VisualizationBusiness {
                         user, lfn.replaceAll("\\.mhd$", extension), connection),
                     extension));
         } catch (DataManagerException dme) {
-            logger.warn(
-                "Error while building lfn name with new extension: " + lfn);
-            logger.warn(dme);
+            logger.warn("Error while building lfn name with new extension: {}. Ignoring", lfn);
             return Optional.empty();
         }
     }
@@ -230,8 +236,7 @@ public class VisualizationBusiness {
         try {
             return gridaClient.exist(filename);
         } catch (GRIDAClientException gce) {
-            logger.warn("Error while grida checked existance of: " + filename);
-            logger.warn(gce);
+            logger.warn("Error while grida checked existance of: {}", filename, gce);
             return false;
         }
     }
@@ -247,8 +252,7 @@ public class VisualizationBusiness {
             }
             return true;
         } catch (GRIDAClientException gce) {
-            logger.warn("Error while grida downloading file: " + filename);
-            logger.warn(gce);
+            logger.warn("Error while grida downloading file: {}", filename, gce);
             return false;
         }
     }

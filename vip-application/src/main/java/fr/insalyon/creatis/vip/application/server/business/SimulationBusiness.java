@@ -52,7 +52,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -60,7 +61,7 @@ import org.apache.log4j.Logger;
  */
 public class SimulationBusiness {
 
-    private static final Logger logger = Logger.getLogger(SimulationBusiness.class);
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     /**
      *
@@ -186,11 +187,9 @@ public class SimulationBusiness {
             }
             return list;
 
-        } catch (DataManagerException ex) {
+        } catch (DataManagerException | DAOException ex) {
             throw new BusinessException(ex);
 
-        } catch (DAOException ex) {
-            throw new BusinessException(ex);
         }
     }
 
@@ -304,7 +303,7 @@ public class SimulationBusiness {
             return sb.toString();
 
         } catch (IOException ex) {
-            logger.error("Error reading Simulation file", ex);
+            logger.error("Error reading Simulation {} file {}", simulationID, fileName, ex);
             throw new BusinessException(ex);
         }
     }

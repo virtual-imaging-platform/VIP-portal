@@ -59,7 +59,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import fr.insalyon.creatis.vip.datamanager.server.dao.DataManagerDAOFactory;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -67,7 +68,7 @@ import org.apache.log4j.Logger;
  */
 public class DataManagerBusiness {
 
-    private final static Logger logger = Logger.getLogger(DataManagerBusiness.class);
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     public void deleteLocalFile(String fileName) throws BusinessException {
 
@@ -96,7 +97,7 @@ public class DataManagerBusiness {
             return dmCachedFiles;
 
         } catch (GRIDAClientException ex) {
-            logger.error(ex);
+            logger.error("Error getting cached files", ex);
             throw new BusinessException(ex);
         }
     }
@@ -111,7 +112,7 @@ public class DataManagerBusiness {
                 client.deleteCachedFile(path);
             }
         } catch (GRIDAClientException ex) {
-            logger.error(ex);
+            logger.error("Error deleting cached files {}", cachedFiles, ex);
             throw new BusinessException(ex);
         }
     }
@@ -124,8 +125,11 @@ public class DataManagerBusiness {
             return CoreUtil.getGRIDAClient().getRemoteFile(
                 DataManagerUtil.parseBaseDir(user, remoteFile, connection),
                 localDir);
-        } catch (DataManagerException | GRIDAClientException ex) {
-            logger.error(ex);
+        } catch (DataManagerException ex) {
+            throw new BusinessException(ex);
+        } catch (GRIDAClientException ex) {
+            logger.error("Error getting file {} to {} by {}",
+                    remoteFile, localDir, user, ex);
             throw new BusinessException(ex);
         }
     }
@@ -143,7 +147,7 @@ public class DataManagerBusiness {
             return list;
 
         } catch (GRIDAClientException ex) {
-            logger.error(ex);
+            logger.error("Error getting zombie files", ex);
             throw new BusinessException(ex);
         }
     }
@@ -163,7 +167,7 @@ public class DataManagerBusiness {
                 client.delete(surl);
             }
         } catch (GRIDAClientException ex) {
-            logger.error(ex);
+            logger.error("Error deleting zombie files {}", surls, ex);
             throw new BusinessException(ex);
         }
     }

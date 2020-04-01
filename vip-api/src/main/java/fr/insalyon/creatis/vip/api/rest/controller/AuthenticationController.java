@@ -36,7 +36,8 @@ import fr.insalyon.creatis.vip.api.exception.SQLRuntimeException;
 import fr.insalyon.creatis.vip.api.rest.RestApiBusiness;
 import fr.insalyon.creatis.vip.api.rest.model.*;
 import fr.insalyon.creatis.vip.core.server.dao.mysql.PlatformConnection;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -52,7 +53,7 @@ import javax.servlet.http.HttpServletRequest;
 @RequestMapping("/authenticate")
 public class AuthenticationController {
 
-    private static final Logger logger = Logger.getLogger(AuthenticationController.class);
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     // although the controller is a singleton, these are proxies that always point on the current request
     @Autowired
@@ -77,7 +78,10 @@ public class AuthenticationController {
             // business call
             return restApiBusiness
                 .authenticate(authenticationCredentials, connection);
-        } catch (SQLException | SQLRuntimeException ex) {
+        } catch (SQLException ex) {
+            logger.error("Error handling a connection", ex);
+            throw new ApiException(ex);
+        } catch (SQLRuntimeException ex) {
             throw new ApiException(ex);
         }
     }

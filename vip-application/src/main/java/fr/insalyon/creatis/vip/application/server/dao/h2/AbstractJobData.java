@@ -31,18 +31,22 @@
  */
 package fr.insalyon.creatis.vip.application.server.dao.h2;
 
+import fr.insalyon.creatis.vip.application.server.business.simulation.parser.InputM2Parser;
 import fr.insalyon.creatis.vip.core.server.business.Server;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
  * @author Rafael Silva
  */
 public abstract class AbstractJobData {
+
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private final String DRIVER = "org.h2.Driver";
     private final String DBURL = "jdbc:h2:tcp://"
@@ -59,9 +63,8 @@ public abstract class AbstractJobData {
             connection = DriverManager.getConnection(DBURL + dbPath + "/db/jobs", "gasw", "gasw");
             connection.setAutoCommit(true);
 
-        } catch (ClassNotFoundException ex) {
-            throw new DAOException(ex);
-        } catch (SQLException ex) {
+        } catch (ClassNotFoundException | SQLException ex) {
+            logger.error("Error creating database connection for {}", dbPath,ex);
             throw new DAOException(ex);
         }
     }

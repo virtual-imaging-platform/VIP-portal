@@ -35,8 +35,10 @@ import fr.insalyon.creatis.vip.api.business.ApiException;
 import fr.insalyon.creatis.vip.api.exception.NotImplementedException;
 import fr.insalyon.creatis.vip.api.rest.RestErrorCodes;
 import fr.insalyon.creatis.vip.api.rest.model.ErrorCodeAndMessage;
-import org.apache.log4j.Logger;
-import org.apache.log4j.spi.ErrorCode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.http.*;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
@@ -52,7 +54,7 @@ import javax.servlet.http.HttpServletRequest;
 @ControllerAdvice
 public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
-    public static final Logger logger = Logger.getLogger(RestExceptionHandler.class);
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(NotImplementedException.class)
@@ -67,13 +69,14 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(ApiException.class)
     @ResponseBody
     public ErrorCodeAndMessage handleApiException(ApiException e) {
-        logger.error("ApiException catched", e);
+        // No need to log, VIP errors are logged when they are created
         return new ErrorCodeAndMessage(RestErrorCodes.API_ERROR.getCode(),
                 RestErrorCodes.API_ERROR.getMessage());
     }
 
     @Override
     protected ResponseEntity<Object> handleExceptionInternal(Exception ex, Object body, HttpHeaders headers, HttpStatus status, WebRequest request) {
+        logger.error("Internal spring exception catched", ex);
         ErrorCodeAndMessage codeAndmessage =
                 new ErrorCodeAndMessage(
                         status.value()*100,

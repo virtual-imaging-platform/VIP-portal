@@ -32,10 +32,12 @@
 package fr.insalyon.creatis.vip.api.rest.controller;
 
 import fr.insalyon.creatis.vip.api.bean.Module;
+import fr.insalyon.creatis.vip.api.business.ApiException;
 import fr.insalyon.creatis.vip.api.business.ApiUtils;
 import fr.insalyon.creatis.vip.api.rest.RestApiBusiness;
 import fr.insalyon.creatis.vip.api.rest.model.*;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -54,7 +56,7 @@ import static fr.insalyon.creatis.vip.api.CarminProperties.*;
 @RequestMapping("/platform")
 public class PlatformController {
 
-    public static final Logger logger = Logger.getLogger(PlatformController.class);
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Autowired
     private Environment env;
@@ -64,7 +66,7 @@ public class PlatformController {
     HttpServletRequest httpServletRequest;
 
     @RequestMapping
-    public PlatformProperties getPlatformProperties() {
+    public PlatformProperties getPlatformProperties() throws ApiException {
         ApiUtils.methodInvocationLog("getPlatformProperties");
         PlatformProperties platformProperties = new PlatformProperties();
         platformProperties.setPlatformName(env.getProperty(PLATFORM_NAME));
@@ -87,15 +89,16 @@ public class PlatformController {
         return platformProperties;
     }
 
-    private List<ErrorCodeAndMessage> getErrorCodesAndMessages() {
+    private List<ErrorCodeAndMessage> getErrorCodesAndMessages() throws ApiException {
         List<ErrorCodeAndMessage> res = new ArrayList<>();
         String[] codesAndMessagesAsStrings = env.getProperty(
                 PLATFORM_ERROR_CODES_AND_MESSAGES, String[].class);
         for (String codeAndMessageAsString : codesAndMessagesAsStrings) {
             String[] parts = codeAndMessageAsString.split(":");
             if (parts.length != 2) {
-                logger.error("Malformed api code and message in properties:"+codeAndMessageAsString);
-                throw new RuntimeException("Malformed api code and message in properties");
+                logger.error("Malformed api code and message in properties: {}",
+                        codeAndMessageAsString);
+                throw new ApiException("Malformed api code and message in properties");
             }
             Integer code = Integer.parseInt(parts[0]);
             res.add(new ErrorCodeAndMessage(code, parts[1]));

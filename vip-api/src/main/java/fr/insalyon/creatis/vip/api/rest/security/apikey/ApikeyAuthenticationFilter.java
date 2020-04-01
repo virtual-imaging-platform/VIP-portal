@@ -31,6 +31,8 @@
  */
 package fr.insalyon.creatis.vip.api.rest.security.apikey;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.*;
 import org.springframework.security.core.*;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -48,6 +50,8 @@ import java.io.IOException;
  * Servlet filter that creates the api key token and calls the authentication.
  */
 public class ApikeyAuthenticationFilter extends OncePerRequestFilter {
+
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private final String apikeyHeader;
     private final AuthenticationEntryPoint authenticationEntryPoint;
@@ -79,19 +83,19 @@ public class ApikeyAuthenticationFilter extends OncePerRequestFilter {
         String apikey = request.getHeader(apikeyHeader);
 
         if (apikey == null) {
-            this.logger.debug("no apikey header " + apikeyHeader +" found.");
+            logger.debug("no apikey header " + apikeyHeader +" found.");
             filterChain.doFilter(request, response);
             return;
         }
         try {
 
-            this.logger.debug("apikey header found.");
+            logger.debug("apikey header found.");
 
             ApikeyAuthenticationToken authRequest = new ApikeyAuthenticationToken(apikey);
             Authentication authResult = this.authenticationManager
                     .authenticate(authRequest);
 
-            this.logger.debug("Authentication success for : " + authResult.getName());
+            logger.debug("Authentication success for : " + authResult.getName());
 
             SecurityContextHolder.getContext().setAuthentication(authResult);
 
@@ -99,13 +103,13 @@ public class ApikeyAuthenticationFilter extends OncePerRequestFilter {
         catch (AuthenticationException failed) {
             SecurityContextHolder.clearContext();
 
-            this.logger.debug("Authentication request failed", failed);
+            logger.debug("Authentication request failed", failed);
             this.authenticationEntryPoint.commence(request, response, failed);
         }
         catch (Exception failed) {
             SecurityContextHolder.clearContext();
 
-            this.logger.error("Unexpected error while authenticating ", failed);
+            logger.error("Unexpected error while authenticating ", failed);
             this.authenticationEntryPoint.commence(
                     request,
                     response,

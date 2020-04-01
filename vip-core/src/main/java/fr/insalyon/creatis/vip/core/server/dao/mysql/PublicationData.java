@@ -43,7 +43,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -51,7 +52,7 @@ import org.apache.log4j.Logger;
  */
 public class PublicationData implements PublicationDAO {
 
-    private final static Logger logger = Logger.getLogger(PublicationData.class);
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     private Connection connection;
 
     public PublicationData(Connection connection) throws DAOException {
@@ -77,7 +78,7 @@ public class PublicationData implements PublicationDAO {
             ps.execute();
             ps.close();
         } catch (SQLException ex) {
-            logger.error(ex);
+            logger.error("Error adding publication {} {}", pub.getTitle(), pub.getDoi(), ex);
             throw new DAOException(ex);
         }
     }
@@ -103,7 +104,7 @@ public class PublicationData implements PublicationDAO {
             ps.close();
 
         } catch (SQLException ex) {
-            logger.error(ex);
+            logger.error("Error updating publication {}",publication.getId(), ex);
             throw new DAOException(ex);
         }
 
@@ -124,7 +125,7 @@ public class PublicationData implements PublicationDAO {
             ps.close();
 
         } catch (SQLException ex) {
-            logger.error(ex);
+            logger.error("Error updating publications owner from {} to {}", oldOwnerEmail, newOwnerEmail, ex);
             throw new DAOException(ex);
         }
 
@@ -141,7 +142,7 @@ public class PublicationData implements PublicationDAO {
             ps.close();
 
         } catch (SQLException ex) {
-            logger.error(ex);
+            logger.error("Error removing publication {}", id, ex);
             throw new DAOException(ex);
         }
     }
@@ -169,7 +170,7 @@ public class PublicationData implements PublicationDAO {
             return publications;
 
         } catch (SQLException ex) {
-            logger.error(ex);
+            logger.error("Error getting all publications", ex);
             throw new DAOException(ex);
         }
     }
@@ -196,7 +197,7 @@ public class PublicationData implements PublicationDAO {
             return p;
 
         } catch (SQLException ex) {
-            logger.error(ex);
+            logger.error("Error getting publication {}", id, ex);
             throw new DAOException(ex);
         }
     }

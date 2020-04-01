@@ -40,7 +40,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -48,18 +49,13 @@ import org.apache.log4j.Logger;
  */
 public class GroupData implements GroupDAO {
 
-    private final static Logger logger = Logger.getLogger(GroupData.class);
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     private Connection connection;
 
     public GroupData(Connection connection) throws DAOException {
         this.connection = connection;
     }
 
-    /**
-     *
-     * @param groupName
-     * @throws DAOException
-     */
     @Override
     public void add(Group group) throws DAOException {
 
@@ -75,10 +71,10 @@ public class GroupData implements GroupDAO {
 
         } catch (SQLException ex) {
             if (ex.getMessage().contains("Duplicate entry")) {
-                logger.error("A group named \"" + group.getName() + "\" already exists.");
-                throw new DAOException("A group named \"" + group.getName() + "\" already exists.", ex);
+                logger.error("A group named {} already exists", group.getName());
+                throw new DAOException("Error creating a group", ex);
             } else {
-                logger.error(ex);
+                logger.error("Error adding group {}", group.getName(), ex);
                 throw new DAOException(ex);
             }
         }
@@ -95,7 +91,7 @@ public class GroupData implements GroupDAO {
             ps.close();
 
         } catch (SQLException ex) {
-            logger.error(ex);
+            logger.error("Error removing group {}", groupName, ex);
             throw new DAOException(ex);
         }
     }
@@ -117,7 +113,7 @@ public class GroupData implements GroupDAO {
             ps.close();
 
         } catch (SQLException ex) {
-            logger.error(ex);
+            logger.error("Error updating group {}", group.getName(), ex);
             throw new DAOException(ex);
         }
     }
@@ -140,7 +136,7 @@ public class GroupData implements GroupDAO {
             return groups;
 
         } catch (SQLException ex) {
-            logger.error(ex);
+            logger.error("Error getting all groups", ex);
             throw new DAOException(ex);
         }
     }

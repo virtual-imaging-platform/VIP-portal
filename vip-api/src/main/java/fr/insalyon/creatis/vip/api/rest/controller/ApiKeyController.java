@@ -38,7 +38,8 @@ import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.datamanager.client.bean.UserApiKey;
 import fr.insalyon.creatis.vip.datamanager.server.business.ApiKeyBusiness;
 import fr.insalyon.creatis.vip.datamanager.server.business.ExternalPlatformBusiness;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -61,8 +62,7 @@ import javax.validation.Valid;
 @RequestMapping("/user/externalKeys")
 public class ApiKeyController {
 
-    private static final Logger logger =
-        Logger.getLogger(ApiKeyController.class);
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private ApiKeyBusiness apiKeyBusiness;
     private ExternalPlatformBusiness externalPlatformBusiness;
@@ -84,8 +84,10 @@ public class ApiKeyController {
         String userEmail = getCurrentUserEmail();
         try(Connection connection = connectionSupplier.get()) {
             return apiKeyBusiness.apiKeysFor(userEmail, connection);
-        } catch (BusinessException | SQLException | SQLRuntimeException e) {
-            logger.error("Error listing api keys for " + userEmail);
+        } catch (BusinessException | SQLRuntimeException e) {
+            throw new ApiException(e);
+        } catch (SQLException e) {
+            logger.error("Error handling a connection", e);
             throw new ApiException(e);
         }
     }
@@ -100,6 +102,7 @@ public class ApiKeyController {
             if (!externalPlatformBusiness.listAll(connection).stream()
                 .anyMatch(ep -> ep.getIdentifier()
                           .equals(keyInfo.storageIdentifier))) {
+                logger.error("Storage does not exist: {}", keyInfo.storageIdentifier);
                 throw new ApiException(
                     "Storage does not exist: " + keyInfo.storageIdentifier);
             }
@@ -109,9 +112,10 @@ public class ApiKeyController {
                 userEmail,
                 keyInfo.apiKey,
                 connection);
-        } catch (BusinessException | SQLException | SQLRuntimeException e) {
-            logger.error("Error add or updating api keys for " + userEmail
-                         + "for storage: " + keyInfo.storageIdentifier);
+        } catch (BusinessException | SQLRuntimeException e) {
+            throw new ApiException(e);
+        } catch (SQLException e) {
+            logger.error("Error handling a connection", e);
             throw new ApiException(e);
         }
     }
@@ -126,9 +130,10 @@ public class ApiKeyController {
         try(Connection connection = connectionSupplier.get()) {
             apiKeyBusiness.deleteApiKey(
                 storageIdentifier, userEmail, connection);
-        } catch (BusinessException | SQLException | SQLRuntimeException e) {
-            logger.error("Error deleting api keys for " + userEmail
-                         + "for storage: " + storageIdentifier);
+        } catch (BusinessException | SQLRuntimeException e) {
+            throw new ApiException(e);
+        } catch (SQLException e) {
+            logger.error("Error handling a connection", e);
             throw new ApiException(e);
         }
     }

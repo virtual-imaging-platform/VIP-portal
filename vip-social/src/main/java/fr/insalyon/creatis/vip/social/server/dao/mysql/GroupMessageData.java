@@ -41,7 +41,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -49,7 +50,7 @@ import org.apache.log4j.Logger;
  */
 public class GroupMessageData implements GroupMessageDAO {
 
-    private static final Logger logger = Logger.getLogger(GroupMessageData.class);
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     private Connection connection;
 
     public GroupMessageData(Connection connection) {
@@ -77,7 +78,7 @@ public class GroupMessageData implements GroupMessageDAO {
             return result;
 
         } catch (SQLException ex) {
-            logger.error(ex);
+            logger.error("Error adding a group message {} by {}", title, sender, ex);
             throw new DAOException(ex);
         }
     }
@@ -93,7 +94,7 @@ public class GroupMessageData implements GroupMessageDAO {
             ps.close();
 
         } catch (SQLException ex) {
-            logger.error(ex);
+            logger.error("Error removing group message {}", id, ex);
             throw new DAOException(ex);
         }
     }
@@ -125,7 +126,7 @@ public class GroupMessageData implements GroupMessageDAO {
             return messages;
 
         } catch (SQLException ex) {
-            logger.error(ex);
+            logger.error("Error getting group messages for {}", groupName, ex);
             throw new DAOException(ex);
         }
     }

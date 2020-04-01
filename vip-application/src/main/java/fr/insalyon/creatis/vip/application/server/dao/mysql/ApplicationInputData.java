@@ -40,7 +40,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -48,7 +49,8 @@ import org.apache.log4j.Logger;
  */
 public class ApplicationInputData implements ApplicationInputDAO {
 
-    private static final Logger logger = Logger.getLogger(ApplicationInputData.class);
+    private final Logger logger = LoggerFactory.getLogger(getClass());
+
     private Connection connection;
 
     public ApplicationInputData(Connection connection) throws DAOException {
@@ -82,7 +84,9 @@ public class ApplicationInputData implements ApplicationInputDAO {
                 logger.error("An input named \"" + SimulationInput.getName() + "\" already exists.");
                 throw new DAOException("An input named \"" + SimulationInput.getName() + "\" already exists.", ex);
             } else {
-                logger.error(ex);
+                logger.error("Error adding inputs {} for app {} by {}",
+                        SimulationInput.getInputs(),
+                        SimulationInput.getApplication(), email, ex);
                 throw new DAOException(ex);
             }
         }
@@ -110,7 +114,7 @@ public class ApplicationInputData implements ApplicationInputDAO {
             ps.close();
 
         } catch (SQLException ex) {
-            logger.error(ex);
+            logger.error("Error removing inputs {} by {}", inputName, email, ex);
             throw new DAOException(ex);
         }
     }
@@ -138,7 +142,9 @@ public class ApplicationInputData implements ApplicationInputDAO {
             ps.close();
 
         } catch (SQLException ex) {
-            logger.error(ex);
+            logger.error("Error updating inputs {} for app {} by {}",
+                    SimulationInput.getInputs(),
+                    SimulationInput.getApplication(), email, ex);
             throw new DAOException(ex);
         }
     }
@@ -168,7 +174,7 @@ public class ApplicationInputData implements ApplicationInputDAO {
             return inputs;
 
         } catch (SQLException ex) {
-            logger.error(ex);
+            logger.error("Error getting inputs for {}", email, ex);
             throw new DAOException(ex);
         }
     }
@@ -199,7 +205,7 @@ public class ApplicationInputData implements ApplicationInputDAO {
             return inputs;
 
         } catch (SQLException ex) {
-            logger.error(ex);
+            logger.error("Error getting workflow inputs for {} by {}", appName, user, ex);
             throw new DAOException(ex);
         }
     }
@@ -238,7 +244,7 @@ public class ApplicationInputData implements ApplicationInputDAO {
             return simulationInput;
 
         } catch (SQLException ex) {
-            logger.error(ex);
+            logger.error("Error getting inputs {} by {}", name, email, ex);
             throw new DAOException(ex);
         }
     }
@@ -267,7 +273,9 @@ public class ApplicationInputData implements ApplicationInputDAO {
                 logger.error("An input named \"" + simulationInput.getName() + "\" already exists.");
                 throw new DAOException("An input named \"" + simulationInput.getName() + "\" already exists.", ex);
             } else {
-                logger.error(ex);
+                logger.error("Error saving example {} for app {}",
+                        simulationInput.getInputs(),
+                        simulationInput.getApplication(), ex);
                 throw new DAOException(ex);
             }
         }
@@ -305,7 +313,7 @@ public class ApplicationInputData implements ApplicationInputDAO {
             return inputs;
 
         } catch (SQLException ex) {
-            logger.error(ex);
+            logger.error("Error getting examples for app {}", applicationName, ex);
             throw new DAOException(ex);
         }
     }
@@ -330,7 +338,7 @@ public class ApplicationInputData implements ApplicationInputDAO {
             ps.close();
 
         } catch (SQLException ex) {
-            logger.error(ex);
+            logger.error("Error removing example {} for app {}", inputName, application, ex);
             throw new DAOException(ex);
         }
     }

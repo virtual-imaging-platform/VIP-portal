@@ -43,7 +43,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -51,7 +52,7 @@ import org.apache.log4j.Logger;
  */
 public class ApplicationData implements ApplicationDAO {
 
-    private final static Logger logger = Logger.getLogger(ApplicationData.class);
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     private Connection connection;
 
     public ApplicationData(Connection connection) throws DAOException {
@@ -83,10 +84,10 @@ public class ApplicationData implements ApplicationDAO {
 
         } catch (SQLException ex) {
             if (ex.getMessage().contains("Duplicate entry")) {
-                logger.error("An application named \"" + application.getName() + "\" already exists.");
+                logger.error("An application named \"{}\" already exists.", application.getName());
                 throw new DAOException("An application named \"" + application.getName() + "\" already exists.", ex);
             } else {
-                logger.error(ex);
+                logger.error("Error adding application {}", application.getName(), ex);
                 throw new DAOException(ex);
             }
         }
@@ -119,7 +120,7 @@ public class ApplicationData implements ApplicationDAO {
             }
 
         } catch (SQLException ex) {
-            logger.error(ex);
+            logger.error("Error updating application {}", application.getName(), ex);
             throw new DAOException(ex);
         }
     }
@@ -141,7 +142,7 @@ public class ApplicationData implements ApplicationDAO {
             ps.close();
 
         } catch (SQLException ex) {
-            logger.error(ex);
+            logger.error("Error removing application {}", name, ex);
             throw new DAOException(ex);
         }
     }
@@ -170,7 +171,7 @@ public class ApplicationData implements ApplicationDAO {
             }
 
         } catch (SQLException ex) {
-            logger.error(ex);
+            logger.error("Error removing application {} for user {}", name, email, ex);
             throw new DAOException(ex);
         }
     }
@@ -224,7 +225,7 @@ public class ApplicationData implements ApplicationDAO {
             return applications;
 
         } catch (SQLException ex) {
-            logger.error(ex);
+            logger.error("Error getting all applications", ex);
             throw new DAOException(ex);
         }
     }
@@ -258,7 +259,7 @@ public class ApplicationData implements ApplicationDAO {
             return applications;
 
         } catch (SQLException ex) {
-            logger.error(ex);
+            logger.error("Error getting all applications for class {}", className, ex);
             throw new DAOException(ex);
         }
     }
@@ -296,7 +297,7 @@ public class ApplicationData implements ApplicationDAO {
             }
             return null;
         } catch (SQLException ex) {
-            logger.error(ex);
+            logger.error("Error getting application {}", applicationName, ex);
             throw new DAOException(ex);
         }
     }
@@ -368,7 +369,7 @@ public class ApplicationData implements ApplicationDAO {
             return applications;
 
         } catch (SQLException ex) {
-            logger.error(ex);
+            logger.error("Error getting applications for classes {}", classes, ex);
             throw new DAOException(ex);
         }
     }
@@ -403,7 +404,7 @@ public class ApplicationData implements ApplicationDAO {
             return applications;
 
         } catch (SQLException ex) {
-            logger.error("Error getting applications name " + applicationClass, ex);
+            logger.error("Error getting applications name {}", applicationClass, ex);
         }
         return null;
     }
@@ -432,7 +433,7 @@ public class ApplicationData implements ApplicationDAO {
                 logger.error("An application named \"" + applicationName + "\" is already associated with clas \"" + className + "\".");
                 throw new DAOException("An application named \"" + applicationName + "\" is already associated with clas \"" + className + "\".", ex);
             } else {
-                logger.error(ex);
+                logger.error("Error adding class {} to application {}", className, applicationName, ex);
                 throw new DAOException(ex);
             }
         }
@@ -454,7 +455,7 @@ public class ApplicationData implements ApplicationDAO {
             ps.close();
 
         } catch (SQLException ex) {
-            logger.error(ex);
+            logger.error("Error removing classes from application {}", workflowName, ex);
             throw new DAOException(ex);
         }
     }
@@ -481,7 +482,7 @@ public class ApplicationData implements ApplicationDAO {
             return citation;
 
         } catch (SQLException ex) {
-            logger.error(ex);
+            logger.error("Error getting citation for application {}", name, ex);
             throw new DAOException(ex);
         }
     }
@@ -513,7 +514,7 @@ public class ApplicationData implements ApplicationDAO {
             return versions;
 
         } catch (SQLException ex) {
-            logger.error(ex);
+            logger.error("Error getting versions for application {}", name, ex);
             throw new DAOException(ex);
         }
     }
@@ -539,7 +540,8 @@ public class ApplicationData implements ApplicationDAO {
                 logger.error("A version named \"" + version.getApplicationName() + "\" already exists.");
                 throw new DAOException("A version named \"" + version.getApplicationName() + "\" already exists.", ex);
             } else {
-                logger.error(ex);
+                logger.error("Error adding version {} for {}",
+                        version.getVersion(), version.getApplicationName(), ex);
                 throw new DAOException(ex);
             }
         }
@@ -562,7 +564,8 @@ public class ApplicationData implements ApplicationDAO {
             ps.close();
 
         } catch (SQLException ex) {
-            logger.error(ex);
+            logger.error("Error adding version {} for {}",
+                    version.getVersion(), version.getApplicationName(), ex);
             throw new DAOException(ex);
         }
     }
@@ -582,7 +585,8 @@ public class ApplicationData implements ApplicationDAO {
             ps.close();
 
         } catch (SQLException ex) {
-            logger.error(ex);
+            logger.error("Error updating doi {} for {}/{}",
+                    doi, applicationName, version, ex);
             throw new DAOException(ex);
         }
     }
@@ -600,7 +604,7 @@ public class ApplicationData implements ApplicationDAO {
             ps.close();
 
         } catch (SQLException ex) {
-            logger.error(ex);
+            logger.error("Error removing version {}/{}", applicationName, version, ex);
             throw new DAOException(ex);
         }
     }
@@ -630,7 +634,8 @@ public class ApplicationData implements ApplicationDAO {
             return version;
 
         } catch (SQLException ex) {
-            logger.error(ex);
+            logger.error("Error getting versions for {}/{}",
+                    applicationName, applicationVersion, ex);
             throw new DAOException(ex);
         }
     }

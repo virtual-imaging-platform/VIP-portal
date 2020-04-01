@@ -37,7 +37,8 @@ import fr.insalyon.creatis.vip.gatelab.server.dao.GateLabDAO;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * 
@@ -45,7 +46,7 @@ import org.apache.log4j.Logger;
  */
 public class GateLabData extends AbstractJobData implements GateLabDAO {
 
-    private static final Logger logger = Logger.getLogger(GateLabData.class);
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     
     public GateLabData(String dbPath) throws DAOException {
         
@@ -70,6 +71,7 @@ public class GateLabData extends AbstractJobData implements GateLabDAO {
             return sum;
 
         } catch (SQLException ex) {
+            logger.error("Error fetching simulation particle number", ex);
             return 0;
         } finally {
             close(logger);
@@ -88,6 +90,7 @@ public class GateLabData extends AbstractJobData implements GateLabDAO {
             ps.close();
             
         } catch (SQLException ex) {
+            logger.error("Error stopping a workflow", ex);
             throw new DAOException(ex);
         }
 

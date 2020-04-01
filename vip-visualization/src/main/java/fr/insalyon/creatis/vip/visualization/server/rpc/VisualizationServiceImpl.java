@@ -43,13 +43,13 @@ import fr.insalyon.creatis.vip.visualization.client.view.VisualizationException;
 import fr.insalyon.creatis.vip.visualization.server.business.VisualizationBusiness;
 import java.sql.Connection;
 import java.sql.SQLException;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class VisualizationServiceImpl extends AbstractRemoteServiceServlet
     implements VisualizationService {
 
-    private static final Logger logger =
-        Logger.getLogger(VisualizationServiceImpl.class);
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private final VisualizationBusiness visualizationBusiness;
 
@@ -65,9 +65,7 @@ public class VisualizationServiceImpl extends AbstractRemoteServiceServlet
             trace(logger, "Slicing image: " + imageFileName);
             return visualizationBusiness.getImageSlicesURL(
                 imageFileName, direction);
-        } catch (CoreException ex) {
-            throw new VisualizationException(ex);
-        } catch (BusinessException ex) {
+        } catch (CoreException | BusinessException ex) {
             throw new VisualizationException(ex);
         }
     }
@@ -83,7 +81,10 @@ public class VisualizationServiceImpl extends AbstractRemoteServiceServlet
                 this.getServletContext().getRealPath("."),
                 user,
                 connection);
-        } catch (CoreException | BusinessException | SQLException ex) {
+        } catch (BusinessException | CoreException ex) {
+            throw new VisualizationException(ex);
+        } catch (SQLException ex) {
+            logger.error("Error handling a connection", ex);
             throw new VisualizationException(ex);
         }
     }

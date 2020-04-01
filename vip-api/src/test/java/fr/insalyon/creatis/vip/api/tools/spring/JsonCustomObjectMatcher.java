@@ -156,7 +156,7 @@ public class JsonCustomObjectMatcher<T> extends TypeSafeDiagnosingMatcher<Map<St
         @Override
         public void describeTo(Description description) {
             description.appendText("same entries as")
-                    .appendList(" [", ", ", "]", mapEntriesMatchers);;
+                    .appendList(" [", ", ", "]", mapEntriesMatchers);
         }
     }
 

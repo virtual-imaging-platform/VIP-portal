@@ -47,7 +47,8 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -55,7 +56,7 @@ import org.apache.log4j.Logger;
  */
 public class JobServiceImpl extends AbstractRemoteServiceServlet implements JobService {
 
-    private static Logger logger = Logger.getLogger(JobServiceImpl.class);
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     private SimulationBusiness simulationBusiness;
 
     public JobServiceImpl() {
@@ -94,7 +95,10 @@ public class JobServiceImpl extends AbstractRemoteServiceServlet implements JobS
         try(Connection connection = PlatformConnection.getInstance().getConnection()) {
             return simulationBusiness.getTasks(
                 simulationID, jobID, getSessionUser().getFolder(), connection);
-        } catch (CoreException | BusinessException | SQLException ex) {
+        } catch (BusinessException | CoreException ex) {
+            throw new ApplicationException(ex);
+        } catch (SQLException ex) {
+            logger.error("Error handling a connection", ex);
             throw new ApplicationException(ex);
         }
     }
@@ -303,9 +307,7 @@ public class JobServiceImpl extends AbstractRemoteServiceServlet implements JobS
                     + "' (" + simulationID + ").");
             simulationBusiness.sendSignal(simulationID, jobID, TaskStatus.valueOf(status));
 
-        } catch (CoreException ex) {
-            throw new ApplicationException(ex);
-        } catch (BusinessException ex) {
+        } catch (CoreException | BusinessException ex) {
             throw new ApplicationException(ex);
         }
     }
@@ -343,9 +345,7 @@ public class JobServiceImpl extends AbstractRemoteServiceServlet implements JobS
                     + jobIDs.toString() + "' (" + simulationID + ").");
             simulationBusiness.sendSignal(simulationID, jobIDs, TaskStatus.valueOf(status));
 
-        } catch (CoreException ex) {
-            throw new ApplicationException(ex);
-        } catch (BusinessException ex) {
+        } catch (CoreException | BusinessException ex) {
             throw new ApplicationException(ex);
         }
     }

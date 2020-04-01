@@ -38,7 +38,8 @@ import fr.insalyon.creatis.vip.datamanager.client.bean.*;
 import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerException;
 import fr.insalyon.creatis.vip.datamanager.server.DataManagerUtil;
 import fr.insalyon.creatis.vip.datamanager.server.business.LFCPermissionBusiness.LFCAccessType;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
 import java.util.*;
@@ -50,7 +51,7 @@ import static fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants.*;
  */
 public class LFCPermissionBusiness {
 
-    private static final Logger logger = Logger.getLogger(LFCPermissionBusiness.class);
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     public enum LFCAccessType {
         READ, UPLOAD, DELETE
@@ -73,7 +74,7 @@ public class LFCPermissionBusiness {
         if (firstDir.equals(TRASH_HOME)) return;
         // currently no admin access is possible via the api for security reasons
         if (firstDir.equals(USERS_FOLDER) || firstDir.equals(VO_ROOT_FOLDER)) {
-            logger.error("Trying to access admin folders from api");
+            logger.error("Trying to access admin folders from api : {}", path);
             throw new BusinessException("Unauthorized LFC access");
         }
         // else it should be a group folder
@@ -141,13 +142,7 @@ public class LFCPermissionBusiness {
     private void checkSynchronizedDirectories(
         User user, String path, Connection connection)
         throws BusinessException {
-        List<SSH> sshs;
-        try {
-            sshs = new DataManagerBusiness().getSSHConnections(connection);
-        } catch (BusinessException e) {
-            logger.error("Error listing synchronized directories");
-            throw new BusinessException("Error listing synchronized directories");
-        }
+        List<SSH> sshs = new DataManagerBusiness().getSSHConnections(connection);
         List<String> lfcDirSSHSynchronization = new ArrayList<String>();
         for (SSH ssh : sshs) {
             if (ssh.getTransferType().equals(TransferType.Synchronization)) {
@@ -159,7 +154,6 @@ public class LFCPermissionBusiness {
         try {
             lfcBaseDir = DataManagerUtil.parseBaseDir(user, path, connection);
         } catch (DataManagerException e) {
-            logger.error("Error parsing api path :" + path);
             throw new BusinessException("Internal error in data API");
         }
         for (String s : lfcDirSSHSynchronization) {

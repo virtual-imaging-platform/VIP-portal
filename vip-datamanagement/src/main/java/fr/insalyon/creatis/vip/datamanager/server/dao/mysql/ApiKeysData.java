@@ -35,7 +35,8 @@ import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import fr.insalyon.creatis.vip.core.server.dao.mysql.PlatformConnection;
 import fr.insalyon.creatis.vip.datamanager.client.bean.UserApiKey;
 import fr.insalyon.creatis.vip.datamanager.server.dao.ApiKeysDAO;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -46,7 +47,7 @@ import java.util.List;
 
 public class ApiKeysData implements ApiKeysDAO {
 
-    private static final Logger logger = Logger.getLogger(ApiKeysData.class);
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     private Connection connection;
 
     public ApiKeysData(Connection connection) throws DAOException {
@@ -65,7 +66,7 @@ public class ApiKeysData implements ApiKeysDAO {
 
             ps.execute();
         } catch (SQLException e) {
-            logger.error("Error inserting api key: " + apiKey.toString(), e);
+            logger.error("Error inserting api key: {}", apiKey, e);
             throw new DAOException(e);
         }
     }
@@ -82,7 +83,7 @@ public class ApiKeysData implements ApiKeysDAO {
 
             ps.execute();
         } catch (SQLException e) {
-            logger.error("Error updating api key: " + apiKey.toString(), e);
+            logger.error("Error updating api key: {}", apiKey, e);
             throw new DAOException(e);
         }
     }
@@ -107,7 +108,7 @@ public class ApiKeysData implements ApiKeysDAO {
             return apiKeys;
         } catch (SQLException e) {
             logger.error(
-                "Error getting api keys for user userEmail=" + userEmail);
+                "Error getting api keys for user: {}", userEmail, e);
             throw new DAOException(e);
         }
     }
@@ -123,6 +124,8 @@ public class ApiKeysData implements ApiKeysDAO {
 
             int nbRows = ps.executeUpdate();
             if (nbRows != 1) {
+                logger.error("Error deleting api key for user {} and storage {} : {} rows deleted",
+                        userEmail, storageIdentifier, nbRows);
                 throw new DAOException(
                     "Number of deleted rows ("
                     + nbRows
@@ -132,9 +135,8 @@ public class ApiKeysData implements ApiKeysDAO {
             }
         } catch (SQLException e) {
             logger.error(
-                "Error deleting api key for: userEmail=" + userEmail
-                + ", storageIdentifier=" + storageIdentifier,
-                e);
+                "Error deleting api key for user {} and storage {}",
+                    userEmail, storageIdentifier, e);
             throw new DAOException(e);
         }
     }

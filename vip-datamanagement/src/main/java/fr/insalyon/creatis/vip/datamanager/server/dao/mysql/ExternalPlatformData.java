@@ -34,7 +34,8 @@ package fr.insalyon.creatis.vip.datamanager.server.dao.mysql;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import fr.insalyon.creatis.vip.datamanager.client.bean.ExternalPlatform;
 import fr.insalyon.creatis.vip.datamanager.server.dao.ExternalPlatformsDAO;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.*;
 import java.util.*;
@@ -44,7 +45,7 @@ import java.util.*;
  */
 public class ExternalPlatformData implements ExternalPlatformsDAO {
 
-    private static final Logger logger = Logger.getLogger(ExternalPlatformData.class);
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     private Connection connection;
 
     public ExternalPlatformData(Connection connection) throws DAOException {
@@ -74,7 +75,7 @@ public class ExternalPlatformData implements ExternalPlatformsDAO {
             throw new DAOException("Cannot find an external platform");
 
         } catch (SQLException e) {
-            logger.error("Error getting external platform {" + identifier + "}");
+            logger.error("Error getting external platform {} ", identifier, e);
             throw new DAOException(e);
         }
     }
@@ -100,7 +101,7 @@ public class ExternalPlatformData implements ExternalPlatformsDAO {
             return externalPlatformsList;
 
         } catch (SQLException e) {
-            logger.error("Error getting all external platforms");
+            logger.error("Error getting all external platforms", e);
             throw new DAOException(e);
         }
     }
@@ -109,8 +110,8 @@ public class ExternalPlatformData implements ExternalPlatformsDAO {
         try {
             return ExternalPlatform.Type.valueOf(bddString.toUpperCase());
         } catch (IllegalArgumentException e) {
-            logger.error("External platform type not found {" + bddString + "}");
-            throw new DAOException("Impossible to map an external platform type from database");
+            logger.error("External platform type not found {}", bddString, e);
+            throw new DAOException(e);
         }
     }
 

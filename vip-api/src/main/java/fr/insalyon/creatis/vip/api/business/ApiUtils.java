@@ -6,6 +6,8 @@
 package fr.insalyon.creatis.vip.api.business;
 
 import fr.insalyon.creatis.vip.api.bean.ParameterType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -13,7 +15,7 @@ import fr.insalyon.creatis.vip.api.bean.ParameterType;
  */
 public class ApiUtils {
 
-    private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(ApiUtils.class);
+    private static final Logger logger = LoggerFactory.getLogger(ApiUtils.class);
     
     public static void methodInvocationLog(String methodName, Object... parameters) {
         String message = "Calling API method " + methodName + "(";
@@ -53,6 +55,7 @@ public class ApiUtils {
 
     public static void throwIfNull(Object parameter, String name) throws ApiException {
         if (parameter == null) {
+            logger.error("parameter {} cannot be empty", name);
             throw new ApiException(name + " cannot be empty.");
         }
     }
@@ -90,6 +93,7 @@ public class ApiUtils {
 
     public static void checkIfValidPipelineIdentifier(String identifier) throws ApiException {
         if (!identifier.contains("/")) {
+            logger.error("Invalid pipeline identifier {} : missing /", identifier);
             throw new ApiException("Invalid pipeline identifier: " + identifier);
         }
     }

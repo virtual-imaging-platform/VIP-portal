@@ -40,7 +40,8 @@ import fr.insalyon.creatis.vip.api.rest.model.*;
 import fr.insalyon.creatis.vip.application.server.business.*;
 import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
 import fr.insalyon.creatis.vip.datamanager.server.business.TransferPoolBusiness;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
@@ -63,7 +64,7 @@ import static fr.insalyon.creatis.vip.api.CarminProperties.DEFAULT_LIMIT_LIST_EX
 @RequestMapping("/executions")
 public class ExecutionControler {
 
-    public static final Logger logger = Logger.getLogger(ExecutionControler.class);
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Autowired
     private Environment environment;
@@ -90,14 +91,26 @@ public class ExecutionControler {
     ) throws ApiException {
         ApiUtils.methodInvocationLog("listExecutions", studyIdentifier, offset, limit);
         restApiBusiness.getApiContext(httpServletRequest, true);
-        if (studyIdentifier != null) throw new ApiException("studyIdentifier not supportet yet");
-        if (offset != null) throw new ApiException("offset not supported yet");
+        if (studyIdentifier != null) {
+            logger.warn("studyIdentifier not supportet yet in listExecutions");
+            throw new ApiException("studyIdentifier not supportet yet");
+        }
+        if (offset != null) {
+            logger.warn("offset not supportet yet in listExecutions");
+            throw new ApiException("offset not supported yet");
+        }
         int executionMaxNb = environment.getProperty(DEFAULT_LIMIT_LIST_EXECUTION, Integer.class);
         if (limit == null) limit = executionMaxNb;
-        if (limit > executionMaxNb) throw new ApiException("limit parameter too high");
+        if (limit > executionMaxNb) {
+            logger.warn("limit parameter too high {}", limit);
+            throw new ApiException("limit parameter too high");
+        }
         try(Connection connection = connectionSupplier.get()) {
             return executionBusiness.listExecutions(limit, connection);
-        } catch (SQLException | SQLRuntimeException ex) {
+        } catch (SQLException ex) {
+            logger.error("Error handling a connection", ex);
+            throw new ApiException(ex);
+        } catch (SQLRuntimeException ex) {
             throw new ApiException(ex);
         }
     }
@@ -108,7 +121,10 @@ public class ExecutionControler {
     ) throws ApiException {
         ApiUtils.methodInvocationLog("countExecutions");
         restApiBusiness.getApiContext(httpServletRequest, true);
-        if (studyIdentifier != null) throw new ApiException("studyIdentifier not supportet yet");
+        if (studyIdentifier != null) {
+            logger.warn("studyIdentifier not supportet yet in countExecutions");
+            throw new ApiException("studyIdentifier not supportet yet");
+        }
         return String.valueOf(executionBusiness.countExecutions());
     }
 
@@ -120,7 +136,10 @@ public class ExecutionControler {
         try(Connection connection = connectionSupplier.get()) {
             return executionBusiness.getExecution(
                 executionId, false, connection);
-        } catch (SQLException | SQLRuntimeException ex) {
+        } catch (SQLException ex) {
+            logger.error("Error handling a connection", ex);
+            throw new ApiException(ex);
+        } catch (SQLRuntimeException ex) {
             throw new ApiException(ex);
         }
     }
@@ -136,7 +155,10 @@ public class ExecutionControler {
         try(Connection connection = connectionSupplier.get()) {
             return executionBusiness.getExecution(
                 executionId, false, connection);
-        } catch (SQLException | SQLRuntimeException ex) {
+        } catch (SQLException ex) {
+            logger.error("Error handling a connection", ex);
+            throw new ApiException(ex);
+        } catch (SQLRuntimeException ex) {
             throw new ApiException(ex);
         }
     }
@@ -151,7 +173,10 @@ public class ExecutionControler {
             String execId = executionBusiness.initExecution(
                 execution, connection);
             return executionBusiness.getExecution(execId, false, connection);
-        } catch (SQLException | SQLRuntimeException ex) {
+        } catch (SQLException ex) {
+            logger.error("Error handling a connection", ex);
+            throw new ApiException(ex);
+        } catch (SQLRuntimeException ex) {
             throw new ApiException(ex);
         }
     }
@@ -164,7 +189,10 @@ public class ExecutionControler {
         try(Connection connection = connectionSupplier.get()) {
             return executionBusiness.getExecutionResultsPaths(
                 executionId, connection);
-        } catch (SQLException | SQLRuntimeException ex) {
+        } catch (SQLException ex) {
+            logger.error("Error handling a connection", ex);
+            throw new ApiException(ex);
+        } catch (SQLRuntimeException ex) {
             throw new ApiException(ex);
         }
     }
@@ -189,6 +217,7 @@ public class ExecutionControler {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void playExecution(@PathVariable String executionId) throws ApiException {
         ApiUtils.methodInvocationLog("playExecution", executionId);
+        logger.warn("playExecution should not be used");
         throw new NotImplementedException("Executions are started on creation");
     }
 

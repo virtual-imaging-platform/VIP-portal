@@ -67,6 +67,8 @@ import org.opensaml.xml.security.x509.BasicX509Credential;
 import org.opensaml.xml.signature.Signature;
 import org.opensaml.xml.signature.SignatureValidator;
 import org.opensaml.xml.validation.ValidationException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -76,7 +78,7 @@ import org.w3c.dom.Element;
  */
 public class SamlTokenValidator {
 
-    private static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(SamlTokenValidator.class);
+    private static final Logger logger = LoggerFactory.getLogger(SamlTokenValidator.class);
 
     public SamlTokenValidator() {
     }

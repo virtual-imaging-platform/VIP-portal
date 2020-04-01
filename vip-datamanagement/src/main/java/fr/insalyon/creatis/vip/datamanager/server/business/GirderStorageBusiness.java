@@ -39,7 +39,8 @@ import fr.insalyon.creatis.vip.core.client.view.*;
 import fr.insalyon.creatis.vip.core.server.business.*;
 import fr.insalyon.creatis.vip.datamanager.client.bean.ExternalPlatform;
 import fr.insalyon.creatis.vip.datamanager.client.bean.ExternalPlatform.Type;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
@@ -56,7 +57,7 @@ import java.util.function.Consumer;
  * Created by abonnet on 7/17/19.
  */
 public class GirderStorageBusiness {
-    private static final Logger logger = Logger.getLogger(GirderStorageBusiness.class);
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private ApiKeyBusiness apiKeyBusiness;
 
@@ -146,6 +147,7 @@ public class GirderStorageBusiness {
                 Optional.empty());
 
             if (res.code >= 400) {
+                logger.error("Unable to get girder token from api key {} : {}", key, res.response);
                 throw new BusinessException(
                     "Unable to get token from api key: " + res.response);
             }
@@ -156,6 +158,8 @@ public class GirderStorageBusiness {
 
             return token;
         } catch (IOException | NullPointerException ex) {
+            logger.error("Error getting girder token for {} with key {}",
+                    userEmail, key, ex);
             throw new BusinessException("Unable to get token from api key", ex);
         }
     }
@@ -173,6 +177,7 @@ public class GirderStorageBusiness {
                     con -> con.setRequestProperty("Girder-Token", token)));
 
             if (res.code >= 400) {
+                logger.error("Unable to get girder filename for file {} : {}", fileId, res.response);
                 throw new BusinessException(
                     "Unable to get file info: " + res.response);
             }
@@ -183,6 +188,8 @@ public class GirderStorageBusiness {
 
             return name;
         } catch (IOException ex) {
+            logger.error("Error getting girder filename for {} with token {}",
+                    fileId, token, ex);
             throw new BusinessException("Unable to get file info", ex);
         }
     }

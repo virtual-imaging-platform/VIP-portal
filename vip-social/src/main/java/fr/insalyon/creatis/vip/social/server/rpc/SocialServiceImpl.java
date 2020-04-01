@@ -46,7 +46,8 @@ import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -54,7 +55,7 @@ import org.apache.log4j.Logger;
  */
 public class SocialServiceImpl extends AbstractRemoteServiceServlet implements SocialService {
 
-    private static final Logger logger = Logger.getLogger(SocialServiceImpl.class);
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     private MessageBusiness messageBusiness;
 
     public SocialServiceImpl() {
@@ -65,7 +66,10 @@ public class SocialServiceImpl extends AbstractRemoteServiceServlet implements S
         try(Connection connection = PlatformConnection.getInstance().getConnection()) {
             return messageBusiness.getMessagesByUser(
                 getSessionUser().getEmail(), startDate, connection);
-        } catch (BusinessException | CoreException | SQLException ex) {
+        } catch (BusinessException | CoreException ex) {
+            throw new SocialException(ex);
+        } catch (SQLException ex) {
+            logger.error("Error handling a connection", ex);
             throw new SocialException(ex);
         }
     }
@@ -74,7 +78,10 @@ public class SocialServiceImpl extends AbstractRemoteServiceServlet implements S
         try(Connection connection = PlatformConnection.getInstance().getConnection()) {
             return messageBusiness.getSentMessagesByUser(
                 getSessionUser().getEmail(), startDate, connection);
-        } catch (BusinessException | CoreException | SQLException ex) {
+        } catch (BusinessException | CoreException ex) {
+            throw new SocialException(ex);
+        } catch (SQLException ex) {
+            logger.error("Error handling a connection", ex);
             throw new SocialException(ex);
         }
     }
@@ -83,7 +90,10 @@ public class SocialServiceImpl extends AbstractRemoteServiceServlet implements S
         try(Connection connection = PlatformConnection.getInstance().getConnection()) {
             return messageBusiness.getGroupMessages(
                 groupName, startDate, connection);
-        } catch (BusinessException | SQLException ex) {
+        } catch (BusinessException ex) {
+            throw new SocialException(ex);
+        } catch (SQLException ex) {
+            logger.error("Error handling a connection", ex);
             throw new SocialException(ex);
         }
     }
@@ -91,7 +101,10 @@ public class SocialServiceImpl extends AbstractRemoteServiceServlet implements S
     public void markMessageAsRead(long id, String receiver) throws SocialException {
         try(Connection connection = PlatformConnection.getInstance().getConnection()) {
             messageBusiness.markAsRead(id, receiver, connection);
-        } catch (BusinessException | SQLException ex) {
+        } catch (BusinessException ex) {
+            throw new SocialException(ex);
+        } catch (SQLException ex) {
+            logger.error("Error handling a connection", ex);
             throw new SocialException(ex);
         }
     }
@@ -99,7 +112,10 @@ public class SocialServiceImpl extends AbstractRemoteServiceServlet implements S
     public void removeMessage(long id) throws SocialException {
         try(Connection connection = PlatformConnection.getInstance().getConnection()) {
             messageBusiness.remove(id, connection);
-        } catch (BusinessException | SQLException ex) {
+        } catch (BusinessException ex) {
+            throw new SocialException(ex);
+        } catch (SQLException ex) {
+            logger.error("Error handling a connection", ex);
             throw new SocialException(ex);
         }
     }
@@ -108,7 +124,10 @@ public class SocialServiceImpl extends AbstractRemoteServiceServlet implements S
         try(Connection connection = PlatformConnection.getInstance().getConnection()) {
             messageBusiness.removeByReceiver(
                 id, getSessionUser().getEmail(), connection);
-        } catch (BusinessException | CoreException | SQLException ex) {
+        } catch (BusinessException | CoreException ex) {
+            throw new SocialException(ex);
+        } catch (SQLException ex) {
+            logger.error("Error handling a connection", ex);
             throw new SocialException(ex);
         }
     }
@@ -116,7 +135,10 @@ public class SocialServiceImpl extends AbstractRemoteServiceServlet implements S
     public void removeGroupMessage(long id) throws SocialException {
         try(Connection connection = PlatformConnection.getInstance().getConnection()) {
             messageBusiness.removeGroupMessage(id, connection);
-        } catch (BusinessException | SQLException ex) {
+        } catch (BusinessException ex) {
+            throw new SocialException(ex);
+        } catch (SQLException ex) {
+            logger.error("Error handling a connection", ex);
             throw new SocialException(ex);
         }
     }
@@ -126,8 +148,12 @@ public class SocialServiceImpl extends AbstractRemoteServiceServlet implements S
             if (isSystemAdministrator()) {
                 return configurationBusiness.getUsers(connection);
             }
+            logger.error("{} is not an admin, he cant access all users", getSessionUser());
             throw new SocialException("Only administrators can send message.");
-        } catch (BusinessException | CoreException | SQLException ex) {
+        } catch (BusinessException | CoreException ex) {
+            throw new SocialException(ex);
+        } catch (SQLException ex) {
+            logger.error("Error handling a connection", ex);
             throw new SocialException(ex);
         }
     }
@@ -137,7 +163,10 @@ public class SocialServiceImpl extends AbstractRemoteServiceServlet implements S
             trace(logger, "Sending message '" + subject + "' to '" + Arrays.asList(recipients) + "'.");
             messageBusiness.sendMessage(
                 getSessionUser(), recipients, subject, message, connection);
-        } catch (BusinessException | CoreException | SQLException ex) {
+        } catch (BusinessException | CoreException ex) {
+            throw new SocialException(ex);
+        } catch (SQLException ex) {
+            logger.error("Error handling a connection", ex);
             throw new SocialException(ex);
         }
     }
@@ -154,7 +183,10 @@ public class SocialServiceImpl extends AbstractRemoteServiceServlet implements S
             messageBusiness.copyMessageToVipSupport(
                 getSessionUser(), recipients,
                 subject, message, connection);
-        } catch (CoreException | BusinessException | SQLException ex) {
+        } catch (BusinessException | CoreException ex) {
+            throw new SocialException(ex);
+        } catch (SQLException ex) {
+            logger.error("Error handling a connection", ex);
             throw new SocialException(ex);
         }
     }
@@ -169,7 +201,10 @@ public class SocialServiceImpl extends AbstractRemoteServiceServlet implements S
             messageBusiness.sendMessageToVipSupport(
                 getSessionUser(),
                 subject, message, workflowID, simulationNames, connection);
-        } catch (CoreException | BusinessException | SQLException ex) {
+        } catch (BusinessException | CoreException ex) {
+            throw new SocialException(ex);
+        } catch (SQLException ex) {
+            logger.error("Error handling a connection", ex);
             throw new SocialException(ex);
         }
     }
@@ -187,7 +222,10 @@ public class SocialServiceImpl extends AbstractRemoteServiceServlet implements S
                 subject,
                 message,
                 connection);
-        } catch (CoreException | BusinessException | SQLException ex) {
+        } catch (BusinessException | CoreException ex) {
+            throw new SocialException(ex);
+        } catch (SQLException ex) {
+            logger.error("Error handling a connection", ex);
             throw new SocialException(ex);
         }
     }
@@ -196,7 +234,10 @@ public class SocialServiceImpl extends AbstractRemoteServiceServlet implements S
         try(Connection connection = PlatformConnection.getInstance().getConnection()) {
             return messageBusiness.verifyMessages(
                 getSessionUser().getEmail(), connection);
-        } catch (BusinessException | CoreException | SQLException ex) {
+        } catch (BusinessException | CoreException ex) {
+            throw new SocialException(ex);
+        } catch (SQLException ex) {
+            logger.error("Error handling a connection", ex);
             throw new SocialException(ex);
         }
     }

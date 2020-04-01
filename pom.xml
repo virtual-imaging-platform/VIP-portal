@@ -95,14 +95,41 @@ knowledge of the CeCILL-B license and that you accept its terms.
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
-            
             <dependency>
                 <groupId>com.isomorphic.smartgwt.lgpl</groupId>
                 <artifactId>smartgwt-lgpl</artifactId>
                 <version>12.0p</version>
             </dependency>
+            
+            <!-- empty jars to ensure commons logging and log4j is not
+              used in project and not present in final war -->
+            <dependency>
+                <groupId>commons-logging</groupId>
+                <artifactId>commons-logging</artifactId>
+                <version>99-empty</version>
+            </dependency>
+            <dependency>
+                <groupId>log4j</groupId>
+                <artifactId>log4j</artifactId>
+                <version>99-empty</version>
+            </dependency>
 
-            <!-- VIP MODULES -->
+            <!-- logging libs -->
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>jcl-over-slf4j</artifactId>
+                <version>1.7.30</version>
+            </dependency>
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-api</artifactId>
+                <version>1.7.30</version>
+            </dependency>
+            <dependency>
+                <groupId>ch.qos.logback</groupId>
+                <artifactId>logback-classic</artifactId>
+                <version>1.2.3</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -125,7 +152,13 @@ knowledge of the CeCILL-B license and that you accept its terms.
             <name>Creatis Insa Lyon repository [creatis]</name>
             <url>http://vip.creatis.insa-lyon.fr:9007/nexus/content/repositories/snapshots</url>
         </repository>
-
+        
+        <!-- repo used to get empty jar for commons logging and log4j -->
+        <repository>
+            <id>version99</id>
+            <!-- highly available repository serving empty artifacts -->
+            <url>http://version99.qos.ch/</url>
+        </repository>
     </repositories>
 
     <distributionManagement>

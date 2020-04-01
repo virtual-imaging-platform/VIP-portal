@@ -51,7 +51,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.io.FileUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -59,11 +60,11 @@ import org.apache.log4j.Logger;
  */
 public class GetFileServiceImpl extends HttpServlet {
 
-    private static Logger logger = Logger.getLogger(GetFileServiceImpl.class);
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-            throws ServletException, IOException {
+            throws ServletException {
         try(Connection connection = PlatformConnection.getInstance().getConnection()) {
             User user = CoreDAOFactory.getDAOFactory()
                 .getUserDAO(connection)
@@ -113,7 +114,10 @@ public class GetFileServiceImpl extends HttpServlet {
                     FileUtils.deleteQuietly(file);
                 }
             }
-        } catch (DAOException | SQLException ex) {
+        } catch (DAOException ex) {
+            throw new ServletException(ex);
+        } catch (Exception ex) {
+            logger.error("Error downloading a file", ex);
             throw new ServletException(ex);
         }
     }

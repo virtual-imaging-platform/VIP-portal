@@ -38,7 +38,8 @@ import fr.insalyon.creatis.vip.core.server.business.*;
 import fr.insalyon.creatis.vip.core.server.dao.*;
 import fr.insalyon.creatis.vip.core.server.dao.mysql.PlatformConnection;
 import fr.insalyon.creatis.vip.datamanager.server.business.*;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -69,7 +70,7 @@ import static fr.insalyon.creatis.vip.api.CarminProperties.CORS_AUTHORIZED_DOMAI
 @ComponentScan
 public class SpringWebConfig extends WebMvcConfigurerAdapter {
 
-    public static final Logger logger = Logger.getLogger(SpringWebConfig.class);
+    private final Logger logger = LoggerFactory.getLogger(getClass());;
 
     @Autowired
     private Environment env;
@@ -95,7 +96,7 @@ public class SpringWebConfig extends WebMvcConfigurerAdapter {
             try {
                 return CoreDAOFactory.getDAOFactory().getUserDAO(connection);
             } catch (DAOException e) {
-                logger.error("error creating user dao bean", e);
+                logger.error("error creating user dao bean");
                 throw new RuntimeException("Cannot create user dao", e);
             }
         };
@@ -120,6 +121,10 @@ public class SpringWebConfig extends WebMvcConfigurerAdapter {
             try {
                 return PlatformConnection.getInstance().getConnection();
             } catch (SQLException e) {
+                // Checked exceptions are not supported so use a runtime exception
+                // It will be caught in API controllers as a business exception
+                // so print the stack here
+                logger.error("error getting a connection for spring context", e);
                 throw new SQLRuntimeException(e);
             }
         };

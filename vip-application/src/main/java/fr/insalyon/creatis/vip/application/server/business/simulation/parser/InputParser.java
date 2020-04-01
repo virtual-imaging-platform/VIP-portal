@@ -34,7 +34,8 @@ package fr.insalyon.creatis.vip.application.server.business.simulation.parser;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import java.io.FileReader;
 import java.io.IOException;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -48,7 +49,7 @@ import org.xml.sax.helpers.XMLReaderFactory;
  */
 public class InputParser extends DefaultHandler {
 
-    private static final Logger logger = Logger.getLogger(InputParser.class);
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     private XMLReader reader;
     private StringBuilder inputs;
     private String name;
@@ -66,11 +67,8 @@ public class InputParser extends DefaultHandler {
 
             return inputs.toString();
 
-        } catch (IOException ex) {
-            logger.error(ex);
-            throw new BusinessException(ex);
-        } catch (SAXException ex) {
-            logger.error(ex);
+        } catch (IOException | SAXException ex) {
+            logger.error("Error parsing file {}", fileName, ex);
             throw new BusinessException(ex);
         }
     }

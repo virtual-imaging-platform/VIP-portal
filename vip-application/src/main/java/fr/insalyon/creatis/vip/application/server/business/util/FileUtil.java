@@ -34,7 +34,8 @@ package fr.insalyon.creatis.vip.application.server.business.util;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -42,7 +43,7 @@ import org.apache.log4j.Logger;
  */
 public class FileUtil {
 
-    private static Logger logger = Logger.getLogger(FileUtil.class);
+    private static final Logger logger = LoggerFactory.getLogger(FileUtil.class);
 
     public static String read(File file) {
 
@@ -58,7 +59,7 @@ public class FileUtil {
 
             buffer.close();
         } catch (java.io.IOException ex) {
-            logger.error("Error reading file" + file, ex);
+            logger.error("Error reading file {}", file, ex);
         }
 
         return (content.length() == 0) ? null : content.toString();

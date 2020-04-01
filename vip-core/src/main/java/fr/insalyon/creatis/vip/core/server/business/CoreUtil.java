@@ -38,7 +38,8 @@ import fr.insalyon.creatis.grida.client.GRIDAZombieClient;
 import fr.insalyon.creatis.sma.client.SMAClient;
 import fr.insalyon.creatis.sma.client.SMAClientException;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -46,7 +47,7 @@ import org.apache.log4j.Logger;
  */
 public class CoreUtil {
 
-    private static final Logger logger = Logger.getLogger(CoreUtil.class);
+    private static final Logger logger = LoggerFactory.getLogger(CoreUtil.class);
 
     public static void sendEmail(String subject, String content, String[] recipients,
             boolean direct, String username) throws BusinessException {
@@ -56,7 +57,7 @@ public class CoreUtil {
             client.sendEmail(subject, content, recipients, direct, username);
 
         } catch (SMAClientException ex) {
-            logger.error(ex);
+            logger.error("Error sending {} email to {}", subject, username, ex);
             throw new BusinessException(ex);
         }
     }

@@ -33,6 +33,7 @@ package fr.insalyon.creatis.vip.api.rest.itest;
 
 import fr.insalyon.creatis.vip.api.*;
 import fr.insalyon.creatis.vip.api.bean.Module;
+import fr.insalyon.creatis.vip.api.business.ApiException;
 import fr.insalyon.creatis.vip.api.rest.controller.PlatformController;
 import fr.insalyon.creatis.vip.api.rest.model.SupportedTransferProtocol;
 import fr.insalyon.creatis.vip.application.server.business.WorkflowBusiness;
@@ -99,7 +100,7 @@ public class DefaultSpringConfigurationIT {
     }
 
     @Test
-    public void propertiesShouldBePresent() {
+    public void propertiesShouldBePresent() throws ApiException {
         // test that the platform properties generation does not throw any exception
         Assert.notNull(platformController.getPlatformProperties());
     }

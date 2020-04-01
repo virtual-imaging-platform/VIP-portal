@@ -48,6 +48,8 @@ import fr.insalyon.creatis.vip.datamanager.server.DataManagerUtil;
 import java.io.*;
 import java.sql.Connection;
 import java.util.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -55,7 +57,7 @@ import java.util.*;
  */
 public class ApplicationImporterBusiness {
 
-    private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(ApplicationImporterBusiness.class);
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     public String readAndValidationBoutiquesFile(
         String fileLFN, User user, Connection connection)
@@ -69,6 +71,8 @@ public class ApplicationImporterBusiness {
                               user, fileLFN, connection))).getParent());
 
             if (!localDir.exists() && !localDir.mkdirs()) {
+                logger.error("Error validating boutiques file {}, Cannot create directory {}",
+                        fileLFN, localDir);
                 throw new BusinessException("Cannot create directory " + localDir.getCanonicalPath());
             }
             String localFilePath = CoreUtil.getGRIDAClient().getRemoteFile(
@@ -77,17 +81,10 @@ public class ApplicationImporterBusiness {
             new BoutiquesBusiness().validateBoutiqueFile(localFilePath);
             String fileContent = new Scanner(new File(localFilePath)).useDelimiter("\\Z").next();
             return fileContent;
-        } catch (GRIDAClientException ex) {
-            logger.error(ex);
+        } catch (GRIDAClientException | IOException ex) {
+            logger.error("Error validating boutiques file {}", fileLFN, ex);
             throw new BusinessException(ex);
         } catch (DataManagerException ex) {
-            logger.error(ex);
-            throw new BusinessException(ex);
-        } catch (FileNotFoundException ex) {
-            logger.error(ex);
-            throw new BusinessException(ex);
-        } catch (IOException ex) {
-            logger.error(ex);
             throw new BusinessException(ex);
         }
     }
@@ -176,14 +173,10 @@ public class ApplicationImporterBusiness {
 // Register application
             registerApplicationVersion(bt.getName(), bt.getToolVersion(), user.getEmail(), bt.getGwendiaLFN(), bt.getJsonLFN(), connection);
 
-        } catch (FileNotFoundException ex) {
-            logger.error(ex);
-            throw new BusinessException(ex);
         } catch (IOException ex) {
-            logger.error(ex);
+            logger.error("Error creating app {}/{} from boutiques file", bt.getName(), bt.getToolVersion(), ex);
             throw new BusinessException(ex);
         } catch (DataManagerException ex) {
-            logger.error(ex);
             throw new BusinessException(ex);
         }
     }
@@ -197,7 +190,7 @@ public class ApplicationImporterBusiness {
             }
             gc.uploadFile(localFile, (new File(lfn)).getParent());
         } catch (GRIDAClientException ex) {
-            logger.error(ex);
+            logger.error("Error uploading file {} to {}", localFile, lfn, ex);
             throw new BusinessException(ex);
         }
     }
@@ -206,6 +199,7 @@ public class ApplicationImporterBusiness {
         // Check if base file directory exists, otherwise create it.
         File directory = (new File(fileName)).getParentFile();
         if (!directory.exists() && !directory.mkdirs()) {
+            logger.error("Error importing an application : Cannot create directory {}", directory);
             throw new BusinessException("Cannot create directory " + directory.getAbsolutePath());
         }
 
@@ -253,7 +247,8 @@ public class ApplicationImporterBusiness {
         }
         // Only the owner of an existing application and a system administrator can modify it.
         if (!user.isSystemAdministrator() && !app.getOwner().equals(user.getEmail())) {
-            logger.error(user.getEmail() + " tried to modify application " + app.getName() + " which belongs to " + app.getOwner());
+            logger.error("{} tried to modify application {} which belongs to {}",
+                    user.getEmail(), app.getName(), app.getOwner());
             throw new BusinessException("Permission denied.");
         }
         // Refuse to overwrite an application version silently if the version overwrite parameter is not set.
@@ -262,7 +257,8 @@ public class ApplicationImporterBusiness {
                 vipApplicationName, connection);
             for (AppVersion v : versions) {
                 if (v.getVersion().equals(vipVersion)) {
-                    logger.error(user.getEmail() + " tried to overwrite version " + vipVersion + " of application " + vipApplicationName + " without setting the overwrite flag.");
+                    logger.error("{} tried to overwrite version {} of application {} without setting the overwrite flag.",
+                            user.getEmail(), vipVersion,vipApplicationName);
                     throw new BusinessException("Application version already exists.");
                 }
             }

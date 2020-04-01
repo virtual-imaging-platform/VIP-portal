@@ -35,7 +35,8 @@ import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import fr.insalyon.creatis.vip.core.server.dao.mysql.PlatformConnection;
 import fr.insalyon.creatis.vip.social.server.dao.mysql.GroupMessageData;
 import fr.insalyon.creatis.vip.social.server.dao.mysql.MessageData;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.sql.Connection;
 import java.sql.SQLException;
 
@@ -45,7 +46,7 @@ import java.sql.SQLException;
  */
 public class MySQLDAOFactory extends SocialDAOFactory {
 
-    private final static Logger logger = Logger.getLogger(MySQLDAOFactory.class);
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     private static SocialDAOFactory instance;
 
     protected static SocialDAOFactory getInstance() {

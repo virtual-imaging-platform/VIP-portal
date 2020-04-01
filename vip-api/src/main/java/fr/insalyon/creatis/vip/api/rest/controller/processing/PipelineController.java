@@ -36,7 +36,8 @@ import fr.insalyon.creatis.vip.api.business.*;
 import fr.insalyon.creatis.vip.api.exception.SQLRuntimeException;
 import fr.insalyon.creatis.vip.api.rest.RestApiBusiness;
 import fr.insalyon.creatis.vip.application.server.business.*;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.web.bind.annotation.*;
@@ -57,7 +58,7 @@ import java.util.function.Supplier;
 @RequestMapping("pipelines")
 public class PipelineController {
 
-    public static final Logger logger = Logger.getLogger(PipelineController.class);
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Autowired
     Environment env;
@@ -85,7 +86,10 @@ public class PipelineController {
         PipelineBusiness pb = new PipelineBusiness(apiContext, env, workflowBusiness, applicationBusiness, classBusiness);
         try(Connection connection = connectionSupplier.get()) {
             return pb.listPipelines(studyIdentifier, connection);
-        } catch (SQLException | SQLRuntimeException ex) {
+        } catch (SQLException ex) {
+            logger.error("Error handling a connection", ex);
+            throw new ApiException(ex);
+        } catch (SQLRuntimeException ex) {
             throw new ApiException(ex);
         }
     }
@@ -96,6 +100,7 @@ public class PipelineController {
         try {
             pipelineId = URLDecoder.decode(pipelineId, "UTF8");
         } catch (UnsupportedEncodingException e) {
+            logger.error("Error decoding pipelineid {}", pipelineId, e);
             throw new ApiException("cannot decode pipelineId : " + pipelineId);
         }
         ApiContext apiContext = restApiBusiness.getApiContext(httpServletRequest, true);
@@ -103,7 +108,10 @@ public class PipelineController {
         try(Connection connection = connectionSupplier.get()) {
             pb.checkIfUserCanAccessPipeline(pipelineId, connection);
             return pb.getPipeline(pipelineId, connection);
-        } catch (SQLException | SQLRuntimeException ex) {
+        } catch (SQLException ex) {
+            logger.error("Error handling a connection", ex);
+            throw new ApiException(ex);
+        } catch (SQLRuntimeException ex) {
             throw new ApiException(ex);
         }
     }

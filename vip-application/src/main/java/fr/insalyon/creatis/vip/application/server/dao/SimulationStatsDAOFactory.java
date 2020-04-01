@@ -35,12 +35,16 @@ import fr.insalyon.creatis.moteur.plugins.workflowsdb.dao.WorkflowsDBDAOExceptio
 import fr.insalyon.creatis.moteur.plugins.workflowsdb.dao.WorkflowsDBDAOFactory;
 import fr.insalyon.creatis.vip.application.server.dao.hibernate.SimulationStatsData;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
  * @author Rafael Ferreira da Silva
  */
 public class SimulationStatsDAOFactory {
+
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private static SimulationStatsDAOFactory instance;
 
@@ -60,6 +64,7 @@ public class SimulationStatsDAOFactory {
             return new SimulationStatsData(WorkflowsDBDAOFactory.getInstance().getSessionFactory());
             
         } catch (WorkflowsDBDAOException ex) {
+            logger.error("Error getting SimulationStatsDAO", ex);
             throw new DAOException(ex);
         }
     }

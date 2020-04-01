@@ -42,12 +42,16 @@ import java.util.zip.GZIPOutputStream;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream;
 import org.apache.commons.compress.utils.IOUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
  * @author Tristan Glatard
  */
 public class TargzUtils {
+
+    private static final Logger logger = LoggerFactory.getLogger(TargzUtils.class);
 
     public static void createTargz(List<File> pathIn, String pathOut) throws BusinessException {
         try {
@@ -61,6 +65,7 @@ public class TargzUtils {
             tos.finish();
             tos.close();
         } catch (IOException ex) {
+            logger.error("Error creating targz {} from {}", pathOut, pathIn, ex);
             throw new BusinessException(ex);
         }
     }
@@ -91,6 +96,7 @@ public class TargzUtils {
                 }
             }
         } catch (IOException ex) {
+            logger.error("Error adding file {} to targz", f, ex);
             throw new BusinessException(ex);
         }
     }

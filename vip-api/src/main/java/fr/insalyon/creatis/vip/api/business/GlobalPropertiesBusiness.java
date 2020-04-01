@@ -34,7 +34,8 @@ package fr.insalyon.creatis.vip.api.business;
 import fr.insalyon.creatis.vip.api.bean.GlobalProperties;
 import fr.insalyon.creatis.vip.api.bean.Module;
 import fr.insalyon.creatis.vip.core.server.business.Server;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -42,7 +43,7 @@ import org.apache.log4j.Logger;
  */
 public class GlobalPropertiesBusiness {
 
-    private final static Logger logger = Logger.getLogger(GlobalPropertiesBusiness.class);
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private final ApiContext apiContext;
 

@@ -41,10 +41,10 @@ import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import java.security.spec.InvalidKeySpecException;
 import java.util.List;
-import java.util.logging.Level;
 import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.codec.binary.Base64;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.opensaml.saml2.core.Assertion;
 import org.opensaml.saml2.core.Issuer;
 import org.opensaml.saml2.core.Response;
@@ -59,7 +59,7 @@ import org.opensaml.xml.validation.ValidationException;
  */
 public class SamlAuthenticationService extends AbstractAuthenticationService {
 
-    private static final Logger logger = Logger.getLogger(SamlAuthenticationService.class);
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     private Assertion assertion;
     private Issuer issuer;
 
@@ -69,6 +69,7 @@ public class SamlAuthenticationService extends AbstractAuthenticationService {
 
         String token = request.getParameter("_saml_token");
         if (token == null) {
+            logger.error("Error with SAML assertion : SAML token is null");
             throw new BusinessException("SAML token is null");
         }
 
@@ -93,15 +94,17 @@ public class SamlAuthenticationService extends AbstractAuthenticationService {
                 assertion = (Assertion) SamlTokenValidator.getSAMLObject(xmlAssertion);
             }
         } catch (UnsupportedEncodingException | ConfigurationException | XMLParserException | UnmarshallingException ex) {
-            java.util.logging.Logger.getLogger(SamlAuthenticationService.class.getName()).log(Level.SEVERE, null, ex);
+            logger.error("Error getting SAML assertion {}", new String(xmlAssertion), ex);
         }
         if (assertion == null) {
+            logger.error("Error getting SAML assertion {}", new String(xmlAssertion));
             throw new BusinessException("Cannot get assertion!");
         }
 
         // Find public key certificate to use from issuer
         issuer = assertion.getIssuer();
         if (issuer == null) {
+            logger.error("Error with SAML assertion {} : Cannot find issuer", new String(xmlAssertion));
             throw new BusinessException("Cannot find assertion issuer!");
         }
         logger.info("Received SAML assertion from issuer " + issuer.getValue());
@@ -111,16 +114,20 @@ public class SamlAuthenticationService extends AbstractAuthenticationService {
         try {
             SamlTokenValidator.isSignatureValid(certFile, assertion);
         } catch (CertificateException | IOException | NoSuchAlgorithmException | InvalidKeySpecException | ValidationException ex) {
-            throw new BusinessException("Assertion signature is not valid!");
+            logger.error("Error with SAML assertion {} : signature is not valid", new String(xmlAssertion), ex);
+            throw new BusinessException("Assertion signature is not valid!", ex);
         }
         if (!SamlTokenValidator.isTimeValid(assertion)) {
+            logger.error("Error with SAML assertion {} : time not valid", new String(xmlAssertion));
             throw new BusinessException("Assertion is not time valid!");
         }
         try {
             if (!SamlTokenValidator.isAudienceValid(request.getRequestURL().toString(), assertion)) {
+                logger.error("Error with SAML assertion {} : audience is not valid", new String(xmlAssertion));
                 throw new BusinessException("Assertion audience is not valid!");
             }
         } catch (MalformedURLException ex) {
+            logger.error("Error with SAML assertion {}", new String(xmlAssertion), ex);
             throw new BusinessException(ex);
         }
     }

@@ -47,7 +47,8 @@ import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -55,7 +56,7 @@ import org.apache.log4j.Logger;
  */
 public class GateLabBusiness {
 
-    private final static Logger logger = Logger.getLogger(GateLabBusiness.class);
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     /**
      *
@@ -70,7 +71,6 @@ public class GateLabBusiness {
                     GateLabConstants.GATELAB_CLASS, new ArrayList<String>()));
         } catch (DAOException ex) {
             if (!ex.getMessage().contains("A class named \"" + GateLabConstants.GATELAB_CLASS + "\" already exists")) {
-                logger.error(ex);
                 throw new BusinessException(ex);
             }
         }
@@ -102,7 +102,6 @@ public class GateLabBusiness {
             return inputMap;
 
         } catch (DAOException ex) {
-            logger.error(ex);
             throw new BusinessException(ex);
         }
     }
@@ -134,7 +133,6 @@ public class GateLabBusiness {
             DAOFactory.getDAOFactory().getGatelabDAO(workflowID).StopWorkflowSimulation();
 
         } catch (DAOException ex) {
-            logger.error(ex);
             throw new BusinessException(ex);
         }
     }

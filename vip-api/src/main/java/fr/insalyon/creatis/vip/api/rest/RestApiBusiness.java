@@ -38,7 +38,8 @@ import fr.insalyon.creatis.vip.api.business.ApiContext;
 import fr.insalyon.creatis.vip.api.business.ApiException;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.server.business.*;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.security.core.Authentication;
@@ -55,7 +56,7 @@ import javax.servlet.http.HttpServletRequest;
 @Service
 public class RestApiBusiness {
 
-    private final static Logger logger = Logger.getLogger(RestApiBusiness.class);
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Autowired
     private VipConfigurer vipConfigurer;
@@ -108,8 +109,7 @@ public class RestApiBusiness {
                 .signinWithoutResetingSession(username, password, connection);
             logger.info("Credentials OK for " + username);
         } catch (BusinessException e) {
-            logger.error("Error authenticating {" + username + "}. Considered as bad credentials", e);
-            throw new ApiException("Authentication Error");
+            throw new ApiException("Authentication Error", e);
         }
     }
 
@@ -127,7 +127,6 @@ public class RestApiBusiness {
                 return configurationBusiness.getUserApikey(email, connection);
             }
         } catch (BusinessException e) {
-            logger.error("Error dealing with api key");
             throw new ApiException(e);
         }
     }

@@ -44,7 +44,8 @@ import fr.insalyon.creatis.vip.core.server.business.proxy.ProxyClient;
 import fr.insalyon.creatis.vip.core.server.dao.CoreDAOFactory;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import fr.insalyon.creatis.vip.core.server.dao.UserDAO;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
@@ -62,7 +63,7 @@ import java.util.*;
  */
 public class ConfigurationBusiness {
 
-    private final static Logger logger = Logger.getLogger(ConfigurationBusiness.class);
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     /**
      *
@@ -76,7 +77,7 @@ public class ConfigurationBusiness {
             myproxy.getProxy();
 
         } catch (Exception ex) {
-            logger.error(ex);
+            logger.error("Error configuring myproxy : {}", ex.getMessage());
             throw new BusinessException(ex);
         }
     }
@@ -153,7 +154,7 @@ public class ConfigurationBusiness {
                 continue;
             }
             if (user.getCountryCode().toString().equals(udc)) {
-                logger.info("Undesired country for " + user.getEmail());
+                logger.error("Undesired country for " + user.getEmail());
                 throw new BusinessException("Error");
             }
         }
@@ -279,16 +280,10 @@ public class ConfigurationBusiness {
                                        new String[]{email}, false, user.getEmail());
                 }
             }
-        } catch (GRIDAClientException ex) {
-            logger.error(ex);
+        } catch (GRIDAClientException | UnsupportedEncodingException | NoSuchAlgorithmException ex) {
+            logger.error("Error signing up user {}", user.getEmail(), ex);
             throw new BusinessException(ex);
         } catch (DAOException ex) {
-            throw new BusinessException(ex);
-        } catch (NoSuchAlgorithmException ex) {
-            logger.error(ex);
-            throw new BusinessException(ex);
-        } catch (UnsupportedEncodingException ex) {
-            logger.error(ex);
             throw new BusinessException(ex);
         }
     }
@@ -321,7 +316,7 @@ public class ConfigurationBusiness {
             }
             // Only check against the domain part of the user's email address
             if (useremail[1].endsWith(udm)) {
-                logger.info("Undesired Mail Domain for " + email);
+                logger.error("Undesired Mail Domain for " + email);
                 throw new BusinessException("Error");
             }
         }
@@ -389,11 +384,8 @@ public class ConfigurationBusiness {
                 logger.error("Authentication failed to '" + email + "' (email or password incorrect, or user is locked).");
                 throw new BusinessException("Authentication failed (email or password incorrect, or user is locked).");
             }
-        } catch (NoSuchAlgorithmException ex) {
-            logger.error(ex);
-            throw new BusinessException(ex);
-        } catch (UnsupportedEncodingException ex) {
-            logger.error(ex);
+        } catch (NoSuchAlgorithmException | UnsupportedEncodingException ex) {
+            logger.error("Error signing in user {}", email, ex);
             throw new BusinessException(ex);
         } catch (DAOException ex) {
             throw new BusinessException(ex);
@@ -408,6 +400,7 @@ public class ConfigurationBusiness {
         try {
             country = email.substring(email.lastIndexOf('.') + 1);
         } catch (NullPointerException e) {
+            logger.warn("Error finding country from email {}", email, e);
         }
 
         try {
@@ -415,7 +408,7 @@ public class ConfigurationBusiness {
                 cc = CountryCode.valueOf(country);
             }
         } catch (IllegalArgumentException e) {
-            logger.info("Cannot determine country from email extension " + country + ": user will be mapped to Antartica");
+            logger.warn("Cannot determine country from email extension {}: user will be mapped to Antartica", country, e);
         }
 
         User u = new User(
@@ -486,7 +479,7 @@ public class ConfigurationBusiness {
             }
 
         } catch (GRIDAClientException ex) {
-            logger.error(ex);
+            logger.error("Error activating {}", email, ex);
             throw new BusinessException(ex);
         } catch (DAOException ex) {
             throw new BusinessException(ex);
@@ -522,6 +515,7 @@ public class ConfigurationBusiness {
 
             if (CoreDAOFactory.getDAOFactory()
                 .getUserDAO(connection).isLocked(email)) {
+                logger.error("Cannot send activation code to {} : account locked", email);
                 throw new BusinessException("User is locked.");
             }
 
@@ -558,6 +552,7 @@ public class ConfigurationBusiness {
 
             if (CoreDAOFactory.getDAOFactory()
                 .getUserDAO(connection).isLocked(email)) {
+                logger.error("Cannot send reset code to {} : account locked", email);
                 throw new BusinessException("User is locked.");
             }
 
@@ -666,10 +661,10 @@ public class ConfigurationBusiness {
                                        new String[]{adminEmail}, true, user.getEmail());
                 }
             }
-        } catch (DAOException ex) {
-            throw new BusinessException(ex);
         } catch (GRIDAClientException ex) {
-            logger.error(ex);
+            logger.error("Error removing user {}", email, ex);
+            throw new BusinessException(ex);
+        } catch (DAOException ex) {
             throw new BusinessException(ex);
         }
     }
@@ -738,10 +733,10 @@ public class ConfigurationBusiness {
                                 group.getName().replaceAll(" ", "_"));
 
             CoreDAOFactory.getDAOFactory().getGroupDAO(connection).add(group);
-        } catch (DAOException ex) {
-            throw new BusinessException(ex);
         } catch (GRIDAClientException ex) {
-            logger.error(ex);
+            logger.error("Error adding group : {}", group.getName(), ex);
+            throw new BusinessException(ex);
+        } catch (DAOException ex) {
             throw new BusinessException(ex);
         }
     }
@@ -760,10 +755,10 @@ public class ConfigurationBusiness {
                           + groupName.replaceAll(" ", "_"), user);
             CoreDAOFactory.getDAOFactory().getGroupDAO(connection)
                 .remove(groupName);
-        } catch (DAOException ex) {
-            throw new BusinessException(ex);
         } catch (GRIDAClientException ex) {
-            logger.error(ex);
+            logger.error("Error removing group : {}", groupName, ex);
+            throw new BusinessException(ex);
+        } catch (DAOException ex) {
             throw new BusinessException(ex);
         }
     }
@@ -785,10 +780,10 @@ public class ConfigurationBusiness {
             }
             CoreDAOFactory.getDAOFactory().getGroupDAO(connection)
                 .update(name, group);
-        } catch (DAOException ex) {
-            throw new BusinessException(ex);
         } catch (GRIDAClientException ex) {
-            logger.error(ex);
+            logger.error("Error updating group : {}", name, ex);
+            throw new BusinessException(ex);
+        } catch (DAOException ex) {
             throw new BusinessException(ex);
         }
     }
@@ -927,11 +922,8 @@ public class ConfigurationBusiness {
             CoreDAOFactory.getDAOFactory()
                 .getUserDAO(connection)
                 .updatePassword(email, currentPassword, newPassword);
-        } catch (NoSuchAlgorithmException ex) {
-            logger.error(ex);
-            throw new BusinessException(ex);
-        } catch (UnsupportedEncodingException ex) {
-            logger.error(ex);
+        } catch (NoSuchAlgorithmException | UnsupportedEncodingException ex) {
+            logger.error("Error updating password for {}", email, ex);
             throw new BusinessException(ex);
         } catch (DAOException ex) {
             throw new BusinessException(ex);
@@ -947,7 +939,6 @@ public class ConfigurationBusiness {
                 .getUserDAO(connection).updateEmail(oldEmail, newEmail);
         } catch (DAOException e) {
             String errorMessage = "Error changing email from " + newEmail + " to " + newEmail;
-            logger.error(errorMessage, e);
             sendErrorEmailToAdmins(errorMessage, e, oldEmail, connection);
             throw new BusinessException("Error changing email address", e);
         }
@@ -962,7 +953,7 @@ public class ConfigurationBusiness {
             // but send a message to admins
             String errorMessage = "Error changing email from " + newEmail + " to " + newEmail
                     + "in the Publication table";
-            logger.error(errorMessage, e);
+            logger.warn("Error changing pulications. Ignoring ({})", e.getMessage());
             sendErrorEmailToAdmins(errorMessage, e, oldEmail, connection);
         }
     }
@@ -984,7 +975,6 @@ public class ConfigurationBusiness {
                 .getUserDAO(connection)
                 .updateTermsOfUse(email, getCurrentTimeStamp());
         } catch (DAOException ex) {
-            logger.error(ex);
             throw new BusinessException(ex);
         }
     }
@@ -996,7 +986,6 @@ public class ConfigurationBusiness {
                 .getUserDAO(connection)
                 .updateLastUpdatePublication(email, getCurrentTimeStamp());
         } catch (DAOException ex) {
-            logger.error(ex);
             throw new BusinessException(ex);
         }
     }
@@ -1150,15 +1139,13 @@ public class ConfigurationBusiness {
                     .getUserDAO(connection)
                     .resetPassword(email, MD5.get(password));
             } else {
+                logger.error("Wrong reset code for {} : {}", email, code);
                 throw new BusinessException("Wrong reset code.");
             }
+        } catch (NoSuchAlgorithmException | UnsupportedEncodingException ex) {
+            logger.error("Error resetting password for {}", email, ex);
+            throw new BusinessException(ex);
         } catch (DAOException ex) {
-            throw new BusinessException(ex);
-        } catch (NoSuchAlgorithmException ex) {
-            logger.error(ex);
-            throw new BusinessException(ex);
-        } catch (UnsupportedEncodingException ex) {
-            logger.error(ex);
             throw new BusinessException(ex);
         }
     }
@@ -1313,7 +1300,6 @@ public class ConfigurationBusiness {
             return CoreDAOFactory.getDAOFactory().getPublicationDAO(connection)
                 .getList();
         } catch (DAOException ex) {
-            logger.error(ex);
             throw new BusinessException(ex);
         }
     }
@@ -1324,7 +1310,6 @@ public class ConfigurationBusiness {
             CoreDAOFactory.getDAOFactory().getPublicationDAO(connection)
                 .remove(id);
         } catch (DAOException ex) {
-            logger.error(ex);
             throw new BusinessException(ex);
         }
     }
@@ -1335,7 +1320,6 @@ public class ConfigurationBusiness {
             CoreDAOFactory.getDAOFactory().getPublicationDAO(connection)
                 .add(pub);
         } catch (DAOException ex) {
-            logger.error(ex);
             throw new BusinessException(ex);
         }
     }
@@ -1346,7 +1330,6 @@ public class ConfigurationBusiness {
             CoreDAOFactory.getDAOFactory().getPublicationDAO(connection)
                 .update(pub);
         } catch (DAOException ex) {
-            logger.error(ex);
             throw new BusinessException(ex);
         }
     }
@@ -1358,7 +1341,6 @@ public class ConfigurationBusiness {
             CoreDAOFactory.getDAOFactory().getPublicationDAO(connection)
                 .updateOwnerEmail(oldOwnerEmail, newOwnerEmail);
         } catch (DAOException ex) {
-            logger.error(ex);
             throw new BusinessException(ex);
         }
     }
@@ -1369,7 +1351,6 @@ public class ConfigurationBusiness {
             return CoreDAOFactory.getDAOFactory().getPublicationDAO(connection)
                 .getPublication(id);
         } catch (DAOException ex) {
-            logger.error(ex);
             throw new BusinessException(ex);
         }
     }
@@ -1381,7 +1362,6 @@ public class ConfigurationBusiness {
             CoreDAOFactory.getDAOFactory().getTermsUseDAO(connection)
                 .add(termsOfUse);
         } catch (DAOException ex) {
-            logger.error(ex);
             throw new BusinessException(ex);
         }
     }
@@ -1392,7 +1372,6 @@ public class ConfigurationBusiness {
             return CoreDAOFactory.getDAOFactory().getTermsUseDAO(connection)
                 .getLastUpdateTermsOfUse();
         } catch (DAOException ex) {
-            logger.error(ex);
             throw new BusinessException(ex);
         }
     }
@@ -1413,7 +1392,6 @@ public class ConfigurationBusiness {
                 return ts.before(getCurrentTimeStamp());
             }
         } catch (DAOException ex) {
-            logger.error(ex);
             throw new BusinessException(ex);
         }
     }
@@ -1427,7 +1405,6 @@ public class ConfigurationBusiness {
                 .getUserDAO(connection);
             return userDAO.getUserApikey(email);
         } catch (DAOException e) {
-            logger.error("Error getting apikey for " + email);
             throw new BusinessException(e);
         }
     }
@@ -1439,7 +1416,6 @@ public class ConfigurationBusiness {
                 .getUserDAO(connection);
             userDAO.updateUserApikey(email, null);
         } catch (DAOException e) {
-            logger.error("Error deleting apikey for " + email);
             throw new BusinessException(e);
         }
     }
@@ -1454,7 +1430,6 @@ public class ConfigurationBusiness {
             userDAO.updateUserApikey(email, apikey);
             return apikey;
         } catch (DAOException e) {
-            logger.error("Error generating apikey for " + email);
             throw new BusinessException(e);
         }
     }
@@ -1487,8 +1462,10 @@ public class ConfigurationBusiness {
                 CoreUtil.sendEmail("[VIP Admin] VIP error", emailContent.toString(),
                         new String[]{email}, true, userEmail);
             }
-        } catch (BusinessException | DAOException e) {
-            logger.error("Cannot sent mail to admin", e);
+        } catch (BusinessException e) {
+            logger.error("Cannot sent mail to admin. Ignoring", e);
+        } catch (DAOException e) {
+            logger.error("Cannot sent mail to admin : {}. Ignoring", e.getMessage());
         }
     }
 

@@ -38,7 +38,8 @@ import java.util.HashMap;
 import java.util.List;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**ip
  *
@@ -49,7 +50,7 @@ public class Server {
     // Configuration File
     PropertiesConfiguration config;
     // Constants
-    private static final Logger logger = Logger.getLogger(Server.class);
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     private static Server instance;
     private final String CONF_FILE = "vip.conf";
     private final String VIP_DIR = "/.vip/";

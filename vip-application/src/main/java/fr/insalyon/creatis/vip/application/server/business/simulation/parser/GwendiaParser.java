@@ -33,7 +33,8 @@ package fr.insalyon.creatis.vip.application.server.business.simulation.parser;
 
 import fr.insalyon.creatis.vip.application.client.bean.Source;
 import fr.insalyon.creatis.vip.application.server.business.SimulationBusiness;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
@@ -46,7 +47,7 @@ public class GwendiaParser extends AbstractWorkflowParser {
     private Source currentSource = null;
     private String text = null;
     
-    private static final Logger logger = Logger.getLogger(GwendiaParser.class);
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     
     public GwendiaParser() {
         super();

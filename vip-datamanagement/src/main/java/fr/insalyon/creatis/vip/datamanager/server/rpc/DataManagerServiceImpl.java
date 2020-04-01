@@ -55,7 +55,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -63,7 +64,7 @@ import org.apache.log4j.Logger;
  */
 public class DataManagerServiceImpl extends AbstractRemoteServiceServlet implements DataManagerService {
 
-    private static final Logger logger = Logger.getLogger(DataManagerServiceImpl.class);
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     private final DataManagerBusiness dataManagerBusiness;
     private final LFCBusiness lfcBusiness;
     private final TransferPoolBusiness transferPoolBusiness;
@@ -103,7 +104,10 @@ public class DataManagerServiceImpl extends AbstractRemoteServiceServlet impleme
                 }
             }
             return data;
-        } catch (BusinessException | CoreException | SQLException ex) {
+        } catch (BusinessException | CoreException ex) {
+            throw new DataManagerException(ex);
+        } catch (SQLException ex) {
+            logger.error("Error handling a connection", ex);
             throw new DataManagerException(ex);
         }
     }
@@ -114,7 +118,10 @@ public class DataManagerServiceImpl extends AbstractRemoteServiceServlet impleme
             trace(logger, "Deleting: " + path);
             User user = getSessionUser();
             transferPoolBusiness.delete(user, connection, path);
-        } catch (CoreException | BusinessException | SQLException ex) {
+        } catch (BusinessException | CoreException ex) {
+            throw new DataManagerException(ex);
+        } catch (SQLException ex) {
+            logger.error("Error handling a connection", ex);
             throw new DataManagerException(ex);
         }
     }
@@ -126,7 +133,10 @@ public class DataManagerServiceImpl extends AbstractRemoteServiceServlet impleme
             User user = getSessionUser();
             transferPoolBusiness.delete(
                 user, connection, paths.toArray(new String[]{}));
-        } catch (CoreException | BusinessException | SQLException ex) {
+        } catch (BusinessException | CoreException ex) {
+            throw new DataManagerException(ex);
+        } catch (SQLException ex) {
+            logger.error("Error handling a connection", ex);
             throw new DataManagerException(ex);
         }
     }
@@ -136,7 +146,10 @@ public class DataManagerServiceImpl extends AbstractRemoteServiceServlet impleme
         try(Connection connection = PlatformConnection.getInstance().getConnection()) {
             trace(logger, "Creating folder: " + baseDir + "/" + name);
             lfcBusiness.createDir(getSessionUser(), baseDir, name, connection);
-        } catch (CoreException | BusinessException | SQLException ex) {
+        } catch (BusinessException | CoreException ex) {
+            throw new DataManagerException(ex);
+        } catch (SQLException ex) {
+            logger.error("Error handling a connection", ex);
             throw new DataManagerException(ex);
         }
     }
@@ -148,7 +161,10 @@ public class DataManagerServiceImpl extends AbstractRemoteServiceServlet impleme
             trace(logger, "Renaming '" + oldPath + "' to '" + newPath + "'");
             lfcBusiness.rename(
                 getSessionUser(), oldPath, newPath, extendPath, connection);
-        } catch (CoreException | BusinessException | SQLException ex) {
+        } catch (BusinessException | CoreException ex) {
+            throw new DataManagerException(ex);
+        } catch (SQLException ex) {
+            logger.error("Error handling a connection", ex);
             throw new DataManagerException(ex);
         }
     }
@@ -160,7 +176,10 @@ public class DataManagerServiceImpl extends AbstractRemoteServiceServlet impleme
             lfcBusiness.rename(
                 getSessionUser(), baseDir, paths,
                 newBaseDir, extendPath, connection);
-        } catch (CoreException | BusinessException | SQLException ex) {
+        } catch (BusinessException | CoreException ex) {
+            throw new DataManagerException(ex);
+        } catch (SQLException ex) {
+            logger.error("Error handling a connection", ex);
             throw new DataManagerException(ex);
         }
     }
@@ -171,9 +190,7 @@ public class DataManagerServiceImpl extends AbstractRemoteServiceServlet impleme
             authenticateSystemAdministrator(logger);
             return dataManagerBusiness.getCachedFiles();
 
-        } catch (CoreException ex) {
-            throw new DataManagerException(ex);
-        } catch (BusinessException ex) {
+        } catch (CoreException | BusinessException ex) {
             throw new DataManagerException(ex);
         }
     }
@@ -190,9 +207,7 @@ public class DataManagerServiceImpl extends AbstractRemoteServiceServlet impleme
             trace(logger, "Removing chached files: " + cachedFiles);
             dataManagerBusiness.deleteCachedFiles(cachedFiles);
 
-        } catch (CoreException ex) {
-            throw new DataManagerException(ex);
-        } catch (BusinessException ex) {
+        } catch (CoreException | BusinessException ex) {
             throw new DataManagerException(ex);
         }
     }
@@ -203,7 +218,10 @@ public class DataManagerServiceImpl extends AbstractRemoteServiceServlet impleme
             User user = getSessionUser();
             return transferPoolBusiness.getOperations(
                 user.getEmail(), new Date(), user.getFolder(), connection);
-        } catch (CoreException | BusinessException | SQLException ex) {
+        } catch (BusinessException | CoreException ex) {
+            throw new DataManagerException(ex);
+        } catch (SQLException ex) {
+            logger.error("Error handling a connection", ex);
             throw new DataManagerException(ex);
         }
     }
@@ -214,7 +232,10 @@ public class DataManagerServiceImpl extends AbstractRemoteServiceServlet impleme
             User user = getSessionUser();
             return transferPoolBusiness.getOperations(
                 user.getEmail(), startDate, user.getFolder(), connection);
-        } catch (CoreException | BusinessException | SQLException ex) {
+        } catch (BusinessException | CoreException ex) {
+            throw new DataManagerException(ex);
+        } catch (SQLException ex) {
+            logger.error("Error handling a connection", ex);
             throw new DataManagerException(ex);
         }
     }
@@ -225,7 +246,10 @@ public class DataManagerServiceImpl extends AbstractRemoteServiceServlet impleme
             authenticateSystemAdministrator(logger);
             return transferPoolBusiness.getOperations(
                 getSessionUser().getFolder(), connection);
-        } catch (CoreException | BusinessException | SQLException ex) {
+        } catch (BusinessException | CoreException ex) {
+            throw new DataManagerException(ex);
+        } catch (SQLException ex) {
+            logger.error("Error handling a connection", ex);
             throw new DataManagerException(ex);
         }
     }
@@ -235,7 +259,10 @@ public class DataManagerServiceImpl extends AbstractRemoteServiceServlet impleme
         try(Connection connection = PlatformConnection.getInstance().getConnection()) {
             return transferPoolBusiness.getOperationById(
                 operationId, getSessionUser().getFolder(), connection);
-        } catch (CoreException | BusinessException | SQLException ex) {
+        } catch (BusinessException | CoreException ex) {
+            throw new DataManagerException(ex);
+        } catch (SQLException ex) {
+            logger.error("Error handling a connection", ex);
             throw new DataManagerException(ex);
         }
     }
@@ -246,9 +273,7 @@ public class DataManagerServiceImpl extends AbstractRemoteServiceServlet impleme
             trace(logger, "Removing operations: " + ids);
             transferPoolBusiness.removeOperations(ids);
 
-        } catch (CoreException ex) {
-            throw new DataManagerException(ex);
-        } catch (BusinessException ex) {
+        } catch (CoreException | BusinessException ex) {
             throw new DataManagerException(ex);
         }
     }
@@ -259,9 +284,7 @@ public class DataManagerServiceImpl extends AbstractRemoteServiceServlet impleme
             trace(logger, "Removing all operations.");
             transferPoolBusiness.removeUserOperations(getSessionUser().getEmail());
 
-        } catch (CoreException ex) {
-            throw new DataManagerException(ex);
-        } catch (BusinessException ex) {
+        } catch (CoreException | BusinessException ex) {
             throw new DataManagerException(ex);
         }
     }
@@ -272,9 +295,7 @@ public class DataManagerServiceImpl extends AbstractRemoteServiceServlet impleme
             trace(logger, "Removing operation: " + id);
             transferPoolBusiness.removeOperationById(id);
 
-        } catch (CoreException ex) {
-            throw new DataManagerException(ex);
-        } catch (BusinessException ex) {
+        } catch (CoreException | BusinessException ex) {
             throw new DataManagerException(ex);
         }
     }
@@ -286,7 +307,10 @@ public class DataManagerServiceImpl extends AbstractRemoteServiceServlet impleme
             User user = getSessionUser();
             return transferPoolBusiness.downloadFile(
                 user, remoteFile, connection);
-        } catch (CoreException | BusinessException | SQLException ex) {
+        } catch (BusinessException | CoreException ex) {
+            throw new DataManagerException(ex);
+        } catch (SQLException ex) {
+            logger.error("Error handling a connection", ex);
             throw new DataManagerException(ex);
         }
     }
@@ -298,7 +322,10 @@ public class DataManagerServiceImpl extends AbstractRemoteServiceServlet impleme
             trace(logger, "Adding files to transfer queue: " + remoteFiles);
             User user = getSessionUser();
             return transferPoolBusiness.downloadFiles(user, remoteFiles, packName, connection);
-        } catch (CoreException | BusinessException | SQLException ex) {
+        } catch (BusinessException | CoreException ex) {
+            throw new DataManagerException(ex);
+        } catch (SQLException ex) {
+            logger.error("Error handling a connection", ex);
             throw new DataManagerException(ex);
         }
     }
@@ -310,7 +337,10 @@ public class DataManagerServiceImpl extends AbstractRemoteServiceServlet impleme
             User user = getSessionUser();
             return transferPoolBusiness.downloadFolder(
                 user, remoteFolder, connection);
-        } catch (CoreException | BusinessException | SQLException ex) {
+        } catch (BusinessException | CoreException ex) {
+            throw new DataManagerException(ex);
+        } catch (SQLException ex) {
+            logger.error("Error handling a connection", ex);
             throw new DataManagerException(ex);
         }
     }
@@ -340,7 +370,10 @@ public class DataManagerServiceImpl extends AbstractRemoteServiceServlet impleme
             User user = getSessionUser();
             transferPoolBusiness.uploadFile(
                 user, localFilePath, remoteFile, connection);
-        } catch (CoreException | BusinessException | SQLException ex) {
+        } catch (BusinessException | CoreException ex) {
+            throw new DataManagerException(ex);
+        } catch (SQLException ex) {
+            logger.error("Error handling a connection", ex);
             throw new DataManagerException(ex);
         }
     }
@@ -351,7 +384,10 @@ public class DataManagerServiceImpl extends AbstractRemoteServiceServlet impleme
             trace(logger, "Test if file '" + remoteFile + " exists");
             User user = getSessionUser();
             return lfcBusiness.exists(user, remoteFile, connection);
-        } catch (CoreException | BusinessException | SQLException ex) {
+        } catch (BusinessException | CoreException ex) {
+            throw new DataManagerException(ex);
+        } catch (SQLException ex) {
+            logger.error("Error handling a connection", ex);
             throw new DataManagerException(ex);
         }
 
@@ -382,9 +418,7 @@ public class DataManagerServiceImpl extends AbstractRemoteServiceServlet impleme
             trace(logger, "Removing zombie files: " + surls);
             dataManagerBusiness.deleteZombieFiles(surls);
 
-        } catch (CoreException ex) {
-            throw new DataManagerException(ex);
-        } catch (BusinessException ex) {
+        } catch (CoreException | BusinessException ex) {
             throw new DataManagerException(ex);
         }
     }
@@ -395,7 +429,10 @@ public class DataManagerServiceImpl extends AbstractRemoteServiceServlet impleme
             trace(logger, "Getting ssh connections");
 
             return dataManagerBusiness.getSSHConnections(connection);
-        } catch (BusinessException | CoreException | SQLException ex) {
+        } catch (BusinessException | CoreException ex) {
+            throw new DataManagerException(ex);
+        } catch (SQLException ex) {
+            logger.error("Error handling a connection", ex);
             throw new DataManagerException(ex);
         }
     }
@@ -405,7 +442,10 @@ public class DataManagerServiceImpl extends AbstractRemoteServiceServlet impleme
         try(Connection connection = PlatformConnection.getInstance().getConnection()) {
             trace(logger, "Adding ssh connection " + ssh.getEmail() + " ; " + ssh.getHost());
             dataManagerBusiness.addSSH(ssh, connection);
-        } catch (BusinessException | CoreException | SQLException ex) {
+        } catch (BusinessException | CoreException ex) {
+            throw new DataManagerException(ex);
+        } catch (SQLException ex) {
+            logger.error("Error handling a connection", ex);
             throw new DataManagerException(ex);
         }
     }
@@ -415,7 +455,10 @@ public class DataManagerServiceImpl extends AbstractRemoteServiceServlet impleme
         try(Connection connection = PlatformConnection.getInstance().getConnection()) {
             trace(logger, "Updating ssh connection " + ssh.getEmail() + " ; " + ssh.getHost());
             dataManagerBusiness.updateSSH(ssh, connection);
-        } catch (BusinessException | CoreException | SQLException ex) {
+        } catch (BusinessException | CoreException ex) {
+            throw new DataManagerException(ex);
+        } catch (SQLException ex) {
+            logger.error("Error handling a connection", ex);
             throw new DataManagerException(ex);
         }
     }
@@ -425,7 +468,10 @@ public class DataManagerServiceImpl extends AbstractRemoteServiceServlet impleme
         try(Connection connection = PlatformConnection.getInstance().getConnection()) {
             trace(logger, "Removing ssh connection " + email + " ; " + name);
             dataManagerBusiness.removeSSH(email, name, connection);
-        } catch (BusinessException | CoreException | SQLException ex) {
+        } catch (BusinessException | CoreException ex) {
+            throw new DataManagerException(ex);
+        } catch (SQLException ex) {
+            logger.error("Error handling a connection", ex);
             throw new DataManagerException(ex);
         }
     }
@@ -437,7 +483,10 @@ public class DataManagerServiceImpl extends AbstractRemoteServiceServlet impleme
                 trace(logger, "Removing ssh connection " + sshC.get(0) + " ; " + sshC.get(1));
             }
             dataManagerBusiness.resetSSHs(sshConnections, connection);
-        } catch (BusinessException | CoreException | SQLException ex) {
+        } catch (BusinessException | CoreException ex) {
+            throw new DataManagerException(ex);
+        } catch (SQLException ex) {
+            logger.error("Error handling a connection", ex);
             throw new DataManagerException(ex);
         }
     }

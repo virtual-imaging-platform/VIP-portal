@@ -44,7 +44,8 @@ import java.util.*;
 import javax.net.ssl.*;
 import javax.security.auth.login.FailedLoginException;
 import javax.security.auth.x500.X500Principal;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.bouncycastle.asn1.ASN1InputStream;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.DEROutputStream;
@@ -63,7 +64,7 @@ import org.bouncycastle.pkcs.jcajce.JcaPKCS10CertificationRequestBuilder;
  */
 public class ProxyClient {
 
-    private final static Logger logger = Logger.getLogger(ProxyClient.class);
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     private SSLSocket socket;
     private BufferedInputStream socketIn;
     private BufferedOutputStream socketOut;
@@ -126,13 +127,12 @@ public class ProxyClient {
             return new Proxy(proxyFileName, endDate);
 
         } catch (Exception ex) {
-            logger.error(ex);
+            logger.error("Error getting proxy : {}", ex.getMessage());
             if (this.socket != null) {
                 try {
                     disconnect();
                 } catch (IOException ioe) {
-                    logger.error(ioe);
-                    throw new BusinessException("Error disconecting proxy client", ioe);
+                    logger.error("Error disconnecting proxy", ioe);
                 }
             }
             throw new BusinessException("Error getting a proxy", ex);
@@ -216,17 +216,21 @@ public class ProxyClient {
 
         String line = readLine(this.socketIn);
         if (line == null) {
+            logger.error("Error logging on MyProxy : nothing received");
             throw new EOFException();
         }
         if (!line.equals(VERSION)) {
+            logger.error("Error logging on MyProxy : bad protocol {}", line);
             throw new ProtocolException("bad MyProxy protocol VERSION string: " + line);
         }
         line = readLine(this.socketIn);
         if (line == null) {
+            logger.error("Error logging on MyProxy : no response");
             throw new EOFException();
         }
         if (!line.startsWith(RESPONSE)
                 || line.length() != RESPONSE.length() + 1) {
+            logger.error("Error logging on MyProxy : bad RESPONSE {}", line);
             throw new ProtocolException(
                     "bad MyProxy protocol RESPONSE string: " + line);
         }
@@ -239,10 +243,13 @@ public class ProxyClient {
                     errString.append(line.substring(ERROR.length()));
                 }
             }
+            logger.error("Error logging on MyProxy : error {}", errString);
             throw new FailedLoginException(errString.toString());
         } else if (response == '2') {
+            logger.error("Error logging on MyProxy : RESPONSE {} not implemented", response);
             throw new ProtocolException("MyProxy authorization RESPONSE not implemented");
         } else if (response != '0') {
+            logger.error("Error logging on MyProxy : RESPONSE {} Unknown", response);
             throw new ProtocolException("Unknown MyProxy protocol RESPONSE string: " + line);
         }
         while ((line = readLine(this.socketIn)) != null) {
@@ -269,8 +276,10 @@ public class ProxyClient {
 
         int numCertificates = this.socketIn.read();
         if (numCertificates == -1) {
+            logger.error("Error getting credentials for MyProxy : connection aborted");
             throw new Exception("connection aborted");
         } else if (numCertificates == 0 || numCertificates < 0) {
+            logger.error("bad number of certificates sent by server: {}", numCertificates);
             throw new Exception("bad number of certificates sent by server: " + numCertificates);
         }
 
@@ -396,13 +405,14 @@ public class ProxyClient {
                     certData[i] = new String(buffer);
                     fileStream.close();
                 } catch (Exception e) {
-                    // ignore
+                    logger.error("Error certificate from {}", certFilenames[i]);
                 }
             }
             try {
                 issuers = getX509CertsFromStringList(certData);
             } catch (Exception e) {
-                // ignore
+                logger.error("Error getting X509 certificates from {} : {}",
+                        Arrays.toString(certData), e.getMessage());
             }
             return issuers;
         }
@@ -410,6 +420,7 @@ public class ProxyClient {
         @Override
         public void checkClientTrusted(X509Certificate[] certs, String authType)
                 throws CertificateException {
+            logger.error("checkClientTrusted not implemented by edu.uiuc.ncsa.MyProxy.MyProxyLogon.MyTrustManager");
             throw new CertificateException(
                     "checkClientTrusted not implemented by edu.uiuc.ncsa.MyProxy.MyProxyLogon.MyTrustManager");
         }
@@ -431,6 +442,7 @@ public class ProxyClient {
                 if (acceptedIssuers == null) {
                     String certDir = getExistingTrustRootPath();
                     if (certDir != null) {
+                        logger.error("no CA certificates found in {}", certDir);
                         throw new CertificateException(
                                 "no CA certificates found in " + certDir);
                     }
@@ -446,9 +458,8 @@ public class ProxyClient {
                 PKIXParameters pkixParameters = new PKIXParameters(trustAnchors);
                 pkixParameters.setRevocationEnabled(false);
                 validator.validate(certPath, pkixParameters);
-            } catch (CertificateException e) {
-                throw e;
             } catch (GeneralSecurityException e) {
+                logger.error("Error in checkServerCertPath", e);
                 throw new CertificateException(e);
             }
         }
@@ -458,6 +469,8 @@ public class ProxyClient {
             String subject = cert.getSubjectX500Principal().getName();
             int index = subject.indexOf("CN=");
             if (index == -1) {
+                logger.error("MyProxy : certificate subject {} does not contain a CN component",
+                        subject);
                 throw new CertificateException("Server certificate subject ("
                         + subject + "does not contain a CN component.");
             }
@@ -470,6 +483,8 @@ public class ProxyClient {
                 String service = CN.substring(0, index);
                 CN = CN.substring(index + 1);
                 if (!service.equals("host") && !service.equals("myproxy")) {
+                    logger.error("MyProxy : certificate subject {} contains unknown service element",
+                            subject);
                     throw new CertificateException(
                             "Server certificate subject CN contains unknown service element: "
                             + subject);
@@ -480,10 +495,12 @@ public class ProxyClient {
                 try {
                     myHostname = InetAddress.getLocalHost().getHostName();
                 } catch (Exception e) {
-                    // ignore
+                    logger.error("Error getting local hostname");
                 }
             }
             if (!CN.equals(myHostname)) {
+                logger.error("MyProxy : certificate CN {} does not match server hostname {}",
+                        CN, Server.getInstance().getMyProxyHost());
                 throw new CertificateException(
                         "Server certificate subject CN (" + CN
                         + ") does not match server hostname ("
@@ -568,18 +585,20 @@ public class ProxyClient {
             in.transferTo(0, in.size(), out);
 
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Error copying file from {} to {}", source, dest, e);
         } finally {
             if (in != null) {
                 try {
                     in.close();
                 } catch (IOException e) {
+                    logger.error("Error closing FileInputStream for file copy", e);
                 }
             }
             if (out != null) {
                 try {
                     out.close();
                 } catch (IOException e) {
+                    logger.error("Error closing FileInputStream for file copy", e);
                 }
             }
         }

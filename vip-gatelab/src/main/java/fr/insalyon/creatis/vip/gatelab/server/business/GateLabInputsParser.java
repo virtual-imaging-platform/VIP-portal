@@ -35,6 +35,9 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -47,6 +50,8 @@ import org.xml.sax.helpers.XMLReaderFactory;
  * @author Ibrahim Kallel, Rafael Silva
  */
 public class GateLabInputsParser extends DefaultHandler {
+
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private XMLReader reader;
     private Map<String, String> inputsMap;
@@ -65,10 +70,8 @@ public class GateLabInputsParser extends DefaultHandler {
 
             return inputsMap;
 
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        } catch (SAXException ex) {
-            ex.printStackTrace();
+        } catch (IOException | SAXException ex) {
+            logger.error("Error parsing {}", fileName, ex);
         }
         return null;
     }

@@ -35,6 +35,7 @@ import fr.insalyon.creatis.moteur.plugins.workflowsdb.bean.Stats;
 import fr.insalyon.creatis.moteur.plugins.workflowsdb.bean.Workflow;
 import fr.insalyon.creatis.moteur.plugins.workflowsdb.dao.WorkflowsDBDAOException;
 import fr.insalyon.creatis.vip.application.server.dao.SimulationStatsDAO;
+import fr.insalyon.creatis.vip.application.server.dao.h2.SimulationData;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -47,12 +48,16 @@ import org.hibernate.criterion.Order;
 import org.hibernate.criterion.ProjectionList;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.criterion.Projections;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
  * @author Rafael Ferreira da Silva
  */
 public class SimulationStatsData implements SimulationStatsDAO {
+
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private SessionFactory sessionFactory;
 
@@ -161,6 +166,7 @@ public class SimulationStatsData implements SimulationStatsDAO {
                     result.add("failedStalledJobs InputTime##" + String.valueOf(ob[28]) + "");
                     result.add("failedStalledJobs OutputTime##" + String.valueOf(ob[29]) + "");
                 }else{
+                    logger.error("getBySimulationID: Not enough data : {}", ob.length);
                     throw new DAOException("getBySimulationID: Not enough data");
                 }
 
@@ -168,6 +174,7 @@ public class SimulationStatsData implements SimulationStatsDAO {
 
             return result;
         } catch (HibernateException ex) {
+            logger.error("Error getting stats for {}", simulationID, ex);
             throw new DAOException(ex);
 
         }
@@ -206,6 +213,7 @@ public class SimulationStatsData implements SimulationStatsDAO {
 
             return result;
         } catch (HibernateException ex) {
+            logger.error("Error getting workflows for {}", workflowsId, ex);
             throw new WorkflowsDBDAOException(ex);
         }
     }
@@ -241,6 +249,7 @@ public class SimulationStatsData implements SimulationStatsDAO {
             }
             return result;
         } catch (HibernateException ex) {
+            logger.error("Error getting applications for {}", workflowsId, ex);
             throw new WorkflowsDBDAOException(ex);
         }
         //System.out.println("getApplications, first result is " + result.get(0).toString());
@@ -260,6 +269,7 @@ public class SimulationStatsData implements SimulationStatsDAO {
             session.close();
             return result;
         } catch (HibernateException ex) {
+            logger.error("Error getting classes for {}", workflowsId, ex);
             throw new WorkflowsDBDAOException(ex);
         }
 

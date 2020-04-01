@@ -35,13 +35,14 @@ import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import fr.insalyon.creatis.vip.datamanager.client.bean.UserApiKey;
 import fr.insalyon.creatis.vip.datamanager.server.dao.*;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
 import java.util.List;
 
 public class ApiKeyBusiness {
-    private final static Logger logger = Logger.getLogger(ApiKeyBusiness.class);
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     public List<UserApiKey> apiKeysFor(String userEmail, Connection connection)
         throws BusinessException {

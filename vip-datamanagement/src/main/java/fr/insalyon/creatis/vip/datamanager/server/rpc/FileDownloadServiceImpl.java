@@ -31,24 +31,24 @@
  */
 package fr.insalyon.creatis.vip.datamanager.server.rpc;
 
-import fr.insalyon.creatis.grida.client.GRIDAClientException;
 import fr.insalyon.creatis.grida.client.GRIDAPoolClient;
 import fr.insalyon.creatis.grida.common.bean.Operation;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.server.business.CoreUtil;
-import java.io.DataInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
+import org.apache.commons.io.FilenameUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import org.apache.commons.io.FilenameUtils;
-import org.apache.log4j.Logger;
+import java.io.DataInputStream;
+import java.io.File;
+import java.io.FileInputStream;
 
 /**
  *
@@ -56,51 +56,53 @@ import org.apache.log4j.Logger;
  */
 public class FileDownloadServiceImpl extends HttpServlet {
 
-    private static Logger logger = Logger.getLogger(FileDownloadServiceImpl.class);
-    
+    private final Logger logger = LoggerFactory.getLogger(getClass());
+
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-            throws ServletException, IOException {
+            throws ServletException {
 
-        User user = (User) req.getSession().getAttribute(CoreConstants.SESSION_USER);
-        String operationId = req.getParameter("operationid");
+        try {
+            User user = (User) req.getSession().getAttribute(CoreConstants.SESSION_USER);
+            String operationId = req.getParameter("operationid");
 
-        if (user != null && operationId != null && !operationId.isEmpty()) {
+            if (user != null && operationId != null && !operationId.isEmpty()) {
 
-            try {
-                GRIDAPoolClient client = CoreUtil.getGRIDAPoolClient();
-                Operation operation = client.getOperationById(operationId);
+                    GRIDAPoolClient client = CoreUtil.getGRIDAPoolClient();
+                    Operation operation = client.getOperationById(operationId);
 
-                File file = new File(operation.getDest());
-                if (file.isDirectory()) {
-                    file = new File(operation.getDest() + "/" 
-                            + FilenameUtils.getName(operation.getSource()));
-                }
-                int length = 0;
-                ServletOutputStream op = resp.getOutputStream();
-                ServletContext context = getServletConfig().getServletContext();
-                String mimetype = context.getMimeType(file.getName());
-                
-                logger.info("(" + user.getEmail() + ") Downloading '" + file.getAbsolutePath() + "'.");
+                    File file = new File(operation.getDest());
+                    if (file.isDirectory()) {
+                        file = new File(operation.getDest() + "/"
+                                + FilenameUtils.getName(operation.getSource()));
+                    }
+                    int length = 0;
+                    ServletOutputStream op = resp.getOutputStream();
+                    ServletContext context = getServletConfig().getServletContext();
+                    String mimetype = context.getMimeType(file.getName());
 
-                resp.setContentType((mimetype != null) ? mimetype : "application/octet-stream");
-                resp.setContentLength((int) file.length());
-                resp.setHeader("Content-Disposition", "attachment; filename=\""
-                        + file.getName() + "\"");
+                    logger.info("(" + user.getEmail() + ") Downloading '" + file.getAbsolutePath() + "'.");
 
-                byte[] bbuf = new byte[4096];
-                DataInputStream in = new DataInputStream(new FileInputStream(file));
+                    resp.setContentType((mimetype != null) ? mimetype : "application/octet-stream");
+                    resp.setContentLength((int) file.length());
+                    resp.setHeader("Content-Disposition", "attachment; filename=\""
+                            + file.getName() + "\"");
 
-                while ((in != null) && ((length = in.read(bbuf)) != -1)) {
-                    op.write(bbuf, 0, length);
-                }
+                    byte[] bbuf = new byte[4096];
+                    DataInputStream in = new DataInputStream(new FileInputStream(file));
 
-                in.close();
-                op.flush();
-                op.close();
-            } catch (GRIDAClientException ex) {
-                logger.error("Error downloading a file", ex);
+                    while ((in != null) && ((length = in.read(bbuf)) != -1)) {
+                        op.write(bbuf, 0, length);
+                    }
+
+                    in.close();
+                    op.flush();
+                    op.close();
+
             }
+        } catch (Exception ex) {
+            logger.error("Error downloading a file", ex);
+            throw new ServletException(ex);
         }
     }
 }

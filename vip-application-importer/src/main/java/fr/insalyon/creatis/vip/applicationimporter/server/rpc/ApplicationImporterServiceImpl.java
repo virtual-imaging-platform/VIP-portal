@@ -42,11 +42,13 @@ import fr.insalyon.creatis.vip.core.server.dao.mysql.PlatformConnection;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.HashMap;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ApplicationImporterServiceImpl extends fr.insalyon.creatis.vip.core.server.rpc.AbstractRemoteServiceServlet
         implements ApplicationImporterService {
 
-    private final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(ApplicationImporterServiceImpl.class);
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Override
     public String readAndValidateBoutiquesFile(String fileLFN) throws ApplicationImporterException {
@@ -55,8 +57,10 @@ public class ApplicationImporterServiceImpl extends fr.insalyon.creatis.vip.core
             ApplicationImporterBusiness abi = new ApplicationImporterBusiness();
             return abi.readAndValidationBoutiquesFile(
                 fileLFN, getSessionUser(), connection);
-        } catch (CoreException | BusinessException | SQLException ex) {
-            logger.error(ex);
+        } catch (CoreException | BusinessException ex) {
+            throw new ApplicationImporterException(ex);
+        } catch (SQLException ex) {
+            logger.error("Error handling a connection", ex);
             throw new ApplicationImporterException(ex);
         }
     }
@@ -67,8 +71,10 @@ public class ApplicationImporterServiceImpl extends fr.insalyon.creatis.vip.core
             trace(logger, "Creating application");
             ApplicationImporterBusiness abi = new ApplicationImporterBusiness();
             abi.createApplication(bt, type, tag, bts, isRunOnGrid, overwriteVersion, getSessionUser(), challenge, connection);
-        } catch (BusinessException | CoreException | SQLException ex) {
-            logger.error(ex);
+        } catch (CoreException | BusinessException ex) {
+            throw new ApplicationImporterException(ex);
+        } catch (SQLException ex) {
+            logger.error("Error handling a connection", ex);
             throw new ApplicationImporterException(ex);
         }
     }

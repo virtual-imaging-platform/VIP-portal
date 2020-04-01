@@ -35,7 +35,8 @@ import fr.insalyon.creatis.vip.api.business.*;
 import fr.insalyon.creatis.vip.api.exception.SQLRuntimeException;
 import fr.insalyon.creatis.vip.api.rest.RestApiBusiness;
 import fr.insalyon.creatis.vip.api.rest.model.*;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.*;
@@ -56,7 +57,7 @@ import java.util.function.Supplier;
 @RequestMapping("path")
 public class DataController {
 
-    public static final Logger logger = Logger.getLogger(DataController.class);
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Autowired
     private RestApiBusiness restApiBusiness;
@@ -80,7 +81,10 @@ public class DataController {
         try(Connection connection = connectionSupplier.get()) {
             // business call
             return dataApiBusiness.getPathProperties(completePath, connection);
-        } catch (SQLException | SQLRuntimeException ex) {
+        } catch (SQLException ex) {
+            logger.error("Error handling a connection", ex);
+            throw new ApiException(ex);
+        } catch (SQLRuntimeException ex) {
             throw new ApiException(ex);
         }
     }
@@ -94,7 +98,10 @@ public class DataController {
             // business call
             return new ExistsApiResponse(
                 dataApiBusiness.doesFileExist(completePath, connection));
-        } catch (SQLException | SQLRuntimeException ex) {
+        } catch (SQLException ex) {
+            logger.error("Error handling a connection", ex);
+            throw new ApiException(ex);
+        } catch (SQLRuntimeException ex) {
             throw new ApiException(ex);
         }
     }
@@ -107,7 +114,10 @@ public class DataController {
         try(Connection connection = connectionSupplier.get()) {
             // business call
             return dataApiBusiness.listDirectory(completePath, connection);
-        } catch (SQLException | SQLRuntimeException ex) {
+        } catch (SQLException ex) {
+            logger.error("Error handling a connection", ex);
+            throw new ApiException(ex);
+        } catch (SQLRuntimeException ex) {
             throw new ApiException(ex);
         }
     }
@@ -119,6 +129,7 @@ public class DataController {
         restApiBusiness.getApiContext(httpServletRequest, true);
         // business call
         // TODO implement that
+        logger.error("Unsupported getFileMD5 call");
         throw new ApiException("Not implemented");
     }
 
@@ -135,7 +146,10 @@ public class DataController {
             // TODO improve mime-type
             headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
             return new ResponseEntity<>(res, headers, HttpStatus.OK);
-        } catch (SQLException | SQLRuntimeException ex) {
+        } catch (SQLException ex) {
+            logger.error("Error handling a connection", ex);
+            throw new ApiException(ex);
+        } catch (SQLRuntimeException ex) {
             throw new ApiException(ex);
         }
     }
@@ -149,7 +163,10 @@ public class DataController {
         try(Connection connection = connectionSupplier.get()) {
             // business call
             dataApiBusiness.deletePath(completePath, connection);
-        } catch (SQLException | SQLRuntimeException ex) {
+        } catch (SQLException ex) {
+            logger.error("Error handling a connection", ex);
+            throw new ApiException(ex);
+        } catch (SQLRuntimeException ex) {
             throw new ApiException(ex);
         }
     }
@@ -174,7 +191,10 @@ public class DataController {
             // business call
             dataApiBusiness.uploadRawFileFromInputStream(
                 completePath, requestInputStream, connection);
-        } catch (SQLException | SQLRuntimeException ex) {
+        } catch (SQLException ex) {
+            logger.error("Error handling a connection", ex);
+            throw new ApiException(ex);
+        } catch (SQLRuntimeException ex) {
             throw new ApiException(ex);
         }
         // TODO : think about returning the PahtProperties of the created Path, to be informed of a filename change
@@ -190,7 +210,10 @@ public class DataController {
             // business call
             dataApiBusiness.uploadCustomData(
                 completePath, uploadData, connection);
-        } catch (SQLException | SQLRuntimeException ex) {
+        } catch (SQLException ex) {
+            logger.error("Error handling a connection", ex);
+            throw new ApiException(ex);
+        } catch (SQLRuntimeException ex) {
             throw new ApiException(ex);
         }
     }

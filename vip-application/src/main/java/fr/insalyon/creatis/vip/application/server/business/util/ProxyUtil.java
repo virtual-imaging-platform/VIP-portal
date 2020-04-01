@@ -36,7 +36,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -44,7 +45,7 @@ import org.apache.log4j.Logger;
  */
 public class ProxyUtil {
 
-    private static Logger logger = Logger.getLogger(ProxyUtil.class);
+    private static final Logger logger = LoggerFactory.getLogger(ProxyUtil.class);
     public static final String CHARSET_UTF8 = "UTF-8";
 
     public static String readAsString(String proxyFileName) {
@@ -65,7 +66,7 @@ public class ProxyUtil {
             return new String(data, CHARSET_UTF8);
 
         } catch (IOException ex) {
-            logger.error("Error reading proxy file" + proxyFileName, ex);
+            logger.error("Error reading proxy file {}", proxyFileName, ex);
         }
         return null;
     }

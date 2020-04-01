@@ -52,7 +52,8 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -60,7 +61,7 @@ import org.apache.log4j.Logger;
  */
 public abstract class AbstractAuthenticationService extends HttpServlet {
 
-    private static Logger logger = Logger.getLogger(AbstractAuthenticationService.class);
+    private static final Logger logger = LoggerFactory.getLogger(AbstractAuthenticationService.class);
 
     protected abstract void checkValidRequest(HttpServletRequest request) throws BusinessException;
 
@@ -73,8 +74,10 @@ public abstract class AbstractAuthenticationService extends HttpServlet {
             throws ServletException, IOException {
         try(Connection connection = PlatformConnection.getInstance().getConnection()) {
             processRequest(request, response, connection);
-        } catch (BusinessException | SQLException ex) {
-            logger.error("Error handling a request", ex);
+        } catch (BusinessException ex) {
+            logger.error("Error handling a request : {}. Ignoring", ex.getMessage());
+        } catch (SQLException ex) {
+            logger.error("Error handling a connection. Ignoring", ex);
         }
     }
 
@@ -83,8 +86,10 @@ public abstract class AbstractAuthenticationService extends HttpServlet {
             throws ServletException, IOException {
         try(Connection connection = PlatformConnection.getInstance().getConnection()) {
             processRequest(request, response, connection);
-        } catch (BusinessException | SQLException ex) {
-            logger.error("Error handling a request", ex);
+        } catch (BusinessException ex) {
+            logger.error("Error handling a request : {}. Ignoring", ex.getMessage());
+        } catch (SQLException ex) {
+            logger.error("Error handling a connection. Ignoring", ex);
         }
     }
 
@@ -123,8 +128,7 @@ public abstract class AbstractAuthenticationService extends HttpServlet {
             userDAO.resetNFailedAuthentications(email);
             logger.debug("Reset auth count for " + email);
         } catch (DAOException e) {
-            logger.error("Error resetting failed auth counter for :" + email, e);
-            logger.error("ignoring it");
+            logger.error("Error resetting failed auth counter for {}. Ignoring it", email, e);
         }
     }
 
@@ -170,6 +174,7 @@ public abstract class AbstractAuthenticationService extends HttpServlet {
             out.println(message);
             out.flush();
         } catch (IOException ex) {
+            logger.error("Error writing auth response " + message, ex);
             throw new BusinessException(ex);
         } finally {
             out.close();
@@ -196,6 +201,7 @@ public abstract class AbstractAuthenticationService extends HttpServlet {
             sessionCookie.setPath("/");
             response.addCookie(sessionCookie);
         } catch (UnsupportedEncodingException ex) {
+            logger.error("Error setting VIP session for {} ",user, ex);
             throw new BusinessException(ex);
         }
     }

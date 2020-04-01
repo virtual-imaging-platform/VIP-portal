@@ -41,7 +41,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -49,7 +50,7 @@ import org.apache.log4j.Logger;
  */
 public class ClassData implements ClassDAO {
 
-    private final static Logger logger = Logger.getLogger(ClassData.class);
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     private Connection connection;
 
     public ClassData(Connection connection) throws DAOException {
@@ -74,9 +75,10 @@ public class ClassData implements ClassDAO {
 
         } catch (SQLException ex) {
             if (ex.getMessage().contains("Duplicate entry")) {
+                logger.error("A class named \"{}\" already exists.", appClass.getName());
                 throw new DAOException("A class named \"" + appClass.getName() + "\" already exists.");
             } else {
-                logger.error(ex);
+                logger.error("Error adding class {}", appClass.getName(), ex);
                 throw new DAOException(ex);
             }
         }
@@ -118,7 +120,7 @@ public class ClassData implements ClassDAO {
             ps.close();
 
         } catch (SQLException ex) {
-            logger.error(ex);
+            logger.error("Error removing class {}", className, ex);
             throw new DAOException(ex);
         }
     }
@@ -170,7 +172,7 @@ public class ClassData implements ClassDAO {
             return classes;
 
         } catch (SQLException ex) {
-            logger.error(ex);
+            logger.error("Error getting all classes", ex);
             throw new DAOException(ex);
         }
     }
@@ -223,7 +225,7 @@ public class ClassData implements ClassDAO {
             return null;
 
         } catch (SQLException ex) {
-            logger.error(ex);
+              logger.error("Error getting class {}", className, ex);
             throw new DAOException(ex);
         }
     }
@@ -272,6 +274,7 @@ public class ClassData implements ClassDAO {
             return classes;
 
         } catch (SQLException ex) {
+            logger.error("Error getting classes for {} (validAdmin : {})", email, validAdmin, ex);
             throw new DAOException(ex);
         }
     }
@@ -300,6 +303,8 @@ public class ClassData implements ClassDAO {
                         + "VALUES(?, ?)");
                         break;
                     default:
+                        logger.error("Error adding something to class {} : invalid objectType {}",
+                                className, objectType);
                         throw new IllegalArgumentException("Invalid objectType: " + objectType);
                 }
                 ps.setString(1, className);
@@ -312,7 +317,7 @@ public class ClassData implements ClassDAO {
                     logger.error("a "+objectType+" named \"" + name + "\" is already associated with the class.");
                     throw new DAOException("a "+objectType+" named \"" + name + "\" is already associated with the class.", ex);
                 } else {
-                    logger.error(ex);
+                    logger.error("Error adding {} {} to class {}", objectType, objectList, className, ex);
                     throw new DAOException(ex);
                 }
             }
@@ -339,6 +344,8 @@ public class ClassData implements ClassDAO {
                     + "VIPClassesEngines WHERE class=?");
                     break;
                 default:
+                    logger.error("Error removing something from class {} : invalid objectType {}",
+                            className, objectType);
                     throw new IllegalArgumentException("Invalid objectType: " + objectType);
             }
 
@@ -347,7 +354,7 @@ public class ClassData implements ClassDAO {
             ps.close();
 
         } catch (SQLException ex) {
-            logger.error(ex);
+            logger.error("Error removing {} from class {}", objectType, className, ex);
             throw new DAOException(ex);
         }
     }

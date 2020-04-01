@@ -72,7 +72,8 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import org.apache.commons.configuration.ConfigurationException;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.jbibtex.ParseException;
 import org.jbibtex.TokenMgrException;
 
@@ -82,7 +83,7 @@ import org.jbibtex.TokenMgrException;
  */
 public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet implements ConfigurationService {
 
-    private static Logger logger = Logger.getLogger(ConfigurationServiceImpl.class);
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     public ConfigurationServiceImpl() {
         super();
@@ -114,7 +115,10 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
                 return user;
             }
             return null;
-        } catch (BusinessException | SQLException ex) {
+        } catch (BusinessException ex) {
+            throw new CoreException(ex);
+        } catch (SQLException ex) {
+            logger.error("Error handling a connection", ex);
             throw new CoreException(ex);
         }
     }
@@ -133,7 +137,10 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
             logger.info("Sign up request from '" + user.getEmail() + "'.");
             configurationBusiness.signup(
                 user, comments, connection, accountType);
-        } catch (BusinessException | SQLException ex) {
+        } catch (BusinessException ex) {
+            throw new CoreException(ex);
+        } catch (SQLException ex) {
+            logger.error("Error handling a connection", ex);
             throw new CoreException(ex);
         }
     }
@@ -156,7 +163,10 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
             logger.info("Connected.");
 
             return user;
-        } catch (BusinessException | SQLException ex) {
+        } catch (BusinessException ex) {
+            throw new CoreException(ex);
+        } catch (SQLException ex) {
+            logger.error("Error handling a connection", ex);
             throw new CoreException(ex);
         }
     }
@@ -173,7 +183,10 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
             trace(logger, "Signed out.");
             getSession().removeAttribute(CoreConstants.SESSION_USER);
             getSession().removeAttribute(CoreConstants.SESSION_GROUPS);
-        } catch (BusinessException | SQLException ex) {
+        } catch (BusinessException ex) {
+            throw new CoreException(ex);
+        } catch (SQLException ex) {
+            logger.error("Error handling a connection", ex);
             throw new CoreException(ex);
         }
     }
@@ -193,7 +206,10 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
                 .activate(user.getEmail(), code, connection);
 
             return setUserSession(user);
-        } catch (BusinessException | SQLException ex) {
+        } catch (BusinessException ex) {
+            throw new CoreException(ex);
+        } catch (SQLException ex) {
+            logger.error("Error handling a connection", ex);
             throw new CoreException(ex);
         }
     }
@@ -212,7 +228,10 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
                 .sendActivationCode(user.getEmail(), connection);
 
             return user.getEmail();
-        } catch (BusinessException | SQLException ex) {
+        } catch (BusinessException ex) {
+            throw new CoreException(ex);
+        } catch (SQLException ex) {
+            logger.error("Error handling a connection", ex);
             throw new CoreException(ex);
         }
     }
@@ -227,7 +246,10 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
         try(Connection connection = PlatformConnection.getInstance().getConnection()) {
             //do not add a trace here: it should be reachable without authentication (#2632)
             configurationBusiness.sendResetCode(email, connection);
-        } catch (BusinessException | SQLException ex) {
+        } catch (BusinessException ex) {
+            throw new CoreException(ex);
+        } catch (SQLException ex) {
+            logger.error("Error handling a connection", ex);
             throw new CoreException(ex);
         }
     }
@@ -241,7 +263,10 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
         try(Connection connection = PlatformConnection.getInstance().getConnection()) {
             authenticateSystemAdministrator(logger);
             return configurationBusiness.getUsers(connection);
-        } catch (BusinessException | SQLException ex) {
+        } catch (BusinessException ex) {
+            throw new CoreException(ex);
+        } catch (SQLException ex) {
+            logger.error("Error handling a connection", ex);
             throw new CoreException(ex);
         }
     }
@@ -257,7 +282,10 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
             authenticateSystemAdministrator(logger);
             trace(logger, "Adding group '" + group + "'.");
             configurationBusiness.addGroup(group, connection);
-        } catch (BusinessException | SQLException ex) {
+        } catch (BusinessException ex) {
+            throw new CoreException(ex);
+        } catch (SQLException ex) {
+            logger.error("Error handling a connection", ex);
             throw new CoreException(ex);
         }
     }
@@ -274,7 +302,10 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
             authenticateSystemAdministrator(logger);
             trace(logger, "Updating group '" + name + "' to '" + group.getName() + "'.");
             configurationBusiness.updateGroup(name, group, connection);
-        } catch (BusinessException | SQLException ex) {
+        } catch (BusinessException ex) {
+            throw new CoreException(ex);
+        } catch (SQLException ex) {
+            logger.error("Error handling a connection", ex);
             throw new CoreException(ex);
         }
     }
@@ -291,7 +322,10 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
             trace(logger, "Removing group '" + groupName + "'.");
             configurationBusiness.removeGroup(
                 getSessionUser().getEmail(), groupName, connection);
-        } catch (BusinessException | SQLException ex) {
+        } catch (BusinessException ex) {
+            throw new CoreException(ex);
+        } catch (SQLException ex) {
+            logger.error("Error handling a connection", ex);
             throw new CoreException(ex);
         }
     }
@@ -305,7 +339,10 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
         try(Connection connection = PlatformConnection.getInstance().getConnection()) {
             authenticateSystemAdministrator(logger);
             return configurationBusiness.getGroups(connection);
-        } catch (BusinessException | SQLException ex) {
+        } catch (BusinessException ex) {
+            throw new CoreException(ex);
+        } catch (SQLException ex) {
+            logger.error("Error handling a connection", ex);
             throw new CoreException(ex);
         }
     }
@@ -318,7 +355,10 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
     public List<Group> getPublicGroups() throws CoreException {
         try(Connection connection = PlatformConnection.getInstance().getConnection()) {
             return configurationBusiness.getPublicGroups(connection);
-        } catch (BusinessException | SQLException ex) {
+        } catch (BusinessException ex) {
+            throw new CoreException(ex);
+        } catch (SQLException ex) {
+            logger.error("Error handling a connection", ex);
             throw new CoreException(ex);
         }
     }
@@ -342,7 +382,10 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
             configurationBusiness.removeUser(user.getEmail(), true, connection);
 
             return user;
-        } catch (BusinessException | SQLException ex) {
+        } catch (BusinessException ex) {
+            throw new CoreException(ex);
+        } catch (SQLException ex) {
+            logger.error("Error handling a connection", ex);
             throw new CoreException(ex);
         }
     }
@@ -364,7 +407,10 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
                 return configurationBusiness.getUserGroups(
                     getSessionUser().getEmail(), connection);
             }
-        } catch (BusinessException | SQLException ex) {
+        } catch (BusinessException ex) {
+            throw new CoreException(ex);
+        } catch (SQLException ex) {
+            logger.error("Error handling a connection", ex);
             throw new CoreException(ex);
         }
     }
@@ -380,7 +426,7 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
         try{
             authenticateSystemAdministrator(logger);
             return;
-        } catch(CoreException ex){ } // The user is not a system administrator. Ignore the exception.
+        } catch(CoreException ignored){ } // The user is not a system administrator. Ignore the exception.
 
         User user = getSessionUser();
         Map<Group, GROUP_ROLE> userGroups = getUserGroups(null);
@@ -391,7 +437,7 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
             }
         }
 
-        logger.error("The user has no admin rights for group " + groupName + ": " + user.getEmail());
+        logger.error("The user {} has no admin rights for group {}", user.getEmail(), groupName);
         throw new CoreException("The user has no group administrator rights.");
     }
 
@@ -401,7 +447,10 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
             String email = getSessionUser().getEmail();
             return configurationBusiness.getUserPropertiesGroups(
                 email, connection);
-        } catch (BusinessException | SQLException ex) {
+        } catch (BusinessException ex) {
+            throw new CoreException(ex);
+        } catch (SQLException ex) {
+            logger.error("Error handling a connection", ex);
             throw new CoreException(ex);
         }
     }
@@ -427,7 +476,10 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
                 }
             }
             return list;
-        } catch (BusinessException | SQLException ex) {
+        } catch (BusinessException ex) {
+            throw new CoreException(ex);
+        } catch (SQLException ex) {
+            logger.error("Error handling a connection", ex);
             throw new CoreException(ex);
         }
     }
@@ -457,7 +509,10 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
                 locked,
                 connection);
             configurationBusiness.setUserGroups(email, groups, connection);
-        } catch (BusinessException | SQLException ex) {
+        } catch (BusinessException ex) {
+            throw new CoreException(ex);
+        } catch (SQLException ex) {
+            logger.error("Error handling a connection", ex);
             throw new CoreException(ex);
         }
     }
@@ -471,7 +526,10 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
         try(Connection connection = PlatformConnection.getInstance().getConnection()) {
             return configurationBusiness
                 .getUserData(getSessionUser().getEmail(), connection);
-        } catch (BusinessException | SQLException ex) {
+        } catch (BusinessException ex) {
+            throw new CoreException(ex);
+        } catch (SQLException ex) {
+            logger.error("Error handling a connection", ex);
             throw new CoreException(ex);
         }
     }
@@ -487,7 +545,10 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
             trace(logger, "Updating user data '" + user.getEmail() + "'.");
             user = configurationBusiness.updateUser(user, connection);
             return setUserSession(user);
-        } catch (BusinessException | SQLException ex) {
+        } catch (BusinessException ex) {
+            throw new CoreException(ex);
+        } catch (SQLException ex) {
+            logger.error("Error handling a connection", ex);
             throw new CoreException(ex);
         }
     }
@@ -507,7 +568,10 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
                 currentPassword,
                 newPassword,
                 connection);
-        } catch (BusinessException | SQLException ex) {
+        } catch (BusinessException ex) {
+            throw new CoreException(ex);
+        } catch (SQLException ex) {
+            logger.error("Error handling a connection", ex);
             throw new CoreException(ex);
         }
     }
@@ -524,7 +588,10 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
             currentUser = configurationBusiness
                 .getUserData(currentUser.getEmail(), connection);
             return setUserSession(currentUser);
-        } catch (BusinessException | SQLException ex) {
+        } catch (BusinessException ex) {
+            throw new CoreException(ex);
+        } catch (SQLException ex) {
+            logger.error("Error handling a connection", ex);
             throw new CoreException(ex);
         }
     }
@@ -536,7 +603,8 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
             String newEmail = currentUser.getNextEmail();
             trace(logger, "Confirming email change from " + currentEmail + " to " + newEmail);
             if (code == null || !code.equals(currentUser.getCode())) {
-                trace(logger, "Wrong validation code for " + currentEmail);
+                logger.error("Wrong validation code for {} : {} vs {}",
+                        currentEmail, code, currentUser.getCode());
                 throw new CoreException("Wrong validation code");
             }
             configurationBusiness.updateUserEmail(
@@ -546,8 +614,11 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
             currentUser = configurationBusiness
                 .getUserData(newEmail, connection);
             return setUserSession(currentUser);
-        } catch (BusinessException | SQLException ex) {
-            throw new CoreException("Error changing email address. Please contact VIP support.", ex);
+        } catch (BusinessException ex) {
+            throw new CoreException(ex);
+        } catch (SQLException ex) {
+            logger.error("Error handling a connection", ex);
+            throw new CoreException(ex);
         }
     }
 
@@ -562,7 +633,10 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
             currentUser = configurationBusiness
                 .getUserData(currentEmail, connection);
             return setUserSession(currentUser);
-        } catch (BusinessException | SQLException ex) {
+        } catch (BusinessException ex) {
+            throw new CoreException(ex);
+        } catch (SQLException ex) {
+            logger.error("Error handling a connection", ex);
             throw new CoreException(ex);
         }
     }
@@ -574,7 +648,10 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
             authenticateSystemAdministrator(logger);
             configurationBusiness.updateUserEmail(
                 currentEmail, newEmail, connection);
-        } catch (BusinessException | SQLException ex) {
+        } catch (BusinessException ex) {
+            throw new CoreException(ex);
+        } catch (SQLException ex) {
+            logger.error("Error handling a connection", ex);
             throw new CoreException(ex);
         }
     }
@@ -592,7 +669,10 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
             configurationBusiness.sendContactMail(
                 getSessionUser(), category, subject, comment, connection);
 
-        } catch (BusinessException | SQLException ex) {
+        } catch (BusinessException ex) {
+            throw new CoreException(ex);
+        } catch (SQLException ex) {
+            logger.error("Error handling a connection", ex);
             throw new CoreException(ex);
         }
     }
@@ -618,6 +698,7 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
 
             return user;
         } catch (SQLException ex) {
+            logger.error("Error handling a connection", ex);
             throw new BusinessException(ex);
         }
     }
@@ -632,7 +713,10 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
             authenticateSystemAdministrator(logger);
             trace(logger, "Activating user: " + email);
             configurationBusiness.activateUser(email, connection);
-        } catch (BusinessException | SQLException ex) {
+        } catch (BusinessException ex) {
+            throw new CoreException(ex);
+        } catch (SQLException ex) {
+            logger.error("Error handling a connection", ex);
             throw new CoreException(ex);
         }
     }
@@ -648,7 +732,10 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
             trace(logger, "Adding user to group '" + groupName + "'.");
             configurationBusiness.addUserToGroup(
                 getSessionUser().getEmail(), groupName, connection);
-        } catch (BusinessException | SQLException ex) {
+        } catch (BusinessException ex) {
+            throw new CoreException(ex);
+        } catch (SQLException ex) {
+            logger.error("Error handling a connection", ex);
             throw new CoreException(ex);
         }
     }
@@ -664,7 +751,10 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
             authenticateGroupAdministrator(logger, groupName);
             return configurationBusiness.getUsersFromGroup(
                 groupName, connection);
-        } catch (BusinessException | SQLException ex) {
+        } catch (BusinessException ex) {
+            throw new CoreException(ex);
+        } catch (SQLException ex) {
+            logger.error("Error handling a connection", ex);
             throw new CoreException(ex);
         }
     }
@@ -689,7 +779,10 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
                 configurationBusiness.removeUserFromGroup(
                     getSessionUser().getEmail(), groupName, connection);
             }
-        } catch (BusinessException | SQLException ex) {
+        } catch (BusinessException ex) {
+            throw new CoreException(ex);
+        } catch (SQLException ex) {
+            logger.error("Error handling a connection", ex);
             throw new CoreException(ex);
         }
     }
@@ -708,7 +801,10 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
             logger.info("(" + email + ") Reseting password.");
             configurationBusiness.resetPassword(
                 email, code, password, connection);
-        } catch (BusinessException | SQLException ex) {
+        } catch (BusinessException ex) {
+            throw new CoreException(ex);
+        } catch (SQLException ex) {
+            logger.error("Error handling a connection", ex);
             throw new CoreException(ex);
         }
     }
@@ -722,7 +818,10 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
     public List<Account> getAccounts() throws CoreException {
         try(Connection connection = PlatformConnection.getInstance().getConnection()) {
             return configurationBusiness.getAccounts(connection);
-        } catch (BusinessException | SQLException ex) {
+        } catch (BusinessException ex) {
+            throw new CoreException(ex);
+        } catch (SQLException ex) {
+            logger.error("Error handling a connection", ex);
             throw new CoreException(ex);
         }
     }
@@ -738,7 +837,10 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
             authenticateSystemAdministrator(logger);
             trace(logger, "Removing account type '" + name + "'.");
             configurationBusiness.removeAccount(name, connection);
-        } catch (BusinessException | SQLException ex) {
+        } catch (BusinessException ex) {
+            throw new CoreException(ex);
+        } catch (SQLException ex) {
+            logger.error("Error handling a connection", ex);
             throw new CoreException(ex);
         }
     }
@@ -749,7 +851,10 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
             authenticateSystemAdministrator(logger);
             trace(logger, "Adding account type '" + name + "'.");
             configurationBusiness.addAccount(name, groups, connection);
-        } catch (BusinessException | SQLException ex) {
+        } catch (BusinessException ex) {
+            throw new CoreException(ex);
+        } catch (SQLException ex) {
+            logger.error("Error handling a connection", ex);
             throw new CoreException(ex);
         }
     }
@@ -762,7 +867,10 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
             trace(logger, "Updating account type from '" + oldName + "' to '" + newName + "'.");
             configurationBusiness.updateAccount(
                 oldName, newName, groups, connection);
-        } catch (BusinessException | SQLException ex) {
+        } catch (BusinessException ex) {
+            throw new CoreException(ex);
+        } catch (SQLException ex) {
+            logger.error("Error handling a connection", ex);
             throw new CoreException(ex);
         }
     }
@@ -802,8 +910,11 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
             Integer countries = CoreDAOFactory.getDAOFactory()
                 .getUserDAO(connection).getNCountries();
             return new UsageStats(users, countries);
-        } catch (DAOException | SQLException ex) {
+        } catch (SQLException ex) {
+            logger.error("Error handling a connection", ex);
             throw new CoreException(ex);
+        } catch (DAOException e) {
+            throw new CoreException(e);
         }
 
     }
@@ -828,11 +939,15 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
                         dir + "/Dropbox",
                         wai.requestTokenPair.key,
                         wai.requestTokenPair.secret);
-            } catch (DAOException | GRIDAClientException | SQLException ex) {
+            } catch (DAOException ex) {
+                throw new CoreException(ex);
+            } catch (GRIDAClientException | SQLException ex) {
+                logger.error("Error linking dropbox account for {}", user.getEmail(), ex);
                 throw new CoreException(ex);
             }
             return wai.url;
         } catch (DropboxException ex) {
+            logger.error("Error linking dropbox account for {}", user.getEmail(), ex);
             throw new CoreException(ex);
         }
     }
@@ -845,8 +960,11 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
             CoreDAOFactory.getDAOFactory()
                 .getUserDAO(connection)
                 .activateDropboxAccount(user.getEmail(), oauth_token);
-        } catch (DAOException | SQLException ex) {
+        } catch (SQLException ex) {
+            logger.error("Error handling a connection", ex);
             throw new CoreException(ex);
+        } catch (DAOException e) {
+            throw new CoreException(e);
         }
     }
 
@@ -858,8 +976,11 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
             return CoreDAOFactory.getDAOFactory()
                 .getUserDAO(connection)
                 .getDropboxAccountStatus(user.getEmail());
-        } catch (DAOException | SQLException ex) {
+        } catch (SQLException ex) {
+            logger.error("Error handling a connection", ex);
             throw new CoreException(ex);
+        } catch (DAOException e) {
+            throw new CoreException(e);
         }
     }
 
@@ -870,8 +991,11 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
         try(Connection connection = PlatformConnection.getInstance().getConnection()) {
             CoreDAOFactory.getDAOFactory()
                 .getUserDAO(connection).unlinkDropboxAccount(user.getEmail());
-        } catch (DAOException | SQLException ex) {
+        } catch (SQLException ex) {
+            logger.error("Error handling a connection", ex);
             throw new CoreException(ex);
+        } catch (DAOException e) {
+            throw new CoreException(e);
         }
     }
 
@@ -881,7 +1005,10 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
         User user = getSessionUser();
         try(Connection connection = PlatformConnection.getInstance().getConnection()) {
             configurationBusiness.updateTermsOfUse(user.getEmail(), connection);
-        } catch (BusinessException | SQLException ex) {
+        } catch (BusinessException ex) {
+            throw new CoreException(ex);
+        } catch (SQLException ex) {
+            logger.error("Error handling a connection", ex);
             throw new CoreException(ex);
         }
     }
@@ -891,8 +1018,10 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
         trace(logger, "Getting publication list.");
         try(Connection connection = PlatformConnection.getInstance().getConnection()) {
             return configurationBusiness.getPublications(connection);
-        } catch (BusinessException | SQLException ex) {
-            logger.error(ex);
+        } catch (BusinessException ex) {
+            throw new CoreException(ex);
+        } catch (SQLException ex) {
+            logger.error("Error handling a connection", ex);
             throw new CoreException(ex);
         }
     }
@@ -909,9 +1038,14 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
                   .getVipAuthor().equals(user.getEmail())) {
                 configurationBusiness.removePublication(id, connection);
             } else {
+                logger.error("{} cannot remove publication {} because it's not his",
+                        user, id);
                 throw new CoreException("you can't remove a publication that is not yours");
             }
-        } catch (BusinessException | SQLException ex) {
+        } catch (BusinessException ex) {
+            throw new CoreException(ex);
+        } catch (SQLException ex) {
+            logger.error("Error handling a connection", ex);
             throw new CoreException(ex);
         }
     }
@@ -924,7 +1058,10 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
             User user = getSessionUser();
             pub.setVipAuthor(user.getEmail());
             configurationBusiness.addPublication(pub, connection);
-        } catch (BusinessException | SQLException ex) {
+        } catch (BusinessException ex) {
+            throw new CoreException(ex);
+        } catch (SQLException ex) {
+            logger.error("Error handling a connection", ex);
             throw new CoreException(ex);
         }
     }
@@ -942,9 +1079,14 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
                 pub.setVipAuthor(user.getEmail());
                 configurationBusiness.updatePublication(pub, connection);
             } else {
+                logger.error("{} cannot modify publication {} because its not his",
+                        user.getEmail(), pub.getId());
                 throw new CoreException("you can't modify a publication that is not yours");
             }
-        } catch (BusinessException | SQLException ex) {
+        } catch (BusinessException ex) {
+            throw new CoreException(ex);
+        } catch (SQLException ex) {
+            logger.error("Error handling a connection", ex);
             throw new CoreException(ex);
         }
     }
@@ -955,7 +1097,10 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
         try(Connection connection = PlatformConnection.getInstance().getConnection()) {
             authenticateSystemAdministrator(logger);
             configurationBusiness.addTermsUse(connection);
-        } catch (BusinessException | SQLException ex) {
+        } catch (BusinessException ex) {
+            throw new CoreException(ex);
+        } catch (SQLException ex) {
+            logger.error("Error handling a connection", ex);
             throw new CoreException(ex);
         }
     }
@@ -965,7 +1110,10 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
         try(Connection connection =
             PlatformConnection.getInstance().getConnection()) {
             return configurationBusiness.getLastUpdateTermsOfUse(connection);
-        } catch (BusinessException | SQLException ex) {
+        } catch (BusinessException ex) {
+            throw new CoreException(ex);
+        } catch (SQLException ex) {
+            logger.error("Error handling a connection", ex);
             throw new CoreException(ex);
         }
     }
@@ -985,7 +1133,8 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
         try {
             Server.getInstance().setMaxPlatformRunningSimulations(maxPlatformRunningSimulations);
         } catch (ConfigurationException ex) {
-            logger.error(ex);
+            logger.error("Configuration error changing maxPlatformRunningSimulations to {}",
+                    maxPlatformRunningSimulations, ex);
             throw new CoreException(ex);
         }
     }
@@ -1016,11 +1165,8 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
 
             }
 
-        } catch (ParseException ex) {
-            logger.error(ex);
-            throw new CoreException(ex);
-        } catch (TokenMgrException ex) {
-            logger.error(ex);
+        } catch (ParseException | TokenMgrException ex) {
+            logger.error("Error parsing publication {}", s, ex);
             throw new CoreException(ex);
         }
         return publications;
@@ -1055,7 +1201,10 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
         try(Connection connection = PlatformConnection.getInstance().getConnection()) {
             return configurationBusiness.testLastUpdatePublication(
                 getSessionUser().getEmail(), connection);
-        } catch (BusinessException | SQLException ex) {
+        } catch (BusinessException ex) {
+            throw new CoreException(ex);
+        } catch (SQLException ex) {
+            logger.error("Error handling a connection", ex);
             throw new CoreException(ex);
         }
     }
@@ -1067,7 +1216,10 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
         try(Connection connection = PlatformConnection.getInstance().getConnection()) {
             configurationBusiness
                 .updateLastUpdatePublication(user.getEmail(), connection);
-        } catch (BusinessException | SQLException ex) {
+        } catch (BusinessException ex) {
+            throw new CoreException(ex);
+        } catch (SQLException ex) {
+            logger.error("Error handling a connection", ex);
             throw new CoreException(ex);
         }
     }
@@ -1080,8 +1232,10 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
         try(Connection connection = PlatformConnection.getInstance().getConnection()) {
             return configurationBusiness
                 .getUserApikey(getSessionUser().getEmail(), connection);
-        } catch (BusinessException | SQLException ex) {
-            logger.error("Error getting apikey for " + email, ex);
+        } catch (BusinessException ex) {
+            throw new CoreException(ex);
+        } catch (SQLException ex) {
+            logger.error("Error handling a connection", ex);
             throw new CoreException(ex);
         }
     }
@@ -1091,8 +1245,10 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
         try(Connection connection = PlatformConnection.getInstance().getConnection()) {
             configurationBusiness
                 .deleteUserApikey(getSessionUser().getEmail(), connection);
-        } catch (BusinessException | SQLException ex) {
-            logger.error("Error deleting apikey for " + email, ex);
+        } catch (BusinessException ex) {
+            throw new CoreException(ex);
+        } catch (SQLException ex) {
+            logger.error("Error handling a connection", ex);
             throw new CoreException(ex);
         }
     }
@@ -1102,8 +1258,10 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
         try(Connection connection = PlatformConnection.getInstance().getConnection()) {
             return configurationBusiness
                 .generateNewUserApikey(getSessionUser().getEmail(), connection);
-        } catch (BusinessException | SQLException ex) {
-            logger.error("Error generating apikey for " + email, ex);
+        } catch (BusinessException ex) {
+            throw new CoreException(ex);
+        } catch (SQLException ex) {
+            logger.error("Error handling a connection", ex);
             throw new CoreException(ex);
         }
     }

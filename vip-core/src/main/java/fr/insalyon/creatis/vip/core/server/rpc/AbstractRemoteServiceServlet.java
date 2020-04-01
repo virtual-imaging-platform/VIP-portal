@@ -38,11 +38,16 @@ import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants.GROUP_ROLE;
 import fr.insalyon.creatis.vip.core.client.view.CoreException;
 import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
-import org.apache.log4j.Logger;
 
+import javax.servlet.ServletConfig;
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import java.util.Arrays;
+import java.util.Enumeration;
 import java.util.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -50,11 +55,27 @@ import java.util.Map;
  */
 public abstract class AbstractRemoteServiceServlet extends RemoteServiceServlet {
 
+    private final Logger logger = LoggerFactory.getLogger(getClass());
+
     protected ConfigurationBusiness configurationBusiness;
 
     public AbstractRemoteServiceServlet() {
-
         configurationBusiness = new ConfigurationBusiness();
+    }
+
+    // see http://blog.excilys.com/2011/05/12/gwt-google-wont-throw/
+    @Override
+    protected void doUnexpectedFailure(Throwable e) {
+        try {
+            super.doUnexpectedFailure(e);
+        } finally {
+            // log the error (otherwise only logged in container log files)
+            logger.error("Unexpected exception caught in a GWT service impl ", e);
+            // do not silence Error because some should stop the JVM
+            if (e instanceof Error) {
+                throw (Error) e;
+            }
+        }
     }
 
     @Override
@@ -78,6 +99,8 @@ public abstract class AbstractRemoteServiceServlet extends RemoteServiceServlet 
         if (user != null) {
             return user;
         }
+        logger.error("No VIP user found in session {}. Attributes : {}",
+                getSession().getId(), enumerationToString(getSession().getAttributeNames()));
         throw new CoreException("User not logged in.");
     }
 
@@ -89,7 +112,17 @@ public abstract class AbstractRemoteServiceServlet extends RemoteServiceServlet 
         if (groups != null) {
             return groups;
         }
+        logger.error("No VIP groups found in session {}. Attributes : {}",
+                getSession().getId(), enumerationToString(getSession().getAttributeNames()));
         throw new CoreException("User has no groups defined.");
+    }
+
+    private String enumerationToString(Enumeration<String> enums) {
+        StringBuilder st = new StringBuilder();
+        while (enums.hasMoreElements()) {
+            st.append(enums.nextElement()).append(" ");
+        }
+        return st.toString();
     }
 
     protected void authenticateSystemAdministrator(Logger logger) throws CoreException {
@@ -119,13 +152,6 @@ public abstract class AbstractRemoteServiceServlet extends RemoteServiceServlet 
     }
 
     protected void trace(Logger logger, String message) throws CoreException {
-
-        try {
-            logger.info("(" + getSessionUser().getEmail() + ") " + message);
-
-        } catch (CoreException ex) {
-            logger.error(ex);
-            throw ex;
-        }
+        logger.info("(" + getSessionUser().getEmail() + ") " + message);
     }
 }

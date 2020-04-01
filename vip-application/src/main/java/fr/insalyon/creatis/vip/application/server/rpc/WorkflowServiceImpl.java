@@ -60,8 +60,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -69,7 +69,7 @@ import org.apache.log4j.Logger;
  */
 public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements WorkflowService {
 
-    private static final Logger logger = Logger.getLogger(WorkflowServiceImpl.class);
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     private WorkflowBusiness workflowBusiness;
     private InputBusiness inputBusiness;
 
@@ -94,9 +94,7 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
             } else {
                 return workflowBusiness.getSimulations(getSessionUser(), null);
             }
-        } catch (CoreException ex) {
-            throw new ApplicationException(ex);
-        } catch (BusinessException ex) {
+        } catch (CoreException | BusinessException ex) {
             throw new ApplicationException(ex);
         }
     }
@@ -117,9 +115,7 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
             } else {
                 return workflowBusiness.getSimulations(getSessionUser(), lastDate);
             }
-        } catch (CoreException ex) {
-            throw new ApplicationException(ex);
-        } catch (BusinessException ex) {
+        } catch (CoreException | BusinessException ex) {
             throw new ApplicationException(ex);
         }
     }
@@ -139,7 +135,10 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
                 applicationName,
                 applicationVersion,
                 connection);
-        } catch (BusinessException | CoreException | SQLException ex) {
+        } catch (BusinessException | CoreException ex) {
+            throw new ApplicationException(ex);
+        } catch (SQLException ex) {
+            logger.error("Error handling a connection", ex);
             throw new ApplicationException(ex);
         }
     }
@@ -175,7 +174,10 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
 
             trace(logger, "Simulation '" + simulationName + "' launched with ID '" + simulationID + "'.");
 
-        } catch (BusinessException | CoreException | SQLException ex) {
+        } catch (BusinessException | CoreException ex) {
+            throw new ApplicationException(ex);
+        } catch (SQLException ex) {
+            logger.error("Error handling a connection", ex);
             throw new ApplicationException(ex);
         }
     }
@@ -193,7 +195,10 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
         try(Connection connection = PlatformConnection.getInstance().getConnection()) {
             return inputBusiness.getInputByUserAndName(
                 getSessionUser().getEmail(), name, appName, connection);
-        } catch (BusinessException | CoreException | SQLException ex) {
+        } catch (BusinessException | CoreException ex) {
+            throw new ApplicationException(ex);
+        } catch (SQLException ex) {
+            logger.error("Error handling a connection", ex);
             throw new ApplicationException(ex);
         }
     }
@@ -208,7 +213,10 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
         try(Connection connection = PlatformConnection.getInstance().getConnection()) {
             inputBusiness.addSimulationInput(
                 getSessionUser().getEmail(), simulationInput, connection);
-        } catch (BusinessException | CoreException | SQLException ex) {
+        } catch (BusinessException | CoreException ex) {
+            throw new ApplicationException(ex);
+        } catch (SQLException ex) {
+            logger.error("Error handling a connection", ex);
             throw new ApplicationException(ex);
         }
     }
@@ -223,7 +231,10 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
         try(Connection connection = PlatformConnection.getInstance().getConnection()) {
             inputBusiness.updateSimulationInput(
                 getSessionUser().getEmail(), simulationInput, connection);
-        } catch (BusinessException | CoreException | SQLException ex) {
+        } catch (BusinessException | CoreException ex) {
+            throw new ApplicationException(ex);
+        } catch (SQLException ex) {
+            logger.error("Error handling a connection", ex);
             throw new ApplicationException(ex);
         }
     }
@@ -239,7 +250,6 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
             return inputBusiness.loadSimulationInput(fileName);
 
         } catch (BusinessException ex) {
-            logger.error(ex);
             throw new ApplicationException(ex);
         }
     }
@@ -256,7 +266,10 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
             inputBusiness.removeSimulationInput(
                 getSessionUser().getEmail(), inputName, applicationName,
                 connection);
-        } catch (BusinessException | CoreException | SQLException ex) {
+        } catch (BusinessException | CoreException ex) {
+            throw new ApplicationException(ex);
+        } catch (SQLException ex) {
+            logger.error("Error handling a connection", ex);
             throw new ApplicationException(ex);
         }
     }
@@ -273,7 +286,10 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
         try(Connection connection = PlatformConnection.getInstance().getConnection()) {
             inputBusiness.removeSimulationInputExample(
                 inputName, applicationName, connection);
-        } catch (BusinessException | SQLException ex) {
+        } catch (BusinessException ex) {
+            throw new ApplicationException(ex);
+        } catch (SQLException ex) {
+            logger.error("Error handling a connection", ex);
             throw new ApplicationException(ex);
         }
     }
@@ -287,7 +303,10 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
         try(Connection connection = PlatformConnection.getInstance().getConnection()) {
             return inputBusiness.getSimulationInputByUser(
                 getSessionUser().getEmail(), connection);
-        } catch (BusinessException | CoreException | SQLException ex) {
+        } catch (BusinessException | CoreException ex) {
+            throw new ApplicationException(ex);
+        } catch (SQLException ex) {
+            logger.error("Error handling a connection", ex);
             throw new ApplicationException(ex);
         }
     }
@@ -302,7 +321,10 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
         try(Connection connection = PlatformConnection.getInstance().getConnection()) {
             inputBusiness.saveSimulationInputAsExample(
                 simulationInput, connection);
-        } catch (BusinessException | SQLException ex) {
+        } catch (BusinessException ex) {
+            throw new ApplicationException(ex);
+        } catch (SQLException ex) {
+            logger.error("Error handling a connection", ex);
             throw new ApplicationException(ex);
         }
     }
@@ -319,7 +341,10 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
         try(Connection connection = PlatformConnection.getInstance().getConnection()) {
             return inputBusiness.getSimulationInputExamples(
                 applicationName, connection);
-        } catch (BusinessException | SQLException ex) {
+        } catch (BusinessException ex) {
+            throw new ApplicationException(ex);
+        } catch (SQLException ex) {
+            logger.error("Error handling a connection", ex);
             throw new ApplicationException(ex);
         }
     }
@@ -347,8 +372,7 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
                 }
             }
             if (sb.length() > 0) {
-                logger.error("Unable to kill the following "
-                        + "simulations: " + sb.toString());
+                logger.error("Unable to kill the following simulations: {}", sb.toString());
                 throw new ApplicationException("Unable to kill the following "
                         + "simulations: " + sb.toString());
             }
@@ -383,8 +407,7 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
             }
 
             if (sb.length() > 0) {
-                logger.error("Unable to clean the following "
-                        + "simulations: " + sb.toString());
+                logger.error("Unable to clean the following simulations: {}", sb.toString());
                 throw new ApplicationException("Unable to clean the following "
                         + "simulations: " + sb.toString());
             }
@@ -415,8 +438,7 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
             }
 
             if (sb.length() > 0) {
-                logger.error("Unable to purge the following "
-                        + "simulations: " + sb.toString());
+                logger.error("Unable to purge the following simulations: {}", sb.toString());
                 throw new ApplicationException("Unable to purge the following "
                         + "simulations: " + sb.toString());
             }
@@ -437,9 +459,7 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
             trace(logger, "Killing simulation '" + simulationID + "'.");
             workflowBusiness.kill(simulationID);
 
-        } catch (CoreException ex) {
-            throw new ApplicationException(ex);
-        } catch (BusinessException ex) {
+        } catch (CoreException | BusinessException ex) {
             throw new ApplicationException(ex);
         }
     }
@@ -455,9 +475,7 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
             trace(logger, "Cleaning simulation '" + simulationID + "'.");
             workflowBusiness.clean(simulationID, getSessionUser().getEmail());
 
-        } catch (CoreException ex) {
-            throw new ApplicationException(ex);
-        } catch (BusinessException ex) {
+        } catch (CoreException | BusinessException ex) {
             throw new ApplicationException(ex);
         }
     }
@@ -474,9 +492,7 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
             trace(logger, "Purging simulation '" + simulationID + "'.");
             workflowBusiness.purge(simulationID);
 
-        } catch (CoreException ex) {
-            throw new ApplicationException(ex);
-        } catch (BusinessException ex) {
+        } catch (CoreException | BusinessException ex) {
             throw new ApplicationException(ex);
         }
     }
@@ -493,7 +509,10 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
             trace(logger, "Relaunching simulation '" + simulationID + "'.");
             return workflowBusiness.relaunch(
                 simulationID, getSessionUser().getFolder(), connection);
-        } catch (CoreException | BusinessException | SQLException ex) {
+        } catch (BusinessException | CoreException ex) {
+            throw new ApplicationException(ex);
+        } catch (SQLException ex) {
+            logger.error("Error handling a connection", ex);
             throw new ApplicationException(ex);
         }
     }
@@ -531,7 +550,10 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
                             application, status, appClass, startDate, endDate);
                 }
             }
-        } catch (BusinessException | CoreException | SQLException ex) {
+        } catch (BusinessException | CoreException ex) {
+            throw new ApplicationException(ex);
+        } catch (SQLException ex) {
+            logger.error("Error handling a connection", ex);
             throw new ApplicationException(ex);
         }
     }
@@ -573,7 +595,7 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
             return sb.toString();
 
         } catch (IOException ex) {
-            logger.error("Error getting workflow file" + fileName, ex);
+            logger.error("Error getting workflow file {}", fileName, ex);
         }
         return null;
     }
@@ -626,7 +648,11 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
             return ApplicationDAOFactory.getDAOFactory()
                 .getApplicationInputDAO(connection)
                 .getWorkflowInputByUserAndAppName(user, appName);
-        } catch (DAOException | SQLException ex) {
+        } catch (DAOException ex) {
+            logger.error("Error in getWorkflowsInputByUserAndAppName. Ignoring", ex);
+            return null;
+        } catch (SQLException ex) {
+            logger.error("Error handling a connection. Ignoring", ex);
             return null;
         }
     }
@@ -643,7 +669,7 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
         try {
             return workflowBusiness.getPerformanceStats(simulationList, type);
         } catch (WorkflowsDBDAOException ex) {
-            java.util.logging.Logger.getLogger(WorkflowServiceImpl.class.getName()).log(Level.SEVERE, null, ex);
+            logger.error("Error getting perf stats for {}", simulationList, ex);
             throw new ApplicationException(ex);
         } catch (BusinessException ex) {
             throw new ApplicationException(ex);
@@ -661,7 +687,10 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
         try(Connection connection = PlatformConnection.getInstance().getConnection()) {
             return workflowBusiness.getOutputData(
                 simulationID, getSessionUser().getFolder(), connection);
-        } catch (CoreException | BusinessException | SQLException ex) {
+        } catch (BusinessException | CoreException ex) {
+            throw new ApplicationException(ex);
+        } catch (SQLException ex) {
+            logger.error("Error handling a connection", ex);
             throw new ApplicationException(ex);
         }
     }
@@ -677,7 +706,10 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
         try(Connection connection = PlatformConnection.getInstance().getConnection()) {
             return workflowBusiness.getInputData(
                 simulationID, getSessionUser().getFolder(), connection);
-        } catch (CoreException | BusinessException | SQLException ex) {
+        } catch (BusinessException | CoreException ex) {
+            throw new ApplicationException(ex);
+        } catch (SQLException ex) {
+            logger.error("Error handling a connection", ex);
             throw new ApplicationException(ex);
         }
     }
@@ -707,7 +739,10 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
     public void validateInputs(List<String> inputs) throws ApplicationException {
         try(Connection connection = PlatformConnection.getInstance().getConnection()) {
             workflowBusiness.validateInputs(getSessionUser(), inputs, connection);
-        } catch (CoreException | BusinessException | SQLException ex) {
+        } catch (BusinessException | CoreException ex) {
+            throw new ApplicationException(ex);
+        } catch (SQLException ex) {
+            logger.error("Error handling a connection", ex);
             throw new ApplicationException(ex);
         }
     }
@@ -724,31 +759,14 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
             trace(logger, "Updating user '" + currentUser + "' to '" + newUser + "'.");
             workflowBusiness.updateUser(currentUser, newUser);
 
-        } catch (CoreException ex) {
-            throw new ApplicationException(ex);
-        } catch (BusinessException ex) {
+        } catch (CoreException | BusinessException ex) {
             throw new ApplicationException(ex);
         }
-    }
-
-    private String getJenaDirName(String baseDir) throws ApplicationException {
-        File dir = new File(baseDir);
-
-        if (dir.isDirectory()) {
-            for (String names : dir.list()) {
-                if (names.startsWith("JENA-TDB-dir")) {
-                    return names;
-                }
-            }
-        } else {
-            throw new ApplicationException(baseDir + "is not a directory");
-        }
-        return null;
     }
 
     @Override
     public void markSimulationsCompleted(List<String> simulationIDs) throws ApplicationException {
-try {
+        try {
             trace(logger, "Marking simulations completed: " + simulationIDs);
             StringBuilder sb = new StringBuilder();
             for (String simulationID : simulationIDs) {
@@ -763,14 +781,14 @@ try {
             }
 
             if (sb.length() > 0) {
-                logger.error("Unable to mark completed the following "
-                        + "simulations: " + sb.toString());
+                logger.error("Unable to mark completed the following simulations: {}", sb.toString());
                 throw new ApplicationException("Unable to mark completed the following "
                         + "simulations: " + sb.toString());
             }
         } catch (CoreException ex) {
             throw new ApplicationException(ex);
-        }    }
+        }
+    }
 
     @Override
     public void markWorkflowCompleted(String simulationID) throws ApplicationException {
@@ -778,9 +796,7 @@ try {
             trace(logger, "Marking simulation '" + simulationID + "' completed.");
             workflowBusiness.markCompleted(simulationID);
 
-        } catch (CoreException ex) {
-            throw new ApplicationException(ex);
-        } catch (BusinessException ex) {
+        } catch (CoreException | BusinessException ex) {
             throw new ApplicationException(ex);
         }
     }
@@ -791,9 +807,7 @@ try {
             trace(logger, "Changing user of simulation '" + simulationId + "' to "+user+".");
             workflowBusiness.changeSimulationUser(simulationId,user);
 
-        } catch (CoreException ex) {
-            throw new ApplicationException(ex);
-        } catch (BusinessException ex) {
+        } catch (CoreException | BusinessException ex) {
             throw new ApplicationException(ex);
         }
     }

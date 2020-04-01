@@ -42,7 +42,8 @@ import fr.insalyon.creatis.vip.datamanager.server.DataManagerUtil;
 import org.apache.commons.fileupload.*;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.*;
@@ -58,7 +59,7 @@ import java.util.*;
  */
 public class FileUploadServiceImpl extends HttpServlet {
 
-    private static Logger logger = Logger.getLogger(FileUploadServiceImpl.class);
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     private GRIDAClient client;
     private GRIDAPoolClient poolClient;
     private String path;
@@ -66,16 +67,15 @@ public class FileUploadServiceImpl extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+            throws ServletException {
 
+        try {
+            User user = (User) request.getSession().getAttribute(CoreConstants.SESSION_USER);
+            logger.info("upload received from " + user.getEmail());
+            if (user != null && ServletFileUpload.isMultipartContent(request)) {
 
-        User user = (User) request.getSession().getAttribute(CoreConstants.SESSION_USER);
-        logger.info("upload received from " + user.getEmail());
-        if (user != null && ServletFileUpload.isMultipartContent(request)) {
-
-            FileItemFactory factory = new DiskFileItemFactory();
-            ServletFileUpload upload = new ServletFileUpload(factory);
-            try {
+                FileItemFactory factory = new DiskFileItemFactory();
+                ServletFileUpload upload = new ServletFileUpload(factory);
                 List items = upload.parseRequest(request);
                 Iterator iter = items.iterator();
                 String fileName = null;
@@ -111,6 +111,7 @@ public class FileUploadServiceImpl extends HttpServlet {
                             this.usePool = Boolean.valueOf(item.getString());
                             break;
                         default:
+                            logger.error("File upload : invalid FieldName {}", item.getFieldName());
                             throw new IllegalArgumentException("Invalid FieldName: " + item.getFieldName());
                     }
 
@@ -123,7 +124,7 @@ public class FileUploadServiceImpl extends HttpServlet {
                     fileName = Normalizer.normalize(fileName, Normalizer.Form.NFD).replaceAll("\\p{InCombiningDiacriticalMarks}+", "");
                     File uploadedFile = new File(rootDirectory + fileName);
 
-                    try(Connection connection = PlatformConnection.getInstance().getConnection()) {
+                    try (Connection connection = PlatformConnection.getInstance().getConnection()) {
                         fileItem.write(uploadedFile);
                         response.getWriter().write(fileName);
 
@@ -142,7 +143,7 @@ public class FileUploadServiceImpl extends HttpServlet {
                                 String dir = uploadedFile.getParent();
                                 uploadedFile.delete();
                                 operationID =
-                                    processDir(user, dir, path, connection);
+                                        processDir(user, dir, path, connection);
                             }
 
                         } else {
@@ -169,9 +170,11 @@ public class FileUploadServiceImpl extends HttpServlet {
                 out.println("</html>");
                 out.flush();
 
-            } catch (FileUploadException ex) {
-                logger.error("Error uploading a file", ex);
+
             }
+        } catch (Exception ex) {
+            logger.error("Error uploading a file", ex);
+            throw new ServletException(ex);
         }
     }
 
