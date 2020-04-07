@@ -130,6 +130,8 @@ public class Server {
     // Application importer
     private String applicationImporterFileRepository;
     private String deleteFilesAfterUpload;
+    private String applicationImporterRootFolder;
+    private List<String> applicationImporterRequirements;
     //Publication
     private int numberMonthsToTestLastPublicationUpdates;
     //Zenodo publication
@@ -245,6 +247,9 @@ public class Server {
             //Applicatoin importer
             applicationImporterFileRepository = config.getString(CoreConstants.APPLICATION_FILES_REPOSITORY, "/tmp/boutiques-cache");
             deleteFilesAfterUpload = config.getString(CoreConstants.APP_DELETE_FILES_AFTER_UPLOAD, "yes");
+            applicationImporterRootFolder = config.getString(CoreConstants.APP_IMPORTER_ROOT_FOLDER, "/biomed/user/c/creatis/vip/data/groups/Applications");
+            List<String> listApplicationImporterRequirements = new ArrayList<>();
+            applicationImporterRequirements = config.getList(CoreConstants.APP_REQUIREMENTS, listApplicationImporterRequirements);
 
             //Publication
             numberMonthsToTestLastPublicationUpdates = config.getInt(CoreConstants.PUB_MONTHS_UPDATES, 6);
@@ -306,6 +311,8 @@ public class Server {
 
             config.setProperty(CoreConstants.APPLICATION_FILES_REPOSITORY, applicationImporterFileRepository);
             config.setProperty(CoreConstants.APP_DELETE_FILES_AFTER_UPLOAD, deleteFilesAfterUpload);
+            config.setProperty(CoreConstants.APP_IMPORTER_ROOT_FOLDER, applicationImporterRootFolder);
+            config.setProperty(CoreConstants.APP_REQUIREMENTS, applicationImporterRequirements);
             config.setProperty(CoreConstants.APPLET_GATELAB_CLASSES, appletGateLabClasses);
             config.setProperty(CoreConstants.APPLET_GATELABTEST_CLASSES, appletGateLabTestClasses);
             config.setProperty(CoreConstants.UNDESIRED_MAIL_DOMAINS, undesiredMailDomains);
@@ -538,6 +545,14 @@ public class Server {
 
     public String getApplicationImporterFileRepository() {
         return applicationImporterFileRepository;
+    }
+    
+    public String getApplicationImporterRootFolder() {
+        return applicationImporterRootFolder;
+    }
+        
+    public List<String> getApplicationImporterRequirements() {
+        return applicationImporterRequirements;
     }
 
     public String getDeleteFilesAfterUpload() {
