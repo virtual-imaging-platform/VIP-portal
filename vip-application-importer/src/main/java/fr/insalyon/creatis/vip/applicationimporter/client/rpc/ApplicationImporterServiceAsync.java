@@ -34,10 +34,16 @@ package fr.insalyon.creatis.vip.applicationimporter.client.rpc;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import fr.insalyon.creatis.vip.applicationimporter.client.bean.BoutiquesTool;
 import java.util.HashMap;
+import java.util.List;
 
 public interface ApplicationImporterServiceAsync {
 
     public void readAndValidateBoutiquesFile(String fileLFN, AsyncCallback<String> callback);
 
     public void createApplication(BoutiquesTool bt, String type, String tag, HashMap<String, BoutiquesTool> bts, boolean isRunOnGrid, boolean overwriteVersion, boolean challenge, AsyncCallback<Void> callback);
+    
+    public void getApplicationImporterRootFolder(AsyncCallback<String> asyncCallback);
+    
+    public void getApplicationImporterRequirements(AsyncCallback<List<String>>  asyncCallback);
+
 }

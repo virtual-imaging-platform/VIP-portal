@@ -38,10 +38,12 @@ import fr.insalyon.creatis.vip.applicationimporter.server.business.ApplicationIm
 import fr.insalyon.creatis.vip.core.client.view.CoreException;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.dao.mysql.PlatformConnection;
+import fr.insalyon.creatis.vip.core.server.business.Server;
 
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.HashMap;
+import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -77,5 +79,15 @@ public class ApplicationImporterServiceImpl extends fr.insalyon.creatis.vip.core
             logger.error("Error handling a connection", ex);
             throw new ApplicationImporterException(ex);
         }
+    }
+
+    @Override
+    public String getApplicationImporterRootFolder() throws ApplicationImporterException {
+        return Server.getInstance().getApplicationImporterRootFolder();
+    }
+
+    @Override
+    public List<String> getApplicationImporterRequirements() throws ApplicationImporterException {
+        return Server.getInstance().getApplicationImporterRequirements();        
     }
 }
