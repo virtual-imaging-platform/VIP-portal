@@ -42,6 +42,7 @@ import fr.insalyon.creatis.vip.applicationimporter.client.view.Constants;
 import fr.insalyon.creatis.vip.core.client.view.common.AbstractFormLayout;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
+import fr.insalyon.creatis.vip.datamanager.client.view.ValidatorUtil;
 import java.util.LinkedHashMap;
 import java.util.List;
 
@@ -121,8 +122,12 @@ public class VIPLayout extends AbstractFormLayout {
 
             @Override
             public void onSuccess(String result) {
-                //TODO: check access rights and point to Home if needed
-                applicationLocation.setValue(result);
+                if (ValidatorUtil.validateRootPath(result, "create a folder in")
+                        && ValidatorUtil.validateUserLevel(result, "create a folder in")) {
+                    applicationLocation.setValue(result);
+                }else{
+                    applicationLocation.setValue("/vip/Home");
+                }       
             }
         };
         ApplicationImporterService.Util.getInstance().getApplicationImporterRootFolder(callback);
@@ -171,7 +176,7 @@ public class VIPLayout extends AbstractFormLayout {
         tagsCb.setTitle("<b>Dirac tag</b>");
         tagsCb.setType("comboBox");
 
-        tagsCb.setValueMap("None", "diracTag:nvidiaGPU");
+        //tagsCb.setValueMap("None", "diracTag:nvidiaGPU");
         
         final AsyncCallback<List<String>> callback = new AsyncCallback<List<String>>() {
             @Override
@@ -185,8 +190,13 @@ public class VIPLayout extends AbstractFormLayout {
                 if(!result.contains("None")){
                     result.add("None");
                 }
-                //TODO : check if toString gives the right format for setValueMap
-                tagsCb.setValueMap(result.toString());
+                
+                LinkedHashMap<String, String> requirementsValues = new LinkedHashMap<String, String>();
+                for (String requirement : result) {
+                    requirementsValues.put(requirement, requirement);
+                }               
+                tagsCb.setValueMap(requirementsValues);
+                
             }
         };
         ApplicationImporterService.Util.getInstance().getApplicationImporterRequirements(callback);
