@@ -176,8 +176,6 @@ public class VIPLayout extends AbstractFormLayout {
         tagsCb.setTitle("<b>Dirac tag</b>");
         tagsCb.setType("comboBox");
 
-        //tagsCb.setValueMap("None", "diracTag:nvidiaGPU");
-        
         final AsyncCallback<List<String>> callback = new AsyncCallback<List<String>>() {
             @Override
             public void onFailure(Throwable caught) {
