@@ -186,7 +186,8 @@ public class GirderStorageBusiness {
                 new ObjectMapper().readValue(res.response, ObjectNode.class);
             String name = node.get("name").asText();
 
-            return name;
+            //remove spaces from filename
+            return name.replace(' ', '_');
         } catch (IOException ex) {
             logger.error("Error getting girder filename for {} with token {}",
                     fileId, token, ex);
