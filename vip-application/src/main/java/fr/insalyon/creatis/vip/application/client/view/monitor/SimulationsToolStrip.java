@@ -137,7 +137,7 @@ public class SimulationsToolStrip extends ToolStrip {
         if (CoreModule.user.isSystemAdministrator()) {
             this.addSeparator();
             // Purge Executions
-            this.addButton(WidgetUtil.getToolStripButton("Purge Executionss",
+            this.addButton(WidgetUtil.getToolStripButton("Purge Executions",
                     CoreConstants.ICON_CLEAR, null, new ClickHandler() {
                 @Override
                 public void onClick(ClickEvent event) {

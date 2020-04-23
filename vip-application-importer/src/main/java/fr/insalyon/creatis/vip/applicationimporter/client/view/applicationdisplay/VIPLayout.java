@@ -30,30 +30,22 @@
  * knowledge of the CeCILL-B license and that you accept its terms.
  */
 package fr.insalyon.creatis.vip.applicationimporter.client.view.applicationdisplay;
-import com.google.gwt.json.client.JSONObject;
-import com.google.gwt.json.client.JSONParser;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.Overflow;
-import com.smartgwt.client.util.SC;
-import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.CheckboxItem;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangeEvent;
-import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
-import fr.insalyon.creatis.vip.applicationimporter.client.ApplicationImporterException;
-import fr.insalyon.creatis.vip.applicationimporter.client.bean.BoutiquesTool;
 import fr.insalyon.creatis.vip.applicationimporter.client.rpc.ApplicationImporterService;
 import fr.insalyon.creatis.vip.applicationimporter.client.view.Constants;
 import fr.insalyon.creatis.vip.core.client.view.common.AbstractFormLayout;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
-import fr.insalyon.creatis.vip.applicationimporter.client.JSONUtil;
-import java.util.HashMap;
+import fr.insalyon.creatis.vip.datamanager.client.view.ValidatorUtil;
 import java.util.LinkedHashMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.List;
+import java.util.Map;
 
 public class VIPLayout extends AbstractFormLayout {
 
@@ -71,7 +63,7 @@ public class VIPLayout extends AbstractFormLayout {
         setOverflow(Overflow.AUTO);
         // Adds application location
         applicationLocation = new LocalTextField("Application file location", true, true);
-        applicationLocation.setValue("/vip/Home");
+        setApplicationLocationValue();
         this.addMember(applicationLocation);
 
         overwriteIfexists = new CheckboxItem("ckbox_over", "Overwrite application version if it exists");
@@ -120,6 +112,30 @@ public class VIPLayout extends AbstractFormLayout {
         this.addMember(FieldUtil.getForm(tagsCbItem));
     }
 
+    public void setApplicationLocationValue(){
+        
+        final AsyncCallback<String> callback = new AsyncCallback<String>() {
+            @Override
+            public void onFailure(Throwable caught) {
+                Layout.getInstance().setWarningMessage("Unable to retrieve configurated root folder for application importer, setting it to Home:<br />" + caught.getMessage());
+                applicationLocation.setValue("/vip/Home");
+            }
+
+            @Override
+            public void onSuccess(String result) {
+                if (ValidatorUtil.validateRootPath(result, "create a folder in")
+                        && ValidatorUtil.validateUserLevel(result, "create a folder in")) {
+                    applicationLocation.setValue(result);
+                }else{
+                    applicationLocation.setValue("/vip/Home");
+                }       
+            }
+        };
+        ApplicationImporterService.Util.getInstance().getApplicationImporterRootFolder(callback);
+
+    }
+    
+
     /**
      * Get the location where to create the application
      *
@@ -161,7 +177,29 @@ public class VIPLayout extends AbstractFormLayout {
         tagsCb.setTitle("<b>Dirac tag</b>");
         tagsCb.setType("comboBox");
 
-        tagsCb.setValueMap("None", "diracTag:nvidiaGPU");
+        final AsyncCallback<List<String>> callback = new AsyncCallback<List<String>>() {
+            @Override
+            public void onFailure(Throwable caught) {
+                Layout.getInstance().setWarningMessage("Unable to retrieve configurated list of requirements, setting it to None:<br />" + caught.getMessage());
+                tagsCb.setValueMap("None");
+            }
+
+            @Override
+            public void onSuccess(List<String> result) {
+                if(!result.contains("None")){
+                    result.add("None");
+                }
+                
+                Map<String, String> requirementsValues = new LinkedHashMap<>();
+                for (String requirement : result) {
+                    requirementsValues.put(requirement, requirement);
+                }               
+                tagsCb.setValueMap(requirementsValues);
+                
+            }
+        };
+        ApplicationImporterService.Util.getInstance().getApplicationImporterRequirements(callback);
+        
         tagsCb.setValue("None");
 
         return tagsCb;
