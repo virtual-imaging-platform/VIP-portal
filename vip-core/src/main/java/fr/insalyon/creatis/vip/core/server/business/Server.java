@@ -248,8 +248,7 @@ public class Server {
             applicationImporterFileRepository = config.getString(CoreConstants.APPLICATION_FILES_REPOSITORY, "/tmp/boutiques-cache");
             deleteFilesAfterUpload = config.getString(CoreConstants.APP_DELETE_FILES_AFTER_UPLOAD, "yes");
             applicationImporterRootFolder = config.getString(CoreConstants.APP_IMPORTER_ROOT_FOLDER, "/biomed/user/c/creatis/vip/data/groups/Applications");
-            List<String> listApplicationImporterRequirements = new ArrayList<>();
-            applicationImporterRequirements = config.getList(CoreConstants.APP_REQUIREMENTS, listApplicationImporterRequirements);
+            applicationImporterRequirements = config.getList(CoreConstants.APP_REQUIREMENTS, new ArrayList<>());
 
             //Publication
             numberMonthsToTestLastPublicationUpdates = config.getInt(CoreConstants.PUB_MONTHS_UPDATES, 6);

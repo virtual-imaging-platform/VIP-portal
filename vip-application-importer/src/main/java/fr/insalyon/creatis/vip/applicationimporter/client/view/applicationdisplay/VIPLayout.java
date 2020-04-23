@@ -45,6 +45,7 @@ import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
 import fr.insalyon.creatis.vip.datamanager.client.view.ValidatorUtil;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 public class VIPLayout extends AbstractFormLayout {
 
@@ -189,7 +190,7 @@ public class VIPLayout extends AbstractFormLayout {
                     result.add("None");
                 }
                 
-                LinkedHashMap<String, String> requirementsValues = new LinkedHashMap<String, String>();
+                Map<String, String> requirementsValues = new LinkedHashMap<>();
                 for (String requirement : result) {
                     requirementsValues.put(requirement, requirement);
                 }               
