@@ -66,4 +66,5 @@ public interface CarminProperties {
     // CARMIN PROCESSING
 
     String API_PIPELINE_WHITE_LIST = "carmin.processing.pipelines.whitelist";
+    String ADDITIONNAL_INPUT_VALID_CHARS = "\\[\\]"; // will be use in regex, so brackets must be escaped
 }

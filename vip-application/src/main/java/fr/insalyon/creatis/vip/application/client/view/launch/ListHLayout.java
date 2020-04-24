@@ -77,9 +77,11 @@ public class ListHLayout extends HLayout {
         this.instance = this;
         this.setMembersMargin(3);
 
-        listItem = FieldUtil.getTextItem(400, false, "", "[0-9.,A-Za-z-+/_(){}: ]");
+        listItem = FieldUtil.getTextItem(400, false, "",
+                "[" + ApplicationConstants.INPUT_VALID_CHARS + "]");
         listItem.setValue(value);
-        listItem.setValidators(ValidatorUtil.getStringValidator());
+        listItem.setValidators(ValidatorUtil.getStringValidator(
+                "^([" + ApplicationConstants.INPUT_VALID_CHARS + "])+$"));
 
         if (optional) {
             listItem.setRequiredMessage(ApplicationConstants.INPUT_WITHOUT_VALUE_REQUIRED_MESSAGE);
