@@ -32,6 +32,7 @@
 package fr.insalyon.creatis.vip.datamanager.server;
 
 import fr.insalyon.creatis.vip.core.client.bean.*;
+import fr.insalyon.creatis.vip.core.server.business.CoreUtil;
 import fr.insalyon.creatis.vip.core.server.business.Server;
 import fr.insalyon.creatis.vip.core.server.dao.*;
 import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
@@ -41,6 +42,7 @@ import java.io.File;
 import java.net.URI;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.text.Normalizer;
 import java.util.*;
 
 /**
@@ -243,5 +245,13 @@ public class DataManagerUtil {
             dir.mkdirs();
         }
         return rootDirectory;
+    }
+
+    /*
+        remove spaces, accents and non-ascii characters
+     */
+    public static String getCleanFilename(String fileName) {
+        fileName = new File(fileName).getName().trim().replaceAll(" ", "_");
+        return CoreUtil.getCleanString(fileName);
     }
 }

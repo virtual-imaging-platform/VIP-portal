@@ -39,6 +39,7 @@ import fr.insalyon.creatis.vip.core.client.view.*;
 import fr.insalyon.creatis.vip.core.server.business.*;
 import fr.insalyon.creatis.vip.datamanager.client.bean.ExternalPlatform;
 import fr.insalyon.creatis.vip.datamanager.client.bean.ExternalPlatform.Type;
+import fr.insalyon.creatis.vip.datamanager.server.DataManagerUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -186,8 +187,8 @@ public class GirderStorageBusiness {
                 new ObjectMapper().readValue(res.response, ObjectNode.class);
             String name = node.get("name").asText();
 
-            //remove spaces from filename
-            return name.replace(' ', '_');
+            // clean filename as in an uploaded file
+            return DataManagerUtil.getCleanFilename(name);
         } catch (IOException ex) {
             logger.error("Error getting girder filename for {} with token {}",
                     fileId, token, ex);

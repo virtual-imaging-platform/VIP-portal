@@ -168,7 +168,8 @@ public class ConfigurationBusiness {
             user.setPassword(MD5.get(user.getPassword()));
             String folder = user.getFirstName().replaceAll(" ", "_").toLowerCase() + "_"
                             + user.getLastName().replaceAll(" ", "_").toLowerCase();
-            folder = Normalizer.normalize(folder, Normalizer.Form.NFD).replaceAll("\\p{InCombiningDiacriticalMarks}+", "");
+            // normalise user folder : remove accents and non ascii characters
+            folder = CoreUtil.getCleanString(folder);
 
             GRIDAClient client = CoreUtil.getGRIDAClient();
             while (client.exist(Server.getInstance().getDataManagerUsersHome() + "/" + folder)) {
