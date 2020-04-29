@@ -31,8 +31,8 @@
  */
 package fr.insalyon.creatis.vip.api.rest.itest;
 
+import fr.insalyon.creatis.vip.api.business.ApiException.ApiError;
 import fr.insalyon.creatis.vip.api.tools.spring.ApikeyRequestPostProcessor;
-import fr.insalyon.creatis.vip.api.rest.RestErrorCodes;
 import fr.insalyon.creatis.vip.api.rest.config.*;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
@@ -79,7 +79,7 @@ public class SpringAuthenticationIT extends BaseVIPSpringIT {
                 .andExpect(status().isUnauthorized())
                 .andExpect(content().contentType(RestTestUtils.JSON_CONTENT_TYPE_UTF8))
                 .andExpect(jsonPath("$.errorCode")
-                        .value(RestErrorCodes.AUTHENTICATION_ERROR.getCode()));
+                        .value(ApiError.AUTHENTICATION_ERROR.getCode()));
     }
 
     @Test
@@ -91,7 +91,7 @@ public class SpringAuthenticationIT extends BaseVIPSpringIT {
                 .andExpect(status().isUnauthorized())
                 .andExpect(content().contentType(RestTestUtils.JSON_CONTENT_TYPE_UTF8))
                 .andExpect(jsonPath("$.errorCode")
-                        .value(RestErrorCodes.INSUFFICIENT_AUTH.getCode()));
+                        .value(ApiError.INSUFFICIENT_AUTH.getCode()));
     }
 
     @Test
@@ -103,7 +103,7 @@ public class SpringAuthenticationIT extends BaseVIPSpringIT {
                 .andExpect(status().isUnauthorized())
                 .andExpect(content().contentType(RestTestUtils.JSON_CONTENT_TYPE_UTF8))
                 .andExpect(jsonPath("$.errorCode")
-                        .value(RestErrorCodes.BAD_CREDENTIALS.getCode()));
+                        .value(ApiError.BAD_CREDENTIALS.getCode()));
     }
 
     @Test
@@ -114,7 +114,7 @@ public class SpringAuthenticationIT extends BaseVIPSpringIT {
                 .andExpect(status().isUnauthorized())
                 .andExpect(content().contentType(RestTestUtils.JSON_CONTENT_TYPE_UTF8))
                 .andExpect(jsonPath("$.errorCode")
-                        .value(RestErrorCodes.INSUFFICIENT_AUTH.getCode()));
+                        .value(ApiError.INSUFFICIENT_AUTH.getCode()));
     }
 
     private void prepareUser1Configuration() throws DAOException, BusinessException, UnsupportedEncodingException, NoSuchAlgorithmException {

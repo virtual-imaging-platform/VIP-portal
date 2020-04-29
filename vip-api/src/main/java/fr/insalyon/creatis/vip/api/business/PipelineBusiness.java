@@ -36,6 +36,7 @@ import fr.insalyon.creatis.vip.api.bean.ParameterType;
 import fr.insalyon.creatis.vip.api.bean.ParameterTypedValue;
 import fr.insalyon.creatis.vip.api.bean.Pipeline;
 import fr.insalyon.creatis.vip.api.bean.PipelineParameter;
+import fr.insalyon.creatis.vip.api.business.ApiException.ApiError;
 import fr.insalyon.creatis.vip.application.client.bean.AppClass;
 import fr.insalyon.creatis.vip.application.client.bean.AppVersion;
 import fr.insalyon.creatis.vip.application.client.bean.Application;
@@ -54,6 +55,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
+
+import static fr.insalyon.creatis.vip.api.business.ApiException.ApiError.*;
 
 /**
  *
@@ -197,7 +200,7 @@ public class PipelineBusiness {
                 applicationName, connection);
             if (a == null) {
                 logger.error("Cannot find application {}", applicationName);
-                throw new ApiException("Cannot find application " + applicationName);
+                throw new ApiException(APPLICATION_NOT_FOUND, applicationName);
             }
             for (String applicationClassName : a.getApplicationClasses()) {
                 if (userClassNames.contains(applicationClassName)) {
@@ -206,7 +209,7 @@ public class PipelineBusiness {
             }
             logger.error("User {} not allowed to access application {}",
                     apiContext.getUser(), applicationName);
-            throw new ApiException("User " + apiContext.getUser().getEmail() + " not allowed to access application " + applicationName);
+            throw new ApiException(NOT_ALLOWED_TO_USE_APPLICATION, applicationName);
         } catch (BusinessException ex) {
             throw new ApiException(ex);
         }
@@ -223,7 +226,6 @@ public class PipelineBusiness {
         }
         logger.error("Pipeline {}/{} doesn't exist or user {} cannot access it",
                 applicationName, applicationVersion , apiContext.getUser());
-        throw new ApiException("Pipeline '" + applicationName + "' (version '" + applicationVersion + "') doesn't exist or user '"
-                + apiContext.getUser().getEmail() + "' cannot access it");
+        throw new ApiException(PIPELINE_NOT_FOUND, applicationName + "/" + applicationVersion);
     }
 }

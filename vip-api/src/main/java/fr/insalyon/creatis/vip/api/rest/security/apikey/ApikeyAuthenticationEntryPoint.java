@@ -32,7 +32,7 @@
 package fr.insalyon.creatis.vip.api.rest.security.apikey;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import fr.insalyon.creatis.vip.api.rest.RestErrorCodes;
+import fr.insalyon.creatis.vip.api.business.ApiException.ApiError;
 import fr.insalyon.creatis.vip.api.rest.model.ErrorCodeAndMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
@@ -65,11 +65,11 @@ public class ApikeyAuthenticationEntryPoint implements AuthenticationEntryPoint 
         response.setContentType("application/json;charset=UTF-8");
         ErrorCodeAndMessage error = new ErrorCodeAndMessage();
         if (authException instanceof BadCredentialsException) {
-            error.setErrorCode(RestErrorCodes.BAD_CREDENTIALS.getCode());
+            error.setErrorCode(ApiError.BAD_CREDENTIALS.getCode());
         } else if (authException instanceof InsufficientAuthenticationException) {
-            error.setErrorCode(RestErrorCodes.INSUFFICIENT_AUTH.getCode());
+            error.setErrorCode(ApiError.INSUFFICIENT_AUTH.getCode());
         } else {
-            error.setErrorCode(RestErrorCodes.AUTHENTICATION_ERROR.getCode());
+            error.setErrorCode(ApiError.AUTHENTICATION_ERROR.getCode());
         }
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         error.setErrorMessage(authException.getMessage());

@@ -32,17 +32,14 @@
 package fr.insalyon.creatis.vip.api.rest.itest.processing;
 
 import fr.insalyon.creatis.vip.api.bean.Execution;
+import fr.insalyon.creatis.vip.api.business.ApiException.ApiError;
 import fr.insalyon.creatis.vip.api.data.*;
-import fr.insalyon.creatis.vip.api.rest.RestErrorCodes;
 import fr.insalyon.creatis.vip.api.rest.config.*;
-import fr.insalyon.creatis.vip.api.rest.model.PathProperties;
 import fr.insalyon.creatis.vip.application.client.bean.Simulation;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
-import fr.insalyon.creatis.vip.datamanager.client.bean.Data;
 import org.junit.*;
 import org.mockito.*;
 
-import java.sql.Connection;
 import java.util.*;
 
 import static fr.insalyon.creatis.vip.api.data.AppVersionTestUtils.version42;
@@ -151,7 +148,7 @@ public class ExecutionControllerIT extends BaseVIPSpringIT {
                     .andDo(print())
                     .andExpect(status().isBadRequest())
                     .andExpect(content().contentType(RestTestUtils.JSON_CONTENT_TYPE_UTF8))
-                    .andExpect(jsonPath("$.errorCode").value(RestErrorCodes.API_ERROR.getCode()));
+                    .andExpect(jsonPath("$.errorCode").value(ApiError.GENERIC_API_ERROR.getCode()));
         }
 
     @Test
@@ -297,7 +294,7 @@ public class ExecutionControllerIT extends BaseVIPSpringIT {
                 .andDo(print())
                 .andExpect(status().isBadRequest())
                 .andExpect(content().contentType(RestTestUtils.JSON_CONTENT_TYPE_UTF8))
-                .andExpect(jsonPath("$.errorCode").value(RestErrorCodes.NOT_IMPLEMENTED.getCode()));
+                .andExpect(jsonPath("$.errorCode").value(ApiError.NOT_IMPLEMENTED.getCode()));
     }
 
     @Test

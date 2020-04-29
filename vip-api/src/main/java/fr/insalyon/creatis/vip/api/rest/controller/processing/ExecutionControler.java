@@ -32,14 +32,15 @@
 package fr.insalyon.creatis.vip.api.rest.controller.processing;
 
 import fr.insalyon.creatis.vip.api.bean.Execution;
-import fr.insalyon.creatis.vip.api.business.*;
-import fr.insalyon.creatis.vip.api.exception.NotImplementedException;
+import fr.insalyon.creatis.vip.api.business.ApiException;
+import fr.insalyon.creatis.vip.api.business.ApiException.ApiError;
+import fr.insalyon.creatis.vip.api.business.ApiUtils;
+import fr.insalyon.creatis.vip.api.business.ExecutionBusiness;
+import fr.insalyon.creatis.vip.api.business.PipelineBusiness;
 import fr.insalyon.creatis.vip.api.exception.SQLRuntimeException;
 import fr.insalyon.creatis.vip.api.rest.RestApiBusiness;
-import fr.insalyon.creatis.vip.api.rest.model.*;
-import fr.insalyon.creatis.vip.application.server.business.*;
-import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
-import fr.insalyon.creatis.vip.datamanager.server.business.TransferPoolBusiness;
+import fr.insalyon.creatis.vip.api.rest.model.DeleteExecutionConfiguration;
+import fr.insalyon.creatis.vip.api.rest.model.PathProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,7 +50,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
-
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
@@ -218,7 +218,7 @@ public class ExecutionControler {
     public void playExecution(@PathVariable String executionId) throws ApiException {
         ApiUtils.methodInvocationLog("playExecution", executionId);
         logger.warn("playExecution should not be used");
-        throw new NotImplementedException("Executions are started on creation");
+        throw new ApiException(ApiError.NOT_IMPLEMENTED, "playExecution");
     }
 
     @RequestMapping(value = "/{executionId}/kill", method = RequestMethod.PUT)

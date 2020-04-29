@@ -32,21 +32,17 @@
 package fr.insalyon.creatis.vip.api.rest.controller;
 
 import fr.insalyon.creatis.vip.api.business.ApiException;
-import fr.insalyon.creatis.vip.api.exception.NotImplementedException;
-import fr.insalyon.creatis.vip.api.rest.RestErrorCodes;
+import fr.insalyon.creatis.vip.api.business.ApiException.ApiError;
 import fr.insalyon.creatis.vip.api.rest.model.ErrorCodeAndMessage;
+import fr.insalyon.creatis.vip.core.client.VipException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.http.*;
-import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
-import javax.servlet.http.HttpServletRequest;
+import java.util.Optional;
 
 /**
  * Created by abonnet on 7/28/16.
@@ -57,22 +53,42 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ExceptionHandler(NotImplementedException.class)
-    @ResponseBody
-    public ErrorCodeAndMessage handleNotImplementedException(NotImplementedException e) {
-        logger.error("Using a non implemented method", e);
-        return new ErrorCodeAndMessage(RestErrorCodes.NOT_IMPLEMENTED.getCode(),
-                RestErrorCodes.NOT_IMPLEMENTED.getMessage());
-    }
-
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(ApiException.class)
     @ResponseBody
     public ErrorCodeAndMessage handleApiException(ApiException e) {
         // No need to log, VIP errors are logged when they are created
-        return new ErrorCodeAndMessage(RestErrorCodes.API_ERROR.getCode(),
-                RestErrorCodes.API_ERROR.getMessage());
+
+        // to find the error message : look for an error code in the vip
+        // ancestor exceptions and use that exception message
+        return fetchErrorInException(e);
     }
+
+    private ErrorCodeAndMessage fetchErrorInException(Throwable throwable) {
+
+        // cast to vipException
+        VipException vipException =  Optional.ofNullable(throwable)
+                .filter(VipException.class::isInstance)
+                .map(VipException.class::cast)
+                // stop recursion if no exception or if not a VipException
+                .orElse( new ApiException(ApiError.GENERIC_API_ERROR));
+
+        // return code and message if present otherwise call parent
+        return vipException.getVipErrorCode()
+                .map( errorCode -> new ErrorCodeAndMessage(
+                        errorCode,
+                        cleanExceptionMessage(vipException) )
+                )
+                .orElseGet( () ->
+                        fetchErrorInException( vipException.getCause() )
+                );
+
+    }
+
+    private String cleanExceptionMessage(VipException vipException) {
+        // remove html newline made for vip portal
+        return vipException.getMessage().replaceAll("<br */>", "");
+    }
+
 
     @Override
     protected ResponseEntity<Object> handleExceptionInternal(Exception ex, Object body, HttpHeaders headers, HttpStatus status, WebRequest request) {

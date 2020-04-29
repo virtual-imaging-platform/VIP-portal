@@ -6,6 +6,7 @@
 package fr.insalyon.creatis.vip.api.business;
 
 import fr.insalyon.creatis.vip.api.bean.ParameterType;
+import fr.insalyon.creatis.vip.api.business.ApiException.ApiError;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -94,7 +95,7 @@ public class ApiUtils {
     public static void checkIfValidPipelineIdentifier(String identifier) throws ApiException {
         if (!identifier.contains("/")) {
             logger.error("Invalid pipeline identifier {} : missing /", identifier);
-            throw new ApiException("Invalid pipeline identifier: " + identifier);
+            throw new ApiException(ApiError.INVALID_PIPELINE_IDENTIFIER, identifier);
         }
     }
 }

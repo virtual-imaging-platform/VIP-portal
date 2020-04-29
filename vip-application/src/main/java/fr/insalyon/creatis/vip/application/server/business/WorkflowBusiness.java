@@ -53,6 +53,7 @@ import fr.insalyon.creatis.vip.application.client.bean.InOutData;
 import fr.insalyon.creatis.vip.application.client.bean.Activity;
 import fr.insalyon.creatis.vip.application.client.bean.Engine;
 import fr.insalyon.creatis.vip.application.client.bean.Simulation;
+import fr.insalyon.creatis.vip.application.client.view.ApplicationException.ApplicationError;
 import fr.insalyon.creatis.vip.application.client.view.monitor.SimulationStatus;
 import fr.insalyon.creatis.vip.application.client.view.monitor.progress.ProcessorStatus;
 import fr.insalyon.creatis.vip.application.server.business.simulation.ParameterSweep;
@@ -83,6 +84,8 @@ import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
+
+import static fr.insalyon.creatis.vip.application.client.view.ApplicationException.ApplicationError.*;
 
 /**
  *
@@ -190,18 +193,18 @@ public class WorkflowBusiness {
             long runningWorkflows = workflowDAO.getNumberOfRunning(user.getFullName());
             long runningSimulations=workflowDAO.getRunning().size();
             if(runningSimulations >= Server.getInstance().getMaxPlatformRunningSimulations()){
-            logger.warn("Unable to launch execution '" + simulationName + "': max "
-                        + "number of running workflows reached in the platform.");
-                throw new fr.insalyon.creatis.vip.core.server.business.BusinessException(
-                        "Max number of running executions reached.");
+                logger.warn("Unable to launch execution '{}': max number of"
+                        + " running workflows reached in the platform : {}",
+                        simulationName, runningSimulations);
+                throw new BusinessException(PLATFORM_MAX_EXECS);
             }
             if (runningWorkflows >= user.getMaxRunningSimulations()) {
 
-                logger.warn("Unable to launch execution '" + simulationName + "': max "
-                        + "number of running workflows reached for user '" + user + "'.");
-                throw new fr.insalyon.creatis.vip.core.server.business.BusinessException(
-                        "Max number of running executions reached.<br />You already have "
-                        + runningWorkflows + " running executions.");
+                logger.warn("Unable to launch execution '{}': max number of "
+                        + "running workflows reached ({}/{}) for user '{}'.",
+                        simulationName, runningWorkflows,
+                        user.getMaxRunningSimulations(), user);
+                throw new BusinessException(USER_MAX_EXECS, runningWorkflows);
             }
 
             List<ParameterSweep> parameters = new ArrayList<ParameterSweep>();
@@ -445,9 +448,11 @@ public class WorkflowBusiness {
         } catch (SAXException | IOException ex) {
             logger.error("Error getting application descriptor for {}/{}",
                     applicationName, applicationVersion, ex);
-            throw new BusinessException(ex);
-        } catch (DAOException ex) {
-            throw new BusinessException(ex);
+            throw new BusinessException(WRONG_APPLICATION_DESCRIPTOR, ex,
+                    applicationName + "/" + applicationVersion);
+        } catch (DAOException | BusinessException ex) {
+            throw new BusinessException(WRONG_APPLICATION_DESCRIPTOR, ex,
+                    applicationName + "/" + applicationVersion);
         }
     }
 

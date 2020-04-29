@@ -32,12 +32,13 @@
 package fr.insalyon.creatis.vip.applicationimporter.client;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
+import fr.insalyon.creatis.vip.core.client.VipException;
 
 /**
  *
  * @author Nouha Boujelben
  */
-public class ApplicationImporterException extends Exception implements IsSerializable {
+public class ApplicationImporterException extends VipException implements IsSerializable {
 
     public ApplicationImporterException() {
     }

@@ -31,11 +31,41 @@
  */
 package fr.insalyon.creatis.vip.api.business;
 
+import fr.insalyon.creatis.vip.core.client.VipException;
+
 /**
  *
  * @author Tristan Glatard
  */
-public class ApiException extends Exception {
+public class ApiException extends VipException {
+
+    /* Reserved codes : 8xxx : vip-api */
+    public enum ApiError implements VipError{
+        GENERIC_API_ERROR(8000),
+        NOT_IMPLEMENTED(8001),
+        BAD_CREDENTIALS(8002),
+        INSUFFICIENT_AUTH(8003),
+        AUTHENTICATION_ERROR(8004),
+        INVALID_PIPELINE_IDENTIFIER(8005),
+        APPLICATION_NOT_FOUND(8006),
+        PIPELINE_NOT_FOUND(8007),
+        NOT_ALLOWED_TO_USE_APPLICATION(8008);
+
+
+        private Integer code;
+        ApiError(Integer code) { this.code = code; }
+        @Override
+        public Integer getCode() { return code; }
+    }
+
+    static {
+        addMessage(ApiError.GENERIC_API_ERROR, "An error has been encountered on the VIP API", 0);
+        addMessage(ApiError.NOT_IMPLEMENTED, "The {} method is not implemented in the VIP API", 1);
+        addMessage(ApiError.INVALID_PIPELINE_IDENTIFIER, "The {} pipeline identifier is not valid", 1);
+        addMessage(ApiError.APPLICATION_NOT_FOUND, "The {} application does not exists", 1);
+        addMessage(ApiError.PIPELINE_NOT_FOUND, "The {} pipeline does not exists or cannot be used", 1);
+        addMessage(ApiError.NOT_ALLOWED_TO_USE_APPLICATION, "Not allowed to access application {}", 1);
+    }
 
     public ApiException(String message) {
         super(message);
@@ -47,5 +77,13 @@ public class ApiException extends Exception {
 
     public ApiException(String message, Throwable cause) {
         super(message, cause);
+    }
+
+    public ApiException(ApiError apiError, Object... params) {
+        super(apiError, params);
+    }
+
+    public ApiException(ApiError apiError, Throwable cause, Object... params) {
+        super(apiError, cause, params);
     }
 }

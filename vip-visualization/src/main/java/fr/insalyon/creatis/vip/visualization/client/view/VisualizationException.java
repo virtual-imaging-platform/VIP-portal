@@ -32,9 +32,10 @@
 package fr.insalyon.creatis.vip.visualization.client.view;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
+import fr.insalyon.creatis.vip.core.client.VipException;
 
 public class VisualizationException
-    extends Exception implements IsSerializable {
+    extends VipException implements IsSerializable {
 
     public VisualizationException() {}
 
