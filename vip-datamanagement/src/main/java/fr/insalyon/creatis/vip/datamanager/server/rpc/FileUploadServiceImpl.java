@@ -120,8 +120,7 @@ public class FileUploadServiceImpl extends HttpServlet {
 
                     boolean local = this.path.equals("local") ? true : false;
                     String rootDirectory = DataManagerUtil.getUploadRootDirectory(local);
-                    fileName = new File(fileName).getName().trim().replaceAll(" ", "_");
-                    fileName = Normalizer.normalize(fileName, Normalizer.Form.NFD).replaceAll("\\p{InCombiningDiacriticalMarks}+", "");
+                    fileName = DataManagerUtil.getCleanFilename(fileName);
                     File uploadedFile = new File(rootDirectory + fileName);
 
                     try (Connection connection = PlatformConnection.getInstance().getConnection()) {

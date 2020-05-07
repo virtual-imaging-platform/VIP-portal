@@ -177,13 +177,14 @@ public class DataApiBusiness {
         // TODO : check if it already exists
         // TODO : support archive upload
         String uploadDirectory = DataManagerUtil.getUploadRootDirectory(false);
-        // TODO : normalize file name to avoid weird characters
-        String fileName = Paths.get(lfcPath).getFileName().toString();
+        // get file name and clean it as in an upload
+        String fileName = DataManagerUtil.getCleanFilename(
+                Paths.get(lfcPath).getFileName().toString() );
         String localPath = uploadDirectory + fileName;
         logger.debug("storing upload file in :" + localPath);
         boolean isFileEmpty = saveInputStreamToFile(is, localPath);
         if (isFileEmpty) {
-            logger.info("no content in upload, creating dir : " + lfcPath);
+            logger.info("no content in upload, creating dir : " + parentLfcPath + "/" + fileName);
             baseMkdir(parentLfcPath, fileName, connection);
         } else {
             String opId = baseUploadFile(localPath, parentLfcPath, connection);
@@ -212,8 +213,9 @@ public class DataApiBusiness {
         // TODO : check if it already exists
         // TODO : support archive upload
         String uploadDirectory = DataManagerUtil.getUploadRootDirectory(false);
-        // TODO : normalize file name to avoid weird characters
-        String fileName = Paths.get(lfcPath).getFileName().toString();
+        // get file name and clean it as in an upload
+        String fileName = DataManagerUtil.getCleanFilename(
+                Paths.get(lfcPath).getFileName().toString() );
         String localPath = uploadDirectory + fileName;
         logger.debug("storing upload file in :" + localPath);
         writeFileFromBase64(uploadData.getBase64Content(), localPath);
@@ -237,7 +239,10 @@ public class DataApiBusiness {
             logger.error("Trying do create an existing directory : {}", path);
             throw new ApiException("Mkdir error");
         }
-        baseMkdir(parentLfcPath, javaPath.getFileName().toString(), connection);
+        // get dir name and clean it as in an upload
+        String dirName = DataManagerUtil.getCleanFilename(
+                javaPath.getFileName().toString() );
+        baseMkdir(parentLfcPath, dirName, connection);
         PathProperties newPathProperties = new PathProperties();
         newPathProperties.setPath(path);
         newPathProperties.setIsDirectory(true);

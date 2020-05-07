@@ -88,8 +88,10 @@ public class LaunchFormLayout extends AbstractFormLayout {
         });
         this.addMember(docLabel);
 
-        simulationNameItem = FieldUtil.getTextItem(400, "[0-9A-Za-z-_ ]");
-        simulationNameItem.setValidators(ValidatorUtil.getStringValidator());
+        simulationNameItem = FieldUtil.getTextItem(400,
+                "[" + ApplicationConstants.EXEC_NAME_VALID_CHARS + "]");
+        simulationNameItem.setValidators(ValidatorUtil.getStringValidator(
+                "^([" + ApplicationConstants.EXEC_NAME_VALID_CHARS + "])+$"));
         simulationNameItem.setEditPendingCSSText("padding-left: 30px");
 
         if (executionNamePadding) { // To align horizontaly "Execution name" and the text field on the others comboBoxes (inputs comboBoxes) of the screen

@@ -58,6 +58,9 @@ import java.sql.SQLException;
 import java.util.*;
 import java.util.Map.Entry;
 
+import static fr.insalyon.creatis.vip.api.CarminProperties.ADDITIONNAL_INPUT_VALID_CHARS;
+import static fr.insalyon.creatis.vip.application.client.ApplicationConstants.INPUT_VALID_CHARS;
+
 /**
  *
  * @author Tristan Glatard
@@ -263,6 +266,7 @@ public class ExecutionBusiness {
                         execution.getIdentifier());
                 throw new ApiException("Update of execution timeout is not supported.");
             }
+            checkInputExecNameIsValid(execution.getName());
             logger.info("updating execution " + execution.getIdentifier()
                     + " name to " + execution.getName());
             workflowBusiness.updateDescription(execution.getIdentifier(), execution.getName());
@@ -307,13 +311,14 @@ public class ExecutionBusiness {
             inputMap.put(CoreConstants.RESULTS_DIRECTORY_PARAM_NAME,
                          resultsLocation);
         }
+        checkInputExecNameIsValid(execution.getName());
         return initExecution(
             execution.getPipelineIdentifier(), inputMap, execution.getTimeout(),
             execution.getName(), execution.getStudyIdentifier(), true,
             connection);
     }
 
-    private String handleRestParameter(String parameterName, Object restParameterValue) {
+    private String handleRestParameter(String parameterName, Object restParameterValue) throws ApiException {
         if (restParameterValue instanceof List) {
             StringBuilder paramBuilder = new StringBuilder();
             boolean isFirst = true;
@@ -321,32 +326,36 @@ public class ExecutionBusiness {
                 if (!isFirst) {
                     paramBuilder.append(ApplicationConstants.SEPARATOR_LIST);
                 }
-                paramBuilder.append(listElement.toString());
+                String inputValue = listElement.toString();
+                checkInputIsValid(inputValue);
+                paramBuilder.append(inputValue);
                 isFirst = false;
             }
             logger.info("Handling list parameter for parameter [" + parameterName +"]");
             return paramBuilder.toString();
         } else {
-            return  restParameterValue.toString();
+            String inputValue = restParameterValue.toString();
+            checkInputIsValid(inputValue);
+            return restParameterValue.toString();
         }
     }
 
-
-    public String initExecution(String pipelineId,
-                                ArrayList<StringKeyParameterValuePair> inputValues,
-                                Integer timeoutInSeconds,
-                                String executionName,
-                                String studyId,
-                                Boolean playExecution,
-                                Connection connection) throws ApiException {// Build input parameter map
-        Map<String, String> inputMap = new HashMap<>();
-        for (StringKeyParameterValuePair skpvp : inputValues) {
-            logger.info("Adding value " + skpvp.getValue().getValue() + " to input " + skpvp.getName());
-            inputMap.put(skpvp.getName(), skpvp.getValue().getValue());
+    private void checkInputIsValid(String input) throws ApiException {
+        String validChars = INPUT_VALID_CHARS + ADDITIONNAL_INPUT_VALID_CHARS;
+        if( ! input.matches("[" + validChars + "]+")) {
+            logger.error("Input {} is not valid. Authorized characters are {}",
+                    input, validChars);
+            throw new ApiException("Input " + input + " is not valid.");
         }
-        return initExecution(
-            pipelineId, inputMap, timeoutInSeconds, executionName, studyId,
-            playExecution, connection);
+    }
+
+    private void checkInputExecNameIsValid(String input) throws ApiException {
+        if( ! input.matches("[" + ApplicationConstants.EXEC_NAME_VALID_CHARS + "]+")) {
+            logger.error("Execution name {} is not valid. Authorized characters are {}",
+                    input, ApplicationConstants.EXEC_NAME_VALID_CHARS);
+            throw new ApiException("Execution name " + input + " is not valid.");
+
+        }
     }
 
     public String initExecution(String pipelineId,

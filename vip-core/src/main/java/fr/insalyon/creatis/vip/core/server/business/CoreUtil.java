@@ -41,6 +41,9 @@ import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
+import java.text.Normalizer;
+
 /**
  *
  * @author Rafael Ferreira da Silva
@@ -92,5 +95,36 @@ public class CoreUtil {
             server.getGRIDAHost(),
             server.getGRIDAPort(),
             server.getServerProxy(server.getVoName()));
+    }
+
+
+    /*
+        remove accents and non-ascii characters
+    */
+    public static String getCleanString(String s) {
+        return getCleanString(s, true, true);
+    }
+
+    public static String getCleanString(
+            String s, boolean removeAccents, boolean onlyKeepAscii) {
+        if ( removeAccents) {
+            // Normalizer.normalize with NFKD form decompose accentuated
+            // letters into separate "accent mark + base letter" characters
+            s = Normalizer.normalize(s, Normalizer.Form.NFKD);
+        }
+
+        if (onlyKeepAscii) {
+            // the [^\\p{ASCII}] regex remove all non-ascii characters
+            // so also the separated accents char if removeAccents is true
+            return s.replaceAll("[^\\p{ASCII}]", "");
+        } else if (removeAccents) {
+            // the '\p{M}' regex remove all the combining marks (accents and
+            // other exotic stuff) and is less strict than onlyKeepAscii
+            // for instance it will keep 'œ' '«' '»' '°'
+            return s.replaceAll("\\p{M}", "");
+        } else {
+            // nothing to do
+            return s;
+        }
     }
 }
