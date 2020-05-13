@@ -53,12 +53,12 @@ public class ApplicationException extends VipException implements IsSerializable
         ApplicationError(Integer code) { this.code = code; }
         @Override
         public Integer getCode() { return code; }
-    }
 
-    static {
-        addMessage(ApplicationError.PLATFORM_MAX_EXECS, "Max number of running executions reached on the platform.", 0);
-        addMessage(ApplicationError.USER_MAX_EXECS, "Max number of running executions reached.<br />You already have {} running executions.", 1);
-        addMessage(ApplicationError.WRONG_APPLICATION_DESCRIPTOR, "Error getting application descriptor for {}.", 1);
+        static {
+            addMessage(ApplicationError.PLATFORM_MAX_EXECS, "Max number of running executions reached on the platform.", 0);
+            addMessage(ApplicationError.USER_MAX_EXECS, "Max number of running executions reached.<br />You already have {} running executions.", 1);
+            addMessage(ApplicationError.WRONG_APPLICATION_DESCRIPTOR, "Error getting application descriptor for {}.", 1);
+        }
     }
 
     public ApplicationException() {
