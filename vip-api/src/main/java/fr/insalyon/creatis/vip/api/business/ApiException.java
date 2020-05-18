@@ -1,0 +1,89 @@
+/*
+ * Copyright and authors: see LICENSE.txt in base repository.
+ *
+ * This software is a web portal for pipeline execution on distributed systems.
+ *
+ * This software is governed by the CeCILL-B license under French law and
+ * abiding by the rules of distribution of free software.  You can  use, 
+ * modify and/ or redistribute the software under the terms of the CeCILL-B
+ * license as circulated by CEA, CNRS and INRIA at the following URL
+ * "http://www.cecill.info". 
+ *
+ * As a counterpart to the access to the source code and  rights to copy,
+ * modify and redistribute granted by the license, users are provided only
+ * with a limited warranty  and the software's author,  the holder of the
+ * economic rights,  and the successive licensors  have only  limited
+ * liability. 
+ *
+ * In this respect, the user's attention is drawn to the risks associated
+ * with loading,  using,  modifying and/or developing or reproducing the
+ * software by the user in light of its specific status of free software,
+ * that may mean  that it is complicated to manipulate,  and  that  also
+ * therefore means  that it is reserved for developers  and  experienced
+ * professionals having in-depth computer knowledge. Users are therefore
+ * encouraged to load and test the software's suitability as regards their
+ * requirements in conditions enabling the security of their systems and/or 
+ * data to be ensured and,  more generally, to use and operate it in the 
+ * same conditions as regards security. 
+ *
+ * The fact that you are presently reading this means that you have had
+ * knowledge of the CeCILL-B license and that you accept its terms.
+ */
+package fr.insalyon.creatis.vip.api.business;
+
+import fr.insalyon.creatis.vip.core.client.VipException;
+
+/**
+ *
+ * @author Tristan Glatard
+ */
+public class ApiException extends VipException {
+
+    /* Reserved codes : 8xxx : vip-api */
+    public enum ApiError implements VipError{
+        GENERIC_API_ERROR(8000),
+        NOT_IMPLEMENTED(8001),
+        BAD_CREDENTIALS(8002),
+        INSUFFICIENT_AUTH(8003),
+        AUTHENTICATION_ERROR(8004),
+        INVALID_PIPELINE_IDENTIFIER(8005),
+        APPLICATION_NOT_FOUND(8006),
+        PIPELINE_NOT_FOUND(8007),
+        NOT_ALLOWED_TO_USE_APPLICATION(8008);
+
+
+        private Integer code;
+        ApiError(Integer code) { this.code = code; }
+        @Override
+        public Integer getCode() { return code; }
+
+        static {
+            addMessage(ApiError.GENERIC_API_ERROR, "An error has been encountered on the VIP API", 0);
+            addMessage(ApiError.NOT_IMPLEMENTED, "The {} method is not implemented in the VIP API", 1);
+            addMessage(ApiError.INVALID_PIPELINE_IDENTIFIER, "The {} pipeline identifier is not valid", 1);
+            addMessage(ApiError.APPLICATION_NOT_FOUND, "The {} application does not exists", 1);
+            addMessage(ApiError.PIPELINE_NOT_FOUND, "The {} pipeline does not exists or cannot be used", 1);
+            addMessage(ApiError.NOT_ALLOWED_TO_USE_APPLICATION, "Not allowed to access application {}", 1);
+        }
+    }
+
+    public ApiException(String message) {
+        super(message);
+    }
+
+    public ApiException(Throwable thrwbl) {
+        super(thrwbl);
+    }
+
+    public ApiException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
+    public ApiException(ApiError apiError, Object... params) {
+        super(apiError, params);
+    }
+
+    public ApiException(ApiError apiError, Throwable cause, Object... params) {
+        super(apiError, cause, params);
+    }
+}

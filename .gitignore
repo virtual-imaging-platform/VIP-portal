@@ -3,5 +3,6 @@
 *.iml
 
 #maven
+.flattened-pom.xml
 target/
 
