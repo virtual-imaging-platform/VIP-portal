@@ -89,7 +89,7 @@ public class ApiUtils {
     }
 
     public static ParameterType getCarminType(String vipType) {
-        return vipType.equals("URI") ? ParameterType.File : ParameterType.String;
+        return vipType.equalsIgnoreCase("URI") ? ParameterType.File : ParameterType.String;
     }
 
     public static void checkIfValidPipelineIdentifier(String identifier) throws ApiException {
