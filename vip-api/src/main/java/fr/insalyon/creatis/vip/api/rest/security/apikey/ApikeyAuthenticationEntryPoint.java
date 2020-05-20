@@ -36,6 +36,7 @@ import fr.insalyon.creatis.vip.api.business.ApiException.ApiError;
 import fr.insalyon.creatis.vip.api.rest.model.ErrorCodeAndMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
+import org.springframework.http.MediaType;
 import org.springframework.security.authentication.*;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
@@ -62,7 +63,7 @@ public class ApikeyAuthenticationEntryPoint implements AuthenticationEntryPoint 
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
         response.addHeader("WWW-Authenticate", "API-key");
-        response.setContentType("application/json;charset=UTF-8");
+        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         ErrorCodeAndMessage error = new ErrorCodeAndMessage();
         if (authException instanceof BadCredentialsException) {
             error.setErrorCode(ApiError.BAD_CREDENTIALS.getCode());

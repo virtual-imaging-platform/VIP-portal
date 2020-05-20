@@ -93,10 +93,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     @Override
     protected ResponseEntity<Object> handleExceptionInternal(Exception ex, Object body, HttpHeaders headers, HttpStatus status, WebRequest request) {
         logger.error("Internal spring exception catched", ex);
-        ErrorCodeAndMessage codeAndmessage =
-                new ErrorCodeAndMessage(
-                        status.value()*100,
-                        ex.getMessage());
+        ErrorCodeAndMessage codeAndmessage = fetchErrorInException(ex);
         return new ResponseEntity<Object>(codeAndmessage, headers, status);
     }
 
@@ -105,7 +102,6 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     @ResponseBody
     public ErrorCodeAndMessage handleAllException(Exception e) {
         logger.error("Unexpected exception catched", e);
-        return new ErrorCodeAndMessage(50000,
-                "Internal Error");
+        return fetchErrorInException(e);
     }
 }

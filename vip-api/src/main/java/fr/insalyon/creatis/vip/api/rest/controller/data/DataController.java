@@ -224,16 +224,11 @@ public class DataController {
     }
 
     private String extractWildcardPath(HttpServletRequest request) throws ApiException {
-        try {
-            String prefixToSearch = "/rest/path/"; // TODO : parametize that
-            String decodedUri = UriUtils.decode(request.getRequestURI(), "UTF-8");
-            int index = decodedUri.indexOf(prefixToSearch);
-            // "-1" at the end to keep the beginning slash
-            return decodedUri.substring(index + prefixToSearch.length() - 1);
-        } catch (UnsupportedEncodingException e) {
-            logger.error("Error decoding uri {}", request.getRequestURI(), e);
-            throw new ApiException(e);
-        }
+        String prefixToSearch = "/rest/path/"; // TODO : parametize that
+        String decodedUri = UriUtils.decode(request.getRequestURI(), "UTF-8");
+        int index = decodedUri.indexOf(prefixToSearch);
+        // "-1" at the end to keep the beginning slash
+        return decodedUri.substring(index + prefixToSearch.length() - 1);
     }
 }
 

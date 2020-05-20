@@ -41,6 +41,7 @@ import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.*;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.web.firewall.StrictHttpFirewall;
 
 /**
  * Spring security configuration.
@@ -87,5 +88,12 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
     @Bean
     public ObjectMapper objectMapper() {
         return Jackson2ObjectMapperBuilder.json().build();
+    }
+
+    @Bean
+    public StrictHttpFirewall httpFirewall() {
+        StrictHttpFirewall firewall = new StrictHttpFirewall();
+        firewall.setAllowUrlEncodedSlash(true);
+        return firewall;
     }
 }

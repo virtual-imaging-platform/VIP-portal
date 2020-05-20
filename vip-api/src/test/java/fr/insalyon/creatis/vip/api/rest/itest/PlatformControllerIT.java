@@ -37,7 +37,8 @@ import fr.insalyon.creatis.vip.api.rest.config.RestTestUtils;
 import fr.insalyon.creatis.vip.api.rest.model.SupportedTransferProtocol;
 import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.springframework.http.MediaType;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -70,7 +71,7 @@ public class PlatformControllerIT extends BaseVIPSpringIT {
         mockMvc.perform(get("/rest/platform"))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(RestTestUtils.JSON_CONTENT_TYPE_UTF8))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.platformName")
                         .value(TEST_PLATFORM_NAME))
                 .andExpect(jsonPath("$.platformDescription")

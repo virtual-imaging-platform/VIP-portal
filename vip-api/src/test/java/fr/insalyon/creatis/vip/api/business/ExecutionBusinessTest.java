@@ -36,11 +36,10 @@ import fr.insalyon.creatis.vip.application.client.view.monitor.SimulationStatus;
 import fr.insalyon.creatis.vip.application.server.business.WorkflowBusiness;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.user.UserLevel;
-import org.junit.Ignore;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Created by abonnet on 7/6/16.
@@ -51,9 +50,6 @@ public class ExecutionBusinessTest {
     public static final String[] USER_LAST_NAME = {"lastName_1", "lastName_2"};
     public static final String[] USER_MAIL = {"mail_1@test.tst", "mail_2@test.tst"};
     public static final String EXEC_ID = "exec-test-1";
-
-    @Rule
-    public ExpectedException exception = ExpectedException.none();
 
     @Test
     public void checkIfAdminCanAccessAnyExecution() throws Exception {
@@ -69,9 +65,10 @@ public class ExecutionBusinessTest {
         Simulation simulation = prepareSimulation(EXEC_ID, 1); // choose a different user
         WorkflowBusiness mockedWb = prepareMockedWorkflowBusiness(EXEC_ID, simulation);
         ExecutionBusiness sut = new ExecutionBusiness(apiContext, null, mockedWb, null, null, null, null);
-        exception.expect(ApiException.class);
-        exception.expectMessage("Permission denied");
-        sut.checkIfUserCanAccessExecution(EXEC_ID);
+        ApiException apiException = assertThrows(ApiException.class,
+            () -> sut.checkIfUserCanAccessExecution(EXEC_ID)
+        );
+        assertEquals("Permission denied", apiException.getMessage());
     }
 
     @Test
