@@ -53,9 +53,9 @@ knowledge of the CeCILL-B license and that you accept its terms.
         <maven.compiler.source>1.8</maven.compiler.source>
 
         <!-- dependencies version -->
-        <springmvc.version>4.3.1.RELEASE</springmvc.version>
-        <springsecurity.version>4.1.1.RELEASE</springsecurity.version>
-        <jackson.version>2.9.10.1</jackson.version>
+        <springmvc.version>5.2.6.RELEASE</springmvc.version>
+        <springsecurity.version>5.3.2.RELEASE</springsecurity.version>
+        <jackson.version>2.11.0</jackson.version>
     </properties>
 
     <description>VIP</description>
@@ -115,11 +115,6 @@ knowledge of the CeCILL-B license and that you accept its terms.
             </dependency>
 
             <!-- logging libs -->
-            <dependency>
-                <groupId>org.slf4j</groupId>
-                <artifactId>jcl-over-slf4j</artifactId>
-                <version>1.7.30</version>
-            </dependency>
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-api</artifactId>

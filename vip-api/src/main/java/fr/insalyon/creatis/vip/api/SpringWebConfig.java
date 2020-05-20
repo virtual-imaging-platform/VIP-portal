@@ -50,6 +50,7 @@ import org.springframework.web.servlet.config.annotation.*;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.Collections;
 import java.util.function.*;
 
 import static fr.insalyon.creatis.vip.api.CarminProperties.CORS_AUTHORIZED_DOMAINS;
@@ -68,26 +69,28 @@ import static fr.insalyon.creatis.vip.api.CarminProperties.CORS_AUTHORIZED_DOMAI
  */
 @EnableWebMvc
 @ComponentScan
-public class SpringWebConfig extends WebMvcConfigurerAdapter {
+public class SpringWebConfig implements WebMvcConfigurer {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());;
 
     @Autowired
     private Environment env;
-    @Autowired
-    private BeanFactory beanFactory;
 
     @Override
-    public void configurePathMatch(PathMatchConfigurer matcher) {
+    public void configurePathMatch(PathMatchConfigurer configurer) {
         // Otherwise all that follow a dot in an URL is considered an extension and removed
         // It's a problem for URL like "/pipelines/gate/3.2
-        matcher.setUseSuffixPatternMatch(false);
+        // The below will become the default values in Spring 5.3
+        // Safe to use in 5.2 as long as disabling pattern match
+        configurer.setUseSuffixPatternMatch(false);
     }
 
     @Override
     public void configureContentNegotiation(ContentNegotiationConfigurer configurer) {
         // necessary in the content negotiation stuff of carmin data
-        configurer.favorPathExtension(false);
+        // this should be the default in Spring 5.3 and may be removed then
+        configurer.useRegisteredExtensionsOnly(true);
+        configurer.replaceMediaTypes(Collections.emptyMap());
     }
 
     @Bean
