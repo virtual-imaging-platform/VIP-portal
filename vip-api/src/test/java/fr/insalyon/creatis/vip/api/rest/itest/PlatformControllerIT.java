@@ -31,9 +31,13 @@
  */
 package fr.insalyon.creatis.vip.api.rest.itest;
 
+import fr.insalyon.creatis.vip.api.exception.ApiException;
+import fr.insalyon.creatis.vip.api.exception.ApiException.ApiError;
 import fr.insalyon.creatis.vip.api.model.Module;
 import fr.insalyon.creatis.vip.api.rest.config.BaseVIPSpringIT;
 import fr.insalyon.creatis.vip.api.model.SupportedTransferProtocol;
+import fr.insalyon.creatis.vip.application.client.bean.Application;
+import fr.insalyon.creatis.vip.application.client.view.ApplicationException.ApplicationError;
 import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
@@ -91,9 +95,13 @@ public class PlatformControllerIT extends BaseVIPSpringIT {
                         .value(Integer.valueOf(TEST_DATA_MAX_SIZE)))
                 // it should be a long, be the test value being small it's actually an int
                 .andExpect(jsonPath("$.APIErrorCodesAndMessages[*]",
-                        containsInAnyOrder(
-                                jsonCorrespondsToErrorCodeAndMessage(TEST_ERROR_CODES_AND_MESSAGES[0]),
-                                jsonCorrespondsToErrorCodeAndMessage(TEST_ERROR_CODES_AND_MESSAGES[1]))));
+                        hasSize(ApiError.values().length + ApplicationError.values().length)))
+                .andExpect(jsonPath("$.APIErrorCodesAndMessages[*]",
+                    hasItems(
+                        jsonCorrespondsToErrorCodeAndMessage(ApiError.GENERIC_API_ERROR),
+                        jsonCorrespondsToErrorCodeAndMessage(ApiError.NOT_ALLOWED_TO_USE_APPLICATION),
+                        jsonCorrespondsToErrorCodeAndMessage(ApplicationError.USER_MAX_EXECS),
+                        jsonCorrespondsToErrorCodeAndMessage(8002, "The error message for 'bad credentials' cannot be known in advance"))));
 
     }
 
