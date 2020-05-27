@@ -31,7 +31,6 @@
  */
 package fr.insalyon.creatis.vip.api.rest.mockconfig;
 
-import fr.insalyon.creatis.vip.api.business.ApiUtils;
 import fr.insalyon.creatis.vip.api.rest.config.BaseVIPSpringIT;
 import fr.insalyon.creatis.vip.application.client.bean.*;
 import fr.insalyon.creatis.vip.application.server.business.*;
@@ -112,6 +111,6 @@ public class ApplicationsConfigurator {
         when(workflowBusiness.getApplicationDescriptor(
                  eq(user), eq(app.getName()), eq(version.getVersion()), any()))
             .thenReturn(getDescriptor("desc test", appParamsIndexes));
-        return ApiUtils.getPipelineIdentifier(app.getName(), version.getVersion());
+        return app.getName() + "/" + version.getVersion();
     }
 }

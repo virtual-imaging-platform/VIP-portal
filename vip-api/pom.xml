@@ -97,6 +97,11 @@ knowledge of the CeCILL-B license and that you accept its terms.
             <artifactId>hibernate-validator</artifactId>
             <version>6.1.5.Final</version>
         </dependency>
+        <dependency>
+            <groupId>org.glassfish</groupId>
+            <artifactId>jakarta.el</artifactId>
+            <version>3.0.3</version>
+        </dependency>
 
         <!-- Test dependencies -->
 

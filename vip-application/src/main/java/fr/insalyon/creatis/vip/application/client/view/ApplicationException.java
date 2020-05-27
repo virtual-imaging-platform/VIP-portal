@@ -34,8 +34,6 @@ package fr.insalyon.creatis.vip.application.client.view;
 import com.google.gwt.user.client.rpc.IsSerializable;
 import fr.insalyon.creatis.vip.core.client.VipException;
 
-import javax.validation.constraints.Max;
-
 /**
  *
  * @author Rafael Silva

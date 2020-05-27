@@ -31,7 +31,7 @@
  */
 package fr.insalyon.creatis.vip.api.data;
 
-import fr.insalyon.creatis.vip.api.rest.model.ErrorCodeAndMessage;
+import fr.insalyon.creatis.vip.api.model.ErrorCodeAndMessage;
 import fr.insalyon.creatis.vip.api.tools.spring.JsonCustomObjectMatcher;
 import org.hamcrest.Matcher;
 

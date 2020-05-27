@@ -31,10 +31,12 @@
  */
 package fr.insalyon.creatis.vip.api.rest.itest;
 
+import fr.insalyon.creatis.vip.api.exception.ApiException.ApiError;
 import fr.insalyon.creatis.vip.api.data.UserTestUtils;
 import fr.insalyon.creatis.vip.api.rest.config.BaseVIPSpringIT;
 import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
 import org.junit.jupiter.api.Test;
+import org.springframework.http.MediaType;
 
 import static fr.insalyon.creatis.vip.api.data.AuthenticationInfoTestUtils.jsonCorrespondsToAuthenticationInfo;
 import static fr.insalyon.creatis.vip.api.data.CarminAPITestConstants.TEST_APIKEY_HEADER;
@@ -71,6 +73,20 @@ public class AuthenticationControllerIT extends BaseVIPSpringIT {
                         jsonCorrespondsToAuthenticationInfo(TEST_APIKEY_HEADER, apikey)
                 ))
                 .andExpect(status().isOk());
+    }
+
+
+    @Test
+    public void missingInfoAuthentication() throws Exception {
+        mockMvc.perform(
+                post("/rest/authenticate")
+                        .contentType("application/json")
+                        .content("{}"))
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.errorCode")
+                        .value(ApiError.INPUT_FIELD_NOT_VALID.getCode()));;
     }
 
 }

@@ -31,10 +31,9 @@
  */
 package fr.insalyon.creatis.vip.api.rest.itest;
 
-import fr.insalyon.creatis.vip.api.bean.Module;
+import fr.insalyon.creatis.vip.api.model.Module;
 import fr.insalyon.creatis.vip.api.rest.config.BaseVIPSpringIT;
-import fr.insalyon.creatis.vip.api.rest.config.RestTestUtils;
-import fr.insalyon.creatis.vip.api.rest.model.SupportedTransferProtocol;
+import fr.insalyon.creatis.vip.api.model.SupportedTransferProtocol;
 import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;

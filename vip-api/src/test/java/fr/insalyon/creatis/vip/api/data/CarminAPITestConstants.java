@@ -31,11 +31,12 @@
  */
 package fr.insalyon.creatis.vip.api.data;
 
-import fr.insalyon.creatis.vip.api.bean.Module;
-import fr.insalyon.creatis.vip.api.rest.model.*;
+import fr.insalyon.creatis.vip.api.model.ErrorCodeAndMessage;
+import fr.insalyon.creatis.vip.api.model.Module;
+import fr.insalyon.creatis.vip.api.model.SupportedTransferProtocol;
 
-import static fr.insalyon.creatis.vip.api.bean.Module.*;
-import static fr.insalyon.creatis.vip.api.rest.model.SupportedTransferProtocol.*;
+import static fr.insalyon.creatis.vip.api.model.Module.*;
+import static fr.insalyon.creatis.vip.api.model.SupportedTransferProtocol.*;
 
 /**
  * Created by abonnet on 7/21/16.

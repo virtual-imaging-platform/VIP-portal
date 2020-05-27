@@ -31,21 +31,18 @@
  */
 package fr.insalyon.creatis.vip.api.rest.itest.processing;
 
-import fr.insalyon.creatis.vip.api.bean.Execution;
-import fr.insalyon.creatis.vip.api.business.ApiException.ApiError;
+import fr.insalyon.creatis.vip.api.model.Execution;
+import fr.insalyon.creatis.vip.api.exception.ApiException.ApiError;
 import fr.insalyon.creatis.vip.api.data.ExecutionTestUtils;
 import fr.insalyon.creatis.vip.api.data.PathTestUtils;
 import fr.insalyon.creatis.vip.api.rest.config.BaseVIPSpringIT;
 import fr.insalyon.creatis.vip.api.rest.config.RestTestUtils;
 import fr.insalyon.creatis.vip.application.client.bean.Simulation;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
-import org.hamcrest.Matcher;
 import org.hamcrest.MatcherAssert;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.http.MediaType;
-import org.springframework.util.Assert;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -239,6 +236,20 @@ public class ExecutionControllerIT extends BaseVIPSpringIT {
         MatcherAssert.<Map<?, ?>>assertThat(inputCaptor.getValue(), allOf(
                 hasEntry("param 1", "test text"),
                 hasEntry("param 2", "/path/test")));
+    }
+
+    @Test
+    public void testNotInitExecutionMissingField() throws Exception {
+        mockMvc.perform(
+            post("/rest/executions").contentType("application/json")
+                    .content("{}")
+                    .with(baseUser1())
+        ).andDo(print())
+        .andExpect(status().isBadRequest())
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+        .andExpect(jsonPath("$.errorCode")
+                .value(ApiError.INPUT_FIELD_NOT_VALID.getCode())
+        );
     }
 
     @Test

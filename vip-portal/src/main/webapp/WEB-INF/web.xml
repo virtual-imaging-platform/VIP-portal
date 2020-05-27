@@ -163,7 +163,7 @@ knowledge of the CeCILL-B license and that you accept its terms.
         </init-param>
         <init-param>
             <param-name>contextInitializerClasses</param-name>
-            <param-value>fr.insalyon.creatis.vip.api.ApiPropertiesInitializer</param-value>
+            <param-value>fr.insalyon.creatis.vip.api.business.ApiPropertiesInitializer</param-value>
         </init-param>
         <load-on-startup>1</load-on-startup>
     </servlet>

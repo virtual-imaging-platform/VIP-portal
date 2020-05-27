@@ -31,8 +31,7 @@
  */
 package fr.insalyon.creatis.vip.api.data;
 
-import fr.insalyon.creatis.vip.api.bean.*;
-import fr.insalyon.creatis.vip.api.business.ApiUtils;
+import fr.insalyon.creatis.vip.api.model.*;
 import fr.insalyon.creatis.vip.api.tools.spring.JsonCustomObjectMatcher;
 import fr.insalyon.creatis.vip.application.client.bean.*;
 import org.hamcrest.Matcher;
@@ -62,15 +61,12 @@ public class PipelineTestUtils {
                 "true", "default value 1", "", "");
 
         pipelineParam1 = new PipelineParameter(sourceParam1.getName(), ParameterType.String,
-                true, false, new ParameterTypedValue(ParameterType.String,sourceParam1.getDefaultValue()),
-                sourceParam1.getDefaultValue(), sourceParam1.getDescription());
+                true, false, sourceParam1.getDefaultValue(), sourceParam1.getDescription());
 
         sourceParam2 = new Source("param 2", "URI", "user level 2", "desc param 2");
 
         pipelineParam2 = new PipelineParameter(sourceParam2.getName(), ParameterType.File,
-
-                false, false, new ParameterTypedValue(ParameterType.File, sourceParam2.getDefaultValue()),
-                sourceParam2.getDefaultValue(), sourceParam2.getDescription());
+                false, false, sourceParam2.getDefaultValue(), sourceParam2.getDescription());
 
         paramPairs = new Entry[] {new SimpleEntry(sourceParam1, pipelineParam1),
             new SimpleEntry(sourceParam2, pipelineParam2)};
@@ -81,7 +77,7 @@ public class PipelineTestUtils {
     }
 
     public static Pipeline getPipeline(Application app, AppVersion version) {
-        return new Pipeline(ApiUtils.getPipelineIdentifier(app.getName(), version.getVersion()),
+        return new Pipeline(app.getName() + "/" + version.getVersion(),
                 app.getName(), version.getVersion(), true);
     }
 
@@ -120,7 +116,7 @@ public class PipelineTestUtils {
                 PipelineParameter::getType,
                 PipelineParameter::isOptional,
                 PipelineParameter::isReturnedValue,
-                PipelineParameter::getRestDefaultValue,
+                PipelineParameter::getDefaultValue,
                 PipelineParameter::getDescription);
     }
 

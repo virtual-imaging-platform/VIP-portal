@@ -31,12 +31,12 @@
  */
 package fr.insalyon.creatis.vip.api.rest.itest;
 
-import fr.insalyon.creatis.vip.api.ApiPropertiesInitializer;
+import fr.insalyon.creatis.vip.api.business.ApiPropertiesInitializer;
 import fr.insalyon.creatis.vip.api.SpringWebConfig;
-import fr.insalyon.creatis.vip.api.VipConfigurer;
-import fr.insalyon.creatis.vip.api.business.ApiException;
+import fr.insalyon.creatis.vip.api.business.VipConfigurer;
+import fr.insalyon.creatis.vip.api.exception.ApiException;
 import fr.insalyon.creatis.vip.api.rest.config.BaseVIPSpringIT;
-import fr.insalyon.creatis.vip.api.rest.controller.PlatformController;
+import fr.insalyon.creatis.vip.api.controller.PlatformController;
 import fr.insalyon.creatis.vip.application.server.business.WorkflowBusiness;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -45,12 +45,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
-import org.springframework.core.env.Environment;
 import org.springframework.test.context.junit.jupiter.web.SpringJUnitWebConfig;
 import org.springframework.util.Assert;
 
 import java.nio.file.Paths;
 import java.util.Collections;
+
+import static org.mockito.ArgumentMatchers.any;
 
 /**
  * Created by abonnet on 7/21/16.
@@ -70,7 +71,9 @@ public class DefaultSpringConfigurationIT {
     static class TestConfig {
         @Bean
         public VipConfigurer vipConfigurer() {
-            return Mockito.mock(VipConfigurer.class);
+            VipConfigurer mock = Mockito.mock(VipConfigurer.class);
+            Mockito.when(mock.preHandle(any(), any(), any())).thenReturn(true);
+            return mock;
         }
 
         @Bean

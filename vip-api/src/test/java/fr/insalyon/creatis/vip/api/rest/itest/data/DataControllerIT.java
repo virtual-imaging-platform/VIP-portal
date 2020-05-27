@@ -32,8 +32,7 @@
 package fr.insalyon.creatis.vip.api.rest.itest.data;
 
 import fr.insalyon.creatis.vip.api.rest.config.BaseVIPSpringIT;
-import fr.insalyon.creatis.vip.api.rest.config.RestTestUtils;
-import fr.insalyon.creatis.vip.api.rest.model.PathProperties;
+import fr.insalyon.creatis.vip.api.model.PathProperties;
 import fr.insalyon.creatis.vip.datamanager.client.bean.PoolOperation;
 import fr.insalyon.creatis.vip.datamanager.client.bean.PoolOperation.Status;
 import fr.insalyon.creatis.vip.datamanager.client.bean.PoolOperation.Type;
@@ -157,6 +156,7 @@ public class DataControllerIT extends BaseVIPSpringIT {
                 get("/rest/path" + lfcPath).param("action", "content").with(baseUser1()))
                 .andDo(print())
                 .andExpect(status().isOk());
+        // todo test file content
     }
 
     @Test

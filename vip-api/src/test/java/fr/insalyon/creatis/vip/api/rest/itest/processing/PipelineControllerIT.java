@@ -31,15 +31,12 @@
  */
 package fr.insalyon.creatis.vip.api.rest.itest.processing;
 
-import fr.insalyon.creatis.vip.api.business.ApiException.ApiError;
-import fr.insalyon.creatis.vip.api.business.ApiUtils;
+import fr.insalyon.creatis.vip.api.exception.ApiException.ApiError;
 import fr.insalyon.creatis.vip.api.rest.config.*;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
-import org.springframework.util.MimeTypeUtils;
 
-import java.net.URLEncoder;
 import java.util.Arrays;
 
 import static fr.insalyon.creatis.vip.api.data.AppVersionTestUtils.*;
@@ -131,7 +128,7 @@ public class PipelineControllerIT extends BaseVIPSpringIT {
     public void shouldReturnErrorOnConfiguredVipException() throws Exception {
         configureApplications(this, baseUser1, Arrays.asList(class1, class2),
                 app2, version42);
-        String pipelineId = ApiUtils.getPipelineIdentifier(app2.getName(), version42.getVersion());
+        String pipelineId = app2.getName() + "/" + version42.getVersion();
         when(workflowBusiness.getApplicationDescriptor(
                 eq(baseUser1), eq(app2.getName()), eq(version42.getVersion()), any()))
                 .thenThrow(new BusinessException(WRONG_APPLICATION_DESCRIPTOR, pipelineId));
