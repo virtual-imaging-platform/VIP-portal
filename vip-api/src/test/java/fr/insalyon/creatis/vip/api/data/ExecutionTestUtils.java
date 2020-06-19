@@ -31,7 +31,7 @@
  */
 package fr.insalyon.creatis.vip.api.data;
 
-import fr.insalyon.creatis.vip.api.bean.*;
+import fr.insalyon.creatis.vip.api.model.*;
 import fr.insalyon.creatis.vip.api.tools.spring.JsonCustomObjectMatcher;
 import fr.insalyon.creatis.vip.application.client.bean.*;
 import fr.insalyon.creatis.vip.application.client.view.monitor.SimulationStatus;
@@ -62,11 +62,12 @@ public class ExecutionTestUtils {
                 new GregorianCalendar(2016, 9, 2).getTime(),
                 "Exec test 1", SimulationStatus.Running.toString(), "engine 1");
         execution1 = getExecution(simulation1, ExecutionStatus.RUNNING);
-        execution1.setRestInputValues(new HashMap<String,Object>() {{
+        execution1.setInputValues(new HashMap<String,Object>() {{
                 put("param 1", "value 1");
                 put("param 2", "42");
             }}
         );
+        execution1.clearReturnedFiles();
 
         simulation1InData = Arrays.asList(
                 new InOutData("value 1", "param 1", "String"),
@@ -78,11 +79,11 @@ public class ExecutionTestUtils {
                 new GregorianCalendar(2016, 4, 29).getTime(),
                 "Exec test 2", SimulationStatus.Completed.toString(), "engine 1");
         execution2 = getExecution(simulation2, ExecutionStatus.FINISHED);
-        execution2.setRestInputValues(new HashMap<String,Object>() {{
+        execution2.setInputValues(new HashMap<String,Object>() {{
                   put("param2-1", "5.3");
               }}
         );
-        execution2.setRestReturnedFiles(new HashMap<String,List<Object>>() {{
+        execution2.setReturnedFiles(new HashMap<String,List<Object>>() {{
             put("param2-res", Collections.singletonList("/vip/Home/testFile1.xml"));
         }});
         simulation2InData = Collections.singletonList(
@@ -135,8 +136,8 @@ public class ExecutionTestUtils {
                 execution.getResultsLocation()
         );
         // WARNING, do not copy input value and returned files objects
-        newExecution.setRestInputValues(execution.getRestInputValues());
-        newExecution.setRestReturnedFiles(execution.getRestReturnedFiles());
+        newExecution.setInputValues(execution.getInputValues());
+        newExecution.setReturnedFiles(execution.getReturnedFiles());
         return newExecution;
     }
 
@@ -166,8 +167,8 @@ public class ExecutionTestUtils {
                 Execution::getPipelineIdentifier,
                 Execution::getTimeout,
                 execution -> execution.getStatus().getRestLabel(),
-                Execution::getRestInputValues,
-                Execution::getRestReturnedFiles,
+                Execution::getInputValues,
+                Execution::getReturnedFiles,
                 Execution::getStudyIdentifier,
                 Execution::getErrorCode,
                 Execution::getStartDate,

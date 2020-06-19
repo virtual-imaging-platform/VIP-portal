@@ -31,26 +31,30 @@
  */
 package fr.insalyon.creatis.vip.api;
 
-import fr.insalyon.creatis.vip.api.business.ApiContext;
+import fr.insalyon.creatis.vip.api.business.VipConfigurer;
 import fr.insalyon.creatis.vip.api.exception.SQLRuntimeException;
-import fr.insalyon.creatis.vip.application.server.business.*;
-import fr.insalyon.creatis.vip.core.server.business.*;
-import fr.insalyon.creatis.vip.core.server.dao.*;
+import fr.insalyon.creatis.vip.application.server.business.ApplicationBusiness;
+import fr.insalyon.creatis.vip.application.server.business.ClassBusiness;
+import fr.insalyon.creatis.vip.application.server.business.SimulationBusiness;
+import fr.insalyon.creatis.vip.application.server.business.WorkflowBusiness;
+import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
+import fr.insalyon.creatis.vip.core.server.dao.CoreDAOFactory;
+import fr.insalyon.creatis.vip.core.server.dao.DAOException;
+import fr.insalyon.creatis.vip.core.server.dao.UserDAO;
 import fr.insalyon.creatis.vip.core.server.dao.mysql.PlatformConnection;
 import fr.insalyon.creatis.vip.datamanager.server.business.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.BeanFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.*;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.core.env.Environment;
-import org.springframework.core.io.support.ResourcePropertySource;
 import org.springframework.web.servlet.config.annotation.*;
 
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.function.*;
+import java.util.Collections;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 import static fr.insalyon.creatis.vip.api.CarminProperties.CORS_AUTHORIZED_DOMAINS;
 
@@ -68,26 +72,33 @@ import static fr.insalyon.creatis.vip.api.CarminProperties.CORS_AUTHORIZED_DOMAI
  */
 @EnableWebMvc
 @ComponentScan
-public class SpringWebConfig extends WebMvcConfigurerAdapter {
+public class SpringWebConfig implements WebMvcConfigurer {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());;
 
-    @Autowired
     private Environment env;
-    @Autowired
-    private BeanFactory beanFactory;
+    private VipConfigurer vipConfigurer;
+
+    public SpringWebConfig(Environment env, VipConfigurer vipConfigurer) {
+        this.env = env;
+        this.vipConfigurer = vipConfigurer;
+    }
 
     @Override
-    public void configurePathMatch(PathMatchConfigurer matcher) {
+    public void configurePathMatch(PathMatchConfigurer configurer) {
         // Otherwise all that follow a dot in an URL is considered an extension and removed
         // It's a problem for URL like "/pipelines/gate/3.2
-        matcher.setUseSuffixPatternMatch(false);
+        // The below will become the default values in Spring 5.3
+        // Safe to use in 5.2 as long as disabling pattern match
+        configurer.setUseSuffixPatternMatch(false);
     }
 
     @Override
     public void configureContentNegotiation(ContentNegotiationConfigurer configurer) {
         // necessary in the content negotiation stuff of carmin data
-        configurer.favorPathExtension(false);
+        // this should be the default in Spring 5.3 and may be removed then
+        configurer.useRegisteredExtensionsOnly(true);
+        configurer.replaceMediaTypes(Collections.emptyMap());
     }
 
     @Bean
@@ -109,10 +120,9 @@ public class SpringWebConfig extends WebMvcConfigurerAdapter {
             .allowedOrigins(env.getProperty(CORS_AUTHORIZED_DOMAINS, String[].class, new String[0]));
     }
 
-    @Bean
-    @Scope(proxyMode = ScopedProxyMode.TARGET_CLASS, value = "request")
-    public ApiContext apiContext() {
-        return new ApiContext();
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+        registry.addInterceptor(vipConfigurer);
     }
 
     @Bean

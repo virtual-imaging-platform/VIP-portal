@@ -204,12 +204,6 @@ knowledge of the CeCILL-B license and that you accept its terms.
             <scope>provided</scope>
         </dependency>
 
-
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>jcl-over-slf4j</artifactId>
-            <scope>runtime</scope>
-        </dependency>
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>

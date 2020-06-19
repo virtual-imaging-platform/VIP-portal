@@ -31,12 +31,12 @@
  */
 package fr.insalyon.creatis.vip.api.rest.itest.processing;
 
-import fr.insalyon.creatis.vip.api.business.ApiException.ApiError;
+import fr.insalyon.creatis.vip.api.exception.ApiException.ApiError;
 import fr.insalyon.creatis.vip.api.rest.config.*;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.springframework.http.MediaType;
 
-import java.net.URLEncoder;
 import java.util.Arrays;
 
 import static fr.insalyon.creatis.vip.api.data.AppVersionTestUtils.*;
@@ -45,10 +45,11 @@ import static fr.insalyon.creatis.vip.api.data.ClassesTestUtils.*;
 import static fr.insalyon.creatis.vip.api.data.PipelineTestUtils.*;
 import static fr.insalyon.creatis.vip.api.data.UserTestUtils.baseUser1;
 import static fr.insalyon.creatis.vip.api.rest.mockconfig.ApplicationsConfigurator.*;
+import static fr.insalyon.creatis.vip.application.client.view.ApplicationException.ApplicationError.WRONG_APPLICATION_DESCRIPTOR;
 import static org.hamcrest.Matchers.*;
-import static org.mockito.Matchers.anyBoolean;
-import static org.mockito.Matchers.anyObject;
-import static org.mockito.Matchers.eq;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -71,27 +72,27 @@ public class PipelineControllerIT extends BaseVIPSpringIT {
     }
 
     @Test
-    public void shouldReturnErrorOnAPIException() throws Exception {
+    public void shouldReturnErrorOnBusinessException() throws Exception {
         when(classBusiness.getUserClasses(
-                 eq(baseUser1.getEmail()), anyBoolean(), anyObject()))
+                 eq(baseUser1.getEmail()), anyBoolean(), any()))
             .thenThrow(new BusinessException("test exception"));
         mockMvc.perform(get("/rest/pipelines").with(baseUser1()))
                 .andDo(print())
                 .andExpect(status().isBadRequest())
-                .andExpect(content().contentType(RestTestUtils.JSON_CONTENT_TYPE_UTF8))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.errorCode").value(ApiError.GENERIC_API_ERROR.getCode()));
     }
 
     @Test
     public void shouldReturnErrorOnUnexpectedException() throws Exception {
         when(classBusiness.getUserClasses(
-                 eq(baseUser1.getEmail()), anyBoolean(), anyObject()))
+                 eq(baseUser1.getEmail()), anyBoolean(), any()))
             .thenThrow(new RuntimeException("test exception"));
         mockMvc.perform(get("/rest/pipelines").with(baseUser1()))
                 .andDo(print())
                 .andExpect(status().isInternalServerError())
-                .andExpect(content().contentType(RestTestUtils.JSON_CONTENT_TYPE_UTF8))
-                .andExpect(jsonPath("$.errorCode").value(50000));
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.errorCode").value(ApiError.GENERIC_API_ERROR.getCode()));
     }
 
     @Test
@@ -103,7 +104,7 @@ public class PipelineControllerIT extends BaseVIPSpringIT {
         mockMvc.perform(get("/rest/pipelines").with(baseUser1()))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(RestTestUtils.JSON_CONTENT_TYPE_UTF8))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$[*]", hasSize(5)))
                 .andExpect(jsonPath("$[*]", containsInAnyOrder(
                         jsonCorrespondsToPipeline(getPipeline(app1, version42)),
@@ -113,16 +114,29 @@ public class PipelineControllerIT extends BaseVIPSpringIT {
                         jsonCorrespondsToPipeline(getPipeline(app3, version43)))));
     }
 
+
     @Test
-    public void userGetAPipelineWithPathParameterEncoded() throws Exception {
+    public void shouldReturnErrorOnAPIException() throws Exception {
+        mockMvc.perform(get("/rest/pipelines/WRONG_APP").with(baseUser1()))
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.errorCode").value(ApiError.INVALID_PIPELINE_IDENTIFIER.getCode()));
+    }
+
+    @Test
+    public void shouldReturnErrorOnConfiguredVipException() throws Exception {
         configureApplications(this, baseUser1, Arrays.asList(class1, class2),
                 app2, version42);
-        String pipelineId = configureAnApplication(this, baseUser1, app2, version42, 0, 1);
-        mockMvc.perform(get("/rest/pipelines/" + URLEncoder.encode(pipelineId, "UTF8"))
-                .with(baseUser1()))
+        String pipelineId = app2.getName() + "/" + version42.getVersion();
+        when(workflowBusiness.getApplicationDescriptor(
+                eq(baseUser1), eq(app2.getName()), eq(version42.getVersion()), any()))
+                .thenThrow(new BusinessException(WRONG_APPLICATION_DESCRIPTOR, pipelineId));
+        mockMvc.perform(get("/rest/pipelines/" + pipelineId).with(baseUser1()))
                 .andDo(print())
-                .andExpect(content().contentType(RestTestUtils.JSON_CONTENT_TYPE_UTF8))
-                .andExpect(jsonPath("$", jsonCorrespondsToPipeline(getFullPipeline(app2, version42, "desc test", 0, 1))));
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.errorCode").value(WRONG_APPLICATION_DESCRIPTOR.getCode()));
     }
 
     @Test
@@ -133,7 +147,7 @@ public class PipelineControllerIT extends BaseVIPSpringIT {
         mockMvc.perform(get("/rest/pipelines/" + pipelineId)
                 .with(baseUser1()))
                 .andDo(print())
-                .andExpect(content().contentType(RestTestUtils.JSON_CONTENT_TYPE_UTF8))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$", jsonCorrespondsToPipeline(getFullPipeline(app2, version42, "desc test", 0, 1))));
     }
 
@@ -145,7 +159,7 @@ public class PipelineControllerIT extends BaseVIPSpringIT {
         mockMvc.perform(get("/rest/pipelines").param("pipelineId", pipelineId)
                 .with(baseUser1()))
                 .andDo(print())
-                .andExpect(content().contentType(RestTestUtils.JSON_CONTENT_TYPE_UTF8))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$", jsonCorrespondsToPipeline(getFullPipeline(app2, version42, "desc test", 0, 1))));
     }
 }

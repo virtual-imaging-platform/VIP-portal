@@ -53,6 +53,14 @@ knowledge of the CeCILL-B license and that you accept its terms.
         <dependency>
             <groupId>com.google.gwt</groupId>
             <artifactId>gwt-user</artifactId>
+            <exclusions>
+                <!-- it is in conflict with jakarta.validation-api (aka validation api 2.0)
+                 that is needed in vip-api for validation within spring mvc -->
+                <exclusion>
+                    <artifactId>validation-api</artifactId>
+                    <groupId>javax.validation</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>

@@ -31,11 +31,12 @@
  */
 package fr.insalyon.creatis.vip.api.data;
 
-import fr.insalyon.creatis.vip.api.bean.Module;
-import fr.insalyon.creatis.vip.api.rest.model.*;
+import fr.insalyon.creatis.vip.api.model.ErrorCodeAndMessage;
+import fr.insalyon.creatis.vip.api.model.Module;
+import fr.insalyon.creatis.vip.api.model.SupportedTransferProtocol;
 
-import static fr.insalyon.creatis.vip.api.bean.Module.*;
-import static fr.insalyon.creatis.vip.api.rest.model.SupportedTransferProtocol.*;
+import static fr.insalyon.creatis.vip.api.model.Module.*;
+import static fr.insalyon.creatis.vip.api.model.SupportedTransferProtocol.*;
 
 /**
  * Created by abonnet on 7/21/16.
@@ -54,11 +55,6 @@ public interface CarminAPITestConstants {
     String TEST_SUPPORTED_MODULES_STRING = "COMMERCIAL,DATA";
     String[] TEST_UNSUPPORTED_METHOD = {"method1", "method2"};
     String TEST_UNSUPPORTED_METHODS_STRING = "method1,method2";
-    ErrorCodeAndMessage[] TEST_ERROR_CODES_AND_MESSAGES = {
-        new ErrorCodeAndMessage(42, "Test message"),
-        new ErrorCodeAndMessage(103, "Other test message")
-    };
-    String TEST_ERROR_CODES_AND_MESSAGE_STRING = "42:Test message,103:Other test message";
     /* End of consistant properties */
 
     String TEST_DOWNLOAD_PATH = "path/test/download";

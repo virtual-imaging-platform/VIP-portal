@@ -35,6 +35,5 @@ package fr.insalyon.creatis.vip.api.rest.config;
  * Created by abonnet on 7/21/16.
  */
 public class RestTestUtils {
-    public static final String JSON_CONTENT_TYPE_UTF8 ="application/json;charset=UTF-8";
     public static final String TEXT_CONTENT_TYPE_UTF8 ="text/plain;charset=UTF-8";
 }
