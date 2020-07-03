@@ -39,6 +39,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.support.JdbcDaoSupport;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.sql.DataSource;
 import java.sql.PreparedStatement;
@@ -52,6 +53,7 @@ import java.util.List;
  * @author Rafael Ferreira da Silva
  */
 @Repository
+@Transactional
 public class GroupData extends JdbcDaoSupport implements GroupDAO {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());

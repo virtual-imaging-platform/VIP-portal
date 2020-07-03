@@ -62,6 +62,7 @@ import java.util.*;
  * @author Rafael Ferreira da Silva, Nouha Boujelben
  */
 @Service
+@Transactional
 public class ConfigurationBusiness {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());

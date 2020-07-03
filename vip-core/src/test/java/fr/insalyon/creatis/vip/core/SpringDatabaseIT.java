@@ -82,4 +82,6 @@ public class SpringDatabaseIT {
         List<Account> accounts = configurationBusiness.getAccounts();
         assertEquals(0, accounts.size());
     }
+
+    // TODO add a rollback test (db request ok, then exception, verify rollback)
 }
