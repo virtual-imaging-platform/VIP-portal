@@ -139,57 +139,6 @@ public class PlatformConnection {
                     }
                 }
 
-                if (createTable(connection,
-                                "VIPGroups",
-                                "groupname VARCHAR(50), "
-                                + "public BOOLEAN, "
-                                + "gridfile BOOLEAN DEFAULT 0, "
-                                + "gridjobs BOOLEAN DEFAULT 0, "
-                                + "PRIMARY KEY(groupname)")) {
-
-                    try {
-                        CoreDAOFactory.getDAOFactory().getGroupDAO(connection).add(
-                            new Group(CoreConstants.GROUP_SUPPORT, false, true, true));
-                    } catch (DAOException ex) {
-                        logger.error("Error creating VIPGroups table", ex);
-                    }
-                }
-
-                if (createTable(connection,
-                            "VIPUsersGroups",
-                            "email VARCHAR(255), "
-                            + "groupname VARCHAR(100), "
-                            + "role VARCHAR(30), "
-                            + "PRIMARY KEY (email, groupname), "
-                            + "FOREIGN KEY (email) REFERENCES VIPUsers(email) "
-                            + "ON DELETE CASCADE ON UPDATE CASCADE, "
-                            + "FOREIGN KEY (groupname) REFERENCES VIPGroups(groupname) "
-                            + "ON DELETE CASCADE ON UPDATE CASCADE")) {
-                    try {
-                        CoreDAOFactory.getDAOFactory().getUsersGroupsDAO(connection).
-                                add(Server.getInstance().getAdminEmail(),
-                                        CoreConstants.GROUP_SUPPORT,
-                                        GROUP_ROLE.Admin);
-                    } catch (DAOException ex) {
-                        logger.error("Error adding admin user to admin group", ex);
-                    }
-                }
-
-                createTable(connection,
-                            "VIPAccounts",
-                            "name VARCHAR(255), "
-                            + "PRIMARY KEY (name)");
-
-                createTable(connection,
-                            "VIPAccountsGroups",
-                            "name VARCHAR(255), "
-                            + "groupname VARCHAR(255), "
-                            + "PRIMARY KEY (name, groupname), "
-                            + "FOREIGN KEY (name) REFERENCES VIPAccounts(name) "
-                            + "ON DELETE CASCADE ON UPDATE CASCADE, "
-                            + "FOREIGN KEY (groupname) REFERENCES VIPGroups(groupname) "
-                            + "ON DELETE CASCADE ON UPDATE CASCADE");
-
                 createTable(connection,
                             "VIPPublication",
                             "id INT(11) NOT NULL AUTO_INCREMENT, "

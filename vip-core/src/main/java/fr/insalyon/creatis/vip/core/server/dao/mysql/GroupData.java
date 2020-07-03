@@ -34,33 +34,38 @@ package fr.insalyon.creatis.vip.core.server.dao.mysql;
 import fr.insalyon.creatis.vip.core.client.bean.Group;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import fr.insalyon.creatis.vip.core.server.dao.GroupDAO;
-import java.sql.Connection;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.support.JdbcDaoSupport;
+import org.springframework.stereotype.Repository;
+
+import javax.sql.DataSource;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  *
  * @author Rafael Ferreira da Silva
  */
-public class GroupData implements GroupDAO {
+@Repository
+public class GroupData extends JdbcDaoSupport implements GroupDAO {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
-    private Connection connection;
 
-    public GroupData(Connection connection) throws DAOException {
-        this.connection = connection;
+    @Autowired
+    public void useDataSource(DataSource dataSource) {
+        setDataSource(dataSource);
     }
 
     @Override
     public void add(Group group) throws DAOException {
 
         try {
-            PreparedStatement ps = connection.prepareStatement(
+            PreparedStatement ps = getConnection().prepareStatement(
                     "INSERT INTO VIPGroups(groupname, public, gridfile, gridjobs) VALUES(?, ?, ?, ?)");
             ps.setString(1, group.getName());
             ps.setBoolean(2, group.isPublicGroup());
@@ -83,7 +88,7 @@ public class GroupData implements GroupDAO {
     @Override
     public void remove(String groupName) throws DAOException {
         try {
-            PreparedStatement ps = connection.prepareStatement("DELETE "
+            PreparedStatement ps = getConnection().prepareStatement("DELETE "
                     + "FROM VIPGroups WHERE groupname=?");
 
             ps.setString(1, groupName);
@@ -99,7 +104,7 @@ public class GroupData implements GroupDAO {
     @Override
     public void update(String name, Group group) throws DAOException {
         try {
-            PreparedStatement ps = connection.prepareStatement("UPDATE "
+            PreparedStatement ps = getConnection().prepareStatement("UPDATE "
                     + "VIPGroups "
                     + "SET groupname=?, public=?, gridfile=?, gridjobs=? "
                     + "WHERE groupname=?");
@@ -123,7 +128,7 @@ public class GroupData implements GroupDAO {
         try {
 
             List<Group> groups = new ArrayList<Group>();
-            PreparedStatement ps = connection.prepareStatement("SELECT "
+            PreparedStatement ps = getConnection().prepareStatement("SELECT "
                     + "groupname, public, gridfile, gridjobs FROM "
                     + "VIPGroups ORDER BY LOWER(groupname)");
 

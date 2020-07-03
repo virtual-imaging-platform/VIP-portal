@@ -281,7 +281,7 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
         try(Connection connection = PlatformConnection.getInstance().getConnection()) {
             authenticateSystemAdministrator(logger);
             trace(logger, "Adding group '" + group + "'.");
-            configurationBusiness.addGroup(group, connection);
+            configurationBusiness.addGroup(group);
         } catch (BusinessException ex) {
             throw new CoreException(ex);
         } catch (SQLException ex) {
@@ -301,7 +301,7 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
         try(Connection connection = PlatformConnection.getInstance().getConnection()) {
             authenticateSystemAdministrator(logger);
             trace(logger, "Updating group '" + name + "' to '" + group.getName() + "'.");
-            configurationBusiness.updateGroup(name, group, connection);
+            configurationBusiness.updateGroup(name, group);
         } catch (BusinessException ex) {
             throw new CoreException(ex);
         } catch (SQLException ex) {
@@ -321,7 +321,7 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
             authenticateSystemAdministrator(logger);
             trace(logger, "Removing group '" + groupName + "'.");
             configurationBusiness.removeGroup(
-                getSessionUser().getEmail(), groupName, connection);
+                getSessionUser().getEmail(), groupName);
         } catch (BusinessException ex) {
             throw new CoreException(ex);
         } catch (SQLException ex) {
@@ -338,7 +338,7 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
     public List<Group> getGroups() throws CoreException {
         try(Connection connection = PlatformConnection.getInstance().getConnection()) {
             authenticateSystemAdministrator(logger);
-            return configurationBusiness.getGroups(connection);
+            return configurationBusiness.getGroups();
         } catch (BusinessException ex) {
             throw new CoreException(ex);
         } catch (SQLException ex) {
@@ -354,7 +354,7 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
     @Override
     public List<Group> getPublicGroups() throws CoreException {
         try(Connection connection = PlatformConnection.getInstance().getConnection()) {
-            return configurationBusiness.getPublicGroups(connection);
+            return configurationBusiness.getPublicGroups();
         } catch (BusinessException ex) {
             throw new CoreException(ex);
         } catch (SQLException ex) {
@@ -464,7 +464,7 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
         try(Connection connection = PlatformConnection.getInstance().getConnection()) {
             List<String> list = new ArrayList<String>();
             if (getSessionUser().isSystemAdministrator()) {
-                for (Group group : configurationBusiness.getGroups(connection)) {
+                for (Group group : configurationBusiness.getGroups()) {
                     list.add(group.getName());
                 }
             } else {
@@ -817,7 +817,7 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
     @Override
     public List<Account> getAccounts() throws CoreException {
         try(Connection connection = PlatformConnection.getInstance().getConnection()) {
-            return configurationBusiness.getAccounts(connection);
+            return configurationBusiness.getAccounts();
         } catch (BusinessException ex) {
             throw new CoreException(ex);
         } catch (SQLException ex) {
@@ -836,7 +836,7 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
         try(Connection connection = PlatformConnection.getInstance().getConnection()) {
             authenticateSystemAdministrator(logger);
             trace(logger, "Removing account type '" + name + "'.");
-            configurationBusiness.removeAccount(name, connection);
+            configurationBusiness.removeAccount(name);
         } catch (BusinessException ex) {
             throw new CoreException(ex);
         } catch (SQLException ex) {
@@ -850,7 +850,7 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
         try(Connection connection = PlatformConnection.getInstance().getConnection()) {
             authenticateSystemAdministrator(logger);
             trace(logger, "Adding account type '" + name + "'.");
-            configurationBusiness.addAccount(name, groups, connection);
+            configurationBusiness.addAccount(name, groups);
         } catch (BusinessException ex) {
             throw new CoreException(ex);
         } catch (SQLException ex) {
@@ -865,8 +865,7 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
         try(Connection connection = PlatformConnection.getInstance().getConnection()) {
             authenticateSystemAdministrator(logger);
             trace(logger, "Updating account type from '" + oldName + "' to '" + newName + "'.");
-            configurationBusiness.updateAccount(
-                oldName, newName, groups, connection);
+            configurationBusiness.updateAccount(oldName, newName, groups);
         } catch (BusinessException ex) {
             throw new CoreException(ex);
         } catch (SQLException ex) {

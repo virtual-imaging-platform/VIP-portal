@@ -41,11 +41,12 @@ import fr.insalyon.creatis.vip.core.client.view.CoreConstants.GROUP_ROLE;
 import fr.insalyon.creatis.vip.core.client.view.user.UserLevel;
 import fr.insalyon.creatis.vip.core.client.view.util.CountryCode;
 import fr.insalyon.creatis.vip.core.server.business.proxy.ProxyClient;
-import fr.insalyon.creatis.vip.core.server.dao.CoreDAOFactory;
-import fr.insalyon.creatis.vip.core.server.dao.DAOException;
-import fr.insalyon.creatis.vip.core.server.dao.UserDAO;
+import fr.insalyon.creatis.vip.core.server.dao.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
@@ -54,16 +55,28 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.sql.Connection;
 import java.sql.Timestamp;
-import java.text.Normalizer;
 import java.util.*;
 
 /**
  *
  * @author Rafael Ferreira da Silva, Nouha Boujelben
  */
+@Service
 public class ConfigurationBusiness {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
+
+    private AccountDAO accountDao;
+    private GroupDAO groupDAO;
+    
+    public ConfigurationBusiness() {
+    }
+
+    @Autowired
+    public ConfigurationBusiness(AccountDAO accountDao, GroupDAO groupDAO) {
+        this.accountDao = accountDao;
+        this.groupDAO = groupDAO;
+    }
 
     /**
      *
@@ -184,8 +197,7 @@ public class ConfigurationBusiness {
             // Adding user to groups
             List<Group> groups = null;
             if (accountType != null) {
-                groups = CoreDAOFactory.getDAOFactory().getAccountDAO(connection)
-                    .getGroups(accountType);
+                groups = accountDao.getGroups(accountType);
                 for (Group group : groups) {
                     if (mapPrivateGroups || automaticCreation || group.isPublicGroup()) {
                         CoreDAOFactory.getDAOFactory()
@@ -726,14 +738,14 @@ public class ConfigurationBusiness {
      * @return
      * @throws BusinessException
      */
-    public void addGroup(Group group, Connection connection)
+    public void addGroup(Group group)
         throws BusinessException {
         try {
             GRIDAClient client = CoreUtil.getGRIDAClient();
             client.createFolder(Server.getInstance().getDataManagerGroupsHome(),
                                 group.getName().replaceAll(" ", "_"));
 
-            CoreDAOFactory.getDAOFactory().getGroupDAO(connection).add(group);
+            groupDAO.add(group);
         } catch (GRIDAClientException ex) {
             logger.error("Error adding group : {}", group.getName(), ex);
             throw new BusinessException(ex);
@@ -748,14 +760,13 @@ public class ConfigurationBusiness {
      * @param groupName
      * @throws BusinessException
      */
-    public void removeGroup(String user, String groupName, Connection connection)
+    public void removeGroup(String user, String groupName)
         throws BusinessException {
         try {
             GRIDAPoolClient client = CoreUtil.getGRIDAPoolClient();
             client.delete(Server.getInstance().getDataManagerGroupsHome() + "/"
                           + groupName.replaceAll(" ", "_"), user);
-            CoreDAOFactory.getDAOFactory().getGroupDAO(connection)
-                .remove(groupName);
+            groupDAO.remove(groupName);
         } catch (GRIDAClientException ex) {
             logger.error("Error removing group : {}", groupName, ex);
             throw new BusinessException(ex);
@@ -770,7 +781,7 @@ public class ConfigurationBusiness {
      * @param group
      * @throws BusinessException
      */
-    public void updateGroup(String name, Group group, Connection connection)
+    public void updateGroup(String name, Group group)
         throws BusinessException {
         try {
             GRIDAClient client = CoreUtil.getGRIDAClient();
@@ -779,8 +790,7 @@ public class ConfigurationBusiness {
                         Server.getInstance().getDataManagerGroupsHome() + "/" + name.replaceAll(" ", "_"),
                         Server.getInstance().getDataManagerGroupsHome() + "/" + group.getName().replaceAll(" ", "_"));
             }
-            CoreDAOFactory.getDAOFactory().getGroupDAO(connection)
-                .update(name, group);
+            groupDAO.update(name, group);
         } catch (GRIDAClientException ex) {
             logger.error("Error updating group : {}", name, ex);
             throw new BusinessException(ex);
@@ -793,22 +803,20 @@ public class ConfigurationBusiness {
      *
      * @return @throws BusinessException
      */
-    public List<Group> getGroups(Connection connection)
+    public List<Group> getGroups()
         throws BusinessException {
         try {
-            return CoreDAOFactory.getDAOFactory().getGroupDAO(connection)
-                .getGroups();
+            return groupDAO.getGroups();
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }
     }
 
-    public List<Group> getPublicGroups(Connection connection)
+    public List<Group> getPublicGroups()
         throws BusinessException {
         try {
             List<Group> publicGroups = new ArrayList<Group>();
-            for (Group g : CoreDAOFactory.getDAOFactory().getGroupDAO(connection)
-                     .getGroups()) {
+            for (Group g : groupDAO.getGroups()) {
                 if (g.isPublicGroup()) {
                     publicGroups.add(g);
                 }
@@ -1171,11 +1179,10 @@ public class ConfigurationBusiness {
      *
      * @return @throws BusinessException
      */
-    public List<Account> getAccounts(Connection connection)
+    public List<Account> getAccounts()
         throws BusinessException {
         try {
-            return CoreDAOFactory.getDAOFactory().getAccountDAO(connection)
-                .getList();
+            return accountDao.getList();
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }
@@ -1187,12 +1194,10 @@ public class ConfigurationBusiness {
      * @param groups
      * @throws BusinessException
      */
-    public void addAccount(
-        String name, List<String> groups, Connection connection)
-        throws BusinessException {
+    public void addAccount(String name, List<String> groups)
+            throws BusinessException {
         try {
-            CoreDAOFactory.getDAOFactory().getAccountDAO(connection)
-                .add(name, groups);
+            accountDao.add(name, groups);
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }
@@ -1205,12 +1210,10 @@ public class ConfigurationBusiness {
      * @param groups
      * @throws BusinessException
      */
-    public void updateAccount(
-        String oldName, String newName, List<String> groups, Connection connection)
-        throws BusinessException {
+    public void updateAccount(String oldName, String newName, List<String> groups)
+            throws BusinessException {
         try {
-            CoreDAOFactory.getDAOFactory().getAccountDAO(connection)
-                .update(oldName, newName, groups);
+            accountDao.update(oldName, newName, groups);
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }
@@ -1221,11 +1224,10 @@ public class ConfigurationBusiness {
      * @param name
      * @throws BusinessException
      */
-    public void removeAccount(String name, Connection connection)
+    public void removeAccount(String name)
         throws BusinessException {
         try {
-            CoreDAOFactory.getDAOFactory().getAccountDAO(connection)
-                .remove(name);
+            accountDao.remove(name);
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }

@@ -39,20 +39,13 @@ import java.sql.Connection;
 public abstract class CoreDAOFactory {
 
     public static CoreDAOFactory getDAOFactory() {
-
         return MySQLDAOFactory.getInstance();
     }
 
     public abstract UserDAO getUserDAO(Connection connection)
         throws DAOException;
 
-    public abstract GroupDAO getGroupDAO(Connection connection)
-        throws DAOException;
-
     public abstract UsersGroupsDAO getUsersGroupsDAO(Connection connection)
-        throws DAOException;
-
-    public abstract AccountDAO getAccountDAO(Connection connection)
         throws DAOException;
 
     public abstract PublicationDAO getPublicationDAO(Connection connection)

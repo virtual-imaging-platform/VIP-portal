@@ -31,12 +31,8 @@
  */
 package fr.insalyon.creatis.vip.core.server.dao;
 
-import fr.insalyon.creatis.vip.core.server.dao.mysql.AccountData;
-import fr.insalyon.creatis.vip.core.server.dao.mysql.GroupData;
-import fr.insalyon.creatis.vip.core.server.dao.mysql.PublicationData;
-import fr.insalyon.creatis.vip.core.server.dao.mysql.TermsUseData;
-import fr.insalyon.creatis.vip.core.server.dao.mysql.UserData;
-import fr.insalyon.creatis.vip.core.server.dao.mysql.UsersGroupsData;
+import fr.insalyon.creatis.vip.core.server.dao.mysql.*;
+
 import java.sql.Connection;
 
 /**
@@ -64,19 +60,9 @@ public class MySQLDAOFactory extends CoreDAOFactory {
     }
 
     @Override
-    public GroupDAO getGroupDAO(Connection connection) throws DAOException {
-        return new GroupData(connection);
-    }
-
-    @Override
     public UsersGroupsDAO getUsersGroupsDAO(Connection connection)
         throws DAOException {
         return new UsersGroupsData(connection);
-    }
-
-    @Override
-    public AccountDAO getAccountDAO(Connection connection) throws DAOException {
-        return new AccountData(connection);
     }
 
     @Override

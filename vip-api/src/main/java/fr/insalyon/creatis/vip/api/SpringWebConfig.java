@@ -47,6 +47,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 import org.springframework.web.servlet.config.annotation.*;
 
@@ -71,7 +72,7 @@ import static fr.insalyon.creatis.vip.api.CarminProperties.CORS_AUTHORIZED_DOMAI
  * Created by abonnet on 7/13/16.
  */
 @EnableWebMvc
-@ComponentScan
+@Configuration
 public class SpringWebConfig implements WebMvcConfigurer {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());;

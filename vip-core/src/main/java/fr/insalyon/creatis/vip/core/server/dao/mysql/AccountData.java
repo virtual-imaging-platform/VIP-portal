@@ -35,27 +35,31 @@ import fr.insalyon.creatis.vip.core.client.bean.Account;
 import fr.insalyon.creatis.vip.core.client.bean.Group;
 import fr.insalyon.creatis.vip.core.server.dao.AccountDAO;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
+import org.springframework.jdbc.core.support.JdbcDaoSupport;
+import org.springframework.stereotype.Repository;
+
+import javax.sql.DataSource;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  *
  * @author Rafael Ferreira da Silva
  */
-public class AccountData implements AccountDAO {
+@Repository
+public class AccountData extends JdbcDaoSupport implements AccountDAO {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
-    private Connection connection;
 
-    public AccountData(Connection connection) throws DAOException {
-        this.connection = connection;
+    @Autowired
+    public void useDataSource(DataSource dataSource) {
+        setDataSource(dataSource);
     }
 
     /**
@@ -68,7 +72,7 @@ public class AccountData implements AccountDAO {
     public void add(String name, List<String> groups) throws DAOException {
 
         try {
-            PreparedStatement ps = connection.prepareStatement("INSERT INTO "
+            PreparedStatement ps = getConnection().prepareStatement("INSERT INTO "
                     + "VIPAccounts(name) VALUES(?)");
             ps.setString(1, name);
             ps.execute();
@@ -94,7 +98,7 @@ public class AccountData implements AccountDAO {
 
         try {
             if (oldName != null && !oldName.equals(newName)) {
-                PreparedStatement ps = connection.prepareStatement("UPDATE "
+                PreparedStatement ps = getConnection().prepareStatement("UPDATE "
                         + "VIPAccounts SET name = ? WHERE name = ?");
                 ps.setString(1, newName);
                 ps.setString(2, oldName);
@@ -120,7 +124,7 @@ public class AccountData implements AccountDAO {
     public void remove(String name) throws DAOException {
 
         try {
-            PreparedStatement ps = connection.prepareStatement("DELETE "
+            PreparedStatement ps = getConnection().prepareStatement("DELETE "
                     + "FROM VIPAccounts WHERE name=?");
 
             ps.setString(1, name);
@@ -141,24 +145,37 @@ public class AccountData implements AccountDAO {
     public List<Account> getList() throws DAOException {
 
         try {
-            PreparedStatement ps = connection.prepareStatement("SELECT "
-                    + "name FROM "
-                    + "VIPAccounts ORDER BY LOWER(name)");
-
-            ResultSet rs = ps.executeQuery();
-            List<Account> accounts = new ArrayList<Account>();
-
-            while (rs.next()) {
-                String name = rs.getString("name");
-                accounts.add(new Account(name, getGroups(name)));
-            }
-            ps.close();
-            return accounts;
-
-        } catch (SQLException ex) {
+            return getJdbcTemplate().query(
+                "SELECT name FROM VIPAccounts ORDER BY LOWER(name)",
+                    (resultSet, rowNum) -> {
+                        String name = resultSet.getString("name");
+                        return new Account(name, getGroupsInternal(name));
+                    });
+        } catch (DataAccessException ex) {
             logger.error("Error getting all accounts", ex);
             throw new DAOException(ex);
         }
+    }
+
+    private List<Group> getGroupsInternal(String... accounts) {
+
+        StringBuilder query = new StringBuilder();
+        for (String account : accounts) {
+            if (query.length() > 0) {
+                query.append(" OR ");
+            }
+            query.append("name = '").append(account).append("'");
+        }
+
+        return getJdbcTemplate().query(
+                "SELECT DISTINCT "
+                        + "ag.groupname AS name, g.public AS pub, g.gridfile AS gfile, g.gridjobs AS gjobs "
+                        + "FROM VIPAccountsGroups AS ag "
+                        + "LEFT JOIN VIPGroups AS g ON ag.groupname = g.groupname "
+                        + "WHERE " + query.toString(),
+                (rs, rowNum) -> new Group(
+                        rs.getString("name"), rs.getBoolean("pub"),
+                        rs.getBoolean("gfile"),rs.getBoolean("gjobs")) );
     }
 
     /**
@@ -171,30 +188,9 @@ public class AccountData implements AccountDAO {
     public List<Group> getGroups(String... accounts) throws DAOException {
 
         try {
-            StringBuilder query = new StringBuilder();
-            for (String account : accounts) {
-                if (query.length() > 0) {
-                    query.append(" OR ");
-                }
-                query.append("name = '").append(account).append("'");
-            }
+            return getGroupsInternal(accounts);
 
-            PreparedStatement ps = connection.prepareStatement("SELECT DISTINCT "
-                    + "ag.groupname AS name, g.public AS pub, g.gridfile AS gfile, g.gridjobs AS gjobs "
-                    + "FROM VIPAccountsGroups AS ag "
-                    + "LEFT JOIN VIPGroups AS g ON ag.groupname = g.groupname "
-                    + "WHERE " + query.toString());
-            ResultSet rs = ps.executeQuery();
-
-            List<Group> groups = new ArrayList<Group>();
-            while (rs.next()) {
-                groups.add(new Group(rs.getString("name"),
-                        rs.getBoolean("pub"),rs.getBoolean("gfile"),rs.getBoolean("gjobs")));
-            }
-            ps.close();
-            return groups;
-
-        } catch (SQLException ex) {
+        } catch (DataAccessException ex) {
             logger.error("Error getting groups for accounts {}", Arrays.toString(accounts), ex);
             throw new DAOException(ex);
         }
@@ -210,7 +206,7 @@ public class AccountData implements AccountDAO {
 
         try {
             for (String group : groups) {
-                PreparedStatement ps = connection.prepareStatement("INSERT INTO "
+                PreparedStatement ps = getConnection().prepareStatement("INSERT INTO "
                         + "VIPAccountsGroups(name, groupname) VALUES(?, ?)");
                 ps.setString(1, name);
                 ps.setString(2, group);
@@ -232,7 +228,7 @@ public class AccountData implements AccountDAO {
     private void removeGroupsFromAccount(String name) throws DAOException {
 
         try {
-            PreparedStatement ps = connection.prepareStatement("DELETE FROM "
+            PreparedStatement ps = getConnection().prepareStatement("DELETE FROM "
                     + "VIPAccountsGroups WHERE name = ?");
             ps.setString(1, name);
             ps.execute();

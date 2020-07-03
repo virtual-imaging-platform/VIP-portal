@@ -159,7 +159,7 @@ knowledge of the CeCILL-B license and that you accept its terms.
         </init-param>
          <init-param>
             <param-name>contextConfigLocation</param-name>
-            <param-value>fr.insalyon.creatis.vip.api.SpringWebConfig</param-value>
+            <param-value>fr.insalyon.creatis.vip.core.server.SpringCoreConfig</param-value>
         </init-param>
         <init-param>
             <param-name>contextInitializerClasses</param-name>
