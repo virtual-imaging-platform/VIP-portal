@@ -17,6 +17,7 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 import org.springframework.transaction.support.TransactionTemplate;
 
@@ -27,17 +28,11 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-/*
-    Use simple jndi to configure an h2 in-memory database and verify :
-    - spring and database config
-    - transaction and connection management
-    - automatic database creation on first launch
-    - database not overridden on next launches
- */
-@SpringJUnitConfig(SpringCoreConfig.class) // launch all spring environment in a test
+
+@SpringJUnitConfig({TestDataSourceSpringConfig.class, SpringCoreConfig.class}) // launch all spring environment in a test
 @TestPropertySource(properties = "db.tableEngine=") // to disable the default mysql/innodb engine on database init
-@TestMethodOrder(OrderAnnotation.class)
-public class SpringConnectionIT {
+@Transactional // to make spring rollback after each test
+public class SpringDatabaseIT {
 
     @Autowired
     private ConfigurationBusiness configurationBusiness;
@@ -52,29 +47,16 @@ public class SpringConnectionIT {
         First launch
      */
     @Test
-    @Order(1)
-    public void testJNDIConfig() throws BusinessException {
+    public void testTestConfig() throws BusinessException {
         // verify the vip-support group created on init is present
         assertNotNull(configurationBusiness);
         List<Group> groups = configurationBusiness.getGroups();
         assertEquals(1, groups.size());
 
-        final Connection[] firstTransactionConnections = new Connection[2];
-        // check that a connection is shared in a transaction
-        TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager);
-        transactionTemplate.execute(new TransactionCallbackWithoutResult() {
-            @Override
-            protected void doInTransactionWithoutResult(TransactionStatus status) {
-                firstTransactionConnections[0] = DataSourceUtils.getConnection(dataSource);
-                firstTransactionConnections[1] = DataSourceUtils.getConnection(dataSource);
-            }
-        });
-        assertEquals(firstTransactionConnections[0], firstTransactionConnections[1]);
-
-        // check that a connection is not shared outside a transaction
+        // check that we are in the test transaction and that the connection is shared
         Connection connection1 = DataSourceUtils.getConnection(dataSource);
         Connection connection2= DataSourceUtils.getConnection(dataSource);
-        assertNotEquals(connection1, connection2);
+        assertEquals(connection1, connection2);
     }
 
     /*
@@ -92,23 +74,12 @@ public class SpringConnectionIT {
 
 
     /*
-        Verify the account is still there
+        Verify the account is not there anymore as each test method is rollbacked
     */
     @Test
     @Order(3)
     public void isAccountStillThere() throws BusinessException {
         List<Account> accounts = configurationBusiness.getAccounts();
-        assertEquals(1, accounts.size());
-    }
-
-    /*
-        Restart spring, account should still be there
-    */
-    @Test
-    @Order(4)
-    @DirtiesContext(methodMode = MethodMode.BEFORE_METHOD) // to restart spring
-    public void isAccountStillThereAfterRestart() throws BusinessException {
-        List<Account> accounts = configurationBusiness.getAccounts();
-        assertEquals(1, accounts.size());
+        assertEquals(0, accounts.size());
     }
 }
