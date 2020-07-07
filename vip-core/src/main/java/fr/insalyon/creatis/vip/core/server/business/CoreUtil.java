@@ -50,54 +50,6 @@ import java.text.Normalizer;
  */
 public class CoreUtil {
 
-    private static final Logger logger = LoggerFactory.getLogger(CoreUtil.class);
-
-    public static void sendEmail(String subject, String content, String[] recipients,
-            boolean direct, String username) throws BusinessException {
-
-        try {
-            SMAClient client = new SMAClient(Server.getInstance().getSMAHost(), Server.getInstance().getSMAPort());
-            client.sendEmail(subject, content, recipients, direct, username);
-
-        } catch (SMAClientException ex) {
-            logger.error("Error sending {} email to {}", subject, username, ex);
-            throw new BusinessException(ex);
-        }
-    }
-
-    public static GRIDAClient getGRIDAClient() {
-        Server server = Server.getInstance();
-        return new GRIDAClient(
-            server.getGRIDAHost(),
-            server.getGRIDAPort(),
-            server.getServerProxy(server.getVoName()));
-    }
-
-    public static GRIDAPoolClient getGRIDAPoolClient() {
-        Server server = Server.getInstance();
-        return new GRIDAPoolClient(
-            server.getGRIDAHost(),
-            server.getGRIDAPort(),
-            server.getServerProxy(server.getVoName()));
-    }
-
-    public static GRIDACacheClient getGRIDACacheClient() {
-        Server server = Server.getInstance();
-        return new GRIDACacheClient(
-            server.getGRIDAHost(),
-            server.getGRIDAPort(),
-            server.getServerProxy(server.getVoName()));
-    }
-
-    public static GRIDAZombieClient getGRIDAZombieClient() {
-        Server server = Server.getInstance();
-        return new GRIDAZombieClient(
-            server.getGRIDAHost(),
-            server.getGRIDAPort(),
-            server.getServerProxy(server.getVoName()));
-    }
-
-
     /*
         remove accents and non-ascii characters
     */

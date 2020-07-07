@@ -46,8 +46,13 @@ import javax.servlet.http.HttpSession;
 import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.Map;
+
+import fr.insalyon.creatis.vip.core.server.business.Server;
+import fr.insalyon.creatis.vip.core.server.dao.UserDAO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  *
@@ -57,10 +62,18 @@ public abstract class AbstractRemoteServiceServlet extends RemoteServiceServlet 
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    protected ConfigurationBusiness configurationBusiness;
+    public void setServer(Server server) {
+        this.server = server;
+    }
 
-    public AbstractRemoteServiceServlet() {
-        configurationBusiness = new ConfigurationBusiness();
+    protected Server server;
+
+    @Override
+    public void init() throws ServletException {
+        super.init();
+        ApplicationContext applicationContext =
+                WebApplicationContextUtils.getRequiredWebApplicationContext(getServletContext());
+        setServer(applicationContext.getBean(Server.class));
     }
 
     // see http://blog.excilys.com/2011/05/12/gwt-google-wont-throw/

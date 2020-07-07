@@ -45,18 +45,26 @@ import java.util.ArrayList;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.support.JdbcDaoSupport;
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
+
+import javax.sql.DataSource;
 
 /**
  *
  * @author Nouha Boujelben
  */
-public class PublicationData implements PublicationDAO {
+@Repository
+@Transactional
+public class PublicationData extends JdbcDaoSupport implements PublicationDAO {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
-    private Connection connection;
 
-    public PublicationData(Connection connection) throws DAOException {
-        this.connection = connection;
+    @Autowired
+    public void useDataSource(DataSource dataSource) {
+        setDataSource(dataSource);
     }
 
     @Override
@@ -64,7 +72,7 @@ public class PublicationData implements PublicationDAO {
 
         PreparedStatement ps = null;
         try {
-            ps = connection.prepareStatement(
+            ps = getConnection().prepareStatement(
                     "INSERT INTO VIPPublication(title,date,doi,authors,type,typeName,vipAuthor) "
                     + "VALUES (?, ?, ?, ?, ?, ?, ?)");
 
@@ -87,7 +95,7 @@ public class PublicationData implements PublicationDAO {
     public void update(Publication publication) throws DAOException {
         try {
 
-            PreparedStatement ps = connection.prepareStatement("UPDATE "
+            PreparedStatement ps = getConnection().prepareStatement("UPDATE "
                     + "VIPPublication "
                     + "SET title=?, date=?, doi=?, authors=?, type=?, typeName=?,vipAuthor=? "
                     + "WHERE id=?");
@@ -114,7 +122,7 @@ public class PublicationData implements PublicationDAO {
     public void updateOwnerEmail(String oldOwnerEmail, String newOwnerEmail) throws DAOException {
         try {
 
-            PreparedStatement ps = connection.prepareStatement("UPDATE "
+            PreparedStatement ps = getConnection().prepareStatement("UPDATE "
                     + "VIPPublication "
                     + "SET vipAuthor=? "
                     + "WHERE vipAuthor=?");
@@ -134,7 +142,7 @@ public class PublicationData implements PublicationDAO {
     @Override
     public void remove(Long id) throws DAOException {
         try {
-            PreparedStatement ps = connection.prepareStatement("DELETE "
+            PreparedStatement ps = getConnection().prepareStatement("DELETE "
                     + "FROM VIPPublication WHERE id=?");
 
             ps.setLong(1, id);
@@ -153,7 +161,7 @@ public class PublicationData implements PublicationDAO {
             String level = null;
             PreparedStatement ps;
 
-            ps = connection.prepareStatement("SELECT "
+            ps = getConnection().prepareStatement("SELECT "
                     + "id,title,date,doi,authors,type,typeName,VIPAuthor FROM "
                     + "VIPPublication");
 
@@ -181,7 +189,7 @@ public class PublicationData implements PublicationDAO {
             String level = null;
             PreparedStatement ps;
 
-            ps = connection.prepareStatement("SELECT "
+            ps = getConnection().prepareStatement("SELECT "
                     + "id,title,date,doi,authors,type,typeName,VIPAuthor FROM "
                     + "VIPPublication where id=?");
 

@@ -85,7 +85,7 @@ public class ApikeyAuthenticationProvider implements
     private Supplier<Connection> connectionSupplier;
 
     @Autowired
-    private Function<Connection,UserDAO> userDAOFactory;
+    private UserDAO userDAO;
 
     public final void afterPropertiesSet() throws Exception {
         Assert.notNull(this.messages, "A message source must be set");
@@ -104,7 +104,6 @@ public class ApikeyAuthenticationProvider implements
                 "Only ApikeyAuthenticationToken is supported");
 
         try(Connection connection = connectionSupplier.get()) {
-            UserDAO userDAO =  userDAOFactory.apply(connection);
             User vipUser;
             String apikey = authentication.getCredentials().toString();
             try {

@@ -41,18 +41,27 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.support.JdbcDaoSupport;
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+
+import javax.sql.DataSource;
 
 /**
  *
  * @author Nouha Boujelben
  */
-public class TermsUseData implements TermsUseDAO {
+@Repository
+@Transactional
+public class TermsUseData extends JdbcDaoSupport implements TermsUseDAO {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
-    private Connection connection;
 
-    public TermsUseData(Connection connection) throws DAOException {
-        this.connection = connection;
+    @Autowired
+    public void useDataSource(DataSource dataSource) {
+        setDataSource(dataSource);
     }
 
     @Override
@@ -60,7 +69,7 @@ public class TermsUseData implements TermsUseDAO {
 
         try {
 
-            PreparedStatement ps = connection.prepareStatement("INSERT INTO VIPTermsOfuse(date) "
+            PreparedStatement ps = getConnection().prepareStatement("INSERT INTO VIPTermsOfuse(date) "
                     + "VALUES (?)");
             ps.setTimestamp(1, termsOfUse.getDate());
             ps.execute();
@@ -77,7 +86,7 @@ public class TermsUseData implements TermsUseDAO {
     public Timestamp getLastUpdateTermsOfUse() throws DAOException {
         try {
             Timestamp date=null;
-            PreparedStatement ps = connection.prepareStatement("Select date From VIPTermsOfuse ORDER BY idTermsOfuse DESC " +
+            PreparedStatement ps = getConnection().prepareStatement("Select date From VIPTermsOfuse ORDER BY idTermsOfuse DESC " +
               "LIMIT 1");
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {

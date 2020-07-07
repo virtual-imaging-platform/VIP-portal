@@ -64,16 +64,6 @@ public class SpringTestConfig {
     }
 
     @Bean
-    public UserDAO testUserDAO() {
-        return Mockito.mock(UserDAO.class);
-    }
-
-    @Bean
-    public Function<Connection, UserDAO> userDaoFactory(UserDAO userDAO) {
-        return connection -> userDAO;
-    }
-
-    @Bean
     public Supplier<Connection> connectionSupplier() {
         return Mockito.mock(Supplier.class);
     }

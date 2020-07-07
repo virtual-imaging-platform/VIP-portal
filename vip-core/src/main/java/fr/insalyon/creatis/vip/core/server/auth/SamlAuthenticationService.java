@@ -32,6 +32,7 @@
 package fr.insalyon.creatis.vip.core.server.auth;
 
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
+import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
 import fr.insalyon.creatis.vip.core.server.business.SamlTokenValidator;
 import fr.insalyon.creatis.vip.core.server.business.Server;
 import java.io.IOException;
@@ -41,7 +42,10 @@ import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import java.security.spec.InvalidKeySpecException;
 import java.util.List;
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
+
+import fr.insalyon.creatis.vip.core.server.dao.UserDAO;
 import org.apache.commons.codec.binary.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,6 +56,8 @@ import org.opensaml.xml.ConfigurationException;
 import org.opensaml.xml.io.UnmarshallingException;
 import org.opensaml.xml.parse.XMLParserException;
 import org.opensaml.xml.validation.ValidationException;
+import org.springframework.context.ApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  *
@@ -62,6 +68,15 @@ public class SamlAuthenticationService extends AbstractAuthenticationService {
     private final Logger logger = LoggerFactory.getLogger(getClass());
     private Assertion assertion;
     private Issuer issuer;
+
+    private Server server;
+
+    @Override
+    public void init() throws ServletException {
+        super.init();
+        ApplicationContext applicationContext = WebApplicationContextUtils.getRequiredWebApplicationContext(getServletContext());
+        server = applicationContext.getBean(Server.class);
+    }
 
     @Override
     protected void checkValidRequest(HttpServletRequest request) throws BusinessException {
@@ -108,7 +123,7 @@ public class SamlAuthenticationService extends AbstractAuthenticationService {
             throw new BusinessException("Cannot find assertion issuer!");
         }
         logger.info("Received SAML assertion from issuer " + issuer.getValue());
-        String certFile = Server.getInstance().getSamlTrustedCertificate(issuer.getValue());
+        String certFile = server.getSamlTrustedCertificate(issuer.getValue());
 
         // Check validity of assertion
         try {
@@ -134,7 +149,7 @@ public class SamlAuthenticationService extends AbstractAuthenticationService {
 
     @Override
     public String getDefaultAccountType() {
-        return Server.getInstance().getSAMLAccountType(issuer.getValue());
+        return server.getSAMLAccountType(issuer.getValue());
     }
 
     @Override

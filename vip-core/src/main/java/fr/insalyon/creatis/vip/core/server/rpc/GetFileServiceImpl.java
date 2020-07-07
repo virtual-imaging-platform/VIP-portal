@@ -35,24 +35,22 @@ import fr.insalyon.creatis.devtools.zip.FolderZipper;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.server.business.Server;
-import fr.insalyon.creatis.vip.core.server.dao.CoreDAOFactory;
-import fr.insalyon.creatis.vip.core.server.dao.DAOException;
-import fr.insalyon.creatis.vip.core.server.dao.mysql.PlatformConnection;
-import java.io.DataInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.sql.Connection;
-import java.sql.SQLException;
+import fr.insalyon.creatis.vip.core.server.dao.UserDAO;
+import org.apache.commons.io.FileUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
+
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import org.apache.commons.io.FileUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.io.DataInputStream;
+import java.io.File;
+import java.io.FileInputStream;
 
 /**
  *
@@ -62,21 +60,29 @@ public class GetFileServiceImpl extends HttpServlet {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
+    private UserDAO userDAO;
+    private Server server;
+
+    @Override
+    public void init() throws ServletException {
+        super.init();
+        ApplicationContext applicationContext = WebApplicationContextUtils.getRequiredWebApplicationContext(getServletContext());
+        userDAO = applicationContext.getBean(UserDAO.class);
+        server = applicationContext.getBean(Server.class);
+    }
+
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException {
-        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
-            User user = CoreDAOFactory.getDAOFactory()
-                .getUserDAO(connection)
-                .getUserBySession(
+        try {
+            User user = userDAO.getUserBySession(
                     req.getParameter(CoreConstants.COOKIES_SESSION));
 
             String filepath = req.getParameter("filepath");
 
             if (filepath != null && !filepath.isEmpty()) {
 
-                File file = new File(
-                        Server.getInstance().getWorkflowsPath()
+                File file = new File(server.getWorkflowsPath()
                         + filepath);
 
                 boolean isDir = false;
@@ -89,7 +95,6 @@ public class GetFileServiceImpl extends HttpServlet {
                 }
 
                 logger.info("(" + user.getEmail() + ") Downloading file '" + filepath + "'.");
-                int length = 0;
                 ServletOutputStream op = resp.getOutputStream();
                 ServletContext context = getServletConfig().getServletContext();
                 String mimetype = context.getMimeType(file.getName());
@@ -102,7 +107,8 @@ public class GetFileServiceImpl extends HttpServlet {
                 byte[] bbuf = new byte[4096];
                 DataInputStream in = new DataInputStream(new FileInputStream(file));
 
-                while ((in != null) && ((length = in.read(bbuf)) != -1)) {
+                int length;
+                while ((length = in.read(bbuf)) != -1) {
                     op.write(bbuf, 0, length);
                 }
 
@@ -114,8 +120,6 @@ public class GetFileServiceImpl extends HttpServlet {
                     FileUtils.deleteQuietly(file);
                 }
             }
-        } catch (DAOException ex) {
-            throw new ServletException(ex);
         } catch (Exception ex) {
             logger.error("Error downloading a file", ex);
             throw new ServletException(ex);

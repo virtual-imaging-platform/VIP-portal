@@ -102,18 +102,6 @@ public class SpringWebConfig implements WebMvcConfigurer {
         configurer.replaceMediaTypes(Collections.emptyMap());
     }
 
-    @Bean
-    public Function<Connection, UserDAO> userDaoFactory() {
-        return connection -> {
-            try {
-                return CoreDAOFactory.getDAOFactory().getUserDAO(connection);
-            } catch (DAOException e) {
-                logger.error("error creating user dao bean");
-                throw new RuntimeException("Cannot create user dao", e);
-            }
-        };
-    }
-
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")

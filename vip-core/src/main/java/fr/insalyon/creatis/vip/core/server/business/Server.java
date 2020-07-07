@@ -40,18 +40,19 @@ import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
-/**ip
+/**
  *
  *
  * @author Rafael Ferreira da Silva
  */
+@Component
 public class Server {
     // Configuration File
     PropertiesConfiguration config;
     // Constants
     private final Logger logger = LoggerFactory.getLogger(getClass());
-    private static Server instance;
     private final String CONF_FILE = "vip.conf";
     private final String VIP_DIR = "/.vip/";
     private final String PROXIES_DIR = "proxies/";
@@ -140,15 +141,8 @@ public class Server {
     // External storage, girder.
     private float girderTokenDurationInDays;
 
-    public static Server getInstance() {
-        if (instance == null) {
-            instance = new Server();
-        }
-        return instance;
-    }
-
     @SuppressWarnings("unchecked")
-    private Server() {
+    public Server() {
 
         try {
             // Directories

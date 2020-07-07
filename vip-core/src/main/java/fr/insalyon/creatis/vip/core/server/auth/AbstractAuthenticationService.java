@@ -36,14 +36,12 @@ import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
 import fr.insalyon.creatis.vip.core.server.dao.*;
-import fr.insalyon.creatis.vip.core.server.dao.mysql.PlatformConnection;
 import fr.insalyon.creatis.vip.core.server.rpc.ConfigurationServiceImpl;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.Date;
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
@@ -54,6 +52,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  *
@@ -69,38 +69,41 @@ public abstract class AbstractAuthenticationService extends HttpServlet {
 
     public abstract String getDefaultAccountType();
 
+    private UserDAO userDAO;
+    private ConfigurationBusiness configurationBusiness;
+
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
-            processRequest(request, response, connection);
+    public void init() throws ServletException {
+        super.init();
+        ApplicationContext applicationContext = WebApplicationContextUtils.getRequiredWebApplicationContext(getServletContext());
+        userDAO = applicationContext.getBean(UserDAO.class);
+        configurationBusiness = applicationContext.getBean(ConfigurationBusiness.class);
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) {
+        try {
+            processRequest(request, response);
         } catch (BusinessException ex) {
             logger.error("Error handling a request : {}. Ignoring", ex.getMessage());
-        } catch (SQLException ex) {
-            logger.error("Error handling a connection. Ignoring", ex);
         }
     }
 
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
-            processRequest(request, response, connection);
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) {
+        try {
+            processRequest(request, response);
         } catch (BusinessException ex) {
             logger.error("Error handling a request : {}. Ignoring", ex.getMessage());
-        } catch (SQLException ex) {
-            logger.error("Error handling a connection. Ignoring", ex);
         }
     }
 
     private void processRequest(
-        HttpServletRequest request,
-        HttpServletResponse response,
-        Connection connection)
-        throws BusinessException {
+            HttpServletRequest request,
+            HttpServletResponse response) throws BusinessException {
 
         logger.info("Third-party authentication request.");
-        String email = null;
+        String email;
         try {
             checkValidRequest(request);
             email = getEmail();
@@ -115,16 +118,13 @@ public abstract class AbstractAuthenticationService extends HttpServlet {
             authFailedResponse(request, response);
             return;
         }
-        resetFailedAuthenticationCount(email, connection);
+        resetFailedAuthenticationCount(email);
         //authenticate email in VIP
-        authSuccessResponse(request, response, email, connection);
+        authSuccessResponse(request, response, email);
     }
 
-    private void resetFailedAuthenticationCount(
-        String email, Connection connection) {
+    private void resetFailedAuthenticationCount(String email) {
         try {
-            UserDAO userDAO = CoreDAOFactory.getDAOFactory()
-                .getUserDAO(connection);
             userDAO.resetNFailedAuthentications(email);
             logger.debug("Reset auth count for " + email);
         } catch (DAOException e) {
@@ -132,28 +132,25 @@ public abstract class AbstractAuthenticationService extends HttpServlet {
         }
     }
 
-    private String getBaseURL(HttpServletRequest request) {
+    private String getBaseURL() {
         return "/";
     }
 
     private void authSuccessResponse(
-        HttpServletRequest request,
-        HttpServletResponse response,
-        String email,
-        Connection connection) throws BusinessException {
+            HttpServletRequest request,
+            HttpServletResponse response,
+            String email) throws BusinessException {
 
-        ConfigurationBusiness cb = new ConfigurationBusiness();
         String accountType = getDefaultAccountType();
-        User user;
-        user = cb.getOrCreateUser(email, accountType, connection);
+        User user = configurationBusiness.getOrCreateUser(email, accountType);
         //third-party authentication services will *not* be trusted to let admins in
         if (user.isSystemAdministrator()) {
             authFailedResponse(request, response);
             return;
         }
-        setVIPSession(request, response, user, connection);
+        setVIPSession(request, response, user);
         try {
-            response.sendRedirect(getBaseURL(request));
+            response.sendRedirect(getBaseURL());
         } catch (IOException ex) {
             throw new BusinessException(ex);
         }
@@ -181,17 +178,15 @@ public abstract class AbstractAuthenticationService extends HttpServlet {
         }
     }
 
-    public static void setVIPSession(
-        HttpServletRequest request,
-        HttpServletResponse response,
-        User user,
-        Connection connection)
-        throws BusinessException {
+    private void setVIPSession(
+            HttpServletRequest request,
+            HttpServletResponse response,
+            User user) throws BusinessException {
         try {
             ConfigurationServiceImpl csi = new ConfigurationServiceImpl();
+            csi.setConfigurationBusiness(configurationBusiness); //inject dependency
             user = csi.setUserSession(user, request.getSession());
-            ConfigurationBusiness cb = new ConfigurationBusiness();
-            cb.updateUserLastLogin(user.getEmail(), connection);
+            configurationBusiness.updateUserLastLogin(user.getEmail());
             Cookie userCookie = new Cookie(CoreConstants.COOKIES_USER, URLEncoder.encode(user.getEmail(), "UTF-8"));
             userCookie.setMaxAge((int) (CoreConstants.COOKIES_EXPIRATION_DATE.getTime() - new Date().getTime()));
             userCookie.setPath("/");
@@ -206,9 +201,10 @@ public abstract class AbstractAuthenticationService extends HttpServlet {
         }
     }
 
-    private void authFailedResponse(HttpServletRequest request, HttpServletResponse response) throws BusinessException {
+    private void authFailedResponse(
+            HttpServletRequest request, HttpServletResponse response) {
         logger.info("Third-party authentication failed.");
-       response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+        response.setStatus(HttpServletResponse.SC_FORBIDDEN);
     }
 
     private boolean isValidEmailAddress(String email) {
