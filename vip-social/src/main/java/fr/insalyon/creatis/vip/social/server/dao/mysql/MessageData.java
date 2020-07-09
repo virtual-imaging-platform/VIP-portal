@@ -32,11 +32,10 @@
 package fr.insalyon.creatis.vip.social.server.dao.mysql;
 
 import fr.insalyon.creatis.vip.core.client.bean.User;
-import fr.insalyon.creatis.vip.core.server.dao.CoreDAOFactory;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
+import fr.insalyon.creatis.vip.core.server.dao.UserDAO;
 import fr.insalyon.creatis.vip.social.client.bean.Message;
 import fr.insalyon.creatis.vip.social.server.dao.MessageDAO;
-import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -48,24 +47,35 @@ import java.util.Date;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.support.JdbcDaoSupport;
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
+
+import javax.sql.DataSource;
 
 /**
  *
  * @author Rafael Ferreira da Silva
  */
-public class MessageData implements MessageDAO {
+@Repository
+@Transactional
+public class MessageData extends JdbcDaoSupport implements MessageDAO {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
-    private Connection connection;
 
-    public MessageData(Connection connection) {
-        this.connection = connection;
+    private UserDAO userDAO;
+
+    @Autowired
+    public MessageData(UserDAO userDAO, DataSource dataSource) {
+        setDataSource(dataSource);
+        this.userDAO = userDAO;
     }
 
     public long add(String sender, String title, String message) throws DAOException {
 
         try {
-            PreparedStatement ps = connection.prepareStatement("INSERT INTO "
+            PreparedStatement ps = getConnection().prepareStatement("INSERT INTO "
                     + "VIPSocialMessage(sender, title, message, posted) "
                     + "VALUES(?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
             ps.setString(1, sender);
@@ -90,7 +100,7 @@ public class MessageData implements MessageDAO {
     public void associateMessageToUser(String receiver, long messageId) throws DAOException {
 
         try {
-            PreparedStatement ps = connection.prepareStatement("INSERT INTO "
+            PreparedStatement ps = getConnection().prepareStatement("INSERT INTO "
                     + "VIPSocialMessageSenderReceiver(receiver, message_id, user_read) "
                     + "VALUES(?, ?, ?)");
             ps.setString(1, receiver);
@@ -110,7 +120,7 @@ public class MessageData implements MessageDAO {
         throws DAOException {
 
         try {
-            PreparedStatement ps = connection.prepareStatement("SELECT "
+            PreparedStatement ps = getConnection().prepareStatement("SELECT "
                     + "id, sender, title, message, posted, user_read "
                     + "FROM VIPSocialMessage AS sc, VIPSocialMessageSenderReceiver AS ss "
                     + "WHERE sc.id = ss.message_id AND receiver = ? "
@@ -124,10 +134,8 @@ public class MessageData implements MessageDAO {
             SimpleDateFormat f = new SimpleDateFormat("MMMM d, yyyy HH:mm");
 
             while (rs.next()) {
-                User from = CoreDAOFactory.getDAOFactory()
-                    .getUserDAO(connection).getUser(rs.getString("sender"));
-                User to = CoreDAOFactory.getDAOFactory()
-                    .getUserDAO(connection).getUser(email);
+                User from = userDAO.getUser(rs.getString("sender"));
+                User to = userDAO.getUser(email);
                 Date posted = new Date(rs.getTimestamp("posted").getTime());
                 messages.add(new Message(rs.getLong("id"), from, to, rs.getString("title"),
                         rs.getString("message"), f.format(posted), posted,
@@ -148,7 +156,7 @@ public class MessageData implements MessageDAO {
         throws DAOException {
 
         try {
-            PreparedStatement ps = connection.prepareStatement("SELECT "
+            PreparedStatement ps = getConnection().prepareStatement("SELECT "
                     + "id, title, message, posted "
                     + "FROM VIPSocialMessage "
                     + "WHERE sender = ? "
@@ -163,10 +171,9 @@ public class MessageData implements MessageDAO {
 
             while (rs.next()) {
 
-                User sender = CoreDAOFactory.getDAOFactory()
-                    .getUserDAO(connection).getUser(email);
+                User sender = userDAO.getUser(email);
 
-                PreparedStatement ps2 = connection.prepareStatement("SELECT "
+                PreparedStatement ps2 = getConnection().prepareStatement("SELECT "
                         + "receiver FROM VIPSocialMessageSenderReceiver "
                         + "WHERE message_id = ?");
                 ps2.setLong(1, rs.getLong("id"));
@@ -175,9 +182,7 @@ public class MessageData implements MessageDAO {
                 List<User> receivers = new ArrayList<User>();
 
                 while (rs2.next()) {
-                    receivers.add(CoreDAOFactory.getDAOFactory()
-                                  .getUserDAO(connection)
-                                  .getUser(rs2.getString("receiver")));
+                    receivers.add(userDAO.getUser(rs2.getString("receiver")));
                 }
                 Date posted = new Date(rs.getTimestamp("posted").getTime());
                 messages.add(new Message(rs.getLong("id"), sender,
@@ -198,7 +203,7 @@ public class MessageData implements MessageDAO {
     public void markAsRead(long id, String receiver) throws DAOException {
 
         try {
-            PreparedStatement ps = connection.prepareStatement("UPDATE "
+            PreparedStatement ps = getConnection().prepareStatement("UPDATE "
                     + "VIPSocialMessageSenderReceiver SET user_read = ? "
                     + "WHERE message_id = ? AND receiver = ?");
             ps.setBoolean(1, true);
@@ -217,7 +222,7 @@ public class MessageData implements MessageDAO {
     public void remove(long id) throws DAOException {
 
         try {
-            PreparedStatement ps = connection.prepareStatement("DELETE FROM "
+            PreparedStatement ps = getConnection().prepareStatement("DELETE FROM "
                     + "VIPSocialMessage WHERE id = ?");
             ps.setLong(1, id);
 
@@ -233,14 +238,14 @@ public class MessageData implements MessageDAO {
     public void removeByReceiver(long id, String receiver) throws DAOException {
 
         try {
-            PreparedStatement ps = connection.prepareStatement("DELETE FROM "
+            PreparedStatement ps = getConnection().prepareStatement("DELETE FROM "
                     + "VIPSocialMessageSenderReceiver "
                     + "WHERE message_id = ? AND receiver = ?");
             ps.setLong(1, id);
             ps.setString(2, receiver);
             ps.executeUpdate();
 
-            ps = connection.prepareStatement("SELECT count(message_id) AS num "
+            ps = getConnection().prepareStatement("SELECT count(message_id) AS num "
                     + "FROM VIPSocialMessageSenderReceiver "
                     + "WHERE message_id = ?");
             ps.setLong(1, id);
@@ -260,7 +265,7 @@ public class MessageData implements MessageDAO {
     public int verifyMessages(String email) throws DAOException {
 
         try {
-            PreparedStatement ps = connection.prepareStatement("SELECT "
+            PreparedStatement ps = getConnection().prepareStatement("SELECT "
                     + "COUNT(id) AS num "
                     + "FROM VIPSocialMessage AS sc, VIPSocialMessageSenderReceiver AS ss "
                     + "WHERE sc.id = ss.message_id AND receiver = ? AND user_read = ?");

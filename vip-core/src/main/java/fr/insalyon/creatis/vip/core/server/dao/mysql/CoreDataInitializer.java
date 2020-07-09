@@ -13,16 +13,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
+import org.springframework.core.annotation.Order;
 import org.springframework.jdbc.core.support.JdbcDaoSupport;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.sql.DataSource;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.Date;
 import java.util.UUID;
 
@@ -32,20 +30,20 @@ public class CoreDataInitializer extends JdbcDaoSupport {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
+    private TableInitializer tableInitializer;
+
     private Server server;
     private UserDAO userDAO;
     private GroupDAO groupDAO;
     private UsersGroupsDAO usersGroupsDAO;
     private TermsUseDAO termsUseDAO;
 
-    @Value("${db.tableEngine:InnoDB}")
-    private String tableEngine = "InnoDB";
-
     @Autowired
-    public CoreDataInitializer(GroupDAO groupDAO, DataSource dataSource,
-                               Server server, UserDAO userDAO, UsersGroupsDAO usersGroupsDAO,
-                               TermsUseDAO termsUseDAO) {
+    public CoreDataInitializer(
+            GroupDAO groupDAO, DataSource dataSource, TableInitializer tableInitializer,
+            Server server, UserDAO userDAO, UsersGroupsDAO usersGroupsDAO, TermsUseDAO termsUseDAO) {
         setDataSource(dataSource);
+        this.tableInitializer = tableInitializer;
         this.userDAO = userDAO;
         this.server = server;
         this.usersGroupsDAO = usersGroupsDAO;
@@ -54,8 +52,9 @@ public class CoreDataInitializer extends JdbcDaoSupport {
     }
 
     @EventListener(ContextRefreshedEvent.class)
+    @Order(10)
     public void onStartup() {
-        logger.info("Configuring VIP database.");
+        logger.info("Configuring VIP core database.");
         initializeUserTables();
         initializeGroupTables();
         initializeAccountTables();
@@ -64,7 +63,7 @@ public class CoreDataInitializer extends JdbcDaoSupport {
     }
 
     private void initializeUserTables() {
-        if (createTable("VIPUsers",
+        if (tableInitializer.createTable("VIPUsers",
                 "email VARCHAR(255), "
                         + "next_email VARCHAR(255), "
                         + "pass VARCHAR(40), "
@@ -113,7 +112,7 @@ public class CoreDataInitializer extends JdbcDaoSupport {
     }
 
     private void initializeGroupTables() {
-        if (createTable("VIPGroups",
+        if (tableInitializer.createTable("VIPGroups",
                 "groupname VARCHAR(50), "
                         + "public BOOLEAN, "
                         + "gridfile BOOLEAN DEFAULT 0, "
@@ -128,7 +127,7 @@ public class CoreDataInitializer extends JdbcDaoSupport {
         }
 
 
-        if (createTable("VIPUsersGroups",
+        if (tableInitializer.createTable("VIPUsersGroups",
                 "email VARCHAR(255), "
                         + "groupname VARCHAR(100), "
                         + "role VARCHAR(30), "
@@ -148,11 +147,11 @@ public class CoreDataInitializer extends JdbcDaoSupport {
     }
 
     private void initializeAccountTables() {
-        createTable("VIPAccounts",
+        tableInitializer.createTable("VIPAccounts",
                 "name VARCHAR(255), "
                         + "PRIMARY KEY (name)");
 
-        createTable("VIPAccountsGroups",
+        tableInitializer.createTable("VIPAccountsGroups",
                 "name VARCHAR(255), "
                         + "groupname VARCHAR(255), "
                         + "PRIMARY KEY (name, groupname), "
@@ -163,7 +162,7 @@ public class CoreDataInitializer extends JdbcDaoSupport {
     }
 
     private void initializePublicationTable() {
-        createTable("VIPPublication",
+        tableInitializer.createTable("VIPPublication",
                 "id INT(11) NOT NULL AUTO_INCREMENT, "
                         + "title VARCHAR(255) NULL, "
                         + "date VARCHAR(45) NULL, "
@@ -178,7 +177,7 @@ public class CoreDataInitializer extends JdbcDaoSupport {
     }
 
     private void initializeTermsOfUseTable() {
-        if (createTable("VIPTermsOfuse",
+        if (tableInitializer.createTable("VIPTermsOfuse",
                 "idTermsOfuse INT(11) NOT NULL AUTO_INCREMENT, "
                         + "date TIMESTAMP NULL, "
                         + "PRIMARY KEY (idTermsOfuse)")) {
@@ -189,25 +188,6 @@ public class CoreDataInitializer extends JdbcDaoSupport {
             } catch (DAOException ex) {
                 logger.error("Error creating VIPGroups table", ex);
             }
-        }
-    }
-
-    private boolean createTable(String name, String columnsDefinition) {
-
-        try {
-            String suffix = tableEngine.isEmpty() ? "" : " ENGINE=" + tableEngine;
-            Statement stat = getConnection().createStatement();
-            stat.executeUpdate("CREATE TABLE " + name + " ("
-                    + columnsDefinition + ")" + suffix);
-
-            logger.info("Table " + name + " successfully created.");
-            return true;
-
-        } catch (SQLException ex) {
-            if (!ex.getMessage().contains("already exists")) {
-                logger.error("Error creating db table {}", name, ex);
-            }
-            return false;
         }
     }
 }

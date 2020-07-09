@@ -40,6 +40,7 @@ import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 /**
@@ -48,6 +49,9 @@ import org.springframework.stereotype.Component;
  * @author Rafael Ferreira da Silva
  */
 @Component
+@Profile({"default", "vip-conf-file"})
+    // to avoid bean being created in tests
+    // although the vif.conf file does not exist and causes an (silent error)
 public class Server {
     // Configuration File
     PropertiesConfiguration config;

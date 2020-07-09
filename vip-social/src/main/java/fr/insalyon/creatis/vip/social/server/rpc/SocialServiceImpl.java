@@ -34,20 +34,22 @@ package fr.insalyon.creatis.vip.social.server.rpc;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.CoreException;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
-import fr.insalyon.creatis.vip.core.server.dao.mysql.PlatformConnection;
+import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
 import fr.insalyon.creatis.vip.core.server.rpc.AbstractRemoteServiceServlet;
 import fr.insalyon.creatis.vip.social.client.bean.GroupMessage;
 import fr.insalyon.creatis.vip.social.client.bean.Message;
 import fr.insalyon.creatis.vip.social.client.rpc.SocialService;
 import fr.insalyon.creatis.vip.social.client.view.SocialException;
 import fr.insalyon.creatis.vip.social.server.business.MessageBusiness;
-import java.sql.Connection;
-import java.sql.SQLException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
+
+import javax.servlet.ServletException;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -56,188 +58,152 @@ import org.slf4j.LoggerFactory;
 public class SocialServiceImpl extends AbstractRemoteServiceServlet implements SocialService {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
-    private MessageBusiness messageBusiness;
 
-    public SocialServiceImpl() {
-        messageBusiness = new MessageBusiness();
+    private MessageBusiness messageBusiness;
+    private ConfigurationBusiness configurationBusiness;
+
+    @Override
+    public void init() throws ServletException {
+        super.init();
+        ApplicationContext applicationContext =
+                WebApplicationContextUtils.getRequiredWebApplicationContext(getServletContext());
+        messageBusiness = applicationContext.getBean(MessageBusiness.class);
+        configurationBusiness = applicationContext.getBean(ConfigurationBusiness.class);
     }
 
     public List<Message> getMessagesByUser(Date startDate) throws SocialException {
-        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
+        try {
             return messageBusiness.getMessagesByUser(
-                getSessionUser().getEmail(), startDate, connection);
+                getSessionUser().getEmail(), startDate);
         } catch (BusinessException | CoreException ex) {
-            throw new SocialException(ex);
-        } catch (SQLException ex) {
-            logger.error("Error handling a connection", ex);
             throw new SocialException(ex);
         }
     }
 
     public List<Message> getSentMessagesByUser(Date startDate) throws SocialException {
-        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
+        try {
             return messageBusiness.getSentMessagesByUser(
-                getSessionUser().getEmail(), startDate, connection);
+                    getSessionUser().getEmail(), startDate);
         } catch (BusinessException | CoreException ex) {
-            throw new SocialException(ex);
-        } catch (SQLException ex) {
-            logger.error("Error handling a connection", ex);
             throw new SocialException(ex);
         }
     }
 
-    public List<GroupMessage> getGroupMessages(String groupName, Date startDate) throws SocialException {
-        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
-            return messageBusiness.getGroupMessages(
-                groupName, startDate, connection);
+    public List<GroupMessage> getGroupMessages(String groupName, Date startDate)
+            throws SocialException {
+        try {
+            return messageBusiness.getGroupMessages(groupName, startDate);
         } catch (BusinessException ex) {
-            throw new SocialException(ex);
-        } catch (SQLException ex) {
-            logger.error("Error handling a connection", ex);
             throw new SocialException(ex);
         }
     }
 
     public void markMessageAsRead(long id, String receiver) throws SocialException {
-        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
-            messageBusiness.markAsRead(id, receiver, connection);
+        try {
+            messageBusiness.markAsRead(id, receiver);
         } catch (BusinessException ex) {
-            throw new SocialException(ex);
-        } catch (SQLException ex) {
-            logger.error("Error handling a connection", ex);
             throw new SocialException(ex);
         }
     }
 
     public void removeMessage(long id) throws SocialException {
-        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
-            messageBusiness.remove(id, connection);
+        try {
+            messageBusiness.remove(id);
         } catch (BusinessException ex) {
-            throw new SocialException(ex);
-        } catch (SQLException ex) {
-            logger.error("Error handling a connection", ex);
             throw new SocialException(ex);
         }
     }
 
     public void removeMessageByReceiver(long id) throws SocialException {
-        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
-            messageBusiness.removeByReceiver(
-                id, getSessionUser().getEmail(), connection);
+        try {
+            messageBusiness.removeByReceiver(id, getSessionUser().getEmail());
         } catch (BusinessException | CoreException ex) {
-            throw new SocialException(ex);
-        } catch (SQLException ex) {
-            logger.error("Error handling a connection", ex);
             throw new SocialException(ex);
         }
     }
 
     public void removeGroupMessage(long id) throws SocialException {
-        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
-            messageBusiness.removeGroupMessage(id, connection);
+        try {
+            messageBusiness.removeGroupMessage(id);
         } catch (BusinessException ex) {
-            throw new SocialException(ex);
-        } catch (SQLException ex) {
-            logger.error("Error handling a connection", ex);
             throw new SocialException(ex);
         }
     }
 
     public List<User> getUsers() throws SocialException {
-        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
+        try {
             if (isSystemAdministrator()) {
-                return configurationBusiness.getUsers(connection);
+                return configurationBusiness.getUsers();
             }
             logger.error("{} is not an admin, he cant access all users", getSessionUser());
             throw new SocialException("Only administrators can send message.");
         } catch (BusinessException | CoreException ex) {
             throw new SocialException(ex);
-        } catch (SQLException ex) {
-            logger.error("Error handling a connection", ex);
-            throw new SocialException(ex);
         }
     }
 
-    public void sendMessage(String[] recipients, String subject, String message) throws SocialException {
-        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
+    public void sendMessage(String[] recipients, String subject, String message)
+            throws SocialException {
+        try {
             trace(logger, "Sending message '" + subject + "' to '" + Arrays.asList(recipients) + "'.");
             messageBusiness.sendMessage(
-                getSessionUser(), recipients, subject, message, connection);
+                getSessionUser(), recipients, subject, message);
         } catch (BusinessException | CoreException ex) {
-            throw new SocialException(ex);
-        } catch (SQLException ex) {
-            logger.error("Error handling a connection", ex);
             throw new SocialException(ex);
         }
     }
 
     public void sendMessageWithSupportCopy(
-        String[] recipients, String subject, String message)
-        throws SocialException {
+            String[] recipients, String subject, String message)
+            throws SocialException {
 
-        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
+        try {
             trace(logger, "Sending message '" + subject + "' to '" + Arrays.asList(recipients) + "'.");
             messageBusiness.sendMessage(
-                getSessionUser(), recipients, subject, message, connection);
+                    getSessionUser(), recipients, subject, message);
             trace(logger, "Sending message '" + subject + "' to 'vip-support' as copy.");
             messageBusiness.copyMessageToVipSupport(
-                getSessionUser(), recipients,
-                subject, message, connection);
+                    getSessionUser(), recipients, subject, message);
         } catch (BusinessException | CoreException ex) {
-            throw new SocialException(ex);
-        } catch (SQLException ex) {
-            logger.error("Error handling a connection", ex);
             throw new SocialException(ex);
         }
     }
 
     public void sendMessageToVipSupport(
-        String subject, String message, List<String> workflowID,
-        List<String> simulationNames)
-        throws SocialException {
+            String subject, String message, List<String> workflowID,
+            List<String> simulationNames) throws SocialException {
 
-        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
+        try{
             trace(logger, "Sending message '" + subject + "' to 'vip-support'.");
             messageBusiness.sendMessageToVipSupport(
                 getSessionUser(),
-                subject, message, workflowID, simulationNames, connection);
+                subject, message, workflowID, simulationNames);
         } catch (BusinessException | CoreException ex) {
-            throw new SocialException(ex);
-        } catch (SQLException ex) {
-            logger.error("Error handling a connection", ex);
             throw new SocialException(ex);
         }
     }
 
-    public void sendGroupMessage(
-        String groupName, String subject, String message)
-        throws SocialException {
+    public void sendGroupMessage(String groupName, String subject, String message)
+            throws SocialException {
 
-        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
+        try {
             trace(logger, "Sending message '" + subject + "' to group '" + groupName + "'.");
             messageBusiness.sendGroupMessage(
                 getSessionUser(),
                 groupName,
-                configurationBusiness.getUsersFromGroup(groupName, connection),
+                configurationBusiness.getUsersFromGroup(groupName),
                 subject,
-                message,
-                connection);
+                message);
         } catch (BusinessException | CoreException ex) {
-            throw new SocialException(ex);
-        } catch (SQLException ex) {
-            logger.error("Error handling a connection", ex);
             throw new SocialException(ex);
         }
     }
 
     public int verifyMessages() throws SocialException {
-        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
+        try {
             return messageBusiness.verifyMessages(
-                getSessionUser().getEmail(), connection);
+                getSessionUser().getEmail());
         } catch (BusinessException | CoreException ex) {
-            throw new SocialException(ex);
-        } catch (SQLException ex) {
-            logger.error("Error handling a connection", ex);
             throw new SocialException(ex);
         }
     }

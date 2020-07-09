@@ -1,37 +1,23 @@
 package fr.insalyon.creatis.vip.core.integrationtest.database;
 
-import fr.insalyon.creatis.grida.client.GRIDAClient;
 import fr.insalyon.creatis.grida.client.GRIDAClientException;
 import fr.insalyon.creatis.vip.core.client.bean.Account;
 import fr.insalyon.creatis.vip.core.client.bean.Group;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.util.CountryCode;
 import fr.insalyon.creatis.vip.core.integrationtest.ServerMockConfig;
-import fr.insalyon.creatis.vip.core.server.SpringCoreConfig;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
-import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
-import fr.insalyon.creatis.vip.core.server.business.EmailBusiness;
-import fr.insalyon.creatis.vip.core.server.business.Server;
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DataSourceUtils;
-import org.springframework.test.annotation.Commit;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
-import org.springframework.test.context.transaction.TestTransaction;
 import org.springframework.test.jdbc.JdbcTestUtils;
-import org.springframework.transaction.CannotCreateTransactionException;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.sql.DataSource;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.sql.Connection;
@@ -43,36 +29,13 @@ import java.util.function.Supplier;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 
-
-@SpringJUnitConfig(SpringCoreConfig.class) // launch all spring environment for testing, also take test bean though automatic package scan
-@ActiveProfiles("test-db") // to take random h2 database and not the test h2 jndi one
-@TestPropertySource(properties = "db.tableEngine=") // to disable the default mysql/innodb engine on database init
-@Transactional
 @TestMethodOrder(OrderAnnotation.class)
-public class SpringDatabaseIT {
-
-    @Autowired
-    private ConfigurationBusiness configurationBusiness;
-
-    @Autowired
-    @Qualifier("db-datasource")
-    private DataSource dataSource;
-
-    @Autowired
-    private DataSource lazyDataSource;
-
-    @Autowired
-    private EmailBusiness emailBusiness;
-
-    @Autowired
-    private Server server;
-
-    @Autowired
-    private GRIDAClient gridaClient;
+public class SpringDatabaseIT extends BaseSpringIT{
     
     /*
         First launch
      */
+
     @Test
     @Order(1)
     public void testTestConfig() throws BusinessException {
@@ -157,15 +120,6 @@ public class SpringDatabaseIT {
             configurationBusiness.removeUser(testEmail, false);
         }
         assertEquals(1, countUser.get());
-    }
-
-    private void createUser(String testEmail) throws GRIDAClientException, BusinessException {
-        User newUser = new User("firstName", "LastName",
-                testEmail, "Test institution",
-                "testPassword", "testPhone", CountryCode.fr,
-                null);
-        Mockito.when(gridaClient.exist(anyString())).thenReturn(true, false);
-        configurationBusiness.signup(newUser, "", (String) null);
     }
 
     @Test
