@@ -41,10 +41,12 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.core.env.Environment;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.*;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.firewall.DefaultHttpFirewall;
 import org.springframework.security.web.firewall.StrictHttpFirewall;
 
 import java.util.function.Supplier;
@@ -112,9 +114,13 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
         return Jackson2ObjectMapperBuilder.json().build();
     }
 
+    /*
+        Do not use the default firewall (StrictHttpFirewall) because it blocks
+        "//" in url and it is used in gwt rpc calls
+     */
     @Bean
-    public StrictHttpFirewall httpFirewall() {
-        StrictHttpFirewall firewall = new StrictHttpFirewall();
+    public DefaultHttpFirewall httpFirewall() {
+        DefaultHttpFirewall firewall = new DefaultHttpFirewall();
         firewall.setAllowUrlEncodedSlash(true);
         return firewall;
     }
