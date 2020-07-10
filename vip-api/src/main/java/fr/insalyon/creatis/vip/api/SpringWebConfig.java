@@ -74,8 +74,6 @@ import static fr.insalyon.creatis.vip.api.CarminProperties.CORS_AUTHORIZED_DOMAI
 @ComponentScan
 public class SpringWebConfig implements WebMvcConfigurer {
 
-    private final Logger logger = LoggerFactory.getLogger(getClass());;
-
     private Environment env;
     private VipConfigurer vipConfigurer;
 
@@ -101,18 +99,6 @@ public class SpringWebConfig implements WebMvcConfigurer {
         configurer.replaceMediaTypes(Collections.emptyMap());
     }
 
-    @Bean
-    public Function<Connection, UserDAO> userDaoFactory() {
-        return connection -> {
-            try {
-                return CoreDAOFactory.getDAOFactory().getUserDAO(connection);
-            } catch (DAOException e) {
-                logger.error("error creating user dao bean");
-                throw new RuntimeException("Cannot create user dao", e);
-            }
-        };
-    }
-
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
@@ -125,75 +111,4 @@ public class SpringWebConfig implements WebMvcConfigurer {
         registry.addInterceptor(vipConfigurer);
     }
 
-    @Bean
-    public Supplier<Connection> connectionSupplier() {
-        return () -> {
-            try {
-                return PlatformConnection.getInstance().getConnection();
-            } catch (SQLException e) {
-                // Checked exceptions are not supported so use a runtime exception
-                // It will be caught in API controllers as a business exception
-                // so print the stack here
-                logger.error("error getting a connection for spring context", e);
-                throw new SQLRuntimeException(e);
-            }
-        };
-    }
-
-    @Bean
-    public WorkflowBusiness workflowBusiness() {
-        return new WorkflowBusiness();
-    }
-
-    @Bean
-    public ApplicationBusiness applicationBusiness() {
-        return new ApplicationBusiness();
-    }
-
-    @Bean
-    public ClassBusiness classBusiness() {
-        return  new ClassBusiness();
-    }
-
-    @Bean
-    public SimulationBusiness simulationBusiness() {
-        return new SimulationBusiness();
-    }
-
-    @Bean
-    public ConfigurationBusiness configurationBusiness() {
-        return new ConfigurationBusiness();
-    }
-
-    @Bean
-    public TransferPoolBusiness transferPoolBusiness() {
-        return new TransferPoolBusiness();
-    }
-
-    @Bean
-    public LFCBusiness lfcBusiness() {
-        return new LFCBusiness();
-    }
-
-    @Bean
-    public DataManagerBusiness dataManagerBusiness() {
-        return new DataManagerBusiness();
-    }
-
-    @Bean
-    public LFCPermissionBusiness lfcPermissionBusiness() {
-        return new LFCPermissionBusiness();
-    }
-
-    @Bean
-    public ExternalPlatformBusiness externalPlatformBusiness() {
-        return new ExternalPlatformBusiness(
-            new GirderStorageBusiness(
-                apiKeyBusiness()));
-    }
-
-    @Bean
-    public ApiKeyBusiness apiKeyBusiness() {
-        return new ApiKeyBusiness();
-    }
 }
