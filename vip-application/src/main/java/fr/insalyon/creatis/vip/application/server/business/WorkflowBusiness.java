@@ -53,14 +53,12 @@ import fr.insalyon.creatis.vip.application.client.bean.InOutData;
 import fr.insalyon.creatis.vip.application.client.bean.Activity;
 import fr.insalyon.creatis.vip.application.client.bean.Engine;
 import fr.insalyon.creatis.vip.application.client.bean.Simulation;
-import fr.insalyon.creatis.vip.application.client.view.ApplicationException.ApplicationError;
 import fr.insalyon.creatis.vip.application.client.view.monitor.SimulationStatus;
 import fr.insalyon.creatis.vip.application.client.view.monitor.progress.ProcessorStatus;
 import fr.insalyon.creatis.vip.application.server.business.simulation.ParameterSweep;
 import fr.insalyon.creatis.vip.application.server.business.simulation.parser.GwendiaParser;
 import fr.insalyon.creatis.vip.application.server.business.simulation.parser.InputM2Parser;
 import fr.insalyon.creatis.vip.application.server.business.simulation.parser.ScuflParser;
-import fr.insalyon.creatis.vip.application.server.dao.ApplicationDAO;
 import fr.insalyon.creatis.vip.application.server.dao.ApplicationDAOFactory;
 import fr.insalyon.creatis.vip.application.server.dao.SimulationStatsDAO;
 import fr.insalyon.creatis.vip.application.server.dao.SimulationStatsDAOFactory;
@@ -118,7 +116,7 @@ public class WorkflowBusiness {
         externalPlatformBusiness =
             new ExternalPlatformBusiness(
                 new GirderStorageBusiness(
-                    new ApiKeyBusiness()));
+                    new ApiKeyBusiness(apiKeysDAO), server), externalPlatformsDAO);
     }
 
     private Engine selectEngine(String applicationClass, Connection connection)

@@ -47,7 +47,7 @@ public interface SSHDAO {
 
     public void updateSSH(SSH ssh) throws DAOException;
 
-    public void removeSSH(String email, String name) throws DAOException;
+    public void removeSSH(String email, String lfcDir) throws DAOException;
 
     public void resetSSHConnections(List<List<String>> sshConnections) throws DAOException;
 

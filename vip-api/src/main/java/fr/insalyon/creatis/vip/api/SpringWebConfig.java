@@ -39,14 +39,11 @@ import fr.insalyon.creatis.vip.application.server.business.SimulationBusiness;
 import fr.insalyon.creatis.vip.application.server.business.WorkflowBusiness;
 import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
 import fr.insalyon.creatis.vip.core.server.dao.CoreDAOFactory;
-import fr.insalyon.creatis.vip.core.server.dao.DAOException;
-import fr.insalyon.creatis.vip.core.server.dao.UserDAO;
 import fr.insalyon.creatis.vip.core.server.dao.mysql.PlatformConnection;
 import fr.insalyon.creatis.vip.datamanager.server.business.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 import org.springframework.web.servlet.config.annotation.*;
@@ -54,7 +51,6 @@ import org.springframework.web.servlet.config.annotation.*;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Collections;
-import java.util.function.Function;
 import java.util.function.Supplier;
 
 import static fr.insalyon.creatis.vip.api.CarminProperties.CORS_AUTHORIZED_DOMAINS;
@@ -156,12 +152,12 @@ public class SpringWebConfig implements WebMvcConfigurer {
 
     @Bean
     public TransferPoolBusiness transferPoolBusiness() {
-        return new TransferPoolBusiness();
+        return new TransferPoolBusiness(serverConfiguration, lfcBusiness, gridaPoolClient, lfcPathsBusiness);
     }
 
     @Bean
     public LFCBusiness lfcBusiness() {
-        return new LFCBusiness();
+        return new LFCBusiness(gridaClient, lfcPathsBusiness);
     }
 
     @Bean
@@ -171,18 +167,18 @@ public class SpringWebConfig implements WebMvcConfigurer {
 
     @Bean
     public LFCPermissionBusiness lfcPermissionBusiness() {
-        return new LFCPermissionBusiness();
+        return new LFCPermissionBusiness(dataManagerBusiness, lfcPathsBusiness);
     }
 
     @Bean
     public ExternalPlatformBusiness externalPlatformBusiness() {
         return new ExternalPlatformBusiness(
             new GirderStorageBusiness(
-                apiKeyBusiness()));
+                apiKeyBusiness(), server), externalPlatformsDAO);
     }
 
     @Bean
     public ApiKeyBusiness apiKeyBusiness() {
-        return new ApiKeyBusiness();
+        return new ApiKeyBusiness(apiKeysDAO);
     }
 }

@@ -35,28 +35,24 @@ import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.CoreException;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.business.Server;
-import fr.insalyon.creatis.vip.core.server.dao.mysql.PlatformConnection;
 import fr.insalyon.creatis.vip.core.server.rpc.AbstractRemoteServiceServlet;
-import fr.insalyon.creatis.vip.datamanager.client.bean.DMCachedFile;
-import fr.insalyon.creatis.vip.datamanager.client.bean.DMZombieFile;
-import fr.insalyon.creatis.vip.datamanager.client.bean.Data;
-import fr.insalyon.creatis.vip.datamanager.client.bean.PoolOperation;
-import fr.insalyon.creatis.vip.datamanager.client.bean.SSH;
-import fr.insalyon.creatis.vip.datamanager.client.bean.TransferType;
+import fr.insalyon.creatis.vip.datamanager.client.bean.*;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerService;
 import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerException;
-import fr.insalyon.creatis.vip.datamanager.server.DataManagerUtil;
 import fr.insalyon.creatis.vip.datamanager.server.business.DataManagerBusiness;
 import fr.insalyon.creatis.vip.datamanager.server.business.LFCBusiness;
+import fr.insalyon.creatis.vip.datamanager.server.business.LfcPathsBusiness;
 import fr.insalyon.creatis.vip.datamanager.server.business.TransferPoolBusiness;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
+
+import javax.servlet.ServletException;
 import java.io.File;
-import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -65,32 +61,37 @@ import org.slf4j.LoggerFactory;
 public class DataManagerServiceImpl extends AbstractRemoteServiceServlet implements DataManagerService {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
-    private final DataManagerBusiness dataManagerBusiness;
-    private final LFCBusiness lfcBusiness;
-    private final TransferPoolBusiness transferPoolBusiness;
+    private DataManagerBusiness dataManagerBusiness;
+    private LFCBusiness lfcBusiness;
+    private TransferPoolBusiness transferPoolBusiness;
+    private LfcPathsBusiness lfcPathsBusiness;
+    private Server server;
 
-    public DataManagerServiceImpl() {
-
-        dataManagerBusiness = new DataManagerBusiness();
-        lfcBusiness = new LFCBusiness();
-        transferPoolBusiness = new TransferPoolBusiness();
+    @Override
+    public void init() throws ServletException {
+        super.init();
+        ApplicationContext applicationContext =
+                WebApplicationContextUtils.getRequiredWebApplicationContext(getServletContext());
+        transferPoolBusiness = applicationContext.getBean(TransferPoolBusiness.class);
+        lfcBusiness = applicationContext.getBean(LFCBusiness.class);
+        dataManagerBusiness = applicationContext.getBean(DataManagerBusiness.class);
+        lfcPathsBusiness = applicationContext.getBean(LfcPathsBusiness.class);
+        server = applicationContext.getBean(Server.class);
     }
 
     @Override
     public List<Data> listDir(String baseDir, boolean refresh) throws DataManagerException {
-        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
-            List<SSH> sshs = dataManagerBusiness.getSSHConnections(connection);
-            List<String> LfcDirSSHSynchronization = new ArrayList<String>();
+        try {
+            List<SSH> sshs = dataManagerBusiness.getSSHConnections();
+            List<String> LfcDirSSHSynchronization = new ArrayList<>();
             for (SSH ssh : sshs) {
                 if (ssh.getTransferType().equals(TransferType.Synchronization)) {
                     LfcDirSSHSynchronization.add(ssh.getLfcDir());
                 }
             }
-            List<Data> data = lfcBusiness.listDir(
-                getSessionUser(), baseDir, refresh, connection);
+            List<Data> data = lfcBusiness.listDir(getSessionUser(), baseDir, refresh);
 
-            String lfcBaseDir = DataManagerUtil.parseBaseDir(
-                getSessionUser(), baseDir, connection);
+            String lfcBaseDir = lfcPathsBusiness.parseBaseDir(getSessionUser(), baseDir);
             for (Data d : data) {
                 String dataPath = lfcBaseDir + "/" + d.getName();
                 for (String s : LfcDirSSHSynchronization) {
@@ -106,50 +107,37 @@ public class DataManagerServiceImpl extends AbstractRemoteServiceServlet impleme
             return data;
         } catch (BusinessException | CoreException ex) {
             throw new DataManagerException(ex);
-        } catch (SQLException ex) {
-            logger.error("Error handling a connection", ex);
-            throw new DataManagerException(ex);
         }
     }
 
     @Override
     public void delete(String path) throws DataManagerException {
-        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
+        try {
             trace(logger, "Deleting: " + path);
             User user = getSessionUser();
-            transferPoolBusiness.delete(user, connection, path);
+            transferPoolBusiness.delete(user, path);
         } catch (BusinessException | CoreException ex) {
-            throw new DataManagerException(ex);
-        } catch (SQLException ex) {
-            logger.error("Error handling a connection", ex);
             throw new DataManagerException(ex);
         }
     }
 
     @Override
     public void delete(List<String> paths) throws DataManagerException {
-        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
+        try {
             trace(logger, "Deleting: " + paths);
             User user = getSessionUser();
-            transferPoolBusiness.delete(
-                user, connection, paths.toArray(new String[]{}));
+            transferPoolBusiness.delete(user, paths.toArray(new String[]{}));
         } catch (BusinessException | CoreException ex) {
-            throw new DataManagerException(ex);
-        } catch (SQLException ex) {
-            logger.error("Error handling a connection", ex);
             throw new DataManagerException(ex);
         }
     }
 
     @Override
     public void createDir(String baseDir, String name) throws DataManagerException {
-        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
+        try {
             trace(logger, "Creating folder: " + baseDir + "/" + name);
-            lfcBusiness.createDir(getSessionUser(), baseDir, name, connection);
+            lfcBusiness.createDir(getSessionUser(), baseDir, name);
         } catch (BusinessException | CoreException ex) {
-            throw new DataManagerException(ex);
-        } catch (SQLException ex) {
-            logger.error("Error handling a connection", ex);
             throw new DataManagerException(ex);
         }
     }
@@ -157,14 +145,10 @@ public class DataManagerServiceImpl extends AbstractRemoteServiceServlet impleme
     @Override
     public void rename(String oldPath, String newPath, boolean extendPath)
             throws DataManagerException {
-        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
+        try {
             trace(logger, "Renaming '" + oldPath + "' to '" + newPath + "'");
-            lfcBusiness.rename(
-                getSessionUser(), oldPath, newPath, extendPath, connection);
+            lfcBusiness.rename(getSessionUser(), oldPath, newPath, extendPath);
         } catch (BusinessException | CoreException ex) {
-            throw new DataManagerException(ex);
-        } catch (SQLException ex) {
-            logger.error("Error handling a connection", ex);
             throw new DataManagerException(ex);
         }
     }
@@ -172,18 +156,15 @@ public class DataManagerServiceImpl extends AbstractRemoteServiceServlet impleme
     @Override
     public void rename(String baseDir, List<String> paths, String newBaseDir,
             boolean extendPath) throws DataManagerException {
-        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
+        try {
             lfcBusiness.rename(
-                getSessionUser(), baseDir, paths,
-                newBaseDir, extendPath, connection);
+                getSessionUser(), baseDir, paths, newBaseDir, extendPath);
         } catch (BusinessException | CoreException ex) {
-            throw new DataManagerException(ex);
-        } catch (SQLException ex) {
-            logger.error("Error handling a connection", ex);
             throw new DataManagerException(ex);
         }
     }
 
+    @Override
     public List<DMCachedFile> getCachedFiles() throws DataManagerException {
 
         try {
@@ -195,11 +176,7 @@ public class DataManagerServiceImpl extends AbstractRemoteServiceServlet impleme
         }
     }
 
-    /**
-     *
-     * @param cachedFiles
-     * @throws DataManagerException
-     */
+    @Override
     public void deleteCachedFiles(List<String> cachedFiles) throws DataManagerException {
 
         try {
@@ -214,59 +191,49 @@ public class DataManagerServiceImpl extends AbstractRemoteServiceServlet impleme
 
     @Override
     public List<PoolOperation> getPoolOperationsByUser() throws DataManagerException {
-        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
+        try {
             User user = getSessionUser();
             return transferPoolBusiness.getOperations(
-                user.getEmail(), new Date(), user.getFolder(), connection);
+                    user.getEmail(), new Date(), user.getFolder());
         } catch (BusinessException | CoreException ex) {
-            throw new DataManagerException(ex);
-        } catch (SQLException ex) {
-            logger.error("Error handling a connection", ex);
             throw new DataManagerException(ex);
         }
     }
 
     @Override
-    public List<PoolOperation> getPoolOperationsByUserAndDate(Date startDate) throws DataManagerException {
-        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
+    public List<PoolOperation> getPoolOperationsByUserAndDate(Date startDate)
+            throws DataManagerException {
+        try {
             User user = getSessionUser();
             return transferPoolBusiness.getOperations(
-                user.getEmail(), startDate, user.getFolder(), connection);
+                user.getEmail(), startDate, user.getFolder());
         } catch (BusinessException | CoreException ex) {
-            throw new DataManagerException(ex);
-        } catch (SQLException ex) {
-            logger.error("Error handling a connection", ex);
             throw new DataManagerException(ex);
         }
     }
 
     @Override
     public List<PoolOperation> getPoolOperations() throws DataManagerException {
-        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
+        try {
             authenticateSystemAdministrator(logger);
-            return transferPoolBusiness.getOperations(
-                getSessionUser().getFolder(), connection);
+            return transferPoolBusiness.getOperations(getSessionUser().getFolder());
         } catch (BusinessException | CoreException ex) {
-            throw new DataManagerException(ex);
-        } catch (SQLException ex) {
-            logger.error("Error handling a connection", ex);
             throw new DataManagerException(ex);
         }
     }
 
     @Override
-    public PoolOperation getPoolOperationById(String operationId) throws DataManagerException {
-        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
+    public PoolOperation getPoolOperationById(String operationId)
+            throws DataManagerException {
+        try {
             return transferPoolBusiness.getOperationById(
-                operationId, getSessionUser().getFolder(), connection);
+                operationId, getSessionUser().getFolder());
         } catch (BusinessException | CoreException ex) {
-            throw new DataManagerException(ex);
-        } catch (SQLException ex) {
-            logger.error("Error handling a connection", ex);
             throw new DataManagerException(ex);
         }
     }
 
+    @Override
     public void removeOperations(List<String> ids) throws DataManagerException {
 
         try {
@@ -278,6 +245,7 @@ public class DataManagerServiceImpl extends AbstractRemoteServiceServlet impleme
         }
     }
 
+    @Override
     public void removeUserOperations() throws DataManagerException {
 
         try {
@@ -289,6 +257,7 @@ public class DataManagerServiceImpl extends AbstractRemoteServiceServlet impleme
         }
     }
 
+    @Override
     public void removeOperationById(String id) throws DataManagerException {
 
         try {
@@ -302,15 +271,11 @@ public class DataManagerServiceImpl extends AbstractRemoteServiceServlet impleme
 
     @Override
     public String downloadFile(String remoteFile) throws DataManagerException {
-        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
+        try {
             trace(logger, "Adding file to transfer queue: " + remoteFile);
             User user = getSessionUser();
-            return transferPoolBusiness.downloadFile(
-                user, remoteFile, connection);
+            return transferPoolBusiness.downloadFile(user, remoteFile);
         } catch (BusinessException | CoreException ex) {
-            throw new DataManagerException(ex);
-        } catch (SQLException ex) {
-            logger.error("Error handling a connection", ex);
             throw new DataManagerException(ex);
         }
     }
@@ -318,85 +283,61 @@ public class DataManagerServiceImpl extends AbstractRemoteServiceServlet impleme
     @Override
     public String downloadFiles(List<String> remoteFiles, String packName)
             throws DataManagerException {
-        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
+        try {
             trace(logger, "Adding files to transfer queue: " + remoteFiles);
             User user = getSessionUser();
-            return transferPoolBusiness.downloadFiles(user, remoteFiles, packName, connection);
+            return transferPoolBusiness.downloadFiles(user, remoteFiles, packName);
         } catch (BusinessException | CoreException ex) {
-            throw new DataManagerException(ex);
-        } catch (SQLException ex) {
-            logger.error("Error handling a connection", ex);
             throw new DataManagerException(ex);
         }
     }
 
     @Override
     public String downloadFolder(String remoteFolder) throws DataManagerException {
-        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
+        try {
             trace(logger, "Adding folder to transfer queue: " + remoteFolder);
             User user = getSessionUser();
-            return transferPoolBusiness.downloadFolder(
-                user, remoteFolder, connection);
+            return transferPoolBusiness.downloadFolder(user, remoteFolder);
         } catch (BusinessException | CoreException ex) {
-            throw new DataManagerException(ex);
-        } catch (SQLException ex) {
-            logger.error("Error handling a connection", ex);
             throw new DataManagerException(ex);
         }
     }
 
-    /**
-     *
-     * @param localFile
-     * @param remoteName
-     * @param remoteDir
-     * @throws DataManagerException
-     */
     @Override
-    public void uploadFile(String localFile, String remoteName,
-            String remoteDir) throws DataManagerException {
+    public void uploadFile(String localFile, String remoteName, String remoteDir)
+            throws DataManagerException {
 
-        File f = new File(Server.getInstance().getDataManagerPath()
-                + "/uploads/" + localFile);
-        f.renameTo(new File(Server.getInstance().getDataManagerPath()
-                + "/uploads/" + remoteName));
+        File f = new File(
+                server.getDataManagerPath() + "/uploads/" + localFile);
+        f.renameTo(new File(
+                server.getDataManagerPath() + "/uploads/" + remoteName));
         uploadFile(f.getAbsolutePath(), remoteDir);
     }
 
     @Override
-    public void uploadFile(String localFilePath, String remoteFile) throws DataManagerException {
-        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
+    public void uploadFile(String localFilePath, String remoteFile)
+            throws DataManagerException {
+        try {
             trace(logger, "Uploading file '" + localFilePath + "' to '" + remoteFile + "'.");
             User user = getSessionUser();
-            transferPoolBusiness.uploadFile(
-                user, localFilePath, remoteFile, connection);
+            transferPoolBusiness.uploadFile(user, localFilePath, remoteFile);
         } catch (BusinessException | CoreException ex) {
-            throw new DataManagerException(ex);
-        } catch (SQLException ex) {
-            logger.error("Error handling a connection", ex);
             throw new DataManagerException(ex);
         }
     }
 
     @Override
     public boolean exists(String remoteFile) throws DataManagerException {
-        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
+        try {
             trace(logger, "Test if file '" + remoteFile + " exists");
             User user = getSessionUser();
-            return lfcBusiness.exists(user, remoteFile, connection);
+            return lfcBusiness.exists(user, remoteFile);
         } catch (BusinessException | CoreException ex) {
             throw new DataManagerException(ex);
-        } catch (SQLException ex) {
-            logger.error("Error handling a connection", ex);
-            throw new DataManagerException(ex);
         }
-
     }
 
-    /**
-     *
-     * @return @throws DataManagerException
-     */
+    @Override
     public List<DMZombieFile> getZombieFiles() throws DataManagerException {
 
         try {
@@ -406,11 +347,7 @@ public class DataManagerServiceImpl extends AbstractRemoteServiceServlet impleme
         }
     }
 
-    /**
-     *
-     * @param surls
-     * @throws DataManagerException
-     */
+    @Override
     public void deleteZombieFiles(List<String> surls) throws DataManagerException {
 
         try {
@@ -425,74 +362,59 @@ public class DataManagerServiceImpl extends AbstractRemoteServiceServlet impleme
 
     @Override
     public List<SSH> getSSHConnections() throws DataManagerException {
-        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
+        try {
             trace(logger, "Getting ssh connections");
 
-            return dataManagerBusiness.getSSHConnections(connection);
+            return dataManagerBusiness.getSSHConnections();
         } catch (BusinessException | CoreException ex) {
-            throw new DataManagerException(ex);
-        } catch (SQLException ex) {
-            logger.error("Error handling a connection", ex);
             throw new DataManagerException(ex);
         }
     }
 
     @Override
     public void addSSH(SSH ssh) throws DataManagerException {
-        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
+        try {
             trace(logger, "Adding ssh connection " + ssh.getEmail() + " ; " + ssh.getHost());
-            dataManagerBusiness.addSSH(ssh, connection);
+            dataManagerBusiness.addSSH(ssh);
         } catch (BusinessException | CoreException ex) {
-            throw new DataManagerException(ex);
-        } catch (SQLException ex) {
-            logger.error("Error handling a connection", ex);
             throw new DataManagerException(ex);
         }
     }
 
     @Override
     public void updateSSH(SSH ssh) throws DataManagerException {
-        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
+        try {
             trace(logger, "Updating ssh connection " + ssh.getEmail() + " ; " + ssh.getHost());
-            dataManagerBusiness.updateSSH(ssh, connection);
+            dataManagerBusiness.updateSSH(ssh);
         } catch (BusinessException | CoreException ex) {
-            throw new DataManagerException(ex);
-        } catch (SQLException ex) {
-            logger.error("Error handling a connection", ex);
             throw new DataManagerException(ex);
         }
     }
 
     @Override
     public void removeSSH(String email, String name) throws DataManagerException {
-        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
+        try {
             trace(logger, "Removing ssh connection " + email + " ; " + name);
-            dataManagerBusiness.removeSSH(email, name, connection);
+            dataManagerBusiness.removeSSH(email, name);
         } catch (BusinessException | CoreException ex) {
-            throw new DataManagerException(ex);
-        } catch (SQLException ex) {
-            logger.error("Error handling a connection", ex);
             throw new DataManagerException(ex);
         }
     }
 
     @Override
     public void resetSSHConnections(List<List<String>> sshConnections) throws DataManagerException {
-        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
+        try {
             for (List<String> sshC : sshConnections) {
                 trace(logger, "Removing ssh connection " + sshC.get(0) + " ; " + sshC.get(1));
             }
-            dataManagerBusiness.resetSSHs(sshConnections, connection);
+            dataManagerBusiness.resetSSHs(sshConnections);
         } catch (BusinessException | CoreException ex) {
-            throw new DataManagerException(ex);
-        } catch (SQLException ex) {
-            logger.error("Error handling a connection", ex);
             throw new DataManagerException(ex);
         }
     }
 
     @Override
     public String getSSHPublicKey() {
-        return Server.getInstance().getSshPublicKey();
+        return server.getSshPublicKey();
     }
 }

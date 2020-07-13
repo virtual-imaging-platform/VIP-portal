@@ -42,9 +42,11 @@ import fr.insalyon.creatis.vip.datamanager.client.bean.ExternalPlatform.Type;
 import fr.insalyon.creatis.vip.datamanager.server.DataManagerUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.BufferedReader;
-import java.io.DataOutputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.IOException;
@@ -57,13 +59,18 @@ import java.util.function.Consumer;
 /**
  * Created by abonnet on 7/17/19.
  */
+@Service
+@Transactional
 public class GirderStorageBusiness {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private ApiKeyBusiness apiKeyBusiness;
+    private Server server;
 
-    public GirderStorageBusiness(ApiKeyBusiness apiKeyBusiness) {
+    @Autowired
+    public GirderStorageBusiness(ApiKeyBusiness apiKeyBusiness, Server server) {
         this.apiKeyBusiness = apiKeyBusiness;
+        this.server = server;
     }
 
     /* GASW regexps in 3.2.0 version
@@ -75,22 +82,15 @@ public class GirderStorageBusiness {
         So objective : generate "girder:/filename?apiurl=[...]&fileId=[...]&token=[...]
      */
     public String generateUri(
-        ExternalPlatform externalPlatform,
-        String parameterName,
-        String fileIdentifier,
-        User user,
-        Connection connection)
-        throws BusinessException {
+            ExternalPlatform externalPlatform, String parameterName,
+            String fileIdentifier, User user)
+            throws BusinessException {
 
         verifyExternalPlatform(externalPlatform);
 
         String apiUrl = externalPlatform.getUrl() + "/api/v1";
 
-        String token = getToken(
-            user.getEmail(),
-            apiUrl,
-            externalPlatform.getIdentifier(),
-            connection);
+        String token = getToken(user.getEmail(), apiUrl, externalPlatform.getIdentifier());
 
         String filename = "//";
         if (! CoreConstants.RESULTS_DIRECTORY_PARAM_NAME.equals(parameterName)) {
@@ -99,10 +99,11 @@ public class GirderStorageBusiness {
         return buildUri(filename, apiUrl, fileIdentifier, token);
     }
 
-    private void verifyExternalPlatform(ExternalPlatform externalPlatform) throws BusinessException {
+    private void verifyExternalPlatform(ExternalPlatform externalPlatform)
+            throws BusinessException {
         if ( ! externalPlatform.getType().equals(Type.GIRDER)) {
-            logger.error("Trying to generate a girder URI for a non girder storage" +
-                    "{" + externalPlatform.getType() + "}");
+            logger.error("Trying to generate a girder URI for a non girder storage {}",
+                    externalPlatform.getType());
             throw new BusinessException("Cannot generate girder uri");
         }
         if (externalPlatform.getUrl() == null) {
@@ -111,26 +112,22 @@ public class GirderStorageBusiness {
         }
     }
 
-    private String buildUri(String filename, String apiUrl, String fileId, String token) {
-        return new StringBuilder()
-                .append("girder:/")
-                .append(filename)
-                .append("?apiurl=")
-                .append(apiUrl)
-                .append("&amp;fileId=")
-                .append(fileId)
-                .append("&amp;token=")
-                .append(token)
-                .toString();
+    private String buildUri(
+            String filename, String apiUrl, String fileId, String token) {
+        return "girder:/" +
+                filename +
+                "?apiurl=" +
+                apiUrl +
+                "&amp;fileId=" +
+                fileId +
+                "&amp;token=" +
+                token;
     }
 
-    private String getToken(
-        String userEmail,
-        String apiUrl,
-        String storageId,
-        Connection connection) throws BusinessException {
+    public String getToken(String userEmail, String apiUrl, String storageId)
+            throws BusinessException {
 
-        String key = apiKeyBusiness.apiKeysFor(userEmail, connection)
+        String key = apiKeyBusiness.apiKeysFor(userEmail)
             .stream()
             .filter(k -> storageId.equals(k.getStorageIdentifier()))
             .findFirst()
@@ -140,12 +137,10 @@ public class GirderStorageBusiness {
 
         try {
             HttpResult res = makeHttpRequest(
-                apiUrl
-                  + "/api_key/token?key=" + key
-                  + "&duration="
-                    + Server.getInstance().getGirderTokenDurationInDays(),
-                METHOD_POST,
-                Optional.empty());
+                    apiUrl + "/api_key/token?key=" + key + "&duration="
+                            + server.getGirderTokenDurationInDays(),
+                    METHOD_POST,
+                    Optional.empty());
 
             if (res.code >= 400) {
                 logger.error("Unable to get girder token from api key {} : {}", key, res.response);
@@ -155,9 +150,7 @@ public class GirderStorageBusiness {
 
             ObjectNode node =
                 new ObjectMapper().readValue(res.response, ObjectNode.class);
-            String token = node.get("authToken").get("token").asText();
-
-            return token;
+            return node.get("authToken").get("token").asText();
         } catch (IOException | NullPointerException ex) {
             logger.error("Error getting girder token for {} with key {}",
                     userEmail, key, ex);
@@ -165,10 +158,8 @@ public class GirderStorageBusiness {
         }
     }
 
-    private String getFilename(
-        String apiUrl,
-        String fileId,
-        String token) throws BusinessException {
+    private String getFilename(String apiUrl, String fileId, String token)
+            throws BusinessException {
 
         try {
             HttpResult res = makeHttpRequest(

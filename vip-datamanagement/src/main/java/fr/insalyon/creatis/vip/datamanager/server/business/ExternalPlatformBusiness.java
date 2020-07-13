@@ -38,6 +38,9 @@ import fr.insalyon.creatis.vip.datamanager.client.bean.ExternalPlatform;
 import fr.insalyon.creatis.vip.datamanager.server.dao.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Connection;
 import java.util.List;
@@ -45,19 +48,26 @@ import java.util.List;
 /**
  * Created by abonnet on 7/17/19.
  */
+@Service
+@Transactional
 public class ExternalPlatformBusiness {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private GirderStorageBusiness girderStorageBusiness;
+    private ExternalPlatformsDAO externalPlatformsDAO;
 
-    public ExternalPlatformBusiness(GirderStorageBusiness girderStorageBusiness) {
+    @Autowired
+    public ExternalPlatformBusiness(
+            GirderStorageBusiness girderStorageBusiness,
+            ExternalPlatformsDAO externalPlatformsDAO) {
         this.girderStorageBusiness = girderStorageBusiness;
+        this.externalPlatformsDAO = externalPlatformsDAO;
     }
 
-    public List<ExternalPlatform> listAll(Connection connection) throws BusinessException {
+    public List<ExternalPlatform> listAll() throws BusinessException {
         try {
-            return getExternalPlatformDAO(connection).getAll();
+            return externalPlatformsDAO.getAll();
         } catch (DAOException e) {
             throw new BusinessException(e);
         }
@@ -67,24 +77,22 @@ public class ExternalPlatformBusiness {
         final public Boolean isUri;
         final public String result;
 
-        public ParseResult(Boolean isUri, String result) {
+        private ParseResult(Boolean isUri, String result) {
             this.isUri = isUri;
             this.result = result;
         }
     }
 
     public ParseResult parseParameter(
-        String parameterName, String parameterValue,
-        User user, Connection connection)
-        throws BusinessException {
+            String parameterName, String parameterValue, User user)
+            throws BusinessException {
         if (!parameterValue.matches("^\\w+:.*")) {
              return new ParseResult(false, parameterValue);
         }
         int indexOfColon = parameterValue.indexOf(':');
         String platformIdentifier = parameterValue.substring(0, indexOfColon);
         String fileIdentifier = parameterValue.substring(indexOfColon + 1);
-        ExternalPlatform externalPlatform =
-                getById(platformIdentifier, connection);
+        ExternalPlatform externalPlatform = getById(platformIdentifier);
         if (externalPlatform == null) {
             String error = "Cannot find external platform : " + platformIdentifier;
             logger.error(error);
@@ -94,7 +102,7 @@ public class ExternalPlatformBusiness {
             case GIRDER:
                 String girderUri = girderStorageBusiness.generateUri(
                     externalPlatform, parameterName,
-                    fileIdentifier, user, connection);
+                    fileIdentifier, user);
                 return new ParseResult(true, girderUri);
             default:
                 String error = "Only girder external storage are supported. "
@@ -104,19 +112,9 @@ public class ExternalPlatformBusiness {
         }
     }
 
-    private ExternalPlatform getById(String identifier, Connection connection) throws BusinessException {
+    private ExternalPlatform getById(String identifier) throws BusinessException {
         try {
-            return getExternalPlatformDAO(connection).getById(identifier);
-        } catch (DAOException e) {
-            throw new BusinessException(e);
-        }
-    }
-
-    private ExternalPlatformsDAO getExternalPlatformDAO(Connection connection)
-            throws BusinessException {
-        try {
-            return DataManagerDAOFactory.getInstance()
-                    .getExternalPlatformsDAO(connection);
+            return externalPlatformsDAO.getById(identifier);
         } catch (DAOException e) {
             throw new BusinessException(e);
         }
