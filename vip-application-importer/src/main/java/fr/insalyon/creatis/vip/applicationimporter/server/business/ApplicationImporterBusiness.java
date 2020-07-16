@@ -40,45 +40,53 @@ import fr.insalyon.creatis.vip.application.server.business.BoutiquesBusiness;
 import fr.insalyon.creatis.vip.applicationimporter.client.bean.BoutiquesTool;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
-import fr.insalyon.creatis.vip.core.server.business.CoreUtil;
 import fr.insalyon.creatis.vip.core.server.business.Server;
 import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerException;
-import fr.insalyon.creatis.vip.datamanager.server.DataManagerUtil;
-
-import java.io.*;
-import java.sql.Connection;
-import java.util.*;
+import fr.insalyon.creatis.vip.datamanager.server.business.LfcPathsBusiness;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.io.*;
+import java.util.*;
 
 /**
  *
  * @author Tristan Glatard
  */
+@Service
+@Transactional
 public class ApplicationImporterBusiness {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    public String readAndValidationBoutiquesFile(
-        String fileLFN, User user, Connection connection)
-        throws BusinessException {
+    private Server server;
+    private LfcPathsBusiness lfcPathsBusiness;
+    private GRIDAClient gridaClient;
+    private BoutiquesBusiness boutiquesBusiness;
+    private VelocityUtils velocityUtils;
+    private TargzUtils targzUtils;
+    private ApplicationBusiness applicationBusiness;
+
+    public String readAndValidationBoutiquesFile(String fileLFN, User user)
+            throws BusinessException {
         try {
 
             File localDir = new File(
-                Server.getInstance().getApplicationImporterFileRepository() +
+                server.getApplicationImporterFileRepository() +
                 "/" +
-                (new File(DataManagerUtil.parseBaseDir(
-                              user, fileLFN, connection))).getParent());
+                (new File(lfcPathsBusiness.parseBaseDir(user, fileLFN))).getParent());
 
             if (!localDir.exists() && !localDir.mkdirs()) {
                 logger.error("Error validating boutiques file {}, Cannot create directory {}",
                         fileLFN, localDir);
                 throw new BusinessException("Cannot create directory " + localDir.getCanonicalPath());
             }
-            String localFilePath = CoreUtil.getGRIDAClient().getRemoteFile(
-                DataManagerUtil.parseBaseDir(user, fileLFN, connection),
+            String localFilePath = gridaClient.getRemoteFile(
+                lfcPathsBusiness.parseBaseDir(user, fileLFN),
                 localDir.getCanonicalPath());
-            new BoutiquesBusiness(server, dataManagerBusiness, applicationBusiness).validateBoutiqueFile(localFilePath);
+            boutiquesBusiness.validateBoutiqueFile(localFilePath);
             String fileContent = new Scanner(new File(localFilePath)).useDelimiter("\\Z").next();
             return fileContent;
         } catch (GRIDAClientException | IOException ex) {
@@ -89,8 +97,11 @@ public class ApplicationImporterBusiness {
         }
     }
 
-    public void createApplication(BoutiquesTool bt, String type, String tag, HashMap<String, BoutiquesTool> bts, boolean isRunOnGrid, boolean overwriteApplicationVersion, User user, boolean challenge, Connection connection)
-        throws BusinessException {
+    public void createApplication(
+            BoutiquesTool bt, String type, String tag, HashMap<String,
+            BoutiquesTool> bts, boolean isRunOnGrid,
+            boolean overwriteApplicationVersion, User user, boolean challenge)
+            throws BusinessException {
 
         try {
 
@@ -111,37 +122,37 @@ public class ApplicationImporterBusiness {
                 gwendiaTemplate = "vm/gwendia_challenge_petseg.vm";
             } else {}
             // Check rights
-            checkEditionRights(bt.getName(), bt.getToolVersion(), overwriteApplicationVersion, user, connection);
+            checkEditionRights(bt.getName(), bt.getToolVersion(), overwriteApplicationVersion, user);
             // set the correct LFN for each component of the application
             for (Map.Entry<String, BoutiquesTool> e : btMaps.entrySet()) {
                 e.getValue().setApplicationLFN(
-                    DataManagerUtil.parseBaseDir(
-                        user, e.getValue().getApplicationLFN(), connection).concat("/").concat(bt.getToolVersion().replaceAll("\\s+","")));
+                    lfcPathsBusiness.parseBaseDir(
+                        user, e.getValue().getApplicationLFN()).concat("/").concat(bt.getToolVersion().replaceAll("\\s+","")));
             }
 
             // Generate strings
             // gwendia String is unique: one entry point for the workflow
-            String gwendiaString = VelocityUtils.getInstance().createDocument(btMaps, gwendiaTemplate);
+            String gwendiaString = velocityUtils.createDocument(btMaps, gwendiaTemplate);
             HashMap<String, String> gaswString = new HashMap<>();
             HashMap<String, String> wrapperString = new HashMap<>();
             HashMap<String, String> gaswFileName = new HashMap<>();
             HashMap<String, String> wrapperFileName = new HashMap<>();
             // for each component we have to generate GASW and script files
             for (Map.Entry<String, BoutiquesTool> e : btMaps.entrySet()) {
-                gaswString.put(e.getKey(), VelocityUtils.getInstance().createDocument(tag, e.getValue(), isRunOnGrid, gaswTemplate));
-                wrapperString.put(e.getKey(), VelocityUtils.getInstance().createDocument(tag, e.getValue(), isRunOnGrid, wrapperTemplate));
-                gaswFileName.put(e.getKey(), Server.getInstance().getApplicationImporterFileRepository() + e.getValue().getGASWLFN());
-                wrapperFileName.put(e.getKey(), Server.getInstance().getApplicationImporterFileRepository() + e.getValue().getWrapperLFN());
+                gaswString.put(e.getKey(), velocityUtils.createDocument(tag, e.getValue(), isRunOnGrid, gaswTemplate));
+                wrapperString.put(e.getKey(), velocityUtils.createDocument(tag, e.getValue(), isRunOnGrid, wrapperTemplate));
+                gaswFileName.put(e.getKey(), server.getApplicationImporterFileRepository() + e.getValue().getGASWLFN());
+                wrapperFileName.put(e.getKey(), server.getApplicationImporterFileRepository() + e.getValue().getWrapperLFN());
             }
 
             // Write files
-            String gwendiaFileName = Server.getInstance().getApplicationImporterFileRepository() + bt.getGwendiaLFN();
+            String gwendiaFileName = server.getApplicationImporterFileRepository() + bt.getGwendiaLFN();
             System.out.print(gwendiaFileName + "\n");
             writeString(gwendiaString, gwendiaFileName);
             uploadFile(gwendiaFileName, bt.getGwendiaLFN());
             
             // Write application json descriptor
-            String jsonFileName = Server.getInstance().getApplicationImporterFileRepository() + bt.getJsonLFN();
+            String jsonFileName = server.getApplicationImporterFileRepository() + bt.getJsonLFN();
             writeString(bt.getJsonFile(), jsonFileName);         
   
             String wrapperArchiveName;
@@ -155,7 +166,7 @@ public class ApplicationImporterBusiness {
                 dependencies.add(new File(wrapperFileName.get(e.getKey())));
                 //Add json file to archive so that it is downloaded on WN for Boutiques exec
                 dependencies.add(new File(jsonFileName));
-                TargzUtils.createTargz(dependencies, wrapperArchiveName);
+                targzUtils.createTargz(dependencies, wrapperArchiveName);
 
                 // Transfer files
                 System.out.print("gasw : " + gaswFileName.get(e.getKey()) + "\n");
@@ -171,7 +182,7 @@ public class ApplicationImporterBusiness {
             uploadFile(jsonFileName, bt.getJsonLFN());
         
 // Register application
-            registerApplicationVersion(bt.getName(), bt.getToolVersion(), user.getEmail(), bt.getGwendiaLFN(), bt.getJsonLFN(), connection);
+            registerApplicationVersion(bt.getName(), bt.getToolVersion(), user.getEmail(), bt.getGwendiaLFN(), bt.getJsonLFN());
 
         } catch (IOException ex) {
             logger.error("Error creating app {}/{} from boutiques file", bt.getName(), bt.getToolVersion(), ex);
@@ -183,12 +194,11 @@ public class ApplicationImporterBusiness {
 
     private void uploadFile(String localFile, String lfn) throws BusinessException {
         try {
-            GRIDAClient gc = CoreUtil.getGRIDAClient();
             logger.info("Uploading file " + localFile + " to " + lfn);
-            if (gc.exist(lfn)) {
-                gc.delete(lfn);
+            if (gridaClient.exist(lfn)) {
+                gridaClient.delete(lfn);
             }
-            gc.uploadFile(localFile, (new File(lfn)).getParent());
+            gridaClient.uploadFile(localFile, (new File(lfn)).getParent());
         } catch (GRIDAClientException ex) {
             logger.error("Error uploading file {} to {}", localFile, lfn, ex);
             throw new BusinessException(ex);
@@ -209,39 +219,33 @@ public class ApplicationImporterBusiness {
     }
 
     private void registerApplicationVersion(
-        String vipApplicationName,
-        String vipVersion,
-        String owner,
-        String lfnGwendiaFile,
-        String lfnJsonFile,
-        Connection connection)
-        throws BusinessException {
-        ApplicationBusiness ab = new ApplicationBusiness(applicationDAO);
-        Application app = ab.getApplication(vipApplicationName, connection);
+            String vipApplicationName, String vipVersion, String owner,
+            String lfnGwendiaFile, String lfnJsonFile) throws BusinessException {
+        Application app = applicationBusiness.getApplication(vipApplicationName);
         AppVersion newVersion = new AppVersion(vipApplicationName, vipVersion, lfnGwendiaFile, lfnJsonFile, true);
         if (app == null) {
             // If application doesn't exist, create it.
             // New applications are not associated with any class (admins may add classes independently).
-            ab.add(new Application(vipApplicationName, new ArrayList<String>(), owner, ""), connection);
+            applicationBusiness.add(new Application(vipApplicationName, new ArrayList<String>(), owner, ""));
         }
         // If version exists, update it
-        List<AppVersion> versions = ab.getVersions(
-            vipApplicationName, connection);
+        List<AppVersion> versions =
+                applicationBusiness.getVersions(vipApplicationName);
         for (AppVersion existingVersion : versions) {
             if (existingVersion.getVersion().equals(newVersion.getVersion())) {
-                ab.updateVersion(newVersion, connection);
+                applicationBusiness.updateVersion(newVersion);
                 return;
             }
         }
         // add new version
-        ab.addVersion(newVersion, connection);
+        applicationBusiness.addVersion(newVersion);
     }
 
-    private void checkEditionRights(String vipApplicationName, String vipVersion, boolean overwrite, User user, Connection connection)
-        throws BusinessException {
+    private void checkEditionRights(
+            String vipApplicationName, String vipVersion, boolean overwrite,
+            User user) throws BusinessException {
 
-        ApplicationBusiness ab = new ApplicationBusiness(applicationDAO);
-        Application app = ab.getApplication(vipApplicationName, connection);
+        Application app = applicationBusiness.getApplication(vipApplicationName);
         if (app == null) {
             return; // any user may create an application (nobody could run it unless an admin adds it to a class
         }
@@ -253,8 +257,8 @@ public class ApplicationImporterBusiness {
         }
         // Refuse to overwrite an application version silently if the version overwrite parameter is not set.
         if (!overwrite) {
-            List<AppVersion> versions = ab.getVersions(
-                vipApplicationName, connection);
+            List<AppVersion> versions =
+                    applicationBusiness.getVersions(vipApplicationName);
             for (AppVersion v : versions) {
                 if (v.getVersion().equals(vipVersion)) {
                     logger.error("{} tried to overwrite version {} of application {} without setting the overwrite flag.",
