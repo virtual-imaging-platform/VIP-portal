@@ -71,8 +71,6 @@ import static fr.insalyon.creatis.vip.api.CarminProperties.CORS_AUTHORIZED_DOMAI
 @Configuration
 public class SpringWebConfig implements WebMvcConfigurer {
 
-    private final Logger logger = LoggerFactory.getLogger(getClass());;
-
     private Environment env;
     private VipConfigurer vipConfigurer;
 
@@ -110,75 +108,4 @@ public class SpringWebConfig implements WebMvcConfigurer {
         registry.addInterceptor(vipConfigurer);
     }
 
-    @Bean
-    public Supplier<Connection> connectionSupplier() {
-        return () -> {
-            try {
-                return PlatformConnection.getInstance().getConnection();
-            } catch (SQLException e) {
-                // Checked exceptions are not supported so use a runtime exception
-                // It will be caught in API controllers as a business exception
-                // so print the stack here
-                logger.error("error getting a connection for spring context", e);
-                throw new SQLRuntimeException(e);
-            }
-        };
-    }
-
-    @Bean
-    public WorkflowBusiness workflowBusiness() {
-        return new WorkflowBusiness(server, simulationStatsDAO, workflowDAO, processorDAO, outputDAO, inputDAO, statsDAO, engineBusiness, engineDAO, applicationDAO, externalPlatformBusiness);
-    }
-
-    @Bean
-    public ApplicationBusiness applicationBusiness() {
-        return new ApplicationBusiness(applicationDAO);
-    }
-
-    @Bean
-    public ClassBusiness classBusiness() {
-        return  new ClassBusiness(classDAO);
-    }
-
-    @Bean
-    public SimulationBusiness simulationBusiness() {
-        return new SimulationBusiness();
-    }
-
-    @Bean
-    public ConfigurationBusiness configurationBusiness() {
-        return new ConfigurationBusiness();
-    }
-
-    @Bean
-    public TransferPoolBusiness transferPoolBusiness() {
-        return new TransferPoolBusiness(serverConfiguration, lfcBusiness, gridaPoolClient, lfcPathsBusiness);
-    }
-
-    @Bean
-    public LFCBusiness lfcBusiness() {
-        return new LFCBusiness(gridaClient, lfcPathsBusiness);
-    }
-
-    @Bean
-    public DataManagerBusiness dataManagerBusiness() {
-        return new DataManagerBusiness();
-    }
-
-    @Bean
-    public LFCPermissionBusiness lfcPermissionBusiness() {
-        return new LFCPermissionBusiness(dataManagerBusiness, lfcPathsBusiness);
-    }
-
-    @Bean
-    public ExternalPlatformBusiness externalPlatformBusiness() {
-        return new ExternalPlatformBusiness(
-            new GirderStorageBusiness(
-                apiKeyBusiness(), server), externalPlatformsDAO);
-    }
-
-    @Bean
-    public ApiKeyBusiness apiKeyBusiness() {
-        return new ApiKeyBusiness(apiKeysDAO);
-    }
 }
