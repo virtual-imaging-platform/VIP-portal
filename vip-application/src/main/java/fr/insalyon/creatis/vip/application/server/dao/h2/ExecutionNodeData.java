@@ -39,17 +39,20 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 /**
  *
  * @author Rafael Ferreira da Silva
  */
+@Component
+@Scope("prototype")
 public class ExecutionNodeData extends AbstractJobData implements ExecutionNodeDAO {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    public ExecutionNodeData(String dbPath) throws DAOException {
-
+    public ExecutionNodeData(String dbPath) {
         super(dbPath);
     }
 

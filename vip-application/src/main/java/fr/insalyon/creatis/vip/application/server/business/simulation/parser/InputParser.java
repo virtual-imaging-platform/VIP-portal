@@ -36,6 +36,8 @@ import java.io.FileReader;
 import java.io.IOException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Service;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -47,6 +49,8 @@ import org.xml.sax.helpers.XMLReaderFactory;
  *
  * @author Rafael Silva
  */
+@Service
+@Scope("prototype")
 public class InputParser extends DefaultHandler {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());

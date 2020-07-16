@@ -34,47 +34,60 @@ package fr.insalyon.creatis.vip.application.server.business;
 import fr.insalyon.creatis.vip.application.client.bean.Job;
 import fr.insalyon.creatis.vip.application.client.bean.Node;
 import fr.insalyon.creatis.vip.application.client.bean.Simulation;
-import fr.insalyon.creatis.vip.application.client.view.monitor.job.SimulationFileType;
 import fr.insalyon.creatis.vip.application.client.bean.Task;
 import fr.insalyon.creatis.vip.application.client.view.monitor.job.JobStatus;
+import fr.insalyon.creatis.vip.application.client.view.monitor.job.SimulationFileType;
 import fr.insalyon.creatis.vip.application.client.view.monitor.job.TaskStatus;
-import fr.insalyon.creatis.vip.application.server.dao.ApplicationDAOFactory;
+import fr.insalyon.creatis.vip.application.server.dao.ExecutionNodeDAO;
+import fr.insalyon.creatis.vip.application.server.dao.SimulationDAO;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.business.Server;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerException;
-import fr.insalyon.creatis.vip.datamanager.server.DataManagerUtil;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.sql.Connection;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Scanner;
+import fr.insalyon.creatis.vip.datamanager.server.business.LfcPathsBusiness;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Lookup;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.*;
 
 /**
  *
  * @author Rafael Ferreira da Silva
  */
+@Service
+@Transactional
 public class SimulationBusiness {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    /**
-     *
-     * @param simulationID
-     * @return
-     * @throws BusinessException
-     */
+    private LfcPathsBusiness lfcPathsBusiness;
+    private Server server;
+
+    @Lookup
+    protected SimulationDAO getSimulationDAO(String dbPath) {
+        // spring will override it to return a new prototype SimulationData
+        // each time
+        return null;
+    }
+
+    @Lookup
+    protected ExecutionNodeDAO getExecutionNodeDAO(String dbPath) {
+        // spring will override it to return a new prototype ExecutionNodeData
+        // each time
+        return null;
+    }
+
     public List<Job> getList(String simulationID) throws BusinessException {
 
         try {
             Map<Integer, Job> jobsMap = new HashMap<Integer, Job>();
 
-            for (Task task : ApplicationDAOFactory.getDAOFactory().getSimulationDAO(simulationID).getTasks()) {
+            for (Task task : getSimulationDAO(simulationID).getTasks()) {
 
                 switch (task.getStatus()) {
                     case QUEUED:
@@ -160,28 +173,17 @@ public class SimulationBusiness {
         }
     }
 
-    /**
-     *
-     * @param simulationID
-     * @param jobID
-     * @param currentUserFolder
-     * @return
-     * @throws BusinessException
-     */
     public List<Task> getTasks(
-        String simulationID,
-        int jobID,
-        String currentUserFolder,
-        Connection connection)
-        throws BusinessException {
+            String simulationID, int jobID, String currentUserFolder)
+            throws BusinessException {
 
         try {
-            List<Task> list = ApplicationDAOFactory.getDAOFactory().getSimulationDAO(simulationID).getTasks(jobID);
+            List<Task> list = getSimulationDAO(simulationID).getTasks(jobID);
             for (Task task : list) {
                 String[] params = task.getParameters();
                 for (int i = 0; i < params.length; i++) {
-                    params[i] = DataManagerUtil.parseRealDir(
-                        params[i], currentUserFolder, connection);
+                    params[i] = lfcPathsBusiness.parseRealDir(
+                        params[i], currentUserFolder);
                 }
                 task.setParameters(params);
             }
@@ -193,19 +195,12 @@ public class SimulationBusiness {
         }
     }
 
-    /**
-     *
-     * @param simulationID
-     * @param taskID
-     * @param fileType
-     * @return
-     * @throws BusinessException
-     */
-    public String[] readSimulationFile(String simulationID, String taskID,
-            SimulationFileType fileType) throws BusinessException {
+    public String[] readSimulationFile(
+            String simulationID, String taskID, SimulationFileType fileType)
+            throws BusinessException {
 
         try {
-            Task task = ApplicationDAOFactory.getDAOFactory().getSimulationDAO(simulationID).getTask(taskID);
+            Task task = getSimulationDAO(simulationID).getTask(taskID);
             String folder = null;
             String extension = null;
 
@@ -241,55 +236,34 @@ public class SimulationBusiness {
         }
     }
 
-    /**
-     *
-     * @param simulationID
-     * @param taskID
-     * @param status
-     * @throws BusinessException
-     */
     public void sendTaskSignal(String simulationID, String taskID, TaskStatus status)
             throws BusinessException {
 
         try {
-            ApplicationDAOFactory.getDAOFactory().getSimulationDAO(simulationID).sendTaskSignal(taskID, status);
+            getSimulationDAO(simulationID).sendTaskSignal(taskID, status);
 
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }
     }
 
-    /**
-     *
-     * @param simulationID
-     * @return
-     * @throws BusinessException
-     */
     public List<Task> getJobsList(String simulationID) throws BusinessException {
 
         try {
-            return ApplicationDAOFactory.getDAOFactory().getSimulationDAO(simulationID).getJobs();
+            return getSimulationDAO(simulationID).getJobs();
 
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }
     }
 
-    /**
-     *
-     * @param simulationID
-     * @param folder
-     * @param fileName
-     * @param extension
-     * @return
-     * @throws BusinessException
-     */
-    public String readFile(String simulationID, String folder, String fileName,
-            String extension) throws BusinessException {
+    public String readFile(
+            String simulationID, String folder, String fileName, String extension)
+            throws BusinessException {
 
         try {
             fileName += extension;
-            Scanner scanner = new Scanner(new FileInputStream(Server.getInstance().getWorkflowsPath()
+            Scanner scanner = new Scanner(new FileInputStream(server.getWorkflowsPath()
                     + "/" + simulationID + "/" + folder + "/" + fileName));
 
             StringBuilder sb = new StringBuilder();
@@ -308,153 +282,98 @@ public class SimulationBusiness {
         }
     }
 
-    /**
-     *
-     * @param simulationID
-     * @param binSize
-     * @return
-     * @throws BusinessException
-     */
-    public List<String> getExecutionPerNumberOfJobs(String simulationID,
-            int binSize) throws BusinessException {
+    public List<String> getExecutionPerNumberOfJobs(
+            String simulationID, int binSize) throws BusinessException {
 
         try {
-            return ApplicationDAOFactory.getDAOFactory().getSimulationDAO(simulationID).getExecutionPerNumberOfJobs(binSize);
+            return getSimulationDAO(simulationID).getExecutionPerNumberOfJobs(binSize);
 
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }
     }
 
-    /**
-     *
-     * @param simulationID
-     * @param binSize
-     * @return
-     * @throws BusinessException
-     */
-    public List<String> getDownloadPerNumberOfJobs(String simulationID,
-            int binSize) throws BusinessException {
+    public List<String> getDownloadPerNumberOfJobs(
+            String simulationID, int binSize) throws BusinessException {
 
         try {
-            return ApplicationDAOFactory.getDAOFactory().getSimulationDAO(simulationID).getDownloadPerNumberOfJobs(binSize);
+            return getSimulationDAO(simulationID).getDownloadPerNumberOfJobs(binSize);
 
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }
     }
 
-    /**
-     *
-     * @param simulationID
-     * @param binSize
-     * @return
-     * @throws BusinessException
-     */
-    public List<String> getUploadPerNumberOfJobs(String simulationID,
-            int binSize) throws BusinessException {
+    public List<String> getUploadPerNumberOfJobs(
+            String simulationID, int binSize) throws BusinessException {
 
         try {
-            return ApplicationDAOFactory.getDAOFactory().getSimulationDAO(simulationID).getUploadPerNumberOfJobs(binSize);
+            return getSimulationDAO(simulationID).getUploadPerNumberOfJobs(binSize);
 
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }
     }
 
-    /**
-     *
-     * @param simulationID
-     * @return
-     * @throws BusinessException
-     */
-    public List<String> getJobsPerTime(String simulationID) throws BusinessException {
+    public List<String> getJobsPerTime(
+            String simulationID) throws BusinessException {
 
         try {
-            return ApplicationDAOFactory.getDAOFactory().getSimulationDAO(simulationID).getJobsPerTime();
+            return getSimulationDAO(simulationID).getJobsPerTime();
 
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }
     }
 
-    /**
-     *
-     * @param simulationID
-     * @return
-     * @throws BusinessException
-     */
-    public List<String> getCkptsPerJob(String simulationID) throws BusinessException {
+    public List<String> getCkptsPerJob(String simulationID)
+            throws BusinessException {
 
         try {
-            return ApplicationDAOFactory.getDAOFactory().getSimulationDAO(simulationID).getCkptsPerJob();
+            return getSimulationDAO(simulationID).getCkptsPerJob();
 
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }
     }
 
-    /**
-     *
-     * @param simulationID
-     * @return
-     * @throws BusinessException
-     */
-    public List<String> getSiteHistogram(String simulationID) throws BusinessException {
+    public List<String> getSiteHistogram(String simulationID)
+            throws BusinessException {
         try {
-            return ApplicationDAOFactory.getDAOFactory().getSimulationDAO(simulationID).getSiteHistogram();
+            return getSimulationDAO(simulationID).getSiteHistogram();
 
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }
     }
 
-    /**
-     *
-     * @param simulationID
-     * @param jobID
-     * @param status
-     * @throws BusinessException
-     */
     public void sendSignal(String simulationID, String jobID, TaskStatus status)
             throws BusinessException {
 
         try {
-            ApplicationDAOFactory.getDAOFactory().getSimulationDAO(simulationID).sendSignal(jobID, status);
+            getSimulationDAO(simulationID).sendSignal(jobID, status);
 
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }
     }
 
-    /**
-     *
-     * @param simulationID
-     * @param jobIDs
-     * @param status
-     * @throws BusinessException
-     */
-    public void sendSignal(String simulationID, List<String> jobIDs,
-            TaskStatus status) throws BusinessException {
+    public void sendSignal(
+            String simulationID, List<String> jobIDs, TaskStatus status)
+            throws BusinessException {
 
         for (String jobID : jobIDs) {
             sendSignal(simulationID, jobID, status);
         }
     }
 
-    /**
-     *
-     * @param simulations
-     * @param status
-     * @return
-     * @throws BusinessException
-     */
-    public int[] getNumberOfActiveTasks(List<Simulation> simulations) throws BusinessException {
+    public int[] getNumberOfActiveTasks(List<Simulation> simulations)
+            throws BusinessException {
 
         try {
             int[] tasks = new int[2];
             for (Simulation simulation : simulations) {
-                int[] t = ApplicationDAOFactory.getDAOFactory().getSimulationDAO(simulation.getID()).getNumberOfActiveTasks();
+                int[] t = getSimulationDAO(simulation.getID()).getNumberOfActiveTasks();
                 tasks[0] += t[0];
                 tasks[1] += t[1];
             }
@@ -465,35 +384,22 @@ public class SimulationBusiness {
         }
     }
 
-    /**
-     *
-     * @param simulationID
-     * @param siteName
-     * @param nodeName
-     * @return
-     * @throws BusinessException
-     */
     public Node getExecutionNode(String simulationID, String siteName, String nodeName)
             throws BusinessException {
 
         try {
-            return ApplicationDAOFactory.getDAOFactory().getExecutionNodeDAO(simulationID).getNode(siteName, nodeName);
+            return getExecutionNodeDAO(simulationID).getNode(siteName, nodeName);
 
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }
     }
 
-    /**
-     *
-     * @param simulationID
-     * @return
-     * @throws BusinessException
-     */
-    public Map<String, Integer> getCountriesMap(String simulationID) throws BusinessException {
+    public Map<String, Integer> getCountriesMap(String simulationID)
+            throws BusinessException {
 
         try {
-            return ApplicationDAOFactory.getDAOFactory().getSimulationDAO(simulationID).getNodeCountriesMap();
+            return getSimulationDAO(simulationID).getNodeCountriesMap();
 
         } catch (DAOException ex) {
             throw new BusinessException(ex);

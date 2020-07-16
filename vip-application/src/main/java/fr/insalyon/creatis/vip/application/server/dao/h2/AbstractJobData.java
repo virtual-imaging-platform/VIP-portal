@@ -31,14 +31,16 @@
  */
 package fr.insalyon.creatis.vip.application.server.dao.h2;
 
-import fr.insalyon.creatis.vip.application.server.business.simulation.parser.InputM2Parser;
 import fr.insalyon.creatis.vip.core.server.business.Server;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import javax.annotation.PostConstruct;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -49,18 +51,34 @@ public abstract class AbstractJobData {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private final String DRIVER = "org.h2.Driver";
-    private final String DBURL = "jdbc:h2:tcp://"
-            + Server.getInstance().getWorkflowsHost() + ":"
-            //            + Server.getInstance().getWorkflowsPort() + "/"
-            + "9092/"
-            + Server.getInstance().getWorkflowsPath() + "/";
+
+    protected Server server;
+    private String dbPath;
     protected Connection connection;
 
-    public AbstractJobData(String dbPath) throws DAOException {
+    @Autowired
+    public final void setServer(Server server) {
+        this.server = server;
+    }
 
+    public AbstractJobData(String dbPath) {
+        this.dbPath = dbPath;
+    }
+
+    @PostConstruct
+    public final void initConnection() throws DAOException {
         try {
             Class.forName(DRIVER);
-            connection = DriverManager.getConnection(DBURL + dbPath + "/db/jobs", "gasw", "gasw");
+            StringBuilder dbUrl = new StringBuilder();
+            dbUrl.append("jdbc:h2:tcp://")
+                    .append(server.getWorkflowsHost())
+                    .append(":9092/")
+                    .append(server.getWorkflowsPath())
+                    .append("/")
+                    .append(dbPath)
+                    .append("/db/jobs");
+
+            connection = DriverManager.getConnection(dbUrl.toString(), "gasw", "gasw");
             connection.setAutoCommit(true);
 
         } catch (ClassNotFoundException | SQLException ex) {
@@ -68,6 +86,7 @@ public abstract class AbstractJobData {
             throw new DAOException(ex);
         }
     }
+    
 
     /**
      * Closes database connection.

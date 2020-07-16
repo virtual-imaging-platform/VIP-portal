@@ -42,25 +42,33 @@ import java.util.ArrayList;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.support.JdbcDaoSupport;
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
+
+import javax.sql.DataSource;
 
 /**
  *
  * @author Rafael Ferreira da Silva
  */
-public class EngineData implements EngineDAO {
+@Repository
+@Transactional
+public class EngineData extends JdbcDaoSupport implements EngineDAO {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
-    private Connection connection;
 
-    public EngineData(Connection connection) throws DAOException {
-        this.connection = connection;
+    @Autowired
+    public void useDataSource(DataSource dataSource) {
+        setDataSource(dataSource);
     }
 
     @Override
     public void add(Engine engine) throws DAOException {
 
         try {
-            PreparedStatement ps = connection.prepareStatement(
+            PreparedStatement ps = getConnection().prepareStatement(
                     "INSERT INTO VIPEngines(name, endpoint) "
                     + "VALUES (?, ?)");
 
@@ -84,7 +92,7 @@ public class EngineData implements EngineDAO {
     public void update(Engine engine) throws DAOException {
 
         try {
-            PreparedStatement ps = connection.prepareStatement(
+            PreparedStatement ps = getConnection().prepareStatement(
                     "UPDATE VIPEngines SET endpoint = ?, "
                     + "status = ? "
                     + "WHERE name = ?");
@@ -105,7 +113,7 @@ public class EngineData implements EngineDAO {
     public void remove(String name) throws DAOException {
 
         try {
-            PreparedStatement ps = connection.prepareStatement("DELETE "
+            PreparedStatement ps = getConnection().prepareStatement("DELETE "
                     + "FROM VIPEngines WHERE name=?");
 
             ps.setString(1, name);
@@ -122,7 +130,7 @@ public class EngineData implements EngineDAO {
     public List<Engine> get() throws DAOException {
 
         try {
-            PreparedStatement ps = connection.prepareStatement("SELECT "
+            PreparedStatement ps = getConnection().prepareStatement("SELECT "
                     + "name, endpoint, status FROM VIPEngines "
                     + "ORDER BY name");
 
@@ -145,7 +153,7 @@ public class EngineData implements EngineDAO {
 
         String status= "enabled";
         try {
-            PreparedStatement ps = connection.prepareStatement("SELECT "
+            PreparedStatement ps = getConnection().prepareStatement("SELECT "
                     + "e.name AS engineName, endpoint, status "
                     + "FROM VIPEngines e, VIPClassesEngines c "
                     + "WHERE e.name = c.engine AND "

@@ -32,6 +32,8 @@
 package fr.insalyon.creatis.vip.application.server.business.simulation.parser;
 
 import fr.insalyon.creatis.vip.application.client.bean.Source;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Service;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
@@ -39,6 +41,8 @@ import org.xml.sax.SAXException;
  *
  * @author Rafael Silva
  */
+@Service
+@Scope("prototype")
 public class ScuflParser extends AbstractWorkflowParser {
 
     @Override

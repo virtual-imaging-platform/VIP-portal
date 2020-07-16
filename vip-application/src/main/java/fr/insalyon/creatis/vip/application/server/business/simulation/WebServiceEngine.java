@@ -40,11 +40,16 @@ import java.util.List;
 import localhost.moteur_service_wsdl.Moteur_ServiceLocator;
 import org.apache.axis.EngineConfiguration;
 import org.apache.axis.configuration.FileProvider;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Service;
 
 /**
  *
  * @author Rafael Ferreira da Silva, Ibrahim kallel
  */
+@Service
+@Scope("prototype")
 public class WebServiceEngine extends WorkflowEngineInstantiator {
 
     // URI address of the Moteur Web service
@@ -72,8 +77,15 @@ public class WebServiceEngine extends WorkflowEngineInstantiator {
         this(null, null);
     }
 
-    WebServiceEngine(File workflow, List<ParameterSweep> parameters) {
+    private Server server;
+
+    private WebServiceEngine(File workflow, List<ParameterSweep> parameters) {
         super(workflow, parameters);
+    }
+
+    @Autowired
+    public final void setServer(Server server) {
+        this.server = server;
     }
 
     /**
@@ -81,9 +93,6 @@ public class WebServiceEngine extends WorkflowEngineInstantiator {
      * that can be used to monitor the workflow status.
      *
      * @return the HTTP link that shows the workflow current status
-     * @throws ServiceException
-     * @throws RemoteException
-     * @throws VlException
      */
     @Override
     public String launch(String proxyFileName, String userDN)
@@ -91,8 +100,8 @@ public class WebServiceEngine extends WorkflowEngineInstantiator {
             java.rmi.RemoteException,
             javax.xml.rpc.ServiceException {
 
-        System.setProperty("javax.net.ssl.trustStore", Server.getInstance().getTruststoreFile());
-        System.setProperty("javax.net.ssl.trustStorePassword", Server.getInstance().getTruststorePass());
+        System.setProperty("javax.net.ssl.trustStore", server.getTruststoreFile());
+        System.setProperty("javax.net.ssl.trustStorePassword", server.getTruststorePass());
         System.setProperty("javax.net.ssl.trustStoreType", "JKS");
 
         // String settings = "This is going to contain settings...";
@@ -108,20 +117,14 @@ public class WebServiceEngine extends WorkflowEngineInstantiator {
         return wfS.getmoteur_service().workflowSubmit(workflow, input, strProxy, settings);
     }
 
-    /**
-     *
-     * @param workflowID
-     * @throws RemoteException
-     * @throws ServiceException
-     */
     @Override
     public void kill(String workflowID)
             throws
             java.rmi.RemoteException,
             javax.xml.rpc.ServiceException {
 
-        System.setProperty("javax.net.ssl.trustStore", Server.getInstance().getTruststoreFile());
-        System.setProperty("javax.net.ssl.trustStorePassword", Server.getInstance().getTruststorePass());
+        System.setProperty("javax.net.ssl.trustStore", server.getTruststoreFile());
+        System.setProperty("javax.net.ssl.trustStorePassword", server.getTruststorePass());
         System.setProperty("javax.net.ssl.trustStoreType", "JKS");
 
         String resourcename = "moteur-client-config.wsdd";
@@ -132,20 +135,14 @@ public class WebServiceEngine extends WorkflowEngineInstantiator {
         wfS.getmoteur_service().killWorkflow(workflowID);
     }
 
-    /**
-     *
-     * @param workflowID
-     * @throws RemoteException
-     * @throws ServiceException
-     */
     @Override
     public SimulationStatus getStatus(String workflowID)
             throws
             java.rmi.RemoteException,
             javax.xml.rpc.ServiceException {
 
-        System.setProperty("javax.net.ssl.trustStore", Server.getInstance().getTruststoreFile());
-        System.setProperty("javax.net.ssl.trustStorePassword", Server.getInstance().getTruststorePass());
+        System.setProperty("javax.net.ssl.trustStore", server.getTruststoreFile());
+        System.setProperty("javax.net.ssl.trustStorePassword", server.getTruststorePass());
         System.setProperty("javax.net.ssl.trustStoreType", "JKS");
 
         String resourcename = "moteur-client-config.wsdd";

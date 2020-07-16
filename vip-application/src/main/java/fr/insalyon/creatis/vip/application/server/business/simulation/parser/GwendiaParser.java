@@ -35,6 +35,8 @@ import fr.insalyon.creatis.vip.application.client.bean.Source;
 import fr.insalyon.creatis.vip.application.server.business.SimulationBusiness;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Service;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
@@ -42,6 +44,8 @@ import org.xml.sax.SAXException;
  *
  * @author Rafael Silva
  */
+@Service
+@Scope("prototype")
 public class GwendiaParser extends AbstractWorkflowParser {
 
     private Source currentSource = null;

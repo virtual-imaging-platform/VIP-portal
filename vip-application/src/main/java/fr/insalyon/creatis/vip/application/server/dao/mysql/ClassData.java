@@ -43,29 +43,32 @@ import java.util.ArrayList;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.support.JdbcDaoSupport;
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
+
+import javax.sql.DataSource;
 
 /**
  *
  * @author Rafael Ferreira da Silva
  */
-public class ClassData implements ClassDAO {
+@Repository
+@Transactional
+public class ClassData extends JdbcDaoSupport implements ClassDAO {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
-    private Connection connection;
 
-    public ClassData(Connection connection) throws DAOException {
-        this.connection = connection;
+    @Autowired
+    public void useDataSource(DataSource dataSource) {
+        setDataSource(dataSource);
     }
 
-    /**
-     *
-     * @param appClass
-     * @throws DAOException
-     */
     @Override
     public void add(AppClass appClass) throws DAOException {
         try {
-            PreparedStatement ps = connection.prepareStatement(
+            PreparedStatement ps = getConnection().prepareStatement(
                     "INSERT INTO VIPClasses(name) "
                     + "VALUES (?)");
 
@@ -87,11 +90,6 @@ public class ClassData implements ClassDAO {
         addToClass(appClass.getName(), appClass.getGroups(), "group");
     }
 
-    /**
-     *
-     * @param appClass
-     * @throws DAOException
-     */
     @Override
     public void update(AppClass appClass) throws DAOException {
 
@@ -103,16 +101,11 @@ public class ClassData implements ClassDAO {
 
     }
 
-    /**
-     *
-     * @param className
-     * @throws DAOException
-     */
     @Override
     public void remove(String className) throws DAOException {
 
         try {
-            PreparedStatement ps = connection.prepareStatement("DELETE "
+            PreparedStatement ps = getConnection().prepareStatement("DELETE "
                     + "FROM VIPClasses WHERE name=?");
 
             ps.setString(1, className);
@@ -125,16 +118,11 @@ public class ClassData implements ClassDAO {
         }
     }
 
-    /**
-     *
-     * @return
-     * @throws DAOException
-     */
     @Override
     public List<AppClass> getClasses() throws DAOException {
 
         try {
-            PreparedStatement ps = connection.prepareStatement(
+            PreparedStatement ps = getConnection().prepareStatement(
                     "SELECT distinct name FROM VIPClasses ORDER BY name");
 
             ResultSet rs = ps.executeQuery();
@@ -142,7 +130,7 @@ public class ClassData implements ClassDAO {
 
             while (rs.next()) {
                 List<String> groups = new ArrayList<String>();
-                PreparedStatement ps2 = connection.prepareStatement(
+                PreparedStatement ps2 = getConnection().prepareStatement(
                         "SELECT groupname FROM VIPGroupsClasses "
                         + "WHERE classname=? ORDER BY groupname");
                 ps2.setString(1, rs.getString("name"));
@@ -154,7 +142,7 @@ public class ClassData implements ClassDAO {
                 ps2.close();
 
                 List<String> engines = new ArrayList<String>();
-                PreparedStatement ps3 = connection.prepareStatement(
+                PreparedStatement ps3 = getConnection().prepareStatement(
                         "SELECT engine FROM VIPClassesEngines "
                         + "WHERE class=? ORDER BY engine");
                 ps3.setString(1, rs.getString("name"));
@@ -177,18 +165,12 @@ public class ClassData implements ClassDAO {
         }
     }
 
-    /**
-     *
-     * @param className
-     * @return
-     * @throws DAOException
-     */
     @Override
     public AppClass getClass(String className) throws DAOException {
           try {
 
               // Get class
-            PreparedStatement ps = connection.prepareStatement(
+            PreparedStatement ps = getConnection().prepareStatement(
                     "SELECT name FROM VIPClasses WHERE name=?");
             ps.setString(1, className);
             ResultSet rs = ps.executeQuery();
@@ -197,7 +179,7 @@ public class ClassData implements ClassDAO {
 
                 // Get groups associated to class
                 List<String> groups = new ArrayList<String>();
-                PreparedStatement ps2 = connection.prepareStatement(
+                PreparedStatement ps2 = getConnection().prepareStatement(
                         "SELECT groupname FROM VIPGroupsClasses "
                         + "WHERE classname=? ORDER BY groupname");
                 ps2.setString(1, rs.getString("name"));
@@ -208,7 +190,7 @@ public class ClassData implements ClassDAO {
                 ps2.close();
                 // Get engines associated to class
                 List<String> engines = new ArrayList<String>();
-                PreparedStatement ps3 = connection.prepareStatement(
+                PreparedStatement ps3 = getConnection().prepareStatement(
                         "SELECT engine FROM VIPClassesEngines "
                         + "WHERE class=? ORDER BY engine");
                 ps3.setString(1, rs.getString("name"));
@@ -230,20 +212,13 @@ public class ClassData implements ClassDAO {
         }
     }
 
-    /**
-     *
-     * @param email
-     * @param validAdmin
-     * @return
-     * @throws DAOException
-     */
     @Override
     public List<AppClass> getUserClasses(String email, boolean validAdmin) throws DAOException {
 
         try {
             String clause = validAdmin ? " AND ug.role = ?" : "";
 
-            PreparedStatement ps = connection.prepareStatement("SELECT DISTINCT classname "
+            PreparedStatement ps = getConnection().prepareStatement("SELECT DISTINCT classname "
                     + "FROM VIPGroupsClasses gc, VIPUsersGroups ug "
                     + "WHERE ug.groupname = gc.groupname AND ug.email = ?" + clause);
 
@@ -257,7 +232,7 @@ public class ClassData implements ClassDAO {
 
             while (rs.next()) {
                 List<String> groups = new ArrayList<String>();
-                PreparedStatement ps2 = connection.prepareStatement(
+                PreparedStatement ps2 = getConnection().prepareStatement(
                         "SELECT groupname FROM VIPGroupsClasses "
                         + "WHERE classname=? ORDER BY groupname");
                 ps2.setString(1, rs.getString("classname"));
@@ -280,11 +255,7 @@ public class ClassData implements ClassDAO {
     }
 
     /**
-     *
-     * @param className
-     * @param objectList
      * @param objectType (group or engine)
-     * @throws DAOException
      */
     private void addToClass(String className, List<String> objectList, String objectType) throws DAOException {
 
@@ -293,12 +264,12 @@ public class ClassData implements ClassDAO {
                 PreparedStatement ps;
                 switch (objectType) {
                     case "group":
-                        ps = connection.prepareStatement("INSERT INTO "
+                        ps = getConnection().prepareStatement("INSERT INTO "
                         + "VIPGroupsClasses(classname, groupname) "
                         + "VALUES(?, ?)");
                         break;
                     case "engine":
-                        ps = connection.prepareStatement("INSERT INTO "
+                        ps = getConnection().prepareStatement("INSERT INTO "
                         + "VIPClassesEngines(class, engine) "
                         + "VALUES(?, ?)");
                         break;
@@ -326,9 +297,7 @@ public class ClassData implements ClassDAO {
 
     /**
      *
-     * @param className
      * @param objectType (group or engine)
-     * @throws DAOException
      */
     private void removeFromClass(String className, String objectType) throws DAOException {
 
@@ -336,11 +305,11 @@ public class ClassData implements ClassDAO {
             PreparedStatement ps;
             switch (objectType) {
                 case "group":
-                    ps = connection.prepareStatement("DELETE FROM "
+                    ps = getConnection().prepareStatement("DELETE FROM "
                     + "VIPGroupsClasses WHERE className=?");
                     break;
                 case "engine":
-                    ps = connection.prepareStatement("DELETE FROM "
+                    ps = getConnection().prepareStatement("DELETE FROM "
                     + "VIPClassesEngines WHERE class=?");
                     break;
                 default:

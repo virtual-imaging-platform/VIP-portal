@@ -127,17 +127,17 @@ public class SpringWebConfig implements WebMvcConfigurer {
 
     @Bean
     public WorkflowBusiness workflowBusiness() {
-        return new WorkflowBusiness();
+        return new WorkflowBusiness(server, simulationStatsDAO, workflowDAO, processorDAO, outputDAO, inputDAO, statsDAO, engineBusiness, engineDAO, applicationDAO, externalPlatformBusiness);
     }
 
     @Bean
     public ApplicationBusiness applicationBusiness() {
-        return new ApplicationBusiness();
+        return new ApplicationBusiness(applicationDAO);
     }
 
     @Bean
     public ClassBusiness classBusiness() {
-        return  new ClassBusiness();
+        return  new ClassBusiness(classDAO);
     }
 
     @Bean

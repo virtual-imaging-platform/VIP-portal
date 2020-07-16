@@ -34,17 +34,17 @@ package fr.insalyon.creatis.vip.gatelab.server.rpc;
 import fr.insalyon.creatis.vip.application.server.business.ClassBusiness;
 import fr.insalyon.creatis.vip.core.client.view.CoreException;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
-import fr.insalyon.creatis.vip.core.server.dao.mysql.PlatformConnection;
 import fr.insalyon.creatis.vip.core.server.rpc.AbstractRemoteServiceServlet;
-import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerException;
 import fr.insalyon.creatis.vip.gatelab.client.rpc.GateLabService;
 import fr.insalyon.creatis.vip.gatelab.client.view.GateLabException;
 import fr.insalyon.creatis.vip.gatelab.server.business.GateLabBusiness;
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
+
+import javax.servlet.ServletException;
+import java.util.Map;
 
 /**
  *
@@ -56,21 +56,21 @@ public class GateLabServiceImpl extends AbstractRemoteServiceServlet implements 
     private GateLabBusiness gatelabBusiness;
     private ClassBusiness classBusiness;
 
-    public GateLabServiceImpl() {
-
-        gatelabBusiness = new GateLabBusiness();
-        classBusiness = new ClassBusiness();
+    @Override
+    public void init() throws ServletException {
+        super.init();
+        ApplicationContext applicationContext =
+                WebApplicationContextUtils.getRequiredWebApplicationContext(getServletContext());
+        gatelabBusiness = applicationContext.getBean(GateLabBusiness.class);
+        classBusiness = applicationContext.getBean(ClassBusiness.class);
     }
 
     @Override
     public Map<String, String> getGatelabWorkflowInputs(String simulationID) throws GateLabException {
-        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
+        try {
             return gatelabBusiness.getGatelabWorkflowInputs(
-                simulationID, getSessionUser().getFolder(), connection);
+                simulationID, getSessionUser().getFolder());
         } catch (BusinessException | CoreException ex) {
-            throw new GateLabException(ex);
-        } catch (SQLException ex) {
-            logger.error("Error handling a connection", ex);
             throw new GateLabException(ex);
         }
     }
@@ -100,14 +100,11 @@ public class GateLabServiceImpl extends AbstractRemoteServiceServlet implements 
 
     @Override
     public void reportProblem(String message) throws GateLabException {
-        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
+        try {
             trace(logger, "Reporting simulation launch problem.");
-            gatelabBusiness.reportProblem(getSessionUser().getEmail(), message, connection);
+            gatelabBusiness.reportProblem(getSessionUser().getEmail(), message);
 
         } catch (BusinessException | CoreException ex) {
-            throw new GateLabException(ex);
-        } catch (SQLException ex) {
-            logger.error("Error handling a connection", ex);
             throw new GateLabException(ex);
         }
     }

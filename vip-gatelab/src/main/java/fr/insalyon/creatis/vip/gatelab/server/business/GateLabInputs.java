@@ -38,25 +38,53 @@ import fr.insalyon.creatis.vip.datamanager.server.DataManagerUtil;
 import java.sql.Connection;
 import java.util.HashMap;
 import java.util.Map;
+
+import fr.insalyon.creatis.vip.datamanager.server.business.LfcPathsBusiness;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
+
+import javax.annotation.PostConstruct;
 
 /**
  *
  * @author Ibrahim Kallel, Rafael Silva
  */
+@Component
+@Scope("prototype")
 public class GateLabInputs {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
     private Map<String, String> inputsMap;
     private String inputfile;
 
-    public GateLabInputs(String workflowID) {
+    private Server server;
+    private LfcPathsBusiness lfcPathsBusiness;
+    private String workflowID;
+    private GateLabInputsParser gateLabInputsParser;
 
+    @Autowired
+    public final void setServer(Server server) {
+        this.server = server;
+    }
+
+    @Autowired
+    public final void setLfcPathsBusiness(fr.insalyon.creatis.vip.datamanager.server.business.LfcPathsBusiness lfcPathsBusiness) {
+        this.lfcPathsBusiness = lfcPathsBusiness;
+    }
+
+    @Autowired
+    public GateLabInputs(String workflowID) {
+        this.workflowID = workflowID;
+    }
+
+    @PostConstruct
+    public final void init() {
         inputsMap = new HashMap<String, String>();
-        inputfile = Server.getInstance().getWorkflowsPath() + "/" + workflowID + "/input-m2.xml";
-        GateLabInputsParser in = new GateLabInputsParser();
-        inputsMap = in.parse(inputfile);
+        inputfile = server.getWorkflowsPath() + "/" + workflowID + "/input-m2.xml";
+        inputsMap = gateLabInputsParser.parse(inputfile);
     }
 
     /**
@@ -65,9 +93,8 @@ public class GateLabInputs {
      * @return
      * @throws BusinessException
      */
-    public Map<String, String> getWorkflowInputs(
-        String currentUserFolder, Connection connection)
-        throws BusinessException {
+    public Map<String, String> getWorkflowInputs(String currentUserFolder)
+            throws BusinessException {
 
         try {
             String input = inputsMap.get("GateInput");
@@ -99,13 +126,11 @@ public class GateLabInputs {
             Map<String, String> inputMap = new HashMap<String, String>();
             inputMap.put(
                 "inputlink",
-                DataManagerUtil.parseRealDir(
-                    input, currentUserFolder, connection));
+                    lfcPathsBusiness.parseRealDir(input, currentUserFolder));
             //inputMap.put("outputlink", DataManagerUtil.parseRealDir(outputlink));
             inputMap.put(
                 "gate_version",
-                DataManagerUtil.parseRealDir(
-                    release, currentUserFolder, connection));
+                    lfcPathsBusiness.parseRealDir(release, currentUserFolder));
             inputMap.put("particles", particles);
             inputMap.put("simulation", simtype);
             inputMap.put("phaseSpace", phaseSpace);
@@ -115,5 +140,9 @@ public class GateLabInputs {
         } catch (DataManagerException ex) {
             throw new BusinessException(ex);
         }
+    }
+
+    public void setGateLabInputsParser(GateLabInputsParser gateLabInputsParser) {
+        this.gateLabInputsParser = gateLabInputsParser;
     }
 }

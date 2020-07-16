@@ -78,7 +78,7 @@ public class ApplicationImporterBusiness {
             String localFilePath = CoreUtil.getGRIDAClient().getRemoteFile(
                 DataManagerUtil.parseBaseDir(user, fileLFN, connection),
                 localDir.getCanonicalPath());
-            new BoutiquesBusiness().validateBoutiqueFile(localFilePath);
+            new BoutiquesBusiness(server, dataManagerBusiness, applicationBusiness).validateBoutiqueFile(localFilePath);
             String fileContent = new Scanner(new File(localFilePath)).useDelimiter("\\Z").next();
             return fileContent;
         } catch (GRIDAClientException | IOException ex) {
@@ -216,7 +216,7 @@ public class ApplicationImporterBusiness {
         String lfnJsonFile,
         Connection connection)
         throws BusinessException {
-        ApplicationBusiness ab = new ApplicationBusiness();
+        ApplicationBusiness ab = new ApplicationBusiness(applicationDAO);
         Application app = ab.getApplication(vipApplicationName, connection);
         AppVersion newVersion = new AppVersion(vipApplicationName, vipVersion, lfnGwendiaFile, lfnJsonFile, true);
         if (app == null) {
@@ -240,7 +240,7 @@ public class ApplicationImporterBusiness {
     private void checkEditionRights(String vipApplicationName, String vipVersion, boolean overwrite, User user, Connection connection)
         throws BusinessException {
 
-        ApplicationBusiness ab = new ApplicationBusiness();
+        ApplicationBusiness ab = new ApplicationBusiness(applicationDAO);
         Application app = ab.getApplication(vipApplicationName, connection);
         if (app == null) {
             return; // any user may create an application (nobody could run it unless an admin adds it to a class
