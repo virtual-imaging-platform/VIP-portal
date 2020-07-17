@@ -14,7 +14,7 @@ public class DataSourceConfig {
 
     @Bean(destroyMethod="") // needed because the application server (tomcat) must close it, not Spring
     @Qualifier("db-datasource")
-    @Profile({"default", "jndi-db"})  // needed to change db in tests
+    @Profile({"default", "prod", "jndi-db"})  // needed to change db in tests
     public DataSource jndiDataSource() {
         return new JndiDataSourceLookup().getDataSource("jdbc/vip");
     }

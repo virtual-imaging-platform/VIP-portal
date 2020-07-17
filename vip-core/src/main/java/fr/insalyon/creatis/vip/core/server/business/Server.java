@@ -52,7 +52,7 @@ import java.util.List;
 @Component
 // to avoid bean being created in tests
 // although the vif.conf file does not exist and causes an (silent error)
-@Profile({"default", "vip-conf-file"})
+@Profile({"default", "prod", "vip-conf-file"})
 public class Server {
     // Configuration File
     PropertiesConfiguration config;

@@ -8,20 +8,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 
 @Configuration
+@Profile({"default", "prod"})
 public class SpringApplicationConfig {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Bean
-    public SimulationStatsDAO getSimulationStatsDAO() throws DAOException {
-        try {
-            return new SimulationStatsData(WorkflowsDBDAOFactory.getInstance().getSessionFactory());
-
-        } catch (WorkflowsDBDAOException ex) {
-            logger.error("Error getting SimulationStatsDAO", ex);
-            throw new DAOException(ex);
-        }
+    public SimulationStatsDAO getSimulationStatsDAO() throws WorkflowsDBDAOException {
+        return new SimulationStatsData(WorkflowsDBDAOFactory.getInstance().getSessionFactory());
     }
 
     @Bean

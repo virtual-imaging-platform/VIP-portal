@@ -209,6 +209,15 @@ knowledge of the CeCILL-B license and that you accept its terms.
             <artifactId>logback-classic</artifactId>
             <scope>runtime</scope>
         </dependency>
+        
+        <!-- test dependencies -->
+        <dependency>
+            <groupId>fr.insalyon.creatis</groupId>
+            <artifactId>vip-core</artifactId>
+            <version>${project.version}</version>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>

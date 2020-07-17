@@ -56,7 +56,7 @@ import static org.mockito.ArgumentMatchers.*;
 @SpringJUnitConfig(SpringCoreConfig.class) // launch all spring environment for testing, also take test bean though automatic package scan
 @TestPropertySource(properties = "db.tableEngine=") // to disable the default mysql/innodb engine on database init
 @TestMethodOrder(OrderAnnotation.class)
-@ActiveProfiles("jndi-db") // to use default jndi datasource but avoid default server config
+@ActiveProfiles({"jndi-db", "test"}) // to use default jndi datasource but avoid default server config
 public class SpringJndiIT {
 
     @Autowired

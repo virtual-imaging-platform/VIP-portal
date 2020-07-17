@@ -12,6 +12,7 @@ import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
 import fr.insalyon.creatis.vip.core.server.business.EmailBusiness;
 import fr.insalyon.creatis.vip.core.server.business.Server;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -19,6 +20,8 @@ import org.junit.jupiter.api.TestMethodOrder;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.ApplicationContext;
+import org.springframework.core.env.Environment;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DataSourceUtils;
 import org.springframework.test.context.ActiveProfiles;
@@ -29,6 +32,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.sql.DataSource;
+import java.applet.AppletContext;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.sql.Connection;
@@ -42,10 +46,13 @@ import static org.mockito.ArgumentMatchers.*;
 
 
 @SpringJUnitConfig(SpringCoreConfig.class) // launch all spring environment for testing, also take test bean though automatic package scan
-@ActiveProfiles("test-db") // to take random h2 database and not the test h2 jndi one
+@ActiveProfiles({"test-db", "test"}) // to take random h2 database and not the test h2 jndi one
 @TestPropertySource(properties = "db.tableEngine=") // to disable the default mysql/innodb engine on database init
 @Transactional
 public abstract class BaseSpringIT {
+
+    @Autowired
+    protected ApplicationContext appContext;
 
     @Autowired
     protected ConfigurationBusiness configurationBusiness;

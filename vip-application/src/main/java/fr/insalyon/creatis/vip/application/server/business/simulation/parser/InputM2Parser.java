@@ -61,7 +61,6 @@ import org.xml.sax.helpers.XMLReaderFactory;
  * @author Rafael Silva
  */
 @Service
-@Transactional
 @Scope("prototype")
 public class InputM2Parser extends DefaultHandler {
 
