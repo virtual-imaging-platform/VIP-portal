@@ -82,9 +82,6 @@ public class ApikeyAuthenticationProvider implements
     private ConfigurationBusiness configurationBusiness;
 
     @Autowired
-    private Supplier<Connection> connectionSupplier;
-
-    @Autowired
     private UserDAO userDAO;
 
     public final void afterPropertiesSet() throws Exception {
@@ -103,7 +100,7 @@ public class ApikeyAuthenticationProvider implements
         Assert.isInstanceOf(ApikeyAuthenticationToken.class, authentication,
                 "Only ApikeyAuthenticationToken is supported");
 
-        try(Connection connection = connectionSupplier.get()) {
+        try {
             User vipUser;
             String apikey = authentication.getCredentials().toString();
             try {
@@ -127,8 +124,7 @@ public class ApikeyAuthenticationProvider implements
             UserDetails springUser;
             try {
                 Map<Group, CoreConstants.GROUP_ROLE> groups =
-                    configurationBusiness.getUserGroups(
-                        vipUser.getEmail(), connection);
+                    configurationBusiness.getUserGroups(vipUser.getEmail());
                 vipUser.setGroups(groups);
                 springUser = new SpringCompatibleUser(vipUser);
             } catch (BusinessException e) {
@@ -148,7 +144,7 @@ public class ApikeyAuthenticationProvider implements
                 logger.error("Error resetting failed auth attempts. Ignoring", e);
             }
             return new ApikeyAuthenticationToken(springUser, apikey);
-        } catch (SQLException | SQLRuntimeException e) {
+        } catch (SQLRuntimeException e) {
             logger.error("error when getting or closing db connexion. Doing as if there is an auth error",e);
             throw new BadCredentialsException(
                 messages.getMessage(

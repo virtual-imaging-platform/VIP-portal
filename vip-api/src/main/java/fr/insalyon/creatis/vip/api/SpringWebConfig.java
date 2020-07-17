@@ -32,36 +32,18 @@
 package fr.insalyon.creatis.vip.api;
 
 import fr.insalyon.creatis.vip.api.business.VipConfigurer;
-import fr.insalyon.creatis.vip.api.exception.SQLRuntimeException;
-import fr.insalyon.creatis.vip.application.server.business.ApplicationBusiness;
-import fr.insalyon.creatis.vip.application.server.business.ClassBusiness;
-import fr.insalyon.creatis.vip.application.server.business.SimulationBusiness;
-import fr.insalyon.creatis.vip.application.server.business.WorkflowBusiness;
-import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
-import fr.insalyon.creatis.vip.core.server.dao.CoreDAOFactory;
-import fr.insalyon.creatis.vip.core.server.dao.mysql.PlatformConnection;
-import fr.insalyon.creatis.vip.datamanager.server.business.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.context.annotation.Bean;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
 import org.springframework.web.servlet.config.annotation.*;
 
-import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.Collections;
-import java.util.function.Supplier;
 
 import static fr.insalyon.creatis.vip.api.CarminProperties.CORS_AUTHORIZED_DOMAINS;
 
 /**
  * Configuration class for spring web.
- *
- * It declares all the business beans from vip-core etc used in vip-api. All are singleton
- * (spring default) except UserDao which is created at each reference by a factory.
- *
- * It enables annotation configuration by subpackage scan.
  *
  * It declares an api conf file which location is configured from the main vip conf file
  *
@@ -74,6 +56,7 @@ public class SpringWebConfig implements WebMvcConfigurer {
     private Environment env;
     private VipConfigurer vipConfigurer;
 
+    @Autowired
     public SpringWebConfig(Environment env, VipConfigurer vipConfigurer) {
         this.env = env;
         this.vipConfigurer = vipConfigurer;

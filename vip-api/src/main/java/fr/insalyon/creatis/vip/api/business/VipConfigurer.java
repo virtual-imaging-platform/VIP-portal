@@ -31,8 +31,8 @@
  */
 package fr.insalyon.creatis.vip.api.business;
 
-import fr.insalyon.creatis.vip.core.server.business.*;
-import fr.insalyon.creatis.vip.core.server.dao.mysql.PlatformConnection;
+import fr.insalyon.creatis.vip.core.server.business.BusinessException;
+import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,7 +49,6 @@ import java.util.Calendar;
 /**
  * Used to configure vip on startup and at each request
  *
- * On startup, test database
  * Daily, renew the grida proxy
  *
  * Created by abonnet on 7/26/16.
@@ -63,6 +62,7 @@ public class VipConfigurer implements ApplicationListener<ContextRefreshedEvent>
 
     private Calendar lastConfiguration = null;
 
+    @Autowired
     public VipConfigurer(ConfigurationBusiness configurationBusiness) {
         this.configurationBusiness = configurationBusiness;
     }
@@ -70,7 +70,6 @@ public class VipConfigurer implements ApplicationListener<ContextRefreshedEvent>
     @Override
     public void onApplicationEvent(@NonNull ContextRefreshedEvent event) {
         logger.info("Init VIP : initialize database");
-        PlatformConnection.getInstance();
         configureIfNecessary();
     }
 

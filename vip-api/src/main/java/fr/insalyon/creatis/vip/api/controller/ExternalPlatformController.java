@@ -32,7 +32,6 @@
 package fr.insalyon.creatis.vip.api.controller;
 
 import fr.insalyon.creatis.vip.api.exception.ApiException;
-import fr.insalyon.creatis.vip.api.exception.SQLRuntimeException;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.datamanager.client.bean.ExternalPlatform;
@@ -40,9 +39,10 @@ import fr.insalyon.creatis.vip.datamanager.server.business.ExternalPlatformBusin
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.sql.*;
 import java.util.List;
 import java.util.function.Supplier;
 
@@ -56,27 +56,21 @@ public class ExternalPlatformController extends ApiController {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private ExternalPlatformBusiness externalPlatformBusiness;
-    private final Supplier<Connection> connectionSupplier;
 
     @Autowired
     public ExternalPlatformController(
             Supplier<User> currentUserSupplier,
-            ExternalPlatformBusiness externalPlatformBusiness,
-            Supplier<Connection> connectionSupplier) {
+            ExternalPlatformBusiness externalPlatformBusiness) {
         super(currentUserSupplier);
         this.externalPlatformBusiness = externalPlatformBusiness;
-        this.connectionSupplier = connectionSupplier;
     }
 
     @GetMapping
     public List<ExternalPlatform> listExternalPlatforms() throws ApiException {
         logMethodInvocation(logger,"listExternalPlatforms");
-        try(Connection connection = connectionSupplier.get()) {
-            return externalPlatformBusiness.listAll(connection);
-        } catch (BusinessException | SQLRuntimeException e) {
-            throw new ApiException(e);
-        } catch (SQLException e) {
-            logger.error("Error handling a connection", e);
+        try{
+            return externalPlatformBusiness.listAll();
+        } catch (BusinessException e) {
             throw new ApiException(e);
         }
     }

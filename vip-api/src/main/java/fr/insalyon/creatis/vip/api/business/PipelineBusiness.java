@@ -75,7 +75,10 @@ public class PipelineBusiness {
     private final ClassBusiness classBusiness;
 
     @Autowired
-    public PipelineBusiness(Supplier<User> currentUserProvider, Environment env, WorkflowBusiness workflowBusiness, ApplicationBusiness applicationBusiness, ClassBusiness classBusiness) {
+    public PipelineBusiness(
+            Supplier<User> currentUserProvider, Environment env,
+            WorkflowBusiness workflowBusiness,
+            ApplicationBusiness applicationBusiness, ClassBusiness classBusiness) {
         this.currentUserProvider = currentUserProvider;
         this.env = env;
         this.workflowBusiness = workflowBusiness;
@@ -83,9 +86,9 @@ public class PipelineBusiness {
         this.classBusiness = classBusiness;
     }
 
-    public Pipeline getPipeline(String pipelineId, Connection connection)
-        throws ApiException {
-        Pipeline p = getPipelineWithResultsDirectory(pipelineId, connection);
+    public Pipeline getPipeline(String pipelineId)
+            throws ApiException {
+        Pipeline p = getPipelineWithResultsDirectory(pipelineId);
 
         p.getParameters().removeIf(
             param ->
@@ -94,16 +97,16 @@ public class PipelineBusiness {
         return p;
     }
 
-    public Pipeline getPipelineWithResultsDirectory(
-        String pipelineId, Connection connection)
-        throws ApiException {
+    public Pipeline getPipelineWithResultsDirectory(String pipelineId)
+            throws ApiException {
         try {
             String applicationName = getApplicationName(pipelineId);
             String applicationVersion = getApplicationVersion(pipelineId);
             Pipeline p = getPipelineWithPermissions(
-                applicationName, applicationVersion, connection);
+                    applicationName, applicationVersion);
 
-            Descriptor d = workflowBusiness.getApplicationDescriptor(currentUserProvider.get(), p.getName(), p.getVersion(), connection); // Be careful, this copies the Gwendia file from LFC.
+            Descriptor d = workflowBusiness.getApplicationDescriptor(
+                    currentUserProvider.get(), p.getName(), p.getVersion()); // Be careful, this copies the Gwendia file from LFC.
             p.setDescription(d.getDescription());
 
             for (Source s : d.getSources()) {
@@ -122,9 +125,7 @@ public class PipelineBusiness {
         }
     }
 
-    public Pipeline[] listPipelines(
-        String studyIdentifier, Connection connection)
-        throws ApiException {
+    public Pipeline[] listPipelines(String studyIdentifier) throws ApiException {
 
         try {
             if (studyIdentifier != null) {
@@ -132,17 +133,17 @@ public class PipelineBusiness {
             }
             ArrayList<Pipeline> pipelines = new ArrayList<>();
 
-            List<AppClass> classes = classBusiness.getUserClasses(currentUserProvider.get().getEmail(), false, connection);
+            List<AppClass> classes = classBusiness.getUserClasses(currentUserProvider.get().getEmail(), false);
             List<String> classNames = new ArrayList<>();
             for (AppClass c : classes) {
                 classNames.add(c.getName());
             }
 
             List<Application> applications =
-                applicationBusiness.getApplications(classNames, connection);
+                applicationBusiness.getApplications(classNames);
             for (Application a : applications) {
                 List<AppVersion> versions =
-                    applicationBusiness.getVersions(a.getName(), connection);
+                    applicationBusiness.getVersions(a.getName());
                 for (AppVersion av : versions) {
                     if (isApplicationVersionUsableInApi(av)) {
                         pipelines.add(
@@ -174,7 +175,7 @@ public class PipelineBusiness {
         return pipelineIdentifier.substring(0, pipelineIdentifier.lastIndexOf("/"));
     }
 
-    public void checkIfValidPipelineIdentifier(String identifier) throws ApiException {
+    private void checkIfValidPipelineIdentifier(String identifier) throws ApiException {
         if (!identifier.contains("/")) {
             logger.error("Invalid pipeline identifier {} : missing /", identifier);
             throw new ApiException(ApiError.INVALID_PIPELINE_IDENTIFIER, identifier);
@@ -197,17 +198,15 @@ public class PipelineBusiness {
         });
     }
 
-    public void checkIfUserCanAccessPipeline(
-        String pipelineId, Connection connection)
-        throws ApiException {
+    public void checkIfUserCanAccessPipeline(String pipelineId)
+            throws ApiException {
         try {
 
             String applicationName = getApplicationName(pipelineId);
             List<String> userClassNames = classBusiness.getUserClassesName(
-                currentUserProvider.get().getEmail(), false, connection);
+                currentUserProvider.get().getEmail(), false);
 
-            Application a = applicationBusiness.getApplication(
-                applicationName, connection);
+            Application a = applicationBusiness.getApplication(applicationName);
             if (a == null) {
                 logger.error("Cannot find application {}", applicationName);
                 throw new ApiException(APPLICATION_NOT_FOUND, applicationName);
@@ -226,9 +225,9 @@ public class PipelineBusiness {
     }
 
     private Pipeline getPipelineWithPermissions(
-        String applicationName, String applicationVersion, Connection connection)
+            String applicationName, String applicationVersion)
         throws ApiException {
-        Pipeline[] pipelines = listPipelines("", connection);
+        Pipeline[] pipelines = listPipelines("");
         for (Pipeline p : pipelines) {
             if (p.getName().equals(applicationName) && p.getVersion().equals(applicationVersion)) {
                 return p;

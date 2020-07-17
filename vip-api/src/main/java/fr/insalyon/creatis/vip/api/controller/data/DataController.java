@@ -31,10 +31,9 @@
  */
 package fr.insalyon.creatis.vip.api.controller.data;
 
-import fr.insalyon.creatis.vip.api.exception.ApiException;
 import fr.insalyon.creatis.vip.api.business.DataApiBusiness;
-import fr.insalyon.creatis.vip.api.exception.SQLRuntimeException;
 import fr.insalyon.creatis.vip.api.controller.ApiController;
+import fr.insalyon.creatis.vip.api.exception.ApiException;
 import fr.insalyon.creatis.vip.api.model.ExistsApiResponse;
 import fr.insalyon.creatis.vip.api.model.PathProperties;
 import fr.insalyon.creatis.vip.api.model.UploadData;
@@ -53,8 +52,6 @@ import org.springframework.web.util.UriUtils;
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.io.InputStream;
-import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.List;
 import java.util.function.Supplier;
 
@@ -69,67 +66,40 @@ public class DataController extends ApiController {
 
     private final DataApiBusiness dataApiBusiness;
 
-    private final Supplier<Connection> connectionSupplier;
-
     // although the controller is a singleton, these are proxies that always point on the current request
     private final HttpServletRequest httpServletRequest;
 
     @Autowired
     public DataController(Supplier<User> currentUserSupplier,
                           DataApiBusiness dataApiBusiness,
-                          Supplier<Connection> connectionSupplier,
                           HttpServletRequest httpServletRequest) {
         super(currentUserSupplier);
         this.dataApiBusiness = dataApiBusiness;
-        this.connectionSupplier = connectionSupplier;
         this.httpServletRequest = httpServletRequest;
     }
 
     @RequestMapping(path = "/**", params = "action=properties")
-    public PathProperties getPathProperties()
-            throws ApiException {
+    public PathProperties getPathProperties() throws ApiException {
         String completePath = extractWildcardPath(httpServletRequest);
         logMethodInvocation(logger, "getPathProperties", currentUser().getEmail(), completePath);
-        try(Connection connection = connectionSupplier.get()) {
-            // business call
-            return dataApiBusiness.getPathProperties(completePath, connection);
-        } catch (SQLException ex) {
-            logger.error("Error handling a connection", ex);
-            throw new ApiException(ex);
-        } catch (SQLRuntimeException ex) {
-            throw new ApiException(ex);
-        }
+        // business call
+        return dataApiBusiness.getPathProperties(completePath);
     }
 
     @RequestMapping(path = "/**", params = "action=exists")
     public ExistsApiResponse doesPathExists() throws ApiException {
         String completePath = extractWildcardPath(httpServletRequest);
         logMethodInvocation(logger, "doesPathExists", currentUser().getEmail(), completePath);
-        try(Connection connection = connectionSupplier.get()) {
             // business call
-            return new ExistsApiResponse(
-                dataApiBusiness.doesFileExist(completePath, connection));
-        } catch (SQLException ex) {
-            logger.error("Error handling a connection", ex);
-            throw new ApiException(ex);
-        } catch (SQLRuntimeException ex) {
-            throw new ApiException(ex);
-        }
+        return new ExistsApiResponse(dataApiBusiness.doesFileExist(completePath));
     }
 
     @RequestMapping(path = "/**", params = "action=list")
     public List<PathProperties> listDirectory() throws ApiException {
         String completePath = extractWildcardPath(httpServletRequest);
         logMethodInvocation(logger, "listDirectory", currentUser().getEmail(), completePath);
-        try(Connection connection = connectionSupplier.get()) {
-            // business call
-            return dataApiBusiness.listDirectory(completePath, connection);
-        } catch (SQLException ex) {
-            logger.error("Error handling a connection", ex);
-            throw new ApiException(ex);
-        } catch (SQLRuntimeException ex) {
-            throw new ApiException(ex);
-        }
+        // business call
+        return dataApiBusiness.listDirectory(completePath);
     }
 
     @RequestMapping(path = "/**", params = "action=md5")
@@ -146,20 +116,13 @@ public class DataController extends ApiController {
     public ResponseEntity<FileSystemResource> downloadRawFile() throws ApiException {
         String completePath = extractWildcardPath(httpServletRequest);
         logMethodInvocation(logger, "downloadFile", currentUser().getEmail(), completePath);
-        try(Connection connection = connectionSupplier.get()) {
-            // business call
-            File file = dataApiBusiness.getFile(completePath, connection);
-            FileSystemResource res = new FileSystemResource(file);
-            HttpHeaders headers = new HttpHeaders();
-            // TODO improve mime-type
-            headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
-            return new ResponseEntity<>(res, headers, HttpStatus.OK);
-        } catch (SQLException ex) {
-            logger.error("Error handling a connection", ex);
-            throw new ApiException(ex);
-        } catch (SQLRuntimeException ex) {
-            throw new ApiException(ex);
-        }
+        // business call
+        File file = dataApiBusiness.getFile(completePath);
+        FileSystemResource res = new FileSystemResource(file);
+        HttpHeaders headers = new HttpHeaders();
+        // TODO improve mime-type
+        headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+        return new ResponseEntity<>(res, headers, HttpStatus.OK);
     }
 
     @RequestMapping(path = "/**", method = RequestMethod.DELETE)
@@ -167,15 +130,8 @@ public class DataController extends ApiController {
     public void deletePath() throws ApiException {
         String completePath = extractWildcardPath(httpServletRequest);
         logMethodInvocation(logger, "deletePath", currentUser().getEmail(), completePath);
-        try(Connection connection = connectionSupplier.get()) {
-            // business call
-            dataApiBusiness.deletePath(completePath, connection);
-        } catch (SQLException ex) {
-            logger.error("Error handling a connection", ex);
-            throw new ApiException(ex);
-        } catch (SQLRuntimeException ex) {
-            throw new ApiException(ex);
-        }
+        // business call
+        dataApiBusiness.deletePath(completePath);
     }
 
     @RequestMapping(path = "/**", method = RequestMethod.PUT)
@@ -183,16 +139,9 @@ public class DataController extends ApiController {
     public void uploadFile(InputStream requestInputStream) throws ApiException {
         String completePath = extractWildcardPath(httpServletRequest);
         logMethodInvocation(logger, "uploadFile", currentUser().getEmail(), completePath);
-        try(Connection connection = connectionSupplier.get()) {
-            // business call
-            dataApiBusiness.uploadRawFileFromInputStream(
-                completePath, requestInputStream, connection);
-        } catch (SQLException ex) {
-            logger.error("Error handling a connection", ex);
-            throw new ApiException(ex);
-        } catch (SQLRuntimeException ex) {
-            throw new ApiException(ex);
-        }
+        // business call
+        dataApiBusiness.uploadRawFileFromInputStream(
+                completePath, requestInputStream);
         // TODO : think about returning the PahtProperties of the created Path, to be informed of a filename change
     }
 
@@ -201,16 +150,8 @@ public class DataController extends ApiController {
     public void uploadCustomData(@RequestBody UploadData uploadData) throws ApiException {
         String completePath = extractWildcardPath(httpServletRequest);
         logMethodInvocation(logger, "uploadCustomData", currentUser().getEmail(), completePath);
-        try(Connection connection = connectionSupplier.get()) {
-            // business call
-            dataApiBusiness.uploadCustomData(
-                completePath, uploadData, connection);
-        } catch (SQLException ex) {
-            logger.error("Error handling a connection", ex);
-            throw new ApiException(ex);
-        } catch (SQLRuntimeException ex) {
-            throw new ApiException(ex);
-        }
+        // business call
+        dataApiBusiness.uploadCustomData(completePath, uploadData);
     }
 
     private String extractWildcardPath(HttpServletRequest request) {

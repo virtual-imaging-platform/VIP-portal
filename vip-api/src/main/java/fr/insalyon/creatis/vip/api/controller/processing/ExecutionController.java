@@ -31,14 +31,13 @@
  */
 package fr.insalyon.creatis.vip.api.controller.processing;
 
-import fr.insalyon.creatis.vip.api.model.Execution;
-import fr.insalyon.creatis.vip.api.exception.ApiException;
-import fr.insalyon.creatis.vip.api.exception.ApiException.ApiError;
 import fr.insalyon.creatis.vip.api.business.ExecutionBusiness;
 import fr.insalyon.creatis.vip.api.business.PipelineBusiness;
-import fr.insalyon.creatis.vip.api.exception.SQLRuntimeException;
 import fr.insalyon.creatis.vip.api.controller.ApiController;
+import fr.insalyon.creatis.vip.api.exception.ApiException;
+import fr.insalyon.creatis.vip.api.exception.ApiException.ApiError;
 import fr.insalyon.creatis.vip.api.model.DeleteExecutionConfiguration;
+import fr.insalyon.creatis.vip.api.model.Execution;
 import fr.insalyon.creatis.vip.api.model.PathProperties;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import org.slf4j.Logger;
@@ -49,8 +48,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.List;
 import java.util.function.Supplier;
 
@@ -70,15 +67,14 @@ public class ExecutionController extends ApiController {
     private final ExecutionBusiness executionBusiness;
     private final PipelineBusiness pipelineBusiness;
 
-    private final Supplier<Connection> connectionSupplier;
-
     @Autowired
-    public ExecutionController(Supplier<User> currentUserSupplier, Environment environment, ExecutionBusiness executionBusiness, PipelineBusiness pipelineBusiness, Supplier<Connection> connectionSupplier) {
+    public ExecutionController(
+            Supplier<User> currentUserSupplier, Environment environment,
+            ExecutionBusiness executionBusiness, PipelineBusiness pipelineBusiness) {
         super(currentUserSupplier);
         this.environment = environment;
         this.executionBusiness = executionBusiness;
         this.pipelineBusiness = pipelineBusiness;
-        this.connectionSupplier = connectionSupplier;
     }
 
     @RequestMapping
@@ -102,20 +98,13 @@ public class ExecutionController extends ApiController {
             logger.warn("limit parameter too high {}", limit);
             throw new ApiException("limit parameter too high");
         }
-        try(Connection connection = connectionSupplier.get()) {
-            return executionBusiness.listExecutions(limit, connection);
-        } catch (SQLException ex) {
-            logger.error("Error handling a connection", ex);
-            throw new ApiException(ex);
-        } catch (SQLRuntimeException ex) {
-            throw new ApiException(ex);
-        }
+        return executionBusiness.listExecutions(limit);
     }
 
     @RequestMapping(value = "count", produces = "text/plain;charset=UTF-8")
     public String countExecutions(
-            @RequestParam(required = false) String studyIdentifier
-    ) throws ApiException {
+            @RequestParam(required = false) String studyIdentifier)
+            throws ApiException {
         logMethodInvocation(logger, "countExecutions");
         if (studyIdentifier != null) {
             logger.warn("studyIdentifier not supportet yet in countExecutions");
@@ -125,68 +114,41 @@ public class ExecutionController extends ApiController {
     }
 
     @RequestMapping("/{executionId}")
-    public Execution getExecution(@PathVariable String executionId) throws ApiException {
+    public Execution getExecution(@PathVariable String executionId)
+            throws ApiException {
         logMethodInvocation(logger, "getExecution", executionId);
         executionBusiness.checkIfUserCanAccessExecution(executionId);
-        try(Connection connection = connectionSupplier.get()) {
-            return executionBusiness.getExecution(
-                executionId, false, connection);
-        } catch (SQLException ex) {
-            logger.error("Error handling a connection", ex);
-            throw new ApiException(ex);
-        } catch (SQLRuntimeException ex) {
-            throw new ApiException(ex);
-        }
+
+        return executionBusiness.getExecution(executionId, false);
     }
 
     @RequestMapping(value = "/{executionId}", method = RequestMethod.PUT)
-    public Execution updateExecution(@PathVariable String executionId,
-                                     @RequestBody @Valid Execution execution) throws ApiException {
+    public Execution updateExecution(
+            @PathVariable String executionId,
+            @RequestBody @Valid Execution execution) throws ApiException {
         logMethodInvocation(logger, "updateExecution", executionId);
         execution.setIdentifier(executionId);
         executionBusiness.checkIfUserCanAccessExecution(executionId);
         executionBusiness.updateExecution(execution);
-        try(Connection connection = connectionSupplier.get()) {
-            return executionBusiness.getExecution(
-                executionId, false, connection);
-        } catch (SQLException ex) {
-            logger.error("Error handling a connection", ex);
-            throw new ApiException(ex);
-        } catch (SQLRuntimeException ex) {
-            throw new ApiException(ex);
-        }
+        return executionBusiness.getExecution(executionId, false);
     }
 
     @RequestMapping(method = RequestMethod.POST)
-    public Execution initExecution(@RequestBody @Valid Execution execution) throws ApiException {
+    public Execution initExecution(@RequestBody @Valid Execution execution)
+            throws ApiException {
         logMethodInvocation(logger, "initExecution", execution);
-        try(Connection connection = connectionSupplier.get()) {
-            pipelineBusiness.checkIfUserCanAccessPipeline(
-                execution.getPipelineIdentifier(), connection);
-            String execId = executionBusiness.initExecution(
-                execution, connection);
-            return executionBusiness.getExecution(execId, false, connection);
-        } catch (SQLException ex) {
-            logger.error("Error handling a connection", ex);
-            throw new ApiException(ex);
-        } catch (SQLRuntimeException ex) {
-            throw new ApiException(ex);
-        }
+        pipelineBusiness.checkIfUserCanAccessPipeline(
+            execution.getPipelineIdentifier());
+        String execId = executionBusiness.initExecution(execution);
+        return executionBusiness.getExecution(execId, false);
     }
 
     @RequestMapping("/{executionId}/results")
-    public List<PathProperties> getExecutionResults(@PathVariable String executionId) throws ApiException {
+    public List<PathProperties> getExecutionResults(
+            @PathVariable String executionId) throws ApiException {
         logMethodInvocation(logger, "getExecutionResults", executionId);
         executionBusiness.checkIfUserCanAccessExecution(executionId);
-        try(Connection connection = connectionSupplier.get()) {
-            return executionBusiness.getExecutionResultsPaths(
-                executionId, connection);
-        } catch (SQLException ex) {
-            logger.error("Error handling a connection", ex);
-            throw new ApiException(ex);
-        } catch (SQLRuntimeException ex) {
-            throw new ApiException(ex);
-        }
+        return executionBusiness.getExecutionResultsPaths(executionId);
     }
 
     @RequestMapping(value = "/{executionId}/stdout", produces = "text/plain;charset=UTF-8")

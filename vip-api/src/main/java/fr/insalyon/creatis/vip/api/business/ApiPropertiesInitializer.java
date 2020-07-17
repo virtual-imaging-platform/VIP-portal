@@ -38,18 +38,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContextInitializer;
 import org.springframework.core.env.Environment;
+import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.ResourcePropertySource;
 import org.springframework.util.Assert;
 import org.springframework.web.context.*;
 
 import java.io.IOException;
+import java.util.Optional;
 
 import static fr.insalyon.creatis.vip.api.CarminProperties.*;
+import static org.springframework.core.io.ResourceLoader.CLASSPATH_URL_PREFIX;
 
 /**
- Vip additional property source location is configured by a property in the
- main property file "$HOME/.vip/vip.conf".
- It is advised to put it in a "vip-api.conf" file in the same folder (default behavior)
  * Created by abonnet on 5/7/18.
  */
 public class ApiPropertiesInitializer implements ApplicationContextInitializer<ConfigurableWebApplicationContext> {
@@ -60,13 +60,52 @@ public class ApiPropertiesInitializer implements ApplicationContextInitializer<C
     public void initialize(ConfigurableWebApplicationContext applicationContext) {
         try {
             applicationContext.getEnvironment().getPropertySources().addLast(
-                    new ResourcePropertySource(Server.getInstance().getApiConfFileLocation())
+                    new ResourcePropertySource(getApiConfRessource(applicationContext))
             );
             verifyProperties(applicationContext.getEnvironment());
         } catch (IOException e) {
-            logger.error("Cant't init api conf file {}", Server.getInstance().getApiConfFileLocation());
+            logger.error("Cant't init api conf file");
             throw new RuntimeException("Error initializing api conf", e);
         }
+    }
+
+    private Resource getApiConfRessource(ConfigurableWebApplicationContext applicationContext) {
+        // first look by profile in classpath
+        Resource configFile;
+        for (String activeProfile :
+                applicationContext.getEnvironment().getActiveProfiles()) {
+            configFile = applicationContext.getResource(getProfileApiConfLocation(activeProfile));
+            if (configFile.exists()) {
+                return configFile;
+            }
+        }
+        // then default name in classpath
+        configFile = applicationContext.getResource(getClasspathApiConfLocation());
+        if (configFile.exists()) {
+            return configFile;
+        }
+        // then default name in home
+        return applicationContext.getResource(getHomeApiConfLocation());
+    }
+
+    private String getProfileApiConfLocation(String profile) {
+        return getApiConfLocation(CLASSPATH_URL_PREFIX, Optional.of(profile));
+    }
+
+    private String getClasspathApiConfLocation() {
+        return getApiConfLocation(CLASSPATH_URL_PREFIX, Optional.empty());
+    }
+
+    private String getHomeApiConfLocation() {
+        String homePath = System.getenv("HOME") + Server.VIP_DIR;
+        return getApiConfLocation("file:" + homePath, Optional.empty());
+    }
+
+    private String getApiConfLocation(String prefix, Optional<String> profile) {
+        StringBuilder sb = new StringBuilder(prefix)
+                .append("vip-api");
+        profile.ifPresent(p -> sb.append("-").append(p));
+        return sb.append(".conf").toString();
     }
 
     private void verifyProperties(Environment env) {
