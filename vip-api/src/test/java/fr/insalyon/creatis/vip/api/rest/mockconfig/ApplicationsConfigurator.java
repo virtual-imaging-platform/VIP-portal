@@ -85,19 +85,19 @@ public class ApplicationsConfigurator {
         ClassBusiness classBusiness = test.getClassBusiness();
         ApplicationBusiness applicationBusiness = test.getApplicationBusiness();
         // 1 return user classes
-        when(classBusiness.getUserClasses(eq(user.getEmail()), eq(false), any()))
+        when(classBusiness.getUserClasses(eq(user.getEmail()), eq(false)))
             .thenReturn(classes);
         when(classBusiness.getUserClassesName(
-                 eq(user.getEmail()), eq(false), any()))
+                 eq(user.getEmail()), eq(false)))
             .thenReturn(classNames);
         // 2 return apps for the classes
-        when(applicationBusiness.getApplications(anyList(), any())).
+        when(applicationBusiness.getApplications(anyList())).
                 thenReturn(new ArrayList<>(applicationVersions.keySet()));
         // 3 return versions for each app
         for (Application app : applicationVersions.keySet()) {
-            when(applicationBusiness.getVersions(eq(app.getName()), any()))
+            when(applicationBusiness.getVersions(eq(app.getName())))
                 .thenReturn(applicationVersions.get(app));
-            when(applicationBusiness.getApplication(eq(app.getName()), any()))
+            when(applicationBusiness.getApplication(eq(app.getName())))
                 .thenReturn(app);
         }
     }
@@ -109,7 +109,7 @@ public class ApplicationsConfigurator {
             Integer... appParamsIndexes) throws BusinessException {
         WorkflowBusiness workflowBusiness = test.getWorkflowBusiness();
         when(workflowBusiness.getApplicationDescriptor(
-                 eq(user), eq(app.getName()), eq(version.getVersion()), any()))
+                 eq(user), eq(app.getName()), eq(version.getVersion())))
             .thenReturn(getDescriptor("desc test", appParamsIndexes));
         return app.getName() + "/" + version.getVersion();
     }

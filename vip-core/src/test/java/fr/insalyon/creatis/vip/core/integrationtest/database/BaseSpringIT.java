@@ -73,6 +73,11 @@ public abstract class BaseSpringIT {
     @Autowired
     protected GRIDAClient gridaClient;
 
+    @BeforeEach
+    protected void setUp() {
+        ServerMockConfig.reset(server);
+    }
+
     protected void assertRowsNbInTable(String tableName, int expectedNb) {
         JdbcTemplate jdbcTemplate = new JdbcTemplate(lazyDataSource);
         int rowsNb = JdbcTestUtils.countRowsInTable(jdbcTemplate, tableName);

@@ -88,7 +88,7 @@ public class DataControllerIT extends BaseVIPSpringIT {
     @Test
     public void shouldReturnNonExistingPath() throws Exception {
         String testLfcPath = "/vip/Home/WRONG/PATH";
-        when(lfcBusiness.exists(eq(baseUser1), eq(testLfcPath), any()))
+        when(lfcBusiness.exists(eq(baseUser1), eq(testLfcPath)))
             .thenReturn(false);
         PathProperties expectedPathProperties = new PathProperties();
         expectedPathProperties.setExists(false);
@@ -145,10 +145,10 @@ public class DataControllerIT extends BaseVIPSpringIT {
                 null, null, null, testFile, Type.Download, Status.Done, baseUser1.getEmail(), 100);
         PoolOperation runningPoolOperation = new PoolOperation(operationId,
                 null, null, null, null, Type.Download, Status.Running, baseUser1.getEmail(), 0);
-        when (transferPoolBusiness.downloadFile(eq(baseUser1), eq(lfcPath), any()))
+        when (transferPoolBusiness.downloadFile(eq(baseUser1), eq(lfcPath)))
             .thenReturn(operationId);
         when (transferPoolBusiness.getOperationById(
-                  eq(operationId), eq(baseUser1.getFolder()), any()))
+                  eq(operationId), eq(baseUser1.getFolder())))
             .thenReturn(runningPoolOperation, runningPoolOperation, donePoolOperation);
         when (transferPoolBusiness.getDownloadPoolOperation(operationId))
                 .thenReturn(donePoolOperation);
@@ -166,10 +166,10 @@ public class DataControllerIT extends BaseVIPSpringIT {
         String operationId = "testOpId";
         PoolOperation runningPoolOperation = new PoolOperation(operationId,
                 null, null, null, null, Type.Download, Status.Running, baseUser1.getEmail(), 0);
-        when (transferPoolBusiness.downloadFile(eq(baseUser1), eq(lfcPath), any()))
+        when (transferPoolBusiness.downloadFile(eq(baseUser1), eq(lfcPath)))
             .thenReturn(operationId);
         when (transferPoolBusiness.getOperationById(
-                  eq(operationId), eq(baseUser1.getFolder()), any()))
+                  eq(operationId), eq(baseUser1.getFolder())))
             .thenReturn(runningPoolOperation, runningPoolOperation);
         mockMvc.perform(
                 get("/rest/path" + lfcPath).param("action", "content").with(baseUser1()))
@@ -188,10 +188,10 @@ public class DataControllerIT extends BaseVIPSpringIT {
                 null, null, null, null, Type.Download, Status.Running, baseUser1.getEmail(), 0);
         PoolOperation donePoolOperation = new PoolOperation(operationId,
                 null, null, null, testFile, Type.Download, Status.Done, baseUser1.getEmail(), 100);
-        when (transferPoolBusiness.downloadFile(eq(baseUser1), eq(lfcPath), any()))
+        when (transferPoolBusiness.downloadFile(eq(baseUser1), eq(lfcPath)))
                 .thenReturn(operationId);
         when (transferPoolBusiness.getOperationById(
-                eq(operationId), eq(baseUser1.getFolder()), any()))
+                eq(operationId), eq(baseUser1.getFolder())))
                 .thenReturn(runningPoolOperation);
         when (transferPoolBusiness.getDownloadPoolOperation(operationId))
               .thenReturn(donePoolOperation);
@@ -202,7 +202,7 @@ public class DataControllerIT extends BaseVIPSpringIT {
         // now do an OK download
         Thread.sleep(3*1000);
           when (transferPoolBusiness.getOperationById(
-                  eq(operationId), eq(baseUser1.getFolder()), any()))
+                  eq(operationId), eq(baseUser1.getFolder())))
                   .thenReturn(runningPoolOperation, runningPoolOperation, donePoolOperation);
         mockMvc.perform(
                 get("/rest/path" + lfcPath).param("action", "content").with(baseUser1()))
@@ -224,11 +224,10 @@ public class DataControllerIT extends BaseVIPSpringIT {
         when (transferPoolBusiness.uploadFile(
                   eq(baseUser2),
                   anyString(),
-                  eq(getAbsolutePath(testDir1)),
-                  any()))
+                  eq(getAbsolutePath(testDir1))))
                 .thenReturn(operationId);
         when (transferPoolBusiness.getOperationById(
-                  eq(operationId), eq(baseUser2.getFolder()), any()))
+                  eq(operationId), eq(baseUser2.getFolder())))
             .thenReturn(runningPoolOperation, runningPoolOperation, donePoolOperation);
         mockMvc.perform(
                 put("/rest/path" + path)
@@ -240,8 +239,7 @@ public class DataControllerIT extends BaseVIPSpringIT {
         Mockito.verify(transferPoolBusiness).uploadFile(
             eq(baseUser2),
             captor.capture(),
-            eq(getAbsolutePath(testDir1)),
-            any());
+            eq(getAbsolutePath(testDir1)));
         String copiedFile = captor.getValue();
         File expectedFile = getResourceFromClasspath("testFile.txt").getFile();
         assertThat(
@@ -262,11 +260,10 @@ public class DataControllerIT extends BaseVIPSpringIT {
         when (transferPoolBusiness.uploadFile(
                   eq(baseUser2),
                   anyString(),
-                  eq(getAbsolutePath(testDir1)),
-                  any()))
+                  eq(getAbsolutePath(testDir1))))
             .thenReturn(operationId);
         when (transferPoolBusiness.getOperationById(
-                  eq(operationId), eq(baseUser2.getFolder()), any()))
+                  eq(operationId), eq(baseUser2.getFolder())))
             .thenReturn(runningPoolOperation, runningPoolOperation, donePoolOperation);
         mockMvc.perform(
                 put("/rest/path" + path)
@@ -279,8 +276,7 @@ public class DataControllerIT extends BaseVIPSpringIT {
         Mockito.verify(transferPoolBusiness).uploadFile(
             eq(baseUser2),
             captor.capture(),
-            eq(getAbsolutePath(testDir1)),
-            any());
+            eq(getAbsolutePath(testDir1)));
         String copiedFile = captor.getValue();
         File expectedFile = getResourceFromClasspath("b64decoded/uploadData_1.txt").getFile();
         assertThat(

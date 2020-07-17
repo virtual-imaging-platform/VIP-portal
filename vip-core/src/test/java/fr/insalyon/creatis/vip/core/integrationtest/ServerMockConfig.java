@@ -27,13 +27,16 @@ public class ServerMockConfig {
 
     public static final String TEST_CAS_URL = "testCasURL";
 
-    @Autowired
-    private ApplicationContext applicationContext;
-
     @Bean
     @Primary
     public Server testServer() throws IOException {
-        Server server = Mockito.mock(Server.class);
+        Server server = mock(Server.class);
+        reset(server);
+        return server;
+    }
+
+    public static void reset(Server server) {
+        Mockito.reset(server);
         Mockito.when(server.getAdminFirstName()).thenReturn(TEST_ADMIN_FIRST_NAME);
         Mockito.when(server.getAdminLastName()).thenReturn(TEST_ADMIN_LAST_NAME);
         Mockito.when(server.getAdminEmail()).thenReturn(TEST_ADMIN_EMAIL);
@@ -41,14 +44,9 @@ public class ServerMockConfig {
         Mockito.when(server.getAdminPhone()).thenReturn(TEST_ADMIN_PHONE);
         Mockito.when(server.getAdminInstitution()).thenReturn(TEST_ADMIN_INSTITUTION);
         Mockito.when(server.getCasURL()).thenReturn(TEST_CAS_URL);
-        
-        Resource testWorkflowPath = applicationContext.getResource("classpath:test_workflow_path");
-        when(server.getWorkflowsPath()).thenReturn(testWorkflowPath.getFile().getAbsolutePath());
         when(server.getDataManagerUsersHome()).thenReturn("/test/prefix/vip/data/test_users");
         when(server.getDataManagerGroupsHome()).thenReturn("/test/prefix/vip/data/test_groups");
         when(server.getVoRoot()).thenReturn("/vo_test/root");
-
-        return server;
     }
 
 }
