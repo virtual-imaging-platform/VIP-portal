@@ -89,7 +89,7 @@ public class PublicationGrid extends ListGrid {
                         public void onClick(ClickEvent event) {
                             PublicationLayout.edit(rollOverRecord.getAttribute("id"), rollOverRecord.getAttribute("title"),
                                     rollOverRecord.getAttribute("type"),
-                                    rollOverRecord.getAttribute("typeName"), rollOverRecord.getAttribute("authors"), rollOverRecord.getAttribute("date"), rollOverRecord.getAttribute("doi"));
+                                    rollOverRecord.getAttribute("typeName"), rollOverRecord.getAttribute("authors"), rollOverRecord.getAttribute("date"), rollOverRecord.getAttribute("doi"), rollOverRecord.getAttribute("vipApplication"));
                         }
                     });
                     final ImgButton deleteImg = getImgButton(CoreConstants.ICON_DELETE, "Delete");
@@ -143,6 +143,7 @@ public class PublicationGrid extends ListGrid {
                             new DetailViewerField("typeName", "Journal, Conference or Book Name"),
                             new DetailViewerField("authors", "Authors"),
                             new DetailViewerField("date", "Date"),
+                            new DetailViewerField("vipApplication", "VIP Application"),
                             new DetailViewerField("doi", "Doi"),
                             new DetailViewerField("vipAuthor", "Owner"));
                 } else {
@@ -152,6 +153,7 @@ public class PublicationGrid extends ListGrid {
                             new DetailViewerField("typeName", "Journal, Conference or Book Name"),
                             new DetailViewerField("authors", "Authors"),
                             new DetailViewerField("date", "Date"),
+                            new DetailViewerField("vipApplication", "VIP Application"),
                             new DetailViewerField("doi", "Doi"));
                 }
 
@@ -181,6 +183,7 @@ public class PublicationGrid extends ListGrid {
                 new ListGridField("typeName", "Journal, Conference or Book Name"),
                 new ListGridField("authors", "Authors"),
                 new ListGridField("date", "Date"),
+                new ListGridField("vipApplication", "VIP Application"),
                 pubOwner);
 
         publicationId.setHidden(true);
@@ -197,17 +200,17 @@ public class PublicationGrid extends ListGrid {
                 if (CoreModule.user.getLevel() == UserLevel.Administrator) {
                     PublicationLayout.edit(event.getRecord().getAttribute("id"), event.getRecord().getAttribute("title"),
                             event.getRecord().getAttribute("type"),
-                            event.getRecord().getAttribute("typeName"), event.getRecord().getAttribute("authors"), event.getRecord().getAttribute("date"), event.getRecord().getAttribute("doi"));
+                            event.getRecord().getAttribute("typeName"), event.getRecord().getAttribute("authors"), event.getRecord().getAttribute("date"), event.getRecord().getAttribute("doi"),event.getRecord().getAttribute("vipApplication"));
                 }
             }
         });
     }
 
-    protected static void edit(String id, String title, String type, String typeName, String authors, String date, String doi) {
+    protected static void edit(String id, String title, String type, String typeName, String authors, String date, String doi, String vipApplication) {
 
         PublicationTab pubTab = (PublicationTab) Layout.getInstance().
                 getTab(CoreConstants.TAB_PUBLICATION);
-        pubTab.setPublication(id, title, type, typeName, authors, date, doi);
+        pubTab.setPublication(id, title, type, typeName, authors, date, doi, vipApplication);
     }
 
     private void remove(Long id) {

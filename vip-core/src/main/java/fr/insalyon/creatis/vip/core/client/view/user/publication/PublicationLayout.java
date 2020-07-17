@@ -91,7 +91,7 @@ public class PublicationLayout extends VLayout {
         addButton.addClickHandler(new ClickHandler() {
             @Override
             public void onClick(ClickEvent event) {
-                edit(null, null, null, null, null, null, null);
+                edit(null, null, null, null, null, null, null, null);
             }
         });
         toolstrip.addMember(addButton);
@@ -127,7 +127,7 @@ public class PublicationLayout extends VLayout {
                modal.hide();
                 List<PublicationRecord> dataList = new ArrayList<PublicationRecord>();
                 for (Publication pub : result) {
-                    dataList.add(new PublicationRecord(pub.getId(), pub.getTitle(), pub.getType(), pub.getTypeName(), pub.getDate(), pub.getAuthors(), pub.getDoi(), pub.getVipAuthor()));
+                    dataList.add(new PublicationRecord(pub.getId(), pub.getTitle(), pub.getType(), pub.getTypeName(), pub.getDate(), pub.getAuthors(), pub.getDoi(), pub.getVipAuthor(), pub.getVipApplication()));
                 }
                 publicationGrid.getGrid().setData(dataList.toArray(new PublicationRecord[]{}));
                 publicationGrid.getDs().setTestData(dataList.toArray(new PublicationRecord[]{}));
@@ -137,11 +137,11 @@ public class PublicationLayout extends VLayout {
         ConfigurationService.Util.getInstance().getPublications(callback);
     }
 
-    protected static void edit(String id, String title, String type, String typeName, String authors, String date, String doi) {
+    protected static void edit(String id, String title, String type, String typeName, String authors, String date, String doi, String vipApplication) {
 
         PublicationTab pubTab = (PublicationTab) Layout.getInstance().
                 getTab(CoreConstants.TAB_PUBLICATION);
-        pubTab.setPublication(id, title, type, typeName, authors, date, doi);
+        pubTab.setPublication(id, title, type, typeName, authors, date, doi, vipApplication);
     }
 
     public void setFilter() {

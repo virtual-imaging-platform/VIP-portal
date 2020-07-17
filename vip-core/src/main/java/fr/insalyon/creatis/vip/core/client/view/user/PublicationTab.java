@@ -88,8 +88,8 @@ public class PublicationTab extends Tab {
 
     }
 
-    public void setPublication(String id, String title, String type, String nameType, String authors, String date, String doi) {
-        editPublicationLayout.setPublication(id, title, type, nameType, authors, date, doi);
+    public void setPublication(String id, String title, String type, String nameType, String authors, String date, String doi, String vipApplication) {
+        editPublicationLayout.setPublication(id, title, type, nameType, authors, date, doi, vipApplication);
     }
 
     public void loadPublication() {

@@ -48,6 +48,7 @@ public class Publication implements IsSerializable {
     private String type;
     private String typeName;
     private String vipAuthor;
+    private String vipApplication;
 
     public Publication() {
     }
@@ -147,7 +148,15 @@ public class Publication implements IsSerializable {
     public void setVipAuthor(String vipAuthor) {
         this.vipAuthor = vipAuthor;
     }
-    
-    
-    
+
+    public String getVipApplication() {
+        return vipApplication;
+    }
+
+    public void setVipApplication(String vipApplication) {
+        this.vipApplication = vipApplication;
+    }
+
+
+
 }
