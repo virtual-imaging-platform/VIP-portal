@@ -29,7 +29,7 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL-B license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.core.client.bean;
+package fr.insalyon.creatis.vip.publication.client.bean;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
 

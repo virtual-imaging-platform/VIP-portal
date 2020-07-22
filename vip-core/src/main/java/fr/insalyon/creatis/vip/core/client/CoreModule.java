@@ -58,7 +58,6 @@ import fr.insalyon.creatis.vip.core.client.view.main.SystemParser;
 import fr.insalyon.creatis.vip.core.client.view.main.SystemTileGrid;
 import fr.insalyon.creatis.vip.core.client.view.user.AccountTab;
 import fr.insalyon.creatis.vip.core.client.view.user.UserMenuButton;
-import fr.insalyon.creatis.vip.core.client.view.user.PublicationTab;
 import java.util.List;
 
 /**
@@ -135,25 +134,6 @@ public class CoreModule extends Module {
         };
         ConfigurationService.Util.getInstance().compare(callback);
         }
-
-        //call to test last publication update
-        final AsyncCallback<Boolean> callback2 = new AsyncCallback<Boolean>() {
-            @Override
-            public void onFailure(Throwable caught) {
-
-                Layout.getInstance().setWarningMessage("Cannot get the date of last publication update" + caught.getMessage(), 10);
-
-            }
-
-            @Override
-            public void onSuccess(Boolean result) {
-                if (result) {
-                    showDialog(" You haven't updated your publications for a while. Please take a few minutes to review the list of publications that you made using VIP.");
-                }
-
-            }
-        };
-        ConfigurationService.Util.getInstance().testLastUpdatePublication(callback2);
 
     }
 
@@ -285,51 +265,5 @@ public class CoreModule extends Module {
         dialog.draw();
     }
 
-    private void showDialog(String message) {
-        final Dialog dialog = new Dialog();
-        dialog.setTitle("Update publications");
-        dialog.setMessage(message);
-        dialog.setIcon("[SKIN]ask.png");
-        dialog.addCloseClickHandler(new CloseClickHandler() {
-            @Override
-            public void onCloseClick(CloseClickEvent event) {
-                dialog.destroy();
-            }
-        });
-        Button ok = new Button("OK");
-        ok.setWidth(180);
-        Button anyPublication = new Button("I don't have any publication to add");
-        anyPublication.setWidth(180);
-        dialog.setButtons(ok, anyPublication);
-        dialog.setIsModal(Boolean.TRUE);
-        anyPublication.addClickHandler(new ClickHandler() {
-            @Override
-            public void onClick(ClickEvent event) {
 
-                ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();
-                final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
-                    @Override
-                    public void onFailure(Throwable caught) {
-
-                        Layout.getInstance().setWarningMessage("can't update field lastUpdatePublication in VIPUsers " + caught.getMessage(), 10);
-                    }
-
-                    @Override
-                    public void onSuccess(Void result) {
-                        dialog.destroy();
-                    }
-                };
-                service.updateLastUpdatePublication(callback);
-            }
-        });
-        ok.addClickHandler(new ClickHandler() {
-            @Override
-            public void onClick(ClickEvent event) {
-                Layout.getInstance().addTab(
-                    CoreConstants.TAB_PUBLICATION, PublicationTab::new);
-                dialog.destroy();
-            }
-        });
-        dialog.draw();
-    }
 }

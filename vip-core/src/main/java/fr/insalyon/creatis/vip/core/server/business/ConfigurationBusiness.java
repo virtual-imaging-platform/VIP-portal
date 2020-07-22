@@ -944,19 +944,6 @@ public class ConfigurationBusiness {
             throw new BusinessException("Error changing email address", e);
         }
 
-        try {
-            // need to update publication separately as the table does not
-            // support foreign keys
-            updatePublicationOwner(oldEmail, newEmail, connection);
-        } catch (BusinessException e) {
-            // ignore the error as the email has been successfully
-            // changed and the user user should not have an error
-            // but send a message to admins
-            String errorMessage = "Error changing email from " + newEmail + " to " + newEmail
-                    + "in the Publication table";
-            logger.warn("Error changing pulications. Ignoring ({})", e.getMessage());
-            sendErrorEmailToAdmins(errorMessage, e, oldEmail, connection);
-        }
     }
 
     public void resetNextEmail(String currentEmail, Connection connection)
@@ -1288,72 +1275,6 @@ public class ConfigurationBusiness {
 
         }
         return user;
-    }
-
-    //Publications
-    /**
-     *
-     * @return @throws BusinessException
-     */
-    public List<Publication> getPublications(Connection connection)
-        throws BusinessException {
-        try {
-            return CoreDAOFactory.getDAOFactory().getPublicationDAO(connection)
-                .getList();
-        } catch (DAOException ex) {
-            throw new BusinessException(ex);
-        }
-    }
-
-    public void removePublication(Long id, Connection connection)
-        throws BusinessException {
-        try {
-            CoreDAOFactory.getDAOFactory().getPublicationDAO(connection)
-                .remove(id);
-        } catch (DAOException ex) {
-            throw new BusinessException(ex);
-        }
-    }
-
-    public void addPublication(Publication pub, Connection connection)
-        throws BusinessException {
-        try {
-            CoreDAOFactory.getDAOFactory().getPublicationDAO(connection)
-                .add(pub);
-        } catch (DAOException ex) {
-            throw new BusinessException(ex);
-        }
-    }
-
-    public void updatePublication(Publication pub, Connection connection)
-        throws BusinessException {
-        try {
-            CoreDAOFactory.getDAOFactory().getPublicationDAO(connection)
-                .update(pub);
-        } catch (DAOException ex) {
-            throw new BusinessException(ex);
-        }
-    }
-
-    public void updatePublicationOwner(
-        String oldOwnerEmail, String newOwnerEmail, Connection connection)
-        throws BusinessException {
-        try {
-            CoreDAOFactory.getDAOFactory().getPublicationDAO(connection)
-                .updateOwnerEmail(oldOwnerEmail, newOwnerEmail);
-        } catch (DAOException ex) {
-            throw new BusinessException(ex);
-        }
-    }
-
-    public Publication getPublication(Long id, Connection connection)
-        throws BusinessException {
-        try {
-            return CoreDAOFactory.getDAOFactory().getPublicationDAO(connection)
-                .getPublication(id);
-        } catch (DAOException ex) {
-            throw new BusinessException(ex);
-        }
     }
 
     public void addTermsUse(Connection connection)

@@ -29,14 +29,11 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL-B license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.core.server.dao.mysql;
+package fr.insalyon.creatis.vip.publication.server.dao.mysql;
 
-import fr.insalyon.creatis.vip.core.client.bean.Account;
-import fr.insalyon.creatis.vip.core.client.bean.Publication;
-import fr.insalyon.creatis.vip.core.client.bean.User;
-import fr.insalyon.creatis.vip.core.client.view.user.UserLevel;
+import fr.insalyon.creatis.vip.publication.client.bean.Publication;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
-import fr.insalyon.creatis.vip.core.server.dao.PublicationDAO;
+import fr.insalyon.creatis.vip.publication.server.dao.PublicationDAO;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -149,6 +146,7 @@ public class PublicationData implements PublicationDAO {
 
     @Override
     public List<Publication> getList() throws DAOException {
+        logger.info("PuBlicationData getList");
         try {
             String level = null;
             PreparedStatement ps;

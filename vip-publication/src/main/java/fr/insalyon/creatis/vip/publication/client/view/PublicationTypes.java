@@ -29,43 +29,28 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL-B license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.core.client.view.user.publication;
+package fr.insalyon.creatis.vip.publication.client.view;
 
-
-import com.smartgwt.client.data.DataSource;
-import com.smartgwt.client.data.fields.DataSourceDateField;
-import com.smartgwt.client.data.fields.DataSourceDateTimeField;
-import com.smartgwt.client.data.fields.DataSourceIntegerField;
-import com.smartgwt.client.data.fields.DataSourceTextField;
-import com.smartgwt.client.widgets.grid.ListGridField;
+import com.google.gwt.user.client.rpc.IsSerializable;
 
 /**
  *
- * @author Nouha Boujelben
+ * @author Nouha boujelben
  */
-public class Data extends DataSource {
+public enum PublicationTypes implements IsSerializable{
 
-    public Data() {
+    ConferenceArticle("Article In Conference Proceedings"), Journal("Journal Article"), BookChapter("Book Chapter"), Other("Other");
 
-        DataSourceIntegerField id = new DataSourceIntegerField("id", "Id");
-        id.setPrimaryKey(true);
-        id.setHidden(true);
-        
-        DataSourceTextField title = new DataSourceTextField("title", "Title");
-        
-        DataSourceTextField type = new DataSourceTextField("type", "type");
-        
-        DataSourceTextField typeName = new DataSourceTextField("typeName", "typeName");
-        
-        DataSourceTextField date = new DataSourceTextField("date", "date");
-        
-        DataSourceTextField authors = new DataSourceTextField("authors", "authors");
-        
-        DataSourceTextField doi = new DataSourceTextField("doi", "doi");
-             
-        setFields(id,title,type,typeName, date,authors,doi );
-        setClientOnly(true);
+    private PublicationTypes() {
+    }
+    private String value;
 
+    private PublicationTypes(String value) {
+        this.value = value;
+    }
 
+    @Override
+    public String toString() {
+        return value;
     }
 }

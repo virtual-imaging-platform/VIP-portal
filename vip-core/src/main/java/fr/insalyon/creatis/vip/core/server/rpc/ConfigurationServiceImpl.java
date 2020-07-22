@@ -40,7 +40,6 @@ import fr.insalyon.creatis.grida.client.GRIDAClientException;
 import fr.insalyon.creatis.vip.core.client.bean.Account;
 import fr.insalyon.creatis.vip.core.client.bean.DropboxAccountStatus;
 import fr.insalyon.creatis.vip.core.client.bean.Group;
-import fr.insalyon.creatis.vip.core.client.bean.Publication;
 import fr.insalyon.creatis.vip.core.client.bean.TermsOfUse;
 import fr.insalyon.creatis.vip.core.client.bean.UsageStats;
 import fr.insalyon.creatis.vip.core.client.bean.User;
@@ -49,7 +48,6 @@ import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants.GROUP_ROLE;
 import fr.insalyon.creatis.vip.core.client.view.CoreException;
 import fr.insalyon.creatis.vip.core.client.view.user.UserLevel;
-import fr.insalyon.creatis.vip.core.client.view.user.publication.PublicationTypes;
 import fr.insalyon.creatis.vip.core.client.view.util.CountryCode;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
@@ -1014,84 +1012,6 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
     }
 
     @Override
-    public List<Publication> getPublications() throws CoreException {
-        trace(logger, "Getting publication list.");
-        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
-            return configurationBusiness.getPublications(connection);
-        } catch (BusinessException ex) {
-            throw new CoreException(ex);
-        } catch (SQLException ex) {
-            logger.error("Error handling a connection", ex);
-            throw new CoreException(ex);
-        }
-    }
-
-    @Override
-    public void removePublication(Long id) throws CoreException {
-        trace(logger, "Removing publication.");
-
-        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
-            User user = getSessionUser();
-            if (user.isSystemAdministrator() ||
-                configurationBusiness
-                  .getPublication(id, connection)
-                  .getVipAuthor().equals(user.getEmail())) {
-                configurationBusiness.removePublication(id, connection);
-            } else {
-                logger.error("{} cannot remove publication {} because it's not his",
-                        user, id);
-                throw new CoreException("you can't remove a publication that is not yours");
-            }
-        } catch (BusinessException ex) {
-            throw new CoreException(ex);
-        } catch (SQLException ex) {
-            logger.error("Error handling a connection", ex);
-            throw new CoreException(ex);
-        }
-    }
-
-    @Override
-    public void addPublication(Publication pub) throws CoreException {
-        trace(logger, "Adding publication.");
-
-        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
-            User user = getSessionUser();
-            pub.setVipAuthor(user.getEmail());
-            configurationBusiness.addPublication(pub, connection);
-        } catch (BusinessException ex) {
-            throw new CoreException(ex);
-        } catch (SQLException ex) {
-            logger.error("Error handling a connection", ex);
-            throw new CoreException(ex);
-        }
-    }
-
-    @Override
-    public void updatePublication(Publication pub) throws CoreException {
-        trace(logger, "Updating publication.");
-
-        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
-            User user = getSessionUser();
-            if (user.isSystemAdministrator() ||
-                configurationBusiness
-                  .getPublication(pub.getId(), connection)
-                  .getVipAuthor().equals(user.getEmail())) {
-                pub.setVipAuthor(user.getEmail());
-                configurationBusiness.updatePublication(pub, connection);
-            } else {
-                logger.error("{} cannot modify publication {} because its not his",
-                        user.getEmail(), pub.getId());
-                throw new CoreException("you can't modify a publication that is not yours");
-            }
-        } catch (BusinessException ex) {
-            throw new CoreException(ex);
-        } catch (SQLException ex) {
-            logger.error("Error handling a connection", ex);
-            throw new CoreException(ex);
-        }
-    }
-
-    @Override
     public void addTermsUse() throws CoreException {
         trace(logger, "adding new terms of Use.");
         try(Connection connection = PlatformConnection.getInstance().getConnection()) {
@@ -1137,63 +1057,6 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
                     maxPlatformRunningSimulations, ex);
             throw new CoreException(ex);
         }
-    }
-
-    @Override
-    public List<Publication> parseBibtexText(String s) throws CoreException {
-        List<Publication> publications = new ArrayList<Publication>();
-        try {
-            Reader reader = new StringReader(s);
-            org.jbibtex.BibTeXParser bibtexParser = new org.jbibtex.BibTeXParser();
-            org.jbibtex.BibTeXDatabase database = bibtexParser.parseFully(reader);
-            Map<org.jbibtex.Key, org.jbibtex.BibTeXEntry> entryMap = database.getEntries();
-            Collection<org.jbibtex.BibTeXEntry> entries = entryMap.values();
-            for (org.jbibtex.BibTeXEntry entry : entries) {
-                String type = entry.getType().toString();
-                org.jbibtex.Value title = entry.getField(org.jbibtex.BibTeXEntry.KEY_TITLE);
-                org.jbibtex.Value date = entry.getField(org.jbibtex.BibTeXEntry.KEY_YEAR);
-                org.jbibtex.Value doi = entry.getField(org.jbibtex.BibTeXEntry.KEY_DOI);
-                org.jbibtex.Value authors = entry.getField(org.jbibtex.BibTeXEntry.KEY_AUTHOR);
-                org.jbibtex.Value typeName = entry.getField(org.jbibtex.BibTeXEntry.KEY_BOOKTITLE);
-                String doiv;
-                if (doi == null) {
-                    doiv = "";
-                } else {
-                    doiv = doi.toUserString();
-                }
-                publications.add(new Publication(title.toUserString(), date.toUserString(), doiv, authors.toUserString(), parseTypePublication(type), getTypeName(entry, type), getSessionUser().getEmail()));
-
-            }
-
-        } catch (ParseException | TokenMgrException ex) {
-            logger.error("Error parsing publication {}", s, ex);
-            throw new CoreException(ex);
-        }
-        return publications;
-    }
-
-    private String parseTypePublication(String type) {
-        if (type.equalsIgnoreCase("inproceedings") || type.equalsIgnoreCase("conference")) {
-            return PublicationTypes.ConferenceArticle.toString();
-        } else if (type.equalsIgnoreCase("article")) {
-            return PublicationTypes.Journal.toString();
-        } else if (type.equalsIgnoreCase("inbook") || type.equalsIgnoreCase("incollection")) {
-            return PublicationTypes.BookChapter.toString();
-        } else {
-            return PublicationTypes.Other.toString();
-        }
-
-    }
-
-    private String getTypeName(org.jbibtex.BibTeXEntry entry, String type) {
-        if (type.equalsIgnoreCase("inproceedings") || type.equalsIgnoreCase("conference") || type.equalsIgnoreCase("incollection")) {
-            return entry.getField(org.jbibtex.BibTeXEntry.KEY_BOOKTITLE).toUserString();
-        } else if (type.equalsIgnoreCase("article")) {
-            return entry.getField(org.jbibtex.BibTeXEntry.KEY_JOURNAL).toUserString();
-        } else {
-            return "";
-        }
-
     }
 
     @Override

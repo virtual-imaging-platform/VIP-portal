@@ -37,7 +37,6 @@ import com.google.gwt.user.client.rpc.ServiceDefTarget;
 import fr.insalyon.creatis.vip.core.client.bean.Account;
 import fr.insalyon.creatis.vip.core.client.bean.DropboxAccountStatus;
 import fr.insalyon.creatis.vip.core.client.bean.Group;
-import fr.insalyon.creatis.vip.core.client.bean.Publication;
 import fr.insalyon.creatis.vip.core.client.bean.TermsOfUse;
 import fr.insalyon.creatis.vip.core.client.bean.UsageStats;
 import fr.insalyon.creatis.vip.core.client.bean.User;
@@ -118,8 +117,6 @@ public interface ConfigurationService extends RemoteService {
 
     User cancelNewEmail() throws CoreException;
 
-    void updateUserEmail(String currentEmail, String newEmail) throws CoreException;
-
     void sendContactMail(String category, String subject, String comment) throws CoreException;
 
     void activateUser(String email) throws CoreException;
@@ -156,18 +153,6 @@ public interface ConfigurationService extends RemoteService {
     void unlinkDropboxAccount() throws CoreException;
 
     boolean testLastUpdatePublication() throws CoreException;
-
-    // public void getPostParameters() throws CoreException;
-    //Publications
-    List<Publication> getPublications() throws CoreException;
-
-    void removePublication(Long id) throws CoreException;
-
-    void addPublication(Publication pub) throws CoreException;
-
-    void updatePublication(Publication pub) throws CoreException;
-
-    List<Publication> parseBibtexText(String text) throws CoreException;
 
     //TermsOfUse
     void addTermsUse() throws CoreException;

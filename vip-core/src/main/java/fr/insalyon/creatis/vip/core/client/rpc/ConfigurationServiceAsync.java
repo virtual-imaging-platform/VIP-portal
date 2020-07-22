@@ -35,7 +35,6 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import fr.insalyon.creatis.vip.core.client.bean.Account;
 import fr.insalyon.creatis.vip.core.client.bean.DropboxAccountStatus;
 import fr.insalyon.creatis.vip.core.client.bean.Group;
-import fr.insalyon.creatis.vip.core.client.bean.Publication;
 import fr.insalyon.creatis.vip.core.client.bean.TermsOfUse;
 import fr.insalyon.creatis.vip.core.client.bean.UsageStats;
 import fr.insalyon.creatis.vip.core.client.bean.User;
@@ -102,8 +101,6 @@ public interface ConfigurationServiceAsync {
 
     void cancelNewEmail(AsyncCallback<User> async);
 
-    void updateUserEmail(String currentEmail, String newEmail, AsyncCallback<Void> async);
-
     void sendContactMail(String category, String subject, String comment, AsyncCallback<Void> asyncCallback);
 
     void activateUser(String email, AsyncCallback<Void> asyncCallback);
@@ -142,16 +139,6 @@ public interface ConfigurationServiceAsync {
     void testLastUpdatePublication(AsyncCallback<Boolean> asyncCallback);
 
     // public void getPostParameters(AsyncCallback<Void> asyncCallback);
-    //publications
-    void getPublications(AsyncCallback<List<Publication>> asyncCallback);
-
-    void removePublication(Long id, AsyncCallback<Void> asyncCallback);
-
-    void addPublication(Publication pub, AsyncCallback<Void> asyncCallback);
-
-    void updatePublication(Publication pub, AsyncCallback<Void> asyncCallback);
-
-    void parseBibtexText(String text, AsyncCallback<List<Publication>> asyncCallback);
 
     //TermsOfUse
     void addTermsUse(AsyncCallback<Void> asyncCallback);

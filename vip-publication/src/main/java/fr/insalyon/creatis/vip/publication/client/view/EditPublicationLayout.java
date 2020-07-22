@@ -29,7 +29,7 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL-B license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.core.client.view.user.publication;
+package fr.insalyon.creatis.vip.publication.client.view;
 
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -41,12 +41,11 @@ import com.smartgwt.client.widgets.form.fields.ComboBoxItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
-import fr.insalyon.creatis.vip.core.client.bean.Publication;
-import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationService;
+import fr.insalyon.creatis.vip.publication.client.bean.Publication;
+import fr.insalyon.creatis.vip.publication.client.rpc.PublicationService;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.common.AbstractFormLayout;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
-import fr.insalyon.creatis.vip.core.client.view.user.PublicationTab;
 import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
 import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
 import java.util.ArrayList;
@@ -73,7 +72,7 @@ public class EditPublicationLayout extends AbstractFormLayout {
     public EditPublicationLayout() {
 
         super("100%", "50%");
-        addTitle("Add/Edit Publications", CoreConstants.ICON_PUBLICATION);
+        addTitle("Add/Edit Publications", PublicationConstants.ICON_PUBLICATION);
         configure();
     }
 
@@ -172,9 +171,9 @@ public class EditPublicationLayout extends AbstractFormLayout {
         WidgetUtil.setLoadingIButton(saveButton, "Saving...");
 
         if (newPublication) {
-            ConfigurationService.Util.getInstance().addPublication(pub, getCallback("add"));
+            PublicationService.Util.getInstance().addPublication(pub, getCallback("add"));
         } else {
-            ConfigurationService.Util.getInstance().updatePublication(pub, getCallback("update"));
+            PublicationService.Util.getInstance().updatePublication(pub, getCallback("update"));
         }
     }
 
@@ -191,7 +190,7 @@ public class EditPublicationLayout extends AbstractFormLayout {
 
                 setPublication(null, null, null, null, null, null, null, null);
                 PublicationTab pubTab = (PublicationTab) Layout.getInstance().
-                        getTab(CoreConstants.TAB_PUBLICATION);
+                        getTab(PublicationConstants.TAB_PUBLICATION);
                 pubTab.loadPublication();
             }
         };

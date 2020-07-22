@@ -29,23 +29,23 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL-B license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.core.client.view.user.publication;
+package fr.insalyon.creatis.vip.publication.client.view;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.types.Overflow;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
-import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.layout.VLayout;
-import fr.insalyon.creatis.vip.core.client.bean.Publication;
 import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationService;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 import fr.insalyon.creatis.vip.core.client.view.common.LabelButton;
 import fr.insalyon.creatis.vip.core.client.view.common.ToolstripLayout;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
-import fr.insalyon.creatis.vip.core.client.view.user.PublicationTab;
 import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
+import fr.insalyon.creatis.vip.publication.client.bean.Publication;
+import fr.insalyon.creatis.vip.publication.client.rpc.PublicationService;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -134,13 +134,13 @@ public class PublicationLayout extends VLayout {
             }
         };
       modal.show("Loading Publications...", true);
-        ConfigurationService.Util.getInstance().getPublications(callback);
+        PublicationService.Util.getInstance().getPublications(callback);
     }
 
     protected static void edit(String id, String title, String type, String typeName, String authors, String date, String doi, String vipApplication) {
 
         PublicationTab pubTab = (PublicationTab) Layout.getInstance().
-                getTab(CoreConstants.TAB_PUBLICATION);
+                getTab(PublicationConstants.TAB_PUBLICATION);
         pubTab.setPublication(id, title, type, typeName, authors, date, doi, vipApplication);
     }
 

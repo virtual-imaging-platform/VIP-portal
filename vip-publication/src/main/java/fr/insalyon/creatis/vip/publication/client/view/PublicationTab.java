@@ -29,19 +29,14 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL-B license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.core.client.view.user;
+package fr.insalyon.creatis.vip.publication.client.view;
 
 import com.smartgwt.client.types.Overflow;
 import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.tab.Tab;
-import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
-import fr.insalyon.creatis.vip.core.client.view.user.publication.BibtexLayout;
-import fr.insalyon.creatis.vip.core.client.view.user.publication.EditPublicationLayout;
-import fr.insalyon.creatis.vip.core.client.view.user.publication.PublicationInfoTab;
-import fr.insalyon.creatis.vip.core.client.view.user.publication.PublicationLayout;
 
 /**
  *
@@ -55,9 +50,9 @@ public class PublicationTab extends Tab {
     private ModalWindow modal;
 
     public PublicationTab() {
-        this.setTitle(Canvas.imgHTML(CoreConstants.ICON_PUBLICATION) + " "
-                + CoreConstants.APP_PUBLICATIONS);
-        this.setID(CoreConstants.TAB_PUBLICATION);
+        this.setTitle(Canvas.imgHTML(PublicationConstants.ICON_PUBLICATION) + " "
+                + PublicationConstants.APP_PUBLICATIONS);
+        this.setID(PublicationConstants.TAB_PUBLICATION);
         this.setCanClose(true);
         VLayout vLayout = new VLayout(5);
         vLayout.setWidth100();

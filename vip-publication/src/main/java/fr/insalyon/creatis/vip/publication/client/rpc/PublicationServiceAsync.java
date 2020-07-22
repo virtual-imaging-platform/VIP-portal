@@ -29,27 +29,25 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL-B license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.core.server.dao;
+package fr.insalyon.creatis.vip.publication.client.rpc;
 
-import fr.insalyon.creatis.vip.core.client.bean.Account;
-import fr.insalyon.creatis.vip.core.client.bean.Publication;
+import com.google.gwt.user.client.rpc.AsyncCallback;
+import fr.insalyon.creatis.vip.publication.client.bean.Publication;
 import java.util.List;
 
 /**
  *
- * @author Nouha Boujelben
+ * @author Rafael Ferreira da Silva, Sorina Pop
  */
-public interface PublicationDAO {
+public interface PublicationServiceAsync {
 
-    public void add(Publication publication) throws DAOException;
+    void getPublications(AsyncCallback<List<Publication>> asyncCallback);
 
-    public void update(Publication publication) throws DAOException;
+    void removePublication(Long id, AsyncCallback<Void> asyncCallback);
 
-    void updateOwnerEmail(String oldOwnerEmail, String newOwnerEmail) throws DAOException;
+    void addPublication(Publication pub, AsyncCallback<Void> asyncCallback);
 
-    public void remove(Long publicationID) throws DAOException;
-    
-    public Publication getPublication(Long publicationID) throws DAOException;
+    void updatePublication(Publication pub, AsyncCallback<Void> asyncCallback);
 
-    public List<Publication> getList() throws DAOException;
+    void parseBibtexText(String text, AsyncCallback<List<Publication>> asyncCallback);
 }
