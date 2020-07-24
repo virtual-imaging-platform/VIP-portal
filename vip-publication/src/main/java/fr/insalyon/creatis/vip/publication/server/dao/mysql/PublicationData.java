@@ -56,14 +56,15 @@ public class PublicationData implements PublicationDAO {
         this.connection = connection;
     }
 
+    //TODO Sorina : when testing is over, change VIPNewPublication to VIPPublication
     @Override
     public void add(Publication pub) throws DAOException {
 
         PreparedStatement ps = null;
         try {
             ps = connection.prepareStatement(
-                    "INSERT INTO VIPPublication(title,date,doi,authors,type,typeName,vipAuthor) "
-                    + "VALUES (?, ?, ?, ?, ?, ?, ?)");
+                    "INSERT INTO VIPNewPublication(title,date,doi,authors,type,typeName,vipAuthor,vipApplication) "
+                    + "VALUES (?, ?, ?, ?, ?, ?, ?,?)");
 
             ps.setString(1, pub.getTitle());
             ps.setString(2, pub.getDate());
@@ -72,6 +73,7 @@ public class PublicationData implements PublicationDAO {
             ps.setString(5, pub.getType());
             ps.setString(6, pub.getTypeName());
             ps.setString(7, pub.getVipAuthor());
+            ps.setString(8, pub.getVipApplication());
             ps.execute();
             ps.close();
         } catch (SQLException ex) {
@@ -85,8 +87,8 @@ public class PublicationData implements PublicationDAO {
         try {
 
             PreparedStatement ps = connection.prepareStatement("UPDATE "
-                    + "VIPPublication "
-                    + "SET title=?, date=?, doi=?, authors=?, type=?, typeName=?,vipAuthor=? "
+                    + "VIPNewPublication "
+                    + "SET title=?, date=?, doi=?, authors=?, type=?, typeName=?,vipAuthor=?,vipApplication=? "
                     + "WHERE id=?");
 
             ps.setString(1, publication.getTitle());
@@ -96,7 +98,8 @@ public class PublicationData implements PublicationDAO {
             ps.setString(5, publication.getType());
             ps.setString(6, publication.getTypeName());
             ps.setString(7, publication.getVipAuthor());
-            ps.setLong(8, publication.getId());
+            ps.setString(8, publication.getVipApplication());
+            ps.setLong(9, publication.getId());
             ps.executeUpdate();
             ps.close();
 
@@ -108,31 +111,10 @@ public class PublicationData implements PublicationDAO {
     }
 
     @Override
-    public void updateOwnerEmail(String oldOwnerEmail, String newOwnerEmail) throws DAOException {
-        try {
-
-            PreparedStatement ps = connection.prepareStatement("UPDATE "
-                    + "VIPPublication "
-                    + "SET vipAuthor=? "
-                    + "WHERE vipAuthor=?");
-
-            ps.setString(1, newOwnerEmail);
-            ps.setString(2, oldOwnerEmail);
-            ps.executeUpdate();
-            ps.close();
-
-        } catch (SQLException ex) {
-            logger.error("Error updating publications owner from {} to {}", oldOwnerEmail, newOwnerEmail, ex);
-            throw new DAOException(ex);
-        }
-
-    }
-
-    @Override
     public void remove(Long id) throws DAOException {
         try {
             PreparedStatement ps = connection.prepareStatement("DELETE "
-                    + "FROM VIPPublication WHERE id=?");
+                    + "FROM VIPNewPublication WHERE id=?");
 
             ps.setLong(1, id);
             ps.execute();
@@ -152,8 +134,8 @@ public class PublicationData implements PublicationDAO {
             PreparedStatement ps;
 
             ps = connection.prepareStatement("SELECT "
-                    + "id,title,date,doi,authors,type,typeName,VIPAuthor FROM "
-                    + "VIPPublication");
+                    + "id,title,date,doi,authors,type,typeName,VIPAuthor,VipApplication FROM "
+                    + "VIPNewPublication");
 
             ResultSet rs = ps.executeQuery();
 
@@ -161,7 +143,7 @@ public class PublicationData implements PublicationDAO {
 
             while (rs.next()) {
 
-                publications.add(new Publication(rs.getLong("id"), rs.getString("title"), rs.getString("date"), rs.getString("doi"), rs.getString("authors"), rs.getString("type"), rs.getString("typeName"), rs.getString("VIPAuthor")));
+                publications.add(new Publication(rs.getLong("id"), rs.getString("title"), rs.getString("date"), rs.getString("doi"), rs.getString("authors"), rs.getString("type"), rs.getString("typeName"), rs.getString("VIPAuthor"), rs.getString("VIPApplication")));
             }
 
             rs.close();
@@ -188,7 +170,7 @@ public class PublicationData implements PublicationDAO {
 
             Publication p = null;
             if (rs.next()) {
-                p = new Publication(rs.getLong("id"), rs.getString("title"), rs.getString("date"), rs.getString("doi"), rs.getString("authors"), rs.getString("type"), rs.getString("typeName"), rs.getString("VIPAuthor"));
+                p = new Publication(rs.getLong("id"), rs.getString("title"), rs.getString("date"), rs.getString("doi"), rs.getString("authors"), rs.getString("type"), rs.getString("typeName"), rs.getString("VIPAuthor"), rs.getString("VIPApplication"));
             }
 
             rs.close();

@@ -32,22 +32,61 @@
 package fr.insalyon.creatis.vip.publication.server.dao;
 
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
+import fr.insalyon.creatis.vip.core.server.dao.mysql.PlatformConnection;
 import fr.insalyon.creatis.vip.publication.server.dao.mysql.PublicationData;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
+import java.sql.SQLException;
 
 /**
  *
  * @author Rafael Ferreira da Silva,Nouha boujelben
  */
 public class MySQLDAOFactory extends PublicationDAOFactory {
+
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     private static PublicationDAOFactory instance;
+
     // Singleton
     protected static PublicationDAOFactory getInstance() {
         if (instance == null) {
             instance = new MySQLDAOFactory();
         }
         return instance;
+    }
+
+    private MySQLDAOFactory() {
+
+        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
+
+            //Attention, for testing purposes, we work on a new InnoDB VIPNewPublication DB
+            //TODO when tests are finished, rename tables and update code to point to the prod VIPPublication table
+            logger.info("Configuring VIP New Publication database.");
+
+            PlatformConnection.getInstance().createTable(
+                    connection,
+                    "VIPNewPublication",
+                    "id INT(11) NOT NULL AUTO_INCREMENT, "
+                            + "title text, "
+                            + "date VARCHAR(45), "
+                            + "doi VARCHAR(255), "
+                            + "authors text, "
+                            + "type VARCHAR(255), "
+                            + "typeName VARCHAR(255), "
+                            + "vipAuthor VARCHAR(255), "
+                            + "vipApplication VARCHAR(255), "
+                            + "PRIMARY KEY (id), "
+                            + "FOREIGN KEY (vipAuthor) REFERENCES VIPUsers(email) "
+                            + "ON DELETE SET NULL ON UPDATE CASCADE, "
+                            + "FOREIGN KEY (vipApplication) REFERENCES VIPApplications(name) "
+                            + "ON DELETE SET NULL ON UPDATE CASCADE");
+
+
+        } catch (SQLException ex) {
+            logger.error("Error initialising VIPPublication database", ex);
+        }
     }
 
     @Override

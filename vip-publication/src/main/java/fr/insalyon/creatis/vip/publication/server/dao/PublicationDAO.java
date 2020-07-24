@@ -46,8 +46,6 @@ public interface PublicationDAO {
 
     public void update(Publication publication) throws DAOException;
 
-    void updateOwnerEmail(String oldOwnerEmail, String newOwnerEmail) throws DAOException;
-
     public void remove(Long publicationID) throws DAOException;
     
     public Publication getPublication(Long publicationID) throws DAOException;

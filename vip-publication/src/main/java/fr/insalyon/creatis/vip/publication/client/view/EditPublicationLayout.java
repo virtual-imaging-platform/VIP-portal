@@ -41,6 +41,9 @@ import com.smartgwt.client.widgets.form.fields.ComboBoxItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
+import fr.insalyon.creatis.vip.application.client.bean.Application;
+import fr.insalyon.creatis.vip.application.client.rpc.ApplicationService;
+import fr.insalyon.creatis.vip.application.client.rpc.ApplicationServiceAsync;
 import fr.insalyon.creatis.vip.publication.client.bean.Publication;
 import fr.insalyon.creatis.vip.publication.client.rpc.PublicationService;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
@@ -48,9 +51,8 @@ import fr.insalyon.creatis.vip.core.client.view.common.AbstractFormLayout;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
 import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+
+import java.util.*;
 
 /**
  *
@@ -87,14 +89,13 @@ public class EditPublicationLayout extends AbstractFormLayout {
 
         vipApplication = new ComboBoxItem();
         vipApplication.setWidth(250);
-        vipApplication.setValueMap(getApplicationsList());
+        loadApplications();
         vipApplication.setDefaultValue("");
         vipApplication.setShowTitle(false);
 
         titleField = FieldUtil.getTextItem(500, null);
         doiField = FieldUtil.getTextItem(500, null);
         authorsField = FieldUtil.getTextItem(500, null);
-
 
         publicationType = new ComboBoxItem();
         publicationType.setWidth(250);
@@ -125,12 +126,11 @@ public class EditPublicationLayout extends AbstractFormLayout {
 
         saveButton = WidgetUtil.getIButton("Add", CoreConstants.ICON_ADD,
                 new ClickHandler() {
-            @Override
-            public void onClick(ClickEvent event) {
-                save(new Publication(idPub, titleField.getValueAsString(), publicationDate.getValueAsString().toString().substring(0, 4), doiField.getValueAsString(), authorsField.getValueAsString(), publicationType.getValueAsString(), publicationTypeName.getValueAsString(), vipApplication.getValueAsString()));
-            }
-        });
-
+                    @Override
+                    public void onClick(ClickEvent event) {
+                        save(new Publication(idPub, titleField.getValueAsString(), publicationDate.getValueAsString().toString().substring(0, 4), doiField.getValueAsString(), authorsField.getValueAsString(), publicationType.getValueAsString(), publicationTypeName.getValueAsString(), vipApplication.getValueAsString()));
+                    }
+                });
 
 
         addButtons(saveButton);
@@ -206,12 +206,25 @@ public class EditPublicationLayout extends AbstractFormLayout {
         return values.toArray(yearTable);
     }
 
-    public String[] getApplicationsList() {
-        //TODO have a callback retrieving the application list from the VIP database
-        List<String> values = new ArrayList<String>();
-        values.add("GATE");
-        values.add("Freesurfer");
-        String[] appliTable = new String[values.size()];
-        return values.toArray(appliTable);
+    private void loadApplications() {
+
+        ApplicationServiceAsync service = ApplicationService.Util.getInstance();
+        final AsyncCallback<List<Application>> callback = new AsyncCallback<List<Application>>() {
+            @Override
+            public void onFailure(Throwable caught) {
+                Layout.getInstance().setWarningMessage("Unable to get applications list:<br />" + caught.getMessage());
+            }
+
+            @Override
+            public void onSuccess(List<Application> result) {
+                Map<String, String> applicationsMap = new LinkedHashMap<String, String>();
+                for (Application a : result) {
+                    String applicationName = a.getName();
+                    applicationsMap.put(applicationName, applicationName);
+                }
+                vipApplication.setValueMap(applicationsMap);
+            }
+        };
+        service.getUserApplications(callback);
     }
 }

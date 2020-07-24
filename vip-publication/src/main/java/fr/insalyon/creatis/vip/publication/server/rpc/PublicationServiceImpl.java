@@ -168,7 +168,9 @@ public class PublicationServiceImpl extends AbstractRemoteServiceServlet impleme
                 } else {
                     doiv = doi.toUserString();
                 }
-                publications.add(new Publication(title.toUserString(), date.toUserString(), doiv, authors.toUserString(), parseTypePublication(type), getTypeName(entry, type), getSessionUser().getEmail()));
+                //TODO Sorina : handle VIPApplication in this case
+                String VipApplication = "";
+                publications.add(new Publication(title.toUserString(), date.toUserString(), doiv, authors.toUserString(), parseTypePublication(type), getTypeName(entry, type), getSessionUser().getEmail(), VipApplication));
 
             }
 

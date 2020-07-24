@@ -48,6 +48,7 @@ import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -240,6 +241,23 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
         try(Connection connection = PlatformConnection.getInstance().getConnection()) {
             return applicationBusiness.getApplications(className, connection);
         } catch (BusinessException ex) {
+            throw new ApplicationException(ex);
+        } catch (SQLException ex) {
+            logger.error("Error handling a connection", ex);
+            throw new ApplicationException(ex);
+        }
+    }
+
+    public List<Application> getUserApplications() throws ApplicationException {
+        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
+            List<AppClass> classes = classBusiness.getUserClasses(
+                    getSessionUser().getEmail(), false, connection);
+            List<String> classNames = new ArrayList<>();
+            for (AppClass c : classes) {
+                classNames.add(c.getName());
+            }
+            return applicationBusiness.getApplications(classNames, connection);
+        } catch (BusinessException | CoreException ex) {
             throw new ApplicationException(ex);
         } catch (SQLException ex) {
             logger.error("Error handling a connection", ex);
