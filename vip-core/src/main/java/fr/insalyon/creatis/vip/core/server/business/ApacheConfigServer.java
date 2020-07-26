@@ -52,13 +52,12 @@ import java.util.List;
 @Component
 // to avoid bean being created in tests
 // although the vif.conf file does not exist and causes an (silent error)
-@Profile({"default", "prod", "vip-conf-file"})
+@Profile({"default", "prod", "apache-config-server"})
 public class ApacheConfigServer implements Server {
     // Configuration File
     PropertiesConfiguration config;
     // Constants
     private final Logger logger = LoggerFactory.getLogger(getClass());
-    private final String CONF_FILE = "vip.conf";
     private final String PROXIES_DIR = "proxies/";
     // Portal
     private String configurationFolder;

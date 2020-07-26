@@ -1,7 +1,6 @@
 package fr.insalyon.creatis.vip.integrationtest;
 
 import fr.insalyon.creatis.grida.client.GRIDAClient;
-import fr.insalyon.creatis.vip.api.business.ApiPropertiesInitializer;
 import fr.insalyon.creatis.vip.api.security.SpringCompatibleUser;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.util.CountryCode;
@@ -29,12 +28,10 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@SpringJUnitWebConfig(
-        value = SpringCoreConfig.class,
-        initializers = ApiPropertiesInitializer.class)
+@SpringJUnitWebConfig(value = SpringCoreConfig.class)
 // launch all spring environment for testing, also take test bean though automatic package scan
 @ActiveProfiles({"test-db", "test"}) // to take random h2 database and not the test h2 jndi one
-@TestPropertySource(properties = "db.tableEngine=") // to disable the default mysql/innodb engine on database init
+@TestPropertySource(properties = {"db.tableEngine="}) // to disable the default mysql/innodb engine on database init
 @Transactional
 public class VipWebConfigurationIT {
 
@@ -68,6 +65,15 @@ public class VipWebConfigurationIT {
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$[*]", Matchers.hasSize(5)));
+    }
+
+    @Test
+    public void testGetPlatformProperties() throws Exception {
+        mockMvc.perform(get("/rest/platform"))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.platformName").value("VIP_TEST"));
     }
 
 

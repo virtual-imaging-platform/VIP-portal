@@ -46,6 +46,7 @@ import fr.insalyon.creatis.vip.core.client.view.CoreException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -66,6 +67,9 @@ public class PlatformController extends ApiController{
 
     private final Environment env;
 
+    @Value("${carmin.platform.name}")
+    private String platformName;
+
     @Autowired
     public PlatformController(Supplier<User> currentUserSupplier, Environment env) {
         super(currentUserSupplier);
@@ -76,7 +80,7 @@ public class PlatformController extends ApiController{
     public PlatformProperties getPlatformProperties() throws ApiException {
         logMethodInvocation(logger, "getPlatformProperties");
         PlatformProperties platformProperties = new PlatformProperties();
-        platformProperties.setPlatformName(env.getProperty(PLATFORM_NAME));
+        platformProperties.setPlatformName(platformName);
         platformProperties.setPlatformDescription(env.getProperty(PLATFORM_DESCRIPTION));
         platformProperties.setSupportedTransferProtocols(Arrays.asList(
                 env.getRequiredProperty(SUPPORTED_TRANSFER_PROTOCOLS, SupportedTransferProtocol[].class)

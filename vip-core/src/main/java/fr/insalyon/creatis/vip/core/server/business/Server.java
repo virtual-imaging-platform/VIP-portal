@@ -6,7 +6,9 @@ import java.util.HashMap;
 import java.util.List;
 
 public interface Server {
+
     String VIP_DIR = "/.vip/";
+    String CONF_FILE = "vip.conf";
 
     String getDatabaseServerHost();
 

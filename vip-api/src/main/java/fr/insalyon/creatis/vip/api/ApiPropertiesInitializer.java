@@ -29,20 +29,23 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL-B license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.api.business;
+package fr.insalyon.creatis.vip.api;
 
 import fr.insalyon.creatis.vip.api.model.Module;
 import fr.insalyon.creatis.vip.api.model.SupportedTransferProtocol;
 import fr.insalyon.creatis.vip.core.server.business.Server;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.ApplicationContextInitializer;
-import org.springframework.core.env.Environment;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.ResourcePropertySource;
+import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
-import org.springframework.web.context.*;
 
+import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.util.Optional;
 
@@ -52,28 +55,33 @@ import static org.springframework.core.io.ResourceLoader.CLASSPATH_URL_PREFIX;
 /**
  * Created by abonnet on 5/7/18.
  */
-public class ApiPropertiesInitializer implements ApplicationContextInitializer<ConfigurableWebApplicationContext> {
+@Component
+public class ApiPropertiesInitializer {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    @Override
-    public void initialize(ConfigurableWebApplicationContext applicationContext) {
-        try {
-            applicationContext.getEnvironment().getPropertySources().addLast(
-                    new ResourcePropertySource(getApiConfRessource(applicationContext))
-            );
-            verifyProperties(applicationContext.getEnvironment());
-        } catch (IOException e) {
-            logger.error("Cant't init api conf file");
-            throw new RuntimeException("Error initializing api conf", e);
-        }
+    private ConfigurableEnvironment env;
+    private ApplicationContext applicationContext;
+
+    @Autowired
+    public ApiPropertiesInitializer(ConfigurableApplicationContext configurableApplicationContext) {
+        this.env = configurableApplicationContext.getEnvironment();
+        this.applicationContext = configurableApplicationContext;
     }
 
-    private Resource getApiConfRessource(ConfigurableWebApplicationContext applicationContext) {
+    @PostConstruct
+    public void init() throws IOException {
+        env.getPropertySources().addLast(
+                new ResourcePropertySource(getApiConfRessource())
+        );
+        verifyProperties();
+    }
+
+    private Resource getApiConfRessource() {
         // first look by profile in classpath
         Resource configFile;
         for (String activeProfile :
-                applicationContext.getEnvironment().getActiveProfiles()) {
+                env.getActiveProfiles()) {
             configFile = applicationContext.getResource(getProfileApiConfLocation(activeProfile));
             if (configFile.exists()) {
                 return configFile;
@@ -97,7 +105,7 @@ public class ApiPropertiesInitializer implements ApplicationContextInitializer<C
     }
 
     private String getHomeApiConfLocation() {
-        String homePath = System.getenv("HOME") + Server.VIP_DIR;
+        String homePath = env.getProperty("user.home") + Server.VIP_DIR;
         return getApiConfLocation("file:" + homePath, Optional.empty());
     }
 
@@ -108,22 +116,22 @@ public class ApiPropertiesInitializer implements ApplicationContextInitializer<C
         return sb.append(".conf").toString();
     }
 
-    private void verifyProperties(Environment env) {
+    private void verifyProperties() {
 
-        verifyPropertyNotNull(env, CORS_AUTHORIZED_DOMAINS, String[].class);
-        verifyPropertyNotNull(env, PLATFORM_NAME, String.class);
-        verifyPropertyNotNull(env, PLATFORM_DESCRIPTION, String.class);
-        verifyPropertyNotNull(env, PLATFORM_EMAIL, String.class);
-        verifyPropertyNotNull(env, DEFAULT_LIMIT_LIST_EXECUTION, Long.class);
-        verifyPropertyNotNull(env, SUPPORTED_API_VERSION, String.class);
-        verifyPropertyNotNull(env, APIKEY_HEADER_NAME, String.class);
-        verifyPropertyNotNull(env, APIKEY_GENERATE_NEW_EACH_TIME, Boolean.class);
-        verifyPropertyNotNull(env, API_DIRECTORY_MIME_TYPE, String.class);
-        verifyPropertyNotNull(env, API_DEFAULT_MIME_TYPE, String.class);
-        verifyPropertyNotNull(env, API_DOWNLOAD_RETRY_IN_SECONDS, Integer.class);
-        verifyPropertyNotNull(env, API_DOWNLOAD_TIMEOUT_IN_SECONDS, Integer.class);
-        verifyPropertyNotNull(env, API_DATA_TRANSFERT_MAX_SIZE, Long.class);
-        verifyPropertyNotNull(env, API_DATA_DOWNLOAD_RELATIVE_PATH, String.class);
+        verifyPropertyNotNull(CORS_AUTHORIZED_DOMAINS, String[].class);
+        verifyPropertyNotNull(PLATFORM_NAME, String.class);
+        verifyPropertyNotNull(PLATFORM_DESCRIPTION, String.class);
+        verifyPropertyNotNull(PLATFORM_EMAIL, String.class);
+        verifyPropertyNotNull(DEFAULT_LIMIT_LIST_EXECUTION, Long.class);
+        verifyPropertyNotNull(SUPPORTED_API_VERSION, String.class);
+        verifyPropertyNotNull(APIKEY_HEADER_NAME, String.class);
+        verifyPropertyNotNull(APIKEY_GENERATE_NEW_EACH_TIME, Boolean.class);
+        verifyPropertyNotNull(API_DIRECTORY_MIME_TYPE, String.class);
+        verifyPropertyNotNull(API_DEFAULT_MIME_TYPE, String.class);
+        verifyPropertyNotNull(API_DOWNLOAD_RETRY_IN_SECONDS, Integer.class);
+        verifyPropertyNotNull(API_DOWNLOAD_TIMEOUT_IN_SECONDS, Integer.class);
+        verifyPropertyNotNull(API_DATA_TRANSFERT_MAX_SIZE, Long.class);
+        verifyPropertyNotNull(API_DATA_DOWNLOAD_RELATIVE_PATH, String.class);
 
         // due to arrays and generics, this verification aren't easy to factorize
         Assert.notEmpty(env.getProperty(SUPPORTED_TRANSFER_PROTOCOLS, SupportedTransferProtocol[].class),
@@ -137,7 +145,7 @@ public class ApiPropertiesInitializer implements ApplicationContextInitializer<C
 
     }
 
-    private void verifyPropertyNotNull(Environment env, String propertyKey, Class<?> targetType) {
+    private void verifyPropertyNotNull(String propertyKey, Class<?> targetType) {
         Assert.notNull(env.getProperty(propertyKey, targetType),
                 propertyKey + " required in api conf file");
     }

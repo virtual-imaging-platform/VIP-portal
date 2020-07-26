@@ -82,7 +82,7 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
                 .anyRequest().permitAll()
             .and()
             .apply(new ApikeyAuthentificationConfigurer<>(
-                    env.getProperty(CarminProperties.APIKEY_HEADER_NAME),
+                    env.getRequiredProperty(CarminProperties.APIKEY_HEADER_NAME),
                     apikeyAuthenticationEntryPoint))
             .and()
             .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)

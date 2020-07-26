@@ -33,11 +33,19 @@ package fr.insalyon.creatis.vip.api;
 
 import fr.insalyon.creatis.vip.api.business.VipConfigurer;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.Environment;
+import org.springframework.core.env.MutablePropertySources;
+import org.springframework.core.env.PropertiesPropertySource;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.support.ResourcePropertySource;
 import org.springframework.web.servlet.config.annotation.*;
 
+import java.io.IOException;
 import java.util.Collections;
 
 import static fr.insalyon.creatis.vip.api.CarminProperties.CORS_AUTHORIZED_DOMAINS;
@@ -83,7 +91,7 @@ public class SpringWebConfig implements WebMvcConfigurer {
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
             .allowedMethods("GET", "POST", "PUT", "DELETE", "HEAD")
-            .allowedOrigins(env.getProperty(CORS_AUTHORIZED_DOMAINS, String[].class, new String[0]));
+            .allowedOrigins(env.getRequiredProperty(CORS_AUTHORIZED_DOMAINS, String[].class)); // todo, new String[0]));
     }
 
     @Override

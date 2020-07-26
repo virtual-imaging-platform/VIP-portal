@@ -8,6 +8,7 @@ import fr.insalyon.creatis.sma.client.SMAClient;
 import fr.insalyon.creatis.vip.core.server.business.Server;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.*;
+import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.jdbc.datasource.DataSourceUtils;
 import org.springframework.jdbc.datasource.LazyConnectionDataSourceProxy;
@@ -75,4 +76,11 @@ public class SpringCoreConfig {
     public SMAClient smaClient(Server server) {
         return new SMAClient(server.getSMAHost(), server.getSMAPort());
     }
+
+    // to verify the @Value injection existance
+    @Bean
+    public static PropertySourcesPlaceholderConfigurer properties(){
+        return new PropertySourcesPlaceholderConfigurer();
+    }
+
 }
