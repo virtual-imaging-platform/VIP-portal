@@ -68,8 +68,6 @@ public interface ApplicationService extends RemoteService {
     
     public List<String[]> getApplications(String className) throws ApplicationException;
 
-    public List<Application> getUserApplications() throws ApplicationException;
-
     public List<String[]> getApplicationsByClass(String className) throws ApplicationException;
     
     public List<AppVersion> getVersions(String applicationName) throws ApplicationException;

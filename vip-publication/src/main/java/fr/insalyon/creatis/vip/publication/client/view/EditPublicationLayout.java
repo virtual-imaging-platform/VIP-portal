@@ -225,6 +225,6 @@ public class EditPublicationLayout extends AbstractFormLayout {
                 vipApplication.setValueMap(applicationsMap);
             }
         };
-        service.getUserApplications(callback);
+        service.getApplications(callback);
     }
 }

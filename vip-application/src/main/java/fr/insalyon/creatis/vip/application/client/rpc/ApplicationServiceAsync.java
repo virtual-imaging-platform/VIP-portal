@@ -97,5 +97,4 @@ public interface ApplicationServiceAsync {
     
     public void getReservedClasses(AsyncCallback <HashMap<String, Integer>> asyncCallback);
 
-    void getUserApplications(AsyncCallback<List<Application>> callback);
 }
