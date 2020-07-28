@@ -5,6 +5,8 @@ import fr.insalyon.creatis.vip.application.client.view.monitor.SimulationStatus;
 import fr.insalyon.creatis.vip.application.server.business.simulation.ParameterSweep;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.DependsOn;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
@@ -23,6 +25,7 @@ import java.util.stream.Collectors;
 
 @Component
 @Profile("local")
+@Lazy
 public class LocalBashEngine {
 
     @Value("${local.workflow.dir}")
@@ -37,9 +40,11 @@ public class LocalBashEngine {
     @Autowired
     public LocalBashEngine(
             GridaClientLocal gridaClient,
-            @Value("local.engine.threadNb") Integer localThreadNb) {
+            @Value("${local.engine.threadNb}") Integer localThreadNb) {
         this.gridaClient = gridaClient;
         this.executorService = Executors.newFixedThreadPool(localThreadNb);
+        executionsInfo = new HashMap<>();
+        executionsFutures = new HashMap<>();
     }
 
     public String launch(File workflowFile, List<ParameterSweep> parameters)  {

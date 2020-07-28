@@ -31,7 +31,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringJUnitWebConfig(value = SpringCoreConfig.class)
 // launch all spring environment for testing, also take test bean though automatic package scan
 @ActiveProfiles({"test-db", "test"}) // to take random h2 database and not the test h2 jndi one
-@TestPropertySource(properties = {"db.tableEngine="}) // to disable the default mysql/innodb engine on database init
+@TestPropertySource(properties = {"db.tableEngine=", "vipConfigFolder=classpath:"}) // to disable the default mysql/innodb engine on database init
 @Transactional
 public class VipWebConfigurationIT {
 
@@ -64,7 +64,7 @@ public class VipWebConfigurationIT {
             .andDo(print())
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-            .andExpect(jsonPath("$[*]", Matchers.hasSize(5)));
+            .andExpect(jsonPath("$[*]", Matchers.hasSize(0)));
     }
 
     @Test

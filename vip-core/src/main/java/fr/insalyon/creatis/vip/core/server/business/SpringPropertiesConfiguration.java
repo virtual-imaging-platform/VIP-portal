@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.Environment;
@@ -17,6 +18,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.ResourcePropertySource;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
@@ -32,17 +34,16 @@ public class SpringPropertiesConfiguration {
     @Autowired
     public SpringPropertiesConfiguration(
             Resource vipConfigFolder,
-            ConfigurableApplicationContext configurableApplicationContext) throws IOException {
-        ConfigurableEnvironment env = configurableApplicationContext.getEnvironment();
-        Resource configFileResource = new FileSystemResource(vipConfigFolder + Server.CONF_FILE);
+            ConfigurableEnvironment env) throws IOException {
+        Resource configFileResource = new FileSystemResource(
+                vipConfigFolder.getFile().toPath().resolve(Server.CONF_FILE));
         env.getPropertySources().addLast(
                 new ResourcePropertySource(configFileResource)
         );
     }
 
     @Component
-    @Profile("spring-config-server")
-    public static class SpringConfigServer implements Server {
+    public class SpringConfigServer implements Server {
 
         @Value("${"+ CoreConstants.LAB_ADMIN_FIRST_NAME + ":Administrator}")
         private String adminFirstName;
@@ -152,7 +153,13 @@ public class SpringPropertiesConfiguration {
             this.vipConfigFolder = vipConfigFolder.getFile();
             this.proxyFolder = vipConfigFolder.createRelative(PROXIES_DIR).getFile();
             createFolderIfNeeded(proxyFolder);
-            buildReservedClasses();
+        }
+
+        @PostConstruct
+        private void init() {
+            reservedClasses = new HashMap<>();
+            gatelabClasses.forEach(className -> reservedClasses.put(className,0));
+            gatelabTestClasses.forEach(className -> reservedClasses.put(className,1));
         }
 
         private void createFolderIfNeeded(File folder) {
@@ -161,12 +168,6 @@ public class SpringPropertiesConfiguration {
                 logger.error("Cannot create VIP config folder : {}", folder);
                 throw new BeanInitializationException("Cannot create VIP config folder");
             }
-        }
-
-        private void buildReservedClasses() {
-            reservedClasses = new HashMap<>();
-            gatelabClasses.forEach(className -> reservedClasses.put(className,0));
-            gatelabTestClasses.forEach(className -> reservedClasses.put(className,1));
         }
 
         @Override

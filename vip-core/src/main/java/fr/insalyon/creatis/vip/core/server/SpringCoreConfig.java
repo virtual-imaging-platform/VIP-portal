@@ -16,6 +16,7 @@ import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.core.convert.support.DefaultConversionService;
 import org.springframework.core.env.ConfigurableEnvironment;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.ResourcePropertySource;
@@ -26,6 +27,7 @@ import org.springframework.jdbc.datasource.lookup.JndiDataSourceLookup;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
+import org.springframework.util.ResourceUtils;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
@@ -33,6 +35,8 @@ import javax.naming.NamingException;
 import javax.sql.DataSource;
 import java.io.IOException;
 import java.util.function.Consumer;
+
+import static org.springframework.util.ResourceUtils.CLASSPATH_URL_PREFIX;
 
 @Configuration
 @EnableTransactionManagement
@@ -118,10 +122,12 @@ public class SpringCoreConfig {
             configFolder = env.getProperty("user.home")  + Server.VIP_DIR;
             logger.info("vipConfigFolder property not found, using user-home : {}", configFolder);
         }
-        if ( ! configFolder.endsWith("/")) {
-            configFolder += "/";
+        Resource vipConfigFolder;
+        if ( configFolder.startsWith(CLASSPATH_URL_PREFIX)) {
+            vipConfigFolder = new ClassPathResource(configFolder.substring(CLASSPATH_URL_PREFIX.length()));
+        } else {
+            vipConfigFolder = new FileSystemResource(configFolder);
         }
-        Resource vipConfigFolder = new FileSystemResource(configFolder);
         if ( ! vipConfigFolder.exists() &&
                 ! vipConfigFolder.getFile().mkdir()) {
             logger.error("Cannot create VIP config folder : {}", vipConfigFolder);

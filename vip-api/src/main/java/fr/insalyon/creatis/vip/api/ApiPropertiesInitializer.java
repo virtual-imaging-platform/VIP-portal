@@ -68,7 +68,8 @@ public class ApiPropertiesInitializer {
             Resource vipConfigFolder,
             ConfigurableEnvironment environment) throws IOException {
         this.env = environment;
-        Resource configFileResource = new FileSystemResource(vipConfigFolder + "vip-api.conf");
+        Resource configFileResource = new FileSystemResource(
+                vipConfigFolder.getFile().toPath().resolve("vip-api.conf"));
         env.getPropertySources().addLast(
                 new ResourcePropertySource(configFileResource)
         );
