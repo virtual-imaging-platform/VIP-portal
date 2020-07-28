@@ -40,6 +40,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.core.env.ConfigurableEnvironment;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.ResourcePropertySource;
 import org.springframework.stereotype.Component;
@@ -61,59 +62,21 @@ public class ApiPropertiesInitializer {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private ConfigurableEnvironment env;
-    private ApplicationContext applicationContext;
 
     @Autowired
-    public ApiPropertiesInitializer(ConfigurableApplicationContext configurableApplicationContext) {
-        this.env = configurableApplicationContext.getEnvironment();
-        this.applicationContext = configurableApplicationContext;
+    public ApiPropertiesInitializer(
+            Resource vipConfigFolder,
+            ConfigurableEnvironment environment) throws IOException {
+        this.env = environment;
+        Resource configFileResource = new FileSystemResource(vipConfigFolder + "vip-api.conf");
+        env.getPropertySources().addLast(
+                new ResourcePropertySource(configFileResource)
+        );
     }
 
     @PostConstruct
     public void init() throws IOException {
-        env.getPropertySources().addLast(
-                new ResourcePropertySource(getApiConfRessource())
-        );
         verifyProperties();
-    }
-
-    private Resource getApiConfRessource() {
-        // first look by profile in classpath
-        Resource configFile;
-        for (String activeProfile :
-                env.getActiveProfiles()) {
-            configFile = applicationContext.getResource(getProfileApiConfLocation(activeProfile));
-            if (configFile.exists()) {
-                return configFile;
-            }
-        }
-        // then default name in classpath
-        configFile = applicationContext.getResource(getClasspathApiConfLocation());
-        if (configFile.exists()) {
-            return configFile;
-        }
-        // then default name in home
-        return applicationContext.getResource(getHomeApiConfLocation());
-    }
-
-    private String getProfileApiConfLocation(String profile) {
-        return getApiConfLocation(CLASSPATH_URL_PREFIX, Optional.of(profile));
-    }
-
-    private String getClasspathApiConfLocation() {
-        return getApiConfLocation(CLASSPATH_URL_PREFIX, Optional.empty());
-    }
-
-    private String getHomeApiConfLocation() {
-        String homePath = env.getProperty("user.home") + Server.VIP_DIR;
-        return getApiConfLocation("file:" + homePath, Optional.empty());
-    }
-
-    private String getApiConfLocation(String prefix, Optional<String> profile) {
-        StringBuilder sb = new StringBuilder(prefix)
-                .append("vip-api");
-        profile.ifPresent(p -> sb.append("-").append(p));
-        return sb.append(".conf").toString();
     }
 
     private void verifyProperties() {

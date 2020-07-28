@@ -6,9 +6,19 @@ import fr.insalyon.creatis.grida.client.GRIDAPoolClient;
 import fr.insalyon.creatis.grida.client.GRIDAZombieClient;
 import fr.insalyon.creatis.sma.client.SMAClient;
 import fr.insalyon.creatis.vip.core.server.business.Server;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.BeanInitializationException;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.*;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
+import org.springframework.core.convert.ConversionService;
+import org.springframework.core.convert.support.DefaultConversionService;
+import org.springframework.core.env.ConfigurableEnvironment;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.support.ResourcePropertySource;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.jdbc.datasource.DataSourceUtils;
 import org.springframework.jdbc.datasource.LazyConnectionDataSourceProxy;
@@ -21,11 +31,15 @@ import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.sql.DataSource;
+import java.io.IOException;
+import java.util.function.Consumer;
 
 @Configuration
 @EnableTransactionManagement
 @ComponentScan(basePackages = "fr.insalyon.creatis.vip")
 public class SpringCoreConfig {
+
+    private static final Logger logger = LoggerFactory.getLogger(SpringCoreConfig.class);
 
     @Bean
     @Primary
@@ -77,10 +91,43 @@ public class SpringCoreConfig {
         return new SMAClient(server.getSMAHost(), server.getSMAPort());
     }
 
-    // to verify the @Value injection existance
+    // to verify the @Value injection existence
     @Bean
     public static PropertySourcesPlaceholderConfigurer properties(){
         return new PropertySourcesPlaceholderConfigurer();
+    }
+
+    // to handle list en spring @value
+    @Bean
+    public static ConversionService conversionService() {
+        return new DefaultConversionService();
+    }
+
+    // to find properties file
+    @Bean
+    public static Resource vipConfigFolder(
+            ConfigurableApplicationContext configurableApplicationContext) throws IOException {
+        ConfigurableEnvironment env = configurableApplicationContext.getEnvironment();
+        // look for configLocation in environment
+        String configFolder = env.getProperty("vipConfigFolder");
+        // if present, look for file
+        if (configFolder != null) {
+            logger.info("found vipConfigFolder property : {}", configFolder);
+        } else {
+            // if not, look in user home folder
+            configFolder = env.getProperty("user.home")  + Server.VIP_DIR;
+            logger.info("vipConfigFolder property not found, using user-home : {}", configFolder);
+        }
+        if ( ! configFolder.endsWith("/")) {
+            configFolder += "/";
+        }
+        Resource vipConfigFolder = new FileSystemResource(configFolder);
+        if ( ! vipConfigFolder.exists() &&
+                ! vipConfigFolder.getFile().mkdir()) {
+            logger.error("Cannot create VIP config folder : {}", vipConfigFolder);
+            throw new BeanInitializationException("Cannot create VIP config folder");
+        }
+        return vipConfigFolder;
     }
 
 }

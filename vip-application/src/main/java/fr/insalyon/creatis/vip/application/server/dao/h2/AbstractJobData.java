@@ -36,6 +36,7 @@ import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 
 import javax.annotation.PostConstruct;
 import java.sql.Connection;
@@ -51,6 +52,9 @@ public abstract class AbstractJobData {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private final String DRIVER = "org.h2.Driver";
+
+    @Value("${workflows.db.scheme:tcp}")
+    private String workflowsScheme = "tcp";
 
     protected Server server;
     private String dbPath;
@@ -70,10 +74,15 @@ public abstract class AbstractJobData {
         try {
             Class.forName(DRIVER);
             StringBuilder dbUrl = new StringBuilder();
-            dbUrl.append("jdbc:h2:tcp://")
-                    .append(server.getWorkflowsHost())
-                    .append(":9092/")
-                    .append(server.getWorkflowsPath())
+            dbUrl.append("jdbc:h2:").append(workflowsScheme).append(":");
+            if ("tcp".equals(workflowsScheme)) {
+                // if tcp, add server and port
+                // otherwise, its a local file, only the path is needed
+                dbUrl.append("//")
+                        .append(server.getWorkflowsHost())
+                        .append(":9092/");
+            }
+            dbUrl.append(server.getWorkflowsPath())
                     .append("/")
                     .append(dbPath)
                     .append("/db/jobs");

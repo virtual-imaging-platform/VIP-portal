@@ -55,16 +55,12 @@ import java.util.List;
 @Profile({"default", "prod", "apache-config-server"})
 public class ApacheConfigServer implements Server {
     // Configuration File
-    PropertiesConfiguration config;
+    private PropertiesConfiguration config;
     // Constants
     private final Logger logger = LoggerFactory.getLogger(getClass());
-    private final String PROXIES_DIR = "proxies/";
     // Portal
     private String configurationFolder;
     private String serverProxy;
-    // Database
-    private String databaseServerHost;
-    private int databaseServerPort;
     // Admin
     private String adminFirstName;
     private String adminLastName;
@@ -88,31 +84,20 @@ public class ApacheConfigServer implements Server {
     // GRIDA server
     private String gridaHost;
     private int gridaPort;
-    // N4u GRIDA server
-    private String n4uGridaHost;
-    private int n4uGridaPort;
     // Data Manager
     private String dataManagerUsersHome;
     private String dataManagerGroupsHome;
     private String dataManagerPath;
-    private String dataManagerLFCHost;
-    private int dataManagerLFCPort;
     // old lfn directories prefixes on the LFC
     private String altDataManagerUsersHome;
     private String altDataManagerGroupsHome;
     // Moteur
-    private String moteurServer;
     private String truststoreFile;
     private String truststorePass;
     // Simulations
-    private int beginnerMaxRunningSimulations;
-    private int advancedMaxRunningSimulations;
     private int maxPlatformRunningSimulations;
     private String workflowsPath;
-    private String workflowsDB;
     private String workflowsHost;
-    private int workflowsPort;
-    private String workflowsExecuctionMode;
     // Apache
     private String apacheHost = "localhost";
     private int apacheSSLPort = 80;
@@ -130,7 +115,6 @@ public class ApacheConfigServer implements Server {
     private List<String> undesiredCountries;
     // Application importer
     private String applicationImporterFileRepository;
-    private String deleteFilesAfterUpload;
     private String applicationImporterRootFolder;
     private List<String> applicationImporterRequirements;
     //Publication
@@ -153,9 +137,6 @@ public class ApacheConfigServer implements Server {
             String confFilePath = configurationFolder + CONF_FILE;
             config = new PropertiesConfiguration(confFilePath);
             logger.info("Loading config file: " + confFilePath);
-
-            databaseServerHost = config.getString(CoreConstants.LAB_DB_HOST, "localhost");
-            databaseServerPort = config.getInt(CoreConstants.LAB_DB_PORT, 9092);
 
             adminFirstName = config.getString(CoreConstants.LAB_ADMIN_FIRST_NAME, "Administrator");
             adminLastName = config.getString(CoreConstants.LAB_ADMIN_LAST_NAME, "");
@@ -180,29 +161,19 @@ public class ApacheConfigServer implements Server {
             gridaHost = config.getString(CoreConstants.LAB_GRIDA_HOST, "localhost");
             gridaPort = config.getInt(CoreConstants.LAB_GRIDA_PORT, 9006);
 
-            n4uGridaHost = config.getString(CoreConstants.LAB_N4U_GRIDA_HOST, "localhost");
-            n4uGridaPort = config.getInt(CoreConstants.LAB_N4U_GRIDA_PORT, 9008);
-
             dataManagerUsersHome = config.getString(CoreConstants.LAB_DATA_USERS_HOME, "/users");
             dataManagerGroupsHome = config.getString(CoreConstants.LAB_DATA_GROUPS_HOME, "/groups");
             dataManagerPath = config.getString(CoreConstants.LAB_DATA_PATH, "/tmp");
-            dataManagerLFCHost = config.getString(CoreConstants.LAB_DATA_LFC_HOST, "lfc-biomed.in2p3.fr");
-            dataManagerLFCPort = config.getInt(CoreConstants.LAB_DATA_LFC_PORT, 5010);
 
             altDataManagerUsersHome = config.getString(CoreConstants.LAB_DATA_ALT_USERS_HOME, "");
             altDataManagerGroupsHome = config.getString(CoreConstants.LAB_DATA_ALT_GROUPS_HOME, "");
 
-            moteurServer = config.getString(CoreConstants.LAB_MOTEUR_HOST, "https://localhost:443/cgi-bin/moteurServer/moteur_server");
             truststoreFile = config.getString(CoreConstants.LAB_TRUSTSTORE_FILE, "/usr/local/apache-tomcat-6.0.29/conf/truststore.jks");
             truststorePass = config.getString(CoreConstants.LAB_TRUSTSTORE_PASS, "");
 
-            beginnerMaxRunningSimulations = config.getInt(CoreConstants.LAB_SIMULATION_BEGINNER_MAX, 1);
-            advancedMaxRunningSimulations = config.getInt(CoreConstants.LAB_SIMULATION_ADVANCED_MAX, Integer.MAX_VALUE);
             maxPlatformRunningSimulations=config.getInt(CoreConstants.LAB_SIMULATION_PLATFORM_MAX, Integer.MAX_VALUE);
             workflowsPath = config.getString(CoreConstants.LAB_SIMULATION_FOLDER, "/var/www/html/workflows");
             workflowsHost = config.getString(CoreConstants.LAB_SIMULATION_DB_HOST, "localhost");
-            workflowsPort = config.getInt(CoreConstants.LAB_SIMULATION_DB_PORT, 1527);
-            workflowsExecuctionMode = config.getString(CoreConstants.LAB_SIMULATION_EXEC_MODE, "ws");
 
             apacheHost = config.getString(CoreConstants.LAB_APACHE_HOST, apacheHost);
             apacheSSLPort = config.getInt(CoreConstants.LAB_APACHE_SSL_PORT, apacheSSLPort);
@@ -237,7 +208,6 @@ public class ApacheConfigServer implements Server {
 
             //Applicatoin importer
             applicationImporterFileRepository = config.getString(CoreConstants.APPLICATION_FILES_REPOSITORY, "/tmp/boutiques-cache");
-            deleteFilesAfterUpload = config.getString(CoreConstants.APP_DELETE_FILES_AFTER_UPLOAD, "yes");
             applicationImporterRootFolder = config.getString(CoreConstants.APP_IMPORTER_ROOT_FOLDER, "/biomed/user/c/creatis/vip/data/groups/Applications");
             applicationImporterRequirements = config.getList(CoreConstants.APP_REQUIREMENTS, new ArrayList<>());
 
@@ -253,8 +223,6 @@ public class ApacheConfigServer implements Server {
             girderTokenDurationInDays = config.getFloat(
                 CoreConstants.GIRDER_TOKEN_DURATION_IN_DAYS, 1.0f);
 
-            config.setProperty(CoreConstants.LAB_DB_HOST, databaseServerHost);
-            config.setProperty(CoreConstants.LAB_DB_PORT, databaseServerPort);
             config.setProperty(CoreConstants.LAB_ADMIN_FIRST_NAME, adminFirstName);
             config.setProperty(CoreConstants.LAB_ADMIN_LAST_NAME, adminLastName);
             config.setProperty(CoreConstants.LAB_ADMIN_EMAIL, adminEmail);
@@ -273,33 +241,23 @@ public class ApacheConfigServer implements Server {
             config.setProperty(CoreConstants.LAB_SMA_PORT, SMAPort);
             config.setProperty(CoreConstants.LAB_GRIDA_HOST, gridaHost);
             config.setProperty(CoreConstants.LAB_GRIDA_PORT, gridaPort);
-            config.setProperty(CoreConstants.LAB_N4U_GRIDA_HOST, n4uGridaHost);
-            config.setProperty(CoreConstants.LAB_N4U_GRIDA_PORT, n4uGridaPort);
             config.setProperty(CoreConstants.LAB_DATA_USERS_HOME, dataManagerUsersHome);
             config.setProperty(CoreConstants.LAB_DATA_GROUPS_HOME, dataManagerGroupsHome);
             config.setProperty(CoreConstants.LAB_DATA_PATH, dataManagerPath);
-            config.setProperty(CoreConstants.LAB_DATA_LFC_HOST, dataManagerLFCHost);
-            config.setProperty(CoreConstants.LAB_DATA_LFC_PORT, dataManagerLFCPort);
             config.setProperty(CoreConstants.LAB_DATA_ALT_USERS_HOME, altDataManagerUsersHome);
             config.setProperty(CoreConstants.LAB_DATA_ALT_GROUPS_HOME, altDataManagerGroupsHome);
-            config.setProperty(CoreConstants.LAB_MOTEUR_HOST, moteurServer);
             config.setProperty(CoreConstants.LAB_TRUSTSTORE_FILE, truststoreFile);
             config.setProperty(CoreConstants.LAB_TRUSTSTORE_PASS, truststorePass);
-            config.setProperty(CoreConstants.LAB_SIMULATION_BEGINNER_MAX, beginnerMaxRunningSimulations);
-            config.setProperty(CoreConstants.LAB_SIMULATION_ADVANCED_MAX, advancedMaxRunningSimulations);
             config.setProperty(CoreConstants.LAB_SIMULATION_PLATFORM_MAX, maxPlatformRunningSimulations);
 
             config.setProperty(CoreConstants.LAB_SIMULATION_FOLDER, workflowsPath);
             config.setProperty(CoreConstants.LAB_SIMULATION_DB_HOST, workflowsHost);
-            config.setProperty(CoreConstants.LAB_SIMULATION_DB_PORT, workflowsPort);
-            config.setProperty(CoreConstants.LAB_SIMULATION_EXEC_MODE, workflowsExecuctionMode);
             config.setProperty(CoreConstants.LAB_APACHE_HOST, apacheHost);
             config.setProperty(CoreConstants.LAB_APACHE_SSL_PORT, apacheSSLPort);
             config.setProperty(CoreConstants.LAB_CAS_URL, casURL);
             config.setProperty(CoreConstants.SSH_PUBLIC_KEY, sshPublicKey);
 
             config.setProperty(CoreConstants.APPLICATION_FILES_REPOSITORY, applicationImporterFileRepository);
-            config.setProperty(CoreConstants.APP_DELETE_FILES_AFTER_UPLOAD, deleteFilesAfterUpload);
             config.setProperty(CoreConstants.APP_IMPORTER_ROOT_FOLDER, applicationImporterRootFolder);
             config.setProperty(CoreConstants.APP_REQUIREMENTS, applicationImporterRequirements);
             config.setProperty(CoreConstants.APPLET_GATELAB_CLASSES, appletGateLabClasses);
@@ -325,16 +283,6 @@ public class ApacheConfigServer implements Server {
             file.mkdirs();
         }
         return path;
-    }
-
-    @Override
-    public String getDatabaseServerHost() {
-        return databaseServerHost;
-    }
-
-    @Override
-    public int getDatabaseServerPort() {
-        return databaseServerPort;
     }
 
     @Override
@@ -398,11 +346,6 @@ public class ApacheConfigServer implements Server {
     }
 
     @Override
-    public String getMoteurServer() {
-        return moteurServer;
-    }
-
-    @Override
     public String getGRIDAHost() {
         return gridaHost;
     }
@@ -413,33 +356,13 @@ public class ApacheConfigServer implements Server {
     }
 
     @Override
-    public String getN4uGridaHost() {
-        return n4uGridaHost;
-    }
-
-    @Override
-    public int getN4uGridaPort() {
-        return n4uGridaPort;
-    }
-
-    @Override
     public String getWorkflowsHost() {
         return workflowsHost;
     }
 
     @Override
-    public int getWorkflowsPort() {
-        return workflowsPort;
-    }
-
-    @Override
     public String getWorkflowsPath() {
         return workflowsPath;
-    }
-
-    @Override
-    public String getWorflowsExecMode() {
-        return workflowsExecuctionMode;
     }
 
     @Override
@@ -465,16 +388,6 @@ public class ApacheConfigServer implements Server {
     @Override
     public String getDataManagerPath() {
         return dataManagerPath;
-    }
-
-    @Override
-    public String getDataManagerLFCHost() {
-        return dataManagerLFCHost;
-    }
-
-    @Override
-    public int getDataManagerLFCPort() {
-        return dataManagerLFCPort;
     }
 
     @Override
@@ -576,31 +489,6 @@ public class ApacheConfigServer implements Server {
     @Override
     public List<String> getApplicationImporterRequirements() {
         return applicationImporterRequirements;
-    }
-
-    @Override
-    public String getDeleteFilesAfterUpload() {
-        return deleteFilesAfterUpload;
-    }
-
-    @Override
-    public List<String> getAppletGateLabClasses() {
-        return appletGateLabClasses;
-    }
-
-    @Override
-    public void setAppletGateLabClasses(List<String> appletGateLabClasses) {
-        this.appletGateLabClasses = appletGateLabClasses;
-    }
-
-    @Override
-    public List<String> getAppletGateLabTestClasses() {
-        return appletGateLabTestClasses;
-    }
-
-    @Override
-    public void setAppletGateLabTestClasses(List<String> appletGateLabTestClasses) {
-        this.appletGateLabTestClasses = appletGateLabTestClasses;
     }
 
     @Override

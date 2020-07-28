@@ -9,10 +9,8 @@ public interface Server {
 
     String VIP_DIR = "/.vip/";
     String CONF_FILE = "vip.conf";
-
-    String getDatabaseServerHost();
-
-    int getDatabaseServerPort();
+    String PROXIES_DIR = "proxies/";
+    String PROXY_FILENAME = "x509up_server";
 
     String getConfigurationFolder();
 
@@ -38,23 +36,13 @@ public interface Server {
 
     int getMyProxyMinHours();
 
-    String getMoteurServer();
-
     String getGRIDAHost();
 
     int getGRIDAPort();
 
-    String getN4uGridaHost();
-
-    int getN4uGridaPort();
-
     String getWorkflowsHost();
 
-    int getWorkflowsPort();
-
     String getWorkflowsPath();
-
-    String getWorflowsExecMode();
 
     String getApacheHost();
 
@@ -65,10 +53,6 @@ public interface Server {
     int getSMAPort();
 
     String getDataManagerPath();
-
-    String getDataManagerLFCHost();
-
-    int getDataManagerLFCPort();
 
     String getDataManagerUsersHome();
 
@@ -107,16 +91,6 @@ public interface Server {
     String getApplicationImporterRootFolder();
 
     List<String> getApplicationImporterRequirements();
-
-    String getDeleteFilesAfterUpload();
-
-    List<String> getAppletGateLabClasses();
-
-    void setAppletGateLabClasses(List<String> appletGateLabClasses);
-
-    List<String> getAppletGateLabTestClasses();
-
-    void setAppletGateLabTestClasses(List<String> appletGateLabTestClasses);
 
     HashMap<String, Integer> getReservedClasses();
 
