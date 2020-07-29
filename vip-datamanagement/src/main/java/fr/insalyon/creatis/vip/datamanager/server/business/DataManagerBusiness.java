@@ -70,7 +70,7 @@ public class DataManagerBusiness {
 
     private SSHDAO sshdao;
     private GRIDAClient gridaClient;
-    private GRIDACacheClient getGRIDACacheClient;
+    private GRIDACacheClient gridaCacheClient;
     private GRIDAZombieClient gridaZombieClient;
     private ConfigurationBusiness configurationBusiness;
     private LfcPathsBusiness lfcPathsBusiness;
@@ -78,11 +78,11 @@ public class DataManagerBusiness {
 
     @Autowired
     public DataManagerBusiness(
-            SSHDAO sshdao, GRIDAClient gridaClient, GRIDACacheClient getGRIDACacheClient,
+            SSHDAO sshdao, GRIDAClient gridaClient, GRIDACacheClient gridaCacheClient,
             GRIDAZombieClient gridaZombieClient, ConfigurationBusiness configurationBusiness, LfcPathsBusiness lfcPathsBusiness, Server server) {
         this.sshdao = sshdao;
         this.gridaClient = gridaClient;
-        this.getGRIDACacheClient = getGRIDACacheClient;
+        this.gridaCacheClient = gridaCacheClient;
         this.gridaZombieClient = gridaZombieClient;
         this.configurationBusiness = configurationBusiness;
         this.lfcPathsBusiness = lfcPathsBusiness;
@@ -103,7 +103,7 @@ public class DataManagerBusiness {
 
         try {
 
-            List<CachedFile> cachedFilesList = getGRIDACacheClient.getCachedFiles();
+            List<CachedFile> cachedFilesList = gridaCacheClient.getCachedFiles();
             List<DMCachedFile> dmCachedFiles = new ArrayList<>();
 
             for (CachedFile cf : cachedFilesList) {
@@ -124,7 +124,7 @@ public class DataManagerBusiness {
 
         try {
             for (String path : cachedFiles) {
-                getGRIDACacheClient.deleteCachedFile(path);
+                gridaCacheClient.deleteCachedFile(path);
             }
         } catch (GRIDAClientException ex) {
             logger.error("Error deleting cached files {}", cachedFiles, ex);

@@ -5,6 +5,7 @@ import fr.insalyon.creatis.grida.client.GRIDAPoolClient;
 import fr.insalyon.creatis.grida.common.bean.Operation;
 import fr.insalyon.creatis.grida.common.bean.Operation.Type;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
@@ -13,6 +14,7 @@ import java.util.stream.Collectors;
 
 @Component
 @Profile("local")
+@Primary
 public class GRIDAPoolClientLocal extends GRIDAPoolClient {
 
     private GridaClientLocal gridaClientLocal;

@@ -5,6 +5,9 @@ import fr.insalyon.creatis.grida.client.GRIDAClientException;
 import fr.insalyon.creatis.grida.common.bean.GridData;
 import fr.insalyon.creatis.grida.common.bean.GridData.Type;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.DependsOn;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
@@ -17,9 +20,11 @@ import java.util.stream.Collectors;
 
 @Component
 @Profile("local")
+@Primary
+@DependsOn("localConfiguration")
 public class GridaClientLocal extends GRIDAClient {
 
-    @Value("${local.grida.root")
+    @Value("${local.grida.root}")
     private String localRoot;
 
     public GridaClientLocal() {
@@ -28,9 +33,13 @@ public class GridaClientLocal extends GRIDAClient {
 
     @Override
     public String getRemoteFile(String remoteFile, String localDir) throws GRIDAClientException {
+        while (remoteFile.startsWith("/")) {
+            remoteFile = remoteFile.substring(1);
+        }
         Path from = Paths.get(localRoot).resolve(remoteFile);
         Path to = Paths.get(localDir).resolve(from.getFileName());
         try {
+            Files.createDirectories(Paths.get(localDir));
             Files.copy(from, to);
         } catch (IOException e) {
             throw new GRIDAClientException(e);

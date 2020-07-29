@@ -151,7 +151,7 @@ public class SpringPropertiesConfiguration {
                 throws IOException {
             this.environment = environment;
             this.vipConfigFolder = vipConfigFolder.getFile();
-            this.proxyFolder = vipConfigFolder.createRelative(PROXIES_DIR).getFile();
+            this.proxyFolder = vipConfigFolder.getFile().toPath().resolve(PROXIES_DIR).toFile();
             createFolderIfNeeded(proxyFolder);
         }
 
@@ -172,7 +172,7 @@ public class SpringPropertiesConfiguration {
 
         @Override
         public String getConfigurationFolder() {
-            return vipConfigFolder.getAbsolutePath();
+            return vipConfigFolder.getAbsolutePath() + "/";
         }
 
         @Override

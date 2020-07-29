@@ -95,7 +95,6 @@ public class ApiPropertiesInitializer {
         verifyPropertyNotNull(API_DOWNLOAD_RETRY_IN_SECONDS, Integer.class);
         verifyPropertyNotNull(API_DOWNLOAD_TIMEOUT_IN_SECONDS, Integer.class);
         verifyPropertyNotNull(API_DATA_TRANSFERT_MAX_SIZE, Long.class);
-        verifyPropertyNotNull(API_DATA_DOWNLOAD_RELATIVE_PATH, String.class);
 
         // due to arrays and generics, this verification aren't easy to factorize
         Assert.notEmpty(env.getProperty(SUPPORTED_TRANSFER_PROTOCOLS, SupportedTransferProtocol[].class),
