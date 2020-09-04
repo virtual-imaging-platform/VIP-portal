@@ -61,13 +61,11 @@ public class MySQLDAOFactory extends PublicationDAOFactory {
 
         try(Connection connection = PlatformConnection.getInstance().getConnection()) {
 
-            //Attention, for testing purposes, we work on a new InnoDB VIPNewPublication DB
-            //TODO when tests are finished, rename tables and update code to point to the prod VIPPublication table
-            logger.info("Configuring VIP New Publication database.");
+            logger.info("Configuring VIP Publication database.");
 
             PlatformConnection.getInstance().createTable(
                     connection,
-                    "VIPNewPublication",
+                    "VIPPublication",
                     "id INT(11) NOT NULL AUTO_INCREMENT, "
                             + "title text, "
                             + "date VARCHAR(45), "

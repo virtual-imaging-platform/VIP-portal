@@ -161,7 +161,7 @@ public class EditPublicationLayout extends AbstractFormLayout {
             this.publicationDate.setValue("");
             this.doiField.setValue("");
             this.authorsField.setValue("");
-            this.vipApplication.setValue(vipApplication);
+            this.vipApplication.setValue("");
 
         }
     }

@@ -56,14 +56,13 @@ public class PublicationData implements PublicationDAO {
         this.connection = connection;
     }
 
-    //TODO Sorina : when testing is over, change VIPNewPublication to VIPPublication
     @Override
     public void add(Publication pub) throws DAOException {
 
         PreparedStatement ps = null;
         try {
             ps = connection.prepareStatement(
-                    "INSERT INTO VIPNewPublication(title,date,doi,authors,type,typeName,vipAuthor,vipApplication) "
+                    "INSERT INTO VIPPublication(title,date,doi,authors,type,typeName,vipAuthor,vipApplication) "
                     + "VALUES (?, ?, ?, ?, ?, ?, ?,?)");
 
             ps.setString(1, pub.getTitle());
@@ -87,7 +86,7 @@ public class PublicationData implements PublicationDAO {
         try {
 
             PreparedStatement ps = connection.prepareStatement("UPDATE "
-                    + "VIPNewPublication "
+                    + "VIPPublication "
                     + "SET title=?, date=?, doi=?, authors=?, type=?, typeName=?,vipAuthor=?,vipApplication=? "
                     + "WHERE id=?");
 
@@ -114,7 +113,7 @@ public class PublicationData implements PublicationDAO {
     public void remove(Long id) throws DAOException {
         try {
             PreparedStatement ps = connection.prepareStatement("DELETE "
-                    + "FROM VIPNewPublication WHERE id=?");
+                    + "FROM VIPPublication WHERE id=?");
 
             ps.setLong(1, id);
             ps.execute();
@@ -135,7 +134,7 @@ public class PublicationData implements PublicationDAO {
 
             ps = connection.prepareStatement("SELECT "
                     + "id,title,date,doi,authors,type,typeName,VIPAuthor,VipApplication FROM "
-                    + "VIPNewPublication");
+                    + "VIPPublication");
 
             ResultSet rs = ps.executeQuery();
 
