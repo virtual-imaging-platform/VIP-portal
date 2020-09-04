@@ -57,10 +57,12 @@ public class Data extends DataSource {
         DataSourceTextField date = new DataSourceTextField("date", "date");
         
         DataSourceTextField authors = new DataSourceTextField("authors", "authors");
+
+        DataSourceTextField vipApplication = new DataSourceTextField("VipApplication", "VipApplication");
         
         DataSourceTextField doi = new DataSourceTextField("doi", "doi");
              
-        setFields(id,title,type,typeName, date,authors,doi );
+        setFields(id,title,type,typeName, date,authors,vipApplication,doi );
         setClientOnly(true);
 
 

@@ -72,8 +72,6 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.configuration.ConfigurationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.jbibtex.ParseException;
-import org.jbibtex.TokenMgrException;
 
 /**
  *

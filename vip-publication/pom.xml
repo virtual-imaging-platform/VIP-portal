@@ -57,6 +57,11 @@ knowledge of the CeCILL-B license and that you accept its terms.
             <artifactId>vip-application</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.jbibtex</groupId>
+            <artifactId>jbibtex</artifactId>
+            <version>1.0.14</version>
+        </dependency>
 
     </dependencies>
 

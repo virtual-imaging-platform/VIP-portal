@@ -51,6 +51,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -228,10 +229,7 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
             }
             List<AppClass> classes = classBusiness.getUserClasses(
                     getSessionUser().getEmail(), false, connection);
-            List<String> classNames = new ArrayList<>();
-            for (AppClass c : classes) {
-                classNames.add(c.getName());
-            }
+            List<String> classNames = classes.stream().map(AppClass::getName).collect(Collectors.toList());
             return applicationBusiness.getApplications(classNames, connection);
         } catch (BusinessException | CoreException ex) {
             throw new ApplicationException(ex);
