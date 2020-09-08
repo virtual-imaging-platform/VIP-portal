@@ -48,8 +48,10 @@ import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -225,8 +227,10 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
                     getSessionUser().getEmail(), true, connection);
                 return applicationBusiness.getApplications(classes, connection);
             }
-            logger.error("Unauthorized to get all applications");
-            throw new ApplicationException("You have no administrator rights.");
+            List<AppClass> classes = classBusiness.getUserClasses(
+                    getSessionUser().getEmail(), false, connection);
+            List<String> classNames = classes.stream().map(AppClass::getName).collect(Collectors.toList());
+            return applicationBusiness.getApplications(classNames, connection);
         } catch (BusinessException | CoreException ex) {
             throw new ApplicationException(ex);
         } catch (SQLException ex) {

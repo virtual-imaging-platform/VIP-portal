@@ -29,20 +29,20 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL-B license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.core.client.view.user.publication;
+package fr.insalyon.creatis.vip.publication.client.view;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.fields.TextAreaItem;
-import fr.insalyon.creatis.vip.core.client.bean.Publication;
-import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationService;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.common.AbstractFormLayout;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
-import fr.insalyon.creatis.vip.core.client.view.user.PublicationTab;
 import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
+import fr.insalyon.creatis.vip.publication.client.bean.Publication;
+import fr.insalyon.creatis.vip.publication.client.rpc.PublicationService;
+
 import java.util.List;
 
 /**
@@ -56,7 +56,7 @@ public class BibtexLayout extends AbstractFormLayout {
 
     public BibtexLayout() {
         super("100%", "50%");
-        addTitle("Add Publications From Bibtex Format", CoreConstants.ICON_PUBLICATION);
+        addTitle("Add Publications From Bibtex Format", PublicationConstants.ICON_PUBLICATION);
         configure();
     }
 
@@ -89,7 +89,7 @@ public class BibtexLayout extends AbstractFormLayout {
             }
         };
      
-        ConfigurationService.Util.getInstance().parseBibtexText(textAreaItem.getValueAsString(), callback);
+        PublicationService.Util.getInstance().parseBibtexText(textAreaItem.getValueAsString(), callback);
                 
               
             }
@@ -103,7 +103,7 @@ public class BibtexLayout extends AbstractFormLayout {
     }
      private void save(Publication pub) {
 
-            ConfigurationService.Util.getInstance().addPublication(pub, getCallback("add"));
+            PublicationService.Util.getInstance().addPublication(pub, getCallback("add"));
        
     }
     
@@ -121,7 +121,7 @@ public class BibtexLayout extends AbstractFormLayout {
 
                 
                 PublicationTab pubTab = (PublicationTab) Layout.getInstance().
-                        getTab(CoreConstants.TAB_PUBLICATION);
+                        getTab(PublicationConstants.TAB_PUBLICATION);
                 pubTab.loadPublication();
             }
         };

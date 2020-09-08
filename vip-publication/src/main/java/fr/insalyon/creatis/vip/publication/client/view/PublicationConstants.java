@@ -29,58 +29,25 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL-B license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.core.server.dao;
-
-import fr.insalyon.creatis.vip.core.server.dao.mysql.AccountData;
-import fr.insalyon.creatis.vip.core.server.dao.mysql.GroupData;
-import fr.insalyon.creatis.vip.core.server.dao.mysql.TermsUseData;
-import fr.insalyon.creatis.vip.core.server.dao.mysql.UserData;
-import fr.insalyon.creatis.vip.core.server.dao.mysql.UsersGroupsData;
-import java.sql.Connection;
+package fr.insalyon.creatis.vip.publication.client.view;
 
 /**
  *
- * @author Rafael Ferreira da Silva, Nouha Boujelben
+ * @author Sorina Pop
  */
-public class MySQLDAOFactory extends CoreDAOFactory {
+public class PublicationConstants {
 
-    private static CoreDAOFactory instance;
+    // Tab IDs
+    public static final String TAB_PUBLICATION = "publications_tab";
 
-    // Singleton
-    protected static CoreDAOFactory getInstance() {
-        if (instance == null) {
-            instance = new MySQLDAOFactory();
-        }
-        return instance;
-    }
+    // Icons
+    private static final String IMG_FOLDER = "publication/";
+    public static final String ICON_PUBLICATION = IMG_FOLDER + "icon-publication.png";
 
-    private MySQLDAOFactory() {
-    }
+    // Application Names
+    public static final String APP_PUBLICATIONS = "Publications";
+    // Application Images
+    public static final String APP_IMG_PUBLICATIONS = IMG_FOLDER + "app-articles.png";
 
-    @Override
-    public UserDAO getUserDAO(Connection connection) throws DAOException {
-        return new UserData(connection);
-    }
 
-    @Override
-    public GroupDAO getGroupDAO(Connection connection) throws DAOException {
-        return new GroupData(connection);
-    }
-
-    @Override
-    public UsersGroupsDAO getUsersGroupsDAO(Connection connection)
-        throws DAOException {
-        return new UsersGroupsData(connection);
-    }
-
-    @Override
-    public AccountDAO getAccountDAO(Connection connection) throws DAOException {
-        return new AccountData(connection);
-    }
-
-    @Override
-    public TermsUseDAO getTermsUseDAO(Connection connection)
-        throws DAOException {
-        return new TermsUseData(connection);
-    }
 }

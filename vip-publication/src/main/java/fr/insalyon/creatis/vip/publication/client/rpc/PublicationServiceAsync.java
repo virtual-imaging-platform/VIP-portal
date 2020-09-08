@@ -29,33 +29,25 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL-B license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.core.client.view.user.publication;
+package fr.insalyon.creatis.vip.publication.client.rpc;
 
-import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
-import fr.insalyon.creatis.vip.core.client.view.common.AbstractFormLayout;
-import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
+import com.google.gwt.user.client.rpc.AsyncCallback;
+import fr.insalyon.creatis.vip.publication.client.bean.Publication;
+import java.util.List;
 
 /**
  *
- * @author Nouha boujelben
+ * @author Rafael Ferreira da Silva, Sorina Pop
  */
-public class PublicationInfoTab extends AbstractFormLayout{
-    public PublicationInfoTab() {
+public interface PublicationServiceAsync {
 
-        super("100%", "50");
-        addTitle("", CoreConstants.ICON_INFO);
-        addMember(WidgetUtil.getLabel(
-                "<b>Please list here the references of the publications "
-                + "that you made using VIP. These references may"
-                + " be used by the VIP team to justify the use of "
-                + "computing and storage resources. <br/><font color=\"blue\">Fr"
-                        + "</font><font color=\"white\">en</font><font "
-                        + "color=\"red\">ch</font> users: "
-                        + "France-Grilles also requires that the "
-                        + "publications made using their infrastructure are "
-                        + "registered in <a href=\"http://hal.archives-ouvertes.fr\">HAL</a> "
-                        + "(only authors can do that, we cannot do it for you).</b>", 20));
-        
-    }
-    
+    void getPublications(AsyncCallback<List<Publication>> asyncCallback);
+
+    void removePublication(Long id, AsyncCallback<Void> asyncCallback);
+
+    void addPublication(Publication pub, AsyncCallback<Void> asyncCallback);
+
+    void updatePublication(Publication pub, AsyncCallback<Void> asyncCallback);
+
+    void parseBibtexText(String text, AsyncCallback<List<Publication>> asyncCallback);
 }

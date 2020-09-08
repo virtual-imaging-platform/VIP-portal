@@ -29,27 +29,42 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL-B license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.core.server.dao;
+package fr.insalyon.creatis.vip.publication.client.view;
 
-import fr.insalyon.creatis.vip.core.client.bean.Account;
-import fr.insalyon.creatis.vip.core.client.bean.Publication;
-import java.util.List;
+
+import com.smartgwt.client.data.DataSource;
+import com.smartgwt.client.data.fields.DataSourceIntegerField;
+import com.smartgwt.client.data.fields.DataSourceTextField;
 
 /**
  *
  * @author Nouha Boujelben
  */
-public interface PublicationDAO {
+public class Data extends DataSource {
 
-    public void add(Publication publication) throws DAOException;
+    public Data() {
 
-    public void update(Publication publication) throws DAOException;
+        DataSourceIntegerField id = new DataSourceIntegerField("id", "Id");
+        id.setPrimaryKey(true);
+        id.setHidden(true);
+        
+        DataSourceTextField title = new DataSourceTextField("title", "Title");
+        
+        DataSourceTextField type = new DataSourceTextField("type", "type");
+        
+        DataSourceTextField typeName = new DataSourceTextField("typeName", "typeName");
+        
+        DataSourceTextField date = new DataSourceTextField("date", "date");
+        
+        DataSourceTextField authors = new DataSourceTextField("authors", "authors");
 
-    void updateOwnerEmail(String oldOwnerEmail, String newOwnerEmail) throws DAOException;
+        DataSourceTextField vipApplication = new DataSourceTextField("VipApplication", "VipApplication");
+        
+        DataSourceTextField doi = new DataSourceTextField("doi", "doi");
+             
+        setFields(id,title,type,typeName, date,authors,vipApplication,doi );
+        setClientOnly(true);
 
-    public void remove(Long publicationID) throws DAOException;
-    
-    public Publication getPublication(Long publicationID) throws DAOException;
 
-    public List<Publication> getList() throws DAOException;
+    }
 }

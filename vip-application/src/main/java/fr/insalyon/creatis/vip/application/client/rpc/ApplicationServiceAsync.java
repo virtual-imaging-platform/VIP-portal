@@ -52,7 +52,7 @@ public interface ApplicationServiceAsync {
     public void getApplications(AsyncCallback<List<Application>> asyncCallback);
     
     public void getApplications(String className, AsyncCallback<List<String[]>> asyncCallback);
-    
+
     public void getApplicationsByClass(String className, AsyncCallback<List<String[]>> asyncCallback);
     
     public void getVersions(String applicationName, AsyncCallback<List<AppVersion>> asyncCallback);
@@ -96,5 +96,5 @@ public interface ApplicationServiceAsync {
     public void getEngines(AsyncCallback<List<Engine>> asyncCallback);
     
     public void getReservedClasses(AsyncCallback <HashMap<String, Integer>> asyncCallback);
-     
+
 }
