@@ -136,16 +136,17 @@ public class TimelineLayout extends VLayout {
                             }
                         }
                         if (!exists) {
-                            if(simulation.getStatus()!=SimulationStatus.Cleaned ||  CoreModule.user.isSystemAdministrator())
-                            simulationsLayout.addMember(TimelineParser.getInstance().parse(
-                                    simulation.getID(),
-                                    simulation.getSimulationName(),
-                                    simulation.getApplicationName(),
-                                    simulation.getApplicationVersion(),
-                                    simulation.getApplicationClass(),
-                                    simulation.getUserName(),
-                                    simulation.getStatus(),
-                                    simulation.getDate()), position);
+                            if(simulation.getStatus()!=SimulationStatus.Cleaned ||  CoreModule.user.isSystemAdministrator()) {
+                                simulationsLayout.addMember(TimelineParser.getInstance().parse(
+                                        simulation.getID(),
+                                        simulation.getSimulationName(),
+                                        simulation.getApplicationName(),
+                                        simulation.getApplicationVersion(),
+                                        simulation.getApplicationClass(),
+                                        simulation.getUserName(),
+                                        simulation.getStatus(),
+                                        simulation.getDate()), position);
+                            }
                         }
                     }
                     simulationsLayout.addMember(loadMoreLabel);

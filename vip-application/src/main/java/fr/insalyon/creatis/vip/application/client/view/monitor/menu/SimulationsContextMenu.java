@@ -204,7 +204,7 @@ public class SimulationsContextMenu extends Menu {
                 if (CoreModule.user.isSystemAdministrator()) {
                     this.setItems(viewItem, purgeItem, separator, changeUserItem);
                 } else {
-                    this.setItems(viewItem, purgeItem);
+                    this.setItems(viewItem);
                 }
                 break;
 
