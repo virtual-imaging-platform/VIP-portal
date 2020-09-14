@@ -136,16 +136,17 @@ public class TimelineLayout extends VLayout {
                             }
                         }
                         if (!exists) {
-                            if(simulation.getStatus()!=SimulationStatus.Cleaned ||  CoreModule.user.isSystemAdministrator())
-                            simulationsLayout.addMember(TimelineParser.getInstance().parse(
-                                    simulation.getID(),
-                                    simulation.getSimulationName(),
-                                    simulation.getApplicationName(),
-                                    simulation.getApplicationVersion(),
-                                    simulation.getApplicationClass(),
-                                    simulation.getUserName(),
-                                    simulation.getStatus(),
-                                    simulation.getDate()), position);
+                            if(simulation.getStatus()!=SimulationStatus.Cleaned ||  CoreModule.user.isSystemAdministrator()) {
+                                simulationsLayout.addMember(TimelineParser.getInstance().parse(
+                                        simulation.getID(),
+                                        simulation.getSimulationName(),
+                                        simulation.getApplicationName(),
+                                        simulation.getApplicationVersion(),
+                                        simulation.getApplicationClass(),
+                                        simulation.getUserName(),
+                                        simulation.getStatus(),
+                                        simulation.getDate()), position);
+                            }
                         }
                     }
                     simulationsLayout.addMember(loadMoreLabel);
@@ -171,15 +172,17 @@ public class TimelineLayout extends VLayout {
                 if (!result.isEmpty()) {    
                     simulationsLayout.removeChild(loadMoreLabel);
                     for (Simulation simulation : result) {
-                        simulationsLayout.addMember(TimelineParser.getInstance().parse(
-                                simulation.getID(),
-                                simulation.getSimulationName(),
-                                simulation.getApplicationName(),
-                                simulation.getApplicationVersion(),
-                                simulation.getApplicationClass(),
-                                simulation.getUserName(),
-                                simulation.getStatus(),
-                                simulation.getDate()));
+                        if(simulation.getStatus()!=SimulationStatus.Cleaned ||  CoreModule.user.isSystemAdministrator()) {
+                            simulationsLayout.addMember(TimelineParser.getInstance().parse(
+                                    simulation.getID(),
+                                    simulation.getSimulationName(),
+                                    simulation.getApplicationName(),
+                                    simulation.getApplicationVersion(),
+                                    simulation.getApplicationClass(),
+                                    simulation.getUserName(),
+                                    simulation.getStatus(),
+                                    simulation.getDate()));
+                        }
                     }
                     simulationsLayout.addMember(loadMoreLabel);
                 } else {

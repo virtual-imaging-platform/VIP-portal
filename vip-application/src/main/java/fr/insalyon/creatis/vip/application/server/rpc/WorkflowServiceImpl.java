@@ -422,8 +422,8 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
      * @throws ApplicationException
      */
     public void purgeSimulations(List<String> simulationIDs) throws ApplicationException {
-
         try {
+            authenticateSystemAdministrator(logger);
             trace(logger, "Purging simulations: " + simulationIDs);
             StringBuilder sb = new StringBuilder();
             for (String simulationID : simulationIDs) {
@@ -489,6 +489,7 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
     public void purgeWorkflow(String simulationID) throws ApplicationException {
 
         try {
+            authenticateSystemAdministrator(logger);
             trace(logger, "Purging simulation '" + simulationID + "'.");
             workflowBusiness.purge(simulationID);
 
