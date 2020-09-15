@@ -50,6 +50,7 @@ import fr.insalyon.creatis.vip.core.client.CoreModule;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
+
 import java.util.Date;
 import java.util.List;
 
@@ -61,6 +62,7 @@ public class TimelineLayout extends VLayout {
 
     private static TimelineLayout instance;
     private VLayout simulationsLayout;
+    private Timer timer;
     private Label loadMoreLabel;
 
     public static TimelineLayout getInstance() {
@@ -101,12 +103,13 @@ public class TimelineLayout extends VLayout {
 
         loadData();
 
-        new Timer() {
+        timer = new Timer() {
             @Override
             public void run() {
                 loadData();
             }
-        }.scheduleRepeating(60000);
+        };
+        timer.scheduleRepeating(60000);
     }
 
     private void loadData() {
@@ -210,6 +213,7 @@ public class TimelineLayout extends VLayout {
     }
     
     public void terminate() {
+        timer.cancel();
         destroy();
         instance = null;
     }

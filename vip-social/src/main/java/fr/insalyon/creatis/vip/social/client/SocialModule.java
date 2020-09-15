@@ -47,6 +47,8 @@ import fr.insalyon.creatis.vip.social.client.rpc.SocialServiceAsync;
 import fr.insalyon.creatis.vip.social.client.view.SocialParser;
 import fr.insalyon.creatis.vip.social.client.view.SocialTab;
 
+import java.util.Set;
+
 /**
  *
  * @author Rafael Ferreira da Silva
@@ -88,8 +90,7 @@ public class SocialModule extends Module {
     }
 
     @Override
-    public void terminate() {
-
+    public void terminate(Set<Tab> removedTabs) {
         timer.cancel();
     }
 
