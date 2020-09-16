@@ -65,7 +65,7 @@ public class OperationLayout extends VLayout {
     }
 
     public static void terminate() {
-
+        instance.destroy();
         instance = null;
     }
 

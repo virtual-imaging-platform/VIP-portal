@@ -372,4 +372,10 @@ public class SimulationBoxLayout extends HLayout {
     public Date getLaunchedDate() {
         return launchedDate;
     }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        cancelTimer();
+    }
 }
