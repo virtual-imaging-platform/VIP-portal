@@ -58,7 +58,9 @@ import fr.insalyon.creatis.vip.core.client.view.main.SystemParser;
 import fr.insalyon.creatis.vip.core.client.view.main.SystemTileGrid;
 import fr.insalyon.creatis.vip.core.client.view.user.AccountTab;
 import fr.insalyon.creatis.vip.core.client.view.user.UserMenuButton;
+
 import java.util.List;
+import java.util.Set;
 
 /**
  *
@@ -156,8 +158,7 @@ public class CoreModule extends Module {
     }
 
     @Override
-    public void terminate() {
-
+    public void terminate(Set<Tab> removedTabs) {
         init();
     }
 

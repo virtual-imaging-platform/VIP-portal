@@ -45,6 +45,9 @@ import com.smartgwt.client.widgets.layout.VLayout;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
 import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
 
+import java.util.HashSet;
+import java.util.Set;
+
 /**
  *
  * @author Rafael Ferreira da Silva
@@ -56,11 +59,14 @@ public class JobLayout extends VLayout {
     private JobStatus status;
     private HLayout statusLayout;
 
+    private Set<DebugLayout> debugLayouts;
+
     public JobLayout(final int jobID, String simulationID, JobStatus status) {
 
         this.jobID = jobID;
         this.simuID = simulationID;
         this.status = status;
+        this.debugLayouts = new HashSet<>();
 
         this.setWidth(40);
         this.setHeight(40);
@@ -72,11 +78,10 @@ public class JobLayout extends VLayout {
         this.setBackgroundPosition("center center");
         this.setCursor(Cursor.HAND);
 
-        this.addClickHandler(new ClickHandler() {
-            @Override
-            public void onClick(ClickEvent event) {
-                new DebugLayout(simuID, jobID).show();
-            }
+        this.addClickHandler(event -> {
+            DebugLayout debugLayout = new DebugLayout(simuID, jobID);
+            debugLayout.show();
+            debugLayouts.add(debugLayout);
         });
         this.addMouseOverHandler(new MouseOverHandler() {
             @Override
@@ -112,5 +117,16 @@ public class JobLayout extends VLayout {
 
     public int getJobID() {
         return jobID;
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        for (DebugLayout debugLayout : debugLayouts) {
+            if ( debugLayout.isCreated()) {
+                  debugLayout.destroy();
+            }
+        }
+        debugLayouts.clear();
     }
 }

@@ -37,6 +37,7 @@ import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
 import fr.insalyon.creatis.vip.core.server.dao.*;
 import fr.insalyon.creatis.vip.core.server.dao.mysql.PlatformConnection;
+import fr.insalyon.creatis.vip.core.server.rpc.AbstractRemoteServiceServlet;
 import fr.insalyon.creatis.vip.core.server.rpc.ConfigurationServiceImpl;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -188,9 +189,9 @@ public abstract class AbstractAuthenticationService extends HttpServlet {
         Connection connection)
         throws BusinessException {
         try {
-            ConfigurationServiceImpl csi = new ConfigurationServiceImpl();
-            user = csi.setUserSession(user, request.getSession());
             ConfigurationBusiness cb = new ConfigurationBusiness();
+            user = AbstractRemoteServiceServlet.setUserSession(
+                    user, request.getSession(), connection, cb);
             cb.updateUserLastLogin(user.getEmail(), connection);
             Cookie userCookie = new Cookie(CoreConstants.COOKIES_USER, URLEncoder.encode(user.getEmail(), "UTF-8"));
             userCookie.setMaxAge((int) (CoreConstants.COOKIES_EXPIRATION_DATE.getTime() - new Date().getTime()));

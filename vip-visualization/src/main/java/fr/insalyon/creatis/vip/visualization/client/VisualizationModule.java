@@ -39,6 +39,8 @@ import fr.insalyon.creatis.vip.datamanager.client.view.browser.BrowserContextMen
 import fr.insalyon.creatis.vip.visualization.client.view.AbstractViewTab;
 import fr.insalyon.creatis.vip.visualization.client.view.AmiImageViewTab;
 import fr.insalyon.creatis.vip.visualization.client.view.BrainBrowserViewTab;
+
+import java.util.Set;
 import java.util.function.Consumer;
 
 public class VisualizationModule extends Module {
@@ -53,7 +55,7 @@ public class VisualizationModule extends Module {
     public void postLoading() {}
 
     @Override
-    public void terminate() {}
+    public void terminate(Set<Tab> removedTabs) {}
 
     private Visualizer brainBrowserVisualizer =
         new Visualizer() {

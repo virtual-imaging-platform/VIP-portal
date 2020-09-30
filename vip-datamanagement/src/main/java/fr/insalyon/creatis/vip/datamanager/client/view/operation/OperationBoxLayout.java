@@ -337,4 +337,12 @@ public class OperationBoxLayout extends HLayout {
             timer.scheduleRepeating(2500);
         }
     }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (timer.isRunning()) {
+            timer.cancel();
+        }
+    }
 }

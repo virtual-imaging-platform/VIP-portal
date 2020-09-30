@@ -104,7 +104,7 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
                 .validateSession(email, session, connection)) {
 
                 User user = configurationBusiness.getUser(email, connection);
-                user = setUserSession(user);
+                user = setUserSession(user, connection);
                 configurationBusiness.updateUserLastLogin(email, connection);
                 trace(logger, "Connected.");
 
@@ -154,7 +154,7 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
             logger.info("Authenticating '" + email + "'.");
             User user = configurationBusiness
                 .signin(email, password, connection);
-            user = setUserSession(user);
+            user = setUserSession(user, connection);
             configurationBusiness.updateUserLastLogin(email, connection);
             logger.info("Connected.");
 
@@ -201,7 +201,7 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
             user = configurationBusiness
                 .activate(user.getEmail(), code, connection);
 
-            return setUserSession(user);
+            return setUserSession(user, connection);
         } catch (BusinessException ex) {
             throw new CoreException(ex);
         } catch (SQLException ex) {
@@ -540,7 +540,7 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
         try(Connection connection = PlatformConnection.getInstance().getConnection()) {
             trace(logger, "Updating user data '" + user.getEmail() + "'.");
             user = configurationBusiness.updateUser(user, connection);
-            return setUserSession(user);
+            return setUserSession(user, connection);
         } catch (BusinessException ex) {
             throw new CoreException(ex);
         } catch (SQLException ex) {
@@ -583,7 +583,7 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
 
             currentUser = configurationBusiness
                 .getUserData(currentUser.getEmail(), connection);
-            return setUserSession(currentUser);
+            return setUserSession(currentUser, connection);
         } catch (BusinessException ex) {
             throw new CoreException(ex);
         } catch (SQLException ex) {
@@ -609,7 +609,7 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
 
             currentUser = configurationBusiness
                 .getUserData(newEmail, connection);
-            return setUserSession(currentUser);
+            return setUserSession(currentUser, connection);
         } catch (BusinessException ex) {
             throw new CoreException(ex);
         } catch (SQLException ex) {
@@ -628,7 +628,7 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
 
             currentUser = configurationBusiness
                 .getUserData(currentEmail, connection);
-            return setUserSession(currentUser);
+            return setUserSession(currentUser, connection);
         } catch (BusinessException ex) {
             throw new CoreException(ex);
         } catch (SQLException ex) {
@@ -679,24 +679,8 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
      * @return
      * @throws BusinessException
      */
-    public User setUserSession(User user) throws BusinessException {
-        return setUserSession(user, getSession());
-    }
-
-    public User setUserSession(User user, HttpSession session) throws BusinessException {
-        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
-            Map<Group, GROUP_ROLE> groups =
-                configurationBusiness.getUserGroups(user.getEmail(), connection);
-            user.setGroups(groups);
-
-            session.setAttribute(CoreConstants.SESSION_USER, user);
-            session.setAttribute(CoreConstants.SESSION_GROUPS, groups);
-
-            return user;
-        } catch (SQLException ex) {
-            logger.error("Error handling a connection", ex);
-            throw new BusinessException(ex);
-        }
+    public User setUserSession(User user, Connection connection) throws BusinessException {
+        return setUserSession(user, getSession(), connection, configurationBusiness);
     }
 
     /**

@@ -67,4 +67,10 @@ public class SimulationTab extends AbstractSimulationTab {
             tabSet.addTab(logsTab);
         }
     }
+
+    @Override
+    public void destroy() {
+        super.destroy();
+        jobsTab.destroy();
+    }
 }

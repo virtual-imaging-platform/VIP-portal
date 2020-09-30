@@ -52,6 +52,8 @@ import fr.insalyon.creatis.vip.core.client.view.auth.SignInTab;
 import fr.insalyon.creatis.vip.core.client.view.common.MessageWindow;
 import fr.insalyon.creatis.vip.core.client.view.layout.toolstrip.MainToolStrip;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.function.Supplier;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -160,12 +162,14 @@ public class Layout {
                 Cookies.setCookie(CoreConstants.COOKIES_USER, null, new Date(0), null, "/", false);
                 Cookies.setCookie(CoreConstants.COOKIES_SESSION, null, new Date(0), null, "/", false);
 
+                Set<Tab> removedTabs = new HashSet<>();
                 for (Tab tab : centerTabSet.getTabs()) {
+                    removedTabs.add(tab);
                     centerTabSet.removeTab(tab);
                 }
                 MainToolStrip.getInstance().reset();
                 authenticate(null);
-                Modules.getInstance().finalizeModules();
+                Modules.getInstance().finalizeModules(removedTabs);
             }
         };
         ConfigurationService.Util.getInstance().signout(callback);
