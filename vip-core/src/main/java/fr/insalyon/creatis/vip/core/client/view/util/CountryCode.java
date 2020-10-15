@@ -32,6 +32,10 @@
 package fr.insalyon.creatis.vip.core.client.view.util;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
+import com.sun.istack.internal.NotNull;
+import com.sun.istack.internal.Nullable;
+
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.TreeMap;
 
@@ -316,5 +320,13 @@ public enum CountryCode implements IsSerializable {
         }
 
         return map;
+    }
+
+    public static CountryCode searchIgnoreCase(String countryName) {
+        return Arrays.stream(values())
+                .filter(countryCode ->
+                        countryName.equalsIgnoreCase(countryCode.getCountryName()))
+                .findFirst().orElse(null);
+
     }
 }

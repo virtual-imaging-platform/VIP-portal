@@ -34,7 +34,11 @@ package fr.insalyon.creatis.vip.api.security.apikey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
+import org.springframework.security.core.authority.AuthorityUtils;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+
+import java.util.Collections;
 
 /**
  * Created by abonnet on 10/6/16.
@@ -56,8 +60,8 @@ public class ApikeyAuthenticationToken extends AbstractAuthenticationToken {
         setAuthenticated(false);
     }
 
-    public ApikeyAuthenticationToken(UserDetails principal, String apikey) {
-        super(null);
+    public ApikeyAuthenticationToken(UserDetails principal, String apikey, String role) {
+        super(AuthorityUtils.createAuthorityList("ROLE_" + role));
         this.principal = principal;
         this.apikey = apikey;
         super.setAuthenticated(true);

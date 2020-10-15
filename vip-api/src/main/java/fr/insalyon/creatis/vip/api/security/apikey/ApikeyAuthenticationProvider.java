@@ -148,7 +148,9 @@ public class ApikeyAuthenticationProvider implements
             } catch (DAOException e) {
                 logger.error("Error resetting failed auth attempts. Ignoring", e);
             }
-            return new ApikeyAuthenticationToken(springUser, apikey);
+            return new ApikeyAuthenticationToken(
+                    springUser, apikey,
+                    vipUser.getLevel().name().toUpperCase());
         } catch (SQLException | SQLRuntimeException e) {
             logger.error("error when getting or closing db connexion. Doing as if there is an auth error",e);
             throw new BadCredentialsException(

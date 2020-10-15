@@ -6,6 +6,7 @@ import fr.insalyon.creatis.vip.application.server.business.ClassBusiness;
 import fr.insalyon.creatis.vip.application.server.business.SimulationBusiness;
 import fr.insalyon.creatis.vip.application.server.business.WorkflowBusiness;
 import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
+import fr.insalyon.creatis.vip.core.server.business.StatsBusiness;
 import fr.insalyon.creatis.vip.core.server.dao.CoreDAOFactory;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import fr.insalyon.creatis.vip.core.server.dao.UserDAO;
@@ -108,5 +109,10 @@ public class VipBeansSpringConfig {
     @Bean
     public ApiKeyBusiness apiKeyBusiness() {
         return new ApiKeyBusiness();
+    }
+
+    @Bean
+    public StatsBusiness statsBusiness() {
+        return new StatsBusiness();
     }
 }
