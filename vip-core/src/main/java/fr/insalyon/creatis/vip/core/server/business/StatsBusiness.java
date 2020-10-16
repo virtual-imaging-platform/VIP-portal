@@ -1,7 +1,5 @@
 package fr.insalyon.creatis.vip.core.server.business;
 
-import com.sun.istack.internal.NotNull;
-import com.sun.istack.internal.Nullable;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.util.CountryCode;
 import fr.insalyon.creatis.vip.core.server.dao.CoreDAOFactory;
@@ -62,8 +60,8 @@ public class StatsBusiness {
     }
 
     public Long getUsersRegisteredNumber(
-            @NotNull UserSearchCriteria searchCriteria,
-            @NotNull Connection connection) throws BusinessException {
+            UserSearchCriteria searchCriteria, Connection connection)
+            throws BusinessException {
         try {
             UserDAO userDAO = CoreDAOFactory.getDAOFactory()
                     .getUserDAO(connection);
@@ -74,8 +72,8 @@ public class StatsBusiness {
     }
 
     public List<User> getUsersRegistered(
-            @NotNull UserSearchCriteria searchCriteria,
-            @NotNull Connection connection) throws BusinessException {
+            UserSearchCriteria searchCriteria,Connection connection)
+            throws BusinessException {
         try {
             UserDAO userDAO = CoreDAOFactory.getDAOFactory()
                     .getUserDAO(connection);

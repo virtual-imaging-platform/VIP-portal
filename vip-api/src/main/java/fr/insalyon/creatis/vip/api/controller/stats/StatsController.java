@@ -1,6 +1,5 @@
 package fr.insalyon.creatis.vip.api.controller.stats;
 
-import com.sun.istack.internal.NotNull;
 import fr.insalyon.creatis.vip.api.business.StatsApiBusiness;
 import fr.insalyon.creatis.vip.api.controller.ApiController;
 import fr.insalyon.creatis.vip.api.exception.ApiException;
@@ -68,7 +67,7 @@ public class StatsController extends ApiController {
             @PathVariable("start") String startString) throws ApiException {
         logMethodInvocation(logger, "getUsersForStatsFromDate", startString);
         assertService(service);
-        return statsApiBusiness.getAllUsersBetweenDate(startString);
+        return statsApiBusiness.getAllUsersFromDate(startString);
     }
 
     @RequestMapping("/service/{service}/{start}/{end}")
@@ -155,7 +154,7 @@ public class StatsController extends ApiController {
         return statsApiBusiness.getAllUsersFromInstitutionBetweenDate(institution, startString, endString);
     }
 
-    private void assertService(@NotNull String service) throws ApiException {
+    private void assertService(String service) throws ApiException {
         if ( ! "vip".equals(service)) {
             logger.error("Looking for stats with wrong service : {}", service);
             throw new ApiException(ApiError.WRONG_STAT_SERVICE, service);

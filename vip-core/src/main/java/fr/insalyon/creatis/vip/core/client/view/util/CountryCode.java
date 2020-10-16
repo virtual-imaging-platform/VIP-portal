@@ -32,8 +32,6 @@
 package fr.insalyon.creatis.vip.core.client.view.util;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
-import com.sun.istack.internal.NotNull;
-import com.sun.istack.internal.Nullable;
 
 import java.util.Arrays;
 import java.util.LinkedHashMap;

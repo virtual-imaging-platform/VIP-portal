@@ -1,7 +1,5 @@
 package fr.insalyon.creatis.vip.api.business;
 
-import com.sun.istack.internal.NotNull;
-import com.sun.istack.internal.Nullable;
 import fr.insalyon.creatis.vip.api.exception.ApiException;
 import fr.insalyon.creatis.vip.api.exception.ApiException.ApiError;
 import fr.insalyon.creatis.vip.api.exception.SQLRuntimeException;
@@ -47,8 +45,7 @@ public class StatsApiBusiness {
     }
 
     public UsersNumber getUsersRegisteredNumber(
-            @Nullable String startDateString,
-            @Nullable String endDateString) throws ApiException {
+            String startDateString, String endDateString) throws ApiException {
         // build search criteria
         UserSearchCriteria searchCriteria =
                 new UserSearchCriteria()
@@ -84,37 +81,33 @@ public class StatsApiBusiness {
         return getUsersList(new UserSearchCriteria());
     }
 
-    public UsersList getAllUsersBetweenDate(
-            @NotNull String startDateString) throws ApiException {
+    public UsersList getAllUsersFromDate(String startDateString) throws ApiException {
         return getUsersList(new UserSearchCriteria()
                 .withRegistrationStart(parseDate(startDateString)));
     }
 
     public UsersList getAllUsersBetweenDate(
-            @NotNull String startDateString, @NotNull String endDateString)
-            throws ApiException {
+            String startDateString, String endDateString) throws ApiException {
         return getUsersList(new UserSearchCriteria()
                 .withRegistrationStart(parseDate(startDateString))
                 .withRegistrationEnd(parseDate(endDateString)));
     }
 
-    public UsersList getAllUsersFromCountry(
-            @NotNull String country) throws ApiException {
+    public UsersList getAllUsersFromCountry(String country) throws ApiException {
         return getUsersList(new UserSearchCriteria()
                 .withCountry(getCountry(country)));
     }
 
     public UsersList getAllUsersFromCountryFromDate(
-            @NotNull String country, @NotNull String startDateString)
-            throws ApiException {
+            String country, String startDateString) throws ApiException {
         return getUsersList(new UserSearchCriteria()
                 .withCountry(getCountry(country))
                 .withRegistrationStart(parseDate(startDateString)));
     }
     
     public UsersList getAllUsersFromCountryBetweenDate(
-            @NotNull String country, @NotNull String startDateString,
-            @NotNull String endDateString) throws ApiException {
+            String country, String startDateString, String endDateString)
+            throws ApiException {
         return getUsersList(new UserSearchCriteria()
                 .withCountry(getCountry(country))
                 .withRegistrationStart(parseDate(startDateString))
@@ -122,22 +115,21 @@ public class StatsApiBusiness {
     }
 
     public UsersList getAllUsersFromInstitution(
-            @NotNull String institution) throws ApiException {
+            String institution) throws ApiException {
         return getUsersList(new UserSearchCriteria()
                 .withInstitution(institution));
     }
 
     public UsersList getAllUsersFromInstitutionFromDate(
-            @NotNull String institution, @NotNull String startDateString)
-            throws ApiException {
+            String institution, String startDateString) throws ApiException {
         return getUsersList(new UserSearchCriteria()
                 .withInstitution(institution)
                 .withRegistrationStart(parseDate(startDateString)));
     }
 
     public UsersList getAllUsersFromInstitutionBetweenDate(
-            @NotNull String institution, @NotNull String startDateString,
-            @NotNull String endDateString) throws ApiException {
+            String institution, String startDateString, String endDateString)
+            throws ApiException {
         return getUsersList(new UserSearchCriteria()
                 .withInstitution(institution)
                 .withRegistrationStart(parseDate(startDateString))
@@ -145,7 +137,7 @@ public class StatsApiBusiness {
     }
 
     public UsersList getAllUsersFromCountryAndInstitution(
-            @NotNull String country, @NotNull String institution)
+            String country, String institution)
             throws ApiException {
         return getUsersList(new UserSearchCriteria()
                 .withCountry(getCountry(country))
@@ -153,8 +145,8 @@ public class StatsApiBusiness {
     }
 
     public UsersList getAllUsersFromCountryAndInstitutionFromDate(
-            @NotNull String country, @NotNull String institution,
-            @NotNull String startDateString) throws ApiException {
+            String country, String institution, String startDateString)
+            throws ApiException {
         return getUsersList(new UserSearchCriteria()
                 .withCountry(getCountry(country))
                 .withInstitution(institution)
@@ -162,9 +154,8 @@ public class StatsApiBusiness {
     }
 
     public UsersList getAllUsersFromCountryAndInstitutionBetweenDate(
-            @NotNull String country, @NotNull String institution,
-            @NotNull String startDateString, @NotNull String endDateString)
-            throws ApiException {
+            String country, String institution, String startDateString,
+            String endDateString) throws ApiException {
         return getUsersList(new UserSearchCriteria()
                 .withCountry(getCountry(country))
                 .withInstitution(institution)
@@ -172,8 +163,8 @@ public class StatsApiBusiness {
                 .withRegistrationEnd(parseDate(endDateString)));
     }
 
-    private UsersList getUsersList(
-            @NotNull UserSearchCriteria searchCriteria) throws ApiException {
+    private UsersList getUsersList(UserSearchCriteria searchCriteria)
+            throws ApiException {
 
         List<User> users;
         try(Connection connection = connectionSupplier.get()) {
@@ -192,7 +183,7 @@ public class StatsApiBusiness {
         return new UsersList(statUsers);
     }
 
-    @NotNull private StatUser mapVipUserToStatUser(@NotNull User vipUser) {
+    private StatUser mapVipUserToStatUser(User vipUser) {
         return new StatUser(
                 null,
                 vipUser.getCountryCode().getCountryName(),
@@ -204,7 +195,7 @@ public class StatsApiBusiness {
         );
     }
 
-    @NotNull private CountryCode getCountry(String countryString) throws ApiException {
+    private CountryCode getCountry(String countryString) throws ApiException {
         CountryCode country = CountryCode.searchIgnoreCase(countryString);
         if (country == null) {
             logger.error("Wrong country {}", countryString);
@@ -215,7 +206,7 @@ public class StatsApiBusiness {
 
     private final String DATE_TIME_FORMAT = "dd-MM-yyyy";
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_TIME_FORMAT);
-    @Nullable private LocalDate parseDate(@Nullable String dateString) throws ApiException {
+    private LocalDate parseDate(String dateString) throws ApiException {
         if (dateString == null) {
             return null;
         }
