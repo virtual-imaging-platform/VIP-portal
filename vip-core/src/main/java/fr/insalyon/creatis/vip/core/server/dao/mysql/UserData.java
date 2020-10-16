@@ -34,13 +34,17 @@ package fr.insalyon.creatis.vip.core.server.dao.mysql;
 import fr.insalyon.creatis.vip.core.client.bean.*;
 import fr.insalyon.creatis.vip.core.client.view.user.UserLevel;
 import fr.insalyon.creatis.vip.core.client.view.util.CountryCode;
+import fr.insalyon.creatis.vip.core.server.business.StatsBusiness.UserSearchCriteria;
 import fr.insalyon.creatis.vip.core.server.dao.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.sql.*;
+import java.time.LocalDate;
 import java.util.*;
+import java.util.AbstractMap.SimpleEntry;
 import java.util.Date;
+import java.util.Map.Entry;
 
 /**
  *
@@ -273,6 +277,133 @@ public class UserData implements UserDAO {
         } catch (SQLException ex) {
             logger.error("Error getting all users", ex);
             throw new DAOException(ex);
+        }
+    }
+
+    @Override
+    public List<User> searchUsers(
+            UserSearchCriteria searchCriteria) throws DAOException {
+
+        try {
+            StringBuilder query = new StringBuilder("SELECT "
+                    + "email, next_email, first_name, last_name, institution, phone, "
+                    + "code, confirmed, folder, registration, last_login, "
+                    + "level, country_code, max_simulations, termsUse, lastUpdatePublications,"
+                    + "failed_authentications, account_locked "
+                    + "FROM VIPUsers ");
+            List<Object> params = new ArrayList<>();
+
+            buildSearchQuery(searchCriteria)
+                    .ifPresent(queryEntry -> {
+                        query.append(queryEntry.getKey());
+                        params.addAll(queryEntry.getValue());
+                    });
+
+            query.append("ORDER BY LOWER(registration)");
+
+            PreparedStatement ps = connection.prepareStatement(query.toString());
+            int paramIndex = 1;
+            for (Object param : params) {
+                ps.setObject(paramIndex, param);
+                paramIndex++;
+            }
+
+            ResultSet rs = ps.executeQuery();
+            List<User> users = new ArrayList<User>();
+
+            while (rs.next()) {
+                users.add(new User(
+                        rs.getString("first_name"), rs.getString("last_name"),
+                        rs.getString("email"), rs.getString("next_email"),
+                        rs.getString("institution"),
+                        "", rs.getString("phone"), rs.getBoolean("confirmed"),
+                        rs.getString("code"), rs.getString("folder"), "",
+                        new Date(rs.getTimestamp("registration").getTime()),
+                        new Date(rs.getTimestamp("last_login").getTime()),
+                        UserLevel.valueOf(rs.getString("level")),
+                        CountryCode.valueOf(rs.getString("country_code")),
+                        rs.getInt("max_simulations"),
+                        rs.getTimestamp("termsUse"),
+                        rs.getTimestamp("lastUpdatePublications"),
+                        rs.getInt("failed_authentications"),
+                        rs.getBoolean("account_locked")));
+            }
+            ps.close();
+            return users;
+
+        } catch (SQLException ex) {
+            logger.error("Error getting all users", ex);
+            throw new DAOException(ex);
+        }
+    }
+
+
+    @Override
+    public Long countUsers(
+            UserSearchCriteria searchCriteria) throws DAOException {
+        try {
+            StringBuilder query = new StringBuilder("select COUNT(*) as count from VIPUsers ");
+            List<Object> params = new ArrayList<>();
+
+            buildSearchQuery(searchCriteria)
+                    .ifPresent(queryEntry -> {
+                        query.append(queryEntry.getKey());
+                        params.addAll(queryEntry.getValue());
+                    });
+
+
+            PreparedStatement ps = connection.prepareStatement(query.toString());
+            int paramIndex = 1;
+            for (Object param : params) {
+                ps.setObject(paramIndex, param);
+                paramIndex++;
+            }
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                return rs.getLong("count");
+            }
+            ps.close();
+        } catch (SQLException ex) {
+            logger.error("Error getting users number", ex);
+            throw new DAOException(ex);
+        }
+        return -1l;
+    }
+
+    private Optional<Map.Entry<String,List<Object>>> buildSearchQuery(
+            UserSearchCriteria searchCriteria) {
+
+        StringBuilder query = new StringBuilder();
+        List<Object> params = new ArrayList<>();
+
+        if (searchCriteria.getRegistrationStart() != null) {
+            query.append("AND registration >= ? ");
+            params.add(java.sql.Date.valueOf(searchCriteria.getRegistrationStart()));
+        }
+        if (searchCriteria.getRegistrationEnd() != null) {
+            query.append("AND registration <= ? ");
+            params.add(java.sql.Date.valueOf(searchCriteria.getRegistrationEnd()));
+        }
+
+        if (searchCriteria.getCountry() != null) {
+            query.append("AND country_code = ? ");
+            params.add(searchCriteria.getCountry().name());
+        }
+
+        if (searchCriteria.getInstitution() != null) {
+            query.append("AND institution = ? ");
+            params.add(searchCriteria.getInstitution());
+        }
+
+        if (query.length() > 0) {
+            // replace starting "AND" by "WHERE"
+            query.replace(0, 3, "WHERE");
+            return Optional.of(new SimpleEntry<>(
+                    query.toString(),
+                    params
+            ));
+        } else {
+            return Optional.empty();
         }
     }
 
