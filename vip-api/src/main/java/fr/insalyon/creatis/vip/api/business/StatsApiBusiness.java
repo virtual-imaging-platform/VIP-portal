@@ -86,7 +86,7 @@ public class StatsApiBusiness {
                 .withRegistrationStart(parseDate(startDateString)));
     }
 
-    public UsersList getAllUsersBetweendates(
+    public UsersList getAllUsersBetweenDates(
             String startDateString, String endDateString) throws ApiException {
         return getUsersList(new UserSearchCriteria()
                 .withRegistrationStart(parseDate(startDateString))
@@ -105,7 +105,7 @@ public class StatsApiBusiness {
                 .withRegistrationStart(parseDate(startDateString)));
     }
     
-    public UsersList getAllUsersFromCountryBetweendates(
+    public UsersList getAllUsersFromCountryBetweenDates(
             String country, String startDateString, String endDateString)
             throws ApiException {
         return getUsersList(new UserSearchCriteria()
@@ -127,7 +127,7 @@ public class StatsApiBusiness {
                 .withRegistrationStart(parseDate(startDateString)));
     }
 
-    public UsersList getAllUsersFromInstitutionBetweendates(
+    public UsersList getAllUsersFromInstitutionBetweenDates(
             String institution, String startDateString, String endDateString)
             throws ApiException {
         return getUsersList(new UserSearchCriteria()
@@ -153,7 +153,7 @@ public class StatsApiBusiness {
                 .withRegistrationStart(parseDate(startDateString)));
     }
 
-    public UsersList getAllUsersFromCountryAndInstitutionBetweendates(
+    public UsersList getAllUsersFromCountryAndInstitutionBetweenDates(
             String country, String institution, String startDateString,
             String endDateString) throws ApiException {
         return getUsersList(new UserSearchCriteria()

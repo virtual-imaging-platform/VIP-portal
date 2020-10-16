@@ -46,10 +46,10 @@ public class StatsController extends ApiController {
     }
 
     @RequestMapping("/users/{start}/{end}")
-    public UsersNumber getUsersRegisteredNumberBetweendatess(
+    public UsersNumber getUsersRegisteredNumberBetweenDates(
             @PathVariable("start") String startString,
             @PathVariable("end") String endString) throws ApiException {
-        logMethodInvocation(logger, "getUsersRegisteredNumberBetweendates", startString, endString);
+        logMethodInvocation(logger, "getUsersRegisteredNumberBetweenDates", startString, endString);
         return statsApiBusiness.getUsersRegisteredNumber(startString, endString);
     }
 
@@ -71,13 +71,13 @@ public class StatsController extends ApiController {
     }
 
     @RequestMapping("/service/{service}/{start}/{end}")
-    public UsersList getUsersForStatsBetweendatess(
+    public UsersList getUsersForStatsBetweenDates(
             @PathVariable String service,
             @PathVariable("start") String startString,
             @PathVariable("end") String endString) throws ApiException {
-        logMethodInvocation(logger, "getUsersForStatsBetweendatess", startString, endString);
+        logMethodInvocation(logger, "getUsersForStatsBetweenDates", startString, endString);
         assertService(service);
-        return statsApiBusiness.getAllUsersBetweendates(startString, endString);
+        return statsApiBusiness.getAllUsersBetweenDates(startString, endString);
     }
 
     @RequestMapping("/country/{country}")
@@ -107,14 +107,14 @@ public class StatsController extends ApiController {
     }
 
     @RequestMapping("/country/{country}/{service}/{start}/{end}")
-    public UsersList getUsersForStatsFromCountryBetweendatess(
+    public UsersList getUsersForStatsFromCountryBetweenDates(
             @PathVariable String country,
             @PathVariable String service,
             @PathVariable("start") String startString,
             @PathVariable("end") String endString) throws ApiException {
-        logMethodInvocation(logger, "getUsersForStatsFromCountryBetweendatess", country, startString, endString);
+        logMethodInvocation(logger, "getUsersForStatsFromCountryBetweenDates", country, startString, endString);
         assertService(service);
-        return statsApiBusiness.getAllUsersFromCountryBetweendates(country, startString, endString);
+        return statsApiBusiness.getAllUsersFromCountryBetweenDates(country, startString, endString);
     }
 
     @RequestMapping("/institute/{institution}")
@@ -144,14 +144,14 @@ public class StatsController extends ApiController {
     }
 
     @RequestMapping("/institute/{institution}/{service}/{start}/{end}")
-    public UsersList getUsersForStatsFromInstitutionBetweendatess(
+    public UsersList getUsersForStatsFromInstitutionBetweenDates(
             @PathVariable String institution,
             @PathVariable String service,
             @PathVariable("start") String startString,
             @PathVariable("end") String endString) throws ApiException {
-        logMethodInvocation(logger, "getUsersForStatsFromInstitutionBetweendatess", institution, startString, endString);
+        logMethodInvocation(logger, "getUsersForStatsFromInstitutionBetweenDates", institution, startString, endString);
         assertService(service);
-        return statsApiBusiness.getAllUsersFromInstitutionBetweendates(institution, startString, endString);
+        return statsApiBusiness.getAllUsersFromInstitutionBetweenDates(institution, startString, endString);
     }
 
     private void assertService(String service) throws ApiException {
