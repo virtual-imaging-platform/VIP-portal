@@ -53,6 +53,24 @@ public class PublicationParser extends ApplicationParser {
     @Override
     public void loadApplications() {
         addApplication(PublicationConstants.APP_PUBLICATIONS, PublicationConstants.APP_IMG_PUBLICATIONS);
+
+        //call to test last publication update
+        final AsyncCallback<Boolean> callback = new AsyncCallback<Boolean>() {
+            @Override
+            public void onFailure(Throwable caught) {
+
+                Layout.getInstance().setWarningMessage("Cannot get the date of last publication update" + caught.getMessage(), 10);
+
+            }
+
+            @Override
+            public void onSuccess(Boolean result) {
+                if (result) {
+                    showDialog(" You haven't updated your publications for a while. Please take a few minutes to review the list of publications that you made using VIP.");
+                }
+
+            }
+        };
         ConfigurationService.Util.getInstance().testLastUpdatePublication(callback);
     }
 
@@ -67,23 +85,6 @@ public class PublicationParser extends ApplicationParser {
         return false;
     }
 
-    //call to test last publication update
-    final AsyncCallback<Boolean> callback = new AsyncCallback<Boolean>() {
-        @Override
-        public void onFailure(Throwable caught) {
-
-            Layout.getInstance().setWarningMessage("Cannot get the date of last publication update" + caught.getMessage(), 10);
-
-        }
-
-        @Override
-        public void onSuccess(Boolean result) {
-            if (result) {
-                showDialog(" You haven't updated your publications for a while. Please take a few minutes to review the list of publications that you made using VIP.");
-            }
-
-        }
-    };
 
 
     private void showDialog(String message) {
