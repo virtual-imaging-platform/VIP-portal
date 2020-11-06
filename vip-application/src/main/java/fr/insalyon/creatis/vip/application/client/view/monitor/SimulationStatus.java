@@ -31,16 +31,19 @@
  */
 package fr.insalyon.creatis.vip.application.client.view.monitor;
 
+import com.sun.org.apache.bcel.internal.classfile.Unknown;
+
 /**
  *
  * @author Rafael Ferreira da Silva
  */
 public enum SimulationStatus {
 
-    Running, 
-    Completed, 
-    Killed, 
-    Cleaned, 
-    Queued, 
+    Running,
+    Completed,
+    Failed,
+    Killed,
+    Cleaned,
+    Queued,
     Unknown
 }

@@ -186,6 +186,7 @@ public class SearchStackSection extends SectionStackSection {
                 statusMap.put(SimulationStatus.Completed.name(), SimulationStatus.Completed.name());
                 statusMap.put(SimulationStatus.Running.name(), SimulationStatus.Running.name());
                 statusMap.put(SimulationStatus.Killed.name(), SimulationStatus.Killed.name());
+                statusMap.put(SimulationStatus.Failed.name(), SimulationStatus.Failed.name());
                 if (CoreModule.user.isSystemAdministrator()) {
                     statusMap.put(SimulationStatus.Cleaned.name(), SimulationStatus.Cleaned.name());
                 }
