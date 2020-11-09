@@ -31,8 +31,6 @@
  */
 package fr.insalyon.creatis.vip.application.client.view.monitor;
 
-import com.sun.org.apache.bcel.internal.classfile.Unknown;
-
 /**
  *
  * @author Rafael Ferreira da Silva

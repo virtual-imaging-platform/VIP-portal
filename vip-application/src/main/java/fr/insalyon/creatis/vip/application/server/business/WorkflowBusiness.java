@@ -106,12 +106,14 @@ public class WorkflowBusiness {
     public WorkflowBusiness() {
         engineBusiness = new EngineBusiness();
         try {
-            simulationStatsDAO = SimulationStatsDAOFactory.getInstance().getSimulationStatsDAO();
-            workflowDAO = WorkflowsDBDAOFactory.getInstance().getWorkflowDAO();
-            processorDAO = WorkflowsDBDAOFactory.getInstance().getProcessorDAO();
-            outputDAO = WorkflowsDBDAOFactory.getInstance().getOutputDAO();
-            inputDAO = WorkflowsDBDAOFactory.getInstance().getInputDAO();
-            statsDAO = WorkflowsDBDAOFactory.getInstance().getStatsDAO();
+            WorkflowsDBDAOFactory workflowsDBDAOFactory = new WorkflowsDBDAOFactory();
+            simulationStatsDAO = SimulationStatsDAOFactory.getInstance()
+                    .getSimulationStatsDAO(workflowsDBDAOFactory);
+            workflowDAO = workflowsDBDAOFactory.getWorkflowDAO();
+            processorDAO = workflowsDBDAOFactory.getProcessorDAO();
+            outputDAO = workflowsDBDAOFactory.getOutputDAO();
+            inputDAO = workflowsDBDAOFactory.getInputDAO();
+            statsDAO = workflowsDBDAOFactory.getStatsDAO();
         } catch (DAOException | WorkflowsDBDAOException ex) {
             logger.error("Error initialising WorkflowBusiness", ex);
         }
