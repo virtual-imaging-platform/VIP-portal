@@ -169,7 +169,7 @@ public class SimulationBoxLayout extends HLayout {
             case Killed:
                 cancelTimer();
                 actionButton.setPrompt("Clean simulation");
-                img.setSrc(ApplicationConstants.ICON_MONITOR_SIMULATION_FAILED);
+                img.setSrc(ApplicationConstants.ICON_MONITOR_SIMULATION_KILLED);
                 break;
             case Cleaned:
                 cancelTimer();
@@ -179,6 +179,11 @@ public class SimulationBoxLayout extends HLayout {
                     actionButton.hide();
                 }
                 img.setSrc(ApplicationConstants.ICON_MONITOR_SIMULATION_CLEANED);
+                break;
+            case Failed:
+                cancelTimer();
+                actionButton.setPrompt("Clean simulation");
+                img.setSrc(ApplicationConstants.ICON_MONITOR_SIMULATION_FAILED);
                 break;
             default:
                 cancelTimer();

@@ -208,6 +208,7 @@ public class SimulationsContextMenu extends Menu {
                 }
                 break;
 
+            case Failed:
             case Killed:
                 if (CoreModule.user.isSystemAdministrator()) {
                     this.setItems(viewItem, markCompletedItem, cleanItem, separator, relauchItem, separator, changeUserItem);

@@ -146,6 +146,9 @@ public class ProgressLayout extends VLayout {
                         if (status == SimulationStatus.Killed) {
                             barLayout.setBackgroundColor(JobStatus.Failed.getColor());
                             sb.append(". <b>Execution killed!</b>");
+                        } else if (status == SimulationStatus.Failed) {
+                            barLayout.setBackgroundColor(JobStatus.Failed.getColor());
+                            sb.append(". <b>Execution Failed!</b>");
                         }
                         sb.append("</font>");
                         barLayout.setWidth(progress + "%");

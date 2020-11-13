@@ -59,13 +59,7 @@ public class SimulationStatsDAOFactory {
     private SimulationStatsDAOFactory() {
     }
 
-    public SimulationStatsDAO getSimulationStatsDAO() throws DAOException {
-        try {
-            return new SimulationStatsData(WorkflowsDBDAOFactory.getInstance().getSessionFactory());
-            
-        } catch (WorkflowsDBDAOException ex) {
-            logger.error("Error getting SimulationStatsDAO", ex);
-            throw new DAOException(ex);
-        }
+    public SimulationStatsDAO getSimulationStatsDAO(WorkflowsDBDAOFactory workflowsDBDAOFactory) throws DAOException {
+        return new SimulationStatsData(workflowsDBDAOFactory.getSessionFactory());
     }
 }
