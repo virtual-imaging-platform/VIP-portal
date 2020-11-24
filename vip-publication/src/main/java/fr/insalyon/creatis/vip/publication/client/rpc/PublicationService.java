@@ -29,43 +29,42 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL-B license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.core.client.view.user.publication;
+package fr.insalyon.creatis.vip.publication.client.rpc;
 
-
-import com.smartgwt.client.data.DataSource;
-import com.smartgwt.client.data.fields.DataSourceDateField;
-import com.smartgwt.client.data.fields.DataSourceDateTimeField;
-import com.smartgwt.client.data.fields.DataSourceIntegerField;
-import com.smartgwt.client.data.fields.DataSourceTextField;
-import com.smartgwt.client.widgets.grid.ListGridField;
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.user.client.rpc.RemoteService;
+import com.google.gwt.user.client.rpc.ServiceDefTarget;
+import fr.insalyon.creatis.vip.publication.client.bean.Publication;
+import fr.insalyon.creatis.vip.core.client.view.CoreException;
+import java.util.List;
 
 /**
  *
- * @author Nouha Boujelben
+ * @author Rafael Ferreira da Silva, Sorina Pop
  */
-public class Data extends DataSource {
+public interface PublicationService extends RemoteService {
 
-    public Data() {
+    String SERVICE_URI = "/publicationservice";
 
-        DataSourceIntegerField id = new DataSourceIntegerField("id", "Id");
-        id.setPrimaryKey(true);
-        id.setHidden(true);
-        
-        DataSourceTextField title = new DataSourceTextField("title", "Title");
-        
-        DataSourceTextField type = new DataSourceTextField("type", "type");
-        
-        DataSourceTextField typeName = new DataSourceTextField("typeName", "typeName");
-        
-        DataSourceTextField date = new DataSourceTextField("date", "date");
-        
-        DataSourceTextField authors = new DataSourceTextField("authors", "authors");
-        
-        DataSourceTextField doi = new DataSourceTextField("doi", "doi");
-             
-        setFields(id,title,type,typeName, date,authors,doi );
-        setClientOnly(true);
+    class Util {
 
+        public static PublicationServiceAsync getInstance() {
 
+            PublicationServiceAsync instance = GWT.create(PublicationService.class);
+            ServiceDefTarget target = (ServiceDefTarget) instance;
+            target.setServiceEntryPoint(GWT.getModuleBaseURL() + SERVICE_URI);
+            return instance;
+        }
     }
+
+    void addPublication(Publication pub) throws CoreException;
+
+    void updatePublication(Publication pub) throws CoreException;
+
+    List<Publication> getPublications() throws CoreException;
+
+    void removePublication(Long id) throws CoreException;
+
+    List<Publication> parseBibtexText(String text) throws CoreException;
+
 }

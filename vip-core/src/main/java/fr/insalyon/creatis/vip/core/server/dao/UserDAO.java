@@ -35,7 +35,10 @@ import fr.insalyon.creatis.vip.core.client.bean.DropboxAccountStatus;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.user.UserLevel;
 import fr.insalyon.creatis.vip.core.client.view.util.CountryCode;
+import fr.insalyon.creatis.vip.core.server.business.StatsBusiness.UserSearchCriteria;
+
 import java.sql.Timestamp;
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 
@@ -69,6 +72,10 @@ public interface UserDAO {
     public User getUser(String email) throws DAOException;
 
     public List<User> getUsers() throws DAOException;
+
+    List<User> searchUsers(UserSearchCriteria searchCriteria) throws DAOException;
+
+    Long countUsers(UserSearchCriteria searchCriteria) throws DAOException;
 
     public void remove(String email) throws DAOException;
 

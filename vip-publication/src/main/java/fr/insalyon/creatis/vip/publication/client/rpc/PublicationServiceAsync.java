@@ -29,28 +29,25 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL-B license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.core.client.view.user.publication;
+package fr.insalyon.creatis.vip.publication.client.rpc;
 
-import com.google.gwt.user.client.rpc.IsSerializable;
+import com.google.gwt.user.client.rpc.AsyncCallback;
+import fr.insalyon.creatis.vip.publication.client.bean.Publication;
+import java.util.List;
 
 /**
  *
- * @author Nouha boujelben
+ * @author Rafael Ferreira da Silva, Sorina Pop
  */
-public enum PublicationTypes implements IsSerializable{
+public interface PublicationServiceAsync {
 
-    ConferenceArticle("Article In Conference Proceedings"), Journal("Journal Article"), BookChapter("Book Chapter"), Other("Other");
+    void getPublications(AsyncCallback<List<Publication>> asyncCallback);
 
-    private PublicationTypes() {
-    }
-    private String value;
+    void removePublication(Long id, AsyncCallback<Void> asyncCallback);
 
-    private PublicationTypes(String value) {
-        this.value = value;
-    }
+    void addPublication(Publication pub, AsyncCallback<Void> asyncCallback);
 
-    @Override
-    public String toString() {
-        return value;
-    }
+    void updatePublication(Publication pub, AsyncCallback<Void> asyncCallback);
+
+    void parseBibtexText(String text, AsyncCallback<List<Publication>> asyncCallback);
 }

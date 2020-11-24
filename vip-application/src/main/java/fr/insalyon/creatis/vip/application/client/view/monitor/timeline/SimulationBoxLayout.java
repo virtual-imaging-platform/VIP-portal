@@ -173,7 +173,11 @@ public class SimulationBoxLayout extends HLayout {
                 break;
             case Cleaned:
                 cancelTimer();
-                actionButton.setPrompt("Purge simulation");
+                if (CoreModule.user.isSystemAdministrator()) {
+                    actionButton.setPrompt("Purge simulation");
+                } else {
+                    actionButton.hide();
+                }
                 img.setSrc(ApplicationConstants.ICON_MONITOR_SIMULATION_CLEANED);
                 break;
             default:
@@ -371,5 +375,11 @@ public class SimulationBoxLayout extends HLayout {
 
     public Date getLaunchedDate() {
         return launchedDate;
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        cancelTimer();
     }
 }

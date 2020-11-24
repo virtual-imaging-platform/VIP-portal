@@ -65,4 +65,7 @@ public interface CarminProperties {
 
     String API_PIPELINE_WHITE_LIST = "carmin.processing.pipelines.whitelist";
     String ADDITIONNAL_INPUT_VALID_CHARS = "\\[\\]"; // will be use in regex, so brackets must be escaped
+
+    // NON-CARMIN : STATISTICS
+    String STATS_DATE_FORMAT = "dd-MM-yyyy HH:mm:ss";
 }

@@ -33,9 +33,12 @@ package fr.insalyon.creatis.vip.core.server.auth;
 
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
+import fr.insalyon.creatis.vip.core.client.view.CoreException;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
+import fr.insalyon.creatis.vip.core.server.business.VipSessionBusiness;
 import fr.insalyon.creatis.vip.core.server.dao.*;
+import fr.insalyon.creatis.vip.core.server.rpc.AbstractRemoteServiceServlet;
 import fr.insalyon.creatis.vip.core.server.rpc.ConfigurationServiceImpl;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -71,6 +74,7 @@ public abstract class AbstractAuthenticationService extends HttpServlet {
 
     private UserDAO userDAO;
     private ConfigurationBusiness configurationBusiness;
+    private VipSessionBusiness vipSessionBusiness;
 
     @Override
     public void init() throws ServletException {
@@ -78,13 +82,14 @@ public abstract class AbstractAuthenticationService extends HttpServlet {
         ApplicationContext applicationContext = WebApplicationContextUtils.getRequiredWebApplicationContext(getServletContext());
         userDAO = applicationContext.getBean(UserDAO.class);
         configurationBusiness = applicationContext.getBean(ConfigurationBusiness.class);
+        vipSessionBusiness = applicationContext.getBean(VipSessionBusiness.class);
     }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) {
         try {
             processRequest(request, response);
-        } catch (BusinessException ex) {
+        } catch (BusinessException | CoreException ex) {
             logger.error("Error handling a request : {}. Ignoring", ex.getMessage());
         }
     }
@@ -93,14 +98,14 @@ public abstract class AbstractAuthenticationService extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) {
         try {
             processRequest(request, response);
-        } catch (BusinessException ex) {
+        } catch (BusinessException | CoreException ex) {
             logger.error("Error handling a request : {}. Ignoring", ex.getMessage());
         }
     }
 
     private void processRequest(
             HttpServletRequest request,
-            HttpServletResponse response) throws BusinessException {
+            HttpServletResponse response) throws BusinessException, CoreException {
 
         logger.info("Third-party authentication request.");
         String email;
@@ -139,7 +144,7 @@ public abstract class AbstractAuthenticationService extends HttpServlet {
     private void authSuccessResponse(
             HttpServletRequest request,
             HttpServletResponse response,
-            String email) throws BusinessException {
+            String email) throws BusinessException, CoreException {
 
         String accountType = getDefaultAccountType();
         User user = configurationBusiness.getOrCreateUser(email, accountType);
@@ -181,12 +186,10 @@ public abstract class AbstractAuthenticationService extends HttpServlet {
     private void setVIPSession(
             HttpServletRequest request,
             HttpServletResponse response,
-            User user) throws BusinessException {
+            User user) throws BusinessException, CoreException {
         try {
-            ConfigurationServiceImpl csi = new ConfigurationServiceImpl();
-            csi.setConfigurationBusiness(configurationBusiness); //inject dependency
-            user = csi.setUserSession(user, request.getSession());
             configurationBusiness.updateUserLastLogin(user.getEmail());
+            user = vipSessionBusiness.setUserInSession(user, request.getSession());
             Cookie userCookie = new Cookie(CoreConstants.COOKIES_USER, URLEncoder.encode(user.getEmail(), "UTF-8"));
             userCookie.setMaxAge((int) (CoreConstants.COOKIES_EXPIRATION_DATE.getTime() - new Date().getTime()));
             userCookie.setPath("/");

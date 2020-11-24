@@ -29,33 +29,42 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL-B license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.core.client.view.user.publication;
+package fr.insalyon.creatis.vip.publication.client.view;
 
-import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
-import fr.insalyon.creatis.vip.core.client.view.common.AbstractFormLayout;
-import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
+
+import com.smartgwt.client.data.DataSource;
+import com.smartgwt.client.data.fields.DataSourceIntegerField;
+import com.smartgwt.client.data.fields.DataSourceTextField;
 
 /**
  *
- * @author Nouha boujelben
+ * @author Nouha Boujelben
  */
-public class PublicationInfoTab extends AbstractFormLayout{
-    public PublicationInfoTab() {
+public class Data extends DataSource {
 
-        super("100%", "50");
-        addTitle("", CoreConstants.ICON_INFO);
-        addMember(WidgetUtil.getLabel(
-                "<b>Please list here the references of the publications "
-                + "that you made using VIP. These references may"
-                + " be used by the VIP team to justify the use of "
-                + "computing and storage resources. <br/><font color=\"blue\">Fr"
-                        + "</font><font color=\"white\">en</font><font "
-                        + "color=\"red\">ch</font> users: "
-                        + "France-Grilles also requires that the "
-                        + "publications made using their infrastructure are "
-                        + "registered in <a href=\"http://hal.archives-ouvertes.fr\">HAL</a> "
-                        + "(only authors can do that, we cannot do it for you).</b>", 20));
+    public Data() {
+
+        DataSourceIntegerField id = new DataSourceIntegerField("id", "Id");
+        id.setPrimaryKey(true);
+        id.setHidden(true);
         
+        DataSourceTextField title = new DataSourceTextField("title", "Title");
+        
+        DataSourceTextField type = new DataSourceTextField("type", "type");
+        
+        DataSourceTextField typeName = new DataSourceTextField("typeName", "typeName");
+        
+        DataSourceTextField date = new DataSourceTextField("date", "date");
+        
+        DataSourceTextField authors = new DataSourceTextField("authors", "authors");
+
+        DataSourceTextField vipApplication = new DataSourceTextField("VipApplication", "VipApplication");
+        
+        DataSourceTextField doi = new DataSourceTextField("doi", "doi");
+             
+        setFields(id,title,type,typeName, date,authors,vipApplication,doi );
+        setClientOnly(true);
+
+
     }
-    
 }

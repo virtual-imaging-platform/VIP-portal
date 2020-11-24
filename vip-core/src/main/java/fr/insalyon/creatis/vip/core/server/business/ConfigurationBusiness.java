@@ -75,17 +75,16 @@ public class ConfigurationBusiness {
     
     private AccountDAO accountDAO;
     private GroupDAO groupDAO;
-    private PublicationDAO publicationDAO;
     private TermsUseDAO termsUseDAO;
     private UserDAO userDAO;
     private UsersGroupsDAO usersGroupsDAO;
 
     @Autowired
     public ConfigurationBusiness(
-            Server server, ProxyClient proxyClient, EmailBusiness emailBusiness, GRIDAClient gridaClient, GRIDAPoolClient gridaPoolClient, AccountDAO accountDAO,
-            GroupDAO groupDAO, PublicationDAO publicationDAO,
-            TermsUseDAO termsUseDAO, UserDAO userDAO,
-            UsersGroupsDAO usersGroupsDAO) {
+            Server server, ProxyClient proxyClient, EmailBusiness emailBusiness,
+            GRIDAClient gridaClient, GRIDAPoolClient gridaPoolClient,
+            AccountDAO accountDAO, GroupDAO groupDAO, TermsUseDAO termsUseDAO,
+            UserDAO userDAO, UsersGroupsDAO usersGroupsDAO) {
         this.server = server;
         this.proxyClient = proxyClient;
         this.emailBusiness = emailBusiness;
@@ -93,7 +92,6 @@ public class ConfigurationBusiness {
         this.gridaPoolClient = gridaPoolClient;
         this.accountDAO = accountDAO;
         this.groupDAO = groupDAO;
-        this.publicationDAO = publicationDAO;
         this.termsUseDAO = termsUseDAO;
         this.userDAO = userDAO;
         this.usersGroupsDAO = usersGroupsDAO;
@@ -778,19 +776,6 @@ public class ConfigurationBusiness {
             throw new BusinessException("Error changing email address", e);
         }
 
-        try {
-            // need to update publication separately as the table does not
-            // support foreign keys
-            updatePublicationOwner(oldEmail, newEmail);
-        } catch (BusinessException e) {
-            // ignore the error as the email has been successfully
-            // changed and the user user should not have an error
-            // but send a message to admins
-            String errorMessage = "Error changing email from " + newEmail + " to " + newEmail
-                    + "in the Publication table";
-            logger.warn("Error changing pulications. Ignoring ({})", e.getMessage());
-            sendErrorEmailToAdmins(errorMessage, e, oldEmail);
-        }
     }
 
     public void resetNextEmail(String currentEmail) throws BusinessException {
@@ -1012,58 +997,6 @@ public class ConfigurationBusiness {
 
         }
         return user;
-    }
-
-    //Publications
-
-
-    public List<Publication> getPublications() throws BusinessException {
-        try {
-            return publicationDAO.getList();
-        } catch (DAOException ex) {
-            throw new BusinessException(ex);
-        }
-    }
-
-    public void removePublication(Long id) throws BusinessException {
-        try {
-            publicationDAO.remove(id);
-        } catch (DAOException ex) {
-            throw new BusinessException(ex);
-        }
-    }
-
-    public void addPublication(Publication pub) throws BusinessException {
-        try {
-            publicationDAO.add(pub);
-        } catch (DAOException ex) {
-            throw new BusinessException(ex);
-        }
-    }
-
-    public void updatePublication(Publication pub) throws BusinessException {
-        try {
-            publicationDAO.update(pub);
-        } catch (DAOException ex) {
-            throw new BusinessException(ex);
-        }
-    }
-
-    public void updatePublicationOwner(String oldOwnerEmail, String newOwnerEmail)
-            throws BusinessException {
-        try {
-            publicationDAO.updateOwnerEmail(oldOwnerEmail, newOwnerEmail);
-        } catch (DAOException ex) {
-            throw new BusinessException(ex);
-        }
-    }
-
-    public Publication getPublication(Long id) throws BusinessException {
-        try {
-            return publicationDAO.getPublication(id);
-        } catch (DAOException ex) {
-            throw new BusinessException(ex);
-        }
     }
 
     public void addTermsUse() throws BusinessException {

@@ -95,7 +95,7 @@ public class ApikeyAuthenticationFilter extends OncePerRequestFilter {
             Authentication authResult = this.authenticationManager
                     .authenticate(authRequest);
 
-            logger.debug("Authentication success for : " + authResult.getName());
+            logger.debug("Authentication success for : " + authResult);
 
             SecurityContextHolder.getContext().setAuthentication(authResult);
 

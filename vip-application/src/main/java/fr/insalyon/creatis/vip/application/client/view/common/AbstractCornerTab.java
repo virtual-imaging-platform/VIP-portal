@@ -40,4 +40,6 @@ import com.smartgwt.client.widgets.tab.Tab;
 public abstract class AbstractCornerTab extends Tab {
 
     public abstract void update();
+
+    public void destroy() {}
 }

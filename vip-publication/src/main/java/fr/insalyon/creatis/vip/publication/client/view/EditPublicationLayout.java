@@ -29,7 +29,7 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL-B license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.core.client.view.user.publication;
+package fr.insalyon.creatis.vip.publication.client.view;
 
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -41,17 +41,18 @@ import com.smartgwt.client.widgets.form.fields.ComboBoxItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
-import fr.insalyon.creatis.vip.core.client.bean.Publication;
-import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationService;
+import fr.insalyon.creatis.vip.application.client.bean.Application;
+import fr.insalyon.creatis.vip.application.client.rpc.ApplicationService;
+import fr.insalyon.creatis.vip.application.client.rpc.ApplicationServiceAsync;
+import fr.insalyon.creatis.vip.publication.client.bean.Publication;
+import fr.insalyon.creatis.vip.publication.client.rpc.PublicationService;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.common.AbstractFormLayout;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
-import fr.insalyon.creatis.vip.core.client.view.user.PublicationTab;
 import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
 import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+
+import java.util.*;
 
 /**
  *
@@ -68,11 +69,12 @@ public class EditPublicationLayout extends AbstractFormLayout {
     private TextItem publicationTypeName;
     private boolean newPublication = true;
     private Long idPub;
+    private ComboBoxItem vipApplication;
 
     public EditPublicationLayout() {
 
         super("100%", "50%");
-        addTitle("Add/Edit Publications", CoreConstants.ICON_PUBLICATION);
+        addTitle("Add/Edit Publications", PublicationConstants.ICON_PUBLICATION);
         configure();
     }
 
@@ -85,10 +87,15 @@ public class EditPublicationLayout extends AbstractFormLayout {
         publicationDate.setDefaultValue("2014");
         publicationDate.setShowTitle(false);
 
+        vipApplication = new ComboBoxItem();
+        vipApplication.setWidth(250);
+        loadApplications();
+        vipApplication.setDefaultValue("");
+        vipApplication.setShowTitle(false);
+
         titleField = FieldUtil.getTextItem(500, null);
         doiField = FieldUtil.getTextItem(500, null);
         authorsField = FieldUtil.getTextItem(500, null);
-
 
         publicationType = new ComboBoxItem();
         publicationType.setWidth(250);
@@ -114,23 +121,23 @@ public class EditPublicationLayout extends AbstractFormLayout {
         addMember(h);
         addField("<font color=red>*</font>" + " Authors", authorsField);
         addField("<font color=red>*</font>" + " Date", publicationDate);
+        addField("<font color=red>*</font>" + " VIP Application used", vipApplication);
         addField("Doi", doiField);
 
         saveButton = WidgetUtil.getIButton("Add", CoreConstants.ICON_ADD,
                 new ClickHandler() {
-            @Override
-            public void onClick(ClickEvent event) {
-                save(new Publication(idPub, titleField.getValueAsString(), publicationDate.getValueAsString().toString().substring(0, 4), doiField.getValueAsString(), authorsField.getValueAsString(), publicationType.getValueAsString(), publicationTypeName.getValueAsString()));
-            }
-        });
-
+                    @Override
+                    public void onClick(ClickEvent event) {
+                        save(new Publication(idPub, titleField.getValueAsString(), publicationDate.getValueAsString().toString().substring(0, 4), doiField.getValueAsString(), authorsField.getValueAsString(), publicationType.getValueAsString(), publicationTypeName.getValueAsString(), vipApplication.getValueAsString()));
+                    }
+                });
 
 
         addButtons(saveButton);
 
     }
 
-    public void setPublication(String id, String title, String type, String nameType, String authors, String date, String doi) {
+    public void setPublication(String id, String title, String type, String nameType, String authors, String date, String doi, String vipApplication) {
 
         if (title != null) {
             idPub = Long.valueOf(id);
@@ -142,6 +149,8 @@ public class EditPublicationLayout extends AbstractFormLayout {
             this.publicationDate.setValue(date);
             this.doiField.setValue(doi);
             this.authorsField.setValue(authors);
+            this.vipApplication.setValue(vipApplication);
+
 
         } else {
             this.newPublication = true;
@@ -152,6 +161,7 @@ public class EditPublicationLayout extends AbstractFormLayout {
             this.publicationDate.setValue("");
             this.doiField.setValue("");
             this.authorsField.setValue("");
+            this.vipApplication.setValue("");
 
         }
     }
@@ -161,9 +171,9 @@ public class EditPublicationLayout extends AbstractFormLayout {
         WidgetUtil.setLoadingIButton(saveButton, "Saving...");
 
         if (newPublication) {
-            ConfigurationService.Util.getInstance().addPublication(pub, getCallback("add"));
+            PublicationService.Util.getInstance().addPublication(pub, getCallback("add"));
         } else {
-            ConfigurationService.Util.getInstance().updatePublication(pub, getCallback("update"));
+            PublicationService.Util.getInstance().updatePublication(pub, getCallback("update"));
         }
     }
 
@@ -178,9 +188,9 @@ public class EditPublicationLayout extends AbstractFormLayout {
             @Override
             public void onSuccess(Void result) {
 
-                setPublication(null, null, null, null, null, null, null);
+                setPublication(null, null, null, null, null, null, null, null);
                 PublicationTab pubTab = (PublicationTab) Layout.getInstance().
-                        getTab(CoreConstants.TAB_PUBLICATION);
+                        getTab(PublicationConstants.TAB_PUBLICATION);
                 pubTab.loadPublication();
             }
         };
@@ -194,5 +204,27 @@ public class EditPublicationLayout extends AbstractFormLayout {
         }
         String[] yearTable = new String[values.size()];
         return values.toArray(yearTable);
+    }
+
+    private void loadApplications() {
+
+        ApplicationServiceAsync service = ApplicationService.Util.getInstance();
+        final AsyncCallback<List<Application>> callback = new AsyncCallback<List<Application>>() {
+            @Override
+            public void onFailure(Throwable caught) {
+                Layout.getInstance().setWarningMessage("Unable to get applications list:<br />" + caught.getMessage());
+            }
+
+            @Override
+            public void onSuccess(List<Application> result) {
+                Map<String, String> applicationsMap = new LinkedHashMap<String, String>();
+                for (Application a : result) {
+                    String applicationName = a.getName();
+                    applicationsMap.put(applicationName, applicationName);
+                }
+                vipApplication.setValueMap(applicationsMap);
+            }
+        };
+        service.getApplications(callback);
     }
 }

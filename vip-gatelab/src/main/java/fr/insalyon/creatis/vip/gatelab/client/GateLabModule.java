@@ -31,6 +31,7 @@
  */
 package fr.insalyon.creatis.vip.gatelab.client;
 
+import com.smartgwt.client.widgets.tab.Tab;
 import fr.insalyon.creatis.vip.application.client.ApplicationModule;
 import fr.insalyon.creatis.vip.application.client.view.monitor.MonitorParser;
 import fr.insalyon.creatis.vip.application.client.view.monitor.timeline.TimelineParser;
@@ -39,6 +40,8 @@ import fr.insalyon.creatis.vip.core.client.Module;
 import fr.insalyon.creatis.vip.gatelab.client.view.GateLabTileGrid;
 import fr.insalyon.creatis.vip.gatelab.client.view.monitor.GateLabMonitorParser;
 import fr.insalyon.creatis.vip.gatelab.client.view.monitor.GateLabTimelineParser;
+
+import java.util.Set;
 
 /**
  *
@@ -80,6 +83,6 @@ public class GateLabModule extends Module {
     }
 
     @Override
-    public void terminate() {
+    public void terminate(Set<Tab> removedTabs) {
     }
 }

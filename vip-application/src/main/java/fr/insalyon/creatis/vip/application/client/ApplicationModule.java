@@ -49,10 +49,10 @@ import fr.insalyon.creatis.vip.core.client.Module;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.layout.CenterTabSet;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
-import fr.insalyon.creatis.vip.core.server.business.Server;
-import java.util.ArrayList;
+
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 
 /**
  *
@@ -125,7 +125,7 @@ public class ApplicationModule extends Module {
     }
 
     @Override
-    public void terminate() {
+    public void terminate(Set<Tab> removedTabs) {
 
         final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
             @Override
@@ -139,6 +139,11 @@ public class ApplicationModule extends Module {
         };
         ApplicationService.Util.getInstance().signout(callback);
         TimelineLayout.getInstance().terminate();
+        for (Tab tab : removedTabs) {
+            if (tab instanceof AbstractSimulationTab) {
+                ((AbstractSimulationTab) tab).destroy();
+            }
+        }
     }
 
     @Override

@@ -52,8 +52,10 @@ public class ApiException extends VipException {
         APPLICATION_NOT_FOUND(8006),
         PIPELINE_NOT_FOUND(8007),
         NOT_ALLOWED_TO_USE_APPLICATION(8008),
-        INPUT_FIELD_NOT_VALID(8009);
-
+        INPUT_FIELD_NOT_VALID(8009),
+        WRONG_DATE_FORMAT(8010),
+        WRONG_STAT_SERVICE(8011),
+        COUNTRY_UNKNOWN(8012);
 
         private Integer code;
         ApiError(Integer code) { this.code = code; }
@@ -70,6 +72,9 @@ public class ApiException extends VipException {
             addMessage(ApiError.PIPELINE_NOT_FOUND, "The {} pipeline does not exists or cannot be used", 1);
             addMessage(ApiError.NOT_ALLOWED_TO_USE_APPLICATION, "Not allowed to access application {}", 1);
             addMessage(ApiError.INPUT_FIELD_NOT_VALID, "Input field '{}' is not valid. Cause : {}", 2);
+            addMessage(ApiError.WRONG_DATE_FORMAT, "The date {} have a wrong format (needed : {})", 2);
+            addMessage(ApiError.WRONG_STAT_SERVICE, "The service {} is unknown, only 'vip' is possible", 1);
+            addMessage(ApiError.COUNTRY_UNKNOWN, "Country unknown : {}", 1);
         }
 
         public Optional<String> getMessage() {

@@ -44,17 +44,12 @@ import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants.GROUP_ROLE;
 import fr.insalyon.creatis.vip.core.client.view.CoreException;
 import fr.insalyon.creatis.vip.core.client.view.user.UserLevel;
-import fr.insalyon.creatis.vip.core.client.view.user.publication.PublicationTypes;
 import fr.insalyon.creatis.vip.core.client.view.util.CountryCode;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
-import fr.insalyon.creatis.vip.core.server.business.CoreUtil;
-import fr.insalyon.creatis.vip.core.server.business.Server;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import fr.insalyon.creatis.vip.core.server.dao.UserDAO;
 import org.apache.commons.configuration.ConfigurationException;
-import org.jbibtex.ParseException;
-import org.jbibtex.TokenMgrException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
@@ -62,14 +57,10 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-import java.io.Reader;
-import java.io.StringReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -109,7 +100,7 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
             if (configurationBusiness.validateSession(email, session)) {
 
                 User user = configurationBusiness.getUser(email);
-                user = setUserSession(user);
+                user = setUserInSession(user);
                 configurationBusiness.updateUserLastLogin(email);
                 trace(logger, "Connected.");
 
@@ -143,7 +134,7 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
         try {
             logger.info("Authenticating '" + email + "'.");
             User user = configurationBusiness.signin(email, password);
-            user = setUserSession(user);
+            user = setUserInSession(user);
             configurationBusiness.updateUserLastLogin(email);
             logger.info("Connected.");
 
@@ -172,7 +163,7 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
             logger.info("Activating '" + user.getEmail() + "'.");
             user = configurationBusiness.activate(user.getEmail(), code);
 
-            return setUserSession(user);
+            return setUserInSession(user);
         } catch (BusinessException ex) {
             throw new CoreException(ex);
         }
@@ -243,7 +234,7 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
             authenticateSystemAdministrator(logger);
             trace(logger, "Removing group '" + groupName + "'.");
             configurationBusiness.removeGroup(
-                getSessionUser().getEmail(), groupName);
+                    getSessionUser().getEmail(), groupName);
         } catch (BusinessException ex) {
             throw new CoreException(ex);
         }
@@ -295,7 +286,7 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
                 return configurationBusiness.getUserGroups(email);
             } else {
                 return configurationBusiness.getUserGroups(
-                    getSessionUser().getEmail());
+                        getSessionUser().getEmail());
             }
         } catch (BusinessException ex) {
             throw new CoreException(ex);
@@ -344,7 +335,7 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
                     list.add(group.getName());
                 }
             } else {
-                Map<Group, GROUP_ROLE> groups = getSessionUserGroups();
+                Map<Group, GROUP_ROLE> groups = getUserGroupsFromSession();
                 for (Group group : groups.keySet()) {
                     if (groups.get(group) != GROUP_ROLE.None) {
                         list.add(group.getName());
@@ -392,7 +383,7 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
         try {
             trace(logger, "Updating user data '" + user.getEmail() + "'.");
             user = configurationBusiness.updateUser(user);
-            return setUserSession(user);
+            return setUserInSession(user);
         } catch (BusinessException ex) {
             throw new CoreException(ex);
         }
@@ -404,7 +395,7 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
         try {
             trace(logger, "Updating user password.");
             configurationBusiness.updateUserPassword(
-                getSessionUser().getEmail(),
+                    getSessionUser().getEmail(),
                 currentPassword,
                 newPassword);
         } catch (BusinessException ex) {
@@ -422,7 +413,7 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
             configurationBusiness.requestNewEmail(currentUser, newEmail);
 
             currentUser = configurationBusiness.getUserData(currentUser.getEmail());
-            return setUserSession(currentUser);
+            return setUserInSession(currentUser);
         } catch (BusinessException ex) {
             throw new CoreException(ex);
         }
@@ -444,7 +435,7 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
             configurationBusiness.resetNextEmail(newEmail);
 
             currentUser = configurationBusiness.getUserData(newEmail);
-            return setUserSession(currentUser);
+            return setUserInSession(currentUser);
         } catch (BusinessException ex) {
             throw new CoreException(ex);
         }
@@ -460,19 +451,7 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
             configurationBusiness.resetNextEmail(currentEmail);
 
             currentUser = configurationBusiness.getUserData(currentEmail);
-            return setUserSession(currentUser);
-        } catch (BusinessException ex) {
-            throw new CoreException(ex);
-        }
-    }
-
-    @Override
-    public void updateUserEmail(String currentEmail, String newEmail)
-            throws CoreException {
-        try {
-            trace(logger, "Updating user email from " + currentEmail + " to " + newEmail);
-            authenticateSystemAdministrator(logger);
-            configurationBusiness.updateUserEmail(currentEmail, newEmail);
+            return setUserInSession(currentUser);
         } catch (BusinessException ex) {
             throw new CoreException(ex);
         }
@@ -483,27 +462,11 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
             throws CoreException {
         try {
             configurationBusiness.sendContactMail(
-                getSessionUser(), category, subject, comment);
+                    getSessionUser(), category, subject, comment);
 
         } catch (BusinessException ex) {
             throw new CoreException(ex);
         }
-    }
-
-    private User setUserSession(User user) throws BusinessException {
-        return setUserSession(user, getSession());
-    }
-
-    public User setUserSession(User user, HttpSession session)
-            throws BusinessException {
-        Map<Group, GROUP_ROLE> groups =
-            configurationBusiness.getUserGroups(user.getEmail());
-        user.setGroups(groups);
-
-        session.setAttribute(CoreConstants.SESSION_USER, user);
-        session.setAttribute(CoreConstants.SESSION_GROUPS, groups);
-
-        return user;
     }
 
     @Override
@@ -549,7 +512,7 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
             } else {
                 trace(logger, "Removing user from '" + groupName + "' group.");
                 configurationBusiness.removeUserFromGroup(
-                    getSessionUser().getEmail(), groupName);
+                        getSessionUser().getEmail(), groupName);
             }
         } catch (BusinessException ex) {
             throw new CoreException(ex);
@@ -730,72 +693,6 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
     }
 
     @Override
-    public List<Publication> getPublications() throws CoreException {
-        trace(logger, "Getting publication list.");
-        try {
-            return configurationBusiness.getPublications();
-        } catch (BusinessException ex) {
-            throw new CoreException(ex);
-        }
-    }
-
-    @Override
-    public void removePublication(Long id) throws CoreException {
-        trace(logger, "Removing publication.");
-
-        try {
-            User user = getSessionUser();
-            if (user.isSystemAdministrator() ||
-                configurationBusiness
-                  .getPublication(id)
-                  .getVipAuthor().equals(user.getEmail())) {
-                configurationBusiness.removePublication(id);
-            } else {
-                logger.error("{} cannot remove publication {} because it's not his",
-                        user, id);
-                throw new CoreException("you can't remove a publication that is not yours");
-            }
-        } catch (BusinessException ex) {
-            throw new CoreException(ex);
-        }
-    }
-
-    @Override
-    public void addPublication(Publication pub) throws CoreException {
-        trace(logger, "Adding publication.");
-
-        try {
-            User user = getSessionUser();
-            pub.setVipAuthor(user.getEmail());
-            configurationBusiness.addPublication(pub);
-        } catch (BusinessException ex) {
-            throw new CoreException(ex);
-        }
-    }
-
-    @Override
-    public void updatePublication(Publication pub) throws CoreException {
-        trace(logger, "Updating publication.");
-
-        try {
-            User user = getSessionUser();
-            if (user.isSystemAdministrator() ||
-                configurationBusiness
-                  .getPublication(pub.getId())
-                  .getVipAuthor().equals(user.getEmail())) {
-                pub.setVipAuthor(user.getEmail());
-                configurationBusiness.updatePublication(pub);
-            } else {
-                logger.error("{} cannot modify publication {} because its not his",
-                        user.getEmail(), pub.getId());
-                throw new CoreException("you can't modify a publication that is not yours");
-            }
-        } catch (BusinessException ex) {
-            throw new CoreException(ex);
-        }
-    }
-
-    @Override
     public void addTermsUse() throws CoreException {
         trace(logger, "adding new terms of Use.");
         try {
@@ -837,67 +734,10 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
     }
 
     @Override
-    public List<Publication> parseBibtexText(String s) throws CoreException {
-        List<Publication> publications = new ArrayList<>();
-        try {
-            Reader reader = new StringReader(s);
-            org.jbibtex.BibTeXParser bibtexParser = new org.jbibtex.BibTeXParser();
-            org.jbibtex.BibTeXDatabase database = bibtexParser.parseFully(reader);
-            Map<org.jbibtex.Key, org.jbibtex.BibTeXEntry> entryMap = database.getEntries();
-            Collection<org.jbibtex.BibTeXEntry> entries = entryMap.values();
-            for (org.jbibtex.BibTeXEntry entry : entries) {
-                String type = entry.getType().toString();
-                org.jbibtex.Value title = entry.getField(org.jbibtex.BibTeXEntry.KEY_TITLE);
-                org.jbibtex.Value date = entry.getField(org.jbibtex.BibTeXEntry.KEY_YEAR);
-                org.jbibtex.Value doi = entry.getField(org.jbibtex.BibTeXEntry.KEY_DOI);
-                org.jbibtex.Value authors = entry.getField(org.jbibtex.BibTeXEntry.KEY_AUTHOR);
-                org.jbibtex.Value typeName = entry.getField(org.jbibtex.BibTeXEntry.KEY_BOOKTITLE);
-                String doiv;
-                if (doi == null) {
-                    doiv = "";
-                } else {
-                    doiv = doi.toUserString();
-                }
-                publications.add(new Publication(title.toUserString(), date.toUserString(), doiv, authors.toUserString(), parseTypePublication(type), getTypeName(entry, type), getSessionUser().getEmail()));
-
-            }
-
-        } catch (ParseException | TokenMgrException ex) {
-            logger.error("Error parsing publication {}", s, ex);
-            throw new CoreException(ex);
-        }
-        return publications;
-    }
-
-    private String parseTypePublication(String type) {
-        if (type.equalsIgnoreCase("inproceedings") || type.equalsIgnoreCase("conference")) {
-            return PublicationTypes.ConferenceArticle.toString();
-        } else if (type.equalsIgnoreCase("article")) {
-            return PublicationTypes.Journal.toString();
-        } else if (type.equalsIgnoreCase("inbook") || type.equalsIgnoreCase("incollection")) {
-            return PublicationTypes.BookChapter.toString();
-        } else {
-            return PublicationTypes.Other.toString();
-        }
-
-    }
-
-    private String getTypeName(org.jbibtex.BibTeXEntry entry, String type) {
-        if (type.equalsIgnoreCase("inproceedings") || type.equalsIgnoreCase("conference") || type.equalsIgnoreCase("incollection")) {
-            return entry.getField(org.jbibtex.BibTeXEntry.KEY_BOOKTITLE).toUserString();
-        } else if (type.equalsIgnoreCase("article")) {
-            return entry.getField(org.jbibtex.BibTeXEntry.KEY_JOURNAL).toUserString();
-        } else {
-            return "";
-        }
-
-    }
-
-    @Override
     public boolean testLastUpdatePublication() throws CoreException {
         try {
             return configurationBusiness.testLastUpdatePublication(
-                getSessionUser().getEmail());
+                    getSessionUser().getEmail());
         } catch (BusinessException ex) {
             throw new CoreException(ex);
         }

@@ -29,27 +29,28 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL-B license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.core.server.dao;
+package fr.insalyon.creatis.vip.publication.client.view;
 
-import fr.insalyon.creatis.vip.core.client.bean.Account;
-import fr.insalyon.creatis.vip.core.client.bean.Publication;
-import java.util.List;
+import com.google.gwt.user.client.rpc.IsSerializable;
 
 /**
  *
- * @author Nouha Boujelben
+ * @author Nouha boujelben
  */
-public interface PublicationDAO {
+public enum PublicationTypes implements IsSerializable{
 
-    public void add(Publication publication) throws DAOException;
+    ConferenceArticle("Article In Conference Proceedings"), Journal("Journal Article"), BookChapter("Book Chapter"), Other("Other");
 
-    public void update(Publication publication) throws DAOException;
+    private PublicationTypes() {
+    }
+    private String value;
 
-    void updateOwnerEmail(String oldOwnerEmail, String newOwnerEmail) throws DAOException;
+    private PublicationTypes(String value) {
+        this.value = value;
+    }
 
-    public void remove(Long publicationID) throws DAOException;
-    
-    public Publication getPublication(Long publicationID) throws DAOException;
-
-    public List<Publication> getList() throws DAOException;
+    @Override
+    public String toString() {
+        return value;
+    }
 }

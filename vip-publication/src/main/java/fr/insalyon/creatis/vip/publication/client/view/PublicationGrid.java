@@ -29,7 +29,7 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL-B license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.core.client.view.user.publication;
+package fr.insalyon.creatis.vip.publication.client.view;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.data.DataSource;
@@ -51,11 +51,10 @@ import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.viewer.DetailViewer;
 import com.smartgwt.client.widgets.viewer.DetailViewerField;
 import fr.insalyon.creatis.vip.core.client.CoreModule;
-import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationService;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
-import fr.insalyon.creatis.vip.core.client.view.user.PublicationTab;
 import fr.insalyon.creatis.vip.core.client.view.user.UserLevel;
+import fr.insalyon.creatis.vip.publication.client.rpc.PublicationService;
 
 /**
  *
@@ -89,7 +88,7 @@ public class PublicationGrid extends ListGrid {
                         public void onClick(ClickEvent event) {
                             PublicationLayout.edit(rollOverRecord.getAttribute("id"), rollOverRecord.getAttribute("title"),
                                     rollOverRecord.getAttribute("type"),
-                                    rollOverRecord.getAttribute("typeName"), rollOverRecord.getAttribute("authors"), rollOverRecord.getAttribute("date"), rollOverRecord.getAttribute("doi"));
+                                    rollOverRecord.getAttribute("typeName"), rollOverRecord.getAttribute("authors"), rollOverRecord.getAttribute("date"), rollOverRecord.getAttribute("doi"), rollOverRecord.getAttribute("vipApplication"));
                         }
                     });
                     final ImgButton deleteImg = getImgButton(CoreConstants.ICON_DELETE, "Delete");
@@ -143,6 +142,7 @@ public class PublicationGrid extends ListGrid {
                             new DetailViewerField("typeName", "Journal, Conference or Book Name"),
                             new DetailViewerField("authors", "Authors"),
                             new DetailViewerField("date", "Date"),
+                            new DetailViewerField("vipApplication", "VIP Application"),
                             new DetailViewerField("doi", "Doi"),
                             new DetailViewerField("vipAuthor", "Owner"));
                 } else {
@@ -152,6 +152,7 @@ public class PublicationGrid extends ListGrid {
                             new DetailViewerField("typeName", "Journal, Conference or Book Name"),
                             new DetailViewerField("authors", "Authors"),
                             new DetailViewerField("date", "Date"),
+                            new DetailViewerField("vipApplication", "VIP Application"),
                             new DetailViewerField("doi", "Doi"));
                 }
 
@@ -181,6 +182,7 @@ public class PublicationGrid extends ListGrid {
                 new ListGridField("typeName", "Journal, Conference or Book Name"),
                 new ListGridField("authors", "Authors"),
                 new ListGridField("date", "Date"),
+                new ListGridField("vipApplication", "VIP Application"),
                 pubOwner);
 
         publicationId.setHidden(true);
@@ -197,17 +199,17 @@ public class PublicationGrid extends ListGrid {
                 if (CoreModule.user.getLevel() == UserLevel.Administrator) {
                     PublicationLayout.edit(event.getRecord().getAttribute("id"), event.getRecord().getAttribute("title"),
                             event.getRecord().getAttribute("type"),
-                            event.getRecord().getAttribute("typeName"), event.getRecord().getAttribute("authors"), event.getRecord().getAttribute("date"), event.getRecord().getAttribute("doi"));
+                            event.getRecord().getAttribute("typeName"), event.getRecord().getAttribute("authors"), event.getRecord().getAttribute("date"), event.getRecord().getAttribute("doi"),event.getRecord().getAttribute("vipApplication"));
                 }
             }
         });
     }
 
-    protected static void edit(String id, String title, String type, String typeName, String authors, String date, String doi) {
+    protected static void edit(String id, String title, String type, String typeName, String authors, String date, String doi, String vipApplication) {
 
         PublicationTab pubTab = (PublicationTab) Layout.getInstance().
-                getTab(CoreConstants.TAB_PUBLICATION);
-        pubTab.setPublication(id, title, type, typeName, authors, date, doi);
+                getTab(PublicationConstants.TAB_PUBLICATION);
+        pubTab.setPublication(id, title, type, typeName, authors, date, doi, vipApplication);
     }
 
     private void remove(Long id) {
@@ -229,7 +231,7 @@ public class PublicationGrid extends ListGrid {
         };
        getPubTab().getModal().show("Removing publication '" + "'...", true);
 
-        ConfigurationService.Util.getInstance().removePublication(id, callback);
+        PublicationService.Util.getInstance().removePublication(id, callback);
 
     }
 
@@ -248,6 +250,6 @@ public class PublicationGrid extends ListGrid {
 
     private PublicationTab getPubTab() {
         return (PublicationTab) Layout.getInstance().
-                getTab(CoreConstants.TAB_PUBLICATION);
+                getTab(PublicationConstants.TAB_PUBLICATION);
     }
 }

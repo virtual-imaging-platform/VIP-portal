@@ -29,25 +29,26 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL-B license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.core.client.view.user.publication;
+package fr.insalyon.creatis.vip.publication.server.dao;
 
-import com.smartgwt.client.widgets.grid.ListGridRecord;
+import fr.insalyon.creatis.vip.core.server.dao.DAOException;
+import fr.insalyon.creatis.vip.publication.client.bean.Publication;
+
+import java.util.List;
 
 /**
  *
  * @author Nouha Boujelben
  */
-public class PublicationRecord extends ListGridRecord {
+public interface PublicationDAO {
 
-    public PublicationRecord(Long id, String title, String type, String typeName, String date, String authors, String doi, String vipAuthor) {
+    public void add(Publication publication) throws DAOException;
 
-        setAttribute("id", id);
-        setAttribute("title", title);
-        setAttribute("type", type);
-        setAttribute("typeName", typeName);
-        setAttribute("date", date);
-        setAttribute("authors", authors);
-        setAttribute("doi", doi);
-        setAttribute("vipAuthor", vipAuthor);
-    }
+    public void update(Publication publication) throws DAOException;
+
+    public void remove(Long publicationID) throws DAOException;
+    
+    public Publication getPublication(Long publicationID) throws DAOException;
+
+    public List<Publication> getList() throws DAOException;
 }

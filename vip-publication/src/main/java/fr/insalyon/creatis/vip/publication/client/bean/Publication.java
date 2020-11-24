@@ -29,7 +29,7 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL-B license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.core.client.bean;
+package fr.insalyon.creatis.vip.publication.client.bean;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
 
@@ -48,12 +48,13 @@ public class Publication implements IsSerializable {
     private String type;
     private String typeName;
     private String vipAuthor;
+    private String vipApplication;
 
     public Publication() {
     }
     
 
-    public Publication(Long id, String title, String date, String doi, String authors, String type, String typeName, String vipAuthor) {
+    public Publication(Long id, String title, String date, String doi, String authors, String type, String typeName, String vipAuthor, String vipApplication) {
         this.id = id;
         this.title = title;
         this.date = date;
@@ -62,9 +63,10 @@ public class Publication implements IsSerializable {
         this.type = type;
         this.typeName = typeName;
         this.vipAuthor = vipAuthor;
+        this.vipApplication = vipApplication;
     }
     
-    public Publication( Long id,String title, String date, String doi, String authors, String type, String typeName) {
+    public Publication( Long id,String title, String date, String doi, String authors, String type, String typeName, String vipApplication) {
         this.id=id;
         this.title = title;
         this.date = date;
@@ -72,8 +74,9 @@ public class Publication implements IsSerializable {
         this.authors = authors;
         this.type = type;
         this.typeName = typeName;
+        this.vipApplication = vipApplication;
     }
-     public Publication(String title, String date, String doi, String authors, String type, String typeName,String vipAuthor) {
+     public Publication(String title, String date, String doi, String authors, String type, String typeName,String vipAuthor, String vipApplication) {
         
         this.title = title;
         this.date = date;
@@ -82,6 +85,7 @@ public class Publication implements IsSerializable {
         this.type = type;
         this.typeName = typeName;
         this.vipAuthor=vipAuthor;
+        this.vipApplication = vipApplication;
     }
 
     public Long getId() {
@@ -147,7 +151,15 @@ public class Publication implements IsSerializable {
     public void setVipAuthor(String vipAuthor) {
         this.vipAuthor = vipAuthor;
     }
-    
-    
-    
+
+    public String getVipApplication() {
+        return vipApplication;
+    }
+
+    public void setVipApplication(String vipApplication) {
+        this.vipApplication = vipApplication;
+    }
+
+
+
 }

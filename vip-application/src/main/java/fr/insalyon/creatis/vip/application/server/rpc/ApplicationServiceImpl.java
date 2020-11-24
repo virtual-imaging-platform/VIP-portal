@@ -48,8 +48,10 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import javax.servlet.ServletException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -212,8 +214,10 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
                     getSessionUser().getEmail(), true);
                 return applicationBusiness.getApplications(classes);
             }
-            logger.error("Unauthorized to get all applications");
-            throw new ApplicationException("You have no administrator rights.");
+            List<AppClass> classes = classBusiness.getUserClasses(
+                    getSessionUser().getEmail(), false);
+            List<String> classNames = classes.stream().map(AppClass::getName).collect(Collectors.toList());
+            return applicationBusiness.getApplications(classNames);
         } catch (BusinessException | CoreException ex) {
             throw new ApplicationException(ex);
         }

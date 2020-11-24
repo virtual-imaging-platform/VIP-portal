@@ -134,6 +134,20 @@ knowledge of the CeCILL-B license and that you accept its terms.
 
         <dependency>
             <groupId>fr.insalyon.creatis</groupId>
+            <artifactId>vip-publication</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>fr.insalyon.creatis</groupId>
+            <artifactId>vip-publication</artifactId>
+            <type>jar</type>
+            <version>${project.version}</version>
+            <classifier>sources</classifier>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>fr.insalyon.creatis</groupId>
             <artifactId>vip-social</artifactId>
             <version>${project.version}</version>
         </dependency>
@@ -165,7 +179,6 @@ knowledge of the CeCILL-B license and that you accept its terms.
           <classifier>sources</classifier>
           <scope>provided</scope>
         </dependency>
-        
         <!-- END VIP MODULES -->
 
         <dependency>

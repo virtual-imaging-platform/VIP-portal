@@ -32,11 +32,13 @@
 package fr.insalyon.creatis.vip.core.client;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.smartgwt.client.widgets.tab.Tab;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationService;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 /**
  *
@@ -93,16 +95,16 @@ public class Modules {
                 }
             }
         };
-        ConfigurationService.Util.getInstance().getUserPropertiesGroups(callback);        
+        ConfigurationService.Util.getInstance().getUserPropertiesGroups(callback);
     }
-    
-    public void finalizeModules() {
-        
+
+    public void finalizeModules(Set<Tab> removedTabs) {
+
         for (Module module : modules) {
-            module.terminate();
+            module.terminate(removedTabs);
         }
     }
-            
+    
     public void userRemoved(User user) {
         
         for (Module module : modules) {

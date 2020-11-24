@@ -29,14 +29,11 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL-B license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.core.server.dao.mysql;
+package fr.insalyon.creatis.vip.publication.server.dao.mysql;
 
-import fr.insalyon.creatis.vip.core.client.bean.Account;
-import fr.insalyon.creatis.vip.core.client.bean.Publication;
-import fr.insalyon.creatis.vip.core.client.bean.User;
-import fr.insalyon.creatis.vip.core.client.view.user.UserLevel;
+import fr.insalyon.creatis.vip.publication.client.bean.Publication;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
-import fr.insalyon.creatis.vip.core.server.dao.PublicationDAO;
+import fr.insalyon.creatis.vip.publication.server.dao.PublicationDAO;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -73,8 +70,8 @@ public class PublicationData extends JdbcDaoSupport implements PublicationDAO {
         PreparedStatement ps = null;
         try {
             ps = getConnection().prepareStatement(
-                    "INSERT INTO VIPPublication(title,date,doi,authors,type,typeName,vipAuthor) "
-                    + "VALUES (?, ?, ?, ?, ?, ?, ?)");
+                    "INSERT INTO VIPPublication(title,date,doi,authors,type,typeName,vipAuthor,vipApplication) "
+                    + "VALUES (?, ?, ?, ?, ?, ?, ?,?)");
 
             ps.setString(1, pub.getTitle());
             ps.setString(2, pub.getDate());
@@ -83,6 +80,7 @@ public class PublicationData extends JdbcDaoSupport implements PublicationDAO {
             ps.setString(5, pub.getType());
             ps.setString(6, pub.getTypeName());
             ps.setString(7, pub.getVipAuthor());
+            ps.setString(8, pub.getVipApplication());
             ps.execute();
             ps.close();
         } catch (SQLException ex) {
@@ -97,7 +95,7 @@ public class PublicationData extends JdbcDaoSupport implements PublicationDAO {
 
             PreparedStatement ps = getConnection().prepareStatement("UPDATE "
                     + "VIPPublication "
-                    + "SET title=?, date=?, doi=?, authors=?, type=?, typeName=?,vipAuthor=? "
+                    + "SET title=?, date=?, doi=?, authors=?, type=?, typeName=?,vipAuthor=?,vipApplication=? "
                     + "WHERE id=?");
 
             ps.setString(1, publication.getTitle());
@@ -107,33 +105,13 @@ public class PublicationData extends JdbcDaoSupport implements PublicationDAO {
             ps.setString(5, publication.getType());
             ps.setString(6, publication.getTypeName());
             ps.setString(7, publication.getVipAuthor());
-            ps.setLong(8, publication.getId());
+            ps.setString(8, publication.getVipApplication());
+            ps.setLong(9, publication.getId());
             ps.executeUpdate();
             ps.close();
 
         } catch (SQLException ex) {
             logger.error("Error updating publication {}",publication.getId(), ex);
-            throw new DAOException(ex);
-        }
-
-    }
-
-    @Override
-    public void updateOwnerEmail(String oldOwnerEmail, String newOwnerEmail) throws DAOException {
-        try {
-
-            PreparedStatement ps = getConnection().prepareStatement("UPDATE "
-                    + "VIPPublication "
-                    + "SET vipAuthor=? "
-                    + "WHERE vipAuthor=?");
-
-            ps.setString(1, newOwnerEmail);
-            ps.setString(2, oldOwnerEmail);
-            ps.executeUpdate();
-            ps.close();
-
-        } catch (SQLException ex) {
-            logger.error("Error updating publications owner from {} to {}", oldOwnerEmail, newOwnerEmail, ex);
             throw new DAOException(ex);
         }
 
@@ -157,12 +135,13 @@ public class PublicationData extends JdbcDaoSupport implements PublicationDAO {
 
     @Override
     public List<Publication> getList() throws DAOException {
+        logger.info("PuBlicationData getList");
         try {
             String level = null;
             PreparedStatement ps;
 
             ps = getConnection().prepareStatement("SELECT "
-                    + "id,title,date,doi,authors,type,typeName,VIPAuthor FROM "
+                    + "id,title,date,doi,authors,type,typeName,VIPAuthor,VipApplication FROM "
                     + "VIPPublication");
 
             ResultSet rs = ps.executeQuery();
@@ -171,7 +150,7 @@ public class PublicationData extends JdbcDaoSupport implements PublicationDAO {
 
             while (rs.next()) {
 
-                publications.add(new Publication(rs.getLong("id"), rs.getString("title"), rs.getString("date"), rs.getString("doi"), rs.getString("authors"), rs.getString("type"), rs.getString("typeName"), rs.getString("VIPAuthor")));
+                publications.add(new Publication(rs.getLong("id"), rs.getString("title"), rs.getString("date"), rs.getString("doi"), rs.getString("authors"), rs.getString("type"), rs.getString("typeName"), rs.getString("VIPAuthor"), rs.getString("VIPApplication")));
             }
 
             rs.close();
@@ -198,7 +177,7 @@ public class PublicationData extends JdbcDaoSupport implements PublicationDAO {
 
             Publication p = null;
             if (rs.next()) {
-                p = new Publication(rs.getLong("id"), rs.getString("title"), rs.getString("date"), rs.getString("doi"), rs.getString("authors"), rs.getString("type"), rs.getString("typeName"), rs.getString("VIPAuthor"));
+                p = new Publication(rs.getLong("id"), rs.getString("title"), rs.getString("date"), rs.getString("doi"), rs.getString("authors"), rs.getString("type"), rs.getString("typeName"), rs.getString("VIPAuthor"), rs.getString("VIPApplication"));
             }
 
             rs.close();

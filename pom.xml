@@ -78,6 +78,7 @@ knowledge of the CeCILL-B license and that you accept its terms.
         <module>vip-core</module>
         <module>vip-docs</module>
         <module>vip-application</module>
+        <module>vip-publication</module>
         <module>vip-datamanagement</module>
         <module>vip-gatelab</module>
         <module>vip-portal</module>

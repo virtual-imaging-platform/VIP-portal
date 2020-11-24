@@ -129,6 +129,16 @@ knowledge of the CeCILL-B license and that you accept its terms.
         <url-pattern>/fr.insalyon.creatis.vip.portal.Main/gatelabservice</url-pattern>
     </servlet-mapping>
     <!-- End GateLab Module -->
+    <!-- Publication Module -->
+    <servlet>
+        <servlet-name>PublicationService</servlet-name>
+        <servlet-class>fr.insalyon.creatis.vip.publication.server.rpc.PublicationServiceImpl</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>PublicationService</servlet-name>
+        <url-pattern>/fr.insalyon.creatis.vip.portal.Main/publicationservice</url-pattern>
+    </servlet-mapping>
+    <!-- End Publication Module -->
     <!-- Social Module -->
     <servlet>
         <servlet-name>SocialService</servlet-name>
