@@ -32,14 +32,10 @@ public class StatsApiBusiness {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private final StatsBusiness statsBusiness;
-    private final Supplier<Connection> connectionSupplier;
 
     @Autowired
-    public StatsApiBusiness(
-            StatsBusiness statsBusiness,
-            Supplier<Connection> connectionSupplier) {
+    public StatsApiBusiness(StatsBusiness statsBusiness) {
         this.statsBusiness = statsBusiness;
-        this.connectionSupplier = connectionSupplier;
     }
 
     public UsersNumber getUsersRegisteredNumber(

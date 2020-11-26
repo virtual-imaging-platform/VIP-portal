@@ -3,11 +3,11 @@ package fr.insalyon.creatis.vip.portal.local;
 import fr.insalyon.creatis.grida.client.GRIDAClientException;
 import fr.insalyon.creatis.vip.application.client.view.monitor.SimulationStatus;
 import fr.insalyon.creatis.vip.application.server.business.simulation.ParameterSweep;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.DependsOn;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
@@ -28,6 +28,7 @@ import java.util.stream.Collectors;
 @Profile("local")
 @Lazy
 public class LocalBashEngine {
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Value("${local.workflow.dir}")
     private String workflowsDir;
@@ -61,9 +62,13 @@ public class LocalBashEngine {
             return execId;
         } catch (IOException e) {
             throw new RuntimeException("Cannot launch local execution", e);
+        } catch (Exception e) {
+            logger.error("launch error", e);
+            throw e;
         }
     }
 
+    // todo : verify killed works
     public SimulationStatus getStatus(String workflowID) {
         Future<?> execFuture = executionsFutures.get(workflowID);
         if (execFuture.isCancelled()) {
@@ -88,7 +93,7 @@ public class LocalBashEngine {
         exec.gwendiaInputs = getGwendiaInputs(workflowFile);
         exec.gwendiaOutputs = getGwendiaOutputs(workflowFile);
         exec.execInputs = getExecInputs(parameters);
-        exec.scriptFile = getGwendiaScriptFile(workflowFile);
+        exec.scriptFileLFN = getGwendiaScriptFile(workflowFile);
         return exec;
     }
 
@@ -96,7 +101,7 @@ public class LocalBashEngine {
         String id;
         File workflowFile;
         Path workflowDir;
-        File scriptFile;
+        String scriptFileLFN;
         Map<String,String> execInputs;     // name -> value
         Map<String,String> gwendiaInputs;  // name -> type (string/URI)
         Map<String,String> gwendiaOutputs;  // name -> type (string/URI)
@@ -137,7 +142,7 @@ public class LocalBashEngine {
                 .collect(Collectors.toMap(matcher -> matcher.group(1), matcher -> matcher.group(2)));
     }
 
-    private File getGwendiaScriptFile(File workflowFile) throws IOException {
+    private String getGwendiaScriptFile(File workflowFile) throws IOException {
         //  <bash script="/path/to/script.sh"/>
         Pattern pattern = Pattern.compile("\\s*<bash\\s+" +
                 "script=\"([\\w/_.-]+)\"\\s*/>\\s*");
@@ -149,11 +154,7 @@ public class LocalBashEngine {
         if (bashScripts.size() != 1) {
             throw new RuntimeException("There should be 1 and only 1 bash script");
         }
-        File scriptFile = Paths.get(bashScripts.get(0)).toFile();
-        if ( ! scriptFile.exists()) {
-            throw new RuntimeException("script file does not exists");
-        }
-        return scriptFile;
+        return bashScripts.get(0);
     }
 
 
@@ -170,6 +171,7 @@ public class LocalBashEngine {
     
     /*
     TODO :
+    - verify inputs are present
     - handle append-date
     - create jobs h2 table
     - support boutiques jobs
@@ -188,14 +190,15 @@ public class LocalBashEngine {
                 exec.status = SimulationStatus.Running;
                 Map<String, Path> inputFiles = transferInputFiles();
                 Path scriptPath = copyScript();
-                String commandLine = generateCommandLine(scriptPath, inputFiles);
+                List<String> commandLine = generateCommandLine(scriptPath, inputFiles);
                 Path execDir = scriptPath.getParent();
                 execute(execDir, commandLine);
                 transferOutputFiles(execDir);
-            } catch (IOException | GRIDAClientException e) {
-                throw new RuntimeException("Error running local execution", e);
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();  // set interrupt flag
+            } catch (Exception e) {
+                logger.error("test run error", e);
+                throw new RuntimeException("Error running local execution", e);
             }
         }
 
@@ -216,7 +219,7 @@ public class LocalBashEngine {
             // find URI inputs
             Path execDir = exec.workflowDir.resolve("exec_dir");
             Files.createDirectory(execDir);
-            String from = exec.scriptFile.toString();
+            String from = exec.scriptFileLFN;
             String to = gridaClient.getRemoteFile(from, execDir.toString());
             return Paths.get(to);
         }
@@ -237,25 +240,23 @@ public class LocalBashEngine {
                     .collect(Collectors.toSet());
         }
 
-        private String generateCommandLine(Path scriptPath, Map<String, Path> inputFiles) {
+        private List<String> generateCommandLine(Path scriptPath, Map<String, Path> inputFiles) {
             // sh $WORKFLOW_DIR/exec_dir/$script_name --$file-input-name $WORKFLOW_DIR/inputs/$file_name --$non-file-input-name $value
-            Path execDir = scriptPath.getParent();
-            StringBuilder sb = new StringBuilder()
-                    .append("bash ").append(scriptPath.getFileName()).append(" ");
+            List<String> commandLine = new ArrayList<>();
+            commandLine.add("bash");
+            commandLine.add(scriptPath.getFileName().toString());
             inputFiles.entrySet().stream().forEach(mapEntry -> {
-                sb
-                        .append("--").append(mapEntry.getKey()).append(" ")
-                        .append(mapEntry.getValue()).append(" ");
+                commandLine.add("--" + mapEntry.getKey());
+                commandLine.add(mapEntry.getValue().toString());
             });
             for (String nonFileInput : getNonFileInputName()) {
-                sb
-                        .append("--").append(nonFileInput).append(" ")
-                        .append(exec.execInputs.get(nonFileInput)).append(" ");
+                commandLine.add("--" + nonFileInput);
+                commandLine.add(exec.execInputs.get(nonFileInput));
             }
-            return sb.toString();
+            return commandLine;
         }
 
-        private void execute(Path execDir, String commandLine) throws IOException, InterruptedException {
+        private void execute(Path execDir, List<String> commandLine) throws IOException, InterruptedException {
             ProcessBuilder builder = new ProcessBuilder()
                     .command(commandLine)
                     .directory(execDir.toFile())
@@ -269,6 +270,9 @@ public class LocalBashEngine {
 
         private void transferOutputFiles(Path execDir) throws GRIDAClientException {
             String toDir = exec.execInputs.get("result-directory");
+            if (toDir == null) {
+                throw new RuntimeException("there should be a results-directory parameter");
+            }
             if (exec.gwendiaOutputs.values().stream()
                     .anyMatch(type -> ! "URI".equals(type) )) {
                 throw new RuntimeException("Only URI outputs are supported");

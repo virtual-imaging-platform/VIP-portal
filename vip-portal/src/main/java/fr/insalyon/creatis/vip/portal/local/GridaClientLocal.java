@@ -12,9 +12,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.nio.file.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -40,7 +38,7 @@ public class GridaClientLocal extends GRIDAClient {
         Path to = Paths.get(localDir).resolve(from.getFileName());
         try {
             Files.createDirectories(Paths.get(localDir));
-            Files.copy(from, to);
+            Files.copy(from, to, StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException e) {
             throw new GRIDAClientException(e);
         }
@@ -84,10 +82,13 @@ public class GridaClientLocal extends GRIDAClient {
 
     @Override
     public String uploadFile(String localFile, String remoteDir) throws GRIDAClientException {
+        while (remoteDir.startsWith("/")) {
+            remoteDir = remoteDir.substring(1);
+        }
         Path from = Paths.get(localFile);
         Path to = Paths.get(localRoot).resolve(remoteDir).resolve(from.getFileName());
         try {
-            Files.copy(from, to);
+            Files.copy(from, to, StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException e) {
             throw new GRIDAClientException(e);
         }

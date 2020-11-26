@@ -26,7 +26,7 @@ public class WorkflowsDBLocalConfiguration {
     public SessionFactory workflowsDbSessionFactory() {
         try {
             org.hibernate.cfg.Configuration cfg = new org.hibernate.cfg.Configuration();
-            cfg.setProperty("hibernate.default_schema", "workflowsdb");
+            //cfg.setProperty("hibernate.default_schema", "workflowsdb");
             cfg.setProperty("hibernate.connection.driver_class", "org.h2.Driver");
             cfg.setProperty("hibernate.connection.url", workflowsDbUrl);
             cfg.setProperty("hibernate.dialect", H2Dialect.class.getCanonicalName());
