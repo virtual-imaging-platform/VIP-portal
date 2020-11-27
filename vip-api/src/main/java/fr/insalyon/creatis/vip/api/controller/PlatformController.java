@@ -67,9 +67,6 @@ public class PlatformController extends ApiController{
 
     private final Environment env;
 
-    @Value("${carmin.platform.name}")
-    private String platformName;
-
     @Autowired
     public PlatformController(Supplier<User> currentUserSupplier, Environment env) {
         super(currentUserSupplier);
@@ -80,7 +77,7 @@ public class PlatformController extends ApiController{
     public PlatformProperties getPlatformProperties() throws ApiException {
         logMethodInvocation(logger, "getPlatformProperties");
         PlatformProperties platformProperties = new PlatformProperties();
-        platformProperties.setPlatformName(platformName);
+        platformProperties.setPlatformName(env.getProperty(PLATFORM_NAME));
         platformProperties.setPlatformDescription(env.getProperty(PLATFORM_DESCRIPTION));
         platformProperties.setSupportedTransferProtocols(Arrays.asList(
                 env.getRequiredProperty(SUPPORTED_TRANSFER_PROTOCOLS, SupportedTransferProtocol[].class)

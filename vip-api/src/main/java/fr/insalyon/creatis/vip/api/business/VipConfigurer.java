@@ -69,7 +69,6 @@ public class VipConfigurer implements ApplicationListener<ContextRefreshedEvent>
 
     @Override
     public void onApplicationEvent(@NonNull ContextRefreshedEvent event) {
-        logger.info("Init VIP : initialize database");
         configureIfNecessary();
     }
 

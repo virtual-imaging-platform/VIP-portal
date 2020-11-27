@@ -74,7 +74,7 @@ public class SamlAuthenticationService extends AbstractAuthenticationService {
     @Override
     public void init() throws ServletException {
         super.init();
-        ApplicationContext applicationContext = WebApplicationContextUtils.getRequiredWebApplicationContext(getServletContext());
+        ApplicationContext applicationContext = WebApplicationContextUtils.findWebApplicationContext(getServletContext());
         server = applicationContext.getBean(Server.class);
     }
 

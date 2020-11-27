@@ -104,7 +104,7 @@ public class VipLocalConfigurationIT {
         Map<String, String> parametersMap = new HashMap<>();
         parametersMap.put("text", "hello" );
         parametersMap.put("file", INPUT_FILE_LFN);
-        parametersMap.put("result-directory", INPUT_RESULT_DIR_LFN);
+        parametersMap.put("results-directory", INPUT_RESULT_DIR_LFN);
         String simulationID = workflowBusiness.launch(
                 configurationBusiness.getUser(ADMIN_EMAIL),
                 Collections.emptyList(),

@@ -101,7 +101,7 @@ public class SpringCoreConfig {
         return new PropertySourcesPlaceholderConfigurer();
     }
 
-    // to handle list en spring @value
+    // to handle list In spring @value
     @Bean
     public static ConversionService conversionService() {
         return new DefaultConversionService();

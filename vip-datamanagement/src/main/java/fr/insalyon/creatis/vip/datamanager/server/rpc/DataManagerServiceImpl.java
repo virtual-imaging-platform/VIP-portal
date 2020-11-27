@@ -71,7 +71,7 @@ public class DataManagerServiceImpl extends AbstractRemoteServiceServlet impleme
     public void init() throws ServletException {
         super.init();
         ApplicationContext applicationContext =
-                WebApplicationContextUtils.getRequiredWebApplicationContext(getServletContext());
+                WebApplicationContextUtils.findWebApplicationContext(getServletContext());
         transferPoolBusiness = applicationContext.getBean(TransferPoolBusiness.class);
         lfcBusiness = applicationContext.getBean(LFCBusiness.class);
         dataManagerBusiness = applicationContext.getBean(DataManagerBusiness.class);

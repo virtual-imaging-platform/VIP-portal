@@ -71,7 +71,7 @@ public class FileDownloadServiceImpl extends HttpServlet {
     public void init() throws ServletException {
         super.init();
         ApplicationContext applicationContext =
-                WebApplicationContextUtils.getRequiredWebApplicationContext(getServletContext());
+                WebApplicationContextUtils.findWebApplicationContext(getServletContext());
         gridaPoolClient = applicationContext.getBean(GRIDAPoolClient.class);
     }
 

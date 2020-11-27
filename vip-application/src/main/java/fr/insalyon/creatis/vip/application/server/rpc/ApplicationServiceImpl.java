@@ -72,7 +72,7 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
     public void init() throws ServletException {
         super.init();
         ApplicationContext applicationContext =
-                WebApplicationContextUtils.getRequiredWebApplicationContext(getServletContext());
+                WebApplicationContextUtils.findWebApplicationContext(getServletContext());
         engineBusiness = applicationContext.getBean(EngineBusiness.class);
         classBusiness = applicationContext.getBean(ClassBusiness.class);
         applicationBusiness = applicationContext.getBean(ApplicationBusiness.class);

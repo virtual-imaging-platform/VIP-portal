@@ -84,7 +84,7 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
     public void init() throws ServletException {
         super.init();
         ApplicationContext applicationContext =
-                WebApplicationContextUtils.getRequiredWebApplicationContext(getServletContext());
+                WebApplicationContextUtils.findWebApplicationContext(getServletContext());
         setConfigurationBusiness(applicationContext.getBean(ConfigurationBusiness.class));
         userDAO = applicationContext.getBean(UserDAO.class);
         gridaClient = applicationContext.getBean(GRIDAClient.class);

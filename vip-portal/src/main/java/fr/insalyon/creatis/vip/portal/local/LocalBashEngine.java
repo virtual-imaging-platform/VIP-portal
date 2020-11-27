@@ -68,10 +68,13 @@ public class LocalBashEngine {
         }
     }
 
-    // todo : verify killed works
     public SimulationStatus getStatus(String workflowID) {
+        if ( ! executionsFutures.containsKey(workflowID)) {
+            return SimulationStatus.Killed;
+        }
         Future<?> execFuture = executionsFutures.get(workflowID);
         if (execFuture.isCancelled()) {
+            // todo : verify that this works, that an exception in the job leads to this
             return SimulationStatus.Killed;
         }
         if (execFuture.isDone()) {
@@ -163,7 +166,9 @@ public class LocalBashEngine {
                 .anyMatch(param -> param.getValues().size() != 1)) {
             throw new RuntimeException("There must be exactly 1 value for all parameters");
         }
-        return parameters.stream().collect(Collectors.toMap(
+        return parameters.stream()
+                .map(p -> {logger.info("exec input {} -- {}", p.getParameterName(), p.getValues()); return p;})
+                .collect(Collectors.toMap(
                 param -> param.getParameterName(),
                 param -> param.getValues().get(0)
         ));
@@ -269,7 +274,7 @@ public class LocalBashEngine {
         }
 
         private void transferOutputFiles(Path execDir) throws GRIDAClientException {
-            String toDir = exec.execInputs.get("result-directory");
+            String toDir = exec.execInputs.get("results-directory");
             if (toDir == null) {
                 throw new RuntimeException("there should be a results-directory parameter");
             }

@@ -79,7 +79,7 @@ public abstract class AbstractAuthenticationService extends HttpServlet {
     @Override
     public void init() throws ServletException {
         super.init();
-        ApplicationContext applicationContext = WebApplicationContextUtils.getRequiredWebApplicationContext(getServletContext());
+        ApplicationContext applicationContext = WebApplicationContextUtils.findWebApplicationContext(getServletContext());
         userDAO = applicationContext.getBean(UserDAO.class);
         configurationBusiness = applicationContext.getBean(ConfigurationBusiness.class);
         vipSessionBusiness = applicationContext.getBean(VipSessionBusiness.class);

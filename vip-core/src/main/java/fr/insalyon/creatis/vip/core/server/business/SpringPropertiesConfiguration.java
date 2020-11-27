@@ -2,6 +2,8 @@ package fr.insalyon.creatis.vip.core.server.business;
 
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.configuration.PropertiesConfiguration;
+import org.apache.commons.configuration.reloading.FileChangedReloadingStrategy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.BeanInitializationException;
@@ -13,6 +15,8 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.Environment;
+import org.springframework.core.env.MutablePropertySources;
+import org.springframework.core.env.PropertySource;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.ResourcePropertySource;
@@ -31,15 +35,34 @@ public class SpringPropertiesConfiguration {
 
     private static final Logger logger = LoggerFactory.getLogger(SamlTokenValidator.class);
 
+    /**
+     * using apache config to have a reloadable config file
+     * from https://www.baeldung.com/spring-reloading-properties
+     */
+    public static class ReloadablePropertySource extends PropertySource {
+
+        private PropertiesConfiguration propertiesConfiguration;
+
+        public ReloadablePropertySource(String name, File configFile)
+                throws ConfigurationException {
+            super(name);
+            this.propertiesConfiguration = new PropertiesConfiguration(configFile);
+            this.propertiesConfiguration.setReloadingStrategy(new FileChangedReloadingStrategy());
+        }
+
+        @Override
+        public Object getProperty(String s) {
+            return propertiesConfiguration.getProperty(s);
+        }
+    }
+
     @Autowired
     public SpringPropertiesConfiguration(
             Resource vipConfigFolder,
-            ConfigurableEnvironment env) throws IOException {
-        Resource configFileResource = new FileSystemResource(
-                vipConfigFolder.getFile().toPath().resolve(Server.CONF_FILE));
-        env.getPropertySources().addLast(
-                new ResourcePropertySource(configFileResource)
-        );
+            ConfigurableEnvironment env) throws IOException, ConfigurationException {
+        File configFile = vipConfigFolder.getFile().toPath().resolve(Server.CONF_FILE).toFile();
+        ReloadablePropertySource vipConf = new ReloadablePropertySource("vipMainConfigFile", configFile);
+        env.getPropertySources().addLast(vipConf);
     }
 
     @Component
@@ -96,8 +119,6 @@ public class SpringPropertiesConfiguration {
         @Value("${"+ CoreConstants.LAB_TRUSTSTORE_PASS + ":}")
         private String truststorePass;
 
-        @Value("${"+ CoreConstants.LAB_SIMULATION_PLATFORM_MAX + ":"+Integer.MAX_VALUE+"}")
-        private Integer maxPlatformRunningSimulations;
         @Value("${"+ CoreConstants.LAB_SIMULATION_FOLDER + ":/var/www/html/workflows}")
         private String workflowsPath;
         @Value("${"+ CoreConstants.LAB_SIMULATION_DB_HOST + ":localhost}")
@@ -391,7 +412,9 @@ public class SpringPropertiesConfiguration {
 
         @Override
         public int getMaxPlatformRunningSimulations() {
-            return maxPlatformRunningSimulations;
+            return environment.getProperty(
+                    CoreConstants.LAB_SIMULATION_PLATFORM_MAX,
+                    Integer.class, Integer.MAX_VALUE);
         }
 
         @Override
@@ -406,7 +429,7 @@ public class SpringPropertiesConfiguration {
 
         @Override
         public void setMaxPlatformRunningSimulations(int maxPlatformRunningSimulations) throws ConfigurationException {
-            throw new ConfigurationException("Not possible to change conf value with spring");
+            throw new ConfigurationException("Not possible to change maxPlatformRunningSimulations that way. Please update the configuration file");
         }
 
         @Override

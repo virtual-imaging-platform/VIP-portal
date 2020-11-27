@@ -38,6 +38,7 @@ import fr.insalyon.creatis.vip.application.client.rpc.WorkflowService;
 import fr.insalyon.creatis.vip.application.client.view.ApplicationException;
 import fr.insalyon.creatis.vip.application.server.business.InputBusiness;
 import fr.insalyon.creatis.vip.application.server.business.WorkflowBusiness;
+import fr.insalyon.creatis.vip.application.server.business.simulation.ParameterSweep;
 import fr.insalyon.creatis.vip.application.server.dao.ApplicationInputDAO;
 import fr.insalyon.creatis.vip.core.client.bean.Group;
 import fr.insalyon.creatis.vip.core.client.bean.User;
@@ -78,7 +79,7 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
     public void init() throws ServletException {
         super.init();
         ApplicationContext applicationContext =
-                WebApplicationContextUtils.getRequiredWebApplicationContext(getServletContext());
+                WebApplicationContextUtils.findWebApplicationContext(getServletContext());
         inputBusiness = applicationContext.getBean(InputBusiness.class);
         applicationInputDAO = applicationContext.getBean(ApplicationInputDAO.class);
         configurationBusiness = applicationContext.getBean(ConfigurationBusiness.class);
@@ -167,6 +168,10 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
             List<String> groups = new ArrayList<String>();
             for (Group group : getUserGroupsFromSession().keySet()) {
                 groups.add(group.getName());
+            }
+
+            for (Map.Entry<String,String> p : parametersMap.entrySet()) {
+                logger.info("received param {} : {}", p.getKey(), p.getValue());
             }
 
             String simulationID = workflowBusiness.launch(

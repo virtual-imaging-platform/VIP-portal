@@ -59,8 +59,6 @@ import static org.springframework.core.io.ResourceLoader.CLASSPATH_URL_PREFIX;
 @Component
 public class ApiPropertiesInitializer {
 
-    private final Logger logger = LoggerFactory.getLogger(getClass());
-
     private ConfigurableEnvironment env;
 
     @Autowired

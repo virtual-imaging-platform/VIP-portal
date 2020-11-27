@@ -77,7 +77,7 @@ public class FileUploadServiceImpl extends HttpServlet {
     public void init() throws ServletException {
         super.init();
         ApplicationContext applicationContext =
-                WebApplicationContextUtils.getRequiredWebApplicationContext(getServletContext());
+                WebApplicationContextUtils.findWebApplicationContext(getServletContext());
         client = applicationContext.getBean(GRIDAClient.class);
         poolClient = applicationContext.getBean(GRIDAPoolClient.class);
         lfcPathsBusiness = applicationContext.getBean(LfcPathsBusiness.class);

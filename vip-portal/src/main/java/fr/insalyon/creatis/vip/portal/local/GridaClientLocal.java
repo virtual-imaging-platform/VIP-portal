@@ -52,6 +52,9 @@ public class GridaClientLocal extends GRIDAClient {
 
     @Override
     public List<GridData> getFolderData(String dir, boolean refresh) throws GRIDAClientException {
+        while (dir.startsWith("/")) {
+            dir = dir.substring(1);
+        }
         Path dirPath = Paths.get(localRoot).resolve(dir);
         try {
             return Files.list(dirPath).map( path -> path.toFile()).map(file ->
@@ -69,12 +72,21 @@ public class GridaClientLocal extends GRIDAClient {
 
     @Override
     public Long getModificationDate(String fileName) throws GRIDAClientException {
+        while (fileName.startsWith("/")) {
+            fileName = fileName.substring(1);
+        }
         return Paths.get(localRoot).resolve(fileName).toFile().lastModified();
     }
 
     @Override
     public List<Long> getModificationDate(List<String> filesList) throws GRIDAClientException {
         return filesList.stream()
+                .map(s -> {
+                    while (s.startsWith("/")) {
+                        s = s.substring(1);
+                    }
+                    return s;
+                })
                 .map(s -> Paths.get(localRoot).resolve(s).toFile())
                 .map(file -> file.lastModified())
                 .collect(Collectors.toList());
@@ -112,6 +124,9 @@ public class GridaClientLocal extends GRIDAClient {
 
     @Override
     public void delete(String path) throws GRIDAClientException {
+        while (path.startsWith("/")) {
+            path = path.substring(1);
+        }
         try {
             Files.delete(Paths.get(localRoot).resolve(path));
         } catch (IOException e) {
@@ -128,6 +143,9 @@ public class GridaClientLocal extends GRIDAClient {
 
     @Override
     public void createFolder(String path, String folderName) throws GRIDAClientException {
+        while (path.startsWith("/")) {
+            path = path.substring(1);
+        }
         try {
             Files.createDirectory(Paths.get(localRoot).resolve(path).resolve(folderName));
         } catch (IOException e) {
@@ -142,6 +160,9 @@ public class GridaClientLocal extends GRIDAClient {
 
     @Override
     public boolean exist(String remotePath) throws GRIDAClientException {
+        while (remotePath.startsWith("/")) {
+            remotePath = remotePath.substring(1);
+        }
         return Paths.get(localRoot).resolve(remotePath).toFile().exists();
     }
 }

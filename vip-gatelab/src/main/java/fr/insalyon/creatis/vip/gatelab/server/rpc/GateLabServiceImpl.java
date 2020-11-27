@@ -60,7 +60,7 @@ public class GateLabServiceImpl extends AbstractRemoteServiceServlet implements 
     public void init() throws ServletException {
         super.init();
         ApplicationContext applicationContext =
-                WebApplicationContextUtils.getRequiredWebApplicationContext(getServletContext());
+                WebApplicationContextUtils.findWebApplicationContext(getServletContext());
         gatelabBusiness = applicationContext.getBean(GateLabBusiness.class);
         classBusiness = applicationContext.getBean(ClassBusiness.class);
     }

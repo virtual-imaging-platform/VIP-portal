@@ -66,7 +66,7 @@ public class GetFileServiceImpl extends HttpServlet {
     @Override
     public void init() throws ServletException {
         super.init();
-        ApplicationContext applicationContext = WebApplicationContextUtils.getRequiredWebApplicationContext(getServletContext());
+        ApplicationContext applicationContext = WebApplicationContextUtils.findWebApplicationContext(getServletContext());
         userDAO = applicationContext.getBean(UserDAO.class);
         server = applicationContext.getBean(Server.class);
     }
