@@ -1,4 +1,4 @@
-package fr.insalyon.creatis.vip.portal.local;
+package fr.insalyon.creatis.vip.local;
 
 import fr.insalyon.creatis.grida.client.GRIDAClientException;
 import fr.insalyon.creatis.grida.client.GRIDAZombieClient;

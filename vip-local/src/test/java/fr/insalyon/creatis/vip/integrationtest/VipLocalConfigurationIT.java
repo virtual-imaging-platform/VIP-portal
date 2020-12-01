@@ -12,6 +12,7 @@ import fr.insalyon.creatis.vip.core.server.SpringCoreConfig;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ActiveProfiles;
@@ -28,6 +29,7 @@ import java.util.Map;
 // launch all spring environment for testing, also take test bean though automatic package scan
 @ActiveProfiles({"local", "spring-config-server", "local-db"}) // to take random h2 database and not the test h2 jndi one
 @TestPropertySource(properties = "vipConfigFolder:/home/abonnet/Workspace/Testing/VIP/LocalInstance1")
+@Disabled
 public class VipLocalConfigurationIT {
 
     @Autowired

@@ -1,4 +1,4 @@
-package fr.insalyon.creatis.vip.portal.local;
+package fr.insalyon.creatis.vip.local;
 
 import fr.insalyon.creatis.moteur.plugins.workflowsdb.bean.*;
 import fr.insalyon.creatis.moteur.plugins.workflowsdb.dao.*;

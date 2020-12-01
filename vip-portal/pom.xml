@@ -166,6 +166,14 @@ knowledge of the CeCILL-B license and that you accept its terms.
             <version>${project.version}</version>
         </dependency>
 
+        <!-- vip-local is a dependency but is not included in the default producion war
+        See the war plugin configuration-->
+        <dependency>
+            <groupId>fr.insalyon.creatis</groupId>
+            <artifactId>vip-local</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
         <dependency>
           <groupId>fr.insalyon.creatis</groupId>
           <artifactId>vip-visualization</artifactId>
@@ -261,31 +269,49 @@ knowledge of the CeCILL-B license and that you accept its terms.
     <build>
         <plugins>
             <plugin>
-              <groupId>net.ltgt.gwt.maven</groupId>
-              <artifactId>gwt-maven-plugin</artifactId>
-              <version>1.0.0</version>
-              <extensions>true</extensions>
-              <executions>
-                <execution>
-                  <id>compile-to-javascript</id>
-                  <configuration>
-                      <moduleName>fr.insalyon.creatis.vip.portal.Main</moduleName>
-                      <jvmArgs>-Xms512m</jvmArgs>
-                      <jvmArgs>-Xmx1024m</jvmArgs>
-                  </configuration>
-                  <goals>
-                    <goal>compile</goal>
-                  </goals>
-                </execution>
-              </executions>
+                <groupId>net.ltgt.gwt.maven</groupId>
+                <artifactId>gwt-maven-plugin</artifactId>
+                <version>1.0.0</version>
+                <extensions>true</extensions>
+                <executions>
+                    <execution>
+                        <id>compile-to-javascript</id>
+                        <configuration>
+                            <moduleName>fr.insalyon.creatis.vip.portal.Main</moduleName>
+                            <jvmArgs>-Xms512m</jvmArgs>
+                            <jvmArgs>-Xmx1024m</jvmArgs>
+                        </configuration>
+                        <goals>
+                            <goal>compile</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
 
             <plugin>
-              <artifactId>maven-war-plugin</artifactId>
-              <version>3.2.3</version>
-              <configuration>
-                <packagingExcludes>WEB-INF/lib/*-sources.jar</packagingExcludes>
-              </configuration>
+                <artifactId>maven-war-plugin</artifactId>
+                <version>3.2.3</version>
+                <executions>
+                    <execution>
+                        <!-- This is the default plugin execution, building the main artefact, the production war.
+                        vip-local is removed from it as it is only needed for local and testing use-->
+                        <id>default-war</id>
+                        <goals><goal>war</goal></goals>
+                        <configuration>
+                            <packagingExcludes>WEB-INF/lib/vip-local-*.jar,WEB-INF/lib/*-sources.jar</packagingExcludes>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <!-- An additional war is produced, with the local classifier.
+                        The only difference is the inclusion of vip-local-->
+                        <id>local</id>
+                        <goals><goal>war</goal></goals>
+                        <configuration>
+                            <classifier>local</classifier>
+                            <packagingExcludes>WEB-INF/lib/*-sources.jar</packagingExcludes>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>

@@ -1,4 +1,4 @@
-package fr.insalyon.creatis.vip.portal.local;
+package fr.insalyon.creatis.vip.local;
 
 import fr.insalyon.creatis.sma.client.SMAClient;
 import fr.insalyon.creatis.sma.client.SMAClientException;

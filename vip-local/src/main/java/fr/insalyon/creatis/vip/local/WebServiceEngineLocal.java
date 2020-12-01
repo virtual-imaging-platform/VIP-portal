@@ -1,4 +1,4 @@
-package fr.insalyon.creatis.vip.portal.local;
+package fr.insalyon.creatis.vip.local;
 
 import fr.insalyon.creatis.vip.application.client.view.monitor.SimulationStatus;
 import fr.insalyon.creatis.vip.application.server.business.simulation.ParameterSweep;
