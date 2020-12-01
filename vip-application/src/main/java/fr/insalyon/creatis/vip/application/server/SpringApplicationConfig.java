@@ -15,32 +15,37 @@ import org.springframework.context.annotation.Profile;
 public class SpringApplicationConfig {
 
     @Bean
+    public WorkflowsDBDAOFactory workflowsDBDAOFactory() throws WorkflowsDBDAOException {
+        return new WorkflowsDBDAOFactory();
+    }
+
+    @Bean
     public SimulationStatsDAO getSimulationStatsDAO() throws WorkflowsDBDAOException {
-        return new SimulationStatsData(WorkflowsDBDAOFactory.getInstance().getSessionFactory());
+        return new SimulationStatsData(workflowsDBDAOFactory().getSessionFactory());
     }
 
     @Bean
     public WorkflowDAO getWorkflowDAO() throws WorkflowsDBDAOException {
-        return WorkflowsDBDAOFactory.getInstance().getWorkflowDAO();
+        return workflowsDBDAOFactory().getWorkflowDAO();
     }
 
     @Bean
     public ProcessorDAO getProcessorDAO() throws WorkflowsDBDAOException {
-        return WorkflowsDBDAOFactory.getInstance().getProcessorDAO();
+        return workflowsDBDAOFactory().getProcessorDAO();
     }
 
     @Bean
     public OutputDAO getOutputDAO() throws WorkflowsDBDAOException {
-        return WorkflowsDBDAOFactory.getInstance().getOutputDAO();
+        return workflowsDBDAOFactory().getOutputDAO();
     }
 
     @Bean
     public InputDAO getInputDAO() throws WorkflowsDBDAOException {
-        return WorkflowsDBDAOFactory.getInstance().getInputDAO();
+        return workflowsDBDAOFactory().getInputDAO();
     }
 
     @Bean
     public StatsDAO getStatsDAO() throws WorkflowsDBDAOException {
-        return WorkflowsDBDAOFactory.getInstance().getStatsDAO();
+        return workflowsDBDAOFactory().getStatsDAO();
     }
 }

@@ -127,6 +127,9 @@ public class GateLabProgressLayout extends ProgressLayout {
                         if (status == SimulationStatus.Killed) {
                             barLayout.setBackgroundColor(JobStatus.Failed.getColor());
                             sb.append(". <b>Simulation killed!</b>");
+                        } else if (status == SimulationStatus.Failed) {
+                            barLayout.setBackgroundColor(JobStatus.Failed.getColor());
+                            sb.append(". <b>Simulation Failed!</b>");
                         }
                         sb.append("</font>");
                         barLayout.setWidth(progress + "%");

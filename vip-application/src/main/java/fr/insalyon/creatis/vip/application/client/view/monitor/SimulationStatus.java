@@ -37,10 +37,11 @@ package fr.insalyon.creatis.vip.application.client.view.monitor;
  */
 public enum SimulationStatus {
 
-    Running, 
-    Completed, 
-    Killed, 
-    Cleaned, 
-    Queued, 
+    Running,
+    Completed,
+    Failed,
+    Killed,
+    Cleaned,
+    Queued,
     Unknown
 }

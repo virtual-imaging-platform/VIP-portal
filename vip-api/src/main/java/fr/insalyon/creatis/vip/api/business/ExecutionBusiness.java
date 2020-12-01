@@ -455,6 +455,8 @@ public class ExecutionBusiness {
                 return ExecutionStatus.RUNNING;
             case Completed:
                 return ExecutionStatus.FINISHED;
+            case Failed:
+                return ExecutionStatus.EXECUTION_FAILED;
             case Killed:
                 return ExecutionStatus.KILLED;
             case Queued:
