@@ -51,9 +51,9 @@ import java.util.Collections;
 import static fr.insalyon.creatis.vip.api.CarminProperties.CORS_AUTHORIZED_DOMAINS;
 
 /**
- * Configuration class for spring web.
- *
- * It declares an api conf file which location is configured from the main vip conf file
+ * Configure the spring mvc DispatcherServlet. Few things to do, as the
+ * controllers and dependencies are automatically configured through
+ * scanning.
  *
  * Created by abonnet on 7/13/16.
  */
@@ -91,9 +91,12 @@ public class SpringWebConfig implements WebMvcConfigurer {
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
             .allowedMethods("GET", "POST", "PUT", "DELETE", "HEAD")
-            .allowedOrigins(env.getRequiredProperty(CORS_AUTHORIZED_DOMAINS, String[].class)); // todo, new String[0]));
+            .allowedOrigins(env.getRequiredProperty(CORS_AUTHORIZED_DOMAINS, String[].class));
     }
 
+    /*
+     to verify that the proxy ist still valid each day
+     */
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(vipConfigurer);

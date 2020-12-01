@@ -64,7 +64,7 @@ public class PublicationDataInitializer extends JdbcDaoSupport {
     }
 
     @EventListener(ContextRefreshedEvent.class)
-    @Order(20)
+    @Order(30) // Publications tables references vip-core and vip-application tables and must be created after
     public void onStartup() {
         logger.info("Configuring VIP Publication database.");
 

@@ -45,14 +45,21 @@ import java.util.HashMap;
 import java.util.List;
 
 /**
+ * Legacy vip.conf configuration class, not unused by default after spring global
+ * integration (still activable through the "legacy-config-server" profile
  *
+ * The new configuration class integrate the vip.conf properties in
+ * the spring environment to simplify their use.
+ *
+ * This version does not support automatic reloading but support writing
+ *
+ * We keep it at the moment in case there is an issue with the new class in the
+ * short term, it will be deleted later.
  *
  * @author Rafael Ferreira da Silva
  */
 @Component
-// to avoid bean being created in tests
-// although the vif.conf file does not exist and causes an (silent error)
-@Profile({"default", "prod", "apache-config-server"})
+@Profile("legacy-config-server")
 public class ApacheConfigServer implements Server {
     // Configuration File
     private PropertiesConfiguration config;

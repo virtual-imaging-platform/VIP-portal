@@ -28,8 +28,9 @@ public class ApplicationDataInitializer extends JdbcDaoSupport {
         this.tableInitializer = tableInitializer;
     }
 
+
     @EventListener(ContextRefreshedEvent.class)
-    @Order(20)
+    @Order(20) // Applications tables references vip-core tables and must be created after
     public void onStartup() {
         logger.info("Configuring VIP Application database.");
 

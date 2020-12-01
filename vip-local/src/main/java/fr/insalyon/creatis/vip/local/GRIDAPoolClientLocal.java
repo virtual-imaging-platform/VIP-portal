@@ -12,6 +12,14 @@ import org.springframework.stereotype.Component;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * Overrides original GRIDAPoolClient by a simple version that stores
+ * operations in a map and do all operations in a synchronous way with
+ * GridaClientLocal.
+ *
+ * all the methods are not implemented yet.
+ */
+
 @Component
 @Profile("local")
 @Primary

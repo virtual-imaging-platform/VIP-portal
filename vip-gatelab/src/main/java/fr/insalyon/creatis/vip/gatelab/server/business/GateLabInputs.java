@@ -49,6 +49,8 @@ import org.springframework.stereotype.Component;
 import javax.annotation.PostConstruct;
 
 /**
+ * This stores data in fields and this is not threadsafe. So it cannot be used
+ * as a spring singleton and this needs prototype scope.
  *
  * @author Ibrahim Kallel, Rafael Silva
  */
@@ -75,7 +77,12 @@ public class GateLabInputs {
         this.lfcPathsBusiness = lfcPathsBusiness;
     }
 
+    /* GateLabInputsParser is also prototype based */
     @Autowired
+    public void setGateLabInputsParser(GateLabInputsParser gateLabInputsParser) {
+        this.gateLabInputsParser = gateLabInputsParser;
+    }
+
     public GateLabInputs(String workflowID) {
         this.workflowID = workflowID;
     }
@@ -140,9 +147,5 @@ public class GateLabInputs {
         } catch (DataManagerException ex) {
             throw new BusinessException(ex);
         }
-    }
-
-    public void setGateLabInputsParser(GateLabInputsParser gateLabInputsParser) {
-        this.gateLabInputsParser = gateLabInputsParser;
     }
 }

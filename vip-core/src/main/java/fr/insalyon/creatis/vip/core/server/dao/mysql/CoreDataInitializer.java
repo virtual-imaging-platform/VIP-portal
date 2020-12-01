@@ -52,7 +52,7 @@ public class CoreDataInitializer extends JdbcDaoSupport {
     }
 
     @EventListener(ContextRefreshedEvent.class)
-    @Order(10)
+    @Order(10) // higher priority to create the vip core tables before the ones that references them
     public void onStartup() {
         logger.info("Configuring VIP core database.");
         initializeUserTables();

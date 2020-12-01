@@ -78,12 +78,10 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
     @Override
     public void init() throws ServletException {
         super.init();
-        ApplicationContext applicationContext =
-                WebApplicationContextUtils.findWebApplicationContext(getServletContext());
-        inputBusiness = applicationContext.getBean(InputBusiness.class);
-        applicationInputDAO = applicationContext.getBean(ApplicationInputDAO.class);
-        configurationBusiness = applicationContext.getBean(ConfigurationBusiness.class);
-        workflowBusiness = applicationContext.getBean(WorkflowBusiness.class);
+        inputBusiness = getBean(InputBusiness.class);
+        applicationInputDAO = getBean(ApplicationInputDAO.class);
+        configurationBusiness = getBean(ConfigurationBusiness.class);
+        workflowBusiness = getBean(WorkflowBusiness.class);
     }
 
     /**

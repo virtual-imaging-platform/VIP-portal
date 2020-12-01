@@ -11,8 +11,15 @@ import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 
 import javax.sql.DataSource;
 
+/**
+ * h2 memory embedded database for tests, which is erased at the end of a
+ * test run.
+ * the datasource is also wrapped by a mockito spy to verify how it is used
+ *
+ * only activated when there is the "test-db" profile
+ */
 @Configuration
-@Profile("test-db") // to disable automatic detection through package scan
+@Profile("test-db") // to be only used when wanted
 public class TestDataSourceSpringConfig {
 
     @Bean

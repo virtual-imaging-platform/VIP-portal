@@ -51,6 +51,13 @@ import java.util.Date;
 import java.util.List;
 
 /**
+ * Wrapper on WebServiceEngine to configure it and to create a Workflow object
+ * after a launch.
+ *
+ * WorkflowExecutionBusiness and WebServiceEngine both have spring prototype
+ * scope, so each WorkflowExecutionBusiness use creates a new intance with a
+ * dedicated WebServiceEngine instance that it will wrap.
+ * This is needed as each time an engine is used, the endpoint can be different.
  *
  * @author Rafael Ferreira da Silva
  */
@@ -69,6 +76,10 @@ public class WorkflowExecutionBusiness {
         this.server = server;
     }
 
+    /*
+    WebServiceEngine is also prototype scoped, this creates a new instance
+    every time. 
+    */
     @Autowired
     public final void setEngine(WebServiceEngine engine) {
         this.engine = engine;

@@ -44,11 +44,8 @@ import fr.insalyon.creatis.vip.core.server.rpc.AbstractRemoteServiceServlet;
 import org.jsoup.Jsoup;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.ApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import javax.servlet.ServletException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -67,18 +64,18 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
     private BoutiquesBusiness boutiquesBusiness;
     private ConfigurationBusiness configurationBusiness;
     private WorkflowBusiness workflowBusiness;
+    private SimulationBusiness simulationBusiness;
 
     @Override
     public void init() throws ServletException {
         super.init();
-        ApplicationContext applicationContext =
-                WebApplicationContextUtils.findWebApplicationContext(getServletContext());
-        engineBusiness = applicationContext.getBean(EngineBusiness.class);
-        classBusiness = applicationContext.getBean(ClassBusiness.class);
-        applicationBusiness = applicationContext.getBean(ApplicationBusiness.class);
-        boutiquesBusiness = applicationContext.getBean(BoutiquesBusiness.class);
-        configurationBusiness = applicationContext.getBean(ConfigurationBusiness.class);
-        workflowBusiness = applicationContext.getBean(WorkflowBusiness.class);
+        engineBusiness = getBean(EngineBusiness.class);
+        classBusiness = getBean(ClassBusiness.class);
+        applicationBusiness = getBean(ApplicationBusiness.class);
+        boutiquesBusiness = getBean(BoutiquesBusiness.class);
+        configurationBusiness = getBean(ConfigurationBusiness.class);
+        workflowBusiness = getBean(WorkflowBusiness.class);
+        simulationBusiness = getBean(SimulationBusiness.class);
     }
 
     @Override
@@ -326,8 +323,7 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
             ApplicationStatus status = new ApplicationStatus();
             status.setRunningWorkflows(runningSimulations.size());
 
-            SimulationBusiness jobBusiness = new SimulationBusiness();
-            int[] tasks = jobBusiness.getNumberOfActiveTasks(runningSimulations);
+            int[] tasks = simulationBusiness.getNumberOfActiveTasks(runningSimulations);
             status.setRunningTasks(tasks[0]);
             status.setWaitingTasks(tasks[1]);
 

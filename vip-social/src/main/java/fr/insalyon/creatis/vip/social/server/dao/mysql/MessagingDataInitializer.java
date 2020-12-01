@@ -29,7 +29,7 @@ public class MessagingDataInitializer extends JdbcDaoSupport {
     }
 
     @EventListener(ContextRefreshedEvent.class)
-    @Order(20)
+    @Order(20) // Social tables references vip-core tables and must be created after
     public void onStartup() {
         logger.info("Configuring VIP Social database.");
 

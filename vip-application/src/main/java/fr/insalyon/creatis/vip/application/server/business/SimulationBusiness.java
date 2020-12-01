@@ -47,6 +47,7 @@ import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerException;
 import fr.insalyon.creatis.vip.datamanager.server.business.LfcPathsBusiness;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Lookup;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -67,6 +68,20 @@ public class SimulationBusiness {
 
     private LfcPathsBusiness lfcPathsBusiness;
     private Server server;
+
+    @Autowired
+    public SimulationBusiness(LfcPathsBusiness lfcPathsBusiness, Server server) {
+        this.lfcPathsBusiness = lfcPathsBusiness;
+        this.server = server;
+    }
+
+    /*
+     Both SimulationDAO and ExecutionNodeDAO have a dbPath parameter field which
+     is different for each simulation. So they cannot be used as spring singleton
+     (spring default scope) - or this would mean adding the dbPath as parameter
+     in each method which is not practical.
+     Instead, we use the prototype scope with lookup methods which creates a new
+     SimulationDAO/ExecutionNodeDAO at each use with the desired dbPath. */
 
     @Lookup
     protected SimulationDAO getSimulationDAO(String dbPath) {

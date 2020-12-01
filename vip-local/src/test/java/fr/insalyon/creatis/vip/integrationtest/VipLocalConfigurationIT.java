@@ -25,10 +25,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Work initiated to do thing automatically with a local configuration.
+ * This can be used to generate data for the local instance (vipConfigFolder to
+ * change in the @TestPropertySource annotation)
+ *
+ */
 @SpringJUnitWebConfig(value = SpringCoreConfig.class)
-// launch all spring environment for testing, also take test bean though automatic package scan
-@ActiveProfiles({"local", "spring-config-server", "local-db"}) // to take random h2 database and not the test h2 jndi one
-@TestPropertySource(properties = "vipConfigFolder:/home/abonnet/Workspace/Testing/VIP/LocalInstance1")
+@ActiveProfiles({"local", "spring-config-server", "local-db"})
+@TestPropertySource(properties = "vipConfigFolder:TOCHANGE")
 @Disabled
 public class VipLocalConfigurationIT {
 

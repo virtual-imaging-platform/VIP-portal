@@ -44,6 +44,12 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 /**
+ * Creates dao for the h2 database of a simulation.
+ * Each dao is specific to a single database, and so to a single simulation.
+ *
+ * The default is to access the h2 database through an h2 server via tcp,
+ * but this is changeable to use (for instance) a memory or a local h2
+ * database for testing or local use
  *
  * @author Rafael Silva
  */

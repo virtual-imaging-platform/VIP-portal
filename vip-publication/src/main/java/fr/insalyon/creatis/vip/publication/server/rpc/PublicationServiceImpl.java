@@ -70,9 +70,7 @@ public class PublicationServiceImpl extends AbstractRemoteServiceServlet impleme
     @Override
     public void init() throws ServletException {
         super.init();
-        ApplicationContext applicationContext =
-                WebApplicationContextUtils.findWebApplicationContext(getServletContext());
-        publicationBusiness = applicationContext.getBean(PublicationBusiness.class);
+        publicationBusiness = getBean(PublicationBusiness.class);
     }
 
     @Override

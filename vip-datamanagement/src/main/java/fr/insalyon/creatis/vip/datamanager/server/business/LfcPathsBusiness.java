@@ -13,6 +13,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.net.URI;
 
+/*
+    Utility service to convert user-readable virtual vip paths to real lfn paths
+    back and forth. For instance /vip/Home/file.txt to
+    /prefix/../user_folder/user_name/file.txt
+ */
 @Service
 @Transactional
 public class LfcPathsBusiness {

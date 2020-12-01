@@ -57,9 +57,7 @@ public class VisualizationServiceImpl extends AbstractRemoteServiceServlet
     @Override
     public void init() throws ServletException {
         super.init();
-        ApplicationContext applicationContext =
-                WebApplicationContextUtils.findWebApplicationContext(getServletContext());
-        visualizationBusiness = applicationContext.getBean(VisualizationBusiness.class);
+        visualizationBusiness = getBean(VisualizationBusiness.class);
     }
 
     @Override

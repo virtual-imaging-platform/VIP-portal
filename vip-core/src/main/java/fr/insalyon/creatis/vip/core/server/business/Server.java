@@ -5,6 +5,10 @@ import org.apache.commons.configuration.ConfigurationException;
 import java.util.HashMap;
 import java.util.List;
 
+/*
+    interface for the server configuration to allow several implementations
+ */
+
 public interface Server {
 
     String VIP_DIR = "/.vip/";

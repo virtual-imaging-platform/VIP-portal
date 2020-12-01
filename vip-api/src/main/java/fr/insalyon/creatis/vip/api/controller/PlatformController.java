@@ -31,27 +31,26 @@
  */
 package fr.insalyon.creatis.vip.api.controller;
 
-import fr.insalyon.creatis.vip.api.exception.ApiException.ApiError;
-import fr.insalyon.creatis.vip.api.model.Module;
 import fr.insalyon.creatis.vip.api.exception.ApiException;
+import fr.insalyon.creatis.vip.api.exception.ApiException.ApiError;
 import fr.insalyon.creatis.vip.api.model.ErrorCodeAndMessage;
+import fr.insalyon.creatis.vip.api.model.Module;
 import fr.insalyon.creatis.vip.api.model.PlatformProperties;
 import fr.insalyon.creatis.vip.api.model.SupportedTransferProtocol;
-import fr.insalyon.creatis.vip.application.client.bean.Application;
 import fr.insalyon.creatis.vip.application.client.view.ApplicationException.ApplicationError;
 import fr.insalyon.creatis.vip.core.client.VipException;
 import fr.insalyon.creatis.vip.core.client.VipException.VipError;
 import fr.insalyon.creatis.vip.core.client.bean.User;
-import fr.insalyon.creatis.vip.core.client.view.CoreException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.function.Supplier;
 
 import static fr.insalyon.creatis.vip.api.CarminProperties.*;

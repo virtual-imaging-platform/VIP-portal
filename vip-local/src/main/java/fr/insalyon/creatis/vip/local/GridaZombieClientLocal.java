@@ -9,6 +9,10 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+/**
+ * Overrides original GRIDAZombieClient (that would fail) by a stub version that
+ * needs to be implemented
+ */
 @Component
 @Profile("local")
 @Primary

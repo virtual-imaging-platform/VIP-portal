@@ -14,6 +14,12 @@ import java.io.IOException;
 
 import static org.mockito.Mockito.*;
 
+/**
+ * Spring configuration class for tests.
+ *
+ * Overrides the Server default implementation by
+ * a mocked one, so this does not need a vip.conf file presence.
+ */
 @Configuration
 @Profile("test")
 public class ServerMockConfig {

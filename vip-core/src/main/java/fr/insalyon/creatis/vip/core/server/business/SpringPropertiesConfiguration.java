@@ -29,8 +29,23 @@ import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 
+/**
+ * replaces ApacheConfigServer which was the legacy configuration class.
+ *
+ * This version supports the vipConfigFolder to allow reading the vip.conf
+ * property file from any configuration folder (it is readonly).
+ * This is based on apache PropertiesConfiguration to allow for automatic
+ * reloading. But to benefit from reloading, properties must be accessed through
+ * environment.getProperty and not @Value. This is only done for getMaxPlatformRunningSimulations
+ * to have an alternative to change the maxPlatformRunningSimulations value at
+ * runtime as this version do not write in vip.conf (read only) and so the
+ * setMaxPlatformRunningSimulations do not work anymore.
+ *
+ * Also, contrary to the old version, as this version does not write in vip.conf,
+ * the first vip start do not create/populate it.
+ */
 @Configuration
-@Profile("spring-config-server")
+@Profile({"default", "prod", "spring-config-server"})
 public class SpringPropertiesConfiguration {
 
     private static final Logger logger = LoggerFactory.getLogger(SamlTokenValidator.class);
@@ -65,6 +80,12 @@ public class SpringPropertiesConfiguration {
         env.getPropertySources().addLast(vipConf);
     }
 
+    /**
+     * This heavily uses the @Value annotation to fetch the properties from
+     * the vip.conf file. The @Value annotation supports a default value in the
+     * format @Value("${property:defaultValue}"} or a weird syntax for default
+     * empty list that works.
+     */
     @Component
     public class SpringConfigServer implements Server {
 
@@ -427,6 +448,11 @@ public class SpringPropertiesConfiguration {
             return publicationCommandLine;
         }
 
+        /*
+           not doable with this server implementation.
+           However, this implementation supports file reloading and updating
+           the conf file allows to update this config
+         */
         @Override
         public void setMaxPlatformRunningSimulations(int maxPlatformRunningSimulations) throws ConfigurationException {
             throw new ConfigurationException("Not possible to change maxPlatformRunningSimulations that way. Please update the configuration file");

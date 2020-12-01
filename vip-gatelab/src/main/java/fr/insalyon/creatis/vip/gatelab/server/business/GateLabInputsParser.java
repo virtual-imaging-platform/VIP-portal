@@ -48,6 +48,10 @@ import org.xml.sax.helpers.DefaultHandler;
 import org.xml.sax.helpers.XMLReaderFactory;
 
 /**
+ * Parse a gatelab input file.
+ *
+ * This stores data in fields and this is not threadsafe. So it cannot be used
+ * as a spring singleton and this needs prototype scope.
  *
  * @author Ibrahim Kallel, Rafael Silva
  */

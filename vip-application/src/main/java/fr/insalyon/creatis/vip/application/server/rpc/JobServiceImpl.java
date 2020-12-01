@@ -64,9 +64,7 @@ public class JobServiceImpl extends AbstractRemoteServiceServlet implements JobS
     @Override
     public void init() throws ServletException {
         super.init();
-        ApplicationContext applicationContext =
-                WebApplicationContextUtils.findWebApplicationContext(getServletContext());
-        simulationBusiness = applicationContext.getBean(SimulationBusiness.class);
+        simulationBusiness = getBean(SimulationBusiness.class);
     }
 
     /**

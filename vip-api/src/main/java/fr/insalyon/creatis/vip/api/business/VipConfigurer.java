@@ -47,9 +47,9 @@ import javax.servlet.http.HttpServletResponse;
 import java.util.Calendar;
 
 /**
- * Used to configure vip on startup and at each request
+ * Configure vip (proxy verification)
  *
- * Daily, renew the grida proxy
+ * Do it on startup, and then every day (test at each api request)
  *
  * Created by abonnet on 7/26/16.
  */

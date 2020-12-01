@@ -29,7 +29,7 @@ public class DataManagerDataInitializer extends JdbcDaoSupport {
     }
 
     @EventListener(ContextRefreshedEvent.class)
-    @Order(20)
+    @Order(20) // DataManager tables references vip-core tables and must be created after
     public void onStartup() {
         logger.info("Configuring VIP SSH database.");
         tableInitializer.createTable("VIPSSHAccounts",

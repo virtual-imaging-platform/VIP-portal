@@ -45,6 +45,10 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
 /**
+ * Communicates with a moteur server through a web service.
+ *
+ * Each call is relative to a unique endpoint and must create a new instance,
+ * so this needs the spring prototype scope.
  *
  * @author Rafael Ferreira da Silva, Ibrahim kallel
  */

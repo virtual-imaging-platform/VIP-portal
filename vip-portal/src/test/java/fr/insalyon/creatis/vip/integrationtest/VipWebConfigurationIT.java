@@ -28,10 +28,15 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+/*
+Functional test with the vip-portal configuration, so very close from
+the production one. Do tests on the api.
+ */
 @SpringJUnitWebConfig(value = SpringCoreConfig.class)
-// launch all spring environment for testing, also take test bean though automatic package scan
 @ActiveProfiles({"test-db", "test"}) // to take random h2 database and not the test h2 jndi one
-@TestPropertySource(properties = {"db.tableEngine=", "vipConfigFolder=classpath:"}) // to disable the default mysql/innodb engine on database init
+// to disable the default mysql/innodb engine on database init
+// also configure the vip conf files to be searched in classpath
+@TestPropertySource(properties = {"db.tableEngine=", "vipConfigFolder=classpath:"})
 @Transactional
 public class VipWebConfigurationIT {
 

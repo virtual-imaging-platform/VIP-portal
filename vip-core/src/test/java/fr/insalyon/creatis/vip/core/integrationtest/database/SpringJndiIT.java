@@ -13,6 +13,7 @@ import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
 import fr.insalyon.creatis.vip.core.server.business.EmailBusiness;
 import fr.insalyon.creatis.vip.core.server.business.Server;
 import fr.insalyon.creatis.vip.core.server.dao.mysql.CoreDataInitializer;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -52,11 +53,23 @@ import static org.mockito.ArgumentMatchers.*;
     - transaction and connection management
     - automatic database creation on first launch
     - database not overridden on next launches
+
+    This allows to test the database with jndi to be as close as possible from
+    production configuration. Unfortunately, jndi configuration is complicated
+    in automatic testing and the jndi.properties file needs an absolute path, which is not
+    possible for a versioned and shared projects. This is disabled but project
+    members are invited to temporally activate it and edit the jndi.properties
+    in case of database issue to investigate.
+
+    The SpringDatabaseIT is very close as this one and works on an h2 in-memory
+    database without jndi, and should be enough to detect most database issues
+    in a automatic way
  */
 @SpringJUnitConfig(SpringCoreConfig.class) // launch all spring environment for testing, also take test bean though automatic package scan
 @TestPropertySource(properties = "db.tableEngine=") // to disable the default mysql/innodb engine on database init
 @TestMethodOrder(OrderAnnotation.class)
 @ActiveProfiles({"jndi-db", "test"}) // to use default jndi datasource but avoid default server config
+@Disabled
 public class SpringJndiIT {
 
     @Autowired
@@ -102,7 +115,7 @@ public class SpringJndiIT {
 
         // check that a connection is not shared outside a transaction
         Connection connection1 = DataSourceUtils.getConnection(dataSource);
-        Connection connection2= DataSourceUtils.getConnection(dataSource);
+        Connection connection2 = DataSourceUtils.getConnection(dataSource);
         assertNotEquals(connection1, connection2);
     }
 
@@ -164,7 +177,8 @@ public class SpringJndiIT {
         createUser(testEmail);
         // verify initial user + new one are there
         assertEquals(2, countUser.get());
-        // when sending an email (after the deletion, throw an exception to cause a rollback
+        // Now we will remove an user, and throw an exception when an email is sent at the end
+        // we will check if the user is still present or not after to see if the transaction have been rollbacked
         Mockito.doAnswer(invocation -> {
             // but before, verify the user has well been deleted
             assertEquals(1, countUser.get());
@@ -203,6 +217,7 @@ public class SpringJndiIT {
         // and not when the connection is obtained through spring and so errors cause SqlException
         // and not spring DataAccessException
         JdbcTemplate jdbcTemplate = new JdbcTemplate(lazyDataSource);
+        // close the datasource to make the next request fail
         try { jdbcTemplate.execute("SHUTDOWN"); } catch (Exception e) {e.printStackTrace();}
         assertThrows(BusinessException.class, () -> configurationBusiness.addTermsUse());
     }
@@ -210,9 +225,10 @@ public class SpringJndiIT {
     @Test
     @Order(8)
     public void connectionShouldBeLazyInTransaction() throws SQLException, MalformedURLException {
-        // getConnection throw an exception but should not be called as 'getLoginUrlCas' do not need db access
         JdbcTemplate jdbcTemplate = new JdbcTemplate(lazyDataSource);
+        // close the datasource to make the next request fail
         try { jdbcTemplate.execute("SHUTDOWN"); } catch (Exception e) {e.printStackTrace();}
+        // getConnection throw an exception but should not be called as 'getLoginUrlCas' do not need db access
         String res = configurationBusiness.getLoginUrlCas(new URL("file:/plop"));
         assertEquals(ServerMockConfig.TEST_CAS_URL + "/login?service=file:/plop", res);
     }

@@ -10,6 +10,11 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
 
+/**
+ * Spring configuration class for tests.
+ *
+ * Overrides the dependency services (grida, proxyclient, email) by mocked ones
+ */
 @Configuration
 @Profile("test")
 public class SpingTestConfig {

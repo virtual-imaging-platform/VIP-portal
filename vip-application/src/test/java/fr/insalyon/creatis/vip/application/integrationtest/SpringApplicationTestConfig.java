@@ -8,6 +8,9 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
 
+/*
+   replaces workflowsdb beans by mocks in tests
+ */
 @Configuration
 @Profile("test")
 public class SpringApplicationTestConfig {
@@ -15,8 +18,8 @@ public class SpringApplicationTestConfig {
 
     @Bean
     @Primary
-    public SimulationStatsDAO getTestSimulationStatsDAO() {
-        return Mockito.mock(SimulationStatsDAO.class);
+    public WorkflowsDBDAOFactory workflowsDBDAOFactory() {
+        return Mockito.mock(WorkflowsDBDAOFactory.class);
     }
 
     @Bean

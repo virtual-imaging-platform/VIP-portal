@@ -38,6 +38,10 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
 /**
+ * Parse a scufl file.
+ *
+ * This stores data in fields and this is not threadsafe. So it cannot be used
+ * as a spring singleton and this needs prototype scope.
  *
  * @author Rafael Silva
  */

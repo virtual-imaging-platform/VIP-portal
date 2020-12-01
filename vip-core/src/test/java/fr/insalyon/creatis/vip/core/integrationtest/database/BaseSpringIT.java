@@ -44,11 +44,21 @@ import java.util.function.Supplier;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 
-
+/**
+ * Utility superclass to launch tests with the whole spring configuration, as
+ * in production. Subclass only need to extend it and can benefit from dependency
+ * injection.
+ *
+ *
+ * The "test" profile overrides all the external dependencies
+ * that would throw exception by mocked and configurable ones.
+ * The "test-db" profile disable the default jndi datasource and uses a
+ * h2 in-memory database instead
+ */
 @SpringJUnitConfig(SpringCoreConfig.class) // launch all spring environment for testing, also take test bean though automatic package scan
 @ActiveProfiles({"test-db", "test"}) // to take random h2 database and not the test h2 jndi one
 @TestPropertySource(properties = "db.tableEngine=") // to disable the default mysql/innodb engine on database init
-@Transactional
+@Transactional // each test is in a transaction that is rollbacked at the end to always leave a "clean" state
 public abstract class BaseSpringIT {
 
     @Autowired
@@ -59,7 +69,7 @@ public abstract class BaseSpringIT {
 
     @Autowired
     @Qualifier("db-datasource")
-    protected DataSource dataSource;
+    protected DataSource dataSource; // this is a mockito spy wrapping the h2 memory datasource
 
     @Autowired
     protected DataSource lazyDataSource;

@@ -15,6 +15,10 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 
+/**
+ * overrides workflowsdb dao by others configured with a h2 database
+ */
+
 @Configuration
 @Profile("local")
 public class WorkflowsDBLocalConfiguration {
@@ -48,11 +52,6 @@ public class WorkflowsDBLocalConfiguration {
         } catch (Exception e) {
             throw new BeanInitializationException("Error creating workflows db local hibernate session factory", e);
         }
-    }
-
-    @Bean
-    public SimulationStatsDAO getSimulationStatsDAO() throws WorkflowsDBDAOException {
-        return new SimulationStatsData(workflowsDbSessionFactory());
     }
 
     @Bean

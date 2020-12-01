@@ -14,6 +14,11 @@ import java.io.File;
 import java.rmi.RemoteException;
 import java.util.List;
 
+/**
+ * local version to override WebServiceEngine and make all executions stuff
+ * by LocalBashEngine
+ */
+
 @Service
 @Scope("prototype")
 @Profile("local")

@@ -57,6 +57,10 @@ import org.xml.sax.helpers.DefaultHandler;
 import org.xml.sax.helpers.XMLReaderFactory;
 
 /**
+ * Parse a m2 input file.
+ *
+ * This stores data in fields and this is not threadsafe. So it cannot be used
+ * as a spring singleton and this needs prototype scope.
  *
  * @author Rafael Silva
  */

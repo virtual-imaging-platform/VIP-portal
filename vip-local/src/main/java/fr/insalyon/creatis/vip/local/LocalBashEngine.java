@@ -24,6 +24,20 @@ import java.util.concurrent.Future;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+/**
+ * Local engine that simulates workflow execution.
+ *
+ * At the moment it does the basic minimum :
+ * - looks for a bash script in the gwendia file
+ * - creates a local directory for each execution
+ * - copies the input file and the bash script in the file
+ * - launches the bash script with the inputs in the command line
+ * - transfers the results in a results-directory given path
+ * - do all this asynchronously and handle a status
+ * - handles all path as lfn and use GridaClientLocal for transfers
+ *
+ * A lot of improvements are possible
+ */
 @Component
 @Profile("local")
 @Lazy
@@ -212,7 +226,7 @@ public class LocalBashEngine {
             Path toDir = exec.workflowDir.resolve("inputs");
             Files.createDirectory(toDir);
             Map<String,Path> inputsFiles = new HashMap<>();
-            for (String name : getFileInputName()) {
+            for (String name : getFileInputNames()) {
                 Path from = Paths.get(exec.execInputs.get(name));
                 String to = gridaClient.getRemoteFile(from.toString(), toDir.toString());
                 inputsFiles.put(name, Paths.get(to));
@@ -229,7 +243,7 @@ public class LocalBashEngine {
             return Paths.get(to);
         }
 
-        private Set<String> getFileInputName() {
+        private Set<String> getFileInputNames() {
             // find URI inputs
             return exec.gwendiaInputs.entrySet().stream()
                     .filter(x -> x.getValue().equals("URI"))

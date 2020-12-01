@@ -38,6 +38,23 @@ import java.util.function.Consumer;
 
 import static org.springframework.util.ResourceUtils.CLASSPATH_URL_PREFIX;
 
+/**
+ * Root spring configuration class.
+ * Basically, the @ComponentScan annotation allows spring to scan all vip
+ * classes and to create/inject automatically all the beans / service. Note that
+ * the GWT servlet cannot be created this way (they are created by the application
+ * server / tomcat) through the web.xml file.
+ *
+ * This also configures the database/transaction/connection : spring will
+ * automatically handle transactions and connection creation (and closing)
+ * by annotating classes with @Transactional and using spring utils to get
+ * the connection in the dao
+ *
+ * This also creates spring beans for services coming from maven dependencies (grida and sma)
+ *
+ * This also manage the vip configuration folder, defaulting to "$HOME/.vip" but
+ * allowing change for tests and local use.
+ */
 @Configuration
 @EnableTransactionManagement
 @ComponentScan(basePackages = "fr.insalyon.creatis.vip")
@@ -45,12 +62,21 @@ public class SpringCoreConfig {
 
     private static final Logger logger = LoggerFactory.getLogger(SpringCoreConfig.class);
 
+    /*
+    wrapper around the "real" datasource to open a connection only when needed
+    (and not every time a @Transactional method is called)
+    The "real" datasource must have the "db-datasource" qualifier
+     */
     @Bean
-    @Primary
+    @Primary // to indicate to spring this is the datasource to inject
     public LazyConnectionDataSourceProxy lazyDataSource(@Qualifier("db-datasource") DataSource dataSource) {
         return new LazyConnectionDataSourceProxy(dataSource);
     }
 
+    /*
+    Spring service that create a transaction (and a connection) automatically
+    in classes with the @Transactional annotation (so the business layer)
+     */
     @Bean
     public PlatformTransactionManager transactionManager(LazyConnectionDataSourceProxy lazyDataSource) {
         return new DataSourceTransactionManager(lazyDataSource);
@@ -101,13 +127,19 @@ public class SpringCoreConfig {
         return new PropertySourcesPlaceholderConfigurer();
     }
 
-    // to handle list In spring @value
+    // to handle list in spring @value
     @Bean
     public static ConversionService conversionService() {
         return new DefaultConversionService();
     }
 
-    // to find properties file
+    /*
+    find the vip configuration folder. This defaults to $HOME/.vip as this is
+    the traditional behavior.
+    This is changeable through the vipConfigFolder property which can be given
+    as a JVM parameter or a system environment variable. This can be changed
+    to a absolute path or a relative classpath.
+     */
     @Bean
     public static Resource vipConfigFolder(
             ConfigurableApplicationContext configurableApplicationContext) throws IOException {

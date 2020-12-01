@@ -16,10 +16,16 @@ import java.nio.file.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * overides original GRIDAClient by a simpler version that do local file
+ * transfers in a configured "localRoot" directory.
+ *
+ * replication methods are not implemented
+ */
 @Component
 @Profile("local")
 @Primary
-@DependsOn("localConfiguration")
+@DependsOn("localConfiguration") // to populate localRoot @Value
 public class GridaClientLocal extends GRIDAClient {
 
     @Value("${local.grida.root}")

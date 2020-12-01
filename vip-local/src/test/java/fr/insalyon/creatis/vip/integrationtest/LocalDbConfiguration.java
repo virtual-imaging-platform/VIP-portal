@@ -11,8 +11,11 @@ import org.springframework.jdbc.datasource.DriverManagerDataSource;
 
 import javax.sql.DataSource;
 
+/*
+ h2 local database configuration to override the default jndi one
+ */
 @Configuration
-@Profile("local-db") // to disable automatic detection through package scan
+@Profile("local-db")
 public class LocalDbConfiguration {
 
     @Bean

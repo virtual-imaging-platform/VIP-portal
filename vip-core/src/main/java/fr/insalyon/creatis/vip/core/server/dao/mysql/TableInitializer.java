@@ -12,6 +12,11 @@ import javax.sql.DataSource;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+/**
+ * Utility to simplify table creation. It handle it properly if the table
+ * already exists, and supports an optional (but present by default) mysql
+ * engine. This allows to use other database for local or testing purposes.
+ */
 @Component
 @Transactional
 public class TableInitializer extends JdbcDaoSupport {

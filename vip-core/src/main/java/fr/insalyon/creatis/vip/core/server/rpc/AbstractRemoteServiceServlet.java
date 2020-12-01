@@ -40,6 +40,7 @@ import fr.insalyon.creatis.vip.core.server.business.Server;
 import fr.insalyon.creatis.vip.core.server.business.VipSessionBusiness;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -49,6 +50,10 @@ import javax.servlet.http.HttpSession;
 import java.util.Map;
 
 /**
+ * Parent for all vip GWT RPC servlet.
+ *
+ * Includes the mechanism to access spring managed beans in all subclasses,
+ * as the Server bean here.
  *
  * @author Rafael Silva
  */
@@ -57,15 +62,23 @@ public abstract class AbstractRemoteServiceServlet extends RemoteServiceServlet 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     protected Server server;
+    private ApplicationContext applicationContext;
     private VipSessionBusiness vipSessionBusiness;
 
     @Override
     public void init() throws ServletException {
         super.init();
-        ApplicationContext applicationContext =
+        applicationContext =
                 WebApplicationContextUtils.findWebApplicationContext(getServletContext());
         server = applicationContext.getBean(Server.class);
-        vipSessionBusiness = applicationContext.getBean(VipSessionBusiness.class);
+        vipSessionBusiness = getBean(VipSessionBusiness.class);
+    }
+
+    /*
+        allows spring beans injection in all subclass
+     */
+    protected final <T> T getBean(Class<T> requiredType) {
+        return applicationContext.getBean(requiredType);
     }
 
     // see http://blog.excilys.com/2011/05/12/gwt-google-wont-throw/

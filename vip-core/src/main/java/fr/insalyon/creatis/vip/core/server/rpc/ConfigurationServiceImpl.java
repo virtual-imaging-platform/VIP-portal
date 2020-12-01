@@ -76,18 +76,12 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
     private UserDAO userDAO;
     private GRIDAClient gridaClient;
 
-    public void setConfigurationBusiness(ConfigurationBusiness configurationBusiness) {
-        this.configurationBusiness = configurationBusiness;
-    }
-    
     @Override
     public void init() throws ServletException {
         super.init();
-        ApplicationContext applicationContext =
-                WebApplicationContextUtils.findWebApplicationContext(getServletContext());
-        setConfigurationBusiness(applicationContext.getBean(ConfigurationBusiness.class));
-        userDAO = applicationContext.getBean(UserDAO.class);
-        gridaClient = applicationContext.getBean(GRIDAClient.class);
+        configurationBusiness = getBean(ConfigurationBusiness.class);
+        userDAO = getBean(UserDAO.class);
+        gridaClient = getBean(GRIDAClient.class);
     }
     
     @Override

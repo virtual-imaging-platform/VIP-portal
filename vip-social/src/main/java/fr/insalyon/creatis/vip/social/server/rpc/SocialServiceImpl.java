@@ -65,10 +65,8 @@ public class SocialServiceImpl extends AbstractRemoteServiceServlet implements S
     @Override
     public void init() throws ServletException {
         super.init();
-        ApplicationContext applicationContext =
-                WebApplicationContextUtils.findWebApplicationContext(getServletContext());
-        messageBusiness = applicationContext.getBean(MessageBusiness.class);
-        configurationBusiness = applicationContext.getBean(ConfigurationBusiness.class);
+        messageBusiness = getBean(MessageBusiness.class);
+        configurationBusiness = getBean(ConfigurationBusiness.class);
     }
 
     public List<Message> getMessagesByUser(Date startDate) throws SocialException {

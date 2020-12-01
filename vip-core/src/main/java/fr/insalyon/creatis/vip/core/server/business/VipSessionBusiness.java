@@ -8,6 +8,7 @@ import fr.insalyon.creatis.vip.core.client.view.CoreException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -20,7 +21,14 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+/*
+    Manages the reads/writes of vip core information in the web session
+    Handle the recovery when the session is lost (server restart) but
+    the identification cookie is still there.
+ */
+
 @Service
+@Transactional
 public class VipSessionBusiness {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());

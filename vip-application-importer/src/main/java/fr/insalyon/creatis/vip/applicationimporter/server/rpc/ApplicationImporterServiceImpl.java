@@ -56,9 +56,7 @@ public class ApplicationImporterServiceImpl extends fr.insalyon.creatis.vip.core
     @Override
     public void init() throws ServletException {
         super.init();
-        ApplicationContext applicationContext =
-                WebApplicationContextUtils.findWebApplicationContext(getServletContext());
-        applicationImporterBusiness = applicationContext.getBean(ApplicationImporterBusiness.class);
+        applicationImporterBusiness = getBean(ApplicationImporterBusiness.class);
     }
 
     @Override

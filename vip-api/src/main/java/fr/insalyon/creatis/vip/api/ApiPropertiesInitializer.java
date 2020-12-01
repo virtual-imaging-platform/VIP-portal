@@ -54,6 +54,9 @@ import static fr.insalyon.creatis.vip.api.CarminProperties.*;
 import static org.springframework.core.io.ResourceLoader.CLASSPATH_URL_PREFIX;
 
 /**
+ * Add an additional "vip-api.conf" property file to spring environment
+ * This file must be in the vip configuration folder (alongside vip.conf)
+ *
  * Created by abonnet on 5/7/18.
  */
 @Component

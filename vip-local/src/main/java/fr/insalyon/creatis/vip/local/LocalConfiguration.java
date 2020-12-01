@@ -20,7 +20,15 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 
-
+/**
+ * Spring configuration to make vip work in local, without any other
+ * external service.
+ *
+ * This overrides ProxyClient and SmaClient.
+ *
+ * This also import properties from vip-local.conf to configure all the other
+ * local components of this package
+ */
 @Configuration
 @Profile("local")
 public class LocalConfiguration {
@@ -36,6 +44,10 @@ public class LocalConfiguration {
         );
     }
 
+    /*
+        Overrides only to do nothing and prevent original behavior that
+        would fail
+     */
     @Component
     @Primary
     public class ProxyClientLocal extends ProxyClient {
@@ -59,6 +71,9 @@ public class LocalConfiguration {
         }
     }
 
+    /**
+     * Send nothing but prints mail in logs
+     */
     @Component
     @Primary
     public class SmaClientLocal extends SMAClient {

@@ -59,10 +59,8 @@ public class GateLabServiceImpl extends AbstractRemoteServiceServlet implements 
     @Override
     public void init() throws ServletException {
         super.init();
-        ApplicationContext applicationContext =
-                WebApplicationContextUtils.findWebApplicationContext(getServletContext());
-        gatelabBusiness = applicationContext.getBean(GateLabBusiness.class);
-        classBusiness = applicationContext.getBean(ClassBusiness.class);
+        gatelabBusiness = getBean(GateLabBusiness.class);
+        classBusiness = getBean(ClassBusiness.class);
     }
 
     @Override
