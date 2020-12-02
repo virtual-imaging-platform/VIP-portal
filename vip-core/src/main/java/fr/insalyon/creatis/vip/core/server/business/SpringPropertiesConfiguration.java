@@ -229,7 +229,7 @@ public class SpringPropertiesConfiguration {
 
         @Override
         public String getServerProxy() {
-            return vipConfigFolder.toPath().resolve(PROXY_FILENAME).toString();
+            return proxyFolder.toPath().resolve(PROXY_FILENAME).toString();
         }
 
         @Override
@@ -241,7 +241,7 @@ public class SpringPropertiesConfiguration {
         public String getServerProxyFolder(String vo) {
             File voProxyFolder = this.proxyFolder.toPath().resolve(vo).toFile();
             createFolderIfNeeded(voProxyFolder);
-            return proxyFolder.getAbsolutePath();
+            return voProxyFolder.getAbsolutePath();
         }
 
         @Override
