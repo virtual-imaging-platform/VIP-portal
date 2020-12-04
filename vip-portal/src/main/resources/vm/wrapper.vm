@@ -75,10 +75,14 @@ case $key in
         then
             if [ "$count" -gt "0" ]
             then 
-                echo ",\"$input.getId()\" : \"$2\"" >> input_param_file.json
-            else
-                echo "\"$input.getId()\" : \"$2\"" >> input_param_file.json
+                echo ",\" >> input_param_file.json
             fi
+            echo "\"$input.getId()\" : " >> input_param_file.json
+            #if($input.getType()=="Flag" || $input.getType()=="Number")
+            echo $2 >> input_param_file.json
+            #else
+            echo "\"$2\""  >> input_param_file.json
+            #end
         count=$((count+1))
         fi
     ;;
