@@ -56,6 +56,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PreDestroy;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -105,6 +106,21 @@ public class DataApiBusiness {
         this.transferPoolBusiness = transferPoolBusiness;
         this.lfcPermissionBusiness = lfcPermissionBusiness;
         this.dataManagerBusiness = dataManagerBusiness;
+    }
+
+    @PreDestroy
+    public void close() {
+        logger.info("shutting down download threads");
+        scheduler.shutdown();
+        try {
+            if (!scheduler.awaitTermination(800, TimeUnit.MILLISECONDS)) {
+                logger.info("Forcing download threads shutdown");
+                scheduler.shutdownNow();
+            }
+        } catch (InterruptedException e) {
+            scheduler.shutdownNow();
+        }
+        logger.info("download threads succesfully shutdown");
     }
 
     public boolean doesFileExist(String path) throws ApiException {

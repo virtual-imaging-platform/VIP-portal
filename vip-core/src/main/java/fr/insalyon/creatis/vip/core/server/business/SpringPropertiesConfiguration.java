@@ -45,7 +45,7 @@ import java.util.List;
  * the first vip start do not create/populate it.
  */
 @Configuration
-@Profile({"default", "prod", "spring-config-server"})
+@Profile({"default", "spring-config-server"})
 public class SpringPropertiesConfiguration {
 
     private static final Logger logger = LoggerFactory.getLogger(SamlTokenValidator.class);
