@@ -45,6 +45,7 @@ import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerException;
 import fr.insalyon.creatis.vip.datamanager.server.business.LfcPathsBusiness;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -68,6 +69,21 @@ public class ApplicationImporterBusiness {
     private VelocityUtils velocityUtils;
     private TargzUtils targzUtils;
     private ApplicationBusiness applicationBusiness;
+
+    @Autowired
+    public ApplicationImporterBusiness(
+            Server server, LfcPathsBusiness lfcPathsBusiness,
+            GRIDAClient gridaClient, BoutiquesBusiness boutiquesBusiness,
+            VelocityUtils velocityUtils, TargzUtils targzUtils,
+            ApplicationBusiness applicationBusiness) {
+        this.server = server;
+        this.lfcPathsBusiness = lfcPathsBusiness;
+        this.gridaClient = gridaClient;
+        this.boutiquesBusiness = boutiquesBusiness;
+        this.velocityUtils = velocityUtils;
+        this.targzUtils = targzUtils;
+        this.applicationBusiness = applicationBusiness;
+    }
 
     public String readAndValidationBoutiquesFile(String fileLFN, User user)
             throws BusinessException {
