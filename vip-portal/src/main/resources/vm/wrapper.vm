@@ -64,7 +64,7 @@ cat << JSONPARAMETERS  > input_param_file.json
 {
 JSONPARAMETERS
 
-count=0
+firstParam=true
 while [[ $# > 0 ]]
 do
 key="$1"
@@ -73,17 +73,27 @@ case $key in
 --$input.getId().toLowerCase())
         if [ "$2" != "No_value_provided" ]
         then
-            if [ "$count" -gt "0" ]
-            then 
-                echo ",\" >> input_param_file.json
-            fi
-            echo "\"$input.getId()\" : " >> input_param_file.json
-            #if($input.getType()=="Flag" || $input.getType()=="Number")
-            echo $2 >> input_param_file.json
+            #if($input.getType()=="Flag")
+            if [ "$firstParam" != true ] && [ "$2" = true ]
             #else
-            echo "\"$2\""  >> input_param_file.json
+            if [ "$firstParam" != true ]
             #end
-        count=$((count+1))
+            then 
+                echo "," >> input_param_file.json
+            fi
+            #if($input.getType()=="Flag") ## for the current boutiques version, a flag must be true or absent (false not allowed)
+            if [ "$2" = true ]
+            then
+                echo "\"$input.getId()\": $2"  >> input_param_file.json
+                firstParam=false
+            fi
+            #elseif($input.getType()=="Number")
+            echo "\"$input.getId()\": $2"  >> input_param_file.json
+            firstParam=false
+            #else ## text or file, put in quotes
+            echo "\"$input.getId()\": \"$2\""  >> input_param_file.json
+            firstParam=false
+            #end
         fi
     ;;
     #end

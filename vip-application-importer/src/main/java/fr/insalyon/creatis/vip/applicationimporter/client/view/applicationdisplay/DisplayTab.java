@@ -197,7 +197,7 @@ public class DisplayTab extends Tab {
         if (boutiquesTool.getName() == null) {
             throw new ApplicationImporterException("Boutiques file must have a name property");
         }
-        if (boutiquesTool.getName().matches("\\s")) {
+        if (boutiquesTool.getName().matches(".*\\s.*")) {
             throw new ApplicationImporterException("Application name should not have a space in it");
         }
         if (boutiquesTool.getToolVersion() == null) {
