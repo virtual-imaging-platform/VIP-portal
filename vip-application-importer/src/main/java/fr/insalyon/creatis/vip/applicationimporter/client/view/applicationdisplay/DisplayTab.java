@@ -203,6 +203,11 @@ public class DisplayTab extends Tab {
         if (boutiquesTool.getAuthor() == null) {
             throw new ApplicationImporterException("Boutiques file must have an author");
         }
+
+        String containerType = boutiquesTool.getContainerType();
+        if (containerType != null && ! containerType.equals("docker")) {
+            throw new ApplicationImporterException("Only docker containers are supported");
+        }
     }
 
     /**

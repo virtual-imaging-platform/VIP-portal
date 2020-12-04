@@ -48,8 +48,8 @@ public class JSONUtil {
         bt.setToolVersion(getPropertyAsString(jsonObject, "tool-version"));
         bt.setDescription(getPropertyAsString(jsonObject, "description"));
         bt.setCommandLine(getPropertyAsString(jsonObject, "command-line"));
-        bt.setDockerImage(getPropertyAsString(jsonObject, "docker-image"));
-        bt.setDockerIndex(getPropertyAsString(jsonObject, "docker-index"));
+        bt.setContainerImage(getPropertyAsString(jsonObject, "docker-image"));
+        bt.setContainerIndex(getPropertyAsString(jsonObject, "docker-index"));
         bt.setSchemaVersion(getPropertyAsString(jsonObject, "schema-version"));
         bt.setChallengerEmail(getPropertyAsString(jsonObject, "vip:miccai-challenger-email"));
         bt.setChallengerTeam(getPropertyAsString(jsonObject, "vip:miccai-challenge-team-name"));
@@ -74,6 +74,13 @@ public class JSONUtil {
                 String value = getPropertyAsString(tagsJSONObject, key);
                 bt.addTag(key, value);
             }
+        }
+
+        JSONObject containerObject = getPropertyAsObject(jsonObject, "container-image");
+        if (containerObject != null) {
+            bt.setContainerType(getPropertyAsString(containerObject, "type"));
+            bt.setContainerImage(getPropertyAsString(containerObject, "image"));
+            bt.setContainerIndex(getPropertyAsString(containerObject, "index"));
         }
 
         bt.setJsonFile(jsonObject.toString());

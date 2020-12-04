@@ -69,8 +69,8 @@ public class GeneralLayout extends AbstractFormLayout {
         version.setValue(bt.getToolVersion());
         description.setValue(bt.getDescription());
         commandLine.setValue(bt.getCommandLine());
-        dockerImage.setValue(bt.getDockerImage());
-        dockerIndex.setValue(bt.getDockerIndex());
+        dockerImage.setValue(bt.getContainerImage());
+        dockerIndex.setValue(bt.getContainerIndex());
         schemaVersion.setValue(bt.getSchemaVersion());
     }
 

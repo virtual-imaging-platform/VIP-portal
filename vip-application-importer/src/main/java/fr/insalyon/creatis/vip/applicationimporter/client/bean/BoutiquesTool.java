@@ -49,8 +49,9 @@ public class BoutiquesTool implements IsSerializable {
     private String toolVersion;
     private String description;
     private String commandLine;
-    private String dockerImage;
-    private String dockerIndex;
+    private String containerType;
+    private String containerImage;
+    private String containerIndex;
     private String schemaVersion;
     private String challengerEmail;
     private String challengerTeam;
@@ -85,12 +86,16 @@ public class BoutiquesTool implements IsSerializable {
         return commandLine;
     }
 
-    public String getDockerImage() {
-        return dockerImage;
+    public String getContainerType() {
+        return containerType;
     }
 
-    public String getDockerIndex() {
-        return dockerIndex;
+    public String getContainerImage() {
+        return containerImage;
+    }
+
+    public String getContainerIndex() {
+        return containerIndex;
     }
 
     public String getSchemaVersion() {
@@ -120,7 +125,7 @@ public class BoutiquesTool implements IsSerializable {
     public void setJsonFile(String jsonFile) {
         this.jsonFile = jsonFile;
     }
-    
+
     public void setApplicationLFN(String applicationLFN) {
         this.applicationLFN = applicationLFN;
     }
@@ -140,10 +145,10 @@ public class BoutiquesTool implements IsSerializable {
     public String getGwendiaLFN() {
         return this.applicationLFN + "/workflow/" + getName() + ".gwendia";
     }
- 
     public String getJsonLFN() {
         return this.applicationLFN + "/json/" + getName() + ".json";
     }
+
     public void setName(String name) {
         this.name = name;
     }
@@ -164,12 +169,16 @@ public class BoutiquesTool implements IsSerializable {
         this.commandLine = commandLine;
     }
 
-    public void setDockerImage(String dockerImage) {
-        this.dockerImage = dockerImage;
+    public void setContainerType(String containerType) {
+        this.containerType = containerType;
     }
 
-    public void setDockerIndex(String dockerIndex) {
-        this.dockerIndex = dockerIndex;
+    public void setContainerImage(String containerImage) {
+        this.containerImage = containerImage;
+    }
+
+    public void setContainerIndex(String containerIndex) {
+        this.containerIndex = containerIndex;
     }
 
     public void setSchemaVersion(String schemaVersion) {
@@ -199,5 +208,4 @@ public class BoutiquesTool implements IsSerializable {
     public boolean hasNextInput(BoutiquesInput input) {
         return inputs.lastIndexOf(input) < (inputs.size()-1) ? true : false;
     }
-
 }
