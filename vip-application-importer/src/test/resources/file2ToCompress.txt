@@ -1,0 +1,3 @@
+begin file2ToCompress.txt
+content file2ToCompress.txt
+end file2ToCompress.txt
