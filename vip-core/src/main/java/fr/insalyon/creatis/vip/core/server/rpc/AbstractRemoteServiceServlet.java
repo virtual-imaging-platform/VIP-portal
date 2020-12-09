@@ -34,35 +34,26 @@ package fr.insalyon.creatis.vip.core.server.rpc;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import fr.insalyon.creatis.vip.core.client.bean.Group;
 import fr.insalyon.creatis.vip.core.client.bean.User;
-import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants.GROUP_ROLE;
 import fr.insalyon.creatis.vip.core.client.view.CoreException;
-import fr.insalyon.creatis.vip.core.server.business.BusinessException;
-import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
-
-import javax.servlet.ServletConfig;
-import javax.servlet.ServletException;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.util.Arrays;
-import java.util.Enumeration;
-import java.util.Map;
-import java.util.Optional;
-import java.util.function.Supplier;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import fr.insalyon.creatis.vip.core.server.dao.mysql.PlatformConnection;
+import fr.insalyon.creatis.vip.core.server.business.Server;
+import fr.insalyon.creatis.vip.core.server.business.VipSessionBusiness;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeansException;
+import org.springframework.context.ApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+import java.util.Map;
 
 /**
+ * Parent for all vip GWT RPC servlet.
+ *
+ * Includes the mechanism to access spring managed beans in all subclasses,
+ * as the Server bean here.
  *
  * @author Rafael Silva
  */
@@ -70,10 +61,24 @@ public abstract class AbstractRemoteServiceServlet extends RemoteServiceServlet 
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    protected ConfigurationBusiness configurationBusiness;
+    protected Server server;
+    private ApplicationContext applicationContext;
+    private VipSessionBusiness vipSessionBusiness;
 
-    public AbstractRemoteServiceServlet() {
-        configurationBusiness = new ConfigurationBusiness();
+    @Override
+    public void init() throws ServletException {
+        super.init();
+        applicationContext =
+                WebApplicationContextUtils.findWebApplicationContext(getServletContext());
+        server = applicationContext.getBean(Server.class);
+        vipSessionBusiness = getBean(VipSessionBusiness.class);
+    }
+
+    /*
+        allows spring beans injection in all subclass
+     */
+    protected final <T> T getBean(Class<T> requiredType) {
+        return applicationContext.getBean(requiredType);
     }
 
     // see http://blog.excilys.com/2011/05/12/gwt-google-wont-throw/
@@ -106,112 +111,16 @@ public abstract class AbstractRemoteServiceServlet extends RemoteServiceServlet 
         return this.getThreadLocalRequest().getSession();
     }
 
-    public User getSessionUser() throws CoreException {
-
-        User user = (User) getSession().getAttribute(CoreConstants.SESSION_USER);
-        if (user != null) {
-            return user;
-        }
-        // not in session. Try to reload session from cookies
-        user = resetSessionFromCookie();
-        if (user != null) {
-            return user;
-        }
-        logger.error("No VIP user found in session {}. Attributes : {}",
-                getSession().getId(), enumerationToString(getSession().getAttributeNames()));
-        throw new CoreException("User not logged in.");
+    protected User getSessionUser() throws CoreException {
+        return vipSessionBusiness.getUserFromSession(this.getThreadLocalRequest());
     }
 
-
-    protected Map<Group, GROUP_ROLE> getSessionUserGroups() throws CoreException {
-
-        @SuppressWarnings("unchecked")
-        Supplier<Map<Group, GROUP_ROLE>> groupsSupplier =
-            () -> (Map<Group, GROUP_ROLE>) getSession().getAttribute(CoreConstants.SESSION_GROUPS);
-        Map<Group, GROUP_ROLE> groups = groupsSupplier.get();
-        if (groups != null) {
-            return groups;
-        }
-        // not in session. Try to reload session from cookies
-        resetSessionFromCookie();
-        groups = groupsSupplier.get();
-        if (groups != null) {
-            return groups;
-        }
-        logger.error("No VIP groups found in session {}. Attributes : {}",
-                getSession().getId(), enumerationToString(getSession().getAttributeNames()));
-        throw new CoreException("User has no groups defined.");
+    protected Map<Group, GROUP_ROLE> getUserGroupsFromSession() throws CoreException {
+        return vipSessionBusiness.getUserGroupsFromSession(this.getThreadLocalRequest());
     }
 
-    protected User resetSessionFromCookie() throws CoreException {
-
-        Map<String, String> cookies = getCookies();
-
-        if ( ! cookies.containsKey(CoreConstants.COOKIES_USER) ||
-                ! cookies.containsKey(CoreConstants.COOKIES_SESSION)) {
-            return null;
-        }
-
-        String email = cookies.get(CoreConstants.COOKIES_USER);
-        String sessionId = cookies.get(CoreConstants.COOKIES_SESSION);
-        // the cookies are there, verify them
-        logger.info("Using cookies to reload session for {} ", email);
-        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
-            if (configurationBusiness.validateSession(email, sessionId, connection)) {
-                return setUserSession(email, connection);
-            }
-            return null;
-        } catch (SQLException ex) {
-            logger.error("Error handling a connection", ex);
-            throw new CoreException(ex);
-        } catch (BusinessException ex) {
-            throw new CoreException(ex);
-        }
-    }
-
-    private Map<String, String> getCookies() {
-        return Stream.of(this.getThreadLocalRequest().getCookies())
-                .collect(Collectors.toMap(
-                        cookie -> cookie.getName(),
-                        cookie -> decodeCookieValue(cookie.getValue())));
-    }
-
-    private String decodeCookieValue(String encodedValue) {
-        try {
-            return URLDecoder.decode(encodedValue, StandardCharsets.UTF_8.toString());
-        } catch (UnsupportedEncodingException e) {
-            logger.error("cannot url decode cookie value {}", encodedValue);
-            return encodedValue;
-        }
-    }
-
-    private User setUserSession(
-            String  email, Connection connection)
-            throws BusinessException {
-        User user = configurationBusiness.getUser(email, connection);
-        return setUserSession(user, getSession(), connection, configurationBusiness);
-    }
-
-    public static User setUserSession(
-        User user, HttpSession session, Connection connection,
-        ConfigurationBusiness configurationBusiness) throws BusinessException {
-
-        Map<Group, GROUP_ROLE> groups =
-                configurationBusiness.getUserGroups(user.getEmail(), connection);
-        user.setGroups(groups);
-
-        session.setAttribute(CoreConstants.SESSION_USER, user);
-        session.setAttribute(CoreConstants.SESSION_GROUPS, groups);
-
-        return user;
-    }
-
-    private String enumerationToString(Enumeration<String> enums) {
-        StringBuilder st = new StringBuilder();
-        while (enums.hasMoreElements()) {
-            st.append(enums.nextElement()).append(" ");
-        }
-        return st.toString();
+    protected User setUserInSession(User user) throws CoreException {
+        return vipSessionBusiness.setUserInSession(user, getSession());
     }
 
     protected void authenticateSystemAdministrator(Logger logger) throws CoreException {

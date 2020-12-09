@@ -36,25 +36,35 @@ import fr.insalyon.creatis.vip.datamanager.client.bean.ExternalPlatform;
 import fr.insalyon.creatis.vip.datamanager.server.dao.ExternalPlatformsDAO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.support.JdbcDaoSupport;
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.sql.*;
-import java.util.*;
+import javax.sql.DataSource;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by abonnet on 9/5/19.
  */
-public class ExternalPlatformData implements ExternalPlatformsDAO {
+@Repository
+@Transactional
+public class ExternalPlatformData extends JdbcDaoSupport implements ExternalPlatformsDAO {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
-    private Connection connection;
 
-    public ExternalPlatformData(Connection connection) throws DAOException {
-        this.connection = connection;
+    @Autowired
+    public void useDataSource(DataSource dataSource) {
+        setDataSource(dataSource);
     }
 
     @Override
     public ExternalPlatform getById(String identifier) throws DAOException {
-        try (PreparedStatement ps = connection.prepareStatement(
+        try (PreparedStatement ps = getConnection().prepareStatement(
                     "SELECT * FROM VIPExternalPlatforms " +
                     "WHERE identifier=?")) {
             ps.setString(1, identifier);
@@ -82,7 +92,7 @@ public class ExternalPlatformData implements ExternalPlatformsDAO {
 
     @Override
     public List<ExternalPlatform> getAll() throws DAOException {
-        try (PreparedStatement ps = connection.prepareStatement(
+        try (PreparedStatement ps = getConnection().prepareStatement(
                     "SELECT * FROM VIPExternalPlatforms ")) {
 
             ResultSet rs = ps.executeQuery();

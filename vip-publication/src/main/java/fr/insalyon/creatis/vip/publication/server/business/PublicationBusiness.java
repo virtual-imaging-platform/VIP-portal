@@ -30,72 +30,79 @@
  * knowledge of the CeCILL-B license and that you accept its terms.
  */
 package fr.insalyon.creatis.vip.publication.server.business;
-import fr.insalyon.creatis.vip.publication.client.bean.Publication;
+
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
-import fr.insalyon.creatis.vip.publication.server.dao.PublicationDAOFactory;
+import fr.insalyon.creatis.vip.publication.client.bean.Publication;
+import fr.insalyon.creatis.vip.publication.server.dao.PublicationDAO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.sql.Connection;
 import java.util.List;
 
 /**
  *
  * @author Rafael Ferreira da Silva,Nouha boujelben
  */
+@Service
+@Transactional
 public class PublicationBusiness {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
+
+    private PublicationDAO publicationDAO;
+
+    public PublicationBusiness(PublicationDAO publicationDAO) {
+        this.publicationDAO = publicationDAO;
+    }
+
+
     /**
      *
      * @return @throws BusinessException
      */
-    public List<Publication> getPublications(Connection connection)
+    public List<Publication> getPublications()
             throws BusinessException {
         logger.info("*******************PublicationBusiness getPublications*******************");
         try {
-            return PublicationDAOFactory.getDAOFactory().getPublicationDAO(connection)
-                    .getList();
+            return publicationDAO.getList();
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }
     }
 
-    public void removePublication(Long id, Connection connection)
+    public void removePublication(Long id)
             throws BusinessException {
         try {
-            PublicationDAOFactory.getDAOFactory().getPublicationDAO(connection)
-                    .remove(id);
+            publicationDAO.remove(id);
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }
     }
 
-    public void addPublication(Publication pub, Connection connection)
+    public void addPublication(Publication pub)
             throws BusinessException {
         try {
-            PublicationDAOFactory.getDAOFactory().getPublicationDAO(connection)
-                    .add(pub);
+            publicationDAO.add(pub);
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }
     }
 
-    public void updatePublication(Publication pub, Connection connection)
+    public void updatePublication(Publication pub)
             throws BusinessException {
         try {
-            PublicationDAOFactory.getDAOFactory().getPublicationDAO(connection)
-                    .update(pub);
+            publicationDAO.update(pub);
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }
     }
-    public Publication getPublication(Long id, Connection connection)
+    public Publication getPublication(Long id)
             throws BusinessException {
         try {
-            return PublicationDAOFactory.getDAOFactory().getPublicationDAO(connection)
-                    .getPublication(id);
+            return publicationDAO.getPublication(id);
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }

@@ -38,7 +38,12 @@ import fr.insalyon.creatis.vip.core.server.business.StatsBusiness.UserSearchCrit
 import fr.insalyon.creatis.vip.core.server.dao.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.support.JdbcDaoSupport;
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
+import javax.sql.DataSource;
 import java.sql.*;
 import java.time.LocalDate;
 import java.util.*;
@@ -50,13 +55,15 @@ import java.util.Map.Entry;
  *
  * @author Rafael Ferreira da Silva, Tristan Glatard
  */
-public class UserData implements UserDAO {
+@Repository
+@Transactional
+public class UserData extends JdbcDaoSupport implements UserDAO {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
-    private Connection connection;
 
-    public UserData(Connection connection) throws DAOException {
-        this.connection = connection;
+    @Autowired
+    public void useDataSource(DataSource dataSource) {
+        setDataSource(dataSource);
     }
 
     /**
@@ -69,7 +76,7 @@ public class UserData implements UserDAO {
     public void add(User user) throws DAOException {
 
         try {
-            PreparedStatement ps = connection.prepareStatement(
+            PreparedStatement ps = getConnection().prepareStatement(
                     "INSERT INTO VIPUsers("
                     + "email, pass, first_name, last_name, institution, phone, "
                     + "code, confirmed, folder, registration, last_login, level, "
@@ -121,7 +128,7 @@ public class UserData implements UserDAO {
     public boolean authenticate(String email, String password) throws DAOException {
 
         try {
-            PreparedStatement ps = connection.prepareStatement("SELECT "
+            PreparedStatement ps = getConnection().prepareStatement("SELECT "
                     + "pass,account_locked FROM VIPUsers WHERE email=?");
 
             ps.setString(1, email);
@@ -154,7 +161,7 @@ public class UserData implements UserDAO {
     public boolean activate(String email, String code) throws DAOException {
 
         try {
-            PreparedStatement ps = connection.prepareStatement("SELECT "
+            PreparedStatement ps = getConnection().prepareStatement("SELECT "
                     + "code,account_locked FROM VIPUsers WHERE email=?");
 
             ps.setString(1, email);
@@ -165,7 +172,7 @@ public class UserData implements UserDAO {
                 boolean locked = rs.getBoolean("account_locked");
                 if (!locked && c.equals(code)) {
 
-                    ps = connection.prepareStatement("UPDATE VIPUsers SET "
+                    ps = getConnection().prepareStatement("UPDATE VIPUsers SET "
                             + "confirmed=? WHERE email=?");
 
                     ps.setBoolean(1, true);
@@ -194,7 +201,7 @@ public class UserData implements UserDAO {
     public User getUser(String email) throws DAOException {
 
         try {
-            PreparedStatement ps = connection.prepareStatement("SELECT "
+            PreparedStatement ps = getConnection().prepareStatement("SELECT "
                     + "email, next_email, first_name, last_name, institution, phone, "
                     + "code, confirmed, folder, session, registration, "
                     + "last_login, level, country_code, max_simulations,termsUse,lastUpdatePublications,failed_authentications,account_locked "
@@ -243,7 +250,7 @@ public class UserData implements UserDAO {
     public List<User> getUsers() throws DAOException {
 
         try {
-            PreparedStatement ps = connection.prepareStatement("SELECT "
+            PreparedStatement ps = getConnection().prepareStatement("SELECT "
                     + "email, next_email, first_name, last_name, institution, phone, "
                     + "code, confirmed, folder, registration, last_login, "
                     + "level, country_code, max_simulations, termsUse, lastUpdatePublications,"
@@ -301,7 +308,7 @@ public class UserData implements UserDAO {
 
             query.append("ORDER BY LOWER(registration)");
 
-            PreparedStatement ps = connection.prepareStatement(query.toString());
+            PreparedStatement ps = getConnection().prepareStatement(query.toString());
             int paramIndex = 1;
             for (Object param : params) {
                 ps.setObject(paramIndex, param);
@@ -352,7 +359,7 @@ public class UserData implements UserDAO {
                     });
 
 
-            PreparedStatement ps = connection.prepareStatement(query.toString());
+            PreparedStatement ps = getConnection().prepareStatement(query.toString());
             int paramIndex = 1;
             for (Object param : params) {
                 ps.setObject(paramIndex, param);
@@ -415,7 +422,7 @@ public class UserData implements UserDAO {
     @Override
     public void remove(String email) throws DAOException {
         try {
-            PreparedStatement ps = connection.prepareStatement("DELETE "
+            PreparedStatement ps = getConnection().prepareStatement("DELETE "
                     + "FROM VIPUsers WHERE email=?");
 
             ps.setString(1, email);
@@ -437,7 +444,7 @@ public class UserData implements UserDAO {
     public void update(User user) throws DAOException {
 
         try {
-            PreparedStatement ps = connection.prepareStatement("UPDATE "
+            PreparedStatement ps = getConnection().prepareStatement("UPDATE "
                     + "VIPUsers SET "
                     + "first_name = ?, last_name = ?, institution = ?, "
                     + "phone = ?, folder = ?, country_code = ? "
@@ -473,7 +480,7 @@ public class UserData implements UserDAO {
 
         if (authenticate(email, currentPassword)) {
             try {
-                PreparedStatement ps = connection.prepareStatement("UPDATE "
+                PreparedStatement ps = getConnection().prepareStatement("UPDATE "
                         + "VIPUsers SET pass = ? WHERE email = ?");
 
                 ps.setString(1, newPassword);
@@ -495,7 +502,7 @@ public class UserData implements UserDAO {
     @Override
     public void updateEmail(String oldEmail, String newEmail) throws DAOException {
         try {
-            PreparedStatement ps = connection.prepareStatement("UPDATE "
+            PreparedStatement ps = getConnection().prepareStatement("UPDATE "
                     + "VIPUsers SET email = ? WHERE email = ?");
 
             ps.setString(1, newEmail);
@@ -517,7 +524,7 @@ public class UserData implements UserDAO {
     @Override
     public void updateNextEmail(String currentEmail, String nextEmail) throws DAOException {
         try {
-            PreparedStatement ps = connection.prepareStatement("UPDATE "
+            PreparedStatement ps = getConnection().prepareStatement("UPDATE "
                     + "VIPUsers SET next_email = ? WHERE email = ?");
 
 
@@ -542,7 +549,7 @@ public class UserData implements UserDAO {
     public void updateSession(String email, String session) throws DAOException {
 
         try {
-            PreparedStatement ps = connection.prepareStatement("UPDATE "
+            PreparedStatement ps = getConnection().prepareStatement("UPDATE "
                     + "VIPUsers SET session = ? WHERE email = ?");
 
             ps.setString(1, session);
@@ -568,7 +575,7 @@ public class UserData implements UserDAO {
     public boolean verifySession(String email, String session) throws DAOException {
 
         try {
-            PreparedStatement ps = connection.prepareStatement("SELECT "
+            PreparedStatement ps = getConnection().prepareStatement("SELECT "
                     + "session FROM VIPUsers WHERE email = ?");
 
             ps.setString(1, email);
@@ -598,7 +605,7 @@ public class UserData implements UserDAO {
     public void updateLastLogin(String email, Date lastLogin) throws DAOException {
 
         try {
-            PreparedStatement ps = connection.prepareStatement("UPDATE "
+            PreparedStatement ps = getConnection().prepareStatement("UPDATE "
                     + "VIPUsers SET last_login = ? WHERE email = ?");
 
             ps.setTimestamp(1, new Timestamp(lastLogin.getTime()));
@@ -617,7 +624,7 @@ public class UserData implements UserDAO {
     public void updateTermsOfUse(String email, Timestamp termsUse) throws DAOException {
 
         try {
-            PreparedStatement ps = connection.prepareStatement("UPDATE "
+            PreparedStatement ps = getConnection().prepareStatement("UPDATE "
                     + "VIPUsers SET termsUse = ? WHERE email = ?");
 
             ps.setTimestamp(1, termsUse);
@@ -642,7 +649,7 @@ public class UserData implements UserDAO {
     public User getUserBySession(String session) throws DAOException {
 
         try {
-            PreparedStatement ps = connection.prepareStatement("SELECT "
+            PreparedStatement ps = getConnection().prepareStatement("SELECT "
                     + "email, next_email, first_name, last_name, institution, phone, "
                     + "code, confirmed, folder, session, registration, "
                     + "last_login, level, country_code, max_simulations,"
@@ -691,7 +698,7 @@ public class UserData implements UserDAO {
     public List<User> getAdministrators() throws DAOException {
 
         try {
-            PreparedStatement ps = connection.prepareStatement("SELECT "
+            PreparedStatement ps = getConnection().prepareStatement("SELECT "
                     + "email, next_email, first_name, last_name, institution, phone, "
                     + "code, confirmed, folder, registration, last_login, "
                     + "level, country_code, max_simulations, termsUse, "
@@ -743,7 +750,7 @@ public class UserData implements UserDAO {
             int maxRunningSimulations, boolean locked) throws DAOException {
 
         try {
-            PreparedStatement ps = connection.prepareStatement("UPDATE "
+            PreparedStatement ps = getConnection().prepareStatement("UPDATE "
                     + "VIPUsers SET level = ?, country_code = ?, "
                     + "max_simulations = ?, account_locked = ? WHERE email = ?");
             ps.setString(1, level.name());
@@ -771,7 +778,7 @@ public class UserData implements UserDAO {
     public void updateCode(String email, String code) throws DAOException {
 
         try {
-            PreparedStatement ps = connection.prepareStatement("UPDATE "
+            PreparedStatement ps = getConnection().prepareStatement("UPDATE "
                     + "VIPUsers SET code = ? WHERE email = ?");
             ps.setString(1, code);
             ps.setString(2, email);
@@ -795,7 +802,7 @@ public class UserData implements UserDAO {
     public void resetPassword(String email, String newPassword) throws DAOException {
 
         try {
-            PreparedStatement ps = connection.prepareStatement("UPDATE "
+            PreparedStatement ps = getConnection().prepareStatement("UPDATE "
                     + "VIPUsers SET pass = ? WHERE email = ?");
 
             ps.setString(1, newPassword);
@@ -812,7 +819,7 @@ public class UserData implements UserDAO {
     @Override
     public int getNUsers() throws DAOException {
         try {
-            PreparedStatement ps = connection.prepareStatement("select COUNT(*) as count from VIPUsers");
+            PreparedStatement ps = getConnection().prepareStatement("select COUNT(*) as count from VIPUsers");
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 return rs.getInt("count");
@@ -828,7 +835,7 @@ public class UserData implements UserDAO {
     @Override
     public int getNCountries() throws DAOException {
         try {
-            PreparedStatement ps = connection.prepareStatement("select COUNT(distinct country_code) as count from VIPUsers");
+            PreparedStatement ps = getConnection().prepareStatement("select COUNT(distinct country_code) as count from VIPUsers");
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 return rs.getInt("count");
@@ -844,7 +851,7 @@ public class UserData implements UserDAO {
     @Override
     public void linkDropboxAccount(String email, String directory, String auth_key, String auth_secret) throws DAOException {
         try {
-            PreparedStatement ps = connection.prepareStatement(
+            PreparedStatement ps = getConnection().prepareStatement(
                     "INSERT INTO VIPDropboxAccounts("
                     + "email, directory, token_key, token_secret, validated, auth_failed) "
                     + "VALUES (?, ?, ?, ?, ?, ?)");
@@ -872,7 +879,7 @@ public class UserData implements UserDAO {
     @Override
     public void activateDropboxAccount(String email, String auth_key) throws DAOException {
         try {
-            PreparedStatement ps = connection.prepareStatement("UPDATE "
+            PreparedStatement ps = getConnection().prepareStatement("UPDATE "
                     + "VIPDropboxAccounts SET auth_failed = '0' WHERE email = ? and token_key = ?");
 
             ps.setString(1, email);
@@ -890,7 +897,7 @@ public class UserData implements UserDAO {
     @Override
     public DropboxAccountStatus.AccountStatus getDropboxAccountStatus(String email) throws DAOException {
         try {
-            PreparedStatement ps = connection.prepareStatement("SELECT "
+            PreparedStatement ps = getConnection().prepareStatement("SELECT "
                     + "auth_failed,validated FROM VIPDropboxAccounts WHERE email=?");
 
             ps.setString(1, email);
@@ -918,7 +925,7 @@ public class UserData implements UserDAO {
     @Override
     public void unlinkDropboxAccount(String email) throws DAOException {
         try {
-            PreparedStatement ps = connection.prepareStatement("DELETE "
+            PreparedStatement ps = getConnection().prepareStatement("DELETE "
                     + "FROM VIPDropboxAccounts WHERE email=?");
 
             ps.setString(1, email);
@@ -935,7 +942,7 @@ public class UserData implements UserDAO {
     public Timestamp getLastPublicationUpdate(String email) throws DAOException {
         try {
             Timestamp lastupdatePublication = null;
-            PreparedStatement ps = connection.prepareStatement("SELECT lastUpdatePublications "
+            PreparedStatement ps = getConnection().prepareStatement("SELECT lastUpdatePublications "
                     + "FROM VIPUsers WHERE email=?");
 
             ps.setString(1, email);
@@ -956,7 +963,7 @@ public class UserData implements UserDAO {
     @Override
     public void updateLastUpdatePublication(String email, Timestamp lastUpdatePublication) throws DAOException {
         try {
-            PreparedStatement ps = connection.prepareStatement("UPDATE "
+            PreparedStatement ps = getConnection().prepareStatement("UPDATE "
                     + "VIPUsers SET lastUpdatePublications = ? WHERE email = ?");
 
             ps.setTimestamp(1, lastUpdatePublication);
@@ -974,7 +981,7 @@ public class UserData implements UserDAO {
     public int getNFailedAuthentications(String email) throws DAOException {
         int n = 0;
         try {
-            PreparedStatement ps = connection.prepareStatement("SELECT failed_authentications FROM VIPUsers WHERE email=?");
+            PreparedStatement ps = getConnection().prepareStatement("SELECT failed_authentications FROM VIPUsers WHERE email=?");
 
             ps.setString(1, email);
             ResultSet rs = ps.executeQuery();
@@ -994,7 +1001,7 @@ public class UserData implements UserDAO {
     @Override
     public void lock(String email) throws DAOException {
         try {
-            PreparedStatement ps = connection.prepareStatement("UPDATE "
+            PreparedStatement ps = getConnection().prepareStatement("UPDATE "
                     + "VIPUsers SET "
                     + "account_locked=1 "
                     + "WHERE email = ?");
@@ -1013,7 +1020,7 @@ public class UserData implements UserDAO {
     @Override
     public void unlock(String email) throws DAOException {
          try {
-            PreparedStatement ps = connection.prepareStatement("UPDATE "
+            PreparedStatement ps = getConnection().prepareStatement("UPDATE "
                     + "VIPUsers SET "
                     + "account_locked=0, failed_authentications=0 "
                     + "WHERE email = ?");
@@ -1032,7 +1039,7 @@ public class UserData implements UserDAO {
     @Override
     public void resetNFailedAuthentications(String email) throws DAOException {
          try {
-            PreparedStatement ps = connection.prepareStatement("UPDATE "
+            PreparedStatement ps = getConnection().prepareStatement("UPDATE "
                     + "VIPUsers SET "
                     + "failed_authentications=0 "
                     + "WHERE email = ?");
@@ -1051,7 +1058,7 @@ public class UserData implements UserDAO {
     @Override
     public void incNFailedAuthentications(String email) throws DAOException {
          try {
-            PreparedStatement ps = connection.prepareStatement("UPDATE "
+            PreparedStatement ps = getConnection().prepareStatement("UPDATE "
                     + "VIPUsers SET "
                     + "failed_authentications = failed_authentications + 1 "
                     + "WHERE email = ?");
@@ -1071,7 +1078,7 @@ public class UserData implements UserDAO {
     public boolean isLocked(String email) throws DAOException {
         boolean locked = true;
         try {
-            PreparedStatement ps = connection.prepareStatement("SELECT account_locked FROM VIPUsers WHERE email=?");
+            PreparedStatement ps = getConnection().prepareStatement("SELECT account_locked FROM VIPUsers WHERE email=?");
 
             ps.setString(1, email);
             ResultSet rs = ps.executeQuery();
@@ -1091,7 +1098,7 @@ public class UserData implements UserDAO {
     @Override
     public User getUserByApikey(String apikey) throws DAOException {
         try {
-            PreparedStatement ps = connection.prepareStatement(
+            PreparedStatement ps = getConnection().prepareStatement(
                     "SELECT email FROM VIPUsers WHERE apikey=?");
 
             ps.setString(1, apikey);
@@ -1114,7 +1121,7 @@ public class UserData implements UserDAO {
     @Override
     public String getUserApikey(String email) throws DAOException {
         try {
-            PreparedStatement ps = connection.prepareStatement(
+            PreparedStatement ps = getConnection().prepareStatement(
                     "SELECT apikey FROM VIPUsers WHERE email=?");
 
             ps.setString(1, email);
@@ -1138,7 +1145,7 @@ public class UserData implements UserDAO {
     @Override
     public void updateUserApikey(String email, String newApikey) throws DAOException {
         try {
-            PreparedStatement ps = connection.prepareStatement("UPDATE "
+            PreparedStatement ps = getConnection().prepareStatement("UPDATE "
                     + "VIPUsers SET apikey = ? WHERE email = ?");
 
             ps.setString(1, newApikey);

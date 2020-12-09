@@ -32,7 +32,6 @@
 package fr.insalyon.creatis.vip.api.controller;
 
 import fr.insalyon.creatis.vip.api.exception.ApiException;
-import fr.insalyon.creatis.vip.api.exception.SQLRuntimeException;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.datamanager.client.bean.UserApiKey;
@@ -46,8 +45,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
-import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.List;
 import java.util.function.Supplier;
 
@@ -59,29 +56,23 @@ public class ApiKeyController extends ApiController{
 
     private ApiKeyBusiness apiKeyBusiness;
     private ExternalPlatformBusiness externalPlatformBusiness;
-    private Supplier<Connection> connectionSupplier;
 
     @Autowired
     public ApiKeyController(
             Supplier<User> currentUserSupplier,
             ApiKeyBusiness apiKeyBusiness,
-            ExternalPlatformBusiness externalPlatformBusiness,
-            Supplier<Connection> connectionSupplier) {
+            ExternalPlatformBusiness externalPlatformBusiness) {
         super(currentUserSupplier);
         this.apiKeyBusiness = apiKeyBusiness;
         this.externalPlatformBusiness = externalPlatformBusiness;
-        this.connectionSupplier = connectionSupplier;
     }
 
     @GetMapping
     public List<UserApiKey> listUserApiKeys() throws ApiException {
         logMethodInvocation(logger, "listUserApiKeys");
-        try(Connection connection = connectionSupplier.get()) {
-            return apiKeyBusiness.apiKeysFor(currentUser().getEmail(), connection);
-        } catch (BusinessException | SQLRuntimeException e) {
-            throw new ApiException(e);
-        } catch (SQLException e) {
-            logger.error("Error handling a connection", e);
+        try {
+            return apiKeyBusiness.apiKeysFor(currentUser().getEmail());
+        } catch (BusinessException e) {
             throw new ApiException(e);
         }
     }
@@ -89,10 +80,10 @@ public class ApiKeyController extends ApiController{
     @PutMapping
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void addOrUpdateApiKey(@RequestBody @Valid KeyInfo keyInfo)
-        throws ApiException {
+            throws ApiException {
         logMethodInvocation(logger, "addOrUpdateApiKey");
-        try(Connection connection = connectionSupplier.get()) {
-            if (externalPlatformBusiness.listAll(connection).stream()
+        try {
+            if (externalPlatformBusiness.listAll().stream()
                 .noneMatch(ep -> ep.getIdentifier()
                           .equals(keyInfo.storageIdentifier))) {
                 logger.error("Storage does not exist: {}", keyInfo.storageIdentifier);
@@ -103,12 +94,8 @@ public class ApiKeyController extends ApiController{
             apiKeyBusiness.addOrUpdateApiKey(
                 keyInfo.storageIdentifier,
                 currentUser().getEmail(),
-                keyInfo.apiKey,
-                connection);
-        } catch (BusinessException | SQLRuntimeException e) {
-            throw new ApiException(e);
-        } catch (SQLException e) {
-            logger.error("Error handling a connection", e);
+                keyInfo.apiKey);
+        } catch (BusinessException e) {
             throw new ApiException(e);
         }
     }
@@ -117,15 +104,12 @@ public class ApiKeyController extends ApiController{
                     method = RequestMethod.DELETE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteApiKey(@PathVariable String storageIdentifier)
-        throws ApiException {
+            throws ApiException {
         logMethodInvocation(logger, "deleteApiKey");
-        try(Connection connection = connectionSupplier.get()) {
+        try {
             apiKeyBusiness.deleteApiKey(
-                storageIdentifier, currentUser().getEmail(), connection);
-        } catch (BusinessException | SQLRuntimeException e) {
-            throw new ApiException(e);
-        } catch (SQLException e) {
-            logger.error("Error handling a connection", e);
+                storageIdentifier, currentUser().getEmail());
+        } catch (BusinessException e) {
             throw new ApiException(e);
         }
     }

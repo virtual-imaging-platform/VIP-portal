@@ -33,26 +33,26 @@ package fr.insalyon.creatis.vip.publication.server.rpc;
 
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.CoreException;
-import fr.insalyon.creatis.vip.core.server.rpc.AbstractRemoteServiceServlet;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
-import fr.insalyon.creatis.vip.core.server.dao.mysql.PlatformConnection;
+import fr.insalyon.creatis.vip.core.server.rpc.AbstractRemoteServiceServlet;
 import fr.insalyon.creatis.vip.publication.client.bean.Publication;
-import fr.insalyon.creatis.vip.publication.client.view.PublicationTypes;
 import fr.insalyon.creatis.vip.publication.client.rpc.PublicationService;
+import fr.insalyon.creatis.vip.publication.client.view.PublicationTypes;
+import fr.insalyon.creatis.vip.publication.server.business.PublicationBusiness;
+import org.jbibtex.ParseException;
+import org.jbibtex.TokenMgrException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
+
+import javax.servlet.ServletException;
 import java.io.Reader;
 import java.io.StringReader;
-import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-
-import fr.insalyon.creatis.vip.publication.server.business.PublicationBusiness;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.jbibtex.ParseException;
-import org.jbibtex.TokenMgrException;
 
 /**
  *
@@ -65,18 +65,20 @@ public class PublicationServiceImpl extends AbstractRemoteServiceServlet impleme
 
     public PublicationServiceImpl() {
         logger.info("PublicationServiceImpl: Creating PublicationBusiness.");
-        publicationBusiness = new PublicationBusiness();
+    }
+
+    @Override
+    public void init() throws ServletException {
+        super.init();
+        publicationBusiness = getBean(PublicationBusiness.class);
     }
 
     @Override
     public List<Publication> getPublications() throws CoreException {
         trace(logger, "Getting publication list.");
-        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
-            return publicationBusiness.getPublications(connection);
+        try {
+            return publicationBusiness.getPublications();
         } catch (BusinessException ex) {
-            throw new CoreException(ex);
-        } catch (SQLException ex) {
-            logger.error("Error handling a connection", ex);
             throw new CoreException(ex);
         }
     }
@@ -85,22 +87,18 @@ public class PublicationServiceImpl extends AbstractRemoteServiceServlet impleme
     public void removePublication(Long id) throws CoreException {
         trace(logger, "Removing publication.");
 
-        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
+        try {
             User user = getSessionUser();
             if (user.isSystemAdministrator() ||
-                    publicationBusiness
-                  .getPublication(id, connection)
-                  .getVipAuthor().equals(user.getEmail())) {
-                publicationBusiness.removePublication(id, connection);
+                    publicationBusiness.getPublication(id).getVipAuthor()
+                            .equals(user.getEmail())) {
+                publicationBusiness.removePublication(id);
             } else {
                 logger.error("{} cannot remove publication {} because it's not his",
                         user, id);
                 throw new CoreException("you can't remove a publication that is not yours");
             }
         } catch (BusinessException ex) {
-            throw new CoreException(ex);
-        } catch (SQLException ex) {
-            logger.error("Error handling a connection", ex);
             throw new CoreException(ex);
         }
     }
@@ -109,14 +107,11 @@ public class PublicationServiceImpl extends AbstractRemoteServiceServlet impleme
     public void addPublication(Publication pub) throws CoreException {
         trace(logger, "Adding publication.");
 
-        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
+        try {
             User user = getSessionUser();
             pub.setVipAuthor(user.getEmail());
-            publicationBusiness.addPublication(pub, connection);
+            publicationBusiness.addPublication(pub);
         } catch (BusinessException ex) {
-            throw new CoreException(ex);
-        } catch (SQLException ex) {
-            logger.error("Error handling a connection", ex);
             throw new CoreException(ex);
         }
     }
@@ -125,23 +120,19 @@ public class PublicationServiceImpl extends AbstractRemoteServiceServlet impleme
     public void updatePublication(Publication pub) throws CoreException {
         trace(logger, "Updating publication.");
 
-        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
+        try {
             User user = getSessionUser();
             if (user.isSystemAdministrator() ||
-                    publicationBusiness
-                  .getPublication(pub.getId(), connection)
-                  .getVipAuthor().equals(user.getEmail())) {
+                    publicationBusiness.getPublication(pub.getId()).getVipAuthor()
+                            .equals(user.getEmail())) {
                 pub.setVipAuthor(user.getEmail());
-                publicationBusiness.updatePublication(pub, connection);
+                publicationBusiness.updatePublication(pub);
             } else {
                 logger.error("{} cannot modify publication {} because its not his",
                         user.getEmail(), pub.getId());
                 throw new CoreException("you can't modify a publication that is not yours");
             }
         } catch (BusinessException ex) {
-            throw new CoreException(ex);
-        } catch (SQLException ex) {
-            logger.error("Error handling a connection", ex);
             throw new CoreException(ex);
         }
     }

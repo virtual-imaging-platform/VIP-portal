@@ -38,38 +38,51 @@ import fr.insalyon.creatis.vip.core.server.business.Server;
 import fr.insalyon.creatis.vip.datamanager.server.business.DataManagerBusiness;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.BufferedReader;
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Created by abonnet on 2/21/19.
  */
+@Service
+@Transactional
 public class BoutiquesBusiness {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    public String publishVersion(
-        User user, String applicationName, String version, Connection connection)
-        throws BusinessException {
-        DataManagerBusiness dmBusiness = new DataManagerBusiness();
+    private Server server;
+    private DataManagerBusiness dataManagerBusiness;
+    private ApplicationBusiness applicationBusiness;
+
+    @Autowired
+    public BoutiquesBusiness(Server server, DataManagerBusiness dataManagerBusiness, ApplicationBusiness applicationBusiness) {
+        this.server = server;
+        this.dataManagerBusiness = dataManagerBusiness;
+        this.applicationBusiness = applicationBusiness;
+    }
+
+    public String publishVersion(User user, String applicationName, String version)
+            throws BusinessException {
 
         // fetch json file
-        String jsonLfn = getJsonLfn(applicationName, version, connection);
-        String localDirectory = Server.getInstance().getApplicationImporterFileRepository()
+        String jsonLfn = getJsonLfn(applicationName, version);
+        String localDirectory = server.getApplicationImporterFileRepository()
                 + "/publications/" + applicationName + "/" + version;
-        String localFile = dmBusiness.getRemoteFile(
-            user, jsonLfn, localDirectory, connection);
+        String localFile = dataManagerBusiness.getRemoteFile(
+            user, jsonLfn, localDirectory);
 
         // TODO : verify it has an author (refactor boutique parser from application-importer
 
         // call publish command
-        String command = "FILE=" + localFile + "; " + Server.getInstance().getPublicationCommandLine();
+        String command = "FILE=" + localFile + "; " + server.getPublicationCommandLine();
         List<String> output = runCommandAndFailOnError(command);
 
         // get the doi
@@ -77,7 +90,7 @@ public class BoutiquesBusiness {
         String doi = getDoiFromPublishOutput(output);
 
         // save the doi in database
-        saveDoiForVersion(doi, applicationName, version, connection);
+        saveDoiForVersion(doi, applicationName, version);
 
         return doi;
     }
@@ -96,12 +109,10 @@ public class BoutiquesBusiness {
         }
     }
 
-    private String getJsonLfn(
-        String applicationName, String applicationVersion, Connection connection)
-        throws BusinessException {
-        ApplicationBusiness applicationBusiness = new ApplicationBusiness();
+    private String getJsonLfn(String applicationName, String applicationVersion)
+            throws BusinessException {
         AppVersion appVersion = applicationBusiness.getVersion(
-            applicationName, applicationVersion, connection);
+            applicationName, applicationVersion);
         if (appVersion.getJsonLfn() == null) {
             logger.error("No json lfn for this application : {} / {}", applicationName, applicationVersion);
             throw new BusinessException("There is no json lfn for this application version.");
@@ -110,15 +121,11 @@ public class BoutiquesBusiness {
     }
 
     private void saveDoiForVersion(
-        String doi,
-        String applicationName,
-        String applicationVersion,
-        Connection connection)
-        throws BusinessException {
+            String doi, String applicationName, String applicationVersion)
+            throws BusinessException {
 
-        ApplicationBusiness applicationBusiness = new ApplicationBusiness();
         applicationBusiness.updateDoiForVersion(
-            doi, applicationName, applicationVersion, connection);
+            doi, applicationName, applicationVersion);
     }
 
     private String getDoiFromPublishOutput(List<String> publishOutput) throws BusinessException {

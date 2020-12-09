@@ -74,7 +74,7 @@ public class PipelineControllerIT extends BaseVIPSpringIT {
     @Test
     public void shouldReturnErrorOnBusinessException() throws Exception {
         when(classBusiness.getUserClasses(
-                 eq(baseUser1.getEmail()), anyBoolean(), any()))
+                 eq(baseUser1.getEmail()), anyBoolean()))
             .thenThrow(new BusinessException("test exception"));
         mockMvc.perform(get("/rest/pipelines").with(baseUser1()))
                 .andDo(print())
@@ -86,7 +86,7 @@ public class PipelineControllerIT extends BaseVIPSpringIT {
     @Test
     public void shouldReturnErrorOnUnexpectedException() throws Exception {
         when(classBusiness.getUserClasses(
-                 eq(baseUser1.getEmail()), anyBoolean(), any()))
+                 eq(baseUser1.getEmail()), anyBoolean()))
             .thenThrow(new RuntimeException("test exception"));
         mockMvc.perform(get("/rest/pipelines").with(baseUser1()))
                 .andDo(print())
@@ -130,7 +130,7 @@ public class PipelineControllerIT extends BaseVIPSpringIT {
                 app2, version42);
         String pipelineId = app2.getName() + "/" + version42.getVersion();
         when(workflowBusiness.getApplicationDescriptor(
-                eq(baseUser1), eq(app2.getName()), eq(version42.getVersion()), any()))
+                eq(baseUser1), eq(app2.getName()), eq(version42.getVersion())))
                 .thenThrow(new BusinessException(WRONG_APPLICATION_DESCRIPTOR, pipelineId));
         mockMvc.perform(get("/rest/pipelines/" + pipelineId).with(baseUser1()))
                 .andDo(print())

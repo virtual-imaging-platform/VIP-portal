@@ -38,6 +38,7 @@ import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.business.CoreUtil;
 import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerException;
 import fr.insalyon.creatis.vip.datamanager.server.DataManagerUtil;
+import fr.insalyon.creatis.vip.datamanager.server.business.LfcPathsBusiness;
 import fr.insalyon.creatis.vip.visualization.client.bean.Image;
 import fr.insalyon.creatis.vip.visualization.client.bean.VisualizationItem;
 import java.io.BufferedReader;
@@ -49,10 +50,24 @@ import java.sql.Connection;
 import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+@Service
+@Transactional
 public class VisualizationBusiness {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
+
+    private GRIDAClient gridaClient;
+    private LfcPathsBusiness lfcPathsBusiness;
+
+    @Autowired
+    public VisualizationBusiness(GRIDAClient gridaClient, LfcPathsBusiness lfcPathsBusiness) {
+        this.gridaClient = gridaClient;
+        this.lfcPathsBusiness = lfcPathsBusiness;
+    }
 
     public Image getImageSlicesURL(String imageFileName, String dir)
         throws BusinessException {
@@ -131,15 +146,14 @@ public class VisualizationBusiness {
     }
 
     public VisualizationItem getVisualizationItemFromLFN(
-        String lfn, String localDir, User user, Connection connection)
-        throws BusinessException {
+            String lfn, String localDir, User user) throws BusinessException {
 
         String separator = System.getProperty("file.separator");
 
         String relativeDirString;
         try {
             relativeDirString = "files/viewer"
-                + (new File(DataManagerUtil.parseBaseDir(user, lfn, connection))
+                + (new File(lfcPathsBusiness.parseBaseDir(user, lfn))
                    .getParent()
                    .replaceAll(" ", "_")
                    .replaceAll("\\([^\\(]*\\)", ""));
@@ -163,13 +177,11 @@ public class VisualizationBusiness {
         }
         fileDir.setWritable(true, false);
 
-        GRIDAClient gridaClient = CoreUtil.getGRIDAClient();
-
         if (!(new File(fileName)).exists()) {
             logger.info("Downloading file: " + lfn);
             try {
                 gridaClient.getRemoteFile(
-                    DataManagerUtil.parseBaseDir(user, lfn, connection),
+                    lfcPathsBusiness.parseBaseDir(user, lfn),
                     fileDir.getAbsolutePath());
             } catch (GRIDAClientException ex) {
                 logger.error("Error getting file {}", lfn, ex);
@@ -187,8 +199,7 @@ public class VisualizationBusiness {
         String rawFileExtension = "";
         if (lfn.endsWith(".mhd")) {
             rawFileExtension =
-                rawFileForMhdFile(gridaClient, lfn, user, fileDir, connection)
-                .orElse("");
+                    rawFileForMhdFile(lfn, user, fileDir).orElse("");
         }
 
         String url = relativeDirString
@@ -199,32 +210,26 @@ public class VisualizationBusiness {
     }
 
     private Optional<String> rawFileForMhdFile(
-        GRIDAClient gridaClient,
-        String lfn,
-        User user,
-        File localDir,
-        Connection connection) {
+            String lfn, User user, File localDir) {
 
         String[] extensions = {".raw", ".zraw", ".raw.gz"};
 
         return java.util.Arrays.stream(extensions)
-            .map(extension -> buildLfnName(user, lfn, extension, connection))
+            .map(extension -> buildLfnName(user, lfn, extension))
             .filter(Optional::isPresent)
             .map(Optional::get)
-            .filter(fe -> checkIfExists(gridaClient, fe.filename))
+            .filter(fe -> checkIfExists(fe.filename))
             .findFirst()
-            .filter(fe -> downloadFileSucceeds(
-                        gridaClient, fe.filename, localDir))
+            .filter(fe -> downloadFileSucceeds(fe.filename, localDir))
             .map(fe -> fe.extension);
     }
 
     private Optional<FilenameAndExtension> buildLfnName(
-        User user, String lfn, String extension, Connection connection) {
+            User user, String lfn, String extension) {
         try {
-            return Optional.of(
-                new FilenameAndExtension(
-                    DataManagerUtil.parseBaseDir(
-                        user, lfn.replaceAll("\\.mhd$", extension), connection),
+            return Optional.of(new FilenameAndExtension(
+                    lfcPathsBusiness.parseBaseDir(
+                            user, lfn.replaceAll("\\.mhd$", extension)),
                     extension));
         } catch (DataManagerException dme) {
             logger.warn("Error while building lfn name with new extension: {}. Ignoring", lfn);
@@ -232,7 +237,7 @@ public class VisualizationBusiness {
         }
     }
 
-    private boolean checkIfExists(GRIDAClient gridaClient, String filename) {
+    private boolean checkIfExists(String filename) {
         try {
             return gridaClient.exist(filename);
         } catch (GRIDAClientException gce) {
@@ -241,8 +246,7 @@ public class VisualizationBusiness {
         }
     }
 
-    private boolean downloadFileSucceeds(
-        GRIDAClient gridaClient, String filename, File localDir) {
+    private boolean downloadFileSucceeds(String filename, File localDir) {
         try {
             if (!new File(localFilename(filename, localDir)).exists()) {
                 logger.info("Downloading file: " + filename);

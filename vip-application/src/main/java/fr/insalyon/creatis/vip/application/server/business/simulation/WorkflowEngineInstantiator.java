@@ -46,18 +46,6 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class WorkflowEngineInstantiator {
 
-    public static WorkflowEngineInstantiator create(String engineEndpoint) {
-
-        WebServiceEngine engine = new WebServiceEngine();
-        engine.setAddressWS(engineEndpoint);
-        String settings = "GRID=DIRAC\n"
-                + "SE=ccsrm02.in2p3.fr\n"
-                + "TIMEOUT=100000\n"
-                + "RETRYCOUNT=3\n"
-                + "MULTIJOB=1";
-        engine.setSettings(settings);
-        return engine;
-    }
     // content of the xml file that describe the workflow (read on a file) */
     protected String workflow;
     // content of the input for the workflow (generated depending of the user)*/

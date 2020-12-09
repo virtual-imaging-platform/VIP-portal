@@ -33,10 +33,12 @@ package fr.insalyon.creatis.vip.application.server.business;
 
 import fr.insalyon.creatis.vip.application.client.bean.AppVersion;
 import fr.insalyon.creatis.vip.application.client.bean.Application;
-import fr.insalyon.creatis.vip.application.server.dao.ApplicationDAOFactory;
+import fr.insalyon.creatis.vip.application.server.dao.ApplicationDAO;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
-import java.sql.Connection;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -44,288 +46,162 @@ import java.util.List;
  *
  * @author Rafael Ferreira da Silva
  */
+@Service
+@Transactional
 public class ApplicationBusiness {
 
-    /**
-     *
-     * @return @throws BusinessException
-     */
-    public List<Application> getApplications(Connection connection)
-        throws BusinessException {
+    private ApplicationDAO applicationDAO;
+
+    public ApplicationBusiness(ApplicationDAO applicationDAO) {
+        this.applicationDAO = applicationDAO;
+    }
+
+    public List<Application> getApplications() throws BusinessException {
 
         try {
-            return ApplicationDAOFactory.getDAOFactory()
-                .getApplicationDAO(connection)
-                .getApplications();
+            return applicationDAO.getApplications();
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }
     }
 
-    /**
-     *
-     * @param className
-     * @return
-     * @throws BusinessException
-     */
-    public List<String[]> getApplications(
-        String className, Connection connection)
-        throws BusinessException {
+    public List<String[]> getApplications(String className)
+            throws BusinessException {
 
         try {
-            return ApplicationDAOFactory.getDAOFactory()
-                .getApplicationDAO(connection)
-                .getApplications(className);
+            return applicationDAO.getApplications(className);
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }
     }
 
-    /**
-     *
-     * @param applicationName
-     * @return
-     * @throws BusinessException
-     */
-    public Application getApplication(
-        String applicationName, Connection connection)
-        throws BusinessException {
+    public Application getApplication(String applicationName)
+            throws BusinessException {
         try {
-            return ApplicationDAOFactory.getDAOFactory()
-                .getApplicationDAO(connection)
-                .getApplication(applicationName);
+            return applicationDAO.getApplication(applicationName);
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }
     }
 
-    /**
-     *
-     * @param classes
-     * @return
-     * @throws BusinessException
-     */
-    public List<Application> getApplications(
-        List<String> classes, Connection connection)
-        throws BusinessException {
+    public List<Application> getApplications(List<String> classes)
+            throws BusinessException {
         try {
-            return ApplicationDAOFactory.getDAOFactory()
-                .getApplicationDAO(connection)
-                .getApplications(classes);
+            return applicationDAO.getApplications(classes);
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }
     }
 
-    /**
-     *
-     * @return @throws BusinessException
-     */
-    public List<String> getApplicationNames(Connection connection)
-        throws BusinessException {
+    public List<String> getApplicationNames() throws BusinessException {
 
         List<String> applicationNames = new ArrayList<String>();
-        for (Application application : getApplications(connection)) {
+        for (Application application : getApplications()) {
             applicationNames.add(application.getName());
         }
 
         return applicationNames;
     }
 
-    /**
-     *
-     * @param classes
-     * @return
-     * @throws BusinessException
-     */
-    public List<String> getApplicationNames(
-        List<String> classes, Connection connection)
-        throws BusinessException {
+    public List<String> getApplicationNames(List<String> classes)
+            throws BusinessException {
 
         List<String> applicationNames = new ArrayList<String>();
-        for (Application application : getApplications(classes, connection)) {
+        for (Application application : getApplications(classes)) {
             applicationNames.add(application.getName());
         }
 
         return applicationNames;
     }
 
-    /**
-     *
-     * @param application
-     * @throws BusinessException
-     */
-    public void add(Application application, Connection connection)
-        throws BusinessException {
+    public void add(Application application) throws BusinessException {
         try {
-            ApplicationDAOFactory.getDAOFactory()
-                .getApplicationDAO(connection)
-                .add(application);
+            applicationDAO.add(application);
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }
     }
 
-    /**
-     *
-     * @param application
-     * @throws BusinessException
-     */
-    public void update(Application application, Connection connection)
-        throws BusinessException {
+    public void update(Application application) throws BusinessException {
         try {
-            ApplicationDAOFactory.getDAOFactory()
-                .getApplicationDAO(connection)
-                .update(application);
+            applicationDAO.update(application);
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }
     }
 
-    /**
-     *
-     * @param name
-     * @throws BusinessException
-     */
-    public void remove(String name, Connection connection)
-        throws BusinessException {
+    public void remove(String name) throws BusinessException {
         try {
-            ApplicationDAOFactory.getDAOFactory()
-                .getApplicationDAO(connection)
-                .remove(name);
+            applicationDAO.remove(name);
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }
     }
 
-    /**
-     *
-     * @param email
-     * @param name
-     * @throws BusinessException
-     */
-    public void remove(String email, String name, Connection connection)
-        throws BusinessException {
+    public void remove(String email, String name) throws BusinessException {
         try {
-            ApplicationDAOFactory.getDAOFactory()
-                .getApplicationDAO(connection)
-                .remove(email, name);
+            applicationDAO.remove(email, name);
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }
     }
 
-    /**
-     *
-     * @param version
-     * @throws BusinessException
-     */
-    public void addVersion(AppVersion version, Connection connection)
-        throws BusinessException {
+    public void addVersion(AppVersion version) throws BusinessException {
         try {
-            ApplicationDAOFactory.getDAOFactory()
-                .getApplicationDAO(connection)
-                .addVersion(version);
+            applicationDAO.addVersion(version);
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }
     }
 
-    /**
-     *
-     * @param version
-     * @throws BusinessException
-     */
-    public void updateVersion(AppVersion version, Connection connection)
-        throws BusinessException {
+    public void updateVersion(AppVersion version) throws BusinessException {
         try {
-            ApplicationDAOFactory.getDAOFactory()
-                .getApplicationDAO(connection)
-                .updateVersion(version);
+            applicationDAO.updateVersion(version);
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }
     }
 
-    /**
-     *
-     * @param doi
-     * @param applicationName
-     * @param version
-     * @throws BusinessException
-     */
     public void updateDoiForVersion(
-        String doi, String applicationName, String version,
-        Connection connection)
-        throws BusinessException {
+            String doi, String applicationName, String version)
+            throws BusinessException {
         try {
-            ApplicationDAOFactory.getDAOFactory()
-                .getApplicationDAO(connection)
-                .updateDoiForVersion(doi, applicationName, version);
+            applicationDAO.updateDoiForVersion(doi, applicationName, version);
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }
     }
 
-    /**
-     *
-     * @param applicationName
-     * @param version
-     * @throws BusinessException
-     */
-    public void removeVersion(
-        String applicationName, String version, Connection connection)
-        throws BusinessException {
+    public void removeVersion(String applicationName, String version)
+            throws BusinessException {
         try {
-            ApplicationDAOFactory.getDAOFactory()
-                .getApplicationDAO(connection)
-                .removeVersion(applicationName, version);
+            applicationDAO.removeVersion(applicationName, version);
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }
     }
 
-    /**
-     *
-     * @param name
-     * @return
-     * @throws BusinessException
-     */
-    public String getCitation(String name, Connection connection)
-        throws BusinessException {
+    public String getCitation(String name) throws BusinessException {
         try {
-            return ApplicationDAOFactory.getDAOFactory()
-                .getApplicationDAO(connection)
-                .getCitation(name);
+            return applicationDAO.getCitation(name);
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }
     }
 
-    /**
-     *
-     * @param applicationName
-     * @return
-     * @throws BusinessException
-     */
-    public List<AppVersion> getVersions(
-        String applicationName, Connection connection) throws BusinessException {
+    public List<AppVersion> getVersions(String applicationName)
+            throws BusinessException {
         try {
-            return ApplicationDAOFactory.getDAOFactory()
-                .getApplicationDAO(connection)
-                .getVersions(applicationName);
+            return applicationDAO.getVersions(applicationName);
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }
     }
 
-    public AppVersion getVersion(
-        String applicationName, String applicationVersion, Connection connection)
-        throws BusinessException {
+    public AppVersion getVersion(String applicationName, String applicationVersion)
+            throws BusinessException {
         try {
-            return ApplicationDAOFactory.getDAOFactory()
-                .getApplicationDAO(connection)
-                .getVersion(applicationName, applicationVersion);
+            return applicationDAO.getVersion(applicationName, applicationVersion);
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }

@@ -2,19 +2,42 @@ package fr.insalyon.creatis.vip.core.server.business;
 
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.util.CountryCode;
-import fr.insalyon.creatis.vip.core.server.dao.CoreDAOFactory;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import fr.insalyon.creatis.vip.core.server.dao.UserDAO;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.sql.Connection;
 import java.time.LocalDate;
 import java.util.List;
 
+@Service
+@Transactional
 public class StatsBusiness {
 
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private UserDAO userDAO;
+
+    public StatsBusiness(UserDAO userDAO) {
+        this.userDAO = userDAO;
+    }
+
+
+    public Long getUsersRegisteredNumber(UserSearchCriteria searchCriteria)
+            throws BusinessException {
+        try {
+            return userDAO.countUsers(searchCriteria);
+        } catch (DAOException ex) {
+            throw new BusinessException(ex);
+        }
+    }
+
+    public List<User> getUsersRegistered(UserSearchCriteria searchCriteria)
+            throws BusinessException {
+        try {
+            return userDAO.searchUsers(searchCriteria);
+        } catch (DAOException ex) {
+            throw new BusinessException(ex);
+        }
+    }
 
     public static class UserSearchCriteria {
         private LocalDate registrationStart;
@@ -56,30 +79,6 @@ public class StatsBusiness {
 
         public String getInstitution() {
             return institution;
-        }
-    }
-
-    public Long getUsersRegisteredNumber(
-            UserSearchCriteria searchCriteria, Connection connection)
-            throws BusinessException {
-        try {
-            UserDAO userDAO = CoreDAOFactory.getDAOFactory()
-                    .getUserDAO(connection);
-            return userDAO.countUsers(searchCriteria);
-        } catch (DAOException ex) {
-            throw new BusinessException(ex);
-        }
-    }
-
-    public List<User> getUsersRegistered(
-            UserSearchCriteria searchCriteria,Connection connection)
-            throws BusinessException {
-        try {
-            UserDAO userDAO = CoreDAOFactory.getDAOFactory()
-                    .getUserDAO(connection);
-            return userDAO.searchUsers(searchCriteria);
-        } catch (DAOException ex) {
-            throw new BusinessException(ex);
         }
     }
 }

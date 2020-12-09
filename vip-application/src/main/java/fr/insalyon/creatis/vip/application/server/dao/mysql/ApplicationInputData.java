@@ -42,33 +42,34 @@ import java.util.ArrayList;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.support.JdbcDaoSupport;
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
+
+import javax.sql.DataSource;
 
 /**
  *
  * @author Rafael Ferreira da Silva
  */
-public class ApplicationInputData implements ApplicationInputDAO {
+@Repository
+@Transactional
+public class ApplicationInputData extends JdbcDaoSupport implements ApplicationInputDAO {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    private Connection connection;
-
-    public ApplicationInputData(Connection connection) throws DAOException {
-        this.connection = connection;
+    @Autowired
+    public void useDataSource(DataSource dataSource) {
+        setDataSource(dataSource);
     }
 
-    /**
-     *
-     * @param email
-     * @param SimulationInput
-     * @throws DAOException
-     */
     @Override
     public void addSimulationInput(String email, SimulationInput SimulationInput)
             throws DAOException {
 
         try {
-            PreparedStatement ps = connection.prepareStatement(
+            PreparedStatement ps = getConnection().prepareStatement(
                     "INSERT INTO VIPAppInputs(email, application, name, inputs) "
                     + "VALUES (?, ?, ?, ?)");
 
@@ -92,19 +93,12 @@ public class ApplicationInputData implements ApplicationInputDAO {
         }
     }
 
-    /**
-     *
-     * @param email
-     * @param inputName
-     * @param application
-     * @throws DAOException
-     */
     @Override
     public void removeSimulationInput(String email, String inputName,
             String application) throws DAOException {
 
         try {
-            PreparedStatement ps = connection.prepareStatement("DELETE "
+            PreparedStatement ps = getConnection().prepareStatement("DELETE "
                     + "FROM VIPAppInputs WHERE email=? AND name=? AND application=?");
 
             ps.setString(1, email);
@@ -119,18 +113,12 @@ public class ApplicationInputData implements ApplicationInputDAO {
         }
     }
 
-    /**
-     *
-     * @param email
-     * @param SimulationInput
-     * @throws DAOException
-     */
     @Override
     public void updateSimulationInput(String email, SimulationInput SimulationInput)
             throws DAOException {
 
         try {
-            PreparedStatement ps = connection.prepareStatement(
+            PreparedStatement ps = getConnection().prepareStatement(
                     "UPDATE VIPAppInputs SET inputs=? "
                     + "WHERE email=? AND application=? AND name=?");
 
@@ -154,7 +142,7 @@ public class ApplicationInputData implements ApplicationInputDAO {
             throws DAOException {
 
         try {
-            PreparedStatement ps = connection.prepareStatement("SELECT "
+            PreparedStatement ps = getConnection().prepareStatement("SELECT "
                     + "application, name, inputs "
                     + "FROM VIPAppInputs WHERE email=? "
                     + "ORDER BY application, name");
@@ -185,7 +173,7 @@ public class ApplicationInputData implements ApplicationInputDAO {
 
         try {
             List<SimulationInput> inputs = new ArrayList<SimulationInput>();
-            PreparedStatement ps = connection.prepareStatement("SELECT "
+            PreparedStatement ps = getConnection().prepareStatement("SELECT "
                     + "username, application, name, inputs "
                     + "FROM WorkflowInput WHERE username=? AND application=? "
                     + "ORDER BY name");
@@ -210,20 +198,12 @@ public class ApplicationInputData implements ApplicationInputDAO {
         }
     }
 
-    /**
-     *
-     * @param email
-     * @param name
-     * @param appName
-     * @return
-     * @throws DAOException
-     */
     @Override
     public SimulationInput getInputByNameUserApp(String email, String name,
             String appName) throws DAOException {
 
         try {
-            PreparedStatement ps = connection.prepareStatement("SELECT "
+            PreparedStatement ps = getConnection().prepareStatement("SELECT "
                     + "email, application, name, inputs "
                     + "FROM VIPAppInputs "
                     + "WHERE email = ? AND name = ? AND application = ? "
@@ -249,16 +229,11 @@ public class ApplicationInputData implements ApplicationInputDAO {
         }
     }
 
-    /**
-     *
-     * @param simulationInput
-     * @throws DAOException
-     */
     @Override
     public void saveSimulationInputAsExample(SimulationInput simulationInput) throws DAOException {
 
         try {
-            PreparedStatement ps = connection.prepareStatement(
+            PreparedStatement ps = getConnection().prepareStatement(
                     "INSERT INTO VIPAppExamples(application, name, inputs) "
                     + "VALUES (?, ?, ?)");
 
@@ -281,18 +256,12 @@ public class ApplicationInputData implements ApplicationInputDAO {
         }
     }
 
-    /**
-     *
-     * @param applicationName
-     * @return
-     * @throws DAOException
-     */
     @Override
     public List<SimulationInput> getSimulationInputExamples(String applicationName) throws DAOException {
 
         try {
 
-            PreparedStatement ps = connection.prepareStatement("SELECT "
+            PreparedStatement ps = getConnection().prepareStatement("SELECT "
                     + "application, name, inputs "
                     + "FROM VIPAppExamples "
                     + "WHERE application = ?"
@@ -318,18 +287,12 @@ public class ApplicationInputData implements ApplicationInputDAO {
         }
     }
 
-    /**
-     *
-     * @param inputName
-     * @param application
-     * @throws DAOException
-     */
     @Override
     public void removeSimulationInputExample(String inputName, String application)
             throws DAOException {
 
         try {
-            PreparedStatement ps = connection.prepareStatement("DELETE "
+            PreparedStatement ps = getConnection().prepareStatement("DELETE "
                     + "FROM VIPAppExamples WHERE name=? AND application=?");
 
             ps.setString(1, inputName);

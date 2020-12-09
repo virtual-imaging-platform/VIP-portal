@@ -37,35 +37,42 @@ import fr.insalyon.creatis.vip.datamanager.client.bean.UserApiKey;
 import fr.insalyon.creatis.vip.datamanager.server.dao.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Connection;
 import java.util.List;
 
+@Service
+@Transactional
 public class ApiKeyBusiness {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    public List<UserApiKey> apiKeysFor(String userEmail, Connection connection)
-        throws BusinessException {
+    private ApiKeysDAO apiKeysDAO;
+
+    @Autowired
+    public ApiKeyBusiness(ApiKeysDAO apiKeysDAO) {
+        this.apiKeysDAO = apiKeysDAO;
+    }
+
+
+    public List<UserApiKey> apiKeysFor(String userEmail) throws BusinessException {
 
         try {
-            return DataManagerDAOFactory.getInstance()
-                .getApiKeysDao(connection).getByUser(userEmail);
+            return apiKeysDAO.getByUser(userEmail);
         } catch (DAOException e) {
             throw new BusinessException(e);
         }
     }
 
     public void addOrUpdateApiKey(
-        String storageIdentifier,
-        String userEmail,
-        String apiKey,
-        Connection connection) throws BusinessException {
+            String storageIdentifier, String userEmail, String apiKey)
+            throws BusinessException {
 
         try {
-            ApiKeysDAO dao = DataManagerDAOFactory.getInstance()
-                .getApiKeysDao(connection);
 
-            List<UserApiKey> keys = dao.getByUser(userEmail);
+            List<UserApiKey> keys = apiKeysDAO.getByUser(userEmail);
             UserApiKey newKey =
                 new UserApiKey(storageIdentifier, userEmail, apiKey);
 
@@ -73,23 +80,20 @@ public class ApiKeyBusiness {
                     k ->
                     k.getStorageIdentifier().equals(storageIdentifier)
                     && k.getUserEmail().equals(userEmail))) {
-                dao.updateKey(newKey);
+                apiKeysDAO.updateKey(newKey);
             } else {
-                dao.addKey(newKey);
+                apiKeysDAO.addKey(newKey);
             }
         } catch (DAOException e) {
             throw new BusinessException(e);
         }
     }
 
-    public void deleteApiKey(
-        String storageIdentifier, String userEmail, Connection connection)
-        throws BusinessException {
+    public void deleteApiKey(String storageIdentifier, String userEmail)
+            throws BusinessException {
 
         try {
-            DataManagerDAOFactory.getInstance()
-                .getApiKeysDao(connection)
-                .deleteKeyFor(userEmail, storageIdentifier);
+            apiKeysDAO.deleteKeyFor(userEmail, storageIdentifier);
         } catch (DAOException e) {
             throw new BusinessException(e);
         }

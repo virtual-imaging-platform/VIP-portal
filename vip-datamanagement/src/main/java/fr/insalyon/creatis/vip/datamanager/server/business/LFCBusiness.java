@@ -31,48 +31,51 @@
  */
 package fr.insalyon.creatis.vip.datamanager.server.business;
 
+import fr.insalyon.creatis.grida.client.GRIDAClient;
 import fr.insalyon.creatis.grida.client.GRIDAClientException;
 import fr.insalyon.creatis.grida.common.bean.GridData;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
-import fr.insalyon.creatis.vip.core.server.business.CoreUtil;
 import fr.insalyon.creatis.vip.datamanager.client.bean.Data;
 import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerException;
-import fr.insalyon.creatis.vip.datamanager.server.DataManagerUtil;
+
 import java.text.SimpleDateFormat;
-import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  *
  * @author Rafael Silva
  */
+@Service
+@Transactional
 public class LFCBusiness {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    /**
-     *
-     * @param user
-     * @param baseDir
-     * @param refresh
-     * @return
-     * @throws BusinessException
-     */
-    public List<Data> listDir(
-        User user, String baseDir, boolean refresh, Connection connection)
-        throws BusinessException {
+    private GRIDAClient gridaClient;
+    private LfcPathsBusiness lfcPathsBusiness;
+
+    @Autowired
+    public LFCBusiness(GRIDAClient gridaClient, LfcPathsBusiness lfcPathsBusiness) {
+        this.gridaClient = gridaClient;
+        this.lfcPathsBusiness = lfcPathsBusiness;
+    }
+
+    public List<Data> listDir(User user, String baseDir, boolean refresh)
+            throws BusinessException {
 
         try {
-            List<GridData> list = CoreUtil.getGRIDAClient().getFolderData(
-                DataManagerUtil.parseBaseDir(user, baseDir, connection),
-                refresh);
+            List<GridData> list = gridaClient.getFolderData(
+                    lfcPathsBusiness.parseBaseDir(user, baseDir), refresh);
 
-            List<Data> dataList = new ArrayList<Data>();
+            List<Data> dataList = new ArrayList<>();
             for (GridData data : list) {
                 if (data.getType() == GridData.Type.Folder) {
                     dataList.add(new Data(data.getName(),
@@ -96,20 +99,12 @@ public class LFCBusiness {
         }
     }
 
-    /**
-     *
-     * @param user
-     * @param baseDir
-     * @param name
-     * @throws BusinessException
-     */
-    public void createDir(
-        User user, String baseDir, String name, Connection connection)
-        throws BusinessException {
+    public void createDir(User user, String baseDir, String name)
+            throws BusinessException {
 
         try {
-            CoreUtil.getGRIDAClient().createFolder(
-                DataManagerUtil.parseBaseDir(user, baseDir, connection), name);
+            gridaClient.createFolder(
+                    lfcPathsBusiness.parseBaseDir(user, baseDir), name);
         } catch (DataManagerException ex) {
             throw new BusinessException(ex);
         } catch (GRIDAClientException ex) {
@@ -119,28 +114,19 @@ public class LFCBusiness {
         }
     }
 
-    /**
-     *
-     * @param user
-     * @param oldPath
-     * @param newPath
-     * @param extendPath
-     * @throws BusinessException
-     */
-    public void rename(User user, String oldPath, String newPath,
-                       boolean extendPath, Connection connection)
-        throws BusinessException {
+    public void rename(User user, String oldPath, String newPath, boolean extendPath)
+            throws BusinessException {
 
         try {
-            CoreUtil.getGRIDAClient().rename(
-                    DataManagerUtil.parseBaseDir(user, oldPath, connection),
-                    DataManagerUtil.parseBaseDir(user, newPath, connection));
+            gridaClient.rename(
+                    lfcPathsBusiness.parseBaseDir(user, oldPath),
+                    lfcPathsBusiness.parseBaseDir(user, newPath));
         } catch (GRIDAClientException ex) {
             if (ex.getMessage().contains("Can not rename/move") && extendPath) {
                 SimpleDateFormat sdf =
                         new SimpleDateFormat("-yyyy.MM.dd-HH.mm.ss");
                 String newExtPath = newPath + sdf.format(new Date());
-                rename(user, oldPath, newExtPath, false, connection);
+                rename(user, oldPath, newExtPath, false);
             } else {
                 logger.error("Error renaming path {} to {} for {}",
                         oldPath, newPath, user,ex);
@@ -151,38 +137,19 @@ public class LFCBusiness {
         }
     }
 
-    /**
-     *
-     * @param user
-     * @param baseDir
-     * @param paths
-     * @param newBaseDir
-     * @param extendPath
-     * @throws BusinessException
-     */
     public void rename(
-        User user, String baseDir, List<String> paths,
-        String newBaseDir, boolean extendPath, Connection connection)
-        throws BusinessException {
+            User user, String baseDir, List<String> paths, String newBaseDir,
+            boolean extendPath) throws BusinessException {
 
         for (String name : paths) {
-            rename(user, baseDir + "/" + name, newBaseDir + "/" + name, extendPath, connection);
+            rename(user, baseDir + "/" + name, newBaseDir + "/" + name, extendPath);
         }
     }
 
-    /**
-     *
-     * @param user
-     * @param path
-     * @return
-     * @throws BusinessException
-     */
-    public boolean exists(User user, String path, Connection connection)
-        throws BusinessException {
+    public boolean exists(User user, String path) throws BusinessException {
 
         try {
-            return CoreUtil.getGRIDAClient().exist(
-                DataManagerUtil.parseBaseDir(user, path, connection));
+            return gridaClient.exist(lfcPathsBusiness.parseBaseDir(user, path));
         } catch (GRIDAClientException ex) {
             logger.error("Error checking file {} existance for {}",
                     path, user,ex);
@@ -192,21 +159,11 @@ public class LFCBusiness {
         }
     }
 
-    /**
-     *
-     * @param user
-     * @param path
-     * @return
-     * @throws BusinessException
-     */
-    public long getModificationDate(
-        User user, String path, Connection connection)
-        throws BusinessException {
+    public long getModificationDate(User user, String path) throws BusinessException {
 
         try {
-            return CoreUtil.getGRIDAClient().
-                    getModificationDate(
-                        DataManagerUtil.parseBaseDir(user, path, connection));
+            return gridaClient.getModificationDate(
+                    lfcPathsBusiness.parseBaseDir(user, path));
         } catch (GRIDAClientException ex) {
             logger.error("Error getting file {} modification date for {}",
                     path, user,ex);
@@ -216,24 +173,15 @@ public class LFCBusiness {
         }
     }
 
-    /**
-     *
-     * @param user
-     * @param paths
-     * @return
-     * @throws BusinessException
-     */
-    public List<Long> getModificationDate(
-        User user, List<String> paths, Connection connection)
-        throws BusinessException {
+    public List<Long> getModificationDate(User user, List<String> paths)
+            throws BusinessException {
         try {
-            List<String> parsedPaths = new ArrayList<String>();
+            List<String> parsedPaths = new ArrayList<>();
             for (String path : paths) {
-                parsedPaths.add(
-                    DataManagerUtil.parseBaseDir(user, path, connection));
+                parsedPaths.add(lfcPathsBusiness.parseBaseDir(user, path));
             }
 
-            return CoreUtil.getGRIDAClient().getModificationDate(parsedPaths);
+            return gridaClient.getModificationDate(parsedPaths);
         } catch (GRIDAClientException ex) {
             logger.error("Error getting files {} modification dates for {}",
                     paths, user,ex);

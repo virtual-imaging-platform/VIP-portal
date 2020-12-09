@@ -41,14 +41,15 @@ import fr.insalyon.creatis.vip.application.client.view.monitor.job.TaskStatus;
 import fr.insalyon.creatis.vip.application.server.business.SimulationBusiness;
 import fr.insalyon.creatis.vip.core.client.view.CoreException;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
-import fr.insalyon.creatis.vip.core.server.dao.mysql.PlatformConnection;
 import fr.insalyon.creatis.vip.core.server.rpc.AbstractRemoteServiceServlet;
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.util.List;
-import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
+
+import javax.servlet.ServletException;
+import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -57,11 +58,13 @@ import org.slf4j.LoggerFactory;
 public class JobServiceImpl extends AbstractRemoteServiceServlet implements JobService {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
+
     private SimulationBusiness simulationBusiness;
 
-    public JobServiceImpl() {
-
-        simulationBusiness = new SimulationBusiness();
+    @Override
+    public void init() throws ServletException {
+        super.init();
+        simulationBusiness = getBean(SimulationBusiness.class);
     }
 
     /**
@@ -92,13 +95,10 @@ public class JobServiceImpl extends AbstractRemoteServiceServlet implements JobS
      */
     @Override
     public List<Task> getTasks(String simulationID, int jobID) throws ApplicationException {
-        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
+        try {
             return simulationBusiness.getTasks(
-                simulationID, jobID, getSessionUser().getFolder(), connection);
+                simulationID, jobID, getSessionUser().getFolder());
         } catch (BusinessException | CoreException ex) {
-            throw new ApplicationException(ex);
-        } catch (SQLException ex) {
-            logger.error("Error handling a connection", ex);
             throw new ApplicationException(ex);
         }
     }

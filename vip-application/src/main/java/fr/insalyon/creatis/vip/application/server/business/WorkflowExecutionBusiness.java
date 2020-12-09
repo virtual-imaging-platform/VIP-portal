@@ -33,29 +33,57 @@ package fr.insalyon.creatis.vip.application.server.business;
 
 import fr.insalyon.creatis.moteur.plugins.workflowsdb.bean.Workflow;
 import fr.insalyon.creatis.moteur.plugins.workflowsdb.bean.WorkflowStatus;
-import fr.insalyon.creatis.vip.application.client.bean.Simulation;
 import fr.insalyon.creatis.vip.application.client.view.monitor.SimulationStatus;
 import fr.insalyon.creatis.vip.application.server.business.simulation.ParameterSweep;
 import fr.insalyon.creatis.vip.application.server.business.simulation.WebServiceEngine;
-import fr.insalyon.creatis.vip.application.server.business.simulation.WorkflowEngineInstantiator;
 import fr.insalyon.creatis.vip.core.client.bean.User;
-import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.business.Server;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Service;
+
+import javax.annotation.PostConstruct;
 import java.io.File;
 import java.util.Date;
 import java.util.List;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
+ * Wrapper on WebServiceEngine to configure it and to create a Workflow object
+ * after a launch.
+ *
+ * WorkflowExecutionBusiness and WebServiceEngine both have spring prototype
+ * scope, so each WorkflowExecutionBusiness use creates a new intance with a
+ * dedicated WebServiceEngine instance that it will wrap.
+ * This is needed as each time an engine is used, the endpoint can be different.
  *
  * @author Rafael Ferreira da Silva
  */
+@Service
+@Scope("prototype")
 public class WorkflowExecutionBusiness {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
-    private WorkflowEngineInstantiator engine;
+
+    private Server server;
+    private WebServiceEngine engine;
+    private String engineEndpoint;
+
+    @Autowired
+    public final void setServer(Server server) {
+        this.server = server;
+    }
+
+    /*
+    WebServiceEngine is also prototype scoped, this creates a new instance
+    every time. 
+    */
+    @Autowired
+    public final void setEngine(WebServiceEngine engine) {
+        this.engine = engine;
+    }
 
     public WorkflowExecutionBusiness(String engineEndpoint) throws BusinessException {
 
@@ -64,22 +92,21 @@ public class WorkflowExecutionBusiness {
             logger.info("WorkflowExecutionBusiness, endpoint is null, setting it to http://data-manager.grid.creatis.insa-lyon.fr/cgi-bin/m2Server-gasw3.1/moteur_server");
             engineEndpoint="http://data-manager.grid.creatis.insa-lyon.fr/cgi-bin/m2Server-gasw3.1/moteur_server";
         }
-
-        engine = WorkflowEngineInstantiator.create(engineEndpoint);
+        this.engineEndpoint = engineEndpoint;
     }
 
-    /**
-     *
-     * @param applicationName
-     * @param applicationVersion
-     * @param applicationClass
-     * @param user
-     * @param simulationName
-     * @param workflowPath
-     * @param parameters
-     * @return
-     * @throws BusinessException
-     */
+    @PostConstruct
+    public final void configureWebServiceEngine() {
+        engine.setAddressWS(engineEndpoint);
+        String settings = "GRID=DIRAC\n"
+                + "SE=ccsrm02.in2p3.fr\n"
+                + "TIMEOUT=100000\n"
+                + "RETRYCOUNT=3\n"
+                + "MULTIJOB=1";
+        engine.setSettings(settings);
+
+    }
+
     public Workflow launch(String applicationName, String applicationVersion,
             String applicationClass, User user, String simulationName,
             String workflowPath, List<ParameterSweep> parameters) throws BusinessException {
@@ -87,14 +114,13 @@ public class WorkflowExecutionBusiness {
         try {
             engine.setWorkflow(new File(workflowPath));
             engine.setInput(parameters);
-            Server server = Server.getInstance();
             String launchID = engine.launch(server.getServerProxy(server.getVoName()), null);
             String workflowID = engine.getSimulationId(launchID);
 
             return new Workflow(workflowID, user.getFullName(),
                     WorkflowStatus.Running,
                     new Date(), null, simulationName, applicationName, applicationVersion, applicationClass,
-                    ((WebServiceEngine)engine).getAddressWS());
+                    engine.getAddressWS());
 
         } catch (javax.xml.rpc.ServiceException | java.rmi.RemoteException ex) {
             logger.error("Error launching simulation {} ({}/{})",
@@ -103,12 +129,6 @@ public class WorkflowExecutionBusiness {
         }
     }
 
-    /**
-     *
-     * @param simulationID
-     * @return
-     * @throws BusinessException
-     */
     public SimulationStatus getStatus(String simulationID) throws BusinessException {
 
         SimulationStatus status = SimulationStatus.Unknown;
@@ -124,11 +144,6 @@ public class WorkflowExecutionBusiness {
         return status;
     }
 
-    /**
-     *
-     * @param simulationID
-     * @throws BusinessException
-     */
     public void kill(String simulationID) throws BusinessException {
 
         try {

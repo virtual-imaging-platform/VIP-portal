@@ -44,16 +44,18 @@ import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream;
 import org.apache.commons.compress.utils.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 
 /**
  *
  * @author Tristan Glatard
  */
+@Service
 public class TargzUtils {
 
     private static final Logger logger = LoggerFactory.getLogger(TargzUtils.class);
 
-    public static void createTargz(List<File> pathIn, String pathOut) throws BusinessException {
+    public void createTargz(List<File> pathIn, String pathOut) throws BusinessException {
         try {
 
             FileOutputStream fos = new FileOutputStream(pathOut);
@@ -70,7 +72,7 @@ public class TargzUtils {
         }
     }
 
-    private static void addFileToTarGz(TarArchiveOutputStream tOut, File f, String dir) throws BusinessException {
+    private void addFileToTarGz(TarArchiveOutputStream tOut, File f, String dir) throws BusinessException {
         try {
             TarArchiveEntry tarEntry;
             if (dir == null) {

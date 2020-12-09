@@ -31,7 +31,6 @@
  */
 package fr.insalyon.creatis.vip.api.rest.itest;
 
-import fr.insalyon.creatis.vip.api.business.ApiPropertiesInitializer;
 import fr.insalyon.creatis.vip.api.SpringWebConfig;
 import fr.insalyon.creatis.vip.api.business.VipConfigurer;
 import fr.insalyon.creatis.vip.api.exception.ApiException;
@@ -62,7 +61,7 @@ import static org.mockito.ArgumentMatchers.any;
  * environment.
  *
  */
-@SpringJUnitWebConfig(initializers = ApiPropertiesInitializer.class)
+@SpringJUnitWebConfig
 public class DefaultSpringConfigurationIT {
 
     // Need to override vipConfigurer that operate on the database

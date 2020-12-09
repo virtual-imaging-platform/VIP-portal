@@ -33,7 +33,6 @@ package fr.insalyon.creatis.vip.api.controller;
 
 import fr.insalyon.creatis.vip.api.business.ApiBusiness;
 import fr.insalyon.creatis.vip.api.exception.ApiException;
-import fr.insalyon.creatis.vip.api.exception.SQLRuntimeException;
 import fr.insalyon.creatis.vip.api.model.AuthenticationCredentials;
 import fr.insalyon.creatis.vip.api.model.AuthenticationInfo;
 import fr.insalyon.creatis.vip.core.client.bean.User;
@@ -46,8 +45,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
-import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.function.Supplier;
 
 /**
@@ -60,33 +57,21 @@ public class AuthenticationController extends ApiController{
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private final ApiBusiness apiBusiness;
-    private final Supplier<Connection> connectionSupplier;
 
     @Autowired
     public AuthenticationController(
             Supplier<User> currentUserSupplier,
-            ApiBusiness apiBusiness,
-            Supplier<Connection> connectionSupplier)
-    {
+            ApiBusiness apiBusiness) {
         super(currentUserSupplier);
         this.apiBusiness = apiBusiness;
-        this.connectionSupplier = connectionSupplier;
     }
 
     @RequestMapping(method = RequestMethod.POST)
     public AuthenticationInfo authenticate(
-            @RequestBody @Valid AuthenticationCredentials authenticationCredentials) throws ApiException {
+            @RequestBody @Valid AuthenticationCredentials authenticationCredentials)
+            throws ApiException {
         logMethodInvocation(logger,"authenticate", authenticationCredentials.getUsername());
         // TODO verify the presence of credentials
-        try(Connection connection = connectionSupplier.get()) {
-            // business call
-            return apiBusiness
-                .authenticate(authenticationCredentials, connection);
-        } catch (SQLException ex) {
-            logger.error("Error handling a connection", ex);
-            throw new ApiException(ex);
-        } catch (SQLRuntimeException ex) {
-            throw new ApiException(ex);
-        }
+        return apiBusiness.authenticate(authenticationCredentials);
     }
 }

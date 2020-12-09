@@ -36,6 +36,7 @@ import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import fr.insalyon.creatis.vip.datamanager.client.bean.SSH;
 import fr.insalyon.creatis.vip.datamanager.client.bean.TransferType;
 import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerException;
+import fr.insalyon.creatis.vip.datamanager.server.DataManagerUtil;
 import fr.insalyon.creatis.vip.datamanager.server.business.DataManagerBusiness;
 import fr.insalyon.creatis.vip.datamanager.server.dao.SSHDAO;
 import java.sql.Connection;
@@ -49,24 +50,32 @@ import java.util.Calendar;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.support.JdbcDaoSupport;
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
+
+import javax.sql.DataSource;
 
 /**
  *
  * @author glatard, Nouha Boujelben
  */
-public class SSHData implements SSHDAO {
+@Repository
+@Transactional
+public class SSHData extends JdbcDaoSupport implements SSHDAO {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
-    private Connection connection;
 
-    public SSHData(Connection connection) {
-        this.connection = connection;
+    @Autowired
+    public void useDataSource(DataSource dataSource) {
+        setDataSource(dataSource);
     }
 
     @Override
     public List<SSH> getSSHConnections() throws DAOException {
         try {
-            PreparedStatement ps = connection.prepareStatement("SELECT "
+            PreparedStatement ps = getConnection().prepareStatement("SELECT "
                     + "* FROM "
                     + "VIPSSHAccounts");
 
@@ -76,7 +85,7 @@ public class SSHData implements SSHDAO {
             while (rs.next()) {
 
                 String email = rs.getString("email");
-                String name = DataManagerBusiness.extractName(rs.getString("LFCDir"));
+                String name = DataManagerUtil.extractName(rs.getString("LFCDir"));
                 String lfcDir = rs.getString("LFCDir");
                 String sshUser = rs.getString("sshUser");
                 String sshHost = rs.getString("sshHost");
@@ -119,7 +128,7 @@ public class SSHData implements SSHDAO {
     @Override
     public void addSSH(SSH ssh) throws DAOException {
         try {
-            PreparedStatement ps = connection.prepareStatement(
+            PreparedStatement ps = getConnection().prepareStatement(
                     "INSERT INTO VIPSSHAccounts(email,LFCDir,sshUser,sshHost,transferType,sshDir,sshPort,validated,auth_failed,checkFilesContent,numberSynchronizationFailed,deleteFilesFromSource) "
                     + "VALUES (?,?,?,?,?,?,?,?,?,?,?,?)");
 
@@ -152,7 +161,7 @@ public class SSHData implements SSHDAO {
     @Override
     public void updateSSH(SSH ssh) throws DAOException {
         try {
-            PreparedStatement ps = connection.prepareStatement("UPDATE "
+            PreparedStatement ps = getConnection().prepareStatement("UPDATE "
                     + "VIPSSHAccounts "
                     + "SET sshUser=?, sshHost=?, transferType=?, sshDir=?, sshPort=?, checkFilesContent=?, deleteFilesFromSource=?, active=? "
                     + "WHERE email=? AND LFCDir=?");
@@ -165,15 +174,7 @@ public class SSHData implements SSHDAO {
             ps.setBoolean(7, ssh.isDeleteFilesFromSource());
             ps.setBoolean(8, ssh.isActive());
             ps.setString(9, ssh.getEmail());
-
-            try {
-                ps.setString(
-                    10,
-                    DataManagerBusiness.generateLFCDir(
-                        ssh.getName(), ssh.getEmail(), connection));
-            } catch (DataManagerException | BusinessException ex) {
-                throw new DAOException(ex);
-            }
+            ps.setString(10, ssh.getLfcDir());
 
             ps.executeUpdate();
             ps.close();
@@ -185,26 +186,19 @@ public class SSHData implements SSHDAO {
     }
 
     @Override
-    public void removeSSH(String email, String name) throws DAOException {
+    public void removeSSH(String email, String lfcDir) throws DAOException {
         try {
-            PreparedStatement ps = connection.prepareStatement("DELETE "
+            PreparedStatement ps = getConnection().prepareStatement("DELETE "
                     + "FROM VIPSSHAccounts WHERE email=? AND LFCDir=?");
 
             ps.setString(1, email);
-            try {
-                ps.setString(
-                    2,
-                    DataManagerBusiness.generateLFCDir(name, email, connection));
-                logger.info("Removing connection " + email + " " + DataManagerBusiness.generateLFCDir(name, email, connection));
-            } catch (DataManagerException | BusinessException ex) {
-                throw new DAOException(ex);
-            }
-
+            ps.setString(2, lfcDir);
+            logger.info("Removing connection " + email + " " + lfcDir);
             ps.execute();
             ps.close();
 
         } catch (SQLException ex) {
-            logger.error("Error removing ssh connection {}", name, ex);
+            logger.error("Error removing ssh connection {}", lfcDir, ex);
             throw new DAOException(ex);
         }
     }
@@ -214,21 +208,14 @@ public class SSHData implements SSHDAO {
 
         for (List<String> sshC : sshConnections) {
             try {
-                PreparedStatement ps = connection.prepareStatement("UPDATE "
+                PreparedStatement ps = getConnection().prepareStatement("UPDATE "
                         + "VIPSSHAccounts "
                         + "SET auth_failed='1', numberSynchronizationFailed='0', theEarliestNextSynchronistation=? "
                         + "WHERE email=? AND LFCDir=?");
                 ps.setTimestamp(1, new Timestamp(Calendar.getInstance().getTime().getTime()));
                 ps.setString(2, sshC.get(0));
-                try {
-                    ps.setString(
-                        3,
-                        DataManagerBusiness.generateLFCDir(
-                            sshC.get(1), sshC.get(0), connection));
-                    logger.info("Reset connection " + sshC.get(0) + " " + DataManagerBusiness.generateLFCDir(sshC.get(1), sshC.get(0), connection));
-                } catch (DataManagerException | BusinessException ex) {
-                    throw new DAOException(ex);
-                }
+                ps.setString(3, sshC.get(1));
+                logger.info("Reset connection " + sshC.get(0) + " " + sshC.get(1));
 
                 ps.execute();
                 ps.close();

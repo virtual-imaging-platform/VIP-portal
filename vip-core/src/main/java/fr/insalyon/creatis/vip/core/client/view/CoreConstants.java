@@ -178,11 +178,11 @@ public class CoreConstants implements IsSerializable {
     public static final String SAML_TRUSTED_CERTIFICATE = "saml.trustedcertificate";
     public static final String SAML_ACCOUNT_TYPE = "saml.accounttype";
     //Boutiques
-    public static String APP_CLASS = "boutiques.application.class";
-    public static String APPLICATION_FILES_REPOSITORY = "boutiques.upload.repository";
-    public static String APP_DELETE_FILES_AFTER_UPLOAD = "boutiques.upload.deleteFile";
-    public static String APP_IMPORTER_ROOT_FOLDER = "boutiques.application.rootFolder";
-    public static String APP_REQUIREMENTS = "boutiques.application.requirements";
+    public static final String APP_CLASS = "boutiques.application.class";
+    public static final String APPLICATION_FILES_REPOSITORY = "boutiques.upload.repository";
+    public static final String APP_DELETE_FILES_AFTER_UPLOAD = "boutiques.upload.deleteFile";
+    public static final String APP_IMPORTER_ROOT_FOLDER = "boutiques.application.rootFolder";
+    public static final String APP_REQUIREMENTS = "boutiques.application.requirements";
     //Publication
     public static final String  PUB_MONTHS_UPDATES = "last.publication.update";
     //Zenodo publication

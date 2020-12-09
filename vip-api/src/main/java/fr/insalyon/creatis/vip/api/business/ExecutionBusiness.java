@@ -33,7 +33,6 @@ package fr.insalyon.creatis.vip.api.business;
 
 import fr.insalyon.creatis.vip.api.exception.ApiException;
 import fr.insalyon.creatis.vip.api.model.*;
-import fr.insalyon.creatis.vip.api.model.PathProperties;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
 import fr.insalyon.creatis.vip.application.client.bean.InOutData;
 import fr.insalyon.creatis.vip.application.client.bean.Simulation;
@@ -51,8 +50,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.lang.Object;
-import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -118,9 +115,8 @@ public class ExecutionBusiness {
         }
     }
 
-    public Execution getExecution(
-        String executionId, boolean summarize, Connection connection)
-        throws ApiException {
+    public Execution getExecution(String executionId, boolean summarize)
+            throws ApiException {
         try {
             // Get main execution object
             Simulation s = workflowBusiness.getSimulation(executionId, true); // check running execution for update
@@ -149,7 +145,7 @@ public class ExecutionBusiness {
 
             // Inputs
             List<InOutData> inputs = workflowBusiness.getInputData(
-                executionId, currentUserProvider.get().getFolder(), connection);
+                executionId, currentUserProvider.get().getFolder());
             logger.info("Execution has " + inputs.size() + " inputs ");
             for (InOutData iod : inputs) {
                 e.getInputValues().put(iod.getProcessor(), iod.getPath());
@@ -157,7 +153,7 @@ public class ExecutionBusiness {
 
             // Outputs
             List<InOutData> outputs = workflowBusiness.getOutputData(
-                executionId, currentUserProvider.get().getFolder(), connection);
+                executionId, currentUserProvider.get().getFolder());
             for (InOutData iod : outputs) {
                 if (!e.getReturnedFiles().containsKey(iod.getProcessor())) {
                      e.getReturnedFiles().put(iod.getProcessor(), new ArrayList<>());
@@ -177,8 +173,7 @@ public class ExecutionBusiness {
 
     }
 
-    public Execution[] listExecutions(int maxReturned, Connection connection)
-        throws ApiException {
+    public Execution[] listExecutions(int maxReturned) throws ApiException {
         try {
 
             List<Simulation> simulations = workflowBusiness.getSimulations(
@@ -195,7 +190,7 @@ public class ExecutionBusiness {
             for (Simulation s : simulations) {
                 if (!(s == null) && !(s.getStatus() == SimulationStatus.Cleaned)) {
                     count++;
-                    executions.add(getExecution(s.getID(), true, connection));
+                    executions.add(getExecution(s.getID(), true));
                     if(count >= maxReturned){
                         logger.warn("Only the {} most recent pipelines were returned.", maxReturned);
                         break;
@@ -251,7 +246,7 @@ public class ExecutionBusiness {
         }
     }
 
-    public String initExecution(Execution execution, Connection connection)
+    public String initExecution(Execution execution)
         throws ApiException {
         Map<String, String> inputMap = new HashMap<>();
         for (Entry<String,Object> restInput : execution.getInputValues().entrySet()) {
@@ -266,10 +261,11 @@ public class ExecutionBusiness {
         checkInputExecNameIsValid(execution.getName());
         return initExecution(
             execution.getPipelineIdentifier(), inputMap, execution.getTimeout(),
-            execution.getName(), execution.getStudyIdentifier(), connection);
+            execution.getName(), execution.getStudyIdentifier());
     }
 
-    private String handleRestParameter(String parameterName, Object restParameterValue) throws ApiException {
+    private String handleRestParameter(String parameterName, Object restParameterValue)
+            throws ApiException {
         if (restParameterValue instanceof List) {
             StringBuilder paramBuilder = new StringBuilder();
             boolean isFirst = true;
@@ -313,8 +309,7 @@ public class ExecutionBusiness {
                                 Map<String,String> inputValues,
                                 Integer timeoutInSeconds,
                                 String executionName,
-                                String studyId,
-                                Connection connection) throws ApiException {
+                                String studyId) throws ApiException {
         try {
             // We cannot easily initialize an execution without starting it.
             // So we will just launch the execution, and launch an error in case playExecution is not true.
@@ -327,8 +322,7 @@ public class ExecutionBusiness {
             }
 
             // Check that all pipeline inputs are present
-            Pipeline p = pipelineBusiness.getPipelineWithResultsDirectory(
-                pipelineId, connection);
+            Pipeline p = pipelineBusiness.getPipelineWithResultsDirectory(pipelineId);
             for (PipelineParameter pp : p.getParameters()) {
                 if (pp.isReturnedValue()) {
                     continue;
@@ -371,8 +365,8 @@ public class ExecutionBusiness {
             // Get user groups
             List<String> groupNames = new ArrayList<>();
             for (Group g : configurationBusiness
-                     .getUserGroups(currentUserProvider.get().getEmail(),
-                                    connection).keySet()) {
+                    .getUserGroups(currentUserProvider.get().getEmail())
+                    .keySet()) {
                 groupNames.add(g.getName());
             }
 
@@ -382,8 +376,8 @@ public class ExecutionBusiness {
 
             // Get application classes
             List<String> classes = applicationBusiness
-                .getApplication(applicationName, connection)
-                .getApplicationClasses();
+                    .getApplication(applicationName)
+                    .getApplicationClasses();
             if (classes.isEmpty()) {
                 logger.error("No class configured for {}", pipelineId);
                 throw new ApiException("Application " + applicationName + " cannot be launched because it doesn't belong to any VIP class.");
@@ -406,8 +400,7 @@ public class ExecutionBusiness {
                     applicationName,
                     applicationVersion,
                     classes.get(0),
-                    executionName,
-                    connection);
+                    executionName);
         } catch (BusinessException ex) {
             throw new ApiException(ex);
         }
@@ -437,21 +430,20 @@ public class ExecutionBusiness {
         }
     }
 
-    public List<PathProperties> getExecutionResultsPaths(
-        String executionId, Connection connection) throws ApiException {
+    public List<PathProperties> getExecutionResultsPaths(String executionId)
+            throws ApiException {
 
         List<PathProperties> pathResults = new ArrayList<>();
         List<InOutData> outputs;
         try {
             outputs = workflowBusiness.getOutputData(
-                executionId, currentUserProvider.get().getFolder(), connection);
+                executionId, currentUserProvider.get().getFolder());
         } catch (BusinessException e) {
             throw new ApiException(e);
         }
         for (InOutData output : outputs) {
             String outputPath = output.getPath();
-            pathResults.add(
-                dataApiBusiness.getPathProperties(outputPath, connection));
+            pathResults.add(dataApiBusiness.getPathProperties(outputPath));
         }
         return pathResults;
     }

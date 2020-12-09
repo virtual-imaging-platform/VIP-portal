@@ -32,32 +32,37 @@
 package fr.insalyon.creatis.vip.datamanager.server.dao.mysql;
 
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
-import fr.insalyon.creatis.vip.core.server.dao.mysql.PlatformConnection;
 import fr.insalyon.creatis.vip.datamanager.client.bean.UserApiKey;
 import fr.insalyon.creatis.vip.datamanager.server.dao.ApiKeysDAO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.support.JdbcDaoSupport;
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.sql.Connection;
+import javax.sql.DataSource;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.List;
 
-public class ApiKeysData implements ApiKeysDAO {
+@Repository
+@Transactional
+public class ApiKeysData extends JdbcDaoSupport implements ApiKeysDAO {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
-    private Connection connection;
 
-    public ApiKeysData(Connection connection) throws DAOException {
-        this.connection = connection;
+    @Autowired
+    public void useDataSource(DataSource dataSource) {
+        setDataSource(dataSource);
     }
 
     @Override
     public void addKey(UserApiKey apiKey)
         throws DAOException {
-        try (PreparedStatement ps = connection.prepareStatement(
+        try (PreparedStatement ps = getConnection().prepareStatement(
                  "insert into VIPApiKeys(email, identifier, apiKey) "
                  + "values(?, ?, ?)")) {
             ps.setString(1, apiKey.getUserEmail());
@@ -74,7 +79,7 @@ public class ApiKeysData implements ApiKeysDAO {
     @Override
     public void updateKey(UserApiKey apiKey)
         throws DAOException {
-        try (PreparedStatement ps = connection.prepareStatement(
+        try (PreparedStatement ps = getConnection().prepareStatement(
                  "update VIPApiKeys set apiKey = ? "
                  + "where email = ? and identifier = ?")) {
             ps.setString(1, apiKey.getApiKey());
@@ -90,7 +95,7 @@ public class ApiKeysData implements ApiKeysDAO {
 
     @Override
     public List<UserApiKey> getByUser(String userEmail) throws DAOException {
-        try (PreparedStatement ps = connection.prepareStatement(
+        try (PreparedStatement ps = getConnection().prepareStatement(
                  "select * from VIPApiKeys " +
                  "where email=?")) {
             ps.setString(1, userEmail);
@@ -116,7 +121,7 @@ public class ApiKeysData implements ApiKeysDAO {
     @Override
     public void deleteKeyFor(String userEmail, String storageIdentifier)
         throws DAOException {
-        try (PreparedStatement ps = connection.prepareStatement(
+        try (PreparedStatement ps = getConnection().prepareStatement(
                  "delete from VIPApiKeys "
                  + "where email = ? and identifier = ?")) {
             ps.setString(1, userEmail);

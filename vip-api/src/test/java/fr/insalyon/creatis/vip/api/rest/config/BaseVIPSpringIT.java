@@ -78,10 +78,11 @@ import static fr.insalyon.creatis.vip.api.data.CarminAPITestConstants.*;
  * is the same as production configuration
  *
  * To authenticate, tests should either
- * * login via wirth(httpbasic(user, password)
+ * * login via with httpbasic(user, password)
  * * use {@link WithMockUser} annotation
  *
  * The interaction with VIP outside vip-api are mocked (see {@link SpringTestConfig} )
+ * TODO : after spring is now everywhere, this does not work anymore, work needed here
  */
 @SpringJUnitWebConfig(classes = SpringTestConfig.class)
 @TestPropertySource(properties = {
@@ -100,7 +101,6 @@ import static fr.insalyon.creatis.vip.api.data.CarminAPITestConstants.*;
         API_DOWNLOAD_RETRY_IN_SECONDS + "=" + Test_DATA_DOWNLOAD_RETRY,
         API_DOWNLOAD_TIMEOUT_IN_SECONDS + "=" + TEST_DATA_DOWNLOAD_TIMEOUT,
         API_DATA_TRANSFERT_MAX_SIZE + "=" + TEST_DATA_MAX_SIZE,
-        API_DATA_DOWNLOAD_RELATIVE_PATH + "=" + TEST_DOWNLOAD_PATH,
         API_PIPELINE_WHITE_LIST + "=" + TEST_PIPELINE_WHITELIST
 })
 abstract public class BaseVIPSpringIT {

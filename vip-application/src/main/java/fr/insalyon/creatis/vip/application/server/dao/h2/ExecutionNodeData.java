@@ -39,17 +39,24 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 /**
+ * Each ExecutionNodeData is specific to a single database, and so to a single simulation.
+ * So a new instance is needed at each call and this needs the prototype scope
+ *
+ * The h2 connection is configured in AbstractJobData
  *
  * @author Rafael Ferreira da Silva
  */
+@Component
+@Scope("prototype")
 public class ExecutionNodeData extends AbstractJobData implements ExecutionNodeDAO {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    public ExecutionNodeData(String dbPath) throws DAOException {
-
+    public ExecutionNodeData(String dbPath) {
         super(dbPath);
     }
 

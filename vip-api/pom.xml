@@ -71,7 +71,7 @@ knowledge of the CeCILL-B license and that you accept its terms.
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-webmvc</artifactId>
-            <version>${springmvc.version}</version>
+            <version>${spring-framework.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.security</groupId>
@@ -111,18 +111,6 @@ knowledge of the CeCILL-B license and that you accept its terms.
         <!-- Test dependencies -->
 
         <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter</artifactId>
-            <version>${junit.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mockito</groupId>
-            <artifactId>mockito-core</artifactId>
-            <version>${test.version.mockito}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-test</artifactId>
             <version>${springsecurity.version}</version>
@@ -138,17 +126,6 @@ knowledge of the CeCILL-B license and that you accept its terms.
             <groupId>org.hamcrest</groupId>
             <artifactId>hamcrest</artifactId>
             <version>${test.version.hamcrest}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-test</artifactId>
-            <version>${springmvc.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-classic</artifactId>
             <scope>test</scope>
         </dependency>
         <!-- End test dependencies -->

@@ -38,30 +38,29 @@ import fr.insalyon.creatis.vip.application.client.rpc.WorkflowService;
 import fr.insalyon.creatis.vip.application.client.view.ApplicationException;
 import fr.insalyon.creatis.vip.application.server.business.InputBusiness;
 import fr.insalyon.creatis.vip.application.server.business.WorkflowBusiness;
-import fr.insalyon.creatis.vip.application.server.dao.ApplicationDAOFactory;
-import fr.insalyon.creatis.vip.core.client.CoreModule;
+import fr.insalyon.creatis.vip.application.server.business.simulation.ParameterSweep;
+import fr.insalyon.creatis.vip.application.server.dao.ApplicationInputDAO;
 import fr.insalyon.creatis.vip.core.client.bean.Group;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.CoreException;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
-import fr.insalyon.creatis.vip.core.server.business.Server;
+import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
-import fr.insalyon.creatis.vip.core.server.dao.mysql.PlatformConnection;
 import fr.insalyon.creatis.vip.core.server.rpc.AbstractRemoteServiceServlet;
-import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerException;
-import fr.insalyon.creatis.vip.datamanager.server.DataManagerUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
+
+import javax.servlet.ServletException;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -70,13 +69,19 @@ import org.slf4j.LoggerFactory;
 public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements WorkflowService {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
+
     private WorkflowBusiness workflowBusiness;
     private InputBusiness inputBusiness;
+    private ConfigurationBusiness configurationBusiness;
+    private ApplicationInputDAO applicationInputDAO;
 
-    public WorkflowServiceImpl() {
-
-        workflowBusiness = new WorkflowBusiness();
-        inputBusiness = new InputBusiness();
+    @Override
+    public void init() throws ServletException {
+        super.init();
+        inputBusiness = getBean(InputBusiness.class);
+        applicationInputDAO = getBean(ApplicationInputDAO.class);
+        configurationBusiness = getBean(ConfigurationBusiness.class);
+        workflowBusiness = getBean(WorkflowBusiness.class);
     }
 
     /**
@@ -129,16 +134,12 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
      */
     @Override
     public Descriptor getApplicationDescriptor(String applicationName, String applicationVersion) throws ApplicationException {
-        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
+        try {
             return workflowBusiness.getApplicationDescriptor(
                 getSessionUser(),
                 applicationName,
-                applicationVersion,
-                connection);
+                applicationVersion);
         } catch (BusinessException | CoreException ex) {
-            throw new ApplicationException(ex);
-        } catch (SQLException ex) {
-            logger.error("Error handling a connection", ex);
             throw new ApplicationException(ex);
         }
     }
@@ -158,26 +159,27 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
             String applicationName, String applicationVersion,
             String applicationClass, String simulationName) throws ApplicationException {
 
-        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
+        try {
             trace(logger, "Launching simulation '" + simulationName + "' (" + applicationName + ").");
             User user = getSessionUser();
 
             List<String> groups = new ArrayList<String>();
-            for (Group group : getSessionUserGroups().keySet()) {
+            for (Group group : getUserGroupsFromSession().keySet()) {
                 groups.add(group.getName());
+            }
+
+            for (Map.Entry<String,String> p : parametersMap.entrySet()) {
+                logger.info("received param {} : {}", p.getKey(), p.getValue());
             }
 
             String simulationID = workflowBusiness.launch(
                 user, groups,
                 parametersMap, applicationName, applicationVersion,
-                applicationClass, simulationName, connection);
+                applicationClass, simulationName);
 
             trace(logger, "Simulation '" + simulationName + "' launched with ID '" + simulationID + "'.");
 
         } catch (BusinessException | CoreException ex) {
-            throw new ApplicationException(ex);
-        } catch (SQLException ex) {
-            logger.error("Error handling a connection", ex);
             throw new ApplicationException(ex);
         }
     }
@@ -192,13 +194,10 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
     @Override
     public SimulationInput getInputByNameUserApp(String name, String appName)
         throws ApplicationException {
-        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
+        try {
             return inputBusiness.getInputByUserAndName(
-                getSessionUser().getEmail(), name, appName, connection);
+                getSessionUser().getEmail(), name, appName);
         } catch (BusinessException | CoreException ex) {
-            throw new ApplicationException(ex);
-        } catch (SQLException ex) {
-            logger.error("Error handling a connection", ex);
             throw new ApplicationException(ex);
         }
     }
@@ -210,13 +209,10 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
      */
     public void addSimulationInput(SimulationInput simulationInput)
             throws ApplicationException {
-        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
+        try {
             inputBusiness.addSimulationInput(
-                getSessionUser().getEmail(), simulationInput, connection);
+                getSessionUser().getEmail(), simulationInput);
         } catch (BusinessException | CoreException ex) {
-            throw new ApplicationException(ex);
-        } catch (SQLException ex) {
-            logger.error("Error handling a connection", ex);
             throw new ApplicationException(ex);
         }
     }
@@ -228,13 +224,10 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
      */
     public void updateSimulationInput(SimulationInput simulationInput)
             throws ApplicationException {
-        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
+        try {
             inputBusiness.updateSimulationInput(
-                getSessionUser().getEmail(), simulationInput, connection);
+                getSessionUser().getEmail(), simulationInput);
         } catch (BusinessException | CoreException ex) {
-            throw new ApplicationException(ex);
-        } catch (SQLException ex) {
-            logger.error("Error handling a connection", ex);
             throw new ApplicationException(ex);
         }
     }
@@ -262,14 +255,10 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
      */
     public void removeSimulationInput(String inputName, String applicationName)
             throws ApplicationException {
-        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
+        try {
             inputBusiness.removeSimulationInput(
-                getSessionUser().getEmail(), inputName, applicationName,
-                connection);
+                getSessionUser().getEmail(), inputName, applicationName);
         } catch (BusinessException | CoreException ex) {
-            throw new ApplicationException(ex);
-        } catch (SQLException ex) {
-            logger.error("Error handling a connection", ex);
             throw new ApplicationException(ex);
         }
     }
@@ -283,13 +272,10 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
     public void removeSimulationInputExample(
         String inputName, String applicationName)
         throws ApplicationException {
-        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
+        try {
             inputBusiness.removeSimulationInputExample(
-                inputName, applicationName, connection);
+                inputName, applicationName);
         } catch (BusinessException ex) {
-            throw new ApplicationException(ex);
-        } catch (SQLException ex) {
-            logger.error("Error handling a connection", ex);
             throw new ApplicationException(ex);
         }
     }
@@ -300,13 +286,10 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
      */
     public List<SimulationInput> getSimulationInputByUser()
         throws ApplicationException {
-        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
+        try {
             return inputBusiness.getSimulationInputByUser(
-                getSessionUser().getEmail(), connection);
+                getSessionUser().getEmail());
         } catch (BusinessException | CoreException ex) {
-            throw new ApplicationException(ex);
-        } catch (SQLException ex) {
-            logger.error("Error handling a connection", ex);
             throw new ApplicationException(ex);
         }
     }
@@ -318,13 +301,10 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
      */
     public void saveInputsAsExamples(SimulationInput simulationInput)
         throws ApplicationException {
-        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
+        try {
             inputBusiness.saveSimulationInputAsExample(
-                simulationInput, connection);
+                simulationInput);
         } catch (BusinessException ex) {
-            throw new ApplicationException(ex);
-        } catch (SQLException ex) {
-            logger.error("Error handling a connection", ex);
             throw new ApplicationException(ex);
         }
     }
@@ -338,13 +318,10 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
     @Override
     public List<SimulationInput> getSimulationInputExamples(
         String applicationName) throws ApplicationException {
-        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
+        try {
             return inputBusiness.getSimulationInputExamples(
-                applicationName, connection);
+                applicationName);
         } catch (BusinessException ex) {
-            throw new ApplicationException(ex);
-        } catch (SQLException ex) {
-            logger.error("Error handling a connection", ex);
             throw new ApplicationException(ex);
         }
     }
@@ -506,14 +483,11 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
      */
     @Override
     public Map<String, String> relaunchSimulation(String simulationID) throws ApplicationException {
-        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
+        try {
             trace(logger, "Relaunching simulation '" + simulationID + "'.");
             return workflowBusiness.relaunch(
-                simulationID, getSessionUser().getFolder(), connection);
+                simulationID, getSessionUser().getFolder());
         } catch (BusinessException | CoreException ex) {
-            throw new ApplicationException(ex);
-        } catch (SQLException ex) {
-            logger.error("Error handling a connection", ex);
             throw new ApplicationException(ex);
         }
     }
@@ -531,7 +505,7 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
     @Override
     public List<Simulation> getSimulations(String userName, String application,
             String status, String appClass, Date startDate, Date endDate) throws ApplicationException {
-        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
+        try {
             User user = getSessionUser();
             if (user.isSystemAdministrator()) {
                 return workflowBusiness.getSimulations(userName, application,
@@ -545,16 +519,13 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
 
                 } else {
                     List<String> users = configurationBusiness
-                        .getUserNames(user.getEmail(), true, connection);
+                        .getUserNames(user.getEmail(), true);
 
                     return workflowBusiness.getSimulations(users,
                             application, status, appClass, startDate, endDate);
                 }
             }
         } catch (BusinessException | CoreException ex) {
-            throw new ApplicationException(ex);
-        } catch (SQLException ex) {
-            logger.error("Error handling a connection", ex);
             throw new ApplicationException(ex);
         }
     }
@@ -578,7 +549,7 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
     public String getFile(String baseDir, String fileName) {
         try {
             FileReader fr = new FileReader(
-                    Server.getInstance().getWorkflowsPath() + "/"
+                    server.getWorkflowsPath() + "/"
                     + baseDir + "/" + fileName);
 
             BufferedReader br = new BufferedReader(fr);
@@ -602,9 +573,8 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
     }
 
     public String getFileURL(String baseDir, String fileName) {
-        Server configuration = Server.getInstance();
-        return "https://" + configuration.getApacheHost() + ":"
-                + configuration.getApacheSSLPort()
+        return "https://" + server.getApacheHost() + ":"
+                + server.getApacheSSLPort()
                 + "/workflows"
                 + baseDir + "/" + fileName;
     }
@@ -612,7 +582,7 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
     public List<String> getLogs(String baseDir) {
         List<String> list = new ArrayList<String>();
 
-        File folder = new File(Server.getInstance().getWorkflowsPath()
+        File folder = new File(server.getWorkflowsPath()
                 + "/" + baseDir);
 
         for (File f : folder.listFiles()) {
@@ -645,15 +615,10 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
 
     public List<SimulationInput> getWorkflowsInputByUserAndAppName(
         String user, String appName) {
-        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
-            return ApplicationDAOFactory.getDAOFactory()
-                .getApplicationInputDAO(connection)
-                .getWorkflowInputByUserAndAppName(user, appName);
+        try {
+            return applicationInputDAO.getWorkflowInputByUserAndAppName(user, appName);
         } catch (DAOException ex) {
             logger.error("Error in getWorkflowsInputByUserAndAppName. Ignoring", ex);
-            return null;
-        } catch (SQLException ex) {
-            logger.error("Error handling a connection. Ignoring", ex);
             return null;
         }
     }
@@ -685,13 +650,10 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
      */
     @Override
     public List<InOutData> getOutputData(String simulationID) throws ApplicationException {
-        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
+        try {
             return workflowBusiness.getOutputData(
-                simulationID, getSessionUser().getFolder(), connection);
+                simulationID, getSessionUser().getFolder());
         } catch (BusinessException | CoreException ex) {
-            throw new ApplicationException(ex);
-        } catch (SQLException ex) {
-            logger.error("Error handling a connection", ex);
             throw new ApplicationException(ex);
         }
     }
@@ -704,13 +666,10 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
      */
     @Override
     public List<InOutData> getInputData(String simulationID) throws ApplicationException {
-        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
+        try {
             return workflowBusiness.getInputData(
-                simulationID, getSessionUser().getFolder(), connection);
+                simulationID, getSessionUser().getFolder());
         } catch (BusinessException | CoreException ex) {
-            throw new ApplicationException(ex);
-        } catch (SQLException ex) {
-            logger.error("Error handling a connection", ex);
             throw new ApplicationException(ex);
         }
     }
@@ -738,12 +697,9 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
      */
     @Override
     public void validateInputs(List<String> inputs) throws ApplicationException {
-        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
-            workflowBusiness.validateInputs(getSessionUser(), inputs, connection);
+        try {
+            workflowBusiness.validateInputs(getSessionUser(), inputs);
         } catch (BusinessException | CoreException ex) {
-            throw new ApplicationException(ex);
-        } catch (SQLException ex) {
-            logger.error("Error handling a connection", ex);
             throw new ApplicationException(ex);
         }
     }

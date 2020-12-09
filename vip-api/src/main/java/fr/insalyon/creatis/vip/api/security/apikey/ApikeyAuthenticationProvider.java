@@ -31,7 +31,6 @@
  */
 package fr.insalyon.creatis.vip.api.security.apikey;
 
-import fr.insalyon.creatis.vip.api.exception.SQLRuntimeException;
 import fr.insalyon.creatis.vip.api.security.SpringCompatibleUser;
 import fr.insalyon.creatis.vip.core.client.bean.Group;
 import fr.insalyon.creatis.vip.core.client.bean.User;
@@ -55,11 +54,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
-import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.Map;
-import java.util.function.Function;
-import java.util.function.Supplier;
 
 /**
  * Created by abonnet on 7/25/16.
@@ -82,10 +77,7 @@ public class ApikeyAuthenticationProvider implements
     private ConfigurationBusiness configurationBusiness;
 
     @Autowired
-    private Supplier<Connection> connectionSupplier;
-
-    @Autowired
-    private Function<Connection,UserDAO> userDAOFactory;
+    private UserDAO userDAO;
 
     public final void afterPropertiesSet() throws Exception {
         Assert.notNull(this.messages, "A message source must be set");
@@ -103,61 +95,51 @@ public class ApikeyAuthenticationProvider implements
         Assert.isInstanceOf(ApikeyAuthenticationToken.class, authentication,
                 "Only ApikeyAuthenticationToken is supported");
 
-        try(Connection connection = connectionSupplier.get()) {
-            UserDAO userDAO =  userDAOFactory.apply(connection);
-            User vipUser;
-            String apikey = authentication.getCredentials().toString();
-            try {
-                vipUser = userDAO.getUserByApikey(apikey);
-            } catch (DAOException e) {
-                logger.error("error when getting user by apikey. Doing as if there is an auth error", e);
-                throw new BadCredentialsException(
-                    messages.getMessage(
-                        "AbstractUserDetailsAuthenticationProvider.badCredentials",
-                        "Bad credentials"));
-            }
-            if (vipUser == null) {
-                logger.info(
-                    "Cant authenticate because apikey not found:" + apikey);
-                throw new BadCredentialsException(
-                    messages.getMessage(
-                        "AbstractUserDetailsAuthenticationProvider.badCredentials",
-                        "Bad credentials"));
-            }
-            logger.debug("apikey OK for " + vipUser.getEmail());
-            UserDetails springUser;
-            try {
-                Map<Group, CoreConstants.GROUP_ROLE> groups =
-                    configurationBusiness.getUserGroups(
-                        vipUser.getEmail(), connection);
-                vipUser.setGroups(groups);
-                springUser = new SpringCompatibleUser(vipUser);
-            } catch (BusinessException e) {
-                logger.error("error when getting user groups for {}. Doing as if there is an auth error",
-                        vipUser.getEmail(), e);
-                throw new BadCredentialsException(
-                    messages.getMessage(
-                        "AbstractUserDetailsAuthenticationProvider.badCredentials",
-                        "Bad credentials"));
-            }
-            checkUserInfo(springUser);
-            try {
-                logger.info(
-                    "successful logging for " + springUser.getUsername());
-                userDAO.resetNFailedAuthentications(springUser.getUsername());
-            } catch (DAOException e) {
-                logger.error("Error resetting failed auth attempts. Ignoring", e);
-            }
-            return new ApikeyAuthenticationToken(
-                    springUser, apikey,
-                    vipUser.getLevel().name().toUpperCase());
-        } catch (SQLException | SQLRuntimeException e) {
-            logger.error("error when getting or closing db connexion. Doing as if there is an auth error",e);
+        User vipUser;
+        String apikey = authentication.getCredentials().toString();
+        try {
+            vipUser = userDAO.getUserByApikey(apikey);
+        } catch (DAOException e) {
+            logger.error("error when getting user by apikey. Doing as if there is an auth error", e);
             throw new BadCredentialsException(
                 messages.getMessage(
                     "AbstractUserDetailsAuthenticationProvider.badCredentials",
                     "Bad credentials"));
         }
+        if (vipUser == null) {
+            logger.info(
+                "Cant authenticate because apikey not found:" + apikey);
+            throw new BadCredentialsException(
+                messages.getMessage(
+                    "AbstractUserDetailsAuthenticationProvider.badCredentials",
+                    "Bad credentials"));
+        }
+        logger.debug("apikey OK for " + vipUser.getEmail());
+        UserDetails springUser;
+        try {
+            Map<Group, CoreConstants.GROUP_ROLE> groups =
+                configurationBusiness.getUserGroups(vipUser.getEmail());
+            vipUser.setGroups(groups);
+            springUser = new SpringCompatibleUser(vipUser);
+        } catch (BusinessException e) {
+            logger.error("error when getting user groups for {}. Doing as if there is an auth error",
+                    vipUser.getEmail(), e);
+            throw new BadCredentialsException(
+                messages.getMessage(
+                    "AbstractUserDetailsAuthenticationProvider.badCredentials",
+                    "Bad credentials"));
+        }
+        checkUserInfo(springUser);
+        try {
+            logger.info(
+                "successful logging for " + springUser.getUsername());
+            userDAO.resetNFailedAuthentications(springUser.getUsername());
+        } catch (DAOException e) {
+            logger.error("Error resetting failed auth attempts. Ignoring", e);
+        }
+            return new ApikeyAuthenticationToken(
+                    springUser, apikey,
+                    vipUser.getLevel().name().toUpperCase());
     }
 
     public void setMessageSource(MessageSource messageSource) {

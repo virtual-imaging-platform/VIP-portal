@@ -32,72 +32,55 @@
 package fr.insalyon.creatis.vip.application.server.business;
 
 import fr.insalyon.creatis.vip.application.client.bean.Engine;
-import fr.insalyon.creatis.vip.application.server.dao.ApplicationDAOFactory;
+import fr.insalyon.creatis.vip.application.server.dao.EngineDAO;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
-import java.sql.Connection;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.util.List;
 
 /**
  *
  * @author Rafael Ferreira da Silva
  */
+@Service
+@Transactional
 public class EngineBusiness {
 
-    /**
-     *
-     * @param engine
-     * @throws BusinessException
-     */
-    public void add(Engine engine, Connection connection)
-        throws BusinessException {
+    private EngineDAO engineDAO;
+
+    public EngineBusiness(EngineDAO engineDAO) {
+        this.engineDAO = engineDAO;
+    }
+
+    public void add(Engine engine) throws BusinessException {
         try {
-            ApplicationDAOFactory.getDAOFactory()
-                .getEngineDAO(connection).add(engine);
+            engineDAO.add(engine);
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }
     }
 
-    /**
-     *
-     * @param engine
-     * @throws BusinessException
-     */
-    public void update(Engine engine, Connection connection)
-        throws BusinessException {
+    public void update(Engine engine) throws BusinessException {
         try {
-            ApplicationDAOFactory.getDAOFactory()
-                .getEngineDAO(connection).update(engine);
+            engineDAO.update(engine);
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }
     }
 
-    /**
-     *
-     * @param name
-     * @throws BusinessException
-     */
-    public void remove(String name, Connection connection)
-        throws BusinessException {
+    public void remove(String name) throws BusinessException {
         try {
-            ApplicationDAOFactory.getDAOFactory()
-                .getEngineDAO(connection).remove(name);
+            engineDAO.remove(name);
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }
     }
 
-    /**
-     *
-     * @return
-     * @throws BusinessException
-     */
-    public List<Engine> get(Connection connection) throws BusinessException {
+    public List<Engine> get() throws BusinessException {
         try {
-            return ApplicationDAOFactory.getDAOFactory()
-                .getEngineDAO(connection).get();
+            return engineDAO.get();
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }

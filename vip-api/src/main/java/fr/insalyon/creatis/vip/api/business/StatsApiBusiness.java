@@ -2,7 +2,6 @@ package fr.insalyon.creatis.vip.api.business;
 
 import fr.insalyon.creatis.vip.api.exception.ApiException;
 import fr.insalyon.creatis.vip.api.exception.ApiException.ApiError;
-import fr.insalyon.creatis.vip.api.exception.SQLRuntimeException;
 import fr.insalyon.creatis.vip.api.model.stats.StatUser;
 import fr.insalyon.creatis.vip.api.model.stats.UsersList;
 import fr.insalyon.creatis.vip.api.model.stats.UsersNumber;
@@ -17,7 +16,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.sql.Connection;
-import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Month;
@@ -34,14 +32,10 @@ public class StatsApiBusiness {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private final StatsBusiness statsBusiness;
-    private final Supplier<Connection> connectionSupplier;
 
     @Autowired
-    public StatsApiBusiness(
-            StatsBusiness statsBusiness,
-            Supplier<Connection> connectionSupplier) {
+    public StatsApiBusiness(StatsBusiness statsBusiness) {
         this.statsBusiness = statsBusiness;
-        this.connectionSupplier = connectionSupplier;
     }
 
     public UsersNumber getUsersRegisteredNumber(
@@ -54,15 +48,10 @@ public class StatsApiBusiness {
 
         // do search
         Long usersRegisteredNumber;
-        try(Connection connection = connectionSupplier.get()) {
-            usersRegisteredNumber =
-                    statsBusiness.getUsersRegisteredNumber(
-                            searchCriteria, connection);
-        } catch (SQLException ex) {
-            logger.error("Error handling a connection", ex);
-            throw new ApiException(ex);
-        } catch (SQLRuntimeException | BusinessException ex) {
-            throw new ApiException(ex);
+        try {
+            usersRegisteredNumber = statsBusiness.getUsersRegisteredNumber(searchCriteria);
+        } catch (BusinessException e) {
+            throw new ApiException(e);
         }
         // build response object
         LocalDate startDate = searchCriteria.getRegistrationStart();
@@ -167,13 +156,9 @@ public class StatsApiBusiness {
             throws ApiException {
 
         List<User> users;
-        try(Connection connection = connectionSupplier.get()) {
-            users = statsBusiness.getUsersRegistered(
-                    searchCriteria, connection);
-        } catch (SQLException ex) {
-            logger.error("Error handling a connection", ex);
-            throw new ApiException(ex);
-        } catch (SQLRuntimeException | BusinessException ex) {
+        try {
+            users = statsBusiness.getUsersRegistered(searchCriteria);
+        } catch (BusinessException ex) {
             throw new ApiException(ex);
         }
         List<StatUser> statUsers = users

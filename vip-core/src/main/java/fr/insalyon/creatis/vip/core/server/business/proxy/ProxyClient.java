@@ -31,7 +31,6 @@
  */
 package fr.insalyon.creatis.vip.core.server.business.proxy;
 
-import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.business.Server;
 import java.io.*;
@@ -57,11 +56,14 @@ import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.bouncycastle.pkcs.PKCS10CertificationRequestBuilder;
 import org.bouncycastle.pkcs.jcajce.JcaPKCS10CertificationRequestBuilder;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**
  *
  * @author Rafael Silva
  */
+@Component
 public class ProxyClient {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
@@ -79,11 +81,15 @@ public class ProxyClient {
     private final String RESPONSE = "RESPONSE=";
     private final String ERROR = "ERROR=";
 
+    private Server server;
+
     /**
      * The ProxyClient class provides an interface for retrieving credentials
      * from a MyProxy server.
      */
-    public ProxyClient() {
+    @Autowired
+    public ProxyClient(Server server) {
+        this.server = server;
     }
 
     /**
@@ -93,14 +99,14 @@ public class ProxyClient {
     public Proxy getProxy() throws BusinessException {
 
         try {
-            String proxyFileName = Server.getInstance().getServerProxy();
+            String proxyFileName = server.getServerProxy();
             File proxyFile = new File(proxyFileName);
             if (proxyFile.exists()) {
                 X509Certificate certificate = readCertificate(proxyFile);
 
                 Calendar currentDate = Calendar.getInstance();
                 currentDate.setTime(new Date());
-                currentDate.add(Calendar.HOUR, Server.getInstance().getMyProxyMinHours());
+                currentDate.add(Calendar.HOUR, server.getMyProxyMinHours());
                 try {
                     certificate.checkValidity(currentDate.getTime());
                     Date endDate = certificate.getNotAfter();
@@ -119,7 +125,6 @@ public class ProxyClient {
             Date endDate = saveCredentials(proxyFileName);
             disconnect();
             //copy the proxy file and add extenstion
-            Server server = Server.getInstance();
             String voName = server.getVoName();
             copyFile(server.getServerProxy(), server.getServerProxyFolder(voName));
             addVomsExtension(voName);
@@ -151,7 +156,7 @@ public class ProxyClient {
 
         logger.info("Adding" + vo + "Extension to server proxy.");
         // Voms Extension
-        Server serverConf = Server.getInstance();
+        Server serverConf = server;
         long hours = Long.parseLong(serverConf.getMyProxyLifeTime()) / 3600;
         String command = "voms-proxy-init -voms " + vo
                 + " -cert " + serverConf.getServerProxy()
@@ -186,8 +191,8 @@ public class ProxyClient {
         SSLSocketFactory sf = sc.getSocketFactory();
 
         this.socket = (SSLSocket) sf.createSocket(
-                Server.getInstance().getMyProxyHost(),
-                Server.getInstance().getMyProxyPort());
+                server.getMyProxyHost(),
+                server.getMyProxyPort());
 
         this.socket.setEnabledProtocols(new String[]{"TLSv1.2"});
         this.socket.startHandshake();
@@ -206,11 +211,11 @@ public class ProxyClient {
         this.socketOut.write('\n');
         this.socketOut.write(GETCOMMAND.getBytes());
         this.socketOut.write('\n');
-        this.socketOut.write((USERNAME + Server.getInstance().getMyProxyUser()).getBytes());
+        this.socketOut.write((USERNAME + server.getMyProxyUser()).getBytes());
         this.socketOut.write('\n');
-        this.socketOut.write((PASSPHRASE + Server.getInstance().getMyProxyPass()).getBytes());
+        this.socketOut.write((PASSPHRASE + server.getMyProxyPass()).getBytes());
         this.socketOut.write('\n');
-        this.socketOut.write((LIFETIME + Server.getInstance().getMyProxyLifeTime()).getBytes());
+        this.socketOut.write((LIFETIME + server.getMyProxyLifeTime()).getBytes());
         this.socketOut.write('\n');
         this.socketOut.flush();
 
@@ -490,7 +495,7 @@ public class ProxyClient {
                             + subject);
                 }
             }
-            String myHostname = Server.getInstance().getMyProxyHost();
+            String myHostname = server.getMyProxyHost();
             if (myHostname.equals("localhost")) {
                 try {
                     myHostname = InetAddress.getLocalHost().getHostName();
@@ -500,11 +505,11 @@ public class ProxyClient {
             }
             if (!CN.equals(myHostname)) {
                 logger.error("MyProxy : certificate CN {} does not match server hostname {}",
-                        CN, Server.getInstance().getMyProxyHost());
+                        CN, server.getMyProxyHost());
                 throw new CertificateException(
                         "Server certificate subject CN (" + CN
                         + ") does not match server hostname ("
-                        + Server.getInstance().getMyProxyHost()
+                        + server.getMyProxyHost()
                         + ").");
             }
         }

@@ -43,6 +43,7 @@ import fr.insalyon.creatis.vip.datamanager.client.bean.Data;
 import fr.insalyon.creatis.vip.datamanager.client.bean.Data.Type;
 import fr.insalyon.creatis.vip.datamanager.client.bean.PoolOperation;
 import fr.insalyon.creatis.vip.datamanager.server.DataManagerUtil;
+import fr.insalyon.creatis.vip.datamanager.server.business.DataManagerBusiness;
 import fr.insalyon.creatis.vip.datamanager.server.business.LFCBusiness;
 import fr.insalyon.creatis.vip.datamanager.server.business.LFCPermissionBusiness;
 import fr.insalyon.creatis.vip.datamanager.server.business.LFCPermissionBusiness.LFCAccessType;
@@ -55,11 +56,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PreDestroy;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.sql.Connection;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -88,49 +89,67 @@ public class DataApiBusiness {
     private final LFCBusiness lfcBusiness;
     private final TransferPoolBusiness transferPoolBusiness;
     private final LFCPermissionBusiness lfcPermissionBusiness;
+    private final DataManagerBusiness dataManagerBusiness;
 
     // 2 threads are needed for every download
     private ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(2 * 5);
 
     @Autowired
-    public DataApiBusiness(Environment env, Supplier<User> currentUserProvider, LFCBusiness lfcBusiness, TransferPoolBusiness transferPoolBusiness, LFCPermissionBusiness lfcPermissionBusiness) {
+    public DataApiBusiness(
+            Environment env, Supplier<User> currentUserProvider,
+            LFCBusiness lfcBusiness, TransferPoolBusiness transferPoolBusiness,
+            LFCPermissionBusiness lfcPermissionBusiness,
+            DataManagerBusiness dataManagerBusiness) {
         this.env = env;
         this.currentUserProvider = currentUserProvider;
         this.lfcBusiness = lfcBusiness;
         this.transferPoolBusiness = transferPoolBusiness;
         this.lfcPermissionBusiness = lfcPermissionBusiness;
+        this.dataManagerBusiness = dataManagerBusiness;
     }
 
-    public boolean doesFileExist(String path, Connection connection)
-        throws ApiException {
-        checkReadPermission(path, connection);
-        return path.equals(ROOT) || baseDoesFileExist(path, connection);
+    @PreDestroy
+    public void close() {
+        logger.info("shutting down download threads");
+        scheduler.shutdown();
+        try {
+            if (!scheduler.awaitTermination(800, TimeUnit.MILLISECONDS)) {
+                logger.info("Forcing download threads shutdown");
+                scheduler.shutdownNow();
+            }
+        } catch (InterruptedException e) {
+            scheduler.shutdownNow();
+        }
+        logger.info("download threads succesfully shutdown");
     }
 
-    public void deletePath(String path, Connection connection)
-        throws ApiException {
-        checkPermission(path, LFCAccessType.DELETE, connection);
-        if (!baseDoesFileExist(path, connection)) {
+    public boolean doesFileExist(String path) throws ApiException {
+        checkReadPermission(path);
+        return path.equals(ROOT) || baseDoesFileExist(path);
+    }
+
+    public void deletePath(String path) throws ApiException {
+        checkPermission(path, LFCAccessType.DELETE);
+        if (!baseDoesFileExist(path)) {
             logger.error("trying to delete a non-existing file : {}", path);
             throw new ApiException("trying to delete a non-existing dile");
         }
-        baseDeletePath(path, connection);
+        baseDeletePath(path);
     }
 
-    public PathProperties getPathProperties(String path, Connection connection)
-        throws ApiException {
-        checkReadPermission(path, connection);
+    public PathProperties getPathProperties(String path ) throws ApiException {
+        checkReadPermission(path);
         if (path.equals(ROOT)) {
             return getRootPathProperties();
         }
         PathProperties pathProperties = new PathProperties();
         pathProperties.setPath(path);
-        if (!baseDoesFileExist(path, connection)) {
+        if (!baseDoesFileExist(path)) {
             pathProperties.setExists(false);
             return pathProperties;
         }
         pathProperties.setExists(true);
-        List<Data> fileData = baseGetFileData(path, connection);
+        List<Data> fileData = baseGetFileData(path);
         if (doesPathCorrespondsToAFile(path, fileData)) {
             // this is a file, not a directory
             Data fileInfo = fileData.get(0);
@@ -144,19 +163,18 @@ public class DataApiBusiness {
             pathProperties.setIsDirectory(true);
             pathProperties.setSize((long) fileData.size());
             pathProperties.setLastModificationDate(
-                baseGetFileModificationDate(path, connection) / 1000);
+                baseGetFileModificationDate(path) / 1000);
             pathProperties.setMimeType(env.getProperty(CarminProperties.API_DIRECTORY_MIME_TYPE));
         }
         return pathProperties;
     }
 
-    public List<PathProperties> listDirectory(String path, Connection connection)
-        throws ApiException {
-        checkReadPermission(path, connection);
+    public List<PathProperties> listDirectory(String path) throws ApiException {
+        checkReadPermission(path);
         if (path.equals(ROOT)) {
             return getRootSubDirectoriesPathProps();
         }
-        List<Data> directoryData = baseGetFileData(path, connection);
+        List<Data> directoryData = baseGetFileData(path);
         if (doesPathCorrespondsToAFile(path, directoryData)) {
             logger.error("Trying to list {} , but is a file :", path);
             throw new ApiException("Error listing a directory");
@@ -168,28 +186,27 @@ public class DataApiBusiness {
         return res;
     }
 
-    public File getFile(String path, Connection connection) throws ApiException {
-        checkDownloadPermission(path, connection);
+    public File getFile(String path) throws ApiException {
+        checkDownloadPermission(path);
         String downloadOperationId =
-            downloadFileToLocalStorage(path, connection);
+            downloadFileToLocalStorage(path);
         return getDownloadFile(downloadOperationId);
     }
 
-    public void uploadRawFileFromInputStream(
-        String lfcPath, InputStream is, Connection connection)
-        throws ApiException {
+    public void uploadRawFileFromInputStream(String lfcPath, InputStream is)
+            throws ApiException {
         // TODO : check upload size ?
-        checkPermission(lfcPath, LFCAccessType.UPLOAD, connection);
+        checkPermission(lfcPath, LFCAccessType.UPLOAD);
         java.nio.file.Path javaPath = Paths.get(lfcPath);
         String parentLfcPath = javaPath.getParent().toString();
         // check if parent dir exists
-        if (!baseDoesFileExist(parentLfcPath, connection)) {
+        if (!baseDoesFileExist(parentLfcPath)) {
             logger.error("parent directory of upload {} does not exist :", lfcPath);
             throw new ApiException("Upload Directory doest not exist");
         }
         // TODO : check if it already exists
         // TODO : support archive upload
-        String uploadDirectory = DataManagerUtil.getUploadRootDirectory(false);
+        String uploadDirectory = dataManagerBusiness.getUploadRootDirectory(false);
         // get file name and clean it as in an upload
         String fileName = DataManagerUtil.getCleanFilename(
                 Paths.get(lfcPath).getFileName().toString() );
@@ -198,24 +215,23 @@ public class DataApiBusiness {
         boolean isFileEmpty = saveInputStreamToFile(is, localPath);
         if (isFileEmpty) {
             logger.info("no content in upload, creating dir : " + parentLfcPath + "/" + fileName);
-            baseMkdir(parentLfcPath, fileName, connection);
+            baseMkdir(parentLfcPath, fileName);
         } else {
-            String opId = baseUploadFile(localPath, parentLfcPath, connection);
+            String opId = baseUploadFile(localPath, parentLfcPath);
             // wait for it to be over
-            waitForOperationOrTimeout(opId, connection);
+            waitForOperationOrTimeout(opId);
         }
     }
 
-    public void uploadCustomData(
-        String lfcPath, UploadData uploadData, Connection connection)
-        throws ApiException {
+    public void uploadCustomData(String lfcPath, UploadData uploadData)
+            throws ApiException {
         // TODO : check upload size ?
         // TODO : factorize with previous method
-        checkPermission(lfcPath, LFCAccessType.UPLOAD, connection);
+        checkPermission(lfcPath, LFCAccessType.UPLOAD);
         java.nio.file.Path javaPath = Paths.get(lfcPath);
         String parentLfcPath = javaPath.getParent().toString();
         // check if parent dir exists
-        if (!baseDoesFileExist(parentLfcPath, connection)) {
+        if (!baseDoesFileExist(parentLfcPath)) {
             logger.error("parent directory of {} does not exist :", lfcPath);
             throw new ApiException("Upload Directory doest not exist");
         }
@@ -225,33 +241,31 @@ public class DataApiBusiness {
         }
         // TODO : check if it already exists
         // TODO : support archive upload
-        String uploadDirectory = DataManagerUtil.getUploadRootDirectory(false);
+        String uploadDirectory = dataManagerBusiness.getUploadRootDirectory(false);
         // get file name and clean it as in an upload
         String fileName = DataManagerUtil.getCleanFilename(
                 Paths.get(lfcPath).getFileName().toString() );
         String localPath = uploadDirectory + fileName;
         logger.debug("storing upload file in :" + localPath);
         writeFileFromBase64(uploadData.getBase64Content(), localPath);
-        String opId = baseUploadFile(localPath, parentLfcPath, connection);
+        String opId = baseUploadFile(localPath, parentLfcPath);
         // wait for it to be over
-        waitForOperationOrTimeout(opId, connection);
+        waitForOperationOrTimeout(opId);
     }
 
     // #### PERMISSION STUFF
 
-    private void checkReadPermission(String path, Connection connection)
-        throws ApiException {
-        checkPermission(path, LFCAccessType.READ, connection);
+    private void checkReadPermission(String path) throws ApiException {
+        checkPermission(path, LFCAccessType.READ);
     }
 
-    private void checkDownloadPermission(String path, Connection connection)
-        throws ApiException {
-        checkReadPermission(path, connection);
+    private void checkDownloadPermission(String path) throws ApiException {
+        checkReadPermission(path);
         if (path.equals(ROOT)) {
             logger.error("cannot download root ({})", path);
             throw new ApiException("Illegal data API access");
         }
-        List<Data> fileData = baseGetFileData(path, connection);
+        List<Data> fileData = baseGetFileData(path);
         if (!doesPathCorrespondsToAFile(path, fileData)) {
             // it works on a directory and return a zip, but we cant check the download size
             logger.error("Trying to download a directory ({})", path);
@@ -264,12 +278,11 @@ public class DataApiBusiness {
         }
     }
 
-    private void checkPermission(
-        String path, LFCAccessType accessType, Connection connection)
-        throws ApiException {
+    private void checkPermission(String path, LFCAccessType accessType)
+            throws ApiException {
         try {
             lfcPermissionBusiness.checkPermission(
-                currentUserProvider.get(), path, accessType, connection);
+                currentUserProvider.get(), path, accessType);
         } catch (BusinessException e) {
             throw new ApiException("API Permission error", e);
         }
@@ -278,10 +291,9 @@ public class DataApiBusiness {
 
     // #### DOWNLOAD STUFF
 
-    private String downloadFileToLocalStorage(
-        String path, Connection connection) throws ApiException {
-        String downloadOperationId = baseDownloadFile(path, connection);
-        waitForOperationOrTimeout(downloadOperationId, connection);
+    private String downloadFileToLocalStorage(String path) throws ApiException {
+        String downloadOperationId = baseDownloadFile(path);
+        waitForOperationOrTimeout(downloadOperationId);
         return downloadOperationId;
     }
 
@@ -297,14 +309,14 @@ public class DataApiBusiness {
 
     // #### Operation stuff
 
-    private void waitForOperationOrTimeout(
-        String operationId, Connection connection) throws ApiException {
+    private void waitForOperationOrTimeout(String operationId)
+            throws ApiException {
         // get user in main thread because spring store auth/user information in
         // thread bound structure and it wont be available in the
         // 'isDownloadOverCall' thread
         User user = currentUserProvider.get();
         Callable<Boolean> isDownloadOverCall =
-            () -> isOperationOver(operationId, user, connection);
+            () -> isOperationOver(operationId, user);
 
         // task that check every x seconds if the operation is over.
         // return true when OK or goes on indefinitly
@@ -349,11 +361,9 @@ public class DataApiBusiness {
         return env.getProperty(CarminProperties.API_DOWNLOAD_TIMEOUT_IN_SECONDS, Integer.class);
     }
 
-    private boolean isOperationOver(
-        String operationId, User user, Connection connection)
-        throws ApiException {
-        PoolOperation operation = baseGetPoolOperation(
-            operationId, user, connection);
+    private boolean isOperationOver(String operationId, User user)
+            throws ApiException {
+        PoolOperation operation = baseGetPoolOperation(operationId, user);
 
         switch (operation.getStatus()) {
             case Queued:
@@ -502,54 +512,49 @@ public class DataApiBusiness {
 
     // #### LOWER LEVELS CALLS, all prefixed with "base"
 
-    private boolean baseDoesFileExist(String path, Connection connection)
-        throws ApiException {
+    private boolean baseDoesFileExist(String path) throws ApiException {
         try {
-            return lfcBusiness.exists(currentUserProvider.get(), path, connection);
+            return lfcBusiness.exists(currentUserProvider.get(), path);
         } catch (BusinessException e) {
             throw new ApiException("Error testing file existence", e);
         }
     }
 
-    private List<Data> baseGetFileData(String path, Connection connection)
-        throws ApiException {
+    private List<Data> baseGetFileData(String path) throws ApiException {
         try {
             return lfcBusiness.listDir(
-                currentUserProvider.get(), path, true, connection);
+                currentUserProvider.get(), path, true);
         } catch (BusinessException e) {
             throw new ApiException("Error getting lfc information", e);
         }
     }
 
     /* return the operation id */
-    private String baseDownloadFile(String path, Connection connection)
-        throws ApiException {
+    private String baseDownloadFile(String path) throws ApiException {
         try {
             return transferPoolBusiness.downloadFile(
-                currentUserProvider.get(), path, connection);
+                currentUserProvider.get(), path);
         } catch (BusinessException e) {
             throw new ApiException("Error download LFC file", e);
         }
     }
 
-    private String baseUploadFile(
-        String localPath, String lfcPath, Connection connection)
-        throws ApiException {
+    private String baseUploadFile(String localPath, String lfcPath)
+            throws ApiException {
         try {
             return transferPoolBusiness.uploadFile(
-                currentUserProvider.get(), localPath, lfcPath, connection);
+                currentUserProvider.get(), localPath, lfcPath);
         } catch (BusinessException e) {
             throw new ApiException("Error uploading a lfc file", e);
         }
     }
 
-    private PoolOperation baseGetPoolOperation(
-        String operationId, User user, Connection connection)
-        throws ApiException {
+    private PoolOperation baseGetPoolOperation(String operationId, User user)
+            throws ApiException {
         // need to specify the user to avoid accessing apiContext from another thread
         try {
             return transferPoolBusiness.getOperationById(
-                operationId, user.getFolder(), connection);
+                    operationId, user.getFolder());
         } catch (BusinessException e) {
             throw new ApiException("Error getting download operation", e);
         }
@@ -563,31 +568,26 @@ public class DataApiBusiness {
         }
     }
 
-    private Long baseGetFileModificationDate(String path, Connection connection)
-        throws ApiException {
+    private Long baseGetFileModificationDate(String path) throws ApiException {
         try {
             return lfcBusiness.getModificationDate(
-                currentUserProvider.get(), path, connection);
+                currentUserProvider.get(), path);
         } catch (BusinessException e) {
             throw new ApiException("Error getting lfc modification", e);
         }
     }
 
-    private void baseDeletePath(String path, Connection connection)
-        throws ApiException {
+    private void baseDeletePath(String path) throws ApiException {
         try {
-            transferPoolBusiness.delete(
-                    currentUserProvider.get(), connection, path);
+            transferPoolBusiness.delete(currentUserProvider.get(), path);
         } catch (BusinessException e) {
             throw new ApiException("Error deleting lfc file", e);
         }
     }
 
-    private void baseMkdir(String path, String dirName, Connection connection)
-        throws ApiException {
+    private void baseMkdir(String path, String dirName) throws ApiException {
         try {
-            lfcBusiness.createDir(
-                currentUserProvider.get(), path, dirName, connection);
+            lfcBusiness.createDir(currentUserProvider.get(), path, dirName);
         } catch (BusinessException e) {
             throw new ApiException("Error creating LFC directory", e);
         }

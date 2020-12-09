@@ -36,58 +36,59 @@ import fr.insalyon.creatis.grida.client.GRIDAPoolClient;
 import fr.insalyon.creatis.grida.common.bean.Operation;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
-import fr.insalyon.creatis.vip.core.server.business.CoreUtil;
 import fr.insalyon.creatis.vip.core.server.business.Server;
 import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
 import fr.insalyon.creatis.vip.datamanager.client.bean.PoolOperation;
 import fr.insalyon.creatis.vip.datamanager.client.bean.PoolOperation.Type;
 import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerException;
-import fr.insalyon.creatis.vip.datamanager.server.DataManagerUtil;
+import org.apache.commons.io.FilenameUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.text.SimpleDateFormat;
-import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
-import org.apache.commons.io.FilenameUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  *
  * @author Rafael Silva
  */
+@Service
+@Transactional
 public class TransferPoolBusiness {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
-    private Server serverConfiguration = Server.getInstance();
-    private LFCBusiness lfcBusiness;
 
-    public TransferPoolBusiness() {
-        lfcBusiness = new LFCBusiness();
+    private Server serverConfiguration;
+    private LFCBusiness lfcBusiness;
+    private GRIDAPoolClient gridaPoolClient;
+    private LfcPathsBusiness lfcPathsBusiness;
+
+    @Autowired
+    public TransferPoolBusiness(Server serverConfiguration, LFCBusiness lfcBusiness, GRIDAPoolClient gridaPoolClient, LfcPathsBusiness lfcPathsBusiness) {
+        this.serverConfiguration = serverConfiguration;
+        this.lfcBusiness = lfcBusiness;
+        this.gridaPoolClient = gridaPoolClient;
+        this.lfcPathsBusiness = lfcPathsBusiness;
     }
 
-    /**
-     *
-     * @param email
-     * @param date
-     * @param currentUserFolder
-     * @return
-     * @throws BusinessException
-     */
     public List<PoolOperation> getOperations(
-        String email, Date date, String currentUserFolder, Connection connection)
-        throws BusinessException {
+            String email, Date date, String currentUserFolder)
+            throws BusinessException {
 
         try {
-            GRIDAPoolClient client = CoreUtil.getGRIDAPoolClient();
-            List<PoolOperation> poolOperations = new ArrayList<PoolOperation>();
+            List<PoolOperation> poolOperations = new ArrayList<>();
 
-            for (Operation operation : client.getOperationsLimitedListByUserAndDate(
+            for (Operation operation : gridaPoolClient.getOperationsLimitedListByUserAndDate(
                     email, DataManagerConstants.MAX_OPERATIONS_LIMIT, date)) {
 
                 if (operation.getType() != Operation.Type.Delete) {
-                    poolOperations.add(processOperation(operation, currentUserFolder, connection));
+                    poolOperations.add(processOperation(operation, currentUserFolder));
                 }
             }
             return poolOperations;
@@ -100,23 +101,15 @@ public class TransferPoolBusiness {
         }
     }
 
-    /**
-     *
-     * @param currentUserFolder
-     * @return
-     * @throws BusinessException
-     */
-    public List<PoolOperation> getOperations(
-        String currentUserFolder, Connection connection)
-        throws BusinessException {
+    public List<PoolOperation> getOperations(String currentUserFolder)
+            throws BusinessException {
 
         try {
-            GRIDAPoolClient client = CoreUtil.getGRIDAPoolClient();
-            List<PoolOperation> poolOperations = new ArrayList<PoolOperation>();
+            List<PoolOperation> poolOperations = new ArrayList<>();
 
-            for (Operation operation : client.getAllOperations()) {
+            for (Operation operation : gridaPoolClient.getAllOperations()) {
                 poolOperations.add(
-                    processOperation(operation, currentUserFolder, connection));
+                    processOperation(operation, currentUserFolder));
             }
 
             return poolOperations;
@@ -128,23 +121,14 @@ public class TransferPoolBusiness {
         }
     }
 
-    /**
-     *
-     * @param operationId
-     * @param currentUserFolder
-     * @return
-     * @throws BusinessException
-     */
     public PoolOperation getOperationById(
-        String operationId, String currentUserFolder, Connection connection)
-        throws BusinessException {
+            String operationId, String currentUserFolder)
+            throws BusinessException {
 
         try {
-            GRIDAPoolClient client = CoreUtil.getGRIDAPoolClient();
             return processOperation(
-                client.getOperationById(operationId),
-                currentUserFolder,
-                connection);
+                    gridaPoolClient.getOperationById(operationId),
+                    currentUserFolder);
         } catch (DataManagerException ex) {
             throw new BusinessException(ex);
         } catch (GRIDAClientException ex) {
@@ -153,10 +137,10 @@ public class TransferPoolBusiness {
         }
     }
 
-    public PoolOperation getDownloadPoolOperation(String operationId) throws BusinessException {
+    public PoolOperation getDownloadPoolOperation(String operationId)
+            throws BusinessException {
         try {
-            GRIDAPoolClient client = CoreUtil.getGRIDAPoolClient();
-            Operation operation = client.getOperationById(operationId);
+            Operation operation = gridaPoolClient.getOperationById(operationId);
             if (operation.getType() != Operation.Type.Download) {
                 logger.error("Not a download operation {}", operationId);
                 throw new BusinessException("Wrong operation type for download");
@@ -172,16 +156,9 @@ public class TransferPoolBusiness {
         }
     }
 
-    /**
-     *
-     * @param operation
-     * @param currentUserFolder
-     * @return
-     * @throws DataManagerException
-     */
     private PoolOperation processOperation(
-        Operation operation, String currentUserFolder, Connection connection)
-        throws DataManagerException {
+            Operation operation, String currentUserFolder)
+            throws DataManagerException {
 
         SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM d, yyyy HH:mm");
         String source = "";
@@ -192,18 +169,18 @@ public class TransferPoolBusiness {
         if (operation.getType() == Operation.Type.Upload) {
             type = PoolOperation.Type.Upload;
             source = FilenameUtils.getName(operation.getSource());
-            dest = DataManagerUtil.parseRealDir(
-                operation.getDest(), currentUserFolder, connection);
+            dest = lfcPathsBusiness.parseRealDir(
+                    operation.getDest(), currentUserFolder);
         } else if (operation.getType() == Operation.Type.Delete) {
             type = PoolOperation.Type.Delete;
-            source = DataManagerUtil.parseRealDir(
-                operation.getSource(), currentUserFolder, connection);
+            source = lfcPathsBusiness.parseRealDir(
+                    operation.getSource(), currentUserFolder);
         } else {
             type = PoolOperation.Type.Download;
             dest = "Platform";
             source = operation.getType() == Operation.Type.Download
-                    ? DataManagerUtil.parseRealDir(
-                        operation.getSource(), currentUserFolder, connection)
+                    ? lfcPathsBusiness.parseRealDir(
+                        operation.getSource(), currentUserFolder)
                     : FilenameUtils.getBaseName(operation.getDest());
         }
 
@@ -212,18 +189,12 @@ public class TransferPoolBusiness {
                 type, status, operation.getUser(), operation.getProgress());
     }
 
-    /**
-     *
-     * @param ids
-     * @throws BusinessException
-     */
     public void removeOperations(List<String> ids) throws BusinessException {
 
         try {
-            GRIDAPoolClient client = CoreUtil.getGRIDAPoolClient();
 
             for (String id : ids) {
-                client.removeOperationById(id);
+                gridaPoolClient.removeOperationById(id);
             }
 
         } catch (GRIDAClientException ex) {
@@ -232,16 +203,10 @@ public class TransferPoolBusiness {
         }
     }
 
-    /**
-     *
-     * @param email
-     * @throws BusinessException
-     */
     public void removeUserOperations(String email) throws BusinessException {
 
         try {
-            GRIDAPoolClient client = CoreUtil.getGRIDAPoolClient();
-            client.removeOperationsByUser(email);
+            gridaPoolClient.removeOperationsByUser(email);
 
         } catch (GRIDAClientException ex) {
             logger.error("Error removing operations for {}", email, ex);
@@ -249,16 +214,10 @@ public class TransferPoolBusiness {
         }
     }
 
-    /**
-     *
-     * @param id
-     * @throws BusinessException
-     */
     public void removeOperationById(String id) throws BusinessException {
 
         try {
-            GRIDAPoolClient client = CoreUtil.getGRIDAPoolClient();
-            client.removeOperationById(id);
+            gridaPoolClient.removeOperationById(id);
 
         } catch (GRIDAClientException ex) {
             logger.error("Error removing operations {}", id, ex);
@@ -266,20 +225,16 @@ public class TransferPoolBusiness {
         }
     }
 
-    public String downloadFile(
-        User user, String remoteFile, Connection connection)
-        throws BusinessException {
+    public String downloadFile(User user, String remoteFile) throws BusinessException {
 
         try {
-            lfcBusiness.getModificationDate(user, remoteFile, connection);
-            GRIDAPoolClient poolClient = CoreUtil.getGRIDAPoolClient();
+            lfcBusiness.getModificationDate(user, remoteFile);
 
-            String remotePath = DataManagerUtil.parseBaseDir(
-                user, remoteFile, connection);
+            String remotePath = lfcPathsBusiness.parseBaseDir(user, remoteFile);
             String localDirPath = serverConfiguration.getDataManagerPath()
                     + "/downloads" + FilenameUtils.getFullPath(remotePath);
 
-            return poolClient.downloadFile(remotePath, localDirPath, user.getEmail());
+            return gridaPoolClient.downloadFile(remotePath, localDirPath, user.getEmail());
 
         } catch (DataManagerException ex) {
             throw new BusinessException(ex);
@@ -289,31 +244,22 @@ public class TransferPoolBusiness {
         }
     }
 
-    /**
-     *
-     * @param user
-     * @param remoteFiles
-     * @param packName
-     * @return Operation ID
-     * @throws BusinessException
-     */
-    public String downloadFiles(User user, List<String> remoteFiles,
-                                String packName, Connection connection)
-        throws BusinessException {
+    public String downloadFiles(
+            User user, List<String> remoteFiles, String packName)
+            throws BusinessException {
 
         try {
-            lfcBusiness.getModificationDate(user, remoteFiles, connection);
-            GRIDAPoolClient poolClient = CoreUtil.getGRIDAPoolClient();
+            lfcBusiness.getModificationDate(user, remoteFiles);
 
-            List<String> remotePaths = new ArrayList<String>();
+            List<String> remotePaths = new ArrayList<>();
             for (String remoteFile : remoteFiles) {
                 remotePaths.add(
-                    DataManagerUtil.parseBaseDir(user, remoteFile, connection));
+                        lfcPathsBusiness.parseBaseDir(user, remoteFile));
             }
             String localDirPath = serverConfiguration.getDataManagerPath()
                     + "/downloads/" + packName;
 
-            return poolClient.downloadFiles(remotePaths.toArray(new String[]{}),
+            return gridaPoolClient.downloadFiles(remotePaths.toArray(new String[]{}),
                     localDirPath, user.getEmail());
 
         } catch (DataManagerException ex) {
@@ -324,26 +270,18 @@ public class TransferPoolBusiness {
         }
     }
 
-    /**
-     *
-     * @param user
-     * @param remoteFolder
-     * @return Operation ID
-     * @throws BusinessException
-     */
-    public String downloadFolder(
-        User user, String remoteFolder, Connection connection)
-        throws BusinessException {
+    public String downloadFolder(User user, String remoteFolder)
+            throws BusinessException {
 
         try {
-            lfcBusiness.getModificationDate(user, remoteFolder, connection);
-            GRIDAPoolClient poolClient = CoreUtil.getGRIDAPoolClient();
+            lfcBusiness.getModificationDate(user, remoteFolder);
 
-            String remotePath = DataManagerUtil.parseBaseDir(
-                user, remoteFolder, connection);
+            String remotePath = lfcPathsBusiness.parseBaseDir(
+                user, remoteFolder);
             String localDirPath = serverConfiguration.getDataManagerPath()
                     + "/downloads" + remotePath;
-            return poolClient.downloadFolder(remotePath, localDirPath, user.getEmail());
+            return gridaPoolClient.downloadFolder(
+                    remotePath, localDirPath, user.getEmail());
 
         } catch (DataManagerException ex) {
             throw new BusinessException(ex);
@@ -353,24 +291,12 @@ public class TransferPoolBusiness {
         }
     }
 
-    /**
-     *
-     * @param user
-     * @param localFilePath
-     * @param remoteFile
-     * @return Operation ID
-     * @throws BusinessException
-     */
-    public String uploadFile(
-        User user, String localFilePath, String remoteFile,
-        Connection connection)
-        throws BusinessException {
+    public String uploadFile(User user, String localFilePath, String remoteFile)
+            throws BusinessException {
 
         try {
-            GRIDAPoolClient poolClient = CoreUtil.getGRIDAPoolClient();
-            String remotePath = DataManagerUtil.parseBaseDir(
-                user, remoteFile, connection);
-            return poolClient.uploadFile(localFilePath, remotePath, user.getEmail());
+            String remotePath = lfcPathsBusiness.parseBaseDir(user, remoteFile);
+            return gridaPoolClient.uploadFile(localFilePath, remotePath, user.getEmail());
         } catch (DataManagerException ex) {
             throw new BusinessException(ex);
         } catch (GRIDAClientException ex) {
@@ -380,22 +306,14 @@ public class TransferPoolBusiness {
         }
     }
 
-    /**
-     *
-     * @param user
-     * @param paths
-     * @throws BusinessException
-     */
-    public void delete(User user, Connection connection, String... paths)
+    public void delete(User user, String... paths)
         throws BusinessException {
 
         try {
-            GRIDAPoolClient poolClient = CoreUtil.getGRIDAPoolClient();
 
             for (String path : paths) {
-                String remotePath =
-                    DataManagerUtil.parseBaseDir(user, path, connection);
-                poolClient.delete(remotePath, user.getEmail());
+                String remotePath = lfcPathsBusiness.parseBaseDir(user, path);
+                gridaPoolClient.delete(remotePath, user.getEmail());
             }
         } catch (DataManagerException ex) {
             throw new BusinessException(ex);

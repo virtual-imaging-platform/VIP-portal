@@ -32,13 +32,21 @@
 package fr.insalyon.creatis.vip.application.server.business.simulation.parser;
 
 import fr.insalyon.creatis.vip.application.client.bean.Source;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Service;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
 /**
+ * Parse a scufl file.
+ *
+ * This stores data in fields and this is not threadsafe. So it cannot be used
+ * as a spring singleton and this needs prototype scope.
  *
  * @author Rafael Silva
  */
+@Service
+@Scope("prototype")
 public class ScuflParser extends AbstractWorkflowParser {
 
     @Override
