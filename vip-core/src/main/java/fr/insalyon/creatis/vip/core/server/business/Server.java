@@ -108,7 +108,5 @@ public interface Server {
 
     String getPublicationCommandLine();
 
-    void setMaxPlatformRunningSimulations(int maxPlatformRunningSimulations) throws ConfigurationException;
-
     float getGirderTokenDurationInDays();
 }

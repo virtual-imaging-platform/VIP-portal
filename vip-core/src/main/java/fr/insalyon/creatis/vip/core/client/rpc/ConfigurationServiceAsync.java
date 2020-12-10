@@ -147,10 +147,6 @@ public interface ConfigurationServiceAsync {
 
     void compare(AsyncCallback<Boolean> asyncCallback);
 
-    void getMaxConfiguredPlatformSimulation(AsyncCallback<Integer> asyncCallback);
-
-    void changeMaxConfiguredPlatformSimulation(int maxPlatformRunningSimulations, AsyncCallback<Void> asyncCallback);
-
     // api key management
 
     void getUserApikey(String email, AsyncCallback<String> async);

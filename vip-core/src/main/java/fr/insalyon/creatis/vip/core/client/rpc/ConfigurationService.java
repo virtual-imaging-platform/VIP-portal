@@ -161,10 +161,6 @@ public interface ConfigurationService extends RemoteService {
 
     boolean compare() throws CoreException;
 
-    int getMaxConfiguredPlatformSimulation() throws CoreException;
-
-    void changeMaxConfiguredPlatformSimulation(int maxPlatformRunningSimulations) throws CoreException;
-
     // api key management
 
     String getUserApikey(String email) throws CoreException;

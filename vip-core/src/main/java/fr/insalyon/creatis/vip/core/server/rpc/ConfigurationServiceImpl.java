@@ -712,22 +712,6 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
     }
 
     @Override
-    public int getMaxConfiguredPlatformSimulation() {
-        return server.getMaxPlatformRunningSimulations();
-    }
-
-    @Override
-    public void changeMaxConfiguredPlatformSimulation(int maxPlatformRunningSimulations) throws CoreException {
-        try {
-            server.setMaxPlatformRunningSimulations(maxPlatformRunningSimulations);
-        } catch (ConfigurationException ex) {
-            logger.error("Configuration error changing maxPlatformRunningSimulations to {}",
-                    maxPlatformRunningSimulations, ex);
-            throw new CoreException(ex);
-        }
-    }
-
-    @Override
     public boolean testLastUpdatePublication() throws CoreException {
         try {
             return configurationBusiness.testLastUpdatePublication(
