@@ -10,12 +10,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -111,10 +113,11 @@ public class VipSessionBusiness {
     }
 
     private Map<String, String> getCookies(HttpServletRequest request) {
-        return Stream.of(request.getCookies())
-                .collect(Collectors.toMap(
-                        cookie -> cookie.getName(),
-                        cookie -> decodeCookieValue(cookie.getValue())));
+        HashMap<String,String> cookiesMap = new HashMap<>();
+        for (Cookie cookie : request.getCookies()) {
+            cookiesMap.put(cookie.getName(), decodeCookieValue(cookie.getValue()));
+        }
+        return cookiesMap;
     }
 
     private String decodeCookieValue(String encodedValue) {
