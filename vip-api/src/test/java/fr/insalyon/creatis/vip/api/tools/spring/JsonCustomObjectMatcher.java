@@ -173,9 +173,9 @@ public class JsonCustomObjectMatcher<T> extends TypeSafeDiagnosingMatcher<Map<St
             if (expectedValueType.equals(String.class) || isPrimitiveOrWrapper(expectedValueType)) {
                 if (expectedValue instanceof Long) {
                     Number longExpectedValue = (Long) expectedValue;
-                    Matcher<Integer> integerMatcher =
-                            both(isA(Integer.class)).and(is(longExpectedValue.intValue()));
-                    return anyOf(is(longExpectedValue), integerMatcher);
+                    return anyOf(
+                            is(longExpectedValue),
+                            both(isA(Integer.class)).and(is(longExpectedValue.intValue())));
                 } else {
                     return equalTo(expectedValue);
                 }
@@ -216,14 +216,12 @@ public class JsonCustomObjectMatcher<T> extends TypeSafeDiagnosingMatcher<Map<St
         throw new RuntimeException("cant find supplier for type " + o.getClass().getSimpleName());
     }
 
-    @Factory
     public static <T> Matcher<Map<String,?>> jsonCorrespondsTo(
             T expectedBean,
             Map<String, Function> suppliers) {
         return new JsonCustomObjectMatcher<T>(expectedBean, suppliers);
     }
 
-    @Factory
     public static <T> Matcher<Map<String,?>> jsonCorrespondsTo(
             T expectedBean,
             Map<String, Function> suppliers,

@@ -31,159 +31,75 @@
  */
 package fr.insalyon.creatis.vip.api;
 
-import fr.insalyon.creatis.vip.api.business.ApiContext;
-import fr.insalyon.creatis.vip.api.exception.SQLRuntimeException;
-import fr.insalyon.creatis.vip.application.server.business.*;
-import fr.insalyon.creatis.vip.core.server.business.*;
-import fr.insalyon.creatis.vip.core.server.dao.*;
-import fr.insalyon.creatis.vip.core.server.dao.mysql.PlatformConnection;
-import fr.insalyon.creatis.vip.datamanager.server.business.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.BeanFactory;
+import fr.insalyon.creatis.vip.api.business.VipConfigurer;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.*;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.DependsOn;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.Environment;
+import org.springframework.core.env.MutablePropertySources;
+import org.springframework.core.env.PropertiesPropertySource;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.support.ResourcePropertySource;
 import org.springframework.web.servlet.config.annotation.*;
 
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.util.function.*;
+import java.io.IOException;
+import java.util.Collections;
 
 import static fr.insalyon.creatis.vip.api.CarminProperties.CORS_AUTHORIZED_DOMAINS;
 
 /**
- * Configuration class for spring web.
- *
- * It declares all the business beans from vip-core etc used in vip-api. All are singleton
- * (spring default) except UserDao which is created at each reference by a factory.
- *
- * It enables annotation configuration by subpackage scan.
- *
- * It declares an api conf file which location is configured from the main vip conf file
+ * Configure the spring mvc DispatcherServlet. Few things to do, as the
+ * controllers and dependencies are automatically configured through
+ * scanning.
  *
  * Created by abonnet on 7/13/16.
  */
 @EnableWebMvc
-@ComponentScan
-public class SpringWebConfig extends WebMvcConfigurerAdapter {
+@Configuration
+public class SpringWebConfig implements WebMvcConfigurer {
 
-    private final Logger logger = LoggerFactory.getLogger(getClass());;
-
-    @Autowired
     private Environment env;
+    private VipConfigurer vipConfigurer;
+
     @Autowired
-    private BeanFactory beanFactory;
+    public SpringWebConfig(Environment env, VipConfigurer vipConfigurer) {
+        this.env = env;
+        this.vipConfigurer = vipConfigurer;
+    }
 
     @Override
-    public void configurePathMatch(PathMatchConfigurer matcher) {
+    public void configurePathMatch(PathMatchConfigurer configurer) {
         // Otherwise all that follow a dot in an URL is considered an extension and removed
         // It's a problem for URL like "/pipelines/gate/3.2
-        matcher.setUseSuffixPatternMatch(false);
+        // The below will become the default values in Spring 5.3
+        // Safe to use in 5.2 as long as disabling pattern match
+        configurer.setUseSuffixPatternMatch(false);
     }
 
     @Override
     public void configureContentNegotiation(ContentNegotiationConfigurer configurer) {
         // necessary in the content negotiation stuff of carmin data
-        configurer.favorPathExtension(false);
-    }
-
-    @Bean
-    public Function<Connection, UserDAO> userDaoFactory() {
-        return connection -> {
-            try {
-                return CoreDAOFactory.getDAOFactory().getUserDAO(connection);
-            } catch (DAOException e) {
-                logger.error("error creating user dao bean");
-                throw new RuntimeException("Cannot create user dao", e);
-            }
-        };
+        // this should be the default in Spring 5.3 and may be removed then
+        configurer.useRegisteredExtensionsOnly(true);
+        configurer.replaceMediaTypes(Collections.emptyMap());
     }
 
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
             .allowedMethods("GET", "POST", "PUT", "DELETE", "HEAD")
-            .allowedOrigins(env.getProperty(CORS_AUTHORIZED_DOMAINS, String[].class, new String[0]));
+            .allowedOrigins(env.getRequiredProperty(CORS_AUTHORIZED_DOMAINS, String[].class));
     }
 
-    @Bean
-    @Scope(proxyMode = ScopedProxyMode.TARGET_CLASS, value = "request")
-    public ApiContext apiContext() {
-        return new ApiContext();
+    /*
+     to verify that the proxy ist still valid each day
+     */
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+        registry.addInterceptor(vipConfigurer);
     }
 
-    @Bean
-    public Supplier<Connection> connectionSupplier() {
-        return () -> {
-            try {
-                return PlatformConnection.getInstance().getConnection();
-            } catch (SQLException e) {
-                // Checked exceptions are not supported so use a runtime exception
-                // It will be caught in API controllers as a business exception
-                // so print the stack here
-                logger.error("error getting a connection for spring context", e);
-                throw new SQLRuntimeException(e);
-            }
-        };
-    }
-
-    @Bean
-    public WorkflowBusiness workflowBusiness() {
-        return new WorkflowBusiness();
-    }
-
-    @Bean
-    public ApplicationBusiness applicationBusiness() {
-        return new ApplicationBusiness();
-    }
-
-    @Bean
-    public ClassBusiness classBusiness() {
-        return  new ClassBusiness();
-    }
-
-    @Bean
-    public SimulationBusiness simulationBusiness() {
-        return new SimulationBusiness();
-    }
-
-    @Bean
-    public ConfigurationBusiness configurationBusiness() {
-        return new ConfigurationBusiness();
-    }
-
-    @Bean
-    public TransferPoolBusiness transferPoolBusiness() {
-        return new TransferPoolBusiness();
-    }
-
-    @Bean
-    public LFCBusiness lfcBusiness() {
-        return new LFCBusiness();
-    }
-
-    @Bean
-    public DataManagerBusiness dataManagerBusiness() {
-        return new DataManagerBusiness();
-    }
-
-    @Bean
-    public LFCPermissionBusiness lfcPermissionBusiness() {
-        return new LFCPermissionBusiness();
-    }
-
-    @Bean
-    public ExternalPlatformBusiness externalPlatformBusiness() {
-        return new ExternalPlatformBusiness(
-            new GirderStorageBusiness(
-                apiKeyBusiness()));
-    }
-
-    @Bean
-    public ApiKeyBusiness apiKeyBusiness() {
-        return new ApiKeyBusiness();
-    }
 }

@@ -31,12 +31,13 @@
  */
 package fr.insalyon.creatis.vip.api.rest.itest;
 
-import fr.insalyon.creatis.vip.api.business.ApiException.ApiError;
+import fr.insalyon.creatis.vip.api.exception.ApiException.ApiError;
 import fr.insalyon.creatis.vip.api.tools.spring.ApikeyRequestPostProcessor;
 import fr.insalyon.creatis.vip.api.rest.config.*;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.springframework.http.MediaType;
 
 import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
@@ -77,7 +78,7 @@ public class SpringAuthenticationIT extends BaseVIPSpringIT {
                 .with(ApikeyRequestPostProcessor.apikey("testapikey", "apikeyvalue")))
                 .andDo(print())
                 .andExpect(status().isUnauthorized())
-                .andExpect(content().contentType(RestTestUtils.JSON_CONTENT_TYPE_UTF8))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.errorCode")
                         .value(ApiError.AUTHENTICATION_ERROR.getCode()));
     }
@@ -89,7 +90,7 @@ public class SpringAuthenticationIT extends BaseVIPSpringIT {
                 .with(httpBasic(baseUser1.getEmail(), baseUser1Password)))
                 .andDo(print())
                 .andExpect(status().isUnauthorized())
-                .andExpect(content().contentType(RestTestUtils.JSON_CONTENT_TYPE_UTF8))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.errorCode")
                         .value(ApiError.INSUFFICIENT_AUTH.getCode()));
     }
@@ -101,7 +102,7 @@ public class SpringAuthenticationIT extends BaseVIPSpringIT {
                 .with(ApikeyRequestPostProcessor.apikey("testapikey", "WRONG")))
                 .andDo(print())
                 .andExpect(status().isUnauthorized())
-                .andExpect(content().contentType(RestTestUtils.JSON_CONTENT_TYPE_UTF8))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.errorCode")
                         .value(ApiError.BAD_CREDENTIALS.getCode()));
     }
@@ -112,7 +113,7 @@ public class SpringAuthenticationIT extends BaseVIPSpringIT {
         mockMvc.perform(get("/rest/wrongUrl"))
                 .andDo(print())
                 .andExpect(status().isUnauthorized())
-                .andExpect(content().contentType(RestTestUtils.JSON_CONTENT_TYPE_UTF8))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.errorCode")
                         .value(ApiError.INSUFFICIENT_AUTH.getCode()));
     }

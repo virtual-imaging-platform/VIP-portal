@@ -40,7 +40,7 @@ import java.util.Date;
  */
 public class CoreConstants implements IsSerializable {
 
-    public static final String VERSION = "v1.28";
+    public static final String VERSION = "v2.0";
     // Configuration Labels
     public static final String VO_NAME = "vo.name";
     public static final String VO_ROOT = "vo.root";
@@ -87,7 +87,6 @@ public class CoreConstants implements IsSerializable {
     public static final String LAB_APACHE_SSL_PORT = "apache.ssl.port";
     // Tabs
     public static final String TAB_ACCOUNT = "account_tab";
-    public static final String TAB_PUBLICATION = "publications_tab";
     public static final String TAB_ACTIVATION = "activation_tab";
     public static final String TAB_CONTACT = "contact_tab";
     public static final String TAB_HOME = "home_tab";
@@ -119,7 +118,6 @@ public class CoreConstants implements IsSerializable {
     public static final String ICON_LOADING = IMG_FOLDER + "icon-loading.gif";
     public static final String ICON_LOCK = IMG_FOLDER + "icon-lock.png";
     public static final String ICON_PASSWORD = IMG_FOLDER + "icon-password.png";
-    public static final String ICON_PUBLICATION = IMG_FOLDER + "icon-publication.png";
     public static final String ICON_INFO = IMG_FOLDER + "icon-info.png";
     public static final String ICON_PERSONAL = IMG_FOLDER + "icon-personal.png";
     public static final String ICON_PICKER_QUESTION = IMG_FOLDER + "icon-picker-question.png";
@@ -146,7 +144,6 @@ public class CoreConstants implements IsSerializable {
     public static final String FOLDER_FLAGS = IMG_FOLDER + "flags/";
     // Application Names
     public static final String APP_ACCOUNT = "My Account";
-    public static final String APP_PUBLICATIONS = "Publications";
     public static final String APP_ACCOUNT_MANAGER = "Accounts Type";
     public static final String APP_GROUP = "Groups";
     public static final String APP_TIP = "Tips";
@@ -154,7 +151,6 @@ public class CoreConstants implements IsSerializable {
     public static final String APP_SETTING = "Settings";
     // Application Images
     public static final String APP_IMG_ACCOUNT = IMG_FOLDER + "app-account.png";
-    public static final String APP_IMG_PUBLICATIONS = IMG_FOLDER + "app-articles.png";
     public static final String APP_IMG_ACCOUNT_MANAGER = IMG_FOLDER + "system/app-account.png";
     public static final String APP_IMG_GROUP = IMG_FOLDER + "system/app-group.png";
     public static final String APP_IMG_TIP = IMG_FOLDER + "system/app-tip.png";
@@ -182,16 +178,15 @@ public class CoreConstants implements IsSerializable {
     public static final String SAML_TRUSTED_CERTIFICATE = "saml.trustedcertificate";
     public static final String SAML_ACCOUNT_TYPE = "saml.accounttype";
     //Boutiques
-    public static String APP_CLASS = "boutiques.application.class";
-    public static String APPLICATION_FILES_REPOSITORY = "boutiques.upload.repository";
-    public static String APP_DELETE_FILES_AFTER_UPLOAD = "boutiques.upload.deleteFile";
-    public static String APP_IMPORTER_ROOT_FOLDER = "boutiques.application.rootFolder";
-    public static String APP_REQUIREMENTS = "boutiques.application.requirements";
-    //Publiction
+    public static final String APP_CLASS = "boutiques.application.class";
+    public static final String APPLICATION_FILES_REPOSITORY = "boutiques.upload.repository";
+    public static final String APP_DELETE_FILES_AFTER_UPLOAD = "boutiques.upload.deleteFile";
+    public static final String APP_IMPORTER_ROOT_FOLDER = "boutiques.application.rootFolder";
+    public static final String APP_REQUIREMENTS = "boutiques.application.requirements";
+    //Publication
     public static final String  PUB_MONTHS_UPDATES = "last.publication.update";
     //Zenodo publication
     public static final String PUBLICATION_SYSTEM_COMMAND = "publication.system-command";
-
     // External storage, girder.
     public static final String GIRDER_TOKEN_DURATION_IN_DAYS = "girder.token.duration-in-days";
 

@@ -39,17 +39,16 @@ import fr.insalyon.creatis.vip.application.server.business.*;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.CoreException;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
-import fr.insalyon.creatis.vip.core.server.business.Server;
-import fr.insalyon.creatis.vip.core.server.dao.mysql.PlatformConnection;
+import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
 import fr.insalyon.creatis.vip.core.server.rpc.AbstractRemoteServiceServlet;
 import org.jsoup.Jsoup;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.sql.Connection;
-import java.sql.SQLException;
+import javax.servlet.ServletException;
 import java.util.HashMap;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -58,17 +57,25 @@ import java.util.List;
 public class ApplicationServiceImpl extends AbstractRemoteServiceServlet implements ApplicationService {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
-    private final ClassBusiness classBusiness;
-    private final ApplicationBusiness applicationBusiness;
-    private final EngineBusiness engineBusiness;
-    private final BoutiquesBusiness boutiquesBusiness;
 
-    public ApplicationServiceImpl() {
+    private ClassBusiness classBusiness;
+    private ApplicationBusiness applicationBusiness;
+    private EngineBusiness engineBusiness;
+    private BoutiquesBusiness boutiquesBusiness;
+    private ConfigurationBusiness configurationBusiness;
+    private WorkflowBusiness workflowBusiness;
+    private SimulationBusiness simulationBusiness;
 
-        engineBusiness = new EngineBusiness();
-        classBusiness = new ClassBusiness();
-        applicationBusiness = new ApplicationBusiness();
-        boutiquesBusiness = new BoutiquesBusiness();
+    @Override
+    public void init() throws ServletException {
+        super.init();
+        engineBusiness = getBean(EngineBusiness.class);
+        classBusiness = getBean(ClassBusiness.class);
+        applicationBusiness = getBean(ApplicationBusiness.class);
+        boutiquesBusiness = getBean(BoutiquesBusiness.class);
+        configurationBusiness = getBean(ConfigurationBusiness.class);
+        workflowBusiness = getBean(WorkflowBusiness.class);
+        simulationBusiness = getBean(SimulationBusiness.class);
     }
 
     @Override
@@ -80,29 +87,26 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
     @Override
     public void add(Application application) throws ApplicationException {
 
-        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
+        try {
             if (isSystemAdministrator() || isGroupAdministrator()) {
                 trace(logger, "Adding application '" + application.getName() + "'.");
                 application.setOwner(getSessionUser().getEmail());
-                applicationBusiness.add(application, connection);
+                applicationBusiness.add(application);
             } else {
                 logger.error("Unauthorized to add application {}", application.getName());
                 throw new ApplicationException("You have no administrator rights.");
             }
         } catch (BusinessException | CoreException ex) {
             throw new ApplicationException(ex);
-        } catch (SQLException ex) {
-            logger.error("Error handling a connection", ex);
-            throw new ApplicationException(ex);
         }
     }
 
     @Override
     public void update(Application application) throws ApplicationException {
-        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
+        try {
             if (isSystemAdministrator() || isGroupAdministrator()) {
                 trace(logger, "Updating application '" + application.getName() + "'.");
-                applicationBusiness.update(application, connection);
+                applicationBusiness.update(application);
 
             } else {
                 logger.error("Unauthorized to update application {}", application.getName());
@@ -110,38 +114,32 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
             }
         } catch (BusinessException | CoreException ex) {
             throw new ApplicationException(ex);
-        } catch (SQLException ex) {
-            logger.error("Error handling a connection", ex);
-            throw new ApplicationException(ex);
         }
     }
 
     @Override
     public void remove(String name) throws ApplicationException {
-        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
+        try {
             if (isSystemAdministrator()) {
                 trace(logger, "Removing application '" + name + "'.");
-                applicationBusiness.remove(name, connection);
+                applicationBusiness.remove(name);
 
             } else {
                 trace(logger, "Removing classes from application '" + name + "'.");
                 applicationBusiness.remove(
-                    getSessionUser().getEmail(), name, connection);
+                    getSessionUser().getEmail(), name);
             }
         } catch (BusinessException | CoreException ex) {
-            throw new ApplicationException(ex);
-        } catch (SQLException ex) {
-            logger.error("Error handling a connection", ex);
             throw new ApplicationException(ex);
         }
     }
 
     @Override
     public void addVersion(AppVersion version) throws ApplicationException {
-        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
+        try {
             if (isSystemAdministrator() || isGroupAdministrator()) {
                 trace(logger, "Adding version '" + version.getVersion() + "' ('" + version.getApplicationName() + "').");
-                applicationBusiness.addVersion(version, connection);
+                applicationBusiness.addVersion(version);
             } else {
                 logger.error("Unauthorized to add version {} to {}",
                         version.getVersion(), version.getApplicationName());
@@ -149,19 +147,16 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
             }
         } catch (BusinessException | CoreException ex) {
             throw new ApplicationException(ex);
-        } catch (SQLException ex) {
-            logger.error("Error handling a connection", ex);
-            throw new ApplicationException(ex);
         }
     }
 
     @Override
     public void updateVersion(AppVersion version) throws ApplicationException {
-        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
+        try {
             if (isSystemAdministrator() || isGroupAdministrator()) {
                 trace(logger, "Updating version '" + version.getVersion() + "' ('" + version.getApplicationName() + "').");
 
-                applicationBusiness.updateVersion(version, connection);
+                applicationBusiness.updateVersion(version);
             } else {
                 logger.error("Unauthorized to update version {}/{}",
                         version.getApplicationName(), version.getVersion());
@@ -169,19 +164,16 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
             }
         } catch (BusinessException | CoreException ex) {
             throw new ApplicationException(ex);
-        } catch (SQLException ex) {
-            logger.error("Error handling a connection", ex);
-            throw new ApplicationException(ex);
         }
     }
 
     @Override
     public void removeVersion(String applicationName, String version) throws ApplicationException {
-        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
+        try {
             if (isSystemAdministrator() || isGroupAdministrator()) {
                 trace(logger, "Removing application '" + applicationName + "'.");
                 applicationBusiness.removeVersion(
-                    applicationName, version, connection);
+                    applicationName, version);
             } else {
                 logger.error("Unauthorized to remove version {}/{}",
                         applicationName, version);
@@ -189,19 +181,16 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
             }
         } catch (BusinessException | CoreException ex) {
             throw new ApplicationException(ex);
-        } catch (SQLException ex) {
-            logger.error("Error handling a connection", ex);
-            throw new ApplicationException(ex);
         }
     }
 
     @Override
     public String publishVersion(String applicationName, String version) throws ApplicationException {
-        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
+        try {
             if (isSystemAdministrator() || isGroupAdministrator()) {
                 trace(logger, "Publishing version " + version + "' ('" + applicationName + "').");
                 return boutiquesBusiness.publishVersion(
-                    getSessionUser(), applicationName, version, connection);
+                    getSessionUser(), applicationName, version);
             } else {
                 logger.error("Unauthorized to publish version {}/{}",
                         applicationName, version);
@@ -209,166 +198,132 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
             }
         } catch (BusinessException | CoreException ex) {
             throw new ApplicationException(ex);
-        } catch (SQLException ex) {
-            logger.error("Error handling a connection", ex);
-            throw new ApplicationException(ex);
         }
     }
 
     @Override
     public List<Application> getApplications() throws ApplicationException {
-        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
+        try {
             if (isSystemAdministrator()) {
-                return applicationBusiness.getApplications(connection);
+                return applicationBusiness.getApplications();
             } else if (isGroupAdministrator()) {
                 List<String> classes = classBusiness.getUserClassesName(
-                    getSessionUser().getEmail(), true, connection);
-                return applicationBusiness.getApplications(classes, connection);
+                    getSessionUser().getEmail(), true);
+                return applicationBusiness.getApplications(classes);
             }
-            logger.error("Unauthorized to get all applications");
-            throw new ApplicationException("You have no administrator rights.");
+            List<AppClass> classes = classBusiness.getUserClasses(
+                    getSessionUser().getEmail(), false);
+            List<String> classNames = classes.stream().map(AppClass::getName).collect(Collectors.toList());
+            return applicationBusiness.getApplications(classNames);
         } catch (BusinessException | CoreException ex) {
-            throw new ApplicationException(ex);
-        } catch (SQLException ex) {
-            logger.error("Error handling a connection", ex);
             throw new ApplicationException(ex);
         }
     }
 
     @Override
     public List<String[]> getApplications(String className) throws ApplicationException {
-        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
-            return applicationBusiness.getApplications(className, connection);
+        try {
+            return applicationBusiness.getApplications(className);
         } catch (BusinessException ex) {
-            throw new ApplicationException(ex);
-        } catch (SQLException ex) {
-            logger.error("Error handling a connection", ex);
             throw new ApplicationException(ex);
         }
     }
 
-    /**
-     *
-     * @param applicationClass
-     * @return
-     * @throws ApplicationException
-     */
     @Override
     public List<String[]> getApplicationsByClass(String applicationClass) throws ApplicationException {
-        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
+        try {
             return applicationBusiness.getApplications(
-                applicationClass, connection);
+                applicationClass);
         } catch (BusinessException ex) {
             throw new ApplicationException(ex);
-        } catch (SQLException ex) {
-            logger.error("Error handling a connection", ex);
-            throw new ApplicationException(ex);
         }
     }
 
+    @Override
     public void addClass(AppClass c) throws ApplicationException {
-        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
+        try {
             authenticateSystemAdministrator(logger);
             trace(logger, "Adding class '" + c.getName() + "'.");
-            classBusiness.addClass(c, connection);
+            classBusiness.addClass(c);
         } catch (BusinessException | CoreException ex) {
-            throw new ApplicationException(ex);
-        } catch (SQLException ex) {
-            logger.error("Error handling a connection", ex);
             throw new ApplicationException(ex);
         }
     }
 
+    @Override
     public void updateClass(AppClass c) throws ApplicationException {
-        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
+        try {
             authenticateSystemAdministrator(logger);
             trace(logger, "Updating class '" + c.getName() + "'.");
-            classBusiness.updateClass(c, connection);
+            classBusiness.updateClass(c);
         } catch (BusinessException | CoreException ex) {
-            throw new ApplicationException(ex);
-        } catch (SQLException ex) {
-            logger.error("Error handling a connection", ex);
             throw new ApplicationException(ex);
         }
     }
 
     @Override
     public void removeClass(String name) throws ApplicationException {
-        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
+        try {
             authenticateSystemAdministrator(logger);
             trace(logger, "Removing class '" + name + "'.");
-            classBusiness.removeClass(name, connection);
+            classBusiness.removeClass(name);
         } catch (BusinessException | CoreException ex) {
-            throw new ApplicationException(ex);
-        } catch (SQLException ex) {
-            logger.error("Error handling a connection", ex);
             throw new ApplicationException(ex);
         }
     }
 
     @Override
     public List<AppClass> getClasses() throws ApplicationException {
-        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
+        try {
             if (isSystemAdministrator()) {
-                return classBusiness.getClasses(connection);
+                return classBusiness.getClasses();
             }
             return classBusiness.getUserClasses(
-                getSessionUser().getEmail(), false, connection);
+                getSessionUser().getEmail(), false);
         } catch (BusinessException | CoreException ex) {
-            throw new ApplicationException(ex);
-        } catch (SQLException ex) {
-            logger.error("Error handling a connection", ex);
             throw new ApplicationException(ex);
         }
     }
 
     @SuppressWarnings("unchecked")
+    @Override
     public List<String>[] getApplicationsAndUsers(List<String> reservedClasses) throws ApplicationException {
-        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
+        try {
             User user = getSessionUser();
             if (isSystemAdministrator()) {
-                List<String> classes = classBusiness.getClassesName(connection);
+                List<String> classes = classBusiness.getClassesName();
                 return new List[]{
                     configurationBusiness.getUserNames(
-                        user.getEmail(), false, connection),
-                    applicationBusiness.getApplicationNames(connection),
+                        user.getEmail(), false),
+                    applicationBusiness.getApplicationNames(),
                     classes
                 };
             } else {
                 List<String> classes = classBusiness.getUserClassesName(
-                    user.getEmail(), !user.isSystemAdministrator(), connection);
+                    user.getEmail(), !user.isSystemAdministrator());
                 classes.removeAll(reservedClasses);
                 return new List[] {
                     configurationBusiness.getUserNames(
-                        user.getEmail(), true, connection),
-                    applicationBusiness.getApplicationNames(classes, connection),
+                        user.getEmail(), true),
+                    applicationBusiness.getApplicationNames(classes),
                     classes
                 };
             }
         } catch (BusinessException | CoreException ex) {
             throw new ApplicationException(ex);
-        } catch (SQLException ex) {
-            logger.error("Error handling a connection", ex);
-            throw new ApplicationException(ex);
         }
     }
 
-    /**
-     *
-     * @return @throws ApplicationException
-     */
     @Override
     public ApplicationStatus getApplicationStatus() throws ApplicationException {
 
         try {
-            WorkflowBusiness workflowBusiness = new WorkflowBusiness();
             List<Simulation> runningSimulations = workflowBusiness.getRunningSimulations();
 
             ApplicationStatus status = new ApplicationStatus();
             status.setRunningWorkflows(runningSimulations.size());
 
-            SimulationBusiness jobBusiness = new SimulationBusiness();
-            int[] tasks = jobBusiness.getNumberOfActiveTasks(runningSimulations);
+            int[] tasks = simulationBusiness.getNumberOfActiveTasks(runningSimulations);
             status.setRunningTasks(tasks[0]);
             status.setWaitingTasks(tasks[1]);
 
@@ -379,121 +334,72 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
         }
     }
 
-    /**
-     *
-     * @param applicationName
-     * @return
-     * @throws ApplicationException
-     */
     @Override
     public String getCitation(String applicationName) throws ApplicationException {
-        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
+        try {
             String citationWithoutHtml = Jsoup
                 .parse(applicationBusiness.getCitation(
-                           applicationName, connection))
+                           applicationName))
                 .text();
             if (citationWithoutHtml.isEmpty() || citationWithoutHtml == null) {
                 return null;
             } else {
                 return applicationBusiness.getCitation(
-                    applicationName, connection);
+                    applicationName);
             }
         } catch (BusinessException ex) {
             throw new ApplicationException(ex);
-        } catch (SQLException ex) {
-            logger.error("Error handling a connection", ex);
-            throw new ApplicationException(ex);
         }
     }
 
-    /**
-     *
-     * @param applicationName
-     * @return
-     * @throws ApplicationException
-     */
     @Override
     public List<AppVersion> getVersions(String applicationName) throws ApplicationException {
-        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
-            return applicationBusiness.getVersions(applicationName, connection);
+        try {
+            return applicationBusiness.getVersions(applicationName);
         } catch (BusinessException ex) {
             throw new ApplicationException(ex);
-        } catch (SQLException ex) {
-            logger.error("Error handling a connection", ex);
-            throw new ApplicationException(ex);
         }
     }
 
-    /**
-     *
-     * @param engine
-     * @throws ApplicationException
-     */
     @Override
     public void addEngine(Engine engine) throws ApplicationException {
-        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
+        try {
             authenticateSystemAdministrator(logger);
             trace(logger, "Adding engine '" + engine.getName() + "'.");
-            engineBusiness.add(engine, connection);
+            engineBusiness.add(engine);
         } catch (BusinessException | CoreException ex) {
-            throw new ApplicationException(ex);
-        } catch (SQLException ex) {
-            logger.error("Error handling a connection", ex);
             throw new ApplicationException(ex);
         }
     }
 
-    /**
-     *
-     * @param engine
-     * @throws ApplicationException
-     */
     @Override
     public void updateEngine(Engine engine) throws ApplicationException {
-        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
+        try {
             authenticateSystemAdministrator(logger);
             trace(logger, "Updating engine '" + engine.getName() + "'.");
-            engineBusiness.update(engine, connection);
+            engineBusiness.update(engine);
         } catch (BusinessException | CoreException ex) {
-            throw new ApplicationException(ex);
-        } catch (SQLException ex) {
-            logger.error("Error handling a connection", ex);
             throw new ApplicationException(ex);
         }
     }
 
-    /**
-     *
-     * @param engineName
-     * @throws ApplicationException
-     */
     @Override
     public void removeEngine(String engineName) throws ApplicationException {
-        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
+        try {
             authenticateSystemAdministrator(logger);
             trace(logger, "Removing engine '" + engineName + "'.");
-            engineBusiness.remove(engineName, connection);
+            engineBusiness.remove(engineName);
         } catch (BusinessException | CoreException ex) {
-            throw new ApplicationException(ex);
-        } catch (SQLException ex) {
-            logger.error("Error handling a connection", ex);
             throw new ApplicationException(ex);
         }
     }
 
-    /**
-     *
-     * @return @throws ApplicationException
-     */
     @Override
     public List<Engine> getEngines() throws ApplicationException {
-        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
+        try {
             authenticateSystemAdministrator(logger);
-            return engineBusiness.get(connection);
+            return engineBusiness.get();
         } catch (BusinessException | CoreException ex) {
-            throw new ApplicationException(ex);
-        } catch (SQLException ex) {
-            logger.error("Error handling a connection", ex);
             throw new ApplicationException(ex);
         }
     }
@@ -501,18 +407,15 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
     @Override
     public HashMap<String, Integer> getReservedClasses()
         throws ApplicationException {
-        return Server.getInstance().getReservedClasses();
+        return server.getReservedClasses();
     }
 
     @Override
     public AppVersion getVersion(String applicationName, String applicationVersion) throws ApplicationException {
-        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
+        try {
             return applicationBusiness.getVersion(
-                applicationName, applicationVersion, connection);
+                applicationName, applicationVersion);
         } catch (BusinessException ex) {
-            throw new ApplicationException(ex);
-        } catch (SQLException ex) {
-            logger.error("Error handling a connection", ex);
             throw new ApplicationException(ex);
         }
     }

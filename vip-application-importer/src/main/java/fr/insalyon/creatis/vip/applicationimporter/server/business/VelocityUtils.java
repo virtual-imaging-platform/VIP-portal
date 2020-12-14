@@ -40,23 +40,16 @@ import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
 import org.apache.velocity.tools.generic.EscapeTool;
+import org.springframework.stereotype.Service;
 
 /**
  *
  * @author Tristan Glatard
  */
+@Service
 public class VelocityUtils {
 
-    private static VelocityUtils instance;
-
     private VelocityEngine velocityEngine;
-
-    public static VelocityUtils getInstance() {
-        if (instance == null) {
-            instance = new VelocityUtils();
-        }
-        return instance;
-    }
 
     private VelocityUtils() {
         velocityEngine = new VelocityEngine();

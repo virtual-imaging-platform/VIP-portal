@@ -230,10 +230,13 @@ public class LaunchFormLayout extends AbstractFormLayout {
 
         asls.stream().forEach(
             asl -> {
+                String newValue = valuesMap.get(asl.getName());
                 if (asl.isOptional()) {
+                    if (ApplicationConstants.INPUT_WITHOUT_VALUE.equalsIgnoreCase(newValue)) {
+                        return;
+                    }
                     asl.enableInput();
                 }
-                String newValue = valuesMap.get(asl.getName());
                 asl.setValue(newValue);
             });
     }

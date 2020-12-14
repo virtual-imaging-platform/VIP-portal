@@ -47,7 +47,6 @@ public interface CarminProperties {
     String DEFAULT_LIMIT_LIST_EXECUTION = "carmin.platform.default_limit_list_execution";
     String UNSUPPORTED_METHODS = "carmin.platform.unsupported_methods";
     String SUPPORTED_API_VERSION = "carmin.platform.supported_API_Version";
-    String PLATFORM_ERROR_CODES_AND_MESSAGES = "carmin.platform.error_codes_and_message";
 
     // CARMIN auth
 
@@ -61,10 +60,12 @@ public interface CarminProperties {
     String API_DOWNLOAD_RETRY_IN_SECONDS = "carmin.data.download.retry";
     String API_DOWNLOAD_TIMEOUT_IN_SECONDS = "carmin.data.download.timeout";
     String API_DATA_TRANSFERT_MAX_SIZE = "carmin.data.max_size";
-    String API_DATA_DOWNLOAD_RELATIVE_PATH = "carmin.data.path.download";
 
     // CARMIN PROCESSING
 
     String API_PIPELINE_WHITE_LIST = "carmin.processing.pipelines.whitelist";
     String ADDITIONNAL_INPUT_VALID_CHARS = "\\[\\]"; // will be use in regex, so brackets must be escaped
+
+    // NON-CARMIN : STATISTICS
+    String STATS_DATE_FORMAT = "dd-MM-yyyy HH:mm:ss";
 }

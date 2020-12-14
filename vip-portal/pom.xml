@@ -134,6 +134,20 @@ knowledge of the CeCILL-B license and that you accept its terms.
 
         <dependency>
             <groupId>fr.insalyon.creatis</groupId>
+            <artifactId>vip-publication</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>fr.insalyon.creatis</groupId>
+            <artifactId>vip-publication</artifactId>
+            <type>jar</type>
+            <version>${project.version}</version>
+            <classifier>sources</classifier>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>fr.insalyon.creatis</groupId>
             <artifactId>vip-social</artifactId>
             <version>${project.version}</version>
         </dependency>
@@ -152,6 +166,14 @@ knowledge of the CeCILL-B license and that you accept its terms.
             <version>${project.version}</version>
         </dependency>
 
+        <!-- vip-local is a dependency but is not included in the default producion war
+        See the war plugin configuration-->
+        <dependency>
+            <groupId>fr.insalyon.creatis</groupId>
+            <artifactId>vip-local</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
         <dependency>
           <groupId>fr.insalyon.creatis</groupId>
           <artifactId>vip-visualization</artifactId>
@@ -165,13 +187,18 @@ knowledge of the CeCILL-B license and that you accept its terms.
           <classifier>sources</classifier>
           <scope>provided</scope>
         </dependency>
-        
         <!-- END VIP MODULES -->
 
-        <dependency>
+        <!--dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
             <version>5.1.23</version>
+            <scope>runtime</scope>
+        </dependency-->
+        <dependency>
+            <groupId>org.mariadb.jdbc</groupId>
+            <artifactId>mariadb-java-client</artifactId>
+            <version>2.1.2</version>
             <scope>runtime</scope>
         </dependency>
 
@@ -204,47 +231,75 @@ knowledge of the CeCILL-B license and that you accept its terms.
             <scope>provided</scope>
         </dependency>
 
-
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>jcl-over-slf4j</artifactId>
-            <scope>runtime</scope>
-        </dependency>
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
             <scope>runtime</scope>
+        </dependency>
+        
+        <!-- test dependencies -->
+        <dependency>
+            <groupId>fr.insalyon.creatis</groupId>
+            <artifactId>vip-core</artifactId>
+            <version>${project.version}</version>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>fr.insalyon.creatis</groupId>
+            <artifactId>vip-application</artifactId>
+            <version>${project.version}</version>
+            <type>test-jar</type>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 
     <build>
         <plugins>
             <plugin>
-              <groupId>net.ltgt.gwt.maven</groupId>
-              <artifactId>gwt-maven-plugin</artifactId>
-              <version>1.0.0</version>
-              <extensions>true</extensions>
-              <executions>
-                <execution>
-                  <id>compile-to-javascript</id>
-                  <configuration>
-                      <moduleName>fr.insalyon.creatis.vip.portal.Main</moduleName>
-                      <jvmArgs>-Xms512m</jvmArgs>
-                      <jvmArgs>-Xmx1024m</jvmArgs>
-                  </configuration>
-                  <goals>
-                    <goal>compile</goal>
-                  </goals>
-                </execution>
-              </executions>
+                <groupId>net.ltgt.gwt.maven</groupId>
+                <artifactId>gwt-maven-plugin</artifactId>
+                <version>1.0.0</version>
+                <extensions>true</extensions>
+                <executions>
+                    <execution>
+                        <id>compile-to-javascript</id>
+                        <configuration>
+                            <moduleName>fr.insalyon.creatis.vip.portal.Main</moduleName>
+                            <jvmArgs>-Xms512m</jvmArgs>
+                            <jvmArgs>-Xmx1024m</jvmArgs>
+                        </configuration>
+                        <goals>
+                            <goal>compile</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
 
             <plugin>
-              <artifactId>maven-war-plugin</artifactId>
-              <version>3.2.3</version>
-              <configuration>
-                <packagingExcludes>WEB-INF/lib/*-sources.jar</packagingExcludes>
-              </configuration>
+                <artifactId>maven-war-plugin</artifactId>
+                <version>3.2.3</version>
+                <executions>
+                    <execution>
+                        <!-- This is the default plugin execution, building the main artefact, the production war.
+                        vip-local is removed from it as it is only needed for local and testing use-->
+                        <id>default-war</id>
+                        <goals><goal>war</goal></goals>
+                        <configuration>
+                            <packagingExcludes>WEB-INF/lib/vip-local-*.jar,WEB-INF/lib/*-sources.jar</packagingExcludes>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <!-- An additional war is produced, with the local classifier.
+                        The only difference is the inclusion of vip-local-->
+                        <id>local</id>
+                        <goals><goal>war</goal></goals>
+                        <configuration>
+                            <classifier>local</classifier>
+                            <packagingExcludes>WEB-INF/lib/*-sources.jar</packagingExcludes>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>

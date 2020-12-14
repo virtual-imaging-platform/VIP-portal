@@ -36,9 +36,16 @@ import fr.insalyon.creatis.grida.common.bean.Operation;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.server.business.CoreUtil;
+import fr.insalyon.creatis.vip.core.server.business.Server;
+import fr.insalyon.creatis.vip.datamanager.server.business.DataManagerBusiness;
+import fr.insalyon.creatis.vip.datamanager.server.business.LFCBusiness;
+import fr.insalyon.creatis.vip.datamanager.server.business.LfcPathsBusiness;
+import fr.insalyon.creatis.vip.datamanager.server.business.TransferPoolBusiness;
 import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -58,6 +65,16 @@ public class FileDownloadServiceImpl extends HttpServlet {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
+    private GRIDAPoolClient gridaPoolClient;
+
+    @Override
+    public void init() throws ServletException {
+        super.init();
+        ApplicationContext applicationContext =
+                WebApplicationContextUtils.findWebApplicationContext(getServletContext());
+        gridaPoolClient = applicationContext.getBean(GRIDAPoolClient.class);
+    }
+
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException {
@@ -68,8 +85,7 @@ public class FileDownloadServiceImpl extends HttpServlet {
 
             if (user != null && operationId != null && !operationId.isEmpty()) {
 
-                    GRIDAPoolClient client = CoreUtil.getGRIDAPoolClient();
-                    Operation operation = client.getOperationById(operationId);
+                    Operation operation = gridaPoolClient.getOperationById(operationId);
 
                     File file = new File(operation.getDest());
                     if (file.isDirectory()) {

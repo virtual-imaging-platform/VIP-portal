@@ -41,8 +41,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import fr.insalyon.creatis.vip.datamanager.server.business.LfcPathsBusiness;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -51,34 +57,43 @@ import org.xml.sax.helpers.DefaultHandler;
 import org.xml.sax.helpers.XMLReaderFactory;
 
 /**
+ * Parse a m2 input file.
+ *
+ * This stores data in fields and this is not threadsafe. So it cannot be used
+ * as a spring singleton and this needs prototype scope.
  *
  * @author Rafael Silva
  */
+@Service
+@Scope("prototype")
 public class InputM2Parser extends DefaultHandler {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    private XMLReader reader;
     private Map<String, String> inputs;
     private String name;
     private List<String> values;
     private boolean parsingItem;
     private String currentUserFolder;
-    private Connection connection;
 
-    public InputM2Parser(String currentUserFolder, Connection connection) {
+    private LfcPathsBusiness lfcPathsBusiness;
 
+    @Autowired
+    public final void setLfcPathsBusiness(LfcPathsBusiness lfcPathsBusiness) {
+        this.lfcPathsBusiness = lfcPathsBusiness;
+    }
+
+    public InputM2Parser(String currentUserFolder) {
         this.inputs = new HashMap<String, String>();
         this.parsingItem = false;
         this.currentUserFolder = currentUserFolder;
-        this.connection = connection;
     }
 
     public Map<String, String> parse(String fileName)
             throws BusinessException {
 
         try {
-            reader = XMLReaderFactory.createXMLReader();
+            XMLReader reader = XMLReaderFactory.createXMLReader();
             reader.setContentHandler(this);
             reader.parse(new InputSource(new FileReader(fileName)));
 
@@ -113,8 +128,8 @@ public class InputM2Parser extends DefaultHandler {
             if (values.size() == 1) {
                 String path = values.get(0);
                 try {
-                    path = DataManagerUtil.parseRealDir(
-                        path, currentUserFolder, connection);
+                    path = lfcPathsBusiness.parseRealDir(
+                            path, currentUserFolder);
                 } catch (DataManagerException ex) {
                     // do nothing
                 }
@@ -160,8 +175,8 @@ public class InputM2Parser extends DefaultHandler {
                             sb.append("; ");
                         }
                         try {
-                            v = DataManagerUtil.parseRealDir(
-                                v, currentUserFolder, connection);
+                            v = lfcPathsBusiness.parseRealDir(
+                                v, currentUserFolder);
                         } catch (DataManagerException ex) {
                             // do nothing
                         }

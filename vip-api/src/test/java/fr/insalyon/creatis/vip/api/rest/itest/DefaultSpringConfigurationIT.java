@@ -31,28 +31,26 @@
  */
 package fr.insalyon.creatis.vip.api.rest.itest;
 
-import fr.insalyon.creatis.vip.api.*;
-import fr.insalyon.creatis.vip.api.bean.Module;
-import fr.insalyon.creatis.vip.api.business.ApiException;
-import fr.insalyon.creatis.vip.api.rest.controller.PlatformController;
-import fr.insalyon.creatis.vip.api.rest.model.SupportedTransferProtocol;
+import fr.insalyon.creatis.vip.api.SpringWebConfig;
+import fr.insalyon.creatis.vip.api.business.VipConfigurer;
+import fr.insalyon.creatis.vip.api.exception.ApiException;
+import fr.insalyon.creatis.vip.api.rest.config.BaseVIPSpringIT;
+import fr.insalyon.creatis.vip.api.controller.PlatformController;
 import fr.insalyon.creatis.vip.application.server.business.WorkflowBusiness;
-import org.junit.*;
-import org.junit.contrib.java.lang.system.EnvironmentVariables;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.*;
-import org.springframework.core.env.Environment;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.test.context.web.WebAppConfiguration;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
+import org.springframework.test.context.junit.jupiter.web.SpringJUnitWebConfig;
 import org.springframework.util.Assert;
 
-import java.net.URISyntaxException;
 import java.nio.file.Paths;
+import java.util.Collections;
 
-import static fr.insalyon.creatis.vip.api.CarminProperties.*;
+import static org.mockito.ArgumentMatchers.any;
 
 /**
  * Created by abonnet on 7/21/16.
@@ -63,9 +61,7 @@ import static fr.insalyon.creatis.vip.api.CarminProperties.*;
  * environment.
  *
  */
-@RunWith(SpringRunner.class)
-@WebAppConfiguration
-@ContextConfiguration(initializers = ApiPropertiesInitializer.class)
+@SpringJUnitWebConfig
 public class DefaultSpringConfigurationIT {
 
     // Need to override vipConfigurer that operate on the database
@@ -74,7 +70,9 @@ public class DefaultSpringConfigurationIT {
     static class TestConfig {
         @Bean
         public VipConfigurer vipConfigurer() {
-            return Mockito.mock(VipConfigurer.class);
+            VipConfigurer mock = Mockito.mock(VipConfigurer.class);
+            Mockito.when(mock.preHandle(any(), any(), any())).thenReturn(true);
+            return mock;
         }
 
         @Bean
@@ -84,24 +82,19 @@ public class DefaultSpringConfigurationIT {
     }
 
     @Autowired
-    private Environment env;
-
-    @Autowired
     private PlatformController platformController;
 
-    @ClassRule
-    public static final EnvironmentVariables environmentVariables = new EnvironmentVariables();
+    @BeforeAll
+    public static void setup() throws Exception {
 
-    @BeforeClass
-    public static void setup() throws URISyntaxException {
         String fakeHomePath = Paths.get(ClassLoader.getSystemResource("TestHome").toURI())
                 .toAbsolutePath().toString();
-        environmentVariables.set("HOME", fakeHomePath);
+        BaseVIPSpringIT.setEnv(Collections.singletonMap("HOME", fakeHomePath));
     }
 
     @Test
     public void propertiesShouldBePresent() throws ApiException {
         // test that the platform properties generation does not throw any exception
-        Assert.notNull(platformController.getPlatformProperties());
+        Assert.notNull(platformController.getPlatformProperties(), "platform properties should be present");
     }
 }

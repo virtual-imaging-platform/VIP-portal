@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<inputdata>
+	<source name="file"  type="String">
+<array>
+		<item><tag name="Group" value="0"/>/test/prefix/vip/data/test_groups/test_group_1/inputs/input_test_1.txt</item>
+</array>
+	</source>
+	<source name="text"  type="String">
+<array>
+		<item><tag name="Group" value="0"/>mi</item>
+</array>
+	</source>
+	<source name="results-directory"  type="String">
+<array>
+		<item><tag name="Group" value="0"/>/test/prefix/vip/data/test_users/test_user_1/output</item>
+</array>
+	</source>
+</inputdata>

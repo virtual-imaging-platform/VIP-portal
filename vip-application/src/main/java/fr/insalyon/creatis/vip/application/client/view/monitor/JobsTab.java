@@ -67,6 +67,11 @@ public class JobsTab extends AbstractCornerTab {
     }
 
     @Override
+    public void destroy() {
+        jobsLayout.destroy();
+    }
+
+    @Override
     public void update() {
         jobsLayout.update();
     }

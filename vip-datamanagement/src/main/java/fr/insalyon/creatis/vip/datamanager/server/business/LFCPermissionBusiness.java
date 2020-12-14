@@ -37,11 +37,12 @@ import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.datamanager.client.bean.*;
 import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerException;
 import fr.insalyon.creatis.vip.datamanager.server.DataManagerUtil;
-import fr.insalyon.creatis.vip.datamanager.server.business.LFCPermissionBusiness.LFCAccessType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.sql.Connection;
 import java.util.*;
 
 import static fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants.*;
@@ -49,20 +50,27 @@ import static fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants.*;
 /**
  * Created by abonnet on 5/24/17.
  */
+@Service
+@Transactional
 public class LFCPermissionBusiness {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
+
+    private DataManagerBusiness dataManagerBusiness;
+    private LfcPathsBusiness lfcPathsBusiness;
+
+    @Autowired
+    public LFCPermissionBusiness(DataManagerBusiness dataManagerBusiness, LfcPathsBusiness lfcPathsBusiness) {
+        this.dataManagerBusiness = dataManagerBusiness;
+        this.lfcPathsBusiness = lfcPathsBusiness;
+    }
 
     public enum LFCAccessType {
         READ, UPLOAD, DELETE
     }
 
-    public void checkPermission(
-        User user,
-        String path,
-        LFCAccessType LFCAccessType,
-        Connection connection)
-        throws BusinessException {
+    public void checkPermission(User user, String path, LFCAccessType LFCAccessType)
+            throws BusinessException {
         // TODO : verify there is no problem with ".." (normalize if its the case)
         checkRootPermission(path, LFCAccessType);
         // Root is always filtered so always permited
@@ -85,7 +93,7 @@ public class LFCPermissionBusiness {
         String groupName = firstDir.substring(0,firstDir.length()-GROUP_APPEND.length());
         checkGroupPermission(user, groupName, LFCAccessType);
         if (LFCAccessType == LFCPermissionBusiness.LFCAccessType.DELETE) {
-            checkAdditionalDeletePermission(user, path, connection);
+            checkAdditionalDeletePermission(user, path);
         }
         // all check passed : all good !
     }
@@ -100,7 +108,9 @@ public class LFCPermissionBusiness {
         }
     }
 
-    private void checkRootPermission(String path, LFCAccessType LFCAccessType) throws BusinessException {
+    private void checkRootPermission(
+            String path, LFCAccessType LFCAccessType)
+            throws BusinessException {
         // verify path begins with the root
         if (!path.startsWith(ROOT)) {
             logger.error("Access to a lfc not starting with the root:" + path);
@@ -116,7 +126,9 @@ public class LFCPermissionBusiness {
         }
     }
 
-    private void checkGroupPermission(User user, String groupname, LFCAccessType LFCAccessType) throws BusinessException {
+    private void checkGroupPermission(
+            User user, String groupname, LFCAccessType LFCAccessType)
+            throws BusinessException {
         // beginner cant write/delete in groups folder
         if (LFCAccessType != LFCPermissionBusiness.LFCAccessType.READ && user.getLevel() == UserLevel.Beginner) {
             logger.error("beginner user try to upload/delete in a group:" + user.getEmail() +"/" + groupname);
@@ -129,21 +141,19 @@ public class LFCPermissionBusiness {
         }
     }
 
-    private void checkAdditionalDeletePermission(
-        User user, String path, Connection connection)
-        throws BusinessException {
-        checkSynchronizedDirectories(user, path, connection);
+    private void checkAdditionalDeletePermission(User user, String path)
+            throws BusinessException {
+        checkSynchronizedDirectories(user, path);
         if(path.endsWith("Dropbox")){
             logger.error("Trying to delete a dropbox directory :" + path);
             throw new BusinessException("Unauthorized LFC access");
         }
     }
 
-    private void checkSynchronizedDirectories(
-        User user, String path, Connection connection)
-        throws BusinessException {
-        List<SSH> sshs = new DataManagerBusiness().getSSHConnections(connection);
-        List<String> lfcDirSSHSynchronization = new ArrayList<String>();
+    private void checkSynchronizedDirectories(User user, String path)
+            throws BusinessException {
+        List<SSH> sshs = dataManagerBusiness.getSSHConnections();
+        List<String> lfcDirSSHSynchronization = new ArrayList<>();
         for (SSH ssh : sshs) {
             if (ssh.getTransferType().equals(TransferType.Synchronization)) {
                 lfcDirSSHSynchronization.add(ssh.getLfcDir());
@@ -152,7 +162,7 @@ public class LFCPermissionBusiness {
 
         String lfcBaseDir;
         try {
-            lfcBaseDir = DataManagerUtil.parseBaseDir(user, path, connection);
+            lfcBaseDir = lfcPathsBusiness.parseBaseDir(user, path);
         } catch (DataManagerException e) {
             throw new BusinessException("Internal error in data API");
         }

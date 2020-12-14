@@ -45,7 +45,13 @@ public abstract class VipException extends Exception implements IsSerializable {
         );
     }
 
-    private static String formatMessage(
+    public static Optional<String> getRawMessage(VipError vipError) {
+        return Optional.ofNullable(apiErrors.get(vipError)).map(
+                vipErrorMessage -> vipErrorMessage.messageFormat
+        );
+    }
+
+    protected static String formatMessage(
             VipError vipError,
             Object ...params )
     {
@@ -78,7 +84,7 @@ public abstract class VipException extends Exception implements IsSerializable {
      need to re-implement a String.format like method as GWT does not support it
      */
     private static String format(String format, Object... args) {
-        String[] split = format.split("\\{\\}");
+        String[] split = format.split("\\{\\}", -1);
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < split.length - 1; i += 1) {
             sb.append(split[i]);

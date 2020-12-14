@@ -31,61 +31,71 @@
  */
 package fr.insalyon.creatis.vip.api;
 
-import fr.insalyon.creatis.vip.api.bean.Module;
-import fr.insalyon.creatis.vip.api.rest.model.SupportedTransferProtocol;
+import fr.insalyon.creatis.vip.api.model.Module;
+import fr.insalyon.creatis.vip.api.model.SupportedTransferProtocol;
 import fr.insalyon.creatis.vip.core.server.business.Server;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.ApplicationContextInitializer;
-import org.springframework.core.env.Environment;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.core.env.ConfigurableEnvironment;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.ResourcePropertySource;
+import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
-import org.springframework.web.context.*;
 
+import javax.annotation.PostConstruct;
 import java.io.IOException;
-import java.lang.reflect.Array;
+import java.util.Optional;
 
 import static fr.insalyon.creatis.vip.api.CarminProperties.*;
+import static org.springframework.core.io.ResourceLoader.CLASSPATH_URL_PREFIX;
 
 /**
- Vip additional property source location is configured by a property in the
- main property file "$HOME/.vip/vip.conf".
- It is advised to put it in a "vip-api.conf" file in the same folder (default behavior)
+ * Add an additional "vip-api.conf" property file to spring environment
+ * This file must be in the vip configuration folder (alongside vip.conf)
+ *
  * Created by abonnet on 5/7/18.
  */
-public class ApiPropertiesInitializer implements ApplicationContextInitializer<ConfigurableWebApplicationContext> {
+@Component
+public class ApiPropertiesInitializer {
 
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private ConfigurableEnvironment env;
 
-    @Override
-    public void initialize(ConfigurableWebApplicationContext applicationContext) {
-        try {
-            applicationContext.getEnvironment().getPropertySources().addLast(
-                    new ResourcePropertySource(Server.getInstance().getApiConfFileLocation())
-            );
-            verifyProperties(applicationContext.getEnvironment());
-        } catch (IOException e) {
-            logger.error("Cant't init api conf file {}", Server.getInstance().getApiConfFileLocation());
-            throw new RuntimeException("Error initializing api conf", e);
-        }
+    @Autowired
+    public ApiPropertiesInitializer(
+            Resource vipConfigFolder,
+            ConfigurableEnvironment environment) throws IOException {
+        this.env = environment;
+        Resource configFileResource = new FileSystemResource(
+                vipConfigFolder.getFile().toPath().resolve("vip-api.conf"));
+        env.getPropertySources().addLast(
+                new ResourcePropertySource(configFileResource)
+        );
     }
 
-    private void verifyProperties(Environment env) {
+    @PostConstruct
+    public void init() throws IOException {
+        verifyProperties();
+    }
 
-        verifyPropertyNotNull(env, CORS_AUTHORIZED_DOMAINS, String[].class);
-        verifyPropertyNotNull(env, PLATFORM_NAME, String.class);
-        verifyPropertyNotNull(env, PLATFORM_DESCRIPTION, String.class);
-        verifyPropertyNotNull(env, PLATFORM_EMAIL, String.class);
-        verifyPropertyNotNull(env, DEFAULT_LIMIT_LIST_EXECUTION, Long.class);
-        verifyPropertyNotNull(env, SUPPORTED_API_VERSION, String.class);
-        verifyPropertyNotNull(env, APIKEY_HEADER_NAME, String.class);
-        verifyPropertyNotNull(env, APIKEY_GENERATE_NEW_EACH_TIME, Boolean.class);
-        verifyPropertyNotNull(env, API_DIRECTORY_MIME_TYPE, String.class);
-        verifyPropertyNotNull(env, API_DEFAULT_MIME_TYPE, String.class);
-        verifyPropertyNotNull(env, API_DOWNLOAD_RETRY_IN_SECONDS, Integer.class);
-        verifyPropertyNotNull(env, API_DOWNLOAD_TIMEOUT_IN_SECONDS, Integer.class);
-        verifyPropertyNotNull(env, API_DATA_TRANSFERT_MAX_SIZE, Long.class);
-        verifyPropertyNotNull(env, API_DATA_DOWNLOAD_RELATIVE_PATH, String.class);
+    private void verifyProperties() {
+
+        verifyPropertyNotNull(CORS_AUTHORIZED_DOMAINS, String[].class);
+        verifyPropertyNotNull(PLATFORM_NAME, String.class);
+        verifyPropertyNotNull(PLATFORM_DESCRIPTION, String.class);
+        verifyPropertyNotNull(PLATFORM_EMAIL, String.class);
+        verifyPropertyNotNull(DEFAULT_LIMIT_LIST_EXECUTION, Long.class);
+        verifyPropertyNotNull(SUPPORTED_API_VERSION, String.class);
+        verifyPropertyNotNull(APIKEY_HEADER_NAME, String.class);
+        verifyPropertyNotNull(APIKEY_GENERATE_NEW_EACH_TIME, Boolean.class);
+        verifyPropertyNotNull(API_DIRECTORY_MIME_TYPE, String.class);
+        verifyPropertyNotNull(API_DEFAULT_MIME_TYPE, String.class);
+        verifyPropertyNotNull(API_DOWNLOAD_RETRY_IN_SECONDS, Integer.class);
+        verifyPropertyNotNull(API_DOWNLOAD_TIMEOUT_IN_SECONDS, Integer.class);
+        verifyPropertyNotNull(API_DATA_TRANSFERT_MAX_SIZE, Long.class);
 
         // due to arrays and generics, this verification aren't easy to factorize
         Assert.notEmpty(env.getProperty(SUPPORTED_TRANSFER_PROTOCOLS, SupportedTransferProtocol[].class),
@@ -94,14 +104,12 @@ public class ApiPropertiesInitializer implements ApplicationContextInitializer<C
                 SUPPORTED_MODULES + " required in api conf file");
         Assert.isInstanceOf(String[].class, env.getProperty(UNSUPPORTED_METHODS, String[].class),
                 UNSUPPORTED_METHODS + " required in api conf file");
-        Assert.notEmpty(env.getProperty(PLATFORM_ERROR_CODES_AND_MESSAGES, String[].class),
-                PLATFORM_ERROR_CODES_AND_MESSAGES + " required in api conf file");
         Assert.isInstanceOf(String[].class, env.getProperty(API_PIPELINE_WHITE_LIST, String[].class),
                 API_PIPELINE_WHITE_LIST + " required in api conf file");
 
     }
 
-    private void verifyPropertyNotNull(Environment env, String propertyKey, Class<?> targetType) {
+    private void verifyPropertyNotNull(String propertyKey, Class<?> targetType) {
         Assert.notNull(env.getProperty(propertyKey, targetType),
                 propertyKey + " required in api conf file");
     }

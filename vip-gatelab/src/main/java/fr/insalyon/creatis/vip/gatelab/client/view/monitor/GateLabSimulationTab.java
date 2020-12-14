@@ -76,4 +76,10 @@ public class GateLabSimulationTab extends AbstractSimulationTab {
             tabSet.addTab(logsTab);
         }
     }
+
+    @Override
+    public void destroy() {
+        super.destroy();
+        jobsTab.destroy();
+    }
 }

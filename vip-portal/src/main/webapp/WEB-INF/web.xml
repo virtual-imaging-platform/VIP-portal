@@ -129,6 +129,16 @@ knowledge of the CeCILL-B license and that you accept its terms.
         <url-pattern>/fr.insalyon.creatis.vip.portal.Main/gatelabservice</url-pattern>
     </servlet-mapping>
     <!-- End GateLab Module -->
+    <!-- Publication Module -->
+    <servlet>
+        <servlet-name>PublicationService</servlet-name>
+        <servlet-class>fr.insalyon.creatis.vip.publication.server.rpc.PublicationServiceImpl</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>PublicationService</servlet-name>
+        <url-pattern>/fr.insalyon.creatis.vip.portal.Main/publicationservice</url-pattern>
+    </servlet-mapping>
+    <!-- End Publication Module -->
     <!-- Social Module -->
     <servlet>
         <servlet-name>SocialService</servlet-name>
@@ -159,11 +169,7 @@ knowledge of the CeCILL-B license and that you accept its terms.
         </init-param>
          <init-param>
             <param-name>contextConfigLocation</param-name>
-            <param-value>fr.insalyon.creatis.vip.api.SpringWebConfig</param-value>
-        </init-param>
-        <init-param>
-            <param-name>contextInitializerClasses</param-name>
-            <param-value>fr.insalyon.creatis.vip.api.ApiPropertiesInitializer</param-value>
+            <param-value>fr.insalyon.creatis.vip.core.server.SpringCoreConfig</param-value>
         </init-param>
         <load-on-startup>1</load-on-startup>
     </servlet>

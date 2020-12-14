@@ -32,35 +32,46 @@
 package fr.insalyon.creatis.vip.social.server.dao.mysql;
 
 import fr.insalyon.creatis.vip.core.client.bean.User;
-import fr.insalyon.creatis.vip.core.server.dao.CoreDAOFactory;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
+import fr.insalyon.creatis.vip.core.server.dao.UserDAO;
 import fr.insalyon.creatis.vip.social.client.bean.GroupMessage;
 import fr.insalyon.creatis.vip.social.server.dao.GroupMessageDAO;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.support.JdbcDaoSupport;
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
+
+import javax.sql.DataSource;
 import java.sql.*;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  *
  * @author Rafael Ferreira da Silva
  */
-public class GroupMessageData implements GroupMessageDAO {
+@Repository
+@Transactional
+public class GroupMessageData extends JdbcDaoSupport implements GroupMessageDAO {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
-    private Connection connection;
 
-    public GroupMessageData(Connection connection) {
-        this.connection = connection;
+    private UserDAO userDAO;
+
+    @Autowired
+    public GroupMessageData(UserDAO userDAO, DataSource dataSource) {
+        setDataSource(dataSource);
+        this.userDAO = userDAO;
     }
 
     public long add(String sender, String groupName, String title, String message) throws DAOException {
 
         try {
-            PreparedStatement ps = connection.prepareStatement("INSERT INTO "
+            PreparedStatement ps = getConnection().prepareStatement("INSERT INTO "
                     + "VIPSocialGroupMessage(sender, groupname, title, message, posted) "
                     + "VALUES(?, ?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
             ps.setString(1, sender);
@@ -86,7 +97,7 @@ public class GroupMessageData implements GroupMessageDAO {
     public void remove(long id) throws DAOException {
 
         try {
-            PreparedStatement ps = connection.prepareStatement("DELETE FROM "
+            PreparedStatement ps = getConnection().prepareStatement("DELETE FROM "
                     + "VIPSocialGroupMessage WHERE id = ?");
             ps.setLong(1, id);
 
@@ -102,7 +113,7 @@ public class GroupMessageData implements GroupMessageDAO {
     public List<GroupMessage> getMessageByGroup(String groupName, int limit, Date startDate) throws DAOException {
 
         try {
-            PreparedStatement ps = connection.prepareStatement("SELECT "
+            PreparedStatement ps = getConnection().prepareStatement("SELECT "
                     + "id, sender, groupname, title, message, posted "
                     + "FROM VIPSocialGroupMessage "
                     + "WHERE posted < ? AND groupname = ? "
@@ -115,8 +126,7 @@ public class GroupMessageData implements GroupMessageDAO {
             SimpleDateFormat f = new SimpleDateFormat("MMMM d, yyyy HH:mm");
 
             while (rs.next()) {
-                User from = CoreDAOFactory.getDAOFactory()
-                    .getUserDAO(connection).getUser(rs.getString("sender"));
+                User from = userDAO.getUser(rs.getString("sender"));
                 Date posted = new Date(rs.getTimestamp("posted").getTime());
                 messages.add(new GroupMessage(rs.getLong("id"), from, groupName, rs.getString("title"),
                         rs.getString("message"), f.format(posted), posted));

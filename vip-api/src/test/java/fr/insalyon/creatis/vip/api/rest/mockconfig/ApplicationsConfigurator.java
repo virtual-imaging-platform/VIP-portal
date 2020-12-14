@@ -31,7 +31,6 @@
  */
 package fr.insalyon.creatis.vip.api.rest.mockconfig;
 
-import fr.insalyon.creatis.vip.api.business.ApiUtils;
 import fr.insalyon.creatis.vip.api.rest.config.BaseVIPSpringIT;
 import fr.insalyon.creatis.vip.application.client.bean.*;
 import fr.insalyon.creatis.vip.application.server.business.*;
@@ -44,7 +43,7 @@ import java.util.stream.Collectors;
 
 import static fr.insalyon.creatis.vip.api.data.AppVersionTestUtils.getVersion;
 import static fr.insalyon.creatis.vip.api.data.PipelineTestUtils.getDescriptor;
-import static org.mockito.Matchers.*;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 
 /**
@@ -86,19 +85,19 @@ public class ApplicationsConfigurator {
         ClassBusiness classBusiness = test.getClassBusiness();
         ApplicationBusiness applicationBusiness = test.getApplicationBusiness();
         // 1 return user classes
-        when(classBusiness.getUserClasses(eq(user.getEmail()), eq(false), anyObject()))
+        when(classBusiness.getUserClasses(eq(user.getEmail()), eq(false)))
             .thenReturn(classes);
         when(classBusiness.getUserClassesName(
-                 eq(user.getEmail()), eq(false), anyObject()))
+                 eq(user.getEmail()), eq(false)))
             .thenReturn(classNames);
         // 2 return apps for the classes
-        when(applicationBusiness.getApplications(anyListOf(String.class), anyObject())).
+        when(applicationBusiness.getApplications(anyList())).
                 thenReturn(new ArrayList<>(applicationVersions.keySet()));
         // 3 return versions for each app
         for (Application app : applicationVersions.keySet()) {
-            when(applicationBusiness.getVersions(eq(app.getName()), anyObject()))
+            when(applicationBusiness.getVersions(eq(app.getName())))
                 .thenReturn(applicationVersions.get(app));
-            when(applicationBusiness.getApplication(eq(app.getName()), anyObject()))
+            when(applicationBusiness.getApplication(eq(app.getName())))
                 .thenReturn(app);
         }
     }
@@ -110,8 +109,8 @@ public class ApplicationsConfigurator {
             Integer... appParamsIndexes) throws BusinessException {
         WorkflowBusiness workflowBusiness = test.getWorkflowBusiness();
         when(workflowBusiness.getApplicationDescriptor(
-                 eq(user), eq(app.getName()), eq(version.getVersion()), anyObject()))
+                 eq(user), eq(app.getName()), eq(version.getVersion())))
             .thenReturn(getDescriptor("desc test", appParamsIndexes));
-        return ApiUtils.getPipelineIdentifier(app.getName(), version.getVersion());
+        return app.getName() + "/" + version.getVersion();
     }
 }

@@ -33,44 +33,63 @@ package fr.insalyon.creatis.vip.datamanager.server.business;
 
 import fr.insalyon.creatis.devtools.FileUtils;
 import fr.insalyon.creatis.grida.client.GRIDACacheClient;
+import fr.insalyon.creatis.grida.client.GRIDAClient;
+import fr.insalyon.creatis.grida.client.GRIDAClientException;
 import fr.insalyon.creatis.grida.client.GRIDAZombieClient;
 import fr.insalyon.creatis.grida.common.bean.CachedFile;
 import fr.insalyon.creatis.grida.common.bean.ZombieFile;
-import fr.insalyon.creatis.grida.client.GRIDAClientException;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
-import fr.insalyon.creatis.vip.core.server.business.CoreUtil;
 import fr.insalyon.creatis.vip.core.server.business.Server;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import fr.insalyon.creatis.vip.datamanager.client.bean.DMCachedFile;
 import fr.insalyon.creatis.vip.datamanager.client.bean.DMZombieFile;
 import fr.insalyon.creatis.vip.datamanager.client.bean.SSH;
 import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerException;
-import fr.insalyon.creatis.vip.datamanager.server.DataManagerUtil;
-
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.sql.Connection;
-import java.util.ArrayList;
-import java.util.List;
-
-import fr.insalyon.creatis.vip.datamanager.server.dao.DataManagerDAOFactory;
+import fr.insalyon.creatis.vip.datamanager.server.dao.SSHDAO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
  * @author Rafael Silva
  */
+@Service
+@Transactional
 public class DataManagerBusiness {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    public void deleteLocalFile(String fileName) throws BusinessException {
+    private SSHDAO sshdao;
+    private GRIDAClient gridaClient;
+    private GRIDACacheClient gridaCacheClient;
+    private GRIDAZombieClient gridaZombieClient;
+    private ConfigurationBusiness configurationBusiness;
+    private LfcPathsBusiness lfcPathsBusiness;
+    private Server server;
+
+    @Autowired
+    public DataManagerBusiness(
+            SSHDAO sshdao, GRIDAClient gridaClient, GRIDACacheClient gridaCacheClient,
+            GRIDAZombieClient gridaZombieClient, ConfigurationBusiness configurationBusiness, LfcPathsBusiness lfcPathsBusiness, Server server) {
+        this.sshdao = sshdao;
+        this.gridaClient = gridaClient;
+        this.gridaCacheClient = gridaCacheClient;
+        this.gridaZombieClient = gridaZombieClient;
+        this.configurationBusiness = configurationBusiness;
+        this.lfcPathsBusiness = lfcPathsBusiness;
+        this.server = server;
+    }
+
+    public void deleteLocalFile(String fileName) {
 
         File file = new File(fileName);
         if (file.exists()) {
@@ -83,10 +102,9 @@ public class DataManagerBusiness {
     public List<DMCachedFile> getCachedFiles() throws BusinessException {
 
         try {
-            GRIDACacheClient client = CoreUtil.getGRIDACacheClient();
 
-            List<CachedFile> cachedFilesList = client.getCachedFiles();
-            List<DMCachedFile> dmCachedFiles = new ArrayList<DMCachedFile>();
+            List<CachedFile> cachedFilesList = gridaCacheClient.getCachedFiles();
+            List<DMCachedFile> dmCachedFiles = new ArrayList<>();
 
             for (CachedFile cf : cachedFilesList) {
                 dmCachedFiles.add(new DMCachedFile(cf.getPath(),
@@ -102,14 +120,11 @@ public class DataManagerBusiness {
         }
     }
 
-    public void deleteCachedFiles(List<String> cachedFiles)
-            throws BusinessException {
+    public void deleteCachedFiles(List<String> cachedFiles) throws BusinessException {
 
         try {
-            GRIDACacheClient client = CoreUtil.getGRIDACacheClient();
-
             for (String path : cachedFiles) {
-                client.deleteCachedFile(path);
+                gridaCacheClient.deleteCachedFile(path);
             }
         } catch (GRIDAClientException ex) {
             logger.error("Error deleting cached files {}", cachedFiles, ex);
@@ -117,14 +132,13 @@ public class DataManagerBusiness {
         }
     }
 
-    public String getRemoteFile(
-        User user, String remoteFile, String localDir, Connection connection)
-        throws BusinessException {
+    public String getRemoteFile(User user, String remoteFile, String localDir)
+            throws BusinessException {
 
         try {
-            return CoreUtil.getGRIDAClient().getRemoteFile(
-                DataManagerUtil.parseBaseDir(user, remoteFile, connection),
-                localDir);
+            return gridaClient.getRemoteFile(
+                    lfcPathsBusiness.parseBaseDir(user, remoteFile),
+                    localDir);
         } catch (DataManagerException ex) {
             throw new BusinessException(ex);
         } catch (GRIDAClientException ex) {
@@ -140,8 +154,8 @@ public class DataManagerBusiness {
     public List<DMZombieFile> getZombieFiles() throws BusinessException {
 
         try {
-            List<DMZombieFile> list = new ArrayList<DMZombieFile>();
-            for (ZombieFile zf : CoreUtil.getGRIDAZombieClient().getList()) {
+            List<DMZombieFile> list = new ArrayList<>();
+            for (ZombieFile zf : gridaZombieClient.getList()) {
                 list.add(new DMZombieFile(zf.getSurl(), zf.getRegistration()));
             }
             return list;
@@ -156,15 +170,13 @@ public class DataManagerBusiness {
      * Deletes a list of zombie files.
      *
      * @param surls List of zombie SURLs
-     * @throws BusinessException
      */
     public void deleteZombieFiles(List<String> surls) throws BusinessException {
 
         try {
-            GRIDAZombieClient client = CoreUtil.getGRIDAZombieClient();
 
             for (String surl : surls) {
-                client.delete(surl);
+                gridaZombieClient.delete(surl);
             }
         } catch (GRIDAClientException ex) {
             logger.error("Error deleting zombie files {}", surls, ex);
@@ -172,74 +184,84 @@ public class DataManagerBusiness {
         }
     }
 
-    public List<SSH> getSSHConnections(Connection connection)
-        throws BusinessException {
+    public List<SSH> getSSHConnections() throws BusinessException {
         try {
-            return DataManagerDAOFactory.getInstance()
-                .getSSHDAO(connection).getSSHConnections();
+            return sshdao.getSSHConnections();
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }
     }
 
-    public void addSSH(SSH ssh, Connection connection) throws BusinessException {
+    public void addSSH(SSH ssh) throws BusinessException {
         try {
             //create LFC dir
-            ConfigurationBusiness conf = new ConfigurationBusiness();
-            User user = conf.getUser(ssh.getEmail(), connection);
-            ssh.setLfcDir(
-                DataManagerUtil.parseBaseDir(user, ssh.getLfcDir(), connection));
-            DataManagerDAOFactory.getInstance().getSSHDAO(connection).addSSH(ssh);
+            User user = configurationBusiness.getUser(ssh.getEmail());
+            ssh.setLfcDir(lfcPathsBusiness.parseBaseDir(user, ssh.getLfcDir()));
+            sshdao.addSSH(ssh);
         } catch (DAOException | DataManagerException ex) {
             throw new BusinessException(ex);
         }
     }
 
-    public void removeSSH(String email, String name, Connection connection)
-        throws BusinessException {
+    public void removeSSH(String email, String name) throws BusinessException {
         try {
-            DataManagerDAOFactory.getInstance()
-                .getSSHDAO(connection).removeSSH(email, name);
+            String lfcDir = getLFCDir(email, name);
+            sshdao.removeSSH(email, lfcDir);
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }
     }
 
-    public void resetSSHs(
-        List<List<String>> sshConnections, Connection connection)
-        throws BusinessException {
-        try {
+    public void resetSSHs(List<List<String>> sshConnections) throws BusinessException {
 
-            DataManagerDAOFactory.getInstance()
-                .getSSHDAO(connection).resetSSHConnections(sshConnections);
+        try {
+            // replace ssh name with complete lfc paths
+            for (List<String> sshConnection : sshConnections) {
+                String lfcDir = getLFCDir(sshConnection.get(0), sshConnection.get(1));
+                sshConnection.set(1, lfcDir);
+            }
+            sshdao.resetSSHConnections(sshConnections);
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }
     }
 
-    public void updateSSH(SSH ssh, Connection connection)
-        throws BusinessException {
+    public void updateSSH(SSH ssh) throws BusinessException {
         try {
-            DataManagerDAOFactory.getInstance().getSSHDAO(connection)
-                    .updateSSH(ssh);
+            generateLFCDir(ssh);
+            sshdao.updateSSH(ssh);
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }
     }
 
-    public static String extractName(String lfcDir) {
-        return lfcDir.substring(lfcDir.lastIndexOf("/") + 1);
+    public void generateLFCDir(SSH ssh) throws BusinessException {
+        String lfcDir = getLFCDir(ssh.getEmail(), ssh.getName());
+        ssh.setLfcDir(lfcDir);
     }
 
-    public static String generateLFCDir(
-        String name, String email, Connection connection)
-        throws DataManagerException, BusinessException {
+    public String getLFCDir(String email, String lfcName) throws BusinessException {
 
-        ConfigurationBusiness conf = new ConfigurationBusiness();
-        User user = conf.getUser(email, connection);
-        String homeDir = Server.getInstance()
-                .getDataManagerUsersHome() + "/" + user.getFolder();
+        User user = configurationBusiness.getUser(email);
+        String homeDir = server.getDataManagerUsersHome() + "/" + user.getFolder();
 
-        return (homeDir + "/" + name);
+        return (homeDir + "/" + lfcName);
     }
+
+    public String getUploadRootDirectory(boolean local) {
+
+        String rootDirectory = server.getDataManagerPath()
+                + "/uploads/";
+
+        if (!local) {
+            rootDirectory += System.nanoTime() + "/";
+        }
+
+        File dir = new File(rootDirectory);
+        if (!dir.exists()) {
+            dir.mkdirs();
+        }
+        return rootDirectory;
+    }
+
 }

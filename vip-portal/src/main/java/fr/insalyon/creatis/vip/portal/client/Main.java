@@ -52,6 +52,7 @@ import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.datamanager.client.DataManagerModule;
 import fr.insalyon.creatis.vip.docs.client.DocsModule;
 import fr.insalyon.creatis.vip.gatelab.client.GateLabModule;
+import fr.insalyon.creatis.vip.publication.client.PublicationModule;
 import fr.insalyon.creatis.vip.social.client.SocialModule;
 import fr.insalyon.creatis.vip.visualization.client.VisualizationModule;
 
@@ -78,6 +79,7 @@ public class Main implements EntryPoint {
         modulesInit.add(new CoreModule());
         modulesInit.add(new DataManagerModule());
         modulesInit.add(new ApplicationModule());
+        modulesInit.add(new PublicationModule());
         modulesInit.add(new DocsModule());
         modulesInit.add(new SocialModule());
         modulesInit.add(new GateLabModule());

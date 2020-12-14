@@ -45,24 +45,28 @@ import java.util.List;
 import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 /**
+ * Creates dao for the h2 database of a simulation.
+ * Each dao is specific to a single database, and so to a single simulation.
  *
+ * The default is to access the h2 database through an h2 server via tcp,
+ * but this is changeable to use (for instance) a memory or a local h2
+ * database for testing or local use
  * @author Rafael Ferreira da Silva
  */
+@Component
+@Scope("prototype")
 public class SimulationData extends AbstractJobData implements SimulationDAO {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    public SimulationData(String dbPath) throws DAOException {
-
+    public SimulationData(String dbPath) {
         super(dbPath);
     }
 
-    /**
-     *
-     * @return @throws DAOException
-     */
     @Override
     public List<Task> getTasks() throws DAOException {
 
@@ -93,12 +97,6 @@ public class SimulationData extends AbstractJobData implements SimulationDAO {
         return list;
     }
 
-    /**
-     *
-     * @param jobID
-     * @return
-     * @throws DAOException
-     */
     @Override
     public List<Task> getTasks(int jobID) throws DAOException {
 
@@ -130,12 +128,6 @@ public class SimulationData extends AbstractJobData implements SimulationDAO {
         return list;
     }
 
-    /**
-     *
-     * @param taskID
-     * @return
-     * @throws DAOException
-     */
     @Override
     public Task getTask(String taskID) throws DAOException {
 
@@ -164,12 +156,6 @@ public class SimulationData extends AbstractJobData implements SimulationDAO {
         }
     }
 
-    /**
-     *
-     * @param rs
-     * @return
-     * @throws SQLException
-     */
     private Task parseTask(ResultSet rs) throws SQLException {
 
         TaskStatus status = TaskStatus.valueOf(rs.getString("status"));
@@ -450,14 +436,6 @@ public class SimulationData extends AbstractJobData implements SimulationDAO {
         }
     }
 
-    /**
-     *
-     * @param binSize
-     * @param startField
-     * @param endField
-     * @return
-     * @throws DAOException
-     */
     private List<String> getHistogramTimes(int binSize, String startField, String endField)
             throws DAOException {
 

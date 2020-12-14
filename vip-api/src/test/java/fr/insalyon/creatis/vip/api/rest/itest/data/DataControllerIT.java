@@ -31,30 +31,28 @@
  */
 package fr.insalyon.creatis.vip.api.rest.itest.data;
 
-import fr.insalyon.creatis.vip.api.rest.config.*;
-import fr.insalyon.creatis.vip.api.rest.model.PathProperties;
+import fr.insalyon.creatis.vip.api.rest.config.BaseVIPSpringIT;
+import fr.insalyon.creatis.vip.api.model.PathProperties;
 import fr.insalyon.creatis.vip.datamanager.client.bean.PoolOperation;
-import fr.insalyon.creatis.vip.datamanager.client.bean.PoolOperation.*;
+import fr.insalyon.creatis.vip.datamanager.client.bean.PoolOperation.Status;
+import fr.insalyon.creatis.vip.datamanager.client.bean.PoolOperation.Type;
 import org.apache.commons.io.FileUtils;
 import org.hamcrest.Matchers;
-import org.junit.*;
-import org.junit.contrib.java.lang.system.EnvironmentVariables;
-import org.mockito.*;
-import static org.mockito.Matchers.anyObject;
+import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Mockito;
 import org.springframework.http.MediaType;
-import org.springframework.test.annotation.DirtiesContext;
 
 import java.io.File;
-import java.nio.file.*;
-import java.util.Base64;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 import static fr.insalyon.creatis.vip.api.data.PathTestUtils.*;
 import static fr.insalyon.creatis.vip.api.data.UserTestUtils.*;
-import static org.apache.commons.io.FileUtils.contentEquals;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
-import static org.springframework.test.annotation.DirtiesContext.MethodMode.BEFORE_METHOD;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -71,7 +69,7 @@ public class DataControllerIT extends BaseVIPSpringIT {
                 get("/rest/path" + testLfcPath).param("action", "properties").with(baseUser1()))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(RestTestUtils.JSON_CONTENT_TYPE_UTF8))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$", jsonCorrespondsToPath(testFile1PathProperties)));
     }
 
@@ -83,14 +81,14 @@ public class DataControllerIT extends BaseVIPSpringIT {
                 get("/rest/path" + testLfcPath).param("action", "properties").with(baseUser2()))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(RestTestUtils.JSON_CONTENT_TYPE_UTF8))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$", jsonCorrespondsToPath(getPathWithTS(testDir1PathProperties))));
     }
 
     @Test
     public void shouldReturnNonExistingPath() throws Exception {
         String testLfcPath = "/vip/Home/WRONG/PATH";
-        when(lfcBusiness.exists(eq(baseUser1), eq(testLfcPath), anyObject()))
+        when(lfcBusiness.exists(eq(baseUser1), eq(testLfcPath)))
             .thenReturn(false);
         PathProperties expectedPathProperties = new PathProperties();
         expectedPathProperties.setExists(false);
@@ -99,7 +97,7 @@ public class DataControllerIT extends BaseVIPSpringIT {
                 get("/rest/path" + testLfcPath).param("action", "exists").with(baseUser1()))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(RestTestUtils.JSON_CONTENT_TYPE_UTF8))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.exists").value(false));
     }
 
@@ -111,7 +109,7 @@ public class DataControllerIT extends BaseVIPSpringIT {
                 get("/rest/path" + lfcPath).param("action", "list").with(baseUser2()))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(RestTestUtils.JSON_CONTENT_TYPE_UTF8))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$[*]", Matchers.containsInAnyOrder(
                         jsonCorrespondsToPath(testDir1PathProperties),
                         jsonCorrespondsToPath(testFile2PathProperties)
@@ -127,7 +125,7 @@ public class DataControllerIT extends BaseVIPSpringIT {
                 get("/rest/path" + lfcPath).param("action", "list").with(baseUser2()))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(RestTestUtils.JSON_CONTENT_TYPE_UTF8))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$[*]", Matchers.containsInAnyOrder(
                         jsonCorrespondsToPath(testFile3PathProperties),
                         jsonCorrespondsToPath(testFile4PathProperties),
@@ -147,10 +145,10 @@ public class DataControllerIT extends BaseVIPSpringIT {
                 null, null, null, testFile, Type.Download, Status.Done, baseUser1.getEmail(), 100);
         PoolOperation runningPoolOperation = new PoolOperation(operationId,
                 null, null, null, null, Type.Download, Status.Running, baseUser1.getEmail(), 0);
-        when (transferPoolBusiness.downloadFile(eq(baseUser1), eq(lfcPath), anyObject()))
+        when (transferPoolBusiness.downloadFile(eq(baseUser1), eq(lfcPath)))
             .thenReturn(operationId);
         when (transferPoolBusiness.getOperationById(
-                  eq(operationId), eq(baseUser1.getFolder()), anyObject()))
+                  eq(operationId), eq(baseUser1.getFolder())))
             .thenReturn(runningPoolOperation, runningPoolOperation, donePoolOperation);
         when (transferPoolBusiness.getDownloadPoolOperation(operationId))
                 .thenReturn(donePoolOperation);
@@ -158,6 +156,7 @@ public class DataControllerIT extends BaseVIPSpringIT {
                 get("/rest/path" + lfcPath).param("action", "content").with(baseUser1()))
                 .andDo(print())
                 .andExpect(status().isOk());
+        // todo test file content
     }
 
     @Test
@@ -167,10 +166,10 @@ public class DataControllerIT extends BaseVIPSpringIT {
         String operationId = "testOpId";
         PoolOperation runningPoolOperation = new PoolOperation(operationId,
                 null, null, null, null, Type.Download, Status.Running, baseUser1.getEmail(), 0);
-        when (transferPoolBusiness.downloadFile(eq(baseUser1), eq(lfcPath), anyObject()))
+        when (transferPoolBusiness.downloadFile(eq(baseUser1), eq(lfcPath)))
             .thenReturn(operationId);
         when (transferPoolBusiness.getOperationById(
-                  eq(operationId), eq(baseUser1.getFolder()), anyObject()))
+                  eq(operationId), eq(baseUser1.getFolder())))
             .thenReturn(runningPoolOperation, runningPoolOperation);
         mockMvc.perform(
                 get("/rest/path" + lfcPath).param("action", "content").with(baseUser1()))
@@ -189,10 +188,10 @@ public class DataControllerIT extends BaseVIPSpringIT {
                 null, null, null, null, Type.Download, Status.Running, baseUser1.getEmail(), 0);
         PoolOperation donePoolOperation = new PoolOperation(operationId,
                 null, null, null, testFile, Type.Download, Status.Done, baseUser1.getEmail(), 100);
-        when (transferPoolBusiness.downloadFile(eq(baseUser1), eq(lfcPath), anyObject()))
+        when (transferPoolBusiness.downloadFile(eq(baseUser1), eq(lfcPath)))
                 .thenReturn(operationId);
         when (transferPoolBusiness.getOperationById(
-                eq(operationId), eq(baseUser1.getFolder()), anyObject()))
+                eq(operationId), eq(baseUser1.getFolder())))
                 .thenReturn(runningPoolOperation);
         when (transferPoolBusiness.getDownloadPoolOperation(operationId))
               .thenReturn(donePoolOperation);
@@ -203,7 +202,7 @@ public class DataControllerIT extends BaseVIPSpringIT {
         // now do an OK download
         Thread.sleep(3*1000);
           when (transferPoolBusiness.getOperationById(
-                  eq(operationId), eq(baseUser1.getFolder()), anyObject()))
+                  eq(operationId), eq(baseUser1.getFolder())))
                   .thenReturn(runningPoolOperation, runningPoolOperation, donePoolOperation);
         mockMvc.perform(
                 get("/rest/path" + lfcPath).param("action", "content").with(baseUser1()))
@@ -225,11 +224,10 @@ public class DataControllerIT extends BaseVIPSpringIT {
         when (transferPoolBusiness.uploadFile(
                   eq(baseUser2),
                   anyString(),
-                  eq(getAbsolutePath(testDir1)),
-                  anyObject()))
+                  eq(getAbsolutePath(testDir1))))
                 .thenReturn(operationId);
         when (transferPoolBusiness.getOperationById(
-                  eq(operationId), eq(baseUser2.getFolder()), anyObject()))
+                  eq(operationId), eq(baseUser2.getFolder())))
             .thenReturn(runningPoolOperation, runningPoolOperation, donePoolOperation);
         mockMvc.perform(
                 put("/rest/path" + path)
@@ -241,14 +239,13 @@ public class DataControllerIT extends BaseVIPSpringIT {
         Mockito.verify(transferPoolBusiness).uploadFile(
             eq(baseUser2),
             captor.capture(),
-            eq(getAbsolutePath(testDir1)),
-            anyObject());
+            eq(getAbsolutePath(testDir1)));
         String copiedFile = captor.getValue();
         File expectedFile = getResourceFromClasspath("testFile.txt").getFile();
-        Assert.assertThat(
+        assertThat(
                 FileUtils.contentEquals(expectedFile, new File(copiedFile)),
                 Matchers.is(true));
-        Assert.assertThat(copiedFile, Matchers.startsWith("/tmp"));
+        assertThat(copiedFile, Matchers.startsWith("/tmp"));
     }
 
     @Test
@@ -263,11 +260,10 @@ public class DataControllerIT extends BaseVIPSpringIT {
         when (transferPoolBusiness.uploadFile(
                   eq(baseUser2),
                   anyString(),
-                  eq(getAbsolutePath(testDir1)),
-                  anyObject()))
+                  eq(getAbsolutePath(testDir1))))
             .thenReturn(operationId);
         when (transferPoolBusiness.getOperationById(
-                  eq(operationId), eq(baseUser2.getFolder()), anyObject()))
+                  eq(operationId), eq(baseUser2.getFolder())))
             .thenReturn(runningPoolOperation, runningPoolOperation, donePoolOperation);
         mockMvc.perform(
                 put("/rest/path" + path)
@@ -280,13 +276,12 @@ public class DataControllerIT extends BaseVIPSpringIT {
         Mockito.verify(transferPoolBusiness).uploadFile(
             eq(baseUser2),
             captor.capture(),
-            eq(getAbsolutePath(testDir1)),
-            anyObject());
+            eq(getAbsolutePath(testDir1)));
         String copiedFile = captor.getValue();
         File expectedFile = getResourceFromClasspath("b64decoded/uploadData_1.txt").getFile();
-        Assert.assertThat(
+        assertThat(
                 FileUtils.contentEquals(expectedFile, new File(copiedFile)),
                 Matchers.is(true));
-        Assert.assertThat(copiedFile, Matchers.startsWith("/tmp"));
+        assertThat(copiedFile, Matchers.startsWith("/tmp"));
     }
 }

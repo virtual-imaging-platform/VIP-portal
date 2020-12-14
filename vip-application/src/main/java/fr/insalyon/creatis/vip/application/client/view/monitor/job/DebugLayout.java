@@ -269,7 +269,6 @@ public class DebugLayout extends VLayout {
         closeLabel.addClickHandler(new ClickHandler() {
             @Override
             public void onClick(ClickEvent event) {
-                refresher.cancel();
                 destroy();
             }
         });
@@ -426,5 +425,11 @@ public class DebugLayout extends VLayout {
             }
         };
         refresher.scheduleRepeating(20000);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        refresher.cancel();
     }
 }

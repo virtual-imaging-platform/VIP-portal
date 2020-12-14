@@ -31,7 +31,10 @@
  */
 package fr.insalyon.creatis.vip.core.client;
 
+import com.smartgwt.client.widgets.tab.Tab;
 import fr.insalyon.creatis.vip.core.client.bean.User;
+
+import java.util.Set;
 
 /**
  *
@@ -43,7 +46,7 @@ public abstract class Module {
 
     public abstract void postLoading();
 
-    public abstract void terminate();
+    public abstract void terminate(Set<Tab> removedTabs);
 
     /**
      * This method is invoked when a user is removed from the platform. Its 

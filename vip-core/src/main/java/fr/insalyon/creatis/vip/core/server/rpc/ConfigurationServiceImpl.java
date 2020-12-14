@@ -36,46 +36,33 @@ import com.dropbox.client2.session.AppKeyPair;
 import com.dropbox.client2.session.Session.AccessType;
 import com.dropbox.client2.session.WebAuthSession;
 import com.dropbox.client2.session.WebAuthSession.WebAuthInfo;
+import fr.insalyon.creatis.grida.client.GRIDAClient;
 import fr.insalyon.creatis.grida.client.GRIDAClientException;
-import fr.insalyon.creatis.vip.core.client.bean.Account;
-import fr.insalyon.creatis.vip.core.client.bean.DropboxAccountStatus;
-import fr.insalyon.creatis.vip.core.client.bean.Group;
-import fr.insalyon.creatis.vip.core.client.bean.Publication;
-import fr.insalyon.creatis.vip.core.client.bean.TermsOfUse;
-import fr.insalyon.creatis.vip.core.client.bean.UsageStats;
-import fr.insalyon.creatis.vip.core.client.bean.User;
+import fr.insalyon.creatis.vip.core.client.bean.*;
 import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationService;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants.GROUP_ROLE;
 import fr.insalyon.creatis.vip.core.client.view.CoreException;
 import fr.insalyon.creatis.vip.core.client.view.user.UserLevel;
-import fr.insalyon.creatis.vip.core.client.view.user.publication.PublicationTypes;
 import fr.insalyon.creatis.vip.core.client.view.util.CountryCode;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
-import fr.insalyon.creatis.vip.core.server.business.CoreUtil;
-import fr.insalyon.creatis.vip.core.server.business.Server;
-import fr.insalyon.creatis.vip.core.server.dao.CoreDAOFactory;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
-import fr.insalyon.creatis.vip.core.server.dao.mysql.PlatformConnection;
-import java.io.Reader;
-import java.io.StringReader;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
+import fr.insalyon.creatis.vip.core.server.dao.UserDAO;
 import org.apache.commons.configuration.ConfigurationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.jbibtex.ParseException;
-import org.jbibtex.TokenMgrException;
+import org.springframework.context.ApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -85,40 +72,36 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    public ConfigurationServiceImpl() {
-        super();
-        configurationBusiness = new ConfigurationBusiness();
-    }
+    private ConfigurationBusiness configurationBusiness;
+    private UserDAO userDAO;
+    private GRIDAClient gridaClient;
 
-    /**
-     *
-     * @param email
-     * @param session
-     * @return
-     * @throws CoreException
-     */
+    @Override
+    public void init() throws ServletException {
+        super.init();
+        configurationBusiness = getBean(ConfigurationBusiness.class);
+        userDAO = getBean(UserDAO.class);
+        gridaClient = getBean(GRIDAClient.class);
+    }
+    
     @Override
     public User configure(String email, String session) throws CoreException {
-        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
+        try {
             logger.debug("Initializing VIP configuration.");
             configurationBusiness.configure();
             logger.debug("VIP successfully configured.");
 
-            if (configurationBusiness
-                .validateSession(email, session, connection)) {
+            if (configurationBusiness.validateSession(email, session)) {
 
-                User user = configurationBusiness.getUser(email, connection);
-                user = setUserSession(user);
-                configurationBusiness.updateUserLastLogin(email, connection);
+                User user = configurationBusiness.getUser(email);
+                user = setUserInSession(user);
+                configurationBusiness.updateUserLastLogin(email);
                 trace(logger, "Connected.");
 
                 return user;
             }
             return null;
         } catch (BusinessException ex) {
-            throw new CoreException(ex);
-        } catch (SQLException ex) {
-            logger.error("Error handling a connection", ex);
             throw new CoreException(ex);
         }
     }
@@ -128,128 +111,77 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
      * @param user User bean object
      * @param comments User's comments
      * @param accountType User's accounts type
-     * @throws CoreException
      */
     @Override
     public void signup(User user, String comments, String[] accountType)
         throws CoreException {
-        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
+        try {
             logger.info("Sign up request from '" + user.getEmail() + "'.");
-            configurationBusiness.signup(
-                user, comments, connection, accountType);
+            configurationBusiness.signup(user, comments, accountType);
         } catch (BusinessException ex) {
-            throw new CoreException(ex);
-        } catch (SQLException ex) {
-            logger.error("Error handling a connection", ex);
             throw new CoreException(ex);
         }
     }
 
-    /**
-     *
-     * @param email
-     * @param password
-     * @throws CoreException
-     * @return
-     */
     @Override
     public User signin(String email, String password) throws CoreException {
-        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
+        try {
             logger.info("Authenticating '" + email + "'.");
-            User user = configurationBusiness
-                .signin(email, password, connection);
-            user = setUserSession(user);
-            configurationBusiness.updateUserLastLogin(email, connection);
+            User user = configurationBusiness.signin(email, password);
+            user = setUserInSession(user);
+            configurationBusiness.updateUserLastLogin(email);
             logger.info("Connected.");
 
             return user;
         } catch (BusinessException ex) {
             throw new CoreException(ex);
-        } catch (SQLException ex) {
-            logger.error("Error handling a connection", ex);
-            throw new CoreException(ex);
         }
     }
 
-    /**
-     *
-     * @throws CoreException
-     */
     @Override
     public void signout() throws CoreException {
-        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
-            configurationBusiness
-                .signout(getSessionUser().getEmail(), connection);
+        try {
+            configurationBusiness.signout(getSessionUser().getEmail());
             trace(logger, "Signed out.");
             getSession().removeAttribute(CoreConstants.SESSION_USER);
             getSession().removeAttribute(CoreConstants.SESSION_GROUPS);
         } catch (BusinessException ex) {
             throw new CoreException(ex);
-        } catch (SQLException ex) {
-            logger.error("Error handling a connection", ex);
-            throw new CoreException(ex);
         }
     }
 
-    /**
-     *
-     * @param code
-     * @return
-     * @throws CoreException
-     */
     @Override
     public User activate(String code) throws CoreException {
-        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
+        try {
             User user = getSessionUser();
             logger.info("Activating '" + user.getEmail() + "'.");
-            user = configurationBusiness
-                .activate(user.getEmail(), code, connection);
+            user = configurationBusiness.activate(user.getEmail(), code);
 
-            return setUserSession(user);
+            return setUserInSession(user);
         } catch (BusinessException ex) {
-            throw new CoreException(ex);
-        } catch (SQLException ex) {
-            logger.error("Error handling a connection", ex);
             throw new CoreException(ex);
         }
     }
 
-    /**
-     *
-     * @return
-     * @throws CoreException
-     */
     @Override
     public String sendActivationCode() throws CoreException {
-        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
+        try {
             User user = getSessionUser();
             logger.info("Sending activation code to: " + user.getEmail() + ".");
-            configurationBusiness
-                .sendActivationCode(user.getEmail(), connection);
+            configurationBusiness.sendActivationCode(user.getEmail());
 
             return user.getEmail();
         } catch (BusinessException ex) {
             throw new CoreException(ex);
-        } catch (SQLException ex) {
-            logger.error("Error handling a connection", ex);
-            throw new CoreException(ex);
         }
     }
 
-    /**
-     *
-     * @param email
-     * @throws CoreException
-     */
     @Override
     public void sendResetCode(String email) throws CoreException {
-        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
+        try {
             //do not add a trace here: it should be reachable without authentication (#2632)
-            configurationBusiness.sendResetCode(email, connection);
+            configurationBusiness.sendResetCode(email);
         } catch (BusinessException ex) {
-            throw new CoreException(ex);
-        } catch (SQLException ex) {
-            logger.error("Error handling a connection", ex);
             throw new CoreException(ex);
         }
     }
@@ -257,171 +189,108 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
     /**
      * Get list of users.
      *
-     * @return
      */
+    @Override
     public List<User> getUsers() throws CoreException {
-        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
+        try {
             authenticateSystemAdministrator(logger);
-            return configurationBusiness.getUsers(connection);
+            return configurationBusiness.getUsers();
         } catch (BusinessException ex) {
-            throw new CoreException(ex);
-        } catch (SQLException ex) {
-            logger.error("Error handling a connection", ex);
             throw new CoreException(ex);
         }
     }
 
-    /**
-     *
-     * @param group
-     * @throws CoreException
-     */
     @Override
     public void addGroup(Group group) throws CoreException {
-        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
+        try {
             authenticateSystemAdministrator(logger);
             trace(logger, "Adding group '" + group + "'.");
-            configurationBusiness.addGroup(group, connection);
+            configurationBusiness.addGroup(group);
         } catch (BusinessException ex) {
-            throw new CoreException(ex);
-        } catch (SQLException ex) {
-            logger.error("Error handling a connection", ex);
             throw new CoreException(ex);
         }
     }
 
-    /**
-     *
-     * @param name
-     * @param group
-     * @throws CoreException
-     */
     @Override
     public void updateGroup(String name, Group group) throws CoreException {
-        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
+        try {
             authenticateSystemAdministrator(logger);
             trace(logger, "Updating group '" + name + "' to '" + group.getName() + "'.");
-            configurationBusiness.updateGroup(name, group, connection);
+            configurationBusiness.updateGroup(name, group);
         } catch (BusinessException ex) {
-            throw new CoreException(ex);
-        } catch (SQLException ex) {
-            logger.error("Error handling a connection", ex);
             throw new CoreException(ex);
         }
     }
 
-    /**
-     *
-     * @param groupName
-     * @throws CoreException
-     */
     @Override
     public void removeGroup(String groupName) throws CoreException {
-        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
+        try {
             authenticateSystemAdministrator(logger);
             trace(logger, "Removing group '" + groupName + "'.");
             configurationBusiness.removeGroup(
-                getSessionUser().getEmail(), groupName, connection);
+                    getSessionUser().getEmail(), groupName);
         } catch (BusinessException ex) {
-            throw new CoreException(ex);
-        } catch (SQLException ex) {
-            logger.error("Error handling a connection", ex);
             throw new CoreException(ex);
         }
     }
 
-    /**
-     *
-     * @return @throws CoreException
-     */
     @Override
     public List<Group> getGroups() throws CoreException {
-        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
+        try {
             authenticateSystemAdministrator(logger);
-            return configurationBusiness.getGroups(connection);
+            return configurationBusiness.getGroups();
         } catch (BusinessException ex) {
-            throw new CoreException(ex);
-        } catch (SQLException ex) {
-            logger.error("Error handling a connection", ex);
             throw new CoreException(ex);
         }
     }
 
-    /**
-     *
-     * @return @throws CoreException
-     */
     @Override
     public List<Group> getPublicGroups() throws CoreException {
-        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
-            return configurationBusiness.getPublicGroups(connection);
+        try {
+            return configurationBusiness.getPublicGroups();
         } catch (BusinessException ex) {
-            throw new CoreException(ex);
-        } catch (SQLException ex) {
-            logger.error("Error handling a connection", ex);
             throw new CoreException(ex);
         }
     }
 
-    /**
-     *
-     * @param email
-     * @return
-     * @throws CoreException
-     */
     @Override
     public User removeUser(String email) throws CoreException {
-        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
+        try {
             User user = email != null
-                ? configurationBusiness.getUser(email, connection)
+                ? configurationBusiness.getUser(email)
                 : getSessionUser();
             if (email != null) {
                 authenticateSystemAdministrator(logger);
             }
             trace(logger, "Removing user '" + user.getEmail() + "'.");
-            configurationBusiness.removeUser(user.getEmail(), true, connection);
+            configurationBusiness.removeUser(user.getEmail(), true);
 
             return user;
         } catch (BusinessException ex) {
             throw new CoreException(ex);
-        } catch (SQLException ex) {
-            logger.error("Error handling a connection", ex);
-            throw new CoreException(ex);
         }
     }
 
-    /**
-     *
-     * @param email
-     * @return
-     * @throws CoreException
-     */
     @Override
     public Map<Group, GROUP_ROLE> getUserGroups(String email)
         throws CoreException {
-        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
+        try {
             if (email != null) {
                 authenticateSystemAdministrator(logger);
-                return configurationBusiness.getUserGroups(email, connection);
+                return configurationBusiness.getUserGroups(email);
             } else {
                 return configurationBusiness.getUserGroups(
-                    getSessionUser().getEmail(), connection);
+                        getSessionUser().getEmail());
             }
         } catch (BusinessException ex) {
-            throw new CoreException(ex);
-        } catch (SQLException ex) {
-            logger.error("Error handling a connection", ex);
             throw new CoreException(ex);
         }
     }
 
     /**
      * Throws an exception if the user is not a group or system administrator.
-     * @param logger
-     * @param groupName
-     * @throws CoreException
      */
-    protected void authenticateGroupAdministrator(Logger logger, String groupName) throws CoreException {
+    private void authenticateGroupAdministrator(Logger logger, String groupName) throws CoreException {
 
         try{
             authenticateSystemAdministrator(logger);
@@ -443,32 +312,24 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
 
     @Override
     public List<Boolean> getUserPropertiesGroups() throws CoreException {
-        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
+        try {
             String email = getSessionUser().getEmail();
-            return configurationBusiness.getUserPropertiesGroups(
-                email, connection);
+            return configurationBusiness.getUserPropertiesGroups(email);
         } catch (BusinessException ex) {
-            throw new CoreException(ex);
-        } catch (SQLException ex) {
-            logger.error("Error handling a connection", ex);
             throw new CoreException(ex);
         }
     }
 
-    /**
-     *
-     * @return @throws CoreException
-     */
     @Override
     public List<String> getUserGroups() throws CoreException {
-        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
-            List<String> list = new ArrayList<String>();
+        try {
+            List<String> list = new ArrayList<>();
             if (getSessionUser().isSystemAdministrator()) {
-                for (Group group : configurationBusiness.getGroups(connection)) {
+                for (Group group : configurationBusiness.getGroups()) {
                     list.add(group.getName());
                 }
             } else {
-                Map<Group, GROUP_ROLE> groups = getSessionUserGroups();
+                Map<Group, GROUP_ROLE> groups = getUserGroupsFromSession();
                 for (Group group : groups.keySet()) {
                     if (groups.get(group) != GROUP_ROLE.None) {
                         list.add(group.getName());
@@ -478,27 +339,16 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
             return list;
         } catch (BusinessException ex) {
             throw new CoreException(ex);
-        } catch (SQLException ex) {
-            logger.error("Error handling a connection", ex);
-            throw new CoreException(ex);
         }
     }
 
-    /**
-     *
-     * @param email
-     * @param level
-     * @param countryCode
-     * @param groups
-     * @throws CoreException
-     */
     @Override
     public void updateUser(
         String email, UserLevel level, CountryCode countryCode,
         int maxRunningSimulations, Map<String, GROUP_ROLE> groups,
         boolean locked)
         throws CoreException {
-        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
+        try {
             authenticateSystemAdministrator(logger);
             trace(logger, "Updating user '" + email + "'.");
             configurationBusiness.updateUser(
@@ -506,98 +356,66 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
                 level,
                 countryCode,
                 maxRunningSimulations,
-                locked,
-                connection);
-            configurationBusiness.setUserGroups(email, groups, connection);
+                locked);
+            configurationBusiness.setUserGroups(email, groups);
         } catch (BusinessException ex) {
-            throw new CoreException(ex);
-        } catch (SQLException ex) {
-            logger.error("Error handling a connection", ex);
             throw new CoreException(ex);
         }
     }
 
-    /**
-     *
-     * @return @throws CoreException
-     */
     @Override
     public User getUserData() throws CoreException {
-        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
-            return configurationBusiness
-                .getUserData(getSessionUser().getEmail(), connection);
+        try {
+            return configurationBusiness.getUserData(getSessionUser().getEmail());
         } catch (BusinessException ex) {
-            throw new CoreException(ex);
-        } catch (SQLException ex) {
-            logger.error("Error handling a connection", ex);
             throw new CoreException(ex);
         }
     }
 
-    /**
-     *
-     * @param user
-     * @throws CoreException
-     */
     @Override
     public User updateUser(User user) throws CoreException {
-        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
+        try {
             trace(logger, "Updating user data '" + user.getEmail() + "'.");
-            user = configurationBusiness.updateUser(user, connection);
-            return setUserSession(user);
+            user = configurationBusiness.updateUser(user);
+            return setUserInSession(user);
         } catch (BusinessException ex) {
-            throw new CoreException(ex);
-        } catch (SQLException ex) {
-            logger.error("Error handling a connection", ex);
             throw new CoreException(ex);
         }
     }
 
-    /**
-     *
-     * @param currentPassword
-     * @param newPassword
-     * @throws CoreException
-     */
+    @Override
     public void updateUserPassword(String currentPassword, String newPassword)
             throws CoreException {
-        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
+        try {
             trace(logger, "Updating user password.");
             configurationBusiness.updateUserPassword(
-                getSessionUser().getEmail(),
+                    getSessionUser().getEmail(),
                 currentPassword,
-                newPassword,
-                connection);
+                newPassword);
         } catch (BusinessException ex) {
-            throw new CoreException(ex);
-        } catch (SQLException ex) {
-            logger.error("Error handling a connection", ex);
             throw new CoreException(ex);
         }
     }
 
+    @Override
     public User requestNewEmail(String newEmail) throws CoreException {
-        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
+        try {
             User currentUser = getSessionUser();
             String currentEmail = currentUser.getEmail();
             trace(logger, "Requesting email change from " + currentEmail + " to " + newEmail);
 
-            configurationBusiness
-                .requestNewEmail(currentUser, newEmail, connection);
+            configurationBusiness.requestNewEmail(currentUser, newEmail);
 
-            currentUser = configurationBusiness
-                .getUserData(currentUser.getEmail(), connection);
-            return setUserSession(currentUser);
+            currentUser = configurationBusiness.getUserData(currentUser.getEmail());
+            return setUserInSession(currentUser);
         } catch (BusinessException ex) {
-            throw new CoreException(ex);
-        } catch (SQLException ex) {
-            logger.error("Error handling a connection", ex);
             throw new CoreException(ex);
         }
     }
 
+    @Override
     public User confirmNewEmail(String code) throws CoreException {
-        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
+        try {
             User currentUser = getSessionUser();
             String currentEmail = currentUser.getEmail();
             String newEmail = currentUser.getNextEmail();
@@ -607,254 +425,136 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
                         currentEmail, code, currentUser.getCode());
                 throw new CoreException("Wrong validation code");
             }
-            configurationBusiness.updateUserEmail(
-                currentEmail, newEmail, connection);
-            configurationBusiness.resetNextEmail(newEmail, connection);
+            configurationBusiness.updateUserEmail(currentEmail, newEmail);
+            configurationBusiness.resetNextEmail(newEmail);
 
-            currentUser = configurationBusiness
-                .getUserData(newEmail, connection);
-            return setUserSession(currentUser);
+            currentUser = configurationBusiness.getUserData(newEmail);
+            return setUserInSession(currentUser);
         } catch (BusinessException ex) {
-            throw new CoreException(ex);
-        } catch (SQLException ex) {
-            logger.error("Error handling a connection", ex);
             throw new CoreException(ex);
         }
     }
 
+    @Override
     public User cancelNewEmail() throws CoreException {
-        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
+        try {
             User currentUser = getSessionUser();
             String currentEmail = currentUser.getEmail();
             String newEmail = currentUser.getNextEmail();
             trace(logger, "Canceling email change from " + currentEmail + " to " + newEmail);
-            configurationBusiness.resetNextEmail(currentEmail, connection);
+            configurationBusiness.resetNextEmail(currentEmail);
 
-            currentUser = configurationBusiness
-                .getUserData(currentEmail, connection);
-            return setUserSession(currentUser);
+            currentUser = configurationBusiness.getUserData(currentEmail);
+            return setUserInSession(currentUser);
         } catch (BusinessException ex) {
-            throw new CoreException(ex);
-        } catch (SQLException ex) {
-            logger.error("Error handling a connection", ex);
             throw new CoreException(ex);
         }
     }
 
-    public void updateUserEmail(String currentEmail, String newEmail)
-        throws CoreException {
-        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
-            trace(logger, "Updating user email from " + currentEmail + " to " + newEmail);
-            authenticateSystemAdministrator(logger);
-            configurationBusiness.updateUserEmail(
-                currentEmail, newEmail, connection);
-        } catch (BusinessException ex) {
-            throw new CoreException(ex);
-        } catch (SQLException ex) {
-            logger.error("Error handling a connection", ex);
-            throw new CoreException(ex);
-        }
-    }
-
-    /**
-     *
-     * @param category
-     * @param subject
-     * @param comment
-     * @throws CoreException
-     */
+    @Override
     public void sendContactMail(String category, String subject, String comment)
-        throws CoreException {
-        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
+            throws CoreException {
+        try {
             configurationBusiness.sendContactMail(
-                getSessionUser(), category, subject, comment, connection);
+                    getSessionUser(), category, subject, comment);
 
         } catch (BusinessException ex) {
             throw new CoreException(ex);
-        } catch (SQLException ex) {
-            logger.error("Error handling a connection", ex);
-            throw new CoreException(ex);
         }
     }
 
-    /**
-     *
-     * @param user
-     * @return
-     * @throws BusinessException
-     */
-    public User setUserSession(User user) throws BusinessException {
-        return setUserSession(user, getSession());
-    }
-
-    public User setUserSession(User user, HttpSession session) throws BusinessException {
-        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
-            Map<Group, GROUP_ROLE> groups =
-                configurationBusiness.getUserGroups(user.getEmail(), connection);
-            user.setGroups(groups);
-
-            session.setAttribute(CoreConstants.SESSION_USER, user);
-            session.setAttribute(CoreConstants.SESSION_GROUPS, groups);
-
-            return user;
-        } catch (SQLException ex) {
-            logger.error("Error handling a connection", ex);
-            throw new BusinessException(ex);
-        }
-    }
-
-    /**
-     *
-     * @param email
-     * @throws CoreException
-     */
+    @Override
     public void activateUser(String email) throws CoreException {
-        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
+        try {
             authenticateSystemAdministrator(logger);
             trace(logger, "Activating user: " + email);
-            configurationBusiness.activateUser(email, connection);
+            configurationBusiness.activateUser(email);
         } catch (BusinessException ex) {
-            throw new CoreException(ex);
-        } catch (SQLException ex) {
-            logger.error("Error handling a connection", ex);
             throw new CoreException(ex);
         }
     }
 
-    /**
-     *
-     * @param groupName
-     * @throws CoreException
-     */
     @Override
     public void addUserToGroup(String groupName) throws CoreException {
-        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
+        try {
             trace(logger, "Adding user to group '" + groupName + "'.");
             configurationBusiness.addUserToGroup(
-                getSessionUser().getEmail(), groupName, connection);
+                    getSessionUser().getEmail(), groupName);
         } catch (BusinessException ex) {
-            throw new CoreException(ex);
-        } catch (SQLException ex) {
-            logger.error("Error handling a connection", ex);
             throw new CoreException(ex);
         }
     }
 
-    /**
-     *
-     * @param groupName
-     * @return
-     * @throws CoreException
-     */
+    @Override
     public List<User> getUsersFromGroup(String groupName) throws CoreException {
-        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
+        try {
             authenticateGroupAdministrator(logger, groupName);
-            return configurationBusiness.getUsersFromGroup(
-                groupName, connection);
+            return configurationBusiness.getUsersFromGroup(groupName);
         } catch (BusinessException ex) {
-            throw new CoreException(ex);
-        } catch (SQLException ex) {
-            logger.error("Error handling a connection", ex);
             throw new CoreException(ex);
         }
     }
 
-    /**
-     *
-     * @param email
-     * @param groupName
-     * @throws CoreException
-     */
     @Override
     public void removeUserFromGroup(String email, String groupName)
-        throws CoreException {
-        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
+            throws CoreException {
+        try {
             if (email != null) {
                 authenticateSystemAdministrator(logger);
                 trace(logger, "Removing '" + email + "' from '" + groupName + "' group.");
-                configurationBusiness.removeUserFromGroup(
-                    email, groupName, connection);
+                configurationBusiness.removeUserFromGroup(email, groupName);
             } else {
                 trace(logger, "Removing user from '" + groupName + "' group.");
                 configurationBusiness.removeUserFromGroup(
-                    getSessionUser().getEmail(), groupName, connection);
+                        getSessionUser().getEmail(), groupName);
             }
         } catch (BusinessException ex) {
             throw new CoreException(ex);
-        } catch (SQLException ex) {
-            logger.error("Error handling a connection", ex);
-            throw new CoreException(ex);
         }
     }
 
-    /**
-     *
-     * @param email
-     * @param code
-     * @param password
-     * @throws CoreException
-     */
     @Override
     public void resetPassword(String email, String code, String password)
-        throws CoreException {
-        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
+            throws CoreException {
+        try {
             logger.info("(" + email + ") Reseting password.");
-            configurationBusiness.resetPassword(
-                email, code, password, connection);
+            configurationBusiness.resetPassword(email, code, password);
         } catch (BusinessException ex) {
-            throw new CoreException(ex);
-        } catch (SQLException ex) {
-            logger.error("Error handling a connection", ex);
             throw new CoreException(ex);
         }
     }
 
     /**
-     *
      * @return List of accounts
-     * @throws CoreException
+     *
      */
     @Override
     public List<Account> getAccounts() throws CoreException {
-        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
-            return configurationBusiness.getAccounts(connection);
+        try {
+            return configurationBusiness.getAccounts();
         } catch (BusinessException ex) {
-            throw new CoreException(ex);
-        } catch (SQLException ex) {
-            logger.error("Error handling a connection", ex);
             throw new CoreException(ex);
         }
     }
 
-    /**
-     *
-     * @param name
-     * @throws CoreException
-     */
     @Override
     public void removeAccount(String name) throws CoreException {
-        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
+        try {
             authenticateSystemAdministrator(logger);
             trace(logger, "Removing account type '" + name + "'.");
-            configurationBusiness.removeAccount(name, connection);
+            configurationBusiness.removeAccount(name);
         } catch (BusinessException ex) {
-            throw new CoreException(ex);
-        } catch (SQLException ex) {
-            logger.error("Error handling a connection", ex);
             throw new CoreException(ex);
         }
     }
 
     @Override
     public void addAccount(String name, List<String> groups) throws CoreException {
-        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
+        try {
             authenticateSystemAdministrator(logger);
             trace(logger, "Adding account type '" + name + "'.");
-            configurationBusiness.addAccount(name, groups, connection);
+            configurationBusiness.addAccount(name, groups);
         } catch (BusinessException ex) {
-            throw new CoreException(ex);
-        } catch (SQLException ex) {
-            logger.error("Error handling a connection", ex);
             throw new CoreException(ex);
         }
     }
@@ -862,22 +562,18 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
     @Override
     public void updateAccount(String oldName, String newName, List<String> groups)
             throws CoreException {
-        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
+        try {
             authenticateSystemAdministrator(logger);
             trace(logger, "Updating account type from '" + oldName + "' to '" + newName + "'.");
-            configurationBusiness.updateAccount(
-                oldName, newName, groups, connection);
+            configurationBusiness.updateAccount(oldName, newName, groups);
         } catch (BusinessException ex) {
-            throw new CoreException(ex);
-        } catch (SQLException ex) {
-            logger.error("Error handling a connection", ex);
             throw new CoreException(ex);
         }
     }
 
     @Override
     public String getCASLoginPageUrl() throws CoreException {
-        URL url = null;
+        URL url;
         try {
             url = getBaseURL();
         } catch (MalformedURLException e) {
@@ -887,7 +583,7 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
     }
 
     private URL getBaseURL() throws MalformedURLException {
-        URL url = null;
+        URL url;
         HttpServletRequest request = this.getThreadLocalRequest();
         if ((request.getServerPort() == 80)
                 || (request.getServerPort() == 443)) {
@@ -904,15 +600,10 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
 
     @Override
     public UsageStats getUsageStats() throws CoreException {
-        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
-            Integer users = CoreDAOFactory.getDAOFactory()
-                .getUserDAO(connection).getNUsers();
-            Integer countries = CoreDAOFactory.getDAOFactory()
-                .getUserDAO(connection).getNCountries();
+        try {
+            Integer users = userDAO.getNUsers();
+            Integer countries = userDAO.getNCountries();
             return new UsageStats(users, countries);
-        } catch (SQLException ex) {
-            logger.error("Error handling a connection", ex);
-            throw new CoreException(ex);
         } catch (DAOException e) {
             throw new CoreException(e);
         }
@@ -930,18 +621,17 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
             //TODO: put server URL instead
             WebAuthInfo wai = session.getAuthInfo("REDIRECT");
 
-            try(Connection connection = PlatformConnection.getInstance().getConnection()) {
-                String dir = Server.getInstance().getDataManagerUsersHome() + "/" + user.getFolder();
-                CoreUtil.getGRIDAClient().createFolder(dir, "Dropbox");
-                CoreDAOFactory.getDAOFactory()
-                    .getUserDAO(connection).linkDropboxAccount(
+            try {
+                String dir = server.getDataManagerUsersHome() + "/" + user.getFolder();
+                gridaClient.createFolder(dir, "Dropbox");
+                userDAO.linkDropboxAccount(
                         user.getEmail(),
                         dir + "/Dropbox",
                         wai.requestTokenPair.key,
                         wai.requestTokenPair.secret);
             } catch (DAOException ex) {
                 throw new CoreException(ex);
-            } catch (GRIDAClientException | SQLException ex) {
+            } catch (GRIDAClientException ex) {
                 logger.error("Error linking dropbox account for {}", user.getEmail(), ex);
                 throw new CoreException(ex);
             }
@@ -956,13 +646,8 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
     public void activateDropboxAccount(String oauth_token) throws CoreException {
         trace(logger, "Activating Dropbox account.");
         User user = getSessionUser();
-        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
-            CoreDAOFactory.getDAOFactory()
-                .getUserDAO(connection)
-                .activateDropboxAccount(user.getEmail(), oauth_token);
-        } catch (SQLException ex) {
-            logger.error("Error handling a connection", ex);
-            throw new CoreException(ex);
+        try {
+            userDAO.activateDropboxAccount(user.getEmail(), oauth_token);
         } catch (DAOException e) {
             throw new CoreException(e);
         }
@@ -972,13 +657,8 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
     public DropboxAccountStatus.AccountStatus getDropboxAccountStatus() throws CoreException {
         trace(logger, "Getting Dropbox account status.");
         User user = getSessionUser();
-        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
-            return CoreDAOFactory.getDAOFactory()
-                .getUserDAO(connection)
-                .getDropboxAccountStatus(user.getEmail());
-        } catch (SQLException ex) {
-            logger.error("Error handling a connection", ex);
-            throw new CoreException(ex);
+        try {
+            return userDAO.getDropboxAccountStatus(user.getEmail());
         } catch (DAOException e) {
             throw new CoreException(e);
         }
@@ -988,12 +668,8 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
     public void unlinkDropboxAccount() throws CoreException {
         trace(logger, "Unlinking Dropbox account.");
         User user = getSessionUser();
-        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
-            CoreDAOFactory.getDAOFactory()
-                .getUserDAO(connection).unlinkDropboxAccount(user.getEmail());
-        } catch (SQLException ex) {
-            logger.error("Error handling a connection", ex);
-            throw new CoreException(ex);
+        try {
+            userDAO.unlinkDropboxAccount(user.getEmail());
         } catch (DAOException e) {
             throw new CoreException(e);
         }
@@ -1003,90 +679,9 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
     public void updateTermsOfUse() throws CoreException {
         trace(logger, "Updating terms of use.");
         User user = getSessionUser();
-        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
-            configurationBusiness.updateTermsOfUse(user.getEmail(), connection);
+        try {
+            configurationBusiness.updateTermsOfUse(user.getEmail());
         } catch (BusinessException ex) {
-            throw new CoreException(ex);
-        } catch (SQLException ex) {
-            logger.error("Error handling a connection", ex);
-            throw new CoreException(ex);
-        }
-    }
-
-    @Override
-    public List<Publication> getPublications() throws CoreException {
-        trace(logger, "Getting publication list.");
-        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
-            return configurationBusiness.getPublications(connection);
-        } catch (BusinessException ex) {
-            throw new CoreException(ex);
-        } catch (SQLException ex) {
-            logger.error("Error handling a connection", ex);
-            throw new CoreException(ex);
-        }
-    }
-
-    @Override
-    public void removePublication(Long id) throws CoreException {
-        trace(logger, "Removing publication.");
-
-        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
-            User user = getSessionUser();
-            if (user.isSystemAdministrator() ||
-                configurationBusiness
-                  .getPublication(id, connection)
-                  .getVipAuthor().equals(user.getEmail())) {
-                configurationBusiness.removePublication(id, connection);
-            } else {
-                logger.error("{} cannot remove publication {} because it's not his",
-                        user, id);
-                throw new CoreException("you can't remove a publication that is not yours");
-            }
-        } catch (BusinessException ex) {
-            throw new CoreException(ex);
-        } catch (SQLException ex) {
-            logger.error("Error handling a connection", ex);
-            throw new CoreException(ex);
-        }
-    }
-
-    @Override
-    public void addPublication(Publication pub) throws CoreException {
-        trace(logger, "Adding publication.");
-
-        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
-            User user = getSessionUser();
-            pub.setVipAuthor(user.getEmail());
-            configurationBusiness.addPublication(pub, connection);
-        } catch (BusinessException ex) {
-            throw new CoreException(ex);
-        } catch (SQLException ex) {
-            logger.error("Error handling a connection", ex);
-            throw new CoreException(ex);
-        }
-    }
-
-    @Override
-    public void updatePublication(Publication pub) throws CoreException {
-        trace(logger, "Updating publication.");
-
-        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
-            User user = getSessionUser();
-            if (user.isSystemAdministrator() ||
-                configurationBusiness
-                  .getPublication(pub.getId(), connection)
-                  .getVipAuthor().equals(user.getEmail())) {
-                pub.setVipAuthor(user.getEmail());
-                configurationBusiness.updatePublication(pub, connection);
-            } else {
-                logger.error("{} cannot modify publication {} because its not his",
-                        user.getEmail(), pub.getId());
-                throw new CoreException("you can't modify a publication that is not yours");
-            }
-        } catch (BusinessException ex) {
-            throw new CoreException(ex);
-        } catch (SQLException ex) {
-            logger.error("Error handling a connection", ex);
             throw new CoreException(ex);
         }
     }
@@ -1094,26 +689,19 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
     @Override
     public void addTermsUse() throws CoreException {
         trace(logger, "adding new terms of Use.");
-        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
+        try {
             authenticateSystemAdministrator(logger);
-            configurationBusiness.addTermsUse(connection);
+            configurationBusiness.addTermsUse();
         } catch (BusinessException ex) {
-            throw new CoreException(ex);
-        } catch (SQLException ex) {
-            logger.error("Error handling a connection", ex);
             throw new CoreException(ex);
         }
     }
 
     @Override
     public Timestamp getLastUpdateTermsOfUse() throws CoreException {
-        try(Connection connection =
-            PlatformConnection.getInstance().getConnection()) {
-            return configurationBusiness.getLastUpdateTermsOfUse(connection);
+        try {
+            return configurationBusiness.getLastUpdateTermsOfUse();
         } catch (BusinessException ex) {
-            throw new CoreException(ex);
-        } catch (SQLException ex) {
-            logger.error("Error handling a connection", ex);
             throw new CoreException(ex);
         }
     }
@@ -1124,87 +712,11 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
     }
 
     @Override
-    public int getMaxConfiguredPlatformSimulation() throws CoreException {
-        return Server.getInstance().getMaxPlatformRunningSimulations();
-    }
-
-    @Override
-    public void changeMaxConfiguredPlatformSimulation(int maxPlatformRunningSimulations) throws CoreException {
-        try {
-            Server.getInstance().setMaxPlatformRunningSimulations(maxPlatformRunningSimulations);
-        } catch (ConfigurationException ex) {
-            logger.error("Configuration error changing maxPlatformRunningSimulations to {}",
-                    maxPlatformRunningSimulations, ex);
-            throw new CoreException(ex);
-        }
-    }
-
-    @Override
-    public List<Publication> parseBibtexText(String s) throws CoreException {
-        List<Publication> publications = new ArrayList<Publication>();
-        try {
-            Reader reader = new StringReader(s);
-            org.jbibtex.BibTeXParser bibtexParser = new org.jbibtex.BibTeXParser();
-            org.jbibtex.BibTeXDatabase database = bibtexParser.parseFully(reader);
-            Map<org.jbibtex.Key, org.jbibtex.BibTeXEntry> entryMap = database.getEntries();
-            Collection<org.jbibtex.BibTeXEntry> entries = entryMap.values();
-            for (org.jbibtex.BibTeXEntry entry : entries) {
-                String type = entry.getType().toString();
-                org.jbibtex.Value title = entry.getField(org.jbibtex.BibTeXEntry.KEY_TITLE);
-                org.jbibtex.Value date = entry.getField(org.jbibtex.BibTeXEntry.KEY_YEAR);
-                org.jbibtex.Value doi = entry.getField(org.jbibtex.BibTeXEntry.KEY_DOI);
-                org.jbibtex.Value authors = entry.getField(org.jbibtex.BibTeXEntry.KEY_AUTHOR);
-                org.jbibtex.Value typeName = entry.getField(org.jbibtex.BibTeXEntry.KEY_BOOKTITLE);
-                String doiv;
-                if (doi == null) {
-                    doiv = "";
-                } else {
-                    doiv = doi.toUserString();
-                }
-                publications.add(new Publication(title.toUserString(), date.toUserString(), doiv, authors.toUserString(), parseTypePublication(type), getTypeName(entry, type), getSessionUser().getEmail()));
-
-            }
-
-        } catch (ParseException | TokenMgrException ex) {
-            logger.error("Error parsing publication {}", s, ex);
-            throw new CoreException(ex);
-        }
-        return publications;
-    }
-
-    private String parseTypePublication(String type) {
-        if (type.equalsIgnoreCase("inproceedings") || type.equalsIgnoreCase("conference")) {
-            return PublicationTypes.ConferenceArticle.toString();
-        } else if (type.equalsIgnoreCase("article")) {
-            return PublicationTypes.Journal.toString();
-        } else if (type.equalsIgnoreCase("inbook") || type.equalsIgnoreCase("incollection")) {
-            return PublicationTypes.BookChapter.toString();
-        } else {
-            return PublicationTypes.Other.toString();
-        }
-
-    }
-
-    private String getTypeName(org.jbibtex.BibTeXEntry entry, String type) {
-        if (type.equalsIgnoreCase("inproceedings") || type.equalsIgnoreCase("conference") || type.equalsIgnoreCase("incollection")) {
-            return entry.getField(org.jbibtex.BibTeXEntry.KEY_BOOKTITLE).toUserString();
-        } else if (type.equalsIgnoreCase("article")) {
-            return entry.getField(org.jbibtex.BibTeXEntry.KEY_JOURNAL).toUserString();
-        } else {
-            return "";
-        }
-
-    }
-
-    @Override
     public boolean testLastUpdatePublication() throws CoreException {
-        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
+        try {
             return configurationBusiness.testLastUpdatePublication(
-                getSessionUser().getEmail(), connection);
+                    getSessionUser().getEmail());
         } catch (BusinessException ex) {
-            throw new CoreException(ex);
-        } catch (SQLException ex) {
-            logger.error("Error handling a connection", ex);
             throw new CoreException(ex);
         }
     }
@@ -1213,13 +725,9 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
     public void updateLastUpdatePublication() throws CoreException {
         trace(logger, "Updating Last Update Publication.");
         User user = getSessionUser();
-        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
-            configurationBusiness
-                .updateLastUpdatePublication(user.getEmail(), connection);
+        try {
+            configurationBusiness.updateLastUpdatePublication(user.getEmail());
         } catch (BusinessException ex) {
-            throw new CoreException(ex);
-        } catch (SQLException ex) {
-            logger.error("Error handling a connection", ex);
             throw new CoreException(ex);
         }
     }
@@ -1229,39 +737,30 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
 
     @Override
     public String getUserApikey(String email) throws CoreException {
-        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
+        try {
             return configurationBusiness
-                .getUserApikey(getSessionUser().getEmail(), connection);
+                    .getUserApikey(getSessionUser().getEmail());
         } catch (BusinessException ex) {
-            throw new CoreException(ex);
-        } catch (SQLException ex) {
-            logger.error("Error handling a connection", ex);
             throw new CoreException(ex);
         }
     }
 
     @Override
     public void deleteUserApikey(String email) throws CoreException {
-        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
+        try {
             configurationBusiness
-                .deleteUserApikey(getSessionUser().getEmail(), connection);
+                .deleteUserApikey(getSessionUser().getEmail());
         } catch (BusinessException ex) {
-            throw new CoreException(ex);
-        } catch (SQLException ex) {
-            logger.error("Error handling a connection", ex);
             throw new CoreException(ex);
         }
     }
 
     @Override
     public String generateNewUserApikey(String email) throws CoreException {
-        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
+        try {
             return configurationBusiness
-                .generateNewUserApikey(getSessionUser().getEmail(), connection);
+                .generateNewUserApikey(getSessionUser().getEmail());
         } catch (BusinessException ex) {
-            throw new CoreException(ex);
-        } catch (SQLException ex) {
-            logger.error("Error handling a connection", ex);
             throw new CoreException(ex);
         }
     }

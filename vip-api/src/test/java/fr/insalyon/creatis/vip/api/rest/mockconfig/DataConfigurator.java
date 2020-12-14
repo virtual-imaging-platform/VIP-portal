@@ -35,14 +35,15 @@ import fr.insalyon.creatis.vip.api.rest.config.BaseVIPSpringIT;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.datamanager.server.business.LFCBusiness;
 import org.mockito.Mockito;
-import static org.mockito.Matchers.anyObject;
+import static org.mockito.ArgumentMatchers.any;
 
 import java.util.Arrays;
+import java.util.Collections;
 
 import static fr.insalyon.creatis.vip.api.data.PathTestUtils.*;
 import static fr.insalyon.creatis.vip.api.data.UserTestUtils.*;
 import static fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants.ROOT;
-import static org.mockito.Matchers.eq;
+import static org.mockito.ArgumentMatchers.eq;
 
 /**
  * Created by abonnet on 2/23/17.
@@ -56,89 +57,86 @@ public class DataConfigurator {
         LFCBusiness mockLFCBusinnes = testSuite.getLfcBusiness();
         // /vip
         Mockito.when(mockLFCBusinnes.listDir(
-                         eq(baseUser1), eq(ROOT), eq(true), anyObject()))
+                         eq(baseUser1), eq(ROOT), eq(true)))
             .thenReturn(Arrays.asList(user1Dir));
         Mockito.when(mockLFCBusinnes.listDir(
-                         eq(baseUser2), eq(ROOT), eq(true), anyObject()))
+                         eq(baseUser2), eq(ROOT), eq(true)))
             .thenReturn(Arrays.asList(user2Dir));
         // /vip/Home
         Mockito.when(mockLFCBusinnes.exists(
-                         eq(baseUser1), eq("/vip/Home"), anyObject()))
+                         eq(baseUser1), eq("/vip/Home")))
             .thenReturn(true);
         Mockito.when(mockLFCBusinnes.exists(
-                         eq(baseUser2), eq("/vip/Home"), anyObject()))
+                         eq(baseUser2), eq("/vip/Home")))
             .thenReturn(true);
         Mockito.when(mockLFCBusinnes.listDir(
-                         eq(baseUser1), eq("/vip/Home"), eq(true), anyObject()))
+                         eq(baseUser1), eq("/vip/Home"), eq(true)))
             .thenReturn(Arrays.asList(testFile1));
         Mockito.when(mockLFCBusinnes.listDir(
-                         eq(baseUser2), eq("/vip/Home"), eq(true), anyObject()))
+                         eq(baseUser2), eq("/vip/Home"), eq(true)))
             .thenReturn(Arrays.asList(testFile2, testDir1));
         // (user1) /vip/Home/testFile1
         Mockito.when(
             mockLFCBusinnes.exists(
-                eq(baseUser1), eq("/vip/Home/testFile1.xml"), anyObject()))
+                eq(baseUser1), eq("/vip/Home/testFile1.xml")))
             .thenReturn(true);
         Mockito.when(
             mockLFCBusinnes.listDir(
-                eq(baseUser1), eq("/vip/Home/testFile1.xml"), eq(true), anyObject()))
-            .thenReturn(Arrays.asList(getAbsoluteData(testFile1)));
+                eq(baseUser1), eq("/vip/Home/testFile1.xml"), eq(true)))
+            .thenReturn(Arrays.asList(testFile1));
         // (user2) /vip/Home/testFile2
         Mockito.when(
             mockLFCBusinnes.exists(
-                eq(baseUser2), eq("/vip/Home/testFile2.json"), anyObject()))
+                eq(baseUser2), eq("/vip/Home/testFile2.json")))
             .thenReturn(true);
         Mockito.when(
             mockLFCBusinnes.listDir(
-                eq(baseUser2), eq("/vip/Home/testFile2.json"), eq(true), anyObject()))
-            .thenReturn(Arrays.asList(getAbsoluteData(testFile2)));
+                eq(baseUser2), eq("/vip/Home/testFile2.json"), eq(true)))
+            .thenReturn(Arrays.asList(testFile2));
         // (user2) /vip/Home/testDir1
         Mockito.when(
             mockLFCBusinnes.exists(
-                eq(baseUser2), eq("/vip/Home/testDir1"), anyObject()))
+                eq(baseUser2), eq("/vip/Home/testDir1")))
             .thenReturn(true);
         Mockito.when(
             mockLFCBusinnes.listDir(
                 eq(baseUser2),
                 eq("/vip/Home/testDir1"),
-                eq(true),
-                anyObject()))
+                eq(true)))
             .thenReturn(Arrays.asList(testFile3, testFile4, testFile5));
         Mockito.when(
             mockLFCBusinnes.getModificationDate(
-                eq(baseUser2), eq("/vip/Home/testDir1"), anyObject()))
+                eq(baseUser2), eq("/vip/Home/testDir1")))
             .thenReturn(getDataModitTS(testDir1)*1000);
         // (user2) /vip/Home/testFile[345]
         Mockito.when(
             mockLFCBusinnes.exists(
-                eq(baseUser2), eq("/vip/Home/testDir1/testFile3"), anyObject()))
+                eq(baseUser2), eq("/vip/Home/testDir1/testFile3")))
             .thenReturn(true);
         Mockito.when(
             mockLFCBusinnes.exists(
-                eq(baseUser2), eq("/vip/Home/testDir1/testFile4.pdf"), anyObject()))
+                eq(baseUser2), eq("/vip/Home/testDir1/testFile4.pdf")))
             .thenReturn(true);
         Mockito.when(
             mockLFCBusinnes.exists(
-                eq(baseUser2), eq("/vip/Home/testDir1/testFile5.zip"), anyObject()))
+                eq(baseUser2), eq("/vip/Home/testDir1/testFile5.zip")))
             .thenReturn(true);
         Mockito.when(
             mockLFCBusinnes.listDir(
-                eq(baseUser2), eq("/vip/Home/testDir1/testFile3"), eq(true), anyObject()))
-            .thenReturn(Arrays.asList(getAbsoluteData(testFile3)));
+                eq(baseUser2), eq("/vip/Home/testDir1/testFile3"), eq(true)))
+            .thenReturn(Collections.singletonList(testFile3));
         Mockito.when(
             mockLFCBusinnes.listDir(
                 eq(baseUser2),
                 eq("/vip/Home/testDir1/testFile4.pdf"),
-                eq(true),
-                anyObject()))
-            .thenReturn(Arrays.asList(getAbsoluteData(testFile4)));
+                eq(true)))
+            .thenReturn(Collections.singletonList(testFile4));
         Mockito.when(
             mockLFCBusinnes.listDir(
                 eq(baseUser2),
                 eq("/vip/Home/testDir1/testFile5.zip"),
-                eq(true),
-                anyObject()))
-            .thenReturn(Arrays.asList(getAbsoluteData(testFile5)));
+                eq(true)))
+            .thenReturn(Collections.singletonList(testFile5));
     }
 
 }

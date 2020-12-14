@@ -31,9 +31,12 @@
  */
 package fr.insalyon.creatis.vip.docs.client;
 
+import com.smartgwt.client.widgets.tab.Tab;
 import fr.insalyon.creatis.vip.core.client.CoreModule;
 import fr.insalyon.creatis.vip.core.client.Module;
 import fr.insalyon.creatis.vip.docs.client.view.DocsParser;
+
+import java.util.Set;
 
 /**
  *
@@ -52,7 +55,7 @@ public class DocsModule extends Module {
     }
 
     @Override
-    public void terminate() {
+    public void terminate(Set<Tab> removedTabs) {
     }
     
     @Override

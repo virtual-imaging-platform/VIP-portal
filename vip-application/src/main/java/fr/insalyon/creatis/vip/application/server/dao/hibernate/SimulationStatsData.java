@@ -34,33 +34,39 @@ package fr.insalyon.creatis.vip.application.server.dao.hibernate;
 import fr.insalyon.creatis.moteur.plugins.workflowsdb.bean.Stats;
 import fr.insalyon.creatis.moteur.plugins.workflowsdb.bean.Workflow;
 import fr.insalyon.creatis.moteur.plugins.workflowsdb.dao.WorkflowsDBDAOException;
+import fr.insalyon.creatis.moteur.plugins.workflowsdb.dao.WorkflowsDBDAOFactory;
 import fr.insalyon.creatis.vip.application.server.dao.SimulationStatsDAO;
-import fr.insalyon.creatis.vip.application.server.dao.h2.SimulationData;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.ProjectionList;
-import org.hibernate.criterion.Restrictions;
 import org.hibernate.criterion.Projections;
+import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  *
  * @author Rafael Ferreira da Silva
  */
+@Repository
 public class SimulationStatsData implements SimulationStatsDAO {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private SessionFactory sessionFactory;
 
+    @Autowired
     public SimulationStatsData(SessionFactory sessionFactory) {
         this.sessionFactory = sessionFactory;
     }

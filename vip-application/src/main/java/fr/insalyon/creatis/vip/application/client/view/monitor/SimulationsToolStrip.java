@@ -309,7 +309,7 @@ public class SimulationsToolStrip extends ToolStrip {
             SimulationStatus status = SimulationStatus.valueOf(data.getStatus());
 
             if (status == SimulationStatus.Completed
-                    || status == SimulationStatus.Killed) {
+                    || status == SimulationStatus.Killed || status == SimulationStatus.Failed) {
 
                 simulationIDs.add(data.getSimulationId());
             }
@@ -377,7 +377,7 @@ public class SimulationsToolStrip extends ToolStrip {
             SimulationRecord data = (SimulationRecord) record;
             SimulationStatus status = SimulationStatus.valueOf(data.getStatus());
 
-            if (status == SimulationStatus.Killed) {
+            if (status == SimulationStatus.Killed || status == SimulationStatus.Failed) {
                 simulationIDs.add(data.getSimulationId());
             }
         }

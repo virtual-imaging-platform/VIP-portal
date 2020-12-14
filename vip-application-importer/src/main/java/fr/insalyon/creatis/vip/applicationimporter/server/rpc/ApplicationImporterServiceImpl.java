@@ -37,57 +37,61 @@ import fr.insalyon.creatis.vip.applicationimporter.client.rpc.ApplicationImporte
 import fr.insalyon.creatis.vip.applicationimporter.server.business.ApplicationImporterBusiness;
 import fr.insalyon.creatis.vip.core.client.view.CoreException;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
-import fr.insalyon.creatis.vip.core.server.dao.mysql.PlatformConnection;
-import fr.insalyon.creatis.vip.core.server.business.Server;
-
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
+
+import javax.servlet.ServletException;
+import java.util.HashMap;
+import java.util.List;
 
 public class ApplicationImporterServiceImpl extends fr.insalyon.creatis.vip.core.server.rpc.AbstractRemoteServiceServlet
         implements ApplicationImporterService {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
+    private ApplicationImporterBusiness applicationImporterBusiness;
+
+    @Override
+    public void init() throws ServletException {
+        super.init();
+        applicationImporterBusiness = getBean(ApplicationImporterBusiness.class);
+    }
+
     @Override
     public String readAndValidateBoutiquesFile(String fileLFN) throws ApplicationImporterException {
-        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
+        try {
             trace(logger, "Reading file "+fileLFN+" as string.");
-            ApplicationImporterBusiness abi = new ApplicationImporterBusiness();
-            return abi.readAndValidationBoutiquesFile(
-                fileLFN, getSessionUser(), connection);
+            return applicationImporterBusiness.readAndValidationBoutiquesFile(
+                    fileLFN, getSessionUser());
         } catch (CoreException | BusinessException ex) {
-            throw new ApplicationImporterException(ex);
-        } catch (SQLException ex) {
-            logger.error("Error handling a connection", ex);
             throw new ApplicationImporterException(ex);
         }
     }
 
     @Override
-    public void createApplication(BoutiquesTool bt, String type, String tag, HashMap<String, BoutiquesTool> bts, boolean isRunOnGrid, boolean overwriteVersion, boolean challenge) throws ApplicationImporterException {
-        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
+    public void createApplication(
+            BoutiquesTool bt, String type, String tag, HashMap<String,
+            BoutiquesTool> bts, boolean isRunOnGrid, boolean overwriteVersion,
+            boolean challenge) throws ApplicationImporterException {
+        try {
             trace(logger, "Creating application");
-            ApplicationImporterBusiness abi = new ApplicationImporterBusiness();
-            abi.createApplication(bt, type, tag, bts, isRunOnGrid, overwriteVersion, getSessionUser(), challenge, connection);
+            applicationImporterBusiness.createApplication(
+                    bt, type, tag, bts, isRunOnGrid, overwriteVersion,
+                    getSessionUser(), challenge);
         } catch (CoreException | BusinessException ex) {
-            throw new ApplicationImporterException(ex);
-        } catch (SQLException ex) {
-            logger.error("Error handling a connection", ex);
             throw new ApplicationImporterException(ex);
         }
     }
 
     @Override
     public String getApplicationImporterRootFolder() throws ApplicationImporterException {
-        return Server.getInstance().getApplicationImporterRootFolder();
+        return server.getApplicationImporterRootFolder();
     }
 
     @Override
     public List<String> getApplicationImporterRequirements() throws ApplicationImporterException {
-        return Server.getInstance().getApplicationImporterRequirements();        
+        return server.getApplicationImporterRequirements();
     }
 }

@@ -32,26 +32,25 @@
 package fr.insalyon.creatis.vip.api.rest.config;
 
 import fr.insalyon.creatis.vip.api.*;
+import fr.insalyon.creatis.vip.api.business.VipConfigurer;
 import fr.insalyon.creatis.vip.application.server.business.*;
 import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
 import fr.insalyon.creatis.vip.core.server.dao.UserDAO;
 import fr.insalyon.creatis.vip.datamanager.server.business.*;
 import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.*;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.*;
-import org.springframework.context.event.ContextRefreshedEvent;
 
 import java.sql.Connection;
 import java.util.function.*;
+
+import static org.mockito.ArgumentMatchers.any;
 
 /**
  * Created by abonnet on 7/26/16.
  *
  * Spring test config that mock bean that interacts with vip outside vip-api
- * Should not be annotated with @Configuration or other to avoid it
- * being package scanned and automatically taken in account.
+ *
+ * TODO : after spring is now everywhere, this does not work anymore, work needed here
  */
 @Import(SpringWebConfig.class)
 @Configuration
@@ -59,22 +58,9 @@ public class SpringTestConfig {
 
     @Bean
     public VipConfigurer vipConfigurer() {
-        return Mockito.mock(VipConfigurer.class);
-    }
-
-    @Bean
-    public UserDAO testUserDAO() {
-        return Mockito.mock(UserDAO.class);
-    }
-
-    @Bean
-    public Function<Connection, UserDAO> userDaoFactory(UserDAO userDAO) {
-        return connection -> userDAO;
-    }
-
-    @Bean
-    public Supplier<Connection> connectionSupplier() {
-        return Mockito.mock(Supplier.class);
+        VipConfigurer mock = Mockito.mock(VipConfigurer.class);
+        Mockito.when(mock.preHandle(any(), any(), any())).thenReturn(true);
+        return mock;
     }
 
     @Bean

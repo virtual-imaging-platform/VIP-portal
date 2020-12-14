@@ -34,27 +34,30 @@ package fr.insalyon.creatis.vip.visualization.server.rpc;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.CoreException;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
-import fr.insalyon.creatis.vip.core.server.dao.mysql.PlatformConnection;
 import fr.insalyon.creatis.vip.core.server.rpc.AbstractRemoteServiceServlet;
 import fr.insalyon.creatis.vip.visualization.client.bean.Image;
 import fr.insalyon.creatis.vip.visualization.client.bean.VisualizationItem;
 import fr.insalyon.creatis.vip.visualization.client.rpc.VisualizationService;
 import fr.insalyon.creatis.vip.visualization.client.view.VisualizationException;
 import fr.insalyon.creatis.vip.visualization.server.business.VisualizationBusiness;
-import java.sql.Connection;
-import java.sql.SQLException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
+
+import javax.servlet.ServletException;
 
 public class VisualizationServiceImpl extends AbstractRemoteServiceServlet
     implements VisualizationService {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    private final VisualizationBusiness visualizationBusiness;
+    private VisualizationBusiness visualizationBusiness;
 
-    public VisualizationServiceImpl() {
-        this.visualizationBusiness = new VisualizationBusiness();
+    @Override
+    public void init() throws ServletException {
+        super.init();
+        visualizationBusiness = getBean(VisualizationBusiness.class);
     }
 
     @Override
@@ -72,19 +75,15 @@ public class VisualizationServiceImpl extends AbstractRemoteServiceServlet
 
     @Override
     public VisualizationItem getVisualizationItemFromLFN(String lfn)
-        throws VisualizationException {
-        try(Connection connection = PlatformConnection.getInstance().getConnection()) {
+            throws VisualizationException {
+        try {
             trace(logger, "Getting URL for file: " + lfn);
             User user = getSessionUser();
             return visualizationBusiness.getVisualizationItemFromLFN(
                 lfn,
                 this.getServletContext().getRealPath("."),
-                user,
-                connection);
+                user);
         } catch (BusinessException | CoreException ex) {
-            throw new VisualizationException(ex);
-        } catch (SQLException ex) {
-            logger.error("Error handling a connection", ex);
             throw new VisualizationException(ex);
         }
     }

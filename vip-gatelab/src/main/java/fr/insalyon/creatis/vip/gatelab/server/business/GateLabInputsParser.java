@@ -38,6 +38,8 @@ import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -46,9 +48,15 @@ import org.xml.sax.helpers.DefaultHandler;
 import org.xml.sax.helpers.XMLReaderFactory;
 
 /**
+ * Parse a gatelab input file.
+ *
+ * This stores data in fields and this is not threadsafe. So it cannot be used
+ * as a spring singleton and this needs prototype scope.
  *
  * @author Ibrahim Kallel, Rafael Silva
  */
+@Component
+@Scope("prototype")
 public class GateLabInputsParser extends DefaultHandler {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());

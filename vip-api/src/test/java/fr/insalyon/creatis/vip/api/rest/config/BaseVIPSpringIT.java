@@ -32,34 +32,42 @@
 package fr.insalyon.creatis.vip.api.rest.config;
 
 import fr.insalyon.creatis.vip.api.rest.mockconfig.DataConfigurator;
-import fr.insalyon.creatis.vip.application.server.business.*;
-import fr.insalyon.creatis.vip.core.server.business.*;
+import fr.insalyon.creatis.vip.application.server.business.ApplicationBusiness;
+import fr.insalyon.creatis.vip.application.server.business.ClassBusiness;
+import fr.insalyon.creatis.vip.application.server.business.SimulationBusiness;
+import fr.insalyon.creatis.vip.application.server.business.WorkflowBusiness;
+import fr.insalyon.creatis.vip.core.server.business.BusinessException;
+import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
 import fr.insalyon.creatis.vip.core.server.dao.UserDAO;
-import fr.insalyon.creatis.vip.datamanager.server.business.*;
+import fr.insalyon.creatis.vip.datamanager.server.business.LFCBusiness;
+import fr.insalyon.creatis.vip.datamanager.server.business.LFCPermissionBusiness;
+import fr.insalyon.creatis.vip.datamanager.server.business.TransferPoolBusiness;
 import org.apache.commons.io.IOUtils;
-import org.junit.*;
-import org.junit.contrib.java.lang.system.EnvironmentVariables;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.*;
-import org.springframework.core.io.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers;
-import org.springframework.test.context.*;
-import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.test.context.web.WebAppConfiguration;
+import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.junit.jupiter.web.SpringJUnitWebConfig;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
-import java.io.*;
+import java.io.IOException;
+import java.lang.reflect.Field;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
+import java.util.Collections;
+import java.util.Map;
 
-import static fr.insalyon.creatis.vip.api.data.CarminAPITestConstants.*;
 import static fr.insalyon.creatis.vip.api.CarminProperties.*;
+import static fr.insalyon.creatis.vip.api.data.CarminAPITestConstants.*;
 
 /**
  * Created by abonnet on 7/28/16.
@@ -70,14 +78,13 @@ import static fr.insalyon.creatis.vip.api.CarminProperties.*;
  * is the same as production configuration
  *
  * To authenticate, tests should either
- * * login via wirth(httpbasic(user, password)
+ * * login via with httpbasic(user, password)
  * * use {@link WithMockUser} annotation
  *
  * The interaction with VIP outside vip-api are mocked (see {@link SpringTestConfig} )
+ * TODO : after spring is now everywhere, this does not work anymore, work needed here
  */
-@RunWith(SpringRunner.class)
-@WebAppConfiguration
-@ContextConfiguration(classes = SpringTestConfig.class)
+@SpringJUnitWebConfig(classes = SpringTestConfig.class)
 @TestPropertySource(properties = {
         PLATFORM_NAME + "=" + TEST_PLATFORM_NAME,
         PLATFORM_DESCRIPTION + "=" + TEST_PLATFORM_DESCRIPTION,
@@ -87,7 +94,6 @@ import static fr.insalyon.creatis.vip.api.CarminProperties.*;
         DEFAULT_LIMIT_LIST_EXECUTION + "=" + TEST_DEFAULT_LIST_LIMIT,
         UNSUPPORTED_METHODS + "=" + TEST_UNSUPPORTED_METHODS_STRING,
         SUPPORTED_API_VERSION + "=" + TEST_SUPPORTED_API_VERSION,
-        PLATFORM_ERROR_CODES_AND_MESSAGES + "=" + TEST_ERROR_CODES_AND_MESSAGE_STRING,
         APIKEY_HEADER_NAME + "=" + TEST_APIKEY_HEADER,
         APIKEY_GENERATE_NEW_EACH_TIME + "=" + TEST_GENERATE_NEW_APIKEY_EACH_TIME,
         API_DIRECTORY_MIME_TYPE + "=" + TEST_DIR_MIMETYPE,
@@ -95,7 +101,6 @@ import static fr.insalyon.creatis.vip.api.CarminProperties.*;
         API_DOWNLOAD_RETRY_IN_SECONDS + "=" + Test_DATA_DOWNLOAD_RETRY,
         API_DOWNLOAD_TIMEOUT_IN_SECONDS + "=" + TEST_DATA_DOWNLOAD_TIMEOUT,
         API_DATA_TRANSFERT_MAX_SIZE + "=" + TEST_DATA_MAX_SIZE,
-        API_DATA_DOWNLOAD_RELATIVE_PATH + "=" + TEST_DOWNLOAD_PATH,
         API_PIPELINE_WHITE_LIST + "=" + TEST_PIPELINE_WHITELIST
 })
 abstract public class BaseVIPSpringIT {
@@ -124,16 +129,44 @@ abstract public class BaseVIPSpringIT {
     @Autowired
     protected LFCPermissionBusiness lfcPermissionBusiness;
 
-    @ClassRule
-    public static final EnvironmentVariables environmentVariables = new EnvironmentVariables();
-
-    @BeforeClass
-    public static void setupEnvVariables() throws URISyntaxException {
-        String fakeHomePath = Paths.get(ClassLoader.getSystemResource("fakehome").toURI())
+    @BeforeAll
+    public static void setupEnvVariables() throws Exception {
+        String fakeHomePath = Paths.get(ClassLoader.getSystemResource("TestHome").toURI())
                 .toAbsolutePath().toString();
-        environmentVariables.set("HOME", fakeHomePath);
+        setEnv(Collections.singletonMap("HOME", fakeHomePath));
     }
-    @Before
+
+    /* hack from :
+     * https://stackoverflow.com/a/7201825
+     */
+    public static void setEnv(Map<String, String> newenv) throws Exception {
+        try {
+            Class<?> processEnvironmentClass = Class.forName("java.lang.ProcessEnvironment");
+            Field theEnvironmentField = processEnvironmentClass.getDeclaredField("theEnvironment");
+            theEnvironmentField.setAccessible(true);
+            Map<String, String> env = (Map<String, String>) theEnvironmentField.get(null);
+            env.putAll(newenv);
+            Field theCaseInsensitiveEnvironmentField = processEnvironmentClass.getDeclaredField("theCaseInsensitiveEnvironment");
+            theCaseInsensitiveEnvironmentField.setAccessible(true);
+            Map<String, String> cienv = (Map<String, String>)     theCaseInsensitiveEnvironmentField.get(null);
+            cienv.putAll(newenv);
+        } catch (NoSuchFieldException e) {
+            Class[] classes = Collections.class.getDeclaredClasses();
+            Map<String, String> env = System.getenv();
+            for(Class cl : classes) {
+                if("java.util.Collections$UnmodifiableMap".equals(cl.getName())) {
+                    Field field = cl.getDeclaredField("m");
+                    field.setAccessible(true);
+                    Object obj = field.get(env);
+                    Map<String, String> map = (Map<String, String>) obj;
+                    map.clear();
+                    map.putAll(newenv);
+                }
+            }
+        }
+    }
+
+    @BeforeEach
     public final void setup() throws URISyntaxException {
         mockMvc = MockMvcBuilders
                 .webAppContextSetup(wac)

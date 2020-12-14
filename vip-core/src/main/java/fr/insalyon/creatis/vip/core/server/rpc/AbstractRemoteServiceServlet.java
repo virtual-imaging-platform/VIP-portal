@@ -34,22 +34,26 @@ package fr.insalyon.creatis.vip.core.server.rpc;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import fr.insalyon.creatis.vip.core.client.bean.Group;
 import fr.insalyon.creatis.vip.core.client.bean.User;
-import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants.GROUP_ROLE;
 import fr.insalyon.creatis.vip.core.client.view.CoreException;
-import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
+import fr.insalyon.creatis.vip.core.server.business.Server;
+import fr.insalyon.creatis.vip.core.server.business.VipSessionBusiness;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeansException;
+import org.springframework.context.ApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 
-import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import java.util.Arrays;
-import java.util.Enumeration;
 import java.util.Map;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
+ * Parent for all vip GWT RPC servlet.
+ *
+ * Includes the mechanism to access spring managed beans in all subclasses,
+ * as the Server bean here.
  *
  * @author Rafael Silva
  */
@@ -57,10 +61,24 @@ public abstract class AbstractRemoteServiceServlet extends RemoteServiceServlet 
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    protected ConfigurationBusiness configurationBusiness;
+    protected Server server;
+    private ApplicationContext applicationContext;
+    private VipSessionBusiness vipSessionBusiness;
 
-    public AbstractRemoteServiceServlet() {
-        configurationBusiness = new ConfigurationBusiness();
+    @Override
+    public void init() throws ServletException {
+        super.init();
+        applicationContext =
+                WebApplicationContextUtils.findWebApplicationContext(getServletContext());
+        server = applicationContext.getBean(Server.class);
+        vipSessionBusiness = getBean(VipSessionBusiness.class);
+    }
+
+    /*
+        allows spring beans injection in all subclass
+     */
+    protected final <T> T getBean(Class<T> requiredType) {
+        return applicationContext.getBean(requiredType);
     }
 
     // see http://blog.excilys.com/2011/05/12/gwt-google-wont-throw/
@@ -93,36 +111,16 @@ public abstract class AbstractRemoteServiceServlet extends RemoteServiceServlet 
         return this.getThreadLocalRequest().getSession();
     }
 
-    public User getSessionUser() throws CoreException {
-
-        User user = (User) getSession().getAttribute(CoreConstants.SESSION_USER);
-        if (user != null) {
-            return user;
-        }
-        logger.error("No VIP user found in session {}. Attributes : {}",
-                getSession().getId(), enumerationToString(getSession().getAttributeNames()));
-        throw new CoreException("User not logged in.");
+    protected User getSessionUser() throws CoreException {
+        return vipSessionBusiness.getUserFromSession(this.getThreadLocalRequest());
     }
 
-
-    protected Map<Group, GROUP_ROLE> getSessionUserGroups() throws CoreException {
-
-        @SuppressWarnings("unchecked")
-        Map<Group, GROUP_ROLE> groups = (Map<Group, GROUP_ROLE>) getSession().getAttribute(CoreConstants.SESSION_GROUPS);
-        if (groups != null) {
-            return groups;
-        }
-        logger.error("No VIP groups found in session {}. Attributes : {}",
-                getSession().getId(), enumerationToString(getSession().getAttributeNames()));
-        throw new CoreException("User has no groups defined.");
+    protected Map<Group, GROUP_ROLE> getUserGroupsFromSession() throws CoreException {
+        return vipSessionBusiness.getUserGroupsFromSession(this.getThreadLocalRequest());
     }
 
-    private String enumerationToString(Enumeration<String> enums) {
-        StringBuilder st = new StringBuilder();
-        while (enums.hasMoreElements()) {
-            st.append(enums.nextElement()).append(" ");
-        }
-        return st.toString();
+    protected User setUserInSession(User user) throws CoreException {
+        return vipSessionBusiness.setUserInSession(user, getSession());
     }
 
     protected void authenticateSystemAdministrator(Logger logger) throws CoreException {

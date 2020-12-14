@@ -32,31 +32,31 @@
 package fr.insalyon.creatis.vip.api.business;
 
 import fr.insalyon.creatis.vip.api.CarminProperties;
-import fr.insalyon.creatis.vip.api.bean.ParameterType;
-import fr.insalyon.creatis.vip.api.bean.ParameterTypedValue;
-import fr.insalyon.creatis.vip.api.bean.Pipeline;
-import fr.insalyon.creatis.vip.api.bean.PipelineParameter;
-import fr.insalyon.creatis.vip.api.business.ApiException.ApiError;
-import fr.insalyon.creatis.vip.application.client.bean.AppClass;
-import fr.insalyon.creatis.vip.application.client.bean.AppVersion;
-import fr.insalyon.creatis.vip.application.client.bean.Application;
-import fr.insalyon.creatis.vip.application.client.bean.Descriptor;
-import fr.insalyon.creatis.vip.application.client.bean.Source;
+import fr.insalyon.creatis.vip.api.exception.ApiException;
+import fr.insalyon.creatis.vip.api.model.ParameterType;
+import fr.insalyon.creatis.vip.api.model.Pipeline;
+import fr.insalyon.creatis.vip.api.model.PipelineParameter;
+import fr.insalyon.creatis.vip.api.exception.ApiException.ApiError;
+import fr.insalyon.creatis.vip.application.client.bean.*;
 import fr.insalyon.creatis.vip.application.server.business.ApplicationBusiness;
 import fr.insalyon.creatis.vip.application.server.business.ClassBusiness;
 import fr.insalyon.creatis.vip.application.server.business.WorkflowBusiness;
+import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
-import java.sql.Connection;
-import java.util.*;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
-import static fr.insalyon.creatis.vip.api.business.ApiException.ApiError.*;
+import java.sql.Connection;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.function.Supplier;
+
+import static fr.insalyon.creatis.vip.api.exception.ApiException.ApiError.*;
 
 /**
  *
@@ -67,29 +67,28 @@ public class PipelineBusiness {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    private final ApiContext apiContext;
     private Environment env;
 
+    private Supplier<User> currentUserProvider;
     private final WorkflowBusiness workflowBusiness;
     private final ApplicationBusiness applicationBusiness;
     private final ClassBusiness classBusiness;
 
-    public PipelineBusiness(ApiContext apiContext, Environment env) {
-        this(apiContext, env, new WorkflowBusiness(), new ApplicationBusiness(), new ClassBusiness());
-    }
-
     @Autowired
-    public PipelineBusiness(ApiContext apiContext, Environment env, WorkflowBusiness workflowBusiness, ApplicationBusiness applicationBusiness, ClassBusiness classBusiness) {
-        this.apiContext = apiContext;
+    public PipelineBusiness(
+            Supplier<User> currentUserProvider, Environment env,
+            WorkflowBusiness workflowBusiness,
+            ApplicationBusiness applicationBusiness, ClassBusiness classBusiness) {
+        this.currentUserProvider = currentUserProvider;
         this.env = env;
         this.workflowBusiness = workflowBusiness;
         this.applicationBusiness = applicationBusiness;
         this.classBusiness = classBusiness;
     }
 
-    public Pipeline getPipeline(String pipelineId, Connection connection)
-        throws ApiException {
-        Pipeline p = getPipelineWithResultsDirectory(pipelineId, connection);
+    public Pipeline getPipeline(String pipelineId)
+            throws ApiException {
+        Pipeline p = getPipelineWithResultsDirectory(pipelineId);
 
         p.getParameters().removeIf(
             param ->
@@ -98,26 +97,24 @@ public class PipelineBusiness {
         return p;
     }
 
-    public Pipeline getPipelineWithResultsDirectory(
-        String pipelineId, Connection connection)
-        throws ApiException {
+    public Pipeline getPipelineWithResultsDirectory(String pipelineId)
+            throws ApiException {
         try {
-            String applicationName = ApiUtils.getApplicationName(pipelineId);
-            String applicationVersion = ApiUtils.getApplicationVersion(pipelineId);
+            String applicationName = getApplicationName(pipelineId);
+            String applicationVersion = getApplicationVersion(pipelineId);
             Pipeline p = getPipelineWithPermissions(
-                applicationName, applicationVersion, connection);
+                    applicationName, applicationVersion);
 
-            Descriptor d = workflowBusiness.getApplicationDescriptor(apiContext.getUser(), p.getName(), p.getVersion(), connection); // Be careful, this copies the Gwendia file from LFC.
+            Descriptor d = workflowBusiness.getApplicationDescriptor(
+                    currentUserProvider.get(), p.getName(), p.getVersion()); // Be careful, this copies the Gwendia file from LFC.
             p.setDescription(d.getDescription());
 
             for (Source s : d.getSources()) {
-                ParameterType sourceType = ApiUtils.getCarminType(s.getType());
-                ParameterTypedValue defaultValue = s.getDefaultValue() == null ? null : new ParameterTypedValue(sourceType, s.getDefaultValue());
+                ParameterType sourceType = ParameterType.fromVipType(s.getType());
                 PipelineParameter pp = new PipelineParameter(s.getName(),
                                                              sourceType,
                                                              s.isOptional(),
                                                              false,
-                                                             defaultValue,
                                                              s.getDefaultValue(),
                                                              s.getDescription());
                 p.getParameters().add(pp);
@@ -128,31 +125,29 @@ public class PipelineBusiness {
         }
     }
 
-    public Pipeline[] listPipelines(
-        String studyIdentifier, Connection connection)
-        throws ApiException {
+    public Pipeline[] listPipelines(String studyIdentifier) throws ApiException {
 
         try {
             if (studyIdentifier != null) {
-                apiContext.getWarnings().add("Study identifier was ignored.");
+                logger.warn("Study identifier ({}) was ignored.", studyIdentifier);
             }
             ArrayList<Pipeline> pipelines = new ArrayList<>();
 
-            List<AppClass> classes = classBusiness.getUserClasses(apiContext.getUser().getEmail(), false, connection);
+            List<AppClass> classes = classBusiness.getUserClasses(currentUserProvider.get().getEmail(), false);
             List<String> classNames = new ArrayList<>();
             for (AppClass c : classes) {
                 classNames.add(c.getName());
             }
 
             List<Application> applications =
-                applicationBusiness.getApplications(classNames, connection);
+                applicationBusiness.getApplications(classNames);
             for (Application a : applications) {
                 List<AppVersion> versions =
-                    applicationBusiness.getVersions(a.getName(), connection);
+                    applicationBusiness.getVersions(a.getName());
                 for (AppVersion av : versions) {
                     if (isApplicationVersionUsableInApi(av)) {
                         pipelines.add(
-                                new Pipeline(ApiUtils.getPipelineIdentifier(
+                                new Pipeline(getPipelineIdentifier(
                                         a.getName(), av.getVersion()),
                                         a.getName(), av.getVersion(), true)
                         );
@@ -166,17 +161,33 @@ public class PipelineBusiness {
         }
     }
 
+    public String getPipelineIdentifier(String applicationName, String applicationVersion) {
+        return applicationName + "/" + applicationVersion;
+    }
+
+    public String getApplicationVersion(String pipelineIdentifier) throws ApiException {
+        checkIfValidPipelineIdentifier(pipelineIdentifier);
+        return pipelineIdentifier.substring(pipelineIdentifier.lastIndexOf("/") + 1);
+    }
+
+    public String getApplicationName(String pipelineIdentifier) throws ApiException {
+        checkIfValidPipelineIdentifier(pipelineIdentifier);
+        return pipelineIdentifier.substring(0, pipelineIdentifier.lastIndexOf("/"));
+    }
+
+    private void checkIfValidPipelineIdentifier(String identifier) throws ApiException {
+        if (!identifier.contains("/")) {
+            logger.error("Invalid pipeline identifier {} : missing /", identifier);
+            throw new ApiException(ApiError.INVALID_PIPELINE_IDENTIFIER, identifier);
+        }
+    }
+
     private boolean isApplicationVersionUsableInApi(AppVersion appVersion) {
         if (appVersion.isVisible()) {
             return true;
         }
-        if (env == null) {
-            // spring not present, so we're in soap context and the white list
-            // is not supported
-            return false;
-        }
         List<String> whiteList = Arrays.asList(
-                env.getProperty(CarminProperties.API_PIPELINE_WHITE_LIST, String[].class));
+                env.getRequiredProperty(CarminProperties.API_PIPELINE_WHITE_LIST, String[].class));
         return whiteList.stream().anyMatch(appString -> {
             String[] splitAppString = appString.split("/");
             if (splitAppString.length != 2) {
@@ -187,17 +198,15 @@ public class PipelineBusiness {
         });
     }
 
-    public void checkIfUserCanAccessPipeline(
-        String pipelineId, Connection connection)
-        throws ApiException {
+    public void checkIfUserCanAccessPipeline(String pipelineId)
+            throws ApiException {
         try {
 
-            String applicationName = ApiUtils.getApplicationName(pipelineId);
+            String applicationName = getApplicationName(pipelineId);
             List<String> userClassNames = classBusiness.getUserClassesName(
-                apiContext.getUser().getEmail(), false, connection);
+                currentUserProvider.get().getEmail(), false);
 
-            Application a = applicationBusiness.getApplication(
-                applicationName, connection);
+            Application a = applicationBusiness.getApplication(applicationName);
             if (a == null) {
                 logger.error("Cannot find application {}", applicationName);
                 throw new ApiException(APPLICATION_NOT_FOUND, applicationName);
@@ -208,7 +217,7 @@ public class PipelineBusiness {
                 }
             }
             logger.error("User {} not allowed to access application {}",
-                    apiContext.getUser(), applicationName);
+                    currentUserProvider.get(), applicationName);
             throw new ApiException(NOT_ALLOWED_TO_USE_APPLICATION, applicationName);
         } catch (BusinessException ex) {
             throw new ApiException(ex);
@@ -216,16 +225,16 @@ public class PipelineBusiness {
     }
 
     private Pipeline getPipelineWithPermissions(
-        String applicationName, String applicationVersion, Connection connection)
+            String applicationName, String applicationVersion)
         throws ApiException {
-        Pipeline[] pipelines = listPipelines("", connection);
+        Pipeline[] pipelines = listPipelines("");
         for (Pipeline p : pipelines) {
             if (p.getName().equals(applicationName) && p.getVersion().equals(applicationVersion)) {
                 return p;
             }
         }
         logger.error("Pipeline {}/{} doesn't exist or user {} cannot access it",
-                applicationName, applicationVersion , apiContext.getUser());
+                applicationName, applicationVersion , currentUserProvider.get());
         throw new ApiException(PIPELINE_NOT_FOUND, applicationName + "/" + applicationVersion);
     }
 }

@@ -169,12 +169,21 @@ public class SimulationBoxLayout extends HLayout {
             case Killed:
                 cancelTimer();
                 actionButton.setPrompt("Clean simulation");
-                img.setSrc(ApplicationConstants.ICON_MONITOR_SIMULATION_FAILED);
+                img.setSrc(ApplicationConstants.ICON_MONITOR_SIMULATION_KILLED);
                 break;
             case Cleaned:
                 cancelTimer();
-                actionButton.setPrompt("Purge simulation");
+                if (CoreModule.user.isSystemAdministrator()) {
+                    actionButton.setPrompt("Purge simulation");
+                } else {
+                    actionButton.hide();
+                }
                 img.setSrc(ApplicationConstants.ICON_MONITOR_SIMULATION_CLEANED);
+                break;
+            case Failed:
+                cancelTimer();
+                actionButton.setPrompt("Clean simulation");
+                img.setSrc(ApplicationConstants.ICON_MONITOR_SIMULATION_FAILED);
                 break;
             default:
                 cancelTimer();
@@ -371,5 +380,11 @@ public class SimulationBoxLayout extends HLayout {
 
     public Date getLaunchedDate() {
         return launchedDate;
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        cancelTimer();
     }
 }
