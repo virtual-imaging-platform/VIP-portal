@@ -4,13 +4,18 @@ import fr.insalyon.creatis.grida.client.GRIDAClient;
 import fr.insalyon.creatis.grida.client.GRIDAClientException;
 import fr.insalyon.creatis.grida.common.bean.GridData;
 import fr.insalyon.creatis.grida.common.bean.GridData.Type;
+import fr.insalyon.creatis.vip.core.server.business.Server;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
+import org.springframework.core.env.Environment;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.nio.file.*;
 import java.util.List;
@@ -25,14 +30,48 @@ import java.util.stream.Collectors;
 @Component
 @Profile("local")
 @Primary
-@DependsOn("localConfiguration") // to populate localRoot @Value
+@DependsOn("localConfiguration") // to populate rootDirName @Value
 public class GridaClientLocal extends GRIDAClient {
 
-    @Value("${local.grida.root}")
-    private String localRoot;
+    private Server server;
 
-    public GridaClientLocal() {
+    private Path localRoot; // local folder simulating remote LFN hierarchy
+
+    @Autowired
+    public GridaClientLocal(
+            Server server,
+            Resource vipConfigFolder,
+            @Value("${local.grida.root.dirname}") String rootDirName) throws IOException {
         super(null, 0, null);
+        this.server = server;
+        localRoot = Paths.get(vipConfigFolder.getURI()).resolve(rootDirName);
+
+    }
+
+    @PostConstruct
+    public void init() {
+        // creating root if needed
+        if (localRoot.toFile().exists() && ! localRoot.toFile().isDirectory()) {
+            throw new IllegalStateException("grida local root must be a directory");
+        } else if (localRoot.toFile().exists()) {
+            return;
+        }
+        // create folder test root folder
+        createDirectory(localRoot, "grida local root");
+        // create users and groups lfn folders
+        String usersFolderLFN = server.getDataManagerUsersHome();
+        String groupsFolderLFN = server.getDataManagerGroupsHome();
+        Path usersFolder = localRoot.resolve(usersFolderLFN.substring(1)); // remove first slash to make usersFolderLFN relative
+        Path groupsFolder = localRoot.resolve(groupsFolderLFN.substring(1)); // remove first slash to make groupsFolderLFN relative
+        createDirectory(usersFolder, "users lfn root folder");
+        createDirectory(groupsFolder, "groups lfn root folder");
+    }
+
+    private void createDirectory(Path dir, String description) {
+        boolean mkdirOK = dir.toFile().mkdirs();
+        if ( ! mkdirOK) {
+            throw new IllegalStateException("Error creating " + description + " directory");
+        }
     }
 
     @Override
@@ -40,7 +79,7 @@ public class GridaClientLocal extends GRIDAClient {
         while (remoteFile.startsWith("/")) {
             remoteFile = remoteFile.substring(1);
         }
-        Path from = Paths.get(localRoot).resolve(remoteFile);
+        Path from = localRoot.resolve(remoteFile);
         Path to = Paths.get(localDir).resolve(from.getFileName());
         try {
             Files.createDirectories(Paths.get(localDir));
@@ -61,7 +100,7 @@ public class GridaClientLocal extends GRIDAClient {
         while (dir.startsWith("/")) {
             dir = dir.substring(1);
         }
-        Path dirPath = Paths.get(localRoot).resolve(dir);
+        Path dirPath = localRoot.resolve(dir);
         try {
             return Files.list(dirPath).map( path -> path.toFile()).map(file ->
                 new GridData(
@@ -81,7 +120,7 @@ public class GridaClientLocal extends GRIDAClient {
         while (fileName.startsWith("/")) {
             fileName = fileName.substring(1);
         }
-        return Paths.get(localRoot).resolve(fileName).toFile().lastModified();
+        return localRoot.resolve(fileName).toFile().lastModified();
     }
 
     @Override
@@ -93,7 +132,7 @@ public class GridaClientLocal extends GRIDAClient {
                     }
                     return s;
                 })
-                .map(s -> Paths.get(localRoot).resolve(s).toFile())
+                .map(s -> localRoot.resolve(s).toFile())
                 .map(file -> file.lastModified())
                 .collect(Collectors.toList());
     }
@@ -104,7 +143,7 @@ public class GridaClientLocal extends GRIDAClient {
             remoteDir = remoteDir.substring(1);
         }
         Path from = Paths.get(localFile);
-        Path to = Paths.get(localRoot).resolve(remoteDir).resolve(from.getFileName());
+        Path to = localRoot.resolve(remoteDir).resolve(from.getFileName());
         try {
             Files.copy(from, to, StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException e) {
@@ -134,7 +173,7 @@ public class GridaClientLocal extends GRIDAClient {
             path = path.substring(1);
         }
         try {
-            Files.delete(Paths.get(localRoot).resolve(path));
+            Files.delete(localRoot.resolve(path));
         } catch (IOException e) {
             throw new GRIDAClientException(e);
         }
@@ -153,7 +192,7 @@ public class GridaClientLocal extends GRIDAClient {
             path = path.substring(1);
         }
         try {
-            Files.createDirectory(Paths.get(localRoot).resolve(path).resolve(folderName));
+            Files.createDirectory(localRoot.resolve(path).resolve(folderName));
         } catch (IOException e) {
             throw new GRIDAClientException(e);
         }
@@ -169,6 +208,6 @@ public class GridaClientLocal extends GRIDAClient {
         while (remotePath.startsWith("/")) {
             remotePath = remotePath.substring(1);
         }
-        return Paths.get(localRoot).resolve(remotePath).toFile().exists();
+        return localRoot.resolve(remotePath).toFile().exists();
     }
 }
