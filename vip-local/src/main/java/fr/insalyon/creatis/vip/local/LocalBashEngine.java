@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.Profile;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
@@ -18,6 +19,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -40,27 +42,31 @@ import java.util.stream.Collectors;
  */
 @Component
 @Profile("local")
-@Lazy
 public class LocalBashEngine {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    @Value("${local.workflow.dir}")
-    private String workflowsDir;
-
     private GridaClientLocal gridaClient;
 
+    private Path workflowsDir;
     private Map<String, LocalBashExecution> executionsInfo;
     private Map<String, Future<?>> executionsFutures;
     private ExecutorService executorService;
 
     @Autowired
     public LocalBashEngine(
+            Resource vipConfigFolder,
             GridaClientLocal gridaClient,
-            @Value("${local.engine.threadNb}") Integer localThreadNb) {
+            @Value("${local.workflow.dirname}") String workflowsDirName,
+            @Value("${local.engine.threadNb}") Integer localThreadNb) throws IOException {
         this.gridaClient = gridaClient;
-        this.executorService = Executors.newFixedThreadPool(localThreadNb);
+        executorService = Executors.newFixedThreadPool(localThreadNb);
         executionsInfo = new HashMap<>();
         executionsFutures = new HashMap<>();
+        workflowsDir = Paths.get(vipConfigFolder.getURI())
+                .resolve(workflowsDirName);
+        if ( ! workflowsDir.toFile().exists() && ! workflowsDir.toFile().mkdir()) {
+            throw new IllegalStateException("cannot create local bash workflows directory");
+        }
     }
 
     public String launch(File workflowFile, List<ParameterSweep> parameters)  {
@@ -88,13 +94,27 @@ public class LocalBashEngine {
         }
         Future<?> execFuture = executionsFutures.get(workflowID);
         if (execFuture.isCancelled()) {
-            // todo : verify that this works, that an exception in the job leads to this
             return SimulationStatus.Killed;
         }
         if (execFuture.isDone()) {
-            return SimulationStatus.Completed;
+            return isFinishedSuccessfully(execFuture) ?
+                SimulationStatus.Completed : SimulationStatus.Failed;
         }
         return executionsInfo.get(workflowID).status;
+    }
+
+    private boolean isFinishedSuccessfully(Future<?> execFuture) {
+        try {
+            execFuture.get();
+        } catch (InterruptedException e) {
+            // should not happen, the execution should be already finished
+            logger.error("An execution was interrupted while checking for its completion");
+            throw new IllegalStateException("Unexpected test bash execution state");
+        } catch (ExecutionException e) {
+            // execution finished with an error
+            return false;
+        }
+        return true;
     }
 
     public void kill(String workflowID) {
@@ -132,7 +152,7 @@ public class LocalBashEngine {
     }
 
     private Path createWorkflowDir(String execId) throws IOException {
-        Path dir = Paths.get(workflowsDir).resolve(execId);
+        Path dir = workflowsDir.resolve(execId);
         Files.createDirectory(dir);
         return dir;
     }
@@ -276,6 +296,8 @@ public class LocalBashEngine {
         }
 
         private void execute(Path execDir, List<String> commandLine) throws IOException, InterruptedException {
+            logger.info("Running a bash test execution in [{}]. Command : {}",
+                    execDir, String.join(" ", commandLine));
             ProcessBuilder builder = new ProcessBuilder()
                     .command(commandLine)
                     .directory(execDir.toFile())
@@ -284,7 +306,7 @@ public class LocalBashEngine {
             Process process = builder.start();
             if ( process.waitFor() != 0) {
                 throw new RuntimeException("process finished with error");
-            };
+            }
         }
 
         private void transferOutputFiles(Path execDir) throws GRIDAClientException {
@@ -299,7 +321,7 @@ public class LocalBashEngine {
             for (String output : exec.gwendiaOutputs.keySet()) {
                 Path from = execDir.resolve(output);
                 gridaClient.uploadFile(from.toString(), toDir);
-            };
+            }
         }
     }
 }

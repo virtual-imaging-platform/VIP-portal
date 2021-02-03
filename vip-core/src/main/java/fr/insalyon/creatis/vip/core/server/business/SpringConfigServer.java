@@ -18,6 +18,7 @@ import org.springframework.util.Assert;
 
 import javax.annotation.PostConstruct;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.Arrays;
@@ -34,7 +35,7 @@ import java.util.stream.Stream;
  * A default vip.conf file is available in vip-portal resources
  */
 @Component
-@Profile({"default", "prod"})
+@Profile({"default", "prod", "config-file"})
 public class SpringConfigServer implements Server {
 
     private final Logger logger = LoggerFactory.getLogger(SamlTokenValidator.class);
@@ -69,6 +70,11 @@ public class SpringConfigServer implements Server {
             Resource vipConfigFolder,
             ConfigurableEnvironment env) throws IOException, ConfigurationException {
         File configFile = vipConfigFolder.getFile().toPath().resolve(Server.CONF_FILE).toFile();
+
+        if( ! configFile.exists()) {
+            throw new FileNotFoundException(configFile.toString());
+        }
+
         ReloadablePropertySource vipConf = new ReloadablePropertySource("vipMainConfigFile", configFile);
         env.getPropertySources().addLast(vipConf);
         this.env = env;
@@ -147,7 +153,7 @@ public class SpringConfigServer implements Server {
     }
 
     private void assertPropertyIsPresent(String property, Class<?> type) {
-        Assert.notNull(env.getProperty(property, type), property + "should be present");
+        Assert.notNull(env.getProperty(property, type), property + " should be present");
     }
 
     private void assertPropertyIsNotEmpty(String property) {
@@ -156,11 +162,11 @@ public class SpringConfigServer implements Server {
 
     private void assertPropertyIsNotEmpty(String property, Class<?> type) {
         if (String.class.equals(type)) {
-            Assert.hasText(env.getProperty(property), property + "should not be empty");
+            Assert.hasText(env.getProperty(property), property + " should not be empty");
         } else if (List.class.equals(type)) {
-            Assert.notEmpty(env.getProperty(property, List.class), property + "should not be empty");
+            Assert.notEmpty(env.getProperty(property, List.class), property + " should not be empty");
         } else {
-            Assert.notNull(env.getProperty(property, type), property + "should not be empty");
+            Assert.notNull(env.getProperty(property, type), property + " should not be empty");
         }
     }
 

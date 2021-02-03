@@ -10,10 +10,14 @@ import org.hibernate.dialect.H2Dialect;
 import org.hibernate.service.ServiceRegistry;
 import org.hibernate.service.ServiceRegistryBuilder;
 import org.springframework.beans.factory.BeanInitializationException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
+import org.springframework.core.io.Resource;
+
+import java.io.IOException;
 
 /**
  * overrides workflowsdb dao by others configured with a h2 database
@@ -23,22 +27,25 @@ import org.springframework.context.annotation.Profile;
 @Profile("local")
 public class WorkflowsDBLocalConfiguration {
 
-    @Value("${local.workflowsdb.url}")
-    private String workflowsDbUrl;
+    @Autowired
+    private Resource vipConfigFolder;
 
     @Bean
-    public SessionFactory workflowsDbSessionFactory() {
+    public SessionFactory workflowsDbSessionFactory() throws IOException {
+        String h2URL = "jdbc:h2:" + vipConfigFolder.getFile().getAbsolutePath() + "/workflowsdb";
+
         try {
             org.hibernate.cfg.Configuration cfg = new org.hibernate.cfg.Configuration();
             //cfg.setProperty("hibernate.default_schema", "workflowsdb");
             cfg.setProperty("hibernate.connection.driver_class", "org.h2.Driver");
-            cfg.setProperty("hibernate.connection.url", workflowsDbUrl);
+            cfg.setProperty("hibernate.connection.url", h2URL);
             cfg.setProperty("hibernate.dialect", H2Dialect.class.getCanonicalName());
             cfg.setProperty("hibernate.connection.username", "sa");
             cfg.setProperty("hibernate.connection.password", "");
             cfg.setProperty("javax.persistence.validation.mode", "none");
             cfg.setProperty("hibernate.validator.apply_to_ddl", "false");
             cfg.setProperty("hibernate.validator.autoregister_listeners", "false");
+            cfg.setProperty("hibernate.hbm2ddl.auto", "update");
             cfg.addAnnotatedClass(Workflow.class);
             cfg.addAnnotatedClass(Processor.class);
             cfg.addAnnotatedClass(ProcessorID.class);
@@ -55,27 +62,27 @@ public class WorkflowsDBLocalConfiguration {
     }
 
     @Bean
-    public WorkflowDAO getWorkflowDAO()  {
+    public WorkflowDAO getWorkflowDAO() throws IOException {
         return new WorkflowData(workflowsDbSessionFactory());
     }
 
     @Bean
-    public ProcessorDAO getProcessorDAO() {
+    public ProcessorDAO getProcessorDAO() throws IOException {
         return new ProcessorData(workflowsDbSessionFactory());
     }
 
     @Bean
-    public OutputDAO getOutputDAO() {
+    public OutputDAO getOutputDAO() throws IOException {
         return new OutputData(workflowsDbSessionFactory());
     }
 
     @Bean
-    public InputDAO getInputDAO() {
+    public InputDAO getInputDAO() throws IOException {
         return new InputData(workflowsDbSessionFactory());
     }
 
     @Bean
-    public StatsDAO getStatsDAO() {
+    public StatsDAO getStatsDAO() throws IOException {
         return new StatsData(workflowsDbSessionFactory());
     }
 }
