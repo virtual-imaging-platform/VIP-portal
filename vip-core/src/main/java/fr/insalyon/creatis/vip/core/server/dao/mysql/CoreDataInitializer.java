@@ -1,5 +1,6 @@
 package fr.insalyon.creatis.vip.core.server.dao.mysql;
 
+import fr.insalyon.creatis.devtools.MD5;
 import fr.insalyon.creatis.vip.core.client.bean.Group;
 import fr.insalyon.creatis.vip.core.client.bean.TermsOfUse;
 import fr.insalyon.creatis.vip.core.client.bean.User;
@@ -21,6 +22,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.sql.DataSource;
+import java.io.UnsupportedEncodingException;
+import java.security.NoSuchAlgorithmException;
 import java.util.Date;
 import java.util.UUID;
 
@@ -98,13 +101,13 @@ public class CoreDataInitializer extends JdbcDaoSupport {
                                 server.getAdminEmail(),
                                 null,
                                 server.getAdminInstitution(),
-                                server.getAdminPassword(),
+                                MD5.get(server.getAdminPassword()),
                                 server.getAdminPhone(), true,
                                 UUID.randomUUID().toString(), folder, "",
                                 new Date(), new Date(), UserLevel.Administrator,
                                 CountryCode.fr, 100, null,null,0,false));
 
-            } catch (DAOException ex) {
+            } catch (DAOException | NoSuchAlgorithmException | UnsupportedEncodingException ex) {
                 logger.error("Error creating VIPUsers table", ex);
             }
         }
