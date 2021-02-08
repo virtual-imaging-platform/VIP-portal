@@ -583,7 +583,7 @@ public class UserData extends JdbcDaoSupport implements UserDAO {
 
             if (rs.next()) {
                 String sess = rs.getString("session");
-                if (sess.equals(session)) {
+                if (sess != null && sess.equals(session)) {
                     return true;
                 }
             }
