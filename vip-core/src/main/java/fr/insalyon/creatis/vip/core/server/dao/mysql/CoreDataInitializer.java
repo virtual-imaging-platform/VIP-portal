@@ -58,7 +58,6 @@ public class CoreDataInitializer extends JdbcDaoSupport {
         initializeUserTables();
         initializeGroupTables();
         initializeAccountTables();
-        initializePublicationTable();
         initializeTermsOfUseTable();
     }
 
@@ -158,21 +157,6 @@ public class CoreDataInitializer extends JdbcDaoSupport {
                         + "FOREIGN KEY (name) REFERENCES VIPAccounts(name) "
                         + "ON DELETE CASCADE ON UPDATE CASCADE, "
                         + "FOREIGN KEY (groupname) REFERENCES VIPGroups(groupname) "
-                        + "ON DELETE CASCADE ON UPDATE CASCADE");
-    }
-
-    private void initializePublicationTable() {
-        tableInitializer.createTable("VIPPublication",
-                "id INT(11) NOT NULL AUTO_INCREMENT, "
-                        + "title VARCHAR(255) NULL, "
-                        + "date VARCHAR(45) NULL, "
-                        + "doi VARCHAR(255) NULL, "
-                        + "autors VARCHAR(255) NULL, "
-                        + "type VARCHAR(255) NULL, "
-                        + "typeName VARCHAR(255) NULL, "
-                        + "VIPAuthor VARCHAR(255) NULL, "
-                        + "PRIMARY KEY (id), "
-                        + "FOREIGN KEY (VIPAuthor) REFERENCES VIPUsers(email) "
                         + "ON DELETE CASCADE ON UPDATE CASCADE");
     }
 
