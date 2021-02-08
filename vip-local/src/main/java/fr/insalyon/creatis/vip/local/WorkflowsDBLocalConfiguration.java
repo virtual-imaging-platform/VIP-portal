@@ -59,7 +59,7 @@ public class WorkflowsDBLocalConfiguration {
     @Bean(destroyMethod = "")
     public SessionFactory workflowsDbSessionFactory() throws IOException {
         logger.info("building a new workflowsdb session factory");
-        String h2URL = "jdbc:h2:" + vipConfigFolder.getFile().getAbsolutePath() + "/workflowsdb;TRACE_LEVEL_SYSTEM_OUT=2";
+        String h2URL = "jdbc:h2:" + vipConfigFolder.getFile().getAbsolutePath() + "/workflowsdb";
 
         try {
             org.hibernate.cfg.Configuration cfg = new org.hibernate.cfg.Configuration();
