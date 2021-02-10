@@ -115,12 +115,6 @@ knowledge of the CeCILL-B license and that you accept its terms.
             <version>2.4</version>
         </dependency>
         <dependency>
-            <groupId>org.syncloud</groupId>
-            <artifactId>dropbox-client</artifactId>
-            <version>1.5.3</version>
-            <type>jar</type>
-        </dependency>
-        <dependency>
             <groupId>org.opensaml</groupId>
             <artifactId>opensaml</artifactId>
             <version>2.6.0</version>

@@ -31,14 +31,12 @@
  */
 package fr.insalyon.creatis.vip.core.server.dao;
 
-import fr.insalyon.creatis.vip.core.client.bean.DropboxAccountStatus;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.user.UserLevel;
 import fr.insalyon.creatis.vip.core.client.view.util.CountryCode;
 import fr.insalyon.creatis.vip.core.server.business.StatsBusiness.UserSearchCriteria;
 
 import java.sql.Timestamp;
-import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 
@@ -106,14 +104,6 @@ public interface UserDAO {
     public int getNUsers() throws DAOException;
 
     public int getNCountries() throws DAOException;
-
-    public void linkDropboxAccount(String email, String directory, String auth_key, String auth_secret) throws DAOException;
-
-    public void activateDropboxAccount(String email, String auth_key) throws DAOException;
-
-    public DropboxAccountStatus.AccountStatus getDropboxAccountStatus(String email) throws DAOException;
-
-    public void unlinkDropboxAccount(String email) throws DAOException;
 
     public Timestamp getLastPublicationUpdate(String email) throws DAOException;
 

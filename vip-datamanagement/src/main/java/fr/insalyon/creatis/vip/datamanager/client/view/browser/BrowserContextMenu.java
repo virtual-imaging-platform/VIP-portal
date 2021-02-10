@@ -98,8 +98,7 @@ public class BrowserContextMenu extends Menu {
             @Override
             public void onClick(MenuItemClickEvent event) {
                 if (ValidatorUtil.validateRootPath(baseDir, "delete from")
-                        && ValidatorUtil.validateUserLevel(baseDir, "delete from")
-                        && ValidatorUtil.validateDropboxDir(baseDir, "delete from")) {
+                        && ValidatorUtil.validateUserLevel(baseDir, "delete from")) {
 
                     delete(modal, baseDir, data.getName());
                 }
