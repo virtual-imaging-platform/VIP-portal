@@ -42,10 +42,10 @@ public class ClassRecord extends ListGridRecord {
     public ClassRecord() {
     }
 
-    public ClassRecord(String name, String groups, String engine) {
+    public ClassRecord(String name, String groups, String engines) {
         
         setAttribute("name", name);
         setAttribute("groups", groups);
-        setAttribute("engine", engine);
+        setAttribute("engines", engines);
     }
 }

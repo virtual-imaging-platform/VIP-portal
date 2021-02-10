@@ -62,7 +62,7 @@ public class ManageClassesTab extends AbstractManageTab {
         classesLayout.loadData();
     }
 
-    public void setClass(String name, String groups, String engine) {
-        editLayout.setClass(name, groups, engine);
+    public void setClass(String name, String groups, String engines) {
+        editLayout.setClass(name, groups, engines);
     }
 }
