@@ -135,6 +135,8 @@ public class ContactTab extends Tab {
                         public void onSuccess(Void result) {
                             WidgetUtil.resetIButton(submitButton, "Submit", null);
                             Layout.getInstance().setNoticeMessage("Contact successfully sent.");
+                            subjectField.clearValue();
+                            commentEditor.setValue("");
                         }
                     };
                     service.sendContactMail(
