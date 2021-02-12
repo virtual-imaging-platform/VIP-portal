@@ -93,7 +93,7 @@ public class LFCPermissionBusiness {
         String groupName = firstDir.substring(0,firstDir.length()-GROUP_APPEND.length());
         checkGroupPermission(user, groupName, LFCAccessType);
         if (LFCAccessType == LFCPermissionBusiness.LFCAccessType.DELETE) {
-            checkAdditionalDeletePermission(user, path);
+            checkSynchronizedDirectories(user, path);
         }
         // all check passed : all good !
     }
@@ -137,15 +137,6 @@ public class LFCPermissionBusiness {
         // otherwise it must have access to this group
         if (!user.hasGroupAccess(groupname)) {
             logger.error("Trying to access an unauthorized goup");
-            throw new BusinessException("Unauthorized LFC access");
-        }
-    }
-
-    private void checkAdditionalDeletePermission(User user, String path)
-            throws BusinessException {
-        checkSynchronizedDirectories(user, path);
-        if(path.endsWith("Dropbox")){
-            logger.error("Trying to delete a dropbox directory :" + path);
             throw new BusinessException("Unauthorized LFC access");
         }
     }

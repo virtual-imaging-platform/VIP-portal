@@ -69,11 +69,12 @@ public class EngineData extends JdbcDaoSupport implements EngineDAO {
 
         try {
             PreparedStatement ps = getConnection().prepareStatement(
-                    "INSERT INTO VIPEngines(name, endpoint) "
-                    + "VALUES (?, ?)");
+                    "INSERT INTO VIPEngines(name, endpoint, status) "
+                    + "VALUES (?, ?, ?)");
 
             ps.setString(1, engine.getName());
             ps.setString(2, engine.getEndpoint());
+            ps.setString(3, engine.getStatus());
             ps.execute();
             ps.close();
 

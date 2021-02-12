@@ -1,5 +1,6 @@
 package fr.insalyon.creatis.vip.core.server.dao.mysql;
 
+import fr.insalyon.creatis.devtools.MD5;
 import fr.insalyon.creatis.vip.core.client.bean.Group;
 import fr.insalyon.creatis.vip.core.client.bean.TermsOfUse;
 import fr.insalyon.creatis.vip.core.client.bean.User;
@@ -21,6 +22,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.sql.DataSource;
+import java.io.UnsupportedEncodingException;
+import java.security.NoSuchAlgorithmException;
 import java.util.Date;
 import java.util.UUID;
 
@@ -58,7 +61,6 @@ public class CoreDataInitializer extends JdbcDaoSupport {
         initializeUserTables();
         initializeGroupTables();
         initializeAccountTables();
-        initializePublicationTable();
         initializeTermsOfUseTable();
     }
 
@@ -99,13 +101,13 @@ public class CoreDataInitializer extends JdbcDaoSupport {
                                 server.getAdminEmail(),
                                 null,
                                 server.getAdminInstitution(),
-                                server.getAdminPassword(),
+                                MD5.get(server.getAdminPassword()),
                                 server.getAdminPhone(), true,
                                 UUID.randomUUID().toString(), folder, "",
                                 new Date(), new Date(), UserLevel.Administrator,
                                 CountryCode.fr, 100, null,null,0,false));
 
-            } catch (DAOException ex) {
+            } catch (DAOException | NoSuchAlgorithmException | UnsupportedEncodingException ex) {
                 logger.error("Error creating VIPUsers table", ex);
             }
         }
@@ -158,21 +160,6 @@ public class CoreDataInitializer extends JdbcDaoSupport {
                         + "FOREIGN KEY (name) REFERENCES VIPAccounts(name) "
                         + "ON DELETE CASCADE ON UPDATE CASCADE, "
                         + "FOREIGN KEY (groupname) REFERENCES VIPGroups(groupname) "
-                        + "ON DELETE CASCADE ON UPDATE CASCADE");
-    }
-
-    private void initializePublicationTable() {
-        tableInitializer.createTable("VIPPublication",
-                "id INT(11) NOT NULL AUTO_INCREMENT, "
-                        + "title VARCHAR(255) NULL, "
-                        + "date VARCHAR(45) NULL, "
-                        + "doi VARCHAR(255) NULL, "
-                        + "autors VARCHAR(255) NULL, "
-                        + "type VARCHAR(255) NULL, "
-                        + "typeName VARCHAR(255) NULL, "
-                        + "VIPAuthor VARCHAR(255) NULL, "
-                        + "PRIMARY KEY (id), "
-                        + "FOREIGN KEY (VIPAuthor) REFERENCES VIPUsers(email) "
                         + "ON DELETE CASCADE ON UPDATE CASCADE");
     }
 

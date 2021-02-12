@@ -82,10 +82,6 @@ public class AccountTab extends Tab {
 
         rightLayout.addMember(new GroupLayout());
 
-        if (CoreModule.user.isSystemAdministrator()
-                || CoreModule.user.hasGroupAccess(CoreConstants.GROUP_DROPBOX)) {
-            rightLayout.addMember(new DropboxLayout());
-        }
         layouttermsOfUse = new TermsOfUseLayout();
         rightLayout.addMember(new RemoveAccountLayout());
         rightLayout.addMember(layouttermsOfUse);

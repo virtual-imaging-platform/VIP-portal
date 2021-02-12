@@ -74,6 +74,7 @@ public class AddFolderWindow extends Window {
         this.centerInPage();
 
         form = new DynamicForm();
+        form.setAutoFocus(true);
         form.setHeight100();
         form.setWidth100();
         form.setPadding(5);
@@ -89,6 +90,7 @@ public class AddFolderWindow extends Window {
                 }
             }
         });
+        nameItem.setSelectOnFocus(true);
 
         ButtonItem saveButton = new ButtonItem("addButton", "Create");
         saveButton.setWidth(60);

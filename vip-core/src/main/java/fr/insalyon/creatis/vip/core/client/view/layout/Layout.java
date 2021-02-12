@@ -136,9 +136,13 @@ public class Layout {
                 addTab(CoreConstants.TAB_ACTIVATION, ActivationTab::new);
             }
         } else {
-            if (!Cookies.isCookieEnabled()) {
+            if (Cookies.isCookieEnabled()) {
+                // delete cookies to not lock the user in case they are wrong
+                Cookies.removeCookie(CoreConstants.COOKIES_USER, "/");
+                Cookies.removeCookie(CoreConstants.COOKIES_SESSION, "/");
+            } else {
                 setWarningMessage(
-                    "Unable to sign in: cookies must be enabled.");
+                        "Unable to sign in: cookies must be enabled.");
             }
             addTab(CoreConstants.TAB_SIGNIN, SignInTab::new);
         }
@@ -159,8 +163,8 @@ public class Layout {
             @Override
             public void onSuccess(Void result) {
 
-                Cookies.setCookie(CoreConstants.COOKIES_USER, null, new Date(0), null, "/", false);
-                Cookies.setCookie(CoreConstants.COOKIES_SESSION, null, new Date(0), null, "/", false);
+                Cookies.removeCookie(CoreConstants.COOKIES_USER, "/");
+                Cookies.removeCookie(CoreConstants.COOKIES_SESSION, "/");
 
                 Set<Tab> removedTabs = new HashSet<>();
                 for (Tab tab : centerTabSet.getTabs()) {

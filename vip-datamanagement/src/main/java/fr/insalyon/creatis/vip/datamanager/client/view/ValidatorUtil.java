@@ -74,12 +74,4 @@ public class ValidatorUtil {
         }
         return true;
     }
-    
-     public static boolean validateDropboxDir(String name, String errorMessage){
-         if(name.endsWith("Dropbox")){
-             Layout.getInstance().setWarningMessage("You cannot " + errorMessage + " a Dropbox folder.");
-             return false;
-         }
-         return true;
-    }
 }
