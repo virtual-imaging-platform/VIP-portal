@@ -69,7 +69,7 @@ export CATALINA_OPTS="$CATALINA_OPTS -DvipConfigFolder=/path/to/vip/local/folder
 
 ### Local instance notes
 
-- on the first connection, the admin password must be initialized. The default admin email is `admin@vip-local-test.local`. Use the "forgot password" feature and get the code in the logs.
+- The default admin email/password is `admin@vip-local-test.local`/`localAdminPassword`.
 - all is not working perfectly yet, expect to see some error messages. The home page, files transfers and executions shoud work.
 - vip do not send email but logs them
 - at the moment, logging is done in the `$HOME/.vip/vip.log` file
