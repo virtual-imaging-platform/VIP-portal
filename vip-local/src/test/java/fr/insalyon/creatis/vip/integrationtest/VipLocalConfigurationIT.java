@@ -58,7 +58,7 @@ import java.util.concurrent.TimeUnit;
 @SpringJUnitWebConfig(value = SpringCoreConfig.class)
 @ActiveProfiles({"local", "config-file", "local-db"})
 @TestPropertySource(locations = "file:${user.home}/.vip/local-config-folder.properties")
-//@Disabled
+@Disabled
 @TestMethodOrder(OrderAnnotation.class)
 public class VipLocalConfigurationIT {
 
