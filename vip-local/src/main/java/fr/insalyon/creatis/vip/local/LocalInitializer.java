@@ -29,8 +29,10 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.Collections;
 
 /**
@@ -243,9 +245,16 @@ public class LocalInitializer {
     private String getPathFromLocation(String location) throws BusinessException {
         Resource resource = resourceLoader.getResource(location);
         try {
-            return resource.getFile().toString();
+            if (resource.isFile()) {
+                return resource.getFile().toString();
+            } else {
+                // it is probably in a jar, copy it locally before
+                Path destination = Files.createTempFile(resource.getFilename(), null);
+                Files.copy(resource.getInputStream(), destination, StandardCopyOption.REPLACE_EXISTING);
+                return destination.toString();
+            }
         } catch (IOException e) {
-            logger.error("cannot get file from [{}] location", location);
+            logger.error("cannot get file from [{}] location", location, e);
             throw new BusinessException(e);
         }
     }
