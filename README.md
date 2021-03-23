@@ -105,7 +105,127 @@ It is advised to use the `moteur-machine` as the NFS server and the `vip-machine
 
 ## `vip-machine` installation
 
-TODO
+1. Install needed Tools
+
+    Python3 should be installed and the default python version
+
+       yum -y install wget unzip nmap vim java-1.8.0-openjdk-devel python3-pip git
+       pip install --upgrade pip
+
+2. Add VIP user
+
+       useradd -m -d /vip vip
+       
+3. Install MariaDB
+
+       yum -y mariadb
+
+4. Configure MariaDB
+
+    TODO
+
+5. Tomcat
+
+       wget https://downloads.apache.org/tomcat/tomcat-9/v9.0.44/bin/apache-tomcat-9.0.44.zip -P /vip
+       unzip apache-tomcat-9.0.44.zip -d /vip
+
+    Add the folowing lines after `<WatchedResources>` lines in `$TOMCAT_HOME/conf/context.xml` (database jndi configuration):
+
+           <GlobalNamingResources>
+             <Resource name="jdbc/vip"
+                 auth="Container"
+                 type="javax.sql.DataSource"
+                 username="vip"
+                 password="<DB_VIP_PASSWORD>"
+                 driverClassName="com.mysql.jdbc.Driver"
+                 url="jdbc:mysql://localhost:3306/vip"
+                 factory="org.apache.commons.dbcp.BasicDataSourceFactory"
+                 validationQuery="select 1"
+                 testOnBorrow="true"
+                 maxTotal="100"
+                 maxIdle="50" />
+           </GlobalNamingResources>
+    
+    Adapt the password with the one chosen in the mariadb installation.
+
+    TODO : Create or adapt the `$TOMCAT_HOME/bin/setenv.sh` file with these lines :
+
+       export CATALINA_OPTS="$CATALINA_OPTS TOCHANGE"
+       export CATALINA_OPTS="$CATALINA_OPTS TOCHANGE"
+
+    Create `/etc/systemd/system/tomcat.service` and fill it with :
+
+       [Unit]
+       Description=Apache Tomcat Web Application Container
+       After=network.target
+
+       [Service]
+       Type=forking
+
+       Environment=JAVA_HOME=/etc/alternatives/java
+       Environment=CATALINA_PID=/vip/apache-tomcat-9.0.44/temp/tomcat.pid
+       Environment=CATALINA_Home=/vip/apache-tomcat-9.0.44
+       Environment=CATALINA_BASE=/vip/apache-tomcat-9.0.44
+       #Environment=’CATALINA_OPTS=-Xms512M -Xmx1024M -server -XX:+UseParallelGC’
+       #Environment=’JAVA_OPTS.awt.headless=true -Djava.security.egd=file:/dev/v/urandom’
+
+       Environment=CATALINA_TMPDIR=/vip/apache-tomcat-9.0.44/temp
+       Environment=JRE_HOME=/usr/lib/jvm/jre
+       Environment=CLASSPATH=/vip/apache-tomcat-9.0.44/bin/bootstrap.jar:/vip/apache-tomcat-9.0.44/bin/tomcat-juli.jar
+       Environment=CATALINA_OPTS=
+       #NOTE: Picked up JDK_JAVA_OPTIONS:  --add-opens=java.base/java.lang=ALL-UNNAMED --add-opens=java.base/java.io=ALL-UNNAMED --add-opens=java.rmi/sun.rmi.transport=ALL-UNNAMED
+
+       ExecStart=/vip/apache-tomcat-9.0.44/bin/startup.sh
+       ExecStop=/vip/apache-tomcat-9.0.44/bin/shutdown.sh
+
+       User=vip
+       Group=vip
+       RestartSec=20
+       Restart=always
+
+       [Install]
+
+       WantedBy=multi-user.target
+       
+    Then reload daemon, start Tomcat service, enable it  and make it restart every night :
+       
+       systemctl daemon-reload
+       systemctl stop tomcat
+       systemctl enable tomcat
+       echo "30 4 * * * systemctl restart tomcat" >> /var/spool/cron/root
+
+
+6. VIP
+
+       mkdir -P /vip/.vip
+       wget vip.conf -P /vip/.vip
+       wget vip-api.conf -P /vip/.vip
+       wget .moteur2/moteur2plugins.conf  
+       wget vip.war -P /vip/apache-tomcat-9.0.44/webapps
+
+    todo : adapt *.conf
+
+
+7. GRIDA
+
+       mkdir /vip/grida
+       wget -q https://github.com/virtual-imaging-platform/GRIDA/releases/download/2.0.1/grida-server-2.0.1.jar -O /vip/grida/grida-server-2.0.1.jar  
+       mkdir /vip/grida/uploads  
+       
+    TODO wget conf, adapt conf, and start grida
+
+
+8.  SMA
+ 
+        mkdir /vip/sma
+        wget -q https://github.com/virtual-imaging-platform/SMA/releases/download/r_0_1/sma-server-0.1.zip -P /vip/sma 
+        unzip -q /vip/sma/sma-server-0.1.zip  -d /vip/sma
+        rm -f /vip/sma/sma-server-0.1.zip  
+
+
+9. Boutiques
+
+10. Start tomcat
 
 ## `moteur-machine` installation
 
