@@ -193,7 +193,7 @@ TODO
         cd ..
         mkdir conf
 
-12. Add configuration
+12. Add moteur2 configuration
 
         wget https://github.com/virtual-imaging-platform/Complementary-tools/raw/develop/moteur/worflow-agent-0.2/workflow-agent-0.2.jar -o $MOTEUR_HOME/workflow-agent_0.2/workflow-agent.conf
         mkdir $MOTEUR_HOME/.moteur2 $MOTEUR_HOME/conf
@@ -201,18 +201,30 @@ TODO
         wget https://github.com/virtual-imaging-platform/Complementary-tools/raw/develop/moteur/conf/default.conf -o $MOTEUR_HOME/conf/default.conf
         wget https://github.com/virtual-imaging-platform/Complementary-tools/raw/develop/moteur/conf/override.conf -o $MOTEUR_HOME/conf/override.conf
         mkdir /var/www/.moteur2
-        wget https://github.com/virtual-imaging-platform/Complementary-tools/raw/develop/conf/.moteur2/moteur2.conf -o /var/www/.moteur2/moteur2.conf
-        wget https://github.com/virtual-imaging-platform/Complementary-tools/raw/develop/conf/.moteur2/moteur2plugins.conf -o /var/www/.moteur2/moteur2plugins.conf 
         wget https://github.com/virtual-imaging-platform/Complementary-tools/raw/develop/conf/.moteur2/moteur2-grida.conf -o /var/www/.moteur2/moteur2-grida.conf
         mkdir /var/www/prod/.moteur2 /var/www/prod/.jgasw
         wget https://github.com/virtual-imaging-platform/Complementary-tools/raw/develop/conf/prod/.jgasw/jgasw.properties -o /var/www/prod/.jgasw/jgasw.properties
-        wget https://github.com/virtual-imaging-platform/Complementary-tools/raw/develop/conf/.moteur2/moteur2-grida.conf -o /var/www/.moteur2/moteur2-grida.conf
-        wget https://raw.githubusercontent.com/virtual-imaging-platform/Complementary-tools/develop/conf/prod/.moteur2/moteur2plugins.conf -o /var/www/prod/.moteur2/moteur2plugins.conf
-        wget https://raw.githubusercontent.com/virtual-imaging-platform/Complementary-tools/develop/conf/prod/.moteur2/moteur2server.conf -o /var/www/prod/.moteur2/moteur2server.conf
+        wget https://github.com/virtual-imaging-platform/Complementary-tools/raw/develop/conf/prod/.moteur2/moteur2plugins.conf -o /var/www/prod/.moteur2/moteur2plugins.conf
+        wget https://github.com/virtual-imaging-platform/Complementary-tools/raw/develop/conf/prod/.moteur2/moteur2server.conf -o /var/www/prod/.moteur2/moteur2server.conf
 
-13. Edit Configurations
-    1. Indented item
-    2. Indented item
+13. Edit moteur2 Configurations
+    1. In `$MOTEUR_HOME/workflow-agent_0.2/workflow-agent.conf`, put `localhost` in `db.h2.server` and `9092` in `db.h2.port`
+    2. In `$MOTEUR_HOME/.moteur2/moteur2.conf`, do nothing
+    3. In `$MOTEUR_HOME/conf/default.conf`, update the paths in `plugin.db`, `plugin.executor` and `plugin.listener`.
+       Put `false` in `minorstatus.service.enabled`
+       Put `localhost` in `plugin.h2.server.host`, `9092` in `plugin.h2.server.port`, and `gasw` in `plugin.h2.user` and `plugin.h2.password`
+    4. In `$MOTEUR_HOME/conf/override.conf`, do nothing
+    5. In `/var/www/prod/.moteur2/moteur2plugins.conf `, 
+       put `vip` in `moteur2.plugins.workflowsdb.connection.username`, 
+       put the vip mariadb password in `moteur2.plugins.workflowsdb.connection.password`, 
+       and add the `vip-machine` hostname and the `3306` port in `moteur2.plugins.workflowsdb.connection.url`
+    6. In `/var/www/.moteur2/moteur2-grida.conf`, 
+       put `moteur-machine`'s hostname in `grida.server.host`,
+       put `9006` in `grida.server.port`,
+       and put `/var/www/.moteur2/moteur2-grida.conf` in `proxy.path`
+    7. In `/var/www/prod/.moteur2/moteur2server.conf`, update `configuration/plugins/plugin/location` to the real path of `moteur2-workflowsdb-plugin`
+
+
     
 14. Change rights
 
