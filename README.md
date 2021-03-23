@@ -204,18 +204,39 @@ mkdir conf
 
 12. Add configuration
 
-TODO
-
-13. Change rights
-
-TODO
 ```
-chown -R apache:apache $MOTEUR_HOME /var/www/prod
+wget https://github.com/virtual-imaging-platform/Complementary-tools/raw/develop/moteur/worflow-agent-0.2/workflow-agent-0.2.jar -o $MOTEUR_HOME/workflow-agent_0.2/workflow-agent.conf
+mkdir $MOTEUR_HOME/.moteur2 $MOTEUR_HOME/conf
+wget https://github.com/virtual-imaging-platform/Complementary-tools/raw/develop/conf/.moteur2/moteur2.conf -o $MOTEUR_HOME/.moteur2/moteur2.conf
+wget https://github.com/virtual-imaging-platform/Complementary-tools/raw/develop/moteur/conf/default.conf -o $MOTEUR_HOME/conf/default.conf
+wget https://github.com/virtual-imaging-platform/Complementary-tools/raw/develop/moteur/conf/override.conf -o $MOTEUR_HOME/conf/override.conf
+mkdir /var/www/.moteur2
+wget https://github.com/virtual-imaging-platform/Complementary-tools/raw/develop/conf/.moteur2/moteur2.conf -o /var/www/.moteur2/moteur2.conf
+wget https://github.com/virtual-imaging-platform/Complementary-tools/raw/develop/conf/.moteur2/moteur2plugins.conf -o /var/www/.moteur2/moteur2plugins.conf 
+wget https://github.com/virtual-imaging-platform/Complementary-tools/raw/develop/conf/.moteur2/moteur2-grida.conf -o /var/www/.moteur2/moteur2-grida.conf
+mkdir /var/www/prod/.moteur2 /var/www/prod/.jgasw
+wget https://github.com/virtual-imaging-platform/Complementary-tools/raw/develop/conf/prod/.jgasw/jgasw.properties -o /var/www/prod/.jgasw/jgasw.properties
+wget https://github.com/virtual-imaging-platform/Complementary-tools/raw/develop/conf/.moteur2/moteur2-grida.conf -o /var/www/.moteur2/moteur2-grida.conf
+wget https://raw.githubusercontent.com/virtual-imaging-platform/Complementary-tools/develop/conf/prod/.moteur2/moteur2plugins.conf -o /var/www/prod/.moteur2/moteur2plugins.conf
+wget https://raw.githubusercontent.com/virtual-imaging-platform/Complementary-tools/develop/conf/prod/.moteur2/moteur2server.conf -o /var/www/prod/.moteur2/moteur2server.conf
 ```
 
-14. Start apache
+13. Edit Configurations
 
+       1. Plop1
+       2. Plop2
 
+14. Change rights
+
+```
+chown -R apache:apache $MOTEUR_HOME /var/www/prod /var/www/.moteur2
+```
+
+15. Start apache
+
+## Finalization and tests
+
+TODO
 
 
 
