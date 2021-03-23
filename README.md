@@ -92,13 +92,16 @@ The procedure is described for centos machines but should be adapted to any majo
 
 As the whole infrastucture is installed on 2 machines, some things must be done to allow the services to communicate and share things.
 
-1. A NFS share must be established on the `/var/www/html/workflows` path on the 2 machines.
+1. Install `apache` (`httpd`) on both machines through the package manager
+
+2. Create the `/var/www/html/workflows` on both machines
+
+3. A NFS share must be established on the `/var/www/html/workflows` path on the 2 machines.
 It is advised to use the `moteur-machine` as the NFS server and the `vip-machine` as a NFS client.
-The apache web server should be installed before on the `moteur-machine` as this shared NFS folder must belong to the `apache` user
 
-2. The `9092` port must be opened on the `moteur-machine` and accessable from the `vip-machine`
+4. The `9092` port must be opened on the `moteur-machine` and accessable from the `vip-machine`
 
-Also, a SMTP server must be accessible from the `vip-machine`
+5. A SMTP server must be accessible from the `vip-machine`
 
 ## `vip-machine` installation
 
@@ -106,17 +109,17 @@ TODO
 
 ## `moteur-machine` installation
 
-**Every folder/file created on the `moteur-machine` must belong to the apache user.**
-Some things must be done with root privileges, in those cases, a `chown` must be done after.
+0. Every folder/file created on the `moteur-machine` must belong to the apache user.
+       It is advised to do the whole machine installation as root and do `chown` commands at the end.
+       The `chown` commands that are necessary are documented at the end
 
-1. If it isn't already done, `apache` must be installed through the system package manager
+1. If it isn't already done, `apache` (`httpd`) must be installed through the system package manager
 
-2. Stop the apache server
+2. Stop the apache server (`service httpd stop`)
 
-3. Install Java JDK 8 through the system package manager
+3. Install Java JDK 8 through the system package manager (`yum install java-1.8.0-openjdk-devel`)
 
-4. Create the `/var/www/cgi-bin/m2Server-gasw3` directory.
-Store it in the `$MOTEUR_HOME` environment variable.
+4. `mkdir -p /var/www/cgi-bin/m2Server-gasw3; export MOTEUR_HOME=/var/www/cgi-bin/m2Server-gasw3`
 
 5. Install the moteur server.
 
@@ -126,7 +129,6 @@ For other any other system, please adapt the compilation instuctions from https:
 cd $MOTEUR_HOME
 wget https://github.com/virtual-imaging-platform/moteur_server/releases/download/v1.1/moteur_server-v1.1-centos7.tar.gz
 tar xzf moteur_server-*-centos7.tar.gz
-mv moteur_server-*-centos7/moteur_server .
 rm -rf moteur_server-*-centos7*
 ```
 
@@ -137,23 +139,24 @@ export MOTEUR_SERVER_RAW_FILES=https://github.com/virtual-imaging-platform/moteu
 wget -q ${MOTEUR_SERVER_RAW_FILES}/env.sh -O ${MOTEUR_HOME}/env.sh
 wget -q ${MOTEUR_SERVER_RAW_FILES}/killWorkflow.sh -O ${MOTEUR_HOME}/killWorkflow.sh
 wget -q ${MOTEUR_SERVER_RAW_FILES}/submitWorkflow.sh -O ${MOTEUR_HOME}/submitWorkflow.sh
-chmod +x ${MOTEUR_DEST_DIR}/killWorkflow.sh ${MOTEUR_HOME}/submitWorkflow.sh
+chmod +x ${MOTEUR_HOME}/killWorkflow.sh ${MOTEUR_HOME}/submitWorkflow.sh
 ```
 
 7. Install h2 server
 
 ```
-mkdir /var/www/prod # may need sudo, then chown it to apache
+mkdir /var/www/prod
 export H2_ZIP=h2-2012-05-23.zip
 wget -q https://storage.googleapis.com/google-code-archive-downloads/v2/code.google.com/h2database/${H2_ZIP} -O /var/www/prod/${H2_ZIP}
 cd /var/www/prod && unzip -q /var/www/prod/${H2_ZIP}
 rm -f /var/www/prod/${H2_ZIP}
 unset H2_ZIP
+chown -R apache:apache /var/www/prod/h2
 ```
 
 8. Start the h2 server
 
-The h2 service must be started under apache with the command `java -cp /var/www/prod/h2/bin/h2-1.3.171.jar org.h2.tools.Server -tcpAllowOthers`.
+The h2 service must be started with the apache user with the command `java -cp /var/www/prod/h2/bin/h2-1.3.167.jar org.h2.tools.Server -tcpAllowOthers`.
 It is advised to configure it as a system service and make it start automatically on machine boot.
 
 9. Install grida
@@ -161,12 +164,17 @@ It is advised to configure it as a system service and make it start automaticall
 ```
 mkdir /var/www/prod/grida
 wget -q  https://github.com/axlbonnet/GRIDA/releases/download/2.1.0-alpha/grida-server-2.1.0-alpha.jar -O /var/www/prod/grida/grida-server-2.0.1.jar
-mkdir /usr/share/httpd/.dirac # this is the apache home on centos, it could be otherwise on other OS. Also this may need root privilege folowed by a chown
-mkdir /usr/share/httpd/.cache # idem as previous line
+mkdir /usr/share/httpd/.dirac
+mkdir /usr/share/httpd/.cache
+chown apache:apache /var/www/prod/grida /usr/share/httpd/.dirac /usr/share/httpd/.cache 
 ```
-10. Configure grida
 
-Copy https://github.com/virtual-imaging-platform/GRIDA#server-configuration in `/var/www/prod/grida/grida-server.conf` and change `commands.type` to `local`
+10. Configure and start grida
+
+Copy https://github.com/virtual-imaging-platform/GRIDA#server-configuration in `/var/www/prod/grida/grida-server.conf` and change `commands.type` to `local`.
+
+Grida must be started with the apache user with the command `java -jar grida-server-2.0.1.jar` in the `/var/www/prod/grida` folder.
+It is advised to configure it as a system service and make it start automatically on machine boot.
 
 11. Install moteur2 jars
 
@@ -176,7 +184,9 @@ wget https://github.com/virtual-imaging-platform/Complementary-tools/raw/develop
 mkdir worflow-agent-0.2
 cd worflow-agent-0.2
 wget https://github.com/virtual-imaging-platform/Complementary-tools/raw/develop/moteur/worflow-agent-0.2/workflow-agent-0.2.jar
-cd ../libs
+cd ..
+mkdir libs plugins
+cd libs
 wget https://github.com/virtual-imaging-platform/GASW/releases/download/v3.6.0/gasw-3.6.0.jar
 wget https://github.com/virtual-imaging-platform/GRIDA/releases/download/2.0.1/grida-client-2.0.1.jar
 wget https://github.com/virtual-imaging-platform/GRIDA/releases/download/2.0.1/grida-common-2.0.1.jar
@@ -195,6 +205,15 @@ mkdir conf
 12. Add configuration
 
 TODO
+
+13. Change rights
+
+TODO
+```
+chown -R apache:apache $MOTEUR_HOME /var/www/prod
+```
+
+14. Start apache
 
 
 
