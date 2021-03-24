@@ -352,7 +352,7 @@ It is advised to use the `moteur-machine` as the NFS server and the `vip-machine
 
 12. Add moteur2 configuration
 
-        wget https://github.com/virtual-imaging-platform/Complementary-tools/raw/develop/moteur/worflow-agent-0.2/workflow-agent.conf -O $MOTEUR_HOME/workflow-agent_0.2/workflow-agent.conf
+        wget https://github.com/virtual-imaging-platform/Complementary-tools/raw/develop/moteur/worflow-agent-0.2/workflow-agent.conf -O $MOTEUR_HOME/workflow-agent-0.2/workflow-agent.conf
         mkdir $MOTEUR_HOME/.moteur2 $MOTEUR_HOME/conf
         wget https://github.com/virtual-imaging-platform/Complementary-tools/raw/develop/conf/.moteur2/moteur2.conf -O $MOTEUR_HOME/.moteur2/moteur2.conf
         wget https://github.com/virtual-imaging-platform/Complementary-tools/raw/develop/moteur/conf/default.conf -O $MOTEUR_HOME/conf/default.conf
@@ -365,7 +365,7 @@ It is advised to use the `moteur-machine` as the NFS server and the `vip-machine
         wget https://github.com/virtual-imaging-platform/Complementary-tools/raw/develop/conf/prod/.moteur2/moteur2server.conf -O /var/www/prod/.moteur2/moteur2server.conf
 
 13. Edit moteur2 Configurations
-    1. In `$MOTEUR_HOME/workflow-agent_0.2/workflow-agent.conf`, put `localhost` in `db.h2.server` and `9092` in `db.h2.port`
+    1. In `$MOTEUR_HOME/workflow-agent-0.2/workflow-agent.conf`, put `localhost` in `db.h2.server` and `9092` in `db.h2.port`
     2. In `$MOTEUR_HOME/.moteur2/moteur2.conf`, do nothing
     3. In `$MOTEUR_HOME/conf/default.conf`, update the paths in `plugin.db`, `plugin.executor` and `plugin.listener`.
        Put `false` in `minorstatus.service.enabled`
