@@ -186,7 +186,7 @@ It is advised to use the `moteur-machine` as the NFS server and the `vip-machine
        wget https://github.com/axlbonnet/VIP-portal/raw/ciSupport/vip-portal/src/main/resources/default-vip.conf -O /vip/.vip/vip.conf
        wget https://github.com/axlbonnet/VIP-portal/raw/ciSupport/vip-portal/src/main/resources/default-vip-api.conf -O /vip/.vip/vip-api.conf
        wget https://github.com/virtual-imaging-platform/Complementary-tools/raw/develop/conf/prod/.moteur2/moteur2plugins.conf -O /vip/.moteur2/moteur2plugins.conf
-       wget https://github.com/axlbonnet/VIP-portal/releases/download/2.1-alpha/vip-portal-2.1-alpha.war -P /vip/apache-tomcat-9.0.44/webapps
+       wget https://github.com/axlbonnet/VIP-portal/releases/download/2.1-alpha/vip-portal-2.1-alpha.war -O /vip/apache-tomcat-9.0.44/webapps/ROOT.war
 
 7. Configure vip.conf
 
@@ -221,10 +221,14 @@ It is advised to use the `moteur-machine` as the NFS server and the `vip-machine
 7. GRIDA
 
        mkdir /vip/grida
-       mkdir /vip/grida/uploads  
+       mkdir /vip/grida/download  
+       mkdir /vip/grida/upload  
        wget -q  https://github.com/axlbonnet/GRIDA/releases/download/2.1.0-alpha/grida-server-2.1.0-alpha.jar -O /vip/grida/grida-server-2.0.1.jar
 
     Copy https://github.com/virtual-imaging-platform/GRIDA#server-configuration in `/vip/grida/grida-server.conf` and change `commands.type` to `local`.
+    
+       chown -R apache:apache /vip/grida
+       chown -R vip:vip /vip/grida/upload  
 
 8.  SMA
  
@@ -248,7 +252,9 @@ It is advised to use the `moteur-machine` as the NFS server and the `vip-machine
     
 9. Install Boutiques
 
-        pip install "git+https://github.com/boutiques/boutiques@0.5.23#egg=boutiques&subdirectory=tools/python"
+    `pip` should run with python3, on python2 systems, `pip3` should be used.
+
+        pip install boutiques
 
 10. Finalize installation
 
@@ -256,13 +262,15 @@ It is advised to use the `moteur-machine` as the NFS server and the `vip-machine
     
 11. Start Grida and SMA
 
-    Grida must be started with the vip user with the command `java -jar grida-server-2.0.1.jar` in the `/vip/grida` folder.
+    Grida must be started with the apache user with the command `java -jar grida-server-2.0.1.jar` in the `/vip/grida` folder.
     SMA must be started with the vip user with the command `java -jar /vip/sma/sma-server-0.1.jar` in the `/vip/sma` folder.
     It is advised to configure grida and sma as a system services and make them start automatically on machine boot.
 
 10. Start tomcat with `/vip/apache-tomcat-9.0.44/bin/startup.sh`
     It is advised to configure tomcat as a system service to make it start automatically on system startup.
     It is also advised to make tomcat restart once a day through a cron entry.
+    Also, tomcat should be configured to respond to HTTPS requests and no HTTP requests.
+    This could be done in tomcat or by setting up a reverse proxy.
 
 ## `moteur-machine` installation
 
