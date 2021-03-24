@@ -204,9 +204,9 @@ It is advised to use the `moteur-machine` as the NFS server and the `vip-machine
 
        mkdir /vip/grida
        mkdir /vip/grida/uploads  
-       wget -q  https://github.com/axlbonnet/GRIDA/releases/download/2.1.0-alpha/grida-server-2.1.0-alpha.jar -O /var/www/prod/grida/grida-server-2.0.1.jar
+       wget -q  https://github.com/axlbonnet/GRIDA/releases/download/2.1.0-alpha/grida-server-2.1.0-alpha.jar -O /vip/grida/grida-server-2.0.1.jar
 
-    Copy https://github.com/virtual-imaging-platform/GRIDA#server-configuration in `/var/www/prod/grida/grida-server.conf` and change `commands.type` to `local`.
+    Copy https://github.com/virtual-imaging-platform/GRIDA#server-configuration in `/vip/grida/grida-server.conf` and change `commands.type` to `local`.
 
 8.  SMA
  
@@ -239,7 +239,7 @@ It is advised to use the `moteur-machine` as the NFS server and the `vip-machine
 11. Start Grida and SMA
 
     Grida must be started with the vip user with the command `java -jar grida-server-2.0.1.jar` in the `/vip/grida` folder.
-    SMA must be started with the vip user with the command `java -jar /home/vip/sma/sma-server-0.1.jar` in the `/vip/sma` folder.
+    SMA must be started with the vip user with the command `java -jar /vip/sma/sma-server-0.1.jar` in the `/vip/sma` folder.
     It is advised to configure grida and sma as a system services and make them start automatically on machine boot.
 
 10. Start tomcat with `/vip/apache-tomcat-9.0.44/bin/startup.sh`
