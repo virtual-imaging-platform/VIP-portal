@@ -182,9 +182,9 @@ It is advised to use the `moteur-machine` as the NFS server and the `vip-machine
 6. VIP
 
        mkdir /vip/.vip /vip/.moteur2
-       wget https://github.com/axlbonnet/VIP-portal/raw/ciSupport/vip-portal/src/main/resources/default-vip.conf -o /vip/.vip/vip.conf
-       wget https://github.com/axlbonnet/VIP-portal/raw/ciSupport/vip-portal/src/main/resources/default-vip-api.conf -o /vip/.vip/vip-api.conf
-       wget https://github.com/virtual-imaging-platform/Complementary-tools/raw/develop/conf/prod/.moteur2/moteur2plugins.conf -o /vip/.moteur2/moteur2plugins.conf
+       wget https://github.com/axlbonnet/VIP-portal/raw/ciSupport/vip-portal/src/main/resources/default-vip.conf -O /vip/.vip/vip.conf
+       wget https://github.com/axlbonnet/VIP-portal/raw/ciSupport/vip-portal/src/main/resources/default-vip-api.conf -O /vip/.vip/vip-api.conf
+       wget https://github.com/virtual-imaging-platform/Complementary-tools/raw/develop/conf/prod/.moteur2/moteur2plugins.conf -O /vip/.moteur2/moteur2plugins.conf
        wget https://github.com/axlbonnet/VIP-portal/releases/download/2.1-alpha/vip-portal-2.1-alpha.war -P /vip/apache-tomcat-9.0.44/webapps
 
 7. Configure vip.conf
@@ -334,17 +334,17 @@ It is advised to use the `moteur-machine` as the NFS server and the `vip-machine
 
 12. Add moteur2 configuration
 
-        wget https://github.com/virtual-imaging-platform/Complementary-tools/raw/develop/moteur/worflow-agent-0.2/workflow-agent-0.2.jar -o $MOTEUR_HOME/workflow-agent_0.2/workflow-agent.conf
+        wget https://github.com/virtual-imaging-platform/Complementary-tools/raw/develop/moteur/worflow-agent-0.2/workflow-agent-0.2.jar -O $MOTEUR_HOME/workflow-agent_0.2/workflow-agent.conf
         mkdir $MOTEUR_HOME/.moteur2 $MOTEUR_HOME/conf
-        wget https://github.com/virtual-imaging-platform/Complementary-tools/raw/develop/conf/.moteur2/moteur2.conf -o $MOTEUR_HOME/.moteur2/moteur2.conf
-        wget https://github.com/virtual-imaging-platform/Complementary-tools/raw/develop/moteur/conf/default.conf -o $MOTEUR_HOME/conf/default.conf
-        wget https://github.com/virtual-imaging-platform/Complementary-tools/raw/develop/moteur/conf/override.conf -o $MOTEUR_HOME/conf/override.conf
+        wget https://github.com/virtual-imaging-platform/Complementary-tools/raw/develop/conf/.moteur2/moteur2.conf -O $MOTEUR_HOME/.moteur2/moteur2.conf
+        wget https://github.com/virtual-imaging-platform/Complementary-tools/raw/develop/moteur/conf/default.conf -O $MOTEUR_HOME/conf/default.conf
+        wget https://github.com/virtual-imaging-platform/Complementary-tools/raw/develop/moteur/conf/override.conf -O $MOTEUR_HOME/conf/override.conf
         mkdir /var/www/.moteur2
-        wget https://github.com/virtual-imaging-platform/Complementary-tools/raw/develop/conf/.moteur2/moteur2-grida.conf -o /var/www/.moteur2/moteur2-grida.conf
+        wget https://github.com/virtual-imaging-platform/Complementary-tools/raw/develop/conf/.moteur2/moteur2-grida.conf -O /var/www/.moteur2/moteur2-grida.conf
         mkdir /var/www/prod/.moteur2 /var/www/prod/.jgasw
-        wget https://github.com/virtual-imaging-platform/Complementary-tools/raw/develop/conf/prod/.jgasw/jgasw.properties -o /var/www/prod/.jgasw/jgasw.properties
-        wget https://github.com/virtual-imaging-platform/Complementary-tools/raw/develop/conf/prod/.moteur2/moteur2plugins.conf -o /var/www/prod/.moteur2/moteur2plugins.conf
-        wget https://github.com/virtual-imaging-platform/Complementary-tools/raw/develop/conf/prod/.moteur2/moteur2server.conf -o /var/www/prod/.moteur2/moteur2server.conf
+        wget https://github.com/virtual-imaging-platform/Complementary-tools/raw/develop/conf/prod/.jgasw/jgasw.properties -O /var/www/prod/.jgasw/jgasw.properties
+        wget https://github.com/virtual-imaging-platform/Complementary-tools/raw/develop/conf/prod/.moteur2/moteur2plugins.conf -O /var/www/prod/.moteur2/moteur2plugins.conf
+        wget https://github.com/virtual-imaging-platform/Complementary-tools/raw/develop/conf/prod/.moteur2/moteur2server.conf -O /var/www/prod/.moteur2/moteur2server.conf
 
 13. Edit moteur2 Configurations
     1. In `$MOTEUR_HOME/workflow-agent_0.2/workflow-agent.conf`, put `localhost` in `db.h2.server` and `9092` in `db.h2.port`
