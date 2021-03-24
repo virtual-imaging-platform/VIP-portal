@@ -107,9 +107,7 @@ It is advised to use the `moteur-machine` as the NFS server and the `vip-machine
 
 1. Install needed Tools
 
-    Python3 must be installed and must be the default python version
-
-       yum -y install wget unzip nmap vim java-1.8.0-openjdk-devel python3-pip git
+       yum -y install wget unzip nmap vim java-1.8.0-openjdk-devel python-pip git
        pip install --upgrade pip
 
 2. Add VIP user
@@ -231,7 +229,6 @@ It is advised to use the `moteur-machine` as the NFS server and the `vip-machine
     
 9. Install Boutiques
 
-        pip install --upgrade pip
         pip install "git+https://github.com/boutiques/boutiques@0.5.23#egg=boutiques&subdirectory=tools/python"
 
 10. Finalize installation
