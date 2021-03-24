@@ -125,7 +125,8 @@ It is advised to use the `moteur-machine` as the NFS server and the `vip-machine
 
 4. Configure MariaDB
 
-    Create the users/rights init file in `/vip/db_init.sql`
+    Create the users/rights init file in `/vip/db_init.sql`.
+    Choose a password for the mariadb user (different from root) and change `MOTEUR_HOST` by `moteur-machine`'s hostname.
                     
        # The following is mysql_secure_installation
        DELETE FROM mysql.user WHERE User='';
