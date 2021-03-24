@@ -107,7 +107,7 @@ It is advised to use the `moteur-machine` as the NFS server and the `vip-machine
 
 1. Install needed Tools
 
-    Python3 should be installed and the default python version
+    Python3 must be installed and must be the default python version
 
        yum -y install wget unzip nmap vim java-1.8.0-openjdk-devel python3-pip git
        pip install --upgrade pip
@@ -148,72 +148,25 @@ It is advised to use the `moteur-machine` as the NFS server and the `vip-machine
     
     Adapt the password with the one chosen in the mariadb installation.
 
-    TODO : Create or adapt the `$TOMCAT_HOME/bin/setenv.sh` file with these lines :
-
-       export CATALINA_OPTS="$CATALINA_OPTS TOCHANGE"
-       export CATALINA_OPTS="$CATALINA_OPTS TOCHANGE"
-
-    Create `/etc/systemd/system/tomcat.service` and fill it with :
-
-       [Unit]
-       Description=Apache Tomcat Web Application Container
-       After=network.target
-
-       [Service]
-       Type=forking
-
-       Environment=JAVA_HOME=/etc/alternatives/java
-       Environment=CATALINA_PID=/vip/apache-tomcat-9.0.44/temp/tomcat.pid
-       Environment=CATALINA_Home=/vip/apache-tomcat-9.0.44
-       Environment=CATALINA_BASE=/vip/apache-tomcat-9.0.44
-       #Environment=’CATALINA_OPTS=-Xms512M -Xmx1024M -server -XX:+UseParallelGC’
-       #Environment=’JAVA_OPTS.awt.headless=true -Djava.security.egd=file:/dev/v/urandom’
-
-       Environment=CATALINA_TMPDIR=/vip/apache-tomcat-9.0.44/temp
-       Environment=JRE_HOME=/usr/lib/jvm/jre
-       Environment=CLASSPATH=/vip/apache-tomcat-9.0.44/bin/bootstrap.jar:/vip/apache-tomcat-9.0.44/bin/tomcat-juli.jar
-       Environment=CATALINA_OPTS=
-       #NOTE: Picked up JDK_JAVA_OPTIONS:  --add-opens=java.base/java.lang=ALL-UNNAMED --add-opens=java.base/java.io=ALL-UNNAMED --add-opens=java.rmi/sun.rmi.transport=ALL-UNNAMED
-
-       ExecStart=/vip/apache-tomcat-9.0.44/bin/startup.sh
-       ExecStop=/vip/apache-tomcat-9.0.44/bin/shutdown.sh
-
-       User=vip
-       Group=vip
-       RestartSec=20
-       Restart=always
-
-       [Install]
-
-       WantedBy=multi-user.target
-       
-    Then reload daemon, start Tomcat service, enable it  and make it restart every night :
-       
-       systemctl daemon-reload
-       systemctl stop tomcat
-       systemctl enable tomcat
-       echo "30 4 * * * systemctl restart tomcat" >> /var/spool/cron/root
-
-
 6. VIP
 
-       mkdir -P /vip/.vip
-       wget vip.conf -P /vip/.vip
-       wget vip-api.conf -P /vip/.vip
-       wget .moteur2/moteur2plugins.conf  
-       wget vip.war -P /vip/apache-tomcat-9.0.44/webapps
+       mkdir /vip/.vip /vip/.moteur2
+       wget https://github.com/axlbonnet/VIP-portal/raw/ciSupport/vip-portal/src/main/resources/default-vip.conf -o /vip/.vip/vip.conf
+       wget https://github.com/axlbonnet/VIP-portal/raw/ciSupport/vip-portal/src/main/resources/default-vip-api.conf -o /vip/.vip/vip-api.conf
+       wget https://github.com/virtual-imaging-platform/Complementary-tools/raw/develop/conf/prod/.moteur2/moteur2plugins.conf -o /vip/.moteur2/moteur2plugins.conf
+       wget https://github.com/axlbonnet/VIP-portal/releases/download/2.1-alpha/vip-portal-2.1-alpha.war -P /vip/apache-tomcat-9.0.44/webapps
 
-    todo : adapt *.conf
-
+7. Configure VIP
+    
+    TODO
 
 7. GRIDA
 
        mkdir /vip/grida
-       wget -q https://github.com/virtual-imaging-platform/GRIDA/releases/download/2.0.1/grida-server-2.0.1.jar -O /vip/grida/grida-server-2.0.1.jar  
        mkdir /vip/grida/uploads  
-       
-    TODO wget conf, adapt conf, and start grida
+       wget -q  https://github.com/axlbonnet/GRIDA/releases/download/2.1.0-alpha/grida-server-2.1.0-alpha.jar -O /var/www/prod/grida/grida-server-2.0.1.jar
 
+    Copy https://github.com/virtual-imaging-platform/GRIDA#server-configuration in `/var/www/prod/grida/grida-server.conf` and change `commands.type` to `local`.
 
 8.  SMA
  
@@ -222,10 +175,37 @@ It is advised to use the `moteur-machine` as the NFS server and the `vip-machine
         unzip -q /vip/sma/sma-server-0.1.zip  -d /vip/sma
         rm -f /vip/sma/sma-server-0.1.zip  
 
+    Copy in the `/vip/sma/sma-server.conf` the following content :
 
-9. Boutiques
+        sma.port = 8084
+        sma.retrycount = 5
+        mail.host = TOCHANGE
+        mail.transport.protocol = smtp
+        mail.from = TOCHANGE
+        mail.from.name = TOCHANGE
+        mail.max.simultaneous.runs = 5
+        sma.max.history = 90TODO
+    
+    Edit `mail.host` to your SMTP host, `mail.from` to your service email adress, and `mail.from.name` to your service name.
+    
+9. Install Boutiques
 
-10. Start tomcat
+        pip install --upgrade pip
+        pip install "git+https://github.com/boutiques/boutiques@0.5.23#egg=boutiques&subdirectory=tools/python"
+
+10. Finalize installation
+
+        sudo chown -R vip:vip /vip
+    
+11. Start Grida and SMA
+
+    Grida must be started with the vip user with the command `java -jar grida-server-2.0.1.jar` in the `/vip/grida` folder.
+    SMA must be started with the vip user with the command `java -jar /home/vip/sma/sma-server-0.1.jar` in the `/vip/sma` folder.
+    It is advised to configure grida and sma as a system services and make them start automatically on machine boot.
+
+10. Start tomcat with `/vip/apache-tomcat-9.0.44/bin/startup.sh`
+    It is advised to configure tomcat as a system service to make it start automatically on system startup.
+    It is also advised to make tomcat restart once a day through a cron entry.
 
 ## `moteur-machine` installation
 
