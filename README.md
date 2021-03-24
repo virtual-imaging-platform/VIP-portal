@@ -118,11 +118,43 @@ It is advised to use the `moteur-machine` as the NFS server and the `vip-machine
        
 3. Install MariaDB
 
-       yum -y mariadb
+    Do the folowing command and choose the root password for the mariadb server.
+    
+        yum -y -q install mariadb mariadb-server
+        systemctl enable mariadb.service
+        systemctl start mariadb.service
+        mysqladmin password $MARIADB_ROOT_PASSWORD
 
 4. Configure MariaDB
 
-    TODO
+    Create the users/rights init file in `/vip/db_init.sql`
+                    
+       # The following is mysql_secure_installation
+       DELETE FROM mysql.user WHERE User='';
+       DELETE FROM mysql.user WHERE User='root' AND Host NOT IN ('localhost', '127.0.0.1', '::1');
+       DROP DATABASE test;
+       DELETE FROM mysql.db WHERE Db='test' OR Db='test\_%';
+       # VIP user
+       CREATE USER 'vip'@'localhost' IDENTIFIED BY '<DB_VIP_PASSWORD>';
+       CREATE USER 'vip'@'<MOTEUR_HOST>' IDENTIFIED BY '<DB_VIP_PASSWORD>';
+       # Create the databases for VIP
+       # Charset cannot be utf8 characters as it takes 3 times the space (max
+       # DB row size is 64 kB)
+       CREATE DATABASE vip;
+       ALTER DATABASE vip CHARACTER SET=latin1;
+       GRANT ALL PRIVILEGES ON vip.* TO 'vip'@'localhost';
+       GRANT ALL PRIVILEGES ON vip.* TO 'vip'@'<MOTEUR_HOST>';
+       CREATE DATABASE workflowsdb;
+       ALTER DATABASE workflowsdb CHARACTER SET=latin1;
+       GRANT ALL PRIVILEGES ON workflowsdb.* TO 'vip'@'localhost';
+       GRANT ALL PRIVILEGES ON workflowsdb.* TO 'vip'@'<MOTEUR_HOST>';
+
+    Init the database (using the root password)
+
+       mysql --user=root --password=$MARIADB_ROOT_PASSWORD < /vip/db_init.sql
+       wget https://github.com/axlbonnet/Complementary-tools/raw/develop/workflowsdb_init.sql -P /vip
+       mysql --user=root --password=$MARIADB_ROOT_PASSWORD < /vip/workflowsdb_init.sql
+       rm /vip/db_init.sql /vip/workflowsdb_init.sql
 
 5. Tomcat
 
@@ -157,6 +189,8 @@ It is advised to use the `moteur-machine` as the NFS server and the `vip-machine
        wget https://github.com/axlbonnet/VIP-portal/releases/download/2.1-alpha/vip-portal-2.1-alpha.war -P /vip/apache-tomcat-9.0.44/webapps
 
 7. Configure vip.conf
+
+    TODO
 
 8. Other configuration
 
