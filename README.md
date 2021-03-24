@@ -156,9 +156,16 @@ It is advised to use the `moteur-machine` as the NFS server and the `vip-machine
        wget https://github.com/virtual-imaging-platform/Complementary-tools/raw/develop/conf/prod/.moteur2/moteur2plugins.conf -o /vip/.moteur2/moteur2plugins.conf
        wget https://github.com/axlbonnet/VIP-portal/releases/download/2.1-alpha/vip-portal-2.1-alpha.war -P /vip/apache-tomcat-9.0.44/webapps
 
-7. Configure VIP
+7. Configure vip.conf
+
+8. Other configuration
+
+    In `/vip/.vip/vip-api.conf`, edit `carmin.platform.name`, `carmin.platform.description` and `carmin.platform.email` to your platform information.
     
-    TODO
+    In `/vip/.moteur2/moteur2plugins.conf`, put `vip` in `moteur2.plugins.workflowsdb.connection.username`, 
+    put the vip mariadb password in `moteur2.plugins.workflowsdb.connection.password`, 
+    and add the `localhost:3306` in `moteur2.plugins.workflowsdb.connection.url`
+     
 
 7. GRIDA
 
