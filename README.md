@@ -352,7 +352,7 @@ It is advised to use the `moteur-machine` as the NFS server and the `vip-machine
 
 12. Add moteur2 configuration
 
-        wget https://github.com/virtual-imaging-platform/Complementary-tools/raw/develop/moteur/worflow-agent-0.2/workflow-agent-0.2.conf -O $MOTEUR_HOME/workflow-agent_0.2/workflow-agent.conf
+        wget https://github.com/virtual-imaging-platform/Complementary-tools/raw/develop/moteur/worflow-agent-0.2/workflow-agent.conf -O $MOTEUR_HOME/workflow-agent_0.2/workflow-agent.conf
         mkdir $MOTEUR_HOME/.moteur2 $MOTEUR_HOME/conf
         wget https://github.com/virtual-imaging-platform/Complementary-tools/raw/develop/conf/.moteur2/moteur2.conf -O $MOTEUR_HOME/.moteur2/moteur2.conf
         wget https://github.com/virtual-imaging-platform/Complementary-tools/raw/develop/moteur/conf/default.conf -O $MOTEUR_HOME/conf/default.conf
