@@ -190,7 +190,24 @@ It is advised to use the `moteur-machine` as the NFS server and the `vip-machine
 
 7. Configure vip.conf
 
-    TODO
+    There are things to change in `/vip/.vip/vip.conf`.
+    
+    At the beginning, you can change all the `admin.*` properties as you desires. 
+    This are the information automatically created for the admin user on the first start.
+    
+    Change `boutiques.application.rootFolder` to `/var/www/html/workflows/SharedData/groups/Applications`
+    
+    Change `datamanager.path` to `/vip/grida`
+    
+    Change `datamanager.users.home` to `/var/www/html/workflows/SharedData/users` and `datamanager.groups.home` to `/var/www/html/workflows/SharedData/groups`
+    
+    Change `myproxy.min.hours` to `0`
+    
+    Change `workflows.directory` to `/var/www/html/workflows`
+    
+    Change `workflows.db.host` to `moteur-machine`'s hostname
+    
+    Change `truststore.file` to `/vip/apache-tomcat-9.0.44/conf/truststore.jks`
 
 8. Other configuration
 
@@ -225,7 +242,7 @@ It is advised to use the `moteur-machine` as the NFS server and the `vip-machine
         mail.from = TOCHANGE
         mail.from.name = TOCHANGE
         mail.max.simultaneous.runs = 5
-        sma.max.history = 90TODO
+        sma.max.history = 90
     
     Edit `mail.host` to your SMTP host, `mail.from` to your service email adress, and `mail.from.name` to your service name.
     
