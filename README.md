@@ -158,7 +158,7 @@ It is advised to use the `moteur-machine` as the NFS server and the `vip-machine
 5. Tomcat
 
        wget https://downloads.apache.org/tomcat/tomcat-9/v9.0.44/bin/apache-tomcat-9.0.44.zip -P /vip
-       unzip apache-tomcat-9.0.44.zip -d /vip
+       unzip /vip/apache-tomcat-9.0.44.zip -d /vip
 
     Add the folowing lines after `<WatchedResources>` lines in `$TOMCAT_HOME/conf/context.xml` (database jndi configuration):
 
