@@ -194,6 +194,8 @@ It is advised to use the `moteur-machine` as the NFS server and the `vip-machine
     
     Change `boutiques.application.rootFolder` to `/var/www/html/workflows/SharedData/groups/Applications`
     
+    Change `grida.server.host` to `vip-machine`'s hostname
+    
     Change `datamanager.path` to `/vip/grida`
     
     Change `datamanager.users.home` to `/var/www/html/workflows/SharedData/users` and `datamanager.groups.home` to `/var/www/html/workflows/SharedData/groups`
