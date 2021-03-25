@@ -157,27 +157,23 @@ It is advised to use the `moteur-machine` as the NFS server and the `vip-machine
 
 5. Tomcat
 
-       wget https://downloads.apache.org/tomcat/tomcat-9/v9.0.44/bin/apache-tomcat-9.0.44.zip -P /vip
-       unzip /vip/apache-tomcat-9.0.44.zip -d /vip
-       chmod +x /vip/apache-tomcat-9.0.44/bin/*.sh
-       rm -rf /vip/apache-tomcat-9.0.44/webapps/ROOT
+       wget https://downloads.apache.org/tomcat/tomcat-9/v9.0.44/bin/apache-tomcat-9.0.44.tar.gz -P /vip
+       tar xzvf /vip/apache-tomcat-9.0.44.tar.gz -C /vip
+       rm -rf /vip/apache-tomcat-9.0.44/webapps/*
 
-    Add the folowing lines after `<WatchedResources>` lines in `$TOMCAT_HOME/conf/context.xml` (database jndi configuration):
+    Add the folowing lines before `</Context>` `$TOMCAT_HOME/conf/context.xml` (database jndi configuration):
 
-           <GlobalNamingResources>
              <Resource name="jdbc/vip"
                  auth="Container"
                  type="javax.sql.DataSource"
                  username="vip"
                  password="<DB_VIP_PASSWORD>"
-                 driverClassName="com.mysql.jdbc.Driver"
+                 driverClassName="org.mariadb.jdbc.Driver"
                  url="jdbc:mysql://localhost:3306/vip"
-                 factory="org.apache.commons.dbcp.BasicDataSourceFactory"
                  validationQuery="select 1"
                  testOnBorrow="true"
                  maxTotal="100"
                  maxIdle="50" />
-           </GlobalNamingResources>
     
     Adapt the password with the one chosen in the mariadb installation.
 
@@ -214,7 +210,9 @@ It is advised to use the `moteur-machine` as the NFS server and the `vip-machine
 
     In `/vip/.vip/vip-api.conf`, edit `carmin.platform.name`, `carmin.platform.description` and `carmin.platform.email` to your platform information.
     
-    In `/vip/.moteur2/moteur2plugins.conf`, put `vip` in `moteur2.plugins.workflowsdb.connection.username`, 
+    In `/vip/.moteur2/moteur2plugins.conf`, 
+    put `org.mariadb.jdbc.Driver` in `moteur2.plugins.workflowsdb.connection.driver_class`, 
+    put `vip` in `moteur2.plugins.workflowsdb.connection.username`, 
     put the vip mariadb password in `moteur2.plugins.workflowsdb.connection.password`, 
     and add the `localhost:3306` in `moteur2.plugins.workflowsdb.connection.url`
      
@@ -259,6 +257,8 @@ It is advised to use the `moteur-machine` as the NFS server and the `vip-machine
         sudo chown -R vip:vip /vip
         sudo chown -R apache:apache /vip/grida
         sudo chown -R vip:vip /vip/grida/uploads
+        sudo chmod g+rx /vip
+        sudo usermod -a -G vip apache
     
 11. Start Grida and SMA
 
