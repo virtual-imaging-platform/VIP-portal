@@ -222,8 +222,8 @@ It is advised to use the `moteur-machine` as the NFS server and the `vip-machine
 7. GRIDA
 
        mkdir /vip/grida
-       mkdir /vip/grida/download  
-       mkdir /vip/grida/upload  
+       mkdir /vip/grida/downloads  
+       mkdir /vip/grida/uploads  
        wget -q  https://github.com/axlbonnet/GRIDA/releases/download/2.1.0-alpha/grida-server-2.1.0-alpha.jar -O /vip/grida/grida-server-2.0.1.jar
 
     Copy https://github.com/virtual-imaging-platform/GRIDA#server-configuration in `/vip/grida/grida-server.conf` and change `commands.type` to `local`. 
@@ -258,7 +258,7 @@ It is advised to use the `moteur-machine` as the NFS server and the `vip-machine
 
         sudo chown -R vip:vip /vip
         sudo chown -R apache:apache /vip/grida
-        sudo chown -R vip:vip /vip/grida/upload 
+        sudo chown -R vip:vip /vip/grida/uploads
     
 11. Start Grida and SMA
 
