@@ -325,9 +325,8 @@ It is advised to use the `moteur-machine` as the NFS server and the `vip-machine
 
        mkdir /var/www/prod/grida
        wget -q  https://github.com/axlbonnet/GRIDA/releases/download/2.1.0-alpha/grida-server-2.1.0-alpha.jar -O /var/www/prod/grida/grida-server-2.0.1.jar
-       mkdir /usr/share/httpd/.dirac
-       mkdir /usr/share/httpd/.cache
-       chown apache:apache /var/www/prod/grida /usr/share/httpd/.dirac /usr/share/httpd/.cache 
+       mkdir /var/www/.cache
+       chown apache:apache /var/www/prod/grida /usr/share/httpd/.dirac /var/www/.cache
 
 10. Configure and start grida
 
