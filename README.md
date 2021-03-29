@@ -151,7 +151,7 @@ It is advised to use the `moteur-machine` as the NFS server and the `vip-machine
     Init the database (using the root password)
 
        mysql --user=root --password=$MARIADB_ROOT_PASSWORD < /vip/db_init.sql
-       wget https://github.com/axlbonnet/Complementary-tools/raw/develop/workflowsdb_init.sql -P /vip
+       wget https://github.com/virtual-imaging-platform/Complementary-tools/raw/develop/workflowsdb_init.sql -P /vip
        mysql --user=root --password=$MARIADB_ROOT_PASSWORD < /vip/workflowsdb_init.sql
        rm /vip/db_init.sql /vip/workflowsdb_init.sql
 
