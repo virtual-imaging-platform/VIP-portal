@@ -39,6 +39,7 @@ import fr.insalyon.creatis.vip.datamanager.server.dao.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -56,6 +57,9 @@ public class ExternalPlatformBusiness {
 
     private GirderStorageBusiness girderStorageBusiness;
     private ExternalPlatformsDAO externalPlatformsDAO;
+
+    @Value("${workflows.inputs.useLocalFiles:false}")
+    private Boolean useLocalFilesInInputs = false;
 
     @Autowired
     public ExternalPlatformBusiness(
@@ -91,6 +95,9 @@ public class ExternalPlatformBusiness {
         }
         int indexOfColon = parameterValue.indexOf(':');
         String platformIdentifier = parameterValue.substring(0, indexOfColon);
+        if (useLocalFilesInInputs && "file".equals(platformIdentifier)) {
+            return new ParseResult(false, parameterValue);
+        }
         String fileIdentifier = parameterValue.substring(indexOfColon + 1);
         ExternalPlatform externalPlatform = getById(platformIdentifier);
         if (externalPlatform == null) {
