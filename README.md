@@ -198,7 +198,9 @@ It is advised to use the `moteur-machine` as the NFS server and the `vip-machine
     
     Change `datamanager.path` to `/vip/grida`
     
-    Change `datamanager.users.home` to `/var/www/html/workflows/SharedData/users` and `datamanager.groups.home` to `/var/www/html/workflows/SharedData/groups`
+    Change `datamanager.users.home` to `/var/www/html/workflows/SharedData/users` 
+    and `datamanager.groups.home` to `/var/www/html/workflows/SharedData/groups`
+    and `vo.root` to `/var/www/html/workflows/SharedData`
     
     Change `myproxy.min.hours` to `0`
     
@@ -207,6 +209,8 @@ It is advised to use the `moteur-machine` as the NFS server and the `vip-machine
     Change `workflows.db.host` to `moteur-machine`'s hostname
     
     Change `truststore.file` to `/vip/apache-tomcat-9.0.44/conf/truststore.jks`
+    
+    Add the line `workflows.inputs.useLocalFiles = true` at the end
 
 8. Other configuration
 
