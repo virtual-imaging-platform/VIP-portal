@@ -384,23 +384,32 @@ It is advised to use the `moteur-machine` as the NFS server and the `vip-machine
        Put `false` in `minorstatus.service.enabled`
        Put `localhost` in `plugin.h2.server.host`, `9092` in `plugin.h2.server.port`, and `gasw` in `plugin.h2.user` and `plugin.h2.password`
     4. In `$MOTEUR_HOME/conf/override.conf`, do nothing
-    5. In `/var/www/prod/.moteur2/moteur2plugins.conf `, 
+    5. In `$MOTEUR_HOME/env.sh`, update `JAVA_HOME` to `/usr/lib/jvm/jre-1.8.0` or to the right JRE path on your system.
+    6. In `/var/www/prod/.moteur2/moteur2plugins.conf `, 
        put `vip` in `moteur2.plugins.workflowsdb.connection.username`, 
        put the vip mariadb password in `moteur2.plugins.workflowsdb.connection.password`, 
        and add the `vip-machine` hostname and the `3306` port in `moteur2.plugins.workflowsdb.connection.url`
-    6. In `/var/www/.moteur2/moteur2-grida.conf`, 
+    7. In `/var/www/.moteur2/moteur2-grida.conf`, 
        put `moteur-machine`'s hostname in `grida.server.host`,
        put `9006` in `grida.server.port`,
        and put `/var/www/.moteur2/moteur2-grida.conf` in `proxy.path`
-    7. In `/var/www/prod/.moteur2/moteur2server.conf`, update `configuration/plugins/plugin/location` to the real path of `moteur2-workflowsdb-plugin`
+    8. In `/var/www/prod/.moteur2/moteur2server.conf`, update `configuration/plugins/plugin/location` to the real path of `moteur2-workflowsdb-plugin`
 
 
-    
-14. Change rights
+14. Install boutiques
 
-       chown -R apache:apache $MOTEUR_HOME /var/www/prod /var/www/.moteur2
+    `pip` should run with python3, on python2 systems, `pip3` should be used.
 
-15. Start apache
+        yum -y install python-pip
+        pip install --upgrade pip
+        pip install boutiques
+
+15. Change rights
+
+        chown -R apache:apache $MOTEUR_HOME /var/www/prod /var/www/.moteur2
+        sudo setenforce Permissive
+
+16. Start apache
 
 ## Finalization and tests
 
