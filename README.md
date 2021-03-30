@@ -86,7 +86,7 @@ The second machine (called `moteur-machine` is composed of moteur-server, its pl
 The installed infrastucture is meant to run only local jobs (on the moteur machine) and to use only local files.
 To use dirac, additional changes not documented here (yet) are necessary.
 
-The procedure is described for centos machines but should be adapted to any major linux distribution without much effort.
+The procedure is described for centos machines but should be adaptable to any major linux distribution without much effort.
 
 ## Prerequisites
 
@@ -94,21 +94,27 @@ As the whole infrastucture is installed on 2 machines, some things must be done 
 
 1. Install `apache` (`httpd`) on both machines through the package manager
 
-5. Create the `/var/www/html/workflows` on both machines
+5. Create the `/var/www/html/workflows` folder on both machines
 
 3. A NFS share must be established on the `/var/www/html/workflows` path on the 2 machines.
 It is advised to use the `moteur-machine` as the NFS server and the `vip-machine` as a NFS client.
 
-4. The `9092` port must be opened on the `moteur-machine` and accessable from the `vip-machine`
+4. The `9092` port must be opened on the `moteur-machine` and accessible from the `vip-machine`.
+   The `3306` port must be opened on the `vip-machine` and accessible from the `moteur-machine`.
 
 5. A SMTP server must be accessible from the `vip-machine`
 
 ## `vip-machine` installation
 
+It is advised to do the installation as the `root` user.
+The `chown` commands necessary to have the correct rights are given in one of the final steps.
+
 1. Install needed Tools
 
        yum -y install wget unzip nmap vim java-1.8.0-openjdk-devel python-pip git
        pip install --upgrade pip
+       
+    Python version 3.x is necessary, if your system is using python2, you must install `python3` and `python-pip3`.
 
 2. Add VIP user
 
@@ -180,8 +186,8 @@ It is advised to use the `moteur-machine` as the NFS server and the `vip-machine
 6. VIP
 
        mkdir /vip/.vip /vip/.moteur2
-       wget https://github.com/axlbonnet/VIP-portal/raw/ciSupport/vip-portal/src/main/resources/default-vip.conf -O /vip/.vip/vip.conf
-       wget https://github.com/axlbonnet/VIP-portal/raw/ciSupport/vip-portal/src/main/resources/default-vip-api.conf -O /vip/.vip/vip-api.conf
+       wget https://github.com/axlbonnet/VIP-portal/raw/local-installation/vip-portal/src/main/resources/default-vip.conf -O /vip/.vip/vip.conf
+       wget https://github.com/axlbonnet/VIP-portal/raw/local-installation/vip-portal/src/main/resources/default-vip-api.conf -O /vip/.vip/vip-api.conf
        wget https://github.com/virtual-imaging-platform/Complementary-tools/raw/develop/conf/prod/.moteur2/moteur2plugins.conf -O /vip/.moteur2/moteur2plugins.conf
        wget https://github.com/axlbonnet/VIP-portal/releases/download/2.1-alpha/vip-portal-2.1-alpha.war -O /vip/apache-tomcat-9.0.44/webapps/ROOT.war
 
@@ -220,7 +226,7 @@ It is advised to use the `moteur-machine` as the NFS server and the `vip-machine
     put `org.mariadb.jdbc.Driver` in `moteur2.plugins.workflowsdb.connection.driver_class`, 
     put `vip` in `moteur2.plugins.workflowsdb.connection.username`, 
     put the vip mariadb password in `moteur2.plugins.workflowsdb.connection.password`, 
-    and add the `localhost:3306` in `moteur2.plugins.workflowsdb.connection.url`
+    and add `localhost:3306` in `moteur2.plugins.workflowsdb.connection.url`
      
 
 7. GRIDA
@@ -254,7 +260,7 @@ It is advised to use the `moteur-machine` as the NFS server and the `vip-machine
     
 9. Install Boutiques
 
-    `pip` should run with python3, on python2 systems, `pip3` should be used.
+    `pip` should run with python3, on python2 systems, `pip3` must be used.
 
         pip install boutiques
 
@@ -272,17 +278,17 @@ It is advised to use the `moteur-machine` as the NFS server and the `vip-machine
     SMA must be started with the vip user with the command `java -jar /vip/sma/sma-server-0.1.jar` in the `/vip/sma` folder.
     It is advised to configure grida and sma as a system services and make them start automatically on machine boot.
 
-10. Start tomcat with `/vip/apache-tomcat-9.0.44/bin/startup.sh`
+10. Start tomcat as vip with `/vip/apache-tomcat-9.0.44/bin/startup.sh`
     It is advised to configure tomcat as a system service to make it start automatically on system startup.
     It is also advised to make tomcat restart once a day through a cron entry.
-    Also, tomcat should be configured to respond to HTTPS requests and no HTTP requests.
-    This could be done in tomcat or by setting up a reverse proxy.
+    Also, tomcat should be configured to respond to HTTPS requests and no HTTP requests,
+    this could be done in tomcat or by setting up a reverse proxy.
 
 ## `moteur-machine` installation
 
 1. Every folder/file created on the `moteur-machine` must belong to the apache user.
        It is advised to do the whole machine installation as root and do `chown` commands at the end.
-       The `chown` commands that are necessary are documented at the end
+       The `chown` commands that are necessary are documented in one of the final steps.
 
 3. If it isn't already done, `apache` (`httpd`) must be installed through the system package manager
 
@@ -330,7 +336,7 @@ It is advised to use the `moteur-machine` as the NFS server and the `vip-machine
        mkdir /var/www/prod/grida
        wget -q  https://github.com/axlbonnet/GRIDA/releases/download/2.1.0-alpha/grida-server-2.1.0-alpha.jar -O /var/www/prod/grida/grida-server-2.0.1.jar
        mkdir /var/www/.cache
-       chown apache:apache /var/www/prod/grida /usr/share/httpd/.dirac /var/www/.cache
+       chown apache:apache /var/www/prod/grida /var/www/.cache
 
 10. Configure and start grida
 
@@ -413,7 +419,12 @@ It is advised to use the `moteur-machine` as the NFS server and the `vip-machine
 
 ## Finalization and tests
 
-TODO
+VIP should be working on the vip machine on the `8080` port (or another port if you changed the tomcat port).
+You can access it with the admin/password configured in the vip.conf file.
+You should then :
+* Create the engine corresponding to `moteur-machine`
+* Create a class
+* Import an application (**Warning** The application automatically imported will not work at the moment and needs manual editing from a VIP expert)
 
 
 
