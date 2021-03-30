@@ -192,7 +192,7 @@ It is advised to use the `moteur-machine` as the NFS server and the `vip-machine
     At the beginning, you can change all the `admin.*` properties as you desires. 
     This are the information automatically created for the admin user on the first start.
     
-    Change `boutiques.application.rootFolder` to `/var/www/html/workflows/SharedData/groups/Applications`
+    Change `boutiques.application.rootFolder` to `/vip/Support (group)/Applications`
     
     Change `grida.server.host` to `vip-machine`'s hostname
     
