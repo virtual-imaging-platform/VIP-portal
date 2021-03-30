@@ -274,7 +274,8 @@ public class WorkflowBusiness {
             String workflowPath = dataManagerBusiness.getRemoteFile(
                 user,
                 version.getLfn(),
-                server.getConfigurationFolder() + "workflows/"
+                    server.getDataManagerPath()
+                            + "/downloads/"
                         + FilenameUtils.getName(version.getLfn()));
 
             //selectRandomEngine could also be used; TODO: make this choice configurable
@@ -429,8 +430,8 @@ public class WorkflowBusiness {
 
         try {
             AppVersion version = applicationDAO.getVersion(applicationName, applicationVersion);
-            String localDirectory = server.getConfigurationFolder()
-                    + "workflows/"
+            String localDirectory = server.getDataManagerPath()
+                    + "/downloads"
                     + FilenameUtils.getPath(version.getLfn()) + "/"
                     + FilenameUtils.getName(version.getLfn());
             String workflowPath = dataManagerBusiness.getRemoteFile(
