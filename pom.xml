@@ -44,7 +44,7 @@ knowledge of the CeCILL-B license and that you accept its terms.
         <!-- project version. Only to change it here (and in CoreConstants.java
            Follow this practice : https://maven.apache.org/maven-ci-friendly.html-->
         <revision>2.1</revision>
-        <changelist>-alpha</changelist>
+        <changelist>-SNAPSHOT</changelist>
         <sha1/>
 
         <!-- other maven config -->
@@ -193,21 +193,9 @@ knowledge of the CeCILL-B license and that you accept its terms.
     <repositories>
 
         <repository>
-            <id>creatis-releases</id>
+            <id>creatis</id>
             <name>Creatis Insa Lyon repository [creatis]</name>
-            <url>http://vip.creatis.insa-lyon.fr:9007/nexus/content/repositories/releases</url>
-        </repository>
-
-        <repository>
-            <id>creatis-thirdparty</id>
-            <name>Creatis Insa Lyon repository [creatis]</name>
-            <url>http://vip.creatis.insa-lyon.fr:9007/nexus/content/repositories/thirdparty</url>
-        </repository>
-
-        <repository>
-            <id>creatis-snapshots</id>
-            <name>Creatis Insa Lyon repository [creatis]</name>
-            <url>http://vip.creatis.insa-lyon.fr:9007/nexus/content/repositories/snapshots</url>
+            <url>https://vip.creatis.insa-lyon.fr:9007/nexus/repository/public</url>
         </repository>
         
         <!-- repo used to get empty jar for commons logging and log4j -->
@@ -222,13 +210,13 @@ knowledge of the CeCILL-B license and that you accept its terms.
         <repository>
             <id>creatis-releases</id>
             <name>Internal Releases</name>
-            <url>http://vip.creatis.insa-lyon.fr:9007/nexus/content/repositories/releases</url>
+            <url>https://vip.creatis.insa-lyon.fr:9007/nexus/repository/releases</url>
         </repository>
 
         <snapshotRepository>
             <id>creatis-snapshots</id>
             <name>Internal Snapshots</name>
-            <url>http://vip.creatis.insa-lyon.fr:9007/nexus/content/repositories/snapshots</url>
+            <url>https://vip.creatis.insa-lyon.fr:9007/nexus/repository/snapshots</url>
         </snapshotRepository>
 
     </distributionManagement>
