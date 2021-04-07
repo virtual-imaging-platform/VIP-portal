@@ -86,7 +86,7 @@ The second machine (called `moteur-machine` is composed of moteur-server, its pl
 The installed infrastucture is meant to run only local jobs (on the moteur machine) and to use only local files.
 To use dirac, additional changes not documented here (yet) are necessary.
 
-The procedure is described for centos machines but should be adapted to any major linux distribution without much effort.
+The procedure is described for centos machines but should be adaptable to any major linux distribution without much effort.
 
 ## Prerequisites
 
@@ -94,21 +94,27 @@ As the whole infrastucture is installed on 2 machines, some things must be done 
 
 1. Install `apache` (`httpd`) on both machines through the package manager
 
-5. Create the `/var/www/html/workflows` on both machines
+5. Create the `/var/www/html/workflows` folder on both machines
 
 3. A NFS share must be established on the `/var/www/html/workflows` path on the 2 machines.
 It is advised to use the `moteur-machine` as the NFS server and the `vip-machine` as a NFS client.
 
-4. The `9092` port must be opened on the `moteur-machine` and accessable from the `vip-machine`
+4. The `9092` port must be opened on the `moteur-machine` and accessible from the `vip-machine`.
+   The `3306` port must be opened on the `vip-machine` and accessible from the `moteur-machine`.
 
 5. A SMTP server must be accessible from the `vip-machine`
 
 ## `vip-machine` installation
 
+It is advised to do the installation as the `root` user.
+The `chown` commands necessary to have the correct rights are given in one of the final steps.
+
 1. Install needed Tools
 
        yum -y install wget unzip nmap vim java-1.8.0-openjdk-devel python-pip git
        pip install --upgrade pip
+       
+    Python version 3.x is necessary, if your system is using python2, you must install `python3` and `python-pip3`.
 
 2. Add VIP user
 
@@ -151,7 +157,7 @@ It is advised to use the `moteur-machine` as the NFS server and the `vip-machine
     Init the database (using the root password)
 
        mysql --user=root --password=$MARIADB_ROOT_PASSWORD < /vip/db_init.sql
-       wget https://github.com/axlbonnet/Complementary-tools/raw/develop/workflowsdb_init.sql -P /vip
+       wget https://github.com/virtual-imaging-platform/Complementary-tools/raw/develop/workflowsdb_init.sql -P /vip
        mysql --user=root --password=$MARIADB_ROOT_PASSWORD < /vip/workflowsdb_init.sql
        rm /vip/db_init.sql /vip/workflowsdb_init.sql
 
@@ -180,8 +186,8 @@ It is advised to use the `moteur-machine` as the NFS server and the `vip-machine
 6. VIP
 
        mkdir /vip/.vip /vip/.moteur2
-       wget https://github.com/axlbonnet/VIP-portal/raw/ciSupport/vip-portal/src/main/resources/default-vip.conf -O /vip/.vip/vip.conf
-       wget https://github.com/axlbonnet/VIP-portal/raw/ciSupport/vip-portal/src/main/resources/default-vip-api.conf -O /vip/.vip/vip-api.conf
+       wget https://github.com/axlbonnet/VIP-portal/raw/local-installation/vip-portal/src/main/resources/default-vip.conf -O /vip/.vip/vip.conf
+       wget https://github.com/axlbonnet/VIP-portal/raw/local-installation/vip-portal/src/main/resources/default-vip-api.conf -O /vip/.vip/vip-api.conf
        wget https://github.com/virtual-imaging-platform/Complementary-tools/raw/develop/conf/prod/.moteur2/moteur2plugins.conf -O /vip/.moteur2/moteur2plugins.conf
        wget https://github.com/axlbonnet/VIP-portal/releases/download/2.1-alpha/vip-portal-2.1-alpha.war -O /vip/apache-tomcat-9.0.44/webapps/ROOT.war
 
@@ -192,13 +198,15 @@ It is advised to use the `moteur-machine` as the NFS server and the `vip-machine
     At the beginning, you can change all the `admin.*` properties as you desires. 
     This are the information automatically created for the admin user on the first start.
     
-    Change `boutiques.application.rootFolder` to `/var/www/html/workflows/SharedData/groups/Applications`
+    Change `boutiques.application.rootFolder` to `/vip/Support (group)/Applications`
     
     Change `grida.server.host` to `vip-machine`'s hostname
     
     Change `datamanager.path` to `/vip/grida`
     
-    Change `datamanager.users.home` to `/var/www/html/workflows/SharedData/users` and `datamanager.groups.home` to `/var/www/html/workflows/SharedData/groups`
+    Change `datamanager.users.home` to `/var/www/html/workflows/SharedData/users` 
+    and `datamanager.groups.home` to `/var/www/html/workflows/SharedData/groups`
+    and `vo.root` to `/var/www/html/workflows/SharedData`
     
     Change `myproxy.min.hours` to `0`
     
@@ -207,6 +215,8 @@ It is advised to use the `moteur-machine` as the NFS server and the `vip-machine
     Change `workflows.db.host` to `moteur-machine`'s hostname
     
     Change `truststore.file` to `/vip/apache-tomcat-9.0.44/conf/truststore.jks`
+    
+    Add the line `workflows.inputs.useLocalFiles = true` at the end
 
 8. Other configuration
 
@@ -216,7 +226,7 @@ It is advised to use the `moteur-machine` as the NFS server and the `vip-machine
     put `org.mariadb.jdbc.Driver` in `moteur2.plugins.workflowsdb.connection.driver_class`, 
     put `vip` in `moteur2.plugins.workflowsdb.connection.username`, 
     put the vip mariadb password in `moteur2.plugins.workflowsdb.connection.password`, 
-    and add the `localhost:3306` in `moteur2.plugins.workflowsdb.connection.url`
+    and add `localhost:3306` in `moteur2.plugins.workflowsdb.connection.url`
      
 
 7. GRIDA
@@ -250,7 +260,7 @@ It is advised to use the `moteur-machine` as the NFS server and the `vip-machine
     
 9. Install Boutiques
 
-    `pip` should run with python3, on python2 systems, `pip3` should be used.
+    `pip` should run with python3, on python2 systems, `pip3` must be used.
 
         pip install boutiques
 
@@ -268,17 +278,17 @@ It is advised to use the `moteur-machine` as the NFS server and the `vip-machine
     SMA must be started with the vip user with the command `java -jar /vip/sma/sma-server-0.1.jar` in the `/vip/sma` folder.
     It is advised to configure grida and sma as a system services and make them start automatically on machine boot.
 
-10. Start tomcat with `/vip/apache-tomcat-9.0.44/bin/startup.sh`
+10. Start tomcat as vip with `/vip/apache-tomcat-9.0.44/bin/startup.sh`
     It is advised to configure tomcat as a system service to make it start automatically on system startup.
     It is also advised to make tomcat restart once a day through a cron entry.
-    Also, tomcat should be configured to respond to HTTPS requests and no HTTP requests.
-    This could be done in tomcat or by setting up a reverse proxy.
+    Also, tomcat should be configured to respond to HTTPS requests and no HTTP requests,
+    this could be done in tomcat or by setting up a reverse proxy.
 
 ## `moteur-machine` installation
 
 1. Every folder/file created on the `moteur-machine` must belong to the apache user.
        It is advised to do the whole machine installation as root and do `chown` commands at the end.
-       The `chown` commands that are necessary are documented at the end
+       The `chown` commands that are necessary are documented in one of the final steps.
 
 3. If it isn't already done, `apache` (`httpd`) must be installed through the system package manager
 
@@ -325,9 +335,8 @@ It is advised to use the `moteur-machine` as the NFS server and the `vip-machine
 
        mkdir /var/www/prod/grida
        wget -q  https://github.com/axlbonnet/GRIDA/releases/download/2.1.0-alpha/grida-server-2.1.0-alpha.jar -O /var/www/prod/grida/grida-server-2.0.1.jar
-       mkdir /usr/share/httpd/.dirac
-       mkdir /usr/share/httpd/.cache
-       chown apache:apache /var/www/prod/grida /usr/share/httpd/.dirac /usr/share/httpd/.cache 
+       mkdir /var/www/.cache
+       chown apache:apache /var/www/prod/grida /var/www/.cache
 
 10. Configure and start grida
 
@@ -340,9 +349,9 @@ It is advised to use the `moteur-machine` as the NFS server and the `vip-machine
 
         cd $MOTEUR_HOME
         wget https://github.com/virtual-imaging-platform/Complementary-tools/raw/develop/moteur/moteur2.jar 
-        mkdir worflow-agent-0.2
-        cd worflow-agent-0.2
-        wget https://github.com/virtual-imaging-platform/Complementary-tools/raw/develop/moteur/worflow-agent-0.2/workflow-agent-0.2.jar
+        mkdir workflow-agent-0.2
+        cd workflow-agent-0.2
+        wget https://github.com/virtual-imaging-platform/Complementary-tools/raw/develop/moteur/workflow-agent-0.2/workflow-agent-0.2.jar
         cd ..
         mkdir libs plugins
         cd libs
@@ -362,7 +371,7 @@ It is advised to use the `moteur-machine` as the NFS server and the `vip-machine
 
 12. Add moteur2 configuration
 
-        wget https://github.com/virtual-imaging-platform/Complementary-tools/raw/develop/moteur/worflow-agent-0.2/workflow-agent.conf -O $MOTEUR_HOME/workflow-agent-0.2/workflow-agent.conf
+        wget https://github.com/virtual-imaging-platform/Complementary-tools/raw/develop/moteur/workflow-agent-0.2/workflow-agent.conf -O $MOTEUR_HOME/workflow-agent-0.2/workflow-agent.conf
         mkdir $MOTEUR_HOME/.moteur2 $MOTEUR_HOME/conf
         wget https://github.com/virtual-imaging-platform/Complementary-tools/raw/develop/conf/.moteur2/moteur2.conf -O $MOTEUR_HOME/.moteur2/moteur2.conf
         wget https://github.com/virtual-imaging-platform/Complementary-tools/raw/develop/moteur/conf/default.conf -O $MOTEUR_HOME/conf/default.conf
@@ -381,27 +390,41 @@ It is advised to use the `moteur-machine` as the NFS server and the `vip-machine
        Put `false` in `minorstatus.service.enabled`
        Put `localhost` in `plugin.h2.server.host`, `9092` in `plugin.h2.server.port`, and `gasw` in `plugin.h2.user` and `plugin.h2.password`
     4. In `$MOTEUR_HOME/conf/override.conf`, do nothing
-    5. In `/var/www/prod/.moteur2/moteur2plugins.conf `, 
+    5. In `$MOTEUR_HOME/env.sh`, update `JAVA_HOME` to `/usr/lib/jvm/jre-1.8.0` or to the right JRE path on your system.
+    6. In `/var/www/prod/.moteur2/moteur2plugins.conf `, 
        put `vip` in `moteur2.plugins.workflowsdb.connection.username`, 
        put the vip mariadb password in `moteur2.plugins.workflowsdb.connection.password`, 
        and add the `vip-machine` hostname and the `3306` port in `moteur2.plugins.workflowsdb.connection.url`
-    6. In `/var/www/.moteur2/moteur2-grida.conf`, 
+    7. In `/var/www/.moteur2/moteur2-grida.conf`, 
        put `moteur-machine`'s hostname in `grida.server.host`,
        put `9006` in `grida.server.port`,
        and put `/var/www/.moteur2/moteur2-grida.conf` in `proxy.path`
-    7. In `/var/www/prod/.moteur2/moteur2server.conf`, update `configuration/plugins/plugin/location` to the real path of `moteur2-workflowsdb-plugin`
+    8. In `/var/www/prod/.moteur2/moteur2server.conf`, update `configuration/plugins/plugin/location` to the real path of `moteur2-workflowsdb-plugin`
 
 
-    
-14. Change rights
+14. Install boutiques
 
-       chown -R apache:apache $MOTEUR_HOME /var/www/prod /var/www/.moteur2
+    `pip` should run with python3, on python2 systems, `pip3` should be used.
 
-15. Start apache
+        yum -y install python-pip
+        pip install --upgrade pip
+        pip install boutiques
+
+15. Change rights
+
+        chown -R apache:apache $MOTEUR_HOME /var/www/prod /var/www/.moteur2
+        sudo setenforce Permissive
+
+16. Start apache
 
 ## Finalization and tests
 
-TODO
+VIP should be working on the vip machine on the `8080` port (or another port if you changed the tomcat port).
+You can access it with the admin/password configured in the vip.conf file.
+You should then :
+* Create the engine corresponding to `moteur-machine`
+* Create a class
+* Import an application (**Warning** The application automatically imported will not work at the moment and needs manual editing from a VIP expert)
 
 
 
