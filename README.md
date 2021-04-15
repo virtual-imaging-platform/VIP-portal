@@ -114,7 +114,7 @@ The `chown` commands necessary to have the correct rights are given in one of th
        yum -y install wget unzip nmap vim java-1.8.0-openjdk-devel python-pip git
        pip install --upgrade pip
        
-    Python version 3.x is necessary, if your system is using python2, you must install `python3` and `python-pip3`.
+    Python version 3.x is necessary, if your system is using python2, you must install `python3` and use `pip3`.
 
 2. Add VIP user
 
@@ -349,9 +349,9 @@ The `chown` commands necessary to have the correct rights are given in one of th
 
         cd $MOTEUR_HOME
         wget https://github.com/virtual-imaging-platform/Complementary-tools/raw/develop/moteur/moteur2.jar 
-        mkdir workflow-agent-0.2
-        cd workflow-agent-0.2
-        wget https://github.com/virtual-imaging-platform/Complementary-tools/raw/develop/moteur/workflow-agent-0.2/workflow-agent-0.2.jar
+        mkdir worflow-agent-0.2
+        cd worflow-agent-0.2
+        wget https://github.com/virtual-imaging-platform/Complementary-tools/raw/develop/moteur/worflow-agent-0.2/workflow-agent-0.2.jar
         cd ..
         mkdir libs plugins
         cd libs
@@ -366,12 +366,10 @@ The `chown` commands necessary to have the correct rights are given in one of th
         wget https://github.com/virtual-imaging-platform/GASW-Stats-Plugin/releases/download/v3.2.0/gasw-stats-plugin-3.2.0-jar-with-dependencies.jar
         wget https://github.com/virtual-imaging-platform/GASW-H2-Plugin/releases/download/3.0/gasw-h2-plugin-3.0-jar-with-dependencies.jar
         wget https://github.com/virtual-imaging-platform/GASW-Local-Plugin/releases/download/3.0/gasw-local-plugin-3.0-jar-with-dependencies.jar
-        cd ..
-        mkdir conf
 
 12. Add moteur2 configuration
 
-        wget https://github.com/virtual-imaging-platform/Complementary-tools/raw/develop/moteur/workflow-agent-0.2/workflow-agent.conf -O $MOTEUR_HOME/workflow-agent-0.2/workflow-agent.conf
+        wget https://github.com/virtual-imaging-platform/Complementary-tools/raw/develop/moteur/worflow-agent-0.2/workflow-agent.conf -O $MOTEUR_HOME/worflow-agent-0.2/workflow-agent.conf
         mkdir $MOTEUR_HOME/.moteur2 $MOTEUR_HOME/conf
         wget https://github.com/virtual-imaging-platform/Complementary-tools/raw/develop/conf/.moteur2/moteur2.conf -O $MOTEUR_HOME/.moteur2/moteur2.conf
         wget https://github.com/virtual-imaging-platform/Complementary-tools/raw/develop/moteur/conf/default.conf -O $MOTEUR_HOME/conf/default.conf
@@ -404,7 +402,7 @@ The `chown` commands necessary to have the correct rights are given in one of th
 
 14. Install boutiques
 
-    `pip` should run with python3, on python2 systems, `pip3` should be used.
+    `pip` should run with python3, on python2 systems, `python3` should be installed and `pip3` should be used.
 
         yum -y install python-pip
         pip install --upgrade pip
