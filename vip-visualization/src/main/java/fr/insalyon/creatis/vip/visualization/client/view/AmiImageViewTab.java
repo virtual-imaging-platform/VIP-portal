@@ -34,7 +34,7 @@ package fr.insalyon.creatis.vip.visualization.client.view;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.smartgwt.client.widgets.HTMLPane;
 import fr.insalyon.creatis.vip.visualization.client.bean.VisualizationItem;
-import java.util.logging.Level;
+
 import java.util.logging.Logger;
 
 public class AmiImageViewTab extends AbstractViewTab {
@@ -88,13 +88,13 @@ public class AmiImageViewTab extends AbstractViewTab {
 
     @Override
     public void displayFile(VisualizationItem item) {
-        String name = item.getURL();
-        amiJsViewer = showAmiImage(name, item.getExtension(), divId);
+        String url = getFileUrl(item.getLfn());
+        amiJsViewer = showAmiImage(url, item.getExtension(), divId);
     }
 
     public native JavaScriptObject
-        showAmiImage(String filename, String extension, String divId) /*-{
-        return $wnd.amiViewer(filename, extension, divId);
+        showAmiImage(String url, String extension, String divId) /*-{
+        return $wnd.amiViewer(url, extension, divId);
     }-*/;
 
     public native void resizeCanvas(JavaScriptObject amiViewer) /*-{

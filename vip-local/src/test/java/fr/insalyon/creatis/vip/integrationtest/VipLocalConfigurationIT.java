@@ -323,7 +323,7 @@ public class VipLocalConfigurationIT {
         // verify output
         Assertions.assertTrue(lfcBusiness.exists(user, resultLFN));
         Path localTempFolder = Files.createTempDirectory("vip-local-test");
-        dataManagerBusiness.getRemoteFile(user, resultLFN, localTempFolder.toString());
+        dataManagerBusiness.getRemoteFile(user, resultLFN);
 
         File result = localTempFolder.resolve(Paths.get(resultLFN).getFileName()).toFile();
         File expected = new ClassPathResource(classpathExpectedResutFile).getFile();

@@ -35,9 +35,8 @@ import fr.insalyon.creatis.grida.client.GRIDAClient;
 import fr.insalyon.creatis.grida.client.GRIDAClientException;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
-import fr.insalyon.creatis.vip.core.server.business.CoreUtil;
 import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerException;
-import fr.insalyon.creatis.vip.datamanager.server.DataManagerUtil;
+import fr.insalyon.creatis.vip.datamanager.server.business.DataManagerBusiness;
 import fr.insalyon.creatis.vip.datamanager.server.business.LfcPathsBusiness;
 import fr.insalyon.creatis.vip.visualization.client.bean.Image;
 import fr.insalyon.creatis.vip.visualization.client.bean.VisualizationItem;
@@ -46,7 +45,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.sql.Connection;
 import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,11 +59,15 @@ public class VisualizationBusiness {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private GRIDAClient gridaClient;
+    private DataManagerBusiness dataManagerBusiness;
     private LfcPathsBusiness lfcPathsBusiness;
 
     @Autowired
-    public VisualizationBusiness(GRIDAClient gridaClient, LfcPathsBusiness lfcPathsBusiness) {
+    public VisualizationBusiness(
+            GRIDAClient gridaClient, LfcPathsBusiness lfcPathsBusiness,
+            DataManagerBusiness dataManagerBusiness) {
         this.gridaClient = gridaClient;
+        this.dataManagerBusiness = dataManagerBusiness;
         this.lfcPathsBusiness = lfcPathsBusiness;
     }
 
@@ -146,71 +148,23 @@ public class VisualizationBusiness {
     }
 
     public VisualizationItem getVisualizationItemFromLFN(
-            String lfn, String localDir, User user) throws BusinessException {
+            String lfn, User user) throws BusinessException {
 
-        String separator = System.getProperty("file.separator");
-
-        String relativeDirString;
-        try {
-            relativeDirString = "files/viewer"
-                + (new File(lfcPathsBusiness.parseBaseDir(user, lfn))
-                   .getParent()
-                   .replaceAll(" ", "_")
-                   .replaceAll("\\([^\\(]*\\)", ""));
-        } catch (DataManagerException ex) {
-            throw new BusinessException(ex);
-        }
-
-        String fileDirString = localDir
-            + separator
-            + relativeDirString;
-        File fileDir = new File(fileDirString);
-        String fileName = localFilename(lfn, fileDir);
-
-        if (!fileDir.exists()) {
-            fileDir.mkdirs();
-            if (!fileDir.exists()) {
-                logger.error("Cannot create viewer dir: {}", fileDir.getAbsolutePath());
-                throw new BusinessException(
-                    "Cannot create viewer dir: " + fileDir.getAbsolutePath());
-            }
-        }
-        fileDir.setWritable(true, false);
-
-        if (!(new File(fileName)).exists()) {
-            logger.info("Downloading file: " + lfn);
-            try {
-                gridaClient.getRemoteFile(
-                    lfcPathsBusiness.parseBaseDir(user, lfn),
-                    fileDir.getAbsolutePath());
-            } catch (GRIDAClientException ex) {
-                logger.error("Error getting file {}", lfn, ex);
-                fileDir.delete();
-                throw new BusinessException(ex);
-            } catch (DataManagerException ex) {
-                throw new BusinessException(ex);
-            }
-        } else {
-            logger.info("File already in cache: " + lfn);
-        }
+        dataManagerBusiness.getRemoteFile(user, lfn);
 
         // Hack: if it is a .mhd file, download also the raw file with the same
         // name, testing multiple possible extensions.
         String rawFileExtension = "";
         if (lfn.endsWith(".mhd")) {
             rawFileExtension =
-                    rawFileForMhdFile(lfn, user, fileDir).orElse("");
+                    rawFileForMhdFile(lfn, user).orElse("");
         }
 
-        String url = relativeDirString
-            + separator
-            + lfn.substring(lfn.lastIndexOf('/') + 1);
-
-        return new VisualizationItem(url, fileName, rawFileExtension);
+        return new VisualizationItem(lfn, rawFileExtension);
     }
 
     private Optional<String> rawFileForMhdFile(
-            String lfn, User user, File localDir) {
+            String lfn, User user) {
 
         String[] extensions = {".raw", ".zraw", ".raw.gz"};
 
@@ -218,9 +172,9 @@ public class VisualizationBusiness {
             .map(extension -> buildLfnName(user, lfn, extension))
             .filter(Optional::isPresent)
             .map(Optional::get)
-            .filter(fe -> checkIfExists(fe.filename))
+            .filter(fe -> checkIfExists(fe.remotePath))
             .findFirst()
-            .filter(fe -> downloadFileSucceeds(fe.filename, localDir))
+            .filter(fe -> downloadFile(user, fe.remotePath))
             .map(fe -> fe.extension);
     }
 
@@ -246,32 +200,21 @@ public class VisualizationBusiness {
         }
     }
 
-    private boolean downloadFileSucceeds(String filename, File localDir) {
+    private boolean downloadFile(User user, String remotePath) {
         try {
-            if (!new File(localFilename(filename, localDir)).exists()) {
-                logger.info("Downloading file: " + filename);
-                gridaClient.getRemoteFile(filename, localDir.getAbsolutePath());
-            } else {
-                logger.info("File already in cache: " + filename);
-            }
+            dataManagerBusiness.getRemoteFile(user, remotePath);
             return true;
-        } catch (GRIDAClientException gce) {
-            logger.warn("Error while grida downloading file: {}", filename, gce);
+        } catch (BusinessException e) {
+            logger.warn("Error while downloading file: {}", remotePath, e);
             return false;
         }
     }
 
-    private String localFilename(String filename, File localDir) {
-        return localDir.getAbsolutePath()
-            + '/'
-            + filename.substring(filename.lastIndexOf('/') + 1);
-    }
-
     private static class FilenameAndExtension {
-        public final String filename;
+        public final String remotePath;
         public final String extension;
-        public FilenameAndExtension(String filename, String extension) {
-            this.filename = filename;
+        public FilenameAndExtension(String remotePath, String extension) {
+            this.remotePath = remotePath;
             this.extension = extension;
         }
     }

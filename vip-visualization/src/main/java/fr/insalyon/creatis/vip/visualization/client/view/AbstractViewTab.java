@@ -31,6 +31,7 @@
  */
 package fr.insalyon.creatis.vip.visualization.client.view;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.tab.Tab;
@@ -78,6 +79,10 @@ public abstract class AbstractViewTab extends Tab {
                     displayFile(result);
                 }
             });
+    }
+
+    protected String getFileUrl(String lfn) {
+        return GWT.getModuleBaseURL() + "/filedownloadservice?path=" + lfn;
     }
 
     public abstract void displayFile(VisualizationItem url);
