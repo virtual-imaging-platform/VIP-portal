@@ -331,9 +331,13 @@ public class WorkflowBusiness {
         }
         // not an external platform parameter, use legacy format
         String parsedPath = lfcPathsBusiness.parseBaseDir(
-                user, parseResult.result);
+                user, parameterValue);
         if (!user.isSystemAdministrator()) {
             checkFolderACL(user, groups, parsedPath);
+        }
+        if ( ! parsedPath.equals(parameterValue) // the parameter is a file path
+                && server.useLocalFilesInInputs()) {
+            parsedPath = "file:" + parsedPath;
         }
         return parsedPath;
     }
