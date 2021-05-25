@@ -50,8 +50,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.*;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.*;
 
 /**
@@ -91,14 +89,19 @@ public class ApplicationImporterBusiness {
             throws BusinessException {
         try {
 
-            String remotePath = lfcPathsBusiness.parseBaseDir(user, fileLFN);
+            File localDir = new File(
+                server.getApplicationImporterFileRepository() +
+                "/" +
+                (new File(lfcPathsBusiness.parseBaseDir(user, fileLFN))).getParent());
 
-            String downloadDir = server.getDataManagerPath()
-                    + "/downloads" + Paths.get(remotePath).getParent().toString();
-
+            if (!localDir.exists() && !localDir.mkdirs()) {
+                logger.error("Error validating boutiques file {}, Cannot create directory {}",
+                        fileLFN, localDir);
+                throw new BusinessException("Cannot create directory " + localDir.getCanonicalPath());
+            }
             String localFilePath = gridaClient.getRemoteFile(
-                    remotePath,
-                    downloadDir);
+                lfcPathsBusiness.parseBaseDir(user, fileLFN),
+                localDir.getCanonicalPath());
             boutiquesBusiness.validateBoutiqueFile(localFilePath);
             String fileContent = new Scanner(new File(localFilePath)).useDelimiter("\\Z").next();
             return fileContent;
