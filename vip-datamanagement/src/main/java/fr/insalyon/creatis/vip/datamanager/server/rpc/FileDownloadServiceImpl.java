@@ -76,6 +76,7 @@ public class FileDownloadServiceImpl extends HttpServlet {
         super.init();
         ApplicationContext applicationContext =
                 WebApplicationContextUtils.findWebApplicationContext(getServletContext());
+        lfcPathsBusiness = applicationContext.getBean(LfcPathsBusiness.class);
         gridaPoolClient = applicationContext.getBean(GRIDAPoolClient.class);
         lfcPermissionBusiness = applicationContext.getBean(LFCPermissionBusiness.class);
     }
