@@ -139,7 +139,7 @@ public class FileDownloadServiceImpl extends HttpServlet {
         }
 
         Path path = Paths.get(vipPath);
-        if (path.isAbsolute()) {
+        if ( ! path.isAbsolute()) {
             logger.error("download path [{}] should be absolute for user {}", path, user.getEmail());
             resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Path should be absolute");
             return;
