@@ -62,10 +62,19 @@ public class BrainBrowserViewTab extends AbstractViewTab {
 
     @Override
     public void displayFile(VisualizationItem item) {
-        showBrainBrowser(getFileUrl(item.getLfn()));
+        String url = getFileUrl(item.getLfn());
+        if (item.getLfn().endsWith(".asc")) {
+            showBrainBrowserForAsc(url);
+        } else {
+            showBrainBrowserForObj(url);
+        }
     }
 
-    public native void showBrainBrowser(String fileUrl) /*-{
-           $wnd.$("#brain-browser").load("https://brainbrowser.cbrain.mcgill.ca/surface-viewer-widget?version=2.1.1&nothreejs=true&model="+fileUrl);
+    public native void showBrainBrowserForObj(String fileUrl) /*-{
+           $wnd.$("#brain-browser").load("https://brainbrowser.cbrain.mcgill.ca/surface-viewer-widget?version=2.5.2&model="+fileUrl);
+    }-*/;
+
+    public native void showBrainBrowserForAsc(String fileUrl) /*-{
+           $wnd.$("#brain-browser").load("https://brainbrowser.cbrain.mcgill.ca/surface-viewer-widget?version=2.5.2&model="+fileUrl+"&format=freesurferasc");
     }-*/;
 }

@@ -74,7 +74,7 @@ function amiViewer(url, rawExtension, divId) {
   // main table listing all images.  Hence the 2 imbricated tables in
   // the following expression.
   const urlsToLoad = filename.endsWith('.mhd')
-        ? [ [ url, url.replace(/\.mhd$/g, rawExtension) ] ]
+        ? [ [ url, url.replace(/\.mhd$/, rawExtension).replace(/\.mhd&/, rawExtension + "&") ] ]
         : url;
 
   loader
