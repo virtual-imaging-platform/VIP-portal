@@ -40,6 +40,8 @@ import fr.insalyon.creatis.vip.visualization.client.bean.VisualizationItem;
 import fr.insalyon.creatis.vip.visualization.client.rpc.VisualizationService;
 import fr.insalyon.creatis.vip.visualization.client.rpc.VisualizationServiceAsync;
 
+import java.nio.file.Paths;
+
 /** @author Tristan Glatard */
 public abstract class AbstractViewTab extends Tab {
 
@@ -82,7 +84,12 @@ public abstract class AbstractViewTab extends Tab {
     }
 
     protected String getFileUrl(String lfn) {
-        return GWT.getModuleBaseURL() + "/filedownloadservice?path=" + lfn;
+        String filename = Paths.get(lfn).getFileName().toString();
+        // filename param is needed for ami to determine type
+        return GWT.getModuleBaseURL() +
+                "/filedownloadservice" +
+                "?path=" + lfn +
+                "&filename=" + filename;
     }
 
     public abstract void displayFile(VisualizationItem url);
