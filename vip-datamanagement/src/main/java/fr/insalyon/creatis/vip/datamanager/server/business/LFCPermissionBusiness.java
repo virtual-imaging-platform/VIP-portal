@@ -69,17 +69,20 @@ public class LFCPermissionBusiness {
         READ, UPLOAD, DELETE
     }
 
-    public Boolean isLFCPathAllowed(User user, String path, LFCAccessType LFCAccessType, Boolean disableAdminAccess)
+    public Boolean isLFCPathAllowed(User user, String path, LFCAccessType LFCAccessType, Boolean enableAdminArea)
             throws BusinessException {
         // normalize to remove "..".
         path = Paths.get(path).normalize().toString();
-        if ( ! isRootOK(user, path, LFCAccessType)) return false;
 
-        // Root is always filtered so always permitted
+        // verify the root ("/vip") is present and that it is not written on
+        if ( ! verifyRoot(user, path, LFCAccessType)) return false;
+
+        // Root is always filtered by user so always permitted
         if (path.equals(ROOT)) return true;
+
         // do not delete synchronized stuff
         if (LFCAccessType == LFCPermissionBusiness.LFCAccessType.DELETE
-            && isSynchronized(user, path)) {
+            && isPathSynchronized(user, path)) {
             return false;
         }
         // else it all depends of the first directory
@@ -89,7 +92,7 @@ public class LFCPermissionBusiness {
         if (firstDir.equals(TRASH_HOME)) return true;
         if (firstDir.equals(USERS_FOLDER) || firstDir.equals(VO_ROOT_FOLDER)) {
             // restricted to admin
-            return isAdminAllowed(user, path, disableAdminAccess);
+            return verifyAdminArea(user, path, enableAdminArea);
         }
         // else it should be a group folder
         if (!firstDir.endsWith(GROUP_APPEND)) {
@@ -98,7 +101,7 @@ public class LFCPermissionBusiness {
             return false;
         }
         String groupName = firstDir.substring(0,firstDir.length()-GROUP_APPEND.length());
-        return isGroupAllowed(user, groupName, LFCAccessType);
+        return isGroupAllowed(user, groupName, LFCAccessType, enableAdminArea);
     }
 
     private String getFirstDirectoryName(String path) {
@@ -111,7 +114,7 @@ public class LFCPermissionBusiness {
         }
     }
 
-    private Boolean isRootOK(
+    private Boolean verifyRoot(
             User user, String path, LFCAccessType LFCAccessType)
             throws BusinessException {
         // verify path begins with the root
@@ -120,13 +123,11 @@ public class LFCPermissionBusiness {
                     user.getEmail(), path);
             return false;
         }
-        // read always possible
-        if (LFCAccessType == LFCPermissionBusiness.LFCAccessType.READ) {
-            return true;
-        }
-        // else it cannot be THE root nor a direct subdirectory of root
-        if (path.equals(ROOT) ||
-                path.lastIndexOf('/') == ROOT.length()) {
+        // the root or a direct subdirectory of root cannot be written or deleted
+        boolean unwritable = path.equals(ROOT) ||
+                path.lastIndexOf('/') == ROOT.length();
+        if (unwritable &&
+                LFCAccessType != LFCPermissionBusiness.LFCAccessType.READ) {
             logger.error("({}) Unexpected write lfc access to '{}'",
                     user.getEmail(), path);
             return false;
@@ -134,14 +135,14 @@ public class LFCPermissionBusiness {
         return true;
     }
 
-    private boolean isAdminAllowed(User user, String path, Boolean disableAdminAccess) {
+    private boolean verifyAdminArea(User user, String path, Boolean enableAdminArea) {
         if ( ! user.isSystemAdministrator()) {
             logger.error("({}) Non admin trying to access an admin folder : {}",
                     user.getEmail(), path);
             return false;
         }
-        if (disableAdminAccess) {
-            logger.error("({}) LFC access disabled to admin : {}",
+        if ( ! enableAdminArea) {
+            logger.error("({}) LFC access not enabled to admins : {}",
                     user.getEmail(), path);
             return false;
         }
@@ -149,8 +150,11 @@ public class LFCPermissionBusiness {
     }
 
     private boolean isGroupAllowed(
-            User user, String groupName, LFCAccessType LFCAccessType)
-            throws BusinessException {
+            User user, String groupName, LFCAccessType LFCAccessType,
+            Boolean enableAdminArea) {
+        if (user.isSystemAdministrator() && enableAdminArea) {
+            return true;
+        }
         // user must have access to this group
         if (!user.hasGroupAccess(groupName)) {
             logger.error("({}) Trying to access an unauthorized goup '{}'",
@@ -166,7 +170,7 @@ public class LFCPermissionBusiness {
         return true;
     }
 
-    private boolean isSynchronized(User user, String path)
+    private boolean isPathSynchronized(User user, String path)
             throws BusinessException {
         List<SSH> sshs = dataManagerBusiness.getSSHConnections();
         List<String> lfcDirSSHSynchronization = new ArrayList<>();
