@@ -81,7 +81,6 @@ public class VisualizationServiceImpl extends AbstractRemoteServiceServlet
             User user = getSessionUser();
             return visualizationBusiness.getVisualizationItemFromLFN(
                 lfn,
-                this.getServletContext().getRealPath("."),
                 user);
         } catch (BusinessException | CoreException ex) {
             throw new VisualizationException(ex);

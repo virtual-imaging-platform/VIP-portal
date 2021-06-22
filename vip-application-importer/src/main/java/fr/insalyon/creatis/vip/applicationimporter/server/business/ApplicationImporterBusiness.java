@@ -42,6 +42,7 @@ import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.business.Server;
 import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerException;
+import fr.insalyon.creatis.vip.datamanager.server.business.DataManagerBusiness;
 import fr.insalyon.creatis.vip.datamanager.server.business.LfcPathsBusiness;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -69,13 +70,15 @@ public class ApplicationImporterBusiness {
     private VelocityUtils velocityUtils;
     private TargzUtils targzUtils;
     private ApplicationBusiness applicationBusiness;
+    private DataManagerBusiness dataManagerBusiness;
 
     @Autowired
     public ApplicationImporterBusiness(
             Server server, LfcPathsBusiness lfcPathsBusiness,
             GRIDAClient gridaClient, BoutiquesBusiness boutiquesBusiness,
             VelocityUtils velocityUtils, TargzUtils targzUtils,
-            ApplicationBusiness applicationBusiness) {
+            ApplicationBusiness applicationBusiness,
+            DataManagerBusiness dataManagerBusiness) {
         this.server = server;
         this.lfcPathsBusiness = lfcPathsBusiness;
         this.gridaClient = gridaClient;
@@ -83,32 +86,18 @@ public class ApplicationImporterBusiness {
         this.velocityUtils = velocityUtils;
         this.targzUtils = targzUtils;
         this.applicationBusiness = applicationBusiness;
+        this.dataManagerBusiness = dataManagerBusiness;
     }
 
     public String readAndValidationBoutiquesFile(String fileLFN, User user)
             throws BusinessException {
         try {
-
-            File localDir = new File(
-                server.getApplicationImporterFileRepository() +
-                "/" +
-                (new File(lfcPathsBusiness.parseBaseDir(user, fileLFN))).getParent());
-
-            if (!localDir.exists() && !localDir.mkdirs()) {
-                logger.error("Error validating boutiques file {}, Cannot create directory {}",
-                        fileLFN, localDir);
-                throw new BusinessException("Cannot create directory " + localDir.getCanonicalPath());
-            }
-            String localFilePath = gridaClient.getRemoteFile(
-                lfcPathsBusiness.parseBaseDir(user, fileLFN),
-                localDir.getCanonicalPath());
+            String localFilePath =
+                    dataManagerBusiness.getRemoteFile(user, fileLFN);
             boutiquesBusiness.validateBoutiqueFile(localFilePath);
-            String fileContent = new Scanner(new File(localFilePath)).useDelimiter("\\Z").next();
-            return fileContent;
-        } catch (GRIDAClientException | IOException ex) {
+            return new Scanner(new File(localFilePath)).useDelimiter("\\Z").next();
+        } catch (IOException ex) {
             logger.error("Error validating boutiques file {}", fileLFN, ex);
-            throw new BusinessException(ex);
-        } catch (DataManagerException ex) {
             throw new BusinessException(ex);
         }
     }

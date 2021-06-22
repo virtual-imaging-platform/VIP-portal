@@ -2,10 +2,10 @@
 // https://codesandbox.io/s/github/FNNDSC/ami/tree/master/lessons/03
 
 function amiViewer(url, rawExtension, divId) {
-  const name = url.substring(url.lastIndexOf('/') + 1);
+  const filename = new URL(url).searchParams.get('filename');
   window.setNoticeMessage(
     'Loading and parsing image ' +
-      name +
+      filename +
       '.  Please wait, this may take a while …');
 
   const colors = {
@@ -54,11 +54,11 @@ function amiViewer(url, rawExtension, divId) {
 
   const loader = new window.AMI.VolumeLoader(container);
 
-  if (name.endsWith('.mhd') && rawExtension.length == 0) {
-    const nameWithoutExtension = name.substring(0, name.lastIndexOf('.'));
+  if (filename.endsWith('.mhd') && rawExtension.length == 0) {
+    const nameWithoutExtension = filename.substring(0, name.lastIndexOf('.'));
     window.setWarningMessage(
       'Could not find raw file associated to mhd file: ' +
-        name +
+        filename +
         '.  Tried to find a file with the name ' +
         nameWithoutExtension +
         ' and extensions .raw, .zraw and .raw.gz.');
@@ -73,8 +73,8 @@ function amiViewer(url, rawExtension, divId) {
   // 2 urls for 2 different images, this table must be included in the
   // main table listing all images.  Hence the 2 imbricated tables in
   // the following expression.
-  const urlsToLoad = url.endsWith('.mhd')
-        ? [ [ url, url.replace(/\.mhd$/, rawExtension) ] ]
+  const urlsToLoad = filename.endsWith('.mhd')
+        ? [ [ url, url.replace(/\.mhd$/, rawExtension).replace(/\.mhd&/, rawExtension + "&") ] ]
         : url;
 
   loader
@@ -122,8 +122,8 @@ function amiViewer(url, rawExtension, divId) {
       window.hideMessage();
     })
     .catch(function(error) {
-      window.console.log('Error loading ' + name, error);
-      window.setWarningMessage('Error loading ' + name + '<br />' + error);
+      window.console.log('Error loading ' + filename, error);
+      window.setWarningMessage('Error loading ' + filename + '<br />' + error);
     });
 
   const animate = function() {
