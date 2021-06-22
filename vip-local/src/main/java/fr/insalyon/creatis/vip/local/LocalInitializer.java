@@ -249,7 +249,8 @@ public class LocalInitializer {
                 return resource.getFile().toString();
             } else {
                 // it is probably in a jar, copy it locally before
-                Path destination = Files.createTempFile(resource.getFilename(), null);
+                String tmpdir = System.getProperty("java.io.tmpdir");
+                Path destination = Paths.get(tmpdir, resource.getFilename());
                 Files.copy(resource.getInputStream(), destination, StandardCopyOption.REPLACE_EXISTING);
                 return destination.toString();
             }
