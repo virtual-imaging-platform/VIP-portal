@@ -56,6 +56,7 @@ public class ApikeyAuthenticationEntryPoint implements AuthenticationEntryPoint 
 
     private final ObjectMapper objectMapper;
 
+    @Autowired
     public ApikeyAuthenticationEntryPoint(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
     }
