@@ -32,6 +32,7 @@
 package fr.insalyon.creatis.vip.gatelab.client.view.monitor;
 
 import com.smartgwt.client.types.Cursor;
+import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.Img;
 import com.smartgwt.client.widgets.Label;
 import com.smartgwt.client.widgets.layout.HLayout;

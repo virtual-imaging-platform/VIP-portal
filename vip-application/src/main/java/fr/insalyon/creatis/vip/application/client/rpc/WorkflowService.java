@@ -66,6 +66,8 @@ public interface WorkflowService extends RemoteService {
     //
     public Descriptor getApplicationDescriptor(String applicationName, String applicationVersion) throws ApplicationException;
 
+    public String getBoutiquesApplicationDescriptor(String applicationName, String applicationVersion) throws ApplicationException;
+
     public void launchSimulation(Map<String, String> parameters, String applicationName, String applicationVersion, String applicationClass, String simulationName) throws ApplicationException;
 
     public SimulationInput getInputByNameUserApp(String inputName, String appName) throws ApplicationException;

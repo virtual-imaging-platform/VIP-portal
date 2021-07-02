@@ -34,7 +34,6 @@ package fr.insalyon.creatis.vip.application.client.view.launch;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.types.Cursor;
 import com.smartgwt.client.types.VerticalAlignment;
-import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.IButton;
@@ -57,24 +56,22 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  *
  * @author Rafael Ferreira da Silva
  */
-public class LaunchFormLayout extends AbstractFormLayout {
+public class OldLaunchFormLayout extends AbstractFormLayout {
 
-    private static Logger logger = Logger.getLogger(LaunchFormLayout.class.getName());
+    private static Logger logger = Logger.getLogger(OldLaunchFormLayout.class.getName());
 
     private TextItem simulationNameItem;
     private VLayout sourcesLayout;
     private VLayout executionNameLayout;
 
-    public LaunchFormLayout(String title, String icon, final String description, boolean executionNamePadding) {
+    public OldLaunchFormLayout(String title, String icon, final String description, boolean executionNamePadding) {
         super("600", "*");
         addTitle(title, icon);
 
@@ -112,7 +109,7 @@ public class LaunchFormLayout extends AbstractFormLayout {
     }
 
     // Constructor called by GateLab application
-    public LaunchFormLayout(String title, String icon, final String description) {
+    public OldLaunchFormLayout(String title, String icon, final String description) {
         this(title, icon, description, false);
     }
 
@@ -277,8 +274,8 @@ public class LaunchFormLayout extends AbstractFormLayout {
             if (canvas instanceof AbstractSourceLayout) {
                 AbstractSourceLayout source = (AbstractSourceLayout) canvas;
                  if (source.isOptional()) {
-                    if (source instanceof InputLayout) {
-                        InputLayout inputLayoutSource = (InputLayout) source;
+                    if (source instanceof OldInputLayout) {
+                        OldInputLayout inputLayoutSource = (OldInputLayout) source;
                         if (inputLayoutSource.isOptionalChecked()) {
                              paramsMap.put(source.getName(), source.getValue());
                         } else {

@@ -144,6 +144,18 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
         }
     }
 
+    @Override
+    public String getBoutiquesApplicationDescriptor(String applicationName, String applicationVersion) throws ApplicationException {
+        try {
+            return workflowBusiness.getBoutiquesApplicationDescriptor(
+                    getSessionUser(),
+                    applicationName,
+                    applicationVersion);
+        } catch (BusinessException | CoreException ex) {
+            throw new ApplicationException(ex);
+        }
+    }
+
     /**
      * Launches a simulation.
      *

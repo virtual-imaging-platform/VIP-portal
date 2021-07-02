@@ -49,6 +49,8 @@ public interface WorkflowServiceAsync {
     //
     public void getApplicationDescriptor(String applicationName, String applicationVersion, AsyncCallback<Descriptor> asyncCallback);
 
+    public void getBoutiquesApplicationDescriptor(String applicationName, String applicationVersion, AsyncCallback<String> asyncCallback);
+
     public void launchSimulation(Map<String, String> parameters, String applicationName, String applicationVersion, String applicationClass, String simulationName, AsyncCallback<Void> asyncCallback);
 
     public void getInputByNameUserApp(String inputName, String appName, AsyncCallback<SimulationInput> asyncCallback);

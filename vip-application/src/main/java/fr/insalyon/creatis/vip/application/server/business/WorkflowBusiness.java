@@ -71,7 +71,11 @@ import org.xml.sax.SAXException;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static fr.insalyon.creatis.vip.application.client.view.ApplicationException.ApplicationError.*;
 
@@ -438,6 +442,28 @@ public class WorkflowBusiness {
 
         } catch (SAXException | IOException ex) {
             logger.error("Error getting application descriptor for {}/{}",
+                    applicationName, applicationVersion, ex);
+            throw new BusinessException(WRONG_APPLICATION_DESCRIPTOR, ex,
+                    applicationName + "/" + applicationVersion);
+        } catch (DAOException | BusinessException ex) {
+            throw new BusinessException(WRONG_APPLICATION_DESCRIPTOR, ex,
+                    applicationName + "/" + applicationVersion);
+        }
+    }
+
+
+    public String getBoutiquesApplicationDescriptor(
+            User user, String applicationName, String applicationVersion)
+            throws BusinessException {
+
+        try {
+            AppVersion version = applicationDAO.getVersion(applicationName, applicationVersion);
+            String BoutiquesPath =
+                    dataManagerBusiness.getRemoteFile(user, version.getJsonLfn());
+            Stream<String> lines = Files.lines(Paths.get(BoutiquesPath));
+            return lines.collect(Collectors.joining(System.lineSeparator()));
+        } catch (IOException ex) {
+            logger.error("Error getting boutiques descriptor for {}/{}",
                     applicationName, applicationVersion, ex);
             throw new BusinessException(WRONG_APPLICATION_DESCRIPTOR, ex,
                     applicationName + "/" + applicationVersion);

@@ -32,12 +32,15 @@
 package fr.insalyon.creatis.vip.application.client.view.launch;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.smartgwt.client.widgets.tab.Tab;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
 import fr.insalyon.creatis.vip.application.client.bean.Descriptor;
 import fr.insalyon.creatis.vip.application.client.bean.Source;
 import fr.insalyon.creatis.vip.application.client.rpc.WorkflowService;
 import fr.insalyon.creatis.vip.application.client.rpc.WorkflowServiceAsync;
 import fr.insalyon.creatis.vip.application.client.view.common.AbstractLaunchTab;
+import fr.insalyon.creatis.vip.application.client.view.launch.applicationLayout.LaunchFormLayout;
+import fr.insalyon.creatis.vip.application.client.view.launch.boutiquesParsing.BoutiquesDescriptor;
 import fr.insalyon.creatis.vip.application.client.view.monitor.timeline.TimelineLayout;
 import fr.insalyon.creatis.vip.core.client.CoreModule;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
@@ -98,7 +101,7 @@ public class LaunchTab extends AbstractLaunchTab {
 
             @Override
             public void onSuccess(Descriptor descriptor) {
-                launchFormLayout = new LaunchFormLayout(applicationName + " " + applicationVersion, null, descriptor.getDescription(), true);
+                launchFormLayout = new OldLaunchFormLayout(applicationName + " " + applicationVersion, null, descriptor.getDescription(), true);
                 layout.addMember(launchFormLayout);
                 
                 // Put mandatory sources first
@@ -127,7 +130,7 @@ public class LaunchTab extends AbstractLaunchTab {
                         launchFormLayout.addSource(new InputFlagLayout(source.getName(), source.getDescription(), source.isOptional(), source.getDefaultValue(), source.getVipTypeRestriction(), source.getPrettyName()), disabled);
                     }
                     else {
-                        launchFormLayout.addSource(new InputLayout(source.getName(), source.getDescription(), source.isOptional(), source.getDefaultValue(), source.getPrettyName()), disabled);
+                        launchFormLayout.addSource(new OldInputLayout(source.getName(), source.getDescription(), source.isOptional(), source.getDefaultValue(), source.getPrettyName()), disabled);
                     }
                 }
 
@@ -155,6 +158,27 @@ public class LaunchTab extends AbstractLaunchTab {
         };
         modal.show("Loading launch panel...", true);
         WorkflowService.Util.getInstance().getApplicationDescriptor(applicationName, applicationVersion, callback);
+
+
+        final AsyncCallback<String> boutiquesLaunchCallback = new AsyncCallback<String>() {
+            @Override
+            public void onFailure(Throwable caught) {
+                modal.hide();
+                Layout.getInstance().setWarningMessage("Unable to download application source file:<br />" + caught.getMessage(), 10);
+            }
+
+            @Override
+            public void onSuccess(String descriptor) {
+                BoutiquesDescriptor boutiquesDescriptor = new BoutiquesDescriptor(descriptor);
+                LaunchFormLayout launchFormLayout = new LaunchFormLayout(boutiquesDescriptor);
+                Tab boutiquesTab = new Tab(boutiquesDescriptor.getFullName());
+                boutiquesTab.setPane(launchFormLayout);
+                Layout.getInstance().addTab(
+                        "new_" + ApplicationConstants.getLaunchTabID(applicationName),
+                        () -> boutiquesTab);
+            }
+        };
+        WorkflowService.Util.getInstance().getBoutiquesApplicationDescriptor(applicationName, applicationVersion, boutiquesLaunchCallback);
     }
 
     /**

@@ -45,7 +45,7 @@ import fr.insalyon.creatis.vip.application.client.bean.SimulationInput;
 import fr.insalyon.creatis.vip.application.client.rpc.WorkflowService;
 import fr.insalyon.creatis.vip.application.client.rpc.WorkflowServiceAsync;
 import fr.insalyon.creatis.vip.application.client.view.launch.InputsLayout;
-import fr.insalyon.creatis.vip.application.client.view.launch.LaunchFormLayout;
+import fr.insalyon.creatis.vip.application.client.view.launch.OldLaunchFormLayout;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
@@ -64,7 +64,7 @@ public abstract class AbstractLaunchTab extends Tab {
     protected String applicationVersion;
     protected String applicationClass;
     protected ModalWindow modal;
-    protected LaunchFormLayout launchFormLayout;
+    protected OldLaunchFormLayout launchFormLayout;
     protected InputsLayout inputsLayout;
     protected IButton launchButton;
     protected IButton saveInputsButton;

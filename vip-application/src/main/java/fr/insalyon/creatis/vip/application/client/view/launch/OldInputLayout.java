@@ -55,7 +55,7 @@ import java.util.List;
  *
  * @author Rafael Ferreira da Silva
  */
-public class InputLayout extends AbstractSourceLayout {
+public class OldInputLayout extends AbstractSourceLayout {
 
     private static enum InputType {
 
@@ -92,7 +92,7 @@ public class InputLayout extends AbstractSourceLayout {
      * @param defaultValue
      * @param prettyName 
      */
-    public InputLayout(String name, String comment, boolean optional, String defaultValue, String prettyName) {
+    public OldInputLayout(String name, String comment, boolean optional, String defaultValue, String prettyName) {
         super(name, comment, optional, prettyName, "");
         
         fieldHLayout = new HLayout(3);
@@ -144,7 +144,7 @@ public class InputLayout extends AbstractSourceLayout {
             setValue(defaultValue);
     }
 
-    public InputLayout(String name, String comment) {
+    public OldInputLayout(String name, String comment) {
         this(name, comment, false, "", "");
     }
 

@@ -76,11 +76,12 @@ public class VIPLayout extends AbstractFormLayout {
         appCbItem = new SelectItem();
         appCbItem.setTitle("<b>Select type of application</b>");
         appCbItem.setType("comboBox");
+        /*
         LinkedHashMap<String, String> valueMap = new LinkedHashMap<String, String>();
         valueMap.put("standalone", "standalone");
         valueMap.put("challenge_msseg", "Challenge MSSEG");
-        valueMap.put("challenge_petseg", "Challenge PETSEG");
-        appCbItem.setValueMap(valueMap);
+        valueMap.put("challenge_petseg", "Challenge PETSEG");*/
+        appCbItem.setValueMap("standalone", "challenge_msseg", "challenge_petseg");
         appCbItem.addChangeHandler(new com.smartgwt.client.widgets.form.fields.events.ChangeHandler() {
             @Override
             public void onChange(ChangeEvent event) {
