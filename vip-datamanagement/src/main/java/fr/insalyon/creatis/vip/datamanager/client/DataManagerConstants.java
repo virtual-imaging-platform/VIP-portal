@@ -96,5 +96,6 @@ public class DataManagerConstants {
     public static final String VO_ROOT_FOLDER = "VO root folder";
     public static final String GROUP_APPEND = " (group)";
     public static final int MAX_OPERATIONS_LIMIT = 10;
+    public static final String DOWNLOAD_FOLDER = "downloads";
 
 }

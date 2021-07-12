@@ -231,8 +231,7 @@ public class TransferPoolBusiness {
             lfcBusiness.getModificationDate(user, remoteFile);
 
             String remotePath = lfcPathsBusiness.parseBaseDir(user, remoteFile);
-            String localDirPath = serverConfiguration.getDataManagerPath()
-                    + "/downloads" + FilenameUtils.getFullPath(remotePath);
+            String localDirPath = lfcPathsBusiness.getLocalDirForGridaFileDownload(remotePath);
 
             return gridaPoolClient.downloadFile(remotePath, localDirPath, user.getEmail());
 
@@ -256,8 +255,8 @@ public class TransferPoolBusiness {
                 remotePaths.add(
                         lfcPathsBusiness.parseBaseDir(user, remoteFile));
             }
-            String localDirPath = serverConfiguration.getDataManagerPath()
-                    + "/downloads/" + packName;
+            String localDirPath =
+                    lfcPathsBusiness.getLocalDirForGridaMultiFilesDownload(packName);
 
             return gridaPoolClient.downloadFiles(remotePaths.toArray(new String[]{}),
                     localDirPath, user.getEmail());
@@ -276,10 +275,8 @@ public class TransferPoolBusiness {
         try {
             lfcBusiness.getModificationDate(user, remoteFolder);
 
-            String remotePath = lfcPathsBusiness.parseBaseDir(
-                user, remoteFolder);
-            String localDirPath = serverConfiguration.getDataManagerPath()
-                    + "/downloads" + remotePath;
+            String remotePath = lfcPathsBusiness.parseBaseDir(user, remoteFolder);
+            String localDirPath = lfcPathsBusiness.getLocalDirForGridaFolderDownload(remotePath);
             return gridaPoolClient.downloadFolder(
                     remotePath, localDirPath, user.getEmail());
 
