@@ -43,6 +43,8 @@ import fr.insalyon.creatis.vip.core.client.view.common.AbstractFormLayout;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
 import fr.insalyon.creatis.vip.datamanager.client.view.ValidatorUtil;
+
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -186,6 +188,7 @@ public class VIPLayout extends AbstractFormLayout {
 
             @Override
             public void onSuccess(List<String> result) {
+                result = new ArrayList<>(result); // make a new list because the returned one does not support the add method
                 if(!result.contains("None")){
                     result.add("None");
                 }
