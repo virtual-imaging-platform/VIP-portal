@@ -31,6 +31,7 @@
  */
 package fr.insalyon.creatis.vip.api;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.insalyon.creatis.vip.api.business.VipConfigurer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -43,6 +44,7 @@ import org.springframework.core.env.MutablePropertySources;
 import org.springframework.core.env.PropertiesPropertySource;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.support.ResourcePropertySource;
+import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.web.servlet.config.annotation.*;
 
 import java.io.IOException;
@@ -102,4 +104,8 @@ public class SpringWebConfig implements WebMvcConfigurer {
         registry.addInterceptor(vipConfigurer);
     }
 
+    @Bean
+    public ObjectMapper objectMapper() {
+        return Jackson2ObjectMapperBuilder.json().build();
+    }
 }

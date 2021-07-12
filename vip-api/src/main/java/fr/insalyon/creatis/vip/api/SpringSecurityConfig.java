@@ -31,23 +31,20 @@
  */
 package fr.insalyon.creatis.vip.api;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import fr.insalyon.creatis.vip.api.CarminProperties;
 import fr.insalyon.creatis.vip.api.security.SpringCompatibleUser;
-import fr.insalyon.creatis.vip.api.security.apikey.*;
+import fr.insalyon.creatis.vip.api.security.apikey.ApikeyAuthenticationEntryPoint;
+import fr.insalyon.creatis.vip.api.security.apikey.ApikeyAuthentificationConfigurer;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.env.Environment;
-import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.builders.WebSecurity;
-import org.springframework.security.config.annotation.web.configuration.*;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.firewall.DefaultHttpFirewall;
-import org.springframework.security.web.firewall.StrictHttpFirewall;
 
 import java.util.function.Supplier;
 
@@ -66,11 +63,15 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
 
     // authentication done by bean LimitigDaoAuthenticationProvider
 
-    @Autowired
-    private ApikeyAuthenticationEntryPoint apikeyAuthenticationEntryPoint;
+    private final ApikeyAuthenticationEntryPoint apikeyAuthenticationEntryPoint;
+
+    private final Environment env;
 
     @Autowired
-    private Environment env;
+    public SpringSecurityConfig(ApikeyAuthenticationEntryPoint apikeyAuthenticationEntryPoint, Environment env) {
+        this.apikeyAuthenticationEntryPoint = apikeyAuthenticationEntryPoint;
+        this.env = env;
+    }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -108,11 +109,6 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
                     (SpringCompatibleUser) authentication.getPrincipal();
             return springCompatibleUser.getVipUser();
         };
-    }
-
-    @Bean
-    public ObjectMapper objectMapper() {
-        return Jackson2ObjectMapperBuilder.json().build();
     }
 
     /*
