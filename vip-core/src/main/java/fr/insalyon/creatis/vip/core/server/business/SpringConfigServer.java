@@ -146,6 +146,9 @@ public class SpringConfigServer implements Server {
 
         assertPropertyIsNotEmpty(CoreConstants.GIRDER_TOKEN_DURATION_IN_DAYS, Float.class);
         assertPropertyIsNotEmpty(CoreConstants.LAB_SIMULATION_PLATFORM_MAX, Integer.class);
+
+        assertOptionalPropertyType(CoreConstants.USE_LOCAL_FILES_AS_INPUTS, Boolean.class);
+
     }
 
     private void assertPropertyIsPresent(String property) {
@@ -154,6 +157,13 @@ public class SpringConfigServer implements Server {
 
     private void assertPropertyIsPresent(String property, Class<?> type) {
         Assert.notNull(env.getProperty(property, type), property + " should be present");
+    }
+
+    private void assertOptionalPropertyType(String property, Class<?> type) {
+        Object val = env.getProperty(property, type);
+        if (val != null) {
+            Assert.isInstanceOf(type, val, val + " must be of type " + type);
+        }
     }
 
     private void assertPropertyIsNotEmpty(String property) {
@@ -420,5 +430,11 @@ public class SpringConfigServer implements Server {
     public float getGirderTokenDurationInDays() {
         return env.getRequiredProperty(CoreConstants.GIRDER_TOKEN_DURATION_IN_DAYS, Float.class);
     }
+
+    @Override
+    public boolean useLocalFilesInInputs() {
+        return env.getProperty(CoreConstants.USE_LOCAL_FILES_AS_INPUTS, Boolean.class, false);
+    }
+
 
 }

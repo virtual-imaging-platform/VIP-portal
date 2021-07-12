@@ -109,4 +109,6 @@ public interface Server {
     String getPublicationCommandLine();
 
     float getGirderTokenDurationInDays();
+
+    boolean useLocalFilesInInputs();
 }

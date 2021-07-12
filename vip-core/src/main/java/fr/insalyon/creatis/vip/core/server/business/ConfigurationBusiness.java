@@ -101,7 +101,7 @@ public class ConfigurationBusiness {
 
         try {
             logger.debug("Configuring VIP server proxy.");
-            proxyClient.getProxy();
+            proxyClient.checkProxy();
 
         } catch (Exception ex) {
             logger.error("Error configuring myproxy : {}", ex.getMessage());

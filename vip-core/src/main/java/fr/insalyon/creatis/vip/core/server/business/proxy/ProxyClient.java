@@ -92,11 +92,13 @@ public class ProxyClient {
         this.server = server;
     }
 
-    /**
-     * @return Proxy file name and end date
-     * @throws BusinessException
-     */
-    public Proxy getProxy() throws BusinessException {
+    public void checkProxy() throws BusinessException {
+
+        int proxyHoursValidity = server.getMyProxyMinHours();
+        if (proxyHoursValidity == 0) {
+            logger.info("Proxy not needed and not validated");
+            return;
+        }
 
         try {
             String proxyFileName = server.getServerProxy();
@@ -106,12 +108,12 @@ public class ProxyClient {
 
                 Calendar currentDate = Calendar.getInstance();
                 currentDate.setTime(new Date());
-                currentDate.add(Calendar.HOUR, server.getMyProxyMinHours());
+                currentDate.add(Calendar.HOUR, proxyHoursValidity);
                 try {
                     certificate.checkValidity(currentDate.getTime());
                     Date endDate = certificate.getNotAfter();
                     logger.debug("Server proxy still valid until: " + endDate);
-                    return new Proxy(proxyFileName, endDate);
+                    return;
                 } catch (Exception ex1) {
                     logger.warn("Proxy server expired, deleting it");
                     logger.warn("End date :" + certificate.getNotAfter());
@@ -128,9 +130,6 @@ public class ProxyClient {
             String voName = server.getVoName();
             copyFile(server.getServerProxy(), server.getServerProxyFolder(voName));
             addVomsExtension(voName);
-
-            return new Proxy(proxyFileName, endDate);
-
         } catch (Exception ex) {
             logger.error("Error getting proxy : {}", ex.getMessage());
             if (this.socket != null) {
