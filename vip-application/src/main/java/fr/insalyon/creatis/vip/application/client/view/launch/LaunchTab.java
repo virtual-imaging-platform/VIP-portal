@@ -37,12 +37,14 @@ import fr.insalyon.creatis.vip.application.client.bean.Descriptor;
 import fr.insalyon.creatis.vip.application.client.bean.Source;
 import fr.insalyon.creatis.vip.application.client.rpc.WorkflowService;
 import fr.insalyon.creatis.vip.application.client.rpc.WorkflowServiceAsync;
+import fr.insalyon.creatis.vip.application.client.view.boutiquesParsing.BoutiquesDescriptor;
 import fr.insalyon.creatis.vip.application.client.view.common.AbstractLaunchTab;
 import fr.insalyon.creatis.vip.application.client.view.monitor.timeline.TimelineLayout;
 import fr.insalyon.creatis.vip.core.client.CoreModule;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
 import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -73,15 +75,63 @@ public class LaunchTab extends AbstractLaunchTab {
 
         super(applicationName, applicationVersion, applicationClass);
         layout.clear();
-        disabledSources = new ArrayList<String>();
+        /*disabledSources = new ArrayList<String>();
         if (disabled != null) {
             disabledSources.addAll(Arrays.asList(disabled));
         }
-        loadData(simulationName, inputs);
+        loadData(simulationName, inputs);*/
+        loadDescriptor();
     }
 
     public boolean hasID() {
         return this.getAttributeAsString("ID") != null;
+    }
+
+    /**
+     * Loads simulation descriptor content as String.
+     */
+    private void loadDescriptor() {
+        final AsyncCallback<String> callback = new AsyncCallback<String>() {
+            @Override
+            public void onFailure(Throwable caught) {
+                modal.hide();
+                Layout.getInstance().setWarningMessage("Unable to download application descriptor:<br />"
+                                                       + caught.getMessage(), 10);
+            }
+
+            @Override
+            public void onSuccess(String StringInputLayout) {
+                LaunchFormLayout formLayout = new LaunchFormLayout(new BoutiquesDescriptor(StringInputLayout),
+                        applicationName, applicationVersion, applicationClass);
+                layout.addMember(formLayout);
+                modal.hide();
+                /*
+
+                configureLaunchButton();
+                configureSaveInputsButton();
+
+                if (CoreModule.user.isSystemAdministrator() || CoreModule.user.isGroupAdmin()) {
+                    configureSaveAsExampleButton();
+                    launchFormLayout.addButtons(launchButton, saveInputsButton,
+                            saveAsExampleButton);
+                } else {
+                    launchFormLayout.addButtons(launchButton, saveInputsButton);
+                }
+
+                launchFormLayout.configureCitation(applicationName);
+
+                modal.hide();
+
+                configureInputsLayout(true);
+
+                if (simulationName != null) {
+                    launchFormLayout.loadInputs(simulationName, inputs);
+                }*/
+            }
+        };
+        modal.show("Loading launch panel...", true);
+        WorkflowService.Util.getInstance().getApplicationDescriptorString(applicationName, applicationVersion,
+                                                                          callback);
     }
 
     /**
@@ -98,7 +148,7 @@ public class LaunchTab extends AbstractLaunchTab {
 
             @Override
             public void onSuccess(Descriptor descriptor) {
-                launchFormLayout = new LaunchFormLayout(applicationName + " " + applicationVersion, null, descriptor.getDescription(), true);
+                launchFormLayout = new LaunchFormLayoutOld(applicationName + " " + applicationVersion, null, descriptor.getDescription(), true);
                 layout.addMember(launchFormLayout);
                 
                 // Put mandatory sources first
@@ -127,7 +177,7 @@ public class LaunchTab extends AbstractLaunchTab {
                         launchFormLayout.addSource(new InputFlagLayout(source.getName(), source.getDescription(), source.isOptional(), source.getDefaultValue(), source.getVipTypeRestriction(), source.getPrettyName()), disabled);
                     }
                     else {
-                        launchFormLayout.addSource(new InputLayout(source.getName(), source.getDescription(), source.isOptional(), source.getDefaultValue(), source.getPrettyName()), disabled);
+                        launchFormLayout.addSource(new InputLayoutOld(source.getName(), source.getDescription(), source.isOptional(), source.getDefaultValue(), source.getPrettyName()), disabled);
                     }
                 }
 

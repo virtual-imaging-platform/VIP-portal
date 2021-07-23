@@ -36,6 +36,7 @@ import fr.insalyon.creatis.moteur.plugins.workflowsdb.dao.WorkflowsDBDAOExceptio
 import fr.insalyon.creatis.vip.application.client.bean.*;
 import fr.insalyon.creatis.vip.application.client.rpc.WorkflowService;
 import fr.insalyon.creatis.vip.application.client.view.ApplicationException;
+import fr.insalyon.creatis.vip.application.server.business.BoutiquesBusiness;
 import fr.insalyon.creatis.vip.application.server.business.InputBusiness;
 import fr.insalyon.creatis.vip.application.server.business.WorkflowBusiness;
 import fr.insalyon.creatis.vip.application.server.business.simulation.ParameterSweep;
@@ -74,6 +75,7 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
     private InputBusiness inputBusiness;
     private ConfigurationBusiness configurationBusiness;
     private ApplicationInputDAO applicationInputDAO;
+    private BoutiquesBusiness boutiquesBusiness;
 
     @Override
     public void init() throws ServletException {
@@ -82,6 +84,7 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
         applicationInputDAO = getBean(ApplicationInputDAO.class);
         configurationBusiness = getBean(ConfigurationBusiness.class);
         workflowBusiness = getBean(WorkflowBusiness.class);
+        boutiquesBusiness = getBean(BoutiquesBusiness.class);
     }
 
     /**
@@ -136,9 +139,27 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
     public Descriptor getApplicationDescriptor(String applicationName, String applicationVersion) throws ApplicationException {
         try {
             return workflowBusiness.getApplicationDescriptor(
-                getSessionUser(),
-                applicationName,
-                applicationVersion);
+                    getSessionUser(),
+                    applicationName,
+                    applicationVersion);
+        } catch (BusinessException | CoreException ex) {
+            throw new ApplicationException(ex);
+        }
+    }
+
+    /**
+     *
+     * @param applicationName
+     * @param applicationVersion
+     * @return
+     * @throws ApplicationException
+     */
+    @Override
+    public String getApplicationDescriptorString(String applicationName, String applicationVersion)
+            throws ApplicationException {
+        try {
+            return boutiquesBusiness.getApplicationDescriptorString(getSessionUser(), applicationName,
+                                                                    applicationVersion);
         } catch (BusinessException | CoreException ex) {
             throw new ApplicationException(ex);
         }

@@ -39,7 +39,7 @@ import fr.insalyon.creatis.vip.application.client.bean.Descriptor;
 import fr.insalyon.creatis.vip.application.client.bean.Source;
 import fr.insalyon.creatis.vip.application.client.rpc.WorkflowService;
 import fr.insalyon.creatis.vip.application.client.view.common.AbstractLaunchTab;
-import fr.insalyon.creatis.vip.application.client.view.launch.LaunchFormLayout;
+import fr.insalyon.creatis.vip.application.client.view.launch.LaunchFormLayoutOld;
 import fr.insalyon.creatis.vip.application.client.view.monitor.timeline.TimelineLayout;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
@@ -82,7 +82,7 @@ public class GateLabLaunchTab extends AbstractLaunchTab {
             @Override
             public void onSuccess(Descriptor descriptor) {
 
-                launchFormLayout = new LaunchFormLayout(applicationName + " " + applicationVersion, null, descriptor.getDescription());
+                launchFormLayout = new LaunchFormLayoutOld(applicationName + " " + applicationVersion, null, descriptor.getDescription());
                 layout.addMember(launchFormLayout);
 
                 launchFormLayout.setSourcesLayoutVisibible(false);
