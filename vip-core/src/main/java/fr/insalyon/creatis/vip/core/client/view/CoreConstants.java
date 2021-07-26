@@ -187,6 +187,9 @@ public class CoreConstants implements IsSerializable {
     public static final String PUBLICATION_SYSTEM_COMMAND = "publication.system-command";
     // External storage, girder.
     public static final String GIRDER_TOKEN_DURATION_IN_DAYS = "girder.token.duration-in-days";
+    // Local config
+    public static final String USE_LOCAL_FILES_AS_INPUTS = "execution.input.local-files";
+
 
     public static enum GROUP_ROLE implements IsSerializable {
 

@@ -4,14 +4,11 @@ import fr.insalyon.creatis.sma.client.SMAClient;
 import fr.insalyon.creatis.sma.client.SMAClientException;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.business.Server;
-import fr.insalyon.creatis.vip.core.server.business.proxy.Proxy;
 import fr.insalyon.creatis.vip.core.server.business.proxy.ProxyClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.*;
-import org.springframework.core.annotation.Order;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.MapPropertySource;
 import org.springframework.core.io.FileSystemResource;
@@ -63,8 +60,7 @@ public class LocalConfiguration {
         }
 
         @Override
-        public Proxy getProxy() throws BusinessException {
-            return null;
+        public void checkProxy() throws BusinessException {
         }
 
         @Override
