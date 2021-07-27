@@ -10,6 +10,7 @@ import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.Label;
 import com.smartgwt.client.widgets.events.ClickEvent;
+import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
@@ -22,6 +23,7 @@ import fr.insalyon.creatis.vip.application.client.view.boutiquesParsing.Boutique
 import fr.insalyon.creatis.vip.application.client.view.boutiquesParsing.BoutiquesInputString;
 import fr.insalyon.creatis.vip.application.client.view.common.AbstractLaunchTab;
 import fr.insalyon.creatis.vip.application.client.view.monitor.timeline.TimelineLayout;
+import fr.insalyon.creatis.vip.core.client.CoreModule;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.common.AbstractFormLayout;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
@@ -42,6 +44,8 @@ import java.util.stream.Collectors;
 public class LaunchFormLayout extends AbstractFormLayout {
     public static final String EXECUTION_NAME_ID = "Execution-name";
     public static final String RESULTS_DIR_ID = "Results-directory";
+    private final String SAVE_AS_EXAMPLE_PROMPT =
+            "Save the inputs as a featured example that will be available for all users.";
     // Application information
     protected String applicationName;
     protected String applicationVersion;
@@ -51,6 +55,7 @@ public class LaunchFormLayout extends AbstractFormLayout {
     private final Map<String, GroupValidator> groups = new HashMap<>();
     private final IButton launchButton;
     private final IButton saveInputsButton;
+    private final IButton saveAsExampleButton;
     // Label warning user about unsupported dependencies (due to one of the inputs having multiple values)
     private final Label warningLabel;
     // Maps the problematic input ID to the set of dependencies that can't be supported because of it
@@ -146,6 +151,20 @@ public class LaunchFormLayout extends AbstractFormLayout {
                     }//this.saveInputs()
                 });
         buttonsLayout.addMember(this.saveInputsButton);
+        // Save as example button
+        if (CoreModule.user.isSystemAdministrator() || CoreModule.user.isGroupAdmin()) {
+            saveAsExampleButton = WidgetUtil.getIButton("Save as Example", CoreConstants.ICON_EXAMPLE,
+                    event -> {
+                        if (!event.getFiringCanvas().isDisabled()) {
+                            saveInputsAsExample();
+                        }
+                    });
+            saveAsExampleButton.setPrompt(SAVE_AS_EXAMPLE_PROMPT);
+            saveAsExampleButton.setWidth(120);
+            buttonsLayout.addMember(this.saveAsExampleButton);
+        } else {
+            saveAsExampleButton = null;
+        }
         buttonsLayout.setMembersMargin(50);
         buttonsLayout.setLayoutLeftMargin(50);
         // Error message
@@ -553,7 +572,7 @@ public class LaunchFormLayout extends AbstractFormLayout {
 
     /**
      * Update displayed user error messages to match field invalidInputNames and errorMessages. If there is no error
-     * to display, also enable launch simulation and save inputs buttons, else disable them
+     * to display, also enable launch simulation, save inputs and save as example buttons, else disable them
      * 
      * @see #addValidationErrorOnInput(InputLayout)
      * @see #removeValidationErrorOnInput(InputLayout)
@@ -566,6 +585,10 @@ public class LaunchFormLayout extends AbstractFormLayout {
             this.launchButton.setPrompt("");
             this.saveInputsButton.enable();
             this.saveInputsButton.setPrompt("");
+            if(this.saveAsExampleButton != null) {
+                this.saveAsExampleButton.enable();
+                this.saveAsExampleButton.setPrompt(SAVE_AS_EXAMPLE_PROMPT);
+            }
             this.errorLabel.hide();
         } else {
             // Errors: disable buttons and show error messages
@@ -573,6 +596,10 @@ public class LaunchFormLayout extends AbstractFormLayout {
             this.launchButton.setPrompt("Cannot launch. Some inputs are not valid (see below).");
             this.saveInputsButton.disable();
             this.saveInputsButton.setPrompt("Cannot save Inputs. Some inputs are not valid (see below).");
+            if(this.saveAsExampleButton != null) {
+                this.saveAsExampleButton.disable();
+                this.saveAsExampleButton.setPrompt("Cannot save Inputs. Some inputs are not valid (see below).");
+            }
             this.errorLabel.show();
             // Error messages
             StringBuilder errorContent = new StringBuilder("<font color=\"red\"><ul>");
@@ -622,6 +649,31 @@ public class LaunchFormLayout extends AbstractFormLayout {
             }
         });
         return parameterMap;
+    }
+
+    /**
+     * Save current input values as example
+     */
+    private void saveInputsAsExample() {
+        WidgetUtil.setLoadingIButton(saveAsExampleButton, "Saving...");
+        WorkflowServiceAsync service = WorkflowService.Util.getInstance();
+        final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
+            @Override
+            public void onFailure(Throwable caught) {
+                resetSaveAsExampleButton();
+                Layout.getInstance().setWarningMessage("Unable to save example inputs:<br />" + caught.getMessage(), 10);
+            }
+
+            @Override
+            public void onSuccess(Void result) {
+                AbstractLaunchTab launchTab = (AbstractLaunchTab) Layout.getInstance().
+                        getTab(ApplicationConstants.getLaunchTabID(applicationName));
+                launchTab.loadInputsList();
+                resetSaveAsExampleButton();
+                Layout.getInstance().setNoticeMessage("Examples input values were succesfully saved!", 10);
+            }
+        };
+        service.saveInputsAsExamples(getSimulationInput(), callback);
     }
 
     /**
@@ -839,6 +891,12 @@ public class LaunchFormLayout extends AbstractFormLayout {
         updateErrorMessages();
     }
 
+    protected void  resetSaveAsExampleButton(){
+        if(this.saveAsExampleButton != null) {
+            WidgetUtil.resetIButton(this.saveAsExampleButton, "Save as Example", CoreConstants.ICON_EXAMPLE);
+            updateErrorMessages();
+        }
+    }
     /**
      * Resets the save inputs button to its initial state.
      */

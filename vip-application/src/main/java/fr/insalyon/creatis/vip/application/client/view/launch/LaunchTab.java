@@ -106,13 +106,6 @@ public class LaunchTab extends AbstractLaunchTab {
                 layout.addMember(formLayout);
                 modal.hide();
 /*
-                if (CoreModule.user.isSystemAdministrator() || CoreModule.user.isGroupAdmin()) {
-                    configureSaveAsExampleButton();
-                    launchFormLayout.addButtons(launchButton, saveInputsButton,
-                            saveAsExampleButton);
-                } else {
-                    launchFormLayout.addButtons(launchButton, saveInputsButton);
-                }
 
                 launchFormLayout.configureCitation(applicationName);
 
