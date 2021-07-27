@@ -125,7 +125,6 @@ public abstract class InputLayout extends VLayout {
         inputField.setName(MAIN_FIELD_NAME);
         this.addValueChangeHandler(inputField);
         inputForm.setFields(inputField);
-        GWT.log(Arrays.toString(inputForm.getFields()) + ' ' + Arrays.toString(this.getMembers()));
         this.addMember(inputForm);
         // Add/remove value button
         inputField.addIcon(iconToAdd);

@@ -5,6 +5,7 @@ import com.google.gwt.json.client.JSONObject;
 import com.google.gwt.json.client.JSONString;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.types.Cursor;
+import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.Label;
@@ -12,14 +13,17 @@ import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
+import fr.insalyon.creatis.vip.application.client.bean.SimulationInput;
 import fr.insalyon.creatis.vip.application.client.rpc.WorkflowService;
 import fr.insalyon.creatis.vip.application.client.rpc.WorkflowServiceAsync;
 import fr.insalyon.creatis.vip.application.client.view.boutiquesParsing.BoutiquesDescriptor;
 import fr.insalyon.creatis.vip.application.client.view.boutiquesParsing.BoutiquesGroup;
 import fr.insalyon.creatis.vip.application.client.view.boutiquesParsing.BoutiquesInput;
 import fr.insalyon.creatis.vip.application.client.view.boutiquesParsing.BoutiquesInputString;
+import fr.insalyon.creatis.vip.application.client.view.common.AbstractLaunchTab;
 import fr.insalyon.creatis.vip.application.client.view.monitor.timeline.TimelineLayout;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
+import fr.insalyon.creatis.vip.core.client.view.common.AbstractFormLayout;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
 import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
@@ -35,7 +39,7 @@ import java.util.stream.Collectors;
  * @author Guillaume Vanel
  * @version %I%, %G%
  */
-public class LaunchFormLayout extends VLayout {
+public class LaunchFormLayout extends AbstractFormLayout {
     public static final String EXECUTION_NAME_ID = "Execution-name";
     public static final String RESULTS_DIR_ID = "Results-directory";
     // Application information
@@ -109,7 +113,7 @@ public class LaunchFormLayout extends VLayout {
      */
     public LaunchFormLayout(final BoutiquesDescriptor applicationDescriptor, String applicationName,
                             String applicationVersion, String applicationClass) {
-        super(10);
+        super("600", "*");
         this.applicationName = applicationName;
         this.applicationVersion = applicationVersion;
         this.applicationClass = applicationClass;
@@ -134,7 +138,13 @@ public class LaunchFormLayout extends VLayout {
         buttonsLayout.addMember(this.launchButton);
         // Save inputs button
         this.saveInputsButton = WidgetUtil.getIButton("Save Inputs", CoreConstants.ICON_SAVED,
-                event -> this.saveInputs());
+                event -> {
+                    if (event.getFiringCanvas().isDisabled()) {
+                        Layout.getInstance().setWarningMessage("Cannot save inputs. Some inputs are not valid.");
+                    } else {
+                        this.saveInputs();
+                    }//this.saveInputs()
+                });
         buttonsLayout.addMember(this.saveInputsButton);
         buttonsLayout.setMembersMargin(50);
         buttonsLayout.setLayoutLeftMargin(50);
@@ -591,14 +601,104 @@ public class LaunchFormLayout extends VLayout {
     }
 
     /**
+     * Returns a map of input IDs to corresponding input values represented as one String
+     *
+     * @return Map with String containing input IDs as keys and String representing input values as values
+     */
+    private Map<String, String> getParametersMap() {
+        Map<String, String> parameterMap = new HashMap<>();
+        this.getInputValueMap().forEach((inputId, valueSet) -> {
+            if((!inputId.equals(EXECUTION_NAME_ID)) & (!inputId.equals(RESULTS_DIR_ID))) {
+                String inputValue;
+                if (valueSet instanceof ValueList) {
+                    inputValue = String.join(ApplicationConstants.SEPARATOR_LIST, valueSet.getValuesAsStrings());
+                } else {
+                    Float[] startStepStop = ((ValueRange) valueSet).getRangeLimits();
+                    inputValue = startStepStop[0] + ApplicationConstants.SEPARATOR_INPUT
+                            + startStepStop[2] + ApplicationConstants.SEPARATOR_INPUT
+                            + startStepStop[1];
+                }
+                parameterMap.put(inputId, inputValue);
+            }
+        });
+        return parameterMap;
+    }
+
+    /**
      * Create a button to later re-load current set of input values
      */
     private void saveInputs() {
-        final Map<String, ValueSet> inputValueMap =  this.getInputValueMap();
-        IButton reloadInputButton = WidgetUtil.getIButton("Load input", ApplicationConstants.ICON_APPLICATION,
-                clickEvent -> this.loadInputs(inputValueMap));
-        this.addMember(reloadInputButton);
+        WidgetUtil.setLoadingIButton(saveInputsButton, "Saving...");
+        WorkflowServiceAsync service = WorkflowService.Util.getInstance();
+        final AsyncCallback<SimulationInput> callback = new AsyncCallback<SimulationInput>() {
+            @Override
+            public void onFailure(Throwable caught) {
+                if (!caught.getMessage().contains("No data is available")
+                        && !caught.getMessage().contains("empty result set")) {
+                    resetSaveInputsButton();
+                    Layout.getInstance().setWarningMessage("Unable to verify execution name:<br />" + caught.getMessage(), 10);
+                } else {
+                    saveInputs(false);
+                }
+            }
+
+            @Override
+            public void onSuccess(SimulationInput result) {
+                SC.ask("A simulation entitled \"" + getSimulationName() + "\" "
+                        + "already exists. <br />Do you want to ovewrite the input data?", new BooleanCallback() {
+                    @Override
+                    public void execute(Boolean value) {
+                        if (value) {
+                            saveInputs(true);
+                        } else {
+                            resetSaveInputsButton();
+                        }
+                    }
+                });
+            }
+        };
+        service.getInputByNameUserApp(getSimulationName(), applicationName, callback);
     }
+
+    private void saveInputs(boolean update) {
+
+        WorkflowServiceAsync service = WorkflowService.Util.getInstance();
+        final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
+            @Override
+            public void onFailure(Throwable caught) {
+                resetSaveInputsButton();
+                Layout.getInstance().setWarningMessage("Unable to save simulation inputs:<br />" + caught.getMessage(), 10);
+            }
+
+            @Override
+            public void onSuccess(Void result) {
+                AbstractLaunchTab launchTab = (AbstractLaunchTab) Layout.getInstance().
+                        getTab(ApplicationConstants.getLaunchTabID(applicationName));
+                launchTab.loadInputsList();
+                resetSaveInputsButton();
+                Layout.getInstance().setNoticeMessage("Input values were successfully saved!", 10);
+            }
+        };
+        if (update) {
+            service.updateSimulationInput(getSimulationInput(), callback);
+        } else {
+            service.addSimulationInput(getSimulationInput(), callback);
+        }
+    }
+
+    /**
+     * @return SimulationInput corresponding to current input values
+     */
+    private SimulationInput getSimulationInput() {
+        StringBuilder sb = new StringBuilder();
+        this.getParametersMap().forEach(
+                (inputId, inputValue) -> sb.append(inputId)
+                        .append("=")
+                        .append(inputValue.replaceAll(ApplicationConstants.INPUT_WITHOUT_VALUE, ""))
+                        .append("--"));
+        return new SimulationInput(applicationName, getSimulationName(), sb.toString());
+    }
+
 
     /**
      * Load saved values after confirming with user if some non default values are to be overwritten
@@ -725,22 +825,8 @@ public class LaunchFormLayout extends VLayout {
                 TimelineLayout.getInstance().update();
             }
         };
-        Map<String, String> parameterMap = new HashMap<>();
-        this.getInputValueMap().forEach((inputId, valueSet) -> {
-            if((!inputId.equals(EXECUTION_NAME_ID)) & (!inputId.equals(RESULTS_DIR_ID))) {
-                String inputValue;
-                if (valueSet instanceof ValueList) {
-                    inputValue = String.join(ApplicationConstants.SEPARATOR_LIST, valueSet.getValuesAsStrings());
-                } else {
-                    Float[] startStepStop = ((ValueRange) valueSet).getRangeLimits();
-                    inputValue = startStepStop[0] + ApplicationConstants.SEPARATOR_INPUT
-                            + startStepStop[2] + ApplicationConstants.SEPARATOR_INPUT
-                            + startStepStop[1];
-                }
-                parameterMap.put(inputId, inputValue);
-            }
-        });
-        WorkflowService.Util.getInstance().launchSimulation(parameterMap,
+
+        WorkflowService.Util.getInstance().launchSimulation(this.getParametersMap(),
                 applicationName, applicationVersion, applicationClass,
                 getSimulationName(), callback);
     }
@@ -750,6 +836,14 @@ public class LaunchFormLayout extends VLayout {
      */
     private void resetLaunchButton(){
         WidgetUtil.resetIButton(launchButton, "Launch", ApplicationConstants.ICON_LAUNCH);
+        updateErrorMessages();
+    }
+
+    /**
+     * Resets the save inputs button to its initial state.
+     */
+    protected void resetSaveInputsButton() {
+        WidgetUtil.resetIButton(saveInputsButton, "Save Inputs", CoreConstants.ICON_SAVED);
         updateErrorMessages();
     }
 

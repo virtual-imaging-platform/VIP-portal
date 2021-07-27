@@ -105,11 +105,7 @@ public class LaunchTab extends AbstractLaunchTab {
                         applicationName, applicationVersion, applicationClass);
                 layout.addMember(formLayout);
                 modal.hide();
-                /*
-
-                configureLaunchButton();
-                configureSaveInputsButton();
-
+/*
                 if (CoreModule.user.isSystemAdministrator() || CoreModule.user.isGroupAdmin()) {
                     configureSaveAsExampleButton();
                     launchFormLayout.addButtons(launchButton, saveInputsButton,
@@ -120,11 +116,11 @@ public class LaunchTab extends AbstractLaunchTab {
 
                 launchFormLayout.configureCitation(applicationName);
 
-                modal.hide();
+                modal.hide();*/
 
                 configureInputsLayout(true);
-
-                if (simulationName != null) {
+/*
+                if (getSimulationName() != null) {
                     launchFormLayout.loadInputs(simulationName, inputs);
                 }*/
             }

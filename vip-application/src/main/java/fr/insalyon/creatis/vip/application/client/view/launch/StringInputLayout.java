@@ -4,6 +4,8 @@ import com.smartgwt.client.widgets.form.fields.FormItem;
 import com.smartgwt.client.widgets.form.fields.PickerIcon;
 import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.form.validator.RegExpValidator;
+import com.smartgwt.client.widgets.form.validator.RequiredIfFunction;
+import com.smartgwt.client.widgets.form.validator.RequiredIfValidator;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
 import fr.insalyon.creatis.vip.application.client.view.boutiquesParsing.BoutiquesInputString;
 import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
@@ -18,6 +20,7 @@ import fr.insalyon.creatis.vip.datamanager.client.view.selection.PathSelectionWi
  * @version %I%, %G%
  */
 public class StringInputLayout extends InputLayout{
+    private final String allowedCharacters;
     /**
      * Initialise graphical labels and main input field
      *
@@ -29,14 +32,13 @@ public class StringInputLayout extends InputLayout{
     public StringInputLayout(BoutiquesInputString input, LaunchFormLayout parentLayout, boolean hasAddValueButton,
                              String allowedChar) {
         super(input, parentLayout);
+        this.allowedCharacters = allowedChar;
         // Remove add value button if needed
         TextItem mainField = (TextItem) this.masterForm.getField(MAIN_FIELD_NAME);
         if (!hasAddValueButton){
             mainField.setIcons();
         }
-        mainField.setKeyPressFilter(allowedChar);
-        mainField.setValidators(ValidatorUtil.getStringValidator(
-                "^(" + allowedChar + ")+$"));
+        this.allowCharacters(mainField);
     }
 
     /**
@@ -47,7 +49,6 @@ public class StringInputLayout extends InputLayout{
     protected FormItem getFormItem() {
         final TextItem inputField = FieldUtil.getTextItem(400, ".");
         inputField.setValue(this.getDefaultValue());
-        inputField.setRequired(!this.isOptional());
         assert this.input instanceof BoutiquesInputString;
         if(this.isFile()){
             // Add browse icon
@@ -55,11 +56,30 @@ public class StringInputLayout extends InputLayout{
                     event -> new PathSelectionWindow(inputField).show());
             browsePicker.setPrompt("Browse on the Grid");
             inputField.setIcons(browsePicker);
+            if(this.allowedCharacters != null) {
+                this.allowCharacters(inputField);
+            }
         }
+
         return inputField;
     }
 
+    /**
+     * @return boolean: true if this input represents a file input, false if it represent an arbitrary string input.
+     */
     public boolean isFile(){
         return ((BoutiquesInputString) this.input).getType().equals("File");
+    }
+
+    /**
+     * Ensure provided input field accepts only allowed characters
+     *
+     * @param inputField TextItem
+     */
+    private void allowCharacters(TextItem inputField){
+            inputField.setKeyPressFilter(this.allowedCharacters);
+            inputField.setValidators(
+                    ValidatorUtil.getStringValidator("^" + this.allowedCharacters + "+$"),
+                    new RequiredIfValidator((formItem, value) -> !this.isOptional()));
     }
 }

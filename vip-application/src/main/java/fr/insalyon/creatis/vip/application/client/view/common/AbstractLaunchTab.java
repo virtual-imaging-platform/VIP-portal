@@ -318,7 +318,7 @@ public abstract class AbstractLaunchTab extends Tab {
                         getTab(ApplicationConstants.getLaunchTabID(applicationName));
                 launchTab.loadInputsList();
                 resetSaveInputsButton();
-                Layout.getInstance().setNoticeMessage("Input values were succesfully saved!", 10);
+                Layout.getInstance().setNoticeMessage("Input values were successfully saved!", 10);
             }
         };
         if (update) {
