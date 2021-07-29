@@ -32,24 +32,22 @@
 package fr.insalyon.creatis.vip.application.client.view.common;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.IButton;
-import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.tab.Tab;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
 import fr.insalyon.creatis.vip.application.client.bean.SimulationInput;
 import fr.insalyon.creatis.vip.application.client.rpc.WorkflowService;
 import fr.insalyon.creatis.vip.application.client.rpc.WorkflowServiceAsync;
+import fr.insalyon.creatis.vip.application.client.view.launch.AbstractLaunchFormLayout;
 import fr.insalyon.creatis.vip.application.client.view.launch.InputsLayout;
-import fr.insalyon.creatis.vip.application.client.view.launch.LaunchFormLayoutOld;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -64,7 +62,7 @@ public abstract class AbstractLaunchTab extends Tab {
     protected String applicationVersion;
     protected String applicationClass;
     protected ModalWindow modal;
-    protected LaunchFormLayoutOld launchFormLayout;
+    protected AbstractLaunchFormLayout abstractLaunchFormLayout;
     protected InputsLayout inputsLayout;
     protected IButton launchButton;
     protected IButton saveInputsButton;
@@ -114,7 +112,7 @@ public abstract class AbstractLaunchTab extends Tab {
      */
     public void loadInput(String simulationName, String values) {
 
-        Map<String, String> valuesMap = new HashMap<String, String>();
+        Map<String, String> valuesMap = new HashMap<>();
 
         for (String input : values.split("<br />")) {
             String[] s = input.split(" = ");
@@ -130,24 +128,7 @@ public abstract class AbstractLaunchTab extends Tab {
      * @param values Input values map
      */
     public void loadInput(String simulationName, Map<String, String> values) {
-
-        launchFormLayout.loadInputs(simulationName, values);
-    }
-
-    /**
-     * Sets a value to an input name. The value should be in the following
-     * forms:
-     *
-     * For single list field: a string For multiple list fields: strings
-     * separated by '; ' For ranges: an string like 'Start: 0 - Stop: 0 - Step:
-     * 0'
-     *
-     * @param inputName
-     * @param value
-     */
-    public void setInputValue(String inputName, String value) {
-
-        launchFormLayout.setInputValue(inputName, value);
+        abstractLaunchFormLayout.loadInputs(simulationName, values);
     }
 
     /**
@@ -161,11 +142,11 @@ public abstract class AbstractLaunchTab extends Tab {
 
     /**
      *
-     * @return
+     * @return Map of String input IDs to String representing corresponding input values
      */
     protected Map<String, String> getParametersMap() {
 
-        return launchFormLayout.getParametersMap();
+        return abstractLaunchFormLayout.getParametersMap();
     }
 
     /**
@@ -174,14 +155,11 @@ public abstract class AbstractLaunchTab extends Tab {
     protected void configureLaunchButton() {
 
         launchButton = WidgetUtil.getIButton("Launch", ApplicationConstants.ICON_LAUNCH,
-                new ClickHandler() {
-                    @Override
-                    public void onClick(ClickEvent event) {
-                        if (validate()) {
-                            launch();
-                        } else {
-                            Layout.getInstance().setWarningMessage("Cannot launch. Some inputs are not valid.");
-                        }
+                event -> {
+                    if (validate()) {
+                        launch();
+                    } else {
+                        Layout.getInstance().setWarningMessage("Cannot launch. Some inputs are not valid.");
                     }
                 });
     }
@@ -199,14 +177,11 @@ public abstract class AbstractLaunchTab extends Tab {
     protected void configureSaveInputsButton() {
 
         saveInputsButton = WidgetUtil.getIButton("Save Inputs", CoreConstants.ICON_SAVED,
-                new ClickHandler() {
-                    @Override
-                    public void onClick(ClickEvent event) {
-                        if (validate()) {
-                            saveInputs();
-                        } else {
-                            Layout.getInstance().setWarningMessage("Cannot save inputs. Some inputs are not valid.");
-                        }
+                event -> {
+                    if (validate()) {
+                        saveInputs();
+                    } else {
+                        Layout.getInstance().setWarningMessage("Cannot save inputs. Some inputs are not valid.");
                     }
                 });
     }
@@ -225,12 +200,9 @@ public abstract class AbstractLaunchTab extends Tab {
     protected void configureSaveAsExampleButton() {
 
         saveAsExampleButton = WidgetUtil.getIButton("Save as Example", CoreConstants.ICON_EXAMPLE,
-                new ClickHandler() {
-                    @Override
-                    public void onClick(ClickEvent event) {
-                        if (validate()) {
-                            saveInputsAsExample();
-                        }
+                event -> {
+                    if (validate()) {
+                        saveInputsAsExample();
                     }
                 });
         saveAsExampleButton.setPrompt("Save the inputs as a featured example that will "
@@ -249,11 +221,11 @@ public abstract class AbstractLaunchTab extends Tab {
     /**
      * Gets the name of the simulation.
      *
-     * @return
+     * @return String
      */
     protected String getSimulationName() {
-
-        return launchFormLayout.getSimulationName();
+        SC.logInfo(String.valueOf(abstractLaunchFormLayout));
+        return abstractLaunchFormLayout.getSimulationName();
     }
 
     /**
@@ -262,7 +234,7 @@ public abstract class AbstractLaunchTab extends Tab {
      * @return Result of the validation
      */
     protected boolean validate() {
-        return launchFormLayout.validate();
+        return abstractLaunchFormLayout.validate();
     }
 
     /**
@@ -287,16 +259,13 @@ public abstract class AbstractLaunchTab extends Tab {
             @Override
             public void onSuccess(SimulationInput result) {
                 SC.ask("A simulation entitled \"" + getSimulationName() + "\" "
-                        + "already exists. <br />Do you want to ovewrite the input data?", new BooleanCallback() {
-                    @Override
-                    public void execute(Boolean value) {
-                        if (value) {
-                            saveInputs(true);
-                        } else {
-                            resetSaveInputsButton();
-                        }
-                    }
-                });
+                        + "already exists. <br />Do you want to overwrite the input data?", value -> {
+                            if (value) {
+                                saveInputs(true);
+                            } else {
+                                resetSaveInputsButton();
+                            }
+                        });
             }
         };
         service.getInputByNameUserApp(getSimulationName(), applicationName, callback);
@@ -345,7 +314,7 @@ public abstract class AbstractLaunchTab extends Tab {
                         getTab(ApplicationConstants.getLaunchTabID(applicationName));
                 launchTab.loadInputsList();
                 resetSaveAsExampleButton();
-                Layout.getInstance().setNoticeMessage("Examples input values were succesfully saved!", 10);
+                Layout.getInstance().setNoticeMessage("Examples input values were successfully saved!", 10);
             }
         };
         service.saveInputsAsExamples(getSimulationInput(), callback);

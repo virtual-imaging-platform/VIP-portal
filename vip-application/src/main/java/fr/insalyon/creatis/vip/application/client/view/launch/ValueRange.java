@@ -1,6 +1,7 @@
 package fr.insalyon.creatis.vip.application.client.view.launch;
 
 import com.smartgwt.client.widgets.form.DynamicForm;
+import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
 
 import java.util.Arrays;
 import java.util.Objects;
@@ -13,6 +14,19 @@ import java.util.Objects;
  */
 public class ValueRange extends ValueSet {
     protected final Float[] rangeLimits; // start, step, end
+
+    /**
+     * @param value String to convert to float
+     * @return      Float representing value, or null if value is ApplicationConstants.INPUT_WITHOUT_VALUE
+     * @throws NumberFormatException if value is neither ApplicationConstants.INPUT_WITHOUT_VALUE nor a valid
+     *                               representation of a float
+     */
+    public static Float floatValue(String value) throws NumberFormatException{
+        if(value.equals(ApplicationConstants.INPUT_WITHOUT_VALUE)){
+            return null;
+        }
+        return Float.parseFloat(value);
+    }
 
     /**
      * Populate represented list of values from the range represented by masterForm
@@ -33,6 +47,35 @@ public class ValueRange extends ValueSet {
             throw new RuntimeException("Cannot create value range: please ensure provided form has fields with names "
                                        + Arrays.toString(NumberInputLayout.RangeItem.names) + " and numeric values.");
         }
+        initializeValues();
+    }
+
+    /**
+     * Initialized this from start, stop and step values represented as Strings
+     *
+     * @param start String
+     * @param stop String
+     * @param step String
+     * @throws NumberFormatException if at least one of the values is neither a float nor
+     * ApplicationConstants.INPUT_WITHOUT_VALUE
+     */
+    public ValueRange(String start, String stop, String step) throws NumberFormatException{
+        this.rangeLimits = new Float[3];
+        try{
+            this.rangeLimits[0] = floatValue(start);
+            this.rangeLimits[1] = floatValue(step);
+            this.rangeLimits[2] = floatValue(stop);
+        } catch (NumberFormatException exception){
+            throw new NumberFormatException("At least one of range limits is not a valid representation of a float " +
+                    "or of an empty value.</br>" + "Received range limits: " + start + ", " + step + " and " + stop);
+        }
+        initializeValues();
+    }
+
+    /**
+     * Initialize all values from range limits
+     */
+    private void initializeValues() {
         float previousValue = this.rangeLimits[0];
         while(previousValue <= this.rangeLimits[2]){
             this.values.add(previousValue);

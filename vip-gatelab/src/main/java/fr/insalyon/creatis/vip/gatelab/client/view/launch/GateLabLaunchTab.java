@@ -39,7 +39,7 @@ import fr.insalyon.creatis.vip.application.client.bean.Descriptor;
 import fr.insalyon.creatis.vip.application.client.bean.Source;
 import fr.insalyon.creatis.vip.application.client.rpc.WorkflowService;
 import fr.insalyon.creatis.vip.application.client.view.common.AbstractLaunchTab;
-import fr.insalyon.creatis.vip.application.client.view.launch.LaunchFormLayoutOld;
+import fr.insalyon.creatis.vip.application.client.view.launch.GateLabLaunchFormLayout;
 import fr.insalyon.creatis.vip.application.client.view.monitor.timeline.TimelineLayout;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
@@ -54,6 +54,7 @@ import fr.insalyon.creatis.vip.gatelab.client.rpc.GateLabServiceAsync;
  */
 public class GateLabLaunchTab extends AbstractLaunchTab {
 
+    protected GateLabLaunchFormLayout launchFormLayout;
     private LoadMacWindow loadMacWindow;
     private String baseDir;
     private IButton loadMacButton;
@@ -70,6 +71,22 @@ public class GateLabLaunchTab extends AbstractLaunchTab {
         loadData();
     }
 
+    /**
+     * Sets a value to an input name. The value should be in the following
+     * forms:
+     *
+     * For single list field: a string For multiple list fields: strings
+     * separated by '; ' For ranges: an string like 'Start: 0 - Stop: 0 - Step:
+     * 0'
+     *
+     * @param inputName
+     * @param value
+     */
+    public void setInputValue(String inputName, String value) {
+
+        launchFormLayout.setInputValue(inputName, value);
+    }
+
     private void loadData() {
 
         final AsyncCallback<Descriptor> callback = new AsyncCallback<Descriptor>() {
@@ -82,10 +99,12 @@ public class GateLabLaunchTab extends AbstractLaunchTab {
             @Override
             public void onSuccess(Descriptor descriptor) {
 
-                launchFormLayout = new LaunchFormLayoutOld(applicationName + " " + applicationVersion, null, descriptor.getDescription());
+                launchFormLayout = new GateLabLaunchFormLayout(applicationName + " " + applicationVersion,
+                        null, descriptor.getDescription());
+                abstractLaunchFormLayout = launchFormLayout;
                 layout.addMember(launchFormLayout);
 
-                launchFormLayout.setSourcesLayoutVisibible(false);
+                launchFormLayout.setSourcesLayoutVisible(false);
 
                 for (Source source : descriptor.getSources()) {
                     launchFormLayout.addSource(new GateLabSourceLayout(source.getName(), source.getDescription(), modal));
@@ -141,7 +160,7 @@ public class GateLabLaunchTab extends AbstractLaunchTab {
             setInputValue(ps[0], ps[1]);
             
             loadMacButton.hide();
-            launchFormLayout.setSourcesLayoutVisibible(true);
+            launchFormLayout.setSourcesLayoutVisible(true);
 
             configureLaunchButton();
             configureSaveInputsButton();

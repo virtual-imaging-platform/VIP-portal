@@ -31,9 +31,7 @@
  */
 package fr.insalyon.creatis.vip.application.client.view.launch;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.types.Cursor;
-import com.smartgwt.client.types.VerticalAlignment;
 import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.IButton;
@@ -41,14 +39,10 @@ import com.smartgwt.client.widgets.Label;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.fields.TextItem;
-import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
-import fr.insalyon.creatis.vip.application.client.rpc.ApplicationService;
 import fr.insalyon.creatis.vip.application.client.view.common.AbstractSourceLayout;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
-import fr.insalyon.creatis.vip.core.client.view.common.AbstractFormLayout;
-import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
 import fr.insalyon.creatis.vip.core.client.view.util.ValidatorUtil;
 import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
@@ -64,15 +58,15 @@ import java.util.stream.Collectors;
  *
  * @author Rafael Ferreira da Silva
  */
-public class LaunchFormLayoutOld extends AbstractFormLayout {
+public class GateLabLaunchFormLayout extends AbstractLaunchFormLayout {
 
-    private static Logger logger = Logger.getLogger(LaunchFormLayoutOld.class.getName());
+    private static Logger logger = Logger.getLogger(GateLabLaunchFormLayout.class.getName());
 
     private TextItem simulationNameItem;
     private VLayout sourcesLayout;
     private VLayout executionNameLayout;
 
-    public LaunchFormLayoutOld(String title, String icon, final String description, boolean executionNamePadding) {
+    public GateLabLaunchFormLayout(String title, String icon, final String description, boolean executionNamePadding) {
         super("600", "*");
         addTitle(title, icon);
 
@@ -110,7 +104,7 @@ public class LaunchFormLayoutOld extends AbstractFormLayout {
     }
 
     // Constructor called by GateLab application
-    public LaunchFormLayoutOld(String title, String icon, final String description) {
+    public GateLabLaunchFormLayout(String title, String icon, final String description) {
         this(title, icon, description, false);
     }
 
@@ -140,21 +134,13 @@ public class LaunchFormLayoutOld extends AbstractFormLayout {
     }
 
     /**
+     * Add given buttons to this
      *
-     * @param margin
-     * @param buttons
+     *  @param margin   int margin before added buttons
+     * @param buttons   IButton... to add to this
      */
     public void addButtons(int margin, IButton... buttons) {
-
-        HLayout buttonsLayout = new HLayout(5);
-        buttonsLayout.setAlign(VerticalAlignment.CENTER);
-        buttonsLayout.setMargin(margin);
-
-        for (IButton button : buttons) {
-            buttonsLayout.addMember(button);
-        }
-
-        this.addMember(buttonsLayout);
+        this.addMember(getButtonLayout(margin, buttons));
     }
 
     /**
@@ -297,43 +283,8 @@ public class LaunchFormLayoutOld extends AbstractFormLayout {
      *
      * @param visible
      */
-    public void setSourcesLayoutVisibible(boolean visible) {
+    public void setSourcesLayoutVisible(boolean visible) {
 
         sourcesLayout.setVisible(visible);
-    }
-
-    /**
-     *
-     * @param applicationName
-     */
-    public void configureCitation(String applicationName) {
-
-        AsyncCallback<String> callback = new AsyncCallback<String>() {
-            @Override
-            public void onFailure(Throwable caught) {
-                Layout.getInstance().setWarningMessage("Unable to load citation:<br />" + caught.getMessage());
-            }
-
-            @Override
-            public void onSuccess(String result) {
-                if (result != null || !result.isEmpty() || !result.equals("")) {
-
-                    VLayout citationLayout = new VLayout(5);
-                    citationLayout.addMember(WidgetUtil.getLabel("<b>Please refer to the following publication:</b>", 20));
-
-                    Label citation = new Label(result);
-                    citation.setWidth100();
-                    citation.setAutoHeight();
-                    citation.setCanSelectText(true);
-                    citation.setPadding(5);
-                    citation.setBackgroundColor("#FFFFFF");
-                    citation.setBorder("1px solid #CCCCCC");
-                    citationLayout.addMember(citation);
-
-                    addMember(citationLayout);
-                }
-            }
-        };
-        ApplicationService.Util.getInstance().getCitation(applicationName, callback);
     }
 }

@@ -1,5 +1,6 @@
 package fr.insalyon.creatis.vip.application.client.view.launch;
 
+import com.smartgwt.client.util.SC;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
 
 import java.util.ArrayList;
@@ -77,4 +78,17 @@ public abstract class ValueSet {
      * @see #valuesAsStrings
      */
     public abstract boolean isEqualTo(ValueSet comparedValueSet);
+
+    /**
+     * @param stringValues String to convert to a ValueSet
+     * @return             ValueSet representing the same values
+     */
+    public static ValueSet valueSetFactory(String stringValues){
+        if ((stringValues != null) && stringValues.contains("Start: ")) { // Range
+            String[] v = stringValues.split("(: | - )");
+            return new ValueRange(v[1].trim(), v[3].trim(), v[5].trim());
+        } else { // List
+            return new ValueList(stringValues, "; ");
+        }
+    }
 }

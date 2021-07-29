@@ -1,8 +1,10 @@
 package fr.insalyon.creatis.vip.application.client.view.launch;
 
+import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.CheckboxItem;
 import com.smartgwt.client.widgets.form.fields.FormItem;
+import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
 
 import java.util.ArrayList;
 
@@ -33,7 +35,9 @@ public class ValueList extends ValueSet{
             }
             return null;
         }
-        return valueField.getValue();
+        Object value = valueField.getValue();
+        Object test = (Object) value;
+        return value;
     }
 
     /**
@@ -54,6 +58,24 @@ public class ValueList extends ValueSet{
             Object iValue = formValue(iForm);
             this.values.add(iValue);
             this.valuesAsStrings.add(valueAsString(iValue));
+        }
+    }
+
+    /**
+     * Initializes this from a String with values separated with given separator
+     *
+     * @param stringValues String to initialize this from
+     * @param separator    String
+     */
+    public ValueList(String stringValues, String separator){
+        if(stringValues == null){
+            this.values.add(null);
+            this.valuesAsStrings.add(valueAsString(null));
+            return;
+        }
+        for(String value : stringValues.split(separator)){
+            this.values.add(value.equals(valueAsString(null)) ? null : value.trim());
+            this.valuesAsStrings.add(value.trim());
         }
     }
 

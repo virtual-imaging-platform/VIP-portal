@@ -2,6 +2,7 @@ package fr.insalyon.creatis.vip.application.client.view.launch;
 
 import com.google.gwt.core.client.GWT;
 import com.smartgwt.client.types.PickerIconName;
+import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.Label;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.FormItem;
@@ -326,29 +327,22 @@ public abstract class InputLayout extends VLayout {
      * happens on the values tracked by this (value changed by user, addition or removal of an additional form...)
      */
     protected void onValueChanged(){
-        GWT.log("hasUniqueVal");
         if(this.hasUniqueValue()){
-            GWT.log("removeUnsupportedDependencies");
             this.parentLayout.removeUnsupportedDependencies(this.getInputId());
-            GWT.log("checkDependencies");
+
             this.checkDependencies();
         } else {
             this.parentLayout.addUnsupportedDependencies(this);
             this.enableInput();
         }
-        GWT.log("disables");
+
         this.disables.forEach(InputLayout::checkDependencies);
-        GWT.log("requiredBy");
         this.requiredBy.forEach(InputLayout::checkDependencies);
         // Value-requires does not enable/disable target inputs, but only produces validation errors, thus we call
         // validateInput, not checkDependencies
-        GWT.log("requiredByValue");
         this.requiredByValue.keySet().forEach(ValueChoiceInputLayout::validateInput);
-        GWT.log("validateInput");
         this.validateInput();
-        GWT.log("validateGroups");
         this.parentLayout.validateGroups();
-        GWT.log("done");
     }
 
     /**

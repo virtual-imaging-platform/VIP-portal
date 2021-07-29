@@ -32,9 +32,8 @@
 package fr.insalyon.creatis.vip.application.client.view.launch;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.smartgwt.client.util.SC;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
-import fr.insalyon.creatis.vip.application.client.bean.Descriptor;
-import fr.insalyon.creatis.vip.application.client.bean.Source;
 import fr.insalyon.creatis.vip.application.client.rpc.WorkflowService;
 import fr.insalyon.creatis.vip.application.client.rpc.WorkflowServiceAsync;
 import fr.insalyon.creatis.vip.application.client.view.boutiquesParsing.BoutiquesDescriptor;
@@ -56,31 +55,18 @@ import java.util.Map;
  */
 public class LaunchTab extends AbstractLaunchTab {
 
-    private ArrayList<String> disabledSources;
+    protected LaunchFormLayout launchFormLayout;
     
     public LaunchTab(String applicationName, String applicationVersion, String applicationClass) {
-        this(applicationName, applicationVersion, applicationClass, null, null, null);
+        this(applicationName, applicationVersion, applicationClass, null, null);
     }
 
     public LaunchTab(String applicationName, String applicationVersion,
             String applicationClass, String simulationName, Map<String, String> inputs) {
 
-        this(applicationName, applicationVersion, applicationClass, 
-                simulationName, inputs, null);
-    }
-
-    public LaunchTab(String applicationName, String applicationVersion,
-            String applicationClass, String simulationName, 
-            Map<String, String> inputs, String[] disabled) {
-
         super(applicationName, applicationVersion, applicationClass);
         layout.clear();
-        /*disabledSources = new ArrayList<String>();
-        if (disabled != null) {
-            disabledSources.addAll(Arrays.asList(disabled));
-        }
-        loadData(simulationName, inputs);*/
-        loadDescriptor();
+        loadDescriptor(simulationName, inputs);
     }
 
     public boolean hasID() {
@@ -90,7 +76,8 @@ public class LaunchTab extends AbstractLaunchTab {
     /**
      * Loads simulation descriptor content as String.
      */
-    private void loadDescriptor() {
+    private void loadDescriptor(String simulationName,
+                                Map<String, String> inputs) {
         final AsyncCallback<String> callback = new AsyncCallback<String>() {
             @Override
             public void onFailure(Throwable caught) {
@@ -101,21 +88,25 @@ public class LaunchTab extends AbstractLaunchTab {
 
             @Override
             public void onSuccess(String StringInputLayout) {
-                LaunchFormLayout formLayout = new LaunchFormLayout(new BoutiquesDescriptor(StringInputLayout),
+                launchFormLayout = new LaunchFormLayout(new BoutiquesDescriptor(StringInputLayout),
                         applicationName, applicationVersion, applicationClass);
-                layout.addMember(formLayout);
-                modal.hide();
-/*
-
+                abstractLaunchFormLayout = launchFormLayout;
+                layout.addMember(launchFormLayout);
+                configureLaunchButton();
+                configureSaveInputsButton();
+                if (CoreModule.user.isSystemAdministrator() || CoreModule.user.isGroupAdmin()) {
+                    configureSaveAsExampleButton();
+                    launchFormLayout.addButtons(launchButton, saveInputsButton,
+                            saveAsExampleButton);
+                } else {
+                    launchFormLayout.addButtons(launchButton, saveInputsButton);
+                }
                 launchFormLayout.configureCitation(applicationName);
-
-                modal.hide();*/
-
+                modal.hide();
                 configureInputsLayout(true);
-/*
-                if (getSimulationName() != null) {
+                if ((getSimulationName() != null) && (inputs != null)) {
                     launchFormLayout.loadInputs(simulationName, inputs);
-                }*/
+                }
             }
         };
         modal.show("Loading launch panel...", true);
@@ -124,88 +115,26 @@ public class LaunchTab extends AbstractLaunchTab {
     }
 
     /**
-     * Loads simulation sources list.
+     * Loads input values from map.
+     *
+     * @param simulationName Simulation name
+     * @param values Input values map
      */
-    private void loadData(final String simulationName, final Map<String, String> inputs) {
+    public void loadInput(String simulationName, Map<String, String> values) {
 
-        final AsyncCallback<Descriptor> callback = new AsyncCallback<Descriptor>() {
-            @Override
-            public void onFailure(Throwable caught) {
-                modal.hide();
-                Layout.getInstance().setWarningMessage("Unable to download application source file:<br />" + caught.getMessage(), 10);
-            }
-
-            @Override
-            public void onSuccess(Descriptor descriptor) {
-                launchFormLayout = new LaunchFormLayoutOld(applicationName + " " + applicationVersion, null, descriptor.getDescription(), true);
-                layout.addMember(launchFormLayout);
-                
-                // Put mandatory sources first
-                List<Source> mandatorySources = new ArrayList<Source>();
-                List<Source> optionalSources = new ArrayList<Source>();
-                for (Source source : descriptor.getSources()) {
-                    if (source.isOptional()) {
-                        optionalSources.add(source);
-                    } else {
-                        mandatorySources.add(source);
-                    }
-                }
-                mandatorySources.addAll(optionalSources);
-                                                
-                for (Source source : mandatorySources) {
-                    boolean disabled = false;
-                    for (String name : disabledSources) {
-                        if (source.getName().equals(name)) {
-                            disabled = true;
-                        }
-                    }
-                    modal.show("Adding source "+source.getName()+"...", true);
-                    
-                    // If the source type is a flag type (one of the boutiques types), InputFlagLayout creation instead of InputLayout.
-                    if (source.getVipTypeRestriction() != null && source.getVipTypeRestriction().equals("flag")) {
-                        launchFormLayout.addSource(new InputFlagLayout(source.getName(), source.getDescription(), source.isOptional(), source.getDefaultValue(), source.getVipTypeRestriction(), source.getPrettyName()), disabled);
-                    }
-                    else {
-                        launchFormLayout.addSource(new InputLayoutOld(source.getName(), source.getDescription(), source.isOptional(), source.getDefaultValue(), source.getPrettyName()), disabled);
-                    }
-                }
-
-                configureLaunchButton();
-                configureSaveInputsButton();
-
-                if (CoreModule.user.isSystemAdministrator() || CoreModule.user.isGroupAdmin()) {
-                    configureSaveAsExampleButton();
-                    launchFormLayout.addButtons(launchButton, saveInputsButton,
-                            saveAsExampleButton);
-                } else {
-                    launchFormLayout.addButtons(launchButton, saveInputsButton);
-                }
-
-                launchFormLayout.configureCitation(applicationName);
-
-                modal.hide();
-
-                configureInputsLayout(true);
-                
-                if (simulationName != null) {
-                    launchFormLayout.loadInputs(simulationName, inputs);
-                }
-            }
-        };
-        modal.show("Loading launch panel...", true);
-        WorkflowService.Util.getInstance().getApplicationDescriptor(applicationName, applicationVersion, callback);
+        launchFormLayout.loadInputs(simulationName, values);
     }
+
 
     /**
      * Launches a simulation.
      */
     @Override
     protected void launch() {
-
         WidgetUtil.setLoadingIButton(launchButton, "Launching...");
-        
+
         // Input data verification
-        List<String> inputData = new ArrayList<String>();
+        List<String> inputData = new ArrayList<>();
         for (String input : getParametersMap().values()) {
             if (input.startsWith(DataManagerConstants.ROOT)) {
                 if (input.contains(ApplicationConstants.SEPARATOR_LIST)) {
@@ -236,10 +165,33 @@ public class LaunchTab extends AbstractLaunchTab {
     }
 
     /**
+     * Resets the launch button to its initial state.
+     */
+    protected void resetLaunchButton() {
+        super.resetLaunchButton();
+        this.launchFormLayout.updateErrorMessages();
+    }
+
+    /**
+     * Resets the save inputs button to its initial state.
+     */
+    protected void resetSaveInputsButton() {
+        super.resetSaveInputsButton();
+        this.launchFormLayout.updateErrorMessages();
+    }
+
+    /**
+     * Resets the save as example button to its initial state.
+     */
+    protected void resetSaveAsExampleButton() {
+        super.resetSaveAsExampleButton();
+        this.launchFormLayout.updateErrorMessages();
+    }
+
+    /**
      * Submits a simulation to the workflow engine.
      */
     private void submit() {
-
         final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
             @Override
             public void onFailure(Throwable caught) {

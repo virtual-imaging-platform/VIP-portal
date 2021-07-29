@@ -41,6 +41,9 @@ public class FlagInputLayout extends InputLayout{
     @Override
     public boolean isMasterEmpty(){
         Object masterValue = ValueList.formValue(this.masterForm);
+        if(masterValue instanceof String){
+            masterValue = Boolean.parseBoolean((String) masterValue);
+        }
         assert masterValue instanceof Boolean;
         return  !((boolean) masterValue);
     }
