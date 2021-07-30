@@ -86,11 +86,17 @@ public class ExternalPlatformBusiness {
     public ParseResult parseParameter(
             String parameterName, String parameterValue, User user)
             throws BusinessException {
-        if (!parameterValue.matches("^\\w+:.*")) {
+        if ( ! parameterValue.matches("^\\w+:.*")) {
              return new ParseResult(false, parameterValue);
         }
         int indexOfColon = parameterValue.indexOf(':');
         String platformIdentifier = parameterValue.substring(0, indexOfColon);
+
+        if ("file".equals(platformIdentifier)) {
+            // its a local file keep it as it is
+            return new ParseResult(true, parameterValue);
+        }
+
         String fileIdentifier = parameterValue.substring(indexOfColon + 1);
         ExternalPlatform externalPlatform = getById(platformIdentifier);
         if (externalPlatform == null) {

@@ -58,10 +58,9 @@ public class VelocityUtils {
         velocityEngine.init();
     }
 
-    public String createDocument(HashMap<String, BoutiquesTool> btMaps, String vmTemplate) {
+    public String createDocument(BoutiquesTool bt, String vmTemplate) {
         VelocityContext context = new VelocityContext();
-        for (Map.Entry<String, BoutiquesTool> e  : btMaps.entrySet())
-             context.put(e.getKey(), e.getValue());
+        context.put("tool", bt);
         context.put("esc", new EscapeTool());
 
         StringWriter stringWriter = new StringWriter();

@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<workflow name="$tool.getName()" version="$tool.getToolVersion()">
+  <description>$esc.xml($tool.getDescription())</description>
+  <interface>
+    <source name="results-directory" type="URI" optional="false" default="/vip/Home" pretty-name="Results directory">
+        <source-comment>Directory where the results will be stored.</source-comment>
+    </source>
+#foreach( $input in $tool.getInputs() )
+  #set($type="string")
+  #if($input.getType()=="File")
+    #set($type="URI")
+  #end
+  #if($input.getType()=="Flag")
+    <source name="$input.getId()" type="string" optional="$input.isOptional()" default="$input.getCommandLineFlag()" vip-type-restriction="flag" pretty-name="$input.getName()">
+  #else
+    #if($input.getDefaultValue()!="null" && $input.getDefaultValue()!="")
+    <source name="$input.getId()" type="$type" optional="$input.isOptional()" default="$input.getDefaultValue()" pretty-name="$input.getName()">
+    #else
+      #if($input.isOptional()==true)
+    <source name="$input.getId()" type="$type" optional="$input.isOptional()" default="No_value_provided" pretty-name="$input.getName()">
+      #else
+    <source name="$input.getId()" type="$type" optional="$input.isOptional()" pretty-name="$input.getName()">
+      #end
+    #end
+  #end
+      <source-comment>$esc.xml($input.getDescription())</source-comment>
+    </source>
+#end
+#foreach($output in $tool.getOutputFiles())
+    <sink name="$output.getId()" type="URI" />
+#end
+  </interface>
+  <processors>
+    <processor name="append-date" >
+      <in name="dir" type="URI" depth="0" />
+      <out name="result" type="string" depth="0" />
+      <beanshell>/*----------Beginning of Beanshell------------*/
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+String result = dir.toString();
+if ( result.startsWith("/") || result.startsWith("lfn:") ) {
+  DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy_HH:mm:ss");
+  result = result + "/" + (dateFormat.format(System.currentTimeMillis()));
+}
+/*------------End of Beanshell------------*/
+      </beanshell>
+    </processor>
+    <processor name="$tool.getName()" >
+        <in name="results-directory" type="string" depth="0"/>
+#foreach($input in $tool.getInputs())
+  #if($input.getType()=="File" )
+        <in name="$input.getId()" type="URI" depth="0"/>
+  #else
+        <in name="$input.getId()" type="string" depth="0"/>
+  #end
+#end
+#foreach( $output in $tool.getOutputFiles() )
+        <out name="$output.getId()" type="URI" depth="0"/>
+#end
+        <iterationstrategy>
+          <cross>
+            <dot>
+#foreach($input in $tool.getInputs())
+              <port name="$input.getId()"/>
+#end
+            </dot>
+            <port name="results-directory" />
+          </cross>
+        </iterationstrategy>
+        <gasw descriptor="lfn:$tool.getGASWLFN()"/>
+    </processor>
+  </processors>
+  <links>
+    <link from="results-directory" to="append-date:dir" />
+    <link from="append-date:result" to="$tool.getName():results-directory" />
+#foreach( $input in $tool.getInputs() )
+    <link from="$input.getId()" to="$tool.getName():$input.getId()" />
+#end
+#foreach($output in $tool.getOutputFiles())
+    <link from="$tool.getName():$output.getId()" to="$output.getId()" />
+#end
+  </links>
+</workflow>
