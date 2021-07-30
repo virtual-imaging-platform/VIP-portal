@@ -38,6 +38,7 @@ import fr.insalyon.creatis.vip.application.client.bean.Application;
 import fr.insalyon.creatis.vip.application.server.business.ApplicationBusiness;
 import fr.insalyon.creatis.vip.application.server.business.BoutiquesBusiness;
 import fr.insalyon.creatis.vip.applicationimporter.client.bean.BoutiquesTool;
+import fr.insalyon.creatis.vip.applicationimporter.client.view.Constants;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.business.Server;
@@ -103,55 +104,38 @@ public class ApplicationImporterBusiness {
     }
 
     public void createApplication(
-            BoutiquesTool bt, String type, String tag, HashMap<String,
-            BoutiquesTool> bts, boolean isRunOnGrid,
-            boolean overwriteApplicationVersion, User user, boolean challenge)
+            BoutiquesTool bt, String type, String tag, boolean isRunOnGrid, boolean overwriteApplicationVersion, User user)
             throws BusinessException {
 
         try {
-
-            HashMap<String, BoutiquesTool> btMaps = new HashMap<String, BoutiquesTool>();
-            btMaps.put("tool", bt);
-            // Will enventually be taken from the Constants.
             String wrapperTemplate = "vm/wrapper.vm";
             String gaswTemplate = "vm/gasw.vm";
-            String gwendiaTemplate = "vm/gwendia.vm";
-            // following the type of application, we have to add other descriptors
-            if (type.contains("challenge")) {
-                btMaps.putAll(bts);
-            }
-            // following the type of application, we have to add other descriptors
-            if (type.contains("msseg")) {
-                gwendiaTemplate = "vm/gwendia_challenge_msseg.vm";
-            } else if (type.contains("petseg")) {
-                gwendiaTemplate = "vm/gwendia_challenge_petseg.vm";
-            } else {}
-            // Check rights
-            checkEditionRights(bt.getName(), bt.getToolVersion(), overwriteApplicationVersion, user);
-            // set the correct LFN for each component of the application
-            for (Map.Entry<String, BoutiquesTool> e : btMaps.entrySet()) {
-                e.getValue().setApplicationLFN(
-                    lfcPathsBusiness.parseBaseDir(
-                        user, e.getValue().getApplicationLFN()).concat("/").concat(bt.getToolVersion().replaceAll("\\s+","")));
+
+            String gwendiaTemplate = "vm/gwendia-standalone.vm";
+            if (Constants.APP_IMPORTER_DOT_INPUTS_TYPE.equals(type)) {
+                gwendiaTemplate = "vm/gwendia-dot-inputs.vm";
+            } else if ( ! Constants.APP_IMPORTER_STANDALONE_TYPE.equals(type)) {
+                logger.error("Cannot import pipeline : unknown importer type : {}", type);
+                throw new BusinessException("Cannot import pipeline : unknown importer type");
             }
 
+            // Check rights
+            checkEditionRights(bt.getName(), bt.getToolVersion(), overwriteApplicationVersion, user);
+            // set the correct LFN
+            bt.setApplicationLFN(
+                lfcPathsBusiness.parseBaseDir(
+                    user, bt.getApplicationLFN()).concat("/").concat(bt.getToolVersion().replaceAll("\\s+","")));
+
             // Generate strings
-            // gwendia String is unique: one entry point for the workflow
-            String gwendiaString = velocityUtils.createDocument(btMaps, gwendiaTemplate);
-            HashMap<String, String> gaswString = new HashMap<>();
-            HashMap<String, String> wrapperString = new HashMap<>();
-            HashMap<String, String> gaswFileName = new HashMap<>();
-            HashMap<String, String> wrapperFileName = new HashMap<>();
-            // for each component we have to generate GASW and script files
-            for (Map.Entry<String, BoutiquesTool> e : btMaps.entrySet()) {
-                gaswString.put(e.getKey(), velocityUtils.createDocument(tag, e.getValue(), isRunOnGrid, gaswTemplate));
-                wrapperString.put(e.getKey(), velocityUtils.createDocument(tag, e.getValue(), isRunOnGrid, wrapperTemplate));
-                gaswFileName.put(e.getKey(), server.getApplicationImporterFileRepository() + e.getValue().getGASWLFN());
-                wrapperFileName.put(e.getKey(), server.getApplicationImporterFileRepository() + e.getValue().getWrapperLFN());
-            }
+            String gwendiaString = velocityUtils.createDocument(bt, gwendiaTemplate);
+            String gaswString = velocityUtils.createDocument(tag, bt, isRunOnGrid, gaswTemplate);
+            String wrapperString = velocityUtils.createDocument(tag, bt, isRunOnGrid, wrapperTemplate);
 
             // Write files
             String gwendiaFileName = server.getApplicationImporterFileRepository() + bt.getGwendiaLFN();
+            String gaswFileName = server.getApplicationImporterFileRepository() + bt.getGASWLFN();
+            String wrapperFileName = server.getApplicationImporterFileRepository() + bt.getWrapperLFN();
+
             System.out.print(gwendiaFileName + "\n");
             writeString(gwendiaString, gwendiaFileName);
             uploadFile(gwendiaFileName, bt.getGwendiaLFN());
@@ -162,31 +146,29 @@ public class ApplicationImporterBusiness {
   
             String wrapperArchiveName;
             // Write files for each GASW and script file
-            for (Map.Entry<String, BoutiquesTool> e : btMaps.entrySet()) {
-                writeString(gaswString.get(e.getKey()), gaswFileName.get(e.getKey()));
-                writeString(wrapperString.get(e.getKey()), wrapperFileName.get(e.getKey()));
-                wrapperArchiveName = wrapperFileName.get(e.getKey()) + ".tar.gz";
+            writeString(gaswString, gaswFileName);
+            writeString(wrapperString, wrapperFileName);
+            wrapperArchiveName = wrapperFileName + ".tar.gz";
 
-                ArrayList<File> dependencies = new ArrayList<File>();
-                dependencies.add(new File(wrapperFileName.get(e.getKey())));
-                //Add json file to archive so that it is downloaded on WN for Boutiques exec
-                dependencies.add(new File(jsonFileName));
-                targzUtils.createTargz(dependencies, wrapperArchiveName);
+            ArrayList<File> dependencies = new ArrayList<File>();
+            dependencies.add(new File(wrapperFileName));
+            //Add json file to archive so that it is downloaded on WN for Boutiques exec
+            dependencies.add(new File(jsonFileName));
+            targzUtils.createTargz(dependencies, wrapperArchiveName);
 
-                // Transfer files
-                System.out.print("gasw : " + gaswFileName.get(e.getKey()) + "\n");
-                System.out.print("gasw : " + e.getValue().getGASWLFN() + "\n");
-                uploadFile(gaswFileName.get(e.getKey()), e.getValue().getGASWLFN());
-                System.out.print("wrapper : " + wrapperFileName.get(e.getKey()) + "\n");
-                System.out.print("wrapper : " + e.getValue().getWrapperLFN() + "\n");
-                uploadFile(wrapperFileName.get(e.getKey()), e.getValue().getWrapperLFN());
+            // Transfer files
+            System.out.print("gasw : " + gaswFileName + "\n");
+            System.out.print("gasw : " + bt.getGASWLFN() + "\n");
+            uploadFile(gaswFileName, bt.getGASWLFN());
+            System.out.print("wrapper : " + wrapperFileName + "\n");
+            System.out.print("wrapper : " + bt.getWrapperLFN() + "\n");
+            uploadFile(wrapperFileName, bt.getWrapperLFN());
 
-                uploadFile(wrapperArchiveName, bt.getWrapperLFN() + ".tar.gz");
-            }
+            uploadFile(wrapperArchiveName, bt.getWrapperLFN() + ".tar.gz");
             //Upload the JSON file at the end, so that it is not deleted before adding it as dependency to wrapperArchiveName
             uploadFile(jsonFileName, bt.getJsonLFN());
         
-// Register application
+            // Register application
             registerApplicationVersion(bt.getName(), bt.getToolVersion(), user.getEmail(), bt.getGwendiaLFN(), bt.getJsonLFN());
 
         } catch (IOException ex) {
