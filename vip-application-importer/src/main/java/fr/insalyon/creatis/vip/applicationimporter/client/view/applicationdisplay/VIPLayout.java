@@ -30,19 +30,19 @@
  * knowledge of the CeCILL-B license and that you accept its terms.
  */
 package fr.insalyon.creatis.vip.applicationimporter.client.view.applicationdisplay;
+
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.Overflow;
 import com.smartgwt.client.widgets.form.fields.CheckboxItem;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
-import com.smartgwt.client.widgets.form.fields.TextItem;
-import com.smartgwt.client.widgets.form.fields.events.ChangeEvent;
 import fr.insalyon.creatis.vip.applicationimporter.client.rpc.ApplicationImporterService;
 import fr.insalyon.creatis.vip.applicationimporter.client.view.Constants;
 import fr.insalyon.creatis.vip.core.client.view.common.AbstractFormLayout;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
 import fr.insalyon.creatis.vip.datamanager.client.view.ValidatorUtil;
+
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -76,7 +76,7 @@ public class VIPLayout extends AbstractFormLayout {
         appCbItem = new SelectItem();
         appCbItem.setTitle("<b>Select type of application</b>");
         appCbItem.setType("comboBox");
-        LinkedHashMap<String, String> valueMap = new LinkedHashMap<String, String>();
+        LinkedHashMap<String, String> valueMap = new LinkedHashMap<>();
         valueMap.put(Constants.APP_IMPORTER_STANDALONE_TYPE, "standalone");
         valueMap.put(Constants.APP_IMPORTER_DOT_INPUTS_TYPE, "Dot inputs (Challenge)");
         appCbItem.setValueMap(valueMap);
