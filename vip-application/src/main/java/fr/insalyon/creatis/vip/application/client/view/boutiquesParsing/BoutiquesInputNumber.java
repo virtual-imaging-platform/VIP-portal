@@ -65,13 +65,6 @@ public class BoutiquesInputNumber extends BoutiquesInputNonFlag{
     }
 
     /**
-     * @return Array of Strings representing possible value choices for this input, or null if any number can be entered
-     */
-    public List<String> getPossibleValues() {
-        return this.possibleValues;
-    }
-
-    /**
      * @return Double representing this input's maximum allowed value, or null if there is not any
      */
     public Double getMaximum() {

@@ -62,7 +62,6 @@ public abstract class AbstractLaunchTab extends Tab {
     protected String applicationVersion;
     protected String applicationClass;
     protected ModalWindow modal;
-    protected AbstractLaunchFormLayout abstractLaunchFormLayout;
     protected InputsLayout inputsLayout;
     protected IButton launchButton;
     protected IButton saveInputsButton;
@@ -128,7 +127,7 @@ public abstract class AbstractLaunchTab extends Tab {
      * @param values Input values map
      */
     public void loadInput(String simulationName, Map<String, String> values) {
-        abstractLaunchFormLayout.loadInputs(simulationName, values);
+        getLaunchFormLayout().loadInputs(simulationName, values);
     }
 
     /**
@@ -146,7 +145,7 @@ public abstract class AbstractLaunchTab extends Tab {
      */
     protected Map<String, String> getParametersMap() {
 
-        return abstractLaunchFormLayout.getParametersMap();
+        return getLaunchFormLayout().getParametersMap();
     }
 
     /**
@@ -224,8 +223,7 @@ public abstract class AbstractLaunchTab extends Tab {
      * @return String
      */
     protected String getSimulationName() {
-        SC.logInfo(String.valueOf(abstractLaunchFormLayout));
-        return abstractLaunchFormLayout.getSimulationName();
+        return getLaunchFormLayout().getSimulationName();
     }
 
     /**
@@ -234,7 +232,7 @@ public abstract class AbstractLaunchTab extends Tab {
      * @return Result of the validation
      */
     protected boolean validate() {
-        return abstractLaunchFormLayout.validate();
+        return getLaunchFormLayout().validate();
     }
 
     /**
@@ -338,4 +336,9 @@ public abstract class AbstractLaunchTab extends Tab {
 
         return new SimulationInput(applicationName, getSimulationName(), sb.toString());
     }
+
+    /**
+     * @return AbstractLaunchFormLayout representing this tab's launch form
+     */
+    protected abstract AbstractLaunchFormLayout getLaunchFormLayout();
 }

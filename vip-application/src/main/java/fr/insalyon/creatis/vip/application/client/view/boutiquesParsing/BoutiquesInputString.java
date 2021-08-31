@@ -42,14 +42,6 @@ public class BoutiquesInputString extends BoutiquesInputNonFlag{
     }
 
     /**
-     * @return Array of Strings representing possible value choices for this input, or null if any value can be entered
-     */
-    @Override
-    public List<String> getPossibleValues() {
-        return this.possibleValues;
-    }
-
-    /**
      * @return String representing this input's default value, or null if there is not any
      */
     @Override

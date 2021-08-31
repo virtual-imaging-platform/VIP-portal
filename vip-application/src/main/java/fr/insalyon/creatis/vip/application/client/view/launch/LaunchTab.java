@@ -32,7 +32,6 @@
 package fr.insalyon.creatis.vip.application.client.view.launch;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.smartgwt.client.util.SC;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
 import fr.insalyon.creatis.vip.application.client.rpc.WorkflowService;
 import fr.insalyon.creatis.vip.application.client.rpc.WorkflowServiceAsync;
@@ -87,10 +86,9 @@ public class LaunchTab extends AbstractLaunchTab {
             }
 
             @Override
-            public void onSuccess(String StringInputLayout) {
-                launchFormLayout = new LaunchFormLayout(new BoutiquesDescriptor(StringInputLayout),
+            public void onSuccess(String boutiquesDescriptorString) {
+                launchFormLayout = new LaunchFormLayout(new BoutiquesDescriptor(boutiquesDescriptorString),
                         applicationName, applicationVersion, applicationClass);
-                abstractLaunchFormLayout = launchFormLayout;
                 layout.addMember(launchFormLayout);
                 configureLaunchButton();
                 configureSaveInputsButton();
@@ -104,7 +102,7 @@ public class LaunchTab extends AbstractLaunchTab {
                 launchFormLayout.configureCitation(applicationName);
                 modal.hide();
                 configureInputsLayout(true);
-                if ((getSimulationName() != null) && (inputs != null)) {
+                if ((simulationName != null) && (inputs != null)) {
                     launchFormLayout.loadInputs(simulationName, inputs);
                 }
             }
@@ -113,18 +111,6 @@ public class LaunchTab extends AbstractLaunchTab {
         WorkflowService.Util.getInstance().getApplicationDescriptorString(applicationName, applicationVersion,
                                                                           callback);
     }
-
-    /**
-     * Loads input values from map.
-     *
-     * @param simulationName Simulation name
-     * @param values Input values map
-     */
-    public void loadInput(String simulationName, Map<String, String> values) {
-
-        launchFormLayout.loadInputs(simulationName, values);
-    }
-
 
     /**
      * Launches a simulation.
@@ -186,6 +172,14 @@ public class LaunchTab extends AbstractLaunchTab {
     protected void resetSaveAsExampleButton() {
         super.resetSaveAsExampleButton();
         this.launchFormLayout.updateErrorMessages();
+    }
+
+    /**
+     * @return LaunchFormLayout representing this tab's launch form
+     */
+    @Override
+    protected LaunchFormLayout getLaunchFormLayout() {
+        return this.launchFormLayout;
     }
 
     /**

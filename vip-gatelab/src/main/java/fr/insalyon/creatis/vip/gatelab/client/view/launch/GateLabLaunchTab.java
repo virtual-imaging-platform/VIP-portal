@@ -40,6 +40,7 @@ import fr.insalyon.creatis.vip.application.client.bean.Source;
 import fr.insalyon.creatis.vip.application.client.rpc.WorkflowService;
 import fr.insalyon.creatis.vip.application.client.view.common.AbstractLaunchTab;
 import fr.insalyon.creatis.vip.application.client.view.launch.GateLabLaunchFormLayout;
+import fr.insalyon.creatis.vip.application.client.view.launch.LaunchFormLayout;
 import fr.insalyon.creatis.vip.application.client.view.monitor.timeline.TimelineLayout;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
@@ -101,7 +102,6 @@ public class GateLabLaunchTab extends AbstractLaunchTab {
 
                 launchFormLayout = new GateLabLaunchFormLayout(applicationName + " " + applicationVersion,
                         null, descriptor.getDescription());
-                abstractLaunchFormLayout = launchFormLayout;
                 layout.addMember(launchFormLayout);
 
                 launchFormLayout.setSourcesLayoutVisible(false);
@@ -237,5 +237,10 @@ public class GateLabLaunchTab extends AbstractLaunchTab {
         WorkflowService.Util.getInstance().launchSimulation(getParametersMap(),
                 applicationName, applicationVersion, applicationClass, 
                 getSimulationName(), callback);
+    }
+
+    @Override
+    protected GateLabLaunchFormLayout getLaunchFormLayout() {
+        return this.launchFormLayout;
     }
 }
