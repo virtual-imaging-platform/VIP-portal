@@ -2,6 +2,9 @@ package fr.insalyon.creatis.vip.application.client.view.launch;
 
 import fr.insalyon.creatis.vip.application.client.view.boutiquesParsing.BoutiquesGroup;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Client-side validation logic for input groups
  *
@@ -10,8 +13,8 @@ import fr.insalyon.creatis.vip.application.client.view.boutiquesParsing.Boutique
  */
 public class GroupValidator {
     private final BoutiquesGroup group;
-    private final InputLayout[] members;
-    private final String[] memberNames;
+    private final List<InputLayout> members = new ArrayList<>();
+    private final List<String> memberNames = new ArrayList<>();
     private final LaunchFormLayout parentLayout;
 
     /**
@@ -22,13 +25,10 @@ public class GroupValidator {
     public GroupValidator(BoutiquesGroup group, LaunchFormLayout parentLayout){
         this.group = group;
         this.parentLayout = parentLayout;
-        String[] memberIds = group.getMembers();
-        this.members = new InputLayout[memberIds.length];
-        this.memberNames = new String[memberIds.length];
-        for (int inputNo=0; inputNo<memberIds.length; inputNo++){
-            InputLayout memberInput = parentLayout.getInputsMap().get(memberIds[inputNo]);
-            this.members[inputNo] = memberInput;
-            this.memberNames[inputNo] = memberInput.getInputName();
+        for (String currentMemberId : group.getMembers()){
+            InputLayout memberInput = parentLayout.getInputsMap().get(currentMemberId);
+            this.members.add(memberInput);
+            this.memberNames.add(memberInput.getInputName());
         }
     }
 
@@ -58,7 +58,7 @@ public class GroupValidator {
         }
         if(this.group.isAllOrNone()){
             this.parentLayout.groupErrorMessage(LaunchFormLayout.allOrNoneMessage(this.memberNames),
-                    ((nActiveMembers != 0) & (nActiveMembers != this.members.length)));
+                    ((nActiveMembers != 0) & (nActiveMembers != this.members.size())));
         }
         if(this.group.isOneIsRequired()){
             this.parentLayout.groupErrorMessage(LaunchFormLayout.oneIsRequiredMessage(this.memberNames),
@@ -97,14 +97,14 @@ public class GroupValidator {
     /**
      * @return InputLayout array containing group members
      */
-    public InputLayout[] getMembers() {
+    public List<InputLayout> getMembers() {
         return members;
     }
 
     /**
      * @return String array containing group member IDs
      */
-    public String[] getMemberNames() {
+    public List<String> getMemberNames() {
         return this.memberNames;
     }
 }

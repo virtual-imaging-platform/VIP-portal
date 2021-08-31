@@ -2,7 +2,9 @@ package fr.insalyon.creatis.vip.application.client.view.boutiquesParsing;
 
 import com.google.gwt.json.client.*;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
@@ -179,7 +181,7 @@ public class BoutiquesUtil {
      *                      true
      * @throws RuntimeException if expected value is not a valid String array or if key is absent and optional is false
      */
-    public static String[] getArrayValueAsStrings(JSONObject descriptor, String key, boolean optional)
+    public static List<String> getArrayValueAsStrings(JSONObject descriptor, String key, boolean optional)
             throws RuntimeException {
         JSONArray array = getArrayValue(descriptor, key, optional);
         try {
@@ -197,14 +199,14 @@ public class BoutiquesUtil {
      * @return      Array of Strings representing array
      * @throws RuntimeException if some elements of array are not valid Strings
      */
-    public static String[] JSONArrayToStrings(JSONArray array) throws RuntimeException {
-        String[] stringArray = new String[array.size()];
+    public static List<String> JSONArrayToStrings(JSONArray array) throws RuntimeException {
+        List<String> stringArray = new ArrayList<>();
         for (int valueNo = 0; valueNo < array.size(); valueNo++){
             JSONString valueString = array.get(valueNo).isString();
             if(valueString == null){
                 throw new RuntimeException("Invalid Array: value " + valueNo + " is not a String.");
             }
-            stringArray[valueNo] = valueString.stringValue();
+            stringArray.add(valueString.stringValue());
         }
         return stringArray;
     }
@@ -222,14 +224,14 @@ public class BoutiquesUtil {
      *                      representing its values
      * @throws RuntimeException if expected value is not a valid object or if key is absent and optional is false
      */
-    public static Map<String, String[]> getStringMapValue(JSONObject descriptor, String key,
-                                                          boolean optional) throws RuntimeException {
+    public static Map<String, List<String>> getStringMapValue(JSONObject descriptor, String key,
+                                                              boolean optional) throws RuntimeException {
         JSONObject object = applyToValue(descriptor, key, optional, JSONValue::isObject, "JSON object");
         if(object == null){
             return null;
         }
         // Converts obtained object to a Map of Strings to String arrays
-        Map<String, String[]> convertedObject = new HashMap<>();
+        Map<String, List<String>> convertedObject = new HashMap<>();
         for(String objectKey : object.keySet()){
             JSONArray objectValue = object.get(objectKey).isArray();
             if (objectValue == null){

@@ -1,6 +1,5 @@
 package fr.insalyon.creatis.vip.application.client.view.launch;
 
-import com.smartgwt.client.util.SC;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
 
 import java.util.ArrayList;

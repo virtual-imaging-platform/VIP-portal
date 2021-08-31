@@ -4,6 +4,7 @@ import com.google.gwt.json.client.JSONObject;
 import fr.insalyon.creatis.vip.application.client.view.launch.InputLayout;
 import fr.insalyon.creatis.vip.application.client.view.launch.LaunchFormLayout;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -17,8 +18,8 @@ public abstract class BoutiquesInput {
     protected final String name;
     protected final String description;
     protected final boolean isOptional;
-    protected final String[] disablesInputsId;
-    protected final String[] requiresInputsId;
+    protected final List<String> disablesInputsId;
+    protected final List<String> requiresInputsId;
 
     /**
      * Initializes input information from its JSON description
@@ -66,14 +67,14 @@ public abstract class BoutiquesInput {
     /**
      * @return array of Strings representing IDs of inputs disabled by this, or null if there is not any
      */
-    public String[] getDisablesInputsId() {
+    public List<String> getDisablesInputsId() {
         return this.disablesInputsId;
     }
 
     /**
      * @return array of Strings representing IDs of inputs required by this, or null if there is not any
      */
-    public String[] getRequiresInputsId() {
+    public List<String> getRequiresInputsId() {
         return this.requiresInputsId;
     }
 
@@ -89,18 +90,18 @@ public abstract class BoutiquesInput {
      * @return Map of String values of this to array of String IDs of inputs disabled by corresponding values.
      *         Return value can be null if this has no 'value-disables' dependency
      */
-    public abstract Map<String, String[]> getValueDisablesInputsId();
+    public abstract Map<String, List<String>> getValueDisablesInputsId();
 
     /**
      * @return Map of String values of this to array of String IDs of inputs required by corresponding values
      *         Return value can be null if this has no 'value-requires' dependency
      */
-    public abstract Map<String, String[]> getValueRequiresInputsId();
+    public abstract Map<String, List<String>> getValueRequiresInputsId();
 
     /**
      * @return Array of Strings representing possible value choices for this input, or null if any value can be entered
      */
-    public abstract String[] getPossibleValues();
+    public abstract List<String> getPossibleValues();
 
     /**
      * @return Object representing this input's default value, or null if there is not any

@@ -1,8 +1,6 @@
 package fr.insalyon.creatis.vip.application.client.view.launch;
 
-import com.google.gwt.core.client.GWT;
 import com.smartgwt.client.types.PickerIconName;
-import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.Label;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.FormItem;

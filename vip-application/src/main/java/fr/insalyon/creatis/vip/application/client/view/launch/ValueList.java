@@ -1,10 +1,8 @@
 package fr.insalyon.creatis.vip.application.client.view.launch;
 
-import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.CheckboxItem;
 import com.smartgwt.client.widgets.form.fields.FormItem;
-import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
 
 import java.util.ArrayList;
 
@@ -35,9 +33,7 @@ public class ValueList extends ValueSet{
             }
             return null;
         }
-        Object value = valueField.getValue();
-        Object test = (Object) value;
-        return value;
+        return valueField.getValue();
     }
 
     /**

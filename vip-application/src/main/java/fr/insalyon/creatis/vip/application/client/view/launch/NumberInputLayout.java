@@ -9,8 +9,11 @@ import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.form.validator.CustomValidator;
 import fr.insalyon.creatis.vip.application.client.view.boutiquesParsing.BoutiquesInputNumber;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 /**
  * Representation of a number input. Notably allows validation of constraints on the number (integer, minimum, maximum),
@@ -26,11 +29,11 @@ public class NumberInputLayout extends InputLayout {
     private final CustomValidator rangeValidator; // For checking this number is between allowed minimum and maximum
     public enum FormLayout {
         LIST, RANGE;
-        public static String[] names = camelNames(values());
+        public static List<String> names = camelNames(values());
     }
     public enum RangeItem {
         START, STEP, STOP;
-        public static String[] names = camelNames(values());
+        public static List<String> names = camelNames(values());
     }
 
     /**
@@ -50,8 +53,8 @@ public class NumberInputLayout extends InputLayout {
      * @param enumValues    Array of Enum values
      * @return              Array of Strings representing enumValues formatted names
      */
-    public static String[] camelNames(Enum<?>[] enumValues) {
-        return Arrays.stream(enumValues).map(NumberInputLayout::camelName).toArray(String[]::new);
+    public static List<String> camelNames(Enum<?>[] enumValues) {
+        return Arrays.stream(enumValues).map(NumberInputLayout::camelName).collect(Collectors.toList());
     }
 
     /**
@@ -192,9 +195,9 @@ public class NumberInputLayout extends InputLayout {
         if (valueList instanceof ValueRange) {
             this.setLayout(FormLayout.RANGE);
             assert !this.masterForm.getField(MAIN_FIELD_NAME).isVisible();
-            Float[] rangeLimits = ((ValueRange) valueList).getRangeLimits();
+            List<Float> rangeLimits = ((ValueRange) valueList).getRangeLimits();
             for (int k = 0; k < 3; k++) {
-                this.masterForm.getField(RangeItem.names[k]).setValue(rangeLimits[k]);
+                this.masterForm.getField(RangeItem.names.get(k)).setValue(rangeLimits.get(k));
             }
             this.onValueChanged();
         } else {
@@ -233,7 +236,7 @@ public class NumberInputLayout extends InputLayout {
         SelectItem selector = new SelectItem();
         selector.setWidth(70);
         selector.setShowTitle(false);
-        selector.setValueMap(FormLayout.names);
+        selector.setValueMap(FormLayout.names.toArray(new String[]{}));
         selector.setValue(camelName(FormLayout.LIST));
         selector.addChangedHandler(changedEvent -> this.setLayout(this.getSelectedFormLayout()));
         return selector;
@@ -245,26 +248,25 @@ public class NumberInputLayout extends InputLayout {
      */
     protected void overwriteMasterForm() {
         // Fields for master form
-        final FormItem[] inputFields = new FormItem[5];
+        final List<FormItem> inputFields = new ArrayList<>();
         // List/Range selection
-        inputFields[0] = this.typeSelector;
+        inputFields.add(this.typeSelector);
         // Value
         final FormItem valueItem = this.getFormItem();
         valueItem.setName(MAIN_FIELD_NAME);
         this.addValueChangeHandler(valueItem);
         valueItem.setValidators(this.numberValidator, this.rangeValidator);
-        inputFields[1] = valueItem;
+        inputFields.add(valueItem);
         // Range
-        final FormItem[] rangeItems = new FormItem[3]; // Start, Step, End
-        for (int k = 0; k < 3; k++) {
-            rangeItems[k] = this.getFormItem();
-            rangeItems[k].setWidth(80);
-            rangeItems[k].setTitle(RangeItem.names[k]);
-            rangeItems[k].setShowTitle(true);
-            rangeItems[k].setName(RangeItem.names[k]);
-            rangeItems[k].setRequired(true);
-            rangeItems[k].hide(); // Default to List layout
-            inputFields[k + 2] = rangeItems[k];
+        for (String rangeItemName : RangeItem.names) {
+            FormItem currentRangeItem = this.getFormItem();
+            currentRangeItem.setWidth(80);
+            currentRangeItem.setTitle(rangeItemName);
+            currentRangeItem.setShowTitle(true);
+            currentRangeItem.setName(rangeItemName);
+            currentRangeItem.setRequired(true);
+            currentRangeItem.hide(); // Default to List layout
+            inputFields.add(currentRangeItem);
         }
         // Range validation logic
         // Start
@@ -272,7 +274,7 @@ public class NumberInputLayout extends InputLayout {
             @Override
             protected boolean condition(Object value) {
                 // Check that start is less than end
-                Float maxValue = valueAsFloat(rangeItems[2].getValue());
+                Float maxValue = valueAsFloat(getRangeItem(RangeItem.STOP).getValue());
                 Float floatValue = valueAsFloat((value));
                 if ((maxValue != null) && (floatValue != null)) {
                     return (floatValue < maxValue);
@@ -281,13 +283,12 @@ public class NumberInputLayout extends InputLayout {
             }
         };
         rangeStartValidator.setErrorMessage("Must be less than range end");
-        rangeItems[0].setValidators(this.numberValidator, this.rangeValidator, rangeStartValidator);
         // End
         CustomValidator rangeEndValidator = new CustomValidator() {
             @Override
             protected boolean condition(Object value) {
                 // Check that end is greater than start
-                Float minValue = valueAsFloat(rangeItems[0].getValue());
+                Float minValue = valueAsFloat(getRangeItem(RangeItem.START).getValue());
                 Float floatValue = valueAsFloat((value));
                 if ((minValue != null) && (floatValue != null)) {
                     return (floatValue > minValue);
@@ -296,7 +297,6 @@ public class NumberInputLayout extends InputLayout {
             }
         };
         rangeEndValidator.setErrorMessage("Must be more than range start");
-        rangeItems[2].setValidators(this.numberValidator, this.rangeValidator, rangeEndValidator);
         // Step
         CustomValidator rangeStepValidator = new CustomValidator() {
             @Override
@@ -309,8 +309,8 @@ public class NumberInputLayout extends InputLayout {
                         return false;
                     }
                     // Check that step is smaller than the difference between end and start
-                    Float minValue = valueAsFloat(rangeItems[0].getValue());
-                    Float maxValue = valueAsFloat(rangeItems[2].getValue());
+                    Float minValue = valueAsFloat(getRangeItem(RangeItem.START).getValue());
+                    Float maxValue = valueAsFloat(getRangeItem(RangeItem.STOP).getValue());
                     if ((minValue != null) && (maxValue != null)) {
                         this.setErrorMessage("Must be less than range size.");
                         return (floatValue < (maxValue - minValue));
@@ -320,9 +320,11 @@ public class NumberInputLayout extends InputLayout {
             }
         };
         // Check that step is positive
-        rangeItems[1].setValidators(rangeStepValidator, this.numberValidator);
         // Overwrite master form
-        this.masterForm.setFields(inputFields);
+        this.masterForm.setFields(inputFields.toArray(new FormItem[]{}));
+        getRangeItem(RangeItem.START).setValidators(this.numberValidator, this.rangeValidator, rangeStartValidator);
+        getRangeItem(RangeItem.STOP).setValidators(this.numberValidator, this.rangeValidator, rangeEndValidator);
+        getRangeItem(RangeItem.STEP).setValidators(rangeStepValidator, this.numberValidator);
         this.masterForm.addItemChangedHandler(itemChangedEvent -> this.onValueChanged(itemChangedEvent.getItem()));
         valueItem.addIcon(this.addValueIcon); // If placed before call to setFields, the icon don't show
     }
@@ -359,13 +361,16 @@ public class NumberInputLayout extends InputLayout {
         this.onValueChanged();
     }
 
+    private FormItem getRangeItem(RangeItem type){
+        return this.masterForm.getField(camelName(type));
+    }
     /**
      * Perform given action on each Range field (Start value, Step value and End value)
      *
      * @param action Consumer<FormItem> to apply to Range fields
      */
     private void rangeItemAction(Consumer<FormItem> action){
-        Arrays.stream(RangeItem.names)
+        RangeItem.names.stream()
                 .map(this.masterForm::getField)
                 .forEach(action);
     }
@@ -376,11 +381,11 @@ public class NumberInputLayout extends InputLayout {
      */
     public FormLayout getSelectedFormLayout() throws IllegalStateException{
         String selectedValue = ((String) this.typeSelector.getValue());
-        if(Arrays.asList(FormLayout.names).contains(selectedValue)){
+        if(FormLayout.names.contains(selectedValue)){
             return FormLayout.valueOf(selectedValue.toUpperCase());
         } else {
             throw new IllegalStateException("Unknown selected layout type. Only allowed values are "
-                    + Arrays.toString(FormLayout.names));
+                    + FormLayout.names);
         }
     }
 

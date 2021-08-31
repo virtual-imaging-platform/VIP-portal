@@ -2,6 +2,8 @@ package fr.insalyon.creatis.vip.application.client.view.boutiquesParsing;
 
 import com.google.gwt.json.client.JSONObject;
 
+import java.util.List;
+
 /**
  * Representation of a group in an application Boutiques descriptor
  *
@@ -13,7 +15,7 @@ public class BoutiquesGroup {
     private final boolean allOrNone;
     private final boolean mutuallyExclusive;
     private final boolean oneIsRequired;
-    private final String[] members;
+    private final List<String> members;
 
     /**
      * Initialises group information based on its JSON description
@@ -39,7 +41,7 @@ public class BoutiquesGroup {
     /**
      * @return Group member IDs as an array of Strings
      */
-    public String[] getMembers() {
+    public List<String> getMembers() {
         return members;
     }
 

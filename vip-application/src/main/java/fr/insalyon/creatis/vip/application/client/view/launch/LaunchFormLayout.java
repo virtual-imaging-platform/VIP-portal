@@ -64,39 +64,39 @@ public class LaunchFormLayout extends AbstractLaunchFormLayout {
     }
 
     /**
-     * @param  memberNames String[] containing a group's member names
+     * @param  memberNames List of Strings containing a group's member names
      * @return             String message describing the group as mutually exclusive
      */
-    public static String mutuallyExclusiveMessage(String[] memberNames) {
+    public static String mutuallyExclusiveMessage(List<String> memberNames) {
         return groupMessage(memberNames, names -> "At most one of " + names + " can be non-empty.");
     }
 
     /**
-     * @param  memberNames String[] containing a group's member names
+     * @param  memberNames List of Strings containing a group's member names
      * @return             String message describing the group as all-or-none
      */
-    public static String allOrNoneMessage(String[] memberNames) {
+    public static String allOrNoneMessage(List<String> memberNames) {
         return groupMessage(memberNames, names -> "Either all or none of " + names + " must be empty.");
     }
 
     /**
-     * @param  memberNames String[] containing a group's member names
+     * @param  memberNames List of Strings containing a group's member names
      * @return             String message describing the group as one-is-required
      */
-    public static String oneIsRequiredMessage(String[] memberNames) {
+    public static String oneIsRequiredMessage(List<String> memberNames) {
         return groupMessage(memberNames, names -> "At least one of " + names + " must be non-empty.");
     }
 
     /**
      * Generate a String description of a group from its members and a message formatter function
      *
-     * @param memberNames       String[] containing names of group member inputs
+     * @param memberNames       List of Strings containing names of group member inputs
      * @param messageFormatter  Function returning a group description as String from a String argument that lists
      *                          the group members
      * @return                  String description of the group
      */
-    private static String groupMessage(String[] memberNames, Function<String, String> messageFormatter){
-        return messageFormatter.apply(bold(Arrays.toString(memberNames)));
+    private static String groupMessage(List<String> memberNames, Function<String, String> messageFormatter){
+        return messageFormatter.apply(bold(memberNames.toString()));
     }
 
     /**
@@ -257,11 +257,10 @@ public class LaunchFormLayout extends AbstractLaunchFormLayout {
 
     /**
      * Make input with ID masterID disable all optional inputs with IDs in disabledIds when it is not empty
-     *
-     * @param masterId      String representing disabling input ID
-     * @param disabledIds   String[] containing IDs of dependent inputs
+     *  @param masterId      String representing disabling input ID
+     * @param disabledIds   List of Strings containing IDs of dependent inputs
      */
-    private void addDisablesInputs(String masterId, String[] disabledIds) {
+    private void addDisablesInputs(String masterId, List<String> disabledIds) {
         assert this.inputsMap.containsKey(masterId);
         InputLayout masterInput = this.inputsMap.get(masterId);
         for (String disabledInputId : disabledIds) {
@@ -277,11 +276,10 @@ public class LaunchFormLayout extends AbstractLaunchFormLayout {
     /**
      * Make input with ID masterID require all inputs and groups with IDs in requiredIds. This means it will be disabled
      * if one of them is left empty
-     *
-     * @param masterId      String representing dependent input ID
-     * @param requiredIds   String[] containing IDs of required inputs or groups of inputs
+     *  @param masterId      String representing dependent input ID
+     * @param requiredIds   List of Strings containing IDs of required inputs or groups of inputs
      */
-    private void addRequiresInputs(String masterId, String[] requiredIds) {
+    private void addRequiresInputs(String masterId, List<String> requiredIds) {
         assert this.inputsMap.containsKey(masterId);
         InputLayout masterInput = this.inputsMap.get(masterId);
         // Ignore dependency if master input is not optional (thus cannot be disabled)
@@ -304,12 +302,10 @@ public class LaunchFormLayout extends AbstractLaunchFormLayout {
     /**
      * Make input with ID masterId values disable certain inputs. valueDisablesIds maps values to IDs of inputs disabled
      * when these values are selected.
-     *
-     * @param masterId          String representing disabling input ID.
+     *  @param masterId          String representing disabling input ID.
      * @param valueDisablesIds  Map with String representation of disabling input values as keys, and String[]
-     *                          containing disabled input IDs as values.
      */
-    private void addValueDisables(String masterId, Map<String, String[]> valueDisablesIds) {
+    private void addValueDisables(String masterId, Map<String, List<String>> valueDisablesIds) {
         assert this.inputsMap.containsKey(masterId);
         InputLayout masterInput = this.inputsMap.get(masterId);
         assert masterInput instanceof ValueChoiceInputLayout;
@@ -330,12 +326,10 @@ public class LaunchFormLayout extends AbstractLaunchFormLayout {
     /**
      * Make input with ID masterId values require certain inputs. valueRequiresIds maps values to IDs of inputs that
      * cannot be empty when these values are selected.
-     *
-     * @param masterId          String representing dependent input ID.
-     * @param valueRequiresIds  Map with String representation of dependent input values as keys, and String[]
-     *                          containing required input IDs as values.
+     *  @param masterId          String representing dependent input ID.
+     * @param valueRequiresIds  Map with String representation of dependent input values as keys, and List of Strings
      */
-    private void addValueRequires(String masterId, Map<String, String[]> valueRequiresIds) {
+    private void addValueRequires(String masterId, Map<String, List<String>> valueRequiresIds) {
         assert this.inputsMap.containsKey(masterId);
         InputLayout masterInput = this.inputsMap.get(masterId);
         assert masterInput instanceof ValueChoiceInputLayout;
@@ -459,7 +453,7 @@ public class LaunchFormLayout extends AbstractLaunchFormLayout {
      */
     public void addUnsupportedGroup(GroupValidator unsupportedGroup) {
         HashSet<String> newUnsupportedDependencies = new HashSet<>();
-        String[] memberNames = unsupportedGroup.getMemberNames();
+        List<String> memberNames = unsupportedGroup.getMemberNames();
         if(unsupportedGroup.isMutuallyExclusive()){
             newUnsupportedDependencies.add(mutuallyExclusiveMessage(memberNames));
         }
@@ -628,10 +622,10 @@ public class LaunchFormLayout extends AbstractLaunchFormLayout {
                 if (valueSet instanceof ValueList) {
                     inputValue = String.join(ApplicationConstants.SEPARATOR_LIST, valueSet.getValuesAsStrings());
                 } else {
-                    Float[] startStepStop = ((ValueRange) valueSet).getRangeLimits();
-                    inputValue = startStepStop[0] + ApplicationConstants.SEPARATOR_INPUT
-                            + startStepStop[2] + ApplicationConstants.SEPARATOR_INPUT
-                            + startStepStop[1];
+                    List<Float> startStepStop = ((ValueRange) valueSet).getRangeLimits();
+                    inputValue = startStepStop.get(0) + ApplicationConstants.SEPARATOR_INPUT
+                            + startStepStop.get(2) + ApplicationConstants.SEPARATOR_INPUT
+                            + startStepStop.get(1);
                 }
                 parameterMap.put(inputId, inputValue);
             }

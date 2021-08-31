@@ -4,6 +4,7 @@ import com.google.gwt.json.client.JSONObject;
 import fr.insalyon.creatis.vip.application.client.view.launch.FlagInputLayout;
 import fr.insalyon.creatis.vip.application.client.view.launch.LaunchFormLayout;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -49,7 +50,7 @@ public class BoutiquesInputFlag extends BoutiquesInput{
      * @return Always null: Flag input cannot have 'value-disables' dependencies
      */
     @Override
-    public Map<String, String[]> getValueDisablesInputsId() {
+    public Map<String, List<String>> getValueDisablesInputsId() {
         return null;
     }
 
@@ -57,7 +58,7 @@ public class BoutiquesInputFlag extends BoutiquesInput{
      * @return Always null: Flag input cannot have 'value-requires' dependencies
      */
     @Override
-    public Map<String, String[]> getValueRequiresInputsId() {
+    public Map<String, List<String>> getValueRequiresInputsId() {
         return null;
     }
 
@@ -65,7 +66,7 @@ public class BoutiquesInputFlag extends BoutiquesInput{
      * @return Always null: Flag cannot have value choices other than true and false
      */
     @Override
-    public String[] getPossibleValues() {
+    public List<String> getPossibleValues() {
         return null;
     }
 

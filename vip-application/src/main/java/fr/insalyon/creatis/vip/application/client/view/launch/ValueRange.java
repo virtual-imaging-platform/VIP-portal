@@ -3,8 +3,10 @@ package fr.insalyon.creatis.vip.application.client.view.launch;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
 
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * Helper class to handle a range of values entered by user for one input
@@ -13,7 +15,7 @@ import java.util.Objects;
  * @version %I%, %G%
  */
 public class ValueRange extends ValueSet {
-    protected final Float[] rangeLimits; // start, step, end
+    protected final List<Float> rangeLimits; // start, step, end
 
     /**
      * @param value String to convert to float
@@ -37,15 +39,15 @@ public class ValueRange extends ValueSet {
      * @see NumberInputLayout.RangeItem#names
      */
     public ValueRange(DynamicForm masterForm) throws RuntimeException{
-        this.rangeLimits = Arrays.stream(NumberInputLayout.RangeItem.names)
+        this.rangeLimits = NumberInputLayout.RangeItem.names.stream()
                 .map(masterForm::getField)
                 .filter(Objects::nonNull)
                 .map(item -> NumberInputLayout.valueAsFloat(item.getValue()))
                 .filter(Objects::nonNull)
-                .toArray(Float[]::new);
-        if(this.rangeLimits.length < 3){
+                .collect(Collectors.toList());
+        if(this.rangeLimits.size() < 3){
             throw new RuntimeException("Cannot create value range: please ensure provided form has fields with names "
-                                       + Arrays.toString(NumberInputLayout.RangeItem.names) + " and numeric values.");
+                                       + NumberInputLayout.RangeItem.names + " and numeric values.");
         }
         initializeValues();
     }
@@ -60,11 +62,11 @@ public class ValueRange extends ValueSet {
      * ApplicationConstants.INPUT_WITHOUT_VALUE
      */
     public ValueRange(String start, String stop, String step) throws NumberFormatException{
-        this.rangeLimits = new Float[3];
+        this.rangeLimits = new ArrayList<>();
         try{
-            this.rangeLimits[0] = floatValue(start);
-            this.rangeLimits[1] = floatValue(step);
-            this.rangeLimits[2] = floatValue(stop);
+            this.rangeLimits.add(floatValue(start));
+            this.rangeLimits.add(floatValue(step));
+            this.rangeLimits.add(floatValue(stop));
         } catch (NumberFormatException exception){
             throw new NumberFormatException("At least one of range limits is not a valid representation of a float " +
                     "or of an empty value.</br>" + "Received range limits: " + start + ", " + step + " and " + stop);
@@ -76,13 +78,13 @@ public class ValueRange extends ValueSet {
      * Initialize all values from range limits
      */
     private void initializeValues() {
-        float previousValue = this.rangeLimits[0];
-        while(previousValue <= this.rangeLimits[2]){
+        float previousValue = this.rangeLimits.get(0);
+        while(previousValue <= this.rangeLimits.get(2)){
             this.values.add(previousValue);
             this.valuesAsStrings.add(String.valueOf(previousValue));
-            previousValue += this.rangeLimits[1];
+            previousValue += this.rangeLimits.get(1);
         }
-        assert this.values.size() == ((int) ((this.rangeLimits[2] - this.rangeLimits[0]) / this.rangeLimits[1]) + 1);
+        assert this.values.size() == ((int) ((this.rangeLimits.get(2) - this.rangeLimits.get(0)) / this.rangeLimits.get(1)) + 1);
     }
 
     /**
@@ -96,9 +98,9 @@ public class ValueRange extends ValueSet {
     public boolean isEqualTo(ValueSet comparedValueSet) {
         if (comparedValueSet instanceof ValueRange) {
             if (comparedValueSet.getNValues() == this.getNValues()) {
-                Float[] comparedRange = ((ValueRange) comparedValueSet).getRangeLimits();
+                List<Float> comparedRange = ((ValueRange) comparedValueSet).getRangeLimits();
                 // If start and step are the same, end can differ as long as there is the same number of values.
-                return (comparedRange[0].equals(this.rangeLimits[0])) & (comparedRange[1].equals(this.rangeLimits[1]));
+                return (comparedRange.get(0).equals(this.rangeLimits.get(0))) & (comparedRange.get(1).equals(this.rangeLimits.get(1)));
             }
         }
         return false;
@@ -107,7 +109,7 @@ public class ValueRange extends ValueSet {
     /**
      * @return Float array containing Start, Step and End value of the range represented by this
      */
-    public Float[] getRangeLimits() {
+    public List<Float> getRangeLimits() {
         return this.rangeLimits;
     }
 }

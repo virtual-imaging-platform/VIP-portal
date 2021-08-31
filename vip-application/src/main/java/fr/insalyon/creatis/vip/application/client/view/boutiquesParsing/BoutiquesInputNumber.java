@@ -7,6 +7,8 @@ import fr.insalyon.creatis.vip.application.client.view.launch.LaunchFormLayout;
 import fr.insalyon.creatis.vip.application.client.view.launch.NumberInputLayout;
 import fr.insalyon.creatis.vip.application.client.view.launch.ValueChoiceInputLayout;
 
+import java.util.List;
+
 /**
  * Representation of a Number input in an application Boutiques descriptor
  *
@@ -75,7 +77,7 @@ public class BoutiquesInputNumber extends BoutiquesInputNonFlag{
     /**
      * @return Array of Strings representing possible value choices for this input, or null if any number can be entered
      */
-    public String[] getPossibleValues() {
+    public List<String> getPossibleValues() {
         return this.possibleValues;
     }
 

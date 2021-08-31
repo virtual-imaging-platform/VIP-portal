@@ -4,6 +4,8 @@ import com.google.gwt.json.client.JSONArray;
 import com.google.gwt.json.client.JSONObject;
 import com.google.gwt.json.client.JSONValue;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -13,9 +15,9 @@ import java.util.Map;
  * @version %I%, %G%
  */
 public abstract class BoutiquesInputNonFlag extends BoutiquesInput{
-    protected final String[] possibleValues;
-    private final Map<String, String[]> valueDisablesInputsId;
-    private final Map<String, String[]> valueRequiresInputsId;
+    protected final List<String> possibleValues;
+    private final Map<String, List<String>> valueDisablesInputsId;
+    private final Map<String, List<String>> valueRequiresInputsId;
 
     /**
      * Initializes input information from its JSON description
@@ -31,23 +33,18 @@ public abstract class BoutiquesInputNonFlag extends BoutiquesInput{
             this.valueDisablesInputsId = null;
             this.valueRequiresInputsId = null;
         } else {
+            this.possibleValues = new ArrayList<>();
             // If input is optional, we add possibility of selecting empty value
-            int emptyChoiceOffset;
             if(this.isOptional){
-                emptyChoiceOffset = 1;
-                this.possibleValues = new String[possibleValuesArray.size() + 1];
-                this.possibleValues[0] = null;
-            } else {
-                emptyChoiceOffset = 0;
-                this.possibleValues = new String[possibleValuesArray.size()];
+                this.possibleValues.add(null);
             }
-            for (int valueNo = emptyChoiceOffset; valueNo < this.possibleValues.length; valueNo++) {
-                String iValue = JSONValueToString(possibleValuesArray.get(valueNo - emptyChoiceOffset));
+            for (int valueNo = 0; valueNo < possibleValuesArray.size(); valueNo++) {
+                String iValue = JSONValueToString(possibleValuesArray.get(valueNo));
                 if (iValue == null) {
                     throw new RuntimeException("Invalid Boutiques descriptor: input '" + this.id
                             + "' has invalid value-choices.");
                 }
-                this.possibleValues[valueNo] = iValue;
+                this.possibleValues.add(iValue);
             }
             this.valueDisablesInputsId = BoutiquesUtil.getStringMapValue(descriptor, "value-disables",
                     true);
@@ -67,7 +64,7 @@ public abstract class BoutiquesInputNonFlag extends BoutiquesInput{
      *         Return value can be null if this has no 'value-disables' dependency
      */
     @Override
-    public Map<String, String[]> getValueDisablesInputsId(){
+    public Map<String, List<String>> getValueDisablesInputsId(){
         return this.valueDisablesInputsId;
     }
 
@@ -76,7 +73,7 @@ public abstract class BoutiquesInputNonFlag extends BoutiquesInput{
      *         Return value can be null if this has no 'value-requires' dependency
      */
     @Override
-    public Map<String, String[]> getValueRequiresInputsId(){
+    public Map<String, List<String>> getValueRequiresInputsId(){
         return this.valueRequiresInputsId;
     }
 
@@ -84,7 +81,7 @@ public abstract class BoutiquesInputNonFlag extends BoutiquesInput{
      * @return Array of Strings representing possible value choices for this input, or null if any value can be entered
      */
     @Override
-    public String[] getPossibleValues() {
+    public List<String> getPossibleValues() {
         return this.possibleValues;
     }
 }

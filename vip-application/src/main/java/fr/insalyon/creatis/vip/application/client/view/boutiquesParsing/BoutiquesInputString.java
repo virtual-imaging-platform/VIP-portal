@@ -9,6 +9,8 @@ import fr.insalyon.creatis.vip.application.client.view.launch.LaunchFormLayout;
 import fr.insalyon.creatis.vip.application.client.view.launch.StringInputLayout;
 import fr.insalyon.creatis.vip.application.client.view.launch.ValueChoiceInputLayout;
 
+import java.util.List;
+
 /**
  * Representation of a String or File input in an application Boutiques descriptor
  *
@@ -48,7 +50,7 @@ public class BoutiquesInputString extends BoutiquesInputNonFlag{
      * @return Array of Strings representing possible value choices for this input, or null if any value can be entered
      */
     @Override
-    public String[] getPossibleValues() {
+    public List<String> getPossibleValues() {
         return this.possibleValues;
     }
 

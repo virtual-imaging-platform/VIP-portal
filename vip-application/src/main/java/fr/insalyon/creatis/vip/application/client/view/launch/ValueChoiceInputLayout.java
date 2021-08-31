@@ -39,7 +39,7 @@ public class ValueChoiceInputLayout extends InputLayout{
         SelectItem inputField = new SelectItem();
         inputField.setWidth(400);
         inputField.setShowTitle(false);
-        inputField.setValueMap(this.input.getPossibleValues());
+        inputField.setValueMap(this.input.getPossibleValues().toArray(new String[]{}));
         inputField.setValue(this.getDefaultValue());
         return inputField;
     }
