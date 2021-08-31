@@ -1,8 +1,6 @@
 package fr.insalyon.creatis.vip.application.client.view.boutiquesParsing;
 
 import com.google.gwt.json.client.JSONObject;
-import fr.insalyon.creatis.vip.application.client.view.launch.InputLayout;
-import fr.insalyon.creatis.vip.application.client.view.launch.LaunchFormLayout;
 
 import java.util.List;
 import java.util.Map;
@@ -20,7 +18,9 @@ public abstract class BoutiquesInput {
     protected final boolean isOptional;
     protected final List<String> disablesInputsId;
     protected final List<String> requiresInputsId;
-
+    public enum InputType {
+        STRING, FILE, NUMBER, FLAG
+    }
     /**
      * Initializes input information from its JSON description
      *
@@ -79,12 +79,9 @@ public abstract class BoutiquesInput {
     }
 
     /**
-     * Create an InputLayout representing this input for user interaction
-     *
-     * @param layout LaunchFormLayout representing application launch form, used as InputLayout's parentLayout
-     * @return       InputLayout representing this
+     * @return InputType representing the type of this
      */
-    public abstract InputLayout getLayout(LaunchFormLayout layout);
+    public abstract InputType getType();
 
     /**
      * @return Map of String values of this to array of String IDs of inputs disabled by corresponding values.

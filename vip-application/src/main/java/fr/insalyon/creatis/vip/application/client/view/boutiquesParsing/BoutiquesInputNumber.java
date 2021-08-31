@@ -39,6 +39,11 @@ public class BoutiquesInputNumber extends BoutiquesInputNonFlag{
         this.isExclusiveMinimum = BoutiquesUtil.getBooleanValue(descriptor, "exclusive-minimum", true);
     }
 
+    @Override
+    public InputType getType() {
+        return InputType.NUMBER;
+    }
+
     /**
      * @param value JSONValue to convert
      * @return      String representation of JSONValue, or null if JSONValue is not a valid representation of a number
@@ -50,21 +55,6 @@ public class BoutiquesInputNumber extends BoutiquesInputNonFlag{
             return null;
         }
         return doubleValue.toString();
-    }
-
-    /**
-     * Create an InputLayout representing this input for user interaction
-     *
-     * @param layout LaunchFormLayout representing application launch form, used as InputLayout's parentLayout
-     * @return       InputLayout representing this
-     */
-    @Override
-    public InputLayout getLayout(LaunchFormLayout layout) {
-        if(this.possibleValues == null){
-            return new NumberInputLayout(this, layout);
-        } else {
-            return new ValueChoiceInputLayout(this, layout);
-        }
     }
 
     /**

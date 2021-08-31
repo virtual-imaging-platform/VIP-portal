@@ -10,10 +10,7 @@ import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.Label;
 import com.smartgwt.client.widgets.layout.HLayout;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
-import fr.insalyon.creatis.vip.application.client.view.boutiquesParsing.BoutiquesDescriptor;
-import fr.insalyon.creatis.vip.application.client.view.boutiquesParsing.BoutiquesGroup;
-import fr.insalyon.creatis.vip.application.client.view.boutiquesParsing.BoutiquesInput;
-import fr.insalyon.creatis.vip.application.client.view.boutiquesParsing.BoutiquesInputString;
+import fr.insalyon.creatis.vip.application.client.view.boutiquesParsing.*;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
 import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
@@ -22,6 +19,8 @@ import java.util.*;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+
+import static fr.insalyon.creatis.vip.application.client.view.launch.NumberInputLayout.camelName;
 
 /**
  * Launch form automatically generated from a Boutiques descriptor.
@@ -182,18 +181,34 @@ public class LaunchFormLayout extends AbstractLaunchFormLayout {
      */
     private void configureInputs(BoutiquesDescriptor applicationDescriptor) {
         // Execution name input
-        GWT.log("Creating execution name input");
         this.createArtificialStringInput("Execution name", EXECUTION_NAME_ID, false, null,
                           false, "[" + ApplicationConstants.EXEC_NAME_VALID_CHARS + "]");
-        GWT.log("Creating results directory input");
         this.createArtificialStringInput("Results directory", RESULTS_DIR_ID, true,
                 DataManagerConstants.ROOT + "/" + DataManagerConstants.USERS_HOME, true,
                 null);
         // Application descriptor inputs
-        GWT.log("Creating application inputs");
         for (BoutiquesInput input : applicationDescriptor.getInputs()) {
-            GWT.log(input.getName());
-            InputLayout inputLayout = input.getLayout(this);
+            InputLayout inputLayout;
+            if(input.getPossibleValues() != null){
+                inputLayout = new ValueChoiceInputLayout(input, this);
+            } else {
+                switch (input.getType()) {
+                    case STRING:
+                    case FILE:
+                        String allowedChar = "[" + ApplicationConstants.INPUT_VALID_CHARS + "]";
+                        inputLayout = new StringInputLayout((BoutiquesInputString) input, this,
+                                true, allowedChar);
+                        break;
+                    case NUMBER:
+                        inputLayout = new NumberInputLayout((BoutiquesInputNumber) input, this);
+                        break;
+                    case FLAG:
+                        inputLayout = new FlagInputLayout((BoutiquesInputFlag) input, this);
+                        break;
+                    default:
+                        throw new RuntimeException("Unknown input type: " + input.getType());
+                }
+            }
             this.inputsMap.put(input.getId(), inputLayout);
             this.addMember(inputLayout);
             // Validate input value and dependencies
@@ -215,22 +230,21 @@ public class LaunchFormLayout extends AbstractLaunchFormLayout {
      */
     private void createArtificialStringInput(String name, String id, boolean isFile,
                                              String defaultValue, boolean hasAddValueButton, String allowedChar) {
-        String type = isFile ? "File" : "String";
+        BoutiquesInput.InputType type = isFile ? BoutiquesInput.InputType.FILE : BoutiquesInput.InputType.STRING;
         // Generate an artificial input descriptor
         JSONObject descriptor = new JSONObject();
         descriptor.put("name", new JSONString(name));
         descriptor.put("id", new JSONString(id));
-        descriptor.put("type", new JSONString(type));
+        descriptor.put("type", new JSONString(camelName(type)));
         if(defaultValue != null) {
             descriptor.put("default-value", new JSONString(defaultValue));
         }
         // Create execution name input from the descriptor
-        InputLayout artificialInput = new BoutiquesInputString(descriptor, type)
-                                           .getLayout(this, hasAddValueButton, allowedChar);
-        assert artificialInput instanceof StringInputLayout;
-        this.inputsMap.put(id, artificialInput);
-        this.addMember(artificialInput);
-        artificialInput.onValueChanged();
+        BoutiquesInputString input = new BoutiquesInputString(descriptor,type);
+        InputLayout inputLayout = new StringInputLayout(input, this, hasAddValueButton, allowedChar);
+        this.inputsMap.put(id, inputLayout);
+        this.addMember(inputLayout);
+        inputLayout.onValueChanged();
     }
 
     /**

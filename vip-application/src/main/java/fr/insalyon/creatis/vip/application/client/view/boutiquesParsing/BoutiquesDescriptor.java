@@ -66,8 +66,9 @@ public class BoutiquesDescriptor {
         BoutiquesInput parsedInput;
         switch(inputType) {
             case "String":
+                parsedInput = new BoutiquesInputString(inputDescriptor, BoutiquesInput.InputType.STRING);
             case "File":
-                parsedInput = new BoutiquesInputString(inputDescriptor, inputType);
+                parsedInput = new BoutiquesInputString(inputDescriptor, BoutiquesInput.InputType.FILE);
                 break;
             case "Number":
                 parsedInput = new BoutiquesInputNumber(inputDescriptor);
@@ -83,24 +84,20 @@ public class BoutiquesDescriptor {
         // Dependencies
         String inputId = parsedInput.getId();
         // disables-inputs
-        List<String> disableInputsIds = parsedInput.getDisablesInputsId();
-        if(disableInputsIds != null){
-            this.disablesInputsMap.put(inputId, disableInputsIds);
+        if(parsedInput.getDisablesInputsId() != null){
+            this.disablesInputsMap.put(inputId, parsedInput.getDisablesInputsId());
         }
         // requires-inputs
-        //String[] requireInputsIds = parsedInput.getRequiresInputsId();
         if(parsedInput.getRequiresInputsId() != null){
             this.requiresInputsMap.put(inputId, parsedInput.getRequiresInputsId());
         }
         // value-disables
-        Map<String, List<String>> valueDisablesMap = parsedInput.getValueDisablesInputsId();
-        if(valueDisablesMap != null){
-            this.valueDisablesInputsMap.put(inputId, valueDisablesMap);
+        if(parsedInput.getValueDisablesInputsId() != null){
+            this.valueDisablesInputsMap.put(inputId, parsedInput.getValueDisablesInputsId());
         }
         // value-requires
-        Map<String, List<String>> valueRequiresMap = parsedInput.getValueRequiresInputsId();
-        if(valueRequiresMap != null){
-            this.valueRequiresInputsMap.put(inputId, valueRequiresMap);
+        if(parsedInput.getValueRequiresInputsId() != null){
+            this.valueRequiresInputsMap.put(inputId, parsedInput.getValueRequiresInputsId());
         }
     }
 

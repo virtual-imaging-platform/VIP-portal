@@ -35,15 +35,9 @@ public class BoutiquesInputFlag extends BoutiquesInput{
         return true;
     }
 
-    /**
-     * Create a FlagInputLayout representing this input for user interaction
-     *
-     * @param layout LaunchFormLayout representing application launch form, used as InputLayout's parentLayout
-     * @return       FlagInputLayout representing this
-     */
     @Override
-    public FlagInputLayout getLayout(LaunchFormLayout layout) {
-        return new FlagInputLayout(this, layout);
+    public InputType getType() {
+        return InputType.FLAG;
     }
 
     /**
