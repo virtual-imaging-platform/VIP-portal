@@ -41,6 +41,7 @@ import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.tab.Tab;
 import fr.insalyon.creatis.vip.application.client.bean.boutiquesTools.BoutiquesApplication;
 import fr.insalyon.creatis.vip.application.client.view.boutiquesParsing.BoutiquesParser;
+import fr.insalyon.creatis.vip.application.client.view.boutiquesParsing.InvalidBoutiquesDescriptorException;
 import fr.insalyon.creatis.vip.applicationimporter.client.ApplicationImporterException;
 import fr.insalyon.creatis.vip.applicationimporter.client.rpc.ApplicationImporterService;
 import fr.insalyon.creatis.vip.applicationimporter.client.view.Constants;
@@ -115,15 +116,21 @@ public class DisplayTab extends Tab {
     public static BoutiquesApplication parseJSON(String jsonDescriptor)
         throws ApplicationImporterException {
 
-        BoutiquesApplication boutiquesApplication = new BoutiquesParser().parseApplication(jsonDescriptor);
-        verifyBoutiquesTool(boutiquesApplication);
+        BoutiquesApplication boutiquesApplication = null;
+        try {
+            boutiquesApplication = new BoutiquesParser().parseApplication(jsonDescriptor);
+            verifyBoutiquesTool(boutiquesApplication);
+        } catch (InvalidBoutiquesDescriptorException exception) {
+            Layout.getInstance().setWarningMessage("Unable to parse application descriptor:<br />"
+                    + exception.getMessage(), 10);
+        }
         return boutiquesApplication;
     }
 
     /**
      * Populates the class with instance variables containing values in the JSON
      * object, and refreshes the display.
-     * @param boutiquesTool
+     * @param boutiquesTool BoutiquesApplication
      */
     public void setBoutiqueTool(BoutiquesApplication boutiquesTool) {
         this.boutiquesTool = boutiquesTool;

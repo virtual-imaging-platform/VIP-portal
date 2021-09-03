@@ -182,11 +182,16 @@ public class LaunchFormLayout extends AbstractLaunchFormLayout {
      */
     private void configureInputs(BoutiquesApplication applicationDescriptor) {
         // Execution name input
-        this.createArtificialStringInput("Execution name", EXECUTION_NAME_ID, false, null,
-                          false, "[" + ApplicationConstants.EXEC_NAME_VALID_CHARS + "]");
-        this.createArtificialStringInput("Results directory", RESULTS_DIR_ID, true,
-                DataManagerConstants.ROOT + "/" + DataManagerConstants.USERS_HOME, true,
-                null);
+        try {
+            this.createArtificialStringInput("Execution name", EXECUTION_NAME_ID, false, null,
+                    false, "[" + ApplicationConstants.EXEC_NAME_VALID_CHARS + "]");
+            this.createArtificialStringInput("Results directory", RESULTS_DIR_ID, true,
+                    DataManagerConstants.ROOT + "/" + DataManagerConstants.USERS_HOME, true,
+                    null);
+        } catch (InvalidBoutiquesDescriptorException exception) {
+            // This should not happen as parameters provided to createArtificialStringInput should be valid.
+            throw new RuntimeException("Could not create 'Execution name' and 'Results directory' input layouts.");
+        }
         // Application descriptor inputs
         for (BoutiquesInput input : applicationDescriptor.getInputs()) {
             InputLayout inputLayout;
@@ -228,9 +233,11 @@ public class LaunchFormLayout extends AbstractLaunchFormLayout {
      * @param hasAddValueButton boolean: true if input should have a "add value" button, false otherwise
      * @param allowedChar       String representing a regexp of allowed characters (ex: "[a-zA-z0-9]" for alphanumeric).
      *                          null with use default value "[" + ApplicationConstants.INPUT_VALID_CHARS + "]".
+     * @throws InvalidBoutiquesDescriptorException if provided properties are invalid
      */
     private void createArtificialStringInput(String name, String id, boolean isFile,
-                                             String defaultValue, boolean hasAddValueButton, String allowedChar) {
+                                             String defaultValue, boolean hasAddValueButton, String allowedChar)
+            throws InvalidBoutiquesDescriptorException {
         BoutiquesInput.InputType type = isFile ? BoutiquesInput.InputType.FILE : BoutiquesInput.InputType.STRING;
         // Generate an artificial input descriptor
         JSONObject descriptor = new JSONObject();
@@ -241,11 +248,17 @@ public class LaunchFormLayout extends AbstractLaunchFormLayout {
             descriptor.put("default-value", new JSONString(defaultValue));
         }
         // Create execution name input from the descriptor
-        BoutiquesInputString input = (BoutiquesInputString) new BoutiquesParser().parseInput(descriptor);
-        InputLayout inputLayout = new StringInputLayout(input, this, hasAddValueButton, allowedChar);
-        this.inputsMap.put(id, inputLayout);
-        this.addMember(inputLayout);
-        inputLayout.onValueChanged();
+
+        try {
+            BoutiquesInputString input = (BoutiquesInputString) new BoutiquesParser().parseInput(descriptor);
+            InputLayout inputLayout = new StringInputLayout(input, this, hasAddValueButton, allowedChar);
+            this.inputsMap.put(id, inputLayout);
+            this.addMember(inputLayout);
+            inputLayout.onValueChanged();
+        } catch (InvalidBoutiquesDescriptorException exception) {
+            throw new InvalidBoutiquesDescriptorException("Could not create artificial input with properties :"
+                    + descriptor, exception);
+        }
     }
 
     /**

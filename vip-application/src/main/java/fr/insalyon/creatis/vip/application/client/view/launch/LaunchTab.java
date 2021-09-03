@@ -37,6 +37,7 @@ import fr.insalyon.creatis.vip.application.client.rpc.WorkflowService;
 import fr.insalyon.creatis.vip.application.client.rpc.WorkflowServiceAsync;
 import fr.insalyon.creatis.vip.application.client.bean.boutiquesTools.BoutiquesApplication;
 import fr.insalyon.creatis.vip.application.client.view.boutiquesParsing.BoutiquesParser;
+import fr.insalyon.creatis.vip.application.client.view.boutiquesParsing.InvalidBoutiquesDescriptorException;
 import fr.insalyon.creatis.vip.application.client.view.common.AbstractLaunchTab;
 import fr.insalyon.creatis.vip.application.client.view.monitor.timeline.TimelineLayout;
 import fr.insalyon.creatis.vip.core.client.CoreModule;
@@ -89,7 +90,13 @@ public class LaunchTab extends AbstractLaunchTab {
             @Override
             public void onSuccess(String boutiquesDescriptorString) {
                 BoutiquesApplication applicationTool =
-                        new BoutiquesParser().parseApplication(boutiquesDescriptorString);
+                        null;
+                try {
+                    applicationTool = new BoutiquesParser().parseApplication(boutiquesDescriptorString);
+                } catch (InvalidBoutiquesDescriptorException exception) {
+                    Layout.getInstance().setWarningMessage("Unable to parse application descriptor:<br />"
+                            + exception.getMessage(), 10);
+                }
                 launchFormLayout = new LaunchFormLayout(applicationTool, applicationName, applicationVersion,
                         applicationClass);
                 layout.addMember(launchFormLayout);

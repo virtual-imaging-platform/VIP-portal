@@ -3,7 +3,10 @@ package fr.insalyon.creatis.vip.application.client.view.boutiquesParsing;
 import com.google.gwt.json.client.*;
 import fr.insalyon.creatis.vip.application.client.bean.boutiquesTools.*;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 
 /**
@@ -18,12 +21,12 @@ public class BoutiquesParser {
      * Parse JSON Boutiques descriptor
      *
      * @param descriptor        String representing application JSON descriptor
-     * @throws RuntimeException if descriptor is invalid
+     * @throws InvalidBoutiquesDescriptorException if descriptor is invalid
      */
-    public BoutiquesApplication parseApplication(String descriptor) throws RuntimeException{
+    public BoutiquesApplication parseApplication(String descriptor) throws InvalidBoutiquesDescriptorException{
         JSONObject parsedDescriptor = JSONParser.parseStrict(descriptor).isObject();
         if (parsedDescriptor == null) {
-            throw new RuntimeException("Invalid Boutiques descriptor: not a JSON object.");
+            throw new InvalidBoutiquesDescriptorException("Invalid Boutiques descriptor: not a JSON object.");
         }
         String name = getStringValue(parsedDescriptor, "name");
         String description = getStringValue(parsedDescriptor, "description");
@@ -32,7 +35,13 @@ public class BoutiquesParser {
         // Inputs
         JSONArray inputsArray = getArrayValue(parsedDescriptor, "inputs", false);
         for(int inputNo = 0; inputNo < inputsArray.size(); inputNo++){
-            BoutiquesInput input = parseInput(inputsArray.get(inputNo).isObject());
+            BoutiquesInput input;
+            try {
+                input = parseInput(inputsArray.get(inputNo).isObject());
+            } catch (InvalidBoutiquesDescriptorException exception){
+                throw new InvalidBoutiquesDescriptorException("Invalid Boutiques descriptor: input " + inputNo
+                        + " is invalid.", exception);
+            }
             application.addInput(input);
             // Dependencies
             String inputId = input.getId();
@@ -58,10 +67,15 @@ public class BoutiquesParser {
         for(int groupNo = 0; groupNo < groupsArray.size(); groupNo++) {
             JSONObject currentGroupDescriptor = groupsArray.get(groupNo).isObject();
             if (currentGroupDescriptor == null) {
-                throw new RuntimeException("Invalid Boutiques descriptor: group " + groupNo
+                throw new InvalidBoutiquesDescriptorException("Invalid Boutiques descriptor: group " + groupNo
                         + " is not a JSON object");
             }
-            application.addGroup(parseGroup(currentGroupDescriptor));
+            try {
+                application.addGroup(parseGroup(currentGroupDescriptor));
+            } catch (InvalidBoutiquesDescriptorException exception){
+                throw new InvalidBoutiquesDescriptorException("Invalid Boutiques descriptor: group " + groupNo
+                        + " is invalid.", exception);
+            }
         }
         // Other properties
         application.setAuthor(getStringValue(parsedDescriptor, "author", true));
@@ -73,23 +87,39 @@ public class BoutiquesParser {
         JSONArray outputJSONArray = getArrayValue(parsedDescriptor, "output-files", true);
         if (outputJSONArray != null) {
             for (int i = 0; i < outputJSONArray.size(); i++) {
-                application.getOutputFiles().add(parseBoutiquesOutputFile(outputJSONArray.get(i).isObject()));
+                try{
+                    application.getOutputFiles().add(parseBoutiquesOutputFile(outputJSONArray.get(i).isObject()));
+                } catch (InvalidBoutiquesDescriptorException exception){
+                    throw new InvalidBoutiquesDescriptorException("Invalid Boutiques descriptor: output file " + i
+                            + " is invalid.", exception);
+                }
             }
         }
         // Tags
         JSONObject tagsJSONObject = getObjectValue(parsedDescriptor, "tags", true);
         if (tagsJSONObject != null) {
             for (String key : tagsJSONObject.keySet()) {
-                String value = getStringValue(tagsJSONObject, key);
+                String value;
+                try {
+                     value = getStringValue(tagsJSONObject, key);
+                } catch (InvalidBoutiquesDescriptorException exception){
+                    throw new InvalidBoutiquesDescriptorException("Invalid Boutiques descriptor: tag with key '" + key
+                            + "' is not a valid String.", exception);
+                }
                 application.addTag(key, value);
             }
         }
         // Container image
         JSONObject containerObject = getObjectValue(parsedDescriptor, "container-image", true);
         if (containerObject != null) {
-            application.setContainerType(getStringValue(containerObject, "type"));
-            application.setContainerImage(getStringValue(containerObject, "image"));
-            application.setContainerIndex(getStringValue(containerObject, "index", true));
+            try {
+                application.setContainerType(getStringValue(containerObject, "type"));
+                application.setContainerImage(getStringValue(containerObject, "image"));
+                application.setContainerIndex(getStringValue(containerObject, "index", true));
+            } catch (InvalidBoutiquesDescriptorException exception){
+                throw new InvalidBoutiquesDescriptorException("Invalid Boutiques descriptor: invalid container-image.",
+                        exception);
+            }
         }
         // Json descriptor
         application.setJsonFile(parsedDescriptor.toString());
@@ -101,11 +131,11 @@ public class BoutiquesParser {
      *
      * @param inputJson JSONObject containing input information
      * @return          Parsed BoutiquesInput
-     * @throws RuntimeException if the JSONObject is not a valid representation of a Boutiques input
+     * @throws InvalidBoutiquesDescriptorException if the JSONObject is not a valid representation of a Boutiques input
      */
-    public BoutiquesInput parseInput(JSONObject inputJson) throws RuntimeException{
+    public BoutiquesInput parseInput(JSONObject inputJson) throws InvalidBoutiquesDescriptorException{
         if (inputJson == null){
-            throw new RuntimeException("Invalid Boutiques descriptor: not a JSON object");
+            throw new InvalidBoutiquesDescriptorException("Invalid input descriptor: not a JSON object");
         }
         // General attributes
         String id = getStringValue(inputJson, "id");
@@ -132,7 +162,13 @@ public class BoutiquesParser {
             List<String> possibleValues;
             switch (inputType) {
                 case NUMBER:
-                    possibleValues = jsonArrayToStringList(isOptional, possibleValuesArray, this::jsonValueToDouble);
+                    try {
+                        possibleValues = jsonArrayToStringList(isOptional, possibleValuesArray, this::jsonValueToDouble);
+                    } catch (InvalidBoutiquesDescriptorException exception){
+                        throw new InvalidBoutiquesDescriptorException("Invalid input descriptor: "
+                                + "input of type 'Number' but value-choice contains non-double value(s).",
+                                exception);
+                    }
                     Double defaultValueDouble = getDoubleValue(inputJson, "default-value", true);
                     boolean isInteger = getBooleanValue(inputJson, "integer", true);
                     Double maximum = getDoubleValue(inputJson, "maximum", true);
@@ -145,14 +181,20 @@ public class BoutiquesParser {
                     break;
                 case STRING:
                 case FILE:
-                    possibleValues = jsonArrayToStringList(isOptional, possibleValuesArray, this::jsonValueToString);
+                    try {
+                        possibleValues = jsonArrayToStringList(isOptional, possibleValuesArray, this::jsonValueToString);
+                    } catch (InvalidBoutiquesDescriptorException exception) {
+                        throw new InvalidBoutiquesDescriptorException("Invalid input descriptor: input of type '"
+                                + inputType.getCamelName() + "'but value-choice contains non-String value(s).",
+                                exception);
+                    }
                     String defaultValueString = getStringValue(inputJson, "default-value", true);
                     input = new BoutiquesInputString(id, name, description, inputType, isOptional, disablesInputsId,
                             requiresInputsId,  possibleValues, valueDisablesInputsId, valueRequiresInputsId,
                             defaultValueString);
                     break;
                 default:
-                    throw new RuntimeException("Invalid Boutiques descriptor: invalid type '"
+                    throw new InvalidBoutiquesDescriptorException("Invalid input descriptor: invalid type '"
                             + inputType + "'. Only allowed types are 'String', 'File', 'Number' and 'Flag'.");
             }
         }
@@ -168,8 +210,9 @@ public class BoutiquesParser {
      *
      * @param groupJson JSONObject to parse
      * @return BoutiquesGroup representing parsed group
+     * @throws InvalidBoutiquesDescriptorException if JSON Object is not a valid representation of a group
      */
-    public BoutiquesGroup parseGroup(JSONObject groupJson){
+    public BoutiquesGroup parseGroup(JSONObject groupJson) throws InvalidBoutiquesDescriptorException{
         String id = getStringValue(groupJson, "id");
         List<String> members = getArrayValueAsStringList(groupJson, "members", false);
         boolean allOrNone = getBooleanValue(groupJson, "all-or-none", true);
@@ -183,9 +226,10 @@ public class BoutiquesParser {
      *
      * @param outputFile JSONObject to parse
      * @return BoutiquesOutputFile representing parsed output file
-     * @throws RuntimeException if outputFile is not a valid representation of an output file
+     * @throws InvalidBoutiquesDescriptorException if outputFile is not a valid representation of an output file
      */
-    private BoutiquesOutputFile parseBoutiquesOutputFile(JSONObject outputFile) throws RuntimeException {
+    private BoutiquesOutputFile parseBoutiquesOutputFile(JSONObject outputFile)
+            throws InvalidBoutiquesDescriptorException {
         BoutiquesOutputFile bof = new BoutiquesOutputFile();
         bof.setId(getStringValue(outputFile, "id"));
         bof.setName(getStringValue(outputFile, "name"));
@@ -210,10 +254,12 @@ public class BoutiquesParser {
      * @param valueConverter Function converting a JSONValue to any Object, or returning null if the JSONValue is
      *                       not of expected type. It is used to ensure all values from jsonArray are valid.
      * @return List of String. Always null if jsonArray was null
-     * @throws RuntimeException if a value is not valid (valueConverter returned null on one of jsonArray's values)
+     * @throws InvalidBoutiquesDescriptorException if a value is not valid (valueConverter returned null on one of
+     *                                             jsonArray's values)
      */
     private List<String> jsonArrayToStringList(boolean addEmptyValue, JSONArray jsonArray,
-                                       Function<JSONValue, Object> valueConverter) throws RuntimeException {
+                                       Function<JSONValue, Object> valueConverter)
+            throws InvalidBoutiquesDescriptorException {
         if(jsonArray == null) {
             return null;
         }
@@ -224,14 +270,13 @@ public class BoutiquesParser {
         for (int valueNo = 0; valueNo < jsonArray.size(); valueNo++) {
             Object iValue = valueConverter.apply(jsonArray.get(valueNo));
             if (iValue == null) {
-                throw new RuntimeException("Invalid Boutiques descriptor: input has invalid value-choices.");
+                throw new InvalidBoutiquesDescriptorException("Invalid JSON array: value " + valueNo
+                        + " is not of expected type.");
             }
             stringList.add(iValue.toString());
         }
         return stringList;
     }
-
-
 
     /**
      * Helper method to get value associated to given key in given JSON object. Provided converter function allows
@@ -243,30 +288,29 @@ public class BoutiquesParser {
      *                      instead of a RuntimeException
      * @param converter     Function<JSONValue, T> converting found JSONValue to expected type, or null if value is
      *                      invalid
-     * @param awaitedType   String representing expected type, used in error message if found value is invalid
      * @param <T>           Type of expected value after conversion
      * @return              Value associated to key after conversion, or null if key is absent and optional is true
-     * @throws RuntimeException if expected value is invalid or if key is absent and optional is false
+     * @throws InvalidBoutiquesDescriptorException if value is invalid or if key is absent and optional is false
      * @see #getStringValue(JSONObject, String, boolean)
      * @see #getDoubleValue(JSONObject, String, boolean)
      * @see #getBooleanValue(JSONObject, String, boolean)
      * @see #getArrayValue(JSONObject, String, boolean)
      */
     private <T> T applyToValue(JSONObject descriptor, String key, boolean optional,
-                                     Function<JSONValue, T> converter, String awaitedType)
-            throws RuntimeException {
+                               Function<JSONValue, T> converter)
+            throws InvalidBoutiquesDescriptorException {
         if (descriptor.containsKey(key)) {
             T value = converter.apply(descriptor.get(key));
             if (value == null) {
-                throw new RuntimeException("Invalid Boutiques descriptor: '" + key + "' value is not a valid "
-                        + awaitedType);
+                throw new InvalidBoutiquesDescriptorException("Invalid JSON object: '" + key + "' value is not valid.");
             }
             return value;
         } else {
             if(optional){
                 return null;
             } else {
-                throw new RuntimeException("Invalid Boutiques descriptor: does not contain key '" + key + "'.");
+                throw new InvalidBoutiquesDescriptorException("Invalid JSON object: does not contain mandatory key '"
+                        + key + "'.");
             }
         }
     }
@@ -316,11 +360,17 @@ public class BoutiquesParser {
      * @param optional      boolean: true if key is optional, in which case its absence will lead to a null return value
      *                      instead of a RuntimeException
      * @return              Double value associated to key in descriptor, or null if key is absent and optional is true
-     * @throws RuntimeException if expected value is not a valid number or if key is absent and optional is false
+     * @throws InvalidBoutiquesDescriptorException if expected value is not a valid number or if key is absent and
+     *                                             optional is false
      */
     private Double getDoubleValue(JSONObject descriptor, String key, boolean optional)
-            throws RuntimeException {
-        return applyToValue(descriptor, key, optional, this::jsonValueToDouble, "number");
+            throws InvalidBoutiquesDescriptorException {
+        try {
+            return applyToValue(descriptor, key, optional, this::jsonValueToDouble);
+        } catch (InvalidBoutiquesDescriptorException exception){
+            throw new InvalidBoutiquesDescriptorException("Invalid JSON object: no valid double value with key '"
+                    + key + "'.", exception);
+        }
     }
 
     /**
@@ -332,12 +382,18 @@ public class BoutiquesParser {
      *                      value instead of a RuntimeException
      * @return              boolean value associated to key in descriptor, or false if key is absent and optional is
      *                      true
-     * @throws RuntimeException if expected value is not a valid boolean or if key is absent and optional is false
+     * @throws InvalidBoutiquesDescriptorException if expected value is not a valid boolean or if key is absent and
+     *                                             optional is false
      */
     private boolean getBooleanValue(JSONObject descriptor, String key, boolean optional)
-            throws RuntimeException {
-        JSONBoolean value = applyToValue(descriptor, key, optional, JSONValue::isBoolean, "boolean");
-        return (value != null) && value.booleanValue();
+            throws InvalidBoutiquesDescriptorException {
+        try {
+            JSONBoolean value = applyToValue(descriptor, key, optional, JSONValue::isBoolean);
+            return (value != null) && value.booleanValue();
+        } catch (InvalidBoutiquesDescriptorException exception){
+            throw new InvalidBoutiquesDescriptorException("Invalid JSON object: no valid boolean value with key '"
+                    + key + "'.", exception);
+        }
     }
 
     /**
@@ -346,10 +402,10 @@ public class BoutiquesParser {
      * @param descriptor    JSONObject to parse
      * @param key           String representing the key in descriptor associated to searched value
      * @return              String value associated to key in descriptor
-     * @throws RuntimeException if expected value is not a valid String or if key is absent
+     * @throws InvalidBoutiquesDescriptorException if expected value is not a valid String or if key is absent
      * @see #getStringValue(JSONObject, String, boolean)
      */
-    private String getStringValue(JSONObject descriptor, String key) throws RuntimeException{
+    private String getStringValue(JSONObject descriptor, String key) throws InvalidBoutiquesDescriptorException{
         String stringValue = getStringValue(descriptor, key, false);
         assert stringValue != null;
         return stringValue;
@@ -363,12 +419,18 @@ public class BoutiquesParser {
      * @param optional      boolean: true if key is optional, in which case its absence will lead to a null return value
      *                      instead of a RuntimeException
      * @return              String value associated to key in descriptor, or null if key is absent and optional is true
-     * @throws RuntimeException if expected value is not a valid String or if key is absent and optional is false
+     * @throws InvalidBoutiquesDescriptorException if expected value is not a valid String or if key is absent and
+     *                                             optional is false
      */
     private String getStringValue(JSONObject descriptor, String key, boolean optional)
-            throws RuntimeException {
-        JSONString value = applyToValue(descriptor, key, optional, JSONValue::isString, "String");
-        return value == null ? null : value.stringValue();
+            throws InvalidBoutiquesDescriptorException {
+        try{
+            JSONString value = applyToValue(descriptor, key, optional, JSONValue::isString);
+            return value == null ? null : value.stringValue();
+        } catch (InvalidBoutiquesDescriptorException exception){
+            throw new InvalidBoutiquesDescriptorException("Invalid JSON object: no valid String value with key '"
+                    + key + "'.", exception);
+        }
     }
 
     /**
@@ -380,11 +442,17 @@ public class BoutiquesParser {
      *                      value instead of a RuntimeException
      * @return              JSONArray value associated to key in descriptor, or null if key is absent and optional is
      *                      true
-     * @throws RuntimeException if expected value is not a valid array or if key is absent and optional is false
+     * @throws InvalidBoutiquesDescriptorException if expected value is not a valid array or if key is absent and
+     *                                             optional is false
      */
     private JSONArray getArrayValue(JSONObject descriptor, String key, boolean optional)
-            throws RuntimeException {
-        return applyToValue(descriptor, key, optional, JSONValue::isArray, "array");
+            throws InvalidBoutiquesDescriptorException {
+        try {
+            return applyToValue(descriptor, key, optional, JSONValue::isArray);
+        } catch (InvalidBoutiquesDescriptorException exception){
+            throw new InvalidBoutiquesDescriptorException("Invalid JSON object: no valid Array value with key '"
+                    + key + "'.", exception);
+        }
     }
 
     /**
@@ -396,16 +464,17 @@ public class BoutiquesParser {
      *                      value instead of a RuntimeException
      * @return              Array of Strings associated to key in descriptor, or null if key is absent and optional is
      *                      true
-     * @throws RuntimeException if expected value is not a valid String array or if key is absent and optional is false
+     * @throws InvalidBoutiquesDescriptorException if expected value is not a valid String array or if key is absent
+     *                                             and optional is false
      */
     private List<String> getArrayValueAsStringList(JSONObject descriptor, String key, boolean optional)
-            throws RuntimeException {
+            throws InvalidBoutiquesDescriptorException {
         JSONArray array = getArrayValue(descriptor, key, optional);
         try {
-            return array == null ? null : JSONArrayToStrings(array);
-        } catch(RuntimeException exception){
-            throw new RuntimeException("Invalid Boutiques descriptor: '" + key
-                    + "' array contains non-String element(s).");
+            return array == null ? null : JSONArrayToStringList(array);
+        } catch(InvalidBoutiquesDescriptorException exception){
+            throw new InvalidBoutiquesDescriptorException("Invalid JSON object: '" + key
+                    + "' array contains non-String element(s).", exception);
         }
     }
 
@@ -414,14 +483,14 @@ public class BoutiquesParser {
      *
      * @param array JSONArray to convert
      * @return      Array of Strings representing array
-     * @throws RuntimeException if some elements of array are not valid Strings
+     * @throws InvalidBoutiquesDescriptorException if some elements of array are not valid Strings
      */
-    private List<String> JSONArrayToStrings(JSONArray array) throws RuntimeException {
+    private List<String> JSONArrayToStringList(JSONArray array) throws InvalidBoutiquesDescriptorException {
         List<String> stringArray = new ArrayList<>();
         for (int valueNo = 0; valueNo < array.size(); valueNo++){
             JSONString valueString = array.get(valueNo).isString();
             if(valueString == null){
-                throw new RuntimeException("Invalid Array: value " + valueNo + " is not a String.");
+                throw new InvalidBoutiquesDescriptorException("Invalid Array: value " + valueNo + " is not a String.");
             }
             stringArray.add(valueString.stringValue());
         }
@@ -439,11 +508,12 @@ public class BoutiquesParser {
      * @return              Map representing JSON object associated to key in descriptor, or null if key is absent and
      *                      optional is true. Map's keys are obtained JSON object keys and values are String arrays
      *                      representing its values
-     * @throws RuntimeException if expected value is not a valid object or if key is absent and optional is false
+     * @throws InvalidBoutiquesDescriptorException if expected value is not a valid object or if key is absent and
+     *                                             optional is false
      */
     private Map<String, List<String>> getStringMapValue(JSONObject descriptor, String key,
-                                                              boolean optional) throws RuntimeException {
-        JSONObject object = applyToValue(descriptor, key, optional, JSONValue::isObject, "JSON object");
+                                                        boolean optional) throws InvalidBoutiquesDescriptorException {
+        JSONObject object = getObjectValue(descriptor, key, optional);
         if(object == null){
             return null;
         }
@@ -452,11 +522,11 @@ public class BoutiquesParser {
         for(String objectKey : object.keySet()){
             JSONArray objectValue = object.get(objectKey).isArray();
             if (objectValue == null){
-                throw new RuntimeException("Invalid Boutiques descriptor: '" + objectKey + "' value in " + key
-                        + "object is not a JSON Array.");
+                throw new InvalidBoutiquesDescriptorException("Invalid JSON object: '" + objectKey
+                        + "' value in " + key + "object is not a JSON Array.");
             }
             if(objectValue.size() > 0){
-                convertedObject.put(objectKey, JSONArrayToStrings(objectValue));
+                convertedObject.put(objectKey, JSONArrayToStringList(objectValue));
             }
         }
         return convertedObject;
@@ -470,10 +540,16 @@ public class BoutiquesParser {
      * @param optional   boolean: true if key is optional, in which case its absence will lead to a null return
      *                   value instead of a RuntimeException
      * @return           JSONObject associated to key in descriptor
-     * @throws RuntimeException if expected value is not a valid JSONObjector if key is absent and optional is false
+     * @throws InvalidBoutiquesDescriptorException if expected value is not a valid JSONObjector if key is absent and
+     *                                             optional is false
      */
     private JSONObject getObjectValue(JSONObject descriptor, String key, boolean optional)
-            throws RuntimeException {
-        return applyToValue(descriptor, key, optional, JSONValue::isObject, "JSON object");
+            throws InvalidBoutiquesDescriptorException {
+        try{
+            return applyToValue(descriptor, key, optional, JSONValue::isObject);
+        } catch (InvalidBoutiquesDescriptorException exception){
+            throw new InvalidBoutiquesDescriptorException("Invalid JSON object: no valid JSON object value with key '"
+                    + key + "'.", exception);
+        }
     }
 }
