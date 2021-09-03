@@ -153,9 +153,9 @@ public class BoutiquesParser extends AbstractJsonParser{
                     defaultValue);
         } else {
             // Non flag inputs (Number, String or File)
-            Map<String, List<String>> valueDisablesInputsId = getStringMapValue(inputJson, "value-disables",
+            Map<String, List<String>> valueDisablesInputsId = getStringListMapValue(inputJson, "value-disables",
                     true);
-            Map<String, List<String>> valueRequiresInputsId = getStringMapValue(inputJson, "value-requires",
+            Map<String, List<String>> valueRequiresInputsId = getStringListMapValue(inputJson, "value-requires",
                     true);
             JSONArray possibleValuesArray = getArrayValue(inputJson, "value-choices", true);
             List<String> possibleValues;

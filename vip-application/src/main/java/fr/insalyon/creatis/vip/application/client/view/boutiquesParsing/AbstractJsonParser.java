@@ -18,7 +18,8 @@ public class AbstractJsonParser {
 
     /**
      * Helper method to get value associated to given key in given JSON object. Provided converter function allows
-     * conversion from JSONValue to awaited type. Converter returns null if obtained value is not a valid
+     * conversion from JSONValue to awaited type. Converter returns null if obtained value is not of expected type
+     * (in which case applyToValue throws an InvalidBoutiquesDescriptorException)
      *
      * @param jsonObject    JSONObject to parse
      * @param key           String representing the key in jsonObject associated to searched value
@@ -267,8 +268,8 @@ public class AbstractJsonParser {
      * @throws InvalidBoutiquesDescriptorException if expected value is not a valid object or if key is absent and
      *                                             optional is false
      */
-    protected Map<String, List<String>> getStringMapValue(JSONObject descriptor, String key,
-                                                        boolean optional) throws InvalidBoutiquesDescriptorException {
+    protected Map<String, List<String>> getStringListMapValue(JSONObject descriptor, String key, boolean optional)
+            throws InvalidBoutiquesDescriptorException {
         JSONObject object = getObjectValue(descriptor, key, optional);
         if(object == null){
             return null;
