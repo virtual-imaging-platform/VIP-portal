@@ -1,5 +1,7 @@
 package fr.insalyon.creatis.vip.application.client.bean.boutiquesTools;
 
+import com.google.gwt.user.client.rpc.IsSerializable;
+
 import java.util.List;
 import java.util.Map;
 
@@ -9,7 +11,7 @@ import java.util.Map;
  * @author Guillaume Vanel
  * @version %I%, %G%
  */
-public abstract class BoutiquesInput {
+public abstract class BoutiquesInput implements IsSerializable {
     protected final String id;
     protected final String name;
     protected final String description;
@@ -54,7 +56,7 @@ public abstract class BoutiquesInput {
     public BoutiquesInput(String id, String name, String description, InputType type, boolean isOptional,
                                  List<String> disablesInputsId, List<String> requiresInputsId,
                                  List<String> possibleValues, Map<String, List<String>> valueDisablesInputsId,
-                                 Map<String, List<String>> valueRequiresInputsId) throws RuntimeException{
+                                 Map<String, List<String>> valueRequiresInputsId){
         this.id = id;
         this.name = name;
         this.description = description;

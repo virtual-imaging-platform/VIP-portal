@@ -176,7 +176,7 @@ public class BoutiquesParser extends AbstractJsonParser{
                     boolean isExclusiveMinimum = getBooleanValue(inputJson, "exclusive-minimum", true);
                     input = new BoutiquesNumberInput(id, name, description, isOptional, disablesInputsId,
                             requiresInputsId, possibleValues, valueDisablesInputsId, valueRequiresInputsId,
-                            defaultValueDouble, isInteger, isExclusiveMinimum, isExclusiveMaximum, maximum, minimum);
+                            defaultValueDouble, isInteger, isExclusiveMaximum, isExclusiveMinimum, maximum, minimum);
                     break;
                 case STRING:
                 case FILE:

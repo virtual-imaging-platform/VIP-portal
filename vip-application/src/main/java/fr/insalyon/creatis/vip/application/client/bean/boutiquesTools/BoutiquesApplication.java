@@ -1,5 +1,7 @@
 package fr.insalyon.creatis.vip.application.client.bean.boutiquesTools;
 
+import com.google.gwt.user.client.rpc.IsSerializable;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -11,18 +13,18 @@ import java.util.Map;
  * @author Guillaume Vanel
  * @version %I%, %G%
  */
-public class BoutiquesApplication {
+public class BoutiquesApplication implements IsSerializable {
 
-    private final String name;
-    private final String description;
-    private final String version;
-    private final List<BoutiquesInput> inputs = new ArrayList<>();
+    private String name;
+    private String description;
+    private String version;
+    private List<BoutiquesInput> inputs = new ArrayList<>();
     // Input dependencies
-    private final List<BoutiquesGroup> groups = new ArrayList<>();
-    private final Map<String, List<String>> disablesInputsMap= new HashMap<>();
-    private final Map<String, List<String>> requiresInputsMap= new HashMap<>();
-    private final Map<String, Map<String, List<String>>> valueDisablesInputsMap= new HashMap<>();
-    private final Map<String, Map<String, List<String>>> valueRequiresInputsMap= new HashMap<>();
+    private List<BoutiquesGroup> groups = new ArrayList<>();
+    private Map<String, List<String>> disablesInputsMap= new HashMap<>();
+    private Map<String, List<String>> requiresInputsMap= new HashMap<>();
+    private Map<String, Map<String, List<String>>> valueDisablesInputsMap= new HashMap<>();
+    private Map<String, Map<String, List<String>>> valueRequiresInputsMap= new HashMap<>();
     // Other properties not used for launch form generation
     private String applicationLFN;
     private String author;
@@ -33,18 +35,18 @@ public class BoutiquesApplication {
     private String schemaVersion;
     private String challengerEmail;
     private String challengerTeam;
-    private List<BoutiquesOutputFile> outputFiles = new ArrayList<BoutiquesOutputFile>();
-    private Map<String,String> tags = new HashMap<String,String>();
+    private List<BoutiquesOutputFile> outputFiles = new ArrayList<>();
+    private Map<String,String> tags = new HashMap<>();
     private String jsonFile;
 
+    private BoutiquesApplication(){}
 
     /**
      * @param name String
      * @param description String
      * @param version String
-     * @throws RuntimeException if descriptor is invalid
      */
-    public BoutiquesApplication(String name, String description, String version) throws RuntimeException{
+    public BoutiquesApplication(String name, String description, String version){
         this.name = name;
         this.description = description;
         this.version = version;

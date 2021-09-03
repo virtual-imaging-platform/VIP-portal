@@ -1,6 +1,7 @@
 package fr.insalyon.creatis.vip.application.client.bean.boutiquesTools;
 
 import com.google.gwt.json.client.JSONObject;
+import com.google.gwt.user.client.rpc.IsSerializable;
 
 import java.util.List;
 
@@ -10,7 +11,7 @@ import java.util.List;
  * @author Guillaume Vanel
  * @version %I%, %G%
  */
-public class BoutiquesGroup {
+public class BoutiquesGroup implements IsSerializable {
     private final String id;
     private final boolean allOrNone;
     private final boolean mutuallyExclusive;

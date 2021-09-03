@@ -9,7 +9,7 @@ import java.util.Map;
  * @author Guillaume Vanel
  * @version %I%, %G%
  */
-public class BoutiquesFlagInput extends BoutiquesInput{
+public class BoutiquesFlagInput extends BoutiquesInput {
     final private boolean defaultValue;
 
     /**

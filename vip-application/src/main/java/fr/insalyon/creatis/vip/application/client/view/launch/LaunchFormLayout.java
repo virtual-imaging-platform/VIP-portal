@@ -187,7 +187,7 @@ public class LaunchFormLayout extends AbstractLaunchFormLayout {
                     false, "[" + ApplicationConstants.EXEC_NAME_VALID_CHARS + "]");
             this.createArtificialStringInput("Results directory", RESULTS_DIR_ID, true,
                     DataManagerConstants.ROOT + "/" + DataManagerConstants.USERS_HOME, true,
-                    null);
+                    "[" + ApplicationConstants.INPUT_VALID_CHARS + "]");
         } catch (InvalidBoutiquesDescriptorException exception) {
             // This should not happen as parameters provided to createArtificialStringInput should be valid.
             throw new RuntimeException("Could not create 'Execution name' and 'Results directory' input layouts.");
