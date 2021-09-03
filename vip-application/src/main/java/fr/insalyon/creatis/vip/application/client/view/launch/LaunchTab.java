@@ -35,7 +35,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
 import fr.insalyon.creatis.vip.application.client.rpc.WorkflowService;
 import fr.insalyon.creatis.vip.application.client.rpc.WorkflowServiceAsync;
-import fr.insalyon.creatis.vip.application.client.bean.boutiquesTools.BoutiquesDescriptor;
+import fr.insalyon.creatis.vip.application.client.bean.boutiquesTools.BoutiquesApplication;
 import fr.insalyon.creatis.vip.application.client.view.boutiquesParsing.BoutiquesParser;
 import fr.insalyon.creatis.vip.application.client.view.common.AbstractLaunchTab;
 import fr.insalyon.creatis.vip.application.client.view.monitor.timeline.TimelineLayout;
@@ -88,8 +88,8 @@ public class LaunchTab extends AbstractLaunchTab {
 
             @Override
             public void onSuccess(String boutiquesDescriptorString) {
-                BoutiquesDescriptor applicationTool =
-                        new BoutiquesParser().parseApplicationDescriptor(boutiquesDescriptorString);
+                BoutiquesApplication applicationTool =
+                        new BoutiquesParser().parseApplication(boutiquesDescriptorString);
                 launchFormLayout = new LaunchFormLayout(applicationTool, applicationName, applicationVersion,
                         applicationClass);
                 layout.addMember(launchFormLayout);

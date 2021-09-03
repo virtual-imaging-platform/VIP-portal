@@ -31,12 +31,12 @@
  */
 package fr.insalyon.creatis.vip.applicationimporter.client.rpc;
 
+import fr.insalyon.creatis.vip.application.client.bean.boutiquesTools.BoutiquesApplication;
 import fr.insalyon.creatis.vip.applicationimporter.client.ApplicationImporterException;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.ServiceDefTarget;
-import fr.insalyon.creatis.vip.applicationimporter.client.bean.BoutiquesTool;
-import java.util.HashMap;
+
 import java.util.List;
 
 public interface ApplicationImporterService extends RemoteService {
@@ -55,7 +55,7 @@ public interface ApplicationImporterService extends RemoteService {
 
     String readAndValidateBoutiquesFile(String fileLFN) throws ApplicationImporterException;
 
-    void createApplication(BoutiquesTool bt, String type, String tag, boolean isRunOnGrid, boolean overwriteVersion) throws ApplicationImporterException;
+    void createApplication(BoutiquesApplication bt, String type, String tag, boolean isRunOnGrid, boolean overwriteVersion) throws ApplicationImporterException;
 
     String getApplicationImporterRootFolder() throws ApplicationImporterException;
     

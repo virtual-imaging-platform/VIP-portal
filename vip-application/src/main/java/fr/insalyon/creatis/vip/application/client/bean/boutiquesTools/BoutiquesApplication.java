@@ -11,7 +11,7 @@ import java.util.Map;
  * @author Guillaume Vanel
  * @version %I%, %G%
  */
-public class BoutiquesDescriptor {
+public class BoutiquesApplication {
 
     private final String name;
     private final String description;
@@ -23,6 +23,20 @@ public class BoutiquesDescriptor {
     private final Map<String, List<String>> requiresInputsMap= new HashMap<>();
     private final Map<String, Map<String, List<String>>> valueDisablesInputsMap= new HashMap<>();
     private final Map<String, Map<String, List<String>>> valueRequiresInputsMap= new HashMap<>();
+    // Other properties not used for launch form generation
+    private String applicationLFN;
+    private String author;
+    private String commandLine;
+    private String containerType;
+    private String containerImage;
+    private String containerIndex;
+    private String schemaVersion;
+    private String challengerEmail;
+    private String challengerTeam;
+    private List<BoutiquesOutputFile> outputFiles = new ArrayList<BoutiquesOutputFile>();
+    private Map<String,String> tags = new HashMap<String,String>();
+    private String jsonFile;
+
 
     /**
      * @param name String
@@ -30,7 +44,7 @@ public class BoutiquesDescriptor {
      * @param version String
      * @throws RuntimeException if descriptor is invalid
      */
-    public BoutiquesDescriptor(String name, String description, String version) throws RuntimeException{
+    public BoutiquesApplication(String name, String description, String version) throws RuntimeException{
         this.name = name;
         this.description = description;
         this.version = version;
@@ -99,6 +113,88 @@ public class BoutiquesDescriptor {
         return valueRequiresInputsMap;
     }
 
+    public String getName() {
+        return name;
+    }
+
+    public String getAuthor() {
+        return author;
+    }
+
+    public String getToolVersion() {
+        return version;
+    }
+
+    public String getCommandLine() {
+        return commandLine;
+    }
+
+    public String getContainerType() {
+        return containerType;
+    }
+
+    public String getContainerImage() {
+        return containerImage;
+    }
+
+    public String getContainerIndex() {
+        return containerIndex;
+    }
+
+    public String getSchemaVersion() {
+        return schemaVersion;
+    }
+
+    public String getChallengerEmail() {
+        return challengerEmail;
+    }
+
+    public String getChallengerTeam() {
+        return challengerTeam;
+    }
+
+    public List<BoutiquesOutputFile> getOutputFiles() {
+        return outputFiles;
+    }
+
+    public String getJsonFile() {
+        return jsonFile;
+    }
+
+    public void setJsonFile(String jsonFile) {
+        this.jsonFile = jsonFile;
+    }
+
+    public String getApplicationLFN() {
+        return applicationLFN;
+    }
+
+    public String getWrapperLFN() {
+        return this.applicationLFN + "/bin/" + getName() + ".sh";
+    }
+
+    public String getWrapperName() {
+        return getName() + ".sh";
+    }
+
+    public String getGASWLFN() {
+        return this.applicationLFN + "/gasw/" + getName() + ".xml";
+    }
+
+    public String getGwendiaLFN() {
+        return this.applicationLFN + "/workflow/" + getName() + ".gwendia";
+    }
+
+    public Map<String, String> getTags() {
+        return tags;
+    }
+
+    public String getJsonLFN() {
+        return this.applicationLFN + "/json/" + getName() + ".json";
+    }
+
+
+
     public void addInput(BoutiquesInput input){
         this.inputs.add(input);
     }
@@ -122,4 +218,45 @@ public class BoutiquesDescriptor {
     public void addValueRequiresInputs(String masterId, Map<String, List<String>> valueRequiredMap){
         this.valueRequiresInputsMap.put(masterId, valueRequiredMap);
     }
+
+    public void setAuthor(String author) {
+        this.author = author;
+    }
+
+    public void setCommandLine(String commandLine) {
+        this.commandLine = commandLine;
+    }
+
+    public void setContainerType(String containerType) {
+        this.containerType = containerType;
+    }
+
+    public void setContainerImage(String containerImage) {
+        this.containerImage = containerImage;
+    }
+
+    public void setContainerIndex(String containerIndex) {
+        this.containerIndex = containerIndex;
+    }
+
+    public void setSchemaVersion(String schemaVersion) {
+        this.schemaVersion = schemaVersion;
+    }
+
+    public void setChallengerEmail(String challengerEmail) {
+        this.challengerEmail = challengerEmail;
+    }
+
+    public void setChallengerTeam(String challengerTeam) {
+        this.challengerTeam = challengerTeam;
+    }
+
+    public void setApplicationLFN(String applicationLFN) {
+        this.applicationLFN = applicationLFN;
+    }
+
+    public void addTag(String key, String value) {
+        tags.put(key, value);
+    }
+
 }

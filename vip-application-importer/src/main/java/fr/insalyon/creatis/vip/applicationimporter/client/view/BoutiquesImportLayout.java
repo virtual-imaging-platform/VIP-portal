@@ -31,8 +31,6 @@
  */
 package fr.insalyon.creatis.vip.applicationimporter.client.view;
 
-import fr.insalyon.creatis.vip.applicationimporter.client.view.applicationdisplay.DisplayTab;
-import com.google.gwt.json.client.JSONObject;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.Label;
@@ -43,18 +41,17 @@ import com.smartgwt.client.widgets.form.fields.PickerIcon;
 import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.form.fields.events.FormItemClickHandler;
 import com.smartgwt.client.widgets.form.fields.events.FormItemIconClickEvent;
-import com.smartgwt.client.widgets.tab.Tab;
+import fr.insalyon.creatis.vip.application.client.bean.boutiquesTools.BoutiquesApplication;
+import fr.insalyon.creatis.vip.applicationimporter.client.ApplicationImporterException;
+import fr.insalyon.creatis.vip.applicationimporter.client.rpc.ApplicationImporterService;
+import fr.insalyon.creatis.vip.applicationimporter.client.view.applicationdisplay.DisplayTab;
+import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 import fr.insalyon.creatis.vip.core.client.view.common.AbstractFormLayout;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
 import fr.insalyon.creatis.vip.core.client.view.util.ValidatorUtil;
 import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
 import fr.insalyon.creatis.vip.datamanager.client.view.selection.PathSelectionWindow;
-import fr.insalyon.creatis.vip.applicationimporter.client.bean.BoutiquesTool;
-import fr.insalyon.creatis.vip.applicationimporter.client.rpc.ApplicationImporterService;
-import com.google.gwt.json.client.JSONParser;
-import fr.insalyon.creatis.vip.applicationimporter.client.ApplicationImporterException;
-import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 
 /**
  *
@@ -137,10 +134,8 @@ public class BoutiquesImportLayout extends AbstractFormLayout {
             @Override
             public void onSuccess(String jsonFileContent) {
                 modal.hide();
-                JSONObject json =
-                    JSONParser.parseStrict(jsonFileContent).isObject();
                 try {
-                    BoutiquesTool boutiquesTool = DisplayTab.parseJSON(json);
+                    BoutiquesApplication boutiquesTool = DisplayTab.parseJSON(jsonFileContent);
                     DisplayTab displayTab =
                         (DisplayTab) Layout.getInstance().addTab(
                             Constants.TAB_ID_BOUTIQUES_APPLICATION,

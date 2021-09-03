@@ -21,8 +21,19 @@ public abstract class BoutiquesInput {
     private final Map<String, List<String>> valueDisablesInputsId;
     private final Map<String, List<String>> valueRequiresInputsId;
 
+    private String valueKey;
+    private boolean list;
+    private String commandLineFlag;
+    
     public enum InputType {
-        STRING, FILE, NUMBER, FLAG
+        STRING("String"), FILE("File"), NUMBER("Number"), FLAG("Flag");
+        private final String camelName;
+        InputType(String camelName) {
+            this.camelName = camelName;
+        }
+        public String getCamelName(){
+            return this.camelName;
+        }
     }
 
     /**
@@ -106,6 +117,13 @@ public abstract class BoutiquesInput {
     }
 
     /**
+     * @return String representing the type of this
+     */
+    public String getTypeString(){
+        return this.type.getCamelName();
+    }
+
+    /**
      * @return Map of String values of this to array of String IDs of inputs disabled by corresponding values.
      *         Return value can be null if this has no 'value-disables' dependency
      */
@@ -132,4 +150,30 @@ public abstract class BoutiquesInput {
      * @return Object representing this input's default value, or null if there is not any
      */
     public abstract Object getDefaultValue();
+
+    public String getValueKey() {
+        return valueKey;
+    }
+
+    public boolean isList() {
+        return list;
+    }
+
+    public String getCommandLineFlag() {
+        return commandLineFlag;
+    }
+
+    public void setValueKey(String valueKey) {
+        this.valueKey = valueKey;
+    }
+
+    public void setList(boolean list) {
+        this.list = list;
+    }
+
+    public void setCommandLineFlag(String commandLineFlag) {
+        this.commandLineFlag = commandLineFlag;
+    }
+
+
 }

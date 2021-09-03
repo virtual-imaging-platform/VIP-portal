@@ -104,7 +104,7 @@ public class LaunchFormLayout extends AbstractLaunchFormLayout {
      *
      * @param applicationDescriptor BoutiquesDescriptor generated from application .json descriptor file
      */
-    public LaunchFormLayout(final BoutiquesDescriptor applicationDescriptor, String applicationName,
+    public LaunchFormLayout(final BoutiquesApplication applicationDescriptor, String applicationName,
                             String applicationVersion, String applicationClass) {
         super("600", "*");
         this.applicationName = applicationName;
@@ -180,7 +180,7 @@ public class LaunchFormLayout extends AbstractLaunchFormLayout {
      *
      * @param applicationDescriptor BoutiquesDescriptor generated from application .json descriptor file
      */
-    private void configureInputs(BoutiquesDescriptor applicationDescriptor) {
+    private void configureInputs(BoutiquesApplication applicationDescriptor) {
         // Execution name input
         this.createArtificialStringInput("Execution name", EXECUTION_NAME_ID, false, null,
                           false, "[" + ApplicationConstants.EXEC_NAME_VALID_CHARS + "]");
@@ -255,7 +255,7 @@ public class LaunchFormLayout extends AbstractLaunchFormLayout {
      *
      * @param applicationDescriptor BoutiquesDescriptor generated from application .json descriptor file
      */
-    private void configureDependencies(BoutiquesDescriptor applicationDescriptor) {
+    private void configureDependencies(BoutiquesApplication applicationDescriptor) {
         // Disables-inputs
         GWT.log("  Disables-inputs");
         applicationDescriptor.getDisablesInputsMap().forEach(this::addDisablesInputs);

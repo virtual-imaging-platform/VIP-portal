@@ -20,7 +20,7 @@ public class BoutiquesParser {
      * @param descriptor        String representing application JSON descriptor
      * @throws RuntimeException if descriptor is invalid
      */
-    public BoutiquesDescriptor parseApplicationDescriptor(String descriptor) throws RuntimeException{
+    public BoutiquesApplication parseApplication(String descriptor) throws RuntimeException{
         JSONObject parsedDescriptor = JSONParser.parseStrict(descriptor).isObject();
         if (parsedDescriptor == null) {
             throw new RuntimeException("Invalid Boutiques descriptor: not a JSON object.");
@@ -28,29 +28,29 @@ public class BoutiquesParser {
         String name = getStringValue(parsedDescriptor, "name");
         String description = getStringValue(parsedDescriptor, "description");
         String version = getStringValue(parsedDescriptor, "tool-version");
-        BoutiquesDescriptor boutiquesTool = new BoutiquesDescriptor(name, description, version);
+        BoutiquesApplication application = new BoutiquesApplication(name, description, version);
         // Inputs
         JSONArray inputsArray = getArrayValue(parsedDescriptor, "inputs", false);
         for(int inputNo = 0; inputNo < inputsArray.size(); inputNo++){
             BoutiquesInput input = parseInput(inputsArray.get(inputNo).isObject());
-            boutiquesTool.addInput(input);
+            application.addInput(input);
             // Dependencies
             String inputId = input.getId();
             // disables-inputs
             if(input.getDisablesInputsId() != null){
-                boutiquesTool.addDisablesInputs(inputId, input.getDisablesInputsId());
+                application.addDisablesInputs(inputId, input.getDisablesInputsId());
             }
             // requires-inputs
             if(input.getRequiresInputsId() != null){
-                boutiquesTool.addRequiresInputs(inputId, input.getRequiresInputsId());
+                application.addRequiresInputs(inputId, input.getRequiresInputsId());
             }
             // value-disables
             if(input.getValueDisablesInputsId() != null){
-                boutiquesTool.addValueDisablesInputs(inputId, input.getValueDisablesInputsId());
+                application.addValueDisablesInputs(inputId, input.getValueDisablesInputsId());
             }
             // value-requires
             if(input.getValueRequiresInputsId() != null){
-                boutiquesTool.addValueRequiresInputs(inputId, input.getValueRequiresInputsId());
+                application.addValueRequiresInputs(inputId, input.getValueRequiresInputsId());
             }
         }
         // Groups
@@ -61,9 +61,39 @@ public class BoutiquesParser {
                 throw new RuntimeException("Invalid Boutiques descriptor: group " + groupNo
                         + " is not a JSON object");
             }
-            boutiquesTool.addGroup(parseGroup(currentGroupDescriptor));
+            application.addGroup(parseGroup(currentGroupDescriptor));
         }
-        return boutiquesTool;
+        // Other properties
+        application.setAuthor(getStringValue(parsedDescriptor, "author", true));
+        application.setCommandLine(getStringValue(parsedDescriptor, "command-line"));
+        application.setSchemaVersion(getStringValue(parsedDescriptor, "schema-version"));
+        application.setChallengerEmail(getStringValue(parsedDescriptor, "vip:miccai-challenger-email", true));
+        application.setChallengerTeam(getStringValue(parsedDescriptor, "vip:miccai-challenge-team-name", true));
+        // Output files
+        JSONArray outputJSONArray = getArrayValue(parsedDescriptor, "output-files", true);
+        if (outputJSONArray != null) {
+            for (int i = 0; i < outputJSONArray.size(); i++) {
+                application.getOutputFiles().add(parseBoutiquesOutputFile(outputJSONArray.get(i).isObject()));
+            }
+        }
+        // Tags
+        JSONObject tagsJSONObject = getObjectValue(parsedDescriptor, "tags", true);
+        if (tagsJSONObject != null) {
+            for (String key : tagsJSONObject.keySet()) {
+                String value = getStringValue(tagsJSONObject, key);
+                application.addTag(key, value);
+            }
+        }
+        // Container image
+        JSONObject containerObject = getObjectValue(parsedDescriptor, "container-image", true);
+        if (containerObject != null) {
+            application.setContainerType(getStringValue(containerObject, "type"));
+            application.setContainerImage(getStringValue(containerObject, "image"));
+            application.setContainerIndex(getStringValue(containerObject, "index", true));
+        }
+        // Json descriptor
+        application.setJsonFile(parsedDescriptor.toString());
+        return application;
     }
 
     /**
@@ -85,44 +115,60 @@ public class BoutiquesParser {
         List<String> disablesInputsId = getArrayValueAsStringList(inputJson, "disables-inputs", true);
         List<String> requiresInputsId = getArrayValueAsStringList(inputJson, "requires-inputs", true);
         String typeString = getStringValue(inputJson, "type");
-        BoutiquesInput.InputType inputType = BoutiquesInput.InputType.valueOf(typeString.toUpperCase(Locale.ROOT));
+        BoutiquesInput.InputType inputType = BoutiquesInput.InputType.valueOf(typeString.toUpperCase());
+        BoutiquesInput input;
         // Flag is treated separately as it does not accept value-disables, value-requires or value-choice properties
         if (inputType == BoutiquesInput.InputType.FLAG){
             boolean defaultValue = getBooleanValue(inputJson, "default-value", true);
-            return new BoutiquesInputFlag(id, name, description, isOptional, disablesInputsId, requiresInputsId,
+            input = new BoutiquesInputFlag(id, name, description, isOptional, disablesInputsId, requiresInputsId,
                     defaultValue);
+        } else {
+            // Non flag inputs (Number, String or File)
+            Map<String, List<String>> valueDisablesInputsId = getStringMapValue(inputJson, "value-disables",
+                    true);
+            Map<String, List<String>> valueRequiresInputsId = getStringMapValue(inputJson, "value-requires",
+                    true);
+            JSONArray possibleValuesArray = getArrayValue(inputJson, "value-choices", true);
+            List<String> possibleValues;
+            switch (inputType) {
+                case NUMBER:
+                    possibleValues = jsonArrayToStringList(isOptional, possibleValuesArray, this::jsonValueToDouble);
+                    Double defaultValueDouble = getDoubleValue(inputJson, "default-value", true);
+                    boolean isInteger = getBooleanValue(inputJson, "integer", true);
+                    Double maximum = getDoubleValue(inputJson, "maximum", true);
+                    Double minimum = getDoubleValue(inputJson, "minimum", true);
+                    boolean isExclusiveMaximum = getBooleanValue(inputJson, "exclusive-maximum", true);
+                    boolean isExclusiveMinimum = getBooleanValue(inputJson, "exclusive-minimum", true);
+                    input = new BoutiquesInputNumber(id, name, description, isOptional, disablesInputsId,
+                            requiresInputsId, possibleValues, valueDisablesInputsId, valueRequiresInputsId,
+                            defaultValueDouble, isInteger, isExclusiveMinimum, isExclusiveMaximum, maximum, minimum);
+                    break;
+                case STRING:
+                case FILE:
+                    possibleValues = jsonArrayToStringList(isOptional, possibleValuesArray, this::jsonValueToString);
+                    String defaultValueString = getStringValue(inputJson, "default-value", true);
+                    input = new BoutiquesInputString(id, name, description, inputType, isOptional, disablesInputsId,
+                            requiresInputsId,  possibleValues, valueDisablesInputsId, valueRequiresInputsId,
+                            defaultValueString);
+                    break;
+                default:
+                    throw new RuntimeException("Invalid Boutiques descriptor: invalid type '"
+                            + inputType + "'. Only allowed types are 'String', 'File', 'Number' and 'Flag'.");
+            }
         }
-        // Non flag inputs (Number, String or File)
-        Map<String, List<String>> valueDisablesInputsId = getStringMapValue(inputJson, "value-disables",
-                true);
-        Map<String, List<String>> valueRequiresInputsId = getStringMapValue(inputJson, "value-requires",
-                true);
-        JSONArray possibleValuesArray = getArrayValue(inputJson, "value-choices", true);
-        List<String> possibleValues;
-        switch(inputType) {
-            case NUMBER:
-                possibleValues = jsonArrayToStringList(isOptional, possibleValuesArray, this::jsonValueToDouble);
-                Double defaultValueDouble = getDoubleValue(inputJson, "default-value", true);
-                boolean isInteger = getBooleanValue(inputJson, "integer", true);
-                Double maximum = getDoubleValue(inputJson, "maximum", true);
-                Double minimum = getDoubleValue(inputJson, "minimum", true);
-                boolean isExclusiveMaximum = getBooleanValue(inputJson, "exclusive-maximum", true);
-                boolean isExclusiveMinimum = getBooleanValue(inputJson, "exclusive-minimum", true);
-                return new BoutiquesInputNumber(id, name, description, isOptional, disablesInputsId, requiresInputsId,
-                        possibleValues, valueDisablesInputsId, valueRequiresInputsId, defaultValueDouble, isInteger,
-                        isExclusiveMinimum, isExclusiveMaximum, maximum, minimum);
-            case STRING:
-            case FILE:
-                possibleValues = jsonArrayToStringList(isOptional, possibleValuesArray, this::jsonValueToString);
-                String defaultValueString = getStringValue(inputJson, "default-value", true);
-                return new BoutiquesInputString(id, name, description, inputType, isOptional, disablesInputsId, requiresInputsId,
-                        possibleValues, valueDisablesInputsId, valueRequiresInputsId, defaultValueString);
-            default:
-                throw new RuntimeException("Invalid Boutiques descriptor: invalid type '"
-                        + inputType + "'. Only allowed types are 'String', 'File', 'Number' and 'Flag'.");
-        }
+        input.setValueKey(getStringValue(inputJson, "value-key", true));
+        input.setList(getBooleanValue(inputJson, "list", true));
+        String commandLineFlag = getStringValue(inputJson, "command-line-flag", true);
+        input.setCommandLineFlag(commandLineFlag == null ? "" : commandLineFlag);
+        return input;
     }
-    
+
+    /**
+     * Parse a JSONObject representing an input group.
+     *
+     * @param groupJson JSONObject to parse
+     * @return BoutiquesGroup representing parsed group
+     */
     public BoutiquesGroup parseGroup(JSONObject groupJson){
         String id = getStringValue(groupJson, "id");
         List<String> members = getArrayValueAsStringList(groupJson, "members", false);
@@ -131,6 +177,29 @@ public class BoutiquesParser {
         boolean oneIsRequired = getBooleanValue(groupJson, "one-is-required", true);
         return new BoutiquesGroup(id, allOrNone, mutuallyExclusive, oneIsRequired, members);
     }
+
+    /**
+     * Parse a JSONObject representing an output file
+     *
+     * @param outputFile JSONObject to parse
+     * @return BoutiquesOutputFile representing parsed output file
+     * @throws RuntimeException if outputFile is not a valid representation of an output file
+     */
+    private BoutiquesOutputFile parseBoutiquesOutputFile(JSONObject outputFile) throws RuntimeException {
+        BoutiquesOutputFile bof = new BoutiquesOutputFile();
+        bof.setId(getStringValue(outputFile, "id"));
+        bof.setName(getStringValue(outputFile, "name"));
+        bof.setDescription(getStringValue(outputFile, "description", true));
+        bof.setValueKey(getStringValue(outputFile, "value-key", true));
+        bof.setPathTemplate(getStringValue(outputFile, "path-template", true));
+        bof.setList(getBooleanValue(outputFile, "list", true));
+        bof.setOptional(getBooleanValue(outputFile, "optional", true));
+        String commandLineFlag = getStringValue(outputFile, "command-line-flag", true);
+        commandLineFlag = commandLineFlag == null ? "" : commandLineFlag;
+        bof.setCommandLineFlag(commandLineFlag);
+        return bof;
+    }
+
 
     /**
      * Converts a JSONArray to List of Strings. Each value is checked using valueConverter which converts them to any
@@ -391,5 +460,20 @@ public class BoutiquesParser {
             }
         }
         return convertedObject;
+    }
+
+    /**
+     * Return the JSONObject associated to given key in given descriptor
+     *
+     * @param descriptor JSONObject containing key
+     * @param key        String key associated to returned value
+     * @param optional   boolean: true if key is optional, in which case its absence will lead to a null return
+     *                   value instead of a RuntimeException
+     * @return           JSONObject associated to key in descriptor
+     * @throws RuntimeException if expected value is not a valid JSONObjector if key is absent and optional is false
+     */
+    private JSONObject getObjectValue(JSONObject descriptor, String key, boolean optional)
+            throws RuntimeException {
+        return applyToValue(descriptor, key, optional, JSONValue::isObject, "JSON object");
     }
 }
