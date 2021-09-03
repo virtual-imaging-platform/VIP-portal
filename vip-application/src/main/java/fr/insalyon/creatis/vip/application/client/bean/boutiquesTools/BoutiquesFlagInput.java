@@ -9,7 +9,7 @@ import java.util.Map;
  * @author Guillaume Vanel
  * @version %I%, %G%
  */
-public class BoutiquesInputFlag extends BoutiquesInput{
+public class BoutiquesFlagInput extends BoutiquesInput{
     final private boolean defaultValue;
 
     /**
@@ -21,7 +21,7 @@ public class BoutiquesInputFlag extends BoutiquesInput{
      * @param requiresInputsId List of String IDs of inputs requiring this to be non-empty
      * @param defaultValue boolean
      */
-    public BoutiquesInputFlag(String id, String name, String description, boolean isOptional,
+    public BoutiquesFlagInput(String id, String name, String description, boolean isOptional,
                               List<String> disablesInputsId, List<String> requiresInputsId, boolean defaultValue){
         super(id, name, description, InputType.FLAG, isOptional, disablesInputsId, requiresInputsId, null,
                 null, null);

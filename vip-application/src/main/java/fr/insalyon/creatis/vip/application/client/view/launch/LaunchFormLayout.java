@@ -202,14 +202,14 @@ public class LaunchFormLayout extends AbstractLaunchFormLayout {
                     case STRING:
                     case FILE:
                         String allowedChar = "[" + ApplicationConstants.INPUT_VALID_CHARS + "]";
-                        inputLayout = new StringInputLayout((BoutiquesInputString) input, this,
+                        inputLayout = new StringInputLayout((BoutiquesStringInput) input, this,
                                 true, allowedChar);
                         break;
                     case NUMBER:
-                        inputLayout = new NumberInputLayout((BoutiquesInputNumber) input, this);
+                        inputLayout = new NumberInputLayout((BoutiquesNumberInput) input, this);
                         break;
                     case FLAG:
-                        inputLayout = new FlagInputLayout((BoutiquesInputFlag) input, this);
+                        inputLayout = new FlagInputLayout((BoutiquesFlagInput) input, this);
                         break;
                     default:
                         throw new RuntimeException("Unknown input type: " + input.getType());
@@ -250,7 +250,7 @@ public class LaunchFormLayout extends AbstractLaunchFormLayout {
         // Create execution name input from the descriptor
 
         try {
-            BoutiquesInputString input = (BoutiquesInputString) new BoutiquesParser().parseInput(descriptor);
+            BoutiquesStringInput input = (BoutiquesStringInput) new BoutiquesParser().parseInput(descriptor);
             InputLayout inputLayout = new StringInputLayout(input, this, hasAddValueButton, allowedChar);
             this.inputsMap.put(id, inputLayout);
             this.addMember(inputLayout);

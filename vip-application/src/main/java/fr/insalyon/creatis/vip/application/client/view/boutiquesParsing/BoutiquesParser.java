@@ -150,7 +150,7 @@ public class BoutiquesParser {
         // Flag is treated separately as it does not accept value-disables, value-requires or value-choice properties
         if (inputType == BoutiquesInput.InputType.FLAG){
             boolean defaultValue = getBooleanValue(inputJson, "default-value", true);
-            input = new BoutiquesInputFlag(id, name, description, isOptional, disablesInputsId, requiresInputsId,
+            input = new BoutiquesFlagInput(id, name, description, isOptional, disablesInputsId, requiresInputsId,
                     defaultValue);
         } else {
             // Non flag inputs (Number, String or File)
@@ -175,7 +175,7 @@ public class BoutiquesParser {
                     Double minimum = getDoubleValue(inputJson, "minimum", true);
                     boolean isExclusiveMaximum = getBooleanValue(inputJson, "exclusive-maximum", true);
                     boolean isExclusiveMinimum = getBooleanValue(inputJson, "exclusive-minimum", true);
-                    input = new BoutiquesInputNumber(id, name, description, isOptional, disablesInputsId,
+                    input = new BoutiquesNumberInput(id, name, description, isOptional, disablesInputsId,
                             requiresInputsId, possibleValues, valueDisablesInputsId, valueRequiresInputsId,
                             defaultValueDouble, isInteger, isExclusiveMinimum, isExclusiveMaximum, maximum, minimum);
                     break;
@@ -189,7 +189,7 @@ public class BoutiquesParser {
                                 exception);
                     }
                     String defaultValueString = getStringValue(inputJson, "default-value", true);
-                    input = new BoutiquesInputString(id, name, description, inputType, isOptional, disablesInputsId,
+                    input = new BoutiquesStringInput(id, name, description, inputType, isOptional, disablesInputsId,
                             requiresInputsId,  possibleValues, valueDisablesInputsId, valueRequiresInputsId,
                             defaultValueString);
                     break;

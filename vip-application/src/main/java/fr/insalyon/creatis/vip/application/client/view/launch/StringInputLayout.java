@@ -5,7 +5,7 @@ import com.smartgwt.client.widgets.form.fields.PickerIcon;
 import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.form.validator.RequiredIfValidator;
 import fr.insalyon.creatis.vip.application.client.bean.boutiquesTools.BoutiquesInput;
-import fr.insalyon.creatis.vip.application.client.bean.boutiquesTools.BoutiquesInputString;
+import fr.insalyon.creatis.vip.application.client.bean.boutiquesTools.BoutiquesStringInput;
 import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
 import fr.insalyon.creatis.vip.core.client.view.util.ValidatorUtil;
 import fr.insalyon.creatis.vip.datamanager.client.view.selection.PathSelectionWindow;
@@ -27,7 +27,7 @@ public class StringInputLayout extends InputLayout{
      * @param hasAddValueButton boolean: true if input should have a "add value" button, false otherwise
      * @param allowedChar       String representing a regexp of allowed characters (ex: "[a-zA-z0-9]" for alphanumeric).
      */
-    public StringInputLayout(BoutiquesInputString input, LaunchFormLayout parentLayout, boolean hasAddValueButton,
+    public StringInputLayout(BoutiquesStringInput input, LaunchFormLayout parentLayout, boolean hasAddValueButton,
                              String allowedChar) {
         super(input, parentLayout);
         this.allowedCharacters = allowedChar;
@@ -47,7 +47,7 @@ public class StringInputLayout extends InputLayout{
     protected FormItem getFormItem() {
         final TextItem inputField = FieldUtil.getTextItem(400, ".");
         inputField.setValue(this.getDefaultValue());
-        assert this.input instanceof BoutiquesInputString;
+        assert this.input instanceof BoutiquesStringInput;
         if(this.isFile()){
             // Add browse icon
             PickerIcon browsePicker = new PickerIcon(PickerIcon.SEARCH,

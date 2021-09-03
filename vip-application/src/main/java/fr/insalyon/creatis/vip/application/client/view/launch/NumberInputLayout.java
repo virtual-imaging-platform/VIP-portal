@@ -7,7 +7,7 @@ import com.smartgwt.client.widgets.form.fields.FormItem;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.form.validator.CustomValidator;
-import fr.insalyon.creatis.vip.application.client.bean.boutiquesTools.BoutiquesInputNumber;
+import fr.insalyon.creatis.vip.application.client.bean.boutiquesTools.BoutiquesNumberInput;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -76,7 +76,7 @@ public class NumberInputLayout extends InputLayout {
      * @param parsedInput   BoutiquesInputNumber to be represented
      * @param parentLayout  LaunchFormLayout containing this
      */
-    public NumberInputLayout(final BoutiquesInputNumber parsedInput, LaunchFormLayout parentLayout) {
+    public NumberInputLayout(final BoutiquesNumberInput parsedInput, LaunchFormLayout parentLayout) {
         super(parsedInput, parentLayout);
         // Configure validators for client-side validation logic
         // Check that input is filled if non optional and is a valid number / integer.

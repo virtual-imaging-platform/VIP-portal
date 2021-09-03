@@ -9,7 +9,7 @@ import java.util.Map;
  * @author Guillaume Vanel
  * @version %I%, %G%
  */
-public class BoutiquesInputNumber extends BoutiquesInput{
+public class BoutiquesNumberInput extends BoutiquesInput{
     private final Double defaultValue;
     private final boolean isInteger;
     private final boolean isExclusiveMaximum;
@@ -37,7 +37,7 @@ public class BoutiquesInputNumber extends BoutiquesInput{
      * @param minimum               Double: minimum allowed value
      * @throws RuntimeException if descriptor is invalid
      */
-    public BoutiquesInputNumber(String id, String name, String description, boolean isOptional,
+    public BoutiquesNumberInput(String id, String name, String description, boolean isOptional,
                                 List<String> disablesInputsId, List<String> requiresInputsId,
                                 List<String> possibleValues, Map<String, List<String>> valueDisablesInputsId,
                                 Map<String, List<String>> valueRequiresInputsId, Double defaultValue,

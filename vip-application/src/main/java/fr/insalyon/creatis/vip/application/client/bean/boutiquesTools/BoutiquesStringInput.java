@@ -9,7 +9,7 @@ import java.util.Map;
  * @author Guillaume Vanel
  * @version %I%, %G%
  */
-public class BoutiquesInputString extends BoutiquesInput{
+public class BoutiquesStringInput extends BoutiquesInput{
     private final String defaultValue;
 
     /**
@@ -28,7 +28,7 @@ public class BoutiquesInputString extends BoutiquesInput{
      * @param defaultValue          String
      * @throws RuntimeException if descriptor is invalid
      */
-    public BoutiquesInputString(String id, String name, String description, InputType type, boolean isOptional,
+    public BoutiquesStringInput(String id, String name, String description, InputType type, boolean isOptional,
                                 List<String> disablesInputsId, List<String> requiresInputsId,
                                 List<String> possibleValues, Map<String, List<String>> valueDisablesInputsId,
                                 Map<String, List<String>> valueRequiresInputsId, String defaultValue) throws RuntimeException{

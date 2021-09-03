@@ -29,7 +29,7 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL-B license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.application.client.view.launch;
+package fr.insalyon.creatis.vip.application.client.view.launch.old;
 
 import com.smartgwt.client.types.Cursor;
 import com.smartgwt.client.util.SC;
@@ -42,6 +42,8 @@ import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.layout.VLayout;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
 import fr.insalyon.creatis.vip.application.client.view.common.AbstractSourceLayout;
+import fr.insalyon.creatis.vip.application.client.view.launch.AbstractLaunchFormLayout;
+import fr.insalyon.creatis.vip.application.client.view.launch.DocumentationLayout;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
 import fr.insalyon.creatis.vip.core.client.view.util.ValidatorUtil;

@@ -29,7 +29,7 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL-B license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.application.client.view.launch;
+package fr.insalyon.creatis.vip.application.client.view.launch.old;
 
 import com.smartgwt.client.types.PickerIconName;
 import com.smartgwt.client.widgets.form.DynamicForm;
