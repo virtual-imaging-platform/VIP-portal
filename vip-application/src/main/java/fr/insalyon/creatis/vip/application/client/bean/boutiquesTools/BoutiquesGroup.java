@@ -1,4 +1,4 @@
-package fr.insalyon.creatis.vip.application.client.view.boutiquesParsing;
+package fr.insalyon.creatis.vip.application.client.bean.boutiquesTools;
 
 import com.google.gwt.json.client.JSONObject;
 
@@ -18,17 +18,19 @@ public class BoutiquesGroup {
     private final List<String> members;
 
     /**
-     * Initialises group information based on its JSON description
-     *
-     * @param descriptor JSONObject describing this group
-     * @throws RuntimeException if descriptor is invalid
+     * @param id                String
+     * @param allOrNone         boolean: true if this group is only valid when all or none of its member are empty
+     * @param mutuallyExclusive boolean: true if this group is only valid when at most one member is non-empty
+     * @param oneIsRequired     boolean: true if this group is only valid when at least one member is non-empty
+     * @param members           List of String IDs of this group members
      */
-    public BoutiquesGroup(JSONObject descriptor) throws RuntimeException{
-        this.id = BoutiquesUtil.getStringValue(descriptor, "id");
-        this.members = BoutiquesUtil.getArrayValueAsStrings(descriptor, "members", false);
-        this.allOrNone = BoutiquesUtil.getBooleanValue(descriptor, "all-or-none", true);
-        this.mutuallyExclusive = BoutiquesUtil.getBooleanValue(descriptor, "mutually-exclusive", true);
-        this.oneIsRequired = BoutiquesUtil.getBooleanValue(descriptor, "one-is-required", true);
+    public BoutiquesGroup(String id, boolean allOrNone, boolean mutuallyExclusive, boolean oneIsRequired,
+                          List<String> members){
+        this.id = id;
+        this.allOrNone = allOrNone;
+        this.mutuallyExclusive = mutuallyExclusive;
+        this.oneIsRequired = oneIsRequired;
+        this.members = members;
     }
 
     /**

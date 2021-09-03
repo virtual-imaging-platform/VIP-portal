@@ -10,6 +10,7 @@ import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.Label;
 import com.smartgwt.client.widgets.layout.HLayout;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
+import fr.insalyon.creatis.vip.application.client.bean.boutiquesTools.*;
 import fr.insalyon.creatis.vip.application.client.view.boutiquesParsing.*;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
@@ -240,7 +241,7 @@ public class LaunchFormLayout extends AbstractLaunchFormLayout {
             descriptor.put("default-value", new JSONString(defaultValue));
         }
         // Create execution name input from the descriptor
-        BoutiquesInputString input = new BoutiquesInputString(descriptor,type);
+        BoutiquesInputString input = (BoutiquesInputString) new BoutiquesParser().parseInput(descriptor);
         InputLayout inputLayout = new StringInputLayout(input, this, hasAddValueButton, allowedChar);
         this.inputsMap.put(id, inputLayout);
         this.addMember(inputLayout);

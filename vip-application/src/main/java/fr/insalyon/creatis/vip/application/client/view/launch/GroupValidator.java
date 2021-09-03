@@ -1,6 +1,6 @@
 package fr.insalyon.creatis.vip.application.client.view.launch;
 
-import fr.insalyon.creatis.vip.application.client.view.boutiquesParsing.BoutiquesGroup;
+import fr.insalyon.creatis.vip.application.client.bean.boutiquesTools.BoutiquesGroup;
 
 import java.util.ArrayList;
 import java.util.List;

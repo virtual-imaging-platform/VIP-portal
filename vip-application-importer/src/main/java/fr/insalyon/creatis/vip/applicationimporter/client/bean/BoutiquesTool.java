@@ -205,7 +205,4 @@ public class BoutiquesTool implements IsSerializable {
         return tags;
     }
 
-    public boolean hasNextInput(BoutiquesInput input) {
-        return inputs.lastIndexOf(input) < (inputs.size()-1) ? true : false;
-    }
 }

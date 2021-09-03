@@ -1,8 +1,4 @@
-package fr.insalyon.creatis.vip.application.client.view.boutiquesParsing;
-
-import com.google.gwt.json.client.JSONObject;
-import fr.insalyon.creatis.vip.application.client.view.launch.FlagInputLayout;
-import fr.insalyon.creatis.vip.application.client.view.launch.LaunchFormLayout;
+package fr.insalyon.creatis.vip.application.client.bean.boutiquesTools;
 
 import java.util.List;
 import java.util.Map;
@@ -17,14 +13,19 @@ public class BoutiquesInputFlag extends BoutiquesInput{
     final private boolean defaultValue;
 
     /**
-     * Initializes input information from its JSON description
-     *
-     * @param descriptor JSONObject describing this input
-     * @throws RuntimeException if descriptor is invalid
+     * @param id String
+     * @param name String
+     * @param description String
+     * @param isOptional boolean
+     * @param disablesInputsId List of String IDs of inputs disabled when this is non-empty
+     * @param requiresInputsId List of String IDs of inputs requiring this to be non-empty
+     * @param defaultValue boolean
      */
-    public BoutiquesInputFlag(JSONObject descriptor){
-        super(descriptor);
-        this.defaultValue = BoutiquesUtil.getBooleanValue(descriptor, "default-value", true);
+    public BoutiquesInputFlag(String id, String name, String description, boolean isOptional,
+                              List<String> disablesInputsId, List<String> requiresInputsId, boolean defaultValue){
+        super(id, name, description, InputType.FLAG, isOptional, disablesInputsId, requiresInputsId, null,
+                null, null);
+        this.defaultValue = defaultValue;
     }
 
     /**
@@ -33,11 +34,6 @@ public class BoutiquesInputFlag extends BoutiquesInput{
     @Override
     public boolean isOptional() {
         return true;
-    }
-
-    @Override
-    public InputType getType() {
-        return InputType.FLAG;
     }
 
     /**

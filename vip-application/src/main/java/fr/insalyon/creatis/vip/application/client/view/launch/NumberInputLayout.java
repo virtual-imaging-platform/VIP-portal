@@ -7,7 +7,7 @@ import com.smartgwt.client.widgets.form.fields.FormItem;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.form.validator.CustomValidator;
-import fr.insalyon.creatis.vip.application.client.view.boutiquesParsing.BoutiquesInputNumber;
+import fr.insalyon.creatis.vip.application.client.bean.boutiquesTools.BoutiquesInputNumber;
 
 import java.util.ArrayList;
 import java.util.Arrays;

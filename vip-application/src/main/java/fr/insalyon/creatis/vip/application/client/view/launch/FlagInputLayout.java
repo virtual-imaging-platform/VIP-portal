@@ -2,7 +2,7 @@ package fr.insalyon.creatis.vip.application.client.view.launch;
 
 import com.smartgwt.client.widgets.form.fields.CheckboxItem;
 import com.smartgwt.client.widgets.form.fields.FormItem;
-import fr.insalyon.creatis.vip.application.client.view.boutiquesParsing.BoutiquesInputFlag;
+import fr.insalyon.creatis.vip.application.client.bean.boutiquesTools.BoutiquesInputFlag;
 
 /**
  * Representation of a checkbox input (Flag input type)

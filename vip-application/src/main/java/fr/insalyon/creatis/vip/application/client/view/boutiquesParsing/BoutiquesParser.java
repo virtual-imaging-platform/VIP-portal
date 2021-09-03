@@ -1,11 +1,9 @@
 package fr.insalyon.creatis.vip.application.client.view.boutiquesParsing;
 
 import com.google.gwt.json.client.*;
+import fr.insalyon.creatis.vip.application.client.bean.boutiquesTools.*;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 
 /**
@@ -14,7 +12,157 @@ import java.util.function.Function;
  * @author Guillaume Vanel
  * @version %I%, %G%
  */
-public class BoutiquesUtil {
+public class BoutiquesParser {
+
+    /**
+     * Parse JSON Boutiques descriptor
+     *
+     * @param descriptor        String representing application JSON descriptor
+     * @throws RuntimeException if descriptor is invalid
+     */
+    public BoutiquesDescriptor parseApplicationDescriptor(String descriptor) throws RuntimeException{
+        JSONObject parsedDescriptor = JSONParser.parseStrict(descriptor).isObject();
+        if (parsedDescriptor == null) {
+            throw new RuntimeException("Invalid Boutiques descriptor: not a JSON object.");
+        }
+        String name = getStringValue(parsedDescriptor, "name");
+        String description = getStringValue(parsedDescriptor, "description");
+        String version = getStringValue(parsedDescriptor, "tool-version");
+        BoutiquesDescriptor boutiquesTool = new BoutiquesDescriptor(name, description, version);
+        // Inputs
+        JSONArray inputsArray = getArrayValue(parsedDescriptor, "inputs", false);
+        for(int inputNo = 0; inputNo < inputsArray.size(); inputNo++){
+            BoutiquesInput input = parseInput(inputsArray.get(inputNo).isObject());
+            boutiquesTool.addInput(input);
+            // Dependencies
+            String inputId = input.getId();
+            // disables-inputs
+            if(input.getDisablesInputsId() != null){
+                boutiquesTool.addDisablesInputs(inputId, input.getDisablesInputsId());
+            }
+            // requires-inputs
+            if(input.getRequiresInputsId() != null){
+                boutiquesTool.addRequiresInputs(inputId, input.getRequiresInputsId());
+            }
+            // value-disables
+            if(input.getValueDisablesInputsId() != null){
+                boutiquesTool.addValueDisablesInputs(inputId, input.getValueDisablesInputsId());
+            }
+            // value-requires
+            if(input.getValueRequiresInputsId() != null){
+                boutiquesTool.addValueRequiresInputs(inputId, input.getValueRequiresInputsId());
+            }
+        }
+        // Groups
+        JSONArray groupsArray = getArrayValue(parsedDescriptor, "groups", true);
+        for(int groupNo = 0; groupNo < groupsArray.size(); groupNo++) {
+            JSONObject currentGroupDescriptor = groupsArray.get(groupNo).isObject();
+            if (currentGroupDescriptor == null) {
+                throw new RuntimeException("Invalid Boutiques descriptor: group " + groupNo
+                        + " is not a JSON object");
+            }
+            boutiquesTool.addGroup(parseGroup(currentGroupDescriptor));
+        }
+        return boutiquesTool;
+    }
+
+    /**
+     * Parse a JSONObject corresponding to an input inside a Boutiques descriptor and return corresponding BoutiquesInput
+     *
+     * @param inputJson JSONObject containing input information
+     * @return          Parsed BoutiquesInput
+     * @throws RuntimeException if the JSONObject is not a valid representation of a Boutiques input
+     */
+    public BoutiquesInput parseInput(JSONObject inputJson) throws RuntimeException{
+        if (inputJson == null){
+            throw new RuntimeException("Invalid Boutiques descriptor: not a JSON object");
+        }
+        // General attributes
+        String id = getStringValue(inputJson, "id");
+        String name = getStringValue(inputJson, "name");
+        String description = getStringValue(inputJson, "description", true);
+        boolean isOptional = getBooleanValue(inputJson, "optional", true);
+        List<String> disablesInputsId = getArrayValueAsStringList(inputJson, "disables-inputs", true);
+        List<String> requiresInputsId = getArrayValueAsStringList(inputJson, "requires-inputs", true);
+        String typeString = getStringValue(inputJson, "type");
+        BoutiquesInput.InputType inputType = BoutiquesInput.InputType.valueOf(typeString.toUpperCase(Locale.ROOT));
+        // Flag is treated separately as it does not accept value-disables, value-requires or value-choice properties
+        if (inputType == BoutiquesInput.InputType.FLAG){
+            boolean defaultValue = getBooleanValue(inputJson, "default-value", true);
+            return new BoutiquesInputFlag(id, name, description, isOptional, disablesInputsId, requiresInputsId,
+                    defaultValue);
+        }
+        // Non flag inputs (Number, String or File)
+        Map<String, List<String>> valueDisablesInputsId = getStringMapValue(inputJson, "value-disables",
+                true);
+        Map<String, List<String>> valueRequiresInputsId = getStringMapValue(inputJson, "value-requires",
+                true);
+        JSONArray possibleValuesArray = getArrayValue(inputJson, "value-choices", true);
+        List<String> possibleValues;
+        switch(inputType) {
+            case NUMBER:
+                possibleValues = jsonArrayToStringList(isOptional, possibleValuesArray, this::jsonValueToDouble);
+                Double defaultValueDouble = getDoubleValue(inputJson, "default-value", true);
+                boolean isInteger = getBooleanValue(inputJson, "integer", true);
+                Double maximum = getDoubleValue(inputJson, "maximum", true);
+                Double minimum = getDoubleValue(inputJson, "minimum", true);
+                boolean isExclusiveMaximum = getBooleanValue(inputJson, "exclusive-maximum", true);
+                boolean isExclusiveMinimum = getBooleanValue(inputJson, "exclusive-minimum", true);
+                return new BoutiquesInputNumber(id, name, description, isOptional, disablesInputsId, requiresInputsId,
+                        possibleValues, valueDisablesInputsId, valueRequiresInputsId, defaultValueDouble, isInteger,
+                        isExclusiveMinimum, isExclusiveMaximum, maximum, minimum);
+            case STRING:
+            case FILE:
+                possibleValues = jsonArrayToStringList(isOptional, possibleValuesArray, this::jsonValueToString);
+                String defaultValueString = getStringValue(inputJson, "default-value", true);
+                return new BoutiquesInputString(id, name, description, inputType, isOptional, disablesInputsId, requiresInputsId,
+                        possibleValues, valueDisablesInputsId, valueRequiresInputsId, defaultValueString);
+            default:
+                throw new RuntimeException("Invalid Boutiques descriptor: invalid type '"
+                        + inputType + "'. Only allowed types are 'String', 'File', 'Number' and 'Flag'.");
+        }
+    }
+    
+    public BoutiquesGroup parseGroup(JSONObject groupJson){
+        String id = getStringValue(groupJson, "id");
+        List<String> members = getArrayValueAsStringList(groupJson, "members", false);
+        boolean allOrNone = getBooleanValue(groupJson, "all-or-none", true);
+        boolean mutuallyExclusive = getBooleanValue(groupJson, "mutually-exclusive", true);
+        boolean oneIsRequired = getBooleanValue(groupJson, "one-is-required", true);
+        return new BoutiquesGroup(id, allOrNone, mutuallyExclusive, oneIsRequired, members);
+    }
+
+    /**
+     * Converts a JSONArray to List of Strings. Each value is checked using valueConverter which converts them to any
+     * Object or returns null if the value is invalid.
+     *
+     * @param addEmptyValue  boolean: true if null should be added as first value of returned List
+     * @param jsonArray      JSONArray from which values are taken
+     * @param valueConverter Function converting a JSONValue to any Object, or returning null if the JSONValue is
+     *                       not of expected type. It is used to ensure all values from jsonArray are valid.
+     * @return List of String. Always null if jsonArray was null
+     * @throws RuntimeException if a value is not valid (valueConverter returned null on one of jsonArray's values)
+     */
+    private List<String> jsonArrayToStringList(boolean addEmptyValue, JSONArray jsonArray,
+                                       Function<JSONValue, Object> valueConverter) throws RuntimeException {
+        if(jsonArray == null) {
+            return null;
+        }
+        List<String> stringList = new ArrayList<>();
+        if (addEmptyValue) {
+            stringList.add(null);
+        }
+        for (int valueNo = 0; valueNo < jsonArray.size(); valueNo++) {
+            Object iValue = valueConverter.apply(jsonArray.get(valueNo));
+            if (iValue == null) {
+                throw new RuntimeException("Invalid Boutiques descriptor: input has invalid value-choices.");
+            }
+            stringList.add(iValue.toString());
+        }
+        return stringList;
+    }
+
+
 
     /**
      * Helper method to get value associated to given key in given JSON object. Provided converter function allows
@@ -35,7 +183,7 @@ public class BoutiquesUtil {
      * @see #getBooleanValue(JSONObject, String, boolean)
      * @see #getArrayValue(JSONObject, String, boolean)
      */
-    public static <T> T applyToValue(JSONObject descriptor, String key, boolean optional,
+    private <T> T applyToValue(JSONObject descriptor, String key, boolean optional,
                                      Function<JSONValue, T> converter, String awaitedType)
             throws RuntimeException {
         if (descriptor.containsKey(key)) {
@@ -60,7 +208,7 @@ public class BoutiquesUtil {
      * @param value JSONValue to convert
      * @return      Double representation of value, or null if it is not a valid number
      */
-    public static Double JSONToDouble(JSONValue value) {
+    private Double jsonValueToDouble(JSONValue value) {
         JSONNumber numberValue = value.isNumber();
         if(numberValue != null){
             return numberValue.doubleValue();
@@ -78,6 +226,20 @@ public class BoutiquesUtil {
     }
 
     /**
+     * Convert given JSONValue to a String if possible, otherwise return null
+     *
+     * @param value JSONValue to convert
+     * @return      String representation of value, or null if it is not a valid String
+     */
+    public String jsonValueToString(JSONValue value) {
+        JSONString stringValue = value.isString();
+        if(stringValue != null){
+            return stringValue.stringValue();
+        }
+        return null;
+    }
+
+    /**
      * Get numeric value associated to given key in given JSON object
      *
      * @param descriptor    JSONObject to parse
@@ -87,9 +249,9 @@ public class BoutiquesUtil {
      * @return              Double value associated to key in descriptor, or null if key is absent and optional is true
      * @throws RuntimeException if expected value is not a valid number or if key is absent and optional is false
      */
-    public static Double getDoubleValue(JSONObject descriptor, String key, boolean optional)
+    private Double getDoubleValue(JSONObject descriptor, String key, boolean optional)
             throws RuntimeException {
-        return applyToValue(descriptor, key, optional, BoutiquesUtil::JSONToDouble, "number");
+        return applyToValue(descriptor, key, optional, this::jsonValueToDouble, "number");
     }
 
     /**
@@ -103,7 +265,7 @@ public class BoutiquesUtil {
      *                      true
      * @throws RuntimeException if expected value is not a valid boolean or if key is absent and optional is false
      */
-    public static boolean getBooleanValue(JSONObject descriptor, String key, boolean optional)
+    private boolean getBooleanValue(JSONObject descriptor, String key, boolean optional)
             throws RuntimeException {
         JSONBoolean value = applyToValue(descriptor, key, optional, JSONValue::isBoolean, "boolean");
         return (value != null) && value.booleanValue();
@@ -118,7 +280,7 @@ public class BoutiquesUtil {
      * @throws RuntimeException if expected value is not a valid String or if key is absent
      * @see #getStringValue(JSONObject, String, boolean)
      */
-    public static String getStringValue(JSONObject descriptor, String key) throws RuntimeException{
+    private String getStringValue(JSONObject descriptor, String key) throws RuntimeException{
         String stringValue = getStringValue(descriptor, key, false);
         assert stringValue != null;
         return stringValue;
@@ -134,24 +296,10 @@ public class BoutiquesUtil {
      * @return              String value associated to key in descriptor, or null if key is absent and optional is true
      * @throws RuntimeException if expected value is not a valid String or if key is absent and optional is false
      */
-    public static String getStringValue(JSONObject descriptor, String key, boolean optional)
+    private String getStringValue(JSONObject descriptor, String key, boolean optional)
             throws RuntimeException {
         JSONString value = applyToValue(descriptor, key, optional, JSONValue::isString, "String");
         return value == null ? null : value.stringValue();
-    }
-
-    /**
-     * Get JSONArray value associated to given mandatory key in given JSON object
-     *
-     * @param descriptor    JSONObject to parse
-     * @param key           String representing the key in descriptor associated to searched value
-     * @return              JSONArray value associated to key in descriptor
-     * @throws RuntimeException if expected value is not a valid array or if key is absent
-     */
-    public static JSONArray getArrayValue(JSONObject descriptor, String key) throws RuntimeException {
-        JSONArray value = getArrayValue(descriptor, key, false);
-        assert value != null;
-        return value;
     }
 
     /**
@@ -165,13 +313,13 @@ public class BoutiquesUtil {
      *                      true
      * @throws RuntimeException if expected value is not a valid array or if key is absent and optional is false
      */
-    public static JSONArray getArrayValue(JSONObject descriptor, String key, boolean optional)
+    private JSONArray getArrayValue(JSONObject descriptor, String key, boolean optional)
             throws RuntimeException {
         return applyToValue(descriptor, key, optional, JSONValue::isArray, "array");
     }
 
     /**
-     * Get a String array associated to given key in given JSON object
+     * Get a List of String associated to given key in given JSON object
      *
      * @param descriptor    JSONObject to parse
      * @param key           String representing the key in descriptor associated to searched value
@@ -181,7 +329,7 @@ public class BoutiquesUtil {
      *                      true
      * @throws RuntimeException if expected value is not a valid String array or if key is absent and optional is false
      */
-    public static List<String> getArrayValueAsStrings(JSONObject descriptor, String key, boolean optional)
+    private List<String> getArrayValueAsStringList(JSONObject descriptor, String key, boolean optional)
             throws RuntimeException {
         JSONArray array = getArrayValue(descriptor, key, optional);
         try {
@@ -199,7 +347,7 @@ public class BoutiquesUtil {
      * @return      Array of Strings representing array
      * @throws RuntimeException if some elements of array are not valid Strings
      */
-    public static List<String> JSONArrayToStrings(JSONArray array) throws RuntimeException {
+    private List<String> JSONArrayToStrings(JSONArray array) throws RuntimeException {
         List<String> stringArray = new ArrayList<>();
         for (int valueNo = 0; valueNo < array.size(); valueNo++){
             JSONString valueString = array.get(valueNo).isString();
@@ -224,7 +372,7 @@ public class BoutiquesUtil {
      *                      representing its values
      * @throws RuntimeException if expected value is not a valid object or if key is absent and optional is false
      */
-    public static Map<String, List<String>> getStringMapValue(JSONObject descriptor, String key,
+    private Map<String, List<String>> getStringMapValue(JSONObject descriptor, String key,
                                                               boolean optional) throws RuntimeException {
         JSONObject object = applyToValue(descriptor, key, optional, JSONValue::isObject, "JSON object");
         if(object == null){
