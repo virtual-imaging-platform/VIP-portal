@@ -70,7 +70,13 @@ public class GateLabData extends AbstractJobData implements GateLabDAO {
         try {
             PreparedStatement ps = connection.prepareStatement("SELECT somme FROM somme ");
             ResultSet rs = ps.executeQuery();
-            rs.next();
+            boolean hasNext = rs.next();
+
+            if ( ! hasNext) {
+                // no row in somme table, no job is running yet
+                ps.close();
+                return 0;
+            }
             
             long sum = rs.getLong("somme");
             
@@ -79,7 +85,7 @@ public class GateLabData extends AbstractJobData implements GateLabDAO {
 
         } catch (SQLException ex) {
             logger.error("Error fetching simulation particle number", ex);
-            return 0;
+            throw new DAOException(ex);
         } finally {
             close(logger);
         }

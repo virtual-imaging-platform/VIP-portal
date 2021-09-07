@@ -35,34 +35,24 @@ import com.google.gwt.user.client.rpc.IsSerializable;
 
 /** @author Tristan Glatard */
 public class VisualizationItem implements IsSerializable{
-    String URL;
-    String localPath;
+    private String lfn;
 
     // Extension of raw file if url is a mhd file.  Empty string otherwise.
-    String extension;
+    private String extension;
 
     public VisualizationItem() {}
 
-    public VisualizationItem(String URL, String localPath, String extension) {
-        this.URL = URL;
-        this.localPath = localPath;
+    public VisualizationItem(String lfn, String extension) {
+        this.lfn = lfn;
         this.extension = extension;
     }
 
-    public String getURL() {
-        return URL;
+    public String getLfn() {
+        return lfn;
     }
 
-    public void setURL(String URL) {
-        this.URL = URL;
-    }
-
-    public String getLocalPath() {
-        return localPath;
-    }
-
-    public void setLocalPath(String localPath) {
-        this.localPath = localPath;
+    public void setLfn(String lfn) {
+        this.lfn = lfn;
     }
 
     public String getExtension() {

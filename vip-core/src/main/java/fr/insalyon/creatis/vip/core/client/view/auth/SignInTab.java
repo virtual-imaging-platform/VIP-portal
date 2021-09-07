@@ -197,13 +197,8 @@ public class SignInTab extends Tab {
                                 null, "/", false);
 
                     } else {
-
-                        Cookies.setCookie(CoreConstants.COOKIES_USER,
-                                null, CoreConstants.COOKIES_EXPIRATION_DATE,
-                                null, "/", false);
-                        Cookies.setCookie(CoreConstants.COOKIES_SESSION,
-                                null, CoreConstants.COOKIES_EXPIRATION_DATE,
-                                null, "/", false);
+                        Cookies.removeCookie(CoreConstants.COOKIES_USER, "/");
+                        Cookies.removeCookie(CoreConstants.COOKIES_SESSION, "/");
                     }
 
                     Layout.getInstance().authenticate(result);

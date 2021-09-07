@@ -43,6 +43,8 @@ import fr.insalyon.creatis.vip.core.client.view.common.AbstractFormLayout;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
 import fr.insalyon.creatis.vip.datamanager.client.view.ValidatorUtil;
+
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -52,7 +54,6 @@ public class VIPLayout extends AbstractFormLayout {
     private final LocalTextField applicationLocation;
     private final CheckboxItem isRunOnGrid; // And not locally.
     private final CheckboxItem overwriteIfexists;
-    private final TextItem tbAddDescriptor;
     private final SelectItem appCbItem;
     private final SelectItem tagsCbItem;
 
@@ -77,36 +78,13 @@ public class VIPLayout extends AbstractFormLayout {
         appCbItem.setTitle("<b>Select type of application</b>");
         appCbItem.setType("comboBox");
         LinkedHashMap<String, String> valueMap = new LinkedHashMap<String, String>();
-        valueMap.put("standalone", "standalone");
-        valueMap.put("challenge_msseg", "Challenge MSSEG");
-        valueMap.put("challenge_petseg", "Challenge PETSEG");
+        valueMap.put(Constants.APP_IMPORTER_STANDALONE_TYPE, "standalone");
+        valueMap.put(Constants.APP_IMPORTER_DOT_INPUTS_TYPE, "Dot inputs (Challenge)");
         appCbItem.setValueMap(valueMap);
-        appCbItem.addChangeHandler(new com.smartgwt.client.widgets.form.fields.events.ChangeHandler() {
-            @Override
-            public void onChange(ChangeEvent event) {
-                if (event.getValue().toString().contains("standalone")) {
-                    tbAddDescriptor.setValue("");
-                    tbAddDescriptor.setDisabled(true);
-                } else if (event.getValue().toString().contains("msseg")) {
-                    tbAddDescriptor.setValue(Constants.APP_IMPORTER_CHALLENGE_PATH_MSSEG);
-                    tbAddDescriptor.setDisabled(false);
-                } else if (event.getValue().toString().contains("petseg")) {
-                    tbAddDescriptor.setValue(Constants.APP_IMPORTER_CHALLENGE_PATH_PETSEG);
-                    tbAddDescriptor.setDisabled(false);
-                }
-            }
-
-        });
-        // TextItem to select if needed the repository path to additional descriptors
-        tbAddDescriptor = new TextItem();
-        tbAddDescriptor.setTitle("<b>location of additional descriptor(s)</b>");
-        tbAddDescriptor.setValue("");
-        tbAddDescriptor.setDisabled(false);
 
         tagsCbItem = createTagsSelect();
 
         this.addMember(FieldUtil.getForm(appCbItem));
-        this.addMember(FieldUtil.getForm(tbAddDescriptor));
         this.addMember(FieldUtil.getForm(isRunOnGrid));
         this.addMember(FieldUtil.getForm(overwriteIfexists));
         this.addMember(FieldUtil.getForm(tagsCbItem));
@@ -154,15 +132,6 @@ public class VIPLayout extends AbstractFormLayout {
     }
 
     /**
-     * Get the path to repository path for additional descriptors
-     *
-     * @return the path
-     */
-    public String getDescriptorLocation() {
-        return tbAddDescriptor.getValueAsString();
-    }
-
-    /**
      * Get the type of application (standalone or challenge)
      *
      * @return the type
@@ -186,6 +155,7 @@ public class VIPLayout extends AbstractFormLayout {
 
             @Override
             public void onSuccess(List<String> result) {
+                result = new ArrayList<>(result); // make a new list because the returned one does not support the add method
                 if(!result.contains("None")){
                     result.add("None");
                 }

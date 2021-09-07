@@ -31,14 +31,11 @@
  */
 package fr.insalyon.creatis.vip.core.server.rpc;
 
-import com.dropbox.client2.exception.DropboxException;
-import com.dropbox.client2.session.AppKeyPair;
-import com.dropbox.client2.session.Session.AccessType;
-import com.dropbox.client2.session.WebAuthSession;
-import com.dropbox.client2.session.WebAuthSession.WebAuthInfo;
 import fr.insalyon.creatis.grida.client.GRIDAClient;
-import fr.insalyon.creatis.grida.client.GRIDAClientException;
-import fr.insalyon.creatis.vip.core.client.bean.*;
+import fr.insalyon.creatis.vip.core.client.bean.Account;
+import fr.insalyon.creatis.vip.core.client.bean.Group;
+import fr.insalyon.creatis.vip.core.client.bean.UsageStats;
+import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationService;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants.GROUP_ROLE;
@@ -49,11 +46,8 @@ import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import fr.insalyon.creatis.vip.core.server.dao.UserDAO;
-import org.apache.commons.configuration.ConfigurationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.ApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -608,71 +602,6 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
             throw new CoreException(e);
         }
 
-    }
-
-    @Override
-    public String linkDropboxAccount() throws CoreException {
-        trace(logger, "Linking Dropbox account.");
-        User user = getSessionUser();
-        //TODO: put this key pair in config file
-        AppKeyPair consumerTokenPair = new AppKeyPair("wqkjwy11upck7vi", "euieqqi699m3zu6");
-        WebAuthSession session = new WebAuthSession(consumerTokenPair, AccessType.APP_FOLDER);
-        try {
-            //TODO: put server URL instead
-            WebAuthInfo wai = session.getAuthInfo("REDIRECT");
-
-            try {
-                String dir = server.getDataManagerUsersHome() + "/" + user.getFolder();
-                gridaClient.createFolder(dir, "Dropbox");
-                userDAO.linkDropboxAccount(
-                        user.getEmail(),
-                        dir + "/Dropbox",
-                        wai.requestTokenPair.key,
-                        wai.requestTokenPair.secret);
-            } catch (DAOException ex) {
-                throw new CoreException(ex);
-            } catch (GRIDAClientException ex) {
-                logger.error("Error linking dropbox account for {}", user.getEmail(), ex);
-                throw new CoreException(ex);
-            }
-            return wai.url;
-        } catch (DropboxException ex) {
-            logger.error("Error linking dropbox account for {}", user.getEmail(), ex);
-            throw new CoreException(ex);
-        }
-    }
-
-    @Override
-    public void activateDropboxAccount(String oauth_token) throws CoreException {
-        trace(logger, "Activating Dropbox account.");
-        User user = getSessionUser();
-        try {
-            userDAO.activateDropboxAccount(user.getEmail(), oauth_token);
-        } catch (DAOException e) {
-            throw new CoreException(e);
-        }
-    }
-
-    @Override
-    public DropboxAccountStatus.AccountStatus getDropboxAccountStatus() throws CoreException {
-        trace(logger, "Getting Dropbox account status.");
-        User user = getSessionUser();
-        try {
-            return userDAO.getDropboxAccountStatus(user.getEmail());
-        } catch (DAOException e) {
-            throw new CoreException(e);
-        }
-    }
-
-    @Override
-    public void unlinkDropboxAccount() throws CoreException {
-        trace(logger, "Unlinking Dropbox account.");
-        User user = getSessionUser();
-        try {
-            userDAO.unlinkDropboxAccount(user.getEmail());
-        } catch (DAOException e) {
-            throw new CoreException(e);
-        }
     }
 
     @Override

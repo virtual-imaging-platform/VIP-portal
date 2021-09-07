@@ -85,7 +85,10 @@ public class GRIDAPoolClientLocal extends GRIDAPoolClient {
 
     @Override
     public List<Operation> getOperationsLimitedListByUserAndDate(String user, int limit, Date startDate) throws GRIDAClientException {
-        throw new GRIDAClientException("not implemented in local version");
+        return getOperationsListByUser(user)
+                .stream().filter(operation -> operation.getRegistration().before(startDate))
+                .limit(limit)
+                .collect(Collectors.toList());
     }
 
     @Override

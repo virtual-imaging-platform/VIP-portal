@@ -40,7 +40,7 @@ import java.util.Date;
  */
 public class CoreConstants implements IsSerializable {
 
-    public static final String VERSION = "v2.0";
+    public static final String VERSION = "v2.1";
     // Configuration Labels
     public static final String VO_NAME = "vo.name";
     public static final String VO_ROOT = "vo.root";
@@ -134,7 +134,6 @@ public class CoreConstants implements IsSerializable {
     public static final String ICON_USER_INFO = IMG_FOLDER + "system/icon-user-info.png";
     public static final String ICON_WARNING = IMG_FOLDER + "icon-warning.png";
     public static final String ICON_WORLD = IMG_FOLDER + "flags/_world.png";
-    public static final String ICON_DROPBOX = IMG_FOLDER + "icon-dropbox.png";
     public static final String ICON_TERMS_USE = IMG_FOLDER + "icon-terms_of_use.png";
     public static final String ICON_RUNNING_SIMULATIONS = IMG_FOLDER +"icon-runningSimulation.png";
     public static final String ICON_VIP_LOGO = IMG_FOLDER + "vip-logo.png";
@@ -166,7 +165,6 @@ public class CoreConstants implements IsSerializable {
     public static final String ACCOUNT_OTHER = "Other";
     // Roles and Groups
     public static final String GROUP_SUPPORT = "Support";
-    public static final String GROUP_DROPBOX = "Dropbox";
     // ssh
     public static final String SSH_PUBLIC_KEY = "ssh.publickey";
     //application,Gatelab
@@ -189,6 +187,9 @@ public class CoreConstants implements IsSerializable {
     public static final String PUBLICATION_SYSTEM_COMMAND = "publication.system-command";
     // External storage, girder.
     public static final String GIRDER_TOKEN_DURATION_IN_DAYS = "girder.token.duration-in-days";
+    // Local config
+    public static final String USE_LOCAL_FILES_AS_INPUTS = "execution.input.local-files";
+
 
     public static enum GROUP_ROLE implements IsSerializable {
 

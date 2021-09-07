@@ -271,11 +271,8 @@ public class WorkflowBusiness {
 
             AppVersion version = applicationDAO.getVersion(
                     applicationName, applicationVersion);
-            String workflowPath = dataManagerBusiness.getRemoteFile(
-                user,
-                version.getLfn(),
-                server.getConfigurationFolder() + "workflows/"
-                        + FilenameUtils.getName(version.getLfn()));
+            String workflowPath =
+                    dataManagerBusiness.getRemoteFile(user, version.getLfn());
 
             //selectRandomEngine could also be used; TODO: make this choice configurable
             Engine engine = selectEngine(applicationClass);
@@ -331,9 +328,13 @@ public class WorkflowBusiness {
         }
         // not an external platform parameter, use legacy format
         String parsedPath = lfcPathsBusiness.parseBaseDir(
-                user, parseResult.result);
+                user, parameterValue);
         if (!user.isSystemAdministrator()) {
             checkFolderACL(user, groups, parsedPath);
+        }
+        if ( ! parsedPath.equals(parameterValue) // the parameter is a file path
+                && server.useLocalFilesInInputs()) {
+            parsedPath = "file:" + parsedPath;
         }
         return parsedPath;
     }
@@ -429,12 +430,8 @@ public class WorkflowBusiness {
 
         try {
             AppVersion version = applicationDAO.getVersion(applicationName, applicationVersion);
-            String localDirectory = server.getConfigurationFolder()
-                    + "workflows/"
-                    + FilenameUtils.getPath(version.getLfn()) + "/"
-                    + FilenameUtils.getName(version.getLfn());
-            String workflowPath = dataManagerBusiness.getRemoteFile(
-                user, version.getLfn(), localDirectory);
+            String workflowPath =
+                    dataManagerBusiness.getRemoteFile(user, version.getLfn());
             return workflowPath.endsWith(".gwendia")
                     ? getGwendiaParser().parse(workflowPath)
                     : getScuflParser().parse(workflowPath);

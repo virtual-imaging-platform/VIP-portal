@@ -137,7 +137,7 @@ public class ClassesLayout extends VLayout {
                         public void onClick(ClickEvent event) {
                             edit(rollOverRecord.getAttribute("name"),
                                     rollOverRecord.getAttribute("groups"),
-                                    rollOverRecord.getAttribute("engine"));
+                                    rollOverRecord.getAttribute("engines"));
                         }
                     });
                     ImgButton deleteImg = getImgButton(CoreConstants.ICON_DELETE, "Delete");
@@ -185,7 +185,8 @@ public class ClassesLayout extends VLayout {
         grid.setEmptyMessage("<br>No data available.");
         grid.setFields(
                 new ListGridField("name", "Class Name"),
-                new ListGridField("groups", "Groups"));
+                new ListGridField("groups", "Groups"),
+                new ListGridField("engines", "Engines"));
         grid.setSortField("name");
         grid.setSortDirection(SortDirection.ASCENDING);
         grid.addCellDoubleClickHandler(new CellDoubleClickHandler() {
@@ -194,7 +195,7 @@ public class ClassesLayout extends VLayout {
             public void onCellDoubleClick(CellDoubleClickEvent event) {
                 edit(event.getRecord().getAttribute("name"),
                         event.getRecord().getAttribute("groups"),
-                        event.getRecord().getAttribute("engine"));
+                        event.getRecord().getAttribute("engines"));
             }
         });
         this.addMember(grid);
@@ -260,9 +261,9 @@ public class ClassesLayout extends VLayout {
         service.removeClass(name, callback);
     }
 
-    private void edit(String name, String groups, String engine) {
+    private void edit(String name, String groups, String engines) {
         ManageClassesTab classTab = (ManageClassesTab) Layout.getInstance().
                 getTab(ApplicationConstants.TAB_MANAGE_CLASSES);
-        classTab.setClass(name, groups, engine);
+        classTab.setClass(name, groups, engines);
     }
 }

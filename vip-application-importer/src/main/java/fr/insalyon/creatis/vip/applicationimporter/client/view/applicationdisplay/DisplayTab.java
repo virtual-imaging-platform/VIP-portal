@@ -58,7 +58,6 @@ public class DisplayTab extends Tab {
     private VIPLayout vipLayout;
     private final ModalWindow modal;
     private BoutiquesTool boutiquesTool;
-    private HashMap<String, BoutiquesTool> bts = null;
 
     public DisplayTab(String tabIcon, String tabId, String tabName) {
         this.setTitle(Canvas.imgHTML(tabIcon) + " " + tabName.trim());
@@ -107,68 +106,11 @@ public class DisplayTab extends Tab {
             @Override
             public void onClick(ClickEvent event) {
                 boutiquesTool.setApplicationLFN(vipLayout.getApplicationLocation() + "/" + boutiquesTool.getName());
-                if (!vipLayout.getApplicationType().contains("standalone")) {
-                    createApplicationWithAddDesc();
-                } else {
-                    createApplication();
-                }
-
+                createApplication();
             }
         });
         createApplicationButton.setWidth(120);
         globalLayout.addMember(createApplicationButton);
-    }
-
-    /**
-     * Creates an application depending on other descriptors for the MICCAI
-     * challenge. The results of application should be evaluated to different
-     * metric methods.
-     *
-     */
-    public void createApplicationWithAddDesc() {
-        bts = new HashMap<String, BoutiquesTool>();
-        // Fisrt callback to get mectric descriptor
-        final AsyncCallback<String> callback = new AsyncCallback<String>() {
-            @Override
-            public void onFailure(Throwable caught) {
-                Layout.getInstance().setWarningMessage("Unable to read JSON file :" + caught.getMessage());
-            }
-
-            @Override
-            public void onSuccess(String jsonFileContent) {
-                try {
-                    bts.put("metric", JSONUtil.parseBoutiquesTool(JSONParser.parseStrict(jsonFileContent).isObject()));
-                    bts.get("metric").setApplicationLFN(vipLayout.getApplicationLocation() + "/" + boutiquesTool.getName());
-
-                    //second callback to get metadata descripotr
-                    final AsyncCallback<String> callback2 = new AsyncCallback<String>() {
-                        @Override
-                        public void onFailure(Throwable caught) {
-                            Layout.getInstance().setWarningMessage("Unable to read JSON file :" + caught.getMessage());
-                        }
-
-                        @Override
-                        public void onSuccess(String jsonFileContent) {
-                            try {
-                                bts.put("adaptater", JSONUtil.parseBoutiquesTool(JSONParser.parseStrict(jsonFileContent).isObject()));
-                                bts.get("adaptater").setApplicationLFN(vipLayout.getApplicationLocation() + "/" + boutiquesTool.getName());
-                                //Finally, launch
-                                createApplication();
-                            } catch (ApplicationImporterException ex) {
-                                Logger.getLogger(DisplayTab.class.getName()).log(Level.SEVERE, null, ex);
-                            }
-
-                        }
-                    };
-                    ApplicationImporterService.Util.getInstance().readAndValidateBoutiquesFile(vipLayout.getDescriptorLocation() + "/" + Constants.APP_IMPORTER_CHALLENGE_METADATA,
-                            callback2);
-                } catch (ApplicationImporterException ex) {
-                    Logger.getLogger(DisplayTab.class.getName()).log(Level.SEVERE, null, ex);
-                }
-
-            }
-        };
-        ApplicationImporterService.Util.getInstance().readAndValidateBoutiquesFile(vipLayout.getDescriptorLocation() + "/" + Constants.APP_IMPORTER_CHALLENGE_METRIC, callback);
     }
 
     public static BoutiquesTool parseJSON(JSONObject jsonObject)
@@ -232,10 +174,8 @@ public class DisplayTab extends Tab {
             boutiquesTool,
             vipLayout.getApplicationType(),
             vipLayout.getTag(),
-            bts,
             vipLayout.getIsRunOnGrid(),
             vipLayout.getOverwrite(),
-            false,
             callback);
     }
 }

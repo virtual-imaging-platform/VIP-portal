@@ -101,7 +101,7 @@ public class ConfigurationBusiness {
 
         try {
             logger.debug("Configuring VIP server proxy.");
-            proxyClient.getProxy();
+            proxyClient.checkProxy();
 
         } catch (Exception ex) {
             logger.error("Error configuring myproxy : {}", ex.getMessage());
@@ -116,6 +116,7 @@ public class ConfigurationBusiness {
                 if (userDAO.verifySession(email, session) && !userDAO.isLocked(email)) {
                     return true;
                 }
+                logger.info("Failed to verify user [{}]'s session {}", email, session);
                 userDAO.incNFailedAuthentications(email); //just in case...
                 if (userDAO.getNFailedAuthentications(email) > 5) {
                     userDAO.lock(email);

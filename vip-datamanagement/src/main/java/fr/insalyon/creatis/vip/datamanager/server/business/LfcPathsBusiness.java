@@ -2,16 +2,24 @@ package fr.insalyon.creatis.vip.datamanager.server.business;
 
 import fr.insalyon.creatis.vip.core.client.bean.Group;
 import fr.insalyon.creatis.vip.core.client.bean.User;
+import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.business.Server;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import fr.insalyon.creatis.vip.core.server.dao.GroupDAO;
 import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
 import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.net.URI;
+import java.nio.file.InvalidPathException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
+import static fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants.DOWNLOAD_FOLDER;
 
 /*
     Utility service to convert user-readable virtual vip paths to real lfn paths
@@ -21,6 +29,8 @@ import java.net.URI;
 @Service
 @Transactional
 public class LfcPathsBusiness {
+
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private Server server;
     private GroupDAO groupDAO;
@@ -165,4 +175,54 @@ public class LfcPathsBusiness {
         }
         return path;
     }
+
+    public String getLocalDirForGridaMultiFilesDownload(String packageName) {
+        // give a temp folder path. Grida will delete it and create a "*.zip"
+        // archive with the folder name
+        return Paths.get(
+                server.getDataManagerPath(),
+                DOWNLOAD_FOLDER,
+                "file-packages",
+                packageName).toString();
+    }
+
+    public String getLocalDirForGridaFolderDownload(String remoteFolderPath) throws BusinessException {
+        // give folder itself, grida will delete it and create a "*.zip" archive
+        // with the folder name
+        return getLocalDownloadPath(remoteFolderPath);
+    }
+
+    public String getLocalDirForGridaFileDownload(String remoteFilePath) throws BusinessException {
+        // give parent folder, grida will download the file into it
+        return Paths.get(getLocalDownloadPath(remoteFilePath)).getParent().toString();
+    }
+    /*
+     Transform a full remote path (generally a LFN path) to the local directory
+      path on the machine where it will be downloaded.
+     */
+
+    public String getLocalDownloadPath(String remotePathString) throws BusinessException {
+        remotePathString = remotePathString.replaceAll(" ", "");
+        Path remotePath;
+        try {
+            remotePath = Paths.get(remotePathString);
+        } catch (InvalidPathException e) {
+            logger.error("Invalid download path : {}", remotePathString, e);
+            throw new BusinessException("Invalid download path", e);
+        }
+        // verify it is an absolute path
+        if ( ! remotePath.isAbsolute()) {
+            logger.error("Cannot download a relative path : {}", remotePathString);
+            throw new BusinessException("Cannot download a relative path");
+        }
+        // remove ".." and "." and avoid security issues
+        remotePath = remotePath.normalize();
+        // return full local path, in local root download path
+        return Paths.get(
+                server.getDataManagerPath(),
+                DOWNLOAD_FOLDER,
+                remotePath.toString()).toString();
+    }
+
+
 }

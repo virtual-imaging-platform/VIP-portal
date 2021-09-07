@@ -33,6 +33,7 @@ package fr.insalyon.creatis.vip.api.business;
 
 import fr.insalyon.creatis.vip.api.CarminProperties;
 import fr.insalyon.creatis.vip.api.exception.ApiException;
+import fr.insalyon.creatis.vip.api.exception.ApiException.ApiError;
 import fr.insalyon.creatis.vip.api.model.PathProperties;
 import fr.insalyon.creatis.vip.api.model.UploadData;
 import fr.insalyon.creatis.vip.api.model.UploadDataType;
@@ -281,12 +282,13 @@ public class DataApiBusiness {
     private void checkPermission(String path, LFCAccessType accessType)
             throws ApiException {
         try {
-            lfcPermissionBusiness.checkPermission(
-                currentUserProvider.get(), path, accessType);
+            if ( ! lfcPermissionBusiness.isLFCPathAllowed(
+                currentUserProvider.get(), path, accessType, true)) {
+                throw new ApiException(ApiError.UNAUTHORIZED_DATA_ACCESS, path);
+            }
         } catch (BusinessException e) {
-            throw new ApiException("API Permission error", e);
+            throw new ApiException("Error when checking permissions", e);
         }
-        // all check passed : all good !
     }
 
     // #### DOWNLOAD STUFF

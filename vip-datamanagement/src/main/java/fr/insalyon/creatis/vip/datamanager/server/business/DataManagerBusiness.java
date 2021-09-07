@@ -132,15 +132,21 @@ public class DataManagerBusiness {
         }
     }
 
-    public String getRemoteFile(User user, String remoteFile, String localDir)
+    public String getRemoteFile(User user, String remoteFile)
             throws BusinessException {
 
+        String remotePath;
+        String localDir;
         try {
-            return gridaClient.getRemoteFile(
-                    lfcPathsBusiness.parseBaseDir(user, remoteFile),
-                    localDir);
+            remotePath = lfcPathsBusiness.parseBaseDir(user, remoteFile);
+            localDir = lfcPathsBusiness.getLocalDirForGridaFileDownload(remotePath);
         } catch (DataManagerException ex) {
             throw new BusinessException(ex);
+        }
+        try {
+            return gridaClient.getRemoteFile(
+                    remotePath,
+                    localDir);
         } catch (GRIDAClientException ex) {
             logger.error("Error getting file {} to {} by {}",
                     remoteFile, localDir, user, ex);
