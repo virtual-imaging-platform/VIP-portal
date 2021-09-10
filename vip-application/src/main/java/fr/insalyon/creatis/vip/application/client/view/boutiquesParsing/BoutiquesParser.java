@@ -5,8 +5,8 @@ import com.google.gwt.json.client.JSONObject;
 import com.google.gwt.json.client.JSONParser;
 import fr.insalyon.creatis.vip.application.client.bean.boutiquesTools.*;
 
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Helper class for parsing JSON objects
@@ -42,24 +42,6 @@ public class BoutiquesParser extends AbstractJsonParser{
                         + " is invalid.", exception);
             }
             application.addInput(input);
-            // Dependencies
-            String inputId = input.getId();
-            // disables-inputs
-            if(input.getDisablesInputsId() != null){
-                application.addDisablesInputs(inputId, input.getDisablesInputsId());
-            }
-            // requires-inputs
-            if(input.getRequiresInputsId() != null){
-                application.addRequiresInputs(inputId, input.getRequiresInputsId());
-            }
-            // value-disables
-            if(input.getValueDisablesInputsId() != null){
-                application.addValueDisablesInputs(inputId, input.getValueDisablesInputsId());
-            }
-            // value-requires
-            if(input.getValueRequiresInputsId() != null){
-                application.addValueRequiresInputs(inputId, input.getValueRequiresInputsId());
-            }
         }
         // Groups
         JSONArray groupsArray = getArrayValue(parsedDescriptor, "groups", true);
@@ -141,8 +123,8 @@ public class BoutiquesParser extends AbstractJsonParser{
         String name = getStringValue(inputJson, "name");
         String description = getStringValue(inputJson, "description", true);
         boolean isOptional = getBooleanValue(inputJson, "optional", true);
-        List<String> disablesInputsId = getArrayValueAsStringList(inputJson, "disables-inputs", true);
-        List<String> requiresInputsId = getArrayValueAsStringList(inputJson, "requires-inputs", true);
+        Set<String> disablesInputsId = getArrayValueAsStringSet(inputJson, "disables-inputs", true);
+        Set<String> requiresInputsId = getArrayValueAsStringSet(inputJson, "requires-inputs", true);
         String typeString = getStringValue(inputJson, "type");
         BoutiquesInput.InputType inputType = BoutiquesInput.InputType.valueOf(typeString.toUpperCase());
         BoutiquesInput input;
@@ -153,16 +135,16 @@ public class BoutiquesParser extends AbstractJsonParser{
                     defaultValue);
         } else {
             // Non flag inputs (Number, String or File)
-            Map<String, List<String>> valueDisablesInputsId = getStringListMapValue(inputJson, "value-disables",
+            Map<String, Set<String>> valueDisablesInputsId = getStringSetMapValue(inputJson, "value-disables",
                     true);
-            Map<String, List<String>> valueRequiresInputsId = getStringListMapValue(inputJson, "value-requires",
+            Map<String, Set<String>> valueRequiresInputsId = getStringSetMapValue(inputJson, "value-requires",
                     true);
             JSONArray possibleValuesArray = getArrayValue(inputJson, "value-choices", true);
-            List<String> possibleValues;
+            Set<String> possibleValues;
             switch (inputType) {
                 case NUMBER:
                     try {
-                        possibleValues = jsonArrayToStringList(isOptional, possibleValuesArray, this::jsonValueToDouble);
+                        possibleValues = jsonArrayToStringSet(isOptional, possibleValuesArray, this::jsonValueToDouble);
                     } catch (InvalidBoutiquesDescriptorException exception){
                         throw new InvalidBoutiquesDescriptorException("Invalid input descriptor: "
                                 + "input of type 'Number' but value-choice contains non-double value(s).",
@@ -181,7 +163,7 @@ public class BoutiquesParser extends AbstractJsonParser{
                 case STRING:
                 case FILE:
                     try {
-                        possibleValues = jsonArrayToStringList(isOptional, possibleValuesArray, this::jsonValueToString);
+                        possibleValues = jsonArrayToStringSet(isOptional, possibleValuesArray, this::jsonValueToString);
                     } catch (InvalidBoutiquesDescriptorException exception) {
                         throw new InvalidBoutiquesDescriptorException("Invalid input descriptor: input of type '"
                                 + inputType.getCamelName() + "'but value-choice contains non-String value(s).",
@@ -213,7 +195,7 @@ public class BoutiquesParser extends AbstractJsonParser{
      */
     public BoutiquesGroup parseGroup(JSONObject groupJson) throws InvalidBoutiquesDescriptorException{
         String id = getStringValue(groupJson, "id");
-        List<String> members = getArrayValueAsStringList(groupJson, "members", false);
+        Set<String> members = getArrayValueAsStringSet(groupJson, "members", false);
         boolean allOrNone = getBooleanValue(groupJson, "all-or-none", true);
         boolean mutuallyExclusive = getBooleanValue(groupJson, "mutually-exclusive", true);
         boolean oneIsRequired = getBooleanValue(groupJson, "one-is-required", true);

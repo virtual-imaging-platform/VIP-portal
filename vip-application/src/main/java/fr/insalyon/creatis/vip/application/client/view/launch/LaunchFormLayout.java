@@ -1,8 +1,5 @@
 package fr.insalyon.creatis.vip.application.client.view.launch;
 
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.json.client.JSONObject;
-import com.google.gwt.json.client.JSONString;
 import com.smartgwt.client.types.Cursor;
 import com.smartgwt.client.types.VerticalAlignment;
 import com.smartgwt.client.util.SC;
@@ -11,7 +8,7 @@ import com.smartgwt.client.widgets.Label;
 import com.smartgwt.client.widgets.layout.HLayout;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
 import fr.insalyon.creatis.vip.application.client.bean.boutiquesTools.*;
-import fr.insalyon.creatis.vip.application.client.view.boutiquesParsing.*;
+import fr.insalyon.creatis.vip.application.client.view.boutiquesParsing.InvalidBoutiquesDescriptorException;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
 import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
@@ -21,7 +18,7 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static fr.insalyon.creatis.vip.application.client.view.launch.NumberInputLayout.camelName;
+import static fr.insalyon.creatis.vip.core.client.view.CoreConstants.RESULTS_DIRECTORY_PARAM_NAME;
 
 /**
  * Launch form automatically generated from a Boutiques descriptor.
@@ -31,7 +28,6 @@ import static fr.insalyon.creatis.vip.application.client.view.launch.NumberInput
  */
 public class LaunchFormLayout extends AbstractLaunchFormLayout {
     public static final String EXECUTION_NAME_ID = "Execution-name";
-    public static final String RESULTS_DIR_ID = "Results-directory";
     // Application information
     protected String applicationName;
     protected String applicationVersion;
@@ -185,7 +181,7 @@ public class LaunchFormLayout extends AbstractLaunchFormLayout {
         try {
             this.createArtificialStringInput("Execution name", EXECUTION_NAME_ID, false, null,
                     false, "[" + ApplicationConstants.EXEC_NAME_VALID_CHARS + "]");
-            this.createArtificialStringInput("Results directory", RESULTS_DIR_ID, true,
+            this.createArtificialStringInput("Results directory", RESULTS_DIRECTORY_PARAM_NAME, true,
                     DataManagerConstants.ROOT + "/" + DataManagerConstants.USERS_HOME, true,
                     "[" + ApplicationConstants.INPUT_VALID_CHARS + "]");
         } catch (InvalidBoutiquesDescriptorException exception) {
@@ -239,26 +235,13 @@ public class LaunchFormLayout extends AbstractLaunchFormLayout {
                                              String defaultValue, boolean hasAddValueButton, String allowedChar)
             throws InvalidBoutiquesDescriptorException {
         BoutiquesInput.InputType type = isFile ? BoutiquesInput.InputType.FILE : BoutiquesInput.InputType.STRING;
-        // Generate an artificial input descriptor
-        JSONObject descriptor = new JSONObject();
-        descriptor.put("name", new JSONString(name));
-        descriptor.put("id", new JSONString(id));
-        descriptor.put("type", new JSONString(camelName(type)));
-        if(defaultValue != null) {
-            descriptor.put("default-value", new JSONString(defaultValue));
-        }
-        // Create execution name input from the descriptor
-
-        try {
-            BoutiquesStringInput input = (BoutiquesStringInput) new BoutiquesParser().parseInput(descriptor);
-            InputLayout inputLayout = new StringInputLayout(input, this, hasAddValueButton, allowedChar);
-            this.inputsMap.put(id, inputLayout);
-            this.addMember(inputLayout);
-            inputLayout.onValueChanged();
-        } catch (InvalidBoutiquesDescriptorException exception) {
-            throw new InvalidBoutiquesDescriptorException("Could not create artificial input with properties :"
-                    + descriptor, exception);
-        }
+        BoutiquesStringInput input = new BoutiquesStringInput(id, name, null, type, false,
+                null, null, null, null,null,
+                defaultValue);
+        InputLayout inputLayout = new StringInputLayout(input, this, hasAddValueButton, allowedChar);
+        this.inputsMap.put(id, inputLayout);
+        this.addMember(inputLayout);
+        inputLayout.onValueChanged();
     }
 
     /**
@@ -270,25 +253,21 @@ public class LaunchFormLayout extends AbstractLaunchFormLayout {
      */
     private void configureDependencies(BoutiquesApplication applicationDescriptor) {
         // Disables-inputs
-        GWT.log("  Disables-inputs");
         applicationDescriptor.getDisablesInputsMap().forEach(this::addDisablesInputs);
         // Requires-inputs
-        GWT.log("  Requires-inputs");
         applicationDescriptor.getRequiresInputsMap().forEach(this::addRequiresInputs);
         // Value-disables
-        GWT.log("  Value-disables");
         applicationDescriptor.getValueDisablesInputsMap().forEach(this::addValueDisables);
         // Value-requires
-        GWT.log("  Value-requires");
         applicationDescriptor.getValueRequiresInputsMap().forEach(this::addValueRequires);
     }
 
     /**
      * Make input with ID masterID disable all optional inputs with IDs in disabledIds when it is not empty
      *  @param masterId      String representing disabling input ID
-     * @param disabledIds   List of Strings containing IDs of dependent inputs
+     * @param disabledIds    Set of String IDs of dependent inputs
      */
-    private void addDisablesInputs(String masterId, List<String> disabledIds) {
+    private void addDisablesInputs(String masterId, Set<String> disabledIds) {
         assert this.inputsMap.containsKey(masterId);
         InputLayout masterInput = this.inputsMap.get(masterId);
         for (String disabledInputId : disabledIds) {
@@ -304,24 +283,25 @@ public class LaunchFormLayout extends AbstractLaunchFormLayout {
     /**
      * Make input with ID masterID require all inputs and groups with IDs in requiredIds. This means it will be disabled
      * if one of them is left empty
-     *  @param masterId      String representing dependent input ID
-     * @param requiredIds   List of Strings containing IDs of required inputs or groups of inputs
+     *  @param masterId     String representing dependent input ID
+     * @param requiredIds   Set of String IDs of required inputs or groups of inputs
      */
-    private void addRequiresInputs(String masterId, List<String> requiredIds) {
+    private void addRequiresInputs(String masterId, Set<String> requiredIds) {
         assert this.inputsMap.containsKey(masterId);
         InputLayout masterInput = this.inputsMap.get(masterId);
         // Ignore dependency if master input is not optional (thus cannot be disabled)
-        if(masterInput.isOptional()) {
-            for (String requiredInputId : requiredIds) {
-                if (this.inputsMap.containsKey(requiredInputId)) {
-                    InputLayout requiredInput = this.inputsMap.get(requiredInputId);
-                    masterInput.addRequires(requiredInput);
-                } else {
-                    // A whole group is required
-                    assert this.groups.containsKey(requiredInputId);
-                    for (InputLayout requiredMember : this.groups.get(requiredInputId).getMembers()) {
-                        masterInput.addRequires(requiredMember);
-                    }
+        if(!masterInput.isOptional()) {
+            return;
+        }
+        for (String requiredInputId : requiredIds) {
+            if (this.inputsMap.containsKey(requiredInputId)) {
+                InputLayout requiredInput = this.inputsMap.get(requiredInputId);
+                masterInput.addRequires(requiredInput);
+            } else {
+                // A whole group is required
+                assert this.groups.containsKey(requiredInputId);
+                for (InputLayout requiredMember : this.groups.get(requiredInputId).getMembers()) {
+                    masterInput.addRequires(requiredMember);
                 }
             }
         }
@@ -331,9 +311,9 @@ public class LaunchFormLayout extends AbstractLaunchFormLayout {
      * Make input with ID masterId values disable certain inputs. valueDisablesIds maps values to IDs of inputs disabled
      * when these values are selected.
      *  @param masterId          String representing disabling input ID.
-     * @param valueDisablesIds  Map with String representation of disabling input values as keys, and String[]
+     * @param valueDisablesIds   Map from String input values to Sets of String IDs of inputs disabled by those values
      */
-    private void addValueDisables(String masterId, Map<String, List<String>> valueDisablesIds) {
+    private void addValueDisables(String masterId, Map<String, Set<String>> valueDisablesIds) {
         assert this.inputsMap.containsKey(masterId);
         InputLayout masterInput = this.inputsMap.get(masterId);
         assert masterInput instanceof ValueChoiceInputLayout;
@@ -355,20 +335,21 @@ public class LaunchFormLayout extends AbstractLaunchFormLayout {
      * Make input with ID masterId values require certain inputs. valueRequiresIds maps values to IDs of inputs that
      * cannot be empty when these values are selected.
      *  @param masterId          String representing dependent input ID.
-     * @param valueRequiresIds  Map with String representation of dependent input values as keys, and List of Strings
+     * @param valueRequiresIds   Map from input values as Strings to Set of String IDs of inputs required by those
+     *                          values
      */
-    private void addValueRequires(String masterId, Map<String, List<String>> valueRequiresIds) {
+    private void addValueRequires(String masterId, Map<String, Set<String>> valueRequiresIds) {
         assert this.inputsMap.containsKey(masterId);
         InputLayout masterInput = this.inputsMap.get(masterId);
         assert masterInput instanceof ValueChoiceInputLayout;
+        Map<String, Set<InputLayout>> valueRequiresLayouts = new HashMap<>();
         for (String iValue : valueRequiresIds.keySet()) {
-            Set<InputLayout> requiredInputs = new HashSet<>();
-            for (String requiredInputId : valueRequiresIds.get(iValue)) {
-                assert this.inputsMap.containsKey(requiredInputId);
-                requiredInputs.add(this.inputsMap.get(requiredInputId));
-            }
-            ((ValueChoiceInputLayout) masterInput).addValueRequires(iValue, requiredInputs);
+            Set<InputLayout> requiredInputs = valueRequiresIds.get(iValue).stream()
+                    .map(this.inputsMap::get)
+                    .collect(Collectors.toSet());
+            valueRequiresLayouts.put(iValue, requiredInputs);
         }
+        ((ValueChoiceInputLayout) masterInput).addValueRequires(valueRequiresLayouts);
     }
 
     /**
@@ -645,7 +626,7 @@ public class LaunchFormLayout extends AbstractLaunchFormLayout {
     public Map<String, String> getParametersMap() {
         Map<String, String> parameterMap = new HashMap<>();
         this.getInputValueMap().forEach((inputId, valueSet) -> {
-            if((!inputId.equals(EXECUTION_NAME_ID)) & (!inputId.equals(RESULTS_DIR_ID))) {
+            if(!inputId.equals(EXECUTION_NAME_ID)) {
                 String inputValue;
                 if (valueSet instanceof ValueList) {
                     inputValue = String.join(ApplicationConstants.SEPARATOR_LIST, valueSet.getValuesAsStrings());
@@ -682,7 +663,7 @@ public class LaunchFormLayout extends AbstractLaunchFormLayout {
                     // Overwrite only if current value is different from default value.
                     Object uniqueValue = currentValueList.getValueNo(0);
                     Object defaultValue = input.getDefaultValue();
-                    if(!((uniqueValue == null) & (defaultValue == null))){
+                    if(!((uniqueValue == null) && (defaultValue == null))){
                         if((uniqueValue == null) | (defaultValue == null)){
                             // Current value or default value is null while the other is not
                             overwriteInput = true;

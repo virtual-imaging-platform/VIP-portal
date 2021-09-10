@@ -36,7 +36,8 @@ import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.SectionStackSection;
 import com.smartgwt.client.widgets.layout.VLayout;
 import fr.insalyon.creatis.vip.applicationimporter.client.view.Constants;
-import java.util.List;
+
+import java.util.Set;
 
 public class OutputLayout extends InputOutputLayout {
 
@@ -44,7 +45,7 @@ public class OutputLayout extends InputOutputLayout {
         super("Application Outputs", Constants.ICON_OUTPUT, width, height);
     }
 
-    public void setOutputFiles(List<BoutiquesOutputFile> outputFiles) {
+    public void setOutputFiles(Set<BoutiquesOutputFile> outputFiles) {
 
         stackSection.clear();
 

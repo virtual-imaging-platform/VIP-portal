@@ -1,7 +1,7 @@
 package fr.insalyon.creatis.vip.application.client.bean.boutiquesTools;
 
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Representation of a Number input in an application Boutiques descriptor
@@ -38,9 +38,9 @@ public class BoutiquesNumberInput extends BoutiquesInput{
      * @throws RuntimeException if descriptor is invalid
      */
     public BoutiquesNumberInput(String id, String name, String description, boolean isOptional,
-                                List<String> disablesInputsId, List<String> requiresInputsId,
-                                List<String> possibleValues, Map<String, List<String>> valueDisablesInputsId,
-                                Map<String, List<String>> valueRequiresInputsId, Double defaultValue,
+                                Set<String> disablesInputsId, Set<String> requiresInputsId,
+                                Set<String> possibleValues, Map<String, Set<String>> valueDisablesInputsId,
+                                Map<String, Set<String>> valueRequiresInputsId, Double defaultValue,
                                 boolean isInteger, boolean isExclusiveMaximum, boolean isExclusiveMinimum,
                                 Double maximum, Double minimum) throws RuntimeException{
         super(id, name, description, InputType.NUMBER, isOptional, disablesInputsId, requiresInputsId, possibleValues,

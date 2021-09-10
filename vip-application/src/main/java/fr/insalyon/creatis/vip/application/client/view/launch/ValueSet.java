@@ -21,7 +21,7 @@ public abstract class ValueSet {
      * @return      String representation of value. null is represented by ApplicationConstants.INPUT_WITHOUT_VALUE
      * @see ApplicationConstants#INPUT_WITHOUT_VALUE
      */
-    public static String valueAsString(Object value){
+    protected String valueAsString(Object value){
         return (value == null) ? ApplicationConstants.INPUT_WITHOUT_VALUE : value.toString();
     }
 

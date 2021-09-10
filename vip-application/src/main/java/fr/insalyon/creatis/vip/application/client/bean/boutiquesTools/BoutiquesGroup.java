@@ -1,9 +1,8 @@
 package fr.insalyon.creatis.vip.application.client.bean.boutiquesTools;
 
-import com.google.gwt.json.client.JSONObject;
 import com.google.gwt.user.client.rpc.IsSerializable;
 
-import java.util.List;
+import java.util.Set;
 
 /**
  * Representation of a group in an application Boutiques descriptor
@@ -16,7 +15,7 @@ public class BoutiquesGroup implements IsSerializable {
     private final boolean allOrNone;
     private final boolean mutuallyExclusive;
     private final boolean oneIsRequired;
-    private final List<String> members;
+    private final Set<String> members;
 
     /**
      * @param id                String
@@ -26,7 +25,7 @@ public class BoutiquesGroup implements IsSerializable {
      * @param members           List of String IDs of this group members
      */
     public BoutiquesGroup(String id, boolean allOrNone, boolean mutuallyExclusive, boolean oneIsRequired,
-                          List<String> members){
+                          Set<String> members){
         this.id = id;
         this.allOrNone = allOrNone;
         this.mutuallyExclusive = mutuallyExclusive;
@@ -44,7 +43,7 @@ public class BoutiquesGroup implements IsSerializable {
     /**
      * @return Group member IDs as an array of Strings
      */
-    public List<String> getMembers() {
+    public Set<String> getMembers() {
         return members;
     }
 

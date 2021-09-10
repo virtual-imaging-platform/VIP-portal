@@ -100,7 +100,7 @@ public class ValueRange extends ValueSet {
             if (comparedValueSet.getNValues() == this.getNValues()) {
                 List<Float> comparedRange = ((ValueRange) comparedValueSet).getRangeLimits();
                 // If start and step are the same, end can differ as long as there is the same number of values.
-                return (comparedRange.get(0).equals(this.rangeLimits.get(0))) & (comparedRange.get(1).equals(this.rangeLimits.get(1)));
+                return (comparedRange.get(0).equals(this.rangeLimits.get(0))) && (comparedRange.get(1).equals(this.rangeLimits.get(1)));
             }
         }
         return false;

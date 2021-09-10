@@ -1,6 +1,5 @@
 package fr.insalyon.creatis.vip.application.client.view.launch;
 
-import com.google.gwt.core.client.GWT;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.FormItem;
@@ -25,8 +24,8 @@ import java.util.stream.Collectors;
 public class NumberInputLayout extends InputLayout {
     private final SelectItem typeSelector = this.configureLayoutSelector(); // Range / List layout selection
     // Validators for client-side validation logic
-    private final CustomValidator numberValidator; // For checking we have a valid number
-    private final CustomValidator rangeValidator; // For checking this number is between allowed minimum and maximum
+    private CustomValidator numberValidator; // For checking we have a valid number
+    private CustomValidator rangeValidator; // For checking this number is between allowed minimum and maximum
     public enum FormLayout {
         LIST, RANGE;
         public static List<String> names = camelNames(values());
@@ -78,18 +77,29 @@ public class NumberInputLayout extends InputLayout {
      */
     public NumberInputLayout(final BoutiquesNumberInput parsedInput, LaunchFormLayout parentLayout) {
         super(parsedInput, parentLayout);
-        // Configure validators for client-side validation logic
+        // Overwrite main input field created by super(). Number main input field is indeed more complicated, notably
+        // allowing range input instead of single value. Done here instead of overriding createMasterForm() because we
+        // need validators above to have been configured first
+        this.createMasterForm();
+    }
+
+    /**
+     * Configure validators for client-side validation (checking the value is a valid number between maximum and minimum
+     * allowed values).
+     */
+    private void configureValidators() {
+        final BoutiquesNumberInput numberInput = (BoutiquesNumberInput) this.input;
         // Check that input is filled if non optional and is a valid number / integer.
         this.numberValidator = new CustomValidator() {
             @Override
             protected boolean condition(Object value) {
                 if (value == null) {
                     this.setErrorMessage("Field is required");
-                    return parsedInput.isOptional();
+                    return numberInput.isOptional();
                 }
                 try {
                     double doubleValue = Double.parseDouble(String.valueOf(value));
-                    if (parsedInput.isInteger()) {
+                    if (numberInput.isInteger()) {
                         this.setErrorMessage("Must be an integer.");
                         return ((doubleValue % 1) == 0);
                     }
@@ -106,9 +116,9 @@ public class NumberInputLayout extends InputLayout {
             protected boolean condition(Object value) {
                 try {
                     double doubleValue = Double.parseDouble(String.valueOf(value));
-                    Double maximum = parsedInput.getMaximum();
+                    Double maximum = numberInput.getMaximum();
                     if (maximum != null) {
-                        if (parsedInput.isExclusiveMaximum() & (doubleValue >= maximum)) {
+                        if (numberInput.isExclusiveMaximum() && (doubleValue >= maximum)) {
                             this.setErrorMessage("Must be strictly less than " + maximum);
                             return false;
                         } else {
@@ -118,9 +128,9 @@ public class NumberInputLayout extends InputLayout {
                             }
                         }
                     }
-                    Double minimum = parsedInput.getMinimum();
+                    Double minimum = numberInput.getMinimum();
                     if (minimum != null) {
-                        if (parsedInput.isExclusiveMinimum() & (doubleValue <= minimum)) {
+                        if (numberInput.isExclusiveMinimum() && (doubleValue <= minimum)) {
                             this.setErrorMessage("Must be strictly greater than " + minimum);
                             return false;
                         } else {
@@ -135,10 +145,6 @@ public class NumberInputLayout extends InputLayout {
                 return true;
             }
         };
-        // Overwrite main input field created by super(). Number main input field is indeed more complicated, notably
-        // allowing range input instead of single value. Done here instead of overriding createMasterForm() because we
-        // need validators above to have been configured first
-        this.overwriteMasterForm();
     }
 
     /**
@@ -161,7 +167,7 @@ public class NumberInputLayout extends InputLayout {
      */
     @Override
     protected void createAdditionalForm() {
-        final DynamicForm inputForm = this.addForm(this.removeValueIcon);
+        final DynamicForm inputForm = this.newForm(this.removeValueIcon);
         inputForm.getField(MAIN_FIELD_NAME).setValidators(this.numberValidator, this.rangeValidator);
         // Size adjustment to align with main field, which contains an additional SelectItem
         inputForm.setWidth(400);
@@ -216,7 +222,7 @@ public class NumberInputLayout extends InputLayout {
         if (this.isRange()) {
             return new ValueRange(this.masterForm);
         }
-        return new ValueList(this.masterForm, this.additionalForms);
+        return super.getValueList();
     }
 
     /**
@@ -225,8 +231,7 @@ public class NumberInputLayout extends InputLayout {
      */
     @Override
     public boolean hasUniqueValue() {
-        GWT.log(String.valueOf(this.typeSelector));
-        return super.hasUniqueValue() & !this.isRange();
+        return super.hasUniqueValue() && !this.isRange();
     }
 
     /**
@@ -243,10 +248,18 @@ public class NumberInputLayout extends InputLayout {
     }
 
     /**
-     * Overwrite main input field created by super. This master form contains a SelectItem to select List or Range
+     * Create main input field. This master form contains a SelectItem to select List or Range
      * layout, as well as fields for both layouts. Should be called only once by constructor
+     *
+     * Note that validators for client-side validation logic are initialized here.
+     * @see #configureValidators()
      */
-    protected void overwriteMasterForm() {
+    @Override
+    protected void createMasterForm() {
+        // Configure validators for client-side validation logic
+        configureValidators();
+        // Initialize master form
+        this.masterForm = new DynamicForm();
         // Fields for master form
         final List<FormItem> inputFields = new ArrayList<>();
         // List/Range selection
@@ -319,9 +332,9 @@ public class NumberInputLayout extends InputLayout {
                 return true;
             }
         };
-        // Check that step is positive
-        // Overwrite master form
+        // Setup and add master form to this
         this.masterForm.setFields(inputFields.toArray(new FormItem[]{}));
+        this.addMember(this.masterForm);
         getRangeItem(RangeItem.START).setValidators(this.numberValidator, this.rangeValidator, rangeStartValidator);
         getRangeItem(RangeItem.STOP).setValidators(this.numberValidator, this.rangeValidator, rangeEndValidator);
         getRangeItem(RangeItem.STEP).setValidators(rangeStepValidator, this.numberValidator);

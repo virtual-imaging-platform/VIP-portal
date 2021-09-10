@@ -2,10 +2,7 @@ package fr.insalyon.creatis.vip.application.client.view.boutiquesParsing;
 
 import com.google.gwt.json.client.*;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 
 /**
@@ -92,24 +89,24 @@ public class AbstractJsonParser {
     }
 
     /**
-     * Converts a JSONArray to List of Strings. Each value is checked using valueConverter which converts them to any
+     * Converts a JSONArray to Set of Strings. Each value is checked using valueConverter which converts them to any
      * Object or returns null if the value is invalid.
      *
      * @param addEmptyValue  boolean: true if null should be added as first value of returned List
      * @param jsonArray      JSONArray from which values are taken
      * @param valueConverter Function converting a JSONValue to any Object, or returning null if the JSONValue is
      *                       not of expected type. It is used to ensure all values from jsonArray are valid.
-     * @return List of String. Always null if jsonArray was null
+     * @return Set of String. Always null if jsonArray was null
      * @throws InvalidBoutiquesDescriptorException if a value is not valid (valueConverter returned null on one of
      *                                             jsonArray's values)
      */
-    protected List<String> jsonArrayToStringList(boolean addEmptyValue, JSONArray jsonArray,
-                                               Function<JSONValue, Object> valueConverter)
+    protected Set<String> jsonArrayToStringSet(boolean addEmptyValue, JSONArray jsonArray,
+                                                Function<JSONValue, Object> valueConverter)
             throws InvalidBoutiquesDescriptorException {
         if(jsonArray == null) {
             return null;
         }
-        List<String> stringList = new ArrayList<>();
+        Set<String> stringList = new HashSet<>();
         if (addEmptyValue) {
             stringList.add(null);
         }
@@ -228,25 +225,25 @@ public class AbstractJsonParser {
     }
 
     /**
-     * Get a List of String associated to given key in given JSON object
+     * Get a Set of String associated to given key in given JSON object
      *
      * @param descriptor    JSONObject to parse
      * @param key           String representing the key in descriptor associated to searched value
      * @param optional      boolean: true if key is optional, in which case its absence will lead to a null return
      *                      value instead of a RuntimeException
-     * @return              Array of Strings associated to key in descriptor, or null if key is absent and optional is
+     * @return              Set of Strings associated to key in descriptor, or null if key is absent and optional is
      *                      true
      * @throws InvalidBoutiquesDescriptorException if expected value is not a valid String array or if key is absent
      *                                             and optional is false
      */
-    protected List<String> getArrayValueAsStringList(JSONObject descriptor, String key, boolean optional)
+    protected Set<String> getArrayValueAsStringSet(JSONObject descriptor, String key, boolean optional)
             throws InvalidBoutiquesDescriptorException {
         JSONArray array = getArrayValue(descriptor, key, optional);
         if (array == null){
             return null;
         } else {
             try {
-                return jsonArrayToStringList(false, array, this::jsonValueToString);
+                return jsonArrayToStringSet(false, array, this::jsonValueToString);
             } catch (InvalidBoutiquesDescriptorException exception) {
                 throw new InvalidBoutiquesDescriptorException("Invalid JSON object: '" + key
                         + "' array contains non-String element(s).", exception);
@@ -268,14 +265,14 @@ public class AbstractJsonParser {
      * @throws InvalidBoutiquesDescriptorException if expected value is not a valid object or if key is absent and
      *                                             optional is false
      */
-    protected Map<String, List<String>> getStringListMapValue(JSONObject descriptor, String key, boolean optional)
+    protected Map<String, Set<String>> getStringSetMapValue(JSONObject descriptor, String key, boolean optional)
             throws InvalidBoutiquesDescriptorException {
         JSONObject object = getObjectValue(descriptor, key, optional);
         if(object == null){
             return null;
         }
         // Converts obtained object to a Map of Strings to String arrays
-        Map<String, List<String>> convertedObject = new HashMap<>();
+        Map<String, Set<String>> convertedObject = new HashMap<>();
         for(String objectKey : object.keySet()){
             JSONArray objectValue = object.get(objectKey).isArray();
             if (objectValue == null){
@@ -283,7 +280,7 @@ public class AbstractJsonParser {
                         + "' value in " + key + "object is not a JSON Array.");
             }
             if(objectValue.size() > 0){
-                convertedObject.put(objectKey, jsonArrayToStringList(false, objectValue,
+                convertedObject.put(objectKey, jsonArrayToStringSet(false, objectValue,
                         this::jsonValueToString));
             }
         }

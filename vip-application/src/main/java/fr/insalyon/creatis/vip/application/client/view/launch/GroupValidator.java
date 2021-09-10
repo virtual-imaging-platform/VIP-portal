@@ -58,7 +58,7 @@ public class GroupValidator {
         }
         if(this.group.isAllOrNone()){
             this.parentLayout.groupErrorMessage(LaunchFormLayout.allOrNoneMessage(this.memberNames),
-                    ((nActiveMembers != 0) & (nActiveMembers != this.members.size())));
+                    ((nActiveMembers != 0) && (nActiveMembers != this.members.size())));
         }
         if(this.group.isOneIsRequired()){
             this.parentLayout.groupErrorMessage(LaunchFormLayout.oneIsRequiredMessage(this.memberNames),

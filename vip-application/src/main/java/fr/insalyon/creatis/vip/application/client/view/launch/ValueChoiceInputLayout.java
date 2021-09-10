@@ -71,16 +71,18 @@ public class ValueChoiceInputLayout extends InputLayout{
     }
 
     /**
-     * Make specified value invalid if some InputLayouts of requiredInputSet are empty. A validation error will
+     * Make specified values invalid if specified InputLayouts are empty. A validation error will
      * appear to inform user they selected an invalid value
      *
-     * @param value             String representing dependant value
-     * @param requiredInputSet  Set of InputLayouts required by value
+     * @param valueRequiresInputs Map from input values as Strings to Set of InputLayouts required by corresponding
+     *                            value.
      */
-    public void addValueRequires(String value, Set<InputLayout> requiredInputSet){
-        requiredInputSet.forEach(requiredInput -> {
-            addToSetInMap(this.valueRequires, requiredInput, value);
-            requiredInput.addRequiredByValue(this, value);
+    public void addValueRequires(Map<String, Set<InputLayout>> valueRequiresInputs){
+        valueRequiresInputs.forEach((value, requiredInputSet) -> {
+            requiredInputSet.forEach(requiredInput -> {
+                addToSetInMap(this.valueRequires, requiredInput, value);
+                requiredInput.addRequiredByValue(this, value);
+            });
         });
         // Update main value field validator to reflect the dependency
         FormItem inputField = this.masterForm.getField(MAIN_FIELD_NAME);
@@ -90,7 +92,7 @@ public class ValueChoiceInputLayout extends InputLayout{
             protected boolean condition(Object value) {
                 // Dependencies are ignored when input has multiple values, thus any value is considered valid
                 // Empty value cannot require another input, thus it is always considered valid
-                if(layoutInstance.hasUniqueValue() & (value != null)) {
+                if(layoutInstance.hasUniqueValue() && (value != null)) {
                     // Identify all inputs required by current value that are empty, and collect their names
                     Set<String> emptyRequiredInputNames = layoutInstance.valueRequires.entrySet()
                             .stream()

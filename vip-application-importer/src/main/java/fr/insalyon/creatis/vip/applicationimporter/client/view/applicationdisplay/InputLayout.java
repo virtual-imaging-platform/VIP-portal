@@ -35,7 +35,8 @@ import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.SectionStackSection;
 import fr.insalyon.creatis.vip.application.client.bean.boutiquesTools.BoutiquesInput;
 import fr.insalyon.creatis.vip.applicationimporter.client.view.Constants;
-import java.util.List;
+
+import java.util.Set;
 
 /**
  *
@@ -47,7 +48,7 @@ public class InputLayout extends InputOutputLayout {
         super("Application Inputs", Constants.ICON_INPUT, width, height);
     }
 
-    public void setInputs(List<BoutiquesInput> inputs) {
+    public void setInputs(Set<BoutiquesInput> inputs) {
         stackSection.clear();
         for (BoutiquesInput bi : inputs) {
             SectionStackSection section = new SectionStackSection();

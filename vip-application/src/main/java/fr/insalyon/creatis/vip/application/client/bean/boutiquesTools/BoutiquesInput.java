@@ -2,8 +2,8 @@ package fr.insalyon.creatis.vip.application.client.bean.boutiquesTools;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
 
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Representation of an input in an application Boutiques descriptor
@@ -17,11 +17,11 @@ public abstract class BoutiquesInput implements IsSerializable {
     protected final String description;
     private final InputType type;
     protected final boolean isOptional;
-    protected final List<String> disablesInputsId;
-    protected final List<String> requiresInputsId;
-    protected final List<String> possibleValues;
-    private final Map<String, List<String>> valueDisablesInputsId;
-    private final Map<String, List<String>> valueRequiresInputsId;
+    protected final Set<String> disablesInputsId;
+    protected final Set<String> requiresInputsId;
+    protected final Set<String> possibleValues;
+    private final Map<String, Set<String>> valueDisablesInputsId;
+    private final Map<String, Set<String>> valueRequiresInputsId;
 
     private String valueKey;
     private boolean list;
@@ -54,9 +54,9 @@ public abstract class BoutiquesInput implements IsSerializable {
      * @throws RuntimeException if descriptor is invalid
      */
     public BoutiquesInput(String id, String name, String description, InputType type, boolean isOptional,
-                                 List<String> disablesInputsId, List<String> requiresInputsId,
-                                 List<String> possibleValues, Map<String, List<String>> valueDisablesInputsId,
-                                 Map<String, List<String>> valueRequiresInputsId){
+                          Set<String> disablesInputsId, Set<String> requiresInputsId,
+                          Set<String> possibleValues, Map<String, Set<String>> valueDisablesInputsId,
+                          Map<String, Set<String>> valueRequiresInputsId){
         this.id = id;
         this.name = name;
         this.description = description;
@@ -100,14 +100,14 @@ public abstract class BoutiquesInput implements IsSerializable {
     /**
      * @return array of Strings representing IDs of inputs disabled by this, or null if there is not any
      */
-    public List<String> getDisablesInputsId() {
+    public Set<String> getDisablesInputsId() {
         return this.disablesInputsId;
     }
 
     /**
      * @return array of Strings representing IDs of inputs required by this, or null if there is not any
      */
-    public List<String> getRequiresInputsId() {
+    public Set<String> getRequiresInputsId() {
         return this.requiresInputsId;
     }
 
@@ -129,7 +129,7 @@ public abstract class BoutiquesInput implements IsSerializable {
      * @return Map of String values of this to array of String IDs of inputs disabled by corresponding values.
      *         Return value can be null if this has no 'value-disables' dependency
      */
-    public Map<String, List<String>> getValueDisablesInputsId(){
+    public Map<String, Set<String>> getValueDisablesInputsId(){
         return this.valueDisablesInputsId;
     }
 
@@ -137,14 +137,14 @@ public abstract class BoutiquesInput implements IsSerializable {
      * @return Map of String values of this to array of String IDs of inputs required by corresponding values
      *         Return value can be null if this has no 'value-requires' dependency
      */
-    public Map<String, List<String>> getValueRequiresInputsId(){
+    public Map<String, Set<String>> getValueRequiresInputsId(){
         return this.valueRequiresInputsId;
     }
 
     /**
      * @return Array of Strings representing possible value choices for this input, or null if any value can be entered
      */
-    public List<String> getPossibleValues(){
+    public Set<String> getPossibleValues(){
         return possibleValues;
     }
 

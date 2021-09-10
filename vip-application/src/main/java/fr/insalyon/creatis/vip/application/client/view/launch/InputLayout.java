@@ -24,7 +24,7 @@ public abstract class InputLayout extends VLayout {
     protected final LaunchFormLayout parentLayout;
     protected final BoutiquesInput input;
     // Input forms
-    protected final DynamicForm masterForm;
+    protected DynamicForm masterForm;
     protected final ArrayList<DynamicForm> additionalForms = new ArrayList<>();
     protected final PickerIcon addValueIcon = this.configureAddValueIcon();
     protected final PickerIcon removeValueIcon = this.configureRemoveValueIcon();
@@ -81,7 +81,7 @@ public abstract class InputLayout extends VLayout {
             this.addMember(descriptionLabel);
         }
         // Input field
-        this.masterForm = this.addForm(this.addValueIcon);
+        this.createMasterForm();
     }
 
     /**
@@ -113,12 +113,12 @@ public abstract class InputLayout extends VLayout {
     }
 
     /**
-     * Create a new input field and add it to this layout
+     * Create and return a new input field and add it to this layout
      *
      * @param iconToAdd PickerIcon attached to created input field
      * @return          DynamicForm representing created input field
      */
-    protected DynamicForm addForm(PickerIcon iconToAdd){
+    protected DynamicForm newForm(PickerIcon iconToAdd){
         final DynamicForm inputForm = new DynamicForm();
         final FormItem inputField = this.getFormItem();
         inputField.setName(MAIN_FIELD_NAME);
@@ -131,11 +131,19 @@ public abstract class InputLayout extends VLayout {
     }
 
     /**
+     * Create master input field for current layout
+     * @see #newForm(PickerIcon)
+     */
+    protected void createMasterForm(){
+        this.masterForm = this.newForm(this.addValueIcon);
+    }
+
+    /**
      * Create an additional input field for current layout
-     * @see #addForm(PickerIcon)
+     * @see #newForm(PickerIcon)
      */
     protected void createAdditionalForm(){
-        this.additionalForms.add(this.addForm(this.removeValueIcon));
+        this.additionalForms.add(this.newForm(this.removeValueIcon));
         this.onValueChanged();
     }
 
@@ -228,44 +236,45 @@ public abstract class InputLayout extends VLayout {
      * Check dependencies with other inputs to enable or disable this as appropriate
      */
     protected void checkDependencies(){
-        if(this.hasUniqueValue()){
-            boolean wasEmpty = this.isMasterEmpty();
-            // Find all inputs that can cause this to be disabled
-            Set<String> disablingInputNames = this.filledDisablingInputs();
-            Set<String> requiredInputNames = this.emptyRequiredInputs();
-            Map<String, String> disablingValues = this.disablingInputValues();
-            if((disablingInputNames.size() + requiredInputNames.size() + disablingValues.size()) == 0){
-                this.enableInput();
-            } else {
-                // Disable input, with a help hover message explaining why
-                StringBuilder disabledHoverMessage = new StringBuilder("This value will be ignored because :<ul>");
-                if(disablingInputNames.size() > 0){
-                    disabledHoverMessage.append("<li>following input(s) are non-empty: ")
-                            .append(disablingInputNames)
-                            .append(".</li>");
-                }
-                if(requiredInputNames.size() > 0){
-                    disabledHoverMessage.append("<li>following input(s) are empty: ")
-                            .append(requiredInputNames)
-                            .append(".</li>");
-                }
-                if(disablingValues.size() > 0) {
-                    disablingValues.forEach(
-                            (inputName, value) -> disabledHoverMessage.append("<li>input [")
-                                    .append(inputName)
-                                    .append("] has value ")
-                                    .append(value)
-                                    .append(".</li>"));
-                }
-                for (FormItem field : this.masterForm.getFields()) {
-                    field.disable();
-                    field.setPrompt(disabledHoverMessage.toString());
-                }
+        if(!this.hasUniqueValue()) {
+            return;
+        }
+        boolean wasEmpty = this.isMasterEmpty();
+        // Find all inputs that can cause this to be disabled
+        Set<String> disablingInputNames = this.filledDisablingInputs();
+        Set<String> requiredInputNames = this.emptyRequiredInputs();
+        Map<String, String> disablingValues = this.disablingInputValues();
+        if((disablingInputNames.size() + requiredInputNames.size() + disablingValues.size()) == 0){
+            this.enableInput();
+        } else {
+            // Disable input, with a help hover message explaining why
+            StringBuilder disabledHoverMessage = new StringBuilder("This value will be ignored because :<ul>");
+            if(disablingInputNames.size() > 0){
+                disabledHoverMessage.append("<li>following input(s) are non-empty: ")
+                        .append(disablingInputNames)
+                        .append(".</li>");
             }
-            if (this.isMasterEmpty() != wasEmpty){
-                // Status changed, this may enable/disable dependent inputs
-                this.onValueChanged();
+            if(requiredInputNames.size() > 0){
+                disabledHoverMessage.append("<li>following input(s) are empty: ")
+                        .append(requiredInputNames)
+                        .append(".</li>");
             }
+            if(disablingValues.size() > 0) {
+                disablingValues.forEach(
+                        (inputName, value) -> disabledHoverMessage.append("<li>input [")
+                                .append(inputName)
+                                .append("] has value ")
+                                .append(value)
+                                .append(".</li>"));
+            }
+            for (FormItem field : this.masterForm.getFields()) {
+                field.disable();
+                field.setPrompt(disabledHoverMessage.toString());
+            }
+        }
+        if (this.isMasterEmpty() != wasEmpty){
+            // Status changed, this may enable/disable dependent inputs
+            this.onValueChanged();
         }
     }
 
@@ -356,7 +365,7 @@ public abstract class InputLayout extends VLayout {
      * Validate this, and update parentLayout invalid inputs error message as appropriate
      */
     protected void validateInput() {
-        if(this.masterForm.validate(false) & validateAdditionalForms()) {
+        if(this.masterForm.validate(false) && validateAdditionalForms()) {
             this.parentLayout.removeValidationErrorOnInput(this);
         } else {
             this.parentLayout.addValidationErrorOnInput(this);
@@ -427,7 +436,7 @@ public abstract class InputLayout extends VLayout {
      * @see #isMasterEmpty()
      */
     public boolean isUniqueEmpty(){
-        return this.hasUniqueValue() & this.isMasterEmpty();
+        return this.hasUniqueValue() && this.isMasterEmpty();
     }
 
     /**
@@ -436,7 +445,7 @@ public abstract class InputLayout extends VLayout {
      * @see #isMasterEmpty()
      */
     public boolean isUniqueFilled(){
-        return this.hasUniqueValue() & !this.isMasterEmpty();
+        return this.hasUniqueValue() && !this.isMasterEmpty();
     }
 
     /**

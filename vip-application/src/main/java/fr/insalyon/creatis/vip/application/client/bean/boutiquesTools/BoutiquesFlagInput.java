@@ -1,7 +1,7 @@
 package fr.insalyon.creatis.vip.application.client.bean.boutiquesTools;
 
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Representation of an Flag input in an application Boutiques descriptor
@@ -22,7 +22,7 @@ public class BoutiquesFlagInput extends BoutiquesInput {
      * @param defaultValue boolean
      */
     public BoutiquesFlagInput(String id, String name, String description, boolean isOptional,
-                              List<String> disablesInputsId, List<String> requiresInputsId, boolean defaultValue){
+                              Set<String> disablesInputsId, Set<String> requiresInputsId, boolean defaultValue){
         super(id, name, description, InputType.FLAG, isOptional, disablesInputsId, requiresInputsId, null,
                 null, null);
         this.defaultValue = defaultValue;
@@ -40,7 +40,7 @@ public class BoutiquesFlagInput extends BoutiquesInput {
      * @return Always null: Flag input cannot have 'value-disables' dependencies
      */
     @Override
-    public Map<String, List<String>> getValueDisablesInputsId() {
+    public Map<String, Set<String>> getValueDisablesInputsId() {
         return null;
     }
 
@@ -48,7 +48,7 @@ public class BoutiquesFlagInput extends BoutiquesInput {
      * @return Always null: Flag input cannot have 'value-requires' dependencies
      */
     @Override
-    public Map<String, List<String>> getValueRequiresInputsId() {
+    public Map<String, Set<String>> getValueRequiresInputsId() {
         return null;
     }
 
@@ -56,7 +56,7 @@ public class BoutiquesFlagInput extends BoutiquesInput {
      * @return Always null: Flag cannot have value choices other than true and false
      */
     @Override
-    public List<String> getPossibleValues() {
+    public Set<String> getPossibleValues() {
         return null;
     }
 

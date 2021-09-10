@@ -2,10 +2,12 @@ package fr.insalyon.creatis.vip.application.client.bean.boutiquesTools;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * Representation of an application Boutiques descriptor
@@ -18,13 +20,9 @@ public class BoutiquesApplication implements IsSerializable {
     private String name;
     private String description;
     private String version;
-    private List<BoutiquesInput> inputs = new ArrayList<>();
+    private Set<BoutiquesInput> inputs = new HashSet<>();
     // Input dependencies
-    private List<BoutiquesGroup> groups = new ArrayList<>();
-    private Map<String, List<String>> disablesInputsMap= new HashMap<>();
-    private Map<String, List<String>> requiresInputsMap= new HashMap<>();
-    private Map<String, Map<String, List<String>>> valueDisablesInputsMap= new HashMap<>();
-    private Map<String, Map<String, List<String>>> valueRequiresInputsMap= new HashMap<>();
+    private Set<BoutiquesGroup> groups = new HashSet<>();
     // Other properties not used for launch form generation
     private String applicationLFN;
     private String author;
@@ -35,8 +33,8 @@ public class BoutiquesApplication implements IsSerializable {
     private String schemaVersion;
     private String challengerEmail;
     private String challengerTeam;
-    private List<BoutiquesOutputFile> outputFiles = new ArrayList<>();
-    private Map<String,String> tags = new HashMap<>();
+    private Set<BoutiquesOutputFile> outputFiles = new HashSet<>();
+    private Map<String, String> tags = new HashMap<>();
     private String jsonFile;
 
     private BoutiquesApplication(){}
@@ -69,23 +67,36 @@ public class BoutiquesApplication implements IsSerializable {
     /**
      * @return Array of BoutiquesInputs representing application inputs
      */
-    public List<BoutiquesInput> getInputs() {
+    public Set<BoutiquesInput> getInputs() {
         return this.inputs;
     }
 
     /**
      * @return Array of BoutiquesGroups representing application input groups
      */
-    public List<BoutiquesGroup> getGroups() {
+    public Set<BoutiquesGroup> getGroups() {
         return groups;
+    }
+
+    /**
+     * Generic method for getters of input attribute maps.
+     *
+     * @param inputGetter Function: getter implemented in BoutiquesInput to return an input attribute.
+     * @param <T> Type of the input attribute
+     * @return  Map from String input IDs to the attribute of those inputs
+     */
+    private <T> Map<String, T> getMap(Function<BoutiquesInput, T> inputGetter){
+        return this.inputs.stream()
+                .filter(input -> inputGetter.apply(input) != null)
+                .collect(Collectors.toMap(BoutiquesInput::getId, inputGetter));
     }
 
     /**
      * @return Map representing input dependencies of type 'disables-inputs'. Keys are disabling input IDs as Strings,
      * and values are arrays of Strings representing IDs of inputs disabled when disabling input is non empty
      */
-    public Map<String, List<String>> getDisablesInputsMap() {
-        return this.disablesInputsMap;
+    public Map<String, Set<String>> getDisablesInputsMap() {
+        return this.getMap(BoutiquesInput::getDisablesInputsId);
     }
 
     /**
@@ -93,8 +104,8 @@ public class BoutiquesApplication implements IsSerializable {
      * and values are arrays of Strings representing IDs of inputs that need to be non-empty for dependant input to be
      * enabled
      */
-    public Map<String, List<String>> getRequiresInputsMap() {
-        return this.requiresInputsMap;
+    public Map<String, Set<String>> getRequiresInputsMap() {
+        return this.getMap(BoutiquesInput::getRequiresInputsId);
     }
 
     /**
@@ -102,8 +113,8 @@ public class BoutiquesApplication implements IsSerializable {
      * and values are Maps of String values to arrays of Strings representing IDs of inputs disabled when
      * corresponding value of disabling input is selected
      */
-    public Map<String, Map<String, List<String>>> getValueDisablesInputsMap() {
-        return valueDisablesInputsMap;
+    public Map<String, Map<String, Set<String>>> getValueDisablesInputsMap() {
+        return this.getMap(BoutiquesInput::getValueDisablesInputsId);
     }
 
     /**
@@ -111,8 +122,8 @@ public class BoutiquesApplication implements IsSerializable {
      * and values are Maps of String values to arrays of Strings representing IDs of inputs that need to be non empty
      * when corresponding value of dependant input is selected
      */
-    public Map<String, Map<String, List<String>>> getValueRequiresInputsMap() {
-        return valueRequiresInputsMap;
+    public Map<String, Map<String, Set<String>>> getValueRequiresInputsMap() {
+        return this.getMap(BoutiquesInput::getValueRequiresInputsId);
     }
 
     public String getName() {
@@ -155,7 +166,7 @@ public class BoutiquesApplication implements IsSerializable {
         return challengerTeam;
     }
 
-    public List<BoutiquesOutputFile> getOutputFiles() {
+    public Set<BoutiquesOutputFile> getOutputFiles() {
         return outputFiles;
     }
 
@@ -203,22 +214,6 @@ public class BoutiquesApplication implements IsSerializable {
 
     public void addGroup(BoutiquesGroup group){
         this.groups.add(group);
-    }
-
-    public void addDisablesInputs(String masterId, List<String> disabledIds){
-        this.disablesInputsMap.put(masterId, disabledIds);
-    }
-
-    public void addRequiresInputs(String masterId, List<String> requiredIds){
-        this.requiresInputsMap.put(masterId, requiredIds);
-    }
-
-    public void addValueDisablesInputs(String masterId, Map<String, List<String>> valueDisabledMap){
-        this.valueDisablesInputsMap.put(masterId, valueDisabledMap);
-    }
-
-    public void addValueRequiresInputs(String masterId, Map<String, List<String>> valueRequiredMap){
-        this.valueRequiresInputsMap.put(masterId, valueRequiredMap);
     }
 
     public void setAuthor(String author) {

@@ -1,7 +1,7 @@
 package fr.insalyon.creatis.vip.application.client.bean.boutiquesTools;
 
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Representation of a String or File input in an application Boutiques descriptor
@@ -29,9 +29,9 @@ public class BoutiquesStringInput extends BoutiquesInput{
      * @throws RuntimeException if descriptor is invalid
      */
     public BoutiquesStringInput(String id, String name, String description, InputType type, boolean isOptional,
-                                List<String> disablesInputsId, List<String> requiresInputsId,
-                                List<String> possibleValues, Map<String, List<String>> valueDisablesInputsId,
-                                Map<String, List<String>> valueRequiresInputsId, String defaultValue) throws RuntimeException{
+                                Set<String> disablesInputsId, Set<String> requiresInputsId,
+                                Set<String> possibleValues, Map<String, Set<String>> valueDisablesInputsId,
+                                Map<String, Set<String>> valueRequiresInputsId, String defaultValue) throws RuntimeException{
         super(id, name, description, type, isOptional, disablesInputsId, requiresInputsId, possibleValues,
                 valueDisablesInputsId, valueRequiresInputsId);
         this.defaultValue = defaultValue;

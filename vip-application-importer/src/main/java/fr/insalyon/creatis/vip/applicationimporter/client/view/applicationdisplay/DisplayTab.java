@@ -123,6 +123,7 @@ public class DisplayTab extends Tab {
         } catch (InvalidBoutiquesDescriptorException exception) {
             Layout.getInstance().setWarningMessage("Unable to parse application descriptor:<br />"
                     + exception.getMessage(), 10);
+            throw new ApplicationImporterException(exception.getMessage(), exception);
         }
         return boutiquesApplication;
     }
