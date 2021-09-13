@@ -201,7 +201,8 @@ public class NumberInputLayout extends InputLayout {
     public void overwriteValues(ValueSet valueList) {
         if (valueList instanceof ValueRange) {
             this.setLayout(FormLayout.RANGE);
-            assert !this.masterForm.getField(MAIN_FIELD_NAME).isVisible();
+            LaunchFormLayout.assertCondition(!this.masterForm.getField(MAIN_FIELD_NAME).isVisible(),
+                    "Invalid state: main field should not be visible in range layout.");
             List<Float> rangeLimits = ((ValueRange) valueList).getRangeLimits();
             for (int k = 0; k < 3; k++) {
                 this.masterForm.getField(RangeItem.names.get(k)).setValue(rangeLimits.get(k));
@@ -209,7 +210,8 @@ public class NumberInputLayout extends InputLayout {
             this.onValueChanged();
         } else {
             this.setLayout(FormLayout.LIST);
-            assert this.masterForm.getField(MAIN_FIELD_NAME).isVisible();
+            LaunchFormLayout.assertCondition(this.masterForm.getField(MAIN_FIELD_NAME).isVisible(),
+                    "Invalid state: main field should be visible in list layout.");
             super.overwriteValues(valueList);
         }
     }

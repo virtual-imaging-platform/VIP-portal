@@ -158,7 +158,8 @@ public abstract class InputLayout extends VLayout {
         if(!this.additionalForms.remove(formToRemove)){
             throw new IllegalArgumentException("Provided form is not contained in this InputLayout's additional forms.");
         }
-        assert this.hasMember(formToRemove);
+        LaunchFormLayout.assertCondition(this.hasMember(formToRemove),
+                "Illegal state: provided additional form was found but is not a member of this InputLayout.");
         this.removeMember(formToRemove);
         this.onValueChanged();
     }
@@ -307,7 +308,8 @@ public abstract class InputLayout extends VLayout {
         this.disabledByValue.forEach((disablingInput, disablingValueSet) -> {
             if(disablingInput.isUniqueFilled()){
                 Object masterValue = ValueList.formValue(disablingInput.masterForm);
-                assert masterValue != null;
+                LaunchFormLayout.assertCondition(masterValue != null,
+                        "Illegal state: master input field is not empty but has null value.");
                 String currentValue = masterValue.toString();
                 if(disablingValueSet.contains(currentValue)){
                     disablingValues.put(disablingInput.getInputName(), currentValue);
@@ -397,7 +399,8 @@ public abstract class InputLayout extends VLayout {
         while (this.additionalForms.size() > (nValues - 1)) {
             this.removeAddedForm(this.additionalForms.get(0));
         }
-        assert this.additionalForms.size() == (nValues - 1);
+        LaunchFormLayout.assertCondition(this.additionalForms.size() == (nValues - 1),
+                "Illegal state: form number still doesn't match the number of provided values.");
         // Overwrite additional form values
         for (int valueNo = 1; valueNo < nValues; valueNo++) {
             this.setValue(this.additionalForms.get(valueNo - 1), valueList.getValueNo(valueNo));

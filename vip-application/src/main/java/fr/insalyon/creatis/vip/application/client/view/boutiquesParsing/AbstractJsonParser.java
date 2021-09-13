@@ -176,7 +176,6 @@ public class AbstractJsonParser {
      */
     protected String getStringValue(JSONObject descriptor, String key) throws InvalidBoutiquesDescriptorException{
         String stringValue = getStringValue(descriptor, key, false);
-        assert stringValue != null;
         return stringValue;
     }
 

@@ -36,7 +36,6 @@ public class ValueRange extends ValueSet {
      * @param masterForm        DynamicForm containing range values (Start, Step and End values)
      * @throws RuntimeException if masterForm does not have three non-empty fields with names
      *                          NumberInputLayout.RangeItem.names
-     * @see NumberInputLayout.RangeItem#names
      */
     public ValueRange(DynamicForm masterForm) throws RuntimeException{
         this.rangeLimits = NumberInputLayout.RangeItem.names.stream()
@@ -84,7 +83,9 @@ public class ValueRange extends ValueSet {
             this.valuesAsStrings.add(String.valueOf(previousValue));
             previousValue += this.rangeLimits.get(1);
         }
-        assert this.values.size() == ((int) ((this.rangeLimits.get(2) - this.rangeLimits.get(0)) / this.rangeLimits.get(1)) + 1);
+        boolean correctSize = this.values.size() == ((int) ((this.rangeLimits.get(2) - this.rangeLimits.get(0)) / this.rangeLimits.get(1)) + 1);
+        LaunchFormLayout.assertCondition(correctSize,
+                "Populating range failed: incorrect number of computed values");
     }
 
     /**

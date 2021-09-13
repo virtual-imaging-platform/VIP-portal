@@ -44,7 +44,8 @@ public class FlagInputLayout extends InputLayout{
         if(masterValue instanceof String){
             masterValue = Boolean.parseBoolean((String) masterValue);
         }
-        assert masterValue instanceof Boolean;
+        LaunchFormLayout.assertCondition(masterValue instanceof Boolean,
+                "Invalid state: flag input value should be a boolean.");
         return  !((boolean) masterValue);
     }
 }

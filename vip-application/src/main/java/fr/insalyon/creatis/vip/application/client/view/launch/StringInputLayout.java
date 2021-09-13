@@ -47,7 +47,8 @@ public class StringInputLayout extends InputLayout{
     protected FormItem getFormItem() {
         final TextItem inputField = FieldUtil.getTextItem(400, ".");
         inputField.setValue(this.getDefaultValue());
-        assert this.input instanceof BoutiquesStringInput;
+        LaunchFormLayout.assertCondition(this.input instanceof BoutiquesStringInput,
+                "Invalid state: StringInputLayout with non BoutiquesStringInput input.");
         if(this.isFile()){
             // Add browse icon
             PickerIcon browsePicker = new PickerIcon(PickerIcon.SEARCH,

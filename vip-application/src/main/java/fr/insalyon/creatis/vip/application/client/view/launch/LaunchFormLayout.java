@@ -52,6 +52,19 @@ public class LaunchFormLayout extends AbstractLaunchFormLayout {
     private final Set<String> errorMessages = new TreeSet<>();
 
     /**
+     * Assertion that given expression is true, else an IllegalStateException with given message is thrown
+     *
+     * @param expression boolean: expression to verify, should evaluate to true in normal execution
+     * @param message    String message of thrown exception when expression is false
+     * @throws IllegalStateException if expression is false
+     */
+    public static void assertCondition (boolean expression, String message) throws IllegalStateException{
+        if(!expression){
+            throw new IllegalStateException(message);
+        }
+    }
+
+    /**
      * @param text  String
      * @return      String with content from text enclosed by HTML bold tag
      */
@@ -268,10 +281,12 @@ public class LaunchFormLayout extends AbstractLaunchFormLayout {
      * @param disabledIds    Set of String IDs of dependent inputs
      */
     private void addDisablesInputs(String masterId, Set<String> disabledIds) {
-        assert this.inputsMap.containsKey(masterId);
+        assertCondition(this.inputsMap.containsKey(masterId),
+                "Invalid master input ID: " + masterId);
         InputLayout masterInput = this.inputsMap.get(masterId);
         for (String disabledInputId : disabledIds) {
-            assert this.inputsMap.containsKey(disabledInputId);
+            assertCondition(this.inputsMap.containsKey(disabledInputId),
+                    "Invalid disabled input ID: " + disabledInputId);
             InputLayout disabledInput = this.inputsMap.get(disabledInputId);
             // Add dependency only if disabledInput can indeed be disabled, which means it is optional
             if(disabledInput.isOptional()) {
@@ -287,7 +302,7 @@ public class LaunchFormLayout extends AbstractLaunchFormLayout {
      * @param requiredIds   Set of String IDs of required inputs or groups of inputs
      */
     private void addRequiresInputs(String masterId, Set<String> requiredIds) {
-        assert this.inputsMap.containsKey(masterId);
+        assertCondition(this.inputsMap.containsKey(masterId), "Invalid master input ID: " + masterId);
         InputLayout masterInput = this.inputsMap.get(masterId);
         // Ignore dependency if master input is not optional (thus cannot be disabled)
         if(!masterInput.isOptional()) {
@@ -299,7 +314,8 @@ public class LaunchFormLayout extends AbstractLaunchFormLayout {
                 masterInput.addRequires(requiredInput);
             } else {
                 // A whole group is required
-                assert this.groups.containsKey(requiredInputId);
+                LaunchFormLayout.assertCondition(this.groups.containsKey(requiredInputId),
+                        "Invalid group ID: " + requiredInputId);
                 for (InputLayout requiredMember : this.groups.get(requiredInputId).getMembers()) {
                     masterInput.addRequires(requiredMember);
                 }
@@ -314,13 +330,16 @@ public class LaunchFormLayout extends AbstractLaunchFormLayout {
      * @param valueDisablesIds   Map from String input values to Sets of String IDs of inputs disabled by those values
      */
     private void addValueDisables(String masterId, Map<String, Set<String>> valueDisablesIds) {
-        assert this.inputsMap.containsKey(masterId);
+        LaunchFormLayout.assertCondition(this.inputsMap.containsKey(masterId),
+                "Invalid master input ID: " + masterId);
         InputLayout masterInput = this.inputsMap.get(masterId);
-        assert masterInput instanceof ValueChoiceInputLayout;
+        LaunchFormLayout.assertCondition(masterInput instanceof ValueChoiceInputLayout,
+                "Invalid state: can't add value-disables to non value choice input: " + masterId);
         for (String iValue : valueDisablesIds.keySet()) {
             Set<InputLayout> disabledInputSet = new HashSet<>();
             for (String disabledInputId : valueDisablesIds.get(iValue)) {
-                assert this.inputsMap.containsKey(disabledInputId);
+                LaunchFormLayout.assertCondition(this.inputsMap.containsKey(disabledInputId),
+                        "Invalid disabled input ID: " + disabledInputId);
                 InputLayout disabledInput = this.inputsMap.get(disabledInputId);
                 // Only optional inputs can be disabled
                 if(disabledInput.isOptional()) {
@@ -339,9 +358,11 @@ public class LaunchFormLayout extends AbstractLaunchFormLayout {
      *                          values
      */
     private void addValueRequires(String masterId, Map<String, Set<String>> valueRequiresIds) {
-        assert this.inputsMap.containsKey(masterId);
+        LaunchFormLayout.assertCondition(this.inputsMap.containsKey(masterId),
+                "Invalid master input ID: " + masterId);
         InputLayout masterInput = this.inputsMap.get(masterId);
-        assert masterInput instanceof ValueChoiceInputLayout;
+        LaunchFormLayout.assertCondition(masterInput instanceof ValueChoiceInputLayout,
+                "Can't add value-requires to non value choice input: " + masterId);
         Map<String, Set<InputLayout>> valueRequiresLayouts = new HashMap<>();
         for (String iValue : valueRequiresIds.keySet()) {
             Set<InputLayout> requiredInputs = valueRequiresIds.get(iValue).stream()
