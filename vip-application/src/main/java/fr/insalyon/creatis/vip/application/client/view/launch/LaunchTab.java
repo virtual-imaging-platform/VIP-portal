@@ -97,8 +97,7 @@ public class LaunchTab extends AbstractLaunchTab {
                     Layout.getInstance().setWarningMessage("Unable to parse application descriptor:<br />"
                             + exception.getMessage(), 10);
                 }
-                launchFormLayout = new LaunchFormLayout(applicationTool, applicationName, applicationVersion,
-                        applicationClass);
+                launchFormLayout = new LaunchFormLayout(applicationTool, true);
                 layout.addMember(launchFormLayout);
                 configureLaunchButton();
                 configureSaveInputsButton();

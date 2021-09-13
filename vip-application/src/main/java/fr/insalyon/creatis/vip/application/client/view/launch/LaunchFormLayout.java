@@ -7,6 +7,7 @@ import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.Label;
 import com.smartgwt.client.widgets.layout.HLayout;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
+import fr.insalyon.creatis.vip.application.client.bean.Descriptor;
 import fr.insalyon.creatis.vip.application.client.bean.boutiquesTools.*;
 import fr.insalyon.creatis.vip.application.client.view.boutiquesParsing.InvalidBoutiquesDescriptorException;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
@@ -109,16 +110,25 @@ public class LaunchFormLayout extends AbstractLaunchFormLayout {
     }
 
     /**
-     * Initialize all visual elements
+     * Alternative constructor to build layout from a Descriptor object (generated from gwendia descriptor)
      *
-     * @param applicationDescriptor BoutiquesDescriptor generated from application .json descriptor file
+     * @param descriptor            Descriptor of the application
+     * @param applicationName       String name of the application
+     * @param applicationVersion    String version of the applciation
      */
-    public LaunchFormLayout(final BoutiquesApplication applicationDescriptor, String applicationName,
-                            String applicationVersion, String applicationClass) {
+    public LaunchFormLayout(final Descriptor descriptor, String applicationName, String applicationVersion) {
+        this(new DescriptorParser().descriptorToBoutiquesApplication(descriptor, applicationName, applicationVersion),
+                false);
+    }
+
+        /**
+         * Initialize all visual elements
+         *
+         * @param applicationDescriptor     BoutiquesApplication generated from application .json descriptor file
+         * @param addResultsDirectoryInput  boolean: true if a Results Directory input should be added, false otherwise
+         */
+    public LaunchFormLayout(final BoutiquesApplication applicationDescriptor, boolean addResultsDirectoryInput) {
         super("600", "*");
-        this.applicationName = applicationName;
-        this.applicationVersion = applicationVersion;
-        this.applicationClass = applicationClass;
         this.setWidth(600);
         // Documentation
         Label docLabel = WidgetUtil.getLabel("Documentation and Terms of Use",
