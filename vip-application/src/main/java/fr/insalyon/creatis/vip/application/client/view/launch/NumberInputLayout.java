@@ -6,6 +6,7 @@ import com.smartgwt.client.widgets.form.fields.FormItem;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.form.validator.CustomValidator;
+import com.smartgwt.client.widgets.form.validator.RequiredIfValidator;
 import fr.insalyon.creatis.vip.application.client.bean.boutiquesTools.BoutiquesNumberInput;
 
 import java.util.ArrayList;
@@ -277,11 +278,12 @@ public class NumberInputLayout extends InputLayout {
             currentRangeItem.setTitle(rangeItemName);
             currentRangeItem.setShowTitle(true);
             currentRangeItem.setName(rangeItemName);
-            currentRangeItem.setRequired(true);
             currentRangeItem.hide(); // Default to List layout
             inputFields.add(currentRangeItem);
         }
         // Range validation logic
+        // Required
+        RequiredIfValidator requiredValidator = new RequiredIfValidator((formItem, value) -> true);
         // Start
         CustomValidator rangeStartValidator = new CustomValidator() {
             @Override
@@ -335,9 +337,12 @@ public class NumberInputLayout extends InputLayout {
         // Setup and add master form to this
         this.masterForm.setFields(inputFields.toArray(new FormItem[]{}));
         this.addMember(this.masterForm);
-        getRangeItem(RangeItem.START).setValidators(this.numberValidator, this.rangeValidator, rangeStartValidator);
-        getRangeItem(RangeItem.STOP).setValidators(this.numberValidator, this.rangeValidator, rangeEndValidator);
-        getRangeItem(RangeItem.STEP).setValidators(rangeStepValidator, this.numberValidator);
+        getRangeItem(RangeItem.START).setValidators(this.numberValidator, this.rangeValidator, rangeStartValidator,
+                requiredValidator);
+        getRangeItem(RangeItem.STOP).setValidators(this.numberValidator, this.rangeValidator, rangeEndValidator,
+                requiredValidator);
+        getRangeItem(RangeItem.STEP).setValidators(rangeStepValidator, this.numberValidator,
+                requiredValidator);
         this.masterForm.addItemChangedHandler(itemChangedEvent -> this.onValueChanged(itemChangedEvent.getItem()));
         valueItem.addIcon(this.addValueIcon); // If placed before call to setFields, the icon don't show
     }
