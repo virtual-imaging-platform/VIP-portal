@@ -1,6 +1,7 @@
 package fr.insalyon.creatis.vip.application.client.view.launch;
 
 import com.smartgwt.client.types.Alignment;
+import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.FormItem;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
@@ -23,7 +24,7 @@ import java.util.stream.Collectors;
  * @version %I%, %G%
  */
 public class NumberInputLayout extends InputLayout {
-    private final SelectItem typeSelector = this.configureLayoutSelector(); // Range / List layout selection
+    private SelectItem typeSelector; // Range / List layout selection
     // Validators for client-side validation logic
     private CustomValidator numberValidator; // For checking we have a valid number
     private CustomValidator rangeValidator; // For checking this number is between allowed minimum and maximum
@@ -78,10 +79,6 @@ public class NumberInputLayout extends InputLayout {
      */
     public NumberInputLayout(final BoutiquesNumberInput parsedInput, LaunchFormLayout parentLayout) {
         super(parsedInput, parentLayout);
-        // Overwrite main input field created by super(). Number main input field is indeed more complicated, notably
-        // allowing range input instead of single value. Done here instead of overriding createMasterForm() because we
-        // need validators above to have been configured first
-        this.createMasterForm();
     }
 
     /**
@@ -238,16 +235,15 @@ public class NumberInputLayout extends InputLayout {
     }
 
     /**
-     * @return SelectItem allowing user to chose between entering a list of values or a range
+     * Configure this.typeSelector, the SelectItem allowing user to chose between entering a list of values or a range
      */
-    private SelectItem configureLayoutSelector() {
-        SelectItem selector = new SelectItem();
-        selector.setWidth(70);
-        selector.setShowTitle(false);
-        selector.setValueMap(FormLayout.names.toArray(new String[]{}));
-        selector.setValue(camelName(FormLayout.LIST));
-        selector.addChangedHandler(changedEvent -> this.setLayout(this.getSelectedFormLayout()));
-        return selector;
+    private void configureLayoutSelector() {
+        this.typeSelector = new SelectItem();
+        this.typeSelector.setWidth(70);
+        this.typeSelector.setShowTitle(false);
+        this.typeSelector.setValueMap(FormLayout.names.toArray(new String[]{}));
+        this.typeSelector.setValue(camelName(FormLayout.LIST));
+        this.typeSelector.addChangedHandler(changedEvent -> this.setLayout(this.getSelectedFormLayout()));
     }
 
     /**
@@ -260,7 +256,11 @@ public class NumberInputLayout extends InputLayout {
     @Override
     protected void createMasterForm() {
         // Configure validators for client-side validation logic
+        SC.logInfo("configureValidators");
         configureValidators();
+        // Configure List/Range layout selector
+        SC.logInfo("configureLayoutSelector");
+        this.configureLayoutSelector();
         // Initialize master form
         this.masterForm = new DynamicForm();
         // Fields for master form
@@ -268,12 +268,16 @@ public class NumberInputLayout extends InputLayout {
         // List/Range selection
         inputFields.add(this.typeSelector);
         // Value
+        SC.logInfo("getFormItem");
         final FormItem valueItem = this.getFormItem();
         valueItem.setName(MAIN_FIELD_NAME);
+        SC.logInfo("addValueChangeHandler");
         this.addValueChangeHandler(valueItem);
+        SC.logInfo("setValidators");
         valueItem.setValidators(this.numberValidator, this.rangeValidator);
         inputFields.add(valueItem);
         // Range
+        SC.logInfo("Range");
         for (String rangeItemName : RangeItem.names) {
             FormItem currentRangeItem = this.getFormItem();
             currentRangeItem.setWidth(80);
@@ -285,8 +289,10 @@ public class NumberInputLayout extends InputLayout {
         }
         // Range validation logic
         // Required
+        SC.logInfo("RequiredIfValidator");
         RequiredIfValidator requiredValidator = new RequiredIfValidator((formItem, value) -> true);
         // Start
+        SC.logInfo("rangeStartValidator");
         CustomValidator rangeStartValidator = new CustomValidator() {
             @Override
             protected boolean condition(Object value) {
@@ -301,6 +307,7 @@ public class NumberInputLayout extends InputLayout {
         };
         rangeStartValidator.setErrorMessage("Must be less than range end");
         // End
+        SC.logInfo("rangeEndValidator");
         CustomValidator rangeEndValidator = new CustomValidator() {
             @Override
             protected boolean condition(Object value) {
@@ -315,6 +322,7 @@ public class NumberInputLayout extends InputLayout {
         };
         rangeEndValidator.setErrorMessage("Must be more than range start");
         // Step
+        SC.logInfo("rangeStepValidator");
         CustomValidator rangeStepValidator = new CustomValidator() {
             @Override
             protected boolean condition(Object value) {
@@ -337,15 +345,22 @@ public class NumberInputLayout extends InputLayout {
             }
         };
         // Setup and add master form to this
+        SC.logInfo("setFields ");
+        SC.logInfo(Arrays.toString(inputFields.toArray(new FormItem[]{})));
         this.masterForm.setFields(inputFields.toArray(new FormItem[]{}));
+        SC.logInfo("addMember ");
+        SC.logInfo(String.valueOf(this.masterForm));
         this.addMember(this.masterForm);
+        SC.logInfo("getRangeItem");
         getRangeItem(RangeItem.START).setValidators(this.numberValidator, this.rangeValidator, rangeStartValidator,
                 requiredValidator);
         getRangeItem(RangeItem.STOP).setValidators(this.numberValidator, this.rangeValidator, rangeEndValidator,
                 requiredValidator);
         getRangeItem(RangeItem.STEP).setValidators(rangeStepValidator, this.numberValidator,
                 requiredValidator);
+        SC.logInfo("addItemChangedHandler");
         this.masterForm.addItemChangedHandler(itemChangedEvent -> this.onValueChanged(itemChangedEvent.getItem()));
+        SC.logInfo("addIcon");
         valueItem.addIcon(this.addValueIcon); // If placed before call to setFields, the icon don't show
     }
 

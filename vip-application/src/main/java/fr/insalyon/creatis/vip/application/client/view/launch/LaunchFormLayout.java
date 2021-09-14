@@ -129,6 +129,7 @@ public class LaunchFormLayout extends AbstractLaunchFormLayout {
          */
     public LaunchFormLayout(final BoutiquesApplication applicationDescriptor, boolean addResultsDirectoryInput) {
         super("600", "*");
+        SC.logInfo("starting");
         this.setWidth(600);
         // Documentation
         Label docLabel = WidgetUtil.getLabel("Documentation and Terms of Use",
@@ -149,14 +150,18 @@ public class LaunchFormLayout extends AbstractLaunchFormLayout {
         this.warningLabel.setWidth(430);
         this.warningLabel.hide();
         // Add inputs, then buttons and warning/error labels below
-        this.configureInputs(applicationDescriptor);
+        SC.logInfo("configureInputs");
+        this.configureInputs(applicationDescriptor, addResultsDirectoryInput);
+        SC.logInfo("buttonsLayout");
         this.addMember(buttonsLayout);
         this.addMember(this.errorLabel);
         this.addMember(this.warningLabel);
         // Groups
+        SC.logInfo("groups");
         for(BoutiquesGroup group : applicationDescriptor.getGroups()){
             this.groups.put(group.getId(), new GroupValidator(group, this));
         }
+        SC.logInfo("validateGroups");
         this.validateGroups();
         // Dependencies
         this.configureDependencies(applicationDescriptor);
@@ -199,44 +204,57 @@ public class LaunchFormLayout extends AbstractLaunchFormLayout {
      *
      * @param applicationDescriptor BoutiquesDescriptor generated from application .json descriptor file
      */
-    private void configureInputs(BoutiquesApplication applicationDescriptor) {
-        // Execution name input
+    private void configureInputs(BoutiquesApplication applicationDescriptor, boolean addResultsDirectoryInput) {
+        // Execution name and results directory inputs
+        SC.logInfo("createArtificialStringInput");
+
         try {
             this.createArtificialStringInput("Execution name", EXECUTION_NAME_ID, false, null,
                     false, "[" + ApplicationConstants.EXEC_NAME_VALID_CHARS + "]");
-            this.createArtificialStringInput("Results directory", RESULTS_DIRECTORY_PARAM_NAME, true,
-                    DataManagerConstants.ROOT + "/" + DataManagerConstants.USERS_HOME, true,
-                    "[" + ApplicationConstants.INPUT_VALID_CHARS + "]");
+            if(addResultsDirectoryInput) {
+                this.createArtificialStringInput("Results directory", RESULTS_DIRECTORY_PARAM_NAME, true,
+                        DataManagerConstants.ROOT + "/" + DataManagerConstants.USERS_HOME,
+                        true, "[" + ApplicationConstants.INPUT_VALID_CHARS + "]");
+            }
         } catch (InvalidBoutiquesDescriptorException exception) {
             // This should not happen as parameters provided to createArtificialStringInput should be valid.
             throw new RuntimeException("Could not create 'Execution name' and 'Results directory' input layouts.");
         }
         // Application descriptor inputs
+        SC.logInfo("getInputs");
         for (BoutiquesInput input : applicationDescriptor.getInputs()) {
             InputLayout inputLayout;
+            SC.logInfo("getPossibleValues");
             if(input.getPossibleValues() != null){
+                SC.logInfo("ValueChoiceInputLayout");
                 inputLayout = new ValueChoiceInputLayout(input, this);
             } else {
+                SC.logInfo("getType");
                 switch (input.getType()) {
                     case STRING:
                     case FILE:
                         String allowedChar = "[" + ApplicationConstants.INPUT_VALID_CHARS + "]";
+                        SC.logInfo("StringInputLayout");
                         inputLayout = new StringInputLayout((BoutiquesStringInput) input, this,
                                 true, allowedChar);
                         break;
                     case NUMBER:
+                        SC.logInfo("NumberInputLayout");
                         inputLayout = new NumberInputLayout((BoutiquesNumberInput) input, this);
                         break;
                     case FLAG:
+                        SC.logInfo("FlagInputLayout");
                         inputLayout = new FlagInputLayout((BoutiquesFlagInput) input, this);
                         break;
                     default:
                         throw new RuntimeException("Unknown input type: " + input.getType());
                 }
             }
+            SC.logInfo("inputsMap");
             this.inputsMap.put(input.getId(), inputLayout);
             this.addMember(inputLayout);
             // Validate input value and dependencies
+            SC.logInfo("onValueChanged");
             inputLayout.onValueChanged();
         }
     }
