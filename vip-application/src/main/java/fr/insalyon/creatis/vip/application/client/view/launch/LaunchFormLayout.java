@@ -129,7 +129,7 @@ public class LaunchFormLayout extends AbstractLaunchFormLayout {
          */
     public LaunchFormLayout(final BoutiquesApplication applicationDescriptor, boolean addResultsDirectoryInput) {
         super("600", "*");
-                this.setWidth(600);
+        this.setWidth(600);
         // Documentation
         Label docLabel = WidgetUtil.getLabel("Documentation and Terms of Use",
                 CoreConstants.ICON_INFORMATION, 30, Cursor.HAND);
@@ -149,15 +149,15 @@ public class LaunchFormLayout extends AbstractLaunchFormLayout {
         this.warningLabel.setWidth(430);
         this.warningLabel.hide();
         // Add inputs, then buttons and warning/error labels below
-                this.configureInputs(applicationDescriptor, addResultsDirectoryInput);
-                this.addMember(buttonsLayout);
+        this.configureInputs(applicationDescriptor, addResultsDirectoryInput);
+        this.addMember(buttonsLayout);
         this.addMember(this.errorLabel);
         this.addMember(this.warningLabel);
         // Groups
-                for(BoutiquesGroup group : applicationDescriptor.getGroups()){
+        for(BoutiquesGroup group : applicationDescriptor.getGroups()){
             this.groups.put(group.getId(), new GroupValidator(group, this));
         }
-                this.validateGroups();
+        this.validateGroups();
         // Dependencies
         this.configureDependencies(applicationDescriptor);
     }
@@ -215,32 +215,32 @@ public class LaunchFormLayout extends AbstractLaunchFormLayout {
             throw new RuntimeException("Could not create 'Execution name' and 'Results directory' input layouts.");
         }
         // Application descriptor inputs
-                for (BoutiquesInput input : applicationDescriptor.getInputs()) {
+        for (BoutiquesInput input : applicationDescriptor.getInputs()) {
             InputLayout inputLayout;
-                        if(input.getPossibleValues() != null){
-                                inputLayout = new ValueChoiceInputLayout(input, this);
+            if(input.getPossibleValues() != null){
+                inputLayout = new ValueChoiceInputLayout(input, this);
             } else {
-                                switch (input.getType()) {
+                switch (input.getType()) {
                     case STRING:
                     case FILE:
                         String allowedChar = "[" + ApplicationConstants.INPUT_VALID_CHARS + "]";
-                                                inputLayout = new StringInputLayout((BoutiquesStringInput) input, this,
+                        inputLayout = new StringInputLayout((BoutiquesStringInput) input, this,
                                 true, allowedChar);
                         break;
                     case NUMBER:
-                                                inputLayout = new NumberInputLayout((BoutiquesNumberInput) input, this);
+                        inputLayout = new NumberInputLayout((BoutiquesNumberInput) input, this);
                         break;
                     case FLAG:
-                                                inputLayout = new FlagInputLayout((BoutiquesFlagInput) input, this);
+                        inputLayout = new FlagInputLayout((BoutiquesFlagInput) input, this);
                         break;
                     default:
                         throw new RuntimeException("Unknown input type: " + input.getType());
                 }
             }
-                        this.inputsMap.put(input.getId(), inputLayout);
+            this.inputsMap.put(input.getId(), inputLayout);
             this.addMember(inputLayout);
             // Validate input value and dependencies
-                        inputLayout.onValueChanged();
+            inputLayout.onValueChanged();
         }
     }
 

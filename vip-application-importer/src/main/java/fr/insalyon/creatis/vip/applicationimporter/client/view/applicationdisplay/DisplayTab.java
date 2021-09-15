@@ -121,8 +121,6 @@ public class DisplayTab extends Tab {
             boutiquesApplication = new BoutiquesParser().parseApplication(jsonDescriptor);
             verifyBoutiquesTool(boutiquesApplication);
         } catch (InvalidBoutiquesDescriptorException exception) {
-            Layout.getInstance().setWarningMessage("Unable to parse application descriptor:<br />"
-                    + exception.getMessage(), 10);
             throw new ApplicationImporterException(exception.getMessage(), exception);
         }
         return boutiquesApplication;

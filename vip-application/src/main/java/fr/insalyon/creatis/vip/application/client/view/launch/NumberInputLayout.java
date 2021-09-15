@@ -256,9 +256,9 @@ public class NumberInputLayout extends InputLayout {
     @Override
     protected void createMasterForm() {
         // Configure validators for client-side validation logic
-                configureValidators();
+        configureValidators();
         // Configure List/Range layout selector
-                this.configureLayoutSelector();
+        this.configureLayoutSelector();
         // Initialize master form
         this.masterForm = new DynamicForm();
         // Fields for master form
@@ -266,13 +266,13 @@ public class NumberInputLayout extends InputLayout {
         // List/Range selection
         inputFields.add(this.typeSelector);
         // Value
-                final FormItem valueItem = this.getFormItem();
+        final FormItem valueItem = this.getFormItem();
         valueItem.setName(MAIN_FIELD_NAME);
-                this.addValueChangeHandler(valueItem);
-                valueItem.setValidators(this.numberValidator, this.rangeValidator);
+        this.addValueChangeHandler(valueItem);
+        valueItem.setValidators(this.numberValidator, this.rangeValidator);
         inputFields.add(valueItem);
         // Range
-                for (String rangeItemName : RangeItem.names) {
+        for (String rangeItemName : RangeItem.names) {
             FormItem currentRangeItem = this.getFormItem();
             currentRangeItem.setWidth(80);
             currentRangeItem.setTitle(rangeItemName);
@@ -283,9 +283,9 @@ public class NumberInputLayout extends InputLayout {
         }
         // Range validation logic
         // Required
-                RequiredIfValidator requiredValidator = new RequiredIfValidator((formItem, value) -> true);
+        RequiredIfValidator requiredValidator = new RequiredIfValidator((formItem, value) -> true);
         // Start
-                CustomValidator rangeStartValidator = new CustomValidator() {
+        CustomValidator rangeStartValidator = new CustomValidator() {
             @Override
             protected boolean condition(Object value) {
                 // Check that start is less than end
@@ -299,7 +299,7 @@ public class NumberInputLayout extends InputLayout {
         };
         rangeStartValidator.setErrorMessage("Must be less than range end");
         // End
-                CustomValidator rangeEndValidator = new CustomValidator() {
+        CustomValidator rangeEndValidator = new CustomValidator() {
             @Override
             protected boolean condition(Object value) {
                 // Check that end is greater than start
@@ -313,7 +313,7 @@ public class NumberInputLayout extends InputLayout {
         };
         rangeEndValidator.setErrorMessage("Must be more than range start");
         // Step
-                CustomValidator rangeStepValidator = new CustomValidator() {
+        CustomValidator rangeStepValidator = new CustomValidator() {
             @Override
             protected boolean condition(Object value) {
                 Float floatValue = valueAsFloat((value));
@@ -335,16 +335,16 @@ public class NumberInputLayout extends InputLayout {
             }
         };
         // Setup and add master form to this
-                        this.masterForm.setFields(inputFields.toArray(new FormItem[]{}));
-                        this.addMember(this.masterForm);
-                getRangeItem(RangeItem.START).setValidators(this.numberValidator, this.rangeValidator, rangeStartValidator,
+        this.masterForm.setFields(inputFields.toArray(new FormItem[]{}));
+        this.addMember(this.masterForm);
+        getRangeItem(RangeItem.START).setValidators(this.numberValidator, this.rangeValidator, rangeStartValidator,
                 requiredValidator);
         getRangeItem(RangeItem.STOP).setValidators(this.numberValidator, this.rangeValidator, rangeEndValidator,
                 requiredValidator);
         getRangeItem(RangeItem.STEP).setValidators(rangeStepValidator, this.numberValidator,
                 requiredValidator);
-                this.masterForm.addItemChangedHandler(itemChangedEvent -> this.onValueChanged(itemChangedEvent.getItem()));
-                valueItem.addIcon(this.addValueIcon); // If placed before call to setFields, the icon don't show
+        this.masterForm.addItemChangedHandler(itemChangedEvent -> this.onValueChanged(itemChangedEvent.getItem()));
+        valueItem.addIcon(this.addValueIcon); // If placed before call to setFields, the icon don't show
     }
 
     /**
