@@ -209,7 +209,7 @@ public class ApplicationImporterBusiness {
             String vipApplicationName, String vipVersion, String owner,
             String lfnGwendiaFile, String lfnJsonFile) throws BusinessException {
         Application app = applicationBusiness.getApplication(vipApplicationName);
-        AppVersion newVersion = new AppVersion(vipApplicationName, vipVersion, lfnGwendiaFile, lfnJsonFile, true);
+        AppVersion newVersion = new AppVersion(vipApplicationName, vipVersion, lfnGwendiaFile, lfnJsonFile, true, true);
         if (app == null) {
             // If application doesn't exist, create it.
             // New applications are not associated with any class (admins may add classes independently).

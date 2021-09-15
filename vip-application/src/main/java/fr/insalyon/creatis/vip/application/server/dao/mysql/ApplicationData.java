@@ -435,7 +435,7 @@ public class ApplicationData extends JdbcDaoSupport implements ApplicationDAO {
 
         try {
             PreparedStatement ps = getConnection().prepareStatement("SELECT "
-                                                               + "version, lfn, json_lfn, doi, visible FROM "
+                                                               + "version, lfn, json_lfn, doi, visible, boutiquesForm FROM "
                                                                + "VIPAppVersions "
                                                                + "WHERE application = ? "
                                                                + "ORDER BY version");
@@ -451,7 +451,8 @@ public class ApplicationData extends JdbcDaoSupport implements ApplicationDAO {
                         rs.getString("lfn"),
                         rs.getString("json_lfn"),
                         rs.getString("doi"),
-                        rs.getBoolean("visible")));
+                        rs.getBoolean("visible"),
+                        rs.getBoolean("useBoutiquesForm")));
             }
             ps.close();
             return versions;
@@ -467,7 +468,7 @@ public class ApplicationData extends JdbcDaoSupport implements ApplicationDAO {
 
         try {
             PreparedStatement ps = getConnection().prepareStatement(
-                    "INSERT INTO VIPAppVersions(application, version, lfn, json_lfn, visible) "
+                    "INSERT INTO VIPAppVersions(application, version, lfn, json_lfn, visible, boutiquesForm) "
                     + "VALUES (?, ?, ?, ?, ?)");
 
             ps.setString(1, version.getApplicationName());
@@ -475,6 +476,7 @@ public class ApplicationData extends JdbcDaoSupport implements ApplicationDAO {
             ps.setString(3, version.getLfn());
             ps.setString(4, version.getJsonLfn());
             ps.setBoolean(5, version.isVisible());
+            ps.setBoolean(5, version.isBoutiquesForm());
             ps.execute();
             ps.close();
 
@@ -495,14 +497,15 @@ public class ApplicationData extends JdbcDaoSupport implements ApplicationDAO {
         try {
             PreparedStatement ps = getConnection().prepareStatement("UPDATE "
                                                                + "VIPAppVersions "
-                                                               + "SET lfn=?, json_lfn=?, visible=? "
+                                                               + "SET lfn=?, json_lfn=?, visible=?, boutiquesForm=? "
                                                                + "WHERE application=? AND version=?");
 
             ps.setString(1, version.getLfn());
             ps.setString(2, version.getJsonLfn());
             ps.setBoolean(3, version.isVisible());
-            ps.setString(4, version.getApplicationName());
-            ps.setString(5, version.getVersion());
+            ps.setBoolean(4, version.isBoutiquesForm());
+            ps.setString(5, version.getApplicationName());
+            ps.setString(6, version.getVersion());
             ps.executeUpdate();
             ps.close();
 
@@ -561,7 +564,8 @@ public class ApplicationData extends JdbcDaoSupport implements ApplicationDAO {
 
         try {
             PreparedStatement ps = getConnection().prepareStatement("SELECT "
-                                                               + "application, version, lfn, json_lfn, doi, visible "
+                                                               + "application, version, lfn, json_lfn, "
+                                                               + "doi, visible, useBoutiquesForm "
                                                                + "FROM VIPAppVersions WHERE "
                                                                + "application = ? AND version = ?");
             ps.setString(1, applicationName);
@@ -575,7 +579,8 @@ public class ApplicationData extends JdbcDaoSupport implements ApplicationDAO {
                                                 rs.getString("lfn"),
                                                 rs.getString("json_lfn"),
                                                 rs.getString("doi"),
-                                                rs.getBoolean("visible"));
+                                                rs.getBoolean("visible"),
+                                                rs.getBoolean("useBoutiquesForm"));
             ps.close();
 
             return version;

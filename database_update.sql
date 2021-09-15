@@ -24,3 +24,6 @@ ALTER TABLE `VIPUsers` ADD next_email VARCHAR(255);
 alter table VIPApiKeys
   add foreign key (identifier) references VIPExternalPlatforms (identifier)
   on delete cascade on update cascade;
+
+-- v2.2
+alter table VIPAppVersions ADD useBoutiquesForm BOOLEAN;
