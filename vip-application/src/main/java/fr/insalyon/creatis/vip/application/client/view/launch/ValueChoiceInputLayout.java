@@ -19,6 +19,7 @@ import java.util.stream.Collectors;
 public class ValueChoiceInputLayout extends InputLayout{
     protected final Map<InputLayout, Set<String>> valueDisables = new HashMap<>();
     protected final Map<InputLayout, Set<String>> valueRequires = new HashMap<>();
+    private final Map<String, String> labels;
 
     /**
      * Initialises graphical labels and input field
@@ -26,8 +27,15 @@ public class ValueChoiceInputLayout extends InputLayout{
      * @param input        BoutiquesInput to be represented
      * @param parentLayout LaunchFormLayout containing this
      */
-    public ValueChoiceInputLayout(BoutiquesInput input, LaunchFormLayout parentLayout) {
-        super(input, parentLayout);
+    public ValueChoiceInputLayout(BoutiquesInput input, LaunchFormLayout parentLayout, Map<String, String> labels) {
+        // must not create the master form it the parent constructor to create and analyse labels first
+        super(input, parentLayout, false);
+        if (labels != null) {
+            LaunchFormLayout.assertCondition(input.getPossibleValues().equals(labels.keySet()),
+                    "The labels for the {" + input.getId() + "} input do not have the good values");
+        }
+        this.labels = labels;
+        createMasterForm();
     }
 
     /**
@@ -39,7 +47,11 @@ public class ValueChoiceInputLayout extends InputLayout{
         SelectItem inputField = new SelectItem();
         inputField.setWidth(400);
         inputField.setShowTitle(false);
-        inputField.setValueMap(this.input.getPossibleValues().toArray(new String[]{}));
+        if (labels != null) {
+            inputField.setValueMap(labels);
+        } else {
+            inputField.setValueMap(this.input.getPossibleValues().toArray(new String[]{}));
+        }
         inputField.setValue(this.getDefaultValue());
         return inputField;
     }

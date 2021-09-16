@@ -111,6 +111,8 @@ public class LaunchFormLayout extends AbstractLaunchFormLayout {
 
     /**
      * Alternative constructor to build layout from a Descriptor object (generated from gwendia descriptor)
+     * It converts it to a basic boutiques descriptor model.
+     * If necessary, the results-directory input must be included in the given descriptor.
      *
      * @param descriptor            Descriptor of the application
      * @param applicationName       String name of the application
@@ -118,16 +120,27 @@ public class LaunchFormLayout extends AbstractLaunchFormLayout {
      */
     public LaunchFormLayout(final Descriptor descriptor, String applicationName, String applicationVersion) {
         this(new DescriptorParser().descriptorToBoutiquesApplication(descriptor, applicationName, applicationVersion),
-                false);
+                new BoutiquesApplicationExtensions(false));
     }
 
-        /**
-         * Initialize all visual elements
-         *
-         * @param applicationDescriptor     BoutiquesApplication generated from application .json descriptor file
-         * @param addResultsDirectoryInput  boolean: true if a Results Directory input should be added, false otherwise
-         */
-    public LaunchFormLayout(final BoutiquesApplication applicationDescriptor, boolean addResultsDirectoryInput) {
+
+    /**
+     * Initialize all visual elements by default : adds an results-directory input but stick to the boutiques
+     * descriptor for the rest
+     *
+     * @param applicationDescriptor     BoutiquesApplication generated from application .json descriptor file
+     */
+    public LaunchFormLayout(final BoutiquesApplication applicationDescriptor) {
+        this(applicationDescriptor, new BoutiquesApplicationExtensions(true));
+    }
+
+    /**
+     * Initialize all visual elements
+     *
+     * @param applicationDescriptor     BoutiquesApplication generated from application .json descriptor file
+     * @param boutiquesExtensions       Additional elements not included in the boutiques descriptor
+     */
+    public LaunchFormLayout(final BoutiquesApplication applicationDescriptor, BoutiquesApplicationExtensions boutiquesExtensions) {
         super("600", "*");
         this.setWidth(600);
         // Documentation
@@ -149,7 +162,7 @@ public class LaunchFormLayout extends AbstractLaunchFormLayout {
         this.warningLabel.setWidth(430);
         this.warningLabel.hide();
         // Add inputs, then buttons and warning/error labels below
-        this.configureInputs(applicationDescriptor, addResultsDirectoryInput);
+        this.configureInputs(applicationDescriptor, boutiquesExtensions);
         this.addMember(buttonsLayout);
         this.addMember(this.errorLabel);
         this.addMember(this.warningLabel);
@@ -199,13 +212,13 @@ public class LaunchFormLayout extends AbstractLaunchFormLayout {
      *
      * @param applicationDescriptor BoutiquesDescriptor generated from application .json descriptor file
      */
-    private void configureInputs(BoutiquesApplication applicationDescriptor, boolean addResultsDirectoryInput) {
+    private void configureInputs(BoutiquesApplication applicationDescriptor, BoutiquesApplicationExtensions boutiquesExtensions) {
         // Execution name and results directory inputs
         
         try {
             this.createArtificialStringInput("Execution name", EXECUTION_NAME_ID, false, null,
                     false, "[" + ApplicationConstants.EXEC_NAME_VALID_CHARS + "]");
-            if(addResultsDirectoryInput) {
+            if(boutiquesExtensions.getAddResultsDirectoryInput()) {
                 this.createArtificialStringInput("Results directory", RESULTS_DIRECTORY_PARAM_NAME, true,
                         DataManagerConstants.ROOT + "/" + DataManagerConstants.USERS_HOME,
                         true, "[" + ApplicationConstants.INPUT_VALID_CHARS + "]");
@@ -218,7 +231,8 @@ public class LaunchFormLayout extends AbstractLaunchFormLayout {
         for (BoutiquesInput input : applicationDescriptor.getInputs()) {
             InputLayout inputLayout;
             if(input.getPossibleValues() != null){
-                inputLayout = new ValueChoiceInputLayout(input, this);
+                Map<String, String> labels = boutiquesExtensions.getValueChoicesLabelsForInput(input.getId());
+                inputLayout = new ValueChoiceInputLayout(input, this, labels);
             } else {
                 switch (input.getType()) {
                     case STRING:

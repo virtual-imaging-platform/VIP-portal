@@ -60,6 +60,18 @@ public abstract class InputLayout extends VLayout {
      * @param parentLayout  LaunchFormLayout containing this
      */
     public InputLayout(BoutiquesInput input, LaunchFormLayout parentLayout){
+        this(input, parentLayout, true);
+    }
+
+    /**
+     * Initialize graphical labels and input field in option. If createMasterForm is false, then the child
+     * constructor must call createMasterForm itself or create the masterForm in a different way
+     *
+     * @param input             BoutiquesInput to be represented
+     * @param parentLayout      LaunchFormLayout containing this
+     * @param createMasterForm  true to create the masterForm
+     */
+    protected InputLayout(BoutiquesInput input, LaunchFormLayout parentLayout, boolean createMasterForm) {
         super(5);
         this.setLayoutLeftMargin(25);
         this.setWidth(300);
@@ -80,8 +92,10 @@ public abstract class InputLayout extends VLayout {
             //descriptionLabel.setWidth(400);
             this.addMember(descriptionLabel);
         }
-        // Input field
-        this.createMasterForm();
+        if (createMasterForm) {
+            // Input field
+            this.createMasterForm();
+        }
     }
 
     /**
