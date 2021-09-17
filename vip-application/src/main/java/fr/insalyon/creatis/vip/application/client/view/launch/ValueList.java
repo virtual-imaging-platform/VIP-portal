@@ -27,6 +27,9 @@ public class ValueList extends ValueSet{
             throw new IllegalArgumentException("Provided form has no field with name " + InputLayout.MAIN_FIELD_NAME);
         }
         if(valueField.isDisabled()){
+            if (valueField.getAttributeAsBoolean(InputLayout.UNMODIFIABLE_ATTR)) {
+                return valueField.getValue();
+            }
             // Disable field is considered empty
             if(valueField instanceof CheckboxItem){
                 return false;

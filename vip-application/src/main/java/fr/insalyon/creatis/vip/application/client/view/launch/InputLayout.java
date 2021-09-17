@@ -21,6 +21,7 @@ import java.util.stream.Collectors;
  */
 public abstract class InputLayout extends VLayout {
     public static String MAIN_FIELD_NAME = "value";
+    public static String UNMODIFIABLE_ATTR = "unmodifiable";
     protected final LaunchFormLayout parentLayout;
     protected final BoutiquesInput input;
     // Input forms
@@ -35,6 +36,8 @@ public abstract class InputLayout extends VLayout {
     protected final Set<InputLayout> requires = new HashSet<>();
     protected final Set<InputLayout> requiredBy = new HashSet<>();
     protected final Map<ValueChoiceInputLayout, Set<String>> requiredByValue = new HashMap<>();
+    protected boolean unmodifiable = false;
+    protected Set<String> unmodifiableValues = new HashSet<>();
 
     /**
      * In a Map with Sets as values, add newValue to the Set corresponding to given key. If this Set does not exist yet,
@@ -247,6 +250,10 @@ public abstract class InputLayout extends VLayout {
         addToSetInMap(this.requiredByValue, requiringInput, requiringValue);
     }
 
+    public void addUnmodifiableValues(Set<String> unmodifiableValues) {
+        this.unmodifiableValues = unmodifiableValues;
+    }
+
     /**
      * Check dependencies with other inputs to enable or disable this as appropriate
      */
@@ -365,6 +372,7 @@ public abstract class InputLayout extends VLayout {
         // validateInput, not checkDependencies
         this.requiredByValue.keySet().forEach(ValueChoiceInputLayout::validateInput);
         this.validateInput();
+        this.checkIfModifiable();
         this.parentLayout.validateGroups();
     }
 
@@ -376,6 +384,35 @@ public abstract class InputLayout extends VLayout {
             field.enable();
         }
     }
+
+    private void checkIfModifiable() {
+        if (this.unmodifiable) {
+            return;
+        }
+        Object value = ValueList.formValue(this.masterForm);
+        setUnmodifiable(value != null && unmodifiableValues.contains(value));
+    }
+
+    public void setUnmodifiable(boolean unmodifiable) {
+        if (unmodifiable == this.unmodifiable) {
+            return;
+        }
+        if ( unmodifiable) {
+            for(FormItem field : this.masterForm.getFields()){
+                field.disable();
+                field.setPrompt("This input cannot be changed");
+                field.setAttribute(UNMODIFIABLE_ATTR, true);
+            }
+        } else {
+            for (FormItem field : this.masterForm.getFields()) {
+                field.enable();
+                field.setPrompt(null);
+                field.setAttribute(UNMODIFIABLE_ATTR, (Object) null);
+            }
+        }
+        this.unmodifiable = unmodifiable;
+    }
+
 
     /**
      * Validate this, and update parentLayout invalid inputs error message as appropriate

@@ -49,9 +49,8 @@ import com.smartgwt.client.widgets.tab.Tab;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
 import fr.insalyon.creatis.vip.application.client.bean.Simulation;
 import fr.insalyon.creatis.vip.application.client.rpc.WorkflowService;
-import fr.insalyon.creatis.vip.application.client.view.common.AbstractLaunchTab;
-import fr.insalyon.creatis.vip.application.client.view.common.AbstractSimulationTab;
 import fr.insalyon.creatis.vip.application.client.view.launch.LaunchTab;
+import fr.insalyon.creatis.vip.application.client.view.common.AbstractSimulationTab;
 import fr.insalyon.creatis.vip.application.client.view.monitor.SimulationStatus;
 import fr.insalyon.creatis.vip.application.client.view.monitor.SimulationTab;
 import fr.insalyon.creatis.vip.core.client.CoreModule;
@@ -347,7 +346,7 @@ public class SimulationBoxLayout extends HLayout {
                             simulationName,
                             result));
                 } else {
-                    ((AbstractLaunchTab) tab).loadInput(simulationName, result);
+                    ((LaunchTab) tab).loadInput(simulationName, result);
                 }
             }
         };

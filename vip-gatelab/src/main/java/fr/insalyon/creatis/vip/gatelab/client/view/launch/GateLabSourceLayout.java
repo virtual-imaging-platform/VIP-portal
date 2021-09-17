@@ -178,7 +178,6 @@ public class GateLabSourceLayout extends AbstractSourceLayout {
 
     @Override
     public String getValue() {
-
         return isSelectItem ? selectItem.getValueAsString() : textItem.getValueAsString();
     }
 

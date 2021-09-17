@@ -1,11 +1,9 @@
 package fr.insalyon.creatis.vip.application.client.bean.boutiquesTools;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
+import jdk.nashorn.internal.ir.Optimistic;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -37,6 +35,8 @@ public class BoutiquesApplication implements IsSerializable {
     private Map<String, String> tags = new HashMap<>();
     private String jsonFile;
 
+    private BoutiquesApplicationExtensions boutiquesExtensions;
+
     private BoutiquesApplication(){}
 
     /**
@@ -48,6 +48,17 @@ public class BoutiquesApplication implements IsSerializable {
         this.name = name;
         this.description = description;
         this.version = version;
+    }
+
+    public void setBoutiquesExtensions(BoutiquesApplicationExtensions boutiquesExtensions) {
+        if (this.boutiquesExtensions != null) {
+            throw new IllegalStateException("A boutiques application can only be extended once");
+        }
+        this.boutiquesExtensions = boutiquesExtensions;
+    }
+
+    public BoutiquesApplicationExtensions getBoutiquesExtensions() {
+        return boutiquesExtensions;
     }
 
     /**
@@ -69,6 +80,10 @@ public class BoutiquesApplication implements IsSerializable {
      */
     public Set<BoutiquesInput> getInputs() {
         return this.inputs;
+    }
+
+    public Optional<BoutiquesInput> getInput(String inputId) {
+        return this.inputs.stream().filter(input -> input.getId().equals(inputId)).findAny();
     }
 
     /**

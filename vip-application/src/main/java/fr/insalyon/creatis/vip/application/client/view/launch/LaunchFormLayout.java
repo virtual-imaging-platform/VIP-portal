@@ -6,6 +6,7 @@ import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.Label;
 import com.smartgwt.client.widgets.layout.HLayout;
+import com.smartgwt.client.widgets.layout.Layout;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
 import fr.insalyon.creatis.vip.application.client.bean.Descriptor;
 import fr.insalyon.creatis.vip.application.client.bean.boutiquesTools.*;
@@ -110,37 +111,11 @@ public class LaunchFormLayout extends AbstractLaunchFormLayout {
     }
 
     /**
-     * Alternative constructor to build layout from a Descriptor object (generated from gwendia descriptor)
-     * It converts it to a basic boutiques descriptor model.
-     * If necessary, the results-directory input must be included in the given descriptor.
-     *
-     * @param descriptor            Descriptor of the application
-     * @param applicationName       String name of the application
-     * @param applicationVersion    String version of the applciation
-     */
-    public LaunchFormLayout(final Descriptor descriptor, String applicationName, String applicationVersion) {
-        this(new DescriptorParser().descriptorToBoutiquesApplication(descriptor, applicationName, applicationVersion),
-                new BoutiquesApplicationExtensions(false));
-    }
-
-
-    /**
-     * Initialize all visual elements by default : adds an results-directory input but stick to the boutiques
-     * descriptor for the rest
+     * Initialize all visual elements
      *
      * @param applicationDescriptor     BoutiquesApplication generated from application .json descriptor file
      */
     public LaunchFormLayout(final BoutiquesApplication applicationDescriptor) {
-        this(applicationDescriptor, new BoutiquesApplicationExtensions(true));
-    }
-
-    /**
-     * Initialize all visual elements
-     *
-     * @param applicationDescriptor     BoutiquesApplication generated from application .json descriptor file
-     * @param boutiquesExtensions       Additional elements not included in the boutiques descriptor
-     */
-    public LaunchFormLayout(final BoutiquesApplication applicationDescriptor, BoutiquesApplicationExtensions boutiquesExtensions) {
         super("600", "*");
         this.setWidth(600);
         // Documentation
@@ -161,8 +136,12 @@ public class LaunchFormLayout extends AbstractLaunchFormLayout {
         this.warningLabel = WidgetUtil.getLabel("", CoreConstants.ICON_HELP, 30);
         this.warningLabel.setWidth(430);
         this.warningLabel.hide();
+        // verify there are extensions
+        assertCondition(applicationDescriptor.getBoutiquesExtensions() != null,
+                "The boutiques descriptor must have extensions");
+        new BoutiquesExtensionValidator(applicationDescriptor).validate(); // validate extensions
         // Add inputs, then buttons and warning/error labels below
-        this.configureInputs(applicationDescriptor, boutiquesExtensions);
+        this.configureInputs(applicationDescriptor);
         this.addMember(buttonsLayout);
         this.addMember(this.errorLabel);
         this.addMember(this.warningLabel);
@@ -175,13 +154,30 @@ public class LaunchFormLayout extends AbstractLaunchFormLayout {
         this.configureDependencies(applicationDescriptor);
     }
 
+    public void hideInputs() {
+        setInputsVisible(false);
+    }
+
+    public void showInputs() {
+        setInputsVisible(true);
+    }
+
+    private void setInputsVisible(Boolean visible) {
+        for (InputLayout inputLayout : inputsMap.values()) {
+            if (inputLayout.getInputId().equals(EXECUTION_NAME_ID)) {
+                continue;
+            }
+            inputLayout.setVisible(visible);
+        }
+    }
+
     /**
      * Add given launch and save inputs buttons to this
      *
      * @param launchButton      IButton
      * @param saveInputsButton  IButton
      */
-    public void addButtons(IButton launchButton, IButton saveInputsButton) {
+    public void setButtons(IButton launchButton, IButton saveInputsButton) {
         this.addButtons(launchButton, saveInputsButton, null);
     }
 
@@ -192,9 +188,9 @@ public class LaunchFormLayout extends AbstractLaunchFormLayout {
      * @param saveInputsButton      IButton
      * @param saveAsExampleButton   IButton, or null
      */
-    public void addButtons(IButton launchButton, IButton saveInputsButton, IButton saveAsExampleButton) {
+    public void setButtons(IButton launchButton, IButton saveInputsButton, IButton saveAsExampleButton) {
         this.launchButton = launchButton;
-        this. saveInputsButton = saveInputsButton;
+        this.saveInputsButton = saveInputsButton;
         HLayout layout;
         if(saveAsExampleButton == null){
             layout = getButtonLayout(20, launchButton, saveInputsButton);
@@ -202,8 +198,23 @@ public class LaunchFormLayout extends AbstractLaunchFormLayout {
             this.saveAsExampleButton = saveAsExampleButton;
             layout = getButtonLayout(20, launchButton, saveInputsButton, saveAsExampleButton);
         }
-        this.buttonsLayout.addMember(layout);
+        this.setButtonsLayout(layout);
         this.updateErrorMessages();
+    }
+
+    /**
+     * Add given buttons to this
+     *
+     *  @param margin   int margin before added buttons
+     * @param buttons   IButton... to add to this
+     */
+    public void setButtons(int margin, IButton... buttons) {
+        this.setButtonsLayout(getButtonLayout(margin, buttons));
+    }
+
+    private void setButtonsLayout(Layout newButtonsLayout) {
+        this.buttonsLayout.clear();
+        this.buttonsLayout.addMember(newButtonsLayout);
     }
 
 
@@ -212,13 +223,13 @@ public class LaunchFormLayout extends AbstractLaunchFormLayout {
      *
      * @param applicationDescriptor BoutiquesDescriptor generated from application .json descriptor file
      */
-    private void configureInputs(BoutiquesApplication applicationDescriptor, BoutiquesApplicationExtensions boutiquesExtensions) {
+    private void configureInputs(BoutiquesApplication applicationDescriptor) {
         // Execution name and results directory inputs
         
         try {
             this.createArtificialStringInput("Execution name", EXECUTION_NAME_ID, false, null,
                     false, "[" + ApplicationConstants.EXEC_NAME_VALID_CHARS + "]");
-            if(boutiquesExtensions.getAddResultsDirectoryInput()) {
+            if(applicationDescriptor.getBoutiquesExtensions().getAddResultsDirectoryInput()) {
                 this.createArtificialStringInput("Results directory", RESULTS_DIRECTORY_PARAM_NAME, true,
                         DataManagerConstants.ROOT + "/" + DataManagerConstants.USERS_HOME,
                         true, "[" + ApplicationConstants.INPUT_VALID_CHARS + "]");
@@ -231,7 +242,8 @@ public class LaunchFormLayout extends AbstractLaunchFormLayout {
         for (BoutiquesInput input : applicationDescriptor.getInputs()) {
             InputLayout inputLayout;
             if(input.getPossibleValues() != null){
-                Map<String, String> labels = boutiquesExtensions.getValueChoicesLabelsForInput(input.getId());
+                Map<String, String> labels =
+                        applicationDescriptor.getBoutiquesExtensions().getValueChoicesLabelsForInput(input.getId());
                 inputLayout = new ValueChoiceInputLayout(input, this, labels);
             } else {
                 switch (input.getType()) {
@@ -250,6 +262,16 @@ public class LaunchFormLayout extends AbstractLaunchFormLayout {
                     default:
                         throw new RuntimeException("Unknown input type: " + input.getType());
                 }
+            }
+            if (applicationDescriptor.getBoutiquesExtensions().getUnmodifiableInputs().contains(input.getId())) {
+                inputLayout.makeUnmodifiable();
+            }
+            if (applicationDescriptor.getBoutiquesExtensions().getUnmodifiableInputsByValue().containsKey(input.getId())) {
+                inputLayout.addUnmodifiableValues(
+                        applicationDescriptor.getBoutiquesExtensions().getUnmodifiableInputsByValue().get(input.getId()));
+            }
+            if (applicationDescriptor.getBoutiquesExtensions().getHiddenInputs().contains(input.getId())) {
+                inputLayout.hide();
             }
             this.inputsMap.put(input.getId(), inputLayout);
             this.addMember(inputLayout);
@@ -612,7 +634,7 @@ public class LaunchFormLayout extends AbstractLaunchFormLayout {
      * @see #removeValidationErrorOnInput(InputLayout)
      * @see #groupErrorMessage(String, boolean) 
      */
-    void updateErrorMessages() {
+    public void updateErrorMessages() {
         if ((this.invalidInputIds.size() + this.errorMessages.size()) == 0){
             // No errors: enable buttons and hide error messages label
             if((this.launchButton != null) && (this.saveInputsButton != null)) {
@@ -711,8 +733,8 @@ public class LaunchFormLayout extends AbstractLaunchFormLayout {
                     // Overwrite only if current value is different from default value.
                     Object uniqueValue = currentValueList.getValueNo(0);
                     Object defaultValue = input.getDefaultValue();
-                    if(!((uniqueValue == null) && (defaultValue == null))){
-                        if((uniqueValue == null) | (defaultValue == null)){
+                    if( ! ((uniqueValue == null) && (defaultValue == null)) ){
+                        if((uniqueValue == null) || (defaultValue == null)){
                             // Current value or default value is null while the other is not
                             overwriteInput = true;
                         } else {

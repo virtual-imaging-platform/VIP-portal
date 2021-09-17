@@ -19,16 +19,18 @@ public abstract class BoutiquesInput implements IsSerializable {
     protected final boolean isOptional;
     protected final Set<String> disablesInputsId;
     protected final Set<String> requiresInputsId;
-    protected final Set<String> possibleValues;
+
+    protected Set<String> possibleValues;
+
     private final Map<String, Set<String>> valueDisablesInputsId;
     private final Map<String, Set<String>> valueRequiresInputsId;
-
     private String valueKey;
+
     private boolean list;
     private String commandLineFlag;
-    
     public enum InputType {
         STRING("String"), FILE("File"), NUMBER("Number"), FLAG("Flag");
+
         private final String camelName;
         InputType(String camelName) {
             this.camelName = camelName;
@@ -37,7 +39,6 @@ public abstract class BoutiquesInput implements IsSerializable {
             return this.camelName;
         }
     }
-
     /**
      * @param id                    String
      * @param name                  String
@@ -175,6 +176,10 @@ public abstract class BoutiquesInput implements IsSerializable {
 
     public void setCommandLineFlag(String commandLineFlag) {
         this.commandLineFlag = commandLineFlag;
+    }
+
+    public void setPossibleValues(Set<String> possibleValues) {
+        this.possibleValues = possibleValues;
     }
 
 

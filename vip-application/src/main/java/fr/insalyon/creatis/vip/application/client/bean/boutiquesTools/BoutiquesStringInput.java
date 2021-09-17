@@ -10,7 +10,7 @@ import java.util.Set;
  * @version %I%, %G%
  */
 public class BoutiquesStringInput extends BoutiquesInput{
-    private final String defaultValue;
+    private String defaultValue;
 
     /**
      * @param id                    String
@@ -43,5 +43,9 @@ public class BoutiquesStringInput extends BoutiquesInput{
     @Override
     public String getDefaultValue() {
         return this.defaultValue;
+    }
+
+    public void setDefaultValue(String defaultValue) {
+        this.defaultValue = defaultValue;
     }
 }
