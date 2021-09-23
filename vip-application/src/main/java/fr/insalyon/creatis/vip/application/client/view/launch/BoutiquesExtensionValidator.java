@@ -42,6 +42,11 @@ public class BoutiquesExtensionValidator {
         LaunchFormLayout.assertCondition(
                 input.getType().equals(BoutiquesInput.InputType.STRING),
                 "{" + input.getId() + "} has unmodifiable values but is not a string input");
+
+        LaunchFormLayout.assertCondition(
+                extensions.getNonListInputs().contains(input.getId()),
+                "{" + input.getId() + "} has unmodifiable values and must not be a list");
+
     }
 
     private void validateInput(BoutiquesInput input, String constraint) {

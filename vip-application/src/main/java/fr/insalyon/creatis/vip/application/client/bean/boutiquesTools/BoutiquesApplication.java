@@ -37,7 +37,7 @@ public class BoutiquesApplication implements IsSerializable {
 
     private BoutiquesApplicationExtensions boutiquesExtensions;
 
-    private BoutiquesApplication(){}
+    public BoutiquesApplication(){}
 
     /**
      * @param name String

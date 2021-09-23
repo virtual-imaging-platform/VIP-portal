@@ -112,6 +112,7 @@ public class GateLabLaunchTab extends LaunchTab {
     @Override
     protected void addExtensionAndCreateForm(
             BoutiquesApplication applicationTool, Boolean addResultsDirectoryInput, Runnable launchFormCreator) {
+        verifyBoutiquesDescriptor(applicationTool);
         BoutiquesApplicationExtensions extensions = new BoutiquesApplicationExtensions(false);
 
         enrichCPUEstimationInput(applicationTool, extensions);
@@ -238,40 +239,24 @@ public class GateLabLaunchTab extends LaunchTab {
             loadMacWindow = null;
 
             modal.hide();
+            // we get something like "GateInput = " + fileName + ", ParallelizationType = " + type + ", NumberOfParticles = " + parts + ", phaseSpace = " + ps;
             String[] inputs = inputList.split(", ");
+            Map<String,String> valuesMap = new HashMap<>();
+
+            // first is a special case, we need to edit the path
             String[] it = inputs[0].split(" = ");
-            setInputValue(it[0], baseDir.concat("/").concat(it[1]));
-            //We do not fill in the parallelization type automaticlaly for the moment
-            //String[] st = simuType.split(" = ");
-            //setInputValue(st[0], st[1]);
-            String[] np = inputs[1].split(" = ");
-            setInputValue(np[0], np[1]);
+            valuesMap.put(it[0], baseDir.concat("/").concat(it[1]));
 
-            String[] st = inputs[2].split(" = ");
-            setInputValue(st[0], st[1]);
+            for (int i=1 ; i<4 ; i++) {
+                String[] keyAndValue = inputs[i].split(" = ");
+                valuesMap.put(keyAndValue[0], keyAndValue[1]);
+            }
 
-            String[] ps = inputs[3].split(" = ");
-            setInputValue(ps[0], ps[1]);
+            launchFormLayout.loadInputs(launchFormLayout.getSimulationName(), valuesMap);
 
             super.createButtons(); // override "load mac button" with "launch button"
             launchFormLayout.showInputs();
         }
-    }
-
-    /**
-     * Sets a value to an input name. The value should be in the following
-     * forms:
-     *
-     * For single list field: a string For multiple list fields: strings
-     * separated by '; ' For ranges: an string like 'Start: 0 - Stop: 0 - Step:
-     * 0'
-     *
-     * @param inputName
-     * @param value
-     */
-    public void setInputValue(String inputName, String value) {
-
-        launchFormLayout.setInputValue(inputName, value);
     }
 
     // called from JS

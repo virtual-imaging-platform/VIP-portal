@@ -263,8 +263,9 @@ public class LaunchFormLayout extends AbstractLaunchFormLayout {
                         throw new RuntimeException("Unknown input type: " + input.getType());
                 }
             }
+            // handle extensions
             if (applicationDescriptor.getBoutiquesExtensions().getUnmodifiableInputs().contains(input.getId())) {
-                inputLayout.makeUnmodifiable();
+                inputLayout.setUnmodifiablePermanently();
             }
             if (applicationDescriptor.getBoutiquesExtensions().getUnmodifiableInputsByValue().containsKey(input.getId())) {
                 inputLayout.addUnmodifiableValues(
@@ -272,6 +273,9 @@ public class LaunchFormLayout extends AbstractLaunchFormLayout {
             }
             if (applicationDescriptor.getBoutiquesExtensions().getHiddenInputs().contains(input.getId())) {
                 inputLayout.hide();
+            }
+            if (applicationDescriptor.getBoutiquesExtensions().getNonListInputs().contains(input.getId())) {
+                inputLayout.disableAddingValue();
             }
             this.inputsMap.put(input.getId(), inputLayout);
             this.addMember(inputLayout);

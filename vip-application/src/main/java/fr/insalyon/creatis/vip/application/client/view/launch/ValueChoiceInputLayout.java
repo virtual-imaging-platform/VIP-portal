@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 public class ValueChoiceInputLayout extends InputLayout{
     protected final Map<InputLayout, Set<String>> valueDisables = new HashMap<>();
     protected final Map<InputLayout, Set<String>> valueRequires = new HashMap<>();
-    private final Map<String, String> labels;
+    protected final Map<String, String> labels;
 
     /**
      * Initialises graphical labels and input field

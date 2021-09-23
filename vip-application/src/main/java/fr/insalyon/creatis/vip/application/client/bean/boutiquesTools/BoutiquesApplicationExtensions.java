@@ -11,8 +11,13 @@ public class BoutiquesApplicationExtensions implements IsSerializable {
 
     private final Set<String> unmodifiableInputs = new HashSet<>();
     private final Set<String> hiddenInputs = new HashSet<>();
+    private final Set<String> nonListInputs = new HashSet<>();
+
     private final Map<String,Set<String>> unmodifiableInputsByValue = new HashMap<>();
 
+    public BoutiquesApplicationExtensions() {
+        this.addResultsDirectoryInput = true;
+    }
 
     public BoutiquesApplicationExtensions(Boolean addResultsDirectoryInput) {
         this.addResultsDirectoryInput = addResultsDirectoryInput;
@@ -28,6 +33,10 @@ public class BoutiquesApplicationExtensions implements IsSerializable {
 
     public void addHiddenInputs(String... inputIds){
         Collections.addAll(hiddenInputs, inputIds);
+    }
+
+    public void addNonListInputs(String... inputIds){
+        Collections.addAll(nonListInputs, inputIds);
     }
 
     public void addUnmodifiableInputByValue(String inputId, Set<String> unmodifiableValues) {
@@ -52,5 +61,9 @@ public class BoutiquesApplicationExtensions implements IsSerializable {
 
     public Set<String> getHiddenInputs() {
         return hiddenInputs;
+    }
+
+    public Set<String> getNonListInputs() {
+        return nonListInputs;
     }
 }
