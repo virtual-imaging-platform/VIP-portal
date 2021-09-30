@@ -9,8 +9,11 @@ import java.util.Set;
  * @author Guillaume Vanel
  * @version %I%, %G%
  */
-public class BoutiquesStringInput extends BoutiquesInput{
+public class BoutiquesStringInput extends BoutiquesInput {
     private String defaultValue;
+
+    public BoutiquesStringInput() {
+    }
 
     /**
      * @param id                    String

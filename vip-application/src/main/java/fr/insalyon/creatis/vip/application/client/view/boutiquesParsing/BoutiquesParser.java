@@ -45,17 +45,19 @@ public class BoutiquesParser extends AbstractJsonParser{
         }
         // Groups
         JSONArray groupsArray = getArrayValue(parsedDescriptor, "groups", true);
-        for(int groupNo = 0; groupNo < groupsArray.size(); groupNo++) {
-            JSONObject currentGroupDescriptor = groupsArray.get(groupNo).isObject();
-            if (currentGroupDescriptor == null) {
-                throw new InvalidBoutiquesDescriptorException("Invalid Boutiques descriptor: group " + groupNo
-                        + " is not a JSON object");
-            }
-            try {
-                application.addGroup(parseGroup(currentGroupDescriptor));
-            } catch (InvalidBoutiquesDescriptorException exception){
-                throw new InvalidBoutiquesDescriptorException("Invalid Boutiques descriptor: group " + groupNo
-                        + " is invalid.", exception);
+        if (groupsArray != null) {
+            for(int groupNo = 0; groupNo < groupsArray.size(); groupNo++) {
+                JSONObject currentGroupDescriptor = groupsArray.get(groupNo).isObject();
+                if (currentGroupDescriptor == null) {
+                    throw new InvalidBoutiquesDescriptorException("Invalid Boutiques descriptor: group " + groupNo
+                            + " is not a JSON object");
+                }
+                try {
+                    application.addGroup(parseGroup(currentGroupDescriptor));
+                } catch (InvalidBoutiquesDescriptorException exception){
+                    throw new InvalidBoutiquesDescriptorException("Invalid Boutiques descriptor: group " + groupNo
+                            + " is invalid.", exception);
+                }
             }
         }
         // Other properties

@@ -435,7 +435,7 @@ public class ApplicationData extends JdbcDaoSupport implements ApplicationDAO {
 
         try {
             PreparedStatement ps = getConnection().prepareStatement("SELECT "
-                                                               + "version, lfn, json_lfn, doi, visible, boutiquesForm FROM "
+                                                               + "version, lfn, json_lfn, doi, visible, useBoutiquesForm FROM "
                                                                + "VIPAppVersions "
                                                                + "WHERE application = ? "
                                                                + "ORDER BY version");
@@ -468,15 +468,15 @@ public class ApplicationData extends JdbcDaoSupport implements ApplicationDAO {
 
         try {
             PreparedStatement ps = getConnection().prepareStatement(
-                    "INSERT INTO VIPAppVersions(application, version, lfn, json_lfn, visible, boutiquesForm) "
-                    + "VALUES (?, ?, ?, ?, ?)");
+                    "INSERT INTO VIPAppVersions(application, version, lfn, json_lfn, visible, useBoutiquesForm) "
+                    + "VALUES (?, ?, ?, ?, ?, ?)");
 
             ps.setString(1, version.getApplicationName());
             ps.setString(2, version.getVersion());
             ps.setString(3, version.getLfn());
             ps.setString(4, version.getJsonLfn());
             ps.setBoolean(5, version.isVisible());
-            ps.setBoolean(5, version.isBoutiquesForm());
+            ps.setBoolean(6, version.isBoutiquesForm());
             ps.execute();
             ps.close();
 
@@ -497,7 +497,7 @@ public class ApplicationData extends JdbcDaoSupport implements ApplicationDAO {
         try {
             PreparedStatement ps = getConnection().prepareStatement("UPDATE "
                                                                + "VIPAppVersions "
-                                                               + "SET lfn=?, json_lfn=?, visible=?, boutiquesForm=? "
+                                                               + "SET lfn=?, json_lfn=?, visible=?, useBoutiquesForm=? "
                                                                + "WHERE application=? AND version=?");
 
             ps.setString(1, version.getLfn());

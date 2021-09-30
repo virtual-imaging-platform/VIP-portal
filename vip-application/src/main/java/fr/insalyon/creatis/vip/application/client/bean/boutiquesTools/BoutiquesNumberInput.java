@@ -10,12 +10,15 @@ import java.util.Set;
  * @version %I%, %G%
  */
 public class BoutiquesNumberInput extends BoutiquesInput{
-    private final Double defaultValue;
-    private final boolean isInteger;
-    private final boolean isExclusiveMaximum;
-    private final boolean isExclusiveMinimum;
-    private final Double maximum;
-    private final Double minimum;
+    private Double defaultValue;
+    private boolean isInteger;
+    private boolean isExclusiveMaximum;
+    private boolean isExclusiveMinimum;
+    private Double maximum;
+    private Double minimum;
+
+    public BoutiquesNumberInput() {
+    }
 
     /**
      * @param id                    String

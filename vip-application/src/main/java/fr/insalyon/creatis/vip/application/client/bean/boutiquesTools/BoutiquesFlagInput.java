@@ -10,7 +10,10 @@ import java.util.Set;
  * @version %I%, %G%
  */
 public class BoutiquesFlagInput extends BoutiquesInput {
-    final private boolean defaultValue;
+    private boolean defaultValue;
+
+    public BoutiquesFlagInput() {
+    }
 
     /**
      * @param id String

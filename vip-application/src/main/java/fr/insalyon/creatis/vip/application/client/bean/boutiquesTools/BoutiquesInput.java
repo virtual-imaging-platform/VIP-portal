@@ -12,18 +12,18 @@ import java.util.Set;
  * @version %I%, %G%
  */
 public abstract class BoutiquesInput implements IsSerializable {
-    protected final String id;
-    protected final String name;
-    protected final String description;
-    private final InputType type;
-    protected final boolean isOptional;
-    protected final Set<String> disablesInputsId;
-    protected final Set<String> requiresInputsId;
+    protected String id;
+    protected String name;
+    protected String description;
+    private InputType type;
+    protected boolean isOptional;
+    protected Set<String> disablesInputsId;
+    protected Set<String> requiresInputsId;
 
     protected Set<String> possibleValues;
 
-    private final Map<String, Set<String>> valueDisablesInputsId;
-    private final Map<String, Set<String>> valueRequiresInputsId;
+    private Map<String, Set<String>> valueDisablesInputsId;
+    private Map<String, Set<String>> valueRequiresInputsId;
     private String valueKey;
 
     private boolean list;
@@ -39,6 +39,10 @@ public abstract class BoutiquesInput implements IsSerializable {
             return this.camelName;
         }
     }
+
+    public BoutiquesInput() {
+    }
+
     /**
      * @param id                    String
      * @param name                  String

@@ -6,14 +6,14 @@ import java.util.*;
 
 public class BoutiquesApplicationExtensions implements IsSerializable {
 
-    private final Boolean addResultsDirectoryInput;
-    private final Map<String, Map<String, String>> valueChoicesLabels = new HashMap<>();
+    private Boolean addResultsDirectoryInput;
+    private Map<String, Map<String, String>> valueChoicesLabels = new HashMap<>();
 
-    private final Set<String> unmodifiableInputs = new HashSet<>();
-    private final Set<String> hiddenInputs = new HashSet<>();
-    private final Set<String> nonListInputs = new HashSet<>();
+    private Set<String> unmodifiableInputs = new HashSet<>();
+    private Set<String> hiddenInputs = new HashSet<>();
+    private Set<String> nonListInputs = new HashSet<>();
 
-    private final Map<String,Set<String>> unmodifiableInputsByValue = new HashMap<>();
+    private Map<String,Set<String>> unmodifiableInputsByValue = new HashMap<>();
 
     public BoutiquesApplicationExtensions() {
         this.addResultsDirectoryInput = true;

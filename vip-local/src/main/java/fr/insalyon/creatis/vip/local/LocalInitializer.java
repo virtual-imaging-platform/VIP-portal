@@ -227,7 +227,7 @@ public class LocalInitializer {
 
         // create AppVersion
         String gwendiaLFN = versionFolder + "/" + Paths.get(gwendiaLocation).getFileName().toString();
-        AppVersion appVersion = new AppVersion(applicationName, applicationVersion, gwendiaLFN, null, true, true);
+        AppVersion appVersion = new AppVersion(applicationName, applicationVersion, gwendiaLFN, null, true, false);
         applicationBusiness.addVersion(appVersion);
 
         logger.info("Application version [{}/{}] installed", applicationName, applicationVersion);
