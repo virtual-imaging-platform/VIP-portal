@@ -1,5 +1,6 @@
 package fr.insalyon.creatis.vip.application.client.view.launch;
 
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.types.Cursor;
 import com.smartgwt.client.types.VerticalAlignment;
 import com.smartgwt.client.util.SC;
@@ -7,11 +8,14 @@ import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.Label;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.Layout;
+import com.smartgwt.client.widgets.layout.VLayout;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
 import fr.insalyon.creatis.vip.application.client.bean.Descriptor;
 import fr.insalyon.creatis.vip.application.client.bean.boutiquesTools.*;
+import fr.insalyon.creatis.vip.application.client.rpc.ApplicationService;
 import fr.insalyon.creatis.vip.application.client.view.boutiquesParsing.InvalidBoutiquesDescriptorException;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
+import fr.insalyon.creatis.vip.core.client.view.common.AbstractFormLayout;
 import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
 import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
 
@@ -28,7 +32,7 @@ import static fr.insalyon.creatis.vip.core.client.view.CoreConstants.RESULTS_DIR
  * @author Guillaume Vanel
  * @version %I%, %G%
  */
-public class LaunchFormLayout extends AbstractLaunchFormLayout {
+public class LaunchFormLayout extends AbstractFormLayout {
     public static final String EXECUTION_NAME_ID = "Execution-name";
     // Application information
     protected String applicationName;
@@ -212,11 +216,51 @@ public class LaunchFormLayout extends AbstractLaunchFormLayout {
         this.setButtonsLayout(getButtonLayout(margin, buttons));
     }
 
+    protected HLayout getButtonLayout(int margin, IButton... buttons) {
+        HLayout buttonsLayout = new HLayout(5);
+        buttonsLayout.setAlign(VerticalAlignment.CENTER);
+        buttonsLayout.setMargin(margin);
+
+        for (IButton button : buttons) {
+            buttonsLayout.addMember(button);
+        }
+        return buttonsLayout;
+    }
+
     private void setButtonsLayout(Layout newButtonsLayout) {
         this.buttonsLayout.clear();
         this.buttonsLayout.addMember(newButtonsLayout);
     }
 
+    public void configureCitation(String applicationName) {
+
+        AsyncCallback<String> callback = new AsyncCallback<String>() {
+            @Override
+            public void onFailure(Throwable caught) {
+                fr.insalyon.creatis.vip.core.client.view.layout.Layout.getInstance().setWarningMessage("Unable to load citation:<br />" + caught.getMessage());
+            }
+
+            @Override
+            public void onSuccess(String result) {
+                if (result != null && !result.isEmpty()) {
+                    VLayout citationLayout = new VLayout(5);
+                    citationLayout.addMember(WidgetUtil.getLabel("<b>Please refer to the following publication:</b>", 20));
+
+                    Label citation = new Label(result);
+                    citation.setWidth100();
+                    citation.setAutoHeight();
+                    citation.setCanSelectText(true);
+                    citation.setPadding(5);
+                    citation.setBackgroundColor("#FFFFFF");
+                    citation.setBorder("1px solid #CCCCCC");
+                    citationLayout.addMember(citation);
+
+                    addMember(citationLayout);
+                }
+            }
+        };
+        ApplicationService.Util.getInstance().getCitation(applicationName, callback);
+    }
 
     /**
      * Generate forms for results directory inputs as well as all inputs described in applicationDescriptor
@@ -789,7 +833,6 @@ public class LaunchFormLayout extends AbstractLaunchFormLayout {
      * @param simulationName Execution name to load
      * @param valuesMap      Map of String input IDs to String representation of corresponding input values
      */
-    @Override
     public void loadInputs( String simulationName, Map<String, String> valuesMap) {
         Map<String, ValueSet> valueSetMap = new HashMap<>();
         valueSetMap.put(EXECUTION_NAME_ID, ValueSet.valueSetFactory(simulationName));
@@ -814,7 +857,6 @@ public class LaunchFormLayout extends AbstractLaunchFormLayout {
     /**
      * @return boolean: true if all inputs and groups are valid, false otherwise
      */
-    @Override
     public boolean validate() {
         return (this.invalidInputIds.size() + this.errorMessages.size()) == 0;
     }

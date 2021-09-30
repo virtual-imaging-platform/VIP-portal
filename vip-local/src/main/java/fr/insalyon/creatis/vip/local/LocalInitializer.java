@@ -183,7 +183,7 @@ public class LocalInitializer {
             return;
         }
         logger.info("adding application [{}]", applicationName);
-        Application application = new Application(applicationName, Collections.singletonList(className),null);
+        Application application = new Application(applicationName, Collections.singletonList(className),"");
         applicationBusiness.add(application);
     }
 

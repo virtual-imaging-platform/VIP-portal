@@ -35,18 +35,12 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
-import fr.insalyon.creatis.vip.application.client.bean.Descriptor;
-import fr.insalyon.creatis.vip.application.client.bean.Source;
 import fr.insalyon.creatis.vip.application.client.bean.boutiquesTools.BoutiquesApplication;
 import fr.insalyon.creatis.vip.application.client.bean.boutiquesTools.BoutiquesApplicationExtensions;
 import fr.insalyon.creatis.vip.application.client.bean.boutiquesTools.BoutiquesInput;
 import fr.insalyon.creatis.vip.application.client.bean.boutiquesTools.BoutiquesStringInput;
-import fr.insalyon.creatis.vip.application.client.rpc.WorkflowService;
 import fr.insalyon.creatis.vip.application.client.view.launch.LaunchFormLayout;
 import fr.insalyon.creatis.vip.application.client.view.launch.LaunchTab;
-import fr.insalyon.creatis.vip.application.client.view.launch.old.GateLabLaunchFormLayout;
-import fr.insalyon.creatis.vip.application.client.view.monitor.timeline.TimelineLayout;
-import fr.insalyon.creatis.vip.core.client.CoreModule;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
@@ -54,13 +48,8 @@ import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
 import fr.insalyon.creatis.vip.datamanager.client.bean.Data;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerService;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerServiceAsync;
-import fr.insalyon.creatis.vip.gatelab.client.rpc.GateLabService;
-import fr.insalyon.creatis.vip.gatelab.client.rpc.GateLabServiceAsync;
 
 import java.util.*;
-import java.util.concurrent.Future;
-import java.util.function.Consumer;
-import java.util.function.Function;
 
 /**
  *

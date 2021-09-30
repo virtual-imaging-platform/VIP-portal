@@ -93,9 +93,12 @@ public class PathSelectionWindow extends Window {
         this.addItem(grid);
         this.addItem(bottomLayout);
 
-        String path = textItem.getValueAsString().trim();
-        if (path != null && !path.isEmpty() && path.startsWith(DataManagerConstants.ROOT)) {
-            oldPath = path.substring(0, path.lastIndexOf("/"));
+        String path = textItem.getValueAsString();
+        if (path != null) {
+            path = path.trim();
+            if (!path.isEmpty() && path.startsWith(DataManagerConstants.ROOT)) {
+                oldPath = path.substring(0, path.lastIndexOf("/"));
+            }
         }
         BrowserUtil.loadData(modal, grid, toolStrip, oldPath, false);
     }
