@@ -38,6 +38,7 @@ import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.Window;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.form.fields.TextItem;
+import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.events.CellContextClickEvent;
 import com.smartgwt.client.widgets.grid.events.CellContextClickHandler;
@@ -119,8 +120,7 @@ public class PathSelectionWindow extends Window {
                             toolStrip.getPath() + "/" + name, false);
                     oldPath = toolStrip.getPath() + "/" + name;
                 } else {
-                    textItem.setValue(toolStrip.getPath() + "/" + name);
-                    destroy();
+                    selectValueAndDestroy(toolStrip.getPath() + "/" + name);
                 }
             }
         });
@@ -148,8 +148,7 @@ public class PathSelectionWindow extends Window {
 
             public void onClick(ClickEvent event) {
                 name = grid.getSelectedRecord().getAttributeAsString("name");
-                textItem.setValue(toolStrip.getPath() + "/" + name);
-                destroy();
+                selectValueAndDestroy(toolStrip.getPath() + "/" + name);
             }
         });
         
@@ -178,10 +177,15 @@ public class PathSelectionWindow extends Window {
         selectItem.addClickHandler(new ClickHandler() {
 
             public void onClick(MenuItemClickEvent event) {
-                textItem.setValue(toolStrip.getPath() + "/" + name);
-                destroy();
+                selectValueAndDestroy(toolStrip.getPath() + "/" + name);
             }
         });
         contextMenu.setItems(selectItem);
+    }
+
+    private void selectValueAndDestroy(String value) {
+        textItem.setValue(toolStrip.getPath() + "/" + name);
+        textItem.fireEvent(new ChangedEvent(null));
+        destroy();
     }
 }

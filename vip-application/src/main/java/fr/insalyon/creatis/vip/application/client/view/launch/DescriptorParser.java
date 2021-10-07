@@ -1,5 +1,6 @@
 package fr.insalyon.creatis.vip.application.client.view.launch;
 
+import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
 import fr.insalyon.creatis.vip.application.client.bean.Descriptor;
 import fr.insalyon.creatis.vip.application.client.bean.Source;
 import fr.insalyon.creatis.vip.application.client.bean.boutiquesTools.BoutiquesApplication;
@@ -24,9 +25,13 @@ public class DescriptorParser {
         for(Source input : descriptor.getSources()){
             BoutiquesInput.InputType type =
                     (input.getType().equals("URI")) ? BoutiquesInput.InputType.FILE : BoutiquesInput.InputType.STRING;
+            String defaultValue = input.getDefaultValue();
+            if (input.isOptional() && ApplicationConstants.INPUT_WITHOUT_VALUE.equals(input.getDefaultValue())) {
+                defaultValue = null;
+            }
             application.addInput(new BoutiquesStringInput(input.getName(), input.getName(), input.getDescription(),
                     type, input.isOptional(), null, null, null,
-                    null, null, input.getDefaultValue()));
+                    null, null, defaultValue));
         }
         return application;
     }
