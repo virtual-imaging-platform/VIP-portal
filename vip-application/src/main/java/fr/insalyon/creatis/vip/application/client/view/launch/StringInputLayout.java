@@ -52,7 +52,7 @@ public class StringInputLayout extends InputLayout{
         if(this.isFile()){
             // Add browse icon
             PickerIcon browsePicker = new PickerIcon(PickerIcon.SEARCH,
-                    event -> new PathSelectionWindow(inputField).show());
+                    event -> new PathSelectionWindow(inputField, this::onValueChanged).show());
             browsePicker.setPrompt("Browse on the Grid");
             inputField.setIcons(browsePicker);
             if(this.allowedCharacters != null) {

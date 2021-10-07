@@ -33,6 +33,8 @@ package fr.insalyon.creatis.vip.datamanager.client.view.selection;
 
 import com.google.gwt.dom.client.Document;
 import com.google.gwt.event.dom.client.DomEvent;
+import com.google.gwt.event.shared.EventHandler;
+import com.google.gwt.event.shared.GwtEvent;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.SelectionAppearance;
 import com.smartgwt.client.types.SelectionStyle;
@@ -41,6 +43,7 @@ import com.smartgwt.client.widgets.Window;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
+import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.events.CellContextClickEvent;
 import com.smartgwt.client.widgets.grid.events.CellContextClickHandler;
@@ -57,6 +60,8 @@ import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
 import fr.insalyon.creatis.vip.datamanager.client.view.common.BasicBrowserToolStrip;
 import fr.insalyon.creatis.vip.datamanager.client.view.common.BrowserUtil;
 
+import java.util.logging.Logger;
+
 /**
  *
  * @author Rafael Silva
@@ -69,12 +74,18 @@ public class PathSelectionWindow extends Window {
     private HLayout bottomLayout;
     private ModalWindow modal;
     private TextItem textItem;
+    private Runnable toRunOnSelection;
     private Menu contextMenu;
     private String name;
-   
+
     public PathSelectionWindow(TextItem textItem) {
+        this(textItem, null);
+    }
+   
+    public PathSelectionWindow(TextItem textItem, Runnable toRunOnSelection) {
 
         this.textItem = textItem;
+        this.toRunOnSelection = toRunOnSelection;
 
         this.setTitle("Path Selection");
         this.setWidth(600);
@@ -187,7 +198,9 @@ public class PathSelectionWindow extends Window {
 
     private void selectValueAndDestroy(String value) {
         textItem.setValue(toolStrip.getPath() + "/" + name);
-        DomEvent.fireNativeEvent(Document.get().createChangeEvent(), textItem);
+        if (toRunOnSelection != null) {
+            toRunOnSelection.run();
+        }
         destroy();
     }
 }
