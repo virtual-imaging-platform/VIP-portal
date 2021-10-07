@@ -31,6 +31,8 @@
  */
 package fr.insalyon.creatis.vip.datamanager.client.view.selection;
 
+import com.google.gwt.dom.client.Document;
+import com.google.gwt.event.dom.client.DomEvent;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.SelectionAppearance;
 import com.smartgwt.client.types.SelectionStyle;
@@ -185,7 +187,7 @@ public class PathSelectionWindow extends Window {
 
     private void selectValueAndDestroy(String value) {
         textItem.setValue(toolStrip.getPath() + "/" + name);
-        textItem.fireEvent(new ChangedEvent(null));
+        DomEvent.fireNativeEvent(Document.get().createChangeEvent(), textItem);
         destroy();
     }
 }
