@@ -75,6 +75,10 @@ public abstract class AbstractJobData {
         this.dbPath = dbPath;
     }
 
+    protected String getDbPath() {
+        return dbPath;
+    }
+
     @PostConstruct
     public final void initConnection() throws DAOException {
         try {
