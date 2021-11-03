@@ -84,7 +84,13 @@ public class GateLabData extends AbstractJobData implements GateLabDAO {
             return sum;
 
         } catch (SQLException ex) {
-            logger.error("Error fetching simulation particle number", ex);
+            if (ex.getMessage().contains("Table \"SOMME\" not found")) {
+                // table does not exist, there is a problem in the h2 server or in the workflow
+                // silence it for the user as it is not blocking
+                logger.warn("Table Somme does not exist for {}", getDbPath(), ex);
+                return 0;
+            }
+            logger.error("Error fetching simulation particle number for {}", getDbPath(), ex);
             throw new DAOException(ex);
         } finally {
             close(logger);
