@@ -101,7 +101,7 @@ public class SpringSecurityConfig extends KeycloakWebSecurityConfigurerAdapter {
     }
 
     @Autowired
-    public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
+    public void configureGlobal(AuthenticationManagerBuilder auth) {
         KeycloakAuthenticationProvider keycloakAuthenticationProvider = keycloakAuthenticationProvider();
         keycloakAuthenticationProvider.setGrantedAuthoritiesMapper(grantedAuthoritiesMapper());
         auth.authenticationProvider(keycloakAuthenticationProvider);
@@ -114,7 +114,7 @@ public class SpringSecurityConfig extends KeycloakWebSecurityConfigurerAdapter {
                 .authorizeRequests()
                 .antMatchers("/rest/platform").permitAll()
                 .antMatchers("/rest/authenticate").permitAll()
-                .antMatchers("/rest/register").authenticated() //signup a user to VIP
+                .antMatchers("/rest/register").permitAll() //signup a user to VIP
                 .antMatchers("/rest/simulate-refresh").authenticated()
                 .antMatchers("/rest/statistics/**").hasAnyRole("ADVANCED", "ADMINISTRATOR")
                 .antMatchers("/rest/**").authenticated()

@@ -26,12 +26,12 @@ public class KeycloakRefreshUtils {
          */
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-        MultiValueMap<String, String> map = new LinkedMultiValueMap<String, String>();
+        MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
 
         map.add("client_id", CLIENT_ID);
         map.add("grant_type", "refresh_token");
         map.add("refresh_token", offlineToken);
-        map.add("client_secret", "15652ba5-5e3b-4f75-9df1-d84879a7a0fa");
+        map.add("client_secret", "");
 
         HttpEntity entity = new HttpEntity(map, httpHeaders);
         ResponseEntity<AccessTokenResponse> responseEntity = null;

@@ -40,7 +40,7 @@ public class RegisterUserController extends ApiController {
     /**
      *
      * @param signUpUser
-     * @return
+     * @return ResponseEntity<String>
      * @throws ApiException
      */
     @RequestMapping(method = RequestMethod.POST)
@@ -59,7 +59,7 @@ public class RegisterUserController extends ApiController {
         user.setRegistration(new Date());
         user.setLastLogin(new Date());
         this.apiRegisterUser.signup(user, signUpUser.getComments(), signUpUser.getAccountTypes());
-        return new ResponseEntity("registered", HttpStatus.OK);
+        return new ResponseEntity("registered", HttpStatus.CREATED);
     }
 
 

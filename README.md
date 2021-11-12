@@ -103,7 +103,6 @@ Import the collection [vip-keycloak.postman_collection.json](vip-keycloak.postma
 this collection is an example that can test the following endpoints:
 
 - get access token from keycloak 
-- ```/rest/register``` endpoint 
 - ```/rest/pipelines``` to test the VipUser compatibility with keycloak
 - ```/rest/statistics/users``` to test roles  
 

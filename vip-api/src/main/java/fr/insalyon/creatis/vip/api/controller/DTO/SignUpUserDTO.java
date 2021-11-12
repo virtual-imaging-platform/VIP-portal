@@ -21,6 +21,19 @@ public class SignUpUserDTO {
     private String comments;
     private String[] accountTypes;
 
+    public SignUpUserDTO(String firstName, String lastName, String email, String institution, String password, String phone, UserLevel level, CountryCode countryCode, String comments, String[] accountTypes) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
+        this.institution = institution;
+        this.password = password;
+        this.phone = phone;
+        this.level = level;
+        this.countryCode = countryCode;
+        this.comments = comments;
+        this.accountTypes = accountTypes;
+    }
+
     public String getFirstName() {
         return firstName;
     }

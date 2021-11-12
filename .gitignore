@@ -2,6 +2,10 @@
 .idea/
 *.iml
 
+#eclipse
+.settings/
+.project/
+
 #maven
 .flattened-pom.xml
 target/
