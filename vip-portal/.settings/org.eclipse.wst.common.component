@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?><project-modules id="moduleCoreId" project-version="1.5.0">
+    <wb-module deploy-name="vip-portal-2.1-SNAPSHOT">
+        <wb-resource deploy-path="/" source-path="/target/m2e-wtp/web-resources"/>
+        <wb-resource deploy-path="/" source-path="/src/main/webapp" tag="defaultRootSource"/>
+        <wb-resource deploy-path="/WEB-INF/classes" source-path="/src/main/java"/>
+        <wb-resource deploy-path="/WEB-INF/classes" source-path="/src/main/resources"/>
+        <dependent-module archiveName="vip-core-2.1-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/vip-core/vip-core">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="vip-docs-2.1-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/vip-docs/vip-docs">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="vip-application-importer-2.1-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/vip-application-importer/vip-application-importer">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="vip-datamanager-2.1-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/vip-datamanagement/vip-datamanagement">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="vip-application-2.1-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/vip-application/vip-application">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="vip-gatelab-2.1-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/vip-gatelab/vip-gatelab">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="vip-publication-2.1-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/vip-publication/vip-publication">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="vip-social-2.1-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/vip-social/vip-social">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="vip-api-2.1-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/vip-api/vip-api">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="vip-local-2.1-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/vip-local/vip-local">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="vip-visualization-2.1-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/vip-visualization/vip-visualization">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <property name="context-root" value="vip-portal"/>
+        <property name="java-output-path" value="/vip-portal/target/classes"/>
+    </wb-module>
+</project-modules>
