@@ -11,11 +11,15 @@ import java.util.Set;
  * @version %I%, %G%
  */
 public class BoutiquesGroup implements IsSerializable {
-    private final String id;
-    private final boolean allOrNone;
-    private final boolean mutuallyExclusive;
-    private final boolean oneIsRequired;
-    private final Set<String> members;
+
+    private String id;
+    private boolean allOrNone;
+    private boolean mutuallyExclusive;
+    private boolean oneIsRequired;
+    private Set<String> members;
+
+    public BoutiquesGroup() {
+    }
 
     /**
      * @param id                String
