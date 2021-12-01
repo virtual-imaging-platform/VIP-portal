@@ -11,7 +11,6 @@ import fr.insalyon.creatis.vip.application.client.bean.boutiquesTools.BoutiquesI
 import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
 
 import java.util.*;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 /**
@@ -387,6 +386,7 @@ public abstract class InputLayout extends VLayout {
      */
     protected void enableInput(){
         for(FormItem field : this.masterForm.getFields()){
+            field.setPrompt(null);
             field.enable();
         }
     }
@@ -411,13 +411,18 @@ public abstract class InputLayout extends VLayout {
     }
 
     private void setFormUnmodifiable(DynamicForm form, boolean unmodifiable) {
+        Boolean isCurrentlyUnmodifiable =
+                form.getField(InputLayout.MAIN_FIELD_NAME).getAttributeAsBoolean(InputLayout.UNMODIFIABLE_ATTR);
         if ( unmodifiable) {
+            if (isCurrentlyUnmodifiable) {
+                return;
+            }
             for(FormItem field : form.getFields()){
                 field.disable();
                 field.setPrompt("This input cannot be changed");
                 field.setAttribute(UNMODIFIABLE_ATTR, true);
             }
-        } else {
+        } else if (isCurrentlyUnmodifiable) {
             for (FormItem field : form.getFields()) {
                 field.enable();
                 field.setPrompt(null);
