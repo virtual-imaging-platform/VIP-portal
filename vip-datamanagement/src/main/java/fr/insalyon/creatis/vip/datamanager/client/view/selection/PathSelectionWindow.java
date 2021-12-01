@@ -31,10 +31,6 @@
  */
 package fr.insalyon.creatis.vip.datamanager.client.view.selection;
 
-import com.google.gwt.dom.client.Document;
-import com.google.gwt.event.dom.client.DomEvent;
-import com.google.gwt.event.shared.EventHandler;
-import com.google.gwt.event.shared.GwtEvent;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.SelectionAppearance;
 import com.smartgwt.client.types.SelectionStyle;
@@ -42,8 +38,6 @@ import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.Window;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.form.fields.TextItem;
-import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
-import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.events.CellContextClickEvent;
 import com.smartgwt.client.widgets.grid.events.CellContextClickHandler;
@@ -59,8 +53,6 @@ import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
 import fr.insalyon.creatis.vip.datamanager.client.view.common.BasicBrowserToolStrip;
 import fr.insalyon.creatis.vip.datamanager.client.view.common.BrowserUtil;
-
-import java.util.logging.Logger;
 
 /**
  *
@@ -197,7 +189,7 @@ public class PathSelectionWindow extends Window {
     }
 
     private void selectValueAndDestroy(String value) {
-        textItem.setValue(toolStrip.getPath() + "/" + name);
+        textItem.setValue(value);
         if (toRunOnSelection != null) {
             toRunOnSelection.run();
         }
