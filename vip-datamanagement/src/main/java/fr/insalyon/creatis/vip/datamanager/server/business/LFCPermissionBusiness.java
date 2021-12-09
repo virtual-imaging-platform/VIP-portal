@@ -189,10 +189,10 @@ public class LFCPermissionBusiness {
         for (String s : lfcDirSSHSynchronization) {
             if (lfcBaseDir.startsWith(s)) {
                 logger.error("({}) Try to delete  synchronized file '{}'", user.getEmail(), path);
-                return false;
+                return true;
             }
         }
-        return true;
+        return false;
     }
 
 }
