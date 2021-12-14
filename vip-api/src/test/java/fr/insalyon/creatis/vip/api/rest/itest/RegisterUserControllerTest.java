@@ -1,13 +1,11 @@
 package fr.insalyon.creatis.vip.api.rest.itest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import fr.insalyon.creatis.vip.api.controller.DTO.SignUpUserDTO;
 import fr.insalyon.creatis.vip.api.data.UserTestUtils;
 import fr.insalyon.creatis.vip.api.rest.config.BaseVIPSpringIT;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;

@@ -68,15 +68,13 @@ public class ApiBusiness {
 
 
     //get user by email
-    public User getUser(String email) {
+    public User getUser(String email) throws ApiException {
         try {
             User user = configurationBusiness.getUser(email);
             logger.info("Found the user with " + email);
-
             return user;
         } catch (BusinessException e) {
-            e.printStackTrace();
+            throw new ApiException(e);
         }
-        return null;
     }
 }

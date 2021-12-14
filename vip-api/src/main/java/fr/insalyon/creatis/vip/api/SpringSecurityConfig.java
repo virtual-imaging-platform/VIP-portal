@@ -31,7 +31,6 @@
  */
 package fr.insalyon.creatis.vip.api;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.insalyon.creatis.vip.api.business.ApiBusiness;
 
 import fr.insalyon.creatis.vip.api.exception.ApiException;
@@ -39,21 +38,27 @@ import fr.insalyon.creatis.vip.api.security.apikey.ApikeyAuthenticationEntryPoin
 import fr.insalyon.creatis.vip.api.security.apikey.ApikeyAuthentificationConfigurer;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 
+import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import org.keycloak.KeycloakPrincipal;
 
+import org.keycloak.KeycloakSecurityContext;
 import org.keycloak.adapters.springsecurity.KeycloakConfiguration;
 import org.keycloak.adapters.springsecurity.KeycloakSecurityComponents;
 import org.keycloak.adapters.springsecurity.authentication.KeycloakAuthenticationProvider;
 import org.keycloak.adapters.springsecurity.config.KeycloakWebSecurityConfigurerAdapter;
 
+import org.keycloak.representations.AccessToken;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.core.env.Environment;
-import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
+
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.mapping.GrantedAuthoritiesMapper;
@@ -85,14 +90,19 @@ public class SpringSecurityConfig extends KeycloakWebSecurityConfigurerAdapter {
 
     // authentication done by bean LimitigDaoAuthenticationProvider
 
-    @Autowired
-    private ApikeyAuthenticationEntryPoint apikeyAuthenticationEntryPoint;
 
-    @Autowired
-    private Environment env;
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    @Autowired
+    private final ApikeyAuthenticationEntryPoint apikeyAuthenticationEntryPoint;
+    private final Environment env;
     private ApiBusiness apiBusiness;
+
+    @Autowired
+    public SpringSecurityConfig(ApikeyAuthenticationEntryPoint apikeyAuthenticationEntryPoint, Environment env, ApiBusiness apiBusiness) {
+        this.apikeyAuthenticationEntryPoint = apikeyAuthenticationEntryPoint;
+        this.env = env;
+        this.apiBusiness = apiBusiness;
+    }
 
 
     @Override
@@ -114,7 +124,7 @@ public class SpringSecurityConfig extends KeycloakWebSecurityConfigurerAdapter {
                 .authorizeRequests()
                 .antMatchers("/rest/platform").permitAll()
                 .antMatchers("/rest/authenticate").permitAll()
-                .antMatchers("/rest/register").permitAll() //signup a user to VIP
+                .antMatchers("/rest/register").authenticated() //signup a user to VIP
                 .antMatchers("/rest/simulate-refresh").authenticated()
                 .antMatchers("/rest/statistics/**").hasAnyRole("ADVANCED", "ADMINISTRATOR")
                 .antMatchers("/rest/**").authenticated()
@@ -135,8 +145,10 @@ public class SpringSecurityConfig extends KeycloakWebSecurityConfigurerAdapter {
 
     @Bean
     public Supplier<User> currentUserProvider() {
+
         return ()  -> {
             // get VIP user by email given by keycloak
+            User user = null;
             Authentication authentication =
                     SecurityContextHolder.getContext().getAuthentication();
 
@@ -146,15 +158,18 @@ public class SpringSecurityConfig extends KeycloakWebSecurityConfigurerAdapter {
                 return null;
             }
             KeycloakPrincipal keycloakPrincipal = (KeycloakPrincipal) authentication.getPrincipal();
-            String email = keycloakPrincipal.getKeycloakSecurityContext().getIdToken().getEmail();
+            KeycloakSecurityContext session = keycloakPrincipal.getKeycloakSecurityContext();
+            AccessToken accessToken = session.getToken();
+            String email = accessToken.getEmail();
 
-            return apiBusiness.getUser(email);
+            try{
+                user = apiBusiness.getUser(email);
+            }catch (ApiException e){
+                e.printStackTrace();
+            }
+
+            return user;
         };
-    }
-
-    @Bean
-    public ObjectMapper objectMapper() {
-        return Jackson2ObjectMapperBuilder.json().build();
     }
 
     /*

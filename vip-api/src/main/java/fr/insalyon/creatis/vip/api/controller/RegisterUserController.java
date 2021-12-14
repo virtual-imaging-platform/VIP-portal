@@ -1,7 +1,7 @@
 package fr.insalyon.creatis.vip.api.controller;
 
-import fr.insalyon.creatis.vip.api.business.ApiRegisterUser;
-import fr.insalyon.creatis.vip.api.controller.DTO.SignUpUserDTO;
+import fr.insalyon.creatis.vip.api.business.ApiUserBusiness;
+import fr.insalyon.creatis.vip.api.model.SignUpUserDTO;
 import fr.insalyon.creatis.vip.api.exception.ApiException;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import org.slf4j.Logger;
@@ -24,17 +24,17 @@ public class RegisterUserController extends ApiController {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    private final ApiRegisterUser apiRegisterUser;
+    private final ApiUserBusiness apiUserBusiness;
 
     /**
      *
      * @param currentUserSupplier
-     * @param apiRegisterUser
+     * @param apiUserBusiness
      */
     @Autowired
-    public RegisterUserController(Supplier<User> currentUserSupplier, ApiRegisterUser apiRegisterUser) {
+    public RegisterUserController(Supplier<User> currentUserSupplier, ApiUserBusiness apiUserBusiness) {
         super(currentUserSupplier);
-        this.apiRegisterUser = apiRegisterUser;
+        this.apiUserBusiness = apiUserBusiness;
     }
 
     /**
@@ -44,7 +44,7 @@ public class RegisterUserController extends ApiController {
      * @throws ApiException
      */
     @RequestMapping(method = RequestMethod.POST)
-    public ResponseEntity<String> signup(
+    public ResponseEntity<?> signup(
             @RequestBody @Valid SignUpUserDTO signUpUser)
             throws ApiException {
         logMethodInvocation(logger,"signup", signUpUser.getEmail());
@@ -58,8 +58,8 @@ public class RegisterUserController extends ApiController {
                 );
         user.setRegistration(new Date());
         user.setLastLogin(new Date());
-        this.apiRegisterUser.signup(user, signUpUser.getComments(), signUpUser.getAccountTypes());
-        return new ResponseEntity("registered", HttpStatus.CREATED);
+        this.apiUserBusiness.signup(user, signUpUser.getComments(), signUpUser.getAccountTypes());
+        return new ResponseEntity(HttpStatus.CREATED);
     }
 
 

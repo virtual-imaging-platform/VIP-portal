@@ -1,4 +1,4 @@
-package fr.insalyon.creatis.vip.api.controller.DTO;
+package fr.insalyon.creatis.vip.api.model;
 
 import fr.insalyon.creatis.vip.core.client.view.user.UserLevel;
 import fr.insalyon.creatis.vip.core.client.view.util.CountryCode;
@@ -21,6 +21,9 @@ public class SignUpUserDTO {
     private String comments;
     private String[] accountTypes;
 
+    public SignUpUserDTO(){
+
+    }
     public SignUpUserDTO(String firstName, String lastName, String email, String institution, String password, String phone, UserLevel level, CountryCode countryCode, String comments, String[] accountTypes) {
         this.firstName = firstName;
         this.lastName = lastName;

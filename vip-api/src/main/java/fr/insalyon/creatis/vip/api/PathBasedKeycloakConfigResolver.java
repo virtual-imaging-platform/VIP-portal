@@ -28,20 +28,19 @@ public class PathBasedKeycloakConfigResolver implements KeycloakConfigResolver {
 
     private KeycloakDeployment deployment;
 
-
     @Override
     public KeycloakDeployment resolve(HttpFacade.Request request) {
         if (deployment != null) {
             return deployment;
         }
 
-        InputStream is;
-        try {
-            is = new FileInputStream( vipConfigFolder.getFile().getAbsoluteFile() + "/keycloak.json");
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        try(InputStream is = new FileInputStream( vipConfigFolder.getFile().getAbsoluteFile() + "/keycloak.json")){
+            deployment = KeycloakDeploymentBuilder.build(is);
+        }catch (IOException e){
+            logger.error(e.getMessage());
+            throw new RuntimeException("keycloak.json file exception");
+
         }
-        deployment = KeycloakDeploymentBuilder.build(is);
         return deployment;
     }
 }
