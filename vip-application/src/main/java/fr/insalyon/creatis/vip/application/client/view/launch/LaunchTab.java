@@ -136,7 +136,7 @@ public class LaunchTab extends Tab {
 
             @Override
             public void onSuccess(AppVersion appVersion) {
-                if (mustBeABoutiquesDescriptor && appVersion.isBoutiquesForm()) {
+                if (mustBeABoutiquesDescriptor && ! appVersion.isBoutiquesForm()) {
                     modal.hide();
                     Layout.getInstance().setWarningMessage("This application does not have the right format:<br />", 10);
                 } else if (appVersion.isBoutiquesForm()) {
@@ -217,7 +217,7 @@ public class LaunchTab extends Tab {
             launchFormLayout.setButtons(launchButton, saveInputsButton,
                     saveAsExampleButton);
         } else {
-            launchFormLayout.setButtons(launchButton, saveInputsButton);
+            launchFormLayout.setButtons(launchButton, saveInputsButton, null);
         }
     }
 

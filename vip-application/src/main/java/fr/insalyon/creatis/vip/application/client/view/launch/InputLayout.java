@@ -38,7 +38,6 @@ public abstract class InputLayout extends VLayout {
     protected final Map<ValueChoiceInputLayout, Set<String>> requiredByValue = new HashMap<>();
     protected boolean unmodifiable = false;
     protected boolean canAddValue = true;
-    protected Set<String> unmodifiableValues = new HashSet<>();
 
     /**
      * In a Map with Sets as values, add newValue to the Set corresponding to given key. If this Set does not exist yet,
@@ -163,9 +162,6 @@ public abstract class InputLayout extends VLayout {
     protected void createAdditionalForm(){
         DynamicForm additionalForm = this.newForm(this.removeValueIcon);
         this.additionalForms.add(additionalForm);
-        if (this.unmodifiable) {
-            this.setFormUnmodifiable(additionalForm, true);
-        }
         this.onValueChanged();
     }
 
@@ -253,10 +249,6 @@ public abstract class InputLayout extends VLayout {
      */
     protected void addRequiredByValue(ValueChoiceInputLayout requiringInput, String requiringValue) {
         addToSetInMap(this.requiredByValue, requiringInput, requiringValue);
-    }
-
-    public void addUnmodifiableValues(Set<String> unmodifiableValues) {
-        this.unmodifiableValues = unmodifiableValues;
     }
 
     /**
@@ -377,7 +369,6 @@ public abstract class InputLayout extends VLayout {
         // validateInput, not checkDependencies
         this.requiredByValue.keySet().forEach(ValueChoiceInputLayout::validateInput);
         this.validateInput();
-        this.checkIfModifiable();
         this.parentLayout.validateGroups();
     }
 
@@ -391,43 +382,13 @@ public abstract class InputLayout extends VLayout {
         }
     }
 
-    private void checkIfModifiable() {
-        if (this.unmodifiable) {
-            return;
-        }
-        Object value = ValueList.formValue(this.masterForm);
-        setMasterUnmodifiable(value != null && unmodifiableValues.contains(value.toString()));
-    }
 
-    public void setUnmodifiablePermanently() {
-        if ( ! unmodifiable) {
-            this.unmodifiable = true;
-            setMasterUnmodifiable(true);
-        }
-    }
-
-    private void setMasterUnmodifiable(boolean unmodifiable) {
-        this.setFormUnmodifiable(masterForm, unmodifiable);
-    }
-
-    private void setFormUnmodifiable(DynamicForm form, boolean unmodifiable) {
-        Boolean isCurrentlyUnmodifiable =
-                form.getField(InputLayout.MAIN_FIELD_NAME).getAttributeAsBoolean(InputLayout.UNMODIFIABLE_ATTR);
-        if ( unmodifiable) {
-            if (isCurrentlyUnmodifiable) {
-                return;
-            }
-            for(FormItem field : form.getFields()){
-                field.disable();
-                field.setPrompt("This input cannot be changed");
-                field.setAttribute(UNMODIFIABLE_ATTR, true);
-            }
-        } else if (isCurrentlyUnmodifiable) {
-            for (FormItem field : form.getFields()) {
-                field.enable();
-                field.setPrompt(null);
-                field.setAttribute(UNMODIFIABLE_ATTR, (Object) null);
-            }
+    public void makeUnmodifiablePermanently() {
+        this.unmodifiable = true;
+        for(FormItem field : masterForm.getFields()){
+            field.disable();
+            field.setPrompt("This input cannot be changed");
+            field.setAttribute(UNMODIFIABLE_ATTR, true);
         }
     }
 

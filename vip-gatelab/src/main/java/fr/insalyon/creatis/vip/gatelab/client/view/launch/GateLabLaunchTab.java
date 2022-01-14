@@ -103,32 +103,34 @@ public class GateLabLaunchTab extends LaunchTab {
             BoutiquesApplication applicationTool, Boolean addResultsDirectoryInput, Runnable launchFormCreator) {
         verifyBoutiquesDescriptor(applicationTool);
         BoutiquesApplicationExtensions extensions = new BoutiquesApplicationExtensions(false);
+        applicationTool.setBoutiquesExtensions(extensions);
 
+        extensions.addNonListInputs(
+                GATE_RELEASE_INPUT_ID, CPU_ESTIMATION_INPUT_ID, PARALLELIZATION_TYPE_INPUT_ID,
+                GATE_INPUT_INPUT_ID, NB_OF_PARTICLES_INPUT_ID, PHASE_SPACE_INPUT_ID);
         enrichCPUEstimationInput(applicationTool, extensions);
         enrichParallelizationType(applicationTool, extensions);
-        extensions.addUnmodifiableInput(GATE_INPUT_INPUT_ID, NB_OF_PARTICLES_INPUT_ID);
-        extensions.addHiddenInputs(PHASE_SPACE_INPUT_ID);
         // do the asynchronous task last for clarity
         enrichGateReleasesInput(applicationTool, extensions, launchFormCreator);
     }
 
     private void verifyBoutiquesDescriptor(BoutiquesApplication applicationTool) {
-        verifyBoutiquesInput(applicationTool, GATE_RELEASE_INPUT_ID);
-        verifyBoutiquesInput(applicationTool, CPU_ESTIMATION_INPUT_ID);
-        verifyBoutiquesInput(applicationTool, PARALLELIZATION_TYPE_INPUT_ID);
-        verifyBoutiquesInput(applicationTool, GATE_INPUT_INPUT_ID);
-        verifyBoutiquesInput(applicationTool, NB_OF_PARTICLES_INPUT_ID);
-        verifyBoutiquesInput(applicationTool, PHASE_SPACE_INPUT_ID);
+        verifyBoutiquesInput(applicationTool, GATE_RELEASE_INPUT_ID, BoutiquesInput.InputType.STRING);
+        verifyBoutiquesInput(applicationTool, CPU_ESTIMATION_INPUT_ID, BoutiquesInput.InputType.NUMBER);
+        verifyBoutiquesInput(applicationTool, PARALLELIZATION_TYPE_INPUT_ID, BoutiquesInput.InputType.STRING);
+        verifyBoutiquesInput(applicationTool, GATE_INPUT_INPUT_ID, BoutiquesInput.InputType.FILE);
+        verifyBoutiquesInput(applicationTool, NB_OF_PARTICLES_INPUT_ID, BoutiquesInput.InputType.NUMBER);
+        verifyBoutiquesInput(applicationTool, PHASE_SPACE_INPUT_ID, BoutiquesInput.InputType.STRING);
     }
 
-    private void verifyBoutiquesInput(BoutiquesApplication applicationTool, String inputId) {
+    private void verifyBoutiquesInput(BoutiquesApplication applicationTool, String inputId, BoutiquesInput.InputType type) {
         Optional<BoutiquesInput> boutiquesInput =
                 applicationTool.getInputs().stream().filter(input -> inputId.equals(input.getId())).findAny();
         LaunchFormLayout.assertCondition(boutiquesInput.isPresent(),
                 "Missing {" + inputId + "} input in Gate descriptor");
         LaunchFormLayout.assertCondition(
-                BoutiquesInput.InputType.STRING.equals(boutiquesInput.get().getType()),
-                "Input {" + inputId + "} must have a String type in Gate descriptor");
+                type.equals(boutiquesInput.get().getType()),
+                "Input {" + inputId + "} must have a number type in Gate descriptor");
     }
 
     private void enrichCPUEstimationInput(
@@ -155,7 +157,6 @@ public class GateLabLaunchTab extends LaunchTab {
         Map<String, String> map = new LinkedHashMap<String, String>();
         map.put("stat", "Static");
         map.put("dyn", "Dynamic");
-        extensions.addUnmodifiableInputByValue(PARALLELIZATION_TYPE_INPUT_ID, Collections.singleton("stat"));
         LaunchFormLayout.assertCondition(
                 paraTypeInput.getPossibleValues() != null && paraTypeInput.getPossibleValues().equals(map.keySet()),
                 "CPU Estimation in Gate descriptor does not have the expected values");
@@ -207,6 +208,7 @@ public class GateLabLaunchTab extends LaunchTab {
     protected void onLaunchFormCreated() {
         // on init, hide all inputs and launch buttons to put only the "load mac buttons"
         launchFormLayout.hideInputs();
+        launchFormLayout.hideErrorsAndWarningLabels();
         launchFormLayout.setButtons(5, loadMacButton);
     }
 
@@ -240,11 +242,20 @@ public class GateLabLaunchTab extends LaunchTab {
                 String[] keyAndValue = inputs[i].split(" = ");
                 valuesMap.put(keyAndValue[0], keyAndValue[1]);
             }
-
-            launchFormLayout.loadInputs(launchFormLayout.getSimulationName(), valuesMap);
+            valuesMap.put(CPU_ESTIMATION_INPUT_ID,"1");
 
             super.createButtons(); // override "load mac button" with "launch button"
             launchFormLayout.showInputs();
+            launchFormLayout.showErrorsAndWarningLabels();
+            launchFormLayout.loadInputs(launchFormLayout.getSimulationName(), valuesMap);
+
+            // hide and disable some inputs
+            launchFormLayout.hideInput(PHASE_SPACE_INPUT_ID);
+            launchFormLayout.makeInputUnmodifiable(GATE_INPUT_INPUT_ID);
+            launchFormLayout.makeInputUnmodifiable(NB_OF_PARTICLES_INPUT_ID);
+            if (valuesMap.get(PARALLELIZATION_TYPE_INPUT_ID).equals("stat")) {
+                launchFormLayout.makeInputUnmodifiable(PARALLELIZATION_TYPE_INPUT_ID);
+            }
         }
     }
 

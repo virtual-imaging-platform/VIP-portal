@@ -114,7 +114,7 @@ public abstract class AbstractFormLayout extends VLayout {
      * @param buttons 
      */
     protected void addButtons(IButton... buttons) {
-        
+
         HLayout hLayout = new HLayout(5);
         hLayout.setWidth100();
         

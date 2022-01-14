@@ -4,6 +4,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.types.Cursor;
 import com.smartgwt.client.types.VerticalAlignment;
 import com.smartgwt.client.util.SC;
+import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.Label;
 import com.smartgwt.client.widgets.layout.HLayout;
@@ -143,7 +144,6 @@ public class LaunchFormLayout extends AbstractFormLayout {
         // verify there are extensions
         assertCondition(applicationDescriptor.getBoutiquesExtensions() != null,
                 "The boutiques descriptor must have extensions");
-        new BoutiquesExtensionValidator(applicationDescriptor).validate(); // validate extensions
         // Add inputs, then buttons and warning/error labels below
         this.configureInputs(applicationDescriptor);
         this.addMember(buttonsLayout);
@@ -175,14 +175,30 @@ public class LaunchFormLayout extends AbstractFormLayout {
         }
     }
 
-    /**
-     * Add given launch and save inputs buttons to this
-     *
-     * @param launchButton      IButton
-     * @param saveInputsButton  IButton
-     */
-    public void setButtons(IButton launchButton, IButton saveInputsButton) {
-        this.addButtons(launchButton, saveInputsButton, null);
+    public void hideInput(String inputId) {
+        for (InputLayout inputLayout : inputsMap.values()) {
+            if (inputLayout.getInputId().equals(inputId)) {
+                inputLayout.setVisible(false);
+            }
+        }
+    }
+
+    public void makeInputUnmodifiable(String inputId) {
+        for (InputLayout inputLayout : inputsMap.values()) {
+            if (inputLayout.getInputId().equals(inputId)) {
+                inputLayout.makeUnmodifiablePermanently();
+            }
+        }
+    }
+
+    public void hideErrorsAndWarningLabels() {
+        this.errorLabel.hide();
+        this.warningLabel.hide();
+    }
+
+    public void showErrorsAndWarningLabels() {
+        this.errorLabel.show();
+        this.warningLabel.show();
     }
 
     /**
@@ -217,20 +233,23 @@ public class LaunchFormLayout extends AbstractFormLayout {
     }
 
     protected HLayout getButtonLayout(int margin, IButton... buttons) {
-        HLayout buttonsLayout = new HLayout(5);
-        buttonsLayout.setAlign(VerticalAlignment.CENTER);
-        buttonsLayout.setMargin(margin);
+        HLayout newButtonLayout = new HLayout(5);
+        newButtonLayout.setAlign(VerticalAlignment.CENTER);
+        newButtonLayout.setMargin(margin);
 
         for (IButton button : buttons) {
-            buttonsLayout.addMember(button);
+            newButtonLayout.addMember(button);
         }
-        return buttonsLayout;
+        return newButtonLayout;
     }
 
     private void setButtonsLayout(Layout newButtonsLayout) {
-        this.buttonsLayout.clear();
+        for (Canvas child : this.buttonsLayout.getChildren()) {
+            this.buttonsLayout.removeChild(child);
+        }
         this.buttonsLayout.addMember(newButtonsLayout);
     }
+
 
     public void configureCitation(String applicationName) {
 
@@ -269,7 +288,7 @@ public class LaunchFormLayout extends AbstractFormLayout {
      */
     private void configureInputs(BoutiquesApplication applicationDescriptor) {
         // Execution name and results directory inputs
-        
+
         try {
             this.createArtificialStringInput("Execution name", EXECUTION_NAME_ID, false, null,
                     false, "[" + ApplicationConstants.EXEC_NAME_VALID_CHARS + "]");
@@ -308,16 +327,6 @@ public class LaunchFormLayout extends AbstractFormLayout {
                 }
             }
             // handle extensions
-            if (applicationDescriptor.getBoutiquesExtensions().getUnmodifiableInputs().contains(input.getId())) {
-                inputLayout.setUnmodifiablePermanently();
-            }
-            if (applicationDescriptor.getBoutiquesExtensions().getUnmodifiableInputsByValue().containsKey(input.getId())) {
-                inputLayout.addUnmodifiableValues(
-                        applicationDescriptor.getBoutiquesExtensions().getUnmodifiableInputsByValue().get(input.getId()));
-            }
-            if (applicationDescriptor.getBoutiquesExtensions().getHiddenInputs().contains(input.getId())) {
-                inputLayout.hide();
-            }
             if (applicationDescriptor.getBoutiquesExtensions().getNonListInputs().contains(input.getId())) {
                 inputLayout.disableAddingValue();
             }
