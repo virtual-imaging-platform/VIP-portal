@@ -38,6 +38,7 @@ import org.keycloak.adapters.springsecurity.client.KeycloakRestTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.ConfigurableEnvironment;
@@ -78,6 +79,7 @@ public class SpringWebConfig implements WebMvcConfigurer {
 
     //implements rest template to send requests with tokens
     @Bean
+    @Profile("keycloak-vip")
     KeycloakRestTemplate keycloakRestTemplate(KeycloakClientRequestFactory keycloakClientRequestFactory) {
         return new KeycloakRestTemplate(keycloakClientRequestFactory);
     }

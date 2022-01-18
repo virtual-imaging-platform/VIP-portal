@@ -88,8 +88,7 @@ after updating the parameters it should look like :
   "disable-trust-manager": true,
   "credentials" : {
       "secret" : "<credential-secret>"
-   },
-   "realm-public-key": "<public-key>"
+   }
 }
 ```
 

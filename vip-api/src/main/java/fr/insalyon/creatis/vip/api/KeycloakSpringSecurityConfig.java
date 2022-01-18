@@ -31,62 +31,103 @@
  */
 package fr.insalyon.creatis.vip.api;
 
-import fr.insalyon.creatis.vip.api.security.SpringCompatibleUser;
+import fr.insalyon.creatis.vip.api.business.ApiBusiness;
+
+import fr.insalyon.creatis.vip.api.exception.ApiException;
 import fr.insalyon.creatis.vip.api.security.apikey.ApikeyAuthenticationEntryPoint;
 import fr.insalyon.creatis.vip.api.security.apikey.ApikeyAuthentificationConfigurer;
 import fr.insalyon.creatis.vip.core.client.bean.User;
+
+import fr.insalyon.creatis.vip.core.server.business.BusinessException;
+import org.keycloak.KeycloakPrincipal;
+
+import org.keycloak.KeycloakSecurityContext;
+import org.keycloak.adapters.springsecurity.KeycloakConfiguration;
+import org.keycloak.adapters.springsecurity.KeycloakSecurityComponents;
+import org.keycloak.adapters.springsecurity.authentication.KeycloakAuthenticationProvider;
+import org.keycloak.adapters.springsecurity.config.KeycloakWebSecurityConfigurerAdapter;
+
+import org.keycloak.representations.AccessToken;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.env.Environment;
+
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.mapping.GrantedAuthoritiesMapper;
+import org.springframework.security.core.authority.mapping.SimpleAuthorityMapper;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.session.SessionRegistryImpl;
+import org.springframework.security.web.authentication.session.NullAuthenticatedSessionStrategy;
+import org.springframework.security.web.authentication.session.RegisterSessionAuthenticationStrategy;
+import org.springframework.security.web.authentication.session.SessionAuthenticationStrategy;
 import org.springframework.security.web.firewall.DefaultHttpFirewall;
 
 import java.util.function.Supplier;
 
 /**
- * Spring security configuration.
+ * Keycloaksecurity configuration.
  *
- * It secures by api key all rest requests (except /platform)
- * General configuration is done here (what is secured, session management etc).
+ * It secures by api key all rest requests (except platform and authenticate)
  *
- * The custom api key configuration is done in {@link ApikeyAuthentificationConfigurer}
+ * Modified by khalilkes to implement keycloak adapter
  *
- * Created by abonnet on 7/22/16.
  */
+@ComponentScan(basePackageClasses = {KeycloakSecurityComponents.class})
+@KeycloakConfiguration
 @EnableWebSecurity
-public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
+@Profile("keycloak-vip")
+public class KeycloakSpringSecurityConfig extends KeycloakWebSecurityConfigurerAdapter {
 
     // authentication done by bean LimitigDaoAuthenticationProvider
 
-    private final ApikeyAuthenticationEntryPoint apikeyAuthenticationEntryPoint;
+
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private final Environment env;
+    private ApiBusiness apiBusiness;
 
     @Autowired
-    public SpringSecurityConfig(ApikeyAuthenticationEntryPoint apikeyAuthenticationEntryPoint, Environment env) {
-        this.apikeyAuthenticationEntryPoint = apikeyAuthenticationEntryPoint;
+    public KeycloakSpringSecurityConfig(Environment env, ApiBusiness apiBusiness) {
         this.env = env;
+        this.apiBusiness = apiBusiness;
+    }
+
+
+    @Override
+    protected SessionAuthenticationStrategy sessionAuthenticationStrategy() {
+        // required for bearer only applications
+        return new NullAuthenticatedSessionStrategy();
+    }
+
+    @Autowired
+    public void configureGlobal(AuthenticationManagerBuilder auth) {
+        KeycloakAuthenticationProvider keycloakAuthenticationProvider = keycloakAuthenticationProvider();
+        keycloakAuthenticationProvider.setGrantedAuthoritiesMapper(grantedAuthoritiesMapper());
+        auth.authenticationProvider(keycloakAuthenticationProvider);
     }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
+        super.configure(http);
         http
             .authorizeRequests()
                 .antMatchers("/rest/platform").permitAll()
                 .antMatchers("/rest/authenticate").permitAll()
+                .antMatchers("/rest/register")
+                .access(String.format("isAuthenticated() and hasIpAddress('%s')", env.getProperty(ShanoirProperties.SHANOIR_HOST_IP))) //signup a user to VIP
+                .antMatchers("/rest/simulate-refresh").authenticated()
                 .antMatchers("/rest/statistics/**").hasAnyRole("ADVANCED", "ADMINISTRATOR")
                 .antMatchers("/rest/**").authenticated()
                 .anyRequest().permitAll()
-            .and()
-            .apply(new ApikeyAuthentificationConfigurer<>(
-                    env.getRequiredProperty(CarminProperties.APIKEY_HEADER_NAME),
-                    apikeyAuthenticationEntryPoint))
             .and()
             .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             .and()
@@ -95,20 +136,33 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
             .csrf().disable();
     }
 
+
     @Bean
     public Supplier<User> currentUserProvider() {
-        return () -> {
-            // get VIP user from the spring one
+
+        return ()  -> {
+            // get VIP user by email given by keycloak
+            User user = null;
             Authentication authentication =
                     SecurityContextHolder.getContext().getAuthentication();
-            if ( authentication == null ||
-                    !  (authentication.getPrincipal() instanceof SpringCompatibleUser)) {
+
+            if (authentication == null ||
+                    !(authentication.getPrincipal() instanceof KeycloakPrincipal)) {
                 // anonymous
                 return null;
             }
-            SpringCompatibleUser springCompatibleUser =
-                    (SpringCompatibleUser) authentication.getPrincipal();
-            return springCompatibleUser.getVipUser();
+            KeycloakPrincipal keycloakPrincipal = (KeycloakPrincipal) authentication.getPrincipal();
+            KeycloakSecurityContext session = keycloakPrincipal.getKeycloakSecurityContext();
+            AccessToken accessToken = session.getToken();
+            String email = accessToken.getEmail();
+
+            try{
+                user = apiBusiness.getUser(email);
+            }catch (ApiException e){
+                e.printStackTrace();
+            }
+
+            return user;
         };
     }
 
@@ -122,4 +176,16 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
         firewall.setAllowUrlEncodedSlash(true);
         return firewall;
     }
+
+    /**
+     * customize roles to match keycloak roles without ROLE_
+     */
+    @Bean
+    public GrantedAuthoritiesMapper grantedAuthoritiesMapper() {
+        SimpleAuthorityMapper mapper = new SimpleAuthorityMapper();
+        mapper.setConvertToUpperCase(true);
+        return mapper;
+    }
+
+
 }
