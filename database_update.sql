@@ -25,5 +25,8 @@ alter table VIPApiKeys
   add foreign key (identifier) references VIPExternalPlatforms (identifier)
   on delete cascade on update cascade;
 
+-- v2.1
+DROP TABLE VIPDropboxAccounts;
+
 -- v2.2
 alter table VIPAppVersions ADD useBoutiquesForm BOOLEAN;

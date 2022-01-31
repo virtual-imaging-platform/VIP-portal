@@ -5,6 +5,10 @@ distributed systems. An instance of this portal deployed on the
 European Grid Infrastructure is accessible at
 [https://vip.creatis.insa-lyon.fr](https://vip.creatis.insa-lyon.fr).
 
+# Credits
+
+The VIP logo was designed by Max Langer under the [CC BY-NC-SA license](https://creativecommons.org/licenses/by-nc-sa/2.0/).
+
 # Development guidelines
 
 0. Your Git username and email should be set to your First-Last name and actual email:
