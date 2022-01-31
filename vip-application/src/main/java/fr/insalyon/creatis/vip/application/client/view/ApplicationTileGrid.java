@@ -32,7 +32,6 @@
 package fr.insalyon.creatis.vip.application.client.view;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.smartgwt.client.widgets.tab.Tab;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
 import fr.insalyon.creatis.vip.application.client.rpc.ApplicationService;
 import fr.insalyon.creatis.vip.application.client.view.launch.LaunchTab;

@@ -26,5 +26,7 @@ alter table VIPApiKeys
   on delete cascade on update cascade;
 
 -- v2.1
-
 DROP TABLE VIPDropboxAccounts;
+
+-- v2.2
+alter table VIPAppVersions ADD useBoutiquesForm BOOLEAN;

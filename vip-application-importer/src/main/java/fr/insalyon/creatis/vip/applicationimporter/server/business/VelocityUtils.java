@@ -32,10 +32,10 @@
 
 package fr.insalyon.creatis.vip.applicationimporter.server.business;
 
-import fr.insalyon.creatis.vip.applicationimporter.client.bean.BoutiquesTool;
+import fr.insalyon.creatis.vip.application.client.bean.boutiquesTools.BoutiquesApplication;
+
 import java.io.StringWriter;
-import java.util.HashMap;
-import java.util.Map;
+
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
@@ -58,7 +58,7 @@ public class VelocityUtils {
         velocityEngine.init();
     }
 
-    public String createDocument(BoutiquesTool bt, String vmTemplate) {
+    public String createDocument(BoutiquesApplication bt, String vmTemplate) {
         VelocityContext context = new VelocityContext();
         context.put("tool", bt);
         context.put("esc", new EscapeTool());
@@ -71,7 +71,7 @@ public class VelocityUtils {
         return stringWriter.toString();
     }
 
-    public String createDocument( String tag, BoutiquesTool bt, Boolean isRunOnGrid, String vmTemplate) {
+    public String createDocument(String tag, BoutiquesApplication bt, Boolean isRunOnGrid, String vmTemplate) {
         VelocityContext context = new VelocityContext();
         context.put("tag", tag);
         context.put("tool", bt);

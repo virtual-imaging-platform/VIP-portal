@@ -32,7 +32,7 @@
 package fr.insalyon.creatis.vip.applicationimporter.client.view.applicationdisplay;
 
 import com.smartgwt.client.types.Overflow;
-import fr.insalyon.creatis.vip.applicationimporter.client.bean.BoutiquesTool;
+import fr.insalyon.creatis.vip.application.client.bean.boutiquesTools.BoutiquesApplication;
 import fr.insalyon.creatis.vip.applicationimporter.client.view.Constants;
 import fr.insalyon.creatis.vip.core.client.view.common.AbstractFormLayout;
 
@@ -64,7 +64,7 @@ public class GeneralLayout extends AbstractFormLayout {
         this.addMembers(name, commandLine, dockerImage, dockerIndex, version, schemaVersion, description);
     }
 
-    public void setTool(BoutiquesTool bt) {
+    public void setTool(BoutiquesApplication bt) {
         name.setValue(bt.getName());
         version.setValue(bt.getToolVersion());
         description.setValue(bt.getDescription());

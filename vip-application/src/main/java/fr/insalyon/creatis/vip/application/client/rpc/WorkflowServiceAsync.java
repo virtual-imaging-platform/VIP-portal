@@ -48,6 +48,7 @@ public interface WorkflowServiceAsync {
     public void getSimulations(Date lastDate, AsyncCallback<List<Simulation>> asyncCallback);
     //
     public void getApplicationDescriptor(String applicationName, String applicationVersion, AsyncCallback<Descriptor> asyncCallback);
+    public void getApplicationDescriptorString(String applicationName, String applicationVersion, AsyncCallback<String> asyncCallback);
 
     public void launchSimulation(Map<String, String> parameters, String applicationName, String applicationVersion, String applicationClass, String simulationName, AsyncCallback<Void> asyncCallback);
 

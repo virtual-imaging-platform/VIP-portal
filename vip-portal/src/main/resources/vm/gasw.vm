@@ -15,7 +15,7 @@
 #foreach($input in $tool.getInputs())
 #set($option="--$input.getId().toLowerCase()")
     <input name="${input.getId()}" option="${option}">
-#if($input.getType() == "File" && !$input.isOptional())
+#if($input.getType().getCamelName() == "File" && !$input.isOptional())
       <access type="LFN"/>
 #end
     </input>
@@ -27,7 +27,7 @@
 #set ($i=1)
 #foreach($input in $tool.getInputs())
 #set ($i=$i+1)
-#if($input.getValueKey()!="")
+#if($input.getValueKey())
 #set ($value=$value.replace($input.getValueKey(),"$na$i"))
 #end
 #end

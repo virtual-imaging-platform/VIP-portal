@@ -32,6 +32,7 @@
 package fr.insalyon.creatis.vip.application.client.rpc;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.ServiceDefTarget;
 import fr.insalyon.creatis.vip.application.client.bean.*;
@@ -65,6 +66,7 @@ public interface WorkflowService extends RemoteService {
 
     //
     public Descriptor getApplicationDescriptor(String applicationName, String applicationVersion) throws ApplicationException;
+    public String getApplicationDescriptorString(String applicationName, String applicationVersion) throws ApplicationException;
 
     public void launchSimulation(Map<String, String> parameters, String applicationName, String applicationVersion, String applicationClass, String simulationName) throws ApplicationException;
 
