@@ -55,10 +55,8 @@ import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
 import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
-import sun.security.krb5.internal.crypto.Des;
 
 import java.util.*;
-import java.util.function.Consumer;
 
 /**
  *
