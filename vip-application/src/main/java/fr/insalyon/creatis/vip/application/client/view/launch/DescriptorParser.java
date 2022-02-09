@@ -6,7 +6,6 @@ import fr.insalyon.creatis.vip.application.client.bean.Source;
 import fr.insalyon.creatis.vip.application.client.bean.boutiquesTools.BoutiquesApplication;
 import fr.insalyon.creatis.vip.application.client.bean.boutiquesTools.BoutiquesInput;
 import fr.insalyon.creatis.vip.application.client.bean.boutiquesTools.BoutiquesStringInput;
-import sun.security.krb5.internal.crypto.Des;
 
 /**
  * Class to parse Descriptor objects (used to represent gwendia descriptors) into BoutiquesApplication objects.

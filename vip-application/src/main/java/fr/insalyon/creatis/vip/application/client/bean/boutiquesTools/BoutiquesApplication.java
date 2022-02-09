@@ -1,7 +1,6 @@
 package fr.insalyon.creatis.vip.application.client.bean.boutiquesTools;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
-import jdk.nashorn.internal.ir.Optimistic;
 
 import java.util.*;
 import java.util.function.Function;
