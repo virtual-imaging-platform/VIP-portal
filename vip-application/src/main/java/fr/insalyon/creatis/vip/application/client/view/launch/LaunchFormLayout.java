@@ -120,7 +120,7 @@ public class LaunchFormLayout extends AbstractFormLayout {
      *
      * @param applicationDescriptor     BoutiquesApplication generated from application .json descriptor file
      */
-    public LaunchFormLayout(final BoutiquesApplication applicationDescriptor) {
+    public LaunchFormLayout(final BoutiquesApplication applicationDescriptor, boolean showSeparators) {
         super("600", "*");
         this.setWidth(600);
         // Documentation
@@ -145,7 +145,7 @@ public class LaunchFormLayout extends AbstractFormLayout {
         assertCondition(applicationDescriptor.getBoutiquesExtensions() != null,
                 "The boutiques descriptor must have extensions");
         // Add inputs, then buttons and warning/error labels below
-        this.configureInputs(applicationDescriptor);
+        this.configureInputs(applicationDescriptor, showSeparators);
         this.addMember(buttonsLayout);
         this.addMember(this.errorLabel);
         this.addMember(this.warningLabel);
@@ -286,8 +286,12 @@ public class LaunchFormLayout extends AbstractFormLayout {
      *
      * @param applicationDescriptor BoutiquesDescriptor generated from application .json descriptor file
      */
-    private void configureInputs(BoutiquesApplication applicationDescriptor) {
+    private void configureInputs(BoutiquesApplication applicationDescriptor, boolean showSeparators) {
         // Execution name and results directory inputs
+        if (showSeparators) {
+            Label separator = WidgetUtil.getLabel("<hr/>Mandatory inputs :", 15);
+            this.addMember(separator);
+        }
 
         try {
             this.createArtificialStringInput("Execution name", EXECUTION_NAME_ID, false, null,
@@ -302,39 +306,60 @@ public class LaunchFormLayout extends AbstractFormLayout {
             throw new RuntimeException("Could not create 'Execution name' and 'Results directory' input layouts.");
         }
         // Application descriptor inputs
-        for (BoutiquesInput input : applicationDescriptor.getInputs()) {
-            InputLayout inputLayout;
-            if(input.getPossibleValues() != null){
-                Map<String, String> labels =
-                        applicationDescriptor.getBoutiquesExtensions().getValueChoicesLabelsForInput(input.getId());
-                inputLayout = new ValueChoiceInputLayout(input, this, labels);
-            } else {
-                switch (input.getType()) {
-                    case STRING:
-                    case FILE:
-                        String allowedChar = "[" + ApplicationConstants.INPUT_VALID_CHARS + "]";
-                        inputLayout = new StringInputLayout((BoutiquesStringInput) input, this,
-                                true, allowedChar);
-                        break;
-                    case NUMBER:
-                        inputLayout = new NumberInputLayout((BoutiquesNumberInput) input, this);
-                        break;
-                    case FLAG:
-                        inputLayout = new FlagInputLayout((BoutiquesFlagInput) input, this);
-                        break;
-                    default:
-                        throw new RuntimeException("Unknown input type: " + input.getType());
-                }
-            }
-            // handle extensions
-            if (applicationDescriptor.getBoutiquesExtensions().getNonListInputs().contains(input.getId())) {
-                inputLayout.disableAddingValue();
-            }
-            this.inputsMap.put(input.getId(), inputLayout);
-            this.addMember(inputLayout);
-            // Validate input value and dependencies
-            inputLayout.onValueChanged();
+        Set<BoutiquesInput> mandatoryInputs = applicationDescriptor.getInputs().stream()
+                .filter(i -> ! i.isOptional()).collect(Collectors.toSet());
+        Set<BoutiquesInput> optionalInputs = applicationDescriptor.getInputs().stream()
+                .filter(i -> i.isOptional()).collect(Collectors.toSet());
+
+
+        for (BoutiquesInput input : mandatoryInputs) {
+            configureInput(applicationDescriptor, input);
         }
+        if (optionalInputs.isEmpty()) {
+            return;
+        }
+        if (showSeparators) {
+            Label separator = WidgetUtil.getLabel("<hr/>Optional inputs :", 15);
+            this.addMember(separator);
+        }
+
+        for (BoutiquesInput input : optionalInputs) {
+            configureInput(applicationDescriptor, input);
+        }
+    }
+
+    private void configureInput(BoutiquesApplication applicationDescriptor, BoutiquesInput input) {
+        InputLayout inputLayout;
+        if(input.getPossibleValues() != null){
+            Map<String, String> labels =
+                    applicationDescriptor.getBoutiquesExtensions().getValueChoicesLabelsForInput(input.getId());
+            inputLayout = new ValueChoiceInputLayout(input, this, labels);
+        } else {
+            switch (input.getType()) {
+                case STRING:
+                case FILE:
+                    String allowedChar = "[" + ApplicationConstants.INPUT_VALID_CHARS + "]";
+                    inputLayout = new StringInputLayout((BoutiquesStringInput) input, this,
+                            true, allowedChar);
+                    break;
+                case NUMBER:
+                    inputLayout = new NumberInputLayout((BoutiquesNumberInput) input, this);
+                    break;
+                case FLAG:
+                    inputLayout = new FlagInputLayout((BoutiquesFlagInput) input, this);
+                    break;
+                default:
+                    throw new RuntimeException("Unknown input type: " + input.getType());
+            }
+        }
+        // handle extensions
+        if (applicationDescriptor.getBoutiquesExtensions().getNonListInputs().contains(input.getId())) {
+            inputLayout.disableAddingValue();
+        }
+        this.inputsMap.put(input.getId(), inputLayout);
+        this.addMember(inputLayout);
+        // Validate input value and dependencies
+        inputLayout.onValueChanged();
     }
 
     /**

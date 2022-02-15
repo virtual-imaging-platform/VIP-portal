@@ -80,5 +80,6 @@ public class StringInputLayout extends InputLayout{
             inputField.setValidators(
                     ValidatorUtil.getStringValidator("^" + this.allowedCharacters + "+$"),
                     new RequiredIfValidator((formItem, value) -> !this.isOptional()));
+            inputField.setShowErrorIcon(false);
     }
 }

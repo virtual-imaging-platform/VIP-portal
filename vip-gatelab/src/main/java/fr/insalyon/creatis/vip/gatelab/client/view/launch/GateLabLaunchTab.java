@@ -87,6 +87,7 @@ public class GateLabLaunchTab extends LaunchTab {
         releaseDir = "/vip/GateLab (group)/releases/";
         this.mustBeABoutiquesDescriptor = true;
         this.showExamples = false;
+        this.showSeparators = false;
 
         if (this.inputs == null) {
             // if inputs is null, it is NOT a relaunch and only the launch mac button must be shown first
@@ -228,7 +229,9 @@ public class GateLabLaunchTab extends LaunchTab {
     @Override
     protected void onLaunchFormReady() {
         super.onLaunchFormReady();
-        customizeGateForm(this.inputs.get(PARALLELIZATION_TYPE_INPUT_ID));
+        if (this.inputs != null) {
+            customizeGateForm(this.inputs.get(PARALLELIZATION_TYPE_INPUT_ID));
+        }
     }
 
     //Bug #2368
