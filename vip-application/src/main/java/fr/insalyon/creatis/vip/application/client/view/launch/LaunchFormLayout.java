@@ -47,6 +47,8 @@ public class LaunchFormLayout extends AbstractFormLayout {
     private  IButton launchButton = null;
     private  IButton saveInputsButton = null;
     private  IButton saveAsExampleButton = null;
+    // customization
+    private boolean disableErrorsAndWarnings = false;
     // Label warning user about unsupported dependencies (due to one of the inputs having multiple values)
     private final Label warningLabel;
     // Maps the problematic input ID to the set of dependencies that can't be supported because of it
@@ -191,14 +193,16 @@ public class LaunchFormLayout extends AbstractFormLayout {
         }
     }
 
-    public void hideErrorsAndWarningLabels() {
+    public void disableErrorsAndWarnings() {
+        this.disableErrorsAndWarnings = true;
         this.errorLabel.hide();
         this.warningLabel.hide();
     }
 
-    public void showErrorsAndWarningLabels() {
-        this.errorLabel.show();
-        this.warningLabel.show();
+    public void enableErrorsAndWarnings() {
+        this.disableErrorsAndWarnings = false;
+        this.updateWarningMessage();
+        this.updateErrorMessages();
     }
 
     /**
@@ -648,7 +652,9 @@ public class LaunchFormLayout extends AbstractFormLayout {
     /**
      * Update this.warningLabel to show current user warnings. Hide it if there is no warning to show
      */
-    private void updateWarningMessage(){
+    public void updateWarningMessage(){
+        if (this.disableErrorsAndWarnings) return;
+
         Set<String> warningDependencies = new TreeSet<>();
         this.unsupportedDependencies.forEach((keyId, warnings) -> warningDependencies.addAll(warnings));
         if(warningDependencies.size() == 0){
@@ -717,6 +723,8 @@ public class LaunchFormLayout extends AbstractFormLayout {
      * @see #groupErrorMessage(String, boolean) 
      */
     public void updateErrorMessages() {
+        if (this.disableErrorsAndWarnings) return;
+
         if ((this.invalidInputIds.size() + this.errorMessages.size()) == 0){
             // No errors: enable buttons and hide error messages label
             if((this.launchButton != null) && (this.saveInputsButton != null)) {

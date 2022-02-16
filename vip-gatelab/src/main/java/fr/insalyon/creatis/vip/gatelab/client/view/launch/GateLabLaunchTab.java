@@ -221,7 +221,7 @@ public class GateLabLaunchTab extends LaunchTab {
             // on init, hide all inputs and launch buttons to put only the "load mac buttons"
             // only if inputs is null, otherwise it is a relaunch
             launchFormLayout.hideInputs();
-            launchFormLayout.hideErrorsAndWarningLabels();
+            launchFormLayout.disableErrorsAndWarnings();
             launchFormLayout.setButtons(5, loadMacButton);
         }
     }
@@ -268,7 +268,7 @@ public class GateLabLaunchTab extends LaunchTab {
 
             super.createButtons(); // override "load mac button" with "launch button"
             launchFormLayout.showInputs();
-            launchFormLayout.showErrorsAndWarningLabels();
+            launchFormLayout.enableErrorsAndWarnings();
             launchFormLayout.loadInputs(launchFormLayout.getSimulationName(), valuesMap);
 
             customizeGateForm(valuesMap.get(PARALLELIZATION_TYPE_INPUT_ID));
