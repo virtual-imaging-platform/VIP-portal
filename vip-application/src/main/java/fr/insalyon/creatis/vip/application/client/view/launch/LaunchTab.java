@@ -72,6 +72,7 @@ public class LaunchTab extends Tab {
 
     protected Boolean mustBeABoutiquesDescriptor = false;
     protected Boolean showExamples = true;
+    protected boolean showSeparators = true;
 
     protected HLayout layout;
     protected LaunchFormLayout launchFormLayout;
@@ -199,7 +200,7 @@ public class LaunchTab extends Tab {
     }
 
     protected void createForm(BoutiquesApplication applicationTool) {
-        launchFormLayout = new LaunchFormLayout(applicationTool);
+        launchFormLayout = new LaunchFormLayout(applicationTool, showSeparators);
         this.createButtons();
         onLaunchFormCreated();
         layout.addMember(launchFormLayout);

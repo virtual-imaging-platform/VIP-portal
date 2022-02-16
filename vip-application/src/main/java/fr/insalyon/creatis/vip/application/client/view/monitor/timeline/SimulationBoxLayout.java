@@ -51,6 +51,7 @@ import fr.insalyon.creatis.vip.application.client.bean.Simulation;
 import fr.insalyon.creatis.vip.application.client.rpc.WorkflowService;
 import fr.insalyon.creatis.vip.application.client.view.launch.LaunchTab;
 import fr.insalyon.creatis.vip.application.client.view.common.AbstractSimulationTab;
+import fr.insalyon.creatis.vip.application.client.view.launch.RelaunchService;
 import fr.insalyon.creatis.vip.application.client.view.monitor.SimulationStatus;
 import fr.insalyon.creatis.vip.application.client.view.monitor.SimulationTab;
 import fr.insalyon.creatis.vip.core.client.CoreModule;
@@ -333,21 +334,10 @@ public class SimulationBoxLayout extends HLayout {
             @Override
             public void onSuccess(final Map<String, String> result) {
                 setLoading(false, null);
-                String tabId =
-                    ApplicationConstants.getLaunchTabID(applicationName);
-                Tab tab = Layout.getInstance().getTab(tabId);
-                if (tab == null) {
-                    Layout.getInstance().addTab(
-                        tabId,
-                        () -> new LaunchTab(
-                            applicationName,
-                            applicationVersion,
-                            applicationClass,
-                            simulationName,
-                            result));
-                } else {
-                    ((LaunchTab) tab).loadInput(simulationName, result);
-                }
+                String tabId = ApplicationConstants.getLaunchTabID(applicationName);
+                Layout.getInstance().removeTab(tabId);
+                RelaunchService.getInstance().relaunch(
+                        applicationName, applicationVersion, applicationClass, simulationName, result, tabId);
             }
         };
         WorkflowService.Util.getInstance().relaunchSimulation(simulationID, callback);

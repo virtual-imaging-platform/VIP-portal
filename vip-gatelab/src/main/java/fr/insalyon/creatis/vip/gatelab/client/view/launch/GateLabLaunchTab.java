@@ -74,15 +74,26 @@ public class GateLabLaunchTab extends LaunchTab {
         super(applicationName, applicationVersion, applicationClass);
     }
 
+    public GateLabLaunchTab(
+            String applicationName, String applicationVersion, String applicationClass,
+            String simulationName, Map<String, String> inputs) {
+        super(applicationName, applicationVersion, applicationClass, simulationName, inputs);
+    }
+
     @Override
     protected void init() {
         super.init();
-        initComplete(this);
-        configureLoadMacButton();
         baseDir = DataManagerConstants.ROOT + "/Home/myGateSimus/inputs";
         releaseDir = "/vip/GateLab (group)/releases/";
         this.mustBeABoutiquesDescriptor = true;
         this.showExamples = false;
+        this.showSeparators = false;
+
+        if (this.inputs == null) {
+            // if inputs is null, it is NOT a relaunch and only the launch mac button must be shown first
+            initComplete(this);
+            configureLoadMacButton();
+        }
     }
 
     private void configureLoadMacButton() {
@@ -206,10 +217,21 @@ public class GateLabLaunchTab extends LaunchTab {
 
     @Override
     protected void onLaunchFormCreated() {
-        // on init, hide all inputs and launch buttons to put only the "load mac buttons"
-        launchFormLayout.hideInputs();
-        launchFormLayout.hideErrorsAndWarningLabels();
-        launchFormLayout.setButtons(5, loadMacButton);
+        if (this.inputs == null) {
+            // on init, hide all inputs and launch buttons to put only the "load mac buttons"
+            // only if inputs is null, otherwise it is a relaunch
+            launchFormLayout.hideInputs();
+            launchFormLayout.disableErrorsAndWarnings();
+            launchFormLayout.setButtons(5, loadMacButton);
+        }
+    }
+
+    @Override
+    protected void onLaunchFormReady() {
+        super.onLaunchFormReady();
+        if (this.inputs != null) {
+            customizeGateForm(this.inputs.get(PARALLELIZATION_TYPE_INPUT_ID));
+        }
     }
 
     //Bug #2368
@@ -246,17 +268,21 @@ public class GateLabLaunchTab extends LaunchTab {
 
             super.createButtons(); // override "load mac button" with "launch button"
             launchFormLayout.showInputs();
-            launchFormLayout.showErrorsAndWarningLabels();
+            launchFormLayout.enableErrorsAndWarnings();
             launchFormLayout.loadInputs(launchFormLayout.getSimulationName(), valuesMap);
 
-            // hide and disable some inputs
+            customizeGateForm(valuesMap.get(PARALLELIZATION_TYPE_INPUT_ID));
+        }
+    }
+
+    public void customizeGateForm(String parallelizationType) {
+        // hide and disable some inputs
             launchFormLayout.hideInput(PHASE_SPACE_INPUT_ID);
             launchFormLayout.makeInputUnmodifiable(GATE_INPUT_INPUT_ID);
             launchFormLayout.makeInputUnmodifiable(NB_OF_PARTICLES_INPUT_ID);
-            if (valuesMap.get(PARALLELIZATION_TYPE_INPUT_ID).equals("stat")) {
+            if ("stat".equals(parallelizationType)) {
                 launchFormLayout.makeInputUnmodifiable(PARALLELIZATION_TYPE_INPUT_ID);
             }
-        }
     }
 
     // called from JS

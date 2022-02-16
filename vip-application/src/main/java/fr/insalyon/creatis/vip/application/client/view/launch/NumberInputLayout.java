@@ -93,17 +93,20 @@ public class NumberInputLayout extends InputLayout {
             protected boolean condition(Object value) {
                 if (value == null) {
                     this.setErrorMessage("Field is required");
+                    this.getFormItem().setShowErrorIcon(false);
                     return numberInput.isOptional();
                 }
                 try {
                     double doubleValue = Double.parseDouble(String.valueOf(value));
                     if (numberInput.isInteger()) {
                         this.setErrorMessage("Must be an integer.");
+                        this.getFormItem().setShowErrorIcon(true);
                         return ((doubleValue % 1) == 0);
                     }
                     return true;
                 } catch (NumberFormatException e) {
                     this.setErrorMessage("Must be a number.");
+                    this.getFormItem().setShowErrorIcon(true);
                     return false;
                 }
             }
@@ -118,10 +121,12 @@ public class NumberInputLayout extends InputLayout {
                     if (maximum != null) {
                         if (numberInput.isExclusiveMaximum() && (doubleValue >= maximum)) {
                             this.setErrorMessage("Must be strictly less than " + maximum);
+                            this.getFormItem().setShowErrorIcon(true);
                             return false;
                         } else {
                             if (doubleValue > maximum) {
                                 this.setErrorMessage("Must be at most " + maximum);
+                                this.getFormItem().setShowErrorIcon(true);
                                 return false;
                             }
                         }
@@ -130,10 +135,12 @@ public class NumberInputLayout extends InputLayout {
                     if (minimum != null) {
                         if (numberInput.isExclusiveMinimum() && (doubleValue <= minimum)) {
                             this.setErrorMessage("Must be strictly greater than " + minimum);
+                            this.getFormItem().setShowErrorIcon(true);
                             return false;
                         } else {
                             if (doubleValue < minimum) {
                                 this.setErrorMessage("Must be at least " + minimum);
+                                this.getFormItem().setShowErrorIcon(true);
                                 return false;
                             }
                         }

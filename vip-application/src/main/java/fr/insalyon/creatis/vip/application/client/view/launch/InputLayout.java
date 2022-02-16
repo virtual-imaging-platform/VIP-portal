@@ -75,7 +75,7 @@ public abstract class InputLayout extends VLayout {
      * @param createMasterForm  true to create the masterForm
      */
     protected InputLayout(BoutiquesInput input, LaunchFormLayout parentLayout, boolean createMasterForm) {
-        super(5);
+        super(0);
         this.setLayoutLeftMargin(25);
         this.setWidth(300);
         this.parentLayout = parentLayout;
@@ -92,7 +92,7 @@ public abstract class InputLayout extends VLayout {
         String description = input.getDescription();
         if (description != null && !description.isEmpty()){
             Label descriptionLabel = WidgetUtil.getLabel(description,15);
-            //descriptionLabel.setWidth(400);
+            descriptionLabel.setWidth(400);
             this.addMember(descriptionLabel);
         }
         if (createMasterForm) {
