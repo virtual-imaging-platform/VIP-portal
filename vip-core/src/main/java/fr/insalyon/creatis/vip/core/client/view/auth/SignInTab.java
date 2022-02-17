@@ -60,6 +60,8 @@ import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
 import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -161,7 +163,14 @@ public class SignInTab extends Tab {
             }
         });
 
-        newForm = FieldUtil.getForm(createAccount, recoverAccount);
+        LinkItem egiAccount = FieldUtil.getLinkItem("link_redirection", "Connection with EGI Check-in.",
+                new com.smartgwt.client.widgets.form.fields.events.ClickHandler() {
+                    public void onClick(com.smartgwt.client.widgets.form.fields.events.ClickEvent event) {
+                        Window.Location.assign("/oauth2/authorize-client/egi");
+                    }
+                });
+
+        newForm = FieldUtil.getForm(createAccount, recoverAccount, egiAccount);
         newForm.setWidth(250);
     }
 
@@ -195,6 +204,7 @@ public class SignInTab extends Tab {
                         Cookies.setCookie(CoreConstants.COOKIES_SESSION,
                                 result.getSession(), CoreConstants.COOKIES_EXPIRATION_DATE,
                                 null, "/", false);
+
 
                     } else {
                         Cookies.removeCookie(CoreConstants.COOKIES_USER, "/");

@@ -45,6 +45,18 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.firewall.DefaultHttpFirewall;
+import org.springframework.security.oauth2.client.endpoint.DefaultAuthorizationCodeTokenResponseClient;
+import org.springframework.security.oauth2.client.endpoint.OAuth2AccessTokenResponseClient;
+import org.springframework.security.oauth2.client.endpoint.OAuth2AuthorizationCodeGrantRequest;
+import org.springframework.security.oauth2.client.registration.ClientRegistration;
+import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
+import org.springframework.security.oauth2.client.registration.InMemoryClientRegistrationRepository;
+import org.springframework.security.oauth2.client.web.AuthorizationRequestRepository;
+import org.springframework.security.oauth2.client.web.HttpSessionOAuth2AuthorizationRequestRepository;
+import org.springframework.security.oauth2.core.AuthorizationGrantType;
+import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
+import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest;
+import org.springframework.security.oauth2.core.oidc.IdTokenClaimNames;
 
 import java.util.function.Supplier;
 
@@ -78,20 +90,65 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
         http
             .authorizeRequests()
                 .antMatchers("/rest/platform").permitAll()
+                .antMatchers("/rest/loginEgi").permitAll()
                 .antMatchers("/rest/authenticate").permitAll()
                 .antMatchers("/rest/statistics/**").hasAnyRole("ADVANCED", "ADMINISTRATOR")
                 .antMatchers("/rest/**").authenticated()
                 .anyRequest().permitAll()
             .and()
+                .oauth2Login()
+                .authorizationEndpoint()
+                .baseUri("/oauth2/authorize-client")
+                .authorizationRequestRepository(authorizationRequestRepository())
+            .and()
+                .tokenEndpoint()
+                .accessTokenResponseClient(accessTokenResponseClient())
+            .and()
+                .defaultSuccessUrl("/rest/loginEgi")
+                .failureUrl("/loginFailure")
+            .and()
             .apply(new ApikeyAuthentificationConfigurer<>(
                     env.getRequiredProperty(CarminProperties.APIKEY_HEADER_NAME),
                     apikeyAuthenticationEntryPoint))
             .and()
-            .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-            .and()
-            .cors().and()
-            .headers().frameOptions().sameOrigin().and()
+            //.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+            //.and()
+                .cors().and()
+                .headers().frameOptions().sameOrigin().and()
             .csrf().disable();
+    }
+
+    @Bean
+    public AuthorizationRequestRepository<OAuth2AuthorizationRequest> authorizationRequestRepository() {
+        return new HttpSessionOAuth2AuthorizationRequestRepository();
+    }
+
+    @Bean
+    public OAuth2AccessTokenResponseClient<OAuth2AuthorizationCodeGrantRequest> accessTokenResponseClient() {
+        DefaultAuthorizationCodeTokenResponseClient accessTokenResponseClient = new DefaultAuthorizationCodeTokenResponseClient();
+        return accessTokenResponseClient;
+    }
+
+    @Bean
+    public ClientRegistrationRepository clientRegistrationRepository() {
+        return new InMemoryClientRegistrationRepository(this.egiClientRegistration());
+    }
+
+    private ClientRegistration egiClientRegistration() {
+        return ClientRegistration.withRegistrationId("egi")
+                .clientId("7f3506c2-8f65-454e-bddd-94c79ff90615")
+                .clientSecret("225E69290452FD78")
+                .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
+                .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
+                .redirectUri("http://localhost:8080/login/oauth2/code/egi")
+                .scope("openid", "profile", "email", "voperson_id")
+                .authorizationUri("https://aai-demo.egi.eu/oidc/authorize")
+                .tokenUri("https://aai-demo.egi.eu/oidc/token")
+                .userInfoUri("https://aai-demo.egi.eu/oidc/userinfo")
+                .userNameAttributeName(IdTokenClaimNames.SUB)
+                .jwkSetUri("https://aai-demo.egi.eu/oidc/jwk")
+                .clientName("EGI")
+                .build();
     }
 
     @Bean

@@ -112,8 +112,9 @@ public class PasswordLayout extends AbstractFormLayout {
             }
         });
 
-        saveButton.setWidth(150);
-        recoverButton = WidgetUtil.getIButton("Forgot Password?", CoreConstants.ICON_HELP, new ClickHandler() {
+        saveButton.setWidth(200);
+
+        recoverButton = WidgetUtil.getIButton("Create/Forgot Password ?", CoreConstants.ICON_HELP, new ClickHandler() {
             @Override
             public void onClick(ClickEvent event) {
                 Layout.getInstance().addTab(
@@ -121,7 +122,7 @@ public class PasswordLayout extends AbstractFormLayout {
             }
         });
 
-        recoverButton.setWidth(150);
+        recoverButton.setWidth(200);
         currentPasswordField.setTooltip("Note: you may not know your VIP password in case your account was automatically generated. If you need it, you can still recover it using the button below.");
         addField("Current", currentPasswordField);
         addField("New", newPasswordField);
