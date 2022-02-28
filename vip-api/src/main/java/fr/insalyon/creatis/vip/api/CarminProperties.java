@@ -68,4 +68,7 @@ public interface CarminProperties {
 
     // NON-CARMIN : STATISTICS
     String STATS_DATE_FORMAT = "dd-MM-yyyy HH:mm:ss";
+
+    // Client secret EGI
+    String EGI_CLIENT_SECRET = "egi.id.secret";
 }

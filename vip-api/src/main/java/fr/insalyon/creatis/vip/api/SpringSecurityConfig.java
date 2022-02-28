@@ -137,7 +137,7 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
     private ClientRegistration egiClientRegistration() {
         return ClientRegistration.withRegistrationId("egi")
                 .clientId("7f3506c2-8f65-454e-bddd-94c79ff90615")
-                .clientSecret("225E69290452FD78")
+                .clientSecret(env.getRequiredProperty(CarminProperties.EGI_CLIENT_SECRET))
                 .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
                 .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
                 .redirectUri("http://localhost:8080/login/oauth2/code/egi")
