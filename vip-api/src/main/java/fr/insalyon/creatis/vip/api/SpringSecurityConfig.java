@@ -136,17 +136,17 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
 
     private ClientRegistration egiClientRegistration() {
         return ClientRegistration.withRegistrationId("egi")
-                .clientId("7f3506c2-8f65-454e-bddd-94c79ff90615")
+                .clientId(env.getRequiredProperty(CarminProperties.EGI_CLIENT_ID))
                 .clientSecret(env.getRequiredProperty(CarminProperties.EGI_CLIENT_SECRET))
                 .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
                 .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
-                .redirectUri("http://localhost:8080/login/oauth2/code/egi")
+                .redirectUri(env.getRequiredProperty(CarminProperties.EGI_REDIRECT_URI))
                 .scope("openid", "profile", "email", "voperson_id")
-                .authorizationUri("https://aai-demo.egi.eu/oidc/authorize")
-                .tokenUri("https://aai-demo.egi.eu/oidc/token")
-                .userInfoUri("https://aai-demo.egi.eu/oidc/userinfo")
+                .authorizationUri(env.getRequiredProperty(CarminProperties.EGI_AUTHORIZATION_URI))
+                .tokenUri(env.getRequiredProperty(CarminProperties.EGI_TOKEN_URI))
+                .userInfoUri(env.getRequiredProperty(CarminProperties.EGI_USER_INFO_URI))
                 .userNameAttributeName(IdTokenClaimNames.SUB)
-                .jwkSetUri("https://aai-demo.egi.eu/oidc/jwk")
+                .jwkSetUri(env.getRequiredProperty(CarminProperties.EGI_JWK_SET_URI))
                 .clientName("EGI")
                 .build();
     }
