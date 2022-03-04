@@ -9,6 +9,7 @@ import fr.insalyon.creatis.vip.core.server.business.VipSessionBusiness;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -47,6 +48,7 @@ public class EgiController {
             protectedInfo.append( userAttributes.get("email"));
             String accountType = null;
             User vipUser = configurationBusiness.getOrCreateUser((String) userAttributes.get("email"), accountType);
+            SecurityContextHolder.clearContext(); // destroy spring session and use VIP own session mechanism
             vipSessionBusiness.setVIPSession(request, response, vipUser);
         }
         else{
