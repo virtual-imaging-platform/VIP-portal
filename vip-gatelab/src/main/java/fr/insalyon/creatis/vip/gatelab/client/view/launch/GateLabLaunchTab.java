@@ -35,73 +35,65 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
-import fr.insalyon.creatis.vip.application.client.bean.Descriptor;
-import fr.insalyon.creatis.vip.application.client.bean.Source;
-import fr.insalyon.creatis.vip.application.client.rpc.WorkflowService;
-import fr.insalyon.creatis.vip.application.client.view.common.AbstractLaunchTab;
+import fr.insalyon.creatis.vip.application.client.bean.boutiquesTools.BoutiquesApplication;
+import fr.insalyon.creatis.vip.application.client.bean.boutiquesTools.BoutiquesApplicationExtensions;
+import fr.insalyon.creatis.vip.application.client.bean.boutiquesTools.BoutiquesInput;
+import fr.insalyon.creatis.vip.application.client.bean.boutiquesTools.BoutiquesStringInput;
 import fr.insalyon.creatis.vip.application.client.view.launch.LaunchFormLayout;
-import fr.insalyon.creatis.vip.application.client.view.monitor.timeline.TimelineLayout;
+import fr.insalyon.creatis.vip.application.client.view.launch.LaunchTab;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
 import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
-import fr.insalyon.creatis.vip.gatelab.client.rpc.GateLabService;
-import fr.insalyon.creatis.vip.gatelab.client.rpc.GateLabServiceAsync;
+import fr.insalyon.creatis.vip.datamanager.client.bean.Data;
+import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerService;
+import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerServiceAsync;
+
+import java.util.*;
 
 /**
  *
  * @author Sorina Camarasu, Rafael Ferreira da Silva
  */
-public class GateLabLaunchTab extends AbstractLaunchTab {
+public class GateLabLaunchTab extends LaunchTab {
 
     private LoadMacWindow loadMacWindow;
     private String baseDir;
+    private String releaseDir;
     private IButton loadMacButton;
+
+    public static final String GATE_RELEASE_INPUT_ID = "GateRelease";
+    public static final String CPU_ESTIMATION_INPUT_ID = "CPUestimation";
+    public static final String PARALLELIZATION_TYPE_INPUT_ID = "ParallelizationType";
+    public static final String GATE_INPUT_INPUT_ID = "GateInput";
+    public static final String NB_OF_PARTICLES_INPUT_ID = "NumberOfParticles";
+    public static final String PHASE_SPACE_INPUT_ID = "phaseSpace";
 
     public GateLabLaunchTab(String applicationName, String applicationVersion, 
             String applicationClass) {
-
         super(applicationName, applicationVersion, applicationClass);
-        layout.clear();
-        initComplete(this);
-
-        baseDir = DataManagerConstants.ROOT + "/Home/myGateSimus/inputs";
-
-        loadData();
     }
 
-    private void loadData() {
+    public GateLabLaunchTab(
+            String applicationName, String applicationVersion, String applicationClass,
+            String simulationName, Map<String, String> inputs) {
+        super(applicationName, applicationVersion, applicationClass, simulationName, inputs);
+    }
 
-        final AsyncCallback<Descriptor> callback = new AsyncCallback<Descriptor>() {
-            @Override
-            public void onFailure(Throwable caught) {
-                modal.hide();
-                Layout.getInstance().setWarningMessage("Unable to download application source file:<br />" + caught.getMessage(), 10);
-            }
+    @Override
+    protected void init() {
+        super.init();
+        baseDir = DataManagerConstants.ROOT + "/Home/myGateSimus/inputs";
+        releaseDir = "/vip/GateLab (group)/releases/";
+        this.mustBeABoutiquesDescriptor = true;
+        this.showExamples = false;
+        this.showSeparators = false;
 
-            @Override
-            public void onSuccess(Descriptor descriptor) {
-
-                launchFormLayout = new LaunchFormLayout(applicationName + " " + applicationVersion, null, descriptor.getDescription());
-                layout.addMember(launchFormLayout);
-
-                launchFormLayout.setSourcesLayoutVisibible(false);
-
-                for (Source source : descriptor.getSources()) {
-                    launchFormLayout.addSource(new GateLabSourceLayout(source.getName(), source.getDescription(), modal));
-                }
-                modal.show("Configuring mac button ", true);
-                configureLoadMacButton();
-                launchFormLayout.addButtons(5, loadMacButton);
-                launchFormLayout.configureCitation(applicationName);
-
-                modal.hide();
-
-                configureInputsLayout(false);
-            }
-        };
-        modal.show("Loading launch panel...", true);
-        WorkflowService.Util.getInstance().getApplicationDescriptor(applicationName, applicationVersion, callback);
+        if (this.inputs == null) {
+            // if inputs is null, it is NOT a relaunch and only the launch mac button must be shown first
+            initComplete(this);
+            configureLoadMacButton();
+        }
     }
 
     private void configureLoadMacButton() {
@@ -117,71 +109,132 @@ public class GateLabLaunchTab extends AbstractLaunchTab {
         loadMacButton.setWidth(150);
     }
 
-    //Bug #2368
-    public void uploadMacComplete(String inputList) {
-       
-        if (loadMacWindow != null) {
-            loadMacWindow.destroy();
-            loadMacWindow = null;
+    @Override
+    protected void addExtensionAndCreateForm(
+            BoutiquesApplication applicationTool, Boolean addResultsDirectoryInput, Runnable launchFormCreator) {
+        verifyBoutiquesDescriptor(applicationTool);
+        BoutiquesApplicationExtensions extensions = new BoutiquesApplicationExtensions(false);
+        applicationTool.setBoutiquesExtensions(extensions);
 
-            modal.hide();
-            String[] inputs = inputList.split(", ");
-            String[] it = inputs[0].split(" = ");
-            setInputValue(it[0], baseDir.concat("/").concat(it[1]));
-            //We do not fill in the parallelization type automaticlaly for the moment
-            //String[] st = simuType.split(" = ");
-            //setInputValue(st[0], st[1]);
-            String[] np = inputs[1].split(" = ");
-            setInputValue(np[0], np[1]);
-
-            String[] st = inputs[2].split(" = ");
-            setInputValue(st[0], st[1]);
-
-            String[] ps = inputs[3].split(" = ");
-            setInputValue(ps[0], ps[1]);
-            
-            loadMacButton.hide();
-            launchFormLayout.setSourcesLayoutVisibible(true);
-
-            configureLaunchButton();
-            configureSaveInputsButton();
-            
-            launchFormLayout.addButtons(launchButton, saveInputsButton);
-        }
+        extensions.addNonListInputs(
+                GATE_RELEASE_INPUT_ID, CPU_ESTIMATION_INPUT_ID, PARALLELIZATION_TYPE_INPUT_ID,
+                GATE_INPUT_INPUT_ID, NB_OF_PARTICLES_INPUT_ID, PHASE_SPACE_INPUT_ID);
+        enrichCPUEstimationInput(applicationTool, extensions);
+        enrichParallelizationType(applicationTool, extensions);
+        // do the asynchronous task last for clarity
+        enrichGateReleasesInput(applicationTool, extensions, launchFormCreator);
     }
 
-    public void close() {
-
-        if (loadMacWindow != null) {
-            loadMacWindow.destroy();
-            loadMacWindow = null;
-
-            modal.hide();
-        }
+    private void verifyBoutiquesDescriptor(BoutiquesApplication applicationTool) {
+        verifyBoutiquesInput(applicationTool, GATE_RELEASE_INPUT_ID, BoutiquesInput.InputType.STRING);
+        verifyBoutiquesInput(applicationTool, CPU_ESTIMATION_INPUT_ID, BoutiquesInput.InputType.NUMBER);
+        verifyBoutiquesInput(applicationTool, PARALLELIZATION_TYPE_INPUT_ID, BoutiquesInput.InputType.STRING);
+        verifyBoutiquesInput(applicationTool, GATE_INPUT_INPUT_ID, BoutiquesInput.InputType.FILE);
+        verifyBoutiquesInput(applicationTool, NB_OF_PARTICLES_INPUT_ID, BoutiquesInput.InputType.NUMBER);
+        verifyBoutiquesInput(applicationTool, PHASE_SPACE_INPUT_ID, BoutiquesInput.InputType.STRING);
     }
 
-    public void report(String message) {
+    private void verifyBoutiquesInput(BoutiquesApplication applicationTool, String inputId, BoutiquesInput.InputType type) {
+        Optional<BoutiquesInput> boutiquesInput =
+                applicationTool.getInputs().stream().filter(input -> inputId.equals(input.getId())).findAny();
+        LaunchFormLayout.assertCondition(boutiquesInput.isPresent(),
+                "Missing {" + inputId + "} input in Gate descriptor");
+        LaunchFormLayout.assertCondition(
+                type.equals(boutiquesInput.get().getType()),
+                "Input {" + inputId + "} must have a number type in Gate descriptor");
+    }
 
-        close();
-        GateLabServiceAsync service = GateLabService.Util.getInstance();
-        final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
+    private void enrichCPUEstimationInput(
+            BoutiquesApplication applicationTool, BoutiquesApplicationExtensions extensions) {
+        BoutiquesInput cpuEstInput = applicationTool.getInputs().stream()
+                .filter(input -> CPU_ESTIMATION_INPUT_ID.equals(input.getId()))
+                .findAny().orElseThrow(IllegalStateException::new);
+        Map<String, String> map = new LinkedHashMap<String, String>();
+        map.put("1", "A few minutes");
+        map.put("2", "A few hours");
+        map.put("3", "A few days");
+        map.put("4", "More than a few days");
+        LaunchFormLayout.assertCondition(
+                cpuEstInput.getPossibleValues() != null && cpuEstInput.getPossibleValues().equals(map.keySet()),
+                "CPU Estimation in Gate descriptor does not have the expected values");
+        extensions.addValueChoiceLabels(CPU_ESTIMATION_INPUT_ID, map);
+    }
+
+    private void enrichParallelizationType(
+            BoutiquesApplication applicationTool, BoutiquesApplicationExtensions extensions) {
+        BoutiquesInput paraTypeInput = applicationTool.getInputs().stream()
+                .filter(input -> PARALLELIZATION_TYPE_INPUT_ID.equals(input.getId()))
+                .findAny().orElseThrow(IllegalStateException::new);
+        Map<String, String> map = new LinkedHashMap<String, String>();
+        map.put("stat", "Static");
+        map.put("dyn", "Dynamic");
+        LaunchFormLayout.assertCondition(
+                paraTypeInput.getPossibleValues() != null && paraTypeInput.getPossibleValues().equals(map.keySet()),
+                "CPU Estimation in Gate descriptor does not have the expected values");
+        extensions.addValueChoiceLabels(PARALLELIZATION_TYPE_INPUT_ID, map);
+    }
+
+    private void enrichGateReleasesInput(
+            BoutiquesApplication applicationTool, BoutiquesApplicationExtensions extensions, Runnable doNextStep) {
+        BoutiquesInput releaseInput = applicationTool.getInputs().stream()
+                .filter(input -> GATE_RELEASE_INPUT_ID.equals(input.getId()))
+                .findAny().orElseThrow(IllegalStateException::new);
+        //get list of available releases
+        DataManagerServiceAsync service = DataManagerService.Util.getInstance();
+        AsyncCallback<List<Data>> callback = new AsyncCallback<List<Data>>() {
             @Override
             public void onFailure(Throwable caught) {
                 modal.hide();
-                Layout.getInstance().setWarningMessage("Unable to report problem:<br />" + caught.getMessage(), 10);
+                Layout.getInstance().setWarningMessage("Unable to list release folder:<br />" + caught.getMessage());
             }
 
             @Override
-            public void onSuccess(Void result) {
+            public void onSuccess(List<Data> result) {
                 modal.hide();
-                Layout.getInstance().setNoticeMessage("Problem successfully reported.", 10);
+                List<Release> releases = new ArrayList<Release>();
+                for (Data d : result) {
+                    releases.add(new Release(d.getName()));
+                }
+                Collections.sort(releases);
+                updateGateReleaseInput(releaseInput, extensions, releases);
+                doNextStep.run();;
             }
         };
-        modal.show("Reporting problem...", true);
-        service.reportProblem(message.replaceAll("\\n", "<br />"), callback);
+        service.listDir(releaseDir, true, callback);
     }
 
-     //Bug #2368
+    private void updateGateReleaseInput(
+            BoutiquesInput releaseInput, BoutiquesApplicationExtensions extensions, List<Release> releases) {
+        Map<String, String> releaseMap = new LinkedHashMap<String, String>();
+        String defaultValue = releaseDir + "/" + releases.get(0).getReleaseName();
+        for (Release r : releases) {
+            releaseMap.put(releaseDir + "/" + r.getReleaseName(), r.getReleaseName());
+        }
+        releaseInput.setPossibleValues(releaseMap.keySet());
+        ((BoutiquesStringInput) releaseInput).setDefaultValue(defaultValue);
+        extensions.addValueChoiceLabels(releaseInput.getId(), releaseMap);
+    }
+
+    @Override
+    protected void onLaunchFormCreated() {
+        if (this.inputs == null) {
+            // on init, hide all inputs and launch buttons to put only the "load mac buttons"
+            // only if inputs is null, otherwise it is a relaunch
+            launchFormLayout.hideInputs();
+            launchFormLayout.disableErrorsAndWarnings();
+            launchFormLayout.setButtons(5, loadMacButton);
+        }
+    }
+
+    @Override
+    protected void onLaunchFormReady() {
+        super.onLaunchFormReady();
+        if (this.inputs != null) {
+            customizeGateForm(this.inputs.get(PARALLELIZATION_TYPE_INPUT_ID));
+        }
+    }
+
+    //Bug #2368
     private native void initComplete(GateLabLaunchTab uploadMac) /*-{
      $wnd.uploadMacComplete = function (inputList) {
      uploadMac.@fr.insalyon.creatis.vip.gatelab.client.view.launch.GateLabLaunchTab::uploadMacComplete(Ljava/lang/String;)(inputList);
@@ -189,34 +242,56 @@ public class GateLabLaunchTab extends AbstractLaunchTab {
      $wnd.close = function () {
      uploadMac.@fr.insalyon.creatis.vip.gatelab.client.view.launch.GateLabLaunchTab::close()();
      };
-     $wnd.report = function (message) {
-     uploadMac.@fr.insalyon.creatis.vip.gatelab.client.view.launch.GateLabLaunchTab::report(Ljava/lang/String;)(message);
-     };
      }-*/;
 
-    /**
-     * Launches a simulation.
-     */
-    @Override
-    protected void launch() {
+    //Bug #2368
+    public void uploadMacComplete(String inputList) {
 
-        final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
-            @Override
-            public void onFailure(Throwable caught) {
-                resetLaunchButton();
-                Layout.getInstance().setWarningMessage("Unable to launch the simulation:<br />" + caught.getMessage(), 10);
-            }
+        if (loadMacWindow != null) {
+            loadMacWindow.destroy();
+            loadMacWindow = null;
 
-            @Override
-            public void onSuccess(Void result) {
-                resetLaunchButton();
-                Layout.getInstance().setNoticeMessage("Simulation '<b>" + getSimulationName() + "</b>' successfully launched.", 10);
-                TimelineLayout.getInstance().update();
+            modal.hide();
+            // we get something like "GateInput = " + fileName + ", ParallelizationType = " + type + ", NumberOfParticles = " + parts + ", phaseSpace = " + ps;
+            String[] inputs = inputList.split(", ");
+            Map<String,String> valuesMap = new HashMap<>();
+
+            // first is a special case, we need to edit the path
+            String[] it = inputs[0].split(" = ");
+            valuesMap.put(it[0], baseDir.concat("/").concat(it[1]));
+
+            for (int i=1 ; i<4 ; i++) {
+                String[] keyAndValue = inputs[i].split(" = ");
+                valuesMap.put(keyAndValue[0], keyAndValue[1]);
             }
-        };
-        WidgetUtil.setLoadingIButton(launchButton, "Launching...");
-        WorkflowService.Util.getInstance().launchSimulation(getParametersMap(),
-                applicationName, applicationVersion, applicationClass, 
-                getSimulationName(), callback);
+            valuesMap.put(CPU_ESTIMATION_INPUT_ID,"1");
+
+            super.createButtons(); // override "load mac button" with "launch button"
+            launchFormLayout.showInputs();
+            launchFormLayout.enableErrorsAndWarnings();
+            launchFormLayout.loadInputs(launchFormLayout.getSimulationName(), valuesMap);
+
+            customizeGateForm(valuesMap.get(PARALLELIZATION_TYPE_INPUT_ID));
+        }
+    }
+
+    public void customizeGateForm(String parallelizationType) {
+        // hide and disable some inputs
+            launchFormLayout.hideInput(PHASE_SPACE_INPUT_ID);
+            launchFormLayout.makeInputUnmodifiable(GATE_INPUT_INPUT_ID);
+            launchFormLayout.makeInputUnmodifiable(NB_OF_PARTICLES_INPUT_ID);
+            if ("stat".equals(parallelizationType)) {
+                launchFormLayout.makeInputUnmodifiable(PARALLELIZATION_TYPE_INPUT_ID);
+            }
+    }
+
+    // called from JS
+    public void close() {
+        if (loadMacWindow != null) {
+            loadMacWindow.destroy();
+            loadMacWindow = null;
+
+            modal.hide();
+        }
     }
 }

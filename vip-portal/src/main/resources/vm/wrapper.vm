@@ -73,7 +73,7 @@ case $key in
 --$input.getId().toLowerCase())
         if [ "$2" != "No_value_provided" ]
         then
-            #if($input.getType()=="Flag")
+            #if($input.getType().getCamelName()=="Flag")
             if [ "$firstParam" != true ] && [ "$2" = true ]
             #else
             if [ "$firstParam" != true ]
@@ -81,13 +81,13 @@ case $key in
             then 
                 echo "," >> input_param_file.json
             fi
-            #if($input.getType()=="Flag") ## for the current boutiques version, a flag must be true or absent (false not allowed)
+            #if($input.getType().getCamelName()=="Flag") ## for the current boutiques version, a flag must be true or absent (false not allowed)
             if [ "$2" = true ]
             then
                 echo "\"$input.getId()\": $2"  >> input_param_file.json
                 firstParam=false
             fi
-            #elseif($input.getType()=="Number")
+            #elseif($input.getType().getCamelName()=="Number")
             echo "\"$input.getId()\": $2"  >> input_param_file.json
             firstParam=false
             #else ## text or file, put in quotes

@@ -31,11 +31,12 @@
  */
 package fr.insalyon.creatis.vip.applicationimporter.client.view.applicationdisplay;
 
-import fr.insalyon.creatis.vip.applicationimporter.client.bean.BoutiquesInput;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.SectionStackSection;
+import fr.insalyon.creatis.vip.application.client.bean.boutiquesTools.BoutiquesInput;
 import fr.insalyon.creatis.vip.applicationimporter.client.view.Constants;
-import java.util.List;
+
+import java.util.Set;
 
 /**
  *
@@ -47,7 +48,7 @@ public class InputLayout extends InputOutputLayout {
         super("Application Inputs", Constants.ICON_INPUT, width, height);
     }
 
-    public void setInputs(List<BoutiquesInput> inputs) {
+    public void setInputs(Set<BoutiquesInput> inputs) {
         stackSection.clear();
         for (BoutiquesInput bi : inputs) {
             SectionStackSection section = new SectionStackSection();
@@ -62,7 +63,7 @@ public class InputLayout extends InputOutputLayout {
 
             HLayout generalLayout = new HLayout();
             generalLayout.addMember(new LocalTextField("Name", false, false, bi.getName()));
-            generalLayout.addMember(new LocalTextField("Type", false, false, bi.getType()));
+            generalLayout.addMember(new LocalTextField("Type", false, false,  bi.getTypeString()));
             generalLayout.addMember(new LocalTextField("List?", false, false, bi.isList() ? "True" : "False"));
             generalLayout.addMember(new LocalTextField("Optional?", false, false, bi.isOptional() ? "True" : "False"));
             generalLayout.setMembersMargin(membersMargin);
@@ -75,7 +76,7 @@ public class InputLayout extends InputOutputLayout {
                 commandLineLayout.addMember(new LocalTextField("Command-line flag", false, false, bi.getCommandLineFlag()));
             }
             if (bi.getDefaultValue() != null) {
-                commandLineLayout.addMember(new LocalTextField("Default value", false, false, bi.getDefaultValue()));
+                commandLineLayout.addMember(new LocalTextField("Default value", false, false, bi.getDefaultValue().toString()));
             }
             commandLineLayout.setMembersMargin(membersMargin);
 
