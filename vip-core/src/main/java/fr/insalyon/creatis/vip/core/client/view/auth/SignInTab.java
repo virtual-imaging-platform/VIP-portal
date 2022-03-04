@@ -68,8 +68,10 @@ import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
 public class SignInTab extends Tab {
 
     private VLayout signinLayout;
+    private Label infoWelcomeVipLayout;
     private Label infoVipLayout;
     private Label infoContactlayout;
+    private Label infoToolLayout;
     private Label infoPublicationLayout;
     private Label infoCodeSource;
     private Label infoContactus;
@@ -81,51 +83,35 @@ public class SignInTab extends Tab {
 
     public SignInTab() {
 
-        HLayout hLayout = new HLayout(5);
-        hLayout.setWidth100();
-        hLayout.setHeight100();
-        hLayout.setOverflow(Overflow.AUTO);
-        hLayout.setPadding(10);
-
         this.setID(CoreConstants.TAB_SIGNIN);
         this.setTitle("Sign In");
 
-        VLayout loginVLayout = new VLayout(10);
-        //loginVLayout.setShowEdges(true);
+        VLayout loginVLayout = new VLayout(12);
+        loginVLayout.setShowEdges(true);
         //loginVLayout.setEdgeShowCenter(true);
         loginVLayout.setWidth100();
         loginVLayout.setHeight100();
-        loginVLayout.setMargin(170);
+        loginVLayout.setLayoutMargin(200);
+        loginVLayout.setLayoutTopMargin(100);
         loginVLayout.setOverflow(Overflow.AUTO);
-        loginVLayout.setAlign(Alignment.CENTER);
-        loginVLayout.setDefaultLayoutAlign(Alignment.LEFT);
+        loginVLayout.setAlign(Alignment.RIGHT);
+        loginVLayout.setDefaultLayoutAlign(Alignment.CENTER);
 
-        VLayout infoVLayout = new VLayout(10);
-        infoVLayout.setShowEdges(true);
-        infoVLayout.setEdgeSize(1);
-        infoVLayout.setEdgeOffset(10);
-        infoVLayout.setEdgeMarginSize(100);
-        infoVLayout.setWidth100();
-        infoVLayout.setHeight100();
-        infoVLayout.setOverflow(Overflow.AUTO);
-        infoVLayout.setAlign(Alignment.CENTER);
-        infoVLayout.setDefaultLayoutAlign(Alignment.RIGHT);
 
         configureNewForm();
         configureSigninLayout();
         testLayoutInfo();
+        loginVLayout.addMember(infoWelcomeVipLayout);
+        loginVLayout.addMember(infoVipLayout);
         loginVLayout.addMember(signinLayout);
         loginVLayout.addMember(newForm);
-        infoVLayout.addMember(infoVipLayout);
-        infoVLayout.addMember(infoContactlayout);
-        infoVLayout.addMember(infoPublicationLayout);
-        infoVLayout.addMember(infoCodeSource);
-        infoVLayout.addMember(infoContactus);
+        loginVLayout.addMember(infoContactlayout);
+        loginVLayout.addMember(infoToolLayout);
+        loginVLayout.addMember(infoPublicationLayout);
+        loginVLayout.addMember(infoCodeSource);
+        loginVLayout.addMember(infoContactus);
 
-        hLayout.addMember(loginVLayout);
-        hLayout.addMember(infoVLayout);
-
-        this.setPane(hLayout);
+        this.setPane(loginVLayout);
     }
 
     private void configureSigninLayout() {
@@ -252,22 +238,16 @@ public class SignInTab extends Tab {
     }
 
     private void testLayoutInfo(){
-        Canvas canvas = new Canvas();
-        String image = "crystal/128/apps/jabber_protocol.png";
-
-        Img starImg3 = new Img(image, 240, 137);
-        starImg3.setImageType(ImageStyle.STRETCH);
-        starImg3.setBorder("1px solid gray");
-        starImg3.setLeft(600);
-        canvas.addChild(starImg3);
-
-        infoVipLayout= WidgetUtil.getLabel("The Virtual Imaging Platform (VIP) is a web portal for medical simulation and image data analysis. It leverages resources available in the EGI biomed Virtual Organisation to offer an open service to academic researchers worldwide. In March 2022, VIP counts 1380 registered users and about 20 applications publicly available. Since its early beginnings in 2011, VIP has facilited (i) the access to distributed computing resources, (ii) the access to scientific applications available as a service and (iii) application sharing worldwide. In the last few years, VIP has addressed interoperability and reproducibility concerns, in the larger scope of a FAIR (Findable, Accessible, Interoperable, Reusable) approach to scientific data analysis.", 30);
+        infoWelcomeVipLayout = WidgetUtil.getLabel("Welcome on Virtual Imaging Platform (VIP) !",20);
+        infoWelcomeVipLayout.setWidth(280);
+        infoWelcomeVipLayout.setStyleName("title");
+        infoVipLayout= WidgetUtil.getLabel("The Virtual Imaging Platform (VIP) is a web portal for medical simulation and image data analysis. It leverages resources available in the EGI biomed Virtual Organisation to offer an open service to academic researchers worldwide. Since its early beginnings in 2011, VIP has facilited (i) the access to distributed computing resources, (ii) the access to scientific applications available as a service and (iii) application sharing worldwide. In the last few years, VIP has addressed interoperability and reproducibility concerns, in the larger scope of a FAIR (Findable, Accessible, Interoperable, Reusable) approach to scientific data analysis.", 20);
         infoContactlayout = WidgetUtil.getLabel("Documentation of Virtual Imaging Platform and its embedded applications is available here :  <a href=\"https://vip.creatis.insa-lyon.fr/documentation/\">Documentation VIP</a>",20);
-        infoPublicationLayout = WidgetUtil.getLabel("The list of all publications related to VIP is here :  <a href=\"https://www.creatis.insa-lyon.fr/vip/more-publications.html\">Publications VIP</a>",20);
+        infoToolLayout = WidgetUtil.getLabel("List of applications available on Virtual Imaging Platform here :  <a href=\"https://www.creatis.insa-lyon.fr/vip/applications.html\">Applications VIP</a>",20);
+        infoPublicationLayout = WidgetUtil.getLabel("The list of all publications related to Virtual Imaging Platform is here :  <a href=\"https://www.creatis.insa-lyon.fr/vip/more-publications.html\">Publications VIP</a>",20);
         infoCodeSource = WidgetUtil.getLabel("Virtual Imaging Platform source code :  <a href=\"https://github.com/virtual-imaging-platform\">Github VIP</a>",20);
         infoContactus = WidgetUtil.getLabel("Contact us : vip-support@creatis.insa-lyon.fr",20);
 
-        canvas.draw();
 
     }
 }
