@@ -70,6 +70,7 @@ public class SignInTab extends Tab {
     private VLayout signinLayout;
     private Label infoWelcomeVipLayout;
     private Label infoVipLayout;
+    private Label infoVipLog;
     private Label infoContactlayout;
     private Label infoToolLayout;
     private Label infoPublicationLayout;
@@ -91,10 +92,10 @@ public class SignInTab extends Tab {
         //loginVLayout.setEdgeShowCenter(true);
         loginVLayout.setWidth100();
         loginVLayout.setHeight100();
-        loginVLayout.setLayoutMargin(200);
-        loginVLayout.setLayoutTopMargin(100);
+        loginVLayout.setLayoutMargin(100);
+        //loginVLayout.setLayoutTopMargin(10);
         loginVLayout.setOverflow(Overflow.AUTO);
-        loginVLayout.setAlign(Alignment.RIGHT);
+        loginVLayout.setAlign(Alignment.CENTER);
         loginVLayout.setDefaultLayoutAlign(Alignment.CENTER);
 
 
@@ -103,13 +104,14 @@ public class SignInTab extends Tab {
         testLayoutInfo();
         loginVLayout.addMember(infoWelcomeVipLayout);
         loginVLayout.addMember(infoVipLayout);
+        loginVLayout.addMember(infoContactus);
+        loginVLayout.addMember(infoVipLog);
         loginVLayout.addMember(signinLayout);
         loginVLayout.addMember(newForm);
         loginVLayout.addMember(infoContactlayout);
         loginVLayout.addMember(infoToolLayout);
         loginVLayout.addMember(infoPublicationLayout);
         loginVLayout.addMember(infoCodeSource);
-        loginVLayout.addMember(infoContactus);
 
         this.setPane(loginVLayout);
     }
@@ -188,7 +190,7 @@ public class SignInTab extends Tab {
                 });
 
         newForm = FieldUtil.getForm(createAccount, recoverAccount, egiAccount);
-        newForm.setWidth(250);
+        newForm.setWidth(230);
     }
 
     private void signin() {
@@ -238,16 +240,16 @@ public class SignInTab extends Tab {
     }
 
     private void testLayoutInfo(){
-        infoWelcomeVipLayout = WidgetUtil.getLabel("Welcome on Virtual Imaging Platform (VIP) !",20);
-        infoWelcomeVipLayout.setWidth(280);
+        infoWelcomeVipLayout = WidgetUtil.getLabel("Welcome on Virtual Imaging Platform !",20);
+        infoWelcomeVipLayout.setWidth(230);
         infoWelcomeVipLayout.setStyleName("title");
-        infoVipLayout= WidgetUtil.getLabel("The Virtual Imaging Platform (VIP) is a web portal for medical simulation and image data analysis. It leverages resources available in the EGI biomed Virtual Organisation to offer an open service to academic researchers worldwide. Since its early beginnings in 2011, VIP has facilited (i) the access to distributed computing resources, (ii) the access to scientific applications available as a service and (iii) application sharing worldwide. In the last few years, VIP has addressed interoperability and reproducibility concerns, in the larger scope of a FAIR (Findable, Accessible, Interoperable, Reusable) approach to scientific data analysis.", 20);
+        infoVipLayout= WidgetUtil.getLabel("VIP is a web portal for medical imaging applications. It allows you to access scientific applications as a service (directly through your web browser with no installation required), as well as distributed computing resources in a transparent manner.", 20);
+        infoVipLog = WidgetUtil.getLabel("Please log in using the form below or the link to the EGI Checkin federated authentication service, or create a new account if you don't have one.",20);
         infoContactlayout = WidgetUtil.getLabel("Documentation of Virtual Imaging Platform and its embedded applications is available here :  <a href=\"https://vip.creatis.insa-lyon.fr/documentation/\">Documentation VIP</a>",20);
         infoToolLayout = WidgetUtil.getLabel("List of applications available on Virtual Imaging Platform here :  <a href=\"https://www.creatis.insa-lyon.fr/vip/applications.html\">Applications VIP</a>",20);
         infoPublicationLayout = WidgetUtil.getLabel("The list of all publications related to Virtual Imaging Platform is here :  <a href=\"https://www.creatis.insa-lyon.fr/vip/more-publications.html\">Publications VIP</a>",20);
         infoCodeSource = WidgetUtil.getLabel("Virtual Imaging Platform source code :  <a href=\"https://github.com/virtual-imaging-platform\">Github VIP</a>",20);
-        infoContactus = WidgetUtil.getLabel("Contact us : vip-support@creatis.insa-lyon.fr",20);
-
+        infoContactus = WidgetUtil.getLabel("This portal is exclusively dedicated to non-commercial academic use, as indicated in the <a href=\"https://vip.creatis.insa-lyon.fr/documentation/terms.html\">terms of use.</a> For commercial use, please contact us at vip-support@creatis.insa-lyon.fr.",20);
 
     }
 }
