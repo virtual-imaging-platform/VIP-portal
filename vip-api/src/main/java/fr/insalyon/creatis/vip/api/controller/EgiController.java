@@ -40,13 +40,12 @@ public class EgiController {
             HttpServletRequest request, HttpServletResponse response, Principal user)
             throws ApiException {
 
-        if (!(user instanceof OAuth2AuthenticationToken)) {
-            logger.error("Egi login must only be called after an OIDC login. User name : [{}]. User type : [{}]",
-                    user.getClass().getCanonicalName(), user.getName());
+        if ( ! (user instanceof OAuth2AuthenticationToken)) {
+            logger.error("Egi login must only be called after an OIDC login. User [{}]", user);
             throw new ApiException(ApiException.ApiError.WRONG_OIDC_LOGIN);
         }
         OAuth2AuthenticationToken authToken = ((OAuth2AuthenticationToken) user);
-        if (!authToken.isAuthenticated()) {
+        if ( ! authToken.isAuthenticated()) {
             logger.error("Egi login method called with an anonymous user");
             throw new ApiException(ApiException.ApiError.WRONG_OIDC_LOGIN);
         }
@@ -66,7 +65,7 @@ public class EgiController {
     private String getRootUrl(HttpServletRequest request) {
         String decodedUri = UriUtils.decode(request.getRequestURI(), "UTF-8");
         int index = decodedUri.indexOf("/rest/loginEgi");
-        return decodedUri.substring(0, index);
+        return decodedUri.substring(0, index+1); // keep trailing slash
     }
 }
 

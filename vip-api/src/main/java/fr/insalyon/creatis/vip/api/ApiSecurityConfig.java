@@ -44,8 +44,9 @@ public class ApiSecurityConfig extends WebSecurityConfigurerAdapter {
                 .apply(new ApikeyAuthentificationConfigurer<>(
                         env.getRequiredProperty(CarminProperties.APIKEY_HEADER_NAME),
                         apikeyAuthenticationEntryPoint))
-                .and()
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                // session must be activated otherwise OIDC auth info will be lost when accessing /loginEgi
+                //.and()
+                //.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .cors().and()
                 .headers().frameOptions().sameOrigin().and()
