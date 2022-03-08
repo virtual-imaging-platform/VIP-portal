@@ -88,12 +88,9 @@ public class SignInTab extends Tab {
         this.setTitle("Sign In");
 
         VLayout loginVLayout = new VLayout(12);
-        loginVLayout.setShowEdges(true);
-        //loginVLayout.setEdgeShowCenter(true);
         loginVLayout.setWidth100();
         loginVLayout.setHeight100();
         loginVLayout.setLayoutMargin(100);
-        //loginVLayout.setLayoutTopMargin(10);
         loginVLayout.setOverflow(Overflow.AUTO);
         loginVLayout.setAlign(Alignment.CENTER);
         loginVLayout.setDefaultLayoutAlign(Alignment.CENTER);
@@ -191,6 +188,7 @@ public class SignInTab extends Tab {
 
         newForm = FieldUtil.getForm(createAccount, recoverAccount, egiAccount);
         newForm.setWidth(230);
+        newForm.setHeight(60);
     }
 
     private void signin() {
