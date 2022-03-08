@@ -153,7 +153,7 @@ public abstract class AbstractAuthenticationService extends HttpServlet {
             authFailedResponse(request, response);
             return;
         }
-        setVIPSession(request, response, user);
+        vipSessionBusiness.setVIPSession(request, response, user);
         try {
             response.sendRedirect(getBaseURL());
         } catch (IOException ex) {
@@ -183,26 +183,7 @@ public abstract class AbstractAuthenticationService extends HttpServlet {
         }
     }
 
-    private void setVIPSession(
-            HttpServletRequest request,
-            HttpServletResponse response,
-            User user) throws BusinessException, CoreException {
-        try {
-            configurationBusiness.updateUserLastLogin(user.getEmail());
-            user = vipSessionBusiness.setUserInSession(user, request.getSession());
-            Cookie userCookie = new Cookie(CoreConstants.COOKIES_USER, URLEncoder.encode(user.getEmail(), "UTF-8"));
-            userCookie.setMaxAge((int) (CoreConstants.COOKIES_EXPIRATION_DATE.getTime() - new Date().getTime()));
-            userCookie.setPath("/");
-            response.addCookie(userCookie);
-            Cookie sessionCookie = new Cookie(CoreConstants.COOKIES_SESSION, user.getSession());
-            userCookie.setMaxAge((int) (CoreConstants.COOKIES_EXPIRATION_DATE.getTime() - new Date().getTime()));
-            sessionCookie.setPath("/");
-            response.addCookie(sessionCookie);
-        } catch (UnsupportedEncodingException ex) {
-            logger.error("Error setting VIP session for {} ",user, ex);
-            throw new BusinessException(ex);
-        }
-    }
+
 
     private void authFailedResponse(
             HttpServletRequest request, HttpServletResponse response) {

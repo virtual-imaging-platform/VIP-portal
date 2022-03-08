@@ -7,15 +7,19 @@ import fr.insalyon.creatis.vip.core.client.view.CoreConstants.GROUP_ROLE;
 import fr.insalyon.creatis.vip.core.client.view.CoreException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
@@ -38,9 +42,31 @@ public class VipSessionBusiness {
     protected Server server;
     protected ConfigurationBusiness configurationBusiness;
 
+    @Autowired
     public VipSessionBusiness(Server server, ConfigurationBusiness configurationBusiness) {
         this.server = server;
         this.configurationBusiness = configurationBusiness;
+    }
+
+    public void setVIPSession(
+            HttpServletRequest request,
+            HttpServletResponse response,
+            User user) throws BusinessException, CoreException {
+        try {
+            configurationBusiness.updateUserLastLogin(user.getEmail());
+            user = setUserInSession(user, request.getSession());
+            Cookie userCookie = new Cookie(CoreConstants.COOKIES_USER, URLEncoder.encode(user.getEmail(), "UTF-8"));
+            userCookie.setMaxAge((int) (CoreConstants.COOKIES_EXPIRATION_DATE.getTime() - new Date().getTime()));
+            userCookie.setPath("/");
+            response.addCookie(userCookie);
+            Cookie sessionCookie = new Cookie(CoreConstants.COOKIES_SESSION, user.getSession());
+            userCookie.setMaxAge((int) (CoreConstants.COOKIES_EXPIRATION_DATE.getTime() - new Date().getTime()));
+            sessionCookie.setPath("/");
+            response.addCookie(sessionCookie);
+        } catch (UnsupportedEncodingException ex) {
+            logger.error("Error setting VIP session for {} ",user, ex);
+            throw new BusinessException(ex);
+        }
     }
 
     public User getUserFromSession(HttpServletRequest request) throws CoreException {
