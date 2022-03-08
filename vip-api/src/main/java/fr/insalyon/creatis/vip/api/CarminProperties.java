@@ -70,12 +70,12 @@ public interface CarminProperties {
     String STATS_DATE_FORMAT = "dd-MM-yyyy HH:mm:ss";
 
     // Client secret EGI
-    String EGI_CLIENT_ID = "egi.id.client";
-    String EGI_CLIENT_SECRET = "egi.id.secret";
-    String EGI_REDIRECT_URI = "egi.redirect.uri";
-    String EGI_AUTHORIZATION_URI = "egi.authorization.uri";
-    String EGI_TOKEN_URI = "egi.token.uri";
-    String EGI_USER_INFO_URI = "egi.user.info.uri";
-    String EGI_JWK_SET_URI = "egi.jwk.set.uri";
+    String EGI_CLIENT_ID = "oidc.egi.client_id";
+    String EGI_CLIENT_SECRET = "oidc.egi.client_secret";
+    String EGI_REDIRECT_URI = "oidc.egi.redirect_uri";
+    String EGI_AUTHORIZATION_URI = "oidc.egi.authorization_uri";
+    String EGI_TOKEN_URI = "oidc.egi.token_uri";
+    String EGI_USER_INFO_URI = "oidc.egi.user_info_uri";
+    String EGI_JWK_SET_URI = "oidc.egi.jwk_set_uri";
 
 }
