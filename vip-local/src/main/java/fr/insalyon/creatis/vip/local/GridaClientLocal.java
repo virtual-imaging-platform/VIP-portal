@@ -144,6 +144,9 @@ public class GridaClientLocal extends GRIDAClient {
         }
         Path from = Paths.get(localFile);
         Path to = localRoot.resolve(remoteDir).resolve(from.getFileName());
+        if ( ! to.getParent().toFile().exists()) {
+            createDirectory(to.getParent(), "");
+        }
         try {
             Files.copy(from, to, StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException e) {

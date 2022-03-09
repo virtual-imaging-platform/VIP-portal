@@ -56,7 +56,8 @@ public class ApiException extends VipException {
         WRONG_DATE_FORMAT(8010),
         WRONG_STAT_SERVICE(8011),
         COUNTRY_UNKNOWN(8012),
-        UNAUTHORIZED_DATA_ACCESS(8013);
+        UNAUTHORIZED_DATA_ACCESS(8013),
+        WRONG_OIDC_LOGIN(8014);
 
         private Integer code;
         ApiError(Integer code) { this.code = code; }
@@ -77,6 +78,7 @@ public class ApiException extends VipException {
             addMessage(ApiError.WRONG_STAT_SERVICE, "The service {} is unknown, only 'vip' is possible", 1);
             addMessage(ApiError.COUNTRY_UNKNOWN, "Country unknown : {}", 1);
             addMessage(ApiError.UNAUTHORIZED_DATA_ACCESS, "Unauthorized data access to : {}", 1);
+            addMessage(ApiError.WRONG_OIDC_LOGIN, "The login process encountered an error", 0);
         }
 
         public Optional<String> getMessage() {

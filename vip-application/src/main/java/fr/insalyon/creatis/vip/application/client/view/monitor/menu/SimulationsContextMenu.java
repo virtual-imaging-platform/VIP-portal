@@ -39,11 +39,11 @@ import com.smartgwt.client.widgets.menu.MenuItem;
 import com.smartgwt.client.widgets.menu.MenuItemSeparator;
 import com.smartgwt.client.widgets.menu.events.ClickHandler;
 import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
-import com.smartgwt.client.widgets.tab.Tab;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
 import fr.insalyon.creatis.vip.application.client.rpc.WorkflowService;
 import fr.insalyon.creatis.vip.application.client.view.common.AbstractSimulationTab;
 import fr.insalyon.creatis.vip.application.client.view.launch.LaunchTab;
+import fr.insalyon.creatis.vip.application.client.view.launch.RelaunchService;
 import fr.insalyon.creatis.vip.application.client.view.monitor.ChangeSimulationUserLayout;
 import fr.insalyon.creatis.vip.application.client.view.monitor.SimulationStatus;
 import fr.insalyon.creatis.vip.application.client.view.monitor.SimulationTab;
@@ -320,14 +320,8 @@ public class SimulationsContextMenu extends Menu {
                 String tabId =
                     ApplicationConstants.getLaunchTabID(applicationName);
                 Layout.getInstance().removeTab(tabId);
-                Layout.getInstance().addTab(
-                    tabId,
-                    () -> new LaunchTab(
-                        applicationName,
-                        applicationVersion,
-                        applicationClass,
-                        simulationName,
-                        result));
+                RelaunchService.getInstance().relaunch(
+                        applicationName, applicationVersion, applicationClass, simulationName, result, tabId);
             }
         };
         WorkflowService.Util.getInstance().relaunchSimulation(simulationID, callback);

@@ -90,8 +90,9 @@ public class ManageApplicationsTab extends AbstractManageTab {
         editLayout.setApplication(name, owner, classes, citation);
     }
 
-    public void setVersion(String version, String lfn, String jsonLfn, String doi, boolean isVisible) {
-        editVersionLayout.setVersion(version, lfn, jsonLfn, isVisible);
+    public void setVersion(
+            String version, String lfn, String jsonLfn, String doi, boolean isVisible, boolean isBoutiquesForm) {
+        editVersionLayout.setVersion(version, lfn, jsonLfn, isVisible, isBoutiquesForm);
         publishVersionLayout.setVersion(version, jsonLfn, doi);
     }
 }

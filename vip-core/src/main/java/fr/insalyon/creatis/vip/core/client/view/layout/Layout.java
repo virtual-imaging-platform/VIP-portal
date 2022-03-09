@@ -247,7 +247,7 @@ public class Layout {
      * @param message
      */
     public void setWarningMessage(String message) {
-        setWarningMessage(message, 15);
+        setWarningMessage(message, 10);
     }
 
     /**

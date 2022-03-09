@@ -37,6 +37,7 @@ import fr.insalyon.creatis.vip.api.security.apikey.ApikeyAuthentificationConfigu
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
+import org.springframework.core.annotation.Order;
 import org.springframework.core.env.Environment;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -71,29 +72,14 @@ import java.util.function.Supplier;
  * Created by abonnet on 7/22/16.
  */
 @EnableWebSecurity
-public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
+@Order(2)
+public class EgiSecurityConfig extends WebSecurityConfigurerAdapter {
 
-    // authentication done by bean LimitigDaoAuthenticationProvider
-
-    private final ApikeyAuthenticationEntryPoint apikeyAuthenticationEntryPoint;
-
-    private final Environment env;
-
-    @Autowired
-    public SpringSecurityConfig(ApikeyAuthenticationEntryPoint apikeyAuthenticationEntryPoint, Environment env) {
-        this.apikeyAuthenticationEntryPoint = apikeyAuthenticationEntryPoint;
-        this.env = env;
-    }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
             .authorizeRequests()
-                .antMatchers("/rest/platform").permitAll()
-                .antMatchers("/rest/loginEgi").permitAll()
-                .antMatchers("/rest/authenticate").permitAll()
-                .antMatchers("/rest/statistics/**").hasAnyRole("ADVANCED", "ADMINISTRATOR")
-                .antMatchers("/rest/**").authenticated()
                 .anyRequest().permitAll()
             .and()
                 .oauth2Login()
@@ -107,15 +93,9 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
                 .defaultSuccessUrl("/rest/loginEgi")
                 .failureUrl("/loginFailure")
             .and()
-            .apply(new ApikeyAuthentificationConfigurer<>(
-                    env.getRequiredProperty(CarminProperties.APIKEY_HEADER_NAME),
-                    apikeyAuthenticationEntryPoint))
-            .and()
-            //.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-            //.and()
                 .cors().and()
                 .headers().frameOptions().sameOrigin().and()
-            .csrf().disable();
+                .csrf().disable();
     }
 
     @Bean
@@ -127,45 +107,6 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
     public OAuth2AccessTokenResponseClient<OAuth2AuthorizationCodeGrantRequest> accessTokenResponseClient() {
         DefaultAuthorizationCodeTokenResponseClient accessTokenResponseClient = new DefaultAuthorizationCodeTokenResponseClient();
         return accessTokenResponseClient;
-    }
-
-    @Bean
-    public ClientRegistrationRepository clientRegistrationRepository() {
-        return new InMemoryClientRegistrationRepository(this.egiClientRegistration());
-    }
-
-    private ClientRegistration egiClientRegistration() {
-        return ClientRegistration.withRegistrationId("egi")
-                .clientId("7f3506c2-8f65-454e-bddd-94c79ff90615")
-                .clientSecret(env.getRequiredProperty(CarminProperties.EGI_CLIENT_SECRET))
-                .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
-                .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
-                .redirectUri("http://localhost:8080/login/oauth2/code/egi")
-                .scope("openid", "profile", "email", "voperson_id")
-                .authorizationUri("https://aai-demo.egi.eu/oidc/authorize")
-                .tokenUri("https://aai-demo.egi.eu/oidc/token")
-                .userInfoUri("https://aai-demo.egi.eu/oidc/userinfo")
-                .userNameAttributeName(IdTokenClaimNames.SUB)
-                .jwkSetUri("https://aai-demo.egi.eu/oidc/jwk")
-                .clientName("EGI")
-                .build();
-    }
-
-    @Bean
-    public Supplier<User> currentUserProvider() {
-        return () -> {
-            // get VIP user from the spring one
-            Authentication authentication =
-                    SecurityContextHolder.getContext().getAuthentication();
-            if ( authentication == null ||
-                    !  (authentication.getPrincipal() instanceof SpringCompatibleUser)) {
-                // anonymous
-                return null;
-            }
-            SpringCompatibleUser springCompatibleUser =
-                    (SpringCompatibleUser) authentication.getPrincipal();
-            return springCompatibleUser.getVipUser();
-        };
     }
 
     /*
