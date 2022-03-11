@@ -1,8 +1,19 @@
 package fr.insalyon.creatis.vip.application.client.view.launch;
 
+import com.smartgwt.client.widgets.Label;
+import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.CheckboxItem;
 import com.smartgwt.client.widgets.form.fields.FormItem;
+import com.smartgwt.client.widgets.form.fields.SpacerItem;
+import com.smartgwt.client.widgets.form.fields.StaticTextItem;
+import com.smartgwt.client.widgets.layout.HLayout;
+import com.smartgwt.client.widgets.layout.LayoutSpacer;
+import com.smartgwt.client.widgets.layout.VLayout;
 import fr.insalyon.creatis.vip.application.client.bean.boutiquesTools.BoutiquesFlagInput;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Representation of a checkbox input (Flag input type)
@@ -11,6 +22,7 @@ import fr.insalyon.creatis.vip.application.client.bean.boutiquesTools.BoutiquesF
  * @version %I%, %G%
  */
 public class FlagInputLayout extends InputLayout{
+    private String nameText;
     /**
      * Initialises graphical labels and checkbox
      *
@@ -21,6 +33,21 @@ public class FlagInputLayout extends InputLayout{
         super(input, parentLayout);
     }
 
+    @Override
+    protected void configureLayout(Label nameLabel, Label descriptionLabel, boolean createMasterForm) {
+        this.canAddValue = false;
+        this.nameText = nameLabel.getContents();
+        this.createMasterForm();
+        // Description
+        if (descriptionLabel != null){
+            VLayout descriptionLayout = new VLayout();
+            descriptionLayout.setLayoutLeftMargin(20);
+            descriptionLayout.addMember(descriptionLabel);
+            this.addMember(descriptionLayout);
+        }
+        this.addMember(new LayoutSpacer(10,5));
+    }
+
     /**
      * @return FormItem representing a checkbox for this input
      * @see InputLayout#getFormItem()
@@ -29,7 +56,8 @@ public class FlagInputLayout extends InputLayout{
     protected FormItem getFormItem() {
         CheckboxItem inputItem = new CheckboxItem();
         inputItem.setWidth(400);
-        inputItem.setShowTitle(false);
+        inputItem.setShowTitle(true);
+        inputItem.setTitle(this.nameText);
         inputItem.setValue(this.getDefaultValue());
         return inputItem;
     }

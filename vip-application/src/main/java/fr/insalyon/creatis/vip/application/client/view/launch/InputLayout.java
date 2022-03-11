@@ -87,12 +87,20 @@ public abstract class InputLayout extends VLayout {
         }
         nameText += "</b>";
         Label nameLabel = WidgetUtil.getLabel(nameText, 15);
-        this.addMember(nameLabel);
         // Description
         String description = input.getDescription();
+        Label descriptionLabel = null;
         if (description != null && !description.isEmpty()){
-            Label descriptionLabel = WidgetUtil.getLabel(description,15);
+            descriptionLabel = WidgetUtil.getLabel(description,15);
             descriptionLabel.setWidth(400);
+        }
+        this.configureLayout(nameLabel, descriptionLabel, createMasterForm);
+    }
+
+    protected void configureLayout(Label nameLabel, Label descriptionLabel, boolean createMasterForm) {
+        this.addMember(nameLabel);
+        // Description
+        if (descriptionLabel != null){
             this.addMember(descriptionLabel);
         }
         if (createMasterForm) {
@@ -143,7 +151,9 @@ public abstract class InputLayout extends VLayout {
         inputForm.setFields(inputField);
         this.addMember(inputForm);
         // Add/remove value button
-        inputField.addIcon(iconToAdd);
+        if (iconToAdd != null) {
+            inputField.addIcon(iconToAdd);
+        }
         return inputForm;
     }
 
@@ -152,7 +162,7 @@ public abstract class InputLayout extends VLayout {
      * @see #newForm(PickerIcon)
      */
     protected void createMasterForm(){
-        this.masterForm = this.newForm(this.addValueIcon);
+        this.masterForm = this.newForm(this.canAddValue ? this.addValueIcon : null);
     }
 
     /**
