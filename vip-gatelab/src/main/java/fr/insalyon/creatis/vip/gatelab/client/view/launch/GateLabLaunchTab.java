@@ -269,7 +269,7 @@ public class GateLabLaunchTab extends LaunchTab {
             super.createButtons(); // override "load mac button" with "launch button"
             launchFormLayout.showInputs();
             launchFormLayout.enableErrorsAndWarnings();
-            launchFormLayout.loadInputs(launchFormLayout.getSimulationName(), valuesMap);
+            launchFormLayout.loadInputs(launchFormLayout.getSimulationName(), valuesMap, false);
 
             customizeGateForm(valuesMap.get(PARALLELIZATION_TYPE_INPUT_ID));
         }

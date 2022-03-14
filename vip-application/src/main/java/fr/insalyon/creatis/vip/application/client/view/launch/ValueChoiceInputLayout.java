@@ -28,7 +28,7 @@ public class ValueChoiceInputLayout extends InputLayout{
      * @param parentLayout LaunchFormLayout containing this
      */
     public ValueChoiceInputLayout(BoutiquesInput input, LaunchFormLayout parentLayout, Map<String, String> labels) {
-        // must not create the master form it the parent constructor to create and analyse labels first
+        // must not create the master form in the parent constructor to create and analyse labels first
         super(input, parentLayout, false);
         if (labels != null) {
             LaunchFormLayout.assertCondition(input.getPossibleValues().equals(labels.keySet()),
@@ -52,7 +52,11 @@ public class ValueChoiceInputLayout extends InputLayout{
         } else {
             inputField.setValueMap(this.input.getPossibleValues().toArray(new String[]{}));
         }
-        inputField.setValue(this.getDefaultValue());
+        if (this.getDefaultValue() != null) {
+            inputField.setValue(this.getDefaultValue());
+        } else if ( ! this.input.getPossibleValues().isEmpty()){
+            inputField.setValue(this.input.getPossibleValues().iterator().next());
+        }
         return inputField;
     }
 

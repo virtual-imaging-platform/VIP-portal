@@ -807,7 +807,7 @@ public class LaunchFormLayout extends AbstractFormLayout {
      *
      * @param valueMap Map of String representing input IDs to ValueSet representing corresponding values to load
      */
-    private void loadValueMap(final Map<String, ValueSet> valueMap) {
+    private void loadValueMap(final Map<String, ValueSet> valueMap, boolean askConfirmation) {
         // Check if some inputs have non default values that will be overwritten with different values,
         // in order to alert the user
         Set<String> overwrittenInputs = new TreeSet<>();
@@ -843,7 +843,7 @@ public class LaunchFormLayout extends AbstractFormLayout {
             }
         }
         // If some values are to be overwritten, ask user to confirm
-        if (overwrittenInputs.size() == 0) {
+        if (overwrittenInputs.size() == 0 || ! askConfirmation) {
             this.overwriteValues(valueMap);
         } else {
             Set<String> overwrittenNames =  overwrittenInputs.stream()
@@ -875,11 +875,11 @@ public class LaunchFormLayout extends AbstractFormLayout {
      * @param simulationName Execution name to load
      * @param valuesMap      Map of String input IDs to String representation of corresponding input values
      */
-    public void loadInputs( String simulationName, Map<String, String> valuesMap) {
+    public void loadInputs( String simulationName, Map<String, String> valuesMap, boolean askConfirmation) {
         Map<String, ValueSet> valueSetMap = new HashMap<>();
         valueSetMap.put(EXECUTION_NAME_ID, ValueSet.valueSetFactory(simulationName));
         valuesMap.forEach((inputId, valueString) -> valueSetMap.put(inputId, ValueSet.valueSetFactory(valueString)));
-        this.loadValueMap(valueSetMap);
+        this.loadValueMap(valueSetMap, askConfirmation);
     }
 
     /**

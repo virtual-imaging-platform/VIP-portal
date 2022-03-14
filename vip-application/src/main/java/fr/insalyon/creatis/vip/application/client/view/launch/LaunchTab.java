@@ -224,7 +224,7 @@ public class LaunchTab extends Tab {
 
     protected void onLaunchFormReady() {
         if ((simulationName != null) && (inputs != null)) {
-            launchFormLayout.loadInputs(simulationName, inputs);
+            launchFormLayout.loadInputs(simulationName, inputs, true);
         }
     }
 
@@ -320,7 +320,7 @@ public class LaunchTab extends Tab {
      * @param values Input values map
      */
     public void loadInput(String simulationName, Map<String, String> values) {
-        launchFormLayout.loadInputs(simulationName, values);
+        launchFormLayout.loadInputs(simulationName, values, true);
     }
 
     /**
