@@ -41,7 +41,7 @@ import java.util.Date;
 public class CoreConstants implements IsSerializable {
 
 
-    public static final String VERSION = "v2.2-dev";
+    public static final String VERSION = "v2.2";
     // Configuration Labels
     public static final String VO_NAME = "vo.name";
     public static final String VO_ROOT = "vo.root";
