@@ -37,6 +37,7 @@ import fr.insalyon.creatis.vip.api.security.apikey.ApikeyAuthentificationConfigu
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
+import org.springframework.core.annotation.Order;
 import org.springframework.core.env.Environment;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -45,6 +46,18 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.firewall.DefaultHttpFirewall;
+import org.springframework.security.oauth2.client.endpoint.DefaultAuthorizationCodeTokenResponseClient;
+import org.springframework.security.oauth2.client.endpoint.OAuth2AccessTokenResponseClient;
+import org.springframework.security.oauth2.client.endpoint.OAuth2AuthorizationCodeGrantRequest;
+import org.springframework.security.oauth2.client.registration.ClientRegistration;
+import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
+import org.springframework.security.oauth2.client.registration.InMemoryClientRegistrationRepository;
+import org.springframework.security.oauth2.client.web.AuthorizationRequestRepository;
+import org.springframework.security.oauth2.client.web.HttpSessionOAuth2AuthorizationRequestRepository;
+import org.springframework.security.oauth2.core.AuthorizationGrantType;
+import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
+import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest;
+import org.springframework.security.oauth2.core.oidc.IdTokenClaimNames;
 
 import java.util.function.Supplier;
 
@@ -59,56 +72,41 @@ import java.util.function.Supplier;
  * Created by abonnet on 7/22/16.
  */
 @EnableWebSecurity
-public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
+@Order(2)
+public class EgiSecurityConfig extends WebSecurityConfigurerAdapter {
 
-    // authentication done by bean LimitigDaoAuthenticationProvider
-
-    private final ApikeyAuthenticationEntryPoint apikeyAuthenticationEntryPoint;
-
-    private final Environment env;
-
-    @Autowired
-    public SpringSecurityConfig(ApikeyAuthenticationEntryPoint apikeyAuthenticationEntryPoint, Environment env) {
-        this.apikeyAuthenticationEntryPoint = apikeyAuthenticationEntryPoint;
-        this.env = env;
-    }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
             .authorizeRequests()
-                .antMatchers("/rest/platform").permitAll()
-                .antMatchers("/rest/authenticate").permitAll()
-                .antMatchers("/rest/statistics/**").hasAnyRole("ADVANCED", "ADMINISTRATOR")
-                .antMatchers("/rest/**").authenticated()
                 .anyRequest().permitAll()
             .and()
-            .apply(new ApikeyAuthentificationConfigurer<>(
-                    env.getRequiredProperty(CarminProperties.APIKEY_HEADER_NAME),
-                    apikeyAuthenticationEntryPoint))
+                .oauth2Login()
+                .authorizationEndpoint()
+                .baseUri("/oauth2/authorize-client")
+                .authorizationRequestRepository(authorizationRequestRepository())
             .and()
-            .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .tokenEndpoint()
+                .accessTokenResponseClient(accessTokenResponseClient())
             .and()
-            .cors().and()
-            .headers().frameOptions().sameOrigin().and()
-            .csrf().disable();
+                .defaultSuccessUrl("/rest/loginEgi")
+                .failureUrl("/loginFailure")
+            .and()
+                .cors().and()
+                .headers().frameOptions().sameOrigin().and()
+                .csrf().disable();
     }
 
     @Bean
-    public Supplier<User> currentUserProvider() {
-        return () -> {
-            // get VIP user from the spring one
-            Authentication authentication =
-                    SecurityContextHolder.getContext().getAuthentication();
-            if ( authentication == null ||
-                    !  (authentication.getPrincipal() instanceof SpringCompatibleUser)) {
-                // anonymous
-                return null;
-            }
-            SpringCompatibleUser springCompatibleUser =
-                    (SpringCompatibleUser) authentication.getPrincipal();
-            return springCompatibleUser.getVipUser();
-        };
+    public AuthorizationRequestRepository<OAuth2AuthorizationRequest> authorizationRequestRepository() {
+        return new HttpSessionOAuth2AuthorizationRequestRepository();
+    }
+
+    @Bean
+    public OAuth2AccessTokenResponseClient<OAuth2AuthorizationCodeGrantRequest> accessTokenResponseClient() {
+        DefaultAuthorizationCodeTokenResponseClient accessTokenResponseClient = new DefaultAuthorizationCodeTokenResponseClient();
+        return accessTokenResponseClient;
     }
 
     /*

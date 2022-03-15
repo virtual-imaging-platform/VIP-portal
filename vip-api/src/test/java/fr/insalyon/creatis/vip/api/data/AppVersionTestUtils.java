@@ -43,9 +43,9 @@ public class AppVersionTestUtils {
     static final public AppVersion version43;
 
     static {
-        version01 = new AppVersion("application (TOCHANGE)", "0.1", "lfn????", "json-lfn???", true);
-        version42 = new AppVersion("application (TOCHANGE)", "4.2", "lfn????", "json-lfn????", true);
-        version43 = new AppVersion("application (TOCHANGE)", "4.2", "lfn????", "json-lfn????", false);
+        version01 = new AppVersion("application (TOCHANGE)", "0.1", "lfn????", "json-lfn???", true, true);
+        version42 = new AppVersion("application (TOCHANGE)", "4.2", "lfn????", "json-lfn????", true, true);
+        version43 = new AppVersion("application (TOCHANGE)", "4.2", "lfn????", "json-lfn????", false, true);
     }
 
     static public AppVersion getVersion(AppVersion base, Application app) {
@@ -54,7 +54,7 @@ public class AppVersionTestUtils {
                 base.getVersion(),
                 base.getLfn(),
                 base.getJsonLfn(),
-                base.isVisible()
-        );
+                base.isVisible(),
+                base.isBoutiquesForm());
     }
 }

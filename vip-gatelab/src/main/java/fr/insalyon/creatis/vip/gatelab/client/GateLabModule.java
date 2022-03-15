@@ -33,14 +33,19 @@ package fr.insalyon.creatis.vip.gatelab.client;
 
 import com.smartgwt.client.widgets.tab.Tab;
 import fr.insalyon.creatis.vip.application.client.ApplicationModule;
+import fr.insalyon.creatis.vip.application.client.view.launch.LaunchTab;
+import fr.insalyon.creatis.vip.application.client.view.launch.RelaunchService;
 import fr.insalyon.creatis.vip.application.client.view.monitor.MonitorParser;
 import fr.insalyon.creatis.vip.application.client.view.monitor.timeline.TimelineParser;
 import fr.insalyon.creatis.vip.core.client.CoreModule;
 import fr.insalyon.creatis.vip.core.client.Module;
+import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.gatelab.client.view.GateLabTileGrid;
+import fr.insalyon.creatis.vip.gatelab.client.view.launch.GateLabLaunchTab;
 import fr.insalyon.creatis.vip.gatelab.client.view.monitor.GateLabMonitorParser;
 import fr.insalyon.creatis.vip.gatelab.client.view.monitor.GateLabTimelineParser;
 
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -76,6 +81,20 @@ public class GateLabModule extends Module {
         }
         TimelineParser.getInstance().addParser(new GateLabTimelineParser());
         MonitorParser.getInstance().addParser(new GateLabMonitorParser());
+        RelaunchService.getInstance().addApplicationRelauncher(new RelaunchService.ApplicationRelauncher() {
+            @Override
+            public boolean relaunchIfSupported(
+                    String applicationName, String applicationVersion, String applicationClass,
+                    String simulationName, Map<String, String> inputs, String tabId) {
+                if (applicationName.toLowerCase().contains(GateLabConstants.GROUP_GATELAB.toLowerCase())) {
+                    Layout.getInstance().addTab(
+                            tabId,
+                            () -> new GateLabLaunchTab(applicationName, applicationVersion, applicationClass, simulationName, inputs));
+                    return true;
+                }
+                return false;
+            }
+        });
     }
 
     @Override

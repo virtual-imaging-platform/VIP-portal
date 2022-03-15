@@ -37,6 +37,8 @@ import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.fields.PasswordItem;
 import com.smartgwt.client.widgets.tab.Tab;
+import fr.insalyon.creatis.vip.core.client.CoreModule;
+import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationService;
 import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationServiceAsync;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
@@ -45,6 +47,7 @@ import fr.insalyon.creatis.vip.core.client.view.common.AbstractFormLayout;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
 import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
+import fr.insalyon.creatis.vip.core.server.dao.UserDAO;
 
 /**
  *
@@ -56,7 +59,6 @@ public class PasswordLayout extends AbstractFormLayout {
     private PasswordItem newPasswordField;
     private PasswordItem confirmPasswordField;
     private IButton saveButton;
-    private IButton recoverButton;
 
     public PasswordLayout() {
 
@@ -67,6 +69,7 @@ public class PasswordLayout extends AbstractFormLayout {
     }
 
     private void configure() {
+
 
         currentPasswordField = FieldUtil.getPasswordItem(200, 32);
         newPasswordField = FieldUtil.getPasswordItem(200, 32);
@@ -112,21 +115,25 @@ public class PasswordLayout extends AbstractFormLayout {
             }
         });
 
-        saveButton.setWidth(150);
-        recoverButton = WidgetUtil.getIButton("Forgot Password?", CoreConstants.ICON_HELP, new ClickHandler() {
+        saveButton.setWidth(200);
+
+        IButton recoverButton = WidgetUtil.getIButton("Forgot Password ?", CoreConstants.ICON_HELP, new ClickHandler() {
             @Override
             public void onClick(ClickEvent event) {
                 Layout.getInstance().addTab(
-                    CoreConstants.TAB_RECOVERY, RecoveryTab::new);
+                        CoreConstants.TAB_RECOVERY, RecoveryTab::new);
             }
         });
 
-        recoverButton.setWidth(150);
+        recoverButton.setWidth(200);
         currentPasswordField.setTooltip("Note: you may not know your VIP password in case your account was automatically generated. If you need it, you can still recover it using the button below.");
         addField("Current", currentPasswordField);
         addField("New", newPasswordField);
         addField("Re-type new", confirmPasswordField);
         this.addMember(saveButton);
         this.addMember(recoverButton);
+
+        this.addMember(WidgetUtil.getLabel("<font color=\"#666666\"><b>Note</b>: "
+                + "If you are logged in with EGI Check-in, please create a password by clicking on Forgot Password.</font>", 30));
     }
 }
