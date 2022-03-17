@@ -57,6 +57,7 @@ public class EditVersionLayout extends AbstractFormLayout {
     private TextItem lfnField;
     private TextItem jsonLfnField;
     private CheckboxItem isVisibleField;
+    private CheckboxItem isBoutiquesFormField;
     private IButton saveButton;
     private IButton removeButton;
 
@@ -88,6 +89,11 @@ public class EditVersionLayout extends AbstractFormLayout {
         isVisibleField.setWidth(450);
         isVisibleField.setValue(true);
 
+        isBoutiquesFormField = new CheckboxItem();
+        isBoutiquesFormField.setTitle("Use Boutiques Form");
+        isBoutiquesFormField.setWidth(450);
+        isBoutiquesFormField.setValue(true);
+
         saveButton = WidgetUtil.getIButton("Save", CoreConstants.ICON_SAVED,
                 new ClickHandler() {
             @Override
@@ -97,7 +103,7 @@ public class EditVersionLayout extends AbstractFormLayout {
                     if (jsonLfn != null) jsonLfn.trim();
                     save(new AppVersion(applicationName, versionField.getValueAsString().trim(),
                             lfnField.getValueAsString().trim(), jsonLfn,
-                            isVisibleField.getValueAsBoolean()));
+                            isVisibleField.getValueAsBoolean(), isBoutiquesFormField.getValueAsBoolean()));
                 }
             }
         });
@@ -124,6 +130,7 @@ public class EditVersionLayout extends AbstractFormLayout {
         addField("Gwendia LFN", lfnField);
         addField("JSON LFN", jsonLfnField);
         this.addMember(FieldUtil.getForm(isVisibleField));
+        this.addMember(FieldUtil.getForm(isBoutiquesFormField));
         addButtons(saveButton, removeButton);
     }
 
@@ -173,7 +180,7 @@ public class EditVersionLayout extends AbstractFormLayout {
             public void onSuccess(Void result) {
                 WidgetUtil.resetIButton(saveButton, "Save", CoreConstants.ICON_SAVED);
                 WidgetUtil.resetIButton(removeButton, "Remove", CoreConstants.ICON_DELETE);
-                setVersion(null, null, null, true);
+                setVersion(null, null, null, true, true);
                 ManageApplicationsTab tab = (ManageApplicationsTab) Layout.getInstance().
                         getTab(ApplicationConstants.TAB_MANAGE_APPLICATION);
                 tab.loadVersions(applicationName);
@@ -186,7 +193,7 @@ public class EditVersionLayout extends AbstractFormLayout {
      * @param applicationName
      */
     public void setApplication(String applicationName) {
-        setVersion(null, null, null, true);
+        setVersion(null, null, null, true, true);
         this.applicationName = applicationName;
         this.applicationLabel.setContents("<b>Application:</b> " + applicationName);
         this.versionField.setDisabled(false);
@@ -202,7 +209,7 @@ public class EditVersionLayout extends AbstractFormLayout {
      * @param lfn
      * @param isVisible
      */
-    public void setVersion(String version, String lfn, String jsonLfn, boolean isVisible) {
+    public void setVersion(String version, String lfn, String jsonLfn, boolean isVisible, boolean isBoutiquesForm) {
 
         if (version != null) {
             this.versionField.setValue(version);
@@ -210,6 +217,7 @@ public class EditVersionLayout extends AbstractFormLayout {
             this.lfnField.setValue(lfn);
             this.jsonLfnField.setValue(jsonLfn);
             this.isVisibleField.setValue(isVisible);
+            this.isBoutiquesFormField.setValue(isBoutiquesForm);
             this.newVersion = false;
             this.removeButton.setDisabled(false);
 
@@ -220,6 +228,7 @@ public class EditVersionLayout extends AbstractFormLayout {
             this.lfnField.setValue("");
             this.jsonLfnField.setValue("");
             this.isVisibleField.setValue(true);
+            this.isBoutiquesFormField.setValue(true);
             this.newVersion = true;
             this.removeButton.setDisabled(true);
         }

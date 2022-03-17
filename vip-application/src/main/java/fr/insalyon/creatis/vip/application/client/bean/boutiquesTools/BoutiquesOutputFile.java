@@ -29,7 +29,7 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL-B license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.applicationimporter.client.bean;
+package fr.insalyon.creatis.vip.application.client.bean.boutiquesTools;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
 
@@ -37,18 +37,17 @@ import com.google.gwt.user.client.rpc.IsSerializable;
  *
  * @author Tristan Glatard
  */
-public class BoutiquesInput implements IsSerializable {
+public class BoutiquesOutputFile implements IsSerializable {
 
     private String id;
     private String name;
-    private String type;
     private String description;
     private String valueKey;
+    private String pathTemplate;
     private boolean list;
     private boolean optional;
     private String commandLineFlag;
-    private String defaultValue;
-    
+
     public String getId() {
         return id;
     }
@@ -57,16 +56,16 @@ public class BoutiquesInput implements IsSerializable {
         return name;
     }
 
-    public String getType() {
-        return type;
-    }
-
     public String getDescription() {
         return description;
     }
 
     public String getValueKey() {
         return valueKey;
+    }
+
+    public String getPathTemplate() {
+        return pathTemplate;
     }
 
     public boolean isList() {
@@ -81,10 +80,6 @@ public class BoutiquesInput implements IsSerializable {
         return commandLineFlag;
     }
 
-    public String getDefaultValue() {
-        return defaultValue;
-    }
-
     public void setId(String id) {
         this.id = id;
     }
@@ -93,16 +88,16 @@ public class BoutiquesInput implements IsSerializable {
         this.name = name;
     }
 
-    public void setType(String type) {
-        this.type = type;
-    }
-
     public void setDescription(String description) {
         this.description = description;
     }
 
     public void setValueKey(String valueKey) {
         this.valueKey = valueKey;
+    }
+
+    public void setPathTemplate(String pathTemplate) {
+        this.pathTemplate = pathTemplate;
     }
 
     public void setList(boolean list) {
@@ -115,10 +110,6 @@ public class BoutiquesInput implements IsSerializable {
 
     public void setCommandLineFlag(String commandLineFlag) {
         this.commandLineFlag = commandLineFlag;
-    }
-
-    public void setDefaultValue(String defaultValue) {
-        this.defaultValue = defaultValue;
     }
 
 }

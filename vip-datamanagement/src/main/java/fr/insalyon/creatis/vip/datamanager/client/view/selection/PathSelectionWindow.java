@@ -66,12 +66,18 @@ public class PathSelectionWindow extends Window {
     private HLayout bottomLayout;
     private ModalWindow modal;
     private TextItem textItem;
+    private Runnable toRunOnSelection;
     private Menu contextMenu;
     private String name;
-   
+
     public PathSelectionWindow(TextItem textItem) {
+        this(textItem, null);
+    }
+   
+    public PathSelectionWindow(TextItem textItem, Runnable toRunOnSelection) {
 
         this.textItem = textItem;
+        this.toRunOnSelection = toRunOnSelection;
 
         this.setTitle("Path Selection");
         this.setWidth(600);
@@ -93,9 +99,12 @@ public class PathSelectionWindow extends Window {
         this.addItem(grid);
         this.addItem(bottomLayout);
 
-        String path = textItem.getValueAsString().trim();
-        if (path != null && !path.isEmpty() && path.startsWith(DataManagerConstants.ROOT)) {
-            oldPath = path.substring(0, path.lastIndexOf("/"));
+        String path = textItem.getValueAsString();
+        if (path != null) {
+            path = path.trim();
+            if (!path.isEmpty() && path.startsWith(DataManagerConstants.ROOT)) {
+                oldPath = path.substring(0, path.lastIndexOf("/"));
+            }
         }
         BrowserUtil.loadData(modal, grid, toolStrip, oldPath, false);
     }
@@ -116,8 +125,7 @@ public class PathSelectionWindow extends Window {
                             toolStrip.getPath() + "/" + name, false);
                     oldPath = toolStrip.getPath() + "/" + name;
                 } else {
-                    textItem.setValue(toolStrip.getPath() + "/" + name);
-                    destroy();
+                    selectValueAndDestroy(toolStrip.getPath() + "/" + name);
                 }
             }
         });
@@ -145,8 +153,7 @@ public class PathSelectionWindow extends Window {
 
             public void onClick(ClickEvent event) {
                 name = grid.getSelectedRecord().getAttributeAsString("name");
-                textItem.setValue(toolStrip.getPath() + "/" + name);
-                destroy();
+                selectValueAndDestroy(toolStrip.getPath() + "/" + name);
             }
         });
         
@@ -175,10 +182,17 @@ public class PathSelectionWindow extends Window {
         selectItem.addClickHandler(new ClickHandler() {
 
             public void onClick(MenuItemClickEvent event) {
-                textItem.setValue(toolStrip.getPath() + "/" + name);
-                destroy();
+                selectValueAndDestroy(toolStrip.getPath() + "/" + name);
             }
         });
         contextMenu.setItems(selectItem);
+    }
+
+    private void selectValueAndDestroy(String value) {
+        textItem.setValue(value);
+        if (toRunOnSelection != null) {
+            toRunOnSelection.run();
+        }
+        destroy();
     }
 }

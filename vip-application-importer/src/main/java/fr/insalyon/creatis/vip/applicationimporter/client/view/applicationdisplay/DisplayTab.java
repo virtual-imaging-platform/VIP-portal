@@ -31,22 +31,23 @@
  */
 package fr.insalyon.creatis.vip.applicationimporter.client.view.applicationdisplay;
 
-import com.google.gwt.json.client.*;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.smartgwt.client.widgets.*;
-import com.smartgwt.client.widgets.events.*;
-import com.smartgwt.client.widgets.layout.*;
+import com.smartgwt.client.widgets.Canvas;
+import com.smartgwt.client.widgets.IButton;
+import com.smartgwt.client.widgets.events.ClickEvent;
+import com.smartgwt.client.widgets.events.ClickHandler;
+import com.smartgwt.client.widgets.layout.HLayout;
+import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.tab.Tab;
-import fr.insalyon.creatis.vip.applicationimporter.client.*;
-import fr.insalyon.creatis.vip.applicationimporter.client.bean.BoutiquesTool;
+import fr.insalyon.creatis.vip.application.client.bean.boutiquesTools.BoutiquesApplication;
+import fr.insalyon.creatis.vip.application.client.view.boutiquesParsing.BoutiquesParser;
+import fr.insalyon.creatis.vip.application.client.view.boutiquesParsing.InvalidBoutiquesDescriptorException;
+import fr.insalyon.creatis.vip.applicationimporter.client.ApplicationImporterException;
 import fr.insalyon.creatis.vip.applicationimporter.client.rpc.ApplicationImporterService;
 import fr.insalyon.creatis.vip.applicationimporter.client.view.Constants;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
-
-import java.util.HashMap;
-import java.util.logging.*;
 
 public class DisplayTab extends Tab {
 
@@ -57,7 +58,7 @@ public class DisplayTab extends Tab {
     private OutputLayout outputsLayout;
     private VIPLayout vipLayout;
     private final ModalWindow modal;
-    private BoutiquesTool boutiquesTool;
+    private BoutiquesApplication boutiquesTool;
 
     public DisplayTab(String tabIcon, String tabId, String tabName) {
         this.setTitle(Canvas.imgHTML(tabIcon) + " " + tabName.trim());
@@ -65,7 +66,6 @@ public class DisplayTab extends Tab {
         this.setCanClose(true);
         this.setAttribute("paneMargin", 0);
         configure();
-        boutiquesTool = new BoutiquesTool();
         modal = new ModalWindow(globalLayout);
         this.setPane(globalLayout);
     }
@@ -113,19 +113,25 @@ public class DisplayTab extends Tab {
         globalLayout.addMember(createApplicationButton);
     }
 
-    public static BoutiquesTool parseJSON(JSONObject jsonObject)
+    public static BoutiquesApplication parseJSON(String jsonDescriptor)
         throws ApplicationImporterException {
 
-        BoutiquesTool boutiquesTool = JSONUtil.parseBoutiquesTool(jsonObject);
-        verifyBoutiquesTool(boutiquesTool);
-        return boutiquesTool;
+        BoutiquesApplication boutiquesApplication = null;
+        try {
+            boutiquesApplication = new BoutiquesParser().parseApplication(jsonDescriptor);
+            verifyBoutiquesTool(boutiquesApplication);
+        } catch (InvalidBoutiquesDescriptorException exception) {
+            throw new ApplicationImporterException(exception.getMessage(), exception);
+        }
+        return boutiquesApplication;
     }
 
     /**
      * Populates the class with instance variables containing values in the JSON
      * object, and refreshes the display.
+     * @param boutiquesTool BoutiquesApplication
      */
-    public void setBoutiqueTool(BoutiquesTool boutiquesTool) {
+    public void setBoutiqueTool(BoutiquesApplication boutiquesTool) {
         this.boutiquesTool = boutiquesTool;
         this.setTitle(boutiquesTool.getName());
         generalLayout.setTool(boutiquesTool);
@@ -133,7 +139,7 @@ public class DisplayTab extends Tab {
         outputsLayout.setOutputFiles(boutiquesTool.getOutputFiles());
     }
 
-    private static void verifyBoutiquesTool(BoutiquesTool boutiquesTool)
+    private static void verifyBoutiquesTool(BoutiquesApplication boutiquesTool)
         throws ApplicationImporterException {
 
         if (boutiquesTool.getName() == null) {

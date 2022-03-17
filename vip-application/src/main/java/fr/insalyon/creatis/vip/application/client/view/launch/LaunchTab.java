@@ -32,141 +32,210 @@
 package fr.insalyon.creatis.vip.application.client.view.launch;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.smartgwt.client.util.SC;
+import com.smartgwt.client.widgets.Canvas;
+import com.smartgwt.client.widgets.IButton;
+import com.smartgwt.client.widgets.layout.HLayout;
+import com.smartgwt.client.widgets.tab.Tab;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
+import fr.insalyon.creatis.vip.application.client.bean.AppVersion;
 import fr.insalyon.creatis.vip.application.client.bean.Descriptor;
-import fr.insalyon.creatis.vip.application.client.bean.Source;
+import fr.insalyon.creatis.vip.application.client.bean.SimulationInput;
+import fr.insalyon.creatis.vip.application.client.bean.boutiquesTools.BoutiquesApplication;
+import fr.insalyon.creatis.vip.application.client.bean.boutiquesTools.BoutiquesApplicationExtensions;
+import fr.insalyon.creatis.vip.application.client.rpc.ApplicationService;
 import fr.insalyon.creatis.vip.application.client.rpc.WorkflowService;
 import fr.insalyon.creatis.vip.application.client.rpc.WorkflowServiceAsync;
-import fr.insalyon.creatis.vip.application.client.view.common.AbstractLaunchTab;
+import fr.insalyon.creatis.vip.application.client.view.boutiquesParsing.BoutiquesParser;
+import fr.insalyon.creatis.vip.application.client.view.boutiquesParsing.InvalidBoutiquesDescriptorException;
 import fr.insalyon.creatis.vip.application.client.view.monitor.timeline.TimelineLayout;
 import fr.insalyon.creatis.vip.core.client.CoreModule;
+import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
+import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
 import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+
+import java.util.*;
 
 /**
  *
- * @author Rafael Ferreira da Silva, Tristan Glatard
+ * @author Rafael Ferreira da Silva
  */
-public class LaunchTab extends AbstractLaunchTab {
+public class LaunchTab extends Tab {
 
-    private ArrayList<String> disabledSources;
-    
+    protected String applicationName;
+    protected String applicationVersion;
+    protected String applicationClass;
+    protected String simulationName;
+    protected Map<String, String> inputs;
+
+    protected Boolean mustBeABoutiquesDescriptor = false;
+    protected Boolean showExamples = true;
+    protected boolean showSeparators = true;
+
+    protected HLayout layout;
+    protected LaunchFormLayout launchFormLayout;
+    protected InputsLayout inputsLayout;
+    protected ModalWindow modal;
+    protected IButton launchButton;
+    protected IButton saveInputsButton;
+    protected IButton saveAsExampleButton;
+
+
     public LaunchTab(String applicationName, String applicationVersion, String applicationClass) {
-        this(applicationName, applicationVersion, applicationClass, null, null, null);
+        this(applicationName, applicationVersion, applicationClass, null, null);
     }
 
-    public LaunchTab(String applicationName, String applicationVersion,
-            String applicationClass, String simulationName, Map<String, String> inputs) {
+    public LaunchTab(
+            String applicationName, String applicationVersion, String applicationClass,
+            String simulationName, Map<String, String> inputs) {
 
-        this(applicationName, applicationVersion, applicationClass, 
-                simulationName, inputs, null);
-    }
+        this.applicationName = applicationName;
+        this.applicationVersion = applicationVersion;
+        this.applicationClass = applicationClass;
+        this.simulationName = simulationName;
+        this.inputs = inputs;
 
-    public LaunchTab(String applicationName, String applicationVersion,
-            String applicationClass, String simulationName, 
-            Map<String, String> inputs, String[] disabled) {
+        this.setTitle(Canvas.imgHTML(ApplicationConstants.ICON_APPLICATION) + " "
+                + applicationName + " " + applicationVersion);
+        this.setCanClose(true);
+        this.setAttribute("paneMargin", 0);
+        this.setID(ApplicationConstants.getLaunchTabID(applicationName));
 
-        super(applicationName, applicationVersion, applicationClass);
-        layout.clear();
-        disabledSources = new ArrayList<String>();
-        if (disabled != null) {
-            disabledSources.addAll(Arrays.asList(disabled));
-        }
-        loadData(simulationName, inputs);
+        layout = new HLayout(10);
+        layout.setWidth100();
+        layout.setHeight100();
+        layout.setMargin(5);
+
+        modal = new ModalWindow(layout);
+
+        this.configureButtons();
+        this.setPane(layout);
+
+        this.init();
+        this.loadDescriptor();
     }
 
     public boolean hasID() {
         return this.getAttributeAsString("ID") != null;
     }
 
-    /**
-     * Loads simulation sources list.
-     */
-    private void loadData(final String simulationName, final Map<String, String> inputs) {
+    protected void init() {}
 
+    protected void loadDescriptor() {
+        modal.show("Loading launch panel...", true);
+        ApplicationService.Util.getInstance().getVersion(applicationName, applicationVersion, new AsyncCallback<AppVersion>() {
+            @Override
+            public void onFailure(Throwable caught) {
+                modal.hide();
+                Layout.getInstance().setWarningMessage("Unable to download application info:<br />"
+                        + caught.getMessage(), 10);
+            }
+
+            @Override
+            public void onSuccess(AppVersion appVersion) {
+                if (mustBeABoutiquesDescriptor && ! appVersion.isBoutiquesForm()) {
+                    modal.hide();
+                    Layout.getInstance().setWarningMessage("This application does not have the right format:<br />", 10);
+                } else if (appVersion.isBoutiquesForm()) {
+                    loadBoutiquesDescriptor();
+                } else {
+                    loadGwendiaDescriptor();
+                }
+
+            }
+        });
+    }
+
+    /**
+     * Loads simulation descriptor content as String.
+     */
+    protected void loadBoutiquesDescriptor() {
+        final AsyncCallback<String> callback = new AsyncCallback<String>() {
+            @Override
+            public void onFailure(Throwable caught) {
+                modal.hide();
+                Layout.getInstance().setWarningMessage("Unable to download application descriptor:<br />"
+                        + caught.getMessage(), 10);
+            }
+
+            @Override
+            public void onSuccess(String boutiquesDescriptorString) {
+                try {
+                    BoutiquesApplication applicationTool = new BoutiquesParser().parseApplication(boutiquesDescriptorString);
+                    addExtensionAndCreateForm(applicationTool, true, () -> createForm(applicationTool));
+                } catch (InvalidBoutiquesDescriptorException exception) {
+                    Layout.getInstance().setWarningMessage("Unable to parse application descriptor:<br />"
+                            + exception.getMessage(), 10);
+                }
+            }
+        };
+        WorkflowService.Util.getInstance().getApplicationDescriptorString(applicationName, applicationVersion,
+                callback);
+    }
+
+    protected void loadGwendiaDescriptor() {
         final AsyncCallback<Descriptor> callback = new AsyncCallback<Descriptor>() {
             @Override
             public void onFailure(Throwable caught) {
                 modal.hide();
-                Layout.getInstance().setWarningMessage("Unable to download application source file:<br />" + caught.getMessage(), 10);
+                Layout.getInstance().setWarningMessage("Unable to download application descriptor:<br />"
+                        + caught.getMessage(), 10);
             }
 
             @Override
-            public void onSuccess(Descriptor descriptor) {
-                launchFormLayout = new LaunchFormLayout(applicationName + " " + applicationVersion, null, descriptor.getDescription(), true);
-                layout.addMember(launchFormLayout);
-                
-                // Put mandatory sources first
-                List<Source> mandatorySources = new ArrayList<Source>();
-                List<Source> optionalSources = new ArrayList<Source>();
-                for (Source source : descriptor.getSources()) {
-                    if (source.isOptional()) {
-                        optionalSources.add(source);
-                    } else {
-                        mandatorySources.add(source);
-                    }
-                }
-                mandatorySources.addAll(optionalSources);
-                                                
-                for (Source source : mandatorySources) {
-                    boolean disabled = false;
-                    for (String name : disabledSources) {
-                        if (source.getName().equals(name)) {
-                            disabled = true;
-                        }
-                    }
-                    modal.show("Adding source "+source.getName()+"...", true);
-                    
-                    // If the source type is a flag type (one of the boutiques types), InputFlagLayout creation instead of InputLayout.
-                    if (source.getVipTypeRestriction() != null && source.getVipTypeRestriction().equals("flag")) {
-                        launchFormLayout.addSource(new InputFlagLayout(source.getName(), source.getDescription(), source.isOptional(), source.getDefaultValue(), source.getVipTypeRestriction(), source.getPrettyName()), disabled);
-                    }
-                    else {
-                        launchFormLayout.addSource(new InputLayout(source.getName(), source.getDescription(), source.isOptional(), source.getDefaultValue(), source.getPrettyName()), disabled);
-                    }
-                }
-
-                configureLaunchButton();
-                configureSaveInputsButton();
-
-                if (CoreModule.user.isSystemAdministrator() || CoreModule.user.isGroupAdmin()) {
-                    configureSaveAsExampleButton();
-                    launchFormLayout.addButtons(launchButton, saveInputsButton,
-                            saveAsExampleButton);
-                } else {
-                    launchFormLayout.addButtons(launchButton, saveInputsButton);
-                }
-
-                launchFormLayout.configureCitation(applicationName);
-
-                modal.hide();
-
-                configureInputsLayout(true);
-                
-                if (simulationName != null) {
-                    launchFormLayout.loadInputs(simulationName, inputs);
-                }
+            public void onSuccess(Descriptor gwendiaDescriptor) {
+                BoutiquesApplication applicationTool = new DescriptorParser().descriptorToBoutiquesApplication(gwendiaDescriptor, applicationName, applicationVersion);
+                addExtensionAndCreateForm(applicationTool, false, () -> createForm(applicationTool));
             }
         };
-        modal.show("Loading launch panel...", true);
         WorkflowService.Util.getInstance().getApplicationDescriptor(applicationName, applicationVersion, callback);
+    }
+
+    protected void addExtensionAndCreateForm(
+            BoutiquesApplication applicationTool, Boolean addResultsDirectoryInput, Runnable launchFormCreator) {
+        applicationTool.setBoutiquesExtensions(new BoutiquesApplicationExtensions(addResultsDirectoryInput));
+        launchFormCreator.run();
+    }
+
+    protected void createForm(BoutiquesApplication applicationTool) {
+        launchFormLayout = new LaunchFormLayout(applicationTool, showSeparators);
+        this.createButtons();
+        onLaunchFormCreated();
+        layout.addMember(launchFormLayout);
+        launchFormLayout.configureCitation(applicationName);
+        modal.hide();
+        configureInputsLayout(this.showExamples);
+        onLaunchFormReady();
+    }
+
+    protected void createButtons() {
+        if (this.showExamples &&
+                (CoreModule.user.isSystemAdministrator() || CoreModule.user.isGroupAdmin()) ) {
+            launchFormLayout.setButtons(launchButton, saveInputsButton,
+                    saveAsExampleButton);
+        } else {
+            launchFormLayout.setButtons(launchButton, saveInputsButton, null);
+        }
+    }
+
+    protected void onLaunchFormCreated() {}
+
+    protected void onLaunchFormReady() {
+        if ((simulationName != null) && (inputs != null)) {
+            launchFormLayout.loadInputs(simulationName, inputs, true);
+        }
     }
 
     /**
      * Launches a simulation.
      */
-    @Override
-    protected void launch() {
-
+    private void launch() {
         WidgetUtil.setLoadingIButton(launchButton, "Launching...");
-        
+
         // Input data verification
-        List<String> inputData = new ArrayList<String>();
+        List<String> inputData = new ArrayList<>();
         for (String input : getParametersMap().values()) {
             if (input.startsWith(DataManagerConstants.ROOT)) {
                 if (input.contains(ApplicationConstants.SEPARATOR_LIST)) {
@@ -200,7 +269,6 @@ public class LaunchTab extends AbstractLaunchTab {
      * Submits a simulation to the workflow engine.
      */
     private void submit() {
-
         final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
             @Override
             public void onFailure(Throwable caught) {
@@ -216,7 +284,239 @@ public class LaunchTab extends AbstractLaunchTab {
             }
         };
         WorkflowService.Util.getInstance().launchSimulation(getParametersMap(),
-                applicationName, applicationVersion, applicationClass, 
+                applicationName, applicationVersion, applicationClass,
                 getSimulationName(), callback);
+    }
+
+    /**
+     *
+     */
+    public void loadInputsList() {
+
+        inputsLayout.loadData();
+    }
+
+    /**
+     * Loads input values from string.
+     *
+     * @param simulationName Simulation name
+     * @param values Input values
+     */
+    public void loadInput(String simulationName, String values) {
+
+        Map<String, String> valuesMap = new HashMap<>();
+
+        for (String input : values.split("<br />")) {
+            String[] s = input.split(" = ");
+            valuesMap.put(s[0], s[1] != null ? s[1] : "");
+        }
+        loadInput(simulationName, valuesMap);
+    }
+
+    /**
+     * Loads input values from map.
+     *
+     * @param simulationName Simulation name
+     * @param values Input values map
+     */
+    public void loadInput(String simulationName, Map<String, String> values) {
+        launchFormLayout.loadInputs(simulationName, values, true);
+    }
+
+    /**
+     *
+     */
+    protected void configureInputsLayout(boolean showExamples) {
+
+        inputsLayout = new InputsLayout(getAttribute("ID"), applicationName, showExamples);
+        layout.addMember(inputsLayout);
+    }
+
+    /**
+     *
+     * @return Map of String input IDs to String representing corresponding input values
+     */
+    protected Map<String, String> getParametersMap() {
+
+        return launchFormLayout.getParametersMap();
+    }
+
+    /**
+     * Configures the buttons
+     */
+    protected void configureButtons() {
+
+        launchButton = WidgetUtil.getIButton("Launch", ApplicationConstants.ICON_LAUNCH,
+                event -> {
+                    if (validate()) {
+                        launch();
+                    } else {
+                        Layout.getInstance().setWarningMessage("Cannot launch. Some inputs are not valid.");
+                    }
+                });
+
+        saveInputsButton = WidgetUtil.getIButton("Save Inputs", CoreConstants.ICON_SAVED,
+                event -> {
+                    if (validate()) {
+                        saveInputs();
+                    } else {
+                        Layout.getInstance().setWarningMessage("Cannot save inputs. Some inputs are not valid.");
+                    }
+                });
+
+        saveAsExampleButton = WidgetUtil.getIButton("Save as Example", CoreConstants.ICON_EXAMPLE,
+                event -> {
+                    if (validate()) {
+                        saveInputsAsExample();
+                    }
+                });
+        saveAsExampleButton.setPrompt("Save the inputs as a featured example that will "
+                + "be available for all users.");
+        saveAsExampleButton.setWidth(120);
+    }
+    
+    /**
+     * Resets the launch button to its initial state.
+     */
+    protected void resetLaunchButton() {
+        WidgetUtil.resetIButton(launchButton, "Launch", ApplicationConstants.ICON_LAUNCH);
+        this.launchFormLayout.updateErrorMessages();
+    }
+
+    /**
+     * Resets the save inputs button to its initial state.
+     */
+    protected void resetSaveInputsButton() {
+
+        WidgetUtil.resetIButton(saveInputsButton, "Save Inputs", CoreConstants.ICON_SAVED);
+        this.launchFormLayout.updateErrorMessages();
+    }
+
+    /**
+     * Resets the save as example button to its initial state.
+     */
+    protected void resetSaveAsExampleButton() {
+        WidgetUtil.resetIButton(saveAsExampleButton, "Save as Example", CoreConstants.ICON_EXAMPLE);
+        this.launchFormLayout.updateErrorMessages();
+    }
+
+    /**
+     * Gets the name of the simulation.
+     *
+     * @return String
+     */
+    protected String getSimulationName() {
+        return launchFormLayout.getSimulationName();
+    }
+
+    /**
+     * Validates the form before launch a simulation.
+     *
+     * @return Result of the validation
+     */
+    protected boolean validate() {
+        return launchFormLayout.validate();
+    }
+
+    /**
+     * Verifies if the simulation name already exists and save the inputs.
+     */
+    private void saveInputs() {
+
+        WidgetUtil.setLoadingIButton(saveInputsButton, "Saving...");
+        WorkflowServiceAsync service = WorkflowService.Util.getInstance();
+        final AsyncCallback<SimulationInput> callback = new AsyncCallback<SimulationInput>() {
+            @Override
+            public void onFailure(Throwable caught) {
+                if (!caught.getMessage().contains("No data is available")
+                        && !caught.getMessage().contains("empty result set")) {
+                    resetSaveInputsButton();
+                    Layout.getInstance().setWarningMessage("Unable to verify execution name:<br />" + caught.getMessage(), 10);
+                } else {
+                    saveInputs(false);
+                }
+            }
+
+            @Override
+            public void onSuccess(SimulationInput result) {
+                SC.ask("A simulation entitled \"" + getSimulationName() + "\" "
+                        + "already exists. <br />Do you want to overwrite the input data?", value -> {
+                            if (value) {
+                                saveInputs(true);
+                            } else {
+                                resetSaveInputsButton();
+                            }
+                        });
+            }
+        };
+        service.getInputByNameUserApp(getSimulationName(), applicationName, callback);
+    }
+
+    private void saveInputs(boolean update) {
+
+        WorkflowServiceAsync service = WorkflowService.Util.getInstance();
+        final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
+            @Override
+            public void onFailure(Throwable caught) {
+                resetSaveInputsButton();
+                Layout.getInstance().setWarningMessage("Unable to save simulation inputs:<br />" + caught.getMessage(), 10);
+            }
+
+            @Override
+            public void onSuccess(Void result) {
+                LaunchTab launchTab = (LaunchTab) Layout.getInstance().
+                        getTab(ApplicationConstants.getLaunchTabID(applicationName));
+                launchTab.loadInputsList();
+                resetSaveInputsButton();
+                Layout.getInstance().setNoticeMessage("Input values were successfully saved!", 10);
+            }
+        };
+        if (update) {
+            service.updateSimulationInput(getSimulationInput(), callback);
+        } else {
+            service.addSimulationInput(getSimulationInput(), callback);
+        }
+    }
+
+    private void saveInputsAsExample() {
+
+        WidgetUtil.setLoadingIButton(saveAsExampleButton, "Saving...");
+        WorkflowServiceAsync service = WorkflowService.Util.getInstance();
+        final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
+            @Override
+            public void onFailure(Throwable caught) {
+                resetSaveAsExampleButton();
+                Layout.getInstance().setWarningMessage("Unable to save example inputs:<br />" + caught.getMessage(), 10);
+            }
+
+            @Override
+            public void onSuccess(Void result) {
+                LaunchTab launchTab = (LaunchTab) Layout.getInstance().
+                        getTab(ApplicationConstants.getLaunchTabID(applicationName));
+                launchTab.loadInputsList();
+                resetSaveAsExampleButton();
+                Layout.getInstance().setNoticeMessage("Examples input values were successfully saved!", 10);
+            }
+        };
+        service.saveInputsAsExamples(getSimulationInput(), callback);
+    }
+
+    private SimulationInput getSimulationInput() {
+
+        StringBuilder sb = new StringBuilder();
+        for (String k : getParametersMap().keySet()) {
+            sb.append(k);
+            sb.append("=");
+            String value = getParametersMap().get(k);
+            if (value == null) {
+                value = "";
+            } else if (value.contains("null")) {
+                value = value.replaceAll("null", "");
+            }
+            sb.append(value);
+            sb.append("--");
+        }
+
+        return new SimulationInput(applicationName, getSimulationName(), sb.toString());
     }
 }
