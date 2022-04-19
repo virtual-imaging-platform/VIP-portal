@@ -36,6 +36,7 @@ import com.google.gwt.user.client.Cookies;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.HorizontalPanel;
+import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.ImageStyle;
@@ -88,16 +89,42 @@ public class SignInTab extends Tab {
     private PasswordItem passwordField;
     private CheckboxItem remembermeField;
     private IButton signinButton;
+    private IButton createAnAccountButton;
+    private IButton egiButton;
 
     public SignInTab() {
 
         this.setID(CoreConstants.TAB_SIGNIN);
         this.setTitle("Sign In");
 
+        IButton checkInButton = WidgetUtil.getIButton("Connection with EGI Check-in", CoreConstants.EGI_CHECK_IN_LOGO, new ClickHandler() {
+            @Override
+            public void onClick(ClickEvent event) {
+                Window.Location.assign("/oauth2/authorize-client/egi");
+            }
+        });
+
+        egiButton = new IButton("Connection with EGI Check-in");
+        egiButton.addClickHandler(new ClickHandler() {
+            @Override
+            public void onClick(ClickEvent event) {
+                Window.Location.assign("/oauth2/authorize-client/egi");
+            }
+        });
+
+        egiButton.setWidth(180);
+
+        Img starImg1 = new Img(CoreConstants.EGI_CHECK_IN_LOGO, 50, 70);
+        starImg1.setImageWidth(50);
+        starImg1.setImageHeight(50);
+        starImg1.setImageType(ImageStyle.CENTER);
+
+        checkInButton.setWidth(180);
+
         VLayout loginVLayout = new VLayout(15);
         loginVLayout.setWidth100();
         loginVLayout.setHeight100();
-        loginVLayout.setLayoutTopMargin(5);
+        loginVLayout.setLayoutTopMargin(1);
         loginVLayout.setOverflow(Overflow.AUTO);
         loginVLayout.setAlign(Alignment.CENTER);
         loginVLayout.setDefaultLayoutAlign(Alignment.CENTER);
@@ -111,16 +138,23 @@ public class SignInTab extends Tab {
         hautLayout.setAlign(Alignment.CENTER);
         hautLayout.setDefaultLayoutAlign(Alignment.CENTER);
 
-        HLayout middleLayout = new HLayout(15);
+        VLayout middleLayout = new VLayout(5);
         middleLayout.setWidth100();
-        middleLayout.setHeight(250);
+        middleLayout.setHeight(360);
         middleLayout.setOverflow(Overflow.AUTO);
         middleLayout.setAlign(Alignment.CENTER);
         middleLayout.setDefaultLayoutAlign(Alignment.CENTER);
 
-        HorizontalPanel middlePanel = new HorizontalPanel();
+        VerticalPanel middlePanel = new VerticalPanel();
+        middlePanel.setSize("10%", "5%");
         middlePanel.setVerticalAlignment(VerticalPanel.ALIGN_MIDDLE);
         middlePanel.setHorizontalAlignment(HorizontalPanel.ALIGN_CENTER);
+
+        HorizontalPanel egiPanel = new HorizontalPanel();
+        egiPanel.setSpacing(5);
+        egiPanel.setSize("10%", "5%");
+        egiPanel.setVerticalAlignment(VerticalPanel.ALIGN_MIDDLE);
+        egiPanel.setHorizontalAlignment(HorizontalPanel.ALIGN_CENTER);
 
         VLayout basLayout = new VLayout(15);
         basLayout.setWidth100();
@@ -138,8 +172,10 @@ public class SignInTab extends Tab {
         hautLayout.addMember(infoContactlayout);
         loginVLayout.addMember(hautLayout);
         middlePanel.add(signinLayout);
-        middlePanel.add(newForm);
+        egiPanel.add(starImg1);
+        egiPanel.add(egiButton);
         middleLayout.addMember(middlePanel);
+        middleLayout.addMember(egiPanel);
         loginVLayout.addMember(middleLayout);
         basLayout.addMember(infoContactlayout);
         basLayout.addMember(infoToolLayout);
@@ -191,11 +227,40 @@ public class SignInTab extends Tab {
             }
         });
 
-        signinLayout = WidgetUtil.getVIPLayout(250, 150);
+        LinkItem recoverAccount = FieldUtil.getLinkItem("link_reset", "Forgot your password?",
+                new com.smartgwt.client.widgets.form.fields.events.ClickHandler() {
+                    @Override
+                    public void onClick(com.smartgwt.client.widgets.form.fields.events.ClickEvent event) {
+                        Layout.getInstance().addTab(
+                                CoreConstants.TAB_RECOVERY, RecoveryTab::new);
+                    }
+                });
+
+        createAnAccountButton = new IButton("Create an account");
+        createAnAccountButton.addClickHandler(new ClickHandler() {
+            @Override
+            public void onClick(ClickEvent event) {
+                Layout.getInstance().addTab(
+                        CoreConstants.TAB_SIGNUP, SignUpTab::new);
+            }
+        });
+
+        HorizontalPanel siginPanel = new HorizontalPanel();
+        siginPanel.setSpacing(10);
+        siginPanel.setSize("10%", "10%");
+        siginPanel.setVerticalAlignment(VerticalPanel.ALIGN_MIDDLE);
+        siginPanel.setHorizontalAlignment(HorizontalPanel.ALIGN_CENTER);
+
+        newForm = FieldUtil.getForm(recoverAccount);
+
+        signinLayout = WidgetUtil.getVIPLayout(250, 110);
         WidgetUtil.addFieldToVIPLayout(signinLayout, "Email", emailField);
         WidgetUtil.addFieldToVIPLayout(signinLayout, "Password", passwordField);
+        signinLayout.addMember(newForm);
         signinLayout.addMember(FieldUtil.getForm(remembermeField));
-        signinLayout.addMember(signinButton);
+        siginPanel.add(signinButton);
+        siginPanel.add(createAnAccountButton);
+        signinLayout.addMember(siginPanel);
     }
 
     private void configureNewForm() {
@@ -217,18 +282,6 @@ public class SignInTab extends Tab {
                     CoreConstants.TAB_RECOVERY, RecoveryTab::new);
             }
         });
-
-        LinkItem egiAccount = FieldUtil.getLinkItem("link_redirection", "Connection with EGI Check-in.",
-                new com.smartgwt.client.widgets.form.fields.events.ClickHandler() {
-                    public void onClick(com.smartgwt.client.widgets.form.fields.events.ClickEvent event) {
-                        Window.Location.assign("/oauth2/authorize-client/egi");
-                    }
-                });
-
-        newForm = FieldUtil.getForm(egiAccount, createAccount, recoverAccount);
-        newForm.setWidth(230);
-        newForm.setHeight(60);
-        newForm.setNumCols(1);
     }
 
     private void signin() {
