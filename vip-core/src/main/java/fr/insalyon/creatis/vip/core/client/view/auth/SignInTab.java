@@ -97,13 +97,6 @@ public class SignInTab extends Tab {
         this.setID(CoreConstants.TAB_SIGNIN);
         this.setTitle("Sign In");
 
-        IButton checkInButton = WidgetUtil.getIButton("Connection with EGI Check-in", CoreConstants.EGI_CHECK_IN_LOGO, new ClickHandler() {
-            @Override
-            public void onClick(ClickEvent event) {
-                Window.Location.assign("/oauth2/authorize-client/egi");
-            }
-        });
-
         egiButton = new IButton("Connection with EGI Check-in");
         egiButton.addClickHandler(new ClickHandler() {
             @Override
@@ -118,8 +111,6 @@ public class SignInTab extends Tab {
         starImg1.setImageWidth(50);
         starImg1.setImageHeight(50);
         starImg1.setImageType(ImageStyle.CENTER);
-
-        checkInButton.setWidth(180);
 
         VLayout loginVLayout = new VLayout(15);
         loginVLayout.setWidth100();
