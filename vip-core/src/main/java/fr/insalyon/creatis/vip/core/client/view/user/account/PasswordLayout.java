@@ -59,6 +59,7 @@ public class PasswordLayout extends AbstractFormLayout {
     private PasswordItem newPasswordField;
     private PasswordItem confirmPasswordField;
     private IButton saveButton;
+    private User user;
 
     public PasswordLayout() {
 
@@ -131,7 +132,8 @@ public class PasswordLayout extends AbstractFormLayout {
         addField("New", newPasswordField);
         addField("Re-type new", confirmPasswordField);
         this.addMember(saveButton);
-        this.addMember(recoverButton);
+        if (CoreModule.user.getPassword() == null){
+        this.addMember(recoverButton);}
 
         this.addMember(WidgetUtil.getLabel("<font color=\"#666666\"><b>Note</b>: "
                 + "If you are logged in with EGI Check-in, please create a password by clicking on Forgot Password.</font>", 30));
