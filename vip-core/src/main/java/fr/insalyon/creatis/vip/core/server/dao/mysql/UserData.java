@@ -138,9 +138,7 @@ public class UserData extends JdbcDaoSupport implements UserDAO {
                 String pass = rs.getString("pass");
                 boolean locked = rs.getBoolean("account_locked");
                 ps.close();
-                if (!locked && pass.equals(password)) {
-                    return true;
-                }
+                return !locked && pass != null && pass.equals(password);
             }
             return false;
 
@@ -202,7 +200,7 @@ public class UserData extends JdbcDaoSupport implements UserDAO {
 
         try {
             PreparedStatement ps = getConnection().prepareStatement("SELECT "
-                    + "email, next_email, first_name, last_name, institution, phone, "
+                    + "email, next_email, pass, first_name, last_name, institution, phone, "
                     + "code, confirmed, folder, session, registration, "
                     + "last_login, level, country_code, max_simulations,termsUse,lastUpdatePublications,failed_authentications,account_locked "
                     + "FROM VIPUsers "
@@ -216,7 +214,8 @@ public class UserData extends JdbcDaoSupport implements UserDAO {
                         rs.getString("first_name"), rs.getString("last_name"),
                         rs.getString("email"), rs.getString("next_email"),
                         rs.getString("institution"),
-                        "", rs.getString("phone"), rs.getBoolean("confirmed"),
+                        rs.getString("pass") == null ? null : "",
+                        rs.getString("phone"), rs.getBoolean("confirmed"),
                         rs.getString("code"), rs.getString("folder"),
                         rs.getString("session"),
                         new Date(rs.getTimestamp("registration").getTime()),
