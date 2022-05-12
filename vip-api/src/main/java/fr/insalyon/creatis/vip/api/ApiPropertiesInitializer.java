@@ -52,6 +52,8 @@ import java.io.IOException;
 import java.util.Optional;
 
 import static fr.insalyon.creatis.vip.api.CarminProperties.*;
+import static fr.insalyon.creatis.vip.api.KeycloakProperties.*;
+import static fr.insalyon.creatis.vip.api.ShanoirProperties.*;
 import static org.springframework.core.io.ResourceLoader.CLASSPATH_URL_PREFIX;
 
 /**
@@ -97,6 +99,12 @@ public class ApiPropertiesInitializer {
         verifyPropertyNotNull(API_DOWNLOAD_RETRY_IN_SECONDS, Integer.class);
         verifyPropertyNotNull(API_DOWNLOAD_TIMEOUT_IN_SECONDS, Integer.class);
         verifyPropertyNotNull(API_DATA_TRANSFERT_MAX_SIZE, Long.class);
+
+
+        verifyPropertyNotNull(SHANOIR_HOST_IP, String.class);
+        verifyPropertyNotNull(KEYCLOAK_CLIENT_ID, String.class);
+        verifyPropertyNotNull(KEYCLOAK_CLIENT_SECRET, String.class);
+        verifyPropertyNotNull(KEYCLOAK_REALM_URL, String.class);
 
         // due to arrays and generics, this verification aren't easy to factorize
         Assert.notEmpty(env.getProperty(SUPPORTED_TRANSFER_PROTOCOLS, SupportedTransferProtocol[].class),

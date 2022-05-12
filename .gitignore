@@ -2,7 +2,13 @@
 .idea/
 *.iml
 
+#eclipse
+.settings/
+.project/
+.sts4-cache/
+
 #maven
 .flattened-pom.xml
 target/
 
+/.metadata/

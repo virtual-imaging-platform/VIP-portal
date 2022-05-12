@@ -31,6 +31,7 @@
  */
 package fr.insalyon.creatis.vip.api.data;
 
+import fr.insalyon.creatis.vip.api.model.SignUpUserDTO;
 import fr.insalyon.creatis.vip.api.security.SpringCompatibleUser;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.user.UserLevel;
@@ -44,8 +45,12 @@ public class UserTestUtils {
 
     static public User baseUser1;
     static public User baseUser2;
+
+    static public SignUpUserDTO restUser1;
+
     static public String baseUser1Password = "baseUser1password";
     static public String baseUser2Password = "baseUser2password";
+
 
     static {
         baseUser1 = new User("base1", "User1", "baseuser1@test.tst", null, null,
@@ -54,6 +59,9 @@ public class UserTestUtils {
         baseUser2 = new User("base2", "User2", "baseuser2@test.tst", null, null,
                 UserLevel.Advanced, null);
         baseUser2.setFolder("user2");
+
+        restUser1 = new SignUpUserDTO("base3", "User3", "baseuser3@test.tst", "test", baseUser2Password,"",
+                UserLevel.Advanced, null, "test comment", null);
     }
 
     public static RequestPostProcessor baseUser1() {
