@@ -90,7 +90,7 @@ public class EditPublicationLayout extends AbstractFormLayout {
         vipApplication = new ComboBoxItem();
         vipApplication.setWidth(250);
         loadApplications();
-        vipApplication.setDefaultValue("");
+        vipApplication.setDefaultValue("Choose VIP application used in the list");
         vipApplication.setShowTitle(false);
 
         titleField = FieldUtil.getTextItem(500, null);
@@ -128,10 +128,15 @@ public class EditPublicationLayout extends AbstractFormLayout {
                 new ClickHandler() {
                     @Override
                     public void onClick(ClickEvent event) {
-                        save(new Publication(idPub, titleField.getValueAsString(), publicationDate.getValueAsString().toString().substring(0, 4), doiField.getValueAsString(), authorsField.getValueAsString(), publicationType.getValueAsString(), publicationTypeName.getValueAsString(), vipApplication.getValueAsString()));
+                        if (titleField.getValueAsString() != null && publicationTypeName.getValueAsString() != null && authorsField.getValueAsString() != null && vipApplication.getValueAsString() != "Choose VIP application used in the list")
+                        {
+                            save(new Publication(idPub, titleField.getValueAsString(), publicationDate.getValueAsString().toString().substring(0, 4), doiField.getValueAsString(), authorsField.getValueAsString(), publicationType.getValueAsString(), publicationTypeName.getValueAsString(), vipApplication.getValueAsString()));
+
+                        } else {
+                            Layout.getInstance().setWarningMessage("All the information mandatory are not fill in", 5);
+                        }
                     }
                 });
-
 
         addButtons(saveButton);
 
@@ -155,13 +160,13 @@ public class EditPublicationLayout extends AbstractFormLayout {
         } else {
             this.newPublication = true;
             WidgetUtil.resetIButton(saveButton, "Add", CoreConstants.ICON_ADD);
-            this.titleField.setValue("");
-            this.publicationType.setValue("");
-            this.publicationTypeName.setValue("");
-            this.publicationDate.setValue("");
-            this.doiField.setValue("");
-            this.authorsField.setValue("");
-            this.vipApplication.setValue("");
+            this.titleField.setValue((String) null);
+            this.publicationType.setValue("Article In Conference Proceedings");
+            this.publicationTypeName.setValue((String) null);
+            this.publicationDate.setValue("2014");
+            this.doiField.setValue((String) null);
+            this.authorsField.setValue((String) null);
+            this.vipApplication.setValue("Choose VIP application used in the list");
 
         }
     }
