@@ -428,25 +428,24 @@ public class LaunchTab extends Tab {
         final AsyncCallback<SimulationInput> callback = new AsyncCallback<SimulationInput>() {
             @Override
             public void onFailure(Throwable caught) {
-                if (!caught.getMessage().contains("No data is available")
-                        && !caught.getMessage().contains("empty result set")) {
-                    resetSaveInputsButton();
-                    Layout.getInstance().setWarningMessage("Unable to verify execution name:<br />" + caught.getMessage(), 10);
-                } else {
-                    saveInputs(false);
-                }
+                resetSaveInputsButton();
+                Layout.getInstance().setWarningMessage("Unable to verify execution name:<br />" + caught.getMessage(), 10);
             }
 
             @Override
             public void onSuccess(SimulationInput result) {
-                SC.ask("A simulation entitled \"" + getSimulationName() + "\" "
-                        + "already exists. <br />Do you want to overwrite the input data?", value -> {
-                            if (value) {
-                                saveInputs(true);
-                            } else {
-                                resetSaveInputsButton();
-                            }
-                        });
+                if (result != null) {
+                    SC.ask("A simulation entitled \"" + getSimulationName() + "\" "
+                            + "already exists. <br />Do you want to overwrite the input data?", value -> {
+                        if (value) {
+                            saveInputs(true);
+                        } else {
+                            resetSaveInputsButton();
+                        }
+                    });
+                } else{
+                    saveInputs(false);
+                }
             }
         };
         service.getInputByNameUserApp(getSimulationName(), applicationName, callback);
