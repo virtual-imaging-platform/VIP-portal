@@ -22,6 +22,7 @@ function udocker {
  git clone --depth=1 https://github.com/indigo-dc/udocker.git
   (cd udocker/udocker; ln -s maincmd.py udocker)
   export PATH=`pwd`/udocker/udocker:$PATH
+  export UDOCKER_CONTAINERS=/cvmfs/biomed.egi.eu/vip/udocker/containers/
   cat >docker <<'EOF'
         #!/bin/bash
         MYARGS=$*
@@ -33,6 +34,7 @@ EOF
 chmod a+x docker
 export PATH=$PWD:$PATH
 }
+
 
 
 function checkBosh {
