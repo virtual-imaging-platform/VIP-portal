@@ -60,6 +60,7 @@ import java.util.function.Supplier;
  * Created by abonnet on 7/22/16.
  */
 @EnableWebSecurity
+@Profile("api-key")
 public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
 
     // authentication done by bean LimitigDaoAuthenticationProvider

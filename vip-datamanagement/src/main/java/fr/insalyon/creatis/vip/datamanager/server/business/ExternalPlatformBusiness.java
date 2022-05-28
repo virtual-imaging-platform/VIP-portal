@@ -55,13 +55,16 @@ public class ExternalPlatformBusiness {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private GirderStorageBusiness girderStorageBusiness;
+    private ShanoirStorageBusiness shanoirStorageBusiness;
     private ExternalPlatformsDAO externalPlatformsDAO;
 
     @Autowired
     public ExternalPlatformBusiness(
             GirderStorageBusiness girderStorageBusiness,
+            ShanoirStorageBusiness shanoirStorageBusiness,
             ExternalPlatformsDAO externalPlatformsDAO) {
         this.girderStorageBusiness = girderStorageBusiness;
+        this.shanoirStorageBusiness = shanoirStorageBusiness;
         this.externalPlatformsDAO = externalPlatformsDAO;
     }
 
@@ -110,6 +113,11 @@ public class ExternalPlatformBusiness {
                     externalPlatform, parameterName,
                     fileIdentifier, user);
                 return new ParseResult(true, girderUri);
+            case SHANOIR:
+                String shanoirUri = shanoirStorageBusiness.generateUri(
+                        externalPlatform, parameterValue
+                );
+                return new ParseResult(true, shanoirUri);
             default:
                 String error = "Only girder external storage are supported. "
                         + " (found : " + externalPlatform.getType() + " )";
