@@ -27,7 +27,10 @@ public class ShanoirStorageBusiness {
         OUT_NAME("outName","^.*[?&]outName=([^&]*)(&.*)?$", 1,"output name"),
         MD5("md5","^.*[?&]md5=([^&]*)(&.*)?$", 1, "md5"),
         TYPE("type", "^.*[?&]type=([^&]*)(&.*)?$", 1, "type"),
-        API_URI("apiUrl", "", 0, "Api Url");
+        API_URI("apiUrl", "", 0, "download Url"),
+        UPLOAD_URL("upload_url","",0,"Import endpoint url"),
+        KEYCLOAK_CLIENT_ID("keycloak_client_id", "", 0, ""),
+        REFRESH_TOKEN_URL("refresh_token_url","", 0, "");
 
         public final String key;
         public final String regex;
@@ -66,9 +69,13 @@ public class ShanoirStorageBusiness {
         String outName = subString(UrlKeys.OUT_NAME, parameterValue);
         String md5 = subString(UrlKeys.MD5, parameterValue);
         String type = subString(UrlKeys.TYPE, parameterValue);
-        String apiUrl = externalPlatform.getUrl();
 
-        return buildUri(datasetId, apiUrl, token, refreshToken, format, fileName, outName, md5, type);
+        String apiUrl = externalPlatform.getUrl();
+        String upload_url = externalPlatform.getUpload_url();
+        String keycloak_client_id = externalPlatform.getKeycloak_client_id();
+        String refresh_token_url = externalPlatform.getRefresh_token_url();
+
+        return buildUri(datasetId, apiUrl, token, refreshToken, format, fileName, outName, md5, type, upload_url, keycloak_client_id, refresh_token_url);
     }
 
     private void verifyExternalPlatform(ExternalPlatform externalPlatform)
@@ -84,7 +91,7 @@ public class ShanoirStorageBusiness {
         }
     }
 
-    private String buildUri(String datasetId, String apiUrl, String token, String refreshToken, String format, String fileName, String outName, String md5, String type){
+    private String buildUri(String datasetId, String apiUrl, String token, String refreshToken, String format, String fileName, String outName, String md5, String type, String upload_url, String keycloak_client_id, String refresh_token_url){
         return UrlKeys.FILE_NAME.key+":/" +
                 fileName +
                 "?"+ UrlKeys.API_URI.key+"=" +
@@ -93,14 +100,20 @@ public class ShanoirStorageBusiness {
                 datasetId +
                 "&amp;"+ UrlKeys.FORMAT.key+"=" +
                 format +
-                "&amp;"+ UrlKeys.TOKEN.key+"=" +
-                token +
                 "&amp;"+ UrlKeys.OUT_NAME.key+"=" +
                 outName +
                 "&amp;"+ UrlKeys.MD5.key+"=" +
                 md5 +
                 "&amp;"+ UrlKeys.TYPE.key+"=" +
                 type +
+                "&amp;"+ UrlKeys.UPLOAD_URL.key+"=" +
+                upload_url +
+                "&amp;"+ UrlKeys.KEYCLOAK_CLIENT_ID.key+"=" +
+                keycloak_client_id +
+                "&amp;"+ UrlKeys.REFRESH_TOKEN_URL.key+"=" +
+                refresh_token_url +
+                "&amp;"+ UrlKeys.TOKEN.key+"=" +
+                token +
                 "&amp;"+ UrlKeys.REFRESH_TOKEN.key+"=" +
                 refreshToken;
     }

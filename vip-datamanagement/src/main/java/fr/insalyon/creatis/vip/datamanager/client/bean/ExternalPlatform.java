@@ -39,14 +39,16 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 public class ExternalPlatform {
 
     public enum Type {
-        GIRDER,
-        SHANOIR
+        GIRDER, SHANOIR
     }
 
     private String identifier;
     private Type type;
     private String description;
     private String url;
+    private String upload_url;
+    private String keycloak_client_id;
+    private String refresh_token_url;
 
     public String getIdentifier() {
         return identifier;
@@ -79,5 +81,29 @@ public class ExternalPlatform {
 
     public void setUrl(String url) {
         this.url = url;
+    }
+
+    public String getUpload_url() {
+        return upload_url;
+    }
+
+    public void setUpload_url(String upload_url) {
+        this.upload_url = upload_url;
+    }
+
+    public String getKeycloak_client_id() {
+        return keycloak_client_id;
+    }
+
+    public void setKeycloak_client_id(String keycloak_client_id) {
+        this.keycloak_client_id = keycloak_client_id;
+    }
+
+    public String getRefresh_token_url() {
+        return refresh_token_url;
+    }
+
+    public void setRefresh_token_url(String refresh_token_url) {
+        this.refresh_token_url = refresh_token_url;
     }
 }
