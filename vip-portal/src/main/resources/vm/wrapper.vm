@@ -18,7 +18,7 @@ function error {
   local D=`date`
   echo [ ERROR - $D ] $* >&2
 }
-function udocker {
+function udocker_function {
  git clone --depth=1 https://github.com/indigo-dc/udocker.git
   (cd udocker/udocker; ln -s maincmd.py udocker)
   export PATH=`pwd`/udocker/udocker:$PATH
@@ -136,7 +136,7 @@ JSONFILE="${TOOLNAME}.json"
 checkBosh $BOSH_CVMFS_PATH
 
 #Clone udocker (A basic user tool to execute simple docker containers in batch or interactive systems without root privileges)
-udocker
+udocker_function
 
 # Change PYTHONPATH to make all strings unicode by default in python2 (as in python3)
 # Otherwise `bosh exec` fails on any non-ascii characters in outputs
