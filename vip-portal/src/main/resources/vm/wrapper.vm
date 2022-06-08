@@ -22,7 +22,9 @@ function udocker_function {
  git clone --depth=1 https://github.com/indigo-dc/udocker.git
   (cd udocker/udocker; ln -s maincmd.py udocker)
   export PATH=`pwd`/udocker/udocker:$PATH
-  export UDOCKER_CONTAINERS=/cvmfs/biomed.egi.eu/vip/udocker/containers/
+  mkdir -p containers
+  export UDOCKER_CONTAINERS=$PWD/containers
+  for d in /cvmfs/biomed.egi.eu/vip/udocker/containers/*/ ; do mkdir containers/$(basename "${d%/}") && ln -s "${d%/}"/* containers/$(basename "${d%/}")/;done
   cat >docker <<'EOF'
         #!/bin/bash
         MYARGS=$*
