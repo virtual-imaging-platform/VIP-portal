@@ -53,6 +53,7 @@ import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
 import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
 
 import java.util.*;
+import java.util.logging.Logger;
 
 /**
  *

@@ -100,6 +100,9 @@ public class CoreConstants implements IsSerializable {
     public static final String TAB_MANAGE_TIPS = "manage_tips_tab";
     public static final String TAB_MANAGE_USERS = "manage_users_tab";
     public static final String TAB_MANAGE_SETTING = "manage_setting_tab";
+    public static final String TAB_PUBLICATION_NOT_LOG = "publication_not_log";
+    // home actions
+    public static final String HOME_ACTION_SHOW_PUBLICATIONS = "SHOW_PUBLICATIONS";
     // Icons
     private static final String IMG_FOLDER = "core/";
     public static final String ICON_SEARCH = "icon-search.png";

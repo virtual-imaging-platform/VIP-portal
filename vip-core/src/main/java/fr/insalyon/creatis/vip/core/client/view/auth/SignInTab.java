@@ -58,6 +58,7 @@ import com.smartgwt.client.widgets.form.fields.events.KeyPressHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.tab.Tab;
+import fr.insalyon.creatis.vip.core.client.CoreModule;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationService;
 import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationServiceAsync;
@@ -65,6 +66,8 @@ import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
 import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
+
+import java.util.logging.Logger;
 
 /**
  *
@@ -285,8 +288,20 @@ public class SignInTab extends Tab {
         infoVipLayout= WidgetUtil.getLabel("<font size=\"3\"><b>VIP is a web portal for medical imaging applications. It allows you to access scientific applications as a service (directly through your web browser with no installation required), as well as distributed computing resources in a transparent manner.</b></font>", 20);
         infoVipLog = WidgetUtil.getLabel("<font size=\"3\"><b>Please log in using the form below or the link to the EGI Checkin federated authentication service, or create a new account if you don't have one.</b></font>",20);
         infoContactlayout = WidgetUtil.getLabel("<font size=\"3\"><b>Documentation of the Virtual Imaging Platform and its embedded applications is available here:  <a href=\"https://vip.creatis.insa-lyon.fr/documentation/\">VIP Documentation</a></b></font>",20);
+
         infoToolLayout = WidgetUtil.getLabel("<font size=\"3\"><b>The list of applications available on the Virtual Imaging Platform is here:  <a href=\"https://www.creatis.insa-lyon.fr/vip/applications.html\">VIP Applications</a></b></font>",20);
-        infoPublicationLayout = WidgetUtil.getLabel("<font size=\"3\"><b>The list of publications related to the Virtual Imaging Platform is here:  <a href=\"https://www.creatis.insa-lyon.fr/vip/more-publications.html\">VIP Publications</a></b></font>",20);
+
+        infoPublicationLayout = WidgetUtil.getLabel("<font size=\"3\"><b>The list of publications related to the Virtual Imaging Platform is here: </font>",20);
+        infoPublicationLayout.addClickHandler(new ClickHandler() {
+            @Override
+            public void onClick(ClickEvent event) {
+                Logger.getLogger("log").info("before");
+                Logger.getLogger("log").info("is runner present " + CoreModule.getHomePageActions().containsKey(CoreConstants.HOME_ACTION_SHOW_PUBLICATIONS));
+                CoreModule.getHomePageActions().get(CoreConstants.HOME_ACTION_SHOW_PUBLICATIONS).run();
+                Logger.getLogger("log").info("after");
+            }
+        });
+
         infoCodeSource = WidgetUtil.getLabel("<font size=\"3\"><b>The Virtual Imaging Platform source code:  <a href=\"https://github.com/virtual-imaging-platform\">VIP Github</a>",20);
         infoContactus = WidgetUtil.getLabel("<font size=\"3\"><b>This portal is exclusively dedicated to non-commercial academic use, as indicated in the <a href=\"https://vip.creatis.insa-lyon.fr/documentation/terms.html\">terms of use.</a> For commercial use, please contact us at <a href=\"mailto:vip-support@creatis.insa-lyon.fr\">vip-support@creatis.insa-lyon.fr</a>.</b></font>",20);
         infoMail = WidgetUtil.getLabel("<font size=\"3\"><b>Contact: <a href=\"mailto:vip-support@creatis.insa-lyon.fr\">vip-support@creatis.insa-lyon.fr</a></b></font>",20);

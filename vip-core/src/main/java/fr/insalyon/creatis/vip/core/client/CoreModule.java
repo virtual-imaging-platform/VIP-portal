@@ -59,8 +59,11 @@ import fr.insalyon.creatis.vip.core.client.view.main.SystemTileGrid;
 import fr.insalyon.creatis.vip.core.client.view.user.AccountTab;
 import fr.insalyon.creatis.vip.core.client.view.user.UserMenuButton;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.logging.Logger;
 
 /**
  *
@@ -72,6 +75,7 @@ public class CoreModule extends Module {
     private static GeneralTileGrid generalTileGrid;
     private static SystemTileGrid systemTileGrid;
     private static HomeTab homeTab;
+    private static Map<String,Runnable> homePageActions;
     public static List<String> accountTypes;
 
     public CoreModule() {
@@ -203,11 +207,17 @@ public class CoreModule extends Module {
         homeTab.addToRightLayout(layout);
     }
 
+    public static Map<String, Runnable> getHomePageActions() {
+        Logger.getLogger("log").info("test methode getHomePageActions");
+        return homePageActions;
+    }
+
     private void init() {
 
         generalTileGrid = new GeneralTileGrid();
         systemTileGrid = new SystemTileGrid();
         homeTab = new HomeTab();
+        homePageActions = new HashMap<>();
     }
 
     private void showDialog(String message, final AccountTab tab) {
