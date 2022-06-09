@@ -91,26 +91,14 @@ public class SignInTab extends Tab {
     private IButton signinButton;
     private IButton createAnAccountButton;
     private IButton egiButton;
+    private Img egiLogo;
 
     public SignInTab() {
 
         this.setID(CoreConstants.TAB_SIGNIN);
         this.setTitle("Sign In");
 
-        egiButton = new IButton("Connection with EGI Check-in");
-        egiButton.addClickHandler(new ClickHandler() {
-            @Override
-            public void onClick(ClickEvent event) {
-                Window.Location.assign("/oauth2/authorize-client/egi");
-            }
-        });
 
-        egiButton.setWidth(180);
-
-        Img starImg1 = new Img(CoreConstants.EGI_CHECK_IN_LOGO, 50, 70);
-        starImg1.setImageWidth(50);
-        starImg1.setImageHeight(50);
-        starImg1.setImageType(ImageStyle.CENTER);
 
         VLayout loginVLayout = new VLayout(15);
         loginVLayout.setWidth100();
@@ -152,7 +140,6 @@ public class SignInTab extends Tab {
         basLayout.setHeight(100);
         basLayout.setLayoutLeftMargin(100);
 
-        configureNewForm();
         configureSigninLayout();
         testLayoutInfo();
         hautLayout.addMember(infoWelcomeVipLayout);
@@ -163,7 +150,7 @@ public class SignInTab extends Tab {
         hautLayout.addMember(infoContactlayout);
         loginVLayout.addMember(hautLayout);
         middlePanel.add(signinLayout);
-        egiPanel.add(starImg1);
+        egiPanel.add(egiLogo);
         egiPanel.add(egiButton);
         middleLayout.addMember(middlePanel);
         middleLayout.addMember(egiPanel);
@@ -182,12 +169,9 @@ public class SignInTab extends Tab {
     private void configureSigninLayout() {
 
         emailField = FieldUtil.getTextItem(230, false, "", "[a-zA-Z0-9_.\\-+@]");
-        emailField.addKeyPressHandler(new KeyPressHandler() {
-            @Override
-            public void onKeyPress(KeyPressEvent event) {
-                if (event.getKeyName().equals("Enter")) {
-                    signin();
-                }
+        emailField.addKeyPressHandler(event -> {
+            if (event.getKeyName().equals("Enter")) {
+                signin();
             }
         });
 
@@ -196,12 +180,9 @@ public class SignInTab extends Tab {
         passwordField.setLength(32);
         passwordField.setShowTitle(false);
         passwordField.setRequired(true);
-        passwordField.addKeyPressHandler(new KeyPressHandler() {
-            @Override
-            public void onKeyPress(KeyPressEvent event) {
-                if (event.getKeyName().equals("Enter")) {
-                    signin();
-                }
+        passwordField.addKeyPressHandler(event -> {
+            if (event.getKeyName().equals("Enter")) {
+                signin();
             }
         });
 
@@ -211,30 +192,15 @@ public class SignInTab extends Tab {
         remembermeField.setAlign(Alignment.LEFT);
 
         signinButton = new IButton("Sign in");
-        signinButton.addClickHandler(new ClickHandler() {
-            @Override
-            public void onClick(ClickEvent event) {
-                signin();
-            }
-        });
+        signinButton.addClickHandler(event -> signin());
 
         LinkItem recoverAccount = FieldUtil.getLinkItem("link_reset", "Forgot your password?",
-                new com.smartgwt.client.widgets.form.fields.events.ClickHandler() {
-                    @Override
-                    public void onClick(com.smartgwt.client.widgets.form.fields.events.ClickEvent event) {
-                        Layout.getInstance().addTab(
-                                CoreConstants.TAB_RECOVERY, RecoveryTab::new);
-                    }
-                });
+                event -> Layout.getInstance().addTab(
+                        CoreConstants.TAB_RECOVERY, RecoveryTab::new));
 
         createAnAccountButton = new IButton("Create an account");
-        createAnAccountButton.addClickHandler(new ClickHandler() {
-            @Override
-            public void onClick(ClickEvent event) {
-                Layout.getInstance().addTab(
-                        CoreConstants.TAB_SIGNUP, SignUpTab::new);
-            }
-        });
+        createAnAccountButton.addClickHandler(event -> Layout.getInstance().addTab(
+                CoreConstants.TAB_SIGNUP, SignUpTab::new));
 
         HorizontalPanel siginPanel = new HorizontalPanel();
         siginPanel.setSpacing(10);
@@ -252,27 +218,16 @@ public class SignInTab extends Tab {
         siginPanel.add(signinButton);
         siginPanel.add(createAnAccountButton);
         signinLayout.addMember(siginPanel);
-    }
 
-    private void configureNewForm() {
+        egiButton = new IButton("Connection with EGI Check-in");
+        egiButton.addClickHandler(event -> Window.Location.assign("/oauth2/authorize-client/egi"));
 
-        LinkItem createAccount = FieldUtil.getLinkItem("link_create", "Create an account.",
-                new com.smartgwt.client.widgets.form.fields.events.ClickHandler() {
-            @Override
-            public void onClick(com.smartgwt.client.widgets.form.fields.events.ClickEvent event) {
-                Layout.getInstance().addTab(
-                    CoreConstants.TAB_SIGNUP, SignUpTab::new);
-            }
-        });
+        egiButton.setWidth(180);
 
-        LinkItem recoverAccount = FieldUtil.getLinkItem("link_reset", "Forgot your password?",
-                new com.smartgwt.client.widgets.form.fields.events.ClickHandler() {
-            @Override
-            public void onClick(com.smartgwt.client.widgets.form.fields.events.ClickEvent event) {
-                Layout.getInstance().addTab(
-                    CoreConstants.TAB_RECOVERY, RecoveryTab::new);
-            }
-        });
+        egiLogo = new Img(CoreConstants.EGI_CHECK_IN_LOGO, 50, 70);
+        egiLogo.setImageWidth(50);
+        egiLogo.setImageHeight(50);
+        egiLogo.setImageType(ImageStyle.CENTER);
     }
 
     private void signin() {
