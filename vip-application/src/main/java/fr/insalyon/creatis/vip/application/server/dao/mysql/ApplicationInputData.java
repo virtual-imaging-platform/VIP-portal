@@ -244,7 +244,6 @@ public class ApplicationInputData extends JdbcDaoSupport implements ApplicationI
     public void saveSimulationInputAsExample(SimulationInput simulationInput) throws DAOException {
 
         try {
-
             PreparedStatement ps = getConnection().prepareStatement(
                     "INSERT INTO VIPAppExamples(application, name, inputs) "
                     + "VALUES (?, ?, ?)");
@@ -298,8 +297,7 @@ public class ApplicationInputData extends JdbcDaoSupport implements ApplicationI
             throw new DAOException(ex);
         }
     }
-
-
+    
     @Override
     public void removeSimulationInputExample(String inputName, String application)
             throws DAOException {
