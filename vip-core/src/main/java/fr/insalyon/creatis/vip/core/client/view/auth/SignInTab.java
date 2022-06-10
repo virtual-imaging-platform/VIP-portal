@@ -291,7 +291,7 @@ public class SignInTab extends Tab {
 
         infoToolLayout = WidgetUtil.getLabel("<font size=\"3\"><b>The list of applications available on the Virtual Imaging Platform is here:  <a href=\"https://www.creatis.insa-lyon.fr/vip/applications.html\">VIP Applications</a></b></font>",20);
 
-        infoPublicationLayout = WidgetUtil.getLabel("<font size=\"3\"><b>The list of publications related to the Virtual Imaging Platform is here: </font>",20);
+        infoPublicationLayout = WidgetUtil.getLabel("<font size=\"3\"><b>The list of publications related to the Virtual Imaging Platform </font>",20);
         infoPublicationLayout.addClickHandler(new ClickHandler() {
             @Override
             public void onClick(ClickEvent event) {
