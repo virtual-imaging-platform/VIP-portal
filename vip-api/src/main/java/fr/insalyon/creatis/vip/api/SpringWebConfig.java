@@ -66,6 +66,7 @@ import static fr.insalyon.creatis.vip.api.CarminProperties.CORS_AUTHORIZED_DOMAI
  */
 @EnableWebMvc
 @Configuration
+@Profile("keycloak-vip")
 public class SpringWebConfig implements WebMvcConfigurer {
 
     private Environment env;
