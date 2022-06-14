@@ -53,27 +53,27 @@ public class ManageApplicationsTab extends AbstractManageTab {
         super(ApplicationConstants.ICON_APPLICATION, ApplicationConstants.APP_APPLICATION, ApplicationConstants.TAB_MANAGE_APPLICATION);
 
         appsLayout = new ApplicationsLayout();
-        editLayout = new EditApplicationLayout();
+        //editLayout = new EditApplicationLayout();
 
         HLayout appLayout = new HLayout(5);
         appLayout.setHeight("50%");
         appLayout.addMember(appsLayout);
-        appLayout.addMember(editLayout);
+        //appLayout.addMember(editLayout);
         vLayout.addMember(appLayout);
 
-        versionsLayout = new VersionsLayout();
+        //versionsLayout = new VersionsLayout();
         VLayout versionInfoLayout = new VLayout(5);
-        editVersionLayout = new EditVersionLayout();
-        publishVersionLayout = new PublishVersionLayout();
+        //editVersionLayout = new EditVersionLayout();
+        //publishVersionLayout = new PublishVersionLayout();
 
         HLayout versionLayout = new HLayout(5);
         versionLayout.setHeight("50%");
-        versionLayout.addMember(versionsLayout);
+        //versionLayout.addMember(versionsLayout);
 
-        versionInfoLayout.addMember(editVersionLayout);
-        versionInfoLayout.addMember(publishVersionLayout);
-        versionLayout.addMember(versionInfoLayout);
-        vLayout.addMember(versionLayout);
+        //versionInfoLayout.addMember(editVersionLayout);
+        //versionInfoLayout.addMember(publishVersionLayout);
+        //versionLayout.addMember(versionInfoLayout);
+        //vLayout.addMember(versionLayout);
     }
 
     public void loadApplications() {

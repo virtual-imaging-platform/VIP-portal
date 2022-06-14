@@ -44,15 +44,18 @@ import fr.insalyon.creatis.vip.application.client.view.ApplicationSystemParser;
 import fr.insalyon.creatis.vip.application.client.view.ApplicationTileGrid;
 import fr.insalyon.creatis.vip.application.client.view.common.AbstractSimulationTab;
 import fr.insalyon.creatis.vip.application.client.view.monitor.timeline.TimelineLayout;
+import fr.insalyon.creatis.vip.application.client.view.system.application.ManageApplicationsTab;
 import fr.insalyon.creatis.vip.core.client.CoreModule;
 import fr.insalyon.creatis.vip.core.client.Module;
 import fr.insalyon.creatis.vip.core.client.bean.User;
+import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.layout.CenterTabSet;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Logger;
 
 /**
  *
@@ -63,7 +66,14 @@ public class ApplicationModule extends Module {
     public static HashMap<String, Integer> reservedClasses;
 
      public ApplicationModule() {
-     
+         CoreModule.getHomePageActions().put(CoreConstants.HOME_ACTION_SHOW_APPLICATIONS, new Runnable() {
+             @Override
+             public void run() {
+                 Logger.getLogger("log").info("test publication module");
+                 Layout.getInstance().addTab(
+                         CoreConstants.TAB_APPLICATIONS_NOT_LOG, ManageApplicationsTab::new);
+             }
+         });
        
         final AsyncCallback<HashMap<String, Integer>> callback = new AsyncCallback<HashMap<String, Integer>>() {
             @Override
