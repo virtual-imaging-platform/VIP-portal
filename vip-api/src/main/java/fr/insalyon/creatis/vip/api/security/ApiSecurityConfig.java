@@ -51,6 +51,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.core.annotation.Order;
 import org.springframework.core.env.Environment;
 
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -84,7 +85,8 @@ import static fr.insalyon.creatis.vip.api.CarminProperties.KEYCLOAK_ACTIVATED;
 @ComponentScan(basePackageClasses = {KeycloakSecurityComponents.class})
 @KeycloakConfiguration
 @EnableWebSecurity
-public class SpringSecurityConfig extends KeycloakWebSecurityConfigurerAdapter {
+@Order(1)
+public class ApiSecurityConfig extends KeycloakWebSecurityConfigurerAdapter {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -94,7 +96,7 @@ public class SpringSecurityConfig extends KeycloakWebSecurityConfigurerAdapter {
     private final VipKeycloakAuthenticationProvider vipKeycloakAuthenticationProvider;
 
     @Autowired
-    public SpringSecurityConfig(
+    public ApiSecurityConfig(
             Environment env, ApikeyAuthenticationProvider apikeyAuthenticationProvider,
             VipAuthenticationEntryPoint vipAuthenticationEntryPoint,
             VipKeycloakAuthenticationProvider vipKeycloakAuthenticationProvider) {
@@ -146,7 +148,7 @@ public class SpringSecurityConfig extends KeycloakWebSecurityConfigurerAdapter {
         if (isKeycloakActive()) {
             super.configure(http);
         }
-        http
+        http.antMatcher("/rest/**")
             .authorizeRequests()
                 .antMatchers("/rest/platform").permitAll()
                 .antMatchers("/rest/authenticate").permitAll()
@@ -159,8 +161,8 @@ public class SpringSecurityConfig extends KeycloakWebSecurityConfigurerAdapter {
             .and()
             .addFilterBefore(apikeyAuthenticationFilter(), BasicAuthenticationFilter.class)
             .exceptionHandling().authenticationEntryPoint(vipAuthenticationEntryPoint)// also done in parent but needed here when keycloak is not active. It can be done twice without harm.
-            .and()
-            .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+            // session must be activated otherwise OIDC auth info will be lost when accessing /loginEgi
+            //.and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             .and()
             .cors().and()
             .headers().frameOptions().sameOrigin().and()

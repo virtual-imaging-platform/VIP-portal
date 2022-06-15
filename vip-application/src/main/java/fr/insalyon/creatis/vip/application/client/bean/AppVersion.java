@@ -44,26 +44,27 @@ public class AppVersion implements IsSerializable {
     private String lfn;
     private String jsonLfn;
     private String doi;
-    private boolean visible;
+    private boolean visible;;
+    private boolean boutiquesForm;
 
     public AppVersion() {
     }
 
-    public AppVersion(String lfn) {
-        this.lfn = lfn;
-    }
-
-    public AppVersion(String applicationName, String version, String lfn, String jsonLfn, boolean visible) {
-
+    public AppVersion(
+            String applicationName, String version, String lfn, String jsonLfn, boolean visible,
+            boolean boutiquesForm) {
         this.applicationName = applicationName;
         this.version = version;
         this.lfn = lfn;
         this.jsonLfn = jsonLfn;
         this.visible = visible;
+        this.boutiquesForm = boutiquesForm;
     }
 
-    public AppVersion(String applicationName, String version, String lfn, String jsonLfn, String doi, boolean visible) {
-        this(applicationName, version, lfn, jsonLfn, visible);
+    public AppVersion(
+            String applicationName, String version, String lfn, String jsonLfn, String doi, boolean visible,
+            boolean boutiquesForm) {
+        this(applicationName, version, lfn, jsonLfn, visible, boutiquesForm);
         this.doi = doi;
     }
 
@@ -89,5 +90,9 @@ public class AppVersion implements IsSerializable {
 
     public boolean isVisible() {
         return visible;
+    }
+
+    public boolean isBoutiquesForm() {
+        return boutiquesForm;
     }
 }

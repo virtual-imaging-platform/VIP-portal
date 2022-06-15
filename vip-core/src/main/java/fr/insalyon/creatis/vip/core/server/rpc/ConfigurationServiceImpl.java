@@ -85,6 +85,8 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
             configurationBusiness.configure();
             logger.debug("VIP successfully configured.");
 
+
+
             if (configurationBusiness.validateSession(email, session)) {
 
                 User user = configurationBusiness.getUser(email);

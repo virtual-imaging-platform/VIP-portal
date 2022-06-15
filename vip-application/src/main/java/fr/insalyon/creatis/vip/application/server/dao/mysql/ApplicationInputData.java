@@ -213,15 +213,26 @@ public class ApplicationInputData extends JdbcDaoSupport implements ApplicationI
             ps.setString(2, name);
             ps.setString(3, appName);
             ResultSet rs = ps.executeQuery();
-            rs.next();
 
-            SimulationInput simulationInput = new SimulationInput(
-                    rs.getString("application"),
-                    rs.getString("name"),
-                    rs.getString("inputs"));
+            logger.info(String.valueOf(rs));
+            logger.info(String.valueOf(rs.next()));
 
-            ps.close();
-            return simulationInput;
+            if (!rs.next()) {
+                ps.close();
+                return null;
+            } else {
+
+                do {
+                    logger.info("TEST TRUE");
+                    SimulationInput simulationInput = new SimulationInput(
+                            rs.getString("application"),
+                            rs.getString("name"),
+                            rs.getString("inputs"));
+
+                    ps.close();
+                    return simulationInput;
+                } while (rs.next());
+            }
 
         } catch (SQLException ex) {
             logger.error("Error getting inputs {} by {}", name, email, ex);
@@ -286,7 +297,7 @@ public class ApplicationInputData extends JdbcDaoSupport implements ApplicationI
             throw new DAOException(ex);
         }
     }
-
+    
     @Override
     public void removeSimulationInputExample(String inputName, String application)
             throws DAOException {

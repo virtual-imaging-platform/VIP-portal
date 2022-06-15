@@ -45,7 +45,7 @@ import java.util.*;
  * @author Rafael Ferreira da Silva
  */
 public class User implements IsSerializable {
- 
+
     private String firstName;
     private String lastName;
     private String email;
@@ -71,7 +71,7 @@ public class User implements IsSerializable {
     
     private Boolean isGridFile;
     private Boolean isGridJob;
-    
+
     public User() {
     }
 

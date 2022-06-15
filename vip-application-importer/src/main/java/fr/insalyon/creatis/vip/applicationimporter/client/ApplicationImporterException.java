@@ -32,6 +32,7 @@
 package fr.insalyon.creatis.vip.applicationimporter.client;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
+import fr.insalyon.creatis.vip.application.client.view.boutiquesParsing.InvalidBoutiquesDescriptorException;
 import fr.insalyon.creatis.vip.core.client.VipException;
 
 /**
@@ -49,5 +50,9 @@ public class ApplicationImporterException extends VipException implements IsSeri
 
     public ApplicationImporterException(Throwable thrwbl) {
         super(thrwbl);
+    }
+
+    public ApplicationImporterException(String message, Throwable parent) {
+        super(message, parent);
     }
 }

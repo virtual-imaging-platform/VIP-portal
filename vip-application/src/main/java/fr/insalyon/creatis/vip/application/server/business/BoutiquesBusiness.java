@@ -35,19 +35,21 @@ import fr.insalyon.creatis.vip.application.client.bean.AppVersion;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.business.Server;
+import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import fr.insalyon.creatis.vip.datamanager.server.business.DataManagerBusiness;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.xml.sax.SAXException;
 
-import java.io.BufferedReader;
-import java.io.Closeable;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
+
+import static fr.insalyon.creatis.vip.application.client.view.ApplicationException.ApplicationError.WRONG_APPLICATION_DESCRIPTOR;
 
 /**
  * Created by abonnet on 2/21/19.
@@ -115,6 +117,20 @@ public class BoutiquesBusiness {
             throw new BusinessException("There is no json lfn for this application version.");
         }
         return appVersion.getJsonLfn();
+    }
+
+    public String getApplicationDescriptorString(
+            User user, String applicationName, String applicationVersion)
+            throws BusinessException {
+        String descriptorLfn = getJsonLfn(applicationName, applicationVersion);
+        try {
+            String localFilePath =
+                    dataManagerBusiness.getRemoteFile(user, descriptorLfn);
+            return new Scanner(new File(localFilePath)).useDelimiter("\\Z").next();
+        } catch (IOException ex) {
+            logger.error("Error reading boutiques file {}", descriptorLfn, ex);
+            throw new BusinessException(ex);
+        }
     }
 
     private void saveDoiForVersion(

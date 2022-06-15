@@ -7,10 +7,10 @@
     </source>
 #foreach( $input in $tool.getInputs() )
   #set($type="string")
-  #if($input.getType()=="File")
+  #if($input.getType().getCamelName()=="File")
     #set($type="URI")
   #end
-  #if($input.getType()=="Flag")
+  #if($input.getType().getCamelName()=="Flag")
     <source name="$input.getId()" type="string" optional="$input.isOptional()" default="$input.getCommandLineFlag()" vip-type-restriction="flag" pretty-name="$input.getName()">
   #else
     #if($input.getDefaultValue()!="null" && $input.getDefaultValue()!="")
@@ -50,7 +50,7 @@ if ( result.startsWith("/") || result.startsWith("lfn:") ) {
     <processor name="$tool.getName()" >
         <in name="results-directory" type="string" depth="0"/>
 #foreach($input in $tool.getInputs())
-  #if($input.getType()=="File" )
+  #if($input.getType().getCamelName()=="File" )
         <in name="$input.getId()" type="URI" depth="0"/>
   #else
         <in name="$input.getId()" type="string" depth="0"/>

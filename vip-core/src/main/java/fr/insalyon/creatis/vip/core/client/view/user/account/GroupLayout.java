@@ -116,7 +116,7 @@ public class GroupLayout extends AbstractFormLayout {
                 }
                 if(result.isEmpty()){
                     messageLabel.setVisible(true);
-                    messageLabel.setContents("You are not a member of any group. The following public groups will grant you access to applications.");
+                    messageLabel.setContents("You are not a member of any group. The following public groups will grant you access to applications. Please choose a group to be able to access the home tab directly at your next login.");
                 } else
                     messageLabel.setVisible(false);
                 service.getPublicGroups(cbPublicGroups);

@@ -31,19 +31,16 @@
  */
 package fr.insalyon.creatis.vip.applicationimporter.server.rpc;
 
+import fr.insalyon.creatis.vip.application.client.bean.boutiquesTools.BoutiquesApplication;
 import fr.insalyon.creatis.vip.applicationimporter.client.ApplicationImporterException;
-import fr.insalyon.creatis.vip.applicationimporter.client.bean.BoutiquesTool;
 import fr.insalyon.creatis.vip.applicationimporter.client.rpc.ApplicationImporterService;
 import fr.insalyon.creatis.vip.applicationimporter.server.business.ApplicationImporterBusiness;
 import fr.insalyon.creatis.vip.core.client.view.CoreException;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.ApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import javax.servlet.ServletException;
-import java.util.HashMap;
 import java.util.List;
 
 public class ApplicationImporterServiceImpl extends fr.insalyon.creatis.vip.core.server.rpc.AbstractRemoteServiceServlet
@@ -72,7 +69,7 @@ public class ApplicationImporterServiceImpl extends fr.insalyon.creatis.vip.core
 
     @Override
     public void createApplication(
-            BoutiquesTool bt, String type, String tag, boolean isRunOnGrid, boolean overwriteVersion)
+            BoutiquesApplication bt, String type, String tag, boolean isRunOnGrid, boolean overwriteVersion)
             throws ApplicationImporterException {
         try {
             trace(logger, "Creating application");

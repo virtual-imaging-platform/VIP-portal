@@ -165,7 +165,7 @@ public class PersonalLayout extends AbstractFormLayout {
         countryField.setValue(user.getCountryCode().name());
 
         if(institutionField.getDisplayValue().equals("Unknown") || phoneField.getDisplayValue().equals("0000")){
-            Layout.getInstance().setWarningMessage("Please review your account information (Institution and/or phone)");
+            Layout.getInstance().setWarningMessage("Please review your account information (Institution and/or phone)",0);
         }
     }
 }

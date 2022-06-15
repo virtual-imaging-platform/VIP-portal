@@ -102,7 +102,7 @@ public class VersionsLayout extends VLayout {
             public void onClick(ClickEvent event) {
                 ManageApplicationsTab appsTab = (ManageApplicationsTab) Layout.getInstance().
                         getTab(ApplicationConstants.TAB_MANAGE_APPLICATION);
-                appsTab.setVersion(null, null, null, null, true);
+                appsTab.setVersion(null, null, null, null, true, true);
             }
         });
         toolstrip.addMember(addButton);
@@ -141,7 +141,8 @@ public class VersionsLayout extends VLayout {
                                     rollOverRecord.getAttribute("lfn"),
                                     rollOverRecord.getAttribute("jsonLfn"),
                                     rollOverRecord.getAttribute("doi"),
-                                    rollOverRecord.getAttributeAsBoolean("visible"));
+                                    rollOverRecord.getAttributeAsBoolean("visible"),
+                                    rollOverRecord.getAttributeAsBoolean("boutiquesForm"));
                         }
                     });
                     ImgButton deleteImg = getImgButton(CoreConstants.ICON_DELETE, "Delete");
@@ -189,8 +190,12 @@ public class VersionsLayout extends VLayout {
         ListGridField isVisibleField = new ListGridField("visible", "Visible");
         isVisibleField.setType(ListGridFieldType.BOOLEAN);
 
+        ListGridField isBoutiquesFormField = new ListGridField("boutiquesForm", "Use Boutiques Form");
+        isBoutiquesFormField.setType(ListGridFieldType.BOOLEAN);
+
         grid.setFields(
                 isVisibleField,
+                isBoutiquesFormField,
                 new ListGridField("version", "Version"),
                 new ListGridField("lfn", "LFN"));
         grid.setSortField("version");
@@ -202,7 +207,8 @@ public class VersionsLayout extends VLayout {
                         event.getRecord().getAttribute("lfn"),
                         event.getRecord().getAttribute("jsonLfn"),
                         event.getRecord().getAttribute("doi"),
-                        event.getRecord().getAttributeAsBoolean("visible"));
+                        event.getRecord().getAttributeAsBoolean("visible"),
+                        event.getRecord().getAttributeAsBoolean("boutiquesForm"));
             }
         });
 
@@ -225,7 +231,7 @@ public class VersionsLayout extends VLayout {
 
                 for (AppVersion version : result) {
                     dataList.add(new VersionRecord(version.getVersion(), version.getLfn(), version.getJsonLfn(),
-                            version.getDoi(), version.isVisible()));
+                            version.getDoi(), version.isVisible(), version.isBoutiquesForm()));
                 }
                 grid.setData(dataList.toArray(new VersionRecord[] {}));
             }
@@ -251,11 +257,11 @@ public class VersionsLayout extends VLayout {
      * @param lfn
      * @param isVisible
      */
-    private void edit(String version, String lfn, String jsonLfn, String doi, boolean isVisible) {
+    private void edit(String version, String lfn, String jsonLfn, String doi, boolean isVisible, boolean isBoutiquesForm) {
 
         ManageApplicationsTab appsTab = (ManageApplicationsTab) Layout.getInstance().
                 getTab(ApplicationConstants.TAB_MANAGE_APPLICATION);
-        appsTab.setVersion(version, lfn, jsonLfn, doi, isVisible);
+        appsTab.setVersion(version, lfn, jsonLfn, doi, isVisible, isBoutiquesForm);
     }
 
     /**

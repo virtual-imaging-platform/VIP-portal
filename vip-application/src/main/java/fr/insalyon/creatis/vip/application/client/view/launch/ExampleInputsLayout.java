@@ -50,7 +50,6 @@ import com.smartgwt.client.widgets.layout.HLayout;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
 import fr.insalyon.creatis.vip.application.client.bean.SimulationInput;
 import fr.insalyon.creatis.vip.application.client.rpc.WorkflowService;
-import fr.insalyon.creatis.vip.application.client.view.common.AbstractLaunchTab;
 import fr.insalyon.creatis.vip.core.client.CoreModule;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
@@ -104,7 +103,7 @@ public class ExampleInputsLayout extends AbstractInputsLayout {
                         @Override
                         public void onClick(ClickEvent event) {
                             String values = rollOverRecord.getAttribute("values");
-                            AbstractLaunchTab launchTab = (AbstractLaunchTab) Layout.getInstance().getTab(tabID);
+                            LaunchTab launchTab = (LaunchTab) Layout.getInstance().getTab(tabID);
                             launchTab.loadInput(rollOverRecord.getAttribute("name"), values);
                         }
                     });

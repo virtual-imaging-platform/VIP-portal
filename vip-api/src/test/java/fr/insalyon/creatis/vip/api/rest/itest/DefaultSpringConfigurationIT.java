@@ -33,6 +33,7 @@ package fr.insalyon.creatis.vip.api.rest.itest;
 
 import fr.insalyon.creatis.vip.api.SpringWebConfig;
 import fr.insalyon.creatis.vip.api.business.VipConfigurer;
+import fr.insalyon.creatis.vip.api.controller.EgiController;
 import fr.insalyon.creatis.vip.api.exception.ApiException;
 import fr.insalyon.creatis.vip.api.rest.config.BaseVIPSpringIT;
 import fr.insalyon.creatis.vip.api.controller.PlatformController;
@@ -83,6 +84,9 @@ public class DefaultSpringConfigurationIT {
 
     @Autowired
     private PlatformController platformController;
+
+    @Autowired
+    private EgiController egiController;
 
     @BeforeAll
     public static void setup() throws Exception {
