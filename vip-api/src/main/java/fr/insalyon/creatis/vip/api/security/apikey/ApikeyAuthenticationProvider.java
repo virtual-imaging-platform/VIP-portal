@@ -31,7 +31,6 @@
  */
 package fr.insalyon.creatis.vip.api.security.apikey;
 
-import fr.insalyon.creatis.vip.api.security.SpringCompatibleUser;
 import fr.insalyon.creatis.vip.core.client.bean.Group;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
@@ -120,7 +119,7 @@ public class ApikeyAuthenticationProvider implements
             Map<Group, CoreConstants.GROUP_ROLE> groups =
                 configurationBusiness.getUserGroups(vipUser.getEmail());
             vipUser.setGroups(groups);
-            springUser = new SpringCompatibleUser(vipUser);
+            springUser = new SpringApiPrincipal(vipUser);
         } catch (BusinessException e) {
             logger.error("error when getting user groups for {}. Doing as if there is an auth error",
                     vipUser.getEmail(), e);

@@ -68,8 +68,8 @@ import static fr.insalyon.creatis.vip.api.CarminProperties.CORS_AUTHORIZED_DOMAI
 @Configuration
 public class SpringWebConfig implements WebMvcConfigurer {
 
-    private Environment env;
-    private VipConfigurer vipConfigurer;
+    private final Environment env;
+    private final VipConfigurer vipConfigurer;
 
     @Autowired
     public SpringWebConfig(Environment env, VipConfigurer vipConfigurer) {
@@ -79,8 +79,7 @@ public class SpringWebConfig implements WebMvcConfigurer {
 
     //implements rest template to send requests with tokens
     @Bean
-    @Profile("keycloak-vip")
-    KeycloakRestTemplate keycloakRestTemplate(KeycloakClientRequestFactory keycloakClientRequestFactory) {
+    public KeycloakRestTemplate keycloakRestTemplate(KeycloakClientRequestFactory keycloakClientRequestFactory) {
         return new KeycloakRestTemplate(keycloakClientRequestFactory);
     }
 

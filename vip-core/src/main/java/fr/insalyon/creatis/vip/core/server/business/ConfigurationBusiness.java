@@ -136,6 +136,16 @@ public class ConfigurationBusiness {
         }
     }
 
+    public User getUserWithGroups(String email) throws BusinessException {
+        try {
+            User user = userDAO.getUser(email);
+            user.setGroups(usersGroupsDAO.getUserGroups(email));
+            return user;
+        } catch (DAOException ex) {
+            throw new BusinessException(ex);
+        }
+    }
+
     public void signup(
             User user, String comments, boolean automaticCreation,
             boolean mapPrivateGroups, String... accountType)

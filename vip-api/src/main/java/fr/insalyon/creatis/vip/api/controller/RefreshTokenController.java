@@ -1,8 +1,7 @@
 package fr.insalyon.creatis.vip.api.controller;
 
 import fr.insalyon.creatis.vip.api.exception.ApiException;
-import fr.insalyon.creatis.vip.api.utils.KeycloakRefreshUtils;
-import fr.insalyon.creatis.vip.core.client.bean.User;
+import fr.insalyon.creatis.vip.api.business.KeycloakBusiness;
 import org.keycloak.representations.AccessTokenResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +12,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.function.Supplier;
 
 /**
  * @author alaeessaki
@@ -22,17 +20,19 @@ import java.util.function.Supplier;
 @RequestMapping("/simulate-refresh")
 public class RefreshTokenController extends ApiController {
 
-    private KeycloakRefreshUtils refreshUtils;
+    private final KeycloakBusiness refreshUtils;
 
     @Autowired
-    public RefreshTokenController(Supplier<User> currentUserSupplier, KeycloakRefreshUtils refreshUtils ) {
-        super(currentUserSupplier);
+    public RefreshTokenController(KeycloakBusiness refreshUtils ) {
         this.refreshUtils = refreshUtils;
     }
 
     @RequestMapping(method = RequestMethod.GET, produces = "application/json;charset=utf-8")
     @ResponseBody
-    public String simulatingRefreshToken(final HttpServletRequest request) throws ApiException{
+    public String simulatingRefreshToken(final HttpServletRequest request) throws ApiException {
+        if ( ! isKeycloakActive()) {
+            throw new ApiException("Keycloak is not activated on the VIP server");
+        }
         String offline_token = request.getHeader("offline_token"); //getting the offline token from header sent by the client.
         ResponseEntity<AccessTokenResponse> tokenResponseEntity = refreshUtils.refreshToken(offline_token);  //refreshing the token
         return tokenResponseEntity.getBody().getToken();

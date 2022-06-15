@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.Date;
-import java.util.function.Supplier;
 
 /**
  * @author KhalilKes
@@ -28,12 +27,10 @@ public class RegisterUserController extends ApiController {
 
     /**
      *
-     * @param currentUserSupplier
      * @param apiUserBusiness
      */
     @Autowired
-    public RegisterUserController(Supplier<User> currentUserSupplier, ApiUserBusiness apiUserBusiness) {
-        super(currentUserSupplier);
+    public RegisterUserController(ApiUserBusiness apiUserBusiness) {
         this.apiUserBusiness = apiUserBusiness;
     }
 

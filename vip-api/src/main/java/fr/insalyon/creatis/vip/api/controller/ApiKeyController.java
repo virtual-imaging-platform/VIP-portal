@@ -54,15 +54,13 @@ public class ApiKeyController extends ApiController{
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    private ApiKeyBusiness apiKeyBusiness;
-    private ExternalPlatformBusiness externalPlatformBusiness;
+    private final ApiKeyBusiness apiKeyBusiness;
+    private final ExternalPlatformBusiness externalPlatformBusiness;
 
     @Autowired
     public ApiKeyController(
-            Supplier<User> currentUserSupplier,
             ApiKeyBusiness apiKeyBusiness,
             ExternalPlatformBusiness externalPlatformBusiness) {
-        super(currentUserSupplier);
         this.apiKeyBusiness = apiKeyBusiness;
         this.externalPlatformBusiness = externalPlatformBusiness;
     }

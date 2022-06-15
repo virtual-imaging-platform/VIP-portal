@@ -1,6 +1,6 @@
-package fr.insalyon.creatis.vip.api.utils;
+package fr.insalyon.creatis.vip.api.business;
 
-import fr.insalyon.creatis.vip.api.KeycloakProperties;
+import fr.insalyon.creatis.vip.api.CarminProperties;
 import fr.insalyon.creatis.vip.api.exception.ApiException;
 import org.keycloak.representations.AccessTokenResponse;
 import org.slf4j.Logger;
@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.http.*;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.HttpClientErrorException;
@@ -17,8 +18,8 @@ import org.springframework.web.client.RestTemplate;
 /**
  * @author alaeessaki this class is only for testing the refresh mechanism
  */
-@Component
-public class KeycloakRefreshUtils {
+@Service
+public class KeycloakBusiness {
 
     private final Environment env;
     private final Logger logger = LoggerFactory.getLogger(getClass());
@@ -26,7 +27,7 @@ public class KeycloakRefreshUtils {
     private static final byte ALLOWED_ATTEMPTS = 2;
 
     @Autowired
-    KeycloakRefreshUtils(Environment env){
+    KeycloakBusiness(Environment env){
         this.env = env;
     }
 
@@ -42,17 +43,17 @@ public class KeycloakRefreshUtils {
         httpHeaders.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
         MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
 
-        map.add("client_id", env.getRequiredProperty(KeycloakProperties.KEYCLOAK_CLIENT_ID));
+        map.add("client_id", env.getRequiredProperty(CarminProperties.KEYCLOAK_CLIENT_ID));
         map.add("grant_type", "refresh_token");
         map.add("refresh_token", offlineToken);
-        map.add("client_secret", env.getRequiredProperty(KeycloakProperties.KEYCLOAK_CLIENT_SECRET));
+        map.add("client_secret", env.getRequiredProperty(CarminProperties.KEYCLOAK_CLIENT_SECRET));
 
         HttpEntity entity = new HttpEntity(map, httpHeaders);
         ResponseEntity<AccessTokenResponse> responseEntity = null;
         while (attempt <= ALLOWED_ATTEMPTS) {
             try {
                 responseEntity = restTemplate.exchange(
-                        env.getRequiredProperty(KeycloakProperties.KEYCLOAK_REALM_URL), HttpMethod.POST,
+                        env.getRequiredProperty(CarminProperties.KEYCLOAK_REALM_URL), HttpMethod.POST,
                         entity, AccessTokenResponse.class);
                 break;
             } catch (HttpClientErrorException httpClientErrorException) {

@@ -29,17 +29,21 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL-B license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.api.security.apikey;
+package fr.insalyon.creatis.vip.api.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.insalyon.creatis.vip.api.exception.ApiException.ApiError;
 import fr.insalyon.creatis.vip.api.model.ErrorCodeAndMessage;
+import org.keycloak.adapters.springsecurity.KeycloakAuthenticationException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.*;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
+import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.ServletException;
@@ -52,24 +56,37 @@ import java.io.IOException;
  * Entry point that writes error response in json with a Jackson object mapper.
  */
 @Component
-public class ApikeyAuthenticationEntryPoint implements AuthenticationEntryPoint {
+public class VipAuthenticationEntryPoint implements AuthenticationEntryPoint, AuthenticationFailureHandler {
+
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private final ObjectMapper objectMapper;
 
     @Autowired
-    public ApikeyAuthenticationEntryPoint(ObjectMapper objectMapper) {
+    public VipAuthenticationEntryPoint(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
     }
 
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
-        response.addHeader("WWW-Authenticate", "API-key");
+        this.onAuthenticationFailure(request, response, authException);
+    }
+
+    @Override
+    public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
+        // keycloak may already have set it up
+        if ( ! response.containsHeader("WWW-Authenticate")) {
+            response.addHeader("WWW-Authenticate", "API-key");
+        }
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         ErrorCodeAndMessage error = new ErrorCodeAndMessage();
+        logger.info("handling auth error", authException);
         if (authException instanceof BadCredentialsException) {
             error.setErrorCode(ApiError.BAD_CREDENTIALS.getCode());
         } else if (authException instanceof InsufficientAuthenticationException) {
             error.setErrorCode(ApiError.INSUFFICIENT_AUTH.getCode());
+        } else if (authException instanceof KeycloakAuthenticationException) {
+            error.setErrorCode(ApiError.BAD_CREDENTIALS.getCode());
         } else {
             error.setErrorCode(ApiError.AUTHENTICATION_ERROR.getCode());
         }
@@ -77,5 +94,4 @@ public class ApikeyAuthenticationEntryPoint implements AuthenticationEntryPoint 
         error.setErrorMessage(authException.getMessage());
         objectMapper.writeValue(response.getOutputStream(), error);
     }
-
 }

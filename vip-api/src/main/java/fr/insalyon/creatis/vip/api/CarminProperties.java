@@ -68,4 +68,12 @@ public interface CarminProperties {
 
     // NON-CARMIN : STATISTICS
     String STATS_DATE_FORMAT = "dd-MM-yyyy HH:mm:ss";
+
+    // NON-CARMIN : Auth
+
+    String SHANOIR_HOST_IP = "shanoir.host.ip";
+    String KEYCLOAK_ACTIVATED = "keycloak.active";
+    String KEYCLOAK_REALM_URL = "keycloak.realm.url";
+    String KEYCLOAK_CLIENT_ID = "keycloak.client.id";
+    String KEYCLOAK_CLIENT_SECRET = "keycloak.client.secret";
 }

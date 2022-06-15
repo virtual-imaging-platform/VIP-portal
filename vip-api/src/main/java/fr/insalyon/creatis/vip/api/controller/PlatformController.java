@@ -64,14 +64,6 @@ public class PlatformController extends ApiController{
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    private final Environment env;
-
-    @Autowired
-    public PlatformController(Supplier<User> currentUserSupplier, Environment env) {
-        super(currentUserSupplier);
-        this.env = env;
-    }
-
     @RequestMapping
     public PlatformProperties getPlatformProperties() throws ApiException {
         logMethodInvocation(logger, "getPlatformProperties");

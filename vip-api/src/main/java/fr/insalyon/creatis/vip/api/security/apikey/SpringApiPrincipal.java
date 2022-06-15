@@ -29,12 +29,13 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL-B license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.api.security;
+package fr.insalyon.creatis.vip.api.security.apikey;
 
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -43,11 +44,11 @@ import java.util.Collection;
  *
  * Created by abonnet on 7/25/16.
  */
-public class SpringCompatibleUser implements UserDetails {
+public class SpringApiPrincipal implements UserDetails, Principal {
 
     private final User vipUser;
 
-    public SpringCompatibleUser(User vipUser) {
+    public SpringApiPrincipal(User vipUser) {
         this.vipUser = vipUser;
     }
 
@@ -88,5 +89,10 @@ public class SpringCompatibleUser implements UserDetails {
     @Override
     public boolean isEnabled() {
         return true; // not used at the moment
+    }
+
+    @Override
+    public String getName() {
+        return getUsername();
     }
 }

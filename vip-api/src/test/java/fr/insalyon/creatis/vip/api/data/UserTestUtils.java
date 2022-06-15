@@ -32,7 +32,7 @@
 package fr.insalyon.creatis.vip.api.data;
 
 import fr.insalyon.creatis.vip.api.model.SignUpUserDTO;
-import fr.insalyon.creatis.vip.api.security.SpringCompatibleUser;
+import fr.insalyon.creatis.vip.api.security.apikey.SpringApiPrincipal;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.user.UserLevel;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
@@ -65,10 +65,10 @@ public class UserTestUtils {
     }
 
     public static RequestPostProcessor baseUser1() {
-        return SecurityMockMvcRequestPostProcessors.user(new SpringCompatibleUser(baseUser1));
+        return SecurityMockMvcRequestPostProcessors.user(new SpringApiPrincipal(baseUser1));
     }
 
     public static RequestPostProcessor baseUser2() {
-        return SecurityMockMvcRequestPostProcessors.user(new SpringCompatibleUser(baseUser2));
+        return SecurityMockMvcRequestPostProcessors.user(new SpringApiPrincipal(baseUser2));
     }
 }

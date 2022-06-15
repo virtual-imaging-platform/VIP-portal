@@ -1,4 +1,4 @@
-package fr.insalyon.creatis.vip.api;
+package fr.insalyon.creatis.vip.api.security.keycloak;
 
 import org.keycloak.adapters.KeycloakConfigResolver;
 import org.keycloak.adapters.KeycloakDeployment;

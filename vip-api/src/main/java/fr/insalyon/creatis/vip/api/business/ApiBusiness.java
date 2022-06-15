@@ -4,7 +4,6 @@ import fr.insalyon.creatis.vip.api.CarminProperties;
 import fr.insalyon.creatis.vip.api.exception.ApiException;
 import fr.insalyon.creatis.vip.api.model.AuthenticationCredentials;
 import fr.insalyon.creatis.vip.api.model.AuthenticationInfo;
-import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
 import org.slf4j.Logger;
@@ -61,18 +60,6 @@ public class ApiBusiness {
                 logger.debug("keeping the current api key for " + email);
                 return configurationBusiness.getUserApikey(email);
             }
-        } catch (BusinessException e) {
-            throw new ApiException(e);
-        }
-    }
-
-
-    //get user by email
-    public User getUser(String email) throws ApiException {
-        try {
-            User user = configurationBusiness.getUser(email);
-            logger.info("Found the user with " + email);
-            return user;
         } catch (BusinessException e) {
             throw new ApiException(e);
         }
