@@ -187,4 +187,13 @@ public class VipSessionBusiness {
         }
         return st.toString();
     }
+
+    public Boolean isUserConnected(HttpServletRequest request){
+        HttpSession session = request.getSession();
+        User user = (User) session.getAttribute(CoreConstants.SESSION_USER);
+        if (user != null) {
+            return true;
+        }
+        return false;
+    }
 }
