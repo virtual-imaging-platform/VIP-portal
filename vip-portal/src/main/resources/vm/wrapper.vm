@@ -19,6 +19,7 @@ function error {
   echo [ ERROR - $D ] $* >&2
 }
 function udocker_function {
+<<<<<<< HEAD
   
   #installation of udocker
   git clone --depth=1 https://github.com/indigo-dc/udocker.git
@@ -32,11 +33,17 @@ function udocker_function {
   #find pre-deployed containers on CVMFS, and create a symlink to the udocker containers directory
   
   git clone --depth=1 https://github.com/indigo-dc/udocker.git
+=======
+ git clone --depth=1 https://github.com/indigo-dc/udocker.git
+>>>>>>> 0131810ca43cedb503b0cdad00ff5d05089a98b5
   (cd udocker/udocker; ln -s maincmd.py udocker)
   export PATH=`pwd`/udocker/udocker:$PATH
   mkdir -p containers
   export UDOCKER_CONTAINERS=$PWD/containers
+<<<<<<< HEAD
 
+=======
+>>>>>>> 0131810ca43cedb503b0cdad00ff5d05089a98b5
   for d in /cvmfs/biomed.egi.eu/vip/udocker/containers/*/ ; do mkdir containers/$(basename "${d%/}") && ln -s "${d%/}"/* containers/$(basename "${d%/}")/;done
   cat >docker <<'EOF'
         #!/bin/bash

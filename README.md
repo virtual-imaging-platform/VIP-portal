@@ -1,5 +1,4 @@
 # Introduction
-
 The Virtual Imaging Platform is a web portal for pipeline execution on
 distributed systems. An instance of this portal deployed on the
 European Grid Infrastructure is accessible at
