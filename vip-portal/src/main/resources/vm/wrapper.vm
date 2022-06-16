@@ -24,7 +24,7 @@ function udocker_function {
   export PATH=`pwd`/udocker/udocker:$PATH
   mkdir -p containers
   export UDOCKER_CONTAINERS=$PWD/containers
-  for d in /cvmfs/biomed.egi.eu/vip/udocker/containers/*/ ; do mkdir containers/$(basename "${d%/}") && ln -s "${d%/}"/* containers/$(basename "${d%/}")/;done
+  for d in ${CONTAINERS_CVMFS_PATH}/*/ ; do mkdir containers/$(basename "${d%/}") && ln -s "${d%/}"/* containers/$(basename "${d%/}")/;done
   cat >docker <<'EOF'
         #!/bin/bash
         MYARGS=$*
