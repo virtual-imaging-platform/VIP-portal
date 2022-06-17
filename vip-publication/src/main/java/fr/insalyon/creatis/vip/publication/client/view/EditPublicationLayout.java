@@ -71,6 +71,10 @@ public class EditPublicationLayout extends AbstractFormLayout {
     private Long idPub;
     private ComboBoxItem vipApplication;
 
+    private final String[] PUBLICATION_TYPES = {"Article In Conference Proceedings", "Journal Article", "Book Chapter", "Other"};
+    private final String DEFAULT_PUBLICATION_YEAR = "2022";
+    private final String DEFAULT_PUBLICATION_APPLICATION_LABEL = "Choose VIP application used in the list";
+
     public EditPublicationLayout() {
 
         super("100%", "50%");
@@ -84,13 +88,13 @@ public class EditPublicationLayout extends AbstractFormLayout {
         publicationDate = new ComboBoxItem();
         publicationDate.setWidth(80);
         publicationDate.setValueMap(configureYear());
-        publicationDate.setDefaultValue("2014");
+        publicationDate.setDefaultValue(DEFAULT_PUBLICATION_YEAR);
         publicationDate.setShowTitle(false);
 
         vipApplication = new ComboBoxItem();
         vipApplication.setWidth(250);
         loadApplications();
-        vipApplication.setDefaultValue("");
+        vipApplication.setDefaultValue(DEFAULT_PUBLICATION_APPLICATION_LABEL);
         vipApplication.setShowTitle(false);
 
         titleField = FieldUtil.getTextItem(500, null);
@@ -99,8 +103,8 @@ public class EditPublicationLayout extends AbstractFormLayout {
 
         publicationType = new ComboBoxItem();
         publicationType.setWidth(250);
-        publicationType.setValueMap("Article In Conference Proceedings", "Journal Article", "Book Chapter", "Other");
-        publicationType.setDefaultValue("Article In Conference Proceedings");
+        publicationType.setValueMap(PUBLICATION_TYPES);
+        publicationType.setDefaultValue(PUBLICATION_TYPES[0]);
         publicationType.setTitleOrientation(TitleOrientation.TOP);
         publicationType.setShowTitle(false);
 
@@ -125,13 +129,23 @@ public class EditPublicationLayout extends AbstractFormLayout {
         addField("Doi", doiField);
 
         saveButton = WidgetUtil.getIButton("Add", CoreConstants.ICON_ADD,
-                new ClickHandler() {
-                    @Override
-                    public void onClick(ClickEvent event) {
-                        save(new Publication(idPub, titleField.getValueAsString(), publicationDate.getValueAsString().toString().substring(0, 4), doiField.getValueAsString(), authorsField.getValueAsString(), publicationType.getValueAsString(), publicationTypeName.getValueAsString(), vipApplication.getValueAsString()));
+                event -> {
+                    if (titleField.getValueAsString() != null
+                            && publicationTypeName.getValueAsString() != null
+                            && authorsField.getValueAsString() != null
+                            && ! vipApplication.getValueAsString().equals(DEFAULT_PUBLICATION_APPLICATION_LABEL)) {
+                        save(new Publication(idPub,
+                                titleField.getValueAsString(),
+                                publicationDate.getValueAsString().substring(0, 4),
+                                doiField.getValueAsString(),
+                                authorsField.getValueAsString(),
+                                publicationType.getValueAsString(),
+                                publicationTypeName.getValueAsString(),
+                                vipApplication.getValueAsString()));
+                    } else {
+                        Layout.getInstance().setWarningMessage("All the mandatory fields are not filled in", 5);
                     }
                 });
-
 
         addButtons(saveButton);
 
@@ -155,13 +169,13 @@ public class EditPublicationLayout extends AbstractFormLayout {
         } else {
             this.newPublication = true;
             WidgetUtil.resetIButton(saveButton, "Add", CoreConstants.ICON_ADD);
-            this.titleField.setValue("");
-            this.publicationType.setValue("");
-            this.publicationTypeName.setValue("");
-            this.publicationDate.setValue("");
-            this.doiField.setValue("");
-            this.authorsField.setValue("");
-            this.vipApplication.setValue("");
+            this.titleField.setValue((String) null);
+            this.publicationType.setValue(PUBLICATION_TYPES[0]);
+            this.publicationTypeName.setValue((String) null);
+            this.publicationDate.setValue(DEFAULT_PUBLICATION_YEAR);
+            this.doiField.setValue((String) null);
+            this.authorsField.setValue((String) null);
+            this.vipApplication.setValue(DEFAULT_PUBLICATION_APPLICATION_LABEL);
 
         }
     }
