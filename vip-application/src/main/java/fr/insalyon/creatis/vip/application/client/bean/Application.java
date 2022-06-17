@@ -32,6 +32,8 @@
 package fr.insalyon.creatis.vip.application.client.bean;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
+import org.opensaml.xml.encryption.Public;
+
 import java.util.List;
 
 /**
@@ -41,40 +43,40 @@ import java.util.List;
 public class Application implements IsSerializable {
 
     private String name;
-    private List<String> applicationClasses;
     private String citation;
     private String owner;
     private String fullName;
+    private List<String> applicationClasses;
+    private List<String> applicationGroups;
 
     public Application() {
     }
 
-    public Application(String name, String citation) {
+    public Application(String name, List<String> classes, String owner, String citation, List<String> groups){}
 
+    public Application(String name, String citation) {
         this(name, null, null, null, citation);
     }
 
     public Application(String name, List<String> applicationClasses, String citation) {
-
         this(name, applicationClasses, null, null, citation);
     }
 
     public Application(String name, List<String> applicationClasses, String owner, String fullName, String citation) {
-
-        this.name = name;
-        this.applicationClasses = applicationClasses;
-        this.citation = citation;
-        this.owner = owner;
-        this.fullName = fullName;
+        this(name, applicationClasses, owner, fullName, citation, null);
     }
 
     public Application(String name, List<String> applicationClasses, String owner, String citation) {
+        this(name, applicationClasses, owner, null, citation, null);
+    }
 
+    public Application(String name, List<String> applicationClasses, String owner, String fullName, String citation, List<String> applicationGroups) {
         this.name = name;
-        this.applicationClasses = applicationClasses;
         this.citation = citation;
         this.owner = owner;
-
+        this.fullName = fullName;
+        this.applicationClasses = applicationClasses;
+        this.applicationGroups = applicationGroups;
     }
 
     public String getName() {
@@ -99,5 +101,9 @@ public class Application implements IsSerializable {
 
     public String getFullName() {
         return fullName;
+    }
+
+    public List<String> getApplicationGroups() {
+        return applicationGroups;
     }
 }

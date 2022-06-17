@@ -126,7 +126,7 @@ public class ApplicationsLayout extends VLayout {
             protected Canvas getRollOverCanvas(Integer rowNum, Integer colNum) {
                 rollOverRecord = this.getRecord(rowNum);
 
-                if (CoreModule.user != null && rollOverCanvas == null) {
+                if (rollOverCanvas == null) {
                     rollOverCanvas = new HLayout(3);
                     rollOverCanvas.setSnapTo("TR");
                     rollOverCanvas.setWidth(50);
@@ -189,12 +189,12 @@ public class ApplicationsLayout extends VLayout {
             grid.setFields(new ListGridField("name", "Application Name"),
                     new ListGridField("ownerFullName", "Owner"),
                     ownerField,
-                    new ListGridField("groups", "Groups"),
-                    new ListGridField("classes", "Classes"));
+                    new ListGridField("classes", "Classes"),
+                    new ListGridField("groups", "Groups"));
         } else {
             grid.setFields(new ListGridField("name", "Application Name"),
-                    new ListGridField("groups", "Groups"),
-                    new ListGridField("classes", "Classes"));
+                    new ListGridField("classes", "Classes"),
+                    new ListGridField("groups", "Groups"));
         }
         grid.setSortField("name");
         grid.setSortDirection(SortDirection.ASCENDING);
@@ -229,21 +229,27 @@ public class ApplicationsLayout extends VLayout {
 
                 for (Application app : result) {
                     StringBuilder sb = new StringBuilder();
+                    StringBuilder sbg = new StringBuilder();
                     for (String className : app.getApplicationClasses()) {
                         if (sb.length() > 0) {
                             sb.append(", ");
                         }
                         sb.append(className);
                     }
-                    dataList.add(new ApplicationRecord(app.getName(), app.getOwner(), app.getFullName(), sb.toString(), app.getCitation()));
+                    for (String group : app.getApplicationGroups()) {
+                        if (sbg.length() > 0) {
+                            sbg.append(", ");
+                        }
+                        sbg.append(group);
+                    }
+                    dataList.add(new ApplicationRecord(app.getName(), app.getOwner(), app.getFullName(), sb.toString(), app.getCitation(), sbg.toString()));
                 }
                 grid.setData(dataList.toArray(new ApplicationRecord[]{}));
             }
         };
         modal.show("Loading applications...", true);
-        Logger.getLogger("log").info("after load applications...");
         ApplicationService.Util.getInstance().getApplications(callback);
-        Logger.getLogger("log").info("done applications service get application dans app layout");
+
     }
 
     private void remove(String name) {

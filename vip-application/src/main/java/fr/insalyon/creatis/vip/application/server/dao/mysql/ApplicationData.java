@@ -214,6 +214,61 @@ public class ApplicationData extends JdbcDaoSupport implements ApplicationDAO {
     }
 
     @Override
+    public List<Application> getApplicationsUserNotConnected() throws DAOException {
+
+        try {
+            PreparedStatement ps = getConnection().prepareStatement("SELECT "
+                    + "name, owner, citation FROM "
+                    + "VIPApplications ORDER BY name");
+
+            ResultSet rs = ps.executeQuery();
+
+            List<Application> applications = new ArrayList<Application>();
+
+            while (rs.next()) {
+
+                PreparedStatement psc = getConnection().prepareStatement(
+                        "SELECT distinct name FROM VIPClasses ORDER BY name");
+                ResultSet rsc = psc.executeQuery();
+                rsc.next();
+
+                List<String> groups = new ArrayList<String>();
+                PreparedStatement ps3 = getConnection().prepareStatement(
+                        "SELECT groupname FROM VIPGroupsClasses "
+                                + "WHERE classname=? ORDER BY groupname");
+                ps3.setString(1, rsc.getString("name"));
+                ResultSet rg = ps3.executeQuery();
+
+                while (rg.next()) {
+                    groups.add(rg.getString("groupname"));
+                }
+                ps3.close();
+
+                String name = rs.getString("name");
+                PreparedStatement ps2 = getConnection().prepareStatement("SELECT "
+                        + "class FROM VIPApplicationClasses WHERE application=?");
+                ps2.setString(1, name);
+
+                ResultSet rs2 = ps2.executeQuery();
+                List<String> classes = new ArrayList<String>();
+
+                while (rs2.next()) {
+                    classes.add(rs2.getString("class"));
+                }
+                ps2.close();
+
+                applications.add(new Application(name, classes, rs.getString("owner"), rs.getString("citation"), groups));
+            }
+            ps.close();
+            return applications;
+
+        } catch (SQLException ex) {
+            logger.error("Error getting all applications", ex);
+            throw new DAOException(ex);
+        }
+    }
+
+    @Override
     public List<String[]> getApplications(String className) throws DAOException {
 
         try {
