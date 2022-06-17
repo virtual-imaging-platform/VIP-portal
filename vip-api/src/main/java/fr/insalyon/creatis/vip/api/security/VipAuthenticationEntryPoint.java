@@ -80,7 +80,7 @@ public class VipAuthenticationEntryPoint implements AuthenticationEntryPoint, Au
         }
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         ErrorCodeAndMessage error = new ErrorCodeAndMessage();
-        logger.info("handling auth error", authException);
+        logger.debug("handling auth error", authException);
         if (authException instanceof BadCredentialsException) {
             error.setErrorCode(ApiError.BAD_CREDENTIALS.getCode());
         } else if (authException instanceof InsufficientAuthenticationException) {
