@@ -94,6 +94,10 @@ public class ApplicationBusiness {
                         .map(group -> group.getName())
                         .collect(Collectors.toSet());
 
+                if (currentAppPublicGroups.isEmpty()){
+                    continue;
+                }
+
                 applicationsWithGroups.add(new Application(
                         application.getName(),
                         application.getApplicationClasses(),
