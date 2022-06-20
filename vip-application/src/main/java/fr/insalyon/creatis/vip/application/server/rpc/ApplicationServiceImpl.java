@@ -210,7 +210,7 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
             if( ! isUserConnected()){
                 return applicationBusiness.getApplicationsWithGroups();
             } else if (isSystemAdministrator()) {
-                return applicationBusiness.getApplicationsWithGroups();
+                return applicationBusiness.getApplications();
             } else if (isGroupAdministrator()) {
                 List<String> classes = classBusiness.getUserClassesName(
                     getSessionUser().getEmail(), true);
