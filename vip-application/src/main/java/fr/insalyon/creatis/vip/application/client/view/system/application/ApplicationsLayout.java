@@ -189,8 +189,7 @@ public class ApplicationsLayout extends VLayout {
             grid.setFields(new ListGridField("name", "Application Name"),
                     new ListGridField("ownerFullName", "Owner"),
                     ownerField,
-                    new ListGridField("classes", "Classes"),
-                    new ListGridField("groups", "Groups"));
+                    new ListGridField("classes", "Classes"));
         } else {
             grid.setFields(new ListGridField("name", "Application Name"),
                     new ListGridField("classes", "Classes"),
@@ -236,13 +235,20 @@ public class ApplicationsLayout extends VLayout {
                         }
                         sb.append(className);
                     }
-                    for (String group : app.getApplicationGroups()) {
-                        if (sbg.length() > 0) {
-                            sbg.append(", ");
+
+                    if(CoreModule.user == null) {
+                        for (String group : app.getApplicationGroups()) {
+                            if (sbg.length() > 0) {
+                                sbg.append(", ");
+                            }
+                            sbg.append(group);
                         }
-                        sbg.append(group);
                     }
-                    dataList.add(new ApplicationRecord(app.getName(), app.getOwner(), app.getFullName(), sb.toString(), app.getCitation(), sbg.toString()));
+                    if(CoreModule.user == null) {
+                        dataList.add(new ApplicationRecord(app.getName(), app.getOwner(), app.getFullName(), sb.toString(), app.getCitation(), sbg.toString()));
+                    } else {
+                        dataList.add(new ApplicationRecord(app.getName(), app.getOwner(), app.getFullName(), sb.toString(), app.getCitation()));
+                    }
                 }
                 grid.setData(dataList.toArray(new ApplicationRecord[]{}));
             }
