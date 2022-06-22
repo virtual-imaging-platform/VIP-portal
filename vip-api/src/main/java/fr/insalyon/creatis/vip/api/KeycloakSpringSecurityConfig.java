@@ -56,6 +56,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.env.Environment;
 
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -123,6 +124,7 @@ public class KeycloakSpringSecurityConfig extends KeycloakWebSecurityConfigurerA
                 .antMatchers("/rest/platform").permitAll()
                 .antMatchers("/rest/authenticate").permitAll()
                 .antMatchers("/rest/register").permitAll()
+                .antMatchers(HttpMethod.GET, "/rest/executions/**").permitAll()
     //            .access(String.format("isAuthenticated() and hasIpAddress('%s')", env.getProperty(ShanoirProperties.SHANOIR_HOST_IP))) //signup a user to VIP
                 .antMatchers("/rest/simulate-refresh").authenticated()
                 .antMatchers("/rest/statistics/**").hasAnyRole("ADVANCED", "ADMINISTRATOR")

@@ -115,7 +115,7 @@ public class ExternalPlatformBusiness {
                 return new ParseResult(true, girderUri);
             case SHANOIR:
                 String shanoirUri = shanoirStorageBusiness.generateUri(
-                        externalPlatform, parameterValue
+                        externalPlatform, parameterName, parameterValue
                 );
                 return new ParseResult(true, shanoirUri);
             default:

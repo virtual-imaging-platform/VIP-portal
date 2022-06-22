@@ -1,5 +1,6 @@
 package fr.insalyon.creatis.vip.datamanager.server.business;
 
+import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.datamanager.client.bean.ExternalPlatform;
 import fr.insalyon.creatis.vip.datamanager.client.bean.ExternalPlatform.Type;
@@ -24,7 +25,6 @@ public class ShanoirStorageBusiness {
         FORMAT("format", "^.*[?&]format=([^&]*)(&.*)?$", 1 ,"format"),
         TOKEN("token", "^.*[?&]token=([^&]*)(&.*)?$", 1 , "token"),
         REFRESH_TOKEN("refreshToken", "^.*[?&]refreshToken=([^&]*)(&.*)?$", 1 , "refresh token"),
-        OUT_NAME("outName","^.*[?&]outName=([^&]*)(&.*)?$", 1,"output name"),
         MD5("md5","^.*[?&]md5=([^&]*)(&.*)?$", 1, "md5"),
         TYPE("type", "^.*[?&]type=([^&]*)(&.*)?$", 1, "type"),
         API_URI("apiUrl", "", 0, "download Url"),
@@ -57,25 +57,30 @@ public class ShanoirStorageBusiness {
        So objective : generate "shanoir:/fileName?apiurl=[...]&datasetId=[...]&format=[...]&token=[...]&refreshToken=[....]
     */
     public String generateUri(
-            ExternalPlatform externalPlatform, String parameterValue) throws BusinessException {
+            ExternalPlatform externalPlatform, String parameterName, String parameterValue) throws BusinessException {
 
         verifyExternalPlatform(externalPlatform);
 
-        String datasetId = subString(UrlKeys.DATASET_ID, parameterValue);
-        String fileName = subString(UrlKeys.FILE_NAME, parameterValue);
-        String format = subString(UrlKeys.FORMAT, parameterValue);
-        String token = subString(UrlKeys.TOKEN, parameterValue);
-        String refreshToken = subString(UrlKeys.REFRESH_TOKEN, parameterValue);
-        String outName = subString(UrlKeys.OUT_NAME, parameterValue);
-        String md5 = subString(UrlKeys.MD5, parameterValue);
-        String type = subString(UrlKeys.TYPE, parameterValue);
-
         String apiUrl = externalPlatform.getUrl();
-        String upload_url = externalPlatform.getUpload_url();
         String keycloak_client_id = externalPlatform.getKeycloak_client_id();
         String refresh_token_url = externalPlatform.getRefresh_token_url();
 
-        return buildUri(datasetId, apiUrl, token, refreshToken, format, fileName, outName, md5, type, upload_url, keycloak_client_id, refresh_token_url);
+        String token = subString(UrlKeys.TOKEN, parameterValue);
+        String refreshToken = subString(UrlKeys.REFRESH_TOKEN, parameterValue);
+        String fileName = subString(UrlKeys.FILE_NAME, parameterValue);
+
+        if(CoreConstants.RESULTS_DIRECTORY_PARAM_NAME.equals(parameterName)){
+            String type = subString(UrlKeys.TYPE, parameterValue);
+            String md5 = subString(UrlKeys.MD5, parameterValue);
+            String upload_url = externalPlatform.getUpload_url();
+
+            return buildUploadUri(fileName, upload_url, token, refreshToken, type, md5, keycloak_client_id, refresh_token_url);
+        }
+        
+        String format = subString(UrlKeys.FORMAT, parameterValue);
+        String datasetId = subString(UrlKeys.DATASET_ID, parameterValue);
+
+        return buildDownloadUri(datasetId, apiUrl, token, refreshToken, format, fileName, keycloak_client_id, refresh_token_url);
     }
 
     private void verifyExternalPlatform(ExternalPlatform externalPlatform)
@@ -91,7 +96,7 @@ public class ShanoirStorageBusiness {
         }
     }
 
-    private String buildUri(String datasetId, String apiUrl, String token, String refreshToken, String format, String fileName, String outName, String md5, String type, String upload_url, String keycloak_client_id, String refresh_token_url){
+    private String buildDownloadUri(String datasetId, String apiUrl, String token, String refreshToken, String format, String fileName, String keycloak_client_id, String refresh_token_url){
         return UrlKeys.FILE_NAME.key+":/" +
                 fileName +
                 "?"+ UrlKeys.API_URI.key+"=" +
@@ -100,14 +105,25 @@ public class ShanoirStorageBusiness {
                 datasetId +
                 "&amp;"+ UrlKeys.FORMAT.key+"=" +
                 format +
-                "&amp;"+ UrlKeys.OUT_NAME.key+"=" +
-                outName +
-                "&amp;"+ UrlKeys.MD5.key+"=" +
-                md5 +
+                "&amp;"+ UrlKeys.KEYCLOAK_CLIENT_ID.key+"=" +
+                keycloak_client_id +
+                "&amp;"+ UrlKeys.REFRESH_TOKEN_URL.key+"=" +
+                refresh_token_url +
+                "&amp;"+ UrlKeys.TOKEN.key+"=" +
+                token +
+                "&amp;"+ UrlKeys.REFRESH_TOKEN.key+"=" +
+                refreshToken;
+    }
+
+    private String buildUploadUri(String filePath, String uploadUrl, String token, String refreshToken, String type, String md5 , String keycloak_client_id, String refresh_token_url){
+        return UrlKeys.FILE_NAME.key+":/" +
+                filePath +
+                "?"+ UrlKeys.UPLOAD_URL.key+"=" +
+                uploadUrl +
                 "&amp;"+ UrlKeys.TYPE.key+"=" +
                 type +
-                "&amp;"+ UrlKeys.UPLOAD_URL.key+"=" +
-                upload_url +
+                "&amp;"+ UrlKeys.MD5.key+"=" +
+                md5 +
                 "&amp;"+ UrlKeys.KEYCLOAK_CLIENT_ID.key+"=" +
                 keycloak_client_id +
                 "&amp;"+ UrlKeys.REFRESH_TOKEN_URL.key+"=" +
