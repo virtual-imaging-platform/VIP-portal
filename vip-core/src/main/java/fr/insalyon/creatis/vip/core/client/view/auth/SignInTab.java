@@ -92,7 +92,6 @@ public class SignInTab extends Tab {
     private IButton createAnAccountButton;
     private IButton egiButton;
     private Img egiLogo;
-    private Img infoAppLogo;
 
     public SignInTab() {
 
@@ -131,12 +130,6 @@ public class SignInTab extends Tab {
         middlePanel.setHorizontalAlignment(HorizontalPanel.ALIGN_CENTER);
 
         HorizontalPanel egiPanel = new HorizontalPanel();
-        egiPanel.setSpacing(5);
-        egiPanel.setSize("10%", "5%");
-        egiPanel.setVerticalAlignment(VerticalPanel.ALIGN_MIDDLE);
-        egiPanel.setHorizontalAlignment(HorizontalPanel.ALIGN_CENTER);
-
-        HorizontalPanel infoAppPanel = new HorizontalPanel();
         egiPanel.setSpacing(5);
         egiPanel.setSize("10%", "5%");
         egiPanel.setVerticalAlignment(VerticalPanel.ALIGN_MIDDLE);
@@ -235,7 +228,6 @@ public class SignInTab extends Tab {
         egiLogo.setImageWidth(50);
         egiLogo.setImageHeight(50);
         egiLogo.setImageType(ImageStyle.CENTER);
-
     }
 
     private void signin() {
@@ -307,9 +299,7 @@ public class SignInTab extends Tab {
             CoreModule.getHomePageActions().get(CoreConstants.HOME_ACTION_SHOW_APPLICATIONS).run();
         });
 
-
         newFormAppLayout = FieldUtil.getForm(infoAppLayout);
-
         infoPublicationLayout = WidgetUtil.getLabel("<font size=\"3\"><b>The list of publications related to the Virtual Imaging Platform is here:  " +
                 "<a href=\"https://www.creatis.insa-lyon.fr/vip/more-publications.html\">VIP Publications</a></b></font>",20);
         infoCodeSource = WidgetUtil.getLabel("<font size=\"3\"><b>The Virtual Imaging Platform source code: " +
