@@ -49,10 +49,7 @@ import com.smartgwt.client.widgets.Label;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.DynamicForm;
-import com.smartgwt.client.widgets.form.fields.CheckboxItem;
-import com.smartgwt.client.widgets.form.fields.LinkItem;
-import com.smartgwt.client.widgets.form.fields.PasswordItem;
-import com.smartgwt.client.widgets.form.fields.TextItem;
+import com.smartgwt.client.widgets.form.fields.*;
 import com.smartgwt.client.widgets.form.fields.events.KeyPressEvent;
 import com.smartgwt.client.widgets.form.fields.events.KeyPressHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
@@ -82,12 +79,12 @@ public class SignInTab extends Tab {
     private Label infoVipLayout;
     private Label infoVipLog;
     private Label infoContactlayout;
-    private Label infoAppLayout;
     private Label infoPublicationLayout;
     private Label infoCodeSource;
     private Label infoContactus;
     private Label infoMail;
     private DynamicForm newForm;
+    private DynamicForm newFormAppLayout;
     private TextItem emailField;
     private PasswordItem passwordField;
     private CheckboxItem remembermeField;
@@ -95,6 +92,7 @@ public class SignInTab extends Tab {
     private IButton createAnAccountButton;
     private IButton egiButton;
     private Img egiLogo;
+    private Img infoAppLogo;
 
     public SignInTab() {
 
@@ -138,6 +136,12 @@ public class SignInTab extends Tab {
         egiPanel.setVerticalAlignment(VerticalPanel.ALIGN_MIDDLE);
         egiPanel.setHorizontalAlignment(HorizontalPanel.ALIGN_CENTER);
 
+        HorizontalPanel infoAppPanel = new HorizontalPanel();
+        egiPanel.setSpacing(5);
+        egiPanel.setSize("10%", "5%");
+        egiPanel.setVerticalAlignment(VerticalPanel.ALIGN_MIDDLE);
+        egiPanel.setHorizontalAlignment(HorizontalPanel.ALIGN_CENTER);
+
         VLayout basLayout = new VLayout(15);
         basLayout.setWidth100();
         basLayout.setHeight(100);
@@ -159,7 +163,7 @@ public class SignInTab extends Tab {
         middleLayout.addMember(egiPanel);
         loginVLayout.addMember(middleLayout);
         basLayout.addMember(infoContactlayout);
-        basLayout.addMember(infoAppLayout);
+        basLayout.addMember(newFormAppLayout);
         basLayout.addMember(infoPublicationLayout);
         basLayout.addMember(infoCodeSource);
         basLayout.addMember(infoVipNews);
@@ -231,6 +235,7 @@ public class SignInTab extends Tab {
         egiLogo.setImageWidth(50);
         egiLogo.setImageHeight(50);
         egiLogo.setImageType(ImageStyle.CENTER);
+
     }
 
     private void signin() {
@@ -293,18 +298,17 @@ public class SignInTab extends Tab {
         infoContactlayout = WidgetUtil.getLabel("<font size=\"3\"><b>Documentation of the Virtual " +
                 "Imaging Platform and its embedded applications is available here:  <a href=\"https://vip.creatis.insa-lyon.fr/documentation/\">" +
                 "VIP Documentation</a></b></font>",20);
-        infoAppLayout = WidgetUtil.getLabel("<font size=\"3\"><b>The list of applications available on the Virtual Imaging Platform is here:  " +
-                "<a href=\"\">VIP Applications</a></b></font>",20);
 
-        infoAppLayout.addClickHandler(new ClickHandler() {
-            @Override
-            public void onClick(ClickEvent event) {
-                Logger.getLogger("log").info("before");
-                Logger.getLogger("log").info("is runner present " + CoreModule.getHomePageActions().containsKey(CoreConstants.HOME_ACTION_SHOW_APPLICATIONS));
-                CoreModule.getHomePageActions().get(CoreConstants.HOME_ACTION_SHOW_APPLICATIONS).run();
-                Logger.getLogger("log").info("after");
-            }
+        LinkItem infoAppLayout = new LinkItem();
+        infoAppLayout.setLinkTitle("<font size=\"3\"><b>The list of Applications related to the Virtual Imaging Platform </b></font>");
+        infoAppLayout.setShowTitle(false);
+        infoAppLayout.addClickHandler((com.smartgwt.client.widgets.form.fields.events.ClickHandler) event -> {
+            Logger.getLogger("log").info("is runner present " + CoreModule.getHomePageActions().containsKey(CoreConstants.HOME_ACTION_SHOW_APPLICATIONS));
+            CoreModule.getHomePageActions().get(CoreConstants.HOME_ACTION_SHOW_APPLICATIONS).run();
         });
+
+
+        newFormAppLayout = FieldUtil.getForm(infoAppLayout);
 
         infoPublicationLayout = WidgetUtil.getLabel("<font size=\"3\"><b>The list of publications related to the Virtual Imaging Platform is here:  " +
                 "<a href=\"https://www.creatis.insa-lyon.fr/vip/more-publications.html\">VIP Publications</a></b></font>",20);
