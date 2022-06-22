@@ -19,7 +19,7 @@ function error {
   echo [ ERROR - $D ] $* >&2
 }
 
-function udocker_function {
+function download_udocker {
   #installation of udocker
   git clone --depth=1 https://github.com/indigo-dc/udocker.git
   (cd udocker/udocker; ln -s maincmd.py udocker)
@@ -141,8 +141,16 @@ JSONFILE="${TOOLNAME}.json"
 # BOSH_CVMFS_PATH is defined by GASW from the settings file
 checkBosh $BOSH_CVMFS_PATH
 
-#Clone udocker (A basic user tool to execute simple docker containers in batch or interactive systems without root privileges)
-udocker_function
+# Clone udocker (A basic user tool to execute simple docker containers in batch or interactive systems without root privileges)
+
+#if($tool.getContainerType() == "docker")
+if ! command -v docker
+then
+    download_udocker
+fi
+#end
+
+
 
 # Change PYTHONPATH to make all strings unicode by default in python2 (as in python3)
 # Otherwise `bosh exec` fails on any non-ascii characters in outputs
