@@ -46,9 +46,9 @@ public class ExternalPlatform {
     private Type type;
     private String description;
     private String url;
-    private String upload_url;
-    private String keycloak_client_id;
-    private String refresh_token_url;
+    private String uploadUrl;
+    private String keycloakClientId;
+    private String refreshTokenUrl;
 
     public String getIdentifier() {
         return identifier;
@@ -83,27 +83,27 @@ public class ExternalPlatform {
         this.url = url;
     }
 
-    public String getUpload_url() {
-        return upload_url;
+    public String getUploadUrl() {
+        return uploadUrl;
     }
 
-    public void setUpload_url(String upload_url) {
-        this.upload_url = upload_url;
+    public void setUploadUrl(String uploadUrl) {
+        this.uploadUrl = uploadUrl;
     }
 
-    public String getKeycloak_client_id() {
-        return keycloak_client_id;
+    public String getKeycloakClientId() {
+        return keycloakClientId;
     }
 
-    public void setKeycloak_client_id(String keycloak_client_id) {
-        this.keycloak_client_id = keycloak_client_id;
+    public void setKeycloakClientId(String keycloakClientId) {
+        this.keycloakClientId = keycloakClientId;
     }
 
-    public String getRefresh_token_url() {
-        return refresh_token_url;
+    public String getRefreshTokenUrl() {
+        return refreshTokenUrl;
     }
 
-    public void setRefresh_token_url(String refresh_token_url) {
-        this.refresh_token_url = refresh_token_url;
+    public void setRefreshTokenUrl(String refreshTokenUrl) {
+        this.refreshTokenUrl = refreshTokenUrl;
     }
 }

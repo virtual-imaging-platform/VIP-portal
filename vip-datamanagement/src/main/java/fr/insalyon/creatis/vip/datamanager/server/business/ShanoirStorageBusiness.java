@@ -62,8 +62,8 @@ public class ShanoirStorageBusiness {
         verifyExternalPlatform(externalPlatform);
 
         String apiUrl = externalPlatform.getUrl();
-        String keycloak_client_id = externalPlatform.getKeycloak_client_id();
-        String refresh_token_url = externalPlatform.getRefresh_token_url();
+        String keycloak_client_id = externalPlatform.getKeycloakClientId();
+        String refresh_token_url = externalPlatform.getRefreshTokenUrl();
 
         String token = subString(UrlKeys.TOKEN, parameterValue);
         String refreshToken = subString(UrlKeys.REFRESH_TOKEN, parameterValue);
@@ -72,7 +72,7 @@ public class ShanoirStorageBusiness {
         if(CoreConstants.RESULTS_DIRECTORY_PARAM_NAME.equals(parameterName)){
             String type = subString(UrlKeys.TYPE, parameterValue);
             String md5 = subString(UrlKeys.MD5, parameterValue);
-            String upload_url = externalPlatform.getUpload_url();
+            String upload_url = externalPlatform.getUploadUrl();
 
             return buildUploadUri(fileName, upload_url, token, refreshToken, type, md5, keycloak_client_id, refresh_token_url);
         }
