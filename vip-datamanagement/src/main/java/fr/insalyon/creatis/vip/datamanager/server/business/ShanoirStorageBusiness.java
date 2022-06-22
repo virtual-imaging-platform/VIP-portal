@@ -34,14 +34,14 @@ public class ShanoirStorageBusiness {
 
         public final String key;
         public final String regex;
-        public final int regex_group;
-        public final String error_key;
+        public final int regexGroup;
+        public final String errorKey;
 
-        UrlKeys(String label, String regex, int regex_group, String error_key) {
+        UrlKeys(String label, String regex, int regexGroup, String errorKey) {
             this.key = label;
             this.regex = regex;
-            this.regex_group = regex_group;
-            this.error_key = error_key;
+            this.regexGroup = regexGroup;
+            this.errorKey = errorKey;
         }
     }
 
@@ -62,8 +62,8 @@ public class ShanoirStorageBusiness {
         verifyExternalPlatform(externalPlatform);
 
         String apiUrl = externalPlatform.getUrl();
-        String keycloak_client_id = externalPlatform.getKeycloakClientId();
-        String refresh_token_url = externalPlatform.getRefreshTokenUrl();
+        String keycloakClientId = externalPlatform.getKeycloakClientId();
+        String refreshTokenUrl = externalPlatform.getRefreshTokenUrl();
 
         String token = subString(UrlKeys.TOKEN, parameterValue);
         String refreshToken = subString(UrlKeys.REFRESH_TOKEN, parameterValue);
@@ -72,15 +72,15 @@ public class ShanoirStorageBusiness {
         if(CoreConstants.RESULTS_DIRECTORY_PARAM_NAME.equals(parameterName)){
             String type = subString(UrlKeys.TYPE, parameterValue);
             String md5 = subString(UrlKeys.MD5, parameterValue);
-            String upload_url = externalPlatform.getUploadUrl();
+            String uploadUrl = externalPlatform.getUploadUrl();
 
-            return buildUploadUri(fileName, upload_url, token, refreshToken, type, md5, keycloak_client_id, refresh_token_url);
+            return buildUploadUri(fileName, uploadUrl, token, refreshToken, type, md5, keycloakClientId, refreshTokenUrl);
         }
         
         String format = subString(UrlKeys.FORMAT, parameterValue);
         String datasetId = subString(UrlKeys.DATASET_ID, parameterValue);
 
-        return buildDownloadUri(datasetId, apiUrl, token, refreshToken, format, fileName, keycloak_client_id, refresh_token_url);
+        return buildDownloadUri(datasetId, apiUrl, token, refreshToken, format, fileName, keycloakClientId, refreshTokenUrl);
     }
 
     private void verifyExternalPlatform(ExternalPlatform externalPlatform)
@@ -96,7 +96,7 @@ public class ShanoirStorageBusiness {
         }
     }
 
-    private String buildDownloadUri(String datasetId, String apiUrl, String token, String refreshToken, String format, String fileName, String keycloak_client_id, String refresh_token_url){
+    private String buildDownloadUri(String datasetId, String apiUrl, String token, String refreshToken, String format, String fileName, String keycloakClientId, String refreshTokenUrl){
         return UrlKeys.FILE_NAME.key+":/" +
                 fileName +
                 "?"+ UrlKeys.API_URI.key+"=" +
@@ -106,16 +106,16 @@ public class ShanoirStorageBusiness {
                 "&amp;"+ UrlKeys.FORMAT.key+"=" +
                 format +
                 "&amp;"+ UrlKeys.KEYCLOAK_CLIENT_ID.key+"=" +
-                keycloak_client_id +
+                keycloakClientId +
                 "&amp;"+ UrlKeys.REFRESH_TOKEN_URL.key+"=" +
-                refresh_token_url +
+                refreshTokenUrl +
                 "&amp;"+ UrlKeys.TOKEN.key+"=" +
                 token +
                 "&amp;"+ UrlKeys.REFRESH_TOKEN.key+"=" +
                 refreshToken;
     }
 
-    private String buildUploadUri(String filePath, String uploadUrl, String token, String refreshToken, String type, String md5 , String keycloak_client_id, String refresh_token_url){
+    private String buildUploadUri(String filePath, String uploadUrl, String token, String refreshToken, String type, String md5 , String keycloakClientId, String refreshTokenUrl){
         return UrlKeys.FILE_NAME.key+":/" +
                 filePath +
                 "?"+ UrlKeys.UPLOAD_URL.key+"=" +
@@ -125,9 +125,9 @@ public class ShanoirStorageBusiness {
                 "&amp;"+ UrlKeys.MD5.key+"=" +
                 md5 +
                 "&amp;"+ UrlKeys.KEYCLOAK_CLIENT_ID.key+"=" +
-                keycloak_client_id +
+                keycloakClientId +
                 "&amp;"+ UrlKeys.REFRESH_TOKEN_URL.key+"=" +
-                refresh_token_url +
+                refreshTokenUrl +
                 "&amp;"+ UrlKeys.TOKEN.key+"=" +
                 token +
                 "&amp;"+ UrlKeys.REFRESH_TOKEN.key+"=" +
@@ -144,14 +144,14 @@ public class ShanoirStorageBusiness {
         Pattern pattern = Pattern.compile(urlKey.regex);
         Matcher matcher = pattern.matcher(text);
         if(matcher.matches()) {
-            if(matcher.group(urlKey.regex_group) == null){
-                logger.error("Cannot get {} from the uri, the {} is null",urlKey.error_key ,urlKey.error_key);
-                throw new BusinessException("Cannot get "+urlKey.error_key+" from the uri, the "+urlKey.error_key+" is null");
+            if(matcher.group(urlKey.regexGroup) == null){
+                logger.error("Cannot get {} from the uri, the {} is null",urlKey.errorKey,urlKey.errorKey);
+                throw new BusinessException("Cannot get "+urlKey.errorKey +" from the uri, the "+urlKey.errorKey +" is null");
             }
-            return matcher.group(urlKey.regex_group);
+            return matcher.group(urlKey.regexGroup);
         }else{
-            logger.error("Cannot get {} from the uri",urlKey.error_key);
-            throw new BusinessException("Cannot get "+urlKey.error_key+" from the uri");
+            logger.error("Cannot get {} from the uri",urlKey.errorKey);
+            throw new BusinessException("Cannot get "+urlKey.errorKey +" from the uri");
         }
     }
 
