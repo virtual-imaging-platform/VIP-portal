@@ -85,7 +85,7 @@ import java.util.function.Supplier;
 @ComponentScan(basePackageClasses = {KeycloakSecurityComponents.class})
 @KeycloakConfiguration
 @EnableWebSecurity
-//@Profile("keycloak-vip")
+@Profile("keycloak-vip")
 public class KeycloakSpringSecurityConfig extends KeycloakWebSecurityConfigurerAdapter {
 
     // authentication done by bean LimitigDaoAuthenticationProvider
@@ -123,9 +123,8 @@ public class KeycloakSpringSecurityConfig extends KeycloakWebSecurityConfigurerA
             .authorizeRequests()
                 .antMatchers("/rest/platform").permitAll()
                 .antMatchers("/rest/authenticate").permitAll()
-                .antMatchers("/rest/register").permitAll()
-                .antMatchers(HttpMethod.GET, "/rest/executions/**").permitAll()
-    //            .access(String.format("isAuthenticated() and hasIpAddress('%s')", env.getProperty(ShanoirProperties.SHANOIR_HOST_IP))) //signup a user to VIP
+                .antMatchers("/rest/register")
+                .access(String.format("isAuthenticated() and hasIpAddress('%s')", env.getProperty(ShanoirProperties.SHANOIR_HOST_IP))) //signup a user to VIP
                 .antMatchers("/rest/simulate-refresh").authenticated()
                 .antMatchers("/rest/statistics/**").hasAnyRole("ADVANCED", "ADMINISTRATOR")
                 .antMatchers("/rest/**").authenticated()

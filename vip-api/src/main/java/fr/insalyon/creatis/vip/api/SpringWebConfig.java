@@ -79,7 +79,7 @@ public class SpringWebConfig implements WebMvcConfigurer {
 
     //implements rest template to send requests with tokens
     @Bean
-//    @Profile("keycloak-vip")
+    @Profile("keycloak-vip")
     KeycloakRestTemplate keycloakRestTemplate(KeycloakClientRequestFactory keycloakClientRequestFactory) {
         return new KeycloakRestTemplate(keycloakClientRequestFactory);
     }
