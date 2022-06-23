@@ -46,15 +46,14 @@ public class VipKeycloakAuthenticationProvider extends KeycloakAuthenticationPro
         try{
             vipUser = configurationBusiness.getUserWithGroups(email);
         } catch (BusinessException e) {
-            logger.error("error when getting user from keycloak token. Doing as if there is an auth error", e);
+            logger.error("Error when getting user from keycloak token. Doing as if there is an auth error", e);
             throw new BadCredentialsException(
                     messages.getMessage(
                             "AbstractUserDetailsAuthenticationProvider.badCredentials",
                             "Bad credentials"));
         }
         if (vipUser == null) {
-            logger.info(
-                    "Cant authenticate from keycloak because user does not exist in VIP:" + email);
+            logger.info("Can't authenticate from keycloak because user does not exist in VIP:" + email);
             throw new BadCredentialsException(
                     messages.getMessage(
                             "AbstractUserDetailsAuthenticationProvider.badCredentials",
