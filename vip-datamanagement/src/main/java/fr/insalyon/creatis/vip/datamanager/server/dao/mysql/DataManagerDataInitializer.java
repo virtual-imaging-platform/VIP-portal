@@ -46,6 +46,9 @@ public class DataManagerDataInitializer extends JdbcDaoSupport {
                         + "type VARCHAR(50) NOT NULL, "
                         + "description VARCHAR(1000), "
                         + "url VARCHAR(255), "
+                        + "upload_url VARCHAR(255), "
+                        + "keycloak_client_id VARCHAR(255), "
+                        + "refresh_token_url VARCHAR(255), "
                         + "PRIMARY KEY (identifier)");
 
         logger.info("Configuring VIP api keys database.");
