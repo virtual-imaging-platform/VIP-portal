@@ -195,6 +195,8 @@ public class VipSessionBusiness {
         if (user != null) {
             return true;
         }
-        return false;
+        Map<String, String> cookies = getCookies(request);
+        return cookies.containsKey(CoreConstants.COOKIES_USER) &&
+                cookies.containsKey(CoreConstants.COOKIES_SESSION);
     }
 }

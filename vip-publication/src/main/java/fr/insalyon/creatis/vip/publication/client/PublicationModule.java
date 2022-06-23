@@ -37,6 +37,7 @@ import fr.insalyon.creatis.vip.core.client.Module;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.auth.RecoveryTab;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
+import fr.insalyon.creatis.vip.publication.client.view.PublicationConstants;
 import fr.insalyon.creatis.vip.publication.client.view.PublicationParser;
 import fr.insalyon.creatis.vip.publication.client.view.PublicationTab;
 
@@ -55,7 +56,7 @@ public class PublicationModule extends Module {
             public void run() {
                 Logger.getLogger("log").info("test publication module");
                 Layout.getInstance().addTab(
-                        CoreConstants.TAB_PUBLICATION_NOT_LOG, PublicationTab::new);
+                        PublicationConstants.TAB_PUBLICATION, PublicationTab::new);
             }
         });
     }
