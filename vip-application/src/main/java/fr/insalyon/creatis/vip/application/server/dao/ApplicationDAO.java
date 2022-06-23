@@ -62,8 +62,6 @@ public interface ApplicationDAO {
     
     public Application getApplication(String applicationName) throws DAOException;
 
-    public List<Application> getApplicationsUserNotConnected() throws DAOException;
-
     public List<String[]> getApplications(String className) throws DAOException;
 
     public List<Application> getApplications(List<String> classes) throws DAOException;

@@ -183,9 +183,9 @@ public class ApplicationsLayout extends VLayout {
         grid.setShowEmptyMessage(true);
         grid.setShowRowNumbers(true);
         grid.setEmptyMessage("<br>No data available.");
-        ListGridField ownerField = new ListGridField("owner", "Owner");
-        ownerField.setHidden(true);
         if (CoreModule.user != null){
+            ListGridField ownerField = new ListGridField("owner", "Owner");
+            ownerField.setHidden(true);
             grid.setFields(new ListGridField("name", "Application Name"),
                     new ListGridField("ownerFullName", "Owner"),
                     ownerField,
