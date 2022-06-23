@@ -126,7 +126,7 @@ public class ApplicationsLayout extends VLayout {
             protected Canvas getRollOverCanvas(Integer rowNum, Integer colNum) {
                 rollOverRecord = this.getRecord(rowNum);
 
-                if (rollOverCanvas == null) {
+                if (CoreModule.user != null && rollOverCanvas == null) {
                     rollOverCanvas = new HLayout(3);
                     rollOverCanvas.setSnapTo("TR");
                     rollOverCanvas.setWidth(50);
@@ -215,14 +215,12 @@ public class ApplicationsLayout extends VLayout {
         final AsyncCallback<List<Application>> callback = new AsyncCallback<List<Application>>() {
             @Override
             public void onFailure(Throwable caught) {
-                Logger.getLogger("log").info("load data FAILURE");
                 modal.hide();
                 Layout.getInstance().setWarningMessage("Unable to get list of applications:<br />" + caught.getMessage());
             }
 
             @Override
             public void onSuccess(List<Application> result) {
-                Logger.getLogger("log").info("load data SUCCESS");
                 modal.hide();
                 List<ApplicationRecord> dataList = new ArrayList<ApplicationRecord>();
 
@@ -255,7 +253,6 @@ public class ApplicationsLayout extends VLayout {
         };
         modal.show("Loading applications...", true);
         ApplicationService.Util.getInstance().getApplications(callback);
-
     }
 
     private void remove(String name) {
