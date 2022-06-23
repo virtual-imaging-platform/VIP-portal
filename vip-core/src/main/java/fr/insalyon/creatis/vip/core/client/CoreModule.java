@@ -208,7 +208,6 @@ public class CoreModule extends Module {
     }
 
     public static Map<String, Runnable> getHomePageActions() {
-        Logger.getLogger("log").info("test methode getHomePageActions");
         return homePageActions;
     }
 
