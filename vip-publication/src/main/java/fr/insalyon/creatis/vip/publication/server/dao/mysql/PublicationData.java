@@ -114,7 +114,6 @@ public class PublicationData extends JdbcDaoSupport implements PublicationDAO {
             logger.error("Error updating publication {}",publication.getId(), ex);
             throw new DAOException(ex);
         }
-
     }
 
     @Override

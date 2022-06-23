@@ -34,7 +34,12 @@ package fr.insalyon.creatis.vip.publication.client;
 import com.smartgwt.client.widgets.tab.Tab;
 import fr.insalyon.creatis.vip.core.client.CoreModule;
 import fr.insalyon.creatis.vip.core.client.Module;
+import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
+import fr.insalyon.creatis.vip.core.client.view.auth.RecoveryTab;
+import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
+import fr.insalyon.creatis.vip.publication.client.view.PublicationConstants;
 import fr.insalyon.creatis.vip.publication.client.view.PublicationParser;
+import fr.insalyon.creatis.vip.publication.client.view.PublicationTab;
 
 import java.util.Set;
 
@@ -44,9 +49,18 @@ import java.util.Set;
  */
 public class PublicationModule extends Module {
 
+    public PublicationModule() {
+        CoreModule.getHomePageActions().put(CoreConstants.HOME_ACTION_SHOW_PUBLICATIONS, new Runnable() {
+            @Override
+            public void run() {
+                Layout.getInstance().addTab(
+                        PublicationConstants.TAB_PUBLICATION, PublicationTab::new);
+            }
+        });
+    }
+
     @Override
     public void load() {
-        
         CoreModule.addGeneralApplicationParser(new PublicationParser());
     }
 
