@@ -208,7 +208,7 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
     public List<Application> getApplications() throws ApplicationException {
         try {
             if( ! isUserConnected()){
-                return applicationBusiness.getApplicationsWithGroups();
+                return applicationBusiness.getPublicApplicationsWithGroups();
             } else if (isSystemAdministrator()) {
                 return applicationBusiness.getApplications();
             } else if (isGroupAdministrator()) {

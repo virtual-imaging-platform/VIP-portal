@@ -75,7 +75,7 @@ public class ApplicationBusiness {
         }
     }
 
-    public List<Application> getApplicationsWithGroups() throws BusinessException {
+    public List<Application> getPublicApplicationsWithGroups() throws BusinessException {
 
         try {
             List<Application> allApplications = getApplications();

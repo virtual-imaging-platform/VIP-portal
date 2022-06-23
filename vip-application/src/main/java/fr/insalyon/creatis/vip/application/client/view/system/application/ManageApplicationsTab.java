@@ -67,7 +67,7 @@ public class ManageApplicationsTab extends AbstractManageTab {
             publishVersionLayout = new PublishVersionLayout();
             appLayout.addMember(editLayout);
             VLayout versionInfoLayout = new VLayout(5);
-            
+
             HLayout versionLayout = new HLayout(5);
             versionLayout.setHeight("50%");
             versionLayout.addMember(versionsLayout);

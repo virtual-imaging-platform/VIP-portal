@@ -212,8 +212,7 @@ public class ApplicationData extends JdbcDaoSupport implements ApplicationDAO {
             throw new DAOException(ex);
         }
     }
-
-    @Override
+    
     public List<Application> getApplicationsUserNotConnected() throws DAOException {
 
         try {
