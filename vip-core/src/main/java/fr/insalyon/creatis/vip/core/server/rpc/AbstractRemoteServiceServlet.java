@@ -128,7 +128,7 @@ public abstract class AbstractRemoteServiceServlet extends RemoteServiceServlet 
         User user = getSessionUser();
         if (!user.isSystemAdministrator()) {
             logger.error("The user has no system administrator rights: " + user.getEmail());
-            throw new CoreException("The user has no sysvipSessionBusiness.tem administrator rights.");
+            throw new CoreException("The user has no system administrator rights.");
         }
     }
 
@@ -155,10 +155,8 @@ public abstract class AbstractRemoteServiceServlet extends RemoteServiceServlet 
 
     protected void trace(Logger logger, String message) throws CoreException {
         if (vipSessionBusiness.isUserConnected(this.getThreadLocalRequest())) {
-            java.util.logging.Logger.getLogger("log").info("test si user est connecte TRUE");
             logger.info("(" + getSessionUser().getEmail() + ") " + message);
         } else {
-            java.util.logging.Logger.getLogger("log").info("test si use est non connecter FALSE");
             logger.info("(Anonymous) " + message);
         }
     }

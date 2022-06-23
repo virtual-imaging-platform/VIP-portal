@@ -52,7 +52,6 @@ public class ManageApplicationsTab extends AbstractManageTab {
     public ManageApplicationsTab() {
 
         super(ApplicationConstants.ICON_APPLICATION, ApplicationConstants.APP_APPLICATION, ApplicationConstants.TAB_MANAGE_APPLICATION);
-        this.setCanClose(true);
 
         appsLayout = new ApplicationsLayout();
         if(CoreModule.user != null) {

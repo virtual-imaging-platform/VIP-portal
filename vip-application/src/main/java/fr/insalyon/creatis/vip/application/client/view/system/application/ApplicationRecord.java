@@ -52,10 +52,6 @@ public class ApplicationRecord extends ListGridRecord {
     }
 
     public ApplicationRecord(String name, String owner, String ownerFullName, String classes, String citation) {
-        setAttribute("name", name);
-        setAttribute("classes", classes);
-        setAttribute("owner", owner);
-        setAttribute("ownerFullName", ownerFullName);
-        setAttribute("citation", citation);
+        this(name, owner,ownerFullName, classes, citation, null);
     }
 }

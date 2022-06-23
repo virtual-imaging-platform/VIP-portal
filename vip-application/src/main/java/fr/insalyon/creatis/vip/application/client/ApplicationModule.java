@@ -69,7 +69,6 @@ public class ApplicationModule extends Module {
          CoreModule.getHomePageActions().put(CoreConstants.HOME_ACTION_SHOW_APPLICATIONS, new Runnable() {
              @Override
              public void run() {
-                 Logger.getLogger("log").info("test publication module");
                  Layout.getInstance().addTab(
                          CoreConstants.TAB_APPLICATIONS_NOT_LOG, ManageApplicationsTab::new);
              }
