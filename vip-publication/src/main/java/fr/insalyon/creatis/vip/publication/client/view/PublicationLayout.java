@@ -49,7 +49,6 @@ import fr.insalyon.creatis.vip.publication.client.rpc.PublicationService;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
 
 /**
  *

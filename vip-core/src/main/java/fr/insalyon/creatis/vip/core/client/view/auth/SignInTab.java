@@ -67,8 +67,6 @@ import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
 import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
 
-import java.util.logging.Logger;
-
 /**
  *
  * @author Rafael Ferreira da Silva, glatard
@@ -295,7 +293,6 @@ public class SignInTab extends Tab {
         infoPubliLayout.setLinkTitle("<font size=\"3\"><b>The list of Publications related to the Virtual Imaging Platform </b></font>");
         infoPubliLayout.setShowTitle(false);
         infoPubliLayout.addClickHandler((com.smartgwt.client.widgets.form.fields.events.ClickHandler) event -> {
-            Logger.getLogger("log").info("is runner present " + CoreModule.getHomePageActions().containsKey(CoreConstants.HOME_ACTION_SHOW_PUBLICATIONS));
             CoreModule.getHomePageActions().get(CoreConstants.HOME_ACTION_SHOW_PUBLICATIONS).run();
         });
 

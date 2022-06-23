@@ -56,8 +56,6 @@ import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.core.client.view.user.UserLevel;
 import fr.insalyon.creatis.vip.publication.client.rpc.PublicationService;
 
-import java.util.logging.Logger;
-
 /**
  *
  * @author Nouha Boujelben

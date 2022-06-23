@@ -42,7 +42,6 @@ import fr.insalyon.creatis.vip.publication.client.view.PublicationParser;
 import fr.insalyon.creatis.vip.publication.client.view.PublicationTab;
 
 import java.util.Set;
-import java.util.logging.Logger;
 
 /**
  *
@@ -54,7 +53,6 @@ public class PublicationModule extends Module {
         CoreModule.getHomePageActions().put(CoreConstants.HOME_ACTION_SHOW_PUBLICATIONS, new Runnable() {
             @Override
             public void run() {
-                Logger.getLogger("log").info("test publication module");
                 Layout.getInstance().addTab(
                         PublicationConstants.TAB_PUBLICATION, PublicationTab::new);
             }

@@ -39,8 +39,6 @@ import com.smartgwt.client.widgets.tab.Tab;
 import fr.insalyon.creatis.vip.core.client.CoreModule;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 
-import java.util.logging.Logger;
-
 /**
  *
  * @author Nouha Boujelben
@@ -53,7 +51,6 @@ public class PublicationTab extends Tab {
     private ModalWindow modal;
 
     public PublicationTab() {
-        Logger.getLogger("log").info("creating publication ");
         this.setTitle(Canvas.imgHTML(PublicationConstants.ICON_PUBLICATION) + " "
                 + PublicationConstants.APP_PUBLICATIONS);
         this.setID(PublicationConstants.TAB_PUBLICATION);
