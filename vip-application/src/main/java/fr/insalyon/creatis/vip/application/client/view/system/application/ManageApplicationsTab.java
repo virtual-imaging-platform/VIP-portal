@@ -54,30 +54,22 @@ public class ManageApplicationsTab extends AbstractManageTab {
         super(ApplicationConstants.ICON_APPLICATION, ApplicationConstants.APP_APPLICATION, ApplicationConstants.TAB_MANAGE_APPLICATION);
 
         appsLayout = new ApplicationsLayout();
-        if(CoreModule.user != null) {
-            editLayout = new EditApplicationLayout();
-        }
 
         HLayout appLayout = new HLayout(5);
         appLayout.setHeight("50%");
         appLayout.addMember(appsLayout);
-        if(CoreModule.user != null) {
-            appLayout.addMember(editLayout);
-        }
         vLayout.addMember(appLayout);
 
         if(CoreModule.user != null) {
+            editLayout = new EditApplicationLayout();
             versionsLayout = new VersionsLayout();
-        }
-        VLayout versionInfoLayout = new VLayout(5);
-        if(CoreModule.user != null) {
             editVersionLayout = new EditVersionLayout();
             publishVersionLayout = new PublishVersionLayout();
-        }
-
-        HLayout versionLayout = new HLayout(5);
-        versionLayout.setHeight("50%");
-        if(CoreModule.user != null) {
+            appLayout.addMember(editLayout);
+            VLayout versionInfoLayout = new VLayout(5);
+            
+            HLayout versionLayout = new HLayout(5);
+            versionLayout.setHeight("50%");
             versionLayout.addMember(versionsLayout);
 
             versionInfoLayout.addMember(editVersionLayout);
