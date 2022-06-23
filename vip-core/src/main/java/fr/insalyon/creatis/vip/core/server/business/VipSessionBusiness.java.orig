@@ -189,14 +189,22 @@ public class VipSessionBusiness {
         return st.toString();
     }
 
+<<<<<<< HEAD
+    public Boolean isUserConnected(HttpServletRequest request) {
+=======
     public Boolean isUserConnected(HttpServletRequest request){
+>>>>>>> develop
         HttpSession session = request.getSession();
         User user = (User) session.getAttribute(CoreConstants.SESSION_USER);
         if (user != null) {
             return true;
         }
+<<<<<<< HEAD
+        return false;
+=======
         Map<String, String> cookies = getCookies(request);
         return cookies.containsKey(CoreConstants.COOKIES_USER) &&
                 cookies.containsKey(CoreConstants.COOKIES_SESSION);
+>>>>>>> develop
     }
 }

@@ -36,6 +36,7 @@ import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.tab.Tab;
+import fr.insalyon.creatis.vip.core.client.CoreModule;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 
 /**
@@ -70,15 +71,20 @@ public class PublicationTab extends Tab {
         hLayout.setOverflow(Overflow.AUTO);
         hLayout.setMembersMargin(5);
 
-        vLayout2.addMember(editPublicationLayout = new EditPublicationLayout());
-        vLayout2.addMember(bibtexLayout = new BibtexLayout());
-         modal = new ModalWindow(hLayout);
+        if(CoreModule.user != null) {
+            vLayout2.addMember(editPublicationLayout = new EditPublicationLayout());
+            vLayout2.addMember(bibtexLayout = new BibtexLayout());
+        }
+
+        modal = new ModalWindow(hLayout);
 
         hLayout.addMember(publicationLayout = new PublicationLayout( modal));
-        hLayout.addMember(vLayout2);
-        vLayout.addMember(new PublicationInfoTab());
+        if(CoreModule.user != null) {
+            hLayout.addMember(vLayout2);
+            vLayout.addMember(new PublicationInfoTab());
+        }
         vLayout.addMember(hLayout);
-       
+
         this.setPane(vLayout);
 
     }
