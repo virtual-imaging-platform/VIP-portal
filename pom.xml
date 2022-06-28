@@ -52,7 +52,13 @@ knowledge of the CeCILL-B license and that you accept its terms.
         <maven.compiler.target>11</maven.compiler.target>
         <maven.compiler.source>11</maven.compiler.source>
 
-        <!-- dependencies version -->
+
+        <!-- VIP related dependencies version -->
+        <moteur2-workflowsdb-common.version>1.6</moteur2-workflowsdb-common.version>
+        <grida.version>2.2.0</grida.version>
+        <sma.version>0.3.0</sma.version>
+
+        <!-- 3rd party dependencies version -->
         <junit.version>5.6.2</junit.version>
         <spring-framework.version>5.3.15</spring-framework.version>
         <springsecurity.version>5.6.1</springsecurity.version>
