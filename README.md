@@ -75,6 +75,49 @@ export CATALINA_OPTS="$CATALINA_OPTS -DvipConfigFolder=/path/to/vip/local/folder
 - vip do not send email but logs them
 - at the moment, logging is done in the `$HOME/.vip/vip.log` file
 
+# Keycloak Server
+
+VIP API can be secured with keycloak by adding keycloak.json in the vip config folder 
+after updating the parameters it should look like :
+
+```
+{
+  "realm": "<name-of-realm>",
+  "auth-server-url": "http://localhost:8180/auth/",
+  "ssl-required": "none",
+  "use-resource-role-mappings" : true,
+  "bearer-only" : true,
+  "resource": "<client ID>",
+  "public-client": true,
+  "disable-trust-manager": true,
+  "credentials" : {
+      "secret" : "<credential-secret>"
+   }
+}
+```
+
+### Testing VIP with keycloak
+- Boot the keycloak server and run it on port 8180, because by default it runs on 8080
+```
+$ cd keycloak/bin
+$ ./standalone.sh -Djboss.socket.bidning.port-offset=100
+or in windows :
+> standalone.bat -Djboss.socket.bidning.port-offset=100
+```
+- Create a realm <name-of-realm> it's a good practice to use another realm other the master realm (default)
+- Create a client <clientID>,
+- Add roles specific to the client here we have ADVANCED, ADMINISTRATOR
+- Add a realm Role and map it to the client roles
+- Create a user and give it the realm role 
+
+Import the collection [vip-keycloak.postman_collection.json](vip-api/src/test/resources/vip-keycloak.postman_collection.json) to postman, 
+this collection is an example that can test the following endpoints:
+
+- get access token from keycloak 
+- ```/rest/pipelines``` to test the VipUser compatibility with keycloak
+- ```/rest/statistics/users``` to test roles  
+
+
 
 
 

@@ -59,10 +59,7 @@ public class AuthenticationController extends ApiController{
     private final ApiBusiness apiBusiness;
 
     @Autowired
-    public AuthenticationController(
-            Supplier<User> currentUserSupplier,
-            ApiBusiness apiBusiness) {
-        super(currentUserSupplier);
+    public AuthenticationController(ApiBusiness apiBusiness) {
         this.apiBusiness = apiBusiness;
     }
 

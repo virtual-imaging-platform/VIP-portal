@@ -48,6 +48,7 @@ knowledge of the CeCILL-B license and that you accept its terms.
         <skip.itests>true</skip.itests>
         <test.version.hamcrest>2.2</test.version.hamcrest>
         <test.version.mockito>3.3.3</test.version.mockito>
+        <keycloak.version>15.0.1</keycloak.version>
     </properties>
 
     <dependencies>
@@ -92,6 +93,17 @@ knowledge of the CeCILL-B license and that you accept its terms.
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-web</artifactId>
             <version>${springsecurity.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.keycloak</groupId>
+            <artifactId>keycloak-spring-security-adapter</artifactId>
+            <version>${keycloak.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.keycloak</groupId>
+            <artifactId>keycloak-admin-client</artifactId>
+            <version>${keycloak.version}</version>
         </dependency>
 
         <!-- Json mapping library -->

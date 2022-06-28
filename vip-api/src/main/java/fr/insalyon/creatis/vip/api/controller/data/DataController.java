@@ -70,10 +70,8 @@ public class DataController extends ApiController {
     private final HttpServletRequest httpServletRequest;
 
     @Autowired
-    public DataController(Supplier<User> currentUserSupplier,
-                          DataApiBusiness dataApiBusiness,
+    public DataController(DataApiBusiness dataApiBusiness,
                           HttpServletRequest httpServletRequest) {
-        super(currentUserSupplier);
         this.dataApiBusiness = dataApiBusiness;
         this.httpServletRequest = httpServletRequest;
     }

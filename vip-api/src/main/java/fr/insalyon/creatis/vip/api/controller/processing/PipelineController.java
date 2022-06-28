@@ -61,9 +61,7 @@ public class PipelineController extends ApiController {
     private final PipelineBusiness pipelineBusiness;
 
     @Autowired
-    protected PipelineController(
-            Supplier<User> currentUserSupplier, PipelineBusiness pipelineBusiness) {
-        super(currentUserSupplier);
+    protected PipelineController(PipelineBusiness pipelineBusiness) {
         this.pipelineBusiness = pipelineBusiness;
     }
 

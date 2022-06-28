@@ -62,17 +62,12 @@ public class ExecutionController extends ApiController {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    private final Environment environment;
 
     private final ExecutionBusiness executionBusiness;
     private final PipelineBusiness pipelineBusiness;
 
     @Autowired
-    public ExecutionController(
-            Supplier<User> currentUserSupplier, Environment environment,
-            ExecutionBusiness executionBusiness, PipelineBusiness pipelineBusiness) {
-        super(currentUserSupplier);
-        this.environment = environment;
+    public ExecutionController(ExecutionBusiness executionBusiness, PipelineBusiness pipelineBusiness) {
         this.executionBusiness = executionBusiness;
         this.pipelineBusiness = pipelineBusiness;
     }
@@ -92,7 +87,7 @@ public class ExecutionController extends ApiController {
             logger.warn("offset not supportet yet in listExecutions");
             throw new ApiException("offset not supported yet");
         }
-        int executionMaxNb = environment.getRequiredProperty(DEFAULT_LIMIT_LIST_EXECUTION, Integer.class);
+        int executionMaxNb = env.getRequiredProperty(DEFAULT_LIMIT_LIST_EXECUTION, Integer.class);
         if (limit == null) limit = executionMaxNb;
         if (limit > executionMaxNb) {
             logger.warn("limit parameter too high {}", limit);
