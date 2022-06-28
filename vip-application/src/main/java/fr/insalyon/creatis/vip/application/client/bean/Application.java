@@ -52,8 +52,6 @@ public class Application implements IsSerializable {
     public Application() {
     }
 
-    public Application(String name, List<String> classes, String owner, String citation, List<String> groups){}
-
     public Application(String name, String citation) {
         this(name, null, null, null, citation);
     }
