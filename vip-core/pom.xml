@@ -83,7 +83,7 @@ knowledge of the CeCILL-B license and that you accept its terms.
         <dependency>
             <groupId>fr.insalyon.creatis</groupId>
             <artifactId>sma-client</artifactId>
-            <version>#${sma.version}</version>
+            <version>${sma.version}</version>
         </dependency>
 
         <dependency>
