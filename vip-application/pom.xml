@@ -65,7 +65,7 @@ knowledge of the CeCILL-B license and that you accept its terms.
         <dependency>
             <groupId>fr.insalyon.creatis</groupId>
             <artifactId>moteur2-workflowsdb-common</artifactId>
-            <version>1.5</version>
+            <version>${moteur2-workflowsdb-common.version}</version>
         </dependency>
 
         <dependency>
