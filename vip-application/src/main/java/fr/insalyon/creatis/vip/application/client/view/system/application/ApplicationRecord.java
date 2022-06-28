@@ -33,14 +33,20 @@ package fr.insalyon.creatis.vip.application.client.view.system.application;
 
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 
+import java.util.List;
+
 /**
  *
  * @author Rafael Ferreira da Silva
  */
 public class ApplicationRecord extends ListGridRecord {
 
-    public ApplicationRecord(String name, String owner, String ownerFullName, String classes, String citation) {
+    public ApplicationRecord(String name, String owner, String ownerFullName, String classes, String citation, String groups) {
+        this(name, owner,ownerFullName, classes, citation);
+        setAttribute("groups", groups);
+    }
 
+    public ApplicationRecord(String name, String owner, String ownerFullName, String classes, String citation) {
         setAttribute("name", name);
         setAttribute("classes", classes);
         setAttribute("owner", owner);
