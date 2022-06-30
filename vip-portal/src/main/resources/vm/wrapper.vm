@@ -30,7 +30,11 @@ function download_udocker {
   export UDOCKER_CONTAINERS=$PWD/containers
   
   #find pre-deployed containers on CVMFS, and create a symlink to the udocker containers directory
-  for d in ${CONTAINERS_CVMFS_PATH}/*/ ; do mkdir containers/$(basename "${d%/}") && ln -s "${d%/}"/* containers/$(basename "${d%/}")/;done
+  ## use a global velocity escape to avoid velocity escaping issue
+#[[
+  for d in ${CONTAINERS_CVMFS_PATH}/*/ ;
+     do mkdir containers/$(basename "${d%/}") && ln -s "${d%/}"/* containers/$(basename "${d%/}")/
+  done
   cat >docker <<'EOF'
         #!/bin/bash
         MYARGS=$*
@@ -42,6 +46,7 @@ EOF
   chmod a+x docker
   export PATH=$PWD:$PATH
 }
+]]#
 
 function checkBosh {
   local BOSH_CVMFS_PATH=$1
