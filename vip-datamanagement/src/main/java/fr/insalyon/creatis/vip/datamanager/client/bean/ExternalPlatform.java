@@ -39,7 +39,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 public class ExternalPlatform {
 
     public enum Type {
-        GIRDER
+        GIRDER,
+        SHANOIR
     }
 
     private String identifier;
