@@ -97,7 +97,7 @@ public class ShanoirStorageBusiness {
             throw new BusinessException("Cannot generate shanoir uri");
         }
         if (externalPlatform.getKeycloakClientId() == null || externalPlatform.getRefreshTokenUrl() == null) { 
-            logger.error("Cannot get keycloak information for shanoir storage from database");
+            logger.error("Cannot get keycloak informations for shanoir storage from database");
             throw new BusinessException("Cannot generate shanoir uri");
         }
     }
