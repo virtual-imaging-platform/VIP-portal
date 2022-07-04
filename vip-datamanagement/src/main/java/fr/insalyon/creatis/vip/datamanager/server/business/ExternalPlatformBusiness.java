@@ -55,16 +55,13 @@ public class ExternalPlatformBusiness {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private GirderStorageBusiness girderStorageBusiness;
-    private ShanoirStorageBusiness shanoirStorageBusiness;
     private ExternalPlatformsDAO externalPlatformsDAO;
 
     @Autowired
     public ExternalPlatformBusiness(
             GirderStorageBusiness girderStorageBusiness,
-            ShanoirStorageBusiness shanoirStorageBusiness,
             ExternalPlatformsDAO externalPlatformsDAO) {
         this.girderStorageBusiness = girderStorageBusiness;
-        this.shanoirStorageBusiness = shanoirStorageBusiness;
         this.externalPlatformsDAO = externalPlatformsDAO;
     }
 
