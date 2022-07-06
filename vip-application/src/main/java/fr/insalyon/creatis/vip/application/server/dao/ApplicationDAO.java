@@ -59,7 +59,7 @@ public interface ApplicationDAO {
     public void removeVersion(String applicationName, String version) throws DAOException;
 
     public List<Application> getApplications() throws DAOException;
-    
+
     public Application getApplication(String applicationName) throws DAOException;
 
     public List<String[]> getApplications(String className) throws DAOException;
@@ -69,6 +69,8 @@ public interface ApplicationDAO {
     public List<String> getApplicationsName(String applicationClass) throws DAOException;
 
     public String getCitation(String name) throws DAOException;
+
+    List<AppVersion> getAllVisibleVersions() throws DAOException;
 
     public List<AppVersion> getVersions(String name) throws DAOException;
 
