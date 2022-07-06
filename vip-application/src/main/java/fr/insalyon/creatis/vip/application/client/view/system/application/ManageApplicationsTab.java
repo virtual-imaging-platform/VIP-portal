@@ -31,11 +31,13 @@
  */
 package fr.insalyon.creatis.vip.application.client.view.system.application;
 
+import com.smartgwt.client.widgets.Label;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
 import fr.insalyon.creatis.vip.core.client.CoreModule;
 import fr.insalyon.creatis.vip.core.client.view.common.AbstractManageTab;
+import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
 
 /**
  *
@@ -48,6 +50,7 @@ public class ManageApplicationsTab extends AbstractManageTab {
     private VersionsLayout versionsLayout;
     private EditVersionLayout editVersionLayout;
     private PublishVersionLayout publishVersionLayout;
+    private Label infoAppText;
 
     public ManageApplicationsTab() {
 
@@ -55,9 +58,11 @@ public class ManageApplicationsTab extends AbstractManageTab {
 
         appsLayout = new ApplicationsLayout();
 
+        titleInfoApp();
         HLayout appLayout = new HLayout(5);
         appLayout.setHeight("50%");
         appLayout.addMember(appsLayout);
+        vLayout.addMember(infoAppText);
         vLayout.addMember(appLayout);
 
         if(CoreModule.user != null) {
@@ -97,5 +102,9 @@ public class ManageApplicationsTab extends AbstractManageTab {
             String version, String lfn, String jsonLfn, String doi, boolean isVisible, boolean isBoutiquesForm) {
         editVersionLayout.setVersion(version, lfn, jsonLfn, isVisible, isBoutiquesForm);
         publishVersionLayout.setVersion(version, jsonLfn, doi);
+    }
+
+    private void titleInfoApp(){
+        infoAppText = WidgetUtil.getLabel("<font size=\"3\"><b> Test layout Application commentaire </b></font>", 20);
     }
 }

@@ -78,11 +78,15 @@ public class ApplicationBusiness {
     public List<Application> getPublicApplicationsWithGroups() throws BusinessException {
 
         try {
-            List<Application> allApplications = getApplications();
             Map<String,AppClass> allClasses = classDAO.getClasses().stream().collect(Collectors.toMap(
                         AppClass::getName, appClass -> appClass));
             Map<String,Group> allGroups = groupDAO.getGroups().stream().collect(Collectors.toMap(
                     Group::getName, group -> group));
+            Set<String> allVisibleApplicationNames = applicationDAO.getAllVisibleVersions().stream()
+                    .map(AppVersion::getApplicationName).collect(Collectors.toSet());
+            List<Application> allApplications = getApplications().stream()
+                    .filter(app -> allVisibleApplicationNames.contains(app.getName()))
+                    .collect(Collectors.toList());
 
             List<Application> applicationsWithGroups = new ArrayList<>();
             for (Application application : allApplications) {
