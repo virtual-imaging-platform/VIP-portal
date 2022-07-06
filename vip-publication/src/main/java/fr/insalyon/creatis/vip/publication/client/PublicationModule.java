@@ -61,6 +61,7 @@ public class PublicationModule extends Module {
 
     @Override
     public void load() {
+        Layout.getInstance().removeTab(PublicationConstants.TAB_PUBLICATION);
         CoreModule.addGeneralApplicationParser(new PublicationParser());
     }
 
