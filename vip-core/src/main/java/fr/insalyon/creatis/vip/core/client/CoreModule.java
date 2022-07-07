@@ -212,10 +212,14 @@ public class CoreModule extends Module {
 
     private void init() {
 
+        user = null;
         generalTileGrid = new GeneralTileGrid();
         systemTileGrid = new SystemTileGrid();
         homeTab = new HomeTab();
-        homePageActions = new HashMap<>();
+        if (homePageActions == null) {
+            // it must not be removed after a logout
+            homePageActions = new HashMap<>();
+        }
     }
 
     private void showDialog(String message, final AccountTab tab) {

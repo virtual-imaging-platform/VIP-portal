@@ -91,6 +91,8 @@ public class ApplicationModule extends Module {
 
     @Override
     public void load() {
+        Layout.getInstance().removeTab(ApplicationConstants.TAB_MANAGE_APPLICATION);
+        
         CoreModule.addGeneralApplicationParser(new ApplicationHomeParser());
         CoreModule.addSystemApplicationParser(new ApplicationSystemParser());
         CoreModule.addLayoutToHomeTab(TimelineLayout.getInstance());
