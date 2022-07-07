@@ -40,6 +40,7 @@ import fr.insalyon.creatis.vip.application.client.bean.Application;
 import fr.insalyon.creatis.vip.application.client.view.ApplicationException.ApplicationError;
 import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
 
@@ -59,6 +60,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  *
  * Test method on platform path
  */
+@Disabled
 public class PlatformControllerIT extends BaseVIPSpringIT {
 
     @Test
