@@ -464,6 +464,39 @@ public class ApplicationData extends JdbcDaoSupport implements ApplicationDAO {
     }
 
     @Override
+    public List<AppVersion> getAllVisibleVersions() throws DAOException {
+
+        try {
+            PreparedStatement ps = getConnection().prepareStatement("SELECT "
+                    + "application, version, lfn, json_lfn, doi, visible, useBoutiquesForm FROM "
+                    + "VIPAppVersions "
+                    + "WHERE visible = ? "
+                    + "ORDER BY version");
+            ps.setBoolean(1, true);
+
+            ResultSet rs = ps.executeQuery();
+            List<AppVersion> versions = new ArrayList<AppVersion>();
+
+            while (rs.next()) {
+                versions.add(new AppVersion(
+                        rs.getString("application"),
+                        rs.getString("version"),
+                        rs.getString("lfn"),
+                        rs.getString("json_lfn"),
+                        rs.getString("doi"),
+                        rs.getBoolean("visible"),
+                        rs.getBoolean("useBoutiquesForm")));
+            }
+            ps.close();
+            return versions;
+
+        } catch (SQLException ex) {
+            logger.error("Error getting all visible versions", ex);
+            throw new DAOException(ex);
+        }
+    }
+
+    @Override
     public void addVersion(AppVersion version) throws DAOException {
 
         try {

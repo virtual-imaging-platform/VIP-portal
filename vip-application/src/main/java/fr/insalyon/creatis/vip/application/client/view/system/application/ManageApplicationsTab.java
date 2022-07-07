@@ -31,11 +31,13 @@
  */
 package fr.insalyon.creatis.vip.application.client.view.system.application;
 
+import com.smartgwt.client.widgets.Label;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
 import fr.insalyon.creatis.vip.core.client.CoreModule;
 import fr.insalyon.creatis.vip.core.client.view.common.AbstractManageTab;
+import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
 
 /**
  *
@@ -48,6 +50,7 @@ public class ManageApplicationsTab extends AbstractManageTab {
     private VersionsLayout versionsLayout;
     private EditVersionLayout editVersionLayout;
     private PublishVersionLayout publishVersionLayout;
+    private Label infoAppText;
 
     public ManageApplicationsTab() {
 
@@ -55,9 +58,11 @@ public class ManageApplicationsTab extends AbstractManageTab {
 
         appsLayout = new ApplicationsLayout();
 
+        titleInfoApp();
         HLayout appLayout = new HLayout(5);
         appLayout.setHeight("50%");
         appLayout.addMember(appsLayout);
+        vLayout.addMember(infoAppText);
         vLayout.addMember(appLayout);
 
         if(CoreModule.user != null) {
@@ -97,5 +102,13 @@ public class ManageApplicationsTab extends AbstractManageTab {
             String version, String lfn, String jsonLfn, String doi, boolean isVisible, boolean isBoutiquesForm) {
         editVersionLayout.setVersion(version, lfn, jsonLfn, isVisible, isBoutiquesForm);
         publishVersionLayout.setVersion(version, jsonLfn, doi);
+    }
+
+    private void titleInfoApp(){
+        infoAppText = WidgetUtil.getLabel("<font size=\"3\"><b> This is a table containing " +
+                "all the applications that are publicly available on VIP. You can see in the last " +
+                "colum which group(s) give access to each application. Once registered and logged " +
+                "onto VIP, you can configure the groups you belong to by accessing your account page. " +
+                "Please refresh the VIP page after updating your groups to apply the change.</b></font>", 20);
     }
 }
