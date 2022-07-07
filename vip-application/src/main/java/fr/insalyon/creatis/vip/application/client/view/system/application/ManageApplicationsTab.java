@@ -105,10 +105,10 @@ public class ManageApplicationsTab extends AbstractManageTab {
     }
 
     private void titleInfoApp(){
-        infoAppText = WidgetUtil.getLabel("<font size=\"3\"><b> This is a table containing all the applications" +
-                " that are publicly available on VIP. You can see in the last colum the group(s) that give access to each application. " +
-                "Once registered and logged onto VIP, you can go in your account page to configure the groups you belong " +
-                "to and access the applications you desire to use (please refresh " +
-                "the VIP page after updating your groups to apply the change).</b></font>", 20);
+        infoAppText = WidgetUtil.getLabel("<font size=\"3\"><b> This is a table containing " +
+                "all the applications that are publicly available on VIP. You can see in the last " +
+                "colum which group(s) give access to each application. Once registered and logged " +
+                "onto VIP, you can configure the groups you belong to by accessing your account page. " +
+                "Please refresh the VIP page after updating your groups to apply the change.</b></font>", 20);
     }
 }
