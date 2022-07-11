@@ -38,6 +38,7 @@ import fr.insalyon.creatis.vip.datamanager.client.bean.PoolOperation.Status;
 import fr.insalyon.creatis.vip.datamanager.client.bean.PoolOperation.Type;
 import org.apache.commons.io.FileUtils;
 import org.hamcrest.Matchers;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
@@ -59,6 +60,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 /**
  * Created by abonnet on 1/23/17.
  */
+@Disabled
 public class DataControllerIT extends BaseVIPSpringIT {
 
     @Test

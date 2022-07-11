@@ -1,5 +1,6 @@
 package fr.insalyon.creatis.vip.core.server.business;
 
+import fr.insalyon.creatis.vip.core.client.CoreModule;
 import fr.insalyon.creatis.vip.core.client.bean.Group;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
@@ -186,5 +187,16 @@ public class VipSessionBusiness {
             st.append(enums.nextElement()).append(" ");
         }
         return st.toString();
+    }
+
+    public Boolean isUserConnected(HttpServletRequest request){
+        HttpSession session = request.getSession();
+        User user = (User) session.getAttribute(CoreConstants.SESSION_USER);
+        if (user != null) {
+            return true;
+        }
+        Map<String, String> cookies = getCookies(request);
+        return cookies.containsKey(CoreConstants.COOKIES_USER) &&
+                cookies.containsKey(CoreConstants.COOKIES_SESSION);
     }
 }

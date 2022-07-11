@@ -40,6 +40,7 @@ import fr.insalyon.creatis.vip.api.rest.config.RestTestUtils;
 import fr.insalyon.creatis.vip.application.client.bean.Simulation;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import org.hamcrest.MatcherAssert;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.http.MediaType;
@@ -69,6 +70,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * <p>
  * Test method on platform path
  */
+@Disabled
 public class ExecutionControllerIT extends BaseVIPSpringIT {
 
     @Test

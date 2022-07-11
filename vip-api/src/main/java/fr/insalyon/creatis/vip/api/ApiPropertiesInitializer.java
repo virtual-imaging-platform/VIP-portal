@@ -33,13 +33,9 @@ package fr.insalyon.creatis.vip.api;
 
 import fr.insalyon.creatis.vip.api.model.Module;
 import fr.insalyon.creatis.vip.api.model.SupportedTransferProtocol;
-import fr.insalyon.creatis.vip.core.server.business.Server;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.context.annotation.Profile;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
@@ -49,10 +45,8 @@ import org.springframework.util.Assert;
 
 import javax.annotation.PostConstruct;
 import java.io.IOException;
-import java.util.Optional;
 
 import static fr.insalyon.creatis.vip.api.CarminProperties.*;
-import static org.springframework.core.io.ResourceLoader.CLASSPATH_URL_PREFIX;
 
 /**
  * Add an additional "vip-api.conf" property file to spring environment
@@ -63,7 +57,9 @@ import static org.springframework.core.io.ResourceLoader.CLASSPATH_URL_PREFIX;
 @Component
 public class ApiPropertiesInitializer {
 
-    private ConfigurableEnvironment env;
+    private final Logger logger = LoggerFactory.getLogger(getClass());
+
+    private final ConfigurableEnvironment env;
 
     @Autowired
     public ApiPropertiesInitializer(
@@ -97,6 +93,17 @@ public class ApiPropertiesInitializer {
         verifyPropertyNotNull(API_DOWNLOAD_RETRY_IN_SECONDS, Integer.class);
         verifyPropertyNotNull(API_DOWNLOAD_TIMEOUT_IN_SECONDS, Integer.class);
         verifyPropertyNotNull(API_DATA_TRANSFERT_MAX_SIZE, Long.class);
+
+
+        verifyPropertyNotNull(SHANOIR_HOST_IP, String.class);
+        if (env.getProperty(KEYCLOAK_ACTIVATED, Boolean.class, Boolean.FALSE)) {
+            logger.info("Keycloak activated");
+            verifyPropertyNotNull(KEYCLOAK_CLIENT_ID, String.class);
+            verifyPropertyNotNull(KEYCLOAK_CLIENT_SECRET, String.class);
+            verifyPropertyNotNull(KEYCLOAK_REALM_URL, String.class);
+        } else {
+            logger.info("Keycloak NOT active");
+        }
 
         // due to arrays and generics, this verification aren't easy to factorize
         Assert.notEmpty(env.getProperty(SUPPORTED_TRANSFER_PROTOCOLS, SupportedTransferProtocol[].class),

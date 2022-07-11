@@ -29,37 +29,20 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL-B license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.api;
+package fr.insalyon.creatis.vip.api.security;
 
-import fr.insalyon.creatis.vip.api.security.SpringCompatibleUser;
-import fr.insalyon.creatis.vip.api.security.apikey.ApikeyAuthenticationEntryPoint;
-import fr.insalyon.creatis.vip.api.security.apikey.ApikeyAuthentificationConfigurer;
-import fr.insalyon.creatis.vip.core.client.bean.User;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.annotation.Order;
-import org.springframework.core.env.Environment;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.web.firewall.DefaultHttpFirewall;
 import org.springframework.security.oauth2.client.endpoint.DefaultAuthorizationCodeTokenResponseClient;
 import org.springframework.security.oauth2.client.endpoint.OAuth2AccessTokenResponseClient;
 import org.springframework.security.oauth2.client.endpoint.OAuth2AuthorizationCodeGrantRequest;
-import org.springframework.security.oauth2.client.registration.ClientRegistration;
-import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
-import org.springframework.security.oauth2.client.registration.InMemoryClientRegistrationRepository;
 import org.springframework.security.oauth2.client.web.AuthorizationRequestRepository;
 import org.springframework.security.oauth2.client.web.HttpSessionOAuth2AuthorizationRequestRepository;
-import org.springframework.security.oauth2.core.AuthorizationGrantType;
-import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
 import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest;
-import org.springframework.security.oauth2.core.oidc.IdTokenClaimNames;
-
-import java.util.function.Supplier;
+import org.springframework.security.web.firewall.DefaultHttpFirewall;
 
 /**
  * Spring security configuration.
@@ -67,7 +50,7 @@ import java.util.function.Supplier;
  * It secures by api key all rest requests (except /platform)
  * General configuration is done here (what is secured, session management etc).
  *
- * The custom api key configuration is done in {@link ApikeyAuthentificationConfigurer}
+ * The custom api key configuration is done in {@link ApiSecurityConfig}
  *
  * Created by abonnet on 7/22/16.
  */

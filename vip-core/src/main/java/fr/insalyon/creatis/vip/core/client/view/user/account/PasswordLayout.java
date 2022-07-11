@@ -33,6 +33,7 @@ package fr.insalyon.creatis.vip.core.client.view.user.account;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.widgets.IButton;
+import com.smartgwt.client.widgets.Label;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.fields.PasswordItem;
@@ -66,6 +67,10 @@ public class PasswordLayout extends AbstractFormLayout {
         addTitle("Password", CoreConstants.ICON_PASSWORD);
 
         configure();
+
+        if (CoreModule.user.getPassword() == null){
+            this.addMember(WidgetUtil.getLabel("<font color=\"#666666\"><b>Note</b>: "
+                    + "You do not have a password yet, if you wish you can create one by clicking on the button above.</font>", 30));}
     }
 
     private void configure() {
@@ -125,15 +130,25 @@ public class PasswordLayout extends AbstractFormLayout {
             }
         });
 
-        recoverButton.setWidth(200);
-        currentPasswordField.setTooltip("Note: you may not know your VIP password in case your account was automatically generated. If you need it, you can still recover it using the button below.");
-        addField("Current", currentPasswordField);
-        addField("New", newPasswordField);
-        addField("Re-type new", confirmPasswordField);
-        this.addMember(saveButton);
-        this.addMember(recoverButton);
+        IButton createPassButton = WidgetUtil.getIButton("Create a Password ?", CoreConstants.ICON_HELP, new ClickHandler() {
+            @Override
+            public void onClick(ClickEvent event) {
+                Layout.getInstance().addTab(
+                        CoreConstants.TAB_RECOVERY, RecoveryTab::new);
+            }
+        });
 
-        this.addMember(WidgetUtil.getLabel("<font color=\"#666666\"><b>Note</b>: "
-                + "If you are logged in with EGI Check-in, please create a password by clicking on Forgot Password.</font>", 30));
+        recoverButton.setWidth(200);
+        createPassButton.setWidth(200);
+        if (CoreModule.user.getPassword() == null) {
+            this.addMember(createPassButton);
+        } else {
+            addField("Current", currentPasswordField);
+            addField("New", newPasswordField);
+            addField("Re-type new", confirmPasswordField);
+            this.addMember(saveButton);
+            this.addMember(recoverButton);
+
+        }
     }
 }

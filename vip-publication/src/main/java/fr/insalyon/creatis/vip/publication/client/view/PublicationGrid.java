@@ -76,7 +76,7 @@ public class PublicationGrid extends ListGrid {
             protected Canvas getRollOverCanvas(Integer rowNum, Integer colNum) {
                 rollOverRecord = this.getRecord(rowNum);
 
-                if (rollOverCanvas == null) {
+                if (CoreModule.user != null && rollOverCanvas == null) {
                     rollOverCanvas = new HLayout(3);
                     rollOverCanvas.setSnapTo("TR");
                     rollOverCanvas.setWidth(50);
@@ -186,7 +186,8 @@ public class PublicationGrid extends ListGrid {
                 pubOwner);
 
         publicationId.setHidden(true);
-        if (CoreModule.user.isSystemAdministrator()) {
+
+        if (CoreModule.user != null && CoreModule.user.isSystemAdministrator()) {
             pubOwner.setHidden(false);
         } else {
             pubOwner.setHidden(true);
@@ -203,13 +204,6 @@ public class PublicationGrid extends ListGrid {
                 }
             }
         });
-    }
-
-    protected static void edit(String id, String title, String type, String typeName, String authors, String date, String doi, String vipApplication) {
-
-        PublicationTab pubTab = (PublicationTab) Layout.getInstance().
-                getTab(PublicationConstants.TAB_PUBLICATION);
-        pubTab.setPublication(id, title, type, typeName, authors, date, doi, vipApplication);
     }
 
     private void remove(Long id) {

@@ -26,9 +26,7 @@ public class StatsController extends ApiController {
 
     @Autowired
     public StatsController(
-            Supplier<User> currentUserSupplier,
             StatsApiBusiness statsApiBusiness) {
-        super(currentUserSupplier);
         this.statsApiBusiness = statsApiBusiness;
     }
 

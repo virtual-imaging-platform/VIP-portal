@@ -149,7 +149,15 @@ public abstract class AbstractRemoteServiceServlet extends RemoteServiceServlet 
         return getSessionUser().isGroupAdmin();
     }
 
+    protected boolean isUserConnected() {
+        return vipSessionBusiness.isUserConnected(this.getThreadLocalRequest());
+    }
+
     protected void trace(Logger logger, String message) throws CoreException {
-        logger.info("(" + getSessionUser().getEmail() + ") " + message);
+        if (vipSessionBusiness.isUserConnected(this.getThreadLocalRequest())) {
+            logger.info("(" + getSessionUser().getEmail() + ") " + message);
+        } else {
+            logger.info("(Anonymous) " + message);
+        }
     }
 }

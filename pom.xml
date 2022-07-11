@@ -43,8 +43,8 @@ knowledge of the CeCILL-B license and that you accept its terms.
     <properties>
         <!-- project version. Only to change it here (and in CoreConstants.java
            Follow this practice : https://maven.apache.org/maven-ci-friendly.html-->
-        <revision>2.2</revision>
-        <changelist/>
+        <revision>2.3</revision>
+        <changelist></changelist>
         <sha1/>
 
         <!-- other maven config -->
@@ -52,7 +52,13 @@ knowledge of the CeCILL-B license and that you accept its terms.
         <maven.compiler.target>11</maven.compiler.target>
         <maven.compiler.source>11</maven.compiler.source>
 
-        <!-- dependencies version -->
+
+        <!-- VIP related dependencies version -->
+        <moteur2-workflowsdb-common.version>1.6</moteur2-workflowsdb-common.version>
+        <grida.version>2.2.0</grida.version>
+        <sma.version>0.3.0</sma.version>
+
+        <!-- 3rd party dependencies version -->
         <junit.version>5.6.2</junit.version>
         <spring-framework.version>5.3.15</spring-framework.version>
         <springsecurity.version>5.6.1</springsecurity.version>
@@ -168,7 +174,7 @@ knowledge of the CeCILL-B license and that you accept its terms.
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
-            <version>3.3.3</version>
+            <version>4.6.1</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -203,7 +209,7 @@ knowledge of the CeCILL-B license and that you accept its terms.
         <repository>
             <id>version99</id>
             <!-- highly available repository serving empty artifacts -->
-            <url>http://version99.qos.ch/</url>
+            <url>https://version99.qos.ch/</url>
         </repository>
     </repositories>
 
@@ -258,7 +264,7 @@ knowledge of the CeCILL-B license and that you accept its terms.
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-failsafe-plugin</artifactId>
-                <version>3.0.0-M5</version>
+                <version>3.0.0-M7</version>
                 <executions>
                     <execution>
                         <goals>

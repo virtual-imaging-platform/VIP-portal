@@ -77,13 +77,13 @@ knowledge of the CeCILL-B license and that you accept its terms.
         <dependency>
             <groupId>fr.insalyon.creatis</groupId>
             <artifactId>grida-client</artifactId>
-            <version>1.4</version>
+            <version>${grida.version}</version>
         </dependency>
 
         <dependency>
             <groupId>fr.insalyon.creatis</groupId>
             <artifactId>sma-client</artifactId>
-            <version>0.2</version>
+            <version>${sma.version}</version>
         </dependency>
 
         <dependency>

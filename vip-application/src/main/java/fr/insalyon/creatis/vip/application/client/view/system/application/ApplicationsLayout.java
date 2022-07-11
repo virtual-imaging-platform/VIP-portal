@@ -51,6 +51,7 @@ import com.smartgwt.client.widgets.layout.VLayout;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
 import fr.insalyon.creatis.vip.application.client.bean.Application;
 import fr.insalyon.creatis.vip.application.client.rpc.ApplicationService;
+import fr.insalyon.creatis.vip.core.client.CoreModule;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 import fr.insalyon.creatis.vip.core.client.view.common.LabelButton;
@@ -59,6 +60,8 @@ import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Supplier;
+import java.util.logging.Logger;
 
 /**
  *
@@ -89,29 +92,31 @@ public class ApplicationsLayout extends VLayout {
 
         toolstrip.addMember(WidgetUtil.getSpaceLabel(15));
 
-        LabelButton addButton = new LabelButton("Add Application", CoreConstants.ICON_ADD);
-        addButton.setWidth(150);
-        addButton.addClickHandler(new ClickHandler() {
-            @Override
-            public void onClick(ClickEvent event) {
-                ManageApplicationsTab appsTab = (ManageApplicationsTab) Layout.getInstance().
-                        getTab(ApplicationConstants.TAB_MANAGE_APPLICATION);
-                appsTab.setApplication(null, null, null, null);
-            }
-        });
-        toolstrip.addMember(addButton);
+        if(CoreModule.user != null) {
+            LabelButton addButton = new LabelButton("Add Application", CoreConstants.ICON_ADD);
+            addButton.setWidth(150);
+            addButton.addClickHandler(new ClickHandler() {
+                @Override
+                public void onClick(ClickEvent event) {
+                    ManageApplicationsTab appsTab = (ManageApplicationsTab) Layout.getInstance().
+                            getTab(ApplicationConstants.TAB_MANAGE_APPLICATION);
+                    appsTab.setApplication(null, null, null, null);
+                }
+            });
+            toolstrip.addMember(addButton);
 
-        LabelButton refreshButton = new LabelButton("Refresh", CoreConstants.ICON_REFRESH);
-        refreshButton.setWidth(150);
-        refreshButton.addClickHandler(new ClickHandler() {
-            @Override
-            public void onClick(ClickEvent event) {
-                loadData();
-            }
-        });
-        toolstrip.addMember(refreshButton);
+            LabelButton refreshButton = new LabelButton("Refresh", CoreConstants.ICON_REFRESH);
+            refreshButton.setWidth(150);
+            refreshButton.addClickHandler(new ClickHandler() {
+                @Override
+                public void onClick(ClickEvent event) {
+                    loadData();
+                }
+            });
+            toolstrip.addMember(refreshButton);
 
-        this.addMember(toolstrip);
+            this.addMember(toolstrip);
+        }
     }
 
     private void configureGrid() {
@@ -121,7 +126,7 @@ public class ApplicationsLayout extends VLayout {
             protected Canvas getRollOverCanvas(Integer rowNum, Integer colNum) {
                 rollOverRecord = this.getRecord(rowNum);
 
-                if (rollOverCanvas == null) {
+                if (CoreModule.user != null && rollOverCanvas == null) {
                     rollOverCanvas = new HLayout(3);
                     rollOverCanvas.setSnapTo("TR");
                     rollOverCanvas.setWidth(50);
@@ -178,12 +183,18 @@ public class ApplicationsLayout extends VLayout {
         grid.setShowEmptyMessage(true);
         grid.setShowRowNumbers(true);
         grid.setEmptyMessage("<br>No data available.");
-        ListGridField ownerField = new ListGridField("owner", "Owner");
-        ownerField.setHidden(true);
-        grid.setFields(new ListGridField("name", "Application Name"),
-                new ListGridField("ownerFullName", "Owner"),
-                ownerField,
-                new ListGridField("classes", "Classes"));
+        if (CoreModule.user != null){
+            ListGridField ownerField = new ListGridField("owner", "Owner");
+            ownerField.setHidden(true);
+            grid.setFields(new ListGridField("name", "Application Name"),
+                    new ListGridField("ownerFullName", "Owner"),
+                    ownerField,
+                    new ListGridField("classes", "Classes"));
+        } else {
+            grid.setFields(new ListGridField("name", "Application Name"),
+                    new ListGridField("classes", "Classes"),
+                    new ListGridField("groups", "Groups"));
+        }
         grid.setSortField("name");
         grid.setSortDirection(SortDirection.ASCENDING);
         grid.addCellClickHandler(new CellClickHandler() {
@@ -215,13 +226,27 @@ public class ApplicationsLayout extends VLayout {
 
                 for (Application app : result) {
                     StringBuilder sb = new StringBuilder();
+                    StringBuilder sbg = new StringBuilder();
                     for (String className : app.getApplicationClasses()) {
                         if (sb.length() > 0) {
                             sb.append(", ");
                         }
                         sb.append(className);
                     }
-                    dataList.add(new ApplicationRecord(app.getName(), app.getOwner(), app.getFullName(), sb.toString(), app.getCitation()));
+
+                    if(CoreModule.user == null) {
+                        for (String group : app.getApplicationGroups()) {
+                            if (sbg.length() > 0) {
+                                sbg.append(", ");
+                            }
+                            sbg.append(group);
+                        }
+                    }
+                    if(CoreModule.user == null) {
+                        dataList.add(new ApplicationRecord(app.getName(), app.getOwner(), app.getFullName(), sb.toString(), app.getCitation(), sbg.toString()));
+                    } else {
+                        dataList.add(new ApplicationRecord(app.getName(), app.getOwner(), app.getFullName(), sb.toString(), app.getCitation()));
+                    }
                 }
                 grid.setData(dataList.toArray(new ApplicationRecord[]{}));
             }

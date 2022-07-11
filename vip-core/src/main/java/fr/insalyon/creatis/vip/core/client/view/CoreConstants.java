@@ -41,7 +41,7 @@ import java.util.Date;
 public class CoreConstants implements IsSerializable {
 
 
-    public static final String VERSION = "v2.2";
+    public static final String VERSION = "v2.3";
     // Configuration Labels
     public static final String VO_NAME = "vo.name";
     public static final String VO_ROOT = "vo.root";
@@ -100,6 +100,9 @@ public class CoreConstants implements IsSerializable {
     public static final String TAB_MANAGE_TIPS = "manage_tips_tab";
     public static final String TAB_MANAGE_USERS = "manage_users_tab";
     public static final String TAB_MANAGE_SETTING = "manage_setting_tab";
+    // home actions
+    public static final String HOME_ACTION_SHOW_APPLICATIONS = "SHOW_APPLICATIONS";
+    public static final String HOME_ACTION_SHOW_PUBLICATIONS = "SHOW_PUBLICATIONS";
     // Icons
     private static final String IMG_FOLDER = "core/";
     public static final String ICON_SEARCH = "icon-search.png";
@@ -139,6 +142,7 @@ public class CoreConstants implements IsSerializable {
     public static final String ICON_RUNNING_SIMULATIONS = IMG_FOLDER +"icon-runningSimulation.png";
     public static final String ICON_VIP_LOGO = IMG_FOLDER + "vip-logo.png";
     public static final String ICON_VIP_LOGO_WITHOUT_TEXT = IMG_FOLDER + "vip-logo-without-text.png";
+    public static final String EGI_CHECK_IN_LOGO = IMG_FOLDER + "egi-check-in.png";
     // Folders
     public static final String FOLDER_TRASH = "Trash";
     public static final String FOLDER_FLAGS = IMG_FOLDER + "flags/";

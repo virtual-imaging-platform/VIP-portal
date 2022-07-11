@@ -136,6 +136,16 @@ public class ConfigurationBusiness {
         }
     }
 
+    public User getUserWithGroups(String email) throws BusinessException {
+        try {
+            User user = userDAO.getUser(email);
+            user.setGroups(usersGroupsDAO.getUserGroups(email));
+            return user;
+        } catch (DAOException ex) {
+            throw new BusinessException(ex);
+        }
+    }
+
     public void signup(
             User user, String comments, boolean automaticCreation,
             boolean mapPrivateGroups, String... accountType)
@@ -145,7 +155,6 @@ public class ConfigurationBusiness {
 
         // Build log message
         StringBuilder message = new StringBuilder("Signing up ");
-        message.append(user.getEmail());
         message.append(". List of undesired countries: ");
         for (String s : server.getUndesiredCountries()) {
             if (!s.trim().isEmpty()) {
@@ -175,7 +184,11 @@ public class ConfigurationBusiness {
             }
             user.setLastUpdatePublications(getCurrentTimeStamp());
             user.setCode(UUID.randomUUID().toString());
-            user.setPassword(MD5.get(user.getPassword()));
+            if (user.getPassword() == null){
+                user.setPassword(null);
+            } else{
+                user.setPassword(MD5.get(user.getPassword()));
+            }
             String folder = user.getFirstName().replaceAll(" ", "_").toLowerCase() + "_"
                             + user.getLastName().replaceAll(" ", "_").toLowerCase();
             // normalise user folder : remove accents and non ascii characters
@@ -399,7 +412,7 @@ public class ConfigurationBusiness {
                 lastName.trim(),
                 email.trim(),
                 "Unknown",
-                UUID.randomUUID().toString(),
+                null,
                 "0000",
                 cc, getCurrentTimeStamp());
     }

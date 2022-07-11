@@ -55,13 +55,11 @@ public class ExternalPlatformController extends ApiController {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    private ExternalPlatformBusiness externalPlatformBusiness;
+    private final ExternalPlatformBusiness externalPlatformBusiness;
 
     @Autowired
     public ExternalPlatformController(
-            Supplier<User> currentUserSupplier,
             ExternalPlatformBusiness externalPlatformBusiness) {
-        super(currentUserSupplier);
         this.externalPlatformBusiness = externalPlatformBusiness;
     }
 

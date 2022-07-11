@@ -36,6 +36,7 @@ import com.google.gwt.user.client.Cookies;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.HorizontalPanel;
+import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.ImageStyle;
@@ -48,15 +49,13 @@ import com.smartgwt.client.widgets.Label;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.DynamicForm;
-import com.smartgwt.client.widgets.form.fields.CheckboxItem;
-import com.smartgwt.client.widgets.form.fields.LinkItem;
-import com.smartgwt.client.widgets.form.fields.PasswordItem;
-import com.smartgwt.client.widgets.form.fields.TextItem;
+import com.smartgwt.client.widgets.form.fields.*;
 import com.smartgwt.client.widgets.form.fields.events.KeyPressEvent;
 import com.smartgwt.client.widgets.form.fields.events.KeyPressHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.tab.Tab;
+import fr.insalyon.creatis.vip.core.client.CoreModule;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationService;
 import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationServiceAsync;
@@ -78,26 +77,31 @@ public class SignInTab extends Tab {
     private Label infoVipLayout;
     private Label infoVipLog;
     private Label infoContactlayout;
-    private Label infoToolLayout;
-    private Label infoPublicationLayout;
     private Label infoCodeSource;
     private Label infoContactus;
     private Label infoMail;
     private DynamicForm newForm;
+    private DynamicForm newFormAppLayout;
+    private DynamicForm newFormPubliLayout;
     private TextItem emailField;
     private PasswordItem passwordField;
     private CheckboxItem remembermeField;
     private IButton signinButton;
+    private IButton createAnAccountButton;
+    private IButton egiButton;
+    private Img egiLogo;
 
     public SignInTab() {
 
         this.setID(CoreConstants.TAB_SIGNIN);
         this.setTitle("Sign In");
 
+
+
         VLayout loginVLayout = new VLayout(15);
         loginVLayout.setWidth100();
         loginVLayout.setHeight100();
-        loginVLayout.setLayoutTopMargin(5);
+        loginVLayout.setLayoutTopMargin(1);
         loginVLayout.setOverflow(Overflow.AUTO);
         loginVLayout.setAlign(Alignment.CENTER);
         loginVLayout.setDefaultLayoutAlign(Alignment.CENTER);
@@ -111,23 +115,29 @@ public class SignInTab extends Tab {
         hautLayout.setAlign(Alignment.CENTER);
         hautLayout.setDefaultLayoutAlign(Alignment.CENTER);
 
-        HLayout middleLayout = new HLayout(15);
+        VLayout middleLayout = new VLayout(5);
         middleLayout.setWidth100();
-        middleLayout.setHeight(250);
+        middleLayout.setHeight(360);
         middleLayout.setOverflow(Overflow.AUTO);
         middleLayout.setAlign(Alignment.CENTER);
         middleLayout.setDefaultLayoutAlign(Alignment.CENTER);
 
-        HorizontalPanel middlePanel = new HorizontalPanel();
+        VerticalPanel middlePanel = new VerticalPanel();
+        middlePanel.setSize("10%", "5%");
         middlePanel.setVerticalAlignment(VerticalPanel.ALIGN_MIDDLE);
         middlePanel.setHorizontalAlignment(HorizontalPanel.ALIGN_CENTER);
+
+        HorizontalPanel egiPanel = new HorizontalPanel();
+        egiPanel.setSpacing(5);
+        egiPanel.setSize("10%", "5%");
+        egiPanel.setVerticalAlignment(VerticalPanel.ALIGN_MIDDLE);
+        egiPanel.setHorizontalAlignment(HorizontalPanel.ALIGN_CENTER);
 
         VLayout basLayout = new VLayout(15);
         basLayout.setWidth100();
         basLayout.setHeight(100);
         basLayout.setLayoutLeftMargin(100);
 
-        configureNewForm();
         configureSigninLayout();
         testLayoutInfo();
         hautLayout.addMember(infoWelcomeVipLayout);
@@ -138,12 +148,14 @@ public class SignInTab extends Tab {
         hautLayout.addMember(infoContactlayout);
         loginVLayout.addMember(hautLayout);
         middlePanel.add(signinLayout);
-        middlePanel.add(newForm);
+        egiPanel.add(egiLogo);
+        egiPanel.add(egiButton);
         middleLayout.addMember(middlePanel);
+        middleLayout.addMember(egiPanel);
         loginVLayout.addMember(middleLayout);
         basLayout.addMember(infoContactlayout);
-        basLayout.addMember(infoToolLayout);
-        basLayout.addMember(infoPublicationLayout);
+        basLayout.addMember(newFormAppLayout);
+        basLayout.addMember(newFormPubliLayout);
         basLayout.addMember(infoCodeSource);
         basLayout.addMember(infoVipNews);
         basLayout.addMember(infoMail);
@@ -155,12 +167,9 @@ public class SignInTab extends Tab {
     private void configureSigninLayout() {
 
         emailField = FieldUtil.getTextItem(230, false, "", "[a-zA-Z0-9_.\\-+@]");
-        emailField.addKeyPressHandler(new KeyPressHandler() {
-            @Override
-            public void onKeyPress(KeyPressEvent event) {
-                if (event.getKeyName().equals("Enter")) {
-                    signin();
-                }
+        emailField.addKeyPressHandler(event -> {
+            if (event.getKeyName().equals("Enter")) {
+                signin();
             }
         });
 
@@ -169,12 +178,9 @@ public class SignInTab extends Tab {
         passwordField.setLength(32);
         passwordField.setShowTitle(false);
         passwordField.setRequired(true);
-        passwordField.addKeyPressHandler(new KeyPressHandler() {
-            @Override
-            public void onKeyPress(KeyPressEvent event) {
-                if (event.getKeyName().equals("Enter")) {
-                    signin();
-                }
+        passwordField.addKeyPressHandler(event -> {
+            if (event.getKeyName().equals("Enter")) {
+                signin();
             }
         });
 
@@ -184,51 +190,42 @@ public class SignInTab extends Tab {
         remembermeField.setAlign(Alignment.LEFT);
 
         signinButton = new IButton("Sign in");
-        signinButton.addClickHandler(new ClickHandler() {
-            @Override
-            public void onClick(ClickEvent event) {
-                signin();
-            }
-        });
-
-        signinLayout = WidgetUtil.getVIPLayout(250, 150);
-        WidgetUtil.addFieldToVIPLayout(signinLayout, "Email", emailField);
-        WidgetUtil.addFieldToVIPLayout(signinLayout, "Password", passwordField);
-        signinLayout.addMember(FieldUtil.getForm(remembermeField));
-        signinLayout.addMember(signinButton);
-    }
-
-    private void configureNewForm() {
-
-        LinkItem createAccount = FieldUtil.getLinkItem("link_create", "Create an account.",
-                new com.smartgwt.client.widgets.form.fields.events.ClickHandler() {
-            @Override
-            public void onClick(com.smartgwt.client.widgets.form.fields.events.ClickEvent event) {
-                Layout.getInstance().addTab(
-                    CoreConstants.TAB_SIGNUP, SignUpTab::new);
-            }
-        });
+        signinButton.addClickHandler(event -> signin());
 
         LinkItem recoverAccount = FieldUtil.getLinkItem("link_reset", "Forgot your password?",
-                new com.smartgwt.client.widgets.form.fields.events.ClickHandler() {
-            @Override
-            public void onClick(com.smartgwt.client.widgets.form.fields.events.ClickEvent event) {
-                Layout.getInstance().addTab(
-                    CoreConstants.TAB_RECOVERY, RecoveryTab::new);
-            }
-        });
+                event -> Layout.getInstance().addTab(
+                        CoreConstants.TAB_RECOVERY, RecoveryTab::new));
 
-        LinkItem egiAccount = FieldUtil.getLinkItem("link_redirection", "Connection with EGI Check-in.",
-                new com.smartgwt.client.widgets.form.fields.events.ClickHandler() {
-                    public void onClick(com.smartgwt.client.widgets.form.fields.events.ClickEvent event) {
-                        Window.Location.assign("/oauth2/authorize-client/egi");
-                    }
-                });
+        createAnAccountButton = new IButton("Create an account");
+        createAnAccountButton.addClickHandler(event -> Layout.getInstance().addTab(
+                CoreConstants.TAB_SIGNUP, SignUpTab::new));
 
-        newForm = FieldUtil.getForm(egiAccount, createAccount, recoverAccount);
-        newForm.setWidth(230);
-        newForm.setHeight(60);
-        newForm.setNumCols(1);
+        HorizontalPanel siginPanel = new HorizontalPanel();
+        siginPanel.setSpacing(10);
+        siginPanel.setSize("10%", "10%");
+        siginPanel.setVerticalAlignment(VerticalPanel.ALIGN_MIDDLE);
+        siginPanel.setHorizontalAlignment(HorizontalPanel.ALIGN_CENTER);
+
+        newForm = FieldUtil.getForm(recoverAccount);
+
+        signinLayout = WidgetUtil.getVIPLayout(250, 110);
+        WidgetUtil.addFieldToVIPLayout(signinLayout, "Email", emailField);
+        WidgetUtil.addFieldToVIPLayout(signinLayout, "Password", passwordField);
+        signinLayout.addMember(newForm);
+        signinLayout.addMember(FieldUtil.getForm(remembermeField));
+        siginPanel.add(signinButton);
+        siginPanel.add(createAnAccountButton);
+        signinLayout.addMember(siginPanel);
+
+        egiButton = new IButton("Connection with EGI Check-in");
+        egiButton.addClickHandler(event -> Window.Location.assign("/oauth2/authorize-client/egi"));
+
+        egiButton.setWidth(180);
+
+        egiLogo = new Img(CoreConstants.EGI_CHECK_IN_LOGO, 50, 70);
+        egiLogo.setImageWidth(50);
+        egiLogo.setImageHeight(50);
+        egiLogo.setImageType(ImageStyle.CENTER);
     }
 
     private void signin() {
@@ -283,15 +280,43 @@ public class SignInTab extends Tab {
         infoWelcomeVipLayout.setStyleName("title");
         infoWelcomeVipLayout.setStyleName("title");
         infoSpace = WidgetUtil.getLabel(" ",20);
-        infoVipLayout= WidgetUtil.getLabel("<font size=\"3\"><b>VIP is a web portal for medical imaging applications. It allows you to access scientific applications as a service (directly through your web browser with no installation required), as well as distributed computing resources in a transparent manner.</b></font>", 20);
-        infoVipLog = WidgetUtil.getLabel("<font size=\"3\"><b>Please log in using the form below or the link to the EGI Checkin federated authentication service, or create a new account if you don't have one.</b></font>",20);
-        infoContactlayout = WidgetUtil.getLabel("<font size=\"3\"><b>Documentation of the Virtual Imaging Platform and its embedded applications is available here:  <a href=\"https://vip.creatis.insa-lyon.fr/documentation/\">VIP Documentation</a></b></font>",20);
-        infoToolLayout = WidgetUtil.getLabel("<font size=\"3\"><b>The list of applications available on the Virtual Imaging Platform is here:  <a href=\"https://www.creatis.insa-lyon.fr/vip/applications.html\">VIP Applications</a></b></font>",20);
-        infoPublicationLayout = WidgetUtil.getLabel("<font size=\"3\"><b>The list of publications related to the Virtual Imaging Platform is here:  <a href=\"https://www.creatis.insa-lyon.fr/vip/more-publications.html\">VIP Publications</a></b></font>",20);
-        infoCodeSource = WidgetUtil.getLabel("<font size=\"3\"><b>The Virtual Imaging Platform source code:  <a href=\"https://github.com/virtual-imaging-platform\">VIP Github</a>",20);
-        infoContactus = WidgetUtil.getLabel("<font size=\"3\"><b>This portal is exclusively dedicated to non-commercial academic use, as indicated in the <a href=\"https://vip.creatis.insa-lyon.fr/documentation/terms.html\">terms of use.</a> For commercial use, please contact us at <a href=\"mailto:vip-support@creatis.insa-lyon.fr\">vip-support@creatis.insa-lyon.fr</a>.</b></font>",20);
-        infoMail = WidgetUtil.getLabel("<font size=\"3\"><b>Contact: <a href=\"mailto:vip-support@creatis.insa-lyon.fr\">vip-support@creatis.insa-lyon.fr</a></b></font>",20);
-        infoVipNews = WidgetUtil.getLabel("<font size=\"3\"><b>VIP News: <a href=\"https://www.creatis.insa-lyon.fr/vip/news.html\">https://www.creatis.insa-lyon.fr/vip/news.html</a>",20);
+        infoVipLayout= WidgetUtil.getLabel("<font size=\"3\"><b>VIP is a web portal for medical imaging applications. " +
+                "It allows you to access scientific applications as a service (directly through your web browser with no installation required), " +
+                "as well as distributed computing resources in a transparent manner.</b></font>", 20);
+        infoVipLog = WidgetUtil.getLabel("<font size=\"3\"><b>Please log in using the form below or the link " +
+                "to the EGI Checkin federated authentication service, or create a new account if you don't have one.</b></font>",20);
+        infoContactlayout = WidgetUtil.getLabel("<font size=\"3\"><b>Documentation of the Virtual " +
+                "Imaging Platform and its embedded applications is available here:  <a href=\"https://vip.creatis.insa-lyon.fr/documentation/\">" +
+                "VIP Documentation</a></b></font>",20);
+
+        LinkItem infoAppLayout = new LinkItem();
+        infoAppLayout.setLinkTitle("<font size=\"3\"><b>The list of Applications related to the Virtual Imaging Platform </b></font>");
+        infoAppLayout.setShowTitle(false);
+        infoAppLayout.addClickHandler((com.smartgwt.client.widgets.form.fields.events.ClickHandler) event -> {
+            CoreModule.getHomePageActions().get(CoreConstants.HOME_ACTION_SHOW_APPLICATIONS).run();            
+        });
+
+        LinkItem infoPubliLayout = new LinkItem();
+        infoPubliLayout.setLinkTitle("<font size=\"3\"><b>The list of Publications related to the Virtual Imaging Platform </b></font>");
+        infoPubliLayout.setShowTitle(false);
+        infoPubliLayout.addClickHandler((com.smartgwt.client.widgets.form.fields.events.ClickHandler) event -> {
+            CoreModule.getHomePageActions().get(CoreConstants.HOME_ACTION_SHOW_PUBLICATIONS).run();
+        });
+
+        newFormPubliLayout = FieldUtil.getForm(infoPubliLayout);
+
+
+        newFormAppLayout = FieldUtil.getForm(infoAppLayout);
+        infoCodeSource = WidgetUtil.getLabel("<font size=\"3\"><b>The Virtual Imaging Platform source code: " +
+                " <a href=\"https://github.com/virtual-imaging-platform\">VIP Github</a>",20);
+        infoContactus = WidgetUtil.getLabel("<font size=\"3\"><b>This portal is exclusively dedicated to non-commercial academic use, " +
+                "as indicated in the <a href=\"https://vip.creatis.insa-lyon.fr/documentation/terms.html\">terms of use.</a> " +
+                "For commercial use, please contact us at <a href=\"mailto:vip-support@creatis.insa-lyon.fr\">" +
+                "vip-support@creatis.insa-lyon.fr</a>.</b></font>",20);
+        infoMail = WidgetUtil.getLabel("<font size=\"3\"><b>Contact: <a href=\"mailto:vip-support@creatis.insa-lyon.fr\">" +
+                "vip-support@creatis.insa-lyon.fr</a></b></font>",20);
+        infoVipNews = WidgetUtil.getLabel("<font size=\"3\"><b>VIP News: <a href=\"https://www.creatis.insa-lyon.fr/vip/news.html\">" +
+                "https://www.creatis.insa-lyon.fr/vip/news.html</a>",20);
 
         infoMail.setCanSelectText(true);
         infoContactus.setCanSelectText(true);
