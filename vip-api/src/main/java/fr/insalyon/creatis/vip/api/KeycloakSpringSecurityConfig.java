@@ -122,6 +122,7 @@ public class KeycloakSpringSecurityConfig extends KeycloakWebSecurityConfigurerA
             .authorizeRequests()
                 .antMatchers("/rest/platform").permitAll()
                 .antMatchers("/rest/authenticate").permitAll()
+                .antMatchers("/rest/executions/{executionId}/summary").permitAll() // We can secure it by IP, but it's changed because of reverse proxy
                 .antMatchers("/rest/register")
                 .access(String.format("isAuthenticated() and hasIpAddress('%s')", env.getProperty(ShanoirProperties.SHANOIR_HOST_IP))) //signup a user to VIP
                 .antMatchers("/rest/simulate-refresh").authenticated()
