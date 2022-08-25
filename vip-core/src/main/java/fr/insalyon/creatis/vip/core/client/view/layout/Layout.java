@@ -230,7 +230,7 @@ public class Layout {
      * @param message
      */
     public void setNoticeMessage(String message) {
-        setNoticeMessage(message, 15);
+        setNoticeMessage(message, 20);
     }
 
     /**
@@ -247,7 +247,7 @@ public class Layout {
      * @param message
      */
     public void setWarningMessage(String message) {
-        setWarningMessage(message, 10);
+        setWarningMessage(message, 20);
     }
 
     /**

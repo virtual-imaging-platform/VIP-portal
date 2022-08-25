@@ -278,7 +278,6 @@ public class SignInTab extends Tab {
         infoWelcomeVipLayout = WidgetUtil.getLabel("<font size=\"6\"><b>Welcome on VIP, the Virtual Imaging Platform!</b></font>",20);
         infoWelcomeVipLayout.setWidth(900);
         infoWelcomeVipLayout.setStyleName("title");
-        infoWelcomeVipLayout.setStyleName("title");
         infoSpace = WidgetUtil.getLabel(" ",20);
         infoVipLayout= WidgetUtil.getLabel("<font size=\"3\"><b>VIP is a web portal for medical imaging applications. " +
                 "It allows you to access scientific applications as a service (directly through your web browser with no installation required), " +
