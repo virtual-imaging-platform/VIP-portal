@@ -114,6 +114,7 @@ public class SignInTab extends Tab {
         hautLayout.setOverflow(Overflow.AUTO);
         hautLayout.setAlign(Alignment.CENTER);
         hautLayout.setDefaultLayoutAlign(Alignment.CENTER);
+        hautLayout.setCanSelectText(true);
 
         VLayout middleLayout = new VLayout(5);
         middleLayout.setWidth100();
@@ -121,6 +122,7 @@ public class SignInTab extends Tab {
         middleLayout.setOverflow(Overflow.AUTO);
         middleLayout.setAlign(Alignment.CENTER);
         middleLayout.setDefaultLayoutAlign(Alignment.CENTER);
+        middleLayout.setCanSelectText(true);
 
         VerticalPanel middlePanel = new VerticalPanel();
         middlePanel.setSize("10%", "5%");
@@ -137,6 +139,7 @@ public class SignInTab extends Tab {
         basLayout.setWidth100();
         basLayout.setHeight(100);
         basLayout.setLayoutLeftMargin(100);
+        basLayout.setCanSelectText(true);
 
         configureSigninLayout();
         testLayoutInfo();
@@ -160,6 +163,7 @@ public class SignInTab extends Tab {
         basLayout.addMember(infoVipNews);
         basLayout.addMember(infoMail);
         loginVLayout.addMember(basLayout);
+        loginVLayout.setCanSelectText(true);
 
         this.setPane(loginVLayout);
     }
@@ -278,6 +282,7 @@ public class SignInTab extends Tab {
         infoWelcomeVipLayout = WidgetUtil.getLabel("<font size=\"6\"><b>Welcome on VIP, the Virtual Imaging Platform!</b></font>",20);
         infoWelcomeVipLayout.setWidth(900);
         infoWelcomeVipLayout.setStyleName("title");
+        infoWelcomeVipLayout.setCanSelectText(true);
         infoSpace = WidgetUtil.getLabel(" ",20);
         infoVipLayout= WidgetUtil.getLabel("<font size=\"3\"><b>VIP is a web portal for medical imaging applications. " +
                 "It allows you to access scientific applications as a service (directly through your web browser with no installation required), " +

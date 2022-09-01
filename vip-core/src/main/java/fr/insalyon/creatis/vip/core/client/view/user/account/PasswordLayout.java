@@ -90,7 +90,7 @@ public class PasswordLayout extends AbstractFormLayout {
                                 & confirmPasswordField.validate()) {
 
                             if (!newPasswordField.getValueAsString().equals(confirmPasswordField.getValueAsString())) {
-                                Layout.getInstance().setWarningMessage("Passwords do not match. Please verify the entered password.");
+                                Layout.getInstance().setWarningMessage("Passwords do not match. Please verify the entered password.", 10);
                                 newPasswordField.focusInItem();
                                 return;
                             }
@@ -100,7 +100,7 @@ public class PasswordLayout extends AbstractFormLayout {
                                 @Override
                                 public void onFailure(Throwable caught) {
                                     WidgetUtil.resetIButton(saveButton, "Save Changes", CoreConstants.ICON_SAVED);
-                                    Layout.getInstance().setWarningMessage("Unable to update password:<br />" + caught.getMessage());
+                                    Layout.getInstance().setWarningMessage("Unable to update password:<br />" + caught.getMessage(), 10);
                                 }
 
                                 @Override
