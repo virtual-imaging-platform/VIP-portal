@@ -92,7 +92,7 @@ public class ApplicationsLayout extends VLayout {
 
         toolstrip.addMember(WidgetUtil.getSpaceLabel(15));
 
-        if(CoreModule.user != null) {
+        if(CoreModule.user != null && CoreModule.user.isSystemAdministrator()) {
             LabelButton addButton = new LabelButton("Add Application", CoreConstants.ICON_ADD);
             addButton.setWidth(150);
             addButton.addClickHandler(new ClickHandler() {
@@ -126,7 +126,7 @@ public class ApplicationsLayout extends VLayout {
             protected Canvas getRollOverCanvas(Integer rowNum, Integer colNum) {
                 rollOverRecord = this.getRecord(rowNum);
 
-                if (CoreModule.user != null && rollOverCanvas == null) {
+                if (CoreModule.user != null && CoreModule.user.isSystemAdministrator() && rollOverCanvas == null) {
                     rollOverCanvas = new HLayout(3);
                     rollOverCanvas.setSnapTo("TR");
                     rollOverCanvas.setWidth(50);
@@ -183,17 +183,17 @@ public class ApplicationsLayout extends VLayout {
         grid.setShowEmptyMessage(true);
         grid.setShowRowNumbers(true);
         grid.setEmptyMessage("<br>No data available.");
-        if (CoreModule.user != null){
+        if (CoreModule.user == null || ! CoreModule.user.isSystemAdministrator()){
+            grid.setFields(new ListGridField("name", "Application Name"),
+                    new ListGridField("classes", "Classes"),
+                    new ListGridField("groups", "Groups"));
+        } else {
             ListGridField ownerField = new ListGridField("owner", "Owner");
             ownerField.setHidden(true);
             grid.setFields(new ListGridField("name", "Application Name"),
                     new ListGridField("ownerFullName", "Owner"),
                     ownerField,
                     new ListGridField("classes", "Classes"));
-        } else {
-            grid.setFields(new ListGridField("name", "Application Name"),
-                    new ListGridField("classes", "Classes"),
-                    new ListGridField("groups", "Groups"));
         }
         grid.setSortField("name");
         grid.setSortDirection(SortDirection.ASCENDING);
@@ -234,7 +234,7 @@ public class ApplicationsLayout extends VLayout {
                         sb.append(className);
                     }
 
-                    if(CoreModule.user == null) {
+                    if(CoreModule.user == null  || ! CoreModule.user.isSystemAdministrator()) {
                         for (String group : app.getApplicationGroups()) {
                             if (sbg.length() > 0) {
                                 sbg.append(", ");
@@ -242,7 +242,7 @@ public class ApplicationsLayout extends VLayout {
                             sbg.append(group);
                         }
                     }
-                    if(CoreModule.user == null) {
+                    if(CoreModule.user == null || ! CoreModule.user.isSystemAdministrator()) {
                         dataList.add(new ApplicationRecord(app.getName(), app.getOwner(), app.getFullName(), sb.toString(), app.getCitation(), sbg.toString()));
                     } else {
                         dataList.add(new ApplicationRecord(app.getName(), app.getOwner(), app.getFullName(), sb.toString(), app.getCitation()));

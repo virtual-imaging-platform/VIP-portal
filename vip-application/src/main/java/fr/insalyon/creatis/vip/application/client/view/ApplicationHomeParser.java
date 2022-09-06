@@ -34,6 +34,8 @@ package fr.insalyon.creatis.vip.application.client.view;
 import com.smartgwt.client.widgets.tab.Tab;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
 import fr.insalyon.creatis.vip.application.client.view.monitor.SimulationsTab;
+import fr.insalyon.creatis.vip.core.client.CoreModule;
+import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.application.ApplicationParser;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 
@@ -48,6 +50,8 @@ public class ApplicationHomeParser extends ApplicationParser {
 
         addApplication(ApplicationConstants.APP_MONITOR,
                 ApplicationConstants.APP_IMG_MONITOR);
+        addApplication(ApplicationConstants.APP_PUBLIC_APPLICATION,
+                ApplicationConstants.APP_IMG_APPLICATION);
     }
 
     @Override
@@ -58,6 +62,11 @@ public class ApplicationHomeParser extends ApplicationParser {
                 ApplicationConstants.TAB_MONITOR, SimulationsTab::new);
             return true;
         }
+        if (applicationName.equals(ApplicationConstants.APP_PUBLIC_APPLICATION)) {
+            CoreModule.getHomePageActions().get(CoreConstants.HOME_ACTION_SHOW_APPLICATIONS).run();
+            return true;
+        }
+
         return false;
     }
 }
