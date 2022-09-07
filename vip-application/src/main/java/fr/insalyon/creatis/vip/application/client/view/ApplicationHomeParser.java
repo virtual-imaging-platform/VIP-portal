@@ -50,8 +50,10 @@ public class ApplicationHomeParser extends ApplicationParser {
 
         addApplication(ApplicationConstants.APP_MONITOR,
                 ApplicationConstants.APP_IMG_MONITOR);
-        addApplication(ApplicationConstants.APP_PUBLIC_APPLICATION,
-                ApplicationConstants.APP_IMG_APPLICATION);
+        if (! CoreModule.user.isSystemAdministrator() && ! CoreModule.user.isGroupAdmin()){
+            addApplication(ApplicationConstants.APP_PUBLIC_APPLICATION,
+                    ApplicationConstants.APP_IMG_APPLICATION);
+        }
     }
 
     @Override
