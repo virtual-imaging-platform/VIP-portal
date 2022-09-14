@@ -39,7 +39,7 @@ function download_udocker {
   cat >docker <<'EOF'
         #!/bin/bash
         MYARGS=$*
-        info "executing ./udocker/udocker/udocker $MYARGS"
+        echo "executing ./udocker/udocker/udocker $MYARGS"
         ./udocker/udocker/udocker $MYARGS
 EOF
   chmod a+x docker
