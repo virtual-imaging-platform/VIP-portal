@@ -43,7 +43,7 @@ knowledge of the CeCILL-B license and that you accept its terms.
     <properties>
         <!-- project version. Only to change it here (and in CoreConstants.java
            Follow this practice : https://maven.apache.org/maven-ci-friendly.html-->
-        <revision>2.3</revision>
+        <revision>2.3.1</revision>
         <changelist></changelist>
         <sha1/>
 
