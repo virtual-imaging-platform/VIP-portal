@@ -35,6 +35,8 @@ import fr.insalyon.creatis.vip.core.client.view.application.ApplicationParser;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
 
+import java.util.logging.Logger;
+
 /**
  *
  * @author Rafael Ferreira da Silva
@@ -43,7 +45,6 @@ public class DataManagerHomeParser extends ApplicationParser {
 
     @Override
     public void loadApplications() {
-
         addApplication(DataManagerConstants.APP_FILE_TRANSFER, 
                 DataManagerConstants.APP_IMG_FILE_TRANSFER);
     }

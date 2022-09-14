@@ -106,7 +106,7 @@ public class ApplicationConstants {
     public static final String APP_ENGINE = "Engines";
     public static final String APP_SIMULATION_ERROR = "Error File";
     public static final String APP_SIMULATION_OUT = "Output File";
-    public static final String APP_PUBLIC_APPLICATION = "Public Application";
+    public static final String APP_PUBLIC_APPLICATION = "Applications";
     // Application Images
     public static final String APP_IMG_APPLICATION = IMG_FOLDER + "app-application.png";
     public static final String APP_IMG_CLASSES = IMG_FOLDER + "app-classes.png";

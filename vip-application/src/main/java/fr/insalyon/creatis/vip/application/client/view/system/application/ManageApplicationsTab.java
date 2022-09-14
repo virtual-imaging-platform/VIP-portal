@@ -52,11 +52,11 @@ public class ManageApplicationsTab extends AbstractManageTab {
     private PublishVersionLayout publishVersionLayout;
     private Label infoAppText;
 
-    public ManageApplicationsTab() {
+    public ManageApplicationsTab(boolean onlyPublicApps) {
 
         super(ApplicationConstants.ICON_APPLICATION, ApplicationConstants.APP_APPLICATION, ApplicationConstants.TAB_MANAGE_APPLICATION);
 
-        appsLayout = new ApplicationsLayout();
+        appsLayout = new ApplicationsLayout(onlyPublicApps);
 
         titleInfoApp();
         HLayout appLayout = new HLayout(5);
@@ -65,7 +65,7 @@ public class ManageApplicationsTab extends AbstractManageTab {
         vLayout.addMember(infoAppText);
         vLayout.addMember(appLayout);
 
-        if((CoreModule.user != null) && (CoreModule.user.isSystemAdministrator())) {
+        if((CoreModule.user != null) && (! onlyPublicApps)) {
             editLayout = new EditApplicationLayout();
             versionsLayout = new VersionsLayout();
             editVersionLayout = new EditVersionLayout();
