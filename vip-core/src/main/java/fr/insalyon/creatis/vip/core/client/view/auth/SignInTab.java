@@ -77,6 +77,7 @@ public class SignInTab extends Tab {
     private Label infoVipLayout;
     private Label infoVipLog;
     private Label infoContactlayout;
+    private Label infoPrivacyPolicy;
     private Label infoCodeSource;
     private Label infoContactus;
     private Label infoMail;
@@ -154,6 +155,7 @@ public class SignInTab extends Tab {
         middleLayout.addMember(egiPanel);
         loginVLayout.addMember(middleLayout);
         basLayout.addMember(infoContactlayout);
+        basLayout.addMember(infoPrivacyPolicy);
         basLayout.addMember(newFormAppLayout);
         basLayout.addMember(newFormPubliLayout);
         basLayout.addMember(infoCodeSource);
@@ -288,6 +290,8 @@ public class SignInTab extends Tab {
         infoContactlayout = WidgetUtil.getLabel("<font size=\"3\"><b>Documentation of the Virtual " +
                 "Imaging Platform and its embedded applications is available here:  <a href=\"https://vip.creatis.insa-lyon.fr/documentation/\">" +
                 "VIP Documentation</a></b></font>",20);
+        infoPrivacyPolicy = WidgetUtil.getLabel("<font size=\"3\"><b>The Virtual Imaging Platform Privacy Policy: " +
+                " <a href=\"https://vip.creatis.insa-lyon.fr/documentation/privacypolicy.html\">VIP Privacy Policy</a>",20);
 
         LinkItem infoAppLayout = new LinkItem();
         infoAppLayout.setLinkTitle("<font size=\"3\"><b>The list of Applications related to the Virtual Imaging Platform </b></font>");
