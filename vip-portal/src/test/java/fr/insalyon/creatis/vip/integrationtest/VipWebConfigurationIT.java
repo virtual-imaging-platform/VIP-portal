@@ -60,7 +60,7 @@ public class VipWebConfigurationIT {
     public void testGetPipelines() throws Exception {
         User newUser = new User("firstName",
                 "LastName", "testEmail@test.tst", "Test institution",
-                "testPassword", "testPhone", CountryCode.fr,
+                "testPassword", CountryCode.fr,
                 null);
         Mockito.when(gridaClient.exist(anyString())).thenReturn(true, false);
         configurationBusiness.signup(newUser, "", (String) null);

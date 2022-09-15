@@ -15,7 +15,6 @@ public class SignUpUserDTO {
     private String email;
     private String institution;
     private String password;
-    private String phone;
     private UserLevel level;
     private CountryCode countryCode;
     private String comments;
@@ -24,13 +23,12 @@ public class SignUpUserDTO {
     public SignUpUserDTO(){
 
     }
-    public SignUpUserDTO(String firstName, String lastName, String email, String institution, String password, String phone, UserLevel level, CountryCode countryCode, String comments, String[] accountTypes) {
+    public SignUpUserDTO(String firstName, String lastName, String email, String institution, String password, UserLevel level, CountryCode countryCode, String comments, String[] accountTypes) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
         this.institution = institution;
         this.password = password;
-        this.phone = phone;
         this.level = level;
         this.countryCode = countryCode;
         this.comments = comments;
@@ -75,14 +73,6 @@ public class SignUpUserDTO {
 
     public void setPassword(String password) {
         this.password = password;
-    }
-
-    public String getPhone() {
-        return phone;
-    }
-
-    public void setPhone(String phone) {
-        this.phone = phone;
     }
 
     public UserLevel getLevel() {

@@ -72,7 +72,6 @@ public class CoreDataInitializer extends JdbcDaoSupport {
                         + "first_name VARCHAR(255), "
                         + "last_name VARCHAR(255), "
                         + "institution VARCHAR(255), "
-                        + "phone VARCHAR(255), "
                         + "code VARCHAR(40), "
                         + "confirmed BOOLEAN, "
                         + "folder VARCHAR(100), "
@@ -102,7 +101,7 @@ public class CoreDataInitializer extends JdbcDaoSupport {
                                 null,
                                 server.getAdminInstitution(),
                                 MD5.get(server.getAdminPassword()),
-                                server.getAdminPhone(), true,
+                                true,
                                 UUID.randomUUID().toString(), folder, "",
                                 new Date(), new Date(), UserLevel.Administrator,
                                 CountryCode.fr, 100, null,null,0,false));

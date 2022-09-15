@@ -101,7 +101,6 @@ public class PersonalLayout extends AbstractFormLayout {
                                     CoreModule.user.getLastName(),
                                     CoreModule.user.getEmail(),
                                     institutionField.getValueAsString().trim(),
-                                    null,
                                     UserLevel.valueOf(levelLabel.getContents()),
                                     CountryCode.valueOf(countryField.getValueAsString()));
                             user.setFolder(CoreModule.user.getFolder());

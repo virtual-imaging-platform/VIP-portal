@@ -86,7 +86,7 @@ public class ExecutionBusinessTest {
     // UTILS to be externalized later
 
     private User prepareTestUser(int userIndex, boolean isAdmin) {
-        return new User(USER_FIRST_NAME[userIndex], USER_LAST_NAME[userIndex], USER_MAIL[userIndex], null, null,
+        return new User(USER_FIRST_NAME[userIndex], USER_LAST_NAME[userIndex], USER_MAIL[userIndex], null,
                 isAdmin ? UserLevel.Administrator : UserLevel.Beginner, null);
     }
 

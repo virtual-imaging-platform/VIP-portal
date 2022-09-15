@@ -204,7 +204,7 @@ public class SpringJndiIT {
     private void createUser(String testEmail) throws GRIDAClientException, BusinessException {
         User newUser = new User("firstName", "LastName",
                 testEmail, "Test institution",
-                "testPassword", "testPhone", CountryCode.fr,
+                "testPassword", CountryCode.fr,
                 null);
         Mockito.when(gridaClient.exist(anyString())).thenReturn(true, false);
         configurationBusiness.signup(newUser, "", (String) null);
