@@ -64,13 +64,12 @@ public class PersonalLayout extends AbstractFormLayout {
     private Label firstNameField;
     private Label lastNameField;
     private TextItem institutionField;
-    private TextItem phoneField;
     private SelectItem countryField;
     private IButton saveButton;
 
     public PersonalLayout() {
 
-        super("100%", "350");
+        super("100%", "275");
         addTitle("Account Information", CoreConstants.ICON_PERSONAL);
 
         configure();
@@ -82,7 +81,6 @@ public class PersonalLayout extends AbstractFormLayout {
         firstNameField = WidgetUtil.getLabel("", 15);
         lastNameField = WidgetUtil.getLabel("", 15);
         institutionField = FieldUtil.getTextItem(200, null);
-        phoneField = FieldUtil.getTextItem(200, "[0-9\\(\\)\\-+. ]");
 
         countryField = new SelectItem();
         countryField.setShowTitle(false);
@@ -96,15 +94,13 @@ public class PersonalLayout extends AbstractFormLayout {
                 new ClickHandler() {
                     @Override
                     public void onClick(ClickEvent clickEvent) {
-                        if (institutionField.validate() & phoneField.validate()
-                                & countryField.validate()) {
+                        if (institutionField.validate() & countryField.validate()) {
 
                             User user = new User(
                                     CoreModule.user.getFirstName(),
                                     CoreModule.user.getLastName(),
                                     CoreModule.user.getEmail(),
                                     institutionField.getValueAsString().trim(),
-                                    phoneField.getValueAsString().trim(),
                                     UserLevel.valueOf(levelLabel.getContents()),
                                     CountryCode.valueOf(countryField.getValueAsString()));
                             user.setFolder(CoreModule.user.getFolder());
@@ -138,7 +134,6 @@ public class PersonalLayout extends AbstractFormLayout {
         this.addMember(WidgetUtil.getLabel("<b>Last Name</b>", 15));
         this.addMember(lastNameField);
         addField("Institution", institutionField);
-        addField("Phone", phoneField);
         addField("Country", countryField);
         this.addMember(saveButton);
     }
@@ -161,11 +156,10 @@ public class PersonalLayout extends AbstractFormLayout {
         firstNameField.setContents(user.getFirstName());
         lastNameField.setContents(user.getLastName());
         institutionField.setValue(user.getInstitution());
-        phoneField.setValue(user.getPhone());
         countryField.setValue(user.getCountryCode().name());
 
-        if(institutionField.getDisplayValue().equals("Unknown") || phoneField.getDisplayValue().equals("0000")){
-            Layout.getInstance().setWarningMessage("Please review your account information (Institution and/or phone)",0);
+        if(institutionField.getDisplayValue().equals("Unknown")){
+            Layout.getInstance().setWarningMessage("Please review your account information (Institution)",0);
         }
     }
 }

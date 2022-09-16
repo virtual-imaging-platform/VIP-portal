@@ -80,8 +80,6 @@ public interface Server {
 
     String getAdminPassword();
 
-    String getAdminPhone();
-
     String getCasURL();
 
     String getSshPublicKey();

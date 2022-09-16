@@ -52,7 +52,6 @@ public class CoreConstants implements IsSerializable {
     public static final String LAB_ADMIN_LAST_NAME = "admin.last.name";
     public static final String LAB_ADMIN_EMAIL = "admin.email";
     public static final String LAB_ADMIN_INSTITUTION = "admin.institution";
-    public static final String LAB_ADMIN_PHONE = "admin.phone";
     public static final String LAB_ADMIN_PASS = "admin.pass";
     public static final String LAB_CAS_URL = "cas.url";
     public static final String LAB_MYPROXY_HOST = "myproxy.host";
