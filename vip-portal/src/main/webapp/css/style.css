@@ -24,3 +24,29 @@
     right: 10px;
     z-index: 1;
 }
+
+.button-blue-border {
+  margin: 50px 20px 0px 0px;
+  padding: 15px 10px 15px 80px;
+  border-style: solid;
+  border-width: 2px;
+  border-color: #005faa;
+  border-radius: 100vw;
+  background-color: #fff;
+  background-image: url(https://assets.website-files.com/62e3a5ba3da3705b0a510a42/62e3a82d4c15a67d55b187c6_egi-logo-color.svg);
+  background-position: 30px 43%;
+  background-size: 36px;
+  background-repeat: no-repeat;
+  -webkit-transition: all 200ms ease-in-out;
+  transition: all 200ms ease-in-out;
+  font-family: 'DM Sans', sans-serif;
+  color: #005faa;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.button-blue-border:hover {
+  background-color: #005faa;
+  background-image: url(https://assets.website-files.com/62e3a5ba3da3705b0a510a42/62e3a82d3ed11b0ea947266c_egi-logo-white.svg);
+  color: #fff;
+}

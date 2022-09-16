@@ -31,28 +31,20 @@
  */
 package fr.insalyon.creatis.vip.core.client.view.auth;
 
-import com.google.gwt.dom.client.Style;
 import com.google.gwt.user.client.Cookies;
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.HorizontalPanel;
-import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.smartgwt.client.types.Alignment;
-import com.smartgwt.client.types.ImageStyle;
 import com.smartgwt.client.types.Overflow;
-import com.smartgwt.client.types.VerticalAlignment;
-import com.smartgwt.client.widgets.Canvas;
+import com.smartgwt.client.widgets.HTMLPane;
 import com.smartgwt.client.widgets.IButton;
-import com.smartgwt.client.widgets.Img;
 import com.smartgwt.client.widgets.Label;
-import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.DynamicForm;
-import com.smartgwt.client.widgets.form.fields.*;
-import com.smartgwt.client.widgets.form.fields.events.KeyPressEvent;
-import com.smartgwt.client.widgets.form.fields.events.KeyPressHandler;
-import com.smartgwt.client.widgets.layout.HLayout;
+import com.smartgwt.client.widgets.form.fields.CheckboxItem;
+import com.smartgwt.client.widgets.form.fields.LinkItem;
+import com.smartgwt.client.widgets.form.fields.PasswordItem;
+import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.tab.Tab;
 import fr.insalyon.creatis.vip.core.client.CoreModule;
@@ -88,8 +80,7 @@ public class SignInTab extends Tab {
     private CheckboxItem remembermeField;
     private IButton signinButton;
     private IButton createAnAccountButton;
-    private IButton egiButton;
-    private Img egiLogo;
+    private HTMLPane egiButton;
 
     public SignInTab() {
 
@@ -127,7 +118,7 @@ public class SignInTab extends Tab {
         middlePanel.setVerticalAlignment(VerticalPanel.ALIGN_MIDDLE);
         middlePanel.setHorizontalAlignment(HorizontalPanel.ALIGN_CENTER);
 
-        HorizontalPanel egiPanel = new HorizontalPanel();
+        VerticalPanel egiPanel = new VerticalPanel();
         egiPanel.setSpacing(5);
         egiPanel.setSize("10%", "5%");
         egiPanel.setVerticalAlignment(VerticalPanel.ALIGN_MIDDLE);
@@ -148,7 +139,6 @@ public class SignInTab extends Tab {
         hautLayout.addMember(infoContactlayout);
         loginVLayout.addMember(hautLayout);
         middlePanel.add(signinLayout);
-        egiPanel.add(egiLogo);
         egiPanel.add(egiButton);
         middleLayout.addMember(middlePanel);
         middleLayout.addMember(egiPanel);
@@ -217,15 +207,14 @@ public class SignInTab extends Tab {
         siginPanel.add(createAnAccountButton);
         signinLayout.addMember(siginPanel);
 
-        egiButton = new IButton("Connection with EGI Check-in");
-        egiButton.addClickHandler(event -> Window.Location.assign("/oauth2/authorize-client/egi"));
+        egiButton = new HTMLPane();
+        // add html code to use egi checkid custom css
+        // add a empty line with <br/> otherwise the top is cropped
+        egiButton.setContents("<br /><a href=\"/oauth2/authorize-client/egi\" class=\"button-blue-border\">Sign up with EGI Check-in</a>");
+        egiButton.setWidth(400);
+        egiButton.setHeight(80);
+        egiButton.setAlign(Alignment.CENTER);
 
-        egiButton.setWidth(180);
-
-        egiLogo = new Img(CoreConstants.EGI_CHECK_IN_LOGO, 50, 70);
-        egiLogo.setImageWidth(50);
-        egiLogo.setImageHeight(50);
-        egiLogo.setImageType(ImageStyle.CENTER);
     }
 
     private void signin() {
