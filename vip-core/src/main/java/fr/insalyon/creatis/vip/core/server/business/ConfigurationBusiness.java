@@ -254,7 +254,6 @@ public class ConfigurationBusiness {
                                              + "<p><b>Last Name:</b> " + user.getLastName() + "</p>"
                                              + "<p><b>Email:</b> " + user.getEmail() + "</p>"
                                              + "<p><b>Institution:</b> " + user.getInstitution() + "</p>"
-                                             + "<p><b>Phone:</b> " + user.getPhone() + "</p>"
                                              + "<p><b>Country:</b> " + user.getCountryCode().getCountryName() + "</p>"
                                              + "<p><b>Accounts:</b> " + accounts.toString() + "</p>"
                                              + "<p><b>Comments:</b><br />" + comments + "</p>"
@@ -285,7 +284,6 @@ public class ConfigurationBusiness {
                                              + "<p><b>Last Name:</b> " + user.getLastName() + "</p>"
                                              + "<p><b>Email:</b> " + user.getEmail() + "</p>"
                                              + "<p><b>Institution:</b> " + user.getInstitution() + "</p>"
-                                             + "<p><b>Phone:</b> " + user.getPhone() + "</p>"
                                              + "<p><b>Country:</b> " + user.getCountryCode().getCountryName() + "</p>"
                                              + "<p><b>Groups:</b> " + groupNames + "</p>"
                                              + "<p><b>Comments:</b><br />" + comments + "</p>"
@@ -412,7 +410,6 @@ public class ConfigurationBusiness {
                 lastName.trim(),
                 email.trim(),
                 "Unknown",
-                null,
                 "0000",
                 cc, getCurrentTimeStamp());
     }
@@ -590,7 +587,6 @@ public class ConfigurationBusiness {
                                              + "<p><b>Last Name:</b> " + user.getLastName() + "</p>"
                                              + "<p><b>Email:</b> " + user.getEmail() + "</p>"
                                              + "<p><b>Institution:</b> " + user.getInstitution() + "</p>"
-                                             + "<p><b>Phone:</b> " + user.getPhone() + "</p>"
                                              + "<p>&nbsp;</p>"
                                              + "<p>Best Regards,</p>"
                                              + "<p>VIP Team</p>"

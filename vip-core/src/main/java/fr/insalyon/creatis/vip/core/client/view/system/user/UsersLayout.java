@@ -185,7 +185,6 @@ public class UsersLayout extends VLayout {
                         new DetailViewerField("email", "Email"),
                         new DetailViewerField("username", "Name"),
                         new DetailViewerField("institution", "Institution"),
-                        new DetailViewerField("phone", "Phone"),
                         new DetailViewerField("countryName", "Country"),
                         registrationField, lastLoginField);
                 detailViewer.setData(new Record[]{record});

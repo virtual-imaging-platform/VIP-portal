@@ -67,7 +67,6 @@ public class SignUpTab extends Tab {
     private TextItem emailField;
     private TextItem confirmEmailField;
     private TextItem institutionField;
-    private TextItem phoneField;
     private SelectItem countryField;
     private PasswordItem passwordField;
     private PasswordItem confirmPasswordField;
@@ -110,7 +109,6 @@ public class SignUpTab extends Tab {
         confirmEmailField.setValidators(ValidatorUtil.getEmailValidator());
 
         institutionField = FieldUtil.getTextItem(300, false, "", null);
-        phoneField = FieldUtil.getTextItem(150, false, "", "[0-9\\(\\)\\-+. ]");
 
         countryField = new SelectItem();
         countryField.setShowTitle(false);
@@ -146,7 +144,7 @@ public class SignUpTab extends Tab {
 
                 if (firstNameField.validate() & lastNameField.validate()
                         & emailField.validate() & confirmEmailField.validate()
-                        & institutionField.validate() & phoneField.validate()
+                        & institutionField.validate()
                         & countryField.validate()
                         & passwordField.validate() & confirmPasswordField.validate()
                         & accountTypeField.validate() & acceptField.validate()
@@ -170,7 +168,6 @@ public class SignUpTab extends Tab {
                             emailField.getValueAsString().trim(),
                             institutionField.getValueAsString().trim(),
                             passwordField.getValueAsString(),
-                            phoneField.getValueAsString().trim(),
                             CountryCode.valueOf(countryField.getValueAsString()),null);
 
                     final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
@@ -210,7 +207,6 @@ public class SignUpTab extends Tab {
         WidgetUtil.addFieldToVIPLayout(signupLayout, "E-mail", emailField);
         WidgetUtil.addFieldToVIPLayout(signupLayout, "Re-enter E-mail", confirmEmailField);
         WidgetUtil.addFieldToVIPLayout(signupLayout, "Institution", institutionField);
-        WidgetUtil.addFieldToVIPLayout(signupLayout, "Phone", phoneField);
         WidgetUtil.addFieldToVIPLayout(signupLayout, "Country", countryField);
         WidgetUtil.addFieldToVIPLayout(signupLayout, "Password", passwordField);
         WidgetUtil.addFieldToVIPLayout(signupLayout, "Re-enter Password", confirmPasswordField);

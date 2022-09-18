@@ -101,7 +101,7 @@ public abstract class BaseSpringIT {
     protected void createUser(String testEmail, String nameSuffix) throws GRIDAClientException, BusinessException {
         User newUser = new User("firstName"+nameSuffix,
                 "LastName"+nameSuffix, testEmail, "Test institution",
-                "testPassword", "testPhone", CountryCode.fr,
+                "testPassword", CountryCode.fr,
                 null);
         Mockito.when(gridaClient.exist(anyString())).thenReturn(true, false);
         configurationBusiness.signup(newUser, "", (String) null);

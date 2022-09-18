@@ -49,7 +49,6 @@ public class UserRecord extends ListGridRecord {
         setAttribute("username", user.getFirstName() + " " + user.getLastName().toUpperCase());
         setAttribute("email", user.getEmail());
         setAttribute("institution", user.getInstitution());
-        setAttribute("phone", user.getPhone());
         setAttribute("confirmed", user.isConfirmed());
         setAttribute("folder", user.getFolder());
         setAttribute("registration", user.getRegistration());

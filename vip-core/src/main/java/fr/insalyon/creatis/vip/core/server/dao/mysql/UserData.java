@@ -78,30 +78,29 @@ public class UserData extends JdbcDaoSupport implements UserDAO {
         try {
             PreparedStatement ps = getConnection().prepareStatement(
                     "INSERT INTO VIPUsers("
-                    + "email, pass, first_name, last_name, institution, phone, "
+                    + "email, pass, first_name, last_name, institution, "
                     + "code, confirmed, folder, registration, last_login, level, "
                     + "country_code, max_simulations, termsUse,lastUpdatePublications,"
                     + "failed_authentications, account_locked) "
-                    + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                    + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
             ps.setString(1, user.getEmail());
             ps.setString(2, user.getPassword());
             ps.setString(3, user.getFirstName());
             ps.setString(4, user.getLastName());
             ps.setString(5, user.getInstitution());
-            ps.setString(6, user.getPhone());
-            ps.setString(7, user.getCode());
-            ps.setBoolean(8, user.isConfirmed());
-            ps.setString(9, user.getFolder());
-            ps.setTimestamp(10, new Timestamp(user.getRegistration().getTime()));
-            ps.setTimestamp(11, new Timestamp(user.getLastLogin().getTime()));
-            ps.setString(12, user.getLevel().name());
-            ps.setString(13, user.getCountryCode().name());
-            ps.setInt(14, user.getMaxRunningSimulations());
-            ps.setTimestamp(15, user.getTermsOfUse());
-            ps.setTimestamp(16, user.getLastUpdatePublications());
-            ps.setInt(17, 0);
-            ps.setBoolean(18, false);
+            ps.setString(6, user.getCode());
+            ps.setBoolean(7, user.isConfirmed());
+            ps.setString(8, user.getFolder());
+            ps.setTimestamp(9, new Timestamp(user.getRegistration().getTime()));
+            ps.setTimestamp(10, new Timestamp(user.getLastLogin().getTime()));
+            ps.setString(11, user.getLevel().name());
+            ps.setString(12, user.getCountryCode().name());
+            ps.setInt(13, user.getMaxRunningSimulations());
+            ps.setTimestamp(14, user.getTermsOfUse());
+            ps.setTimestamp(15, user.getLastUpdatePublications());
+            ps.setInt(16, 0);
+            ps.setBoolean(17, false);
 
             ps.execute();
             ps.close();
@@ -200,7 +199,7 @@ public class UserData extends JdbcDaoSupport implements UserDAO {
 
         try {
             PreparedStatement ps = getConnection().prepareStatement("SELECT "
-                    + "email, next_email, pass, first_name, last_name, institution, phone, "
+                    + "email, next_email, pass, first_name, last_name, institution, "
                     + "code, confirmed, folder, session, registration, "
                     + "last_login, level, country_code, max_simulations,termsUse,lastUpdatePublications,failed_authentications,account_locked "
                     + "FROM VIPUsers "
@@ -215,7 +214,7 @@ public class UserData extends JdbcDaoSupport implements UserDAO {
                         rs.getString("email"), rs.getString("next_email"),
                         rs.getString("institution"),
                         rs.getString("pass") == null ? null : "",
-                        rs.getString("phone"), rs.getBoolean("confirmed"),
+                        rs.getBoolean("confirmed"),
                         rs.getString("code"), rs.getString("folder"),
                         rs.getString("session"),
                         new Date(rs.getTimestamp("registration").getTime()),
@@ -250,7 +249,7 @@ public class UserData extends JdbcDaoSupport implements UserDAO {
 
         try {
             PreparedStatement ps = getConnection().prepareStatement("SELECT "
-                    + "email, next_email, first_name, last_name, institution, phone, "
+                    + "email, next_email, first_name, last_name, institution, "
                     + "code, confirmed, folder, registration, last_login, "
                     + "level, country_code, max_simulations, termsUse, lastUpdatePublications,"
                     + "failed_authentications, account_locked "
@@ -265,7 +264,7 @@ public class UserData extends JdbcDaoSupport implements UserDAO {
                         rs.getString("first_name"), rs.getString("last_name"),
                         rs.getString("email"), rs.getString("next_email"),
                         rs.getString("institution"),
-                        "", rs.getString("phone"), rs.getBoolean("confirmed"),
+                        "", rs.getBoolean("confirmed"),
                         rs.getString("code"), rs.getString("folder"), "",
                         new Date(rs.getTimestamp("registration").getTime()),
                         new Date(rs.getTimestamp("last_login").getTime()),
@@ -292,7 +291,7 @@ public class UserData extends JdbcDaoSupport implements UserDAO {
 
         try {
             StringBuilder query = new StringBuilder("SELECT "
-                    + "email, next_email, first_name, last_name, institution, phone, "
+                    + "email, next_email, first_name, last_name, institution, "
                     + "code, confirmed, folder, registration, last_login, "
                     + "level, country_code, max_simulations, termsUse, lastUpdatePublications,"
                     + "failed_authentications, account_locked "
@@ -322,7 +321,7 @@ public class UserData extends JdbcDaoSupport implements UserDAO {
                         rs.getString("first_name"), rs.getString("last_name"),
                         rs.getString("email"), rs.getString("next_email"),
                         rs.getString("institution"),
-                        "", rs.getString("phone"), rs.getBoolean("confirmed"),
+                        "", rs.getBoolean("confirmed"),
                         rs.getString("code"), rs.getString("folder"), "",
                         new Date(rs.getTimestamp("registration").getTime()),
                         new Date(rs.getTimestamp("last_login").getTime()),
@@ -446,16 +445,15 @@ public class UserData extends JdbcDaoSupport implements UserDAO {
             PreparedStatement ps = getConnection().prepareStatement("UPDATE "
                     + "VIPUsers SET "
                     + "first_name = ?, last_name = ?, institution = ?, "
-                    + "phone = ?, folder = ?, country_code = ? "
+                    + "folder = ?, country_code = ? "
                     + "WHERE email = ?");
 
             ps.setString(1, user.getFirstName());
             ps.setString(2, user.getLastName());
             ps.setString(3, user.getInstitution());
-            ps.setString(4, user.getPhone());
-            ps.setString(5, user.getFolder());
-            ps.setString(6, user.getCountryCode().name());
-            ps.setString(7, user.getEmail());
+            ps.setString(4, user.getFolder());
+            ps.setString(5, user.getCountryCode().name());
+            ps.setString(6, user.getEmail());
 
             ps.executeUpdate();
             ps.close();
@@ -649,7 +647,7 @@ public class UserData extends JdbcDaoSupport implements UserDAO {
 
         try {
             PreparedStatement ps = getConnection().prepareStatement("SELECT "
-                    + "email, next_email, first_name, last_name, institution, phone, "
+                    + "email, next_email, first_name, last_name, institution, "
                     + "code, confirmed, folder, session, registration, "
                     + "last_login, level, country_code, max_simulations,"
                     + "termsUse, lastUpdatePublications, failed_authentications, account_locked "
@@ -664,7 +662,7 @@ public class UserData extends JdbcDaoSupport implements UserDAO {
                         rs.getString("first_name"), rs.getString("last_name"),
                         rs.getString("email"), rs.getString("next_email"),
                         rs.getString("institution"),
-                        "", rs.getString("phone"), rs.getBoolean("confirmed"),
+                        "", rs.getBoolean("confirmed"),
                         rs.getString("code"), rs.getString("folder"),
                         rs.getString("session"),
                         new Date(rs.getTimestamp("registration").getTime()),
@@ -698,7 +696,7 @@ public class UserData extends JdbcDaoSupport implements UserDAO {
 
         try {
             PreparedStatement ps = getConnection().prepareStatement("SELECT "
-                    + "email, next_email, first_name, last_name, institution, phone, "
+                    + "email, next_email, first_name, last_name, institution, "
                     + "code, confirmed, folder, registration, last_login, "
                     + "level, country_code, max_simulations, termsUse, "
                     + " lastUpdatePublications, failed_authentications, account_locked "
@@ -714,7 +712,7 @@ public class UserData extends JdbcDaoSupport implements UserDAO {
                         rs.getString("first_name"), rs.getString("last_name"),
                         rs.getString("email"), rs.getString("next_email"),
                         rs.getString("institution"),
-                        "", rs.getString("phone"), rs.getBoolean("confirmed"),
+                        "", rs.getBoolean("confirmed"),
                         rs.getString("code"), rs.getString("folder"), "",
                         new Date(rs.getTimestamp("registration").getTime()),
                         new Date(rs.getTimestamp("last_login").getTime()),
