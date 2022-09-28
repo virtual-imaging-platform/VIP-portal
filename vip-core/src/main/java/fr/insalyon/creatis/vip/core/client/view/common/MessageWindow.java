@@ -69,7 +69,6 @@ public class MessageWindow {
         panel.addDrawHandler(new DrawHandler() {
             @Override
             public void onDraw(DrawEvent event) {
-                messageLabel.setCanSelectText(true);
                 panel.setWidth(messageLabel.getWidth());
                 panel.setHeight(messageLabel.getHeight());
                 panel.moveTo(getPanelXPosition(canvas), 2);
@@ -118,6 +117,7 @@ public class MessageWindow {
         messageLabel.setWidth(1);
         messageLabel.setHeight(1);
         messageLabel.setContents(title);
+        messageLabel.setCanSelectText(true);
         messageLabel.setIcon(icon);
         messageLabel.addDrawHandler(new DrawHandler() {
             @Override
