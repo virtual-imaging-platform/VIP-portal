@@ -100,7 +100,7 @@ public class PasswordLayout extends AbstractFormLayout {
                                 @Override
                                 public void onFailure(Throwable caught) {
                                     WidgetUtil.resetIButton(saveButton, "Save Changes", CoreConstants.ICON_SAVED);
-                                    Layout.getInstance().setWarningMessage("Unable to update password:<br />" + caught.getMessage(), 10);
+                                    Layout.getInstance().setWarningMessage("Unable to update password:<br />" + caught.getMessage());
                                 }
 
                                 @Override

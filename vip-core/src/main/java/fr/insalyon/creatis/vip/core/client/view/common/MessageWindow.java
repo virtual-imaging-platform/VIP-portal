@@ -69,10 +69,10 @@ public class MessageWindow {
         panel.addDrawHandler(new DrawHandler() {
             @Override
             public void onDraw(DrawEvent event) {
+                messageLabel.setCanSelectText(true);
                 panel.setWidth(messageLabel.getWidth());
                 panel.setHeight(messageLabel.getHeight());
                 panel.moveTo(getPanelXPosition(canvas), 2);
-                messageLabel.setCanSelectText(true);
             }
         });
 
@@ -124,7 +124,6 @@ public class MessageWindow {
             public void onDraw(DrawEvent event) {
                 messageLabel.setWidth(messageLabel.getVisibleWidth());
                 messageLabel.setMargin(5);
-                messageLabel.setCanSelectText(true);
                 panel.setWidth(messageLabel.getWidth());
                 panel.setHeight(messageLabel.getHeight());
                 panel.moveTo(getPanelXPosition(canvas), 2);
@@ -175,7 +174,6 @@ public class MessageWindow {
         panel.setBackgroundColor(bgColor);
         panel.show();
         panel.animateFade(100);
-        messageLabel.setCanSelectText(true);
     }
 
     public void hideMessage() {
