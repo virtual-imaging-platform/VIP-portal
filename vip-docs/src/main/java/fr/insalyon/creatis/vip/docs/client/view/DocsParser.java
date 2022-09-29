@@ -35,8 +35,6 @@ import com.smartgwt.client.widgets.tab.Tab;
 import fr.insalyon.creatis.vip.core.client.view.application.ApplicationParser;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 
-import java.util.logging.Logger;
-
 /**
  *
  * @author Rafael Ferreira da Silva
