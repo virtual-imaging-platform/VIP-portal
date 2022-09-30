@@ -65,7 +65,7 @@ public class ManageApplicationsTab extends AbstractManageTab {
         vLayout.addMember(infoAppText);
         vLayout.addMember(appLayout);
 
-        if((CoreModule.user != null) && (! onlyPublicApps)) {
+        if( ! onlyPublicApps ) {
             editLayout = new EditApplicationLayout();
             versionsLayout = new VersionsLayout();
             editVersionLayout = new EditVersionLayout();
