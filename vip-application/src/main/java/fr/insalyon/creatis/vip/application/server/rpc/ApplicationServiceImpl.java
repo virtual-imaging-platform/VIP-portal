@@ -205,11 +205,18 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
     }
 
     @Override
+    public List<Application> getPublicApplications() throws ApplicationException {
+        try {
+            return applicationBusiness.getPublicApplicationsWithGroups();
+        } catch (BusinessException ex) {
+            throw new ApplicationException(ex);
+        }
+    }
+
+    @Override
     public List<Application> getApplications() throws ApplicationException {
         try {
-            if( ! isUserConnected()){
-                return applicationBusiness.getPublicApplicationsWithGroups();
-            } else if (isSystemAdministrator()) {
+            if (isSystemAdministrator()) {
                 return applicationBusiness.getApplications();
             } else if (isGroupAdministrator()) {
                 List<String> classes = classBusiness.getUserClassesName(

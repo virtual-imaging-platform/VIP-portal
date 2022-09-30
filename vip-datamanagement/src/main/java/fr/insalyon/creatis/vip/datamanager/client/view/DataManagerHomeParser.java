@@ -43,7 +43,6 @@ public class DataManagerHomeParser extends ApplicationParser {
 
     @Override
     public void loadApplications() {
-
         addApplication(DataManagerConstants.APP_FILE_TRANSFER, 
                 DataManagerConstants.APP_IMG_FILE_TRANSFER);
     }
