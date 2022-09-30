@@ -90,7 +90,7 @@ public class PasswordLayout extends AbstractFormLayout {
                                 & confirmPasswordField.validate()) {
 
                             if (!newPasswordField.getValueAsString().equals(confirmPasswordField.getValueAsString())) {
-                                Layout.getInstance().setWarningMessage("Passwords do not match. Please verify the entered password.");
+                                Layout.getInstance().setWarningMessage("Passwords do not match. Please verify the entered password.", 10);
                                 newPasswordField.focusInItem();
                                 return;
                             }
