@@ -91,7 +91,7 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
     public void add(Application application) throws ApplicationException {
 
         try {
-            if (isSystemAdministrator() || isGroupAdministrator()) {
+            if (isSystemAdministrator() || isGroupAdministrator() || isDeveloper()) {
                 trace(logger, "Adding application '" + application.getName() + "'.");
                 application.setOwner(getSessionUser().getEmail());
                 applicationBusiness.add(application);
