@@ -242,9 +242,10 @@ public class ApplicationsLayout extends VLayout {
                             sbg.append(group);
                         }
                     }
+
                     if(CoreModule.user == null) {
                         dataList.add(new ApplicationRecord(app.getName(), app.getOwner(), app.getFullName(), sb.toString(), app.getCitation(), sbg.toString()));
-                    } else {
+                    }  else {
                         dataList.add(new ApplicationRecord(app.getName(), app.getOwner(), app.getFullName(), sb.toString(), app.getCitation()));
                     }
                 }

@@ -60,6 +60,8 @@ public interface ApplicationDAO {
 
     public List<Application> getApplications() throws DAOException;
 
+    public List<Application> getApplicationsOnlyDev(String email) throws DAOException;
+
     public Application getApplication(String applicationName) throws DAOException;
 
     public List<String[]> getApplications(String className) throws DAOException;

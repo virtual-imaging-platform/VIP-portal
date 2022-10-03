@@ -214,6 +214,57 @@ public class ApplicationData extends JdbcDaoSupport implements ApplicationDAO {
     }
 
     @Override
+    public List<Application> getApplicationsOnlyDev(String email) throws DAOException {
+
+        try {
+            PreparedStatement ps = getConnection().prepareStatement("SELECT "
+                                                                + "name, owner, citation FROM "
+                                                                + "VIPApplications WHERE owner IN (?)");
+
+            ps.setString(1, email);
+            ResultSet rs = ps.executeQuery();
+            List<Application> applications = new ArrayList<Application>();
+
+            while (rs.next()) {
+
+                String owner = rs.getString("owner");
+                PreparedStatement ps3 = getConnection().prepareStatement("SELECT "
+                        + "first_name,last_name FROM VIPUsers WHERE email=?");
+                ps3.setString(1, owner);
+                ResultSet rs3 = ps3.executeQuery();
+                String firstName = null;
+                String lastName = null;
+                while (rs3.next()) {
+                    firstName = rs3.getString("first_name");
+                    lastName = rs3.getString("last_name");
+                }
+                ps3.close();
+
+                String name = rs.getString("name");
+                PreparedStatement ps2 = getConnection().prepareStatement("SELECT "
+                        + "class FROM VIPApplicationClasses WHERE application=?");
+                ps2.setString(1, name);
+
+                ResultSet rs2 = ps2.executeQuery();
+                List<String> classes = new ArrayList<String>();
+
+                while (rs2.next()) {
+                    classes.add(rs2.getString("class"));
+                }
+                ps2.close();
+
+                applications.add(new Application(name, classes, rs.getString("owner"), firstName + " " + lastName, rs.getString("citation")));
+            }
+            ps.close();
+            return applications;
+
+        } catch (SQLException ex) {
+            logger.error("Error getting all applications", ex);
+            throw new DAOException(ex);
+        }
+    }
+
+    @Override
     public List<String[]> getApplications(String className) throws DAOException {
 
         try {

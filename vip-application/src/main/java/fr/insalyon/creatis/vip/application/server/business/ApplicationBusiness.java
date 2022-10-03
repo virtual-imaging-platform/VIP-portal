@@ -75,6 +75,15 @@ public class ApplicationBusiness {
         }
     }
 
+    public List<Application> getApplicationsOnlyDev(String email) throws BusinessException {
+
+        try {
+            return applicationDAO.getApplicationsOnlyDev(email);
+        } catch (DAOException ex) {
+            throw new BusinessException(ex);
+        }
+    }
+
     public List<Application> getPublicApplicationsWithGroups() throws BusinessException {
 
         try {
