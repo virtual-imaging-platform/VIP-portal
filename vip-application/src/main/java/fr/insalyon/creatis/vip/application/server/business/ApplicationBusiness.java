@@ -69,7 +69,7 @@ public class ApplicationBusiness {
     public List<Application> getApplications() throws BusinessException {
 
         try {
-            return applicationDAO.getApplications();
+            return applicationDAO.getApplications(Boolean.FALSE, null);
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }
@@ -78,7 +78,7 @@ public class ApplicationBusiness {
     public List<Application> getApplicationsOnlyDev(String email) throws BusinessException {
 
         try {
-            return applicationDAO.getApplicationsOnlyDev(email);
+            return applicationDAO.getApplications(true, email);
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }

@@ -58,9 +58,7 @@ public interface ApplicationDAO {
 
     public void removeVersion(String applicationName, String version) throws DAOException;
 
-    public List<Application> getApplications() throws DAOException;
-
-    public List<Application> getApplicationsOnlyDev(String email) throws DAOException;
+    public List<Application> getApplications(Boolean isDeveloper, String userEmail) throws DAOException;
 
     public Application getApplication(String applicationName) throws DAOException;
 
