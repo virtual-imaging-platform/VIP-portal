@@ -139,10 +139,8 @@ public class EditApplicationLayout extends AbstractFormLayout {
         removeButton.setDisabled(true);
 
         addField("Name", nameField);
-        if (CoreModule.user.isSystemAdministrator()) {
-            this.addMember(WidgetUtil.getLabel("<b>Owner</b>", 15));
-            this.addMember(FieldUtil.getForm(usersPickList));
-        }
+        this.addMember(WidgetUtil.getLabel("<b>Owner</b>", 15));
+        this.addMember(FieldUtil.getForm(usersPickList));
         addField("Classes", classesPickList);
         this.addMember(WidgetUtil.getLabel("<b>Citation</b>", 15));
         this.addMember(richTextEditor);
@@ -256,13 +254,18 @@ public class EditApplicationLayout extends AbstractFormLayout {
         ApplicationService.Util.getInstance().getClasses(callback);
     }
 
-    private void loadUsers(final String currentUser) {
+    private void loadUsers(final String currentOwner) {
+
+        if ( ! CoreModule.user.isSystemAdministrator()) {
+            usersPickList.setValues(currentOwner);
+            return;
+        }
 
         final AsyncCallback<List<User>> callback = new AsyncCallback<List<User>>() {
             @Override
             public void onFailure(Throwable caught) {
                 Layout.getInstance().setWarningMessage("Unable to load users:<br />" + caught.getMessage());
-                usersPickList.setValues(currentUser);
+                usersPickList.setValues(currentOwner);
 
             }
 
@@ -278,7 +281,7 @@ public class EditApplicationLayout extends AbstractFormLayout {
 
                 }
                 usersPickList.setValueMap(valueMap);
-                usersPickList.setValue(currentUser);
+                usersPickList.setValue(currentOwner);
 
             }
         };

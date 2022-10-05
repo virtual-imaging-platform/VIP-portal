@@ -166,11 +166,21 @@ public class ApplicationData extends JdbcDaoSupport implements ApplicationDAO {
     }
 
     @Override
-    public List<Application> getApplications(Boolean isDeveloper, String userEmail) throws DAOException {
+    public List<Application> getApplications() throws DAOException {
+        return this.getApplications((String) null);
+
+    }
+
+    @Override
+    public List<Application> getApplicationsWithOwner(String owner) throws DAOException {
+        return this.getApplications(owner);
+    }
+
+    private List<Application> getApplications(String owner) throws DAOException {
 
         try {
             String requestSql = null;
-            if (isDeveloper) {
+            if (owner != null) {
                 requestSql = "SELECT "
                         + "name, owner, citation FROM "
                         + "VIPApplications WHERE owner=? ORDER BY name";
@@ -181,16 +191,18 @@ public class ApplicationData extends JdbcDaoSupport implements ApplicationDAO {
             }
 
             PreparedStatement ps = getConnection().prepareStatement(requestSql);
-            if (isDeveloper){ ps.setString(1, userEmail); }
+            if (owner != null) {
+                ps.setString(1, owner);
+            }
             ResultSet rs = ps.executeQuery();
             List<Application> applications = new ArrayList<Application>();
 
             while (rs.next()) {
 
-                String owner = rs.getString("owner");
+                String appOwner = rs.getString("owner");
                 PreparedStatement ps3 = getConnection().prepareStatement("SELECT "
                                                                     + "first_name,last_name FROM VIPUsers WHERE email=?");
-                ps3.setString(1, owner);
+                ps3.setString(1, appOwner);
                 ResultSet rs3 = ps3.executeQuery();
                 String firstName = null;
                 String lastName = null;
@@ -225,7 +237,7 @@ public class ApplicationData extends JdbcDaoSupport implements ApplicationDAO {
     }
 
     @Override
-    public List<String[]> getApplications(String className) throws DAOException {
+    public List<String[]> getApplicationsFromClass(String className) throws DAOException {
 
         try {
             PreparedStatement ps = getConnection().prepareStatement("SELECT "
@@ -284,8 +296,7 @@ public class ApplicationData extends JdbcDaoSupport implements ApplicationDAO {
         }
     }
 
-    @Override
-    public List<Application> getApplications(List<String> classes) throws DAOException {
+    public List<Application> getApplicationsFromClasses(List<String> classes) throws DAOException {
 
         try {
             List<Application> applications = new ArrayList<Application>();

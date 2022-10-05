@@ -36,19 +36,16 @@ import fr.insalyon.creatis.vip.application.client.bean.*;
 import fr.insalyon.creatis.vip.application.client.rpc.ApplicationService;
 import fr.insalyon.creatis.vip.application.client.view.ApplicationException;
 import fr.insalyon.creatis.vip.application.server.business.*;
-import fr.insalyon.creatis.vip.core.client.CoreModule;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.CoreException;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
-import fr.insalyon.creatis.vip.core.server.business.VipSessionBusiness;
 import fr.insalyon.creatis.vip.core.server.rpc.AbstractRemoteServiceServlet;
 import org.jsoup.Jsoup;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletException;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -212,7 +209,7 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
             } else if (isSystemAdministrator()) {
                 return applicationBusiness.getApplications();
             } else if (isDeveloper()) {
-                return applicationBusiness.getApplicationsOnlyDev(getSessionUser().getEmail());
+                return applicationBusiness.getApplicationsWithOwner(getSessionUser().getEmail());
             }  else if (isGroupAdministrator()) {
                 List<String> classes = classBusiness.getUserClassesName(
                     getSessionUser().getEmail(), true);

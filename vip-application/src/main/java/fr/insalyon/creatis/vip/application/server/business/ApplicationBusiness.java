@@ -69,16 +69,16 @@ public class ApplicationBusiness {
     public List<Application> getApplications() throws BusinessException {
 
         try {
-            return applicationDAO.getApplications(Boolean.FALSE, null);
+            return applicationDAO.getApplications();
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }
     }
 
-    public List<Application> getApplicationsOnlyDev(String email) throws BusinessException {
+    public List<Application> getApplicationsWithOwner(String email) throws BusinessException {
 
         try {
-            return applicationDAO.getApplications(true, email);
+            return applicationDAO.getApplicationsWithOwner(email);
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }
@@ -129,7 +129,7 @@ public class ApplicationBusiness {
             throws BusinessException {
 
         try {
-            return applicationDAO.getApplications(className);
+            return applicationDAO.getApplicationsFromClass(className);
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }
@@ -147,7 +147,7 @@ public class ApplicationBusiness {
     public List<Application> getApplications(List<String> classes)
             throws BusinessException {
         try {
-            return applicationDAO.getApplications(classes);
+            return applicationDAO.getApplicationsFromClasses(classes);
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }
