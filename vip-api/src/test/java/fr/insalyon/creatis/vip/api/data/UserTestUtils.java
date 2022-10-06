@@ -53,14 +53,14 @@ public class UserTestUtils {
 
 
     static {
-        baseUser1 = new User("base1", "User1", "baseuser1@test.tst", null, null,
+        baseUser1 = new User("base1", "User1", "baseuser1@test.tst", null,
                 UserLevel.Beginner, null);
         baseUser1.setFolder("user1");
-        baseUser2 = new User("base2", "User2", "baseuser2@test.tst", null, null,
+        baseUser2 = new User("base2", "User2", "baseuser2@test.tst", null,
                 UserLevel.Advanced, null);
         baseUser2.setFolder("user2");
 
-        restUser1 = new SignUpUserDTO("base3", "User3", "baseuser3@test.tst", "test", baseUser2Password,"",
+        restUser1 = new SignUpUserDTO("base3", "User3", "baseuser3@test.tst", "test", baseUser2Password,
                 UserLevel.Advanced, null, "test comment", null);
     }
 

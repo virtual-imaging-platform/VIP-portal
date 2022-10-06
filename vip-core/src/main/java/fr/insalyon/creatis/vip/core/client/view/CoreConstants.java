@@ -52,7 +52,6 @@ public class CoreConstants implements IsSerializable {
     public static final String LAB_ADMIN_LAST_NAME = "admin.last.name";
     public static final String LAB_ADMIN_EMAIL = "admin.email";
     public static final String LAB_ADMIN_INSTITUTION = "admin.institution";
-    public static final String LAB_ADMIN_PHONE = "admin.phone";
     public static final String LAB_ADMIN_PASS = "admin.pass";
     public static final String LAB_CAS_URL = "cas.url";
     public static final String LAB_MYPROXY_HOST = "myproxy.host";
@@ -142,7 +141,7 @@ public class CoreConstants implements IsSerializable {
     public static final String ICON_RUNNING_SIMULATIONS = IMG_FOLDER +"icon-runningSimulation.png";
     public static final String ICON_VIP_LOGO = IMG_FOLDER + "vip-logo.png";
     public static final String ICON_VIP_LOGO_WITHOUT_TEXT = IMG_FOLDER + "vip-logo-without-text.png";
-    public static final String EGI_CHECK_IN_LOGO = IMG_FOLDER + "egi-check-in.png";
+    public static final String EGI_CHECK_IN_LOGO = IMG_FOLDER + "egi-check-in-color.svg";
     // Folders
     public static final String FOLDER_TRASH = "Trash";
     public static final String FOLDER_FLAGS = IMG_FOLDER + "flags/";

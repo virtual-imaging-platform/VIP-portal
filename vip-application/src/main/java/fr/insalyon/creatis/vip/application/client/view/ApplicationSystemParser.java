@@ -64,7 +64,7 @@ public class ApplicationSystemParser extends ApplicationParser {
         if (applicationName.equals(ApplicationConstants.APP_APPLICATION)) {
             Layout.getInstance().addTab(
                 ApplicationConstants.TAB_MANAGE_APPLICATION,
-                ManageApplicationsTab::new);
+                () -> new ManageApplicationsTab(false));
             return true;
         } else if (applicationName.equals(ApplicationConstants.APP_CLASSES)) {
             Layout.getInstance().addTab(

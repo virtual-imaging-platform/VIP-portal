@@ -70,7 +70,8 @@ public class ApplicationModule extends Module {
              @Override
              public void run() {
                  Layout.getInstance().addTab(
-                         ApplicationConstants.TAB_MANAGE_APPLICATION, ManageApplicationsTab::new);
+                         ApplicationConstants.TAB_MANAGE_APPLICATION,
+                         () -> new ManageApplicationsTab(true));
              }
          });
        

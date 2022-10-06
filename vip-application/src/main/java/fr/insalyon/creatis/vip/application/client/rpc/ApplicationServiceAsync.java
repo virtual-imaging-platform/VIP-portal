@@ -48,6 +48,8 @@ import java.util.List;
 public interface ApplicationServiceAsync {
 
     public void signout(AsyncCallback<Void> asyncCallback);
+
+    public void getPublicApplications(AsyncCallback<List<Application>> asyncCallback);
     
     public void getApplications(AsyncCallback<List<Application>> asyncCallback);
     

@@ -119,7 +119,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n  \"firstName\":\"usertest\",\r\n  \"lastName\":\"usertest\",\r\n  \"email\":\"test@mail.com\",\r\n  \"institution\":\"test\",\r\n  \"password\": \"Test@2021\",\r\n  \"phone\":\"\",\r\n  \"level\": 0,\r\n  \"countryCode\":\"fr\",\r\n  \"comments\": \"test comment\",\r\n  \"accountTypes\": [\r\n      \"Support\"\r\n  ]\r\n}",
+					"raw": "{\r\n  \"firstName\":\"usertest\",\r\n  \"lastName\":\"usertest\",\r\n  \"email\":\"test@mail.com\",\r\n  \"institution\":\"test\",\r\n  \"password\": \"Test@2021\",\r\n  \"level\": 0,\r\n  \"countryCode\":\"fr\",\r\n  \"comments\": \"test comment\",\r\n  \"accountTypes\": [\r\n      \"Support\"\r\n  ]\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"

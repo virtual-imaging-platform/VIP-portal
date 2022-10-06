@@ -56,10 +56,6 @@ public class SystemParser extends ApplicationParser {
             addApplication(CoreConstants.APP_ACCOUNT_MANAGER, CoreConstants.APP_IMG_ACCOUNT_MANAGER);
             addApplication(CoreConstants.APP_SETTING, CoreConstants.APP_IMG_SETTING);
         }
-        if (CoreModule.user.isDeveloper()) {
-            addApplication(CoreConstants.APP_GROUP, CoreConstants.APP_IMG_GROUP);
-            addApplication(CoreConstants.APP_SETTING, CoreConstants.APP_IMG_SETTING);
-        }
     }
 
     @Override

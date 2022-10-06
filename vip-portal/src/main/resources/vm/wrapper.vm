@@ -21,7 +21,8 @@ function error {
 
 function download_udocker {
   #installation of udocker
-  git clone --depth=1 https://github.com/indigo-dc/udocker.git
+  info "cloning udocker ${UDOCKER_TAG} "
+  git clone --depth=1 --branch ${UDOCKER_TAG} https://github.com/indigo-dc/udocker.git
   (cd udocker/udocker; ln -s maincmd.py udocker)
   export PATH=`pwd`/udocker/udocker:$PATH
   
@@ -38,9 +39,7 @@ function download_udocker {
   cat >docker <<'EOF'
         #!/bin/bash
         MYARGS=$*
-        echo "my args are: " $MYARGS
-        #MYARGS=${MYARGS/"--entrypoint=/bin/sh"}
-        #echo "my latest args are: " $MYARGS
+        echo "executing ./udocker/udocker/udocker $MYARGS"
         ./udocker/udocker/udocker $MYARGS
 EOF
   chmod a+x docker

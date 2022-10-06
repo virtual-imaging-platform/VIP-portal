@@ -144,7 +144,11 @@ public class EditApplicationLayout extends AbstractFormLayout {
         addField("Classes", classesPickList);
         this.addMember(WidgetUtil.getLabel("<b>Citation</b>", 15));
         this.addMember(richTextEditor);
-        addButtons(saveButton, removeButton);
+        if (CoreModule.user.isDeveloper()){
+            addButtons(saveButton);
+        } else {
+            addButtons(saveButton, removeButton);
+        }
     }
 
     /**

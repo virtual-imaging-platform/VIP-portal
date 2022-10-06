@@ -51,7 +51,6 @@ public class User implements IsSerializable {
     private String email;
     private String nextEmail;
     private String institution;
-    private String phone;
     private String password;
     private boolean confirmed;
     private String code;
@@ -75,18 +74,17 @@ public class User implements IsSerializable {
     public User() {
     }
 
-    public User(String firstName, String lastName, String email, String institution,
-            String phone, UserLevel level, CountryCode countryCode) {
+    public User(String firstName, String lastName, String email, String institution, UserLevel level, CountryCode countryCode) {
 
-        this(firstName, lastName, email, null, institution, "", phone, false, "", "",
+        this(firstName, lastName, email, null, institution, "", false, "", "",
                 "", null, null, level, countryCode, 1,null,null,0,false);
 
     }
 
     public User(String firstName, String lastName, String email, String institution,
-            String password, String phone, CountryCode countryCode,Timestamp lastUpdatePublications) {
+            String password, CountryCode countryCode,Timestamp lastUpdatePublications) {
 
-        this(firstName, lastName, email, null, institution, password, phone, false,
+        this(firstName, lastName, email, null, institution, password, false,
                 "", "", "", new Date(), new Date(), null, countryCode, 1,null,lastUpdatePublications,0,false);
     }
 
@@ -97,7 +95,6 @@ public class User implements IsSerializable {
             String nextEmail,
             String institution,
             String password,
-            String phone,
             boolean confirmed,
             String code,
             String folder,
@@ -119,7 +116,6 @@ public class User implements IsSerializable {
         this.nextEmail = nextEmail;
         this.institution = institution;
         this.password = password;
-        this.phone = phone;
         this.confirmed = confirmed;
         this.code = code;
         this.folder = folder;
@@ -169,10 +165,6 @@ public class User implements IsSerializable {
 
     public String getPassword() {
         return password;
-    }
-
-    public String getPhone() {
-        return phone;
     }
 
     public void setCode(String code) {

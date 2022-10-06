@@ -97,7 +97,6 @@ public class SpringConfigServer implements Server {
         assertPropertyIsPresent(CoreConstants.LAB_ADMIN_LAST_NAME);
         assertPropertyIsNotEmpty(CoreConstants.LAB_ADMIN_EMAIL);
         assertPropertyIsPresent(CoreConstants.LAB_ADMIN_INSTITUTION);
-        assertPropertyIsPresent(CoreConstants.LAB_ADMIN_PHONE);
         assertPropertyIsPresent(CoreConstants.LAB_ADMIN_PASS);
 
         assertPropertyIsNotEmpty(CoreConstants.VO_NAME);
@@ -341,11 +340,6 @@ public class SpringConfigServer implements Server {
     @Override
     public String getAdminPassword() {
         return env.getRequiredProperty(CoreConstants.LAB_ADMIN_PASS);
-    }
-
-    @Override
-    public String getAdminPhone() {
-        return env.getRequiredProperty(CoreConstants.LAB_ADMIN_PHONE);
     }
 
     @Override
