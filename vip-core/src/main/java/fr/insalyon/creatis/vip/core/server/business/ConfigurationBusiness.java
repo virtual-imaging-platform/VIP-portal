@@ -386,7 +386,7 @@ public class ConfigurationBusiness {
         }
     }
 
-    public User getNewUser(String email, String firstName, String lastName) {
+    public User getNewUser(String email, String firstName, String lastName, String egi_affiliation) {
         CountryCode cc = CountryCode.aq;
 
         String country = "";
@@ -409,7 +409,7 @@ public class ConfigurationBusiness {
                 firstName.trim(),
                 lastName.trim(),
                 email.trim(),
-                "Unknown",
+                egi_affiliation.trim(),
                 "0000",
                 cc, getCurrentTimeStamp());
     }
@@ -965,10 +965,11 @@ public class ConfigurationBusiness {
         return server.getCasURL() + "/login?service=" + serviceURL;
     }
 
-    public User getOrCreateUser(String email, String defaultAccountType)
+    public User getOrCreateUser(String email, Object egi_affiliation, String defaultAccountType)
             throws BusinessException {
 
         User user;
+        String domainName;
         try {
             user = getUserWithSession(email);
         } catch (DAOException ex) {
@@ -985,7 +986,16 @@ public class ConfigurationBusiness {
                 }
             }
 
-            user = getNewUser(email, firstName, lastName);
+            if(egi_affiliation != null){
+                String egi_affiliation_string = egi_affiliation.toString();
+                String temp = egi_affiliation_string .substring(egi_affiliation_string .indexOf("@") + 1);
+                domainName = temp.substring(0, temp.indexOf("."));
+                domainName = domainName.toUpperCase();
+            } else {
+                domainName = "Unknown";
+            }
+
+            user = getNewUser(email, firstName, lastName, domainName);
             try {
                 signup(user, "Generated automatically", true, true,
                        defaultAccountType);
@@ -993,7 +1003,7 @@ public class ConfigurationBusiness {
                 if (ex2.getMessage().contains("existing")) {
                     //try with a different last name
                     lastName += "_" + System.currentTimeMillis();
-                    user = getNewUser(email, firstName, lastName);
+                    user = getNewUser(email, firstName, lastName, domainName);
                     signup(user, "Generated automatically", true,
                             true, defaultAccountType);
                 }
