@@ -52,7 +52,8 @@ public class EgiController {
 
         Map<String, Object> userAttributes = authToken.getPrincipal().getAttributes();
         try {
-            User vipUser = configurationBusiness.getOrCreateUser((String) userAttributes.get("email"), null);
+            logger.info(String.valueOf(userAttributes.get("eduperson_scoped_affiliation")));
+            User vipUser = configurationBusiness.getOrCreateUser((String) userAttributes.get("email"), userAttributes.get("eduperson_scoped_affiliation"), null);
             SecurityContextHolder.clearContext(); // destroy spring session and use VIP own session mechanism
             vipSessionBusiness.setVIPSession(request, response, vipUser); // creates VIP cookies and session
         } catch (BusinessException | CoreException e) {

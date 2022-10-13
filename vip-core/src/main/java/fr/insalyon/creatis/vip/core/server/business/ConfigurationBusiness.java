@@ -386,7 +386,7 @@ public class ConfigurationBusiness {
         }
     }
 
-    public User getNewUser(String email, String firstName, String lastName) {
+    public User getNewUser(String email, String firstName, String lastName, String egi_affiliation) {
         CountryCode cc = CountryCode.aq;
 
         String country = "";
@@ -405,11 +405,19 @@ public class ConfigurationBusiness {
             logger.warn("Cannot determine country from email extension {}: user will be mapped to Antartica", country, e);
         }
 
+        try {
+            if (egi_affiliation == "null") {
+                egi_affiliation = "Unknown";
+            }
+        } catch (IllegalArgumentException e) {
+            logger.warn("Cannot determine institution from email extension {}: user will be mapped to Antartica", egi_affiliation, e);
+        }
+
         return new User(
                 firstName.trim(),
                 lastName.trim(),
                 email.trim(),
-                "Unknown",
+                egi_affiliation,
                 "0000",
                 cc, getCurrentTimeStamp());
     }
@@ -965,10 +973,11 @@ public class ConfigurationBusiness {
         return server.getCasURL() + "/login?service=" + serviceURL;
     }
 
-    public User getOrCreateUser(String email, String defaultAccountType)
+    public User getOrCreateUser(String email, Object egi_affiliation, String defaultAccountType)
             throws BusinessException {
 
         User user;
+        String domainName;
         try {
             user = getUserWithSession(email);
         } catch (DAOException ex) {
@@ -985,7 +994,16 @@ public class ConfigurationBusiness {
                 }
             }
 
-            user = getNewUser(email, firstName, lastName);
+            if(egi_affiliation != null){
+                String egi_affiliation_string = egi_affiliation.toString();
+                String temp = egi_affiliation_string .substring(egi_affiliation_string .indexOf("@") + 1);
+                domainName = temp.substring(0, temp.indexOf("."));
+                domainName = domainName.toUpperCase();
+            } else {
+                domainName = "Unknown";
+            }
+
+            user = getNewUser(email, firstName, lastName, domainName);
             try {
                 signup(user, "Generated automatically", true, true,
                        defaultAccountType);
@@ -993,7 +1011,7 @@ public class ConfigurationBusiness {
                 if (ex2.getMessage().contains("existing")) {
                     //try with a different last name
                     lastName += "_" + System.currentTimeMillis();
-                    user = getNewUser(email, firstName, lastName);
+                    user = getNewUser(email, firstName, lastName, domainName);
                     signup(user, "Generated automatically", true,
                             true, defaultAccountType);
                 }
