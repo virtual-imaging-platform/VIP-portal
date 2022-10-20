@@ -58,7 +58,7 @@ public class SimulationTab extends AbstractSimulationTab {
         tabSet.addTab(jobsTab);
         tabSet.addTab(chartsTab);
 
-        if (CoreModule.user.isSystemAdministrator()) {
+        if (CoreModule.user.isSystemAdministrator() || CoreModule.user.isDeveloper()) {
             
             tasksTab = new SummaryTab(simulationID, completed);
             tabSet.addTab(tasksTab);
