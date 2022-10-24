@@ -48,9 +48,6 @@ import fr.insalyon.creatis.vip.applicationimporter.client.view.Constants;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
-import org.slf4j.LoggerFactory;
-
-import java.util.logging.Logger;
 
 public class DisplayTab extends Tab {
 
@@ -110,7 +107,7 @@ public class DisplayTab extends Tab {
             public void onClick(ClickEvent event) {
                 boutiquesTool.setApplicationLFN(vipLayout.getApplicationLocation() + "/" + boutiquesTool.getName());
                 if (vipLayout.getApplicationType() == "Unknown"){
-                    Layout.getInstance().setWarningMessage("Select type of Application is empty, please chose one.");
+                    Layout.getInstance().setWarningMessage("Select type of Application is empty, please choose one.");
                 } else {
                     createApplication();
                 }
