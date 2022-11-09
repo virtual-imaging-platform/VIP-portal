@@ -3,7 +3,7 @@
   <executable name="$tool.getWrapperName()">
     <access type="LFN" cached="true"/>
     <retrycount value="1"/>
-    <value value="$tool.getWrapperLFN()"/>
+    <value value="$executionType:$tool.getWrapperLFN()"/>
 #if($tag != "None")
     <requirement value="${tag}" />
 #end

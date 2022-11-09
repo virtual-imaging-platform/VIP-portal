@@ -104,7 +104,7 @@ public class ApplicationImporterBusiness {
     }
 
     public void createApplication(
-            BoutiquesTool bt, String type, String tag, boolean isRunOnGrid, boolean overwriteApplicationVersion, User user)
+            BoutiquesTool bt, String type, String tag, boolean isRunOnGrid, boolean overwriteApplicationVersion, String executionType, User user)
             throws BusinessException {
 
         try {
@@ -127,8 +127,8 @@ public class ApplicationImporterBusiness {
                     user, bt.getApplicationLFN()).concat("/").concat(bt.getToolVersion().replaceAll("\\s+","")));
 
             // Generate strings
-            String gwendiaString = velocityUtils.createDocument(bt, gwendiaTemplate);
-            String gaswString = velocityUtils.createDocument(tag, bt, isRunOnGrid, gaswTemplate);
+            String gwendiaString = velocityUtils.createDocument(bt, executionType, gwendiaTemplate);
+            String gaswString = velocityUtils.createDocument(tag, bt, isRunOnGrid, executionType, gaswTemplate);
             String wrapperString = velocityUtils.createDocument(tag, bt, isRunOnGrid, wrapperTemplate);
 
             // Write files

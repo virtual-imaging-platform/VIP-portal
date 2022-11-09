@@ -71,12 +71,42 @@ public class VelocityUtils {
         return stringWriter.toString();
     }
 
+    public String createDocument(BoutiquesTool bt, String executionType, String vmTemplate) {
+        VelocityContext context = new VelocityContext();
+        context.put("tool", bt);
+        context.put("esc", new EscapeTool());
+        context.put("executionType", executionType);
+
+        StringWriter stringWriter = new StringWriter();
+
+        Template template = velocityEngine.getTemplate(vmTemplate);
+        template.merge(context, stringWriter);
+
+        return stringWriter.toString();
+    }
+
     public String createDocument( String tag, BoutiquesTool bt, Boolean isRunOnGrid, String vmTemplate) {
         VelocityContext context = new VelocityContext();
         context.put("tag", tag);
         context.put("tool", bt);
         context.put("isRunOnGrid", isRunOnGrid);
         context.put("esc", new EscapeTool());
+
+        StringWriter stringWriter = new StringWriter();
+
+        Template template = velocityEngine.getTemplate(vmTemplate);
+        template.merge(context, stringWriter);
+
+        return stringWriter.toString();
+    }
+
+    public String createDocument(String tag, BoutiquesTool bt, Boolean isRunOnGrid, String executionType, String vmTemplate) {
+        VelocityContext context = new VelocityContext();
+        context.put("tag", tag);
+        context.put("tool", bt);
+        context.put("isRunOnGrid", isRunOnGrid);
+        context.put("esc", new EscapeTool());
+        context.put("executionType", executionType);
 
         StringWriter stringWriter = new StringWriter();
 
