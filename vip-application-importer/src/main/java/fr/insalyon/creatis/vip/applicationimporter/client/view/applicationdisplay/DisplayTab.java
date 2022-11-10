@@ -105,10 +105,10 @@ public class DisplayTab extends Tab {
         createApplicationButton = WidgetUtil.getIButton("Create application", Constants.ICON_LAUNCH, new ClickHandler() {
             @Override
             public void onClick(ClickEvent event) {
-                boutiquesTool.setApplicationLFN(vipLayout.getApplicationLocation() + "/" + boutiquesTool.getName());
                 if (vipLayout.getApplicationType() == null){
                     Layout.getInstance().setWarningMessage("Select type of Application is empty, please choose one.");
                 } else {
+                    boutiquesTool.setApplicationLFN(vipLayout.getApplicationLocation() + "/" + boutiquesTool.getName());
                     createApplication();
                 }
             }
