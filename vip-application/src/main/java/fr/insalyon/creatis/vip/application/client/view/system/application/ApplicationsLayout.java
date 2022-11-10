@@ -250,7 +250,7 @@ public class ApplicationsLayout extends VLayout {
                     }
                     if(onlyPublicApps) {
                         dataList.add(new ApplicationRecord(app.getName(), app.getOwner(), app.getFullName(), sb.toString(), app.getCitation(), sbg.toString()));
-                    }  else {
+                    } else {
                         dataList.add(new ApplicationRecord(app.getName(), app.getOwner(), app.getFullName(), sb.toString(), app.getCitation()));
                     }
                 }
