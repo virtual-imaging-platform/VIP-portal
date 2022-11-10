@@ -386,7 +386,7 @@ public class ConfigurationBusiness {
         }
     }
 
-    public User getNewUser(String email, String firstName, String lastName, String egi_affiliation) {
+    public User getNewUser(String email, String firstName, String lastName, String institution) {
         CountryCode cc = CountryCode.aq;
 
         String country = "";
@@ -409,7 +409,7 @@ public class ConfigurationBusiness {
                 firstName.trim(),
                 lastName.trim(),
                 email.trim(),
-                egi_affiliation.trim(),
+                institution.trim(),
                 "0000",
                 cc, getCurrentTimeStamp());
     }
@@ -965,7 +965,7 @@ public class ConfigurationBusiness {
         return server.getCasURL() + "/login?service=" + serviceURL;
     }
 
-    public User getOrCreateUser(String email, Object egi_affiliation, String defaultAccountType)
+    public User getOrCreateUser(String email, Object institution, String defaultAccountType)
             throws BusinessException {
 
         User user;
@@ -986,9 +986,9 @@ public class ConfigurationBusiness {
                 }
             }
 
-            if(egi_affiliation != null){
-                String egi_affiliation_string = egi_affiliation.toString();
-                String temp = egi_affiliation_string .substring(egi_affiliation_string .indexOf("@") + 1);
+            if(institution != null){
+                String institution_string = institution.toString();
+                String temp = institution_string .substring(institution_string .indexOf("@") + 1);
                 domainName = temp.substring(0, temp.indexOf("."));
                 domainName = domainName.toUpperCase();
             } else {
