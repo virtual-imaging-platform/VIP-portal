@@ -106,7 +106,7 @@ public class DisplayTab extends Tab {
             @Override
             public void onClick(ClickEvent event) {
                 boutiquesTool.setApplicationLFN(vipLayout.getApplicationLocation() + "/" + boutiquesTool.getName());
-                if (vipLayout.getApplicationType() == "Unknown"){
+                if (vipLayout.getApplicationType() == null){
                     Layout.getInstance().setWarningMessage("Select type of Application is empty, please choose one.");
                 } else {
                     createApplication();

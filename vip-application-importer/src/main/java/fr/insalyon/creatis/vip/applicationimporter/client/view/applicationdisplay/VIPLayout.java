@@ -136,7 +136,7 @@ public class VIPLayout extends AbstractFormLayout {
      */
     public String getApplicationType() {
         if (appCbItem._getValue() == null){
-            return "Unknown";
+            return null;
         } else {
             return appCbItem._getValue().toString();
         }
