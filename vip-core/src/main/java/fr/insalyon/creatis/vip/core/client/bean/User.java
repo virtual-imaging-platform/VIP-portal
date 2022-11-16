@@ -187,6 +187,10 @@ public class User implements IsSerializable {
         return level == UserLevel.Administrator;
     }
 
+    public boolean isDeveloper() {
+        return level == UserLevel.Developer;
+    }
+
     public String getSession() {
         return session;
     }

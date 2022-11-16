@@ -75,6 +75,15 @@ public class ApplicationBusiness {
         }
     }
 
+    public List<Application> getApplicationsWithOwner(String email) throws BusinessException {
+
+        try {
+            return applicationDAO.getApplicationsWithOwner(email);
+        } catch (DAOException ex) {
+            throw new BusinessException(ex);
+        }
+    }
+
     public List<Application> getPublicApplicationsWithGroups() throws BusinessException {
 
         try {
@@ -120,7 +129,7 @@ public class ApplicationBusiness {
             throws BusinessException {
 
         try {
-            return applicationDAO.getApplications(className);
+            return applicationDAO.getApplicationsFromClass(className);
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }
@@ -138,7 +147,7 @@ public class ApplicationBusiness {
     public List<Application> getApplications(List<String> classes)
             throws BusinessException {
         try {
-            return applicationDAO.getApplications(classes);
+            return applicationDAO.getApplicationsFromClasses(classes);
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }

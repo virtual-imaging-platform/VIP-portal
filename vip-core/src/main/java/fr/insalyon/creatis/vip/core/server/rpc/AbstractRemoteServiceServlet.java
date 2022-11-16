@@ -132,6 +132,15 @@ public abstract class AbstractRemoteServiceServlet extends RemoteServiceServlet 
         }
     }
 
+    protected void authenticateDeveloper(Logger logger) throws CoreException {
+
+        User user = getSessionUser();
+        if (!user.isDeveloper()) {
+            logger.error("The user has no system administrator rights: " + user.getEmail());
+            throw new CoreException("The user has no system developer rights.");
+        }
+    }
+
     protected void authenticateGroupAdministrator(Logger logger) throws CoreException {
 
         User user = getSessionUser();
@@ -147,6 +156,10 @@ public abstract class AbstractRemoteServiceServlet extends RemoteServiceServlet 
     
     protected boolean isGroupAdministrator() throws CoreException {
         return getSessionUser().isGroupAdmin();
+    }
+
+    protected boolean isDeveloper() throws CoreException {
+        return getSessionUser().isDeveloper();
     }
 
     protected boolean isUserConnected() {

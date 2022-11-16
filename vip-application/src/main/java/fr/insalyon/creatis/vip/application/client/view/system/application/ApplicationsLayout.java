@@ -163,7 +163,9 @@ public class ApplicationsLayout extends VLayout {
                         }
                     });
                     rollOverCanvas.addMember(loadImg);
-                    rollOverCanvas.addMember(deleteImg);
+                    if (! CoreModule.user.isDeveloper()) {
+                        rollOverCanvas.addMember(deleteImg);
+                    }
                 }
                 return rollOverCanvas;
             }
