@@ -25,6 +25,46 @@
     z-index: 1;
 }
 
+
+body{
+  font-family: 'Montserrat', sans-serif;
+}
+
+h1{
+  font-size: 4.5em;
+  margin-bottom: 5%;
+}
+
+h2{
+  font-size: 2.5em;
+}
+
+p{
+  font-size: 1.25em;
+  text-align: justify;
+}
+
+span{
+  color: orange;
+}
+
+.nav-item{
+  font-size: large;
+}
+
+.navbar-nav > li{
+  margin-left:20px;
+  margin-right:20px;
+}
+
+
+.divider:after, .divider:before {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: #eee;
+  }
+
 .button-blue-border {
   margin: 50px 20px 0px 0px;
   padding: 15px 10px 15px 80px;
