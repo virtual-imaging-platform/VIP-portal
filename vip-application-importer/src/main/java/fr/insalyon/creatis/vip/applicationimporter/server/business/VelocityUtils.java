@@ -71,11 +71,11 @@ public class VelocityUtils {
         return stringWriter.toString();
     }
 
-    public String createDocument(BoutiquesTool bt, String executionType, String vmTemplate) {
+    public String createDocument(BoutiquesTool bt, String fileAccessProtocol, String vmTemplate) {
         VelocityContext context = new VelocityContext();
         context.put("tool", bt);
         context.put("esc", new EscapeTool());
-        context.put("executionType", executionType);
+        context.put("executionType", fileAccessProtocol);
 
         StringWriter stringWriter = new StringWriter();
 
@@ -100,13 +100,13 @@ public class VelocityUtils {
         return stringWriter.toString();
     }
 
-    public String createDocument(String tag, BoutiquesTool bt, Boolean isRunOnGrid, String executionType, String vmTemplate) {
+    public String createDocument(String tag, BoutiquesTool bt, Boolean isRunOnGrid, String fileAccessProtocol, String vmTemplate) {
         VelocityContext context = new VelocityContext();
         context.put("tag", tag);
         context.put("tool", bt);
         context.put("isRunOnGrid", isRunOnGrid);
         context.put("esc", new EscapeTool());
-        context.put("executionType", executionType);
+        context.put("executionType", fileAccessProtocol);
 
         StringWriter stringWriter = new StringWriter();
 

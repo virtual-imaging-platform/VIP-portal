@@ -40,7 +40,7 @@ public interface ApplicationImporterServiceAsync {
 
     public void readAndValidateBoutiquesFile(String fileLFN, AsyncCallback<String> callback);
 
-    public void createApplication(BoutiquesTool bt, String type, String tag, boolean isRunOnGrid, boolean overwriteVersion, String executionType, AsyncCallback<Void> callback);
+    public void createApplication(BoutiquesTool bt, String type, String tag, boolean isRunOnGrid, boolean overwriteVersion, String fileAccessProtocol, AsyncCallback<Void> callback);
     
     public void getApplicationImporterRootFolder(AsyncCallback<String> asyncCallback);
     

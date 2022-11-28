@@ -87,11 +87,11 @@ public class VIPLayout extends AbstractFormLayout {
 
         //select list to choose the execution type
         executionTypeItem = new SelectItem();
-        executionTypeItem.setTitle("<br>Select execution type</b>");
+        executionTypeItem.setTitle("<br>Select where the application files must be located</b>");
         executionTypeItem.setType("comboBox");
         LinkedHashMap<String, String> executionTypeValueMap = new LinkedHashMap<>();
-        executionTypeValueMap.put(Constants.APP_EXECUTION_LOCAL, "Local");
-        executionTypeValueMap.put(Constants.APP_EXECUTION_CLOUD, "Cloud");
+        executionTypeValueMap.put(Constants.APP_IMPORTER_FILE_PROTOCOL, "Local (file)");
+        executionTypeValueMap.put(Constants.APP_IMPORTER_LFN_PROTOCOL, "Grid (lfn)");
         executionTypeItem.setValueMap(executionTypeValueMap);
 
         this.addMember(FieldUtil.getForm(appCbItem));
