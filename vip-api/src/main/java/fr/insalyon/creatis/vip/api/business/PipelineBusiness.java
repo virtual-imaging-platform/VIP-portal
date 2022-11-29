@@ -161,6 +161,21 @@ public class PipelineBusiness {
         }
     }
 
+
+    public List<Pipeline> listPublicPipelines() throws ApiException {
+        try {
+            List<Pipeline> pipelines = new ArrayList<>();
+            for (Application app : applicationBusiness.getPublicApplicationsWithGroups()) {
+                pipelines.add(new Pipeline(
+                        app.getFullName(), app.getName(), "plop", true)
+                );
+            }
+            return pipelines;
+        } catch (BusinessException e) {
+            throw new ApiException(e);
+        }
+    }
+
     public String getPipelineIdentifier(String applicationName, String applicationVersion) {
         return applicationName + "/" + applicationVersion;
     }

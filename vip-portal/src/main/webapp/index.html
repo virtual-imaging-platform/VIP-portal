@@ -85,6 +85,10 @@
                     <form class="text-center">
                         <img class="mb-4" src="images/core/vip-logo.png" alt="" width="220" height="150">
                         <h2 class="mb-3 fw-normal">Please sign in</h2>
+                        <!-- THIS IS BOOTSTRAP ALERT -->
+                        <div class='alert alert-danger' style='display:none' id='login-failed'>
+                            The username or password you entered is incorrect.
+                        </div>
 
                         <div class="form-floating">
                             <input type="email" class="form-control" id="floatingEmail" placeholder="name@example.com">
@@ -105,6 +109,7 @@
                             <!-- Submit button -->
                             <a type="button" class="btn btn-primary btn-lg btn-block" onclick="clickinner()" style="background-color: #0095d6;">Sign in</a>
                             <a type="button" class="btn btn-primary btn-lg btn-block" style="background-color: #0095d6;">Create an account</a>
+
                             <!-- divider -->
                             <div class="divider d-flex align-items-center my-4 ">
                                 <h2 class="text-center mx-3 mb-0 ">OR</h2>

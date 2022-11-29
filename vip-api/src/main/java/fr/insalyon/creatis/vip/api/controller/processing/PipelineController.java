@@ -46,6 +46,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.util.List;
 import java.util.function.Supplier;
 
 /**
@@ -70,6 +71,12 @@ public class PipelineController extends ApiController {
             @RequestParam(required = false) String studyIdentifier) throws ApiException {
         logMethodInvocation(logger, "listPipelines", studyIdentifier);
         return pipelineBusiness.listPipelines(studyIdentifier);
+    }
+
+    @RequestMapping("public")
+    public List<Pipeline> listPublicPipelines() throws ApiException {
+        logMethodInvocation(logger, "listPublicPipelines");
+        return pipelineBusiness.listPublicPipelines();
     }
 
     @RequestMapping("{pipelineId}")

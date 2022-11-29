@@ -1,13 +1,12 @@
-
 function validateEmail(emailField){
     var reg = /^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/;
 
     if (reg.test(emailField) == false)
     {
-        alert('Invalid Email Address');
+        document.getElementById('login-failed').style.display = 'block';
+        setTimeout(function(){document.getElementById('login-failed').style.display = 'none'}, 3000);
         return false;
     } else{
-        window.location.href="home.html";
         return true;
     }
 }
@@ -21,8 +20,33 @@ function setCookie(value_user, value_session, exdays) {
     document.cookie = cname + "=" + value_user + ";" + expires + ";path=/";
     document.cookie = csession + "=" + value_session + ";" + expires + ";path=/";
     window.location.href="home.html";
-    alert(document.cookie)
 }
+
+function getCookie(cName) {
+    let cookieExist = true;
+    const name = cName + "=";
+    const cDecoded = decodeURIComponent(document.cookie);
+    console.log(cDecoded);
+    const cArr = cDecoded.split('; ');
+    let res;
+    cArr.forEach(val => {
+      if (val.indexOf(name) === 0) res = val.substring(name.length);
+    })
+    if (res == undefined){
+        cookieExist = false;
+    }
+    return cookieExist;
+  }
+
+function checkIfCookieExist(){
+    if (getCookie("vip-cookie-user") == true && getCookie("vip-cookie-user") == true) {
+        window.location.href="home.html";
+        return true;
+    } else {
+        return false;
+    }
+}
+
 
 async function get_fetch(form_email, form_password){
     const data = await fetch('http://localhost:8080/rest/authenticate', {
@@ -43,12 +67,8 @@ async function get_fetch(form_email, form_password){
 function clickinner(){
     email = document.getElementById("floatingEmail").value;
     password = document.getElementById("floatingPassword").value;
-    //validateEmail(email);*
-
+    validateEmail(email);
     get_fetch(email, password).then(data => setCookie(email, data.httpHeaderValue, 7));
-
-
-    //setCookie("admin@vip-local-test.local", "15b1c9bd-765a-4047-a9c5-3031f2a47afa", 7)
-    //window.location.href="home.html";
-
 };
+
+checkIfCookieExist();
