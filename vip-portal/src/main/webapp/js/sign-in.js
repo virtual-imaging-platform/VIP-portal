@@ -64,6 +64,41 @@ async function get_fetch(form_email, form_password){
 
 }
 
+function grid(data) {
+    window.onload = function(){
+    var section = document.createElement("section");
+    section.id = "appGrid"
+    var container = document.createElement("div");
+    container.className = "container";
+
+    for (let i = 0; i < data.length; i++){
+        var row = document.createElement("div");
+        row.className = "row";
+        row.id = "appRow" + i;
+
+        var colApp = document.createElement("div");
+        colApp.className = "col";
+        colApp.innerText = data[i].identifier;
+        var colName = document.createElement("div");
+        colName.className = "col";
+        colName.innerText = data[i].name;
+
+        row.append(colApp);
+        row.appendChild(colName);
+        container.appendChild(row);
+    }
+
+    section.appendChild(container);
+    document.body.appendChild(section);}
+};
+
+function createGridapp(){
+    fetch('http://localhost:8080/rest/pipelines/public')
+    .then((response) => response.json())
+    .then((data) => grid(data));
+}
+
+
 function clickinner(){
     email = document.getElementById("floatingEmail").value;
     password = document.getElementById("floatingPassword").value;
@@ -72,3 +107,4 @@ function clickinner(){
 };
 
 checkIfCookieExist();
+createGridapp();
