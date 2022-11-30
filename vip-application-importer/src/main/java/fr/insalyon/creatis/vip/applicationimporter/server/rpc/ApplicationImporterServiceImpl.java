@@ -72,12 +72,12 @@ public class ApplicationImporterServiceImpl extends fr.insalyon.creatis.vip.core
 
     @Override
     public void createApplication(
-            BoutiquesTool bt, String type, String tag, boolean isRunOnGrid, boolean overwriteVersion, String executionType)
+            BoutiquesTool bt, String type, String tag, boolean isRunOnGrid, boolean overwriteVersion, String fileAccessProtocol)
             throws ApplicationImporterException {
         try {
             trace(logger, "Creating application");
             applicationImporterBusiness.createApplication(
-                    bt, type, tag, isRunOnGrid, overwriteVersion, executionType, getSessionUser());
+                    bt, type, tag, isRunOnGrid, overwriteVersion, fileAccessProtocol, getSessionUser());
         } catch (CoreException | BusinessException ex) {
             throw new ApplicationImporterException(ex);
         }

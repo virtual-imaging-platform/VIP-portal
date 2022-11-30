@@ -56,7 +56,7 @@ public class VIPLayout extends AbstractFormLayout {
     private final CheckboxItem overwriteIfexists;
     private final SelectItem appCbItem;
     private final SelectItem tagsCbItem;
-    private final SelectItem executionTypeItem;
+    private final SelectItem fileAccessProtocolItem;
 
     public VIPLayout(String width, String height) {
         super(width, height);
@@ -86,19 +86,19 @@ public class VIPLayout extends AbstractFormLayout {
         tagsCbItem = createTagsSelect();
 
         //select list to choose the execution type
-        executionTypeItem = new SelectItem();
-        executionTypeItem.setTitle("<br>Select where the application files must be located</b>");
-        executionTypeItem.setType("comboBox");
+        fileAccessProtocolItem = new SelectItem();
+        fileAccessProtocolItem.setTitle("<br>Select where the application files must be located</b>");
+        fileAccessProtocolItem.setType("comboBox");
         LinkedHashMap<String, String> executionTypeValueMap = new LinkedHashMap<>();
         executionTypeValueMap.put(Constants.APP_IMPORTER_FILE_PROTOCOL, "Local (file)");
         executionTypeValueMap.put(Constants.APP_IMPORTER_LFN_PROTOCOL, "Grid (lfn)");
-        executionTypeItem.setValueMap(executionTypeValueMap);
+        fileAccessProtocolItem.setValueMap(executionTypeValueMap);
 
         this.addMember(FieldUtil.getForm(appCbItem));
         this.addMember(FieldUtil.getForm(isRunOnGrid));
         this.addMember(FieldUtil.getForm(overwriteIfexists));
         this.addMember(FieldUtil.getForm(tagsCbItem));
-        this.addMember(FieldUtil.getForm(executionTypeItem));
+        this.addMember(FieldUtil.getForm(fileAccessProtocolItem));
 
     }
 
@@ -190,7 +190,7 @@ public class VIPLayout extends AbstractFormLayout {
     public String getTag() {
         return tagsCbItem._getValue().toString();
     }
-    public String getExecutionType(){
-        return executionTypeItem._getValue().toString();
+    public String getFileAccessProtocol(){
+        return fileAccessProtocolItem._getValue().toString();
     }
 }

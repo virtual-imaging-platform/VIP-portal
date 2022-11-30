@@ -75,7 +75,7 @@ public class VelocityUtils {
         VelocityContext context = new VelocityContext();
         context.put("tool", bt);
         context.put("esc", new EscapeTool());
-        context.put("executionType", fileAccessProtocol);
+        context.put("fileAccessProtocol", fileAccessProtocol);
 
         StringWriter stringWriter = new StringWriter();
 
@@ -106,7 +106,7 @@ public class VelocityUtils {
         context.put("tool", bt);
         context.put("isRunOnGrid", isRunOnGrid);
         context.put("esc", new EscapeTool());
-        context.put("executionType", fileAccessProtocol);
+        context.put("fileAccessProtocol", fileAccessProtocol);
 
         StringWriter stringWriter = new StringWriter();
 
