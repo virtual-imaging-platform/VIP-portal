@@ -89,10 +89,10 @@ public class VIPLayout extends AbstractFormLayout {
         fileAccessProtocolItem = new SelectItem();
         fileAccessProtocolItem.setTitle("<br>Select where the application files must be located</b>");
         fileAccessProtocolItem.setType("comboBox");
-        LinkedHashMap<String, String> executionTypeValueMap = new LinkedHashMap<>();
-        executionTypeValueMap.put(Constants.APP_IMPORTER_FILE_PROTOCOL, "Local (file)");
-        executionTypeValueMap.put(Constants.APP_IMPORTER_LFN_PROTOCOL, "Grid (lfn)");
-        fileAccessProtocolItem.setValueMap(executionTypeValueMap);
+        LinkedHashMap<String, String> fileAccessProtocolValueMap = new LinkedHashMap<>();
+        fileAccessProtocolValueMap.put(Constants.APP_IMPORTER_FILE_PROTOCOL, "Local (file)");
+        fileAccessProtocolValueMap.put(Constants.APP_IMPORTER_LFN_PROTOCOL, "Grid (lfn)");
+        fileAccessProtocolItem.setValueMap(fileAccessProtocolValueMap);
 
         this.addMember(FieldUtil.getForm(appCbItem));
         this.addMember(FieldUtil.getForm(isRunOnGrid));
