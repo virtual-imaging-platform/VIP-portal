@@ -35,6 +35,7 @@ import fr.insalyon.creatis.vip.api.business.PipelineBusiness;
 import fr.insalyon.creatis.vip.api.controller.ApiController;
 import fr.insalyon.creatis.vip.api.exception.ApiException;
 import fr.insalyon.creatis.vip.api.model.Pipeline;
+import fr.insalyon.creatis.vip.application.client.bean.Application;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -73,8 +74,8 @@ public class PipelineController extends ApiController {
         return pipelineBusiness.listPipelines(studyIdentifier);
     }
 
-    @RequestMapping("public")
-    public List<Pipeline> listPublicPipelines() throws ApiException {
+    @RequestMapping(params = "public")
+    public List<Application> listPublicPipelines() throws ApiException {
         logMethodInvocation(logger, "listPublicPipelines");
         return pipelineBusiness.listPublicPipelines();
     }

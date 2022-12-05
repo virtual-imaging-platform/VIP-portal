@@ -45,7 +45,7 @@
 </head>
 
 <body>
-<section id="welcome">
+<section id="navbar">
     <div class="container-fluid p-0">
         <!-- Navigation bar -->
         <nav class="navbar navbar-expand-lg" style="background-color: #0095d6;">
@@ -71,59 +71,112 @@
                 </li>
             </ul>
         </nav>
+    </div>
+</section>
+<section id="welcome">
+    <div class="container-fluid text-center" id="welcome_ paragraphe">
+        <div class="row gx-5">
+            <div class="col" id="welcome_col">
+                <h1 id="main_title">Welcome on the <br> <span>V</span>irtual <span>I</span>maging <span>P</span>latform</h1>
+                <p>VIP is a web portal for medical imaging applications. It allows you to access scientific applications
+                    as a service (directly through your web browser with no installation required), as well as distributed
+                    computing resources in a transparent manner. It exploits the resources available in the biomed virtual
+                    organization of the EGI e-infrastructure to offer an open service to researchers worldwide.
+                    <br>
+                    <br>
+                    This portal is exclusively dedicated to non-commercial academic use, as indicated in the <a href="https://vip.creatis.insa-lyon.fr/documentation/terms.html">terms of use</a>. For commercial use, Please
+                    contact us at <strong>vip-support@creatis.insa-lyon.fr</strong>.
+                </p>
+            </div>
+            <div class="col" id="welcome_signin">
+                <form class="text-center">
+                    <img class="mb-4" src="images/core/vip-logo.png" alt="" width="220" height="150">
+                    <h2 class="mb-3 fw-normal">Please sign in</h2>
+                    <!-- THIS IS BOOTSTRAP ALERT -->
+                    <div class='alert alert-danger' style='display:none' id='login-failed'>
+                        The username or password you entered is incorrect.
+                    </div>
+                    <div class='alert alert-warning' style='display:none' id='forgot_password'>
+                        To reset your password, enter the email address you use to sign in in to VIP. <br>
+                        <label for="floatingInput">Email address</label>
+                        <input type="email_warning" class="form-control" id="floatingEmailWarning" placeholder="name@example.com">
+                        <br>
+                        <a type="button" class="btn btn-primary btn-lg btn-block" style="background-color: #0095d6;">Continue</a>
+                    </div>
 
-        <div class="container-fluid text-center">
-            <div class="row">
-                <div class="col p-5">
-                    <h1>Welcome on the <br> <span>V</span>irtual <span>I</span>maging <span>P</span>latform</h1>
-                    <p>VIP is a web portal for medical imaging applications. It allows you to access scientific applications
-                        as a service (directly through your web browser with no installation required), as well as distributed
-                        computing resources in a transparent manner. It exploits the resources available in the biomed virtual
-                        organization of the EGI e-infrastructure to offer an open service to researchers worldwide.</p>
-                </div>
-                <div class="col p-5">
-                    <form class="text-center">
-                        <img class="mb-4" src="images/core/vip-logo.png" alt="" width="220" height="150">
-                        <h2 class="mb-3 fw-normal">Please sign in</h2>
-                        <!-- THIS IS BOOTSTRAP ALERT -->
-                        <div class='alert alert-danger' style='display:none' id='login-failed'>
-                            The username or password you entered is incorrect.
+                    <div class="form-floating">
+                        <input type="email" class="form-control" id="floatingEmail" placeholder="name@example.com">
+                        <label for="floatingInput">Email address</label>
+                    </div>
+                    <div class="form-floating">
+                        <input type="password" class="form-control" id="floatingPassword" placeholder="Password">
+                        <label for="floatingPassword">Password</label>
+                        <div class="d-flex justify-content-around align-items-center mb-4">
+                            <!-- Checkbox -->
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="" id="form1Example3" checked />
+                                <label class="form-check-label" for="form1Example3"> Remember me </label>
+                            </div>
+                            <a href="#!" onclick="forgot_password()">Forgot password?</a>
                         </div>
 
-                        <div class="form-floating">
-                            <input type="email" class="form-control" id="floatingEmail" placeholder="name@example.com">
-                            <label for="floatingInput">Email address</label>
-                        </div>
-                        <div class="form-floating">
-                            <input type="password" class="form-control" id="floatingPassword" placeholder="Password">
-                            <label for="floatingPassword">Password</label>
-                            <div class="d-flex justify-content-around align-items-center mb-4">
-                                <!-- Checkbox -->
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" value="" id="form1Example3" checked />
-                                    <label class="form-check-label" for="form1Example3"> Remember me </label>
-                                </div>
-                                <a href="#!">Forgot password?</a>
-                            </div>
+                        <!-- Submit button -->
+                        <a type="button" class="btn btn-primary btn-lg btn-block" onclick="clickinner()" style="background-color: #0095d6;">Sign in</a>
+                        <a type="button" class="btn btn-primary btn-lg btn-block" style="background-color: #0095d6;">Create an account</a>
 
-                            <!-- Submit button -->
-                            <a type="button" class="btn btn-primary btn-lg btn-block" onclick="clickinner()" style="background-color: #0095d6;">Sign in</a>
-                            <a type="button" class="btn btn-primary btn-lg btn-block" style="background-color: #0095d6;">Create an account</a>
+                        <!-- divider
+                        <div class="divider d-flex align-items-center my-4 " id="divider_signin">
+                            <h2 class="text-center mx-3 mb-0 ">OR</h2>
+                        </div> -->
+                        <hr id="signin_hr">
+                        <br>
+                        <!-- EGI check-in button -->
+                        <a class="button-blue-border" href="/oauth2/authorize-client/egi"
+                           role="button">
+                            <i class="fab fa-facebook-f me-2"></i>Login with EGI Check-in
+                        </a>
 
-                            <!-- divider -->
-                            <div class="divider d-flex align-items-center my-4 ">
-                                <h2 class="text-center mx-3 mb-0 ">OR</h2>
-                            </div>
-                            <!-- EGI check-in button -->
-                            <a class="button-blue-border" href="/oauth2/authorize-client/egi"
-                               role="button">
-                                <i class="fab fa-facebook-f me-2"></i>Login with EGI Check-in
-                            </a>
-
-                    </form>
-                </div>
+                </form>
             </div>
         </div>
+    </div>
+</section>
+<section id="tableApp">
+    <h2>List of Applications</h2>
+    <p class="text-center">This is a table containing all the applications that are publicly available on VIP. You can see in the last
+        colum which group(s) give access to each application. Once registered and logged onto VIP, you can configure
+        the groups you belong to by accessing your account page. Please refresh the VIP page after updating your groups to apply the change.</p>
+    <table class="table table-striped" id="appTable">
+        <thead>
+        <tr>
+            <th scope="col">#</th>
+            <th scope="col">Application Name</th>
+            <th scope="col">Classes</th>
+            <th scope="col">Groups</th>
+        </tr>
+        </thead>
+        <tbody id="my_tbody">
+        </tbody>
+    </table>
+</section>
+<hr class="style_hr">
+<section id="tablePublication">
+    <h2>List of Publications</h2>
+    <table class="table table-striped" id="id_table_Publication">
+        <thead>
+        <tr>
+            <th scope="col">#</th>
+            <th scope="col">Title</th>
+            <th scope="col">Type</th>
+            <th scope="col">Journal, Conference or Book Name</th>
+            <th scope="col">Authors</th>
+            <th scope="col">Date</th>
+            <th scope="col">VIP Application</th>
+        </tr>
+        </thead>
+        <tbody id="my_tbody">
+        </tbody>
+    </table>
 </section>
 </body>
 </html>

@@ -30,13 +30,9 @@ body{
   font-family: 'Montserrat', sans-serif;
 }
 
-h1{
-  font-size: 4.5em;
-  margin-bottom: 5%;
-}
-
 h2{
   font-size: 2.5em;
+  padding-bottom: 1%;
 }
 
 p{
@@ -89,4 +85,63 @@ span{
   background-color: #005faa;
   background-image: url(https://assets.website-files.com/62e3a5ba3da3705b0a510a42/62e3a82d3ed11b0ea947266c_egi-logo-white.svg);
   color: #fff;
+}
+
+.table-striped > tbody > tr:nth-child(2n+1) > td, .table-striped > tbody > tr:nth-child(2n+1) > th {
+  background-color: #0095d6;
+}
+.style_hr{
+  border: 0;
+  height: 2px;
+  background-image: -webkit-linear-gradient(left, #f0f0f0, #8c8b8b, #f0f0f0);
+  background-image: -moz-linear-gradient(left, #f0f0f0, #8c8b8b, #f0f0f0);
+  background-image: -ms-linear-gradient(left, #f0f0f0, #8c8b8b, #f0f0f0);
+  background-image: -o-linear-gradient(left, #f0f0f0, #8c8b8b, #f0f0f0);
+}
+
+#welcome {
+  padding-top: 2%;
+  padding-left: 10%;
+  padding-right: 10%;
+  padding-bottom: 2%;
+  background-color: #f0f2f5;
+}
+
+#main_title {
+  font-size: 3.5em;
+  margin-bottom: 6%;
+  padding-bottom: 5%;
+}
+
+#welcome_paragraphe {
+  padding-right: 15%;
+}
+
+#welcome_signin {
+  padding-left: 15%;
+}
+
+#signin_hr {
+  border: 0;
+  height: 2px;
+  background-image: -webkit-linear-gradient(left, #f0f2f5, #0095d6, #f0f2f5);
+  background-image: -moz-linear-gradient(left, #f0f2f5, #0095d6, #f0f2f5);
+  background-image: -ms-linear-gradient(left, #f0f2f5, #0095d6, #f0f2f5);
+  background-image: -o-linear-gradient(left, #f0f2f5, #0095d6, #f0f2f5);
+}
+
+
+#tableApp {
+  text-align: center;
+  padding-top: 2%;
+  padding-left: 10%;
+  padding-right: 10%;
+  padding-bottom: 2%;
+}
+
+#tablePublication {
+  text-align: center;
+  padding-top: 1%;
+  padding-left: 10%;
+  padding-right: 10%;
 }

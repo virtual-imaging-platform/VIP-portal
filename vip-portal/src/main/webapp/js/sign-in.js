@@ -11,6 +11,10 @@ function validateEmail(emailField){
     }
 }
 
+function forgot_password(){
+    document.getElementById('forgot_password').style.display = 'block';
+}
+
 function setCookie(value_user, value_session, exdays) {
     cname = "vip-cookie-user"
     csession = "vip-cookie-session"
@@ -64,38 +68,32 @@ async function get_fetch(form_email, form_password){
 
 }
 
-function grid(data) {
-    window.onload = function(){
-    var section = document.createElement("section");
-    section.id = "appGrid"
-    var container = document.createElement("div");
-    container.className = "container";
-
+function make_table(data) {
+    window.onload = function() {
+    var application = new Array();
+    var name_app = "";
+    var name_groups = "";
     for (let i = 0; i < data.length; i++){
-        var row = document.createElement("div");
-        row.className = "row";
-        row.id = "appRow" + i;
-
-        var colApp = document.createElement("div");
-        colApp.className = "col";
-        colApp.innerText = data[i].identifier;
-        var colName = document.createElement("div");
-        colName.className = "col";
-        colName.innerText = data[i].name;
-
-        row.append(colApp);
-        row.appendChild(colName);
-        container.appendChild(row);
+        name_classes = data[i].applicationClasses.toString();
+        name_groups = data[i].applicationGroups.toString();
+        application.push([i, data[i].name, name_classes, name_groups])
     }
 
-    section.appendChild(container);
-    document.body.appendChild(section);}
-};
+    var tablecontents = "";
+    for (var i = 0; i < application.length; i++) {
+        tablecontents += "<tr>";
+        for (var j = 0; j < application[i].length; j++) {
+            tablecontents += "<td>" + application[i][j] + "</td>";
+        }
+        tablecontents += "</tr>";
+    }
+    document.getElementById("my_tbody").innerHTML = tablecontents;
+}};
 
 function createGridapp(){
-    fetch('http://localhost:8080/rest/pipelines/public')
+    fetch('http://localhost:8080/rest/pipelines?public')
     .then((response) => response.json())
-    .then((data) => grid(data));
+    .then((data) => make_table(data));
 }
 
 

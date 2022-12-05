@@ -50,7 +50,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
-import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -162,15 +161,17 @@ public class PipelineBusiness {
     }
 
 
-    public List<Pipeline> listPublicPipelines() throws ApiException {
+    public List<Application> listPublicPipelines() throws ApiException {
         try {
             List<Pipeline> pipelines = new ArrayList<>();
+             return applicationBusiness.getPublicApplicationsWithGroups();
+            /*
             for (Application app : applicationBusiness.getPublicApplicationsWithGroups()) {
                 pipelines.add(new Pipeline(
                         app.getFullName(), app.getName(), "plop", true)
                 );
             }
-            return pipelines;
+            return pipelines;*/
         } catch (BusinessException e) {
             throw new ApiException(e);
         }
