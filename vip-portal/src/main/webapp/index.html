@@ -44,7 +44,7 @@
     <script language="javascript" src="js/jszip.js"></script>
 </head>
 
-<body>
+<body style="font-family: 'Montserrat', sans-serif;">
 <section id="navbar">
     <div class="container-fluid p-0">
         <!-- Navigation bar -->
@@ -56,6 +56,9 @@
             <ul class="navbar-nav ms-auto">
                 <li class="nav-item">
                     <a class="nav-link" style="color: white;" href="https://vip.creatis.insa-lyon.fr/documentation/">Documentation</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" style="color: white;" href="https://www.creatis.insa-lyon.fr/vip/news.html">News</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" style="color: white;" href="https://vip.creatis.insa-lyon.fr/documentation/privacypolicy.html">Privacy Policy</a>
@@ -101,7 +104,7 @@
                         <label for="floatingInput">Email address</label>
                         <input type="email_warning" class="form-control" id="floatingEmailWarning" placeholder="name@example.com">
                         <br>
-                        <a type="button" class="btn btn-primary btn-lg btn-block" style="background-color: #0095d6;">Continue</a>
+                        <a type="button" class="btn btn-primary btn-lg btn-block" onclick="continue_forgotpsw()" style="background-color: #0095d6;">Continue</a>
                     </div>
 
                     <div class="form-floating">
@@ -122,7 +125,7 @@
 
                         <!-- Submit button -->
                         <a type="button" class="btn btn-primary btn-lg btn-block" onclick="clickinner()" style="background-color: #0095d6;">Sign in</a>
-                        <a type="button" class="btn btn-primary btn-lg btn-block" style="background-color: #0095d6;">Create an account</a>
+                        <a type="button" class="btn btn-primary btn-lg btn-block" onclick="createAnAccount()" style="background-color: #0095d6;">Create an account</a>
 
                         <!-- divider
                         <div class="divider d-flex align-items-center my-4 " id="divider_signin">

@@ -15,6 +15,10 @@ function forgot_password(){
     document.getElementById('forgot_password').style.display = 'block';
 }
 
+function continue_forgotpsw(){
+    setTimeout(function(){document.getElementById('forgot_password').style.display = 'none'}, 0);
+}
+
 function setCookie(value_user, value_session, exdays) {
     cname = "vip-cookie-user"
     csession = "vip-cookie-session"
@@ -49,6 +53,10 @@ function checkIfCookieExist(){
     } else {
         return false;
     }
+}
+
+function createAnAccount(){
+    window.location.href="sign-up.html";
 }
 
 
