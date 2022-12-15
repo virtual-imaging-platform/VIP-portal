@@ -44,6 +44,8 @@ import fr.insalyon.creatis.vip.application.server.business.WorkflowBusiness;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
+import fr.insalyon.creatis.vip.publication.client.bean.Publication;
+import fr.insalyon.creatis.vip.publication.server.business.PublicationBusiness;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -71,17 +73,19 @@ public class PipelineBusiness {
     private Supplier<User> currentUserProvider;
     private final WorkflowBusiness workflowBusiness;
     private final ApplicationBusiness applicationBusiness;
+    private final PublicationBusiness publicationBusiness;
     private final ClassBusiness classBusiness;
 
     @Autowired
     public PipelineBusiness(
             Supplier<User> currentUserProvider, Environment env,
             WorkflowBusiness workflowBusiness,
-            ApplicationBusiness applicationBusiness, ClassBusiness classBusiness) {
+            ApplicationBusiness applicationBusiness, PublicationBusiness publicationBusiness, ClassBusiness classBusiness) {
         this.currentUserProvider = currentUserProvider;
         this.env = env;
         this.workflowBusiness = workflowBusiness;
         this.applicationBusiness = applicationBusiness;
+        this.publicationBusiness = publicationBusiness;
         this.classBusiness = classBusiness;
     }
 
@@ -165,6 +169,22 @@ public class PipelineBusiness {
         try {
             List<Pipeline> pipelines = new ArrayList<>();
              return applicationBusiness.getPublicApplicationsWithGroups();
+            /*
+            for (Application app : applicationBusiness.getPublicApplicationsWithGroups()) {
+                pipelines.add(new Pipeline(
+                        app.getFullName(), app.getName(), "plop", true)
+                );
+            }
+            return pipelines;*/
+        } catch (BusinessException e) {
+            throw new ApiException(e);
+        }
+    }
+
+    public List<Publication> listPublication() throws ApiException {
+        try {
+            List<Pipeline> pipelines = new ArrayList<>();
+            return publicationBusiness.getPublications();
             /*
             for (Application app : applicationBusiness.getPublicApplicationsWithGroups()) {
                 pipelines.add(new Pipeline(

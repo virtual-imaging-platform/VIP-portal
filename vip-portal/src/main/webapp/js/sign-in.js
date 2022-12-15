@@ -79,12 +79,10 @@ async function get_fetch(form_email, form_password){
 function make_table(data) {
     window.onload = function() {
     var application = new Array();
-    var name_app = "";
-    var name_groups = "";
-    for (let i = 0; i < data.length; i++){
-        name_classes = data[i].applicationClasses.toString();
-        name_groups = data[i].applicationGroups.toString();
-        application.push([i, data[i].name, name_classes, name_groups])
+    for (let i = 0; i < data[0].length; i++){
+        name_classes = data[0][i].applicationClasses.toString();
+        name_groups = data[0][i].applicationGroups.toString();
+        application.push([i, data[0][i].name, name_classes, name_groups])
     }
 
     var tablecontents = "";
@@ -95,13 +93,61 @@ function make_table(data) {
         }
         tablecontents += "</tr>";
     }
-    document.getElementById("my_tbody").innerHTML = tablecontents;
+    document.getElementById("my_tbody_app").innerHTML = tablecontents;
+
+    var publication = new Array();
+    for (let i = 0; i < data[1].length; i++){
+        name_title = data[1][i].title.toString();
+        name_type = data[1][i].type.toString();
+        name_typeName = data[1][i].typeName.toString();
+        name_vipAuthor = data[1][i].vipAuthor.toString();
+        name_date = data[1][i].date.toString();
+        name_vipApplication = data[1][i].vipApplication.toString();
+        publication.push([i, data[1][i].name, name_title, name_type, name_typeName, name_vipAuthor, name_date, name_vipApplication])
+    }
+
+    var tablecontents = "";
+    for (var i = 0; i < publication.length; i++) {
+        tablecontents += "<tr>";
+        for (var j = 0; j < publication[i].length; j++) {
+            tablecontents += "<td>" + publication[i][j] + "</td>";
+        }
+        tablecontents += "</tr>";
+    }
+    document.getElementById("my_tbody_publi").innerHTML = tablecontents;
 }};
 
-function createGridapp(){
-    fetch('http://localhost:8080/rest/pipelines?public')
-    .then((response) => response.json())
-    .then((data) => make_table(data));
+function make_table_publi(data) {
+    window.onload = function() {
+    var publication = new Array();
+    for (let i = 0; i < data.length; i++){
+        name_title = data[i].title.toString();
+        name_type = data[i].type.toString();
+        name_typeName = data[i].typeName.toString();
+        name_vipAuthor = data[i].vipAuthor.toString();
+        name_date = data[i].date.toString();
+        name_vipApplication = data[i].vipApplication.toString();
+        publication.push([i, data[i].name, name_title, name_type, name_typeName, name_vipAuthor, name_date, name_vipApplication])
+    }
+
+    var tablecontents = "";
+    for (var i = 0; i < publication.length; i++) {
+        tablecontents += "<tr>";
+        for (var j = 0; j < publication[i].length; j++) {
+            tablecontents += "<td>" + publication[i][j] + "</td>";
+        }
+        tablecontents += "</tr>";
+    }
+    document.getElementById("my_tbody_publi").innerHTML = tablecontents;
+}};
+
+async function createGrid(){
+    Promise.all([
+        await fetch('http://localhost:8080/rest/pipelines?public')
+        .then((response_app) => response_app.json()),
+        await fetch('http://localhost:8080/rest/publication')
+        .then((response_publi) => response_publi.json())
+      ]).then((data) => make_table(data));
 }
 
 
@@ -113,4 +159,4 @@ function clickinner(){
 };
 
 checkIfCookieExist();
-createGridapp();
+createGrid();
