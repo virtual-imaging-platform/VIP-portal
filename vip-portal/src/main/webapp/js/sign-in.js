@@ -103,7 +103,7 @@ function make_table(data) {
         name_vipAuthor = data[1][i].vipAuthor.toString();
         name_date = data[1][i].date.toString();
         name_vipApplication = data[1][i].vipApplication.toString();
-        publication.push([i, data[1][i].name, name_title, name_type, name_typeName, name_vipAuthor, name_date, name_vipApplication])
+        publication.push([i, name_title, name_type, name_typeName, name_vipAuthor, name_date, name_vipApplication])
     }
 
     var tablecontents = "";
@@ -115,6 +115,10 @@ function make_table(data) {
         tablecontents += "</tr>";
     }
     document.getElementById("my_tbody_publi").innerHTML = tablecontents;
+
+    $(document).ready(function () {
+        $('#id_table_Publication').DataTable();
+    });
 }};
 
 function make_table_publi(data) {
@@ -139,6 +143,7 @@ function make_table_publi(data) {
         tablecontents += "</tr>";
     }
     document.getElementById("my_tbody_publi").innerHTML = tablecontents;
+
 }};
 
 async function createGrid(){
