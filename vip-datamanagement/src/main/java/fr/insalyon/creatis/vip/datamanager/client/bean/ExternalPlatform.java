@@ -39,13 +39,17 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 public class ExternalPlatform {
 
     public enum Type {
-        GIRDER
+        GIRDER,
+        SHANOIR
     }
 
     private String identifier;
     private Type type;
     private String description;
     private String url;
+    private String uploadUrl;
+    private String keycloakClientId;
+    private String refreshTokenUrl;
 
     public String getIdentifier() {
         return identifier;
@@ -78,5 +82,29 @@ public class ExternalPlatform {
 
     public void setUrl(String url) {
         this.url = url;
+    }
+
+    public String getUploadUrl() {
+        return uploadUrl;
+    }
+
+    public void setUploadUrl(String uploadUrl) {
+        this.uploadUrl = uploadUrl;
+    }
+
+    public String getKeycloakClientId() {
+        return keycloakClientId;
+    }
+
+    public void setKeycloakClientId(String keycloakClientId) {
+        this.keycloakClientId = keycloakClientId;
+    }
+
+    public String getRefreshTokenUrl() {
+        return refreshTokenUrl;
+    }
+
+    public void setRefreshTokenUrl(String refreshTokenUrl) {
+        this.refreshTokenUrl = refreshTokenUrl;
     }
 }

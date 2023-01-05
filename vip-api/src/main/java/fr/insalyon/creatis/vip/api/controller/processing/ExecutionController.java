@@ -116,6 +116,14 @@ public class ExecutionController extends ApiController {
 
         return executionBusiness.getExecution(executionId, false);
     }
+    
+    @RequestMapping("/{executionId}/summary")
+    public Execution getExecutionSummary(@PathVariable String executionId)
+            throws ApiException {
+        logMethodInvocation(logger, "getExecutionSummary", executionId);
+        return executionBusiness.getExecution(executionId, true);
+    }
+    
 
     @RequestMapping(value = "/{executionId}", method = RequestMethod.PUT)
     public Execution updateExecution(
