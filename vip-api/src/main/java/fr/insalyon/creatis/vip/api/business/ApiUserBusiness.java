@@ -28,13 +28,12 @@ public class ApiUserBusiness {
      *
      * @param user
      * @param comments
-     * @param accountTypes
      * @throws ApiException
      */
-    public void signup(User user, String comments, String[] accountTypes) throws ApiException {
+    public void signup(User user, String comments) throws ApiException {
         try {
             configurationBusiness
-                    .signup(user, comments, true, true, accountTypes);
+                    .signup(user, comments, true, true, null);
             logger.info("Signing up with the " + user.getEmail());
         } catch (BusinessException e) {
             throw new ApiException("Signing up Error", e);
