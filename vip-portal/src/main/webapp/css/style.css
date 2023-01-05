@@ -43,6 +43,11 @@ span{
   font-size: large;
 }
 
+.nav-link{
+  color: white;
+}
+
+
 .navbar-nav > li{
   margin-left:20px;
   margin-right:20px;
