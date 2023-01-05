@@ -49,6 +49,7 @@ public class RegisterUserController extends ApiController {
                 signUpUser.getLastName(),
                 signUpUser.getEmail(),
                 signUpUser.getInstitution(),
+                signUpUser.getPassword(),
                 signUpUser.getLevel(),
                 signUpUser.getCountryCode()
                 );

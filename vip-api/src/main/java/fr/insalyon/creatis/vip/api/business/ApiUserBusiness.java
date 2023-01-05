@@ -4,6 +4,7 @@ import fr.insalyon.creatis.vip.api.exception.ApiException;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
+import fr.insalyon.creatis.vip.core.server.rpc.ConfigurationServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.env.Environment;
@@ -33,7 +34,7 @@ public class ApiUserBusiness {
     public void signup(User user, String comments) throws ApiException {
         try {
             configurationBusiness
-                    .signup(user, comments, true, true, null);
+                    .signup(user, comments, false, true, null);
             logger.info("Signing up with the " + user.getEmail());
         } catch (BusinessException e) {
             throw new ApiException("Signing up Error", e);

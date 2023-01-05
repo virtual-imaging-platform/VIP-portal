@@ -1,11 +1,11 @@
-async function get_fetch(firstName, lastName, email, institution, country, accountType){
+async function get_fetch(firstName, lastName, email, institution, country){
     const data = await fetch('http://localhost:8080/rest/register', {
         method: 'POST',
         headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ "firstName": firstName, "lastName": lastName, "email": email, "institution": institution, "countryCode": country, "accountTypes": accountType})
+        body: JSON.stringify({ "firstName": firstName, "lastName": lastName, "email": email, "institution": institution, "countryCode": country})
         })
 
         window.location.href="activation.html";
@@ -35,7 +35,6 @@ function createUser(){
     new_country = document.getElementById("country").value;
     new_password = document.getElementById("password").value;
     new_rePassword = document.getElementById("rePassword").value;
-    new_accountType = document.getElementById("accountType").value;
 
     new_country = new_country.toLowerCase();
     console.log(new_country);
@@ -43,7 +42,7 @@ function createUser(){
     if (validateEmail(new_email)) {
         if (new_email == new_reEmail && new_password == new_rePassword){
             if (document.getElementById("termsOfUse").checked){
-                get_fetch(new_firstName, new_lastName, new_email, new_institution, new_country, new_accountType);
+                get_fetch(new_firstName, new_lastName, new_email, new_institution, new_country);
             } else {
                 document.getElementById('termsOfUse-failed').style.display = 'block';
                 setTimeout(function(){document.getElementById('termsOfUse-failed').style.display = 'none'}, 30000);

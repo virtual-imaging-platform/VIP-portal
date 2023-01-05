@@ -238,12 +238,12 @@ public class ConfigurationBusiness {
                                    new String[]{user.getEmail()}, true, user.getEmail());
 
                 StringBuilder accounts = new StringBuilder();
-                for (String account : accountType) {
+                /*for (String account : accountType) {
                     if (accounts.length() > 0) {
                         accounts.append(", ");
                     }
                     accounts.append(account);
-                }
+                }*/
 
                 String adminsEmailContents = "<html>"
                                              + "<head></head>"
@@ -255,7 +255,7 @@ public class ConfigurationBusiness {
                                              + "<p><b>Email:</b> " + user.getEmail() + "</p>"
                                              + "<p><b>Institution:</b> " + user.getInstitution() + "</p>"
                                              + "<p><b>Country:</b> " + user.getCountryCode().getCountryName() + "</p>"
-                                             + "<p><b>Accounts:</b> " + accounts.toString() + "</p>"
+                                             //+ "<p><b>Accounts:</b> " + accounts.toString() + "</p>"
                                              + "<p><b>Comments:</b><br />" + comments + "</p>"
                                              + "<p>&nbsp;</p>"
                                              + "<p>Best Regards,</p>"
