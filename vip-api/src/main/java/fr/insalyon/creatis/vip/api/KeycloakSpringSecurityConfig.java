@@ -122,10 +122,8 @@ public class KeycloakSpringSecurityConfig extends KeycloakWebSecurityConfigurerA
             .authorizeRequests()
                 .antMatchers("/rest/platform").permitAll()
                 .antMatchers("/rest/authenticate").permitAll()
-                .antMatchers("/rest/executions/{executionId}/summary")
-                .access(String.format("hasIpAddress('%s')", env.getProperty(ShanoirProperties.SHANOIR_HOST_IP)))
-                .antMatchers("/rest/register")
-                .access(String.format("isAuthenticated() and hasIpAddress('%s')", env.getProperty(ShanoirProperties.SHANOIR_HOST_IP))) //signup a user to VIP
+                .antMatchers("/rest/executions/{executionId}/summary").hasAnyRole("SERVICE")
+                .antMatchers("/rest/register").hasAnyRole("SERVICE")
                 .antMatchers("/rest/simulate-refresh").authenticated()
                 .antMatchers("/rest/statistics/**").hasAnyRole("ADVANCED", "ADMINISTRATOR")
                 .antMatchers("/rest/**").authenticated()
