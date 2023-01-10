@@ -40,4 +40,22 @@ public class ApiUserBusiness {
             throw new ApiException("Signing up Error", e);
         }
     }
+
+    public void resetCode(String email) throws ApiException {
+        try {
+            configurationBusiness.sendResetCode(email);
+            logger.info("Resetting password for user with email: " + email);
+        } catch (BusinessException e) {
+            throw new ApiException("Error resetting password", e);
+        }
+    }
+
+    public void resetPassword(String email, String code, String password) throws ApiException {
+        try {
+            configurationBusiness.resetPassword(email, code, password);
+            logger.info("Resetting password for user with email: " + email);
+        } catch (BusinessException e) {
+            throw new ApiException("Error resetting password", e);
+        }
+    }
 }

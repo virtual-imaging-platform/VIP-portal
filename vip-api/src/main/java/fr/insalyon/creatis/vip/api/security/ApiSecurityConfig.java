@@ -154,6 +154,8 @@ public class ApiSecurityConfig extends KeycloakWebSecurityConfigurerAdapter {
                 .antMatchers("/rest/authenticate").permitAll()
                 .regexMatchers("/rest/pipelines\\?public").permitAll()
                 .regexMatchers("/rest/publication").permitAll()
+                .antMatchers("/rest/reset-code").permitAll()
+                .antMatchers("/rest/reset-password").permitAll()
                 .antMatchers("/rest/register")
                 .permitAll()
                 //.access(String.format("isAuthenticated() and hasIpAddress('%s')", env.getProperty(CarminProperties.SHANOIR_HOST_IP))) //signup a user to VIP
