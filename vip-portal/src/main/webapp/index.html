@@ -23,6 +23,9 @@
           window.isc_useSimpleNames = false;
         </script>
 
+    <!-- Font Awesome-->
+    <script src="https://kit.fontawesome.com/945d9bd0aa.js" crossorigin="anonymous"></script>
+
     <meta name='gwt:module' content='fr.insalyon.creatis.vip.portal.Main=fr.insalyon.creatis.vip.portal.Main'>
     <script language="javascript" src="fr.insalyon.creatis.vip.portal.Main/jquery-1.7.2.min.js"></script>
     <!--script language="javascript" src="fr.insalyon.creatis.vip.portal.Main/fr.insalyon.creatis.vip.portal.Main.nocache.js"></script-->
@@ -47,10 +50,11 @@
 </head>
 
 <body style="font-family: 'Montserrat', sans-serif;">
+
 <section id="navbar">
     <div class="container-fluid p-0">
         <!-- Navigation bar -->
-        <nav class="navbar navbar-expand-lg" style="background-color: #0095d6;">
+        <nav class="navbar navbar-expand-lg fixed-top" style="background-color: #0095d6;">
             <a class="navbar-brand" style="color: white;" href="#">
                 <img src="images/core/vip-logo-without-text.png" alt="" width="50" height="50" class="d-inline-block">
                 VIP
@@ -66,13 +70,13 @@
                     <a class="nav-link" href="https://vip.creatis.insa-lyon.fr/documentation/privacypolicy.html">Privacy Policy</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="">Applications</a>
+                    <a class="nav-link" href="#tableApp">Applications</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="">Publications</a>
+                    <a class="nav-link" href="#tablePublication">Publications</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="">Teams</a>
+                    <a class="nav-link" href="#team">Teams</a>
                 </li>
             </ul>
         </nav>
@@ -83,19 +87,11 @@
         <div class="row gx-5">
             <div class="col" id="welcome_col">
                 <h1 id="main_title">Welcome on the <br> <span>V</span>irtual <span>I</span>maging <span>P</span>latform</h1>
-                <p>VIP is a web portal for medical imaging applications. It allows you to access scientific applications
-                    as a service (directly through your web browser with no installation required), as well as distributed
-                    computing resources in a transparent manner. It exploits the resources available in the biomed virtual
-                    organization of the EGI e-infrastructure to offer an open service to researchers worldwide.
-                    <br>
-                    <br>
-                    This portal is exclusively dedicated to non-commercial academic use, as indicated in the <a href="https://vip.creatis.insa-lyon.fr/documentation/terms.html">terms of use</a>. For commercial use, Please
-                    contact us at <strong>vip-support@creatis.insa-lyon.fr</strong>.
-                </p>
+                <p>Medical simulation and image data analysis as a service</p>
+                <p>Contact us: <strong>vip-support@creatis.insa-lyon.fr</strong>.</p>
             </div>
             <div class="col" id="welcome_signin">
                 <form class="text-center">
-                    <img class="mb-4" src="images/core/vip-logo.png" alt="" width="220" height="150">
                     <h2 class="mb-3 fw-normal">Please sign in</h2>
                     <!-- THIS IS BOOTSTRAP ALERT -->
                     <div class='alert alert-danger' style='display:none' id='login-failed'>
@@ -138,7 +134,7 @@
                         <!-- EGI check-in button -->
                         <a class="button-blue-border" href="/oauth2/authorize-client/egi"
                            role="button">
-                            <i class="fab fa-facebook-f me-2"></i>Login with EGI Check-in
+                            Login with EGI Check-in
                         </a>
 
                 </form>
@@ -146,6 +142,38 @@
         </div>
     </div>
 </section>
+<section id="presentation">
+    <img class="mb-4" src="images/core/vip-logo.png" alt="" width="220" height="150">
+    <p class="text-center">VIP is a web portal for medical imaging applications. It allows you to access scientific applications
+        as a service (directly through your web browser with no installation required), as well as distributed
+        computing resources in a transparent manner. It exploits the resources available in the biomed virtual
+        organization of the EGI e-infrastructure to offer an open service to researchers worldwide. <br>
+        This portal is exclusively dedicated to non-commercial academic use, as indicated in the <a href="https://vip.creatis.insa-lyon.fr/documentation/terms.html">terms of use</a>. For commercial use, Please
+        contact us at <strong>vip-support@creatis.insa-lyon.fr</strong>.
+    </p>
+
+</section>
+<section id="features">
+    <div class="row">
+        <div class="feature-box col-lg-4">
+            <i class="icon fa-solid fa-atom fa-5x"></i>
+            <h3 class="fw-bold">Scientific applications as a Service</h3>
+            <p style="font-size: medium; color: #8f8f8f;">Use existing applications on VIP & Import your own application and make it available to the community</p>
+        </div>
+        <div class="feature-box col-lg-4">
+            <i class="icon fa-regular fa-eye fa-5x"></i>
+            <h3 class="fw-bold">Transparent access to computing resources</h3>
+            <p style="font-size: medium; color: #8f8f8f;">VIP uses EGI biomed resources in a transparent way</p>
+        </div>
+        <div class="feature-box col-lg-4">
+            <i class="icon fa-solid fa-book-open-reader fa-5x"></i>
+            <h3 class="fw-bold">Various use-cases</h3>
+            <p style="font-size: medium; color: #8f8f8f;">Scientific challenges & Web portal and API </p>
+        </div>
+    </div>
+
+</section>
+<hr class="style_hr">
 <section id="tableApp">
     <h2>List of Applications</h2>
     <p class="text-center">This is a table containing all the applications that are publicly available on VIP. You can see in the last

@@ -26,13 +26,12 @@
 }
 
 h2{
-  font-size: 2.5em;
+  font-size: 2em;
   padding-bottom: 1%;
 }
 
 p{
   font-size: 1.25em;
-  text-align: justify;
 }
 
 span{
@@ -101,7 +100,7 @@ span{
 }
 
 #welcome {
-  padding-top: 2%;
+  padding-top: 5%;
   padding-left: 10%;
   padding-right: 10%;
   padding-bottom: 2%;
@@ -109,14 +108,15 @@ span{
 }
 
 #main_title {
-  font-size: 3.5em;
+  font-size: 3em;
+  padding-top: 5%;
   margin-bottom: 6%;
-  padding-bottom: 5%;
+  padding-bottom: 1%;
   color: #0095d6;
 }
 
 #welcome_paragraphe {
-  padding-right: 15%;
+  padding-right: 10%;
 }
 
 #welcome_signin {
@@ -130,6 +130,30 @@ span{
   background-image: -moz-linear-gradient(left, #f0f2f5, #0095d6, #f0f2f5);
   background-image: -ms-linear-gradient(left, #f0f2f5, #0095d6, #f0f2f5);
   background-image: -o-linear-gradient(left, #f0f2f5, #0095d6, #f0f2f5);
+}
+
+#presentation {
+  text-align: center;
+  padding-top: 2%;
+  padding-left: 10%;
+  padding-right: 10%;
+  padding-bottom: 2%;
+}
+
+#features {
+  text-align: center;
+  padding-top: 0.5% ;
+  padding-left: 10%;
+  padding-right: 10%;
+}
+
+.icon {
+  color: #0095d6;
+  margin-bottom: 1rem;
+}
+
+.feature-box {
+  text-align: center;
 }
 
 
