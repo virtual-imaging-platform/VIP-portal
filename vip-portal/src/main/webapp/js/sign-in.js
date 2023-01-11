@@ -195,6 +195,10 @@ function make_table(data) {
     document.getElementById("my_tbody_publi").innerHTML = tablecontents;
 
     $(document).ready(function () {
+        $('#appTable').DataTable();
+    });
+
+    $(document).ready(function () {
         $('#id_table_Publication').DataTable();
     });
 }};
