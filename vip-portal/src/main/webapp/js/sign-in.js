@@ -1,5 +1,3 @@
-
-
 function validateEmail(emailField){
     var reg = /^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/;
 
@@ -155,78 +153,47 @@ async function get_fetch(form_email, form_password){
 }
 
 function make_table(data) {
-    window.onload = function() {
     var application = new Array();
-    for (let i = 0; i < data[0].length; i++){
-        name_classes = data[0][i].applicationClasses.toString();
-        name_groups = data[0][i].applicationGroups.toString();
-        application.push([i, data[0][i].name, name_classes, name_groups])
-    }
+    data[0].forEach((item, index) => {
+        let name_classes = item.applicationClasses.toString();
+        let name_groups = item.applicationGroups.toString();
+        application.push([index, item.name, name_classes, name_groups])
+    });
 
-    var tablecontents = "";
-    for (var i = 0; i < application.length; i++) {
-        tablecontents += "<tr>";
-        for (var j = 0; j < application[i].length; j++) {
-            tablecontents += "<td>" + application[i][j] + "</td>";
-        }
-        tablecontents += "</tr>";
-    }
+    let tablecontents = createTableHTMLString(application);
     document.getElementById("my_tbody_app").innerHTML = tablecontents;
 
     var publication = new Array();
-    for (let i = 0; i < data[1].length; i++){
-        name_title = data[1][i].title.toString();
-        name_type = data[1][i].type.toString();
-        name_typeName = data[1][i].typeName.toString();
-        name_vipAuthor = data[1][i].vipAuthor.toString();
-        name_date = data[1][i].date.toString();
-        name_vipApplication = data[1][i].vipApplication.toString();
-        publication.push([i, name_title, name_type, name_typeName, name_vipAuthor, name_date, name_vipApplication])
-    }
+    data[1].forEach((item, index) => {
+        let name_title = item.title.toString();
+        let name_type = item.type.toString();
+        let name_typeName = item.typeName.toString();
+        let name_vipAuthor = item.vipAuthor.toString();
+        let name_date = item.date.toString();
+        let name_vipApplication = item.vipApplication.toString();
+        publication.push([index, name_title, name_type, name_typeName, name_vipAuthor, name_date, name_vipApplication])
+    });
 
-    var tablecontents = "";
-    for (var i = 0; i < publication.length; i++) {
-        tablecontents += "<tr>";
-        for (var j = 0; j < publication[i].length; j++) {
-            tablecontents += "<td>" + publication[i][j] + "</td>";
-        }
-        tablecontents += "</tr>";
-    }
+    tablecontents = createTableHTMLString(publication);
     document.getElementById("my_tbody_publi").innerHTML = tablecontents;
 
     $(document).ready(function () {
         $('#appTable').DataTable();
-    });
-
-    $(document).ready(function () {
         $('#id_table_Publication').DataTable();
     });
-}};
+}
 
-function make_table_publi(data) {
-    window.onload = function() {
-    var publication = new Array();
-    for (let i = 0; i < data.length; i++){
-        name_title = data[i].title.toString();
-        name_type = data[i].type.toString();
-        name_typeName = data[i].typeName.toString();
-        name_vipAuthor = data[i].vipAuthor.toString();
-        name_date = data[i].date.toString();
-        name_vipApplication = data[i].vipApplication.toString();
-        publication.push([i, data[i].name, name_title, name_type, name_typeName, name_vipAuthor, name_date, name_vipApplication])
-    }
-
-    var tablecontents = "";
-    for (var i = 0; i < publication.length; i++) {
+function createTableHTMLString(data) {
+    let tablecontents = "";
+    data.forEach((item) => {
         tablecontents += "<tr>";
-        for (var j = 0; j < publication[i].length; j++) {
-            tablecontents += "<td>" + publication[i][j] + "</td>";
-        }
+        item.forEach((cell) => {
+            tablecontents += "<td>" + cell + "</td>";
+        });
         tablecontents += "</tr>";
-    }
-    document.getElementById("my_tbody_publi").innerHTML = tablecontents;
-
-}};
+    });
+    return tablecontents;
+}
 
 async function createGrid(){
     Promise.all([
