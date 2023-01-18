@@ -31,6 +31,16 @@
                 <div class="card shadow-2-strong card-registration" style="border-radius: 15px;">
                     <div class="card-body p-4 p-md-5">
                         <h3 class="mb-4 pb-2 pb-md-0 mb-md-5">Registration Form</h3>
+                        <div class='alert alert-danger' style='display:none' id='emptyFields-failed'>
+                            Please fill in the fields: First Name, Last Name, Email, Re-enter email, Select an application,
+                            Select your country, Institution, Password and Re-enter password.
+                        </div>
+                        <div class='alert alert-danger' style='display:none' id='emailMatch-failed'>
+                            Email and Re-enter email isn't matching.
+                        </div>
+                        <div class='alert alert-danger' style='display:none' id='passwordMatch-failed'>
+                            Password and Re-enter password isn't matching.
+                        </div>
                         <div class='alert alert-danger' style='display:none' id='termsOfUse-failed'>
                             Please read the terms of Use and checked it.
                         </div>
@@ -39,6 +49,9 @@
                         </div>
                         <div class='alert alert-danger' style='display:none' id='signUp-failed'>
                             Email or Password aren't the same.
+                        </div>
+                        <div class='alert alert-danger' style='display:none' id='fetch-failed'>
+                            There seems to be a problem to create an account now.
                         </div>
                         <form>
 
@@ -82,11 +95,12 @@
 
                             <div class="row">
                                 <div class="col-md-6 mb-4">
-
-                                    <div class="form-floating">
-                                        <input type="text" id="institution" class="form-control form-control-lg" />
-                                        <label class="form-label" for="institution">Institution</label>
-                                    </div>
+                                    <select class="form-select" aria-label="Default select example">
+                                        <option selected>Open this select menu</option>
+                                        <option value="1">One</option>
+                                        <option value="2">Two</option>
+                                        <option value="3">Three</option>
+                                    </select>
 
                                 </div>
                                 <div class="col-md-6 mb-4">
@@ -344,6 +358,12 @@
 
                                 </div>
                             </div>
+
+                            <div class="form-floating">
+                                <input type="text" id="institution" class="form-control form-control-lg" />
+                                <label class="form-label" for="institution">Institution</label>
+                            </div>
+                            <br>
 
                             <div class="row">
                                 <div class="col-md-6 mb-4">

@@ -10,19 +10,6 @@ async function get_fetch(firstName, lastName, email, institution, password, coun
 
 }
 
-function validateEmail(emailField){
-    var reg = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
-
-    if (reg.test(emailField) == false)
-    {
-        document.getElementById('email-failed').style.display = 'block';
-        setTimeout(function(){document.getElementById('email-failed').style.display = 'none'}, 3000);
-        return false;
-    } else{
-        return true;
-    }
-}
-
 async function get_fetch_authenticate(form_email, form_password){
     const data = await fetch('http://localhost:8080/rest/authenticate', {
         method: 'POST',
@@ -50,32 +37,54 @@ function setCookie(value_user, value_session, exdays) {
     window.location.href="home.html";
 }
 
-function createUser(){
-    new_firstName = document.getElementById("firstName").value;
-    new_lastName = document.getElementById("lastName").value;
-    new_email = document.getElementById("email").value;
-    new_reEmail = document.getElementById("reEmail").value;
-    new_institution = document.getElementById("institution").value;
-    new_country = document.getElementById("country").value;
-    new_password = document.getElementById("password").value;
-    new_rePassword = document.getElementById("rePassword").value;
+async function createUser(){
+    let isValid = true;
 
-    new_country = new_country.toLowerCase();
-    console.log(new_country);
+    const new_firstName = document.getElementById("firstName").value;
+    const new_lastName = document.getElementById("lastName").value;
+    const new_email = document.getElementById("email").value;
+    const new_reEmail = document.getElementById("reEmail").value;
+    const new_institution = document.getElementById("institution").value;
+    const new_country = document.getElementById("country").value.toLowerCase();
+    const new_password = document.getElementById("password").value;
+    const new_rePassword = document.getElementById("rePassword").value;
+    const emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
 
-    if (validateEmail(new_email)) {
-        if (new_email == new_reEmail && new_password == new_rePassword){
-            if (document.getElementById("termsOfUse").checked){
-                get_fetch(new_firstName, new_lastName, new_email, new_institution, new_password, new_country)
-                .then(get_fetch_authenticate(new_email, new_password)
-                .then(data => setCookie(new_email, data.httpHeaderValue, 7)));
-            } else {
-                document.getElementById('termsOfUse-failed').style.display = 'block';
-                setTimeout(function(){document.getElementById('termsOfUse-failed').style.display = 'none'}, 30000);
-            }
-        } else {
-            document.getElementById('signUp-failed').style.display = 'block';
-            setTimeout(function(){document.getElementById('signUp-failed').style.display = 'none'}, 30000);
-        }
+    if (!new_firstName || !new_lastName || !new_email || !new_reEmail || !new_institution || !new_country || !new_password || !new_rePassword) {
+        isValid = false;
+        document.getElementById('emptyFields-failed').style.display = 'block';
+        setTimeout(function(){document.getElementById('emptyFields-failed').style.display = 'none'}, 30000);
     }
-};
+    if (!emailRegex.test(new_email)) {
+        isValid = false;
+        document.getElementById('email-failed').style.display = 'block';
+        setTimeout(function(){document.getElementById('email-failed').style.display = 'none'}, 30000);
+    }
+    if (new_email !== new_reEmail) {
+        isValid = false;
+        document.getElementById('emailMatch-failed').style.display = 'block';
+        setTimeout(function(){document.getElementById('emailMatch-failed').style.display = 'none'}, 30000);
+    }
+    if (new_password !== new_rePassword) {
+        isValid = false;
+        document.getElementById('passwordMatch-failed').style.display = 'block';
+        setTimeout(function(){document.getElementById('passwordMatch-failed').style.display = 'none'}, 30000);
+    }
+    if (!document.getElementById("termsOfUse").checked) {
+        isValid = false;
+        document.getElementById('termsOfUse-failed').style.display = 'block';
+        setTimeout(function(){document.getElementById('termsOfUse-failed').style.display = 'none'}, 30000);
+    }
+    if (isValid) {
+        try {
+                await get_fetch(new_firstName, new_lastName, new_email, new_institution, new_password, new_country);
+                const data = await get_fetch_authenticate(new_email, new_password);
+                setCookie(new_email, data.httpHeaderValue, 7);
+            } catch (error) {
+                console.log(error);
+                document.getElementById('fetch-failed').style.display = 'block';
+                setTimeout(function(){document.getElementById('fetch-failed').style.display = 'none'}, 30000);
+            }
+        }
+}
+
