@@ -1,26 +1,247 @@
-html, body{
-  height: 100%;
+/*
+    Document   : style
+    Created on : Feb 14, 2011, 9:59:04 AM
+    Author     : Rafael Silva
+    Description:
+        VIP style sheet.
+*/
+
+.ami-container {
+    background-color: #000;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
 }
 
-body{
-  text-align: center;
-  align-items: center;
-  justify-content: center;
-  padding-top: 40px;
-  padding-bottom: 40px;
-  height: 100%;
+.ami-gui-container {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 1;
 }
 
-.card-registration .select-input.form-control[readonly]:not([disabled]) {
-  font-size: 1rem;
-  line-height: 2.15;
-  padding-left: .75em;
-  padding-right: .75em;
-  }
-  .card-registration .select-arrow {
-  top: 13px;
+h2{
+  font-size: 2em;
+  padding-bottom: 1%;
+}
+
+p{
+  font-size: 1.25em;
+}
+
+span{
+  color: orange;
+}
+
+.nav-item{
+  font-size: large;
+}
+
+.nav-link{
+  color: white;
+}
+
+
+.navbar-nav > li{
+  margin-left:20px;
+  margin-right:20px;
+}
+
+
+.divider:after, .divider:before {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: #eee;
   }
 
-#activationDiv {
+.button-blue-border {
+  margin: 50px 20px 0px 0px;
+  padding: 15px 10px 15px 80px;
+  border-style: solid;
+  border-width: 2px;
+  border-color: #005faa;
+  border-radius: 100vw;
+  background-color: #fff;
+  background-image: url(https://assets.website-files.com/62e3a5ba3da3705b0a510a42/62e3a82d4c15a67d55b187c6_egi-logo-color.svg);
+  background-position: 30px 43%;
+  background-size: 36px;
+  background-repeat: no-repeat;
+  -webkit-transition: all 200ms ease-in-out;
+  transition: all 200ms ease-in-out;
+  font-family: 'DM Sans', sans-serif;
+  color: #005faa;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.button-blue-border:hover {
+  background-color: #005faa;
+  background-image: url(https://assets.website-files.com/62e3a5ba3da3705b0a510a42/62e3a82d3ed11b0ea947266c_egi-logo-white.svg);
+  color: #fff;
+}
+
+.table-striped > tbody > tr:nth-child(2n+1) > td, .table-striped > tbody > tr:nth-child(2n+1) > th {
+  background-color: #0095d6;
+  color: white;
+}
+.style_hr{
+  border: 0;
+  height: 2px;
+  background-image: -webkit-linear-gradient(left, #f0f0f0, #8c8b8b, #f0f0f0);
+  background-image: -moz-linear-gradient(left, #f0f0f0, #8c8b8b, #f0f0f0);
+  background-image: -ms-linear-gradient(left, #f0f0f0, #8c8b8b, #f0f0f0);
+  background-image: -o-linear-gradient(left, #f0f0f0, #8c8b8b, #f0f0f0);
+}
+
+#welcome {
   padding-top: 5%;
+  padding-left: 10%;
+  padding-right: 10%;
+  padding-bottom: 2%;
+  background-color: #f0f2f5;
+}
+
+#main_title {
+  font-size: 3em;
+  padding-top: 5%;
+  margin-bottom: 6%;
+  padding-bottom: 1%;
+  color: #0095d6;
+}
+
+#welcome_paragraphe {
+  padding-right: 10%;
+}
+
+#welcome_signin {
+  padding-left: 15%;
+}
+
+#signin_hr {
+  border: 0;
+  height: 2px;
+  background-image: -webkit-linear-gradient(left, #f0f2f5, #0095d6, #f0f2f5);
+  background-image: -moz-linear-gradient(left, #f0f2f5, #0095d6, #f0f2f5);
+  background-image: -ms-linear-gradient(left, #f0f2f5, #0095d6, #f0f2f5);
+  background-image: -o-linear-gradient(left, #f0f2f5, #0095d6, #f0f2f5);
+}
+
+#presentation {
+  text-align: center;
+  padding-top: 4%;
+  padding-left: 10%;
+  padding-right: 10%;
+  padding-bottom: 2%;
+}
+
+#features {
+  text-align: center;
+  padding-top: 1% ;
+  padding-left: 10%;
+  padding-right: 10%;
+  padding-bottom: 4%;
+}
+
+.icon {
+  color: #0095d6;
+  margin-bottom: 1rem;
+}
+
+.feature-box {
+  text-align: center;
+}
+
+
+#tableApp {
+  text-align: center;
+  padding-top: 4%;
+  padding-left: 10%;
+  padding-right: 10%;
+  padding-bottom: 4%;
+}
+
+#tablePublication {
+  text-align: center;
+  padding-top: 4%;
+  padding-left: 10%;
+  padding-right: 10%;
+  padding-bottom: 4%;
+}
+
+
+#team {
+  padding-top: 4%;
+  text-align: center;
+}
+.py-5 {
+  padding-top: 3rem !important;
+  padding-bottom: 3rem !important;
+}
+.pt-5 {
+  padding-top: 3rem !important;
+}
+.my-5 {
+  margin-top: 3rem !important;
+  margin-bottom: 3rem !important;
+}
+.border-0 {
+  border: 0 !important;
+}
+.position-relative {
+  position: relative !important;
+}
+.shadow-lg {
+  box-shadow: 0 1rem 3rem rgb(0 0 0 / 18%) !important;
+}
+.card {
+  position: relative;
+  display: -webkit-flex;
+  display: flex;
+  -webkit-flex-direction: column;
+  flex-direction: column;
+  min-width: 0;
+  word-wrap: break-word;
+  background-color: #fff;
+  background-clip: border-box;
+  border: 1px solid rgba(0,0,0,0.125);
+  border-radius: .25rem;
+}
+
+.member-profile {
+  top: -50px;
+  left: 0;
+}
+.text-center {
+  text-align: center !important;
+}
+.w-100 {
+  width: 100% !important;
+}
+.position-absolute {
+  position: absolute !important;
+}
+
+.member-profile img {
+  width: 100px;
+  height: 100px;
+}
+.rounded-circle {
+  border-radius: 50% !important;
+}
+.mx-auto {
+  margin-right: auto !important;
+  margin-left: auto !important;
+}
+.shadow-sm {
+  box-shadow: 0 0.125rem 0.25rem rgb(0 0 0 / 8%) !important;
+}
+
+.infoProject {
+  font-size: small;
 }
