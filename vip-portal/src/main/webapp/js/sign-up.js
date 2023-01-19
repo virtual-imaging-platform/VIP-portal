@@ -45,12 +45,16 @@ async function createUser(){
     const new_email = document.getElementById("email").value;
     const new_reEmail = document.getElementById("reEmail").value;
     const new_institution = document.getElementById("institution").value;
+    const new_application = document.getElementById("application").value;
     const new_country = document.getElementById("country").value.toLowerCase();
     const new_password = document.getElementById("password").value;
     const new_rePassword = document.getElementById("rePassword").value;
     const emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
 
-    if (!new_firstName || !new_lastName || !new_email || !new_reEmail || !new_institution || !new_country || !new_password || !new_rePassword) {
+    console.log(new_application);
+    console.log(new_country);
+
+    if (!new_firstName || !new_lastName || !new_email || !new_reEmail || !new_institution || new_application === "Choose your Application" || new_country === "select your country" || !new_password || !new_rePassword) {
         isValid = false;
         document.getElementById('emptyFields-failed').style.display = 'block';
         setTimeout(function(){document.getElementById('emptyFields-failed').style.display = 'none'}, 30000);
@@ -87,4 +91,46 @@ async function createUser(){
             }
         }
 }
+
+function createSelectApp(applications) {
+    // Créer l'élément de sélection
+    const select = document.createElement("select");
+    select.setAttribute("id", "application");
+    select.classList.add("form-select");
+    select.setAttribute("aria-label", "Default select example");
+
+    // Ajouter une option par défaut
+    const defaultOption = document.createElement("option");
+    defaultOption.textContent = "Choose your Application";
+    select.appendChild(defaultOption);
+
+    // Ajouter les options correspondant aux applications
+    applications.forEach((application) => {
+      const option = document.createElement("option");
+      option.value = application.name;
+      option.textContent = application.name;
+      select.appendChild(option);
+    });
+
+    return select;
+  }
+
+  fetch('http://localhost:8080/rest/pipelines?public')
+    .then((response_app) => response_app.json())
+    .then((data) => {
+      var application = new Array();
+      data.forEach((item, index) => {
+          let name_classes = item.applicationClasses.toString();
+          let name_groups = item.applicationGroups.toString();
+          application.push({name:item.name,name_classes:name_classes,name_groups:name_groups});
+      });
+      return application;
+    })
+    .then((applications) => {
+        const select = createSelectApp(applications);
+
+        const selectAppDiv = document.getElementById("select-app");
+        selectAppDiv.appendChild(select);
+    });
+
 
