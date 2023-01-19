@@ -74,6 +74,9 @@ public class User implements IsSerializable {
     public User() {
     }
 
+    public User(String firstName, String lastName, String email, String institution, String password, UserLevel level, CountryCode countryCode, String applications) {
+    }
+
     public User(String firstName, String lastName, String email, String institution, UserLevel level, CountryCode countryCode) {
 
         this(firstName, lastName, email, null, institution, "", false, "", "",

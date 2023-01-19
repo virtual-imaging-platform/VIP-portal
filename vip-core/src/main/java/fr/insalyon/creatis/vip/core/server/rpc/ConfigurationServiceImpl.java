@@ -109,11 +109,11 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
      * @param accountType User's accounts type
      */
     @Override
-    public void signup(User user, String comments, String[] accountType)
+    public void signup(User user, String comments)
         throws CoreException {
         try {
             logger.info("Sign up request from '" + user.getEmail() + "'.");
-            configurationBusiness.signup(user, comments, accountType);
+            configurationBusiness.signup(user, comments, (Group) null);
         } catch (BusinessException ex) {
             throw new CoreException(ex);
         }

@@ -178,7 +178,7 @@ public class CoreConstants implements IsSerializable {
     public static final String UNDESIRED_MAIL_DOMAINS = "account.undesiredEmailDomains";
     public static final String UNDESIRED_COUNTRIES = "account.undesiredCountries";
     public static final String SAML_TRUSTED_CERTIFICATE = "saml.trustedcertificate";
-    public static final String SAML_ACCOUNT_TYPE = "saml.accounttype";
+    public static final String SAML_DEFAULT_GROUP = "saml.defaultgroup";
     //Boutiques
     public static final String APP_CLASS = "boutiques.application.class";
     public static final String APPLICATION_FILES_REPOSITORY = "boutiques.upload.repository";

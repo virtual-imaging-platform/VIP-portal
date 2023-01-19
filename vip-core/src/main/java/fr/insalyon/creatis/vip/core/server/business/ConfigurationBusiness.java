@@ -146,9 +146,18 @@ public class ConfigurationBusiness {
         }
     }
 
+
     public void signup(
             User user, String comments, boolean automaticCreation,
-            boolean mapPrivateGroups, String... accountType)
+            boolean mapPrivateGroups, Group group)
+            throws BusinessException {
+        this.signup(user, comments, automaticCreation, mapPrivateGroups,
+                group == null ? new ArrayList<>() : Collections.singletonList(group));
+    }
+
+    public void signup(
+            User user, String comments, boolean automaticCreation,
+            boolean mapPrivateGroups, List<Group> groups)
             throws BusinessException {
 
         verifyEmail(user.getEmail());
@@ -204,18 +213,15 @@ public class ConfigurationBusiness {
             userDAO.add(user);
 
             // Adding user to groups
-            List<Group> groups;
-            if (accountType != null) {
-                groups = accountDAO.getGroups(accountType);
-                for (Group group : groups) {
-                    if (mapPrivateGroups || automaticCreation || group.isPublicGroup()) {
-                        usersGroupsDAO.add(user.getEmail(), group.getName(), GROUP_ROLE.User);
-                    } else {
-                        logger.info("Don't map user " + user.getEmail() + " to private group " + group.getName());
-                    }
-                }
-            } else {
+            if (groups == null) {
                 groups = new ArrayList<>();
+            }
+            for (Group group : groups) {
+                if (mapPrivateGroups || automaticCreation || group.isPublicGroup()) {
+                    usersGroupsDAO.add(user.getEmail(), group.getName(), GROUP_ROLE.User);
+                } else {
+                    logger.info("Don't map user " + user.getEmail() + " to private group " + group.getName());
+                }
             }
 
             if (!automaticCreation) {
@@ -340,9 +346,14 @@ public class ConfigurationBusiness {
         }
     }
 
-    public void signup(User user, String comments, String... accountType)
+
+    public void signup(User user, String comments, Group group) throws BusinessException {
+        signup(user, comments, false, false, group);
+    }
+
+    public void signup(User user, String comments,  List<Group> groups)
             throws BusinessException {
-        signup(user, comments, false, false, accountType);
+        signup(user, comments, false, false, groups);
     }
 
     public User signin(String email, String password) throws BusinessException {
@@ -693,6 +704,12 @@ public class ConfigurationBusiness {
         }
     }
 
+    public Group getGroup(String groupName) throws BusinessException {
+        return this.getGroups().stream()
+                .filter(g -> groupName.equals(g.getName()))
+                .findAny().orElse(null);
+    }
+
     public List<Group> getPublicGroups() throws BusinessException {
         try {
             List<Group> publicGroups = new ArrayList<>();
@@ -965,7 +982,7 @@ public class ConfigurationBusiness {
         return server.getCasURL() + "/login?service=" + serviceURL;
     }
 
-    public User getOrCreateUser(String email, String defaultAccountType)
+    public User getOrCreateUser(String email, String groupName)
             throws BusinessException {
 
         User user;
@@ -988,14 +1005,14 @@ public class ConfigurationBusiness {
             user = getNewUser(email, firstName, lastName);
             try {
                 signup(user, "Generated automatically", true, true,
-                       defaultAccountType);
+                       getGroup(groupName));
             } catch (BusinessException ex2) {
                 if (ex2.getMessage().contains("existing")) {
                     //try with a different last name
                     lastName += "_" + System.currentTimeMillis();
                     user = getNewUser(email, firstName, lastName);
                     signup(user, "Generated automatically", true,
-                            true, defaultAccountType);
+                            true, getGroup(groupName));
                 }
             }
             activateUser(user.getEmail());

@@ -61,7 +61,7 @@ public class UserTestUtils {
         baseUser2.setFolder("user2");
 
         restUser1 = new SignUpUserDTO("base3", "User3", "baseuser3@test.tst", "test", baseUser2Password,
-                UserLevel.Advanced, null, "test comment");
+                UserLevel.Advanced, null, "test comment", "test applications");
     }
 
     public static RequestPostProcessor baseUser1() {

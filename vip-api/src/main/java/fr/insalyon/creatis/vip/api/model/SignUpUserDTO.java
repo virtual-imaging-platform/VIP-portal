@@ -18,11 +18,12 @@ public class SignUpUserDTO {
     private UserLevel level;
     private CountryCode countryCode;
     private String comments;
+    private String application;
 
     public SignUpUserDTO(){
 
     }
-    public SignUpUserDTO(String firstName, String lastName, String email, String institution, String password, UserLevel level, CountryCode countryCode, String comments) {
+    public SignUpUserDTO(String firstName, String lastName, String email, String institution, String password, UserLevel level, CountryCode countryCode, String comments, String application) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
@@ -31,6 +32,7 @@ public class SignUpUserDTO {
         this.level = level;
         this.countryCode = countryCode;
         this.comments = comments;
+        this.application = application;
     }
 
     public String getFirstName() {
@@ -96,4 +98,9 @@ public class SignUpUserDTO {
     public void setComments(String comments) {
         this.comments = comments;
     }
+
+    public String getApplication() { return application; }
+
+    public void setApplication(String application) { this.application = application;}
+
 }
