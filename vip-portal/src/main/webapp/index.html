@@ -95,7 +95,19 @@
                 <form class="text-center">
                     <h2 class="mb-3 fw-normal">Please sign in</h2>
                     <!-- THIS IS BOOTSTRAP ALERT -->
+                    <div class='alert alert-danger' style='display:none' id='enter-email-failed'>
+                        Please enter your email address.
+                    </div>
+                    <div class='alert alert-danger' style='display:none' id='reset-failed'>
+                        There was a problem resetting your password. Please try again.
+                    </div>
+                    <div class='alert alert-danger' style='display:none' id='resetPassword-failed'>
+                        The entered passwords do not match.
+                    </div>
                     <div class='alert alert-danger' style='display:none' id='login-failed'>
+                        The email isn't valid.
+                    </div>
+                    <div class='alert alert-danger' style='display:none' id='auth-failed'>
                         The username or password you entered is incorrect.
                     </div>
                     <div class='alert alert-warning' style='display:none' id='forgot_password'>

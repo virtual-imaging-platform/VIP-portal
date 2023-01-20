@@ -16,40 +16,46 @@ function forgot_password(){
 }
 
 async function continue_forgotpsw() {
-    email = document.getElementById("floatingEmailWarning").value;
-    localStorage.setItem("email", email);
-    fetch('http://localhost:8080/rest/reset-code', {
-        method: 'POST',
-        headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ email: email })
-    })
+    var email = document.getElementById("floatingEmailWarning").value;
+    if(email == "") {
+        document.getElementById('enter-email-failed').style.display = 'block';
+        setTimeout(function(){document.getElementById('enter-email-failed').style.display = 'none'}, 3000);
+    } else {
+        email = document.getElementById("floatingEmailWarning").value;
+        localStorage.setItem("email", email);
+        fetch('http://localhost:8080/rest/reset-code', {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ email: email })
+        })
 
-    // Create the new alert block
-    var alertHTML =
-        '<div class="alert alert-success">' +
-            '<p>An email with your reset code has been sent to your email address.</p>' +
-            '<div class="form-group">' +
-                '<label for="activationCode">Reset code:</label>' +
-                '<input type="text" class="form-control" id="activationCode" placeholder="Enter your reset code">' +
-            '</div>' +
-            '<div class="form-group">' +
-                '<label for="newPassword">New password:</label>' +
-                '<input type="password" class="form-control" id="newPassword" placeholder="Enter your new password">' +
-            '</div>' +
-            '<div class="form-group">' +
-                '<label for="reEnterNewPassword">Re-enter your new password:</label>' +
-                '<input type="password" class="form-control" id="reEnterNewPassword" placeholder="Re-enter your new password">' +
-            '</div>' +
-            '<button type="submit" class="btn btn-primary" onclick="resetPassword()">Reset password</button>' +
-        '</div>';
+        // Create the new alert block
+        var alertHTML =
+            '<div class="alert alert-warning" id="forgot_password">' +
+                '<p>An email with your reset code has been sent to your email address.</p>' +
+                '<div class="form-group">' +
+                    '<label for="activationCode">Reset code:</label>' +
+                    '<input type="text" class="form-control" id="activationCode" placeholder="Enter your reset code">' +
+                '</div>' +
+                '<div class="form-group">' +
+                    '<label for="newPassword">New password:</label>' +
+                    '<input type="password" class="form-control" id="newPassword" placeholder="Enter your new password">' +
+                '</div>' +
+                '<div class="form-group">' +
+                    '<label for="reEnterNewPassword">Re-enter your new password:</label>' +
+                    '<input type="password" class="form-control" id="reEnterNewPassword" placeholder="Re-enter your new password">' +
+                '</div>' +
+                '<button type="submit" class="btn btn-primary" onclick="resetPassword()">Reset password</button>' +
+            '</div>';
 
-    // Replace the existing alert block with the new one
-    var oldAlert = document.getElementById('forgot_password');
-    var newAlert = document.createRange().createContextualFragment(alertHTML);
-    oldAlert.parentNode.replaceChild(newAlert, oldAlert);
+        // Replace the existing alert block with the new one
+        var oldAlert = document.getElementById('forgot_password');
+        var newAlert = document.createRange().createContextualFragment(alertHTML);
+        oldAlert.parentNode.replaceChild(newAlert, oldAlert);
+    }
 }
 
 function resetPassword() {
@@ -60,9 +66,10 @@ function resetPassword() {
     var reEnterNewPassword = document.getElementById('reEnterNewPassword').value;
 
     // Check that the new password and re-enter new password fields are the same
-    if (newPassword !== reEnterNewPassword) {
+    if (newPassword !== reEnterNewPassword || newPassword == "") {
         // Display an error message if the fields are not the same
-        alert('The entered passwords do not match!');
+        document.getElementById('resetPassword-failed').style.display = 'block';
+        setTimeout(function(){document.getElementById('resetPassword-failed').style.display = 'none'}, 3000);
         return;
     }
 
@@ -80,20 +87,14 @@ function resetPassword() {
     })
     .then(response => {
         if (response.ok) {
-            // Create the new alert block
-            var alertHTML =
-                '<div class="alert alert-success">' +
-                    '<p>Your password has been successfully reset!</p>' +
-                '</div>';
-
+            alert("Your password has been successfully reset!");
+            location.reload();
         } else {
-            // Display an error message if there was a problem resetting the password
-            alert('There was a problem resetting your password. Please try again.');
+            document.getElementById('reset-failed').style.display = 'block';
+            setTimeout(function(){document.getElementById('reset-failed').style.display = 'none'}, 3000);
         }
     });
 }
-
-
 
 
 function setCookie(value_user, value_session, exdays) {
@@ -147,8 +148,10 @@ async function get_fetch(form_email, form_password){
         })
         if (data.ok == true){
            return data.json();
+        } else {
+            document.getElementById('auth-failed').style.display = 'block';
+            setTimeout(function(){document.getElementById('auth-failed').style.display = 'none'}, 3000);
         }
-        throw new Error("Unable to contact the server")
 
 }
 
