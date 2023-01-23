@@ -93,18 +93,15 @@ async function createUser(){
 }
 
 function createSelectApp(applications) {
-    // Créer l'élément de sélection
     const select = document.createElement("select");
     select.setAttribute("id", "application");
     select.classList.add("form-select");
     select.setAttribute("aria-label", "Default select example");
 
-    // Ajouter une option par défaut
     const defaultOption = document.createElement("option");
     defaultOption.textContent = "Choose your Application";
     select.appendChild(defaultOption);
 
-    // Ajouter les options correspondant aux applications
     applications.forEach((application) => {
       const option = document.createElement("option");
       option.value = application.name;
