@@ -23,7 +23,7 @@ async function continue_forgotpsw() {
     } else {
         email = document.getElementById("floatingEmailWarning").value;
         localStorage.setItem("email", email);
-        fetch('http://localhost:8080/rest/reset-code', {
+        fetch('rest/reset-password', {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
@@ -80,7 +80,7 @@ function resetPassword() {
     }
 
     // Send the data to the server to reset the password
-    fetch('http://localhost:8080/rest/reset-password', {
+    fetch('rest/reset-password', {
         method: 'POST',
         headers: {
             'Accept': 'application/json',
@@ -144,7 +144,7 @@ function createAnAccount(){
 }
 
 async function get_fetch(form_email, form_password){
-    const data = await fetch('http://localhost:8080/rest/authenticate', {
+    const data = await fetch('rest/session', {
         method: 'POST',
         headers: {
             'Accept': 'application/json',
@@ -206,9 +206,9 @@ function createTableHTMLString(data) {
 
 async function createGrid(){
     Promise.all([
-        await fetch('http://localhost:8080/rest/pipelines?public')
+        await fetch('rest/pipelines?public')
         .then((response_app) => response_app.json()),
-        await fetch('http://localhost:8080/rest/publication')
+        await fetch('rest/publications')
         .then((response_publi) => response_publi.json())
       ]).then((data) => make_table(data));
 }

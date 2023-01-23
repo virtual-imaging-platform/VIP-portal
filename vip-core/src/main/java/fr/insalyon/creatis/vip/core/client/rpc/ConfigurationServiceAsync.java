@@ -113,15 +113,6 @@ public interface ConfigurationServiceAsync {
 
     void updateLastUpdatePublication(AsyncCallback<Void> asyncCallback);
 
-    // Accounts
-    void getAccounts(AsyncCallback<List<Account>> asyncCallback);
-
-    void addAccount(String name, List<String> groups, AsyncCallback<Void> asyncCallback);
-
-    void updateAccount(String oldName, String newName, List<String> groups, AsyncCallback<Void> asyncCallback);
-
-    void removeAccount(String name, AsyncCallback<Void> asyncCallback);
-
     void getCASLoginPageUrl(AsyncCallback<String> asyncCallback);
 
     void getUsageStats(AsyncCallback<UsageStats> asyncCallback);

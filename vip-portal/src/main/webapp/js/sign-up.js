@@ -1,17 +1,17 @@
-async function get_fetch(firstName, lastName, email, institution, password, country){
-    const data = await fetch('http://localhost:8080/rest/register', {
+async function get_fetch(firstName, lastName, email, institution, password, country, application){
+    const data = await fetch('rest/register', {
         method: 'POST',
         headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ "firstName": firstName, "lastName": lastName, "email": email, "institution": institution, "password": password, "countryCode": country})
+        body: JSON.stringify({ "firstName": firstName, "lastName": lastName, "email": email, "institution": institution, "password": password, "countryCode": country, "application": application})
         })
 
 }
 
 async function get_fetch_authenticate(form_email, form_password){
-    const data = await fetch('http://localhost:8080/rest/authenticate', {
+    const data = await fetch('rest/session', {
         method: 'POST',
         headers: {
             'Accept': 'application/json',
@@ -81,7 +81,7 @@ async function createUser(){
     }
     if (isValid) {
         try {
-                await get_fetch(new_firstName, new_lastName, new_email, new_institution, new_password, new_country);
+                await get_fetch(new_firstName, new_lastName, new_email, new_institution, new_password, new_country, new_application);
                 const data = await get_fetch_authenticate(new_email, new_password);
                 setCookie(new_email, data.httpHeaderValue, 7);
             } catch (error) {
@@ -112,7 +112,7 @@ function createSelectApp(applications) {
     return select;
   }
 
-  fetch('http://localhost:8080/rest/pipelines?public')
+  fetch('rest/pipelines?public')
     .then((response_app) => response_app.json())
     .then((data) => {
       var application = new Array();

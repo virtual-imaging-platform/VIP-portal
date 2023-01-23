@@ -77,7 +77,11 @@ public class PipelineController extends ApiController {
     @RequestMapping(params = "public")
     public List<Application> listPublicPipelines() throws ApiException {
         logMethodInvocation(logger, "listPublicPipelines");
-        return pipelineBusiness.listPublicPipelines();
+        List<Application> pipelines = pipelineBusiness.listPublicPipelines();
+        for (Application application : pipelines) {
+            application.removeOwner();
+        }
+        return pipelines;
     }
 
     @RequestMapping("{pipelineId}")

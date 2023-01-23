@@ -121,7 +121,6 @@ public class SpringJndiIT {
 
     /*
         Add an account
-    */
     @Test
     @Order(2)
     public void addNewAccount() throws BusinessException {
@@ -131,21 +130,21 @@ public class SpringJndiIT {
         accounts = configurationBusiness.getAccounts();
         assertEquals(1, accounts.size());
     }
+    */
 
 
     /*
         Verify the account is still there
-    */
     @Test
     @Order(3)
     public void isAccountStillThere() throws BusinessException {
         List<Account> accounts = configurationBusiness.getAccounts();
         assertEquals(1, accounts.size());
     }
+    */
 
     /*
         Restart spring, account should still be there
-    */
     @Test
     @Order(4)
     @DirtiesContext(methodMode = MethodMode.BEFORE_METHOD) // to restart spring
@@ -153,6 +152,7 @@ public class SpringJndiIT {
         List<Account> accounts = configurationBusiness.getAccounts();
         assertEquals(1, accounts.size());
     }
+    */
 
     @Test
     @Order(5)

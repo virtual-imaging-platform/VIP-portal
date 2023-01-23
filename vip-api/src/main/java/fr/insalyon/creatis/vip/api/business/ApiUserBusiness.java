@@ -48,12 +48,12 @@ public class ApiUserBusiness {
         }
     }
 
-    public void resetCode(String email) throws ApiException {
+    public void sendResetCode(String email) throws ApiException {
         try {
             configurationBusiness.sendResetCode(email);
-            logger.info("Resetting password for user with email: " + email);
+            logger.info("Sending reset code for user with email: " + email);
         } catch (BusinessException e) {
-            throw new ApiException("Error resetting password", e);
+            throw new ApiException("Error sending reset password", e);
         }
     }
 

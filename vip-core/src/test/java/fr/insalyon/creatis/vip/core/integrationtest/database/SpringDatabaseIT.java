@@ -58,7 +58,6 @@ public class SpringDatabaseIT extends BaseSpringIT{
 
     /*
         verify simple database operation
-    */
     @Test
     @Order(2)
     public void addNewAccount() throws BusinessException {
@@ -68,17 +67,18 @@ public class SpringDatabaseIT extends BaseSpringIT{
         accounts = configurationBusiness.getAccounts();
         assertEquals(1, accounts.size());
     }
+    */
 
 
     /*
         Verify the account is not there anymore as last test method is Transactional and rollbacked
-    */
     @Test
     @Order(3)
     public void isAccountStillThere() throws BusinessException {
         List<Account> accounts = configurationBusiness.getAccounts();
         assertEquals(0, accounts.size());
     }
+    */
 
     /*
         from now on, test transactions are disabled to verify rollbacks and

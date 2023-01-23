@@ -164,34 +164,9 @@ public class PipelineBusiness {
         }
     }
 
-
     public List<Application> listPublicPipelines() throws ApiException {
         try {
-            List<Pipeline> pipelines = new ArrayList<>();
              return applicationBusiness.getPublicApplicationsWithGroups();
-            /*
-            for (Application app : applicationBusiness.getPublicApplicationsWithGroups()) {
-                pipelines.add(new Pipeline(
-                        app.getFullName(), app.getName(), "plop", true)
-                );
-            }
-            return pipelines;*/
-        } catch (BusinessException e) {
-            throw new ApiException(e);
-        }
-    }
-
-    public List<Publication> listPublication() throws ApiException {
-        try {
-            List<Pipeline> pipelines = new ArrayList<>();
-            return publicationBusiness.getPublications();
-            /*
-            for (Application app : applicationBusiness.getPublicApplicationsWithGroups()) {
-                pipelines.add(new Pipeline(
-                        app.getFullName(), app.getName(), "plop", true)
-                );
-            }
-            return pipelines;*/
         } catch (BusinessException e) {
             throw new ApiException(e);
         }

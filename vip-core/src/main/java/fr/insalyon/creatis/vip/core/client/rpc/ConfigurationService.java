@@ -129,15 +129,6 @@ public interface ConfigurationService extends RemoteService {
 
     void updateLastUpdatePublication() throws CoreException;
 
-    // Accounts
-    List<Account> getAccounts() throws CoreException;
-
-    void addAccount(String name, List<String> groups) throws CoreException;
-
-    void updateAccount(String oldName, String newName, List<String> groups) throws CoreException;
-
-    void removeAccount(String name) throws CoreException;
-
     String getCASLoginPageUrl() throws CoreException;
 
     UsageStats getUsageStats() throws CoreException;
