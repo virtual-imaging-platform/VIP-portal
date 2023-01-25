@@ -73,7 +73,6 @@ public class PipelineBusiness {
     private Supplier<User> currentUserProvider;
     private final WorkflowBusiness workflowBusiness;
     private final ApplicationBusiness applicationBusiness;
-    private final PublicationBusiness publicationBusiness;
     private final ClassBusiness classBusiness;
 
     @Autowired
@@ -85,7 +84,6 @@ public class PipelineBusiness {
         this.env = env;
         this.workflowBusiness = workflowBusiness;
         this.applicationBusiness = applicationBusiness;
-        this.publicationBusiness = publicationBusiness;
         this.classBusiness = classBusiness;
     }
 
