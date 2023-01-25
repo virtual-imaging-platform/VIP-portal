@@ -166,7 +166,7 @@ public class Layout {
                 Cookies.removeCookie(CoreConstants.COOKIES_USER, "/");
                 Cookies.removeCookie(CoreConstants.COOKIES_SESSION, "/");
 
-                Window.Location.replace("http://localhost:8080/index.html");
+                Window.Location.replace("index.html");
             }
         };
         ConfigurationService.Util.getInstance().signout(callback);

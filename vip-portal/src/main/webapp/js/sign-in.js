@@ -174,12 +174,13 @@ function make_table(data) {
 
     var publication = new Array();
     data[1].forEach((item, index) => {
-        let name_title = item.title.toString();
-        let name_type = item.type.toString();
-        let name_typeName = item.typeName.toString();
-        let name_vipAuthor = item.vipAuthor.toString();
-        let name_date = item.date.toString();
-        let name_vipApplication = item.vipApplication.toString();
+        let name_title = item.title ? item.title.toString() : "";
+        let name_type = item.type ? item.type.toString() : "";
+        let name_typeName = item.typeName ? item.typeName.toString() : "";
+        let name_vipAuthor = item.vipAuthor ? item.vipAuthor.toString() : "";
+        console.log(name_vipAuthor);
+        let name_date = item.date ? item.date.toString() : "";
+        let name_vipApplication = item.vipApplication ? item.vipApplication.toString() : "";
         publication.push([index, name_title, name_type, name_typeName, name_vipAuthor, name_date, name_vipApplication])
     });
 
