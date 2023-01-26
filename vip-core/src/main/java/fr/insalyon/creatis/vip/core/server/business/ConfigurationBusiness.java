@@ -965,11 +965,10 @@ public class ConfigurationBusiness {
         return server.getCasURL() + "/login?service=" + serviceURL;
     }
 
-    public User getOrCreateUser(String email, Object institution, String defaultAccountType)
+    public User getOrCreateUser(String email, String institution, String defaultAccountType)
             throws BusinessException {
 
         User user;
-        String domainName;
         try {
             user = getUserWithSession(email);
         } catch (DAOException ex) {
@@ -986,16 +985,7 @@ public class ConfigurationBusiness {
                 }
             }
 
-            if(institution != null){
-                String institution_string = institution.toString();
-                String temp = institution_string .substring(institution_string .indexOf("@") + 1);
-                domainName = temp.substring(0, temp.indexOf("."));
-                domainName = domainName.toUpperCase();
-            } else {
-                domainName = "Unknown";
-            }
-
-            user = getNewUser(email, firstName, lastName, domainName);
+            user = getNewUser(email, firstName, lastName, institution);
             try {
                 signup(user, "Generated automatically", true, true,
                        defaultAccountType);
@@ -1003,7 +993,7 @@ public class ConfigurationBusiness {
                 if (ex2.getMessage().contains("existing")) {
                     //try with a different last name
                     lastName += "_" + System.currentTimeMillis();
-                    user = getNewUser(email, firstName, lastName, domainName);
+                    user = getNewUser(email, firstName, lastName, institution);
                     signup(user, "Generated automatically", true,
                             true, defaultAccountType);
                 }
