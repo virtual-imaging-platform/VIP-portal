@@ -92,7 +92,7 @@ public class ExternalPlatformBusiness {
         int indexOfColon = parameterValue.indexOf(':');
         String platformIdentifier = parameterValue.substring(0, indexOfColon);
 
-        if ("file".equals(platformIdentifier)) {
+        if ("file".equals(platformIdentifier)) || ("gfal".equals(platformIdentifier)) || ("srm".equals(platformIdentifier))) {
             // its a local file keep it as it is
             return new ParseResult(true, parameterValue);
         }
