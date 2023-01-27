@@ -100,10 +100,10 @@ span{
 }
 
 #welcome {
-  padding-top: 5%;
+  padding-top: 3%;
   padding-left: 10%;
   padding-right: 10%;
-  padding-bottom: 2%;
+  padding-bottom: 3%;
   background-color: #f0f2f5;
 }
 
@@ -134,10 +134,10 @@ span{
 
 #presentation {
   text-align: center;
-  padding-top: 4%;
+  padding-top: 3%;
   padding-left: 10%;
   padding-right: 10%;
-  padding-bottom: 2%;
+  padding-bottom: 3%;
 }
 
 #features {
@@ -145,7 +145,7 @@ span{
   padding-top: 1% ;
   padding-left: 10%;
   padding-right: 10%;
-  padding-bottom: 4%;
+  padding-bottom: 3%;
 }
 
 .icon {
@@ -160,23 +160,23 @@ span{
 
 #tableApp {
   text-align: center;
-  padding-top: 4%;
+  padding-top: 3%;
   padding-left: 10%;
   padding-right: 10%;
-  padding-bottom: 4%;
+  padding-bottom: 3%;
 }
 
 #tablePublication {
   text-align: center;
-  padding-top: 4%;
+  padding-top: 3%;
   padding-left: 10%;
   padding-right: 10%;
-  padding-bottom: 4%;
+  padding-bottom: 3%;
 }
 
 
 #team {
-  padding-top: 4%;
+  padding-top: 3%;
   text-align: center;
 }
 .py-5 {
