@@ -65,13 +65,11 @@ async function continue_forgotpsw() {
 }
 
 function resetPassword() {
-    // Retrieve the values of the activation code, new password, and re-enter new password fields
     var email = localStorage.getItem("email");
     var activationCode = document.getElementById('activationCode').value;
     var newPassword = document.getElementById('newPassword').value;
     var reEnterNewPassword = document.getElementById('reEnterNewPassword').value;
 
-    // Check that the new password and re-enter new password fields are the same
     if (newPassword !== reEnterNewPassword || newPassword == "") {
         // Display an error message if the fields are not the same
         document.getElementById('resetPassword-failed').style.display = 'block';
@@ -79,7 +77,6 @@ function resetPassword() {
         return;
     }
 
-    // Send the data to the server to reset the password
     fetch('rest/reset-password', {
         method: 'POST',
         headers: {
