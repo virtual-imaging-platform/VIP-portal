@@ -118,7 +118,6 @@ function getCookie(cName) {
     let cookieExist = true;
     const name = cName + "=";
     const cDecoded = decodeURIComponent(document.cookie);
-    console.log(cDecoded);
     const cArr = cDecoded.split('; ');
     let res;
     cArr.forEach(val => {
@@ -178,7 +177,6 @@ function make_table(data) {
         let name_type = item.type ? item.type.toString() : "";
         let name_typeName = item.typeName ? item.typeName.toString() : "";
         let name_vipAuthor = item.vipAuthor ? item.vipAuthor.toString() : "";
-        console.log(name_vipAuthor);
         let name_date = item.date ? item.date.toString() : "";
         let name_vipApplication = item.vipApplication ? item.vipApplication.toString() : "";
         publication.push([index, name_title, name_type, name_typeName, name_vipAuthor, name_date, name_vipApplication])
