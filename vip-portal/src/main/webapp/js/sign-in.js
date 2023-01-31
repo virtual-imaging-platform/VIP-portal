@@ -184,7 +184,9 @@ function make_table(data) {
 
     $(document).ready(function () {
         $('#appTable').DataTable();
-        $('#id_table_Publication').DataTable();
+        $('#id_table_Publication').DataTable({
+            order: [[5, 'desc']],
+        });
     });
 }
 
