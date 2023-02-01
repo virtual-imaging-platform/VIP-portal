@@ -36,19 +36,16 @@ import fr.insalyon.creatis.vip.application.client.bean.*;
 import fr.insalyon.creatis.vip.application.client.rpc.ApplicationService;
 import fr.insalyon.creatis.vip.application.client.view.ApplicationException;
 import fr.insalyon.creatis.vip.application.server.business.*;
-import fr.insalyon.creatis.vip.core.client.CoreModule;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.CoreException;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
-import fr.insalyon.creatis.vip.core.server.business.VipSessionBusiness;
 import fr.insalyon.creatis.vip.core.server.rpc.AbstractRemoteServiceServlet;
 import org.jsoup.Jsoup;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletException;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -91,7 +88,7 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
     public void add(Application application) throws ApplicationException {
 
         try {
-            if (isSystemAdministrator() || isGroupAdministrator()) {
+            if (isSystemAdministrator() || isGroupAdministrator() || isDeveloper()) {
                 trace(logger, "Adding application '" + application.getName() + "'.");
                 application.setOwner(getSessionUser().getEmail());
                 applicationBusiness.add(application);
@@ -107,7 +104,7 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
     @Override
     public void update(Application application) throws ApplicationException {
         try {
-            if (isSystemAdministrator() || isGroupAdministrator()) {
+            if (isSystemAdministrator() || isGroupAdministrator() || isDeveloper()) {
                 trace(logger, "Updating application '" + application.getName() + "'.");
                 applicationBusiness.update(application);
 
@@ -205,13 +202,22 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
     }
 
     @Override
+    public List<Application> getPublicApplications() throws ApplicationException {
+        try {
+            return applicationBusiness.getPublicApplicationsWithGroups();
+        } catch (BusinessException ex) {
+            throw new ApplicationException(ex);
+        }
+    }
+
+    @Override
     public List<Application> getApplications() throws ApplicationException {
         try {
-            if( ! isUserConnected()){
-                return applicationBusiness.getPublicApplicationsWithGroups();
-            } else if (isSystemAdministrator()) {
+            if (isSystemAdministrator()) {
                 return applicationBusiness.getApplications();
-            } else if (isGroupAdministrator()) {
+            } else if (isDeveloper()) {
+                return applicationBusiness.getApplicationsWithOwner(getSessionUser().getEmail());
+            }  else if (isGroupAdministrator()) {
                 List<String> classes = classBusiness.getUserClassesName(
                     getSessionUser().getEmail(), true);
                 return applicationBusiness.getApplications(classes);

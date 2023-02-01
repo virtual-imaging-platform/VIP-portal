@@ -166,14 +166,7 @@ public class Layout {
                 Cookies.removeCookie(CoreConstants.COOKIES_USER, "/");
                 Cookies.removeCookie(CoreConstants.COOKIES_SESSION, "/");
 
-                Set<Tab> removedTabs = new HashSet<>();
-                for (Tab tab : centerTabSet.getTabs()) {
-                    removedTabs.add(tab);
-                    centerTabSet.removeTab(tab);
-                }
-                MainToolStrip.getInstance().reset();
-                authenticate(null);
-                Modules.getInstance().finalizeModules(removedTabs);
+                Window.Location.replace("index.html");
             }
         };
         ConfigurationService.Util.getInstance().signout(callback);
@@ -247,7 +240,7 @@ public class Layout {
      * @param message
      */
     public void setWarningMessage(String message) {
-        setWarningMessage(message, 10);
+        setWarningMessage(message, 0);
     }
 
     /**

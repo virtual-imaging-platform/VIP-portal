@@ -42,6 +42,7 @@ public enum UserLevel {
 
     Beginner,
     Advanced,
+    Developer,
     Administrator;
 
     public static String[] toStringArray() {

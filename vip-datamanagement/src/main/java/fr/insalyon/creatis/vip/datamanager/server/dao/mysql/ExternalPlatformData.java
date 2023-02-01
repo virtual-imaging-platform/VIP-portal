@@ -78,6 +78,9 @@ public class ExternalPlatformData extends JdbcDaoSupport implements ExternalPlat
                         getExternalPlatformTypeFromBDDString(rs.getString("type")));
                 externalPlatform.setUrl(rs.getString("url"));
                 externalPlatform.setDescription(rs.getString("description"));
+                externalPlatform.setUploadUrl(rs.getString("upload_url"));
+                externalPlatform.setKeycloakClientId(rs.getString("keycloak_client_id"));
+                externalPlatform.setRefreshTokenUrl(rs.getString("refresh_token_url"));
                 return externalPlatform;
             }
 
@@ -105,6 +108,9 @@ public class ExternalPlatformData extends JdbcDaoSupport implements ExternalPlat
                         getExternalPlatformTypeFromBDDString(rs.getString("type")));
                 externalPlatform.setUrl(rs.getString("url"));
                 externalPlatform.setDescription(rs.getString("description"));
+                externalPlatform.setUploadUrl(rs.getString("upload_url"));
+                externalPlatform.setKeycloakClientId(rs.getString("keycloak_client_id"));
+                externalPlatform.setRefreshTokenUrl(rs.getString("refresh_token_url"));
                 externalPlatformsList.add(externalPlatform);
             }
 

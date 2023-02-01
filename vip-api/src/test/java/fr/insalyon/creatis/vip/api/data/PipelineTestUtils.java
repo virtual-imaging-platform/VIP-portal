@@ -34,6 +34,7 @@ package fr.insalyon.creatis.vip.api.data;
 import fr.insalyon.creatis.vip.api.model.*;
 import fr.insalyon.creatis.vip.api.tools.spring.JsonCustomObjectMatcher;
 import fr.insalyon.creatis.vip.application.client.bean.*;
+import fr.insalyon.creatis.vip.application.client.bean.Application;
 import org.hamcrest.Matcher;
 
 import java.util.*;

@@ -63,7 +63,9 @@ public interface ApplicationService extends RemoteService {
     }
 
     public void signout() throws ApplicationException;
-    
+
+    List<Application> getPublicApplications() throws ApplicationException;
+
     public List<Application> getApplications() throws ApplicationException;
     
     public List<String[]> getApplications(String className) throws ApplicationException;
