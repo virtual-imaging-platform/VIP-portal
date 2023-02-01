@@ -697,6 +697,9 @@ public class ConfigurationBusiness {
     }
 
     public Group getGroup(String groupName) throws BusinessException {
+        if (groupName == null) {
+            return null;
+        }
         return this.getGroups().stream()
                 .filter(g -> groupName.equals(g.getName()))
                 .findAny().orElse(null);
