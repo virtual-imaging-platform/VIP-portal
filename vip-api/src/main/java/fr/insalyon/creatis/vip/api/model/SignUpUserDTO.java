@@ -18,12 +18,12 @@ public class SignUpUserDTO {
     private UserLevel level;
     private CountryCode countryCode;
     private String comments;
-    private String[] accountTypes;
+    private String application;
 
     public SignUpUserDTO(){
 
     }
-    public SignUpUserDTO(String firstName, String lastName, String email, String institution, String password, UserLevel level, CountryCode countryCode, String comments, String[] accountTypes) {
+    public SignUpUserDTO(String firstName, String lastName, String email, String institution, String password, UserLevel level, CountryCode countryCode, String comments, String application) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
@@ -32,7 +32,7 @@ public class SignUpUserDTO {
         this.level = level;
         this.countryCode = countryCode;
         this.comments = comments;
-        this.accountTypes = accountTypes;
+        this.application = application;
     }
 
     public String getFirstName() {
@@ -99,11 +99,8 @@ public class SignUpUserDTO {
         this.comments = comments;
     }
 
-    public String[] getAccountTypes() {
-        return accountTypes;
-    }
+    public String getApplication() { return application; }
 
-    public void setAccountTypes(String[] accountTypes) {
-        this.accountTypes = accountTypes;
-    }
+    public void setApplication(String application) { this.application = application;}
+
 }

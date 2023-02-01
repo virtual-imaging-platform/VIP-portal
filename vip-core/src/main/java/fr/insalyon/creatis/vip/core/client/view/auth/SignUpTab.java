@@ -70,7 +70,6 @@ public class SignUpTab extends Tab {
     private SelectItem countryField;
     private PasswordItem passwordField;
     private PasswordItem confirmPasswordField;
-    private SelectItem accountTypeField;
     private TextAreaItem commentsItem;
     private CheckboxItem acceptField;
     private IButton signupButton;
@@ -92,8 +91,6 @@ public class SignUpTab extends Tab {
         vLayout.addMember(signupLayout);
 
         this.setPane(vLayout);
-
-        loadAccountTypes();
     }
 
     private void configureSignupLayout() {
@@ -121,12 +118,6 @@ public class SignUpTab extends Tab {
         passwordField = FieldUtil.getPasswordItem(150, 32);
         confirmPasswordField = FieldUtil.getPasswordItem(150, 32);
 
-        accountTypeField = new SelectItem();
-        accountTypeField.setShowTitle(false);
-        accountTypeField.setRequired(true);
-        accountTypeField.setMultiple(true);
-        accountTypeField.setMultipleAppearance(MultipleAppearance.PICKLIST);
-
         commentsItem = new TextAreaItem("comment", "");
         commentsItem.setHeight(80);
         commentsItem.setWidth(300);
@@ -147,7 +138,6 @@ public class SignUpTab extends Tab {
                         & institutionField.validate()
                         & countryField.validate()
                         & passwordField.validate() & confirmPasswordField.validate()
-                        & accountTypeField.validate() & acceptField.validate()
                         & acceptField.getValueAsBoolean()) {
 
                     if (!emailField.getValueAsString().equals(confirmEmailField.getValueAsString())) {
@@ -194,8 +184,7 @@ public class SignUpTab extends Tab {
                            
                         }
                     };
-                    ConfigurationService.Util.getInstance().signup(user, commentsItem.getValueAsString(),
-                            accountTypeField.getValues(), callback);
+                    ConfigurationService.Util.getInstance().signup(user, commentsItem.getValueAsString(), callback);
                     WidgetUtil.setLoadingIButton(signupButton, "Signing up...");
                 }
             }
@@ -210,7 +199,6 @@ public class SignUpTab extends Tab {
         WidgetUtil.addFieldToVIPLayout(signupLayout, "Country", countryField);
         WidgetUtil.addFieldToVIPLayout(signupLayout, "Password", passwordField);
         WidgetUtil.addFieldToVIPLayout(signupLayout, "Re-enter Password", confirmPasswordField);
-        WidgetUtil.addFieldToVIPLayout(signupLayout, "Account Type", accountTypeField);
         WidgetUtil.addFieldToVIPLayout(signupLayout, "Comments", commentsItem);
         signupLayout.addMember(FieldUtil.getForm(acceptField));
         signupLayout.addMember(signupButton);
@@ -245,26 +233,5 @@ public class SignUpTab extends Tab {
         };
         ConfigurationService.Util.getInstance().signin(emailField.getValueAsString().trim(),
                 passwordField.getValueAsString(), callback);
-    }
-
-    private void loadAccountTypes() {
-
-        final AsyncCallback<List<Account>> callback = new AsyncCallback<List<Account>>() {
-            @Override
-            public void onFailure(Throwable caught) {
-                Layout.getInstance().setWarningMessage("Unable to load account types:<br />" + caught.getMessage(), 10);
-            }
-
-            @Override
-            public void onSuccess(List<Account> result) {
-
-                String[] values = new String[result.size()];
-                for (int i = 0; i < result.size(); i++) {
-                    values[i] = result.get(i).getName();
-                }
-                accountTypeField.setValueMap(values);
-            }
-        };
-        ConfigurationService.Util.getInstance().getAccounts(callback);
     }
 }
