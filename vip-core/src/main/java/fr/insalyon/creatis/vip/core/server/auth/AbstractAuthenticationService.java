@@ -141,7 +141,7 @@ public abstract class AbstractAuthenticationService extends HttpServlet {
             String email) throws BusinessException, CoreException {
 
         String groupName = getDefaultGroup();
-        User user = configurationBusiness.getOrCreateUser(email, null, groupName);
+        User user = configurationBusiness.getOrCreateUser(email, "Unknown", groupName);
         //third-party authentication services will *not* be trusted to let admins in
         if (user.isSystemAdministrator()) {
             authFailedResponse(request, response);
