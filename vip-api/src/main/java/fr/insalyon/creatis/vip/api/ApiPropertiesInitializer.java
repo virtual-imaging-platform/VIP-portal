@@ -95,7 +95,6 @@ public class ApiPropertiesInitializer {
         verifyPropertyNotNull(API_DATA_TRANSFERT_MAX_SIZE, Long.class);
 
 
-        verifyPropertyNotNull(SHANOIR_HOST_IP, String.class);
         if (env.getProperty(KEYCLOAK_ACTIVATED, Boolean.class, Boolean.FALSE)) {
             logger.info("Keycloak activated");
             verifyPropertyNotNull(KEYCLOAK_CLIENT_ID, String.class);

@@ -186,6 +186,7 @@ public class DisplayTab extends Tab {
             vipLayout.getTag(),
             vipLayout.getIsRunOnGrid(),
             vipLayout.getOverwrite(),
+            vipLayout.getFileAccessProtocol(),
             callback);
     }
 }

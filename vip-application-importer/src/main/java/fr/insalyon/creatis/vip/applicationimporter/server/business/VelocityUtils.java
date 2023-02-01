@@ -71,12 +71,42 @@ public class VelocityUtils {
         return stringWriter.toString();
     }
 
-    public String createDocument(String tag, BoutiquesApplication bt, Boolean isRunOnGrid, String vmTemplate) {
+    public String createDocument(BoutiquesApplication bt, String fileAccessProtocol, String vmTemplate) {
+        VelocityContext context = new VelocityContext();
+        context.put("tool", bt);
+        context.put("esc", new EscapeTool());
+        context.put("fileAccessProtocol", fileAccessProtocol);
+
+        StringWriter stringWriter = new StringWriter();
+
+        Template template = velocityEngine.getTemplate(vmTemplate);
+        template.merge(context, stringWriter);
+
+        return stringWriter.toString();
+    }
+
+    public String createDocument( String tag, BoutiquesApplication bt, Boolean isRunOnGrid, String vmTemplate) {
         VelocityContext context = new VelocityContext();
         context.put("tag", tag);
         context.put("tool", bt);
         context.put("isRunOnGrid", isRunOnGrid);
         context.put("esc", new EscapeTool());
+
+        StringWriter stringWriter = new StringWriter();
+
+        Template template = velocityEngine.getTemplate(vmTemplate);
+        template.merge(context, stringWriter);
+
+        return stringWriter.toString();
+    }
+
+    public String createDocument(String tag, BoutiquesApplication bt, Boolean isRunOnGrid, String fileAccessProtocol, String vmTemplate) {
+        VelocityContext context = new VelocityContext();
+        context.put("tag", tag);
+        context.put("tool", bt);
+        context.put("isRunOnGrid", isRunOnGrid);
+        context.put("esc", new EscapeTool());
+        context.put("fileAccessProtocol", fileAccessProtocol);
 
         StringWriter stringWriter = new StringWriter();
 
