@@ -2,6 +2,7 @@ package fr.insalyon.creatis.vip.integrationtest;
 
 import fr.insalyon.creatis.grida.client.GRIDAClient;
 import fr.insalyon.creatis.vip.api.security.apikey.SpringApiPrincipal;
+import fr.insalyon.creatis.vip.core.client.bean.Group;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.util.CountryCode;
 import fr.insalyon.creatis.vip.core.server.SpringCoreConfig;
@@ -63,7 +64,7 @@ public class VipWebConfigurationIT {
                 "testPassword", CountryCode.fr,
                 null);
         Mockito.when(gridaClient.exist(anyString())).thenReturn(true, false);
-        configurationBusiness.signup(newUser, "", (String) null);
+        configurationBusiness.signup(newUser, "", (Group) null);
         mockMvc.perform(get("/rest/pipelines")
             .with(SecurityMockMvcRequestPostProcessors.user(new SpringApiPrincipal(newUser))))
             .andDo(print())

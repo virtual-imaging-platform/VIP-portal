@@ -289,6 +289,8 @@ public class SummaryTab extends AbstractCornerTab {
                             break;
                         case CANCELLED:
                         case CANCELLED_REPLICA:
+                        case DELETED:
+                        case DELETED_REPLICA:
                             cancelled++;
                             break;
                         case STALLED:

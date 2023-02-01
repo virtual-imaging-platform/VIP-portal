@@ -31,12 +31,10 @@
  */
 package fr.insalyon.creatis.vip.core.client.view.main;
 
-import com.smartgwt.client.widgets.tab.Tab;
 import fr.insalyon.creatis.vip.core.client.CoreModule;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.application.ApplicationParser;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
-import fr.insalyon.creatis.vip.core.client.view.system.account.ManageAccountsTab;
 import fr.insalyon.creatis.vip.core.client.view.system.group.ManageGroupsTab;
 import fr.insalyon.creatis.vip.core.client.view.system.setting.ManageSettingTab;
 import fr.insalyon.creatis.vip.core.client.view.system.user.ManageUsersTab;
@@ -53,7 +51,6 @@ public class SystemParser extends ApplicationParser {
         if (CoreModule.user.isSystemAdministrator()) {
             addApplication(CoreConstants.APP_USER, CoreConstants.APP_IMG_USER);
             addApplication(CoreConstants.APP_GROUP, CoreConstants.APP_IMG_GROUP);
-            addApplication(CoreConstants.APP_ACCOUNT_MANAGER, CoreConstants.APP_IMG_ACCOUNT_MANAGER);
             addApplication(CoreConstants.APP_SETTING, CoreConstants.APP_IMG_SETTING);
         }
     }
@@ -68,11 +65,7 @@ public class SystemParser extends ApplicationParser {
             Layout.getInstance().addTab(
                 CoreConstants.TAB_MANAGE_GROUPS, ManageGroupsTab::new);
             return true;
-        } else if (applicationName.equals(CoreConstants.APP_ACCOUNT_MANAGER)) {
-            Layout.getInstance().addTab(
-                CoreConstants.TAB_MANAGE_ACCOUNTS, ManageAccountsTab::new);
-            return true;
-        } else if (applicationName.equals(CoreConstants.APP_SETTING)) {
+        }  else if (applicationName.equals(CoreConstants.APP_SETTING)) {
             Layout.getInstance().addTab(
                 CoreConstants.TAB_MANAGE_SETTING, ManageSettingTab::new);
             return true;

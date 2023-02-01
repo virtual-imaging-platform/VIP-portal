@@ -106,14 +106,13 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
      *
      * @param user User bean object
      * @param comments User's comments
-     * @param accountType User's accounts type
      */
     @Override
-    public void signup(User user, String comments, String[] accountType)
+    public void signup(User user, String comments)
         throws CoreException {
         try {
             logger.info("Sign up request from '" + user.getEmail() + "'.");
-            configurationBusiness.signup(user, comments, accountType);
+            configurationBusiness.signup(user, comments, (Group) null);
         } catch (BusinessException ex) {
             throw new CoreException(ex);
         }
@@ -515,53 +514,6 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
         try {
             logger.info("(" + email + ") Reseting password.");
             configurationBusiness.resetPassword(email, code, password);
-        } catch (BusinessException ex) {
-            throw new CoreException(ex);
-        }
-    }
-
-    /**
-     * @return List of accounts
-     *
-     */
-    @Override
-    public List<Account> getAccounts() throws CoreException {
-        try {
-            return configurationBusiness.getAccounts();
-        } catch (BusinessException ex) {
-            throw new CoreException(ex);
-        }
-    }
-
-    @Override
-    public void removeAccount(String name) throws CoreException {
-        try {
-            authenticateSystemAdministrator(logger);
-            trace(logger, "Removing account type '" + name + "'.");
-            configurationBusiness.removeAccount(name);
-        } catch (BusinessException ex) {
-            throw new CoreException(ex);
-        }
-    }
-
-    @Override
-    public void addAccount(String name, List<String> groups) throws CoreException {
-        try {
-            authenticateSystemAdministrator(logger);
-            trace(logger, "Adding account type '" + name + "'.");
-            configurationBusiness.addAccount(name, groups);
-        } catch (BusinessException ex) {
-            throw new CoreException(ex);
-        }
-    }
-
-    @Override
-    public void updateAccount(String oldName, String newName, List<String> groups)
-            throws CoreException {
-        try {
-            authenticateSystemAdministrator(logger);
-            trace(logger, "Updating account type from '" + oldName + "' to '" + newName + "'.");
-            configurationBusiness.updateAccount(oldName, newName, groups);
         } catch (BusinessException ex) {
             throw new CoreException(ex);
         }

@@ -1,34 +1,380 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <meta charset="utf-8">
-        <title>VIP</title>
-        <link rel="stylesheet" href="css/style.css" />
-        <link rel="icon" type="image/png" href="images/core/vip-logo-without-text.png" />
+<head>
+    <meta charset="utf-8">
+    <title>VIP</title>
+    <link rel="icon" type="image/png" href="images/core/vip-logo-without-text.png" />
 
-        <script type="text/javascript">
-          // This must be done before SmartClient is loaded.  See:
-          // https://www.smartclient.com/smartclient-release/isomorphic/system/reference/?id=group..simpleNamesMode
-          window.isc_useSimpleNames = false;
-        </script>
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="icon" href="images/core/vip-logo-without-text.png">
+    <!-- Google font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Yellowtail&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat&family=Ubuntu&family=Yellowtail&display=swap" rel="stylesheet">
 
-        <meta name='gwt:module' content='fr.insalyon.creatis.vip.portal.Main=fr.insalyon.creatis.vip.portal.Main'>
-        <script language="javascript" src="fr.insalyon.creatis.vip.portal.Main/fr.insalyon.creatis.vip.portal.Main.nocache.js"></script>
-        <script language="javascript" src="fr.insalyon.creatis.vip.portal.Main/jquery-1.7.2.min.js"></script>
+    <!-- Font Awesome-->
+    <script src="https://kit.fontawesome.com/945d9bd0aa.js" crossorigin="anonymous"></script>
 
-        <!-- For the image viewer -->
-        <script language="javascript" src="js/dat.gui-0.6.5.min.js"></script>
-        <script language="javascript" src="js/three-r105.min.js"></script>
-        <script language="javascript" src="js/ami-0.32.0.js"></script>
-        <script language="javascript" src="js/ami-viewer.js"></script>
+    <script language="javascript" src="fr.insalyon.creatis.vip.portal.Main/jquery-1.7.2.min.js"></script>
+    <!--script language="javascript" src="fr.insalyon.creatis.vip.portal.Main/fr.insalyon.creatis.vip.portal.Main.nocache.js"></script-->
 
-        <!-- Other javascript -->
-        <script language="javascript" src="js/dataUpload.js"></script>
-        <script language="javascript" src="js/clickHandlers.js"></script>
-        <script language="javascript" src="js/macroParser.js"></script>
-        <script language="javascript" src="js/jszip.js"></script>
-    </head>
+    <!-- For the image viewer -->
+    <script language="javascript" src="js/dat.gui-0.6.5.min.js"></script>
+    <script language="javascript" src="js/three-r105.min.js"></script>
+    <script language="javascript" src="js/ami-0.32.0.js"></script>
+    <script language="javascript" src="js/ami-viewer.js"></script>
 
-    <body>
-    </body>
+    <!-- Other javascript -->
+    <script language="javascript" src="js/dataUpload.js"></script>
+    <script language="javascript" src="js/clickHandlers.js"></script>
+    <script language="javascript" src="js/macroParser.js"></script>
+    <script language="javascript" src="js/jszip.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/dt/dt-1.13.1/datatables.min.css"/>
+    <script type="text/javascript" src="https://cdn.datatables.net/v/dt/dt-1.13.1/datatables.min.js"></script>
+
+    <!-- For the sign in -->
+    <script language="javascript" src="js/sign-in.js"></script>
+</head>
+
+<body style="font-family: 'Montserrat', sans-serif;">
+
+<section id="navbar">
+    <div class="container-fluid p-0">
+        <!-- Navigation bar -->
+        <nav class="navbar navbar-expand-lg" style="background-color: #0095d6;">
+            <a class="navbar-brand" style="color: white;" href="#">
+                <img src="images/core/vip-logo-without-text.png" alt="" width="50" height="50" class="d-inline-block">
+                VIP
+            </a>
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="#tableApp">Applications</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#tablePublication">Publications</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#team">Team</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="https://vip.creatis.insa-lyon.fr/documentation/">Documentation</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="https://vip.creatis.insa-lyon.fr/documentation/privacypolicy.html">Privacy Policy</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="https://www.creatis.insa-lyon.fr/vip/news.html">News</a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+</section>
+<section id="welcome">
+    <div class="container-fluid text-center" id="welcome_ paragraphe">
+        <div class="row gx-5">
+            <div class="col" id="welcome_col">
+                <h1 id="main_title">Welcome on the <br> <span>V</span>irtual <span>I</span>maging <span>P</span>latform</h1>
+                <p>Medical imaging applications as a service</p>
+                <p>Contact us: <strong>vip-support@creatis.insa-lyon.fr</strong>.</p>
+            </div>
+            <div class="col" id="welcome_signin">
+                <form class="text-center">
+                    <h2 class="mb-3 fw-normal">Please sign in</h2>
+                    <!-- THIS IS BOOTSTRAP ALERT -->
+                    <div class='alert alert-danger' style='display:none' id='enter-email-failed'>
+                        Please enter your email address.
+                    </div>
+                    <div class='alert alert-danger' style='display:none' id='reset-failed'>
+                        There was a problem resetting your password. Please try again.
+                    </div>
+                    <div class='alert alert-danger' style='display:none' id='resetPassword-failed'>
+                        The entered passwords do not match.
+                    </div>
+                    <div class='alert alert-danger' style='display:none' id='login-failed'>
+                        The email isn't valid.
+                    </div>
+                    <div class='alert alert-danger' style='display:none' id='auth-failed'>
+                        The username or password you entered is incorrect.
+                    </div>
+                    <div class='alert alert-danger' style='display:none' id='email-not-found-error'>
+                        There is no user registered with this email.
+                    </div>
+                    <div class='alert alert-warning' style='display:none' id='forgot_password'>
+                        To reset your password, enter the email address you use to sign in in to VIP. <br>
+                        <label for="floatingInput">Email address</label>
+                        <input type="email_warning" class="form-control" id="floatingEmailWarning" placeholder="name@example.com">
+                        <br>
+                        <a type="button" class="btn btn-primary btn-lg btn-block" onclick="continue_forgotpsw()" style="background-color: #0095d6;">Continue</a>
+                    </div>
+
+                    <div class="form-floating">
+                        <input type="email" class="form-control" id="floatingEmail" placeholder="name@example.com">
+                        <label for="floatingInput">Email address</label>
+                    </div>
+                    <div class="form-floating">
+                        <input type="password" class="form-control" id="floatingPassword" placeholder="Password">
+                        <label for="floatingPassword">Password</label>
+                        <div class="d-flex justify-content-around align-items-center mb-4">
+                            <!-- Checkbox -->
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="" id="form1Example3" checked />
+                                <label class="form-check-label" for="form1Example3"> Remember me </label>
+                            </div>
+                            <a href="#!" onclick="forgot_password()">Forgot password?</a>
+                        </div>
+
+                        <!-- Submit button -->
+                        <a type="button" class="btn btn-primary btn-lg btn-block" onclick="clickinner()" style="background-color: #0095d6;">Sign in</a>
+                        <a type="button" class="btn btn-primary btn-lg btn-block" onclick="createAnAccount()" style="background-color: #0095d6;">Create an account</a>
+
+                        <!-- divider
+                        <div class="divider d-flex align-items-center my-4 " id="divider_signin">
+                            <h2 class="text-center mx-3 mb-0 ">OR</h2>
+                        </div> -->
+                        <hr id="signin_hr">
+                        <br>
+                        <!-- EGI check-in button -->
+                        <a class="button-blue-border" href="/oauth2/authorize-client/egi"
+                           role="button">
+                            Login with EGI Check-in
+                        </a>
+
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+<section id="presentation">
+    <img class="mb-4" src="images/core/vip-logo.png" alt="" width="220" height="150">
+    <p class="text-center">VIP is a web portal for medical imaging applications. It allows you to access scientific applications
+        as a service (directly through your web browser with no installation required), as well as distributed
+        computing resources in a transparent manner. It exploits the resources available in the biomed virtual
+        organization of the EGI e-infrastructure to offer an open service to researchers worldwide. <br>
+        This portal is exclusively dedicated to non-commercial academic use, as indicated in the <a href="https://vip.creatis.insa-lyon.fr/documentation/terms.html">terms of use</a>. For commercial use, Please
+        contact us at <strong>vip-support@creatis.insa-lyon.fr</strong>.
+    </p>
+
+</section>
+<section id="features">
+    <div class="row">
+        <div class="feature-box col-lg-4">
+            <i class="icon fa-solid fa-atom fa-5x"></i>
+            <h3 class="fw-bold">Scientific applications as a Service</h3>
+            <p style="font-size: medium; color: #8f8f8f;">Use existing applications on VIP & Import your own application and make it available to the community</p>
+        </div>
+        <div class="feature-box col-lg-4">
+            <i class="icon fa-regular fa-eye fa-5x"></i>
+            <h3 class="fw-bold">Transparent access to computing resources</h3>
+            <p style="font-size: medium; color: #8f8f8f;">VIP uses EGI biomed resources in a transparent way</p>
+        </div>
+        <div class="feature-box col-lg-4">
+            <i class="icon fa-solid fa-book-open-reader fa-5x"></i>
+            <h3 class="fw-bold">Various use-cases</h3>
+            <p style="font-size: medium; color: #8f8f8f;">Scientific challenges & Web portal and API </p>
+        </div>
+    </div>
+
+</section>
+<hr class="style_hr">
+<section id="tableApp">
+    <h2>List of Applications</h2>
+    <p class="text-center">This is the list of applications publicly available on VIP. You can see in the last
+        colum which group(s) give access to each application. Once registered and logged onto VIP, you can configure
+        the groups you belong to by accessing your account page. Please refresh the VIP page after updating your groups to apply the change.</p>
+    <table class="table table-striped" id="appTable">
+        <thead>
+        <tr>
+            <th scope="col">#</th>
+            <th scope="col">Application Name</th>
+            <th scope="col">Classes</th>
+            <th scope="col">Groups</th>
+        </tr>
+        </thead>
+        <tbody id="my_tbody_app">
+        </tbody>
+    </table>
+</section>
+<hr class="style_hr">
+<section id="tablePublication">
+    <h2>List of Publications</h2>
+    <table class="table table-striped" id="id_table_Publication">
+        <thead>
+        <tr>
+            <th scope="col">#</th>
+            <th scope="col">Title</th>
+            <th scope="col">Type</th>
+            <th scope="col">Journal, Conference or Book Name</th>
+            <th scope="col">Authors</th>
+            <th scope="col">Date</th>
+            <th scope="col">VIP Application</th>
+        </tr>
+        </thead>
+        <tbody id="my_tbody_publi">
+        </tbody>
+    </table>
+</section>
+<hr class="style_hr">
+<section id="team">
+    <h2>Current team</h2>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-12 col-md-6">
+                <div class="card border-0 shadow-lg pt-5 my-5 position-relative">
+                    <div class="card-body p-4">
+                        <div class="member-profile position-absolute w-100 text-center">
+                            <img class="rounded-circle mx-auto d-inline-block shadow-sm" src="images/team/sorina_pop.jpg" alt="">
+                        </div>
+                        <div class="card-text pt-1">
+                            <h5 class="member-name mb-0 text-center text-primary font-weight-bold">Sorina Pop</h5>
+                            <div class="mb-3 text-center">Project Manager - CREATIS</div>
+                            <p class="infoProject"><a href="https://www.creatis.insa-lyon.fr/site7/fr/users/camarasu">More info</a></p>
+
+                        </div>
+                    </div><!--//card-body-->
+                </div><!--//card-->
+            </div><!--//col-->
+
+            <div class="col-12 col-md-6">
+                <div class="card border-0 shadow-lg pt-5 my-5 position-relative">
+                    <div class="card-body p-4">
+                        <div class="member-profile position-absolute w-100 text-center">
+                            <img class="rounded-circle mx-auto d-inline-block shadow-sm" src="images/team/axel_bonnet.jpg" alt="">
+                        </div>
+                        <div class="card-text pt-1">
+                            <h5 class="member-name mb-0 text-center text-primary font-weight-bold">Axel Bonnet</h5>
+                            <div class="mb-3 text-center">Main developer - CREATIS</div>
+                            <p class="infoProject"><a href="https://www.egi.eu/people/axel-bonnet/">More info</a></p>
+                        </div>
+                    </div><!--//card-body-->
+                </div><!--//card-->
+            </div><!--//col-->
+
+            <div class="col-12 col-md-6 col-lg-4">
+                <div class="card border-0 shadow-lg pt-5 my-5 position-relative">
+                    <div class="card-body p-4">
+                        <div class="member-profile position-absolute w-100 text-center">
+                            <img class="rounded-circle mx-auto d-inline-block shadow-sm" src="images/team/gael_vila.jpg" alt="">
+                        </div>
+                        <div class="card-text pt-1">
+                            <h5 class="member-name mb-0 text-center text-primary font-weight-bold">Gaël Vila</h5>
+                            <div class="mb-3 text-center">Post-Doctorant - ReproVIP</div>
+                            <p class="infoProject"><a href="https://www.creatis.insa-lyon.fr/reprovip/">More info about ReproVIP project</a></p>
+                        </div>
+                    </div><!--//card-body-->
+                </div><!--//card-->
+            </div><!--//col-->
+            <div class="col-12 col-md-6 col-lg-4">
+                <div class="card border-0 shadow-lg pt-5 my-5 position-relative">
+                    <div class="card-body p-4">
+                        <div class="member-profile position-absolute w-100 text-center">
+                            <img class="rounded-circle mx-auto d-inline-block shadow-sm" src="images/team/sandesh_patil.jpg" alt="">
+                        </div>
+                        <div class="card-text pt-1">
+                            <h5 class="member-name mb-0 text-center text-primary font-weight-bold">Sandesh Patil</h5>
+                            <div class="mb-3 text-center">Research Engineer - FLI-IAM</div>
+                            <p class="infoProject"><a href="https://www.francelifeimaging.fr/">More info about FLI-IAM project</a></p>
+                        </div>
+                    </div><!--//card-body-->
+                </div><!--//card-->
+            </div><!--//col-->
+            <div class="col-12 col-md-6 col-lg-4">
+                <div class="card border-0 shadow-lg pt-5 my-5 position-relative">
+                    <div class="card-body p-4">
+                        <div class="member-profile position-absolute w-100 text-center">
+                            <img class="rounded-circle mx-auto d-inline-block shadow-sm" src="images/team/alex_cornier.jpg" alt="">
+                        </div>
+                        <div class="card-text pt-1">
+                            <h5 class="member-name mb-0 text-center text-primary font-weight-bold">Alexandre Cornier</h5>
+                            <div class="mb-3 text-center">Research Engineer - EGI-ACE</div>
+                            <p class="infoProject"><a href="https://www.egi.eu/project/egi-ace/">More info about EGI-ACE project</a></p>
+                        </div>
+                    </div><!--//card-body-->
+                </div><!--//card-->
+            </div><!--//col-->
+        </div><!--//row-->
+
+    </div>
+    <h2>Former contributors to the projects</h2>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-12 col-md-6">
+                <div class="card border-0 shadow-lg pt-5 my-5 position-relative">
+                    <div class="card-body p-4">
+                        <div class="member-profile position-absolute w-100 text-center">
+                            <img class="rounded-circle mx-auto d-inline-block shadow-sm" src="images/team/tristan_glatard.jpg" alt="">
+                        </div>
+                        <div class="card-text pt-1">
+                            <h5 class="member-name mb-0 text-center text-primary font-weight-bold">Tristan Glatard</h5>
+                            <div class="mb-3 text-center">VIP Founder</div>
+                            <div class="mb-3 text-center">Associate Professor, Computer Science and Software Engineering - Concordia University</div>
+                            <p class="infoProject"><a href="https://users.encs.concordia.ca/~tglatard/">More info</a></p>
+                        </div>
+                    </div><!--//card-body-->
+                </div><!--//card-->
+            </div><!--//col-->
+
+            <div class="col-12 col-md-6">
+                <div class="card border-0 shadow-lg pt-5 my-5 position-relative">
+                    <div class="card-body p-4">
+                        <div class="member-profile position-absolute w-100 text-center">
+                            <img class="rounded-circle mx-auto d-inline-block shadow-sm" src="images/team/rafael_silva.jpg" alt="">
+                        </div>
+                        <div class="card-text pt-1">
+                            <h5 class="member-name mb-0 text-center text-primary font-weight-bold">Rafael Ferreira da Silva</h5>
+                            <div class="mb-3 text-center">Senior Research Scientist - Oak Ridge National Laboratory</div>
+                            <br>
+                            <br>
+                            <br>
+                            <p class="infoProject"><a href="https://rafaelsilva.com/">More info</a></p>
+                        </div>
+                    </div><!--//card-body-->
+                </div><!--//card-->
+            </div><!--//col-->
+        </div>
+
+        <h2>The platform's steering committee</h2>
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-12 col-md-6 col-lg-4">
+                    <div class="card border-0 shadow-lg pt-5 my-5 position-relative">
+                        <div class="card-body p-4">
+                            <div class="card-text pt-1">
+                                <h5 class="member-name mb-0 text-center text-primary font-weight-bold">Olivier Beuf</h5>
+                                <div class="mb-3 text-center">Director of CREATIS laboratory</div>
+                                <br>
+                            </div>
+                        </div><!--//card-body-->
+                    </div><!--//card-->
+                </div><!--//col-->
+                <div class="col-12 col-md-6 col-lg-4">
+                    <div class="card border-0 shadow-lg pt-5 my-5 position-relative">
+                        <div class="card-body p-4">
+                            <div class="card-text pt-1">
+                                <h5 class="member-name mb-0 text-center text-primary font-weight-bold">Hugues BENOIT-CATTIN </h5>
+                                <div class="mb-3 text-center">Deputy Director INSA Lyon in charge of digital</div>
+                            </div>
+                        </div><!--//card-body-->
+                    </div><!--//card-->
+                </div><!--//col-->
+                <div class="col-12 col-md-6 col-lg-4">
+                    <div class="card border-0 shadow-lg pt-5 my-5 position-relative">
+                        <div class="card-body p-4">
+                            <div class="card-text pt-1">
+                                <h5 class="member-name mb-0 text-center text-primary font-weight-bold">Jérôme Pansanel</h5>
+                                <div class="mb-3 text-center">Technical Director at IPHC</div>
+                                <br>
+                            </div>
+                        </div><!--//card-body-->
+                    </div><!--//card-->
+                </div><!--//col-->
+            </div><!--//row-->
+</section>
+</section>
+</body>
 </html>

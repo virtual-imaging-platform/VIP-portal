@@ -140,6 +140,7 @@ public class CheckpointChart extends AbstractChart {
                     failedJobs++;
                     break;
                 case CANCELLED:
+                case DELETED:
                     cancelled = nb_occ;
                     occCancelled += nb_occ;
             }

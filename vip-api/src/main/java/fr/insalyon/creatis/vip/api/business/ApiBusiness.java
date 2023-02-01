@@ -4,6 +4,8 @@ import fr.insalyon.creatis.vip.api.CarminProperties;
 import fr.insalyon.creatis.vip.api.exception.ApiException;
 import fr.insalyon.creatis.vip.api.model.AuthenticationCredentials;
 import fr.insalyon.creatis.vip.api.model.AuthenticationInfo;
+import fr.insalyon.creatis.vip.core.client.bean.User;
+import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
 import org.slf4j.Logger;
@@ -24,26 +26,39 @@ public class ApiBusiness {
         this.configurationBusiness = configurationBusiness;
     }
 
-    public AuthenticationInfo authenticate(AuthenticationCredentials authCreds)
+    public AuthenticationInfo authenticate(AuthenticationCredentials authCreds) throws ApiException {
+        return authenticate(authCreds, false);
+    }
+
+    public AuthenticationInfo authenticateSession(AuthenticationCredentials authCreds) throws ApiException {
+        return authenticate(authCreds, true);
+    }
+
+    public AuthenticationInfo authenticate(AuthenticationCredentials authCreds, boolean initSession)
             throws ApiException {
         String username = authCreds.getUsername(), password = authCreds.getPassword();
         logger.debug("Verifying credential for " + username);
-        signin(username, password);
+        User user = signin(username, password);
         logger.debug("Constructing authentication info for " + username);
         AuthenticationInfo authInfo = new AuthenticationInfo();
-        String headerName = env.getProperty(CarminProperties.APIKEY_HEADER_NAME);
-        String apikey = getAnApikeyForUser(username); // the username is an email
-        authInfo.setHttpHeader(headerName);
-        authInfo.setHttpHeaderValue(apikey);
+        if (initSession) {
+            authInfo.setHttpHeader(CoreConstants.COOKIES_SESSION);
+            authInfo.setHttpHeaderValue(user.getSession());
+        } else {
+            authInfo.setHttpHeader(env.getProperty(CarminProperties.APIKEY_HEADER_NAME));
+            String apikey = getAnApikeyForUser(username); // the username is an email
+            authInfo.setHttpHeaderValue(apikey);
+        }
         return authInfo;
     }
 
-    private void signin(String username, String password) throws ApiException {
+    private User signin(String username, String password) throws ApiException {
         try {
             // we do not care about the session, we're not in browser action
-            configurationBusiness
-                    .signinWithoutResetingSession(username, password);
+            User user = configurationBusiness
+                    .signin(username, password);
             logger.info("Credentials OK for " + username);
+            return user;
         } catch (BusinessException e) {
             throw new ApiException("Authentication Error", e);
         }

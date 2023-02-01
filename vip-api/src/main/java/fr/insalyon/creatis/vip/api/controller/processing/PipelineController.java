@@ -35,6 +35,7 @@ import fr.insalyon.creatis.vip.api.business.PipelineBusiness;
 import fr.insalyon.creatis.vip.api.controller.ApiController;
 import fr.insalyon.creatis.vip.api.exception.ApiException;
 import fr.insalyon.creatis.vip.api.model.Pipeline;
+import fr.insalyon.creatis.vip.application.client.bean.Application;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,6 +47,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.util.List;
 import java.util.function.Supplier;
 
 /**
@@ -70,6 +72,16 @@ public class PipelineController extends ApiController {
             @RequestParam(required = false) String studyIdentifier) throws ApiException {
         logMethodInvocation(logger, "listPipelines", studyIdentifier);
         return pipelineBusiness.listPipelines(studyIdentifier);
+    }
+
+    @RequestMapping(params = "public")
+    public List<Application> listPublicPipelines() throws ApiException {
+        logMethodInvocation(logger, "listPublicPipelines");
+        List<Application> pipelines = pipelineBusiness.listPublicPipelines();
+        for (Application application : pipelines) {
+            application.removeOwner();
+        }
+        return pipelines;
     }
 
     @RequestMapping("{pipelineId}")

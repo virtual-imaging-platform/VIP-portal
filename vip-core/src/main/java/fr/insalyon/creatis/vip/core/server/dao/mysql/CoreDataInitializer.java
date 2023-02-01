@@ -60,7 +60,6 @@ public class CoreDataInitializer extends JdbcDaoSupport {
         logger.info("Configuring VIP core database.");
         initializeUserTables();
         initializeGroupTables();
-        initializeAccountTables();
         initializeTermsOfUseTable();
     }
 
@@ -145,21 +144,6 @@ public class CoreDataInitializer extends JdbcDaoSupport {
                 logger.error("Error adding admin user to admin group", ex);
             }
         }
-    }
-
-    private void initializeAccountTables() {
-        tableInitializer.createTable("VIPAccounts",
-                "name VARCHAR(255), "
-                        + "PRIMARY KEY (name)");
-
-        tableInitializer.createTable("VIPAccountsGroups",
-                "name VARCHAR(255), "
-                        + "groupname VARCHAR(255), "
-                        + "PRIMARY KEY (name, groupname), "
-                        + "FOREIGN KEY (name) REFERENCES VIPAccounts(name) "
-                        + "ON DELETE CASCADE ON UPDATE CASCADE, "
-                        + "FOREIGN KEY (groupname) REFERENCES VIPGroups(groupname) "
-                        + "ON DELETE CASCADE ON UPDATE CASCADE");
     }
 
     private void initializeTermsOfUseTable() {
