@@ -86,7 +86,7 @@ public interface Server {
 
     String getSamlTrustedCertificate(String issuer);
 
-    String getSAMLAccountType(String issuer);
+    String getSAMLDefaultGroup(String issuer);
 
     String getApplicationImporterFileRepository();
 

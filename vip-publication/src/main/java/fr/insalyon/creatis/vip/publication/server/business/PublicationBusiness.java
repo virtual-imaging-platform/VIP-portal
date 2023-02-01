@@ -65,7 +65,7 @@ public class PublicationBusiness {
      */
     public List<Publication> getPublications()
             throws BusinessException {
-        logger.info("*******************PublicationBusiness getPublications*******************");
+        logger.debug("*******************PublicationBusiness getPublications*******************");
         try {
             return publicationDAO.getList();
         } catch (DAOException ex) {

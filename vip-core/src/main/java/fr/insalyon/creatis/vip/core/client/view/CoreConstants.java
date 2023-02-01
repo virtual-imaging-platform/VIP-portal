@@ -41,7 +41,7 @@ import java.util.Date;
 public class CoreConstants implements IsSerializable {
 
 
-    public static final String VERSION = "v2.3.2";
+    public static final String VERSION = "v2.4";
     // Configuration Labels
     public static final String VO_NAME = "vo.name";
     public static final String VO_ROOT = "vo.root";
@@ -94,7 +94,6 @@ public class CoreConstants implements IsSerializable {
     public static final String TAB_SIGNIN = "signin_tab";
     public static final String TAB_SIGNUP = "signup_tab";
     public static final String TAB_SYSTEM = "system_tab";
-    public static final String TAB_MANAGE_ACCOUNTS = "manage_accounts_tab";
     public static final String TAB_MANAGE_GROUPS = "manage_groups_tab";
     public static final String TAB_MANAGE_TIPS = "manage_tips_tab";
     public static final String TAB_MANAGE_USERS = "manage_users_tab";
@@ -147,14 +146,12 @@ public class CoreConstants implements IsSerializable {
     public static final String FOLDER_FLAGS = IMG_FOLDER + "flags/";
     // Application Names
     public static final String APP_ACCOUNT = "My Account";
-    public static final String APP_ACCOUNT_MANAGER = "Accounts Type";
     public static final String APP_GROUP = "Groups";
     public static final String APP_TIP = "Tips";
     public static final String APP_USER = "Users";
     public static final String APP_SETTING = "Settings";
     // Application Images
     public static final String APP_IMG_ACCOUNT = IMG_FOLDER + "app-account.png";
-    public static final String APP_IMG_ACCOUNT_MANAGER = IMG_FOLDER + "system/app-account.png";
     public static final String APP_IMG_GROUP = IMG_FOLDER + "system/app-group.png";
     public static final String APP_IMG_TIP = IMG_FOLDER + "system/app-tip.png";
     public static final String APP_IMG_USER = IMG_FOLDER + "system/app-user.png";
@@ -165,8 +162,6 @@ public class CoreConstants implements IsSerializable {
     public static final String SESSION_USER = "vip-user";
     public static final String SESSION_GROUPS = "vip-groups";
     public static final Date COOKIES_EXPIRATION_DATE = new Date(new Date().getTime() + (1000l * 60 * 60 * 24 * 7)); //cookies are valid for a week
-    // Account Type
-    public static final String ACCOUNT_OTHER = "Other";
     // Roles and Groups
     public static final String GROUP_SUPPORT = "Support";
     // ssh
@@ -178,7 +173,7 @@ public class CoreConstants implements IsSerializable {
     public static final String UNDESIRED_MAIL_DOMAINS = "account.undesiredEmailDomains";
     public static final String UNDESIRED_COUNTRIES = "account.undesiredCountries";
     public static final String SAML_TRUSTED_CERTIFICATE = "saml.trustedcertificate";
-    public static final String SAML_ACCOUNT_TYPE = "saml.accounttype";
+    public static final String SAML_DEFAULT_GROUP = "saml.defaultgroup";
     //Boutiques
     public static final String APP_CLASS = "boutiques.application.class";
     public static final String APPLICATION_FILES_REPOSITORY = "boutiques.upload.repository";

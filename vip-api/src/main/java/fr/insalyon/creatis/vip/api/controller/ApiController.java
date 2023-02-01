@@ -30,7 +30,7 @@ public abstract class ApiController {
 
     protected void logMethodInvocation(Logger logger, String methodName, Object... parameters) {
         Object user = currentUser() != null ? currentUser() : "Anonymous";
-        logger.info( "({}) Calling API method {}} ({})", user, methodName, parameters);
+        logger.debug( "({}) Calling API method {}} ({})", user, methodName, parameters);
     }
 
 }

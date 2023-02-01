@@ -104,6 +104,6 @@ public abstract class BaseSpringIT {
                 "testPassword", CountryCode.fr,
                 null);
         Mockito.when(gridaClient.exist(anyString())).thenReturn(true, false);
-        configurationBusiness.signup(newUser, "", (String) null);
+        configurationBusiness.signup(newUser, "", (Group) null);
     }
 }

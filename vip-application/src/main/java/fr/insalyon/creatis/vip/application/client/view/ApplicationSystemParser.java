@@ -49,7 +49,7 @@ public class ApplicationSystemParser extends ApplicationParser {
     @Override
     public void loadApplications() {
 
-        if (CoreModule.user.isSystemAdministrator() || CoreModule.user.isGroupAdmin()) {
+        if (CoreModule.user.isSystemAdministrator() || CoreModule.user.isGroupAdmin() || CoreModule.user.isDeveloper()) {
             addApplication(ApplicationConstants.APP_APPLICATION, ApplicationConstants.APP_IMG_APPLICATION);
         }
         if (CoreModule.user.isSystemAdministrator()) {
@@ -64,7 +64,7 @@ public class ApplicationSystemParser extends ApplicationParser {
         if (applicationName.equals(ApplicationConstants.APP_APPLICATION)) {
             Layout.getInstance().addTab(
                 ApplicationConstants.TAB_MANAGE_APPLICATION,
-                ManageApplicationsTab::new);
+                () -> new ManageApplicationsTab(false));
             return true;
         } else if (applicationName.equals(ApplicationConstants.APP_CLASSES)) {
             Layout.getInstance().addTab(

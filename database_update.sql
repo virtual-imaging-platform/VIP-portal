@@ -30,3 +30,9 @@ DROP TABLE VIPDropboxAccounts;
 
 -- v2.2
 alter table VIPAppVersions ADD useBoutiquesForm BOOLEAN;
+
+-- v2.3.2
+ALTER TABLE VIPUsers DROP COLUMN phone;
+
+-- v2.4
+DROP TABLE VIPAccounts;

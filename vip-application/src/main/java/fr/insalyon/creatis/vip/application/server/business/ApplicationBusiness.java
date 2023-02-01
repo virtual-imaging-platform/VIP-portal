@@ -40,6 +40,8 @@ import fr.insalyon.creatis.vip.core.client.bean.Group;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import fr.insalyon.creatis.vip.core.server.dao.GroupDAO;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -54,6 +56,8 @@ import java.util.stream.Collectors;
 @Service
 @Transactional
 public class ApplicationBusiness {
+
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private ApplicationDAO applicationDAO;
     private ClassDAO classDAO;
@@ -70,6 +74,15 @@ public class ApplicationBusiness {
 
         try {
             return applicationDAO.getApplications();
+        } catch (DAOException ex) {
+            throw new BusinessException(ex);
+        }
+    }
+
+    public List<Application> getApplicationsWithOwner(String email) throws BusinessException {
+
+        try {
+            return applicationDAO.getApplicationsWithOwner(email);
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }
@@ -116,11 +129,34 @@ public class ApplicationBusiness {
         }
     }
 
+    public List<Group> getPublicGroupsForApplication(String applicationName) throws BusinessException {
+        try {
+            Application application = this.getApplication(applicationName);
+            if (application == null) {
+                logger.error("No application exists with name {}", applicationName);
+                throw new BusinessException("Wrong application name");
+            }
+            // need to fetch all the groups to get their properties
+            Map<String,Group> allGroups = groupDAO.getGroups().stream().collect(
+                    Collectors.toMap(Group::getName, group -> group));
+            List<Group> appGroups = new ArrayList<>();
+            for (String className : application.getApplicationClasses()) {
+                // need to fetch the classes to get their groups
+                for (String groupName : classDAO.getClass(className).getGroups()) {
+                    appGroups.add(allGroups.get(groupName));
+                }
+            }
+            return appGroups.stream().filter(g -> g.isPublicGroup()).collect(Collectors.toList());
+        } catch (DAOException e) {
+            throw new BusinessException(e);
+        }
+    }
+
     public List<String[]> getApplications(String className)
             throws BusinessException {
 
         try {
-            return applicationDAO.getApplications(className);
+            return applicationDAO.getApplicationsFromClass(className);
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }
@@ -138,7 +174,7 @@ public class ApplicationBusiness {
     public List<Application> getApplications(List<String> classes)
             throws BusinessException {
         try {
-            return applicationDAO.getApplications(classes);
+            return applicationDAO.getApplicationsFromClasses(classes);
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }

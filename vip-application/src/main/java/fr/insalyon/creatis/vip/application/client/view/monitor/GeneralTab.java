@@ -81,7 +81,7 @@ public class GeneralTab extends AbstractCornerTab {
         leftLayout.addMember(inputTreeGrid);
         
         if (CoreModule.user.isSystemAdministrator()
-                || CoreModule.user.isGroupAdmin()) {
+                || CoreModule.user.isGroupAdmin() || CoreModule.user.isDeveloper()) {
             leftLayout.addMember(new LogsLayout(simulationID));
         }
 

@@ -36,6 +36,7 @@ import fr.insalyon.creatis.vip.application.client.bean.AppVersion;
 import fr.insalyon.creatis.vip.application.client.bean.Application;
 import fr.insalyon.creatis.vip.application.server.dao.ApplicationDAO;
 import fr.insalyon.creatis.vip.application.server.dao.ClassDAO;
+import fr.insalyon.creatis.vip.core.client.CoreModule;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,6 +51,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.BooleanSupplier;
 
 /**
  *
@@ -165,21 +167,42 @@ public class ApplicationData extends JdbcDaoSupport implements ApplicationDAO {
 
     @Override
     public List<Application> getApplications() throws DAOException {
+        return this.getApplications((String) null);
+
+    }
+
+    @Override
+    public List<Application> getApplicationsWithOwner(String owner) throws DAOException {
+        return this.getApplications(owner);
+    }
+
+    private List<Application> getApplications(String owner) throws DAOException {
 
         try {
-            PreparedStatement ps = getConnection().prepareStatement("SELECT "
-                                                               + "name, owner, citation FROM "
-                                                               + "VIPApplications ORDER BY name");
+            String requestSql = null;
+            if (owner != null) {
+                requestSql = "SELECT "
+                        + "name, owner, citation FROM "
+                        + "VIPApplications WHERE owner=? ORDER BY name";
+            } else {
+                requestSql = "SELECT "
+                        + "name, owner, citation FROM "
+                        + "VIPApplications ORDER BY name";
+            }
 
+            PreparedStatement ps = getConnection().prepareStatement(requestSql);
+            if (owner != null) {
+                ps.setString(1, owner);
+            }
             ResultSet rs = ps.executeQuery();
             List<Application> applications = new ArrayList<Application>();
 
             while (rs.next()) {
 
-                String owner = rs.getString("owner");
+                String appOwner = rs.getString("owner");
                 PreparedStatement ps3 = getConnection().prepareStatement("SELECT "
                                                                     + "first_name,last_name FROM VIPUsers WHERE email=?");
-                ps3.setString(1, owner);
+                ps3.setString(1, appOwner);
                 ResultSet rs3 = ps3.executeQuery();
                 String firstName = null;
                 String lastName = null;
@@ -214,7 +237,7 @@ public class ApplicationData extends JdbcDaoSupport implements ApplicationDAO {
     }
 
     @Override
-    public List<String[]> getApplications(String className) throws DAOException {
+    public List<String[]> getApplicationsFromClass(String className) throws DAOException {
 
         try {
             PreparedStatement ps = getConnection().prepareStatement("SELECT "
@@ -273,8 +296,7 @@ public class ApplicationData extends JdbcDaoSupport implements ApplicationDAO {
         }
     }
 
-    @Override
-    public List<Application> getApplications(List<String> classes) throws DAOException {
+    public List<Application> getApplicationsFromClasses(List<String> classes) throws DAOException {
 
         try {
             List<Application> applications = new ArrayList<Application>();
