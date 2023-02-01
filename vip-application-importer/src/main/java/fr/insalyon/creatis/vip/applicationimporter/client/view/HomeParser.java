@@ -45,7 +45,7 @@ public class HomeParser extends ApplicationParser {
     @Override
     public void loadApplications() {
 
-        if (CoreModule.user.isSystemAdministrator() || CoreModule.user.hasGroupAccess(Constants.APPLICATION_IMPORTER_GROUP)) {
+        if (CoreModule.user.isSystemAdministrator()|| CoreModule.user.isDeveloper() || CoreModule.user.hasGroupAccess(Constants.APPLICATION_IMPORTER_GROUP)) {
             addApplication(Constants.APP_APPLICATION_IMPORTER, Constants.APP_IMG_IMPORTER);
         }
     }

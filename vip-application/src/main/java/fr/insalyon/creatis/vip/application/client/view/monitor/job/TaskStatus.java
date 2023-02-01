@@ -41,6 +41,8 @@ public enum TaskStatus {
     QUEUED("#DBA400", "Queued"),
     RUNNING("#8CC653", "Running"),
     COMPLETED("#287fd6", "Completed"),
+    DELETED("#FF8575", "Deleted"),
+    DELETED_REPLICA("#287fd6", "Deleted (Replica)"),
     CANCELLED("#FF8575", "Cancelled"),
     CANCELLED_REPLICA("#287fd6", "Cancelled (Replica)"),
     ERROR_FINISHING("#d64949", "Failed"), // not yet in gasw

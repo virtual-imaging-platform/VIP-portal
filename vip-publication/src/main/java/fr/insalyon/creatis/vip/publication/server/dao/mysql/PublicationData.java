@@ -134,7 +134,7 @@ public class PublicationData extends JdbcDaoSupport implements PublicationDAO {
 
     @Override
     public List<Publication> getList() throws DAOException {
-        logger.info("PuBlicationData getList");
+        logger.debug("PuBlicationData getList");
         try {
             String level = null;
             PreparedStatement ps;

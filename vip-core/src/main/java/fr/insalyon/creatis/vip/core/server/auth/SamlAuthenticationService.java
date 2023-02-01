@@ -32,7 +32,6 @@
 package fr.insalyon.creatis.vip.core.server.auth;
 
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
-import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
 import fr.insalyon.creatis.vip.core.server.business.SamlTokenValidator;
 import fr.insalyon.creatis.vip.core.server.business.Server;
 import java.io.IOException;
@@ -45,7 +44,6 @@ import java.util.List;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 
-import fr.insalyon.creatis.vip.core.server.dao.UserDAO;
 import org.apache.commons.codec.binary.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -148,8 +146,8 @@ public class SamlAuthenticationService extends AbstractAuthenticationService {
     }
 
     @Override
-    public String getDefaultAccountType() {
-        return server.getSAMLAccountType(issuer.getValue());
+    public String getDefaultGroup() {
+        return server.getSAMLDefaultGroup(issuer.getValue());
     }
 
     @Override

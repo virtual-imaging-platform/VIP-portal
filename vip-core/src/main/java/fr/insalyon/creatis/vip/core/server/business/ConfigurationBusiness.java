@@ -72,8 +72,7 @@ public class ConfigurationBusiness {
     private EmailBusiness emailBusiness;
     private GRIDAPoolClient gridaPoolClient;
     private GRIDAClient gridaClient;
-    
-    private AccountDAO accountDAO;
+
     private GroupDAO groupDAO;
     private TermsUseDAO termsUseDAO;
     private UserDAO userDAO;
@@ -83,14 +82,13 @@ public class ConfigurationBusiness {
     public ConfigurationBusiness(
             Server server, ProxyClient proxyClient, EmailBusiness emailBusiness,
             GRIDAClient gridaClient, GRIDAPoolClient gridaPoolClient,
-            AccountDAO accountDAO, GroupDAO groupDAO, TermsUseDAO termsUseDAO,
+            GroupDAO groupDAO, TermsUseDAO termsUseDAO,
             UserDAO userDAO, UsersGroupsDAO usersGroupsDAO) {
         this.server = server;
         this.proxyClient = proxyClient;
         this.emailBusiness = emailBusiness;
         this.gridaClient = gridaClient;
         this.gridaPoolClient = gridaPoolClient;
-        this.accountDAO = accountDAO;
         this.groupDAO = groupDAO;
         this.termsUseDAO = termsUseDAO;
         this.userDAO = userDAO;
@@ -146,9 +144,18 @@ public class ConfigurationBusiness {
         }
     }
 
+
     public void signup(
             User user, String comments, boolean automaticCreation,
-            boolean mapPrivateGroups, String... accountType)
+            boolean mapPrivateGroups, Group group)
+            throws BusinessException {
+        this.signup(user, comments, automaticCreation, mapPrivateGroups,
+                group == null ? new ArrayList<>() : Collections.singletonList(group));
+    }
+
+    public void signup(
+            User user, String comments, boolean automaticCreation,
+            boolean mapPrivateGroups, List<Group> groups)
             throws BusinessException {
 
         verifyEmail(user.getEmail());
@@ -204,18 +211,17 @@ public class ConfigurationBusiness {
             userDAO.add(user);
 
             // Adding user to groups
-            List<Group> groups;
-            if (accountType != null) {
-                groups = accountDAO.getGroups(accountType);
-                for (Group group : groups) {
-                    if (mapPrivateGroups || automaticCreation || group.isPublicGroup()) {
-                        usersGroupsDAO.add(user.getEmail(), group.getName(), GROUP_ROLE.User);
-                    } else {
-                        logger.info("Don't map user " + user.getEmail() + " to private group " + group.getName());
-                    }
-                }
-            } else {
+            if (groups == null) {
                 groups = new ArrayList<>();
+            }
+            StringBuilder groupsString = new StringBuilder();
+            for (Group group : groups) {
+                if (mapPrivateGroups || automaticCreation || group.isPublicGroup()) {
+                    usersGroupsDAO.add(user.getEmail(), group.getName(), GROUP_ROLE.User);
+                } else {
+                    logger.info("Don't map user " + user.getEmail() + " to private group " + group.getName());
+                }
+                groupsString.append(group.getName()).append(", ");
             }
 
             if (!automaticCreation) {
@@ -237,14 +243,6 @@ public class ConfigurationBusiness {
                 emailBusiness.sendEmail("VIP account details", emailContent,
                                    new String[]{user.getEmail()}, true, user.getEmail());
 
-                StringBuilder accounts = new StringBuilder();
-                for (String account : accountType) {
-                    if (accounts.length() > 0) {
-                        accounts.append(", ");
-                    }
-                    accounts.append(account);
-                }
-
                 String adminsEmailContents = "<html>"
                                              + "<head></head>"
                                              + "<body>"
@@ -255,7 +253,7 @@ public class ConfigurationBusiness {
                                              + "<p><b>Email:</b> " + user.getEmail() + "</p>"
                                              + "<p><b>Institution:</b> " + user.getInstitution() + "</p>"
                                              + "<p><b>Country:</b> " + user.getCountryCode().getCountryName() + "</p>"
-                                             + "<p><b>Accounts:</b> " + accounts.toString() + "</p>"
+                                             + "<p><b>Groups:</b> " + groupsString + "</p>"
                                              + "<p><b>Comments:</b><br />" + comments + "</p>"
                                              + "<p>&nbsp;</p>"
                                              + "<p>Best Regards,</p>"
@@ -340,9 +338,14 @@ public class ConfigurationBusiness {
         }
     }
 
-    public void signup(User user, String comments, String... accountType)
+
+    public void signup(User user, String comments, Group group) throws BusinessException {
+        signup(user, comments, false, false, group);
+    }
+
+    public void signup(User user, String comments,  List<Group> groups)
             throws BusinessException {
-        signup(user, comments, false, false, accountType);
+        signup(user, comments, false, false, groups);
     }
 
     public User signin(String email, String password) throws BusinessException {
@@ -693,6 +696,12 @@ public class ConfigurationBusiness {
         }
     }
 
+    public Group getGroup(String groupName) throws BusinessException {
+        return this.getGroups().stream()
+                .filter(g -> groupName.equals(g.getName()))
+                .findAny().orElse(null);
+    }
+
     public List<Group> getPublicGroups() throws BusinessException {
         try {
             List<Group> publicGroups = new ArrayList<>();
@@ -919,40 +928,6 @@ public class ConfigurationBusiness {
         return emails.toArray(new String[]{});
     }
 
-    public List<Account> getAccounts() throws BusinessException {
-        try {
-            return accountDAO.getList();
-        } catch (DAOException ex) {
-            throw new BusinessException(ex);
-        }
-    }
-
-    public void addAccount(String name, List<String> groups)
-            throws BusinessException {
-        try {
-            accountDAO.add(name, groups);
-        } catch (DAOException ex) {
-            throw new BusinessException(ex);
-        }
-    }
-
-    public void updateAccount(String oldName, String newName, List<String> groups)
-            throws BusinessException {
-        try {
-            accountDAO.update(oldName, newName, groups);
-        } catch (DAOException ex) {
-            throw new BusinessException(ex);
-        }
-    }
-
-    public void removeAccount(String name) throws BusinessException {
-        try {
-            accountDAO.remove(name);
-        } catch (DAOException ex) {
-            throw new BusinessException(ex);
-        }
-    }
-
     public User getUserWithSession(String email) throws DAOException {
 
         String session = UUID.randomUUID().toString();
@@ -965,7 +940,7 @@ public class ConfigurationBusiness {
         return server.getCasURL() + "/login?service=" + serviceURL;
     }
 
-    public User getOrCreateUser(String email, String institution, String defaultAccountType)
+    public User getOrCreateUser(String email, String institution, String groupName)
             throws BusinessException {
 
         User user;
@@ -988,14 +963,14 @@ public class ConfigurationBusiness {
             user = getNewUser(email, firstName, lastName, institution);
             try {
                 signup(user, "Generated automatically", true, true,
-                       defaultAccountType);
+                       getGroup(groupName));
             } catch (BusinessException ex2) {
                 if (ex2.getMessage().contains("existing")) {
                     //try with a different last name
                     lastName += "_" + System.currentTimeMillis();
                     user = getNewUser(email, firstName, lastName, institution);
                     signup(user, "Generated automatically", true,
-                            true, defaultAccountType);
+                            true, getGroup(groupName));
                 }
             }
             activateUser(user.getEmail());

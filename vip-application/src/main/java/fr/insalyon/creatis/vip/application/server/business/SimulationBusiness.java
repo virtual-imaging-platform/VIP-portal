@@ -138,6 +138,7 @@ public class SimulationBusiness {
                         break;
                     case COMPLETED:
                     case CANCELLED:
+                    case DELETED:
                         if (jobsMap.containsKey(task.getJobID())) {
                             jobsMap.get(task.getJobID()).setStatus(JobStatus.Completed);
                         } else {
@@ -175,6 +176,7 @@ public class SimulationBusiness {
                         }
                         break;
                     case CANCELLED_REPLICA:
+                    case DELETED_REPLICA:
                         // ignore, there should be at least on another task
                         // for the same invocation
                         break;

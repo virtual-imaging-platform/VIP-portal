@@ -46,7 +46,7 @@ public class ApplicationImporterModule extends Module {
 
     @Override
     public void load() {
-        CoreModule.addGeneralApplicationParser(new HomeParser());
+        CoreModule.addSystemApplicationParser(new HomeParser());
     }
 
     @Override

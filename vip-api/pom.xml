@@ -64,6 +64,11 @@ knowledge of the CeCILL-B license and that you accept its terms.
         </dependency>
         <dependency>
             <groupId>fr.insalyon.creatis</groupId>
+            <artifactId>vip-publication</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>fr.insalyon.creatis</groupId>
             <artifactId>vip-datamanager</artifactId>
             <version>${project.version}</version>
         </dependency>

@@ -42,7 +42,6 @@ import fr.insalyon.creatis.vip.core.client.view.common.AbstractFormLayout;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
 import fr.insalyon.creatis.vip.datamanager.client.view.ValidatorUtil;
-
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -136,7 +135,11 @@ public class VIPLayout extends AbstractFormLayout {
      * @return the type
      */
     public String getApplicationType() {
-        return appCbItem._getValue().toString();
+        if (appCbItem._getValue() == null){
+            return null;
+        } else {
+            return appCbItem._getValue().toString();
+        }
     }
 
     private SelectItem createTagsSelect() {
