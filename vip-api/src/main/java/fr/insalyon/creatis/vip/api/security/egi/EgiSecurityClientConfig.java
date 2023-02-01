@@ -34,7 +34,7 @@ public class EgiSecurityClientConfig {
                 .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
                 .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
                 .redirectUri(env.getRequiredProperty(CarminProperties.EGI_REDIRECT_URI))
-                .scope("openid", "profile", "email", "voperson_id")
+                .scope("openid", "profile", "email", "voperson_id", "eduperson_scoped_affiliation")
                 .authorizationUri(env.getRequiredProperty(CarminProperties.EGI_AUTHORIZATION_URI))
                 .tokenUri(env.getRequiredProperty(CarminProperties.EGI_TOKEN_URI))
                 .userInfoUri(env.getRequiredProperty(CarminProperties.EGI_USER_INFO_URI))

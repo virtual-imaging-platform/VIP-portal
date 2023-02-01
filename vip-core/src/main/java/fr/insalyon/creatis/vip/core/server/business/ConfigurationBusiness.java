@@ -389,7 +389,7 @@ public class ConfigurationBusiness {
         }
     }
 
-    public User getNewUser(String email, String firstName, String lastName) {
+    public User getNewUser(String email, String firstName, String lastName, String institution) {
         CountryCode cc = CountryCode.aq;
 
         String country = "";
@@ -412,7 +412,7 @@ public class ConfigurationBusiness {
                 firstName.trim(),
                 lastName.trim(),
                 email.trim(),
-                "Unknown",
+                institution.trim(),
                 "0000",
                 cc, getCurrentTimeStamp());
     }
@@ -940,7 +940,7 @@ public class ConfigurationBusiness {
         return server.getCasURL() + "/login?service=" + serviceURL;
     }
 
-    public User getOrCreateUser(String email, String groupName)
+    public User getOrCreateUser(String email, String institution, String groupName)
             throws BusinessException {
 
         User user;
@@ -960,7 +960,7 @@ public class ConfigurationBusiness {
                 }
             }
 
-            user = getNewUser(email, firstName, lastName);
+            user = getNewUser(email, firstName, lastName, institution);
             try {
                 signup(user, "Generated automatically", true, true,
                        getGroup(groupName));
@@ -968,7 +968,7 @@ public class ConfigurationBusiness {
                 if (ex2.getMessage().contains("existing")) {
                     //try with a different last name
                     lastName += "_" + System.currentTimeMillis();
-                    user = getNewUser(email, firstName, lastName);
+                    user = getNewUser(email, firstName, lastName, institution);
                     signup(user, "Generated automatically", true,
                             true, getGroup(groupName));
                 }

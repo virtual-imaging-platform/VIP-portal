@@ -51,8 +51,19 @@ public class EgiController {
         }
 
         Map<String, Object> userAttributes = authToken.getPrincipal().getAttributes();
+        Object institution = userAttributes.get("eduperson_scoped_affiliation");
+        String domainName;
+        if(institution != null){
+            String institution_string = institution.toString();
+            String temp = institution_string .substring(institution_string .indexOf("@") + 1);
+            domainName = temp.substring(0, temp.indexOf("."));
+            domainName = domainName.toUpperCase();
+        } else {
+            domainName = "Unknown";
+        }
+
         try {
-            User vipUser = configurationBusiness.getOrCreateUser((String) userAttributes.get("email"), null);
+            User vipUser = configurationBusiness.getOrCreateUser((String) userAttributes.get("email"), domainName, null);
             SecurityContextHolder.clearContext(); // destroy spring session and use VIP own session mechanism
             vipSessionBusiness.setVIPSession(request, response, vipUser); // creates VIP cookies and session
         } catch (BusinessException | CoreException e) {
