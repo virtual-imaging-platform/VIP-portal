@@ -74,9 +74,19 @@ public class User implements IsSerializable {
     public User() {
     }
 
+    public User(String firstName, String lastName, String email, String institution, String password, UserLevel level, CountryCode countryCode, String applications) {
+    }
+
     public User(String firstName, String lastName, String email, String institution, UserLevel level, CountryCode countryCode) {
 
         this(firstName, lastName, email, null, institution, "", false, "", "",
+                "", null, null, level, countryCode, 1,null,null,0,false);
+
+    }
+
+    public User(String firstName, String lastName, String email, String institution, String password, UserLevel level, CountryCode countryCode) {
+
+        this(firstName, lastName, email, null, institution, password, false, "", "",
                 "", null, null, level, countryCode, 1,null,null,0,false);
 
     }
@@ -185,6 +195,10 @@ public class User implements IsSerializable {
 
     public boolean isSystemAdministrator() {
         return level == UserLevel.Administrator;
+    }
+
+    public boolean isDeveloper() {
+        return level == UserLevel.Developer;
     }
 
     public String getSession() {

@@ -49,12 +49,13 @@ public class RegisterUserController extends ApiController {
                 signUpUser.getLastName(),
                 signUpUser.getEmail(),
                 signUpUser.getInstitution(),
+                signUpUser.getPassword(),
                 signUpUser.getLevel(),
                 signUpUser.getCountryCode()
                 );
         user.setRegistration(new Date());
         user.setLastLogin(new Date());
-        this.apiUserBusiness.signup(user, signUpUser.getComments(), signUpUser.getAccountTypes());
+        this.apiUserBusiness.signup(user, signUpUser.getComments(), signUpUser.getApplication());
         return new ResponseEntity(HttpStatus.CREATED);
     }
 

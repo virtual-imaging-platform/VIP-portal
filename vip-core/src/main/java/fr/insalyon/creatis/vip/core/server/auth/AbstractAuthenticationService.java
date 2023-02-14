@@ -31,25 +31,19 @@
  */
 package fr.insalyon.creatis.vip.core.server.auth;
 
+import fr.insalyon.creatis.vip.core.client.bean.Group;
 import fr.insalyon.creatis.vip.core.client.bean.User;
-import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.CoreException;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
 import fr.insalyon.creatis.vip.core.server.business.VipSessionBusiness;
 import fr.insalyon.creatis.vip.core.server.dao.*;
-import fr.insalyon.creatis.vip.core.server.rpc.AbstractRemoteServiceServlet;
-import fr.insalyon.creatis.vip.core.server.rpc.ConfigurationServiceImpl;
+
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.sql.Connection;
-import java.util.Date;
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import javax.servlet.ServletException;
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -70,7 +64,7 @@ public abstract class AbstractAuthenticationService extends HttpServlet {
 
     protected abstract String getEmail() throws BusinessException;
 
-    public abstract String getDefaultAccountType();
+    public abstract String getDefaultGroup();
 
     private UserDAO userDAO;
     private ConfigurationBusiness configurationBusiness;
@@ -146,8 +140,8 @@ public abstract class AbstractAuthenticationService extends HttpServlet {
             HttpServletResponse response,
             String email) throws BusinessException, CoreException {
 
-        String accountType = getDefaultAccountType();
-        User user = configurationBusiness.getOrCreateUser(email, accountType);
+        String groupName = getDefaultGroup();
+        User user = configurationBusiness.getOrCreateUser(email, "Unknown", groupName);
         //third-party authentication services will *not* be trusted to let admins in
         if (user.isSystemAdministrator()) {
             authFailedResponse(request, response);

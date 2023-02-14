@@ -359,9 +359,9 @@ public class SpringConfigServer implements Server {
     }
 
     @Override
-    public String getSAMLAccountType(String issuer) {
-        logger.info("Getting account type for issuer "+issuer);
-        return env.getRequiredProperty(CoreConstants.SAML_ACCOUNT_TYPE+"."+issuer);
+    public String getSAMLDefaultGroup(String issuer) {
+        logger.info("Getting default group for issuer "+issuer);
+        return env.getRequiredProperty(CoreConstants.SAML_DEFAULT_GROUP +"."+issuer);
     }
 
     @Override

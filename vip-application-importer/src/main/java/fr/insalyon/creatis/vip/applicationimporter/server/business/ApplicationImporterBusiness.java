@@ -104,7 +104,7 @@ public class ApplicationImporterBusiness {
     }
 
     public void createApplication(
-            BoutiquesApplication bt, String type, String tag, boolean isRunOnGrid, boolean overwriteApplicationVersion, User user)
+            BoutiquesApplication bt, String type, String tag, boolean isRunOnGrid, boolean overwriteApplicationVersion, String fileAccessProtocol, User user)
             throws BusinessException {
 
         try {
@@ -127,8 +127,8 @@ public class ApplicationImporterBusiness {
                     user, bt.getApplicationLFN()).concat("/").concat(bt.getToolVersion().replaceAll("\\s+","")));
 
             // Generate strings
-            String gwendiaString = velocityUtils.createDocument(bt, gwendiaTemplate);
-            String gaswString = velocityUtils.createDocument(tag, bt, isRunOnGrid, gaswTemplate);
+            String gwendiaString = velocityUtils.createDocument(bt, fileAccessProtocol, gwendiaTemplate);
+            String gaswString = velocityUtils.createDocument(tag, bt, isRunOnGrid, fileAccessProtocol, gaswTemplate);
             String wrapperString = velocityUtils.createDocument(tag, bt, isRunOnGrid, wrapperTemplate);
 
             // Write files
@@ -237,7 +237,7 @@ public class ApplicationImporterBusiness {
             return; // any user may create an application (nobody could run it unless an admin adds it to a class
         }
         // Only the owner of an existing application and a system administrator can modify it.
-        if (!user.isSystemAdministrator() && !app.getOwner().equals(user.getEmail())) {
+        if (!user.isSystemAdministrator() && !user.isDeveloper() && !app.getOwner().equals(user.getEmail())) {
             logger.error("{} tried to modify application {} which belongs to {}",
                     user.getEmail(), app.getName(), app.getOwner());
             throw new BusinessException("Permission denied.");

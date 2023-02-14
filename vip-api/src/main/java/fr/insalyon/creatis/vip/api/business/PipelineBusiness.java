@@ -44,13 +44,14 @@ import fr.insalyon.creatis.vip.application.server.business.WorkflowBusiness;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
+import fr.insalyon.creatis.vip.publication.client.bean.Publication;
+import fr.insalyon.creatis.vip.publication.server.business.PublicationBusiness;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
-import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -78,7 +79,7 @@ public class PipelineBusiness {
     public PipelineBusiness(
             Supplier<User> currentUserProvider, Environment env,
             WorkflowBusiness workflowBusiness,
-            ApplicationBusiness applicationBusiness, ClassBusiness classBusiness) {
+            ApplicationBusiness applicationBusiness, PublicationBusiness publicationBusiness, ClassBusiness classBusiness) {
         this.currentUserProvider = currentUserProvider;
         this.env = env;
         this.workflowBusiness = workflowBusiness;
@@ -158,6 +159,14 @@ public class PipelineBusiness {
             return pipelines.toArray(array_pipelines);
         } catch (BusinessException ex) {
             throw new ApiException(ex);
+        }
+    }
+
+    public List<Application> listPublicPipelines() throws ApiException {
+        try {
+             return applicationBusiness.getPublicApplicationsWithGroups();
+        } catch (BusinessException e) {
+            throw new ApiException(e);
         }
     }
 

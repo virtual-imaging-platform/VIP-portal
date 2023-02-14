@@ -87,7 +87,7 @@ public class CoreModule extends Module {
 
         // Add tile grids
         homeTab.addTileGrid(generalTileGrid);
-        if (user.isSystemAdministrator() || user.isGroupAdmin()) {
+        if (user.isSystemAdministrator() || user.isGroupAdmin() || user.isDeveloper()) {
             systemTileGrid.addParser(new SystemParser());
             homeTab.addTileGrid(systemTileGrid);
         }

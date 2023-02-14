@@ -60,11 +60,13 @@ public interface ApplicationDAO {
 
     public List<Application> getApplications() throws DAOException;
 
+    public List<Application> getApplicationsWithOwner(String owner) throws DAOException;
+
     public Application getApplication(String applicationName) throws DAOException;
 
-    public List<String[]> getApplications(String className) throws DAOException;
+    public List<String[]> getApplicationsFromClass(String className) throws DAOException;
 
-    public List<Application> getApplications(List<String> classes) throws DAOException;
+    public List<Application> getApplicationsFromClasses(List<String> classes) throws DAOException;
 
     public List<String> getApplicationsName(String applicationClass) throws DAOException;
 

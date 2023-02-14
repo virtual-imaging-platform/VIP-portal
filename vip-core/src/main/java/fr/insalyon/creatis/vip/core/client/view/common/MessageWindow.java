@@ -117,6 +117,7 @@ public class MessageWindow {
         messageLabel.setWidth(1);
         messageLabel.setHeight(1);
         messageLabel.setContents(title);
+        messageLabel.setCanSelectText(true);
         messageLabel.setIcon(icon);
         messageLabel.addDrawHandler(new DrawHandler() {
             @Override
