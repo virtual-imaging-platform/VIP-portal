@@ -45,14 +45,15 @@ async function createUser(){
     const new_email = document.getElementById("email").value;
     const new_reEmail = document.getElementById("reEmail").value;
     const new_institution = document.getElementById("institution").value;
-    const new_application = document.getElementById("application").value;
     const new_country = document.getElementById("country").value.toLowerCase();
     const new_password = document.getElementById("password").value;
     const new_rePassword = document.getElementById("rePassword").value;
     const emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
 
-    console.log(new_application);
-    console.log(new_country);
+    const selectedApplications = Array.from(document.querySelectorAll('input[name="applications"]:checked'))
+    .map((checkbox) => checkbox.value);
+
+    console.log(selectedApplications);
 
     if (!new_firstName || !new_lastName || !new_email || !new_reEmail || !new_institution || new_application === "Choose your Application" || new_country === "select your country" || !new_password || !new_rePassword) {
         isValid = false;
@@ -113,21 +114,30 @@ function createSelectApp(applications) {
     });
 
     const dropdownToggle = document.createElement("button");
-    dropdownToggle.classList.add("btn", "btn-secondary", "dropdown-toggle");
+    dropdownToggle.classList.add("btn", "btn-primary", "dropdown-toggle");
     dropdownToggle.setAttribute("type", "button");
-    dropdownToggle.setAttribute("id", "application-dropdown");
+    dropdownToggle.setAttribute("id", "select-applications-btn");
     dropdownToggle.setAttribute("data-bs-toggle", "dropdown");
     dropdownToggle.setAttribute("aria-expanded", "false");
-    dropdownToggle.textContent = "Select applications";
+    dropdownToggle.textContent = "Select applications ";
 
     const dropdownMenu = document.createElement("div");
     dropdownMenu.classList.add("dropdown");
     dropdownMenu.appendChild(dropdownToggle);
     dropdownMenu.appendChild(selectContainer);
 
+    dropdownToggle.addEventListener("click", function() {
+      const checkboxes = selectContainer.querySelectorAll("input[name='applications']");
+      const selectedApplications = [];
+      checkboxes.forEach((checkbox) => {
+        if (checkbox.checked) {
+          selectedApplications.push(checkbox.value);
+        }
+      });
+    });
     return dropdownMenu;
   }
-  
+
   fetch('rest/pipelines?public')
     .then((response_app) => response_app.json())
     .then((data) => {
