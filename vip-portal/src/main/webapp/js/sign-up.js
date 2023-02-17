@@ -93,25 +93,41 @@ async function createUser(){
 }
 
 function createSelectApp(applications) {
-    const select = document.createElement("select");
-    select.setAttribute("id", "application");
-    select.classList.add("form-select");
-    select.setAttribute("aria-label", "Default select example");
-
-    const defaultOption = document.createElement("option");
-    defaultOption.textContent = "Choose your Application";
-    select.appendChild(defaultOption);
+    const selectContainer = document.createElement("div");
+    selectContainer.classList.add("dropdown-menu");
+    selectContainer.setAttribute("aria-labelledby", "application-dropdown");
 
     applications.forEach((application) => {
-      const option = document.createElement("option");
-      option.value = application.name;
-      option.textContent = application.name;
-      select.appendChild(option);
+      const label = document.createElement("label");
+      label.classList.add("dropdown-item");
+
+      const checkbox = document.createElement("input");
+      checkbox.type = "checkbox";
+      checkbox.classList.add("form-check-input");
+      checkbox.name = "applications";
+      checkbox.value = application.name;
+
+      label.appendChild(checkbox);
+      label.appendChild(document.createTextNode(" " + application.name));
+      selectContainer.appendChild(label);
     });
 
-    return select;
-  }
+    const dropdownToggle = document.createElement("button");
+    dropdownToggle.classList.add("btn", "btn-secondary", "dropdown-toggle");
+    dropdownToggle.setAttribute("type", "button");
+    dropdownToggle.setAttribute("id", "application-dropdown");
+    dropdownToggle.setAttribute("data-bs-toggle", "dropdown");
+    dropdownToggle.setAttribute("aria-expanded", "false");
+    dropdownToggle.textContent = "Select applications";
 
+    const dropdownMenu = document.createElement("div");
+    dropdownMenu.classList.add("dropdown");
+    dropdownMenu.appendChild(dropdownToggle);
+    dropdownMenu.appendChild(selectContainer);
+
+    return dropdownMenu;
+  }
+  
   fetch('rest/pipelines?public')
     .then((response_app) => response_app.json())
     .then((data) => {
