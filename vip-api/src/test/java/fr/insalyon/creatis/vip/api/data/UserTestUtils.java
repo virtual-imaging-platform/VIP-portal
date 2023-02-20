@@ -38,6 +38,8 @@ import fr.insalyon.creatis.vip.core.client.view.user.UserLevel;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.web.servlet.request.RequestPostProcessor;
 
+import java.util.Collections;
+
 /**
  * Created by abonnet on 7/26/16.
  */
@@ -61,7 +63,7 @@ public class UserTestUtils {
         baseUser2.setFolder("user2");
 
         restUser1 = new SignUpUserDTO("base3", "User3", "baseuser3@test.tst", "test", baseUser2Password,
-                UserLevel.Advanced, null, "test comment", "test applications");
+                UserLevel.Advanced, null, "test comment", Collections.singletonList("test applications"));
     }
 
     public static RequestPostProcessor baseUser1() {

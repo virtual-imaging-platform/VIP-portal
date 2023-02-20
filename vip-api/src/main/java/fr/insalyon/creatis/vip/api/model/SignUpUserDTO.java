@@ -3,6 +3,8 @@ package fr.insalyon.creatis.vip.api.model;
 import fr.insalyon.creatis.vip.core.client.view.user.UserLevel;
 import fr.insalyon.creatis.vip.core.client.view.util.CountryCode;
 
+import java.util.List;
+
 /**
  * @author KhalilKes
  *
@@ -18,12 +20,12 @@ public class SignUpUserDTO {
     private UserLevel level;
     private CountryCode countryCode;
     private String comments;
-    private String application;
+    private List<String> applications;
 
     public SignUpUserDTO(){
 
     }
-    public SignUpUserDTO(String firstName, String lastName, String email, String institution, String password, UserLevel level, CountryCode countryCode, String comments, String application) {
+    public SignUpUserDTO(String firstName, String lastName, String email, String institution, String password, UserLevel level, CountryCode countryCode, String comments, List<String> applications) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
@@ -32,8 +34,9 @@ public class SignUpUserDTO {
         this.level = level;
         this.countryCode = countryCode;
         this.comments = comments;
-        this.application = application;
+        this.applications = applications;
     }
+
 
     public String getFirstName() {
         return firstName;
@@ -99,8 +102,6 @@ public class SignUpUserDTO {
         this.comments = comments;
     }
 
-    public String getApplication() { return application; }
-
-    public void setApplication(String application) { this.application = application;}
+    public List<String> getApplications() { return applications; }
 
 }

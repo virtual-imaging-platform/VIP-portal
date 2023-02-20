@@ -1,11 +1,12 @@
-async function get_fetch(firstName, lastName, email, institution, password, country, application){
+async function get_fetch(firstName, lastName, email, institution, password, country, applications){
+    console.log(applications);
     const data = await fetch('rest/register', {
         method: 'POST',
         headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ "firstName": firstName, "lastName": lastName, "email": email, "institution": institution, "password": password, "countryCode": country, "application": application})
+        body: JSON.stringify({ "firstName": firstName, "lastName": lastName, "email": email, "institution": institution, "password": password, "countryCode": country, "applications": applications})
         })
 
 }
@@ -55,7 +56,7 @@ async function createUser(){
 
     console.log(selectedApplications);
 
-    if (!new_firstName || !new_lastName || !new_email || !new_reEmail || !new_institution || new_application === "Choose your Application" || new_country === "select your country" || !new_password || !new_rePassword) {
+    if (!new_firstName || !new_lastName || !new_email || !new_reEmail || !new_institution || new_country === "select your country" || !new_password || !new_rePassword) {
         isValid = false;
         document.getElementById('emptyFields-failed').style.display = 'block';
         setTimeout(function(){document.getElementById('emptyFields-failed').style.display = 'none'}, 30000);
@@ -82,7 +83,7 @@ async function createUser(){
     }
     if (isValid) {
         try {
-                await get_fetch(new_firstName, new_lastName, new_email, new_institution, new_password, new_country, new_application);
+                await get_fetch(new_firstName, new_lastName, new_email, new_institution, new_password, new_country, selectedApplications);
                 const data = await get_fetch_authenticate(new_email, new_password);
                 setCookie(new_email, data.httpHeaderValue, 7);
             } catch (error) {
@@ -155,5 +156,3 @@ function createSelectApp(applications) {
         const selectAppDiv = document.getElementById("select-app");
         selectAppDiv.appendChild(select);
     });
-
-
