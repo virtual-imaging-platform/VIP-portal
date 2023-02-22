@@ -115,7 +115,7 @@ function createSelectApp(applications) {
     });
 
     const dropdownToggle = document.createElement("button");
-    dropdownToggle.classList.add("btn", "btn-primary", "dropdown-toggle");
+    dropdownToggle.classList.add("btn", "btn-primary", "dropdown-toggle", "w-100");
     dropdownToggle.setAttribute("type", "button");
     dropdownToggle.setAttribute("id", "select-applications-btn");
     dropdownToggle.setAttribute("data-bs-toggle", "dropdown");
