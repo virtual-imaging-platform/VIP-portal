@@ -96,7 +96,7 @@ public class InOutContextMenu extends Menu {
             @Override
             public void onClick(MenuItemClickEvent event) {
                 String folder = node.getName().substring(0, node.getName().lastIndexOf("/"));
-                BrowserLayout.getInstance().loadData(folder, false);
+                BrowserLayout.getInstance().loadData(folder, true);
                 DataManagerModule.dataManagerSection.expand();
             }
         });
