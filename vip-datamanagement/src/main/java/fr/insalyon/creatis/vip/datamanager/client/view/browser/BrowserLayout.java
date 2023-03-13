@@ -31,6 +31,7 @@
  */
 package fr.insalyon.creatis.vip.datamanager.client.view.browser;
 
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.NamedFrame;
 import com.smartgwt.client.types.Overflow;
 import com.smartgwt.client.types.SelectionAppearance;
@@ -79,7 +80,7 @@ public class BrowserLayout extends VLayout {
         this.setOverflow(Overflow.AUTO);
         this.setShowResizeBar(true);
 
-        grid = BrowserUtil.getListGrid();
+        this.grid = BrowserUtil.getListGrid();
         configureGrid();
 
         modal = new ModalWindow(grid);
@@ -160,7 +161,16 @@ public class BrowserLayout extends VLayout {
         modal.hide();
         for (String operationID : result.split("##")) {
             if (!operationID.isEmpty()) {
-                OperationLayout.getInstance().addOperation(operationID);
+                OperationLayout.getInstance().addOperationTest(operationID, new AsyncCallback<String>() {
+                    @Override
+                    public void onFailure(Throwable throwable) {
+
+                    }
+                    @Override
+                    public void onSuccess(String operationPath) {
+                        loadData(operationPath, true);
+                    }
+                });
             }
         }
     }

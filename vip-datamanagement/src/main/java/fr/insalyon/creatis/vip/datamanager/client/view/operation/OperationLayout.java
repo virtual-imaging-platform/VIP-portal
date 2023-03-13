@@ -177,6 +177,31 @@ public class OperationLayout extends VLayout {
             @Override
             public void onSuccess(PoolOperation result) {
                 operationsLayout.addMember(new OperationBoxLayout(result), 0);
+                if (result.getStatus() == PoolOperation.Status.Done){
+                    Layout.getInstance().setWarningMessage(result.getDest() + result.getSource());
+                }
+            }
+        };
+        service.getPoolOperationById(operationID, asyncCallback);
+    }
+
+    public void addOperationTest(final String operationID, final AsyncCallback<String> callback) {
+
+        DataManagerServiceAsync service = DataManagerService.Util.getInstance();
+        AsyncCallback<PoolOperation> asyncCallback = new AsyncCallback<PoolOperation>() {
+
+            @Override
+            public void onFailure(Throwable caught) {
+                Layout.getInstance().setWarningMessage(operationID + "<br />Unable to get operation data:<br />" + caught.getMessage());
+            }
+
+            @Override
+            public void onSuccess(PoolOperation result) {
+                String path = result.getDest() + "/" + result.getSource();
+                operationsLayout.addMember(new OperationBoxLayout(result), 0);
+                if (result.getStatus() == PoolOperation.Status.Done){
+                    callback.onSuccess(path);
+                }
             }
         };
         service.getPoolOperationById(operationID, asyncCallback);
