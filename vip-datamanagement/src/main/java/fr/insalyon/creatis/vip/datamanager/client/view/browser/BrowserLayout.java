@@ -44,9 +44,12 @@ import com.smartgwt.client.widgets.grid.events.CellDoubleClickEvent;
 import com.smartgwt.client.widgets.grid.events.CellDoubleClickHandler;
 import com.smartgwt.client.widgets.layout.VLayout;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
+import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
 import fr.insalyon.creatis.vip.datamanager.client.view.common.BrowserUtil;
 import fr.insalyon.creatis.vip.datamanager.client.view.operation.OperationLayout;
+
+import java.util.List;
 
 /**
  *
@@ -161,15 +164,21 @@ public class BrowserLayout extends VLayout {
         modal.hide();
         for (String operationID : result.split("##")) {
             if (!operationID.isEmpty()) {
-                OperationLayout.getInstance().addOperationTest(operationID, new AsyncCallback<String>() {
+                OperationLayout.getInstance().addOperationAndRefreshForUpload(operationID, new AsyncCallback<List<String>>() {
                     @Override
-                    public void onFailure(Throwable throwable) {
+                    public void onFailure(Throwable caught) {
+                        Layout.getInstance().setWarningMessage(operationID + "<br />Unable to load the data:<br />" + caught.getMessage());
+                    }
 
-                    }
                     @Override
-                    public void onSuccess(String operationPath) {
-                        loadData(operationPath, true);
+                    public void onSuccess(List<String> operationPath) {
+                        String folder = operationPath.get(0);
+                        String file = operationPath.get(1);
+                        String path = operationPath.get(0) + "/" + operationPath.get(1);
+                        loadData(path, true);
+                        loadData(folder, true);
                     }
+
                 });
             }
         }

@@ -80,7 +80,7 @@ public class BasicBrowserToolStrip extends ToolStrip {
                 if (!pathItem.getValueAsString().equals(DataManagerConstants.ROOT)) {
                     String newPath = pathItem.getValueAsString();
                     BrowserUtil.loadData(modal, grid, toolStrip,
-                            newPath.substring(0, newPath.lastIndexOf("/")), false);
+                            newPath.substring(0, newPath.lastIndexOf("/")), true);
                 }
             }
         }));

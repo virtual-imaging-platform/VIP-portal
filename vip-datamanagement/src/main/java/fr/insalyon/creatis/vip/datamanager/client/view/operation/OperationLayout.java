@@ -42,6 +42,8 @@ import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
 import fr.insalyon.creatis.vip.datamanager.client.bean.PoolOperation;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerService;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerServiceAsync;
+
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -185,7 +187,7 @@ public class OperationLayout extends VLayout {
         service.getPoolOperationById(operationID, asyncCallback);
     }
 
-    public void addOperationTest(final String operationID, final AsyncCallback<String> callback) {
+    public void addOperationAndRefreshForUpload(final String operationID, final AsyncCallback<List<String>> callback) {
 
         DataManagerServiceAsync service = DataManagerService.Util.getInstance();
         AsyncCallback<PoolOperation> asyncCallback = new AsyncCallback<PoolOperation>() {
@@ -197,10 +199,12 @@ public class OperationLayout extends VLayout {
 
             @Override
             public void onSuccess(PoolOperation result) {
-                String path = result.getDest() + "/" + result.getSource();
+                String folder = result.getDest();
+                String file = result.getSource();
                 operationsLayout.addMember(new OperationBoxLayout(result), 0);
                 if (result.getStatus() == PoolOperation.Status.Done){
-                    callback.onSuccess(path);
+                    List<String> folderAndFile = Arrays.asList(folder, file);
+                    callback.onSuccess(folderAndFile);
                 }
             }
         };
