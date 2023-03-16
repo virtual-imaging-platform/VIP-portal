@@ -46,6 +46,8 @@ import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerServiceAsync;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import com.google.gwt.user.client.Timer;
+
 
 /**
  *
@@ -179,17 +181,28 @@ public class OperationLayout extends VLayout {
             @Override
             public void onSuccess(PoolOperation result) {
                 operationsLayout.addMember(new OperationBoxLayout(result), 0);
-                if (result.getStatus() == PoolOperation.Status.Done){
-                    Layout.getInstance().setWarningMessage(result.getDest() + result.getSource());
-                }
             }
         };
         service.getPoolOperationById(operationID, asyncCallback);
     }
 
-    public void addOperationAndRefreshForUpload(final String operationID, final AsyncCallback<List<String>> callback) {
-
+    public void addOperationWithCallback(final String operationID, final AsyncCallback<List<String>> callback) {
         DataManagerServiceAsync service = DataManagerService.Util.getInstance();
+        service.getPoolOperationById(operationID, new AsyncCallback<PoolOperation>() {
+            @Override
+            public void onFailure(Throwable caught) {
+                Layout.getInstance().setWarningMessage(operationID + "<br />Unable to get operation data:<br />" + caught.getMessage());
+            }
+
+            @Override
+            public void onSuccess(PoolOperation result) {
+                operationsLayout.addMember(new OperationBoxLayout(result), 0);
+                checkOperationStatus(service, operationID, callback);
+            }
+        });
+    }
+
+    private void checkOperationStatus(DataManagerServiceAsync service, final String operationID, final AsyncCallback<List<String>> callback) {
         AsyncCallback<PoolOperation> asyncCallback = new AsyncCallback<PoolOperation>() {
 
             @Override
@@ -201,13 +214,23 @@ public class OperationLayout extends VLayout {
             public void onSuccess(PoolOperation result) {
                 String folder = result.getDest();
                 String file = result.getSource();
-                operationsLayout.addMember(new OperationBoxLayout(result), 0);
-                if (result.getStatus() == PoolOperation.Status.Done){
+
+                if (result.getStatus() == PoolOperation.Status.Done) {
                     List<String> folderAndFile = Arrays.asList(folder, file);
                     callback.onSuccess(folderAndFile);
+                } else {
+                    // Schedule a new check in 500 milliseconds
+                    new Timer() {
+                        @Override
+                        public void run() {
+                            checkOperationStatus(service, operationID, callback);
+                        }
+                    }.schedule(500);
+
                 }
             }
         };
+
         service.getPoolOperationById(operationID, asyncCallback);
     }
 

@@ -101,23 +101,19 @@ public class InOutContextMenu extends Menu {
             }
         });
 
-        if (node.getName().startsWith("/vip/")) {
+        if (node.getName().startsWith(DataManagerConstants.ROOT + "/")) {
+            ArrayList<MenuItem> menuItems = new ArrayList<MenuItem>();
+            BrowserContextMenu.addVizualisers(menuItems, node.getName());
+            menuItems.add(downloadFileItem);
+            menuItems.add(jumpToItem);
+            this.setItems(menuItems.toArray(new MenuItem[menuItems.size()]));
+        } else if (node.getName().startsWith("/vip/")) {
             ArrayList<MenuItem> menuItems = new ArrayList<MenuItem>();
             menuItems.add(downloadFileItem);
             menuItems.add(jumpToItem);
             this.setItems(menuItems.toArray(new MenuItem[menuItems.size()]));
-        } else {
-            if (!node.getType().equals("Simulation")) {
-                if (node.getName().startsWith(DataManagerConstants.ROOT + "/")) {
-                    ArrayList<MenuItem> menuItems = new ArrayList<MenuItem>();
-                    BrowserContextMenu.addVizualisers(menuItems, node.getName());
-                    menuItems.add(downloadFileItem);
-                    menuItems.add(jumpToItem);
-                    this.setItems(menuItems.toArray(new MenuItem[menuItems.size()]));
-                } else {
-                    this.setItems(downloadFilesItem);
-                }
-            }
+        } else if (!node.getType().equals("Simulation")) {
+            this.setItems(downloadFilesItem);
         }
     }
     private void downloadFile(String path) {

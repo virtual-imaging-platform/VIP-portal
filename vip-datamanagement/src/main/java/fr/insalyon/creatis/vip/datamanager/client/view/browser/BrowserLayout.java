@@ -164,7 +164,7 @@ public class BrowserLayout extends VLayout {
         modal.hide();
         for (String operationID : result.split("##")) {
             if (!operationID.isEmpty()) {
-                OperationLayout.getInstance().addOperationAndRefreshForUpload(operationID, new AsyncCallback<List<String>>() {
+                OperationLayout.getInstance().addOperationWithCallback(operationID, new AsyncCallback<List<String>>() {
                     @Override
                     public void onFailure(Throwable caught) {
                         Layout.getInstance().setWarningMessage(operationID + "<br />Unable to load the data:<br />" + caught.getMessage());
@@ -173,12 +173,11 @@ public class BrowserLayout extends VLayout {
                     @Override
                     public void onSuccess(List<String> operationPath) {
                         String folder = operationPath.get(0);
-                        String file = operationPath.get(1);
-                        String path = operationPath.get(0) + "/" + operationPath.get(1);
-                        loadData(path, true);
+                        int lastIndex = folder.lastIndexOf('/');
+                        String parentPath = folder.substring(0, lastIndex);
+                        loadData(parentPath, true);
                         loadData(folder, true);
                     }
-
                 });
             }
         }
