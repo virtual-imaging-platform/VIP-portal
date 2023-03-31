@@ -122,9 +122,9 @@ public class ExternalPlatformBusiness {
                 );
                 return new ParseResult(true, shanoirUri);
             case SRM:
-			    String srmUri = srmStorageBusiness.generateUri(externalPlatform,
-					fileIdentifier, user);
-			    return new ParseResult(true, srmUri);
+	        String srmUri = srmStorageBusiness.generateUri(externalPlatform,
+			fileIdentifier, user);
+	        return new ParseResult(true, srmUri);
             default:
                 String error = "Only girder, shanoir and srm external storages are supported. "
                         + " (found : " + externalPlatform.getType() + " )";
