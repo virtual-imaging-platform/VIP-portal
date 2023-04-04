@@ -38,6 +38,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
+import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerException;
 import fr.insalyon.creatis.vip.datamanager.client.bean.ExternalPlatform;
 import fr.insalyon.creatis.vip.datamanager.client.bean.ExternalPlatform.Type;
 
@@ -48,21 +49,18 @@ import fr.insalyon.creatis.vip.datamanager.client.bean.ExternalPlatform.Type;
 @Transactional
 public class SrmStorageBusiness {
 	private final Logger logger = LoggerFactory.getLogger(getClass());
-
-	public String generateUri(ExternalPlatform externalPlatform,
-			String fileIdentifier, User user) throws BusinessException {
-
+		
+	private LfcPathsBusiness lfcPathsBusiness;
+	
+    	@Autowired
+    	public SrmStorageBusiness(LfcPathsBusiness lfcPathsBusiness) {
+		this.lfcPathsBusiness = lfcPathsBusiness; 
+	}
+	
+	public String generateUri(ExternalPlatform externalPlatform, String fileIdentifier, User user) throws BusinessException, DataManagerException {
 		verifyExternalPlatform(externalPlatform);
-
-		String apiUrl = externalPlatform.getUrl() + "/home/biomed/user/c/creatis/vip/data/users/";
-
-		String UserFolderName = user.getFirstName() + "_" + user.getLastName();
-
-		String userFolderPath;
-
-		userFolderPath = fileIdentifier.substring(fileIdentifier.indexOf("vip/Home") + 8);
-
-		return buildUri(UserFolderName, apiUrl, userFolderPath);
+		String userFolderPath = lfcPathsBusiness.parseBaseDir(user, fileIdentifier);
+		return userFolderPath;
 	}
 
 	private void verifyExternalPlatform(ExternalPlatform externalPlatform) throws BusinessException {
@@ -74,9 +72,5 @@ public class SrmStorageBusiness {
 			logger.error("A srm external storage must have an URL to generate an URI");
 			throw new BusinessException("Cannot generate srm uri");
 		}
-	}
-
-	private String buildUri(String UserFolderName, String apiUrl, String userFolderPath) {
-		return apiUrl + UserFolderName + userFolderPath;
 	}
 }
