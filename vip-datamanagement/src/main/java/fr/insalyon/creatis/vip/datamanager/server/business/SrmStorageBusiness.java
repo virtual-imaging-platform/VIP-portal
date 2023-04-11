@@ -41,6 +41,7 @@ import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerException;
 import fr.insalyon.creatis.vip.datamanager.client.bean.ExternalPlatform;
 import fr.insalyon.creatis.vip.datamanager.client.bean.ExternalPlatform.Type;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Created by Sandesh Patil on 02/07/23(MM/DD/YY).
@@ -57,10 +58,15 @@ public class SrmStorageBusiness {
 		this.lfcPathsBusiness = lfcPathsBusiness; 
 	}
 	
-	public String generateUri(ExternalPlatform externalPlatform, String fileIdentifier, User user) throws BusinessException, DataManagerException {
+	public String generateUri(ExternalPlatform externalPlatform, String fileIdentifier, User user) throws BusinessException {
 		verifyExternalPlatform(externalPlatform);
-		String userFolderPath = lfcPathsBusiness.parseBaseDir(user, fileIdentifier);
-		return userFolderPath;
+		String userFolderPath = "";
+		try {
+			userFolderPath = lfcPathsBusiness.parseBaseDir(user, fileIdentifier);	
+		} catch (DataManagerException e) {
+			throw new BusinessException(e);	
+		}
+		return buildUri(externalPlatform.getUrl(), userFolderPath);
 	}
 
 	private void verifyExternalPlatform(ExternalPlatform externalPlatform) throws BusinessException {
@@ -72,5 +78,8 @@ public class SrmStorageBusiness {
 			logger.error("A srm external storage must have an URL to generate an URI");
 			throw new BusinessException("Cannot generate srm uri");
 		}
+	}
+	private String buildUri(String apiUrl, String userFolderPath) {
+		return apiUrl + "/" + userFolderPath;
 	}
 }
