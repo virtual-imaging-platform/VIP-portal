@@ -1,5 +1,4 @@
 async function get_fetch(firstName, lastName, email, institution, password, country, applications){
-    console.log(applications);
     const data = await fetch('rest/register', {
         method: 'POST',
         headers: {
@@ -56,7 +55,7 @@ async function createUser(){
 
     console.log(selectedApplications);
 
-    if (!new_firstName || !new_lastName || !new_email || !new_reEmail || !new_institution || new_country === "select your country" || !new_password || !new_rePassword) {
+    if (!new_firstName || !new_lastName || !new_email || !new_reEmail || !new_institution || selectedApplications.length === 0 || new_country === "select your country" || new_country === "select your country" || !new_password || !new_rePassword) {
         isValid = false;
         document.getElementById('emptyFields-failed').style.display = 'block';
         setTimeout(function(){document.getElementById('emptyFields-failed').style.display = 'none'}, 30000);

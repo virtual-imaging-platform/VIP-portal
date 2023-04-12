@@ -43,11 +43,11 @@ public class ApiUserBusiness {
     public void signup(User user, String comments, List<String> applicationNames) throws ApiException {
         try {
             List<Group> allGroups = new ArrayList<>();
-            Set<String> groupNames = new HashSet<>(); // utilisé pour vérifier les doublons
+            Set<String> groupNames = new HashSet<>(); //check for duplicates
             for (String applicationName : applicationNames) {
                 List<Group> appGroups = applicationBusiness.getPublicGroupsForApplication(applicationName);
                 for (Group group : appGroups) {
-                    if (!groupNames.contains(group.getName())) { // vérifier les doublons
+                    if (!groupNames.contains(group.getName())) { //check for duplicates
                         allGroups.add(group);
                         groupNames.add(group.getName());
                     }
