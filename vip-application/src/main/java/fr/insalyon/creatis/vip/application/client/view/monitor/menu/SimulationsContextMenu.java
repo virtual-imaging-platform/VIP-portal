@@ -181,28 +181,63 @@ public class SimulationsContextMenu extends Menu {
             }
         });
 
+        MenuItem askPublicExecutionItem = new MenuItem("Request to make this execution public");
+        askPublicExecutionItem.setIcon(ApplicationConstants.ICON_SIMULATION_VIEW);
+        askPublicExecutionItem.addClickHandler(new ClickHandler() {
+            @Override
+            public void onClick(MenuItemClickEvent event) {
+                SC.ask("Do you really want to make this execution public:  ("
+                        + title + ")?", new BooleanCallback() {
+                    @Override
+                    public void execute(Boolean value) {
+                        if (value) {
+                            sendingExecutionAdminEmail();
+                        }
+                    }
+                });
+            }
+        });
+
+        MenuItem makePublicExecutionItem = new MenuItem("Make this execution public");
+        makePublicExecutionItem.setIcon(ApplicationConstants.ICON_SIMULATION_VIEW);
+        makePublicExecutionItem.addClickHandler(new ClickHandler() {
+            @Override
+            public void onClick(MenuItemClickEvent event) {
+                SC.ask("Do you really want to make this execution public:  ("
+                        + title + ")?", new BooleanCallback() {
+                    @Override
+                    public void execute(Boolean value) {
+                        if (value) {
+                            killSimulation();
+                        }
+                    }
+                });
+            }
+        });
+
+
         MenuItemSeparator separator = new MenuItemSeparator();
 
         switch (status) {
             case Running:
                 if (CoreModule.user.isSystemAdministrator()) {
-                    this.setItems(viewItem, killItem, separator, relauchItem, separator, changeUserItem);
+                    this.setItems(viewItem, killItem, separator, relauchItem, separator, changeUserItem, separator, makePublicExecutionItem);
                 } else {
-                    this.setItems(viewItem, killItem, separator, relauchItem);
+                    this.setItems(viewItem, killItem, separator, relauchItem, separator, askPublicExecutionItem);
                 }
                 break;
 
             case Completed:
                 if (CoreModule.user.isSystemAdministrator()) {
-                    this.setItems(viewItem, cleanItem, separator, relauchItem, separator, changeUserItem);
+                    this.setItems(viewItem, cleanItem, separator, relauchItem, separator, changeUserItem, separator, makePublicExecutionItem);
                 } else {
-                    this.setItems(viewItem, cleanItem, separator, relauchItem);
+                    this.setItems(viewItem, cleanItem, separator, relauchItem, separator, askPublicExecutionItem);
                 }
                 break;
 
             case Cleaned:
                 if (CoreModule.user.isSystemAdministrator()) {
-                    this.setItems(viewItem, purgeItem, separator, changeUserItem);
+                    this.setItems(viewItem, purgeItem, separator, changeUserItem, separator, makePublicExecutionItem);
                 } else {
                     this.setItems(viewItem);
                 }
@@ -211,9 +246,9 @@ public class SimulationsContextMenu extends Menu {
             case Failed:
             case Killed:
                 if (CoreModule.user.isSystemAdministrator()) {
-                    this.setItems(viewItem, markCompletedItem, cleanItem, separator, relauchItem, separator, changeUserItem);
+                    this.setItems(viewItem, markCompletedItem, cleanItem, separator, relauchItem, separator, changeUserItem, separator, makePublicExecutionItem);
                 } else {
-                    this.setItems(viewItem, cleanItem, separator, relauchItem);
+                    this.setItems(viewItem, cleanItem, separator, relauchItem, separator, askPublicExecutionItem);
                 }
         }
     }
@@ -335,5 +370,17 @@ public class SimulationsContextMenu extends Menu {
 
     private SimulationsTab getSimulationsTab() {
         return (SimulationsTab) Layout.getInstance().getTab(ApplicationConstants.TAB_MONITOR);
+    }
+
+    private void sendingExecutionAdminEmail() {
+        String adminsEmailContents = "<html>"
+                + "<head></head>"
+                + "<body>"
+                + "<p>Dear Administrator,</p>"
+                + "<p>A new user requested to make an execution public</p>"
+                + "<p>Best Regards,</p>"
+                + "<p>VIP Team</p>"
+                + "</body>"
+                + "</html>";
     }
 }
