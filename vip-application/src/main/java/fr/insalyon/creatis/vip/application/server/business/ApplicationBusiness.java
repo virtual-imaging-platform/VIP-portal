@@ -91,9 +91,9 @@ public class ApplicationBusiness {
     public List<Application> getPublicApplicationsWithGroups() throws BusinessException {
 
         try {
-            Map<String,AppClass> allClasses = classDAO.getClasses().stream().collect(Collectors.toMap(
-                        AppClass::getName, appClass -> appClass));
-            Map<String,Group> allGroups = groupDAO.getGroups().stream().collect(Collectors.toMap(
+            Map<String, AppClass> allClasses = classDAO.getClasses().stream().collect(Collectors.toMap(
+                    AppClass::getName, appClass -> appClass));
+            Map<String, Group> allGroups = groupDAO.getGroups().stream().collect(Collectors.toMap(
                     Group::getName, group -> group));
             Set<String> allVisibleApplicationNames = applicationDAO.getAllVisibleVersions().stream()
                     .map(AppVersion::getApplicationName).collect(Collectors.toSet());
@@ -111,13 +111,19 @@ public class ApplicationBusiness {
                         .map(group -> group.getName())
                         .collect(Collectors.toSet());
 
-                if (currentAppPublicGroups.isEmpty()){
+                List<String> publicClasses = application.getApplicationClasses().stream()
+                        .filter(className -> allClasses.get(className).getGroups().stream()
+                                .map(groupName -> allGroups.get(groupName))
+                                .anyMatch(Group::isPublicGroup))
+                        .collect(Collectors.toList());
+
+                if (currentAppPublicGroups.isEmpty() || publicClasses.isEmpty()){
                     continue;
                 }
 
                 applicationsWithGroups.add(new Application(
                         application.getName(),
-                        application.getApplicationClasses(),
+                        publicClasses,
                         application.getOwner(),
                         application.getFullName(),
                         application.getCitation(),
@@ -128,6 +134,9 @@ public class ApplicationBusiness {
             throw new BusinessException(ex);
         }
     }
+
+
+
 
     public List<Group> getPublicGroupsForApplication(String applicationName) throws BusinessException {
         try {
