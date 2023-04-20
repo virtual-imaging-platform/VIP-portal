@@ -135,9 +135,6 @@ public class ApplicationBusiness {
         }
     }
 
-
-
-
     public List<Group> getPublicGroupsForApplication(String applicationName) throws BusinessException {
         try {
             Application application = this.getApplication(applicationName);
