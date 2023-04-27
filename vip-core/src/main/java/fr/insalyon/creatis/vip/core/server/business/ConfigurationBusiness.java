@@ -923,7 +923,7 @@ public class ConfigurationBusiness {
      * Gets an array of administrator's e-mails
      *
      */
-    private String[] getAdministratorsEmails() throws DAOException {
+    public String[] getAdministratorsEmails() throws DAOException {
         List<String> emails = new ArrayList<>();
         for (User admin : userDAO.getAdministrators()) {
             emails.add(admin.getEmail());

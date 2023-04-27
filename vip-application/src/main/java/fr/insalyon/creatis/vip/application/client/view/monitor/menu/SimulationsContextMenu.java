@@ -40,6 +40,8 @@ import com.smartgwt.client.widgets.menu.MenuItemSeparator;
 import com.smartgwt.client.widgets.menu.events.ClickHandler;
 import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
+import fr.insalyon.creatis.vip.application.client.rpc.ReproVipService;
+import fr.insalyon.creatis.vip.application.client.rpc.ReproVipServiceAsync;
 import fr.insalyon.creatis.vip.application.client.rpc.WorkflowService;
 import fr.insalyon.creatis.vip.application.client.view.common.AbstractSimulationTab;
 import fr.insalyon.creatis.vip.application.client.view.launch.LaunchTab;
@@ -52,6 +54,8 @@ import fr.insalyon.creatis.vip.core.client.CoreModule;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
+import fr.insalyon.creatis.vip.core.server.business.BusinessException;
+import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import java.util.Map;
 
 /**
@@ -68,9 +72,11 @@ public class SimulationsContextMenu extends Menu {
     private String applicationClass;
     private String simulationUser;
 
+    ReproVipServiceAsync reproVipServiceAsync = ReproVipService.Util.getInstance();
+
     public SimulationsContextMenu(ModalWindow modal, final String simulationID,
-            final String title, final SimulationStatus status, String applicationName,
-            String applicationVersion, String applicationClass, String simulationUser) {
+                                  final String title, final SimulationStatus status, String applicationName,
+                                  String applicationVersion, String applicationClass, String simulationUser) {
 
         this.modal = modal;
         this.simulationID = simulationID;
@@ -90,8 +96,8 @@ public class SimulationsContextMenu extends Menu {
             @Override
             public void onClick(MenuItemClickEvent event) {
                 Layout.getInstance().addTab(
-                    AbstractSimulationTab.tabIdFrom(simulationID),
-                    () -> new SimulationTab(simulationID, title, status));
+                        AbstractSimulationTab.tabIdFrom(simulationID),
+                        () -> new SimulationTab(simulationID, title, status));
             }
         });
 
@@ -191,7 +197,7 @@ public class SimulationsContextMenu extends Menu {
                     @Override
                     public void execute(Boolean value) {
                         if (value) {
-                            sendingExecutionAdminEmail();
+                            sendExecutionAdminEmail();
                         }
                     }
                 });
@@ -208,7 +214,7 @@ public class SimulationsContextMenu extends Menu {
                     @Override
                     public void execute(Boolean value) {
                         if (value) {
-                            killSimulation();
+                            sendExecutionAdminEmail();
                         }
                     }
                 });
@@ -353,7 +359,7 @@ public class SimulationsContextMenu extends Menu {
             public void onSuccess(final Map<String, String> result) {
                 modal.hide();
                 String tabId =
-                    ApplicationConstants.getLaunchTabID(applicationName);
+                        ApplicationConstants.getLaunchTabID(applicationName);
                 Layout.getInstance().removeTab(tabId);
                 RelaunchService.getInstance().relaunch(
                         applicationName, applicationVersion, applicationClass, simulationName, result, tabId);
@@ -372,15 +378,19 @@ public class SimulationsContextMenu extends Menu {
         return (SimulationsTab) Layout.getInstance().getTab(ApplicationConstants.TAB_MONITOR);
     }
 
-    private void sendingExecutionAdminEmail() {
-        String adminsEmailContents = "<html>"
-                + "<head></head>"
-                + "<body>"
-                + "<p>Dear Administrator,</p>"
-                + "<p>A new user requested to make an execution public</p>"
-                + "<p>Best Regards,</p>"
-                + "<p>VIP Team</p>"
-                + "</body>"
-                + "</html>";
+    private void sendExecutionAdminEmail() {
+        final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
+            @Override
+            public void onFailure(Throwable caught) {
+                Layout.getInstance().setWarningMessage("Unable to send email to admins:<br />" + caught.getMessage());
+            }
+
+            @Override
+            public void onSuccess(Void result) {
+                Layout.getInstance().setNoticeMessage("Email has been sent to admins.");
+            }
+        };
+        reproVipServiceAsync.executionAdminEmail(simulationUser, callback);
     }
+
 }
