@@ -40,7 +40,8 @@ public class ExternalPlatform {
 
     public enum Type {
         GIRDER,
-        SHANOIR
+        SHANOIR,
+        SRM
     }
 
     private String identifier;
