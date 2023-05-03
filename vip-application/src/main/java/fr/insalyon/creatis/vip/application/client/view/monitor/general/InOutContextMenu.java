@@ -107,11 +107,6 @@ public class InOutContextMenu extends Menu {
             menuItems.add(downloadFileItem);
             menuItems.add(jumpToItem);
             this.setItems(menuItems.toArray(new MenuItem[menuItems.size()]));
-        } else if (node.getName().startsWith("/vip/")) {
-            ArrayList<MenuItem> menuItems = new ArrayList<MenuItem>();
-            menuItems.add(downloadFileItem);
-            menuItems.add(jumpToItem);
-            this.setItems(menuItems.toArray(new MenuItem[menuItems.size()]));
         } else if (!node.getType().equals("Simulation")) {
             this.setItems(downloadFilesItem);
         }
