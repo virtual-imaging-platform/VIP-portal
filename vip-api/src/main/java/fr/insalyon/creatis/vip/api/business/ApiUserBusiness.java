@@ -11,10 +11,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author khalilkes service to signup a user in VIP
@@ -42,18 +40,12 @@ public class ApiUserBusiness {
      */
     public void signup(User user, String comments, List<String> applicationNames) throws ApiException {
         try {
-            List<Group> allGroups = new ArrayList<>();
-            Set<String> groupNames = new HashSet<>(); //check for duplicates
+            Set<Group> allGroups = new TreeSet<>(Comparator.comparing(Group::getName));
             for (String applicationName : applicationNames) {
                 List<Group> appGroups = applicationBusiness.getPublicGroupsForApplication(applicationName);
-                for (Group group : appGroups) {
-                    if (!groupNames.contains(group.getName())) { //check for duplicates
-                        allGroups.add(group);
-                        groupNames.add(group.getName());
-                    }
-                }
+                allGroups.addAll(appGroups);
             }
-            configurationBusiness.signup(user, comments, false, true, allGroups);
+            configurationBusiness.signup(user, comments, false, true, new ArrayList<>(allGroups));
             logger.info("Signing up with the " + user.getEmail());
         } catch (BusinessException e) {
             throw new ApiException("Signing up Error", e);

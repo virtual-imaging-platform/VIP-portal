@@ -53,8 +53,6 @@ async function createUser(){
     const selectedApplications = Array.from(document.querySelectorAll('input[name="applications"]:checked'))
     .map((checkbox) => checkbox.value);
 
-    console.log(selectedApplications);
-
     if (!new_firstName || !new_lastName || !new_email || !new_reEmail || !new_institution || selectedApplications.length === 0 || new_country === "select your country" || new_country === "select your country" || !new_password || !new_rePassword) {
         isValid = false;
         document.getElementById('emptyFields-failed').style.display = 'block';
