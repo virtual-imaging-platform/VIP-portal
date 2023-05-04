@@ -31,6 +31,7 @@
  */
 package fr.insalyon.creatis.vip.datamanager.client.view.operation;
 
+import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.types.Overflow;
 import com.smartgwt.client.types.VerticalAlignment;
@@ -46,7 +47,9 @@ import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerServiceAsync;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
-import com.google.gwt.user.client.Timer;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Semaphore;
+import java.util.function.Supplier;
 
 
 /**
@@ -186,52 +189,53 @@ public class OperationLayout extends VLayout {
         service.getPoolOperationById(operationID, asyncCallback);
     }
 
-    public void addOperationWithCallback(final String operationID, final AsyncCallback<List<String>> callback) {
-        DataManagerServiceAsync service = DataManagerService.Util.getInstance();
-        service.getPoolOperationById(operationID, new AsyncCallback<PoolOperation>() {
+    public void addOperationsWithCallback(String[] operationsIds, AsyncCallback<Void> callback) {
+        if (operationsIds.length == 1) {
+            addOperationWithCallback(operationsIds[0], callback);
+            return;
+        }
+        AsyncCallback<Void> counterCallback = new AsyncCallback<Void>() {
+            Integer counter = operationsIds.length;
             @Override
-            public void onFailure(Throwable caught) {
-                Layout.getInstance().setWarningMessage(operationID + "<br />Unable to get operation data:<br />" + caught.getMessage());
-            }
-
-            @Override
-            public void onSuccess(PoolOperation result) {
-                operationsLayout.addMember(new OperationBoxLayout(result), 0);
-                checkOperationStatus(service, operationID, callback);
-            }
-        });
-    }
-
-    private void checkOperationStatus(DataManagerServiceAsync service, final String operationID, final AsyncCallback<List<String>> callback) {
-        AsyncCallback<PoolOperation> asyncCallback = new AsyncCallback<PoolOperation>() {
+            public void onFailure(Throwable caught) {} // cannot be called
 
             @Override
-            public void onFailure(Throwable caught) {
-                Layout.getInstance().setWarningMessage(operationID + "<br />Unable to get operation data:<br />" + caught.getMessage());
-            }
-
-            @Override
-            public void onSuccess(PoolOperation result) {
-                String folder = result.getDest();
-                String file = result.getSource();
-
-                if (result.getStatus() == PoolOperation.Status.Done) {
-                    List<String> folderAndFile = Arrays.asList(folder, file);
-                    callback.onSuccess(folderAndFile);
-                } else {
-                    // Schedule a new check in 500 milliseconds
-                    new Timer() {
-                        @Override
-                        public void run() {
-                            checkOperationStatus(service, operationID, callback);
-                        }
-                    }.schedule(500);
-
+            public void onSuccess(Void v) {
+                counter--;
+                if (counter == 0) {
+                    callback.onSuccess(null);
                 }
             }
         };
 
-        service.getPoolOperationById(operationID, asyncCallback);
+        DataManagerServiceAsync service = DataManagerService.Util.getInstance();
+        for (String operationID : operationsIds) {
+            service.getPoolOperationById(operationID, new AsyncCallback<PoolOperation>() {
+                @Override
+                public void onFailure(Throwable caught) {
+                    Layout.getInstance().setWarningMessage(operationID + "<br />Unable to get operation data:<br />" + caught.getMessage());
+                }
+
+                @Override
+                public void onSuccess(PoolOperation result) {
+                    operationsLayout.addMember(new OperationBoxLayout(result, counterCallback), 0);
+                }
+            });
+        }
+    }
+
+    public void addOperationWithCallback(String operationID, AsyncCallback<Void> callback) {
+        DataManagerService.Util.getInstance().getPoolOperationById(operationID, new AsyncCallback<PoolOperation>() {
+            @Override
+            public void onFailure(Throwable caught) {
+                Layout.getInstance().setWarningMessage(operationID + "<br />Unable to get operation data:<br />" + caught.getMessage());
+            }
+
+            @Override
+            public void onSuccess(PoolOperation result) {
+                operationsLayout.addMember(new OperationBoxLayout(result, callback), 0);
+            }
+        });
     }
 
     /**

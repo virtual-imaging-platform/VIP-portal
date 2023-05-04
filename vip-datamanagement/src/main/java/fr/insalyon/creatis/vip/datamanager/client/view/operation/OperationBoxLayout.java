@@ -54,6 +54,9 @@ import fr.insalyon.creatis.vip.datamanager.client.bean.PoolOperation.Type;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerService;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerServiceAsync;
 
+import java.util.Arrays;
+import java.util.List;
+
 /**
  *
  * @author Rafael Ferreira da Silva
@@ -65,6 +68,7 @@ public class OperationBoxLayout extends HLayout {
     private VLayout imgLayout;
     private VLayout mainLayout;
     private VLayout actionLayout;
+    private AsyncCallback<Void> callback;
 
     public OperationBoxLayout(PoolOperation operation) {
 
@@ -103,6 +107,12 @@ public class OperationBoxLayout extends HLayout {
         };
         setTimer();
     }
+
+    public OperationBoxLayout(PoolOperation operation, final AsyncCallback<Void> callback) {
+        this(operation);
+        this.callback = callback;
+    }
+
 
     /**
      * Configures the image layout.
@@ -275,11 +285,13 @@ public class OperationBoxLayout extends HLayout {
 
                 if (operation.getStatus() == Status.Done
                         || operation.getStatus() == Status.Failed) {
-
                     timer.cancel();
-
                 } else {
                     setTimer();
+                }
+
+                if (operation.getStatus() == Status.Done) {
+                    callback.onSuccess(null);
                 }
             }
         };

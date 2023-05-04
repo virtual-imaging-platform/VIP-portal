@@ -49,6 +49,7 @@ import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
 import fr.insalyon.creatis.vip.datamanager.client.view.common.BrowserUtil;
 import fr.insalyon.creatis.vip.datamanager.client.view.operation.OperationLayout;
 
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -162,25 +163,21 @@ public class BrowserLayout extends VLayout {
             dataUploadWindow = null;
         }
         modal.hide();
-        for (String operationID : result.split("##")) {
-            if (!operationID.isEmpty()) {
-                OperationLayout.getInstance().addOperationWithCallback(operationID, new AsyncCallback<List<String>>() {
-                    @Override
-                    public void onFailure(Throwable caught) {
-                        Layout.getInstance().setWarningMessage(operationID + "<br />Unable to load the data:<br />" + caught.getMessage());
-                    }
 
-                    @Override
-                    public void onSuccess(List<String> operationPath) {
-                        String folder = operationPath.get(0);
-                        int lastIndex = folder.lastIndexOf('/');
-                        String parentPath = folder.substring(0, lastIndex);
-                        loadData(parentPath, true);
-                        loadData(folder, true);
-                    }
-                });
+        AsyncCallback<Void> callback = new AsyncCallback<Void>() {
+            @Override
+            public void onFailure(Throwable caught) {} // cannot be called
+
+            @Override
+            public void onSuccess(Void v) {
+                loadData(toolStrip.getPath(), true);
             }
-        }
+        };
+
+        String[] operationsIds = result.split("##");
+
+        OperationLayout.getInstance().addOperationsWithCallback(operationsIds, callback);
+
     }
 
     private native void initComplete(BrowserLayout upload) /*-{
