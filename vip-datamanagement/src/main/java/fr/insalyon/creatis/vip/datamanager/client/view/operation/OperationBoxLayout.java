@@ -291,7 +291,9 @@ public class OperationBoxLayout extends HLayout {
                 }
 
                 if (operation.getStatus() == Status.Done) {
-                    callback.onSuccess(null);
+                    if (callback != null) {
+                        callback.onSuccess(null);
+                    }
                 }
             }
         };
