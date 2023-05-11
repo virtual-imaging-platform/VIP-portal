@@ -5,8 +5,12 @@ import com.google.gwt.json.client.JSONObject;
 import com.google.gwt.json.client.JSONParser;
 import fr.insalyon.creatis.vip.application.client.bean.boutiquesTools.*;
 
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Helper class for parsing JSON objects
@@ -16,6 +20,7 @@ import java.util.Set;
  */
 public class BoutiquesParser extends AbstractJsonParser{
 
+	private final Logger logger = LoggerFactory.getLogger(getClass());
     /**
      * Parse JSON Boutiques descriptor
      *
@@ -221,6 +226,14 @@ public class BoutiquesParser extends AbstractJsonParser{
         bof.setPathTemplate(getStringValue(outputFile, "path-template", true));
         bof.setList(getBooleanValue(outputFile, "list", true));
         bof.setOptional(getBooleanValue(outputFile, "optional", true));
+        Set<String> stripExtn=getArrayValueAsStringSet(outputFile, "path-template-stripped-extensions", true);
+        if (stripExtn!=null && !stripExtn.isEmpty()) {
+        	bof.setStripExtension(true);
+        	bof.setPathTemplateStrippedExtensions(getArrayValueAsStringSet(outputFile, "path-template-stripped-extensions", true));
+        }
+        else {
+        	bof.setStripExtension(false);
+        }
         String commandLineFlag = getStringValue(outputFile, "command-line-flag", true);
         commandLineFlag = commandLineFlag == null ? "" : commandLineFlag;
         bof.setCommandLineFlag(commandLineFlag);
