@@ -80,6 +80,6 @@ public class SrmStorageBusiness {
 		}
 	}
 	private String buildUri(String apiUrl, String userFolderPath) {
-		return apiUrl + "/" + DataManagerConstants.USERS_HOME + userFolderPath;
+		return apiUrl + "/" + (DataManagerConstants.USERS_HOME).toLowerCase() + userFolderPath;
 	}
 }
