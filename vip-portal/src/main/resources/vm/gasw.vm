@@ -28,9 +28,16 @@
 #foreach($input in $tool.getInputs())
 #set ($i=$i+1)
 #if($input.getValueKey())
-#set ($value=$value.replace($input.getValueKey(),"$na$i"))
+#set ($isStripExtn="")
+#foreach($extn in $outputFile.getPathTemplateStrippedExtensions())
+#if($input.getValueKey().endsWith($extn))
+#set ($isStripExtn="-s")
+#end	
+#end
+#set ($value=$value.replace($input.getValueKey(),"$na$i$isStripExtn"))
 #end
 #end
+#set ($i=$i+1)
       <template value="$prefix1$dir1/$na1/$value$options1" />
       <access type="LFN"/>
     </output>
