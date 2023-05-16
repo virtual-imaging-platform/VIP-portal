@@ -31,6 +31,7 @@
  */
 package fr.insalyon.creatis.vip.datamanager.server.business;
 
+import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
