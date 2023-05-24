@@ -53,7 +53,9 @@ import fr.insalyon.creatis.vip.application.client.view.monitor.SimulationsTab;
 import fr.insalyon.creatis.vip.core.client.CoreModule;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
+import fr.insalyon.creatis.vip.core.client.view.auth.SignUpTab;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
+import fr.insalyon.creatis.vip.core.client.view.user.MakeExecutionPublicTab;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import java.util.Map;
@@ -214,7 +216,8 @@ public class SimulationsContextMenu extends Menu {
                     @Override
                     public void execute(Boolean value) {
                         if (value) {
-                            sendExecutionAdminEmail();
+                            Layout.getInstance().addTab(
+                                    CoreConstants.TAB_MAKE_EXECUTION_PUBLIC, MakeExecutionPublicTab::new);
                         }
                     }
                 });
