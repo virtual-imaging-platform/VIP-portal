@@ -61,6 +61,7 @@ public class CoreDataInitializer extends JdbcDaoSupport {
         initializeUserTables();
         initializeGroupTables();
         initializeTermsOfUseTable();
+        initializeExecutionTables();
     }
 
     private void initializeUserTables() {
@@ -160,4 +161,24 @@ public class CoreDataInitializer extends JdbcDaoSupport {
             }
         }
     }
+
+    private void initializeExecutionTables() {
+        if (tableInitializer.createTable("ExecutionPublic",
+                "execution_name VARCHAR(255), "
+                        + "version VARCHAR(255), "
+                        + "status VARCHAR(255), "
+                        + "author VARCHAR(255), "
+                        + "comments TEXT, "
+                        + "PRIMARY KEY(execution_name)")) {
+
+            try {
+                usersGroupsDAO.add(server.getAdminEmail(),
+                        CoreConstants.GROUP_SUPPORT,
+                        GROUP_ROLE.Admin);
+            } catch (DAOException ex) {
+                logger.error("Error creating ExecutionPublic table", ex);
+            }
+        }
+    }
+
 }

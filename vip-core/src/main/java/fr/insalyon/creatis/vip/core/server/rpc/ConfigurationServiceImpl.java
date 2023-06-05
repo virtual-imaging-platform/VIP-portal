@@ -32,10 +32,7 @@
 package fr.insalyon.creatis.vip.core.server.rpc;
 
 import fr.insalyon.creatis.grida.client.GRIDAClient;
-import fr.insalyon.creatis.vip.core.client.bean.Account;
-import fr.insalyon.creatis.vip.core.client.bean.Group;
-import fr.insalyon.creatis.vip.core.client.bean.UsageStats;
-import fr.insalyon.creatis.vip.core.client.bean.User;
+import fr.insalyon.creatis.vip.core.client.bean.*;
 import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationService;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants.GROUP_ROLE;
@@ -45,7 +42,9 @@ import fr.insalyon.creatis.vip.core.client.view.util.CountryCode;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
+import fr.insalyon.creatis.vip.core.server.dao.ExecutionPublicDAO;
 import fr.insalyon.creatis.vip.core.server.dao.UserDAO;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -69,6 +68,7 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
     private ConfigurationBusiness configurationBusiness;
     private UserDAO userDAO;
     private GRIDAClient gridaClient;
+    private ExecutionPublicDAO executionPublicDAO;
 
     @Override
     public void init() throws ServletException {
@@ -76,6 +76,7 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
         configurationBusiness = getBean(ConfigurationBusiness.class);
         userDAO = getBean(UserDAO.class);
         gridaClient = getBean(GRIDAClient.class);
+        executionPublicDAO = getBean(ExecutionPublicDAO.class);
     }
     
     @Override
@@ -616,8 +617,6 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
     }
 
     // api key management
-
-
     @Override
     public String getUserApikey(String email) throws CoreException {
         try {
@@ -647,4 +646,14 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
             throw new CoreException(ex);
         }
     }
+    // execution management
+    @Override
+    public void addExecution(Execution execution) throws CoreException {
+        try {
+            executionPublicDAO.add(execution);
+        } catch (DAOException e) {
+            throw new CoreException("Failed to add execution", e);
+        }
+    }
+
 }

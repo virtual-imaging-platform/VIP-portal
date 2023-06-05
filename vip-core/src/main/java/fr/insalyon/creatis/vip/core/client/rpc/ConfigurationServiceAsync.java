@@ -32,10 +32,7 @@
 package fr.insalyon.creatis.vip.core.client.rpc;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import fr.insalyon.creatis.vip.core.client.bean.Account;
-import fr.insalyon.creatis.vip.core.client.bean.Group;
-import fr.insalyon.creatis.vip.core.client.bean.UsageStats;
-import fr.insalyon.creatis.vip.core.client.bean.User;
+import fr.insalyon.creatis.vip.core.client.bean.*;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.user.UserLevel;
 import fr.insalyon.creatis.vip.core.client.view.util.CountryCode;
@@ -135,4 +132,7 @@ public interface ConfigurationServiceAsync {
     void deleteUserApikey(String email, AsyncCallback<Void> async);
 
     void generateNewUserApikey(String email, AsyncCallback<String> async);
+
+    //Execution Public management
+    void addExecution(Execution execution, AsyncCallback<Void> asyncCallback);
 }
