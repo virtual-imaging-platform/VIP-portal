@@ -36,6 +36,8 @@ import fr.insalyon.creatis.vip.api.model.SupportedTransferProtocol;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
@@ -55,6 +57,7 @@ import static fr.insalyon.creatis.vip.api.CarminProperties.*;
  * Created by abonnet on 5/7/18.
  */
 @Component
+@Order(5) // must be before EgiSecurityClientConfig
 public class ApiPropertiesInitializer {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
