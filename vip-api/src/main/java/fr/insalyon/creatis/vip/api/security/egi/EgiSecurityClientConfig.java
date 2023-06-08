@@ -4,7 +4,7 @@ import fr.insalyon.creatis.vip.api.CarminProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.annotation.Order;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.core.env.Environment;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
@@ -23,8 +23,13 @@ public class EgiSecurityClientConfig {
         this.env = env;
     }
 
+    /*
+        This needs the properties that could be in vip-api.conf (especially in the test)
+        For vip-api.conf properties to be loaded, the ApiPropertyInitializer must be run before
+        Spring is not aware of that, so we must tell him explicitly with @DependsOn
+     */
     @Bean
-    @Order(7) // must be after ApiPropertiesInitializer
+    @DependsOn("apiPropertiesInitializer")
     public ClientRegistrationRepository clientRegistrationRepository() {
         return new InMemoryClientRegistrationRepository(this.egiClientRegistration());
     }
