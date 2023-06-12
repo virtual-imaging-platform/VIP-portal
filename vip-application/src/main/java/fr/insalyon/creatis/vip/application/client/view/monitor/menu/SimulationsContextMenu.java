@@ -40,24 +40,20 @@ import com.smartgwt.client.widgets.menu.MenuItemSeparator;
 import com.smartgwt.client.widgets.menu.events.ClickHandler;
 import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
-import fr.insalyon.creatis.vip.application.client.rpc.ReproVipService;
-import fr.insalyon.creatis.vip.application.client.rpc.ReproVipServiceAsync;
 import fr.insalyon.creatis.vip.application.client.rpc.WorkflowService;
 import fr.insalyon.creatis.vip.application.client.view.common.AbstractSimulationTab;
-import fr.insalyon.creatis.vip.application.client.view.launch.LaunchTab;
 import fr.insalyon.creatis.vip.application.client.view.launch.RelaunchService;
 import fr.insalyon.creatis.vip.application.client.view.monitor.ChangeSimulationUserLayout;
 import fr.insalyon.creatis.vip.application.client.view.monitor.SimulationStatus;
 import fr.insalyon.creatis.vip.application.client.view.monitor.SimulationTab;
 import fr.insalyon.creatis.vip.application.client.view.monitor.SimulationsTab;
 import fr.insalyon.creatis.vip.core.client.CoreModule;
+import fr.insalyon.creatis.vip.core.client.bean.Execution;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
-import fr.insalyon.creatis.vip.core.client.view.auth.SignUpTab;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.core.client.view.user.MakeExecutionPublicTab;
-import fr.insalyon.creatis.vip.core.server.business.BusinessException;
-import fr.insalyon.creatis.vip.core.server.dao.DAOException;
+
 import java.util.Map;
 
 /**
@@ -73,8 +69,6 @@ public class SimulationsContextMenu extends Menu {
     private String applicationVersion;
     private String applicationClass;
     private String simulationUser;
-
-    ReproVipServiceAsync reproVipServiceAsync = ReproVipService.Util.getInstance();
 
     public SimulationsContextMenu(ModalWindow modal, final String simulationID,
                                   final String title, final SimulationStatus status, String applicationName,
@@ -189,23 +183,6 @@ public class SimulationsContextMenu extends Menu {
             }
         });
 
-        MenuItem askPublicExecutionItem = new MenuItem("Request to make this execution public");
-        askPublicExecutionItem.setIcon(ApplicationConstants.ICON_SIMULATION_VIEW);
-        askPublicExecutionItem.addClickHandler(new ClickHandler() {
-            @Override
-            public void onClick(MenuItemClickEvent event) {
-                SC.ask("Do you really want to make this execution public:  ("
-                        + title + ")?", new BooleanCallback() {
-                    @Override
-                    public void execute(Boolean value) {
-                        if (value) {
-                            sendExecutionAdminEmail();
-                        }
-                    }
-                });
-            }
-        });
-
         MenuItem makePublicExecutionItem = new MenuItem("Make this execution public");
         makePublicExecutionItem.setIcon(ApplicationConstants.ICON_SIMULATION_VIEW);
         makePublicExecutionItem.addClickHandler(new ClickHandler() {
@@ -216,14 +193,13 @@ public class SimulationsContextMenu extends Menu {
                     @Override
                     public void execute(Boolean value) {
                         if (value) {
-                            Layout.getInstance().addTab(
-                                    CoreConstants.TAB_MAKE_EXECUTION_PUBLIC, MakeExecutionPublicTab::new);
+                            Execution execution = new Execution(simulationName, applicationVersion, "status", simulationUser, "comments");
+                            Layout.getInstance().addTab(CoreConstants.TAB_MAKE_EXECUTION_PUBLIC, () -> new MakeExecutionPublicTab(execution));
                         }
                     }
                 });
             }
         });
-
 
         MenuItemSeparator separator = new MenuItemSeparator();
 
@@ -232,7 +208,7 @@ public class SimulationsContextMenu extends Menu {
                 if (CoreModule.user.isSystemAdministrator()) {
                     this.setItems(viewItem, killItem, separator, relauchItem, separator, changeUserItem, separator, makePublicExecutionItem);
                 } else {
-                    this.setItems(viewItem, killItem, separator, relauchItem, separator, askPublicExecutionItem);
+                    this.setItems(viewItem, killItem, separator, relauchItem, separator, makePublicExecutionItem);
                 }
                 break;
 
@@ -240,7 +216,7 @@ public class SimulationsContextMenu extends Menu {
                 if (CoreModule.user.isSystemAdministrator()) {
                     this.setItems(viewItem, cleanItem, separator, relauchItem, separator, changeUserItem, separator, makePublicExecutionItem);
                 } else {
-                    this.setItems(viewItem, cleanItem, separator, relauchItem, separator, askPublicExecutionItem);
+                    this.setItems(viewItem, cleanItem, separator, relauchItem, separator, makePublicExecutionItem);
                 }
                 break;
 
@@ -257,7 +233,7 @@ public class SimulationsContextMenu extends Menu {
                 if (CoreModule.user.isSystemAdministrator()) {
                     this.setItems(viewItem, markCompletedItem, cleanItem, separator, relauchItem, separator, changeUserItem, separator, makePublicExecutionItem);
                 } else {
-                    this.setItems(viewItem, cleanItem, separator, relauchItem, separator, askPublicExecutionItem);
+                    this.setItems(viewItem, cleanItem, separator, relauchItem, separator, makePublicExecutionItem);
                 }
         }
     }
@@ -380,20 +356,4 @@ public class SimulationsContextMenu extends Menu {
     private SimulationsTab getSimulationsTab() {
         return (SimulationsTab) Layout.getInstance().getTab(ApplicationConstants.TAB_MONITOR);
     }
-
-    private void sendExecutionAdminEmail() {
-        final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
-            @Override
-            public void onFailure(Throwable caught) {
-                Layout.getInstance().setWarningMessage("Unable to send email to admins:<br />" + caught.getMessage());
-            }
-
-            @Override
-            public void onSuccess(Void result) {
-                Layout.getInstance().setNoticeMessage("Email has been sent to admins.");
-            }
-        };
-        reproVipServiceAsync.executionAdminEmail(simulationUser, callback);
-    }
-
 }

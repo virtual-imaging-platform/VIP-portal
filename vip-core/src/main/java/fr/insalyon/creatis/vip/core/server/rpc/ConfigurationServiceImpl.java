@@ -68,7 +68,6 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
     private ConfigurationBusiness configurationBusiness;
     private UserDAO userDAO;
     private GRIDAClient gridaClient;
-    private ExecutionPublicDAO executionPublicDAO;
 
     @Override
     public void init() throws ServletException {
@@ -76,7 +75,6 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
         configurationBusiness = getBean(ConfigurationBusiness.class);
         userDAO = getBean(UserDAO.class);
         gridaClient = getBean(GRIDAClient.class);
-        executionPublicDAO = getBean(ExecutionPublicDAO.class);
     }
     
     @Override
@@ -644,15 +642,6 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
                 .generateNewUserApikey(getSessionUser().getEmail());
         } catch (BusinessException ex) {
             throw new CoreException(ex);
-        }
-    }
-    // execution management
-    @Override
-    public void addExecution(Execution execution) throws CoreException {
-        try {
-            executionPublicDAO.add(execution);
-        } catch (DAOException e) {
-            throw new CoreException("Failed to add execution", e);
         }
     }
 

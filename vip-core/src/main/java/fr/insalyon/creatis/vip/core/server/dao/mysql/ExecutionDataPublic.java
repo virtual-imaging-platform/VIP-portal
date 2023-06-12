@@ -22,7 +22,6 @@ public class ExecutionDataPublic extends JdbcDaoSupport implements ExecutionPubl
     }
     @Override
     public void add(Execution execution) throws DAOException {
-
         try {
             PreparedStatement ps = getConnection().prepareStatement(
                     "INSERT INTO ExecutionPublic(execution_name, version, status, author, comments) VALUES(?, ?, ?, ?, ?)");
@@ -42,5 +41,25 @@ public class ExecutionDataPublic extends JdbcDaoSupport implements ExecutionPubl
             }
         }
     }
+
+    @Override
+    public void update(Execution execution) throws DAOException {
+        try {
+            PreparedStatement ps = getConnection().prepareStatement(
+                    "UPDATE ExecutionPublic SET execution_name = ?, version = ?, status = ?, author = ?, comments = ? WHERE id = ?");
+            ps.setString(1, execution.getName());
+            ps.setString(2, execution.getVersion());
+            ps.setString(3, execution.getStatus());
+            ps.setString(4, execution.getAuthor());
+            ps.setString(5, execution.getComments());
+            ps.setInt(6, execution.getId());
+            ps.execute();
+            ps.close();
+
+        } catch (SQLException ex) {
+            throw new DAOException("Error updating an execution", ex);
+        }
+    }
+
 }
 

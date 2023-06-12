@@ -146,5 +146,4 @@ public interface ConfigurationService extends RemoteService {
     void deleteUserApikey(String email) throws CoreException;
 
     String generateNewUserApikey(String email) throws CoreException;
-    void addExecution(Execution execution) throws CoreException;
 }

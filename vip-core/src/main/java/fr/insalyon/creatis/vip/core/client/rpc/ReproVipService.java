@@ -1,8 +1,10 @@
-package fr.insalyon.creatis.vip.application.client.rpc;
+package fr.insalyon.creatis.vip.core.client.rpc;
 
-import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.ServiceDefTarget;
+import fr.insalyon.creatis.vip.core.client.bean.Execution;
+import fr.insalyon.creatis.vip.core.client.view.CoreException;
 
 public interface ReproVipService extends RemoteService {
 
@@ -19,5 +21,7 @@ public interface ReproVipService extends RemoteService {
         }
     }
 
-    public void executionAdminEmail(String user);
+    public void executionAdminEmail(Execution execution);
+    void addExecution(Execution execution) throws CoreException;
+    void updateExecution(Execution execution) throws CoreException;
 }

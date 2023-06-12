@@ -205,7 +205,7 @@ knowledge of the CeCILL-B license and that you accept its terms.
     <!-- ReproVipService Module -->
     <servlet>
         <servlet-name>ReproVipService</servlet-name>
-        <servlet-class>fr.insalyon.creatis.vip.application.server.rpc.ReproVipServiceImpl</servlet-class>
+        <servlet-class>fr.insalyon.creatis.vip.core.server.rpc.ReproVipServiceImpl</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>ReproVipService</servlet-name>
