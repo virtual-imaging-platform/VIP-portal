@@ -31,9 +31,13 @@
 #set ($value=$value.replace($input.getValueKey(),"$na$i"))
 #end
 #end
-      <template value="$prefix1$dir1/$na1/$value$options1" />
-      <access type="LFN"/>
-    </output>
+    <template value="$prefix1$dir1/$na1/$value$options1"
+#if(($outputFile.PathTemplateStrippedExtensions) && ($outputFile.PathTemplateStrippedExtensions != []))
+    strip-extension="$outputFile.getPathTemplateStrippedExtensions()"
 #end
-  </executable>
+/>
+<access type="LFN"/>
+</output>
+#end
+</executable>
 </description>
