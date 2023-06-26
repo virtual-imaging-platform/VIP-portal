@@ -107,6 +107,7 @@ public class ApplicationConstants {
     public static final String APP_SIMULATION_ERROR = "Error File";
     public static final String APP_SIMULATION_OUT = "Output File";
     public static final String APP_PUBLIC_APPLICATION = "Applications";
+    public static final String APP_REPRO_VIP = "ReproVIP";
     // Application Images
     public static final String APP_IMG_APPLICATION = IMG_FOLDER + "app-application.png";
     public static final String APP_IMG_CLASSES = IMG_FOLDER + "app-classes.png";

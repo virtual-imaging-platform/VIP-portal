@@ -56,6 +56,9 @@ public class ApplicationHomeParser extends ApplicationParser {
 
         addApplication(ApplicationConstants.APP_PUBLIC_APPLICATION,
                 ApplicationConstants.APP_IMG_APPLICATION);
+
+        addApplication(ApplicationConstants.APP_REPRO_VIP,
+                ApplicationConstants.APP_IMG_APPLICATION);
     }
 
     @Override
@@ -67,6 +70,12 @@ public class ApplicationHomeParser extends ApplicationParser {
             return true;
         }
         if (applicationName.equals(ApplicationConstants.APP_PUBLIC_APPLICATION)) {
+            Layout.getInstance().addTab(
+                    ApplicationConstants.TAB_MANAGE_APPLICATION,
+                    () -> new ManageApplicationsTab(true));
+            return true;
+        }
+        if (applicationName.equals(ApplicationConstants.APP_REPRO_VIP)) {
             Layout.getInstance().addTab(
                     ApplicationConstants.TAB_MANAGE_APPLICATION,
                     () -> new ManageApplicationsTab(true));
