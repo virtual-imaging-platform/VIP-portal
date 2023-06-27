@@ -3,6 +3,8 @@ package fr.insalyon.creatis.vip.core.server.dao.mysql;
 import fr.insalyon.creatis.vip.core.client.bean.Execution;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import fr.insalyon.creatis.vip.core.server.dao.ExecutionPublicDAO;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.support.JdbcDaoSupport;
 import org.springframework.stereotype.Repository;
@@ -10,12 +12,15 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.sql.DataSource;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 @Repository
 @Transactional
 public class ExecutionDataPublic extends JdbcDaoSupport implements ExecutionPublicDAO {
-
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     @Autowired
     public void useDataSource(DataSource dataSource) {
         setDataSource(dataSource);
@@ -61,5 +66,28 @@ public class ExecutionDataPublic extends JdbcDaoSupport implements ExecutionPubl
         }
     }
 
+    @Override
+    public List<Execution> getExecutions() throws DAOException {
+        try {
+            List<Execution> executions = new ArrayList<>();
+            PreparedStatement ps = getConnection().prepareStatement("SELECT * FROM ExecutionPublic");
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                executions.add(new Execution(
+                        rs.getString("execution_name"),
+                        rs.getString("version"),
+                        rs.getString("status"),
+                        rs.getString("author"),
+                        rs.getString("comments")
+                ));
+                logger.info(executions.toString());
+            }
+            rs.close();
+            ps.close();
+            return executions;
+        } catch (SQLException ex) {
+            throw new DAOException("Error getting executions", ex);
+        }
+    }
 }
 

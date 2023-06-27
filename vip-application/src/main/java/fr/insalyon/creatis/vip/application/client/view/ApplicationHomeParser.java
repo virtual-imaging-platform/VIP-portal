@@ -35,6 +35,7 @@ import com.smartgwt.client.widgets.tab.Tab;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
 import fr.insalyon.creatis.vip.application.client.view.monitor.SimulationsTab;
 import fr.insalyon.creatis.vip.application.client.view.system.application.ManageApplicationsTab;
+import fr.insalyon.creatis.vip.application.client.view.system.application.ReproVipTab;
 import fr.insalyon.creatis.vip.core.client.CoreModule;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
@@ -77,8 +78,8 @@ public class ApplicationHomeParser extends ApplicationParser {
         }
         if (applicationName.equals(ApplicationConstants.APP_REPRO_VIP)) {
             Layout.getInstance().addTab(
-                    ApplicationConstants.TAB_MANAGE_APPLICATION,
-                    () -> new ManageApplicationsTab(true));
+                    ApplicationConstants.TAB_REPROVIP,
+                    () -> new ReproVipTab());
             return true;
         }
         return false;
