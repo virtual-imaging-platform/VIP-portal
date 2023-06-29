@@ -222,7 +222,7 @@ public class BoutiquesParser extends AbstractJsonParser{
         bof.setList(getBooleanValue(outputFile, "list", true));
         bof.setOptional(getBooleanValue(outputFile, "optional", true));
         Set<String> stripExtn=getArrayValueAsStringSet(outputFile, "path-template-stripped-extensions", true);
-        bof.setPathTemplateStrippedExtensions(stripExtn);
+        bof.setPathTemplateStrippedExtensionsString(String.join("", stripExtn));
         String commandLineFlag = getStringValue(outputFile, "command-line-flag", true);
         commandLineFlag = commandLineFlag == null ? "" : commandLineFlag;
         bof.setCommandLineFlag(commandLineFlag);

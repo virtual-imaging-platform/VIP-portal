@@ -32,8 +32,8 @@
 #end
 #end
     <template value="$prefix1$dir1/$na1/$value$options1"
-#if(($outputFile.getPathTemplateStrippedExtensions()) && ($outputFile.getPathTemplateStrippedExtensions() != []))
-    strip-extension="$outputFile.getPathTemplateStrippedExtensions()"
+#if(($outputFile.getPathTemplateStrippedExtensionsString()) && ($outputFile.getPathTemplateStrippedExtensionsString() != ""))
+    strip-extensions="$outputFile.getPathTemplateStrippedExtensionsString()"
 #end
 />
 <access type="LFN"/>

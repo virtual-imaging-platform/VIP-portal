@@ -49,7 +49,7 @@ public class BoutiquesOutputFile implements IsSerializable {
     private boolean list;
     private boolean optional;
     private String commandLineFlag;
-    private Set<String> pathTemplateStrippedExtensions;
+    private String pathTemplateStrippedExtensionsString;
     
    
     public String getId() {
@@ -84,6 +84,10 @@ public class BoutiquesOutputFile implements IsSerializable {
         return commandLineFlag;
     }
 
+    public String getPathTemplateStrippedExtensionsString() {
+	    return pathTemplateStrippedExtensionsString;
+	}
+
     public void setId(String id) {
         this.id = id;
     }
@@ -116,12 +120,7 @@ public class BoutiquesOutputFile implements IsSerializable {
         this.commandLineFlag = commandLineFlag;
     }
 
-    //getter
-	public Set<String> getPathTemplateStrippedExtensions() {
-		return pathTemplateStrippedExtensions;
-	}
-	//setter
-	public void setPathTemplateStrippedExtensions(Set<String> pathTemplateStrippedExtensions) {
-		this.pathTemplateStrippedExtensions = pathTemplateStrippedExtensions;
+        public void setPathTemplateStrippedExtensionsString(String pathTemplateStrippedExtensionsString) {
+	    this.pathTemplateStrippedExtensionsString = pathTemplateStrippedExtensionsString;
 	}
 }
