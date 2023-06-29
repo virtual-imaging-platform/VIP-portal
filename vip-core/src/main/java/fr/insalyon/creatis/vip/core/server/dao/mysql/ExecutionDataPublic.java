@@ -29,12 +29,14 @@ public class ExecutionDataPublic extends JdbcDaoSupport implements ExecutionPubl
     public void add(Execution execution) throws DAOException {
         try {
             PreparedStatement ps = getConnection().prepareStatement(
-                    "INSERT INTO ExecutionPublic(execution_name, version, status, author, comments) VALUES(?, ?, ?, ?, ?)");
-            ps.setString(1, execution.getName());
-            ps.setString(2, execution.getVersion());
-            ps.setString(3, execution.getStatus());
-            ps.setString(4, execution.getAuthor());
-            ps.setString(5, execution.getComments());
+                    "INSERT INTO VIPExecutionPublic(execution_ID, simulation_name, application_name, version, status, author, comments) VALUES(?, ?, ?, ?, ?, ?, ?)");
+            ps.setString(1, execution.getId());
+            ps.setString(2, execution.getSimulationName());
+            ps.setString(3, execution.getApplicationName());
+            ps.setString(4, execution.getVersion());
+            ps.setString(5, execution.getStatus());
+            ps.setString(6, execution.getAuthor());
+            ps.setString(7, execution.getComments());
             ps.execute();
             ps.close();
 
@@ -51,13 +53,14 @@ public class ExecutionDataPublic extends JdbcDaoSupport implements ExecutionPubl
     public void update(Execution execution) throws DAOException {
         try {
             PreparedStatement ps = getConnection().prepareStatement(
-                    "UPDATE ExecutionPublic SET execution_name = ?, version = ?, status = ?, author = ?, comments = ? WHERE id = ?");
-            ps.setString(1, execution.getName());
-            ps.setString(2, execution.getVersion());
-            ps.setString(3, execution.getStatus());
-            ps.setString(4, execution.getAuthor());
-            ps.setString(5, execution.getComments());
-            ps.setInt(6, execution.getId());
+                    "UPDATE ExecutionPublic SET execution_ID = ?, simulation_name = ?, application_name = ?, version = ?, status = ?, author = ?, comments = ? WHERE id = ?");
+            ps.setString(1, execution.getId());
+            ps.setString(2, execution.getSimulationName());
+            ps.setString(3, execution.getApplicationName());
+            ps.setString(4, execution.getVersion());
+            ps.setString(5, execution.getStatus());
+            ps.setString(6, execution.getAuthor());
+            ps.setString(7, execution.getComments());
             ps.execute();
             ps.close();
 
@@ -70,11 +73,13 @@ public class ExecutionDataPublic extends JdbcDaoSupport implements ExecutionPubl
     public List<Execution> getExecutions() throws DAOException {
         try {
             List<Execution> executions = new ArrayList<>();
-            PreparedStatement ps = getConnection().prepareStatement("SELECT * FROM ExecutionPublic");
+            PreparedStatement ps = getConnection().prepareStatement("SELECT * FROM VIPExecutionPublic");
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 executions.add(new Execution(
-                        rs.getString("execution_name"),
+                        rs.getString("execution_ID"),
+                        rs.getString("simulation_name"),
+                        rs.getString("application_name"),
                         rs.getString("version"),
                         rs.getString("status"),
                         rs.getString("author"),

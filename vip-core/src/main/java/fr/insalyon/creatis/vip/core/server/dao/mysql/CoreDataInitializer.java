@@ -163,13 +163,15 @@ public class CoreDataInitializer extends JdbcDaoSupport {
     }
 
     private void initializeExecutionTables() {
-        if (tableInitializer.createTable("ExecutionPublic",
-                "execution_name VARCHAR(255), "
+        if (tableInitializer.createTable("VIPExecutionPublic",
+                "execution_ID VARCHAR(255), "
+                        + "simulation_name VARCHAR(255), "
+                        + "application_name VARCHAR(255), "
                         + "version VARCHAR(255), "
                         + "status VARCHAR(255), "
                         + "author VARCHAR(255), "
                         + "comments TEXT, "
-                        + "PRIMARY KEY(execution_name)")) {
+                        + "PRIMARY KEY(execution_ID)")) {
 
             try {
                 usersGroupsDAO.add(server.getAdminEmail(),

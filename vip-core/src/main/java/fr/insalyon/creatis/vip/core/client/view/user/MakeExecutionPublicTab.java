@@ -20,7 +20,9 @@ import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
 
 public class MakeExecutionPublicTab extends Tab {
     private VLayout makeExecutionPublicLayout;
-    private TextItem nameOfTheExecutionField;
+    private TextItem idOfTheExecutionField;
+    private TextItem nameOfTheExecutionSimulationField;
+    private TextItem nameOfTheExecutionApplicationField;
     private TextItem versionExecutionField;
     private TextItem statusExecutionField;
     private TextItem authorNameField;
@@ -42,7 +44,9 @@ public class MakeExecutionPublicTab extends Tab {
         vLayout.setDefaultLayoutAlign(Alignment.CENTER);
 
         configureExecutionPublicLayout();
-        nameOfTheExecutionField.setValue(execution.getName());
+        idOfTheExecutionField.setValue(execution.getId());
+        nameOfTheExecutionSimulationField.setValue(execution.getSimulationName());
+        nameOfTheExecutionApplicationField.setValue(execution.getApplicationName());
         versionExecutionField.setValue(execution.getVersion());
         statusExecutionField.setValue(execution.getStatus());
         authorNameField.setValue(execution.getAuthor());
@@ -54,7 +58,9 @@ public class MakeExecutionPublicTab extends Tab {
 
     private void configureExecutionPublicLayout() {
 
-        nameOfTheExecutionField = FieldUtil.getTextItem(300, false, "", null);
+        idOfTheExecutionField = FieldUtil.getTextItem(300, false, "", null);
+        nameOfTheExecutionSimulationField = FieldUtil.getTextItem(300, false, "", null);
+        nameOfTheExecutionApplicationField = FieldUtil.getTextItem(300, false, "", null);
         authorNameField = FieldUtil.getTextItem(300, false, "", null);
         versionExecutionField= FieldUtil.getTextItem(300, false, "", null);
         statusExecutionField = FieldUtil.getTextItem(300, false, "", null);
@@ -68,13 +74,15 @@ public class MakeExecutionPublicTab extends Tab {
 
         makeExecutionblicButton.addClickHandler(new ClickHandler() {
             public void onClick(ClickEvent event) {
-                String name = nameOfTheExecutionField.getValueAsString();
+                String id = idOfTheExecutionField.getValueAsString();
+                String nameSimulation = nameOfTheExecutionSimulationField.getValueAsString();
+                String nameApplication = nameOfTheExecutionApplicationField.getValueAsString();
                 String version = versionExecutionField.getValueAsString();
                 String status = statusExecutionField.getValueAsString();
                 String author = authorNameField.getValueAsString();
                 String comments = commentsItem.getValueAsString();
 
-                Execution newExecution = new Execution(name, version, status, author, comments);
+                Execution newExecution = new Execution(id, nameSimulation, nameApplication, version, status, author, comments);
                 reproVipServiceAsync.addExecution(newExecution, new AsyncCallback<Void>() {
                     public void onFailure(Throwable caught) {
                         SC.warn("Failed to add execution: " + caught.getMessage());
@@ -88,7 +96,9 @@ public class MakeExecutionPublicTab extends Tab {
         });
 
         makeExecutionPublicLayout = WidgetUtil.getVIPLayout(320);
-        WidgetUtil.addFieldToVIPLayout(makeExecutionPublicLayout, "Name of the execution", nameOfTheExecutionField);
+        WidgetUtil.addFieldToVIPLayout(makeExecutionPublicLayout, "ID of the execution", idOfTheExecutionField);
+        WidgetUtil.addFieldToVIPLayout(makeExecutionPublicLayout, "Name of the execution simulation", nameOfTheExecutionSimulationField);
+        WidgetUtil.addFieldToVIPLayout(makeExecutionPublicLayout, "Name of the execution application", nameOfTheExecutionApplicationField);
         WidgetUtil.addFieldToVIPLayout(makeExecutionPublicLayout, "Version of the execution", versionExecutionField);
         WidgetUtil.addFieldToVIPLayout(makeExecutionPublicLayout, "Status of the execution", statusExecutionField);
         WidgetUtil.addFieldToVIPLayout(makeExecutionPublicLayout, "Author name", authorNameField);

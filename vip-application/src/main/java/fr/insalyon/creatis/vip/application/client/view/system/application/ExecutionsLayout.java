@@ -41,7 +41,9 @@ public class ExecutionsLayout extends VLayout {
         grid.setShowEmptyMessage(true);
         grid.setEmptyMessage("<br>No data available.");
         grid.setFields(
-                new ListGridField("name", "Execution Name"),
+                new ListGridField("id", "Execution ID"),
+                new ListGridField("simulation_name", "Execution Simulation Name"),
+                new ListGridField("application_name", "Execution Application Name"),
                 new ListGridField("version", "Version"),
                 new ListGridField("status", "Status"),
                 new ListGridField("author", "Author"),
@@ -71,7 +73,7 @@ public class ExecutionsLayout extends VLayout {
                 List<ExecutionsRecord> dataList = new ArrayList<ExecutionsRecord>();
 
                 for (Execution exe : result) {
-                    dataList.add(new ExecutionsRecord(exe.getName(), exe.getVersion(), exe.getStatus(), exe.getAuthor(), exe.getComments()));
+                    dataList.add(new ExecutionsRecord(exe.getId(), exe.getSimulationName(), exe.getApplicationName(), exe.getVersion(), exe.getStatus(), exe.getAuthor(), exe.getComments()));
                 }
                 grid.setData(dataList.toArray(new ExecutionsRecord[]{}));
             }
