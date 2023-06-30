@@ -1,5 +1,6 @@
 package fr.insalyon.creatis.vip.core.server.business;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.insalyon.creatis.vip.core.client.bean.Execution;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import org.slf4j.Logger;
