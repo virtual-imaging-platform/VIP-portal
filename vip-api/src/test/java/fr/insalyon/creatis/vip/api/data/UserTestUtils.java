@@ -55,6 +55,10 @@ public class UserTestUtils {
 
 
     static {
+        reset();
+    }
+
+    static public void reset() {
         baseUser1 = new User("base1", "User1", "baseuser1@test.tst", null,
                 UserLevel.Beginner, null);
         baseUser1.setFolder("user1");
