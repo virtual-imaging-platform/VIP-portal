@@ -123,7 +123,8 @@ public class ExecutionBusiness {
 
             // Return null if execution doesn't exist or is cleaned (cleaned status is not supported in Carmin)
             if (s == null || s.getStatus() == SimulationStatus.Cleaned) {
-                return null;
+                logger.error("Error accessing invalid execution {}. (is cleaned : {})", executionId, s != null);
+                throw new ApiException(ApiException.ApiError.INVALID_EXECUTION_ID, executionId);
             }
 
             // Build Carmin's execution object
