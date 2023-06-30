@@ -4,7 +4,7 @@ import com.google.gwt.json.client.JSONArray;
 import com.google.gwt.json.client.JSONObject;
 import com.google.gwt.json.client.JSONParser;
 import fr.insalyon.creatis.vip.application.client.bean.boutiquesTools.*;
-
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -221,6 +221,8 @@ public class BoutiquesParser extends AbstractJsonParser{
         bof.setPathTemplate(getStringValue(outputFile, "path-template", true));
         bof.setList(getBooleanValue(outputFile, "list", true));
         bof.setOptional(getBooleanValue(outputFile, "optional", true));
+        Set<String> stripExtn=getArrayValueAsStringSet(outputFile, "path-template-stripped-extensions", true);
+        bof.setPathTemplateStrippedExtensionsString(String.join(",", stripExtn));
         String commandLineFlag = getStringValue(outputFile, "command-line-flag", true);
         commandLineFlag = commandLineFlag == null ? "" : commandLineFlag;
         bof.setCommandLineFlag(commandLineFlag);
