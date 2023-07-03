@@ -32,13 +32,16 @@
 package fr.insalyon.creatis.vip.api.business;
 
 import fr.insalyon.creatis.vip.api.exception.ApiException;
+import fr.insalyon.creatis.vip.api.model.Execution;
 import fr.insalyon.creatis.vip.application.client.bean.Simulation;
 import fr.insalyon.creatis.vip.application.client.view.monitor.SimulationStatus;
 import fr.insalyon.creatis.vip.application.server.business.WorkflowBusiness;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.user.UserLevel;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import org.springframework.util.Assert;
 
 import java.util.function.Supplier;
 
@@ -65,7 +68,7 @@ public class ExecutionBusinessTest {
     @Test
     public void checkIfBasicUserCannotAccessAnyExecution() throws Exception {
         Supplier<User> userSupplier = () -> prepareTestUser(0, false);
-        Simulation simulation = prepareSimulation(EXEC_ID, 1); // choose a different user
+        Simulation simulation = prepareRunningSimulation(EXEC_ID, 1); // choose a different user
         WorkflowBusiness mockedWb = prepareMockedWorkflowBusiness(EXEC_ID, simulation);
         ExecutionBusiness sut = new ExecutionBusiness(userSupplier, null, mockedWb, null, null, null, null);
         ApiException apiException = assertThrows(ApiException.class,
@@ -77,11 +80,23 @@ public class ExecutionBusinessTest {
     @Test
     public void checkIfBasicUserCanAccessItsExecution() throws Exception {
         Supplier<User> userSupplier = () -> prepareTestUser(0, false);
-        Simulation simulation = prepareSimulation(EXEC_ID, 0); // the creator of the execution is the same user
+        Simulation simulation = prepareRunningSimulation(EXEC_ID, 0); // the creator of the execution is the same user
         WorkflowBusiness mockedWb = prepareMockedWorkflowBusiness(EXEC_ID, simulation);
         ExecutionBusiness sut = new ExecutionBusiness(userSupplier, null, mockedWb, null, null, null, null);
         sut.checkIfUserCanAccessExecution(EXEC_ID);
     }
+
+    @Test
+    public void checkErrorWhenAccessingACleanedExecution() throws Exception {
+        Supplier<User> userSupplier = () -> prepareTestUser(0, false);
+        Simulation simulation = prepareSimulation(EXEC_ID, SimulationStatus.Cleaned, 0); // the creator of the execution is the same user
+        WorkflowBusiness mockedWb = prepareMockedWorkflowBusiness(EXEC_ID, simulation);
+        ExecutionBusiness sut = new ExecutionBusiness(userSupplier, null, mockedWb, null, null, null, null);
+        ApiException ex = Assertions.assertThrows(ApiException.class, () -> sut.getExecution(EXEC_ID, false));
+        Assertions.assertTrue(ex.getVipErrorCode().isPresent());
+        Assertions.assertEquals(ApiException.ApiError.INVALID_EXECUTION_ID.getCode(), ex.getVipErrorCode().get());
+    }
+
 
     // UTILS to be externalized later
 
@@ -90,10 +105,14 @@ public class ExecutionBusinessTest {
                 isAdmin ? UserLevel.Administrator : UserLevel.Beginner, null);
     }
 
-    private Simulation prepareSimulation(String exedId, int userIndex) {
+    private Simulation prepareRunningSimulation(String exedId, int userIndex) {
+        return prepareSimulation(exedId, SimulationStatus.Running, userIndex);
+    }
+
+    private Simulation prepareSimulation(String exedId, SimulationStatus status, int userIndex) {
         User creator = prepareTestUser(userIndex, false);
         return new Simulation(null, null, null, exedId, creator.getFullName(), null, null,
-                SimulationStatus.Running.name(), null);
+                status.name(), null);
     }
 
     private WorkflowBusiness prepareMockedWorkflowBusiness(String execId, Simulation simu) throws Exception {
