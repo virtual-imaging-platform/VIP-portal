@@ -13,7 +13,7 @@
   #if($input.getType().getCamelName()=="Flag")
     <source name="$input.getId()" type="string" optional="$input.isOptional()" default="$input.getCommandLineFlag()" vip-type-restriction="flag" pretty-name="$input.getName()">
   #else
-    #if($input.getDefaultValue()!="null" && $input.getDefaultValue()!="")
+    #if($input.getDefaultValue() && $input.getDefaultValue()!="")
     <source name="$input.getId()" type="$type" optional="$input.isOptional()" default="$input.getDefaultValue()" pretty-name="$input.getName()">
     #else
       #if($input.isOptional()==true)
@@ -23,7 +23,11 @@
       #end
     #end
   #end
+  #if($input.getDescription())
       <source-comment>$esc.xml($input.getDescription())</source-comment>
+  #else
+      <source-comment></source-comment>
+  #end
     </source>
 #end
 #foreach($output in $tool.getOutputFiles())
