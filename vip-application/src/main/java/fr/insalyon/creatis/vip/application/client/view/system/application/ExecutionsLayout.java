@@ -5,6 +5,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.types.Overflow;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
+import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.grid.events.RowContextClickEvent;
 import com.smartgwt.client.widgets.grid.events.RowContextClickHandler;
 import com.smartgwt.client.widgets.layout.VLayout;
@@ -52,7 +53,9 @@ public class ExecutionsLayout extends VLayout {
             @Override
             public void onRowContextClick(RowContextClickEvent event) {
                 event.cancel();
-                new ExecutionsContextMenu(modal).showContextMenu();
+                ListGridRecord selectedRecord = grid.getSelectedRecord();
+                String executionId = selectedRecord.getAttribute("id");
+                new ExecutionsContextMenu(modal, executionId).showContextMenu();
             }
         });
 

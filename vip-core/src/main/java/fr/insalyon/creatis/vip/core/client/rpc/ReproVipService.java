@@ -23,5 +23,5 @@ public interface ReproVipService extends RemoteService {
 
     public void executionAdminEmail(Execution execution);
     void addExecution(Execution execution) throws CoreException;
-    void updateExecution(Execution execution) throws CoreException;
+    void updateExecution(String executionID, String newStatus) throws CoreException;
 }

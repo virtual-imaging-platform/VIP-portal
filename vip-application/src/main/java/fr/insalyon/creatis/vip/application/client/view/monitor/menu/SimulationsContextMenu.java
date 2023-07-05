@@ -193,7 +193,7 @@ public class SimulationsContextMenu extends Menu {
                     @Override
                     public void execute(Boolean value) {
                         if (value) {
-                            Execution execution = new Execution(simulationID, simulationName, applicationName, applicationVersion, "status", simulationUser, "comments");
+                            Execution execution = new Execution(simulationID, simulationName, applicationName, applicationVersion, "Pending", simulationUser, "comments");
                             Layout.getInstance().addTab(CoreConstants.TAB_MAKE_EXECUTION_PUBLIC, () -> new MakeExecutionPublicTab(execution));
                         }
                     }

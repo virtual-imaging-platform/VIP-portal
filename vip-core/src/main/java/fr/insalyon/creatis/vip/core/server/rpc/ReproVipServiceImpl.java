@@ -41,11 +41,11 @@ public class ReproVipServiceImpl extends AbstractRemoteServiceServlet implements
     }
 
     @Override
-    public void updateExecution(Execution execution) throws CoreException {
+    public void updateExecution(String executionID, String newStatus) throws CoreException {
         try {
-            executionPublicDAO.update(execution);
+            executionPublicDAO.update(executionID, newStatus);
         } catch (DAOException e) {
-            throw new CoreException("Failed to add execution", e);
+            throw new CoreException("Failed to update execution", e);
         }
     }
 }

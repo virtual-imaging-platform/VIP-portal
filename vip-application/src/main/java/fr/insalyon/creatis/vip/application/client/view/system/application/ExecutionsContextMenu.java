@@ -6,13 +6,18 @@ import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
 import com.smartgwt.client.widgets.menu.events.ClickHandler;
 import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
+import fr.insalyon.creatis.vip.core.client.rpc.ReproVipService;
+import fr.insalyon.creatis.vip.core.client.rpc.ReproVipServiceAsync;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 
 public class ExecutionsContextMenu extends Menu {
     private ModalWindow modal;
-    public ExecutionsContextMenu(ModalWindow modal){
+    private String executionID;
+    private ReproVipServiceAsync reproVipServiceAsync = ReproVipService.Util.getInstance();
+    public ExecutionsContextMenu(ModalWindow modal, String executionID){
         this.modal = modal;
+        this.executionID = executionID;
         this.setShowShadow(true);
         this.setShadowDepth(10);
         this.setWidth(90);
@@ -38,8 +43,11 @@ public class ExecutionsContextMenu extends Menu {
             @Override
             public void onSuccess(Void result) {
                 modal.hide();
+                SC.say("Execution made public successfully");
             }
         };
         modal.show("Make execution public", true);
+        reproVipServiceAsync.updateExecution(executionID, "Public", callback);
     }
+
 }

@@ -6,6 +6,6 @@ import fr.insalyon.creatis.vip.core.client.bean.Execution;
 public interface ReproVipServiceAsync {
     void executionAdminEmail(Execution execution, AsyncCallback<Void> callback);
     void addExecution(Execution execution, AsyncCallback<Void> asyncCallback);
-    void updateExecution(Execution execution, AsyncCallback<Void> asyncCallback);
+    void updateExecution(String executionID, String newStatus, AsyncCallback<Void> asyncCallback);
 }
 

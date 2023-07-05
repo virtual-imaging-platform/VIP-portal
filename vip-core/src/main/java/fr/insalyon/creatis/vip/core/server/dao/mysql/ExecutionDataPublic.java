@@ -50,22 +50,15 @@ public class ExecutionDataPublic extends JdbcDaoSupport implements ExecutionPubl
     }
 
     @Override
-    public void update(Execution execution) throws DAOException {
-        try {
-            PreparedStatement ps = getConnection().prepareStatement(
-                    "UPDATE ExecutionPublic SET execution_ID = ?, simulation_name = ?, application_name = ?, version = ?, status = ?, author = ?, comments = ? WHERE id = ?");
-            ps.setString(1, execution.getId());
-            ps.setString(2, execution.getSimulationName());
-            ps.setString(3, execution.getApplicationName());
-            ps.setString(4, execution.getVersion());
-            ps.setString(5, execution.getStatus());
-            ps.setString(6, execution.getAuthor());
-            ps.setString(7, execution.getComments());
+    public void update(String executionId, String newStatus) throws DAOException {
+        try (PreparedStatement ps = getConnection().prepareStatement(
+                "UPDATE VIPExecutionPublic SET status = ? WHERE execution_ID = ?")) {
+            ps.setString(1, newStatus);
+            ps.setString(2, executionId);
             ps.execute();
-            ps.close();
 
         } catch (SQLException ex) {
-            throw new DAOException("Error updating an execution", ex);
+            throw new DAOException("Error updating execution status", ex);
         }
     }
 

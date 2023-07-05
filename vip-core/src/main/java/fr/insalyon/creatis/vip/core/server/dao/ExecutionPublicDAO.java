@@ -6,7 +6,7 @@ import java.util.List;
 
 public interface ExecutionPublicDAO {
     public void add(Execution execution) throws DAOException;
-    public void update(Execution execution) throws DAOException;
+    void update(String executionId, String newStatus) throws DAOException;
     List<Execution> getExecutions() throws DAOException;
 }
 
