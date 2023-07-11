@@ -52,7 +52,7 @@ import fr.insalyon.creatis.vip.core.client.bean.Execution;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
-import fr.insalyon.creatis.vip.core.client.view.user.MakeExecutionPublicTab;
+import fr.insalyon.creatis.vip.application.client.view.system.application.MakeExecutionPublicTab;
 
 import java.util.Map;
 

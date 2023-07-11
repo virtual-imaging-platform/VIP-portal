@@ -6,8 +6,8 @@ import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
 import com.smartgwt.client.widgets.menu.events.ClickHandler;
 import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
-import fr.insalyon.creatis.vip.core.client.rpc.ReproVipService;
-import fr.insalyon.creatis.vip.core.client.rpc.ReproVipServiceAsync;
+import fr.insalyon.creatis.vip.application.client.rpc.ReproVipService;
+import fr.insalyon.creatis.vip.application.client.rpc.ReproVipServiceAsync;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 
@@ -31,7 +31,16 @@ public class ExecutionsContextMenu extends Menu {
             }
         });
 
-        this.setItems(OptionPublicExecutionItem);
+        MenuItem DownloadOutputDataItem = new MenuItem("Donwload outputs");
+        DownloadOutputDataItem.setIcon(CoreConstants.ICON_INFO);
+        DownloadOutputDataItem.addClickHandler(new ClickHandler() {
+            @Override
+            public void onClick(MenuItemClickEvent event) {
+                DownloadOutputDataExecution();
+            }
+        });
+
+        this.setItems(OptionPublicExecutionItem, DownloadOutputDataItem);
     }
     private void MakexExecutionPublic() {
         final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
@@ -49,5 +58,20 @@ public class ExecutionsContextMenu extends Menu {
         modal.show("Make execution public", true);
         reproVipServiceAsync.updateExecution(executionID, "Public", callback);
     }
-
+    private void DownloadOutputDataExecution() {
+        final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
+            @Override
+            public void onFailure(Throwable caught) {
+                modal.hide();
+                SC.warn("Unable to download outputs of this execution public:<br />" + caught.getMessage());
+            }
+            @Override
+            public void onSuccess(Void result) {
+                modal.hide();
+                SC.say("Ouputs downloaded");
+            }
+        };
+        modal.show("Download Outputs", true);
+        reproVipServiceAsync.executionOutputData(executionID, callback);
+    }
 }

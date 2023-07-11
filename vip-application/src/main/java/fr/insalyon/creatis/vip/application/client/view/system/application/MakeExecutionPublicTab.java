@@ -1,4 +1,4 @@
-package fr.insalyon.creatis.vip.core.client.view.user;
+package fr.insalyon.creatis.vip.application.client.view.system.application;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.types.Alignment;
@@ -10,9 +10,9 @@ import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.fields.*;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.tab.Tab;
+import fr.insalyon.creatis.vip.application.client.rpc.ReproVipService;
+import fr.insalyon.creatis.vip.application.client.rpc.ReproVipServiceAsync;
 import fr.insalyon.creatis.vip.core.client.bean.Execution;
-import fr.insalyon.creatis.vip.core.client.rpc.ReproVipService;
-import fr.insalyon.creatis.vip.core.client.rpc.ReproVipServiceAsync;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
