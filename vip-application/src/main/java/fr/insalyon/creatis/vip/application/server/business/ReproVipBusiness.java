@@ -1,5 +1,6 @@
 package fr.insalyon.creatis.vip.application.server.business;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.insalyon.creatis.vip.application.client.bean.InOutData;
 import fr.insalyon.creatis.vip.application.client.rpc.WorkflowService;
@@ -59,13 +60,23 @@ public class ReproVipBusiness {
     }
     public List<InOutData> executionOutputData (String executionID, User currentUser) throws ApplicationException, BusinessException {
         logger.info("Fetching input data for executionID: {}", executionID);
-        List<InOutData> inputData = workflowBusiness.getInputData(executionID, currentUser.getFolder());
-        if (inputData != null) {
-            logger.info("Fetched {} input data items", inputData.size());
+        List<InOutData> outputData = workflowBusiness.getOutputData(executionID, currentUser.getFolder());
+        if (outputData != null) {
+            logger.info("Fetched {} output data items", outputData.size());
         } else {
-            logger.info("Input data is null for executionID: {}", executionID);
+            logger.info("Output data is null for executionID: {}", executionID);
         }
-        return inputData;
+        return outputData;
+    }
+    public String createJsonOutputData(String executionID, User currentUser) throws ApplicationException, BusinessException {
+        List<InOutData> inputData = executionOutputData(executionID, currentUser);
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            String json = objectMapper.writeValueAsString(inputData);
+            return json;
+        } catch (JsonProcessingException e) {
+            throw new ApplicationException(ApplicationException.ApplicationError.valueOf("Failed to convert Output to JSON"), e);
+        }
     }
 
 }

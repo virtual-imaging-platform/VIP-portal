@@ -12,6 +12,9 @@ import fr.insalyon.creatis.vip.core.server.dao.ExecutionPublicDAO;
 import fr.insalyon.creatis.vip.core.server.rpc.AbstractRemoteServiceServlet;
 
 import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.PrintWriter;
 
 public class ReproVipServiceImpl extends AbstractRemoteServiceServlet implements ReproVipService {
     private ReproVipBusiness reproVipBusiness;
@@ -57,6 +60,15 @@ public class ReproVipServiceImpl extends AbstractRemoteServiceServlet implements
         try {
             User currentUser = getSessionUser();
             reproVipBusiness.executionOutputData(executionID, currentUser);
+        } catch (BusinessException | ApplicationException e) {
+            throw new RuntimeException(e);
+        }
+    }
+    public String downloadJsonOutputData(String executionID) throws CoreException {
+        try {
+            User currentUser = getSessionUser();
+            String json = reproVipBusiness.createJsonOutputData(executionID, currentUser);
+            return json;
         } catch (BusinessException | ApplicationException e) {
             throw new RuntimeException(e);
         }

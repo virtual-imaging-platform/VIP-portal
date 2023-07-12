@@ -59,19 +59,19 @@ public class ExecutionsContextMenu extends Menu {
         reproVipServiceAsync.updateExecution(executionID, "Public", callback);
     }
     private void DownloadOutputDataExecution() {
-        final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
+        final AsyncCallback<String> callback = new AsyncCallback<String>() {
             @Override
             public void onFailure(Throwable caught) {
                 modal.hide();
                 SC.warn("Unable to download outputs of this execution public:<br />" + caught.getMessage());
             }
             @Override
-            public void onSuccess(Void result) {
+            public void onSuccess(String s) {
                 modal.hide();
                 SC.say("Ouputs downloaded");
             }
         };
         modal.show("Download Outputs", true);
-        reproVipServiceAsync.executionOutputData(executionID, callback);
+        reproVipServiceAsync.downloadJsonOutputData(executionID, callback);
     }
 }
