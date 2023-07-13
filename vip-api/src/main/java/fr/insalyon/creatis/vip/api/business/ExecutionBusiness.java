@@ -259,6 +259,7 @@ public class ExecutionBusiness {
             inputMap.put(CoreConstants.RESULTS_DIRECTORY_PARAM_NAME,
                          resultsLocation);
         }
+
         checkInputExecNameIsValid(execution.getName());
         return initExecution(
             execution.getPipelineIdentifier(), inputMap, execution.getTimeout(),
