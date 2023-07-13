@@ -68,10 +68,10 @@ public class FileUploadServiceImpl extends HttpServlet {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    public GRIDAClient client;
-    public GRIDAPoolClient poolClient;
-    public LfcPathsBusiness lfcPathsBusiness;
-    public DataManagerBusiness dataManagerBusiness;
+    private GRIDAClient client;
+    private GRIDAPoolClient poolClient;
+    private LfcPathsBusiness lfcPathsBusiness;
+    private DataManagerBusiness dataManagerBusiness;
 
     @Override
     public void init() throws ServletException {
@@ -190,7 +190,7 @@ public class FileUploadServiceImpl extends HttpServlet {
         }
     }
 
-    public String processDir(User user, String dir, String baseDir, boolean usePool)
+    private String processDir(User user, String dir, String baseDir, boolean usePool)
         throws GRIDAClientException, DataManagerException {
 
         StringBuilder ids = new StringBuilder();
