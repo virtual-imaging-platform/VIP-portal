@@ -206,10 +206,16 @@ public class FileUploadServiceImpl extends HttpServlet {
                 ids.append(
                     uploadFile(
                         user, f.getAbsolutePath(), baseDir, usePool));
+                ids.append("##");
             }
-            ids.append("##");
         }
-        return ids.toString();
+
+        String idsStr = ids.toString();
+        if (idsStr.endsWith("##")) {
+            idsStr = idsStr.substring(0, idsStr.length() - 2);
+        }
+
+        return idsStr;
     }
 
     private String uploadFile(User user, String fileName, String dir, boolean usePool)
