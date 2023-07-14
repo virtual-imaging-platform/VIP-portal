@@ -40,6 +40,7 @@ import fr.insalyon.creatis.vip.api.model.UploadDataType;
 import fr.insalyon.creatis.vip.core.client.bean.Group;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
+import fr.insalyon.creatis.vip.core.server.business.Server;
 import fr.insalyon.creatis.vip.datamanager.client.bean.Data;
 import fr.insalyon.creatis.vip.datamanager.client.bean.Data.Type;
 import fr.insalyon.creatis.vip.datamanager.client.bean.PoolOperation;
@@ -92,21 +93,24 @@ public class DataApiBusiness {
     private final LFCPermissionBusiness lfcPermissionBusiness;
     private final DataManagerBusiness dataManagerBusiness;
 
-    // 2 threads are needed for every download
-    private ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(2 * 5);
+    private final ScheduledExecutorService scheduler;
 
     @Autowired
     public DataApiBusiness(
             Environment env, Supplier<User> currentUserProvider,
             LFCBusiness lfcBusiness, TransferPoolBusiness transferPoolBusiness,
             LFCPermissionBusiness lfcPermissionBusiness,
-            DataManagerBusiness dataManagerBusiness) {
+            DataManagerBusiness dataManagerBusiness, Server server) {
         this.env = env;
         this.currentUserProvider = currentUserProvider;
         this.lfcBusiness = lfcBusiness;
         this.transferPoolBusiness = transferPoolBusiness;
         this.lfcPermissionBusiness = lfcPermissionBusiness;
         this.dataManagerBusiness = dataManagerBusiness;
+        int parallelDownloadsNb = server.getApiParallelDownloadNb();
+        logger.info("Starting threads for {} parallel downloads", parallelDownloadsNb);
+        // 2 threads are needed for every download
+        this.scheduler = Executors.newScheduledThreadPool(2 * parallelDownloadsNb);
     }
 
     @PreDestroy

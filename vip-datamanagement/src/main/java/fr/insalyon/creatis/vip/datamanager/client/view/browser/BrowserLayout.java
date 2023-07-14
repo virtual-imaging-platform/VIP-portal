@@ -31,6 +31,7 @@
  */
 package fr.insalyon.creatis.vip.datamanager.client.view.browser;
 
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.NamedFrame;
 import com.smartgwt.client.types.Overflow;
 import com.smartgwt.client.types.SelectionAppearance;
@@ -43,9 +44,13 @@ import com.smartgwt.client.widgets.grid.events.CellDoubleClickEvent;
 import com.smartgwt.client.widgets.grid.events.CellDoubleClickHandler;
 import com.smartgwt.client.widgets.layout.VLayout;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
+import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
 import fr.insalyon.creatis.vip.datamanager.client.view.common.BrowserUtil;
 import fr.insalyon.creatis.vip.datamanager.client.view.operation.OperationLayout;
+
+import java.util.Arrays;
+import java.util.List;
 
 /**
  *
@@ -79,7 +84,7 @@ public class BrowserLayout extends VLayout {
         this.setOverflow(Overflow.AUTO);
         this.setShowResizeBar(true);
 
-        grid = BrowserUtil.getListGrid();
+        this.grid = BrowserUtil.getListGrid();
         configureGrid();
 
         modal = new ModalWindow(grid);
@@ -158,11 +163,21 @@ public class BrowserLayout extends VLayout {
             dataUploadWindow = null;
         }
         modal.hide();
-        for (String operationID : result.split("##")) {
-            if (!operationID.isEmpty()) {
-                OperationLayout.getInstance().addOperation(operationID);
+
+        AsyncCallback<Void> callback = new AsyncCallback<Void>() {
+            @Override
+            public void onFailure(Throwable caught) {} // cannot be called
+
+            @Override
+            public void onSuccess(Void v) {
+                loadData(toolStrip.getPath(), true);
             }
-        }
+        };
+
+        String[] operationsIds = result.split("##");
+
+        OperationLayout.getInstance().addOperationsWithCallback(operationsIds, callback);
+
     }
 
     private native void initComplete(BrowserLayout upload) /*-{

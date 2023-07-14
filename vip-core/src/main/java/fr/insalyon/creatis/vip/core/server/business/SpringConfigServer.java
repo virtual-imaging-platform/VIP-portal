@@ -430,5 +430,10 @@ public class SpringConfigServer implements Server {
         return env.getProperty(CoreConstants.USE_LOCAL_FILES_AS_INPUTS, Boolean.class, false);
     }
 
+    @Override
+    public int getApiParallelDownloadNb() {
+        return env.getProperty(CoreConstants.API_PARALLEL_DOWNLOAD_NB, Integer.class, 20);
+    }
+
 
 }

@@ -112,6 +112,9 @@ public class PipelineBusiness {
 
             for (Source s : d.getSources()) {
                 ParameterType sourceType = ParameterType.fromVipType(s.getType());
+                if ("flag".equalsIgnoreCase(s.getVipTypeRestriction())) {
+                    sourceType = ParameterType.Boolean;
+                }
                 PipelineParameter pp = new PipelineParameter(s.getName(),
                                                              sourceType,
                                                              s.isOptional(),

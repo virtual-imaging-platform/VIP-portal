@@ -109,4 +109,6 @@ public interface Server {
     float getGirderTokenDurationInDays();
 
     boolean useLocalFilesInInputs();
+
+    int getApiParallelDownloadNb();
 }

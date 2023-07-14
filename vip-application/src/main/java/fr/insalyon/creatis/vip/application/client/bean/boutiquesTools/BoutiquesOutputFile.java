@@ -31,6 +31,8 @@
  */
 package fr.insalyon.creatis.vip.application.client.bean.boutiquesTools;
 
+import java.util.Set;
+
 import com.google.gwt.user.client.rpc.IsSerializable;
 
 /**
@@ -47,7 +49,9 @@ public class BoutiquesOutputFile implements IsSerializable {
     private boolean list;
     private boolean optional;
     private String commandLineFlag;
-
+    private String pathTemplateStrippedExtensionsString;
+    
+   
     public String getId() {
         return id;
     }
@@ -79,6 +83,10 @@ public class BoutiquesOutputFile implements IsSerializable {
     public String getCommandLineFlag() {
         return commandLineFlag;
     }
+
+    public String getPathTemplateStrippedExtensionsString() {
+	    return pathTemplateStrippedExtensionsString;
+	}
 
     public void setId(String id) {
         this.id = id;
@@ -112,4 +120,7 @@ public class BoutiquesOutputFile implements IsSerializable {
         this.commandLineFlag = commandLineFlag;
     }
 
+        public void setPathTemplateStrippedExtensionsString(String pathTemplateStrippedExtensionsString) {
+	    this.pathTemplateStrippedExtensionsString = pathTemplateStrippedExtensionsString;
+	}
 }
