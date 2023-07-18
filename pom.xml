@@ -95,6 +95,7 @@ knowledge of the CeCILL-B license and that you accept its terms.
         <module>vip-api</module>
         <module>vip-visualization</module>
         <module>vip-local</module>
+        <module>coverage</module>
     </modules>
 
     <dependencyManagement>
@@ -270,6 +271,19 @@ knowledge of the CeCILL-B license and that you accept its terms.
                         <goals>
                             <goal>integration-test</goal>
                             <goal>verify</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>0.8.7</version>
+                <executions>
+                    <execution>
+                        <id>prepare-agent</id>
+                        <goals>
+                            <goal>prepare-agent</goal>
                         </goals>
                     </execution>
                 </executions>
