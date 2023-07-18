@@ -26,8 +26,8 @@ jobs:
   deploy:
     environment:
       name: github-pages
-      #url: ${{ steps.deployment.outputs.page_url }}
-      url: https://mathildemrz.github.io/VIP-portal/
+      url: ${{ steps.deployment.outputs.page_url }}
+      #url: https://virtual-imaging-platform.github.io/VIP-portal/
     runs-on: ubuntu-latest
     steps:
 
@@ -63,15 +63,15 @@ jobs:
           git fetch
           git branch -a
           git checkout -- .
-          git checkout -b history_reports origin/history_reports
-          git config --global user.email "mathilde.marza2001@gmail.com"
-          git config --global user.name "MathildeMrz"
+          git checkout -b coverage_history origin/coverage_history
+          git config --global user.email "axel.bonnet@creatis.insa-lyon.fr"
+          git config --global user.name "github-ci"
           # git pull origin develop
           git add -f "coverage/target/site/jacoco-aggregate/"
           DATE=$(date +%Y-%m-%d-%H-%M-%S)
-          mkdir -p history/"$DATE"
-          cp -R "coverage/target/site/jacoco-aggregate/." history/"$DATE"/
-          git add -f history/"$DATE"
+          mkdir -p coverage_history/"$DATE"
+          cp -R "coverage/target/site/jacoco-aggregate/." coverage_history/"$DATE"/
+          git add -f coverage_history/"$DATE"
           git commit -m "Update Jacoco HTML report"
           git push origin
           # git push develop history_reports
