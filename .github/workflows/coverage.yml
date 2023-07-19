@@ -66,5 +66,4 @@ jobs:
           git add -f coverage_history/"$DATE"
           git commit -m "Update Jacoco HTML report"
           git push origin
-          # git push develop history_reports
 
