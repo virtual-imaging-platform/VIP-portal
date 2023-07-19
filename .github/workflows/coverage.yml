@@ -4,16 +4,6 @@ env:
 name: tests_coverage_jacoco
 
 on:
-  push:
-    branches: [ "develop" ]
-    paths-ignore:
-      - '**.github/workflows/**'
-
-  pull_request:
-    branches: ["develop"]
-    paths-ignore:
-      - "**.github/workflows/**"
-
   schedule:
     - cron: "0 0 1 * *" # Once a month
 
