@@ -18,8 +18,8 @@ jobs:
   deploy:
     environment:
       name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-      #url: https://virtual-imaging-platform.github.io/VIP-portal/
+      #url: ${{ steps.deployment.outputs.page_url }}
+      url: https://virtual-imaging-platform.github.io/VIP-portal/
     runs-on: ubuntu-latest
     steps:
 
