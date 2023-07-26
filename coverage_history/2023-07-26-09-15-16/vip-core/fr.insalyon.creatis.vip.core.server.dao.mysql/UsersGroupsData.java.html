@@ -1,0 +1,341 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../jacoco-resources/report.gif" type="image/gif"/><title>UsersGroupsData.java</title><link rel="stylesheet" href="../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../index.html" class="el_report">coverage</a> &gt; <a href="../index.html" class="el_bundle">vip-core</a> &gt; <a href="index.source.html" class="el_package">fr.insalyon.creatis.vip.core.server.dao.mysql</a> &gt; <span class="el_source">UsersGroupsData.java</span></div><h1>UsersGroupsData.java</h1><pre class="source lang-java linenums">/*
+ * Copyright and authors: see LICENSE.txt in base repository.
+ *
+ * This software is a web portal for pipeline execution on distributed systems.
+ *
+ * This software is governed by the CeCILL-B license under French law and
+ * abiding by the rules of distribution of free software.  You can  use,
+ * modify and/ or redistribute the software under the terms of the CeCILL-B
+ * license as circulated by CEA, CNRS and INRIA at the following URL
+ * &quot;http://www.cecill.info&quot;.
+ *
+ * As a counterpart to the access to the source code and  rights to copy,
+ * modify and redistribute granted by the license, users are provided only
+ * with a limited warranty  and the software's author,  the holder of the
+ * economic rights,  and the successive licensors  have only  limited
+ * liability.
+ *
+ * In this respect, the user's attention is drawn to the risks associated
+ * with loading,  using,  modifying and/or developing or reproducing the
+ * software by the user in light of its specific status of free software,
+ * that may mean  that it is complicated to manipulate,  and  that  also
+ * therefore means  that it is reserved for developers  and  experienced
+ * professionals having in-depth computer knowledge. Users are therefore
+ * encouraged to load and test the software's suitability as regards their
+ * requirements in conditions enabling the security of their systems and/or
+ * data to be ensured and,  more generally, to use and operate it in the
+ * same conditions as regards security.
+ *
+ * The fact that you are presently reading this means that you have had
+ * knowledge of the CeCILL-B license and that you accept its terms.
+ */
+package fr.insalyon.creatis.vip.core.server.dao.mysql;
+
+import fr.insalyon.creatis.vip.core.client.bean.Group;
+import fr.insalyon.creatis.vip.core.client.bean.User;
+import fr.insalyon.creatis.vip.core.client.view.CoreConstants.GROUP_ROLE;
+import fr.insalyon.creatis.vip.core.client.view.user.UserLevel;
+import fr.insalyon.creatis.vip.core.client.view.util.CountryCode;
+import fr.insalyon.creatis.vip.core.server.dao.DAOException;
+import fr.insalyon.creatis.vip.core.server.dao.UsersGroupsDAO;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.support.JdbcDaoSupport;
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
+
+import javax.sql.DataSource;
+
+/**
+ *
+ * @author Rafael Ferreira da Silva
+ */
+@Repository
+@Transactional
+<span class="fc" id="L61">public class UsersGroupsData extends JdbcDaoSupport implements UsersGroupsDAO {</span>
+
+<span class="fc" id="L63">    private final Logger logger = LoggerFactory.getLogger(getClass());</span>
+
+    @Autowired
+    public void useDataSource(DataSource dataSource) {
+<span class="fc" id="L67">        setDataSource(dataSource);</span>
+<span class="fc" id="L68">    }</span>
+
+    @Override
+    public void add(String email, String groupname, GROUP_ROLE role)
+            throws DAOException {
+
+        try {
+<span class="fc" id="L75">            PreparedStatement ps = getConnection().prepareStatement(</span>
+                    &quot;INSERT INTO VIPUsersGroups(email, groupname, role) &quot;
+                    + &quot;VALUES(?, ?, ?)&quot;);
+
+<span class="fc" id="L79">            ps.setString(1, email);</span>
+<span class="fc" id="L80">            ps.setString(2, groupname);</span>
+<span class="fc" id="L81">            ps.setString(3, role.name());</span>
+<span class="fc" id="L82">            ps.execute();</span>
+<span class="fc" id="L83">            ps.close();</span>
+
+<span class="nc" id="L85">        } catch (SQLException ex) {</span>
+<span class="nc" id="L86">            logger.error(&quot;Error adding group {} to {}&quot;, groupname, email, ex);</span>
+<span class="nc" id="L87">            throw new DAOException(ex);</span>
+<span class="fc" id="L88">        }</span>
+<span class="fc" id="L89">    }</span>
+
+    /**
+     *
+     * @param email
+     * @return
+     * @throws DAOException
+     */
+    @Override
+    public Map&lt;Group, GROUP_ROLE&gt; getUserGroups(String email)
+            throws DAOException {
+
+        try {
+<span class="nc" id="L102">            PreparedStatement ps = getConnection().prepareStatement(</span>
+                    &quot;SELECT g.groupname, g.public, g.gridfile, g.gridjobs, role &quot;
+                    + &quot;FROM VIPGroups g JOIN VIPUsersGroups ug &quot;
+                    + &quot;ON g.groupname = ug.groupname AND email = ?&quot;);
+<span class="nc" id="L106">            ps.setString(1, email);</span>
+<span class="nc" id="L107">            ResultSet rs = ps.executeQuery();</span>
+
+<span class="nc" id="L109">            Map&lt;Group, GROUP_ROLE&gt; groups = new HashMap&lt;Group, GROUP_ROLE&gt;();</span>
+
+<span class="nc bnc" id="L111" title="All 2 branches missed.">            while (rs.next()) {</span>
+<span class="nc" id="L112">                String role = rs.getString(&quot;role&quot;);</span>
+<span class="nc bnc" id="L113" title="All 6 branches missed.">                if (role == null || role.isEmpty() || role.equals(&quot;null&quot;)) {</span>
+<span class="nc" id="L114">                    role = &quot;None&quot;;</span>
+                }
+<span class="nc" id="L116">                groups.put(new Group(rs.getString(&quot;groupname&quot;), rs.getBoolean(&quot;public&quot;), rs.getBoolean(&quot;gridfile&quot;), rs.getBoolean(&quot;gridjobs&quot;)),</span>
+<span class="nc" id="L117">                        GROUP_ROLE.valueOf(role));</span>
+<span class="nc" id="L118">            }</span>
+<span class="nc" id="L119">            ps.close();</span>
+<span class="nc" id="L120">            return groups;</span>
+
+<span class="nc" id="L122">        } catch (SQLException ex) {</span>
+<span class="nc" id="L123">            logger.error(&quot;Error getting groups for {}&quot;, email, ex);</span>
+<span class="nc" id="L124">            throw new DAOException(ex);</span>
+        }
+    }
+
+    /**
+     *
+     * @param email
+     * @return
+     * @throws DAOException
+     */
+    @Override
+    public List&lt;String&gt; getUserAdminGroups(String email) throws DAOException {
+
+        try {
+<span class="nc" id="L138">            PreparedStatement ps = getConnection().prepareStatement(&quot;SELECT &quot;</span>
+                    + &quot;groupname FROM VIPUsersGroups &quot;
+                    + &quot;WHERE email = ? AND role = ?&quot;);
+<span class="nc" id="L141">            ps.setString(1, email);</span>
+<span class="nc" id="L142">            ps.setString(2, GROUP_ROLE.Admin.name());</span>
+
+<span class="nc" id="L144">            ResultSet rs = ps.executeQuery();</span>
+<span class="nc" id="L145">            List&lt;String&gt; groupsName = new ArrayList&lt;String&gt;();</span>
+
+<span class="nc bnc" id="L147" title="All 2 branches missed.">            while (rs.next()) {</span>
+<span class="nc" id="L148">                groupsName.add(rs.getString(&quot;groupname&quot;));</span>
+            }
+<span class="nc" id="L150">            ps.close();</span>
+<span class="nc" id="L151">            return groupsName;</span>
+
+<span class="nc" id="L153">        } catch (SQLException ex) {</span>
+<span class="nc" id="L154">            logger.error(&quot;Error getting user admin groups for {}&quot;, email, ex);</span>
+<span class="nc" id="L155">            throw new DAOException(ex);</span>
+        }
+    }
+
+    /**
+     *
+     * @param email
+     * @param groups
+     * @throws DAOException
+     */
+    @Override
+    public void setUserGroups(String email, Map&lt;String, GROUP_ROLE&gt; groups)
+            throws DAOException {
+
+        try {
+<span class="nc" id="L170">            PreparedStatement ps = getConnection().prepareStatement(&quot;DELETE &quot;</span>
+                    + &quot;FROM VIPUsersGroups &quot;
+                    + &quot;WHERE email=?&quot;);
+
+<span class="nc" id="L174">            ps.setString(1, email);</span>
+<span class="nc" id="L175">            ps.execute();</span>
+<span class="nc" id="L176">            ps.close();</span>
+
+<span class="nc bnc" id="L178" title="All 2 branches missed.">            for (String group : groups.keySet()) {</span>
+<span class="nc" id="L179">                add(email, group, groups.get(group));</span>
+<span class="nc" id="L180">            }</span>
+
+<span class="nc" id="L182">        } catch (SQLException ex) {</span>
+<span class="nc" id="L183">            logger.error(&quot;Error setting user groups for {}&quot;, email, ex);</span>
+<span class="nc" id="L184">            throw new DAOException(ex);</span>
+<span class="nc" id="L185">        }</span>
+<span class="nc" id="L186">    }</span>
+
+    /**
+     *
+     * @param groups
+     * @return
+     * @throws DAOException
+     */
+    @Override
+    public List&lt;String&gt; getUsersFromGroups(List&lt;String&gt; groups) throws DAOException {
+
+        try {
+<span class="nc" id="L198">            StringBuilder sb = new StringBuilder();</span>
+
+<span class="nc bnc" id="L200" title="All 2 branches missed.">            for (String groupName : groups) {</span>
+<span class="nc bnc" id="L201" title="All 2 branches missed.">                if (sb.length() &gt; 0) {</span>
+<span class="nc" id="L202">                    sb.append(&quot; OR &quot;);</span>
+                }
+<span class="nc" id="L204">                sb.append(&quot;groupname = '&quot;).append(groupName).append(&quot;'&quot;);</span>
+<span class="nc" id="L205">            }</span>
+<span class="nc" id="L206">            PreparedStatement ps = getConnection().prepareStatement(&quot;SELECT DISTINCT &quot;</span>
+                    + &quot;first_name, last_name, LOWER(first_name), LOWER(last_name) &quot;
+                    + &quot;FROM VIPUsers vu, VIPUsersGroups vg &quot;
+<span class="nc" id="L209">                    + &quot;WHERE vu.email = vg.email AND (&quot; + sb.toString() + &quot;) &quot;</span>
+                    + &quot;ORDER BY LOWER(first_name), LOWER(last_name)&quot;);
+
+<span class="nc" id="L212">            ResultSet rs = ps.executeQuery();</span>
+<span class="nc" id="L213">            List&lt;String&gt; users = new ArrayList&lt;String&gt;();</span>
+
+<span class="nc bnc" id="L215" title="All 2 branches missed.">            while (rs.next()) {</span>
+<span class="nc" id="L216">                users.add(rs.getString(&quot;first_name&quot;) + &quot; &quot;</span>
+<span class="nc" id="L217">                        + rs.getString(&quot;last_name&quot;));</span>
+            }
+<span class="nc" id="L219">            ps.close();</span>
+<span class="nc" id="L220">            return users;</span>
+
+<span class="nc" id="L222">        } catch (SQLException ex) {</span>
+<span class="nc" id="L223">            logger.error(&quot;Error getting users from {}&quot;, groups, ex);</span>
+<span class="nc" id="L224">            throw new DAOException(ex);</span>
+        }
+    }
+
+    @Override
+    public List&lt;Boolean&gt; getUserPropertiesGroups(String email)
+            throws DAOException {
+
+        try {
+<span class="nc" id="L233">            PreparedStatement ps = getConnection().prepareStatement(</span>
+                    &quot;SELECT public, gridfile, gridjobs &quot;
+                    + &quot;FROM VIPGroups g, VIPUsersGroups ug &quot;
+                    + &quot;WHERE g.groupname = ug.groupname AND ug.email= ?&quot;);
+<span class="nc" id="L237">            ps.setString(1, email);</span>
+<span class="nc" id="L238">            ResultSet rs = ps.executeQuery();</span>
+
+<span class="nc" id="L240">            List&lt;Boolean&gt; proprties = new ArrayList&lt;Boolean&gt;();</span>
+<span class="nc" id="L241">            boolean isPublic = false;</span>
+<span class="nc" id="L242">            boolean isGridFile = false;</span>
+<span class="nc" id="L243">            boolean isGridJobs = false;</span>
+
+<span class="nc bnc" id="L245" title="All 2 branches missed.">            while (rs.next()) {</span>
+<span class="nc bnc" id="L246" title="All 2 branches missed.">                if (rs.getInt(&quot;gridfile&quot;) == 1) {</span>
+<span class="nc" id="L247">                    isGridFile = true;</span>
+                }
+<span class="nc bnc" id="L249" title="All 2 branches missed.">                if (rs.getInt(&quot;gridjobs&quot;) == 1) {</span>
+<span class="nc" id="L250">                    isGridJobs = true;</span>
+                }
+<span class="nc bnc" id="L252" title="All 2 branches missed.">                if (rs.getInt(&quot;public&quot;) == 1) {</span>
+<span class="nc" id="L253">                    isPublic = true;</span>
+                }
+            }
+<span class="nc" id="L256">            proprties.add(0, isPublic);</span>
+<span class="nc" id="L257">            proprties.add(1, isGridFile);</span>
+<span class="nc" id="L258">            proprties.add(2, isGridJobs);</span>
+
+<span class="nc" id="L260">            ps.close();</span>
+
+<span class="nc" id="L262">            return proprties;</span>
+
+<span class="nc" id="L264">        } catch (SQLException ex) {</span>
+<span class="nc" id="L265">            logger.error(&quot;Error getting users properties groups for {} &quot;, email, ex);</span>
+<span class="nc" id="L266">            throw new DAOException(ex);</span>
+        }
+    }
+
+    /**
+     *
+     * @return @throws DAOException
+     */
+    @Override
+    public List&lt;User&gt; getUsersFromGroup(String groupName) throws DAOException {
+
+        try {
+<span class="nc" id="L278">            PreparedStatement ps = getConnection().prepareStatement(&quot;SELECT &quot;</span>
+                    + &quot;us.email AS uemail, next_email, first_name, last_name, institution, &quot;
+                    + &quot;code, confirmed, folder, registration, last_login, &quot;
+                    + &quot;level, country_code, max_simulations, termsUse, lastUpdatePublications, &quot;
+                    + &quot;failed_authentications, account_locked &quot;
+                    + &quot;FROM VIPUsers us, VIPUsersGroups ug &quot;
+                    + &quot;WHERE us.email = ug.email AND ug.groupname = ? &quot;
+                    + &quot;ORDER BY LOWER(first_name), LOWER(last_name)&quot;);
+
+<span class="nc" id="L287">            ps.setString(1, groupName);</span>
+
+<span class="nc" id="L289">            ResultSet rs = ps.executeQuery();</span>
+<span class="nc" id="L290">            List&lt;User&gt; users = new ArrayList&lt;User&gt;();</span>
+
+<span class="nc bnc" id="L292" title="All 2 branches missed.">            while (rs.next()) {</span>
+<span class="nc" id="L293">                users.add(new User(</span>
+<span class="nc" id="L294">                        rs.getString(&quot;first_name&quot;), rs.getString(&quot;last_name&quot;),</span>
+<span class="nc" id="L295">                        rs.getString(&quot;uemail&quot;), rs.getString(&quot;next_email&quot;),</span>
+<span class="nc" id="L296">                        rs.getString(&quot;institution&quot;),</span>
+<span class="nc" id="L297">                        &quot;&quot;, rs.getBoolean(&quot;confirmed&quot;),</span>
+<span class="nc" id="L298">                        rs.getString(&quot;code&quot;), rs.getString(&quot;folder&quot;), &quot;&quot;,</span>
+<span class="nc" id="L299">                        new Date(rs.getTimestamp(&quot;registration&quot;).getTime()),</span>
+<span class="nc" id="L300">                        new Date(rs.getTimestamp(&quot;last_login&quot;).getTime()),</span>
+<span class="nc" id="L301">                        UserLevel.valueOf(rs.getString(&quot;level&quot;)),</span>
+<span class="nc" id="L302">                        CountryCode.valueOf(rs.getString(&quot;country_code&quot;)),</span>
+<span class="nc" id="L303">                        rs.getInt(&quot;max_simulations&quot;),</span>
+<span class="nc" id="L304">                        rs.getTimestamp(&quot;termsUse&quot;),</span>
+<span class="nc" id="L305">                        rs.getTimestamp(&quot;lastUpdatePublications&quot;),</span>
+<span class="nc" id="L306">                        rs.getInt(&quot;failed_authentications&quot;),</span>
+<span class="nc" id="L307">                        rs.getBoolean(&quot;account_locked&quot;)));</span>
+            }
+<span class="nc" id="L309">            ps.close();</span>
+<span class="nc" id="L310">            return users;</span>
+
+<span class="nc" id="L312">        } catch (SQLException ex) {</span>
+<span class="nc" id="L313">            logger.error(&quot;Error getting users from group {} &quot;, groupName, ex);</span>
+<span class="nc" id="L314">            throw new DAOException(ex);</span>
+        }
+    }
+
+    /**
+     *
+     * @param email
+     * @param groupName
+     * @throws DAOException
+     */
+    @Override
+    public void removeUserFromGroup(String email, String groupName) throws DAOException {
+
+        try {
+<span class="nc" id="L328">            PreparedStatement ps = getConnection().prepareStatement(&quot;DELETE FROM &quot;</span>
+                    + &quot;VIPUsersGroups WHERE email = ? AND groupname = ?&quot;);
+<span class="nc" id="L330">            ps.setString(1, email);</span>
+<span class="nc" id="L331">            ps.setString(2, groupName);</span>
+<span class="nc" id="L332">            ps.executeUpdate();</span>
+<span class="nc" id="L333">            ps.close();</span>
+
+<span class="nc" id="L335">        } catch (SQLException ex) {</span>
+<span class="nc" id="L336">            logger.error(&quot;Error removing {} from group {} &quot;, email, groupName, ex);</span>
+<span class="nc" id="L337">            throw new DAOException(ex);</span>
+<span class="nc" id="L338">        }</span>
+<span class="nc" id="L339">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

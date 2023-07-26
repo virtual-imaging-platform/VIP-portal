@@ -1,0 +1,303 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../jacoco-resources/report.gif" type="image/gif"/><title>ApplicationBusiness.java</title><link rel="stylesheet" href="../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../index.html" class="el_report">coverage</a> &gt; <a href="../index.html" class="el_bundle">vip-application</a> &gt; <a href="index.source.html" class="el_package">fr.insalyon.creatis.vip.application.server.business</a> &gt; <span class="el_source">ApplicationBusiness.java</span></div><h1>ApplicationBusiness.java</h1><pre class="source lang-java linenums">/*
+ * Copyright and authors: see LICENSE.txt in base repository.
+ *
+ * This software is a web portal for pipeline execution on distributed systems.
+ *
+ * This software is governed by the CeCILL-B license under French law and
+ * abiding by the rules of distribution of free software.  You can  use,
+ * modify and/ or redistribute the software under the terms of the CeCILL-B
+ * license as circulated by CEA, CNRS and INRIA at the following URL
+ * &quot;http://www.cecill.info&quot;.
+ *
+ * As a counterpart to the access to the source code and  rights to copy,
+ * modify and redistribute granted by the license, users are provided only
+ * with a limited warranty  and the software's author,  the holder of the
+ * economic rights,  and the successive licensors  have only  limited
+ * liability.
+ *
+ * In this respect, the user's attention is drawn to the risks associated
+ * with loading,  using,  modifying and/or developing or reproducing the
+ * software by the user in light of its specific status of free software,
+ * that may mean  that it is complicated to manipulate,  and  that  also
+ * therefore means  that it is reserved for developers  and  experienced
+ * professionals having in-depth computer knowledge. Users are therefore
+ * encouraged to load and test the software's suitability as regards their
+ * requirements in conditions enabling the security of their systems and/or
+ * data to be ensured and,  more generally, to use and operate it in the
+ * same conditions as regards security.
+ *
+ * The fact that you are presently reading this means that you have had
+ * knowledge of the CeCILL-B license and that you accept its terms.
+ */
+package fr.insalyon.creatis.vip.application.server.business;
+
+import fr.insalyon.creatis.vip.application.client.bean.AppClass;
+import fr.insalyon.creatis.vip.application.client.bean.AppVersion;
+import fr.insalyon.creatis.vip.application.client.bean.Application;
+import fr.insalyon.creatis.vip.application.server.dao.ApplicationDAO;
+import fr.insalyon.creatis.vip.application.server.dao.ClassDAO;
+import fr.insalyon.creatis.vip.core.client.bean.Group;
+import fr.insalyon.creatis.vip.core.server.business.BusinessException;
+import fr.insalyon.creatis.vip.core.server.dao.DAOException;
+import fr.insalyon.creatis.vip.core.server.dao.GroupDAO;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.*;
+import java.util.stream.Collectors;
+
+/**
+ *
+ * @author Rafael Ferreira da Silva
+ */
+@Service
+@Transactional
+public class ApplicationBusiness {
+
+<span class="fc" id="L60">    private final Logger logger = LoggerFactory.getLogger(getClass());</span>
+
+    private ApplicationDAO applicationDAO;
+    private ClassDAO classDAO;
+    private GroupDAO groupDAO;
+
+    @Autowired
+<span class="fc" id="L67">    public ApplicationBusiness(ApplicationDAO applicationDAO, ClassDAO classDAO, GroupDAO groupDAO) {</span>
+<span class="fc" id="L68">        this.applicationDAO = applicationDAO;</span>
+<span class="fc" id="L69">        this.classDAO = classDAO;</span>
+<span class="fc" id="L70">        this.groupDAO = groupDAO;</span>
+<span class="fc" id="L71">    }</span>
+
+    public List&lt;Application&gt; getApplications() throws BusinessException {
+
+        try {
+<span class="fc" id="L76">            return applicationDAO.getApplications();</span>
+<span class="nc" id="L77">        } catch (DAOException ex) {</span>
+<span class="nc" id="L78">            throw new BusinessException(ex);</span>
+        }
+    }
+
+    public List&lt;Application&gt; getApplicationsWithOwner(String email) throws BusinessException {
+
+        try {
+<span class="nc" id="L85">            return applicationDAO.getApplicationsWithOwner(email);</span>
+<span class="nc" id="L86">        } catch (DAOException ex) {</span>
+<span class="nc" id="L87">            throw new BusinessException(ex);</span>
+        }
+    }
+
+    public List&lt;Application&gt; getPublicApplicationsWithGroups() throws BusinessException {
+
+        try {
+<span class="fc" id="L94">            Map&lt;String, AppClass&gt; allClasses = classDAO.getClasses().stream().collect(Collectors.toMap(</span>
+<span class="fc" id="L95">                    AppClass::getName, appClass -&gt; appClass));</span>
+<span class="fc" id="L96">            Map&lt;String, Group&gt; allGroups = groupDAO.getGroups().stream().collect(Collectors.toMap(</span>
+<span class="fc" id="L97">                    Group::getName, group -&gt; group));</span>
+<span class="fc" id="L98">            Set&lt;String&gt; allVisibleApplicationNames = applicationDAO.getAllVisibleVersions().stream()</span>
+<span class="fc" id="L99">                    .map(AppVersion::getApplicationName).collect(Collectors.toSet());</span>
+<span class="fc" id="L100">            List&lt;Application&gt; allApplications = getApplications().stream()</span>
+<span class="fc" id="L101">                    .filter(app -&gt; allVisibleApplicationNames.contains(app.getName()))</span>
+<span class="fc" id="L102">                    .collect(Collectors.toList());</span>
+
+<span class="fc" id="L104">            List&lt;Application&gt; applicationsWithGroups = new ArrayList&lt;&gt;();</span>
+<span class="fc bfc" id="L105" title="All 2 branches covered.">            for (Application application : allApplications) {</span>
+<span class="fc" id="L106">                Set&lt;String&gt; currentAppPublicGroups = application.getApplicationClasses().stream()</span>
+<span class="fc" id="L107">                        .map(className -&gt; allClasses.get(className).getGroups())</span>
+<span class="fc" id="L108">                        .flatMap(List::stream) // transform the stream of (List&lt;String&gt;) groupNames in a stream of (String) groupName</span>
+<span class="fc" id="L109">                        .map(groupName -&gt; allGroups.get(groupName))</span>
+<span class="fc" id="L110">                        .filter(group -&gt; group.isPublicGroup())</span>
+<span class="fc" id="L111">                        .map(group -&gt; group.getName())</span>
+<span class="fc" id="L112">                        .collect(Collectors.toSet());</span>
+
+<span class="fc" id="L114">                List&lt;String&gt; publicClasses = application.getApplicationClasses().stream()</span>
+<span class="fc" id="L115">                        .filter(className -&gt; allClasses.get(className).getGroups().stream()</span>
+<span class="fc" id="L116">                                .map(groupName -&gt; allGroups.get(groupName))</span>
+<span class="fc" id="L117">                                .anyMatch(Group::isPublicGroup))</span>
+<span class="fc" id="L118">                        .collect(Collectors.toList());</span>
+
+<span class="pc bpc" id="L120" title="2 of 4 branches missed.">                if (currentAppPublicGroups.isEmpty() || publicClasses.isEmpty()){</span>
+<span class="nc" id="L121">                    continue;</span>
+                }
+
+<span class="fc" id="L124">                applicationsWithGroups.add(new Application(</span>
+<span class="fc" id="L125">                        application.getName(),</span>
+                        publicClasses,
+<span class="fc" id="L127">                        application.getOwner(),</span>
+<span class="fc" id="L128">                        application.getFullName(),</span>
+<span class="fc" id="L129">                        application.getCitation(),</span>
+                        new ArrayList&lt;&gt;(currentAppPublicGroups)));
+<span class="fc" id="L131">            }</span>
+<span class="fc" id="L132">            return applicationsWithGroups;</span>
+<span class="nc" id="L133">        } catch (DAOException ex) {</span>
+<span class="nc" id="L134">            throw new BusinessException(ex);</span>
+        }
+    }
+
+    public List&lt;Group&gt; getPublicGroupsForApplication(String applicationName) throws BusinessException {
+        try {
+<span class="nc" id="L140">            Application application = this.getApplication(applicationName);</span>
+<span class="nc bnc" id="L141" title="All 2 branches missed.">            if (application == null) {</span>
+<span class="nc" id="L142">                logger.error(&quot;No application exists with name {}&quot;, applicationName);</span>
+<span class="nc" id="L143">                throw new BusinessException(&quot;Wrong application name&quot;);</span>
+            }
+            // need to fetch all the groups to get their properties
+<span class="nc" id="L146">            Map&lt;String,Group&gt; allGroups = groupDAO.getGroups().stream().collect(</span>
+<span class="nc" id="L147">                    Collectors.toMap(Group::getName, group -&gt; group));</span>
+<span class="nc" id="L148">            List&lt;Group&gt; appGroups = new ArrayList&lt;&gt;();</span>
+<span class="nc bnc" id="L149" title="All 2 branches missed.">            for (String className : application.getApplicationClasses()) {</span>
+                // need to fetch the classes to get their groups
+<span class="nc bnc" id="L151" title="All 2 branches missed.">                for (String groupName : classDAO.getClass(className).getGroups()) {</span>
+<span class="nc" id="L152">                    appGroups.add(allGroups.get(groupName));</span>
+<span class="nc" id="L153">                }</span>
+<span class="nc" id="L154">            }</span>
+<span class="nc" id="L155">            return appGroups.stream().filter(g -&gt; g.isPublicGroup()).collect(Collectors.toList());</span>
+<span class="nc" id="L156">        } catch (DAOException e) {</span>
+<span class="nc" id="L157">            throw new BusinessException(e);</span>
+        }
+    }
+
+    public List&lt;String[]&gt; getApplications(String className)
+            throws BusinessException {
+
+        try {
+<span class="nc" id="L165">            return applicationDAO.getApplicationsFromClass(className);</span>
+<span class="nc" id="L166">        } catch (DAOException ex) {</span>
+<span class="nc" id="L167">            throw new BusinessException(ex);</span>
+        }
+    }
+
+    public Application getApplication(String applicationName)
+            throws BusinessException {
+        try {
+<span class="nc" id="L174">            return applicationDAO.getApplication(applicationName);</span>
+<span class="nc" id="L175">        } catch (DAOException ex) {</span>
+<span class="nc" id="L176">            throw new BusinessException(ex);</span>
+        }
+    }
+
+    public List&lt;Application&gt; getApplications(List&lt;String&gt; classes)
+            throws BusinessException {
+        try {
+<span class="fc" id="L183">            return applicationDAO.getApplicationsFromClasses(classes);</span>
+<span class="nc" id="L184">        } catch (DAOException ex) {</span>
+<span class="nc" id="L185">            throw new BusinessException(ex);</span>
+        }
+    }
+
+    public List&lt;String&gt; getApplicationNames() throws BusinessException {
+
+<span class="nc" id="L191">        List&lt;String&gt; applicationNames = new ArrayList&lt;String&gt;();</span>
+<span class="nc bnc" id="L192" title="All 2 branches missed.">        for (Application application : getApplications()) {</span>
+<span class="nc" id="L193">            applicationNames.add(application.getName());</span>
+<span class="nc" id="L194">        }</span>
+
+<span class="nc" id="L196">        return applicationNames;</span>
+    }
+
+    public List&lt;String&gt; getApplicationNames(List&lt;String&gt; classes)
+            throws BusinessException {
+
+<span class="nc" id="L202">        List&lt;String&gt; applicationNames = new ArrayList&lt;String&gt;();</span>
+<span class="nc bnc" id="L203" title="All 2 branches missed.">        for (Application application : getApplications(classes)) {</span>
+<span class="nc" id="L204">            applicationNames.add(application.getName());</span>
+<span class="nc" id="L205">        }</span>
+
+<span class="nc" id="L207">        return applicationNames;</span>
+    }
+
+    public void add(Application application) throws BusinessException {
+        try {
+<span class="fc" id="L212">            applicationDAO.add(application);</span>
+<span class="nc" id="L213">        } catch (DAOException ex) {</span>
+<span class="nc" id="L214">            throw new BusinessException(ex);</span>
+<span class="fc" id="L215">        }</span>
+<span class="fc" id="L216">    }</span>
+
+    public void update(Application application) throws BusinessException {
+        try {
+<span class="nc" id="L220">            applicationDAO.update(application);</span>
+<span class="nc" id="L221">        } catch (DAOException ex) {</span>
+<span class="nc" id="L222">            throw new BusinessException(ex);</span>
+<span class="nc" id="L223">        }</span>
+<span class="nc" id="L224">    }</span>
+
+    public void remove(String name) throws BusinessException {
+        try {
+<span class="nc" id="L228">            applicationDAO.remove(name);</span>
+<span class="nc" id="L229">        } catch (DAOException ex) {</span>
+<span class="nc" id="L230">            throw new BusinessException(ex);</span>
+<span class="nc" id="L231">        }</span>
+<span class="nc" id="L232">    }</span>
+
+    public void remove(String email, String name) throws BusinessException {
+        try {
+<span class="nc" id="L236">            applicationDAO.remove(email, name);</span>
+<span class="nc" id="L237">        } catch (DAOException ex) {</span>
+<span class="nc" id="L238">            throw new BusinessException(ex);</span>
+<span class="nc" id="L239">        }</span>
+<span class="nc" id="L240">    }</span>
+
+    public void addVersion(AppVersion version) throws BusinessException {
+        try {
+<span class="fc" id="L244">            applicationDAO.addVersion(version);</span>
+<span class="nc" id="L245">        } catch (DAOException ex) {</span>
+<span class="nc" id="L246">            throw new BusinessException(ex);</span>
+<span class="fc" id="L247">        }</span>
+<span class="fc" id="L248">    }</span>
+
+    public void updateVersion(AppVersion version) throws BusinessException {
+        try {
+<span class="nc" id="L252">            applicationDAO.updateVersion(version);</span>
+<span class="nc" id="L253">        } catch (DAOException ex) {</span>
+<span class="nc" id="L254">            throw new BusinessException(ex);</span>
+<span class="nc" id="L255">        }</span>
+<span class="nc" id="L256">    }</span>
+
+    public void updateDoiForVersion(
+            String doi, String applicationName, String version)
+            throws BusinessException {
+        try {
+<span class="nc" id="L262">            applicationDAO.updateDoiForVersion(doi, applicationName, version);</span>
+<span class="nc" id="L263">        } catch (DAOException ex) {</span>
+<span class="nc" id="L264">            throw new BusinessException(ex);</span>
+<span class="nc" id="L265">        }</span>
+<span class="nc" id="L266">    }</span>
+
+    public void removeVersion(String applicationName, String version)
+            throws BusinessException {
+        try {
+<span class="nc" id="L271">            applicationDAO.removeVersion(applicationName, version);</span>
+<span class="nc" id="L272">        } catch (DAOException ex) {</span>
+<span class="nc" id="L273">            throw new BusinessException(ex);</span>
+<span class="nc" id="L274">        }</span>
+<span class="nc" id="L275">    }</span>
+
+    public String getCitation(String name) throws BusinessException {
+        try {
+<span class="nc" id="L279">            return applicationDAO.getCitation(name);</span>
+<span class="nc" id="L280">        } catch (DAOException ex) {</span>
+<span class="nc" id="L281">            throw new BusinessException(ex);</span>
+        }
+    }
+
+    public List&lt;AppVersion&gt; getVersions(String applicationName)
+            throws BusinessException {
+        try {
+<span class="nc" id="L288">            return applicationDAO.getVersions(applicationName);</span>
+<span class="nc" id="L289">        } catch (DAOException ex) {</span>
+<span class="nc" id="L290">            throw new BusinessException(ex);</span>
+        }
+    }
+
+    public AppVersion getVersion(String applicationName, String applicationVersion)
+            throws BusinessException {
+        try {
+<span class="nc" id="L297">            return applicationDAO.getVersion(applicationName, applicationVersion);</span>
+<span class="nc" id="L298">        } catch (DAOException ex) {</span>
+<span class="nc" id="L299">            throw new BusinessException(ex);</span>
+        }
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

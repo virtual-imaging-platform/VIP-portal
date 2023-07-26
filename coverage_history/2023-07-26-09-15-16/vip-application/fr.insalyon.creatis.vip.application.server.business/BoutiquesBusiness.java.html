@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../jacoco-resources/report.gif" type="image/gif"/><title>BoutiquesBusiness.java</title><link rel="stylesheet" href="../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../index.html" class="el_report">coverage</a> &gt; <a href="../index.html" class="el_bundle">vip-application</a> &gt; <a href="index.source.html" class="el_package">fr.insalyon.creatis.vip.application.server.business</a> &gt; <span class="el_source">BoutiquesBusiness.java</span></div><h1>BoutiquesBusiness.java</h1><pre class="source lang-java linenums">/*
+ * Copyright and authors: see LICENSE.txt in base repository.
+ *
+ * This software is a web portal for pipeline execution on distributed systems.
+ *
+ * This software is governed by the CeCILL-B license under French law and
+ * abiding by the rules of distribution of free software.  You can  use,
+ * modify and/ or redistribute the software under the terms of the CeCILL-B
+ * license as circulated by CEA, CNRS and INRIA at the following URL
+ * &quot;http://www.cecill.info&quot;.
+ *
+ * As a counterpart to the access to the source code and  rights to copy,
+ * modify and redistribute granted by the license, users are provided only
+ * with a limited warranty  and the software's author,  the holder of the
+ * economic rights,  and the successive licensors  have only  limited
+ * liability.
+ *
+ * In this respect, the user's attention is drawn to the risks associated
+ * with loading,  using,  modifying and/or developing or reproducing the
+ * software by the user in light of its specific status of free software,
+ * that may mean  that it is complicated to manipulate,  and  that  also
+ * therefore means  that it is reserved for developers  and  experienced
+ * professionals having in-depth computer knowledge. Users are therefore
+ * encouraged to load and test the software's suitability as regards their
+ * requirements in conditions enabling the security of their systems and/or
+ * data to be ensured and,  more generally, to use and operate it in the
+ * same conditions as regards security.
+ *
+ * The fact that you are presently reading this means that you have had
+ * knowledge of the CeCILL-B license and that you accept its terms.
+ */
+package fr.insalyon.creatis.vip.application.server.business;
+
+import fr.insalyon.creatis.vip.application.client.bean.AppVersion;
+import fr.insalyon.creatis.vip.core.client.bean.User;
+import fr.insalyon.creatis.vip.core.server.business.BusinessException;
+import fr.insalyon.creatis.vip.core.server.business.Server;
+import fr.insalyon.creatis.vip.core.server.dao.DAOException;
+import fr.insalyon.creatis.vip.datamanager.server.business.DataManagerBusiness;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.xml.sax.SAXException;
+
+import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
+
+import static fr.insalyon.creatis.vip.application.client.view.ApplicationException.ApplicationError.WRONG_APPLICATION_DESCRIPTOR;
+
+/**
+ * Created by abonnet on 2/21/19.
+ */
+@Service
+@Transactional
+public class BoutiquesBusiness {
+
+<span class="fc" id="L61">    private final Logger logger = LoggerFactory.getLogger(getClass());</span>
+
+    private Server server;
+    private DataManagerBusiness dataManagerBusiness;
+    private ApplicationBusiness applicationBusiness;
+
+    @Autowired
+<span class="fc" id="L68">    public BoutiquesBusiness(Server server, DataManagerBusiness dataManagerBusiness, ApplicationBusiness applicationBusiness) {</span>
+<span class="fc" id="L69">        this.server = server;</span>
+<span class="fc" id="L70">        this.dataManagerBusiness = dataManagerBusiness;</span>
+<span class="fc" id="L71">        this.applicationBusiness = applicationBusiness;</span>
+<span class="fc" id="L72">    }</span>
+
+    public String publishVersion(User user, String applicationName, String version)
+            throws BusinessException {
+
+        // fetch json file
+<span class="nc" id="L78">        String jsonLfn = getJsonLfn(applicationName, version);</span>
+<span class="nc" id="L79">        String localFile = dataManagerBusiness.getRemoteFile(user, jsonLfn);</span>
+
+        // TODO : verify it has an author (refactor boutique parser from application-importer
+
+        // call publish command
+<span class="nc" id="L84">        String command = &quot;FILE=&quot; + localFile + &quot;; &quot; + server.getPublicationCommandLine();</span>
+<span class="nc" id="L85">        List&lt;String&gt; output = runCommandAndFailOnError(command);</span>
+
+        // get the doi
+        // There should be only one line with the DOI
+<span class="nc" id="L89">        String doi = getDoiFromPublishOutput(output);</span>
+
+        // save the doi in database
+<span class="nc" id="L92">        saveDoiForVersion(doi, applicationName, version);</span>
+
+<span class="nc" id="L94">        return doi;</span>
+    }
+
+    public void validateBoutiqueFile(String localPath) throws BusinessException {
+        // call validate command
+<span class="nc" id="L99">        String command = &quot;bosh validate &quot; + localPath;</span>
+        try {
+            // if no exception : the command was  successful
+<span class="nc" id="L102">            runCommand(command);</span>
+<span class="nc" id="L103">        } catch (CommandErrorException e) {</span>
+            // if there's an error, only keep the first line because the output can be very long
+            // and the first line contains the json validation error message
+<span class="nc bnc" id="L106" title="All 2 branches missed.">            String firstLine = e.getCout().isEmpty() ? &quot;&lt; No Information&gt; &quot; : e.getCout().get(0);</span>
+<span class="nc" id="L107">            throw new BusinessException(&quot;Boutiques file not valid : &quot; + firstLine);</span>
+<span class="nc" id="L108">        }</span>
+<span class="nc" id="L109">    }</span>
+
+    private String getJsonLfn(String applicationName, String applicationVersion)
+            throws BusinessException {
+<span class="nc" id="L113">        AppVersion appVersion = applicationBusiness.getVersion(</span>
+            applicationName, applicationVersion);
+<span class="nc bnc" id="L115" title="All 2 branches missed.">        if (appVersion.getJsonLfn() == null) {</span>
+<span class="nc" id="L116">            logger.error(&quot;No json lfn for this application : {} / {}&quot;, applicationName, applicationVersion);</span>
+<span class="nc" id="L117">            throw new BusinessException(&quot;There is no json lfn for this application version.&quot;);</span>
+        }
+<span class="nc" id="L119">        return appVersion.getJsonLfn();</span>
+    }
+
+    public String getApplicationDescriptorString(
+            User user, String applicationName, String applicationVersion)
+            throws BusinessException {
+<span class="nc" id="L125">        String descriptorLfn = getJsonLfn(applicationName, applicationVersion);</span>
+        try {
+<span class="nc" id="L127">            String localFilePath =</span>
+<span class="nc" id="L128">                    dataManagerBusiness.getRemoteFile(user, descriptorLfn);</span>
+<span class="nc" id="L129">            return new Scanner(new File(localFilePath)).useDelimiter(&quot;\\Z&quot;).next();</span>
+<span class="nc" id="L130">        } catch (IOException ex) {</span>
+<span class="nc" id="L131">            logger.error(&quot;Error reading boutiques file {}&quot;, descriptorLfn, ex);</span>
+<span class="nc" id="L132">            throw new BusinessException(ex);</span>
+        }
+    }
+
+    private void saveDoiForVersion(
+            String doi, String applicationName, String applicationVersion)
+            throws BusinessException {
+
+<span class="nc" id="L140">        applicationBusiness.updateDoiForVersion(</span>
+            doi, applicationName, applicationVersion);
+<span class="nc" id="L142">    }</span>
+
+    private String getDoiFromPublishOutput(List&lt;String&gt; publishOutput) throws BusinessException {
+<span class="nc bnc" id="L145" title="All 2 branches missed.">        if (publishOutput.size() != 1) {</span>
+<span class="nc" id="L146">            logger.error(&quot;Wrong publication output, there should be only one line : {}&quot;,</span>
+<span class="nc" id="L147">                    String.join(&quot;\n&quot;, publishOutput));</span>
+<span class="nc" id="L148">            throw new BusinessException(&quot;Wrong publication output.&quot;);</span>
+        }
+<span class="nc" id="L150">        return publishOutput.get(0);</span>
+    }
+
+    private class CommandErrorException extends Exception {
+
+        private List&lt;String&gt; cout;
+
+<span class="nc" id="L157">        public CommandErrorException(List&lt;String&gt; cout) {</span>
+<span class="nc" id="L158">            this.cout = cout;</span>
+<span class="nc" id="L159">        }</span>
+
+        public List&lt;String&gt; getCout() {
+<span class="nc" id="L162">            return cout;</span>
+        }
+    }
+
+
+    private List&lt;String&gt; runCommandAndFailOnError(String command) throws BusinessException {
+        try {
+<span class="nc" id="L169">            return runCommand(command);</span>
+<span class="nc" id="L170">        } catch (CommandErrorException e) {</span>
+<span class="nc" id="L171">            throw new BusinessException(&quot;Command {&quot; + command + &quot;} failed : &quot; + String.join(&quot;\n&quot;, e.getCout()));</span>
+        }
+    }
+
+    private List&lt;String&gt; runCommand(String command) throws CommandErrorException, BusinessException {
+<span class="nc" id="L176">        ProcessBuilder builder = new ProcessBuilder(&quot;bash&quot;, &quot;-c&quot;, command);</span>
+<span class="nc" id="L177">        builder.redirectErrorStream(true);</span>
+<span class="nc" id="L178">        Process process = null;</span>
+<span class="nc" id="L179">        List&lt;String&gt; cout = new ArrayList&lt;&gt;();</span>
+
+        try {
+<span class="nc" id="L182">            logger.info(&quot;Executing command : &quot; + command);</span>
+<span class="nc" id="L183">            process = builder.start();</span>
+<span class="nc" id="L184">            BufferedReader r = new BufferedReader(</span>
+<span class="nc" id="L185">                new InputStreamReader(process.getInputStream()));</span>
+            String s;
+<span class="nc bnc" id="L187" title="All 2 branches missed.">            while ((s = r.readLine()) != null) {</span>
+<span class="nc" id="L188">                cout.add(s);</span>
+            }
+<span class="nc" id="L190">            process.waitFor();</span>
+<span class="nc" id="L191">            closeProcess(process);</span>
+<span class="nc" id="L192">        } catch (IOException | InterruptedException e) {</span>
+<span class="nc" id="L193">            logger.error(&quot;Unexpected error in a boutiques command : {}&quot;,</span>
+<span class="nc" id="L194">                    String.join(&quot;\n&quot;, cout), e);</span>
+<span class="nc" id="L195">            throw new BusinessException(&quot;Unexpected error in a boutiques command&quot;, e);</span>
+        } finally {
+<span class="nc" id="L197">            closeProcess(process);</span>
+        }
+
+<span class="nc bnc" id="L200" title="All 2 branches missed.">        if (process.exitValue() != 0) {</span>
+<span class="nc" id="L201">            logger.error(&quot;Command failed : {}&quot;,</span>
+<span class="nc" id="L202">                    String.join(&quot;\n&quot;, cout));</span>
+<span class="nc" id="L203">            throw new CommandErrorException(cout);</span>
+        }
+<span class="nc" id="L205">        process = null;</span>
+<span class="nc" id="L206">        return cout;</span>
+    }
+
+    private void closeProcess(Process process) {
+<span class="nc bnc" id="L210" title="All 2 branches missed.">        if (process == null) return;</span>
+<span class="nc" id="L211">        close(process.getOutputStream());</span>
+<span class="nc" id="L212">        close(process.getInputStream());</span>
+<span class="nc" id="L213">        close(process.getErrorStream());</span>
+<span class="nc" id="L214">        process.destroy();</span>
+<span class="nc" id="L215">    }</span>
+
+    private void close(Closeable c) {
+
+<span class="nc bnc" id="L219" title="All 2 branches missed.">        if (c != null) {</span>
+            try {
+<span class="nc" id="L221">                c.close();</span>
+<span class="nc" id="L222">            } catch (IOException ex) {</span>
+<span class="nc" id="L223">                logger.error(&quot;Error closing {}&quot;, c);</span>
+<span class="nc" id="L224">            }</span>
+        }
+<span class="nc" id="L226">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

@@ -1,0 +1,492 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../jacoco-resources/report.gif" type="image/gif"/><title>ExecutionBusiness.java</title><link rel="stylesheet" href="../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../index.html" class="el_report">coverage</a> &gt; <a href="../index.html" class="el_bundle">vip-api</a> &gt; <a href="index.source.html" class="el_package">fr.insalyon.creatis.vip.api.business</a> &gt; <span class="el_source">ExecutionBusiness.java</span></div><h1>ExecutionBusiness.java</h1><pre class="source lang-java linenums">/*
+ * Copyright and authors: see LICENSE.txt in base repository.
+ *
+ * This software is a web portal for pipeline execution on distributed systems.
+ *
+ * This software is governed by the CeCILL-B license under French law and
+ * abiding by the rules of distribution of free software.  You can  use,
+ * modify and/ or redistribute the software under the terms of the CeCILL-B
+ * license as circulated by CEA, CNRS and INRIA at the following URL
+ * &quot;http://www.cecill.info&quot;.
+ *
+ * As a counterpart to the access to the source code and  rights to copy,
+ * modify and redistribute granted by the license, users are provided only
+ * with a limited warranty  and the software's author,  the holder of the
+ * economic rights,  and the successive licensors  have only  limited
+ * liability.
+ *
+ * In this respect, the user's attention is drawn to the risks associated
+ * with loading,  using,  modifying and/or developing or reproducing the
+ * software by the user in light of its specific status of free software,
+ * that may mean  that it is complicated to manipulate,  and  that  also
+ * therefore means  that it is reserved for developers  and  experienced
+ * professionals having in-depth computer knowledge. Users are therefore
+ * encouraged to load and test the software's suitability as regards their
+ * requirements in conditions enabling the security of their systems and/or
+ * data to be ensured and,  more generally, to use and operate it in the
+ * same conditions as regards security.
+ *
+ * The fact that you are presently reading this means that you have had
+ * knowledge of the CeCILL-B license and that you accept its terms.
+ */
+package fr.insalyon.creatis.vip.api.business;
+
+import fr.insalyon.creatis.vip.api.exception.ApiException;
+import fr.insalyon.creatis.vip.api.model.*;
+import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
+import fr.insalyon.creatis.vip.application.client.bean.InOutData;
+import fr.insalyon.creatis.vip.application.client.bean.Simulation;
+import fr.insalyon.creatis.vip.application.client.view.monitor.SimulationStatus;
+import fr.insalyon.creatis.vip.application.server.business.ApplicationBusiness;
+import fr.insalyon.creatis.vip.application.server.business.SimulationBusiness;
+import fr.insalyon.creatis.vip.application.server.business.WorkflowBusiness;
+import fr.insalyon.creatis.vip.core.client.bean.Group;
+import fr.insalyon.creatis.vip.core.client.bean.User;
+import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
+import fr.insalyon.creatis.vip.core.server.business.BusinessException;
+import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.function.Supplier;
+
+import static fr.insalyon.creatis.vip.api.CarminProperties.ADDITIONNAL_INPUT_VALID_CHARS;
+import static fr.insalyon.creatis.vip.application.client.ApplicationConstants.INPUT_VALID_CHARS;
+
+/**
+ *
+ * @author Tristan Glatard
+ */
+@Service
+public class ExecutionBusiness {
+
+<span class="fc" id="L70">    private final Logger logger = LoggerFactory.getLogger(getClass());</span>
+
+    // API dependencies
+    private Supplier&lt;User&gt; currentUserProvider;
+    private final DataApiBusiness dataApiBusiness;
+
+    // other modules dependencies
+    private final SimulationBusiness simulationBusiness;
+    private final WorkflowBusiness workflowBusiness;
+    private final PipelineBusiness pipelineBusiness;
+    private final ConfigurationBusiness configurationBusiness;
+    private final ApplicationBusiness applicationBusiness;
+
+    @Autowired
+    public ExecutionBusiness(Supplier&lt;User&gt; currentUserProvider,
+                             SimulationBusiness simulationBusiness,
+                             WorkflowBusiness workflowBusiness,
+                             ConfigurationBusiness configurationBusiness,
+                             ApplicationBusiness applicationBusiness,
+                             PipelineBusiness pipelineBusiness,
+<span class="fc" id="L90">                             DataApiBusiness dataApiBusiness) {</span>
+<span class="fc" id="L91">        this.currentUserProvider = currentUserProvider;</span>
+<span class="fc" id="L92">        this.simulationBusiness = simulationBusiness;</span>
+<span class="fc" id="L93">        this.workflowBusiness = workflowBusiness;</span>
+<span class="fc" id="L94">        this.configurationBusiness = configurationBusiness;</span>
+<span class="fc" id="L95">        this.applicationBusiness = applicationBusiness;</span>
+<span class="fc" id="L96">        this.pipelineBusiness = pipelineBusiness;</span>
+<span class="fc" id="L97">        this.dataApiBusiness = dataApiBusiness;</span>
+<span class="fc" id="L98">    }</span>
+
+    public String getStdOut(String executionId) throws ApiException {
+        try {
+<span class="nc" id="L102">            Simulation s = workflowBusiness.getSimulation(executionId);</span>
+<span class="nc" id="L103">            return simulationBusiness.readFile(s.getID(), &quot;&quot;, &quot;workflow&quot;, &quot;.out&quot;);</span>
+<span class="nc" id="L104">        } catch (BusinessException ex) {</span>
+<span class="nc" id="L105">            throw new ApiException(ex);</span>
+        }
+    }
+
+    public String getStdErr(String executionId) throws ApiException {
+        try {
+<span class="nc" id="L111">            Simulation s = workflowBusiness.getSimulation(executionId);</span>
+<span class="nc" id="L112">            return simulationBusiness.readFile(s.getID(), &quot;&quot;, &quot;workflow&quot;, &quot;.err&quot;);</span>
+<span class="nc" id="L113">        } catch (BusinessException ex) {</span>
+<span class="nc" id="L114">            throw new ApiException(ex);</span>
+        }
+    }
+
+    public Execution getExecution(String executionId, boolean summarize)
+            throws ApiException {
+        try {
+            // Get main execution object
+<span class="fc" id="L122">            Simulation s = workflowBusiness.getSimulation(executionId, true); // check running execution for update</span>
+
+            // Return null if execution doesn't exist or is cleaned (cleaned status is not supported in Carmin)
+<span class="pc bpc" id="L125" title="3 of 4 branches missed.">            if (s == null || s.getStatus() == SimulationStatus.Cleaned) {</span>
+<span class="pc bpc" id="L126" title="1 of 2 branches missed.">                logger.error(&quot;Error accessing invalid execution {}. (is cleaned : {})&quot;, executionId, s != null);</span>
+<span class="fc" id="L127">                throw new ApiException(ApiException.ApiError.INVALID_EXECUTION_ID, executionId);</span>
+            }
+
+            // Build Carmin's execution object
+<span class="nc" id="L131">            Execution e = new Execution(</span>
+<span class="nc" id="L132">                    s.getID(),</span>
+<span class="nc" id="L133">                    s.getSimulationName(),</span>
+<span class="nc" id="L134">                    pipelineBusiness.getPipelineIdentifier(s.getApplicationName(), s.getApplicationVersion()),</span>
+                    0, // timeout (no timeout set in VIP)
+<span class="nc" id="L136">                    VIPtoCarminStatus(s.getStatus()),</span>
+                    null, // study identifier (not available in VIP yet)
+                    null, // error codes and mesasges (not available in VIP yet)
+<span class="nc" id="L139">                    s.getDate().getTime(),</span>
+                    null, // last status modification date (not available in VIP yet)
+                    null // results location (not available in VIP yet)
+            );
+
+<span class="nc bnc" id="L144" title="All 2 branches missed.">            if(summarize) // don't look into inputs and outputs</span>
+<span class="nc" id="L145">                return e;</span>
+
+            // Inputs
+<span class="nc" id="L148">            List&lt;InOutData&gt; inputs = workflowBusiness.getInputData(</span>
+<span class="nc" id="L149">                executionId, currentUserProvider.get().getFolder());</span>
+<span class="nc" id="L150">            logger.info(&quot;Execution has &quot; + inputs.size() + &quot; inputs &quot;);</span>
+<span class="nc bnc" id="L151" title="All 2 branches missed.">            for (InOutData iod : inputs) {</span>
+<span class="nc" id="L152">                e.getInputValues().put(iod.getProcessor(), iod.getPath());</span>
+<span class="nc" id="L153">            }</span>
+
+            // Outputs
+<span class="nc" id="L156">            List&lt;InOutData&gt; outputs = workflowBusiness.getOutputData(</span>
+<span class="nc" id="L157">                executionId, currentUserProvider.get().getFolder());</span>
+<span class="nc bnc" id="L158" title="All 2 branches missed.">            for (InOutData iod : outputs) {</span>
+<span class="nc bnc" id="L159" title="All 2 branches missed.">                if (!e.getReturnedFiles().containsKey(iod.getProcessor())) {</span>
+<span class="nc" id="L160">                     e.getReturnedFiles().put(iod.getProcessor(), new ArrayList&lt;&gt;());</span>
+                }
+<span class="nc" id="L162">                e.getReturnedFiles().get(iod.getProcessor()).add(iod.getPath());</span>
+<span class="nc" id="L163">            }</span>
+
+<span class="nc bnc" id="L165" title="All 6 branches missed.">            if (!(e.getStatus() == ExecutionStatus.FINISHED) &amp;&amp; !(e.getStatus() == ExecutionStatus.KILLED) &amp;&amp; e.getReturnedFiles().isEmpty()) {</span>
+<span class="nc" id="L166">                e.clearReturnedFiles();</span>
+            }
+
+<span class="nc" id="L169">            return e;</span>
+
+<span class="nc" id="L171">        } catch (BusinessException ex) {</span>
+<span class="nc" id="L172">            throw new ApiException(ex);</span>
+        }
+
+    }
+
+    public Execution[] listExecutions(int maxReturned) throws ApiException {
+        try {
+
+<span class="nc" id="L180">            List&lt;Simulation&gt; simulations = workflowBusiness.getSimulations(</span>
+<span class="nc" id="L181">                    currentUserProvider.get().getFullName(),</span>
+                    null, // application
+                    null, // status
+                    null, // class
+                    null, // startDate
+                    null // endDate
+            );
+<span class="nc" id="L188">            logger.info(&quot;Found {} simulations&quot;, simulations.size());</span>
+<span class="nc" id="L189">            ArrayList&lt;Execution&gt; executions = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L190">            int count = 0;</span>
+<span class="nc bnc" id="L191" title="All 2 branches missed.">            for (Simulation s : simulations) {</span>
+<span class="nc bnc" id="L192" title="All 4 branches missed.">                if (!(s == null) &amp;&amp; !(s.getStatus() == SimulationStatus.Cleaned)) {</span>
+<span class="nc" id="L193">                    count++;</span>
+<span class="nc" id="L194">                    executions.add(getExecution(s.getID(), true));</span>
+<span class="nc bnc" id="L195" title="All 2 branches missed.">                    if(count &gt;= maxReturned){</span>
+<span class="nc" id="L196">                        logger.warn(&quot;Only the {} most recent pipelines were returned.&quot;, maxReturned);</span>
+<span class="nc" id="L197">                        break;</span>
+                    }
+                }
+<span class="nc" id="L200">            }</span>
+<span class="nc" id="L201">            logger.info(&quot;Returning {} executions&quot;, executions.size());</span>
+<span class="nc" id="L202">            Execution[] array_executions = new Execution[executions.size()];</span>
+<span class="nc" id="L203">            return executions.toArray(array_executions);</span>
+<span class="nc" id="L204">        } catch (BusinessException ex) {</span>
+<span class="nc" id="L205">            throw new ApiException(ex);</span>
+        }
+    }
+
+    public int countExecutions() throws ApiException {
+        try {
+
+<span class="nc" id="L212">            List&lt;Simulation&gt; simulations = workflowBusiness.getSimulations(</span>
+<span class="nc" id="L213">                    currentUserProvider.get().getFullName(),</span>
+                    null, // application
+                    null, // status
+                    null, // class
+                    null, // startDate
+                    null // endDate
+            );
+<span class="nc" id="L220">            logger.info(&quot;Counting executions, found {} simulations.&quot;, simulations.size());</span>
+<span class="nc" id="L221">            int count = 0;</span>
+<span class="nc bnc" id="L222" title="All 2 branches missed.">            for (Simulation s : simulations) {</span>
+<span class="nc bnc" id="L223" title="All 4 branches missed.">                if (!(s == null) &amp;&amp; !(s.getStatus() == SimulationStatus.Cleaned)) {</span>
+<span class="nc" id="L224">                    count++;</span>
+                }
+<span class="nc" id="L226">            }</span>
+<span class="nc" id="L227">            logger.info(&quot;After removing null and cleaned, found {}&quot;, count);</span>
+<span class="nc" id="L228">            return count;</span>
+<span class="nc" id="L229">        } catch (BusinessException ex) {</span>
+<span class="nc" id="L230">            throw new ApiException(ex);</span>
+        }
+    }
+
+    public void updateExecution(Execution execution) throws ApiException {
+        try {
+<span class="nc bnc" id="L236" title="All 2 branches missed.">            if (execution.getTimeout() &gt; 0) {</span>
+<span class="nc" id="L237">                logger.error(&quot;Unsupported change of execution timeout {}&quot;,</span>
+<span class="nc" id="L238">                        execution.getIdentifier());</span>
+<span class="nc" id="L239">                throw new ApiException(&quot;Update of execution timeout is not supported.&quot;);</span>
+            }
+<span class="nc" id="L241">            checkInputExecNameIsValid(execution.getName());</span>
+<span class="nc" id="L242">            logger.info(&quot;updating execution &quot; + execution.getIdentifier()</span>
+<span class="nc" id="L243">                    + &quot; name to &quot; + execution.getName());</span>
+<span class="nc" id="L244">            workflowBusiness.updateDescription(execution.getIdentifier(), execution.getName());</span>
+<span class="nc" id="L245">        } catch (BusinessException e) {</span>
+<span class="nc" id="L246">            throw new ApiException(e);</span>
+<span class="nc" id="L247">        }</span>
+<span class="nc" id="L248">    }</span>
+
+    public String initExecution(Execution execution)
+        throws ApiException {
+<span class="nc" id="L252">        Map&lt;String, String&gt; inputMap = new HashMap&lt;&gt;();</span>
+<span class="nc bnc" id="L253" title="All 2 branches missed.">        for (Entry&lt;String,Object&gt; restInput : execution.getInputValues().entrySet()) {</span>
+<span class="nc" id="L254">            inputMap.put(restInput.getKey(),</span>
+<span class="nc" id="L255">                    handleRestParameter(restInput.getKey(), restInput.getValue()));</span>
+<span class="nc" id="L256">        }</span>
+<span class="nc" id="L257">        String resultsLocation = execution.getResultsLocation();</span>
+<span class="nc bnc" id="L258" title="All 2 branches missed.">        if (resultsLocation != null) {</span>
+<span class="nc" id="L259">            inputMap.put(CoreConstants.RESULTS_DIRECTORY_PARAM_NAME,</span>
+                         resultsLocation);
+        }
+
+<span class="nc" id="L263">        checkInputExecNameIsValid(execution.getName());</span>
+<span class="nc" id="L264">        return initExecution(</span>
+<span class="nc" id="L265">            execution.getPipelineIdentifier(), inputMap, execution.getTimeout(),</span>
+<span class="nc" id="L266">            execution.getName(), execution.getStudyIdentifier());</span>
+    }
+
+    private String handleRestParameter(String parameterName, Object restParameterValue)
+            throws ApiException {
+<span class="nc bnc" id="L271" title="All 2 branches missed.">        if (restParameterValue instanceof List) {</span>
+<span class="nc" id="L272">            StringBuilder paramBuilder = new StringBuilder();</span>
+<span class="nc" id="L273">            boolean isFirst = true;</span>
+<span class="nc bnc" id="L274" title="All 2 branches missed.">            for (Object listElement : (List) restParameterValue) {</span>
+<span class="nc bnc" id="L275" title="All 2 branches missed.">                if (!isFirst) {</span>
+<span class="nc" id="L276">                    paramBuilder.append(ApplicationConstants.SEPARATOR_LIST);</span>
+                }
+<span class="nc" id="L278">                String inputValue = listElement.toString();</span>
+<span class="nc" id="L279">                checkInputIsValid(inputValue);</span>
+<span class="nc" id="L280">                paramBuilder.append(inputValue);</span>
+<span class="nc" id="L281">                isFirst = false;</span>
+<span class="nc" id="L282">            }</span>
+<span class="nc" id="L283">            logger.info(&quot;Handling list parameter for parameter [&quot; + parameterName +&quot;]&quot;);</span>
+<span class="nc" id="L284">            return paramBuilder.toString();</span>
+        } else {
+<span class="nc" id="L286">            String inputValue = restParameterValue.toString();</span>
+<span class="nc" id="L287">            checkInputIsValid(inputValue);</span>
+<span class="nc" id="L288">            return restParameterValue.toString();</span>
+        }
+    }
+
+    private void checkInputIsValid(String input) throws ApiException {
+<span class="nc" id="L293">        String validChars = INPUT_VALID_CHARS + ADDITIONNAL_INPUT_VALID_CHARS;</span>
+<span class="nc bnc" id="L294" title="All 2 branches missed.">        if( ! input.matches(&quot;[&quot; + validChars + &quot;]+&quot;)) {</span>
+<span class="nc" id="L295">            logger.error(&quot;Input {} is not valid. Authorized characters are {}&quot;,</span>
+                    input, validChars);
+<span class="nc" id="L297">            throw new ApiException(&quot;Input &quot; + input + &quot; is not valid.&quot;);</span>
+        }
+<span class="nc" id="L299">    }</span>
+
+    private void checkInputExecNameIsValid(String input) throws ApiException {
+<span class="nc bnc" id="L302" title="All 2 branches missed.">        if( ! input.matches(&quot;[&quot; + ApplicationConstants.EXEC_NAME_VALID_CHARS + &quot;]+&quot;)) {</span>
+<span class="nc" id="L303">            logger.error(&quot;Execution name {} is not valid. Authorized characters are {}&quot;,</span>
+                    input, ApplicationConstants.EXEC_NAME_VALID_CHARS);
+<span class="nc" id="L305">            throw new ApiException(&quot;Execution name &quot; + input + &quot; is not valid.&quot;);</span>
+
+        }
+<span class="nc" id="L308">    }</span>
+
+    private String initExecution(String pipelineId,
+                                Map&lt;String,String&gt; inputValues,
+                                Integer timeoutInSeconds,
+                                String executionName,
+                                String studyId) throws ApiException {
+        try {
+            // We cannot easily initialize an execution without starting it.
+            // So we will just launch the execution, and launch an error in case playExecution is not true.
+            // Set warnings
+<span class="nc bnc" id="L319" title="All 2 branches missed.">            if (studyId != null) {</span>
+<span class="nc" id="L320">                logger.warn(&quot;Study identifier ({}) was ignored.&quot;, studyId);</span>
+            }
+<span class="nc bnc" id="L322" title="All 4 branches missed.">            if (timeoutInSeconds != null &amp;&amp; timeoutInSeconds != 0) {</span>
+<span class="nc" id="L323">                logger.warn(&quot;Timeout value ({}) was ignored.&quot;, timeoutInSeconds);</span>
+            }
+
+            // Check that all pipeline inputs are present
+<span class="nc" id="L327">            Pipeline p = pipelineBusiness.getPipelineWithResultsDirectory(pipelineId);</span>
+<span class="nc bnc" id="L328" title="All 2 branches missed.">            for (PipelineParameter pp : p.getParameters()) {</span>
+<span class="nc bnc" id="L329" title="All 2 branches missed.">                if (pp.isReturnedValue()) {</span>
+<span class="nc" id="L330">                    continue;</span>
+                }
+                // pp is an input
+<span class="nc bnc" id="L333" title="All 2 branches missed.">                if (!(inputValues.get(pp.getName()) == null)) {</span>
+<span class="nc" id="L334">                    continue;</span>
+                }
+                // pp is an empty input
+<span class="nc bnc" id="L337" title="All 2 branches missed.">                if (pp.getDefaultValue() != null) {</span>
+<span class="nc" id="L338">                    inputValues.put(pp.getName(), pp.getDefaultValue().toString());</span>
+<span class="nc" id="L339">                    continue;</span>
+                }
+                // pp is an empty input with no default value
+<span class="nc bnc" id="L342" title="All 2 branches missed.">                if (pp.isOptional()) {</span>
+<span class="nc" id="L343">                    inputValues.put(&quot;no&quot;, pp.getDefaultValue().toString());//that's how optional values are handled in VIP</span>
+<span class="nc" id="L344">                    continue;</span>
+                }
+                // pp is an empty input with no default value and it is not optional
+<span class="nc" id="L347">                logger.error(&quot;Error initialising {}, missing {} parameter&quot;,</span>
+<span class="nc" id="L348">                        pipelineId, pp.getName());</span>
+<span class="nc" id="L349">                throw new ApiException(&quot;Parameter &quot; + pp.getName() + &quot; is empty while it is not optional and it has no default value.&quot;);</span>
+            }
+
+<span class="nc" id="L352">            boolean hasInputResultsDirectory =</span>
+<span class="nc" id="L353">                inputValues.containsKey(</span>
+                    CoreConstants.RESULTS_DIRECTORY_PARAM_NAME);
+
+<span class="nc" id="L356">            boolean hasPipelineResultsDirectory =</span>
+<span class="nc" id="L357">                p.getParameters().stream().anyMatch(</span>
+                        param -&gt;
+<span class="nc" id="L359">                        param.getName().equals(CoreConstants.RESULTS_DIRECTORY_PARAM_NAME));</span>
+
+<span class="nc bnc" id="L361" title="All 4 branches missed.">            if (hasInputResultsDirectory &amp;&amp; !hasPipelineResultsDirectory) {</span>
+<span class="nc" id="L362">                logger.error(&quot;Missing results-directory for {}&quot;, pipelineId);</span>
+<span class="nc" id="L363">                throw new ApiException(</span>
+                    &quot;Input has parameter results-directory but it is not defined in pipeline.&quot;);
+            }
+
+            // Get user groups
+<span class="nc" id="L368">            List&lt;String&gt; groupNames = new ArrayList&lt;&gt;();</span>
+<span class="nc bnc" id="L369" title="All 2 branches missed.">            for (Group g : configurationBusiness</span>
+<span class="nc" id="L370">                    .getUserGroups(currentUserProvider.get().getEmail())</span>
+<span class="nc" id="L371">                    .keySet()) {</span>
+<span class="nc" id="L372">                groupNames.add(g.getName());</span>
+<span class="nc" id="L373">            }</span>
+
+            // Get application name and version
+<span class="nc" id="L376">            String applicationName = pipelineBusiness.getApplicationName(pipelineId);</span>
+<span class="nc" id="L377">            String applicationVersion = pipelineBusiness.getApplicationVersion(pipelineId);</span>
+
+            // Get application classes
+<span class="nc" id="L380">            List&lt;String&gt; classes = applicationBusiness</span>
+<span class="nc" id="L381">                    .getApplication(applicationName)</span>
+<span class="nc" id="L382">                    .getApplicationClasses();</span>
+<span class="nc bnc" id="L383" title="All 2 branches missed.">            if (classes.isEmpty()) {</span>
+<span class="nc" id="L384">                logger.error(&quot;No class configured for {}&quot;, pipelineId);</span>
+<span class="nc" id="L385">                throw new ApiException(&quot;Application &quot; + applicationName + &quot; cannot be launched because it doesn't belong to any VIP class.&quot;);</span>
+            }
+
+<span class="nc" id="L388">            logger.info(&quot;Launching workflow with the following parameters: &quot;);</span>
+<span class="nc" id="L389">            logger.info(currentUserProvider.get().toString());</span>
+<span class="nc" id="L390">            logger.info(groupNames.toString());</span>
+<span class="nc" id="L391">            logger.info(inputValues.toString());</span>
+<span class="nc" id="L392">            logger.info(applicationName);</span>
+<span class="nc" id="L393">            logger.info(applicationVersion);</span>
+<span class="nc" id="L394">            logger.info(classes.get(0));</span>
+<span class="nc" id="L395">            logger.info(executionName);</span>
+
+            // Launch the workflow
+<span class="nc" id="L398">            return workflowBusiness.launch(</span>
+<span class="nc" id="L399">                    currentUserProvider.get(),</span>
+                    groupNames,
+                    inputValues,
+                    applicationName,
+                    applicationVersion,
+<span class="nc" id="L404">                    classes.get(0),</span>
+                    executionName);
+<span class="nc" id="L406">        } catch (BusinessException ex) {</span>
+<span class="nc" id="L407">            throw new ApiException(ex);</span>
+        }
+    }
+
+    public void killExecution(String executionId) throws ApiException {
+        try {
+<span class="nc" id="L413">            workflowBusiness.kill(executionId);</span>
+<span class="nc" id="L414">        } catch (BusinessException ex) {</span>
+<span class="nc" id="L415">            throw new ApiException(ex);</span>
+<span class="nc" id="L416">        }</span>
+<span class="nc" id="L417">    }</span>
+
+    public void deleteExecution(String executionId, Boolean deleteFiles) throws ApiException {
+<span class="nc" id="L420">        checkIfUserCanAccessExecution(executionId);</span>
+        try {
+<span class="nc" id="L422">            Simulation s = workflowBusiness.getSimulation(executionId);</span>
+<span class="nc bnc" id="L423" title="All 4 branches missed.">            if (s.getStatus() != SimulationStatus.Completed &amp;&amp; s.getStatus() != SimulationStatus.Killed) {</span>
+<span class="nc" id="L424">                logger.error(&quot;Cannot delete exec {}, it is {}&quot;, executionId, s.getStatus());</span>
+<span class="nc" id="L425">                throw new ApiException(&quot;Cannot delete execution &quot; + executionId + &quot; because status is &quot; + s.getStatus().toString());</span>
+            }
+            // Note: this won't delete the intermediate files in case the execution was run locally, which violates the spec.
+            // Purge should be called in that case but purge also violates the spec.
+<span class="nc" id="L429">            workflowBusiness.clean(executionId, currentUserProvider.get().getEmail(), deleteFiles);</span>
+<span class="nc" id="L430">        } catch (BusinessException ex) {</span>
+<span class="nc" id="L431">            throw new ApiException(ex);</span>
+<span class="nc" id="L432">        }</span>
+<span class="nc" id="L433">    }</span>
+
+    public List&lt;PathProperties&gt; getExecutionResultsPaths(String executionId)
+            throws ApiException {
+
+<span class="nc" id="L438">        List&lt;PathProperties&gt; pathResults = new ArrayList&lt;&gt;();</span>
+        List&lt;InOutData&gt; outputs;
+        try {
+<span class="nc" id="L441">            outputs = workflowBusiness.getOutputData(</span>
+<span class="nc" id="L442">                executionId, currentUserProvider.get().getFolder());</span>
+<span class="nc" id="L443">        } catch (BusinessException e) {</span>
+<span class="nc" id="L444">            throw new ApiException(e);</span>
+<span class="nc" id="L445">        }</span>
+<span class="nc bnc" id="L446" title="All 2 branches missed.">        for (InOutData output : outputs) {</span>
+<span class="nc" id="L447">            String outputPath = output.getPath();</span>
+<span class="nc" id="L448">            pathResults.add(dataApiBusiness.getPathProperties(outputPath));</span>
+<span class="nc" id="L449">        }</span>
+<span class="nc" id="L450">        return pathResults;</span>
+    }
+
+    private ExecutionStatus VIPtoCarminStatus(SimulationStatus s) {
+
+<span class="nc bnc" id="L455" title="All 6 branches missed.">        switch (s) {</span>
+            case Running:
+<span class="nc" id="L457">                return ExecutionStatus.RUNNING;</span>
+            case Completed:
+<span class="nc" id="L459">                return ExecutionStatus.FINISHED;</span>
+            case Failed:
+<span class="nc" id="L461">                return ExecutionStatus.EXECUTION_FAILED;</span>
+            case Killed:
+<span class="nc" id="L463">                return ExecutionStatus.KILLED;</span>
+            case Queued:
+<span class="nc" id="L465">                return ExecutionStatus.READY;</span>
+            case Cleaned:
+            case Unknown:
+            default:
+<span class="nc" id="L469">                return ExecutionStatus.UNKOWN;</span>
+        }
+    }
+
+    public void checkIfUserCanAccessExecution(String executionId) throws ApiException {
+        try {
+<span class="fc" id="L475">            User user = currentUserProvider.get();</span>
+<span class="fc bfc" id="L476" title="All 2 branches covered.">            if (user.isSystemAdministrator()) {</span>
+<span class="fc" id="L477">                return;</span>
+            }
+<span class="fc" id="L479">            Simulation s = workflowBusiness.getSimulation(executionId);</span>
+<span class="fc bfc" id="L480" title="All 2 branches covered.">            if (s.getUserName().equals(user.getFullName())) {</span>
+<span class="fc" id="L481">                return;</span>
+            }
+<span class="fc" id="L483">            logger.error(&quot;Permission denied for {} on exec {}&quot;, user, executionId);</span>
+<span class="fc" id="L484">            throw new ApiException(&quot;Permission denied&quot;);</span>
+<span class="nc" id="L485">        } catch (BusinessException ex) {</span>
+<span class="nc" id="L486">            throw new ApiException(ex);</span>
+        }
+
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

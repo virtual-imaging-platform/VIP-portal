@@ -1,0 +1,496 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../jacoco-resources/report.gif" type="image/gif"/><title>SimulationData.java</title><link rel="stylesheet" href="../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../index.html" class="el_report">coverage</a> &gt; <a href="../index.html" class="el_bundle">vip-application</a> &gt; <a href="index.source.html" class="el_package">fr.insalyon.creatis.vip.application.server.dao.h2</a> &gt; <span class="el_source">SimulationData.java</span></div><h1>SimulationData.java</h1><pre class="source lang-java linenums">/*
+ * Copyright and authors: see LICENSE.txt in base repository.
+ *
+ * This software is a web portal for pipeline execution on distributed systems.
+ *
+ * This software is governed by the CeCILL-B license under French law and
+ * abiding by the rules of distribution of free software.  You can  use, 
+ * modify and/ or redistribute the software under the terms of the CeCILL-B
+ * license as circulated by CEA, CNRS and INRIA at the following URL
+ * &quot;http://www.cecill.info&quot;. 
+ *
+ * As a counterpart to the access to the source code and  rights to copy,
+ * modify and redistribute granted by the license, users are provided only
+ * with a limited warranty  and the software's author,  the holder of the
+ * economic rights,  and the successive licensors  have only  limited
+ * liability. 
+ *
+ * In this respect, the user's attention is drawn to the risks associated
+ * with loading,  using,  modifying and/or developing or reproducing the
+ * software by the user in light of its specific status of free software,
+ * that may mean  that it is complicated to manipulate,  and  that  also
+ * therefore means  that it is reserved for developers  and  experienced
+ * professionals having in-depth computer knowledge. Users are therefore
+ * encouraged to load and test the software's suitability as regards their
+ * requirements in conditions enabling the security of their systems and/or 
+ * data to be ensured and,  more generally, to use and operate it in the 
+ * same conditions as regards security. 
+ *
+ * The fact that you are presently reading this means that you have had
+ * knowledge of the CeCILL-B license and that you accept its terms.
+ */
+package fr.insalyon.creatis.vip.application.server.dao.h2;
+
+import fr.insalyon.creatis.vip.application.client.bean.Task;
+import fr.insalyon.creatis.vip.application.client.view.monitor.job.TaskStatus;
+import fr.insalyon.creatis.vip.application.server.dao.SimulationDAO;
+import fr.insalyon.creatis.vip.core.server.dao.DAOException;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
+
+/**
+ * Creates dao for the h2 database of a simulation.
+ * Each dao is specific to a single database, and so to a single simulation.
+ *
+ * The default is to access the h2 database through an h2 server via tcp,
+ * but this is changeable to use (for instance) a memory or a local h2
+ * database for testing or local use
+ * @author Rafael Ferreira da Silva
+ */
+@Component
+@Scope(&quot;prototype&quot;)
+public class SimulationData extends AbstractJobData implements SimulationDAO {
+
+<span class="nc" id="L64">    private final Logger logger = LoggerFactory.getLogger(getClass());</span>
+
+    public SimulationData(String dbPath) {
+<span class="nc" id="L67">        super(dbPath);</span>
+<span class="nc" id="L68">    }</span>
+
+    @Override
+    public List&lt;Task&gt; getTasks() throws DAOException {
+
+<span class="nc" id="L73">        List&lt;Task&gt; list = new ArrayList&lt;Task&gt;();</span>
+
+        try {
+<span class="nc" id="L76">            Statement stat = connection.createStatement();</span>
+<span class="nc" id="L77">            ResultSet rs = stat.executeQuery(&quot;SELECT &quot;</span>
+                    + &quot;invocation_id, status, command &quot;
+                    + &quot;FROM Jobs &quot;
+                    + &quot;ORDER BY creation&quot;);
+
+<span class="nc bnc" id="L82" title="All 2 branches missed.">            while (rs.next()) {</span>
+<span class="nc" id="L83">                list.add(new Task(rs.getInt(&quot;invocation_id&quot;),</span>
+<span class="nc" id="L84">                        TaskStatus.valueOf(rs.getString(&quot;status&quot;)),</span>
+<span class="nc" id="L85">                        rs.getString(&quot;command&quot;)));</span>
+            }
+<span class="nc" id="L87">            stat.close();</span>
+
+<span class="nc" id="L89">        } catch (SQLException ex) {</span>
+<span class="nc bnc" id="L90" title="All 2 branches missed.">            if (!ex.getMessage().contains(&quot;Table \&quot;JOBS\&quot; not found&quot;)) {</span>
+<span class="nc" id="L91">                logger.error(&quot;Error getting all jobs&quot;, ex);</span>
+<span class="nc" id="L92">                throw new DAOException(ex);</span>
+            }
+        } finally {
+<span class="nc" id="L95">            close(logger);</span>
+        }
+<span class="nc" id="L97">        return list;</span>
+    }
+
+    @Override
+    public List&lt;Task&gt; getTasks(int jobID) throws DAOException {
+
+<span class="nc" id="L103">        List&lt;Task&gt; list = new ArrayList&lt;Task&gt;();</span>
+        try {
+<span class="nc" id="L105">            PreparedStatement ps = connection.prepareStatement(</span>
+                    &quot;SELECT j.id, status, command, file_name, exit_code, node_site, node_name, parameters, &quot;
+                    + &quot;ms FROM Jobs AS j LEFT JOIN (&quot;
+                    + &quot;  SELECT jm.id, minor_status AS ms FROM JobsMinorStatus AS jm RIGHT JOIN ( &quot;
+                    + &quot;    SELECT id, MAX(event_date) AS ed FROM JobsMinorStatus GROUP BY id &quot;
+                    + &quot;  ) AS jm1 ON jm1.id = jm.id AND jm1.ed = jm.event_date &quot;
+                    + &quot;) AS jm2 ON j.id = jm2.id &quot;
+                    + &quot;WHERE j.invocation_id = ? &quot;
+                    + &quot;ORDER BY j.id&quot;);
+<span class="nc" id="L114">            ps.setInt(1, jobID);</span>
+<span class="nc" id="L115">            ResultSet rs = ps.executeQuery();</span>
+
+<span class="nc bnc" id="L117" title="All 2 branches missed.">            while (rs.next()) {</span>
+<span class="nc" id="L118">                list.add(parseTask(rs));</span>
+            }
+<span class="nc" id="L120">            ps.close();</span>
+
+<span class="nc" id="L122">        } catch (SQLException ex) {</span>
+<span class="nc" id="L123">            logger.error(&quot;Error getting jobs for invocation {}&quot;, jobID, ex);</span>
+<span class="nc" id="L124">            throw new DAOException(ex);</span>
+        } finally {
+<span class="nc" id="L126">            close(logger);</span>
+        }
+<span class="nc" id="L128">        return list;</span>
+    }
+
+    @Override
+    public Task getTask(String taskID) throws DAOException {
+
+        try {
+<span class="nc" id="L135">            PreparedStatement ps = connection.prepareStatement(</span>
+                    &quot;SELECT j.id, status, command, file_name, exit_code, node_site, node_name, parameters, &quot;
+                    + &quot;ms FROM Jobs AS j LEFT JOIN (&quot;
+                    + &quot;  SELECT jm.id, minor_status AS ms FROM JobsMinorStatus AS jm RIGHT JOIN ( &quot;
+                    + &quot;    SELECT id, MAX(event_date) AS ed FROM JobsMinorStatus GROUP BY id &quot;
+                    + &quot;  ) AS jm1 ON jm1.id = jm.id AND jm1.ed = jm.event_date &quot;
+                    + &quot;) AS jm2 ON j.id = jm2.id &quot;
+                    + &quot;WHERE j.id = ? &quot;
+                    + &quot;ORDER BY j.id&quot;);
+<span class="nc" id="L144">            ps.setString(1, taskID);</span>
+<span class="nc" id="L145">            ResultSet rs = ps.executeQuery();</span>
+<span class="nc" id="L146">            rs.next();</span>
+<span class="nc" id="L147">            Task task = parseTask(rs);</span>
+<span class="nc" id="L148">            ps.close();</span>
+<span class="nc" id="L149">            return task;</span>
+
+<span class="nc" id="L151">        } catch (SQLException ex) {</span>
+<span class="nc" id="L152">            logger.error(&quot;Error getting job {}&quot;, taskID, ex);</span>
+<span class="nc" id="L153">            throw new DAOException(ex);</span>
+        } finally {
+<span class="nc" id="L155">            close(logger);</span>
+        }
+    }
+
+    private Task parseTask(ResultSet rs) throws SQLException {
+
+<span class="nc" id="L161">        TaskStatus status = TaskStatus.valueOf(rs.getString(&quot;status&quot;));</span>
+<span class="nc" id="L162">        int minorStatus = -1;</span>
+
+<span class="nc bnc" id="L164" title="All 2 branches missed.">        if (status == TaskStatus.RUNNING) {</span>
+<span class="nc" id="L165">            minorStatus = parseMinorStatus(rs.getString(&quot;ms&quot;));</span>
+        }
+
+<span class="nc" id="L168">        return new Task(rs.getString(&quot;id&quot;), status,</span>
+<span class="nc" id="L169">                rs.getString(&quot;command&quot;), rs.getString(&quot;file_name&quot;),</span>
+<span class="nc" id="L170">                rs.getInt(&quot;exit_code&quot;), rs.getString(&quot;node_site&quot;),</span>
+<span class="nc" id="L171">                rs.getString(&quot;node_name&quot;), minorStatus,</span>
+<span class="nc" id="L172">                rs.getString(&quot;parameters&quot;).split(&quot; &quot;));</span>
+    }
+
+    @Override
+    public void sendTaskSignal(String taskID, TaskStatus status) throws DAOException {
+
+        try {
+<span class="nc" id="L179">            PreparedStatement ps = connection.prepareStatement(</span>
+                    &quot;UPDATE Jobs SET status = ? WHERE id = ?&quot;);
+
+<span class="nc" id="L182">            ps.setString(1, status.name());</span>
+<span class="nc" id="L183">            ps.setString(2, taskID);</span>
+<span class="nc" id="L184">            ps.executeUpdate();</span>
+<span class="nc" id="L185">            ps.close();</span>
+
+<span class="nc" id="L187">        } catch (SQLException ex) {</span>
+<span class="nc" id="L188">            logger.error(&quot;Error sending signal {} to job {}&quot;, status, taskID, ex);</span>
+<span class="nc" id="L189">            throw new DAOException(ex);</span>
+        } finally {
+<span class="nc" id="L191">            close(logger);</span>
+        }
+<span class="nc" id="L193">    }</span>
+
+    @Override
+    public List&lt;Task&gt; getJobs() throws DAOException {
+
+<span class="nc" id="L198">        List&lt;Task&gt; list = new ArrayList&lt;Task&gt;();</span>
+
+        try {
+<span class="nc" id="L201">            Statement stat = connection.createStatement();</span>
+<span class="nc" id="L202">            ResultSet rs = stat.executeQuery(</span>
+                    &quot;SELECT j.id, status, command, file_name, exit_code, node_site, node_name, parameters, &quot;
+                    + &quot;ms FROM Jobs AS j LEFT JOIN (&quot;
+                    + &quot;  SELECT jm.id, minor_status AS ms FROM JobsMinorStatus AS jm RIGHT JOIN ( &quot;
+                    + &quot;    SELECT id, MAX(event_date) AS ed FROM JobsMinorStatus GROUP BY id &quot;
+                    + &quot;  ) AS jm1 ON jm1.id = jm.id AND jm1.ed = jm.event_date &quot;
+                    + &quot;) AS jm2 ON j.id = jm2.id ORDER BY j.id&quot;);
+
+<span class="nc bnc" id="L210" title="All 2 branches missed.">            while (rs.next()) {</span>
+<span class="nc" id="L211">                TaskStatus status = TaskStatus.valueOf(rs.getString(&quot;status&quot;));</span>
+<span class="nc" id="L212">                int minorStatus = -1;</span>
+
+<span class="nc bnc" id="L214" title="All 2 branches missed.">                if (status == TaskStatus.RUNNING) {</span>
+<span class="nc" id="L215">                    minorStatus = parseMinorStatus(rs.getString(&quot;ms&quot;));</span>
+                }
+
+<span class="nc" id="L218">                list.add(new Task(rs.getString(&quot;id&quot;), status,</span>
+<span class="nc" id="L219">                        rs.getString(&quot;command&quot;), rs.getString(&quot;file_name&quot;),</span>
+<span class="nc" id="L220">                        rs.getInt(&quot;exit_code&quot;), rs.getString(&quot;node_site&quot;),</span>
+<span class="nc" id="L221">                        rs.getString(&quot;node_name&quot;), minorStatus,</span>
+<span class="nc" id="L222">                        rs.getString(&quot;parameters&quot;).split(&quot; &quot;)));</span>
+<span class="nc" id="L223">            }</span>
+<span class="nc" id="L224">            stat.close();</span>
+
+<span class="nc" id="L226">        } catch (SQLException ex) {</span>
+<span class="nc bnc" id="L227" title="All 2 branches missed.">            if (!ex.getMessage().contains(&quot;Table \&quot;JOBS\&quot; not found&quot;)</span>
+<span class="nc bnc" id="L228" title="All 2 branches missed.">                    &amp;&amp; !ex.getMessage().contains(&quot;Table \&quot;JOBSMINORSTATUS\&quot; not found&quot;)) {</span>
+<span class="nc" id="L229">                logger.error(&quot;Error getting all jobs&quot;, ex);</span>
+<span class="nc" id="L230">                throw new DAOException(ex);</span>
+            }
+        } finally {
+<span class="nc" id="L233">            close(logger);</span>
+        }
+<span class="nc" id="L235">        return list;</span>
+    }
+
+    @Override
+    public List&lt;String&gt; getExecutionPerNumberOfJobs(int binSize) throws DAOException {
+
+<span class="nc" id="L241">        return getHistogramTimes(binSize, &quot;running&quot;, &quot;upload&quot;);</span>
+    }
+
+    @Override
+    public List&lt;String&gt; getDownloadPerNumberOfJobs(int binSize) throws DAOException {
+
+<span class="nc" id="L247">        return getHistogramTimes(binSize, &quot;download&quot;, &quot;running&quot;);</span>
+    }
+
+    @Override
+    public List&lt;String&gt; getUploadPerNumberOfJobs(int binSize) throws DAOException {
+
+<span class="nc" id="L253">        return getHistogramTimes(binSize, &quot;upload&quot;, &quot;end_e&quot;);</span>
+    }
+
+    @Override
+    public List&lt;String&gt; getJobsPerTime() throws DAOException {
+
+        try {
+<span class="nc" id="L260">            List&lt;String&gt; list = new ArrayList&lt;String&gt;();</span>
+<span class="nc" id="L261">            Statement stat = connection.createStatement();</span>
+<span class="nc" id="L262">            ResultSet rs = stat.executeQuery(&quot;SELECT status, creation AS crea, &quot;</span>
+                    + &quot;TIMESTAMPDIFF('SECOND', creation, queued) AS creation, &quot;
+                    + &quot;TIMESTAMPDIFF('SECOND', queued, download) AS queued, &quot;
+                    + &quot;TIMESTAMPDIFF('SECOND', download, running) AS download, &quot;
+                    + &quot;TIMESTAMPDIFF('SECOND', running, upload) AS running, &quot;
+                    + &quot;TIMESTAMPDIFF('SECOND', upload, end_e) AS upload, &quot;
+                    + &quot;checkpoint_init, checkpoint_upload &quot;
+                    + &quot;FROM Jobs ORDER BY id&quot;);
+
+<span class="nc" id="L271">            long start = -1;</span>
+
+<span class="nc bnc" id="L273" title="All 2 branches missed.">            while (rs.next()) {</span>
+
+<span class="nc" id="L275">                long creation = rs.getTimestamp(&quot;crea&quot;).getTime();</span>
+<span class="nc bnc" id="L276" title="All 2 branches missed.">                if (start == -1) {</span>
+<span class="nc" id="L277">                    start = creation;</span>
+                }
+<span class="nc" id="L279">                creation -= start;</span>
+<span class="nc" id="L280">                list.add(rs.getString(&quot;status&quot;)</span>
+<span class="nc" id="L281">                        + &quot;##&quot; + (rs.getInt(&quot;creation&quot;) + (creation / 1000))</span>
+<span class="nc" id="L282">                        + &quot;##&quot; + rs.getInt(&quot;queued&quot;)</span>
+<span class="nc" id="L283">                        + &quot;##&quot; + rs.getInt(&quot;download&quot;)</span>
+<span class="nc" id="L284">                        + &quot;##&quot; + rs.getInt(&quot;running&quot;)</span>
+<span class="nc" id="L285">                        + &quot;##&quot; + rs.getInt(&quot;upload&quot;)</span>
+<span class="nc" id="L286">                        + &quot;##&quot; + rs.getInt(&quot;checkpoint_init&quot;)</span>
+<span class="nc" id="L287">                        + &quot;##&quot; + rs.getInt(&quot;checkpoint_upload&quot;)</span>
+                        + &quot;##0&quot;);
+<span class="nc" id="L289">            }</span>
+<span class="nc" id="L290">            stat.close();</span>
+<span class="nc" id="L291">            return list;</span>
+
+<span class="nc" id="L293">        } catch (SQLException ex) {</span>
+<span class="nc" id="L294">            logger.error(&quot;Error getting all jobs with timings&quot;, ex);</span>
+<span class="nc" id="L295">            throw new DAOException(ex);</span>
+        } finally {
+<span class="nc" id="L297">            close(logger);</span>
+        }
+    }
+
+    @Override
+    public List&lt;String&gt; getCkptsPerJob() throws DAOException {
+
+        try {
+<span class="nc" id="L305">            List&lt;String&gt; list = new ArrayList&lt;String&gt;();</span>
+<span class="nc" id="L306">            PreparedStatement ps = connection.prepareStatement(&quot;SELECT j.id, status, &quot;</span>
+                    + &quot;COALESCE(jm.occ, 0) AS ckpt_occ FROM Jobs AS j LEFT JOIN &quot;
+                    + &quot;(SELECT id, count(minor_status) AS occ FROM JobsMinorStatus &quot;
+                    + &quot;WHERE minor_status = ? GROUP BY id) AS jm &quot;
+                    + &quot;ON j.id = jm.id ORDER BY ckpt_occ&quot;);
+<span class="nc" id="L311">            ps.setString(1, &quot;CheckPoint_End&quot;);</span>
+<span class="nc" id="L312">            ResultSet rs = ps.executeQuery();</span>
+
+<span class="nc bnc" id="L314" title="All 2 branches missed.">            while (rs.next()) {</span>
+<span class="nc" id="L315">                list.add(rs.getString(&quot;status&quot;) + &quot;##&quot; + rs.getString(&quot;ckpt_occ&quot;));</span>
+            }
+<span class="nc" id="L317">            ps.close();</span>
+<span class="nc" id="L318">            return list;</span>
+
+<span class="nc" id="L320">        } catch (SQLException ex) {</span>
+<span class="nc" id="L321">            logger.error(&quot;Error getting all jobs with checkpoints&quot;, ex);</span>
+<span class="nc" id="L322">            throw new DAOException(ex);</span>
+        } finally {
+<span class="nc" id="L324">            close(logger);</span>
+        }
+    }
+
+    @Override
+    public List&lt;String&gt; getSiteHistogram() throws DAOException {
+
+        try {
+<span class="nc" id="L332">            Statement stat = connection.createStatement();</span>
+<span class="nc" id="L333">            ResultSet rs = stat.executeQuery(&quot;SELECT COUNT(id) AS num, &quot;</span>
+                    + &quot;node_site AS site FROM jobs GROUP BY node_site &quot;
+                    + &quot;ORDER BY num DESC&quot;);
+
+<span class="nc" id="L337">            List&lt;String&gt; list = new ArrayList&lt;String&gt;();</span>
+<span class="nc bnc" id="L338" title="All 2 branches missed.">            while (rs.next()) {</span>
+<span class="nc" id="L339">                list.add(rs.getString(&quot;site&quot;) + &quot;##&quot; + rs.getString(&quot;num&quot;));</span>
+            }
+<span class="nc" id="L341">            stat.close();</span>
+<span class="nc" id="L342">            return list;</span>
+
+<span class="nc" id="L344">        } catch (SQLException ex) {</span>
+<span class="nc" id="L345">            logger.error(&quot;Error getting all jobs by site&quot;, ex);</span>
+<span class="nc" id="L346">            throw new DAOException(ex);</span>
+        } finally {
+<span class="nc" id="L348">            close(logger);</span>
+        }
+    }
+
+    @Override
+    public void sendSignal(String jobID, TaskStatus status) throws DAOException {
+
+        try {
+<span class="nc" id="L356">            PreparedStatement ps = connection.prepareStatement(</span>
+                    &quot;UPDATE Jobs SET status = ? WHERE id = ?&quot;);
+
+<span class="nc" id="L359">            ps.setString(1, status.name());</span>
+<span class="nc" id="L360">            ps.setString(2, jobID);</span>
+<span class="nc" id="L361">            ps.executeUpdate();</span>
+<span class="nc" id="L362">            ps.close();</span>
+
+<span class="nc" id="L364">        } catch (SQLException ex) {</span>
+<span class="nc" id="L365">            logger.error(&quot;Error sending signal {} to job {}&quot;, status, jobID, ex);</span>
+<span class="nc" id="L366">            throw new DAOException(ex);</span>
+        } finally {
+<span class="nc" id="L368">            close(logger);</span>
+        }
+<span class="nc" id="L370">    }</span>
+
+    @Override
+    public int[] getNumberOfActiveTasks() throws DAOException {
+
+        try {
+<span class="nc" id="L376">            PreparedStatement ps = connection.prepareStatement(&quot;SELECT &quot;</span>
+                    + &quot;status, count(id) AS num FROM Jobs &quot;
+                    + &quot;WHERE status = ? OR status = ? &quot;
+                    + &quot;GROUP BY status&quot;);
+<span class="nc" id="L380">            ps.setString(1, TaskStatus.RUNNING.name());</span>
+<span class="nc" id="L381">            ps.setString(2, TaskStatus.QUEUED.name());</span>
+
+<span class="nc" id="L383">            ResultSet rs = ps.executeQuery();</span>
+<span class="nc" id="L384">            int[] tasks = new int[2];</span>
+
+<span class="nc bnc" id="L386" title="All 2 branches missed.">            while (rs.next()) {</span>
+<span class="nc bnc" id="L387" title="All 2 branches missed.">                if (TaskStatus.valueOf(rs.getString(&quot;status&quot;)) == TaskStatus.RUNNING) {</span>
+<span class="nc" id="L388">                    tasks[0] = rs.getInt(&quot;num&quot;);</span>
+<span class="nc bnc" id="L389" title="All 2 branches missed.">                } else if (TaskStatus.valueOf(rs.getString(&quot;status&quot;)) == TaskStatus.QUEUED) {</span>
+<span class="nc" id="L390">                    tasks[1] = rs.getInt(&quot;num&quot;);</span>
+                }
+            }
+<span class="nc" id="L393">            ps.close();</span>
+<span class="nc" id="L394">            return tasks;</span>
+
+<span class="nc" id="L396">        } catch (SQLException ex) {</span>
+<span class="nc bnc" id="L397" title="All 2 branches missed.">            if (ex.getMessage().contains(&quot;Table \&quot;JOBS\&quot; not found&quot;)) {</span>
+<span class="nc" id="L398">                return new int[]{0, 0};</span>
+            }
+<span class="nc" id="L400">            logger.error(&quot;Error counting active jobs&quot;, ex);</span>
+<span class="nc" id="L401">            throw new DAOException(ex);</span>
+        } finally {
+<span class="nc" id="L403">            close(logger);</span>
+        }
+    }
+
+    @Override
+    public Map&lt;String, Integer&gt; getNodeCountriesMap() throws DAOException {
+
+        try {
+<span class="nc" id="L411">            PreparedStatement ps = connection.prepareStatement(&quot;SELECT &quot;</span>
+                    + &quot;SUBSTR(node_name, -2) AS country, COUNT(id) AS num &quot;
+                    + &quot;FROM Jobs WHERE status = ? &quot;
+                    + &quot;GROUP BY country ORDER BY country&quot;);
+<span class="nc" id="L415">            ps.setString(1, TaskStatus.COMPLETED.name());</span>
+<span class="nc" id="L416">            ResultSet rs = ps.executeQuery();</span>
+
+<span class="nc" id="L418">            Map&lt;String, Integer&gt; map = new HashMap&lt;String, Integer&gt;();</span>
+<span class="nc bnc" id="L419" title="All 2 branches missed.">            while (rs.next()) {</span>
+<span class="nc" id="L420">                String name = rs.getString(&quot;country&quot;);</span>
+<span class="nc bnc" id="L421" title="All 4 branches missed.">                if (name != null &amp;&amp; !name.isEmpty()) {</span>
+<span class="nc" id="L422">                    map.put(name, rs.getInt(&quot;num&quot;));</span>
+                }
+<span class="nc" id="L424">            }</span>
+<span class="nc" id="L425">            ps.close();</span>
+<span class="nc" id="L426">            return map;</span>
+
+<span class="nc" id="L428">        } catch (SQLException ex) {</span>
+<span class="nc bnc" id="L429" title="All 2 branches missed.">            if (ex.getMessage().contains(&quot;Table \&quot;JOBS\&quot; not found&quot;)) {</span>
+<span class="nc" id="L430">                return new HashMap&lt;String, Integer&gt;();</span>
+            }
+<span class="nc" id="L432">            logger.error(&quot;Error getting jobs by countries&quot;, ex);</span>
+<span class="nc" id="L433">            throw new DAOException(ex);</span>
+        } finally {
+<span class="nc" id="L435">            close(logger);</span>
+        }
+    }
+
+    private List&lt;String&gt; getHistogramTimes(int binSize, String startField, String endField)
+            throws DAOException {
+
+        try {
+<span class="nc" id="L443">            List&lt;String&gt; list = new ArrayList&lt;String&gt;();</span>
+<span class="nc" id="L444">            PreparedStatement ps = connection.prepareStatement(&quot;SELECT &quot;</span>
+                    + &quot;TIMESTAMPDIFF('SECOND', &quot; + startField + &quot;, &quot; + endField + &quot;)/&quot; + binSize + &quot;*&quot; + binSize + &quot; AS execut, &quot;
+                    + &quot;COUNT(id) AS num, &quot;
+                    + &quot;MIN(TIMESTAMPDIFF('SECOND', &quot; + startField + &quot;, &quot; + endField + &quot;)) AS mini, &quot;
+                    + &quot;MAX(TIMESTAMPDIFF('SECOND', &quot; + startField + &quot;, &quot; + endField + &quot;)) AS maxi, &quot;
+                    + &quot;SUM(TIMESTAMPDIFF('SECOND', &quot; + startField + &quot;, &quot; + endField + &quot;)) AS som &quot;
+                    + &quot;FROM JOBS &quot;
+                    + &quot;WHERE STATUS = ? AND TIMESTAMPDIFF('SECOND', &quot; + startField + &quot;, &quot; + endField + &quot;) &gt;= 0 &quot;
+                    + &quot;GROUP BY TIMESTAMPDIFF('SECOND', &quot; + startField + &quot;, &quot; + endField + &quot;)/&quot; + binSize + &quot;*&quot; + binSize + &quot; &quot;
+                    + &quot;ORDER BY EXECUT&quot;);
+<span class="nc" id="L454">            ps.setString(1, TaskStatus.COMPLETED.name());</span>
+
+<span class="nc" id="L456">            ResultSet rs = ps.executeQuery();</span>
+
+<span class="nc bnc" id="L458" title="All 2 branches missed.">            while (rs.next()) {</span>
+<span class="nc" id="L459">                list.add(rs.getString(&quot;execut&quot;)</span>
+<span class="nc" id="L460">                        + &quot;##&quot; + rs.getString(&quot;num&quot;)</span>
+<span class="nc" id="L461">                        + &quot;##&quot; + rs.getString(&quot;mini&quot;)</span>
+<span class="nc" id="L462">                        + &quot;##&quot; + rs.getString(&quot;maxi&quot;)</span>
+<span class="nc" id="L463">                        + &quot;##&quot; + rs.getString(&quot;som&quot;));</span>
+            }
+<span class="nc" id="L465">            ps.close();</span>
+<span class="nc" id="L466">            return list;</span>
+
+<span class="nc" id="L468">        } catch (SQLException ex) {</span>
+<span class="nc" id="L469">            logger.error(&quot;Error getting jobs with times&quot;, ex);</span>
+<span class="nc" id="L470">            throw new DAOException(ex);</span>
+        } finally {
+<span class="nc" id="L472">            close(logger);</span>
+        }
+    }
+
+    private int parseMinorStatus(String minorStatus) {
+
+<span class="nc bnc" id="L478" title="All 4 branches missed.">        if (minorStatus == null || minorStatus.isEmpty()) {</span>
+<span class="nc" id="L479">            return -1;</span>
+<span class="nc bnc" id="L480" title="All 2 branches missed.">        } else if (minorStatus.equals(&quot;Started&quot;)) {</span>
+<span class="nc" id="L481">            return 1;</span>
+<span class="nc bnc" id="L482" title="All 2 branches missed.">        } else if (minorStatus.equals(&quot;Background&quot;)) {</span>
+<span class="nc" id="L483">            return 2;</span>
+<span class="nc bnc" id="L484" title="All 2 branches missed.">        } else if (minorStatus.equals(&quot;Inputs&quot;)) {</span>
+<span class="nc" id="L485">            return 3;</span>
+<span class="nc bnc" id="L486" title="All 2 branches missed.">        } else if (minorStatus.equals(&quot;Application&quot;)) {</span>
+<span class="nc" id="L487">            return 4;</span>
+<span class="nc bnc" id="L488" title="All 2 branches missed.">        } else if (minorStatus.equals(&quot;Outputs&quot;)) {</span>
+<span class="nc" id="L489">            return 5;</span>
+<span class="nc bnc" id="L490" title="All 2 branches missed.">        } else if (minorStatus.equals(&quot;Finished&quot;)) {</span>
+<span class="nc" id="L491">            return 6;</span>
+        }
+<span class="nc" id="L493">        return -1;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

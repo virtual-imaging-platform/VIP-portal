@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../jacoco-resources/report.gif" type="image/gif"/><title>DataController.java</title><link rel="stylesheet" href="../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../index.html" class="el_report">coverage</a> &gt; <a href="../index.html" class="el_bundle">vip-api</a> &gt; <a href="index.source.html" class="el_package">fr.insalyon.creatis.vip.api.controller.data</a> &gt; <span class="el_source">DataController.java</span></div><h1>DataController.java</h1><pre class="source lang-java linenums">/*
+ * Copyright and authors: see LICENSE.txt in base repository.
+ *
+ * This software is a web portal for pipeline execution on distributed systems.
+ *
+ * This software is governed by the CeCILL-B license under French law and
+ * abiding by the rules of distribution of free software.  You can  use,
+ * modify and/ or redistribute the software under the terms of the CeCILL-B
+ * license as circulated by CEA, CNRS and INRIA at the following URL
+ * &quot;http://www.cecill.info&quot;.
+ *
+ * As a counterpart to the access to the source code and  rights to copy,
+ * modify and redistribute granted by the license, users are provided only
+ * with a limited warranty  and the software's author,  the holder of the
+ * economic rights,  and the successive licensors  have only  limited
+ * liability.
+ *
+ * In this respect, the user's attention is drawn to the risks associated
+ * with loading,  using,  modifying and/or developing or reproducing the
+ * software by the user in light of its specific status of free software,
+ * that may mean  that it is complicated to manipulate,  and  that  also
+ * therefore means  that it is reserved for developers  and  experienced
+ * professionals having in-depth computer knowledge. Users are therefore
+ * encouraged to load and test the software's suitability as regards their
+ * requirements in conditions enabling the security of their systems and/or
+ * data to be ensured and,  more generally, to use and operate it in the
+ * same conditions as regards security.
+ *
+ * The fact that you are presently reading this means that you have had
+ * knowledge of the CeCILL-B license and that you accept its terms.
+ */
+package fr.insalyon.creatis.vip.api.controller.data;
+
+import fr.insalyon.creatis.vip.api.business.DataApiBusiness;
+import fr.insalyon.creatis.vip.api.controller.ApiController;
+import fr.insalyon.creatis.vip.api.exception.ApiException;
+import fr.insalyon.creatis.vip.api.model.ExistsApiResponse;
+import fr.insalyon.creatis.vip.api.model.PathProperties;
+import fr.insalyon.creatis.vip.api.model.UploadData;
+import fr.insalyon.creatis.vip.core.client.bean.User;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.util.UriUtils;
+
+import javax.servlet.http.HttpServletRequest;
+import java.io.File;
+import java.io.InputStream;
+import java.util.List;
+import java.util.function.Supplier;
+
+/**
+ * Created by abonnet on 1/13/17.
+ */
+@RestController
+@RequestMapping(&quot;path&quot;)
+public class DataController extends ApiController {
+
+<span class="fc" id="L65">    private final Logger logger = LoggerFactory.getLogger(getClass());</span>
+
+    private final DataApiBusiness dataApiBusiness;
+
+    // although the controller is a singleton, these are proxies that always point on the current request
+    private final HttpServletRequest httpServletRequest;
+
+    @Autowired
+    public DataController(DataApiBusiness dataApiBusiness,
+<span class="fc" id="L74">                          HttpServletRequest httpServletRequest) {</span>
+<span class="fc" id="L75">        this.dataApiBusiness = dataApiBusiness;</span>
+<span class="fc" id="L76">        this.httpServletRequest = httpServletRequest;</span>
+<span class="fc" id="L77">    }</span>
+
+    @RequestMapping(path = &quot;/**&quot;, params = &quot;action=properties&quot;)
+    public PathProperties getPathProperties() throws ApiException {
+<span class="nc" id="L81">        String completePath = extractWildcardPath(httpServletRequest);</span>
+<span class="nc" id="L82">        logMethodInvocation(logger, &quot;getPathProperties&quot;, currentUser().getEmail(), completePath);</span>
+        // business call
+<span class="nc" id="L84">        return dataApiBusiness.getPathProperties(completePath);</span>
+    }
+
+    @RequestMapping(path = &quot;/**&quot;, params = &quot;action=exists&quot;)
+    public ExistsApiResponse doesPathExists() throws ApiException {
+<span class="nc" id="L89">        String completePath = extractWildcardPath(httpServletRequest);</span>
+<span class="nc" id="L90">        logMethodInvocation(logger, &quot;doesPathExists&quot;, currentUser().getEmail(), completePath);</span>
+            // business call
+<span class="nc" id="L92">        return new ExistsApiResponse(dataApiBusiness.doesFileExist(completePath));</span>
+    }
+
+    @RequestMapping(path = &quot;/**&quot;, params = &quot;action=list&quot;)
+    public List&lt;PathProperties&gt; listDirectory() throws ApiException {
+<span class="nc" id="L97">        String completePath = extractWildcardPath(httpServletRequest);</span>
+<span class="nc" id="L98">        logMethodInvocation(logger, &quot;listDirectory&quot;, currentUser().getEmail(), completePath);</span>
+        // business call
+<span class="nc" id="L100">        return dataApiBusiness.listDirectory(completePath);</span>
+    }
+
+    @RequestMapping(path = &quot;/**&quot;, params = &quot;action=md5&quot;)
+    public void getFileMD5() throws ApiException {
+<span class="nc" id="L105">        String completePath = extractWildcardPath(httpServletRequest);</span>
+<span class="nc" id="L106">        logMethodInvocation(logger, &quot;getFileMD5&quot;, currentUser().getEmail(), completePath);</span>
+        // business call
+        // TODO implement that
+<span class="nc" id="L109">        logger.error(&quot;Unsupported getFileMD5 call&quot;);</span>
+<span class="nc" id="L110">        throw new ApiException(&quot;Not implemented&quot;);</span>
+    }
+
+    @RequestMapping(path = &quot;/**&quot;, params = &quot;action=content&quot;)
+    public ResponseEntity&lt;FileSystemResource&gt; downloadRawFile() throws ApiException {
+<span class="nc" id="L115">        String completePath = extractWildcardPath(httpServletRequest);</span>
+<span class="nc" id="L116">        logMethodInvocation(logger, &quot;downloadFile&quot;, currentUser().getEmail(), completePath);</span>
+        // business call
+<span class="nc" id="L118">        File file = dataApiBusiness.getFile(completePath);</span>
+<span class="nc" id="L119">        FileSystemResource res = new FileSystemResource(file);</span>
+<span class="nc" id="L120">        HttpHeaders headers = new HttpHeaders();</span>
+        // TODO improve mime-type
+<span class="nc" id="L122">        headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);</span>
+<span class="nc" id="L123">        return new ResponseEntity&lt;&gt;(res, headers, HttpStatus.OK);</span>
+    }
+
+    @RequestMapping(path = &quot;/**&quot;, method = RequestMethod.DELETE)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deletePath() throws ApiException {
+<span class="nc" id="L129">        String completePath = extractWildcardPath(httpServletRequest);</span>
+<span class="nc" id="L130">        logMethodInvocation(logger, &quot;deletePath&quot;, currentUser().getEmail(), completePath);</span>
+        // business call
+<span class="nc" id="L132">        dataApiBusiness.deletePath(completePath);</span>
+<span class="nc" id="L133">    }</span>
+
+    @RequestMapping(path = &quot;/**&quot;, method = RequestMethod.PUT)
+    @ResponseStatus(HttpStatus.CREATED)
+    public void uploadFile(InputStream requestInputStream) throws ApiException {
+<span class="nc" id="L138">        String completePath = extractWildcardPath(httpServletRequest);</span>
+<span class="nc" id="L139">        logMethodInvocation(logger, &quot;uploadFile&quot;, currentUser().getEmail(), completePath);</span>
+        // business call
+<span class="nc" id="L141">        dataApiBusiness.uploadRawFileFromInputStream(</span>
+                completePath, requestInputStream);
+        // TODO : think about returning the PahtProperties of the created Path, to be informed of a filename change
+<span class="nc" id="L144">    }</span>
+
+    @RequestMapping(path = &quot;/**&quot;, method = RequestMethod.PUT, consumes = &quot;application/carmin+json&quot;)
+    @ResponseStatus(HttpStatus.CREATED)
+    public void uploadCustomData(@RequestBody UploadData uploadData) throws ApiException {
+<span class="nc" id="L149">        String completePath = extractWildcardPath(httpServletRequest);</span>
+<span class="nc" id="L150">        logMethodInvocation(logger, &quot;uploadCustomData&quot;, currentUser().getEmail(), completePath);</span>
+        // business call
+<span class="nc" id="L152">        dataApiBusiness.uploadCustomData(completePath, uploadData);</span>
+<span class="nc" id="L153">    }</span>
+
+    private String extractWildcardPath(HttpServletRequest request) {
+<span class="nc" id="L156">        String prefixToSearch = &quot;/rest/path/&quot;; // TODO : parametize that</span>
+<span class="nc" id="L157">        String decodedUri = UriUtils.decode(request.getRequestURI(), &quot;UTF-8&quot;);</span>
+<span class="nc" id="L158">        int index = decodedUri.indexOf(prefixToSearch);</span>
+        // &quot;-1&quot; at the end to keep the beginning slash
+<span class="nc" id="L160">        return decodedUri.substring(index + prefixToSearch.length() - 1);</span>
+    }
+}
+
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

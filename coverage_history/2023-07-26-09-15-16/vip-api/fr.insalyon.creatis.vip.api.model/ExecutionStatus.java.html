@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../jacoco-resources/report.gif" type="image/gif"/><title>ExecutionStatus.java</title><link rel="stylesheet" href="../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../index.html" class="el_report">coverage</a> &gt; <a href="../index.html" class="el_bundle">vip-api</a> &gt; <a href="index.source.html" class="el_package">fr.insalyon.creatis.vip.api.model</a> &gt; <span class="el_source">ExecutionStatus.java</span></div><h1>ExecutionStatus.java</h1><pre class="source lang-java linenums">/*
+ * Copyright and authors: see LICENSE.txt in base repository.
+ *
+ * This software is a web portal for pipeline execution on distributed systems.
+ *
+ * This software is governed by the CeCILL-B license under French law and
+ * abiding by the rules of distribution of free software.  You can  use,
+ * modify and/ or redistribute the software under the terms of the CeCILL-B
+ * license as circulated by CEA, CNRS and INRIA at the following URL
+ * &quot;http://www.cecill.info&quot;.
+ *
+ * As a counterpart to the access to the source code and  rights to copy,
+ * modify and redistribute granted by the license, users are provided only
+ * with a limited warranty  and the software's author,  the holder of the
+ * economic rights,  and the successive licensors  have only  limited
+ * liability.
+ *
+ * In this respect, the user's attention is drawn to the risks associated
+ * with loading,  using,  modifying and/or developing or reproducing the
+ * software by the user in light of its specific status of free software,
+ * that may mean  that it is complicated to manipulate,  and  that  also
+ * therefore means  that it is reserved for developers  and  experienced
+ * professionals having in-depth computer knowledge. Users are therefore
+ * encouraged to load and test the software's suitability as regards their
+ * requirements in conditions enabling the security of their systems and/or
+ * data to be ensured and,  more generally, to use and operate it in the
+ * same conditions as regards security.
+ *
+ * The fact that you are presently reading this means that you have had
+ * knowledge of the CeCILL-B license and that you accept its terms.
+ */
+package fr.insalyon.creatis.vip.api.model;
+
+import com.fasterxml.jackson.annotation.*;
+
+
+/**
+ * Created by abonnet on 8/4/16.
+ */
+<span class="nc" id="L40">public enum ExecutionStatus {</span>
+
+<span class="nc" id="L42">    INITIALIZING(&quot;Initializing&quot;),</span>
+<span class="nc" id="L43">    READY(&quot;Ready&quot;),</span>
+<span class="nc" id="L44">    RUNNING(&quot;Running&quot;),</span>
+<span class="nc" id="L45">    FINISHED(&quot;Finished&quot;),</span>
+<span class="nc" id="L46">    INITIALIZATION_FAILED(&quot;InitializationFailed&quot;),</span>
+<span class="nc" id="L47">    EXECUTION_FAILED(&quot;ExecutionFailed&quot;),</span>
+<span class="nc" id="L48">    UNKOWN(&quot;Unknown&quot;),</span>
+<span class="nc" id="L49">    KILLED(&quot;Killed&quot;);</span>
+
+    private String restLabel;
+
+<span class="nc" id="L53">    ExecutionStatus(String restLabel) {</span>
+<span class="nc" id="L54">        this.restLabel = restLabel;</span>
+<span class="nc" id="L55">    }</span>
+
+    @JsonCreator
+    public static ExecutionStatus fromRestLabel(String restlabel) {
+<span class="nc bnc" id="L59" title="All 2 branches missed.">        for (ExecutionStatus status : values()) {</span>
+<span class="nc bnc" id="L60" title="All 2 branches missed.">            if (status.restLabel.equals(restlabel)) { return status; }</span>
+        }
+<span class="nc" id="L62">        throw new IllegalArgumentException(&quot;Unknown execution status : &quot; + restlabel);</span>
+    }
+
+    @JsonValue
+    public String getRestLabel() {
+<span class="nc" id="L67">        return restLabel;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>
