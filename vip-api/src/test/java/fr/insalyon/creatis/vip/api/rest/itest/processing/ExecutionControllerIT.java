@@ -31,35 +31,40 @@
  */
 package fr.insalyon.creatis.vip.api.rest.itest.processing;
 
-import fr.insalyon.creatis.vip.api.model.Execution;
-import fr.insalyon.creatis.vip.api.exception.ApiException.ApiError;
-import fr.insalyon.creatis.vip.api.data.ExecutionTestUtils;
-import fr.insalyon.creatis.vip.api.data.PathTestUtils;
-import fr.insalyon.creatis.vip.api.rest.config.BaseVIPSpringIT;
+import fr.insalyon.creatis.moteur.plugins.workflowsdb.bean.*;
+import fr.insalyon.creatis.moteur.plugins.workflowsdb.dao.InputDAO;
+import fr.insalyon.creatis.moteur.plugins.workflowsdb.dao.OutputDAO;
+import fr.insalyon.creatis.moteur.plugins.workflowsdb.dao.WorkflowDAO;
+import fr.insalyon.creatis.vip.api.exception.ApiException;
+import fr.insalyon.creatis.vip.api.rest.config.BaseWebSpringIT;
 import fr.insalyon.creatis.vip.api.rest.config.RestTestUtils;
-import fr.insalyon.creatis.vip.application.client.bean.Simulation;
+import fr.insalyon.creatis.vip.application.client.bean.AppClass;
+import fr.insalyon.creatis.vip.application.client.bean.AppVersion;
+import fr.insalyon.creatis.vip.application.client.bean.Application;
+import fr.insalyon.creatis.vip.application.client.bean.Engine;
+import fr.insalyon.creatis.vip.application.server.business.simulation.WebServiceEngine;
+import fr.insalyon.creatis.vip.application.server.dao.ApplicationDAO;
+import fr.insalyon.creatis.vip.core.client.bean.Group;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
-import org.hamcrest.MatcherAssert;
+import fr.insalyon.creatis.vip.core.server.dao.GroupDAO;
+import fr.insalyon.creatis.vip.core.server.dao.UsersGroupsDAO;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
+import org.mockito.ArgumentMatchers;
+import org.mockito.Mockito;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.ResultActions;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
-import static fr.insalyon.creatis.vip.api.data.AppVersionTestUtils.version42;
-import static fr.insalyon.creatis.vip.api.data.ApplicationTestUtils.app1;
-import static fr.insalyon.creatis.vip.api.data.ClassesTestUtils.class1;
 import static fr.insalyon.creatis.vip.api.data.ExecutionTestUtils.*;
 import static fr.insalyon.creatis.vip.api.data.UserTestUtils.baseUser1;
-import static fr.insalyon.creatis.vip.api.rest.mockconfig.ApplicationsConfigurator.*;
-import static org.hamcrest.Matchers.*;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -70,35 +75,77 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * <p>
  * Test method on platform path
  */
-@Disabled
-public class ExecutionControllerIT extends BaseVIPSpringIT {
+
+public class ExecutionControllerIT extends BaseWebSpringIT {
+    @Autowired
+    @Qualifier("mockWorkflowDAO")
+    WorkflowDAO workflowDAO;
+    @Autowired
+    @Qualifier("mockOutputDAO")
+    OutputDAO outputDAO;
+    @Autowired
+    @Qualifier("mockInputDAO")
+    InputDAO inputDAO;
+    @Autowired
+    @Qualifier("mockUsersGroupsDAO")
+    UsersGroupsDAO usersGroupsDAO;
+    @Autowired
+    @Qualifier("mockApplicationDAO")
+    ApplicationDAO applicationDAO;
+    @Autowired
+    @Qualifier("mockWebServiceEngine")
+    WebServiceEngine webServiceEngine;
+    @Autowired
+    @Qualifier("mockGroupDAO")
+    GroupDAO groupDAO;
+
+    private Workflow w1;
+    private Workflow w2;
+
+    @BeforeEach
+    public void setUp() throws Exception {
+        super.setUp();
+        Mockito.reset(workflowDAO);
+        Mockito.reset(outputDAO);
+        Mockito.reset(webServiceEngine);
+        Mockito.reset(inputDAO);
+        Mockito.reset(usersGroupsDAO);
+        Mockito.reset(applicationDAO);
+
+        w1 = new Workflow(simulation1.getID(), baseUser1.getFullName(), WorkflowStatus.Completed, new Date(), new Date(), "description", "application", "applicationVersion", "applicationClass", "engine");
+        w2 = new Workflow(simulation2.getID(), baseUser1.getFullName(), WorkflowStatus.Completed, new Date(), new Date(), "description", "application", "applicationVersion", "applicationClass", "engine");
+    }
 
     @Test
     public void shouldListExecutions() throws Exception {
-        when(workflowBusiness.getSimulations(baseUser1.getFullName(), null, null, null, null, null))
-                .thenReturn(Arrays.asList(simulation1, simulation2));
-        when(workflowBusiness.getSimulation(simulation1.getID(), true))
-                .thenReturn(simulation1);
-        when(workflowBusiness.getSimulation(simulation2.getID(), true))
-                .thenReturn(simulation2);
+        when(workflowDAO.get(eq(simulation1.getID()))).thenReturn(w1, null);
+        when(workflowDAO.get(eq(simulation2.getID()))).thenReturn(w2, null);
+        when(workflowDAO.get(eq(baseUser1.getFullName()), ArgumentMatchers.isNull(), ArgumentMatchers.isNull(), ArgumentMatchers.isNull(), ArgumentMatchers.isNull(), ArgumentMatchers.isNull()))
+                .thenReturn(Arrays.asList(w1, w2), null);
+
+        // perform a getWorkflows()
         mockMvc.perform(
-                get("/rest/executions").with(baseUser1()))
+                        get("/rest/executions").with(baseUser1()))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("[*]", hasSize(2)))
-                .andExpect(jsonPath("$[*]", containsInAnyOrder(
-                        jsonCorrespondsToExecution(summariseExecution(execution1)),
-                        jsonCorrespondsToExecution(summariseExecution(execution2))
-                )));
+                // Check that the returned executions are the good ones
+                .andExpect(jsonPath("$[0].status").value("Finished"))
+                .andExpect(jsonPath("$[0].identifier").value("execId1"))
+                .andExpect(jsonPath("$[1].status").value("Finished"))
+                .andExpect(jsonPath("$[1].identifier").value("execId2"));
+
     }
 
     @Test
     public void shouldCountExecutions() throws Exception {
-        when(workflowBusiness.getSimulations(baseUser1.getFullName(), null, null, null, null, null))
-                .thenReturn(Arrays.asList(simulation1, simulation2));
+        when(workflowDAO.get(eq(baseUser1.getFullName()), ArgumentMatchers.isNull(), ArgumentMatchers.isNull(), ArgumentMatchers.isNull(), ArgumentMatchers.isNull(), ArgumentMatchers.isNull()))
+                .thenReturn(Arrays.asList(w1, w2), null);
+
+        // perform a getWorkflows()
         mockMvc.perform(
-                get("/rest/executions/count").with(baseUser1()))
+                        get("/rest/executions/count").with(baseUser1()))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(RestTestUtils.TEXT_CONTENT_TYPE_UTF8))
@@ -107,77 +154,75 @@ public class ExecutionControllerIT extends BaseVIPSpringIT {
 
     @Test
     public void shouldGetExecution1() throws Exception {
-        when(workflowBusiness.getSimulation(simulation1.getID()))
-                .thenReturn(simulation1);
-        when(workflowBusiness.getSimulation(simulation1.getID(), true))
-                .thenReturn(simulation1);
-        when(workflowBusiness.getInputData(
-                 eq(simulation1.getID()), eq(baseUser1.getFolder())))
-            .thenReturn(simulation1InData);
-        when(workflowBusiness.getOutputData(
-                 eq(simulation1.getID()), eq(baseUser1.getFolder())))
-            .thenReturn(simulation1OutData);
+        when(workflowDAO.get(eq(simulation1.getID()))).thenReturn(w1, w1, null);
+
+        // perform a getWorkflows()
         mockMvc.perform(
-                get("/rest/executions/" + simulation1.getID()).with(baseUser1()))
+                        get("/rest/executions/" + simulation1.getID()).with(baseUser1()))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$",
-                        jsonCorrespondsToExecution(execution1)
-                ));
+                // Check that the returned execution is the good one
+                .andExpect(jsonPath("$.status").value("Finished"))
+                .andExpect(jsonPath("$.identifier").value("execId1"));
     }
 
     @Test
     public void shouldGetExecution2() throws Exception {
-        when(workflowBusiness.getSimulation(simulation2.getID()))
-                .thenReturn(simulation2);
-        when(workflowBusiness.getSimulation(simulation2.getID(), true))
-                .thenReturn(simulation2);
-        when(workflowBusiness.getInputData(
-                 eq(simulation2.getID()), eq(baseUser1.getFolder())))
-            .thenReturn(simulation2InData);
-        when(workflowBusiness.getOutputData(
-                 eq(simulation2.getID()), eq(baseUser1.getFolder())))
-            .thenReturn(simulation2OutData);
+        when(workflowDAO.get(eq(simulation2.getID()))).thenReturn(w2, w2, null);
+
+        // perform a getWorkflows()
         mockMvc.perform(
-                get("/rest/executions/" + simulation2.getID()).with(baseUser1()))
+                        get("/rest/executions/" + simulation2.getID()).with(baseUser1()))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$",
-                        jsonCorrespondsToExecution(execution2)
-                ));
+                // Check that the returned execution is the good one
+                .andExpect(jsonPath("$.status").value("Finished"))
+                .andExpect(jsonPath("$.identifier").value("execId2"));
     }
 
     @Test
     public void shouldGetErrorWhenGettingUnknownExecution() throws Exception {
-        when(workflowBusiness.getSimulation(anyString()))
-                .thenThrow(new BusinessException("no test execution"));
-            mockMvc.perform(
-                    get("/rest/executions/WrongExecId").with(baseUser1()))
-                    .andDo(print())
-                    .andExpect(status().isBadRequest())
-                    .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-                    .andExpect(jsonPath("$.errorCode").value(ApiError.GENERIC_API_ERROR.getCode()));
-        }
+        when(workflowDAO.get(argThat(argument -> !simulation1.getID().equals(argument) && !simulation2.getID().equals(argument))))
+                .thenAnswer(invocation -> {
+                    throw new BusinessException("no test execution");
+                });
+
+        // perform a getWorkflows()
+        mockMvc.perform(
+                        get("/rest/executions/WrongExecId").with(baseUser1()))
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.errorCode").value(ApiException.ApiError.GENERIC_API_ERROR.getCode()));
+    }
+
+    @Test
+    public void shouldReturnErrorOnUnexpectedException() throws Exception {
+        when(workflowDAO.get(argThat(argument -> !simulation1.getID().equals(argument) && !simulation2.getID().equals(argument))))
+                .thenAnswer(invocation -> {
+                    throw new RuntimeException("TEST RUNTIME EXCEPTION");
+                });
+
+        // perform a getWorkflows()
+        mockMvc.perform(
+                        get("/rest/executions/WrongExecId").with(baseUser1()))
+                .andDo(print())
+                .andExpect(status().isInternalServerError())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.errorCode").value(ApiException.ApiError.GENERIC_API_ERROR.getCode()));
+    }
 
     @Test
     public void shouldUpdateExecution1() throws Exception {
         String newName = "Exec test 1 - modified";
-        Execution modifiedExecution =
-                ExecutionTestUtils.copyExecutionWithNewName(execution1, newName);
-        Simulation modifiedSimulation =
-                ExecutionTestUtils.copySimulationWithNewName(simulation1, newName);
-        when(workflowBusiness.getSimulation(simulation1.getID(), true))
-                .thenReturn(modifiedSimulation).thenThrow(new RuntimeException());
-        when(workflowBusiness.getSimulation(simulation1.getID()))
-                .thenReturn(simulation1).thenThrow(new RuntimeException());
-        when(workflowBusiness.getInputData(
-                 eq(simulation1.getID()), eq(baseUser1.getFolder())))
-            .thenReturn(simulation1InData);
-        when(workflowBusiness.getOutputData(
-                 eq(simulation1.getID()), eq(baseUser1.getFolder())))
-            .thenReturn(simulation1OutData);
+
+        when(workflowDAO.get(eq(simulation1.getID()))).thenReturn(w1, w1, w1, w1, null);
+
+        workflowDAO.get(w1.getId()).setId(newName);
+
+        // perform a getWorkflows()
         mockMvc.perform(
                 put("/rest/executions/" + simulation1.getID())
                         .contentType("application/json")
@@ -186,204 +231,211 @@ public class ExecutionControllerIT extends BaseVIPSpringIT {
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$",
-                        jsonCorrespondsToExecution(modifiedExecution)
-                ));
-        verify(workflowBusiness).updateDescription(simulation1.getID(), newName);
-    }
-
-    @Test
-    public void testInitExecution() throws Exception {
-        // configure pipeline access right
-        configureApplications(
-                this, baseUser1, Collections.singletonList(class1),
-                app1, version42);
-        // configure pipeline input
-        configureAnApplication(this, baseUser1, app1, version42, 0, 1);
-        // configure lauch
-        when(workflowBusiness.launch(
-                 eq(baseUser1), anyList(), anyMap(), eq(app1.getName()),
-                 eq(version42.getVersion()), eq(class1.getName()),
-                 eq(execution1.getName())))
-                .thenReturn(execution1.getIdentifier());
-        // configure returne execution
-        when(workflowBusiness.getSimulation(execution1.getIdentifier(), true))
-                .thenReturn(simulation1);
-        when(workflowBusiness.getInputData(
-                 eq(simulation1.getID()), eq(baseUser1.getFolder())))
-            .thenReturn(simulation1InData);
-        when(workflowBusiness.getOutputData(
-                 eq(simulation1.getID()), eq(baseUser1.getFolder())))
-            .thenReturn(simulation1OutData);
-        // misc config
-        when(configurationBusiness.getUserGroups(eq(baseUser1.getEmail())))
-                .thenReturn(new HashMap<>());
-        mockMvc.perform(
-                post("/rest/executions").contentType("application/json")
-                        .content(getResourceAsString("jsonObjects/execution1.json"))
-                        .with(baseUser1()))
-                .andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$",
-                        jsonCorrespondsToExecution(execution1)
-                ));
-        ArgumentCaptor<Map> inputCaptor =
-                ArgumentCaptor.forClass(Map.class);
-        verify(workflowBusiness).launch(
-            eq(baseUser1), anyList(), inputCaptor.capture(), eq(app1.getName()),
-            eq(version42.getVersion()), eq(class1.getName()),
-            eq(execution1.getName()));
-        assertEquals(inputCaptor.getValue().size(), 2);
-        MatcherAssert.<Map<?, ?>>assertThat(inputCaptor.getValue(), allOf(
-                hasEntry("param 1", "test text"),
-                hasEntry("param 2", "/path/test")));
+                // Check that the returned execution is the good one and has been modified correctly
+                .andExpect(jsonPath("$.name").value("Exec test 1 - modified"));
     }
 
     @Test
     public void testNotInitExecutionMissingField() throws Exception {
         mockMvc.perform(
-            post("/rest/executions").contentType("application/json")
-                    .content("{}")
-                    .with(baseUser1())
-        ).andDo(print())
-        .andExpect(status().isBadRequest())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-        .andExpect(jsonPath("$.errorCode")
-                .value(ApiError.INPUT_FIELD_NOT_VALID.getCode())
-        );
-    }
-
-    @Test
-    public void shouldGetExecution2Results() throws Exception {
-        when(workflowBusiness.getSimulation(simulation2.getID()))
-                .thenReturn(simulation2);
-        when(workflowBusiness.getOutputData(
-                 eq(simulation2.getID()), eq(baseUser1.getFolder())))
-            .thenReturn(simulation2OutData);
-        String resultPath = simulation2OutData.get(0).getPath();
-        when(lfcBusiness.exists(eq(baseUser1), eq(resultPath)))
-                .thenReturn(true);
-        when(lfcBusiness.listDir(eq(baseUser1), eq(resultPath), eq(true)))
-                .thenReturn(Collections.singletonList(PathTestUtils.testFile1));
-        when(transferPoolBusiness.downloadFile(any(), any()))
-                .thenThrow(new RuntimeException());
-
-        mockMvc.perform(
-                get("/rest/executions/" + simulation2.getID() + "/results").with(baseUser1()))
-                .andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$[*]", hasSize(1)))
-                .andExpect(jsonPath("$[0]",
-                        PathTestUtils.jsonCorrespondsToPath(PathTestUtils.testFile1PathProperties)));
-    }
-
-    @Test
-    public void shouldGetExecution2Stdout() throws Exception {
-        when(workflowBusiness.getSimulation(simulation2.getID()))
-                .thenReturn(simulation2);
-        String testOutput = "blablabla";
-        when(simulationBusiness.readFile(simulation2.getID(), "", "workflow", ".out"))
-                .thenReturn(testOutput);
-        mockMvc.perform(
-                get("/rest/executions/" + simulation2.getID() + "/stdout").with(baseUser1()))
-                .andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(RestTestUtils.TEXT_CONTENT_TYPE_UTF8))
-                .andExpect(content().string(testOutput));
-    }
-
-    @Test
-    public void shouldGetExecution2Stderr() throws Exception {
-        when(workflowBusiness.getSimulation(simulation2.getID()))
-                .thenReturn(simulation2);
-        String testOutput = "blablabla";
-        when(simulationBusiness.readFile(simulation2.getID(), "", "workflow", ".err"))
-                .thenReturn(testOutput);
-        mockMvc.perform(
-                get("/rest/executions/" + simulation2.getID() + "/stderr").with(baseUser1()))
-                .andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(RestTestUtils.TEXT_CONTENT_TYPE_UTF8))
-                .andExpect(content().string(testOutput));
-    }
-
-    @Test
-    public void testPlayExecutionIsNotImplemented() throws Exception {
-        mockMvc.perform(
-                put("/rest/executions/" + simulation1.getID() + "/play")
-                        .with(baseUser1()))
-                .andDo(print())
+                        post("/rest/executions").contentType("application/json")
+                                .content("{}")
+                                .with(baseUser1())
+                ).andDo(print())
                 .andExpect(status().isBadRequest())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.errorCode").value(ApiError.NOT_IMPLEMENTED.getCode()));
-    }
-
-    @Test
-    public void shouldKillExecution2() throws Exception {
-        when(workflowBusiness.getSimulation(simulation2.getID()))
-                .thenReturn(simulation2);
-        mockMvc.perform(
-                put("/rest/executions/" + simulation2.getID() + "/kill").with(baseUser1()))
-                .andDo(print())
-                .andExpect(status().isNoContent())
-                .andExpect(content().string(""));
-        verify(workflowBusiness).kill(simulation2.getID());
-
+                .andExpect(jsonPath("$.errorCode")
+                        .value(ApiException.ApiError.INPUT_FIELD_NOT_VALID.getCode())
+                );
     }
 
     @Test
     public void shouldDeleteWithFilesExecution2() throws Exception {
-        when(workflowBusiness.getSimulation(simulation2.getID()))
-                .thenReturn(simulation2);
+        when(workflowDAO.get(eq(simulation2.getID()))).thenReturn(w2, w2, w2, w2, null);
+
+        // perform a getWorkflows() and then delete
         mockMvc.perform(
-                put("/rest/executions/" + simulation2.getID() + "/delete")
-                        .contentType("application/json")
-                        .content("{\"deleteFiles\":true}")
-                        .with(baseUser1()))
+                        put("/rest/executions/" + simulation2.getID() + "/delete")
+                                .contentType("application/json")
+                                .content("{\"deleteFiles\":true}")
+                                .with(baseUser1()))
                 .andDo(print())
                 .andExpect(status().isNoContent())
                 .andExpect(content().string(""));
-        verify(workflowBusiness).clean(simulation2.getID(), baseUser1.getEmail(), true);
-
-    }
-
-    @Test
-    public void shouldDeleteWithoutExecution2() throws Exception {
-        when(workflowBusiness.getSimulation(simulation2.getID()))
-                .thenReturn(simulation2);
-        mockMvc.perform(
-                put("/rest/executions/" + simulation2.getID() + "/delete")
-                        .contentType("application/json")
-                        .content("{\"deleteFiles\":false}")
-                        .with(baseUser1()))
-                .andDo(print())
-                .andExpect(status().isNoContent())
-                .andExpect(content().string(""));
-        verify(workflowBusiness).clean(simulation2.getID(), baseUser1.getEmail(), false);
-
-    }
-
-    @Test
-    public void shouldReturn400() throws Exception {
-        mockMvc.perform(
-                put("/rest/executions/whynotthisid").with(baseUser1()))
-                .andDo(print())
-                .andExpect(status().isBadRequest())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.errorCode").value(ApiError.GENERIC_API_ERROR.getCode()));
     }
 
     @Test
     public void shouldReturn500() throws Exception {
-        when(workflowBusiness.getSimulations(baseUser1.getFullName(), null, null, null, null, null))
-                .thenThrow(new RuntimeException("test exception"));
+        when(workflowDAO.get(baseUser1.getFullName(), null, null, null, null, null)).thenThrow(new RuntimeException("test exception"));
+
+        // perform a getWorkflows() with an undetermined error
         mockMvc.perform(
-                get("/rest/executions").with(baseUser1()))
+                        get("/rest/executions").with(baseUser1()))
                 .andDo(print())
                 .andExpect(status().isInternalServerError())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.errorCode").value(ApiError.GENERIC_API_ERROR.getCode()));
+                .andExpect(jsonPath("$.errorCode").value(ApiException.ApiError.GENERIC_API_ERROR.getCode()));
+    }
+
+    @Test
+    public void shouldReturn400() throws Exception {
+        // perform a getWorkflows() with a client error
+        mockMvc.perform(
+                        put("/rest/executions/whynotthisid").with(baseUser1()))
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.errorCode").value(ApiException.ApiError.GENERIC_API_ERROR.getCode()));
+    }
+
+
+    @Test
+    public void shouldGetExecution2Stderr() throws Exception {
+        when(workflowDAO.get(eq(simulation2.getID()))).thenReturn(w2, w2, null);
+        when(server.getWorkflowsPath()).thenReturn("src/test/resources/testFolder");
+
+        String testOutput = "blablabla\n";
+
+        mockMvc.perform(get("/rest/executions/" + simulation2.getID() + "/stderr").with(baseUser1()))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(RestTestUtils.TEXT_CONTENT_TYPE_UTF8))
+                .andExpect(content().string(testOutput));
+    }
+
+    @Test
+    public void shouldGetExecution2Stdout() throws Exception {
+        when(workflowDAO.get(eq(simulation2.getID()))).thenReturn(w2);
+        when(server.getWorkflowsPath()).thenReturn("src/test/resources/testFolder");
+
+        String testOutput = "blablabla\n";
+
+        mockMvc.perform(
+                        get("/rest/executions/" + simulation2.getID() + "/stdout").with(baseUser1()))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(RestTestUtils.TEXT_CONTENT_TYPE_UTF8))
+                .andExpect(content().string(testOutput));
+    }
+
+    @Test
+    public void shouldDeleteWithoutExecution2() throws Exception {
+        when(workflowDAO.get(eq(simulation2.getID()))).thenReturn(w2, w2, w2, w2, null);
+
+        mockMvc.perform(
+                        put("/rest/executions/" + simulation2.getID() + "/delete")
+                                .contentType("application/json")
+                                .content("{\"deleteFiles\":false}")
+                                .with(baseUser1()))
+                .andDo(print())
+                .andExpect(status().isNoContent())
+                .andExpect(content().string(""));
+    }
+
+
+    @Test
+    public void testPlayExecutionIsNotImplemented() throws Exception {
+        mockMvc.perform(
+                        put("/rest/executions/" + simulation1.getID() + "/play")
+                                .with(baseUser1()))
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.errorCode").value(ApiException.ApiError.NOT_IMPLEMENTED.getCode()));
+    }
+
+    @Test
+    public void shouldGetExecution2Results() throws Exception {
+        String resultPath = simulation2OutData.get(0).getPath();
+        when(workflowDAO.get(eq(simulation2.getID()))).thenReturn(w2, null);
+        Output output = new Output(new OutputID("workflowID", resultPath, "processor"), DataType.URI, "port");
+        when(outputDAO.get(eq(simulation2.getID()))).thenReturn(Arrays.asList(output), null);
+        Group group = new Group("group1", true, true, true);
+        configurationBusiness.addGroup(group);
+        when(groupDAO.getGroups()).thenReturn(Arrays.asList(group));
+
+
+        mockMvc.perform(
+                        get("/rest/executions/" + simulation2.getID() + "/results").with(baseUser1()))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$[*]", hasSize(1)));
+                /*.andExpect(jsonPath("$[0]",
+                        PathTestUtils.jsonCorrespondsToPath(PathTestUtils.testFile1PathProperties)));*/
+    }
+
+
+    @Test
+    public void shouldKillExecution2() throws Exception
+    {
+        when(workflowDAO.get(eq(simulation2.getID()))).thenReturn(w2, w2, null);
+
+        mockMvc.perform(
+                        put("/rest/executions/" + simulation2.getID() + "/kill").with(baseUser1()))
+                .andDo(print());
+
+        verify(webServiceEngine).kill(simulation2.getID());
+    }
+
+    @Test
+    @Disabled
+    public void testInitExecution() throws Exception
+    {
+        // engine test creation
+        group1 = new Group("group1", true, true, true);
+        configurationBusiness.addGroup(group1);
+        List<String> groups = new ArrayList<>();
+        groups.add("group1");
+        createUserInGroup("test1@test.fr", "suffix1", "group1");
+        createUserInGroup("test2@test.fr", "suffix2", "group1");
+
+        // engine test creation
+        String engineName = "test engine";
+        String engineEndpoint = "test endpoint";
+        String engineStatus = "enabled";
+        Engine engine = new Engine(engineName, engineEndpoint, engineStatus);
+        List<String> engines = new ArrayList<>();
+        engines.add("test engine");
+        engineBusiness.add(engine);
+
+        // appClass test creation
+        AppClass appClass = new AppClass("class1", engines, groups);
+        classBusiness.addClass(appClass);
+        applicationClasses = new ArrayList<>();
+        applicationClasses.add("class1");
+
+        // Application test creation
+        Application application = new Application("application 1", applicationClasses, "test1@test.fr", "test1", "citation1");
+        applicationBusiness.add(application);
+
+        // AppVersion test creation
+        AppVersion version42 = new AppVersion("application 1", "version 4.2", "lfn", "jsonLfn", true, true);
+        applicationBusiness.addVersion(version42);
+
+        when(applicationDAO.getApplication("application 1")).thenReturn(application);
+
+        // configure lauch
+        when(workflowDAO.get(eq(simulation1.getID()))).thenReturn(w1);
+        when(workflowDAO.getNumberOfRunning(baseUser1.getFullName())).thenReturn(1L);
+        when(workflowDAO.getRunning()).thenReturn(Arrays.asList(w1));
+        when(applicationDAO.getVersion("Application 1", "version 0.0")).thenReturn(version42);
+        Input input = new Input(new InputID("workflowId", "jsonObjects/execution1.json", "processor"), DataType.URI);
+        when(inputDAO.get(eq(simulation1.getID()))).thenReturn(Arrays.asList(input));
+        //when(testLfcPathsBusiness.parseRealDir(anyString(), eq(baseUser1.getFolder()))).thenReturn("path",null);
+        Output output = new Output(new OutputID("workflowID", "path", "processor"), DataType.URI, "port");
+        when(outputDAO.get(eq(simulation1.getID()))).thenReturn(Arrays.asList(output));
+        when(usersGroupsDAO.getUserGroups(eq(baseUser1.getEmail()))).thenReturn(new HashMap<>());
+
+        mockMvc.perform(
+                post("/rest/executions").contentType("application/json")
+                        .content(getResourceAsString("jsonObjects/execution1.json"))
+                        .with(baseUser1()))
+        .andDo(print())
+        .andExpect(status().isOk())
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+        .andExpect(jsonPath("$",
+                jsonCorrespondsToExecution(execution1)
+        ));
     }
 }

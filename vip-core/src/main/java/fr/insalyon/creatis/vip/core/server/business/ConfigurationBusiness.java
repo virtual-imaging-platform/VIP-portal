@@ -948,6 +948,10 @@ public class ConfigurationBusiness {
 
         User user;
         try {
+            if (!email.contains("@")) {
+                logger.error("The email {} is invalid : it does not contain an @", email);
+                throw new BusinessException("The email " + email + " is invalid: it does not contain an @");
+            }
             user = getUserWithSession(email);
         } catch (DAOException ex) {
             //User doesn't exist: let's create an account

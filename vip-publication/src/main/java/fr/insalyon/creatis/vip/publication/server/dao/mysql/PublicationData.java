@@ -168,7 +168,7 @@ public class PublicationData extends JdbcDaoSupport implements PublicationDAO {
             PreparedStatement ps;
 
             ps = getConnection().prepareStatement("SELECT "
-                    + "id,title,date,doi,authors,type,typeName,VIPAuthor FROM "
+                    + "id,title,date,doi,authors,type,typeName,VIPAuthor, VIPApplication FROM " // VIPApplication was missing in the SQL request
                     + "VIPPublication where id=?");
 
             ps.setLong(1, id);
