@@ -31,17 +31,17 @@
  */
 package fr.insalyon.creatis.vip.api.rest.mockconfig;
 
-import fr.insalyon.creatis.vip.api.rest.config.BaseVIPSpringIT;
+import fr.insalyon.creatis.vip.api.rest.config.BaseWebSpringIT;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.datamanager.server.business.LFCBusiness;
 import org.mockito.Mockito;
-import static org.mockito.ArgumentMatchers.any;
 
 import java.util.Arrays;
 import java.util.Collections;
 
 import static fr.insalyon.creatis.vip.api.data.PathTestUtils.*;
-import static fr.insalyon.creatis.vip.api.data.UserTestUtils.*;
+import static fr.insalyon.creatis.vip.api.data.UserTestUtils.baseUser1;
+import static fr.insalyon.creatis.vip.api.data.UserTestUtils.baseUser2;
 import static fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants.ROOT;
 import static org.mockito.ArgumentMatchers.eq;
 
@@ -50,7 +50,7 @@ import static org.mockito.ArgumentMatchers.eq;
  */
 public class DataConfigurator {
 
-    public static void configureFS(BaseVIPSpringIT testSuite) throws BusinessException {
+    public static void configureFS(BaseWebSpringIT testSuite) throws BusinessException {
         // exists
         // getModifDate
         // listDir

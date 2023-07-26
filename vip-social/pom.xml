@@ -61,7 +61,11 @@ knowledge of the CeCILL-B license and that you accept its terms.
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
-
+        <dependency>
+            <groupId>com.ibm.icu</groupId>
+            <artifactId>icu4j</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>

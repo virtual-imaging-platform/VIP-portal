@@ -31,16 +31,20 @@
  */
 package fr.insalyon.creatis.vip.api.data;
 
-import fr.insalyon.creatis.vip.api.model.*;
+import fr.insalyon.creatis.vip.api.model.ParameterType;
+import fr.insalyon.creatis.vip.api.model.Pipeline;
+import fr.insalyon.creatis.vip.api.model.PipelineParameter;
 import fr.insalyon.creatis.vip.api.tools.spring.JsonCustomObjectMatcher;
-import fr.insalyon.creatis.vip.application.client.bean.*;
+import fr.insalyon.creatis.vip.application.client.bean.AppVersion;
 import fr.insalyon.creatis.vip.application.client.bean.Application;
+import fr.insalyon.creatis.vip.application.client.bean.Descriptor;
+import fr.insalyon.creatis.vip.application.client.bean.Source;
 import org.hamcrest.Matcher;
 
-import java.util.*;
 import java.util.AbstractMap.SimpleEntry;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.function.*;
+import java.util.function.Function;
 
 /**
  * Created by abonnet on 8/3/16.

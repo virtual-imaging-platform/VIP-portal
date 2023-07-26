@@ -31,21 +31,17 @@
  */
 package fr.insalyon.creatis.vip.api.rest.itest;
 
-import fr.insalyon.creatis.vip.api.SpringWebConfig;
 import fr.insalyon.creatis.vip.api.business.VipConfigurer;
 import fr.insalyon.creatis.vip.api.controller.EgiController;
-import fr.insalyon.creatis.vip.api.exception.ApiException;
-import fr.insalyon.creatis.vip.api.rest.config.BaseVIPSpringIT;
 import fr.insalyon.creatis.vip.api.controller.PlatformController;
+import fr.insalyon.creatis.vip.api.exception.ApiException;
+import fr.insalyon.creatis.vip.api.rest.config.BaseWebSpringIT;
 import fr.insalyon.creatis.vip.application.server.business.WorkflowBusiness;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
-import org.springframework.test.context.junit.jupiter.web.SpringJUnitWebConfig;
 import org.springframework.util.Assert;
 
 import java.nio.file.Paths;
@@ -60,14 +56,30 @@ import static org.mockito.ArgumentMatchers.any;
  *
  * The less mock should be used to be as close as possible to the production
  * environment.
- *
  */
-@SpringJUnitWebConfig
 public class DefaultSpringConfigurationIT {
 
+    @Autowired
+    private PlatformController platformController;
+    @Autowired
+    private EgiController egiController;
+
+    @BeforeAll
+    public static void setup() throws Exception {
+        String fakeHomePath = Paths.get(ClassLoader.getSystemResource("TestHome").toURI())
+                .toAbsolutePath().toString();
+        BaseWebSpringIT.setEnv(Collections.singletonMap("HOME", fakeHomePath));
+    }
+
+    @Test
+    public void propertiesShouldBePresent() throws ApiException {
+        // test that the platform properties generation does not throw any exception
+        Assert.notNull(platformController.getPlatformProperties(), "platform properties should be present");
+    }
+
     // Need to override vipConfigurer that operate on the database
-    @Configuration
-    @Import(SpringWebConfig.class)
+    //@Configuration
+    //@Import(SpringWebConfig.class)
     static class TestConfig {
         @Bean
         public VipConfigurer vipConfigurer() {
@@ -80,25 +92,5 @@ public class DefaultSpringConfigurationIT {
         public WorkflowBusiness workflowBusiness() {
             return Mockito.mock(WorkflowBusiness.class);
         }
-    }
-
-    @Autowired
-    private PlatformController platformController;
-
-    @Autowired
-    private EgiController egiController;
-
-    @BeforeAll
-    public static void setup() throws Exception {
-
-        String fakeHomePath = Paths.get(ClassLoader.getSystemResource("TestHome").toURI())
-                .toAbsolutePath().toString();
-        BaseVIPSpringIT.setEnv(Collections.singletonMap("HOME", fakeHomePath));
-    }
-
-    @Test
-    public void propertiesShouldBePresent() throws ApiException {
-        // test that the platform properties generation does not throw any exception
-        Assert.notNull(platformController.getPlatformProperties(), "platform properties should be present");
     }
 }

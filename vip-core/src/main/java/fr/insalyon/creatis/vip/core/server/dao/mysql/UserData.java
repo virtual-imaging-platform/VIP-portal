@@ -39,6 +39,7 @@ import fr.insalyon.creatis.vip.core.server.dao.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.core.support.JdbcDaoSupport;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -106,9 +107,9 @@ public class UserData extends JdbcDaoSupport implements UserDAO {
             ps.close();
 
         } catch (SQLException ex) {
-            if (ex.getMessage().contains("Duplicate entry")) {
+            if (ex.getMessage().contains("Unique index or primary key violation")) {
                 logger.error("There is an existing account associated with the email: {} or with this {first name,last name} ({})", user.getEmail(), ex.getMessage());
-                throw new DAOException("There is an existing account associated with this email or with this {first name,last name}.", ex);
+                throw new DAOException("There is an existing account associated with the email: "+user.getEmail()+" or with the first name,last name: "+user.getFirstName()+ ","+user.getLastName(), ex);
             } else {
                 logger.error("Error adding user {}", user.getEmail(), ex);
                 throw new DAOException(ex);
@@ -1042,7 +1043,7 @@ public class UserData extends JdbcDaoSupport implements UserDAO {
             ps.close();
             logger.error("Looking for an apikey, but there is no user registered with the email: {}", email);
             throw new DAOException(
-                    "Looking for an apikey, but there is no user registered with the email");
+                    "Looking for an apikey, but there is no user registered with the email: "+email);
         } catch (SQLException ex) {
             logger.error("Error getting user api key for {}", email, ex);
             throw new DAOException(ex);
@@ -1063,7 +1064,7 @@ public class UserData extends JdbcDaoSupport implements UserDAO {
             if (rowsUpdatedNb == 0) {
                 logger.error("Updating an apikey, but there is no user registered with the email: {}", email);
                 throw new DAOException(
-                        "Updating an apikey, but there is no user registered with the email");
+                        "Updating an apikey, but there is no user registered with the email: "+email);
             }
         } catch (SQLException ex) {
             logger.error("Error updating {} api key to {}", email, newApikey, ex);

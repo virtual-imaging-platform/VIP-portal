@@ -44,6 +44,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.core.support.JdbcDaoSupport;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -77,7 +78,7 @@ public class ClassData extends JdbcDaoSupport implements ClassDAO {
             ps.close();
 
         } catch (SQLException ex) {
-            if (ex.getMessage().contains("Duplicate entry")) {
+            if (ex.getMessage().contains("Unique index or primary key violation")) {
                 logger.error("A class named \"{}\" already exists.", appClass.getName());
                 throw new DAOException("A class named \"" + appClass.getName() + "\" already exists.");
             } else {
@@ -284,7 +285,7 @@ public class ClassData extends JdbcDaoSupport implements ClassDAO {
                 ps.close();
 
             } catch (SQLException ex) {
-                if (ex.getMessage().contains("Duplicate entry")) {
+                if (ex.getMessage().contains("Unique index or primary key violation")) {
                     logger.error("a "+objectType+" named \"" + name + "\" is already associated with the class.");
                     throw new DAOException("a "+objectType+" named \"" + name + "\" is already associated with the class.", ex);
                 } else {

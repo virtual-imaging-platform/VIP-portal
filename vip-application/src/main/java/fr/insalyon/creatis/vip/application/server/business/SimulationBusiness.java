@@ -52,6 +52,7 @@ import org.springframework.beans.factory.annotation.Lookup;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.*;
@@ -280,6 +281,9 @@ public class SimulationBusiness {
 
         try {
             fileName += extension;
+
+            String filePath = server.getWorkflowsPath() + "/" + simulationID + "/" + folder + "/" + fileName;
+
             Scanner scanner = new Scanner(new FileInputStream(server.getWorkflowsPath()
                     + "/" + simulationID + "/" + folder + "/" + fileName));
 

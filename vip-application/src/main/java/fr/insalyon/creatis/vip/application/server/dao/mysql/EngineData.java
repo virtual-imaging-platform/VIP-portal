@@ -79,7 +79,7 @@ public class EngineData extends JdbcDaoSupport implements EngineDAO {
             ps.close();
 
         } catch (SQLException ex) {
-            if (ex.getMessage().contains("Duplicate entry")) {
+            if (ex.getMessage().contains("Unique index or primary key violation")) {
                 logger.error("An engine named \"{}\" already exists.", engine.getName());
                 throw new DAOException("An engine named \"" + engine.getName() + "\" already exists.");
             } else {
@@ -122,8 +122,16 @@ public class EngineData extends JdbcDaoSupport implements EngineDAO {
             ps.close();
 
         } catch (SQLException ex) {
-            logger.error("Error removing engine {}", name, ex);
-            throw new DAOException(ex);
+            if (ex.getMessage().contains("Unique index or primary key violation"))
+            {
+                logger.error("There is no engine registered with the name {}", name);
+                throw new DAOException("There is no engine registered with the name : " + name);
+            }
+            else
+            {
+                logger.error("Error removing engine {}", name, ex);
+                throw new DAOException(ex);
+            }
         }
     }
 

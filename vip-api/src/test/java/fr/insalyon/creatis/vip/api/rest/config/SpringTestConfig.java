@@ -31,17 +31,16 @@
  */
 package fr.insalyon.creatis.vip.api.rest.config;
 
-import fr.insalyon.creatis.vip.api.*;
 import fr.insalyon.creatis.vip.api.business.VipConfigurer;
-import fr.insalyon.creatis.vip.application.server.business.*;
+import fr.insalyon.creatis.vip.application.server.business.ApplicationBusiness;
+import fr.insalyon.creatis.vip.application.server.business.ClassBusiness;
+import fr.insalyon.creatis.vip.application.server.business.SimulationBusiness;
+import fr.insalyon.creatis.vip.application.server.business.WorkflowBusiness;
 import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
-import fr.insalyon.creatis.vip.core.server.dao.UserDAO;
-import fr.insalyon.creatis.vip.datamanager.server.business.*;
+import fr.insalyon.creatis.vip.datamanager.server.business.LFCPermissionBusiness;
+import fr.insalyon.creatis.vip.datamanager.server.business.TransferPoolBusiness;
 import org.mockito.Mockito;
-import org.springframework.context.annotation.*;
-
-import java.sql.Connection;
-import java.util.function.*;
+import org.springframework.context.annotation.Bean;
 
 import static org.mockito.ArgumentMatchers.any;
 
@@ -52,8 +51,8 @@ import static org.mockito.ArgumentMatchers.any;
  *
  * TODO : after spring is now everywhere, this does not work anymore, work needed here
  */
-@Import(SpringWebConfig.class)
-@Configuration
+//@Import(SpringWebConfig.class)
+//@Configuration
 public class SpringTestConfig {
 
     @Bean
@@ -91,11 +90,6 @@ public class SpringTestConfig {
     @Bean
     public SimulationBusiness simulationBusiness() {
         return Mockito.mock(SimulationBusiness.class);
-    }
-
-    @Bean
-    public LFCBusiness lfcBusiness() {
-        return Mockito.mock(LFCBusiness.class);
     }
 
     @Bean

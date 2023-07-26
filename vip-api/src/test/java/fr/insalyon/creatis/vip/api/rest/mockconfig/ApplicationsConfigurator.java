@@ -31,9 +31,13 @@
  */
 package fr.insalyon.creatis.vip.api.rest.mockconfig;
 
-import fr.insalyon.creatis.vip.api.rest.config.BaseVIPSpringIT;
-import fr.insalyon.creatis.vip.application.client.bean.*;
-import fr.insalyon.creatis.vip.application.server.business.*;
+import fr.insalyon.creatis.vip.api.rest.config.BaseWebSpringIT;
+import fr.insalyon.creatis.vip.application.client.bean.AppClass;
+import fr.insalyon.creatis.vip.application.client.bean.AppVersion;
+import fr.insalyon.creatis.vip.application.client.bean.Application;
+import fr.insalyon.creatis.vip.application.server.business.ApplicationBusiness;
+import fr.insalyon.creatis.vip.application.server.business.ClassBusiness;
+import fr.insalyon.creatis.vip.application.server.business.WorkflowBusiness;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 
@@ -43,7 +47,8 @@ import java.util.stream.Collectors;
 
 import static fr.insalyon.creatis.vip.api.data.AppVersionTestUtils.getVersion;
 import static fr.insalyon.creatis.vip.api.data.PipelineTestUtils.getDescriptor;
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 /**
@@ -57,7 +62,7 @@ public class ApplicationsConfigurator {
      * (an application followed by one or more version)
      */
     public static void configureApplications(
-            BaseVIPSpringIT test,
+            BaseWebSpringIT test,
             User user,
             List<AppClass> classes,
             Object... args) throws BusinessException {
@@ -103,7 +108,7 @@ public class ApplicationsConfigurator {
     }
 
     public static String configureAnApplication(
-            BaseVIPSpringIT test,
+            BaseWebSpringIT test,
             User user, Application app,
             AppVersion version,
             Integer... appParamsIndexes) throws BusinessException {
