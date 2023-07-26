@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../jacoco-resources/report.gif" type="image/gif"/><title>StatsApiBusiness.java</title><link rel="stylesheet" href="../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../index.html" class="el_report">coverage</a> &gt; <a href="../index.html" class="el_bundle">vip-api</a> &gt; <a href="index.source.html" class="el_package">fr.insalyon.creatis.vip.api.business</a> &gt; <span class="el_source">StatsApiBusiness.java</span></div><h1>StatsApiBusiness.java</h1><pre class="source lang-java linenums">package fr.insalyon.creatis.vip.api.business;
+
+import fr.insalyon.creatis.vip.api.exception.ApiException;
+import fr.insalyon.creatis.vip.api.exception.ApiException.ApiError;
+import fr.insalyon.creatis.vip.api.model.stats.StatUser;
+import fr.insalyon.creatis.vip.api.model.stats.UsersList;
+import fr.insalyon.creatis.vip.api.model.stats.UsersNumber;
+import fr.insalyon.creatis.vip.core.client.bean.User;
+import fr.insalyon.creatis.vip.core.client.view.util.CountryCode;
+import fr.insalyon.creatis.vip.core.server.business.BusinessException;
+import fr.insalyon.creatis.vip.core.server.business.StatsBusiness;
+import fr.insalyon.creatis.vip.core.server.business.StatsBusiness.UserSearchCriteria;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.sql.Connection;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.Month;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.util.List;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
+
+@Service
+public class StatsApiBusiness {
+
+<span class="fc" id="L32">    private final Logger logger = LoggerFactory.getLogger(getClass());</span>
+
+    private final StatsBusiness statsBusiness;
+
+    @Autowired
+<span class="fc" id="L37">    public StatsApiBusiness(StatsBusiness statsBusiness) {</span>
+<span class="fc" id="L38">        this.statsBusiness = statsBusiness;</span>
+<span class="fc" id="L39">    }</span>
+
+    public UsersNumber getUsersRegisteredNumber(
+            String startDateString, String endDateString) throws ApiException {
+        // build search criteria
+<span class="nc" id="L44">        UserSearchCriteria searchCriteria =</span>
+                new UserSearchCriteria()
+<span class="nc" id="L46">                .withRegistrationStart(parseDate(startDateString))</span>
+<span class="nc" id="L47">                .withRegistrationEnd(parseDate(endDateString));</span>
+
+        // do search
+        Long usersRegisteredNumber;
+        try {
+<span class="nc" id="L52">            usersRegisteredNumber = statsBusiness.getUsersRegisteredNumber(searchCriteria);</span>
+<span class="nc" id="L53">        } catch (BusinessException e) {</span>
+<span class="nc" id="L54">            throw new ApiException(e);</span>
+<span class="nc" id="L55">        }</span>
+        // build response object
+<span class="nc" id="L57">        LocalDate startDate = searchCriteria.getRegistrationStart();</span>
+<span class="nc bnc" id="L58" title="All 2 branches missed.">        if (startDate == null) {</span>
+<span class="nc" id="L59">            startDate = LocalDate.of(2010, Month.JANUARY, 1);</span>
+        }
+<span class="nc" id="L61">        LocalDateTime endDateTime = LocalDateTime.now();</span>
+<span class="nc bnc" id="L62" title="All 2 branches missed.">        if (endDateString != null) {</span>
+<span class="nc" id="L63">            endDateTime = searchCriteria.getRegistrationEnd().atStartOfDay();</span>
+        }
+<span class="nc" id="L65">        return new UsersNumber(startDate.atStartOfDay(), endDateTime, usersRegisteredNumber);</span>
+    }
+
+
+    public UsersList getAllUsers() throws ApiException {
+<span class="nc" id="L70">        return getUsersList(new UserSearchCriteria());</span>
+    }
+
+    public UsersList getAllUsersFromDate(String startDateString) throws ApiException {
+<span class="nc" id="L74">        return getUsersList(new UserSearchCriteria()</span>
+<span class="nc" id="L75">                .withRegistrationStart(parseDate(startDateString)));</span>
+    }
+
+    public UsersList getAllUsersBetweenDates(
+            String startDateString, String endDateString) throws ApiException {
+<span class="nc" id="L80">        return getUsersList(new UserSearchCriteria()</span>
+<span class="nc" id="L81">                .withRegistrationStart(parseDate(startDateString))</span>
+<span class="nc" id="L82">                .withRegistrationEnd(parseDate(endDateString)));</span>
+    }
+
+    public UsersList getAllUsersFromCountry(String country) throws ApiException {
+<span class="nc" id="L86">        return getUsersList(new UserSearchCriteria()</span>
+<span class="nc" id="L87">                .withCountry(getCountry(country)));</span>
+    }
+
+    public UsersList getAllUsersFromCountryFromDate(
+            String country, String startDateString) throws ApiException {
+<span class="nc" id="L92">        return getUsersList(new UserSearchCriteria()</span>
+<span class="nc" id="L93">                .withCountry(getCountry(country))</span>
+<span class="nc" id="L94">                .withRegistrationStart(parseDate(startDateString)));</span>
+    }
+    
+    public UsersList getAllUsersFromCountryBetweenDates(
+            String country, String startDateString, String endDateString)
+            throws ApiException {
+<span class="nc" id="L100">        return getUsersList(new UserSearchCriteria()</span>
+<span class="nc" id="L101">                .withCountry(getCountry(country))</span>
+<span class="nc" id="L102">                .withRegistrationStart(parseDate(startDateString))</span>
+<span class="nc" id="L103">                .withRegistrationEnd(parseDate(endDateString)));</span>
+    }
+
+    public UsersList getAllUsersFromInstitution(
+            String institution) throws ApiException {
+<span class="nc" id="L108">        return getUsersList(new UserSearchCriteria()</span>
+<span class="nc" id="L109">                .withInstitution(institution));</span>
+    }
+
+    public UsersList getAllUsersFromInstitutionFromDate(
+            String institution, String startDateString) throws ApiException {
+<span class="nc" id="L114">        return getUsersList(new UserSearchCriteria()</span>
+<span class="nc" id="L115">                .withInstitution(institution)</span>
+<span class="nc" id="L116">                .withRegistrationStart(parseDate(startDateString)));</span>
+    }
+
+    public UsersList getAllUsersFromInstitutionBetweenDates(
+            String institution, String startDateString, String endDateString)
+            throws ApiException {
+<span class="nc" id="L122">        return getUsersList(new UserSearchCriteria()</span>
+<span class="nc" id="L123">                .withInstitution(institution)</span>
+<span class="nc" id="L124">                .withRegistrationStart(parseDate(startDateString))</span>
+<span class="nc" id="L125">                .withRegistrationEnd(parseDate(endDateString)));</span>
+    }
+
+    public UsersList getAllUsersFromCountryAndInstitution(
+            String country, String institution)
+            throws ApiException {
+<span class="nc" id="L131">        return getUsersList(new UserSearchCriteria()</span>
+<span class="nc" id="L132">                .withCountry(getCountry(country))</span>
+<span class="nc" id="L133">                .withInstitution(institution));</span>
+    }
+
+    public UsersList getAllUsersFromCountryAndInstitutionFromDate(
+            String country, String institution, String startDateString)
+            throws ApiException {
+<span class="nc" id="L139">        return getUsersList(new UserSearchCriteria()</span>
+<span class="nc" id="L140">                .withCountry(getCountry(country))</span>
+<span class="nc" id="L141">                .withInstitution(institution)</span>
+<span class="nc" id="L142">                .withRegistrationStart(parseDate(startDateString)));</span>
+    }
+
+    public UsersList getAllUsersFromCountryAndInstitutionBetweenDates(
+            String country, String institution, String startDateString,
+            String endDateString) throws ApiException {
+<span class="nc" id="L148">        return getUsersList(new UserSearchCriteria()</span>
+<span class="nc" id="L149">                .withCountry(getCountry(country))</span>
+<span class="nc" id="L150">                .withInstitution(institution)</span>
+<span class="nc" id="L151">                .withRegistrationStart(parseDate(startDateString))</span>
+<span class="nc" id="L152">                .withRegistrationEnd(parseDate(endDateString)));</span>
+    }
+
+    private UsersList getUsersList(UserSearchCriteria searchCriteria)
+            throws ApiException {
+
+        List&lt;User&gt; users;
+        try {
+<span class="nc" id="L160">            users = statsBusiness.getUsersRegistered(searchCriteria);</span>
+<span class="nc" id="L161">        } catch (BusinessException ex) {</span>
+<span class="nc" id="L162">            throw new ApiException(ex);</span>
+<span class="nc" id="L163">        }</span>
+<span class="nc" id="L164">        List&lt;StatUser&gt; statUsers = users</span>
+<span class="nc" id="L165">                .stream()</span>
+<span class="nc" id="L166">                .map(this::mapVipUserToStatUser)</span>
+<span class="nc" id="L167">                .collect(Collectors.toList());</span>
+<span class="nc" id="L168">        return new UsersList(statUsers);</span>
+    }
+
+    private StatUser mapVipUserToStatUser(User vipUser) {
+<span class="nc" id="L172">        return new StatUser(</span>
+                null,
+<span class="nc" id="L174">                vipUser.getCountryCode().getCountryName(),</span>
+<span class="nc" id="L175">                vipUser.getLastLogin().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime(),</span>
+<span class="nc" id="L176">                vipUser.getRegistration().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime(),</span>
+                null,
+<span class="nc" id="L178">                vipUser.getInstitution(),</span>
+                null
+        );
+    }
+
+    private CountryCode getCountry(String countryString) throws ApiException {
+<span class="nc" id="L184">        CountryCode country = CountryCode.searchIgnoreCase(countryString);</span>
+<span class="nc bnc" id="L185" title="All 2 branches missed.">        if (country == null) {</span>
+<span class="nc" id="L186">            logger.error(&quot;Wrong country {}&quot;, countryString);</span>
+<span class="nc" id="L187">            throw new ApiException(ApiError.COUNTRY_UNKNOWN, countryString);</span>
+        }
+<span class="nc" id="L189">        return country;</span>
+    }
+
+<span class="fc" id="L192">    private final String DATE_TIME_FORMAT = &quot;dd-MM-yyyy&quot;;</span>
+<span class="fc" id="L193">    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_TIME_FORMAT);</span>
+    private LocalDate parseDate(String dateString) throws ApiException {
+<span class="nc bnc" id="L195" title="All 2 branches missed.">        if (dateString == null) {</span>
+<span class="nc" id="L196">            return null;</span>
+        }
+        try {
+<span class="nc" id="L199">            return LocalDate.parse(dateString, formatter);</span>
+<span class="nc" id="L200">        } catch (DateTimeParseException e) {</span>
+<span class="nc" id="L201">            logger.error(&quot;Wrong date format for {} (required : {})&quot;, dateString, DATE_TIME_FORMAT);</span>
+<span class="nc" id="L202">            throw new ApiException(ApiError.WRONG_DATE_FORMAT, e, dateString, DATE_TIME_FORMAT);</span>
+        }
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

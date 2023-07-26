@@ -1,0 +1,440 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../jacoco-resources/report.gif" type="image/gif"/><title>SpringConfigServer.java</title><link rel="stylesheet" href="../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../index.html" class="el_report">coverage</a> &gt; <a href="../index.html" class="el_bundle">vip-core</a> &gt; <a href="index.source.html" class="el_package">fr.insalyon.creatis.vip.core.server.business</a> &gt; <span class="el_source">SpringConfigServer.java</span></div><h1>SpringConfigServer.java</h1><pre class="source lang-java linenums">package fr.insalyon.creatis.vip.core.server.business;
+
+import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
+import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.configuration.PropertiesConfiguration;
+import org.apache.commons.configuration.reloading.FileChangedReloadingStrategy;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.BeanInitializationException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
+import org.springframework.core.env.ConfigurableEnvironment;
+import org.springframework.core.env.Environment;
+import org.springframework.core.env.PropertySource;
+import org.springframework.core.io.Resource;
+import org.springframework.stereotype.Component;
+import org.springframework.util.Assert;
+
+import javax.annotation.PostConstruct;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.stream.Stream;
+
+/**
+ * Reads the vip.conf property file from the configured vifConfigFolder
+ * (see {@link fr.insalyon.creatis.vip.core.server.SpringCoreConfig})
+ * It is readonly.
+ * This is based on apache PropertiesConfiguration to allow for automatic
+ * reloading.
+ * A default vip.conf file is available in vip-portal resources
+ */
+@Component
+@Profile({&quot;default&quot;, &quot;prod&quot;, &quot;config-file&quot;})
+public class SpringConfigServer implements Server {
+
+<span class="nc" id="L41">    private final Logger logger = LoggerFactory.getLogger(SamlTokenValidator.class);</span>
+
+    /**
+     * using apache config to have a reloadable config file
+     * from https://www.baeldung.com/spring-reloading-properties
+     */
+    public static class ReloadablePropertySource extends PropertySource {
+
+        private PropertiesConfiguration propertiesConfiguration;
+
+        public ReloadablePropertySource(String name, File configFile)
+                throws ConfigurationException {
+<span class="nc" id="L53">            super(name);</span>
+<span class="nc" id="L54">            this.propertiesConfiguration = new PropertiesConfiguration(configFile);</span>
+<span class="nc" id="L55">            this.propertiesConfiguration.setReloadingStrategy(new FileChangedReloadingStrategy());</span>
+<span class="nc" id="L56">        }</span>
+
+        @Override
+        public Object getProperty(String s) {
+<span class="nc" id="L60">            return propertiesConfiguration.getProperty(s);</span>
+        }
+    }
+
+    private Environment env;
+    private File vipConfigFolder;
+    private File proxyFolder;
+
+    @Autowired
+    public SpringConfigServer(
+            Resource vipConfigFolder,
+<span class="nc" id="L71">            ConfigurableEnvironment env) throws IOException, ConfigurationException {</span>
+<span class="nc" id="L72">        File configFile = vipConfigFolder.getFile().toPath().resolve(Server.CONF_FILE).toFile();</span>
+
+<span class="nc bnc" id="L74" title="All 2 branches missed.">        if( ! configFile.exists()) {</span>
+<span class="nc" id="L75">            throw new FileNotFoundException(configFile.toString());</span>
+        }
+
+<span class="nc" id="L78">        ReloadablePropertySource vipConf = new ReloadablePropertySource(&quot;vipMainConfigFile&quot;, configFile);</span>
+<span class="nc" id="L79">        env.getPropertySources().addLast(vipConf);</span>
+<span class="nc" id="L80">        this.env = env;</span>
+<span class="nc" id="L81">        this.vipConfigFolder = vipConfigFolder.getFile();</span>
+<span class="nc" id="L82">        this.proxyFolder = vipConfigFolder.getFile().toPath().resolve(PROXIES_DIR).toFile();</span>
+<span class="nc" id="L83">        createFolderIfNeeded(proxyFolder);</span>
+<span class="nc" id="L84">    }</span>
+
+    private void createFolderIfNeeded(File folder) {
+<span class="nc bnc" id="L87" title="All 2 branches missed.">        if ( ! folder.exists() &amp;&amp;</span>
+<span class="nc bnc" id="L88" title="All 2 branches missed.">                ! folder.mkdir()) {</span>
+<span class="nc" id="L89">            logger.error(&quot;Cannot create VIP config folder : {}&quot;, folder);</span>
+<span class="nc" id="L90">            throw new BeanInitializationException(&quot;Cannot create VIP config folder&quot;);</span>
+        }
+<span class="nc" id="L92">    }</span>
+
+    @PostConstruct
+    public void verify() {
+<span class="nc" id="L96">        assertPropertyIsPresent(CoreConstants.LAB_ADMIN_FIRST_NAME);</span>
+<span class="nc" id="L97">        assertPropertyIsPresent(CoreConstants.LAB_ADMIN_LAST_NAME);</span>
+<span class="nc" id="L98">        assertPropertyIsNotEmpty(CoreConstants.LAB_ADMIN_EMAIL);</span>
+<span class="nc" id="L99">        assertPropertyIsPresent(CoreConstants.LAB_ADMIN_INSTITUTION);</span>
+<span class="nc" id="L100">        assertPropertyIsPresent(CoreConstants.LAB_ADMIN_PASS);</span>
+
+<span class="nc" id="L102">        assertPropertyIsNotEmpty(CoreConstants.VO_NAME);</span>
+<span class="nc" id="L103">        assertPropertyIsNotEmpty(CoreConstants.VO_ROOT);</span>
+
+<span class="nc" id="L105">        assertPropertyIsPresent(CoreConstants.LAB_MYPROXY_HOST);</span>
+<span class="nc" id="L106">        assertPropertyIsPresent(CoreConstants.LAB_MYPROXY_PORT);</span>
+<span class="nc" id="L107">        assertPropertyIsPresent(CoreConstants.LAB_MYPROXY_USER);</span>
+<span class="nc" id="L108">        assertPropertyIsPresent(CoreConstants.LAB_MYPROXY_PASS);</span>
+<span class="nc" id="L109">        assertPropertyIsPresent(CoreConstants.LAB_MYPROXY_LIFETIME);</span>
+<span class="nc" id="L110">        assertPropertyIsNotEmpty(CoreConstants.LAB_MYPROXY_MIN_HOURS, Integer.class);</span>
+
+<span class="nc" id="L112">        assertPropertyIsNotEmpty(CoreConstants.LAB_SMA_HOST);</span>
+<span class="nc" id="L113">        assertPropertyIsNotEmpty(CoreConstants.LAB_SMA_PORT, Integer.class);</span>
+
+<span class="nc" id="L115">        assertPropertyIsNotEmpty(CoreConstants.LAB_GRIDA_HOST);</span>
+<span class="nc" id="L116">        assertPropertyIsNotEmpty(CoreConstants.LAB_GRIDA_PORT, Integer.class);</span>
+
+<span class="nc" id="L118">        assertPropertyIsNotEmpty(CoreConstants.LAB_DATA_PATH);</span>
+<span class="nc" id="L119">        assertPropertyIsNotEmpty(CoreConstants.LAB_DATA_USERS_HOME);</span>
+<span class="nc" id="L120">        assertPropertyIsNotEmpty(CoreConstants.LAB_DATA_GROUPS_HOME);</span>
+<span class="nc" id="L121">        assertPropertyIsPresent(CoreConstants.LAB_DATA_ALT_USERS_HOME);</span>
+<span class="nc" id="L122">        assertPropertyIsPresent(CoreConstants.LAB_DATA_ALT_GROUPS_HOME);</span>
+
+<span class="nc" id="L124">        assertPropertyIsNotEmpty(CoreConstants.LAB_TRUSTSTORE_FILE);</span>
+<span class="nc" id="L125">        assertPropertyIsNotEmpty(CoreConstants.LAB_TRUSTSTORE_PASS);</span>
+
+<span class="nc" id="L127">        assertPropertyIsNotEmpty(CoreConstants.LAB_SIMULATION_FOLDER);</span>
+<span class="nc" id="L128">        assertPropertyIsNotEmpty(CoreConstants.LAB_SIMULATION_DB_HOST);</span>
+
+<span class="nc" id="L130">        assertPropertyIsPresent(CoreConstants.LAB_APACHE_HOST);</span>
+<span class="nc" id="L131">        assertPropertyIsPresent(CoreConstants.LAB_APACHE_SSL_PORT);</span>
+<span class="nc" id="L132">        assertPropertyIsPresent(CoreConstants.LAB_CAS_URL);</span>
+<span class="nc" id="L133">        assertPropertyIsPresent(CoreConstants.SSH_PUBLIC_KEY);</span>
+
+<span class="nc" id="L135">        assertPropertyIsPresent(CoreConstants.UNDESIRED_MAIL_DOMAINS, List.class);</span>
+<span class="nc" id="L136">        assertPropertyIsPresent(CoreConstants.UNDESIRED_COUNTRIES, List.class);</span>
+
+<span class="nc" id="L138">        assertPropertyIsPresent(CoreConstants.APPLET_GATELAB_CLASSES, List.class);</span>
+<span class="nc" id="L139">        assertPropertyIsPresent(CoreConstants.APPLET_GATELABTEST_CLASSES, List.class);</span>
+
+<span class="nc" id="L141">        assertPropertyIsNotEmpty(CoreConstants.APPLICATION_FILES_REPOSITORY);</span>
+<span class="nc" id="L142">        assertPropertyIsNotEmpty(CoreConstants.APP_IMPORTER_ROOT_FOLDER);</span>
+<span class="nc" id="L143">        assertPropertyIsPresent(CoreConstants.APP_REQUIREMENTS, List.class);</span>
+<span class="nc" id="L144">        assertPropertyIsNotEmpty(CoreConstants.PUBLICATION_SYSTEM_COMMAND);</span>
+
+<span class="nc" id="L146">        assertPropertyIsNotEmpty(CoreConstants.GIRDER_TOKEN_DURATION_IN_DAYS, Float.class);</span>
+<span class="nc" id="L147">        assertPropertyIsNotEmpty(CoreConstants.LAB_SIMULATION_PLATFORM_MAX, Integer.class);</span>
+
+<span class="nc" id="L149">        assertOptionalPropertyType(CoreConstants.USE_LOCAL_FILES_AS_INPUTS, Boolean.class);</span>
+
+<span class="nc" id="L151">    }</span>
+
+    private void assertPropertyIsPresent(String property) {
+<span class="nc" id="L154">        assertPropertyIsPresent(property, String.class);</span>
+<span class="nc" id="L155">    }</span>
+
+    private void assertPropertyIsPresent(String property, Class&lt;?&gt; type) {
+<span class="nc" id="L158">        Assert.notNull(env.getProperty(property, type), property + &quot; should be present&quot;);</span>
+<span class="nc" id="L159">    }</span>
+
+    private void assertOptionalPropertyType(String property, Class&lt;?&gt; type) {
+<span class="nc" id="L162">        Object val = env.getProperty(property, type);</span>
+<span class="nc bnc" id="L163" title="All 2 branches missed.">        if (val != null) {</span>
+<span class="nc" id="L164">            Assert.isInstanceOf(type, val, val + &quot; must be of type &quot; + type);</span>
+        }
+<span class="nc" id="L166">    }</span>
+
+    private void assertPropertyIsNotEmpty(String property) {
+<span class="nc" id="L169">        assertPropertyIsNotEmpty(property, String.class);</span>
+<span class="nc" id="L170">    }</span>
+
+    private void assertPropertyIsNotEmpty(String property, Class&lt;?&gt; type) {
+<span class="nc bnc" id="L173" title="All 2 branches missed.">        if (String.class.equals(type)) {</span>
+<span class="nc" id="L174">            Assert.hasText(env.getProperty(property), property + &quot; should not be empty&quot;);</span>
+<span class="nc bnc" id="L175" title="All 2 branches missed.">        } else if (List.class.equals(type)) {</span>
+<span class="nc" id="L176">            Assert.notEmpty(env.getProperty(property, List.class), property + &quot; should not be empty&quot;);</span>
+        } else {
+<span class="nc" id="L178">            Assert.notNull(env.getProperty(property, type), property + &quot; should not be empty&quot;);</span>
+        }
+<span class="nc" id="L180">    }</span>
+
+
+    @Override
+    public String getConfigurationFolder() {
+<span class="nc" id="L185">        return vipConfigFolder.getAbsolutePath() + &quot;/&quot;;</span>
+    }
+
+    @Override
+    public String getVoName() {
+<span class="nc" id="L190">        return env.getRequiredProperty(CoreConstants.VO_NAME);</span>
+    }
+
+    @Override
+    public String getVoRoot() {
+<span class="nc" id="L195">        return env.getRequiredProperty(CoreConstants.VO_ROOT);</span>
+    }
+
+    @Override
+    public String getServerProxy() {
+<span class="nc" id="L200">        return proxyFolder.toPath().resolve(PROXY_FILENAME).toString();</span>
+    }
+
+    @Override
+    public String getServerProxy(String vo) {
+<span class="nc" id="L205">        return Paths.get(getServerProxyFolder(vo)).resolve(PROXY_FILENAME).toString();</span>
+    }
+
+    @Override
+    public String getServerProxyFolder(String vo) {
+<span class="nc" id="L210">        File voProxyFolder = this.proxyFolder.toPath().resolve(vo).toFile();</span>
+<span class="nc" id="L211">        createFolderIfNeeded(voProxyFolder);</span>
+<span class="nc" id="L212">        return voProxyFolder.getAbsolutePath();</span>
+    }
+
+    @Override
+    public String getMyProxyHost() {
+<span class="nc" id="L217">        return env.getRequiredProperty(CoreConstants.LAB_MYPROXY_HOST);</span>
+    }
+
+    @Override
+    public int getMyProxyPort() {
+<span class="nc" id="L222">        return env.getRequiredProperty(CoreConstants.LAB_MYPROXY_PORT, Integer.class);</span>
+    }
+
+    @Override
+    public String getMyProxyPass() {
+<span class="nc" id="L227">        return env.getRequiredProperty(CoreConstants.LAB_MYPROXY_PASS);</span>
+    }
+
+    @Override
+    public String getMyProxyUser() {
+<span class="nc" id="L232">        return env.getRequiredProperty(CoreConstants.LAB_MYPROXY_USER);</span>
+    }
+
+    @Override
+    public String getMyProxyLifeTime() {
+<span class="nc" id="L237">        return env.getRequiredProperty(CoreConstants.LAB_MYPROXY_LIFETIME);</span>
+    }
+
+    @Override
+    public int getMyProxyMinHours() {
+<span class="nc" id="L242">        return env.getRequiredProperty(CoreConstants.LAB_MYPROXY_MIN_HOURS, Integer.class);</span>
+    }
+
+    @Override
+    public String getGRIDAHost() {
+<span class="nc" id="L247">        return env.getRequiredProperty(CoreConstants.LAB_GRIDA_HOST);</span>
+    }
+
+    @Override
+    public int getGRIDAPort() {
+<span class="nc" id="L252">        return env.getRequiredProperty(CoreConstants.LAB_GRIDA_PORT, Integer.class);</span>
+    }
+
+    @Override
+    public String getWorkflowsHost() {
+<span class="nc" id="L257">        return env.getRequiredProperty(CoreConstants.LAB_SIMULATION_DB_HOST);</span>
+    }
+
+    @Override
+    public String getWorkflowsPath() {
+<span class="nc" id="L262">        return env.getRequiredProperty(CoreConstants.LAB_SIMULATION_FOLDER);</span>
+    }
+
+    @Override
+    public String getApacheHost() {
+<span class="nc" id="L267">        return env.getRequiredProperty(CoreConstants.LAB_APACHE_HOST);</span>
+    }
+
+    @Override
+    public int getApacheSSLPort() {
+<span class="nc" id="L272">        return env.getRequiredProperty(CoreConstants.LAB_APACHE_SSL_PORT, Integer.class);</span>
+    }
+
+    @Override
+    public String getSMAHost() {
+<span class="nc" id="L277">        return env.getRequiredProperty(CoreConstants.LAB_SMA_HOST);</span>
+    }
+
+    @Override
+    public int getSMAPort() {
+<span class="nc" id="L282">        return env.getRequiredProperty(CoreConstants.LAB_SMA_PORT, Integer.class);</span>
+    }
+
+    @Override
+    public String getDataManagerPath() {
+<span class="nc" id="L287">        return env.getRequiredProperty(CoreConstants.LAB_DATA_PATH);</span>
+    }
+
+    @Override
+    public String getDataManagerUsersHome() {
+<span class="nc" id="L292">        return env.getRequiredProperty(CoreConstants.LAB_DATA_USERS_HOME);</span>
+    }
+
+    @Override
+    public String getDataManagerGroupsHome() {
+<span class="nc" id="L297">        return env.getRequiredProperty(CoreConstants.LAB_DATA_GROUPS_HOME);</span>
+    }
+
+    @Override
+    public String getAltDataManagerUsersHome() {
+<span class="nc" id="L302">        return env.getRequiredProperty(CoreConstants.LAB_DATA_ALT_USERS_HOME);</span>
+    }
+
+    @Override
+    public String getAltDataManagerGroupsHome() {
+<span class="nc" id="L307">        return env.getRequiredProperty(CoreConstants.LAB_DATA_ALT_GROUPS_HOME);</span>
+    }
+
+    @Override
+    public String getTruststoreFile() {
+<span class="nc" id="L312">        return env.getRequiredProperty(CoreConstants.LAB_TRUSTSTORE_FILE);</span>
+    }
+
+    @Override
+    public String getTruststorePass() {
+<span class="nc" id="L317">        return env.getRequiredProperty(CoreConstants.LAB_TRUSTSTORE_PASS);</span>
+    }
+
+    @Override
+    public String getAdminEmail() {
+<span class="nc" id="L322">        return env.getRequiredProperty(CoreConstants.LAB_ADMIN_EMAIL);</span>
+    }
+
+    @Override
+    public String getAdminFirstName() {
+<span class="nc" id="L327">        return env.getRequiredProperty(CoreConstants.LAB_ADMIN_FIRST_NAME);</span>
+    }
+
+    @Override
+    public String getAdminInstitution() {
+<span class="nc" id="L332">        return env.getRequiredProperty(CoreConstants.LAB_ADMIN_INSTITUTION);</span>
+    }
+
+    @Override
+    public String getAdminLastName() {
+<span class="nc" id="L337">        return env.getRequiredProperty(CoreConstants.LAB_ADMIN_LAST_NAME);</span>
+    }
+
+    @Override
+    public String getAdminPassword() {
+<span class="nc" id="L342">        return env.getRequiredProperty(CoreConstants.LAB_ADMIN_PASS);</span>
+    }
+
+    @Override
+    public String getCasURL() {
+<span class="nc" id="L347">        return env.getRequiredProperty(CoreConstants.LAB_CAS_URL);</span>
+    }
+
+    @Override
+    public String getSshPublicKey() {
+<span class="nc" id="L352">        return env.getRequiredProperty(CoreConstants.SSH_PUBLIC_KEY);</span>
+    }
+
+    @Override
+    public String getSamlTrustedCertificate(String issuer) {
+<span class="nc" id="L357">        logger.info(&quot;Getting trusted certificate for issuer {}&quot;, issuer);</span>
+<span class="nc" id="L358">        return env.getRequiredProperty(CoreConstants.SAML_TRUSTED_CERTIFICATE+&quot;.&quot;+issuer);</span>
+    }
+
+    @Override
+    public String getSAMLDefaultGroup(String issuer) {
+<span class="nc" id="L363">        logger.info(&quot;Getting default group for issuer &quot;+issuer);</span>
+<span class="nc" id="L364">        return env.getRequiredProperty(CoreConstants.SAML_DEFAULT_GROUP +&quot;.&quot;+issuer);</span>
+    }
+
+    @Override
+    public String getApplicationImporterFileRepository() {
+<span class="nc" id="L369">        return env.getRequiredProperty(CoreConstants.APPLICATION_FILES_REPOSITORY);</span>
+    }
+
+    @Override
+    public String getApplicationImporterRootFolder() {
+<span class="nc" id="L374">        return env.getRequiredProperty(CoreConstants.APP_IMPORTER_ROOT_FOLDER);</span>
+    }
+
+    @Override
+    public List&lt;String&gt; getApplicationImporterRequirements() {
+<span class="nc" id="L379">        return Arrays.asList(env.getRequiredProperty(CoreConstants.APP_REQUIREMENTS, String[].class));</span>
+    }
+
+    @Override
+    public HashMap&lt;String, Integer&gt; getReservedClasses() {
+<span class="nc" id="L384">        HashMap&lt;String, Integer&gt; reservedClasses = new HashMap&lt;&gt;();</span>
+<span class="nc" id="L385">        Stream.of(</span>
+<span class="nc" id="L386">                env.getRequiredProperty(</span>
+                        CoreConstants.APPLET_GATELAB_CLASSES,
+                        String[].class))
+<span class="nc" id="L389">                .forEach(className -&gt; reservedClasses.put(className,0));</span>
+<span class="nc" id="L390">        Stream.of(</span>
+<span class="nc" id="L391">                env.getRequiredProperty(</span>
+                        CoreConstants.APPLET_GATELABTEST_CLASSES,
+                        String[].class))
+<span class="nc" id="L394">                .forEach(className -&gt; reservedClasses.put(className,0));</span>
+<span class="nc" id="L395">        return reservedClasses;</span>
+    }
+
+    @Override
+    public List&lt;String&gt; getUndesiredMailDomains() {
+<span class="nc" id="L400">        return Arrays.asList(env.getRequiredProperty(CoreConstants.UNDESIRED_MAIL_DOMAINS, String[].class));</span>
+    }
+
+    @Override
+    public List&lt;String&gt; getUndesiredCountries() {
+<span class="nc" id="L405">        return Arrays.asList(env.getRequiredProperty(CoreConstants.UNDESIRED_COUNTRIES, String[].class));</span>
+    }
+
+    @Override
+    public int getMaxPlatformRunningSimulations() {
+<span class="nc" id="L410">        return env.getRequiredProperty(CoreConstants.LAB_SIMULATION_PLATFORM_MAX, Integer.class);</span>
+    }
+
+    @Override
+    public int getNumberMonthsToTestLastPublicationUpdates() {
+<span class="nc" id="L415">        return env.getRequiredProperty(CoreConstants.PUB_MONTHS_UPDATES, Integer.class);</span>
+    }
+
+    @Override
+    public String getPublicationCommandLine() {
+<span class="nc" id="L420">        return env.getRequiredProperty(CoreConstants.PUBLICATION_SYSTEM_COMMAND);</span>
+    }
+
+    @Override
+    public float getGirderTokenDurationInDays() {
+<span class="nc" id="L425">        return env.getRequiredProperty(CoreConstants.GIRDER_TOKEN_DURATION_IN_DAYS, Float.class);</span>
+    }
+
+    @Override
+    public boolean useLocalFilesInInputs() {
+<span class="nc" id="L430">        return env.getProperty(CoreConstants.USE_LOCAL_FILES_AS_INPUTS, Boolean.class, false);</span>
+    }
+
+    @Override
+    public int getApiParallelDownloadNb() {
+<span class="nc" id="L435">        return env.getProperty(CoreConstants.API_PARALLEL_DOWNLOAD_NB, Integer.class, 20);</span>
+    }
+
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

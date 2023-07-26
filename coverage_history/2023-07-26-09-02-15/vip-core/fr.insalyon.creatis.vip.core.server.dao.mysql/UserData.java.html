@@ -1,0 +1,1074 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../jacoco-resources/report.gif" type="image/gif"/><title>UserData.java</title><link rel="stylesheet" href="../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../index.html" class="el_report">coverage</a> &gt; <a href="../index.html" class="el_bundle">vip-core</a> &gt; <a href="index.source.html" class="el_package">fr.insalyon.creatis.vip.core.server.dao.mysql</a> &gt; <span class="el_source">UserData.java</span></div><h1>UserData.java</h1><pre class="source lang-java linenums">/*
+ * Copyright and authors: see LICENSE.txt in base repository.
+ *
+ * This software is a web portal for pipeline execution on distributed systems.
+ *
+ * This software is governed by the CeCILL-B license under French law and
+ * abiding by the rules of distribution of free software.  You can  use,
+ * modify and/ or redistribute the software under the terms of the CeCILL-B
+ * license as circulated by CEA, CNRS and INRIA at the following URL
+ * &quot;http://www.cecill.info&quot;.
+ *
+ * As a counterpart to the access to the source code and  rights to copy,
+ * modify and redistribute granted by the license, users are provided only
+ * with a limited warranty  and the software's author,  the holder of the
+ * economic rights,  and the successive licensors  have only  limited
+ * liability.
+ *
+ * In this respect, the user's attention is drawn to the risks associated
+ * with loading,  using,  modifying and/or developing or reproducing the
+ * software by the user in light of its specific status of free software,
+ * that may mean  that it is complicated to manipulate,  and  that  also
+ * therefore means  that it is reserved for developers  and  experienced
+ * professionals having in-depth computer knowledge. Users are therefore
+ * encouraged to load and test the software's suitability as regards their
+ * requirements in conditions enabling the security of their systems and/or
+ * data to be ensured and,  more generally, to use and operate it in the
+ * same conditions as regards security.
+ *
+ * The fact that you are presently reading this means that you have had
+ * knowledge of the CeCILL-B license and that you accept its terms.
+ */
+package fr.insalyon.creatis.vip.core.server.dao.mysql;
+
+import fr.insalyon.creatis.vip.core.client.bean.*;
+import fr.insalyon.creatis.vip.core.client.view.user.UserLevel;
+import fr.insalyon.creatis.vip.core.client.view.util.CountryCode;
+import fr.insalyon.creatis.vip.core.server.business.StatsBusiness.UserSearchCriteria;
+import fr.insalyon.creatis.vip.core.server.dao.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.support.JdbcDaoSupport;
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
+
+import javax.sql.DataSource;
+import java.sql.*;
+import java.time.LocalDate;
+import java.util.*;
+import java.util.AbstractMap.SimpleEntry;
+import java.util.Date;
+import java.util.Map.Entry;
+
+/**
+ *
+ * @author Rafael Ferreira da Silva, Tristan Glatard
+ */
+@Repository
+@Transactional
+<span class="fc" id="L60">public class UserData extends JdbcDaoSupport implements UserDAO {</span>
+
+<span class="fc" id="L62">    private final Logger logger = LoggerFactory.getLogger(getClass());</span>
+
+    @Autowired
+    public void useDataSource(DataSource dataSource) {
+<span class="fc" id="L66">        setDataSource(dataSource);</span>
+<span class="fc" id="L67">    }</span>
+
+    /**
+     * Adds a user
+     *
+     * @param user
+     * @return
+     */
+    @Override
+    public void add(User user) throws DAOException {
+
+        try {
+<span class="fc" id="L79">            PreparedStatement ps = getConnection().prepareStatement(</span>
+                    &quot;INSERT INTO VIPUsers(&quot;
+                    + &quot;email, pass, first_name, last_name, institution, &quot;
+                    + &quot;code, confirmed, folder, registration, last_login, level, &quot;
+                    + &quot;country_code, max_simulations, termsUse,lastUpdatePublications,&quot;
+                    + &quot;failed_authentications, account_locked) &quot;
+                    + &quot;VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)&quot;);
+
+<span class="fc" id="L87">            ps.setString(1, user.getEmail());</span>
+<span class="fc" id="L88">            ps.setString(2, user.getPassword());</span>
+<span class="fc" id="L89">            ps.setString(3, user.getFirstName());</span>
+<span class="fc" id="L90">            ps.setString(4, user.getLastName());</span>
+<span class="fc" id="L91">            ps.setString(5, user.getInstitution());</span>
+<span class="fc" id="L92">            ps.setString(6, user.getCode());</span>
+<span class="fc" id="L93">            ps.setBoolean(7, user.isConfirmed());</span>
+<span class="fc" id="L94">            ps.setString(8, user.getFolder());</span>
+<span class="fc" id="L95">            ps.setTimestamp(9, new Timestamp(user.getRegistration().getTime()));</span>
+<span class="fc" id="L96">            ps.setTimestamp(10, new Timestamp(user.getLastLogin().getTime()));</span>
+<span class="fc" id="L97">            ps.setString(11, user.getLevel().name());</span>
+<span class="fc" id="L98">            ps.setString(12, user.getCountryCode().name());</span>
+<span class="fc" id="L99">            ps.setInt(13, user.getMaxRunningSimulations());</span>
+<span class="fc" id="L100">            ps.setTimestamp(14, user.getTermsOfUse());</span>
+<span class="fc" id="L101">            ps.setTimestamp(15, user.getLastUpdatePublications());</span>
+<span class="fc" id="L102">            ps.setInt(16, 0);</span>
+<span class="fc" id="L103">            ps.setBoolean(17, false);</span>
+
+<span class="fc" id="L105">            ps.execute();</span>
+<span class="fc" id="L106">            ps.close();</span>
+
+<span class="nc" id="L108">        } catch (SQLException ex) {</span>
+<span class="nc bnc" id="L109" title="All 2 branches missed.">            if (ex.getMessage().contains(&quot;Duplicate entry&quot;)) {</span>
+<span class="nc" id="L110">                logger.error(&quot;There is an existing account associated with the email: {} or with this {first name,last name} ({})&quot;, user.getEmail(), ex.getMessage());</span>
+<span class="nc" id="L111">                throw new DAOException(&quot;There is an existing account associated with this email or with this {first name,last name}.&quot;, ex);</span>
+            } else {
+<span class="nc" id="L113">                logger.error(&quot;Error adding user {}&quot;, user.getEmail(), ex);</span>
+<span class="nc" id="L114">                throw new DAOException(ex);</span>
+            }
+<span class="fc" id="L116">        }</span>
+<span class="fc" id="L117">    }</span>
+
+    /**
+     *
+     * @param email
+     * @param password
+     * @return
+     * @throws DAOException
+     */
+    @Override
+    public boolean authenticate(String email, String password) throws DAOException {
+
+        try {
+<span class="nc" id="L130">            PreparedStatement ps = getConnection().prepareStatement(&quot;SELECT &quot;</span>
+                    + &quot;pass,account_locked FROM VIPUsers WHERE email=?&quot;);
+
+<span class="nc" id="L133">            ps.setString(1, email);</span>
+<span class="nc" id="L134">            ResultSet rs = ps.executeQuery();</span>
+
+<span class="nc bnc" id="L136" title="All 2 branches missed.">            if (rs.next()) {</span>
+<span class="nc" id="L137">                String pass = rs.getString(&quot;pass&quot;);</span>
+<span class="nc" id="L138">                boolean locked = rs.getBoolean(&quot;account_locked&quot;);</span>
+<span class="nc" id="L139">                ps.close();</span>
+<span class="nc bnc" id="L140" title="All 6 branches missed.">                return !locked &amp;&amp; pass != null &amp;&amp; pass.equals(password);</span>
+            }
+<span class="nc" id="L142">            return false;</span>
+
+<span class="nc" id="L144">        } catch (SQLException ex) {</span>
+<span class="nc" id="L145">            logger.error(&quot;Error authenticating user {}&quot;, email, ex);</span>
+<span class="nc" id="L146">            throw new DAOException(ex);</span>
+        }
+    }
+
+    /**
+     *
+     * @param email
+     * @param code
+     * @return
+     * @throws DAOException
+     */
+    @Override
+    public boolean activate(String email, String code) throws DAOException {
+
+        try {
+<span class="nc" id="L161">            PreparedStatement ps = getConnection().prepareStatement(&quot;SELECT &quot;</span>
+                    + &quot;code,account_locked FROM VIPUsers WHERE email=?&quot;);
+
+<span class="nc" id="L164">            ps.setString(1, email);</span>
+<span class="nc" id="L165">            ResultSet rs = ps.executeQuery();</span>
+
+<span class="nc bnc" id="L167" title="All 2 branches missed.">            if (rs.next()) {</span>
+<span class="nc" id="L168">                String c = rs.getString(&quot;code&quot;);</span>
+<span class="nc" id="L169">                boolean locked = rs.getBoolean(&quot;account_locked&quot;);</span>
+<span class="nc bnc" id="L170" title="All 4 branches missed.">                if (!locked &amp;&amp; c.equals(code)) {</span>
+
+<span class="nc" id="L172">                    ps = getConnection().prepareStatement(&quot;UPDATE VIPUsers SET &quot;</span>
+                            + &quot;confirmed=? WHERE email=?&quot;);
+
+<span class="nc" id="L175">                    ps.setBoolean(1, true);</span>
+<span class="nc" id="L176">                    ps.setString(2, email);</span>
+<span class="nc" id="L177">                    ps.executeUpdate();</span>
+<span class="nc" id="L178">                    ps.close();</span>
+
+<span class="nc" id="L180">                    return true;</span>
+                }
+            }
+<span class="nc" id="L183">            return false;</span>
+
+<span class="nc" id="L185">        } catch (SQLException ex) {</span>
+<span class="nc" id="L186">            logger.error(&quot;Error activating user {}&quot;, email, ex);</span>
+<span class="nc" id="L187">            throw new DAOException(ex);</span>
+        }
+    }
+
+    /**
+     *
+     * @param email
+     * @return
+     * @throws DAOException
+     */
+    @Override
+    public User getUser(String email) throws DAOException {
+
+        try {
+<span class="fc" id="L201">            PreparedStatement ps = getConnection().prepareStatement(&quot;SELECT &quot;</span>
+                    + &quot;email, next_email, pass, first_name, last_name, institution, &quot;
+                    + &quot;code, confirmed, folder, session, registration, &quot;
+                    + &quot;last_login, level, country_code, max_simulations,termsUse,lastUpdatePublications,failed_authentications,account_locked &quot;
+                    + &quot;FROM VIPUsers &quot;
+                    + &quot;WHERE email=?&quot;);
+
+<span class="fc" id="L208">            ps.setString(1, email);</span>
+<span class="fc" id="L209">            ResultSet rs = ps.executeQuery();</span>
+
+<span class="pc bpc" id="L211" title="1 of 2 branches missed.">            if (rs.next()) {</span>
+<span class="fc" id="L212">                User user = new User(</span>
+<span class="fc" id="L213">                        rs.getString(&quot;first_name&quot;), rs.getString(&quot;last_name&quot;),</span>
+<span class="fc" id="L214">                        rs.getString(&quot;email&quot;), rs.getString(&quot;next_email&quot;),</span>
+<span class="fc" id="L215">                        rs.getString(&quot;institution&quot;),</span>
+<span class="pc bpc" id="L216" title="1 of 2 branches missed.">                        rs.getString(&quot;pass&quot;) == null ? null : &quot;&quot;,</span>
+<span class="fc" id="L217">                        rs.getBoolean(&quot;confirmed&quot;),</span>
+<span class="fc" id="L218">                        rs.getString(&quot;code&quot;), rs.getString(&quot;folder&quot;),</span>
+<span class="fc" id="L219">                        rs.getString(&quot;session&quot;),</span>
+<span class="fc" id="L220">                        new Date(rs.getTimestamp(&quot;registration&quot;).getTime()),</span>
+<span class="fc" id="L221">                        new Date(rs.getTimestamp(&quot;last_login&quot;).getTime()),</span>
+<span class="fc" id="L222">                        UserLevel.valueOf(rs.getString(&quot;level&quot;)),</span>
+<span class="fc" id="L223">                        CountryCode.valueOf(rs.getString(&quot;country_code&quot;)),</span>
+<span class="fc" id="L224">                        rs.getInt(&quot;max_simulations&quot;),</span>
+<span class="fc" id="L225">                        rs.getTimestamp(&quot;termsUse&quot;),</span>
+<span class="fc" id="L226">                        rs.getTimestamp(&quot;lastUpdatePublications&quot;),</span>
+<span class="fc" id="L227">                        rs.getInt(&quot;failed_authentications&quot;),</span>
+<span class="fc" id="L228">                        rs.getBoolean(&quot;account_locked&quot;));</span>
+
+<span class="fc" id="L230">                ps.close();</span>
+<span class="fc" id="L231">                return user;</span>
+            }
+
+<span class="nc" id="L234">            logger.error(&quot;There is no user registered with the e-mail {}&quot;, email);</span>
+<span class="nc" id="L235">            throw new DAOException(&quot;There is no user registered with the e-mail: &quot; + email);</span>
+
+<span class="nc" id="L237">        } catch (SQLException ex) {</span>
+<span class="nc" id="L238">            logger.error(&quot;Error getting user {}&quot;, email, ex);</span>
+<span class="nc" id="L239">            throw new DAOException(ex);</span>
+        }
+    }
+
+    /**
+     *
+     * @return @throws DAOException
+     */
+    @Override
+    public List&lt;User&gt; getUsers() throws DAOException {
+
+        try {
+<span class="nc" id="L251">            PreparedStatement ps = getConnection().prepareStatement(&quot;SELECT &quot;</span>
+                    + &quot;email, next_email, first_name, last_name, institution, &quot;
+                    + &quot;code, confirmed, folder, registration, last_login, &quot;
+                    + &quot;level, country_code, max_simulations, termsUse, lastUpdatePublications,&quot;
+                    + &quot;failed_authentications, account_locked &quot;
+                    + &quot;FROM VIPUsers &quot;
+                    + &quot;ORDER BY LOWER(first_name), LOWER(last_name)&quot;);
+
+<span class="nc" id="L259">            ResultSet rs = ps.executeQuery();</span>
+<span class="nc" id="L260">            List&lt;User&gt; users = new ArrayList&lt;User&gt;();</span>
+
+<span class="nc bnc" id="L262" title="All 2 branches missed.">            while (rs.next()) {</span>
+<span class="nc" id="L263">                users.add(new User(</span>
+<span class="nc" id="L264">                        rs.getString(&quot;first_name&quot;), rs.getString(&quot;last_name&quot;),</span>
+<span class="nc" id="L265">                        rs.getString(&quot;email&quot;), rs.getString(&quot;next_email&quot;),</span>
+<span class="nc" id="L266">                        rs.getString(&quot;institution&quot;),</span>
+<span class="nc" id="L267">                        &quot;&quot;, rs.getBoolean(&quot;confirmed&quot;),</span>
+<span class="nc" id="L268">                        rs.getString(&quot;code&quot;), rs.getString(&quot;folder&quot;), &quot;&quot;,</span>
+<span class="nc" id="L269">                        new Date(rs.getTimestamp(&quot;registration&quot;).getTime()),</span>
+<span class="nc" id="L270">                        new Date(rs.getTimestamp(&quot;last_login&quot;).getTime()),</span>
+<span class="nc" id="L271">                        UserLevel.valueOf(rs.getString(&quot;level&quot;)),</span>
+<span class="nc" id="L272">                        CountryCode.valueOf(rs.getString(&quot;country_code&quot;)),</span>
+<span class="nc" id="L273">                        rs.getInt(&quot;max_simulations&quot;),</span>
+<span class="nc" id="L274">                        rs.getTimestamp(&quot;termsUse&quot;),</span>
+<span class="nc" id="L275">                        rs.getTimestamp(&quot;lastUpdatePublications&quot;),</span>
+<span class="nc" id="L276">                        rs.getInt(&quot;failed_authentications&quot;),</span>
+<span class="nc" id="L277">                        rs.getBoolean(&quot;account_locked&quot;)));</span>
+            }
+<span class="nc" id="L279">            ps.close();</span>
+<span class="nc" id="L280">            return users;</span>
+
+<span class="nc" id="L282">        } catch (SQLException ex) {</span>
+<span class="nc" id="L283">            logger.error(&quot;Error getting all users&quot;, ex);</span>
+<span class="nc" id="L284">            throw new DAOException(ex);</span>
+        }
+    }
+
+    @Override
+    public List&lt;User&gt; searchUsers(
+            UserSearchCriteria searchCriteria) throws DAOException {
+
+        try {
+<span class="nc" id="L293">            StringBuilder query = new StringBuilder(&quot;SELECT &quot;</span>
+                    + &quot;email, next_email, first_name, last_name, institution, &quot;
+                    + &quot;code, confirmed, folder, registration, last_login, &quot;
+                    + &quot;level, country_code, max_simulations, termsUse, lastUpdatePublications,&quot;
+                    + &quot;failed_authentications, account_locked &quot;
+                    + &quot;FROM VIPUsers &quot;);
+<span class="nc" id="L299">            List&lt;Object&gt; params = new ArrayList&lt;&gt;();</span>
+
+<span class="nc" id="L301">            buildSearchQuery(searchCriteria)</span>
+<span class="nc" id="L302">                    .ifPresent(queryEntry -&gt; {</span>
+<span class="nc" id="L303">                        query.append(queryEntry.getKey());</span>
+<span class="nc" id="L304">                        params.addAll(queryEntry.getValue());</span>
+<span class="nc" id="L305">                    });</span>
+
+<span class="nc" id="L307">            query.append(&quot;ORDER BY LOWER(registration)&quot;);</span>
+
+<span class="nc" id="L309">            PreparedStatement ps = getConnection().prepareStatement(query.toString());</span>
+<span class="nc" id="L310">            int paramIndex = 1;</span>
+<span class="nc bnc" id="L311" title="All 2 branches missed.">            for (Object param : params) {</span>
+<span class="nc" id="L312">                ps.setObject(paramIndex, param);</span>
+<span class="nc" id="L313">                paramIndex++;</span>
+<span class="nc" id="L314">            }</span>
+
+<span class="nc" id="L316">            ResultSet rs = ps.executeQuery();</span>
+<span class="nc" id="L317">            List&lt;User&gt; users = new ArrayList&lt;User&gt;();</span>
+
+<span class="nc bnc" id="L319" title="All 2 branches missed.">            while (rs.next()) {</span>
+<span class="nc" id="L320">                users.add(new User(</span>
+<span class="nc" id="L321">                        rs.getString(&quot;first_name&quot;), rs.getString(&quot;last_name&quot;),</span>
+<span class="nc" id="L322">                        rs.getString(&quot;email&quot;), rs.getString(&quot;next_email&quot;),</span>
+<span class="nc" id="L323">                        rs.getString(&quot;institution&quot;),</span>
+<span class="nc" id="L324">                        &quot;&quot;, rs.getBoolean(&quot;confirmed&quot;),</span>
+<span class="nc" id="L325">                        rs.getString(&quot;code&quot;), rs.getString(&quot;folder&quot;), &quot;&quot;,</span>
+<span class="nc" id="L326">                        new Date(rs.getTimestamp(&quot;registration&quot;).getTime()),</span>
+<span class="nc" id="L327">                        new Date(rs.getTimestamp(&quot;last_login&quot;).getTime()),</span>
+<span class="nc" id="L328">                        UserLevel.valueOf(rs.getString(&quot;level&quot;)),</span>
+<span class="nc" id="L329">                        CountryCode.valueOf(rs.getString(&quot;country_code&quot;)),</span>
+<span class="nc" id="L330">                        rs.getInt(&quot;max_simulations&quot;),</span>
+<span class="nc" id="L331">                        rs.getTimestamp(&quot;termsUse&quot;),</span>
+<span class="nc" id="L332">                        rs.getTimestamp(&quot;lastUpdatePublications&quot;),</span>
+<span class="nc" id="L333">                        rs.getInt(&quot;failed_authentications&quot;),</span>
+<span class="nc" id="L334">                        rs.getBoolean(&quot;account_locked&quot;)));</span>
+            }
+<span class="nc" id="L336">            ps.close();</span>
+<span class="nc" id="L337">            return users;</span>
+
+<span class="nc" id="L339">        } catch (SQLException ex) {</span>
+<span class="nc" id="L340">            logger.error(&quot;Error getting all users&quot;, ex);</span>
+<span class="nc" id="L341">            throw new DAOException(ex);</span>
+        }
+    }
+
+
+    @Override
+    public Long countUsers(
+            UserSearchCriteria searchCriteria) throws DAOException {
+        try {
+<span class="nc" id="L350">            StringBuilder query = new StringBuilder(&quot;select COUNT(*) as count from VIPUsers &quot;);</span>
+<span class="nc" id="L351">            List&lt;Object&gt; params = new ArrayList&lt;&gt;();</span>
+
+<span class="nc" id="L353">            buildSearchQuery(searchCriteria)</span>
+<span class="nc" id="L354">                    .ifPresent(queryEntry -&gt; {</span>
+<span class="nc" id="L355">                        query.append(queryEntry.getKey());</span>
+<span class="nc" id="L356">                        params.addAll(queryEntry.getValue());</span>
+<span class="nc" id="L357">                    });</span>
+
+
+<span class="nc" id="L360">            PreparedStatement ps = getConnection().prepareStatement(query.toString());</span>
+<span class="nc" id="L361">            int paramIndex = 1;</span>
+<span class="nc bnc" id="L362" title="All 2 branches missed.">            for (Object param : params) {</span>
+<span class="nc" id="L363">                ps.setObject(paramIndex, param);</span>
+<span class="nc" id="L364">                paramIndex++;</span>
+<span class="nc" id="L365">            }</span>
+<span class="nc" id="L366">            ResultSet rs = ps.executeQuery();</span>
+<span class="nc bnc" id="L367" title="All 2 branches missed.">            while (rs.next()) {</span>
+<span class="nc" id="L368">                return rs.getLong(&quot;count&quot;);</span>
+            }
+<span class="nc" id="L370">            ps.close();</span>
+<span class="nc" id="L371">        } catch (SQLException ex) {</span>
+<span class="nc" id="L372">            logger.error(&quot;Error getting users number&quot;, ex);</span>
+<span class="nc" id="L373">            throw new DAOException(ex);</span>
+<span class="nc" id="L374">        }</span>
+<span class="nc" id="L375">        return -1l;</span>
+    }
+
+    private Optional&lt;Map.Entry&lt;String,List&lt;Object&gt;&gt;&gt; buildSearchQuery(
+            UserSearchCriteria searchCriteria) {
+
+<span class="nc" id="L381">        StringBuilder query = new StringBuilder();</span>
+<span class="nc" id="L382">        List&lt;Object&gt; params = new ArrayList&lt;&gt;();</span>
+
+<span class="nc bnc" id="L384" title="All 2 branches missed.">        if (searchCriteria.getRegistrationStart() != null) {</span>
+<span class="nc" id="L385">            query.append(&quot;AND registration &gt;= ? &quot;);</span>
+<span class="nc" id="L386">            params.add(java.sql.Date.valueOf(searchCriteria.getRegistrationStart()));</span>
+        }
+<span class="nc bnc" id="L388" title="All 2 branches missed.">        if (searchCriteria.getRegistrationEnd() != null) {</span>
+<span class="nc" id="L389">            query.append(&quot;AND registration &lt;= ? &quot;);</span>
+<span class="nc" id="L390">            params.add(java.sql.Date.valueOf(searchCriteria.getRegistrationEnd()));</span>
+        }
+
+<span class="nc bnc" id="L393" title="All 2 branches missed.">        if (searchCriteria.getCountry() != null) {</span>
+<span class="nc" id="L394">            query.append(&quot;AND country_code = ? &quot;);</span>
+<span class="nc" id="L395">            params.add(searchCriteria.getCountry().name());</span>
+        }
+
+<span class="nc bnc" id="L398" title="All 2 branches missed.">        if (searchCriteria.getInstitution() != null) {</span>
+<span class="nc" id="L399">            query.append(&quot;AND institution = ? &quot;);</span>
+<span class="nc" id="L400">            params.add(searchCriteria.getInstitution());</span>
+        }
+
+<span class="nc bnc" id="L403" title="All 2 branches missed.">        if (query.length() &gt; 0) {</span>
+            // replace starting &quot;AND&quot; by &quot;WHERE&quot;
+<span class="nc" id="L405">            query.replace(0, 3, &quot;WHERE&quot;);</span>
+<span class="nc" id="L406">            return Optional.of(new SimpleEntry&lt;&gt;(</span>
+<span class="nc" id="L407">                    query.toString(),</span>
+                    params
+            ));
+        } else {
+<span class="nc" id="L411">            return Optional.empty();</span>
+        }
+    }
+
+    /**
+     *
+     * @param email
+     * @throws DAOException
+     */
+    @Override
+    public void remove(String email) throws DAOException {
+        try {
+<span class="fc" id="L423">            PreparedStatement ps = getConnection().prepareStatement(&quot;DELETE &quot;</span>
+                    + &quot;FROM VIPUsers WHERE email=?&quot;);
+
+<span class="fc" id="L426">            ps.setString(1, email);</span>
+<span class="fc" id="L427">            ps.execute();</span>
+<span class="fc" id="L428">            ps.close();</span>
+
+<span class="nc" id="L430">        } catch (SQLException ex) {</span>
+<span class="nc" id="L431">            logger.error(&quot;Error removing user {}&quot;, email, ex);</span>
+<span class="nc" id="L432">            throw new DAOException(ex);</span>
+<span class="fc" id="L433">        }</span>
+<span class="fc" id="L434">    }</span>
+
+    /**
+     *
+     * @param user
+     * @throws DAOException
+     */
+    @Override
+    public void update(User user) throws DAOException {
+
+        try {
+<span class="nc" id="L445">            PreparedStatement ps = getConnection().prepareStatement(&quot;UPDATE &quot;</span>
+                    + &quot;VIPUsers SET &quot;
+                    + &quot;first_name = ?, last_name = ?, institution = ?, &quot;
+                    + &quot;folder = ?, country_code = ? &quot;
+                    + &quot;WHERE email = ?&quot;);
+
+<span class="nc" id="L451">            ps.setString(1, user.getFirstName());</span>
+<span class="nc" id="L452">            ps.setString(2, user.getLastName());</span>
+<span class="nc" id="L453">            ps.setString(3, user.getInstitution());</span>
+<span class="nc" id="L454">            ps.setString(4, user.getFolder());</span>
+<span class="nc" id="L455">            ps.setString(5, user.getCountryCode().name());</span>
+<span class="nc" id="L456">            ps.setString(6, user.getEmail());</span>
+
+<span class="nc" id="L458">            ps.executeUpdate();</span>
+<span class="nc" id="L459">            ps.close();</span>
+
+<span class="nc" id="L461">        } catch (SQLException ex) {</span>
+<span class="nc" id="L462">            logger.error(&quot;Error updating user {}&quot;, user.getEmail(), ex);</span>
+<span class="nc" id="L463">            throw new DAOException(ex);</span>
+<span class="nc" id="L464">        }</span>
+<span class="nc" id="L465">    }</span>
+
+    /**
+     *
+     * @param email
+     * @param currentPassword
+     * @param newPassword
+     * @throws DAOException
+     */
+    @Override
+    public void updatePassword(String email, String currentPassword,
+            String newPassword) throws DAOException {
+
+<span class="nc bnc" id="L478" title="All 2 branches missed.">        if (authenticate(email, currentPassword)) {</span>
+            try {
+<span class="nc" id="L480">                PreparedStatement ps = getConnection().prepareStatement(&quot;UPDATE &quot;</span>
+                        + &quot;VIPUsers SET pass = ? WHERE email = ?&quot;);
+
+<span class="nc" id="L483">                ps.setString(1, newPassword);</span>
+<span class="nc" id="L484">                ps.setString(2, email);</span>
+
+<span class="nc" id="L486">                ps.executeUpdate();</span>
+<span class="nc" id="L487">                ps.close();</span>
+
+<span class="nc" id="L489">            } catch (SQLException ex) {</span>
+<span class="nc" id="L490">                logger.error(&quot;Error updating password for {}&quot;, email,ex);</span>
+<span class="nc" id="L491">                throw new DAOException(ex);</span>
+<span class="nc" id="L492">            }</span>
+        } else {
+<span class="nc" id="L494">            logger.error(&quot;The current password mismatch for {}&quot;, email);</span>
+<span class="nc" id="L495">            throw new DAOException(&quot;The current password mismatch.&quot;);</span>
+        }
+<span class="nc" id="L497">    }</span>
+
+    @Override
+    public void updateEmail(String oldEmail, String newEmail) throws DAOException {
+        try {
+<span class="nc" id="L502">            PreparedStatement ps = getConnection().prepareStatement(&quot;UPDATE &quot;</span>
+                    + &quot;VIPUsers SET email = ? WHERE email = ?&quot;);
+
+<span class="nc" id="L505">            ps.setString(1, newEmail);</span>
+<span class="nc" id="L506">            ps.setString(2, oldEmail);</span>
+
+<span class="nc" id="L508">            ps.executeUpdate();</span>
+<span class="nc" id="L509">            ps.close();</span>
+<span class="nc" id="L510">        } catch (SQLException ex) {</span>
+<span class="nc bnc" id="L511" title="All 2 branches missed.">            if (ex.getMessage().contains(&quot;Duplicate entry&quot;)) {</span>
+<span class="nc" id="L512">                logger.error(&quot;There is an existing account associated with the email: {}&quot;, newEmail);</span>
+<span class="nc" id="L513">                throw new DAOException(&quot;There is an existing account associated with this email.&quot;, ex);</span>
+            } else {
+<span class="nc" id="L515">                logger.error(&quot;Error updating email from {} to {}&quot;, oldEmail, newEmail, ex);</span>
+<span class="nc" id="L516">                throw new DAOException(ex);</span>
+            }
+<span class="nc" id="L518">        }</span>
+<span class="nc" id="L519">    }</span>
+
+    @Override
+    public void updateNextEmail(String currentEmail, String nextEmail) throws DAOException {
+        try {
+<span class="nc" id="L524">            PreparedStatement ps = getConnection().prepareStatement(&quot;UPDATE &quot;</span>
+                    + &quot;VIPUsers SET next_email = ? WHERE email = ?&quot;);
+
+
+<span class="nc" id="L528">            ps.setString(1, nextEmail); // work even if it's null</span>
+<span class="nc" id="L529">            ps.setString(2, currentEmail);</span>
+
+<span class="nc" id="L531">            ps.executeUpdate();</span>
+<span class="nc" id="L532">            ps.close();</span>
+<span class="nc" id="L533">        } catch (SQLException ex) {</span>
+<span class="nc" id="L534">            logger.error(&quot;Error updating next email from {} to {}&quot;, currentEmail, nextEmail, ex);</span>
+<span class="nc" id="L535">            throw new DAOException(ex);</span>
+<span class="nc" id="L536">        }</span>
+<span class="nc" id="L537">    }</span>
+
+    /**
+     *
+     * @param email
+     * @param session
+     * @throws DAOException
+     */
+    @Override
+    public void updateSession(String email, String session) throws DAOException {
+
+        try {
+<span class="nc" id="L549">            PreparedStatement ps = getConnection().prepareStatement(&quot;UPDATE &quot;</span>
+                    + &quot;VIPUsers SET session = ? WHERE email = ?&quot;);
+
+<span class="nc" id="L552">            ps.setString(1, session);</span>
+<span class="nc" id="L553">            ps.setString(2, email);</span>
+
+<span class="nc" id="L555">            ps.executeUpdate();</span>
+<span class="nc" id="L556">            ps.close();</span>
+
+<span class="nc" id="L558">        } catch (SQLException ex) {</span>
+<span class="nc" id="L559">            logger.error(&quot;Error updating session for {}&quot;, email, ex);</span>
+<span class="nc" id="L560">            throw new DAOException(ex);</span>
+<span class="nc" id="L561">        }</span>
+<span class="nc" id="L562">    }</span>
+
+    /**
+     *
+     * @param email
+     * @param session
+     * @return
+     * @throws DAOException
+     */
+    @Override
+    public boolean verifySession(String email, String session) throws DAOException {
+
+        try {
+<span class="nc" id="L575">            PreparedStatement ps = getConnection().prepareStatement(&quot;SELECT &quot;</span>
+                    + &quot;session FROM VIPUsers WHERE email = ?&quot;);
+
+<span class="nc" id="L578">            ps.setString(1, email);</span>
+<span class="nc" id="L579">            ResultSet rs = ps.executeQuery();</span>
+
+<span class="nc bnc" id="L581" title="All 2 branches missed.">            if (rs.next()) {</span>
+<span class="nc" id="L582">                String sess = rs.getString(&quot;session&quot;);</span>
+<span class="nc bnc" id="L583" title="All 4 branches missed.">                if (sess != null &amp;&amp; sess.equals(session)) {</span>
+<span class="nc" id="L584">                    return true;</span>
+                }
+            }
+<span class="nc" id="L587">            return false;</span>
+
+<span class="nc" id="L589">        } catch (SQLException ex) {</span>
+<span class="nc" id="L590">            logger.error(&quot;Error verifying session for {}&quot;, email, ex);</span>
+<span class="nc" id="L591">            throw new DAOException(ex);</span>
+        }
+    }
+
+    /**
+     *
+     * @param email
+     * @param lastLogin
+     * @throws DAOException
+     */
+    @Override
+    public void updateLastLogin(String email, Date lastLogin) throws DAOException {
+
+        try {
+<span class="nc" id="L605">            PreparedStatement ps = getConnection().prepareStatement(&quot;UPDATE &quot;</span>
+                    + &quot;VIPUsers SET last_login = ? WHERE email = ?&quot;);
+
+<span class="nc" id="L608">            ps.setTimestamp(1, new Timestamp(lastLogin.getTime()));</span>
+<span class="nc" id="L609">            ps.setString(2, email);</span>
+
+<span class="nc" id="L611">            ps.executeUpdate();</span>
+<span class="nc" id="L612">            ps.close();</span>
+
+<span class="nc" id="L614">        } catch (SQLException ex) {</span>
+<span class="nc" id="L615">            logger.error(&quot;Error updating last login to {} for {}&quot;, lastLogin, email, ex);</span>
+<span class="nc" id="L616">            throw new DAOException(ex);</span>
+<span class="nc" id="L617">        }</span>
+<span class="nc" id="L618">    }</span>
+
+    @Override
+    public void updateTermsOfUse(String email, Timestamp termsUse) throws DAOException {
+
+        try {
+<span class="nc" id="L624">            PreparedStatement ps = getConnection().prepareStatement(&quot;UPDATE &quot;</span>
+                    + &quot;VIPUsers SET termsUse = ? WHERE email = ?&quot;);
+
+<span class="nc" id="L627">            ps.setTimestamp(1, termsUse);</span>
+<span class="nc" id="L628">            ps.setString(2, email);</span>
+
+<span class="nc" id="L630">            ps.executeUpdate();</span>
+<span class="nc" id="L631">            ps.close();</span>
+
+<span class="nc" id="L633">        } catch (SQLException ex) {</span>
+<span class="nc" id="L634">            logger.error(&quot;Error updating terms of use to {} for {}&quot;, termsUse, email, ex);</span>
+<span class="nc" id="L635">            throw new DAOException(ex);</span>
+<span class="nc" id="L636">        }</span>
+<span class="nc" id="L637">    }</span>
+
+    /**
+     *
+     * @param session
+     * @return
+     * @throws DAOException
+     */
+    @Override
+    public User getUserBySession(String session) throws DAOException {
+
+        try {
+<span class="nc" id="L649">            PreparedStatement ps = getConnection().prepareStatement(&quot;SELECT &quot;</span>
+                    + &quot;email, next_email, first_name, last_name, institution, &quot;
+                    + &quot;code, confirmed, folder, session, registration, &quot;
+                    + &quot;last_login, level, country_code, max_simulations,&quot;
+                    + &quot;termsUse, lastUpdatePublications, failed_authentications, account_locked &quot;
+                    + &quot;FROM VIPUsers &quot;
+                    + &quot;WHERE session = ?&quot;);
+
+<span class="nc" id="L657">            ps.setString(1, session);</span>
+<span class="nc" id="L658">            ResultSet rs = ps.executeQuery();</span>
+
+<span class="nc bnc" id="L660" title="All 2 branches missed.">            if (rs.next()) {</span>
+<span class="nc" id="L661">                User user = new User(</span>
+<span class="nc" id="L662">                        rs.getString(&quot;first_name&quot;), rs.getString(&quot;last_name&quot;),</span>
+<span class="nc" id="L663">                        rs.getString(&quot;email&quot;), rs.getString(&quot;next_email&quot;),</span>
+<span class="nc" id="L664">                        rs.getString(&quot;institution&quot;),</span>
+<span class="nc" id="L665">                        &quot;&quot;, rs.getBoolean(&quot;confirmed&quot;),</span>
+<span class="nc" id="L666">                        rs.getString(&quot;code&quot;), rs.getString(&quot;folder&quot;),</span>
+<span class="nc" id="L667">                        rs.getString(&quot;session&quot;),</span>
+<span class="nc" id="L668">                        new Date(rs.getTimestamp(&quot;registration&quot;).getTime()),</span>
+<span class="nc" id="L669">                        new Date(rs.getTimestamp(&quot;last_login&quot;).getTime()),</span>
+<span class="nc" id="L670">                        UserLevel.valueOf(rs.getString(&quot;level&quot;)),</span>
+<span class="nc" id="L671">                        CountryCode.valueOf(rs.getString(&quot;country_code&quot;)),</span>
+<span class="nc" id="L672">                        rs.getInt(&quot;max_simulations&quot;),</span>
+<span class="nc" id="L673">                        rs.getTimestamp(&quot;termsUse&quot;),</span>
+<span class="nc" id="L674">                        rs.getTimestamp(&quot;lastUpdatePublications&quot;),</span>
+<span class="nc" id="L675">                        rs.getInt(&quot;failed_authentications&quot;),</span>
+<span class="nc" id="L676">                        rs.getBoolean(&quot;account_locked&quot;));</span>
+<span class="nc" id="L677">                ps.close();</span>
+<span class="nc" id="L678">                return user;</span>
+            }
+
+<span class="nc" id="L681">            logger.error(&quot;There is no user registered with the session: {}&quot;, session);</span>
+<span class="nc" id="L682">            throw new DAOException(&quot;There is no user registered with the session: &quot; + session);</span>
+
+<span class="nc" id="L684">        } catch (SQLException ex) {</span>
+<span class="nc" id="L685">            logger.error(&quot;Error getting user from session: {}&quot;, session, ex);</span>
+<span class="nc" id="L686">            throw new DAOException(ex);</span>
+        }
+    }
+
+    /**
+     *
+     * @return @throws DAOException
+     */
+    @Override
+    public List&lt;User&gt; getAdministrators() throws DAOException {
+
+        try {
+<span class="fc" id="L698">            PreparedStatement ps = getConnection().prepareStatement(&quot;SELECT &quot;</span>
+                    + &quot;email, next_email, first_name, last_name, institution, &quot;
+                    + &quot;code, confirmed, folder, registration, last_login, &quot;
+                    + &quot;level, country_code, max_simulations, termsUse, &quot;
+                    + &quot; lastUpdatePublications, failed_authentications, account_locked &quot;
+                    + &quot;FROM VIPUsers WHERE level = ? &quot;
+                    + &quot;ORDER BY LOWER(first_name), LOWER(last_name)&quot;);
+<span class="fc" id="L705">            ps.setString(1, UserLevel.Administrator.name());</span>
+
+<span class="fc" id="L707">            ResultSet rs = ps.executeQuery();</span>
+<span class="fc" id="L708">            List&lt;User&gt; users = new ArrayList&lt;User&gt;();</span>
+
+<span class="fc bfc" id="L710" title="All 2 branches covered.">            while (rs.next()) {</span>
+<span class="fc" id="L711">                users.add(new User(</span>
+<span class="fc" id="L712">                        rs.getString(&quot;first_name&quot;), rs.getString(&quot;last_name&quot;),</span>
+<span class="fc" id="L713">                        rs.getString(&quot;email&quot;), rs.getString(&quot;next_email&quot;),</span>
+<span class="fc" id="L714">                        rs.getString(&quot;institution&quot;),</span>
+<span class="fc" id="L715">                        &quot;&quot;, rs.getBoolean(&quot;confirmed&quot;),</span>
+<span class="fc" id="L716">                        rs.getString(&quot;code&quot;), rs.getString(&quot;folder&quot;), &quot;&quot;,</span>
+<span class="fc" id="L717">                        new Date(rs.getTimestamp(&quot;registration&quot;).getTime()),</span>
+<span class="fc" id="L718">                        new Date(rs.getTimestamp(&quot;last_login&quot;).getTime()),</span>
+<span class="fc" id="L719">                        UserLevel.valueOf(rs.getString(&quot;level&quot;)),</span>
+<span class="fc" id="L720">                        CountryCode.valueOf(rs.getString(&quot;country_code&quot;)),</span>
+<span class="fc" id="L721">                        rs.getInt(&quot;max_simulations&quot;),</span>
+<span class="fc" id="L722">                        rs.getTimestamp(&quot;termsUse&quot;),</span>
+<span class="fc" id="L723">                        rs.getTimestamp(&quot;lastUpdatePublications&quot;),</span>
+<span class="fc" id="L724">                        rs.getInt(&quot;failed_authentications&quot;),</span>
+<span class="fc" id="L725">                        rs.getBoolean(&quot;account_locked&quot;)));</span>
+            }
+<span class="fc" id="L727">            ps.close();</span>
+<span class="fc" id="L728">            return users;</span>
+
+<span class="nc" id="L730">        } catch (SQLException ex) {</span>
+<span class="nc" id="L731">            logger.error(&quot;Error getting all administrators&quot;, ex);</span>
+<span class="nc" id="L732">            throw new DAOException(ex);</span>
+        }
+    }
+
+    /**
+     *
+     * @param email
+     * @param level
+     * @param countryCode
+     * @param maxRunningSimulations
+     * @param locked
+     * @throws DAOException
+     */
+    @Override
+    public void update(String email, UserLevel level, CountryCode countryCode,
+            int maxRunningSimulations, boolean locked) throws DAOException {
+
+        try {
+<span class="nc" id="L750">            PreparedStatement ps = getConnection().prepareStatement(&quot;UPDATE &quot;</span>
+                    + &quot;VIPUsers SET level = ?, country_code = ?, &quot;
+                    + &quot;max_simulations = ?, account_locked = ? WHERE email = ?&quot;);
+<span class="nc" id="L753">            ps.setString(1, level.name());</span>
+<span class="nc" id="L754">            ps.setString(2, countryCode.name());</span>
+<span class="nc" id="L755">            ps.setInt(3, maxRunningSimulations);</span>
+<span class="nc" id="L756">            ps.setBoolean(4, locked);</span>
+<span class="nc" id="L757">            ps.setString(5, email);</span>
+
+<span class="nc" id="L759">            ps.executeUpdate();</span>
+<span class="nc" id="L760">            ps.close();</span>
+
+<span class="nc" id="L762">        } catch (SQLException ex) {</span>
+<span class="nc" id="L763">            logger.error(&quot;Error updating user {}&quot;, email, ex);</span>
+<span class="nc" id="L764">            throw new DAOException(ex);</span>
+<span class="nc" id="L765">        }</span>
+<span class="nc" id="L766">    }</span>
+
+    /**
+     *
+     * @param email
+     * @param code
+     * @throws DAOException
+     */
+    @Override
+    public void updateCode(String email, String code) throws DAOException {
+
+        try {
+<span class="nc" id="L778">            PreparedStatement ps = getConnection().prepareStatement(&quot;UPDATE &quot;</span>
+                    + &quot;VIPUsers SET code = ? WHERE email = ?&quot;);
+<span class="nc" id="L780">            ps.setString(1, code);</span>
+<span class="nc" id="L781">            ps.setString(2, email);</span>
+
+<span class="nc" id="L783">            ps.executeUpdate();</span>
+<span class="nc" id="L784">            ps.close();</span>
+
+<span class="nc" id="L786">        } catch (SQLException ex) {</span>
+<span class="nc" id="L787">            logger.error(&quot;Error updating code to {} for user {}&quot;, code, email, ex);</span>
+<span class="nc" id="L788">            throw new DAOException(ex);</span>
+<span class="nc" id="L789">        }</span>
+<span class="nc" id="L790">    }</span>
+
+    /**
+     *
+     * @param email
+     * @param newPassword
+     * @throws DAOException
+     */
+    @Override
+    public void resetPassword(String email, String newPassword) throws DAOException {
+
+        try {
+<span class="nc" id="L802">            PreparedStatement ps = getConnection().prepareStatement(&quot;UPDATE &quot;</span>
+                    + &quot;VIPUsers SET pass = ? WHERE email = ?&quot;);
+
+<span class="nc" id="L805">            ps.setString(1, newPassword);</span>
+<span class="nc" id="L806">            ps.setString(2, email);</span>
+<span class="nc" id="L807">            ps.executeUpdate();</span>
+<span class="nc" id="L808">            ps.close();</span>
+
+<span class="nc" id="L810">        } catch (SQLException ex) {</span>
+<span class="nc" id="L811">            logger.error(&quot;Error resetting password for user {}&quot;, email, ex);</span>
+<span class="nc" id="L812">            throw new DAOException(ex);</span>
+<span class="nc" id="L813">        }</span>
+<span class="nc" id="L814">    }</span>
+
+    @Override
+    public int getNUsers() throws DAOException {
+        try {
+<span class="nc" id="L819">            PreparedStatement ps = getConnection().prepareStatement(&quot;select COUNT(*) as count from VIPUsers&quot;);</span>
+<span class="nc" id="L820">            ResultSet rs = ps.executeQuery();</span>
+<span class="nc bnc" id="L821" title="All 2 branches missed.">            while (rs.next()) {</span>
+<span class="nc" id="L822">                return rs.getInt(&quot;count&quot;);</span>
+            }
+<span class="nc" id="L824">            ps.close();</span>
+<span class="nc" id="L825">        } catch (SQLException ex) {</span>
+<span class="nc" id="L826">            logger.error(&quot;Error getting users number&quot;, ex);</span>
+<span class="nc" id="L827">            throw new DAOException(ex);</span>
+<span class="nc" id="L828">        }</span>
+<span class="nc" id="L829">        return -1;</span>
+    }
+
+    @Override
+    public int getNCountries() throws DAOException {
+        try {
+<span class="nc" id="L835">            PreparedStatement ps = getConnection().prepareStatement(&quot;select COUNT(distinct country_code) as count from VIPUsers&quot;);</span>
+<span class="nc" id="L836">            ResultSet rs = ps.executeQuery();</span>
+<span class="nc bnc" id="L837" title="All 2 branches missed.">            while (rs.next()) {</span>
+<span class="nc" id="L838">                return rs.getInt(&quot;count&quot;);</span>
+            }
+<span class="nc" id="L840">            ps.close();</span>
+<span class="nc" id="L841">        } catch (SQLException ex) {</span>
+<span class="nc" id="L842">            logger.error(&quot;Error getting countries number&quot;, ex);</span>
+<span class="nc" id="L843">            throw new DAOException(ex);</span>
+<span class="nc" id="L844">        }</span>
+<span class="nc" id="L845">        return -1;</span>
+    }
+
+    @Override
+    public Timestamp getLastPublicationUpdate(String email) throws DAOException {
+        try {
+<span class="nc" id="L851">            Timestamp lastupdatePublication = null;</span>
+<span class="nc" id="L852">            PreparedStatement ps = getConnection().prepareStatement(&quot;SELECT lastUpdatePublications &quot;</span>
+                    + &quot;FROM VIPUsers WHERE email=?&quot;);
+
+<span class="nc" id="L855">            ps.setString(1, email);</span>
+<span class="nc" id="L856">            ResultSet rs = ps.executeQuery();</span>
+<span class="nc bnc" id="L857" title="All 2 branches missed.">            while (rs.next()) {</span>
+<span class="nc" id="L858">                lastupdatePublication = rs.getTimestamp(&quot;lastUpdatePublications&quot;);</span>
+            }
+
+<span class="nc" id="L861">            ps.close();</span>
+<span class="nc" id="L862">            return lastupdatePublication;</span>
+
+<span class="nc" id="L864">        } catch (SQLException ex) {</span>
+<span class="nc" id="L865">            logger.error(&quot;Error getting last publication update for {}&quot;, email, ex);</span>
+<span class="nc" id="L866">            throw new DAOException(ex);</span>
+        }
+    }
+
+    @Override
+    public void updateLastUpdatePublication(String email, Timestamp lastUpdatePublication) throws DAOException {
+        try {
+<span class="nc" id="L873">            PreparedStatement ps = getConnection().prepareStatement(&quot;UPDATE &quot;</span>
+                    + &quot;VIPUsers SET lastUpdatePublications = ? WHERE email = ?&quot;);
+
+<span class="nc" id="L876">            ps.setTimestamp(1, lastUpdatePublication);</span>
+<span class="nc" id="L877">            ps.setString(2, email);</span>
+<span class="nc" id="L878">            ps.executeUpdate();</span>
+<span class="nc" id="L879">            ps.close();</span>
+
+<span class="nc" id="L881">        } catch (SQLException ex) {</span>
+<span class="nc" id="L882">            logger.error(&quot;Error updating last publication to {} for {}&quot;, lastUpdatePublication, email, ex);</span>
+<span class="nc" id="L883">            throw new DAOException(ex);</span>
+<span class="nc" id="L884">        }</span>
+<span class="nc" id="L885">    }</span>
+
+    @Override
+    public int getNFailedAuthentications(String email) throws DAOException {
+<span class="nc" id="L889">        int n = 0;</span>
+        try {
+<span class="nc" id="L891">            PreparedStatement ps = getConnection().prepareStatement(&quot;SELECT failed_authentications FROM VIPUsers WHERE email=?&quot;);</span>
+
+<span class="nc" id="L893">            ps.setString(1, email);</span>
+<span class="nc" id="L894">            ResultSet rs = ps.executeQuery();</span>
+<span class="nc bnc" id="L895" title="All 2 branches missed.">            while (rs.next()) {</span>
+<span class="nc" id="L896">                n = rs.getInt(&quot;failed_authentications&quot;);</span>
+            }
+
+<span class="nc" id="L899">            ps.close();</span>
+<span class="nc" id="L900">            return n;</span>
+
+<span class="nc" id="L902">        } catch (SQLException ex) {</span>
+<span class="nc" id="L903">            logger.error(&quot;Error getting failed auth number for {}&quot;, email, ex);</span>
+<span class="nc" id="L904">            throw new DAOException(ex);</span>
+        }
+    }
+
+    @Override
+    public void lock(String email) throws DAOException {
+        try {
+<span class="nc" id="L911">            PreparedStatement ps = getConnection().prepareStatement(&quot;UPDATE &quot;</span>
+                    + &quot;VIPUsers SET &quot;
+                    + &quot;account_locked=1 &quot;
+                    + &quot;WHERE email = ?&quot;);
+
+<span class="nc" id="L916">            ps.setString(1, email);</span>
+
+<span class="nc" id="L918">            ps.executeUpdate();</span>
+<span class="nc" id="L919">            ps.close();</span>
+
+<span class="nc" id="L921">        } catch (SQLException ex) {</span>
+<span class="nc" id="L922">            logger.error(&quot;Error locking {}&quot;, email, ex);</span>
+<span class="nc" id="L923">            throw new DAOException(ex);</span>
+<span class="nc" id="L924">        }</span>
+<span class="nc" id="L925">    }</span>
+
+    @Override
+    public void unlock(String email) throws DAOException {
+         try {
+<span class="nc" id="L930">            PreparedStatement ps = getConnection().prepareStatement(&quot;UPDATE &quot;</span>
+                    + &quot;VIPUsers SET &quot;
+                    + &quot;account_locked=0, failed_authentications=0 &quot;
+                    + &quot;WHERE email = ?&quot;);
+
+<span class="nc" id="L935">            ps.setString(1, email);</span>
+
+<span class="nc" id="L937">            ps.executeUpdate();</span>
+<span class="nc" id="L938">            ps.close();</span>
+
+<span class="nc" id="L940">        } catch (SQLException ex) {</span>
+<span class="nc" id="L941">             logger.error(&quot;Error unlocking {}&quot;, email, ex);</span>
+<span class="nc" id="L942">             throw new DAOException(ex);</span>
+<span class="nc" id="L943">        }</span>
+<span class="nc" id="L944">    }</span>
+
+    @Override
+    public void resetNFailedAuthentications(String email) throws DAOException {
+         try {
+<span class="nc" id="L949">            PreparedStatement ps = getConnection().prepareStatement(&quot;UPDATE &quot;</span>
+                    + &quot;VIPUsers SET &quot;
+                    + &quot;failed_authentications=0 &quot;
+                    + &quot;WHERE email = ?&quot;);
+
+<span class="nc" id="L954">            ps.setString(1, email);</span>
+
+<span class="nc" id="L956">            ps.executeUpdate();</span>
+<span class="nc" id="L957">            ps.close();</span>
+
+<span class="nc" id="L959">        } catch (SQLException ex) {</span>
+<span class="nc" id="L960">             logger.error(&quot;Error resetting failed auth number for {}&quot;, email, ex);</span>
+<span class="nc" id="L961">            throw new DAOException(ex);</span>
+<span class="nc" id="L962">        }</span>
+<span class="nc" id="L963">    }</span>
+
+    @Override
+    public void incNFailedAuthentications(String email) throws DAOException {
+         try {
+<span class="nc" id="L968">            PreparedStatement ps = getConnection().prepareStatement(&quot;UPDATE &quot;</span>
+                    + &quot;VIPUsers SET &quot;
+                    + &quot;failed_authentications = failed_authentications + 1 &quot;
+                    + &quot;WHERE email = ?&quot;);
+
+<span class="nc" id="L973">            ps.setString(1, email);</span>
+
+<span class="nc" id="L975">            ps.executeUpdate();</span>
+<span class="nc" id="L976">            ps.close();</span>
+
+<span class="nc" id="L978">        } catch (SQLException ex) {</span>
+<span class="nc" id="L979">             logger.error(&quot;Error increasing failed auth number for {}&quot;, email, ex);</span>
+<span class="nc" id="L980">            throw new DAOException(ex);</span>
+<span class="nc" id="L981">        }</span>
+<span class="nc" id="L982">    }</span>
+
+    @Override
+    public boolean isLocked(String email) throws DAOException {
+<span class="nc" id="L986">        boolean locked = true;</span>
+        try {
+<span class="nc" id="L988">            PreparedStatement ps = getConnection().prepareStatement(&quot;SELECT account_locked FROM VIPUsers WHERE email=?&quot;);</span>
+
+<span class="nc" id="L990">            ps.setString(1, email);</span>
+<span class="nc" id="L991">            ResultSet rs = ps.executeQuery();</span>
+<span class="nc bnc" id="L992" title="All 2 branches missed.">            while (rs.next()) {</span>
+<span class="nc" id="L993">                locked = rs.getBoolean(&quot;account_locked&quot;);</span>
+            }
+
+<span class="nc" id="L996">            ps.close();</span>
+<span class="nc" id="L997">            return locked;</span>
+
+<span class="nc" id="L999">        } catch (SQLException ex) {</span>
+<span class="nc" id="L1000">            logger.error(&quot;Error checking if {} is locked&quot;, email, ex);</span>
+<span class="nc" id="L1001">            throw new DAOException(ex);</span>
+        }
+    }
+
+    @Override
+    public User getUserByApikey(String apikey) throws DAOException {
+        try {
+<span class="nc" id="L1008">            PreparedStatement ps = getConnection().prepareStatement(</span>
+                    &quot;SELECT email FROM VIPUsers WHERE apikey=?&quot;);
+
+<span class="nc" id="L1011">            ps.setString(1, apikey);</span>
+<span class="nc" id="L1012">            ResultSet rs = ps.executeQuery();</span>
+<span class="nc bnc" id="L1013" title="All 2 branches missed.">            if (rs.next()) {</span>
+<span class="nc" id="L1014">                String email = rs.getString(&quot;email&quot;);</span>
+<span class="nc" id="L1015">                ps.close();</span>
+<span class="nc" id="L1016">                return getUser(email);</span>
+            }
+<span class="nc" id="L1018">            ps.close();</span>
+<span class="nc" id="L1019">            logger.info(&quot;There is no user registered with the key: &quot; + apikey);</span>
+<span class="nc" id="L1020">            return null;</span>
+
+<span class="nc" id="L1022">        } catch (SQLException ex) {</span>
+<span class="nc" id="L1023">            logger.error(&quot;Error getting user by api key for {}&quot;, apikey, ex);</span>
+<span class="nc" id="L1024">            throw new DAOException(ex);</span>
+        }
+    }
+
+    @Override
+    public String getUserApikey(String email) throws DAOException {
+        try {
+<span class="nc" id="L1031">            PreparedStatement ps = getConnection().prepareStatement(</span>
+                    &quot;SELECT apikey FROM VIPUsers WHERE email=?&quot;);
+
+<span class="nc" id="L1034">            ps.setString(1, email);</span>
+<span class="nc" id="L1035">            ResultSet rs = ps.executeQuery();</span>
+<span class="nc bnc" id="L1036" title="All 2 branches missed.">            if (rs.next()) {</span>
+<span class="nc" id="L1037">                String apikey = rs.getString(&quot;apikey&quot;);</span>
+<span class="nc" id="L1038">                ps.close();</span>
+<span class="nc" id="L1039">                return apikey;</span>
+            }
+
+<span class="nc" id="L1042">            ps.close();</span>
+<span class="nc" id="L1043">            logger.error(&quot;Looking for an apikey, but there is no user registered with the email: {}&quot;, email);</span>
+<span class="nc" id="L1044">            throw new DAOException(</span>
+                    &quot;Looking for an apikey, but there is no user registered with the email&quot;);
+<span class="nc" id="L1046">        } catch (SQLException ex) {</span>
+<span class="nc" id="L1047">            logger.error(&quot;Error getting user api key for {}&quot;, email, ex);</span>
+<span class="nc" id="L1048">            throw new DAOException(ex);</span>
+        }
+    }
+
+    @Override
+    public void updateUserApikey(String email, String newApikey) throws DAOException {
+        try {
+<span class="nc" id="L1055">            PreparedStatement ps = getConnection().prepareStatement(&quot;UPDATE &quot;</span>
+                    + &quot;VIPUsers SET apikey = ? WHERE email = ?&quot;);
+
+<span class="nc" id="L1058">            ps.setString(1, newApikey);</span>
+<span class="nc" id="L1059">            ps.setString(2, email);</span>
+<span class="nc" id="L1060">            int rowsUpdatedNb = ps.executeUpdate();</span>
+<span class="nc" id="L1061">            ps.close();</span>
+
+<span class="nc bnc" id="L1063" title="All 2 branches missed.">            if (rowsUpdatedNb == 0) {</span>
+<span class="nc" id="L1064">                logger.error(&quot;Updating an apikey, but there is no user registered with the email: {}&quot;, email);</span>
+<span class="nc" id="L1065">                throw new DAOException(</span>
+                        &quot;Updating an apikey, but there is no user registered with the email&quot;);
+            }
+<span class="nc" id="L1068">        } catch (SQLException ex) {</span>
+<span class="nc" id="L1069">            logger.error(&quot;Error updating {} api key to {}&quot;, email, newApikey, ex);</span>
+<span class="nc" id="L1070">            throw new DAOException(ex);</span>
+<span class="nc" id="L1071">        }</span>
+<span class="nc" id="L1072">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

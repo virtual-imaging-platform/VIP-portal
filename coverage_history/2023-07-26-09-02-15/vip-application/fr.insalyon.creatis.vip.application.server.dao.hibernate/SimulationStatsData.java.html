@@ -1,0 +1,284 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../jacoco-resources/report.gif" type="image/gif"/><title>SimulationStatsData.java</title><link rel="stylesheet" href="../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../index.html" class="el_report">coverage</a> &gt; <a href="../index.html" class="el_bundle">vip-application</a> &gt; <a href="index.source.html" class="el_package">fr.insalyon.creatis.vip.application.server.dao.hibernate</a> &gt; <span class="el_source">SimulationStatsData.java</span></div><h1>SimulationStatsData.java</h1><pre class="source lang-java linenums">/*
+ * Copyright and authors: see LICENSE.txt in base repository.
+ *
+ * This software is a web portal for pipeline execution on distributed systems.
+ *
+ * This software is governed by the CeCILL-B license under French law and
+ * abiding by the rules of distribution of free software.  You can  use, 
+ * modify and/ or redistribute the software under the terms of the CeCILL-B
+ * license as circulated by CEA, CNRS and INRIA at the following URL
+ * &quot;http://www.cecill.info&quot;. 
+ *
+ * As a counterpart to the access to the source code and  rights to copy,
+ * modify and redistribute granted by the license, users are provided only
+ * with a limited warranty  and the software's author,  the holder of the
+ * economic rights,  and the successive licensors  have only  limited
+ * liability. 
+ *
+ * In this respect, the user's attention is drawn to the risks associated
+ * with loading,  using,  modifying and/or developing or reproducing the
+ * software by the user in light of its specific status of free software,
+ * that may mean  that it is complicated to manipulate,  and  that  also
+ * therefore means  that it is reserved for developers  and  experienced
+ * professionals having in-depth computer knowledge. Users are therefore
+ * encouraged to load and test the software's suitability as regards their
+ * requirements in conditions enabling the security of their systems and/or 
+ * data to be ensured and,  more generally, to use and operate it in the 
+ * same conditions as regards security. 
+ *
+ * The fact that you are presently reading this means that you have had
+ * knowledge of the CeCILL-B license and that you accept its terms.
+ */
+package fr.insalyon.creatis.vip.application.server.dao.hibernate;
+
+import fr.insalyon.creatis.moteur.plugins.workflowsdb.bean.Stats;
+import fr.insalyon.creatis.moteur.plugins.workflowsdb.bean.Workflow;
+import fr.insalyon.creatis.moteur.plugins.workflowsdb.dao.WorkflowsDBDAOException;
+import fr.insalyon.creatis.moteur.plugins.workflowsdb.dao.WorkflowsDBDAOFactory;
+import fr.insalyon.creatis.vip.application.server.dao.SimulationStatsDAO;
+import fr.insalyon.creatis.vip.core.server.dao.DAOException;
+import org.hibernate.Criteria;
+import org.hibernate.HibernateException;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.criterion.Order;
+import org.hibernate.criterion.ProjectionList;
+import org.hibernate.criterion.Projections;
+import org.hibernate.criterion.Restrictions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
+/**
+ *
+ * @author Rafael Ferreira da Silva
+ */
+@Repository
+public class SimulationStatsData implements SimulationStatsDAO {
+
+<span class="fc" id="L65">    private final Logger logger = LoggerFactory.getLogger(getClass());</span>
+
+    private SessionFactory sessionFactory;
+
+    @Autowired
+<span class="fc" id="L70">    public SimulationStatsData(SessionFactory sessionFactory) {</span>
+<span class="fc" id="L71">        this.sessionFactory = sessionFactory;</span>
+<span class="fc" id="L72">    }</span>
+
+    @Override
+    public List&lt;String&gt; getBySimulationID(List&lt;String&gt; simulationID) throws DAOException {
+        //System.out.println(&quot;Calling SimulationStatsData: getBySimuID&quot;);
+<span class="nc" id="L77">        List&lt;String&gt; result = new ArrayList&lt;String&gt;();</span>
+        try {
+<span class="nc" id="L79">            Session session = sessionFactory.openSession();</span>
+<span class="nc" id="L80">            session.beginTransaction();</span>
+<span class="nc" id="L81">            Criteria criteria = session.createCriteria(Stats.class);</span>
+
+            // 'workflowID' is the variable in the class Stats
+            //criteria.add(Restrictions.eq(&quot;workflowID&quot;, simulationID));
+<span class="nc" id="L85">            criteria.add(Restrictions.in(&quot;workflowID&quot;, simulationID));</span>
+            //criteria.addOrder(Order.desc(&quot;workflowID&quot;));
+
+<span class="nc" id="L88">            ProjectionList p = Projections.projectionList();</span>
+            //p.add(Projections.sum(&quot;completed&quot;));
+<span class="nc" id="L90">            p.add(Projections.alias(Projections.sum(&quot;completed&quot;), &quot;sumCompleted&quot;));</span>
+<span class="nc" id="L91">            p.add(Projections.alias(Projections.sum(&quot;completedWaitingTime&quot;), &quot;sumCompletedWaitingTime&quot;));</span>
+<span class="nc" id="L92">            p.add(Projections.alias(Projections.sum(&quot;completedExecutionTime&quot;), &quot;sumCompletedExecutionTime&quot;));</span>
+<span class="nc" id="L93">            p.add(Projections.alias(Projections.sum(&quot;completedInputTime&quot;), &quot;sumCompletedInputTime&quot;));</span>
+<span class="nc" id="L94">            p.add(Projections.alias(Projections.sum(&quot;completedOutputTime&quot;), &quot;sumCompletedOutputTime&quot;));</span>
+<span class="nc" id="L95">            p.add(Projections.sum(&quot;cancelled&quot;));</span>
+<span class="nc" id="L96">            p.add(Projections.sum(&quot;cancelledWaitingTime&quot;));</span>
+<span class="nc" id="L97">            p.add(Projections.sum(&quot;cancelledExecutionTime&quot;));</span>
+<span class="nc" id="L98">            p.add(Projections.sum(&quot;cancelledInputTime&quot;));</span>
+<span class="nc" id="L99">            p.add(Projections.sum(&quot;cancelledOutputTime&quot;));</span>
+<span class="nc" id="L100">            p.add(Projections.sum(&quot;failedApplication&quot;));</span>
+<span class="nc" id="L101">            p.add(Projections.sum(&quot;failedApplicationWaitingTime&quot;));</span>
+<span class="nc" id="L102">            p.add(Projections.sum(&quot;failedApplicationExecutionTime&quot;));</span>
+<span class="nc" id="L103">            p.add(Projections.sum(&quot;failedApplicationInputTime&quot;));</span>
+<span class="nc" id="L104">            p.add(Projections.sum(&quot;failedApplicationOutputTime&quot;));</span>
+<span class="nc" id="L105">            p.add(Projections.sum(&quot;failedInput&quot;));</span>
+<span class="nc" id="L106">            p.add(Projections.sum(&quot;failedInputWaitingTime&quot;));</span>
+<span class="nc" id="L107">            p.add(Projections.sum(&quot;failedInputExecutionTime&quot;));</span>
+<span class="nc" id="L108">            p.add(Projections.sum(&quot;failedInputInputTime&quot;));</span>
+<span class="nc" id="L109">            p.add(Projections.sum(&quot;failedInputOutputTime&quot;));</span>
+<span class="nc" id="L110">            p.add(Projections.sum(&quot;failedOutput&quot;));</span>
+<span class="nc" id="L111">            p.add(Projections.sum(&quot;failedOutputWaitingTime&quot;));</span>
+<span class="nc" id="L112">            p.add(Projections.sum(&quot;failedOutputExecutionTime&quot;));</span>
+<span class="nc" id="L113">            p.add(Projections.sum(&quot;failedOutputInputTime&quot;));</span>
+<span class="nc" id="L114">            p.add(Projections.sum(&quot;failedOutputOutputTime&quot;));</span>
+<span class="nc" id="L115">            p.add(Projections.sum(&quot;failedStalled&quot;));</span>
+<span class="nc" id="L116">            p.add(Projections.sum(&quot;failedStalledWaitingTime&quot;));</span>
+<span class="nc" id="L117">            p.add(Projections.sum(&quot;failedStalledExecutionTime&quot;));</span>
+<span class="nc" id="L118">            p.add(Projections.sum(&quot;failedStalledInputTime&quot;));</span>
+<span class="nc" id="L119">            p.add(Projections.sum(&quot;failedStalledOutputTime&quot;));</span>
+
+<span class="nc" id="L121">            criteria.setProjection(p);</span>
+<span class="nc" id="L122">            List l = criteria.list();</span>
+<span class="nc" id="L123">            session.getTransaction().commit();</span>
+<span class="nc" id="L124">            session.close();</span>
+
+<span class="nc" id="L126">            Iterator it = l.iterator();</span>
+<span class="nc bnc" id="L127" title="All 2 branches missed.">            while (it.hasNext()) {</span>
+<span class="nc" id="L128">                Object ob[] = (Object[]) it.next();</span>
+                /*
+                for (int i = 0; i &lt; ob.length; i++) {
+                System.out.println(&quot;Object &quot; + i + &quot; is &quot; + ob[i]);
+                if (ob[i] != null) {
+                result.add(String.valueOf(ob[i]));
+                }
+                }
+                 * 
+                 */
+<span class="nc bnc" id="L138" title="All 2 branches missed.">                if (ob.length &gt;= 30) {</span>
+<span class="nc" id="L139">                    result.add(&quot;Completed Jobs##&quot; + String.valueOf(ob[0]) + &quot;&quot;);</span>
+<span class="nc" id="L140">                    result.add(&quot;CompletedJobs WaitingTime##&quot; + String.valueOf(ob[1]) + &quot;&quot;);</span>
+<span class="nc" id="L141">                    result.add(&quot;CompletedJobs ExecutionTime##&quot; + String.valueOf(ob[2]) + &quot;&quot;);</span>
+<span class="nc" id="L142">                    result.add(&quot;CompletedJobs InputTime##&quot; + String.valueOf(ob[3]) + &quot;&quot;);</span>
+<span class="nc" id="L143">                    result.add(&quot;CompletedJobs OutputTime##&quot; + String.valueOf(ob[4]) + &quot;&quot;);</span>
+<span class="nc" id="L144">                    result.add(&quot;Cancelled Jobs##&quot; + String.valueOf(ob[5]) + &quot;&quot;);</span>
+<span class="nc" id="L145">                    result.add(&quot;CancelledJobs WaitingTime##&quot; + String.valueOf(ob[6]) + &quot;&quot;);</span>
+<span class="nc" id="L146">                    result.add(&quot;CancelledJobs ExecutionTime##&quot; + String.valueOf(ob[7]) + &quot;&quot;);</span>
+<span class="nc" id="L147">                    result.add(&quot;CancelledJobs InputTime##&quot; + String.valueOf(ob[8]) + &quot;&quot;);</span>
+<span class="nc" id="L148">                    result.add(&quot;CancelledJobs OutputTime##&quot; + String.valueOf(ob[9]) + &quot;&quot;);</span>
+<span class="nc" id="L149">                    result.add(&quot;failedApplication Jobs##&quot; + String.valueOf(ob[10]) + &quot;&quot;);</span>
+<span class="nc" id="L150">                    result.add(&quot;failedApplicationJobs WaitingTime##&quot; + String.valueOf(ob[11]) + &quot;&quot;);</span>
+<span class="nc" id="L151">                    result.add(&quot;failedApplicationJobs ExecutionTime##&quot; + String.valueOf(ob[12]) + &quot;&quot;);</span>
+<span class="nc" id="L152">                    result.add(&quot;failedApplicationJobs InputTime##&quot; + String.valueOf(ob[13]) + &quot;&quot;);</span>
+<span class="nc" id="L153">                    result.add(&quot;failedApplicationJobs OutputTime##&quot; + String.valueOf(ob[14]) + &quot;&quot;);</span>
+<span class="nc" id="L154">                    result.add(&quot;failedInput Jobs##&quot; + String.valueOf(ob[15]) + &quot;&quot;);</span>
+<span class="nc" id="L155">                    result.add(&quot;failedInputJobs WaitingTime##&quot; + String.valueOf(ob[16]) + &quot;&quot;);</span>
+<span class="nc" id="L156">                    result.add(&quot;failedInputJobs ExecutionTime##&quot; + String.valueOf(ob[17]) + &quot;&quot;);</span>
+<span class="nc" id="L157">                    result.add(&quot;failedInputJobs InputTime##&quot; + String.valueOf(ob[18]) + &quot;&quot;);</span>
+<span class="nc" id="L158">                    result.add(&quot;failedInputJobs OutputTime##&quot; + String.valueOf(ob[19]) + &quot;&quot;);</span>
+<span class="nc" id="L159">                    result.add(&quot;failedInput Jobs##&quot; + String.valueOf(ob[15]) + &quot;&quot;);</span>
+<span class="nc" id="L160">                    result.add(&quot;failedInputJobs WaitingTime##&quot; + String.valueOf(ob[16]) + &quot;&quot;);</span>
+<span class="nc" id="L161">                    result.add(&quot;failedInputJobs ExecutionTime##&quot; + String.valueOf(ob[17]) + &quot;&quot;);</span>
+<span class="nc" id="L162">                    result.add(&quot;failedInputJpbs InputTime##&quot; + String.valueOf(ob[18]) + &quot;&quot;);</span>
+<span class="nc" id="L163">                    result.add(&quot;failedInputJobs OutputTime##&quot; + String.valueOf(ob[19]) + &quot;&quot;);</span>
+<span class="nc" id="L164">                    result.add(&quot;failedOutput Jobs##&quot; + String.valueOf(ob[20]) + &quot;&quot;);</span>
+<span class="nc" id="L165">                    result.add(&quot;failedOutputJobs WaitingTime##&quot; + String.valueOf(ob[21]) + &quot;&quot;);</span>
+<span class="nc" id="L166">                    result.add(&quot;failedOutputJobs ExecutionTime##&quot; + String.valueOf(ob[22]) + &quot;&quot;);</span>
+<span class="nc" id="L167">                    result.add(&quot;failedOutputJobs InputTime##&quot; + String.valueOf(ob[23]) + &quot;&quot;);</span>
+<span class="nc" id="L168">                    result.add(&quot;failedOutputJobs OutputTime##&quot; + String.valueOf(ob[24]) + &quot;&quot;);</span>
+<span class="nc" id="L169">                    result.add(&quot;failedStalled Jobs##&quot; + String.valueOf(ob[25]) + &quot;&quot;);</span>
+<span class="nc" id="L170">                    result.add(&quot;failedStalledJobs WaitingTime##&quot; + String.valueOf(ob[26]) + &quot;&quot;);</span>
+<span class="nc" id="L171">                    result.add(&quot;failedStalledJobs ExecutionTime##&quot; + String.valueOf(ob[27]) + &quot;&quot;);</span>
+<span class="nc" id="L172">                    result.add(&quot;failedStalledJobs InputTime##&quot; + String.valueOf(ob[28]) + &quot;&quot;);</span>
+<span class="nc" id="L173">                    result.add(&quot;failedStalledJobs OutputTime##&quot; + String.valueOf(ob[29]) + &quot;&quot;);</span>
+                }else{
+<span class="nc" id="L175">                    logger.error(&quot;getBySimulationID: Not enough data : {}&quot;, ob.length);</span>
+<span class="nc" id="L176">                    throw new DAOException(&quot;getBySimulationID: Not enough data&quot;);</span>
+                }
+
+<span class="nc" id="L179">            }</span>
+
+<span class="nc" id="L181">            return result;</span>
+<span class="nc" id="L182">        } catch (HibernateException ex) {</span>
+<span class="nc" id="L183">            logger.error(&quot;Error getting stats for {}&quot;, simulationID, ex);</span>
+<span class="nc" id="L184">            throw new DAOException(ex);</span>
+
+        }
+
+
+    }
+
+    @Override
+    public List&lt;String&gt; getWorkflowsPerUser(List&lt;String&gt; workflowsId) throws WorkflowsDBDAOException {
+<span class="nc" id="L193">        List&lt;String&gt; result = new ArrayList&lt;String&gt;();</span>
+        try {
+<span class="nc" id="L195">            Session session = sessionFactory.openSession();</span>
+<span class="nc" id="L196">            session.beginTransaction();</span>
+<span class="nc" id="L197">            Criteria criteria = session.createCriteria(Workflow.class);</span>
+<span class="nc" id="L198">            criteria.add(Restrictions.in(&quot;id&quot;, workflowsId));</span>
+
+<span class="nc" id="L200">            ProjectionList p = Projections.projectionList();</span>
+<span class="nc" id="L201">            p.add(Projections.groupProperty(&quot;username&quot;));</span>
+<span class="nc" id="L202">            p.add(Projections.property(&quot;username&quot;));</span>
+<span class="nc" id="L203">            p.add(Projections.alias(Projections.count(&quot;status&quot;), &quot;nbWfls&quot;));</span>
+   
+            //p.add(Projections.count(&quot;status&quot;));
+<span class="nc" id="L206">            criteria.setProjection(p);</span>
+<span class="nc" id="L207">            criteria.addOrder(Order.desc(&quot;nbWfls&quot;));</span>
+<span class="nc" id="L208">            List l = criteria.list();</span>
+<span class="nc" id="L209">            session.getTransaction().commit();</span>
+<span class="nc" id="L210">            session.close();</span>
+
+<span class="nc" id="L212">            Iterator it = l.iterator();</span>
+<span class="nc bnc" id="L213" title="All 2 branches missed.">            while (it.hasNext()) {</span>
+<span class="nc" id="L214">                Object ob[] = (Object[]) it.next();</span>
+<span class="nc bnc" id="L215" title="All 4 branches missed.">                if (ob[0] != null &amp;&amp; ob[1] != null) {</span>
+<span class="nc" id="L216">                    result.add(String.valueOf(ob[0]) + &quot;##&quot; + String.valueOf(ob[2]));</span>
+                }
+<span class="nc" id="L218">            }</span>
+
+<span class="nc" id="L220">            return result;</span>
+<span class="nc" id="L221">        } catch (HibernateException ex) {</span>
+<span class="nc" id="L222">            logger.error(&quot;Error getting workflows for {}&quot;, workflowsId, ex);</span>
+<span class="nc" id="L223">            throw new WorkflowsDBDAOException(ex);</span>
+        }
+    }
+
+    @Override
+    public List&lt;String&gt; getApplications(List&lt;String&gt; workflowsId) throws WorkflowsDBDAOException {
+<span class="nc" id="L229">        List&lt;String&gt; result = new ArrayList&lt;String&gt;();</span>
+        try {
+<span class="nc" id="L231">            Session session = sessionFactory.openSession();</span>
+<span class="nc" id="L232">            session.beginTransaction();</span>
+<span class="nc" id="L233">            Criteria criteria = session.createCriteria(Workflow.class);</span>
+<span class="nc" id="L234">            criteria.add(Restrictions.in(&quot;id&quot;, workflowsId));</span>
+
+<span class="nc" id="L236">            ProjectionList p = Projections.projectionList();</span>
+<span class="nc" id="L237">            p.add(Projections.groupProperty(&quot;application&quot;));</span>
+<span class="nc" id="L238">            p.add(Projections.property(&quot;application&quot;));</span>
+<span class="nc" id="L239">            p.add(Projections.alias(Projections.count(&quot;status&quot;), &quot;nbWfls&quot;));</span>
+<span class="nc" id="L240">            criteria.setProjection(p);</span>
+<span class="nc" id="L241">            criteria.setProjection(p);</span>
+<span class="nc" id="L242">            criteria.addOrder(Order.desc(&quot;nbWfls&quot;));</span>
+<span class="nc" id="L243">            List l = criteria.list();</span>
+
+<span class="nc" id="L245">            session.getTransaction().commit();</span>
+<span class="nc" id="L246">            session.close();</span>
+
+<span class="nc" id="L248">            Iterator it = l.iterator();</span>
+<span class="nc bnc" id="L249" title="All 2 branches missed.">            while (it.hasNext()) {</span>
+<span class="nc" id="L250">                Object ob[] = (Object[]) it.next();</span>
+<span class="nc bnc" id="L251" title="All 4 branches missed.">                if (ob[0] != null &amp;&amp; ob[1] != null) {</span>
+<span class="nc" id="L252">                    result.add(String.valueOf(ob[0]) + &quot;##&quot; + String.valueOf(ob[2]));</span>
+                }
+
+<span class="nc" id="L255">            }</span>
+<span class="nc" id="L256">            return result;</span>
+<span class="nc" id="L257">        } catch (HibernateException ex) {</span>
+<span class="nc" id="L258">            logger.error(&quot;Error getting applications for {}&quot;, workflowsId, ex);</span>
+<span class="nc" id="L259">            throw new WorkflowsDBDAOException(ex);</span>
+        }
+        //System.out.println(&quot;getApplications, first result is &quot; + result.get(0).toString());
+    }
+
+    @Override
+    public List&lt;String&gt; getClasses(List&lt;String&gt; workflowsId) throws WorkflowsDBDAOException {
+        try {
+<span class="nc" id="L267">            Session session = sessionFactory.openSession();</span>
+<span class="nc" id="L268">            session.beginTransaction();</span>
+<span class="nc" id="L269">            Criteria criteria = session.createCriteria(Workflow.class);</span>
+<span class="nc" id="L270">            criteria.add(Restrictions.in(&quot;id&quot;, workflowsId));</span>
+<span class="nc" id="L271">            criteria.setProjection(Projections.distinct(Projections.property(&quot;applicationClass&quot;)));</span>
+            @SuppressWarnings(&quot;unchecked&quot;)
+<span class="nc" id="L273">            List&lt;String&gt; result = (List&lt;String&gt;) criteria.list();</span>
+<span class="nc" id="L274">            session.getTransaction().commit();</span>
+<span class="nc" id="L275">            session.close();</span>
+<span class="nc" id="L276">            return result;</span>
+<span class="nc" id="L277">        } catch (HibernateException ex) {</span>
+<span class="nc" id="L278">            logger.error(&quot;Error getting classes for {}&quot;, workflowsId, ex);</span>
+<span class="nc" id="L279">            throw new WorkflowsDBDAOException(ex);</span>
+        }
+
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>
