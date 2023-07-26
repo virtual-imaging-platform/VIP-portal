@@ -54,12 +54,9 @@ jobs:
         run: |
           git fetch
           git branch -a
-          git checkout -- .
           git checkout -b coverage_history origin/coverage_history
           git config --global user.email "axel.bonnet@creatis.insa-lyon.fr"
           git config --global user.name "github-ci"
-          # git pull origin develop
-          git add -f "coverage/target/site/jacoco-aggregate/"
           DATE=$(date +%Y-%m-%d-%H-%M-%S)
           mkdir -p coverage_history/"$DATE"
           cp -R "coverage/target/site/jacoco-aggregate/." coverage_history/"$DATE"/
