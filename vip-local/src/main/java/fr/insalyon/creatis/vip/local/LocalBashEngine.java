@@ -1,6 +1,11 @@
 package fr.insalyon.creatis.vip.local;
 
 import fr.insalyon.creatis.grida.client.GRIDAClientException;
+import fr.insalyon.creatis.moteur.plugins.workflowsdb.bean.Input;
+import fr.insalyon.creatis.moteur.plugins.workflowsdb.dao.InputDAO;
+import fr.insalyon.creatis.moteur.plugins.workflowsdb.dao.OutputDAO;
+import fr.insalyon.creatis.moteur.plugins.workflowsdb.dao.WorkflowsDBDAOException;
+import fr.insalyon.creatis.moteur.plugins.workflowsdb.hibernate.InputData;
 import fr.insalyon.creatis.vip.application.client.view.monitor.SimulationStatus;
 import fr.insalyon.creatis.vip.application.server.business.simulation.ParameterSweep;
 import org.slf4j.Logger;
@@ -46,6 +51,7 @@ public class LocalBashEngine {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private GridaClientLocal gridaClient;
+    private LocalWorkflowDataManager workflowDataManager;
 
     private Path workflowsDir;
     private Map<String, LocalBashExecution> executionsInfo;
@@ -56,9 +62,11 @@ public class LocalBashEngine {
     public LocalBashEngine(
             Resource vipConfigFolder,
             GridaClientLocal gridaClient,
+            LocalWorkflowDataManager workflowDataManager,
             @Value("${local.workflow.dirname}") String workflowsDirName,
             @Value("${local.engine.threadNb}") Integer localThreadNb) throws IOException {
         this.gridaClient = gridaClient;
+        this.workflowDataManager = workflowDataManager;
         executorService = Executors.newFixedThreadPool(localThreadNb);
         executionsInfo = new HashMap<>();
         executionsFutures = new HashMap<>();
@@ -131,15 +139,17 @@ public class LocalBashEngine {
         exec.gwendiaOutputs = getGwendiaOutputs(workflowFile);
         exec.execInputs = getExecInputs(parameters);
         exec.scriptFileLFN = getGwendiaScriptFile(workflowFile);
+        exec.execOutputs = new HashMap<>();
         return exec;
     }
 
-    private static class LocalBashExecution {
+    public static class LocalBashExecution {
         String id;
         File workflowFile;
         Path workflowDir;
         String scriptFileLFN;
         Map<String,String> execInputs;     // name -> value
+        Map<String,String> execOutputs;    // name -> value (path)
         Map<String,String> gwendiaInputs;  // name -> type (string/URI)
         Map<String,String> gwendiaOutputs;  // name -> type (string/URI)
         SimulationStatus status = SimulationStatus.Unknown;
@@ -241,7 +251,7 @@ public class LocalBashEngine {
             }
         }
 
-        private Map<String,Path> transferInputFiles() throws IOException, GRIDAClientException {
+        private Map<String,Path> transferInputFiles() throws IOException, GRIDAClientException, WorkflowsDBDAOException {
             // find URI inputs
             Path toDir = exec.workflowDir.resolve("inputs");
             Files.createDirectory(toDir);
@@ -251,6 +261,8 @@ public class LocalBashEngine {
                 String to = gridaClient.getRemoteFile(from.toString(), toDir.toString());
                 inputsFiles.put(name, Paths.get(to));
             }
+            // insert data in workflows db
+            workflowDataManager.addInputs(exec);
             return inputsFiles;
         }
 
@@ -296,7 +308,7 @@ public class LocalBashEngine {
         }
 
         private void execute(Path execDir, List<String> commandLine) throws IOException, InterruptedException {
-            logger.info("Running a bash test execution in [{}]. Command : {}",
+            logger.info("Running a bash test execution in [{}]. Command : {}",
                     execDir, String.join(" ", commandLine));
             ProcessBuilder builder = new ProcessBuilder()
                     .command(commandLine)
@@ -309,7 +321,7 @@ public class LocalBashEngine {
             }
         }
 
-        private void transferOutputFiles(Path execDir) throws GRIDAClientException {
+        private void transferOutputFiles(Path execDir) throws GRIDAClientException, WorkflowsDBDAOException {
             String toDir = exec.execInputs.get("results-directory");
             if (toDir == null) {
                 throw new RuntimeException("there should be a results-directory parameter");
@@ -321,7 +333,9 @@ public class LocalBashEngine {
             for (String output : exec.gwendiaOutputs.keySet()) {
                 Path from = execDir.resolve(output);
                 gridaClient.uploadFile(from.toString(), toDir);
+                exec.execOutputs.put(output, toDir + "/" + output);
             }
+            workflowDataManager.addOutputs(exec);
         }
     }
 }
