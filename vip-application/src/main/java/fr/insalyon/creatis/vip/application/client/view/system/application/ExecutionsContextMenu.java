@@ -8,6 +8,7 @@ import com.smartgwt.client.widgets.menu.events.ClickHandler;
 import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
 import fr.insalyon.creatis.vip.application.client.rpc.ReproVipService;
 import fr.insalyon.creatis.vip.application.client.rpc.ReproVipServiceAsync;
+import fr.insalyon.creatis.vip.application.client.view.monitor.ViewerWindow;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 
@@ -68,7 +69,7 @@ public class ExecutionsContextMenu extends Menu {
             @Override
             public void onSuccess(String s) {
                 modal.hide();
-                SC.say("Ouputs downloaded");
+                new ViewerWindow("Execution Output Data", executionID, s).show();
             }
         };
         modal.show("Download Outputs", true);

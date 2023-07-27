@@ -63,6 +63,7 @@ public class ReproVipBusiness {
         List<InOutData> outputData = workflowBusiness.getOutputData(executionID, currentUser.getFolder());
         if (outputData != null) {
             logger.info("Fetched {} output data items", outputData.size());
+            logger.info(outputData.toString());
         } else {
             logger.info("Output data is null for executionID: {}", executionID);
         }
