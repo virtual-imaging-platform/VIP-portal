@@ -34,12 +34,6 @@ package fr.insalyon.creatis.vip.application.server.dao.mysql;
 import fr.insalyon.creatis.vip.application.client.bean.Engine;
 import fr.insalyon.creatis.vip.application.server.dao.EngineDAO;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,9 +42,13 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.sql.DataSource;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
- *
  * @author Rafael Ferreira da Silva
  */
 @Repository
@@ -70,7 +68,7 @@ public class EngineData extends JdbcDaoSupport implements EngineDAO {
         try {
             PreparedStatement ps = getConnection().prepareStatement(
                     "INSERT INTO VIPEngines(name, endpoint, status) "
-                    + "VALUES (?, ?, ?)");
+                            + "VALUES (?, ?, ?)");
 
             ps.setString(1, engine.getName());
             ps.setString(2, engine.getEndpoint());
@@ -79,7 +77,7 @@ public class EngineData extends JdbcDaoSupport implements EngineDAO {
             ps.close();
 
         } catch (SQLException ex) {
-            if (ex.getMessage().contains("Unique index or primary key violation")) {
+            if (ex.getMessage().contains("Unique index or primary key violation") || ex.getMessage().contains("Duplicate entry ")) {
                 logger.error("An engine named \"{}\" already exists.", engine.getName());
                 throw new DAOException("An engine named \"" + engine.getName() + "\" already exists.");
             } else {
@@ -95,8 +93,8 @@ public class EngineData extends JdbcDaoSupport implements EngineDAO {
         try {
             PreparedStatement ps = getConnection().prepareStatement(
                     "UPDATE VIPEngines SET endpoint = ?, "
-                    + "status = ? "
-                    + "WHERE name = ?");
+                            + "status = ? "
+                            + "WHERE name = ?");
 
             ps.setString(1, engine.getEndpoint());
             ps.setString(2, engine.getStatus());
@@ -122,13 +120,10 @@ public class EngineData extends JdbcDaoSupport implements EngineDAO {
             ps.close();
 
         } catch (SQLException ex) {
-            if (ex.getMessage().contains("Unique index or primary key violation"))
-            {
+            if (ex.getMessage().contains("Unique index or primary key violation") || ex.getMessage().contains("Duplicate entry ")) {
                 logger.error("There is no engine registered with the name {}", name);
                 throw new DAOException("There is no engine registered with the name : " + name);
-            }
-            else
-            {
+            } else {
                 logger.error("Error removing engine {}", name, ex);
                 throw new DAOException(ex);
             }
@@ -160,7 +155,7 @@ public class EngineData extends JdbcDaoSupport implements EngineDAO {
     @Override
     public List<Engine> getByClass(String className) throws DAOException {
 
-        String status= "enabled";
+        String status = "enabled";
         try {
             PreparedStatement ps = getConnection().prepareStatement("SELECT "
                     + "e.name AS engineName, endpoint, status "

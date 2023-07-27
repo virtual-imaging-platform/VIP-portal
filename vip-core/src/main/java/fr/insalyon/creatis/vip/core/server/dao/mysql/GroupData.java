@@ -37,7 +37,6 @@ import fr.insalyon.creatis.vip.core.server.dao.GroupDAO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.core.support.JdbcDaoSupport;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -50,7 +49,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
  * @author Rafael Ferreira da Silva
  */
 @Repository
@@ -78,9 +76,9 @@ public class GroupData extends JdbcDaoSupport implements GroupDAO {
             ps.close();
 
         } catch (SQLException ex) {
-            if (ex.getMessage().contains("Unique index or primary key violation")) {
+            if (ex.getMessage().contains("Unique index or primary key violation") || ex.getMessage().contains("Duplicate entry ")) {
                 logger.error("A group named {} already exists", group.getName());
-                throw new DAOException("A group named "+group.getName()+" already exists");
+                throw new DAOException("A group named " + group.getName() + " already exists");
             } else {
                 logger.error("Error adding group {}", group.getName(), ex);
                 throw new DAOException(ex);
@@ -138,7 +136,7 @@ public class GroupData extends JdbcDaoSupport implements GroupDAO {
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 groups.add(new Group(rs.getString("groupname"),
-                        rs.getBoolean("public"),rs.getBoolean("gridfile"),rs.getBoolean("gridjobs")));
+                        rs.getBoolean("public"), rs.getBoolean("gridfile"), rs.getBoolean("gridjobs")));
             }
             ps.close();
             return groups;

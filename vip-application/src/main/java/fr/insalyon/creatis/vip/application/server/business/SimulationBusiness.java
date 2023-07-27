@@ -52,13 +52,11 @@ import org.springframework.beans.factory.annotation.Lookup;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.*;
 
 /**
- *
  * @author Rafael Ferreira da Silva
  */
 @Service
@@ -201,7 +199,7 @@ public class SimulationBusiness {
                 String[] params = task.getParameters();
                 for (int i = 0; i < params.length; i++) {
                     params[i] = lfcPathsBusiness.parseRealDir(
-                        params[i], currentUserFolder);
+                            params[i], currentUserFolder);
                 }
                 task.setParameters(params);
             }
@@ -281,8 +279,6 @@ public class SimulationBusiness {
 
         try {
             fileName += extension;
-
-            String filePath = server.getWorkflowsPath() + "/" + simulationID + "/" + folder + "/" + fileName;
 
             Scanner scanner = new Scanner(new FileInputStream(server.getWorkflowsPath()
                     + "/" + simulationID + "/" + folder + "/" + fileName));

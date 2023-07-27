@@ -31,29 +31,28 @@
  */
 package fr.insalyon.creatis.vip.core.server.dao.mysql;
 
-import fr.insalyon.creatis.vip.core.client.bean.*;
+import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.user.UserLevel;
 import fr.insalyon.creatis.vip.core.client.view.util.CountryCode;
 import fr.insalyon.creatis.vip.core.server.business.StatsBusiness.UserSearchCriteria;
-import fr.insalyon.creatis.vip.core.server.dao.*;
+import fr.insalyon.creatis.vip.core.server.dao.DAOException;
+import fr.insalyon.creatis.vip.core.server.dao.UserDAO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.core.support.JdbcDaoSupport;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.sql.DataSource;
-import java.sql.*;
-import java.time.LocalDate;
-import java.util.*;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.AbstractMap.SimpleEntry;
-import java.util.Date;
-import java.util.Map.Entry;
+import java.util.*;
 
 /**
- *
  * @author Rafael Ferreira da Silva, Tristan Glatard
  */
 @Repository
@@ -79,11 +78,11 @@ public class UserData extends JdbcDaoSupport implements UserDAO {
         try {
             PreparedStatement ps = getConnection().prepareStatement(
                     "INSERT INTO VIPUsers("
-                    + "email, pass, first_name, last_name, institution, "
-                    + "code, confirmed, folder, registration, last_login, level, "
-                    + "country_code, max_simulations, termsUse,lastUpdatePublications,"
-                    + "failed_authentications, account_locked) "
-                    + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                            + "email, pass, first_name, last_name, institution, "
+                            + "code, confirmed, folder, registration, last_login, level, "
+                            + "country_code, max_simulations, termsUse,lastUpdatePublications,"
+                            + "failed_authentications, account_locked) "
+                            + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
             ps.setString(1, user.getEmail());
             ps.setString(2, user.getPassword());
@@ -107,9 +106,9 @@ public class UserData extends JdbcDaoSupport implements UserDAO {
             ps.close();
 
         } catch (SQLException ex) {
-            if (ex.getMessage().contains("Unique index or primary key violation")) {
+            if (ex.getMessage().contains("Unique index or primary key violation") || ex.getMessage().contains("Duplicate entry ")) {
                 logger.error("There is an existing account associated with the email: {} or with this {first name,last name} ({})", user.getEmail(), ex.getMessage());
-                throw new DAOException("There is an existing account associated with the email: "+user.getEmail()+" or with the first name,last name: "+user.getFirstName()+ ","+user.getLastName(), ex);
+                throw new DAOException("There is an existing account associated with the email: " + user.getEmail() + " or with the first name,last name: " + user.getFirstName() + "," + user.getLastName(), ex);
             } else {
                 logger.error("Error adding user {}", user.getEmail(), ex);
                 throw new DAOException(ex);
@@ -118,7 +117,6 @@ public class UserData extends JdbcDaoSupport implements UserDAO {
     }
 
     /**
-     *
      * @param email
      * @param password
      * @return
@@ -149,7 +147,6 @@ public class UserData extends JdbcDaoSupport implements UserDAO {
     }
 
     /**
-     *
      * @param email
      * @param code
      * @return
@@ -190,7 +187,6 @@ public class UserData extends JdbcDaoSupport implements UserDAO {
     }
 
     /**
-     *
      * @param email
      * @return
      * @throws DAOException
@@ -242,7 +238,6 @@ public class UserData extends JdbcDaoSupport implements UserDAO {
     }
 
     /**
-     *
      * @return @throws DAOException
      */
     @Override
@@ -376,7 +371,7 @@ public class UserData extends JdbcDaoSupport implements UserDAO {
         return -1l;
     }
 
-    private Optional<Map.Entry<String,List<Object>>> buildSearchQuery(
+    private Optional<Map.Entry<String, List<Object>>> buildSearchQuery(
             UserSearchCriteria searchCriteria) {
 
         StringBuilder query = new StringBuilder();
@@ -414,7 +409,6 @@ public class UserData extends JdbcDaoSupport implements UserDAO {
     }
 
     /**
-     *
      * @param email
      * @throws DAOException
      */
@@ -435,7 +429,6 @@ public class UserData extends JdbcDaoSupport implements UserDAO {
     }
 
     /**
-     *
      * @param user
      * @throws DAOException
      */
@@ -466,7 +459,6 @@ public class UserData extends JdbcDaoSupport implements UserDAO {
     }
 
     /**
-     *
      * @param email
      * @param currentPassword
      * @param newPassword
@@ -474,7 +466,7 @@ public class UserData extends JdbcDaoSupport implements UserDAO {
      */
     @Override
     public void updatePassword(String email, String currentPassword,
-            String newPassword) throws DAOException {
+                               String newPassword) throws DAOException {
 
         if (authenticate(email, currentPassword)) {
             try {
@@ -488,7 +480,7 @@ public class UserData extends JdbcDaoSupport implements UserDAO {
                 ps.close();
 
             } catch (SQLException ex) {
-                logger.error("Error updating password for {}", email,ex);
+                logger.error("Error updating password for {}", email, ex);
                 throw new DAOException(ex);
             }
         } else {
@@ -509,7 +501,7 @@ public class UserData extends JdbcDaoSupport implements UserDAO {
             ps.executeUpdate();
             ps.close();
         } catch (SQLException ex) {
-            if (ex.getMessage().contains("Duplicate entry")) {
+            if (ex.getMessage().contains("Unique index or primary key violation") || ex.getMessage().contains("Duplicate entry ")) {
                 logger.error("There is an existing account associated with the email: {}", newEmail);
                 throw new DAOException("There is an existing account associated with this email.", ex);
             } else {
@@ -538,7 +530,6 @@ public class UserData extends JdbcDaoSupport implements UserDAO {
     }
 
     /**
-     *
      * @param email
      * @param session
      * @throws DAOException
@@ -563,7 +554,6 @@ public class UserData extends JdbcDaoSupport implements UserDAO {
     }
 
     /**
-     *
      * @param email
      * @param session
      * @return
@@ -594,7 +584,6 @@ public class UserData extends JdbcDaoSupport implements UserDAO {
     }
 
     /**
-     *
      * @param email
      * @param lastLogin
      * @throws DAOException
@@ -638,7 +627,6 @@ public class UserData extends JdbcDaoSupport implements UserDAO {
     }
 
     /**
-     *
      * @param session
      * @return
      * @throws DAOException
@@ -689,7 +677,6 @@ public class UserData extends JdbcDaoSupport implements UserDAO {
     }
 
     /**
-     *
      * @return @throws DAOException
      */
     @Override
@@ -735,7 +722,6 @@ public class UserData extends JdbcDaoSupport implements UserDAO {
     }
 
     /**
-     *
      * @param email
      * @param level
      * @param countryCode
@@ -745,7 +731,7 @@ public class UserData extends JdbcDaoSupport implements UserDAO {
      */
     @Override
     public void update(String email, UserLevel level, CountryCode countryCode,
-            int maxRunningSimulations, boolean locked) throws DAOException {
+                       int maxRunningSimulations, boolean locked) throws DAOException {
 
         try {
             PreparedStatement ps = getConnection().prepareStatement("UPDATE "
@@ -767,7 +753,6 @@ public class UserData extends JdbcDaoSupport implements UserDAO {
     }
 
     /**
-     *
      * @param email
      * @param code
      * @throws DAOException
@@ -791,7 +776,6 @@ public class UserData extends JdbcDaoSupport implements UserDAO {
     }
 
     /**
-     *
      * @param email
      * @param newPassword
      * @throws DAOException
@@ -927,7 +911,7 @@ public class UserData extends JdbcDaoSupport implements UserDAO {
 
     @Override
     public void unlock(String email) throws DAOException {
-         try {
+        try {
             PreparedStatement ps = getConnection().prepareStatement("UPDATE "
                     + "VIPUsers SET "
                     + "account_locked=0, failed_authentications=0 "
@@ -939,14 +923,14 @@ public class UserData extends JdbcDaoSupport implements UserDAO {
             ps.close();
 
         } catch (SQLException ex) {
-             logger.error("Error unlocking {}", email, ex);
-             throw new DAOException(ex);
+            logger.error("Error unlocking {}", email, ex);
+            throw new DAOException(ex);
         }
     }
 
     @Override
     public void resetNFailedAuthentications(String email) throws DAOException {
-         try {
+        try {
             PreparedStatement ps = getConnection().prepareStatement("UPDATE "
                     + "VIPUsers SET "
                     + "failed_authentications=0 "
@@ -958,14 +942,14 @@ public class UserData extends JdbcDaoSupport implements UserDAO {
             ps.close();
 
         } catch (SQLException ex) {
-             logger.error("Error resetting failed auth number for {}", email, ex);
+            logger.error("Error resetting failed auth number for {}", email, ex);
             throw new DAOException(ex);
         }
     }
 
     @Override
     public void incNFailedAuthentications(String email) throws DAOException {
-         try {
+        try {
             PreparedStatement ps = getConnection().prepareStatement("UPDATE "
                     + "VIPUsers SET "
                     + "failed_authentications = failed_authentications + 1 "
@@ -977,7 +961,7 @@ public class UserData extends JdbcDaoSupport implements UserDAO {
             ps.close();
 
         } catch (SQLException ex) {
-             logger.error("Error increasing failed auth number for {}", email, ex);
+            logger.error("Error increasing failed auth number for {}", email, ex);
             throw new DAOException(ex);
         }
     }
@@ -1043,7 +1027,7 @@ public class UserData extends JdbcDaoSupport implements UserDAO {
             ps.close();
             logger.error("Looking for an apikey, but there is no user registered with the email: {}", email);
             throw new DAOException(
-                    "Looking for an apikey, but there is no user registered with the email: "+email);
+                    "Looking for an apikey, but there is no user registered with the email: " + email);
         } catch (SQLException ex) {
             logger.error("Error getting user api key for {}", email, ex);
             throw new DAOException(ex);
@@ -1064,7 +1048,7 @@ public class UserData extends JdbcDaoSupport implements UserDAO {
             if (rowsUpdatedNb == 0) {
                 logger.error("Updating an apikey, but there is no user registered with the email: {}", email);
                 throw new DAOException(
-                        "Updating an apikey, but there is no user registered with the email: "+email);
+                        "Updating an apikey, but there is no user registered with the email: " + email);
             }
         } catch (SQLException ex) {
             logger.error("Error updating {} api key to {}", email, newApikey, ex);
