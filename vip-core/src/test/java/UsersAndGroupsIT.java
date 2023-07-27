@@ -21,7 +21,7 @@ import static fr.insalyon.creatis.vip.core.client.view.user.UserLevel.Beginner;
 import static fr.insalyon.creatis.vip.core.client.view.user.UserLevel.Developer;
 import static org.junit.jupiter.api.Assertions.*;
 
-public class ConfigurationBusiness_CoreSpringServerIT extends BaseSpringIT {
+public class UsersAndGroupsIT extends BaseSpringIT {
     private User user5;
 
     @BeforeEach
