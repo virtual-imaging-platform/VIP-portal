@@ -4,8 +4,6 @@ env:
 name: tests_coverage_jacoco
 
 on:
-  push:
-    branches: [ "ci" ]
   schedule:
     - cron: "0 0 1 * *" # Once a month
 
