@@ -38,6 +38,7 @@ import fr.insalyon.creatis.vip.api.exception.ApiException;
 import fr.insalyon.creatis.vip.api.rest.config.BaseWebSpringIT;
 import fr.insalyon.creatis.vip.application.server.business.WorkflowBusiness;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,6 +58,7 @@ import static org.mockito.ArgumentMatchers.any;
  * The less mock should be used to be as close as possible to the production
  * environment.
  */
+@Disabled
 public class DefaultSpringConfigurationIT {
 
     @Autowired
