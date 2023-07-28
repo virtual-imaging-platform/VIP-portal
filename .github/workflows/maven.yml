@@ -31,7 +31,7 @@ jobs:
         server-username: MAVEN_USERNAME
         server-password: MAVEN_PASSWORD
     - name: Build with Maven
-      run: mvn -B clean deploy
+      run: mvn -B clean verify
       env:
         MAVEN_USERNAME: github
         MAVEN_PASSWORD: ${{ secrets.NEXUS_PSW }}
