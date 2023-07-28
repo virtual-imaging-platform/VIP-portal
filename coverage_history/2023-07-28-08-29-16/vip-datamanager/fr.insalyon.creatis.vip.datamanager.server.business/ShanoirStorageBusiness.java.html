@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../jacoco-resources/report.gif" type="image/gif"/><title>ShanoirStorageBusiness.java</title><link rel="stylesheet" href="../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../index.html" class="el_report">coverage</a> &gt; <a href="../index.html" class="el_bundle">vip-datamanager</a> &gt; <a href="index.source.html" class="el_package">fr.insalyon.creatis.vip.datamanager.server.business</a> &gt; <span class="el_source">ShanoirStorageBusiness.java</span></div><h1>ShanoirStorageBusiness.java</h1><pre class="source lang-java linenums">package fr.insalyon.creatis.vip.datamanager.server.business;
+
+import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
+import fr.insalyon.creatis.vip.core.server.business.BusinessException;
+import fr.insalyon.creatis.vip.datamanager.client.bean.ExternalPlatform;
+import fr.insalyon.creatis.vip.datamanager.client.bean.ExternalPlatform.Type;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+/**
+ *  Created by Alae Es-saki on 12/04/2022
+ */
+@Service
+<span class="fc" id="L18">public class ShanoirStorageBusiness {</span>
+
+<span class="fc" id="L20">    private final Logger logger = LoggerFactory.getLogger(getClass());</span>
+
+<span class="nc" id="L22">    enum UrlKeys{</span>
+<span class="nc" id="L23">        FILE_NAME(&quot;shanoir&quot;, &quot;^shanoir:/(//)?([^/].*)\\?.*$&quot;, 2 ,&quot;fileName&quot;),</span>
+<span class="nc" id="L24">        DATASET_ID(&quot;datasetId&quot;, &quot;^.*[?&amp;]datasetId=([^&amp;]*)(&amp;.*)?$&quot;, 1 ,&quot;datasetId&quot;),</span>
+<span class="nc" id="L25">        FORMAT(&quot;format&quot;, &quot;^.*[?&amp;]format=([^&amp;]*)(&amp;.*)?$&quot;, 1 ,&quot;format&quot;),</span>
+<span class="nc" id="L26">        TOKEN(&quot;token&quot;, &quot;^.*[?&amp;]token=([^&amp;]*)(&amp;.*)?$&quot;, 1 , &quot;token&quot;),</span>
+<span class="nc" id="L27">        REFRESH_TOKEN(&quot;refreshToken&quot;, &quot;^.*[?&amp;]refreshToken=([^&amp;]*)(&amp;.*)?$&quot;, 1 , &quot;refresh token&quot;),</span>
+<span class="nc" id="L28">        MD5(&quot;md5&quot;,&quot;^.*[?&amp;]md5=([^&amp;]*)(&amp;.*)?$&quot;, 1, &quot;md5&quot;),</span>
+<span class="nc" id="L29">        TYPE(&quot;type&quot;, &quot;^.*[?&amp;]type=([^&amp;]*)(&amp;.*)?$&quot;, 1, &quot;type&quot;),</span>
+<span class="nc" id="L30">        API_URI(&quot;apiUrl&quot;, &quot;&quot;, 0, &quot;download Url&quot;),</span>
+<span class="nc" id="L31">        UPLOAD_URL(&quot;upload_url&quot;,&quot;&quot;,0,&quot;Import endpoint url&quot;),</span>
+<span class="nc" id="L32">        KEYCLOAK_CLIENT_ID(&quot;keycloak_client_id&quot;, &quot;&quot;, 0, &quot;&quot;),</span>
+<span class="nc" id="L33">        REFRESH_TOKEN_URL(&quot;refresh_token_url&quot;,&quot;&quot;, 0, &quot;&quot;);</span>
+
+        public final String key;
+        public final String regex;
+        public final int regexGroup;
+        public final String errorKey;
+
+<span class="nc" id="L40">        UrlKeys(String label, String regex, int regexGroup, String errorKey) {</span>
+<span class="nc" id="L41">            this.key = label;</span>
+<span class="nc" id="L42">            this.regex = regex;</span>
+<span class="nc" id="L43">            this.regexGroup = regexGroup;</span>
+<span class="nc" id="L44">            this.errorKey = errorKey;</span>
+<span class="nc" id="L45">        }</span>
+    }
+
+    /* GASW regexps in 3.2.0 version
+
+       local token=`echo $URI | sed -r 's/^.*[?&amp;]token=([^&amp;]*)(&amp;.*)?$/\1/i'`
+       local fileName=`echo $URI | sed -r 's#^shanoir:/(//)?([^/].*)\?.*$#\2#i'`
+       local apiUrl=`echo $URI | sed -r 's/^.*[?&amp;]apiurl=([^&amp;]*)(&amp;.*)?$/\1/i'`
+       local refreshToken=`echo $URI | sed -r 's/^.*[?&amp;]refreshToken=([^&amp;]*)(&amp;.*)?$/\1/i'`
+       local format=`echo $URI | sed -r 's/^.*[?&amp;]format=([^&amp;]*)(&amp;.*)?$/\1/i'`
+       local datasetId=`echo $URI | sed -r 's/^.*[?&amp;]datasetId=([^&amp;]*)(&amp;.*)?$/\1/i'`
+       local keycloak_client_id=`echo $URI | sed -r 's/^.*[?&amp;]keycloak_client_id=([^&amp;]*)(&amp;.*)?$/\1/i'`
+       local refresh_token_url=`echo $URI | sed -r 's/^.*[?&amp;]refresh_token_url=([^&amp;]*)(&amp;.*)?$/\1/i'`
+
+       So objective : generate &quot;shanoir:/fileName?apiurl=[...]&amp;datasetId=[...]&amp;format=[...]&amp;token=[...]&amp;refreshToken=[....]&amp;keycloak_client_id=[....]&amp;refresh_token_url=[....]
+    */
+    public String generateUri(
+            ExternalPlatform externalPlatform, String parameterName, String parameterValue) throws BusinessException {
+
+<span class="nc" id="L64">        verifyExternalPlatform(externalPlatform);</span>
+
+<span class="nc" id="L66">        String apiUrl = externalPlatform.getUrl();</span>
+<span class="nc" id="L67">        String keycloakClientId = externalPlatform.getKeycloakClientId();</span>
+<span class="nc" id="L68">        String refreshTokenUrl = externalPlatform.getRefreshTokenUrl();</span>
+
+<span class="nc" id="L70">        String token = subString(UrlKeys.TOKEN, parameterValue);</span>
+<span class="nc" id="L71">        String refreshToken = subString(UrlKeys.REFRESH_TOKEN, parameterValue);</span>
+<span class="nc" id="L72">        String fileName = subString(UrlKeys.FILE_NAME, parameterValue);</span>
+
+<span class="nc bnc" id="L74" title="All 2 branches missed.">        if(CoreConstants.RESULTS_DIRECTORY_PARAM_NAME.equals(parameterName)){</span>
+<span class="nc" id="L75">            String type = subString(UrlKeys.TYPE, parameterValue);</span>
+<span class="nc" id="L76">            String md5 = subString(UrlKeys.MD5, parameterValue);</span>
+<span class="nc" id="L77">            String uploadUrl = externalPlatform.getUploadUrl();</span>
+
+<span class="nc" id="L79">            return buildUploadUri(fileName, uploadUrl, token, refreshToken, type, md5, keycloakClientId, refreshTokenUrl);</span>
+        }
+        
+<span class="nc" id="L82">        String format = subString(UrlKeys.FORMAT, parameterValue);</span>
+<span class="nc" id="L83">        String datasetId = subString(UrlKeys.DATASET_ID, parameterValue);</span>
+
+<span class="nc" id="L85">        return buildDownloadUri(datasetId, apiUrl, token, refreshToken, format, fileName, keycloakClientId, refreshTokenUrl);</span>
+    }
+
+    private void verifyExternalPlatform(ExternalPlatform externalPlatform)
+            throws RuntimeException, BusinessException {
+<span class="nc bnc" id="L90" title="All 2 branches missed.">        if ( ! externalPlatform.getType().equals(Type.SHANOIR)) {</span>
+<span class="nc" id="L91">            logger.error(&quot;Trying to generate a shanoir URI for a non shanoir storage {}&quot;,</span>
+<span class="nc" id="L92">                    externalPlatform.getType());</span>
+<span class="nc" id="L93">            throw new BusinessException(&quot;Cannot generate shanoir uri&quot;);</span>
+        }
+<span class="nc bnc" id="L95" title="All 2 branches missed.">        if (externalPlatform.getUrl() == null) {</span>
+<span class="nc" id="L96">            logger.error(&quot;A shanoir external storage must have an URL to generate an URI&quot;);</span>
+<span class="nc" id="L97">            throw new BusinessException(&quot;Cannot generate shanoir uri&quot;);</span>
+        }
+<span class="nc bnc" id="L99" title="All 4 branches missed.">        if (externalPlatform.getKeycloakClientId() == null || externalPlatform.getRefreshTokenUrl() == null) { </span>
+<span class="nc" id="L100">            logger.error(&quot;Cannot get keycloak informations for shanoir storage from database&quot;);</span>
+<span class="nc" id="L101">            throw new BusinessException(&quot;Cannot generate shanoir uri&quot;);</span>
+        }
+<span class="nc" id="L103">    }</span>
+
+    private String buildDownloadUri(String datasetId, String apiUrl, String token, String refreshToken, String format, String fileName, String keycloakClientId, String refreshTokenUrl){
+<span class="nc" id="L106">        return UrlKeys.FILE_NAME.key+&quot;:/&quot; +</span>
+                fileName +
+                &quot;?&quot;+ UrlKeys.API_URI.key+&quot;=&quot; +
+                apiUrl +
+                &quot;&amp;amp;&quot;+ UrlKeys.DATASET_ID.key+&quot;=&quot; +
+                datasetId +
+                &quot;&amp;amp;&quot;+ UrlKeys.FORMAT.key+&quot;=&quot; +
+                format +
+                &quot;&amp;amp;&quot;+ UrlKeys.KEYCLOAK_CLIENT_ID.key+&quot;=&quot; +
+                keycloakClientId +
+                &quot;&amp;amp;&quot;+ UrlKeys.REFRESH_TOKEN_URL.key+&quot;=&quot; +
+                refreshTokenUrl +
+                &quot;&amp;amp;&quot;+ UrlKeys.TOKEN.key+&quot;=&quot; +
+                token +
+                &quot;&amp;amp;&quot;+ UrlKeys.REFRESH_TOKEN.key+&quot;=&quot; +
+                refreshToken;
+    }
+
+    private String buildUploadUri(String filePath, String uploadUrl, String token, String refreshToken, String type, String md5 , String keycloakClientId, String refreshTokenUrl){
+<span class="nc" id="L125">        return UrlKeys.FILE_NAME.key+&quot;:/&quot; +</span>
+                filePath +
+                &quot;?&quot;+ UrlKeys.UPLOAD_URL.key+&quot;=&quot; +
+                uploadUrl +
+                &quot;&amp;amp;&quot;+ UrlKeys.TYPE.key+&quot;=&quot; +
+                type +
+                &quot;&amp;amp;&quot;+ UrlKeys.MD5.key+&quot;=&quot; +
+                md5 +
+                &quot;&amp;amp;&quot;+ UrlKeys.KEYCLOAK_CLIENT_ID.key+&quot;=&quot; +
+                keycloakClientId +
+                &quot;&amp;amp;&quot;+ UrlKeys.REFRESH_TOKEN_URL.key+&quot;=&quot; +
+                refreshTokenUrl +
+                &quot;&amp;amp;&quot;+ UrlKeys.TOKEN.key+&quot;=&quot; +
+                token +
+                &quot;&amp;amp;&quot;+ UrlKeys.REFRESH_TOKEN.key+&quot;=&quot; +
+                refreshToken;
+    }
+
+    /**
+     * SubString a text with a key and regex
+     * @param urlKey
+     * @param text
+     * @return
+     */
+    private String subString(UrlKeys urlKey, String text) throws BusinessException {
+<span class="nc" id="L150">        Pattern pattern = Pattern.compile(urlKey.regex);</span>
+<span class="nc" id="L151">        Matcher matcher = pattern.matcher(text);</span>
+<span class="nc bnc" id="L152" title="All 2 branches missed.">        if(matcher.matches()) {</span>
+<span class="nc bnc" id="L153" title="All 2 branches missed.">            if(matcher.group(urlKey.regexGroup) == null){</span>
+<span class="nc" id="L154">                logger.error(&quot;Cannot get {} from the uri, the {} is null&quot;,urlKey.errorKey,urlKey.errorKey);</span>
+<span class="nc" id="L155">                throw new BusinessException(&quot;Cannot get &quot;+urlKey.errorKey +&quot; from the uri, the &quot;+urlKey.errorKey +&quot; is null&quot;);</span>
+            }
+<span class="nc" id="L157">            return matcher.group(urlKey.regexGroup);</span>
+        }else{
+<span class="nc" id="L159">            logger.error(&quot;Cannot get {} from the uri&quot;,urlKey.errorKey);</span>
+<span class="nc" id="L160">            throw new BusinessException(&quot;Cannot get &quot;+urlKey.errorKey +&quot; from the uri&quot;);</span>
+        }
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../jacoco-resources/report.gif" type="image/gif"/><title>ApikeyAuthenticationProvider.java</title><link rel="stylesheet" href="../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../index.html" class="el_report">coverage</a> &gt; <a href="../index.html" class="el_bundle">vip-api</a> &gt; <a href="index.source.html" class="el_package">fr.insalyon.creatis.vip.api.security.apikey</a> &gt; <span class="el_source">ApikeyAuthenticationProvider.java</span></div><h1>ApikeyAuthenticationProvider.java</h1><pre class="source lang-java linenums">/*
+ * Copyright and authors: see LICENSE.txt in base repository.
+ *
+ * This software is a web portal for pipeline execution on distributed systems.
+ *
+ * This software is governed by the CeCILL-B license under French law and
+ * abiding by the rules of distribution of free software.  You can  use,
+ * modify and/ or redistribute the software under the terms of the CeCILL-B
+ * license as circulated by CEA, CNRS and INRIA at the following URL
+ * &quot;http://www.cecill.info&quot;.
+ *
+ * As a counterpart to the access to the source code and  rights to copy,
+ * modify and redistribute granted by the license, users are provided only
+ * with a limited warranty  and the software's author,  the holder of the
+ * economic rights,  and the successive licensors  have only  limited
+ * liability.
+ *
+ * In this respect, the user's attention is drawn to the risks associated
+ * with loading,  using,  modifying and/or developing or reproducing the
+ * software by the user in light of its specific status of free software,
+ * that may mean  that it is complicated to manipulate,  and  that  also
+ * therefore means  that it is reserved for developers  and  experienced
+ * professionals having in-depth computer knowledge. Users are therefore
+ * encouraged to load and test the software's suitability as regards their
+ * requirements in conditions enabling the security of their systems and/or
+ * data to be ensured and,  more generally, to use and operate it in the
+ * same conditions as regards security.
+ *
+ * The fact that you are presently reading this means that you have had
+ * knowledge of the CeCILL-B license and that you accept its terms.
+ */
+package fr.insalyon.creatis.vip.api.security.apikey;
+
+import fr.insalyon.creatis.vip.core.client.bean.Group;
+import fr.insalyon.creatis.vip.core.client.bean.User;
+import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
+import fr.insalyon.creatis.vip.core.server.business.BusinessException;
+import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
+import fr.insalyon.creatis.vip.core.server.dao.DAOException;
+import fr.insalyon.creatis.vip.core.server.dao.UserDAO;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
+import org.springframework.context.MessageSourceAware;
+import org.springframework.context.support.MessageSourceAccessor;
+import org.springframework.security.authentication.*;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.SpringSecurityMessageSource;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.stereotype.Service;
+import org.springframework.util.Assert;
+
+import java.util.Map;
+
+/**
+ * Created by abonnet on 7/25/16.
+ *
+ * Authenticate a user with its api key.
+ * Automaticaly taken into account by spring security by implementing {@link AuthenticationProvider}
+ */
+@Service
+<span class="fc" id="L65">public class ApikeyAuthenticationProvider implements</span>
+        AuthenticationProvider, InitializingBean, MessageSourceAware {
+
+<span class="fc" id="L68">    private final Logger logger = LoggerFactory.getLogger(getClass());</span>
+
+    // ~ Instance fields
+    // ================================================================================================
+
+<span class="fc" id="L73">    protected MessageSourceAccessor messages = SpringSecurityMessageSource.getAccessor();</span>
+
+    @Autowired
+    private ConfigurationBusiness configurationBusiness;
+
+    @Autowired
+    private UserDAO userDAO;
+
+    public final void afterPropertiesSet() throws Exception {
+<span class="fc" id="L82">        Assert.notNull(this.messages, &quot;A message source must be set&quot;);</span>
+<span class="fc" id="L83">    }</span>
+
+    @Override
+    public boolean supports(Class&lt;?&gt; authentication) {
+<span class="nc" id="L87">        return ApikeyAuthenticationToken.class.isAssignableFrom(authentication);</span>
+    }
+
+    @Override
+    public Authentication authenticate(Authentication authentication)
+        throws AuthenticationException {
+
+<span class="nc" id="L94">        Assert.isInstanceOf(ApikeyAuthenticationToken.class, authentication,</span>
+                &quot;Only ApikeyAuthenticationToken is supported&quot;);
+
+        User vipUser;
+<span class="nc" id="L98">        String apikey = authentication.getCredentials().toString();</span>
+        try {
+<span class="nc" id="L100">            vipUser = userDAO.getUserByApikey(apikey);</span>
+<span class="nc" id="L101">        } catch (DAOException e) {</span>
+<span class="nc" id="L102">            logger.error(&quot;error when getting user by apikey. Doing as if there is an auth error&quot;, e);</span>
+<span class="nc" id="L103">            throw new BadCredentialsException(</span>
+<span class="nc" id="L104">                messages.getMessage(</span>
+                    &quot;AbstractUserDetailsAuthenticationProvider.badCredentials&quot;,
+                    &quot;Bad credentials&quot;));
+<span class="nc" id="L107">        }</span>
+<span class="nc bnc" id="L108" title="All 2 branches missed.">        if (vipUser == null) {</span>
+<span class="nc" id="L109">            logger.info(</span>
+                &quot;Cant authenticate because apikey not found:&quot; + apikey);
+<span class="nc" id="L111">            throw new BadCredentialsException(</span>
+<span class="nc" id="L112">                messages.getMessage(</span>
+                    &quot;AbstractUserDetailsAuthenticationProvider.badCredentials&quot;,
+                    &quot;Bad credentials&quot;));
+        }
+<span class="nc" id="L116">        logger.debug(&quot;apikey OK for &quot; + vipUser.getEmail());</span>
+        UserDetails springUser;
+        try {
+<span class="nc" id="L119">            Map&lt;Group, CoreConstants.GROUP_ROLE&gt; groups =</span>
+<span class="nc" id="L120">                configurationBusiness.getUserGroups(vipUser.getEmail());</span>
+<span class="nc" id="L121">            vipUser.setGroups(groups);</span>
+<span class="nc" id="L122">            springUser = new SpringApiPrincipal(vipUser);</span>
+<span class="nc" id="L123">        } catch (BusinessException e) {</span>
+<span class="nc" id="L124">            logger.error(&quot;error when getting user groups for {}. Doing as if there is an auth error&quot;,</span>
+<span class="nc" id="L125">                    vipUser.getEmail(), e);</span>
+<span class="nc" id="L126">            throw new BadCredentialsException(</span>
+<span class="nc" id="L127">                messages.getMessage(</span>
+                    &quot;AbstractUserDetailsAuthenticationProvider.badCredentials&quot;,
+                    &quot;Bad credentials&quot;));
+<span class="nc" id="L130">        }</span>
+<span class="nc" id="L131">        checkUserInfo(springUser);</span>
+        try {
+<span class="nc" id="L133">            logger.info(</span>
+<span class="nc" id="L134">                &quot;successful logging for &quot; + springUser.getUsername());</span>
+<span class="nc" id="L135">            userDAO.resetNFailedAuthentications(springUser.getUsername());</span>
+<span class="nc" id="L136">        } catch (DAOException e) {</span>
+<span class="nc" id="L137">            logger.error(&quot;Error resetting failed auth attempts. Ignoring&quot;, e);</span>
+<span class="nc" id="L138">        }</span>
+<span class="nc" id="L139">            return new ApikeyAuthenticationToken(</span>
+                    springUser, apikey,
+<span class="nc" id="L141">                    vipUser.getLevel().name().toUpperCase());</span>
+    }
+
+    public void setMessageSource(MessageSource messageSource) {
+<span class="fc" id="L145">        this.messages = new MessageSourceAccessor(messageSource);</span>
+<span class="fc" id="L146">    }</span>
+
+    private void checkUserInfo(UserDetails user) {
+<span class="nc bnc" id="L149" title="All 2 branches missed.">        if (!user.isAccountNonLocked()) {</span>
+<span class="nc" id="L150">            logger.info(&quot;User account is locked&quot;);</span>
+
+<span class="nc" id="L152">            throw new LockedException(messages.getMessage(</span>
+                    &quot;AbstractUserDetailsAuthenticationProvider.locked&quot;,
+                    &quot;User account is locked&quot;));
+        }
+
+<span class="nc bnc" id="L157" title="All 2 branches missed.">        if (!user.isEnabled()) {</span>
+<span class="nc" id="L158">            logger.info(&quot;User account is disabled&quot;);</span>
+
+<span class="nc" id="L160">            throw new DisabledException(messages.getMessage(</span>
+                    &quot;AbstractUserDetailsAuthenticationProvider.disabled&quot;,
+                    &quot;User is disabled&quot;));
+        }
+
+<span class="nc bnc" id="L165" title="All 2 branches missed.">        if (!user.isAccountNonExpired()) {</span>
+<span class="nc" id="L166">            logger.info(&quot;User account is expired&quot;);</span>
+
+<span class="nc" id="L168">            throw new AccountExpiredException(messages.getMessage(</span>
+                    &quot;AbstractUserDetailsAuthenticationProvider.expired&quot;,
+                    &quot;User account has expired&quot;));
+        }
+<span class="nc bnc" id="L172" title="All 2 branches missed.">        if (!user.isCredentialsNonExpired()) {</span>
+<span class="nc" id="L173">            logger.info(&quot;User account credentials have expired&quot;);</span>
+
+<span class="nc" id="L175">            throw new CredentialsExpiredException(messages.getMessage(</span>
+                    &quot;AbstractUserDetailsAuthenticationProvider.credentialsExpired&quot;,
+                    &quot;User credentials have expired&quot;));
+        }
+<span class="nc" id="L179">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

@@ -1,0 +1,324 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../jacoco-resources/report.gif" type="image/gif"/><title>TransferPoolBusiness.java</title><link rel="stylesheet" href="../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../index.html" class="el_report">coverage</a> &gt; <a href="../index.html" class="el_bundle">vip-datamanager</a> &gt; <a href="index.source.html" class="el_package">fr.insalyon.creatis.vip.datamanager.server.business</a> &gt; <span class="el_source">TransferPoolBusiness.java</span></div><h1>TransferPoolBusiness.java</h1><pre class="source lang-java linenums">/*
+ * Copyright and authors: see LICENSE.txt in base repository.
+ *
+ * This software is a web portal for pipeline execution on distributed systems.
+ *
+ * This software is governed by the CeCILL-B license under French law and
+ * abiding by the rules of distribution of free software.  You can  use,
+ * modify and/ or redistribute the software under the terms of the CeCILL-B
+ * license as circulated by CEA, CNRS and INRIA at the following URL
+ * &quot;http://www.cecill.info&quot;.
+ *
+ * As a counterpart to the access to the source code and  rights to copy,
+ * modify and redistribute granted by the license, users are provided only
+ * with a limited warranty  and the software's author,  the holder of the
+ * economic rights,  and the successive licensors  have only  limited
+ * liability.
+ *
+ * In this respect, the user's attention is drawn to the risks associated
+ * with loading,  using,  modifying and/or developing or reproducing the
+ * software by the user in light of its specific status of free software,
+ * that may mean  that it is complicated to manipulate,  and  that  also
+ * therefore means  that it is reserved for developers  and  experienced
+ * professionals having in-depth computer knowledge. Users are therefore
+ * encouraged to load and test the software's suitability as regards their
+ * requirements in conditions enabling the security of their systems and/or
+ * data to be ensured and,  more generally, to use and operate it in the
+ * same conditions as regards security.
+ *
+ * The fact that you are presently reading this means that you have had
+ * knowledge of the CeCILL-B license and that you accept its terms.
+ */
+package fr.insalyon.creatis.vip.datamanager.server.business;
+
+import fr.insalyon.creatis.grida.client.GRIDAClientException;
+import fr.insalyon.creatis.grida.client.GRIDAPoolClient;
+import fr.insalyon.creatis.grida.common.bean.Operation;
+import fr.insalyon.creatis.vip.core.client.bean.User;
+import fr.insalyon.creatis.vip.core.server.business.BusinessException;
+import fr.insalyon.creatis.vip.core.server.business.Server;
+import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
+import fr.insalyon.creatis.vip.datamanager.client.bean.PoolOperation;
+import fr.insalyon.creatis.vip.datamanager.client.bean.PoolOperation.Type;
+import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerException;
+import org.apache.commons.io.FilenameUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+
+/**
+ *
+ * @author Rafael Silva
+ */
+@Service
+@Transactional
+public class TransferPoolBusiness {
+
+<span class="fc" id="L65">    private final Logger logger = LoggerFactory.getLogger(getClass());</span>
+
+    private Server serverConfiguration;
+    private LFCBusiness lfcBusiness;
+    private GRIDAPoolClient gridaPoolClient;
+    private LfcPathsBusiness lfcPathsBusiness;
+
+    @Autowired
+<span class="fc" id="L73">    public TransferPoolBusiness(Server serverConfiguration, LFCBusiness lfcBusiness, GRIDAPoolClient gridaPoolClient, LfcPathsBusiness lfcPathsBusiness) {</span>
+<span class="fc" id="L74">        this.serverConfiguration = serverConfiguration;</span>
+<span class="fc" id="L75">        this.lfcBusiness = lfcBusiness;</span>
+<span class="fc" id="L76">        this.gridaPoolClient = gridaPoolClient;</span>
+<span class="fc" id="L77">        this.lfcPathsBusiness = lfcPathsBusiness;</span>
+<span class="fc" id="L78">    }</span>
+
+    public List&lt;PoolOperation&gt; getOperations(
+            String email, Date date, String currentUserFolder)
+            throws BusinessException {
+
+        try {
+<span class="nc" id="L85">            List&lt;PoolOperation&gt; poolOperations = new ArrayList&lt;&gt;();</span>
+
+<span class="nc bnc" id="L87" title="All 2 branches missed.">            for (Operation operation : gridaPoolClient.getOperationsLimitedListByUserAndDate(</span>
+                    email, DataManagerConstants.MAX_OPERATIONS_LIMIT, date)) {
+
+<span class="nc bnc" id="L90" title="All 2 branches missed.">                if (operation.getType() != Operation.Type.Delete) {</span>
+<span class="nc" id="L91">                    poolOperations.add(processOperation(operation, currentUserFolder));</span>
+                }
+<span class="nc" id="L93">            }</span>
+<span class="nc" id="L94">            return poolOperations;</span>
+
+<span class="nc" id="L96">        } catch (DataManagerException ex) {</span>
+<span class="nc" id="L97">            throw new BusinessException(ex);</span>
+<span class="nc" id="L98">        } catch (GRIDAClientException ex) {</span>
+<span class="nc" id="L99">            logger.error(&quot;Error getting operations for {} since {}&quot;, email, date, ex);</span>
+<span class="nc" id="L100">            throw new BusinessException(ex);</span>
+        }
+    }
+
+    public List&lt;PoolOperation&gt; getOperations(String currentUserFolder)
+            throws BusinessException {
+
+        try {
+<span class="nc" id="L108">            List&lt;PoolOperation&gt; poolOperations = new ArrayList&lt;&gt;();</span>
+
+<span class="nc bnc" id="L110" title="All 2 branches missed.">            for (Operation operation : gridaPoolClient.getAllOperations()) {</span>
+<span class="nc" id="L111">                poolOperations.add(</span>
+<span class="nc" id="L112">                    processOperation(operation, currentUserFolder));</span>
+<span class="nc" id="L113">            }</span>
+
+<span class="nc" id="L115">            return poolOperations;</span>
+<span class="nc" id="L116">        } catch (DataManagerException ex) {</span>
+<span class="nc" id="L117">            throw new BusinessException(ex);</span>
+<span class="nc" id="L118">        } catch (GRIDAClientException ex) {</span>
+<span class="nc" id="L119">            logger.error(&quot;Error getting all operations&quot;, ex);</span>
+<span class="nc" id="L120">            throw new BusinessException(ex);</span>
+        }
+    }
+
+    public PoolOperation getOperationById(
+            String operationId, String currentUserFolder)
+            throws BusinessException {
+
+        try {
+<span class="nc" id="L129">            return processOperation(</span>
+<span class="nc" id="L130">                    gridaPoolClient.getOperationById(operationId),</span>
+                    currentUserFolder);
+<span class="nc" id="L132">        } catch (DataManagerException ex) {</span>
+<span class="nc" id="L133">            throw new BusinessException(ex);</span>
+<span class="nc" id="L134">        } catch (GRIDAClientException ex) {</span>
+<span class="nc" id="L135">            logger.error(&quot;Error getting operation {}&quot;, operationId, ex);</span>
+<span class="nc" id="L136">            throw new BusinessException(ex);</span>
+        }
+    }
+
+    public PoolOperation getDownloadPoolOperation(String operationId)
+            throws BusinessException {
+        try {
+<span class="nc" id="L143">            Operation operation = gridaPoolClient.getOperationById(operationId);</span>
+<span class="nc bnc" id="L144" title="All 2 branches missed.">            if (operation.getType() != Operation.Type.Download) {</span>
+<span class="nc" id="L145">                logger.error(&quot;Not a download operation {}&quot;, operationId);</span>
+<span class="nc" id="L146">                throw new BusinessException(&quot;Wrong operation type for download&quot;);</span>
+            }
+<span class="nc" id="L148">            SimpleDateFormat dateFormat = new SimpleDateFormat(&quot;MMMM d, yyyy HH:mm&quot;);</span>
+<span class="nc" id="L149">            PoolOperation.Status status = PoolOperation.Status.valueOf(operation.getStatus().name());</span>
+<span class="nc" id="L150">            return new PoolOperation(operation.getId(), operation.getRegistration(),</span>
+<span class="nc" id="L151">                    dateFormat.format(operation.getRegistration()), operation.getSource(), operation.getDest(),</span>
+<span class="nc" id="L152">                    Type.Download, status, operation.getUser(), operation.getProgress());</span>
+<span class="nc" id="L153">        } catch (GRIDAClientException ex) {</span>
+<span class="nc" id="L154">            logger.error(&quot;Error getting download operation {}&quot;, operationId, ex);</span>
+<span class="nc" id="L155">            throw new BusinessException(ex);</span>
+        }
+    }
+
+    private PoolOperation processOperation(
+            Operation operation, String currentUserFolder)
+            throws DataManagerException {
+
+<span class="nc" id="L163">        SimpleDateFormat dateFormat = new SimpleDateFormat(&quot;MMMM d, yyyy HH:mm&quot;);</span>
+<span class="nc" id="L164">        String source = &quot;&quot;;</span>
+<span class="nc" id="L165">        String dest = &quot;&quot;;</span>
+<span class="nc" id="L166">        PoolOperation.Type type = null;</span>
+<span class="nc" id="L167">        PoolOperation.Status status = PoolOperation.Status.valueOf(operation.getStatus().name());</span>
+
+<span class="nc bnc" id="L169" title="All 2 branches missed.">        if (operation.getType() == Operation.Type.Upload) {</span>
+<span class="nc" id="L170">            type = PoolOperation.Type.Upload;</span>
+<span class="nc" id="L171">            source = FilenameUtils.getName(operation.getSource());</span>
+<span class="nc" id="L172">            dest = lfcPathsBusiness.parseRealDir(</span>
+<span class="nc" id="L173">                    operation.getDest(), currentUserFolder);</span>
+<span class="nc bnc" id="L174" title="All 2 branches missed.">        } else if (operation.getType() == Operation.Type.Delete) {</span>
+<span class="nc" id="L175">            type = PoolOperation.Type.Delete;</span>
+<span class="nc" id="L176">            source = lfcPathsBusiness.parseRealDir(</span>
+<span class="nc" id="L177">                    operation.getSource(), currentUserFolder);</span>
+        } else {
+<span class="nc" id="L179">            type = PoolOperation.Type.Download;</span>
+<span class="nc" id="L180">            dest = &quot;Platform&quot;;</span>
+<span class="nc bnc" id="L181" title="All 2 branches missed.">            source = operation.getType() == Operation.Type.Download</span>
+<span class="nc" id="L182">                    ? lfcPathsBusiness.parseRealDir(</span>
+<span class="nc" id="L183">                        operation.getSource(), currentUserFolder)</span>
+<span class="nc" id="L184">                    : FilenameUtils.getBaseName(operation.getDest());</span>
+        }
+
+<span class="nc" id="L187">        return new PoolOperation(operation.getId(), operation.getRegistration(),</span>
+<span class="nc" id="L188">                dateFormat.format(operation.getRegistration()), source, dest,</span>
+<span class="nc" id="L189">                type, status, operation.getUser(), operation.getProgress());</span>
+    }
+
+    public void removeOperations(List&lt;String&gt; ids) throws BusinessException {
+
+        try {
+
+<span class="nc bnc" id="L196" title="All 2 branches missed.">            for (String id : ids) {</span>
+<span class="nc" id="L197">                gridaPoolClient.removeOperationById(id);</span>
+<span class="nc" id="L198">            }</span>
+
+<span class="nc" id="L200">        } catch (GRIDAClientException ex) {</span>
+<span class="nc" id="L201">            logger.error(&quot;Error removing operations {}&quot;, ids, ex);</span>
+<span class="nc" id="L202">            throw new BusinessException(ex);</span>
+<span class="nc" id="L203">        }</span>
+<span class="nc" id="L204">    }</span>
+
+    public void removeUserOperations(String email) throws BusinessException {
+
+        try {
+<span class="nc" id="L209">            gridaPoolClient.removeOperationsByUser(email);</span>
+
+<span class="nc" id="L211">        } catch (GRIDAClientException ex) {</span>
+<span class="nc" id="L212">            logger.error(&quot;Error removing operations for {}&quot;, email, ex);</span>
+<span class="nc" id="L213">            throw new BusinessException(ex);</span>
+<span class="nc" id="L214">        }</span>
+<span class="nc" id="L215">    }</span>
+
+    public void removeOperationById(String id) throws BusinessException {
+
+        try {
+<span class="nc" id="L220">            gridaPoolClient.removeOperationById(id);</span>
+
+<span class="nc" id="L222">        } catch (GRIDAClientException ex) {</span>
+<span class="nc" id="L223">            logger.error(&quot;Error removing operations {}&quot;, id, ex);</span>
+<span class="nc" id="L224">            throw new BusinessException(ex);</span>
+<span class="nc" id="L225">        }</span>
+<span class="nc" id="L226">    }</span>
+
+    public String downloadFile(User user, String remoteFile) throws BusinessException {
+
+        try {
+<span class="nc" id="L231">            lfcBusiness.getModificationDate(user, remoteFile);</span>
+
+<span class="nc" id="L233">            String remotePath = lfcPathsBusiness.parseBaseDir(user, remoteFile);</span>
+<span class="nc" id="L234">            String localDirPath = lfcPathsBusiness.getLocalDirForGridaFileDownload(remotePath);</span>
+
+<span class="nc" id="L236">            return gridaPoolClient.downloadFile(remotePath, localDirPath, user.getEmail());</span>
+
+<span class="nc" id="L238">        } catch (DataManagerException ex) {</span>
+<span class="nc" id="L239">            throw new BusinessException(ex);</span>
+<span class="nc" id="L240">        } catch (GRIDAClientException ex) {</span>
+<span class="nc" id="L241">            logger.error(&quot;Error downloading file {} for {}&quot;, remoteFile, user, ex);</span>
+<span class="nc" id="L242">            throw new BusinessException(ex);</span>
+        }
+    }
+
+    public String downloadFiles(
+            User user, List&lt;String&gt; remoteFiles, String packName)
+            throws BusinessException {
+
+        try {
+<span class="nc" id="L251">            lfcBusiness.getModificationDate(user, remoteFiles);</span>
+
+<span class="nc" id="L253">            List&lt;String&gt; remotePaths = new ArrayList&lt;&gt;();</span>
+<span class="nc bnc" id="L254" title="All 2 branches missed.">            for (String remoteFile : remoteFiles) {</span>
+<span class="nc" id="L255">                remotePaths.add(</span>
+<span class="nc" id="L256">                        lfcPathsBusiness.parseBaseDir(user, remoteFile));</span>
+<span class="nc" id="L257">            }</span>
+<span class="nc" id="L258">            String localDirPath =</span>
+<span class="nc" id="L259">                    lfcPathsBusiness.getLocalDirForGridaMultiFilesDownload(packName);</span>
+
+<span class="nc" id="L261">            return gridaPoolClient.downloadFiles(remotePaths.toArray(new String[]{}),</span>
+<span class="nc" id="L262">                    localDirPath, user.getEmail());</span>
+
+<span class="nc" id="L264">        } catch (DataManagerException ex) {</span>
+<span class="nc" id="L265">            throw new BusinessException(ex);</span>
+<span class="nc" id="L266">        } catch (GRIDAClientException ex) {</span>
+<span class="nc" id="L267">            logger.error(&quot;Error downloading files {} for {}&quot;, remoteFiles, user, ex);</span>
+<span class="nc" id="L268">            throw new BusinessException(ex);</span>
+        }
+    }
+
+    public String downloadFolder(User user, String remoteFolder)
+            throws BusinessException {
+
+        try {
+<span class="nc" id="L276">            lfcBusiness.getModificationDate(user, remoteFolder);</span>
+
+<span class="nc" id="L278">            String remotePath = lfcPathsBusiness.parseBaseDir(user, remoteFolder);</span>
+<span class="nc" id="L279">            String localDirPath = lfcPathsBusiness.getLocalDirForGridaFolderDownload(remotePath);</span>
+<span class="nc" id="L280">            return gridaPoolClient.downloadFolder(</span>
+<span class="nc" id="L281">                    remotePath, localDirPath, user.getEmail());</span>
+
+<span class="nc" id="L283">        } catch (DataManagerException ex) {</span>
+<span class="nc" id="L284">            throw new BusinessException(ex);</span>
+<span class="nc" id="L285">        } catch (GRIDAClientException ex) {</span>
+<span class="nc" id="L286">            logger.error(&quot;Error downloading folder {} for {}&quot;, remoteFolder, user, ex);</span>
+<span class="nc" id="L287">            throw new BusinessException(ex);</span>
+        }
+    }
+
+    public String uploadFile(User user, String localFilePath, String remoteFile)
+            throws BusinessException {
+
+        try {
+<span class="nc" id="L295">            String remotePath = lfcPathsBusiness.parseBaseDir(user, remoteFile);</span>
+<span class="nc" id="L296">            return gridaPoolClient.uploadFile(localFilePath, remotePath, user.getEmail());</span>
+<span class="nc" id="L297">        } catch (DataManagerException ex) {</span>
+<span class="nc" id="L298">            throw new BusinessException(ex);</span>
+<span class="nc" id="L299">        } catch (GRIDAClientException ex) {</span>
+<span class="nc" id="L300">            logger.error(&quot;Error uploading file {} to {} for {}&quot;,</span>
+                    localFilePath, remoteFile, user, ex);
+<span class="nc" id="L302">            throw new BusinessException(ex);</span>
+        }
+    }
+
+    public void delete(User user, String... paths)
+        throws BusinessException {
+
+        try {
+
+<span class="nc bnc" id="L311" title="All 2 branches missed.">            for (String path : paths) {</span>
+<span class="nc" id="L312">                String remotePath = lfcPathsBusiness.parseBaseDir(user, path);</span>
+<span class="nc" id="L313">                gridaPoolClient.delete(remotePath, user.getEmail());</span>
+            }
+<span class="nc" id="L315">        } catch (DataManagerException ex) {</span>
+<span class="nc" id="L316">            throw new BusinessException(ex);</span>
+<span class="nc" id="L317">        } catch (GRIDAClientException ex) {</span>
+<span class="nc" id="L318">            logger.error(&quot;Error deleting files {} for {}&quot;,</span>
+<span class="nc" id="L319">                    Arrays.toString(paths), user, ex);</span>
+<span class="nc" id="L320">            throw new BusinessException(ex);</span>
+<span class="nc" id="L321">        }</span>
+<span class="nc" id="L322">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

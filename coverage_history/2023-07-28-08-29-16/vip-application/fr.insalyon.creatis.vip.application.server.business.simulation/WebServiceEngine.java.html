@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../jacoco-resources/report.gif" type="image/gif"/><title>WebServiceEngine.java</title><link rel="stylesheet" href="../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../index.html" class="el_report">coverage</a> &gt; <a href="../index.html" class="el_bundle">vip-application</a> &gt; <a href="index.source.html" class="el_package">fr.insalyon.creatis.vip.application.server.business.simulation</a> &gt; <span class="el_source">WebServiceEngine.java</span></div><h1>WebServiceEngine.java</h1><pre class="source lang-java linenums">/*
+ * Copyright and authors: see LICENSE.txt in base repository.
+ *
+ * This software is a web portal for pipeline execution on distributed systems.
+ *
+ * This software is governed by the CeCILL-B license under French law and
+ * abiding by the rules of distribution of free software.  You can  use, 
+ * modify and/ or redistribute the software under the terms of the CeCILL-B
+ * license as circulated by CEA, CNRS and INRIA at the following URL
+ * &quot;http://www.cecill.info&quot;. 
+ *
+ * As a counterpart to the access to the source code and  rights to copy,
+ * modify and redistribute granted by the license, users are provided only
+ * with a limited warranty  and the software's author,  the holder of the
+ * economic rights,  and the successive licensors  have only  limited
+ * liability. 
+ *
+ * In this respect, the user's attention is drawn to the risks associated
+ * with loading,  using,  modifying and/or developing or reproducing the
+ * software by the user in light of its specific status of free software,
+ * that may mean  that it is complicated to manipulate,  and  that  also
+ * therefore means  that it is reserved for developers  and  experienced
+ * professionals having in-depth computer knowledge. Users are therefore
+ * encouraged to load and test the software's suitability as regards their
+ * requirements in conditions enabling the security of their systems and/or 
+ * data to be ensured and,  more generally, to use and operate it in the 
+ * same conditions as regards security. 
+ *
+ * The fact that you are presently reading this means that you have had
+ * knowledge of the CeCILL-B license and that you accept its terms.
+ */
+package fr.insalyon.creatis.vip.application.server.business.simulation;
+
+import fr.insalyon.creatis.vip.application.client.view.monitor.SimulationStatus;
+import fr.insalyon.creatis.vip.application.server.business.util.ProxyUtil;
+import fr.insalyon.creatis.vip.core.server.business.Server;
+import java.io.File;
+import java.io.InputStream;
+import java.util.List;
+import localhost.moteur_service_wsdl.Moteur_ServiceLocator;
+import org.apache.axis.EngineConfiguration;
+import org.apache.axis.configuration.FileProvider;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Service;
+
+/**
+ * Communicates with a moteur server through a web service.
+ *
+ * Each call is relative to a unique endpoint and must create a new instance,
+ * so this needs the spring prototype scope.
+ *
+ * @author Rafael Ferreira da Silva, Ibrahim kallel
+ */
+@Service
+@Scope(&quot;prototype&quot;)
+public class WebServiceEngine extends WorkflowEngineInstantiator {
+
+    // URI address of the Moteur Web service
+    private String addressWS;
+    // settings to send to the web service.
+    private String settings;
+
+    public String getAddressWS() {
+<span class="nc" id="L65">        return addressWS;</span>
+    }
+
+    public void setAddressWS(String addressWS) {
+<span class="nc" id="L69">        this.addressWS = addressWS;</span>
+<span class="nc" id="L70">    }</span>
+
+    public String getSettings() {
+<span class="nc" id="L73">        return settings;</span>
+    }
+
+    public void setSettings(String settings) {
+<span class="nc" id="L77">        this.settings = settings;</span>
+<span class="nc" id="L78">    }</span>
+
+    public WebServiceEngine() {
+<span class="nc" id="L81">        this(null, null);</span>
+<span class="nc" id="L82">    }</span>
+
+    private Server server;
+
+    private WebServiceEngine(File workflow, List&lt;ParameterSweep&gt; parameters) {
+<span class="nc" id="L87">        super(workflow, parameters);</span>
+<span class="nc" id="L88">    }</span>
+
+    @Autowired
+    public final void setServer(Server server) {
+<span class="nc" id="L92">        this.server = server;</span>
+<span class="nc" id="L93">    }</span>
+
+    /**
+     * Call the WS that is going to run the workflow and return the HTTP link
+     * that can be used to monitor the workflow status.
+     *
+     * @return the HTTP link that shows the workflow current status
+     */
+    @Override
+    public String launch(String proxyFileName, String userDN)
+            throws
+            java.rmi.RemoteException,
+            javax.xml.rpc.ServiceException {
+
+<span class="nc" id="L107">        System.setProperty(&quot;javax.net.ssl.trustStore&quot;, server.getTruststoreFile());</span>
+<span class="nc" id="L108">        System.setProperty(&quot;javax.net.ssl.trustStorePassword&quot;, server.getTruststorePass());</span>
+<span class="nc" id="L109">        System.setProperty(&quot;javax.net.ssl.trustStoreType&quot;, &quot;JKS&quot;);</span>
+
+        // String settings = &quot;This is going to contain settings...&quot;;
+        // Get Proxy from current User's context
+<span class="nc" id="L113">        String strProxy = ProxyUtil.readAsString(proxyFileName);</span>
+
+        //configure WS with the specific wsdd file (fix pb of conflict with grid service)
+<span class="nc" id="L116">        String resourcename = &quot;moteur-client-config.wsdd&quot;;</span>
+<span class="nc" id="L117">        InputStream is = this.getClass().getClassLoader().getResourceAsStream(resourcename);</span>
+<span class="nc" id="L118">        EngineConfiguration engineConfig = new FileProvider(is);</span>
+<span class="nc" id="L119">        Moteur_ServiceLocator wfS = new Moteur_ServiceLocator(addressWS, engineConfig);</span>
+
+<span class="nc" id="L121">        return wfS.getmoteur_service().workflowSubmit(workflow, input, strProxy, settings);</span>
+    }
+
+    @Override
+    public void kill(String workflowID)
+            throws
+            java.rmi.RemoteException,
+            javax.xml.rpc.ServiceException {
+
+<span class="nc" id="L130">        System.setProperty(&quot;javax.net.ssl.trustStore&quot;, server.getTruststoreFile());</span>
+<span class="nc" id="L131">        System.setProperty(&quot;javax.net.ssl.trustStorePassword&quot;, server.getTruststorePass());</span>
+<span class="nc" id="L132">        System.setProperty(&quot;javax.net.ssl.trustStoreType&quot;, &quot;JKS&quot;);</span>
+
+<span class="nc" id="L134">        String resourcename = &quot;moteur-client-config.wsdd&quot;;</span>
+<span class="nc" id="L135">        InputStream is = this.getClass().getClassLoader().getResourceAsStream(resourcename);</span>
+<span class="nc" id="L136">        EngineConfiguration engineConfig = new FileProvider(is);</span>
+<span class="nc" id="L137">        Moteur_ServiceLocator wfS = new Moteur_ServiceLocator(addressWS, engineConfig);</span>
+
+<span class="nc" id="L139">        wfS.getmoteur_service().killWorkflow(workflowID);</span>
+<span class="nc" id="L140">    }</span>
+
+    @Override
+    public SimulationStatus getStatus(String workflowID)
+            throws
+            java.rmi.RemoteException,
+            javax.xml.rpc.ServiceException {
+
+<span class="nc" id="L148">        System.setProperty(&quot;javax.net.ssl.trustStore&quot;, server.getTruststoreFile());</span>
+<span class="nc" id="L149">        System.setProperty(&quot;javax.net.ssl.trustStorePassword&quot;, server.getTruststorePass());</span>
+<span class="nc" id="L150">        System.setProperty(&quot;javax.net.ssl.trustStoreType&quot;, &quot;JKS&quot;);</span>
+
+<span class="nc" id="L152">        String resourcename = &quot;moteur-client-config.wsdd&quot;;</span>
+<span class="nc" id="L153">        InputStream is = this.getClass().getClassLoader().getResourceAsStream(resourcename);</span>
+<span class="nc" id="L154">        EngineConfiguration engineConfig = new FileProvider(is);</span>
+<span class="nc" id="L155">        Moteur_ServiceLocator wfS = new Moteur_ServiceLocator(addressWS, engineConfig);</span>
+
+<span class="nc" id="L157">        String workflowStatus = wfS.getmoteur_service().getWorkflowStatus(workflowID);</span>
+<span class="nc" id="L158">        MoteurStatus moteurStatus = MoteurStatus.valueOf(workflowStatus);</span>
+<span class="nc bnc" id="L159" title="All 5 branches missed.">        switch (moteurStatus) {</span>
+
+            case RUNNING:
+<span class="nc" id="L162">                return SimulationStatus.Running;</span>
+            case COMPLETE:
+<span class="nc" id="L164">                return SimulationStatus.Completed;</span>
+            case TERMINATED:
+<span class="nc" id="L166">                return SimulationStatus.Killed;</span>
+            case UNKNOWN:
+<span class="nc" id="L168">                return SimulationStatus.Unknown;</span>
+            default:
+<span class="nc" id="L170">                return SimulationStatus.Unknown;</span>
+        }
+    }
+
+<span class="nc" id="L174">    static enum MoteurStatus {</span>
+
+<span class="nc" id="L176">        RUNNING, COMPLETE, TERMINATED, UNKNOWN</span>
+    };
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../jacoco-resources/report.gif" type="image/gif"/><title>EngineData.java</title><link rel="stylesheet" href="../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../index.html" class="el_report">coverage</a> &gt; <a href="../index.html" class="el_bundle">vip-application</a> &gt; <a href="index.source.html" class="el_package">fr.insalyon.creatis.vip.application.server.dao.mysql</a> &gt; <span class="el_source">EngineData.java</span></div><h1>EngineData.java</h1><pre class="source lang-java linenums">/*
+ * Copyright and authors: see LICENSE.txt in base repository.
+ *
+ * This software is a web portal for pipeline execution on distributed systems.
+ *
+ * This software is governed by the CeCILL-B license under French law and
+ * abiding by the rules of distribution of free software.  You can  use,
+ * modify and/ or redistribute the software under the terms of the CeCILL-B
+ * license as circulated by CEA, CNRS and INRIA at the following URL
+ * &quot;http://www.cecill.info&quot;.
+ *
+ * As a counterpart to the access to the source code and  rights to copy,
+ * modify and redistribute granted by the license, users are provided only
+ * with a limited warranty  and the software's author,  the holder of the
+ * economic rights,  and the successive licensors  have only  limited
+ * liability.
+ *
+ * In this respect, the user's attention is drawn to the risks associated
+ * with loading,  using,  modifying and/or developing or reproducing the
+ * software by the user in light of its specific status of free software,
+ * that may mean  that it is complicated to manipulate,  and  that  also
+ * therefore means  that it is reserved for developers  and  experienced
+ * professionals having in-depth computer knowledge. Users are therefore
+ * encouraged to load and test the software's suitability as regards their
+ * requirements in conditions enabling the security of their systems and/or
+ * data to be ensured and,  more generally, to use and operate it in the
+ * same conditions as regards security.
+ *
+ * The fact that you are presently reading this means that you have had
+ * knowledge of the CeCILL-B license and that you accept its terms.
+ */
+package fr.insalyon.creatis.vip.application.server.dao.mysql;
+
+import fr.insalyon.creatis.vip.application.client.bean.Engine;
+import fr.insalyon.creatis.vip.application.server.dao.EngineDAO;
+import fr.insalyon.creatis.vip.core.server.dao.DAOException;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.support.JdbcDaoSupport;
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
+
+import javax.sql.DataSource;
+
+/**
+ *
+ * @author Rafael Ferreira da Silva
+ */
+@Repository
+@Transactional
+<span class="fc" id="L58">public class EngineData extends JdbcDaoSupport implements EngineDAO {</span>
+
+<span class="fc" id="L60">    private final Logger logger = LoggerFactory.getLogger(getClass());</span>
+
+    @Autowired
+    public void useDataSource(DataSource dataSource) {
+<span class="fc" id="L64">        setDataSource(dataSource);</span>
+<span class="fc" id="L65">    }</span>
+
+    @Override
+    public void add(Engine engine) throws DAOException {
+
+        try {
+<span class="fc" id="L71">            PreparedStatement ps = getConnection().prepareStatement(</span>
+                    &quot;INSERT INTO VIPEngines(name, endpoint, status) &quot;
+                    + &quot;VALUES (?, ?, ?)&quot;);
+
+<span class="fc" id="L75">            ps.setString(1, engine.getName());</span>
+<span class="fc" id="L76">            ps.setString(2, engine.getEndpoint());</span>
+<span class="fc" id="L77">            ps.setString(3, engine.getStatus());</span>
+<span class="fc" id="L78">            ps.execute();</span>
+<span class="fc" id="L79">            ps.close();</span>
+
+<span class="nc" id="L81">        } catch (SQLException ex) {</span>
+<span class="nc bnc" id="L82" title="All 2 branches missed.">            if (ex.getMessage().contains(&quot;Duplicate entry&quot;)) {</span>
+<span class="nc" id="L83">                logger.error(&quot;An engine named \&quot;{}\&quot; already exists.&quot;, engine.getName());</span>
+<span class="nc" id="L84">                throw new DAOException(&quot;An engine named \&quot;&quot; + engine.getName() + &quot;\&quot; already exists.&quot;);</span>
+            } else {
+<span class="nc" id="L86">                logger.error(&quot;Error adding engine {}&quot;, engine.getEndpoint(), ex);</span>
+<span class="nc" id="L87">                throw new DAOException(ex);</span>
+            }
+<span class="fc" id="L89">        }</span>
+<span class="fc" id="L90">    }</span>
+
+    @Override
+    public void update(Engine engine) throws DAOException {
+
+        try {
+<span class="nc" id="L96">            PreparedStatement ps = getConnection().prepareStatement(</span>
+                    &quot;UPDATE VIPEngines SET endpoint = ?, &quot;
+                    + &quot;status = ? &quot;
+                    + &quot;WHERE name = ?&quot;);
+
+<span class="nc" id="L101">            ps.setString(1, engine.getEndpoint());</span>
+<span class="nc" id="L102">            ps.setString(2, engine.getStatus());</span>
+<span class="nc" id="L103">            ps.setString(3, engine.getName());</span>
+<span class="nc" id="L104">            ps.executeUpdate();</span>
+<span class="nc" id="L105">            ps.close();</span>
+
+<span class="nc" id="L107">        } catch (SQLException ex) {</span>
+<span class="nc" id="L108">            logger.error(&quot;Error updating engine {} to {}&quot;, engine.getName(), engine.getEndpoint(), ex);</span>
+<span class="nc" id="L109">            throw new DAOException(ex);</span>
+<span class="nc" id="L110">        }</span>
+<span class="nc" id="L111">    }</span>
+
+    @Override
+    public void remove(String name) throws DAOException {
+
+        try {
+<span class="nc" id="L117">            PreparedStatement ps = getConnection().prepareStatement(&quot;DELETE &quot;</span>
+                    + &quot;FROM VIPEngines WHERE name=?&quot;);
+
+<span class="nc" id="L120">            ps.setString(1, name);</span>
+<span class="nc" id="L121">            ps.execute();</span>
+<span class="nc" id="L122">            ps.close();</span>
+
+<span class="nc" id="L124">        } catch (SQLException ex) {</span>
+<span class="nc" id="L125">            logger.error(&quot;Error removing engine {}&quot;, name, ex);</span>
+<span class="nc" id="L126">            throw new DAOException(ex);</span>
+<span class="nc" id="L127">        }</span>
+<span class="nc" id="L128">    }</span>
+
+    @Override
+    public List&lt;Engine&gt; get() throws DAOException {
+
+        try {
+<span class="fc" id="L134">            PreparedStatement ps = getConnection().prepareStatement(&quot;SELECT &quot;</span>
+                    + &quot;name, endpoint, status FROM VIPEngines &quot;
+                    + &quot;ORDER BY name&quot;);
+
+<span class="fc" id="L138">            ResultSet rs = ps.executeQuery();</span>
+<span class="fc" id="L139">            List&lt;Engine&gt; list = new ArrayList&lt;Engine&gt;();</span>
+
+<span class="fc bfc" id="L141" title="All 2 branches covered.">            while (rs.next()) {</span>
+<span class="fc" id="L142">                list.add(new Engine(rs.getString(&quot;name&quot;), rs.getString(&quot;endpoint&quot;), rs.getString(&quot;status&quot;)));</span>
+            }
+<span class="fc" id="L144">            return list;</span>
+
+<span class="nc" id="L146">        } catch (SQLException ex) {</span>
+<span class="nc" id="L147">            logger.error(&quot;Error getting all engines&quot;, ex);</span>
+<span class="nc" id="L148">            throw new DAOException(ex);</span>
+        }
+    }
+
+    @Override
+    public List&lt;Engine&gt; getByClass(String className) throws DAOException {
+
+<span class="nc" id="L155">        String status= &quot;enabled&quot;;</span>
+        try {
+<span class="nc" id="L157">            PreparedStatement ps = getConnection().prepareStatement(&quot;SELECT &quot;</span>
+                    + &quot;e.name AS engineName, endpoint, status &quot;
+                    + &quot;FROM VIPEngines e, VIPClassesEngines c &quot;
+                    + &quot;WHERE e.name = c.engine AND &quot;
+                    + &quot;e.status = ? AND &quot;
+                    + &quot;c.class = ?&quot;);
+<span class="nc" id="L163">            ps.setString(1, status);</span>
+<span class="nc" id="L164">            ps.setString(2, className);</span>
+
+<span class="nc" id="L166">            ResultSet rs = ps.executeQuery();</span>
+
+<span class="nc" id="L168">            List&lt;Engine&gt; list = new ArrayList&lt;Engine&gt;();</span>
+<span class="nc bnc" id="L169" title="All 2 branches missed.">            while (rs.next()) {</span>
+<span class="nc" id="L170">                list.add(new Engine(rs.getString(&quot;engineName&quot;), rs.getString(&quot;endpoint&quot;), rs.getString(&quot;status&quot;)));</span>
+            }
+<span class="nc" id="L172">            ps.close();</span>
+<span class="nc" id="L173">            return list;</span>
+
+<span class="nc" id="L175">        } catch (SQLException ex) {</span>
+<span class="nc" id="L176">            logger.error(&quot;Error getting engines by class {}&quot;, className, ex);</span>
+<span class="nc" id="L177">            throw new DAOException(ex);</span>
+        }
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

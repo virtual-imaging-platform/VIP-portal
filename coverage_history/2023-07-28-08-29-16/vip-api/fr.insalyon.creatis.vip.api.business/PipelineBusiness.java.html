@@ -1,0 +1,253 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../jacoco-resources/report.gif" type="image/gif"/><title>PipelineBusiness.java</title><link rel="stylesheet" href="../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../index.html" class="el_report">coverage</a> &gt; <a href="../index.html" class="el_bundle">vip-api</a> &gt; <a href="index.source.html" class="el_package">fr.insalyon.creatis.vip.api.business</a> &gt; <span class="el_source">PipelineBusiness.java</span></div><h1>PipelineBusiness.java</h1><pre class="source lang-java linenums">/*
+ * Copyright and authors: see LICENSE.txt in base repository.
+ *
+ * This software is a web portal for pipeline execution on distributed systems.
+ *
+ * This software is governed by the CeCILL-B license under French law and
+ * abiding by the rules of distribution of free software.  You can  use,
+ * modify and/ or redistribute the software under the terms of the CeCILL-B
+ * license as circulated by CEA, CNRS and INRIA at the following URL
+ * &quot;http://www.cecill.info&quot;.
+ *
+ * As a counterpart to the access to the source code and  rights to copy,
+ * modify and redistribute granted by the license, users are provided only
+ * with a limited warranty  and the software's author,  the holder of the
+ * economic rights,  and the successive licensors  have only  limited
+ * liability.
+ *
+ * In this respect, the user's attention is drawn to the risks associated
+ * with loading,  using,  modifying and/or developing or reproducing the
+ * software by the user in light of its specific status of free software,
+ * that may mean  that it is complicated to manipulate,  and  that  also
+ * therefore means  that it is reserved for developers  and  experienced
+ * professionals having in-depth computer knowledge. Users are therefore
+ * encouraged to load and test the software's suitability as regards their
+ * requirements in conditions enabling the security of their systems and/or
+ * data to be ensured and,  more generally, to use and operate it in the
+ * same conditions as regards security.
+ *
+ * The fact that you are presently reading this means that you have had
+ * knowledge of the CeCILL-B license and that you accept its terms.
+ */
+package fr.insalyon.creatis.vip.api.business;
+
+import fr.insalyon.creatis.vip.api.CarminProperties;
+import fr.insalyon.creatis.vip.api.exception.ApiException;
+import fr.insalyon.creatis.vip.api.model.ParameterType;
+import fr.insalyon.creatis.vip.api.model.Pipeline;
+import fr.insalyon.creatis.vip.api.model.PipelineParameter;
+import fr.insalyon.creatis.vip.api.exception.ApiException.ApiError;
+import fr.insalyon.creatis.vip.application.client.bean.*;
+import fr.insalyon.creatis.vip.application.server.business.ApplicationBusiness;
+import fr.insalyon.creatis.vip.application.server.business.ClassBusiness;
+import fr.insalyon.creatis.vip.application.server.business.WorkflowBusiness;
+import fr.insalyon.creatis.vip.core.client.bean.User;
+import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
+import fr.insalyon.creatis.vip.core.server.business.BusinessException;
+import fr.insalyon.creatis.vip.publication.client.bean.Publication;
+import fr.insalyon.creatis.vip.publication.server.business.PublicationBusiness;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
+import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.function.Supplier;
+
+import static fr.insalyon.creatis.vip.api.exception.ApiException.ApiError.*;
+
+/**
+ *
+ * @author Tristan Glatard
+ */
+@Service
+public class PipelineBusiness {
+
+<span class="fc" id="L69">    private final Logger logger = LoggerFactory.getLogger(getClass());</span>
+
+    private Environment env;
+
+    private Supplier&lt;User&gt; currentUserProvider;
+    private final WorkflowBusiness workflowBusiness;
+    private final ApplicationBusiness applicationBusiness;
+    private final ClassBusiness classBusiness;
+
+    @Autowired
+    public PipelineBusiness(
+            Supplier&lt;User&gt; currentUserProvider, Environment env,
+            WorkflowBusiness workflowBusiness,
+<span class="fc" id="L82">            ApplicationBusiness applicationBusiness, PublicationBusiness publicationBusiness, ClassBusiness classBusiness) {</span>
+<span class="fc" id="L83">        this.currentUserProvider = currentUserProvider;</span>
+<span class="fc" id="L84">        this.env = env;</span>
+<span class="fc" id="L85">        this.workflowBusiness = workflowBusiness;</span>
+<span class="fc" id="L86">        this.applicationBusiness = applicationBusiness;</span>
+<span class="fc" id="L87">        this.classBusiness = classBusiness;</span>
+<span class="fc" id="L88">    }</span>
+
+    public Pipeline getPipeline(String pipelineId)
+            throws ApiException {
+<span class="nc" id="L92">        Pipeline p = getPipelineWithResultsDirectory(pipelineId);</span>
+
+<span class="nc" id="L94">        p.getParameters().removeIf(</span>
+            param -&gt;
+<span class="nc" id="L96">            param.getName().equals(CoreConstants.RESULTS_DIRECTORY_PARAM_NAME));</span>
+
+<span class="nc" id="L98">        return p;</span>
+    }
+
+    public Pipeline getPipelineWithResultsDirectory(String pipelineId)
+            throws ApiException {
+        try {
+<span class="nc" id="L104">            String applicationName = getApplicationName(pipelineId);</span>
+<span class="nc" id="L105">            String applicationVersion = getApplicationVersion(pipelineId);</span>
+<span class="nc" id="L106">            Pipeline p = getPipelineWithPermissions(</span>
+                    applicationName, applicationVersion);
+
+<span class="nc" id="L109">            Descriptor d = workflowBusiness.getApplicationDescriptor(</span>
+<span class="nc" id="L110">                    currentUserProvider.get(), p.getName(), p.getVersion()); // Be careful, this copies the Gwendia file from LFC.</span>
+<span class="nc" id="L111">            p.setDescription(d.getDescription());</span>
+
+<span class="nc bnc" id="L113" title="All 2 branches missed.">            for (Source s : d.getSources()) {</span>
+<span class="nc" id="L114">                ParameterType sourceType = ParameterType.fromVipType(s.getType());</span>
+<span class="nc bnc" id="L115" title="All 2 branches missed.">                if (&quot;flag&quot;.equalsIgnoreCase(s.getVipTypeRestriction())) {</span>
+<span class="nc" id="L116">                    sourceType = ParameterType.Boolean;</span>
+                }
+<span class="nc" id="L118">                PipelineParameter pp = new PipelineParameter(s.getName(),</span>
+                                                             sourceType,
+<span class="nc" id="L120">                                                             s.isOptional(),</span>
+<span class="nc" id="L121">                                                             false,</span>
+<span class="nc" id="L122">                                                             s.getDefaultValue(),</span>
+<span class="nc" id="L123">                                                             s.getDescription());</span>
+<span class="nc" id="L124">                p.getParameters().add(pp);</span>
+<span class="nc" id="L125">            }</span>
+<span class="nc" id="L126">            return p;</span>
+<span class="nc" id="L127">        } catch (BusinessException ex) {</span>
+<span class="nc" id="L128">            throw new ApiException(ex);</span>
+        }
+    }
+
+    public Pipeline[] listPipelines(String studyIdentifier) throws ApiException {
+
+        try {
+<span class="pc bpc" id="L135" title="1 of 2 branches missed.">            if (studyIdentifier != null) {</span>
+<span class="nc" id="L136">                logger.warn(&quot;Study identifier ({}) was ignored.&quot;, studyIdentifier);</span>
+            }
+<span class="fc" id="L138">            ArrayList&lt;Pipeline&gt; pipelines = new ArrayList&lt;&gt;();</span>
+
+<span class="fc" id="L140">            List&lt;AppClass&gt; classes = classBusiness.getUserClasses(currentUserProvider.get().getEmail(), false);</span>
+<span class="fc" id="L141">            List&lt;String&gt; classNames = new ArrayList&lt;&gt;();</span>
+<span class="pc bpc" id="L142" title="1 of 2 branches missed.">            for (AppClass c : classes) {</span>
+<span class="nc" id="L143">                classNames.add(c.getName());</span>
+<span class="nc" id="L144">            }</span>
+
+<span class="fc" id="L146">            List&lt;Application&gt; applications =</span>
+<span class="fc" id="L147">                applicationBusiness.getApplications(classNames);</span>
+<span class="pc bpc" id="L148" title="1 of 2 branches missed.">            for (Application a : applications) {</span>
+<span class="nc" id="L149">                List&lt;AppVersion&gt; versions =</span>
+<span class="nc" id="L150">                    applicationBusiness.getVersions(a.getName());</span>
+<span class="nc bnc" id="L151" title="All 2 branches missed.">                for (AppVersion av : versions) {</span>
+<span class="nc bnc" id="L152" title="All 2 branches missed.">                    if (isApplicationVersionUsableInApi(av)) {</span>
+<span class="nc" id="L153">                        pipelines.add(</span>
+<span class="nc" id="L154">                                new Pipeline(getPipelineIdentifier(</span>
+<span class="nc" id="L155">                                        a.getName(), av.getVersion()),</span>
+<span class="nc" id="L156">                                        a.getName(), av.getVersion(), true)</span>
+                        );
+                    }
+<span class="nc" id="L159">                }</span>
+<span class="nc" id="L160">            }</span>
+<span class="fc" id="L161">            Pipeline[] array_pipelines = new Pipeline[pipelines.size()];</span>
+<span class="fc" id="L162">            return pipelines.toArray(array_pipelines);</span>
+<span class="nc" id="L163">        } catch (BusinessException ex) {</span>
+<span class="nc" id="L164">            throw new ApiException(ex);</span>
+        }
+    }
+
+    public List&lt;Application&gt; listPublicPipelines() throws ApiException {
+        try {
+<span class="nc" id="L170">             return applicationBusiness.getPublicApplicationsWithGroups();</span>
+<span class="nc" id="L171">        } catch (BusinessException e) {</span>
+<span class="nc" id="L172">            throw new ApiException(e);</span>
+        }
+    }
+
+    public String getPipelineIdentifier(String applicationName, String applicationVersion) {
+<span class="nc" id="L177">        return applicationName + &quot;/&quot; + applicationVersion;</span>
+    }
+
+    public String getApplicationVersion(String pipelineIdentifier) throws ApiException {
+<span class="nc" id="L181">        checkIfValidPipelineIdentifier(pipelineIdentifier);</span>
+<span class="nc" id="L182">        return pipelineIdentifier.substring(pipelineIdentifier.lastIndexOf(&quot;/&quot;) + 1);</span>
+    }
+
+    public String getApplicationName(String pipelineIdentifier) throws ApiException {
+<span class="nc" id="L186">        checkIfValidPipelineIdentifier(pipelineIdentifier);</span>
+<span class="nc" id="L187">        return pipelineIdentifier.substring(0, pipelineIdentifier.lastIndexOf(&quot;/&quot;));</span>
+    }
+
+    private void checkIfValidPipelineIdentifier(String identifier) throws ApiException {
+<span class="nc bnc" id="L191" title="All 2 branches missed.">        if (!identifier.contains(&quot;/&quot;)) {</span>
+<span class="nc" id="L192">            logger.error(&quot;Invalid pipeline identifier {} : missing /&quot;, identifier);</span>
+<span class="nc" id="L193">            throw new ApiException(ApiError.INVALID_PIPELINE_IDENTIFIER, identifier);</span>
+        }
+<span class="nc" id="L195">    }</span>
+
+    private boolean isApplicationVersionUsableInApi(AppVersion appVersion) {
+<span class="nc bnc" id="L198" title="All 2 branches missed.">        if (appVersion.isVisible()) {</span>
+<span class="nc" id="L199">            return true;</span>
+        }
+<span class="nc" id="L201">        List&lt;String&gt; whiteList = Arrays.asList(</span>
+<span class="nc" id="L202">                env.getRequiredProperty(CarminProperties.API_PIPELINE_WHITE_LIST, String[].class));</span>
+<span class="nc" id="L203">        return whiteList.stream().anyMatch(appString -&gt; {</span>
+<span class="nc" id="L204">            String[] splitAppString = appString.split(&quot;/&quot;);</span>
+<span class="nc bnc" id="L205" title="All 2 branches missed.">            if (splitAppString.length != 2) {</span>
+<span class="nc" id="L206">                return false;</span>
+            }
+<span class="nc bnc" id="L208" title="All 2 branches missed.">            return splitAppString[0].equals(appVersion.getApplicationName())</span>
+<span class="nc bnc" id="L209" title="All 2 branches missed.">                    &amp;&amp; splitAppString[1].equals(appVersion.getVersion());</span>
+        });
+    }
+
+    public void checkIfUserCanAccessPipeline(String pipelineId)
+            throws ApiException {
+        try {
+
+<span class="nc" id="L217">            String applicationName = getApplicationName(pipelineId);</span>
+<span class="nc" id="L218">            List&lt;String&gt; userClassNames = classBusiness.getUserClassesName(</span>
+<span class="nc" id="L219">                currentUserProvider.get().getEmail(), false);</span>
+
+<span class="nc" id="L221">            Application a = applicationBusiness.getApplication(applicationName);</span>
+<span class="nc bnc" id="L222" title="All 2 branches missed.">            if (a == null) {</span>
+<span class="nc" id="L223">                logger.error(&quot;Cannot find application {}&quot;, applicationName);</span>
+<span class="nc" id="L224">                throw new ApiException(APPLICATION_NOT_FOUND, applicationName);</span>
+            }
+<span class="nc bnc" id="L226" title="All 2 branches missed.">            for (String applicationClassName : a.getApplicationClasses()) {</span>
+<span class="nc bnc" id="L227" title="All 2 branches missed.">                if (userClassNames.contains(applicationClassName)) {</span>
+<span class="nc" id="L228">                    return;</span>
+                }
+<span class="nc" id="L230">            }</span>
+<span class="nc" id="L231">            logger.error(&quot;User {} not allowed to access application {}&quot;,</span>
+<span class="nc" id="L232">                    currentUserProvider.get(), applicationName);</span>
+<span class="nc" id="L233">            throw new ApiException(NOT_ALLOWED_TO_USE_APPLICATION, applicationName);</span>
+<span class="nc" id="L234">        } catch (BusinessException ex) {</span>
+<span class="nc" id="L235">            throw new ApiException(ex);</span>
+        }
+    }
+
+    private Pipeline getPipelineWithPermissions(
+            String applicationName, String applicationVersion)
+        throws ApiException {
+<span class="nc" id="L242">        Pipeline[] pipelines = listPipelines(&quot;&quot;);</span>
+<span class="nc bnc" id="L243" title="All 2 branches missed.">        for (Pipeline p : pipelines) {</span>
+<span class="nc bnc" id="L244" title="All 4 branches missed.">            if (p.getName().equals(applicationName) &amp;&amp; p.getVersion().equals(applicationVersion)) {</span>
+<span class="nc" id="L245">                return p;</span>
+            }
+        }
+<span class="nc" id="L248">        logger.error(&quot;Pipeline {}/{} doesn't exist or user {} cannot access it&quot;,</span>
+<span class="nc" id="L249">                applicationName, applicationVersion , currentUserProvider.get());</span>
+<span class="nc" id="L250">        throw new ApiException(PIPELINE_NOT_FOUND, applicationName + &quot;/&quot; + applicationVersion);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

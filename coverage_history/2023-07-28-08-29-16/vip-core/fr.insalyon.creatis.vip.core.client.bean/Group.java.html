@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../jacoco-resources/report.gif" type="image/gif"/><title>Group.java</title><link rel="stylesheet" href="../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../index.html" class="el_report">coverage</a> &gt; <a href="../index.html" class="el_bundle">vip-core</a> &gt; <a href="index.source.html" class="el_package">fr.insalyon.creatis.vip.core.client.bean</a> &gt; <span class="el_source">Group.java</span></div><h1>Group.java</h1><pre class="source lang-java linenums">/*
+ * Copyright and authors: see LICENSE.txt in base repository.
+ *
+ * This software is a web portal for pipeline execution on distributed systems.
+ *
+ * This software is governed by the CeCILL-B license under French law and
+ * abiding by the rules of distribution of free software.  You can  use, 
+ * modify and/ or redistribute the software under the terms of the CeCILL-B
+ * license as circulated by CEA, CNRS and INRIA at the following URL
+ * &quot;http://www.cecill.info&quot;. 
+ *
+ * As a counterpart to the access to the source code and  rights to copy,
+ * modify and redistribute granted by the license, users are provided only
+ * with a limited warranty  and the software's author,  the holder of the
+ * economic rights,  and the successive licensors  have only  limited
+ * liability. 
+ *
+ * In this respect, the user's attention is drawn to the risks associated
+ * with loading,  using,  modifying and/or developing or reproducing the
+ * software by the user in light of its specific status of free software,
+ * that may mean  that it is complicated to manipulate,  and  that  also
+ * therefore means  that it is reserved for developers  and  experienced
+ * professionals having in-depth computer knowledge. Users are therefore
+ * encouraged to load and test the software's suitability as regards their
+ * requirements in conditions enabling the security of their systems and/or 
+ * data to be ensured and,  more generally, to use and operate it in the 
+ * same conditions as regards security. 
+ *
+ * The fact that you are presently reading this means that you have had
+ * knowledge of the CeCILL-B license and that you accept its terms.
+ */
+package fr.insalyon.creatis.vip.core.client.bean;
+
+import com.google.gwt.user.client.rpc.IsSerializable;
+
+/**
+ *
+ * @author Rafael Silva
+ */
+public class Group implements IsSerializable {
+
+    private String name;
+    private boolean publicGroup;
+    private boolean gridFile; 
+    private boolean gridJobs;
+
+<span class="nc" id="L47">    public Group() {</span>
+<span class="nc" id="L48">    }</span>
+
+<span class="fc" id="L50">    public Group(String name, boolean publicGroup,boolean gridFile,boolean gridJobs) {</span>
+<span class="fc" id="L51">        this.name = name;</span>
+<span class="fc" id="L52">        this.publicGroup = publicGroup;</span>
+<span class="fc" id="L53">        this.gridFile=gridFile;</span>
+<span class="fc" id="L54">        this.gridJobs=gridJobs;</span>
+        
+<span class="fc" id="L56">    }</span>
+
+    public String getName() {
+<span class="fc" id="L59">        return name;</span>
+    }
+
+    public void setName(String name) {
+<span class="nc" id="L63">        this.name = name;</span>
+<span class="nc" id="L64">    }</span>
+
+    public boolean isPublicGroup() {
+<span class="fc" id="L67">        return publicGroup;</span>
+    }
+
+    public void setPublicGroup(boolean publicGroup) {
+<span class="nc" id="L71">        this.publicGroup = publicGroup;</span>
+<span class="nc" id="L72">    }</span>
+    public void setGridFile(boolean gridFile) {
+<span class="nc" id="L74">        this.gridFile = gridFile;</span>
+<span class="nc" id="L75">    }</span>
+
+    public void setGridJobs(boolean gridJobs) {
+<span class="nc" id="L78">        this.gridJobs = gridJobs;</span>
+<span class="nc" id="L79">    }</span>
+
+    public boolean isGridFile() {
+<span class="fc" id="L82">        return gridFile;</span>
+    }
+
+    public boolean isGridJobs() {
+<span class="fc" id="L86">        return gridJobs;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

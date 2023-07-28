@@ -1,0 +1,240 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../jacoco-resources/report.gif" type="image/gif"/><title>SSHData.java</title><link rel="stylesheet" href="../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../index.html" class="el_report">coverage</a> &gt; <a href="../index.html" class="el_bundle">vip-datamanager</a> &gt; <a href="index.source.html" class="el_package">fr.insalyon.creatis.vip.datamanager.server.dao.mysql</a> &gt; <span class="el_source">SSHData.java</span></div><h1>SSHData.java</h1><pre class="source lang-java linenums">/*
+ * Copyright and authors: see LICENSE.txt in base repository.
+ *
+ * This software is a web portal for pipeline execution on distributed systems.
+ *
+ * This software is governed by the CeCILL-B license under French law and
+ * abiding by the rules of distribution of free software.  You can  use,
+ * modify and/ or redistribute the software under the terms of the CeCILL-B
+ * license as circulated by CEA, CNRS and INRIA at the following URL
+ * &quot;http://www.cecill.info&quot;.
+ *
+ * As a counterpart to the access to the source code and  rights to copy,
+ * modify and redistribute granted by the license, users are provided only
+ * with a limited warranty  and the software's author,  the holder of the
+ * economic rights,  and the successive licensors  have only  limited
+ * liability.
+ *
+ * In this respect, the user's attention is drawn to the risks associated
+ * with loading,  using,  modifying and/or developing or reproducing the
+ * software by the user in light of its specific status of free software,
+ * that may mean  that it is complicated to manipulate,  and  that  also
+ * therefore means  that it is reserved for developers  and  experienced
+ * professionals having in-depth computer knowledge. Users are therefore
+ * encouraged to load and test the software's suitability as regards their
+ * requirements in conditions enabling the security of their systems and/or
+ * data to be ensured and,  more generally, to use and operate it in the
+ * same conditions as regards security.
+ *
+ * The fact that you are presently reading this means that you have had
+ * knowledge of the CeCILL-B license and that you accept its terms.
+ */
+package fr.insalyon.creatis.vip.datamanager.server.dao.mysql;
+
+import fr.insalyon.creatis.vip.core.server.business.BusinessException;
+import fr.insalyon.creatis.vip.core.server.dao.DAOException;
+import fr.insalyon.creatis.vip.datamanager.client.bean.SSH;
+import fr.insalyon.creatis.vip.datamanager.client.bean.TransferType;
+import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerException;
+import fr.insalyon.creatis.vip.datamanager.server.DataManagerUtil;
+import fr.insalyon.creatis.vip.datamanager.server.business.DataManagerBusiness;
+import fr.insalyon.creatis.vip.datamanager.server.dao.SSHDAO;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.support.JdbcDaoSupport;
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
+
+import javax.sql.DataSource;
+
+/**
+ *
+ * @author glatard, Nouha Boujelben
+ */
+@Repository
+@Transactional
+<span class="fc" id="L66">public class SSHData extends JdbcDaoSupport implements SSHDAO {</span>
+
+<span class="fc" id="L68">    private final Logger logger = LoggerFactory.getLogger(getClass());</span>
+
+    @Autowired
+    public void useDataSource(DataSource dataSource) {
+<span class="fc" id="L72">        setDataSource(dataSource);</span>
+<span class="fc" id="L73">    }</span>
+
+    @Override
+    public List&lt;SSH&gt; getSSHConnections() throws DAOException {
+        try {
+<span class="nc" id="L78">            PreparedStatement ps = getConnection().prepareStatement(&quot;SELECT &quot;</span>
+                    + &quot;* FROM &quot;
+                    + &quot;VIPSSHAccounts&quot;);
+
+<span class="nc" id="L82">            ResultSet rs = ps.executeQuery();</span>
+<span class="nc" id="L83">            List&lt;SSH&gt; ssh = new ArrayList&lt;SSH&gt;();</span>
+
+<span class="nc bnc" id="L85" title="All 2 branches missed.">            while (rs.next()) {</span>
+
+<span class="nc" id="L87">                String email = rs.getString(&quot;email&quot;);</span>
+<span class="nc" id="L88">                String name = DataManagerUtil.extractName(rs.getString(&quot;LFCDir&quot;));</span>
+<span class="nc" id="L89">                String lfcDir = rs.getString(&quot;LFCDir&quot;);</span>
+<span class="nc" id="L90">                String sshUser = rs.getString(&quot;sshUser&quot;);</span>
+<span class="nc" id="L91">                String sshHost = rs.getString(&quot;sshHost&quot;);</span>
+<span class="nc" id="L92">                TransferType sshTransferType = TransferType.valueOf(rs.getString(&quot;transferType&quot;));</span>
+<span class="nc" id="L93">                String sshDir = rs.getString(&quot;sshDir&quot;);</span>
+<span class="nc" id="L94">                int sshPort = rs.getInt(&quot;sshPort&quot;);</span>
+<span class="nc" id="L95">                boolean validated = rs.getBoolean(&quot;validated&quot;);</span>
+<span class="nc" id="L96">                boolean auth_failed = rs.getBoolean(&quot;auth_failed&quot;);</span>
+<span class="nc" id="L97">                Timestamp theEarliestNextSynchronistation = rs.getTimestamp(&quot;theEarliestNextSynchronistation&quot;);</span>
+<span class="nc" id="L98">                long numberSynchronizationFailed = rs.getLong(&quot;numberSynchronizationFailed&quot;);</span>
+<span class="nc" id="L99">                boolean deleteFilesFromSource = rs.getBoolean(&quot;deleteFilesFromSource&quot;);</span>
+<span class="nc" id="L100">                boolean active = rs.getBoolean(&quot;active&quot;);</span>
+<span class="nc" id="L101">                boolean checkFilesContent = rs.getBoolean(&quot;checkFilesContent&quot;);</span>
+
+<span class="nc" id="L103">                String lfcFiles = &quot;+&quot; + String.valueOf(rs.getInt(&quot;numberOfFilesTransferredToLFC&quot;)) + &quot; (&quot; + readableUnitFileSize(rs.getLong(&quot;sizeOfFilesTransferredToLFC&quot;)) + &quot;) &quot;</span>
+<span class="nc" id="L104">                        + &quot;-&quot; + String.valueOf(rs.getInt(&quot;numberOfFilesDeletedInLFC&quot;)) + &quot; (&quot; + readableUnitFileSize(rs.getLong(&quot;sizeOfFilesDeletedInLFC&quot;)) + &quot;)&quot;;</span>
+
+<span class="nc" id="L106">                String sshFiles = &quot;+&quot; + String.valueOf(rs.getInt(&quot;numberOfFilesTransferredToDevice&quot;)) + &quot; (&quot; + readableUnitFileSize(rs.getLong(&quot;sizeOfFilesTransferredToDevice&quot;)) + &quot;) &quot;</span>
+<span class="nc" id="L107">                        + &quot;-&quot; + String.valueOf(rs.getInt(&quot;numberOfFilesDeletedInDevice&quot;)) + &quot; (&quot; + readableUnitFileSize(rs.getLong(&quot;sizeOfFilesDeletedInDevice&quot;)) + &quot;)&quot;;</span>
+
+<span class="nc" id="L109">                String status = &quot;ok&quot;;</span>
+<span class="nc bnc" id="L110" title="All 2 branches missed.">                if (auth_failed) {</span>
+<span class="nc" id="L111">                    status = &quot;authentication failed&quot;;</span>
+                }
+<span class="nc bnc" id="L113" title="All 2 branches missed.">                if (!validated) {</span>
+<span class="nc" id="L114">                    status = &quot;waiting for validation&quot;;</span>
+                }
+
+<span class="nc" id="L117">                ssh.add(new SSH(email, lfcDir, name, sshUser, sshHost, sshPort, sshTransferType, sshDir, status, theEarliestNextSynchronistation, numberSynchronizationFailed, checkFilesContent, deleteFilesFromSource, active, sshFiles, lfcFiles));</span>
+<span class="nc" id="L118">            }</span>
+<span class="nc" id="L119">            ps.close();</span>
+<span class="nc" id="L120">            return ssh;</span>
+
+<span class="nc" id="L122">        } catch (SQLException ex) {</span>
+<span class="nc" id="L123">            logger.error(&quot;Error getting ssh connections&quot;, ex);</span>
+<span class="nc" id="L124">            throw new DAOException(ex);</span>
+        }
+    }
+
+    @Override
+    public void addSSH(SSH ssh) throws DAOException {
+        try {
+<span class="nc" id="L131">            PreparedStatement ps = getConnection().prepareStatement(</span>
+                    &quot;INSERT INTO VIPSSHAccounts(email,LFCDir,sshUser,sshHost,transferType,sshDir,sshPort,validated,auth_failed,checkFilesContent,numberSynchronizationFailed,deleteFilesFromSource) &quot;
+                    + &quot;VALUES (?,?,?,?,?,?,?,?,?,?,?,?)&quot;);
+
+<span class="nc" id="L135">            ps.setString(1, ssh.getEmail());</span>
+<span class="nc" id="L136">            ps.setString(2, ssh.getLfcDir());</span>
+<span class="nc" id="L137">            ps.setString(3, ssh.getUser());</span>
+<span class="nc" id="L138">            ps.setString(4, ssh.getHost());</span>
+<span class="nc" id="L139">            ps.setString(5, ssh.getTransferType().name());</span>
+<span class="nc" id="L140">            ps.setString(6, ssh.getDirectory());</span>
+<span class="nc" id="L141">            ps.setInt(7, ssh.getPort());</span>
+<span class="nc" id="L142">            ps.setString(8, &quot;1&quot;);</span>
+<span class="nc" id="L143">            ps.setString(9, &quot;0&quot;);</span>
+<span class="nc" id="L144">            ps.setBoolean(10, ssh.isCheckFilesContent());</span>
+<span class="nc" id="L145">            ps.setLong(11, 0);</span>
+<span class="nc" id="L146">            ps.setBoolean(12, ssh.isDeleteFilesFromSource());</span>
+<span class="nc" id="L147">            ps.execute();</span>
+<span class="nc" id="L148">            ps.close();</span>
+
+<span class="nc" id="L150">        } catch (SQLException ex) {</span>
+<span class="nc bnc" id="L151" title="All 2 branches missed.">            if (ex.getMessage().contains(&quot;Duplicate entry&quot;)) {</span>
+<span class="nc" id="L152">                logger.error(&quot;An ssh connection with this LFC Directory \&quot;&quot; + ssh.getLfcDir() + &quot;\&quot; already exists for user &quot; + ssh.getEmail() + &quot;.&quot;);</span>
+<span class="nc" id="L153">                throw new DAOException(&quot;An ssh connection with this LFC Directory \&quot;&quot; + ssh.getLfcDir() + &quot;\&quot; already exists for user &quot; + ssh.getEmail() + &quot;.&quot;, ex);</span>
+            } else {
+<span class="nc" id="L155">                logger.error(&quot;Error adding ssh connection {}&quot;, ssh.getLfcDir(), ex);</span>
+<span class="nc" id="L156">                throw new DAOException(ex);</span>
+            }
+<span class="nc" id="L158">        }</span>
+<span class="nc" id="L159">    }</span>
+
+    @Override
+    public void updateSSH(SSH ssh) throws DAOException {
+        try {
+<span class="nc" id="L164">            PreparedStatement ps = getConnection().prepareStatement(&quot;UPDATE &quot;</span>
+                    + &quot;VIPSSHAccounts &quot;
+                    + &quot;SET sshUser=?, sshHost=?, transferType=?, sshDir=?, sshPort=?, checkFilesContent=?, deleteFilesFromSource=?, active=? &quot;
+                    + &quot;WHERE email=? AND LFCDir=?&quot;);
+<span class="nc" id="L168">            ps.setString(1, ssh.getUser());</span>
+<span class="nc" id="L169">            ps.setString(2, ssh.getHost());</span>
+<span class="nc" id="L170">            ps.setString(3, ssh.getTransferType().toString());</span>
+<span class="nc" id="L171">            ps.setString(4, ssh.getDirectory());</span>
+<span class="nc" id="L172">            ps.setInt(5, ssh.getPort());</span>
+<span class="nc" id="L173">            ps.setBoolean(6, ssh.isCheckFilesContent());</span>
+<span class="nc" id="L174">            ps.setBoolean(7, ssh.isDeleteFilesFromSource());</span>
+<span class="nc" id="L175">            ps.setBoolean(8, ssh.isActive());</span>
+<span class="nc" id="L176">            ps.setString(9, ssh.getEmail());</span>
+<span class="nc" id="L177">            ps.setString(10, ssh.getLfcDir());</span>
+
+<span class="nc" id="L179">            ps.executeUpdate();</span>
+<span class="nc" id="L180">            ps.close();</span>
+
+<span class="nc" id="L182">        } catch (SQLException ex) {</span>
+<span class="nc" id="L183">            logger.error(&quot;Error updating ssh connection {}&quot;, ssh.getLfcDir(), ex);</span>
+<span class="nc" id="L184">            throw new DAOException(ex);</span>
+<span class="nc" id="L185">        }</span>
+<span class="nc" id="L186">    }</span>
+
+    @Override
+    public void removeSSH(String email, String lfcDir) throws DAOException {
+        try {
+<span class="nc" id="L191">            PreparedStatement ps = getConnection().prepareStatement(&quot;DELETE &quot;</span>
+                    + &quot;FROM VIPSSHAccounts WHERE email=? AND LFCDir=?&quot;);
+
+<span class="nc" id="L194">            ps.setString(1, email);</span>
+<span class="nc" id="L195">            ps.setString(2, lfcDir);</span>
+<span class="nc" id="L196">            logger.info(&quot;Removing connection &quot; + email + &quot; &quot; + lfcDir);</span>
+<span class="nc" id="L197">            ps.execute();</span>
+<span class="nc" id="L198">            ps.close();</span>
+
+<span class="nc" id="L200">        } catch (SQLException ex) {</span>
+<span class="nc" id="L201">            logger.error(&quot;Error removing ssh connection {}&quot;, lfcDir, ex);</span>
+<span class="nc" id="L202">            throw new DAOException(ex);</span>
+<span class="nc" id="L203">        }</span>
+<span class="nc" id="L204">    }</span>
+
+    @Override
+    public void resetSSHConnections(List&lt;List&lt;String&gt;&gt; sshConnections) throws DAOException {
+
+<span class="nc bnc" id="L209" title="All 2 branches missed.">        for (List&lt;String&gt; sshC : sshConnections) {</span>
+            try {
+<span class="nc" id="L211">                PreparedStatement ps = getConnection().prepareStatement(&quot;UPDATE &quot;</span>
+                        + &quot;VIPSSHAccounts &quot;
+                        + &quot;SET auth_failed='1', numberSynchronizationFailed='0', theEarliestNextSynchronistation=? &quot;
+                        + &quot;WHERE email=? AND LFCDir=?&quot;);
+<span class="nc" id="L215">                ps.setTimestamp(1, new Timestamp(Calendar.getInstance().getTime().getTime()));</span>
+<span class="nc" id="L216">                ps.setString(2, sshC.get(0));</span>
+<span class="nc" id="L217">                ps.setString(3, sshC.get(1));</span>
+<span class="nc" id="L218">                logger.info(&quot;Reset connection &quot; + sshC.get(0) + &quot; &quot; + sshC.get(1));</span>
+
+<span class="nc" id="L220">                ps.execute();</span>
+<span class="nc" id="L221">                ps.close();</span>
+
+<span class="nc" id="L223">            } catch (SQLException ex) {</span>
+<span class="nc" id="L224">                logger.error(&quot;Error reseting ssh connections {}&quot;, sshC, ex);</span>
+<span class="nc" id="L225">                throw new DAOException(ex);</span>
+<span class="nc" id="L226">            }</span>
+
+<span class="nc" id="L228">        }</span>
+<span class="nc" id="L229">    }</span>
+
+    public static String readableUnitFileSize(long size) {
+<span class="nc bnc" id="L232" title="All 2 branches missed.">        if (size &lt;= 0) {</span>
+<span class="nc" id="L233">            return &quot;0&quot;;</span>
+        }
+<span class="nc" id="L235">        final String[] units = new String[]{&quot;B&quot;, &quot;kB&quot;, &quot;MB&quot;, &quot;GB&quot;, &quot;TB&quot;};</span>
+<span class="nc" id="L236">        int digitGroups = (int) (Math.log10(size) / Math.log10(1024));</span>
+<span class="nc" id="L237">        return new DecimalFormat(&quot;#,##0.#&quot;).format(size / Math.pow(1024, digitGroups)) + &quot; &quot; + units[digitGroups];</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>
