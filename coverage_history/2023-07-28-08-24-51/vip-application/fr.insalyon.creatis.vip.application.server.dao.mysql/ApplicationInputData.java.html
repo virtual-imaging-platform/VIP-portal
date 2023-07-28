@@ -1,0 +1,320 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../jacoco-resources/report.gif" type="image/gif"/><title>ApplicationInputData.java</title><link rel="stylesheet" href="../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../index.html" class="el_report">coverage</a> &gt; <a href="../index.html" class="el_bundle">vip-application</a> &gt; <a href="index.source.html" class="el_package">fr.insalyon.creatis.vip.application.server.dao.mysql</a> &gt; <span class="el_source">ApplicationInputData.java</span></div><h1>ApplicationInputData.java</h1><pre class="source lang-java linenums">/*
+ * Copyright and authors: see LICENSE.txt in base repository.
+ *
+ * This software is a web portal for pipeline execution on distributed systems.
+ *
+ * This software is governed by the CeCILL-B license under French law and
+ * abiding by the rules of distribution of free software.  You can  use,
+ * modify and/ or redistribute the software under the terms of the CeCILL-B
+ * license as circulated by CEA, CNRS and INRIA at the following URL
+ * &quot;http://www.cecill.info&quot;.
+ *
+ * As a counterpart to the access to the source code and  rights to copy,
+ * modify and redistribute granted by the license, users are provided only
+ * with a limited warranty  and the software's author,  the holder of the
+ * economic rights,  and the successive licensors  have only  limited
+ * liability.
+ *
+ * In this respect, the user's attention is drawn to the risks associated
+ * with loading,  using,  modifying and/or developing or reproducing the
+ * software by the user in light of its specific status of free software,
+ * that may mean  that it is complicated to manipulate,  and  that  also
+ * therefore means  that it is reserved for developers  and  experienced
+ * professionals having in-depth computer knowledge. Users are therefore
+ * encouraged to load and test the software's suitability as regards their
+ * requirements in conditions enabling the security of their systems and/or
+ * data to be ensured and,  more generally, to use and operate it in the
+ * same conditions as regards security.
+ *
+ * The fact that you are presently reading this means that you have had
+ * knowledge of the CeCILL-B license and that you accept its terms.
+ */
+package fr.insalyon.creatis.vip.application.server.dao.mysql;
+
+import fr.insalyon.creatis.vip.application.client.bean.SimulationInput;
+import fr.insalyon.creatis.vip.application.server.dao.ApplicationInputDAO;
+import fr.insalyon.creatis.vip.core.server.dao.DAOException;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.support.JdbcDaoSupport;
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
+
+import javax.sql.DataSource;
+
+/**
+ *
+ * @author Rafael Ferreira da Silva
+ */
+@Repository
+@Transactional
+<span class="fc" id="L58">public class ApplicationInputData extends JdbcDaoSupport implements ApplicationInputDAO {</span>
+
+<span class="fc" id="L60">    private final Logger logger = LoggerFactory.getLogger(getClass());</span>
+
+    @Autowired
+    public void useDataSource(DataSource dataSource) {
+<span class="fc" id="L64">        setDataSource(dataSource);</span>
+<span class="fc" id="L65">    }</span>
+
+    @Override
+    public void addSimulationInput(String email, SimulationInput SimulationInput)
+            throws DAOException {
+
+        try {
+<span class="nc" id="L72">            PreparedStatement ps = getConnection().prepareStatement(</span>
+                    &quot;INSERT INTO VIPAppInputs(email, application, name, inputs) &quot;
+                    + &quot;VALUES (?, ?, ?, ?)&quot;);
+
+<span class="nc" id="L76">            ps.setString(1, email);</span>
+<span class="nc" id="L77">            ps.setString(2, SimulationInput.getApplication());</span>
+<span class="nc" id="L78">            ps.setString(3, SimulationInput.getName());</span>
+<span class="nc" id="L79">            ps.setString(4, SimulationInput.getInputs());</span>
+<span class="nc" id="L80">            ps.execute();</span>
+<span class="nc" id="L81">            ps.close();</span>
+
+<span class="nc" id="L83">        } catch (SQLException ex) {</span>
+<span class="nc bnc" id="L84" title="All 2 branches missed.">            if (ex.getMessage().contains(&quot;Duplicate entry&quot;)) {</span>
+<span class="nc" id="L85">                logger.error(&quot;An input named \&quot;&quot; + SimulationInput.getName() + &quot;\&quot; already exists.&quot;);</span>
+<span class="nc" id="L86">                throw new DAOException(&quot;An input named \&quot;&quot; + SimulationInput.getName() + &quot;\&quot; already exists.&quot;, ex);</span>
+            } else {
+<span class="nc" id="L88">                logger.error(&quot;Error adding inputs {} for app {} by {}&quot;,</span>
+<span class="nc" id="L89">                        SimulationInput.getInputs(),</span>
+<span class="nc" id="L90">                        SimulationInput.getApplication(), email, ex);</span>
+<span class="nc" id="L91">                throw new DAOException(ex);</span>
+            }
+<span class="nc" id="L93">        }</span>
+<span class="nc" id="L94">    }</span>
+
+    @Override
+    public void removeSimulationInput(String email, String inputName,
+            String application) throws DAOException {
+
+        try {
+<span class="nc" id="L101">            PreparedStatement ps = getConnection().prepareStatement(&quot;DELETE &quot;</span>
+                    + &quot;FROM VIPAppInputs WHERE email=? AND name=? AND application=?&quot;);
+
+<span class="nc" id="L104">            ps.setString(1, email);</span>
+<span class="nc" id="L105">            ps.setString(2, inputName);</span>
+<span class="nc" id="L106">            ps.setString(3, application);</span>
+<span class="nc" id="L107">            ps.execute();</span>
+<span class="nc" id="L108">            ps.close();</span>
+
+<span class="nc" id="L110">        } catch (SQLException ex) {</span>
+<span class="nc" id="L111">            logger.error(&quot;Error removing inputs {} by {}&quot;, inputName, email, ex);</span>
+<span class="nc" id="L112">            throw new DAOException(ex);</span>
+<span class="nc" id="L113">        }</span>
+<span class="nc" id="L114">    }</span>
+
+    @Override
+    public void updateSimulationInput(String email, SimulationInput SimulationInput)
+            throws DAOException {
+
+        try {
+<span class="nc" id="L121">            PreparedStatement ps = getConnection().prepareStatement(</span>
+                    &quot;UPDATE VIPAppInputs SET inputs=? &quot;
+                    + &quot;WHERE email=? AND application=? AND name=?&quot;);
+
+<span class="nc" id="L125">            ps.setString(1, SimulationInput.getInputs());</span>
+<span class="nc" id="L126">            ps.setString(2, email);</span>
+<span class="nc" id="L127">            ps.setString(3, SimulationInput.getApplication());</span>
+<span class="nc" id="L128">            ps.setString(4, SimulationInput.getName());</span>
+<span class="nc" id="L129">            ps.execute();</span>
+<span class="nc" id="L130">            ps.close();</span>
+
+<span class="nc" id="L132">        } catch (SQLException ex) {</span>
+<span class="nc" id="L133">            logger.error(&quot;Error updating inputs {} for app {} by {}&quot;,</span>
+<span class="nc" id="L134">                    SimulationInput.getInputs(),</span>
+<span class="nc" id="L135">                    SimulationInput.getApplication(), email, ex);</span>
+<span class="nc" id="L136">            throw new DAOException(ex);</span>
+<span class="nc" id="L137">        }</span>
+<span class="nc" id="L138">    }</span>
+
+    @Override
+    public List&lt;SimulationInput&gt; getSimulationInputByUser(String email)
+            throws DAOException {
+
+        try {
+<span class="nc" id="L145">            PreparedStatement ps = getConnection().prepareStatement(&quot;SELECT &quot;</span>
+                    + &quot;application, name, inputs &quot;
+                    + &quot;FROM VIPAppInputs WHERE email=? &quot;
+                    + &quot;ORDER BY application, name&quot;);
+
+<span class="nc" id="L150">            ps.setString(1, email);</span>
+<span class="nc" id="L151">            ResultSet rs = ps.executeQuery();</span>
+<span class="nc" id="L152">            List&lt;SimulationInput&gt; inputs = new ArrayList&lt;SimulationInput&gt;();</span>
+
+<span class="nc bnc" id="L154" title="All 2 branches missed.">            while (rs.next()) {</span>
+<span class="nc" id="L155">                inputs.add(new SimulationInput(</span>
+<span class="nc" id="L156">                        rs.getString(&quot;application&quot;),</span>
+<span class="nc" id="L157">                        rs.getString(&quot;name&quot;),</span>
+<span class="nc" id="L158">                        rs.getString(&quot;inputs&quot;)));</span>
+            }
+
+<span class="nc" id="L161">            ps.close();</span>
+<span class="nc" id="L162">            return inputs;</span>
+
+<span class="nc" id="L164">        } catch (SQLException ex) {</span>
+<span class="nc" id="L165">            logger.error(&quot;Error getting inputs for {}&quot;, email, ex);</span>
+<span class="nc" id="L166">            throw new DAOException(ex);</span>
+        }
+    }
+
+    @Override
+    public List&lt;SimulationInput&gt; getWorkflowInputByUserAndAppName(String user,
+            String appName) throws DAOException {
+
+        try {
+<span class="nc" id="L175">            List&lt;SimulationInput&gt; inputs = new ArrayList&lt;SimulationInput&gt;();</span>
+<span class="nc" id="L176">            PreparedStatement ps = getConnection().prepareStatement(&quot;SELECT &quot;</span>
+                    + &quot;username, application, name, inputs &quot;
+                    + &quot;FROM WorkflowInput WHERE username=? AND application=? &quot;
+                    + &quot;ORDER BY name&quot;);
+
+<span class="nc" id="L181">            ps.setString(1, user);</span>
+<span class="nc" id="L182">            ps.setString(2, appName);</span>
+<span class="nc" id="L183">            ResultSet rs = ps.executeQuery();</span>
+
+<span class="nc bnc" id="L185" title="All 2 branches missed.">            while (rs.next()) {</span>
+<span class="nc" id="L186">                inputs.add(new SimulationInput(</span>
+<span class="nc" id="L187">                        rs.getString(&quot;application&quot;),</span>
+<span class="nc" id="L188">                        rs.getString(&quot;name&quot;),</span>
+<span class="nc" id="L189">                        rs.getString(&quot;inputs&quot;)));</span>
+            }
+
+<span class="nc" id="L192">            ps.close();</span>
+<span class="nc" id="L193">            return inputs;</span>
+
+<span class="nc" id="L195">        } catch (SQLException ex) {</span>
+<span class="nc" id="L196">            logger.error(&quot;Error getting workflow inputs for {} by {}&quot;, appName, user, ex);</span>
+<span class="nc" id="L197">            throw new DAOException(ex);</span>
+        }
+    }
+
+    @Override
+    public SimulationInput getInputByNameUserApp(String email, String name,
+            String appName) throws DAOException {
+
+        try {
+<span class="nc" id="L206">            PreparedStatement ps = getConnection().prepareStatement(&quot;SELECT &quot;</span>
+                    + &quot;email, application, name, inputs &quot;
+                    + &quot;FROM VIPAppInputs &quot;
+                    + &quot;WHERE email = ? AND name = ? AND application = ? &quot;
+                    + &quot;ORDER BY name&quot;);
+
+<span class="nc" id="L212">            ps.setString(1, email);</span>
+<span class="nc" id="L213">            ps.setString(2, name);</span>
+<span class="nc" id="L214">            ps.setString(3, appName);</span>
+<span class="nc" id="L215">            ResultSet rs = ps.executeQuery();</span>
+
+<span class="nc" id="L217">            logger.info(String.valueOf(rs));</span>
+<span class="nc" id="L218">            logger.info(String.valueOf(rs.next()));</span>
+
+<span class="nc bnc" id="L220" title="All 2 branches missed.">            if (!rs.next()) {</span>
+<span class="nc" id="L221">                ps.close();</span>
+<span class="nc" id="L222">                return null;</span>
+            } else {
+
+                do {
+<span class="nc" id="L226">                    logger.info(&quot;TEST TRUE&quot;);</span>
+<span class="nc" id="L227">                    SimulationInput simulationInput = new SimulationInput(</span>
+<span class="nc" id="L228">                            rs.getString(&quot;application&quot;),</span>
+<span class="nc" id="L229">                            rs.getString(&quot;name&quot;),</span>
+<span class="nc" id="L230">                            rs.getString(&quot;inputs&quot;));</span>
+
+<span class="nc" id="L232">                    ps.close();</span>
+<span class="nc" id="L233">                    return simulationInput;</span>
+                } while (rs.next());
+            }
+
+<span class="nc" id="L237">        } catch (SQLException ex) {</span>
+<span class="nc" id="L238">            logger.error(&quot;Error getting inputs {} by {}&quot;, name, email, ex);</span>
+<span class="nc" id="L239">            throw new DAOException(ex);</span>
+        }
+    }
+
+    @Override
+    public void saveSimulationInputAsExample(SimulationInput simulationInput) throws DAOException {
+
+        try {
+<span class="nc" id="L247">            PreparedStatement ps = getConnection().prepareStatement(</span>
+                    &quot;INSERT INTO VIPAppExamples(application, name, inputs) &quot;
+                    + &quot;VALUES (?, ?, ?)&quot;);
+
+<span class="nc" id="L251">            ps.setString(1, simulationInput.getApplication());</span>
+<span class="nc" id="L252">            ps.setString(2, simulationInput.getName());</span>
+<span class="nc" id="L253">            ps.setString(3, simulationInput.getInputs());</span>
+<span class="nc" id="L254">            ps.execute();</span>
+<span class="nc" id="L255">            ps.close();</span>
+
+<span class="nc" id="L257">        } catch (SQLException ex) {</span>
+<span class="nc bnc" id="L258" title="All 2 branches missed.">            if (ex.getMessage().contains(&quot;Duplicate entry&quot;)) {</span>
+<span class="nc" id="L259">                logger.error(&quot;An input named \&quot;&quot; + simulationInput.getName() + &quot;\&quot; already exists.&quot;);</span>
+<span class="nc" id="L260">                throw new DAOException(&quot;An input named \&quot;&quot; + simulationInput.getName() + &quot;\&quot; already exists.&quot;, ex);</span>
+            } else {
+<span class="nc" id="L262">                logger.error(&quot;Error saving example {} for app {}&quot;,</span>
+<span class="nc" id="L263">                        simulationInput.getInputs(),</span>
+<span class="nc" id="L264">                        simulationInput.getApplication(), ex);</span>
+<span class="nc" id="L265">                throw new DAOException(ex);</span>
+            }
+<span class="nc" id="L267">        }</span>
+<span class="nc" id="L268">    }</span>
+
+    @Override
+    public List&lt;SimulationInput&gt; getSimulationInputExamples(String applicationName) throws DAOException {
+
+        try {
+
+<span class="nc" id="L275">            PreparedStatement ps = getConnection().prepareStatement(&quot;SELECT &quot;</span>
+                    + &quot;application, name, inputs &quot;
+                    + &quot;FROM VIPAppExamples &quot;
+                    + &quot;WHERE application = ?&quot;
+                    + &quot;ORDER BY application, name&quot;);
+<span class="nc" id="L280">            ps.setString(1, applicationName);</span>
+
+<span class="nc" id="L282">            ResultSet rs = ps.executeQuery();</span>
+<span class="nc" id="L283">            List&lt;SimulationInput&gt; inputs = new ArrayList&lt;SimulationInput&gt;();</span>
+
+<span class="nc bnc" id="L285" title="All 2 branches missed.">            while (rs.next()) {</span>
+<span class="nc" id="L286">                inputs.add(new SimulationInput(</span>
+<span class="nc" id="L287">                        rs.getString(&quot;application&quot;),</span>
+<span class="nc" id="L288">                        rs.getString(&quot;name&quot;),</span>
+<span class="nc" id="L289">                        rs.getString(&quot;inputs&quot;)));</span>
+            }
+
+<span class="nc" id="L292">            ps.close();</span>
+<span class="nc" id="L293">            return inputs;</span>
+
+<span class="nc" id="L295">        } catch (SQLException ex) {</span>
+<span class="nc" id="L296">            logger.error(&quot;Error getting examples for app {}&quot;, applicationName, ex);</span>
+<span class="nc" id="L297">            throw new DAOException(ex);</span>
+        }
+    }
+    
+    @Override
+    public void removeSimulationInputExample(String inputName, String application)
+            throws DAOException {
+
+        try {
+<span class="nc" id="L306">            PreparedStatement ps = getConnection().prepareStatement(&quot;DELETE &quot;</span>
+                    + &quot;FROM VIPAppExamples WHERE name=? AND application=?&quot;);
+
+<span class="nc" id="L309">            ps.setString(1, inputName);</span>
+<span class="nc" id="L310">            ps.setString(2, application);</span>
+<span class="nc" id="L311">            ps.execute();</span>
+<span class="nc" id="L312">            ps.close();</span>
+
+<span class="nc" id="L314">        } catch (SQLException ex) {</span>
+<span class="nc" id="L315">            logger.error(&quot;Error removing example {} for app {}&quot;, inputName, application, ex);</span>
+<span class="nc" id="L316">            throw new DAOException(ex);</span>
+<span class="nc" id="L317">        }</span>
+<span class="nc" id="L318">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

@@ -1,0 +1,244 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../jacoco-resources/report.gif" type="image/gif"/><title>ApiSecurityConfig.java</title><link rel="stylesheet" href="../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../index.html" class="el_report">coverage</a> &gt; <a href="../index.html" class="el_bundle">vip-api</a> &gt; <a href="index.source.html" class="el_package">fr.insalyon.creatis.vip.api.security</a> &gt; <span class="el_source">ApiSecurityConfig.java</span></div><h1>ApiSecurityConfig.java</h1><pre class="source lang-java linenums">/*
+ * Copyright and authors: see LICENSE.txt in base repository.
+ *
+ * This software is a web portal for pipeline execution on distributed systems.
+ *
+ * This software is governed by the CeCILL-B license under French law and
+ * abiding by the rules of distribution of free software.  You can  use,
+ * modify and/ or redistribute the software under the terms of the CeCILL-B
+ * license as circulated by CEA, CNRS and INRIA at the following URL
+ * &quot;http://www.cecill.info&quot;.
+ *
+ * As a counterpart to the access to the source code and  rights to copy,
+ * modify and redistribute granted by the license, users are provided only
+ * with a limited warranty  and the software's author,  the holder of the
+ * economic rights,  and the successive licensors  have only  limited
+ * liability.
+ *
+ * In this respect, the user's attention is drawn to the risks associated
+ * with loading,  using,  modifying and/or developing or reproducing the
+ * software by the user in light of its specific status of free software,
+ * that may mean  that it is complicated to manipulate,  and  that  also
+ * therefore means  that it is reserved for developers  and  experienced
+ * professionals having in-depth computer knowledge. Users are therefore
+ * encouraged to load and test the software's suitability as regards their
+ * requirements in conditions enabling the security of their systems and/or
+ * data to be ensured and,  more generally, to use and operate it in the
+ * same conditions as regards security.
+ *
+ * The fact that you are presently reading this means that you have had
+ * knowledge of the CeCILL-B license and that you accept its terms.
+ */
+package fr.insalyon.creatis.vip.api.security;
+
+import fr.insalyon.creatis.vip.api.CarminProperties;
+
+import fr.insalyon.creatis.vip.api.security.apikey.SpringApiPrincipal;
+import fr.insalyon.creatis.vip.api.security.apikey.ApikeyAuthenticationFilter;
+import fr.insalyon.creatis.vip.api.security.apikey.ApikeyAuthenticationProvider;
+import fr.insalyon.creatis.vip.api.security.keycloak.SpringKeycloakPrincipal;
+import fr.insalyon.creatis.vip.api.security.keycloak.VipKeycloakAuthenticationProvider;
+import fr.insalyon.creatis.vip.core.client.bean.User;
+
+import org.keycloak.adapters.springsecurity.KeycloakConfiguration;
+import org.keycloak.adapters.springsecurity.KeycloakSecurityComponents;
+import org.keycloak.adapters.springsecurity.authentication.KeycloakAuthenticationProvider;
+import org.keycloak.adapters.springsecurity.config.KeycloakWebSecurityConfigurerAdapter;
+
+import org.keycloak.adapters.springsecurity.filter.KeycloakAuthenticationProcessingFilter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.core.annotation.Order;
+import org.springframework.core.env.Environment;
+
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.mapping.GrantedAuthoritiesMapper;
+import org.springframework.security.core.authority.mapping.SimpleAuthorityMapper;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.AuthenticationEntryPoint;
+import org.springframework.security.web.authentication.session.NullAuthenticatedSessionStrategy;
+import org.springframework.security.web.authentication.session.SessionAuthenticationStrategy;
+import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
+import org.springframework.security.web.firewall.DefaultHttpFirewall;
+import org.springframework.stereotype.Service;
+
+import java.util.function.Supplier;
+
+import static fr.insalyon.creatis.vip.api.CarminProperties.KEYCLOAK_ACTIVATED;
+
+/**
+ * Keycloaksecurity configuration.
+ *
+ * It secures by api key all rest requests (except platform and authenticate)
+ *
+ * Modified by khalilkes to implement keycloak adapter
+ *
+ */
+@ComponentScan(basePackageClasses = {KeycloakSecurityComponents.class})
+@KeycloakConfiguration
+@EnableWebSecurity
+@Order(1)
+public class ApiSecurityConfig extends KeycloakWebSecurityConfigurerAdapter {
+
+<span class="fc" id="L91">    private final Logger logger = LoggerFactory.getLogger(getClass());</span>
+
+    private final Environment env;
+    private final ApikeyAuthenticationProvider apikeyAuthenticationProvider;
+    private final VipAuthenticationEntryPoint vipAuthenticationEntryPoint;
+    private final VipKeycloakAuthenticationProvider vipKeycloakAuthenticationProvider;
+
+    @Autowired
+    public ApiSecurityConfig(
+            Environment env, ApikeyAuthenticationProvider apikeyAuthenticationProvider,
+            VipAuthenticationEntryPoint vipAuthenticationEntryPoint,
+<span class="fc" id="L102">            VipKeycloakAuthenticationProvider vipKeycloakAuthenticationProvider) {</span>
+<span class="fc" id="L103">        this.env = env;</span>
+<span class="fc" id="L104">        this.apikeyAuthenticationProvider = apikeyAuthenticationProvider;</span>
+<span class="fc" id="L105">        this.vipAuthenticationEntryPoint = vipAuthenticationEntryPoint;</span>
+<span class="fc" id="L106">        this.vipKeycloakAuthenticationProvider = vipKeycloakAuthenticationProvider;</span>
+<span class="fc" id="L107">    }</span>
+
+    protected boolean isKeycloakActive() {
+<span class="fc" id="L110">        return env.getProperty(KEYCLOAK_ACTIVATED, Boolean.class, Boolean.FALSE);</span>
+    }
+
+    @Override
+    protected SessionAuthenticationStrategy sessionAuthenticationStrategy() {
+        // required for bearer only applications
+<span class="fc" id="L116">        return new NullAuthenticatedSessionStrategy();</span>
+    }
+
+    @Override
+    protected AuthenticationEntryPoint authenticationEntryPoint() throws Exception {
+<span class="nc" id="L121">        return vipAuthenticationEntryPoint;</span>
+    }
+
+    @Override
+    protected KeycloakAuthenticationProcessingFilter keycloakAuthenticationProcessingFilter() throws Exception {
+<span class="fc" id="L126">        KeycloakAuthenticationProcessingFilter f = super.keycloakAuthenticationProcessingFilter();</span>
+<span class="fc" id="L127">        f.setAuthenticationFailureHandler(vipAuthenticationEntryPoint);</span>
+<span class="fc" id="L128">        return f;</span>
+    }
+
+    @Override
+    protected KeycloakAuthenticationProvider keycloakAuthenticationProvider() {
+<span class="nc" id="L133">        return vipKeycloakAuthenticationProvider;</span>
+    }
+
+    @Override
+    public void configure(AuthenticationManagerBuilder auth) {
+<span class="pc bpc" id="L138" title="1 of 2 branches missed.">        if (isKeycloakActive()) {</span>
+<span class="nc" id="L139">            KeycloakAuthenticationProvider keycloakAuthenticationProvider = keycloakAuthenticationProvider();</span>
+<span class="nc" id="L140">            keycloakAuthenticationProvider.setGrantedAuthoritiesMapper(grantedAuthoritiesMapper());</span>
+<span class="nc" id="L141">            auth.authenticationProvider(keycloakAuthenticationProvider);</span>
+        }
+<span class="fc" id="L143">        auth.authenticationProvider(apikeyAuthenticationProvider);</span>
+<span class="fc" id="L144">    }</span>
+
+    @Override
+    protected void configure(HttpSecurity http) throws Exception {
+<span class="pc bpc" id="L148" title="1 of 2 branches missed.">        if (isKeycloakActive()) {</span>
+<span class="nc" id="L149">            super.configure(http);</span>
+        }
+<span class="fc" id="L151">        http.antMatcher(&quot;/rest/**&quot;)</span>
+<span class="fc" id="L152">            .authorizeRequests()</span>
+<span class="fc" id="L153">                .antMatchers(&quot;/rest/platform&quot;).permitAll()</span>
+<span class="fc" id="L154">                .antMatchers(&quot;/rest/authenticate&quot;).permitAll()</span>
+<span class="fc" id="L155">                .antMatchers(&quot;/rest/session&quot;).permitAll()</span>
+<span class="fc" id="L156">                .regexMatchers(&quot;/rest/pipelines\\?public&quot;).permitAll()</span>
+<span class="fc" id="L157">                .antMatchers(&quot;/rest/publications&quot;).permitAll()</span>
+<span class="fc" id="L158">                .antMatchers(&quot;/rest/reset-password&quot;).permitAll()</span>
+<span class="fc" id="L159">                .antMatchers(&quot;/rest/register&quot;).permitAll()</span>
+<span class="fc" id="L160">                .antMatchers(&quot;/rest/executions/{executionId}/summary&quot;).hasAnyRole(&quot;SERVICE&quot;)</span>
+<span class="fc" id="L161">                .antMatchers(&quot;/rest/simulate-refresh&quot;).authenticated()</span>
+<span class="fc" id="L162">                .antMatchers(&quot;/rest/statistics/**&quot;).hasAnyRole(&quot;ADVANCED&quot;, &quot;ADMINISTRATOR&quot;)</span>
+<span class="fc" id="L163">                .antMatchers(&quot;/rest/**&quot;).authenticated()</span>
+<span class="fc" id="L164">                .anyRequest().permitAll()</span>
+<span class="fc" id="L165">            .and()</span>
+<span class="fc" id="L166">            .addFilterBefore(apikeyAuthenticationFilter(), BasicAuthenticationFilter.class)</span>
+<span class="fc" id="L167">            .exceptionHandling().authenticationEntryPoint(vipAuthenticationEntryPoint)// also done in parent but needed here when keycloak is not active. It can be done twice without harm.</span>
+            // session must be activated otherwise OIDC auth info will be lost when accessing /loginEgi
+            //.and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+<span class="fc" id="L170">            .and()</span>
+<span class="fc" id="L171">            .cors().and()</span>
+<span class="fc" id="L172">            .headers().frameOptions().sameOrigin().and()</span>
+<span class="fc" id="L173">            .csrf().disable();</span>
+<span class="fc" id="L174">    }</span>
+
+    @Bean
+    public ApikeyAuthenticationFilter apikeyAuthenticationFilter() throws Exception {
+<span class="fc" id="L178">        return new ApikeyAuthenticationFilter(</span>
+<span class="fc" id="L179">                env.getRequiredProperty(CarminProperties.APIKEY_HEADER_NAME),</span>
+<span class="fc" id="L180">                vipAuthenticationEntryPoint, authenticationManager());</span>
+    }
+
+    @Service
+<span class="fc" id="L184">    public static class CurrentUserProvider implements Supplier&lt;User&gt; {</span>
+
+<span class="fc" id="L186">        private final Logger logger = LoggerFactory.getLogger(getClass());</span>
+
+        @Override
+        public User get() {
+            Authentication authentication =
+<span class="fc" id="L191">                    SecurityContextHolder.getContext().getAuthentication();</span>
+<span class="pc bpc" id="L192" title="1 of 2 branches missed.">            if (authentication == null) {</span>
+<span class="nc" id="L193">                return null;</span>
+            }
+<span class="fc" id="L195">            User user = getApikeyUser(authentication);</span>
+<span class="fc bfc" id="L196" title="All 2 branches covered.">            if (user != null) {</span>
+<span class="fc" id="L197">                return user;</span>
+            }
+<span class="fc" id="L199">            return getKeycloakUser(authentication);</span>
+        }
+
+        private User getApikeyUser(Authentication authentication) {
+<span class="fc bfc" id="L203" title="All 2 branches covered.">            if ( ! (authentication.getPrincipal() instanceof SpringApiPrincipal)) {</span>
+<span class="fc" id="L204">                return null;</span>
+            }
+<span class="fc" id="L206">            SpringApiPrincipal springCompatibleUser =</span>
+<span class="fc" id="L207">                    (SpringApiPrincipal) authentication.getPrincipal();</span>
+<span class="fc" id="L208">            return springCompatibleUser.getVipUser();</span>
+        }
+
+        private User getKeycloakUser(Authentication authentication) {
+<span class="pc bpc" id="L212" title="1 of 2 branches missed.">            if ( ! (authentication.getPrincipal() instanceof SpringKeycloakPrincipal)) {</span>
+<span class="fc" id="L213">                return null;</span>
+            }
+<span class="nc" id="L215">            SpringKeycloakPrincipal springKeycloakPrincipal =</span>
+<span class="nc" id="L216">                    (SpringKeycloakPrincipal) authentication.getPrincipal();</span>
+<span class="nc" id="L217">            return springKeycloakPrincipal.getVipUser();</span>
+        }
+    }
+
+    /*
+        Do not use the default firewall (StrictHttpFirewall) because it blocks
+        &quot;//&quot; in url and it is used in gwt rpc calls
+     */
+    @Bean
+    public DefaultHttpFirewall httpFirewall() {
+<span class="nc" id="L227">        DefaultHttpFirewall firewall = new DefaultHttpFirewall();</span>
+<span class="nc" id="L228">        firewall.setAllowUrlEncodedSlash(true);</span>
+<span class="nc" id="L229">        return firewall;</span>
+    }
+
+    /**
+     * customize roles to match keycloak roles without ROLE_
+     */
+    @Bean
+    public GrantedAuthoritiesMapper grantedAuthoritiesMapper() {
+<span class="fc" id="L237">        SimpleAuthorityMapper mapper = new SimpleAuthorityMapper();</span>
+<span class="fc" id="L238">        mapper.setConvertToUpperCase(true);</span>
+<span class="fc" id="L239">        return mapper;</span>
+    }
+
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../jacoco-resources/report.gif" type="image/gif"/><title>AbstractAuthenticationService.java</title><link rel="stylesheet" href="../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../index.html" class="el_report">coverage</a> &gt; <a href="../index.html" class="el_bundle">vip-core</a> &gt; <a href="index.source.html" class="el_package">fr.insalyon.creatis.vip.core.server.auth</a> &gt; <span class="el_source">AbstractAuthenticationService.java</span></div><h1>AbstractAuthenticationService.java</h1><pre class="source lang-java linenums">/*
+ * Copyright and authors: see LICENSE.txt in base repository.
+ *
+ * This software is a web portal for pipeline execution on distributed systems.
+ *
+ * This software is governed by the CeCILL-B license under French law and
+ * abiding by the rules of distribution of free software.  You can  use,
+ * modify and/ or redistribute the software under the terms of the CeCILL-B
+ * license as circulated by CEA, CNRS and INRIA at the following URL
+ * &quot;http://www.cecill.info&quot;.
+ *
+ * As a counterpart to the access to the source code and  rights to copy,
+ * modify and redistribute granted by the license, users are provided only
+ * with a limited warranty  and the software's author,  the holder of the
+ * economic rights,  and the successive licensors  have only  limited
+ * liability.
+ *
+ * In this respect, the user's attention is drawn to the risks associated
+ * with loading,  using,  modifying and/or developing or reproducing the
+ * software by the user in light of its specific status of free software,
+ * that may mean  that it is complicated to manipulate,  and  that  also
+ * therefore means  that it is reserved for developers  and  experienced
+ * professionals having in-depth computer knowledge. Users are therefore
+ * encouraged to load and test the software's suitability as regards their
+ * requirements in conditions enabling the security of their systems and/or
+ * data to be ensured and,  more generally, to use and operate it in the
+ * same conditions as regards security.
+ *
+ * The fact that you are presently reading this means that you have had
+ * knowledge of the CeCILL-B license and that you accept its terms.
+ */
+package fr.insalyon.creatis.vip.core.server.auth;
+
+import fr.insalyon.creatis.vip.core.client.bean.Group;
+import fr.insalyon.creatis.vip.core.client.bean.User;
+import fr.insalyon.creatis.vip.core.client.view.CoreException;
+import fr.insalyon.creatis.vip.core.server.business.BusinessException;
+import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
+import fr.insalyon.creatis.vip.core.server.business.VipSessionBusiness;
+import fr.insalyon.creatis.vip.core.server.dao.*;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+import javax.mail.internet.AddressException;
+import javax.mail.internet.InternetAddress;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
+
+/**
+ *
+ * @author glatard
+ */
+<span class="nc" id="L59">public abstract class AbstractAuthenticationService extends HttpServlet {</span>
+
+<span class="nc" id="L61">    private static final Logger logger = LoggerFactory.getLogger(AbstractAuthenticationService.class);</span>
+
+    protected abstract void checkValidRequest(HttpServletRequest request) throws BusinessException;
+
+    protected abstract String getEmail() throws BusinessException;
+
+    public abstract String getDefaultGroup();
+
+    private UserDAO userDAO;
+    private ConfigurationBusiness configurationBusiness;
+    private VipSessionBusiness vipSessionBusiness;
+
+    @Override
+    public void init() throws ServletException {
+<span class="nc" id="L75">        super.init();</span>
+<span class="nc" id="L76">        ApplicationContext applicationContext = WebApplicationContextUtils.findWebApplicationContext(getServletContext());</span>
+<span class="nc" id="L77">        userDAO = applicationContext.getBean(UserDAO.class);</span>
+<span class="nc" id="L78">        configurationBusiness = applicationContext.getBean(ConfigurationBusiness.class);</span>
+<span class="nc" id="L79">        vipSessionBusiness = applicationContext.getBean(VipSessionBusiness.class);</span>
+<span class="nc" id="L80">    }</span>
+
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) {
+        try {
+<span class="nc" id="L85">            processRequest(request, response);</span>
+<span class="nc" id="L86">        } catch (BusinessException | CoreException ex) {</span>
+<span class="nc" id="L87">            logger.error(&quot;Error handling a request : {}. Ignoring&quot;, ex.getMessage());</span>
+<span class="nc" id="L88">        }</span>
+<span class="nc" id="L89">    }</span>
+
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) {
+        try {
+<span class="nc" id="L94">            processRequest(request, response);</span>
+<span class="nc" id="L95">        } catch (BusinessException | CoreException ex) {</span>
+<span class="nc" id="L96">            logger.error(&quot;Error handling a request : {}. Ignoring&quot;, ex.getMessage());</span>
+<span class="nc" id="L97">        }</span>
+<span class="nc" id="L98">    }</span>
+
+    private void processRequest(
+            HttpServletRequest request,
+            HttpServletResponse response) throws BusinessException, CoreException {
+
+<span class="nc" id="L104">        logger.info(&quot;Third-party authentication request.&quot;);</span>
+        String email;
+        try {
+<span class="nc" id="L107">            checkValidRequest(request);</span>
+<span class="nc" id="L108">            email = getEmail();</span>
+<span class="nc" id="L109">        } catch (BusinessException ex) {</span>
+<span class="nc" id="L110">            logger.info(ex.getMessage());</span>
+<span class="nc" id="L111">            authFailedResponse(request, response);</span>
+<span class="nc" id="L112">            return;</span>
+<span class="nc" id="L113">        }</span>
+        //verify email format
+<span class="nc bnc" id="L115" title="All 4 branches missed.">        if (email == null || !isValidEmailAddress(email)) {</span>
+<span class="nc" id="L116">            logger.info(&quot;Invalid email: &quot; + email);</span>
+<span class="nc" id="L117">            authFailedResponse(request, response);</span>
+<span class="nc" id="L118">            return;</span>
+        }
+<span class="nc" id="L120">        resetFailedAuthenticationCount(email);</span>
+        //authenticate email in VIP
+<span class="nc" id="L122">        authSuccessResponse(request, response, email);</span>
+<span class="nc" id="L123">    }</span>
+
+    private void resetFailedAuthenticationCount(String email) {
+        try {
+<span class="nc" id="L127">            userDAO.resetNFailedAuthentications(email);</span>
+<span class="nc" id="L128">            logger.debug(&quot;Reset auth count for &quot; + email);</span>
+<span class="nc" id="L129">        } catch (DAOException e) {</span>
+<span class="nc" id="L130">            logger.error(&quot;Error resetting failed auth counter for {}. Ignoring it&quot;, email, e);</span>
+<span class="nc" id="L131">        }</span>
+<span class="nc" id="L132">    }</span>
+
+    private String getBaseURL() {
+<span class="nc" id="L135">        return &quot;/&quot;;</span>
+    }
+
+    private void authSuccessResponse(
+            HttpServletRequest request,
+            HttpServletResponse response,
+            String email) throws BusinessException, CoreException {
+
+<span class="nc" id="L143">        String groupName = getDefaultGroup();</span>
+<span class="nc" id="L144">        User user = configurationBusiness.getOrCreateUser(email, &quot;Unknown&quot;, groupName);</span>
+        //third-party authentication services will *not* be trusted to let admins in
+<span class="nc bnc" id="L146" title="All 2 branches missed.">        if (user.isSystemAdministrator()) {</span>
+<span class="nc" id="L147">            authFailedResponse(request, response);</span>
+<span class="nc" id="L148">            return;</span>
+        }
+<span class="nc" id="L150">        vipSessionBusiness.setVIPSession(request, response, user);</span>
+        try {
+<span class="nc" id="L152">            response.sendRedirect(getBaseURL());</span>
+<span class="nc" id="L153">        } catch (IOException ex) {</span>
+<span class="nc" id="L154">            throw new BusinessException(ex);</span>
+<span class="nc" id="L155">        }</span>
+<span class="nc" id="L156">        logger.info(&quot;User &quot; + email + &quot; connected.&quot;);</span>
+<span class="nc" id="L157">        response.setStatus(HttpServletResponse.SC_OK);</span>
+<span class="nc" id="L158">        setResponseText(email, response);</span>
+<span class="nc" id="L159">    }</span>
+
+    private void setResponseText(String message, HttpServletResponse response) throws BusinessException {
+<span class="nc" id="L162">        PrintWriter out = null;</span>
+        try {
+<span class="nc" id="L164">            response.setContentType(&quot;text/html&quot;);</span>
+<span class="nc" id="L165">            response.setHeader(&quot;Pragma&quot;, &quot;No-cache&quot;);</span>
+<span class="nc" id="L166">            response.setDateHeader(&quot;Expires&quot;, 0);</span>
+<span class="nc" id="L167">            response.setHeader(&quot;Cache-Control&quot;, &quot;no-cache&quot;);</span>
+<span class="nc" id="L168">            response.setContentLength(message.length());</span>
+<span class="nc" id="L169">            out = response.getWriter();</span>
+<span class="nc" id="L170">            out.println(message);</span>
+<span class="nc" id="L171">            out.flush();</span>
+<span class="nc" id="L172">        } catch (IOException ex) {</span>
+<span class="nc" id="L173">            logger.error(&quot;Error writing auth response &quot; + message, ex);</span>
+<span class="nc" id="L174">            throw new BusinessException(ex);</span>
+        } finally {
+<span class="nc" id="L176">            out.close();</span>
+        }
+<span class="nc" id="L178">    }</span>
+
+
+
+    private void authFailedResponse(
+            HttpServletRequest request, HttpServletResponse response) {
+<span class="nc" id="L184">        logger.info(&quot;Third-party authentication failed.&quot;);</span>
+<span class="nc" id="L185">        response.setStatus(HttpServletResponse.SC_FORBIDDEN);</span>
+<span class="nc" id="L186">    }</span>
+
+    private boolean isValidEmailAddress(String email) {
+<span class="nc" id="L189">        boolean result = true;</span>
+        try {
+<span class="nc" id="L191">            InternetAddress emailAddr = new InternetAddress(email);</span>
+<span class="nc" id="L192">            emailAddr.validate();</span>
+<span class="nc" id="L193">        } catch (AddressException ex) {</span>
+<span class="nc" id="L194">            result = false;</span>
+<span class="nc" id="L195">        }</span>
+<span class="nc" id="L196">        return result;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

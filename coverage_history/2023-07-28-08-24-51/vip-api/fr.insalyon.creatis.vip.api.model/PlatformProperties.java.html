@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../jacoco-resources/report.gif" type="image/gif"/><title>PlatformProperties.java</title><link rel="stylesheet" href="../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../index.html" class="el_report">coverage</a> &gt; <a href="../index.html" class="el_bundle">vip-api</a> &gt; <a href="index.source.html" class="el_package">fr.insalyon.creatis.vip.api.model</a> &gt; <span class="el_source">PlatformProperties.java</span></div><h1>PlatformProperties.java</h1><pre class="source lang-java linenums">/*
+ * Copyright and authors: see LICENSE.txt in base repository.
+ *
+ * This software is a web portal for pipeline execution on distributed systems.
+ *
+ * This software is governed by the CeCILL-B license under French law and
+ * abiding by the rules of distribution of free software.  You can  use,
+ * modify and/ or redistribute the software under the terms of the CeCILL-B
+ * license as circulated by CEA, CNRS and INRIA at the following URL
+ * &quot;http://www.cecill.info&quot;.
+ *
+ * As a counterpart to the access to the source code and  rights to copy,
+ * modify and redistribute granted by the license, users are provided only
+ * with a limited warranty  and the software's author,  the holder of the
+ * economic rights,  and the successive licensors  have only  limited
+ * liability.
+ *
+ * In this respect, the user's attention is drawn to the risks associated
+ * with loading,  using,  modifying and/or developing or reproducing the
+ * software by the user in light of its specific status of free software,
+ * that may mean  that it is complicated to manipulate,  and  that  also
+ * therefore means  that it is reserved for developers  and  experienced
+ * professionals having in-depth computer knowledge. Users are therefore
+ * encouraged to load and test the software's suitability as regards their
+ * requirements in conditions enabling the security of their systems and/or
+ * data to be ensured and,  more generally, to use and operate it in the
+ * same conditions as regards security.
+ *
+ * The fact that you are presently reading this means that you have had
+ * knowledge of the CeCILL-B license and that you accept its terms.
+ */
+package fr.insalyon.creatis.vip.api.model;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import javax.validation.constraints.NotNull;
+import java.util.List;
+
+/**
+ * Created by abonnet on 7/19/16.
+ */
+<span class="fc" id="L42">public class PlatformProperties {</span>
+
+    @NotNull
+    private String platformName;
+    @JsonProperty(&quot;APIErrorCodesAndMessages&quot;)
+    private List&lt;ErrorCodeAndMessage&gt; APIErrorCodesAndMessages;
+    @NotNull
+    private List&lt;SupportedTransferProtocol&gt; supportedTransferProtocols;
+    @NotNull
+    private List&lt;Module&gt; supportedModules;
+    @NotNull
+    private Long defaultLimitListExecutions;
+    private String email;
+    private String platformDescription;
+    private Long minAuthorizedExecutionTimeout;
+    private Long maxAuthorizedExecutionTimeout;
+    @NotNull
+    private List&lt;String&gt; unsupportedMethods;
+    private Long maxSizeDirectTransfer;
+    private String defaultStudy;
+    @NotNull
+    private String supportedAPIVersion;
+
+    public String getPlatformName() {
+<span class="fc" id="L66">        return platformName;</span>
+    }
+
+    public void setPlatformName(String platformName) {
+<span class="fc" id="L70">        this.platformName = platformName;</span>
+<span class="fc" id="L71">    }</span>
+
+    public List&lt;ErrorCodeAndMessage&gt; getAPIErrorCodesAndMessages() {
+<span class="fc" id="L74">        return APIErrorCodesAndMessages;</span>
+    }
+
+    public void setAPIErrorCodesAndMessages(List&lt;ErrorCodeAndMessage&gt; APIErrorCodesAndMessages) {
+<span class="fc" id="L78">        this.APIErrorCodesAndMessages = APIErrorCodesAndMessages;</span>
+<span class="fc" id="L79">    }</span>
+
+    public List&lt;SupportedTransferProtocol&gt; getSupportedTransferProtocols() {
+<span class="fc" id="L82">        return supportedTransferProtocols;</span>
+    }
+
+    public void setSupportedTransferProtocols(List&lt;SupportedTransferProtocol&gt; supportedTransferProtocols) {
+<span class="fc" id="L86">        this.supportedTransferProtocols = supportedTransferProtocols;</span>
+<span class="fc" id="L87">    }</span>
+
+    public List&lt;Module&gt; getSupportedModules() {
+<span class="fc" id="L90">        return supportedModules;</span>
+    }
+
+    public void setSupportedModules(List&lt;Module&gt; supportedModules) {
+<span class="fc" id="L94">        this.supportedModules = supportedModules;</span>
+<span class="fc" id="L95">    }</span>
+
+    public Long getDefaultLimitListExecutions() {
+<span class="fc" id="L98">        return defaultLimitListExecutions;</span>
+    }
+
+    public void setDefaultLimitListExecutions(Long defaultLimitListExecutions) {
+<span class="fc" id="L102">        this.defaultLimitListExecutions = defaultLimitListExecutions;</span>
+<span class="fc" id="L103">    }</span>
+
+    public String getEmail() {
+<span class="fc" id="L106">        return email;</span>
+    }
+
+    public void setEmail(String email) {
+<span class="fc" id="L110">        this.email = email;</span>
+<span class="fc" id="L111">    }</span>
+
+    public String getPlatformDescription() {
+<span class="fc" id="L114">        return platformDescription;</span>
+    }
+
+    public void setPlatformDescription(String platformDescription) {
+<span class="fc" id="L118">        this.platformDescription = platformDescription;</span>
+<span class="fc" id="L119">    }</span>
+
+    public Long getMinAuthorizedExecutionTimeout() {
+<span class="fc" id="L122">        return minAuthorizedExecutionTimeout;</span>
+    }
+
+    public void setMinAuthorizedExecutionTimeout(Long minAuthorizedExecutionTimeout) {
+<span class="nc" id="L126">        this.minAuthorizedExecutionTimeout = minAuthorizedExecutionTimeout;</span>
+<span class="nc" id="L127">    }</span>
+
+    public Long getMaxAuthorizedExecutionTimeout() {
+<span class="fc" id="L130">        return maxAuthorizedExecutionTimeout;</span>
+    }
+
+    public void setMaxAuthorizedExecutionTimeout(Long maxAuthorizedExecutionTimeout) {
+<span class="nc" id="L134">        this.maxAuthorizedExecutionTimeout = maxAuthorizedExecutionTimeout;</span>
+<span class="nc" id="L135">    }</span>
+
+    public List&lt;String&gt; getUnsupportedMethods() {
+<span class="fc" id="L138">        return unsupportedMethods;</span>
+    }
+
+    public void setUnsupportedMethods(List&lt;String&gt; unsupportedMethods) {
+<span class="fc" id="L142">        this.unsupportedMethods = unsupportedMethods;</span>
+<span class="fc" id="L143">    }</span>
+
+    public Long getMaxSizeDirectTransfer() {
+<span class="fc" id="L146">        return maxSizeDirectTransfer;</span>
+    }
+
+    public void setMaxSizeDirectTransfer(Long maxSizeDirectTransfer) {
+<span class="fc" id="L150">        this.maxSizeDirectTransfer = maxSizeDirectTransfer;</span>
+<span class="fc" id="L151">    }</span>
+
+    public String getDefaultStudy() {
+<span class="fc" id="L154">        return defaultStudy;</span>
+    }
+
+    public void setDefaultStudy(String defaultStudy) {
+<span class="nc" id="L158">        this.defaultStudy = defaultStudy;</span>
+<span class="nc" id="L159">    }</span>
+
+    public String getSupportedAPIVersion() {
+<span class="fc" id="L162">        return supportedAPIVersion;</span>
+    }
+
+    public void setSupportedAPIVersion(String supportedAPIVersion) {
+<span class="fc" id="L166">        this.supportedAPIVersion = supportedAPIVersion;</span>
+<span class="fc" id="L167">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../jacoco-resources/report.gif" type="image/gif"/><title>GateLabInputs.java</title><link rel="stylesheet" href="../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../index.html" class="el_report">coverage</a> &gt; <a href="../index.html" class="el_bundle">vip-gatelab</a> &gt; <a href="index.source.html" class="el_package">fr.insalyon.creatis.vip.gatelab.server.business</a> &gt; <span class="el_source">GateLabInputs.java</span></div><h1>GateLabInputs.java</h1><pre class="source lang-java linenums">/*
+ * Copyright and authors: see LICENSE.txt in base repository.
+ *
+ * This software is a web portal for pipeline execution on distributed systems.
+ *
+ * This software is governed by the CeCILL-B license under French law and
+ * abiding by the rules of distribution of free software.  You can  use,
+ * modify and/ or redistribute the software under the terms of the CeCILL-B
+ * license as circulated by CEA, CNRS and INRIA at the following URL
+ * &quot;http://www.cecill.info&quot;.
+ *
+ * As a counterpart to the access to the source code and  rights to copy,
+ * modify and redistribute granted by the license, users are provided only
+ * with a limited warranty  and the software's author,  the holder of the
+ * economic rights,  and the successive licensors  have only  limited
+ * liability.
+ *
+ * In this respect, the user's attention is drawn to the risks associated
+ * with loading,  using,  modifying and/or developing or reproducing the
+ * software by the user in light of its specific status of free software,
+ * that may mean  that it is complicated to manipulate,  and  that  also
+ * therefore means  that it is reserved for developers  and  experienced
+ * professionals having in-depth computer knowledge. Users are therefore
+ * encouraged to load and test the software's suitability as regards their
+ * requirements in conditions enabling the security of their systems and/or
+ * data to be ensured and,  more generally, to use and operate it in the
+ * same conditions as regards security.
+ *
+ * The fact that you are presently reading this means that you have had
+ * knowledge of the CeCILL-B license and that you accept its terms.
+ */
+package fr.insalyon.creatis.vip.gatelab.server.business;
+
+import fr.insalyon.creatis.vip.core.server.business.BusinessException;
+import fr.insalyon.creatis.vip.core.server.business.Server;
+import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerException;
+import fr.insalyon.creatis.vip.datamanager.server.DataManagerUtil;
+import java.sql.Connection;
+import java.util.HashMap;
+import java.util.Map;
+
+import fr.insalyon.creatis.vip.datamanager.server.business.LfcPathsBusiness;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
+
+import javax.annotation.PostConstruct;
+
+/**
+ * This stores data in fields and this is not threadsafe. So it cannot be used
+ * as a spring singleton and this needs prototype scope.
+ *
+ * @author Ibrahim Kallel, Rafael Silva
+ */
+@Component
+@Scope(&quot;prototype&quot;)
+public class GateLabInputs {
+
+<span class="nc" id="L61">    private final Logger logger = LoggerFactory.getLogger(getClass());</span>
+    private Map&lt;String, String&gt; inputsMap;
+    private String inputfile;
+
+    private Server server;
+    private LfcPathsBusiness lfcPathsBusiness;
+    private String workflowID;
+    private GateLabInputsParser gateLabInputsParser;
+
+    @Autowired
+    public final void setServer(Server server) {
+<span class="nc" id="L72">        this.server = server;</span>
+<span class="nc" id="L73">    }</span>
+
+    @Autowired
+    public final void setLfcPathsBusiness(fr.insalyon.creatis.vip.datamanager.server.business.LfcPathsBusiness lfcPathsBusiness) {
+<span class="nc" id="L77">        this.lfcPathsBusiness = lfcPathsBusiness;</span>
+<span class="nc" id="L78">    }</span>
+
+    /* GateLabInputsParser is also prototype based */
+    @Autowired
+    public void setGateLabInputsParser(GateLabInputsParser gateLabInputsParser) {
+<span class="nc" id="L83">        this.gateLabInputsParser = gateLabInputsParser;</span>
+<span class="nc" id="L84">    }</span>
+
+<span class="nc" id="L86">    public GateLabInputs(String workflowID) {</span>
+<span class="nc" id="L87">        this.workflowID = workflowID;</span>
+<span class="nc" id="L88">    }</span>
+
+    @PostConstruct
+    public final void init() {
+<span class="nc" id="L92">        inputsMap = new HashMap&lt;String, String&gt;();</span>
+<span class="nc" id="L93">        inputfile = server.getWorkflowsPath() + &quot;/&quot; + workflowID + &quot;/input-m2.xml&quot;;</span>
+<span class="nc" id="L94">        inputsMap = gateLabInputsParser.parse(inputfile);</span>
+<span class="nc" id="L95">    }</span>
+
+    /**
+     *
+     * @param currentUserFolder
+     * @return
+     * @throws BusinessException
+     */
+    public Map&lt;String, String&gt; getWorkflowInputs(String currentUserFolder)
+            throws BusinessException {
+
+        try {
+<span class="nc" id="L107">            String input = inputsMap.get(&quot;GateInput&quot;);</span>
+            /*
+             * int ind = input.lastIndexOf(&quot;/&quot;); String inputlink =
+             * input.substring(0, ind);
+             *
+             * String application_name = &quot;unknown&quot;;
+             *
+             * if (input.indexOf(&quot;.zip&quot;) &gt; 0) { application_name =
+             * input.substring(ind + 1, input.indexOf(&quot;.zip&quot;));
+             *
+             * } else if (input.indexOf(&quot;.tgz&quot;) &gt; 0) { application_name =
+             * input.substring(ind + 1, input.indexOf(&quot;.tgz&quot;));
+             *
+             * } else if (input.indexOf(&quot;.tar.gz&quot;) &gt; 0) { application_name =
+             * input.substring(ind + 1, input.indexOf(&quot;.tar.gz&quot;));
+             *
+             * } else if (input.indexOf(&quot;.zip&quot;) &gt; 0) { application_name =
+             * input.substring(ind + 1, input.indexOf(&quot;.zip&quot;)); }
+             *
+             * String outputlink = inputlink + &quot;/output&quot;;
+             */
+<span class="nc" id="L128">            String release = inputsMap.get(&quot;GateRelease&quot;);</span>
+<span class="nc" id="L129">            String particles = inputsMap.get(&quot;NumberOfParticles&quot;);</span>
+<span class="nc bnc" id="L130" title="All 2 branches missed.">            String simtype = inputsMap.get(&quot;ParallelizationType&quot;).equals(&quot;dyn&quot;) ?</span>
+<span class="nc" id="L131">                    &quot;Dynamic&quot; : &quot;Static&quot;;</span>
+<span class="nc" id="L132">            String phaseSpace = inputsMap.get(&quot;phaseSpace&quot;);</span>
+<span class="nc" id="L133">            Map&lt;String, String&gt; inputMap = new HashMap&lt;String, String&gt;();</span>
+<span class="nc" id="L134">            inputMap.put(</span>
+                &quot;inputlink&quot;,
+<span class="nc" id="L136">                    lfcPathsBusiness.parseRealDir(input, currentUserFolder));</span>
+            //inputMap.put(&quot;outputlink&quot;, DataManagerUtil.parseRealDir(outputlink));
+<span class="nc" id="L138">            inputMap.put(</span>
+                &quot;gate_version&quot;,
+<span class="nc" id="L140">                    lfcPathsBusiness.parseRealDir(release, currentUserFolder));</span>
+<span class="nc" id="L141">            inputMap.put(&quot;particles&quot;, particles);</span>
+<span class="nc" id="L142">            inputMap.put(&quot;simulation&quot;, simtype);</span>
+<span class="nc" id="L143">            inputMap.put(&quot;phaseSpace&quot;, phaseSpace);</span>
+
+<span class="nc" id="L145">            return inputMap;</span>
+
+<span class="nc" id="L147">        } catch (DataManagerException ex) {</span>
+<span class="nc" id="L148">            throw new BusinessException(ex);</span>
+        }
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>
