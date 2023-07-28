@@ -9,11 +9,10 @@ name: code_quality_pmd
 
 on:
   push:
-
-    branches: [ "master" ]
+    branches: [ "ci" ]
 
   pull_request:
-    branches: [ "master" ]
+    branches: [ "ci" ]
 
 permissions:
   contents: read
