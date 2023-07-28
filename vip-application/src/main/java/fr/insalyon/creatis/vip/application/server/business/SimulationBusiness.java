@@ -57,7 +57,6 @@ import java.io.IOException;
 import java.util.*;
 
 /**
- *
  * @author Rafael Ferreira da Silva
  */
 @Service
@@ -200,7 +199,7 @@ public class SimulationBusiness {
                 String[] params = task.getParameters();
                 for (int i = 0; i < params.length; i++) {
                     params[i] = lfcPathsBusiness.parseRealDir(
-                        params[i], currentUserFolder);
+                            params[i], currentUserFolder);
                 }
                 task.setParameters(params);
             }
@@ -280,6 +279,7 @@ public class SimulationBusiness {
 
         try {
             fileName += extension;
+
             Scanner scanner = new Scanner(new FileInputStream(server.getWorkflowsPath()
                     + "/" + simulationID + "/" + folder + "/" + fileName));
 

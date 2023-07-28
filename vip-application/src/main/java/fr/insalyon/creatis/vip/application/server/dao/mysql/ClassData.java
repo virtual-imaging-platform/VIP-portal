@@ -35,12 +35,6 @@ import fr.insalyon.creatis.vip.application.client.bean.AppClass;
 import fr.insalyon.creatis.vip.application.server.dao.ClassDAO;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants.GROUP_ROLE;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,9 +43,13 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.sql.DataSource;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
- *
  * @author Rafael Ferreira da Silva
  */
 @Repository
@@ -70,14 +68,14 @@ public class ClassData extends JdbcDaoSupport implements ClassDAO {
         try {
             PreparedStatement ps = getConnection().prepareStatement(
                     "INSERT INTO VIPClasses(name) "
-                    + "VALUES (?)");
+                            + "VALUES (?)");
 
             ps.setString(1, appClass.getName());
             ps.execute();
             ps.close();
 
         } catch (SQLException ex) {
-            if (ex.getMessage().contains("Duplicate entry")) {
+            if (ex.getMessage().contains("Unique index or primary key violation") || ex.getMessage().contains("Duplicate entry ")) {
                 logger.error("A class named \"{}\" already exists.", appClass.getName());
                 throw new DAOException("A class named \"" + appClass.getName() + "\" already exists.");
             } else {
@@ -132,7 +130,7 @@ public class ClassData extends JdbcDaoSupport implements ClassDAO {
                 List<String> groups = new ArrayList<String>();
                 PreparedStatement ps2 = getConnection().prepareStatement(
                         "SELECT groupname FROM VIPGroupsClasses "
-                        + "WHERE classname=? ORDER BY groupname");
+                                + "WHERE classname=? ORDER BY groupname");
                 ps2.setString(1, rs.getString("name"));
                 ResultSet rg = ps2.executeQuery();
 
@@ -144,7 +142,7 @@ public class ClassData extends JdbcDaoSupport implements ClassDAO {
                 List<String> engines = new ArrayList<String>();
                 PreparedStatement ps3 = getConnection().prepareStatement(
                         "SELECT engine FROM VIPClassesEngines "
-                        + "WHERE class=? ORDER BY engine");
+                                + "WHERE class=? ORDER BY engine");
                 ps3.setString(1, rs.getString("name"));
                 ResultSet re = ps3.executeQuery();
                 while (re.next()) {
@@ -167,21 +165,21 @@ public class ClassData extends JdbcDaoSupport implements ClassDAO {
 
     @Override
     public AppClass getClass(String className) throws DAOException {
-          try {
+        try {
 
-              // Get class
+            // Get class
             PreparedStatement ps = getConnection().prepareStatement(
                     "SELECT name FROM VIPClasses WHERE name=?");
             ps.setString(1, className);
             ResultSet rs = ps.executeQuery();
 
-            if(rs.first()) {
+            if (rs.first()) {
 
                 // Get groups associated to class
                 List<String> groups = new ArrayList<String>();
                 PreparedStatement ps2 = getConnection().prepareStatement(
                         "SELECT groupname FROM VIPGroupsClasses "
-                        + "WHERE classname=? ORDER BY groupname");
+                                + "WHERE classname=? ORDER BY groupname");
                 ps2.setString(1, rs.getString("name"));
                 ResultSet r = ps2.executeQuery();
                 while (r.next()) {
@@ -192,7 +190,7 @@ public class ClassData extends JdbcDaoSupport implements ClassDAO {
                 List<String> engines = new ArrayList<String>();
                 PreparedStatement ps3 = getConnection().prepareStatement(
                         "SELECT engine FROM VIPClassesEngines "
-                        + "WHERE class=? ORDER BY engine");
+                                + "WHERE class=? ORDER BY engine");
                 ps3.setString(1, rs.getString("name"));
                 ResultSet re = ps3.executeQuery();
                 while (re.next()) {
@@ -207,7 +205,7 @@ public class ClassData extends JdbcDaoSupport implements ClassDAO {
             return null;
 
         } catch (SQLException ex) {
-              logger.error("Error getting class {}", className, ex);
+            logger.error("Error getting class {}", className, ex);
             throw new DAOException(ex);
         }
     }
@@ -234,7 +232,7 @@ public class ClassData extends JdbcDaoSupport implements ClassDAO {
                 List<String> groups = new ArrayList<String>();
                 PreparedStatement ps2 = getConnection().prepareStatement(
                         "SELECT groupname FROM VIPGroupsClasses "
-                        + "WHERE classname=? ORDER BY groupname");
+                                + "WHERE classname=? ORDER BY groupname");
                 ps2.setString(1, rs.getString("classname"));
                 ResultSet r = ps2.executeQuery();
 
@@ -265,13 +263,13 @@ public class ClassData extends JdbcDaoSupport implements ClassDAO {
                 switch (objectType) {
                     case "group":
                         ps = getConnection().prepareStatement("INSERT INTO "
-                        + "VIPGroupsClasses(classname, groupname) "
-                        + "VALUES(?, ?)");
+                                + "VIPGroupsClasses(classname, groupname) "
+                                + "VALUES(?, ?)");
                         break;
                     case "engine":
                         ps = getConnection().prepareStatement("INSERT INTO "
-                        + "VIPClassesEngines(class, engine) "
-                        + "VALUES(?, ?)");
+                                + "VIPClassesEngines(class, engine) "
+                                + "VALUES(?, ?)");
                         break;
                     default:
                         logger.error("Error adding something to class {} : invalid objectType {}",
@@ -284,9 +282,9 @@ public class ClassData extends JdbcDaoSupport implements ClassDAO {
                 ps.close();
 
             } catch (SQLException ex) {
-                if (ex.getMessage().contains("Duplicate entry")) {
-                    logger.error("a "+objectType+" named \"" + name + "\" is already associated with the class.");
-                    throw new DAOException("a "+objectType+" named \"" + name + "\" is already associated with the class.", ex);
+                if (ex.getMessage().contains("Unique index or primary key violation") || ex.getMessage().contains("Duplicate entry ")) {
+                    logger.error("a " + objectType + " named \"" + name + "\" is already associated with the class.");
+                    throw new DAOException("a " + objectType + " named \"" + name + "\" is already associated with the class.", ex);
                 } else {
                     logger.error("Error adding {} {} to class {}", objectType, objectList, className, ex);
                     throw new DAOException(ex);
@@ -296,7 +294,6 @@ public class ClassData extends JdbcDaoSupport implements ClassDAO {
     }
 
     /**
-     *
      * @param objectType (group or engine)
      */
     private void removeFromClass(String className, String objectType) throws DAOException {
@@ -306,11 +303,11 @@ public class ClassData extends JdbcDaoSupport implements ClassDAO {
             switch (objectType) {
                 case "group":
                     ps = getConnection().prepareStatement("DELETE FROM "
-                    + "VIPGroupsClasses WHERE className=?");
+                            + "VIPGroupsClasses WHERE className=?");
                     break;
                 case "engine":
                     ps = getConnection().prepareStatement("DELETE FROM "
-                    + "VIPClassesEngines WHERE class=?");
+                            + "VIPClassesEngines WHERE class=?");
                     break;
                 default:
                     logger.error("Error removing something from class {} : invalid objectType {}",

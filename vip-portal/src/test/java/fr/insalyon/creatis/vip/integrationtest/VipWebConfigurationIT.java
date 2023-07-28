@@ -82,6 +82,4 @@ public class VipWebConfigurationIT {
                 .andExpect(jsonPath("$.platformName").value("VIP_TEST"));
     }
 
-
-
 }

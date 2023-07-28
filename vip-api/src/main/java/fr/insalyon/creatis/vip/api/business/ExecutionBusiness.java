@@ -100,7 +100,7 @@ public class ExecutionBusiness {
     public String getStdOut(String executionId) throws ApiException {
         try {
             Simulation s = workflowBusiness.getSimulation(executionId);
-            return simulationBusiness.readFile(s.getID(), "", "workflow", ".out");
+            return simulationBusiness.readFile(s.getID(), "folder", "workflow", ".out");
         } catch (BusinessException ex) {
             throw new ApiException(ex);
         }
@@ -109,7 +109,7 @@ public class ExecutionBusiness {
     public String getStdErr(String executionId) throws ApiException {
         try {
             Simulation s = workflowBusiness.getSimulation(executionId);
-            return simulationBusiness.readFile(s.getID(), "", "workflow", ".err");
+            return simulationBusiness.readFile(s.getID(), "folder", "workflow", ".err");
         } catch (BusinessException ex) {
             throw new ApiException(ex);
         }

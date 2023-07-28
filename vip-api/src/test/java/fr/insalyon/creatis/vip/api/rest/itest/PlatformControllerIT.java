@@ -31,12 +31,10 @@
  */
 package fr.insalyon.creatis.vip.api.rest.itest;
 
-import fr.insalyon.creatis.vip.api.exception.ApiException;
 import fr.insalyon.creatis.vip.api.exception.ApiException.ApiError;
 import fr.insalyon.creatis.vip.api.model.Module;
-import fr.insalyon.creatis.vip.api.rest.config.BaseVIPSpringIT;
 import fr.insalyon.creatis.vip.api.model.SupportedTransferProtocol;
-import fr.insalyon.creatis.vip.application.client.bean.Application;
+import fr.insalyon.creatis.vip.api.rest.config.BaseWebSpringIT;
 import fr.insalyon.creatis.vip.application.client.view.ApplicationException.ApplicationError;
 import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
@@ -61,7 +59,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * Test method on platform path
  */
 @Disabled
-public class PlatformControllerIT extends BaseVIPSpringIT {
+public class PlatformControllerIT extends BaseWebSpringIT {
 
     @Test
     public void platformShouldNotBeSecured() throws Exception {

@@ -31,12 +31,13 @@
  */
 package fr.insalyon.creatis.vip.api.data;
 
-import fr.insalyon.creatis.vip.api.model.ErrorCodeAndMessage;
 import fr.insalyon.creatis.vip.api.model.Module;
 import fr.insalyon.creatis.vip.api.model.SupportedTransferProtocol;
 
-import static fr.insalyon.creatis.vip.api.model.Module.*;
-import static fr.insalyon.creatis.vip.api.model.SupportedTransferProtocol.*;
+import static fr.insalyon.creatis.vip.api.model.Module.COMMERCIAL;
+import static fr.insalyon.creatis.vip.api.model.Module.DATA;
+import static fr.insalyon.creatis.vip.api.model.SupportedTransferProtocol.HTTP;
+import static fr.insalyon.creatis.vip.api.model.SupportedTransferProtocol.WEBDAV;
 
 /**
  * Created by abonnet on 7/21/16.
@@ -66,6 +67,6 @@ public interface CarminAPITestConstants {
 
     String TEST_APIKEY_HEADER = "testapikey";
     String TEST_GENERATE_NEW_APIKEY_EACH_TIME = "false";
-    
+
     String TEST_PIPELINE_WHITELIST = "application 3/4.2";
 }

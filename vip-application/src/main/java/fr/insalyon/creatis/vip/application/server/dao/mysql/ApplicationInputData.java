@@ -34,12 +34,6 @@ package fr.insalyon.creatis.vip.application.server.dao.mysql;
 import fr.insalyon.creatis.vip.application.client.bean.SimulationInput;
 import fr.insalyon.creatis.vip.application.server.dao.ApplicationInputDAO;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,9 +42,13 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.sql.DataSource;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
- *
  * @author Rafael Ferreira da Silva
  */
 @Repository
@@ -71,7 +69,7 @@ public class ApplicationInputData extends JdbcDaoSupport implements ApplicationI
         try {
             PreparedStatement ps = getConnection().prepareStatement(
                     "INSERT INTO VIPAppInputs(email, application, name, inputs) "
-                    + "VALUES (?, ?, ?, ?)");
+                            + "VALUES (?, ?, ?, ?)");
 
             ps.setString(1, email);
             ps.setString(2, SimulationInput.getApplication());
@@ -81,7 +79,7 @@ public class ApplicationInputData extends JdbcDaoSupport implements ApplicationI
             ps.close();
 
         } catch (SQLException ex) {
-            if (ex.getMessage().contains("Duplicate entry")) {
+            if (ex.getMessage().contains("Unique index or primary key violation") || ex.getMessage().contains("Duplicate entry ")) {
                 logger.error("An input named \"" + SimulationInput.getName() + "\" already exists.");
                 throw new DAOException("An input named \"" + SimulationInput.getName() + "\" already exists.", ex);
             } else {
@@ -95,7 +93,7 @@ public class ApplicationInputData extends JdbcDaoSupport implements ApplicationI
 
     @Override
     public void removeSimulationInput(String email, String inputName,
-            String application) throws DAOException {
+                                      String application) throws DAOException {
 
         try {
             PreparedStatement ps = getConnection().prepareStatement("DELETE "
@@ -120,7 +118,7 @@ public class ApplicationInputData extends JdbcDaoSupport implements ApplicationI
         try {
             PreparedStatement ps = getConnection().prepareStatement(
                     "UPDATE VIPAppInputs SET inputs=? "
-                    + "WHERE email=? AND application=? AND name=?");
+                            + "WHERE email=? AND application=? AND name=?");
 
             ps.setString(1, SimulationInput.getInputs());
             ps.setString(2, email);
@@ -169,7 +167,7 @@ public class ApplicationInputData extends JdbcDaoSupport implements ApplicationI
 
     @Override
     public List<SimulationInput> getWorkflowInputByUserAndAppName(String user,
-            String appName) throws DAOException {
+                                                                  String appName) throws DAOException {
 
         try {
             List<SimulationInput> inputs = new ArrayList<SimulationInput>();
@@ -200,7 +198,7 @@ public class ApplicationInputData extends JdbcDaoSupport implements ApplicationI
 
     @Override
     public SimulationInput getInputByNameUserApp(String email, String name,
-            String appName) throws DAOException {
+                                                 String appName) throws DAOException {
 
         try {
             PreparedStatement ps = getConnection().prepareStatement("SELECT "
@@ -246,7 +244,7 @@ public class ApplicationInputData extends JdbcDaoSupport implements ApplicationI
         try {
             PreparedStatement ps = getConnection().prepareStatement(
                     "INSERT INTO VIPAppExamples(application, name, inputs) "
-                    + "VALUES (?, ?, ?)");
+                            + "VALUES (?, ?, ?)");
 
             ps.setString(1, simulationInput.getApplication());
             ps.setString(2, simulationInput.getName());
@@ -255,7 +253,7 @@ public class ApplicationInputData extends JdbcDaoSupport implements ApplicationI
             ps.close();
 
         } catch (SQLException ex) {
-            if (ex.getMessage().contains("Duplicate entry")) {
+            if (ex.getMessage().contains("Unique index or primary key violation") || ex.getMessage().contains("Duplicate entry ")) {
                 logger.error("An input named \"" + simulationInput.getName() + "\" already exists.");
                 throw new DAOException("An input named \"" + simulationInput.getName() + "\" already exists.", ex);
             } else {
@@ -297,7 +295,7 @@ public class ApplicationInputData extends JdbcDaoSupport implements ApplicationI
             throw new DAOException(ex);
         }
     }
-    
+
     @Override
     public void removeSimulationInputExample(String inputName, String application)
             throws DAOException {
