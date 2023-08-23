@@ -29,6 +29,8 @@ public class ReproVipBusiness {
     private WorkflowBusiness workflowBusiness;
     @Autowired
     private EmailBusiness emailBusiness;
+    @Autowired
+    private ExecutionInOutData executionInOutData;
 
     public void executionAdminEmail(Execution execution) throws DAOException, BusinessException {
         String adminsEmailContents = "<html>"
@@ -58,22 +60,33 @@ public class ReproVipBusiness {
         }
         logger.info("Email send");
     }
-    public List<InOutData> executionOutputData (String executionID, User currentUser) throws ApplicationException, BusinessException {
-        logger.info("Fetching input data for executionID: {}", executionID);
+    public ExecutionInOutData executionOutputData(String executionID, User currentUser) throws ApplicationException, BusinessException {
+        logger.info("Fetching data for executionID: {}", executionID);
+
         List<InOutData> outputData = workflowBusiness.getOutputData(executionID, currentUser.getFolder());
+        List<InOutData> inputData = workflowBusiness.getInputData(executionID, currentUser.getFolder());
+
         if (outputData != null) {
             logger.info("Fetched {} output data items", outputData.size());
             logger.info(outputData.toString());
         } else {
             logger.info("Output data is null for executionID: {}", executionID);
         }
-        return outputData;
+
+        if (inputData != null) {
+            logger.info("Fetched {} input data items", inputData.size());
+            logger.info(inputData.toString());
+        } else {
+            logger.info("Input data is null for executionID: {}", executionID);
+        }
+
+        return new ExecutionInOutData(inputData, outputData);
     }
     public String createJsonOutputData(String executionID, User currentUser) throws ApplicationException, BusinessException {
-        List<InOutData> inputData = executionOutputData(executionID, currentUser);
+        ExecutionInOutData inOutData = executionOutputData(executionID, currentUser);
         ObjectMapper objectMapper = new ObjectMapper();
         try {
-            String json = objectMapper.writeValueAsString(inputData);
+            String json = objectMapper.writeValueAsString(inOutData);
             return json;
         } catch (JsonProcessingException e) {
             throw new ApplicationException(ApplicationException.ApplicationError.valueOf("Failed to convert Output to JSON"), e);
