@@ -55,9 +55,8 @@ public class RegisterUserController extends ApiController {
                 );
         user.setRegistration(new Date());
         user.setLastLogin(new Date());
-        this.apiUserBusiness.signup(user, signUpUser.getComments(), signUpUser.getApplication());
+        this.apiUserBusiness.signup(user, signUpUser.getComments(), signUpUser.getApplications());
         return new ResponseEntity(HttpStatus.CREATED);
     }
-
 
 }

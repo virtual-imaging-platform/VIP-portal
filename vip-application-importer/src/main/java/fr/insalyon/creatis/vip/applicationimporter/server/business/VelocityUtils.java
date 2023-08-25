@@ -51,7 +51,7 @@ public class VelocityUtils {
 
     private VelocityEngine velocityEngine;
 
-    private VelocityUtils() {
+    public VelocityUtils() {
         velocityEngine = new VelocityEngine();
         velocityEngine.setProperty("resource.loader", "class");
         velocityEngine.setProperty("class.resource.loader.class", "org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader");

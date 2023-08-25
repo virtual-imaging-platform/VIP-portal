@@ -41,6 +41,8 @@ import org.xml.sax.helpers.XMLReaderFactory;
 
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.Reader;
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -60,9 +62,17 @@ public abstract class AbstractWorkflowParser extends DefaultHandler {
     }
 
     public Descriptor parse(String fileName) throws IOException, SAXException {
+        return parse(new FileReader(fileName));
+    }
+
+    public Descriptor parseString(String workflowString) throws IOException, SAXException {
+        return parse(new StringReader(workflowString));
+    }
+
+    private Descriptor parse(Reader workflowReader) throws IOException, SAXException {
         reader = XMLReaderFactory.createXMLReader();
         reader.setContentHandler(this);
-        reader.parse(new InputSource(new FileReader(fileName)));
+        reader.parse(new InputSource(workflowReader));
 
         return new Descriptor(sources,description);
     }

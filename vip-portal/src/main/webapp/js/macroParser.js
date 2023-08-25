@@ -205,7 +205,9 @@ function isSimuStatic(dataArray) {
     return false;
 }
 function fillInInputs(fileName, dataArray) {
-    var type = isSimuStatic(dataArray) ? "stat" : "dyn";
+    //var type = isSimuStatic(dataArray) ? "stat" : "dyn";
+    //force static simulation while waiting for confirmation of dynamic mode removal
+    var type = "stat";
     //TODO handle phaseSpace use-case
     var ps = "dummy";
     var parts = dataArray.totalNumberOfPrimaries;

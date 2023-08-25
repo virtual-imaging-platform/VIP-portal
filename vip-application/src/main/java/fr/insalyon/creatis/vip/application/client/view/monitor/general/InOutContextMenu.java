@@ -96,24 +96,21 @@ public class InOutContextMenu extends Menu {
             @Override
             public void onClick(MenuItemClickEvent event) {
                 String folder = node.getName().substring(0, node.getName().lastIndexOf("/"));
-                BrowserLayout.getInstance().loadData(folder, false);
+                BrowserLayout.getInstance().loadData(folder, true);
                 DataManagerModule.dataManagerSection.expand();
             }
         });
 
-        if (!node.getType().equals("Simulation")) {
-            if (node.getName().startsWith(DataManagerConstants.ROOT + "/")) {
-                 ArrayList<MenuItem> menuItems = new ArrayList<MenuItem>();
-
-                 BrowserContextMenu.addVizualisers(menuItems, node.getName());
-                 menuItems.add(downloadFileItem);
-                 menuItems.add(jumpToItem);
-            } else {
-                this.setItems(downloadFilesItem);
-            }
+        if (node.getName().startsWith(DataManagerConstants.ROOT + "/")) {
+            ArrayList<MenuItem> menuItems = new ArrayList<MenuItem>();
+            BrowserContextMenu.addVizualisers(menuItems, node.getName());
+            menuItems.add(downloadFileItem);
+            menuItems.add(jumpToItem);
+            this.setItems(menuItems.toArray(new MenuItem[menuItems.size()]));
+        } else if (!node.getType().equals("Simulation")) {
+            this.setItems(downloadFilesItem);
         }
     }
-
     private void downloadFile(String path) {
 
         AsyncCallback<String> callback = new AsyncCallback<String>() {

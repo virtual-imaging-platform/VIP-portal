@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+
+<ruleset name="PMD-Rules">
+    <description>
+        The rulesets we want to use in pmd. For a detailed description of pmd rulesets:
+        http://pmd.sourceforge.net/rules/index.html
+    </description>
+    <rule ref="category/java/security.xml/HardCodedCryptoKey" />
+    <rule ref="category/java/security.xml/InsecureCryptoIv" />
+
+    <rule ref="category/java/bestpractices.xml/UnusedFormalParameter"/>
+    <rule ref="category/java/bestpractices.xml/UnusedLocalVariable"/>
+    <rule ref="category/java/bestpractices.xml/UnusedPrivateField"/>
+    <rule ref="category/java/bestpractices.xml/UnusedPrivateMethod"/>
+</ruleset>

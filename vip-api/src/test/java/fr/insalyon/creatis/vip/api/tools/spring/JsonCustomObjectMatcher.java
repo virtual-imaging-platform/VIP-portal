@@ -31,7 +31,10 @@
  */
 package fr.insalyon.creatis.vip.api.tools.spring;
 
-import org.hamcrest.*;
+import org.hamcrest.Description;
+import org.hamcrest.Matcher;
+import org.hamcrest.Matchers;
+import org.hamcrest.TypeSafeDiagnosingMatcher;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -46,7 +49,7 @@ import static org.springframework.util.ClassUtils.isPrimitiveOrWrapper;
 
 /**
  * Created by abonnet on 8/3/16
- *
+ * <p>
  * // TODO verify generic types of suppliers
  * // TODO study and correct error message
  */
@@ -83,81 +86,6 @@ public class JsonCustomObjectMatcher<T> extends TypeSafeDiagnosingMatcher<Map<St
             }
         }
         nonNullPropertiesCountMatcher = equalTo(propertyMatchers.size());
-    }
-
-    @Override
-    public boolean matchesSafely(Map<String,?> map, Description mismatch) {
-        Integer nonNullValues = countNonNullValue(map);
-        if (!nonNullPropertiesCountMatcher.matches(nonNullValues)) {
-            nonNullPropertiesCountMatcher.describeMismatch(nonNullValues, mismatch);
-            return false;
-        }
-        for (Matcher<?> propertyMatcher : propertyMatchers) {
-            if (!propertyMatcher.matches(map)) {
-                propertyMatcher.describeMismatch(map, mismatch);
-                return false;
-            }
-        }
-        return true;
-    }
-
-    @Override
-    public void describeTo(Description description) {
-        description.appendText("same property values as :")
-                .appendValue(expectedBean.getClass().getSimpleName())
-                .appendList(" [", ", ", "]", propertyMatchers);
-    }
-
-    public int countNonNullValue(Map<String,?> map) {
-        int counter = 0;
-        for (Entry<String,?> entry : map.entrySet()) {
-            if (entry.getValue() != null) {
-                counter++;
-            }
-        }
-        return counter;
-    }
-
-    private static class JsonMapMatcher extends TypeSafeDiagnosingMatcher<Map<String,?>> {
-
-        private final Matcher<Integer> sizeMatcher;
-        private final List<Matcher<?>> mapEntriesMatchers = new ArrayList<>();
-
-        private JsonMapMatcher(
-                Map<?,?> expectedMap,
-                Map<Class, Map<String, Function>> suppliersRegistry) {
-            sizeMatcher = equalTo(expectedMap.size());
-            for (Map.Entry<?, ?> expectedEntry : expectedMap.entrySet()) {
-                String expectedKey = expectedEntry.getKey().toString();
-                Object expectedValue = expectedEntry.getValue();
-                Matcher<String> keyMatcher = equalTo(expectedKey);
-                Matcher valueMatcher = getGenericMatcher(expectedValue, suppliersRegistry);
-                Matcher<Map> entryMatcher = hasEntry(keyMatcher, valueMatcher);
-                mapEntriesMatchers.add(entryMatcher);
-            }
-        }
-
-        @Override
-        protected boolean matchesSafely(Map<String, ?> item, Description mismatchDescription) {
-            if (!sizeMatcher.matches(item.size())) {
-                mismatchDescription.appendText("map size is different");
-                sizeMatcher.describeMismatch(item, mismatchDescription);
-                return false;
-            }
-            for (Matcher<?> entryMatcher : mapEntriesMatchers) {
-                if (!entryMatcher.matches(item)) {
-                    entryMatcher.describeMismatch(item, mismatchDescription);
-                    return false;
-                }
-            }
-            return true;
-        }
-
-        @Override
-        public void describeTo(Description description) {
-            description.appendText("same entries as")
-                    .appendList(" [", ", ", "]", mapEntriesMatchers);
-        }
     }
 
     private static Matcher<?> getGenericMatcher(
@@ -239,6 +167,81 @@ public class JsonCustomObjectMatcher<T> extends TypeSafeDiagnosingMatcher<Map<St
             suppliersMap.put(mapKeys.get(it), suppliers[it]);
         }
         return suppliersMap;
+    }
+
+    @Override
+    public boolean matchesSafely(Map<String, ?> map, Description mismatch) {
+        Integer nonNullValues = countNonNullValue(map);
+        if (!nonNullPropertiesCountMatcher.matches(nonNullValues)) {
+            nonNullPropertiesCountMatcher.describeMismatch(nonNullValues, mismatch);
+            return false;
+        }
+        for (Matcher<?> propertyMatcher : propertyMatchers) {
+            if (!propertyMatcher.matches(map)) {
+                propertyMatcher.describeMismatch(map, mismatch);
+                return false;
+            }
+        }
+        return true;
+    }
+
+    @Override
+    public void describeTo(Description description) {
+        description.appendText("same property values as :")
+                .appendValue(expectedBean.getClass().getSimpleName())
+                .appendList(" [", ", ", "]", propertyMatchers);
+    }
+
+    public int countNonNullValue(Map<String, ?> map) {
+        int counter = 0;
+        for (Entry<String, ?> entry : map.entrySet()) {
+            if (entry.getValue() != null) {
+                counter++;
+            }
+        }
+        return counter;
+    }
+
+    private static class JsonMapMatcher extends TypeSafeDiagnosingMatcher<Map<String, ?>> {
+
+        private final Matcher<Integer> sizeMatcher;
+        private final List<Matcher<?>> mapEntriesMatchers = new ArrayList<>();
+
+        private JsonMapMatcher(
+                Map<?, ?> expectedMap,
+                Map<Class, Map<String, Function>> suppliersRegistry) {
+            sizeMatcher = equalTo(expectedMap.size());
+            for (Map.Entry<?, ?> expectedEntry : expectedMap.entrySet()) {
+                String expectedKey = expectedEntry.getKey().toString();
+                Object expectedValue = expectedEntry.getValue();
+                Matcher<String> keyMatcher = equalTo(expectedKey);
+                Matcher valueMatcher = getGenericMatcher(expectedValue, suppliersRegistry);
+                Matcher<Map> entryMatcher = hasEntry(keyMatcher, valueMatcher);
+                mapEntriesMatchers.add(entryMatcher);
+            }
+        }
+
+        @Override
+        protected boolean matchesSafely(Map<String, ?> item, Description mismatchDescription) {
+            if (!sizeMatcher.matches(item.size())) {
+                mismatchDescription.appendText("map size is different");
+                sizeMatcher.describeMismatch(item, mismatchDescription);
+                return false;
+            }
+            for (Matcher<?> entryMatcher : mapEntriesMatchers) {
+                if (!entryMatcher.matches(item)) {
+                    entryMatcher.describeMismatch(item, mismatchDescription);
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        @Override
+        public void describeTo(Description description) {
+            description.appendText("same entries as")
+                    .appendList(" [", ", ", "]", mapEntriesMatchers);
+        }
     }
 
 }

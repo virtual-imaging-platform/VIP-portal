@@ -1,11 +1,11 @@
-async function get_fetch(firstName, lastName, email, institution, password, country, application){
+async function get_fetch(firstName, lastName, email, institution, password, country, applications){
     const data = await fetch('rest/register', {
         method: 'POST',
         headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ "firstName": firstName, "lastName": lastName, "email": email, "institution": institution, "password": password, "countryCode": country, "application": application})
+        body: JSON.stringify({ "firstName": firstName, "lastName": lastName, "email": email, "institution": institution, "password": password, "countryCode": country, "applications": applications})
         })
 
 }
@@ -45,16 +45,15 @@ async function createUser(){
     const new_email = document.getElementById("email").value;
     const new_reEmail = document.getElementById("reEmail").value;
     const new_institution = document.getElementById("institution").value;
-    const new_application = document.getElementById("application").value;
     const new_country = document.getElementById("country").value.toLowerCase();
     const new_password = document.getElementById("password").value;
     const new_rePassword = document.getElementById("rePassword").value;
     const emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
 
-    console.log(new_application);
-    console.log(new_country);
+    const selectedApplications = Array.from(document.querySelectorAll('input[name="applications"]:checked'))
+    .map((checkbox) => checkbox.value);
 
-    if (!new_firstName || !new_lastName || !new_email || !new_reEmail || !new_institution || new_application === "Choose your Application" || new_country === "select your country" || !new_password || !new_rePassword) {
+    if (!new_firstName || !new_lastName || !new_email || !new_reEmail || !new_institution || selectedApplications.length === 0 || new_country === "select your country" || new_country === "select your country" || !new_password || !new_rePassword) {
         isValid = false;
         document.getElementById('emptyFields-failed').style.display = 'block';
         setTimeout(function(){document.getElementById('emptyFields-failed').style.display = 'none'}, 30000);
@@ -81,7 +80,7 @@ async function createUser(){
     }
     if (isValid) {
         try {
-                await get_fetch(new_firstName, new_lastName, new_email, new_institution, new_password, new_country, new_application);
+                await get_fetch(new_firstName, new_lastName, new_email, new_institution, new_password, new_country, selectedApplications);
                 const data = await get_fetch_authenticate(new_email, new_password);
                 setCookie(new_email, data.httpHeaderValue, 7);
             } catch (error) {
@@ -93,23 +92,48 @@ async function createUser(){
 }
 
 function createSelectApp(applications) {
-    const select = document.createElement("select");
-    select.setAttribute("id", "application");
-    select.classList.add("form-select");
-    select.setAttribute("aria-label", "Default select example");
-
-    const defaultOption = document.createElement("option");
-    defaultOption.textContent = "Choose your Application";
-    select.appendChild(defaultOption);
+    const selectContainer = document.createElement("div");
+    selectContainer.classList.add("dropdown-menu");
+    selectContainer.setAttribute("aria-labelledby", "application-dropdown");
 
     applications.forEach((application) => {
-      const option = document.createElement("option");
-      option.value = application.name;
-      option.textContent = application.name;
-      select.appendChild(option);
+      const label = document.createElement("label");
+      label.classList.add("dropdown-item");
+
+      const checkbox = document.createElement("input");
+      checkbox.type = "checkbox";
+      checkbox.classList.add("form-check-input");
+      checkbox.name = "applications";
+      checkbox.value = application.name;
+
+      label.appendChild(checkbox);
+      label.appendChild(document.createTextNode(" " + application.name));
+      selectContainer.appendChild(label);
     });
 
-    return select;
+    const dropdownToggle = document.createElement("button");
+    dropdownToggle.classList.add("btn", "btn-primary", "dropdown-toggle", "w-100");
+    dropdownToggle.setAttribute("type", "button");
+    dropdownToggle.setAttribute("id", "select-applications-btn");
+    dropdownToggle.setAttribute("data-bs-toggle", "dropdown");
+    dropdownToggle.setAttribute("aria-expanded", "false");
+    dropdownToggle.textContent = "Select applications ";
+
+    const dropdownMenu = document.createElement("div");
+    dropdownMenu.classList.add("dropdown");
+    dropdownMenu.appendChild(dropdownToggle);
+    dropdownMenu.appendChild(selectContainer);
+
+    dropdownToggle.addEventListener("click", function() {
+      const checkboxes = selectContainer.querySelectorAll("input[name='applications']");
+      const selectedApplications = [];
+      checkboxes.forEach((checkbox) => {
+        if (checkbox.checked) {
+          selectedApplications.push(checkbox.value);
+        }
+      });
+    });
+    return dropdownMenu;
   }
 
   fetch('rest/pipelines?public')
@@ -129,5 +153,3 @@ function createSelectApp(applications) {
         const selectAppDiv = document.getElementById("select-app");
         selectAppDiv.appendChild(select);
     });
-
-

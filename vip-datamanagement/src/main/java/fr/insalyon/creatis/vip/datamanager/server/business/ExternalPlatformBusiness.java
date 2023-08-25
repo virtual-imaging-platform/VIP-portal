@@ -56,15 +56,18 @@ public class ExternalPlatformBusiness {
 
     private GirderStorageBusiness girderStorageBusiness;
     private ShanoirStorageBusiness shanoirStorageBusiness;
+    private SrmStorageBusiness srmStorageBusiness;
     private ExternalPlatformsDAO externalPlatformsDAO;
 
     @Autowired
     public ExternalPlatformBusiness(
             GirderStorageBusiness girderStorageBusiness,
             ShanoirStorageBusiness shanoirStorageBusiness,
+            SrmStorageBusiness srmStorageBusiness,
             ExternalPlatformsDAO externalPlatformsDAO) {
         this.girderStorageBusiness = girderStorageBusiness;
         this.shanoirStorageBusiness = shanoirStorageBusiness;
+        this.srmStorageBusiness = srmStorageBusiness;
         this.externalPlatformsDAO = externalPlatformsDAO;
     }
 
@@ -118,8 +121,12 @@ public class ExternalPlatformBusiness {
                         externalPlatform, parameterName, parameterValue
                 );
                 return new ParseResult(true, shanoirUri);
+            case SRM:
+	        String srmUri = srmStorageBusiness.generateUri(externalPlatform,
+			fileIdentifier, user);
+	        return new ParseResult(true, srmUri);
             default:
-                String error = "Only girder external storage are supported. "
+                String error = "Only girder, shanoir and srm external storages are supported. "
                         + " (found : " + externalPlatform.getType() + " )";
                 logger.error(error);
                 throw new BusinessException(error);

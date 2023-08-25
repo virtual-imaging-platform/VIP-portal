@@ -35,4 +35,8 @@ alter table VIPAppVersions ADD useBoutiquesForm BOOLEAN;
 ALTER TABLE VIPUsers DROP COLUMN phone;
 
 -- v2.4
+DROP TABLE VIPAccountsGroups;
 DROP TABLE VIPAccounts;
+ALTER TABLE VIPExternalPlatforms ADD upload_url VARCHAR(255);
+ALTER TABLE VIPExternalPlatforms ADD keycloak_client_id VARCHAR(255);
+ALTER TABLE VIPExternalPlatforms ADD refresh_token_url VARCHAR(255);

@@ -37,6 +37,7 @@ import fr.insalyon.creatis.vip.core.client.VipException;
  *
  * @author Rafael Silva
  */
+
 public class BusinessException extends VipException {
 
     public BusinessException(String message) {
