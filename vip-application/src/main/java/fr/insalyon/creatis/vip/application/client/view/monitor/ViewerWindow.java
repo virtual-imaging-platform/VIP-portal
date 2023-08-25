@@ -180,9 +180,33 @@ public class ViewerWindow extends Window {
             }
         });
         toolStrip.addButton(downloadButton);
+
+        if (!file) {
+            ToolStripButton jsonDownloadButton = new ToolStripButton();
+            jsonDownloadButton.setTitle("Download JSON");
+            jsonDownloadButton.addClickHandler(new ClickHandler() {
+                public void onClick(ClickEvent event) {
+                    downloadJsonContent();
+                }
+            });
+            toolStrip.addButton(jsonDownloadButton);
+        }
     }
 
     private void loadString() {
         pane.setContents(content.replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll("\n", "<br />"));
     }
+
+    private void downloadJsonContent() {
+        String jsonContent = this.content;
+        String mimeType = "application/json;charset=utf-8;";
+        String blobData = "data:" + mimeType + ", " + encodeURIComponent(jsonContent);
+        com.google.gwt.user.client.Window.open(blobData, "_blank", "Download JSON");
+    }
+
+    // This is a helper method for encoding the content
+    private static native String encodeURIComponent(String content) /*-{
+    return encodeURIComponent(content);
+}-*/;
+
 }

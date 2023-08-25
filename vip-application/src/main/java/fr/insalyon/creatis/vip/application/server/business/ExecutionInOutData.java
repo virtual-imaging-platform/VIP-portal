@@ -1,7 +1,6 @@
 package fr.insalyon.creatis.vip.application.server.business;
 
 import fr.insalyon.creatis.vip.application.client.bean.InOutData;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
