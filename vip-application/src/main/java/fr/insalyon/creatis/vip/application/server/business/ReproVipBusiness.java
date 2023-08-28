@@ -11,6 +11,7 @@ import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
 import fr.insalyon.creatis.vip.core.server.business.EmailBusiness;
+import fr.insalyon.creatis.vip.core.server.business.Server;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,6 +19,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.List;
 
 @Service
@@ -32,6 +36,8 @@ public class ReproVipBusiness {
     private EmailBusiness emailBusiness;
     @Autowired
     private ExecutionInOutData executionInOutData;
+    @Autowired
+    private Server server;
 
     public void executionAdminEmail(Execution execution) throws DAOException, BusinessException {
         String adminsEmailContents = "<html>"
@@ -88,10 +94,24 @@ public class ReproVipBusiness {
         ObjectMapper objectMapper = new ObjectMapper();
         try {
             String json = objectMapper.writeValueAsString(inOutData);
+            saveJsonToFile(json, executionID);
             return json;
         } catch (JsonProcessingException e) {
             throw new ApplicationException(ApplicationException.ApplicationError.valueOf("Failed to convert Output to JSON"), e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
+    public void saveJsonToFile(String jsonContent, String executionID) throws IOException {
+        String filePath = server.getWorkflowsPath() + "/" + executionID + "/inOutPut.json";
+        File file = new File(filePath);
 
+        if (!file.exists()) {
+            file.createNewFile();
+        }
+
+        try (FileWriter fileWriter = new FileWriter(file)) {
+            fileWriter.write(jsonContent);
+        }
+    }
 }
