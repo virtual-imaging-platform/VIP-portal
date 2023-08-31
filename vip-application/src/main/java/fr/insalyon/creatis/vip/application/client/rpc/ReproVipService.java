@@ -14,7 +14,6 @@ public interface ReproVipService extends RemoteService {
     public static class Util {
 
         public static ReproVipServiceAsync getInstance() {
-
             ReproVipServiceAsync instance = (ReproVipServiceAsync) GWT.create(ReproVipService.class);
             ServiceDefTarget target = (ServiceDefTarget) instance;
             target.setServiceEntryPoint(GWT.getModuleBaseURL() + SERVICE_URI);
@@ -25,6 +24,6 @@ public interface ReproVipService extends RemoteService {
     void addExecution(Execution execution) throws CoreException;
     void updateExecution(String executionID, String newStatus) throws CoreException;
     void executionOutputData(String executionID) throws CoreException;
-    String downloadJsonOutputData(String executionID) throws ApplicationException, CoreException;
-
+    String downloadJsonOutputData(String executionID) throws CoreException;
 }
+

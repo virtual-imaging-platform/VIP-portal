@@ -9,6 +9,5 @@ public interface ReproVipServiceAsync {
     void updateExecution(String executionID, String newStatus, AsyncCallback<Void> asyncCallback);
     void executionOutputData(String executionID, AsyncCallback<Void> callback);
     void downloadJsonOutputData(String executionID, AsyncCallback<String> callback);
-
 }
 

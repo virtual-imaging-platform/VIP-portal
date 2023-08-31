@@ -1,5 +1,6 @@
 package fr.insalyon.creatis.vip.application.server.rpc;
 
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import fr.insalyon.creatis.vip.application.client.view.ApplicationException;
 import fr.insalyon.creatis.vip.application.server.business.ReproVipBusiness;
 import fr.insalyon.creatis.vip.core.client.bean.Execution;
@@ -15,6 +16,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.concurrent.CompletableFuture;
 
 public class ReproVipServiceImpl extends AbstractRemoteServiceServlet implements ReproVipService {
     private ReproVipBusiness reproVipBusiness;
@@ -54,7 +56,6 @@ public class ReproVipServiceImpl extends AbstractRemoteServiceServlet implements
             throw new CoreException("Failed to update execution", e);
         }
     }
-
     @Override
     public void executionOutputData(String executionID) throws CoreException {
         try {

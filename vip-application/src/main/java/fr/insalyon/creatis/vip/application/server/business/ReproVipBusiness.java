@@ -2,10 +2,14 @@ package fr.insalyon.creatis.vip.application.server.business;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import fr.insalyon.creatis.vip.application.client.bean.InOutData;
-import fr.insalyon.creatis.vip.application.client.bean.SimulationInput;
-import fr.insalyon.creatis.vip.application.client.rpc.WorkflowService;
+import fr.insalyon.creatis.vip.application.client.bean.Job;
+import fr.insalyon.creatis.vip.application.client.bean.Task;
+import fr.insalyon.creatis.vip.application.client.rpc.JobService;
+import fr.insalyon.creatis.vip.application.client.rpc.JobServiceAsync;
 import fr.insalyon.creatis.vip.application.client.view.ApplicationException;
+import fr.insalyon.creatis.vip.application.server.rpc.JobServiceImpl;
 import fr.insalyon.creatis.vip.core.client.bean.Execution;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
@@ -22,7 +26,10 @@ import org.springframework.transaction.annotation.Transactional;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @Transactional
@@ -38,6 +45,8 @@ public class ReproVipBusiness {
     private ExecutionInOutData executionInOutData;
     @Autowired
     private Server server;
+    @Autowired
+    private SimulationBusiness simulationBusiness;
 
     public void executionAdminEmail(Execution execution) throws DAOException, BusinessException {
         String adminsEmailContents = "<html>"
@@ -89,17 +98,30 @@ public class ReproVipBusiness {
 
         return new ExecutionInOutData(inputData, outputData);
     }
-    public String createJsonOutputData(String executionID, User currentUser) throws ApplicationException, BusinessException {
+    public ExecutionJobTaskData getExecutionJobTaskData(String executionID) throws BusinessException {
+        logger.info("Fetching job and task data for executionID: {}", executionID);
+        List<Task> jobList = simulationBusiness.getJobsList(executionID);
+        if (jobList == null || jobList.isEmpty()) {
+            logger.info("No jobs found for executionID: {}", executionID);
+        }
+        return new ExecutionJobTaskData(jobList);
+    }
+    public String createJsonOutputData(String executionID, User currentUser)
+            throws ApplicationException, BusinessException {
         ExecutionInOutData inOutData = executionOutputData(executionID, currentUser);
+        ExecutionJobTaskData jobTaskData = getExecutionJobTaskData(executionID);
+
+        Map<String, Object> combinedData = new HashMap<>();
+        combinedData.put("inOutData", inOutData);
+        combinedData.put("jobs", jobTaskData.getJobs());
+
         ObjectMapper objectMapper = new ObjectMapper();
         try {
-            String json = objectMapper.writeValueAsString(inOutData);
-            saveJsonToFile(json, executionID);
+            String json = objectMapper.writeValueAsString(combinedData);
+            //saveJsonToFile(json, executionID);
             return json;
         } catch (JsonProcessingException e) {
             throw new ApplicationException(ApplicationException.ApplicationError.valueOf("Failed to convert Output to JSON"), e);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
         }
     }
     public void saveJsonToFile(String jsonContent, String executionID) throws IOException {
