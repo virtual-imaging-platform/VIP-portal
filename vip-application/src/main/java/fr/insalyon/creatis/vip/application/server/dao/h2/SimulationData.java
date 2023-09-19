@@ -156,6 +156,44 @@ public class SimulationData extends AbstractJobData implements SimulationDAO {
         }
     }
 
+    @Override
+    public Map<String, List<String>> getInvocationData(int jobId) throws DAOException {
+
+        try {
+            PreparedStatement ps = connection.prepareStatement(
+                    "SELECT j.id, d.data_type, d.data_path FROM Jobs AS j, job_data AS jd" +
+                            " LEFT JOIN Data d ON d.data_path = jd.data_path" +
+                            " WHERE j.invocation_id = ? AND jd.id = j.id" +
+                            " ORDER BY j.id, d.data_type");
+
+            ps.setInt(1, jobId);
+            ResultSet rs = ps.executeQuery();
+
+            Map<String, List<String>> dataMap = new HashMap<>();
+
+            while (rs.next()) {
+                String jid = rs.getString("id");
+                String dataType = rs.getString("data_type");
+                String dataPath = rs.getString("data_path");
+
+                if (!dataMap.containsKey(jid)) {
+                    dataMap.put(jid, new ArrayList<>());
+                }
+                String prefix = "output : ";
+                if ("input".equalsIgnoreCase(dataType)) {
+                    prefix = "input : ";
+                }
+                dataPath = prefix + dataPath;
+                dataMap.get(jid).add(dataPath);
+            }
+            ps.close();
+            return dataMap;
+        } catch (SQLException ex) {
+            logger.error("Error getting job data for {}", jobId, ex);
+            throw new DAOException(ex);
+        }
+    }
+
     private Task parseTask(ResultSet rs) throws SQLException {
 
         TaskStatus status = TaskStatus.valueOf(rs.getString("status"));

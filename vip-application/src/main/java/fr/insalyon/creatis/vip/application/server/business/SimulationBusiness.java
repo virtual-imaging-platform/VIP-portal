@@ -203,6 +203,15 @@ public class SimulationBusiness {
                 }
                 task.setParameters(params);
             }
+
+            // also get data
+            Map<String, List<String>> invocationOutputs = getSimulationDAO(simulationID).getInvocationData(jobID);// jobId here means invocationId
+            for (String jid : invocationOutputs.keySet()) {
+                for (String outputPath : invocationOutputs.get(jid)) {
+                    logger.info("Found output for {} : {}", jid, outputPath);
+                }
+            }
+
             return list;
 
         } catch (DataManagerException | DAOException ex) {
