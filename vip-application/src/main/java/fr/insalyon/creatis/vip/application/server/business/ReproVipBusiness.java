@@ -109,15 +109,15 @@ public class ReproVipBusiness {
     public String createJsonOutputData(String executionID, User currentUser)
             throws ApplicationException, BusinessException {
         ExecutionInOutData inOutData = executionOutputData(executionID, currentUser);
-        ExecutionJobTaskData jobTaskData = getExecutionJobTaskData(executionID);
+        //ExecutionJobTaskData jobTaskData = getExecutionJobTaskData(executionID);
 
-        Map<String, Object> combinedData = new HashMap<>();
-        combinedData.put("inOutData", inOutData);
-        combinedData.put("jobs", jobTaskData.getJobs());
+        //Map<String, Object> combinedData = new HashMap<>();
+        //combinedData.put("inOutData", inOutData);
+        //combinedData.put("jobs", jobTaskData.getJobs());
 
         ObjectMapper objectMapper = new ObjectMapper();
         try {
-            String json = objectMapper.writeValueAsString(combinedData);
+            String json = objectMapper.writeValueAsString(inOutData);
             //saveJsonToFile(json, executionID);
             return json;
         } catch (JsonProcessingException e) {

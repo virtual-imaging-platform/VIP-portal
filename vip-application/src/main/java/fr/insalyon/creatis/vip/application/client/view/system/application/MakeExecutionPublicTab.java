@@ -1,22 +1,32 @@
 package fr.insalyon.creatis.vip.application.client.view.system.application;
 
+import com.google.gwt.json.client.JSONArray;
+import com.google.gwt.json.client.JSONObject;
+import com.google.gwt.json.client.JSONParser;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.Overflow;
 import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.IButton;
+import com.smartgwt.client.widgets.Label;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
+import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.*;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.tab.Tab;
-import fr.insalyon.creatis.vip.application.client.rpc.ReproVipService;
-import fr.insalyon.creatis.vip.application.client.rpc.ReproVipServiceAsync;
+import fr.insalyon.creatis.vip.application.client.bean.boutiquesTools.BoutiquesApplication;
+import fr.insalyon.creatis.vip.application.client.bean.boutiquesTools.BoutiquesOutputFile;
+import fr.insalyon.creatis.vip.application.client.rpc.*;
+import fr.insalyon.creatis.vip.application.client.view.boutiquesParsing.BoutiquesParser;
+import fr.insalyon.creatis.vip.application.client.view.boutiquesParsing.InvalidBoutiquesDescriptorException;
 import fr.insalyon.creatis.vip.core.client.bean.Execution;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
 import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
+
+import java.util.*;
 
 public class MakeExecutionPublicTab extends Tab {
     private VLayout makeExecutionPublicLayout;
@@ -28,8 +38,8 @@ public class MakeExecutionPublicTab extends Tab {
     private TextItem authorNameField;
     private TextAreaItem commentsItem;
     private IButton makeExecutionblicButton;
+    private DynamicForm outputFilesForm;
     private ReproVipServiceAsync reproVipServiceAsync = ReproVipService.Util.getInstance();
-
     public MakeExecutionPublicTab(Execution execution) {
 
         this.setID(CoreConstants.TAB_MAKE_EXECUTION_PUBLIC);
@@ -42,6 +52,39 @@ public class MakeExecutionPublicTab extends Tab {
         vLayout.setMargin(5);
         vLayout.setOverflow(Overflow.AUTO);
         vLayout.setDefaultLayoutAlign(Alignment.CENTER);
+
+        outputFilesForm = new DynamicForm();
+        AsyncCallback<String> descriptorCallback = new AsyncCallback<String>() {
+            @Override
+            public void onFailure(Throwable caught) {
+                SC.warn("Error retrieving application descriptor: " + caught.getMessage());
+            }
+            @Override
+            public void onSuccess(String descriptorString) {
+                try {
+                    BoutiquesApplication applicationTool = new BoutiquesParser().parseApplication(descriptorString);
+                    if(applicationTool.getOutputFiles() == null || applicationTool.getOutputFiles().isEmpty()) {
+                        SC.warn("Output File is empty");
+                    } else {
+                        Set<BoutiquesOutputFile> outputFiles = applicationTool.getOutputFiles();
+                        if (outputFiles != null && !outputFiles.isEmpty()) {
+                            CheckboxItem[] checkboxes = new CheckboxItem[outputFiles.size()];
+                            int index = 0;
+                            for (BoutiquesOutputFile outputFile : outputFiles) {
+                                CheckboxItem checkbox = new CheckboxItem(outputFile.getName(), outputFile.getName());
+                                checkboxes[index] = checkbox;
+                                index++;
+                            }
+                            outputFilesForm.setFields(checkboxes);
+                        }
+                    }
+                } catch (InvalidBoutiquesDescriptorException exception) {
+                    SC.warn("Error when parsing application descriptor: " + exception.getMessage());
+                }
+            }
+        };
+
+        WorkflowService.Util.getInstance().getApplicationDescriptorString(execution.getApplicationName(), execution.getVersion(), descriptorCallback);
 
         configureExecutionPublicLayout();
         idOfTheExecutionField.setValue(execution.getId());
@@ -59,16 +102,27 @@ public class MakeExecutionPublicTab extends Tab {
     private void configureExecutionPublicLayout() {
 
         idOfTheExecutionField = FieldUtil.getTextItem(300, false, "", null);
+        idOfTheExecutionField.setCanEdit(false);
+
         nameOfTheExecutionSimulationField = FieldUtil.getTextItem(300, false, "", null);
+
         nameOfTheExecutionApplicationField = FieldUtil.getTextItem(300, false, "", null);
+        nameOfTheExecutionApplicationField.setCanEdit(false);
+
         authorNameField = FieldUtil.getTextItem(300, false, "", null);
+
         versionExecutionField= FieldUtil.getTextItem(300, false, "", null);
+        versionExecutionField.setCanEdit(false);
+
         statusExecutionField = FieldUtil.getTextItem(300, false, "", null);
+        statusExecutionField.setCanEdit(false);
 
         commentsItem = new TextAreaItem("comment", "");
         commentsItem.setHeight(80);
         commentsItem.setWidth(300);
         commentsItem.setShowTitle(false);
+
+        outputFilesForm = new DynamicForm();
 
         makeExecutionblicButton = new IButton("Make execution public");
 
@@ -95,6 +149,10 @@ public class MakeExecutionPublicTab extends Tab {
             }
         });
 
+        Label descriptionLabel = new Label("Choose your output file(s):");
+        descriptionLabel.setHeight(20);
+        descriptionLabel.setWidth100();
+
         makeExecutionPublicLayout = WidgetUtil.getVIPLayout(320);
         WidgetUtil.addFieldToVIPLayout(makeExecutionPublicLayout, "ID of the execution", idOfTheExecutionField);
         WidgetUtil.addFieldToVIPLayout(makeExecutionPublicLayout, "Name of the execution simulation", nameOfTheExecutionSimulationField);
@@ -103,6 +161,8 @@ public class MakeExecutionPublicTab extends Tab {
         WidgetUtil.addFieldToVIPLayout(makeExecutionPublicLayout, "Status of the execution", statusExecutionField);
         WidgetUtil.addFieldToVIPLayout(makeExecutionPublicLayout, "Author name", authorNameField);
         WidgetUtil.addFieldToVIPLayout(makeExecutionPublicLayout, "Comments", commentsItem);
+        makeExecutionPublicLayout.addMember(descriptionLabel);
+        makeExecutionPublicLayout.addMember(outputFilesForm);
         makeExecutionPublicLayout.addMember(makeExecutionblicButton);
     }
 
@@ -120,5 +180,4 @@ public class MakeExecutionPublicTab extends Tab {
         };
         reproVipServiceAsync.executionAdminEmail(execution, callback);
     }
-
 }
