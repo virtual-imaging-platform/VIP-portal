@@ -76,6 +76,7 @@ public class ReproVipBusiness {
         }
         logger.info("Email send");
     }
+
     public ExecutionInOutData executionOutputData(String executionID, User currentUser) throws ApplicationException, BusinessException {
         logger.info("Fetching data for executionID: {}", executionID);
 
@@ -98,6 +99,7 @@ public class ReproVipBusiness {
 
         return new ExecutionInOutData(inputData, outputData);
     }
+
     public ExecutionJobTaskData getExecutionJobTaskData(String executionID) throws BusinessException {
         logger.info("Fetching job and task data for executionID: {}", executionID);
         List<Task> jobList = simulationBusiness.getJobsList(executionID);
@@ -106,6 +108,7 @@ public class ReproVipBusiness {
         }
         return new ExecutionJobTaskData(jobList);
     }
+
     public String createJsonOutputData(String executionID, User currentUser)
             throws ApplicationException, BusinessException {
         ExecutionInOutData inOutData = executionOutputData(executionID, currentUser);
@@ -124,6 +127,7 @@ public class ReproVipBusiness {
             throw new ApplicationException(ApplicationException.ApplicationError.valueOf("Failed to convert Output to JSON"), e);
         }
     }
+
     public void saveJsonToFile(String jsonContent, String executionID) throws IOException {
         String filePath = server.getWorkflowsPath() + "/" + executionID + "/inOutPut.json";
         File file = new File(filePath);
@@ -134,6 +138,25 @@ public class ReproVipBusiness {
 
         try (FileWriter fileWriter = new FileWriter(file)) {
             fileWriter.write(jsonContent);
+        }
+    }
+    public void createReproVipDirectory() {
+        try {
+            logger.info("Attempting to create ReproVip directory...");
+            String reproVipDirPath = server.getWorkflowsPath() + "/ReproVip";
+            File reproVipDir = new File(reproVipDirPath);
+
+            if (reproVipDir.exists()) {
+                logger.info("ReproVip directory already exists");
+            } else {
+                if (reproVipDir.mkdirs()) {
+                    logger.info("ReproVip directory successfully created");
+                } else {
+                    logger.error("Error creating ReproVip directory");
+                }
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 }

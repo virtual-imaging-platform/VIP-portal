@@ -15,6 +15,7 @@ import fr.insalyon.creatis.vip.application.client.rpc.ReproVipServiceAsync;
 import fr.insalyon.creatis.vip.application.client.view.monitor.ViewerWindow;
 import fr.insalyon.creatis.vip.application.client.view.monitor.job.SimulationFileType;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
+import fr.insalyon.creatis.vip.core.client.view.CoreException;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 
 import java.util.Arrays;
@@ -24,6 +25,7 @@ public class ExecutionsContextMenu extends Menu {
     private ModalWindow modal;
     private String executionID;
     private ReproVipServiceAsync reproVipServiceAsync = ReproVipService.Util.getInstance();
+    private ReproVipService reproVipService;
     public ExecutionsContextMenu(ModalWindow modal, String executionID){
         this.modal = modal;
         this.executionID = executionID;
@@ -36,7 +38,8 @@ public class ExecutionsContextMenu extends Menu {
         OptionPublicExecutionItem.addClickHandler(new ClickHandler() {
             @Override
             public void onClick(MenuItemClickEvent event) {
-                MakexExecutionPublic();
+                createReproVipDirectory();
+                //MakexExecutionPublic();
             }
         });
 
@@ -83,4 +86,16 @@ public class ExecutionsContextMenu extends Menu {
         modal.show("Download Outputs", true);
         reproVipServiceAsync.downloadJsonOutputData(executionID, callback);
     }
+
+    public void createReproVipDirectory() {
+        reproVipServiceAsync.createReproVipDirectory(new AsyncCallback<Void>() {
+            public void onFailure(Throwable caught) {
+                SC.warn("Error creating ReproVip directory: " + caught.getMessage());
+            }
+            public void onSuccess(Void result) {
+                SC.say("ReproVip directory successfully created");
+            }
+        });
+    }
+
 }

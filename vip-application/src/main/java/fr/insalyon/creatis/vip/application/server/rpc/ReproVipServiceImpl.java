@@ -74,4 +74,11 @@ public class ReproVipServiceImpl extends AbstractRemoteServiceServlet implements
             throw new RuntimeException(e);
         }
     }
+    public void createReproVipDirectory() {
+        try {
+            reproVipBusiness.createReproVipDirectory();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
 }
