@@ -1,32 +1,25 @@
 package fr.insalyon.creatis.vip.application.client.view.system.application;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
 import com.smartgwt.client.widgets.menu.events.ClickHandler;
 import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
-import fr.insalyon.creatis.vip.application.client.bean.Job;
-import fr.insalyon.creatis.vip.application.client.bean.Task;
-import fr.insalyon.creatis.vip.application.client.rpc.JobService;
 import fr.insalyon.creatis.vip.application.client.rpc.ReproVipService;
 import fr.insalyon.creatis.vip.application.client.rpc.ReproVipServiceAsync;
 import fr.insalyon.creatis.vip.application.client.view.monitor.ViewerWindow;
-import fr.insalyon.creatis.vip.application.client.view.monitor.job.SimulationFileType;
+import fr.insalyon.creatis.vip.core.client.bean.Execution;
+import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
-import fr.insalyon.creatis.vip.core.client.view.CoreException;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
-
-import java.util.Arrays;
-import java.util.List;
 
 public class ExecutionsContextMenu extends Menu {
     private ModalWindow modal;
     private String executionID;
     private ReproVipServiceAsync reproVipServiceAsync = ReproVipService.Util.getInstance();
     private ReproVipService reproVipService;
-    public ExecutionsContextMenu(ModalWindow modal, String executionID){
+    public ExecutionsContextMenu(ModalWindow modal, String executionName, String executionID, String version){
         this.modal = modal;
         this.executionID = executionID;
         this.setShowShadow(true);
@@ -38,7 +31,7 @@ public class ExecutionsContextMenu extends Menu {
         OptionPublicExecutionItem.addClickHandler(new ClickHandler() {
             @Override
             public void onClick(MenuItemClickEvent event) {
-                createReproVipDirectory();
+                createReproVipDirectory(executionName, executionID, version);
                 //MakexExecutionPublic();
             }
         });
@@ -86,9 +79,8 @@ public class ExecutionsContextMenu extends Menu {
         modal.show("Download Outputs", true);
         reproVipServiceAsync.downloadJsonOutputData(executionID, callback);
     }
-
-    public void createReproVipDirectory() {
-        reproVipServiceAsync.createReproVipDirectory(new AsyncCallback<Void>() {
+    public void createReproVipDirectory(String executionName, String executionID, String version) {
+        reproVipServiceAsync.createReproVipDirectory(executionName, executionID, version, new AsyncCallback<Void>() {
             public void onFailure(Throwable caught) {
                 SC.warn("Error creating ReproVip directory: " + caught.getMessage());
             }
@@ -97,5 +89,4 @@ public class ExecutionsContextMenu extends Menu {
             }
         });
     }
-
 }

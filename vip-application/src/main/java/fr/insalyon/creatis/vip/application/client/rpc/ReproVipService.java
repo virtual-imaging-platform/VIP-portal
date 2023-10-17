@@ -5,6 +5,7 @@ import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.ServiceDefTarget;
 import fr.insalyon.creatis.vip.application.client.view.ApplicationException;
 import fr.insalyon.creatis.vip.core.client.bean.Execution;
+import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.CoreException;
 
 public interface ReproVipService extends RemoteService {
@@ -25,6 +26,6 @@ public interface ReproVipService extends RemoteService {
     void updateExecution(String executionID, String newStatus) throws CoreException;
     void executionOutputData(String executionID) throws CoreException;
     String downloadJsonOutputData(String executionID) throws CoreException;
-    void createReproVipDirectory() throws CoreException;
+    void createReproVipDirectory(String executionName, String executionID, String version) throws CoreException;
 }
 

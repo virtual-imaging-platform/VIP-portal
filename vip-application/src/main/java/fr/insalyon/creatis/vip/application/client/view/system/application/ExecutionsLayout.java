@@ -54,8 +54,10 @@ public class ExecutionsLayout extends VLayout {
             public void onRowContextClick(RowContextClickEvent event) {
                 event.cancel();
                 ListGridRecord selectedRecord = grid.getSelectedRecord();
+                String executionName = selectedRecord.getAttribute("application_name");
                 String executionId = selectedRecord.getAttribute("id");
-                new ExecutionsContextMenu(modal, executionId).showContextMenu();
+                String version = selectedRecord.getAttribute("version");
+                new ExecutionsContextMenu(modal, executionName, executionId, version).showContextMenu();
             }
         });
 
