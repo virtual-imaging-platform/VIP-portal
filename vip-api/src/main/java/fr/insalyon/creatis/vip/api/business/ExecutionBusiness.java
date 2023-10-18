@@ -154,7 +154,7 @@ public class ExecutionBusiness {
 
             // Outputs
             List<InOutData> outputs = workflowBusiness.getOutputData(
-                executionId, currentUserProvider.get().getFolder());
+                executionId, currentUserProvider.get().getFolder(), false);
             for (InOutData iod : outputs) {
                 if (!e.getReturnedFiles().containsKey(iod.getProcessor())) {
                      e.getReturnedFiles().put(iod.getProcessor(), new ArrayList<>());
@@ -439,7 +439,7 @@ public class ExecutionBusiness {
         List<InOutData> outputs;
         try {
             outputs = workflowBusiness.getOutputData(
-                executionId, currentUserProvider.get().getFolder());
+                executionId, currentUserProvider.get().getFolder(), false);
         } catch (BusinessException e) {
             throw new ApiException(e);
         }

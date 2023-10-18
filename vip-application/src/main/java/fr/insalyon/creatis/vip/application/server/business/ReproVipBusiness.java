@@ -83,7 +83,8 @@ public class ReproVipBusiness {
     public ExecutionInOutData executionOutputData(String executionID, User currentUser) throws ApplicationException, BusinessException {
         logger.info("Fetching data for executionID: {}", executionID);
 
-        List<InOutData> outputData = workflowBusiness.getOutputData(executionID, currentUser.getFolder());
+        List<InOutData> outputData = workflowBusiness.getOutputData(executionID, currentUser.getFolder(), false);
+        logger.info(String.valueOf(outputData));
         List<InOutData> inputData = workflowBusiness.getInputData(executionID, currentUser.getFolder());
 
         if (outputData != null) {
@@ -125,6 +126,7 @@ public class ReproVipBusiness {
         try {
             String json = objectMapper.writeValueAsString(inOutData);
             //saveJsonToFile(json, executionID);
+            logger.info(json);
             return json;
         } catch (JsonProcessingException e) {
             throw new ApplicationException(ApplicationException.ApplicationError.valueOf("Failed to convert Output to JSON"), e);
@@ -159,7 +161,28 @@ public class ReproVipBusiness {
                 }
             }
 
-            String workflowPath = String.valueOf(workflowBusiness.getApplicationDescriptor(currentUser, executionName, version));
+            List<InOutData> outputData = workflowBusiness.getOutputData(executionID, currentUser.getFolder(), true);
+            logger.info(outputData.get(0).getPath());
+
+            if (outputData != null && !outputData.isEmpty()) {
+                String outputPath = outputData.get(0).getPath();
+                if (outputPath != null) {
+                    File outputFile = new File(outputPath);
+                    if (outputFile.exists()) {
+                        Files.copy(outputFile.toPath(), new File(reproVipDir, outputFile.getName()).toPath(), StandardCopyOption.REPLACE_EXISTING);
+                        logger.info("Output file {} successfully copied to ReproVip directory", outputPath);
+                    } else {
+                        logger.warn("Output file {} not found", outputPath);
+                    }
+                } else {
+                    logger.warn("No output path found for executionID: {}", executionID);
+                }
+            } else {
+                logger.warn("No output data found for executionID: {}", executionID);
+            }
+
+            String workflowPath = String.valueOf(workflowBusiness.getRawApplicationDescriptorPath(currentUser, executionName, version));
+            logger.info(workflowPath);
             File workflowFile = new File(workflowPath);
             if (workflowFile.exists()) {
                 Files.copy(workflowFile.toPath(), new File(reproVipDir, workflowFile.getName()).toPath(), StandardCopyOption.REPLACE_EXISTING);
@@ -211,7 +234,4 @@ public class ReproVipBusiness {
             throw new RuntimeException(e);
         }
     }
-
-
-
 }

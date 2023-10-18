@@ -151,6 +151,15 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
         }
     }
 
+    @Override
+    public String getRawApplicationDescriptorPath(String applicationName, String applicationVersion) throws ApplicationException {
+        try {
+            return workflowBusiness.getRawApplicationDescriptorPath(getSessionUser(), applicationName, applicationVersion);
+        } catch (BusinessException | CoreException ex) {
+            throw new ApplicationException(ex);
+        }
+    }
+
     /**
      *
      * @param applicationName
@@ -677,7 +686,7 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
     public List<InOutData> getOutputData(String simulationID) throws ApplicationException {
         try {
             return workflowBusiness.getOutputData(
-                simulationID, getSessionUser().getFolder());
+                simulationID, getSessionUser().getFolder(), false);
         } catch (BusinessException | CoreException ex) {
             throw new ApplicationException(ex);
         }

@@ -447,6 +447,17 @@ public class WorkflowBusiness {
         }
     }
 
+    public String getRawApplicationDescriptorPath(User user, String applicationName, String applicationVersion)
+            throws BusinessException {
+
+        try {
+            AppVersion version = applicationDAO.getVersion(applicationName, applicationVersion);
+            return dataManagerBusiness.getRemoteFile(user, version.getLfn());
+        } catch (DAOException | BusinessException ex) {
+            throw new BusinessException(WRONG_APPLICATION_DESCRIPTOR, ex, applicationName + "/" + applicationVersion);
+        }
+    }
+
     public void kill(String simulationID) throws BusinessException {
 
         try {
@@ -554,14 +565,19 @@ public class WorkflowBusiness {
     }
 
     public List<InOutData> getOutputData(
-            String simulationID, String currentUserFolder)
+            String simulationID, String currentUserFolder, boolean useRawPath)
             throws BusinessException {
 
         List<InOutData> list = new ArrayList<InOutData>();
         try {
             for (Output output : outputDAO.get(simulationID)) {
-                String path = lfcPathsBusiness.parseRealDir(
-                    output.getOutputID().getPath(), currentUserFolder);
+                String path;
+                if (useRawPath) {
+                    path = output.getOutputID().getPath();
+                } else {
+                    path = lfcPathsBusiness.parseRealDir(
+                            output.getOutputID().getPath(), currentUserFolder);
+                }
                 list.add(new InOutData(path, output.getOutputID().getProcessor(),
                         output.getType().name()));
             }
@@ -569,9 +585,10 @@ public class WorkflowBusiness {
             logger.error("Error getting output data for {}", simulationID, ex);
             throw new BusinessException(ex);
         } catch (DataManagerException ex) {
-            throw new BusinessException(ex);
+            if (!useRawPath) {
+                throw new BusinessException(ex);
+            }
         }
-
         return list;
     }
 
