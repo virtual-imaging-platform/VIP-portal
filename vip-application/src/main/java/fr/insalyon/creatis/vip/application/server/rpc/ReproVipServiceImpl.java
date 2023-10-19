@@ -65,10 +65,10 @@ public class ReproVipServiceImpl extends AbstractRemoteServiceServlet implements
             throw new RuntimeException(e);
         }
     }
-    public String downloadJsonOutputData(String executionID) throws CoreException {
+    public String downloadJsonOutputData(String executionName, String executionID, String version) throws CoreException {
         try {
             User currentUser = getSessionUser();
-            String json = reproVipBusiness.createJsonOutputData(executionID, currentUser);
+            String json = reproVipBusiness.createJsonOutputData(executionName, executionID, version, currentUser);
             return json;
         } catch (BusinessException | ApplicationException e) {
             throw new RuntimeException(e);

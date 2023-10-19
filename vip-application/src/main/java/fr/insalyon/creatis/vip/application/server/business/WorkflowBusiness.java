@@ -452,7 +452,7 @@ public class WorkflowBusiness {
 
         try {
             AppVersion version = applicationDAO.getVersion(applicationName, applicationVersion);
-            return dataManagerBusiness.getRemoteFile(user, version.getLfn());
+            return dataManagerBusiness.getRemoteFile(user, version.getJsonLfn());
         } catch (DAOException | BusinessException ex) {
             throw new BusinessException(WRONG_APPLICATION_DESCRIPTOR, ex, applicationName + "/" + applicationVersion);
         }

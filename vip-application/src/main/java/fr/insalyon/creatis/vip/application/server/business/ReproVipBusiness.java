@@ -23,10 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.FilenameFilter;
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
@@ -112,37 +109,51 @@ public class ReproVipBusiness {
         }
         return new ExecutionJobTaskData(jobList);
     }
-
-    public String createJsonOutputData(String executionID, User currentUser)
+    public String createJsonOutputData(String executionName, String executionID, String version, User currentUser)
             throws ApplicationException, BusinessException {
-        ExecutionInOutData inOutData = executionOutputData(executionID, currentUser);
-        //ExecutionJobTaskData jobTaskData = getExecutionJobTaskData(executionID);
+        List<String> filesToDownload = getFilesToCopyPaths(executionName, executionID, version, currentUser);
 
-        //Map<String, Object> combinedData = new HashMap<>();
-        //combinedData.put("inOutData", inOutData);
-        //combinedData.put("jobs", jobTaskData.getJobs());
+        Map<String, Object> structuredJson = new HashMap<>();
+
+        structuredJson.put("files_to_download", filesToDownload);
+
+        Map<String, Object> metadataOuter = new HashMap<>();
+        Map<String, Object> metadataInner = new HashMap<>();
+
+        metadataInner.put("title", "your title");
+        metadataInner.put("upload_type", "workflow");
+        metadataInner.put("description", "your description");
+
+        List<Map<String, String>> creators = new ArrayList<>();
+        Map<String, String> creator = new HashMap<>();
+        creator.put("name", currentUser.getFullName());
+        creator.put("affiliation", "your affiliation");
+        creators.add(creator);
+
+        metadataInner.put("creators", creators);
+        metadataOuter.put("metadata", metadataInner);
+
+        structuredJson.put("metadata", metadataOuter);
 
         ObjectMapper objectMapper = new ObjectMapper();
         try {
-            String json = objectMapper.writeValueAsString(inOutData);
-            //saveJsonToFile(json, executionID);
+            String json = objectMapper.writeValueAsString(structuredJson);
             logger.info(json);
+
+            String filePath = "/vip/ReproVip/structuredOutput.json";
+            saveJsonToFile(json, filePath);
+
             return json;
         } catch (JsonProcessingException e) {
-            throw new ApplicationException(ApplicationException.ApplicationError.valueOf("Failed to convert Output to JSON"), e);
+            throw new ApplicationException(ApplicationException.ApplicationError.valueOf("Failed to convert structured output to JSON"), e);
+        } catch (IOException e) {
+            throw new BusinessException("Failed to save JSON to file", e);
         }
     }
-
-    public void saveJsonToFile(String jsonContent, String executionID) throws IOException {
-        String filePath = server.getWorkflowsPath() + "/" + executionID + "/inOutPut.json";
-        File file = new File(filePath);
-
-        if (!file.exists()) {
-            file.createNewFile();
-        }
-
-        try (FileWriter fileWriter = new FileWriter(file)) {
-            fileWriter.write(jsonContent);
+    public void saveJsonToFile(String jsonContent, String filePath) throws IOException {
+        try (FileWriter fileWriter = new FileWriter(filePath);
+             BufferedWriter bufferedWriter = new BufferedWriter(fileWriter)) {
+            bufferedWriter.write(jsonContent);
         }
     }
     public void createReproVipDirectory(String executionName, String executionID, String version, User currentUser) {
@@ -165,7 +176,7 @@ public class ReproVipBusiness {
             logger.info(outputData.get(0).getPath());
 
             if (outputData != null && !outputData.isEmpty()) {
-                String outputPath = outputData.get(0).getPath();
+                String outputPath = "/vip/grida/downloads" + outputData.get(0).getPath();
                 if (outputPath != null) {
                     File outputFile = new File(outputPath);
                     if (outputFile.exists()) {
@@ -233,5 +244,39 @@ public class ReproVipBusiness {
         } catch (BusinessException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public List<String> getFilesToCopyPaths(String executionName, String executionID, String version, User currentUser) throws BusinessException {
+        List<String> paths = new ArrayList<>();
+
+        List<InOutData> outputData = workflowBusiness.getOutputData(executionID, currentUser.getFolder(), true);
+        if (outputData != null && !outputData.isEmpty()) {
+            String outputPath = outputData.get(0).getPath();
+            if (outputPath != null) {
+                paths.add(outputPath);
+            }
+        }
+
+        String workflowPath = String.valueOf(workflowBusiness.getRawApplicationDescriptorPath(currentUser, executionName, version));
+        if (workflowPath != null && !workflowPath.isEmpty()) {
+            paths.add(workflowPath);
+        }
+
+        String provenanceDirPath = server.getWorkflowsPath() + "/" + executionID + "/provenance";
+        File provenanceDir = new File(provenanceDirPath);
+        if (provenanceDir.exists()) {
+            FilenameFilter filter = new FilenameFilter() {
+                @Override
+                public boolean accept(File dir, String name) {
+                    return name.endsWith(".sh.provenance.json");
+                }
+            };
+            File[] matchingFiles = provenanceDir.listFiles(filter);
+            if (matchingFiles != null && matchingFiles.length > 0) {
+                paths.add(matchingFiles[0].getAbsolutePath());
+            }
+        }
+
+        return paths;
     }
 }

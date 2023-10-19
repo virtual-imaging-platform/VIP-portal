@@ -41,7 +41,7 @@ public class ExecutionsContextMenu extends Menu {
         DownloadOutputDataItem.addClickHandler(new ClickHandler() {
             @Override
             public void onClick(MenuItemClickEvent event) {
-                DownloadOutputDataExecution();
+                DownloadOutputDataExecution(executionName, executionID, version);
             }
         });
 
@@ -63,7 +63,7 @@ public class ExecutionsContextMenu extends Menu {
         modal.show("Make execution public", true);
         reproVipServiceAsync.updateExecution(executionID, "Public", callback);
     }
-    private void DownloadOutputDataExecution() {
+    private void DownloadOutputDataExecution(String executionName, String executionID, String version) {
         final AsyncCallback<String> callback = new AsyncCallback<String>() {
             @Override
             public void onFailure(Throwable caught) {
@@ -77,7 +77,7 @@ public class ExecutionsContextMenu extends Menu {
             }
         };
         modal.show("Download Outputs", true);
-        reproVipServiceAsync.downloadJsonOutputData(executionID, callback);
+        reproVipServiceAsync.downloadJsonOutputData(executionName, executionID, version,  callback);
     }
     public void createReproVipDirectory(String executionName, String executionID, String version) {
         reproVipServiceAsync.createReproVipDirectory(executionName, executionID, version, new AsyncCallback<Void>() {

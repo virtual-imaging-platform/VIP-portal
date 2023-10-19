@@ -25,7 +25,7 @@ public interface ReproVipService extends RemoteService {
     void addExecution(Execution execution) throws CoreException;
     void updateExecution(String executionID, String newStatus) throws CoreException;
     void executionOutputData(String executionID) throws CoreException;
-    String downloadJsonOutputData(String executionID) throws CoreException;
+    String downloadJsonOutputData(String executionName, String executionID, String version) throws CoreException;
     void createReproVipDirectory(String executionName, String executionID, String version) throws CoreException;
 }
 
