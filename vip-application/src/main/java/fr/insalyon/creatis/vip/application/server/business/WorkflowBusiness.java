@@ -564,7 +564,18 @@ public class WorkflowBusiness {
         return simulation;
     }
 
+
     public List<InOutData> getOutputData(
+            String simulationID, String currentUserFolder) throws BusinessException {
+        return getOutputData(simulationID, currentUserFolder, false);
+    }
+
+    public List<InOutData> getRawOutputData(
+            String simulationID) throws BusinessException {
+        return getOutputData(simulationID, null, true);
+    }
+
+    private List<InOutData> getOutputData(
             String simulationID, String currentUserFolder, boolean useRawPath)
             throws BusinessException {
 
@@ -581,13 +592,9 @@ public class WorkflowBusiness {
                 list.add(new InOutData(path, output.getOutputID().getProcessor(),
                         output.getType().name()));
             }
-        } catch (WorkflowsDBDAOException ex) {
+        } catch (WorkflowsDBDAOException | DataManagerException ex) {
             logger.error("Error getting output data for {}", simulationID, ex);
             throw new BusinessException(ex);
-        } catch (DataManagerException ex) {
-            if (!useRawPath) {
-                throw new BusinessException(ex);
-            }
         }
         return list;
     }

@@ -3,6 +3,7 @@ package fr.insalyon.creatis.vip.application.server.business;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import fr.insalyon.creatis.vip.application.client.bean.AppVersion;
 import fr.insalyon.creatis.vip.application.client.bean.InOutData;
 import fr.insalyon.creatis.vip.application.client.bean.Job;
 import fr.insalyon.creatis.vip.application.client.bean.Task;
@@ -25,11 +26,15 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.*;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 @Transactional
@@ -39,6 +44,8 @@ public class ReproVipBusiness {
     private ConfigurationBusiness configurationBusiness;
     @Autowired
     private WorkflowBusiness workflowBusiness;
+    @Autowired
+    private ApplicationBusiness applicationBusiness;
     @Autowired
     private EmailBusiness emailBusiness;
     @Autowired
@@ -80,7 +87,7 @@ public class ReproVipBusiness {
     public ExecutionInOutData executionOutputData(String executionID, User currentUser) throws ApplicationException, BusinessException {
         logger.info("Fetching data for executionID: {}", executionID);
 
-        List<InOutData> outputData = workflowBusiness.getOutputData(executionID, currentUser.getFolder(), false);
+        List<InOutData> outputData = workflowBusiness.getOutputData(executionID, currentUser.getFolder());
         logger.info(String.valueOf(outputData));
         List<InOutData> inputData = workflowBusiness.getInputData(executionID, currentUser.getFolder());
 
@@ -109,9 +116,9 @@ public class ReproVipBusiness {
         }
         return new ExecutionJobTaskData(jobList);
     }
-    public String createJsonOutputData(String executionName, String executionID, String version, User currentUser)
-            throws ApplicationException, BusinessException {
-        List<String> filesToDownload = getFilesToCopyPaths(executionName, executionID, version, currentUser);
+    public String generateReprovipJson(Path reproVipDir, String executionName, String executionID, String version, User currentUser)
+            throws BusinessException {
+        List<String> filesToDownload = getFilesToCopyPaths(executionName, executionID, version);
 
         Map<String, Object> structuredJson = new HashMap<>();
 
@@ -140,116 +147,67 @@ public class ReproVipBusiness {
             String json = objectMapper.writeValueAsString(structuredJson);
             logger.info(json);
 
-            String filePath = "/vip/ReproVip/structuredOutput.json";
-            saveJsonToFile(json, filePath);
+            Path reprovipJsonPath = reproVipDir.resolve("structuredOutput.json");
+            saveJsonToFile(json, reprovipJsonPath);
 
             return json;
-        } catch (JsonProcessingException e) {
-            throw new ApplicationException(ApplicationException.ApplicationError.valueOf("Failed to convert structured output to JSON"), e);
         } catch (IOException e) {
             throw new BusinessException("Failed to save JSON to file", e);
         }
     }
-    public void saveJsonToFile(String jsonContent, String filePath) throws IOException {
-        try (FileWriter fileWriter = new FileWriter(filePath);
+    public void saveJsonToFile(String jsonContent, Path filePath) throws IOException {
+        Files.writeString(filePath, jsonContent);
+        /*try (FileWriter fileWriter = new FileWriter(filePath.toFile());
              BufferedWriter bufferedWriter = new BufferedWriter(fileWriter)) {
             bufferedWriter.write(jsonContent);
-        }
+        }*/
     }
-    public void createReproVipDirectory(String executionName, String executionID, String version, User currentUser) {
+    public String createReproVipDirectory(String executionName, String executionID, String version, User currentUser) throws BusinessException {
+        Path reproVipDir = Paths.get("/vip/ReproVip/" + executionID);
+        logger.info("Creating reprovip dir : {}", reproVipDir);
         try {
-            logger.info("Attempting to create ReproVip directory...");
-            logger.info("Version de l'app : " + version);
 
-            String reproVipDirPath = "/vip/ReproVip";
-            File reproVipDir = new File(reproVipDirPath);
-
-            if (!reproVipDir.exists()) {
-                if (reproVipDir.mkdirs()) {
-                    logger.info("ReproVip directory successfully created");
-                } else {
-                    logger.error("Error creating ReproVip directory");
-                }
+            if ( ! Files.exists(reproVipDir)) {
+                Files.createDirectories(reproVipDir);
             }
+        } catch (IOException e) {
+            logger.error("Exception creating the a reprovip directory {}", reproVipDir, e);
+            throw new RuntimeException(e);
+        }
+        copyProvenanceFiles(reproVipDir, executionID);
+        return generateReprovipJson(reproVipDir, executionName, executionID, version, currentUser);
+    }
 
-            List<InOutData> outputData = workflowBusiness.getOutputData(executionID, currentUser.getFolder(), true);
-            logger.info(outputData.get(0).getPath());
+    public void copyProvenanceFiles(Path reproVipDir, String executionID) {
+        try {
+            logger.debug("Workflows path: " + server.getWorkflowsPath());
 
-            if (outputData != null && !outputData.isEmpty()) {
-                String outputPath = "/vip/grida/downloads" + outputData.get(0).getPath();
-                if (outputPath != null) {
-                    File outputFile = new File(outputPath);
-                    if (outputFile.exists()) {
-                        Files.copy(outputFile.toPath(), new File(reproVipDir, outputFile.getName()).toPath(), StandardCopyOption.REPLACE_EXISTING);
-                        logger.info("Output file {} successfully copied to ReproVip directory", outputPath);
-                    } else {
-                        logger.warn("Output file {} not found", outputPath);
-                    }
-                } else {
-                    logger.warn("No output path found for executionID: {}", executionID);
-                }
-            } else {
-                logger.warn("No output data found for executionID: {}", executionID);
-            }
-
-            String workflowPath = String.valueOf(workflowBusiness.getRawApplicationDescriptorPath(currentUser, executionName, version));
-            logger.info(workflowPath);
-            File workflowFile = new File(workflowPath);
-            if (workflowFile.exists()) {
-                Files.copy(workflowFile.toPath(), new File(reproVipDir, workflowFile.getName()).toPath(), StandardCopyOption.REPLACE_EXISTING);
-                logger.info("Workflow file successfully copied to ReproVip directory");
-            } else {
-                logger.warn("Workflow file not found");
-            }
-
-            logger.info("Workflows path: " + server.getWorkflowsPath());
-
-            String provenanceDirPath = server.getWorkflowsPath() + "/" + executionID + "/provenance";
-            File provenanceDir = new File(provenanceDirPath);
-            if (!provenanceDir.exists()) {
-                logger.warn("Provenance directory does not exist: " + provenanceDirPath);
+            Path provenanceDirPath = Paths.get(server.getWorkflowsPath() + "/" + executionID + "/provenance");
+            if ( ! Files.exists(provenanceDirPath)) {
+                logger.error("Provenance directory does not exist: " + provenanceDirPath);
                 return;
             }
 
-            File[] allFiles = provenanceDir.listFiles();
-            if (allFiles != null) {
-                for (File file : allFiles) {
-                    logger.info("Found file in provenance directory: " + file.getName());
+            try (Stream<Path> stream = Files.list(provenanceDirPath)) {
+                List<Path> provenanceFiles = stream
+                        .filter(path -> path.toString().endsWith(".sh.provenance.json"))
+                        .collect(Collectors.toList());
+                for (Path provenanceFile : provenanceFiles) {
+                    Files.copy(provenanceFile, reproVipDir.resolve(provenanceFile.getFileName()), StandardCopyOption.REPLACE_EXISTING);
+                    logger.info("{} file successfully copied to ReproVip directory", provenanceFile);
                 }
-            }
-            FilenameFilter filter = new FilenameFilter() {
-                @Override
-                public boolean accept(File dir, String name) {
-                    return name.endsWith(".sh.provenance.json");
-                }
-            };
-
-            File[] matchingFiles = provenanceDir.listFiles(filter);
-
-            if (matchingFiles != null && matchingFiles.length > 0) {
-                File provenanceFile = matchingFiles[0];
-                if (provenanceFile.exists()) {
-                    Files.copy(provenanceFile.toPath(), new File(reproVipDir, provenanceFile.getName()).toPath(), StandardCopyOption.REPLACE_EXISTING);
-                    logger.info(provenanceFile.getName() + " file successfully copied to ReproVip directory");
-                } else {
-                    logger.warn(provenanceFile.getName() + " file not found");
-                }
-            } else {
-                logger.warn("No matching provenance file found");
             }
 
         } catch (IOException e) {
-            logger.error("Exception while copying files to ReproVip directory", e);
-            throw new RuntimeException(e);
-        } catch (BusinessException e) {
+            logger.error("Exception creating the a reprovip directory {}", reproVipDir, e);
             throw new RuntimeException(e);
         }
     }
 
-    public List<String> getFilesToCopyPaths(String executionName, String executionID, String version, User currentUser) throws BusinessException {
+    public List<String> getFilesToCopyPaths(String executionName, String executionID, String version) throws BusinessException {
         List<String> paths = new ArrayList<>();
 
-        List<InOutData> outputData = workflowBusiness.getOutputData(executionID, currentUser.getFolder(), true);
+        List<InOutData> outputData = workflowBusiness.getRawOutputData(executionID);
         if (outputData != null && !outputData.isEmpty()) {
             String outputPath = outputData.get(0).getPath();
             if (outputPath != null) {
@@ -257,24 +215,9 @@ public class ReproVipBusiness {
             }
         }
 
-        String workflowPath = String.valueOf(workflowBusiness.getRawApplicationDescriptorPath(currentUser, executionName, version));
-        if (workflowPath != null && !workflowPath.isEmpty()) {
-            paths.add(workflowPath);
-        }
-
-        String provenanceDirPath = server.getWorkflowsPath() + "/" + executionID + "/provenance";
-        File provenanceDir = new File(provenanceDirPath);
-        if (provenanceDir.exists()) {
-            FilenameFilter filter = new FilenameFilter() {
-                @Override
-                public boolean accept(File dir, String name) {
-                    return name.endsWith(".sh.provenance.json");
-                }
-            };
-            File[] matchingFiles = provenanceDir.listFiles(filter);
-            if (matchingFiles != null && matchingFiles.length > 0) {
-                paths.add(matchingFiles[0].getAbsolutePath());
-            }
+        AppVersion appVersion = applicationBusiness.getVersion(executionName, version);
+        if (appVersion != null && appVersion.getJsonLfn() != null) {
+            paths.add(appVersion.getJsonLfn());
         }
 
         return paths;

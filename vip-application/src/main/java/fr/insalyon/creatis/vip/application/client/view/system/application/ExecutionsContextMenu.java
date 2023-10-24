@@ -32,20 +32,10 @@ public class ExecutionsContextMenu extends Menu {
             @Override
             public void onClick(MenuItemClickEvent event) {
                 createReproVipDirectory(executionName, executionID, version);
-                //MakexExecutionPublic();
             }
         });
 
-        MenuItem DownloadOutputDataItem = new MenuItem("Donwload outputs");
-        DownloadOutputDataItem.setIcon(CoreConstants.ICON_INFO);
-        DownloadOutputDataItem.addClickHandler(new ClickHandler() {
-            @Override
-            public void onClick(MenuItemClickEvent event) {
-                DownloadOutputDataExecution(executionName, executionID, version);
-            }
-        });
-
-        this.setItems(OptionPublicExecutionItem, DownloadOutputDataItem);
+        this.setItems(OptionPublicExecutionItem);
     }
     private void MakexExecutionPublic() {
         final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
@@ -63,28 +53,14 @@ public class ExecutionsContextMenu extends Menu {
         modal.show("Make execution public", true);
         reproVipServiceAsync.updateExecution(executionID, "Public", callback);
     }
-    private void DownloadOutputDataExecution(String executionName, String executionID, String version) {
-        final AsyncCallback<String> callback = new AsyncCallback<String>() {
-            @Override
-            public void onFailure(Throwable caught) {
-                modal.hide();
-                SC.warn("Unable to download outputs of this execution public:<br />" + caught.getMessage());
-            }
-            @Override
-            public void onSuccess(String s) {
-                modal.hide();
-                new ViewerWindow("Execution Output Data", executionID, s).show();
-            }
-        };
-        modal.show("Download Outputs", true);
-        reproVipServiceAsync.downloadJsonOutputData(executionName, executionID, version,  callback);
-    }
     public void createReproVipDirectory(String executionName, String executionID, String version) {
-        reproVipServiceAsync.createReproVipDirectory(executionName, executionID, version, new AsyncCallback<Void>() {
+        reproVipServiceAsync.createReproVipDirectory(executionName, executionID, version, new AsyncCallback<String>() {
             public void onFailure(Throwable caught) {
                 SC.warn("Error creating ReproVip directory: " + caught.getMessage());
             }
-            public void onSuccess(Void result) {
+
+            @Override
+            public void onSuccess(String s) {
                 SC.say("ReproVip directory successfully created");
             }
         });

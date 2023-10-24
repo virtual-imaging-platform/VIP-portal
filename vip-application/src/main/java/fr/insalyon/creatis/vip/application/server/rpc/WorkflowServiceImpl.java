@@ -686,7 +686,7 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
     public List<InOutData> getOutputData(String simulationID) throws ApplicationException {
         try {
             return workflowBusiness.getOutputData(
-                simulationID, getSessionUser().getFolder(), false);
+                simulationID, getSessionUser().getFolder());
         } catch (BusinessException | CoreException ex) {
             throw new ApplicationException(ex);
         }

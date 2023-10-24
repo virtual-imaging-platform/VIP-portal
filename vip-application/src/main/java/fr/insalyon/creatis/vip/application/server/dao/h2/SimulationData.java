@@ -414,6 +414,7 @@ public class SimulationData extends AbstractJobData implements SimulationDAO {
                     + "GROUP BY country ORDER BY country");
             ps.setString(1, TaskStatus.COMPLETED.name());
             ResultSet rs = ps.executeQuery();
+            
 
             Map<String, Integer> map = new HashMap<String, Integer>();
             while (rs.next()) {
