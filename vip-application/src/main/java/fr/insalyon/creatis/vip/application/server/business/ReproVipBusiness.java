@@ -1,16 +1,10 @@
 package fr.insalyon.creatis.vip.application.server.business;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import fr.insalyon.creatis.vip.application.client.bean.AppVersion;
 import fr.insalyon.creatis.vip.application.client.bean.InOutData;
-import fr.insalyon.creatis.vip.application.client.bean.Job;
 import fr.insalyon.creatis.vip.application.client.bean.Task;
-import fr.insalyon.creatis.vip.application.client.rpc.JobService;
-import fr.insalyon.creatis.vip.application.client.rpc.JobServiceAsync;
 import fr.insalyon.creatis.vip.application.client.view.ApplicationException;
-import fr.insalyon.creatis.vip.application.server.rpc.JobServiceImpl;
 import fr.insalyon.creatis.vip.core.client.bean.Execution;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
@@ -29,10 +23,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -116,23 +107,27 @@ public class ReproVipBusiness {
         }
         return new ExecutionJobTaskData(jobList);
     }
-    public String generateReprovipJson(Path reproVipDir, String executionName, String executionID, String version, User currentUser)
+    public String generateReprovipJson(Path reproVipDir, String executionName, String executionID, String version, User currentUser, List<Path> provenanceFiles)
             throws BusinessException {
         List<String> filesToDownload = getFilesToCopyPaths(executionName, executionID, version);
 
-        Map<String, Object> structuredJson = new HashMap<>();
+        List<String> filesToUpload = provenanceFiles.stream()
+                .map(Path::toString)
+                .collect(Collectors.toList());
 
+        Map<String, Object> structuredJson = new LinkedHashMap<>();
         structuredJson.put("files_to_download", filesToDownload);
+        structuredJson.put("files_to_upload", filesToUpload);
 
-        Map<String, Object> metadataOuter = new HashMap<>();
-        Map<String, Object> metadataInner = new HashMap<>();
+        Map<String, Object> metadataOuter = new LinkedHashMap<>();
+        Map<String, Object> metadataInner = new LinkedHashMap<>();
 
         metadataInner.put("title", "your title");
         metadataInner.put("upload_type", "workflow");
         metadataInner.put("description", "your description");
 
         List<Map<String, String>> creators = new ArrayList<>();
-        Map<String, String> creator = new HashMap<>();
+        Map<String, String> creator = new LinkedHashMap<>();
         creator.put("name", currentUser.getFullName());
         creator.put("affiliation", "your affiliation");
         creators.add(creator);
@@ -157,10 +152,6 @@ public class ReproVipBusiness {
     }
     public void saveJsonToFile(String jsonContent, Path filePath) throws IOException {
         Files.writeString(filePath, jsonContent);
-        /*try (FileWriter fileWriter = new FileWriter(filePath.toFile());
-             BufferedWriter bufferedWriter = new BufferedWriter(fileWriter)) {
-            bufferedWriter.write(jsonContent);
-        }*/
     }
     public String createReproVipDirectory(String executionName, String executionID, String version, User currentUser) throws BusinessException {
         Path reproVipDir = Paths.get("/vip/ReproVip/" + executionID);
@@ -174,18 +165,19 @@ public class ReproVipBusiness {
             logger.error("Exception creating the a reprovip directory {}", reproVipDir, e);
             throw new RuntimeException(e);
         }
-        copyProvenanceFiles(reproVipDir, executionID);
-        return generateReprovipJson(reproVipDir, executionName, executionID, version, currentUser);
+        List<Path> provenanceFiles = copyProvenanceFiles(reproVipDir, executionID);
+        return generateReprovipJson(reproVipDir, executionName, executionID, version, currentUser, provenanceFiles);
     }
 
-    public void copyProvenanceFiles(Path reproVipDir, String executionID) {
+    public List<Path> copyProvenanceFiles(Path reproVipDir, String executionID) {
         try {
             logger.debug("Workflows path: " + server.getWorkflowsPath());
+            List<Path> copiedProvenanceFiles = new ArrayList<>();
 
             Path provenanceDirPath = Paths.get(server.getWorkflowsPath() + "/" + executionID + "/provenance");
             if ( ! Files.exists(provenanceDirPath)) {
                 logger.error("Provenance directory does not exist: " + provenanceDirPath);
-                return;
+                return copiedProvenanceFiles;
             }
 
             try (Stream<Path> stream = Files.list(provenanceDirPath)) {
@@ -195,9 +187,10 @@ public class ReproVipBusiness {
                 for (Path provenanceFile : provenanceFiles) {
                     Files.copy(provenanceFile, reproVipDir.resolve(provenanceFile.getFileName()), StandardCopyOption.REPLACE_EXISTING);
                     logger.info("{} file successfully copied to ReproVip directory", provenanceFile);
+                    copiedProvenanceFiles.add(reproVipDir.resolve(provenanceFile.getFileName()));
                 }
             }
-
+            return copiedProvenanceFiles;
         } catch (IOException e) {
             logger.error("Exception creating the a reprovip directory {}", reproVipDir, e);
             throw new RuntimeException(e);
