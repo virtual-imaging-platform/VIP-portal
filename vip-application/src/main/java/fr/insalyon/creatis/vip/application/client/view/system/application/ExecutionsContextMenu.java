@@ -19,7 +19,7 @@ public class ExecutionsContextMenu extends Menu {
     private String executionID;
     private ReproVipServiceAsync reproVipServiceAsync = ReproVipService.Util.getInstance();
     private ReproVipService reproVipService;
-    public ExecutionsContextMenu(ModalWindow modal, String executionName, String executionID, String version){
+    public ExecutionsContextMenu(ModalWindow modal, String executionName, String executionID, String version, String comments){
         this.modal = modal;
         this.executionID = executionID;
         this.setShowShadow(true);
@@ -31,7 +31,7 @@ public class ExecutionsContextMenu extends Menu {
         OptionPublicExecutionItem.addClickHandler(new ClickHandler() {
             @Override
             public void onClick(MenuItemClickEvent event) {
-                createReproVipDirectory(executionName, executionID, version);
+                createReproVipDirectory(executionName, executionID, version, comments);
             }
         });
 
@@ -53,8 +53,8 @@ public class ExecutionsContextMenu extends Menu {
         modal.show("Make execution public", true);
         reproVipServiceAsync.updateExecution(executionID, "Public", callback);
     }
-    public void createReproVipDirectory(String executionName, String executionID, String version) {
-        reproVipServiceAsync.createReproVipDirectory(executionName, executionID, version, new AsyncCallback<String>() {
+    public void createReproVipDirectory(String executionName, String executionID, String version, String comments) {
+        reproVipServiceAsync.createReproVipDirectory(executionName, executionID, version, comments, new AsyncCallback<String>() {
             public void onFailure(Throwable caught) {
                 SC.warn("Error creating ReproVip directory: " + caught.getMessage());
             }

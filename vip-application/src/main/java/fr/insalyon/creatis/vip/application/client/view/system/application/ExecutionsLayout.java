@@ -57,7 +57,8 @@ public class ExecutionsLayout extends VLayout {
                 String executionName = selectedRecord.getAttribute("application_name");
                 String executionId = selectedRecord.getAttribute("id");
                 String version = selectedRecord.getAttribute("version");
-                new ExecutionsContextMenu(modal, executionName, executionId, version).showContextMenu();
+                String comments = selectedRecord.getAttribute("comments");
+                new ExecutionsContextMenu(modal, executionName, executionId, version, comments).showContextMenu();
             }
         });
 

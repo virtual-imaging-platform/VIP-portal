@@ -107,7 +107,7 @@ public class ReproVipBusiness {
         }
         return new ExecutionJobTaskData(jobList);
     }
-    public String generateReprovipJson(Path reproVipDir, String executionName, String executionID, String version, User currentUser, List<Path> provenanceFiles)
+    public String generateReprovipJson(Path reproVipDir, String executionName, String executionID, String version, String comments, User currentUser, List<Path> provenanceFiles)
             throws BusinessException {
         List<String> filesToDownload = getFilesToCopyPaths(executionName, executionID, version);
 
@@ -124,7 +124,7 @@ public class ReproVipBusiness {
 
         metadataInner.put("title", "your title");
         metadataInner.put("upload_type", "workflow");
-        metadataInner.put("description", "your description");
+        metadataInner.put("description", comments);
 
         List<Map<String, String>> creators = new ArrayList<>();
         Map<String, String> creator = new LinkedHashMap<>();
@@ -153,7 +153,7 @@ public class ReproVipBusiness {
     public void saveJsonToFile(String jsonContent, Path filePath) throws IOException {
         Files.writeString(filePath, jsonContent);
     }
-    public String createReproVipDirectory(String executionName, String executionID, String version, User currentUser) throws BusinessException {
+    public String createReproVipDirectory(String executionName, String executionID, String version, String comments,  User currentUser) throws BusinessException {
         Path reproVipDir = Paths.get("/vip/ReproVip/" + executionID);
         logger.info("Creating reprovip dir : {}", reproVipDir);
         try {
@@ -166,7 +166,7 @@ public class ReproVipBusiness {
             throw new RuntimeException(e);
         }
         List<Path> provenanceFiles = copyProvenanceFiles(reproVipDir, executionID);
-        return generateReprovipJson(reproVipDir, executionName, executionID, version, currentUser, provenanceFiles);
+        return generateReprovipJson(reproVipDir, executionName, executionID, version, comments, currentUser, provenanceFiles);
     }
 
     public List<Path> copyProvenanceFiles(Path reproVipDir, String executionID) {

@@ -50,10 +50,10 @@ public class ReproVipServiceImpl extends AbstractRemoteServiceServlet implements
             throw new CoreException("Failed to update execution", e);
         }
     }
-    public String createReproVipDirectory(String executionName, String executionID, String version) {
+    public String createReproVipDirectory(String executionName, String executionID, String version, String comments) {
         try {
             User currentUser = getSessionUser();
-            return reproVipBusiness.createReproVipDirectory(executionName, executionID, version, currentUser);
+            return reproVipBusiness.createReproVipDirectory(executionName, executionID, version, comments, currentUser);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
