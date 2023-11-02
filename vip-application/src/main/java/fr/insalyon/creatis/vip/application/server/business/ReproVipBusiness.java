@@ -1,5 +1,6 @@
 package fr.insalyon.creatis.vip.application.server.business;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.insalyon.creatis.vip.application.client.bean.AppVersion;
 import fr.insalyon.creatis.vip.application.client.bean.InOutData;
@@ -174,25 +175,50 @@ public class ReproVipBusiness {
             logger.debug("Workflows path: " + server.getWorkflowsPath());
             List<Path> copiedProvenanceFiles = new ArrayList<>();
 
+            // Define the directory where provenance files are stored
             Path provenanceDirPath = Paths.get(server.getWorkflowsPath() + "/" + executionID + "/provenance");
-            if ( ! Files.exists(provenanceDirPath)) {
+            if (!Files.exists(provenanceDirPath)) {
                 logger.error("Provenance directory does not exist: " + provenanceDirPath);
                 return copiedProvenanceFiles;
             }
 
+            ObjectMapper objectMapper = new ObjectMapper();
             try (Stream<Path> stream = Files.list(provenanceDirPath)) {
                 List<Path> provenanceFiles = stream
                         .filter(path -> path.toString().endsWith(".sh.provenance.json"))
                         .collect(Collectors.toList());
+
                 for (Path provenanceFile : provenanceFiles) {
-                    Files.copy(provenanceFile, reproVipDir.resolve(provenanceFile.getFileName()), StandardCopyOption.REPLACE_EXISTING);
-                    logger.info("{} file successfully copied to ReproVip directory", provenanceFile);
-                    copiedProvenanceFiles.add(reproVipDir.resolve(provenanceFile.getFileName()));
+                    // Read the JSON content of the source file
+                    String jsonContent = Files.readString(provenanceFile);
+                    Map<String, Object> provenanceMap = objectMapper.readValue(jsonContent, new TypeReference<Map<String, Object>>(){});
+                    // Navigate through the nested JSON to find the md5sum
+                    Map<String, Object> outputFilesSection = (Map<String, Object>) ((Map<String, Object>) provenanceMap.get("public-output")).get("output-files");
+
+                    if (outputFilesSection != null) {
+                        for (Map.Entry<String, Object> entry : outputFilesSection.entrySet()) {
+                            Map<String, String> fileDetails = (Map<String, String>) entry.getValue();
+                            String md5sum = fileDetails.get("md5sum");
+
+                            // Create subfolder named after md5sum
+                            Path md5Dir = reproVipDir.resolve(md5sum);
+                            if (!Files.exists(md5Dir)) {
+                                Files.createDirectories(md5Dir);
+                            }
+
+                            // Copy the source file to the new subfolder
+                            Path newLocation = md5Dir.resolve(provenanceFile.getFileName());
+                            Files.copy(provenanceFile, newLocation, StandardCopyOption.REPLACE_EXISTING);
+                            logger.info("Copied provenance file to directory: {}", newLocation);
+
+                            copiedProvenanceFiles.add(newLocation);
+                        }
+                    }
                 }
             }
             return copiedProvenanceFiles;
         } catch (IOException e) {
-            logger.error("Exception creating the a reprovip directory {}", reproVipDir, e);
+            logger.error("Error while copying provenance files", e);
             throw new RuntimeException(e);
         }
     }
@@ -202,14 +228,16 @@ public class ReproVipBusiness {
 
         List<InOutData> outputData = workflowBusiness.getRawOutputData(executionID);
         if (outputData != null && !outputData.isEmpty()) {
-            String outputPath = outputData.get(0).getPath();
-            if (outputPath != null) {
-                paths.add(outputPath);
+            for (InOutData data : outputData) {
+                String outputPath = data.getPath();
+                if (outputPath != null) {
+                    paths.add(outputPath);
+                }
             }
         }
 
         AppVersion appVersion = applicationBusiness.getVersion(executionName, version);
-        if (appVersion != null && appVersion.getJsonLfn() != null) {
+        if (appVersion != null && appVersion.getJsonLfn() != null && !paths.contains(appVersion.getJsonLfn())) {
             paths.add(appVersion.getJsonLfn());
         }
 
