@@ -175,45 +175,36 @@ public class ReproVipBusiness {
             logger.debug("Workflows path: " + server.getWorkflowsPath());
             List<Path> copiedProvenanceFiles = new ArrayList<>();
 
-            // Define the directory where provenance files are stored
+            // directory where provenance files are stored
             Path provenanceDirPath = Paths.get(server.getWorkflowsPath() + "/" + executionID + "/provenance");
             if (!Files.exists(provenanceDirPath)) {
                 logger.error("Provenance directory does not exist: " + provenanceDirPath);
                 return copiedProvenanceFiles;
             }
 
-            ObjectMapper objectMapper = new ObjectMapper();
             try (Stream<Path> stream = Files.list(provenanceDirPath)) {
                 List<Path> provenanceFiles = stream
                         .filter(path -> path.toString().endsWith(".sh.provenance.json"))
                         .collect(Collectors.toList());
 
                 for (Path provenanceFile : provenanceFiles) {
-                    // Read the JSON content of the source file
-                    String jsonContent = Files.readString(provenanceFile);
-                    Map<String, Object> provenanceMap = objectMapper.readValue(jsonContent, new TypeReference<Map<String, Object>>(){});
-                    // Navigate through the nested JSON to find the md5sum
-                    Map<String, Object> outputFilesSection = (Map<String, Object>) ((Map<String, Object>) provenanceMap.get("public-output")).get("output-files");
+                    // Extract the invocationID from the provenance file name
+                    String fileName = provenanceFile.getFileName().toString();
+                    // The invocationID is between the first dash and ".sh.provenance.json"
+                    String invocationID = fileName.substring(fileName.indexOf('-') + 1, fileName.indexOf(".sh.provenance.json"));
 
-                    if (outputFilesSection != null) {
-                        for (Map.Entry<String, Object> entry : outputFilesSection.entrySet()) {
-                            Map<String, String> fileDetails = (Map<String, String>) entry.getValue();
-                            String md5sum = fileDetails.get("md5sum");
-
-                            // Create subfolder named after md5sum
-                            Path md5Dir = reproVipDir.resolve(md5sum);
-                            if (!Files.exists(md5Dir)) {
-                                Files.createDirectories(md5Dir);
-                            }
-
-                            // Copy the source file to the new subfolder
-                            Path newLocation = md5Dir.resolve(provenanceFile.getFileName());
-                            Files.copy(provenanceFile, newLocation, StandardCopyOption.REPLACE_EXISTING);
-                            logger.info("Copied provenance file to directory: {}", newLocation);
-
-                            copiedProvenanceFiles.add(newLocation);
-                        }
+                    // Create subfolder named with the invocationID
+                    Path invocationDir = reproVipDir.resolve(invocationID);
+                    if (!Files.exists(invocationDir)) {
+                        Files.createDirectories(invocationDir);
                     }
+
+                    // Copy the source file to the new subfolder
+                    Path newLocation = invocationDir.resolve(provenanceFile.getFileName());
+                    Files.copy(provenanceFile, newLocation, StandardCopyOption.REPLACE_EXISTING);
+                    logger.info("Copied provenance file to directory: {}", newLocation);
+
+                    copiedProvenanceFiles.add(newLocation);
                 }
             }
             return copiedProvenanceFiles;
