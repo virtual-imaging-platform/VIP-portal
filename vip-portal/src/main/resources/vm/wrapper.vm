@@ -82,6 +82,24 @@ function checkBosh {
     export BOSHEXEC="${BOSH_CVMFS_PATH}/bosh"
   fi
 }
+
+function copyProvenanceFile() {
+  local dest=$1
+  BOUTIQUES_CACHE_DIR="$HOME/.cache/boutiques/data"
+  if [ ! -d "$BOUTIQUES_CACHE_DIR" ]; then
+    error "Boutiques cache dir $BOUTIQUES_CACHE_DIR does not exist."
+    return 1
+  fi
+  local provenanceFile=$(ls -t "$BOUTIQUES_CACHE_DIR" | grep -v "^descriptor_" | head -n 1)
+  if [[ -z "$provenanceFile" ]]; then
+    error "No provenance found in boutiques cache $BOUTIQUES_CACHE_DIR"
+    return 2
+  fi
+  info "Found provenance file $BOUTIQUES_CACHE_DIR/$provenanceFile"
+  info "Copying it to $dest"
+  cp $BOUTIQUES_CACHE_DIR/$provenanceFile $dest
+}
+
 #####################
 # Arguments parsing #
 #####################
@@ -167,5 +185,6 @@ then
     exit 1
 fi
 
+copyProvenanceFile "./provenance.json"
 info "Execution of $tool.getName() completed."
 

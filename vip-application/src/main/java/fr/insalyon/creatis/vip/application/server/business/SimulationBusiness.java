@@ -203,6 +203,7 @@ public class SimulationBusiness {
                 }
                 task.setParameters(params);
             }
+
             return list;
 
         } catch (DataManagerException | DAOException ex) {
