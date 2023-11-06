@@ -157,39 +157,37 @@ public class SimulationData extends AbstractJobData implements SimulationDAO {
     }
 
     @Override
-    public Map<String, List<String>> getInvocationData(int jobId) throws DAOException {
+    public List<String> getInputData(String taskID) throws DAOException {
+        return getTaskData(taskID, "Input");
+    }
+
+    @Override
+    public List<String> getOutputData(String taskID) throws DAOException {
+        return getTaskData(taskID, "Output");
+    }
+
+    private List<String> getTaskData(String taskID, String dataType) throws DAOException {
 
         try {
             PreparedStatement ps = connection.prepareStatement(
-                    "SELECT j.id, d.data_type, d.data_path FROM Jobs AS j, job_data AS jd" +
-                            " LEFT JOIN Data d ON d.data_path = jd.data_path" +
-                            " WHERE j.invocation_id = ? AND jd.id = j.id" +
-                            " ORDER BY j.id, d.data_type");
+                    "SELECT d.data_path" +
+                            " FROM job_data AS jd, Data AS d" +
+                            " WHERE jd.id = ?" +
+                            " AND d.data_path = jd.data_path AND d.data_type = ?");
 
-            ps.setInt(1, jobId);
+            ps.setString(1, taskID);
+            ps.setString(2, dataType);
             ResultSet rs = ps.executeQuery();
 
-            Map<String, List<String>> dataMap = new HashMap<>();
+            List<String> dataList = new ArrayList<>();
 
             while (rs.next()) {
-                String jid = rs.getString("id");
-                String dataType = rs.getString("data_type");
-                String dataPath = rs.getString("data_path");
-
-                if (!dataMap.containsKey(jid)) {
-                    dataMap.put(jid, new ArrayList<>());
-                }
-                String prefix = "output : ";
-                if ("input".equalsIgnoreCase(dataType)) {
-                    prefix = "input : ";
-                }
-                dataPath = prefix + dataPath;
-                dataMap.get(jid).add(dataPath);
+                dataList.add(rs.getString("data_path"));
             }
             ps.close();
-            return dataMap;
+            return dataList;
         } catch (SQLException ex) {
-            logger.error("Error getting job data for {}", jobId, ex);
+            logger.error("Error getting job data for {}", taskID, ex);
             throw new DAOException(ex);
         }
     }

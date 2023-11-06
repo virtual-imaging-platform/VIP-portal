@@ -49,7 +49,9 @@ public interface SimulationDAO {
 
     public Task getTask(String taskID) throws DAOException;
 
-    public Map<String, List<String>> getInvocationData(int jobId) throws DAOException;
+    public List<String> getInputData(String taskID) throws DAOException;
+
+    public List<String> getOutputData(String taskID) throws DAOException;
 
     public void sendTaskSignal(String jobID, TaskStatus status) throws DAOException;
 
