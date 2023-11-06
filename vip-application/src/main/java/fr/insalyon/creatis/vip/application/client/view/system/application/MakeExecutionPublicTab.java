@@ -52,9 +52,11 @@ public class MakeExecutionPublicTab extends Tab {
         vLayout.setDefaultLayoutAlign(Alignment.CENTER);
 
         outputFilesForm = new DynamicForm();
+        Layout.getInstance().getModal().show("Loading...", true);
         AsyncCallback<String> descriptorCallback = new AsyncCallback<String>() {
             @Override
             public void onFailure(Throwable caught) {
+                Layout.getInstance().getModal().hide();
                 SC.warn("Error retrieving application descriptor: " + caught.getMessage());
             }
             @Override
@@ -78,6 +80,8 @@ public class MakeExecutionPublicTab extends Tab {
                     }
                 } catch (InvalidBoutiquesDescriptorException exception) {
                     SC.warn("Error when parsing application descriptor: " + exception.getMessage());
+                } finally {
+                    Layout.getInstance().getModal().hide();
                 }
             }
         };
