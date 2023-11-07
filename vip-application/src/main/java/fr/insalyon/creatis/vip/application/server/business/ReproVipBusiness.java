@@ -6,6 +6,7 @@ import fr.insalyon.creatis.vip.application.client.bean.AppVersion;
 import fr.insalyon.creatis.vip.application.client.bean.InOutData;
 import fr.insalyon.creatis.vip.application.client.bean.Task;
 import fr.insalyon.creatis.vip.application.client.view.ApplicationException;
+import fr.insalyon.creatis.vip.application.server.dao.h2.SimulationData;
 import fr.insalyon.creatis.vip.core.client.bean.Execution;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
@@ -46,7 +47,6 @@ public class ReproVipBusiness {
     private Server server;
     @Autowired
     private SimulationBusiness simulationBusiness;
-
     public void executionAdminEmail(Execution execution) throws DAOException, BusinessException {
         String adminsEmailContents = "<html>"
                 + "<head></head>"
@@ -108,8 +108,9 @@ public class ReproVipBusiness {
         }
         return new ExecutionJobTaskData(jobList);
     }
-    public String generateReprovipJson(Path reproVipDir, String executionName, String executionID, String version, String comments, User currentUser, List<Path> provenanceFiles)
-            throws BusinessException {
+    public String generateReprovipJson(Path reproVipDir, String executionName, String executionID, String version,
+                                       String comments, User currentUser, List<Path> provenanceFiles)
+            throws BusinessException, DAOException {
         List<String> filesToDownload = getFilesToCopyPaths(executionName, executionID, version);
 
         List<String> filesToUpload = provenanceFiles.stream()
@@ -119,6 +120,17 @@ public class ReproVipBusiness {
         Map<String, Object> structuredJson = new LinkedHashMap<>();
         structuredJson.put("files_to_download", filesToDownload);
         structuredJson.put("files_to_upload", filesToUpload);
+
+        Map<String, List<String>> invocationOutputsMap = new LinkedHashMap<>();
+
+        for (Path provenanceFile : provenanceFiles) {
+            String fileName = provenanceFile.getFileName().toString();
+            String invocationID = fileName.substring(0, fileName.indexOf(".sh.provenance.json"));
+            List<String> outputDataPaths = simulationBusiness.getSimulationDAO(executionID).getOutputData(invocationID);
+            invocationOutputsMap.put(invocationID, outputDataPaths);
+        }
+
+        structuredJson.put("invocation_outputs", invocationOutputsMap);
 
         Map<String, Object> metadataOuter = new LinkedHashMap<>();
         Map<String, Object> metadataInner = new LinkedHashMap<>();
@@ -154,7 +166,7 @@ public class ReproVipBusiness {
     public void saveJsonToFile(String jsonContent, Path filePath) throws IOException {
         Files.writeString(filePath, jsonContent);
     }
-    public String createReproVipDirectory(String executionName, String executionID, String version, String comments,  User currentUser) throws BusinessException {
+    public String createReproVipDirectory(String executionName, String executionID, String version, String comments,  User currentUser) throws BusinessException, DAOException {
         Path reproVipDir = Paths.get("/vip/ReproVip/" + executionID);
         logger.info("Creating reprovip dir : {}", reproVipDir);
         try {
@@ -191,7 +203,7 @@ public class ReproVipBusiness {
                     // Extract the invocationID from the provenance file name
                     String fileName = provenanceFile.getFileName().toString();
                     // The invocationID is between the first dash and ".sh.provenance.json"
-                    String invocationID = fileName.substring(fileName.indexOf('-') + 1, fileName.indexOf(".sh.provenance.json"));
+                    String invocationID = fileName.substring(0, fileName.indexOf(".sh.provenance.json"));
 
                     // Create subfolder named with the invocationID
                     Path invocationDir = reproVipDir.resolve(invocationID);
