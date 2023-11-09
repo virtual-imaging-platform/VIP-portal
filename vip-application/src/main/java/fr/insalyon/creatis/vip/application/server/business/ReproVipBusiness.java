@@ -111,14 +111,16 @@ public class ReproVipBusiness {
     public String generateReprovipJson(Path reproVipDir, String executionName, String executionID, String version,
                                        String comments, User currentUser, List<Path> provenanceFiles)
             throws BusinessException, DAOException {
-        List<String> filesToDownload = getFilesToCopyPaths(executionName, executionID, version);
+        Path workflowVipDir = Paths.get("/vip/ReproVip/" + executionID);
+        String filesToDownload = getDescritporBoutiqueJsonPath(executionName, version);
 
         List<String> filesToUpload = provenanceFiles.stream()
                 .map(Path::toString)
                 .collect(Collectors.toList());
 
         Map<String, Object> structuredJson = new LinkedHashMap<>();
-        structuredJson.put("files_to_download", filesToDownload);
+        structuredJson.put("path_workflow_directory", workflowVipDir);
+        structuredJson.put("descriptor_boutique", filesToDownload);
         structuredJson.put("files_to_upload", filesToUpload);
 
         Map<String, List<String>> invocationOutputsMap = new LinkedHashMap<>();
@@ -155,7 +157,7 @@ public class ReproVipBusiness {
             String json = objectMapper.writeValueAsString(structuredJson);
             logger.info(json);
 
-            Path reprovipJsonPath = reproVipDir.resolve("structuredOutput.json");
+            Path reprovipJsonPath = reproVipDir.resolve("workflowMetadata.json");
             saveJsonToFile(json, reprovipJsonPath);
 
             return json;
@@ -226,24 +228,11 @@ public class ReproVipBusiness {
         }
     }
 
-    public List<String> getFilesToCopyPaths(String executionName, String executionID, String version) throws BusinessException {
-        List<String> paths = new ArrayList<>();
-
-        List<InOutData> outputData = workflowBusiness.getRawOutputData(executionID);
-        if (outputData != null && !outputData.isEmpty()) {
-            for (InOutData data : outputData) {
-                String outputPath = data.getPath();
-                if (outputPath != null) {
-                    paths.add(outputPath);
-                }
-            }
-        }
-
+    public String getDescritporBoutiqueJsonPath(String executionName, String version) throws BusinessException {
         AppVersion appVersion = applicationBusiness.getVersion(executionName, version);
-        if (appVersion != null && appVersion.getJsonLfn() != null && !paths.contains(appVersion.getJsonLfn())) {
-            paths.add(appVersion.getJsonLfn());
+        if (appVersion != null && appVersion.getJsonLfn() != null) {
+            return appVersion.getJsonLfn();
         }
-
-        return paths;
+        return null;
     }
 }
