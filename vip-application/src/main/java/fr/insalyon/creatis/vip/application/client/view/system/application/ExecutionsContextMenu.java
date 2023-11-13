@@ -9,6 +9,7 @@ import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
 import fr.insalyon.creatis.vip.application.client.rpc.ReproVipService;
 import fr.insalyon.creatis.vip.application.client.rpc.ReproVipServiceAsync;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
+import fr.insalyon.creatis.vip.core.client.view.CoreException;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 
 public class ExecutionsContextMenu extends Menu {
@@ -16,7 +17,7 @@ public class ExecutionsContextMenu extends Menu {
     private String executionID;
     private ReproVipServiceAsync reproVipServiceAsync = ReproVipService.Util.getInstance();
     private ReproVipService reproVipService;
-    public ExecutionsContextMenu(ModalWindow modal, String executionName, String executionID, String version, String comments){
+    public ExecutionsContextMenu(ModalWindow modal, String executionName, String executionID, String version, String status,  String comments){
         this.modal = modal;
         this.executionID = executionID;
         this.setShowShadow(true);
@@ -28,13 +29,18 @@ public class ExecutionsContextMenu extends Menu {
         OptionPublicExecutionItem.addClickHandler(new ClickHandler() {
             @Override
             public void onClick(MenuItemClickEvent event) {
-                createReproVipDirectory(executionName, executionID, version, comments);
+                if (!status.equals("ReproVIP directory created")) {
+                    createReproVipDirectory(executionName, executionID, version, comments);
+                    makexExecutionPublic();
+                } else {
+                    SC.warn("ReproVIP directory is already created for this execution.");
+                }
             }
         });
 
         this.setItems(OptionPublicExecutionItem);
     }
-    private void MakexExecutionPublic() {
+    private void makexExecutionPublic() {
         final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
             @Override
             public void onFailure(Throwable caught) {
@@ -48,7 +54,7 @@ public class ExecutionsContextMenu extends Menu {
             }
         };
         modal.show("Make execution public", true);
-        reproVipServiceAsync.updateExecution(executionID, "Public", callback);
+        reproVipServiceAsync.updateExecution(executionID, "ReproVIP directory created", callback);
     }
     public void createReproVipDirectory(String executionName, String executionID, String version, String comments) {
         reproVipServiceAsync.createReproVipDirectory(executionName, executionID, version, comments, new AsyncCallback<String>() {
