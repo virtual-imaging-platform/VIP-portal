@@ -227,12 +227,31 @@ public class ReproVipBusiness {
             throw new RuntimeException(e);
         }
     }
-
     public String getDescritporBoutiqueJsonPath(String executionName, String version) throws BusinessException {
         AppVersion appVersion = applicationBusiness.getVersion(executionName, version);
         if (appVersion != null && appVersion.getJsonLfn() != null) {
             return appVersion.getJsonLfn();
         }
         return null;
+    }
+    public void deleteReproVipDirectory(String executionID) throws IOException {
+        Path reproVipDir = Paths.get("/vip/ReproVip/" + executionID);
+        logger.info("Deleting ReproVip directory: {}", reproVipDir);
+
+        if (Files.exists(reproVipDir)) {
+            Files.walk(reproVipDir)
+                    .sorted(Comparator.reverseOrder())
+                    .forEach(path -> {
+                        try {
+                            Files.delete(path);
+                            logger.info("Deleted: {}", path);
+                        } catch (IOException e) {
+                            logger.error("Error deleting: {}", path, e);
+                            throw new RuntimeException("Failed to delete " + path, e);
+                        }
+                    });
+        } else {
+            logger.info("ReproVip directory does not exist: {}", reproVipDir);
+        }
     }
 }

@@ -11,6 +11,7 @@ import fr.insalyon.creatis.vip.core.server.dao.ExecutionPublicDAO;
 import fr.insalyon.creatis.vip.core.server.rpc.AbstractRemoteServiceServlet;
 
 import javax.servlet.ServletException;
+import java.io.IOException;
 
 public class ReproVipServiceImpl extends AbstractRemoteServiceServlet implements ReproVipService {
     private ReproVipBusiness reproVipBusiness;
@@ -55,6 +56,13 @@ public class ReproVipServiceImpl extends AbstractRemoteServiceServlet implements
             User currentUser = getSessionUser();
             return reproVipBusiness.createReproVipDirectory(executionName, executionID, version, comments, currentUser);
         } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+    public void deleteReproVipDirectory(String executionID) throws CoreException {
+        try {
+            reproVipBusiness.deleteReproVipDirectory(executionID);
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
