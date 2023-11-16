@@ -42,13 +42,20 @@ public class ReproVipServiceImpl extends AbstractRemoteServiceServlet implements
             throw new CoreException("Failed to add execution", e);
         }
     }
-
     @Override
     public void updateExecution(String executionID, String newStatus) throws CoreException {
         try {
             executionPublicDAO.update(executionID, newStatus);
         } catch (DAOException e) {
             throw new CoreException("Failed to update execution", e);
+        }
+    }
+    @Override
+    public boolean doesExecutionExist(String executionID) throws CoreException {
+        try {
+            return executionPublicDAO.doesExecutionExist(executionID);
+        } catch (DAOException e) {
+            throw new CoreException("Failed to check if execution exist", e);
         }
     }
     public String createReproVipDirectory(String executionName, String executionID, String version, String comments) {

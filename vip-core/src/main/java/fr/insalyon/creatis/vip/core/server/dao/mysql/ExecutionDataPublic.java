@@ -87,5 +87,21 @@ public class ExecutionDataPublic extends JdbcDaoSupport implements ExecutionPubl
             throw new DAOException("Error getting executions", ex);
         }
     }
+
+    @Override
+    public boolean doesExecutionExist(String executionId) throws DAOException {
+        try (PreparedStatement ps = getConnection().prepareStatement(
+                "SELECT COUNT(*) FROM VIPExecutionPublic WHERE execution_ID = ?")) {
+            ps.setString(1, executionId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;
+                }
+                return false;
+            }
+        } catch (SQLException ex) {
+            throw new DAOException("Error checking if execution exists", ex);
+        }
+    }
 }
 

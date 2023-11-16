@@ -31,6 +31,7 @@
  */
 package fr.insalyon.creatis.vip.application.client.view.monitor.menu;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.util.SC;
@@ -40,6 +41,8 @@ import com.smartgwt.client.widgets.menu.MenuItemSeparator;
 import com.smartgwt.client.widgets.menu.events.ClickHandler;
 import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
+import fr.insalyon.creatis.vip.application.client.rpc.ReproVipService;
+import fr.insalyon.creatis.vip.application.client.rpc.ReproVipServiceAsync;
 import fr.insalyon.creatis.vip.application.client.rpc.WorkflowService;
 import fr.insalyon.creatis.vip.application.client.view.common.AbstractSimulationTab;
 import fr.insalyon.creatis.vip.application.client.view.launch.RelaunchService;
@@ -70,6 +73,7 @@ public class SimulationsContextMenu extends Menu {
     private String applicationVersion;
     private String applicationClass;
     private String simulationUser;
+    private ReproVipServiceAsync reproVipServiceAsync = ReproVipService.Util.getInstance();
 
     public SimulationsContextMenu(ModalWindow modal, final String simulationID,
                                   final String title, final SimulationStatus status, String applicationName,
@@ -185,17 +189,28 @@ public class SimulationsContextMenu extends Menu {
         });
 
         MenuItem makePublicExecutionItem = new MenuItem("Make this execution public");
-        makePublicExecutionItem.setIcon(ApplicationConstants.ICON_SIMULATION_VIEW);
         makePublicExecutionItem.addClickHandler(new ClickHandler() {
             @Override
             public void onClick(MenuItemClickEvent event) {
-                SC.ask("Do you really want to make this execution public:  ("
-                        + title + ")?", new BooleanCallback() {
+                reproVipServiceAsync.doesExecutionExist(simulationID, new AsyncCallback<Boolean>() {
                     @Override
-                    public void execute(Boolean value) {
-                        if (value) {
-                            Execution execution = new Execution(simulationID, simulationName, applicationName, applicationVersion, "Initializer", simulationUser, "comments");
-                            Layout.getInstance().addTab(CoreConstants.TAB_MAKE_EXECUTION_PUBLIC, () -> new MakeExecutionPublicTab(execution));
+                    public void onFailure(Throwable caught) {
+                        SC.warn("Error checking if execution exists: " + caught.getMessage());
+                    }
+                    @Override
+                    public void onSuccess(Boolean exists) {
+                        if (exists) {
+                            SC.warn("This execution already exists and cannot be made public again.");
+                        } else {
+                            SC.ask("Do you really want to make this execution public: (" + title + ")?", new BooleanCallback() {
+                                @Override
+                                public void execute(Boolean value) {
+                                    if (value) {
+                                        Execution execution = new Execution(simulationID, simulationName, applicationName, applicationVersion, "Initializer", simulationUser, "comments");
+                                        Layout.getInstance().addTab(CoreConstants.TAB_MAKE_EXECUTION_PUBLIC, () -> new MakeExecutionPublicTab(execution));
+                                    }
+                                }
+                            });
                         }
                     }
                 });
