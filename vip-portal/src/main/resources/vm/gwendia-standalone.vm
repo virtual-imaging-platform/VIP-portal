@@ -11,10 +11,18 @@
     #set($type="URI")
   #end
   #if($input.getType().getCamelName()=="Flag")
-    <source name="$input.getId()" type="string" optional="$input.isOptional()" default="$input.getCommandLineFlag()" vip-type-restriction="flag" pretty-name="$input.getName()">
+    #if($input.getDefaultValue() && $input.getDefaultValue()!="")
+      <source name="$input.getId()" type="string" optional="$input.isOptional()" default="$input.getDefaultValue()" vip-type-restriction="flag" pretty-name="$input.getName()">
+    #else
+      <source name="$input.getId()" type="string" optional="$input.isOptional()" default="false" vip-type-restriction="flag" pretty-name="$input.getName()">
+    #end
   #else
     #if($input.getDefaultValue() && $input.getDefaultValue()!="")
-    <source name="$input.getId()" type="$type" optional="$input.isOptional()" default="$input.getDefaultValue()" pretty-name="$input.getName()">
+       #if($input.getType().getCamelName()=="Number" && $input.isInteger())
+           <source name="$input.getId()" type="$type" optional="$input.isOptional()" default="$input.getDefaultValue().intValue()" pretty-name="$input.getName()">
+       #else
+           <source name="$input.getId()" type="$type" optional="$input.isOptional()" default="$input.getDefaultValue()" pretty-name="$input.getName()">
+       #end
     #else
       #if($input.isOptional()==true)
     <source name="$input.getId()" type="$type" optional="$input.isOptional()" default="No_value_provided" pretty-name="$input.getName()">
