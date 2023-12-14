@@ -98,7 +98,6 @@ public class CoreConstants implements IsSerializable {
     public static final String TAB_MANAGE_TIPS = "manage_tips_tab";
     public static final String TAB_MANAGE_USERS = "manage_users_tab";
     public static final String TAB_MANAGE_SETTING = "manage_setting_tab";
-    public static final String TAB_MAKE_EXECUTION_PUBLIC = "make_execution_public_tab";
     // home actions
     public static final String HOME_ACTION_SHOW_APPLICATIONS = "SHOW_APPLICATIONS";
     public static final String HOME_ACTION_SHOW_PUBLICATIONS = "SHOW_PUBLICATIONS";
@@ -191,6 +190,9 @@ public class CoreConstants implements IsSerializable {
     public static final String USE_LOCAL_FILES_AS_INPUTS = "execution.input.local-files";
     // API
     public static final String API_PARALLEL_DOWNLOAD_NB = "api.downloads.nb";
+    // ReproVIPfiles";
+    public static final String REPROVIP_ROOT_DIR = "reprovip.root-dir";
+
 
 
     public static enum GROUP_ROLE implements IsSerializable {

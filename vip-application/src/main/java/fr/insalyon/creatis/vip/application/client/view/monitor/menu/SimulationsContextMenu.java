@@ -31,7 +31,6 @@
  */
 package fr.insalyon.creatis.vip.application.client.view.monitor.menu;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.util.SC;
@@ -50,13 +49,12 @@ import fr.insalyon.creatis.vip.application.client.view.monitor.ChangeSimulationU
 import fr.insalyon.creatis.vip.application.client.view.monitor.SimulationStatus;
 import fr.insalyon.creatis.vip.application.client.view.monitor.SimulationTab;
 import fr.insalyon.creatis.vip.application.client.view.monitor.SimulationsTab;
+import fr.insalyon.creatis.vip.application.client.view.reprovip.MakeExecutionPublicTab;
 import fr.insalyon.creatis.vip.core.client.CoreModule;
-import fr.insalyon.creatis.vip.core.client.bean.Execution;
+import fr.insalyon.creatis.vip.core.client.bean.PublicExecution;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
-import fr.insalyon.creatis.vip.application.client.view.system.application.MakeExecutionPublicTab;
-import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 
 import java.util.Map;
 
@@ -75,9 +73,9 @@ public class SimulationsContextMenu extends Menu {
     private String simulationUser;
     private ReproVipServiceAsync reproVipServiceAsync = ReproVipService.Util.getInstance();
 
-    public SimulationsContextMenu(ModalWindow modal, final String simulationID,
-                                  final String title, final SimulationStatus status, String applicationName,
-                                  String applicationVersion, String applicationClass, String simulationUser) {
+    public SimulationsContextMenu(
+            ModalWindow modal, final String simulationID, final String title, final SimulationStatus status,
+            String applicationName, String applicationVersion, String applicationClass, String simulationUser) {
 
         this.modal = modal;
         this.simulationID = simulationID;
@@ -192,28 +190,7 @@ public class SimulationsContextMenu extends Menu {
         makePublicExecutionItem.addClickHandler(new ClickHandler() {
             @Override
             public void onClick(MenuItemClickEvent event) {
-                reproVipServiceAsync.doesExecutionExist(simulationID, new AsyncCallback<Boolean>() {
-                    @Override
-                    public void onFailure(Throwable caught) {
-                        SC.warn("Error checking if execution exists: " + caught.getMessage());
-                    }
-                    @Override
-                    public void onSuccess(Boolean exists) {
-                        if (exists) {
-                            SC.warn("This execution already exists and cannot be made public again.");
-                        } else {
-                            SC.ask("Do you really want to make this execution public: (" + title + ")?", new BooleanCallback() {
-                                @Override
-                                public void execute(Boolean value) {
-                                    if (value) {
-                                        Execution execution = new Execution(simulationID, simulationName, applicationName, applicationVersion, "Initializer", simulationUser, "comments");
-                                        Layout.getInstance().addTab(CoreConstants.TAB_MAKE_EXECUTION_PUBLIC, () -> new MakeExecutionPublicTab(execution));
-                                    }
-                                }
-                            });
-                        }
-                    }
-                });
+                makeExecutionPublic();
             }
         });
 
@@ -222,9 +199,9 @@ public class SimulationsContextMenu extends Menu {
         switch (status) {
             case Running:
                 if (CoreModule.user.isSystemAdministrator()) {
-                    this.setItems(viewItem, killItem, separator, relauchItem, separator, changeUserItem, separator, makePublicExecutionItem);
+                    this.setItems(viewItem, killItem, separator, relauchItem, separator, changeUserItem);
                 } else {
-                    this.setItems(viewItem, killItem, separator, relauchItem, separator, makePublicExecutionItem);
+                    this.setItems(viewItem, killItem, separator, relauchItem);
                 }
                 break;
 
@@ -238,7 +215,7 @@ public class SimulationsContextMenu extends Menu {
 
             case Cleaned:
                 if (CoreModule.user.isSystemAdministrator()) {
-                    this.setItems(viewItem, purgeItem, separator, changeUserItem, separator, makePublicExecutionItem);
+                    this.setItems(viewItem, purgeItem, separator, changeUserItem);
                 } else {
                     this.setItems(viewItem);
                 }
@@ -247,11 +224,42 @@ public class SimulationsContextMenu extends Menu {
             case Failed:
             case Killed:
                 if (CoreModule.user.isSystemAdministrator()) {
-                    this.setItems(viewItem, markCompletedItem, cleanItem, separator, relauchItem, separator, changeUserItem, separator, makePublicExecutionItem);
+                    this.setItems(viewItem, markCompletedItem, cleanItem, separator, relauchItem, separator, changeUserItem);
                 } else {
-                    this.setItems(viewItem, cleanItem, separator, relauchItem, separator, makePublicExecutionItem);
+                    this.setItems(viewItem, cleanItem, separator, relauchItem);
                 }
         }
+    }
+
+    private void makeExecutionPublic() {
+        final AsyncCallback<Boolean> callback = new AsyncCallback<Boolean>() {
+            @Override
+            public void onFailure(Throwable caught) {
+                SC.warn("Error checking if execution exists: " + caught.getMessage());
+            }
+            @Override
+            public void onSuccess(Boolean exists) {
+                if (exists) {
+                    SC.warn("This execution has already been made public.");
+                } else {
+                    SC.ask("Do you really want to make this execution public: (" + simulationName + ")?", new BooleanCallback() {
+                        @Override
+                        public void execute(Boolean value) {
+                            if (value) {
+                                PublicExecution publicExecution =
+                                        new PublicExecution(simulationID, simulationName, applicationName,
+                                                applicationVersion, PublicExecution.PublicExecutionStatus.REQUESTED,
+                                                simulationUser, "comments");
+                                Layout.getInstance().addTab(
+                                        ApplicationConstants.TAB_MAKE_EXECUTION_PUBLIC,
+                                        () -> new MakeExecutionPublicTab(publicExecution));
+                            }
+                        }
+                    });
+                }
+            }
+        };
+        reproVipServiceAsync.doesExecutionExist(simulationID, callback);
     }
 
     /**
@@ -353,8 +361,7 @@ public class SimulationsContextMenu extends Menu {
             @Override
             public void onSuccess(final Map<String, String> result) {
                 modal.hide();
-                String tabId =
-                        ApplicationConstants.getLaunchTabID(applicationName);
+                String tabId = ApplicationConstants.getLaunchTabID(applicationName);
                 Layout.getInstance().removeTab(tabId);
                 RelaunchService.getInstance().relaunch(
                         applicationName, applicationVersion, applicationClass, simulationName, result, tabId);

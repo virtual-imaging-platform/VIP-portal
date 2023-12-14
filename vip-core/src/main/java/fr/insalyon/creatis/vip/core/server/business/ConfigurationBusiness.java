@@ -59,6 +59,9 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.sql.Timestamp;
 import java.util.*;
+import java.util.stream.Collectors;
+
+import static fr.insalyon.creatis.vip.core.client.CoreModule.user;
 
 /**
  * @author Rafael Ferreira da Silva, Nouha Boujelben
@@ -935,10 +938,20 @@ public class ConfigurationBusiness {
         }
     }
 
+    public List<String> getSupportEmails() throws BusinessException {
+        try {
+            return usersGroupsDAO.getUsersFromGroup(CoreConstants.GROUP_SUPPORT)
+                    .stream().map(User::getEmail)
+                    .collect(Collectors.toList());
+        } catch (DAOException e) {
+            throw new BusinessException(e);
+        }
+    }
+
     /**
      * Gets an array of administrator's e-mails
      */
-    public String[] getAdministratorsEmails() throws DAOException {
+    private String[] getAdministratorsEmails() throws DAOException {
         List<String> emails = new ArrayList<>();
         for (User admin : userDAO.getAdministrators()) {
             emails.add(admin.getEmail());

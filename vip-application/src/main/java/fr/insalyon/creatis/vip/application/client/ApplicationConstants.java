@@ -47,6 +47,7 @@ public class ApplicationConstants {
     public final static String TAB_MONITOR = "monitor_tab";
     public final static String TAB_STATS = "stats_tab";
     public final static String TAB_REPROVIP = "reproVip_tab";
+    public static final String TAB_MAKE_EXECUTION_PUBLIC = "make_execution_public_tab";
     // Icons
     private static final String IMG_FOLDER = "application/";
     public static final String ICON_APPLICATION = IMG_FOLDER + "icon-application.png";

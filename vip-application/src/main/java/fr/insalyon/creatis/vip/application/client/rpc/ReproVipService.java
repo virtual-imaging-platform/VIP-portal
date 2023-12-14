@@ -1,12 +1,13 @@
 package fr.insalyon.creatis.vip.application.client.rpc;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.ServiceDefTarget;
 import fr.insalyon.creatis.vip.application.client.view.ApplicationException;
-import fr.insalyon.creatis.vip.core.client.bean.Execution;
-import fr.insalyon.creatis.vip.core.client.bean.User;
-import fr.insalyon.creatis.vip.core.client.view.CoreException;
+import fr.insalyon.creatis.vip.core.client.bean.PublicExecution;
+
+import java.util.List;
 
 public interface ReproVipService extends RemoteService {
 
@@ -21,11 +22,15 @@ public interface ReproVipService extends RemoteService {
             return instance;
         }
     }
-    public void executionAdminEmail(Execution execution);
-    void addExecution(Execution execution) throws CoreException;
-    void updateExecution(String executionID, String newStatus) throws CoreException;
-    boolean doesExecutionExist(String executionID) throws CoreException;
-    String createReproVipDirectory(String executionName, String executionID, String version, String comments) throws CoreException;
-    void deleteReproVipDirectory(String executionID) throws CoreException;
+
+    void addPublicExecution(PublicExecution publicExecution) throws ApplicationException;
+
+    public List<PublicExecution> getPublicExecutions() throws ApplicationException;
+
+    boolean doesExecutionExist(String executionID) throws ApplicationException;
+
+    PublicExecution.PublicExecutionStatus createReproVipDirectory(String executionID) throws ApplicationException;
+
+    PublicExecution.PublicExecutionStatus deleteReproVipDirectory(String executionID) throws ApplicationException;
 }
 

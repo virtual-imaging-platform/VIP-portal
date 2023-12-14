@@ -95,14 +95,6 @@ knowledge of the CeCILL-B license and that you accept its terms.
         <url-pattern>/fr.insalyon.creatis.vip.portal.Main/applicationservice</url-pattern>
     </servlet-mapping>
     <servlet>
-        <servlet-name>ExecutionsService</servlet-name>
-        <servlet-class>fr.insalyon.creatis.vip.application.server.rpc.ExecutionsServiceImpl</servlet-class>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>ExecutionsService</servlet-name>
-        <url-pattern>/fr.insalyon.creatis.vip.portal.Main/executionsservice</url-pattern>
-    </servlet-mapping>
-    <servlet>
         <servlet-name>WorkflowService</servlet-name>
         <servlet-class>fr.insalyon.creatis.vip.application.server.rpc.WorkflowServiceImpl</servlet-class>
     </servlet>

@@ -1,6 +1,5 @@
-package fr.insalyon.creatis.vip.application.client.view.system.application;
+package fr.insalyon.creatis.vip.application.client.view.reprovip;
 
-import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.types.Overflow;
 import com.smartgwt.client.widgets.grid.ListGrid;
@@ -9,19 +8,21 @@ import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.grid.events.RowContextClickEvent;
 import com.smartgwt.client.widgets.grid.events.RowContextClickHandler;
 import com.smartgwt.client.widgets.layout.VLayout;
-import fr.insalyon.creatis.vip.application.client.rpc.ExecutionsService;
-import fr.insalyon.creatis.vip.core.client.bean.Execution;
+import fr.insalyon.creatis.vip.application.client.rpc.ReproVipService;
+import fr.insalyon.creatis.vip.application.client.view.system.application.ExecutionsRecord;
+import fr.insalyon.creatis.vip.core.client.bean.PublicExecution;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
+
 import java.util.ArrayList;
 import java.util.List;
 
-public class ExecutionsLayout extends VLayout {
+public class PublicExecutionsLayout extends VLayout {
+
     private ModalWindow modal;
     private ListGrid grid;
-    protected HandlerRegistration rowContextClickHandler;
 
-    public ExecutionsLayout() {
+    public PublicExecutionsLayout() {
 
         this.setWidth100();
         this.setHeight100();
@@ -49,17 +50,17 @@ public class ExecutionsLayout extends VLayout {
                 new ListGridField("status", "Status"),
                 new ListGridField("author", "Author"),
                 new ListGridField("comments", "Comments"));
+
         grid.addRowContextClickHandler(new RowContextClickHandler() {
             @Override
             public void onRowContextClick(RowContextClickEvent event) {
                 event.cancel();
                 ListGridRecord selectedRecord = grid.getSelectedRecord();
-                String executionName = selectedRecord.getAttribute("application_name");
                 String executionId = selectedRecord.getAttribute("id");
-                String version = selectedRecord.getAttribute("version");
-                String status = selectedRecord.getAttribute("status");
-                String comments = selectedRecord.getAttribute("comments");
-                new ExecutionsContextMenu(modal, executionName, executionId, version, status, comments).showContextMenu();
+                PublicExecution.PublicExecutionStatus status =
+                        PublicExecution.PublicExecutionStatus.valueOf(selectedRecord.getAttribute("status"));
+
+                new PublicExecutionsContextMenu(modal, executionId, status).showContextMenu();
             }
         });
 
@@ -67,7 +68,7 @@ public class ExecutionsLayout extends VLayout {
     }
 
     public void loadData() {
-        final AsyncCallback<List<Execution>> callback = new AsyncCallback<List<Execution>>() {
+        final AsyncCallback<List<PublicExecution>> callback = new AsyncCallback<List<PublicExecution>>() {
             @Override
             public void onFailure(Throwable caught) {
                 modal.hide();
@@ -75,17 +76,17 @@ public class ExecutionsLayout extends VLayout {
             }
 
             @Override
-            public void onSuccess(List<Execution> result) {
+            public void onSuccess(List<PublicExecution> result) {
                 modal.hide();
                 List<ExecutionsRecord> dataList = new ArrayList<ExecutionsRecord>();
 
-                for (Execution exe : result) {
-                    dataList.add(new ExecutionsRecord(exe.getId(), exe.getSimulationName(), exe.getApplicationName(), exe.getVersion(), exe.getStatus(), exe.getAuthor(), exe.getComments()));
+                for (PublicExecution exe : result) {
+                    dataList.add(new ExecutionsRecord(exe.getId(), exe.getSimulationName(), exe.getApplicationName(), exe.getApplicationVersion(), exe.getStatus(), exe.getAuthor(), exe.getComments()));
                 }
                 grid.setData(dataList.toArray(new ExecutionsRecord[]{}));
             }
         };
         modal.show("Loading executions...", true);
-        ExecutionsService.Util.getInstance().getExecutions(callback);
+        ReproVipService.Util.getInstance().getPublicExecutions(callback);
     }
 }

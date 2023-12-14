@@ -1,76 +1,76 @@
 package fr.insalyon.creatis.vip.application.server.rpc;
 
+import fr.insalyon.creatis.vip.application.client.view.ApplicationException;
 import fr.insalyon.creatis.vip.application.server.business.ReproVipBusiness;
-import fr.insalyon.creatis.vip.core.client.bean.Execution;
+import fr.insalyon.creatis.vip.core.client.bean.PublicExecution;
 import fr.insalyon.creatis.vip.application.client.rpc.ReproVipService;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.CoreException;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
-import fr.insalyon.creatis.vip.core.server.dao.ExecutionPublicDAO;
+import fr.insalyon.creatis.vip.application.server.dao.PublicExecutionDAO;
 import fr.insalyon.creatis.vip.core.server.rpc.AbstractRemoteServiceServlet;
 
 import javax.servlet.ServletException;
 import java.io.IOException;
+import java.util.List;
 
 public class ReproVipServiceImpl extends AbstractRemoteServiceServlet implements ReproVipService {
+
     private ReproVipBusiness reproVipBusiness;
-    private ExecutionPublicDAO executionPublicDAO;
+
     @Override
     public void init() throws ServletException {
         super.init();
         reproVipBusiness = getBean(ReproVipBusiness.class);
-        executionPublicDAO = getBean(ExecutionPublicDAO.class);
     }
 
-    public void executionAdminEmail(Execution execution) {
+    @Override
+    public void addPublicExecution(PublicExecution publicExecution) throws ApplicationException {
         try {
-            reproVipBusiness.executionAdminEmail(execution);
-        } catch (DAOException e) {
-            throw new RuntimeException(e);
+            reproVipBusiness.createPublicExecution(publicExecution);
         } catch (BusinessException e) {
-            throw new RuntimeException(e);
+            throw new ApplicationException(e);
         }
     }
 
-    // execution management
     @Override
-    public void addExecution(Execution execution) throws CoreException {
+    public List<PublicExecution> getPublicExecutions() throws ApplicationException {
         try {
-            executionPublicDAO.add(execution);
-        } catch (DAOException e) {
-            throw new CoreException("Failed to add execution", e);
+            return reproVipBusiness.getPublicExecutions();
+        } catch (BusinessException e) {
+            throw new ApplicationException(e);
         }
     }
+
     @Override
-    public void updateExecution(String executionID, String newStatus) throws CoreException {
+    public boolean doesExecutionExist(String executionID) throws ApplicationException {
         try {
-            executionPublicDAO.update(executionID, newStatus);
-        } catch (DAOException e) {
-            throw new CoreException("Failed to update execution", e);
+            return reproVipBusiness.doesExecutionExist(executionID);
+        } catch (BusinessException e) {
+            throw new ApplicationException(e);
         }
     }
+
     @Override
-    public boolean doesExecutionExist(String executionID) throws CoreException {
+    public PublicExecution.PublicExecutionStatus createReproVipDirectory(String executionID) {
         try {
-            return executionPublicDAO.doesExecutionExist(executionID);
-        } catch (DAOException e) {
-            throw new CoreException("Failed to check if execution exist", e);
-        }
-    }
-    public String createReproVipDirectory(String executionName, String executionID, String version, String comments) {
-        try {
-            User currentUser = getSessionUser();
-            return reproVipBusiness.createReproVipDirectory(executionName, executionID, version, comments, currentUser);
+            reproVipBusiness.createReproVipDirectory(executionID);
+            reproVipBusiness. updatePublicExecutionStatus(executionID, PublicExecution.PublicExecutionStatus.DIRECTORY_CREATED);
+            return PublicExecution.PublicExecutionStatus.DIRECTORY_CREATED;
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
-    public void deleteReproVipDirectory(String executionID) throws CoreException {
+
+    @Override
+    public PublicExecution.PublicExecutionStatus deleteReproVipDirectory(String executionID) throws ApplicationException {
         try {
             reproVipBusiness.deleteReproVipDirectory(executionID);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+            reproVipBusiness. updatePublicExecutionStatus(executionID, PublicExecution.PublicExecutionStatus.REQUESTED);
+            return PublicExecution.PublicExecutionStatus.REQUESTED;
+        } catch (BusinessException e) {
+            throw new ApplicationException(e);
         }
     }
 }

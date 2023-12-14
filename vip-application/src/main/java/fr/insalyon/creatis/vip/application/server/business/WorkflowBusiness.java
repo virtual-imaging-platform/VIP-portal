@@ -447,17 +447,6 @@ public class WorkflowBusiness {
         }
     }
 
-    public String getRawApplicationDescriptorPath(User user, String applicationName, String applicationVersion)
-            throws BusinessException {
-
-        try {
-            AppVersion version = applicationDAO.getVersion(applicationName, applicationVersion);
-            return dataManagerBusiness.getRemoteFile(user, version.getJsonLfn());
-        } catch (DAOException | BusinessException ex) {
-            throw new BusinessException(WRONG_APPLICATION_DESCRIPTOR, ex, applicationName + "/" + applicationVersion);
-        }
-    }
-
     public void kill(String simulationID) throws BusinessException {
 
         try {
@@ -567,28 +556,11 @@ public class WorkflowBusiness {
 
     public List<InOutData> getOutputData(
             String simulationID, String currentUserFolder) throws BusinessException {
-        return getOutputData(simulationID, currentUserFolder, false);
-    }
-
-    public List<InOutData> getRawOutputData(
-            String simulationID) throws BusinessException {
-        return getOutputData(simulationID, null, true);
-    }
-
-    private List<InOutData> getOutputData(
-            String simulationID, String currentUserFolder, boolean useRawPath)
-            throws BusinessException {
-
         List<InOutData> list = new ArrayList<InOutData>();
         try {
             for (Output output : outputDAO.get(simulationID)) {
-                String path;
-                if (useRawPath) {
-                    path = output.getOutputID().getPath();
-                } else {
-                    path = lfcPathsBusiness.parseRealDir(
-                            output.getOutputID().getPath(), currentUserFolder);
-                }
+                String path = lfcPathsBusiness.parseRealDir(
+                        output.getOutputID().getPath(), currentUserFolder);
                 list.add(new InOutData(path, output.getOutputID().getProcessor(),
                         output.getType().name()));
             }

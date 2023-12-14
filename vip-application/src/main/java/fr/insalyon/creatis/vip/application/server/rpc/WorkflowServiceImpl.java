@@ -69,8 +69,6 @@ import java.util.Map;
  *
  * @author Rafael Ferreira da Silva
  */
-@Service
-@Transactional
 public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements WorkflowService {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
@@ -146,15 +144,6 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
                     getSessionUser(),
                     applicationName,
                     applicationVersion);
-        } catch (BusinessException | CoreException ex) {
-            throw new ApplicationException(ex);
-        }
-    }
-
-    @Override
-    public String getRawApplicationDescriptorPath(String applicationName, String applicationVersion) throws ApplicationException {
-        try {
-            return workflowBusiness.getRawApplicationDescriptorPath(getSessionUser(), applicationName, applicationVersion);
         } catch (BusinessException | CoreException ex) {
             throw new ApplicationException(ex);
         }

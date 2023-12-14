@@ -42,7 +42,6 @@ import fr.insalyon.creatis.vip.core.client.view.util.CountryCode;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
-import fr.insalyon.creatis.vip.core.server.dao.ExecutionPublicDAO;
 import fr.insalyon.creatis.vip.core.server.dao.UserDAO;
 
 import org.slf4j.Logger;

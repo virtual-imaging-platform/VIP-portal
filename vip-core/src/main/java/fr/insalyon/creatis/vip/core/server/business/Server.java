@@ -111,4 +111,6 @@ public interface Server {
     boolean useLocalFilesInInputs();
 
     int getApiParallelDownloadNb();
+
+    String getReproVIPRootDir();
 }

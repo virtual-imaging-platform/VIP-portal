@@ -61,7 +61,6 @@ public class CoreDataInitializer extends JdbcDaoSupport {
         initializeUserTables();
         initializeGroupTables();
         initializeTermsOfUseTable();
-        initializeExecutionTables();
     }
 
     private void initializeUserTables() {
@@ -158,27 +157,6 @@ public class CoreDataInitializer extends JdbcDaoSupport {
                         new TermsOfUse(new java.sql.Timestamp(today.getTime())));
             } catch (DAOException ex) {
                 logger.error("Error creating VIPGroups table", ex);
-            }
-        }
-    }
-
-    private void initializeExecutionTables() {
-        if (tableInitializer.createTable("VIPExecutionPublic",
-                "execution_ID VARCHAR(255), "
-                        + "simulation_name VARCHAR(255), "
-                        + "application_name VARCHAR(255), "
-                        + "version VARCHAR(255), "
-                        + "status VARCHAR(255), "
-                        + "author VARCHAR(255), "
-                        + "comments TEXT, "
-                        + "PRIMARY KEY(execution_ID)")) {
-
-            try {
-                usersGroupsDAO.add(server.getAdminEmail(),
-                        CoreConstants.GROUP_SUPPORT,
-                        GROUP_ROLE.Admin);
-            } catch (DAOException ex) {
-                logger.error("Error creating ExecutionPublic table", ex);
             }
         }
     }
