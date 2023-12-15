@@ -61,8 +61,6 @@ import java.sql.Timestamp;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static fr.insalyon.creatis.vip.core.client.CoreModule.user;
-
 /**
  * @author Rafael Ferreira da Silva, Nouha Boujelben
  */
