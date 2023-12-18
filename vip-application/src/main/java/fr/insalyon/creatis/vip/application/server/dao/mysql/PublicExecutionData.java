@@ -34,8 +34,8 @@ public class PublicExecutionData extends JdbcDaoSupport implements PublicExecuti
         try {
             PreparedStatement ps = getConnection().prepareStatement(
                     "SELECT execution_ID, simulation_name, application_name," +
-                            " application_version, status, author, comments, output_names FROM VIPPublicExecutions" +
-                            " FROM FROM VIPExecutionPublic WHERE execution_ID=?");
+                            " application_version, status, author, comments, output_names" +
+                            " FROM VIPPublicExecutions WHERE execution_ID=?");
 
             ps.setString(1, publicExecutionId);
             ResultSet rs = ps.executeQuery();
