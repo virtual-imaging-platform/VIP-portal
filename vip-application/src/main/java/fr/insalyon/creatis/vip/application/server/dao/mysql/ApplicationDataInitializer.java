@@ -108,13 +108,14 @@ public class ApplicationDataInitializer extends JdbcDaoSupport {
                         + "inputs VARCHAR(32000), "
                         + "PRIMARY KEY (application, name)");
 
-        tableInitializer.createTable("VIPExecutionPublic",
+        tableInitializer.createTable("VIPPublicExecutions",
                 "execution_ID VARCHAR(255), "
                         + "simulation_name VARCHAR(255), "
                         + "application_name VARCHAR(255), "
                         + "application_version VARCHAR(255), "
                         + "status  VARCHAR(50), "
                         + "author VARCHAR(255), "
+                        + "output_names VARCHAR(255), "
                         + "comments TEXT, "
                         + "PRIMARY KEY(execution_ID)");
     }

@@ -78,7 +78,7 @@ public class MakeExecutionPublicTab extends Tab {
                     } else {
                         List<CheckboxItem> checkboxes = new ArrayList<>();
                         for (BoutiquesOutputFile outputFile : applicationTool.getOutputFiles()) {
-                            CheckboxItem checkbox = new CheckboxItem(outputFile.getName(), outputFile.getName());
+                            CheckboxItem checkbox = new CheckboxItem(outputFile.getId(), outputFile.getName());
                             checkboxes.add(checkbox);
                         }
                         outputFilesForm.setFields(checkboxes.toArray(new CheckboxItem[0]));
@@ -109,14 +109,18 @@ public class MakeExecutionPublicTab extends Tab {
 
         submitButton.addClickHandler(new ClickHandler() {
             public void onClick(ClickEvent event) {
+                if ( ! validate()) {
+                    return;
+                }
                 String nameSimulation = nameOfTheExecutionSimulationField.getValueAsString();
                 String author = authorNameField.getValueAsString();
                 String comments = commentsItem.getValueAsString();
+                List<String> outputNames = getOutputNamesSelected();
 
                 PublicExecution newPublicExecution =
-                        new PublicExecution(id, nameSimulation,
+                        new PublicExecution(publicExecution.getId(), nameSimulation,
                                 publicExecution.getApplicationName(), publicExecution.getApplicationVersion(),
-                                PublicExecution.PublicExecutionStatus.REQUESTED, author, comments);
+                                PublicExecution.PublicExecutionStatus.REQUESTED, author, comments, outputNames);
 
                 reproVipServiceAsync.addPublicExecution(newPublicExecution, new AsyncCallback<Void>() {
                     public void onFailure(Throwable caught) {
@@ -150,5 +154,29 @@ public class MakeExecutionPublicTab extends Tab {
         makeExecutionPublicLayout.addMember(descriptionLabel);
         makeExecutionPublicLayout.addMember(outputFilesForm);
         makeExecutionPublicLayout.addMember(submitButton);
+    }
+
+    private boolean validate() {
+        if ( ! nameOfTheExecutionSimulationField.validate()
+                || ! authorNameField.validate()
+                || ! commentsItem.validate()) {
+            SC.warn("The form is invalid");
+            return false;
+        }
+        if (getOutputNamesSelected().isEmpty()) {
+            SC.warn("Please select at least one output");
+            return false;
+        }
+        return true;
+    }
+
+    private List<String> getOutputNamesSelected() {
+        List<String> outputNames = new ArrayList<>();
+        for (FormItem formItem : outputFilesForm.getFields()) {
+            if( ((CheckboxItem) formItem).getValueAsBoolean()) {
+                outputNames.add(formItem.getName());
+            }
+        }
+        return outputNames;
     }
 }

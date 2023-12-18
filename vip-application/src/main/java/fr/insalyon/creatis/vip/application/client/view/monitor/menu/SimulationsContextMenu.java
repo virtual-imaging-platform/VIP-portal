@@ -248,8 +248,7 @@ public class SimulationsContextMenu extends Menu {
                             if (value) {
                                 PublicExecution publicExecution =
                                         new PublicExecution(simulationID, simulationName, applicationName,
-                                                applicationVersion, PublicExecution.PublicExecutionStatus.REQUESTED,
-                                                simulationUser, "comments");
+                                                applicationVersion, simulationUser);
                                 Layout.getInstance().addTab(
                                         ApplicationConstants.TAB_MAKE_EXECUTION_PUBLIC,
                                         () -> new MakeExecutionPublicTab(publicExecution));

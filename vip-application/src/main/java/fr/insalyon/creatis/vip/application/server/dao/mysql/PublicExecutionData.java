@@ -16,6 +16,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Repository
 @Transactional
@@ -33,7 +34,7 @@ public class PublicExecutionData extends JdbcDaoSupport implements PublicExecuti
         try {
             PreparedStatement ps = getConnection().prepareStatement(
                     "SELECT execution_ID, simulation_name, application_name," +
-                            " application_version, status, author, commentsFROM VIPExecutionPublic" +
+                            " application_version, status, author, comments, output_names FROM VIPPublicExecutions" +
                             " FROM FROM VIPExecutionPublic WHERE execution_ID=?");
 
             ps.setString(1, publicExecutionId);
@@ -48,7 +49,8 @@ public class PublicExecutionData extends JdbcDaoSupport implements PublicExecuti
                         rs.getString("application_version"),
                         PublicExecution.PublicExecutionStatus.valueOf(rs.getString("status")),
                         rs.getString("author"),
-                        rs.getString("comments"));
+                        rs.getString("comments"),
+                        rs.getString("output_names"));
             }
 
             rs.close();
@@ -65,9 +67,9 @@ public class PublicExecutionData extends JdbcDaoSupport implements PublicExecuti
     public void add(PublicExecution publicExecution) throws DAOException {
         try {
             PreparedStatement ps = getConnection().prepareStatement(
-                    "INSERT INTO VIPExecutionPublic(execution_ID, simulation_name, application_name," +
-                            " application_version, status, author, comments)" +
-                            " VALUES(?, ?, ?, ?, ?, ?, ?)");
+                    "INSERT INTO VIPPublicExecutions(execution_ID, simulation_name, application_name," +
+                            " application_version, status, author, comments, output_names)" +
+                            " VALUES(?, ?, ?, ?, ?, ?, ?, ?)");
             ps.setString(1, publicExecution.getId());
             ps.setString(2, publicExecution.getSimulationName());
             ps.setString(3, publicExecution.getApplicationName());
@@ -75,6 +77,7 @@ public class PublicExecutionData extends JdbcDaoSupport implements PublicExecuti
             ps.setString(5, publicExecution.getStatus().name());
             ps.setString(6, publicExecution.getAuthor());
             ps.setString(7, publicExecution.getComments());
+            ps.setString(8, publicExecution.getOutputNames().stream().collect(Collectors.joining(PublicExecution.OUTPUT_NAMES_SEPARATOR)));
             ps.execute();
             ps.close();
 
@@ -93,7 +96,7 @@ public class PublicExecutionData extends JdbcDaoSupport implements PublicExecuti
     @Override
     public void update(String executionId, PublicExecution.PublicExecutionStatus newStatus) throws DAOException {
         try (PreparedStatement ps = getConnection().prepareStatement(
-                "UPDATE VIPExecutionPublic SET status = ? WHERE execution_ID = ?")) {
+                "UPDATE VIPPublicExecutions SET status = ? WHERE execution_ID = ?")) {
             ps.setString(1, newStatus.name());
             ps.setString(2, executionId);
             ps.execute();
@@ -108,7 +111,7 @@ public class PublicExecutionData extends JdbcDaoSupport implements PublicExecuti
     public List<PublicExecution> getExecutions() throws DAOException {
         try {
             List<PublicExecution> publicExecutions = new ArrayList<>();
-            PreparedStatement ps = getConnection().prepareStatement("SELECT * FROM VIPExecutionPublic");
+            PreparedStatement ps = getConnection().prepareStatement("SELECT * FROM VIPPublicExecutions");
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 publicExecutions.add(new PublicExecution(
@@ -118,8 +121,8 @@ public class PublicExecutionData extends JdbcDaoSupport implements PublicExecuti
                         rs.getString("application_version"),
                         PublicExecution.PublicExecutionStatus.valueOf(rs.getString("status")),
                         rs.getString("author"),
-                        rs.getString("comments")
-                ));
+                        rs.getString("comments"),
+                        rs.getString("output_names")));
             }
             rs.close();
             ps.close();
@@ -133,7 +136,7 @@ public class PublicExecutionData extends JdbcDaoSupport implements PublicExecuti
     @Override
     public boolean doesExecutionExist(String executionId) throws DAOException {
         try (PreparedStatement ps = getConnection().prepareStatement(
-                "SELECT COUNT(*) FROM VIPExecutionPublic WHERE execution_ID = ?")) {
+                "SELECT COUNT(*) FROM VIPPublicExecutions WHERE execution_ID = ?")) {
             ps.setString(1, executionId);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
