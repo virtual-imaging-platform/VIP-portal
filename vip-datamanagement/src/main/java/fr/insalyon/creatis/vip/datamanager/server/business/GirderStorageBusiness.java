@@ -132,8 +132,11 @@ public class GirderStorageBusiness {
             .filter(k -> storageId.equals(k.getStorageIdentifier()))
             .findFirst()
             .map(k -> k.getApiKey())
-            .orElseThrow(() -> new BusinessException(
-                             "No api key found for storageId: " + storageId));
+            .orElseThrow(() -> {
+                logger.error("no girder api key found for {} on {}", userEmail, storageId);
+                return new BusinessException(
+                        "No api key found for storageId: " + storageId);
+            });
 
         try {
             HttpResult res = makeHttpRequest(

@@ -85,7 +85,7 @@ function checkBosh {
 
 function copyProvenanceFile() {
   local dest=$1
-  BOUTIQUES_CACHE_DIR="$HOME/.cache/boutiques/data"
+  # $BOUTIQUES_CACHE_DIR is defined by GASW from the settings file
   if [ ! -d "$BOUTIQUES_CACHE_DIR" ]; then
     error "Boutiques cache dir $BOUTIQUES_CACHE_DIR does not exist."
     return 1
