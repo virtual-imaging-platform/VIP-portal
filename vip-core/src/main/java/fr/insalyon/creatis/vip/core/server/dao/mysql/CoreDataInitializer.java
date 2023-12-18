@@ -160,4 +160,5 @@ public class CoreDataInitializer extends JdbcDaoSupport {
             }
         }
     }
+
 }

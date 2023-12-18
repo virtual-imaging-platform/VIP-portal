@@ -59,6 +59,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.sql.Timestamp;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author Rafael Ferreira da Silva, Nouha Boujelben
@@ -932,6 +933,16 @@ public class ConfigurationBusiness {
             throw new BusinessException(ex);
         } catch (DAOException ex) {
             throw new BusinessException(ex);
+        }
+    }
+
+    public List<String> getSupportEmails() throws BusinessException {
+        try {
+            return usersGroupsDAO.getUsersFromGroup(CoreConstants.GROUP_SUPPORT)
+                    .stream().map(User::getEmail)
+                    .collect(Collectors.toList());
+        } catch (DAOException e) {
+            throw new BusinessException(e);
         }
     }
 

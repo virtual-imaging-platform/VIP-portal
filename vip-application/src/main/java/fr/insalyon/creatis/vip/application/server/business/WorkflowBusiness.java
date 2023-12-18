@@ -553,25 +553,21 @@ public class WorkflowBusiness {
         return simulation;
     }
 
-    public List<InOutData> getOutputData(
-            String simulationID, String currentUserFolder)
-            throws BusinessException {
 
+    public List<InOutData> getOutputData(
+            String simulationID, String currentUserFolder) throws BusinessException {
         List<InOutData> list = new ArrayList<InOutData>();
         try {
             for (Output output : outputDAO.get(simulationID)) {
                 String path = lfcPathsBusiness.parseRealDir(
-                    output.getOutputID().getPath(), currentUserFolder);
+                        output.getOutputID().getPath(), currentUserFolder);
                 list.add(new InOutData(path, output.getOutputID().getProcessor(),
                         output.getType().name()));
             }
-        } catch (WorkflowsDBDAOException ex) {
+        } catch (WorkflowsDBDAOException | DataManagerException ex) {
             logger.error("Error getting output data for {}", simulationID, ex);
             throw new BusinessException(ex);
-        } catch (DataManagerException ex) {
-            throw new BusinessException(ex);
         }
-
         return list;
     }
 

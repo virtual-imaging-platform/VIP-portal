@@ -157,7 +157,7 @@ knowledge of the CeCILL-B license and that you accept its terms.
             <artifactId>spring-context</artifactId>
             <version>${spring-framework.version}</version>
         </dependency>
-        
+
     </dependencies>
 
     <build>

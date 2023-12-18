@@ -185,4 +185,5 @@ public class ViewerWindow extends Window {
     private void loadString() {
         pane.setContents(content.replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll("\n", "<br />"));
     }
+
 }

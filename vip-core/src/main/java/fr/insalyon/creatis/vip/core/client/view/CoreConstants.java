@@ -190,6 +190,9 @@ public class CoreConstants implements IsSerializable {
     public static final String USE_LOCAL_FILES_AS_INPUTS = "execution.input.local-files";
     // API
     public static final String API_PARALLEL_DOWNLOAD_NB = "api.downloads.nb";
+    // ReproVIPfiles";
+    public static final String REPROVIP_ROOT_DIR = "reprovip.root-dir";
+
 
 
     public static enum GROUP_ROLE implements IsSerializable {
