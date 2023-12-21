@@ -178,16 +178,15 @@ fi
 # Otherwise `bosh exec` fails on any non-ascii characters in outputs
 echo "import sys; sys.setdefaultencoding(\"UTF8\")" > sitecustomize.py
 #creating a temporary directory for bindmount /tmp of containers
-mkdir -p tmp
 #TMP_FOLDER is created differently for execution on GRID and execution on LOCAL
 #TMP of the container is bind mounted on TMP_FOLDER to avoid creating temporary files on container.
 TMP_FOLDER=tmp_$(basename $PWD)
 #if($isRunOnGrid == false)
 TMP_FOLDER=/tmp/$TMP_FOLDER
-#else  
+#else
 TMP_FOLDER=../$TMP_FOLDER
 #end
-
+mkdir -p $TMP_FOLDER
 PYTHONPATH=".:$PYTHONPATH" $BOSHEXEC exec launch $JSONFILE input_param_file.json -v $PWD/../cache:$PWD/../cache -v $TMP_FOLDER:/tmp
 
 if [ $? != 0 ]
