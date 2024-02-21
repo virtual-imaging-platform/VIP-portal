@@ -238,9 +238,9 @@ public class SimulationsContextMenu extends Menu {
                 SC.warn("Error checking if execution exists: " + caught.getMessage());
             }
             @Override
-            public void onSuccess(Boolean exists) {
-                if (exists) {
-                    SC.warn("This execution has already been made public.");
+            public void onSuccess(Boolean ok) {
+                if ( ! ok) {
+                    SC.warn("This execution can not be made public (it may be already public).");
                 } else {
                     SC.ask("Do you really want to make this execution public: (" + simulationName + ")?", new BooleanCallback() {
                         @Override
@@ -258,7 +258,7 @@ public class SimulationsContextMenu extends Menu {
                 }
             }
         };
-        reproVipServiceAsync.doesExecutionExist(simulationID, callback);
+        reproVipServiceAsync.canMakeExecutionPublic(simulationID, callback);
     }
 
     /**

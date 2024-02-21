@@ -29,7 +29,11 @@ public class PublicExecutionsLayout extends VLayout {
         this.setOverflow(Overflow.AUTO);
 
         configureGrid();
+        this.addMember(new PublicExecutionsToolStrip());
+        this.addMember(grid);
+
         modal = new ModalWindow(grid);
+
         loadData();
     }
 
@@ -64,7 +68,6 @@ public class PublicExecutionsLayout extends VLayout {
             }
         });
 
-        this.addMember(grid);
     }
 
     public void loadData() {

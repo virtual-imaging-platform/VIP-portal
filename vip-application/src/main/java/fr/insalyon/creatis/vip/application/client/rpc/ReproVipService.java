@@ -29,6 +29,8 @@ public interface ReproVipService extends RemoteService {
 
     boolean doesExecutionExist(String executionID) throws ApplicationException;
 
+    boolean canMakeExecutionPublic(String executionID) throws ApplicationException;
+
     PublicExecution.PublicExecutionStatus createReproVipDirectory(String executionID) throws ApplicationException;
 
     PublicExecution.PublicExecutionStatus deleteReproVipDirectory(String executionID) throws ApplicationException;

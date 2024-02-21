@@ -6,11 +6,13 @@ import com.smartgwt.client.widgets.menu.Menu;
 import com.smartgwt.client.widgets.menu.MenuItem;
 import com.smartgwt.client.widgets.menu.events.ClickHandler;
 import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
+import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
 import fr.insalyon.creatis.vip.application.client.rpc.ReproVipService;
 import fr.insalyon.creatis.vip.application.client.rpc.ReproVipServiceAsync;
 import fr.insalyon.creatis.vip.core.client.bean.PublicExecution;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
+import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 
 public class PublicExecutionsContextMenu extends Menu {
 
@@ -68,6 +70,7 @@ public class PublicExecutionsContextMenu extends Menu {
             @Override
             public void onSuccess(PublicExecution.PublicExecutionStatus s) {
                 SC.say("ReproVip directory successfully created");
+                refreshPublicExecutions();
             }
         });
     }
@@ -82,7 +85,14 @@ public class PublicExecutionsContextMenu extends Menu {
             @Override
             public void onSuccess(PublicExecution.PublicExecutionStatus s) {
                 SC.say("ReproVip directory successfully deleted");
+                refreshPublicExecutions();
             }
         });
+    }
+
+    private void refreshPublicExecutions() {
+        ReproVipTab reproVipTab = (ReproVipTab) Layout.getInstance().
+                getTab(ApplicationConstants.TAB_REPROVIP);
+        reproVipTab.loadPublicExecutions();
     }
 }

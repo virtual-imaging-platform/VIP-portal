@@ -21,4 +21,8 @@ public class ReproVipTab extends AbstractManageTab {
         vLayout.addMember(appLayout);
     }
 
+    public void loadPublicExecutions() {
+        publicExecutionsLayout.loadData();
+    }
+
 }
