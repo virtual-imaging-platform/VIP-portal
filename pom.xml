@@ -114,7 +114,13 @@ knowledge of the CeCILL-B license and that you accept its terms.
             </dependency>
             
             <!-- empty jars to ensure commons logging and log4j is not
-              used in project and not present in final war -->
+              used in project and not present in final war.
+              (see alternative 3 in https://www.slf4j.org/faq.html#excludingJCL)
+
+               they used to be hosted on https://version99.qos.ch/ but this was
+               decommissioned in 2023
+               (see https://mailman.qos.ch/pipermail/slf4j-user/2022-October/001798.html).
+               So the jar's were migrated on the vip's nexus -->
             <dependency>
                 <groupId>commons-logging</groupId>
                 <artifactId>commons-logging</artifactId>
@@ -204,13 +210,6 @@ knowledge of the CeCILL-B license and that you accept its terms.
             <id>creatis</id>
             <name>Creatis Insa Lyon repository [creatis]</name>
             <url>https://vip.creatis.insa-lyon.fr:9007/nexus/repository/public</url>
-        </repository>
-        
-        <!-- repo used to get empty jar for commons logging and log4j -->
-        <repository>
-            <id>version99</id>
-            <!-- highly available repository serving empty artifacts -->
-            <url>https://version99.qos.ch/</url>
         </repository>
     </repositories>
 
