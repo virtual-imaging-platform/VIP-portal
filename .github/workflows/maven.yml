@@ -15,7 +15,7 @@ on:
     branches: develop
 env:
   isProduction: ${{ github.event_name == 'push' && github.ref_name == 'master' }}
-  doDeploy: ${{ github.event_name == 'push' }}
+  mavenTarget: ${{ github.event_name == 'push' && 'deploy' || 'verify' }}
 
 jobs:
   build:
@@ -34,7 +34,7 @@ jobs:
         server-password: MAVEN_PASSWORD
     - name: Build with Maven
       # deploy only on pushs and not on PRs
-      run: mvn --batch-mode --update-snapshots clean ${{ env.doDeploy == true && 'deploy' || 'verify' }}
+      run: mvn --batch-mode --update-snapshots clean ${{ env.mavenTarget }}
       env:
         MAVEN_USERNAME: github
         MAVEN_PASSWORD: ${{ secrets.NEXUS_PSW }}
