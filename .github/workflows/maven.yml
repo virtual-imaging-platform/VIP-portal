@@ -16,7 +16,6 @@ on:
 env:
   isProduction: ${{ github.event_name == 'push' && github.ref_name == 'master' }}
   mavenTarget: ${{ github.event_name == 'push' && 'deploy' || 'verify' }}
-  serverId: ${{ (env.isProduction && 'creatis-releases') || 'creatis-snapshots' }}
 
 jobs:
   build:
