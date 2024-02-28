@@ -34,7 +34,7 @@ jobs:
         server-password: MAVEN_PASSWORD
     - name: Build with Maven
       # deploy only on pushs and not on PRs
-      run: mvn --batch-mode --update-snapshots clean ${{ env.mavenTarget }}
+      run: mvn --batch-mode --update-snapshots  -e -X clean ${{ env.mavenTarget }}
       env:
         MAVEN_USERNAME: github
         MAVEN_PASSWORD: ${{ secrets.NEXUS_PSW }}
