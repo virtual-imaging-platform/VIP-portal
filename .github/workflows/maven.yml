@@ -14,8 +14,8 @@ on:
   pull_request:
     branches: develop
 env:
-  isProduction: {{ github.event_name == 'push' && github.ref_name == 'master' }}
-  doDeploy: {{ github.event_name == 'push' }}
+  isProduction: ${{ github.event_name == 'push' && github.ref_name == 'master' }}
+  doDeploy: ${{ github.event_name == 'push' }}
 
 jobs:
   build:
@@ -29,12 +29,12 @@ jobs:
         java-version: '11'
         distribution: 'temurin'
         cache: maven
-        server-id: {{ isProduction && 'creatis-snapshots' || 'creatis-releases' }}
+        server-id: ${{ isProduction && 'creatis-snapshots' || 'creatis-releases' }}
         server-username: MAVEN_USERNAME
         server-password: MAVEN_PASSWORD
     - name: Build with Maven
       # deploy only on pushs and not on PRs
-      run: mvn --batch-mode --update-snapshots clean verify {{ doDeploy && 'deploy' || '' }}
+      run: mvn --batch-mode --update-snapshots clean verify ${{ doDeploy && 'deploy' || '' }}
       env:
         MAVEN_USERNAME: github
         MAVEN_PASSWORD: ${{ secrets.NEXUS_PSW }}
