@@ -22,6 +22,7 @@ public class ShanoirStorageBusiness {
     enum UrlKeys{
         FILE_NAME("shanoir", "^shanoir:/(//)?([^/].*)\\?.*$", 2 ,"fileName"),
         DATASET_ID("datasetId", "^.*[?&]datasetId=([^&]*)(&.*)?$", 1 ,"datasetId"),
+        RESOURCE_ID("resourceId", "^.*[?&]resourceId=([^&]*)(&.*)?$", 1 ,"resourceId"),
         FORMAT("format", "^.*[?&]format=([^&]*)(&.*)?$", 1 ,"format"),
         TOKEN("token", "^.*[?&]token=([^&]*)(&.*)?$", 1 , "token"),
         REFRESH_TOKEN("refreshToken", "^.*[?&]refreshToken=([^&]*)(&.*)?$", 1 , "refresh token"),
@@ -80,9 +81,10 @@ public class ShanoirStorageBusiness {
         }
         
         String format = subString(UrlKeys.FORMAT, parameterValue);
-        String datasetId = subString(UrlKeys.DATASET_ID, parameterValue);
+        // datasetId has been renamed to resourceId
+        String resourceId = subString(UrlKeys.RESOURCE_ID, UrlKeys.DATASET_ID, parameterValue);
 
-        return buildDownloadUri(datasetId, apiUrl, token, refreshToken, format, fileName, keycloakClientId, refreshTokenUrl);
+        return buildDownloadUri(resourceId, apiUrl, token, refreshToken, format, fileName, keycloakClientId, refreshTokenUrl);
     }
 
     private void verifyExternalPlatform(ExternalPlatform externalPlatform)
@@ -102,13 +104,13 @@ public class ShanoirStorageBusiness {
         }
     }
 
-    private String buildDownloadUri(String datasetId, String apiUrl, String token, String refreshToken, String format, String fileName, String keycloakClientId, String refreshTokenUrl){
+    private String buildDownloadUri(String resourceId, String apiUrl, String token, String refreshToken, String format, String fileName, String keycloakClientId, String refreshTokenUrl){
         return UrlKeys.FILE_NAME.key+":/" +
                 fileName +
                 "?"+ UrlKeys.API_URI.key+"=" +
                 apiUrl +
-                "&amp;"+ UrlKeys.DATASET_ID.key+"=" +
-                datasetId +
+                "&amp;"+ UrlKeys.RESOURCE_ID.key+"=" +
+                resourceId +
                 "&amp;"+ UrlKeys.FORMAT.key+"=" +
                 format +
                 "&amp;"+ UrlKeys.KEYCLOAK_CLIENT_ID.key+"=" +
@@ -158,6 +160,24 @@ public class ShanoirStorageBusiness {
         }else{
             logger.error("Cannot get {} from the uri",urlKey.errorKey);
             throw new BusinessException("Cannot get "+urlKey.errorKey +" from the uri");
+        }
+    }
+
+
+    private String subString(UrlKeys urlKey, UrlKeys altUrlKey, String text) throws BusinessException {
+        BusinessException originalError;
+        try {
+            return subString(urlKey, text);
+        } catch (BusinessException be) {
+            originalError = be;
+        }
+        // if first try did not work, try alternate regex but throw original exception if it also fails
+        try {
+            String res = subString(altUrlKey, text);
+            logger.info("[Shanoir] using alternative keyword {} because {} did not work", altUrlKey.key, urlKey.key);
+            return res;
+        } catch (BusinessException be) {
+            throw originalError;
         }
     }
 

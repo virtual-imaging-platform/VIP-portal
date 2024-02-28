@@ -2,6 +2,7 @@ package fr.insalyon.creatis.vip.application.server.business;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.insalyon.creatis.vip.application.client.bean.AppVersion;
+import fr.insalyon.creatis.vip.application.client.bean.Simulation;
 import fr.insalyon.creatis.vip.application.server.dao.PublicExecutionDAO;
 import fr.insalyon.creatis.vip.core.client.bean.PublicExecution;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
@@ -38,18 +39,20 @@ public class ReproVipBusiness {
     private final Server server;
     private final SimulationBusiness simulationBusiness;
     private final PublicExecutionDAO publicExecutionDAO;
+    private final WorkflowBusiness workflowBusiness;
 
     @Autowired
     public ReproVipBusiness(
             ConfigurationBusiness configurationBusiness, ApplicationBusiness applicationBusiness,
             EmailBusiness emailBusiness, Server server, SimulationBusiness simulationBusiness,
-            PublicExecutionDAO publicExecutionDAO) {
+            PublicExecutionDAO publicExecutionDAO, WorkflowBusiness workflowBusiness) {
         this.configurationBusiness = configurationBusiness;
         this.applicationBusiness = applicationBusiness;
         this.emailBusiness = emailBusiness;
         this.server = server;
         this.simulationBusiness = simulationBusiness;
         this.publicExecutionDAO = publicExecutionDAO;
+        this.workflowBusiness = workflowBusiness;
     }
 
     public void createPublicExecution(PublicExecution publicExecution) throws BusinessException {
@@ -116,6 +119,22 @@ public class ReproVipBusiness {
         } catch (DAOException e) {
             throw new BusinessException(e);
         }
+    }
+
+    public boolean canMakeExecutionPublic(String executionID) throws BusinessException {
+        // looking for provenance directory
+        Path provenanceDirPath = Paths.get(server.getWorkflowsPath() + "/" + executionID + "/provenance");
+        if ( ! Files.exists(provenanceDirPath)) {
+             return false;
+        }
+        // checking if it is empty
+        if (provenanceDirPath.toFile().listFiles().length == 0) {
+            return false;
+        }
+        // verifying the application has a boutiques file
+        Simulation simulation = workflowBusiness.getSimulation(executionID);
+        String boutiquesPath = getBoutiquesDescriptorJsonPath(simulation.getApplicationName(), simulation.getApplicationVersion());
+        return boutiquesPath != null;
     }
 
     public String createReproVipDirectory(String executionID) throws BusinessException {

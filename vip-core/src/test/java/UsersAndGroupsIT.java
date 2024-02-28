@@ -14,6 +14,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 
 import java.sql.Timestamp;
+import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -323,8 +324,9 @@ public class UsersAndGroupsIT extends BaseSpringIT {
 
     @Test
     public void testGetLastUpdateTermOfUse() throws BusinessException {
+        // a term-of-use update must be inserted at database creation
         Timestamp timestamp = configurationBusiness.getLastUpdateTermsOfUse();
-        assertEquals("2023", timestamp.toString().substring(0, 4), "Incorrect new user api key value");
+        assertEquals(LocalDate.now(), timestamp.toLocalDateTime().toLocalDate(), "Missing default term of use in database");
     }
 
     /* ********************************************************************************************************************************************** */

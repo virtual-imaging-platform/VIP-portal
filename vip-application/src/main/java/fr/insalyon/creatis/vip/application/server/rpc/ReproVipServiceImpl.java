@@ -53,6 +53,16 @@ public class ReproVipServiceImpl extends AbstractRemoteServiceServlet implements
     }
 
     @Override
+    public boolean canMakeExecutionPublic(String executionID) throws ApplicationException {
+        try {
+            return ! reproVipBusiness.doesExecutionExist(executionID) &&
+                    reproVipBusiness.canMakeExecutionPublic(executionID);
+        } catch (BusinessException e) {
+            throw new ApplicationException(e);
+        }
+    }
+
+    @Override
     public PublicExecution.PublicExecutionStatus createReproVipDirectory(String executionID) {
         try {
             reproVipBusiness.createReproVipDirectory(executionID);

@@ -85,19 +85,19 @@ function checkBosh {
 
 function copyProvenanceFile() {
   local dest=$1
-  # $BOUTIQUES_CACHE_DIR is defined by GASW from the settings file
-  if [ ! -d "$BOUTIQUES_CACHE_DIR" ]; then
-    error "Boutiques cache dir $BOUTIQUES_CACHE_DIR does not exist."
+  # $BOUTIQUES_PROV_DIR is defined by GASW from the settings file
+  if [ ! -d "$BOUTIQUES_PROV_DIR" ]; then
+    error "Boutiques cache dir $BOUTIQUES_PROV_DIR does not exist."
     return 1
   fi
-  local provenanceFile=$(ls -t "$BOUTIQUES_CACHE_DIR" | grep -v "^descriptor_" | head -n 1)
+  local provenanceFile=$(ls -t "$BOUTIQUES_PROV_DIR" | grep -v "^descriptor_" | head -n 1)
   if [[ -z "$provenanceFile" ]]; then
-    error "No provenance found in boutiques cache $BOUTIQUES_CACHE_DIR"
+    error "No provenance found in boutiques cache $BOUTIQUES_PROV_DIR"
     return 2
   fi
-  info "Found provenance file $BOUTIQUES_CACHE_DIR/$provenanceFile"
+  info "Found provenance file $BOUTIQUES_PROV_DIR/$provenanceFile"
   info "Copying it to $dest"
-  cp $BOUTIQUES_CACHE_DIR/$provenanceFile $dest
+  cp $BOUTIQUES_PROV_DIR/$provenanceFile $dest
 }
 
 #####################

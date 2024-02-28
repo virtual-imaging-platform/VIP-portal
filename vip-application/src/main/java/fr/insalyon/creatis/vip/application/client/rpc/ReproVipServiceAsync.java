@@ -13,6 +13,8 @@ public interface ReproVipServiceAsync {
 
     void doesExecutionExist(String executionID, AsyncCallback<Boolean> asyncCallback);
 
+    void canMakeExecutionPublic(String executionID, AsyncCallback<Boolean> asyncCallback);
+
     void createReproVipDirectory(String executionId, AsyncCallback<PublicExecution.PublicExecutionStatus> callback);
 
     void deleteReproVipDirectory(String executionId, AsyncCallback<PublicExecution.PublicExecutionStatus> callback);
