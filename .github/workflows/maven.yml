@@ -37,7 +37,7 @@ jobs:
       run: mvn --batch-mode --update-snapshots  -e -X clean ${{ env.mavenTarget }}
       env:
         MAVEN_USERNAME: github
-        MAVEN_PASSWORD: ${{ secrets.NEXUS_PSW }}
+        MAVEN_PASSWORD: plop
              
     - name: Publish Test Report
       uses: mikepenz/action-junit-report@v3
