@@ -205,7 +205,6 @@ knowledge of the CeCILL-B license and that you accept its terms.
     </dependencies>
 
     <repositories>
-
         <repository>
             <id>creatis</id>
             <name>Creatis Insa Lyon repository [creatis]</name>
