@@ -33,6 +33,7 @@ jobs:
         server-username: MAVEN_USERNAME
         server-password: MAVEN_PASSWORD
     - name: Build with Maven
+      # deploy only for pushes on develop and master, et verify for PRs
       run: mvn -B clean ${{ env.mavenTarget }}
       env:
         MAVEN_USERNAME: github
@@ -46,7 +47,6 @@ jobs:
         detailed_summary: true
         include_passed: true
 
-  
     # Optional: Uploads the full dependency graph to GitHub to improve the quality of Dependabot alerts this repository can receive
     - name: Update dependency graph      
       uses: advanced-security/maven-dependency-submission-action@571e99aab1055c2e71a1e2309b9691de18d6b7d6
