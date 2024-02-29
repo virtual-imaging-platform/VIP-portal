@@ -30,7 +30,7 @@ public class ShanoirStorageBusiness {
         TYPE("type", "^.*[?&]type=([^&]*)(&.*)?$", 1, "type"),
         API_URI("apiUrl", "", 0, "download Url"),
         UPLOAD_URL("upload_url","",0,"Import endpoint url"),
-        KEYCLOAK_CLIENT_ID("keycloak_client_id", "", 0, ""),
+        KEYCLOAK_CLIENT_ID("keycloak_client_id", "^.*[?&]clientId=([^&]*)(&.*)?$", 1 ,"clientId"),
         REFRESH_TOKEN_URL("refresh_token_url","", 0, "");
 
         public final String key;
@@ -65,9 +65,9 @@ public class ShanoirStorageBusiness {
         verifyExternalPlatform(externalPlatform);
 
         String apiUrl = externalPlatform.getUrl();
-        String keycloakClientId = externalPlatform.getKeycloakClientId();
         String refreshTokenUrl = externalPlatform.getRefreshTokenUrl();
 
+        String keycloakClientId = subString(UrlKeys.KEYCLOAK_CLIENT_ID, parameterValue);
         String token = subString(UrlKeys.TOKEN, parameterValue);
         String refreshToken = subString(UrlKeys.REFRESH_TOKEN, parameterValue);
         String fileName = subString(UrlKeys.FILE_NAME, parameterValue);
@@ -82,6 +82,7 @@ public class ShanoirStorageBusiness {
         
         String format = subString(UrlKeys.FORMAT, parameterValue);
         // datasetId has been renamed to resourceId
+        // TODO remove datasetId after version 2.7 (and update method doc)
         String resourceId = subString(UrlKeys.RESOURCE_ID, UrlKeys.DATASET_ID, parameterValue);
 
         return buildDownloadUri(resourceId, apiUrl, token, refreshToken, format, fileName, keycloakClientId, refreshTokenUrl);
@@ -104,7 +105,9 @@ public class ShanoirStorageBusiness {
         }
     }
 
-    private String buildDownloadUri(String resourceId, String apiUrl, String token, String refreshToken, String format, String fileName, String keycloakClientId, String refreshTokenUrl){
+    private String buildDownloadUri(
+            String resourceId, String apiUrl, String token, String refreshToken,
+            String format, String fileName, String keycloakClientId, String refreshTokenUrl){
         return UrlKeys.FILE_NAME.key+":/" +
                 fileName +
                 "?"+ UrlKeys.API_URI.key+"=" +
@@ -153,13 +156,13 @@ public class ShanoirStorageBusiness {
         Matcher matcher = pattern.matcher(text);
         if(matcher.matches()) {
             if(matcher.group(urlKey.regexGroup) == null){
-                logger.error("Cannot get {} from the uri, the {} is null",urlKey.errorKey,urlKey.errorKey);
-                throw new BusinessException("Cannot get "+urlKey.errorKey +" from the uri, the "+urlKey.errorKey +" is null");
+                logger.error("Cannot get {} from the uri,", urlKey.errorKey);
+                throw new BusinessException("Cannot get " + urlKey.errorKey + " from shanoir uri");
             }
             return matcher.group(urlKey.regexGroup);
         }else{
-            logger.error("Cannot get {} from the uri",urlKey.errorKey);
-            throw new BusinessException("Cannot get "+urlKey.errorKey +" from the uri");
+            logger.error("Cannot get {} from the uri", urlKey.errorKey);
+            throw new BusinessException("Cannot get " + urlKey.errorKey + " from the uri");
         }
     }
 
