@@ -215,15 +215,16 @@ public class ReproVipBusiness {
         Map<String, List<String>> invocationOutputsMap = new LinkedHashMap<>();
         try {
             for (Path provenanceFile : provenanceFiles) {
+                logger.debug("handling provenance file {}", provenanceFile);
                 String fileName = provenanceFile.getFileName().toString();
-                String invocationID = fileName.substring(0, fileName.indexOf(".sh.provenance.json"));
-                List<String> outputDataPaths = simulationBusiness.getSimulationDAO(executionID).getOutputData(invocationID);
+                String invocationFilename = fileName.substring(0, fileName.indexOf(".sh.provenance.json"));
+                List<String> outputDataPaths = simulationBusiness.getSimulationDAO(executionID).getOutputData(invocationFilename);
                 Map<String, String> provenanceOutputFilenames = getOutputFilenamesFromProvenanceFile(provenanceFile);
                 List<String> outputDataPathToKeep = getOutputPathToDownload(
                         outputDataPaths,
                         provenanceOutputFilenames,
                         publicExecution.getOutputNames());
-                invocationOutputsMap.put(invocationID, outputDataPathToKeep);
+                invocationOutputsMap.put(invocationFilename, outputDataPathToKeep);
             }
         } catch (DAOException e) {
             throw new BusinessException(e);
@@ -297,6 +298,7 @@ public class ReproVipBusiness {
     private Map<String, String> mapOutputDataPathsByFilenames(List<String> outputDataPaths) throws BusinessException {
         Map<String, String> outputDataMap = new HashMap<>();
         for (String outputDataPath : outputDataPaths) {
+            logger.debug("[ReproVIP] Handling outputDataPath {}", outputDataPath);
             try {
                     URI uri = new URI(outputDataPath);
                     String filename = Paths.get(uri.getPath()).getFileName().toString();
@@ -304,6 +306,7 @@ public class ReproVipBusiness {
                         logger.error("A job contains two results with the same filename [{}]", filename);
                         throw new BusinessException("A job contains two results with the same filename");
                     }
+                    logger.debug("[ReproVIP] got filename for {} : {}", outputDataPath, filename);
                     outputDataMap.put(filename, outputDataPath);
             } catch (URISyntaxException e) {
                 logger.error("Cannot convert a job result to URI [{}]", outputDataPath, e);
@@ -321,6 +324,7 @@ public class ReproVipBusiness {
             Map<String, String> outputFilenames = new HashMap<>();
             for (String outputId : outputFiles.keySet()) {
                 outputFilenames.put(outputId, outputFiles.get(outputId).get("file-name"));
+                logger.debug("got {} as filename for {} in {}", outputFilenames.get(outputId), outputId, provenanceFilePath);
             }
             return outputFilenames;
         } catch (IOException e) {
