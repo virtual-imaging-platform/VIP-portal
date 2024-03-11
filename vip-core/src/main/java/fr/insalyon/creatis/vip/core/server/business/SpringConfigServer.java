@@ -435,5 +435,8 @@ public class SpringConfigServer implements Server {
         return env.getProperty(CoreConstants.API_PARALLEL_DOWNLOAD_NB, Integer.class, 20);
     }
 
-
+    @Override
+    public String getReproVIPRootDir() {
+        return env.getProperty(CoreConstants.REPROVIP_ROOT_DIR, "/vip/ReproVip/");
+    }
 }

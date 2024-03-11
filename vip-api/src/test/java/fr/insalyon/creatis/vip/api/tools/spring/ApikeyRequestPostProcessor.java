@@ -45,13 +45,13 @@ public class ApikeyRequestPostProcessor implements RequestPostProcessor {
         this.apikeyValue = apikeyValue;
     }
 
+    public static RequestPostProcessor apikey(String apikeyHeader, String apikeyValue) {
+        return new ApikeyRequestPostProcessor(apikeyHeader, apikeyValue);
+    }
+
     @Override
     public MockHttpServletRequest postProcessRequest(MockHttpServletRequest request) {
         request.addHeader(apikeyHeader, apikeyValue);
         return request;
-    }
-
-    public static RequestPostProcessor apikey(String apikeyHeader, String apikeyValue) {
-        return new ApikeyRequestPostProcessor(apikeyHeader, apikeyValue);
     }
 }

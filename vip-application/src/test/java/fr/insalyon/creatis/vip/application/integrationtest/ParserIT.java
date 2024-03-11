@@ -1,22 +1,30 @@
 package fr.insalyon.creatis.vip.application.integrationtest;
 
-import fr.insalyon.creatis.vip.application.client.view.system.application.ApplicationRecord;
+import fr.insalyon.creatis.grida.client.GRIDAClientException;
+import fr.insalyon.creatis.vip.application.client.bean.Application;
+import fr.insalyon.creatis.vip.application.server.business.ApplicationBusiness;
+import fr.insalyon.creatis.vip.application.server.business.SimulationBusiness;
 import fr.insalyon.creatis.vip.application.server.business.WorkflowBusiness;
 import fr.insalyon.creatis.vip.core.client.bean.Group;
+import fr.insalyon.creatis.vip.core.integrationtest.ServerMockConfig;
 import fr.insalyon.creatis.vip.core.integrationtest.database.BaseSpringIT;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import fr.insalyon.creatis.vip.core.server.dao.GroupDAO;
+import org.apache.commons.lang.StringUtils;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.io.Resource;
 
 import java.io.IOException;
-import java.util.Map;
+import java.util.*;
 
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /*
  To test InputM2Parser, but more importantly to test the prototype injections
@@ -33,6 +41,7 @@ public class ParserIT extends BaseSpringIT {
     @Autowired
     private ApplicationContext applicationContext;
 
+
     @Test
     public void testInputM2Parsing() throws BusinessException, DAOException, IOException {
         // test data
@@ -43,7 +52,7 @@ public class ParserIT extends BaseSpringIT {
         // test configuration
         groupDAO.add(testGroup);
         Resource testWorkflowPath = applicationContext.getResource("classpath:test_workflow_path");
-        when(server.getWorkflowsPath()).thenReturn(testWorkflowPath.getFile().getAbsolutePath());
+        Mockito.when(server.getWorkflowsPath()).thenReturn(testWorkflowPath.getFile().getAbsolutePath());
 
         // do test
         Map<String, String> res = workflowBusiness.relaunch(simulationId, currentUserFolder);
@@ -63,4 +72,5 @@ public class ParserIT extends BaseSpringIT {
         Assertions.assertEquals("mi", res.get("text"));
         Assertions.assertEquals("/vip/Users/test_user_1/output", res.get("results-directory"));
     }
+
 }

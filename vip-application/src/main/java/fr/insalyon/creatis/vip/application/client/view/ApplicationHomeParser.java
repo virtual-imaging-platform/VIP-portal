@@ -31,16 +31,13 @@
  */
 package fr.insalyon.creatis.vip.application.client.view;
 
-import com.smartgwt.client.widgets.tab.Tab;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
 import fr.insalyon.creatis.vip.application.client.view.monitor.SimulationsTab;
 import fr.insalyon.creatis.vip.application.client.view.system.application.ManageApplicationsTab;
+import fr.insalyon.creatis.vip.application.client.view.reprovip.ReproVipTab;
 import fr.insalyon.creatis.vip.core.client.CoreModule;
-import fr.insalyon.creatis.vip.core.client.bean.User;
-import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.application.ApplicationParser;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
-import fr.insalyon.creatis.vip.core.client.view.user.UserLevel;
 
 /**
  *
@@ -56,6 +53,11 @@ public class ApplicationHomeParser extends ApplicationParser {
 
         addApplication(ApplicationConstants.APP_PUBLIC_APPLICATION,
                 ApplicationConstants.APP_IMG_APPLICATION);
+
+        if (CoreModule.user.isSystemAdministrator()  || CoreModule.user.isDeveloper()) {
+            addApplication(ApplicationConstants.APP_REPRO_VIP,
+                    ApplicationConstants.APP_IMG_APPLICATION);
+        }
     }
 
     @Override
@@ -70,6 +72,12 @@ public class ApplicationHomeParser extends ApplicationParser {
             Layout.getInstance().addTab(
                     ApplicationConstants.TAB_MANAGE_APPLICATION,
                     () -> new ManageApplicationsTab(true));
+            return true;
+        }
+        if (applicationName.equals(ApplicationConstants.APP_REPRO_VIP)) {
+            Layout.getInstance().addTab(
+                    ApplicationConstants.TAB_REPROVIP,
+                    ReproVipTab::new);
             return true;
         }
         return false;

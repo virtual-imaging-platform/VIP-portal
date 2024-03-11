@@ -49,7 +49,7 @@ public class ExternalPlatform {
     private String description;
     private String url;
     private String uploadUrl;
-    private String keycloakClientId;
+    private String keycloakClientId; // TODO : will not be necessary after VIP version 2.7
     private String refreshTokenUrl;
 
     public String getIdentifier() {

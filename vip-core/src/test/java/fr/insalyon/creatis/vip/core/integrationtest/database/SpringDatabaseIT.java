@@ -1,10 +1,7 @@
 package fr.insalyon.creatis.vip.core.integrationtest.database;
 
 import fr.insalyon.creatis.grida.client.GRIDAClientException;
-import fr.insalyon.creatis.vip.core.client.bean.Account;
 import fr.insalyon.creatis.vip.core.client.bean.Group;
-import fr.insalyon.creatis.vip.core.client.bean.User;
-import fr.insalyon.creatis.vip.core.client.view.util.CountryCode;
 import fr.insalyon.creatis.vip.core.integrationtest.ServerMockConfig;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
@@ -22,12 +19,12 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.Collections;
 import java.util.List;
 import java.util.function.Supplier;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 
 /**
  * Integration tests that verify the spring database/transactions configuration
@@ -128,7 +125,7 @@ public class SpringDatabaseIT extends BaseSpringIT{
         }
         Mockito.reset(emailBusiness);
         assertEquals(exception, exceptionCatched);
-        assertEquals(shouldRollback ? 2:1, countUser.get());
+        assertEquals(shouldRollback ? 2 : 1, countUser.get());
         if (shouldRollback) {
             // clean if necessary
             configurationBusiness.removeUser(testEmail, false);

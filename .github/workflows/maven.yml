@@ -1,0 +1,55 @@
+# This workflow will build a Java project with Maven, and cache/restore any dependencies to improve the workflow execution time
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-java-with-maven
+
+# This workflow uses actions that are not certified by GitHub.
+# They are provided by a third-party and are governed by
+# separate terms of service, privacy policy, and support
+# documentation.
+
+name: Java CI with Maven
+
+on:
+  push:
+    branches: [ develop, master ]
+    paths-ignore:
+      - 'README.md'
+  pull_request:
+    branches: develop
+env: # beware env value are of string type, not boolean. Need to use fromJSON to convert them to boolean
+  isProduction: ${{ github.event_name == 'push' && github.ref_name == 'master' }}
+  prepareRelease: ${{ github.event_name == 'push' && github.ref_name == 'develop' && contains(github.event.head_commit.message, 'prepare release') }}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up JDK 11
+      uses: actions/setup-java@v3
+      with:
+        java-version: '11'
+        distribution: 'temurin'
+        cache: maven
+        server-id: ${{ (fromJSON(env.isProduction) && 'creatis-releases') || 'creatis-snapshots' }}
+        server-username: MAVEN_USERNAME
+        server-password: MAVEN_PASSWORD
+    - name: Build with Maven
+      # deploy only for pushes on develop and master, et verify for PRs
+      run: mvn -B clean ${{ env.mavenTarget }}
+      env:
+        MAVEN_USERNAME: github
+        MAVEN_PASSWORD: ${{ secrets.NEXUS_PSW }}
+        mavenTarget: ${{ github.event_name == 'push' && ! fromJSON(env.prepareRelease) && 'deploy' || 'verify' }}
+    - name: Publish Test Report
+      uses: mikepenz/action-junit-report@v3
+      with:
+        commit: ${{github.event.workflow_run.head_sha}}
+        report_paths: '**/target/*-reports/TEST-*.xml'
+        detailed_summary: true
+        include_passed: true
+
+    # Optional: Uploads the full dependency graph to GitHub to improve the quality of Dependabot alerts this repository can receive
+    - name: Update dependency graph
+      uses: advanced-security/maven-dependency-submission-action@v4.0.2
+      if: github.event_name != 'pull_request'
