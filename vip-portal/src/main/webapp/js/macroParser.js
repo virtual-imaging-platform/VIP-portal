@@ -81,7 +81,7 @@ function parseMacFile(macId, parentFolderId) {
             } else {
                 var macFileName = parsedValuesArray["macFilesArray"][fileIndex];
                 var macFile = getFileByName(macFileName, parentFolderId);
-                checkAndThrow(macFile, "Macro file " + macFileName + " not found in the mac folder");
+                checkAndThrow(macFile, "Macro file " + macFileName + " not found in the mac folder.");
                 var reader = new FileReader();
                 reader.onload = function (e) {
                     // Read by lines
@@ -144,7 +144,7 @@ function getFileByName(fileName, parentFolderId) {
             return myFile;
         }
     }
-    checkAndThrow(myFile, "Warning: file " + fileName + " not found in parent folder");
+    checkAndThrow(myFile, "Warning: file " + fileName + " not found in parent folder.");
     return myFile;
 }
 
@@ -157,7 +157,7 @@ function getFilesByNameWithoutExtension(fileName, parentFolderId) {
             myFiles.push(listOfFiles[searchIndex]);
         }
     }
-    checkAndThrow(myFiles, "Warning: file " + fileName + " not found in parent folder");
+    checkAndThrow(myFiles, "Warning: file " + fileName + " not found in parent folder.");
     return myFiles;
 }
 
@@ -188,6 +188,16 @@ function getListOfFiles(dataArray, parentFolderId) {
             myListOfFiles.push.apply(myListOfFiles, myFiles);
         }
     }
+
+    //Add Materials.xml file needed by default by Gate 9.2 onwards
+    var materialsFileName = "Materials.xml";
+    try {
+        var myMaterialsFile = getFileByName(materialsFileName, parentFolderId);
+        myListOfFiles.push(myMaterialsFile);
+    } catch (e) {
+        alert(e.toString() + " This shouldn't be an issue for Gate version inferior to 9.2. Please add this file to your data folder for Gate 9.2 and above.");
+    }
+
 
     //Add Wfl config file containing the name of the main Mac file. 
     //Note that the created file has a name and a content, but no path
