@@ -218,7 +218,10 @@ public class EditGroupLayout extends AbstractFormLayout {
     }
 
     private void save(String name, boolean isPublic,boolean isgridfile,boolean isgridjobs) {
-
+        if (name.equals(CoreConstants.GROUP_SUPPORT) && isPublic) {
+            Layout.getInstance().setWarningMessage("The <b>" + name + "</b> group must remain private.");
+            return;
+        }
         ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();
         WidgetUtil.setLoadingIButton(saveButton, "Saving...");
 

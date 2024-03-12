@@ -222,11 +222,6 @@ public class GroupsLayout extends VLayout {
      * @param isPublic Whether the group if public or not
      */
     private void edit(String name, boolean isPublic,boolean isgridfile,boolean isgridjobs) {
-
-        if (name.equals(CoreConstants.GROUP_SUPPORT)) {
-            SC.warn("You cannot edit " + name + " group.");
-            return;
-        }
         ((ManageGroupsTab) Layout.getInstance().getTab(
                 CoreConstants.TAB_MANAGE_GROUPS)).setGroup(name, isPublic,isgridfile,isgridjobs);
     }

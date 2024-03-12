@@ -98,6 +98,12 @@ public class EditClassLayout extends AbstractFormLayout {
                 new ClickHandler() {
                     @Override
                     public void onClick(ClickEvent event) {
+                        List<String> groups = Arrays.asList(groupsPickList.getValues());
+                        if (groups.contains(CoreConstants.GROUP_SUPPORT)) {
+                            Layout.getInstance().setWarningMessage("The <b>" + CoreConstants.GROUP_SUPPORT +
+                                    "</b> group cannot be associated to a class.");
+                            return;
+                        }
                         if (nameField.validate()) {
                             save(new AppClass(nameField.getValueAsString().trim(),
                                     Arrays.asList(enginesPickList.getValues()),
