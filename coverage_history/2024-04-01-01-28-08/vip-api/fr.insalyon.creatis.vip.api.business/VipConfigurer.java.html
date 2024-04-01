@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../jacoco-resources/report.gif" type="image/gif"/><title>VipConfigurer.java</title><link rel="stylesheet" href="../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../index.html" class="el_report">coverage</a> &gt; <a href="../index.html" class="el_bundle">vip-api</a> &gt; <a href="index.source.html" class="el_package">fr.insalyon.creatis.vip.api.business</a> &gt; <span class="el_source">VipConfigurer.java</span></div><h1>VipConfigurer.java</h1><pre class="source lang-java linenums">/*
+ * Copyright and authors: see LICENSE.txt in base repository.
+ *
+ * This software is a web portal for pipeline execution on distributed systems.
+ *
+ * This software is governed by the CeCILL-B license under French law and
+ * abiding by the rules of distribution of free software.  You can  use,
+ * modify and/ or redistribute the software under the terms of the CeCILL-B
+ * license as circulated by CEA, CNRS and INRIA at the following URL
+ * &quot;http://www.cecill.info&quot;.
+ *
+ * As a counterpart to the access to the source code and  rights to copy,
+ * modify and redistribute granted by the license, users are provided only
+ * with a limited warranty  and the software's author,  the holder of the
+ * economic rights,  and the successive licensors  have only  limited
+ * liability.
+ *
+ * In this respect, the user's attention is drawn to the risks associated
+ * with loading,  using,  modifying and/or developing or reproducing the
+ * software by the user in light of its specific status of free software,
+ * that may mean  that it is complicated to manipulate,  and  that  also
+ * therefore means  that it is reserved for developers  and  experienced
+ * professionals having in-depth computer knowledge. Users are therefore
+ * encouraged to load and test the software's suitability as regards their
+ * requirements in conditions enabling the security of their systems and/or
+ * data to be ensured and,  more generally, to use and operate it in the
+ * same conditions as regards security.
+ *
+ * The fact that you are presently reading this means that you have had
+ * knowledge of the CeCILL-B license and that you accept its terms.
+ */
+package fr.insalyon.creatis.vip.api.business;
+
+import fr.insalyon.creatis.vip.core.server.business.BusinessException;
+import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationListener;
+import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.lang.NonNull;
+import org.springframework.stereotype.Component;
+import org.springframework.web.servlet.HandlerInterceptor;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.Calendar;
+
+/**
+ * Configure vip (proxy verification)
+ *
+ * Do it on startup, and then every day (test at each api request)
+ *
+ * Created by abonnet on 7/26/16.
+ */
+@Component
+public class VipConfigurer implements ApplicationListener&lt;ContextRefreshedEvent&gt;, HandlerInterceptor {
+
+<span class="fc" id="L59">    private final Logger logger = LoggerFactory.getLogger(getClass());</span>
+
+    private final ConfigurationBusiness configurationBusiness;
+
+<span class="fc" id="L63">    private Calendar lastConfiguration = null;</span>
+
+    @Autowired
+<span class="fc" id="L66">    public VipConfigurer(ConfigurationBusiness configurationBusiness) {</span>
+<span class="fc" id="L67">        this.configurationBusiness = configurationBusiness;</span>
+<span class="fc" id="L68">    }</span>
+
+    @Override
+    public void onApplicationEvent(@NonNull ContextRefreshedEvent event) {
+<span class="fc" id="L72">        configureIfNecessary();</span>
+<span class="fc" id="L73">    }</span>
+
+    @Override
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
+<span class="fc" id="L77">        configureIfNecessary();</span>
+<span class="fc" id="L78">        return true;</span>
+    }
+
+    public synchronized void configureIfNecessary() {
+<span class="fc bfc" id="L82" title="All 2 branches covered.">        if (!shouldConfigure()) {</span>
+<span class="fc" id="L83">            logger.debug(&quot;no need to reconfigure&quot;);</span>
+<span class="fc" id="L84">            return;</span>
+        }
+        try {
+<span class="fc" id="L87">            logger.info(&quot;New VIP configuration necessary&quot;);</span>
+<span class="fc" id="L88">            configurationBusiness.configure();</span>
+<span class="fc" id="L89">            lastConfiguration = Calendar.getInstance();</span>
+<span class="nc" id="L90">        } catch (BusinessException e) {</span>
+<span class="nc" id="L91">            throw new RuntimeException(&quot;Cannot init VIP&quot;, e);</span>
+<span class="fc" id="L92">        }</span>
+<span class="fc" id="L93">    }</span>
+
+    private boolean shouldConfigure() {
+<span class="fc bfc" id="L96" title="All 2 branches covered.">        if (lastConfiguration == null) {</span>
+<span class="fc" id="L97">            logger.debug(&quot;first check : configure VIP&quot;);</span>
+<span class="fc" id="L98">            return true;</span>
+        }
+<span class="fc" id="L100">        Calendar now = Calendar.getInstance();</span>
+<span class="fc" id="L101">        logger.debug(&quot;comparing {} to now {} to check configuration&quot;, lastConfiguration, now);</span>
+<span class="pc bpc" id="L102" title="1 of 2 branches missed.">        return now.get(Calendar.DAY_OF_YEAR) != lastConfiguration.get(Calendar.DAY_OF_YEAR);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../jacoco-resources/report.gif" type="image/gif"/><title>SpringCoreConfig.java</title><link rel="stylesheet" href="../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../index.html" class="el_report">coverage</a> &gt; <a href="../index.html" class="el_bundle">vip-core</a> &gt; <a href="index.source.html" class="el_package">fr.insalyon.creatis.vip.core.server</a> &gt; <span class="el_source">SpringCoreConfig.java</span></div><h1>SpringCoreConfig.java</h1><pre class="source lang-java linenums">package fr.insalyon.creatis.vip.core.server;
+
+import fr.insalyon.creatis.grida.client.GRIDACacheClient;
+import fr.insalyon.creatis.grida.client.GRIDAClient;
+import fr.insalyon.creatis.grida.client.GRIDAPoolClient;
+import fr.insalyon.creatis.grida.client.GRIDAZombieClient;
+import fr.insalyon.creatis.sma.client.SMAClient;
+import fr.insalyon.creatis.vip.core.server.business.Server;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.BeanInitializationException;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.annotation.*;
+import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
+import org.springframework.core.convert.ConversionService;
+import org.springframework.core.convert.support.DefaultConversionService;
+import org.springframework.core.env.ConfigurableEnvironment;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.support.ResourcePropertySource;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
+import org.springframework.jdbc.datasource.DataSourceUtils;
+import org.springframework.jdbc.datasource.LazyConnectionDataSourceProxy;
+import org.springframework.jdbc.datasource.lookup.JndiDataSourceLookup;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionManager;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
+import org.springframework.util.ResourceUtils;
+
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
+import javax.sql.DataSource;
+import java.io.IOException;
+import java.util.function.Consumer;
+
+import static org.springframework.util.ResourceUtils.CLASSPATH_URL_PREFIX;
+
+/**
+ * Root spring configuration class.
+ * Basically, the @ComponentScan annotation allows spring to scan all vip
+ * classes and to create/inject automatically all the beans / service. Note that
+ * the GWT servlet cannot be created this way (they are created by the application
+ * server / tomcat) through the web.xml file.
+ *
+ * This also configures the database/transaction/connection : spring will
+ * automatically handle transactions and connection creation (and closing)
+ * by annotating classes with @Transactional and using spring utils to get
+ * the connection in the dao
+ *
+ * This also creates spring beans for services coming from maven dependencies (grida and sma)
+ *
+ * This also manage the vip configuration folder, defaulting to &quot;$HOME/.vip&quot; but
+ * allowing change for tests and local use.
+ */
+@Configuration
+@EnableTransactionManagement
+@ComponentScan(basePackages = &quot;fr.insalyon.creatis.vip&quot;)
+<span class="fc" id="L61">public class SpringCoreConfig {</span>
+
+<span class="fc" id="L63">    private static final Logger logger = LoggerFactory.getLogger(SpringCoreConfig.class);</span>
+
+    /*
+    wrapper around the &quot;real&quot; datasource to open a connection only when needed
+    (and not every time a @Transactional method is called)
+    The &quot;real&quot; datasource must have the &quot;db-datasource&quot; qualifier
+     */
+    @Bean
+    @Primary // to indicate to spring this is the datasource to inject
+    public LazyConnectionDataSourceProxy lazyDataSource(@Qualifier(&quot;db-datasource&quot;) DataSource dataSource) {
+<span class="fc" id="L73">        return new LazyConnectionDataSourceProxy(dataSource);</span>
+    }
+
+    /*
+    Spring service that create a transaction (and a connection) automatically
+    in classes with the @Transactional annotation (so the business layer)
+     */
+    @Bean
+    public PlatformTransactionManager transactionManager(LazyConnectionDataSourceProxy lazyDataSource) {
+<span class="fc" id="L82">        return new DataSourceTransactionManager(lazyDataSource);</span>
+    }
+
+    // VIP dependencies beans
+
+    @Bean
+    public GRIDAClient gridaClient(Server server) {
+<span class="fc" id="L89">        return new GRIDAClient(</span>
+<span class="fc" id="L90">                server.getGRIDAHost(),</span>
+<span class="fc" id="L91">                server.getGRIDAPort(),</span>
+<span class="fc" id="L92">                server.getServerProxy(server.getVoName()));</span>
+    }
+
+    @Bean
+    public GRIDAPoolClient gridaPoolClient(Server server) {
+<span class="fc" id="L97">        return new GRIDAPoolClient(</span>
+<span class="fc" id="L98">                server.getGRIDAHost(),</span>
+<span class="fc" id="L99">                server.getGRIDAPort(),</span>
+<span class="fc" id="L100">                server.getServerProxy(server.getVoName()));</span>
+    }
+
+    @Bean
+    public GRIDACacheClient gridaCacheClient(Server server) {
+<span class="fc" id="L105">        return new GRIDACacheClient(</span>
+<span class="fc" id="L106">                server.getGRIDAHost(),</span>
+<span class="fc" id="L107">                server.getGRIDAPort(),</span>
+<span class="fc" id="L108">                server.getServerProxy(server.getVoName()));</span>
+    }
+
+    @Bean
+    public GRIDAZombieClient gridaZombieClient(Server server) {
+<span class="fc" id="L113">        return new GRIDAZombieClient(</span>
+<span class="fc" id="L114">                server.getGRIDAHost(),</span>
+<span class="fc" id="L115">                server.getGRIDAPort(),</span>
+<span class="fc" id="L116">                server.getServerProxy(server.getVoName()));</span>
+    }
+
+    @Bean
+    public SMAClient smaClient(Server server) {
+<span class="fc" id="L121">        return new SMAClient(server.getSMAHost(), server.getSMAPort());</span>
+    }
+
+    // to verify the @Value injection existence
+    @Bean
+    public static PropertySourcesPlaceholderConfigurer properties(){
+<span class="fc" id="L127">        return new PropertySourcesPlaceholderConfigurer();</span>
+    }
+
+    // to handle list in spring @value
+    @Bean
+    public static ConversionService conversionService() {
+<span class="fc" id="L133">        return new DefaultConversionService();</span>
+    }
+
+    /*
+    find the vip configuration folder. This defaults to $HOME/.vip as this is
+    the traditional behavior.
+    This is changeable through the vipConfigFolder property which can be given
+    as a JVM parameter or a system environment variable. This can be changed
+    to a absolute path or a relative classpath.
+     */
+    @Bean
+    public static Resource vipConfigFolder(
+            ConfigurableApplicationContext configurableApplicationContext) throws IOException {
+<span class="fc" id="L146">        ConfigurableEnvironment env = configurableApplicationContext.getEnvironment();</span>
+        // look for configLocation in environment
+<span class="fc" id="L148">        String configFolder = env.getProperty(&quot;vipConfigFolder&quot;);</span>
+        // if present, look for file
+<span class="pc bpc" id="L150" title="1 of 2 branches missed.">        if (configFolder != null) {</span>
+<span class="fc" id="L151">            logger.info(&quot;found vipConfigFolder property : {}&quot;, configFolder);</span>
+        } else {
+            // if not, look in user home folder
+<span class="nc" id="L154">            configFolder = env.getProperty(&quot;user.home&quot;)  + Server.VIP_DIR;</span>
+<span class="nc" id="L155">            logger.info(&quot;vipConfigFolder property not found, using user-home : {}&quot;, configFolder);</span>
+        }
+        Resource vipConfigFolder;
+<span class="pc bpc" id="L158" title="1 of 2 branches missed.">        if ( configFolder.startsWith(CLASSPATH_URL_PREFIX)) {</span>
+<span class="fc" id="L159">            vipConfigFolder = new ClassPathResource(configFolder.substring(CLASSPATH_URL_PREFIX.length()));</span>
+        } else {
+<span class="nc" id="L161">            vipConfigFolder = new FileSystemResource(configFolder);</span>
+        }
+<span class="pc bpc" id="L163" title="1 of 2 branches missed.">        if ( ! vipConfigFolder.exists() &amp;&amp;</span>
+<span class="nc bnc" id="L164" title="All 2 branches missed.">                ! vipConfigFolder.getFile().mkdir()) {</span>
+<span class="nc" id="L165">            logger.error(&quot;Cannot create VIP config folder : {}&quot;, vipConfigFolder);</span>
+<span class="nc" id="L166">            throw new BeanInitializationException(&quot;Cannot create VIP config folder&quot;);</span>
+        }
+<span class="fc" id="L168">        return vipConfigFolder;</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

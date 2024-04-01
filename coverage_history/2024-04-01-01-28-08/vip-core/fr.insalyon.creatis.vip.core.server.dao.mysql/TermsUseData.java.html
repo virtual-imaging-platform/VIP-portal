@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../jacoco-resources/report.gif" type="image/gif"/><title>TermsUseData.java</title><link rel="stylesheet" href="../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../index.html" class="el_report">coverage</a> &gt; <a href="../index.html" class="el_bundle">vip-core</a> &gt; <a href="index.source.html" class="el_package">fr.insalyon.creatis.vip.core.server.dao.mysql</a> &gt; <span class="el_source">TermsUseData.java</span></div><h1>TermsUseData.java</h1><pre class="source lang-java linenums">/*
+ * Copyright and authors: see LICENSE.txt in base repository.
+ *
+ * This software is a web portal for pipeline execution on distributed systems.
+ *
+ * This software is governed by the CeCILL-B license under French law and
+ * abiding by the rules of distribution of free software.  You can  use,
+ * modify and/ or redistribute the software under the terms of the CeCILL-B
+ * license as circulated by CEA, CNRS and INRIA at the following URL
+ * &quot;http://www.cecill.info&quot;.
+ *
+ * As a counterpart to the access to the source code and  rights to copy,
+ * modify and redistribute granted by the license, users are provided only
+ * with a limited warranty  and the software's author,  the holder of the
+ * economic rights,  and the successive licensors  have only  limited
+ * liability.
+ *
+ * In this respect, the user's attention is drawn to the risks associated
+ * with loading,  using,  modifying and/or developing or reproducing the
+ * software by the user in light of its specific status of free software,
+ * that may mean  that it is complicated to manipulate,  and  that  also
+ * therefore means  that it is reserved for developers  and  experienced
+ * professionals having in-depth computer knowledge. Users are therefore
+ * encouraged to load and test the software's suitability as regards their
+ * requirements in conditions enabling the security of their systems and/or
+ * data to be ensured and,  more generally, to use and operate it in the
+ * same conditions as regards security.
+ *
+ * The fact that you are presently reading this means that you have had
+ * knowledge of the CeCILL-B license and that you accept its terms.
+ */
+package fr.insalyon.creatis.vip.core.server.dao.mysql;
+
+import fr.insalyon.creatis.vip.core.client.bean.TermsOfUse;
+import fr.insalyon.creatis.vip.core.server.dao.DAOException;
+import fr.insalyon.creatis.vip.core.server.dao.TermsUseDAO;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Timestamp;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.support.JdbcDaoSupport;
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+
+import javax.sql.DataSource;
+
+/**
+ *
+ * @author Nouha Boujelben
+ */
+@Repository
+@Transactional
+<span class="fc" id="L58">public class TermsUseData extends JdbcDaoSupport implements TermsUseDAO {</span>
+
+<span class="fc" id="L60">    private final Logger logger = LoggerFactory.getLogger(getClass());</span>
+
+    @Autowired
+    public void useDataSource(DataSource dataSource) {
+<span class="fc" id="L64">        setDataSource(dataSource);</span>
+<span class="fc" id="L65">    }</span>
+
+    @Override
+    public void add(TermsOfUse termsOfUse) throws DAOException {
+
+        try {
+
+<span class="fc" id="L72">            PreparedStatement ps = getConnection().prepareStatement(&quot;INSERT INTO VIPTermsOfuse(date) &quot;</span>
+                    + &quot;VALUES (?)&quot;);
+<span class="fc" id="L74">            ps.setTimestamp(1, termsOfUse.getDate());</span>
+<span class="fc" id="L75">            ps.execute();</span>
+<span class="fc" id="L76">            ps.close();</span>
+
+
+<span class="fc" id="L79">        } catch (SQLException ex) {</span>
+<span class="fc" id="L80">            logger.error(&quot;Error adding terms of use {}&quot;, termsOfUse.getDate(), ex);</span>
+<span class="fc" id="L81">            throw new DAOException(ex);</span>
+<span class="fc" id="L82">        }</span>
+<span class="fc" id="L83">    }</span>
+
+    @Override
+    public Timestamp getLastUpdateTermsOfUse() throws DAOException {
+        try {
+<span class="fc" id="L88">            Timestamp date=null;</span>
+<span class="fc" id="L89">            PreparedStatement ps = getConnection().prepareStatement(&quot;Select date From VIPTermsOfuse ORDER BY idTermsOfuse DESC &quot; +</span>
+              &quot;LIMIT 1&quot;);
+<span class="fc" id="L91">            ResultSet rs = ps.executeQuery();</span>
+<span class="fc bfc" id="L92" title="All 2 branches covered.">            while (rs.next()) {</span>
+<span class="fc" id="L93">            date=rs.getTimestamp(&quot;date&quot;);</span>
+            }
+<span class="fc" id="L95">            ps.close();</span>
+
+<span class="fc" id="L97">            return date;</span>
+
+<span class="nc" id="L99">        } catch (SQLException ex) {</span>
+<span class="nc" id="L100">            logger.error(&quot;Error getting last terms of use&quot;, ex);</span>
+<span class="nc" id="L101">            throw new DAOException(ex);</span>
+        }
+
+    }
+
+
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>
