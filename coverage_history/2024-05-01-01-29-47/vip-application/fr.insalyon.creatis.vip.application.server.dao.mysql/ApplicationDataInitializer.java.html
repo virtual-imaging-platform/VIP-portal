@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../jacoco-resources/report.gif" type="image/gif"/><title>ApplicationDataInitializer.java</title><link rel="stylesheet" href="../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../index.html" class="el_report">coverage</a> &gt; <a href="../index.html" class="el_bundle">vip-application</a> &gt; <a href="index.source.html" class="el_package">fr.insalyon.creatis.vip.application.server.dao.mysql</a> &gt; <span class="el_source">ApplicationDataInitializer.java</span></div><h1>ApplicationDataInitializer.java</h1><pre class="source lang-java linenums">package fr.insalyon.creatis.vip.application.server.dao.mysql;
+
+import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
+import fr.insalyon.creatis.vip.core.server.dao.DAOException;
+import fr.insalyon.creatis.vip.core.server.dao.mysql.TableInitializer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.context.event.EventListener;
+import org.springframework.core.annotation.Order;
+import org.springframework.jdbc.core.support.JdbcDaoSupport;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
+
+import javax.sql.DataSource;
+
+@Component
+@Transactional
+public class ApplicationDataInitializer extends JdbcDaoSupport {
+
+<span class="fc" id="L22">    private final Logger logger = LoggerFactory.getLogger(getClass());</span>
+
+    private TableInitializer tableInitializer;
+
+    @Autowired
+    public ApplicationDataInitializer(
+<span class="fc" id="L28">            DataSource dataSource, TableInitializer tableInitializer) {</span>
+<span class="fc" id="L29">        setDataSource(dataSource);</span>
+<span class="fc" id="L30">        this.tableInitializer = tableInitializer;</span>
+<span class="fc" id="L31">    }</span>
+
+
+    @EventListener(ContextRefreshedEvent.class)
+    @Order(20) // Applications tables references vip-core tables and must be created after
+    public void onStartup() {
+<span class="fc" id="L37">        logger.info(&quot;Configuring VIP Application database.&quot;);</span>
+
+<span class="fc" id="L39">        tableInitializer.createTable(&quot;VIPEngines&quot;,</span>
+                &quot;name VARCHAR(255), &quot;
+                        + &quot;endpoint VARCHAR(255), &quot;
+                        + &quot;status VARCHAR(255) DEFAULT NULL, &quot;
+                        + &quot;PRIMARY KEY (name)&quot;);
+
+<span class="fc" id="L45">        tableInitializer.createTable(&quot;VIPClasses&quot;,</span>
+                &quot;name VARCHAR(255), &quot;
+                        + &quot;PRIMARY KEY (name)&quot;);
+
+<span class="fc" id="L49">        tableInitializer.createTable(&quot;VIPClassesEngines&quot;,</span>
+                &quot;class VARCHAR(255), &quot;
+                        + &quot;engine VARCHAR(255), &quot;
+                        + &quot;PRIMARY KEY (class, engine), &quot;
+                        + &quot;FOREIGN KEY (class) REFERENCES VIPClasses(name) &quot;
+                        + &quot;ON DELETE CASCADE ON UPDATE CASCADE, &quot;
+                        + &quot;FOREIGN KEY (engine) REFERENCES VIPEngines(name) &quot;
+                        + &quot;ON DELETE CASCADE ON UPDATE CASCADE&quot;);
+
+<span class="fc" id="L58">        tableInitializer.createTable(&quot;VIPGroupsClasses&quot;,</span>
+                &quot;classname VARCHAR(255), &quot;
+                        + &quot;groupname VARCHAR(255), &quot;
+                        + &quot;PRIMARY KEY (classname, groupname), &quot;
+                        + &quot;FOREIGN KEY (classname) REFERENCES VIPClasses(name) &quot;
+                        + &quot;ON DELETE CASCADE ON UPDATE RESTRICT, &quot;
+                        + &quot;FOREIGN KEY (groupname) REFERENCES VIPGroups(groupname) &quot;
+                        + &quot;ON DELETE CASCADE ON UPDATE RESTRICT&quot;);
+
+<span class="fc" id="L67">        tableInitializer.createTable(&quot;VIPApplications&quot;,</span>
+                &quot;name VARCHAR(255), &quot;
+                        + &quot;citation TEXT, &quot;
+                        + &quot;owner VARCHAR(255), &quot;
+                        + &quot;PRIMARY KEY (name), &quot;
+                        + &quot;FOREIGN KEY (owner) REFERENCES VIPUsers(email) &quot;
+                        + &quot;ON DELETE SET NULL ON UPDATE CASCADE&quot;);
+
+<span class="fc" id="L75">        tableInitializer.createTable(&quot;VIPAppVersions&quot;,</span>
+                &quot;application VARCHAR(255), &quot;
+                        + &quot;version VARCHAR(255), &quot;
+                        + &quot;lfn VARCHAR(255), &quot;
+                        + &quot;json_lfn VARCHAR(255), &quot;
+                        + &quot;doi VARCHAR(255), &quot;
+                        + &quot;visible BOOLEAN, &quot;
+                        + &quot;useBoutiquesForm BOOLEAN, &quot;
+                        + &quot;PRIMARY KEY (application, version), &quot;
+                        + &quot;FOREIGN KEY (application) REFERENCES VIPApplications(name) &quot;
+                        + &quot;ON DELETE CASCADE ON UPDATE CASCADE&quot;);
+
+<span class="fc" id="L87">        tableInitializer.createTable(&quot;VIPApplicationClasses&quot;,</span>
+                &quot;class VARCHAR(255), &quot;
+                        + &quot;application VARCHAR(255), &quot;
+                        + &quot;PRIMARY KEY (class, application), &quot;
+                        + &quot;FOREIGN KEY (class) REFERENCES VIPClasses(name) &quot;
+                        + &quot;ON DELETE CASCADE ON UPDATE RESTRICT, &quot;
+                        + &quot;FOREIGN KEY (application) REFERENCES VIPApplications(name) &quot;
+                        + &quot;ON DELETE CASCADE ON UPDATE RESTRICT&quot;);
+
+<span class="fc" id="L96">        tableInitializer.createTable(&quot;VIPAppInputs&quot;,</span>
+                &quot;email VARCHAR(255), &quot;
+                        + &quot;application VARCHAR(255), &quot;
+                        + &quot;name VARCHAR(255), &quot;
+                        + &quot;inputs VARCHAR(32000), &quot;
+                        + &quot;PRIMARY KEY (email, application, name), &quot;
+                        + &quot;FOREIGN KEY (email) REFERENCES VIPUsers(email) &quot;
+                        + &quot;ON DELETE CASCADE ON UPDATE CASCADE&quot;);
+
+<span class="fc" id="L105">        tableInitializer.createTable(&quot;VIPAppExamples&quot;,</span>
+                &quot;application VARCHAR(255), &quot;
+                        + &quot;name VARCHAR(255), &quot;
+                        + &quot;inputs VARCHAR(32000), &quot;
+                        + &quot;PRIMARY KEY (application, name)&quot;);
+
+<span class="fc" id="L111">        tableInitializer.createTable(&quot;VIPPublicExecutions&quot;,</span>
+                &quot;execution_ID VARCHAR(255), &quot;
+                        + &quot;simulation_name VARCHAR(255), &quot;
+                        + &quot;application_name VARCHAR(255), &quot;
+                        + &quot;application_version VARCHAR(255), &quot;
+                        + &quot;status  VARCHAR(50), &quot;
+                        + &quot;author VARCHAR(255), &quot;
+                        + &quot;output_names VARCHAR(255), &quot;
+                        + &quot;comments TEXT, &quot;
+                        + &quot;PRIMARY KEY(execution_ID)&quot;);
+<span class="fc" id="L121">    }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

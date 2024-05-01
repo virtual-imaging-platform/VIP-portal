@@ -1,0 +1,243 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../jacoco-resources/report.gif" type="image/gif"/><title>GirderStorageBusiness.java</title><link rel="stylesheet" href="../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../index.html" class="el_report">coverage</a> &gt; <a href="../index.html" class="el_bundle">vip-datamanager</a> &gt; <a href="index.source.html" class="el_package">fr.insalyon.creatis.vip.datamanager.server.business</a> &gt; <span class="el_source">GirderStorageBusiness.java</span></div><h1>GirderStorageBusiness.java</h1><pre class="source lang-java linenums">/*
+ * Copyright and authors: see LICENSE.txt in base repository.
+ *
+ * This software is a web portal for pipeline execution on distributed systems.
+ *
+ * This software is governed by the CeCILL-B license under French law and
+ * abiding by the rules of distribution of free software.  You can  use,
+ * modify and/ or redistribute the software under the terms of the CeCILL-B
+ * license as circulated by CEA, CNRS and INRIA at the following URL
+ * &quot;http://www.cecill.info&quot;.
+ *
+ * As a counterpart to the access to the source code and  rights to copy,
+ * modify and redistribute granted by the license, users are provided only
+ * with a limited warranty  and the software's author,  the holder of the
+ * economic rights,  and the successive licensors  have only  limited
+ * liability.
+ *
+ * In this respect, the user's attention is drawn to the risks associated
+ * with loading,  using,  modifying and/or developing or reproducing the
+ * software by the user in light of its specific status of free software,
+ * that may mean  that it is complicated to manipulate,  and  that  also
+ * therefore means  that it is reserved for developers  and  experienced
+ * professionals having in-depth computer knowledge. Users are therefore
+ * encouraged to load and test the software's suitability as regards their
+ * requirements in conditions enabling the security of their systems and/or
+ * data to be ensured and,  more generally, to use and operate it in the
+ * same conditions as regards security.
+ *
+ * The fact that you are presently reading this means that you have had
+ * knowledge of the CeCILL-B license and that you accept its terms.
+ */
+package fr.insalyon.creatis.vip.datamanager.server.business;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
+import fr.insalyon.creatis.vip.core.client.bean.User;
+import fr.insalyon.creatis.vip.core.client.view.*;
+import fr.insalyon.creatis.vip.core.server.business.*;
+import fr.insalyon.creatis.vip.datamanager.client.bean.ExternalPlatform;
+import fr.insalyon.creatis.vip.datamanager.client.bean.ExternalPlatform.Type;
+import fr.insalyon.creatis.vip.datamanager.server.DataManagerUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.sql.Connection;
+import java.util.Optional;
+import java.util.function.Consumer;
+
+/**
+ * Created by abonnet on 7/17/19.
+ */
+@Service
+@Transactional
+public class GirderStorageBusiness {
+<span class="fc" id="L65">    private final Logger logger = LoggerFactory.getLogger(getClass());</span>
+
+    private ApiKeyBusiness apiKeyBusiness;
+    private Server server;
+
+    @Autowired
+<span class="fc" id="L71">    public GirderStorageBusiness(ApiKeyBusiness apiKeyBusiness, Server server) {</span>
+<span class="fc" id="L72">        this.apiKeyBusiness = apiKeyBusiness;</span>
+<span class="fc" id="L73">        this.server = server;</span>
+<span class="fc" id="L74">    }</span>
+
+    /* GASW regexps in 3.2.0 version
+        local fileName=`echo $URI | sed -r 's#^girder:/(//)?([^/].*)\?.*$#\2#i'`
+        local apiUrl=`echo $URI | sed -r 's/^.*[?&amp;]apiurl=([^&amp;]*)(&amp;.*)?$/\1/i'`
+        local fileId=`echo $URI | sed -r 's/^.*[?&amp;]fileid=([^&amp;]*)(&amp;.*)?$/\1/i'`
+        local token=`echo $URI | sed -r 's/^.*[?&amp;]token=([^&amp;]*)(&amp;.*)?$/\1/i'`
+
+        So objective : generate &quot;girder:/filename?apiurl=[...]&amp;fileId=[...]&amp;token=[...]
+     */
+    public String generateUri(
+            ExternalPlatform externalPlatform, String parameterName,
+            String fileIdentifier, User user)
+            throws BusinessException {
+
+<span class="nc" id="L89">        verifyExternalPlatform(externalPlatform);</span>
+
+<span class="nc" id="L91">        String apiUrl = externalPlatform.getUrl() + &quot;/api/v1&quot;;</span>
+
+<span class="nc" id="L93">        String token = getToken(user.getEmail(), apiUrl, externalPlatform.getIdentifier());</span>
+
+<span class="nc" id="L95">        String filename = &quot;//&quot;;</span>
+<span class="nc bnc" id="L96" title="All 2 branches missed.">        if (! CoreConstants.RESULTS_DIRECTORY_PARAM_NAME.equals(parameterName)) {</span>
+<span class="nc" id="L97">            filename = getFilename(apiUrl, fileIdentifier, token);</span>
+        }
+<span class="nc" id="L99">        return buildUri(filename, apiUrl, fileIdentifier, token);</span>
+    }
+
+    private void verifyExternalPlatform(ExternalPlatform externalPlatform)
+            throws BusinessException {
+<span class="nc bnc" id="L104" title="All 2 branches missed.">        if ( ! externalPlatform.getType().equals(Type.GIRDER)) {</span>
+<span class="nc" id="L105">            logger.error(&quot;Trying to generate a girder URI for a non girder storage {}&quot;,</span>
+<span class="nc" id="L106">                    externalPlatform.getType());</span>
+<span class="nc" id="L107">            throw new BusinessException(&quot;Cannot generate girder uri&quot;);</span>
+        }
+<span class="nc bnc" id="L109" title="All 2 branches missed.">        if (externalPlatform.getUrl() == null) {</span>
+<span class="nc" id="L110">            logger.error(&quot;A girder external storage must have an URL to generate an URI&quot;);</span>
+<span class="nc" id="L111">            throw new BusinessException(&quot;Cannot generate girder uri&quot;);</span>
+        }
+<span class="nc" id="L113">    }</span>
+
+    private String buildUri(
+            String filename, String apiUrl, String fileId, String token) {
+<span class="nc" id="L117">        return &quot;girder:/&quot; +</span>
+                filename +
+                &quot;?apiurl=&quot; +
+                apiUrl +
+                &quot;&amp;amp;fileId=&quot; +
+                fileId +
+                &quot;&amp;amp;token=&quot; +
+                token;
+    }
+
+    public String getToken(String userEmail, String apiUrl, String storageId)
+            throws BusinessException {
+
+<span class="nc" id="L130">        String key = apiKeyBusiness.apiKeysFor(userEmail)</span>
+<span class="nc" id="L131">            .stream()</span>
+<span class="nc" id="L132">            .filter(k -&gt; storageId.equals(k.getStorageIdentifier()))</span>
+<span class="nc" id="L133">            .findFirst()</span>
+<span class="nc" id="L134">            .map(k -&gt; k.getApiKey())</span>
+<span class="nc" id="L135">            .orElseThrow(() -&gt; {</span>
+<span class="nc" id="L136">                logger.error(&quot;no girder api key found for {} on {}&quot;, userEmail, storageId);</span>
+<span class="nc" id="L137">                return new BusinessException(</span>
+                        &quot;No api key found for storageId: &quot; + storageId);
+            });
+
+        try {
+<span class="nc" id="L142">            HttpResult res = makeHttpRequest(</span>
+                    apiUrl + &quot;/api_key/token?key=&quot; + key + &quot;&amp;duration=&quot;
+<span class="nc" id="L144">                            + server.getGirderTokenDurationInDays(),</span>
+                    METHOD_POST,
+<span class="nc" id="L146">                    Optional.empty());</span>
+
+<span class="nc bnc" id="L148" title="All 2 branches missed.">            if (res.code &gt;= 400) {</span>
+<span class="nc" id="L149">                logger.error(&quot;Unable to get girder token from api key {} : {}&quot;, key, res.response);</span>
+<span class="nc" id="L150">                throw new BusinessException(</span>
+                    &quot;Unable to get token from api key: &quot; + res.response);
+            }
+
+<span class="nc" id="L154">            ObjectNode node =</span>
+<span class="nc" id="L155">                new ObjectMapper().readValue(res.response, ObjectNode.class);</span>
+<span class="nc" id="L156">            return node.get(&quot;authToken&quot;).get(&quot;token&quot;).asText();</span>
+<span class="nc" id="L157">        } catch (IOException | NullPointerException ex) {</span>
+<span class="nc" id="L158">            logger.error(&quot;Error getting girder token for {} with key {}&quot;,</span>
+                    userEmail, key, ex);
+<span class="nc" id="L160">            throw new BusinessException(&quot;Unable to get token from api key&quot;, ex);</span>
+        }
+    }
+
+    private String getFilename(String apiUrl, String fileId, String token)
+            throws BusinessException {
+
+        try {
+<span class="nc" id="L168">            HttpResult res = makeHttpRequest(</span>
+                apiUrl + &quot;/file/&quot; + fileId,
+                METHOD_GET,
+<span class="nc" id="L171">                Optional.of(</span>
+<span class="nc" id="L172">                    con -&gt; con.setRequestProperty(&quot;Girder-Token&quot;, token)));</span>
+
+<span class="nc bnc" id="L174" title="All 2 branches missed.">            if (res.code &gt;= 400) {</span>
+<span class="nc" id="L175">                logger.error(&quot;Unable to get girder filename for file {} : {}&quot;, fileId, res.response);</span>
+<span class="nc" id="L176">                throw new BusinessException(</span>
+                    &quot;Unable to get file info: &quot; + res.response);
+            }
+
+<span class="nc" id="L180">            ObjectNode node =</span>
+<span class="nc" id="L181">                new ObjectMapper().readValue(res.response, ObjectNode.class);</span>
+<span class="nc" id="L182">            String name = node.get(&quot;name&quot;).asText();</span>
+
+            // clean filename as in an uploaded file
+<span class="nc" id="L185">            return DataManagerUtil.getCleanFilename(name);</span>
+<span class="nc" id="L186">        } catch (IOException ex) {</span>
+<span class="nc" id="L187">            logger.error(&quot;Error getting girder filename for {} with token {}&quot;,</span>
+                    fileId, token, ex);
+<span class="nc" id="L189">            throw new BusinessException(&quot;Unable to get file info&quot;, ex);</span>
+        }
+    }
+
+    private static final String METHOD_GET = &quot;GET&quot;;
+    private static final String METHOD_POST = &quot;POST&quot;;
+    private HttpResult makeHttpRequest(
+        String surl,
+        String method,
+        Optional&lt;Consumer&lt;HttpURLConnection&gt;&gt; connectionUpdater)
+        throws IOException {
+
+<span class="nc" id="L201">        URL url = new URL(surl);</span>
+
+<span class="nc" id="L203">        HttpURLConnection con = (HttpURLConnection) url.openConnection();</span>
+<span class="nc" id="L204">        con.setRequestMethod(method);</span>
+<span class="nc bnc" id="L205" title="All 2 branches missed.">        if (METHOD_POST.equals(method)) {</span>
+<span class="nc" id="L206">            con.setDoOutput(true);</span>
+<span class="nc" id="L207">            con.setFixedLengthStreamingMode(0);</span>
+        }
+<span class="nc" id="L209">        con.setRequestProperty(&quot;Content-Type&quot;, &quot;application/json&quot;);</span>
+<span class="nc" id="L210">        con.setRequestProperty(&quot;Accept&quot;, &quot;application/json&quot;);</span>
+
+<span class="nc" id="L212">        connectionUpdater.ifPresent(f -&gt; f.accept(con));</span>
+
+<span class="nc bnc" id="L214" title="All 2 branches missed.">        InputStream is = con.getResponseCode() &gt;= 400</span>
+<span class="nc" id="L215">            ? con.getErrorStream()</span>
+<span class="nc" id="L216">            : con.getInputStream();</span>
+
+<span class="nc" id="L218">        StringBuilder response = new StringBuilder();</span>
+<span class="nc" id="L219">        try (BufferedReader br1 =</span>
+             new BufferedReader(new InputStreamReader(is))) {
+
+<span class="nc" id="L222">            String line = null;</span>
+<span class="nc bnc" id="L223" title="All 2 branches missed.">            while ((line = br1.readLine()) != null) {</span>
+<span class="nc" id="L224">                response.append(line);</span>
+            }
+        }
+
+<span class="nc" id="L228">        con.disconnect();</span>
+
+<span class="nc" id="L230">        return new HttpResult(con.getResponseCode(), response.toString());</span>
+    }
+
+    private static class HttpResult {
+        final int code;
+        final String response;
+
+<span class="nc" id="L237">        public HttpResult(int code, String response) {</span>
+<span class="nc" id="L238">            this.code = code;</span>
+<span class="nc" id="L239">            this.response = response;</span>
+<span class="nc" id="L240">        }</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

@@ -1,0 +1,328 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../jacoco-resources/report.gif" type="image/gif"/><title>ClassData.java</title><link rel="stylesheet" href="../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../index.html" class="el_report">coverage</a> &gt; <a href="../index.html" class="el_bundle">vip-application</a> &gt; <a href="index.source.html" class="el_package">fr.insalyon.creatis.vip.application.server.dao.mysql</a> &gt; <span class="el_source">ClassData.java</span></div><h1>ClassData.java</h1><pre class="source lang-java linenums">/*
+ * Copyright and authors: see LICENSE.txt in base repository.
+ *
+ * This software is a web portal for pipeline execution on distributed systems.
+ *
+ * This software is governed by the CeCILL-B license under French law and
+ * abiding by the rules of distribution of free software.  You can  use,
+ * modify and/ or redistribute the software under the terms of the CeCILL-B
+ * license as circulated by CEA, CNRS and INRIA at the following URL
+ * &quot;http://www.cecill.info&quot;.
+ *
+ * As a counterpart to the access to the source code and  rights to copy,
+ * modify and redistribute granted by the license, users are provided only
+ * with a limited warranty  and the software's author,  the holder of the
+ * economic rights,  and the successive licensors  have only  limited
+ * liability.
+ *
+ * In this respect, the user's attention is drawn to the risks associated
+ * with loading,  using,  modifying and/or developing or reproducing the
+ * software by the user in light of its specific status of free software,
+ * that may mean  that it is complicated to manipulate,  and  that  also
+ * therefore means  that it is reserved for developers  and  experienced
+ * professionals having in-depth computer knowledge. Users are therefore
+ * encouraged to load and test the software's suitability as regards their
+ * requirements in conditions enabling the security of their systems and/or
+ * data to be ensured and,  more generally, to use and operate it in the
+ * same conditions as regards security.
+ *
+ * The fact that you are presently reading this means that you have had
+ * knowledge of the CeCILL-B license and that you accept its terms.
+ */
+package fr.insalyon.creatis.vip.application.server.dao.mysql;
+
+import fr.insalyon.creatis.vip.application.client.bean.AppClass;
+import fr.insalyon.creatis.vip.application.server.dao.ClassDAO;
+import fr.insalyon.creatis.vip.core.client.view.CoreConstants.GROUP_ROLE;
+import fr.insalyon.creatis.vip.core.server.dao.DAOException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.support.JdbcDaoSupport;
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
+
+import javax.sql.DataSource;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * @author Rafael Ferreira da Silva
+ */
+@Repository
+@Transactional
+<span class="fc" id="L57">public class ClassData extends JdbcDaoSupport implements ClassDAO {</span>
+
+<span class="fc" id="L59">    private final Logger logger = LoggerFactory.getLogger(getClass());</span>
+
+    @Autowired
+    public void useDataSource(DataSource dataSource) {
+<span class="fc" id="L63">        setDataSource(dataSource);</span>
+<span class="fc" id="L64">    }</span>
+
+    @Override
+    public void add(AppClass appClass) throws DAOException {
+        try {
+<span class="fc" id="L69">            PreparedStatement ps = getConnection().prepareStatement(</span>
+                    &quot;INSERT INTO VIPClasses(name) &quot;
+                            + &quot;VALUES (?)&quot;);
+
+<span class="fc" id="L73">            ps.setString(1, appClass.getName());</span>
+<span class="fc" id="L74">            ps.execute();</span>
+<span class="fc" id="L75">            ps.close();</span>
+
+<span class="fc" id="L77">        } catch (SQLException ex) {</span>
+<span class="pc bpc" id="L78" title="3 of 4 branches missed.">            if (ex.getMessage().contains(&quot;Unique index or primary key violation&quot;) || ex.getMessage().contains(&quot;Duplicate entry &quot;)) {</span>
+<span class="fc" id="L79">                logger.error(&quot;A class named \&quot;{}\&quot; already exists.&quot;, appClass.getName());</span>
+<span class="fc" id="L80">                throw new DAOException(&quot;A class named \&quot;&quot; + appClass.getName() + &quot;\&quot; already exists.&quot;);</span>
+            } else {
+<span class="nc" id="L82">                logger.error(&quot;Error adding class {}&quot;, appClass.getName(), ex);</span>
+<span class="nc" id="L83">                throw new DAOException(ex);</span>
+            }
+<span class="fc" id="L85">        }</span>
+
+<span class="fc" id="L87">        addToClass(appClass.getName(), appClass.getEngines(), &quot;engine&quot;);</span>
+<span class="fc" id="L88">        addToClass(appClass.getName(), appClass.getGroups(), &quot;group&quot;);</span>
+<span class="fc" id="L89">    }</span>
+
+    @Override
+    public void update(AppClass appClass) throws DAOException {
+
+<span class="fc" id="L94">        removeFromClass(appClass.getName(), &quot;engine&quot;);</span>
+<span class="fc" id="L95">        addToClass(appClass.getName(), appClass.getEngines(), &quot;engine&quot;);</span>
+
+<span class="fc" id="L97">        removeFromClass(appClass.getName(), &quot;group&quot;);</span>
+<span class="fc" id="L98">        addToClass(appClass.getName(), appClass.getGroups(), &quot;group&quot;);</span>
+
+<span class="fc" id="L100">    }</span>
+
+    @Override
+    public void remove(String className) throws DAOException {
+
+        try {
+<span class="fc" id="L106">            PreparedStatement ps = getConnection().prepareStatement(&quot;DELETE &quot;</span>
+                    + &quot;FROM VIPClasses WHERE name=?&quot;);
+
+<span class="fc" id="L109">            ps.setString(1, className);</span>
+<span class="fc" id="L110">            ps.execute();</span>
+<span class="fc" id="L111">            ps.close();</span>
+
+<span class="nc" id="L113">        } catch (SQLException ex) {</span>
+<span class="nc" id="L114">            logger.error(&quot;Error removing class {}&quot;, className, ex);</span>
+<span class="nc" id="L115">            throw new DAOException(ex);</span>
+<span class="fc" id="L116">        }</span>
+<span class="fc" id="L117">    }</span>
+
+    @Override
+    public List&lt;AppClass&gt; getClasses() throws DAOException {
+
+        try {
+<span class="fc" id="L123">            PreparedStatement ps = getConnection().prepareStatement(</span>
+                    &quot;SELECT distinct name FROM VIPClasses ORDER BY name&quot;);
+
+<span class="fc" id="L126">            ResultSet rs = ps.executeQuery();</span>
+<span class="fc" id="L127">            List&lt;AppClass&gt; classes = new ArrayList&lt;AppClass&gt;();</span>
+
+<span class="fc bfc" id="L129" title="All 2 branches covered.">            while (rs.next()) {</span>
+<span class="fc" id="L130">                List&lt;String&gt; groups = new ArrayList&lt;String&gt;();</span>
+<span class="fc" id="L131">                PreparedStatement ps2 = getConnection().prepareStatement(</span>
+                        &quot;SELECT groupname FROM VIPGroupsClasses &quot;
+                                + &quot;WHERE classname=? ORDER BY groupname&quot;);
+<span class="fc" id="L134">                ps2.setString(1, rs.getString(&quot;name&quot;));</span>
+<span class="fc" id="L135">                ResultSet rg = ps2.executeQuery();</span>
+
+<span class="fc bfc" id="L137" title="All 2 branches covered.">                while (rg.next()) {</span>
+<span class="fc" id="L138">                    groups.add(rg.getString(&quot;groupname&quot;));</span>
+                }
+<span class="fc" id="L140">                ps2.close();</span>
+
+<span class="fc" id="L142">                List&lt;String&gt; engines = new ArrayList&lt;String&gt;();</span>
+<span class="fc" id="L143">                PreparedStatement ps3 = getConnection().prepareStatement(</span>
+                        &quot;SELECT engine FROM VIPClassesEngines &quot;
+                                + &quot;WHERE class=? ORDER BY engine&quot;);
+<span class="fc" id="L146">                ps3.setString(1, rs.getString(&quot;name&quot;));</span>
+<span class="fc" id="L147">                ResultSet re = ps3.executeQuery();</span>
+<span class="fc bfc" id="L148" title="All 2 branches covered.">                while (re.next()) {</span>
+<span class="fc" id="L149">                    engines.add(re.getString(&quot;engine&quot;));</span>
+                }
+<span class="fc" id="L151">                ps3.close();</span>
+
+<span class="fc" id="L153">                classes.add(new AppClass(rs.getString(&quot;name&quot;),</span>
+                        engines, groups));
+<span class="fc" id="L155">            }</span>
+
+<span class="fc" id="L157">            ps.close();</span>
+<span class="fc" id="L158">            return classes;</span>
+
+<span class="nc" id="L160">        } catch (SQLException ex) {</span>
+<span class="nc" id="L161">            logger.error(&quot;Error getting all classes&quot;, ex);</span>
+<span class="nc" id="L162">            throw new DAOException(ex);</span>
+        }
+    }
+
+    @Override
+    public AppClass getClass(String className) throws DAOException {
+        try {
+
+            // Get class
+<span class="fc" id="L171">            PreparedStatement ps = getConnection().prepareStatement(</span>
+                    &quot;SELECT name FROM VIPClasses WHERE name=?&quot;);
+<span class="fc" id="L173">            ps.setString(1, className);</span>
+<span class="fc" id="L174">            ResultSet rs = ps.executeQuery();</span>
+
+<span class="fc bfc" id="L176" title="All 2 branches covered.">            if (rs.first()) {</span>
+
+                // Get groups associated to class
+<span class="fc" id="L179">                List&lt;String&gt; groups = new ArrayList&lt;String&gt;();</span>
+<span class="fc" id="L180">                PreparedStatement ps2 = getConnection().prepareStatement(</span>
+                        &quot;SELECT groupname FROM VIPGroupsClasses &quot;
+                                + &quot;WHERE classname=? ORDER BY groupname&quot;);
+<span class="fc" id="L183">                ps2.setString(1, rs.getString(&quot;name&quot;));</span>
+<span class="fc" id="L184">                ResultSet r = ps2.executeQuery();</span>
+<span class="fc bfc" id="L185" title="All 2 branches covered.">                while (r.next()) {</span>
+<span class="fc" id="L186">                    groups.add(r.getString(&quot;groupname&quot;));</span>
+                }
+<span class="fc" id="L188">                ps2.close();</span>
+                // Get engines associated to class
+<span class="fc" id="L190">                List&lt;String&gt; engines = new ArrayList&lt;String&gt;();</span>
+<span class="fc" id="L191">                PreparedStatement ps3 = getConnection().prepareStatement(</span>
+                        &quot;SELECT engine FROM VIPClassesEngines &quot;
+                                + &quot;WHERE class=? ORDER BY engine&quot;);
+<span class="fc" id="L194">                ps3.setString(1, rs.getString(&quot;name&quot;));</span>
+<span class="fc" id="L195">                ResultSet re = ps3.executeQuery();</span>
+<span class="fc bfc" id="L196" title="All 2 branches covered.">                while (re.next()) {</span>
+<span class="fc" id="L197">                    engines.add(re.getString(&quot;engine&quot;));</span>
+                }
+<span class="fc" id="L199">                ps3.close();</span>
+
+<span class="fc" id="L201">                return new AppClass(rs.getString(&quot;name&quot;),</span>
+                        engines, groups);
+            }
+<span class="fc" id="L204">            ps.close();</span>
+<span class="fc" id="L205">            return null;</span>
+
+<span class="nc" id="L207">        } catch (SQLException ex) {</span>
+<span class="nc" id="L208">            logger.error(&quot;Error getting class {}&quot;, className, ex);</span>
+<span class="nc" id="L209">            throw new DAOException(ex);</span>
+        }
+    }
+
+    @Override
+    public List&lt;AppClass&gt; getUserClasses(String email, boolean validAdmin) throws DAOException {
+
+        try {
+<span class="pc bpc" id="L217" title="1 of 2 branches missed.">            String clause = validAdmin ? &quot; AND ug.role = ?&quot; : &quot;&quot;;</span>
+
+<span class="fc" id="L219">            PreparedStatement ps = getConnection().prepareStatement(&quot;SELECT DISTINCT classname &quot;</span>
+                    + &quot;FROM VIPGroupsClasses gc, VIPUsersGroups ug &quot;
+                    + &quot;WHERE ug.groupname = gc.groupname AND ug.email = ?&quot; + clause);
+
+<span class="fc" id="L223">            ps.setString(1, email);</span>
+<span class="pc bpc" id="L224" title="1 of 2 branches missed.">            if (validAdmin) {</span>
+<span class="nc" id="L225">                ps.setString(2, GROUP_ROLE.Admin.name());</span>
+            }
+
+<span class="fc" id="L228">            ResultSet rs = ps.executeQuery();</span>
+<span class="fc" id="L229">            List&lt;AppClass&gt; classes = new ArrayList&lt;AppClass&gt;();</span>
+
+<span class="pc bpc" id="L231" title="1 of 2 branches missed.">            while (rs.next()) {</span>
+<span class="nc" id="L232">                List&lt;String&gt; groups = new ArrayList&lt;String&gt;();</span>
+<span class="nc" id="L233">                PreparedStatement ps2 = getConnection().prepareStatement(</span>
+                        &quot;SELECT groupname FROM VIPGroupsClasses &quot;
+                                + &quot;WHERE classname=? ORDER BY groupname&quot;);
+<span class="nc" id="L236">                ps2.setString(1, rs.getString(&quot;classname&quot;));</span>
+<span class="nc" id="L237">                ResultSet r = ps2.executeQuery();</span>
+
+<span class="nc bnc" id="L239" title="All 2 branches missed.">                while (r.next()) {</span>
+<span class="nc" id="L240">                    groups.add(r.getString(&quot;groupname&quot;));</span>
+                }
+<span class="nc" id="L242">                classes.add(new AppClass(rs.getString(&quot;classname&quot;), groups));</span>
+<span class="nc" id="L243">                ps2.close();</span>
+<span class="nc" id="L244">            }</span>
+
+<span class="fc" id="L246">            ps.close();</span>
+<span class="fc" id="L247">            return classes;</span>
+
+<span class="nc" id="L249">        } catch (SQLException ex) {</span>
+<span class="nc" id="L250">            logger.error(&quot;Error getting classes for {} (validAdmin : {})&quot;, email, validAdmin, ex);</span>
+<span class="nc" id="L251">            throw new DAOException(ex);</span>
+        }
+    }
+
+    /**
+     * @param objectType (group or engine)
+     */
+    private void addToClass(String className, List&lt;String&gt; objectList, String objectType) throws DAOException {
+
+<span class="fc bfc" id="L260" title="All 2 branches covered.">        for (String name : objectList) {</span>
+            try {
+                PreparedStatement ps;
+<span class="pc bpc" id="L263" title="1 of 3 branches missed.">                switch (objectType) {</span>
+                    case &quot;group&quot;:
+<span class="fc" id="L265">                        ps = getConnection().prepareStatement(&quot;INSERT INTO &quot;</span>
+                                + &quot;VIPGroupsClasses(classname, groupname) &quot;
+                                + &quot;VALUES(?, ?)&quot;);
+<span class="fc" id="L268">                        break;</span>
+                    case &quot;engine&quot;:
+<span class="fc" id="L270">                        ps = getConnection().prepareStatement(&quot;INSERT INTO &quot;</span>
+                                + &quot;VIPClassesEngines(class, engine) &quot;
+                                + &quot;VALUES(?, ?)&quot;);
+<span class="fc" id="L273">                        break;</span>
+                    default:
+<span class="nc" id="L275">                        logger.error(&quot;Error adding something to class {} : invalid objectType {}&quot;,</span>
+                                className, objectType);
+<span class="nc" id="L277">                        throw new IllegalArgumentException(&quot;Invalid objectType: &quot; + objectType);</span>
+                }
+<span class="fc" id="L279">                ps.setString(1, className);</span>
+<span class="fc" id="L280">                ps.setString(2, name);</span>
+<span class="fc" id="L281">                ps.execute();</span>
+<span class="fc" id="L282">                ps.close();</span>
+
+<span class="nc" id="L284">            } catch (SQLException ex) {</span>
+<span class="nc bnc" id="L285" title="All 4 branches missed.">                if (ex.getMessage().contains(&quot;Unique index or primary key violation&quot;) || ex.getMessage().contains(&quot;Duplicate entry &quot;)) {</span>
+<span class="nc" id="L286">                    logger.error(&quot;a &quot; + objectType + &quot; named \&quot;&quot; + name + &quot;\&quot; is already associated with the class.&quot;);</span>
+<span class="nc" id="L287">                    throw new DAOException(&quot;a &quot; + objectType + &quot; named \&quot;&quot; + name + &quot;\&quot; is already associated with the class.&quot;, ex);</span>
+                } else {
+<span class="nc" id="L289">                    logger.error(&quot;Error adding {} {} to class {}&quot;, objectType, objectList, className, ex);</span>
+<span class="nc" id="L290">                    throw new DAOException(ex);</span>
+                }
+<span class="fc" id="L292">            }</span>
+<span class="fc" id="L293">        }</span>
+<span class="fc" id="L294">    }</span>
+
+    /**
+     * @param objectType (group or engine)
+     */
+    private void removeFromClass(String className, String objectType) throws DAOException {
+
+        try {
+            PreparedStatement ps;
+<span class="pc bpc" id="L303" title="1 of 3 branches missed.">            switch (objectType) {</span>
+                case &quot;group&quot;:
+<span class="fc" id="L305">                    ps = getConnection().prepareStatement(&quot;DELETE FROM &quot;</span>
+                            + &quot;VIPGroupsClasses WHERE className=?&quot;);
+<span class="fc" id="L307">                    break;</span>
+                case &quot;engine&quot;:
+<span class="fc" id="L309">                    ps = getConnection().prepareStatement(&quot;DELETE FROM &quot;</span>
+                            + &quot;VIPClassesEngines WHERE class=?&quot;);
+<span class="fc" id="L311">                    break;</span>
+                default:
+<span class="nc" id="L313">                    logger.error(&quot;Error removing something from class {} : invalid objectType {}&quot;,</span>
+                            className, objectType);
+<span class="nc" id="L315">                    throw new IllegalArgumentException(&quot;Invalid objectType: &quot; + objectType);</span>
+            }
+
+<span class="fc" id="L318">            ps.setString(1, className);</span>
+<span class="fc" id="L319">            ps.execute();</span>
+<span class="fc" id="L320">            ps.close();</span>
+
+<span class="nc" id="L322">        } catch (SQLException ex) {</span>
+<span class="nc" id="L323">            logger.error(&quot;Error removing {} from class {}&quot;, objectType, className, ex);</span>
+<span class="nc" id="L324">            throw new DAOException(ex);</span>
+<span class="fc" id="L325">        }</span>
+<span class="fc" id="L326">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>
