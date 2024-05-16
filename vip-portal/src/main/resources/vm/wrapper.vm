@@ -19,6 +19,22 @@ function error {
   echo [ ERROR - $D ] $* >&2
 }
 
+function function_singularity {
+    cat > singularity << 'EOF'
+          #!/bin/bash
+          /cvmfs/dirac.egi.eu/container/apptainer/bin/apptainer "$@"
+EOF
+}
+
+# Call the function to create the singularity script and make it executable
+function_singularity
+chmod +x singularity
+
+# Define a function to run singularity commands
+singularity() {
+    ./singularity "$@"
+}
+
 function download_udocker {
   #installation of udocker
   info "cloning udocker ${UDOCKER_TAG} "
