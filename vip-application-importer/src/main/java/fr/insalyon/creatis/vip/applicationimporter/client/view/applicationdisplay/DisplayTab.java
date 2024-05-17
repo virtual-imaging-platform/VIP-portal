@@ -39,6 +39,7 @@ import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.tab.Tab;
+
 import fr.insalyon.creatis.vip.application.client.bean.boutiquesTools.BoutiquesApplication;
 import fr.insalyon.creatis.vip.application.client.view.boutiquesParsing.BoutiquesParser;
 import fr.insalyon.creatis.vip.application.client.view.boutiquesParsing.InvalidBoutiquesDescriptorException;
@@ -80,27 +81,37 @@ public class DisplayTab extends Tab {
         globalLayout.setMargin(6);
         globalLayout.setMembersMargin(5);
 
-        generalLayout = new GeneralLayout("50%", "100%");
+        HLayout upperRow = new HLayout();
+        upperRow.setWidth100();
+        upperRow.setHeight("45%"); // Occupy 45% of the height
+        upperRow.setMargin(0);
+        upperRow.setMembersMargin(10);
+        upperRow.setStyleName("shadow-lg");
 
-        inputsLayout = new InputLayout("50%", "100%");
-        outputsLayout = new OutputLayout("50%", "100%");
-        vipLayout = new VIPLayout("50%", "100%");
+        VLayout spaceLayout = new VLayout(); // Layout for the space between upper and lower rows
+        spaceLayout.setWidth100();
+        spaceLayout.setHeight("10%"); // Occupy 10% of the height
+        spaceLayout.setMargin(0);
 
-        HLayout hLayout1 = new HLayout();
-        hLayout1.setMembersMargin(10);
-        hLayout1.setHeight("50%");
-        hLayout1.addMember(generalLayout);
-        hLayout1.addMember(outputsLayout);
-        globalLayout.addMember(hLayout1);
+        HLayout lowerRow = new HLayout();
+        lowerRow.setWidth100();
+        lowerRow.setHeight("45%"); // Occupy 45% of the height
+        lowerRow.setMargin(0);
+        lowerRow.setMembersMargin(10);
 
-        HLayout hLayout2 = new HLayout();
-        hLayout2.setMembersMargin(10);
-        hLayout2.setHeight("50%");
-        hLayout2.addMember(inputsLayout);
-        hLayout2.addMember(vipLayout);
-        globalLayout.addMember(hLayout2);
+        generalLayout = new GeneralLayout("50%", "100%"); // Adjusted height to occupy half the height
+        inputsLayout = new InputLayout("50%", "100%"); 
+        outputsLayout = new OutputLayout("50%", "100%"); 
+        vipLayout = new VIPLayout("50%", "100%"); 
 
-        globalLayout.addMember(hLayout2);
+        upperRow.addMember(generalLayout);
+        upperRow.addMember(outputsLayout);
+        lowerRow.addMember(inputsLayout);
+        lowerRow.addMember(vipLayout);
+
+        globalLayout.addMember(upperRow);
+        globalLayout.addMember(spaceLayout); // Add the space layout between the upper and lower rows
+        globalLayout.addMember(lowerRow);
         IButton createApplicationButton;
         createApplicationButton = WidgetUtil.getIButton("Create application", Constants.ICON_LAUNCH, new ClickHandler() {
             @Override
