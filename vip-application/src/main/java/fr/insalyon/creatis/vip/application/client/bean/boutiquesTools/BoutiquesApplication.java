@@ -33,6 +33,8 @@ public class BoutiquesApplication implements IsSerializable {
     private Set<BoutiquesOutputFile> outputFiles = new HashSet<>();
     private Map<String, String> tags = new HashMap<>();
     private String jsonFile;
+    private static Set<String> commandLineFlag;
+    private Set<String> customProperties;
 
     private BoutiquesApplicationExtensions boutiquesExtensions;
 
@@ -220,6 +222,40 @@ public class BoutiquesApplication implements IsSerializable {
         return this.applicationLFN + "/json/" + getName() + ".json";
     }
 
+    public String getCustomProperties() {
+        if (customProperties == null || customProperties.isEmpty()) {
+            return "";
+          }
+          // Use a StringBuilder to efficiently build the string
+          StringBuilder formattedString = new StringBuilder();
+          boolean first = true;
+          for (String property : customProperties) {
+            if (!first) {
+              formattedString.append(", "); // Add comma and space after first element
+            }
+            formattedString.append(property);
+            first = false;
+          }
+          return formattedString.toString();
+    }
+
+    public String getCommandLineFlag() {
+        if (commandLineFlag == null || commandLineFlag.isEmpty()) {
+            return "";
+          }
+          // Use a StringBuilder to efficiently build the string
+          StringBuilder formattedString = new StringBuilder();
+          boolean first = true;
+          for (String property : commandLineFlag) {
+            if (!first) {
+              formattedString.append(", ");
+            }
+            formattedString.append(property);
+            first = false;
+          }
+          return formattedString.toString();
+    }
+
 
 
     public void addInput(BoutiquesInput input){
@@ -264,6 +300,38 @@ public class BoutiquesApplication implements IsSerializable {
 
     public void setApplicationLFN(String applicationLFN) {
         this.applicationLFN = applicationLFN;
+    }
+
+    public void setCustomProperties(Set<String> inputIds) {
+        this.customProperties = inputIds;
+    }
+
+    public static void setCommandLineFlag(Set<String> commandLineFlag) {
+        BoutiquesApplication.commandLineFlag = commandLineFlag;
+    }
+
+    public String setWarning() {
+        Set<String> commonValues = new HashSet<>();
+        for (String customValue : customProperties) {
+            // If the value is found in commandLineFlags set, add it to commonValues set
+            if (commandLineFlag.contains(customValue)) {
+                commonValues.add(customValue);
+            }
+        }
+        if (commonValues == null || commonValues.isEmpty()) {
+            return "";
+          }
+          // Use a StringBuilder to efficiently build the string
+          StringBuilder formattedString = new StringBuilder();
+          boolean first = true;
+          for (String property : commandLineFlag) {
+            if (!first) {
+              formattedString.append(", ");
+            }
+            formattedString.append(property);
+            first = false;
+          }
+        return formattedString.toString();
     }
 
     public void addTag(String key, String value) {

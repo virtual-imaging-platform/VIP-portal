@@ -144,6 +144,10 @@ public class BoutiquesImportLayout extends AbstractFormLayout {
                                 Constants.TAB_ID_BOUTIQUES_APPLICATION,
                                 Constants.TAB_NAME_BOUTIQUES));
                     displayTab.setBoutiqueTool(boutiquesTool);
+                    if (boutiquesTool.setWarning() != null) {
+                        String warningMessage = "<b>" + boutiquesTool.setWarning() + "</b> appears as a command-line flag input, it should not be included in Dot iteration. Importing it may cause functionality issues, although the application will still be imported.";
+                        Layout.getInstance().setWarningMessage(warningMessage);
+                    }
                 } catch (ApplicationImporterException ex) {
                     Layout.getInstance().setWarningMessage(
                         "Unable to parse JSON file :" + ex.getMessage());
