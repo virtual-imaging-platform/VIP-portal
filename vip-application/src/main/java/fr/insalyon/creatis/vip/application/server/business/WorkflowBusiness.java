@@ -272,7 +272,7 @@ public class WorkflowBusiness {
             AppVersion version = applicationDAO.getVersion(
                     applicationName, applicationVersion);
             String workflowPath =
-                    dataManagerBusiness.getRemoteFile(user, version.getLfn());
+                    dataManagerBusiness.getRemoteFile(user, version.getJsonLfn());
 
             //selectRandomEngine could also be used; TODO: make this choice configurable
             Engine engine = selectEngine(applicationClass);
@@ -431,7 +431,7 @@ public class WorkflowBusiness {
         try {
             AppVersion version = applicationDAO.getVersion(applicationName, applicationVersion);
             String workflowPath =
-                    dataManagerBusiness.getRemoteFile(user, version.getLfn());
+                    dataManagerBusiness.getRemoteFile(user, version.getJsonLfn());
             return workflowPath.endsWith(".gwendia")
                     ? getGwendiaParser().parse(workflowPath)
                     : getScuflParser().parse(workflowPath);
