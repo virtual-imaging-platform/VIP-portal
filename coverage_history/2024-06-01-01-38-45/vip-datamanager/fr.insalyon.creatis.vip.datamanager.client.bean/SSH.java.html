@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../jacoco-resources/report.gif" type="image/gif"/><title>SSH.java</title><link rel="stylesheet" href="../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../index.html" class="el_report">coverage</a> &gt; <a href="../index.html" class="el_bundle">vip-datamanager</a> &gt; <a href="index.source.html" class="el_package">fr.insalyon.creatis.vip.datamanager.client.bean</a> &gt; <span class="el_source">SSH.java</span></div><h1>SSH.java</h1><pre class="source lang-java linenums">/*
+ * Copyright and authors: see LICENSE.txt in base repository.
+ *
+ * This software is a web portal for pipeline execution on distributed systems.
+ *
+ * This software is governed by the CeCILL-B license under French law and
+ * abiding by the rules of distribution of free software.  You can  use, 
+ * modify and/ or redistribute the software under the terms of the CeCILL-B
+ * license as circulated by CEA, CNRS and INRIA at the following URL
+ * &quot;http://www.cecill.info&quot;. 
+ *
+ * As a counterpart to the access to the source code and  rights to copy,
+ * modify and redistribute granted by the license, users are provided only
+ * with a limited warranty  and the software's author,  the holder of the
+ * economic rights,  and the successive licensors  have only  limited
+ * liability. 
+ *
+ * In this respect, the user's attention is drawn to the risks associated
+ * with loading,  using,  modifying and/or developing or reproducing the
+ * software by the user in light of its specific status of free software,
+ * that may mean  that it is complicated to manipulate,  and  that  also
+ * therefore means  that it is reserved for developers  and  experienced
+ * professionals having in-depth computer knowledge. Users are therefore
+ * encouraged to load and test the software's suitability as regards their
+ * requirements in conditions enabling the security of their systems and/or 
+ * data to be ensured and,  more generally, to use and operate it in the 
+ * same conditions as regards security. 
+ *
+ * The fact that you are presently reading this means that you have had
+ * knowledge of the CeCILL-B license and that you accept its terms.
+ */
+package fr.insalyon.creatis.vip.datamanager.client.bean;
+
+import com.google.gwt.user.client.rpc.IsSerializable;
+import java.util.Date;
+
+/**
+ *
+ * @author glatard, Nouha Boujelben
+ */
+public class SSH implements IsSerializable {
+
+    private String email;
+    private String name;
+    private String user;
+    private String host;
+    private int port;
+    private TransferType transferType;
+    private String directory;
+    private String status;
+    private Date theEarliestNextSynchronistation;
+    private long numberSynchronizationFailed;
+    private boolean checkFilesContent;
+    private boolean deleteFilesFromSource;
+    private boolean active;
+    private String sshFiles;
+    private String lfcFiles;
+    private String lfcDir;
+
+<span class="nc" id="L60">    public SSH() {</span>
+<span class="nc" id="L61">    }</span>
+
+    /**
+     * Adds an SSH connection.
+     *
+     * @param email the user mail
+     * @param name the connection name
+     * @param user the ssh user name
+     * @param host the ssh host name
+     * @param port the ssh port
+     * @param transferType specifying a type to transfer data
+     * @param directory the full path of the synchronization folder
+     * @param status the connection status
+     * @param theEarliestNextSynchronistation
+     * @param numberSynchronizationFailed the number of times the
+     * synchronization failed
+     * @param deleteFilesFromSource enbale delete files from source location
+     */
+    public SSH(String email, String lfcDir,String name, String user, String host, int port, TransferType transferType, String directory, String status, Date theEarliestNextSynchronistation, long numberSynchronizationFailed, boolean checkFilesContent, boolean deleteFilesFromSource, boolean active, String sshFiles, String lfcFiles) {
+<span class="nc" id="L80">        this(email, lfcDir, user, host, port, transferType, directory, status, checkFilesContent, deleteFilesFromSource, active);</span>
+<span class="nc" id="L81">        this.name=name;</span>
+<span class="nc" id="L82">        this.theEarliestNextSynchronistation = theEarliestNextSynchronistation;</span>
+<span class="nc" id="L83">        this.numberSynchronizationFailed = numberSynchronizationFailed;</span>
+<span class="nc" id="L84">        this.sshFiles = sshFiles;</span>
+<span class="nc" id="L85">        this.lfcFiles = lfcFiles;</span>
+<span class="nc" id="L86">    }</span>
+
+<span class="nc" id="L88">    public SSH(String email, String lfcDir, String user, String host, int port, TransferType transferType, String directory, String status, boolean checkFilesContent, boolean deleteFilesFromSource, boolean active) {</span>
+<span class="nc" id="L89">        this.email = email;</span>
+<span class="nc" id="L90">        this.lfcDir = lfcDir;</span>
+<span class="nc" id="L91">        this.user = user;</span>
+<span class="nc" id="L92">        this.host = host;</span>
+<span class="nc" id="L93">        this.port = port;</span>
+<span class="nc" id="L94">        this.transferType = transferType;</span>
+<span class="nc" id="L95">        this.directory = directory;</span>
+<span class="nc" id="L96">        this.status = status;</span>
+<span class="nc" id="L97">        this.checkFilesContent = checkFilesContent;</span>
+<span class="nc" id="L98">        this.deleteFilesFromSource = deleteFilesFromSource;</span>
+<span class="nc" id="L99">        this.active = active;</span>
+<span class="nc" id="L100">    }</span>
+
+    public String getName() {
+<span class="nc" id="L103">        return name;</span>
+    }
+
+    public String getUser() {
+<span class="nc" id="L107">        return user;</span>
+    }
+
+    public String getHost() {
+<span class="nc" id="L111">        return host;</span>
+    }
+
+    public int getPort() {
+<span class="nc" id="L115">        return port;</span>
+    }
+
+    public String getDirectory() {
+<span class="nc" id="L119">        return directory;</span>
+    }
+
+    public TransferType getTransferType() {
+<span class="nc" id="L123">        return transferType;</span>
+    }
+
+    public String getStatus() {
+<span class="nc" id="L127">        return status;</span>
+    }
+
+    public Date getTheEarliestNextSynchronistation() {
+<span class="nc" id="L131">        return theEarliestNextSynchronistation;</span>
+    }
+
+    public void setTheEarliestNextSynchronistation(Date theEarliestNextSynchronistation) {
+<span class="nc" id="L135">        this.theEarliestNextSynchronistation = theEarliestNextSynchronistation;</span>
+<span class="nc" id="L136">    }</span>
+
+    public String getEmail() {
+<span class="nc" id="L139">        return email;</span>
+    }
+
+    public long getNumberSynchronizationFailed() {
+<span class="nc" id="L143">        return numberSynchronizationFailed;</span>
+    }
+
+    public void setNumberSynchronizationFailed(long numberSynchronizationFailed) {
+<span class="nc" id="L147">        this.numberSynchronizationFailed = numberSynchronizationFailed;</span>
+<span class="nc" id="L148">    }</span>
+
+    public boolean isDeleteFilesFromSource() {
+<span class="nc" id="L151">        return deleteFilesFromSource;</span>
+    }
+
+    public void setDeleteFilesFromSource(boolean deleteFilesFromSource) {
+<span class="nc" id="L155">        this.deleteFilesFromSource = deleteFilesFromSource;</span>
+<span class="nc" id="L156">    }</span>
+
+    public boolean isActive() {
+<span class="nc" id="L159">        return active;</span>
+    }
+
+    public void setActive(boolean active) {
+<span class="nc" id="L163">        this.active = active;</span>
+<span class="nc" id="L164">    }</span>
+
+    public boolean isCheckFilesContent() {
+<span class="nc" id="L167">        return checkFilesContent;</span>
+    }
+
+    public void setCheckFilesContent(boolean checkFilesContent) {
+<span class="nc" id="L171">        this.checkFilesContent = checkFilesContent;</span>
+<span class="nc" id="L172">    }</span>
+
+    public String getSshFiles() {
+<span class="nc" id="L175">        return sshFiles;</span>
+    }
+
+    public void setSshFiles(String sshFiles) {
+<span class="nc" id="L179">        this.sshFiles = sshFiles;</span>
+<span class="nc" id="L180">    }</span>
+
+    public String getLfcFiles() {
+<span class="nc" id="L183">        return lfcFiles;</span>
+    }
+
+    public void setLfcFiles(String lfcFiles) {
+<span class="nc" id="L187">        this.lfcFiles = lfcFiles;</span>
+<span class="nc" id="L188">    }</span>
+
+    public String getLfcDir() {
+<span class="nc" id="L191">        return lfcDir;</span>
+    }
+
+    public void setLfcDir(String lfcDir) {
+<span class="nc" id="L195">        this.lfcDir = lfcDir;</span>
+<span class="nc" id="L196">    }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

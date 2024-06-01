@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../jacoco-resources/report.gif" type="image/gif"/><title>GroupData.java</title><link rel="stylesheet" href="../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../index.html" class="el_report">coverage</a> &gt; <a href="../index.html" class="el_bundle">vip-core</a> &gt; <a href="index.source.html" class="el_package">fr.insalyon.creatis.vip.core.server.dao.mysql</a> &gt; <span class="el_source">GroupData.java</span></div><h1>GroupData.java</h1><pre class="source lang-java linenums">/*
+ * Copyright and authors: see LICENSE.txt in base repository.
+ *
+ * This software is a web portal for pipeline execution on distributed systems.
+ *
+ * This software is governed by the CeCILL-B license under French law and
+ * abiding by the rules of distribution of free software.  You can  use,
+ * modify and/ or redistribute the software under the terms of the CeCILL-B
+ * license as circulated by CEA, CNRS and INRIA at the following URL
+ * &quot;http://www.cecill.info&quot;.
+ *
+ * As a counterpart to the access to the source code and  rights to copy,
+ * modify and redistribute granted by the license, users are provided only
+ * with a limited warranty  and the software's author,  the holder of the
+ * economic rights,  and the successive licensors  have only  limited
+ * liability.
+ *
+ * In this respect, the user's attention is drawn to the risks associated
+ * with loading,  using,  modifying and/or developing or reproducing the
+ * software by the user in light of its specific status of free software,
+ * that may mean  that it is complicated to manipulate,  and  that  also
+ * therefore means  that it is reserved for developers  and  experienced
+ * professionals having in-depth computer knowledge. Users are therefore
+ * encouraged to load and test the software's suitability as regards their
+ * requirements in conditions enabling the security of their systems and/or
+ * data to be ensured and,  more generally, to use and operate it in the
+ * same conditions as regards security.
+ *
+ * The fact that you are presently reading this means that you have had
+ * knowledge of the CeCILL-B license and that you accept its terms.
+ */
+package fr.insalyon.creatis.vip.core.server.dao.mysql;
+
+import fr.insalyon.creatis.vip.core.client.bean.Group;
+import fr.insalyon.creatis.vip.core.server.dao.DAOException;
+import fr.insalyon.creatis.vip.core.server.dao.GroupDAO;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.support.JdbcDaoSupport;
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
+
+import javax.sql.DataSource;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * @author Rafael Ferreira da Silva
+ */
+@Repository
+@Transactional
+<span class="fc" id="L56">public class GroupData extends JdbcDaoSupport implements GroupDAO {</span>
+
+<span class="fc" id="L58">    private final Logger logger = LoggerFactory.getLogger(getClass());</span>
+
+    @Autowired
+    public void useDataSource(DataSource dataSource) {
+<span class="fc" id="L62">        setDataSource(dataSource);</span>
+<span class="fc" id="L63">    }</span>
+
+    @Override
+    public void add(Group group) throws DAOException {
+
+        try {
+<span class="fc" id="L69">            PreparedStatement ps = getConnection().prepareStatement(</span>
+                    &quot;INSERT INTO VIPGroups(groupname, public, gridfile, gridjobs) VALUES(?, ?, ?, ?)&quot;);
+<span class="fc" id="L71">            ps.setString(1, group.getName());</span>
+<span class="fc" id="L72">            ps.setBoolean(2, group.isPublicGroup());</span>
+<span class="fc" id="L73">            ps.setBoolean(3, group.isGridFile());</span>
+<span class="fc" id="L74">            ps.setBoolean(4, group.isGridJobs());</span>
+<span class="fc" id="L75">            ps.execute();</span>
+<span class="fc" id="L76">            ps.close();</span>
+
+<span class="fc" id="L78">        } catch (SQLException ex) {</span>
+<span class="pc bpc" id="L79" title="3 of 4 branches missed.">            if (ex.getMessage().contains(&quot;Unique index or primary key violation&quot;) || ex.getMessage().contains(&quot;Duplicate entry &quot;)) {</span>
+<span class="fc" id="L80">                logger.error(&quot;A group named {} already exists&quot;, group.getName());</span>
+<span class="fc" id="L81">                throw new DAOException(&quot;A group named &quot; + group.getName() + &quot; already exists&quot;);</span>
+            } else {
+<span class="nc" id="L83">                logger.error(&quot;Error adding group {}&quot;, group.getName(), ex);</span>
+<span class="nc" id="L84">                throw new DAOException(ex);</span>
+            }
+<span class="fc" id="L86">        }</span>
+<span class="fc" id="L87">    }</span>
+
+    @Override
+    public void remove(String groupName) throws DAOException {
+        try {
+<span class="fc" id="L92">            PreparedStatement ps = getConnection().prepareStatement(&quot;DELETE &quot;</span>
+                    + &quot;FROM VIPGroups WHERE groupname=?&quot;);
+
+<span class="fc" id="L95">            ps.setString(1, groupName);</span>
+<span class="fc" id="L96">            ps.execute();</span>
+<span class="fc" id="L97">            ps.close();</span>
+
+<span class="nc" id="L99">        } catch (SQLException ex) {</span>
+<span class="nc" id="L100">            logger.error(&quot;Error removing group {}&quot;, groupName, ex);</span>
+<span class="nc" id="L101">            throw new DAOException(ex);</span>
+<span class="fc" id="L102">        }</span>
+<span class="fc" id="L103">    }</span>
+
+    @Override
+    public void update(String name, Group group) throws DAOException {
+        try {
+<span class="fc" id="L108">            PreparedStatement ps = getConnection().prepareStatement(&quot;UPDATE &quot;</span>
+                    + &quot;VIPGroups &quot;
+                    + &quot;SET groupname=?, public=?, gridfile=?, gridjobs=? &quot;
+                    + &quot;WHERE groupname=?&quot;);
+
+<span class="fc" id="L113">            ps.setString(1, group.getName());</span>
+<span class="fc" id="L114">            ps.setBoolean(2, group.isPublicGroup());</span>
+<span class="fc" id="L115">            ps.setBoolean(3, group.isGridFile());</span>
+<span class="fc" id="L116">            ps.setBoolean(4, group.isGridJobs());</span>
+<span class="fc" id="L117">            ps.setString(5, name);</span>
+<span class="fc" id="L118">            ps.executeUpdate();</span>
+<span class="fc" id="L119">            ps.close();</span>
+
+<span class="nc" id="L121">        } catch (SQLException ex) {</span>
+<span class="nc" id="L122">            logger.error(&quot;Error updating group {}&quot;, group.getName(), ex);</span>
+<span class="nc" id="L123">            throw new DAOException(ex);</span>
+<span class="fc" id="L124">        }</span>
+<span class="fc" id="L125">    }</span>
+
+    @Override
+    public List&lt;Group&gt; getGroups() throws DAOException {
+        try {
+
+<span class="fc" id="L131">            List&lt;Group&gt; groups = new ArrayList&lt;Group&gt;();</span>
+<span class="fc" id="L132">            PreparedStatement ps = getConnection().prepareStatement(&quot;SELECT &quot;</span>
+                    + &quot;groupname, public, gridfile, gridjobs FROM &quot;
+                    + &quot;VIPGroups ORDER BY LOWER(groupname)&quot;);
+
+<span class="fc" id="L136">            ResultSet rs = ps.executeQuery();</span>
+<span class="fc bfc" id="L137" title="All 2 branches covered.">            while (rs.next()) {</span>
+<span class="fc" id="L138">                groups.add(new Group(rs.getString(&quot;groupname&quot;),</span>
+<span class="fc" id="L139">                        rs.getBoolean(&quot;public&quot;), rs.getBoolean(&quot;gridfile&quot;), rs.getBoolean(&quot;gridjobs&quot;)));</span>
+            }
+<span class="fc" id="L141">            ps.close();</span>
+<span class="fc" id="L142">            return groups;</span>
+
+<span class="nc" id="L144">        } catch (SQLException ex) {</span>
+<span class="nc" id="L145">            logger.error(&quot;Error getting all groups&quot;, ex);</span>
+<span class="nc" id="L146">            throw new DAOException(ex);</span>
+        }
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

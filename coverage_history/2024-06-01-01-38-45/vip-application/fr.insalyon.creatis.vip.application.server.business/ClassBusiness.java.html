@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../jacoco-resources/report.gif" type="image/gif"/><title>ClassBusiness.java</title><link rel="stylesheet" href="../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../index.html" class="el_report">coverage</a> &gt; <a href="../index.html" class="el_bundle">vip-application</a> &gt; <a href="index.source.html" class="el_package">fr.insalyon.creatis.vip.application.server.business</a> &gt; <span class="el_source">ClassBusiness.java</span></div><h1>ClassBusiness.java</h1><pre class="source lang-java linenums">/*
+ * Copyright and authors: see LICENSE.txt in base repository.
+ *
+ * This software is a web portal for pipeline execution on distributed systems.
+ *
+ * This software is governed by the CeCILL-B license under French law and
+ * abiding by the rules of distribution of free software.  You can  use,
+ * modify and/ or redistribute the software under the terms of the CeCILL-B
+ * license as circulated by CEA, CNRS and INRIA at the following URL
+ * &quot;http://www.cecill.info&quot;.
+ *
+ * As a counterpart to the access to the source code and  rights to copy,
+ * modify and redistribute granted by the license, users are provided only
+ * with a limited warranty  and the software's author,  the holder of the
+ * economic rights,  and the successive licensors  have only  limited
+ * liability.
+ *
+ * In this respect, the user's attention is drawn to the risks associated
+ * with loading,  using,  modifying and/or developing or reproducing the
+ * software by the user in light of its specific status of free software,
+ * that may mean  that it is complicated to manipulate,  and  that  also
+ * therefore means  that it is reserved for developers  and  experienced
+ * professionals having in-depth computer knowledge. Users are therefore
+ * encouraged to load and test the software's suitability as regards their
+ * requirements in conditions enabling the security of their systems and/or
+ * data to be ensured and,  more generally, to use and operate it in the
+ * same conditions as regards security.
+ *
+ * The fact that you are presently reading this means that you have had
+ * knowledge of the CeCILL-B license and that you accept its terms.
+ */
+package fr.insalyon.creatis.vip.application.server.business;
+
+import fr.insalyon.creatis.vip.application.client.bean.AppClass;
+import fr.insalyon.creatis.vip.application.server.dao.ClassDAO;
+import fr.insalyon.creatis.vip.core.server.business.BusinessException;
+import fr.insalyon.creatis.vip.core.server.dao.DAOException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ *
+ * @author Rafael Silva
+ */
+@Service
+@Transactional
+public class ClassBusiness {
+
+    private ClassDAO classDAO;
+
+    @Autowired
+<span class="fc" id="L56">    public ClassBusiness(ClassDAO classDAO) {</span>
+<span class="fc" id="L57">        this.classDAO = classDAO;</span>
+<span class="fc" id="L58">    }</span>
+
+    public List&lt;AppClass&gt; getClasses() throws BusinessException {
+        try {
+<span class="fc" id="L62">            return classDAO.getClasses();</span>
+<span class="nc" id="L63">        } catch (DAOException ex) {</span>
+<span class="nc" id="L64">            throw new BusinessException(ex);</span>
+        }
+    }
+
+    public List&lt;String&gt; getClassesName() throws BusinessException {
+<span class="fc" id="L69">        List&lt;String&gt; classesName = new ArrayList&lt;&gt;();</span>
+<span class="fc bfc" id="L70" title="All 2 branches covered.">        for (AppClass appClass : getClasses()) {</span>
+<span class="fc" id="L71">            classesName.add(appClass.getName());</span>
+<span class="fc" id="L72">        }</span>
+
+<span class="fc" id="L74">        return classesName;</span>
+    }
+
+    public AppClass getClass(String className) throws BusinessException {
+        try {
+<span class="fc" id="L79">            return classDAO.getClass(className);</span>
+<span class="nc" id="L80">        } catch (DAOException ex) {</span>
+<span class="nc" id="L81">            throw new BusinessException(ex);</span>
+        }
+    }
+
+    public void addClass(AppClass c) throws BusinessException {
+        try {
+<span class="fc" id="L87">            classDAO.add(c);</span>
+<span class="fc" id="L88">        } catch (DAOException ex) {</span>
+<span class="fc" id="L89">            throw new BusinessException(ex);</span>
+<span class="fc" id="L90">        }</span>
+<span class="fc" id="L91">    }</span>
+
+    public void updateClass(AppClass c) throws BusinessException {
+        try {
+<span class="fc" id="L95">            classDAO.update(c);</span>
+<span class="nc" id="L96">        } catch (DAOException ex) {</span>
+<span class="nc" id="L97">            throw new BusinessException(ex);</span>
+<span class="fc" id="L98">        }</span>
+<span class="fc" id="L99">    }</span>
+
+    public void removeClass(String name) throws BusinessException {
+        try {
+<span class="fc" id="L103">            classDAO.remove(name);</span>
+<span class="nc" id="L104">        } catch (DAOException ex) {</span>
+<span class="nc" id="L105">            throw new BusinessException(ex);</span>
+<span class="fc" id="L106">        }</span>
+<span class="fc" id="L107">    }</span>
+
+    public List&lt;String&gt; getUserClassesName(String email, boolean validAdmin)
+            throws BusinessException {
+
+<span class="nc" id="L112">        List&lt;String&gt; classesName = new ArrayList&lt;String&gt;();</span>
+<span class="nc bnc" id="L113" title="All 2 branches missed.">        for (AppClass appClass : getUserClasses(email, validAdmin)) {</span>
+<span class="nc" id="L114">            classesName.add(appClass.getName());</span>
+<span class="nc" id="L115">        }</span>
+
+<span class="nc" id="L117">        return classesName;</span>
+    }
+
+    public List&lt;AppClass&gt; getUserClasses(String email, boolean validAdmin)
+            throws BusinessException {
+        try {
+<span class="fc" id="L123">            return classDAO.getUserClasses(email, validAdmin);</span>
+<span class="nc" id="L124">        } catch (DAOException ex) {</span>
+<span class="nc" id="L125">            throw new BusinessException(ex);</span>
+        }
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

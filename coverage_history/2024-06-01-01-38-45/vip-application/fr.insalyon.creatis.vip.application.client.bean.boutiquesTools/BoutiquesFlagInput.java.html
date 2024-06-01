@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../jacoco-resources/report.gif" type="image/gif"/><title>BoutiquesFlagInput.java</title><link rel="stylesheet" href="../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../index.html" class="el_report">coverage</a> &gt; <a href="../index.html" class="el_bundle">vip-application</a> &gt; <a href="index.source.html" class="el_package">fr.insalyon.creatis.vip.application.client.bean.boutiquesTools</a> &gt; <span class="el_source">BoutiquesFlagInput.java</span></div><h1>BoutiquesFlagInput.java</h1><pre class="source lang-java linenums">package fr.insalyon.creatis.vip.application.client.bean.boutiquesTools;
+
+import java.util.Map;
+import java.util.Set;
+
+/**
+ * Representation of an Flag input in an application Boutiques descriptor
+ *
+ * @author Guillaume Vanel
+ * @version %I%, %G%
+ */
+public class BoutiquesFlagInput extends BoutiquesInput {
+    private boolean defaultValue;
+
+<span class="nc" id="L15">    public BoutiquesFlagInput() {</span>
+<span class="nc" id="L16">    }</span>
+
+    /**
+     * @param id String
+     * @param name String
+     * @param description String
+     * @param isOptional boolean
+     * @param disablesInputsId List of String IDs of inputs disabled when this is non-empty
+     * @param requiresInputsId List of String IDs of inputs requiring this to be non-empty
+     * @param defaultValue boolean
+     */
+    public BoutiquesFlagInput(String id, String name, String description, boolean isOptional,
+                              Set&lt;String&gt; disablesInputsId, Set&lt;String&gt; requiresInputsId, boolean defaultValue){
+<span class="nc" id="L29">        super(id, name, description, InputType.FLAG, isOptional, disablesInputsId, requiresInputsId, null,</span>
+                null, null);
+<span class="nc" id="L31">        this.defaultValue = defaultValue;</span>
+<span class="nc" id="L32">    }</span>
+
+    /**
+     * @return boolean: always true (Flag input is always optional
+     */
+    @Override
+    public boolean isOptional() {
+<span class="nc" id="L39">        return true;</span>
+    }
+
+    /**
+     * @return Always null: Flag input cannot have 'value-disables' dependencies
+     */
+    @Override
+    public Map&lt;String, Set&lt;String&gt;&gt; getValueDisablesInputsId() {
+<span class="nc" id="L47">        return null;</span>
+    }
+
+    /**
+     * @return Always null: Flag input cannot have 'value-requires' dependencies
+     */
+    @Override
+    public Map&lt;String, Set&lt;String&gt;&gt; getValueRequiresInputsId() {
+<span class="nc" id="L55">        return null;</span>
+    }
+
+    /**
+     * @return Always null: Flag cannot have value choices other than true and false
+     */
+    @Override
+    public Set&lt;String&gt; getPossibleValues() {
+<span class="nc" id="L63">        return null;</span>
+    }
+
+    /**
+     * @return Boolean representing this input's default value
+     */
+    @Override
+    public Boolean getDefaultValue() {
+<span class="nc" id="L71">        return this.defaultValue;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>
