@@ -20,20 +20,13 @@ function error {
 }
 
 function function_singularity {
-    cat > singularity << 'EOF'
-          #!/bin/bash
-          /cvmfs/dirac.egi.eu/container/apptainer/bin/apptainer "$@"
+  #ApptainerPath is defined in the configuration (/cvmfs/dirac.egi.eu/container/apptainer/bin/apptainer)
+  cat > singularity << EOF
+        #!/bin/bash
+        $ApptainerPath "$@"
 EOF
-}
-
-# Call the function to create the singularity script and make it executable
-function_singularity
-chmod +x singularity
-export APPTAINER_PULLFOLDER="/cvmfs/dirac.egi.eu/container/apptainer/"
-
-# Define a function to run singularity commands
-singularity() {
-    ./singularity "$@"
+  chmod a+x singularity
+  export PATH=$PWD:$PATH
 }
 
 function download_udocker {
@@ -190,6 +183,12 @@ fi
 #end
 
 
+#if($tool.getContainerType() == "singularity")
+if ! command -v singularity
+then
+    function_singularity
+fi
+#end
 
 # Change PYTHONPATH to make all strings unicode by default in python2 (as in python3)
 # Otherwise `bosh exec` fails on any non-ascii characters in outputs
@@ -204,7 +203,12 @@ TMP_FOLDER=/tmp/$TMP_FOLDER
 TMP_FOLDER=../$TMP_FOLDER
 #end
 mkdir -p $TMP_FOLDER
+
+#if($imagepath == "")
 PYTHONPATH=".:$PYTHONPATH" $BOSHEXEC exec launch $JSONFILE input_param_file.json -v $PWD/../cache:$PWD/../cache -v $TMP_FOLDER:/tmp
+#else
+PYTHONPATH=".:$PYTHONPATH" $BOSHEXEC exec launch --imagepath $imagepath $JSONFILE input_param_file.json -v $PWD/../cache:$PWD/../cache -v $TMP_FOLDER:/tmp
+#end
 
 if [ $? != 0 ]
 then
