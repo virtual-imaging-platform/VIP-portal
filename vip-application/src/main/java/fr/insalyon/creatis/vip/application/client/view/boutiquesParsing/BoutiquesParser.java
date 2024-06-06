@@ -115,7 +115,7 @@ public class BoutiquesParser extends AbstractJsonParser{
         JSONObject customObject = getObjectValue(parsedDescriptor, "custom", true);
         if (customObject != null) {
             try {
-                application.setVipContainer(getStringValue(customObject, "vip:container", true));
+                application.setVipContainer(getStringValue(customObject, "vip:imagepath", true));
             } catch (InvalidBoutiquesDescriptorException exception) {
                 throw new InvalidBoutiquesDescriptorException("Invalid Boutiques descriptor: invalid vip:container.");
             }
