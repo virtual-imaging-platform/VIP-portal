@@ -19,14 +19,14 @@ function error {
   echo [ ERROR - $D ] $* >&2
 }
 
-function function_singularity {
+function configure_apptainer_for_singularity {
   #ApptainerPath is defined in the configuration (/cvmfs/dirac.egi.eu/container/apptainer/bin/apptainer)
   cat > singularity << EOF
         #!/bin/bash
-        $ApptainerPath "$@"
+        apptainer "$@"
 EOF
   chmod a+x singularity
-  export PATH=$PWD:$PATH
+  export PATH=$ApptainerPath:$PWD:$PATH
 }
 
 function download_udocker {
