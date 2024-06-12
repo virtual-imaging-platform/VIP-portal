@@ -20,13 +20,13 @@ function error {
 }
 
 function configure_apptainer_for_singularity {
-  #ApptainerPath is defined in the configuration (/cvmfs/dirac.egi.eu/container/apptainer/bin/apptainer)
+  #APPTAINER_PATH is defined in the configuration (/cvmfs/dirac.egi.eu/container/apptainer/bin/)
   cat > singularity << EOF
         #!/bin/bash
         apptainer "$@"
 EOF
   chmod a+x singularity
-  export PATH=$ApptainerPath:$PWD:$PATH
+  export PATH=$APPTAINER_PATH:$PWD:$PATH
 }
 
 function download_udocker {
@@ -186,7 +186,7 @@ fi
 #if($tool.getContainerType() == "singularity")
 if ! command -v singularity
 then
-    function_singularity
+    configure_apptainer_for_singularity
 fi
 #end
 
