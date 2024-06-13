@@ -1,10 +1,14 @@
 package fr.insalyon.creatis.vip.application.client.bean.boutiquesTools;
 
-import com.google.gwt.user.client.rpc.IsSerializable;
-
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+
+import com.google.gwt.user.client.rpc.IsSerializable;
 
 /**
  * Representation of an application Boutiques descriptor
@@ -30,6 +34,7 @@ public class BoutiquesApplication implements IsSerializable {
     private String schemaVersion;
     private String challengerEmail;
     private String challengerTeam;
+    private String vipContainer;
     private Set<BoutiquesOutputFile> outputFiles = new HashSet<>();
     private Map<String, String> tags = new HashMap<>();
     private String jsonFile;
@@ -220,7 +225,9 @@ public class BoutiquesApplication implements IsSerializable {
         return this.applicationLFN + "/json/" + getName() + ".json";
     }
 
-
+    public String getVipContainer() {
+        return vipContainer;
+    }
 
     public void addInput(BoutiquesInput input){
         this.inputs.add(input);
@@ -270,4 +277,7 @@ public class BoutiquesApplication implements IsSerializable {
         tags.put(key, value);
     }
 
+    public void setVipContainer(String vipContainer) {
+        this.vipContainer = vipContainer;
+    }
 }

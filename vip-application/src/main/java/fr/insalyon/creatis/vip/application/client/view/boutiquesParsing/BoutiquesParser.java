@@ -1,12 +1,19 @@
 package fr.insalyon.creatis.vip.application.client.view.boutiquesParsing;
 
+import java.util.Map;
+import java.util.Set;
+
 import com.google.gwt.json.client.JSONArray;
 import com.google.gwt.json.client.JSONObject;
 import com.google.gwt.json.client.JSONParser;
-import fr.insalyon.creatis.vip.application.client.bean.boutiquesTools.*;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+
+import fr.insalyon.creatis.vip.application.client.bean.boutiquesTools.BoutiquesApplication;
+import fr.insalyon.creatis.vip.application.client.bean.boutiquesTools.BoutiquesFlagInput;
+import fr.insalyon.creatis.vip.application.client.bean.boutiquesTools.BoutiquesGroup;
+import fr.insalyon.creatis.vip.application.client.bean.boutiquesTools.BoutiquesInput;
+import fr.insalyon.creatis.vip.application.client.bean.boutiquesTools.BoutiquesNumberInput;
+import fr.insalyon.creatis.vip.application.client.bean.boutiquesTools.BoutiquesOutputFile;
+import fr.insalyon.creatis.vip.application.client.bean.boutiquesTools.BoutiquesStringInput;
 
 /**
  * Helper class for parsing JSON objects
@@ -103,6 +110,12 @@ public class BoutiquesParser extends AbstractJsonParser{
                 throw new InvalidBoutiquesDescriptorException("Invalid Boutiques descriptor: invalid container-image.",
                         exception);
             }
+        }
+        // Custom property
+        JSONObject customObject = getObjectValue(parsedDescriptor, "custom", true);
+        if (customObject != null) {
+            String vipImagePath = getStringValue(customObject, "vip:imagepath", true);
+            application.setVipContainer(vipImagePath);
         }
         // Json descriptor
         application.setJsonFile(parsedDescriptor.toString());
@@ -228,4 +241,6 @@ public class BoutiquesParser extends AbstractJsonParser{
         bof.setCommandLineFlag(commandLineFlag);
         return bof;
     }
+
+
 }

@@ -19,6 +19,16 @@ function error {
   echo [ ERROR - $D ] $* >&2
 }
 
+function configure_apptainer_for_singularity {
+  #APPTAINER_PATH is defined in the configuration (/cvmfs/dirac.egi.eu/container/apptainer/bin/)
+  cat > singularity << EOF
+        #!/bin/bash
+        apptainer "$@"
+EOF
+  chmod a+x singularity
+  export PATH=$APPTAINER_PATH:$PWD:$PATH
+}
+
 function download_udocker {
   #installation of udocker
   info "cloning udocker ${UDOCKER_TAG} "
@@ -173,6 +183,12 @@ fi
 #end
 
 
+#if($tool.getContainerType() == "singularity")
+if ! command -v singularity
+then
+    configure_apptainer_for_singularity
+fi
+#end
 
 # Change PYTHONPATH to make all strings unicode by default in python2 (as in python3)
 # Otherwise `bosh exec` fails on any non-ascii characters in outputs
@@ -187,7 +203,12 @@ TMP_FOLDER=/tmp/$TMP_FOLDER
 TMP_FOLDER=../$TMP_FOLDER
 #end
 mkdir -p $TMP_FOLDER
+
+#if($imagepath == "")
 PYTHONPATH=".:$PYTHONPATH" $BOSHEXEC exec launch $JSONFILE input_param_file.json -v $PWD/../cache:$PWD/../cache -v $TMP_FOLDER:/tmp
+#else
+PYTHONPATH=".:$PYTHONPATH" $BOSHEXEC exec launch --imagepath $imagepath $JSONFILE input_param_file.json -v $PWD/../cache:$PWD/../cache -v $TMP_FOLDER:/tmp
+#end
 
 if [ $? != 0 ]
 then
