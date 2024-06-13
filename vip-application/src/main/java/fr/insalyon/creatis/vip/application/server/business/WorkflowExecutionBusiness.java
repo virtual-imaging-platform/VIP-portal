@@ -89,8 +89,8 @@ public class WorkflowExecutionBusiness {
 
         //HACK for testing while still having simulations launched with VIP 1.16.1; to be removed before getting in production or replaced with a proper constant
         if(engineEndpoint == null){
-            logger.info("WorkflowExecutionBusiness, endpoint is null, setting it to http://data-manager.grid.creatis.insa-lyon.fr/cgi-bin/m2Server-gasw3.1/moteur_server");
-            engineEndpoint="http://data-manager.grid.creatis.insa-lyon.fr/cgi-bin/m2Server-gasw3.1/moteur_server";
+            logger.info("WorkflowExecutionBusiness, endpoint is null, setting it to http://data-manager.grid.creatis.insa-lyon.fr/cgi-bin/m2Server-gasw3.1/moteur_server_moteurlite");
+            engineEndpoint="http://data-manager.grid.creatis.insa-lyon.fr/cgi-bin/m2Server-gasw3.1/moteur_server_moteurlite";
         }
         this.engineEndpoint = engineEndpoint;
     }
