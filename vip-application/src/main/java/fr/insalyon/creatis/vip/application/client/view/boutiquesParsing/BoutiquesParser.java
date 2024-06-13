@@ -114,11 +114,8 @@ public class BoutiquesParser extends AbstractJsonParser{
         // Custom property
         JSONObject customObject = getObjectValue(parsedDescriptor, "custom", true);
         if (customObject != null) {
-            try {
-                application.setVipContainer(getStringValue(customObject, "vip:imagepath", true));
-            } catch (InvalidBoutiquesDescriptorException exception) {
-                throw new InvalidBoutiquesDescriptorException("Invalid Boutiques descriptor: invalid vip:container.");
-            }
+            String vipImagePath = getStringValue(customObject, "vip:imagepath", true);
+            application.setVipContainer(vipImagePath);
         }
         // Json descriptor
         application.setJsonFile(parsedDescriptor.toString());
