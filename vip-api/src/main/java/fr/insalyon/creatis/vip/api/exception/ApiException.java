@@ -58,7 +58,8 @@ public class ApiException extends VipException {
         COUNTRY_UNKNOWN(8012),
         UNAUTHORIZED_DATA_ACCESS(8013),
         WRONG_OIDC_LOGIN(8014),
-        INVALID_EXECUTION_ID(8015);
+        INVALID_EXECUTION_ID(8015),
+        INVALID_EXAMPLE_ID(8016);
 
         private Integer code;
         ApiError(Integer code) { this.code = code; }
@@ -81,6 +82,7 @@ public class ApiException extends VipException {
             addMessage(ApiError.UNAUTHORIZED_DATA_ACCESS, "Unauthorized data access to : {}", 1);
             addMessage(ApiError.WRONG_OIDC_LOGIN, "The login process encountered an error", 0);
             addMessage(ApiError.INVALID_EXECUTION_ID, "No execution available with this id : {}", 1);
+            addMessage(ApiError.INVALID_EXAMPLE_ID, "There is no example with the id : {}", 1);
         }
 
         public Optional<String> getMessage() {

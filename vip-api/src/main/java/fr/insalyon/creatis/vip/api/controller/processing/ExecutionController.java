@@ -96,6 +96,18 @@ public class ExecutionController extends ApiController {
         return executionBusiness.listExecutions(limit);
     }
 
+    @RequestMapping("examples")
+    public List<Execution> listExecutions() throws ApiException {
+        logMethodInvocation(logger, "listExamples");
+        return executionBusiness.listExamples();
+    }
+
+    @RequestMapping("examples/{exampleId}")
+    public Execution getExample(@PathVariable String exampleId) throws ApiException {
+        logMethodInvocation(logger, "getExample", exampleId);
+        return executionBusiness.getExecution(exampleId, false);
+    }
+
     @RequestMapping(value = "count", produces = "text/plain;charset=UTF-8")
     public String countExecutions(
             @RequestParam(required = false) String studyIdentifier)

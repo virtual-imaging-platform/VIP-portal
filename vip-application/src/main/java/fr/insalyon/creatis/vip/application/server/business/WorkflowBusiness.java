@@ -380,6 +380,17 @@ public class WorkflowBusiness {
             String userName, String application, String status, String appClass,
             Date startDate, Date endDate) throws BusinessException {
 
+        return getSimulations(userName, application, status, appClass, startDate, endDate, null);
+    }
+
+    /**
+     * Get the simulation information
+     *
+     */
+    public List<Simulation> getSimulations(
+            String userName, String application, String status, String appClass,
+            Date startDate, Date endDate, String tag) throws BusinessException {
+
         try {
             if (endDate != null) {
                 Calendar calendar = Calendar.getInstance();
@@ -396,7 +407,7 @@ public class WorkflowBusiness {
             List<Simulation> simulations = parseWorkflows(
                     workflowDAO.get(
                             userName, application, wStatus,
-                            appClass, startDate, endDate));
+                            appClass, startDate, endDate, tag));
             checkRunningSimulations(simulations);
 
             return simulations;
@@ -434,7 +445,7 @@ public class WorkflowBusiness {
             List<Simulation> simulations = parseWorkflows(
                     workflowDAO.get(
                             users, application, wStatus,
-                            appClass, startDate, endDate));
+                            appClass, startDate, endDate, null));
             checkRunningSimulations(simulations);
 
             return simulations;
@@ -561,7 +572,8 @@ public class WorkflowBusiness {
                     workflow.getStartedTime(),
                     workflow.getDescription(),
                     workflow.getStatus().name(),
-                    workflow.getEngine());
+                    workflow.getEngine(),
+                    workflow.getTags());
             if (refresh) {
                 checkRunningSimulations(Collections.singletonList(simulation));
             }
@@ -812,7 +824,8 @@ public class WorkflowBusiness {
                     workflow.getStartedTime(),
                     workflow.getDescription(),
                     workflow.getStatus().name(),
-                    workflow.getEngine()));
+                    workflow.getEngine(),
+                    workflow.getTags()));
         }
         return simulationsList;
     }

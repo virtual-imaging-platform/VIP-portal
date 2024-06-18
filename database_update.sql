@@ -40,3 +40,7 @@ DROP TABLE VIPAccounts;
 ALTER TABLE VIPExternalPlatforms ADD upload_url VARCHAR(255);
 ALTER TABLE VIPExternalPlatforms ADD keycloak_client_id VARCHAR(255);
 ALTER TABLE VIPExternalPlatforms ADD refresh_token_url VARCHAR(255);
+
+-- v2.7
+USE workflowsdb;
+ALTER TABLE Workflows ADD tags VARCHAR(255);

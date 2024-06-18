@@ -31,6 +31,7 @@
  */
 package fr.insalyon.creatis.vip.api.business;
 
+import fr.insalyon.creatis.moteur.plugins.workflowsdb.bean.WorkflowStatus;
 import fr.insalyon.creatis.vip.api.exception.ApiException;
 import fr.insalyon.creatis.vip.api.model.*;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
@@ -115,7 +116,15 @@ public class ExecutionBusiness {
         }
     }
 
-    public Execution getExecution(String executionId, boolean summarize)
+    public Execution getExample(String executionId) throws ApiException {
+        return getExecution(executionId, false, true);
+    }
+
+    public Execution getExecution(String executionId, boolean summarize) throws ApiException {
+        return getExecution(executionId, summarize, false);
+    }
+
+    public Execution getExecution(String executionId, boolean summarize, boolean onlyExample)
             throws ApiException {
         try {
             // Get main execution object
@@ -125,6 +134,12 @@ public class ExecutionBusiness {
             if (s == null || s.getStatus() == SimulationStatus.Cleaned) {
                 logger.error("Error accessing invalid execution {}. (is cleaned : {})", executionId, s != null);
                 throw new ApiException(ApiException.ApiError.INVALID_EXECUTION_ID, executionId);
+            }
+
+            if (onlyExample &&
+                    (s.getTags() == null || ! s.getTags().contains(ApplicationConstants.WORKKFLOW_EXAMPLE_TAG))) {
+                logger.error("Error trying to get an non-example execution as example : {}", executionId);
+                throw new ApiException(ApiException.ApiError.INVALID_EXAMPLE_ID, executionId);
             }
 
             // Build Carmin's execution object
@@ -185,7 +200,7 @@ public class ExecutionBusiness {
                     null, // startDate
                     null // endDate
             );
-            logger.info("Found {} simulations", simulations.size());
+            logger.debug("Found {} simulations", simulations.size());
             ArrayList<Execution> executions = new ArrayList<>();
             int count = 0;
             for (Simulation s : simulations) {
@@ -203,6 +218,27 @@ public class ExecutionBusiness {
             return executions.toArray(array_executions);
         } catch (BusinessException ex) {
             throw new ApiException(ex);
+        }
+    }
+
+    public List<Execution> listExamples() throws ApiException {
+        try {
+            List<Simulation> simulations = workflowBusiness.getSimulations(
+                    null, // User must be null to take examples from other users
+                    null, // application
+                    WorkflowStatus.Completed.name(), // status
+                    null, // class
+                    null, // startDate
+                    null, // endDate
+                    ApplicationConstants.WORKKFLOW_EXAMPLE_TAG
+            );
+            List<Execution> executions = new ArrayList<>();
+            for (Simulation simulation : simulations) {
+                executions.add(getExecution(simulation.getID(), true));
+            }
+            return executions;
+        } catch (BusinessException e) {
+            throw new ApiException(e);
         }
     }
 
