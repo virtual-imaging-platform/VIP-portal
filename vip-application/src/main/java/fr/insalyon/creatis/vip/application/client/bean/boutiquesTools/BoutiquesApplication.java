@@ -1,5 +1,6 @@
 package fr.insalyon.creatis.vip.application.client.bean.boutiquesTools;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -9,6 +10,8 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
+
+import fr.insalyon.creatis.vip.application.client.bean.boutiquesTools.BoutiquesInput.InputType;
 
 /**
  * Representation of an application Boutiques descriptor
@@ -38,6 +41,7 @@ public class BoutiquesApplication implements IsSerializable {
     private Set<BoutiquesOutputFile> outputFiles = new HashSet<>();
     private Map<String, String> tags = new HashMap<>();
     private String jsonFile;
+    private Set<String> vipDotInputIds;
 
     private BoutiquesApplicationExtensions boutiquesExtensions;
 
@@ -229,6 +233,20 @@ public class BoutiquesApplication implements IsSerializable {
         return vipContainer;
     }
 
+    public Set<String> getVipDotInputIds() {
+        if (vipDotInputIds == null) {
+            return Collections.emptySet();      
+            }
+            return vipDotInputIds;
+    }
+
+    public Set<String> getCommandLineFlag() {
+        return inputs.stream()
+                .filter(i -> InputType.FLAG.equals(i.getType()))
+                .map(BoutiquesInput::getId)
+                .collect(Collectors.toSet());
+    }
+
     public void addInput(BoutiquesInput input){
         this.inputs.add(input);
     }
@@ -279,5 +297,9 @@ public class BoutiquesApplication implements IsSerializable {
 
     public void setVipContainer(String vipContainer) {
         this.vipContainer = vipContainer;
+    }
+
+    public void setVipDotInputIds(Set<String> inputIds) {
+        this.vipDotInputIds = inputIds;
     }
 }
