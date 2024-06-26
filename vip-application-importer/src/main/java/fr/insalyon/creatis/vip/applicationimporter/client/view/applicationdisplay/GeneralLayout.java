@@ -46,7 +46,8 @@ public class GeneralLayout extends AbstractFormLayout {
             version,
             schemaVersion,
             description,
-            vipContainer;
+            vipContainer,
+            dotInputs;
 
     public GeneralLayout(String width, String height) {
         super(width, height);
@@ -63,8 +64,9 @@ public class GeneralLayout extends AbstractFormLayout {
         schemaVersion = new LocalTextField("Schema Version", false, false);
         description = new LocalTextField("Description", false, false);
         vipContainer = new LocalTextField("VIP Container", false, false);
+        dotInputs = new LocalTextField("DOT Inputs", false, false);
 
-        this.addMembers(name, commandLine, dockerImage, dockerIndex, version, schemaVersion, description, vipContainer);
+        this.addMembers(name, commandLine, dockerImage, dockerIndex, version, schemaVersion, description, vipContainer, dotInputs);
     }
 
     public void setTool(BoutiquesApplication bt) {
@@ -76,5 +78,6 @@ public class GeneralLayout extends AbstractFormLayout {
         dockerIndex.setValue(bt.getContainerIndex());
         schemaVersion.setValue(bt.getSchemaVersion());
         vipContainer.setValue(bt.getVipContainer());
+        dotInputs.setValue(String.join(", ", bt.getVipDotInputIds()));
     }
 }

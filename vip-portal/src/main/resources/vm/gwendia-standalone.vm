@@ -75,7 +75,16 @@ if ( result.startsWith("/") || result.startsWith("lfn:") ) {
           <cross>
             <port name="results-directory" />
 #foreach($input in $tool.getInputs()) 
+  #if(!$tool.getVipDotInputIds().contains($input.getId()))
             <port name="$input.getId()"/>
+  #end
+#end
+#if($tool.getVipDotInputIds() && !$tool.getVipDotInputIds().isEmpty())
+            <dot>
+#foreach($dotInput in $tool.getVipDotInputIds())
+                <port name="$dotInput"/>
+#end
+            </dot>
 #end
           </cross>
         </iterationstrategy>
