@@ -31,8 +31,6 @@
  */
 package fr.insalyon.creatis.vip.application.server.business;
 
-import static fr.insalyon.creatis.vip.application.client.view.ApplicationException.ApplicationError.*;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -73,6 +71,9 @@ import fr.insalyon.creatis.vip.application.client.bean.Descriptor;
 import fr.insalyon.creatis.vip.application.client.bean.Engine;
 import fr.insalyon.creatis.vip.application.client.bean.InOutData;
 import fr.insalyon.creatis.vip.application.client.bean.Simulation;
+import static fr.insalyon.creatis.vip.application.client.view.ApplicationException.ApplicationError.PLATFORM_MAX_EXECS;
+import static fr.insalyon.creatis.vip.application.client.view.ApplicationException.ApplicationError.USER_MAX_EXECS;
+import static fr.insalyon.creatis.vip.application.client.view.ApplicationException.ApplicationError.WRONG_APPLICATION_DESCRIPTOR;
 import fr.insalyon.creatis.vip.application.client.view.monitor.SimulationStatus;
 import fr.insalyon.creatis.vip.application.client.view.monitor.progress.ProcessorStatus;
 import fr.insalyon.creatis.vip.application.server.business.simulation.ParameterSweep;
@@ -122,7 +123,6 @@ public class WorkflowBusiness {
     private GRIDAPoolClient gridaPoolClient;
     private GRIDAClient gridaClient;
     private ExternalPlatformBusiness externalPlatformBusiness;
-    private Engine selectedEngine;
 
     @Autowired
     public WorkflowBusiness(
@@ -207,7 +207,6 @@ public class WorkflowBusiness {
             logger.error("No available engines for class {}", applicationClass);
             throw new BusinessException("No available engines for class " + applicationClass);
         } else {
-            selectedEngine = engineBean;
             return engineBean;
         }
     }
@@ -293,15 +292,11 @@ public class WorkflowBusiness {
 
             AppVersion version = applicationDAO.getVersion(
                     applicationName, applicationVersion);
+            logger.info( " moteurlite status: " + server.useMoteurlite());
+            String workflowPath = dataManagerBusiness.getRemoteFile(user, server.useMoteurlite() ? version.getJsonLfn() : version.getLfn());
+            
+            //selectRandomEngine could also be used; TODO: make this choice configurable
             Engine engine = selectEngine(applicationClass);
-            String workflowPath;
-            workflowPath = dataManagerBusiness.getRemoteFile(user, version.getLfn());
-            if (selectedEngine != null && selectedEngine.getName().equals("moteurlite")) {
-                workflowPath = dataManagerBusiness.getRemoteFile(user, version.getJsonLfn());
-            }
-            else {
-                workflowPath = dataManagerBusiness.getRemoteFile(user, version.getLfn());
-            }
             WorkflowExecutionBusiness executionBusiness =
                     getWorkflowExecutionBusiness(engine.getEndpoint());
             Workflow workflow = null;
@@ -456,14 +451,8 @@ public class WorkflowBusiness {
 
         try {
             AppVersion version = applicationDAO.getVersion(applicationName, applicationVersion);
-            String workflowPath = dataManagerBusiness.getRemoteFile(user, version.getLfn());
-            workflowPath = dataManagerBusiness.getRemoteFile(user, version.getLfn());
-            if (selectedEngine != null && selectedEngine.getName().equals("moteurlite")) {
-                workflowPath = dataManagerBusiness.getRemoteFile(user, version.getJsonLfn());
-            }
-            else {
-                workflowPath = dataManagerBusiness.getRemoteFile(user, version.getLfn());
-            }
+            String workflowPath =
+                    dataManagerBusiness.getRemoteFile(user, version.getLfn());
             return workflowPath.endsWith(".gwendia")
                     ? getGwendiaParser().parse(workflowPath)
                     : getScuflParser().parse(workflowPath);
