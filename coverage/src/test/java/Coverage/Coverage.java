@@ -1,4 +1,4 @@
-package coverage;
+package Coverage;
 
 import org.junit.jupiter.api.Test;
 

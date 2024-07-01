@@ -78,6 +78,7 @@ public class GeneralLayout extends AbstractFormLayout {
         dockerIndex.setValue(bt.getContainerIndex());
         schemaVersion.setValue(bt.getSchemaVersion());
         vipContainer.setValue(bt.getVipContainer());
-        dotInputs.setValue(String.join(", ", bt.getVipDotInputIds()));
+        String dotInputsValue = String.join(", ", bt.getVipDotInputIds());
+        dotInputs.setValue(dotInputsValue + (bt.getVipDotIncludesResultsDir() ? (dotInputsValue.isEmpty() ? "results-directory" : ", results-directory") : ""));
     }
 }

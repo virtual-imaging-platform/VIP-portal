@@ -42,7 +42,8 @@ public class BoutiquesApplication implements IsSerializable {
     private Map<String, String> tags = new HashMap<>();
     private String jsonFile;
     private Set<String> vipDotInputIds;
-    private String resultDirs;
+    private Set<String> inputIds;
+    private boolean vipDotIncludesResultsDir;
 
     private BoutiquesApplicationExtensions boutiquesExtensions;
 
@@ -248,8 +249,14 @@ public class BoutiquesApplication implements IsSerializable {
                 .collect(Collectors.toSet());
     }
 
-    public String getVipDotResultDirs() {
-        return resultDirs;
+    public Set<String> getinputIds() {
+        return this.getInputs().stream()
+                .map(BoutiquesInput::getId)
+                .collect(Collectors.toSet());
+    }
+
+    public boolean getVipDotIncludesResultsDir() {
+        return vipDotIncludesResultsDir;
     }
 
     public void addInput(BoutiquesInput input){
@@ -308,7 +315,7 @@ public class BoutiquesApplication implements IsSerializable {
         this.vipDotInputIds = inputIds;
     }
 
-    public void setVipDotResultDirs(String resultDirs) {
-        this.resultDirs = resultDirs;
+    public void setVipDotIncludesResultsDir(boolean vipDotIncludesResultsDir) {
+        this.vipDotIncludesResultsDir = vipDotIncludesResultsDir;
     }
 }
