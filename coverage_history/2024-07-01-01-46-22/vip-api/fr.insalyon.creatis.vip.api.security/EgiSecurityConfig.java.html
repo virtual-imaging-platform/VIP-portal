@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../jacoco-resources/report.gif" type="image/gif"/><title>EgiSecurityConfig.java</title><link rel="stylesheet" href="../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../index.html" class="el_report">coverage</a> &gt; <a href="../index.html" class="el_bundle">vip-api</a> &gt; <a href="index.source.html" class="el_package">fr.insalyon.creatis.vip.api.security</a> &gt; <span class="el_source">EgiSecurityConfig.java</span></div><h1>EgiSecurityConfig.java</h1><pre class="source lang-java linenums">/*
+ * Copyright and authors: see LICENSE.txt in base repository.
+ *
+ * This software is a web portal for pipeline execution on distributed systems.
+ *
+ * This software is governed by the CeCILL-B license under French law and
+ * abiding by the rules of distribution of free software.  You can  use,
+ * modify and/ or redistribute the software under the terms of the CeCILL-B
+ * license as circulated by CEA, CNRS and INRIA at the following URL
+ * &quot;http://www.cecill.info&quot;.
+ *
+ * As a counterpart to the access to the source code and  rights to copy,
+ * modify and redistribute granted by the license, users are provided only
+ * with a limited warranty  and the software's author,  the holder of the
+ * economic rights,  and the successive licensors  have only  limited
+ * liability.
+ *
+ * In this respect, the user's attention is drawn to the risks associated
+ * with loading,  using,  modifying and/or developing or reproducing the
+ * software by the user in light of its specific status of free software,
+ * that may mean  that it is complicated to manipulate,  and  that  also
+ * therefore means  that it is reserved for developers  and  experienced
+ * professionals having in-depth computer knowledge. Users are therefore
+ * encouraged to load and test the software's suitability as regards their
+ * requirements in conditions enabling the security of their systems and/or
+ * data to be ensured and,  more generally, to use and operate it in the
+ * same conditions as regards security.
+ *
+ * The fact that you are presently reading this means that you have had
+ * knowledge of the CeCILL-B license and that you accept its terms.
+ */
+package fr.insalyon.creatis.vip.api.security;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.core.annotation.Order;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.oauth2.client.endpoint.DefaultAuthorizationCodeTokenResponseClient;
+import org.springframework.security.oauth2.client.endpoint.OAuth2AccessTokenResponseClient;
+import org.springframework.security.oauth2.client.endpoint.OAuth2AuthorizationCodeGrantRequest;
+import org.springframework.security.oauth2.client.web.AuthorizationRequestRepository;
+import org.springframework.security.oauth2.client.web.HttpSessionOAuth2AuthorizationRequestRepository;
+import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest;
+import org.springframework.security.web.firewall.DefaultHttpFirewall;
+
+/**
+ * Spring security configuration.
+ *
+ * It secures by api key all rest requests (except /platform)
+ * General configuration is done here (what is secured, session management etc).
+ *
+ * The custom api key configuration is done in {@link ApiSecurityConfig}
+ *
+ * Created by abonnet on 7/22/16.
+ */
+@EnableWebSecurity
+@Order(2)
+<span class="fc" id="L59">public class EgiSecurityConfig extends WebSecurityConfigurerAdapter {</span>
+
+
+    @Override
+    protected void configure(HttpSecurity http) throws Exception {
+<span class="fc" id="L64">        http</span>
+<span class="fc" id="L65">            .authorizeRequests()</span>
+<span class="fc" id="L66">                .anyRequest().permitAll()</span>
+<span class="fc" id="L67">            .and()</span>
+<span class="fc" id="L68">                .oauth2Login()</span>
+<span class="fc" id="L69">                .authorizationEndpoint()</span>
+<span class="fc" id="L70">                .baseUri(&quot;/oauth2/authorize-client&quot;)</span>
+<span class="fc" id="L71">                .authorizationRequestRepository(authorizationRequestRepository())</span>
+<span class="fc" id="L72">            .and()</span>
+<span class="fc" id="L73">                .tokenEndpoint()</span>
+<span class="fc" id="L74">                .accessTokenResponseClient(accessTokenResponseClient())</span>
+<span class="fc" id="L75">            .and()</span>
+<span class="fc" id="L76">                .defaultSuccessUrl(&quot;/rest/loginEgi&quot;)</span>
+<span class="fc" id="L77">                .failureUrl(&quot;/loginFailure&quot;)</span>
+<span class="fc" id="L78">            .and()</span>
+<span class="fc" id="L79">                .cors().and()</span>
+<span class="fc" id="L80">                .headers().frameOptions().sameOrigin().and()</span>
+<span class="fc" id="L81">                .csrf().disable();</span>
+<span class="fc" id="L82">    }</span>
+
+    @Bean
+    public AuthorizationRequestRepository&lt;OAuth2AuthorizationRequest&gt; authorizationRequestRepository() {
+<span class="fc" id="L86">        return new HttpSessionOAuth2AuthorizationRequestRepository();</span>
+    }
+
+    @Bean
+    public OAuth2AccessTokenResponseClient&lt;OAuth2AuthorizationCodeGrantRequest&gt; accessTokenResponseClient() {
+<span class="fc" id="L91">        DefaultAuthorizationCodeTokenResponseClient accessTokenResponseClient = new DefaultAuthorizationCodeTokenResponseClient();</span>
+<span class="fc" id="L92">        return accessTokenResponseClient;</span>
+    }
+
+    /*
+        Do not use the default firewall (StrictHttpFirewall) because it blocks
+        &quot;//&quot; in url and it is used in gwt rpc calls
+     */
+    @Bean
+    public DefaultHttpFirewall httpFirewall() {
+<span class="nc" id="L101">        DefaultHttpFirewall firewall = new DefaultHttpFirewall();</span>
+<span class="nc" id="L102">        firewall.setAllowUrlEncodedSlash(true);</span>
+<span class="nc" id="L103">        return firewall;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

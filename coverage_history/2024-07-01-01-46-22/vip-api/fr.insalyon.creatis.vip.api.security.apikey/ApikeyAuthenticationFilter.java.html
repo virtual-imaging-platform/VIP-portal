@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../jacoco-resources/report.gif" type="image/gif"/><title>ApikeyAuthenticationFilter.java</title><link rel="stylesheet" href="../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../index.html" class="el_report">coverage</a> &gt; <a href="../index.html" class="el_bundle">vip-api</a> &gt; <a href="index.source.html" class="el_package">fr.insalyon.creatis.vip.api.security.apikey</a> &gt; <span class="el_source">ApikeyAuthenticationFilter.java</span></div><h1>ApikeyAuthenticationFilter.java</h1><pre class="source lang-java linenums">/*
+ * Copyright and authors: see LICENSE.txt in base repository.
+ *
+ * This software is a web portal for pipeline execution on distributed systems.
+ *
+ * This software is governed by the CeCILL-B license under French law and
+ * abiding by the rules of distribution of free software.  You can  use,
+ * modify and/ or redistribute the software under the terms of the CeCILL-B
+ * license as circulated by CEA, CNRS and INRIA at the following URL
+ * &quot;http://www.cecill.info&quot;.
+ *
+ * As a counterpart to the access to the source code and  rights to copy,
+ * modify and redistribute granted by the license, users are provided only
+ * with a limited warranty  and the software's author,  the holder of the
+ * economic rights,  and the successive licensors  have only  limited
+ * liability.
+ *
+ * In this respect, the user's attention is drawn to the risks associated
+ * with loading,  using,  modifying and/or developing or reproducing the
+ * software by the user in light of its specific status of free software,
+ * that may mean  that it is complicated to manipulate,  and  that  also
+ * therefore means  that it is reserved for developers  and  experienced
+ * professionals having in-depth computer knowledge. Users are therefore
+ * encouraged to load and test the software's suitability as regards their
+ * requirements in conditions enabling the security of their systems and/or
+ * data to be ensured and,  more generally, to use and operate it in the
+ * same conditions as regards security.
+ *
+ * The fact that you are presently reading this means that you have had
+ * knowledge of the CeCILL-B license and that you accept its terms.
+ */
+package fr.insalyon.creatis.vip.api.security.apikey;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.AuthenticationServiceException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.AuthenticationEntryPoint;
+import org.springframework.util.Assert;
+import org.springframework.web.filter.OncePerRequestFilter;
+
+import javax.servlet.FilterChain;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+
+/**
+ * Created by abonnet on 10/6/16.
+ *
+ * Servlet filter that creates the api key token and calls the authentication.
+ */
+public class ApikeyAuthenticationFilter extends OncePerRequestFilter {
+
+<span class="fc" id="L58">    private final Logger logger = LoggerFactory.getLogger(getClass());</span>
+
+    private final String apikeyHeader;
+    private final AuthenticationEntryPoint authenticationEntryPoint;
+    private final AuthenticationManager authenticationManager;
+
+    public ApikeyAuthenticationFilter(
+            String apikeyHeader,
+            AuthenticationEntryPoint authenticationEntryPoint,
+<span class="fc" id="L67">            AuthenticationManager authenticationManager) {</span>
+<span class="fc" id="L68">        this.apikeyHeader = apikeyHeader;</span>
+<span class="fc" id="L69">        this.authenticationEntryPoint = authenticationEntryPoint;</span>
+<span class="fc" id="L70">        this.authenticationManager = authenticationManager;</span>
+<span class="fc" id="L71">    }</span>
+
+    @Override
+    public void afterPropertiesSet() {
+<span class="fc" id="L75">        Assert.notNull(this.authenticationManager,</span>
+                &quot;An AuthenticationManager is required&quot;);
+
+<span class="fc" id="L78">        Assert.notNull(this.authenticationEntryPoint,</span>
+                &quot;An AuthenticationEntryPoint is required&quot;);
+<span class="fc" id="L80">    }</span>
+
+    @Override
+    protected void doFilterInternal(
+            HttpServletRequest request,
+            HttpServletResponse response,
+            FilterChain filterChain) throws ServletException, IOException {
+<span class="fc" id="L87">        String apikey = request.getHeader(apikeyHeader);</span>
+
+<span class="pc bpc" id="L89" title="1 of 2 branches missed.">        if (apikey == null) {</span>
+<span class="fc" id="L90">            logger.debug(&quot;no apikey header &quot; + apikeyHeader +&quot; found.&quot;);</span>
+<span class="fc" id="L91">            filterChain.doFilter(request, response);</span>
+<span class="fc" id="L92">            return;</span>
+        }
+        try {
+
+<span class="nc" id="L96">            logger.debug(&quot;apikey header found.&quot;);</span>
+
+<span class="nc" id="L98">            ApikeyAuthenticationToken authRequest = new ApikeyAuthenticationToken(apikey);</span>
+<span class="nc" id="L99">            Authentication authResult = this.authenticationManager</span>
+<span class="nc" id="L100">                    .authenticate(authRequest);</span>
+
+<span class="nc" id="L102">            logger.debug(&quot;Authentication success for : &quot; + authResult);</span>
+
+<span class="nc" id="L104">            SecurityContextHolder.getContext().setAuthentication(authResult);</span>
+
+        }
+<span class="nc" id="L107">        catch (AuthenticationException failed) {</span>
+<span class="nc" id="L108">            SecurityContextHolder.clearContext();</span>
+
+<span class="nc" id="L110">            logger.debug(&quot;Authentication request failed&quot;, failed);</span>
+<span class="nc" id="L111">            this.authenticationEntryPoint.commence(request, response, failed);</span>
+        }
+<span class="nc" id="L113">        catch (Exception failed) {</span>
+<span class="nc" id="L114">            SecurityContextHolder.clearContext();</span>
+
+<span class="nc" id="L116">            logger.error(&quot;Unexpected error while authenticating &quot;, failed);</span>
+<span class="nc" id="L117">            this.authenticationEntryPoint.commence(</span>
+                    request,
+                    response,
+                    new AuthenticationServiceException(&quot;Internal Authentication error&quot;));
+<span class="nc" id="L121">        }</span>
+
+<span class="nc" id="L123">        filterChain.doFilter(request, response);</span>
+<span class="nc" id="L124">    }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

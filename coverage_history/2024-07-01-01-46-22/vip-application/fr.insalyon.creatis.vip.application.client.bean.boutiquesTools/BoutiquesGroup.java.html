@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../jacoco-resources/report.gif" type="image/gif"/><title>BoutiquesGroup.java</title><link rel="stylesheet" href="../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../index.html" class="el_report">coverage</a> &gt; <a href="../index.html" class="el_bundle">vip-application</a> &gt; <a href="index.source.html" class="el_package">fr.insalyon.creatis.vip.application.client.bean.boutiquesTools</a> &gt; <span class="el_source">BoutiquesGroup.java</span></div><h1>BoutiquesGroup.java</h1><pre class="source lang-java linenums">package fr.insalyon.creatis.vip.application.client.bean.boutiquesTools;
+
+import com.google.gwt.user.client.rpc.IsSerializable;
+
+import java.util.Set;
+
+/**
+ * Representation of a group in an application Boutiques descriptor
+ *
+ * @author Guillaume Vanel
+ * @version %I%, %G%
+ */
+public class BoutiquesGroup implements IsSerializable {
+
+    private String id;
+    private boolean allOrNone;
+    private boolean mutuallyExclusive;
+    private boolean oneIsRequired;
+    private Set&lt;String&gt; members;
+
+<span class="nc" id="L21">    public BoutiquesGroup() {</span>
+<span class="nc" id="L22">    }</span>
+
+    /**
+     * @param id                String
+     * @param allOrNone         boolean: true if this group is only valid when all or none of its member are empty
+     * @param mutuallyExclusive boolean: true if this group is only valid when at most one member is non-empty
+     * @param oneIsRequired     boolean: true if this group is only valid when at least one member is non-empty
+     * @param members           List of String IDs of this group members
+     */
+    public BoutiquesGroup(String id, boolean allOrNone, boolean mutuallyExclusive, boolean oneIsRequired,
+<span class="nc" id="L32">                          Set&lt;String&gt; members){</span>
+<span class="nc" id="L33">        this.id = id;</span>
+<span class="nc" id="L34">        this.allOrNone = allOrNone;</span>
+<span class="nc" id="L35">        this.mutuallyExclusive = mutuallyExclusive;</span>
+<span class="nc" id="L36">        this.oneIsRequired = oneIsRequired;</span>
+<span class="nc" id="L37">        this.members = members;</span>
+<span class="nc" id="L38">    }</span>
+
+    /**
+     * @return Group ID as String
+     */
+    public String getId() {
+<span class="nc" id="L44">        return this.id;</span>
+    }
+
+    /**
+     * @return Group member IDs as an array of Strings
+     */
+    public Set&lt;String&gt; getMembers() {
+<span class="nc" id="L51">        return members;</span>
+    }
+
+    /**
+     * @return boolean: true if group is 'all-or-none', meaning either all or none of member inputs must be empty
+     */
+    public boolean isAllOrNone() {
+<span class="nc" id="L58">        return allOrNone;</span>
+    }
+
+    /**
+     * @return boolean: true if group is 'mutually-exclusive', meaning at most one member input can be non empty
+     */
+    public boolean isMutuallyExclusive() {
+<span class="nc" id="L65">        return mutuallyExclusive;</span>
+    }
+
+    /**
+     * @return boolean: true if group is 'one-is-required', meaning at least one member input must be non empty
+     */
+    public boolean isOneIsRequired() {
+<span class="nc" id="L72">        return oneIsRequired;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

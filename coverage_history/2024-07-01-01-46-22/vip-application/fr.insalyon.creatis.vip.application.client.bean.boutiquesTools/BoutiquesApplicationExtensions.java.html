@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../jacoco-resources/report.gif" type="image/gif"/><title>BoutiquesApplicationExtensions.java</title><link rel="stylesheet" href="../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../index.html" class="el_report">coverage</a> &gt; <a href="../index.html" class="el_bundle">vip-application</a> &gt; <a href="index.source.html" class="el_package">fr.insalyon.creatis.vip.application.client.bean.boutiquesTools</a> &gt; <span class="el_source">BoutiquesApplicationExtensions.java</span></div><h1>BoutiquesApplicationExtensions.java</h1><pre class="source lang-java linenums">package fr.insalyon.creatis.vip.application.client.bean.boutiquesTools;
+
+import com.google.gwt.user.client.rpc.IsSerializable;
+
+import java.util.*;
+
+public class BoutiquesApplicationExtensions implements IsSerializable {
+
+    private Boolean addResultsDirectoryInput;
+<span class="nc" id="L10">    private Map&lt;String, Map&lt;String, String&gt;&gt; valueChoicesLabels = new HashMap&lt;&gt;();</span>
+<span class="nc" id="L11">    private Set&lt;String&gt; nonListInputs = new HashSet&lt;&gt;();</span>
+
+<span class="nc" id="L13">    public BoutiquesApplicationExtensions() {</span>
+<span class="nc" id="L14">        this.addResultsDirectoryInput = true;</span>
+<span class="nc" id="L15">    }</span>
+
+<span class="nc" id="L17">    public BoutiquesApplicationExtensions(Boolean addResultsDirectoryInput) {</span>
+<span class="nc" id="L18">        this.addResultsDirectoryInput = addResultsDirectoryInput;</span>
+<span class="nc" id="L19">    }</span>
+
+    public void addValueChoiceLabels(String inputId, Map&lt;String, String&gt; valueChoiceLabels) {
+<span class="nc" id="L22">        valueChoicesLabels.put(inputId, valueChoiceLabels);</span>
+<span class="nc" id="L23">    }</span>
+
+    public void addNonListInputs(String... inputIds){
+<span class="nc" id="L26">        Collections.addAll(nonListInputs, inputIds);</span>
+<span class="nc" id="L27">    }</span>
+
+    public Boolean getAddResultsDirectoryInput() {
+<span class="nc" id="L30">        return addResultsDirectoryInput;</span>
+    }
+
+    public Map&lt;String, String&gt; getValueChoicesLabelsForInput(String inputId) {
+<span class="nc" id="L34">        return valueChoicesLabels.get(inputId);</span>
+    }
+
+    public Set&lt;String&gt; getNonListInputs() {
+<span class="nc" id="L38">        return nonListInputs;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

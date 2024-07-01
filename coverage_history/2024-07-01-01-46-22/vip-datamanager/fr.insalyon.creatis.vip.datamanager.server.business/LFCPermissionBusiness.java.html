@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../jacoco-resources/report.gif" type="image/gif"/><title>LFCPermissionBusiness.java</title><link rel="stylesheet" href="../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../index.html" class="el_report">coverage</a> &gt; <a href="../index.html" class="el_bundle">vip-datamanager</a> &gt; <a href="index.source.html" class="el_package">fr.insalyon.creatis.vip.datamanager.server.business</a> &gt; <span class="el_source">LFCPermissionBusiness.java</span></div><h1>LFCPermissionBusiness.java</h1><pre class="source lang-java linenums">/*
+ * Copyright and authors: see LICENSE.txt in base repository.
+ *
+ * This software is a web portal for pipeline execution on distributed systems.
+ *
+ * This software is governed by the CeCILL-B license under French law and
+ * abiding by the rules of distribution of free software.  You can  use,
+ * modify and/ or redistribute the software under the terms of the CeCILL-B
+ * license as circulated by CEA, CNRS and INRIA at the following URL
+ * &quot;http://www.cecill.info&quot;.
+ *
+ * As a counterpart to the access to the source code and  rights to copy,
+ * modify and redistribute granted by the license, users are provided only
+ * with a limited warranty  and the software's author,  the holder of the
+ * economic rights,  and the successive licensors  have only  limited
+ * liability.
+ *
+ * In this respect, the user's attention is drawn to the risks associated
+ * with loading,  using,  modifying and/or developing or reproducing the
+ * software by the user in light of its specific status of free software,
+ * that may mean  that it is complicated to manipulate,  and  that  also
+ * therefore means  that it is reserved for developers  and  experienced
+ * professionals having in-depth computer knowledge. Users are therefore
+ * encouraged to load and test the software's suitability as regards their
+ * requirements in conditions enabling the security of their systems and/or
+ * data to be ensured and,  more generally, to use and operate it in the
+ * same conditions as regards security.
+ *
+ * The fact that you are presently reading this means that you have had
+ * knowledge of the CeCILL-B license and that you accept its terms.
+ */
+package fr.insalyon.creatis.vip.datamanager.server.business;
+
+import fr.insalyon.creatis.vip.core.client.bean.User;
+import fr.insalyon.creatis.vip.core.client.view.user.UserLevel;
+import fr.insalyon.creatis.vip.core.server.business.BusinessException;
+import fr.insalyon.creatis.vip.datamanager.client.bean.*;
+import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.nio.file.Paths;
+import java.util.*;
+
+import static fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants.*;
+
+/**
+ * Created by abonnet on 5/24/17.
+ */
+@Service
+@Transactional
+public class LFCPermissionBusiness {
+
+<span class="fc" id="L57">    private final Logger logger = LoggerFactory.getLogger(getClass());</span>
+
+    private DataManagerBusiness dataManagerBusiness;
+    private LfcPathsBusiness lfcPathsBusiness;
+
+    @Autowired
+<span class="fc" id="L63">    public LFCPermissionBusiness(DataManagerBusiness dataManagerBusiness, LfcPathsBusiness lfcPathsBusiness) {</span>
+<span class="fc" id="L64">        this.dataManagerBusiness = dataManagerBusiness;</span>
+<span class="fc" id="L65">        this.lfcPathsBusiness = lfcPathsBusiness;</span>
+<span class="fc" id="L66">    }</span>
+
+<span class="fc" id="L68">    public enum LFCAccessType {</span>
+<span class="fc" id="L69">        READ, UPLOAD, DELETE</span>
+    }
+
+    public Boolean isLFCPathAllowed(User user, String path, LFCAccessType LFCAccessType, Boolean enableAdminArea)
+            throws BusinessException {
+        // normalize to remove &quot;..&quot;.
+<span class="fc" id="L75">        path = Paths.get(path).normalize().toString();</span>
+
+        // verify the root (&quot;/vip&quot;) is present and that it is not written on
+<span class="pc bpc" id="L78" title="1 of 2 branches missed.">        if ( ! verifyRoot(user, path, LFCAccessType)) return false;</span>
+
+        // Root is always filtered by user so always permitted
+<span class="pc bpc" id="L81" title="1 of 2 branches missed.">        if (path.equals(ROOT)) return true;</span>
+
+        // do not delete synchronized stuff
+<span class="pc bpc" id="L84" title="1 of 2 branches missed.">        if (LFCAccessType == LFCPermissionBusiness.LFCAccessType.DELETE</span>
+<span class="nc bnc" id="L85" title="All 2 branches missed.">            &amp;&amp; isPathSynchronized(user, path)) {</span>
+<span class="nc" id="L86">            return false;</span>
+        }
+        // else it all depends of the first directory
+<span class="fc" id="L89">        String firstDir = getFirstDirectoryName(path);</span>
+        // always can access its home and its trash
+<span class="pc bpc" id="L91" title="1 of 2 branches missed.">        if (firstDir.equals(USERS_HOME)) return true;</span>
+<span class="pc bpc" id="L92" title="1 of 2 branches missed.">        if (firstDir.equals(TRASH_HOME)) return true;</span>
+<span class="pc bpc" id="L93" title="2 of 4 branches missed.">        if (firstDir.equals(USERS_FOLDER) || firstDir.equals(VO_ROOT_FOLDER)) {</span>
+            // restricted to admin
+<span class="nc" id="L95">            return verifyAdminArea(user, path, enableAdminArea);</span>
+        }
+        // else it should be a group folder
+<span class="pc bpc" id="L98" title="1 of 2 branches missed.">        if (!firstDir.endsWith(GROUP_APPEND)) {</span>
+<span class="nc" id="L99">            logger.error(&quot;({}) Wrong lfc access to '{}'&quot;,</span>
+<span class="nc" id="L100">                    user.getEmail(), path);</span>
+<span class="nc" id="L101">            return false;</span>
+        }
+<span class="fc" id="L103">        String groupName = firstDir.substring(0,firstDir.length()-GROUP_APPEND.length());</span>
+<span class="fc" id="L104">        return isGroupAllowed(user, groupName, LFCAccessType, enableAdminArea);</span>
+    }
+
+    private String getFirstDirectoryName(String path) {
+<span class="fc" id="L108">        path = path.substring(ROOT.length() + 1); // remove trailing slash</span>
+<span class="fc" id="L109">        int nextSlashIndex = path.indexOf('/');</span>
+<span class="pc bpc" id="L110" title="1 of 2 branches missed.">        if (nextSlashIndex &gt; 0) {</span>
+<span class="fc" id="L111">            return path.substring(0, nextSlashIndex);</span>
+        } else {
+<span class="nc" id="L113">            return path;</span>
+        }
+    }
+
+    private Boolean verifyRoot(
+            User user, String path, LFCAccessType LFCAccessType)
+            throws BusinessException {
+        // verify path begins with the root
+<span class="pc bpc" id="L121" title="1 of 2 branches missed.">        if (!path.startsWith(ROOT)) {</span>
+<span class="nc" id="L122">            logger.error(&quot;({}) Access to a lfc not starting with the root '{}'&quot;,</span>
+<span class="nc" id="L123">                    user.getEmail(), path);</span>
+<span class="nc" id="L124">            return false;</span>
+        }
+        // the root or a direct subdirectory of root cannot be written or deleted
+<span class="pc bpc" id="L127" title="1 of 2 branches missed.">        boolean unwritable = path.equals(ROOT) ||</span>
+<span class="pc bpc" id="L128" title="1 of 2 branches missed.">                path.lastIndexOf('/') == ROOT.length();</span>
+<span class="pc bpc" id="L129" title="3 of 4 branches missed.">        if (unwritable &amp;&amp;</span>
+                LFCAccessType != LFCPermissionBusiness.LFCAccessType.READ) {
+<span class="nc" id="L131">            logger.error(&quot;({}) Unexpected write lfc access to '{}'&quot;,</span>
+<span class="nc" id="L132">                    user.getEmail(), path);</span>
+<span class="nc" id="L133">            return false;</span>
+        }
+<span class="fc" id="L135">        return true;</span>
+    }
+
+    private boolean verifyAdminArea(User user, String path, Boolean enableAdminArea) {
+<span class="nc bnc" id="L139" title="All 2 branches missed.">        if ( ! user.isSystemAdministrator()) {</span>
+<span class="nc" id="L140">            logger.error(&quot;({}) Non admin trying to access an admin folder : {}&quot;,</span>
+<span class="nc" id="L141">                    user.getEmail(), path);</span>
+<span class="nc" id="L142">            return false;</span>
+        }
+<span class="nc bnc" id="L144" title="All 2 branches missed.">        if ( ! enableAdminArea) {</span>
+<span class="nc" id="L145">            logger.error(&quot;({}) LFC access not enabled to admins : {}&quot;,</span>
+<span class="nc" id="L146">                    user.getEmail(), path);</span>
+<span class="nc" id="L147">            return false;</span>
+        }
+<span class="nc" id="L149">        return true;</span>
+    }
+
+    private boolean isGroupAllowed(
+            User user, String groupName, LFCAccessType LFCAccessType,
+            Boolean enableAdminArea) {
+<span class="pc bpc" id="L155" title="3 of 4 branches missed.">        if (user.isSystemAdministrator() &amp;&amp; enableAdminArea) {</span>
+<span class="nc" id="L156">            return true;</span>
+        }
+        // user must have access to this group
+<span class="fc bfc" id="L159" title="All 2 branches covered.">        if (!user.hasGroupAccess(groupName)) {</span>
+<span class="fc" id="L160">            logger.error(&quot;({}) Trying to access an unauthorized goup '{}'&quot;,</span>
+<span class="fc" id="L161">                    user.getEmail(), groupName);</span>
+<span class="fc" id="L162">            return false;</span>
+        }
+        // beginner cant write/delete in groups folder
+<span class="pc bpc" id="L165" title="1 of 4 branches missed.">        if (LFCAccessType != LFCPermissionBusiness.LFCAccessType.READ &amp;&amp; user.getLevel() == UserLevel.Beginner) {</span>
+<span class="fc" id="L166">            logger.error(&quot;({}) Beginner user try to upload/delete in a group '{}'&quot;,</span>
+<span class="fc" id="L167">                    user.getEmail(), groupName);</span>
+<span class="fc" id="L168">            return false;</span>
+        }
+<span class="fc" id="L170">        return true;</span>
+    }
+
+    private boolean isPathSynchronized(User user, String path)
+            throws BusinessException {
+<span class="nc" id="L175">        List&lt;SSH&gt; sshs = dataManagerBusiness.getSSHConnections();</span>
+<span class="nc" id="L176">        List&lt;String&gt; lfcDirSSHSynchronization = new ArrayList&lt;&gt;();</span>
+<span class="nc bnc" id="L177" title="All 2 branches missed.">        for (SSH ssh : sshs) {</span>
+<span class="nc bnc" id="L178" title="All 2 branches missed.">            if (ssh.getTransferType().equals(TransferType.Synchronization)) {</span>
+<span class="nc" id="L179">                lfcDirSSHSynchronization.add(ssh.getLfcDir());</span>
+            }
+<span class="nc" id="L181">        }</span>
+
+        String lfcBaseDir;
+        try {
+<span class="nc" id="L185">            lfcBaseDir = lfcPathsBusiness.parseBaseDir(user, path);</span>
+<span class="nc" id="L186">        } catch (DataManagerException e) {</span>
+<span class="nc" id="L187">            throw new BusinessException(&quot;Internal error in data API&quot;);</span>
+<span class="nc" id="L188">        }</span>
+<span class="nc bnc" id="L189" title="All 2 branches missed.">        for (String s : lfcDirSSHSynchronization) {</span>
+<span class="nc bnc" id="L190" title="All 2 branches missed.">            if (lfcBaseDir.startsWith(s)) {</span>
+<span class="nc" id="L191">                logger.error(&quot;({}) Try to delete  synchronized file '{}'&quot;, user.getEmail(), path);</span>
+<span class="nc" id="L192">                return true;</span>
+            }
+<span class="nc" id="L194">        }</span>
+<span class="nc" id="L195">        return false;</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

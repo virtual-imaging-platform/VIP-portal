@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../jacoco-resources/report.gif" type="image/gif"/><title>GwendiaParser.java</title><link rel="stylesheet" href="../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../index.html" class="el_report">coverage</a> &gt; <a href="../index.html" class="el_bundle">vip-application</a> &gt; <a href="index.source.html" class="el_package">fr.insalyon.creatis.vip.application.server.business.simulation.parser</a> &gt; <span class="el_source">GwendiaParser.java</span></div><h1>GwendiaParser.java</h1><pre class="source lang-java linenums">/*
+ * Copyright and authors: see LICENSE.txt in base repository.
+ *
+ * This software is a web portal for pipeline execution on distributed systems.
+ *
+ * This software is governed by the CeCILL-B license under French law and
+ * abiding by the rules of distribution of free software.  You can  use, 
+ * modify and/ or redistribute the software under the terms of the CeCILL-B
+ * license as circulated by CEA, CNRS and INRIA at the following URL
+ * &quot;http://www.cecill.info&quot;. 
+ *
+ * As a counterpart to the access to the source code and  rights to copy,
+ * modify and redistribute granted by the license, users are provided only
+ * with a limited warranty  and the software's author,  the holder of the
+ * economic rights,  and the successive licensors  have only  limited
+ * liability. 
+ *
+ * In this respect, the user's attention is drawn to the risks associated
+ * with loading,  using,  modifying and/or developing or reproducing the
+ * software by the user in light of its specific status of free software,
+ * that may mean  that it is complicated to manipulate,  and  that  also
+ * therefore means  that it is reserved for developers  and  experienced
+ * professionals having in-depth computer knowledge. Users are therefore
+ * encouraged to load and test the software's suitability as regards their
+ * requirements in conditions enabling the security of their systems and/or 
+ * data to be ensured and,  more generally, to use and operate it in the 
+ * same conditions as regards security. 
+ *
+ * The fact that you are presently reading this means that you have had
+ * knowledge of the CeCILL-B license and that you accept its terms.
+ */
+package fr.insalyon.creatis.vip.application.server.business.simulation.parser;
+
+import fr.insalyon.creatis.vip.application.client.bean.Source;
+import fr.insalyon.creatis.vip.application.server.business.SimulationBusiness;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Service;
+import org.xml.sax.Attributes;
+import org.xml.sax.SAXException;
+
+/**
+ * Parse a gwendia file.
+ *
+ * This stores data in fields and this is not threadsafe. So it cannot be used
+ * as a spring singleton and this needs prototype scope.
+ *
+ * @author Rafael Silva
+ */
+@Service
+@Scope(&quot;prototype&quot;)
+public class GwendiaParser extends AbstractWorkflowParser {
+
+<span class="fc" id="L55">    private Source currentSource = null;</span>
+<span class="fc" id="L56">    private String text = null;</span>
+    
+<span class="fc" id="L58">    private final Logger logger = LoggerFactory.getLogger(getClass());</span>
+    
+    public GwendiaParser() {
+<span class="fc" id="L61">        super();</span>
+<span class="fc" id="L62">    }</span>
+
+    @Override
+    public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
+
+<span class="fc bfc" id="L67" title="All 2 branches covered.">        if (localName.equals(&quot;source&quot;)) {</span>
+<span class="fc" id="L68">            Source s = new Source(attributes.getValue(&quot;name&quot;), attributes.getValue(&quot;type&quot;), attributes.getValue(&quot;user-level&quot;), </span>
+<span class="fc" id="L69">                    attributes.getValue(&quot;description&quot;), attributes.getValue(&quot;optional&quot;), attributes.getValue(&quot;default&quot;),  </span>
+<span class="fc" id="L70">                    attributes.getValue(&quot;vip-type-restriction&quot;), attributes.getValue(&quot;pretty-name&quot;));</span>
+            
+<span class="fc" id="L72">            sources.add(s);</span>
+<span class="fc" id="L73">            currentSource = s;</span>
+<span class="fc" id="L74">            return;</span>
+        }
+<span class="fc bfc" id="L76" title="All 4 branches covered.">        if(localName.equals(&quot;source-comment&quot;) || localName.equals(&quot;description&quot;))</span>
+<span class="fc" id="L77">            text=&quot;&quot;;</span>
+<span class="fc" id="L78">    }</span>
+
+    @Override
+    public void characters(char[] ch, int start, int length) throws SAXException {
+<span class="fc bfc" id="L82" title="All 2 branches covered.">         if(text != null) {</span>
+<span class="fc" id="L83">            String chars = new String(ch);</span>
+<span class="fc" id="L84">            text += chars.substring(start,start+length);</span>
+        }
+<span class="fc" id="L86">    }</span>
+
+    @Override
+    public void endElement(String uri, String localName, String qName) throws SAXException {
+<span class="fc bfc" id="L90" title="All 2 branches covered.">        if(localName.equals(&quot;source&quot;)){</span>
+<span class="fc" id="L91">            currentSource = null;</span>
+        }
+<span class="fc bfc" id="L93" title="All 2 branches covered.">        if (localName.equals(&quot;source-comment&quot;)) {</span>
+<span class="fc" id="L94">            currentSource.setDescription(text);</span>
+        }
+<span class="fc bfc" id="L96" title="All 2 branches covered.">        if (localName.equals(&quot;description&quot;)) {</span>
+<span class="fc" id="L97">            description = text;</span>
+        }
+<span class="fc" id="L99">    }</span>
+    
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>
