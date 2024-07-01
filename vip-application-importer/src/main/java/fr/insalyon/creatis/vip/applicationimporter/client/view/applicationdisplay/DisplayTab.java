@@ -173,14 +173,25 @@ public class DisplayTab extends Tab {
      * **/
     private static void checkvipdot(BoutiquesApplication application) {
         Set<String> commandLineFlags = application.getCommandLineFlag();
-
+        Set<String> vipDotInputIds = application.getVipDotInputIds();
         Set<String> commonValues = new HashSet<>(application.getVipDotInputIds());
+        
         commonValues.retainAll(commandLineFlags);
 
         if (!commonValues.isEmpty()) {
             String warningMessage = "<b>" + String.join(", ", commonValues) + "</b> appears as command-line flag input(s), it should not be included in Dot iteration. Importing it may cause functionality issues, although the application will still be imported.";
             Layout.getInstance().setWarningMessage(warningMessage);
         }
+
+        // Extract the IDs from inputs
+        Set<String> inputIds = application.getInputs().stream().map(BoutiquesInput::getId).collect(Collectors.toSet());
+        // Check if all vipDotInputIds are in inputs
+        if (!inputIds.containsAll(vipDotInputIds)) {
+            Set<String> incorrectInputs = new HashSet<>(vipDotInputIds);
+            incorrectInputs.removeAll(inputIds);
+            String warningMessage = "<b>" + String.join(", ", incorrectInputs) + "</b> appears in vipDotInputIds but not in inputs. Please ensure all ids are correct.";
+            Layout.getInstance().setWarningMessage(warningMessage);
+    }
     }
 
     /**
