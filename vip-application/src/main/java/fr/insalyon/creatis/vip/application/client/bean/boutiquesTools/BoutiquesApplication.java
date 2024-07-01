@@ -42,6 +42,7 @@ public class BoutiquesApplication implements IsSerializable {
     private Map<String, String> tags = new HashMap<>();
     private String jsonFile;
     private Set<String> vipDotInputIds;
+    private String resultDirs;
 
     private BoutiquesApplicationExtensions boutiquesExtensions;
 
@@ -247,6 +248,10 @@ public class BoutiquesApplication implements IsSerializable {
                 .collect(Collectors.toSet());
     }
 
+    public String getVipDotResultDirs() {
+        return resultDirs;
+    }
+
     public void addInput(BoutiquesInput input){
         this.inputs.add(input);
     }
@@ -301,5 +306,9 @@ public class BoutiquesApplication implements IsSerializable {
 
     public void setVipDotInputIds(Set<String> inputIds) {
         this.vipDotInputIds = inputIds;
+    }
+
+    public void setVipDotResultDirs(String resultDirs) {
+        this.resultDirs = resultDirs;
     }
 }
