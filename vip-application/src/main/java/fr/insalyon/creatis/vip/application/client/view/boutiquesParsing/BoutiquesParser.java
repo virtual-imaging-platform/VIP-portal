@@ -116,6 +116,7 @@ public class BoutiquesParser extends AbstractJsonParser{
         if (customObject != null) {
             application.setVipContainer(getStringValue(customObject, "vip:imagepath", true));
             application.setVipDotInputIds(getArrayValueAsStringSet(customObject, "vip:dot", true));
+            application.setVipDotResultDirs(getStringValue(customObject, "vip:dot-result-directory", true));
         }
         // Json descriptor
         application.setJsonFile(parsedDescriptor.toString());
