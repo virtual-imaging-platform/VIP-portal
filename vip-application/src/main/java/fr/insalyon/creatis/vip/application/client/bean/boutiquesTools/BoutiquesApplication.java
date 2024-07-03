@@ -42,7 +42,6 @@ public class BoutiquesApplication implements IsSerializable {
     private Map<String, String> tags = new HashMap<>();
     private String jsonFile;
     private Set<String> vipDotInputIds;
-    private Set<String> inputIds;
     private boolean vipDotIncludesResultsDir;
 
     private BoutiquesApplicationExtensions boutiquesExtensions;
