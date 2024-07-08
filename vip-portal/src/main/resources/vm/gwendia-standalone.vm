@@ -73,29 +73,25 @@ if ( result.startsWith("/") || result.startsWith("lfn:") ) {
 #end
       <iterationstrategy>
         <cross>
-#if($tools.getVipDotResultDirs)
+#if($tool.getVipDotInputIds() && !$tool.getVipDotInputIds().isEmpty())
           <dot>
+    #if($tools.getVipDotResultDirs)
             <port name="results-directory" />
-    #foreach($input in $tool.getInputs()) 
-        #if($tool.getVipDotInputIds().contains($input.getId()))
-            <port name="$input.getId()"/>
-        #end
+    #end
+    #foreach($dotInput in $tool.getVipDotInputIds())
+            <port name="$dotInput"/>
     #end
           </dot>
+    #if( ! $tools.getVipDotResultDirs)
+          <port name="results-directory" />
+    #end
 #else
           <port name="results-directory" />
+#end
 #foreach($input in $tool.getInputs()) 
     #if(!$tool.getVipDotInputIds().contains($input.getId()))
-            <port name="$input.getId()"/>
+          <port name="$input.getId()"/>
     #end
-#end
-#end
-#if($tool.getVipDotInputIds() && !$tool.getVipDotInputIds().isEmpty() && !$tools.getVipDotResultDirs)
-          <dot>
-#foreach($dotInput in $tool.getVipDotInputIds())
-            <port name="$dotInput"/>
-#end
-          </dot>
 #end
         </cross>
       </iterationstrategy>
