@@ -545,7 +545,7 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
                         .getUserNames(user.getEmail(), true);
 
                     return workflowBusiness.getSimulations(users,
-                            application, status, appClass, startDate, endDate);
+                            application, status, appClass, startDate, endDate, null);
                 }
             }
         } catch (BusinessException | CoreException ex) {
