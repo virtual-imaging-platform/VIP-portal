@@ -21,7 +21,6 @@ public class ShanoirStorageBusiness {
 
     enum UrlKeys{
         FILE_NAME("shanoir", "^shanoir:/(//)?([^/].*)\\?.*$", 2 ,"fileName"),
-        DATASET_ID("datasetId", "^.*[?&]datasetId=([^&]*)(&.*)?$", 1 ,"datasetId"),
         RESOURCE_ID("resourceId", "^.*[?&]resourceId=([^&]*)(&.*)?$", 1 ,"resourceId"),
         FORMAT("format", "^.*[?&]format=([^&]*)(&.*)?$", 1 ,"format"),
         TOKEN("token", "^.*[?&]token=([^&]*)(&.*)?$", 1 , "token"),
@@ -31,18 +30,25 @@ public class ShanoirStorageBusiness {
         API_URI("apiUrl", "", 0, "download Url"),
         UPLOAD_URL("upload_url","",0,"Import endpoint url"),
         KEYCLOAK_CLIENT_ID("keycloak_client_id", "^.*[?&]clientId=([^&]*)(&.*)?$", 1 ,"clientId"),
-        REFRESH_TOKEN_URL("refresh_token_url","", 0, "");
+        REFRESH_TOKEN_URL("refresh_token_url","", 0, ""),
+        CONVERTER_ID("converterId", "^.*[?&]converterId=([^&]*)(&.*)?$", 1 ,"converterId", "8");
 
         public final String key;
         public final String regex;
         public final int regexGroup;
         public final String errorKey;
+        public final String defaultValue;
 
         UrlKeys(String label, String regex, int regexGroup, String errorKey) {
+            this(label, regex, regexGroup, errorKey, null);
+        }
+
+        UrlKeys(String label, String regex, int regexGroup, String errorKey, String defaultValue) {
             this.key = label;
             this.regex = regex;
             this.regexGroup = regexGroup;
             this.errorKey = errorKey;
+            this.defaultValue = defaultValue;
         }
     }
 
@@ -57,7 +63,7 @@ public class ShanoirStorageBusiness {
        local keycloak_client_id=`echo $URI | sed -r 's/^.*[?&]keycloak_client_id=([^&]*)(&.*)?$/\1/i'`
        local refresh_token_url=`echo $URI | sed -r 's/^.*[?&]refresh_token_url=([^&]*)(&.*)?$/\1/i'`
 
-       So objective : generate "shanoir:/fileName?apiurl=[...]&datasetId=[...]&format=[...]&token=[...]&refreshToken=[....]&keycloak_client_id=[....]&refresh_token_url=[....]
+       So objective : generate "shanoir:/fileName?apiurl=[...]&resourceId=[...]&format=[...]&token=[...]&refreshToken=[....]&keycloak_client_id=[....]&refresh_token_url=[....]
     */
     public String generateUri(
             ExternalPlatform externalPlatform, String parameterName, String parameterValue) throws BusinessException {
@@ -81,11 +87,10 @@ public class ShanoirStorageBusiness {
         }
         
         String format = subString(UrlKeys.FORMAT, parameterValue);
-        // datasetId has been renamed to resourceId
-        // TODO remove datasetId after version 2.7 (and update method doc)
-        String resourceId = subString(UrlKeys.RESOURCE_ID, UrlKeys.DATASET_ID, parameterValue);
+        String resourceId = subString(UrlKeys.RESOURCE_ID, parameterValue);
+        String converterId = subString(UrlKeys.CONVERTER_ID, parameterValue);
 
-        return buildDownloadUri(resourceId, apiUrl, token, refreshToken, format, fileName, keycloakClientId, refreshTokenUrl);
+        return buildDownloadUri(resourceId, apiUrl, token, refreshToken, format, converterId, fileName, keycloakClientId, refreshTokenUrl);
     }
 
     private void verifyExternalPlatform(ExternalPlatform externalPlatform)
@@ -107,7 +112,7 @@ public class ShanoirStorageBusiness {
 
     private String buildDownloadUri(
             String resourceId, String apiUrl, String token, String refreshToken,
-            String format, String fileName, String keycloakClientId, String refreshTokenUrl){
+            String format, String converterId, String fileName, String keycloakClientId, String refreshTokenUrl){
         return UrlKeys.FILE_NAME.key+":/" +
                 fileName +
                 "?"+ UrlKeys.API_URI.key+"=" +
@@ -116,6 +121,8 @@ public class ShanoirStorageBusiness {
                 resourceId +
                 "&amp;"+ UrlKeys.FORMAT.key+"=" +
                 format +
+                "&amp;"+ UrlKeys.CONVERTER_ID.key+"=" +
+                converterId +
                 "&amp;"+ UrlKeys.KEYCLOAK_CLIENT_ID.key+"=" +
                 keycloakClientId +
                 "&amp;"+ UrlKeys.REFRESH_TOKEN_URL.key+"=" +
@@ -154,33 +161,17 @@ public class ShanoirStorageBusiness {
     private String subString(UrlKeys urlKey, String text) throws BusinessException {
         Pattern pattern = Pattern.compile(urlKey.regex);
         Matcher matcher = pattern.matcher(text);
-        if(matcher.matches()) {
+        if (matcher.matches()) {
             if(matcher.group(urlKey.regexGroup) == null){
                 logger.error("Cannot get {} from the uri,", urlKey.errorKey);
                 throw new BusinessException("Cannot get " + urlKey.errorKey + " from shanoir uri");
             }
             return matcher.group(urlKey.regexGroup);
-        }else{
+        } else if (urlKey.defaultValue != null) {
+            return urlKey.defaultValue;
+        } else {
             logger.error("Cannot get {} from the uri", urlKey.errorKey);
             throw new BusinessException("Cannot get " + urlKey.errorKey + " from the uri");
-        }
-    }
-
-
-    private String subString(UrlKeys urlKey, UrlKeys altUrlKey, String text) throws BusinessException {
-        BusinessException originalError;
-        try {
-            return subString(urlKey, text);
-        } catch (BusinessException be) {
-            originalError = be;
-        }
-        // if first try did not work, try alternate regex but throw original exception if it also fails
-        try {
-            String res = subString(altUrlKey, text);
-            logger.info("[Shanoir] using alternative keyword {} because {} did not work", altUrlKey.key, urlKey.key);
-            return res;
-        } catch (BusinessException be) {
-            throw originalError;
         }
     }
 
