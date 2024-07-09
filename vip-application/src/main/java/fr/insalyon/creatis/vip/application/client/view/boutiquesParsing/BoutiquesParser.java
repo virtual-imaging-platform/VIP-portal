@@ -114,8 +114,9 @@ public class BoutiquesParser extends AbstractJsonParser{
         // Custom property
         JSONObject customObject = getObjectValue(parsedDescriptor, "custom", true);
         if (customObject != null) {
-            String vipImagePath = getStringValue(customObject, "vip:imagepath", true);
-            application.setVipContainer(vipImagePath);
+            application.setVipContainer(getStringValue(customObject, "vip:imagepath", true));
+            application.setVipDotInputIds(getArrayValueAsStringSet(customObject, "vip:dot", true));
+            application.setVipDotIncludesResultsDir(getBooleanValue(customObject, "vip:dot-with-results-directory", true));
         }
         // Json descriptor
         application.setJsonFile(parsedDescriptor.toString());
@@ -241,6 +242,4 @@ public class BoutiquesParser extends AbstractJsonParser{
         bof.setCommandLineFlag(commandLineFlag);
         return bof;
     }
-
-
 }

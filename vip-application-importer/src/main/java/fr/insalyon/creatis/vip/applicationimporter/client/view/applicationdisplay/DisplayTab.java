@@ -31,6 +31,9 @@
  */
 package fr.insalyon.creatis.vip.applicationimporter.client.view.applicationdisplay;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.IButton;
@@ -39,6 +42,7 @@ import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.tab.Tab;
+
 import fr.insalyon.creatis.vip.application.client.bean.boutiquesTools.BoutiquesApplication;
 import fr.insalyon.creatis.vip.application.client.view.boutiquesParsing.BoutiquesParser;
 import fr.insalyon.creatis.vip.application.client.view.boutiquesParsing.InvalidBoutiquesDescriptorException;
@@ -48,6 +52,7 @@ import fr.insalyon.creatis.vip.applicationimporter.client.view.Constants;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
+
 
 public class DisplayTab extends Tab {
 
@@ -158,6 +163,34 @@ public class DisplayTab extends Tab {
         if (boutiquesTool.getAuthor() == null) {
             throw new ApplicationImporterException("Boutiques file must have an author");
         }
+         checkvipdot(boutiquesTool);
+    }
+    
+    /**
+     * display warning message if any.
+     *
+     * @param application BoutiquesApplication object to cehck warning message 
+     * @throws ApplicationImporterException 
+     * **/
+    private static void checkvipdot(BoutiquesApplication application) throws ApplicationImporterException {
+        Set<String> commandLineFlags = application.getCommandLineFlag();
+        Set<String> vipDotInputIds = application.getVipDotInputIds();
+        Set<String> inputIds = application.getinputIds();
+        Set<String> commonValues = new HashSet<>(vipDotInputIds);
+        
+        commonValues.retainAll(commandLineFlags);
+
+        if (!commonValues.isEmpty()) {
+            String warningMessage = "<b>" + String.join(", ", commonValues) + "</b> appears as command-line flag input(s), it should not be included in Dot iteration. Importing it may cause functionality issues, although the application will still be imported.";
+            Layout.getInstance().setWarningMessage(warningMessage);
+        }
+        // Check if all vipDotInputIds are in inputs
+        if (!inputIds.containsAll(vipDotInputIds)) {
+            Set<String> incorrectInputs = new HashSet<>(vipDotInputIds);
+            incorrectInputs.removeAll(inputIds);
+            String errorMessage = "<b>" + String.join(", ", incorrectInputs) + "</b> appears in vipDotInputIds but not in inputs. Please ensure all ids are correct.";
+            throw new ApplicationImporterException(errorMessage);
+    }
     }
 
     /**
