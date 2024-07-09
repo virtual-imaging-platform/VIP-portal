@@ -65,8 +65,8 @@ public class SimulationBusiness {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    private LfcPathsBusiness lfcPathsBusiness;
-    private Server server;
+    private final LfcPathsBusiness lfcPathsBusiness;
+    private final Server server;
 
     @Autowired
     public SimulationBusiness(LfcPathsBusiness lfcPathsBusiness, Server server) {

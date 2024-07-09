@@ -73,7 +73,7 @@ public class ExecutionController extends ApiController {
     }
 
     @RequestMapping
-    public Execution[] listExecutions(
+    public List<Execution> listExecutions(
             @RequestParam(required = false) String studyIdentifier,
             @RequestParam(required = false) Integer offset,
             @RequestParam(required = false) Integer limit

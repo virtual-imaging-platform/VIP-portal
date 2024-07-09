@@ -36,6 +36,7 @@ import fr.insalyon.creatis.vip.application.client.view.monitor.SimulationStatus;
 import java.util.Date;
 
 /**
+ * This is almost the same as the workflow class from workflowsdb
  *
  * @author Rafael Ferreira da Silva
  */
