@@ -1,6 +1,16 @@
 package fr.insalyon.creatis.vip.core.server.business;
 
-import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.stream.Stream;
+
+import javax.annotation.PostConstruct;
+
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.configuration.reloading.FileChangedReloadingStrategy;
@@ -16,15 +26,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
-import javax.annotation.PostConstruct;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.stream.Stream;
+import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 
 /**
  * Reads the vip.conf property file from the configured vifConfigFolder
@@ -438,5 +440,10 @@ public class SpringConfigServer implements Server {
     @Override
     public String getReproVIPRootDir() {
         return env.getProperty(CoreConstants.REPROVIP_ROOT_DIR, "/vip/ReproVip/");
+    }
+
+    @Override
+    public boolean useMoteurlite() {
+        return env.getProperty(CoreConstants.USE_MOTEURLITE, Boolean.class, false);
     }
 }

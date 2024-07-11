@@ -1,7 +1,5 @@
 package fr.insalyon.creatis.vip.core.server.business;
 
-import org.apache.commons.configuration.ConfigurationException;
-
 import java.util.HashMap;
 import java.util.List;
 
@@ -113,4 +111,6 @@ public interface Server {
     int getApiParallelDownloadNb();
 
     String getReproVIPRootDir();
+
+    boolean useMoteurlite();
 }

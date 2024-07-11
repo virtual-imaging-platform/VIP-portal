@@ -31,8 +31,9 @@
  */
 package fr.insalyon.creatis.vip.core.client.view;
 
-import com.google.gwt.user.client.rpc.IsSerializable;
 import java.util.Date;
+
+import com.google.gwt.user.client.rpc.IsSerializable;
 
 /**
  *
@@ -192,6 +193,8 @@ public class CoreConstants implements IsSerializable {
     public static final String API_PARALLEL_DOWNLOAD_NB = "api.downloads.nb";
     // ReproVIPfiles";
     public static final String REPROVIP_ROOT_DIR = "reprovip.root-dir";
+    //moteurlite
+    public static final String USE_MOTEURLITE = "moteurlite.enabled";
 
 
 
