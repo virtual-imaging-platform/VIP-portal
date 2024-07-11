@@ -167,9 +167,6 @@ JSONPARAMETERS
 # Command-line execution #
 ##########################
 
-TOOLNAME="$tool.getName()"
-JSONFILE="${TOOLNAME}.json"
-
 # BOSH_CVMFS_PATH is defined by GASW from the settings file
 checkBosh $BOSH_CVMFS_PATH
 
@@ -204,10 +201,12 @@ TMP_FOLDER=../$TMP_FOLDER
 #end
 mkdir -p $TMP_FOLDER
 
-#if($imagepath == "")
-PYTHONPATH=".:$PYTHONPATH" $BOSHEXEC exec launch $JSONFILE input_param_file.json -v $PWD/../cache:$PWD/../cache -v $TMP_FOLDER:/tmp
+#set($jsonFile="${tool.getName()}.json")
+
+#if($imagepath)
+PYTHONPATH=".:$PYTHONPATH" $BOSHEXEC exec launch --imagepath $imagepath $jsonFile input_param_file.json -v $PWD/../cache:$PWD/../cache -v $TMP_FOLDER:/tmp
 #else
-PYTHONPATH=".:$PYTHONPATH" $BOSHEXEC exec launch --imagepath $imagepath $JSONFILE input_param_file.json -v $PWD/../cache:$PWD/../cache -v $TMP_FOLDER:/tmp
+PYTHONPATH=".:$PYTHONPATH" $BOSHEXEC exec launch $jsonFile input_param_file.json -v $PWD/../cache:$PWD/../cache -v $TMP_FOLDER:/tmp
 #end
 
 if [ $? != 0 ]
