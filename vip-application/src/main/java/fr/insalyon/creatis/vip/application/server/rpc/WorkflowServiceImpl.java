@@ -132,6 +132,44 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
 
     /**
      *
+     * @param userName
+     * @param application
+     * @param status
+     * @param startDate
+     * @param endDate
+     * @return
+     * @throws ApplicationException
+     */
+    @Override
+    public List<Simulation> getSimulations(String userName, String application,
+                                           String status, String appClass, Date startDate, Date endDate) throws ApplicationException {
+        try {
+            User user = getSessionUser();
+            if (user.isSystemAdministrator()) {
+                return workflowBusiness.getSimulations(userName, application,
+                        status, appClass, startDate, endDate);
+
+            } else {
+
+                if (userName != null) {
+                    return workflowBusiness.getSimulations(userName,
+                            application, status, appClass, startDate, endDate);
+
+                } else {
+                    List<String> users = configurationBusiness
+                            .getUserNames(user.getEmail(), true);
+
+                    return workflowBusiness.getSimulations(users,
+                            application, status, appClass, startDate, endDate, null);
+                }
+            }
+        } catch (BusinessException | CoreException ex) {
+            throw new ApplicationException(ex);
+        }
+    }
+
+    /**
+     *
      * @param applicationName
      * @param applicationVersion
      * @return
@@ -510,44 +548,6 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
             trace(logger, "Relaunching simulation '" + simulationID + "'.");
             return workflowBusiness.relaunch(
                 simulationID, getSessionUser().getFolder());
-        } catch (BusinessException | CoreException ex) {
-            throw new ApplicationException(ex);
-        }
-    }
-
-    /**
-     *
-     * @param userName
-     * @param application
-     * @param status
-     * @param startDate
-     * @param endDate
-     * @return
-     * @throws ApplicationException
-     */
-    @Override
-    public List<Simulation> getSimulations(String userName, String application,
-            String status, String appClass, Date startDate, Date endDate) throws ApplicationException {
-        try {
-            User user = getSessionUser();
-            if (user.isSystemAdministrator()) {
-                return workflowBusiness.getSimulations(userName, application,
-                        status, appClass, startDate, endDate);
-
-            } else {
-
-                if (userName != null) {
-                    return workflowBusiness.getSimulations(userName,
-                            application, status, appClass, startDate, endDate);
-
-                } else {
-                    List<String> users = configurationBusiness
-                        .getUserNames(user.getEmail(), true);
-
-                    return workflowBusiness.getSimulations(users,
-                            application, status, appClass, startDate, endDate, null);
-                }
-            }
         } catch (BusinessException | CoreException ex) {
             throw new ApplicationException(ex);
         }

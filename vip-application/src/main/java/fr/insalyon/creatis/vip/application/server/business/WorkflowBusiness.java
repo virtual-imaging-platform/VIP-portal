@@ -366,7 +366,9 @@ public class WorkflowBusiness {
             String userName, String application, String status, String appClass,
             Date startDate, Date endDate, String tag) throws BusinessException {
 
-        return getSimulations(Collections.singletonList(userName), application, status, appClass, startDate, endDate, tag);
+        return getSimulations(
+                userName == null ? null : Collections.singletonList(userName),
+                application, status, appClass, startDate, endDate, tag);
     }
 
     /**
