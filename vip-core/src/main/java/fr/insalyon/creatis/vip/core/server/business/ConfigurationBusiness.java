@@ -106,14 +106,17 @@ public class ConfigurationBusiness {
     }
 
     public void configure() throws BusinessException {
-
-        try {
-            logger.debug("Configuring VIP server proxy.");
-            proxyClient.checkProxy();
-
-        } catch (Exception ex) {
-            logger.error("Error configuring myproxy : {}", ex.getMessage());
-            throw new BusinessException(ex);
+        if (server.getMyProxyEnabled()) {
+            try {
+                logger.debug("Configuring VIP server proxy.");
+                proxyClient.checkProxy();
+    
+            } catch (Exception ex) {
+                logger.error("Error configuring myproxy : {}", ex.getMessage());
+                throw new BusinessException(ex);
+            }
+        } else {
+            logger.info("Proxy not needed and not validated !");
         }
     }
 

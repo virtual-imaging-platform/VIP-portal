@@ -38,6 +38,8 @@ public interface Server {
 
     int getMyProxyMinHours();
 
+	boolean getMyProxyEnabled();
+
     String getGRIDAHost();
 
     int getGRIDAPort();

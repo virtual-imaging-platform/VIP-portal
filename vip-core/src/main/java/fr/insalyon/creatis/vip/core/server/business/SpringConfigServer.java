@@ -104,12 +104,15 @@ public class SpringConfigServer implements Server {
         assertPropertyIsNotEmpty(CoreConstants.VO_NAME);
         assertPropertyIsNotEmpty(CoreConstants.VO_ROOT);
 
-        assertPropertyIsPresent(CoreConstants.LAB_MYPROXY_HOST);
-        assertPropertyIsPresent(CoreConstants.LAB_MYPROXY_PORT);
-        assertPropertyIsPresent(CoreConstants.LAB_MYPROXY_USER);
-        assertPropertyIsPresent(CoreConstants.LAB_MYPROXY_PASS);
-        assertPropertyIsPresent(CoreConstants.LAB_MYPROXY_LIFETIME);
-        assertPropertyIsNotEmpty(CoreConstants.LAB_MYPROXY_MIN_HOURS, Integer.class);
+        assertOptionalPropertyType(CoreConstants.LAB_MYPROXY_ENABLED, Boolean.class);
+        if (getMyProxyEnabled()) {
+            assertPropertyIsPresent(CoreConstants.LAB_MYPROXY_HOST);
+            assertPropertyIsPresent(CoreConstants.LAB_MYPROXY_PORT);
+            assertPropertyIsPresent(CoreConstants.LAB_MYPROXY_USER);
+            assertPropertyIsPresent(CoreConstants.LAB_MYPROXY_PASS);
+            assertPropertyIsPresent(CoreConstants.LAB_MYPROXY_LIFETIME);
+            assertPropertyIsNotEmpty(CoreConstants.LAB_MYPROXY_MIN_HOURS, Integer.class);
+        }
 
         assertPropertyIsNotEmpty(CoreConstants.LAB_SMA_HOST);
         assertPropertyIsNotEmpty(CoreConstants.LAB_SMA_PORT, Integer.class);
@@ -149,7 +152,6 @@ public class SpringConfigServer implements Server {
         assertPropertyIsNotEmpty(CoreConstants.LAB_SIMULATION_PLATFORM_MAX, Integer.class);
 
         assertOptionalPropertyType(CoreConstants.USE_LOCAL_FILES_AS_INPUTS, Boolean.class);
-
     }
 
     private void assertPropertyIsPresent(String property) {
@@ -180,7 +182,6 @@ public class SpringConfigServer implements Server {
             Assert.notNull(env.getProperty(property, type), property + " should not be empty");
         }
     }
-
 
     @Override
     public String getConfigurationFolder() {
@@ -242,6 +243,11 @@ public class SpringConfigServer implements Server {
     @Override
     public int getMyProxyMinHours() {
         return env.getRequiredProperty(CoreConstants.LAB_MYPROXY_MIN_HOURS, Integer.class);
+    }
+
+    @Override
+    public boolean getMyProxyEnabled() {
+        return env.getProperty(CoreConstants.LAB_MYPROXY_ENABLED, Boolean.class, true);
     }
 
     @Override
