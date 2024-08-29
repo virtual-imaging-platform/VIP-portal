@@ -110,6 +110,7 @@ public class SpringConfigServer implements Server {
         assertPropertyIsPresent(CoreConstants.LAB_MYPROXY_PASS);
         assertPropertyIsPresent(CoreConstants.LAB_MYPROXY_LIFETIME);
         assertPropertyIsNotEmpty(CoreConstants.LAB_MYPROXY_MIN_HOURS, Integer.class);
+		assertPropertyIsNotEmpty(CoreConstants.LAB_MYPROXY_ENABLED, Boolean.class);
 
         assertPropertyIsNotEmpty(CoreConstants.LAB_SMA_HOST);
         assertPropertyIsNotEmpty(CoreConstants.LAB_SMA_PORT, Integer.class);
@@ -149,7 +150,6 @@ public class SpringConfigServer implements Server {
         assertPropertyIsNotEmpty(CoreConstants.LAB_SIMULATION_PLATFORM_MAX, Integer.class);
 
         assertOptionalPropertyType(CoreConstants.USE_LOCAL_FILES_AS_INPUTS, Boolean.class);
-
     }
 
     private void assertPropertyIsPresent(String property) {
@@ -243,6 +243,11 @@ public class SpringConfigServer implements Server {
     public int getMyProxyMinHours() {
         return env.getRequiredProperty(CoreConstants.LAB_MYPROXY_MIN_HOURS, Integer.class);
     }
+
+	@Override
+	public boolean getMyProxyEnabled() {
+		return env.getRequiredProperty(CoreConstants.LAB_MYPROXY_ENABLED, Boolean.class);
+	}
 
     @Override
     public String getGRIDAHost() {
