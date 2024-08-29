@@ -104,13 +104,15 @@ public class SpringConfigServer implements Server {
         assertPropertyIsNotEmpty(CoreConstants.VO_NAME);
         assertPropertyIsNotEmpty(CoreConstants.VO_ROOT);
 
-        assertPropertyIsPresent(CoreConstants.LAB_MYPROXY_HOST);
-        assertPropertyIsPresent(CoreConstants.LAB_MYPROXY_PORT);
-        assertPropertyIsPresent(CoreConstants.LAB_MYPROXY_USER);
-        assertPropertyIsPresent(CoreConstants.LAB_MYPROXY_PASS);
-        assertPropertyIsPresent(CoreConstants.LAB_MYPROXY_LIFETIME);
-        assertPropertyIsNotEmpty(CoreConstants.LAB_MYPROXY_MIN_HOURS, Integer.class);
-		assertPropertyIsNotEmpty(CoreConstants.LAB_MYPROXY_ENABLED, Boolean.class);
+        assertOptionalPropertyType(CoreConstants.LAB_MYPROXY_ENABLED, Boolean.class);
+        if (getMyProxyEnabled()) {
+            assertPropertyIsPresent(CoreConstants.LAB_MYPROXY_HOST);
+            assertPropertyIsPresent(CoreConstants.LAB_MYPROXY_PORT);
+            assertPropertyIsPresent(CoreConstants.LAB_MYPROXY_USER);
+            assertPropertyIsPresent(CoreConstants.LAB_MYPROXY_PASS);
+            assertPropertyIsPresent(CoreConstants.LAB_MYPROXY_LIFETIME);
+            assertPropertyIsNotEmpty(CoreConstants.LAB_MYPROXY_MIN_HOURS, Integer.class);
+        }
 
         assertPropertyIsNotEmpty(CoreConstants.LAB_SMA_HOST);
         assertPropertyIsNotEmpty(CoreConstants.LAB_SMA_PORT, Integer.class);
@@ -181,7 +183,6 @@ public class SpringConfigServer implements Server {
         }
     }
 
-
     @Override
     public String getConfigurationFolder() {
         return vipConfigFolder.getAbsolutePath() + "/";
@@ -244,10 +245,10 @@ public class SpringConfigServer implements Server {
         return env.getRequiredProperty(CoreConstants.LAB_MYPROXY_MIN_HOURS, Integer.class);
     }
 
-	@Override
-	public boolean getMyProxyEnabled() {
-		return env.getRequiredProperty(CoreConstants.LAB_MYPROXY_ENABLED, Boolean.class);
-	}
+    @Override
+    public boolean getMyProxyEnabled() {
+        return env.getProperty(CoreConstants.LAB_MYPROXY_ENABLED, Boolean.class, true);
+    }
 
     @Override
     public String getGRIDAHost() {

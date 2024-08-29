@@ -104,7 +104,7 @@ public class WebServiceEngine extends WorkflowEngineInstantiator {
             throws
             java.rmi.RemoteException,
             javax.xml.rpc.ServiceException {
-		String strProxy = null;
+        String strProxy = null;
 
         System.setProperty("javax.net.ssl.trustStore", server.getTruststoreFile());
         System.setProperty("javax.net.ssl.trustStorePassword", server.getTruststorePass());
@@ -112,9 +112,9 @@ public class WebServiceEngine extends WorkflowEngineInstantiator {
 
         // String settings = "This is going to contain settings...";
         // Get Proxy from current User's context
-		if (server.getMyProxyEnabled()) {
-			strProxy = ProxyUtil.readAsString(proxyFileName);
-		}
+        if (server.getMyProxyEnabled()) {
+            strProxy = ProxyUtil.readAsString(proxyFileName);
+        }
 
         //configure WS with the specific wsdd file (fix pb of conflict with grid service)
         String resourcename = "moteur-client-config.wsdd";

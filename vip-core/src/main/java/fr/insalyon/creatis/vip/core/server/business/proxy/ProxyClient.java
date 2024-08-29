@@ -96,7 +96,7 @@ public class ProxyClient {
 
         int proxyHoursValidity = server.getMyProxyMinHours();
 
-        if (!server.getMyProxyEnabled()) {
+        if ( ! server.getMyProxyEnabled()) {
             logger.info("Proxy not needed and not validated");
             return;
         }
