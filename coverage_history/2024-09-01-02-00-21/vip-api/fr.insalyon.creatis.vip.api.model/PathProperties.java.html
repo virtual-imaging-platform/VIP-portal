@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../jacoco-resources/report.gif" type="image/gif"/><title>PathProperties.java</title><link rel="stylesheet" href="../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../index.html" class="el_report">coverage</a> &gt; <a href="../index.html" class="el_bundle">vip-api</a> &gt; <a href="index.source.html" class="el_package">fr.insalyon.creatis.vip.api.model</a> &gt; <span class="el_source">PathProperties.java</span></div><h1>PathProperties.java</h1><pre class="source lang-java linenums">/*
+ * Copyright and authors: see LICENSE.txt in base repository.
+ *
+ * This software is a web portal for pipeline execution on distributed systems.
+ *
+ * This software is governed by the CeCILL-B license under French law and
+ * abiding by the rules of distribution of free software.  You can  use,
+ * modify and/ or redistribute the software under the terms of the CeCILL-B
+ * license as circulated by CEA, CNRS and INRIA at the following URL
+ * &quot;http://www.cecill.info&quot;.
+ *
+ * As a counterpart to the access to the source code and  rights to copy,
+ * modify and redistribute granted by the license, users are provided only
+ * with a limited warranty  and the software's author,  the holder of the
+ * economic rights,  and the successive licensors  have only  limited
+ * liability.
+ *
+ * In this respect, the user's attention is drawn to the risks associated
+ * with loading,  using,  modifying and/or developing or reproducing the
+ * software by the user in light of its specific status of free software,
+ * that may mean  that it is complicated to manipulate,  and  that  also
+ * therefore means  that it is reserved for developers  and  experienced
+ * professionals having in-depth computer knowledge. Users are therefore
+ * encouraged to load and test the software's suitability as regards their
+ * requirements in conditions enabling the security of their systems and/or
+ * data to be ensured and,  more generally, to use and operate it in the
+ * same conditions as regards security.
+ *
+ * The fact that you are presently reading this means that you have had
+ * knowledge of the CeCILL-B license and that you accept its terms.
+ */
+package fr.insalyon.creatis.vip.api.model;
+
+/**
+ * Created by abonnet on 1/13/17.
+ */
+<span class="nc" id="L37">public class PathProperties {</span>
+
+    private String path;
+    private Long lastModificationDate;
+    private Boolean isDirectory;
+    private Boolean exists;
+    private Long size;
+    private String executionId;
+    private String mimeType;
+
+    public String getPath() {
+<span class="nc" id="L48">        return path;</span>
+    }
+
+    public void setPath(String path) {
+<span class="nc" id="L52">        this.path = path;</span>
+<span class="nc" id="L53">    }</span>
+
+    public Long getLastModificationDate() {
+<span class="nc" id="L56">        return lastModificationDate;</span>
+    }
+
+    public void setLastModificationDate(Long lastModificationDate) {
+<span class="nc" id="L60">        this.lastModificationDate = lastModificationDate;</span>
+<span class="nc" id="L61">    }</span>
+
+    public Boolean getIsDirectory() {
+<span class="nc" id="L64">        return isDirectory;</span>
+    }
+
+    public void setIsDirectory(Boolean directory) {
+<span class="nc" id="L68">        isDirectory = directory;</span>
+<span class="nc" id="L69">    }</span>
+
+    public Boolean getExists() {
+<span class="nc" id="L72">        return exists;</span>
+    }
+
+    public void setExists(Boolean exists) {
+<span class="nc" id="L76">        this.exists = exists;</span>
+<span class="nc" id="L77">    }</span>
+
+    public Long getSize() {
+<span class="nc" id="L80">        return size;</span>
+    }
+
+    public void setSize(Long size) {
+<span class="nc" id="L84">        this.size = size;</span>
+<span class="nc" id="L85">    }</span>
+
+    public String getExecutionId() {
+<span class="nc" id="L88">        return executionId;</span>
+    }
+
+    public void setExecutionId(String executionId) {
+<span class="nc" id="L92">        this.executionId = executionId;</span>
+<span class="nc" id="L93">    }</span>
+
+    public String getMimeType() {
+<span class="nc" id="L96">        return mimeType;</span>
+    }
+
+    public void setMimeType(String mimeType) {
+<span class="nc" id="L100">        this.mimeType = mimeType;</span>
+<span class="nc" id="L101">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

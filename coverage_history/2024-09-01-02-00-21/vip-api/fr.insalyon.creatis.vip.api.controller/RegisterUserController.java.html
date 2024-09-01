@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../jacoco-resources/report.gif" type="image/gif"/><title>RegisterUserController.java</title><link rel="stylesheet" href="../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../index.html" class="el_report">coverage</a> &gt; <a href="../index.html" class="el_bundle">vip-api</a> &gt; <a href="index.source.html" class="el_package">fr.insalyon.creatis.vip.api.controller</a> &gt; <span class="el_source">RegisterUserController.java</span></div><h1>RegisterUserController.java</h1><pre class="source lang-java linenums">package fr.insalyon.creatis.vip.api.controller;
+
+import fr.insalyon.creatis.vip.api.business.ApiUserBusiness;
+import fr.insalyon.creatis.vip.api.model.SignUpUserDTO;
+import fr.insalyon.creatis.vip.api.exception.ApiException;
+import fr.insalyon.creatis.vip.core.client.bean.User;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
+import java.util.Date;
+
+/**
+ * @author KhalilKes
+ */
+@RestController
+@RequestMapping(&quot;/register&quot;)
+public class RegisterUserController extends ApiController {
+
+<span class="fc" id="L24">    private final Logger logger = LoggerFactory.getLogger(getClass());</span>
+
+    private final ApiUserBusiness apiUserBusiness;
+
+    /**
+     *
+     * @param apiUserBusiness
+     */
+    @Autowired
+<span class="fc" id="L33">    public RegisterUserController(ApiUserBusiness apiUserBusiness) {</span>
+<span class="fc" id="L34">        this.apiUserBusiness = apiUserBusiness;</span>
+<span class="fc" id="L35">    }</span>
+
+    /**
+     *
+     * @param signUpUser
+     * @return ResponseEntity&lt;String&gt;
+     * @throws ApiException
+     */
+    @RequestMapping(method = RequestMethod.POST)
+    public ResponseEntity&lt;?&gt; signup(
+            @RequestBody @Valid SignUpUserDTO signUpUser)
+            throws ApiException {
+<span class="nc" id="L47">        logMethodInvocation(logger,&quot;signup&quot;, signUpUser.getEmail());</span>
+<span class="nc" id="L48">        User user = new User(signUpUser.getFirstName(),</span>
+<span class="nc" id="L49">                signUpUser.getLastName(),</span>
+<span class="nc" id="L50">                signUpUser.getEmail(),</span>
+<span class="nc" id="L51">                signUpUser.getInstitution(),</span>
+<span class="nc" id="L52">                signUpUser.getPassword(),</span>
+<span class="nc" id="L53">                signUpUser.getLevel(),</span>
+<span class="nc" id="L54">                signUpUser.getCountryCode()</span>
+                );
+<span class="nc" id="L56">        user.setRegistration(new Date());</span>
+<span class="nc" id="L57">        user.setLastLogin(new Date());</span>
+<span class="nc" id="L58">        this.apiUserBusiness.signup(user, signUpUser.getComments(), signUpUser.getApplications());</span>
+<span class="nc" id="L59">        return new ResponseEntity(HttpStatus.CREATED);</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../jacoco-resources/report.gif" type="image/gif"/><title>BoutiquesNumberInput.java</title><link rel="stylesheet" href="../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../index.html" class="el_report">coverage</a> &gt; <a href="../index.html" class="el_bundle">vip-application</a> &gt; <a href="index.source.html" class="el_package">fr.insalyon.creatis.vip.application.client.bean.boutiquesTools</a> &gt; <span class="el_source">BoutiquesNumberInput.java</span></div><h1>BoutiquesNumberInput.java</h1><pre class="source lang-java linenums">package fr.insalyon.creatis.vip.application.client.bean.boutiquesTools;
+
+import java.util.Map;
+import java.util.Set;
+
+/**
+ * Representation of a Number input in an application Boutiques descriptor
+ *
+ * @author Guillaume Vanel
+ * @version %I%, %G%
+ */
+public class BoutiquesNumberInput extends BoutiquesInput{
+    private Double defaultValue;
+    private boolean isInteger;
+    private boolean isExclusiveMaximum;
+    private boolean isExclusiveMinimum;
+    private Double maximum;
+    private Double minimum;
+
+<span class="nc" id="L20">    public BoutiquesNumberInput() {</span>
+<span class="nc" id="L21">    }</span>
+
+    /**
+     * @param id                    String
+     * @param name                  String
+     * @param description           String
+     * @param isOptional            boolean
+     * @param disablesInputsId      List of String IDs of inputs disabled when this is non-empty
+     * @param requiresInputsId      List of String IDs of inputs requiring this to be non-empty
+     * @param possibleValues        List of String values this input can take
+     * @param valueDisablesInputsId Map from String values to Lists of String IDs of inputs disabled by corresponding
+     *                              value
+     * @param valueRequiresInputsId Map from String values to Lists of String IDs of inputs requiring corresponding
+     *                              value
+     * @param defaultValue          Double
+     * @param isInteger             boolean: true if this input accepts only integer values
+     * @param isExclusiveMaximum    boolean: true if maximum is exclusive
+     * @param isExclusiveMinimum    boolean: true if maximum is exclusive
+     * @param maximum               Double: maximum allowed value
+     * @param minimum               Double: minimum allowed value
+     * @throws RuntimeException if descriptor is invalid
+     */
+    public BoutiquesNumberInput(String id, String name, String description, boolean isOptional,
+                                Set&lt;String&gt; disablesInputsId, Set&lt;String&gt; requiresInputsId,
+                                Set&lt;String&gt; possibleValues, Map&lt;String, Set&lt;String&gt;&gt; valueDisablesInputsId,
+                                Map&lt;String, Set&lt;String&gt;&gt; valueRequiresInputsId, Double defaultValue,
+                                boolean isInteger, boolean isExclusiveMaximum, boolean isExclusiveMinimum,
+                                Double maximum, Double minimum) throws RuntimeException{
+<span class="fc" id="L49">        super(id, name, description, InputType.NUMBER, isOptional, disablesInputsId, requiresInputsId, possibleValues,</span>
+                valueDisablesInputsId, valueRequiresInputsId);
+<span class="fc" id="L51">        this.defaultValue = defaultValue;</span>
+<span class="fc" id="L52">        this.isInteger = isInteger;</span>
+<span class="fc" id="L53">        this.isExclusiveMaximum = isExclusiveMaximum;</span>
+<span class="fc" id="L54">        this.isExclusiveMinimum = isExclusiveMinimum;</span>
+<span class="fc" id="L55">        this.maximum = maximum;</span>
+<span class="fc" id="L56">        this.minimum = minimum;</span>
+<span class="fc" id="L57">    }</span>
+
+    /**
+     * @return Double representing this input's default value, or null if there is not any
+     */
+    public Double getDefaultValue() {
+<span class="fc" id="L63">        return this.defaultValue;</span>
+    }
+
+    /**
+     * @return Double representing this input's maximum allowed value, or null if there is not any
+     */
+    public Double getMaximum() {
+<span class="nc" id="L70">        return this.maximum;</span>
+    }
+
+    /**
+     * @return Double representing this input's minimum allowed value, or null if there is not any
+     */
+    public Double getMinimum() {
+<span class="nc" id="L77">        return this.minimum;</span>
+    }
+
+    /**
+     * @return boolean: true if maximum allowed value for this is exclusive, false otherwise
+     */
+    public boolean isExclusiveMaximum() {
+<span class="nc" id="L84">        return this.isExclusiveMaximum;</span>
+    }
+
+    /**
+     * @return boolean: true if minimum allowed value for this is exclusive, false otherwise
+     */
+    public boolean isExclusiveMinimum() {
+<span class="nc" id="L91">        return this.isExclusiveMinimum;</span>
+    }
+
+    /**
+     * @return boolean: true if this accepts only integer values, false otherwise
+     */
+    public boolean isInteger() {
+<span class="fc" id="L98">        return this.isInteger;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

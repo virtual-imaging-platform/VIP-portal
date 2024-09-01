@@ -1,0 +1,364 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../jacoco-resources/report.gif" type="image/gif"/><title>ReproVipBusiness.java</title><link rel="stylesheet" href="../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../index.html" class="el_report">coverage</a> &gt; <a href="../index.html" class="el_bundle">vip-application</a> &gt; <a href="index.source.html" class="el_package">fr.insalyon.creatis.vip.application.server.business</a> &gt; <span class="el_source">ReproVipBusiness.java</span></div><h1>ReproVipBusiness.java</h1><pre class="source lang-java linenums">package fr.insalyon.creatis.vip.application.server.business;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import fr.insalyon.creatis.vip.application.client.bean.AppVersion;
+import fr.insalyon.creatis.vip.application.client.bean.Simulation;
+import fr.insalyon.creatis.vip.application.server.dao.PublicExecutionDAO;
+import fr.insalyon.creatis.vip.core.client.bean.PublicExecution;
+import fr.insalyon.creatis.vip.core.server.business.BusinessException;
+import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
+import fr.insalyon.creatis.vip.core.server.business.EmailBusiness;
+import fr.insalyon.creatis.vip.core.server.business.Server;
+import fr.insalyon.creatis.vip.core.server.dao.DAOException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+@Service
+@Transactional
+public class ReproVipBusiness {
+
+<span class="fc" id="L34">    private final Logger logger = LoggerFactory.getLogger(getClass());</span>
+
+    private final ConfigurationBusiness configurationBusiness;
+    private final ApplicationBusiness applicationBusiness;
+    private final EmailBusiness emailBusiness;
+    private final Server server;
+    private final SimulationBusiness simulationBusiness;
+    private final PublicExecutionDAO publicExecutionDAO;
+    private final WorkflowBusiness workflowBusiness;
+
+    @Autowired
+    public ReproVipBusiness(
+            ConfigurationBusiness configurationBusiness, ApplicationBusiness applicationBusiness,
+            EmailBusiness emailBusiness, Server server, SimulationBusiness simulationBusiness,
+<span class="fc" id="L48">            PublicExecutionDAO publicExecutionDAO, WorkflowBusiness workflowBusiness) {</span>
+<span class="fc" id="L49">        this.configurationBusiness = configurationBusiness;</span>
+<span class="fc" id="L50">        this.applicationBusiness = applicationBusiness;</span>
+<span class="fc" id="L51">        this.emailBusiness = emailBusiness;</span>
+<span class="fc" id="L52">        this.server = server;</span>
+<span class="fc" id="L53">        this.simulationBusiness = simulationBusiness;</span>
+<span class="fc" id="L54">        this.publicExecutionDAO = publicExecutionDAO;</span>
+<span class="fc" id="L55">        this.workflowBusiness = workflowBusiness;</span>
+<span class="fc" id="L56">    }</span>
+
+    public void createPublicExecution(PublicExecution publicExecution) throws BusinessException {
+        try {
+<span class="nc" id="L60">            publicExecutionDAO.add(publicExecution);</span>
+
+<span class="nc" id="L62">            String adminsEmailContents = &quot;&lt;html&gt;&quot;</span>
+                    + &quot;&lt;head&gt;&lt;/head&gt;&quot;
+                    + &quot;&lt;body&gt;&quot;
+                    + &quot;&lt;p&gt;Dear Administrator,&lt;/p&gt;&quot;
+                    + &quot;&lt;p&gt;A new user requested to make an execution public&lt;/p&gt;&quot;
+                    + &quot;&lt;p&gt;Details:&lt;/p&gt;&quot;
+                    + &quot;&lt;ul&gt;&quot;
+<span class="nc" id="L69">                    + &quot;&lt;li&gt;ID: &quot; + publicExecution.getId() + &quot;&lt;/li&gt;&quot;</span>
+<span class="nc" id="L70">                    + &quot;&lt;li&gt;Name: &quot; + publicExecution.getSimulationName() + &quot;&lt;/li&gt;&quot;</span>
+<span class="nc" id="L71">                    + &quot;&lt;li&gt;Name: &quot; + publicExecution.getApplicationName() + &quot;&lt;/li&gt;&quot;</span>
+<span class="nc" id="L72">                    + &quot;&lt;li&gt;Version: &quot; + publicExecution.getApplicationVersion() + &quot;&lt;/li&gt;&quot;</span>
+<span class="nc" id="L73">                    + &quot;&lt;li&gt;Status: &quot; + publicExecution.getStatus() + &quot;&lt;/li&gt;&quot;</span>
+<span class="nc" id="L74">                    + &quot;&lt;li&gt;Author: &quot; + publicExecution.getAuthor() + &quot;&lt;/li&gt;&quot;</span>
+<span class="nc" id="L75">                    + &quot;&lt;li&gt;Comments: &quot; + publicExecution.getComments() + &quot;&lt;/li&gt;&quot;</span>
+                    + &quot;&lt;/ul&gt;&quot;
+                    + &quot;&lt;p&gt;Best Regards,&lt;/p&gt;&quot;
+                    + &quot;&lt;p&gt;VIP Team&lt;/p&gt;&quot;
+                    + &quot;&lt;/body&gt;&quot;
+                    + &quot;&lt;/html&gt;&quot;;
+
+<span class="nc bnc" id="L82" title="All 2 branches missed.">            for (String supportEmail : configurationBusiness.getSupportEmails()) {</span>
+<span class="nc" id="L83">                emailBusiness.sendEmail(&quot;[VIP Admin] Execution Public Request&quot;, adminsEmailContents,</span>
+<span class="nc" id="L84">                        new String[]{supportEmail}, true, publicExecution.getAuthor());</span>
+<span class="nc" id="L85">            }</span>
+<span class="nc" id="L86">        } catch (DAOException e) {</span>
+<span class="nc" id="L87">            throw new BusinessException(e);</span>
+<span class="nc" id="L88">        }</span>
+<span class="nc" id="L89">    }</span>
+
+    public PublicExecution getPublicExecution(String publicExecutionId)  throws BusinessException {
+        try {
+<span class="nc" id="L93">            return publicExecutionDAO.get(publicExecutionId);</span>
+<span class="nc" id="L94">        } catch (DAOException e) {</span>
+<span class="nc" id="L95">            throw new BusinessException(e);</span>
+        }
+    }
+
+    public void updatePublicExecutionStatus(String publicExecutionId, PublicExecution.PublicExecutionStatus newStatus)
+            throws BusinessException {
+        try {
+<span class="nc" id="L102">            publicExecutionDAO.update(publicExecutionId, newStatus);</span>
+<span class="nc" id="L103">        } catch (DAOException e) {</span>
+<span class="nc" id="L104">            throw new BusinessException(e);</span>
+<span class="nc" id="L105">        }</span>
+<span class="nc" id="L106">    }</span>
+
+    public List&lt;PublicExecution&gt; getPublicExecutions() throws BusinessException {
+        try {
+<span class="nc" id="L110">            return publicExecutionDAO.getExecutions();</span>
+<span class="nc" id="L111">        } catch (DAOException ex) {</span>
+<span class="nc" id="L112">            throw new BusinessException(ex);</span>
+        }
+    }
+
+    public boolean doesExecutionExist(String executionID) throws BusinessException {
+        try {
+<span class="nc" id="L118">            return publicExecutionDAO.doesExecutionExist(executionID);</span>
+<span class="nc" id="L119">        } catch (DAOException e) {</span>
+<span class="nc" id="L120">            throw new BusinessException(e);</span>
+        }
+    }
+
+    public boolean canMakeExecutionPublic(String executionID) throws BusinessException {
+        // looking for provenance directory
+<span class="nc" id="L126">        Path provenanceDirPath = Paths.get(server.getWorkflowsPath() + &quot;/&quot; + executionID + &quot;/provenance&quot;);</span>
+<span class="nc bnc" id="L127" title="All 2 branches missed.">        if ( ! Files.exists(provenanceDirPath)) {</span>
+<span class="nc" id="L128">             return false;</span>
+        }
+        // checking if it is empty
+<span class="nc bnc" id="L131" title="All 2 branches missed.">        if (provenanceDirPath.toFile().listFiles().length == 0) {</span>
+<span class="nc" id="L132">            return false;</span>
+        }
+        // verifying the application has a boutiques file
+<span class="nc" id="L135">        Simulation simulation = workflowBusiness.getSimulation(executionID);</span>
+<span class="nc" id="L136">        String boutiquesPath = getBoutiquesDescriptorJsonPath(simulation.getApplicationName(), simulation.getApplicationVersion());</span>
+<span class="nc bnc" id="L137" title="All 2 branches missed.">        return boutiquesPath != null;</span>
+    }
+
+    public String createReproVipDirectory(String executionID) throws BusinessException {
+<span class="nc" id="L141">        PublicExecution publicExecution = getPublicExecution(executionID);</span>
+<span class="nc" id="L142">        Path reproVipDir = Paths.get(server.getReproVIPRootDir()).resolve(executionID);</span>
+<span class="nc" id="L143">        logger.info(&quot;Creating reprovip dir : {}&quot;, reproVipDir);</span>
+        try {
+<span class="nc bnc" id="L145" title="All 2 branches missed.">            if ( ! Files.exists(reproVipDir)) {</span>
+<span class="nc" id="L146">                Files.createDirectories(reproVipDir);</span>
+            }
+<span class="nc" id="L148">        } catch (IOException e) {</span>
+<span class="nc" id="L149">            logger.error(&quot;Exception creating the a reprovip directory {}&quot;, reproVipDir, e);</span>
+<span class="nc" id="L150">            throw new BusinessException(&quot;Error creating a reprovip directory&quot;, e);</span>
+<span class="nc" id="L151">        }</span>
+<span class="nc" id="L152">        List&lt;Path&gt; provenanceFiles = copyProvenanceFiles(reproVipDir, publicExecution.getId());</span>
+<span class="nc" id="L153">        return generateReprovipJson(reproVipDir, publicExecution, provenanceFiles);</span>
+    }
+
+    public List&lt;Path&gt; copyProvenanceFiles(Path reproVipDir, String executionID) throws BusinessException {
+        try {
+<span class="nc" id="L158">            List&lt;Path&gt; copiedProvenanceFiles = new ArrayList&lt;&gt;();</span>
+
+            // directory where provenance files are stored
+<span class="nc" id="L161">            Path provenanceDirPath = Paths.get(server.getWorkflowsPath() + &quot;/&quot; + executionID + &quot;/provenance&quot;);</span>
+<span class="nc bnc" id="L162" title="All 2 branches missed.">            if ( ! Files.exists(provenanceDirPath)) {</span>
+<span class="nc" id="L163">                logger.error(&quot;Error creating a reprovip directory : no provenance dir for {}&quot;, provenanceDirPath);</span>
+<span class="nc" id="L164">                throw new BusinessException(&quot;Error creating a reprovip directory : no provenance dir&quot;);</span>
+            }
+
+<span class="nc" id="L167">            try (Stream&lt;Path&gt; stream = Files.list(provenanceDirPath)) {</span>
+<span class="nc" id="L168">                List&lt;Path&gt; provenanceFiles = stream</span>
+<span class="nc" id="L169">                        .filter(path -&gt; path.toString().endsWith(&quot;.sh.provenance.json&quot;))</span>
+<span class="nc" id="L170">                        .collect(Collectors.toList());</span>
+
+<span class="nc bnc" id="L172" title="All 2 branches missed.">                for (Path provenanceFile : provenanceFiles) {</span>
+                    // Extract the invocationID from the provenance file name
+<span class="nc" id="L174">                    String fileName = provenanceFile.getFileName().toString();</span>
+                    // The invocationID is between the first dash and &quot;.sh.provenance.json&quot;
+<span class="nc" id="L176">                    String invocationID = fileName.substring(0, fileName.indexOf(&quot;.sh.provenance.json&quot;));</span>
+
+                    // Create subfolder named with the invocationID
+<span class="nc" id="L179">                    Path invocationDir = reproVipDir.resolve(invocationID);</span>
+<span class="nc bnc" id="L180" title="All 2 branches missed.">                    if ( ! Files.exists(invocationDir)) {</span>
+<span class="nc" id="L181">                        Files.createDirectories(invocationDir);</span>
+                    }
+
+                    // Copy the source file to the new subfolder
+<span class="nc" id="L185">                    Path newLocation = invocationDir.resolve(provenanceFile.getFileName());</span>
+<span class="nc" id="L186">                    Files.copy(provenanceFile, newLocation, StandardCopyOption.REPLACE_EXISTING);</span>
+<span class="nc" id="L187">                    logger.debug(&quot;Copied provenance file to directory: {}&quot;, newLocation);</span>
+
+<span class="nc" id="L189">                    copiedProvenanceFiles.add(newLocation);</span>
+<span class="nc" id="L190">                }</span>
+            }
+<span class="nc" id="L192">            return copiedProvenanceFiles;</span>
+<span class="nc" id="L193">        } catch (IOException e) {</span>
+<span class="nc" id="L194">            logger.error(&quot;Error while copying provenance files for {}&quot;, executionID, e);</span>
+<span class="nc" id="L195">            throw new BusinessException(&quot;Error while copying provenance files&quot;, e);</span>
+        }
+    }
+
+    public String generateReprovipJson(Path reproVipDir, PublicExecution publicExecution, List&lt;Path&gt; provenanceFiles)
+            throws BusinessException {
+
+<span class="nc" id="L202">        String executionID = publicExecution.getId();</span>
+<span class="nc" id="L203">        String filesToDownload = getBoutiquesDescriptorJsonPath(</span>
+<span class="nc" id="L204">                publicExecution.getApplicationName(), publicExecution.getApplicationVersion());</span>
+
+<span class="nc" id="L206">        List&lt;String&gt; filesToUpload = provenanceFiles.stream()</span>
+<span class="nc" id="L207">                .map(Path::toString)</span>
+<span class="nc" id="L208">                .collect(Collectors.toList());</span>
+
+<span class="nc" id="L210">        Map&lt;String, Object&gt; structuredJson = new LinkedHashMap&lt;&gt;();</span>
+<span class="nc" id="L211">        structuredJson.put(&quot;path_workflow_directory&quot;, reproVipDir);</span>
+<span class="nc" id="L212">        structuredJson.put(&quot;descriptor_boutique&quot;, filesToDownload);</span>
+<span class="nc" id="L213">        structuredJson.put(&quot;files_to_upload&quot;, filesToUpload);</span>
+
+<span class="nc" id="L215">        Map&lt;String, List&lt;String&gt;&gt; invocationOutputsMap = new LinkedHashMap&lt;&gt;();</span>
+        try {
+<span class="nc bnc" id="L217" title="All 2 branches missed.">            for (Path provenanceFile : provenanceFiles) {</span>
+<span class="nc" id="L218">                logger.debug(&quot;handling provenance file {}&quot;, provenanceFile);</span>
+<span class="nc" id="L219">                String fileName = provenanceFile.getFileName().toString();</span>
+<span class="nc" id="L220">                String invocationFilename = fileName.substring(0, fileName.indexOf(&quot;.sh.provenance.json&quot;));</span>
+<span class="nc" id="L221">                List&lt;String&gt; outputDataPaths = simulationBusiness.getSimulationDAO(executionID).getOutputData(invocationFilename);</span>
+<span class="nc" id="L222">                Map&lt;String, String&gt; provenanceOutputFilenames = getOutputFilenamesFromProvenanceFile(provenanceFile);</span>
+<span class="nc" id="L223">                List&lt;String&gt; outputDataPathToKeep = getOutputPathToDownload(</span>
+                        outputDataPaths,
+                        provenanceOutputFilenames,
+<span class="nc" id="L226">                        publicExecution.getOutputNames());</span>
+<span class="nc" id="L227">                invocationOutputsMap.put(invocationFilename, outputDataPathToKeep);</span>
+<span class="nc" id="L228">            }</span>
+<span class="nc" id="L229">        } catch (DAOException e) {</span>
+<span class="nc" id="L230">            throw new BusinessException(e);</span>
+<span class="nc" id="L231">        }</span>
+
+<span class="nc" id="L233">        structuredJson.put(&quot;invocation_outputs&quot;, invocationOutputsMap);</span>
+
+<span class="nc" id="L235">        Map&lt;String, Object&gt; metadataOuter = new LinkedHashMap&lt;&gt;();</span>
+<span class="nc" id="L236">        Map&lt;String, Object&gt; metadataInner = new LinkedHashMap&lt;&gt;();</span>
+
+<span class="nc" id="L238">        metadataInner.put(&quot;title&quot;, &quot;your title&quot;);</span>
+<span class="nc" id="L239">        metadataInner.put(&quot;upload_type&quot;, &quot;workflow&quot;);</span>
+<span class="nc" id="L240">        metadataInner.put(&quot;description&quot;, publicExecution.getComments());</span>
+
+<span class="nc" id="L242">        List&lt;Map&lt;String, String&gt;&gt; creators = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L243">        Map&lt;String, String&gt; creator = new LinkedHashMap&lt;&gt;();</span>
+<span class="nc" id="L244">        creator.put(&quot;name&quot;, publicExecution.getAuthor());</span>
+<span class="nc" id="L245">        creators.add(creator);</span>
+
+<span class="nc" id="L247">        metadataInner.put(&quot;creators&quot;, creators);</span>
+<span class="nc" id="L248">        metadataOuter.put(&quot;metadata&quot;, metadataInner);</span>
+
+<span class="nc" id="L250">        structuredJson.put(&quot;metadata&quot;, metadataOuter);</span>
+
+<span class="nc" id="L252">        ObjectMapper objectMapper = new ObjectMapper();</span>
+        try {
+<span class="nc" id="L254">            String jsonContent = objectMapper.writeValueAsString(structuredJson);</span>
+<span class="nc" id="L255">            Path reprovipJsonPath = reproVipDir.resolve(&quot;workflowMetadata.json&quot;);</span>
+<span class="nc" id="L256">            Files.writeString(reprovipJsonPath, jsonContent);</span>
+
+<span class="nc" id="L258">            return jsonContent;</span>
+<span class="nc" id="L259">        } catch (IOException e) {</span>
+<span class="nc" id="L260">            logger.error(&quot;Error saving reprovip metadata file for {}&quot;, publicExecution.getId(), e);</span>
+<span class="nc" id="L261">            throw new BusinessException(&quot;Failed to save JSON to file&quot;, e);</span>
+        }
+    }
+
+    public String getBoutiquesDescriptorJsonPath(String applicationName, String applicationVersion) throws BusinessException {
+<span class="nc" id="L266">        AppVersion appVersion = applicationBusiness.getVersion(applicationName, applicationVersion);</span>
+<span class="nc bnc" id="L267" title="All 4 branches missed.">        if (appVersion != null &amp;&amp; appVersion.getJsonLfn() != null) {</span>
+<span class="nc" id="L268">            return appVersion.getJsonLfn();</span>
+        }
+<span class="nc" id="L270">        return null;</span>
+    }
+
+    /*
+        outputDataPaths is the list of all the results path/URIs produced for a job
+        provenanceOutputFilenames is the mapping between the output id and their filename
+     */
+    private List&lt;String&gt; getOutputPathToDownload(
+            List&lt;String&gt; outputDataPaths,
+            Map&lt;String, String&gt; provenanceOutputFilenames,
+            List&lt;String&gt; outputIdsToKeep) throws BusinessException {
+<span class="nc" id="L281">        Map&lt;String, String&gt; outputDataPathsByFilenames = mapOutputDataPathsByFilenames(outputDataPaths);</span>
+<span class="nc" id="L282">        List&lt;String&gt; results = new ArrayList&lt;&gt;(); // all the path/URIs to keep</span>
+<span class="nc bnc" id="L283" title="All 2 branches missed.">        for (String outputIdToKeep : outputIdsToKeep) {</span>
+<span class="nc bnc" id="L284" title="All 2 branches missed.">            if ( ! provenanceOutputFilenames.containsKey(outputIdToKeep)) {</span>
+<span class="nc" id="L285">                logger.error(&quot;Error getting a output path from provenance file : {} output id not found&quot;, outputIdToKeep);</span>
+<span class="nc" id="L286">                throw new BusinessException(&quot;Error getting output path from provenance&quot;);</span>
+            }
+<span class="nc" id="L288">            String filename = provenanceOutputFilenames.get(outputIdToKeep);</span>
+<span class="nc bnc" id="L289" title="All 2 branches missed.">            if ( ! outputDataPathsByFilenames.containsKey(filename)) {</span>
+<span class="nc" id="L290">                logger.error(&quot;Error getting a output with filename {}&quot;, filename);</span>
+<span class="nc" id="L291">                throw new BusinessException(&quot;Error getting a output with the expected filename&quot;);</span>
+            }
+<span class="nc" id="L293">            results.add(outputDataPathsByFilenames.get(filename));</span>
+<span class="nc" id="L294">        }</span>
+<span class="nc" id="L295">        return results;</span>
+    }
+
+    private Map&lt;String, String&gt; mapOutputDataPathsByFilenames(List&lt;String&gt; outputDataPaths) throws BusinessException {
+<span class="nc" id="L299">        Map&lt;String, String&gt; outputDataMap = new HashMap&lt;&gt;();</span>
+<span class="nc bnc" id="L300" title="All 2 branches missed.">        for (String outputDataPath : outputDataPaths) {</span>
+<span class="nc" id="L301">            logger.debug(&quot;[ReproVIP] Handling outputDataPath {}&quot;, outputDataPath);</span>
+            try {
+<span class="nc" id="L303">                    URI uri = new URI(outputDataPath);</span>
+<span class="nc" id="L304">                    String filename = Paths.get(uri.getPath()).getFileName().toString();</span>
+<span class="nc bnc" id="L305" title="All 2 branches missed.">                    if (outputDataMap.containsKey(filename)) {</span>
+<span class="nc" id="L306">                        logger.error(&quot;A job contains two results with the same filename [{}]&quot;, filename);</span>
+<span class="nc" id="L307">                        throw new BusinessException(&quot;A job contains two results with the same filename&quot;);</span>
+                    }
+<span class="nc" id="L309">                    logger.debug(&quot;[ReproVIP] got filename for {} : {}&quot;, outputDataPath, filename);</span>
+<span class="nc" id="L310">                    outputDataMap.put(filename, outputDataPath);</span>
+<span class="nc" id="L311">            } catch (URISyntaxException e) {</span>
+<span class="nc" id="L312">                logger.error(&quot;Cannot convert a job result to URI [{}]&quot;, outputDataPath, e);</span>
+<span class="nc" id="L313">                throw new BusinessException(&quot;Error converting a job result to URI&quot;, e);</span>
+<span class="nc" id="L314">            }</span>
+<span class="nc" id="L315">        }</span>
+<span class="nc" id="L316">        return outputDataMap;</span>
+    }
+
+    private Map&lt;String, String&gt; getOutputFilenamesFromProvenanceFile(Path provenanceFilePath) throws BusinessException {
+        try {
+<span class="nc" id="L321">            Map&lt;?, ?&gt; map = new ObjectMapper().readValue(provenanceFilePath.toFile(), Map.class);</span>
+<span class="nc" id="L322">            Map&lt;String, ?&gt; publicOutputSection = (Map&lt;String, ?&gt;) map.get(&quot;public-output&quot;);</span>
+<span class="nc" id="L323">            Map&lt;String, Map&lt;String,String&gt;&gt; outputFiles = (Map&lt;String, Map&lt;String, String&gt;&gt;) publicOutputSection.get(&quot;output-files&quot;);</span>
+<span class="nc" id="L324">            Map&lt;String, String&gt; outputFilenames = new HashMap&lt;&gt;();</span>
+<span class="nc bnc" id="L325" title="All 2 branches missed.">            for (String outputId : outputFiles.keySet()) {</span>
+<span class="nc" id="L326">                outputFilenames.put(outputId, outputFiles.get(outputId).get(&quot;file-name&quot;));</span>
+<span class="nc" id="L327">                logger.debug(&quot;got {} as filename for {} in {}&quot;, outputFilenames.get(outputId), outputId, provenanceFilePath);</span>
+<span class="nc" id="L328">            }</span>
+<span class="nc" id="L329">            return outputFilenames;</span>
+<span class="nc" id="L330">        } catch (IOException e) {</span>
+<span class="nc" id="L331">            logger.error(&quot;Error reading a provenance file : {}&quot;, provenanceFilePath);</span>
+<span class="nc" id="L332">            throw new BusinessException(&quot;Error reading a provenance file&quot;, e);</span>
+        }
+    }
+
+    public void deleteReproVipDirectory(String executionID) throws BusinessException {
+<span class="nc" id="L337">        Path reproVipDir = Paths.get(server.getReproVIPRootDir()).resolve(executionID);</span>
+<span class="nc" id="L338">        logger.info(&quot;Deleting ReproVip directory: {}&quot;, reproVipDir);</span>
+
+<span class="nc bnc" id="L340" title="All 2 branches missed.">        if (Files.exists(reproVipDir)) {</span>
+            try {
+<span class="nc" id="L342">                boolean isDeleteOk = Files.walk(reproVipDir)</span>
+<span class="nc" id="L343">                        .sorted(Comparator.reverseOrder())</span>
+<span class="nc" id="L344">                        .map(Path::toFile)</span>
+<span class="nc" id="L345">                        .allMatch(f -&gt; {</span>
+<span class="nc bnc" id="L346" title="All 2 branches missed.">                            if ( ! f.delete()) {</span>
+<span class="nc" id="L347">                                logger.error(&quot;Error deleting file {} for reprovip dir {}&quot;, f, reproVipDir);</span>
+<span class="nc" id="L348">                                return false;</span>
+                            }
+<span class="nc" id="L350">                            return true;</span>
+                        }); // this will stop if any delete returns false (and is in error)
+<span class="nc bnc" id="L352" title="All 2 branches missed.">                if ( ! isDeleteOk) {</span>
+<span class="nc" id="L353">                    throw new BusinessException(&quot;Error deleting a reprovip dir&quot;);</span>
+                }
+<span class="nc" id="L355">            } catch (IOException e) {</span>
+<span class="nc" id="L356">                logger.error(&quot;Error deleting directory {}&quot;, reproVipDir, e);</span>
+<span class="nc" id="L357">                throw new BusinessException(&quot;Error deleting a reprovip dir&quot;, e);</span>
+<span class="nc" id="L358">            }</span>
+        } else {
+<span class="nc" id="L360">            logger.info(&quot;ReproVip directory does not exist: {}&quot;, reproVipDir);</span>
+        }
+<span class="nc" id="L362">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>
