@@ -31,7 +31,9 @@
  */
 package fr.insalyon.creatis.vip.application.server.business;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.insalyon.creatis.vip.application.client.bean.AppVersion;
+import fr.insalyon.creatis.vip.application.server.model.boutiques.BoutiquesDescriptor;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.business.Server;
@@ -45,6 +47,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.xml.sax.SAXException;
 
 import java.io.*;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -63,12 +66,15 @@ public class BoutiquesBusiness {
     private Server server;
     private DataManagerBusiness dataManagerBusiness;
     private ApplicationBusiness applicationBusiness;
+    private ObjectMapper objectMapper;
 
     @Autowired
-    public BoutiquesBusiness(Server server, DataManagerBusiness dataManagerBusiness, ApplicationBusiness applicationBusiness) {
+    public BoutiquesBusiness(Server server, DataManagerBusiness dataManagerBusiness,
+                             ApplicationBusiness applicationBusiness, ObjectMapper objectMapper) {
         this.server = server;
         this.dataManagerBusiness = dataManagerBusiness;
         this.applicationBusiness = applicationBusiness;
+        this.objectMapper = objectMapper;
     }
 
     public String publishVersion(User user, String applicationName, String version)
@@ -130,6 +136,15 @@ public class BoutiquesBusiness {
         } catch (IOException ex) {
             logger.error("Error reading boutiques file {}", descriptorLfn, ex);
             throw new BusinessException(ex);
+        }
+    }
+
+    public BoutiquesDescriptor parseBoutiquesFile(File boutiquesFile) throws BusinessException {
+        try {
+            return objectMapper.readValue(boutiquesFile, BoutiquesDescriptor.class);
+        } catch (IOException e) {
+            logger.error("Error reading {} file for boutiques parsing", boutiquesFile, e);
+            throw new BusinessException("Error reading boutiques file", e);
         }
     }
 

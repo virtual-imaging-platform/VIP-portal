@@ -58,7 +58,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  *
  * Test method on platform path
  */
-@Disabled
 public class PlatformControllerIT extends BaseWebSpringIT {
 
     @Test
@@ -99,9 +98,10 @@ public class PlatformControllerIT extends BaseWebSpringIT {
                 .andExpect(jsonPath("$.APIErrorCodesAndMessages[*]",
                     hasItems(
                         jsonCorrespondsToErrorCodeAndMessage(ApiError.GENERIC_API_ERROR),
-                        jsonCorrespondsToErrorCodeAndMessage(ApiError.NOT_ALLOWED_TO_USE_APPLICATION),
+                        jsonCorrespondsToErrorCodeAndMessage(ApiError.NOT_ALLOWED_TO_USE_PIPELINE),
                         jsonCorrespondsToErrorCodeAndMessage(ApplicationError.USER_MAX_EXECS),
-                        jsonCorrespondsToErrorCodeAndMessage(8002, "The error message for 'bad credentials' cannot be known in advance"))));
+                        jsonCorrespondsToErrorCodeAndMessage(ApiError.BAD_CREDENTIALS),
+                        jsonCorrespondsToErrorCodeAndMessage(ApiError.INSUFFICIENT_AUTH.getCode(), "The error message for 'insufficient auth' cannot be known in advance"))));
 
     }
 

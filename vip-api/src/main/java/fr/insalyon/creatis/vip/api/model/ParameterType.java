@@ -31,6 +31,8 @@
  */
 package fr.insalyon.creatis.vip.api.model;
 
+import fr.insalyon.creatis.vip.application.server.model.boutiques.Input;
+
 /**
  * 
  * @author Tristan Glatard
@@ -41,5 +43,18 @@ public enum ParameterType {
 
     public static ParameterType fromVipType(String vipType) {
         return vipType.equalsIgnoreCase("URI") ? File : String;
+    }
+
+    public static ParameterType fromBoutiquesInput(Input boutiquesInput) {
+        if (boutiquesInput.getList() != null && boutiquesInput.getList()) {
+            return List;
+        }
+        switch (boutiquesInput.getType()) {
+            case FILE: return File;
+            case STRING: return String;
+            case FLAG: return Boolean;
+            case NUMBER: return boutiquesInput.getInteger() ? Int64 : Double;
+        }
+        return null;
     }
 }

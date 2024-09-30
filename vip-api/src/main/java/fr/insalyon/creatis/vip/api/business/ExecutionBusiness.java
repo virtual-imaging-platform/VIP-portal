@@ -256,8 +256,7 @@ public class ExecutionBusiness {
         }
         String resultsLocation = execution.getResultsLocation();
         if (resultsLocation != null) {
-            inputMap.put(CoreConstants.RESULTS_DIRECTORY_PARAM_NAME,
-                         resultsLocation);
+            inputMap.put(CoreConstants.RESULTS_DIRECTORY_PARAM_NAME, resultsLocation);
         }
 
         checkInputExecNameIsValid(execution.getName());
@@ -326,39 +325,35 @@ public class ExecutionBusiness {
             // Check that all pipeline inputs are present
             Pipeline p = pipelineBusiness.getPipelineWithResultsDirectory(pipelineId);
             for (PipelineParameter pp : p.getParameters()) {
+                // always true on vip
                 if (pp.isReturnedValue()) {
                     continue;
                 }
-                // pp is an input
-                if (!(inputValues.get(pp.getName()) == null)) {
+                // ok if input is present
+                if ( inputValues.get(pp.getName()) != null) {
                     continue;
                 }
-                // pp is an empty input
+                // then ok if input has a default value (and we set it)
+                // beware : with gwendia, optional always have an defaultValue (either defined or No_Value_Provided)
                 if (pp.getDefaultValue() != null) {
                     inputValues.put(pp.getName(), pp.getDefaultValue().toString());
                     continue;
                 }
-                // pp is an empty input with no default value
+                // then ok if it is optional
+                // beware, with gwendia it should not be possible to enter this case (see previous condition)
                 if (pp.isOptional()) {
-                    inputValues.put("no", pp.getDefaultValue().toString());//that's how optional values are handled in VIP
                     continue;
                 }
-                // pp is an empty input with no default value and it is not optional
-                logger.error("Error initialising {}, missing {} parameter",
-                        pipelineId, pp.getName());
-                throw new ApiException("Parameter " + pp.getName() + " is empty while it is not optional and it has no default value.");
+                // error : pp is an empty input with no default value and it is not optional
+                logger.error("Error initialising {}, missing {} parameter", pipelineId, pp.getName());
+                throw new ApiException(ApiException.ApiError.INPUT_FIELD_MISSING, pp.getName());
             }
 
-            boolean hasInputResultsDirectory =
-                inputValues.containsKey(
-                    CoreConstants.RESULTS_DIRECTORY_PARAM_NAME);
-
-            boolean hasPipelineResultsDirectory =
-                p.getParameters().stream().anyMatch(
-                        param ->
+            boolean inputsContainsResultsDirectoryInput = inputValues.containsKey(CoreConstants.RESULTS_DIRECTORY_PARAM_NAME);
+            boolean pipelineHasResultsDirectoryInput = p.getParameters().stream().anyMatch(param ->
                         param.getName().equals(CoreConstants.RESULTS_DIRECTORY_PARAM_NAME));
 
-            if (hasInputResultsDirectory && !hasPipelineResultsDirectory) {
+            if (inputsContainsResultsDirectoryInput && ! pipelineHasResultsDirectoryInput) {
                 logger.error("Missing results-directory for {}", pipelineId);
                 throw new ApiException(
                     "Input has parameter results-directory but it is not defined in pipeline.");

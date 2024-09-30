@@ -31,75 +31,32 @@
  */
 package fr.insalyon.creatis.vip.api.rest.itest.processing;
 
-import fr.insalyon.creatis.vip.api.data.ClassesTestUtils;
-import fr.insalyon.creatis.vip.api.data.UserTestUtils;
+import fr.insalyon.creatis.grida.client.GRIDAClientException;
 import fr.insalyon.creatis.vip.api.exception.ApiException.ApiError;
 import fr.insalyon.creatis.vip.api.rest.config.BaseWebSpringIT;
-import fr.insalyon.creatis.vip.application.client.bean.AppClass;
 import fr.insalyon.creatis.vip.application.client.bean.AppVersion;
-import fr.insalyon.creatis.vip.application.client.bean.Application;
-import fr.insalyon.creatis.vip.application.server.dao.ApplicationDAO;
-import fr.insalyon.creatis.vip.application.server.dao.ClassDAO;
-import fr.insalyon.creatis.vip.core.client.bean.Group;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
-import fr.insalyon.creatis.vip.datamanager.server.business.DataManagerBusiness;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.test.web.servlet.ResultActions;
-import org.springframework.test.web.servlet.request.RequestPostProcessor;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.io.File;
+import java.io.IOException;
 
-import static fr.insalyon.creatis.vip.api.data.AppVersionTestUtils.*;
-import static fr.insalyon.creatis.vip.api.data.ApplicationTestUtils.*;
 import static fr.insalyon.creatis.vip.api.data.PipelineTestUtils.*;
-import static fr.insalyon.creatis.vip.api.data.UserTestUtils.baseUser1;
-import static fr.insalyon.creatis.vip.api.rest.mockconfig.ApplicationsConfigurator.configureAnApplication;
-import static fr.insalyon.creatis.vip.api.rest.mockconfig.ApplicationsConfigurator.configureApplications;
+import static fr.insalyon.creatis.vip.api.data.UserTestUtils.*;
 import static fr.insalyon.creatis.vip.application.client.view.ApplicationException.ApplicationError.WRONG_APPLICATION_DESCRIPTOR;
-import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.hamcrest.Matchers.hasSize;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.when;
+import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-/**
- * Created by abonnet on 7/20/16.
- * <p>
- * Test methods on pipeline path
- * <p>
- * Include 2 tests on error handling
- */
-@Disabled
 public class PipelineControllerIT extends BaseWebSpringIT {
-
-    @Autowired
-    @Qualifier("mockClassDAO")
-    ClassDAO classDAO;
-    @Autowired
-    @Qualifier("mockApplicationDAO")
-    ApplicationDAO applicationDAO;
-    @Autowired
-    @Qualifier("mockDataManagerBusiness")
-    DataManagerBusiness dataManagerBusiness;
 
     @BeforeEach
     public void setUp() throws Exception {
         super.setUp();
-        Mockito.reset(classDAO);
-        Mockito.reset(applicationDAO);
     }
 
     @Test
@@ -129,13 +86,22 @@ public class PipelineControllerIT extends BaseWebSpringIT {
 
     @Test
     public void shouldReturnErrorOnConfiguredVipException() throws Exception {
-        /*configureApplications(this, baseUser1, Arrays.asList(class1, class2),
-                app2, version42);*/
+        String appName = "testApp", groupName = "testGroup", className = "testClass";
+        String versionName = "42-test";
+        AppVersion appVersion = configureAnApplication(appName, versionName, groupName, className);
+        configureVersion(appVersion,
+                "/vip/testGroup (group)/path/to/test.gwendia", null);
 
-        String pipelineId = app2.getName() + "/" + version42.getVersion();
-        when(workflowBusiness.getApplicationDescriptor(
-                eq(baseUser1), eq(app2.getName()), eq(version42.getVersion())))
-                .thenThrow(new BusinessException(WRONG_APPLICATION_DESCRIPTOR, pipelineId));
+        createUserInGroup(baseUser1.getEmail(), groupName);
+
+        Mockito.when(server.getDataManagerPath()).thenReturn("/test/folder");
+        Mockito.when(server.getDataManagerGroupsHome()).thenReturn("/root/group");
+        // localDir is datamanagerpath + "downloads" + groupRoot + dir(path)
+        Mockito.when(gridaClient.getRemoteFile(
+                "/root/group/testGroup/path/to/test.gwendia",
+                "/test/folder/downloads/root/group/testGroup/path/to")).thenThrow(new GRIDAClientException("test exception"));
+
+        String pipelineId = appName + "/" + versionName;
         mockMvc.perform(get("/rest/pipelines/" + pipelineId).with(baseUser1()))
                 .andDo(print())
                 .andExpect(status().isBadRequest())
@@ -145,74 +111,155 @@ public class PipelineControllerIT extends BaseWebSpringIT {
 
     @Test
     public void userGetAPipelineWithPathParameterNonEncoded() throws Exception {
-        /*configureApplications(this, baseUser1, Arrays.asList(class1, class2),
-                app2, version42);*/
 
-        String pipelineId = configureAnApplication(this, baseUser1, app2, version42, 0, 1);
-        mockMvc.perform(get("/rest/pipelines/" + pipelineId)
-                        .with(baseUser1()))
+        String appName = "testGwendiaApp", groupName = "testGroup", className = "testClass", versionName = "42-test";
+        AppVersion appVersion = configureGwendiaTestApp(appName, groupName, className, versionName);
+        String pipelineId = appName + "/" + versionName;
+
+        createUserInGroup(baseUser1.getEmail(), groupName);
+
+        mockMvc.perform(get("/rest/pipelines/" + pipelineId).with(baseUser1()))
                 .andDo(print())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$", jsonCorrespondsToPipeline(getFullPipeline(app2, version42, "desc test", 0, 1))));
+                // res-dir should be removed from the description
+                .andExpect(jsonPath("$", jsonCorrespondsToPipeline(
+                        getFullPipeline(appVersion, "Test tool description. Must be similar to the boutiques one", flagParam, textParam, fileParam, optionalTextParamNoValueProvided))));
+    }
+
+    @Test
+    public void userGetAPipelineWithQueryParameter() throws Exception {
+        String appName = "testGwendiaApp", groupName = "testGroup", className = "testClass", versionName = "42-test";
+        AppVersion appVersion = configureGwendiaTestApp(appName, groupName, className, versionName);
+        String pipelineId = appName + "/" + versionName;
+
+        createUserInGroup(baseUser1.getEmail(), groupName);
+
+        mockMvc.perform(get("/rest/pipelines").param("pipelineId", pipelineId).with(baseUser1()))
+                .andDo(print())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                // res-dir should be removed from the description
+                .andExpect(jsonPath("$", jsonCorrespondsToPipeline(
+                        getFullPipeline(appVersion, "Test tool description. Must be similar to the boutiques one", flagParam, textParam, fileParam, optionalTextParamNoValueProvided))));
+    }
+
+    @Test
+    public void userGetAPipelineWithBoutiques() throws Exception {
+
+        String appName = "testBoutiquesApp", groupName = "testGroup", className = "testClass", versionName = "v42";
+        AppVersion appVersion = configureBoutiquesTestApp(appName, groupName, className, versionName);
+        String pipelineId = appName + "/" + versionName;
+
+        Mockito.when(server.useMoteurlite()).thenReturn(true);
+
+        createUserInGroup(baseUser1.getEmail(), groupName);
+
+        mockMvc.perform(get("/rest/pipelines/" + pipelineId).with(baseUser1()))
+                .andDo(print())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                // res-dir should be absent from the description
+                .andExpect(jsonPath("$.name", equalTo(appName)))
+                .andExpect(jsonPath("$", jsonCorrespondsToPipeline(
+                        getFullPipeline(appVersion, "Test app from axel. Must be similar to the gwendia test app", flagParam, textParam, fileParam, optionalTextParam))));
+
+    }
+
+    @Test
+    public void userGetBoutiquesDescriptor() throws Exception {
+
+        String appName = "testBoutiquesApp", groupName = "testGroup", className = "testClass", versionName = "v42";
+        configureBoutiquesTestApp(appName, groupName, className, versionName);
+        String pipelineId = appName + "/" + versionName;
+
+        createUserInGroup(baseUser1.getEmail(), groupName);
+
+        mockMvc.perform(get("/rest/pipelines/" + pipelineId).param("format", "boutiques").with(baseUser1()))
+                .andDo(print())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                // res-dir should be removed from the description
+                .andExpect(jsonPath("$.name", equalTo(appName)))
+                .andExpect(jsonPath("$.tool-version", equalTo(versionName)))
+                .andExpect(jsonPath("$.schema-version", equalTo("0.5")))
+                .andExpect(jsonPath("$.inputs[*]", hasSize(4)));
+
     }
 
     @Test
     public void shouldReturnPipelines() throws Exception {
+        createGroup("group1");
+        createGroup("group2");
+        createGroup("group3");
 
-        AppClass appClass = new AppClass("appClass", new ArrayList<>());
-        classBusiness.addClass(appClass);
+        createClass("class1", "group1");
+        createClass("class2", "group2");
+        createClass("class3", "group3");
+        createAnApplication("app1", "class1");
+        createAnApplication("app2", "class2");
+        createAnApplication("app3", "class3");
 
-        createUser("test1@test.fr");
+        AppVersion app11 = createAVersion("app1", "v1", true, null, null);
+        createAVersion("app1", "v2", false, null, null);
+        AppVersion app13 = createAVersion("app1", "v3", true, null, null);
+        AppVersion app2 = createAVersion("app2", "v1.1", true, null, null);
+        createAVersion("app3", "v4", false, null, null);
 
-        Application app1 = new Application("app1", Arrays.asList(appClass.getName()), "test1@test.fr", "test1", "citation1");
-        Application app2 = new Application("app2", Arrays.asList(appClass.getName()), "test1@test.fr", "test1", "citation1");
-        Application app3 = new Application("app3", Arrays.asList(appClass.getName()), "test1@test.fr", "test1", "citation1");
-        applicationBusiness.add(app1);
-        applicationBusiness.add(app2);
-        applicationBusiness.add(app3);
+        createClass("classA", "group1", "group2");
+        createClass("classB", "group2", "group3");
+        createClass("classC", "group3");
 
-        AppVersion version42App1 = new AppVersion("app1", "version42", "lfn", "jsonLfn", true, true);
-        applicationBusiness.addVersion(version42App1);
+        createAnApplication("appAB", "classA", "classB");
+        createAnApplication("appBC", "classB", "classC");
+        createAnApplication("appC", "classC");
 
-        AppVersion version42App3 = new AppVersion("app3", "version42", "lfn", "jsonLfn", true, true);
-        applicationBusiness.addVersion(version42App3);
+        AppVersion appAB = createAVersion("appAB", "v1", true, null, null);
+        AppVersion appBC = createAVersion("appBC", "v1", true, null, null);
+        AppVersion appC = createAVersion("appC", "v1", true, null, null);
 
-        AppVersion version01App2= new AppVersion("app2", "version01", "lfn", "jsonLfn", true, true);
-        applicationBusiness.addVersion(version01App2);
+        createUserInGroup(baseUser1.getEmail(), "test1", "group1");
+        createUserInGroup(baseUser2.getEmail(), "test2", "group2");
+        createUserInGroup(baseUser3.getEmail(), "test3", "group3");
+        createUserInGroups(baseUser4.getEmail(), "test4", "group1", "group2");
 
-        AppVersion version01App3= new AppVersion("app3", "version01", "lfn", "jsonLfn", true, true);
-        applicationBusiness.addVersion(version01App3);
+        mockMvc.perform(get("/rest/pipelines").with(baseUser1()))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$[*]", hasSize(3)))
+                .andExpect(jsonPath("$[*]", containsInAnyOrder(
+                        jsonCorrespondsToPipeline(getPipeline(app11)),
+                        jsonCorrespondsToPipeline(getPipeline(app13)),
+                        jsonCorrespondsToPipeline(getPipeline(appAB)))));
 
-        AppVersion version43App3= new AppVersion("app3", "version43", "lfn", "jsonLfn", true, true);
-        applicationBusiness.addVersion(version43App3);
+        mockMvc.perform(get("/rest/pipelines").with(baseUser2()))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$[*]", hasSize(3)))
+                .andExpect(jsonPath("$[*]", containsInAnyOrder(
+                        jsonCorrespondsToPipeline(getPipeline(app2)),
+                        jsonCorrespondsToPipeline(getPipeline(appAB)),
+                        jsonCorrespondsToPipeline(getPipeline(appBC)))));
 
+        mockMvc.perform(get("/rest/pipelines").with(baseUser3()))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$[*]", hasSize(3)))
+                .andExpect(jsonPath("$[*]", containsInAnyOrder(
+                        jsonCorrespondsToPipeline(getPipeline(appAB)),
+                        jsonCorrespondsToPipeline(getPipeline(appBC)),
+                        jsonCorrespondsToPipeline(getPipeline(appC)))));
 
-        ResultActions result = mockMvc.perform(get("/rest/pipelines").with(baseUser1()))
+        mockMvc.perform(get("/rest/pipelines").with(baseUser4()))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$[*]", hasSize(5)))
                 .andExpect(jsonPath("$[*]", containsInAnyOrder(
-                        jsonCorrespondsToPipeline(getPipeline(app1, version42)),
-                        jsonCorrespondsToPipeline(getPipeline(app2, version01)),
-                        jsonCorrespondsToPipeline(getPipeline(app3, version01)),
-                        jsonCorrespondsToPipeline(getPipeline(app3, version42)),
-                        jsonCorrespondsToPipeline(getPipeline(app3, version43)))));
+                        jsonCorrespondsToPipeline(getPipeline(app11)),
+                        jsonCorrespondsToPipeline(getPipeline(app13)),
+                        jsonCorrespondsToPipeline(getPipeline(app2)),
+                        jsonCorrespondsToPipeline(getPipeline(appAB)),
+                        jsonCorrespondsToPipeline(getPipeline(appBC)))));
 
-        String content = result.andReturn().getResponse().getContentAsString();
-        System.out.println("Results : "+content);
-    }
-
-    @Test
-    public void userGetAPipelineWithQueryParameter() throws Exception {
-        /*configureApplications(this, baseUser1, Arrays.asList(class1, class2),
-                app2, version42);*/
-
-        String pipelineId = configureAnApplication(this, baseUser1, app2, version42, 0, 1);
-        mockMvc.perform(get("/rest/pipelines").param("pipelineId", pipelineId)
-                .with(baseUser1()))
-                .andDo(print())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$", jsonCorrespondsToPipeline(getFullPipeline(app2, version42, "desc test", 0, 1))));
     }
 }

@@ -50,8 +50,8 @@ public class RegisterUserController extends ApiController {
                 signUpUser.getEmail(),
                 signUpUser.getInstitution(),
                 signUpUser.getPassword(),
-                signUpUser.getLevel(),
-                signUpUser.getCountryCode()
+                signUpUser.getCountryCode(),
+                null
                 );
         user.setRegistration(new Date());
         user.setLastLogin(new Date());

@@ -29,48 +29,37 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL-B license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.api.rest.itest;
+package fr.insalyon.creatis.vip.integrationtest;
 
-import fr.insalyon.creatis.vip.api.business.VipConfigurer;
-import fr.insalyon.creatis.vip.api.controller.EgiController;
 import fr.insalyon.creatis.vip.api.controller.PlatformController;
 import fr.insalyon.creatis.vip.api.exception.ApiException;
-import fr.insalyon.creatis.vip.api.rest.config.BaseWebSpringIT;
-import fr.insalyon.creatis.vip.application.server.business.WorkflowBusiness;
+import fr.insalyon.creatis.vip.core.server.SpringCoreConfig;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
+import org.springframework.test.context.junit.jupiter.web.SpringJUnitWebConfig;
 import org.springframework.util.Assert;
 
 import java.nio.file.Paths;
-import java.util.Collections;
-
-import static org.mockito.ArgumentMatchers.any;
 
 /**
  * Created by abonnet on 7/21/16.
  *
- * Test the the global spring configuration
+ * Test the the global spring configuration, almost nothing is mocked
  *
- * The less mock should be used to be as close as possible to the production
- * environment.
  */
-@Disabled
+@SpringJUnitWebConfig(SpringCoreConfig.class)
 public class DefaultSpringConfigurationIT {
 
     @Autowired
     private PlatformController platformController;
-    @Autowired
-    private EgiController egiController;
+
 
     @BeforeAll
-    public static void setup() throws Exception {
+    static void configureHomePath() throws Exception {
         String fakeHomePath = Paths.get(ClassLoader.getSystemResource("TestHome").toURI())
                 .toAbsolutePath().toString();
-        BaseWebSpringIT.setEnv(Collections.singletonMap("HOME", fakeHomePath));
+        System.setProperty("user.home", fakeHomePath);
     }
 
     @Test
@@ -79,20 +68,4 @@ public class DefaultSpringConfigurationIT {
         Assert.notNull(platformController.getPlatformProperties(), "platform properties should be present");
     }
 
-    // Need to override vipConfigurer that operate on the database
-    //@Configuration
-    //@Import(SpringWebConfig.class)
-    static class TestConfig {
-        @Bean
-        public VipConfigurer vipConfigurer() {
-            VipConfigurer mock = Mockito.mock(VipConfigurer.class);
-            Mockito.when(mock.preHandle(any(), any(), any())).thenReturn(true);
-            return mock;
-        }
-
-        @Bean
-        public WorkflowBusiness workflowBusiness() {
-            return Mockito.mock(WorkflowBusiness.class);
-        }
-    }
 }

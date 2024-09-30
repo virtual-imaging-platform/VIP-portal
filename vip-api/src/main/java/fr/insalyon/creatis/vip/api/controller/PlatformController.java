@@ -114,11 +114,8 @@ public class PlatformController extends ApiController{
     private ErrorCodeAndMessage getErrorCodeAndMessage(VipError vipError, String errorName) {
         errorName = errorName.replace('_', ' ').toLowerCase();
         String message = VipException.getRawMessage(vipError)
-                .orElse("The error message for '"
-                        + errorName + "' cannot be known in advance");
-        return new ErrorCodeAndMessage(
-                vipError.getCode(),
-                message
+                .orElse("The error message for '" + errorName + "' cannot be known in advance");
+        return new ErrorCodeAndMessage(vipError.getCode(), message
         );
     }
 }

@@ -13,6 +13,8 @@ import fr.insalyon.creatis.vip.core.server.business.EmailBusiness;
 import fr.insalyon.creatis.vip.core.server.business.Server;
 import org.junit.jupiter.api.BeforeEach;
 import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationContext;
@@ -25,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.sql.DataSource;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -90,6 +93,7 @@ public abstract class BaseSpringIT {
     @BeforeEach
     protected void setUp() throws Exception {
         ServerMockConfig.reset(server);
+        Mockito.reset(gridaClient);
     }
 
     protected void assertRowsNbInTable(String tableName, int expectedNb) {
@@ -102,27 +106,46 @@ public abstract class BaseSpringIT {
         createUser(testEmail, "");
     }
 
+    protected void createUserWithPassword(String testEmail, String password) throws GRIDAClientException, BusinessException {
+        createUser(testEmail, "", password);
+    }
+
     protected void createUser(String testEmail, String nameSuffix) throws GRIDAClientException, BusinessException {
+        createUser(testEmail, nameSuffix, "testPassword");
+    }
+
+    protected void createUser(String testEmail, String nameSuffix, String password) throws GRIDAClientException, BusinessException {
         User newUser = new User("test firstName " + nameSuffix,
                 "test lastName " + nameSuffix, testEmail, "test institution",
-                "testPassword", CountryCode.fr,
+                password, CountryCode.fr,
                 null);
         Mockito.when(gridaClient.exist(anyString())).thenReturn(true, false);
         configurationBusiness.signup(newUser, "", (Group) null);
     }
 
+    protected void createUserInGroup(String userEmail, String groupName) throws BusinessException, GRIDAClientException {
+        createUserInGroup(userEmail, "", groupName);
+    }
+
     protected void createUserInGroup(String userEmail, String nameSuffix, String groupName) throws BusinessException, GRIDAClientException {
+        createUserInGroups(userEmail, nameSuffix, groupName);
+    }
+
+    public void createGroup(String groupName) throws BusinessException {
+        configurationBusiness.addGroup(new Group(groupName, true, true, true));
+    }
+
+    protected void createUserInGroups(String userEmail, String nameSuffix, String... groupNames) throws BusinessException, GRIDAClientException {
         User newUser = new User("test firstName " + nameSuffix,
                 "test lastName " + nameSuffix, userEmail, "test institution",
                 "testPassword", CountryCode.fr,
                 null);
         Mockito.when(gridaClient.exist(anyString())).thenReturn(true, false);
-        Group group = configurationBusiness.getGroup(groupName);
-        configurationBusiness.signup(newUser, "", false, true, group);
-    }
-
-    protected void signInUser() throws BusinessException {
-        configurationBusiness.signin("test1@test.fr", "testPassword");
+        List<Group> groups = new ArrayList<>();
+        for (String groupName : groupNames) {
+            groups.add(configurationBusiness.getGroup(groupName));
+        }
+        configurationBusiness.signup(newUser, "", false, true, groups);
     }
 
     protected Date getNextSecondDate() {

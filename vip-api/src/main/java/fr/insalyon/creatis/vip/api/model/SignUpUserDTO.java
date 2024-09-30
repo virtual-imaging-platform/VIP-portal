@@ -3,6 +3,7 @@ package fr.insalyon.creatis.vip.api.model;
 import fr.insalyon.creatis.vip.core.client.view.user.UserLevel;
 import fr.insalyon.creatis.vip.core.client.view.util.CountryCode;
 
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 /**
@@ -12,26 +13,31 @@ import java.util.List;
  */
 public class SignUpUserDTO {
 
+    @NotNull
     private String firstName;
+    @NotNull
     private String lastName;
+    @NotNull
     private String email;
+    @NotNull
     private String institution;
+    @NotNull
     private String password;
-    private UserLevel level;
+    @NotNull
     private CountryCode countryCode;
     private String comments;
+    @NotNull
     private List<String> applications;
 
     public SignUpUserDTO(){
 
     }
-    public SignUpUserDTO(String firstName, String lastName, String email, String institution, String password, UserLevel level, CountryCode countryCode, String comments, List<String> applications) {
+    public SignUpUserDTO(String firstName, String lastName, String email, String institution, String password, CountryCode countryCode, String comments, List<String> applications) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
         this.institution = institution;
         this.password = password;
-        this.level = level;
         this.countryCode = countryCode;
         this.comments = comments;
         this.applications = applications;
@@ -76,14 +82,6 @@ public class SignUpUserDTO {
 
     public void setPassword(String password) {
         this.password = password;
-    }
-
-    public UserLevel getLevel() {
-        return level;
-    }
-
-    public void setLevel(UserLevel level) {
-        this.level = level;
     }
 
     public CountryCode getCountryCode() {

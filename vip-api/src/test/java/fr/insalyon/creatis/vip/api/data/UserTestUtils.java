@@ -35,9 +35,11 @@ import fr.insalyon.creatis.vip.api.model.SignUpUserDTO;
 import fr.insalyon.creatis.vip.api.security.apikey.SpringApiPrincipal;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.user.UserLevel;
+import fr.insalyon.creatis.vip.core.client.view.util.CountryCode;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.web.servlet.request.RequestPostProcessor;
 
+import java.util.ArrayList;
 import java.util.Collections;
 
 /**
@@ -47,6 +49,8 @@ public class UserTestUtils {
 
     static public User baseUser1;
     static public User baseUser2;
+    static public User baseUser3;
+    static public User baseUser4;
 
     static public SignUpUserDTO restUser1;
 
@@ -65,9 +69,14 @@ public class UserTestUtils {
         baseUser2 = new User("base2", "User2", "baseuser2@test.tst", null,
                 UserLevel.Advanced, null);
         baseUser2.setFolder("user2");
+        baseUser3 = new User("base3", "User3", "baseuser3@test.tst", null,
+                UserLevel.Beginner, null);
+        baseUser3.setFolder("user3");
+        baseUser4 = new User("base4", "User4", "baseuser4@test.tst", null,
+                UserLevel.Beginner, null);
+        baseUser4.setFolder("user4");
 
-        restUser1 = new SignUpUserDTO("base3", "User3", "baseuser3@test.tst", "test", baseUser2Password,
-                UserLevel.Advanced, null, "test comment", Collections.singletonList("test applications"));
+        restUser1 = new SignUpUserDTO("base3", "User3", "baseuser3@test.tst", "test", baseUser2Password, CountryCode.lc, "test comment", new ArrayList<>());
     }
 
     public static RequestPostProcessor baseUser1() {
@@ -76,5 +85,13 @@ public class UserTestUtils {
 
     public static RequestPostProcessor baseUser2() {
         return SecurityMockMvcRequestPostProcessors.user(new SpringApiPrincipal(baseUser2));
+    }
+
+    public static RequestPostProcessor baseUser3() {
+        return SecurityMockMvcRequestPostProcessors.user(new SpringApiPrincipal(baseUser3));
+    }
+
+    public static RequestPostProcessor baseUser4() {
+        return SecurityMockMvcRequestPostProcessors.user(new SpringApiPrincipal(baseUser4));
     }
 }

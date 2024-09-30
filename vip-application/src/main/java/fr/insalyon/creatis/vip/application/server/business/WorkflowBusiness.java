@@ -41,6 +41,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
+import fr.insalyon.creatis.vip.application.server.model.boutiques.BoutiquesDescriptor;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
