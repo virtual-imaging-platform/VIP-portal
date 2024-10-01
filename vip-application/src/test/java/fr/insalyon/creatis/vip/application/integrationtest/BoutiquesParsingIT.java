@@ -34,7 +34,7 @@ public class BoutiquesParsingIT extends BaseSpringIT {
         Assertions.assertTrue(desc.getCommandLine().contains("recon-all -subjid [SUBJID] [NIFTI] [DIRECTIVES]"));
         Assertions.assertEquals(1, desc.getOutputFiles().size());
         Assertions.assertEquals(2, desc.getCustom().getAdditionalProperties().size());
-        Assertions.assertEquals("Natacha Beck <natacha.beck@mcgill.ca>", desc.getCustom().getAdditionalProperties().get("cbrain:author"));
+        Assertions.assertEquals("Natacha Beck <natacha.beck at mcgill.ca>", desc.getCustom().getAdditionalProperties().get("cbrain:author"));
         Assertions.assertEquals(true, desc.getCustom().getAdditionalProperties().get("cbrain:readonly-input-files"));
 
 

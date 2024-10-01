@@ -115,7 +115,6 @@ public class PlatformController extends ApiController{
         errorName = errorName.replace('_', ' ').toLowerCase();
         String message = VipException.getRawMessage(vipError)
                 .orElse("The error message for '" + errorName + "' cannot be known in advance");
-        return new ErrorCodeAndMessage(vipError.getCode(), message
-        );
+        return new ErrorCodeAndMessage(vipError.getCode(), message);
     }
 }

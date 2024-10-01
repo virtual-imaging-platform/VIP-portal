@@ -159,7 +159,7 @@
         }
     ],
     "custom": {
-        "cbrain:author": "Natacha Beck <natacha.beck@mcgill.ca>",
+        "cbrain:author": "Natacha Beck <natacha.beck at mcgill.ca>",
         "cbrain:readonly-input-files": true
     },
     "description": "Performs all, or any part of, the FreeSurfer cortical reconstruction process (https://surfer.nmr.mgh.harvard.edu/fswiki/recon-all)."

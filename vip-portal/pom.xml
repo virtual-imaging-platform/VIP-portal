@@ -223,6 +223,7 @@ knowledge of the CeCILL-B license and that you accept its terms.
             <artifactId>gwt-dev</artifactId>
             <scope>provided</scope>
             <exclusions>
+                <!-- excluded for conflicts in transitive dependencies in test context  -->
                 <exclusion>
                     <groupId>org.eclipse.jetty</groupId>
                     <artifactId>*</artifactId>

@@ -1,14 +1,10 @@
 package fr.insalyon.creatis.vip.application.server;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.insalyon.creatis.moteur.plugins.workflowsdb.dao.*;
-import fr.insalyon.creatis.vip.application.server.dao.SimulationStatsDAO;
-import fr.insalyon.creatis.vip.application.server.dao.hibernate.SimulationStatsData;
 import org.hibernate.SessionFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
-import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 
 /**
  * Spring special configuration for vip-application.
