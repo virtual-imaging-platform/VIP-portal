@@ -624,19 +624,19 @@ public class ApplicationData extends JdbcDaoSupport implements ApplicationDAO {
             ps.setString(2, applicationVersion);
 
             ResultSet rs = ps.executeQuery();
-            rs.next();
+            if (rs.first()) {
+                AppVersion version = new AppVersion(rs.getString("application"),
+                        rs.getString("version"),
+                        rs.getString("lfn"),
+                        rs.getString("json_lfn"),
+                        rs.getString("doi"),
+                        rs.getBoolean("visible"),
+                        rs.getBoolean("useBoutiquesForm"));
+                ps.close();
 
-            AppVersion version = new AppVersion(rs.getString("application"),
-                    rs.getString("version"),
-                    rs.getString("lfn"),
-                    rs.getString("json_lfn"),
-                    rs.getString("doi"),
-                    rs.getBoolean("visible"),
-                    rs.getBoolean("useBoutiquesForm"));
-            ps.close();
-
-            return version;
-
+                return version;
+            }
+            return null;
         } catch (SQLException ex) {
             logger.error("Error getting versions for {}/{}",
                     applicationName, applicationVersion, ex);

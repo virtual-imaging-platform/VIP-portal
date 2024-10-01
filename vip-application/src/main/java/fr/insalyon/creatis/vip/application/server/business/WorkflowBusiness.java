@@ -31,49 +31,13 @@
  */
 package fr.insalyon.creatis.vip.application.server.business;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-
-import org.apache.commons.io.FileUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Lookup;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.xml.sax.SAXException;
-
 import fr.insalyon.creatis.grida.client.GRIDAClient;
 import fr.insalyon.creatis.grida.client.GRIDAClientException;
 import fr.insalyon.creatis.grida.client.GRIDAPoolClient;
-import fr.insalyon.creatis.moteur.plugins.workflowsdb.bean.Input;
-import fr.insalyon.creatis.moteur.plugins.workflowsdb.bean.Output;
-import fr.insalyon.creatis.moteur.plugins.workflowsdb.bean.Processor;
-import fr.insalyon.creatis.moteur.plugins.workflowsdb.bean.Workflow;
-import fr.insalyon.creatis.moteur.plugins.workflowsdb.bean.WorkflowStatus;
-import fr.insalyon.creatis.moteur.plugins.workflowsdb.dao.InputDAO;
-import fr.insalyon.creatis.moteur.plugins.workflowsdb.dao.OutputDAO;
-import fr.insalyon.creatis.moteur.plugins.workflowsdb.dao.ProcessorDAO;
-import fr.insalyon.creatis.moteur.plugins.workflowsdb.dao.StatsDAO;
-import fr.insalyon.creatis.moteur.plugins.workflowsdb.dao.WorkflowDAO;
-import fr.insalyon.creatis.moteur.plugins.workflowsdb.dao.WorkflowsDBDAOException;
+import fr.insalyon.creatis.moteur.plugins.workflowsdb.bean.*;
+import fr.insalyon.creatis.moteur.plugins.workflowsdb.dao.*;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
-import fr.insalyon.creatis.vip.application.client.bean.Activity;
-import fr.insalyon.creatis.vip.application.client.bean.AppVersion;
-import fr.insalyon.creatis.vip.application.client.bean.Descriptor;
-import fr.insalyon.creatis.vip.application.client.bean.Engine;
-import fr.insalyon.creatis.vip.application.client.bean.InOutData;
-import fr.insalyon.creatis.vip.application.client.bean.Simulation;
-import static fr.insalyon.creatis.vip.application.client.view.ApplicationException.ApplicationError.PLATFORM_MAX_EXECS;
-import static fr.insalyon.creatis.vip.application.client.view.ApplicationException.ApplicationError.USER_MAX_EXECS;
-import static fr.insalyon.creatis.vip.application.client.view.ApplicationException.ApplicationError.WRONG_APPLICATION_DESCRIPTOR;
+import fr.insalyon.creatis.vip.application.client.bean.*;
 import fr.insalyon.creatis.vip.application.client.view.monitor.SimulationStatus;
 import fr.insalyon.creatis.vip.application.client.view.monitor.progress.ProcessorStatus;
 import fr.insalyon.creatis.vip.application.server.business.simulation.ParameterSweep;
@@ -95,6 +59,20 @@ import fr.insalyon.creatis.vip.datamanager.server.DataManagerUtil;
 import fr.insalyon.creatis.vip.datamanager.server.business.DataManagerBusiness;
 import fr.insalyon.creatis.vip.datamanager.server.business.ExternalPlatformBusiness;
 import fr.insalyon.creatis.vip.datamanager.server.business.LfcPathsBusiness;
+import org.apache.commons.io.FileUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Lookup;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.xml.sax.SAXException;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.*;
+
+import static fr.insalyon.creatis.vip.application.client.view.ApplicationException.ApplicationError.*;
 
 /**
  *
@@ -106,23 +84,23 @@ public class WorkflowBusiness {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    private Server server;
-    private SimulationStatsDAO simulationStatsDAO;
-    private WorkflowDAO workflowDAO;
-    private ProcessorDAO processorDAO;
-    private OutputDAO outputDAO;
-    private InputDAO inputDAO;
-    private StatsDAO statsDAO;
-    private EngineDAO engineDAO;
-    private ApplicationDAO applicationDAO;
-    private UsersGroupsDAO usersGroupsDAO;
-    private EngineBusiness engineBusiness;
-    private DataManagerBusiness dataManagerBusiness;
-    private EmailBusiness emailBusiness;
-    private LfcPathsBusiness lfcPathsBusiness;
-    private GRIDAPoolClient gridaPoolClient;
-    private GRIDAClient gridaClient;
-    private ExternalPlatformBusiness externalPlatformBusiness;
+    private final Server server;
+    private final SimulationStatsDAO simulationStatsDAO;
+    private final WorkflowDAO workflowDAO;
+    private final ProcessorDAO processorDAO;
+    private final OutputDAO outputDAO;
+    private final InputDAO inputDAO;
+    private final StatsDAO statsDAO;
+    private final EngineDAO engineDAO;
+    private final ApplicationDAO applicationDAO;
+    private final UsersGroupsDAO usersGroupsDAO;
+    private final EngineBusiness engineBusiness;
+    private final DataManagerBusiness dataManagerBusiness;
+    private final EmailBusiness emailBusiness;
+    private final LfcPathsBusiness lfcPathsBusiness;
+    private final GRIDAPoolClient gridaPoolClient;
+    private final GRIDAClient gridaClient;
+    private final ExternalPlatformBusiness externalPlatformBusiness;
 
     @Autowired
     public WorkflowBusiness(
@@ -254,7 +232,7 @@ public class WorkflowBusiness {
                 throw new BusinessException(USER_MAX_EXECS, runningWorkflows);
             }
 
-            List<ParameterSweep> parameters = new ArrayList<ParameterSweep>();
+            List<ParameterSweep> parameters = new ArrayList<>();
             for (String name : parametersMap.keySet()) {
 
                 ParameterSweep ps = new ParameterSweep(name);
@@ -531,11 +509,8 @@ public class WorkflowBusiness {
             throws BusinessException {
 
         //TODO fix
-        Map<String, String> inputs =
-            getInputM2Parser(currentUserFolder).parse(
-                server.getWorkflowsPath() + "/" + simulationID + "/input-m2.xml");
-
-        return inputs;
+        return getInputM2Parser(currentUserFolder).parse(
+            server.getWorkflowsPath() + "/" + simulationID + "/input-m2.xml");
     }
 
     public Simulation getSimulation(String simulationID) throws BusinessException {
@@ -545,7 +520,7 @@ public class WorkflowBusiness {
     public Simulation getSimulation(String simulationID, boolean refresh)
             throws BusinessException {
 
-        Simulation simulation = null;
+        Simulation simulation;
         try {
             Workflow workflow = workflowDAO.get(simulationID);
             if (workflow == null) {
@@ -577,7 +552,7 @@ public class WorkflowBusiness {
 
     public List<InOutData> getOutputData(
             String simulationID, String currentUserFolder) throws BusinessException {
-        List<InOutData> list = new ArrayList<InOutData>();
+        List<InOutData> list = new ArrayList<>();
         try {
             for (Output output : outputDAO.get(simulationID)) {
                 String path = lfcPathsBusiness.parseRealDir(
@@ -597,7 +572,7 @@ public class WorkflowBusiness {
             throws BusinessException {
 
         try {
-            List<InOutData> list = new ArrayList<InOutData>();
+            List<InOutData> list = new ArrayList<>();
             for (Input input : inputDAO.get(simulationID)) {
                 String path = lfcPathsBusiness.parseRealDir(
                     input.getInputID().getPath(), currentUserFolder);
@@ -634,7 +609,7 @@ public class WorkflowBusiness {
     public List<Activity> getProcessors(String simulationID) throws BusinessException {
 
         try {
-            List<Activity> list = new ArrayList<Activity>();
+            List<Activity> list = new ArrayList<>();
             for (Processor processor : processorDAO.get(simulationID)) {
 
                 ProcessorStatus status = ProcessorStatus.Unstarted;
@@ -665,19 +640,19 @@ public class WorkflowBusiness {
             List<Simulation> simulationIDList, int type)
             throws BusinessException, WorkflowsDBDAOException {
 
-        List<String> workflowIDList = new ArrayList<String>();
-        List<String> stats = new ArrayList<String>();
+        List<String> workflowIDList = new ArrayList<>();
+        List<String> stats = new ArrayList<>();
         if (simulationIDList != null) {
-            for (int i = 0; i < simulationIDList.size(); i++) {
+            for (Simulation simulation : simulationIDList) {
                 //logger.error("Stat module, id is "+simulationIDList.get(i).getID());
-                workflowIDList.add(simulationIDList.get(i).getID());
+                workflowIDList.add(simulation.getID());
             }
         } else {
             logger.error("Incorrect call of getPerformanceStats : Execution list is null");
             throw new BusinessException("Execution list is null!");
         }
 
-        if (workflowIDList != null && !workflowIDList.isEmpty()) {
+        if ( ! workflowIDList.isEmpty()) {
             try {
                 switch (type) {
                     case 1:
@@ -725,9 +700,9 @@ public class WorkflowBusiness {
             }
 
             if (sb.length() > 0) {
-                logger.error("The following data does not exist: " + sb.toString());
+                logger.error("The following data does not exist: " + sb);
                 throw new fr.insalyon.creatis.vip.core.server.business.BusinessException(
-                        "The following data does not exist: " + sb.toString());
+                        "The following data does not exist: " + sb);
             }
         } catch (DataManagerException ex) {
             throw new BusinessException(ex);
@@ -788,7 +763,7 @@ public class WorkflowBusiness {
         } else if (path.startsWith(server.getDataManagerGroupsHome())) {
 
             path = path.replace(server.getDataManagerGroupsHome() + "/", "");
-            if (path.indexOf("/") != -1) {
+            if (path.contains("/")) {
                 path = path.substring(0, path.indexOf("/"));
             }
 
@@ -801,7 +776,7 @@ public class WorkflowBusiness {
 
     private List<Simulation> parseWorkflows(List<Workflow> list) {
 
-        List<Simulation> simulationsList = new ArrayList<Simulation>();
+        List<Simulation> simulationsList = new ArrayList<>();
         for (Workflow workflow : list) {
             simulationsList.add(new Simulation(
                     workflow.getApplication(),

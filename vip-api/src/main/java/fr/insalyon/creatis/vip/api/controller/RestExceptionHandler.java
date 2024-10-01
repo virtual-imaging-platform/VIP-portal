@@ -60,15 +60,15 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(ApiException.class)
-    @ResponseBody
-    public ErrorCodeAndMessage handleApiException(ApiException e) {
+    public ResponseEntity<Object> handleApiException(ApiException e) {
         // No need to log, VIP errors are logged when they are created
 
         // to find the error message : look for an error code in the vip
         // ancestor exceptions and use that exception message
-        return fetchErrorInException(e);
+        ErrorCodeAndMessage codeAndMessage = fetchErrorInException(e);
+        HttpStatus status = e.getHttpStatus().map(HttpStatus::resolve).orElse(HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(codeAndMessage, status);
     }
 
     private ErrorCodeAndMessage fetchErrorInException(Throwable throwable) {

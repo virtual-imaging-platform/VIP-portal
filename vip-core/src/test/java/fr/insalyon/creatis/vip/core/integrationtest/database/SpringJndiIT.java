@@ -2,6 +2,7 @@ package fr.insalyon.creatis.vip.core.integrationtest.database;
 
 import fr.insalyon.creatis.grida.client.GRIDAClient;
 import fr.insalyon.creatis.grida.client.GRIDAClientException;
+import fr.insalyon.creatis.vip.core.client.bean.Account;
 import fr.insalyon.creatis.vip.core.client.bean.Group;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.util.CountryCode;
@@ -19,6 +20,7 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DataSourceUtils;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
@@ -61,7 +63,6 @@ import static org.mockito.ArgumentMatchers.*;
 @TestPropertySource(properties = "db.tableEngine=") // to disable the default mysql/innodb engine on database init
 @TestMethodOrder(OrderAnnotation.class)
 @ActiveProfiles({"jndi-db", "test"}) // to use default jndi datasource but avoid default server config
-@Disabled
 public class SpringJndiIT {
 
     @Autowired
@@ -112,39 +113,39 @@ public class SpringJndiIT {
     }
 
     /*
-        Add an account
+        Add a group (there is already one after init)
+    */
     @Test
     @Order(2)
-    public void addNewAccount() throws BusinessException {
-        List<Account> accounts = configurationBusiness.getAccounts();
-        assertEquals(0, accounts.size());
-        configurationBusiness.addAccount("test Account", Collections.emptyList());
-        accounts = configurationBusiness.getAccounts();
-        assertEquals(1, accounts.size());
+    public void addNewGroup() throws BusinessException {
+        List<Group> groups = configurationBusiness.getGroups();
+        assertEquals(1, groups.size());
+        configurationBusiness.addGroup(new Group("test group", true, true, true));
+        groups = configurationBusiness.getGroups();
+        assertEquals(2, groups.size());
     }
-    */
 
 
     /*
-        Verify the account is still there
+        Verify the group is still there
+    */
     @Test
     @Order(3)
-    public void isAccountStillThere() throws BusinessException {
-        List<Account> accounts = configurationBusiness.getAccounts();
-        assertEquals(1, accounts.size());
+    public void isGroupStillThere() throws BusinessException {
+        List<Group> groups = configurationBusiness.getGroups();
+        assertEquals(2, groups.size());
     }
-    */
 
     /*
-        Restart spring, account should still be there
+        Restart spring, group should still be there
+    */
     @Test
     @Order(4)
-    @DirtiesContext(methodMode = MethodMode.BEFORE_METHOD) // to restart spring
-    public void isAccountStillThereAfterRestart() throws BusinessException {
-        List<Account> accounts = configurationBusiness.getAccounts();
-        assertEquals(1, accounts.size());
+    @DirtiesContext(methodMode = DirtiesContext.MethodMode.BEFORE_METHOD) // to restart spring
+    public void isGroupStillThereAfterRestart() throws BusinessException {
+        List<Group> groups = configurationBusiness.getGroups();
+        assertEquals(2, groups.size());
     }
-    */
 
     @Test
     @Order(5)
