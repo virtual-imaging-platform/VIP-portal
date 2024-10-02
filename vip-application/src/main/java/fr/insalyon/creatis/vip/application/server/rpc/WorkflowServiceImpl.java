@@ -43,6 +43,7 @@ import fr.insalyon.creatis.vip.application.server.business.simulation.ParameterS
 import fr.insalyon.creatis.vip.application.server.dao.ApplicationInputDAO;
 import fr.insalyon.creatis.vip.core.client.bean.Group;
 import fr.insalyon.creatis.vip.core.client.bean.User;
+import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.CoreException;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
@@ -60,6 +61,8 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -192,8 +195,9 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
             }
 
             for (Map.Entry<String,String> p : parametersMap.entrySet()) {
-                logger.info("received param {} : {}", p.getKey(), p.getValue());
+                logger.info("received param {} : {}", p.getKey(), p.getValue());
             }
+            addTimestampedSubDirectoryIfNecessary(parametersMap);
 
             String simulationID = workflowBusiness.launch(
                 user, groups,
@@ -204,6 +208,24 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
 
         } catch (BusinessException | CoreException ex) {
             throw new ApplicationException(ex);
+        }
+    }
+
+    private void addTimestampedSubDirectoryIfNecessary(Map<String, String> parametersMap) {
+        if (server.useMoteurlite()) {
+            if (parametersMap.containsKey(CoreConstants.RESULTS_DIRECTORY_PARAM_NAME)) {
+                String resultDir = parametersMap.get(CoreConstants.RESULTS_DIRECTORY_PARAM_NAME);
+                if (resultDir.startsWith("/") || resultDir.startsWith("lfn:")) {
+                    DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy_HH:mm:ss");
+                    resultDir = resultDir + "/" + (dateFormat.format(System.currentTimeMillis()));
+                    parametersMap.put(CoreConstants.RESULTS_DIRECTORY_PARAM_NAME, resultDir);
+                    logger.info("For MoteurLite : changing results-directory to : {}", resultDir);
+                } else {
+                    logger.info("Using MoteurLite but results-directory not a LFN ({})", resultDir);
+                }
+            } else {
+                logger.info("Using MoteurLite but no results-directory given -> no subdirectory added");
+            }
         }
     }
 

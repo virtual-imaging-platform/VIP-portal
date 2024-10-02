@@ -104,20 +104,13 @@ public class ApplicationImporterBusiness {
     }
 
     public void createApplication(
-            BoutiquesApplication bt, String type, String tag, boolean isRunOnGrid, boolean overwriteApplicationVersion, String fileAccessProtocol, User user)
+            BoutiquesApplication bt, String tag, boolean isRunOnGrid, boolean overwriteApplicationVersion, String fileAccessProtocol, User user)
             throws BusinessException {
 
         try {
             String wrapperTemplate = "vm/wrapper.vm";
             String gaswTemplate = "vm/gasw.vm";
-
             String gwendiaTemplate = "vm/gwendia-standalone.vm";
-            if (Constants.APP_IMPORTER_DOT_INPUTS_TYPE.equals(type)) {
-                gwendiaTemplate = "vm/gwendia-dot-inputs.vm";
-            } else if ( ! Constants.APP_IMPORTER_STANDALONE_TYPE.equals(type)) {
-                logger.error("Cannot import pipeline : unknown importer type : {}", type);
-                throw new BusinessException("Cannot import pipeline : unknown importer type");
-            }
 
             // Check rights
             checkEditionRights(bt.getName(), bt.getToolVersion(), overwriteApplicationVersion, user);
