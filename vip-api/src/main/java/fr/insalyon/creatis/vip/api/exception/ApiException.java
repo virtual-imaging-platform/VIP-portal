@@ -60,8 +60,9 @@ public class ApiException extends VipException {
         UNAUTHORIZED_DATA_ACCESS(8013),
         WRONG_OIDC_LOGIN(8014),
         INVALID_EXECUTION_ID(8015),
-        NOT_COMPATIBLE_WITH_BOUTIQUES(8016),
-        INPUT_FIELD_MISSING(8017);
+        INVALID_EXAMPLE_ID(8016),
+        NOT_COMPATIBLE_WITH_BOUTIQUES(8017),
+        INPUT_FIELD_MISSING(8018);
 
         private final Integer code;
         private final Integer httpStatus;
@@ -97,6 +98,7 @@ public class ApiException extends VipException {
             addMessage(ApiError.UNAUTHORIZED_DATA_ACCESS, "Unauthorized data access to : {}", 1);
             addMessage(ApiError.WRONG_OIDC_LOGIN, "The login process encountered an error", 0);
             addMessage(ApiError.INVALID_EXECUTION_ID, "No execution available with this id : {}", 1);
+            addMessage(ApiError.INVALID_EXAMPLE_ID, "There is no example with the id : {}", 1);
             addMessage(ApiError.NOT_COMPATIBLE_WITH_BOUTIQUES, "The pipeline is not compatible with boutiques : {}", 1);
         }
 

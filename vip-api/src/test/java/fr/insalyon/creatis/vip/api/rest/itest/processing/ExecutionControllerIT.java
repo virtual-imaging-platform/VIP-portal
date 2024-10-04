@@ -93,16 +93,15 @@ public class ExecutionControllerIT extends BaseWebSpringIT {
     public void setUp() throws Exception {
         super.setUp();
 
-        w1 = new Workflow(simulation1.getID(), baseUser1.getFullName(), WorkflowStatus.Completed, new Date(), new Date(), "description", "application", "applicationVersion", "applicationClass", "engine");
-        w2 = new Workflow(simulation2.getID(), baseUser1.getFullName(), WorkflowStatus.Completed, new Date(), new Date(), "description", "application", "applicationVersion", "applicationClass", "engine");
+        w1 = new Workflow(simulation1.getID(), baseUser1.getFullName(), WorkflowStatus.Completed, new Date(), new Date(), "description", "application", "applicationVersion", "applicationClass", "engine", null);
+        w2 = new Workflow(simulation2.getID(), baseUser1.getFullName(), WorkflowStatus.Completed, new Date(), new Date(), "description", "application", "applicationVersion", "applicationClass", "engine", null);
     }
 
     @Test
     public void shouldListExecutions() throws Exception {
         when(workflowDAO.get(eq(simulation1.getID()))).thenReturn(w1, null);
         when(workflowDAO.get(eq(simulation2.getID()))).thenReturn(w2, null);
-        when(workflowDAO.get(
-                eq(baseUser1.getFullName()), ArgumentMatchers.isNull(), ArgumentMatchers.isNull(), ArgumentMatchers.isNull(), ArgumentMatchers.isNull(), ArgumentMatchers.isNull()))
+        when(workflowDAO.get(Collections.singletonList(baseUser1.getFullName()), null, null, null, null, null, null))
                 .thenReturn(Arrays.asList(w1, w2), null);
 
         // perform a getWorkflows()
@@ -122,7 +121,7 @@ public class ExecutionControllerIT extends BaseWebSpringIT {
 
     @Test
     public void shouldCountExecutions() throws Exception {
-        when(workflowDAO.get(eq(baseUser1.getFullName()), ArgumentMatchers.isNull(), ArgumentMatchers.isNull(), ArgumentMatchers.isNull(), ArgumentMatchers.isNull(), ArgumentMatchers.isNull()))
+        when(workflowDAO.get(Collections.singletonList(baseUser1.getFullName()), null, null, null, null, null, null))
                 .thenReturn(Arrays.asList(w1, w2), null);
 
         // perform a getWorkflows()
@@ -251,7 +250,7 @@ public class ExecutionControllerIT extends BaseWebSpringIT {
 
     @Test
     public void shouldReturn500() throws Exception {
-        when(workflowDAO.get(baseUser1.getFullName(), null, null, null, null, null)).thenThrow(new RuntimeException("test exception"));
+        when(workflowDAO.get(Collections.singletonList(baseUser1.getFullName()), null, null, null, null, null, null)).thenThrow(new RuntimeException("test exception"));
 
         // perform a getWorkflows() with an undetermined error
         mockMvc.perform(
@@ -388,7 +387,7 @@ public class ExecutionControllerIT extends BaseWebSpringIT {
         Mockito.when(getWebServiceEngine().getStatus(worflowId)).thenReturn(SimulationStatus.Running, (SimulationStatus) null);
         Mockito.when(getWebServiceEngine().getAddressWS()).thenReturn(engineEndpoint, (String) null);
 
-        Workflow w = new Workflow(worflowId, baseUser1.getFullName(), WorkflowStatus.Running, startDate, null, "Exec test 1", appName, versionName, className, engineName);
+        Workflow w = new Workflow(worflowId, baseUser1.getFullName(), WorkflowStatus.Running, startDate, null, "Exec test 1", appName, versionName, className, engineName, null);
         when(workflowDAO.get(worflowId)).thenReturn(w, (Workflow) null);
 
         Execution expectedExecution = new Execution(worflowId, "Exec test 1", appName + "/" + versionName, 0, ExecutionStatus.RUNNING, null, null, startDate.getTime(), null, null);
@@ -468,7 +467,7 @@ public class ExecutionControllerIT extends BaseWebSpringIT {
         Mockito.when(getWebServiceEngine().getStatus(worflowId)).thenReturn(SimulationStatus.Running, (SimulationStatus) null);
         Mockito.when(getWebServiceEngine().getAddressWS()).thenReturn(engineEndpoint, (String) null);
 
-        Workflow w = new Workflow(worflowId, baseUser1.getFullName(), WorkflowStatus.Running, startDate, null, "Exec test 1", appName, versionName, className, engineName);
+        Workflow w = new Workflow(worflowId, baseUser1.getFullName(), WorkflowStatus.Running, startDate, null, "Exec test 1", appName, versionName, className, engineName, null);
         when(workflowDAO.get(worflowId)).thenReturn(w, (Workflow) null);
 
         Execution expectedExecution = new Execution(worflowId, "Exec test 1", appName + "/" + versionName, 0, ExecutionStatus.RUNNING, null, null, startDate.getTime(), null, null);

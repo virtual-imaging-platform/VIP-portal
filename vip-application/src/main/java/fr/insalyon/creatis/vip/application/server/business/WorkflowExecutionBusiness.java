@@ -120,7 +120,7 @@ public class WorkflowExecutionBusiness {
             return new Workflow(workflowID, user.getFullName(),
                     WorkflowStatus.Running,
                     new Date(), null, simulationName, applicationName, applicationVersion, applicationClass,
-                    engine.getAddressWS());
+                    engine.getAddressWS(), null);
 
         } catch (javax.xml.rpc.ServiceException | java.rmi.RemoteException ex) {
             logger.error("Error launching simulation {} ({}/{})",
