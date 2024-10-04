@@ -110,8 +110,8 @@ public class DisplayTab extends Tab {
         createApplicationButton = WidgetUtil.getIButton("Create application", Constants.ICON_LAUNCH, new ClickHandler() {
             @Override
             public void onClick(ClickEvent event) {
-                if (vipLayout.getApplicationType() == null){
-                    Layout.getInstance().setWarningMessage("Select type of Application is empty, please choose one.");
+                if (vipLayout.getFileAccessProtocol() == null){
+                    Layout.getInstance().setWarningMessage("Select file access protocol.");
                 } else {
                     boutiquesTool.setApplicationLFN(vipLayout.getApplicationLocation() + "/" + boutiquesTool.getName());
                     createApplication();
@@ -215,7 +215,6 @@ public class DisplayTab extends Tab {
         modal.show("Creating application...", true);
         ApplicationImporterService.Util.getInstance().createApplication(
             boutiquesTool,
-            vipLayout.getApplicationType(),
             vipLayout.getTag(),
             vipLayout.getIsRunOnGrid(),
             vipLayout.getOverwrite(),

@@ -69,13 +69,28 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
     @Override
     public void init() throws ServletException {
         super.init();
-        engineBusiness = getBean(EngineBusiness.class);
-        classBusiness = getBean(ClassBusiness.class);
-        applicationBusiness = getBean(ApplicationBusiness.class);
-        boutiquesBusiness = getBean(BoutiquesBusiness.class);
-        configurationBusiness = getBean(ConfigurationBusiness.class);
-        workflowBusiness = getBean(WorkflowBusiness.class);
-        simulationBusiness = getBean(SimulationBusiness.class);
+        setBeans(
+                getBean(ClassBusiness.class),
+                getBean(ApplicationBusiness.class),
+                getBean(EngineBusiness.class),
+                getBean(BoutiquesBusiness.class),
+                getBean(ConfigurationBusiness.class),
+                getBean(WorkflowBusiness.class),
+                getBean(SimulationBusiness.class)
+        );
+    }
+
+    public void setBeans(
+            ClassBusiness classBusiness, ApplicationBusiness applicationBusiness, EngineBusiness engineBusiness,
+            BoutiquesBusiness boutiquesBusiness, ConfigurationBusiness configurationBusiness,
+            WorkflowBusiness workflowBusiness, SimulationBusiness simulationBusiness) {
+        this.classBusiness = classBusiness;
+        this.applicationBusiness = applicationBusiness;
+        this.engineBusiness = engineBusiness;
+        this.boutiquesBusiness = boutiquesBusiness;
+        this.configurationBusiness = configurationBusiness;
+        this.workflowBusiness = workflowBusiness;
+        this.simulationBusiness = simulationBusiness;
     }
 
     @Override
@@ -347,16 +362,14 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
 
     @Override
     public String getCitation(String applicationName) throws ApplicationException {
+        // I think this is meant to nullify empty citation like "  <br /> "
         try {
-            String citationWithoutHtml = Jsoup
-                .parse(applicationBusiness.getCitation(
-                           applicationName))
-                .text();
-            if (citationWithoutHtml.isEmpty() || citationWithoutHtml == null) {
+            String citation = applicationBusiness.getCitation(applicationName);
+            String citationWithoutHtml = Jsoup.parse(citation).text();
+            if (citationWithoutHtml.isEmpty()) {
                 return null;
             } else {
-                return applicationBusiness.getCitation(
-                    applicationName);
+                return citation;
             }
         } catch (BusinessException ex) {
             throw new ApplicationException(ex);

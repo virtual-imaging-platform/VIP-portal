@@ -94,9 +94,12 @@ public abstract class VipException extends Exception implements IsSerializable {
         return sb.toString();
     }
 
-    private Integer vipErrorCode = null;
+    private VipError vipError = null;
+    protected Optional<VipError> getVipError() {
+        return Optional.ofNullable(vipError);
+    }
     public Optional<Integer> getVipErrorCode() {
-        return Optional.ofNullable(vipErrorCode);
+        return getVipError().map(VipError::getCode);
     }
 
     // Allow all exception constructors to be used
@@ -120,17 +123,17 @@ public abstract class VipException extends Exception implements IsSerializable {
 
     public VipException(VipError vipError, Object ...params) {
         super(formatMessage(vipError, params));
-        this.vipErrorCode = vipError.getCode();
+        this.vipError = vipError;
     }
 
     public VipException(VipError vipError, Throwable cause, Object ...params) {
         super(formatMessage(vipError, params), cause);
-        this.vipErrorCode = vipError.getCode();
+        this.vipError = vipError;
     }
 
     public VipException(String message, VipError vipError) {
         super(message);
-        this.vipErrorCode = vipError.getCode();
+        this.vipError = vipError;
     }
 
 }

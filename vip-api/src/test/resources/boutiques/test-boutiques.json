@@ -1,0 +1,68 @@
+{
+    "name": "testBoutiquesApp",
+    "tool-version": "v42",
+    "description": "Test app from axel. Must be similar to the gwendia test app",
+    "schema-version": "0.5",
+    "command-line": "echo [testFileInput] [testTextInput] [testOptionalTextInput] [testFlagInput]",
+    "author": "Axel ",
+    "container-image": {
+        "index": "docker://",
+        "image": "test-axel",
+        "type": "docker",
+        "container-opts": [
+            "-v /tmp:/tmp"
+        ]
+    },
+    "inputs": [
+        {
+            "id": "testFileInput",
+            "name": "Test file input",
+            "type": "File",
+            "description": "This is a test file input",
+            "value-key": "[testFileInput]"
+        },
+        {
+            "id": "testTextInput",
+            "name": "Test text input",
+            "type": "String",
+            "default-value": "test text value",
+            "description": "This is a test text input",
+            "value-key": "[testTextInput]"
+        },
+        {
+            "id": "testOptionalTextInput",
+            "name": "Test optional text input",
+            "type": "String",
+            "optional": true,
+            "description": "This is a optional test text input",
+            "value-key": "[testOptionalTextInput]"
+        },
+        {
+            "id": "testFlagInput",
+            "name": "Test flag input",
+            "type": "Flag",
+            "optional": true,
+            "default-value": "false",
+            "description": "This is a test flag input",
+            "command-line-flag": "--test-flag",
+            "value-key": "[testFlagInput]"
+        }
+    ],
+    "output-files": [
+        {
+            "id": "UNUSED",
+            "name": "Output",
+            "optional": false,
+            "description": "UNUSED",
+            "path-template": "UNUSED.tgz"
+        }
+    ], "error-codes": [
+        {
+            "description": "Crashed",
+            "code": 1
+        }
+    ],
+    "custom": {
+        "vip:plop": "plop"
+    }
+}

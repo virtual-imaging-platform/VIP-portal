@@ -61,6 +61,7 @@ public class CoreConstants implements IsSerializable {
     public static final String LAB_MYPROXY_PASS = "myproxy.pass";
     public static final String LAB_MYPROXY_LIFETIME = "myproxy.lifetime";
     public static final String LAB_MYPROXY_MIN_HOURS = "myproxy.min.hours";
+    public static final String LAB_MYPROXY_ENABLED = "myproxy.enabled";
     public static final String LAB_GRIDA_HOST = "grida.server.host";
     public static final String LAB_GRIDA_PORT = "grida.server.port";
     public static final String LAB_N4U_GRIDA_HOST = "n4u.grida.server.host";

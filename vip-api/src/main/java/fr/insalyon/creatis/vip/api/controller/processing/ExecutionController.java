@@ -152,8 +152,6 @@ public class ExecutionController extends ApiController {
     public Execution initExecution(@RequestBody @Valid Execution execution)
             throws ApiException {
         logMethodInvocation(logger, "initExecution", execution);
-        pipelineBusiness.checkIfUserCanAccessPipeline(
-            execution.getPipelineIdentifier());
         String execId = executionBusiness.initExecution(execution);
         return executionBusiness.getExecution(execId, false);
     }

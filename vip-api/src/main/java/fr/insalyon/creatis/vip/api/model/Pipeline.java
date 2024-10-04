@@ -51,11 +51,11 @@ public class Pipeline {
     public Pipeline() {
     }
     
-     public Pipeline(String identifier, String name, String version, boolean canExecute) {
+     public Pipeline(String identifier, String name, String version) {
         this.identifier = identifier;
         this.name = name;       
         this.version = version;
-        this.canExecute = canExecute;
+        this.canExecute = true;
         parameters = new ArrayList<>();
     }
 

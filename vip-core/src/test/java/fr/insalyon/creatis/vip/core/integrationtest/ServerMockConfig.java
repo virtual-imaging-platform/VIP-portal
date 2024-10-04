@@ -2,6 +2,7 @@ package fr.insalyon.creatis.vip.core.integrationtest;
 
 import fr.insalyon.creatis.vip.core.server.business.Server;
 import org.mockito.Mockito;
+import org.mockito.quality.Strictness;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
@@ -9,8 +10,7 @@ import org.springframework.context.annotation.Profile;
 
 import java.io.IOException;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 /**
  * Spring configuration class for tests.
@@ -34,6 +34,10 @@ public class ServerMockConfig {
     public static final String MAX_NUMBER_EXECUTIONS = "5";
     public static final String TEST_CAS_URL = "testCasURL";
 
+    // paths stuff
+    public static final String TEST_USERS_ROOT = "/test/prefix/vip/data/test_users";
+    public static final String TEST_GROUP_ROOT = "/test/prefix/vip/data/test_groups";
+
     public static void reset(Server server) {
         Mockito.reset(server);
         Mockito.when(server.getAdminFirstName()).thenReturn(TEST_ADMIN_FIRST_NAME);
@@ -45,15 +49,15 @@ public class ServerMockConfig {
         Mockito.when(server.getTruststoreFile()).thenReturn(LAB_TRUSTSTORE_FILE);
         Mockito.when(server.getTruststorePass()).thenReturn(LAB_TRUSTSTORE_PASS);
         when(server.getMaxPlatformRunningSimulations()).thenReturn(Integer.valueOf(MAX_NUMBER_EXECUTIONS));
-        when(server.getDataManagerUsersHome()).thenReturn("/test/prefix/vip/data/test_users");
-        when(server.getDataManagerGroupsHome()).thenReturn("/test/prefix/vip/data/test_groups");
+        when(server.getDataManagerUsersHome()).thenReturn(TEST_USERS_ROOT);
+        when(server.getDataManagerGroupsHome()).thenReturn(TEST_GROUP_ROOT);
         when(server.getVoRoot()).thenReturn("/vo_test/root");
     }
 
     @Bean
     @Primary
     public Server testServer() throws IOException {
-        Server server = mock(Server.class);
+        Server server = mock(Server.class, withSettings().strictness(Strictness.STRICT_STUBS));
         reset(server);
         return server;
     }

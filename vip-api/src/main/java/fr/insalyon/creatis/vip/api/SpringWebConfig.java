@@ -108,15 +108,10 @@ public class SpringWebConfig implements WebMvcConfigurer {
     }
 
     /*
-     to verify that the proxy ist still valid each day
+     to verify that the proxy is still valid each day
      */
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(vipConfigurer);
-    }
-
-    @Bean
-    public ObjectMapper objectMapper() {
-        return Jackson2ObjectMapperBuilder.json().build();
     }
 }

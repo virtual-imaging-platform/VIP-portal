@@ -59,6 +59,8 @@ public class PipelineTestUtils {
     public static final Source sourceParam1, sourceParam2;
     public static final PipelineParameter pipelineParam1, pipelineParam2;
 
+    public static final PipelineParameter resultsDir, fileParam, textParam, optionalTextParamNoValueProvided, optionalTextParam, flagParam;
+
     public static final Entry<Source, PipelineParameter>[] paramPairs;
 
     static {
@@ -76,6 +78,23 @@ public class PipelineTestUtils {
         paramPairs = new Entry[] {new SimpleEntry(sourceParam1, pipelineParam1),
             new SimpleEntry(sourceParam2, pipelineParam2)};
 
+        resultsDir = new PipelineParameter("results-directory", ParameterType.File,
+                false, false, "/test/vip/Home", "This is the test results directory input");
+
+        fileParam = new PipelineParameter("testFileInput", ParameterType.File,
+                false, false, null, "This is a test file input");
+
+        textParam = new PipelineParameter("testTextInput", ParameterType.String,
+                false, false, "test text value", "This is a test text input");
+
+        optionalTextParamNoValueProvided = new PipelineParameter("testOptionalTextInput", ParameterType.String,
+                true, false, "No_value_provided", "This is a optional test text input");
+
+        optionalTextParam = new PipelineParameter("testOptionalTextInput", ParameterType.String,
+                true, false, null, "This is a optional test text input");
+
+        flagParam = new PipelineParameter("testFlagInput", ParameterType.Boolean,
+                true, false, "false", "This is a test flag input");
 
         pipelineSuppliers = getPipelineSuppliers();
         pipelineParameterSuppliers = getPipelineParameterSuppliers();
@@ -83,7 +102,12 @@ public class PipelineTestUtils {
 
     public static Pipeline getPipeline(Application app, AppVersion version) {
         return new Pipeline(app.getName() + "/" + version.getVersion(),
-                app.getName(), version.getVersion(), true);
+                app.getName(), version.getVersion());
+    }
+
+    public static Pipeline getPipeline(AppVersion version) {
+        return new Pipeline(version.getApplicationName() + "/" + version.getVersion(),
+                version.getApplicationName(), version.getVersion());
     }
 
     public static Descriptor getDescriptor(String desc, Integer... paramIndexes) {
@@ -94,11 +118,20 @@ public class PipelineTestUtils {
         return new Descriptor(sources, desc);
     }
 
-    public static Pipeline getFullPipeline(Application app, AppVersion version, String desc, Integer... paramIndexes) {
-        Pipeline pipeline = getPipeline(app, version);
+    public static Pipeline getFullPipeline(AppVersion version, String desc, Integer... paramIndexes) {
+        Pipeline pipeline = getPipeline(version);
         pipeline.setDescription(desc);
         for (Integer paramIndex : paramIndexes) {
             pipeline.getParameters().add(paramPairs[paramIndex].getValue());
+        }
+        return pipeline;
+    }
+
+    public static Pipeline getFullPipeline(AppVersion version, String desc, PipelineParameter... params) {
+        Pipeline pipeline = getPipeline(version);
+        pipeline.setDescription(desc);
+        for (PipelineParameter param : params) {
+            pipeline.getParameters().add(param);
         }
         return pipeline;
     }
