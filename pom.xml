@@ -49,8 +49,8 @@ knowledge of the CeCILL-B license and that you accept its terms.
 
         <!-- other maven config -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.target>11</maven.compiler.target>
-        <maven.compiler.source>11</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
+        <maven.compiler.source>21</maven.compiler.source>
 
 
         <!-- VIP related dependencies version -->
@@ -110,7 +110,7 @@ knowledge of the CeCILL-B license and that you accept its terms.
             <dependency>
                 <groupId>com.isomorphic.smartgwt.lgpl</groupId>
                 <artifactId>smartgwt-lgpl</artifactId>
-                <version>12.0p</version>
+                <version>13.0p</version>
             </dependency>
             
             <!-- empty jars to ensure commons logging and log4j is not
