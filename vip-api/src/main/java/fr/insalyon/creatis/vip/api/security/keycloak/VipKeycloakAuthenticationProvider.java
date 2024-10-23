@@ -1,6 +1,5 @@
 package fr.insalyon.creatis.vip.api.security.keycloak;
 
-import fr.insalyon.creatis.vip.api.security.keycloak.SpringKeycloakPrincipal;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
