@@ -40,10 +40,8 @@ import fr.insalyon.creatis.vip.gatelab.client.view.GateLabException;
 import fr.insalyon.creatis.vip.gatelab.server.business.GateLabBusiness;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.ApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
 
-import javax.servlet.ServletException;
+import jakarta.servlet.ServletException;
 import java.util.Map;
 
 /**
