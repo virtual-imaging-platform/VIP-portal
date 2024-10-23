@@ -32,6 +32,7 @@
 package fr.insalyon.creatis.vip.applicationimporter.client.view.applicationdisplay;
 
 import com.smartgwt.client.types.Overflow;
+
 import fr.insalyon.creatis.vip.application.client.bean.boutiquesTools.BoutiquesApplication;
 import fr.insalyon.creatis.vip.applicationimporter.client.view.Constants;
 import fr.insalyon.creatis.vip.core.client.view.common.AbstractFormLayout;
@@ -44,7 +45,9 @@ public class GeneralLayout extends AbstractFormLayout {
             dockerIndex,
             version,
             schemaVersion,
-            description;
+            description,
+            vipContainer,
+            dotInputs;
 
     public GeneralLayout(String width, String height) {
         super(width, height);
@@ -60,8 +63,10 @@ public class GeneralLayout extends AbstractFormLayout {
         version = new LocalTextField("Version", false, false);
         schemaVersion = new LocalTextField("Schema Version", false, false);
         description = new LocalTextField("Description", false, false);
+        vipContainer = new LocalTextField("VIP Container", false, false);
+        dotInputs = new LocalTextField("DOT Inputs", false, false);
 
-        this.addMembers(name, commandLine, dockerImage, dockerIndex, version, schemaVersion, description);
+        this.addMembers(name, commandLine, dockerImage, dockerIndex, version, schemaVersion, description, vipContainer, dotInputs);
     }
 
     public void setTool(BoutiquesApplication bt) {
@@ -72,6 +77,8 @@ public class GeneralLayout extends AbstractFormLayout {
         dockerImage.setValue(bt.getContainerImage());
         dockerIndex.setValue(bt.getContainerIndex());
         schemaVersion.setValue(bt.getSchemaVersion());
+        vipContainer.setValue(bt.getVipContainer());
+        String dotInputsValue = String.join(", ", bt.getVipDotInputIds());
+        dotInputs.setValue(dotInputsValue + (bt.getVipDotIncludesResultsDir() ? (dotInputsValue.isEmpty() ? "results-directory" : ", results-directory") : ""));
     }
-
 }

@@ -1,5 +1,6 @@
 package fr.insalyon.creatis.vip.core.server;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.insalyon.creatis.grida.client.GRIDACacheClient;
 import fr.insalyon.creatis.grida.client.GRIDAClient;
 import fr.insalyon.creatis.grida.client.GRIDAPoolClient;
@@ -20,6 +21,7 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.ResourcePropertySource;
+import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.jdbc.datasource.DataSourceUtils;
 import org.springframework.jdbc.datasource.LazyConnectionDataSourceProxy;
@@ -119,6 +121,11 @@ public class SpringCoreConfig {
     @Bean
     public SMAClient smaClient(Server server) {
         return new SMAClient(server.getSMAHost(), server.getSMAPort());
+    }
+
+    @Bean
+    public ObjectMapper objectMapper() {
+        return Jackson2ObjectMapperBuilder.json().build();
     }
 
     // to verify the @Value injection existence

@@ -36,7 +36,7 @@ import fr.insalyon.creatis.vip.api.controller.ApiController;
 import fr.insalyon.creatis.vip.api.exception.ApiException;
 import fr.insalyon.creatis.vip.api.model.Pipeline;
 import fr.insalyon.creatis.vip.application.client.bean.Application;
-import fr.insalyon.creatis.vip.core.client.bean.User;
+import fr.insalyon.creatis.vip.application.server.model.boutiques.BoutiquesDescriptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,7 +48,6 @@ import org.springframework.web.bind.annotation.RestController;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.List;
-import java.util.function.Supplier;
 
 /**
  * Created by abonnet on 7/28/16.
@@ -68,7 +67,7 @@ public class PipelineController extends ApiController {
     }
 
     @RequestMapping
-    public Pipeline[] listPipelines(
+    public List<Pipeline> listPipelines(
             @RequestParam(required = false) String studyIdentifier) throws ApiException {
         logMethodInvocation(logger, "listPipelines", studyIdentifier);
         return pipelineBusiness.listPipelines(studyIdentifier);
@@ -93,14 +92,31 @@ public class PipelineController extends ApiController {
             logger.error("Error decoding pipelineid {}", pipelineId, e);
             throw new ApiException("cannot decode pipelineId : " + pipelineId);
         }
-        pipelineBusiness.checkIfUserCanAccessPipeline(pipelineId);
-        return pipelineBusiness.getPipeline(pipelineId);
+        return pipelineBusiness.getPipelineWithoutResultsDirectory(pipelineId);
+    }
+
+    @RequestMapping(value = "{pipelineId}", params = {"format=boutiques"})
+    public BoutiquesDescriptor getBoutiquesDescriptor(@PathVariable String pipelineId) throws ApiException {
+        logMethodInvocation(logger, "getBoutiquesDescriptor", pipelineId);
+        try {
+            pipelineId = URLDecoder.decode(pipelineId, "UTF8");
+        } catch (UnsupportedEncodingException e) {
+            logger.error("Error decoding pipelineid {}", pipelineId, e);
+            throw new ApiException("cannot decode pipelineId : " + pipelineId);
+        }
+        return pipelineBusiness.getBoutiquesDescriptor(pipelineId);
     }
 
     @RequestMapping("{pipelineIdFirstPart}/{pipelineIdSecondPart}")
     public Pipeline getPipeline(@PathVariable String pipelineIdFirstPart,
                                 @PathVariable String pipelineIdSecondPart) throws ApiException {
         return getPipeline(pipelineIdFirstPart + "/" + pipelineIdSecondPart);
+    }
+
+    @RequestMapping(value = "{pipelineIdFirstPart}/{pipelineIdSecondPart}", params = {"format=boutiques"})
+    public BoutiquesDescriptor getBoutiquesDescriptor(@PathVariable String pipelineIdFirstPart,
+                                @PathVariable String pipelineIdSecondPart) throws ApiException {
+        return getBoutiquesDescriptor(pipelineIdFirstPart + "/" + pipelineIdSecondPart);
     }
 
     @RequestMapping(params = "pipelineId")

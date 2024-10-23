@@ -71,14 +71,30 @@ if ( result.startsWith("/") || result.startsWith("lfn:") ) {
 #foreach( $output in $tool.getOutputFiles() )
         <out name="$output.getId()" type="URI" depth="0"/>
 #end
-        <iterationstrategy>
-          <cross>
+      <iterationstrategy>
+        <cross>
+#if($tool.getVipDotInputIds() && !$tool.getVipDotInputIds().isEmpty())
+          <dot>
+    #if($tools.getVipDotResultDirs)
             <port name="results-directory" />
-#foreach($input in $tool.getInputs()) 
-            <port name="$input.getId()"/>
+    #end
+    #foreach($dotInput in $tool.getVipDotInputIds())
+            <port name="$dotInput"/>
+    #end
+          </dot>
+    #if( ! $tools.getVipDotResultDirs)
+          <port name="results-directory" />
+    #end
+#else
+          <port name="results-directory" />
 #end
-          </cross>
-        </iterationstrategy>
+#foreach($input in $tool.getInputs()) 
+    #if(!$tool.getVipDotInputIds().contains($input.getId()))
+          <port name="$input.getId()"/>
+    #end
+#end
+        </cross>
+      </iterationstrategy>
         <gasw descriptor="$fileAccessProtocol:$tool.getGASWLFN()"/>
     </processor>
   </processors>

@@ -22,11 +22,10 @@ This needs te be here to use the production velocity templates
  */
 public class GwendiaTemplateTest {
 
-    final protected String DOT_TEMPLATE = "vm/gwendia-dot-inputs.vm";
     final protected String STANDALONE_TEMPLATE = "vm/gwendia-standalone.vm";
 
     @ParameterizedTest
-    @ValueSource(strings = {DOT_TEMPLATE, STANDALONE_TEMPLATE})
+    @ValueSource(strings = {STANDALONE_TEMPLATE})
     public void testTemplateWithNonNullDescription(String template) throws IOException, InvalidBoutiquesDescriptorException, SAXException {
         String inputDescription = "test input description";
         Descriptor gwendiaDesc = testGwendiaTemplate(
@@ -37,7 +36,7 @@ public class GwendiaTemplateTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {DOT_TEMPLATE, STANDALONE_TEMPLATE})
+    @ValueSource(strings = {STANDALONE_TEMPLATE})
     public void testTemplateWithNullDescription(String template) throws IOException, InvalidBoutiquesDescriptorException, SAXException {
         // when the description is not in boutiques, it must be an empty string in gwendia
         Descriptor gwendiaDesc = testGwendiaTemplate(
@@ -48,7 +47,7 @@ public class GwendiaTemplateTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {DOT_TEMPLATE, STANDALONE_TEMPLATE})
+    @ValueSource(strings = {STANDALONE_TEMPLATE})
     public void testTemplateWithAIntegerInput(String template) throws IOException, InvalidBoutiquesDescriptorException, SAXException {
         Descriptor gwendiaDesc = testGwendiaTemplate(
                 template,
@@ -57,7 +56,7 @@ public class GwendiaTemplateTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {DOT_TEMPLATE, STANDALONE_TEMPLATE})
+    @ValueSource(strings = {STANDALONE_TEMPLATE})
     public void testTemplateWithANumberInput(String template) throws IOException, InvalidBoutiquesDescriptorException, SAXException {
         Descriptor gwendiaDesc = testGwendiaTemplate(
                 template,

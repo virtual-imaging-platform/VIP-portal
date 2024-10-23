@@ -31,6 +31,7 @@
  */
 package fr.insalyon.creatis.vip.api.business;
 
+import fr.insalyon.creatis.moteur.plugins.workflowsdb.bean.WorkflowStatus;
 import fr.insalyon.creatis.vip.api.exception.ApiException;
 import fr.insalyon.creatis.vip.api.model.*;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
@@ -70,7 +71,7 @@ public class ExecutionBusiness {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     // API dependencies
-    private Supplier<User> currentUserProvider;
+    private final Supplier<User> currentUserProvider;
     private final DataApiBusiness dataApiBusiness;
 
     // other modules dependencies
@@ -115,10 +116,18 @@ public class ExecutionBusiness {
         }
     }
 
-    public Execution getExecution(String executionId, boolean summarize)
+    public Execution getExample(String executionId) throws ApiException {
+        return getExecution(executionId, false, true);
+    }
+
+    public Execution getExecution(String executionId, boolean summarize) throws ApiException {
+        return getExecution(executionId, summarize, false);
+    }
+
+    public Execution getExecution(String executionId, boolean summarize, boolean onlyExample)
             throws ApiException {
         try {
-            // Get main execution object
+            // Get simulation object
             Simulation s = workflowBusiness.getSimulation(executionId, true); // check running execution for update
 
             // Return null if execution doesn't exist or is cleaned (cleaned status is not supported in Carmin)
@@ -127,54 +136,67 @@ public class ExecutionBusiness {
                 throw new ApiException(ApiException.ApiError.INVALID_EXECUTION_ID, executionId);
             }
 
-            // Build Carmin's execution object
-            Execution e = new Execution(
-                    s.getID(),
-                    s.getSimulationName(),
-                    pipelineBusiness.getPipelineIdentifier(s.getApplicationName(), s.getApplicationVersion()),
-                    0, // timeout (no timeout set in VIP)
-                    VIPtoCarminStatus(s.getStatus()),
-                    null, // study identifier (not available in VIP yet)
-                    null, // error codes and mesasges (not available in VIP yet)
-                    s.getDate().getTime(),
-                    null, // last status modification date (not available in VIP yet)
-                    null // results location (not available in VIP yet)
-            );
-
-            if(summarize) // don't look into inputs and outputs
-                return e;
-
-            // Inputs
-            List<InOutData> inputs = workflowBusiness.getInputData(
-                executionId, currentUserProvider.get().getFolder());
-            logger.info("Execution has " + inputs.size() + " inputs ");
-            for (InOutData iod : inputs) {
-                e.getInputValues().put(iod.getProcessor(), iod.getPath());
+            if (onlyExample && ! isSimulationAnExample(s)) {
+                logger.error("Error trying to get an non-example execution as example : {}", executionId);
+                throw new ApiException(ApiException.ApiError.INVALID_EXAMPLE_ID, executionId);
             }
 
-            // Outputs
-            List<InOutData> outputs = workflowBusiness.getOutputData(
-                executionId, currentUserProvider.get().getFolder());
-            for (InOutData iod : outputs) {
-                if (!e.getReturnedFiles().containsKey(iod.getProcessor())) {
-                     e.getReturnedFiles().put(iod.getProcessor(), new ArrayList<>());
-                }
-                e.getReturnedFiles().get(iod.getProcessor()).add(iod.getPath());
-            }
-
-            if (!(e.getStatus() == ExecutionStatus.FINISHED) && !(e.getStatus() == ExecutionStatus.KILLED) && e.getReturnedFiles().isEmpty()) {
-                e.clearReturnedFiles();
-            }
-
-            return e;
+            return getExecutionFromSimulation(s, summarize);
 
         } catch (BusinessException ex) {
             throw new ApiException(ex);
         }
-
     }
 
-    public Execution[] listExecutions(int maxReturned) throws ApiException {
+    private Execution getExecutionFromSimulation(Simulation s, boolean summarize) throws BusinessException {
+        // Build Carmin's execution object
+        Execution e = new Execution(
+                s.getID(),
+                s.getSimulationName(),
+                pipelineBusiness.getPipelineIdentifier(s.getApplicationName(), s.getApplicationVersion()),
+                0, // timeout (no timeout set in VIP)
+                VIPtoCarminStatus(s.getStatus()),
+                null, // study identifier (not available in VIP yet)
+                null, // error codes and mesasges (not available in VIP yet)
+                s.getDate().getTime(),
+                null, // last status modification date (not available in VIP yet)
+                null // results location (not available in VIP yet)
+        );
+
+        if(summarize) // don't look into inputs and outputs
+            return e;
+
+        // Inputs
+        List<InOutData> inputs = workflowBusiness.getInputData(
+            s.getID(), currentUserProvider.get().getFolder());
+        logger.debug("Execution has " + inputs.size() + " inputs ");
+        for (InOutData iod : inputs) {
+            e.getInputValues().put(iod.getProcessor(), iod.getPath());
+        }
+
+        // Outputs
+        List<InOutData> outputs = workflowBusiness.getOutputData(
+            s.getID(), currentUserProvider.get().getFolder());
+        for (InOutData iod : outputs) {
+            if (!e.getReturnedFiles().containsKey(iod.getProcessor())) {
+                 e.getReturnedFiles().put(iod.getProcessor(), new ArrayList<>());
+            }
+            e.getReturnedFiles().get(iod.getProcessor()).add(iod.getPath());
+        }
+
+        if (!(e.getStatus() == ExecutionStatus.FINISHED) && !(e.getStatus() == ExecutionStatus.KILLED) && e.getReturnedFiles().isEmpty()) {
+            e.clearReturnedFiles();
+        }
+
+        return e;
+    }
+
+    private boolean isSimulationAnExample(Simulation simulation) {
+        return simulation.getTags() != null &&
+                simulation.getTags().contains(ApplicationConstants.WORKKFLOW_EXAMPLE_TAG);
+    }
+
+    public List<Execution> listExecutions(int maxReturned) throws ApiException {
         try {
 
             List<Simulation> simulations = workflowBusiness.getSimulations(
@@ -185,24 +207,44 @@ public class ExecutionBusiness {
                     null, // startDate
                     null // endDate
             );
-            logger.info("Found {} simulations", simulations.size());
+            logger.debug("Found {} simulations", simulations.size());
             ArrayList<Execution> executions = new ArrayList<>();
             int count = 0;
             for (Simulation s : simulations) {
                 if (!(s == null) && !(s.getStatus() == SimulationStatus.Cleaned)) {
                     count++;
-                    executions.add(getExecution(s.getID(), true));
+                    executions.add(getExecutionFromSimulation(s, true));
                     if(count >= maxReturned){
                         logger.warn("Only the {} most recent pipelines were returned.", maxReturned);
                         break;
                     }
                 }
             }
-            logger.info("Returning {} executions", executions.size());
-            Execution[] array_executions = new Execution[executions.size()];
-            return executions.toArray(array_executions);
+            logger.debug("Returning {} executions", executions.size());
+            return executions;
         } catch (BusinessException ex) {
             throw new ApiException(ex);
+        }
+    }
+
+    public List<Execution> listExamples() throws ApiException {
+        try {
+            List<Simulation> simulations = workflowBusiness.getSimulations(
+                    (String) null, // User must be null to take examples from other users
+                    null, // application
+                    WorkflowStatus.Completed.name(), // status
+                    null, // class
+                    null, // startDate
+                    null, // endDate
+                    ApplicationConstants.WORKKFLOW_EXAMPLE_TAG
+            );
+            List<Execution> executions = new ArrayList<>();
+            for (Simulation simulation : simulations) {
+                executions.add(getExecutionFromSimulation(simulation, true));
+            }
+            return executions;
+        } catch (BusinessException e) {
+            throw new ApiException(e);
         }
     }
 
@@ -217,14 +259,14 @@ public class ExecutionBusiness {
                     null, // startDate
                     null // endDate
             );
-            logger.info("Counting executions, found {} simulations.", simulations.size());
+            logger.debug("Counting executions, found {} simulations.", simulations.size());
             int count = 0;
             for (Simulation s : simulations) {
                 if (!(s == null) && !(s.getStatus() == SimulationStatus.Cleaned)) {
                     count++;
                 }
             }
-            logger.info("After removing null and cleaned, found {}", count);
+            logger.debug("After removing null and cleaned, found {}", count);
             return count;
         } catch (BusinessException ex) {
             throw new ApiException(ex);
@@ -256,8 +298,7 @@ public class ExecutionBusiness {
         }
         String resultsLocation = execution.getResultsLocation();
         if (resultsLocation != null) {
-            inputMap.put(CoreConstants.RESULTS_DIRECTORY_PARAM_NAME,
-                         resultsLocation);
+            inputMap.put(CoreConstants.RESULTS_DIRECTORY_PARAM_NAME, resultsLocation);
         }
 
         checkInputExecNameIsValid(execution.getName());
@@ -326,39 +367,35 @@ public class ExecutionBusiness {
             // Check that all pipeline inputs are present
             Pipeline p = pipelineBusiness.getPipelineWithResultsDirectory(pipelineId);
             for (PipelineParameter pp : p.getParameters()) {
+                // always true on vip
                 if (pp.isReturnedValue()) {
                     continue;
                 }
-                // pp is an input
-                if (!(inputValues.get(pp.getName()) == null)) {
+                // ok if input is present
+                if ( inputValues.get(pp.getName()) != null) {
                     continue;
                 }
-                // pp is an empty input
+                // then ok if input has a default value (and we set it)
+                // beware : with gwendia, optional always have an defaultValue (either defined or No_Value_Provided)
                 if (pp.getDefaultValue() != null) {
                     inputValues.put(pp.getName(), pp.getDefaultValue().toString());
                     continue;
                 }
-                // pp is an empty input with no default value
+                // then ok if it is optional
+                // beware, with gwendia it should not be possible to enter this case (see previous condition)
                 if (pp.isOptional()) {
-                    inputValues.put("no", pp.getDefaultValue().toString());//that's how optional values are handled in VIP
                     continue;
                 }
-                // pp is an empty input with no default value and it is not optional
-                logger.error("Error initialising {}, missing {} parameter",
-                        pipelineId, pp.getName());
-                throw new ApiException("Parameter " + pp.getName() + " is empty while it is not optional and it has no default value.");
+                // error : pp is an empty input with no default value and it is not optional
+                logger.error("Error initialising {}, missing {} parameter", pipelineId, pp.getName());
+                throw new ApiException(ApiException.ApiError.INPUT_FIELD_MISSING, pp.getName());
             }
 
-            boolean hasInputResultsDirectory =
-                inputValues.containsKey(
-                    CoreConstants.RESULTS_DIRECTORY_PARAM_NAME);
-
-            boolean hasPipelineResultsDirectory =
-                p.getParameters().stream().anyMatch(
-                        param ->
+            boolean inputsContainsResultsDirectoryInput = inputValues.containsKey(CoreConstants.RESULTS_DIRECTORY_PARAM_NAME);
+            boolean pipelineHasResultsDirectoryInput = p.getParameters().stream().anyMatch(param ->
                         param.getName().equals(CoreConstants.RESULTS_DIRECTORY_PARAM_NAME));
 
-            if (hasInputResultsDirectory && !hasPipelineResultsDirectory) {
+            if (inputsContainsResultsDirectoryInput && ! pipelineHasResultsDirectoryInput) {
                 logger.error("Missing results-directory for {}", pipelineId);
                 throw new ApiException(
                     "Input has parameter results-directory but it is not defined in pipeline.");

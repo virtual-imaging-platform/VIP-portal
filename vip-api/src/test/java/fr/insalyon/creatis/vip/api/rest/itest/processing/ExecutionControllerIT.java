@@ -31,39 +31,47 @@
  */
 package fr.insalyon.creatis.vip.api.rest.itest.processing;
 
+import fr.insalyon.creatis.grida.common.bean.GridData;
 import fr.insalyon.creatis.moteur.plugins.workflowsdb.bean.*;
 import fr.insalyon.creatis.moteur.plugins.workflowsdb.dao.InputDAO;
 import fr.insalyon.creatis.moteur.plugins.workflowsdb.dao.OutputDAO;
 import fr.insalyon.creatis.moteur.plugins.workflowsdb.dao.WorkflowDAO;
+import fr.insalyon.creatis.moteur.plugins.workflowsdb.dao.WorkflowsDBDAOException;
 import fr.insalyon.creatis.vip.api.exception.ApiException;
+import fr.insalyon.creatis.vip.api.model.Execution;
+import fr.insalyon.creatis.vip.api.model.ExecutionStatus;
 import fr.insalyon.creatis.vip.api.rest.config.BaseWebSpringIT;
 import fr.insalyon.creatis.vip.api.rest.config.RestTestUtils;
 import fr.insalyon.creatis.vip.application.client.bean.AppClass;
 import fr.insalyon.creatis.vip.application.client.bean.AppVersion;
 import fr.insalyon.creatis.vip.application.client.bean.Application;
 import fr.insalyon.creatis.vip.application.client.bean.Engine;
+import fr.insalyon.creatis.vip.application.client.view.monitor.SimulationStatus;
+import fr.insalyon.creatis.vip.application.server.business.simulation.ParameterSweep;
 import fr.insalyon.creatis.vip.application.server.business.simulation.WebServiceEngine;
-import fr.insalyon.creatis.vip.application.server.dao.ApplicationDAO;
 import fr.insalyon.creatis.vip.core.client.bean.Group;
-import fr.insalyon.creatis.vip.core.server.business.BusinessException;
-import fr.insalyon.creatis.vip.core.server.dao.GroupDAO;
-import fr.insalyon.creatis.vip.core.server.dao.UsersGroupsDAO;
+import fr.insalyon.creatis.vip.core.integrationtest.ServerMockConfig;
+import org.hamcrest.MatcherAssert;
+import org.hamcrest.Matchers;
+import org.hibernate.jdbc.Work;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.ArgumentMatchers;
+import org.mockito.MockedConstruction;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.test.web.servlet.ResultActions;
 
+import java.io.File;
+import java.lang.reflect.Parameter;
 import java.util.*;
 
 import static fr.insalyon.creatis.vip.api.data.ExecutionTestUtils.*;
 import static fr.insalyon.creatis.vip.api.data.UserTestUtils.baseUser1;
-import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.*;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -77,27 +85,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  */
 
 public class ExecutionControllerIT extends BaseWebSpringIT {
-    @Autowired
-    @Qualifier("mockWorkflowDAO")
-    WorkflowDAO workflowDAO;
-    @Autowired
-    @Qualifier("mockOutputDAO")
-    OutputDAO outputDAO;
-    @Autowired
-    @Qualifier("mockInputDAO")
-    InputDAO inputDAO;
-    //@Autowired
-    //@Qualifier("mockUsersGroupsDAO")
-    UsersGroupsDAO usersGroupsDAO;
-    //@Autowired
-    //@Qualifier("mockApplicationDAO")
-    ApplicationDAO applicationDAO;
-    @Autowired
-    @Qualifier("mockWebServiceEngine")
-    WebServiceEngine webServiceEngine;
-    //@Autowired
-    //@Qualifier("mockGroupDAO")
-    GroupDAO groupDAO;
 
     private Workflow w1;
     private Workflow w2;
@@ -105,22 +92,16 @@ public class ExecutionControllerIT extends BaseWebSpringIT {
     @BeforeEach
     public void setUp() throws Exception {
         super.setUp();
-        Mockito.reset(workflowDAO);
-        Mockito.reset(outputDAO);
-        Mockito.reset(webServiceEngine);
-        Mockito.reset(inputDAO);
-        //Mockito.reset(usersGroupsDAO);
-        //Mockito.reset(applicationDAO);
 
-        w1 = new Workflow(simulation1.getID(), baseUser1.getFullName(), WorkflowStatus.Completed, new Date(), new Date(), "description", "application", "applicationVersion", "applicationClass", "engine");
-        w2 = new Workflow(simulation2.getID(), baseUser1.getFullName(), WorkflowStatus.Completed, new Date(), new Date(), "description", "application", "applicationVersion", "applicationClass", "engine");
+        w1 = new Workflow(simulation1.getID(), baseUser1.getFullName(), WorkflowStatus.Completed, new Date(), new Date(), "description", "application", "applicationVersion", "applicationClass", "engine", null);
+        w2 = new Workflow(simulation2.getID(), baseUser1.getFullName(), WorkflowStatus.Completed, new Date(), new Date(), "description", "application", "applicationVersion", "applicationClass", "engine", null);
     }
 
     @Test
     public void shouldListExecutions() throws Exception {
         when(workflowDAO.get(eq(simulation1.getID()))).thenReturn(w1, null);
         when(workflowDAO.get(eq(simulation2.getID()))).thenReturn(w2, null);
-        when(workflowDAO.get(eq(baseUser1.getFullName()), ArgumentMatchers.isNull(), ArgumentMatchers.isNull(), ArgumentMatchers.isNull(), ArgumentMatchers.isNull(), ArgumentMatchers.isNull()))
+        when(workflowDAO.get(Collections.singletonList(baseUser1.getFullName()), null, null, null, null, null, null))
                 .thenReturn(Arrays.asList(w1, w2), null);
 
         // perform a getWorkflows()
@@ -129,7 +110,7 @@ public class ExecutionControllerIT extends BaseWebSpringIT {
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("[*]", hasSize(2)))
+                .andExpect(jsonPath("$[*]", hasSize(2)))
                 // Check that the returned executions are the good ones
                 .andExpect(jsonPath("$[0].status").value("Finished"))
                 .andExpect(jsonPath("$[0].identifier").value("execId1"))
@@ -140,7 +121,7 @@ public class ExecutionControllerIT extends BaseWebSpringIT {
 
     @Test
     public void shouldCountExecutions() throws Exception {
-        when(workflowDAO.get(eq(baseUser1.getFullName()), ArgumentMatchers.isNull(), ArgumentMatchers.isNull(), ArgumentMatchers.isNull(), ArgumentMatchers.isNull(), ArgumentMatchers.isNull()))
+        when(workflowDAO.get(Collections.singletonList(baseUser1.getFullName()), null, null, null, null, null, null))
                 .thenReturn(Arrays.asList(w1, w2), null);
 
         // perform a getWorkflows()
@@ -183,13 +164,19 @@ public class ExecutionControllerIT extends BaseWebSpringIT {
     }
 
     @Test
-    public void shouldGetErrorWhenGettingUnknownExecution() throws Exception {
-        when(workflowDAO.get(argThat(argument -> !simulation1.getID().equals(argument) && !simulation2.getID().equals(argument))))
-                .thenAnswer(invocation -> {
-                    throw new BusinessException("no test execution");
-                });
+    public void shouldGetErrorOnUnknownExecution() throws Exception {
+        mockMvc.perform(
+                        get("/rest/executions/WrongExecId").with(baseUser1()))
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.errorCode").value(ApiException.ApiError.GENERIC_API_ERROR.getCode()));
+    }
 
-        // perform a getWorkflows()
+    @Test
+    public void shouldGetErrorOnExpectedException() throws Exception {
+        when(workflowDAO.get(anyString())).thenThrow(new WorkflowsDBDAOException("test exception"));
+
         mockMvc.perform(
                         get("/rest/executions/WrongExecId").with(baseUser1()))
                 .andDo(print())
@@ -200,10 +187,7 @@ public class ExecutionControllerIT extends BaseWebSpringIT {
 
     @Test
     public void shouldReturnErrorOnUnexpectedException() throws Exception {
-        when(workflowDAO.get(argThat(argument -> !simulation1.getID().equals(argument) && !simulation2.getID().equals(argument))))
-                .thenAnswer(invocation -> {
-                    throw new RuntimeException("TEST RUNTIME EXCEPTION");
-                });
+        when(workflowDAO.get(anyString())).thenThrow(new RuntimeException("TEST RUNTIME EXCEPTION"));
 
         // perform a getWorkflows()
         mockMvc.perform(
@@ -266,7 +250,7 @@ public class ExecutionControllerIT extends BaseWebSpringIT {
 
     @Test
     public void shouldReturn500() throws Exception {
-        when(workflowDAO.get(baseUser1.getFullName(), null, null, null, null, null)).thenThrow(new RuntimeException("test exception"));
+        when(workflowDAO.get(Collections.singletonList(baseUser1.getFullName()), null, null, null, null, null, null)).thenThrow(new RuntimeException("test exception"));
 
         // perform a getWorkflows() with an undetermined error
         mockMvc.perform(
@@ -345,25 +329,26 @@ public class ExecutionControllerIT extends BaseWebSpringIT {
     }
 
     @Test
-    @Disabled
     public void shouldGetExecution2Results() throws Exception {
-        String resultPath = simulation2OutData.get(0).getPath();
+        String resultPath = "/root/user/user1/path/to/result.res";
+
         when(workflowDAO.get(eq(simulation2.getID()))).thenReturn(w2, null);
         Output output = new Output(new OutputID("workflowID", resultPath, "processor"), DataType.URI, "port");
         when(outputDAO.get(eq(simulation2.getID()))).thenReturn(Arrays.asList(output), null);
-        Group group = new Group("group1", true, true, true);
-        configurationBusiness.addGroup(group);
-        when(groupDAO.getGroups()).thenReturn(Arrays.asList(group));
 
+        Mockito.when(server.getDataManagerUsersHome()).thenReturn("/root/user");
+        Mockito.when(gridaClient.exist(resultPath)).thenReturn(true);
+        Mockito.when(gridaClient.getFolderData(resultPath, true)).thenReturn(Arrays.asList(
+                new GridData("result.res", GridData.Type.File, 42, "modifData", "", "", "")));
 
         mockMvc.perform(
                         get("/rest/executions/" + simulation2.getID() + "/results").with(baseUser1()))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$[*]", hasSize(1)));
-                /*.andExpect(jsonPath("$[0]",
-                        PathTestUtils.jsonCorrespondsToPath(PathTestUtils.testFile1PathProperties)));*/
+                .andExpect(jsonPath("$[*]", hasSize(1)))
+                .andExpect(jsonPath("$[0].path", equalTo("/vip/Home/path/to/result.res")))
+                .andExpect(jsonPath("$[0].size", equalTo(42)));
     }
 
 
@@ -380,63 +365,158 @@ public class ExecutionControllerIT extends BaseWebSpringIT {
     }
 
     @Test
-    @Disabled
-    public void testInitExecution() throws Exception
+    public void testInitGwendiaExecution() throws Exception
     {
-        // engine test creation
-        group1 = new Group("group1", true, true, true);
-        configurationBusiness.addGroup(group1);
-        List<String> groups = new ArrayList<>();
-        groups.add("group1");
-        createUserInGroup("test1@test.fr", "suffix1", "group1");
-        createUserInGroup("test2@test.fr", "suffix2", "group1");
+        String appName = "test application", groupName = "testGroup", className = "testClass", versionName = "4.2";
+        String engineName = "testEngine", engineEndpoint = "endpoint", worflowId = "test-workflow-id";
+        Date startDate = new Date();
 
-        // engine test creation
-        String engineName = "test engine";
-        String engineEndpoint = "test endpoint";
-        String engineStatus = "enabled";
-        Engine engine = new Engine(engineName, engineEndpoint, engineStatus);
-        List<String> engines = new ArrayList<>();
-        engines.add("test engine");
-        engineBusiness.add(engine);
+        configureGwendiaTestApp(appName,groupName, className, versionName);
+        addEngineToClass(className, engineName, engineEndpoint);
 
-        // appClass test creation
-        AppClass appClass = new AppClass("class1", engines, groups);
-        classBusiness.addClass(appClass);
-        applicationClasses = new ArrayList<>();
-        applicationClasses.add("class1");
+        createUserInGroup(baseUser1.getEmail(), groupName);
 
-        // Application test creation
-        Application application = new Application("application 1", applicationClasses, "test1@test.fr", "test1", "citation1");
-        applicationBusiness.add(application);
+        ArgumentCaptor<File> workflowFile = ArgumentCaptor.forClass(File.class);
+        ArgumentCaptor<List<ParameterSweep>> inputsCaptor = ArgumentCaptor.forClass(List.class);
+        ArgumentCaptor<Workflow> workflowCaptor = ArgumentCaptor.forClass(Workflow.class);
 
-        // AppVersion test creation
-        AppVersion version42 = new AppVersion("application 1", "version 4.2", "lfn", "jsonLfn", true, true);
-        applicationBusiness.addVersion(version42);
+        Mockito.when(server.getVoName()).thenReturn("test-vo-name");
+        Mockito.when(server.getServerProxy("test-vo-name")).thenReturn("/path/to/proxy");
+        Mockito.when(getWebServiceEngine().launch("/path/to/proxy", null)).thenReturn("full-test-workflow-id", (String) null);
+        Mockito.when(getWebServiceEngine().getSimulationId("full-test-workflow-id")).thenReturn(worflowId, (String) null);
+        Mockito.when(getWebServiceEngine().getStatus(worflowId)).thenReturn(SimulationStatus.Running, (SimulationStatus) null);
+        Mockito.when(getWebServiceEngine().getAddressWS()).thenReturn(engineEndpoint, (String) null);
 
-        when(applicationDAO.getApplication("application 1")).thenReturn(application);
+        Workflow w = new Workflow(worflowId, baseUser1.getFullName(), WorkflowStatus.Running, startDate, null, "Exec test 1", appName, versionName, className, engineName, null);
+        when(workflowDAO.get(worflowId)).thenReturn(w, (Workflow) null);
 
-        // configure lauch
-        when(workflowDAO.get(eq(simulation1.getID()))).thenReturn(w1);
-        when(workflowDAO.getNumberOfRunning(baseUser1.getFullName())).thenReturn(1L);
-        when(workflowDAO.getRunning()).thenReturn(Arrays.asList(w1));
-        when(applicationDAO.getVersion("Application 1", "version 0.0")).thenReturn(version42);
-        Input input = new Input(new InputID("workflowId", "jsonObjects/execution1.json", "processor"), DataType.URI);
-        when(inputDAO.get(eq(simulation1.getID()))).thenReturn(Arrays.asList(input));
-        //when(testLfcPathsBusiness.parseRealDir(anyString(), eq(baseUser1.getFolder()))).thenReturn("path",null);
-        Output output = new Output(new OutputID("workflowID", "path", "processor"), DataType.URI, "port");
-        when(outputDAO.get(eq(simulation1.getID()))).thenReturn(Arrays.asList(output));
-        when(usersGroupsDAO.getUserGroups(eq(baseUser1.getEmail()))).thenReturn(new HashMap<>());
+        Execution expectedExecution = new Execution(worflowId, "Exec test 1", appName + "/" + versionName, 0, ExecutionStatus.RUNNING, null, null, startDate.getTime(), null, null);
+        expectedExecution.clearReturnedFiles();
 
         mockMvc.perform(
-                post("/rest/executions").contentType("application/json")
-                        .content(getResourceAsString("jsonObjects/execution1.json"))
-                        .with(baseUser1()))
-        .andDo(print())
-        .andExpect(status().isOk())
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-        .andExpect(jsonPath("$",
-                jsonCorrespondsToExecution(execution1)
+                        post("/rest/executions").contentType("application/json")
+                                .content(getResourceAsString("jsonObjects/execution1.json"))
+                                .with(baseUser1()))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$",
+                        jsonCorrespondsToExecution(expectedExecution)
+                ));
+
+        // verify workflow path
+        Mockito.verify(getWebServiceEngine()).setWorkflow(workflowFile.capture());
+        Assertions.assertEquals(getGwendiaTestFile().getAbsolutePath(), workflowFile.getValue().getAbsolutePath());
+
+        // verify inputs
+        Mockito.verify(getWebServiceEngine()).setInput(inputsCaptor.capture());
+        List<ParameterSweep> inputs = inputsCaptor.getValue();
+        Assertions.assertEquals(5, inputs.size());
+        MatcherAssert.assertThat(inputs, Matchers.containsInAnyOrder(
+                both(hasProperty("parameterName", is("testFileInput"))).
+                        and(hasProperty("values",  Matchers.contains(ServerMockConfig.TEST_USERS_ROOT + "/" +  baseUser1.getFolder() + "/path/to/input.in"))),
+                both(hasProperty("parameterName", is("testTextInput"))).
+                        and(hasProperty("values",  Matchers.contains("best test text value"))),
+                both(hasProperty("parameterName", is("results-directory"))).
+                        and(hasProperty("values",  Matchers.contains(ServerMockConfig.TEST_USERS_ROOT + "/" +  baseUser1.getFolder()))),
+                both(hasProperty("parameterName", is("testOptionalTextInput"))).
+                        and(hasProperty("values",  Matchers.contains("No_value_provided"))),
+                both(hasProperty("parameterName", is("testFlagInput"))).
+                        and(hasProperty("values",  Matchers.contains("false")))
         ));
+
+        // verify created workflow
+        Mockito.verify(workflowDAO).add(workflowCaptor.capture());
+        Workflow workflow = workflowCaptor.getValue();
+        Assertions.assertEquals(appName, workflow.getApplication());
+        Assertions.assertEquals(versionName, workflow.getApplicationVersion());
+        Assertions.assertEquals(className, workflow.getApplicationClass());
+        Assertions.assertEquals(worflowId, workflow.getId());
+        Assertions.assertEquals(WorkflowStatus.Running, workflow.getStatus());
+        Assertions.assertEquals("Exec test 1", workflow.getDescription());
+        Assertions.assertEquals(engineEndpoint, workflow.getEngine());
+        Assertions.assertEquals(baseUser1.getFullName(), workflow.getUsername());
+        Assertions.assertNull(workflow.getFinishedTime());
+        MatcherAssert.assertThat(workflow.getStartedTime().getTime(),
+                is(both(greaterThan(startDate.getTime())).and(lessThan(new Date().getTime()))));
+
+    }
+
+    // the difference (at the moment) is that with moteurLite the optional and absent parameters are not included
+    @Test
+    public void testInitBoutiquesExecution() throws Exception
+    {
+        String appName = "test application", groupName = "testGroup", className = "testClass", versionName = "4.2";
+        String engineName = "testEngine", engineEndpoint = "endpoint", worflowId = "test-workflow-id";
+        Date startDate = new Date();
+
+        configureBoutiquesTestApp(appName,groupName, className, versionName);
+        addEngineToClass(className, engineName, engineEndpoint);
+
+        createUserInGroup(baseUser1.getEmail(), groupName);
+
+        ArgumentCaptor<File> workflowFile = ArgumentCaptor.forClass(File.class);
+        ArgumentCaptor<List<ParameterSweep>> inputsCaptor = ArgumentCaptor.forClass(List.class);
+        ArgumentCaptor<Workflow> workflowCaptor = ArgumentCaptor.forClass(Workflow.class);
+
+        Mockito.when(server.useMoteurlite()).thenReturn(true);
+        Mockito.when(server.getVoName()).thenReturn("test-vo-name");
+        Mockito.when(server.getServerProxy("test-vo-name")).thenReturn("/path/to/proxy");
+        Mockito.when(getWebServiceEngine().launch("/path/to/proxy", null)).thenReturn("full-test-workflow-id", (String) null);
+        Mockito.when(getWebServiceEngine().getSimulationId("full-test-workflow-id")).thenReturn(worflowId, (String) null);
+        Mockito.when(getWebServiceEngine().getStatus(worflowId)).thenReturn(SimulationStatus.Running, (SimulationStatus) null);
+        Mockito.when(getWebServiceEngine().getAddressWS()).thenReturn(engineEndpoint, (String) null);
+
+        Workflow w = new Workflow(worflowId, baseUser1.getFullName(), WorkflowStatus.Running, startDate, null, "Exec test 1", appName, versionName, className, engineName, null);
+        when(workflowDAO.get(worflowId)).thenReturn(w, (Workflow) null);
+
+        Execution expectedExecution = new Execution(worflowId, "Exec test 1", appName + "/" + versionName, 0, ExecutionStatus.RUNNING, null, null, startDate.getTime(), null, null);
+        expectedExecution.clearReturnedFiles();
+
+        mockMvc.perform(
+                        post("/rest/executions").contentType("application/json")
+                                .content(getResourceAsString("jsonObjects/execution1.json"))
+                                .with(baseUser1()))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$",
+                        jsonCorrespondsToExecution(expectedExecution)
+                ));
+
+        // verify workflow path
+        Mockito.verify(getWebServiceEngine()).setWorkflow(workflowFile.capture());
+        Assertions.assertEquals(getBoutiquesTestFile().getAbsolutePath(), workflowFile.getValue().getAbsolutePath());
+
+        // verify inputs
+        Mockito.verify(getWebServiceEngine()).setInput(inputsCaptor.capture());
+        List<ParameterSweep> inputs = inputsCaptor.getValue();
+        Assertions.assertEquals(4, inputs.size());
+        MatcherAssert.assertThat(inputs, Matchers.containsInAnyOrder(
+                both(hasProperty("parameterName", is("testFileInput"))).
+                        and(hasProperty("values",  Matchers.contains(ServerMockConfig.TEST_USERS_ROOT + "/" +  baseUser1.getFolder() + "/path/to/input.in"))),
+                both(hasProperty("parameterName", is("testTextInput"))).
+                        and(hasProperty("values",  Matchers.contains("best test text value"))),
+                both(hasProperty("parameterName", is("results-directory"))).
+                        and(hasProperty("values",  Matchers.contains(ServerMockConfig.TEST_USERS_ROOT + "/" +  baseUser1.getFolder()))),
+                both(hasProperty("parameterName", is("testFlagInput"))).
+                        and(hasProperty("values",  Matchers.contains("false")))
+        ));
+
+        // verify created workflow
+        Mockito.verify(workflowDAO).add(workflowCaptor.capture());
+        Workflow workflow = workflowCaptor.getValue();
+        Assertions.assertEquals(appName, workflow.getApplication());
+        Assertions.assertEquals(versionName, workflow.getApplicationVersion());
+        Assertions.assertEquals(className, workflow.getApplicationClass());
+        Assertions.assertEquals(worflowId, workflow.getId());
+        Assertions.assertEquals(WorkflowStatus.Running, workflow.getStatus());
+        Assertions.assertEquals("Exec test 1", workflow.getDescription());
+        Assertions.assertEquals(engineEndpoint, workflow.getEngine());
+        Assertions.assertEquals(baseUser1.getFullName(), workflow.getUsername());
+        Assertions.assertNull(workflow.getFinishedTime());
+        MatcherAssert.assertThat(workflow.getStartedTime().getTime(),
+                is(both(greaterThan(startDate.getTime())).and(lessThan(new Date().getTime()))));
+
     }
 }

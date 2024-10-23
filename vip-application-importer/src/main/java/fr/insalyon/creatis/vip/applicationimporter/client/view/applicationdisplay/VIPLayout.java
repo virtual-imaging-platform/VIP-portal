@@ -52,7 +52,6 @@ public class VIPLayout extends AbstractFormLayout {
     private final LocalTextField applicationLocation;
     private final CheckboxItem isRunOnGrid; // And not locally.
     private final CheckboxItem overwriteIfexists;
-    private final SelectItem appCbItem;
     private final SelectItem tagsCbItem;
     private final SelectItem fileAccessProtocolItem;
 
@@ -72,15 +71,6 @@ public class VIPLayout extends AbstractFormLayout {
         isRunOnGrid = new CheckboxItem("ckbox_isRunOnGrid", "Application must run on grid, and not locally");
         isRunOnGrid.setAlign(Alignment.LEFT);
 
-        //ComboBox to select type of application
-        appCbItem = new SelectItem();
-        appCbItem.setTitle("<b>Select type of application</b>");
-        appCbItem.setType("comboBox");
-        LinkedHashMap<String, String> valueMap = new LinkedHashMap<>();
-        valueMap.put(Constants.APP_IMPORTER_STANDALONE_TYPE, "standalone");
-        valueMap.put(Constants.APP_IMPORTER_DOT_INPUTS_TYPE, "Dot inputs (Challenge)");
-        appCbItem.setValueMap(valueMap);
-
         tagsCbItem = createTagsSelect();
 
         //select list to choose the execution type
@@ -92,7 +82,6 @@ public class VIPLayout extends AbstractFormLayout {
         fileAccessProtocolValueMap.put(Constants.APP_IMPORTER_LFN_PROTOCOL, "Grid (lfn)");
         fileAccessProtocolItem.setValueMap(fileAccessProtocolValueMap);
 
-        this.addMember(FieldUtil.getForm(appCbItem));
         this.addMember(FieldUtil.getForm(isRunOnGrid));
         this.addMember(FieldUtil.getForm(overwriteIfexists));
         this.addMember(FieldUtil.getForm(tagsCbItem));
@@ -141,19 +130,6 @@ public class VIPLayout extends AbstractFormLayout {
         return this.isRunOnGrid.getValueAsBoolean();
     }
 
-    /**
-     * Get the type of application (standalone or challenge)
-     *
-     * @return the type
-     */
-    public String getApplicationType() {
-        if (appCbItem._getValue() == null){
-            return null;
-        } else {
-            return appCbItem._getValue().toString();
-        }
-    }
-
     private SelectItem createTagsSelect() {
         // ComboBox to select tags.
         SelectItem tagsCb = new SelectItem();
@@ -192,6 +168,7 @@ public class VIPLayout extends AbstractFormLayout {
     public String getTag() {
         return tagsCbItem._getValue().toString();
     }
+
     public String getFileAccessProtocol(){
         return fileAccessProtocolItem._getValue().toString();
     }

@@ -41,7 +41,11 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ContextConfiguration;
 
 import static fr.insalyon.creatis.vip.api.data.UserTestUtils.baseUser1;
 import static fr.insalyon.creatis.vip.api.data.UserTestUtils.baseUser1Password;
@@ -60,45 +64,26 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * <p>
  * Use common vip spring test configuration ({@link BaseWebSpringIT}
  */
-@Disabled
 public class SpringAuthenticationIT extends BaseWebSpringIT {
-
-    @Autowired
-    @Qualifier("mockUserDAO")
-    UserDAO userDAO;
-
-    @BeforeEach
-    public void setUp() throws Exception {
-        super.setUp();
-        Mockito.reset(userDAO);
-        when(userDAO.getUserByApikey(eq("apikeyvalue"))).thenReturn(baseUser1);
-    }
 
     @Test
     public void authenticationOK() throws Exception {
+        createUserWithPassword(emailUser2, "coucou");
+        String apikey = getConfigurationBusiness().generateNewUserApikey(emailUser2);
         mockMvc.perform(get("/rest/wrongUrl")
-                .with(ApikeyRequestPostProcessor.apikey("testapikey", "apikeyvalue")))
+                .with(ApikeyRequestPostProcessor.apikey("testapikey", apikey)))
                 .andDo(print())
                 .andExpect(status().isNotFound());
     }
 
-    @Test
-    public void authenticationWithCoreKo() throws Exception {
-        when(userDAO.getUserByApikey("apikeyvalue"))
-                .thenThrow(new RuntimeException("hey hey"));
-        mockMvc.perform(get("/rest/wrongUrl")
-                .with(ApikeyRequestPostProcessor.apikey("testapikey", "apikeyvalue")))
-                .andDo(print())
-                .andExpect(status().isUnauthorized())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.errorCode")
-                        .value(ApiError.AUTHENTICATION_ERROR.getCode()));
-    }
-
+    /**
+     * Basic is not supported anymore
+     */
     @Test
     public void authenticationWithBasicShouldBeKo() throws Exception {
+        createUserWithPassword(emailUser2, "coucou");
         mockMvc.perform(get("/rest/wrongUrl")
-                .with(httpBasic(baseUser1.getEmail(), baseUser1Password)))
+                .with(httpBasic(emailUser2, "coucou")))
                 .andDo(print())
                 .andExpect(status().isUnauthorized())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))

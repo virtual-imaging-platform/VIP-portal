@@ -147,7 +147,7 @@ public class FileDownloadServiceImpl extends HttpServlet {
         }
 
         if ( ! lfcPermissionBusiness.isLFCPathAllowed(
-                user, vipPath, LFCAccessType.READ, false)) {
+                user, vipPath, LFCAccessType.READ, true)) {
             logger.error("download path [{}] not allowed for user {}", path, user.getEmail());
             resp.sendError(HttpServletResponse.SC_FORBIDDEN, "Access forbidden to this file");
             return;

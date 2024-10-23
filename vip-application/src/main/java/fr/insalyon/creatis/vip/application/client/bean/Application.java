@@ -34,6 +34,7 @@ package fr.insalyon.creatis.vip.application.client.bean;
 import com.google.gwt.user.client.rpc.IsSerializable;
 import org.opensaml.xml.encryption.Public;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -53,7 +54,7 @@ public class Application implements IsSerializable {
     }
 
     public Application(String name, String citation) {
-        this(name, null, null, null, citation);
+        this(name, new ArrayList<>(), null, null, citation);
     }
 
     public Application(String name, List<String> applicationClasses, String citation) {

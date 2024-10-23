@@ -121,6 +121,7 @@ public class ApplicationConstants {
     public static final String INPUT_WITHOUT_VALUE = "No_value_provided";
     public static final String INPUT_WITHOUT_VALUE_REQUIRED_MESSAGE = "Either you deselect the field or you fill it in";
     // Configuration
+    public static final String WORKKFLOW_EXAMPLE_TAG = "example";
     public static final String SESSION_CLASSES = "vip-classes";
     public static final String SEPARATOR_INPUT = "##";
     public static final String SEPARATOR_LIST = "@@";

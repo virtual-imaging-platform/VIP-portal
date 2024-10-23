@@ -364,7 +364,7 @@ public class DebugLayout extends VLayout {
                 if (taskLayout.getTaskID().equals(taskID)) {
                     taskLayout.setSelected(true);
                     selectedTaskID = taskID;
-                    if (status == TaskStatus.COMPLETED || status == TaskStatus.ERROR) {
+                    if (status == TaskStatus.COMPLETED || status == TaskStatus.ERROR || status == TaskStatus.ERROR_HELD) {
                         outputLabel.setDisabled(false);
                         errorLabel.setDisabled(false);
                         appOutputLabel.setDisabled(false);

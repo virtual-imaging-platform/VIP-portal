@@ -19,6 +19,16 @@ function error {
   echo [ ERROR - $D ] $* >&2
 }
 
+function configure_apptainer_for_singularity {
+  #APPTAINER_PATH is defined in the configuration (/cvmfs/dirac.egi.eu/container/apptainer/bin/)
+  cat > singularity << EOF
+        #!/bin/bash
+        apptainer "$@"
+EOF
+  chmod a+x singularity
+  export PATH=$APPTAINER_PATH:$PWD:$PATH
+}
+
 function download_udocker {
   #installation of udocker
   info "cloning udocker ${UDOCKER_TAG} "
@@ -62,14 +72,15 @@ function checkBosh {
         if [ -z "$HOMEBOSH" ]
         then
             info "bosh not found, trying to install it"
-            pip install --trusted-host pypi.org --trusted-host pypi.python.org --trusted-host files.pythonhosted.org boutiques --prefix $PWD 
+            export PATH="$HOME/.local/bin:$PATH"
+            pip install --trusted-host pypi.org --trusted-host pypi.python.org --trusted-host files.pythonhosted.org --user boutiques
             if [ $? != 0 ]
             then
                 error "pip install boutiques failed"
                 exit 1
             else
-                export BOSHEXEC="$PWD/bin/bosh"
-            fi           
+                export BOSHEXEC="bosh"
+            fi
         else
             info "local bosh found in $HOMEBOSH"
             export BOSHEXEC=$HOMEBOSH
@@ -157,9 +168,6 @@ JSONPARAMETERS
 # Command-line execution #
 ##########################
 
-TOOLNAME="$tool.getName()"
-JSONFILE="${TOOLNAME}.json"
-
 # BOSH_CVMFS_PATH is defined by GASW from the settings file
 checkBosh $BOSH_CVMFS_PATH
 
@@ -173,10 +181,13 @@ fi
 #end
 
 
+#if($tool.getContainerType() == "singularity")
+if ! command -v singularity
+then
+    configure_apptainer_for_singularity
+fi
+#end
 
-# Change PYTHONPATH to make all strings unicode by default in python2 (as in python3)
-# Otherwise `bosh exec` fails on any non-ascii characters in outputs
-echo "import sys; sys.setdefaultencoding(\"UTF8\")" > sitecustomize.py
 #creating a temporary directory for bindmount /tmp of containers
 #TMP_FOLDER is created differently for execution on GRID and execution on LOCAL
 #TMP of the container is bind mounted on TMP_FOLDER to avoid creating temporary files on container.
@@ -187,7 +198,14 @@ TMP_FOLDER=/tmp/$TMP_FOLDER
 TMP_FOLDER=../$TMP_FOLDER
 #end
 mkdir -p $TMP_FOLDER
-PYTHONPATH=".:$PYTHONPATH" $BOSHEXEC exec launch $JSONFILE input_param_file.json -v $PWD/../cache:$PWD/../cache -v $TMP_FOLDER:/tmp
+
+#set($jsonFile="${tool.getName()}.json")
+
+#if($imagepath)
+PYTHONPATH=".:$PYTHONPATH" $BOSHEXEC exec launch --imagepath $imagepath $jsonFile input_param_file.json -v $PWD/../cache:$PWD/../cache -v $TMP_FOLDER:/tmp
+#else
+PYTHONPATH=".:$PYTHONPATH" $BOSHEXEC exec launch $jsonFile input_param_file.json -v $PWD/../cache:$PWD/../cache -v $TMP_FOLDER:/tmp
+#end
 
 if [ $? != 0 ]
 then

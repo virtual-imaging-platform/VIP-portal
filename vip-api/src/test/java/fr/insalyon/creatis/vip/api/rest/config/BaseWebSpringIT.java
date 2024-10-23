@@ -31,9 +31,14 @@
  */
 package fr.insalyon.creatis.vip.api.rest.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import fr.insalyon.creatis.grida.client.GRIDAClient;
+import fr.insalyon.creatis.grida.client.GRIDAClientException;
 import fr.insalyon.creatis.vip.api.rest.mockconfig.DataConfigurator;
+import fr.insalyon.creatis.vip.application.client.bean.AppVersion;
+import fr.insalyon.creatis.vip.application.integrationtest.BaseApplicationSpringIT;
 import fr.insalyon.creatis.vip.application.server.business.*;
-import fr.insalyon.creatis.vip.core.integrationtest.database.BaseSpringIT;
+import fr.insalyon.creatis.vip.core.integrationtest.ServerMockConfig;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
 import fr.insalyon.creatis.vip.core.server.dao.UserDAO;
@@ -42,6 +47,7 @@ import fr.insalyon.creatis.vip.datamanager.server.business.LFCPermissionBusiness
 import fr.insalyon.creatis.vip.datamanager.server.business.TransferPoolBusiness;
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.BeforeEach;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
@@ -53,11 +59,9 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
+import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Field;
 import java.nio.charset.StandardCharsets;
-import java.util.Collections;
-import java.util.Map;
 
 /**
  * Created by abonnet on 7/28/16.
@@ -71,10 +75,9 @@ import java.util.Map;
  * * login via with httpbasic(user, password)
  * * use {@link WithMockUser} annotation
  * <p>
- * The interaction with VIP outside vip-api are mocked (see {@link SpringTestConfig} )
  */
 @WebAppConfiguration
-abstract public class BaseWebSpringIT extends BaseSpringIT {
+abstract public class BaseWebSpringIT extends BaseApplicationSpringIT {
 
     @Autowired
     protected WebApplicationContext wac;
@@ -86,52 +89,15 @@ abstract public class BaseWebSpringIT extends BaseSpringIT {
     @Autowired
     protected ConfigurationBusiness configurationBusiness;
     @Autowired
-    protected WorkflowBusiness workflowBusiness;
-    @Autowired
-    protected ApplicationBusiness applicationBusiness;
-    @Autowired
-    protected ClassBusiness classBusiness;
-    @Autowired
     protected TransferPoolBusiness transferPoolBusiness;
     @Autowired
     protected SimulationBusiness simulationBusiness;
     @Autowired
-    protected EngineBusiness engineBusiness;
-    @Autowired
     protected LFCBusiness lfcBusiness;
-
     @Autowired
     protected LFCPermissionBusiness lfcPermissionBusiness;
-
-    /* hack from :
-     * https://stackoverflow.com/a/7201825
-     */
-    public static void setEnv(Map<String, String> newenv) throws Exception {
-        try {
-            Class<?> processEnvironmentClass = Class.forName("java.lang.ProcessEnvironment");
-            Field theEnvironmentField = processEnvironmentClass.getDeclaredField("theEnvironment");
-            theEnvironmentField.setAccessible(true);
-            Map<String, String> env = (Map<String, String>) theEnvironmentField.get(null);
-            env.putAll(newenv);
-            Field theCaseInsensitiveEnvironmentField = processEnvironmentClass.getDeclaredField("theCaseInsensitiveEnvironment");
-            theCaseInsensitiveEnvironmentField.setAccessible(true);
-            Map<String, String> cienv = (Map<String, String>) theCaseInsensitiveEnvironmentField.get(null);
-            cienv.putAll(newenv);
-        } catch (NoSuchFieldException e) {
-            Class[] classes = Collections.class.getDeclaredClasses();
-            Map<String, String> env = System.getenv();
-            for (Class cl : classes) {
-                if ("java.util.Collections$UnmodifiableMap".equals(cl.getName())) {
-                    Field field = cl.getDeclaredField("m");
-                    field.setAccessible(true);
-                    Object obj = field.get(env);
-                    Map<String, String> map = (Map<String, String>) obj;
-                    map.clear();
-                    map.putAll(newenv);
-                }
-            }
-        }
-    }
+    @Autowired
+    protected GRIDAClient gridaClient;
 
     @BeforeEach
     @Override
@@ -173,18 +139,6 @@ abstract public class BaseWebSpringIT extends BaseSpringIT {
         return configurationBusiness;
     }
 
-    public WorkflowBusiness getWorkflowBusiness() {
-        return workflowBusiness;
-    }
-
-    public ApplicationBusiness getApplicationBusiness() {
-        return applicationBusiness;
-    }
-
-    public ClassBusiness getClassBusiness() {
-        return classBusiness;
-    }
-
     public TransferPoolBusiness getTransferPoolBusiness() {
         return transferPoolBusiness;
     }
@@ -201,15 +155,54 @@ abstract public class BaseWebSpringIT extends BaseSpringIT {
         return lfcPermissionBusiness;
     }
 
-    /*
-    @BeforeAll
-    public static void setupEnvVariables() throws Exception {
-        String fakeHomePath = Paths.get(ClassLoader.getSystemResource("TestHome").toURI())
-                .toAbsolutePath().toString();
-        setEnv(Collections.singletonMap("HOME", fakeHomePath));
-    }*/
-
     protected void configureDataFS() throws BusinessException {
         DataConfigurator.configureFS(this);
+    }
+
+    protected static String asJsonString(final Object obj) {
+        try {
+            return new ObjectMapper().writeValueAsString(obj);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    protected AppVersion configureGwendiaTestApp(String appName, String groupName, String className, String versionName) throws BusinessException, GRIDAClientException, IOException {
+        return configureTestApp(appName, groupName, className, versionName, true);
+    }
+
+    protected AppVersion configureBoutiquesTestApp(String appName, String groupName, String className, String versionName) throws BusinessException, GRIDAClientException, IOException {
+        return configureTestApp(appName, groupName, className, versionName, false);
+    }
+
+    protected File getGwendiaTestFile() throws IOException {
+        return getResourceFromClasspath("gwendia/basic-gwendia.gwendia").getFile();
+    }
+
+    protected File getBoutiquesTestFile() throws IOException {
+        return getResourceFromClasspath("boutiques/test-boutiques.json").getFile();
+    }
+
+    protected AppVersion configureTestApp(String appName, String groupName, String className, String versionName, boolean gwendia) throws BusinessException, GRIDAClientException, IOException {
+        AppVersion appVersion = configureAnApplication(appName, versionName, groupName, className);
+        configureVersion(appVersion,
+                gwendia ? "/vip/testGroup (group)/path/to/test.gwendia" : null,
+                gwendia ? null : "/vip/testGroup (group)/path/to/desc-boutiques.json");
+
+        Mockito.when(server.getDataManagerPath()).thenReturn("/test/folder");
+
+        // localDir is datamanagerpath + "downloads" + groupRoot + dir(path)
+        File gwendiaFile = getGwendiaTestFile();
+        File jsonFile = getBoutiquesTestFile();
+        if (gwendia) {
+            Mockito.when(gridaClient.getRemoteFile(
+                    ServerMockConfig.TEST_GROUP_ROOT + "/testGroup/path/to/test.gwendia",
+                    "/test/folder/downloads"+ ServerMockConfig.TEST_GROUP_ROOT +"/testGroup/path/to")).thenReturn(gwendiaFile.getAbsolutePath());
+        } else {
+            Mockito.when(gridaClient.getRemoteFile(
+                    ServerMockConfig.TEST_GROUP_ROOT + "/testGroup/path/to/desc-boutiques.json",
+                    "/test/folder/downloads"+ ServerMockConfig.TEST_GROUP_ROOT +"/testGroup/path/to")).thenReturn(jsonFile.getAbsolutePath());
+        }
+        return appVersion;
     }
 }

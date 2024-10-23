@@ -33,7 +33,7 @@ public class SimulationIT extends BaseSpringIT {
 
         simulation = new Simulation("pipelineTest1", "3", null, "execId1",
                 "fullName", new GregorianCalendar(2016, 9, 2).getTime(),
-                "Exec test 1", SimulationStatus.Running.toString(), "test engine");
+                "Exec test 1", SimulationStatus.Running.toString(), "test engine", null);
 
 
         job = new Job(1, "command", JobStatus.Completed);

@@ -36,6 +36,7 @@ import fr.insalyon.creatis.vip.application.client.view.monitor.SimulationStatus;
 import java.util.Date;
 
 /**
+ * This is almost the same as the workflow class from workflowsdb
  *
  * @author Rafael Ferreira da Silva
  */
@@ -50,13 +51,14 @@ public class Simulation implements IsSerializable {
     private Date date;
     private SimulationStatus status;
     private String engine;
+    private String tags;
 
     public Simulation() {
     }
 
     public Simulation(String application, String applicationVersion,
             String applicationClass, String id, String userName, Date date, 
-            String simulationName, String status, String engine) {
+            String simulationName, String status, String engine, String tags) {
 
         this.applicationName = application;
         this.applicationVersion = applicationVersion;
@@ -67,6 +69,7 @@ public class Simulation implements IsSerializable {
         this.simulationName = simulationName;
         this.status = SimulationStatus.valueOf(status);
         this.engine = engine;
+        this.tags = tags;
     }
 
     public String getApplicationName() {
@@ -108,8 +111,13 @@ public class Simulation implements IsSerializable {
     public void setEngine(String engine) {
         this.engine = engine;
     }
+
     public String getSimulationName() {
         return simulationName;
+    }
+
+    public String getTags() {
+        return tags;
     }
 
     @Override

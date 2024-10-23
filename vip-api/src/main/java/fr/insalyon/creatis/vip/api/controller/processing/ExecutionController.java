@@ -73,7 +73,7 @@ public class ExecutionController extends ApiController {
     }
 
     @RequestMapping
-    public Execution[] listExecutions(
+    public List<Execution> listExecutions(
             @RequestParam(required = false) String studyIdentifier,
             @RequestParam(required = false) Integer offset,
             @RequestParam(required = false) Integer limit
@@ -94,6 +94,18 @@ public class ExecutionController extends ApiController {
             throw new ApiException("limit parameter too high");
         }
         return executionBusiness.listExecutions(limit);
+    }
+
+    @RequestMapping("examples")
+    public List<Execution> listExecutions() throws ApiException {
+        logMethodInvocation(logger, "listExamples");
+        return executionBusiness.listExamples();
+    }
+
+    @RequestMapping("examples/{exampleId}")
+    public Execution getExample(@PathVariable String exampleId) throws ApiException {
+        logMethodInvocation(logger, "getExample", exampleId);
+        return executionBusiness.getExecution(exampleId, false);
     }
 
     @RequestMapping(value = "count", produces = "text/plain;charset=UTF-8")
@@ -140,8 +152,6 @@ public class ExecutionController extends ApiController {
     public Execution initExecution(@RequestBody @Valid Execution execution)
             throws ApiException {
         logMethodInvocation(logger, "initExecution", execution);
-        pipelineBusiness.checkIfUserCanAccessPipeline(
-            execution.getPipelineIdentifier());
         String execId = executionBusiness.initExecution(execution);
         return executionBusiness.getExecution(execId, false);
     }

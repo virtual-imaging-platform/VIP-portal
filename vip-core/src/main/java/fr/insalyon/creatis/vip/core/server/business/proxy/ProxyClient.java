@@ -93,12 +93,7 @@ public class ProxyClient {
     }
 
     public void checkProxy() throws BusinessException {
-
         int proxyHoursValidity = server.getMyProxyMinHours();
-        if (proxyHoursValidity == 0) {
-            logger.info("Proxy not needed and not validated");
-            return;
-        }
 
         try {
             String proxyFileName = server.getServerProxy();

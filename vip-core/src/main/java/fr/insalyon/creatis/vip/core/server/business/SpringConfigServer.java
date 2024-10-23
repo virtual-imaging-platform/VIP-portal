@@ -1,6 +1,16 @@
 package fr.insalyon.creatis.vip.core.server.business;
 
-import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.stream.Stream;
+
+import javax.annotation.PostConstruct;
+
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.configuration.reloading.FileChangedReloadingStrategy;
@@ -16,15 +26,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
-import javax.annotation.PostConstruct;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.stream.Stream;
+import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 
 /**
  * Reads the vip.conf property file from the configured vifConfigFolder
@@ -102,12 +104,15 @@ public class SpringConfigServer implements Server {
         assertPropertyIsNotEmpty(CoreConstants.VO_NAME);
         assertPropertyIsNotEmpty(CoreConstants.VO_ROOT);
 
-        assertPropertyIsPresent(CoreConstants.LAB_MYPROXY_HOST);
-        assertPropertyIsPresent(CoreConstants.LAB_MYPROXY_PORT);
-        assertPropertyIsPresent(CoreConstants.LAB_MYPROXY_USER);
-        assertPropertyIsPresent(CoreConstants.LAB_MYPROXY_PASS);
-        assertPropertyIsPresent(CoreConstants.LAB_MYPROXY_LIFETIME);
-        assertPropertyIsNotEmpty(CoreConstants.LAB_MYPROXY_MIN_HOURS, Integer.class);
+        assertOptionalPropertyType(CoreConstants.LAB_MYPROXY_ENABLED, Boolean.class);
+        if (getMyProxyEnabled()) {
+            assertPropertyIsPresent(CoreConstants.LAB_MYPROXY_HOST);
+            assertPropertyIsPresent(CoreConstants.LAB_MYPROXY_PORT);
+            assertPropertyIsPresent(CoreConstants.LAB_MYPROXY_USER);
+            assertPropertyIsPresent(CoreConstants.LAB_MYPROXY_PASS);
+            assertPropertyIsPresent(CoreConstants.LAB_MYPROXY_LIFETIME);
+            assertPropertyIsNotEmpty(CoreConstants.LAB_MYPROXY_MIN_HOURS, Integer.class);
+        }
 
         assertPropertyIsNotEmpty(CoreConstants.LAB_SMA_HOST);
         assertPropertyIsNotEmpty(CoreConstants.LAB_SMA_PORT, Integer.class);
@@ -147,7 +152,6 @@ public class SpringConfigServer implements Server {
         assertPropertyIsNotEmpty(CoreConstants.LAB_SIMULATION_PLATFORM_MAX, Integer.class);
 
         assertOptionalPropertyType(CoreConstants.USE_LOCAL_FILES_AS_INPUTS, Boolean.class);
-
     }
 
     private void assertPropertyIsPresent(String property) {
@@ -178,7 +182,6 @@ public class SpringConfigServer implements Server {
             Assert.notNull(env.getProperty(property, type), property + " should not be empty");
         }
     }
-
 
     @Override
     public String getConfigurationFolder() {
@@ -240,6 +243,11 @@ public class SpringConfigServer implements Server {
     @Override
     public int getMyProxyMinHours() {
         return env.getRequiredProperty(CoreConstants.LAB_MYPROXY_MIN_HOURS, Integer.class);
+    }
+
+    @Override
+    public boolean getMyProxyEnabled() {
+        return env.getProperty(CoreConstants.LAB_MYPROXY_ENABLED, Boolean.class, true);
     }
 
     @Override
@@ -438,5 +446,10 @@ public class SpringConfigServer implements Server {
     @Override
     public String getReproVIPRootDir() {
         return env.getProperty(CoreConstants.REPROVIP_ROOT_DIR, "/vip/ReproVip/");
+    }
+
+    @Override
+    public boolean useMoteurlite() {
+        return env.getProperty(CoreConstants.USE_MOTEURLITE, Boolean.class, false);
     }
 }
