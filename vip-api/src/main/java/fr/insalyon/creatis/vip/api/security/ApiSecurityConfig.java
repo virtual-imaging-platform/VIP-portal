@@ -86,7 +86,7 @@ import static fr.insalyon.creatis.vip.api.CarminProperties.KEYCLOAK_ACTIVATED;
 @KeycloakConfiguration
 @EnableWebSecurity
 @Order(1)
-public class ApiSecurityConfig extends KeycloakWebSecurityConfigurerAdapter {
+public class ApiSecurityConfig {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -110,30 +110,30 @@ public class ApiSecurityConfig extends KeycloakWebSecurityConfigurerAdapter {
         return env.getProperty(KEYCLOAK_ACTIVATED, Boolean.class, Boolean.FALSE);
     }
 
-    @Override
+    // @Override
     protected SessionAuthenticationStrategy sessionAuthenticationStrategy() {
         // required for bearer only applications
         return new NullAuthenticatedSessionStrategy();
     }
 
-    @Override
+    // @Override
     protected AuthenticationEntryPoint authenticationEntryPoint() throws Exception {
         return vipAuthenticationEntryPoint;
     }
 
-    @Override
-    protected KeycloakAuthenticationProcessingFilter keycloakAuthenticationProcessingFilter() throws Exception {
-        KeycloakAuthenticationProcessingFilter f = super.keycloakAuthenticationProcessingFilter();
-        f.setAuthenticationFailureHandler(vipAuthenticationEntryPoint);
-        return f;
-    }
+    // @Override
+    // protected KeycloakAuthenticationProcessingFilter keycloakAuthenticationProcessingFilter() throws Exception {
+        // KeycloakAuthenticationProcessingFilter f = super.keycloakAuthenticationProcessingFilter();
+        // f.setAuthenticationFailureHandler(vipAuthenticationEntryPoint);
+        // return f;
+    // }
 
-    @Override
+    // @Override
     protected KeycloakAuthenticationProvider keycloakAuthenticationProvider() {
         return vipKeycloakAuthenticationProvider;
     }
 
-    @Override
+    // @Override
     public void configure(AuthenticationManagerBuilder auth) {
         if (isKeycloakActive()) {
             KeycloakAuthenticationProvider keycloakAuthenticationProvider = keycloakAuthenticationProvider();
@@ -143,42 +143,42 @@ public class ApiSecurityConfig extends KeycloakWebSecurityConfigurerAdapter {
         auth.authenticationProvider(apikeyAuthenticationProvider);
     }
 
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
-        if (isKeycloakActive()) {
-            super.configure(http);
-        }
-        http.antMatcher("/rest/**")
-            .authorizeRequests()
-                .antMatchers("/rest/platform").permitAll()
-                .antMatchers("/rest/authenticate").permitAll()
-                .antMatchers("/rest/session").permitAll()
-                .regexMatchers("/rest/pipelines\\?public").permitAll()
-                .antMatchers("/rest/publications").permitAll()
-                .antMatchers("/rest/reset-password").permitAll()
-                .antMatchers("/rest/register").permitAll()
-                .antMatchers("/rest/executions/{executionId}/summary").hasAnyRole("SERVICE")
-                .antMatchers("/rest/simulate-refresh").authenticated()
-                .antMatchers("/rest/statistics/**").hasAnyRole("ADVANCED", "ADMINISTRATOR")
-                .antMatchers("/rest/**").authenticated()
-                .anyRequest().permitAll()
-            .and()
-            .addFilterBefore(apikeyAuthenticationFilter(), BasicAuthenticationFilter.class)
-            .exceptionHandling().authenticationEntryPoint(vipAuthenticationEntryPoint)// also done in parent but needed here when keycloak is not active. It can be done twice without harm.
-            // session must be activated otherwise OIDC auth info will be lost when accessing /loginEgi
-            //.and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-            .and()
-            .cors().and()
-            .headers().frameOptions().sameOrigin().and()
-            .csrf().disable();
-    }
+    // @Override
+    // protected void configure(HttpSecurity http) throws Exception {
+    //     if (isKeycloakActive()) {
+    //         super.configure(http);
+    //     }
+    //     http.antMatcher("/rest/**")
+    //         .authorizeRequests()
+    //             .antMatchers("/rest/platform").permitAll()
+    //             .antMatchers("/rest/authenticate").permitAll()
+    //             .antMatchers("/rest/session").permitAll()
+    //             .regexMatchers("/rest/pipelines\\?public").permitAll()
+    //             .antMatchers("/rest/publications").permitAll()
+    //             .antMatchers("/rest/reset-password").permitAll()
+    //             .antMatchers("/rest/register").permitAll()
+    //             .antMatchers("/rest/executions/{executionId}/summary").hasAnyRole("SERVICE")
+    //             .antMatchers("/rest/simulate-refresh").authenticated()
+    //             .antMatchers("/rest/statistics/**").hasAnyRole("ADVANCED", "ADMINISTRATOR")
+    //             .antMatchers("/rest/**").authenticated()
+    //             .anyRequest().permitAll()
+    //         .and()
+    //         .addFilterBefore(apikeyAuthenticationFilter(), BasicAuthenticationFilter.class)
+    //         .exceptionHandling().authenticationEntryPoint(vipAuthenticationEntryPoint)// also done in parent but needed here when keycloak is not active. It can be done twice without harm.
+    //         // session must be activated otherwise OIDC auth info will be lost when accessing /loginEgi
+    //         //.and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+    //         .and()
+    //         .cors().and()
+    //         .headers().frameOptions().sameOrigin().and()
+    //         .csrf().disable();
+    // }
 
-    @Bean
-    public ApikeyAuthenticationFilter apikeyAuthenticationFilter() throws Exception {
-        return new ApikeyAuthenticationFilter(
-                env.getRequiredProperty(CarminProperties.APIKEY_HEADER_NAME),
-                vipAuthenticationEntryPoint, authenticationManager());
-    }
+    // @Bean
+    // public ApikeyAuthenticationFilter apikeyAuthenticationFilter() throws Exception {
+    //     return new ApikeyAuthenticationFilter(
+    //             env.getRequiredProperty(CarminProperties.APIKEY_HEADER_NAME),
+    //             vipAuthenticationEntryPoint, authenticationManager());
+    // }
 
     @Service
     public static class CurrentUserProvider implements Supplier<User> {
