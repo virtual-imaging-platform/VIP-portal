@@ -31,7 +31,6 @@
  */
 package fr.insalyon.creatis.vip.core.server.rpc;
 
-import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import fr.insalyon.creatis.vip.core.client.bean.Group;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants.GROUP_ROLE;
@@ -42,10 +41,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
+import com.google.gwt.user.server.rpc.jakarta.RemoteServiceServlet;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import java.util.Map;
 
 /**

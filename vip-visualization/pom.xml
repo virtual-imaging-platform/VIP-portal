@@ -57,7 +57,10 @@ knowledge of the CeCILL-B license and that you accept its terms.
       <artifactId>vip-datamanager</artifactId>
       <version>${project.version}</version>
     </dependency>
-
+    <dependency>
+        <groupId>jakarta.servlet</groupId>
+        <artifactId>jakarta.servlet-api</artifactId>
+    </dependency>
   </dependencies>
   
   <build>

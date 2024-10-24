@@ -6,7 +6,6 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import fr.insalyon.creatis.vip.api.CarminProperties;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @JsonInclude(Include.NON_NULL)

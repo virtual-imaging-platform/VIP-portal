@@ -32,7 +32,6 @@
 package fr.insalyon.creatis.vip.api.controller;
 
 import fr.insalyon.creatis.vip.api.exception.ApiException;
-import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.datamanager.client.bean.ExternalPlatform;
 import fr.insalyon.creatis.vip.datamanager.server.business.ExternalPlatformBusiness;
@@ -44,7 +43,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
-import java.util.function.Supplier;
 
 /**
  * Created by abonnet on 7/4/19.

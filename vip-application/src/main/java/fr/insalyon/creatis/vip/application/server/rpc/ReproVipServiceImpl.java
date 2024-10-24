@@ -4,15 +4,10 @@ import fr.insalyon.creatis.vip.application.client.view.ApplicationException;
 import fr.insalyon.creatis.vip.application.server.business.ReproVipBusiness;
 import fr.insalyon.creatis.vip.core.client.bean.PublicExecution;
 import fr.insalyon.creatis.vip.application.client.rpc.ReproVipService;
-import fr.insalyon.creatis.vip.core.client.bean.User;
-import fr.insalyon.creatis.vip.core.client.view.CoreException;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
-import fr.insalyon.creatis.vip.core.server.dao.DAOException;
-import fr.insalyon.creatis.vip.application.server.dao.PublicExecutionDAO;
 import fr.insalyon.creatis.vip.core.server.rpc.AbstractRemoteServiceServlet;
 
-import javax.servlet.ServletException;
-import java.io.IOException;
+import jakarta.servlet.ServletException;
 import java.util.List;
 
 public class ReproVipServiceImpl extends AbstractRemoteServiceServlet implements ReproVipService {

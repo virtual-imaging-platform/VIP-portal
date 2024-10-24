@@ -11,7 +11,6 @@ import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.env.Environment;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Service;
 
 @Service

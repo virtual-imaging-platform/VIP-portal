@@ -32,6 +32,7 @@
 package fr.insalyon.creatis.vip.gatelab.client.view.monitor;
 
 import com.smartgwt.client.types.Cursor;
+import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.Img;
 import com.smartgwt.client.widgets.Label;
 import com.smartgwt.client.widgets.layout.HLayout;
@@ -70,7 +71,7 @@ public class GateLabDownloadButtonLayout extends HLayout {
     }
     
     @Override
-    public void setDisabled(boolean disabled) {
+    public Canvas setDisabled(boolean disabled) {
         
         if (disabled) {
             this.setCursor(Cursor.ARROW);
@@ -81,5 +82,6 @@ public class GateLabDownloadButtonLayout extends HLayout {
             img.setCursor(Cursor.HAND);
             vLayout.setCursor(Cursor.HAND);
         }
+        return (this);
     }
 }

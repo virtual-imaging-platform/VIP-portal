@@ -48,10 +48,21 @@ knowledge of the CeCILL-B license and that you accept its terms.
         <skip.itests>true</skip.itests>
         <test.version.hamcrest>2.2</test.version.hamcrest>
         <test.version.mockito>3.3.3</test.version.mockito>
-        <keycloak.version>15.0.1</keycloak.version>
+        <keycloak.version>25.0.3</keycloak.version>
     </properties>
 
     <dependencies>
+        <dependency>
+            <groupId>jakarta.servlet</groupId>
+            <artifactId>jakarta.servlet-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>jakarta.validation</groupId>
+            <artifactId>jakarta.validation-api</artifactId>
+            <version>3.1.0</version>
+            <scope>provided</scope>
+        </dependency>
+
         <dependency>
             <groupId>fr.insalyon.creatis</groupId>
             <artifactId>vip-core</artifactId>

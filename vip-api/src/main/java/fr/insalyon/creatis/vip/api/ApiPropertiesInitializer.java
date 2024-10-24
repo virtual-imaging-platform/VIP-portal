@@ -43,7 +43,7 @@ import org.springframework.core.io.support.ResourcePropertySource;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 import java.io.IOException;
 
 import static fr.insalyon.creatis.vip.api.CarminProperties.*;

@@ -45,7 +45,7 @@ import fr.insalyon.creatis.vip.core.server.rpc.AbstractRemoteServiceServlet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.servlet.ServletException;
+import jakarta.servlet.ServletException;
 import java.util.List;
 import java.util.Map;
 

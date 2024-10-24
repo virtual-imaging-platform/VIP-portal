@@ -36,7 +36,6 @@ import fr.insalyon.creatis.vip.api.business.ApiUserBusiness;
 import fr.insalyon.creatis.vip.api.exception.ApiException;
 import fr.insalyon.creatis.vip.api.model.AuthenticationCredentials;
 import fr.insalyon.creatis.vip.api.model.AuthenticationInfo;
-import fr.insalyon.creatis.vip.api.model.EmailDTO;
 import fr.insalyon.creatis.vip.api.model.ResetPasswordDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,7 +45,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 
 /**
  * Created by abonnet on 8/21/17.

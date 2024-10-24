@@ -1,7 +1,6 @@
 package fr.insalyon.creatis.vip.api.controller.processing;
 
 import fr.insalyon.creatis.vip.api.controller.ApiController;
-import fr.insalyon.creatis.vip.api.business.PipelineBusiness;
 import fr.insalyon.creatis.vip.api.exception.ApiException;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.publication.client.bean.Publication;

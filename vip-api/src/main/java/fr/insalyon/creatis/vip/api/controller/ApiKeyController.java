@@ -32,7 +32,6 @@
 package fr.insalyon.creatis.vip.api.controller;
 
 import fr.insalyon.creatis.vip.api.exception.ApiException;
-import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.datamanager.client.bean.UserApiKey;
 import fr.insalyon.creatis.vip.datamanager.server.business.ApiKeyBusiness;
@@ -43,10 +42,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.Valid;
 import java.util.List;
-import java.util.function.Supplier;
 
 @RestController
 @RequestMapping("/user/externalKeys")

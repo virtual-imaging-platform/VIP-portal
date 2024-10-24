@@ -46,7 +46,10 @@ knowledge of the CeCILL-B license and that you accept its terms.
     <name>VIP-Publication</name>
 
     <dependencies>
-
+        <dependency>
+            <groupId>jakarta.servlet</groupId>
+            <artifactId>jakarta.servlet-api</artifactId>
+        </dependency>
         <dependency>
             <groupId>fr.insalyon.creatis</groupId>
             <artifactId>vip-core</artifactId>

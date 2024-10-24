@@ -39,6 +39,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.NonNull;
 import org.springframework.validation.FieldError;
@@ -102,7 +103,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     @NonNull
     protected ResponseEntity<Object> handleExceptionInternal(
             @NonNull Exception ex, Object body, HttpHeaders headers,
-            HttpStatus status, @NonNull WebRequest request) {
+            HttpStatusCode status, @NonNull WebRequest request) {
         logger.error("Internal spring exception catched", ex);
         ErrorCodeAndMessage codeAndmessage = new ErrorCodeAndMessage(
                 ApiError.GENERIC_API_ERROR.getCode(),
@@ -116,7 +117,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     protected ResponseEntity<Object> handleMethodArgumentNotValid(
             @NonNull MethodArgumentNotValidException ex,
             @NonNull HttpHeaders headers,
-            @NonNull HttpStatus status,
+            @NonNull HttpStatusCode status,
             @NonNull WebRequest request) {
         // only handle field error
         if (ex.getBindingResult().getFieldError() != null) {
