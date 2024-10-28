@@ -59,7 +59,7 @@ knowledge of the CeCILL-B license and that you accept its terms.
         <sma.version>0.3.0</sma.version>
 
         <!-- 3rd party dependencies version -->
-        <junit.version>5.6.2</junit.version>
+        <junit.version>5.11.3</junit.version>
         <spring-framework.version>6.1.14</spring-framework.version>
         <springsecurity.version>6.3.4</springsecurity.version>
         <springoauth.version>6.3.4</springoauth.version>

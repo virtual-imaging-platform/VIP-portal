@@ -40,6 +40,7 @@ import fr.insalyon.creatis.vip.core.server.dao.*;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+
 import jakarta.mail.internet.AddressException;
 import jakarta.mail.internet.InternetAddress;
 import jakarta.servlet.ServletException;
