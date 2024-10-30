@@ -65,6 +65,7 @@ public class ApikeyAuthenticationFilter extends OncePerRequestFilter {
             String apikeyHeader,
             AuthenticationEntryPoint authenticationEntryPoint,
             AuthenticationManager authenticationManager) {
+        logger.info("XXX ApikeyAuthenticationFilter: constructor aep="+authenticationEntryPoint+" am="+authenticationManager);
         this.apikeyHeader = apikeyHeader;
         this.authenticationEntryPoint = authenticationEntryPoint;
         this.authenticationManager = authenticationManager;
@@ -84,8 +85,10 @@ public class ApikeyAuthenticationFilter extends OncePerRequestFilter {
             HttpServletRequest request,
             HttpServletResponse response,
             FilterChain filterChain) throws ServletException, IOException {
+        logger.info("XXX ApikeyAuthenticationFilter: doFilterInternal");
         String apikey = request.getHeader(apikeyHeader);
 
+        logger.info("XXX ApikeyAuthenticationFilter: doFilterInternal, apikey=" + apikey);
         if (apikey == null) {
             logger.debug("no apikey header " + apikeyHeader +" found.");
             filterChain.doFilter(request, response);

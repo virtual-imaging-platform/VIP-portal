@@ -97,9 +97,6 @@ public class ApiPropertiesInitializer {
 
         if (env.getProperty(KEYCLOAK_ACTIVATED, Boolean.class, Boolean.FALSE)) {
             logger.info("Keycloak activated");
-            verifyPropertyNotNull(KEYCLOAK_CLIENT_ID, String.class);
-            verifyPropertyNotNull(KEYCLOAK_CLIENT_SECRET, String.class);
-            verifyPropertyNotNull(KEYCLOAK_REALM_URL, String.class);
         } else {
             logger.info("Keycloak NOT active");
         }

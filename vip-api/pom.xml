@@ -111,17 +111,6 @@ knowledge of the CeCILL-B license and that you accept its terms.
             <version>${springsecurity.version}</version>
         </dependency>
 
-        <dependency>
-            <groupId>org.keycloak</groupId>
-            <artifactId>keycloak-spring-security-adapter</artifactId>
-            <version>${keycloak.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.keycloak</groupId>
-            <artifactId>keycloak-admin-client</artifactId>
-            <version>${keycloak.version}</version>
-        </dependency>
-
         <!-- Validation implementation -->
         <dependency>
             <groupId>org.hibernate</groupId>
