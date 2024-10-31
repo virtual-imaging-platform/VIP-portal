@@ -66,6 +66,9 @@ import org.springframework.security.web.authentication.session.NullAuthenticated
 import org.springframework.security.web.authentication.session.SessionAuthenticationStrategy;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.security.web.firewall.DefaultHttpFirewall;
+import org.springframework.security.web.servlet.util.matcher.MvcRequestMatcher;
+import org.springframework.web.servlet.handler.HandlerMappingIntrospector;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.security.web.util.matcher.RegexRequestMatcher;
 import org.springframework.stereotype.Service;
 
@@ -100,7 +103,7 @@ public class ApiSecurityConfig {
         this.apikeyAuthenticationProvider = apikeyAuthenticationProvider;
         this.vipAuthenticationEntryPoint = vipAuthenticationEntryPoint;
         this.vipAuthenticationManager = new ProviderManager(apikeyAuthenticationProvider);
-        // add OIDC AuthenticationProvider here if (isOIDCActive())
+        // XXX TODO: add OIDC AuthenticationProvider here if (isOIDCActive())
         logger.info("XXX secconf, oidcActive=" + isOIDCActive());
     }
 
@@ -110,43 +113,65 @@ public class ApiSecurityConfig {
 
     @Bean
     public AuthenticationManager authenticationManager() {
-        logger.info("XXX authmanager bean value="+vipAuthenticationManager);
         return vipAuthenticationManager;
     }
 
+    //@Bean
+    //MvcRequestMatcher.Builder mvc(HandlerMappingIntrospector introspector) {
+    //    return new MvcRequestMatcher.Builder(introspector).servletPath("/rest");
+    //}
+    // if this bean is defined, add "MvcRequestMatcher.Builder mvc" to securityFilterChain()
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        if(false) {
-            logger.info("XXX secchain disabled");
-            return http.authorizeHttpRequests(a -> a.anyRequest().permitAll()).csrf(c -> c.disable()).build();
-        }
-
-        logger.info("XXX secchain enabled");
         // API key authentication:
-        http.securityMatcher("/rest/**")
+        // XXX custom filters are not called when a .securityMatcher("/rest/**") is defined,
+        // and forcing antMatcher() below seems to work, it's still a bit unclear why.
+        // Also unclear whether securityMatcher has to be replaced with e.g. MvcRequestMatcher
+        // or AntRequestMatcher, and whether there should be antmatchers everywhere or only on securityMatcher.
+        // see https://docs.spring.io/spring-security/reference/servlet/authorization/authorize-http-requests.html#security-matchers
+        if (false) { // tests
+            logger.info("XXX securityFilterChain: tests");
+            http
+                    .securityMatcher("/rest/**")
+                    .addFilterBefore(apikeyAuthenticationFilter(), BasicAuthenticationFilter.class)
+                    .authenticationManager(vipAuthenticationManager)
+                    .authorizeHttpRequests((authorize) -> authorize
+                            //.requestMatchers(mvc.pattern("/**")).hasAuthority("controller")
+                            .requestMatchers("/platform").permitAll()
+                            .requestMatchers("/executions").authenticated()
+                            .requestMatchers("/rest/**").authenticated()
+                            .anyRequest().permitAll()
+                    )
+                    .csrf((csrf) -> csrf.disable());
+            return http.build();
+        } // /tests
+        http
+                .securityMatcher(AntPathRequestMatcher.antMatcher("/rest/**"))
                 .addFilterBefore(apikeyAuthenticationFilter(), BasicAuthenticationFilter.class)
+                .authenticationManager(vipAuthenticationManager)
                 .authorizeHttpRequests((authorize) -> authorize
-                .requestMatchers("/rest/platform").permitAll()
-                //        .requestMatchers("/rest/authenticate").permitAll()
-                //        .requestMatchers("/rest/session").permitAll()
+                        .requestMatchers(AntPathRequestMatcher.antMatcher("/rest/platform")).permitAll()
+                        .requestMatchers(AntPathRequestMatcher.antMatcher("/rest/authenticate")).permitAll()
+                        .requestMatchers(AntPathRequestMatcher.antMatcher("/rest/session")).permitAll()
                         // XXX was: .regexMatchers("/rest/pipelines\\?public").permitAll(), unsure if just GET
-                //        .requestMatchers(new RegexRequestMatcher("/rest/pipelines\\?public", "GET")).permitAll()
-                //        .requestMatchers("/rest/publications").permitAll()
-                //        .requestMatchers("/rest/reset-password").permitAll()
-                //        .requestMatchers("/rest/register").permitAll()
-                //        .requestMatchers("/rest/executions/{executionId}/summary").hasAnyRole("SERVICE")
-                //        .requestMatchers("/rest/simulate-refresh").authenticated()
-                //        .requestMatchers("/rest/statistics/**").hasAnyRole("ADVANCED", "ADMINISTRATOR")
-                        .requestMatchers("/rest/**").authenticated()
+                        .requestMatchers(new RegexRequestMatcher("/rest/pipelines\\?public", "GET")).permitAll()
+                        .requestMatchers(AntPathRequestMatcher.antMatcher("/rest/publications")).permitAll()
+                        .requestMatchers(AntPathRequestMatcher.antMatcher("/rest/reset-password")).permitAll()
+                        .requestMatchers(AntPathRequestMatcher.antMatcher("/rest/register")).permitAll()
+                        .requestMatchers(AntPathRequestMatcher.antMatcher("/rest/executions/{executionId}/summary")).hasAnyRole("SERVICE")
+                        .requestMatchers(AntPathRequestMatcher.antMatcher("/rest/simulate-refresh")).authenticated()
+                        .requestMatchers(AntPathRequestMatcher.antMatcher("/rest/statistics/**")).hasAnyRole("ADVANCED", "ADMINISTRATOR")
+                        .requestMatchers(AntPathRequestMatcher.antMatcher("/rest/**")).authenticated()
                         .anyRequest().permitAll()
                 )
                 // XXX was: "also done in parent but needed here when keycloak is not active. It can be done twice without harm."
                 // now there is no "parent" anymore
-        //        .exceptionHandling((exceptionHandling) -> exceptionHandling.authenticationEntryPoint(vipAuthenticationEntryPoint))
+                .exceptionHandling((exceptionHandling) -> exceptionHandling.authenticationEntryPoint(vipAuthenticationEntryPoint))
                 // session must be activated otherwise OIDC auth info will be lost when accessing /loginEgi
                 // .sessionManagement((sessionManagement) -> sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-        //        .cors(Customizer.withDefaults())
-        //        .headers((headers) -> headers.frameOptions((frameOptions) -> frameOptions.sameOrigin()))
+                .cors(Customizer.withDefaults())
+                .headers((headers) -> headers.frameOptions((frameOptions) -> frameOptions.sameOrigin()))
                 .csrf((csrf) -> csrf.disable());
         return http.build();
     }
