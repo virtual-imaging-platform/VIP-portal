@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../jacoco-resources/report.gif" type="image/gif"/><title>CoreDataInitializer.java</title><link rel="stylesheet" href="../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../index.html" class="el_report">coverage</a> &gt; <a href="../index.html" class="el_bundle">vip-core</a> &gt; <a href="index.source.html" class="el_package">fr.insalyon.creatis.vip.core.server.dao.mysql</a> &gt; <span class="el_source">CoreDataInitializer.java</span></div><h1>CoreDataInitializer.java</h1><pre class="source lang-java linenums">package fr.insalyon.creatis.vip.core.server.dao.mysql;
+
+import fr.insalyon.creatis.devtools.MD5;
+import fr.insalyon.creatis.vip.core.client.bean.Group;
+import fr.insalyon.creatis.vip.core.client.bean.TermsOfUse;
+import fr.insalyon.creatis.vip.core.client.bean.User;
+import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
+import fr.insalyon.creatis.vip.core.client.view.CoreConstants.GROUP_ROLE;
+import fr.insalyon.creatis.vip.core.client.view.user.UserLevel;
+import fr.insalyon.creatis.vip.core.client.view.util.CountryCode;
+import fr.insalyon.creatis.vip.core.server.business.Server;
+import fr.insalyon.creatis.vip.core.server.dao.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.context.event.EventListener;
+import org.springframework.core.annotation.Order;
+import org.springframework.jdbc.core.support.JdbcDaoSupport;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
+
+import javax.sql.DataSource;
+import java.io.UnsupportedEncodingException;
+import java.security.NoSuchAlgorithmException;
+import java.util.Date;
+import java.util.UUID;
+
+@Component
+@Transactional
+public class CoreDataInitializer extends JdbcDaoSupport {
+
+<span class="fc" id="L34">    private final Logger logger = LoggerFactory.getLogger(getClass());</span>
+
+    private TableInitializer tableInitializer;
+
+    private Server server;
+    private UserDAO userDAO;
+    private GroupDAO groupDAO;
+    private UsersGroupsDAO usersGroupsDAO;
+    private TermsUseDAO termsUseDAO;
+
+    @Autowired
+    public CoreDataInitializer(
+            GroupDAO groupDAO, DataSource dataSource, TableInitializer tableInitializer,
+<span class="fc" id="L47">            Server server, UserDAO userDAO, UsersGroupsDAO usersGroupsDAO, TermsUseDAO termsUseDAO) {</span>
+<span class="fc" id="L48">        setDataSource(dataSource);</span>
+<span class="fc" id="L49">        this.tableInitializer = tableInitializer;</span>
+<span class="fc" id="L50">        this.userDAO = userDAO;</span>
+<span class="fc" id="L51">        this.server = server;</span>
+<span class="fc" id="L52">        this.usersGroupsDAO = usersGroupsDAO;</span>
+<span class="fc" id="L53">        this.termsUseDAO = termsUseDAO;</span>
+<span class="fc" id="L54">        this.groupDAO = groupDAO;</span>
+<span class="fc" id="L55">    }</span>
+
+    @EventListener(ContextRefreshedEvent.class)
+    @Order(10) // higher priority to create the vip core tables before the ones that references them
+    public void onStartup() {
+<span class="fc" id="L60">        logger.info(&quot;Configuring VIP core database.&quot;);</span>
+<span class="fc" id="L61">        initializeUserTables();</span>
+<span class="fc" id="L62">        initializeGroupTables();</span>
+<span class="fc" id="L63">        initializeTermsOfUseTable();</span>
+<span class="fc" id="L64">    }</span>
+
+    private void initializeUserTables() {
+<span class="fc bfc" id="L67" title="All 2 branches covered.">        if (tableInitializer.createTable(&quot;VIPUsers&quot;,</span>
+                &quot;email VARCHAR(255), &quot;
+                        + &quot;next_email VARCHAR(255), &quot;
+                        + &quot;pass VARCHAR(40), &quot;
+                        + &quot;first_name VARCHAR(255), &quot;
+                        + &quot;last_name VARCHAR(255), &quot;
+                        + &quot;institution VARCHAR(255), &quot;
+                        + &quot;code VARCHAR(40), &quot;
+                        + &quot;confirmed BOOLEAN, &quot;
+                        + &quot;folder VARCHAR(100), &quot;
+                        + &quot;session VARCHAR(255), &quot;
+                        + &quot;registration TIMESTAMP, &quot;
+                        + &quot;last_login TIMESTAMP, &quot;
+                        + &quot;level VARCHAR(50), &quot;
+                        + &quot;country_code VARCHAR(2), &quot;
+                        + &quot;max_simulations int(11), &quot;
+                        + &quot;termsUse TIMESTAMP, &quot;
+                        + &quot;lastUpdatePublications TIMESTAMP,&quot;
+                        + &quot;failed_authentications int(11),&quot;
+                        + &quot;account_locked BOOLEAN,&quot;
+                        + &quot;apikey VARCHAR(255),&quot;
+                        + &quot;PRIMARY KEY(email),&quot;
+                        + &quot;UNIQUE KEY(first_name,last_name),&quot;
+                        + &quot;UNIQUE KEY(apikey)&quot;)) {
+
+<span class="fc" id="L92">            String folder = server.getAdminFirstName().toLowerCase() + &quot;_&quot;</span>
+<span class="fc" id="L93">                    + server.getAdminLastName().toLowerCase();</span>
+
+            try {
+<span class="fc" id="L96">                userDAO.add(</span>
+<span class="fc" id="L97">                        new User(server.getAdminFirstName(),</span>
+<span class="fc" id="L98">                                server.getAdminLastName(),</span>
+<span class="fc" id="L99">                                server.getAdminEmail(),</span>
+                                null,
+<span class="fc" id="L101">                                server.getAdminInstitution(),</span>
+<span class="fc" id="L102">                                MD5.get(server.getAdminPassword()),</span>
+                                true,
+<span class="fc" id="L104">                                UUID.randomUUID().toString(), folder, &quot;&quot;,</span>
+                                new Date(), new Date(), UserLevel.Administrator,
+                                CountryCode.fr, 100, null,null,0,false));
+
+<span class="nc" id="L108">            } catch (DAOException | NoSuchAlgorithmException | UnsupportedEncodingException ex) {</span>
+<span class="nc" id="L109">                logger.error(&quot;Error creating VIPUsers table&quot;, ex);</span>
+<span class="fc" id="L110">            }</span>
+        }
+<span class="fc" id="L112">    }</span>
+
+    private void initializeGroupTables() {
+<span class="fc bfc" id="L115" title="All 2 branches covered.">        if (tableInitializer.createTable(&quot;VIPGroups&quot;,</span>
+                &quot;groupname VARCHAR(50), &quot;
+                        + &quot;public BOOLEAN, &quot;
+                        + &quot;gridfile BOOLEAN DEFAULT 0, &quot;
+                        + &quot;gridjobs BOOLEAN DEFAULT 0, &quot;
+                        + &quot;PRIMARY KEY(groupname)&quot;)) {
+
+            try {
+<span class="fc" id="L123">                groupDAO.add(new Group(CoreConstants.GROUP_SUPPORT, false, true, true));</span>
+<span class="nc" id="L124">            } catch (DAOException ex) {</span>
+<span class="nc" id="L125">                logger.error(&quot;Error creating VIPGroups table&quot;, ex);</span>
+<span class="fc" id="L126">            }</span>
+        }
+
+
+<span class="fc bfc" id="L130" title="All 2 branches covered.">        if (tableInitializer.createTable(&quot;VIPUsersGroups&quot;,</span>
+                &quot;email VARCHAR(255), &quot;
+                        + &quot;groupname VARCHAR(100), &quot;
+                        + &quot;role VARCHAR(30), &quot;
+                        + &quot;PRIMARY KEY (email, groupname), &quot;
+                        + &quot;FOREIGN KEY (email) REFERENCES VIPUsers(email) &quot;
+                        + &quot;ON DELETE CASCADE ON UPDATE CASCADE, &quot;
+                        + &quot;FOREIGN KEY (groupname) REFERENCES VIPGroups(groupname) &quot;
+                        + &quot;ON DELETE CASCADE ON UPDATE CASCADE&quot;)) {
+            try {
+<span class="fc" id="L140">                usersGroupsDAO.add(server.getAdminEmail(),</span>
+                                CoreConstants.GROUP_SUPPORT,
+                                GROUP_ROLE.Admin);
+<span class="fc" id="L143">            } catch (DAOException ex) {</span>
+<span class="fc" id="L144">                logger.error(&quot;Error adding admin user to admin group&quot;, ex);</span>
+<span class="fc" id="L145">            }</span>
+        }
+<span class="fc" id="L147">    }</span>
+
+    private void initializeTermsOfUseTable() {
+<span class="fc bfc" id="L150" title="All 2 branches covered.">        if (tableInitializer.createTable(&quot;VIPTermsOfuse&quot;,</span>
+                &quot;idTermsOfuse INT(11) NOT NULL AUTO_INCREMENT, &quot;
+                        + &quot;date TIMESTAMP NULL, &quot;
+                        + &quot;PRIMARY KEY (idTermsOfuse)&quot;)) {
+            try {
+<span class="fc" id="L155">                java.util.Date today = new java.util.Date();</span>
+<span class="fc" id="L156">                termsUseDAO.add(</span>
+<span class="fc" id="L157">                        new TermsOfUse(new java.sql.Timestamp(today.getTime())));</span>
+<span class="nc" id="L158">            } catch (DAOException ex) {</span>
+<span class="nc" id="L159">                logger.error(&quot;Error creating VIPGroups table&quot;, ex);</span>
+<span class="fc" id="L160">            }</span>
+        }
+<span class="fc" id="L162">    }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

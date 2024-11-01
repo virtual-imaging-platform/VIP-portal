@@ -1,0 +1,348 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../jacoco-resources/report.gif" type="image/gif"/><title>PipelineBusiness.java</title><link rel="stylesheet" href="../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../index.html" class="el_report">coverage</a> &gt; <a href="../index.html" class="el_bundle">vip-api</a> &gt; <a href="index.source.html" class="el_package">fr.insalyon.creatis.vip.api.business</a> &gt; <span class="el_source">PipelineBusiness.java</span></div><h1>PipelineBusiness.java</h1><pre class="source lang-java linenums">/*
+ * Copyright and authors: see LICENSE.txt in base repository.
+ *
+ * This software is a web portal for pipeline execution on distributed systems.
+ *
+ * This software is governed by the CeCILL-B license under French law and
+ * abiding by the rules of distribution of free software.  You can  use,
+ * modify and/ or redistribute the software under the terms of the CeCILL-B
+ * license as circulated by CEA, CNRS and INRIA at the following URL
+ * &quot;http://www.cecill.info&quot;.
+ *
+ * As a counterpart to the access to the source code and  rights to copy,
+ * modify and redistribute granted by the license, users are provided only
+ * with a limited warranty  and the software's author,  the holder of the
+ * economic rights,  and the successive licensors  have only  limited
+ * liability.
+ *
+ * In this respect, the user's attention is drawn to the risks associated
+ * with loading,  using,  modifying and/or developing or reproducing the
+ * software by the user in light of its specific status of free software,
+ * that may mean  that it is complicated to manipulate,  and  that  also
+ * therefore means  that it is reserved for developers  and  experienced
+ * professionals having in-depth computer knowledge. Users are therefore
+ * encouraged to load and test the software's suitability as regards their
+ * requirements in conditions enabling the security of their systems and/or
+ * data to be ensured and,  more generally, to use and operate it in the
+ * same conditions as regards security.
+ *
+ * The fact that you are presently reading this means that you have had
+ * knowledge of the CeCILL-B license and that you accept its terms.
+ */
+package fr.insalyon.creatis.vip.api.business;
+
+import fr.insalyon.creatis.vip.api.CarminProperties;
+import fr.insalyon.creatis.vip.api.exception.ApiException;
+import fr.insalyon.creatis.vip.api.exception.ApiException.ApiError;
+import fr.insalyon.creatis.vip.api.model.ParameterType;
+import fr.insalyon.creatis.vip.api.model.Pipeline;
+import fr.insalyon.creatis.vip.api.model.PipelineParameter;
+import fr.insalyon.creatis.vip.application.client.bean.AppVersion;
+import fr.insalyon.creatis.vip.application.client.bean.Application;
+import fr.insalyon.creatis.vip.application.client.bean.Descriptor;
+import fr.insalyon.creatis.vip.application.client.bean.Source;
+import fr.insalyon.creatis.vip.application.server.business.ApplicationBusiness;
+import fr.insalyon.creatis.vip.application.server.business.BoutiquesBusiness;
+import fr.insalyon.creatis.vip.application.server.business.ClassBusiness;
+import fr.insalyon.creatis.vip.application.server.business.WorkflowBusiness;
+import fr.insalyon.creatis.vip.application.server.model.boutiques.BoutiquesDescriptor;
+import fr.insalyon.creatis.vip.application.server.model.boutiques.Input;
+import fr.insalyon.creatis.vip.core.client.bean.User;
+import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
+import fr.insalyon.creatis.vip.core.server.business.BusinessException;
+import fr.insalyon.creatis.vip.core.server.business.Server;
+import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
+import fr.insalyon.creatis.vip.datamanager.server.business.DataManagerBusiness;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
+import org.springframework.stereotype.Service;
+
+import java.io.File;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.function.Supplier;
+
+import static fr.insalyon.creatis.vip.api.exception.ApiException.ApiError.*;
+
+/**
+ *
+ * @author Tristan Glatard
+ */
+@Service
+public class PipelineBusiness {
+
+<span class="fc" id="L78">    private final Logger logger = LoggerFactory.getLogger(getClass());</span>
+
+    private final Environment env;
+    private final Server server;
+
+    private final Supplier&lt;User&gt; currentUserProvider;
+    private final WorkflowBusiness workflowBusiness;
+    private final ApplicationBusiness applicationBusiness;
+    private final ClassBusiness classBusiness;
+    private final BoutiquesBusiness boutiquesBusiness;
+    private final DataManagerBusiness dataManagerBusiness;
+
+    @Autowired
+    public PipelineBusiness(
+            Supplier&lt;User&gt; currentUserProvider, Environment env,
+            Server server, WorkflowBusiness workflowBusiness, ApplicationBusiness applicationBusiness,
+<span class="fc" id="L94">            ClassBusiness classBusiness, BoutiquesBusiness boutiquesBusiness, DataManagerBusiness dataManagerBusiness) {</span>
+<span class="fc" id="L95">        this.currentUserProvider = currentUserProvider;</span>
+<span class="fc" id="L96">        this.env = env;</span>
+<span class="fc" id="L97">        this.server = server;</span>
+<span class="fc" id="L98">        this.workflowBusiness = workflowBusiness;</span>
+<span class="fc" id="L99">        this.applicationBusiness = applicationBusiness;</span>
+<span class="fc" id="L100">        this.classBusiness = classBusiness;</span>
+<span class="fc" id="L101">        this.boutiquesBusiness = boutiquesBusiness;</span>
+<span class="fc" id="L102">        this.dataManagerBusiness = dataManagerBusiness;</span>
+<span class="fc" id="L103">    }</span>
+
+    //*********************** pipeline id format validation **********************************
+
+    public String getPipelineIdentifier(String applicationName, String applicationVersion) {
+<span class="fc" id="L108">        return applicationName + &quot;/&quot; + applicationVersion;</span>
+    }
+
+    public String getApplicationVersion(String pipelineIdentifier) throws ApiException {
+<span class="fc" id="L112">        checkIfValidPipelineIdentifier(pipelineIdentifier);</span>
+<span class="fc" id="L113">        return pipelineIdentifier.substring(pipelineIdentifier.lastIndexOf(&quot;/&quot;) + 1);</span>
+    }
+
+    public String getApplicationName(String pipelineIdentifier) throws ApiException {
+<span class="fc" id="L117">        checkIfValidPipelineIdentifier(pipelineIdentifier);</span>
+<span class="fc" id="L118">        return pipelineIdentifier.substring(0, pipelineIdentifier.lastIndexOf(&quot;/&quot;));</span>
+    }
+
+    private void checkIfValidPipelineIdentifier(String identifier) throws ApiException {
+<span class="fc bfc" id="L122" title="All 2 branches covered.">        if (!identifier.contains(&quot;/&quot;)) {</span>
+<span class="fc" id="L123">            logger.error(&quot;Invalid pipeline identifier {} : missing /&quot;, identifier);</span>
+<span class="fc" id="L124">            throw new ApiException(ApiError.INVALID_PIPELINE_IDENTIFIER, identifier);</span>
+        }
+<span class="fc" id="L126">    }</span>
+
+    // *************************** public methods ***********************
+
+
+    /**
+     * Returns pipeline + parameters without the results-directory param
+     */
+    public Pipeline getPipelineWithoutResultsDirectory(String pipelineId) throws ApiException {
+
+<span class="fc bfc" id="L136" title="All 2 branches covered.">        if (server.useMoteurlite()) {</span>
+<span class="fc" id="L137">            return getPipelineFromBoutiquesDescriptor(pipelineId);</span>
+        } else {
+<span class="fc" id="L139">            Pipeline p = getPipelineFromGwendiaDescriptor(pipelineId);</span>
+<span class="fc" id="L140">            p.getParameters().removeIf(</span>
+<span class="fc" id="L141">                    param -&gt; CoreConstants.RESULTS_DIRECTORY_PARAM_NAME.equals(param.getName()));</span>
+<span class="fc" id="L142">            return p;</span>
+        }
+    }
+
+    /**
+     * Returns pipeline + parameters with the results-directory param
+     */
+    public Pipeline getPipelineWithResultsDirectory(String pipelineId) throws ApiException {
+
+<span class="fc bfc" id="L151" title="All 2 branches covered.">        if (server.useMoteurlite()) {</span>
+            // boutiques must not contain it, we always add it
+<span class="fc" id="L153">            Pipeline p = getPipelineFromBoutiquesDescriptor(pipelineId);</span>
+<span class="fc" id="L154">            p.getParameters().add(new PipelineParameter(</span>
+<span class="fc" id="L155">                    CoreConstants.RESULTS_DIRECTORY_PARAM_NAME, ParameterType.File, false, false,</span>
+                    DataManagerConstants.ROOT + &quot;/&quot; + DataManagerConstants.USERS_HOME, &quot;Results directory&quot;));
+<span class="fc" id="L157">            return p;</span>
+        } else {
+<span class="fc" id="L159">            return getPipelineFromGwendiaDescriptor(pipelineId);</span>
+        }
+    }
+
+    public BoutiquesDescriptor getBoutiquesDescriptor(String pipelineId) throws ApiException {
+<span class="fc" id="L164">        AppVersion appVersion = getAppVersionFromPipelineId(pipelineId);</span>
+
+<span class="fc" id="L166">        String boutiquesUri = appVersion.getJsonLfn();</span>
+<span class="pc bpc" id="L167" title="2 of 4 branches missed.">        if (boutiquesUri == null || boutiquesUri.isEmpty()) {</span>
+<span class="nc" id="L168">            logger.error(&quot;boutiques lfn not specified for app {}&quot;, pipelineId);</span>
+<span class="nc" id="L169">            throw new ApiException(NOT_COMPATIBLE_WITH_BOUTIQUES, pipelineId);</span>
+        }
+
+        try {
+<span class="fc" id="L173">            String boutiquesFilePath = dataManagerBusiness.getRemoteFile(currentUserProvider.get(), boutiquesUri);</span>
+<span class="fc" id="L174">            File boutiquesFile = Paths.get(boutiquesFilePath).toFile();</span>
+<span class="pc bpc" id="L175" title="1 of 2 branches missed.">            if ( ! boutiquesFile.exists()) {</span>
+<span class="nc" id="L176">                logger.error(&quot;Boutiques file ({}) absent after download in {}&quot;, boutiquesUri, boutiquesFilePath);</span>
+<span class="nc" id="L177">                throw new ApiException(GENERIC_API_ERROR);</span>
+            }
+<span class="fc" id="L179">            return boutiquesBusiness.parseBoutiquesFile(boutiquesFile);</span>
+<span class="nc" id="L180">        } catch (BusinessException e) {</span>
+<span class="nc" id="L181">            throw new ApiException(e);</span>
+        }
+    }
+
+    /**
+     * List all the pipeline the user can access
+     */
+    public List&lt;Pipeline&gt; listPipelines(String studyIdentifier) throws ApiException {
+
+        try {
+<span class="pc bpc" id="L191" title="1 of 2 branches missed.">            if (studyIdentifier != null) {</span>
+<span class="nc" id="L192">                logger.warn(&quot;Study identifier ({}) was ignored.&quot;, studyIdentifier);</span>
+            }
+<span class="fc" id="L194">            ArrayList&lt;Pipeline&gt; pipelines = new ArrayList&lt;&gt;();</span>
+
+<span class="fc" id="L196">            List&lt;String&gt; classNames = classBusiness.getUserClassesName(currentUserProvider.get().getEmail(), false);</span>
+
+<span class="fc" id="L198">            List&lt;Application&gt; applications = applicationBusiness.getApplications(classNames);</span>
+<span class="fc bfc" id="L199" title="All 2 branches covered.">            for (Application a : applications) {</span>
+<span class="fc" id="L200">                List&lt;AppVersion&gt; versions = applicationBusiness.getVersions(a.getName());</span>
+<span class="fc bfc" id="L201" title="All 2 branches covered.">                for (AppVersion av : versions) {</span>
+<span class="fc bfc" id="L202" title="All 2 branches covered.">                    if (isApplicationVersionUsableInApi(av)) {</span>
+<span class="fc" id="L203">                        pipelines.add(</span>
+<span class="fc" id="L204">                                new Pipeline(getPipelineIdentifier(</span>
+<span class="fc" id="L205">                                        a.getName(), av.getVersion()),</span>
+<span class="fc" id="L206">                                        a.getName(), av.getVersion())</span>
+                        );
+                    }
+<span class="fc" id="L209">                }</span>
+<span class="fc" id="L210">            }</span>
+<span class="fc" id="L211">            return pipelines;</span>
+<span class="nc" id="L212">        } catch (BusinessException ex) {</span>
+<span class="nc" id="L213">            throw new ApiException(ex);</span>
+        }
+    }
+
+    // Specific stuff that return in 'Application' class format and not 'Pipeline'
+    // used for the VIP landing page
+    public List&lt;Application&gt; listPublicPipelines() throws ApiException {
+        try {
+<span class="nc" id="L221">            return applicationBusiness.getPublicApplicationsWithGroups();</span>
+<span class="nc" id="L222">        } catch (BusinessException e) {</span>
+<span class="nc" id="L223">            throw new ApiException(e);</span>
+        }
+    }
+
+    // ********************* Basic stuff **************************************
+
+    /**
+     *  Get the pipeline parameters from the gwendia file
+     *  Warning : this includes the results-directory parameter
+     */
+    private Pipeline getPipelineFromGwendiaDescriptor(String pipelineId) throws ApiException {
+        try {
+<span class="fc" id="L235">            Pipeline p = getPipelineWithoutParameters(pipelineId);</span>
+
+            // download the gwendia file (can be slow)
+<span class="fc" id="L238">            Descriptor d = workflowBusiness.getApplicationDescriptor(</span>
+<span class="fc" id="L239">                    currentUserProvider.get(), p.getName(), p.getVersion());</span>
+<span class="fc" id="L240">            p.setDescription(d.getDescription());</span>
+
+<span class="fc bfc" id="L242" title="All 2 branches covered.">            for (Source s : d.getSources()) {</span>
+<span class="fc" id="L243">                ParameterType sourceType = ParameterType.fromVipType(s.getType());</span>
+<span class="fc bfc" id="L244" title="All 2 branches covered.">                if (&quot;flag&quot;.equalsIgnoreCase(s.getVipTypeRestriction())) {</span>
+<span class="fc" id="L245">                    sourceType = ParameterType.Boolean;</span>
+                }
+<span class="fc" id="L247">                PipelineParameter pp = new PipelineParameter(</span>
+<span class="fc" id="L248">                        s.getName(), sourceType, s.isOptional(),false,</span>
+<span class="fc" id="L249">                        s.getDefaultValue(), s.getDescription());</span>
+<span class="fc" id="L250">                p.getParameters().add(pp);</span>
+<span class="fc" id="L251">            }</span>
+<span class="fc" id="L252">            return p;</span>
+<span class="fc" id="L253">        } catch (BusinessException ex) {</span>
+<span class="fc" id="L254">            throw new ApiException(ex);</span>
+        }
+    }
+
+
+    /**
+     *  Get the pipeline parameters from the boutiques file
+     *  Warning : this does not include the results-directory parameter
+     */
+    private Pipeline getPipelineFromBoutiquesDescriptor(String pipelineId) throws ApiException {
+        // download the boutiques file and parse it
+<span class="fc" id="L265">        BoutiquesDescriptor boutiques = getBoutiquesDescriptor(pipelineId);</span>
+<span class="fc" id="L266">        Pipeline p = new Pipeline(pipelineId, boutiques.getName(), boutiques.getToolVersion());</span>
+<span class="fc" id="L267">        p.setDescription(boutiques.getDescription());</span>
+
+<span class="fc bfc" id="L269" title="All 2 branches covered.">        for (Input input : boutiques.getInputs()) {</span>
+<span class="fc" id="L270">            ParameterType type = ParameterType.fromBoutiquesInput(input);</span>
+<span class="fc" id="L271">            PipelineParameter pp = new PipelineParameter(</span>
+<span class="pc bpc" id="L272" title="1 of 4 branches missed.">                    input.getId(), type, input.getOptional() != null &amp;&amp; input.getOptional(),false,</span>
+<span class="fc" id="L273">                    input.getDefaultValue(), input.getDescription());</span>
+<span class="fc" id="L274">            p.getParameters().add(pp);</span>
+<span class="fc" id="L275">        }</span>
+<span class="fc" id="L276">        return p;</span>
+    }
+
+    // return basic pipeline without parameters
+    private Pipeline getPipelineWithoutParameters(String pipelineId) throws ApiException {
+<span class="fc" id="L281">        AppVersion appVersion = getAppVersionFromPipelineId(pipelineId);</span>
+
+<span class="fc" id="L283">        return new Pipeline(pipelineId, appVersion.getApplicationName(), appVersion.getVersion());</span>
+    }
+
+    private AppVersion getAppVersionFromPipelineId(String pipelineId) throws ApiException {
+        try {
+<span class="fc" id="L288">            String applicationName = getApplicationName(pipelineId);</span>
+<span class="fc" id="L289">            String applicationVersion = getApplicationVersion(pipelineId);</span>
+<span class="fc" id="L290">            AppVersion appVersion = applicationBusiness.getVersion(applicationName, applicationVersion);</span>
+<span class="pc bpc" id="L291" title="1 of 2 branches missed.">            if (appVersion == null) {</span>
+<span class="nc" id="L292">                logger.error(&quot;Cannot find pipeline {}/{}&quot;, applicationName, applicationVersion);</span>
+<span class="nc" id="L293">                throw new ApiException(PIPELINE_NOT_FOUND, pipelineId);</span>
+            }
+<span class="fc" id="L295">            checkAppVersionAccess(appVersion);</span>
+<span class="fc" id="L296">            return appVersion;</span>
+<span class="nc" id="L297">        } catch (BusinessException e) {</span>
+<span class="nc" id="L298">            throw new ApiException(e);</span>
+        }
+    }
+
+    // ********************* VERIFICATION STUFF *******************************
+
+    // should be called it all cases
+    private void checkAppVersionAccess(AppVersion appVersion) throws ApiException {
+<span class="fc" id="L306">        String appName = appVersion.getApplicationName();</span>
+<span class="fc" id="L307">        String version = appVersion.getVersion();</span>
+
+        // check it is visible or in white list
+<span class="pc bpc" id="L310" title="1 of 2 branches missed.">        if ( ! isApplicationVersionUsableInApi(appVersion)) {</span>
+<span class="nc" id="L311">            logger.error(&quot;Application {}/{} not visible or in api whitelist&quot;, appName, version);</span>
+<span class="nc" id="L312">            throw new ApiException(PIPELINE_NOT_FOUND, getPipelineIdentifier(appName, version));</span>
+        }
+
+        // check the user can use it through its classes
+        try {
+<span class="fc" id="L317">            List&lt;String&gt; userClassNames = classBusiness.getUserClassesName(currentUserProvider.get().getEmail(), false);</span>
+<span class="fc" id="L318">            List&lt;String&gt; applicationClassNames = applicationBusiness.getApplication(appName).getApplicationClasses();</span>
+
+<span class="pc bpc" id="L320" title="1 of 2 branches missed.">            for (String applicationClassName : applicationClassNames) {</span>
+<span class="pc bpc" id="L321" title="1 of 2 branches missed.">                if (userClassNames.contains(applicationClassName)) {</span>
+<span class="fc" id="L322">                    return;</span>
+                }
+<span class="nc" id="L324">            }</span>
+<span class="nc" id="L325">            logger.error(&quot;User {} not allowed to access application {}&quot;, currentUserProvider.get(), appName);</span>
+<span class="nc" id="L326">            throw new ApiException(NOT_ALLOWED_TO_USE_PIPELINE, getPipelineIdentifier(appName, version));</span>
+<span class="nc" id="L327">        } catch (BusinessException e) {</span>
+<span class="nc" id="L328">            throw new ApiException(e);</span>
+        }
+    }
+
+    private boolean isApplicationVersionUsableInApi(AppVersion appVersion) {
+<span class="fc bfc" id="L333" title="All 2 branches covered.">        if (appVersion.isVisible()) {</span>
+<span class="fc" id="L334">            return true;</span>
+        }
+<span class="fc" id="L336">        List&lt;String&gt; whiteList = Arrays.asList(</span>
+<span class="fc" id="L337">                env.getRequiredProperty(CarminProperties.API_PIPELINE_WHITE_LIST, String[].class));</span>
+<span class="fc" id="L338">        return whiteList.stream().anyMatch(appString -&gt; {</span>
+<span class="fc" id="L339">            String[] splitAppString = appString.split(&quot;/&quot;);</span>
+<span class="pc bpc" id="L340" title="1 of 2 branches missed.">            if (splitAppString.length != 2) {</span>
+<span class="nc" id="L341">                return false;</span>
+            }
+<span class="pc bpc" id="L343" title="1 of 2 branches missed.">            return splitAppString[0].equals(appVersion.getApplicationName())</span>
+<span class="pc bnc" id="L344" title="All 2 branches missed.">                    &amp;&amp; splitAppString[1].equals(appVersion.getVersion());</span>
+        });
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

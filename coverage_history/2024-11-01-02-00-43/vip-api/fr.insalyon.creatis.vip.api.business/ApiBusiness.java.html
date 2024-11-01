@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../jacoco-resources/report.gif" type="image/gif"/><title>ApiBusiness.java</title><link rel="stylesheet" href="../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../index.html" class="el_report">coverage</a> &gt; <a href="../index.html" class="el_bundle">vip-api</a> &gt; <a href="index.source.html" class="el_package">fr.insalyon.creatis.vip.api.business</a> &gt; <span class="el_source">ApiBusiness.java</span></div><h1>ApiBusiness.java</h1><pre class="source lang-java linenums">package fr.insalyon.creatis.vip.api.business;
+
+import fr.insalyon.creatis.vip.api.CarminProperties;
+import fr.insalyon.creatis.vip.api.exception.ApiException;
+import fr.insalyon.creatis.vip.api.model.AuthenticationCredentials;
+import fr.insalyon.creatis.vip.api.model.AuthenticationInfo;
+import fr.insalyon.creatis.vip.core.client.bean.User;
+import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
+import fr.insalyon.creatis.vip.core.server.business.BusinessException;
+import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.core.env.Environment;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.stereotype.Service;
+
+@Service
+public class ApiBusiness {
+
+<span class="fc" id="L20">    private final Logger logger = LoggerFactory.getLogger(getClass());</span>
+
+    private final Environment env;
+    private final ConfigurationBusiness configurationBusiness;
+
+<span class="fc" id="L25">    public ApiBusiness(Environment env, ConfigurationBusiness configurationBusiness) {</span>
+<span class="fc" id="L26">        this.env = env;</span>
+<span class="fc" id="L27">        this.configurationBusiness = configurationBusiness;</span>
+<span class="fc" id="L28">    }</span>
+
+    public AuthenticationInfo authenticate(AuthenticationCredentials authCreds) throws ApiException {
+<span class="fc" id="L31">        return authenticate(authCreds, false);</span>
+    }
+
+    public AuthenticationInfo authenticateSession(AuthenticationCredentials authCreds) throws ApiException {
+<span class="nc" id="L35">        return authenticate(authCreds, true);</span>
+    }
+
+    public AuthenticationInfo authenticate(AuthenticationCredentials authCreds, boolean initSession)
+            throws ApiException {
+<span class="fc" id="L40">        String username = authCreds.getUsername(), password = authCreds.getPassword();</span>
+<span class="fc" id="L41">        logger.debug(&quot;Verifying credential for &quot; + username);</span>
+<span class="fc" id="L42">        User user = signin(username, password);</span>
+<span class="fc" id="L43">        logger.debug(&quot;Constructing authentication info for &quot; + username);</span>
+<span class="fc" id="L44">        AuthenticationInfo authInfo = new AuthenticationInfo();</span>
+<span class="pc bpc" id="L45" title="1 of 2 branches missed.">        if (initSession) {</span>
+<span class="nc" id="L46">            authInfo.setHttpHeader(CoreConstants.COOKIES_SESSION);</span>
+<span class="nc" id="L47">            authInfo.setHttpHeaderValue(user.getSession());</span>
+        } else {
+<span class="fc" id="L49">            authInfo.setHttpHeader(env.getProperty(CarminProperties.APIKEY_HEADER_NAME));</span>
+<span class="fc" id="L50">            String apikey = getAnApikeyForUser(username); // the username is an email</span>
+<span class="fc" id="L51">            authInfo.setHttpHeaderValue(apikey);</span>
+        }
+<span class="fc" id="L53">        return authInfo;</span>
+    }
+
+    private User signin(String username, String password) throws ApiException {
+        try {
+            // we do not care about the session, we're not in browser action
+<span class="fc" id="L59">            User user = configurationBusiness</span>
+<span class="fc" id="L60">                    .signin(username, password);</span>
+<span class="fc" id="L61">            logger.info(&quot;Credentials OK for &quot; + username);</span>
+<span class="fc" id="L62">            return user;</span>
+<span class="fc" id="L63">        } catch (BusinessException e) {</span>
+<span class="pc bpc" id="L64" title="1 of 2 branches missed.">            if (e.getMessage().startsWith(&quot;Authentication failed&quot;)) {</span>
+<span class="fc" id="L65">                throw new ApiException(ApiException.ApiError.BAD_CREDENTIALS);</span>
+            }
+<span class="nc" id="L67">            throw new ApiException(&quot;Authentication Error&quot;, e);</span>
+        }
+    }
+
+    private String getAnApikeyForUser(String email) throws ApiException {
+<span class="fc" id="L72">        boolean generateNewApiKey = env.getRequiredProperty(</span>
+                CarminProperties.APIKEY_GENERATE_NEW_EACH_TIME, Boolean.class);
+        try {
+<span class="pc bpc" id="L75" title="1 of 2 branches missed.">            if (generateNewApiKey) {</span>
+<span class="nc" id="L76">                logger.info(&quot;generating a new apikey for &quot; + email);</span>
+<span class="nc" id="L77">                return configurationBusiness.generateNewUserApikey(email);</span>
+            } else {
+<span class="fc" id="L79">                logger.debug(&quot;keeping the current api key for &quot; + email);</span>
+<span class="fc" id="L80">                return configurationBusiness.getUserApikey(email);</span>
+            }
+<span class="nc" id="L82">        } catch (BusinessException e) {</span>
+<span class="nc" id="L83">            throw new ApiException(e);</span>
+        }
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

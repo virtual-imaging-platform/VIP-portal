@@ -1,0 +1,1116 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../jacoco-resources/report.gif" type="image/gif"/><title>ConfigurationBusiness.java</title><link rel="stylesheet" href="../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../index.html" class="el_report">coverage</a> &gt; <a href="../index.html" class="el_bundle">vip-core</a> &gt; <a href="index.source.html" class="el_package">fr.insalyon.creatis.vip.core.server.business</a> &gt; <span class="el_source">ConfigurationBusiness.java</span></div><h1>ConfigurationBusiness.java</h1><pre class="source lang-java linenums">/*
+ * Copyright and authors: see LICENSE.txt in base repository.
+ *
+ * This software is a web portal for pipeline execution on distributed systems.
+ *
+ * This software is governed by the CeCILL-B license under French law and
+ * abiding by the rules of distribution of free software.  You can  use,
+ * modify and/ or redistribute the software under the terms of the CeCILL-B
+ * license as circulated by CEA, CNRS and INRIA at the following URL
+ * &quot;http://www.cecill.info&quot;.
+ *
+ * As a counterpart to the access to the source code and  rights to copy,
+ * modify and redistribute granted by the license, users are provided only
+ * with a limited warranty  and the software's author,  the holder of the
+ * economic rights,  and the successive licensors  have only  limited
+ * liability.
+ *
+ * In this respect, the user's attention is drawn to the risks associated
+ * with loading,  using,  modifying and/or developing or reproducing the
+ * software by the user in light of its specific status of free software,
+ * that may mean  that it is complicated to manipulate,  and  that  also
+ * therefore means  that it is reserved for developers  and  experienced
+ * professionals having in-depth computer knowledge. Users are therefore
+ * encouraged to load and test the software's suitability as regards their
+ * requirements in conditions enabling the security of their systems and/or
+ * data to be ensured and,  more generally, to use and operate it in the
+ * same conditions as regards security.
+ *
+ * The fact that you are presently reading this means that you have had
+ * knowledge of the CeCILL-B license and that you accept its terms.
+ */
+package fr.insalyon.creatis.vip.core.server.business;
+
+import fr.insalyon.creatis.devtools.MD5;
+import fr.insalyon.creatis.grida.client.GRIDAClient;
+import fr.insalyon.creatis.grida.client.GRIDAClientException;
+import fr.insalyon.creatis.grida.client.GRIDAPoolClient;
+import fr.insalyon.creatis.vip.core.client.bean.Group;
+import fr.insalyon.creatis.vip.core.client.bean.TermsOfUse;
+import fr.insalyon.creatis.vip.core.client.bean.User;
+import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
+import fr.insalyon.creatis.vip.core.client.view.CoreConstants.GROUP_ROLE;
+import fr.insalyon.creatis.vip.core.client.view.user.UserLevel;
+import fr.insalyon.creatis.vip.core.client.view.util.CountryCode;
+import fr.insalyon.creatis.vip.core.server.business.proxy.ProxyClient;
+import fr.insalyon.creatis.vip.core.server.dao.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import javax.mail.internet.AddressException;
+import javax.mail.internet.InternetAddress;
+import java.io.UnsupportedEncodingException;
+import java.math.BigInteger;
+import java.net.URL;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+import java.sql.Timestamp;
+import java.util.*;
+import java.util.stream.Collectors;
+
+/**
+ * @author Rafael Ferreira da Silva, Nouha Boujelben
+ */
+@Service
+@Transactional
+public class ConfigurationBusiness {
+
+<span class="fc" id="L71">    private final Logger logger = LoggerFactory.getLogger(getClass());</span>
+
+    private Server server;
+    private ProxyClient proxyClient;
+    private EmailBusiness emailBusiness;
+    private GRIDAPoolClient gridaPoolClient;
+    private GRIDAClient gridaClient;
+
+    private GroupDAO groupDAO;
+    private TermsUseDAO termsUseDAO;
+    private UserDAO userDAO;
+    private UsersGroupsDAO usersGroupsDAO;
+
+    @Autowired
+    public ConfigurationBusiness(
+            Server server, ProxyClient proxyClient, EmailBusiness emailBusiness,
+            GRIDAClient gridaClient, GRIDAPoolClient gridaPoolClient,
+            GroupDAO groupDAO, TermsUseDAO termsUseDAO,
+<span class="fc" id="L89">            UserDAO userDAO, UsersGroupsDAO usersGroupsDAO) {</span>
+<span class="fc" id="L90">        this.server = server;</span>
+<span class="fc" id="L91">        this.proxyClient = proxyClient;</span>
+<span class="fc" id="L92">        this.emailBusiness = emailBusiness;</span>
+<span class="fc" id="L93">        this.gridaClient = gridaClient;</span>
+<span class="fc" id="L94">        this.gridaPoolClient = gridaPoolClient;</span>
+<span class="fc" id="L95">        this.groupDAO = groupDAO;</span>
+<span class="fc" id="L96">        this.termsUseDAO = termsUseDAO;</span>
+<span class="fc" id="L97">        this.userDAO = userDAO;</span>
+<span class="fc" id="L98">        this.usersGroupsDAO = usersGroupsDAO;</span>
+<span class="fc" id="L99">    }</span>
+
+    private static java.sql.Timestamp getCurrentTimeStamp() {
+
+<span class="fc" id="L103">        java.util.Date today = new java.util.Date();</span>
+<span class="fc" id="L104">        return new java.sql.Timestamp(today.getTime());</span>
+
+    }
+
+    public void configure() throws BusinessException {
+<span class="pc bpc" id="L109" title="1 of 2 branches missed.">        if (server.getMyProxyEnabled()) {</span>
+            try {
+<span class="nc" id="L111">                logger.debug(&quot;Configuring VIP server proxy.&quot;);</span>
+<span class="nc" id="L112">                proxyClient.checkProxy();</span>
+    
+<span class="nc" id="L114">            } catch (Exception ex) {</span>
+<span class="nc" id="L115">                logger.error(&quot;Error configuring myproxy : {}&quot;, ex.getMessage());</span>
+<span class="nc" id="L116">                throw new BusinessException(ex);</span>
+<span class="nc" id="L117">            }</span>
+        } else {
+<span class="fc" id="L119">            logger.info(&quot;Proxy not needed and not validated !&quot;);</span>
+        }
+<span class="fc" id="L121">    }</span>
+
+    public boolean validateSession(String email, String session)
+            throws BusinessException {
+        try {
+<span class="pc bpc" id="L126" title="1 of 4 branches missed.">            if (email != null &amp;&amp; session != null) {</span>
+<span class="pc bpc" id="L127" title="3 of 4 branches missed.">                if (userDAO.verifySession(email, session) &amp;&amp; !userDAO.isLocked(email)) {</span>
+<span class="nc" id="L128">                    return true;</span>
+                }
+<span class="fc" id="L130">                logger.info(&quot;Failed to verify user [{}]'s session {}&quot;, email, session);</span>
+<span class="fc" id="L131">                userDAO.incNFailedAuthentications(email); //just in case...</span>
+<span class="pc bpc" id="L132" title="1 of 2 branches missed.">                if (userDAO.getNFailedAuthentications(email) &gt; 5) {</span>
+<span class="nc" id="L133">                    userDAO.lock(email);</span>
+                }
+            }
+<span class="fc" id="L136">            return false;</span>
+<span class="nc" id="L137">        } catch (DAOException ex) {</span>
+<span class="nc" id="L138">            throw new BusinessException(ex);</span>
+        }
+    }
+
+    public User getUser(String email) throws BusinessException {
+        try {
+<span class="fc" id="L144">            return userDAO.getUser(email);</span>
+<span class="fc" id="L145">        } catch (DAOException ex) {</span>
+<span class="fc" id="L146">            throw new BusinessException(ex);</span>
+        }
+    }
+
+    public User getUserWithGroups(String email) throws BusinessException {
+        try {
+<span class="fc" id="L152">            User user = userDAO.getUser(email);</span>
+<span class="fc" id="L153">            user.setGroups(usersGroupsDAO.getUserGroups(email));</span>
+<span class="fc" id="L154">            return user;</span>
+<span class="nc" id="L155">        } catch (DAOException ex) {</span>
+<span class="nc" id="L156">            throw new BusinessException(ex);</span>
+        }
+    }
+
+    public void signup(
+            User user, String comments, boolean automaticCreation,
+            boolean mapPrivateGroups, Group group)
+            throws BusinessException {
+<span class="fc" id="L164">        this.signup(user, comments, automaticCreation, mapPrivateGroups,</span>
+<span class="fc bfc" id="L165" title="All 2 branches covered.">                group == null ? new ArrayList&lt;&gt;() : Collections.singletonList(group));</span>
+<span class="fc" id="L166">    }</span>
+
+    public void signup(
+            User user, String comments, boolean automaticCreation,
+            boolean mapPrivateGroups, List&lt;Group&gt; groups)
+            throws BusinessException {
+
+<span class="fc" id="L173">        verifyEmail(user.getEmail());</span>
+
+        // Build log message
+<span class="fc" id="L176">        StringBuilder message = new StringBuilder(&quot;Signing up &quot;);</span>
+<span class="fc" id="L177">        message.append(&quot;. List of undesired countries: &quot;);</span>
+<span class="pc bpc" id="L178" title="1 of 2 branches missed.">        for (String s : server.getUndesiredCountries()) {</span>
+<span class="nc bnc" id="L179" title="All 2 branches missed.">            if (!s.trim().isEmpty()) {</span>
+<span class="nc" id="L180">                message.append(&quot; &quot;);</span>
+<span class="nc" id="L181">                message.append(s);</span>
+            }
+<span class="nc" id="L183">        }</span>
+<span class="fc" id="L184">        message.append(&quot;.&quot;);</span>
+<span class="fc" id="L185">        logger.info(message.toString());</span>
+
+        // Check if country is undesired
+<span class="pc bpc" id="L188" title="1 of 2 branches missed.">        for (String udc : server.getUndesiredCountries()) {</span>
+<span class="nc bnc" id="L189" title="All 2 branches missed.">            if (udc.trim().isEmpty()) {</span>
+                // An empty config file entry gets here as an empty or
+                // whitespace-only string, skip it
+<span class="nc" id="L192">                continue;</span>
+            }
+<span class="nc bnc" id="L194" title="All 2 branches missed.">            if (user.getCountryCode().toString().equals(udc)) {</span>
+<span class="nc" id="L195">                logger.error(&quot;Undesired country for &quot; + user.getEmail());</span>
+<span class="nc" id="L196">                throw new BusinessException(&quot;Error&quot;);</span>
+            }
+<span class="nc" id="L198">        }</span>
+
+        try {
+<span class="fc bfc" id="L201" title="All 2 branches covered.">            if (!automaticCreation) {</span>
+<span class="fc" id="L202">                user.setTermsOfUse(getCurrentTimeStamp());</span>
+            }
+<span class="fc" id="L204">            user.setLastUpdatePublications(getCurrentTimeStamp());</span>
+<span class="fc" id="L205">            user.setCode(UUID.randomUUID().toString());</span>
+<span class="pc bpc" id="L206" title="1 of 2 branches missed.">            if (user.getPassword() == null) {</span>
+<span class="nc" id="L207">                user.setPassword(null);</span>
+            } else {
+<span class="fc" id="L209">                user.setPassword(MD5.get(user.getPassword()));</span>
+            }
+<span class="fc" id="L211">            String folder = user.getFirstName().replaceAll(&quot; &quot;, &quot;_&quot;).toLowerCase() + &quot;_&quot;</span>
+<span class="fc" id="L212">                    + user.getLastName().replaceAll(&quot; &quot;, &quot;_&quot;).toLowerCase();</span>
+            // normalise user folder : remove accents and non ascii characters
+<span class="fc" id="L214">            folder = CoreUtil.getCleanString(folder);</span>
+
+<span class="fc bfc" id="L216" title="All 2 branches covered.">            while (gridaClient.exist(server.getDataManagerUsersHome() + &quot;/&quot; + folder)) {</span>
+<span class="fc" id="L217">                folder += &quot;_&quot; + new Random().nextInt(10000);</span>
+            }
+
+<span class="fc" id="L220">            user.setFolder(folder);</span>
+<span class="fc" id="L221">            user.setLevel(UserLevel.Beginner);</span>
+
+<span class="fc" id="L223">            userDAO.add(user);</span>
+
+            // Adding user to groups
+<span class="pc bpc" id="L226" title="1 of 2 branches missed.">            if (groups == null) {</span>
+<span class="nc" id="L227">                groups = new ArrayList&lt;&gt;();</span>
+            }
+<span class="fc" id="L229">            StringBuilder groupsString = new StringBuilder();</span>
+<span class="fc bfc" id="L230" title="All 2 branches covered.">            for (Group group : groups) {</span>
+<span class="pc bpc" id="L231" title="5 of 6 branches missed.">                if (mapPrivateGroups || automaticCreation || group.isPublicGroup()) {</span>
+<span class="fc" id="L232">                    usersGroupsDAO.add(user.getEmail(), group.getName(), GROUP_ROLE.User);</span>
+                } else {
+<span class="nc" id="L234">                    logger.info(&quot;Don't map user &quot; + user.getEmail() + &quot; to private group &quot; + group.getName());</span>
+                }
+<span class="fc" id="L236">                groupsString.append(group.getName()).append(&quot;, &quot;);</span>
+<span class="fc" id="L237">            }</span>
+
+<span class="fc bfc" id="L239" title="All 2 branches covered.">            if (!automaticCreation) {</span>
+<span class="fc" id="L240">                String emailContent = &quot;&lt;html&gt;&quot;</span>
+                        + &quot;&lt;head&gt;&lt;/head&gt;&quot;
+                        + &quot;&lt;body&gt;&quot;
+<span class="fc" id="L243">                        + &quot;&lt;p&gt;Dear &quot; + user.getFirstName() + &quot; &quot; + user.getLastName() + &quot;,&lt;/p&gt;&quot;</span>
+                        + &quot;&lt;p&gt;We have successfully received your membership registration &quot;
+                        + &quot;and your personal profile has been created.&lt;/p&gt;&quot;
+                        + &quot;&lt;p&gt;Please confirm your registration using the following activation &quot;
+                        + &quot;code on your first login:&lt;/p&gt;&quot;
+<span class="fc" id="L248">                        + &quot;&lt;p&gt;&lt;b&gt;&quot; + user.getCode() + &quot;&lt;/b&gt;&lt;/p&gt;&quot;</span>
+                        + &quot;&lt;p&gt;Best Regards,&lt;/p&gt;&quot;
+                        + &quot;&lt;p&gt;VIP Team&lt;/p&gt;&quot;
+                        + &quot;&lt;/body&gt;&quot;
+                        + &quot;&lt;/html&gt;&quot;;
+
+<span class="fc" id="L254">                logger.info(&quot;Sending confirmation email to '&quot; + user.getEmail() + &quot;'.&quot;);</span>
+<span class="fc" id="L255">                emailBusiness.sendEmail(&quot;VIP account details&quot;, emailContent,</span>
+<span class="fc" id="L256">                        new String[]{user.getEmail()}, true, user.getEmail());</span>
+
+<span class="fc" id="L258">                String adminsEmailContents = &quot;&lt;html&gt;&quot;</span>
+                        + &quot;&lt;head&gt;&lt;/head&gt;&quot;
+                        + &quot;&lt;body&gt;&quot;
+                        + &quot;&lt;p&gt;Dear Administrator,&lt;/p&gt;&quot;
+                        + &quot;&lt;p&gt;A new user requested an account:&lt;/p&gt;&quot;
+<span class="fc" id="L263">                        + &quot;&lt;p&gt;&lt;b&gt;First Name:&lt;/b&gt; &quot; + user.getFirstName() + &quot;&lt;/p&gt;&quot;</span>
+<span class="fc" id="L264">                        + &quot;&lt;p&gt;&lt;b&gt;Last Name:&lt;/b&gt; &quot; + user.getLastName() + &quot;&lt;/p&gt;&quot;</span>
+<span class="fc" id="L265">                        + &quot;&lt;p&gt;&lt;b&gt;Email:&lt;/b&gt; &quot; + user.getEmail() + &quot;&lt;/p&gt;&quot;</span>
+<span class="fc" id="L266">                        + &quot;&lt;p&gt;&lt;b&gt;Institution:&lt;/b&gt; &quot; + user.getInstitution() + &quot;&lt;/p&gt;&quot;</span>
+<span class="fc" id="L267">                        + &quot;&lt;p&gt;&lt;b&gt;Country:&lt;/b&gt; &quot; + user.getCountryCode().getCountryName() + &quot;&lt;/p&gt;&quot;</span>
+                        + &quot;&lt;p&gt;&lt;b&gt;Groups:&lt;/b&gt; &quot; + groupsString + &quot;&lt;/p&gt;&quot;
+                        + &quot;&lt;p&gt;&lt;b&gt;Comments:&lt;/b&gt;&lt;br /&gt;&quot; + comments + &quot;&lt;/p&gt;&quot;
+                        + &quot;&lt;p&gt;&amp;nbsp;&lt;/p&gt;&quot;
+                        + &quot;&lt;p&gt;Best Regards,&lt;/p&gt;&quot;
+                        + &quot;&lt;p&gt;VIP Team&lt;/p&gt;&quot;
+                        + &quot;&lt;/body&gt;&quot;
+                        + &quot;&lt;/html&gt;&quot;;
+
+<span class="fc bfc" id="L276" title="All 2 branches covered.">                for (String email : getAdministratorsEmails()) {</span>
+<span class="fc" id="L277">                    emailBusiness.sendEmail(&quot;[VIP Admin] Account Requested&quot;, adminsEmailContents,</span>
+<span class="fc" id="L278">                            new String[]{email}, true, user.getEmail());</span>
+                }
+<span class="fc" id="L280">            } else {</span>
+<span class="fc" id="L281">                StringBuilder groupNames = new StringBuilder();</span>
+<span class="fc bfc" id="L282" title="All 2 branches covered.">                for (Group group : groups) {</span>
+<span class="pc bpc" id="L283" title="1 of 2 branches missed.">                    if (groupNames.length() &gt; 0) {</span>
+<span class="nc" id="L284">                        groupNames.append(&quot;, &quot;);</span>
+                    }
+<span class="fc" id="L286">                    groupNames.append(group.getName());</span>
+<span class="fc" id="L287">                }</span>
+<span class="fc" id="L288">                String adminsEmailContents = &quot;&lt;html&gt;&quot;</span>
+                        + &quot;&lt;head&gt;&lt;/head&gt;&quot;
+                        + &quot;&lt;body&gt;&quot;
+                        + &quot;&lt;p&gt;Dear Administrators,&lt;/p&gt;&quot;
+                        + &quot;&lt;p&gt;The following account was automatically created:&lt;/p&gt;&quot;
+<span class="fc" id="L293">                        + &quot;&lt;p&gt;&lt;b&gt;First Name:&lt;/b&gt; &quot; + user.getFirstName() + &quot;&lt;/p&gt;&quot;</span>
+<span class="fc" id="L294">                        + &quot;&lt;p&gt;&lt;b&gt;Last Name:&lt;/b&gt; &quot; + user.getLastName() + &quot;&lt;/p&gt;&quot;</span>
+<span class="fc" id="L295">                        + &quot;&lt;p&gt;&lt;b&gt;Email:&lt;/b&gt; &quot; + user.getEmail() + &quot;&lt;/p&gt;&quot;</span>
+<span class="fc" id="L296">                        + &quot;&lt;p&gt;&lt;b&gt;Institution:&lt;/b&gt; &quot; + user.getInstitution() + &quot;&lt;/p&gt;&quot;</span>
+<span class="fc" id="L297">                        + &quot;&lt;p&gt;&lt;b&gt;Country:&lt;/b&gt; &quot; + user.getCountryCode().getCountryName() + &quot;&lt;/p&gt;&quot;</span>
+                        + &quot;&lt;p&gt;&lt;b&gt;Groups:&lt;/b&gt; &quot; + groupNames + &quot;&lt;/p&gt;&quot;
+                        + &quot;&lt;p&gt;&lt;b&gt;Comments:&lt;/b&gt;&lt;br /&gt;&quot; + comments + &quot;&lt;/p&gt;&quot;
+                        + &quot;&lt;p&gt;&amp;nbsp;&lt;/p&gt;&quot;
+                        + &quot;&lt;p&gt;Best Regards,&lt;/p&gt;&quot;
+                        + &quot;&lt;p&gt;VIP Team&lt;/p&gt;&quot;
+                        + &quot;&lt;/body&gt;&quot;
+                        + &quot;&lt;/html&gt;&quot;;
+
+<span class="fc bfc" id="L306" title="All 2 branches covered.">                for (String email : getAdministratorsEmails()) {</span>
+<span class="fc" id="L307">                    emailBusiness.sendEmail(&quot;[VIP Admin] Automatic Account Creation&quot;, adminsEmailContents,</span>
+<span class="fc" id="L308">                            new String[]{email}, false, user.getEmail());</span>
+                }
+            }
+<span class="nc" id="L311">        } catch (GRIDAClientException | UnsupportedEncodingException | NoSuchAlgorithmException ex) {</span>
+<span class="nc" id="L312">            logger.error(&quot;Error signing up user {}&quot;, user.getEmail(), ex);</span>
+<span class="nc" id="L313">            throw new BusinessException(ex);</span>
+<span class="fc" id="L314">        } catch (DAOException ex) {</span>
+<span class="fc" id="L315">            throw new BusinessException(ex);</span>
+<span class="fc" id="L316">        }</span>
+<span class="fc" id="L317">    }</span>
+
+    private void verifyEmail(String email) throws BusinessException {
+        // verify email format
+        try {
+<span class="fc" id="L322">            InternetAddress emailAddr = new InternetAddress(email);</span>
+<span class="fc" id="L323">            emailAddr.validate();</span>
+<span class="fc" id="L324">        } catch (AddressException ex) {</span>
+<span class="fc" id="L325">            logger.error(&quot;The email {} is invalid&quot;, email);</span>
+<span class="fc" id="L326">            throw new BusinessException(&quot;The email &quot; + email + &quot; is invalid&quot;);</span>
+<span class="fc" id="L327">        }</span>
+
+        // Build log message
+<span class="fc" id="L330">        StringBuilder message = new StringBuilder(&quot;verifying &quot;);</span>
+<span class="fc" id="L331">        message.append(email);</span>
+<span class="fc" id="L332">        message.append(&quot;. List of undesired mail domains: &quot;);</span>
+<span class="pc bpc" id="L333" title="1 of 2 branches missed.">        for (String s : server.getUndesiredMailDomains()) {</span>
+<span class="nc bnc" id="L334" title="All 2 branches missed.">            if (!s.trim().isEmpty()) {</span>
+<span class="nc" id="L335">                message.append(&quot; &quot;);</span>
+<span class="nc" id="L336">                message.append(s);</span>
+            }
+<span class="nc" id="L338">        }</span>
+<span class="fc" id="L339">        message.append(&quot;. &quot;);</span>
+<span class="fc" id="L340">        logger.info(message.toString());</span>
+
+        // Check if email domain is undesired
+<span class="pc bpc" id="L343" title="1 of 2 branches missed.">        for (String udm : server.getUndesiredMailDomains()) {</span>
+<span class="nc bnc" id="L344" title="All 2 branches missed.">            if (udm.trim().isEmpty()) {</span>
+                // An empty config file entry gets here as an empty or
+                // whitespace-only string, skip it
+<span class="nc" id="L347">                continue;</span>
+            }
+<span class="nc" id="L349">            String[] useremail = email.split(&quot;@&quot;);</span>
+<span class="nc bnc" id="L350" title="All 2 branches missed.">            if (useremail.length != 2) {</span>
+<span class="nc" id="L351">                logger.info(&quot;User Mail address is incorrect : &quot; + email);</span>
+<span class="nc" id="L352">                throw new BusinessException(&quot;Error&quot;);</span>
+            }
+            // Only check against the domain part of the user's email address
+<span class="nc bnc" id="L355" title="All 2 branches missed.">            if (useremail[1].endsWith(udm)) {</span>
+<span class="nc" id="L356">                logger.error(&quot;Undesired Mail Domain for &quot; + email);</span>
+<span class="nc" id="L357">                throw new BusinessException(&quot;Error&quot;);</span>
+            }
+<span class="nc" id="L359">        }</span>
+<span class="fc" id="L360">    }</span>
+
+    public void signup(User user, String comments, Group group) throws BusinessException {
+<span class="fc" id="L363">        signup(user, comments, false, false, group);</span>
+<span class="fc" id="L364">    }</span>
+
+    public void signup(User user, String comments, List&lt;Group&gt; groups)
+            throws BusinessException {
+<span class="nc" id="L368">        signup(user, comments, false, false, groups);</span>
+<span class="nc" id="L369">    }</span>
+
+    public User signin(String email, String password) throws BusinessException {
+<span class="fc" id="L372">        return signin(email, password, true);</span>
+    }
+
+    public User signinWithoutResetingSession(String email, String password)
+            throws BusinessException {
+<span class="fc" id="L377">        return signin(email, password, false);</span>
+    }
+
+    private User signin(String email, String password, boolean resetSession)
+            throws BusinessException {
+
+        try {
+<span class="fc" id="L384">            password = MD5.get(password);</span>
+
+<span class="fc bfc" id="L386" title="All 2 branches covered.">            if (userDAO.authenticate(email, password)) {</span>
+
+<span class="fc" id="L388">                userDAO.resetNFailedAuthentications(email);</span>
+
+<span class="fc bfc" id="L390" title="All 2 branches covered.">                if (resetSession) {</span>
+<span class="fc" id="L391">                    return getUserWithSession(email);</span>
+                } else {
+<span class="fc" id="L393">                    return userDAO.getUser(email);</span>
+                }
+
+            } else {
+<span class="fc" id="L397">                userDAO.incNFailedAuthentications(email);</span>
+<span class="pc bpc" id="L398" title="1 of 2 branches missed.">                if (userDAO.getNFailedAuthentications(email) &gt; 5) {</span>
+<span class="nc" id="L399">                    userDAO.lock(email);</span>
+                }
+<span class="fc" id="L401">                logger.error(&quot;Authentication failed to '&quot; + email + &quot;' (email or password incorrect, or user is locked).&quot;);</span>
+<span class="fc" id="L402">                throw new BusinessException(&quot;Authentication failed (email or password incorrect, or user is locked).&quot;);</span>
+            }
+<span class="nc" id="L404">        } catch (NoSuchAlgorithmException | UnsupportedEncodingException ex) {</span>
+<span class="nc" id="L405">            logger.error(&quot;Error signing in user {}&quot;, email, ex);</span>
+<span class="nc" id="L406">            throw new BusinessException(ex);</span>
+<span class="nc" id="L407">        } catch (DAOException ex) {</span>
+<span class="nc" id="L408">            throw new BusinessException(ex);</span>
+        }
+    }
+
+    public User getNewUser(String email, String firstName, String lastName, String institution) {
+<span class="fc" id="L413">        CountryCode cc = CountryCode.aq;</span>
+
+<span class="fc" id="L415">        String country = &quot;&quot;;</span>
+
+        try {
+<span class="fc" id="L418">            country = email.substring(email.lastIndexOf('.') + 1);</span>
+<span class="nc" id="L419">        } catch (NullPointerException e) {</span>
+<span class="nc" id="L420">            logger.warn(&quot;Error finding country from email {}&quot;, email, e);</span>
+<span class="fc" id="L421">        }</span>
+
+        try {
+<span class="pc bpc" id="L424" title="1 of 2 branches missed.">            if (CountryCode.valueOf(country) != null) {</span>
+<span class="fc" id="L425">                cc = CountryCode.valueOf(country);</span>
+            }
+<span class="nc" id="L427">        } catch (IllegalArgumentException e) {</span>
+<span class="nc" id="L428">            logger.warn(&quot;Cannot determine country from email extension {}: user will be mapped to Antartica&quot;, country, e);</span>
+<span class="fc" id="L429">        }</span>
+
+<span class="fc" id="L431">        return new User(</span>
+<span class="fc" id="L432">                firstName.trim(),</span>
+<span class="fc" id="L433">                lastName.trim(),</span>
+<span class="fc" id="L434">                email.trim(),</span>
+<span class="fc" id="L435">                institution.trim(),</span>
+                &quot;0000&quot;,
+<span class="fc" id="L437">                cc, getCurrentTimeStamp());</span>
+    }
+
+    public void signout(String email) throws BusinessException {
+        try {
+<span class="fc" id="L442">            String session = UUID.randomUUID().toString();</span>
+<span class="fc" id="L443">            userDAO.updateSession(email, session);</span>
+<span class="nc" id="L444">        } catch (DAOException ex) {</span>
+<span class="nc" id="L445">            throw new BusinessException(ex);</span>
+<span class="fc" id="L446">        }</span>
+<span class="fc" id="L447">    }</span>
+
+    public User activate(String email, String code) throws BusinessException {
+        try {
+<span class="pc bpc" id="L451" title="1 of 2 branches missed.">            if (userDAO.isLocked(email)) {</span>
+<span class="nc" id="L452">                logger.error(&quot;Activation failed to '&quot; + email + &quot;' (user is locked).&quot;);</span>
+<span class="nc" id="L453">                throw new BusinessException(&quot;User is locked.&quot;);</span>
+            }
+<span class="fc bfc" id="L455" title="All 2 branches covered.">            if (userDAO.activate(email, code)) {</span>
+
+<span class="fc" id="L457">                User user = userDAO.getUser(email);</span>
+<span class="fc" id="L458">                userDAO.resetNFailedAuthentications(email);</span>
+
+<span class="fc" id="L460">                gridaClient.createFolder(server.getDataManagerUsersHome(),</span>
+<span class="fc" id="L461">                        user.getFolder());</span>
+
+<span class="fc" id="L463">                gridaClient.createFolder(server.getDataManagerUsersHome(),</span>
+<span class="fc" id="L464">                        user.getFolder() + &quot;_&quot; + CoreConstants.FOLDER_TRASH);</span>
+
+<span class="fc" id="L466">                return user;</span>
+
+            } else {
+<span class="fc" id="L469">                userDAO.incNFailedAuthentications(email);</span>
+<span class="pc bpc" id="L470" title="1 of 2 branches missed.">                if (userDAO.getNFailedAuthentications(email) &gt; 5) {</span>
+<span class="nc" id="L471">                    userDAO.lock(email);</span>
+                }
+<span class="fc" id="L473">                logger.error(&quot;Activation failed to '&quot; + email + &quot;' (wrong code: &quot; + code + &quot;).&quot;);</span>
+<span class="fc" id="L474">                throw new BusinessException(&quot;Activation failed.&quot;);</span>
+            }
+
+<span class="nc" id="L477">        } catch (GRIDAClientException ex) {</span>
+<span class="nc" id="L478">            logger.error(&quot;Error activating {}&quot;, email, ex);</span>
+<span class="nc" id="L479">            throw new BusinessException(ex);</span>
+<span class="nc" id="L480">        } catch (DAOException ex) {</span>
+<span class="nc" id="L481">            throw new BusinessException(ex);</span>
+        }
+    }
+
+    public void activateUser(String email) throws BusinessException {
+        try {
+<span class="fc" id="L487">            User user = userDAO.getUser(email);</span>
+<span class="fc" id="L488">            activate(email, user.getCode());</span>
+<span class="nc" id="L489">        } catch (DAOException ex) {</span>
+<span class="nc" id="L490">            throw new BusinessException(ex);</span>
+<span class="fc" id="L491">        }</span>
+<span class="fc" id="L492">    }</span>
+
+    public void sendActivationCode(String email) throws BusinessException {
+        try {
+<span class="fc" id="L496">            User user = userDAO.getUser(email);</span>
+
+<span class="pc bpc" id="L498" title="1 of 2 branches missed.">            if (userDAO.isLocked(email)) {</span>
+<span class="nc" id="L499">                logger.error(&quot;Cannot send activation code to {} : account locked&quot;, email);</span>
+<span class="nc" id="L500">                throw new BusinessException(&quot;User is locked.&quot;);</span>
+            }
+
+<span class="fc" id="L503">            String emailContent = &quot;&lt;html&gt;&quot;</span>
+                    + &quot;&lt;head&gt;&lt;/head&gt;&quot;
+                    + &quot;&lt;body&gt;&quot;
+<span class="fc" id="L506">                    + &quot;&lt;p&gt;Dear &quot; + user.getFullName() + &quot;,&lt;/p&gt;&quot;</span>
+                    + &quot;&lt;p&gt;You requested us to send you your personal activation code.&lt;/p&gt;&quot;
+                    + &quot;&lt;p&gt;Please use the following code to activate your account:&lt;/p&gt;&quot;
+<span class="fc" id="L509">                    + &quot;&lt;p&gt;&lt;b&gt;&quot; + user.getCode() + &quot;&lt;/b&gt;&lt;/p&gt;&quot;</span>
+                    + &quot;&lt;p&gt;Best Regards,&lt;/p&gt;&quot;
+                    + &quot;&lt;p&gt;VIP Team&lt;/p&gt;&quot;
+                    + &quot;&lt;/body&gt;&quot;
+                    + &quot;&lt;/html&gt;&quot;;
+
+<span class="fc" id="L515">            emailBusiness.sendEmail(&quot;VIP activation code (reminder)&quot;, emailContent,</span>
+<span class="fc" id="L516">                    new String[]{user.getEmail()}, true, user.getEmail());</span>
+
+<span class="fc" id="L518">        } catch (DAOException ex) {</span>
+<span class="fc" id="L519">            throw new BusinessException(ex);</span>
+<span class="fc" id="L520">        }</span>
+<span class="fc" id="L521">    }</span>
+
+    public void sendResetCode(String email) throws BusinessException {
+        try {
+<span class="fc" id="L525">            User user = userDAO.getUser(email);</span>
+
+<span class="pc bpc" id="L527" title="1 of 2 branches missed.">            if (userDAO.isLocked(email)) {</span>
+<span class="nc" id="L528">                logger.error(&quot;Cannot send reset code to {} : account locked&quot;, email);</span>
+<span class="nc" id="L529">                throw new BusinessException(&quot;User is locked.&quot;);</span>
+            }
+
+<span class="fc" id="L532">            String code = UUID.randomUUID().toString();</span>
+<span class="fc" id="L533">            userDAO.updateCode(email, code);</span>
+
+<span class="fc" id="L535">            String emailContent = &quot;&lt;html&gt;&quot;</span>
+                    + &quot;&lt;head&gt;&lt;/head&gt;&quot;
+                    + &quot;&lt;body&gt;&quot;
+<span class="fc" id="L538">                    + &quot;&lt;p&gt;Dear &quot; + user.getFullName() + &quot;,&lt;/p&gt;&quot;</span>
+                    + &quot;&lt;p&gt;You recently requested a new password to sign in to your VIP account.&lt;/p&gt;&quot;
+                    + &quot;&lt;p&gt;Please use the following code to reset your password:&lt;/p&gt;&quot;
+                    + &quot;&lt;p&gt;&lt;b&gt;&quot; + code + &quot;&lt;/b&gt;&lt;/p&gt;&quot;
+                    + &quot;&lt;p&gt;Best Regards,&lt;/p&gt;&quot;
+                    + &quot;&lt;p&gt;VIP Team&lt;/p&gt;&quot;
+                    + &quot;&lt;/body&gt;&quot;
+                    + &quot;&lt;/html&gt;&quot;;
+
+<span class="fc" id="L547">            emailBusiness.sendEmail(&quot;Code to reset your VIP password&quot;, emailContent,</span>
+<span class="fc" id="L548">                    new String[]{user.getEmail()}, true, user.getEmail());</span>
+
+<span class="fc" id="L550">        } catch (DAOException ex) {</span>
+<span class="fc" id="L551">            throw new BusinessException(ex);</span>
+<span class="fc" id="L552">        }</span>
+<span class="fc" id="L553">    }</span>
+
+    public void requestNewEmail(User user, String newEmail)
+            throws BusinessException {
+
+        try {
+<span class="fc" id="L559">            String code = UUID.randomUUID().toString();</span>
+<span class="fc" id="L560">            userDAO.updateCode(user.getEmail(), code);</span>
+<span class="fc" id="L561">            userDAO</span>
+<span class="fc" id="L562">                    .updateNextEmail(user.getEmail(), newEmail);</span>
+
+<span class="fc" id="L564">            String emailContent = &quot;&lt;html&gt;&quot;</span>
+                    + &quot;&lt;head&gt;&lt;/head&gt;&quot;
+                    + &quot;&lt;body&gt;&quot;
+<span class="fc" id="L567">                    + &quot;&lt;p&gt;Dear &quot; + user.getFullName() + &quot;,&lt;/p&gt;&quot;</span>
+                    + &quot;&lt;p&gt;You requested to link your VIP account to this email address.&lt;/p&gt;&quot;
+                    + &quot;&lt;p&gt;Please use the following code to activate it in your VIP account page:&lt;/p&gt;&quot;
+                    + &quot;&lt;p&gt;&lt;b&gt;&quot; + code + &quot;&lt;/b&gt;&lt;/p&gt;&quot;
+                    + &quot;&lt;p&gt;You will have to refresh your VIP web page if you have not done it since you requested the change.&lt;/p&gt;&quot;
+                    + &quot;&lt;p&gt;Please note that your login email is still &quot;
+<span class="fc" id="L573">                    + user.getEmail() + &quot; until you validate it.&lt;/p&gt;&quot;</span>
+                    + &quot;&lt;p&gt;Best Regards,&lt;/p&gt;&quot;
+                    + &quot;&lt;p&gt;VIP Team&lt;/p&gt;&quot;
+                    + &quot;&lt;/body&gt;&quot;
+                    + &quot;&lt;/html&gt;&quot;;
+
+<span class="fc" id="L579">            emailBusiness.sendEmail(&quot;Code to confirm your VIP email address&quot;, emailContent,</span>
+                    new String[]{newEmail}, true, newEmail);
+
+<span class="nc" id="L582">        } catch (DAOException ex) {</span>
+<span class="nc" id="L583">            throw new BusinessException(ex);</span>
+<span class="fc" id="L584">        }</span>
+<span class="fc" id="L585">    }</span>
+
+    public void removeUser(String email, boolean sendNotificationEmail)
+            throws BusinessException {
+
+        try {
+<span class="fc" id="L591">            User user = getUser(email);</span>
+
+<span class="fc" id="L593">            gridaPoolClient.removeOperationsByUser(email);</span>
+
+<span class="fc" id="L595">            gridaPoolClient.delete(server.getDataManagerUsersHome() + &quot;/&quot;</span>
+<span class="fc" id="L596">                    + user.getFolder(), user.getEmail());</span>
+<span class="fc" id="L597">            gridaPoolClient.delete(server.getDataManagerUsersHome() + &quot;/&quot;</span>
+<span class="fc" id="L598">                    + user.getFolder() + &quot;_&quot; + CoreConstants.FOLDER_TRASH, user.getEmail());</span>
+
+<span class="fc" id="L600">            userDAO.remove(email);</span>
+
+<span class="fc bfc" id="L602" title="All 2 branches covered.">            if (sendNotificationEmail) {</span>
+
+<span class="fc" id="L604">                String adminsEmailContents = &quot;&lt;html&gt;&quot;</span>
+                        + &quot;&lt;head&gt;&lt;/head&gt;&quot;
+                        + &quot;&lt;body&gt;&quot;
+                        + &quot;&lt;p&gt;Dear Administrators,&lt;/p&gt;&quot;
+                        + &quot;&lt;p&gt;The following user removed her/his account:&lt;/p&gt;&quot;
+<span class="fc" id="L609">                        + &quot;&lt;p&gt;&lt;b&gt;First Name:&lt;/b&gt; &quot; + user.getFirstName() + &quot;&lt;/p&gt;&quot;</span>
+<span class="fc" id="L610">                        + &quot;&lt;p&gt;&lt;b&gt;Last Name:&lt;/b&gt; &quot; + user.getLastName() + &quot;&lt;/p&gt;&quot;</span>
+<span class="fc" id="L611">                        + &quot;&lt;p&gt;&lt;b&gt;Email:&lt;/b&gt; &quot; + user.getEmail() + &quot;&lt;/p&gt;&quot;</span>
+<span class="fc" id="L612">                        + &quot;&lt;p&gt;&lt;b&gt;Institution:&lt;/b&gt; &quot; + user.getInstitution() + &quot;&lt;/p&gt;&quot;</span>
+                        + &quot;&lt;p&gt;&amp;nbsp;&lt;/p&gt;&quot;
+                        + &quot;&lt;p&gt;Best Regards,&lt;/p&gt;&quot;
+                        + &quot;&lt;p&gt;VIP Team&lt;/p&gt;&quot;
+                        + &quot;&lt;/body&gt;&quot;
+                        + &quot;&lt;/html&gt;&quot;;
+
+<span class="pc bpc" id="L619" title="1 of 2 branches missed.">                for (String adminEmail : getAdministratorsEmails()) {</span>
+<span class="pc" id="L620">                    emailBusiness.sendEmail(&quot;[VIP Admin] Account Removed&quot;, adminsEmailContents,</span>
+<span class="fc" id="L621">                            new String[]{adminEmail}, true, user.getEmail());</span>
+                }
+            }
+<span class="nc" id="L624">        } catch (GRIDAClientException ex) {</span>
+<span class="nc" id="L625">            logger.error(&quot;Error removing user {}&quot;, email, ex);</span>
+<span class="nc" id="L626">            throw new BusinessException(ex);</span>
+<span class="nc" id="L627">        } catch (DAOException ex) {</span>
+<span class="nc" id="L628">            throw new BusinessException(ex);</span>
+<span class="fc" id="L629">        }</span>
+<span class="fc" id="L630">    }</span>
+
+    public List&lt;User&gt; getUsers() throws BusinessException {
+        try {
+<span class="fc" id="L634">            return userDAO.getUsers();</span>
+<span class="nc" id="L635">        } catch (DAOException ex) {</span>
+<span class="nc" id="L636">            throw new BusinessException(ex);</span>
+        }
+    }
+
+    public List&lt;String&gt; getUserNames(String email, boolean validGroup)
+            throws BusinessException {
+        try {
+<span class="pc bpc" id="L643" title="1 of 2 branches missed.">            if (validGroup) {</span>
+                // Discarded the effect of validGroups as this has several side effects (see #2669)
+                //List&lt;String&gt; groups = CoreDAOFactory.getDAOFactory().getUsersGroupsDAO().getUserAdminGroups(email);
+                // if (groups.isEmpty()) {
+<span class="fc" id="L647">                List&lt;String&gt; userNames = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L648">                userNames.add(userDAO.getUser(email).getFullName());</span>
+<span class="fc" id="L649">                return userNames;</span>
+
+//                } else {
+//                    return CoreDAOFactory.getDAOFactory().getUsersGroupsDAO().getUsersFromGroups(groups);
+//                }
+            } else {
+<span class="nc" id="L655">                List&lt;String&gt; userNames = new ArrayList&lt;&gt;();</span>
+<span class="nc bnc" id="L656" title="All 2 branches missed.">                for (User user : getUsers()) {</span>
+<span class="nc" id="L657">                    userNames.add(user.getFullName());</span>
+<span class="nc" id="L658">                }</span>
+
+<span class="nc" id="L660">                return userNames;</span>
+            }
+<span class="nc" id="L662">        } catch (DAOException ex) {</span>
+<span class="nc" id="L663">            throw new BusinessException(ex);</span>
+        }
+    }
+
+    public void addGroup(Group group) throws BusinessException {
+        try {
+<span class="fc" id="L669">            gridaClient.createFolder(server.getDataManagerGroupsHome(),</span>
+<span class="fc" id="L670">                    group.getName().replaceAll(&quot; &quot;, &quot;_&quot;));</span>
+
+<span class="fc" id="L672">            groupDAO.add(group);</span>
+<span class="nc" id="L673">        } catch (GRIDAClientException ex) {</span>
+<span class="nc" id="L674">            logger.error(&quot;Error adding group : {}&quot;, group.getName(), ex);</span>
+<span class="nc" id="L675">            throw new BusinessException(ex);</span>
+<span class="fc" id="L676">        } catch (DAOException ex) {</span>
+<span class="fc" id="L677">            throw new BusinessException(ex);</span>
+<span class="fc" id="L678">        }</span>
+<span class="fc" id="L679">    }</span>
+
+    public void removeGroup(String user, String groupName)
+            throws BusinessException {
+        try {
+<span class="fc" id="L684">            gridaPoolClient.delete(server.getDataManagerGroupsHome() + &quot;/&quot;</span>
+<span class="fc" id="L685">                    + groupName.replaceAll(&quot; &quot;, &quot;_&quot;), user);</span>
+<span class="fc" id="L686">            groupDAO.remove(groupName);</span>
+<span class="nc" id="L687">        } catch (GRIDAClientException ex) {</span>
+<span class="nc" id="L688">            logger.error(&quot;Error removing group : {}&quot;, groupName, ex);</span>
+<span class="nc" id="L689">            throw new BusinessException(ex);</span>
+<span class="nc" id="L690">        } catch (DAOException ex) {</span>
+<span class="nc" id="L691">            throw new BusinessException(ex);</span>
+<span class="fc" id="L692">        }</span>
+<span class="fc" id="L693">    }</span>
+
+    public void updateGroup(String name, Group group) throws BusinessException {
+        try {
+<span class="pc bpc" id="L697" title="1 of 2 branches missed.">            if (!name.equals(group.getName())) {</span>
+<span class="fc" id="L698">                gridaClient.rename(</span>
+<span class="fc" id="L699">                        server.getDataManagerGroupsHome() + &quot;/&quot; + name.replaceAll(&quot; &quot;, &quot;_&quot;),</span>
+<span class="fc" id="L700">                        server.getDataManagerGroupsHome() + &quot;/&quot; + group.getName().replaceAll(&quot; &quot;, &quot;_&quot;));</span>
+            }
+<span class="fc" id="L702">            groupDAO.update(name, group);</span>
+<span class="nc" id="L703">        } catch (GRIDAClientException ex) {</span>
+<span class="nc" id="L704">            logger.error(&quot;Error updating group : {}&quot;, name, ex);</span>
+<span class="nc" id="L705">            throw new BusinessException(ex);</span>
+<span class="nc" id="L706">        } catch (DAOException ex) {</span>
+<span class="nc" id="L707">            throw new BusinessException(ex);</span>
+<span class="fc" id="L708">        }</span>
+<span class="fc" id="L709">    }</span>
+
+    public List&lt;Group&gt; getGroups() throws BusinessException {
+        try {
+<span class="fc" id="L713">            return groupDAO.getGroups();</span>
+<span class="nc" id="L714">        } catch (DAOException ex) {</span>
+<span class="nc" id="L715">            throw new BusinessException(ex);</span>
+        }
+    }
+
+    public Group getGroup(String groupName) throws BusinessException {
+<span class="fc bfc" id="L720" title="All 2 branches covered.">        if (groupName == null) {</span>
+<span class="fc" id="L721">            return null;</span>
+        }
+<span class="fc" id="L723">        return this.getGroups().stream()</span>
+<span class="fc" id="L724">                .filter(g -&gt; groupName.equals(g.getName()))</span>
+<span class="fc" id="L725">                .findAny().orElse(null);</span>
+    }
+
+    public List&lt;Group&gt; getPublicGroups() throws BusinessException {
+        try {
+<span class="fc" id="L730">            List&lt;Group&gt; publicGroups = new ArrayList&lt;&gt;();</span>
+<span class="fc bfc" id="L731" title="All 2 branches covered.">            for (Group g : groupDAO.getGroups()) {</span>
+<span class="fc bfc" id="L732" title="All 2 branches covered.">                if (g.isPublicGroup()) {</span>
+<span class="fc" id="L733">                    publicGroups.add(g);</span>
+                }
+<span class="fc" id="L735">            }</span>
+<span class="fc" id="L736">            return publicGroups;</span>
+<span class="nc" id="L737">        } catch (DAOException ex) {</span>
+<span class="nc" id="L738">            throw new BusinessException(ex);</span>
+        }
+    }
+
+    public Map&lt;Group, CoreConstants.GROUP_ROLE&gt; getUserGroups(String email)
+            throws BusinessException {
+        try {
+<span class="fc" id="L745">            return usersGroupsDAO.getUserGroups(email);</span>
+
+<span class="nc" id="L747">        } catch (DAOException ex) {</span>
+<span class="nc" id="L748">            throw new BusinessException(ex);</span>
+        }
+    }
+
+    public List&lt;Boolean&gt; getUserPropertiesGroups(String email)
+            throws BusinessException {
+        try {
+<span class="fc" id="L755">            return usersGroupsDAO.getUserPropertiesGroups(email);</span>
+
+<span class="nc" id="L757">        } catch (DAOException ex) {</span>
+<span class="nc" id="L758">            throw new BusinessException(ex);</span>
+        }
+    }
+
+    public List&lt;String&gt; getUserGroupsName(
+            Map&lt;String, CoreConstants.GROUP_ROLE&gt; groups) {
+<span class="nc" id="L764">        return new ArrayList&lt;&gt;(groups.keySet());</span>
+    }
+
+    public void setUserGroups(
+            String email, Map&lt;String, CoreConstants.GROUP_ROLE&gt; groups)
+            throws BusinessException {
+        try {
+<span class="nc" id="L771">            usersGroupsDAO.setUserGroups(email, groups);</span>
+<span class="nc" id="L772">        } catch (DAOException ex) {</span>
+<span class="nc" id="L773">            throw new BusinessException(ex);</span>
+<span class="nc" id="L774">        }</span>
+<span class="nc" id="L775">    }</span>
+
+    public User getUserData(String email) throws BusinessException {
+        try {
+<span class="fc" id="L779">            return userDAO.getUser(email);</span>
+<span class="fc" id="L780">        } catch (DAOException ex) {</span>
+<span class="fc" id="L781">            throw new BusinessException(ex);</span>
+        }
+    }
+
+    public User updateUser(User user) throws BusinessException {
+        try {
+<span class="fc" id="L787">            userDAO.update(user);</span>
+<span class="fc" id="L788">            return user;</span>
+<span class="nc" id="L789">        } catch (DAOException ex) {</span>
+<span class="nc" id="L790">            throw new BusinessException(ex);</span>
+        }
+    }
+
+    public void updateUserPassword(
+            String email, String currentPassword, String newPassword)
+            throws BusinessException {
+
+        try {
+<span class="fc" id="L799">            currentPassword = MD5.get(currentPassword);</span>
+<span class="fc" id="L800">            newPassword = MD5.get(newPassword);</span>
+<span class="fc" id="L801">            userDAO.updatePassword(email, currentPassword, newPassword);</span>
+<span class="nc" id="L802">        } catch (NoSuchAlgorithmException | UnsupportedEncodingException ex) {</span>
+<span class="nc" id="L803">            logger.error(&quot;Error updating password for {}&quot;, email, ex);</span>
+<span class="nc" id="L804">            throw new BusinessException(ex);</span>
+<span class="fc" id="L805">        } catch (DAOException ex) {</span>
+<span class="fc" id="L806">            throw new BusinessException(ex);</span>
+<span class="fc" id="L807">        }</span>
+<span class="fc" id="L808">    }</span>
+
+    public void updateUserEmail(String oldEmail, String newEmail)
+            throws BusinessException {
+<span class="fc" id="L812">        verifyEmail(newEmail);</span>
+        try {
+<span class="fc" id="L814">            userDAO.updateEmail(oldEmail, newEmail);</span>
+<span class="nc" id="L815">        } catch (DAOException e) {</span>
+<span class="nc" id="L816">            String errorMessage = &quot;Error changing email from &quot; + newEmail + &quot; to &quot; + newEmail;</span>
+<span class="nc" id="L817">            sendErrorEmailToAdmins(errorMessage, e, oldEmail);</span>
+<span class="nc" id="L818">            throw new BusinessException(&quot;Error changing email address&quot;, e);</span>
+<span class="fc" id="L819">        }</span>
+
+<span class="fc" id="L821">    }</span>
+
+    public void resetNextEmail(String currentEmail) throws BusinessException {
+        try {
+<span class="fc" id="L825">            userDAO.updateNextEmail(currentEmail, null);</span>
+<span class="nc" id="L826">        } catch (DAOException e) {</span>
+<span class="nc" id="L827">            throw new BusinessException(e);</span>
+<span class="fc" id="L828">        }</span>
+<span class="fc" id="L829">    }</span>
+
+    public void updateTermsOfUse(String email) throws BusinessException {
+        try {
+<span class="fc" id="L833">            userDAO.updateTermsOfUse(email, getCurrentTimeStamp());</span>
+<span class="nc" id="L834">        } catch (DAOException ex) {</span>
+<span class="nc" id="L835">            throw new BusinessException(ex);</span>
+<span class="fc" id="L836">        }</span>
+<span class="fc" id="L837">    }</span>
+
+    public void updateLastUpdatePublication(String email) throws BusinessException {
+        try {
+<span class="fc" id="L841">            userDAO.updateLastUpdatePublication(email, getCurrentTimeStamp());</span>
+<span class="nc" id="L842">        } catch (DAOException ex) {</span>
+<span class="nc" id="L843">            throw new BusinessException(ex);</span>
+<span class="fc" id="L844">        }</span>
+<span class="fc" id="L845">    }</span>
+
+    public void sendContactMail(
+            User user, String category, String subject, String comment)
+            throws BusinessException {
+        try {
+<span class="fc" id="L851">            String emailContent = &quot;&lt;html&gt;&quot;</span>
+                    + &quot;&lt;head&gt;&lt;/head&gt;&quot;
+                    + &quot;&lt;body&gt;&quot;
+                    + &quot;&lt;p&gt;&lt;b&gt;VIP Contact&lt;/b&gt;&lt;/p&gt;&quot;
+<span class="fc" id="L855">                    + &quot;&lt;p&gt;&lt;b&gt;User:&lt;/b&gt; &quot; + user.getFullName() + &quot;&lt;/p&gt;&quot;</span>
+<span class="fc" id="L856">                    + &quot;&lt;p&gt;&lt;b&gt;Email:&lt;/b&gt; &lt;a href=\&quot;mailto:&quot; + user.getEmail() + &quot;\&quot;&gt;&quot; + user.getEmail() + &quot;&lt;/a&gt;&lt;/p&gt;&quot;</span>
+                    + &quot;&lt;p&gt;&amp;nbsp;&lt;/p&gt;&quot;
+                    + &quot;&lt;p&gt;&lt;b&gt;Category:&lt;/b&gt; &quot; + category + &quot;&lt;/p&gt;&quot;
+                    + &quot;&lt;p&gt;&lt;b&gt;Subject:&lt;/b&gt; &quot; + subject + &quot;&lt;/p&gt;&quot;
+                    + &quot;&lt;p&gt;&amp;nbsp;&lt;/p&gt;&quot;
+                    + &quot;&lt;p&gt;&lt;b&gt;Comments:&lt;/b&gt;&lt;/p&gt;&quot;
+                    + &quot;&lt;p&gt;&quot; + comment + &quot;&lt;/p&gt;&quot;
+                    + &quot;&lt;/body&gt;&quot;
+                    + &quot;&lt;/html&gt;&quot;;
+
+<span class="fc bfc" id="L866" title="All 2 branches covered.">            for (User u : usersGroupsDAO.getUsersFromGroup(CoreConstants.GROUP_SUPPORT)) {</span>
+<span class="fc" id="L867">                emailBusiness.sendEmail(&quot;[VIP Contact] &quot; + category, emailContent,</span>
+<span class="fc" id="L868">                        new String[]{u.getEmail()}, true, user.getEmail());</span>
+<span class="fc" id="L869">            }</span>
+<span class="nc" id="L870">        } catch (DAOException ex) {</span>
+<span class="nc" id="L871">            throw new BusinessException(ex);</span>
+<span class="fc" id="L872">        }</span>
+<span class="fc" id="L873">    }</span>
+
+    public void updateUserLastLogin(String email) throws BusinessException {
+        try {
+<span class="fc" id="L877">            userDAO.updateLastLogin(email, new Date());</span>
+<span class="nc" id="L878">        } catch (DAOException ex) {</span>
+<span class="nc" id="L879">            throw new BusinessException(ex);</span>
+<span class="fc" id="L880">        }</span>
+<span class="fc" id="L881">    }</span>
+
+    public void addUserToGroup(String email, String groupName) throws BusinessException {
+        try {
+<span class="fc" id="L885">            usersGroupsDAO.add(email, groupName, GROUP_ROLE.User);</span>
+<span class="fc" id="L886">        } catch (DAOException ex) {</span>
+<span class="fc" id="L887">            throw new BusinessException(ex);</span>
+<span class="fc" id="L888">        }</span>
+<span class="fc" id="L889">    }</span>
+
+    public void updateUser(
+            String email, UserLevel level, CountryCode countryCode,
+            int maxRunningSimulations, boolean locked)
+            throws BusinessException {
+        try {
+<span class="nc" id="L896">            userDAO.update(</span>
+                    email, level, countryCode, maxRunningSimulations, locked);
+<span class="nc" id="L898">        } catch (DAOException ex) {</span>
+<span class="nc" id="L899">            throw new BusinessException(ex);</span>
+<span class="nc" id="L900">        }</span>
+<span class="nc" id="L901">    }</span>
+
+    public List&lt;User&gt; getUsersFromGroup(String groupName) throws BusinessException {
+        try {
+<span class="fc" id="L905">            return usersGroupsDAO.getUsersFromGroup(groupName);</span>
+
+<span class="nc" id="L907">        } catch (DAOException ex) {</span>
+<span class="nc" id="L908">            throw new BusinessException(ex);</span>
+        }
+    }
+
+    public void removeUserFromGroup(String email, String groupName)
+            throws BusinessException {
+        try {
+<span class="fc" id="L915">            usersGroupsDAO.removeUserFromGroup(email, groupName);</span>
+
+<span class="nc" id="L917">        } catch (DAOException ex) {</span>
+<span class="nc" id="L918">            throw new BusinessException(ex);</span>
+<span class="fc" id="L919">        }</span>
+<span class="fc" id="L920">    }</span>
+
+    public void resetPassword(String email, String code, String password)
+            throws BusinessException {
+
+        try {
+<span class="fc" id="L926">            User user = userDAO.getUser(email);</span>
+
+<span class="fc bfc" id="L928" title="All 2 branches covered.">            if (code.equals(user.getCode())) {</span>
+<span class="fc" id="L929">                userDAO.resetPassword(email, MD5.get(password));</span>
+            } else {
+<span class="fc" id="L931">                logger.error(&quot;Wrong reset code for {} : {}&quot;, email, code);</span>
+<span class="fc" id="L932">                throw new BusinessException(&quot;Wrong reset code.&quot;);</span>
+            }
+<span class="nc" id="L934">        } catch (NoSuchAlgorithmException | UnsupportedEncodingException ex) {</span>
+<span class="nc" id="L935">            logger.error(&quot;Error resetting password for {}&quot;, email, ex);</span>
+<span class="nc" id="L936">            throw new BusinessException(ex);</span>
+<span class="nc" id="L937">        } catch (DAOException ex) {</span>
+<span class="nc" id="L938">            throw new BusinessException(ex);</span>
+<span class="fc" id="L939">        }</span>
+<span class="fc" id="L940">    }</span>
+
+    public List&lt;String&gt; getSupportEmails() throws BusinessException {
+        try {
+<span class="nc" id="L944">            return usersGroupsDAO.getUsersFromGroup(CoreConstants.GROUP_SUPPORT)</span>
+<span class="nc" id="L945">                    .stream().map(User::getEmail)</span>
+<span class="nc" id="L946">                    .collect(Collectors.toList());</span>
+<span class="nc" id="L947">        } catch (DAOException e) {</span>
+<span class="nc" id="L948">            throw new BusinessException(e);</span>
+        }
+    }
+
+    /**
+     * Gets an array of administrator's e-mails
+     */
+    private String[] getAdministratorsEmails() throws DAOException {
+<span class="fc" id="L956">        List&lt;String&gt; emails = new ArrayList&lt;&gt;();</span>
+<span class="fc bfc" id="L957" title="All 2 branches covered.">        for (User admin : userDAO.getAdministrators()) {</span>
+<span class="fc" id="L958">            emails.add(admin.getEmail());</span>
+<span class="fc" id="L959">        }</span>
+<span class="fc" id="L960">        return emails.toArray(new String[]{});</span>
+    }
+
+    public User getUserWithSession(String email) throws DAOException {
+
+<span class="fc" id="L965">        String session = UUID.randomUUID().toString();</span>
+<span class="fc" id="L966">        userDAO.updateSession(email, session);</span>
+
+<span class="fc" id="L968">        return userDAO.getUser(email);</span>
+    }
+
+    public String getLoginUrlCas(URL serviceURL) {
+<span class="fc" id="L972">        return server.getCasURL() + &quot;/login?service=&quot; + serviceURL;</span>
+    }
+
+
+    public User getOrCreateUser(String email, String institution, String groupName)
+            throws BusinessException {
+
+<span class="fc" id="L979">        verifyEmail(email);</span>
+
+        User user;
+        try {
+<span class="fc" id="L983">            user = getUserWithSession(email);</span>
+<span class="fc" id="L984">        } catch (DAOException ex) {</span>
+            //User doesn't exist: let's create an account
+<span class="fc" id="L986">            String name = email.substring(0, email.indexOf('@'));</span>
+<span class="fc" id="L987">            String firstName = name, lastName = name;</span>
+
+<span class="fc" id="L989">            String[] delimiters = {&quot;\\.&quot;, &quot;-&quot;, &quot;_&quot;};</span>
+<span class="fc bfc" id="L990" title="All 2 branches covered.">            for (String delimiter : delimiters) {</span>
+<span class="pc bpc" id="L991" title="3 of 4 branches missed.">                if (name.contains(&quot;.&quot;) &amp;&amp; name.split(delimiter).length &gt;= 2) {</span>
+<span class="nc" id="L992">                    firstName = name.split(delimiter)[0];</span>
+<span class="nc" id="L993">                    lastName = name.split(delimiter)[1];</span>
+<span class="nc" id="L994">                    break;</span>
+                }
+            }
+
+<span class="fc" id="L998">            user = getNewUser(email, firstName, lastName, institution);</span>
+            try {
+<span class="fc" id="L1000">                signup(user, &quot;Generated automatically&quot;, true, true,</span>
+<span class="fc" id="L1001">                        getGroup(groupName));</span>
+<span class="nc" id="L1002">            } catch (BusinessException ex2) {</span>
+<span class="nc bnc" id="L1003" title="All 2 branches missed.">                if (ex2.getMessage().contains(&quot;existing&quot;)) {</span>
+                    //try with a different last name
+<span class="nc" id="L1005">                    lastName += &quot;_&quot; + System.currentTimeMillis();</span>
+<span class="nc" id="L1006">                    user = getNewUser(email, firstName, lastName, institution);</span>
+<span class="nc" id="L1007">                    signup(user, &quot;Generated automatically&quot;, true,</span>
+<span class="nc" id="L1008">                            true, getGroup(groupName));</span>
+                }
+<span class="fc" id="L1010">            }</span>
+<span class="fc" id="L1011">            activateUser(user.getEmail());</span>
+            try {
+<span class="fc" id="L1013">                user = getUserWithSession(email);</span>
+<span class="nc" id="L1014">            } catch (DAOException ex1) {</span>
+<span class="nc" id="L1015">                throw new BusinessException(ex1);</span>
+<span class="fc" id="L1016">            }</span>
+
+<span class="fc" id="L1018">        }</span>
+<span class="fc" id="L1019">        return user;</span>
+    }
+
+    public void addTermsUse() throws BusinessException {
+        try {
+<span class="fc" id="L1024">            TermsOfUse termsOfUse = new TermsOfUse(getCurrentTimeStamp());</span>
+<span class="nc" id="L1025">            termsUseDAO.add(termsOfUse);</span>
+<span class="fc" id="L1026">        } catch (DAOException ex) {</span>
+<span class="fc" id="L1027">            throw new BusinessException(ex);</span>
+<span class="nc" id="L1028">        }</span>
+<span class="nc" id="L1029">    }</span>
+
+    public Timestamp getLastUpdateTermsOfUse() throws BusinessException {
+        try {
+<span class="fc" id="L1033">            return termsUseDAO.getLastUpdateTermsOfUse();</span>
+<span class="nc" id="L1034">        } catch (DAOException ex) {</span>
+<span class="nc" id="L1035">            throw new BusinessException(ex);</span>
+        }
+    }
+
+    // api key management
+
+    public boolean testLastUpdatePublication(String email) throws BusinessException {
+        try {
+<span class="nc bnc" id="L1043" title="All 2 branches missed.">            if (userDAO.getLastPublicationUpdate(email) == null) {</span>
+<span class="nc" id="L1044">                return true;</span>
+            } else {
+<span class="nc" id="L1046">                Calendar cal = Calendar.getInstance();</span>
+<span class="nc" id="L1047">                cal.setTime(userDAO.getLastPublicationUpdate(email));</span>
+<span class="nc" id="L1048">                cal.add(Calendar.MONTH, server.getNumberMonthsToTestLastPublicationUpdates());</span>
+<span class="nc" id="L1049">                Timestamp ts = new Timestamp(cal.getTime().getTime());</span>
+<span class="nc" id="L1050">                return ts.before(getCurrentTimeStamp());</span>
+            }
+<span class="nc" id="L1052">        } catch (DAOException ex) {</span>
+<span class="nc" id="L1053">            throw new BusinessException(ex);</span>
+        }
+    }
+
+    public String getUserApikey(String email) throws BusinessException {
+        try {
+<span class="fc" id="L1059">            return userDAO.getUserApikey(email);</span>
+<span class="fc" id="L1060">        } catch (DAOException e) {</span>
+<span class="fc" id="L1061">            throw new BusinessException(e);</span>
+        }
+    }
+
+    public void deleteUserApikey(String email) throws BusinessException {
+        try {
+<span class="nc" id="L1067">            userDAO.updateUserApikey(email, null);</span>
+<span class="fc" id="L1068">        } catch (DAOException e) {</span>
+<span class="fc" id="L1069">            throw new BusinessException(e);</span>
+<span class="nc" id="L1070">        }</span>
+<span class="nc" id="L1071">    }</span>
+
+    public String generateNewUserApikey(String email) throws BusinessException {
+        try {
+<span class="fc" id="L1075">            SecureRandom random = new SecureRandom();</span>
+<span class="fc" id="L1076">            String apikey = new BigInteger(130, random).toString(32);</span>
+<span class="fc" id="L1077">            userDAO.updateUserApikey(email, apikey);</span>
+<span class="fc" id="L1078">            return apikey;</span>
+<span class="fc" id="L1079">        } catch (DAOException e) {</span>
+<span class="fc" id="L1080">            throw new BusinessException(e);</span>
+        }
+    }
+
+    private void sendErrorEmailToAdmins(
+            String errorMessage, Exception exception, String userEmail) {
+        try {
+<span class="nc" id="L1087">            StringBuilder emailContent = new StringBuilder(&quot;&lt;html&gt;&lt;head&gt;&lt;/head&gt;&lt;body&gt;&quot;);</span>
+<span class="nc" id="L1088">            emailContent.append(&quot;&lt;p&gt;Dear Administrator,&lt;/p&gt;&quot;);</span>
+
+<span class="nc" id="L1090">            emailContent.append(&quot;&lt;p&gt;An error has been encountered in VIP with the following user:&quot;);</span>
+<span class="nc" id="L1091">            emailContent.append(&quot;&lt;b&gt;&quot; + userEmail + &quot;&lt;/b&gt;&lt;/p&gt;&quot;);</span>
+
+<span class="nc" id="L1093">            emailContent.append(&quot;&lt;p&gt;&lt;b&gt;&quot; + errorMessage + &quot;&lt;/b&gt;&lt;/p&gt;&quot;);</span>
+
+<span class="nc bnc" id="L1095" title="All 2 branches missed.">            if (exception != null) {</span>
+<span class="nc" id="L1096">                emailContent.append(&quot;The exception was:&quot;);</span>
+<span class="nc" id="L1097">                emailContent.append(exception);</span>
+            }
+
+<span class="nc" id="L1100">            emailContent.append(&quot;&lt;p&gt;Please check the logs for more information&lt;/p&gt;&quot;);</span>
+<span class="nc" id="L1101">            emailContent.append(&quot;&lt;p&gt;&amp;nbsp;&lt;/p&gt;&quot;);</span>
+<span class="nc" id="L1102">            emailContent.append(&quot;&lt;p&gt;Best Regards,&lt;/p&gt;&lt;p&gt;VIP Team&lt;/p&gt;&quot;);</span>
+<span class="nc" id="L1103">            emailContent.append(&quot;&lt;/body&gt;&lt;/html&gt;&quot;);</span>
+
+<span class="nc bnc" id="L1105" title="All 2 branches missed.">            for (String email : getAdministratorsEmails()) {</span>
+<span class="nc" id="L1106">                emailBusiness.sendEmail(&quot;[VIP Admin] VIP error&quot;, emailContent.toString(),</span>
+                        new String[]{email}, true, userEmail);
+            }
+<span class="nc" id="L1109">        } catch (BusinessException e) {</span>
+<span class="nc" id="L1110">            logger.error(&quot;Cannot sent mail to admin. Ignoring&quot;, e);</span>
+<span class="nc" id="L1111">        } catch (DAOException e) {</span>
+<span class="nc" id="L1112">            logger.error(&quot;Cannot sent mail to admin : {}. Ignoring&quot;, e.getMessage());</span>
+<span class="nc" id="L1113">        }</span>
+<span class="nc" id="L1114">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

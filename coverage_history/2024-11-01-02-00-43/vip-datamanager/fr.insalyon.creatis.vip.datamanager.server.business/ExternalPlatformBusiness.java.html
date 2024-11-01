@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../jacoco-resources/report.gif" type="image/gif"/><title>ExternalPlatformBusiness.java</title><link rel="stylesheet" href="../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../index.html" class="el_report">coverage</a> &gt; <a href="../index.html" class="el_bundle">vip-datamanager</a> &gt; <a href="index.source.html" class="el_package">fr.insalyon.creatis.vip.datamanager.server.business</a> &gt; <span class="el_source">ExternalPlatformBusiness.java</span></div><h1>ExternalPlatformBusiness.java</h1><pre class="source lang-java linenums">/*
+ * Copyright and authors: see LICENSE.txt in base repository.
+ *
+ * This software is a web portal for pipeline execution on distributed systems.
+ *
+ * This software is governed by the CeCILL-B license under French law and
+ * abiding by the rules of distribution of free software.  You can  use,
+ * modify and/ or redistribute the software under the terms of the CeCILL-B
+ * license as circulated by CEA, CNRS and INRIA at the following URL
+ * &quot;http://www.cecill.info&quot;.
+ *
+ * As a counterpart to the access to the source code and  rights to copy,
+ * modify and redistribute granted by the license, users are provided only
+ * with a limited warranty  and the software's author,  the holder of the
+ * economic rights,  and the successive licensors  have only  limited
+ * liability.
+ *
+ * In this respect, the user's attention is drawn to the risks associated
+ * with loading,  using,  modifying and/or developing or reproducing the
+ * software by the user in light of its specific status of free software,
+ * that may mean  that it is complicated to manipulate,  and  that  also
+ * therefore means  that it is reserved for developers  and  experienced
+ * professionals having in-depth computer knowledge. Users are therefore
+ * encouraged to load and test the software's suitability as regards their
+ * requirements in conditions enabling the security of their systems and/or
+ * data to be ensured and,  more generally, to use and operate it in the
+ * same conditions as regards security.
+ *
+ * The fact that you are presently reading this means that you have had
+ * knowledge of the CeCILL-B license and that you accept its terms.
+ */
+package fr.insalyon.creatis.vip.datamanager.server.business;
+
+import fr.insalyon.creatis.vip.core.client.bean.User;
+import fr.insalyon.creatis.vip.core.server.business.BusinessException;
+import fr.insalyon.creatis.vip.core.server.dao.DAOException;
+import fr.insalyon.creatis.vip.datamanager.client.bean.ExternalPlatform;
+import fr.insalyon.creatis.vip.datamanager.server.dao.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.sql.Connection;
+import java.util.List;
+
+/**
+ * Created by abonnet on 7/17/19.
+ */
+@Service
+@Transactional
+public class ExternalPlatformBusiness {
+
+<span class="fc" id="L55">    private final Logger logger = LoggerFactory.getLogger(getClass());</span>
+
+    private GirderStorageBusiness girderStorageBusiness;
+    private ShanoirStorageBusiness shanoirStorageBusiness;
+    private SrmStorageBusiness srmStorageBusiness;
+    private ExternalPlatformsDAO externalPlatformsDAO;
+
+    @Autowired
+    public ExternalPlatformBusiness(
+            GirderStorageBusiness girderStorageBusiness,
+            ShanoirStorageBusiness shanoirStorageBusiness,
+            SrmStorageBusiness srmStorageBusiness,
+<span class="fc" id="L67">            ExternalPlatformsDAO externalPlatformsDAO) {</span>
+<span class="fc" id="L68">        this.girderStorageBusiness = girderStorageBusiness;</span>
+<span class="fc" id="L69">        this.shanoirStorageBusiness = shanoirStorageBusiness;</span>
+<span class="fc" id="L70">        this.srmStorageBusiness = srmStorageBusiness;</span>
+<span class="fc" id="L71">        this.externalPlatformsDAO = externalPlatformsDAO;</span>
+<span class="fc" id="L72">    }</span>
+
+    public List&lt;ExternalPlatform&gt; listAll() throws BusinessException {
+        try {
+<span class="nc" id="L76">            return externalPlatformsDAO.getAll();</span>
+<span class="nc" id="L77">        } catch (DAOException e) {</span>
+<span class="nc" id="L78">            throw new BusinessException(e);</span>
+        }
+    }
+
+    public static class ParseResult {
+        final public Boolean isUri;
+        final public String result;
+
+<span class="fc" id="L86">        private ParseResult(Boolean isUri, String result) {</span>
+<span class="fc" id="L87">            this.isUri = isUri;</span>
+<span class="fc" id="L88">            this.result = result;</span>
+<span class="fc" id="L89">        }</span>
+    }
+
+    public ParseResult parseParameter(
+            String parameterName, String parameterValue, User user)
+            throws BusinessException {
+<span class="pc bpc" id="L95" title="1 of 2 branches missed.">        if ( ! parameterValue.matches(&quot;^\\w+:.*&quot;)) {</span>
+<span class="fc" id="L96">             return new ParseResult(false, parameterValue);</span>
+        }
+<span class="nc" id="L98">        int indexOfColon = parameterValue.indexOf(':');</span>
+<span class="nc" id="L99">        String platformIdentifier = parameterValue.substring(0, indexOfColon);</span>
+
+<span class="nc bnc" id="L101" title="All 2 branches missed.">        if (&quot;file&quot;.equals(platformIdentifier)) {</span>
+            // its a local file keep it as it is
+<span class="nc" id="L103">            return new ParseResult(true, parameterValue);</span>
+        }
+
+<span class="nc" id="L106">        String fileIdentifier = parameterValue.substring(indexOfColon + 1);</span>
+<span class="nc" id="L107">        ExternalPlatform externalPlatform = getById(platformIdentifier);</span>
+<span class="nc bnc" id="L108" title="All 2 branches missed.">        if (externalPlatform == null) {</span>
+<span class="nc" id="L109">            String error = &quot;Cannot find external platform : &quot; + platformIdentifier;</span>
+<span class="nc" id="L110">            logger.error(error);</span>
+<span class="nc" id="L111">            throw new BusinessException(error);</span>
+        }
+<span class="nc bnc" id="L113" title="All 4 branches missed.">        switch (externalPlatform.getType()) {</span>
+            case GIRDER:
+<span class="nc" id="L115">                String girderUri = girderStorageBusiness.generateUri(</span>
+                    externalPlatform, parameterName,
+                    fileIdentifier, user);
+<span class="nc" id="L118">                return new ParseResult(true, girderUri);</span>
+            case SHANOIR:
+<span class="nc" id="L120">                String shanoirUri = shanoirStorageBusiness.generateUri(</span>
+                        externalPlatform, parameterName, parameterValue
+                );
+<span class="nc" id="L123">                return new ParseResult(true, shanoirUri);</span>
+            case SRM:
+<span class="nc" id="L125">	        String srmUri = srmStorageBusiness.generateUri(externalPlatform,</span>
+			fileIdentifier, user);
+<span class="nc" id="L127">	        return new ParseResult(true, srmUri);</span>
+            default:
+<span class="nc" id="L129">                String error = &quot;Only girder, shanoir and srm external storages are supported. &quot;</span>
+<span class="nc" id="L130">                        + &quot; (found : &quot; + externalPlatform.getType() + &quot; )&quot;;</span>
+<span class="nc" id="L131">                logger.error(error);</span>
+<span class="nc" id="L132">                throw new BusinessException(error);</span>
+        }
+    }
+
+    private ExternalPlatform getById(String identifier) throws BusinessException {
+        try {
+<span class="nc" id="L138">            return externalPlatformsDAO.getById(identifier);</span>
+<span class="nc" id="L139">        } catch (DAOException e) {</span>
+<span class="nc" id="L140">            throw new BusinessException(e);</span>
+        }
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

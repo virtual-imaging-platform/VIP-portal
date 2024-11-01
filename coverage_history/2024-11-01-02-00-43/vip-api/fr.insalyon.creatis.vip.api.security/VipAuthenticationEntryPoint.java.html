@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../jacoco-resources/report.gif" type="image/gif"/><title>VipAuthenticationEntryPoint.java</title><link rel="stylesheet" href="../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../index.html" class="el_report">coverage</a> &gt; <a href="../index.html" class="el_bundle">vip-api</a> &gt; <a href="index.source.html" class="el_package">fr.insalyon.creatis.vip.api.security</a> &gt; <span class="el_source">VipAuthenticationEntryPoint.java</span></div><h1>VipAuthenticationEntryPoint.java</h1><pre class="source lang-java linenums">/*
+ * Copyright and authors: see LICENSE.txt in base repository.
+ *
+ * This software is a web portal for pipeline execution on distributed systems.
+ *
+ * This software is governed by the CeCILL-B license under French law and
+ * abiding by the rules of distribution of free software.  You can  use,
+ * modify and/ or redistribute the software under the terms of the CeCILL-B
+ * license as circulated by CEA, CNRS and INRIA at the following URL
+ * &quot;http://www.cecill.info&quot;.
+ *
+ * As a counterpart to the access to the source code and  rights to copy,
+ * modify and redistribute granted by the license, users are provided only
+ * with a limited warranty  and the software's author,  the holder of the
+ * economic rights,  and the successive licensors  have only  limited
+ * liability.
+ *
+ * In this respect, the user's attention is drawn to the risks associated
+ * with loading,  using,  modifying and/or developing or reproducing the
+ * software by the user in light of its specific status of free software,
+ * that may mean  that it is complicated to manipulate,  and  that  also
+ * therefore means  that it is reserved for developers  and  experienced
+ * professionals having in-depth computer knowledge. Users are therefore
+ * encouraged to load and test the software's suitability as regards their
+ * requirements in conditions enabling the security of their systems and/or
+ * data to be ensured and,  more generally, to use and operate it in the
+ * same conditions as regards security.
+ *
+ * The fact that you are presently reading this means that you have had
+ * knowledge of the CeCILL-B license and that you accept its terms.
+ */
+package fr.insalyon.creatis.vip.api.security;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import fr.insalyon.creatis.vip.api.exception.ApiException.ApiError;
+import fr.insalyon.creatis.vip.api.model.ErrorCodeAndMessage;
+import org.keycloak.adapters.springsecurity.KeycloakAuthenticationException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
+import org.springframework.http.MediaType;
+import org.springframework.security.authentication.*;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.web.AuthenticationEntryPoint;
+import org.springframework.security.web.authentication.AuthenticationFailureHandler;
+import org.springframework.stereotype.Component;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.*;
+import java.io.IOException;
+
+/**
+ * Created by abonnet on 7/26/16.
+ *
+ * Entry point that writes error response in json with a Jackson object mapper.
+ */
+@Component
+public class VipAuthenticationEntryPoint implements AuthenticationEntryPoint, AuthenticationFailureHandler {
+
+<span class="fc" id="L61">    private final Logger logger = LoggerFactory.getLogger(getClass());</span>
+
+    private final ObjectMapper objectMapper;
+
+    @Autowired
+<span class="fc" id="L66">    public VipAuthenticationEntryPoint(ObjectMapper objectMapper) {</span>
+<span class="fc" id="L67">        this.objectMapper = objectMapper;</span>
+<span class="fc" id="L68">    }</span>
+
+    @Override
+    public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
+<span class="fc" id="L72">        this.onAuthenticationFailure(request, response, authException);</span>
+<span class="fc" id="L73">    }</span>
+
+    @Override
+    public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
+        // keycloak may already have set it up
+<span class="fc bfc" id="L78" title="All 2 branches covered.">        if ( ! response.containsHeader(&quot;WWW-Authenticate&quot;)) {</span>
+<span class="fc" id="L79">            response.addHeader(&quot;WWW-Authenticate&quot;, &quot;API-key&quot;);</span>
+        }
+<span class="fc" id="L81">        response.setContentType(MediaType.APPLICATION_JSON_VALUE);</span>
+<span class="fc" id="L82">        ErrorCodeAndMessage error = new ErrorCodeAndMessage();</span>
+<span class="fc" id="L83">        logger.debug(&quot;handling auth error&quot;, authException);</span>
+<span class="fc bfc" id="L84" title="All 2 branches covered.">        if (authException instanceof BadCredentialsException) {</span>
+<span class="fc" id="L85">            error.setErrorCode(ApiError.BAD_CREDENTIALS.getCode());</span>
+<span class="fc bfc" id="L86" title="All 2 branches covered.">        } else if (authException instanceof InsufficientAuthenticationException) {</span>
+<span class="fc" id="L87">            error.setErrorCode(ApiError.INSUFFICIENT_AUTH.getCode());</span>
+<span class="pc bpc" id="L88" title="1 of 2 branches missed.">        } else if (authException instanceof KeycloakAuthenticationException) {</span>
+<span class="nc" id="L89">            error.setErrorCode(ApiError.BAD_CREDENTIALS.getCode());</span>
+        } else {
+<span class="fc" id="L91">            error.setErrorCode(ApiError.AUTHENTICATION_ERROR.getCode());</span>
+        }
+<span class="fc" id="L93">        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);</span>
+<span class="fc" id="L94">        error.setErrorMessage(authException.getMessage());</span>
+<span class="fc" id="L95">        objectMapper.writeValue(response.getOutputStream(), error);</span>
+<span class="fc" id="L96">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

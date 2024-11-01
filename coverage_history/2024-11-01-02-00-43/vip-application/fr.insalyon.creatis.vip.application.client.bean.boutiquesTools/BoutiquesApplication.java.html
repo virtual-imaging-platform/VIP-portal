@@ -1,0 +1,321 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../jacoco-resources/report.gif" type="image/gif"/><title>BoutiquesApplication.java</title><link rel="stylesheet" href="../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../index.html" class="el_report">coverage</a> &gt; <a href="../index.html" class="el_bundle">vip-application</a> &gt; <a href="index.source.html" class="el_package">fr.insalyon.creatis.vip.application.client.bean.boutiquesTools</a> &gt; <span class="el_source">BoutiquesApplication.java</span></div><h1>BoutiquesApplication.java</h1><pre class="source lang-java linenums">package fr.insalyon.creatis.vip.application.client.bean.boutiquesTools;
+
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
+import com.google.gwt.user.client.rpc.IsSerializable;
+
+import fr.insalyon.creatis.vip.application.client.bean.boutiquesTools.BoutiquesInput.InputType;
+
+/**
+ * Representation of an application Boutiques descriptor
+ *
+ * @author Guillaume Vanel
+ * @version %I%, %G%
+ */
+public class BoutiquesApplication implements IsSerializable {
+
+    private String name;
+    private String description;
+    private String version;
+<span class="pc" id="L27">    private Set&lt;BoutiquesInput&gt; inputs = new HashSet&lt;&gt;();</span>
+    // Input dependencies
+<span class="pc" id="L29">    private Set&lt;BoutiquesGroup&gt; groups = new HashSet&lt;&gt;();</span>
+    // Other properties not used for launch form generation
+    private String applicationLFN;
+    private String author;
+    private String commandLine;
+    private String containerType;
+    private String containerImage;
+    private String containerIndex;
+    private String schemaVersion;
+    private String challengerEmail;
+    private String challengerTeam;
+    private String vipContainer;
+<span class="pc" id="L41">    private Set&lt;BoutiquesOutputFile&gt; outputFiles = new HashSet&lt;&gt;();</span>
+<span class="pc" id="L42">    private Map&lt;String, String&gt; tags = new HashMap&lt;&gt;();</span>
+    private String jsonFile;
+    private Set&lt;String&gt; vipDotInputIds;
+    private boolean vipDotIncludesResultsDir;
+
+    private BoutiquesApplicationExtensions boutiquesExtensions;
+
+<span class="nc" id="L49">    public BoutiquesApplication(){}</span>
+
+    /**
+     * @param name String
+     * @param description String
+     * @param version String
+     */
+<span class="fc" id="L56">    public BoutiquesApplication(String name, String description, String version){</span>
+<span class="fc" id="L57">        this.name = name;</span>
+<span class="fc" id="L58">        this.description = description;</span>
+<span class="fc" id="L59">        this.version = version;</span>
+<span class="fc" id="L60">    }</span>
+
+    public void setBoutiquesExtensions(BoutiquesApplicationExtensions boutiquesExtensions) {
+<span class="nc bnc" id="L63" title="All 2 branches missed.">        if (this.boutiquesExtensions != null) {</span>
+<span class="nc" id="L64">            throw new IllegalStateException(&quot;A boutiques application can only be extended once&quot;);</span>
+        }
+<span class="nc" id="L66">        this.boutiquesExtensions = boutiquesExtensions;</span>
+<span class="nc" id="L67">    }</span>
+
+    public BoutiquesApplicationExtensions getBoutiquesExtensions() {
+<span class="nc" id="L70">        return boutiquesExtensions;</span>
+    }
+
+    /**
+     * @return String of format 'applicationName applicationVersion'
+     */
+    public String getFullName(){
+<span class="nc" id="L77">        return this.name + &quot; &quot; + this.version;</span>
+    }
+
+    /**
+     * @return Application description as String
+     */
+    public String getDescription(){
+<span class="fc" id="L84">        return this.description;</span>
+    }
+
+    /**
+     * @return Array of BoutiquesInputs representing application inputs
+     */
+    public Set&lt;BoutiquesInput&gt; getInputs() {
+<span class="fc" id="L91">        return this.inputs;</span>
+    }
+
+    public Optional&lt;BoutiquesInput&gt; getInput(String inputId) {
+<span class="nc" id="L95">        return this.inputs.stream().filter(input -&gt; input.getId().equals(inputId)).findAny();</span>
+    }
+
+    /**
+     * @return Array of BoutiquesGroups representing application input groups
+     */
+    public Set&lt;BoutiquesGroup&gt; getGroups() {
+<span class="nc" id="L102">        return groups;</span>
+    }
+
+    /**
+     * Generic method for getters of input attribute maps.
+     *
+     * @param inputGetter Function: getter implemented in BoutiquesInput to return an input attribute.
+     * @param &lt;T&gt; Type of the input attribute
+     * @return  Map from String input IDs to the attribute of those inputs
+     */
+    private &lt;T&gt; Map&lt;String, T&gt; getMap(Function&lt;BoutiquesInput, T&gt; inputGetter){
+<span class="nc" id="L113">        return this.inputs.stream()</span>
+<span class="nc bnc" id="L114" title="All 2 branches missed.">                .filter(input -&gt; inputGetter.apply(input) != null)</span>
+<span class="nc" id="L115">                .collect(Collectors.toMap(BoutiquesInput::getId, inputGetter));</span>
+    }
+
+    /**
+     * @return Map representing input dependencies of type 'disables-inputs'. Keys are disabling input IDs as Strings,
+     * and values are arrays of Strings representing IDs of inputs disabled when disabling input is non empty
+     */
+    public Map&lt;String, Set&lt;String&gt;&gt; getDisablesInputsMap() {
+<span class="nc" id="L123">        return this.getMap(BoutiquesInput::getDisablesInputsId);</span>
+    }
+
+    /**
+     * @return Map representing input dependencies of type 'requires-inputs'. Keys are dependant input IDs as Strings,
+     * and values are arrays of Strings representing IDs of inputs that need to be non-empty for dependant input to be
+     * enabled
+     */
+    public Map&lt;String, Set&lt;String&gt;&gt; getRequiresInputsMap() {
+<span class="nc" id="L132">        return this.getMap(BoutiquesInput::getRequiresInputsId);</span>
+    }
+
+    /**
+     * @return Map representing input dependencies of type 'value-disables'. Keys are disabling input IDs as Strings,
+     * and values are Maps of String values to arrays of Strings representing IDs of inputs disabled when
+     * corresponding value of disabling input is selected
+     */
+    public Map&lt;String, Map&lt;String, Set&lt;String&gt;&gt;&gt; getValueDisablesInputsMap() {
+<span class="nc" id="L141">        return this.getMap(BoutiquesInput::getValueDisablesInputsId);</span>
+    }
+
+    /**
+     * @return Map representing input dependencies of type 'value-requires'. Keys are dependant input IDs as Strings,
+     * and values are Maps of String values to arrays of Strings representing IDs of inputs that need to be non empty
+     * when corresponding value of dependant input is selected
+     */
+    public Map&lt;String, Map&lt;String, Set&lt;String&gt;&gt;&gt; getValueRequiresInputsMap() {
+<span class="nc" id="L150">        return this.getMap(BoutiquesInput::getValueRequiresInputsId);</span>
+    }
+
+    public String getName() {
+<span class="fc" id="L154">        return name;</span>
+    }
+
+    public String getAuthor() {
+<span class="nc" id="L158">        return author;</span>
+    }
+
+    public String getToolVersion() {
+<span class="fc" id="L162">        return version;</span>
+    }
+
+    public String getCommandLine() {
+<span class="nc" id="L166">        return commandLine;</span>
+    }
+
+    public String getContainerType() {
+<span class="fc" id="L170">        return containerType;</span>
+    }
+
+    public String getContainerImage() {
+<span class="nc" id="L174">        return containerImage;</span>
+    }
+
+    public String getContainerIndex() {
+<span class="nc" id="L178">        return containerIndex;</span>
+    }
+
+    public String getSchemaVersion() {
+<span class="nc" id="L182">        return schemaVersion;</span>
+    }
+
+    public String getChallengerEmail() {
+<span class="nc" id="L186">        return challengerEmail;</span>
+    }
+
+    public String getChallengerTeam() {
+<span class="nc" id="L190">        return challengerTeam;</span>
+    }
+
+    public Set&lt;BoutiquesOutputFile&gt; getOutputFiles() {
+<span class="fc" id="L194">        return outputFiles;</span>
+    }
+
+    public String getJsonFile() {
+<span class="nc" id="L198">        return jsonFile;</span>
+    }
+
+    public void setJsonFile(String jsonFile) {
+<span class="nc" id="L202">        this.jsonFile = jsonFile;</span>
+<span class="nc" id="L203">    }</span>
+
+    public String getApplicationLFN() {
+<span class="nc" id="L206">        return applicationLFN;</span>
+    }
+
+    public String getWrapperLFN() {
+<span class="nc" id="L210">        return this.applicationLFN + &quot;/bin/&quot; + getName() + &quot;.sh&quot;;</span>
+    }
+
+    public String getWrapperName() {
+<span class="nc" id="L214">        return getName() + &quot;.sh&quot;;</span>
+    }
+
+    public String getGASWLFN() {
+<span class="fc" id="L218">        return this.applicationLFN + &quot;/gasw/&quot; + getName() + &quot;.xml&quot;;</span>
+    }
+
+    public String getGwendiaLFN() {
+<span class="nc" id="L222">        return this.applicationLFN + &quot;/workflow/&quot; + getName() + &quot;.gwendia&quot;;</span>
+    }
+
+    public Map&lt;String, String&gt; getTags() {
+<span class="nc" id="L226">        return tags;</span>
+    }
+
+    public String getJsonLFN() {
+<span class="nc" id="L230">        return this.applicationLFN + &quot;/json/&quot; + getName() + &quot;.json&quot;;</span>
+    }
+
+    public String getVipContainer() {
+<span class="fc" id="L234">        return vipContainer;</span>
+    }
+
+    public Set&lt;String&gt; getVipDotInputIds() {
+<span class="pc bpc" id="L238" title="1 of 2 branches missed.">        if (vipDotInputIds == null) {</span>
+<span class="fc" id="L239">            return Collections.emptySet();      </span>
+            }
+<span class="nc" id="L241">            return vipDotInputIds;</span>
+    }
+
+    public Set&lt;String&gt; getCommandLineFlag() {
+<span class="nc" id="L245">        return inputs.stream()</span>
+<span class="nc" id="L246">                .filter(i -&gt; InputType.FLAG.equals(i.getType()))</span>
+<span class="nc" id="L247">                .map(BoutiquesInput::getId)</span>
+<span class="nc" id="L248">                .collect(Collectors.toSet());</span>
+    }
+
+    public Set&lt;String&gt; getinputIds() {
+<span class="nc" id="L252">        return this.getInputs().stream()</span>
+<span class="nc" id="L253">                .map(BoutiquesInput::getId)</span>
+<span class="nc" id="L254">                .collect(Collectors.toSet());</span>
+    }
+
+    public boolean getVipDotIncludesResultsDir() {
+<span class="nc" id="L258">        return vipDotIncludesResultsDir;</span>
+    }
+
+    public void addInput(BoutiquesInput input){
+<span class="fc" id="L262">        this.inputs.add(input);</span>
+<span class="fc" id="L263">    }</span>
+
+    public void addGroup(BoutiquesGroup group){
+<span class="nc" id="L266">        this.groups.add(group);</span>
+<span class="nc" id="L267">    }</span>
+
+    public void setAuthor(String author) {
+<span class="nc" id="L270">        this.author = author;</span>
+<span class="nc" id="L271">    }</span>
+
+    public void setCommandLine(String commandLine) {
+<span class="nc" id="L274">        this.commandLine = commandLine;</span>
+<span class="nc" id="L275">    }</span>
+
+    public void setContainerType(String containerType) {
+<span class="nc" id="L278">        this.containerType = containerType;</span>
+<span class="nc" id="L279">    }</span>
+
+    public void setContainerImage(String containerImage) {
+<span class="nc" id="L282">        this.containerImage = containerImage;</span>
+<span class="nc" id="L283">    }</span>
+
+    public void setContainerIndex(String containerIndex) {
+<span class="nc" id="L286">        this.containerIndex = containerIndex;</span>
+<span class="nc" id="L287">    }</span>
+
+    public void setSchemaVersion(String schemaVersion) {
+<span class="nc" id="L290">        this.schemaVersion = schemaVersion;</span>
+<span class="nc" id="L291">    }</span>
+
+    public void setChallengerEmail(String challengerEmail) {
+<span class="nc" id="L294">        this.challengerEmail = challengerEmail;</span>
+<span class="nc" id="L295">    }</span>
+
+    public void setChallengerTeam(String challengerTeam) {
+<span class="nc" id="L298">        this.challengerTeam = challengerTeam;</span>
+<span class="nc" id="L299">    }</span>
+
+    public void setApplicationLFN(String applicationLFN) {
+<span class="nc" id="L302">        this.applicationLFN = applicationLFN;</span>
+<span class="nc" id="L303">    }</span>
+
+    public void addTag(String key, String value) {
+<span class="nc" id="L306">        tags.put(key, value);</span>
+<span class="nc" id="L307">    }</span>
+
+    public void setVipContainer(String vipContainer) {
+<span class="fc" id="L310">        this.vipContainer = vipContainer;</span>
+<span class="fc" id="L311">    }</span>
+
+    public void setVipDotInputIds(Set&lt;String&gt; inputIds) {
+<span class="nc" id="L314">        this.vipDotInputIds = inputIds;</span>
+<span class="nc" id="L315">    }</span>
+
+    public void setVipDotIncludesResultsDir(boolean vipDotIncludesResultsDir) {
+<span class="nc" id="L318">        this.vipDotIncludesResultsDir = vipDotIncludesResultsDir;</span>
+<span class="nc" id="L319">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

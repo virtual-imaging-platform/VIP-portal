@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../jacoco-resources/report.gif" type="image/gif"/><title>SuggestedResources.java</title><link rel="stylesheet" href="../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../index.html" class="el_report">coverage</a> &gt; <a href="../index.html" class="el_bundle">vip-application</a> &gt; <a href="index.source.html" class="el_package">fr.insalyon.creatis.vip.application.server.model.boutiques</a> &gt; <span class="el_source">SuggestedResources.java</span></div><h1>SuggestedResources.java</h1><pre class="source lang-java linenums">
+package fr.insalyon.creatis.vip.application.server.model.boutiques;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+import javax.annotation.Generated;
+import com.fasterxml.jackson.annotation.JsonAnyGetter;
+import com.fasterxml.jackson.annotation.JsonAnySetter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyDescription;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+
+@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonPropertyOrder({
+    &quot;cpu-cores&quot;,
+    &quot;ram&quot;,
+    &quot;disk-space&quot;,
+    &quot;nodes&quot;,
+    &quot;walltime-estimate&quot;
+})
+@Generated(&quot;jsonschema2pojo&quot;)
+<span class="fc" id="L24">public class SuggestedResources {</span>
+
+    /**
+     * The requested number of cpu cores to run the described application
+     * 
+     */
+    @JsonProperty(&quot;cpu-cores&quot;)
+    @JsonPropertyDescription(&quot;The requested number of cpu cores to run the described application&quot;)
+    private Integer cpuCores;
+    /**
+     * The requested number of GB RAM to run the described application
+     * 
+     */
+    @JsonProperty(&quot;ram&quot;)
+    @JsonPropertyDescription(&quot;The requested number of GB RAM to run the described application&quot;)
+    private Double ram;
+    /**
+     * The requested number of GB of storage to run the described application
+     * 
+     */
+    @JsonProperty(&quot;disk-space&quot;)
+    @JsonPropertyDescription(&quot;The requested number of GB of storage to run the described application&quot;)
+    private Double diskSpace;
+    /**
+     * The requested number of nodes to spread the described application across
+     * 
+     */
+    @JsonProperty(&quot;nodes&quot;)
+    @JsonPropertyDescription(&quot;The requested number of nodes to spread the described application across&quot;)
+    private Integer nodes;
+    /**
+     * Estimated wall time of a task in seconds.
+     * 
+     */
+    @JsonProperty(&quot;walltime-estimate&quot;)
+    @JsonPropertyDescription(&quot;Estimated wall time of a task in seconds.&quot;)
+    private Double walltimeEstimate;
+<span class="fc" id="L61">    @JsonIgnore</span>
+    private Map&lt;String, Object&gt; additionalProperties = new LinkedHashMap&lt;String, Object&gt;();
+
+    /**
+     * The requested number of cpu cores to run the described application
+     * 
+     */
+    @JsonProperty(&quot;cpu-cores&quot;)
+    public Integer getCpuCores() {
+<span class="nc" id="L70">        return cpuCores;</span>
+    }
+
+    /**
+     * The requested number of cpu cores to run the described application
+     * 
+     */
+    @JsonProperty(&quot;cpu-cores&quot;)
+    public void setCpuCores(Integer cpuCores) {
+<span class="fc" id="L79">        this.cpuCores = cpuCores;</span>
+<span class="fc" id="L80">    }</span>
+
+    /**
+     * The requested number of GB RAM to run the described application
+     * 
+     */
+    @JsonProperty(&quot;ram&quot;)
+    public Double getRam() {
+<span class="nc" id="L88">        return ram;</span>
+    }
+
+    /**
+     * The requested number of GB RAM to run the described application
+     * 
+     */
+    @JsonProperty(&quot;ram&quot;)
+    public void setRam(Double ram) {
+<span class="fc" id="L97">        this.ram = ram;</span>
+<span class="fc" id="L98">    }</span>
+
+    /**
+     * The requested number of GB of storage to run the described application
+     * 
+     */
+    @JsonProperty(&quot;disk-space&quot;)
+    public Double getDiskSpace() {
+<span class="nc" id="L106">        return diskSpace;</span>
+    }
+
+    /**
+     * The requested number of GB of storage to run the described application
+     * 
+     */
+    @JsonProperty(&quot;disk-space&quot;)
+    public void setDiskSpace(Double diskSpace) {
+<span class="nc" id="L115">        this.diskSpace = diskSpace;</span>
+<span class="nc" id="L116">    }</span>
+
+    /**
+     * The requested number of nodes to spread the described application across
+     * 
+     */
+    @JsonProperty(&quot;nodes&quot;)
+    public Integer getNodes() {
+<span class="nc" id="L124">        return nodes;</span>
+    }
+
+    /**
+     * The requested number of nodes to spread the described application across
+     * 
+     */
+    @JsonProperty(&quot;nodes&quot;)
+    public void setNodes(Integer nodes) {
+<span class="nc" id="L133">        this.nodes = nodes;</span>
+<span class="nc" id="L134">    }</span>
+
+    /**
+     * Estimated wall time of a task in seconds.
+     * 
+     */
+    @JsonProperty(&quot;walltime-estimate&quot;)
+    public Double getWalltimeEstimate() {
+<span class="nc" id="L142">        return walltimeEstimate;</span>
+    }
+
+    /**
+     * Estimated wall time of a task in seconds.
+     * 
+     */
+    @JsonProperty(&quot;walltime-estimate&quot;)
+    public void setWalltimeEstimate(Double walltimeEstimate) {
+<span class="fc" id="L151">        this.walltimeEstimate = walltimeEstimate;</span>
+<span class="fc" id="L152">    }</span>
+
+    @JsonAnyGetter
+    public Map&lt;String, Object&gt; getAdditionalProperties() {
+<span class="nc" id="L156">        return this.additionalProperties;</span>
+    }
+
+    @JsonAnySetter
+    public void setAdditionalProperty(String name, Object value) {
+<span class="nc" id="L161">        this.additionalProperties.put(name, value);</span>
+<span class="nc" id="L162">    }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

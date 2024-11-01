@@ -1,0 +1,607 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../jacoco-resources/report.gif" type="image/gif"/><title>ProxyClient.java</title><link rel="stylesheet" href="../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../index.html" class="el_report">coverage</a> &gt; <a href="../index.html" class="el_bundle">vip-core</a> &gt; <a href="index.source.html" class="el_package">fr.insalyon.creatis.vip.core.server.business.proxy</a> &gt; <span class="el_source">ProxyClient.java</span></div><h1>ProxyClient.java</h1><pre class="source lang-java linenums">/*
+ * Copyright and authors: see LICENSE.txt in base repository.
+ *
+ * This software is a web portal for pipeline execution on distributed systems.
+ *
+ * This software is governed by the CeCILL-B license under French law and
+ * abiding by the rules of distribution of free software.  You can  use,
+ * modify and/ or redistribute the software under the terms of the CeCILL-B
+ * license as circulated by CEA, CNRS and INRIA at the following URL
+ * &quot;http://www.cecill.info&quot;.
+ *
+ * As a counterpart to the access to the source code and  rights to copy,
+ * modify and redistribute granted by the license, users are provided only
+ * with a limited warranty  and the software's author,  the holder of the
+ * economic rights,  and the successive licensors  have only  limited
+ * liability.
+ *
+ * In this respect, the user's attention is drawn to the risks associated
+ * with loading,  using,  modifying and/or developing or reproducing the
+ * software by the user in light of its specific status of free software,
+ * that may mean  that it is complicated to manipulate,  and  that  also
+ * therefore means  that it is reserved for developers  and  experienced
+ * professionals having in-depth computer knowledge. Users are therefore
+ * encouraged to load and test the software's suitability as regards their
+ * requirements in conditions enabling the security of their systems and/or
+ * data to be ensured and,  more generally, to use and operate it in the
+ * same conditions as regards security.
+ *
+ * The fact that you are presently reading this means that you have had
+ * knowledge of the CeCILL-B license and that you accept its terms.
+ */
+package fr.insalyon.creatis.vip.core.server.business.proxy;
+
+import fr.insalyon.creatis.vip.core.server.business.BusinessException;
+import fr.insalyon.creatis.vip.core.server.business.Server;
+import java.io.*;
+import java.net.InetAddress;
+import java.net.ProtocolException;
+import java.nio.channels.FileChannel;
+import java.security.*;
+import java.security.cert.*;
+import java.util.*;
+import javax.net.ssl.*;
+import javax.security.auth.login.FailedLoginException;
+import javax.security.auth.x500.X500Principal;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.bouncycastle.asn1.ASN1InputStream;
+import org.bouncycastle.asn1.ASN1Sequence;
+import org.bouncycastle.asn1.DEROutputStream;
+import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
+import org.bouncycastle.pkcs.PKCS10CertificationRequest;
+import org.bouncycastle.util.encoders.Base64;
+import org.bouncycastle.asn1.ASN1Primitive;
+import org.bouncycastle.operator.ContentSigner;
+import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
+import org.bouncycastle.pkcs.PKCS10CertificationRequestBuilder;
+import org.bouncycastle.pkcs.jcajce.JcaPKCS10CertificationRequestBuilder;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+/**
+ *
+ * @author Rafael Silva
+ */
+@Component
+public class ProxyClient {
+
+<span class="fc" id="L69">    private final Logger logger = LoggerFactory.getLogger(getClass());</span>
+    private SSLSocket socket;
+    private BufferedInputStream socketIn;
+    private BufferedOutputStream socketOut;
+    private Collection certificateChain;
+    private KeyPair keyPair;
+    // CONSTANTS
+<span class="fc" id="L76">    private final String VERSION = &quot;VERSION=MYPROXYv2&quot;;</span>
+<span class="fc" id="L77">    private final String GETCOMMAND = &quot;COMMAND=0&quot;;</span>
+<span class="fc" id="L78">    private final String USERNAME = &quot;USERNAME=&quot;;</span>
+<span class="fc" id="L79">    private final String PASSPHRASE = &quot;PASSPHRASE=&quot;;</span>
+<span class="fc" id="L80">    private final String LIFETIME = &quot;LIFETIME=&quot;;</span>
+<span class="fc" id="L81">    private final String RESPONSE = &quot;RESPONSE=&quot;;</span>
+<span class="fc" id="L82">    private final String ERROR = &quot;ERROR=&quot;;</span>
+
+    private Server server;
+
+    /**
+     * The ProxyClient class provides an interface for retrieving credentials
+     * from a MyProxy server.
+     */
+    @Autowired
+<span class="fc" id="L91">    public ProxyClient(Server server) {</span>
+<span class="fc" id="L92">        this.server = server;</span>
+<span class="fc" id="L93">    }</span>
+
+    public void checkProxy() throws BusinessException {
+<span class="nc" id="L96">        int proxyHoursValidity = server.getMyProxyMinHours();</span>
+
+        try {
+<span class="nc" id="L99">            String proxyFileName = server.getServerProxy();</span>
+<span class="nc" id="L100">            File proxyFile = new File(proxyFileName);</span>
+<span class="nc bnc" id="L101" title="All 2 branches missed.">            if (proxyFile.exists()) {</span>
+<span class="nc" id="L102">                X509Certificate certificate = readCertificate(proxyFile);</span>
+
+<span class="nc" id="L104">                Calendar currentDate = Calendar.getInstance();</span>
+<span class="nc" id="L105">                currentDate.setTime(new Date());</span>
+<span class="nc" id="L106">                currentDate.add(Calendar.HOUR, proxyHoursValidity);</span>
+                try {
+<span class="nc" id="L108">                    certificate.checkValidity(currentDate.getTime());</span>
+<span class="nc" id="L109">                    Date endDate = certificate.getNotAfter();</span>
+<span class="nc" id="L110">                    logger.debug(&quot;Server proxy still valid until: &quot; + endDate);</span>
+<span class="nc" id="L111">                    return;</span>
+<span class="nc" id="L112">                } catch (Exception ex1) {</span>
+<span class="nc" id="L113">                    logger.warn(&quot;Proxy server expired, deleting it&quot;);</span>
+<span class="nc" id="L114">                    logger.warn(&quot;End date :&quot; + certificate.getNotAfter());</span>
+<span class="nc" id="L115">                    proxyFile.delete();</span>
+                }
+            }
+<span class="nc" id="L118">            logger.info(&quot;Fetching server proxy from MyProxy server.&quot;);</span>
+<span class="nc" id="L119">            connect();</span>
+<span class="nc" id="L120">            logon();</span>
+<span class="nc" id="L121">            getCredentials();</span>
+<span class="nc" id="L122">            Date endDate = saveCredentials(proxyFileName);</span>
+<span class="nc" id="L123">            disconnect();</span>
+            //copy the proxy file and add extenstion
+<span class="nc" id="L125">            String voName = server.getVoName();</span>
+<span class="nc" id="L126">            copyFile(server.getServerProxy(), server.getServerProxyFolder(voName));</span>
+<span class="nc" id="L127">            addVomsExtension(voName);</span>
+<span class="nc" id="L128">        } catch (Exception ex) {</span>
+<span class="nc" id="L129">            logger.error(&quot;Error getting proxy : {}&quot;, ex.getMessage());</span>
+<span class="nc bnc" id="L130" title="All 2 branches missed.">            if (this.socket != null) {</span>
+                try {
+<span class="nc" id="L132">                    disconnect();</span>
+<span class="nc" id="L133">                } catch (IOException ioe) {</span>
+<span class="nc" id="L134">                    logger.error(&quot;Error disconnecting proxy&quot;, ioe);</span>
+<span class="nc" id="L135">                }</span>
+            }
+<span class="nc" id="L137">            throw new BusinessException(&quot;Error getting a proxy&quot;, ex);</span>
+<span class="nc" id="L138">        }</span>
+<span class="nc" id="L139">    }</span>
+
+    private X509Certificate readCertificate(File proxyFile)
+        throws FileNotFoundException, IOException, CertificateException {
+<span class="nc" id="L143">        try (FileInputStream fis = new FileInputStream(proxyFile)) {</span>
+<span class="nc" id="L144">            CertificateFactory cf = CertificateFactory.getInstance(&quot;X.509&quot;);</span>
+<span class="nc" id="L145">            return (X509Certificate) cf.generateCertificate(fis);</span>
+        }
+    }
+
+    private void addVomsExtension(String vo) throws Exception {
+
+<span class="nc" id="L151">        logger.info(&quot;Adding&quot; + vo + &quot;Extension to server proxy.&quot;);</span>
+        // Voms Extension
+<span class="nc" id="L153">        Server serverConf = server;</span>
+<span class="nc" id="L154">        long hours = Long.parseLong(serverConf.getMyProxyLifeTime()) / 3600;</span>
+<span class="nc" id="L155">        String command = &quot;voms-proxy-init -voms &quot; + vo</span>
+<span class="nc" id="L156">                + &quot; -cert &quot; + serverConf.getServerProxy()</span>
+<span class="nc" id="L157">                + &quot; -key &quot; + serverConf.getServerProxy()</span>
+<span class="nc" id="L158">                + &quot; -out &quot; + serverConf.getServerProxy(vo)</span>
+                + &quot; -noregen -valid &quot; + hours + &quot;:00&quot;;
+<span class="nc" id="L160">        Process process = Runtime.getRuntime().exec(command);</span>
+
+<span class="nc" id="L162">        BufferedReader r = new BufferedReader(new InputStreamReader(process.getInputStream()));</span>
+<span class="nc" id="L163">        String s = null;</span>
+<span class="nc" id="L164">        String cout = &quot;&quot;;</span>
+
+<span class="nc bnc" id="L166" title="All 2 branches missed.">        while ((s = r.readLine()) != null) {</span>
+<span class="nc" id="L167">            cout += s + &quot;\n&quot;;</span>
+        }
+<span class="nc" id="L169">        process.waitFor();</span>
+
+<span class="nc" id="L171">        logger.info(cout);</span>
+
+<span class="nc" id="L173">        process.getOutputStream().close();</span>
+<span class="nc" id="L174">        process.getInputStream().close();</span>
+<span class="nc" id="L175">        process.getErrorStream().close();</span>
+<span class="nc" id="L176">        r.close();</span>
+
+<span class="nc" id="L178">        process = null;</span>
+<span class="nc" id="L179">    }</span>
+
+    private void connect() throws Exception {
+
+<span class="nc" id="L183">        SSLContext sc = SSLContext.getInstance(&quot;TLS&quot;);</span>
+<span class="nc" id="L184">        sc.init(new KeyManager[]{}, new TrustManager[]{new ProxyClient.MyTrustManager()}, new SecureRandom());</span>
+<span class="nc" id="L185">        SSLSocketFactory sf = sc.getSocketFactory();</span>
+
+<span class="nc" id="L187">        this.socket = (SSLSocket) sf.createSocket(</span>
+<span class="nc" id="L188">                server.getMyProxyHost(),</span>
+<span class="nc" id="L189">                server.getMyProxyPort());</span>
+
+<span class="nc" id="L191">        this.socket.setEnabledProtocols(new String[]{&quot;TLSv1.2&quot;});</span>
+<span class="nc" id="L192">        this.socket.startHandshake();</span>
+<span class="nc" id="L193">        this.socketIn = new BufferedInputStream(this.socket.getInputStream());</span>
+<span class="nc" id="L194">        this.socketOut = new BufferedOutputStream(this.socket.getOutputStream());</span>
+<span class="nc" id="L195">    }</span>
+
+    /**
+     * Logs on to the MyProxy server by issuing the MyProxy GET command.
+     */
+    private void logon() throws Exception {
+
+<span class="nc" id="L202">        this.socketOut.write('0');</span>
+<span class="nc" id="L203">        this.socketOut.flush();</span>
+<span class="nc" id="L204">        this.socketOut.write(VERSION.getBytes());</span>
+<span class="nc" id="L205">        this.socketOut.write('\n');</span>
+<span class="nc" id="L206">        this.socketOut.write(GETCOMMAND.getBytes());</span>
+<span class="nc" id="L207">        this.socketOut.write('\n');</span>
+<span class="nc" id="L208">        this.socketOut.write((USERNAME + server.getMyProxyUser()).getBytes());</span>
+<span class="nc" id="L209">        this.socketOut.write('\n');</span>
+<span class="nc" id="L210">        this.socketOut.write((PASSPHRASE + server.getMyProxyPass()).getBytes());</span>
+<span class="nc" id="L211">        this.socketOut.write('\n');</span>
+<span class="nc" id="L212">        this.socketOut.write((LIFETIME + server.getMyProxyLifeTime()).getBytes());</span>
+<span class="nc" id="L213">        this.socketOut.write('\n');</span>
+<span class="nc" id="L214">        this.socketOut.flush();</span>
+
+<span class="nc" id="L216">        String line = readLine(this.socketIn);</span>
+<span class="nc bnc" id="L217" title="All 2 branches missed.">        if (line == null) {</span>
+<span class="nc" id="L218">            logger.error(&quot;Error logging on MyProxy : nothing received&quot;);</span>
+<span class="nc" id="L219">            throw new EOFException();</span>
+        }
+<span class="nc bnc" id="L221" title="All 2 branches missed.">        if (!line.equals(VERSION)) {</span>
+<span class="nc" id="L222">            logger.error(&quot;Error logging on MyProxy : bad protocol {}&quot;, line);</span>
+<span class="nc" id="L223">            throw new ProtocolException(&quot;bad MyProxy protocol VERSION string: &quot; + line);</span>
+        }
+<span class="nc" id="L225">        line = readLine(this.socketIn);</span>
+<span class="nc bnc" id="L226" title="All 2 branches missed.">        if (line == null) {</span>
+<span class="nc" id="L227">            logger.error(&quot;Error logging on MyProxy : no response&quot;);</span>
+<span class="nc" id="L228">            throw new EOFException();</span>
+        }
+<span class="nc bnc" id="L230" title="All 2 branches missed.">        if (!line.startsWith(RESPONSE)</span>
+<span class="nc bnc" id="L231" title="All 2 branches missed.">                || line.length() != RESPONSE.length() + 1) {</span>
+<span class="nc" id="L232">            logger.error(&quot;Error logging on MyProxy : bad RESPONSE {}&quot;, line);</span>
+<span class="nc" id="L233">            throw new ProtocolException(</span>
+                    &quot;bad MyProxy protocol RESPONSE string: &quot; + line);
+        }
+<span class="nc" id="L236">        char response = line.charAt(RESPONSE.length());</span>
+<span class="nc bnc" id="L237" title="All 2 branches missed.">        if (response == '1') {</span>
+<span class="nc" id="L238">            StringBuilder errString = new StringBuilder(&quot;MyProxy logon failed&quot;);</span>
+<span class="nc bnc" id="L239" title="All 2 branches missed.">            while ((line = readLine(this.socketIn)) != null) {</span>
+<span class="nc bnc" id="L240" title="All 2 branches missed.">                if (line.startsWith(ERROR)) {</span>
+<span class="nc" id="L241">                    errString.append('\n');</span>
+<span class="nc" id="L242">                    errString.append(line.substring(ERROR.length()));</span>
+                }
+            }
+<span class="nc" id="L245">            logger.error(&quot;Error logging on MyProxy : error {}&quot;, errString);</span>
+<span class="nc" id="L246">            throw new FailedLoginException(errString.toString());</span>
+<span class="nc bnc" id="L247" title="All 2 branches missed.">        } else if (response == '2') {</span>
+<span class="nc" id="L248">            logger.error(&quot;Error logging on MyProxy : RESPONSE {} not implemented&quot;, response);</span>
+<span class="nc" id="L249">            throw new ProtocolException(&quot;MyProxy authorization RESPONSE not implemented&quot;);</span>
+<span class="nc bnc" id="L250" title="All 2 branches missed.">        } else if (response != '0') {</span>
+<span class="nc" id="L251">            logger.error(&quot;Error logging on MyProxy : RESPONSE {} Unknown&quot;, response);</span>
+<span class="nc" id="L252">            throw new ProtocolException(&quot;Unknown MyProxy protocol RESPONSE string: &quot; + line);</span>
+        }
+<span class="nc bnc" id="L254" title="All 2 branches missed.">        while ((line = readLine(this.socketIn)) != null) {</span>
+            // Drain potentially stale data incoming from socket
+        }
+<span class="nc" id="L257">    }</span>
+
+    /**
+     * Retrieves credentials from the MyProxy server.
+     */
+    private void getCredentials() throws Exception {
+
+<span class="nc" id="L264">        KeyPairGenerator keyGenerator = KeyPairGenerator.getInstance(&quot;RSA&quot;);</span>
+<span class="nc" id="L265">        keyPair = keyGenerator.generateKeyPair();</span>
+
+<span class="nc" id="L267">        X500Principal subject = new X500Principal (&quot;CN=irrelevant&quot;);</span>
+<span class="nc" id="L268">        ContentSigner signGen = new JcaContentSignerBuilder(&quot;SHA1withRSA&quot;).build(keyPair.getPrivate());</span>
+<span class="nc" id="L269">        PKCS10CertificationRequestBuilder builder = new JcaPKCS10CertificationRequestBuilder(subject, keyPair.getPublic());</span>
+<span class="nc" id="L270">        PKCS10CertificationRequest cert = builder.build(signGen);</span>
+
+<span class="nc" id="L272">        socketOut.write(cert.getEncoded());</span>
+<span class="nc" id="L273">        socketOut.write(0x00);</span>
+<span class="nc" id="L274">        socketOut.flush();</span>
+
+<span class="nc" id="L276">        int numCertificates = this.socketIn.read();</span>
+<span class="nc bnc" id="L277" title="All 2 branches missed.">        if (numCertificates == -1) {</span>
+<span class="nc" id="L278">            logger.error(&quot;Error getting credentials for MyProxy : connection aborted&quot;);</span>
+<span class="nc" id="L279">            throw new Exception(&quot;connection aborted&quot;);</span>
+<span class="nc bnc" id="L280" title="All 4 branches missed.">        } else if (numCertificates == 0 || numCertificates &lt; 0) {</span>
+<span class="nc" id="L281">            logger.error(&quot;bad number of certificates sent by server: {}&quot;, numCertificates);</span>
+<span class="nc" id="L282">            throw new Exception(&quot;bad number of certificates sent by server: &quot; + numCertificates);</span>
+        }
+
+<span class="nc" id="L285">        CertificateFactory certFactory = CertificateFactory.getInstance(&quot;X.509&quot;);</span>
+<span class="nc" id="L286">        certificateChain = certFactory.generateCertificates(this.socketIn);</span>
+<span class="nc" id="L287">    }</span>
+
+    /**
+     * Writes the retrieved credentials to the specified filename.
+     */
+    private Date saveCredentials(String proxyName) throws Exception {
+
+        Iterator iter;
+        X509Certificate certificate;
+        PrintStream printStream;
+
+<span class="nc" id="L298">        iter = certificateChain.iterator();</span>
+<span class="nc" id="L299">        certificate = (X509Certificate) iter.next();</span>
+<span class="nc" id="L300">        File outFile = new File(proxyName);</span>
+<span class="nc" id="L301">        outFile.delete();</span>
+<span class="nc" id="L302">        outFile.createNewFile();</span>
+        // set permission
+<span class="nc" id="L304">        String command = &quot;chmod 0600 &quot; + proxyName;</span>
+<span class="nc" id="L305">        Runtime.getRuntime().exec(command);</span>
+
+<span class="nc" id="L307">        printStream = new PrintStream(new FileOutputStream(outFile));</span>
+<span class="nc" id="L308">        printCert(certificate, printStream);</span>
+<span class="nc" id="L309">        printKey(keyPair.getPrivate(), printStream);</span>
+<span class="nc" id="L310">        Date endDate = null;</span>
+<span class="nc bnc" id="L311" title="All 2 branches missed.">        while (iter.hasNext()) {</span>
+<span class="nc" id="L312">            certificate = (X509Certificate) iter.next();</span>
+<span class="nc bnc" id="L313" title="All 4 branches missed.">            if (endDate != null &amp;&amp; certificate.getNotAfter().getTime() &lt; endDate.getTime()) {</span>
+<span class="nc" id="L314">                endDate = certificate.getNotAfter();</span>
+            } else {
+<span class="nc" id="L316">                endDate = certificate.getNotAfter();</span>
+            }
+<span class="nc" id="L318">            printCert(certificate, printStream);</span>
+        }
+<span class="nc" id="L320">        return endDate;</span>
+    }
+
+    /**
+     * Disconnects from the MyProxy server.
+     */
+    private void disconnect() throws IOException {
+<span class="nc" id="L327">        this.socket.close();</span>
+<span class="nc" id="L328">        this.socket = null;</span>
+<span class="nc" id="L329">        this.socketIn = null;</span>
+<span class="nc" id="L330">        this.socketOut = null;</span>
+<span class="nc" id="L331">    }</span>
+
+    private void printB64(byte[] data, PrintStream out) {
+        byte[] b64data;
+
+<span class="nc" id="L336">        b64data = Base64.encode(data);</span>
+<span class="nc bnc" id="L337" title="All 2 branches missed.">        for (int i = 0; i &lt; b64data.length; i += 64) {</span>
+<span class="nc bnc" id="L338" title="All 2 branches missed.">            if ((b64data.length - i) &gt; 64) {</span>
+<span class="nc" id="L339">                out.write(b64data, i, 64);</span>
+            } else {
+<span class="nc" id="L341">                out.write(b64data, i, b64data.length - i);</span>
+            }
+<span class="nc" id="L343">            out.println();</span>
+        }
+<span class="nc" id="L345">    }</span>
+
+    private void printCert(X509Certificate certificate, PrintStream out)
+            throws CertificateEncodingException {
+<span class="nc" id="L349">        out.println(&quot;-----BEGIN CERTIFICATE-----&quot;);</span>
+<span class="nc" id="L350">        printB64(certificate.getEncoded(), out);</span>
+<span class="nc" id="L351">        out.println(&quot;-----END CERTIFICATE-----&quot;);</span>
+<span class="nc" id="L352">    }</span>
+
+    private void printKey(PrivateKey key, PrintStream out)
+            throws IOException {
+<span class="nc" id="L356">        out.println(&quot;-----BEGIN RSA PRIVATE KEY-----&quot;);</span>
+<span class="nc" id="L357">        ByteArrayInputStream inStream = new ByteArrayInputStream(key.getEncoded());</span>
+<span class="nc" id="L358">        ASN1InputStream derInputStream = new ASN1InputStream(inStream);</span>
+<span class="nc" id="L359">        ASN1Primitive keyInfo = derInputStream.readObject();</span>
+        PrivateKeyInfo pki;
+<span class="nc" id="L361">        pki = PrivateKeyInfo.getInstance(keyInfo);</span>
+<span class="nc" id="L362">        ASN1Primitive innerType = pki.parsePrivateKey().toASN1Primitive();</span>
+        // build and return the actual key
+<span class="nc" id="L364">        ASN1Sequence privKey  = (ASN1Sequence)innerType;</span>
+<span class="nc" id="L365">        ByteArrayOutputStream bout = new ByteArrayOutputStream();</span>
+<span class="nc" id="L366">        DEROutputStream der = new DEROutputStream(bout);</span>
+<span class="nc" id="L367">        der.writeObject(privKey);</span>
+<span class="nc" id="L368">        printB64(bout.toByteArray(), out);</span>
+<span class="nc" id="L369">        out.println(&quot;-----END RSA PRIVATE KEY-----&quot;);</span>
+<span class="nc" id="L370">    }</span>
+
+    private String readLine(InputStream is) throws IOException {
+<span class="nc" id="L373">        StringBuffer sb = new StringBuffer();</span>
+<span class="nc bnc" id="L374" title="All 4 branches missed.">        for (int c = is.read(); c &gt; 0 &amp;&amp; c != '\n'; c = is.read()) {</span>
+<span class="nc" id="L375">            sb.append((char) c);</span>
+        }
+<span class="nc bnc" id="L377" title="All 2 branches missed.">        if (sb.length() &gt; 0) {</span>
+<span class="nc" id="L378">            return new String(sb);</span>
+        }
+<span class="nc" id="L380">        return null;</span>
+    }
+
+<span class="nc" id="L383">    private class MyTrustManager implements X509TrustManager {</span>
+
+        @Override
+        public X509Certificate[] getAcceptedIssuers() {
+<span class="nc" id="L387">            X509Certificate[] issuers = null;</span>
+<span class="nc" id="L388">            String certDirPath = getExistingTrustRootPath();</span>
+<span class="nc bnc" id="L389" title="All 2 branches missed.">            if (certDirPath == null) {</span>
+<span class="nc" id="L390">                return null;</span>
+            }
+<span class="nc" id="L392">            File dir = new File(certDirPath);</span>
+<span class="nc bnc" id="L393" title="All 2 branches missed.">            if (!dir.isDirectory()) {</span>
+<span class="nc" id="L394">                return null;</span>
+            }
+<span class="nc" id="L396">            String[] certFilenames = dir.list();</span>
+<span class="nc" id="L397">            String[] certData = new String[certFilenames.length];</span>
+<span class="nc bnc" id="L398" title="All 2 branches missed.">            for (int i = 0; i &lt; certFilenames.length; i++) {</span>
+                try {
+<span class="nc" id="L400">                    FileInputStream fileStream = new FileInputStream(</span>
+                            certDirPath + File.separator + certFilenames[i]);
+<span class="nc" id="L402">                    byte[] buffer = new byte[fileStream.available()];</span>
+<span class="nc" id="L403">                    fileStream.read(buffer);</span>
+<span class="nc" id="L404">                    certData[i] = new String(buffer);</span>
+<span class="nc" id="L405">                    fileStream.close();</span>
+<span class="nc" id="L406">                } catch (Exception e) {</span>
+<span class="nc" id="L407">                    logger.error(&quot;Error certificate from {}&quot;, certFilenames[i]);</span>
+<span class="nc" id="L408">                }</span>
+            }
+            try {
+<span class="nc" id="L411">                issuers = getX509CertsFromStringList(certData);</span>
+<span class="nc" id="L412">            } catch (Exception e) {</span>
+<span class="nc" id="L413">                logger.error(&quot;Error getting X509 certificates from {} : {}&quot;,</span>
+<span class="nc" id="L414">                        Arrays.toString(certData), e.getMessage());</span>
+<span class="nc" id="L415">            }</span>
+<span class="nc" id="L416">            return issuers;</span>
+        }
+
+        @Override
+        public void checkClientTrusted(X509Certificate[] certs, String authType)
+                throws CertificateException {
+<span class="nc" id="L422">            logger.error(&quot;checkClientTrusted not implemented by edu.uiuc.ncsa.MyProxy.MyProxyLogon.MyTrustManager&quot;);</span>
+<span class="nc" id="L423">            throw new CertificateException(</span>
+                    &quot;checkClientTrusted not implemented by edu.uiuc.ncsa.MyProxy.MyProxyLogon.MyTrustManager&quot;);
+        }
+
+        @Override
+        public void checkServerTrusted(X509Certificate[] certs, String authType)
+                throws CertificateException {
+<span class="nc" id="L430">            checkServerCertPath(certs);</span>
+<span class="nc" id="L431">            checkServerDN(certs[0]);</span>
+<span class="nc" id="L432">        }</span>
+
+        private void checkServerCertPath(X509Certificate[] certs)
+                throws CertificateException {
+            try {
+<span class="nc" id="L437">                CertPathValidator validator = CertPathValidator.getInstance(CertPathValidator.getDefaultType());</span>
+<span class="nc" id="L438">                CertificateFactory certFactory = CertificateFactory.getInstance(&quot;X.509&quot;);</span>
+<span class="nc" id="L439">                CertPath certPath = certFactory.generateCertPath(Arrays.asList(certs));</span>
+<span class="nc" id="L440">                X509Certificate[] acceptedIssuers = getAcceptedIssuers();</span>
+<span class="nc bnc" id="L441" title="All 2 branches missed.">                if (acceptedIssuers == null) {</span>
+<span class="nc" id="L442">                    String certDir = getExistingTrustRootPath();</span>
+<span class="nc bnc" id="L443" title="All 2 branches missed.">                    if (certDir != null) {</span>
+<span class="nc" id="L444">                        logger.error(&quot;no CA certificates found in {}&quot;, certDir);</span>
+<span class="nc" id="L445">                        throw new CertificateException(</span>
+                                &quot;no CA certificates found in &quot; + certDir);
+                    }
+<span class="nc" id="L448">                    acceptedIssuers = new X509Certificate[1];</span>
+<span class="nc" id="L449">                    acceptedIssuers[0] = certs[certs.length - 1];</span>
+                }
+<span class="nc" id="L451">                Set&lt;TrustAnchor&gt; trustAnchors = new HashSet&lt;TrustAnchor&gt;(</span>
+                        acceptedIssuers.length);
+<span class="nc bnc" id="L453" title="All 2 branches missed.">                for (int i = 0; i &lt; acceptedIssuers.length; i++) {</span>
+<span class="nc" id="L454">                    TrustAnchor ta = new TrustAnchor(acceptedIssuers[i], null);</span>
+<span class="nc" id="L455">                    trustAnchors.add(ta);</span>
+                }
+<span class="nc" id="L457">                PKIXParameters pkixParameters = new PKIXParameters(trustAnchors);</span>
+<span class="nc" id="L458">                pkixParameters.setRevocationEnabled(false);</span>
+<span class="nc" id="L459">                validator.validate(certPath, pkixParameters);</span>
+<span class="nc" id="L460">            } catch (GeneralSecurityException e) {</span>
+<span class="nc" id="L461">                logger.error(&quot;Error in checkServerCertPath&quot;, e);</span>
+<span class="nc" id="L462">                throw new CertificateException(e);</span>
+<span class="nc" id="L463">            }</span>
+<span class="nc" id="L464">        }</span>
+
+        private void checkServerDN(X509Certificate cert)
+                throws CertificateException {
+<span class="nc" id="L468">            String subject = cert.getSubjectX500Principal().getName();</span>
+<span class="nc" id="L469">            int index = subject.indexOf(&quot;CN=&quot;);</span>
+<span class="nc bnc" id="L470" title="All 2 branches missed.">            if (index == -1) {</span>
+<span class="nc" id="L471">                logger.error(&quot;MyProxy : certificate subject {} does not contain a CN component&quot;,</span>
+                        subject);
+<span class="nc" id="L473">                throw new CertificateException(&quot;Server certificate subject (&quot;</span>
+                        + subject + &quot;does not contain a CN component.&quot;);
+            }
+<span class="nc" id="L476">            String CN = subject.substring(index + 3);</span>
+<span class="nc" id="L477">            index = CN.indexOf(',');</span>
+<span class="nc bnc" id="L478" title="All 2 branches missed.">            if (index &gt;= 0) {</span>
+<span class="nc" id="L479">                CN = CN.substring(0, index);</span>
+            }
+<span class="nc bnc" id="L481" title="All 2 branches missed.">            if ((index = CN.indexOf('/')) &gt;= 0) {</span>
+<span class="nc" id="L482">                String service = CN.substring(0, index);</span>
+<span class="nc" id="L483">                CN = CN.substring(index + 1);</span>
+<span class="nc bnc" id="L484" title="All 4 branches missed.">                if (!service.equals(&quot;host&quot;) &amp;&amp; !service.equals(&quot;myproxy&quot;)) {</span>
+<span class="nc" id="L485">                    logger.error(&quot;MyProxy : certificate subject {} contains unknown service element&quot;,</span>
+                            subject);
+<span class="nc" id="L487">                    throw new CertificateException(</span>
+                            &quot;Server certificate subject CN contains unknown service element: &quot;
+                            + subject);
+                }
+            }
+<span class="nc" id="L492">            String myHostname = server.getMyProxyHost();</span>
+<span class="nc bnc" id="L493" title="All 2 branches missed.">            if (myHostname.equals(&quot;localhost&quot;)) {</span>
+                try {
+<span class="nc" id="L495">                    myHostname = InetAddress.getLocalHost().getHostName();</span>
+<span class="nc" id="L496">                } catch (Exception e) {</span>
+<span class="nc" id="L497">                    logger.error(&quot;Error getting local hostname&quot;);</span>
+<span class="nc" id="L498">                }</span>
+            }
+<span class="nc bnc" id="L500" title="All 2 branches missed.">            if (!CN.equals(myHostname)) {</span>
+<span class="nc" id="L501">                logger.error(&quot;MyProxy : certificate CN {} does not match server hostname {}&quot;,</span>
+<span class="nc" id="L502">                        CN, server.getMyProxyHost());</span>
+<span class="nc" id="L503">                throw new CertificateException(</span>
+                        &quot;Server certificate subject CN (&quot; + CN
+                        + &quot;) does not match server hostname (&quot;
+<span class="nc" id="L506">                        + server.getMyProxyHost()</span>
+                        + &quot;).&quot;);
+            }
+<span class="nc" id="L509">        }</span>
+    }
+
+    private X509Certificate[] getX509CertsFromStringList(String[] certList) throws CertificateException {
+
+<span class="nc" id="L514">        CertificateFactory certFactory = CertificateFactory.getInstance(&quot;X.509&quot;);</span>
+<span class="nc" id="L515">        Collection&lt;X509Certificate&gt; c = new ArrayList&lt;X509Certificate&gt;(</span>
+                certList.length);
+<span class="nc bnc" id="L517" title="All 2 branches missed.">        for (int i = 0; i &lt; certList.length; i++) {</span>
+<span class="nc" id="L518">            int index = -1;</span>
+<span class="nc" id="L519">            String certData = certList[i];</span>
+<span class="nc bnc" id="L520" title="All 2 branches missed.">            if (certData != null) {</span>
+<span class="nc" id="L521">                index = certData.indexOf(&quot;-----BEGIN CERTIFICATE-----&quot;);</span>
+            }
+<span class="nc bnc" id="L523" title="All 2 branches missed.">            if (index &gt;= 0) {</span>
+<span class="nc" id="L524">                certData = certData.substring(index);</span>
+<span class="nc" id="L525">                ByteArrayInputStream inputStream = new ByteArrayInputStream(</span>
+<span class="nc" id="L526">                        certData.getBytes());</span>
+<span class="nc" id="L527">                X509Certificate cert = (X509Certificate) certFactory.generateCertificate(inputStream);</span>
+<span class="nc" id="L528">                c.add(cert);</span>
+            }
+        }
+<span class="nc bnc" id="L531" title="All 2 branches missed.">        if (c.isEmpty()) {</span>
+<span class="nc" id="L532">            return null;</span>
+        }
+<span class="nc" id="L534">        return c.toArray(new X509Certificate[0]);</span>
+    }
+
+    /**
+     * Gets the existing trusted CA certificates directory.
+     *
+     * @return directory path string or null if none found
+     */
+    public String getExistingTrustRootPath() {
+        String path, GL;
+
+<span class="nc" id="L545">        GL = System.getenv(&quot;GLOBUS_LOCATION&quot;);</span>
+<span class="nc bnc" id="L546" title="All 2 branches missed.">        if (GL == null) {</span>
+<span class="nc" id="L547">            GL = System.getProperty(&quot;GLOBUS_LOCATION&quot;);</span>
+        }
+
+<span class="nc" id="L550">        path = System.getenv(&quot;X509_CERT_DIR&quot;);</span>
+<span class="nc bnc" id="L551" title="All 2 branches missed.">        if (path == null) {</span>
+<span class="nc" id="L552">            path = System.getProperty(&quot;X509_CERT_DIR&quot;);</span>
+        }
+<span class="nc bnc" id="L554" title="All 2 branches missed.">        if (path == null) {</span>
+<span class="nc" id="L555">            path = getDir(&quot;/etc/grid-security/certificates&quot;);</span>
+        }
+<span class="nc bnc" id="L557" title="All 2 branches missed.">        if (path == null) {</span>
+<span class="nc" id="L558">            path = getDir(GL + File.separator + &quot;share&quot; + File.separator</span>
+                    + &quot;certificates&quot;);
+        }
+
+<span class="nc" id="L562">        return path;</span>
+    }
+
+    private String getDir(String path) {
+<span class="nc bnc" id="L566" title="All 2 branches missed.">        if (path == null) {</span>
+<span class="nc" id="L567">            return null;</span>
+        }
+<span class="nc" id="L569">        File f = new File(path);</span>
+<span class="nc bnc" id="L570" title="All 4 branches missed.">        if (f.isDirectory() &amp;&amp; f.canRead()) {</span>
+<span class="nc" id="L571">            return f.getAbsolutePath();</span>
+        }
+<span class="nc" id="L573">        return null;</span>
+    }
+
+    public void copyFile(String source, String dest) {
+<span class="nc" id="L577">        FileChannel in = null;</span>
+<span class="nc" id="L578">        FileChannel out = null;</span>
+
+        try {
+            // Init
+<span class="nc" id="L582">            in = new FileInputStream(source).getChannel();</span>
+<span class="nc" id="L583">            out = new FileOutputStream(dest).getChannel();</span>
+<span class="nc" id="L584">            in.transferTo(0, in.size(), out);</span>
+
+<span class="nc" id="L586">        } catch (Exception e) {</span>
+<span class="nc" id="L587">            logger.error(&quot;Error copying file from {} to {}&quot;, source, dest, e);</span>
+        } finally {
+<span class="nc bnc" id="L589" title="All 2 branches missed.">            if (in != null) {</span>
+                try {
+<span class="nc" id="L591">                    in.close();</span>
+<span class="nc" id="L592">                } catch (IOException e) {</span>
+<span class="nc" id="L593">                    logger.error(&quot;Error closing FileInputStream for file copy&quot;, e);</span>
+<span class="nc" id="L594">                }</span>
+            }
+<span class="nc bnc" id="L596" title="All 2 branches missed.">            if (out != null) {</span>
+                try {
+<span class="nc" id="L598">                    out.close();</span>
+<span class="nc" id="L599">                } catch (IOException e) {</span>
+<span class="nc" id="L600">                    logger.error(&quot;Error closing FileInputStream for file copy&quot;, e);</span>
+<span class="nc" id="L601">                }</span>
+            }
+        }
+
+<span class="nc" id="L605">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>
