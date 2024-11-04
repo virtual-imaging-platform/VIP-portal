@@ -34,6 +34,7 @@ package fr.insalyon.creatis.vip.api.security;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.oauth2.client.endpoint.DefaultAuthorizationCodeTokenResponseClient;
@@ -55,41 +56,36 @@ import org.springframework.security.web.firewall.DefaultHttpFirewall;
  *
  * Created by abonnet on 7/22/16.
  */
-// XXX temporarily disabled until ApiSecurityConfig is sorted out, also @Bean below
-//@Configuration
-//@EnableWebSecurity
-//@Order(2)
+
+@Configuration
+@EnableWebSecurity
 public class EgiSecurityConfig {
 
-    //@Bean
-    protected SecurityFilterChain configure(HttpSecurity http) throws Exception {
+    @Bean
+    @Order(2)
+    public SecurityFilterChain egiFilterChain(HttpSecurity http) throws Exception {
         http
-            .authorizeRequests()
-                .anyRequest().permitAll()
-            .and()
-                .oauth2Login()
-                .authorizationEndpoint()
-                .baseUri("/oauth2/authorize-client")
-                .authorizationRequestRepository(authorizationRequestRepository())
-            .and()
-                .tokenEndpoint()
-                .accessTokenResponseClient(accessTokenResponseClient())
-            .and()
-                .defaultSuccessUrl("/rest/loginEgi")
-                .failureUrl("/loginFailure")
-            .and()
-                .cors().and()
-                .headers().frameOptions().sameOrigin().and()
+                .authorizeHttpRequests((authorize) -> authorize.anyRequest().permitAll())
+                .oauth2Login((oauth2)->oauth2
+                        .authorizationEndpoint((authorization)->authorization
+                                .baseUri("/oauth2/authorize-client")
+                                .authorizationRequestRepository(authorizationRequestRepository()))
+                        .tokenEndpoint((token)->token
+                                .accessTokenResponseClient(accessTokenResponseClient()))
+                        .defaultSuccessUrl("/rest/loginEgi")
+                        .failureUrl("/loginFailure"))
+                .cors(Customizer.withDefaults())
+                .headers((headers) -> headers.frameOptions((frameOptions) -> frameOptions.sameOrigin()))
                 .csrf((csrf) -> csrf.disable());
         return http.build();
     }
 
-    //@Bean
+    @Bean
     public AuthorizationRequestRepository<OAuth2AuthorizationRequest> authorizationRequestRepository() {
         return new HttpSessionOAuth2AuthorizationRequestRepository();
     }
 
-    //@Bean
+    @Bean
     public OAuth2AccessTokenResponseClient<OAuth2AuthorizationCodeGrantRequest> accessTokenResponseClient() {
         DefaultAuthorizationCodeTokenResponseClient accessTokenResponseClient = new DefaultAuthorizationCodeTokenResponseClient();
         return accessTokenResponseClient;
@@ -99,7 +95,7 @@ public class EgiSecurityConfig {
         Do not use the default firewall (StrictHttpFirewall) because it blocks
         "//" in url and it is used in gwt rpc calls
      */
-    //@Bean
+    @Bean
     public DefaultHttpFirewall httpFirewall() {
         DefaultHttpFirewall firewall = new DefaultHttpFirewall();
         firewall.setAllowUrlEncodedSlash(true);

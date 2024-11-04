@@ -78,7 +78,6 @@ import static fr.insalyon.creatis.vip.api.CarminProperties.KEYCLOAK_ACTIVATED;
  */
 @Configuration
 @EnableWebSecurity
-@Order(1)
 public class ApiSecurityConfig {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
@@ -110,7 +109,8 @@ public class ApiSecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    @Order(1)
+    public SecurityFilterChain apiFilterChain(HttpSecurity http) throws Exception {
         http
                 .securityMatcher(AntPathRequestMatcher.antMatcher("/rest/**"))
                 .authorizeHttpRequests((authorize) -> authorize
@@ -128,6 +128,7 @@ public class ApiSecurityConfig {
                 )
                 .addFilterBefore(apikeyAuthenticationFilter(), BasicAuthenticationFilter.class)
                 //.addFilterBefore(oidcAuthenticationFilter(), BasicAuthenticationFilter.class)
+                .exceptionHandling((exceptionHandling) -> exceptionHandling.authenticationEntryPoint(vipAuthenticationEntryPoint))
                 // session must be activated otherwise OIDC auth info will be lost when accessing /loginEgi
                 // .sessionManagement((sessionManagement) -> sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .cors(Customizer.withDefaults())
