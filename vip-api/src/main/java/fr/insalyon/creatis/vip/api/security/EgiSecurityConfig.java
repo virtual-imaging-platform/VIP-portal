@@ -32,7 +32,9 @@
 package fr.insalyon.creatis.vip.api.security;
 
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.oauth2.client.endpoint.DefaultAuthorizationCodeTokenResponseClient;
@@ -54,30 +56,27 @@ import org.springframework.security.web.firewall.DefaultHttpFirewall;
  *
  * Created by abonnet on 7/22/16.
  */
+
+@Configuration
 @EnableWebSecurity
-@Order(2)
 public class EgiSecurityConfig {
 
     @Bean
-    protected SecurityFilterChain configure(HttpSecurity http) throws Exception {
+    @Order(2)
+    public SecurityFilterChain egiFilterChain(HttpSecurity http) throws Exception {
         http
-            .authorizeRequests()
-                .anyRequest().permitAll()
-            .and()
-                .oauth2Login()
-                .authorizationEndpoint()
-                .baseUri("/oauth2/authorize-client")
-                .authorizationRequestRepository(authorizationRequestRepository())
-            .and()
-                .tokenEndpoint()
-                .accessTokenResponseClient(accessTokenResponseClient())
-            .and()
-                .defaultSuccessUrl("/rest/loginEgi")
-                .failureUrl("/loginFailure")
-            .and()
-                .cors().and()
-                .headers().frameOptions().sameOrigin().and()
-                .csrf().disable();
+                .authorizeHttpRequests((authorize) -> authorize.anyRequest().permitAll())
+                .oauth2Login((oauth2)->oauth2
+                        .authorizationEndpoint((authorization)->authorization
+                                .baseUri("/oauth2/authorize-client")
+                                .authorizationRequestRepository(authorizationRequestRepository()))
+                        .tokenEndpoint((token)->token
+                                .accessTokenResponseClient(accessTokenResponseClient()))
+                        .defaultSuccessUrl("/rest/loginEgi")
+                        .failureUrl("/loginFailure"))
+                .cors(Customizer.withDefaults())
+                .headers((headers) -> headers.frameOptions((frameOptions) -> frameOptions.sameOrigin()))
+                .csrf((csrf) -> csrf.disable());
         return http.build();
     }
 

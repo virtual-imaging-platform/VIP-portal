@@ -36,149 +36,113 @@ import fr.insalyon.creatis.vip.api.CarminProperties;
 import fr.insalyon.creatis.vip.api.security.apikey.SpringApiPrincipal;
 import fr.insalyon.creatis.vip.api.security.apikey.ApikeyAuthenticationFilter;
 import fr.insalyon.creatis.vip.api.security.apikey.ApikeyAuthenticationProvider;
-import fr.insalyon.creatis.vip.api.security.keycloak.SpringKeycloakPrincipal;
-import fr.insalyon.creatis.vip.api.security.keycloak.VipKeycloakAuthenticationProvider;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 
-import org.keycloak.adapters.springsecurity.KeycloakConfiguration;
-import org.keycloak.adapters.springsecurity.KeycloakSecurityComponents;
-import org.keycloak.adapters.springsecurity.authentication.KeycloakAuthenticationProvider;
-import org.keycloak.adapters.springsecurity.config.KeycloakWebSecurityConfigurerAdapter;
-
-import org.keycloak.adapters.springsecurity.filter.KeycloakAuthenticationProcessingFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.env.Environment;
+import org.springframework.stereotype.Service;
 
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-
-import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.mapping.GrantedAuthoritiesMapper;
 import org.springframework.security.core.authority.mapping.SimpleAuthorityMapper;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.web.AuthenticationEntryPoint;
-import org.springframework.security.web.authentication.session.NullAuthenticatedSessionStrategy;
-import org.springframework.security.web.authentication.session.SessionAuthenticationStrategy;
+import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.security.web.firewall.DefaultHttpFirewall;
-import org.springframework.stereotype.Service;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.security.web.util.matcher.RegexRequestMatcher;
 
 import java.util.function.Supplier;
+import java.util.ArrayList;
 
 import static fr.insalyon.creatis.vip.api.CarminProperties.KEYCLOAK_ACTIVATED;
 
 /**
- * Keycloaksecurity configuration.
+ * VIP API configuration for API key and OIDC authentications.
  *
- * It secures by api key all rest requests (except platform and authenticate)
- *
- * Modified by khalilkes to implement keycloak adapter
- *
+ * Authenticates /rest requests with either:
+ * - a static per-user API key (ApikeyAuthenticationFilter)
+ * - or an OIDC Bearer token (ex-Keycloak). This part is currently work-in-progress,
+ *   with org.keycloak currently removed, and proper OIDC connector not implemented yet.
  */
-@ComponentScan(basePackageClasses = {KeycloakSecurityComponents.class})
-@KeycloakConfiguration
+@Configuration
 @EnableWebSecurity
-@Order(1)
 public class ApiSecurityConfig {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private final Environment env;
-    private final ApikeyAuthenticationProvider apikeyAuthenticationProvider;
     private final VipAuthenticationEntryPoint vipAuthenticationEntryPoint;
-    private final VipKeycloakAuthenticationProvider vipKeycloakAuthenticationProvider;
+    private final AuthenticationManager vipAuthenticationManager;
 
     @Autowired
     public ApiSecurityConfig(
             Environment env, ApikeyAuthenticationProvider apikeyAuthenticationProvider,
-            VipAuthenticationEntryPoint vipAuthenticationEntryPoint,
-            VipKeycloakAuthenticationProvider vipKeycloakAuthenticationProvider) {
+            VipAuthenticationEntryPoint vipAuthenticationEntryPoint) {
         this.env = env;
-        this.apikeyAuthenticationProvider = apikeyAuthenticationProvider;
         this.vipAuthenticationEntryPoint = vipAuthenticationEntryPoint;
-        this.vipKeycloakAuthenticationProvider = vipKeycloakAuthenticationProvider;
+        // Build our AuthenticationManager instance, with one provider for each authentication method
+        ArrayList<AuthenticationProvider> providers = new ArrayList<>();
+        providers.add(apikeyAuthenticationProvider);
+        // providers.add(oidcAuthenticationProvider);
+        this.vipAuthenticationManager = new ProviderManager(providers);
     }
 
-    protected boolean isKeycloakActive() {
+    @Bean
+    public AuthenticationManager authenticationManager() {
+        return vipAuthenticationManager;
+    }
+
+    protected boolean isOIDCActive() {
         return env.getProperty(KEYCLOAK_ACTIVATED, Boolean.class, Boolean.FALSE);
     }
 
-    // @Override
-    protected SessionAuthenticationStrategy sessionAuthenticationStrategy() {
-        // required for bearer only applications
-        return new NullAuthenticatedSessionStrategy();
+    @Bean
+    @Order(1)
+    public SecurityFilterChain apiFilterChain(HttpSecurity http) throws Exception {
+        http
+                .securityMatcher(AntPathRequestMatcher.antMatcher("/rest/**"))
+                .authorizeHttpRequests((authorize) -> authorize
+                        .requestMatchers(AntPathRequestMatcher.antMatcher("/rest/platform")).permitAll()
+                        .requestMatchers(AntPathRequestMatcher.antMatcher("/rest/authenticate")).permitAll()
+                        .requestMatchers(AntPathRequestMatcher.antMatcher("/rest/session")).permitAll()
+                        .requestMatchers(new RegexRequestMatcher("/rest/pipelines\\?public", "GET")).permitAll()
+                        .requestMatchers(AntPathRequestMatcher.antMatcher("/rest/publications")).permitAll()
+                        .requestMatchers(AntPathRequestMatcher.antMatcher("/rest/reset-password")).permitAll()
+                        .requestMatchers(AntPathRequestMatcher.antMatcher("/rest/register")).permitAll()
+                        .requestMatchers(AntPathRequestMatcher.antMatcher("/rest/executions/{executionId}/summary")).hasAnyRole("SERVICE")
+                        .requestMatchers(AntPathRequestMatcher.antMatcher("/rest/statistics/**")).hasAnyRole("ADVANCED", "ADMINISTRATOR")
+                        .requestMatchers(AntPathRequestMatcher.antMatcher("/rest/**")).authenticated()
+                        .anyRequest().permitAll()
+                )
+                .addFilterBefore(apikeyAuthenticationFilter(), BasicAuthenticationFilter.class)
+                //.addFilterBefore(oidcAuthenticationFilter(), BasicAuthenticationFilter.class)
+                .exceptionHandling((exceptionHandling) -> exceptionHandling.authenticationEntryPoint(vipAuthenticationEntryPoint))
+                // session must be activated otherwise OIDC auth info will be lost when accessing /loginEgi
+                // .sessionManagement((sessionManagement) -> sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .cors(Customizer.withDefaults())
+                .headers((headers) -> headers.frameOptions((frameOptions) -> frameOptions.sameOrigin()))
+                .csrf((csrf) -> csrf.disable());
+        return http.build();
     }
 
-    // @Override
-    protected AuthenticationEntryPoint authenticationEntryPoint() throws Exception {
-        return vipAuthenticationEntryPoint;
+    @Bean
+    public ApikeyAuthenticationFilter apikeyAuthenticationFilter() throws Exception {
+        return new ApikeyAuthenticationFilter(
+                env.getRequiredProperty(CarminProperties.APIKEY_HEADER_NAME),
+                vipAuthenticationEntryPoint, authenticationManager());
     }
-
-    // @Override
-    // protected KeycloakAuthenticationProcessingFilter keycloakAuthenticationProcessingFilter() throws Exception {
-        // KeycloakAuthenticationProcessingFilter f = super.keycloakAuthenticationProcessingFilter();
-        // f.setAuthenticationFailureHandler(vipAuthenticationEntryPoint);
-        // return f;
-    // }
-
-    // @Override
-    protected KeycloakAuthenticationProvider keycloakAuthenticationProvider() {
-        return vipKeycloakAuthenticationProvider;
-    }
-
-    // @Override
-    public void configure(AuthenticationManagerBuilder auth) {
-        if (isKeycloakActive()) {
-            KeycloakAuthenticationProvider keycloakAuthenticationProvider = keycloakAuthenticationProvider();
-            keycloakAuthenticationProvider.setGrantedAuthoritiesMapper(grantedAuthoritiesMapper());
-            auth.authenticationProvider(keycloakAuthenticationProvider);
-        }
-        auth.authenticationProvider(apikeyAuthenticationProvider);
-    }
-
-    // @Override
-    // protected void configure(HttpSecurity http) throws Exception {
-    //     if (isKeycloakActive()) {
-    //         super.configure(http);
-    //     }
-    //     http.antMatcher("/rest/**")
-    //         .authorizeRequests()
-    //             .antMatchers("/rest/platform").permitAll()
-    //             .antMatchers("/rest/authenticate").permitAll()
-    //             .antMatchers("/rest/session").permitAll()
-    //             .regexMatchers("/rest/pipelines\\?public").permitAll()
-    //             .antMatchers("/rest/publications").permitAll()
-    //             .antMatchers("/rest/reset-password").permitAll()
-    //             .antMatchers("/rest/register").permitAll()
-    //             .antMatchers("/rest/executions/{executionId}/summary").hasAnyRole("SERVICE")
-    //             .antMatchers("/rest/simulate-refresh").authenticated()
-    //             .antMatchers("/rest/statistics/**").hasAnyRole("ADVANCED", "ADMINISTRATOR")
-    //             .antMatchers("/rest/**").authenticated()
-    //             .anyRequest().permitAll()
-    //         .and()
-    //         .addFilterBefore(apikeyAuthenticationFilter(), BasicAuthenticationFilter.class)
-    //         .exceptionHandling().authenticationEntryPoint(vipAuthenticationEntryPoint)// also done in parent but needed here when keycloak is not active. It can be done twice without harm.
-    //         // session must be activated otherwise OIDC auth info will be lost when accessing /loginEgi
-    //         //.and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-    //         .and()
-    //         .cors().and()
-    //         .headers().frameOptions().sameOrigin().and()
-    //         .csrf().disable();
-    // }
-
-    // @Bean
-    // public ApikeyAuthenticationFilter apikeyAuthenticationFilter() throws Exception {
-    //     return new ApikeyAuthenticationFilter(
-    //             env.getRequiredProperty(CarminProperties.APIKEY_HEADER_NAME),
-    //             vipAuthenticationEntryPoint, authenticationManager());
-    // }
 
     @Service
     public static class CurrentUserProvider implements Supplier<User> {
@@ -196,7 +160,8 @@ public class ApiSecurityConfig {
             if (user != null) {
                 return user;
             }
-            return getKeycloakUser(authentication);
+            // user = getOidcUser(authentication);
+            return null;
         }
 
         private User getApikeyUser(Authentication authentication) {
@@ -206,15 +171,6 @@ public class ApiSecurityConfig {
             SpringApiPrincipal springCompatibleUser =
                     (SpringApiPrincipal) authentication.getPrincipal();
             return springCompatibleUser.getVipUser();
-        }
-
-        private User getKeycloakUser(Authentication authentication) {
-            if ( ! (authentication.getPrincipal() instanceof SpringKeycloakPrincipal)) {
-                return null;
-            }
-            SpringKeycloakPrincipal springKeycloakPrincipal =
-                    (SpringKeycloakPrincipal) authentication.getPrincipal();
-            return springKeycloakPrincipal.getVipUser();
         }
     }
 

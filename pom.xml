@@ -236,6 +236,17 @@ knowledge of the CeCILL-B license and that you accept its terms.
     <build>
         <plugins>
             <plugin>
+                <!-- needed for Spring 6.1 -->
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.13.0</version>
+                <configuration>
+                    <compilerArgs>
+                        <arg>-parameters</arg>
+                    </compilerArgs>
+                </configuration>
+            </plugin>
+            <plugin>
                 <!-- needed to replace the artifact version when calling install or deploy -->
               <groupId>org.codehaus.mojo</groupId>
               <artifactId>flatten-maven-plugin</artifactId>

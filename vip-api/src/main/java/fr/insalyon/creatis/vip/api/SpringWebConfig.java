@@ -63,12 +63,6 @@ public class SpringWebConfig implements WebMvcConfigurer {
         this.vipConfigurer = vipConfigurer;
     }
 
-    //implements rest template to send requests with tokens
-    // @Bean
-    // public KeycloakRestTemplate keycloakRestTemplate(KeycloakClientRequestFactory keycloakClientRequestFactory) {
-    //     return new KeycloakRestTemplate(keycloakClientRequestFactory);
-    // }
-
     @Override
     public void configurePathMatch(PathMatchConfigurer configurer) {
         // Otherwise all that follow a dot in an URL is considered an extension and removed

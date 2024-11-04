@@ -96,12 +96,9 @@ public class ApiPropertiesInitializer {
 
 
         if (env.getProperty(KEYCLOAK_ACTIVATED, Boolean.class, Boolean.FALSE)) {
-            logger.info("Keycloak activated");
-            verifyPropertyNotNull(KEYCLOAK_CLIENT_ID, String.class);
-            verifyPropertyNotNull(KEYCLOAK_CLIENT_SECRET, String.class);
-            verifyPropertyNotNull(KEYCLOAK_REALM_URL, String.class);
+            logger.info("Keycloak/OIDC activated, but this has no effect yet");
         } else {
-            logger.info("Keycloak NOT active");
+            logger.info("Keycloak/OIDC NOT active");
         }
 
         // due to arrays and generics, this verification aren't easy to factorize
