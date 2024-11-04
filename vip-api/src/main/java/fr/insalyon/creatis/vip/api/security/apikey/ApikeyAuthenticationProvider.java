@@ -91,7 +91,6 @@ public class ApikeyAuthenticationProvider implements
     public Authentication authenticate(Authentication authentication)
         throws AuthenticationException {
 
-        logger.info("XXX ApikeyAuthenticationProvider: authenticate");
         Assert.isInstanceOf(ApikeyAuthenticationToken.class, authentication,
                 "Only ApikeyAuthenticationToken is supported");
 

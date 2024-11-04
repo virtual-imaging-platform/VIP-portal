@@ -48,7 +48,6 @@ knowledge of the CeCILL-B license and that you accept its terms.
         <skip.itests>true</skip.itests>
         <test.version.hamcrest>2.2</test.version.hamcrest>
         <test.version.mockito>3.3.3</test.version.mockito>
-        <keycloak.version>25.0.3</keycloak.version>
     </properties>
 
     <dependencies>
