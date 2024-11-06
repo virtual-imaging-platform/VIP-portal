@@ -112,13 +112,7 @@ knowledge of the CeCILL-B license and that you accept its terms.
                 <artifactId>smartgwt-lgpl</artifactId>
                 <version>13.0p</version>
             </dependency>
-            <dependency>
-                <groupId>jakarta.servlet</groupId>
-                <artifactId>jakarta.servlet-api</artifactId>
-                <version>6.1.0</version>
-                <scope>provided</scope>
-            </dependency>
-            
+
             <!-- empty jars to ensure commons logging and log4j is not
               used in project and not present in final war.
               (see alternative 3 in https://www.slf4j.org/faq.html#excludingJCL)
@@ -152,9 +146,15 @@ knowledge of the CeCILL-B license and that you accept its terms.
         </dependencies>
     </dependencyManagement>
 
-    <!-- Test dependencies -->
-
     <dependencies>
+        <!-- jakarta.servlet is used in almost all submodules, provided by Tomcat -->
+        <dependency>
+            <groupId>jakarta.servlet</groupId>
+            <artifactId>jakarta.servlet-api</artifactId>
+            <version>6.1.0</version>
+            <scope>provided</scope>
+        </dependency>
+        <!-- Test dependencies -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>

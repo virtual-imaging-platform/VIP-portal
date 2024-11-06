@@ -44,10 +44,6 @@ knowledge of the CeCILL-B license and that you accept its terms.
     <name>VIP-Core</name>
 
     <dependencies>
-        <dependency>
-            <groupId>jakarta.servlet</groupId>
-            <artifactId>jakarta.servlet-api</artifactId>
-        </dependency>
 
         <dependency>
             <groupId>org.gwtproject</groupId>

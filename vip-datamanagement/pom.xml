@@ -43,10 +43,6 @@ knowledge of the CeCILL-B license and that you accept its terms.
     <packaging>jar</packaging>
     <name>VIP-DataManager</name>
     <dependencies>
-        <dependency>
-            <groupId>jakarta.servlet</groupId>
-            <artifactId>jakarta.servlet-api</artifactId>
-        </dependency>
 
         <dependency>
             <groupId>fr.insalyon.creatis</groupId>
