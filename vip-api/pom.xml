@@ -52,13 +52,6 @@ knowledge of the CeCILL-B license and that you accept its terms.
 
     <dependencies>
         <dependency>
-            <groupId>jakarta.validation</groupId>
-            <artifactId>jakarta.validation-api</artifactId>
-            <version>3.1.0</version>
-            <scope>provided</scope>
-        </dependency>
-
-        <dependency>
             <groupId>fr.insalyon.creatis</groupId>
             <artifactId>vip-core</artifactId>
             <version>${project.version}</version>
@@ -108,9 +101,9 @@ knowledge of the CeCILL-B license and that you accept its terms.
 
         <!-- Validation implementation -->
         <dependency>
-            <groupId>org.hibernate</groupId>
+            <groupId>org.hibernate.validator</groupId>
             <artifactId>hibernate-validator</artifactId>
-            <version>6.1.5.Final</version>
+            <version>8.0.1.Final</version>
         </dependency>
         <dependency>
             <groupId>org.glassfish</groupId>
