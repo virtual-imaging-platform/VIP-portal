@@ -99,11 +99,6 @@ public class ApiSecurityConfig {
         this.vipAuthenticationManager = new ProviderManager(providers);
     }
 
-    @Bean
-    public AuthenticationManager authenticationManager() {
-        return vipAuthenticationManager;
-    }
-
     protected boolean isOIDCActive() {
         return env.getProperty(KEYCLOAK_ACTIVATED, Boolean.class, Boolean.FALSE);
     }
@@ -111,6 +106,8 @@ public class ApiSecurityConfig {
     @Bean
     @Order(1)
     public SecurityFilterChain apiFilterChain(HttpSecurity http) throws Exception {
+        // It is required to used AntPathRequestMatcher.antMatcher() everywhere below,
+        // otherwise Spring users MvcRequestMatcher as the default requestMatchers implementation.
         http
                 .securityMatcher(AntPathRequestMatcher.antMatcher("/rest/**"))
                 .authorizeHttpRequests((authorize) -> authorize
@@ -141,7 +138,7 @@ public class ApiSecurityConfig {
     public ApikeyAuthenticationFilter apikeyAuthenticationFilter() throws Exception {
         return new ApikeyAuthenticationFilter(
                 env.getRequiredProperty(CarminProperties.APIKEY_HEADER_NAME),
-                vipAuthenticationEntryPoint, authenticationManager());
+                vipAuthenticationEntryPoint, vipAuthenticationManager);
     }
 
     @Service
