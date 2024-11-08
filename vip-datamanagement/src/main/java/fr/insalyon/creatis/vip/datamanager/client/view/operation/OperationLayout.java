@@ -31,25 +31,22 @@
  */
 package fr.insalyon.creatis.vip.datamanager.client.view.operation;
 
-import com.google.gwt.user.client.Timer;
+import java.util.Date;
+import java.util.List;
+
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.types.Overflow;
 import com.smartgwt.client.types.VerticalAlignment;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.layout.VLayout;
+
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
 import fr.insalyon.creatis.vip.datamanager.client.bean.PoolOperation;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerService;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerServiceAsync;
-
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.Semaphore;
-import java.util.function.Supplier;
+import fr.insalyon.creatis.vip.datamanager.client.view.browser.BrowserContextMenu;
 
 
 /**
@@ -184,6 +181,11 @@ public class OperationLayout extends VLayout {
             @Override
             public void onSuccess(PoolOperation result) {
                 operationsLayout.addMember(new OperationBoxLayout(result), 0);
+                try {
+                    BrowserContextMenu.downloadclient(operationID);
+                } catch (Exception e) {
+                    Layout.getInstance().setWarningMessage(operationID + "<br />Unable to download operation:<br />" + e.getMessage());
+                }               
             }
         };
         service.getPoolOperationById(operationID, asyncCallback);

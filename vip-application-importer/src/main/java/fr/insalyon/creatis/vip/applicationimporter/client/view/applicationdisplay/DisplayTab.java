@@ -74,44 +74,48 @@ public class DisplayTab extends Tab {
     /**
      * Creates the general layout of the tab.
      */
+
     private void configure() {
+
         globalLayout = new VLayout();
         globalLayout.setWidth100();
         globalLayout.setHeight100();
         globalLayout.setMargin(6);
         globalLayout.setMembersMargin(5);
-
+        
         HLayout upperRow = new HLayout();
         upperRow.setWidth100();
         upperRow.setHeight("45%"); // Occupy 45% of the height
         upperRow.setMargin(0);
         upperRow.setMembersMargin(10);
         upperRow.setStyleName("shadow-lg");
-
+        
         VLayout spaceLayout = new VLayout(); // Layout for the space between upper and lower rows
         spaceLayout.setWidth100();
         spaceLayout.setHeight("10%"); // Occupy 10% of the height
         spaceLayout.setMargin(0);
-
+        
         HLayout lowerRow = new HLayout();
         lowerRow.setWidth100();
         lowerRow.setHeight("45%"); // Occupy 45% of the height
         lowerRow.setMargin(0);
         lowerRow.setMembersMargin(10);
-
+        
         generalLayout = new GeneralLayout("50%", "100%"); // Adjusted height to occupy half the height
-        inputsLayout = new InputLayout("50%", "100%"); 
-        outputsLayout = new OutputLayout("50%", "100%"); 
-        vipLayout = new VIPLayout("50%", "100%"); 
-
+        inputsLayout = new InputLayout("50%", "100%"); // Adjusted height to occupy half the height
+        outputsLayout = new OutputLayout("50%", "100%"); // Adjusted height to occupy half the height
+        vipLayout = new VIPLayout("50%", "100%"); // Adjusted height to occupy half the height
+        
         upperRow.addMember(generalLayout);
         upperRow.addMember(outputsLayout);
         lowerRow.addMember(inputsLayout);
         lowerRow.addMember(vipLayout);
-
+        
         globalLayout.addMember(upperRow);
         globalLayout.addMember(spaceLayout); // Add the space layout between the upper and lower rows
         globalLayout.addMember(lowerRow);
+
+
         IButton createApplicationButton;
         createApplicationButton = WidgetUtil.getIButton("Create application", Constants.ICON_LAUNCH, new ClickHandler() {
             @Override

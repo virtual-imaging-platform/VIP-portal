@@ -35,8 +35,13 @@ import com.smartgwt.client.widgets.Label;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
+import com.smartgwt.client.widgets.form.fields.TextItem;
+import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
+import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
+import com.smartgwt.client.widgets.form.fields.events.KeyPressHandler;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
+
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
@@ -44,32 +49,55 @@ import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
 import fr.insalyon.creatis.vip.datamanager.client.view.ValidatorUtil;
 import fr.insalyon.creatis.vip.datamanager.client.view.browser.AddFolderWindow;
 
-/**
- *
- * @author Rafael Silva
- */
 public class BasicBrowserToolStrip extends ToolStrip {
 
     private BasicBrowserToolStrip toolStrip;
     protected ModalWindow modal;
     protected SelectItem pathItem;
+    private SelectItem fileTypeSelect;
+    private ListGrid grid;
+    private TextItem searchItem;
 
-    public BasicBrowserToolStrip(final ModalWindow modal, final ListGrid grid) {
-
+    public BasicBrowserToolStrip(final ModalWindow modal, final ListGrid grid1) {
+        grid = grid1;
         this.modal = modal;
         this.toolStrip = this;
-        this.setWidth100();
+        //this.setWidth100();
 
         Label titleLabel = new Label("&nbsp;&nbsp;Platform Files");
-        titleLabel.setWidth(75);
+        titleLabel.setWidth(85);
         this.addMember(titleLabel);
-        this.addSeparator();
+        //this.addSeparator();
 
         pathItem = new SelectItem("path");
         pathItem.setShowTitle(false);
-        pathItem.setWidth(400);
+        pathItem.setWidth("100%");
         pathItem.setValue(DataManagerConstants.ROOT);
         this.addFormItem(pathItem);
+          
+        fileTypeSelect = new SelectItem();
+        fileTypeSelect.setTitle("File Type");
+        fileTypeSelect.setShowTitle(false);
+        fileTypeSelect.setWidth(120);
+        fileTypeSelect.setValueMap("All Files (*.*)", "JSON File (*.json)");
+        fileTypeSelect.setDefaultToFirstOption(true);
+        BrowserUtil.fileType = "all";
+        fileTypeSelect.addChangedHandler(new ChangedHandler() {
+            @Override
+            public void onChanged(ChangedEvent event) {
+                String fileType = event.getValue().toString();
+                if ("JSON File (*.json)".equals(fileType)) {
+                    // Filter JSON files
+                    BrowserUtil.fileTypeChanged("json");
+                } else {
+                    // Show all files
+                    BrowserUtil.fileTypeChanged("all");
+                }
+                reloadGridData();
+            }
+        });
+        
+        this.addFormItem(fileTypeSelect);
 
         // Folder Up Button
         this.addButton(WidgetUtil.getToolStripButton(
@@ -92,6 +120,7 @@ public class BasicBrowserToolStrip extends ToolStrip {
             @Override
             public void onClick(ClickEvent event) {
                 BrowserUtil.loadData(modal, grid, toolStrip, pathItem.getValueAsString(), true);
+                BrowserUtil.fileType = "all";
             }
         }));
 
@@ -118,6 +147,22 @@ public class BasicBrowserToolStrip extends ToolStrip {
                 }
             }
         }));
+
+        searchItem = new TextItem();
+        searchItem.setTitle("Search");
+        searchItem.setShowTitle(false);
+        searchItem.setWidth(120);
+        searchItem.setHint("<span style='color:gray'>Search</span>");
+        searchItem.addKeyPressHandler(new KeyPressHandler() {
+            @Override
+            public void onKeyPress(com.smartgwt.client.widgets.form.fields.events.KeyPressEvent event) {
+                // Reload grid data when the user presses Enter in the search box
+                if ("Enter".equals(event.getKeyName())) {
+                    filterData();
+                }
+            }
+        });
+        this.addFormItem(searchItem);
     }
 
     public String getPath() {
@@ -126,5 +171,19 @@ public class BasicBrowserToolStrip extends ToolStrip {
 
     public void setPath(String path) {
         pathItem.setValue(path);
+    }
+
+    public void reloadGridData() {
+        String path = toolStrip.getPath(); // Get the current path
+        boolean refresh = true; // Force refresh of data
+    
+        // Reload data based on the current path and fileType value
+        BrowserUtil.loadData(modal, grid, toolStrip, path, refresh);
+    }
+
+    public void filterData() {
+        String searchValue = searchItem.getValueAsString(); // Get the value entered in the search box
+        BrowserUtil.setSearchValue(searchValue); // Set the search value in BrowserUtil
+        reloadGridData(); // Reload grid data with the new search value
     }
 }
