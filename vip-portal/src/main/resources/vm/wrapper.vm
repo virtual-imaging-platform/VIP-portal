@@ -20,7 +20,7 @@ function error {
 }
 
 function configure_apptainer_for_singularity {
-  #APPTAINER_PATH is defined in the configuration (/cvmfs/dirac.egi.eu/container/apptainer/bin/)
+  #APPTAINER_PATH is defined in the configuration (/cvmfs/dirac.egi.eu/dirac/v8.0.39/Linux-x86_64/libexec/)
   cat > singularity << EOF
         #!/bin/bash
         apptainer "$@"
