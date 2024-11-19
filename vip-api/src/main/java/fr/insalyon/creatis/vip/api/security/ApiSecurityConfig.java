@@ -38,6 +38,9 @@ import fr.insalyon.creatis.vip.api.security.apikey.ApikeyAuthenticationFilter;
 import fr.insalyon.creatis.vip.api.security.apikey.ApikeyAuthenticationProvider;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 
+import fr.insalyon.creatis.vip.api.security.oidc.OidcConfig;
+import fr.insalyon.creatis.vip.api.security.oidc.OidcResolver;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,9 +50,6 @@ import org.springframework.core.annotation.Order;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.AuthenticationProvider;
-import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.Customizer;
@@ -64,17 +64,13 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.security.web.util.matcher.RegexRequestMatcher;
 
 import java.util.function.Supplier;
-import java.util.ArrayList;
-
-import static fr.insalyon.creatis.vip.api.CarminProperties.KEYCLOAK_ACTIVATED;
 
 /**
  * VIP API configuration for API key and OIDC authentications.
  *
  * Authenticates /rest requests with either:
- * - a static per-user API key (ApikeyAuthenticationFilter)
- * - or an OIDC Bearer token (ex-Keycloak). This part is currently work-in-progress,
- *   with org.keycloak currently removed, and proper OIDC connector not implemented yet.
+ * - a static per-user API key, in apikeyAuthenticationFilter()
+ * - or an OIDC Bearer token, in oauth2ResourceServer()
  */
 @Configuration
 @EnableWebSecurity
@@ -84,30 +80,28 @@ public class ApiSecurityConfig {
 
     private final Environment env;
     private final VipAuthenticationEntryPoint vipAuthenticationEntryPoint;
-    private final AuthenticationManager vipAuthenticationManager;
+    private final ApikeyAuthenticationProvider apikeyAuthenticationProvider;
+    private final OidcConfig oidcConfig;
+    private final OidcResolver oidcResolver;
 
     @Autowired
     public ApiSecurityConfig(
             Environment env, ApikeyAuthenticationProvider apikeyAuthenticationProvider,
-            VipAuthenticationEntryPoint vipAuthenticationEntryPoint) {
+            VipAuthenticationEntryPoint vipAuthenticationEntryPoint,
+            OidcConfig oidcConfig, OidcResolver oidcResolver) {
         this.env = env;
         this.vipAuthenticationEntryPoint = vipAuthenticationEntryPoint;
-        // Build our AuthenticationManager instance, with one provider for each authentication method
-        ArrayList<AuthenticationProvider> providers = new ArrayList<>();
-        providers.add(apikeyAuthenticationProvider);
-        // providers.add(oidcAuthenticationProvider);
-        this.vipAuthenticationManager = new ProviderManager(providers);
-    }
-
-    protected boolean isOIDCActive() {
-        return env.getProperty(KEYCLOAK_ACTIVATED, Boolean.class, Boolean.FALSE);
+        this.apikeyAuthenticationProvider = apikeyAuthenticationProvider;
+        this.oidcConfig = oidcConfig;
+        this.oidcResolver = oidcResolver;
     }
 
     @Bean
     @Order(1)
     public SecurityFilterChain apiFilterChain(HttpSecurity http) throws Exception {
-        // It is required to used AntPathRequestMatcher.antMatcher() everywhere below,
-        // otherwise Spring users MvcRequestMatcher as the default requestMatchers implementation.
+        // Spring Security configuration for /rest API endpoints, common to both API key and OIDC authentications.
+        // Note that it is required to used AntPathRequestMatcher.antMatcher() everywhere below,
+        // otherwise Spring uses MvcRequestMatcher as the default requestMatchers implementation.
         http
                 .securityMatcher(AntPathRequestMatcher.antMatcher("/rest/**"))
                 .authorizeHttpRequests((authorize) -> authorize
@@ -123,14 +117,28 @@ public class ApiSecurityConfig {
                         .requestMatchers(AntPathRequestMatcher.antMatcher("/rest/**")).authenticated()
                         .anyRequest().permitAll()
                 )
-                .addFilterBefore(apikeyAuthenticationFilter(), BasicAuthenticationFilter.class)
-                //.addFilterBefore(oidcAuthenticationFilter(), BasicAuthenticationFilter.class)
                 .exceptionHandling((exceptionHandling) -> exceptionHandling.authenticationEntryPoint(vipAuthenticationEntryPoint))
                 // session must be activated otherwise OIDC auth info will be lost when accessing /loginEgi
                 // .sessionManagement((sessionManagement) -> sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .cors(Customizer.withDefaults())
                 .headers((headers) -> headers.frameOptions((frameOptions) -> frameOptions.sameOrigin()))
                 .csrf((csrf) -> csrf.disable());
+        // API key authentication always active
+        http.addFilterBefore(apikeyAuthenticationFilter(), BasicAuthenticationFilter.class);
+        // OIDC Bearer token authentication, if enabled
+        if (oidcConfig.isOIDCActive()) {
+            // We configure each OIDC server with issuerLocation instead of jwks_uri: on first token verification,
+            // this does two requests to the relevant OIDC server (obtained from the JWT "iss" field):
+            // - a GET .well-known/openid-configuration request to the OIDC server, to get this server jwks_uri
+            // - then a GET on the jwks_uri, to get the public key which is then used to verify the token
+            // Note that these two requests are done just once per OIDC server (not once per inbound API request).
+            // We also use a customized authenticationManagerResolver instead of simpler JwtDecoder bean, so that:
+            // - requests to the OIDC server happen at inbound-request-time instead of boot, and can be retried on failure
+            // - multiple servers can be supported
+            // - on successful authentication, Jwt principal is converted to a User principal, so DB lookup happens only once
+            http.oauth2ResourceServer((oauth2) -> oauth2
+                    .authenticationManagerResolver(oidcResolver.getAuthenticationManagerResolver()));
+        }
         return http.build();
     }
 
@@ -138,9 +146,10 @@ public class ApiSecurityConfig {
     public ApikeyAuthenticationFilter apikeyAuthenticationFilter() throws Exception {
         return new ApikeyAuthenticationFilter(
                 env.getRequiredProperty(CarminProperties.APIKEY_HEADER_NAME),
-                vipAuthenticationEntryPoint, vipAuthenticationManager);
+                vipAuthenticationEntryPoint, apikeyAuthenticationProvider);
     }
 
+    // Provide authenticated user after a successful API key or OIDC token authentication
     @Service
     public static class CurrentUserProvider implements Supplier<User> {
 
@@ -148,26 +157,19 @@ public class ApiSecurityConfig {
 
         @Override
         public User get() {
-            Authentication authentication =
-                    SecurityContextHolder.getContext().getAuthentication();
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             if (authentication == null) {
                 return null;
             }
-            User user = getApikeyUser(authentication);
-            if (user != null) {
-                return user;
-            }
-            // user = getOidcUser(authentication);
-            return null;
-        }
-
-        private User getApikeyUser(Authentication authentication) {
-            if ( ! (authentication.getPrincipal() instanceof SpringApiPrincipal)) {
+            Object principal = authentication.getPrincipal();
+            if (principal instanceof SpringApiPrincipal) { // API key authentication
+                return ((SpringApiPrincipal) principal).getVipUser();
+            } else if (principal instanceof User) { // OIDC authentication
+                return (User) principal;
+            } else { // no resolvable user found (shouldn't happen)
+                logger.error("CurrentUserProvider: unknown principal class {}", principal.getClass());
                 return null;
             }
-            SpringApiPrincipal springCompatibleUser =
-                    (SpringApiPrincipal) authentication.getPrincipal();
-            return springCompatibleUser.getVipUser();
         }
     }
 

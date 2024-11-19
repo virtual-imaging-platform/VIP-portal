@@ -96,7 +96,7 @@ public class ApiPropertiesInitializer {
 
 
         if (env.getProperty(KEYCLOAK_ACTIVATED, Boolean.class, Boolean.FALSE)) {
-            logger.info("Keycloak/OIDC activated, but this has no effect yet");
+            logger.info("Keycloak/OIDC activated");
         } else {
             logger.info("Keycloak/OIDC NOT active");
         }

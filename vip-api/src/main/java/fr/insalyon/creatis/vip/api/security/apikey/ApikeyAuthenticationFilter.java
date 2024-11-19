@@ -33,8 +33,8 @@ package fr.insalyon.creatis.vip.api.security.apikey;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationServiceException;
+import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -59,21 +59,21 @@ public class ApikeyAuthenticationFilter extends OncePerRequestFilter {
 
     private final String apikeyHeader;
     private final AuthenticationEntryPoint authenticationEntryPoint;
-    private final AuthenticationManager authenticationManager;
+    private final AuthenticationProvider authenticationProvider;
 
     public ApikeyAuthenticationFilter(
             String apikeyHeader,
             AuthenticationEntryPoint authenticationEntryPoint,
-            AuthenticationManager authenticationManager) {
+            AuthenticationProvider authenticationProvider) {
         this.apikeyHeader = apikeyHeader;
         this.authenticationEntryPoint = authenticationEntryPoint;
-        this.authenticationManager = authenticationManager;
+        this.authenticationProvider = authenticationProvider;
     }
 
     @Override
     public void afterPropertiesSet() {
-        Assert.notNull(this.authenticationManager,
-                "An AuthenticationManager is required");
+        Assert.notNull(this.authenticationProvider,
+                "An AuthenticationProvider is required");
 
         Assert.notNull(this.authenticationEntryPoint,
                 "An AuthenticationEntryPoint is required");
@@ -96,8 +96,7 @@ public class ApikeyAuthenticationFilter extends OncePerRequestFilter {
             logger.debug("apikey header found.");
 
             ApikeyAuthenticationToken authRequest = new ApikeyAuthenticationToken(apikey);
-            Authentication authResult = this.authenticationManager
-                    .authenticate(authRequest);
+            Authentication authResult = this.authenticationProvider.authenticate(authRequest);
 
             logger.debug("Authentication success for : " + authResult);
 
