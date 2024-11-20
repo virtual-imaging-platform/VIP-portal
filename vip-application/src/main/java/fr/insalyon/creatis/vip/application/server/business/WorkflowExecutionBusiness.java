@@ -104,7 +104,6 @@ public class WorkflowExecutionBusiness {
                 + "RETRYCOUNT=3\n"
                 + "MULTIJOB=1";
         engine.setSettings(settings);
-
     }
 
     public Workflow launch(String applicationName, String applicationVersion,
@@ -114,8 +113,7 @@ public class WorkflowExecutionBusiness {
         try {
             engine.setWorkflow(new File(workflowPath));
             engine.setInput(parameters);
-            String launchID = engine.launch(server.getServerProxy(server.getVoName()), null);
-            String workflowID = engine.getSimulationId(launchID);
+            String workflowID = engine.launch(server.getServerProxy(server.getVoName()), null);
 
             return new Workflow(workflowID, user.getFullName(),
                     WorkflowStatus.Running,
@@ -132,28 +130,12 @@ public class WorkflowExecutionBusiness {
     public SimulationStatus getStatus(String simulationID) throws BusinessException {
 
         SimulationStatus status = SimulationStatus.Unknown;
-        try {
-            status = engine.getStatus(simulationID);
-        } catch (javax.xml.rpc.ServiceException ex) {
-            logger.error("Error getting status for {}", simulationID, ex);
-            throw new BusinessException(ex);
-        } catch (java.rmi.RemoteException ex) {
-            logger.error("Error getting status for {}. Ignoring", simulationID, ex);
-        }
+        status = engine.getStatus(simulationID);
 
         return status;
     }
 
     public void kill(String simulationID) throws BusinessException {
-
-        try {
-            engine.kill(simulationID);
-
-        } catch (javax.xml.rpc.ServiceException ex) {
-            logger.error("Error killing simulation {}", simulationID, ex);
-            throw new BusinessException(ex);
-        } catch (java.rmi.RemoteException ex) {
-            logger.error("Error killing simulation {}. Ignoring", simulationID, ex);
-        }
+        engine.kill(simulationID);
     }
 }

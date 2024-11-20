@@ -84,12 +84,12 @@ public class WebServiceEngineLocal extends WebServiceEngine {
     }
 
     @Override
-    public void kill(String workflowID) throws RemoteException, ServiceException {
+    public void kill(String workflowID) {
         localBashEngine.kill(workflowID);
     }
 
     @Override
-    public SimulationStatus getStatus(String workflowID) throws RemoteException, ServiceException {
+    public SimulationStatus getStatus(String workflowID) {
         return localBashEngine.getStatus(workflowID);
     }
 }

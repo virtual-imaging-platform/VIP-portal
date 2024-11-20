@@ -36,6 +36,8 @@ import fr.insalyon.creatis.vip.application.server.business.util.FileUtil;
 
 import java.io.File;
 import java.util.List;
+
+import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -70,7 +72,7 @@ public abstract class WorkflowEngineInstantiator {
     public abstract String launch(String proxyFileName, String userDN)
             throws
             java.rmi.RemoteException,
-            javax.xml.rpc.ServiceException;
+            javax.xml.rpc.ServiceException, BusinessException;
 
     public abstract void kill(String workflowID)
             throws

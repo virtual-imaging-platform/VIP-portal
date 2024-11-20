@@ -5,6 +5,8 @@ import fr.insalyon.creatis.grida.client.GRIDAClientException;
 import fr.insalyon.creatis.grida.common.bean.GridData;
 import fr.insalyon.creatis.grida.common.bean.GridData.Type;
 import fr.insalyon.creatis.vip.core.server.business.Server;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.DependsOn;
@@ -31,6 +33,8 @@ import java.util.stream.Collectors;
 @DependsOn("localConfiguration") // to populate rootDirName @Value
 public class GridaClientLocal extends GRIDAClient {
 
+    private final Logger logger = LoggerFactory.getLogger(getClass());
+
     private Server server;
 
     private Path localRoot; // local folder simulating remote LFN hierarchy
@@ -42,6 +46,7 @@ public class GridaClientLocal extends GRIDAClient {
             @Value("${local.grida.root.dirname}") String rootDirName) throws IOException {
         super(null, 0, null);
         this.server = server;
+        logger.info("Creating local GRIDAClient with rootDirName: {}", rootDirName);
         localRoot = Paths.get(vipConfigFolder.getURI()).resolve(rootDirName);
 
     }
@@ -49,6 +54,7 @@ public class GridaClientLocal extends GRIDAClient {
     @PostConstruct
     public void init() {
         // creating root if needed
+        logger.info("Local GRIDAClient root: {}", localRoot);
         if (localRoot.toFile().exists() && ! localRoot.toFile().isDirectory()) {
             throw new IllegalStateException("grida local root must be a directory");
         } else if (localRoot.toFile().exists()) {
@@ -66,6 +72,7 @@ public class GridaClientLocal extends GRIDAClient {
     }
 
     private void createDirectory(Path dir, String description) {
+        logger.info("Creating {} directory: {}", description, dir);
         boolean mkdirOK = dir.toFile().mkdirs();
         if ( ! mkdirOK) {
             throw new IllegalStateException("Error creating " + description + " directory");
@@ -189,12 +196,13 @@ public class GridaClientLocal extends GRIDAClient {
 
     @Override
     public void createFolder(String path, String folderName) throws GRIDAClientException {
-        while (path.startsWith("/")) {
+        while (path.startsWith("\\") || path.startsWith("/")) { // TODO : / ou \
             path = path.substring(1);
         }
         try {
             Files.createDirectory(localRoot.resolve(path).resolve(folderName));
         } catch (IOException e) {
+            logger.error("Error creating folder {}", folderName, e);
             throw new GRIDAClientException(e);
         }
     }
@@ -206,7 +214,7 @@ public class GridaClientLocal extends GRIDAClient {
 
     @Override
     public boolean exist(String remotePath) throws GRIDAClientException {
-        while (remotePath.startsWith("/")) {
+        while (remotePath.startsWith("\\") || remotePath.startsWith("/")) { // TODO : / ou \
             remotePath = remotePath.substring(1);
         }
         return localRoot.resolve(remotePath).toFile().exists();

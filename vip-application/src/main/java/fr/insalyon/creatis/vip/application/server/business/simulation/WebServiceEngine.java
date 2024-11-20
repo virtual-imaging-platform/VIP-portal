@@ -30,9 +30,9 @@
  * knowledge of the CeCILL-B license and that you accept its terms.
  */
 package fr.insalyon.creatis.vip.application.server.business.simulation;
-
 import fr.insalyon.creatis.vip.application.client.view.monitor.SimulationStatus;
 import fr.insalyon.creatis.vip.application.server.business.util.ProxyUtil;
+import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.business.Server;
 import localhost.moteur_service_wsdl.Moteur_ServiceLocator;
 import org.apache.axis.EngineConfiguration;
@@ -43,6 +43,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.*;
@@ -67,9 +68,6 @@ import java.util.List;
 public class WebServiceEngine extends WorkflowEngineInstantiator {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
-
-    @Autowired
-    private RestTemplate restTemplate;
 
     // URI address of the Moteur Web service
     private String addressWS;
@@ -115,7 +113,7 @@ public class WebServiceEngine extends WorkflowEngineInstantiator {
      */
     @Override
     public String launch(String proxyFileName, String userDN)
-            throws java.rmi.RemoteException, javax.xml.rpc.ServiceException {
+            throws java.rmi.RemoteException, javax.xml.rpc.ServiceException, BusinessException {
 
         System.setProperty("javax.net.ssl.trustStore", server.getTruststoreFile());
         System.setProperty("javax.net.ssl.trustStorePassword", server.getTruststorePass());
@@ -141,7 +139,13 @@ public class WebServiceEngine extends WorkflowEngineInstantiator {
         String url = addressWS + "/submit";
 
         logger.info("sending rest request to launch workflow");
-        return restTemplate.exchange(url, HttpMethod.POST, entity, String.class).getBody();
+        try {
+            RestTemplate restTemplate = new RestTemplate();
+            return restTemplate.exchange(url, HttpMethod.POST, entity, String.class).getBody();
+        } catch (Error e) {
+            logger.error("Error in the rest request on moteur server", e);
+            throw new BusinessException("Error in the rest request on moteur server", e);
+        }
     }
 
     @Override
@@ -164,6 +168,7 @@ public class WebServiceEngine extends WorkflowEngineInstantiator {
 
         try {
             // Send POST request
+            RestTemplate restTemplate = new RestTemplate();
             ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.PUT, entity, String.class);
 
             // Check response status
@@ -193,6 +198,7 @@ public class WebServiceEngine extends WorkflowEngineInstantiator {
 
         try {
             // Send GET request
+            RestTemplate restTemplate = new RestTemplate();
             ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
 
             // Check response status
@@ -210,8 +216,6 @@ public class WebServiceEngine extends WorkflowEngineInstantiator {
                     return SimulationStatus.Completed;
                 case TERMINATED:
                     return SimulationStatus.Killed;
-                case UNKNOWN:
-                    return SimulationStatus.Unknown;
                 default:
                     return SimulationStatus.Unknown;
             }
@@ -221,7 +225,6 @@ public class WebServiceEngine extends WorkflowEngineInstantiator {
     }
 
     static enum MoteurStatus {
-
         RUNNING, COMPLETE, TERMINATED, UNKNOWN
     };
 }
