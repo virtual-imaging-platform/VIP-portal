@@ -72,14 +72,20 @@ public class OidcResolver {
     }
 
     // Create authorities list from jwt claims.
-    // Using resource_access.<resource_name>.roles is Keycloak-specific.
+    // Parsing realm_access.roles or resource_access.<resourceName>.roles is Keycloak-specific.
     private List<GrantedAuthority> parseAuthorities(User user, Jwt jwt) {
         List<String> roles = new ArrayList<>(); // default to no roles
         try {
-            String resource = oidcConfig.getIssuerResourceName(jwt.getIssuer().toString());
-            Map<String, Object> resourceAccess = jwt.getClaimAsMap("resource_access");
-            Map<String, Object> realmAccess = (Map<String, Object>) resourceAccess.get(resource);
-            roles = (List<String>) realmAccess.get("roles");
+            OidcConfig.OidcServer server = oidcConfig.getServerConfig(jwt.getIssuer().toString());
+            if (server.useResourceRoleMappings) { // use resource-level roles
+                String resource = server.resourceName;
+                Map<String, Object> resourceAccess = jwt.getClaimAsMap("resource_access");
+                Map<String, Object> realmAccess = (Map<String, Object>) resourceAccess.get(resource);
+                roles = (List<String>) realmAccess.get("roles");
+            } else { // use realm-level roles
+                Map<String, Object> realmAccess = jwt.getClaimAsMap("realm_access");
+                roles = (List<String>) realmAccess.get("roles");
+            }
             // here we could also map an authority from user level, as done by Apikey auth:
             // roles.add("ROLE_" + user.getLevel().name().toUpperCase());
             // but the existing Keycloak only used JWT-provided authorities

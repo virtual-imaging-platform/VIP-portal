@@ -10,7 +10,8 @@ import org.springframework.core.env.Environment;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.JsonNode;
 
-import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Collection;
 import java.io.FileInputStream;
 import java.net.URI;
@@ -21,15 +22,20 @@ import fr.insalyon.creatis.vip.api.CarminProperties;
 public class OidcConfig {
     private final Logger logger = LoggerFactory.getLogger(getClass());
     private final Environment env;
-    private final Collection<OidcServer> servers;
+    private final Map<String, OidcServer> servers;
 
-    static private class OidcServer {
-        public String issuer;
-        public String resource;
+    public class OidcServer {
+        public final String issuer;
+        public final Boolean useResourceRoleMappings;
+        public final String resourceName;
 
-        OidcServer(String issuer, String resource) {
+        OidcServer(String issuer, Boolean useResourceRoleMappings, String resourceName) {
             this.issuer = issuer;
-            this.resource = resource;
+            if (useResourceRoleMappings && (resourceName == null || resourceName.isEmpty())) {
+                throw new IllegalArgumentException("useResourceRoleMappings enabled but no resourceName defined");
+            }
+            this.useResourceRoleMappings = useResourceRoleMappings;
+            this.resourceName = resourceName;
         }
     }
 
@@ -37,21 +43,36 @@ public class OidcConfig {
     public OidcConfig(Environment env, Resource vipConfigFolder) throws Exception {
         this.env = env;
         // Build the list of OIDC servers from config file. If OIDC is disabled, just create an empty list.
-        ArrayList<OidcServer> servers = new ArrayList<>();
+        HashMap<String, OidcServer> servers = new HashMap<>();
         if (isOIDCActive()) {
             final String basename = "keycloak.json";
             try {
-                // read and parse keycloak.json file to get OIDC server URL and clientId
+                // read and parse keycloak.json file into one OidcServer config
                 String filename = vipConfigFolder.getFile().getAbsoluteFile() + "/" + basename;
                 ObjectMapper mapper = new ObjectMapper();
                 JsonNode node = mapper.readTree(new FileInputStream(filename));
+                // mandatory fields
                 String baseURL = node.get("auth-server-url").asText();
                 String realm = node.get("realm").asText();
-                String resource = node.get("resource").asText();
+                // optional fields
+                Boolean useResourceRoleMappings;
+                if (node.hasNonNull("use-resource-role-mapping")) {
+                    useResourceRoleMappings = node.get("use-resource-role-mapping").asBoolean();
+                } else {
+                    useResourceRoleMappings = false;
+                }
+                String resourceName;
+                if (node.hasNonNull("resource")) {
+                    resourceName = node.get("resource").asText();
+                } else {
+                    resourceName = "";
+                }
+
                 // Build OIDC server URL from auth-server-url + realm name (this is Keycloak-specific).
                 // We use URI.resolve() instead of just concatenation, to correctly handle optional '/' at the end of baseURL.
                 URI url = new URI(baseURL).resolve("realms/" + realm);
-                servers.add(new OidcServer(url.toASCIIString(), resource));
+                String issuer = url.toASCIIString();
+                servers.put(issuer, new OidcServer(issuer, useResourceRoleMappings, resourceName));
             } catch (Exception exception) {
                 // Many errors are possible here:
                 // IOException in FileInputStream (can't read file), JsonProcessingException in readTree (bad JSON),
@@ -71,16 +92,11 @@ public class OidcConfig {
 
     // list of issuers URLs
     public Collection<String> getServers() {
-        return servers.stream().map((server) -> server.issuer).toList();
+        return servers.keySet();
     }
 
     // get resource name property for a given issuer URL
-    public String getIssuerResourceName(String issuer) {
-        for (OidcServer server: servers) {
-            if (server.issuer.equals(issuer)) {
-                return server.resource;
-            }
-        }
-        return null;
+    public OidcServer getServerConfig(String issuer) {
+        return servers.get(issuer);
     }
 }
