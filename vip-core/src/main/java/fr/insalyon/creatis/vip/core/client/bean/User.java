@@ -68,9 +68,6 @@ public class User implements IsSerializable {
     private int failedAuthentications;
     private boolean accountLocked;
     
-    private Boolean isGridFile;
-    private Boolean isGridJob;
-
     public User() {
     }
 
@@ -259,22 +256,6 @@ public class User implements IsSerializable {
         this.termsOfUse = termsOfUse;
     }
 
-    public Boolean getIsgridfile() {
-        return isGridFile;
-    }
-
-    public void setIsgridfile(Boolean isgridfile) {
-        this.isGridFile = isgridfile;
-    }
-
-    public Boolean getIsgridjobs() {
-        return isGridJob;
-    }
-
-    public void setIsgridjobs(Boolean isgridjobs) {
-        this.isGridJob = isgridjobs;
-    }
-    
     public Timestamp getLastUpdatePublications() {
         return lastUpdatePublications;
     }

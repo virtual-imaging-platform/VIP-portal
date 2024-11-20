@@ -103,8 +103,7 @@ public class GroupsLayout extends VLayout {
                         public void onClick(ClickEvent event) {
                             edit(rollOverRecord.getAttribute("name"),
                                     rollOverRecord.getAttributeAsBoolean("isPublic"),
-                                    rollOverRecord.getAttributeAsBoolean("isGridFile"),
-                                    rollOverRecord.getAttributeAsBoolean("isGridJobs"));
+                                    rollOverRecord.getAttributeAsString("type"));
                         }
                     }));
 
@@ -130,14 +129,11 @@ public class GroupsLayout extends VLayout {
 
         ListGridField isPublicField = new ListGridField("isPublic", "Public");
         isPublicField.setType(ListGridFieldType.BOOLEAN);
+
+        ListGridField typeField = new ListGridField("type", "GroupType");
+        typeField.setType(ListGridFieldType.TEXT);
         
-        ListGridField isGridFileField = new ListGridField("isGridFile", "GridFile");
-        isGridFileField.setType(ListGridFieldType.BOOLEAN);
-        
-        ListGridField isGridJobsField = new ListGridField("isGridJobs", "GridJobs");
-        isGridJobsField.setType(ListGridFieldType.BOOLEAN);
-        
-        grid.setFields(isPublicField,isGridFileField,isGridJobsField, new ListGridField("name", "Group Name"));
+        grid.setFields(isPublicField, typeField, new ListGridField("name", "Group Name"));
         grid.setSortField("name");
         grid.setSortDirection(SortDirection.ASCENDING);
         grid.addCellDoubleClickHandler(new CellDoubleClickHandler() {
@@ -146,8 +142,7 @@ public class GroupsLayout extends VLayout {
             public void onCellDoubleClick(CellDoubleClickEvent event) {
                 edit(event.getRecord().getAttribute("name"),
                         event.getRecord().getAttributeAsBoolean("isPublic"),
-                        event.getRecord().getAttributeAsBoolean("isGridFile"),
-                        event.getRecord().getAttributeAsBoolean("isGridJobs"));
+                        event.getRecord().getAttributeAsString("type"));
             }
         });
     }
@@ -185,12 +180,7 @@ public class GroupsLayout extends VLayout {
      */
     private void remove(final String name) {
 
-        if (name.equals(CoreConstants.GROUP_SUPPORT)) {
-            SC.warn("You cannot remove " + name + " group.");
-            return;
-        }
         SC.ask("Do you really want to remove \"" + name + "\" group?", new BooleanCallback() {
-
             @Override
             public void execute(Boolean value) {
                 if (value) {
@@ -221,13 +211,9 @@ public class GroupsLayout extends VLayout {
      * @param name Group name
      * @param isPublic Whether the group if public or not
      */
-    private void edit(String name, boolean isPublic,boolean isgridfile,boolean isgridjobs) {
+    private void edit(String name, boolean isPublic, String type) {
 
-        if (name.equals(CoreConstants.GROUP_SUPPORT)) {
-            SC.warn("You cannot edit " + name + " group.");
-            return;
-        }
         ((ManageGroupsTab) Layout.getInstance().getTab(
-                CoreConstants.TAB_MANAGE_GROUPS)).setGroup(name, isPublic,isgridfile,isgridjobs);
+                CoreConstants.TAB_MANAGE_GROUPS)).setGroup(name, isPublic, type);
     }
 }

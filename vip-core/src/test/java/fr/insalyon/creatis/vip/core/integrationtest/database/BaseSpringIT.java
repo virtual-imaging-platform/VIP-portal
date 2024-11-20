@@ -3,6 +3,7 @@ package fr.insalyon.creatis.vip.core.integrationtest.database;
 import fr.insalyon.creatis.grida.client.GRIDAClient;
 import fr.insalyon.creatis.grida.client.GRIDAClientException;
 import fr.insalyon.creatis.vip.core.client.bean.Group;
+import fr.insalyon.creatis.vip.core.client.bean.GroupType;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.util.CountryCode;
 import fr.insalyon.creatis.vip.core.integrationtest.ServerMockConfig;
@@ -91,6 +92,7 @@ public abstract class BaseSpringIT {
     protected void setUp() throws Exception {
         ServerMockConfig.reset(server);
         Mockito.reset(gridaClient);
+        Mockito.doReturn(new String[]{"test@admin.test"}).when(emailBusiness).getAdministratorsEmails();
     }
 
     protected void assertRowsNbInTable(String tableName, int expectedNb) {
@@ -129,7 +131,7 @@ public abstract class BaseSpringIT {
     }
 
     public void createGroup(String groupName) throws BusinessException {
-        configurationBusiness.addGroup(new Group(groupName, true, true, true));
+        configurationBusiness.addGroup(new Group(groupName, true, GroupType.APPLICATION));
     }
 
     protected void createUserInGroups(String userEmail, String nameSuffix, String... groupNames) throws BusinessException, GRIDAClientException {

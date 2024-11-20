@@ -62,7 +62,7 @@ public class ManageGroupsTab extends AbstractManageTab {
         groupsLayout.loadData();
     }
 
-    public void setGroup(String name, boolean isPublic,boolean isgridfile,boolean isgridjobs) {
-        editLayout.setGroup(name, isPublic,isgridfile,isgridjobs);
+    public void setGroup(String name, boolean isPublic, String type) {
+        editLayout.setGroup(name, isPublic, type);
     }
 }

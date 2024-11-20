@@ -164,8 +164,6 @@ public class CoreConstants implements IsSerializable {
     public static final String SESSION_USER = "vip-user";
     public static final String SESSION_GROUPS = "vip-groups";
     public static final Date COOKIES_EXPIRATION_DATE = new Date(new Date().getTime() + (1000l * 60 * 60 * 24 * 7)); //cookies are valid for a week
-    // Roles and Groups
-    public static final String GROUP_SUPPORT = "Support";
     // ssh
     public static final String SSH_PUBLIC_KEY = "ssh.publickey";
     //application,Gatelab

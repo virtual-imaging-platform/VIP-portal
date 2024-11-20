@@ -47,7 +47,6 @@ public class GroupRecord extends ListGridRecord {
         
         setAttribute("name", group.getName());
         setAttribute("isPublic", group.isPublicGroup());
-        setAttribute("isGridFile", group.isGridFile());
-        setAttribute("isGridJobs", group.isGridJobs());
+        setAttribute("type", group.getType().toString());
     }
 }

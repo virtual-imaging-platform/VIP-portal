@@ -115,10 +115,6 @@ public class LocalInitializer {
                 server.getDataManagerUsersHome() + "/" + admin.getFolder(),
                 "Admin home folder");
 
-        createFolderIfNecessary(admin,
-                server.getDataManagerGroupsHome() + "/" + CoreConstants.GROUP_SUPPORT,
-                "Support group folder");
-
         // applications root folder parent must exist
         String appRootFolder = server.getApplicationImporterRootFolder();
         String appRootFolderParent = Paths.get(appRootFolder).getParent().toString();
@@ -173,7 +169,7 @@ public class LocalInitializer {
         AppClass appClass = new AppClass(
                 className,
                 Collections.singletonList(engineName),
-                Collections.singletonList(CoreConstants.GROUP_SUPPORT));
+                Collections.singletonList(""));
         classBusiness.addClass(appClass);
     }
 

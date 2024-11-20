@@ -45,7 +45,7 @@ public class SpringDatabaseIT extends BaseSpringIT{
         // verify the vip-support group created on init is present
         assertNotNull(configurationBusiness);
         List<Group> groups = configurationBusiness.getGroups();
-        assertEquals(1, groups.size());
+        assertEquals(0, groups.size());
 
         // check that we are in the test transaction and that the connection is shared
         Connection connection1 = DataSourceUtils.getConnection(dataSource);

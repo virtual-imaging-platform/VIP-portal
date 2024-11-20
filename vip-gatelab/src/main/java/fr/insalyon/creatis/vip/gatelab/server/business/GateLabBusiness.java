@@ -188,9 +188,9 @@ public class GateLabBusiness {
                     + "</body>"
                     + "</html>";
 
-            for (User u : usersGroupsDAO.getUsersFromGroup(CoreConstants.GROUP_SUPPORT)) {
+            for (String adminEmail : emailBusiness.getAdministratorsEmails()) {
                 emailBusiness.sendEmail("[VIP Contact] GATE-Lab Error", adminsEmailContents,
-                        new String[]{u.getEmail()}, false, user.getEmail());
+                        new String[]{adminEmail}, false, user.getEmail());
             }
         } catch (DAOException ex) {
             throw new BusinessException(ex);

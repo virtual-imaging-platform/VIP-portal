@@ -32,6 +32,7 @@
 package fr.insalyon.creatis.vip.core.client.view.system.group;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.smartgwt.client.types.MultipleAppearance;
 import com.smartgwt.client.types.SortDirection;
 import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.util.SC;
@@ -40,12 +41,14 @@ import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.fields.CheckboxItem;
+import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.layout.HLayout;
 import fr.insalyon.creatis.vip.core.client.bean.Group;
+import fr.insalyon.creatis.vip.core.client.bean.GroupType;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationService;
 import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationServiceAsync;
@@ -56,6 +59,7 @@ import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.core.client.view.system.user.UserRecord;
 import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
 import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -69,8 +73,7 @@ public class EditGroupLayout extends AbstractFormLayout {
     private boolean newGroup = true;
     private TextItem nameItem;
     private CheckboxItem isPublicField;
-    private CheckboxItem isGridFileField;
-    private CheckboxItem isGridJobsField;
+    private SelectItem typeFieldList;
     private IButton saveButton;
     private IButton removeButton;
     private ListGrid grid;
@@ -94,16 +97,12 @@ public class EditGroupLayout extends AbstractFormLayout {
         isPublicField = new CheckboxItem();
         isPublicField.setTitle("Public");
         isPublicField.setWidth(350);
-        
-        isGridFileField = new CheckboxItem();
-        isGridFileField.setTitle("Grid File");
-        isGridFileField.setWidth(350);
-        
-        isGridJobsField= new CheckboxItem();
-        isGridJobsField.setTitle("Grid Jobs");
-        isGridJobsField.setWidth(350);
-        
-        
+
+        typeFieldList = new SelectItem();
+        typeFieldList.setShowTitle(false);
+        typeFieldList.setMultipleAppearance(MultipleAppearance.PICKLIST);
+        typeFieldList.setValueMap(GroupType.getValues());
+        typeFieldList.setWidth(350);
 
         saveButton = WidgetUtil.getIButton("Save", CoreConstants.ICON_SAVED,
                 new ClickHandler() {
@@ -112,8 +111,7 @@ public class EditGroupLayout extends AbstractFormLayout {
                         if (nameItem.validate()) {
                             save(nameItem.getValueAsString().trim(),
                                     isPublicField.getValueAsBoolean(),
-                                    isGridFileField.getValueAsBoolean(),
-                                    isGridJobsField.getValueAsBoolean());
+                                    typeFieldList.getValueAsString());
                         }
                     }
                 });
@@ -181,8 +179,7 @@ public class EditGroupLayout extends AbstractFormLayout {
 
         addField("Name", nameItem);
         this.addMember(FieldUtil.getForm(isPublicField));
-        this.addMember(FieldUtil.getForm(isGridFileField));
-        this.addMember(FieldUtil.getForm(isGridJobsField));
+        this.addMember(FieldUtil.getForm(typeFieldList));
         this.addMember(WidgetUtil.getLabel("<b>Users</b>", 15));
         this.addMember(grid);
         addButtons(saveButton, removeButton);
@@ -193,14 +190,13 @@ public class EditGroupLayout extends AbstractFormLayout {
      *
      * @param name Group name
      */
-    public void setGroup(String name, boolean isPublic,boolean isGridFile,boolean isGridJobs ) {
+    public void setGroup(String name, boolean isPublic, String type) {
 
         if (name != null) {
             this.oldName = name;
             this.nameItem.setValue(name);
             this.isPublicField.setValue(isPublic);
-            this.isGridFileField.setValue(isGridFile);
-            this.isGridJobsField.setValue(isGridJobs);
+            this.typeFieldList.setValue(type);
             this.newGroup = false;
             this.removeButton.setDisabled(false);
             loadUsers();
@@ -209,32 +205,26 @@ public class EditGroupLayout extends AbstractFormLayout {
             this.oldName = null;
             this.nameItem.setValue("");
             this.isPublicField.setValue(true);
-            this.isGridFileField.setValue(true);
-            this.isGridJobsField.setValue(true);
             this.newGroup = true;
             this.removeButton.setDisabled(true);
             this.grid.setData(new ListGridRecord[]{});
         }
     }
 
-    private void save(String name, boolean isPublic,boolean isgridfile,boolean isgridjobs) {
+    private void save(String name, boolean isPublic, String type) {
 
         ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();
         WidgetUtil.setLoadingIButton(saveButton, "Saving...");
 
         if (newGroup) {
-            service.addGroup(new Group(name, isPublic,isgridfile,isgridjobs), getCallback("add"));
+            service.addGroup(new Group(name, isPublic, type), getCallback("add"));
         } else {
-            service.updateGroup(oldName, new Group(name, isPublic,isgridfile,isgridjobs), getCallback("update"));
+            service.updateGroup(oldName, new Group(name, isPublic, type), getCallback("update"));
         }
     }
 
     private void remove(final String name) {
 
-        if (name.equals(CoreConstants.GROUP_SUPPORT)) {
-            Layout.getInstance().setWarningMessage("You can not remove the <b>" + name + "</b> group.");
-            return;
-        }
         SC.ask("Do you really want to remove \"" + name + "\" group?", new BooleanCallback() {
             @Override
             public void execute(Boolean value) {
@@ -261,7 +251,7 @@ public class EditGroupLayout extends AbstractFormLayout {
             public void onSuccess(Void result) {
                 WidgetUtil.resetIButton(saveButton, "Save", CoreConstants.ICON_SAVED);
                 WidgetUtil.resetIButton(removeButton, "Remove", CoreConstants.ICON_DELETE);
-                setGroup(null, false,false,false);
+                setGroup(null, false, null);
                 ((ManageGroupsTab) Layout.getInstance().getTab(
                         CoreConstants.TAB_MANAGE_GROUPS)).loadGroups();
             }

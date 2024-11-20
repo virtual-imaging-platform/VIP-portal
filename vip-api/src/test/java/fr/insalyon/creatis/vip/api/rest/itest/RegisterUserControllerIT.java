@@ -6,6 +6,7 @@ import fr.insalyon.creatis.vip.api.rest.config.BaseWebSpringIT;
 import fr.insalyon.creatis.vip.application.client.bean.AppClass;
 import fr.insalyon.creatis.vip.application.client.bean.Application;
 import fr.insalyon.creatis.vip.core.client.bean.Group;
+import fr.insalyon.creatis.vip.core.client.bean.GroupType;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.user.UserLevel;
 import fr.insalyon.creatis.vip.core.client.view.util.CountryCode;
@@ -52,7 +53,7 @@ class RegisterUserControllerIT extends BaseWebSpringIT {
     @Test
     public void registerEndpointWithAppOk() throws Exception {
         String appName = "testApp", groupName = "testGroup", className = "testClass";
-        getConfigurationBusiness().addGroup(new Group(groupName, true, true, true));
+        getConfigurationBusiness().addGroup(new Group(groupName, true, GroupType.getDefault()));
         getClassBusiness().addClass(new AppClass(className, Collections.emptyList(), List.of(groupName)));
         getApplicationBusiness().add(new Application(appName, List.of(className), "test citation"));
         UserTestUtils.restUser1.getApplications().add("testApp");

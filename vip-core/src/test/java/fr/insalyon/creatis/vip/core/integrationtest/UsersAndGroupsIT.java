@@ -2,6 +2,7 @@ package fr.insalyon.creatis.vip.core.integrationtest;
 
 import fr.insalyon.creatis.grida.client.GRIDAClientException;
 import fr.insalyon.creatis.vip.core.client.bean.Group;
+import fr.insalyon.creatis.vip.core.client.bean.GroupType;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.util.CountryCode;
@@ -32,11 +33,11 @@ public class UsersAndGroupsIT extends BaseSpringIT {
         super.setUp();
 
         // Create test group
-        group1 = new Group("group1", true, true, true);
+        group1 = new Group("group1", true, GroupType.getDefault());
         configurationBusiness.addGroup(group1);
 
         // Create test group
-        group2 = new Group("group2", false, true, false);
+        group2 = new Group("group2", false, GroupType.getDefault());
         configurationBusiness.addGroup(group2);
 
         // Create test users
@@ -68,7 +69,7 @@ public class UsersAndGroupsIT extends BaseSpringIT {
 
     @Test
     public void testInitialization() throws BusinessException {
-        assertEquals(3, configurationBusiness.getGroups().size(), "incorrect groups number");// Support + group1
+        assertEquals(2, configurationBusiness.getGroups().size(), "incorrect groups number");// group1 + group2
         assertEquals(6, configurationBusiness.getUsers().size(), "incorrect users number");// Created users + admin
         assertEquals(1, user5.getMaxRunningSimulations(), "incorrect max running simulations");// Created users + admin
     }
@@ -105,14 +106,14 @@ public class UsersAndGroupsIT extends BaseSpringIT {
 
     @Test
     public void testCreateGroup() throws DAOException, BusinessException {
-        Group group = new Group("group3", true, true, true);
+        Group group = new Group("group3", true, GroupType.APPLICATION);
         configurationBusiness.addGroup(group);
         assertNotNull(configurationBusiness.getGroup("group3"));
     }
 
     @Test
     public void testCatchCreateGroupAlreadyExisting() {
-        Group group = new Group("group1", true, true, true);
+        Group group = new Group("group1", true, GroupType.APPLICATION);
 
         Exception exception = assertThrows(
                 BusinessException.class, () ->
@@ -146,7 +147,7 @@ public class UsersAndGroupsIT extends BaseSpringIT {
     @Test
     public void testCatchGetGroups() throws BusinessException {
         List<Group> groups = configurationBusiness.getGroups();
-        Assertions.assertEquals(3, groups.size(), "Incorrect groups number");// group1, group2 and support
+        Assertions.assertEquals(2, groups.size(), "Incorrect groups number");// group1, group2 and support
     }
 
 
@@ -159,9 +160,11 @@ public class UsersAndGroupsIT extends BaseSpringIT {
         Group group = configurationBusiness.getGroup(nameGroup1);
         group.setPublicGroup(false);
         group.setName("group_name_updated");
+        group.setType(GroupType.RESOURCE);
         configurationBusiness.updateGroup(nameGroup1, group);
         Group updatedGroup = configurationBusiness.getGroup("group_name_updated");
-        Assertions.assertEquals("group_name_updated", updatedGroup.getName(), "Incorrect group name");
+        assertEquals("group_name_updated", updatedGroup.getName(), "Incorrect group name");
+        assertEquals(GroupType.RESOURCE, updatedGroup.getType(), "Incorrect group type");
         assertFalse(updatedGroup.isPublicGroup(), "Incorrect group privacy");
     }
 
@@ -171,6 +174,7 @@ public class UsersAndGroupsIT extends BaseSpringIT {
         Group group = new Group();
         group.setPublicGroup(false);
         group.setName("group_name_updated");
+        group.setType(GroupType.getDefault());
         // UPDATE + nonExistent primary key group name => no exception
         // We decided not to add an exception because if this occurs, it will not create problem, just no row will be updated
         configurationBusiness.updateGroup("non existent group", group);
@@ -258,7 +262,7 @@ public class UsersAndGroupsIT extends BaseSpringIT {
     @Test
     public void testRemoveGroup() throws BusinessException {
         configurationBusiness.removeGroup(emailUser1, nameGroup1);
-        Assertions.assertEquals(2, configurationBusiness.getGroups().size(), "incorrect groups number");
+        Assertions.assertEquals(1, configurationBusiness.getGroups().size(), "incorrect groups number");
     }
 
     @Test
@@ -266,7 +270,7 @@ public class UsersAndGroupsIT extends BaseSpringIT {
         // DELETE + nonExistent foreign key / part of primary key groupName => no exception
         // We decided not to add an exception because if this occurs, it will not create problem, just no row will be deleted
         configurationBusiness.removeGroup(emailUser1, "nonExistent group");
-        Assertions.assertEquals(3, configurationBusiness.getGroups().size(), "incorrect groups number");
+        Assertions.assertEquals(2, configurationBusiness.getGroups().size(), "incorrect groups number");
     }
 
     /* ********************************************************************************************************************************************** */
@@ -453,7 +457,7 @@ public class UsersAndGroupsIT extends BaseSpringIT {
         // DELETE + nonExistent foreign key user email => no exception
         // We decided not to add an exception because if this occurs, it will not create problem, just no row will be deleted
         configurationBusiness.removeGroup("nonExistent user", nameGroup1);
-        Assertions.assertEquals(2, configurationBusiness.getGroups().size(), "incorrect groups number");
+        Assertions.assertEquals(1, configurationBusiness.getGroups().size(), "incorrect groups number");
     }
 
     /* ********************************************************************************************************************************************** */
@@ -463,12 +467,8 @@ public class UsersAndGroupsIT extends BaseSpringIT {
     @Test
     public void testGetUserPropertiesGroup() throws BusinessException {
         assertTrue(configurationBusiness.getUserPropertiesGroups(emailUser1).get(0)); // isPublic : group is public, it is accessible to every user
-        assertTrue(configurationBusiness.getUserPropertiesGroups(emailUser1).get(1)); // isGridFile : group allows to files sharing
-        assertTrue(configurationBusiness.getUserPropertiesGroups(emailUser1).get(2)); // isGridJobs : group allows job offers sharing
 
         assertFalse(configurationBusiness.getUserPropertiesGroups(emailUser4).get(0));
-        assertTrue(configurationBusiness.getUserPropertiesGroups(emailUser4).get(1));
-        assertFalse(configurationBusiness.getUserPropertiesGroups(emailUser4).get(2));
     }
 
     /* ********************************************************************************************************************************************** */
@@ -596,9 +596,10 @@ public class UsersAndGroupsIT extends BaseSpringIT {
 
 
     @Test
-    public void testSendContactEmail() throws BusinessException {
+    public void testSendContactEmail() throws BusinessException, DAOException {
         // Reset not to capture the calls to sendEmail in the Setup
         Mockito.reset(emailBusiness);
+        Mockito.doReturn(new String[]{"test-admin@test.com"}).when(emailBusiness).getAdministratorsEmails();
 
         // Capture email content
         ArgumentCaptor<String> emailContent = ArgumentCaptor.forClass(String.class);

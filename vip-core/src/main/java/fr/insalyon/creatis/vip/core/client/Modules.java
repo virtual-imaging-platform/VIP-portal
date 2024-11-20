@@ -69,9 +69,6 @@ public class Modules {
     public void initializeModules(User user) {
         CoreModule.user = user;      
         final AsyncCallback<List<Boolean>> callback = new AsyncCallback<List<Boolean>>() {
-            boolean isGridFile;
-            boolean isGridJobs;
-
             @Override
             public void onFailure(Throwable caught) {
                 Layout.getInstance().setWarningMessage("Unable to get group properties:<br />" + caught.getMessage());
@@ -80,18 +77,15 @@ public class Modules {
             @Override
             public void onSuccess(List<Boolean> result) {
                
-                    isGridFile =result.get(1);
-                    isGridJobs = result.get(2);
-                
                 for (Module module : modules) {
-                    if ((!module.requiresGridFile() || isGridFile) && (!module.requiresGridJob() || isGridJobs)) {
+                    // if ((!module.requiresGridFile() || isGridFile) && (!module.requiresGridJob() || isGridJobs)) {
                         module.load();
-                    }
+                    // }
                 }
                 for (Module module : modules) {
-                    if ((!module.requiresGridFile() || isGridFile) && (!module.requiresGridJob() || isGridJobs)) {
+                    // if ((!module.requiresGridFile() || isGridFile) && (!module.requiresGridJob() || isGridJobs)) {
                         module.postLoading();
-                    }
+                    // }
                 }
             }
         };

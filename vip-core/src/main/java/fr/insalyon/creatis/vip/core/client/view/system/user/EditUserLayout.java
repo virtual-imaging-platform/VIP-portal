@@ -136,19 +136,14 @@ public class EditUserLayout extends AbstractFormLayout {
                     Map<String, CoreConstants.GROUP_ROLE> map = new HashMap<String, CoreConstants.GROUP_ROLE>();
 
                     for (String v : values) {
-                        if (v.equals(CoreConstants.GROUP_SUPPORT)) {
-                            map.put(v, CoreConstants.GROUP_ROLE.User);
+                        String name = v.substring(0, v.indexOf(" ("));
+                        CoreConstants.GROUP_ROLE role = v.contains("("
+                                + CoreConstants.GROUP_ROLE.Admin.name() + ")")
+                                ? CoreConstants.GROUP_ROLE.Admin
+                                : CoreConstants.GROUP_ROLE.User;
 
-                        } else {
-                            String name = v.substring(0, v.indexOf(" ("));
-                            CoreConstants.GROUP_ROLE role = v.contains("("
-                                    + CoreConstants.GROUP_ROLE.Admin.name() + ")")
-                                    ? CoreConstants.GROUP_ROLE.Admin
-                                    : CoreConstants.GROUP_ROLE.User;
-
-                            if (map.get(name) == null || role == CoreConstants.GROUP_ROLE.Admin) {
-                                map.put(name, role);
-                            }
+                        if (map.get(name) == null || role == CoreConstants.GROUP_ROLE.Admin) {
+                            map.put(name, role);
                         }
                     }
                     save(emailLabel.getContents(),
@@ -208,10 +203,7 @@ public class EditUserLayout extends AbstractFormLayout {
 
                 for (Group group : result.keySet()) {
                     if (result.get(group) != CoreConstants.GROUP_ROLE.None) {
-                        userGroups.add(
-                                group.getName().equals(CoreConstants.GROUP_SUPPORT)
-                                ? group.getName()
-                                : group.getName() + " (" + result.get(group).name() + ")");
+                        userGroups.add(group.getName() + " (" + result.get(group).name() + ")");
                     }
                 }
                 groupsPickList.setValues(userGroups.toArray(new String[]{}));
@@ -276,12 +268,8 @@ public class EditUserLayout extends AbstractFormLayout {
 
                 List<String> dataList = new ArrayList<String>();
                 for (Group g : result) {
-                    if (g.getName().equals(CoreConstants.GROUP_SUPPORT)) {
-                        dataList.add(g.getName());
-                    } else {
-                        dataList.add(g.getName() + " (" + CoreConstants.GROUP_ROLE.Admin.name() + ")");
-                        dataList.add(g.getName() + " (" + CoreConstants.GROUP_ROLE.User.name() + ")");
-                    }
+                    dataList.add(g.getName() + " (" + CoreConstants.GROUP_ROLE.Admin.name() + ")");
+                    dataList.add(g.getName() + " (" + CoreConstants.GROUP_ROLE.User.name() + ")");
                 }
                 groupsPickList.setValueMap(dataList.toArray(new String[]{}));
             }

@@ -263,12 +263,11 @@ public class WorkflowBusiness {
                 if (workflow == null) {
                     engine.setStatus("disabled");
                     this.engineBusiness.update(engine);
-                    for (User u : usersGroupsDAO
-                            .getUsersFromGroup(CoreConstants.GROUP_SUPPORT)) {
-                        logger.info("Sending warning email to user " + u.toString() + " having email address " + u.getEmail());
+                    for (String adminEmail : emailBusiness.getAdministratorsEmails()) {
+                        logger.info("Sending warning email to " + adminEmail);
                         emailBusiness.sendEmail("Urgent: VIP engine disabled",
                                 "Engine " + engine.getName() + " has just been disabled. Please check that there is at least one active engine left.",
-                                new String[]{u.getEmail()}, true, user.getEmail());
+                                new String[]{adminEmail}, true, user.getEmail());
                     }
                     throw new BusinessException("Workflow is null, engine " + engine.getName() + " has been disabled");
                 }else{

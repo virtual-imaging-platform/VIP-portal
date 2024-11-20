@@ -101,7 +101,7 @@ public class UsersGroupsData extends JdbcDaoSupport implements UsersGroupsDAO {
 
         try {
             PreparedStatement ps = getConnection().prepareStatement(
-                    "SELECT g.groupname, g.public, g.gridfile, g.gridjobs, role "
+                    "SELECT g.groupname, g.public, g.type, role "
                     + "FROM VIPGroups g JOIN VIPUsersGroups ug "
                     + "ON g.groupname = ug.groupname AND email = ?");
             ps.setString(1, email);
@@ -114,7 +114,7 @@ public class UsersGroupsData extends JdbcDaoSupport implements UsersGroupsDAO {
                 if (role == null || role.isEmpty() || role.equals("null")) {
                     role = "None";
                 }
-                groups.put(new Group(rs.getString("groupname"), rs.getBoolean("public"), rs.getBoolean("gridfile"), rs.getBoolean("gridjobs")),
+                groups.put(new Group(rs.getString("groupname"), rs.getBoolean("public"), rs.getString("type")),
                         GROUP_ROLE.valueOf(role));
             }
             ps.close();
@@ -232,35 +232,25 @@ public class UsersGroupsData extends JdbcDaoSupport implements UsersGroupsDAO {
 
         try {
             PreparedStatement ps = getConnection().prepareStatement(
-                    "SELECT public, gridfile, gridjobs "
+                    "SELECT public "
                     + "FROM VIPGroups g, VIPUsersGroups ug "
                     + "WHERE g.groupname = ug.groupname AND ug.email= ?");
             ps.setString(1, email);
             ResultSet rs = ps.executeQuery();
 
-            List<Boolean> proprties = new ArrayList<Boolean>();
+            List<Boolean> properties = new ArrayList<Boolean>();
             boolean isPublic = false;
-            boolean isGridFile = false;
-            boolean isGridJobs = false;
 
             while (rs.next()) {
-                if (rs.getInt("gridfile") == 1) {
-                    isGridFile = true;
-                }
-                if (rs.getInt("gridjobs") == 1) {
-                    isGridJobs = true;
-                }
                 if (rs.getInt("public") == 1) {
                     isPublic = true;
                 }
             }
-            proprties.add(0, isPublic);
-            proprties.add(1, isGridFile);
-            proprties.add(2, isGridJobs);
+            properties.add(0, isPublic);
 
             ps.close();
 
-            return proprties;
+            return properties;
 
         } catch (SQLException ex) {
             logger.error("Error getting users properties groups for {} ", email, ex);

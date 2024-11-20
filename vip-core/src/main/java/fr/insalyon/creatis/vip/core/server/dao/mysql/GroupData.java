@@ -67,11 +67,10 @@ public class GroupData extends JdbcDaoSupport implements GroupDAO {
 
         try {
             PreparedStatement ps = getConnection().prepareStatement(
-                    "INSERT INTO VIPGroups(groupname, public, gridfile, gridjobs) VALUES(?, ?, ?, ?)");
+                    "INSERT INTO VIPGroups(groupname, public, type) VALUES(?, ?, ?)");
             ps.setString(1, group.getName());
             ps.setBoolean(2, group.isPublicGroup());
-            ps.setBoolean(3, group.isGridFile());
-            ps.setBoolean(4, group.isGridJobs());
+            ps.setString(3, group.getType().toString());
             ps.execute();
             ps.close();
 
@@ -107,14 +106,13 @@ public class GroupData extends JdbcDaoSupport implements GroupDAO {
         try {
             PreparedStatement ps = getConnection().prepareStatement("UPDATE "
                     + "VIPGroups "
-                    + "SET groupname=?, public=?, gridfile=?, gridjobs=? "
+                    + "SET groupname=?, public=?, type=? "
                     + "WHERE groupname=?");
 
             ps.setString(1, group.getName());
             ps.setBoolean(2, group.isPublicGroup());
-            ps.setBoolean(3, group.isGridFile());
-            ps.setBoolean(4, group.isGridJobs());
-            ps.setString(5, name);
+            ps.setString(3, group.getType().toString());
+            ps.setString(4, name);
             ps.executeUpdate();
             ps.close();
 
@@ -130,13 +128,13 @@ public class GroupData extends JdbcDaoSupport implements GroupDAO {
 
             List<Group> groups = new ArrayList<Group>();
             PreparedStatement ps = getConnection().prepareStatement("SELECT "
-                    + "groupname, public, gridfile, gridjobs FROM "
+                    + "groupname, public, type FROM "
                     + "VIPGroups ORDER BY LOWER(groupname)");
 
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 groups.add(new Group(rs.getString("groupname"),
-                        rs.getBoolean("public"), rs.getBoolean("gridfile"), rs.getBoolean("gridjobs")));
+                        rs.getBoolean("public"), rs.getString("type")));
             }
             ps.close();
             return groups;

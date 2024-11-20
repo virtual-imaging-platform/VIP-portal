@@ -207,11 +207,11 @@ public class MessageBusiness {
             String subjectInfo = recipients.length == 1 ?
                     "to " + recipients[0] : "from " + sender.getFullName();
 
-            for (User u : usersGroupsDAO.getUsersFromGroup(CoreConstants.GROUP_SUPPORT)) {
+            for (String adminEmail : emailBusiness.getAdministratorsEmails()) {
                 emailBusiness.sendEmail(
                     "[VIP Support Copy] " + subject + "(" + subjectInfo + ")",
                     emailContent,
-                    new String[]{u.getEmail()}, true, sender.getEmail());
+                    new String[]{adminEmail}, true, sender.getEmail());
             }
         } catch (DAOException ex) {
             throw new BusinessException(ex);
@@ -235,11 +235,11 @@ public class MessageBusiness {
                     + "</body>"
                     + "</html>";
 
-            for (User u : usersGroupsDAO.getUsersFromGroup(CoreConstants.GROUP_SUPPORT)) {
+            for (String adminEmail : emailBusiness.getAdministratorsEmails()) {
                 emailBusiness.sendEmail(
                     "[VIP Contact] " + subject + " (" + user.getFullName() + ")",
                     emailContent,
-                    new String[]{u.getEmail()}, true, user.getEmail());
+                    new String[]{adminEmail}, true, user.getEmail());
             }
         } catch (DAOException ex) {
             throw new BusinessException(ex);

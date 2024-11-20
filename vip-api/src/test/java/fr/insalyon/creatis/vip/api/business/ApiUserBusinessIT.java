@@ -3,6 +3,7 @@ package fr.insalyon.creatis.vip.api.business;
 import fr.insalyon.creatis.vip.api.exception.ApiException;
 import fr.insalyon.creatis.vip.application.server.business.ApplicationBusiness;
 import fr.insalyon.creatis.vip.core.client.bean.Group;
+import fr.insalyon.creatis.vip.core.client.bean.GroupType;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.util.CountryCode;
 import fr.insalyon.creatis.vip.core.integrationtest.database.BaseSpringIT;
@@ -39,7 +40,7 @@ public class ApiUserBusinessIT extends BaseSpringIT {
         super.setUp();
 
         // Create test group
-        group1 = new Group("group1", true, true, true);
+        group1 = new Group("group1", true, GroupType.getDefault());
         configurationBusiness.addGroup(group1);
 
         // Create test users

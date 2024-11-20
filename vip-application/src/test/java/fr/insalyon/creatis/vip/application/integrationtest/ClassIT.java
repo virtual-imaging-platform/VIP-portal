@@ -5,6 +5,7 @@ import fr.insalyon.creatis.vip.application.client.bean.Engine;
 import fr.insalyon.creatis.vip.application.server.business.ClassBusiness;
 import fr.insalyon.creatis.vip.application.server.business.EngineBusiness;
 import fr.insalyon.creatis.vip.core.client.bean.Group;
+import fr.insalyon.creatis.vip.core.client.bean.GroupType;
 import fr.insalyon.creatis.vip.core.integrationtest.database.BaseSpringIT;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import org.apache.commons.lang.StringUtils;
@@ -35,7 +36,7 @@ public class ClassIT extends BaseSpringIT {
     public void setUp() throws Exception {
         super.setUp();
 
-        Group group1 = new Group("group1", true, true, true);
+        Group group1 = new Group("group1", true, GroupType.getDefault());
         applicationGroups.add("group1");
         configurationBusiness.addGroup(group1);
 

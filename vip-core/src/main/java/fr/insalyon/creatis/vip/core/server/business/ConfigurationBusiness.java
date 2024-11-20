@@ -59,7 +59,6 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.sql.Timestamp;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * @author Rafael Ferreira da Silva, Nouha Boujelben
@@ -272,8 +271,7 @@ public class ConfigurationBusiness {
                         + "<p>VIP Team</p>"
                         + "</body>"
                         + "</html>";
-
-                for (String email : getAdministratorsEmails()) {
+                for (String email : emailBusiness.getAdministratorsEmails()) {
                     emailBusiness.sendEmail("[VIP Admin] Account Requested", adminsEmailContents,
                             new String[]{email}, true, user.getEmail());
                 }
@@ -303,7 +301,7 @@ public class ConfigurationBusiness {
                         + "</body>"
                         + "</html>";
 
-                for (String email : getAdministratorsEmails()) {
+                for (String email : emailBusiness.getAdministratorsEmails()) {
                     emailBusiness.sendEmail("[VIP Admin] Automatic Account Creation", adminsEmailContents,
                             new String[]{email}, false, user.getEmail());
                 }
@@ -616,7 +614,7 @@ public class ConfigurationBusiness {
                         + "</body>"
                         + "</html>";
 
-                for (String adminEmail : getAdministratorsEmails()) {
+                for (String adminEmail : emailBusiness.getAdministratorsEmails()) {
                     emailBusiness.sendEmail("[VIP Admin] Account Removed", adminsEmailContents,
                             new String[]{adminEmail}, true, user.getEmail());
                 }
@@ -863,9 +861,9 @@ public class ConfigurationBusiness {
                     + "</body>"
                     + "</html>";
 
-            for (User u : usersGroupsDAO.getUsersFromGroup(CoreConstants.GROUP_SUPPORT)) {
+            for (String adminEmail : emailBusiness.getAdministratorsEmails()) {
                 emailBusiness.sendEmail("[VIP Contact] " + category, emailContent,
-                        new String[]{u.getEmail()}, true, user.getEmail());
+                        new String[]{adminEmail}, true, user.getEmail());
             }
         } catch (DAOException ex) {
             throw new BusinessException(ex);
@@ -937,27 +935,6 @@ public class ConfigurationBusiness {
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }
-    }
-
-    public List<String> getSupportEmails() throws BusinessException {
-        try {
-            return usersGroupsDAO.getUsersFromGroup(CoreConstants.GROUP_SUPPORT)
-                    .stream().map(User::getEmail)
-                    .collect(Collectors.toList());
-        } catch (DAOException e) {
-            throw new BusinessException(e);
-        }
-    }
-
-    /**
-     * Gets an array of administrator's e-mails
-     */
-    private String[] getAdministratorsEmails() throws DAOException {
-        List<String> emails = new ArrayList<>();
-        for (User admin : userDAO.getAdministrators()) {
-            emails.add(admin.getEmail());
-        }
-        return emails.toArray(new String[]{});
     }
 
     public User getUserWithSession(String email) throws DAOException {
@@ -1102,7 +1079,7 @@ public class ConfigurationBusiness {
             emailContent.append("<p>Best Regards,</p><p>VIP Team</p>");
             emailContent.append("</body></html>");
 
-            for (String email : getAdministratorsEmails()) {
+            for (String email : emailBusiness.getAdministratorsEmails()) {
                 emailBusiness.sendEmail("[VIP Admin] VIP error", emailContent.toString(),
                         new String[]{email}, true, userEmail);
             }

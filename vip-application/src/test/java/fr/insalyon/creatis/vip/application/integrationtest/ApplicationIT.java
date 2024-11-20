@@ -8,6 +8,7 @@ import fr.insalyon.creatis.vip.application.server.business.ApplicationBusiness;
 import fr.insalyon.creatis.vip.application.server.business.ClassBusiness;
 import fr.insalyon.creatis.vip.application.server.business.EngineBusiness;
 import fr.insalyon.creatis.vip.core.client.bean.Group;
+import fr.insalyon.creatis.vip.core.client.bean.GroupType;
 import fr.insalyon.creatis.vip.core.integrationtest.database.BaseSpringIT;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import org.apache.commons.lang.StringUtils;
@@ -35,7 +36,7 @@ public class ApplicationIT extends BaseSpringIT {
         super.setUp();
 
         // group test and user test creation
-        group1 = new Group("group1", true, true, true);
+        group1 = new Group("group1", true, GroupType.getDefault());
         configurationBusiness.addGroup(group1);
         List<String> groups = new ArrayList<>();
         groups.add("group1");
