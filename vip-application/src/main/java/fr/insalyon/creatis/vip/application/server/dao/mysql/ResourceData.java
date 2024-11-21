@@ -118,7 +118,7 @@ public class ResourceData extends JdbcDaoSupport implements ResourceDAO {
     public List<Resource> getByUser(User user) throws DAOException {
         String query = "SELECT * FROM VIPResources r "
         +              "JOIN VIPGroupResources gr ON r.name = gr.resourcename "
-        +              "JOIN VIPUsersGroups ug ON gr.groupname = ug.groupname "
+        +              "JOIN VIPUsersGroups ug ON gr.name = ug.name "
         +              "WHERE ug.email = ?";
 
         try (PreparedStatement ps = getConnection().prepareStatement(query)) {
@@ -191,7 +191,7 @@ public class ResourceData extends JdbcDaoSupport implements ResourceDAO {
     public List<Resource> getByGroup(Group group) throws DAOException {
         String query = "SELECT * FROM VIPResources r "
         +              "JOIN VIPGroupResources gr ON r.name = gr.resourcename "
-        +              "WHERE gr.groupname = ?";
+        +              "WHERE gr.name = ?";
 
         try (PreparedStatement ps = getConnection().prepareStatement(query)) {
             ps.setString(1, group.getName());
@@ -212,7 +212,7 @@ public class ResourceData extends JdbcDaoSupport implements ResourceDAO {
 
     @Override
     public void putInGroup(Resource resource, Group group) throws DAOException {
-        String query = "INSERT INTO VIPGroupResources (resourcename, groupname) "
+        String query = "INSERT INTO VIPGroupResources (resourcename, name) "
         +              "VALUES (?,?)";
         
         try (PreparedStatement ps = getConnection().prepareStatement(query)) {
@@ -232,7 +232,7 @@ public class ResourceData extends JdbcDaoSupport implements ResourceDAO {
 
     @Override
     public void removeFromGroup(Resource resource, Group group) throws DAOException {
-        String query = "DELETE FROM VIPGroupResources WHERE resourcename = ? AND groupname = ?";
+        String query = "DELETE FROM VIPGroupResources WHERE resourcename = ? AND name = ?";
 
         try (PreparedStatement ps = getConnection().prepareStatement(query)) {
             ps.setString(1, resource.getName());

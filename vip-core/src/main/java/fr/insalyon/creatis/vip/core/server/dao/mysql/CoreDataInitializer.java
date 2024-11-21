@@ -105,20 +105,20 @@ public class CoreDataInitializer extends JdbcDaoSupport {
 
     private void initializeGroupTables() {
         tableInitializer.createTable("VIPGroups",
-                          "groupname VARCHAR(50), "
+                          "name VARCHAR(50), "
                         + "public BOOLEAN, "
                         + "type VARCHAR(30), "
-                        + "PRIMARY KEY(groupname)");
+                        + "PRIMARY KEY(name)");
 
 
         tableInitializer.createTable("VIPUsersGroups",
                 "email VARCHAR(255), "
-                        + "groupname VARCHAR(100), "
+                        + "name VARCHAR(100), "
                         + "role VARCHAR(30), "
-                        + "PRIMARY KEY (email, groupname), "
+                        + "PRIMARY KEY (email, name), "
                         + "FOREIGN KEY (email) REFERENCES VIPUsers(email) "
                         + "ON DELETE CASCADE ON UPDATE CASCADE, "
-                        + "FOREIGN KEY (groupname) REFERENCES VIPGroups(groupname) "
+                        + "FOREIGN KEY (name) REFERENCES VIPGroups(name) "
                         + "ON DELETE CASCADE ON UPDATE CASCADE");
     }
 

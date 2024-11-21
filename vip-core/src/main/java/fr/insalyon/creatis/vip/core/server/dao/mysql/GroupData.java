@@ -68,7 +68,7 @@ public class GroupData extends JdbcDaoSupport implements GroupDAO {
 
         try {
             PreparedStatement ps = getConnection().prepareStatement(
-                    "INSERT INTO VIPGroups(groupname, public, type) VALUES(?, ?, ?)");
+                    "INSERT INTO VIPGroups(name, public, type) VALUES(?, ?, ?)");
             ps.setString(1, group.getName());
             ps.setBoolean(2, group.isPublicGroup());
             ps.setString(3, group.getType().toString());
@@ -90,7 +90,7 @@ public class GroupData extends JdbcDaoSupport implements GroupDAO {
     public void remove(String groupName) throws DAOException {
         try {
             PreparedStatement ps = getConnection().prepareStatement("DELETE "
-                    + "FROM VIPGroups WHERE groupname=?");
+                    + "FROM VIPGroups WHERE name=?");
 
             ps.setString(1, groupName);
             ps.execute();
@@ -107,8 +107,8 @@ public class GroupData extends JdbcDaoSupport implements GroupDAO {
         try {
             PreparedStatement ps = getConnection().prepareStatement("UPDATE "
                     + "VIPGroups "
-                    + "SET groupname=?, public=?, type=? "
-                    + "WHERE groupname=?");
+                    + "SET name=?, public=?, type=? "
+                    + "WHERE name=?");
 
             ps.setString(1, group.getName());
             ps.setBoolean(2, group.isPublicGroup());
@@ -129,12 +129,12 @@ public class GroupData extends JdbcDaoSupport implements GroupDAO {
 
             List<Group> groups = new ArrayList<Group>();
             PreparedStatement ps = getConnection().prepareStatement("SELECT "
-                    + "groupname, public, type FROM "
-                    + "VIPGroups ORDER BY LOWER(groupname)");
+                    + "name, public, type FROM "
+                    + "VIPGroups ORDER BY LOWER(name)");
 
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
-                groups.add(new Group(rs.getString("groupname"),
+                groups.add(new Group(rs.getString("name"),
                         rs.getBoolean("public"), rs.getString("type")));
             }
             ps.close();
