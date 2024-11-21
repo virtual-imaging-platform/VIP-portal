@@ -127,7 +127,7 @@ public class WebServiceEngine extends WorkflowEngineInstantiator {
         String base64Settings = Base64.getEncoder().encodeToString(settings.getBytes(StandardCharsets.UTF_8));
 
         String jsonInputString = String.format(
-                "{\"workflow\":\"%s\",\"input\":\"%s\",\"proxy\":\"%s\",\"settings\":\"%s\"}",
+                "{\"workflow\":\"%s\",\"inputs\":\"%s\",\"proxy\":\"%s\",\"settings\":\"%s\"}",
                 base64Workflow, base64Input, base64Proxy, base64Settings
         );
 
