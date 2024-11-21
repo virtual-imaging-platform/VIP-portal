@@ -32,6 +32,7 @@
 package fr.insalyon.creatis.vip.core.server.dao.mysql;
 
 import fr.insalyon.creatis.vip.core.client.bean.Group;
+import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import fr.insalyon.creatis.vip.core.server.dao.GroupDAO;
 import org.slf4j.Logger;

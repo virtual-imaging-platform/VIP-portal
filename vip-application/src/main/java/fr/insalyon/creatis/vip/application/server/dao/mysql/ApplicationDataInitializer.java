@@ -36,12 +36,63 @@ public class ApplicationDataInitializer extends JdbcDaoSupport {
     public void onStartup() {
         logger.info("Configuring VIP Application database.");
 
+        createEngineTable();
+        createResourcesTables();
+        createClassesTables();
+        createApplicationsTables();
+        createOthersTables();
+    }
+
+    private void createEngineTable() {
         tableInitializer.createTable("VIPEngines",
                 "name VARCHAR(255), "
                         + "endpoint VARCHAR(255), "
                         + "status VARCHAR(255) DEFAULT NULL, "
                         + "PRIMARY KEY (name)");
+    }
 
+    private void createResourcesTables() {
+        tableInitializer.createTable("VIPResources", 
+                    "name VARCHAR(255) NOT NULL, "
+                +   "visible BOOLEAN DEFAULT FALSE, "
+                +   "status BOOLEAN DEFAULT FALSE, "
+                +   "type VARCHAR(255), "
+                +   "configuration VARCHAR(255), "
+                +   "PRIMARY KEY (name)"
+        );
+
+        tableInitializer.createTable("VIPGroupResources",
+                    "groupname VARCHAR(255), "
+                +   "resourcename VARCHAR(255), "
+                +   "PRIMARY KEY (groupname, resourcename), "
+                +   "FOREIGN KEY (groupname) REFERENCES VIPGroups(groupname) "
+                +   "ON DELETE CASCADE ON UPDATE RESTRICT, "
+                +   "FOREIGN KEY (resourcename) REFERENCES VIPResources(name) "
+                +   "ON DELETE CASCADE ON UPDATE RESTRICT");
+
+        tableInitializer.createTable("VIPResourceEngines",
+                    "resourcename VARCHAR(255), "
+                +   "enginename VARCHAR(255), "
+                +   "PRIMARY KEY (resourcename, enginename), "
+                +   "FOREIGN KEY (resourcename) REFERENCES VIPResources(name) "
+                +   "ON DELETE CASCADE ON UPDATE RESTRICT, "
+                +   "FOREIGN KEY (enginename) REFERENCES VIPEngines(name) "
+                +   "ON DELETE CASCADE ON UPDATE RESTRICT"
+        );
+
+        tableInitializer.createTable("VIPResourceAppVersions",
+                    "resourcename VARCHAR(255), "
+                +   "application VARCHAR(255), "
+                +   "version VARCHAR(255), "
+                +   "PRIMARY KEY (resourcename, application, version), "
+                +   "FOREIGN KEY (resourcename) REFERENCES VIPResources(name) "
+                +   "ON DELETE CASCADE ON UPDATE RESTRICT, "
+                +   "FOREIGN KEY (application, version) REFERENCES VIPAppVersions(application, version) "
+                +   "ON DELETE CASCADE ON UPDATE RESTRICT"
+        );
+    }
+
+    private void createClassesTables() {
         tableInitializer.createTable("VIPClasses",
                 "name VARCHAR(255), "
                         + "PRIMARY KEY (name)");
@@ -63,7 +114,9 @@ public class ApplicationDataInitializer extends JdbcDaoSupport {
                         + "ON DELETE CASCADE ON UPDATE RESTRICT, "
                         + "FOREIGN KEY (groupname) REFERENCES VIPGroups(groupname) "
                         + "ON DELETE CASCADE ON UPDATE RESTRICT");
+    }
 
+    private void createApplicationsTables() {
         tableInitializer.createTable("VIPApplications",
                 "name VARCHAR(255), "
                         + "citation TEXT, "
@@ -93,6 +146,14 @@ public class ApplicationDataInitializer extends JdbcDaoSupport {
                         + "FOREIGN KEY (application) REFERENCES VIPApplications(name) "
                         + "ON DELETE CASCADE ON UPDATE RESTRICT");
 
+        tableInitializer.createTable("VIPAppExamples",
+                "application VARCHAR(255), "
+                        + "name VARCHAR(255), "
+                        + "inputs VARCHAR(32000), "
+                        + "PRIMARY KEY (application, name)");
+    }
+
+    private void createOthersTables() {
         tableInitializer.createTable("VIPAppInputs",
                 "email VARCHAR(255), "
                         + "application VARCHAR(255), "
@@ -101,12 +162,6 @@ public class ApplicationDataInitializer extends JdbcDaoSupport {
                         + "PRIMARY KEY (email, application, name), "
                         + "FOREIGN KEY (email) REFERENCES VIPUsers(email) "
                         + "ON DELETE CASCADE ON UPDATE CASCADE");
-
-        tableInitializer.createTable("VIPAppExamples",
-                "application VARCHAR(255), "
-                        + "name VARCHAR(255), "
-                        + "inputs VARCHAR(32000), "
-                        + "PRIMARY KEY (application, name)");
 
         tableInitializer.createTable("VIPPublicExecutions",
                 "execution_ID VARCHAR(255), "
@@ -119,5 +174,4 @@ public class ApplicationDataInitializer extends JdbcDaoSupport {
                         + "comments TEXT, "
                         + "PRIMARY KEY(execution_ID)");
     }
-
-}
+} 

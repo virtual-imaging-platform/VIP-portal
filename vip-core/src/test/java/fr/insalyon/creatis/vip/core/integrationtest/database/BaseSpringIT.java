@@ -134,6 +134,10 @@ public abstract class BaseSpringIT {
         configurationBusiness.addGroup(new Group(groupName, true, GroupType.APPLICATION));
     }
 
+    public void createGroup(String groupName, GroupType type) throws BusinessException {
+        configurationBusiness.addGroup(new Group(groupName, true, type));
+    }
+
     protected void createUserInGroups(String userEmail, String nameSuffix, String... groupNames) throws BusinessException, GRIDAClientException {
         User newUser = new User("test firstName " + nameSuffix,
                 "test lastName " + nameSuffix, userEmail, "test institution",
