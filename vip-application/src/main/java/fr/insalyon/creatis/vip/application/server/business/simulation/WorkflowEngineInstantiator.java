@@ -48,94 +48,23 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class WorkflowEngineInstantiator {
 
-    // content of the xml file that describe the workflow (read on a file) */
-    protected String workflow;
-    // content of the input for the workflow (generated depending of the user)*/
-    protected String input;
+    public abstract String launch(String addressWS, String workflowContent, String inputs, String settings, String proxyFileName)
+            throws java.rmi.RemoteException, javax.xml.rpc.ServiceException, BusinessException;
+
+    public abstract void kill(String addressWS, String workflowID)
+            throws
+            java.rmi.RemoteException,
+            javax.xml.rpc.ServiceException;
+
+    public abstract SimulationStatus getStatus(String addressWS, String workflowID)
+            throws
+            java.rmi.RemoteException,
+            javax.xml.rpc.ServiceException;
+
 
     public String getSimulationId(String launchID) {
-
         return launchID.substring(launchID.lastIndexOf("/") + 1, launchID.lastIndexOf("."));
     }
 
-    /**
-     *
-     * @param workflow workflow file
-     * @param parameters list of parameters
-     */
-    public WorkflowEngineInstantiator(File workflow, List<ParameterSweep> parameters) {
 
-        this.workflow = (workflow != null) ? FileUtil.read(workflow) : null;
-        this.input = (parameters != null) ? WorkflowEngineInstantiator.setParametersAsXMLInput(parameters) : null;
-    }
-
-    public abstract String launch(String proxyFileName, String userDN)
-            throws
-            java.rmi.RemoteException,
-            javax.xml.rpc.ServiceException, BusinessException;
-
-    public abstract void kill(String workflowID)
-            throws
-            java.rmi.RemoteException,
-            javax.xml.rpc.ServiceException;
-
-    public abstract SimulationStatus getStatus(String workflowID)
-            throws
-            java.rmi.RemoteException,
-            javax.xml.rpc.ServiceException;
-
-    public String getWorkflow() {
-
-        return workflow;
-    }
-
-    public void setWorkflow(File workflow) {
-        this.workflow = FileUtil.read(workflow);
-    }
-
-    public String getInput() {
-
-        return input;
-    }
-
-    public void setInput(List<ParameterSweep> parameters) {
-
-        this.input = WorkflowEngineInstantiator.setParametersAsXMLInput(parameters);
-    }
-
-    private static String setParametersAsXMLInput(List<ParameterSweep> parameters) {
-
-        //generate the xml input file according to the user input on the GUI
-        StringBuilder xml = new StringBuilder("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
-        xml.append("<inputdata>\n");
-
-        for (ParameterSweep parameter : parameters) {
-
-            xml.append("\t<source name=\"")
-                    .append(parameter.getParameterName())
-                    .append("\"  type=\"String\">\n")
-                    .append("<array>\n");
-
-            int counter = 0;
-            for (String value : parameter.getValues()) {
-
-
-                xml.append("\t\t<item>")
-                        .append("<tag name=\"Group\" value=\"")
-                        .append(counter)
-                        .append("\"/>")
-                        .append(value)
-                        .append("</item>\n");
-
-                counter++;
-            }
-
-            xml.append("</array>\n");
-            xml.append("\t</source>\n");
-        }
-
-        xml.append("</inputdata>\n");
-
-        return xml.toString();
-    }
 }

@@ -2,7 +2,9 @@ package fr.insalyon.creatis.vip.local;
 
 import fr.insalyon.creatis.vip.application.client.view.monitor.SimulationStatus;
 import fr.insalyon.creatis.vip.application.server.business.simulation.ParameterSweep;
-import fr.insalyon.creatis.vip.application.server.business.simulation.WebServiceEngine;
+import fr.insalyon.creatis.vip.application.server.business.simulation.RestServiceEngine;
+import fr.insalyon.creatis.vip.application.server.business.simulation.WorkflowEngineInstantiator;
+import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
@@ -20,76 +22,27 @@ import java.util.List;
  */
 
 @Service
-@Scope("prototype")
 @Profile("local")
 @Primary
-public class WebServiceEngineLocal extends WebServiceEngine {
+public class LocalWorkflowEngineInstantiator extends WorkflowEngineInstantiator {
 
     @Autowired
     private LocalBashEngine localBashEngine;
 
-    private String addressWS;
-    private String settings;
-    private List<ParameterSweep> inputs;
-    private File workflow;
-
     @Override
-    public String getAddressWS() {
-        return addressWS;
+    public String launch(String addressWS, String workflowContent, String inputs, String settings, String proxyFileName) throws RemoteException, ServiceException, BusinessException {
+        return localBashEngine.launch(workflowContent, inputs);
     }
 
     @Override
-    public void setAddressWS(String addressWS) {
-        this.addressWS = addressWS;
-    }
-
-    @Override
-    public String getSettings() {
-        return settings;
-    }
-
-    @Override
-    public void setSettings(String settings) {
-        this.settings = settings;
-    }
-
-    @Override
-    public String getWorkflow() {
-        return workflow.toString();
-    }
-
-    @Override
-    public void setWorkflow(File workflow) {
-        this.workflow = workflow;
-    }
-
-    @Override
-    public String getInput() {
-        return inputs.toString();
-    }
-
-    @Override
-    public void setInput(List<ParameterSweep> parameters) {
-        this.inputs = parameters;
-    }
-
-    @Override
-    public String launch(String proxyFileName, String userDN) throws RemoteException, ServiceException {
-        return localBashEngine.launch(workflow, inputs);
-    }
-
-    @Override
-    public String getSimulationId(String launchID) {
-        return launchID;
-    }
-
-    @Override
-    public void kill(String workflowID) {
+    public void kill(String addressWS, String workflowID) throws RemoteException, ServiceException {
         localBashEngine.kill(workflowID);
+
     }
 
     @Override
-    public SimulationStatus getStatus(String workflowID) {
+    public SimulationStatus getStatus(String addressWS, String workflowID) throws RemoteException, ServiceException {
         return localBashEngine.getStatus(workflowID);
     }
+
 }
