@@ -50,7 +50,7 @@ public class OidcResolver {
     private User getVipUser(Jwt jwt) throws BadCredentialsException {
         String email = jwt.getClaim("email");
         if (email == null) { // no email field in token
-            logger.info("Can't authenticate from OIDC token: no email in token");
+            logger.warn("Can't authenticate from OIDC token: no email in token");
             throw authError();
         }
         User vipUser;
@@ -61,7 +61,7 @@ public class OidcResolver {
             throw authError();
         }
         if (vipUser == null) { // user not found
-            logger.info("Can't authenticate from OIDC token: user does not exist in VIP: {}", email);
+            logger.warn("Can't authenticate from OIDC token: user does not exist in VIP: {}", email);
             throw authError();
         }
         if (vipUser.isAccountLocked()) { // account locked
@@ -75,23 +75,28 @@ public class OidcResolver {
     // Parsing realm_access.roles or resource_access.<resourceName>.roles is Keycloak-specific.
     private List<GrantedAuthority> parseAuthorities(User user, Jwt jwt) {
         List<String> roles = new ArrayList<>(); // default to no roles
-        try {
-            OidcConfig.OidcServer server = oidcConfig.getServerConfig(jwt.getIssuer().toString());
-            if (server.useResourceRoleMappings) { // use resource-level roles
-                String resource = server.resourceName;
-                Map<String, Object> resourceAccess = jwt.getClaimAsMap("resource_access");
-                Map<String, Object> realmAccess = (Map<String, Object>) resourceAccess.get(resource);
+        // At this point, jwt has already been verified by Spring resource server, so we assume the issuer is known (server != null).
+        // Also, we only handle Keycloak-generated tokens for now, so we assume realm_access and roles fields to exist.
+        // Thus, the only error case we handle in token parsing below is a mismatch on resourceName:
+        // any other issue will deliberately cause an exception and request error 500.
+        OidcConfig.OidcServer server = oidcConfig.getServerConfig(jwt.getIssuer().toString());
+        if (server.useResourceRoleMappings) { // use resource-level roles
+            String resource = server.resourceName;
+            Map<String, Object> resourceAccess = jwt.getClaimAsMap("resource_access");
+            Map<String, Object> realmAccess = (Map<String, Object>) resourceAccess.get(resource);
+            if (realmAccess != null) {
                 roles = (List<String>) realmAccess.get("roles");
-            } else { // use realm-level roles
-                Map<String, Object> realmAccess = jwt.getClaimAsMap("realm_access");
-                roles = (List<String>) realmAccess.get("roles");
+            } else {
+                logger.warn("Can't get roles for user {}: resource '{}' not found in token, defaulting to no roles",
+                        user.getEmail(), resource);
             }
-            // here we could also map an authority from user level, as done by Apikey auth:
-            // roles.add("ROLE_" + user.getLevel().name().toUpperCase());
-            // but the existing Keycloak only used JWT-provided authorities
-        } catch (Exception e) {
-            logger.info("Can't get roles for user {}", user.getEmail(), e);
+        } else { // use realm-level roles
+            Map<String, Object> realmAccess = jwt.getClaimAsMap("realm_access");
+            roles = (List<String>) realmAccess.get("roles");
         }
+        // here we could also map an authority from user level, as done by Apikey auth:
+        // roles.add("ROLE_" + user.getLevel().name().toUpperCase());
+        // but the existing Keycloak only used JWT-provided authorities
         return AuthorityUtils.createAuthorityList(roles);
     }
 
