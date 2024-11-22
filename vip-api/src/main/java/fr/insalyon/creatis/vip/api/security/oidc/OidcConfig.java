@@ -2,7 +2,7 @@ package fr.insalyon.creatis.vip.api.security.oidc;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.env.Environment;
@@ -10,6 +10,7 @@ import org.springframework.core.env.Environment;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.JsonNode;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Collection;
@@ -18,7 +19,7 @@ import java.net.URI;
 
 import fr.insalyon.creatis.vip.api.CarminProperties;
 
-@Configuration
+@Service
 public class OidcConfig {
     private final Logger logger = LoggerFactory.getLogger(getClass());
     private final Environment env;
@@ -48,9 +49,9 @@ public class OidcConfig {
             final String basename = "keycloak.json";
             try {
                 // read and parse keycloak.json file into one OidcServer config
-                String filename = vipConfigFolder.getFile().getAbsoluteFile() + "/" + basename;
+                File file = vipConfigFolder.getFile().toPath().resolve(basename).toFile();
                 ObjectMapper mapper = new ObjectMapper();
-                JsonNode node = mapper.readTree(new FileInputStream(filename));
+                JsonNode node = mapper.readTree(file);
                 // mandatory fields
                 String baseURL = node.get("auth-server-url").asText();
                 String realm = node.get("realm").asText();

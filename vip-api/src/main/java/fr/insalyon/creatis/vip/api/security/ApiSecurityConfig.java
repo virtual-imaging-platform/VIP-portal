@@ -60,7 +60,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.security.web.firewall.DefaultHttpFirewall;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import static org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher;
 import org.springframework.security.web.util.matcher.RegexRequestMatcher;
 
 import java.util.function.Supplier;
@@ -103,18 +103,18 @@ public class ApiSecurityConfig {
         // Note that it is required to used AntPathRequestMatcher.antMatcher() everywhere below,
         // otherwise Spring uses MvcRequestMatcher as the default requestMatchers implementation.
         http
-                .securityMatcher(AntPathRequestMatcher.antMatcher("/rest/**"))
+                .securityMatcher(antMatcher("/rest/**"))
                 .authorizeHttpRequests((authorize) -> authorize
-                        .requestMatchers(AntPathRequestMatcher.antMatcher("/rest/platform")).permitAll()
-                        .requestMatchers(AntPathRequestMatcher.antMatcher("/rest/authenticate")).permitAll()
-                        .requestMatchers(AntPathRequestMatcher.antMatcher("/rest/session")).permitAll()
+                        .requestMatchers(antMatcher("/rest/platform")).permitAll()
+                        .requestMatchers(antMatcher("/rest/authenticate")).permitAll()
+                        .requestMatchers(antMatcher("/rest/session")).permitAll()
                         .requestMatchers(new RegexRequestMatcher("/rest/pipelines\\?public", "GET")).permitAll()
-                        .requestMatchers(AntPathRequestMatcher.antMatcher("/rest/publications")).permitAll()
-                        .requestMatchers(AntPathRequestMatcher.antMatcher("/rest/reset-password")).permitAll()
-                        .requestMatchers(AntPathRequestMatcher.antMatcher("/rest/register")).permitAll()
-                        .requestMatchers(AntPathRequestMatcher.antMatcher("/rest/executions/{executionId}/summary")).hasAnyRole("SERVICE")
-                        .requestMatchers(AntPathRequestMatcher.antMatcher("/rest/statistics/**")).hasAnyRole("ADVANCED", "ADMINISTRATOR")
-                        .requestMatchers(AntPathRequestMatcher.antMatcher("/rest/**")).authenticated()
+                        .requestMatchers(antMatcher("/rest/publications")).permitAll()
+                        .requestMatchers(antMatcher("/rest/reset-password")).permitAll()
+                        .requestMatchers(antMatcher("/rest/register")).permitAll()
+                        .requestMatchers(antMatcher("/rest/executions/{executionId}/summary")).hasAnyRole("SERVICE")
+                        .requestMatchers(antMatcher("/rest/statistics/**")).hasAnyRole("ADVANCED", "ADMINISTRATOR")
+                        .requestMatchers(antMatcher("/rest/**")).authenticated()
                         .anyRequest().permitAll()
                 )
                 .exceptionHandling((exceptionHandling) -> exceptionHandling.authenticationEntryPoint(vipAuthenticationEntryPoint))
