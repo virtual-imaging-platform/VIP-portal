@@ -38,6 +38,7 @@ import fr.insalyon.creatis.vip.application.client.bean.Application;
 import fr.insalyon.creatis.vip.application.client.bean.ApplicationStatus;
 import fr.insalyon.creatis.vip.application.client.bean.Engine;
 import fr.insalyon.creatis.vip.application.client.bean.Resource;
+import fr.insalyon.creatis.vip.application.client.bean.Tag;
 
 import java.util.HashMap;
 import java.util.List;
@@ -107,4 +108,13 @@ public interface ApplicationServiceAsync {
     public void updateResource(Resource resource, AsyncCallback<Void> asyncCallback);
 
     public void getResources(AsyncCallback<List<Resource>> asyncCallback);
+
+    public void addTag(Tag tag, AsyncCallback<Void> asyncCallback);
+
+    public void removeTag(Tag tag, AsyncCallback<Void> asyncCallback);
+
+    public void updateTag(Tag tag, String newName, AsyncCallback<Void> asyncCallback);
+
+    public void getTags(AsyncCallback<List<Tag>> asyncCallback);
+
 }

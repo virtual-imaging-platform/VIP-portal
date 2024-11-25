@@ -29,40 +29,26 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL-B license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.application.client.view.system.engine;
+package fr.insalyon.creatis.vip.application.client.view.system.applications;
 
-import com.smartgwt.client.widgets.layout.HLayout;
-import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
-import fr.insalyon.creatis.vip.core.client.view.common.AbstractManageTab;
+import com.smartgwt.client.widgets.grid.ListGridRecord;
 
 /**
  *
  * @author Rafael Ferreira da Silva
  */
-public class ManageEnginesTab extends AbstractManageTab {
+public class ApplicationRecord extends ListGridRecord {
 
-    private EnginesLayout enginesLayout;
-    private EditEngineLayout editLayout;
-    
-    public ManageEnginesTab() {
-
-        super(ApplicationConstants.ICON_ENGINE, ApplicationConstants.APP_ENGINE, ApplicationConstants.TAB_MANAGE_ENGINE);
-        
-        enginesLayout = new EnginesLayout();
-        editLayout = new EditEngineLayout();
-        
-        HLayout hLayout = new HLayout(5);
-        hLayout.addMember(enginesLayout);
-        hLayout.addMember(editLayout);
-        
-        vLayout.addMember(hLayout);
-    }
-    
-    public void loadEngines() {
-        enginesLayout.loadData();
+    public ApplicationRecord(String name, String owner, String ownerFullName, String classes, String citation, String groups) {
+        this(name, owner,ownerFullName, classes, citation);
+        setAttribute("groups", groups);
     }
 
-    public void setEngine(String name, String endpoint, String status) {
-        editLayout.setEngine(name, endpoint, status);
+    public ApplicationRecord(String name, String owner, String ownerFullName, String classes, String citation) {
+        setAttribute("name", name);
+        setAttribute("classes", classes);
+        setAttribute("owner", owner);
+        setAttribute("ownerFullName", ownerFullName);
+        setAttribute("citation", citation);
     }
 }

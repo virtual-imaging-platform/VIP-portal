@@ -29,18 +29,16 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL-B license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.application.client.view.system.application;
+package fr.insalyon.creatis.vip.application.client.view.system.engines;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.types.Alignment;
-import com.smartgwt.client.types.ListGridFieldType;
 import com.smartgwt.client.types.Overflow;
 import com.smartgwt.client.types.SortDirection;
 import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.ImgButton;
-import com.smartgwt.client.widgets.Label;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.grid.ListGrid;
@@ -51,7 +49,7 @@ import com.smartgwt.client.widgets.grid.events.CellDoubleClickHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
-import fr.insalyon.creatis.vip.application.client.bean.AppVersion;
+import fr.insalyon.creatis.vip.application.client.bean.Engine;
 import fr.insalyon.creatis.vip.application.client.rpc.ApplicationService;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
@@ -66,43 +64,40 @@ import java.util.List;
  *
  * @author Rafael Ferreira da Silva
  */
-public class VersionsLayout extends VLayout {
+public class EnginesLayout extends VLayout {
 
-    private String applicationName;
-    private Label applicationLabel;
     private ModalWindow modal;
     private ListGrid grid;
     private HLayout rollOverCanvas;
     private ListGridRecord rollOverRecord;
 
-    public VersionsLayout() {
+    public EnginesLayout() {
 
         this.setWidth100();
         this.setHeight100();
         this.setOverflow(Overflow.AUTO);
 
-        configureActions();
+        configureToolStrip();
         configureGrid();
         modal = new ModalWindow(grid);
+
+        loadData();
     }
 
-    private void configureActions() {
+    private void configureToolStrip() {
 
         ToolstripLayout toolstrip = new ToolstripLayout();
 
-        applicationLabel = WidgetUtil.getLabel("", 24);
-        applicationLabel.setWidth(250);
-        toolstrip.addMember(applicationLabel);
         toolstrip.addMember(WidgetUtil.getSpaceLabel(15));
 
-        LabelButton addButton = new LabelButton("Add Version", CoreConstants.ICON_ADD);
+        LabelButton addButton = new LabelButton("Add Engine", CoreConstants.ICON_ADD);
         addButton.setWidth(150);
         addButton.addClickHandler(new ClickHandler() {
             @Override
             public void onClick(ClickEvent event) {
-                ManageApplicationsTab appsTab = (ManageApplicationsTab) Layout.getInstance().
-                        getTab(ApplicationConstants.TAB_MANAGE_APPLICATION);
-                appsTab.setVersion(null, null, null, null, true, true);
+                ManageEnginesTab enginesTab = (ManageEnginesTab) Layout.getInstance().
+                        getTab(ApplicationConstants.TAB_MANAGE_ENGINE);
+                enginesTab.setEngine(null, null, null);
             }
         });
         toolstrip.addMember(addButton);
@@ -137,25 +132,22 @@ public class VersionsLayout extends VLayout {
                     loadImg.addClickHandler(new ClickHandler() {
                         @Override
                         public void onClick(ClickEvent event) {
-                            edit(rollOverRecord.getAttribute("version"),
-                                    rollOverRecord.getAttribute("lfn"),
-                                    rollOverRecord.getAttribute("jsonLfn"),
-                                    rollOverRecord.getAttribute("doi"),
-                                    rollOverRecord.getAttributeAsBoolean("visible"),
-                                    rollOverRecord.getAttributeAsBoolean("boutiquesForm"));
+                            edit(rollOverRecord.getAttribute("name"),
+                                    rollOverRecord.getAttribute("endpoint"),
+                                    rollOverRecord.getAttribute("status"));
                         }
                     });
                     ImgButton deleteImg = getImgButton(CoreConstants.ICON_DELETE, "Delete");
                     deleteImg.addClickHandler(new ClickHandler() {
                         @Override
                         public void onClick(ClickEvent event) {
-                            final String version = rollOverRecord.getAttribute("version");
-                            SC.ask("Do you really want to remove the application version \""
-                                    + version + "\"?", new BooleanCallback() {
+                            final String name = rollOverRecord.getAttribute("name");
+                            SC.ask("Do you really want to remove the engine \""
+                                    + name + "\"?", new BooleanCallback() {
                                 @Override
                                 public void execute(Boolean value) {
                                     if (value) {
-                                        remove(version);
+                                        remove(name);
                                     }
                                 }
                             });
@@ -186,105 +178,70 @@ public class VersionsLayout extends VLayout {
         grid.setShowEmptyMessage(true);
         grid.setShowRowNumbers(true);
         grid.setEmptyMessage("<br>No data available.");
-
-        ListGridField isVisibleField = new ListGridField("visible", "Visible");
-        isVisibleField.setType(ListGridFieldType.BOOLEAN);
-
-        ListGridField isBoutiquesFormField = new ListGridField("boutiquesForm", "Use Boutiques Form");
-        isBoutiquesFormField.setType(ListGridFieldType.BOOLEAN);
-
-        grid.setFields(
-                isVisibleField,
-                isBoutiquesFormField,
-                new ListGridField("version", "Version"),
-                new ListGridField("lfn", "LFN"));
-        grid.setSortField("version");
+        grid.setFields(new ListGridField("name", "Engine Name"),
+                new ListGridField("endpoint", "End-Point"),
+                new ListGridField("status", "Status"));
+        grid.setSortField("name");
         grid.setSortDirection(SortDirection.ASCENDING);
         grid.addCellDoubleClickHandler(new CellDoubleClickHandler() {
             @Override
             public void onCellDoubleClick(CellDoubleClickEvent event) {
-                edit(event.getRecord().getAttribute("version"),
-                        event.getRecord().getAttribute("lfn"),
-                        event.getRecord().getAttribute("jsonLfn"),
-                        event.getRecord().getAttribute("doi"),
-                        event.getRecord().getAttributeAsBoolean("visible"),
-                        event.getRecord().getAttributeAsBoolean("boutiquesForm"));
+                edit(event.getRecord().getAttribute("name"),
+                        event.getRecord().getAttribute("endpoint"),
+                        event.getRecord().getAttribute("status"));
             }
         });
-
         this.addMember(grid);
     }
 
     public void loadData() {
 
-        final AsyncCallback<List<AppVersion>> callback = new AsyncCallback<List<AppVersion>>() {
+        final AsyncCallback<List<Engine>> callback = new AsyncCallback<List<Engine>>() {
             @Override
             public void onFailure(Throwable caught) {
                 modal.hide();
-                Layout.getInstance().setWarningMessage("Unable to get list of applications:<br />" + caught.getMessage());
+                Layout.getInstance().setWarningMessage("Unable to get list of engines:<br />" + caught.getMessage());
             }
 
             @Override
-            public void onSuccess(List<AppVersion> result) {
+            public void onSuccess(List<Engine> result) {
                 modal.hide();
-                List<VersionRecord> dataList = new ArrayList<VersionRecord>();
+                List<EngineRecord> dataList = new ArrayList<EngineRecord>();
 
-                for (AppVersion version : result) {
-                    dataList.add(new VersionRecord(version.getVersion(), version.getLfn(), version.getJsonLfn(),
-                            version.getDoi(), version.isVisible(), version.isBoutiquesForm()));
+                for (Engine engine : result) {
+                    dataList.add(new EngineRecord(engine.getName(), engine.getEndpoint(), engine.getStatus()));
                 }
-                grid.setData(dataList.toArray(new VersionRecord[] {}));
+                grid.setData(dataList.toArray(new EngineRecord[]{}));
             }
         };
-        modal.show("Loading versions...", true);
-        ApplicationService.Util.getInstance().getVersions(applicationName, callback);
+        modal.show("Loading engines...", true);
+        ApplicationService.Util.getInstance().getEngines(callback);
     }
 
-    /**
-     *
-     * @param applicationName
-     */
-    public void setApplication(String applicationName) {
-
-        this.applicationName = applicationName;
-        this.applicationLabel.setContents("<b>Application:</b> " + applicationName);
-        loadData();
-    }
-
-    /**
-     *
-     * @param version
-     * @param lfn
-     * @param isVisible
-     */
-    private void edit(String version, String lfn, String jsonLfn, String doi, boolean isVisible, boolean isBoutiquesForm) {
-
-        ManageApplicationsTab appsTab = (ManageApplicationsTab) Layout.getInstance().
-                getTab(ApplicationConstants.TAB_MANAGE_APPLICATION);
-        appsTab.setVersion(version, lfn, jsonLfn, doi, isVisible, isBoutiquesForm);
-    }
-
-    /**
-     *
-     * @param version
-     */
-    private void remove(String version) {
+    private void remove(String name) {
 
         final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
             @Override
             public void onFailure(Throwable caught) {
                 modal.hide();
-                Layout.getInstance().setWarningMessage("Unable to remove version:<br />" + caught.getMessage());
+                Layout.getInstance().setWarningMessage("Unable to remove engine:<br />" + caught.getMessage());
             }
 
             @Override
             public void onSuccess(Void result) {
                 modal.hide();
-                Layout.getInstance().setNoticeMessage("The version was successfully removed!");
+                Layout.getInstance().setNoticeMessage("The engine was successfully removed!");
                 loadData();
             }
         };
-        modal.show("Removing version '" + version + "'...", true);
-        ApplicationService.Util.getInstance().removeVersion(applicationName, version, callback);
+        modal.show("Removing engine '" + name + "'...", true);
+        ApplicationService.Util.getInstance().removeEngine(name, callback);
+    }
+
+    private void edit(String name, String endpoint, String status) {
+
+        ManageEnginesTab appsTab = (ManageEnginesTab) Layout.getInstance().
+                getTab(ApplicationConstants.TAB_MANAGE_ENGINE);
+        appsTab.setEngine(name, endpoint, status);
     }
 }

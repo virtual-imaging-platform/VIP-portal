@@ -40,6 +40,7 @@ import fr.insalyon.creatis.vip.application.client.bean.Application;
 import fr.insalyon.creatis.vip.application.client.bean.ApplicationStatus;
 import fr.insalyon.creatis.vip.application.client.bean.Engine;
 import fr.insalyon.creatis.vip.application.client.bean.Resource;
+import fr.insalyon.creatis.vip.application.client.bean.Tag;
 import fr.insalyon.creatis.vip.application.client.view.ApplicationException;
 import java.util.HashMap;
 import java.util.List;
@@ -122,4 +123,12 @@ public interface ApplicationService extends RemoteService {
     public void updateResource(Resource resource) throws ApplicationException;
 
     public List<Resource> getResources() throws ApplicationException;
+
+    public void addTag(Tag tag) throws ApplicationException;
+
+    public void removeTag(Tag tag) throws ApplicationException;
+
+    public void updateTag(Tag tag, String newName) throws ApplicationException;
+
+    public List<Tag> getTags() throws ApplicationException;
 }

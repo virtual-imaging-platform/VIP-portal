@@ -29,28 +29,20 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL-B license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.application.client.view.system.application;
+package fr.insalyon.creatis.vip.application.client.view.system.engines;
 
 import com.smartgwt.client.widgets.grid.ListGridRecord;
-
-import java.util.List;
 
 /**
  *
  * @author Rafael Ferreira da Silva
  */
-public class ApplicationRecord extends ListGridRecord {
+public class EngineRecord extends ListGridRecord {
 
-    public ApplicationRecord(String name, String owner, String ownerFullName, String classes, String citation, String groups) {
-        this(name, owner,ownerFullName, classes, citation);
-        setAttribute("groups", groups);
-    }
+    public EngineRecord(String name, String endpoint, String status) {
 
-    public ApplicationRecord(String name, String owner, String ownerFullName, String classes, String citation) {
         setAttribute("name", name);
-        setAttribute("classes", classes);
-        setAttribute("owner", owner);
-        setAttribute("ownerFullName", ownerFullName);
-        setAttribute("citation", citation);
+        setAttribute("endpoint", endpoint);
+        setAttribute("status", status);
     }
 }

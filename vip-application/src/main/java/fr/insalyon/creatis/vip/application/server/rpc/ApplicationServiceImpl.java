@@ -66,6 +66,7 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
     private WorkflowBusiness workflowBusiness;
     private SimulationBusiness simulationBusiness;
     private ResourceBusiness resourceBusiness;
+    private TagBusiness tagBusiness;
 
     @Override
     public void init() throws ServletException {
@@ -78,14 +79,16 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
                 getBean(ConfigurationBusiness.class),
                 getBean(WorkflowBusiness.class),
                 getBean(SimulationBusiness.class),
-                getBean(ResourceBusiness.class)
+                getBean(ResourceBusiness.class),
+                getBean(TagBusiness.class)
         );
     }
 
     public void setBeans(
             ClassBusiness classBusiness, ApplicationBusiness applicationBusiness, EngineBusiness engineBusiness,
             BoutiquesBusiness boutiquesBusiness, ConfigurationBusiness configurationBusiness,
-            WorkflowBusiness workflowBusiness, SimulationBusiness simulationBusiness, ResourceBusiness resourceBusiness) {
+            WorkflowBusiness workflowBusiness, SimulationBusiness simulationBusiness, 
+            ResourceBusiness resourceBusiness, TagBusiness tagBusiness) {
         this.classBusiness = classBusiness;
         this.applicationBusiness = applicationBusiness;
         this.engineBusiness = engineBusiness;
@@ -94,6 +97,7 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
         this.workflowBusiness = workflowBusiness;
         this.simulationBusiness = simulationBusiness;
         this.resourceBusiness = resourceBusiness;
+        this.tagBusiness = tagBusiness;
     }
 
     @Override
@@ -478,6 +482,42 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
     public List<Resource> getResources() throws ApplicationException {
         try {
             return resourceBusiness.getAll();
+        } catch (BusinessException e) {
+            throw new ApplicationException(e);
+        }
+    }
+
+    @Override
+    public void addTag(Tag tag) throws ApplicationException {
+        try {
+            tagBusiness.add(tag);
+        } catch (BusinessException e) {
+            throw new ApplicationException(e);
+        }
+    }
+
+    @Override
+    public void removeTag(Tag tag) throws ApplicationException {
+        try {
+            tagBusiness.remove(tag);
+        } catch (BusinessException e) {
+            throw new ApplicationException(e);
+        }
+    }
+
+    @Override
+    public void updateTag(Tag tag, String newName) throws ApplicationException {
+        try {
+            tagBusiness.update(tag, newName);
+        } catch (BusinessException e) {
+            throw new ApplicationException(e);
+        }
+    }
+
+    @Override
+    public List<Tag> getTags() throws ApplicationException {
+        try {
+            return tagBusiness.getAll();
         } catch (BusinessException e) {
             throw new ApplicationException(e);
         }

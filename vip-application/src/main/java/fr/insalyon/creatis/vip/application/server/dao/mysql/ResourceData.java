@@ -47,7 +47,7 @@ public class ResourceData extends JdbcDaoSupport implements ResourceDAO {
             ps.executeUpdate();
 
         } catch (SQLException e) {
-            if (e.getMessage().contains("Unique index or primary key violation")) {
+            if (e.getMessage().contains("Unique index or primary key violation") || e.getMessage().contains("Duplicate entry ")) {
                 logger.error("A resource named \"{}\" already exists.", resource.getName());
                 throw new DAOException("A resource named " + resource.getName() + " already exists.");
             } else {

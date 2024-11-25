@@ -40,7 +40,7 @@ public class TagData extends JdbcDaoSupport implements TagDAO {
             ps.executeUpdate();
 
         } catch (SQLException e) {
-            if (e.getMessage().contains("Unique index or primary key violation")) {
+            if (e.getMessage().contains("Unique index or primary key violation") || e.getMessage().contains("Duplicate entry ")) {
                 logger.error("A tag named \"{}\" already exists.", tag.getName());
                 throw new DAOException("A tag named " + tag.getName() + " already exists.");
             } else {
@@ -60,8 +60,13 @@ public class TagData extends JdbcDaoSupport implements TagDAO {
             ps.executeUpdate();
 
         } catch (SQLException e) {
-            logger.error("Error updating tag : " + tag.getName(), e);
-            throw new DAOException(e);
+            if (e.getMessage().contains("Duplicate entry ")) {
+                logger.error("Error updating tag name, value already exists !", e);
+                throw new DAOException("A tag named " + newName + " already exists.");
+            } else {
+                logger.error("Error updating tag : " + tag.getName(), e);
+                throw new DAOException(e);
+            }
         }
     }
 

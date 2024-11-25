@@ -29,7 +29,7 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL-B license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.application.client.view.system.application;
+package fr.insalyon.creatis.vip.application.client.view.system.applications;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.types.Alignment;
@@ -60,8 +60,6 @@ import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Supplier;
-import java.util.logging.Logger;
 
 /**
  *
