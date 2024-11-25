@@ -123,7 +123,7 @@ public class CoreDataInitializer extends JdbcDaoSupport {
     }
 
     private void initializeTermsOfUseTable() {
-        if (tableInitializer.createTable("VIPTermsOfuse",
+        if (tableInitializer.createTable("VIPTermsOfUse",
                 "idTermsOfuse INT(11) NOT NULL AUTO_INCREMENT, "
                         + "date TIMESTAMP NULL, "
                         + "PRIMARY KEY (idTermsOfuse)")) {
