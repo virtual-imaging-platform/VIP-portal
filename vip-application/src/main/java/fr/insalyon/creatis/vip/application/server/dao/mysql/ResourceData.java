@@ -85,13 +85,8 @@ public class ResourceData extends JdbcDaoSupport implements ResourceDAO {
             ps.executeUpdate();
 
         } catch (SQLException e) {
-            if (e.getMessage().contains("Unique index or primary key violation") || e.getMessage().contains("Duplicate entry ")) {
-                logger.error("There is no resource registered with the name {}", resource.getName());
-                throw new DAOException("There is no resource registered with the name : " + resource.getName());
-            } else {
-                logger.error("Error removing resource " + resource.getName(), e);
-                throw new DAOException(e);
-            }
+            logger.error("Error removing resource " + resource.getName(), e);
+            throw new DAOException(e);
         }
     }
 
@@ -240,13 +235,8 @@ public class ResourceData extends JdbcDaoSupport implements ResourceDAO {
             ps.executeUpdate();
 
         } catch (SQLException e) {
-            if (e.getMessage().contains("Unique index or primary key violation") || e.getMessage().contains("Duplicate entry ")) {
-                logger.error("There is no resource registered with the name {} and the group {}", resource.getName(), group.getName());
-                throw new DAOException("There is no resource registered with the name " + resource.getName() + " and the group " + group.getName());
-            } else {
-                logger.error("Error removing resource/group pair " + resource.getName() + "/" + group.getName(), e);
-                throw new DAOException(e);
-            }
+            logger.error("Error removing resource/group pair " + resource.getName() + "/" + group.getName(), e);
+            throw new DAOException(e);
         }
     }
 

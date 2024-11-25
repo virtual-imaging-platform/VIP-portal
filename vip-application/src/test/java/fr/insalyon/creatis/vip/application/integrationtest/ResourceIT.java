@@ -44,6 +44,12 @@ public class ResourceIT extends BaseSpringIT {
     }
 
     @Test
+    public void remove() throws BusinessException {
+        resourceBusiness.remove(resource);
+        assertEquals(0, resourceBusiness.getAll().size());
+    }
+
+    @Test
     public void addExistingResource() throws BusinessException {
         assertThrows(BusinessException.class, () -> resourceBusiness.add(resource));
     }

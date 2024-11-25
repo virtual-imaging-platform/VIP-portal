@@ -1,7 +1,5 @@
 package fr.insalyon.creatis.vip.application.server.dao.mysql;
 
-import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
-import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import fr.insalyon.creatis.vip.core.server.dao.mysql.TableInitializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,6 +38,7 @@ public class ApplicationDataInitializer extends JdbcDaoSupport {
         createResourcesTables();
         createClassesTables();
         createApplicationsTables();
+        createTagsTables();
         createOthersTables();
     }
 
@@ -151,6 +150,22 @@ public class ApplicationDataInitializer extends JdbcDaoSupport {
                         + "name VARCHAR(255), "
                         + "inputs VARCHAR(32000), "
                         + "PRIMARY KEY (application, name)");
+    }
+
+    private void createTagsTables() {
+        tableInitializer.createTable("VIPTags",
+                    "name VARCHAR(255), "
+                +   "PRIMARY KEY (name)");
+
+        tableInitializer.createTable("VIPTagsAppVersions",
+                    "application VARCHAR(255), "
+                +   "version VARCHAR(255), "
+                +   "tagname VARCHAR(255), "
+                +   "PRIMARY KEY (application, version, tagname), "
+                +   "FOREIGN KEY (application, version) REFERENCES VIPAppVersions(application, version) "
+                +   "ON DELETE CASCADE ON UPDATE CASCADE, "
+                +   "FOREIGN KEY (tagname) REFERENCES VIPTags(name) "
+                +   "ON DELETE CASCADE ON UPDATE CASCADE");
     }
 
     private void createOthersTables() {
