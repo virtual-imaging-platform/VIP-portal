@@ -129,13 +129,13 @@ public class ClassData extends JdbcDaoSupport implements ClassDAO {
             while (rs.next()) {
                 List<String> groups = new ArrayList<String>();
                 PreparedStatement ps2 = getConnection().prepareStatement(
-                        "SELECT name FROM VIPGroupsClasses "
-                                + "WHERE classname=? ORDER BY name");
+                        "SELECT groupname FROM VIPGroupsClasses "
+                                + "WHERE classname=? ORDER BY groupname");
                 ps2.setString(1, rs.getString("name"));
                 ResultSet rg = ps2.executeQuery();
 
                 while (rg.next()) {
-                    groups.add(rg.getString("name"));
+                    groups.add(rg.getString("groupname"));
                 }
                 ps2.close();
 
@@ -178,12 +178,12 @@ public class ClassData extends JdbcDaoSupport implements ClassDAO {
                 // Get groups associated to class
                 List<String> groups = new ArrayList<String>();
                 PreparedStatement ps2 = getConnection().prepareStatement(
-                        "SELECT name FROM VIPGroupsClasses "
-                                + "WHERE classname=? ORDER BY name");
+                        "SELECT groupname FROM VIPGroupsClasses "
+                                + "WHERE classname=? ORDER BY groupname");
                 ps2.setString(1, rs.getString("name"));
                 ResultSet r = ps2.executeQuery();
                 while (r.next()) {
-                    groups.add(r.getString("name"));
+                    groups.add(r.getString("groupname"));
                 }
                 ps2.close();
                 // Get engines associated to class
@@ -218,7 +218,7 @@ public class ClassData extends JdbcDaoSupport implements ClassDAO {
 
             PreparedStatement ps = getConnection().prepareStatement("SELECT DISTINCT classname "
                     + "FROM VIPGroupsClasses gc, VIPUsersGroups ug "
-                    + "WHERE ug.name = gc.name AND ug.email = ?" + clause);
+                    + "WHERE ug.groupname = gc.groupname AND ug.email = ?" + clause);
 
             ps.setString(1, email);
             if (validAdmin) {
@@ -231,13 +231,13 @@ public class ClassData extends JdbcDaoSupport implements ClassDAO {
             while (rs.next()) {
                 List<String> groups = new ArrayList<String>();
                 PreparedStatement ps2 = getConnection().prepareStatement(
-                        "SELECT name FROM VIPGroupsClasses "
-                                + "WHERE classname=? ORDER BY name");
+                        "SELECT groupname FROM VIPGroupsClasses "
+                                + "WHERE classname=? ORDER BY groupname");
                 ps2.setString(1, rs.getString("classname"));
                 ResultSet r = ps2.executeQuery();
 
                 while (r.next()) {
-                    groups.add(r.getString("name"));
+                    groups.add(r.getString("groupname"));
                 }
                 classes.add(new AppClass(rs.getString("classname"), groups));
                 ps2.close();
@@ -263,7 +263,7 @@ public class ClassData extends JdbcDaoSupport implements ClassDAO {
                 switch (objectType) {
                     case "group":
                         ps = getConnection().prepareStatement("INSERT INTO "
-                                + "VIPGroupsClasses(classname, name) "
+                                + "VIPGroupsClasses(classname, groupname) "
                                 + "VALUES(?, ?)");
                         break;
                     case "engine":

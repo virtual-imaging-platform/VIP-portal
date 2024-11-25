@@ -74,7 +74,7 @@ public class UsersGroupsData extends JdbcDaoSupport implements UsersGroupsDAO {
 
         try {
             PreparedStatement ps = getConnection().prepareStatement(
-                    "INSERT INTO VIPUsersGroups(email, name, role) "
+                    "INSERT INTO VIPUsersGroups(email, groupname, role) "
                     + "VALUES(?, ?, ?)");
 
             ps.setString(1, email);
@@ -103,7 +103,7 @@ public class UsersGroupsData extends JdbcDaoSupport implements UsersGroupsDAO {
             PreparedStatement ps = getConnection().prepareStatement(
                     "SELECT g.name, g.public, g.type, role "
                     + "FROM VIPGroups g JOIN VIPUsersGroups ug "
-                    + "ON g.name = ug.name AND email = ?");
+                    + "ON g.name = ug.groupname AND email = ?");
             ps.setString(1, email);
             ResultSet rs = ps.executeQuery();
 
@@ -137,7 +137,7 @@ public class UsersGroupsData extends JdbcDaoSupport implements UsersGroupsDAO {
 
         try {
             PreparedStatement ps = getConnection().prepareStatement("SELECT "
-                    + "name FROM VIPUsersGroups "
+                    + "groupname FROM VIPUsersGroups "
                     + "WHERE email = ? AND role = ?");
             ps.setString(1, email);
             ps.setString(2, GROUP_ROLE.Admin.name());
@@ -202,7 +202,7 @@ public class UsersGroupsData extends JdbcDaoSupport implements UsersGroupsDAO {
                 if (sb.length() > 0) {
                     sb.append(" OR ");
                 }
-                sb.append("name = '").append(groupName).append("'");
+                sb.append("groupname = '").append(groupName).append("'");
             }
             PreparedStatement ps = getConnection().prepareStatement("SELECT DISTINCT "
                     + "first_name, last_name, LOWER(first_name), LOWER(last_name) "
@@ -234,7 +234,7 @@ public class UsersGroupsData extends JdbcDaoSupport implements UsersGroupsDAO {
             PreparedStatement ps = getConnection().prepareStatement(
                     "SELECT public "
                     + "FROM VIPGroups g, VIPUsersGroups ug "
-                    + "WHERE g.name = ug.name AND ug.email= ?");
+                    + "WHERE g.name = ug.groupname AND ug.email= ?");
             ps.setString(1, email);
             ResultSet rs = ps.executeQuery();
 
@@ -272,7 +272,7 @@ public class UsersGroupsData extends JdbcDaoSupport implements UsersGroupsDAO {
                     + "level, country_code, max_simulations, termsUse, lastUpdatePublications, "
                     + "failed_authentications, account_locked "
                     + "FROM VIPUsers us, VIPUsersGroups ug "
-                    + "WHERE us.email = ug.email AND ug.name = ? "
+                    + "WHERE us.email = ug.email AND ug.groupname = ? "
                     + "ORDER BY LOWER(first_name), LOWER(last_name)");
 
             ps.setString(1, groupName);
@@ -317,7 +317,7 @@ public class UsersGroupsData extends JdbcDaoSupport implements UsersGroupsDAO {
 
         try {
             PreparedStatement ps = getConnection().prepareStatement("DELETE FROM "
-                    + "VIPUsersGroups WHERE email = ? AND name = ?");
+                    + "VIPUsersGroups WHERE email = ? AND groupname = ?");
             ps.setString(1, email);
             ps.setString(2, groupName);
             ps.executeUpdate();

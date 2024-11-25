@@ -37,7 +37,8 @@ import fr.insalyon.creatis.vip.application.client.bean.AppVersion;
 import fr.insalyon.creatis.vip.application.client.bean.Application;
 import fr.insalyon.creatis.vip.application.client.bean.ApplicationStatus;
 import fr.insalyon.creatis.vip.application.client.bean.Engine;
-import fr.insalyon.creatis.vip.application.client.view.ApplicationException;
+import fr.insalyon.creatis.vip.application.client.bean.Resource;
+
 import java.util.HashMap;
 import java.util.List;
 
@@ -99,4 +100,11 @@ public interface ApplicationServiceAsync {
     
     public void getReservedClasses(AsyncCallback <HashMap<String, Integer>> asyncCallback);
 
+    public void addResource(Resource resource, AsyncCallback<Void> asyncCallback);
+
+    public void removeResource(Resource resource, AsyncCallback<Void> asyncCallback);
+
+    public void updateResource(Resource resource, AsyncCallback<Void> asyncCallback);
+
+    public void getResources(AsyncCallback<List<Resource>> asyncCallback);
 }

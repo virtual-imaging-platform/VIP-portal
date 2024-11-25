@@ -18,9 +18,15 @@ public class Resource implements IsSerializable {
         this.configuration = configuration;
     }
 
+    public Resource(String name) {
+        this(name, false, false, ResourceType.getDefault(), "");
+    }
+
     public Resource(String name, boolean visible, boolean status, String type, String configuration) {
         this(name, visible, status, ResourceType.fromString(type), configuration);
     }
+
+    public Resource() {}
 
     public String getName() {
         return name;

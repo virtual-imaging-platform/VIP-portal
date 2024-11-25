@@ -65,6 +65,7 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
     private ConfigurationBusiness configurationBusiness;
     private WorkflowBusiness workflowBusiness;
     private SimulationBusiness simulationBusiness;
+    private ResourceBusiness resourceBusiness;
 
     @Override
     public void init() throws ServletException {
@@ -76,14 +77,15 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
                 getBean(BoutiquesBusiness.class),
                 getBean(ConfigurationBusiness.class),
                 getBean(WorkflowBusiness.class),
-                getBean(SimulationBusiness.class)
+                getBean(SimulationBusiness.class),
+                getBean(ResourceBusiness.class)
         );
     }
 
     public void setBeans(
             ClassBusiness classBusiness, ApplicationBusiness applicationBusiness, EngineBusiness engineBusiness,
             BoutiquesBusiness boutiquesBusiness, ConfigurationBusiness configurationBusiness,
-            WorkflowBusiness workflowBusiness, SimulationBusiness simulationBusiness) {
+            WorkflowBusiness workflowBusiness, SimulationBusiness simulationBusiness, ResourceBusiness resourceBusiness) {
         this.classBusiness = classBusiness;
         this.applicationBusiness = applicationBusiness;
         this.engineBusiness = engineBusiness;
@@ -91,6 +93,7 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
         this.configurationBusiness = configurationBusiness;
         this.workflowBusiness = workflowBusiness;
         this.simulationBusiness = simulationBusiness;
+        this.resourceBusiness = resourceBusiness;
     }
 
     @Override
@@ -441,6 +444,42 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
                 applicationName, applicationVersion);
         } catch (BusinessException ex) {
             throw new ApplicationException(ex);
+        }
+    }
+
+    @Override
+    public void addResource(Resource resource) throws ApplicationException {
+        try {
+            resourceBusiness.add(resource);
+        } catch (BusinessException e) {
+            throw new ApplicationException(e);
+        }
+    }
+
+    @Override
+    public void removeResource(Resource resource) throws ApplicationException {
+        try {
+            resourceBusiness.remove(resource);
+        } catch (BusinessException e) {
+            throw new ApplicationException(e);
+        }
+    }
+
+    @Override
+    public void updateResource(Resource resource) throws ApplicationException {
+        try {
+            resourceBusiness.update(resource);
+        } catch (BusinessException e) {
+            throw new ApplicationException(e);
+        }
+    }
+
+    @Override
+    public List<Resource> getResources() throws ApplicationException {
+        try {
+            return resourceBusiness.getAll();
+        } catch (BusinessException e) {
+            throw new ApplicationException(e);
         }
     }
 }

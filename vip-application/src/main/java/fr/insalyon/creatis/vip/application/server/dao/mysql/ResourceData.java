@@ -117,8 +117,8 @@ public class ResourceData extends JdbcDaoSupport implements ResourceDAO {
     @Override
     public List<Resource> getByUser(User user) throws DAOException {
         String query = "SELECT * FROM VIPResources r "
-        +              "JOIN VIPGroupResources gr ON r.name = gr.resourcename "
-        +              "JOIN VIPUsersGroups ug ON gr.name = ug.name "
+        +              "JOIN VIPGroupsResources gr ON r.name = gr.resourcename "
+        +              "JOIN VIPUsersGroups ug ON gr.groupname = ug.groupname "
         +              "WHERE ug.email = ?";
 
         try (PreparedStatement ps = getConnection().prepareStatement(query)) {
@@ -190,8 +190,8 @@ public class ResourceData extends JdbcDaoSupport implements ResourceDAO {
     @Override
     public List<Resource> getByGroup(Group group) throws DAOException {
         String query = "SELECT * FROM VIPResources r "
-        +              "JOIN VIPGroupResources gr ON r.name = gr.resourcename "
-        +              "WHERE gr.name = ?";
+        +              "JOIN VIPGroupsResources gr ON r.name = gr.resourcename "
+        +              "WHERE gr.groupname = ?";
 
         try (PreparedStatement ps = getConnection().prepareStatement(query)) {
             ps.setString(1, group.getName());
@@ -212,7 +212,7 @@ public class ResourceData extends JdbcDaoSupport implements ResourceDAO {
 
     @Override
     public void putInGroup(Resource resource, Group group) throws DAOException {
-        String query = "INSERT INTO VIPGroupResources (resourcename, name) "
+        String query = "INSERT INTO VIPGroupsResources (resourcename, groupname) "
         +              "VALUES (?,?)";
         
         try (PreparedStatement ps = getConnection().prepareStatement(query)) {
@@ -232,7 +232,7 @@ public class ResourceData extends JdbcDaoSupport implements ResourceDAO {
 
     @Override
     public void removeFromGroup(Resource resource, Group group) throws DAOException {
-        String query = "DELETE FROM VIPGroupResources WHERE resourcename = ? AND name = ?";
+        String query = "DELETE FROM VIPGroupsResources WHERE resourcename = ? AND groupname = ?";
 
         try (PreparedStatement ps = getConnection().prepareStatement(query)) {
             ps.setString(1, resource.getName());

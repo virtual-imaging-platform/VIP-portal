@@ -39,6 +39,7 @@ import fr.insalyon.creatis.vip.application.client.bean.AppVersion;
 import fr.insalyon.creatis.vip.application.client.bean.Application;
 import fr.insalyon.creatis.vip.application.client.bean.ApplicationStatus;
 import fr.insalyon.creatis.vip.application.client.bean.Engine;
+import fr.insalyon.creatis.vip.application.client.bean.Resource;
 import fr.insalyon.creatis.vip.application.client.view.ApplicationException;
 import java.util.HashMap;
 import java.util.List;
@@ -113,5 +114,12 @@ public interface ApplicationService extends RemoteService {
     public List<Engine> getEngines() throws ApplicationException;
     
     public HashMap<String, Integer> getReservedClasses() throws ApplicationException;
-    
+
+    public void addResource(Resource resource) throws ApplicationException;
+
+    public void removeResource(Resource resource) throws ApplicationException;
+
+    public void updateResource(Resource resource) throws ApplicationException;
+
+    public List<Resource> getResources() throws ApplicationException;
 }

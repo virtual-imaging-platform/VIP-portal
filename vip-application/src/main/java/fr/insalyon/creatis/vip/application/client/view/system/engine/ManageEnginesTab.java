@@ -45,7 +45,7 @@ public class ManageEnginesTab extends AbstractManageTab {
     private EditEngineLayout editLayout;
     
     public ManageEnginesTab() {
-        
+
         super(ApplicationConstants.ICON_ENGINE, ApplicationConstants.APP_ENGINE, ApplicationConstants.TAB_MANAGE_ENGINE);
         
         enginesLayout = new EnginesLayout();

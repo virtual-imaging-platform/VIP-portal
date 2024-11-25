@@ -44,6 +44,7 @@ public class ApplicationConstants {
     public final static String TAB_MANAGE_APPLICATION = "manage_application_tab";
     public final static String TAB_MANAGE_CLASSES = "manage_classes_tab";
     public final static String TAB_MANAGE_ENGINE = "manage_engine_tab";
+    public final static String TAB_MANAGE_RESOURCE = "manage_resource_tab";
     public final static String TAB_MONITOR = "monitor_tab";
     public final static String TAB_STATS = "stats_tab";
     public final static String TAB_REPROVIP = "reproVip_tab";
@@ -74,6 +75,7 @@ public class ApplicationConstants {
     public static final String ICON_MONITOR_SIMULATION_COMPLETED = IMG_FOLDER + "monitor/icon-simulation-completed.png";
     public static final String ICON_MARK_COMPLETED = IMG_FOLDER + "icon-mark-completed.png";
     public static final String ICON_USER = IMG_FOLDER + "icon-user.png";
+    public static final String ICON_RESOURCE = IMG_FOLDER + "app-resource.png";
     ;
     public static final String ICON_MONITOR_SIMULATION_FAILED = IMG_FOLDER + "monitor/icon-simulation-failed.png";
     public static final String ICON_MONITOR_SIMULATION_KILLED = IMG_FOLDER + "monitor/icon-simulation-killed.png";
@@ -110,11 +112,13 @@ public class ApplicationConstants {
     public static final String APP_SIMULATION_OUT = "Output File";
     public static final String APP_PUBLIC_APPLICATION = "Applications";
     public static final String APP_REPRO_VIP = "ReproVIP";
+    public static final String APP_RESOURCE = "Resources";
     // Application Images
     public static final String APP_IMG_APPLICATION = IMG_FOLDER + "app-application.png";
     public static final String APP_IMG_CLASSES = IMG_FOLDER + "app-classes.png";
     public static final String APP_IMG_MONITOR = IMG_FOLDER + "app-monitor.png";
     public static final String APP_IMG_ENGINE = IMG_FOLDER + "app-engine.png";
+    public static final String APP_IMG_RESOURCE = IMG_FOLDER + "app-resource.png";
     public static final String APP_IMG_SIMULATION_ERROR = IMG_FOLDER + "app-simulation-error.png";
     public static final String APP_IMG_SIMULATION_OUT = IMG_FOLDER + "app-simulation-out.png";
     // Application launch, input without value

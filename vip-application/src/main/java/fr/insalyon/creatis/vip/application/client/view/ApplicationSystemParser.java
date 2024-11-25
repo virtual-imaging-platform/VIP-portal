@@ -31,11 +31,11 @@
  */
 package fr.insalyon.creatis.vip.application.client.view;
 
-import com.smartgwt.client.widgets.tab.Tab;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
 import fr.insalyon.creatis.vip.application.client.view.system.application.ManageApplicationsTab;
 import fr.insalyon.creatis.vip.application.client.view.system.classes.ManageClassesTab;
 import fr.insalyon.creatis.vip.application.client.view.system.engine.ManageEnginesTab;
+import fr.insalyon.creatis.vip.application.client.view.system.resources.ManageResourcesTab;
 import fr.insalyon.creatis.vip.core.client.CoreModule;
 import fr.insalyon.creatis.vip.core.client.view.application.ApplicationParser;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
@@ -55,6 +55,7 @@ public class ApplicationSystemParser extends ApplicationParser {
         if (CoreModule.user.isSystemAdministrator()) {
             addApplication(ApplicationConstants.APP_CLASSES, ApplicationConstants.APP_IMG_CLASSES);
             addApplication(ApplicationConstants.APP_ENGINE, ApplicationConstants.APP_IMG_ENGINE);
+            addApplication(ApplicationConstants.APP_RESOURCE, ApplicationConstants.APP_IMG_RESOURCE);
         }
     }
 
@@ -73,6 +74,10 @@ public class ApplicationSystemParser extends ApplicationParser {
         } else if (applicationName.equals(ApplicationConstants.APP_ENGINE)) {
             Layout.getInstance().addTab(
                 ApplicationConstants.TAB_MANAGE_ENGINE, ManageEnginesTab::new);
+            return true;
+        } else if (applicationName.equals(ApplicationConstants.APP_RESOURCE)) {
+            Layout.getInstance().addTab(
+                ApplicationConstants.TAB_MANAGE_RESOURCE, ManageResourcesTab::new);
             return true;
         }
         return false;

@@ -61,11 +61,11 @@ public class ApplicationDataInitializer extends JdbcDaoSupport {
                 +   "PRIMARY KEY (name)"
         );
 
-        tableInitializer.createTable("VIPGroupResources",
-                    "name VARCHAR(255), "
+        tableInitializer.createTable("VIPGroupsResources",
+                    "groupname VARCHAR(50), "
                 +   "resourcename VARCHAR(255), "
-                +   "PRIMARY KEY (name, resourcename), "
-                +   "FOREIGN KEY (name) REFERENCES VIPGroups(name) "
+                +   "PRIMARY KEY (groupname, resourcename), "
+                +   "FOREIGN KEY (groupname) REFERENCES VIPGroups(name) "
                 +   "ON DELETE CASCADE ON UPDATE RESTRICT, "
                 +   "FOREIGN KEY (resourcename) REFERENCES VIPResources(name) "
                 +   "ON DELETE CASCADE ON UPDATE RESTRICT");
@@ -108,11 +108,11 @@ public class ApplicationDataInitializer extends JdbcDaoSupport {
 
         tableInitializer.createTable("VIPGroupsClasses",
                 "classname VARCHAR(255), "
-                        + "name VARCHAR(255), "
-                        + "PRIMARY KEY (classname, name), "
+                        + "groupname VARCHAR(50), "
+                        + "PRIMARY KEY (classname, groupname), "
                         + "FOREIGN KEY (classname) REFERENCES VIPClasses(name) "
                         + "ON DELETE CASCADE ON UPDATE RESTRICT, "
-                        + "FOREIGN KEY (name) REFERENCES VIPGroups(name) "
+                        + "FOREIGN KEY (groupname) REFERENCES VIPGroups(name) "
                         + "ON DELETE CASCADE ON UPDATE RESTRICT");
     }
 

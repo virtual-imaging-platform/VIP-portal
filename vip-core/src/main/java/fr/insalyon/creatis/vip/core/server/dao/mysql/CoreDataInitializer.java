@@ -113,12 +113,12 @@ public class CoreDataInitializer extends JdbcDaoSupport {
 
         tableInitializer.createTable("VIPUsersGroups",
                 "email VARCHAR(255), "
-                        + "name VARCHAR(100), "
+                        + "groupname VARCHAR(50), "
                         + "role VARCHAR(30), "
-                        + "PRIMARY KEY (email, name), "
+                        + "PRIMARY KEY (email, groupname), "
                         + "FOREIGN KEY (email) REFERENCES VIPUsers(email) "
                         + "ON DELETE CASCADE ON UPDATE CASCADE, "
-                        + "FOREIGN KEY (name) REFERENCES VIPGroups(name) "
+                        + "FOREIGN KEY (groupname) REFERENCES VIPGroups(name) "
                         + "ON DELETE CASCADE ON UPDATE CASCADE");
     }
 
