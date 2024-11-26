@@ -47,7 +47,6 @@ knowledge of the CeCILL-B license and that you accept its terms.
     <name>VIP-Social</name>
 
     <dependencies>
-
         <dependency>
             <groupId>fr.insalyon.creatis</groupId>
             <artifactId>vip-core</artifactId>

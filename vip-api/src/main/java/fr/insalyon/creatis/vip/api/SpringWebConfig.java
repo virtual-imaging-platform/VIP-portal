@@ -31,26 +31,12 @@
  */
 package fr.insalyon.creatis.vip.api;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.insalyon.creatis.vip.api.business.VipConfigurer;
-import org.keycloak.adapters.springsecurity.client.KeycloakClientRequestFactory;
-import org.keycloak.adapters.springsecurity.client.KeycloakRestTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Profile;
-import org.springframework.context.annotation.DependsOn;
-import org.springframework.context.annotation.PropertySource;
-import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.Environment;
-import org.springframework.core.env.MutablePropertySources;
-import org.springframework.core.env.PropertiesPropertySource;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.support.ResourcePropertySource;
-import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.web.servlet.config.annotation.*;
 
-import java.io.IOException;
 import java.util.Collections;
 
 import static fr.insalyon.creatis.vip.api.CarminProperties.CORS_AUTHORIZED_DOMAINS;
@@ -75,12 +61,6 @@ public class SpringWebConfig implements WebMvcConfigurer {
     public SpringWebConfig(Environment env, VipConfigurer vipConfigurer) {
         this.env = env;
         this.vipConfigurer = vipConfigurer;
-    }
-
-    //implements rest template to send requests with tokens
-    @Bean
-    public KeycloakRestTemplate keycloakRestTemplate(KeycloakClientRequestFactory keycloakClientRequestFactory) {
-        return new KeycloakRestTemplate(keycloakClientRequestFactory);
     }
 
     @Override

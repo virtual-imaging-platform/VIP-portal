@@ -70,6 +70,7 @@ public class FileUploadWindow extends Window {
         form.setMethod(FormMethod.POST);
         form.setAction(GWT.getModuleBaseURL() + "/fileuploadservice");
         form.setTarget(target);
+        form.setCheckFileAccessOnSubmit(false); // make JS upload synchronous as we destroy the form just after submit
 
         fileItem = new UploadItem("file");
         fileItem.setTitle("File");

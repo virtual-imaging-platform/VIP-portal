@@ -37,7 +37,6 @@ import fr.insalyon.creatis.vip.api.exception.ApiException;
 import fr.insalyon.creatis.vip.api.model.ExistsApiResponse;
 import fr.insalyon.creatis.vip.api.model.PathProperties;
 import fr.insalyon.creatis.vip.api.model.UploadData;
-import fr.insalyon.creatis.vip.core.client.bean.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,11 +48,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriUtils;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.io.InputStream;
 import java.util.List;
-import java.util.function.Supplier;
 
 /**
  * Created by abonnet on 1/13/17.
