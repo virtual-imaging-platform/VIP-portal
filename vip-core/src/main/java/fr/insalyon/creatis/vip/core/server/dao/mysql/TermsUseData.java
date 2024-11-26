@@ -86,7 +86,7 @@ public class TermsUseData extends JdbcDaoSupport implements TermsUseDAO {
     public Timestamp getLastUpdateTermsOfUse() throws DAOException {
         try {
             Timestamp date=null;
-            PreparedStatement ps = getConnection().prepareStatement("Select date From VIPTermsOfUse ORDER BY idTermsOfuse DESC " +
+            PreparedStatement ps = getConnection().prepareStatement("SELECT date FROM VIPTermsOfUse ORDER BY id DESC " +
               "LIMIT 1");
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
