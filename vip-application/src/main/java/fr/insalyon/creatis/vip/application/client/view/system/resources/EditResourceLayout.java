@@ -1,6 +1,7 @@
 package fr.insalyon.creatis.vip.application.client.view.system.resources;
 
 import java.util.Arrays;
+import java.util.List;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.types.MultipleAppearance;
@@ -13,9 +14,11 @@ import com.smartgwt.client.widgets.form.fields.BooleanItem;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
+import fr.insalyon.creatis.vip.application.client.bean.Engine;
 import fr.insalyon.creatis.vip.application.client.bean.Resource;
 import fr.insalyon.creatis.vip.application.client.bean.ResourceType;
 import fr.insalyon.creatis.vip.application.client.rpc.ApplicationService;
+import fr.insalyon.creatis.vip.application.client.rpc.ApplicationServiceAsync;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.common.AbstractFormLayout;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
@@ -61,6 +64,7 @@ public class EditResourceLayout extends AbstractFormLayout {
         typeFieldList.setWidth(350);
 
         enginesList = new SelectItem();
+        enginesList.setShowTitle(false);
         enginesList.setMultiple(true);
         enginesList.setMultipleAppearance(MultipleAppearance.PICKLIST);
         enginesList.setWidth(350);
@@ -104,10 +108,11 @@ public class EditResourceLayout extends AbstractFormLayout {
         addField("Active", statusField);
         addField("Type", typeFieldList);
         addField("Configuration", configurationField);
+        addField("Engines", enginesList);
         addButtons(saveButton, removeButton);
     }
 
-    public void setResource(String name, boolean visible, boolean status, String type, String configuration) {
+    public void setResource(String name, boolean visible, boolean status, String type, String configuration, String[] engines) {
 
         if (name != null) {
             this.nameField.setValue(name);
@@ -116,9 +121,9 @@ public class EditResourceLayout extends AbstractFormLayout {
             this.statusField.setValue(status);
             this.typeFieldList.setValue(type);
             this.configurationField.setValue(configuration);
+            this.enginesList.setValues(engines);
             this.newResource = false;
             this.removeButton.setDisabled(false);
-
         } else {
             this.nameField.setValue("");
             this.nameField.setDisabled(false);
@@ -129,6 +134,7 @@ public class EditResourceLayout extends AbstractFormLayout {
             this.newResource = true;
             this.removeButton.setDisabled(true);
         }
+        fetchData();
     }
 
     private void save(Resource resource) {
@@ -148,7 +154,6 @@ public class EditResourceLayout extends AbstractFormLayout {
     }
 
     private AsyncCallback<Void> getCallback(final String text) {
-
         return new AsyncCallback<Void>() {
             @Override
             public void onFailure(Throwable caught) {
@@ -161,11 +166,28 @@ public class EditResourceLayout extends AbstractFormLayout {
             public void onSuccess(Void result) {
                 WidgetUtil.resetIButton(saveButton, "Save", CoreConstants.ICON_SAVED);
                 WidgetUtil.resetIButton(removeButton, "Remove", CoreConstants.ICON_DELETE);
-                setResource(null, false, false, null, null);
+                setResource(null, false, false, null, null, null);
                 ManageResourcesTab tab = (ManageResourcesTab) Layout.getInstance().
                         getTab(ApplicationConstants.TAB_MANAGE_RESOURCE);
                 tab.loadResources();
             }
         };
+    }
+
+    private void fetchData() {
+        ApplicationServiceAsync service = ApplicationService.Util.getInstance();
+        final AsyncCallback<List<Engine>> callback = new AsyncCallback<>() {
+            @Override
+            public void onFailure(Throwable caught) {
+                Layout.getInstance().setWarningMessage("Unable to load engines:<br />" + caught.getMessage());
+            }
+    
+            @Override
+            public void onSuccess(List<Engine> result) {
+                String[] data = result.stream().map(Engine::getName).toArray(String[]::new);
+                enginesList.setValueMap(data);
+            }
+        };
+        service.getEngines(callback);
     }
 }

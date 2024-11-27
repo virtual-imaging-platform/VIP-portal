@@ -276,7 +276,6 @@ public class ApplicationBusiness {
 
             applicationDAO.updateVersion(version);
             for (String resource : version.getResources()) {
-                logger.info("resource name = " + resource);
                 if ( ! beforeResourceNames.removeIf((s) -> s.equals(resource))) {
                     resourceBusiness.associate(resourceBusiness.getByName(resource), version);
                 }
@@ -292,6 +291,7 @@ public class ApplicationBusiness {
             for (String e : beforeTagsNames) {
                 tagBusiness.dissociate(tagBusiness.getByName(e), version);
             }
+
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }

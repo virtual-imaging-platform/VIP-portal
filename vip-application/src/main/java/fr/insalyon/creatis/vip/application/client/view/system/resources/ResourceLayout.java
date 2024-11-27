@@ -62,7 +62,7 @@ public class ResourceLayout extends VLayout {
             public void onClick(ClickEvent event) {
                 ManageResourcesTab resourceTab = (ManageResourcesTab) Layout.getInstance().
                         getTab(ApplicationConstants.TAB_MANAGE_RESOURCE);
-                        resourceTab.setResource(null, false, false, null, null);
+                        resourceTab.setResource(null, false, false, null, null, null);
             }
         });
         toolstrip.addMember(addButton);
@@ -146,7 +146,8 @@ public class ResourceLayout extends VLayout {
                 new ListGridField("visible", "Visibility"),
                 new ListGridField("status", "Status"),
                 new ListGridField("type", "Type"),
-                new ListGridField("configuration", "Configuration"));
+                new ListGridField("configuration", "Configuration"),
+                new ListGridField("engines", "Engines"));
         grid.setSortField("name");
         grid.setSortDirection(SortDirection.ASCENDING);
         grid.addCellDoubleClickHandler(new CellDoubleClickHandler() {
@@ -211,6 +212,7 @@ public class ResourceLayout extends VLayout {
             record.getAttributeAsBoolean("visible"), 
             record.getAttributeAsBoolean("status"), 
             record.getAttribute("type"), 
-            record.getAttribute("configuration"));
+            record.getAttribute("configuration"),
+            record.getAttributeAsStringArray("engines"));
     }
 }

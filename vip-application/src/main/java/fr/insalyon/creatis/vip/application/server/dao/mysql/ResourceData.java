@@ -137,7 +137,7 @@ public class ResourceData extends JdbcDaoSupport implements ResourceDAO {
     public List<Resource> getByEngine(Engine engine) throws DAOException {
         String query = "SELECT * FROM VIPResources r "
         +              "JOIN VIPResourcesEngines re ON r.name = re.resourcename "
-        +              "WHERE re.name = ?";
+        +              "WHERE re.enginename = ?";
 
         try (PreparedStatement ps = getConnection().prepareStatement(query)) {
             ps.setString(1, engine.getName());
@@ -285,5 +285,41 @@ public class ResourceData extends JdbcDaoSupport implements ResourceDAO {
             logger.error("Error dissociating resource " + resource.getName() + " from " + appVersion.getApplicationName() + " " + appVersion.getVersion(), e);
             throw new DAOException(e);
         }
+    }
+
+    @Override
+    public void associate(Resource resource, Engine engine) throws DAOException {
+        String query = "INSERT INTO VIPResourcesEngines (resourcename, enginename) "
+        +              "VALUES (?,?)";
+        
+        try (PreparedStatement ps = getConnection().prepareStatement(query)) {
+            ps.setString(1, resource.getName());
+            ps.setString(2, engine.getName());
+            ps.executeUpdate();
+
+        } catch (SQLException e) {
+            if (e.getMessage().contains("Unique index or primary key violation")) {
+                logger.error("A resource \"{}\" is already associated with \"{}\"", resource.getName(), engine.getName());
+            } else {
+                logger.error("Error associating " + resource.getName() + " to " + engine.getName(), e);
+                throw new DAOException(e);
+            }
+        }
+    }
+
+    @Override
+    public void dissociate(Resource resource, Engine engine) throws DAOException {
+        String query = "DELETE FROM VIPResourcesEngines WHERE resourcename = ? AND enginename = ?";
+
+        try (PreparedStatement ps = getConnection().prepareStatement(query)) {
+            ps.setString(1, resource.getName());
+            ps.setString(2, engine.getName());
+            ps.executeUpdate();
+
+        } catch (SQLException e) {
+            logger.error("Error dissociating resource " + resource.getName() + " from " + engine.getName(), e);
+            throw new DAOException(e);
+        }
+
     }
 }

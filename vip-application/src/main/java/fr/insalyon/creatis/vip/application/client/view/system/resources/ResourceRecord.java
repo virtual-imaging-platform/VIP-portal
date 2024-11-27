@@ -12,5 +12,6 @@ public class ResourceRecord extends ListGridRecord {
         setAttribute("status", resource.getStatus());
         setAttribute("type", resource.getType());
         setAttribute("configuration", resource.getConfiguration());
+        setAttribute("engines", resource.getEngines());
     }
 }

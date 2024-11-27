@@ -22,6 +22,9 @@ import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 public class ResourceBusiness {
 
     private ResourceDAO resourceDAO;
+    
+    @Autowired
+    private EngineBusiness engineBusiness;
 
     @Autowired
     public ResourceBusiness(ResourceDAO dao) {
@@ -31,6 +34,10 @@ public class ResourceBusiness {
     public void add(Resource resource) throws BusinessException {
         try {
             resourceDAO.add(resource);
+
+            for (String engineName : resource.getEngines()) {
+                resourceDAO.associate(resource, new Engine(engineName));
+            }
         } catch (DAOException e){
             throw new BusinessException(e);
         }
@@ -38,7 +45,18 @@ public class ResourceBusiness {
 
     public void update(Resource resource) throws BusinessException {
         try {
+            Resource before = getByName(resource.getName());
+            List<String> beforeEnginesNames = before.getEngines();
+
             resourceDAO.update(resource);
+            for (String engine : resource.getEngines()) {
+                if ( ! beforeEnginesNames.removeIf((s) -> s.equals(engine))) {
+                    associate(resource, new Engine(engine));
+                }
+            }
+            for (String engine : beforeEnginesNames) {
+                dissociate(resource, new Engine(engine));
+            }
         } catch (DAOException e){
             throw new BusinessException(e);
         }
@@ -54,9 +72,9 @@ public class ResourceBusiness {
 
     public Resource getByName(String name) throws BusinessException {
         try {
-            return resourceDAO.getAll().stream()
+            return mapEngines(resourceDAO.getAll().stream()
                 .filter(e -> e.getName().equalsIgnoreCase(name))
-                .findFirst().get();
+                .findFirst().get());
         } catch (DAOException | NoSuchElementException e){
             throw new BusinessException(e);
         }
@@ -64,40 +82,32 @@ public class ResourceBusiness {
 
     public List<Resource> getAll() throws BusinessException {
         try {
-            return resourceDAO.getAll();
+            return mapEngines(resourceDAO.getAll());
         } catch (DAOException e){
             throw new BusinessException(e);
         }
     }
 
     public List<Resource> getAll(boolean visible) throws BusinessException {
-        try {
-            return resourceDAO.getAll()
-                .stream()
-                .filter(r -> r.isVisible() == visible)
-                .collect(Collectors.toList());
-        } catch (DAOException e){
-            throw new BusinessException(e);
-        }
+        return getAll()
+            .stream()
+            .filter(r -> r.isVisible() == visible)
+            .collect(Collectors.toList());
     }
 
     public List<Resource> getActiveResources() throws BusinessException {
-        try {
-            return resourceDAO.getAll()
-                .stream()
-                .filter(Resource::getStatus)
-                .collect(Collectors.toList());
-        } catch (DAOException e){
-            throw new BusinessException(e);
-        }
+        return getAll()
+            .stream()
+            .filter(Resource::getStatus)
+            .collect(Collectors.toList());
     }
 
     public List<Resource> getAvailableForUser(User user) throws BusinessException {
         try {
-            return resourceDAO.getByUser(user)
+            return mapEngines(resourceDAO.getByUser(user)
                 .stream()
                 .filter(Resource::getStatus)
-                .collect(Collectors.toList());
+                .collect(Collectors.toList()));
         } catch (DAOException e){
             throw new BusinessException(e);
         }
@@ -105,7 +115,7 @@ public class ResourceBusiness {
 
     public List<Resource> getByGroup(Group group) throws BusinessException {
         try {
-            return resourceDAO.getByGroup(group);
+            return mapEngines(resourceDAO.getByGroup(group));
         } catch (DAOException e) {
             throw new BusinessException(e);
         }
@@ -113,7 +123,7 @@ public class ResourceBusiness {
 
     public List<Resource> getByAppVersion(AppVersion appVersion) throws BusinessException {
         try {
-            return resourceDAO.getByAppVersion(appVersion);
+            return mapEngines(resourceDAO.getByAppVersion(appVersion));
         } catch (DAOException e) {
             throw new BusinessException(e);
         }
@@ -121,7 +131,7 @@ public class ResourceBusiness {
 
     public List<Resource> getByEngine(Engine engine) throws BusinessException {
         try {
-            return resourceDAO.getByEngine(engine);
+            return mapEngines(resourceDAO.getByEngine(engine));
         } catch (DAOException e) {
             throw new BusinessException(e);
         }
@@ -165,5 +175,36 @@ public class ResourceBusiness {
         } catch (DAOException e) {
             throw new BusinessException(e);
         }
+    }
+
+    public void associate(Resource resource, Engine engine) throws BusinessException {
+        try {
+            if ( ! resourceDAO.getByEngine(engine).stream().filter((e) -> e.getName().equals(resource.getName())).findFirst().isPresent()) {
+                resourceDAO.associate(resource, engine);
+            }
+        } catch (DAOException e) {
+            throw new BusinessException(e);
+        }
+    }
+
+    public void dissociate(Resource resource, Engine engine) throws BusinessException {
+        try {
+            resourceDAO.dissociate(resource, engine);
+        } catch (DAOException e) {
+            throw new BusinessException(e);
+        }
+    }
+
+    private Resource mapEngines(Resource resource) throws BusinessException {
+        resource.setEngines(engineBusiness.getByResource(resource).stream().map((e) -> e.getName()).collect(Collectors.toList()));
+
+        return resource;
+    }
+
+    private List<Resource> mapEngines(List<Resource> resources) throws BusinessException {
+        for (Resource resource : resources) {
+            resource = mapEngines(resource);
+        }
+        return resources;
     }
 }

@@ -4,6 +4,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.ArrayList;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,9 +13,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import fr.insalyon.creatis.grida.client.GRIDAClientException;
 import fr.insalyon.creatis.vip.application.client.bean.AppVersion;
 import fr.insalyon.creatis.vip.application.client.bean.Application;
+import fr.insalyon.creatis.vip.application.client.bean.Engine;
 import fr.insalyon.creatis.vip.application.client.bean.Resource;
 import fr.insalyon.creatis.vip.application.client.bean.ResourceType;
 import fr.insalyon.creatis.vip.application.server.business.ApplicationBusiness;
+import fr.insalyon.creatis.vip.application.server.business.EngineBusiness;
 import fr.insalyon.creatis.vip.application.server.business.ResourceBusiness;
 import fr.insalyon.creatis.vip.core.client.bean.Group;
 import fr.insalyon.creatis.vip.core.client.bean.GroupType;
@@ -29,6 +33,9 @@ public class ResourceIT extends BaseSpringIT {
     @Autowired 
     private ApplicationBusiness appBusiness;
 
+    @Autowired
+    private EngineBusiness engineBusiness;
+
     private Resource resource;
 
     @BeforeEach
@@ -40,7 +47,7 @@ public class ResourceIT extends BaseSpringIT {
             false, 
             ResourceType.BATCH, 
             "conf.file",
-            null);
+            new ArrayList<>());
     
         createGroup("test_resource", GroupType.RESOURCE);
         resourceBusiness.add(resource);
@@ -162,5 +169,39 @@ public class ResourceIT extends BaseSpringIT {
         resourceBusiness.dissociate(resource, appVersion);
 
         assertTrue(resourceBusiness.getByAppVersion(appVersion).isEmpty());
+    }
+
+    @Test
+    public void associateToEngine() throws BusinessException {
+        Engine engine = new Engine("bla", "blou", "bli");
+        Resource bis = new Resource("bis");
+
+        engineBusiness.add(engine);
+
+        resourceBusiness.add(bis);
+        resourceBusiness.associate(resource, engine);
+
+        assertEquals(resource.getName(), resourceBusiness.getByEngine(engine).get(0).getName());
+        assertEquals(resource.getType(), resourceBusiness.getByEngine(engine).get(0).getType());
+        assertEquals(resource.getConfiguration(), resourceBusiness.getByEngine(engine).get(0).getConfiguration());
+        assertEquals(1, resourceBusiness.getByEngine(engine).size());
+    }
+
+    @Test
+    public void dissociateFromEngine() throws BusinessException {
+        Engine engine = new Engine("bla", "blou", "bli");
+
+        engineBusiness.add(engine);
+
+        resourceBusiness.associate(resource, engine);
+
+        assertEquals(resource.getName(), resourceBusiness.getByEngine(engine).get(0).getName());
+        assertEquals(resource.getType(), resourceBusiness.getByEngine(engine).get(0).getType());
+        assertEquals(resource.getConfiguration(), resourceBusiness.getByEngine(engine).get(0).getConfiguration());
+        assertEquals(1, resourceBusiness.getByEngine(engine).size());
+
+        resourceBusiness.dissociate(resource, engine);
+
+        assertTrue(resourceBusiness.getByEngine(engine).isEmpty());
     }
 }

@@ -33,4 +33,8 @@ public interface ResourceDAO {
     public void associate(Resource resource, AppVersion appVersion) throws DAOException;
 
     public void dissociate(Resource resource, AppVersion appVersion) throws DAOException;
+
+    public void associate(Resource resource, Engine engine) throws DAOException;
+
+    public void dissociate(Resource resource, Engine engine) throws DAOException;
 }

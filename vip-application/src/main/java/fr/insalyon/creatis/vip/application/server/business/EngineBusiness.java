@@ -32,6 +32,7 @@
 package fr.insalyon.creatis.vip.application.server.business;
 
 import fr.insalyon.creatis.vip.application.client.bean.Engine;
+import fr.insalyon.creatis.vip.application.client.bean.Resource;
 import fr.insalyon.creatis.vip.application.server.dao.EngineDAO;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
@@ -83,6 +84,14 @@ public class EngineBusiness {
             return engineDAO.get();
         } catch (DAOException ex) {
             throw new BusinessException(ex);
+        }
+    }
+
+    public List<Engine> getByResource(Resource resource) throws BusinessException {
+        try {
+            return engineDAO.getByResource(resource);
+        } catch (DAOException e) {
+            throw new BusinessException(e);
         }
     }
 }

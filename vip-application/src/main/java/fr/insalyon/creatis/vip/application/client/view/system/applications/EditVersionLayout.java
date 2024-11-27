@@ -216,7 +216,6 @@ public class EditVersionLayout extends AbstractFormLayout {
             this.resourcesList.setValues(resources);
             this.newVersion = false;
             this.removeButton.setDisabled(false);
-            fetchData();
         } else {
             this.versionField.setValue("");
             this.versionField.setDisabled(false);
@@ -226,8 +225,8 @@ public class EditVersionLayout extends AbstractFormLayout {
             this.isBoutiquesFormField.setValue(true);
             this.newVersion = true;
             this.removeButton.setDisabled(true);
-            fetchData();
         }
+        fetchData();
     }
 
     private void fetchData() {

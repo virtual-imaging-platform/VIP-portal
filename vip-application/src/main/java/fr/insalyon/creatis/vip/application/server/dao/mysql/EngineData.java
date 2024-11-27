@@ -32,6 +32,7 @@
 package fr.insalyon.creatis.vip.application.server.dao.mysql;
 
 import fr.insalyon.creatis.vip.application.client.bean.Engine;
+import fr.insalyon.creatis.vip.application.client.bean.Resource;
 import fr.insalyon.creatis.vip.application.server.dao.EngineDAO;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import org.slf4j.Logger;
@@ -64,17 +65,13 @@ public class EngineData extends JdbcDaoSupport implements EngineDAO {
 
     @Override
     public void add(Engine engine) throws DAOException {
+        String query = "INSERT INTO VIPEngines(name, endpoint, status) VALUES (?,?,?)";
 
-        try {
-            PreparedStatement ps = getConnection().prepareStatement(
-                    "INSERT INTO VIPEngines(name, endpoint, status) "
-                            + "VALUES (?, ?, ?)");
-
+        try (PreparedStatement ps = getConnection().prepareStatement(query)) {
             ps.setString(1, engine.getName());
             ps.setString(2, engine.getEndpoint());
             ps.setString(3, engine.getStatus());
-            ps.execute();
-            ps.close();
+            ps.executeUpdate();
 
         } catch (SQLException ex) {
             if (ex.getMessage().contains("Unique index or primary key violation") || ex.getMessage().contains("Duplicate entry ")) {
@@ -89,18 +86,13 @@ public class EngineData extends JdbcDaoSupport implements EngineDAO {
 
     @Override
     public void update(Engine engine) throws DAOException {
+        String query = "UPDATE VIPEngines SET endpoint = ?, status = ? WHERE name = ?";
 
-        try {
-            PreparedStatement ps = getConnection().prepareStatement(
-                    "UPDATE VIPEngines SET endpoint = ?, "
-                            + "status = ? "
-                            + "WHERE name = ?");
-
+        try (PreparedStatement ps = getConnection().prepareStatement(query)) {
             ps.setString(1, engine.getEndpoint());
             ps.setString(2, engine.getStatus());
             ps.setString(3, engine.getName());
             ps.executeUpdate();
-            ps.close();
 
         } catch (SQLException ex) {
             logger.error("Error updating engine {} to {}", engine.getName(), engine.getEndpoint(), ex);
@@ -110,14 +102,11 @@ public class EngineData extends JdbcDaoSupport implements EngineDAO {
 
     @Override
     public void remove(String name) throws DAOException {
+        String query = "DELETE FROM VIPEngines WHERE name = ?";
 
-        try {
-            PreparedStatement ps = getConnection().prepareStatement("DELETE "
-                    + "FROM VIPEngines WHERE name=?");
-
+        try (PreparedStatement ps = getConnection().prepareStatement(query)) {
             ps.setString(1, name);
-            ps.execute();
-            ps.close();
+            ps.executeUpdate();
 
         } catch (SQLException ex) {
             if (ex.getMessage().contains("Unique index or primary key violation") || ex.getMessage().contains("Duplicate entry ")) {
@@ -132,12 +121,9 @@ public class EngineData extends JdbcDaoSupport implements EngineDAO {
 
     @Override
     public List<Engine> get() throws DAOException {
+        String query = "SELECT name, endpoint, status FROM VIPEngines ORDER BY name";
 
-        try {
-            PreparedStatement ps = getConnection().prepareStatement("SELECT "
-                    + "name, endpoint, status FROM VIPEngines "
-                    + "ORDER BY name");
-
+        try (PreparedStatement ps = getConnection().prepareStatement(query)) {
             ResultSet rs = ps.executeQuery();
             List<Engine> list = new ArrayList<Engine>();
 
@@ -154,30 +140,51 @@ public class EngineData extends JdbcDaoSupport implements EngineDAO {
 
     @Override
     public List<Engine> getByClass(String className) throws DAOException {
-
+        String query =  "SELECT e.name AS engineName, endpoint, status "
+        +               "FROM VIPEngines e, VIPClassesEngines c "
+        +               "WHERE e.name = c.engine AND "
+        +               "e.status = ? AND "
+        +               "c.class = ?";
         String status = "enabled";
-        try {
-            PreparedStatement ps = getConnection().prepareStatement("SELECT "
-                    + "e.name AS engineName, endpoint, status "
-                    + "FROM VIPEngines e, VIPClassesEngines c "
-                    + "WHERE e.name = c.engine AND "
-                    + "e.status = ? AND "
-                    + "c.class = ?");
+
+        try (PreparedStatement ps = getConnection().prepareStatement(query)) {
             ps.setString(1, status);
             ps.setString(2, className);
 
             ResultSet rs = ps.executeQuery();
-
             List<Engine> list = new ArrayList<Engine>();
+
             while (rs.next()) {
                 list.add(new Engine(rs.getString("engineName"), rs.getString("endpoint"), rs.getString("status")));
             }
-            ps.close();
             return list;
 
         } catch (SQLException ex) {
             logger.error("Error getting engines by class {}", className, ex);
             throw new DAOException(ex);
         }
+    }
+
+    @Override
+    public List<Engine> getByResource(Resource resource) throws DAOException {
+        String query =  "SELECT * FROM VIPEngines e "
+        +               "JOIN VIPResourcesEngines re ON e.name = re.enginename "
+        +               "WHERE re.resourcename = ?";
+
+        try (PreparedStatement ps = getConnection().prepareStatement(query)) {
+            ps.setString(1, resource.getName());
+
+            ResultSet rs = ps.executeQuery();
+            List<Engine> list = new ArrayList<Engine>();
+
+            while (rs.next()) {
+                list.add(new Engine(rs.getString("engineName"), rs.getString("endpoint"), rs.getString("status")));
+            }
+            return list;
+
+        } catch (SQLException ex) {
+            logger.error("Error getting engines by resource {}", resource.getName(), ex);
+            throw new DAOException(ex);
+        }  
     }
 }
