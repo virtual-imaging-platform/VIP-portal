@@ -63,7 +63,7 @@ public class WorkflowExecutionBusiness {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private Server server;
-    private WorkflowEngineInstantiator engine; //
+    private WorkflowEngineInstantiator engine;
 
 
     @Autowired

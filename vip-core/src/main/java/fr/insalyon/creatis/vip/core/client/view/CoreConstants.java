@@ -197,6 +197,8 @@ public class CoreConstants implements IsSerializable {
     //moteurlite
     public static final String USE_MOTEURLITE = "moteurlite.enabled";
 
+    public static final String MOTEUR_REST_PASSWORD = "moteur.rest.password";
+
 
 
     public static enum GROUP_ROLE implements IsSerializable {

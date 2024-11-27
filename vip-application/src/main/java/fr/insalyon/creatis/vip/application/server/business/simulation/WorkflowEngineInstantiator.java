@@ -40,6 +40,7 @@ import java.util.List;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 
 /**
  *
@@ -47,6 +48,10 @@ import org.slf4j.LoggerFactory;
  * @author kboulebiar
  */
 public abstract class WorkflowEngineInstantiator {
+
+    static enum MoteurStatus {
+        RUNNING, COMPLETE, TERMINATED, UNKNOWN
+    }
 
     public abstract String launch(String addressWS, String workflowContent, String inputs, String settings, String proxyFileName)
             throws java.rmi.RemoteException, javax.xml.rpc.ServiceException, BusinessException;
@@ -60,11 +65,5 @@ public abstract class WorkflowEngineInstantiator {
             throws
             java.rmi.RemoteException,
             javax.xml.rpc.ServiceException;
-
-
-    public String getSimulationId(String launchID) {
-        return launchID.substring(launchID.lastIndexOf("/") + 1, launchID.lastIndexOf("."));
-    }
-
 
 }

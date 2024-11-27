@@ -11,6 +11,7 @@ import fr.insalyon.creatis.vip.application.server.business.ApplicationBusiness;
 import fr.insalyon.creatis.vip.application.server.business.ClassBusiness;
 import fr.insalyon.creatis.vip.application.server.business.EngineBusiness;
 import fr.insalyon.creatis.vip.application.server.business.simulation.RestServiceEngine;
+import fr.insalyon.creatis.vip.application.server.business.simulation.WorkflowEngineInstantiator;
 import fr.insalyon.creatis.vip.core.integrationtest.database.BaseSpringIT;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import org.junit.jupiter.api.BeforeEach;
@@ -30,7 +31,7 @@ public class BaseApplicationSpringIT extends BaseSpringIT {
     @Autowired
     protected InputDAO inputDAO;
     @Autowired
-    protected RestServiceEngine webServiceEngine;
+    protected WorkflowEngineInstantiator webServiceEngine;
 
     @Autowired
     protected ApplicationBusiness applicationBusiness;
@@ -60,7 +61,7 @@ public class BaseApplicationSpringIT extends BaseSpringIT {
         return engineBusiness;
     }
 
-    public RestServiceEngine getWebServiceEngine() {
+    public WorkflowEngineInstantiator getWebServiceEngine() {
         return webServiceEngine;
     }
 

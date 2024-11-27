@@ -115,4 +115,6 @@ public interface Server {
     String getReproVIPRootDir();
 
     boolean useMoteurlite();
+
+    String getMoteurServerPassword();
 }

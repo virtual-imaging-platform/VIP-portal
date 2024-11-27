@@ -30,6 +30,7 @@
  * knowledge of the CeCILL-B license and that you accept its terms.
  */
 package fr.insalyon.creatis.vip.application.server.business.simulation;
+
 import fr.insalyon.creatis.vip.application.client.view.monitor.SimulationStatus;
 import fr.insalyon.creatis.vip.application.server.business.util.ProxyUtil;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
@@ -38,13 +39,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
-import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
-import java.util.List;
 
 /**
  * Communicates with a moteur server through a web service.
@@ -72,9 +70,8 @@ public class RestServiceEngine extends WorkflowEngineInstantiator {
      * @return the HTTP link that shows the workflow current status
      */
     @Override
-    public String launch(String addressWS, String workflowContent, String inputs, String settings, String proxyFileName)
+    public String launch(String addressWS, String workflow, String inputs, String settings, String proxyFileName)
             throws java.rmi.RemoteException, javax.xml.rpc.ServiceException, BusinessException {
-
 
         System.setProperty("javax.net.ssl.trustStore", server.getTruststoreFile());
         System.setProperty("javax.net.ssl.trustStorePassword", server.getTruststorePass());
@@ -82,7 +79,7 @@ public class RestServiceEngine extends WorkflowEngineInstantiator {
 
         String strProxy = ProxyUtil.readAsString(proxyFileName);
 
-        String base64Workflow = Base64.getEncoder().encodeToString(workflowContent.getBytes(StandardCharsets.UTF_8));
+        String base64Workflow = Base64.getEncoder().encodeToString(workflow.getBytes(StandardCharsets.UTF_8));
         String base64Input = Base64.getEncoder().encodeToString(inputs.getBytes(StandardCharsets.UTF_8));
         String base64Proxy = Base64.getEncoder().encodeToString(strProxy.getBytes(StandardCharsets.UTF_8));
         String base64Settings = Base64.getEncoder().encodeToString(settings.getBytes(StandardCharsets.UTF_8));
@@ -92,8 +89,10 @@ public class RestServiceEngine extends WorkflowEngineInstantiator {
                 base64Workflow, base64Input, base64Proxy, base64Settings
         );
 
+
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.setBasicAuth("user", server.getMoteurServerPassword());
 
         HttpEntity<String> entity = new HttpEntity<>(jsonInputString, headers);
 
@@ -103,11 +102,12 @@ public class RestServiceEngine extends WorkflowEngineInstantiator {
         try {
             RestTemplate restTemplate = new RestTemplate();
             return restTemplate.exchange(url, HttpMethod.POST, entity, String.class).getBody();
-        } catch (Error e) {
+        } catch (Exception e) {
             logger.error("Error in the rest request on moteur server", e);
             throw new BusinessException("Error in the rest request on moteur server", e);
         }
     }
+
 
     @Override
     public void kill(String addressWS, String workflowID) {
@@ -123,6 +123,7 @@ public class RestServiceEngine extends WorkflowEngineInstantiator {
         // Set headers
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.setBasicAuth("user", server.getMoteurServerPassword());
 
         // Create HTTP entity
         HttpEntity<String> entity = new HttpEntity<>(jsonInputString, headers);
@@ -153,6 +154,7 @@ public class RestServiceEngine extends WorkflowEngineInstantiator {
 
         HttpHeaders headers = new HttpHeaders();
         headers.set("Accept", "application/json");
+        headers.setBasicAuth("user", server.getMoteurServerPassword());
 
         // Create HTTP entity with headers
         HttpEntity<String> entity = new HttpEntity<>(headers);
@@ -184,8 +186,4 @@ public class RestServiceEngine extends WorkflowEngineInstantiator {
             throw new RuntimeException("An error occurred while getting the workflow status", e);
         }
     }
-
-    static enum MoteurStatus {
-        RUNNING, COMPLETE, TERMINATED, UNKNOWN
-    };
 }
