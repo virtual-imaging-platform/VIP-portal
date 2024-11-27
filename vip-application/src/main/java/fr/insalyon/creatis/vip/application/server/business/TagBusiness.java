@@ -1,6 +1,7 @@
 package fr.insalyon.creatis.vip.application.server.business;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -47,6 +48,16 @@ public class TagBusiness {
         }
     }
 
+    public Tag getByName(String name) throws BusinessException {
+        try {
+            return tagDAO.getAll().stream()
+                .filter((e) -> e.getName().equalsIgnoreCase(name))
+                .findFirst().get();
+        } catch (DAOException | NoSuchElementException e) {
+            throw new BusinessException(e);
+        }
+    }
+
     public List<Tag> getAll() throws BusinessException {
         try {
             return tagDAO.getAll();
@@ -57,7 +68,9 @@ public class TagBusiness {
 
     public void associate(Tag tag, AppVersion appVersion) throws BusinessException {
         try {
-            tagDAO.associate(tag, appVersion);
+            if ( ! tagDAO.getTags(appVersion).stream().filter((e) -> e.getName().equals(tag.getName())).findFirst().isPresent()) {
+                tagDAO.associate(tag, appVersion);
+            }
         } catch (DAOException e) {
             throw new BusinessException(e);
         }

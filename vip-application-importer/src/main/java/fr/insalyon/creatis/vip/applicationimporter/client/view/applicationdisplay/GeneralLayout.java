@@ -31,11 +31,21 @@
  */
 package fr.insalyon.creatis.vip.applicationimporter.client.view.applicationdisplay;
 
-import com.smartgwt.client.types.Overflow;
+import java.util.Arrays;
+import java.util.List;
 
+import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.smartgwt.client.types.Overflow;
+import com.smartgwt.client.widgets.form.fields.SelectItem;
+
+import fr.insalyon.creatis.vip.application.client.bean.Tag;
 import fr.insalyon.creatis.vip.application.client.bean.boutiquesTools.BoutiquesApplication;
+import fr.insalyon.creatis.vip.application.client.rpc.ApplicationService;
+import fr.insalyon.creatis.vip.application.client.rpc.ApplicationServiceAsync;
 import fr.insalyon.creatis.vip.applicationimporter.client.view.Constants;
 import fr.insalyon.creatis.vip.core.client.view.common.AbstractFormLayout;
+import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
+import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
 
 public class GeneralLayout extends AbstractFormLayout {
 
@@ -48,6 +58,8 @@ public class GeneralLayout extends AbstractFormLayout {
             description,
             vipContainer,
             dotInputs;
+
+    private final SelectItem tags;
 
     public GeneralLayout(String width, String height) {
         super(width, height);
@@ -66,7 +78,14 @@ public class GeneralLayout extends AbstractFormLayout {
         vipContainer = new LocalTextField("VIP Container", false, false);
         dotInputs = new LocalTextField("DOT Inputs", false, false);
 
+        tags = new SelectItem();
+        tags.setTitle("Tags associated");
+        tags.setMultiple(true);
+
         this.addMembers(name, commandLine, dockerImage, dockerIndex, version, schemaVersion, description, vipContainer, dotInputs);
+        this.addMember(FieldUtil.getForm(tags));
+    
+        loadTags();
     }
 
     public void setTool(BoutiquesApplication bt) {
@@ -80,5 +99,26 @@ public class GeneralLayout extends AbstractFormLayout {
         vipContainer.setValue(bt.getVipContainer());
         String dotInputsValue = String.join(", ", bt.getVipDotInputIds());
         dotInputs.setValue(dotInputsValue + (bt.getVipDotIncludesResultsDir() ? (dotInputsValue.isEmpty() ? "results-directory" : ", results-directory") : ""));
+    }
+
+    private void loadTags() {
+        ApplicationServiceAsync service = ApplicationService.Util.getInstance();
+        final AsyncCallback<List<Tag>> callback = new AsyncCallback<>() {
+            @Override
+            public void onFailure(Throwable caught) {
+                Layout.getInstance().setWarningMessage("Unable to load tags:<br />" + caught.getMessage());
+            }
+
+            @Override
+            public void onSuccess(List<Tag> result) {
+                String[] data = result.stream().map((e) -> e.getName()).toArray(String[]::new);
+                tags.setValueMap(data);
+            }
+        };
+        service.getTags(callback);
+    }
+
+    public List<String> getSelectedTags() {
+        return Arrays.asList(tags.getValues());
     }
 }

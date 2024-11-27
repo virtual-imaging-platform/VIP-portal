@@ -31,6 +31,8 @@
  */
 package fr.insalyon.creatis.vip.application.client.view.system.applications;
 
+import java.util.List;
+
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.util.*;
 import com.smartgwt.client.widgets.*;
@@ -38,7 +40,10 @@ import com.smartgwt.client.widgets.events.*;
 import com.smartgwt.client.widgets.form.fields.*;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
 import fr.insalyon.creatis.vip.application.client.bean.AppVersion;
+import fr.insalyon.creatis.vip.application.client.bean.Resource;
+import fr.insalyon.creatis.vip.application.client.bean.Tag;
 import fr.insalyon.creatis.vip.application.client.rpc.ApplicationService;
+import fr.insalyon.creatis.vip.application.client.rpc.ApplicationServiceAsync;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.common.AbstractFormLayout;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
@@ -58,6 +63,8 @@ public class EditVersionLayout extends AbstractFormLayout {
     private TextItem jsonLfnField;
     private CheckboxItem isVisibleField;
     private CheckboxItem isBoutiquesFormField;
+    private SelectItem tagsList;
+    private SelectItem resourcesList;
     private IButton saveButton;
     private IButton removeButton;
 
@@ -93,6 +100,16 @@ public class EditVersionLayout extends AbstractFormLayout {
         isBoutiquesFormField.setTitle("Use Boutiques Form");
         isBoutiquesFormField.setWidth(450);
         isBoutiquesFormField.setValue(true);
+
+        tagsList = new SelectItem();
+        tagsList.setTitle("Tags associated");
+        tagsList.setMultiple(true);
+        tagsList.setWidth(450);
+  
+        resourcesList = new SelectItem();
+        resourcesList.setTitle("Resources authorized");
+        resourcesList.setMultiple(true);
+        resourcesList.setWidth(450);
 
         saveButton = WidgetUtil.getIButton("Save", CoreConstants.ICON_SAVED,
                 new ClickHandler() {
@@ -131,41 +148,27 @@ public class EditVersionLayout extends AbstractFormLayout {
         addField("JSON LFN", jsonLfnField);
         this.addMember(FieldUtil.getForm(isVisibleField));
         this.addMember(FieldUtil.getForm(isBoutiquesFormField));
+        this.addMember(FieldUtil.getForm(tagsList));
+        this.addMember(FieldUtil.getForm(resourcesList));
         addButtons(saveButton, removeButton);
     }
 
-    /**
-     *
-     * @param version
-     */
     private void save(AppVersion version) {
-
         WidgetUtil.setLoadingIButton(saveButton, "Saving...");
 
         if (newVersion) {
-            ApplicationService.Util.getInstance().addVersion(version, getCallback("add"));
+            ApplicationService.Util.getInstance().addVersion(version, tagsList.getValues(), resourcesList.getValues(), getCallback("add"));
         } else {
-            ApplicationService.Util.getInstance().updateVersion(version, getCallback("update"));
+            ApplicationService.Util.getInstance().updateVersion(version, tagsList.getValues(), resourcesList.getValues(), getCallback("update"));
         }
     }
 
-    /**
-     * Removes an application.
-     *
-     * @param applicationName Application name
-     * @param version Application version
-     */
     private void remove(String applicationName, String version) {
 
         WidgetUtil.setLoadingIButton(removeButton, "Removing...");
         ApplicationService.Util.getInstance().removeVersion(applicationName, version, getCallback("remove"));
     }
 
-    /**
-     *
-     * @param text
-     * @return
-     */
     private AsyncCallback<Void> getCallback(final String text) {
 
         return new AsyncCallback<Void>() {
@@ -180,7 +183,7 @@ public class EditVersionLayout extends AbstractFormLayout {
             public void onSuccess(Void result) {
                 WidgetUtil.resetIButton(saveButton, "Save", CoreConstants.ICON_SAVED);
                 WidgetUtil.resetIButton(removeButton, "Remove", CoreConstants.ICON_DELETE);
-                setVersion(null, null, null, true, true);
+                setVersion(null, null, null, true, true, null, null);
                 ManageApplicationsTab tab = (ManageApplicationsTab) Layout.getInstance().
                         getTab(ApplicationConstants.TAB_MANAGE_APPLICATION);
                 tab.loadVersions(applicationName);
@@ -188,12 +191,8 @@ public class EditVersionLayout extends AbstractFormLayout {
         };
     }
 
-    /**
-     *
-     * @param applicationName
-     */
     public void setApplication(String applicationName) {
-        setVersion(null, null, null, true, true);
+        setVersion(null, null, null, true, true, null, null);
         this.applicationName = applicationName;
         this.applicationLabel.setContents("<b>Application:</b> " + applicationName);
         this.versionField.setDisabled(false);
@@ -202,15 +201,7 @@ public class EditVersionLayout extends AbstractFormLayout {
         this.saveButton.setDisabled(false);
     }
 
-    /**
-     * Sets a version to edit or creates a blank form.
-     *
-     * @param version
-     * @param lfn
-     * @param isVisible
-     */
-    public void setVersion(String version, String lfn, String jsonLfn, boolean isVisible, boolean isBoutiquesForm) {
-
+    public void setVersion(String version, String lfn, String jsonLfn, boolean isVisible, boolean isBoutiquesForm, String[] tags, String[] resources) {
         if (version != null) {
             this.versionField.setValue(version);
             this.versionField.setDisabled(true);
@@ -218,11 +209,12 @@ public class EditVersionLayout extends AbstractFormLayout {
             this.jsonLfnField.setValue(jsonLfn);
             this.isVisibleField.setValue(isVisible);
             this.isBoutiquesFormField.setValue(isBoutiquesForm);
+            this.tagsList.setValues(tags);
+            this.tagsList.setValues(resources);
             this.newVersion = false;
             this.removeButton.setDisabled(false);
-
+            fetchAssociatedData(new AppVersion(applicationName, version));
         } else {
-
             this.versionField.setValue("");
             this.versionField.setDisabled(false);
             this.lfnField.setValue("");
@@ -231,6 +223,69 @@ public class EditVersionLayout extends AbstractFormLayout {
             this.isBoutiquesFormField.setValue(true);
             this.newVersion = true;
             this.removeButton.setDisabled(true);
+            fetchAssociatedData(null);
+        }
+    }
+
+    private void fetchAssociatedData(AppVersion appVersion) {
+        loadTagsData(null, false);
+        loadResourcesData(null, false);
+
+        if (appVersion != null) {
+            loadTagsData(appVersion, true);
+            loadResourcesData(appVersion, true);
+        }
+    }
+
+    private void loadTagsData(AppVersion appVersion, boolean isAssociated) {
+        ApplicationServiceAsync service = ApplicationService.Util.getInstance();
+        final AsyncCallback<List<Tag>> callback = new AsyncCallback<>() {
+            @Override
+            public void onFailure(Throwable caught) {
+                Layout.getInstance().setWarningMessage("Unable to load tags:<br />" + caught.getMessage());
+            }
+    
+            @Override
+            public void onSuccess(List<Tag> result) {
+                String[] data = result.stream().map(Tag::getName).toArray(String[]::new);
+                if (isAssociated) {
+                    tagsList.setValues(data);
+                } else {
+                    tagsList.setValueMap(data);
+                }
+            }
+        };
+    
+        if (isAssociated) {
+            service.getTagsFrom(appVersion, callback);
+        } else {
+            service.getTags(callback);
+        }
+    }
+
+    private void loadResourcesData(AppVersion appVersion, boolean isAssociated) {
+        ApplicationServiceAsync service = ApplicationService.Util.getInstance();
+        final AsyncCallback<List<Resource>> callback = new AsyncCallback<>() {
+            @Override
+            public void onFailure(Throwable caught) {
+                Layout.getInstance().setWarningMessage("Unable to load resources:<br />" + caught.getMessage());
+            }
+    
+            @Override
+            public void onSuccess(List<Resource> result) {
+                String[] data = result.stream().map(Resource::getName).toArray(String[]::new);
+                if (isAssociated) {
+                    resourcesList.setValues(data);
+                } else {
+                    resourcesList.setValueMap(data);
+                }
+            }
+        };
+    
+        if (isAssociated) {
+            service.getResourcesFrom(appVersion, callback);
+        } else {
+            service.getResources(callback);
         }
     }
 }

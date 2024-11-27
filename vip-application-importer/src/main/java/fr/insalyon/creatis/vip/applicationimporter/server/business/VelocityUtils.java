@@ -85,11 +85,10 @@ public class VelocityUtils {
         return stringWriter.toString();
     }
 
-    public String createDocument( String tag, BoutiquesApplication bt, Boolean isRunOnGrid, String vmTemplate) {
+    public String createDocument( String tag, BoutiquesApplication bt, String vmTemplate) {
         VelocityContext context = new VelocityContext();
         context.put("tag", tag);
         context.put("tool", bt);
-        context.put("isRunOnGrid", isRunOnGrid);
         context.put("esc", new EscapeTool());
         context.put("imagepath", bt.getVipContainer());
 
@@ -101,11 +100,10 @@ public class VelocityUtils {
         return stringWriter.toString();
     }
 
-    public String createDocument(String tag, BoutiquesApplication bt, Boolean isRunOnGrid, String fileAccessProtocol, String vmTemplate) {
+    public String createDocument(String tag, BoutiquesApplication bt, String fileAccessProtocol, String vmTemplate) {
         VelocityContext context = new VelocityContext();
         context.put("tag", tag);
         context.put("tool", bt);
-        context.put("isRunOnGrid", isRunOnGrid);
         context.put("esc", new EscapeTool());
         context.put("fileAccessProtocol", fileAccessProtocol);
 

@@ -173,12 +173,7 @@ public class ResourceLayout extends VLayout {
                 List<ResourceRecord> dataList = new ArrayList<>();
 
                 for (Resource resource : result) {
-                    dataList.add(new ResourceRecord(
-                        resource.getName(), 
-                        resource.isVisible(), 
-                        resource.getStatus(), 
-                        resource.getType().toString(), 
-                        resource.getConfiguration()));
+                    dataList.add(new ResourceRecord(resource));
                 }
                 grid.setData(dataList.toArray(new ResourceRecord[]{}));
             }

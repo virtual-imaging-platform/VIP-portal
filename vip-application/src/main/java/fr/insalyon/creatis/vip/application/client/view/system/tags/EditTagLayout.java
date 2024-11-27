@@ -26,7 +26,7 @@ public class EditTagLayout extends AbstractFormLayout {
 
     public EditTagLayout() {
         super(480, 200);
-        addTitle("Add/Edit resource", ApplicationConstants.ICON_TAG);
+        addTitle("Add/Edit tag", ApplicationConstants.ICON_TAG);
 
         configure();
     }

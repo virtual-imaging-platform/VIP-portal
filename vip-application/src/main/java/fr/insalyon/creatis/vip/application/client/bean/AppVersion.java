@@ -68,6 +68,11 @@ public class AppVersion implements IsSerializable {
         this.doi = doi;
     }
 
+    public AppVersion(String applicationName, String version) {
+        this.applicationName = applicationName;
+        this.version = version;
+    }
+
     public String getApplicationName() {
         return applicationName;
     }

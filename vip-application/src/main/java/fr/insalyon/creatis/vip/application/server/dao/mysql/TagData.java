@@ -115,7 +115,7 @@ public class TagData extends JdbcDaoSupport implements TagDAO {
             ps.executeUpdate();
 
         } catch (SQLException e) {
-            if (e.getMessage().contains("Unique index or primary key violation")) {
+            if (e.getMessage().contains("Unique index or primary key violation") || e.getMessage().contains("Duplicate entry ")) {
                 logger.error("The tag name \"{}\" is already associated to \"{}\"", tag.getName(), appVersion.getApplicationName() + " " + appVersion.getVersion());
             } else {
                 logger.error("Error adding tag " + tag.getName() + " to appversion " + appVersion.getApplicationName() + " " + appVersion.getVersion(), e);

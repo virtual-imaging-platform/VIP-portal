@@ -1,12 +1,15 @@
 package fr.insalyon.creatis.vip.application.server.business;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import fr.insalyon.creatis.vip.application.client.bean.AppVersion;
+import fr.insalyon.creatis.vip.application.client.bean.Engine;
 import fr.insalyon.creatis.vip.application.client.bean.Resource;
 import fr.insalyon.creatis.vip.application.server.dao.ResourceDAO;
 import fr.insalyon.creatis.vip.core.client.bean.Group;
@@ -45,6 +48,16 @@ public class ResourceBusiness {
         try {
             resourceDAO.remove(resource);
         } catch (DAOException e){
+            throw new BusinessException(e);
+        }
+    }
+
+    public Resource getByName(String name) throws BusinessException {
+        try {
+            return resourceDAO.getAll().stream()
+                .filter(e -> e.getName().equalsIgnoreCase(name))
+                .findFirst().get();
+        } catch (DAOException | NoSuchElementException e){
             throw new BusinessException(e);
         }
     }
@@ -98,6 +111,22 @@ public class ResourceBusiness {
         }
     }
 
+    public List<Resource> getByAppVersion(AppVersion appVersion) throws BusinessException {
+        try {
+            return resourceDAO.getByAppVersion(appVersion);
+        } catch (DAOException e) {
+            throw new BusinessException(e);
+        }
+    }
+
+    public List<Resource> getByEngine(Engine engine) throws BusinessException {
+        try {
+            return resourceDAO.getByEngine(engine);
+        } catch (DAOException e) {
+            throw new BusinessException(e);
+        }
+    }
+
     public void putInGroup(Resource resource, Group group) throws BusinessException {
         try {
             resourceDAO.putInGroup(resource, group);
@@ -109,6 +138,24 @@ public class ResourceBusiness {
     public void removeFromGroup(Resource resource, Group group) throws BusinessException {
         try {
             resourceDAO.removeFromGroup(resource, group);
+        } catch (DAOException e) {
+            throw new BusinessException(e);
+        }
+    }
+
+    public void associate(Resource resource, AppVersion appVersion) throws BusinessException {
+        try {
+            if ( ! resourceDAO.getByAppVersion(appVersion).stream().filter((e) -> e.getName().equals(resource.getName())).findFirst().isPresent()) {
+                resourceDAO.associate(resource, appVersion);
+            }
+        } catch (DAOException e) {
+            throw new BusinessException(e);
+        }
+    }
+
+    public void dissociate(Resource resource, AppVersion appVersion) throws BusinessException {
+        try {
+            resourceDAO.dissociate(resource, appVersion);
         } catch (DAOException e) {
             throw new BusinessException(e);
         }

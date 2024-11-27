@@ -3,7 +3,6 @@ package fr.insalyon.creatis.vip.application.client.bean;
 import com.google.gwt.user.client.rpc.IsSerializable;
 
 public class Resource implements IsSerializable {
-
     private String name;
     private boolean visible;
     private boolean status;

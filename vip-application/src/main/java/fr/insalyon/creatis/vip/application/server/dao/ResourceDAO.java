@@ -29,4 +29,8 @@ public interface ResourceDAO {
     public void putInGroup(Resource resource, Group group) throws DAOException;
 
     public void removeFromGroup(Resource resource, Group group) throws DAOException;
+
+    public void associate(Resource resource, AppVersion appVersion) throws DAOException;
+
+    public void dissociate(Resource resource, AppVersion appVersion) throws DAOException;
 }

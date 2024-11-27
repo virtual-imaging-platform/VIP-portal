@@ -35,9 +35,9 @@ public class ApplicationDataInitializer extends JdbcDaoSupport {
         logger.info("Configuring VIP Application database.");
 
         createEngineTable();
-        createResourcesTables();
         createClassesTables();
         createApplicationsTables();
+        createResourcesTables();
         createTagsTables();
         createOthersTables();
     }
@@ -65,29 +65,29 @@ public class ApplicationDataInitializer extends JdbcDaoSupport {
                 +   "resourcename VARCHAR(255), "
                 +   "PRIMARY KEY (groupname, resourcename), "
                 +   "FOREIGN KEY (groupname) REFERENCES VIPGroups(name) "
-                +   "ON DELETE CASCADE ON UPDATE RESTRICT, "
+                +   "ON DELETE CASCADE ON UPDATE CASCADE, "
                 +   "FOREIGN KEY (resourcename) REFERENCES VIPResources(name) "
-                +   "ON DELETE CASCADE ON UPDATE RESTRICT");
+                +   "ON DELETE CASCADE ON UPDATE CASCADE");
 
-        tableInitializer.createTable("VIPResourceEngines",
+        tableInitializer.createTable("VIPResourcesEngines",
                     "resourcename VARCHAR(255), "
                 +   "enginename VARCHAR(255), "
                 +   "PRIMARY KEY (resourcename, enginename), "
                 +   "FOREIGN KEY (resourcename) REFERENCES VIPResources(name) "
-                +   "ON DELETE CASCADE ON UPDATE RESTRICT, "
+                +   "ON DELETE CASCADE ON UPDATE CASCADE, "
                 +   "FOREIGN KEY (enginename) REFERENCES VIPEngines(name) "
-                +   "ON DELETE CASCADE ON UPDATE RESTRICT"
+                +   "ON DELETE CASCADE ON UPDATE CASCADE"
         );
 
-        tableInitializer.createTable("VIPResourceAppVersions",
+        tableInitializer.createTable("VIPResourcesAppVersions",
                     "resourcename VARCHAR(255), "
                 +   "application VARCHAR(255), "
                 +   "version VARCHAR(255), "
                 +   "PRIMARY KEY (resourcename, application, version), "
                 +   "FOREIGN KEY (resourcename) REFERENCES VIPResources(name) "
-                +   "ON DELETE CASCADE ON UPDATE RESTRICT, "
+                +   "ON DELETE CASCADE ON UPDATE CASCADE, "
                 +   "FOREIGN KEY (application, version) REFERENCES VIPAppVersions(application, version) "
-                +   "ON DELETE CASCADE ON UPDATE RESTRICT"
+                +   "ON DELETE CASCADE ON UPDATE CASCADE"
         );
     }
 

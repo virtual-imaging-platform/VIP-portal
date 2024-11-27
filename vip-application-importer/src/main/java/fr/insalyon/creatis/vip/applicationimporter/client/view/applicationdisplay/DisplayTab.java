@@ -215,10 +215,11 @@ public class DisplayTab extends Tab {
         modal.show("Creating application...", true);
         ApplicationImporterService.Util.getInstance().createApplication(
             boutiquesTool,
-            vipLayout.getTag(),
-            vipLayout.getIsRunOnGrid(),
+            vipLayout.getDiracTag(),
             vipLayout.getOverwrite(),
             vipLayout.getFileAccessProtocol(),
+            generalLayout.getSelectedTags(),
+            vipLayout.getSelectedResources(),
             callback);
     }
 }

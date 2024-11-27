@@ -2,13 +2,15 @@ package fr.insalyon.creatis.vip.application.client.view.system.resources;
 
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 
+import fr.insalyon.creatis.vip.application.client.bean.Resource;
+
 public class ResourceRecord extends ListGridRecord {
 
-    public ResourceRecord(String name, boolean visible, boolean status, String type, String configuration) {
-        setAttribute("name", name);
-        setAttribute("visible", visible);
-        setAttribute("status", status);
-        setAttribute("type", type);
-        setAttribute("configuration", configuration);
+    public ResourceRecord(Resource resource) {
+        setAttribute("name", resource.getName());
+        setAttribute("visible", resource.isVisible());
+        setAttribute("status", resource.getStatus());
+        setAttribute("type", resource.getType());
+        setAttribute("configuration", resource.getConfiguration());
     }
 }

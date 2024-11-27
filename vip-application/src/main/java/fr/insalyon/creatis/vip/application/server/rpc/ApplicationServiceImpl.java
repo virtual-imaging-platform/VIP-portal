@@ -46,8 +46,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import jakarta.servlet.ServletException;
+
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -157,7 +161,7 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
     }
 
     @Override
-    public void addVersion(AppVersion version) throws ApplicationException {
+    public void addVersion(AppVersion version, String[] tags, String[] resources) throws ApplicationException {
         try {
             if (isSystemAdministrator() || isGroupAdministrator()) {
                 trace(logger, "Adding version '" + version.getVersion() + "' ('" + version.getApplicationName() + "').");
@@ -167,13 +171,15 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
                         version.getVersion(), version.getApplicationName());
                 throw new ApplicationException("You have no administrator rights.");
             }
+            updateResourcesReference(resources, version);
+            updateTagsReference(tags, version);
         } catch (BusinessException | CoreException ex) {
             throw new ApplicationException(ex);
         }
     }
 
     @Override
-    public void updateVersion(AppVersion version) throws ApplicationException {
+    public void updateVersion(AppVersion version, String[] tags, String[] resources) throws ApplicationException {
         try {
             if (isSystemAdministrator() || isGroupAdministrator()) {
                 trace(logger, "Updating version '" + version.getVersion() + "' ('" + version.getApplicationName() + "').");
@@ -184,6 +190,8 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
                         version.getApplicationName(), version.getVersion());
                 throw new ApplicationException("You have no administrator rights.");
             }
+            updateResourcesReference(resources, version);
+            updateTagsReference(tags, version);
         } catch (BusinessException | CoreException ex) {
             throw new ApplicationException(ex);
         }
@@ -488,6 +496,33 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
     }
 
     @Override
+    public List<Resource> getResourcesFrom(AppVersion appVersion) throws ApplicationException {
+        try {
+            return resourceBusiness.getByAppVersion(appVersion);
+        } catch (BusinessException e) {
+            throw new ApplicationException(e);
+        }
+    }
+
+    @Override
+    public void updateResourcesReference(String selected[], AppVersion appVersion) throws ApplicationException {
+        try {
+            List<Resource> allResources = resourceBusiness.getAll();
+            Set<String> selectedResourcesNames = Arrays.stream(selected).collect(Collectors.toSet());
+
+            for (Resource r : allResources) {
+                if (selectedResourcesNames.contains(r.getName())) {
+                    resourceBusiness.associate(r, appVersion);
+                } else {
+                    resourceBusiness.dissociate(r, appVersion);
+                }
+            }
+        } catch (BusinessException e) {
+            throw new ApplicationException(e);
+        }
+    }
+
+    @Override
     public void addTag(Tag tag) throws ApplicationException {
         try {
             tagBusiness.add(tag);
@@ -518,6 +553,33 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
     public List<Tag> getTags() throws ApplicationException {
         try {
             return tagBusiness.getAll();
+        } catch (BusinessException e) {
+            throw new ApplicationException(e);
+        }
+    }
+
+    @Override
+    public List<Tag> getTagsFrom(AppVersion appVersion) throws ApplicationException {
+        try {
+            return tagBusiness.getTags(appVersion);
+        } catch (BusinessException e) {
+            throw new ApplicationException(e);
+        }
+    }
+
+    @Override
+    public void updateTagsReference(String[] selected, AppVersion appVersion) throws ApplicationException {
+        try {
+            List<Tag> allTags = tagBusiness.getAll();
+            Set<String> selectedTagNames = Arrays.stream(selected).collect(Collectors.toSet());
+
+            for (Tag t : allTags) {
+                if (selectedTagNames.contains(t.getName())) {
+                    tagBusiness.associate(t, appVersion);
+                } else {
+                    tagBusiness.dissociate(t, appVersion);
+                }
+            }
         } catch (BusinessException e) {
             throw new ApplicationException(e);
         }

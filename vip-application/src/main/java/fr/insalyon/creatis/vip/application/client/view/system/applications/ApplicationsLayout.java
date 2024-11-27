@@ -215,7 +215,6 @@ public class ApplicationsLayout extends VLayout {
     }
 
     public void loadData() {
-
         final AsyncCallback<List<Application>> callback = new AsyncCallback<List<Application>>() {
             @Override
             public void onFailure(Throwable caught) {

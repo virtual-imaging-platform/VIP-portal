@@ -136,7 +136,7 @@ public class ResourceData extends JdbcDaoSupport implements ResourceDAO {
     @Override
     public List<Resource> getByEngine(Engine engine) throws DAOException {
         String query = "SELECT * FROM VIPResources r "
-        +              "JOIN VIPResourceEngines re ON r.name = re.resourcename "
+        +              "JOIN VIPResourcesEngines re ON r.name = re.resourcename "
         +              "WHERE re.name = ?";
 
         try (PreparedStatement ps = getConnection().prepareStatement(query)) {
@@ -159,7 +159,7 @@ public class ResourceData extends JdbcDaoSupport implements ResourceDAO {
     @Override
     public List<Resource> getByAppVersion(AppVersion appVersion) throws DAOException {
         String query = "SELECT * FROM VIPResources r "
-        +              "JOIN VIPResourceAppVersions rav ON r.name = rav.resourcename "
+        +              "JOIN VIPResourcesAppVersions rav ON r.name = rav.resourcename "
         +              "WHERE rav.application = ? AND rav.version = ?";
 
         try (PreparedStatement ps = getConnection().prepareStatement(query)) {
@@ -247,5 +247,42 @@ public class ResourceData extends JdbcDaoSupport implements ResourceDAO {
             rs.getBoolean("status"), 
             rs.getString("type"),
             rs.getString("configuration"));
+    }
+
+    @Override
+    public void associate(Resource resource, AppVersion appVersion) throws DAOException {
+        String query = "INSERT INTO VIPResourcesAppVersions (resourcename, application, version) "
+        +              "VALUES (?,?,?)";
+        
+        try (PreparedStatement ps = getConnection().prepareStatement(query)) {
+            ps.setString(1, resource.getName());
+            ps.setString(2, appVersion.getApplicationName());
+            ps.setString(3, appVersion.getVersion());
+            ps.executeUpdate();
+
+        } catch (SQLException e) {
+            if (e.getMessage().contains("Unique index or primary key violation")) {
+                logger.error("A resource \"{}\" is already associated with \"{}\"", resource.getName(), appVersion.getApplicationName() + " " + appVersion.getVersion());
+            } else {
+                logger.error("Error associating " + resource.getName() + " to " + appVersion.getApplicationName() + " " + appVersion.getVersion(), e);
+                throw new DAOException(e);
+            }
+        }
+    }
+
+    @Override
+    public void dissociate(Resource resource, AppVersion appVersion) throws DAOException {
+        String query = "DELETE FROM VIPResourcesAppVersions WHERE resourcename = ? AND application = ? AND version = ?";
+
+        try (PreparedStatement ps = getConnection().prepareStatement(query)) {
+            ps.setString(1, resource.getName());
+            ps.setString(2, appVersion.getApplicationName());
+            ps.setString(3, appVersion.getVersion());
+            ps.executeUpdate();
+
+        } catch (SQLException e) {
+            logger.error("Error dissociating resource " + resource.getName() + " from " + appVersion.getApplicationName() + " " + appVersion.getVersion(), e);
+            throw new DAOException(e);
+        }
     }
 }

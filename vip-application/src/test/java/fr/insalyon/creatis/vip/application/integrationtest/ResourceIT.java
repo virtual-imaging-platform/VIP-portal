@@ -2,14 +2,18 @@ package fr.insalyon.creatis.vip.application.integrationtest;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import fr.insalyon.creatis.grida.client.GRIDAClientException;
+import fr.insalyon.creatis.vip.application.client.bean.AppVersion;
+import fr.insalyon.creatis.vip.application.client.bean.Application;
 import fr.insalyon.creatis.vip.application.client.bean.Resource;
 import fr.insalyon.creatis.vip.application.client.bean.ResourceType;
+import fr.insalyon.creatis.vip.application.server.business.ApplicationBusiness;
 import fr.insalyon.creatis.vip.application.server.business.ResourceBusiness;
 import fr.insalyon.creatis.vip.core.client.bean.Group;
 import fr.insalyon.creatis.vip.core.client.bean.GroupType;
@@ -21,6 +25,9 @@ public class ResourceIT extends BaseSpringIT {
     
     @Autowired
     private ResourceBusiness resourceBusiness;
+
+    @Autowired 
+    private ApplicationBusiness appBusiness;
 
     private Resource resource;
 
@@ -116,5 +123,43 @@ public class ResourceIT extends BaseSpringIT {
         resourceBusiness.update(resource);
 
         assertEquals(1, resourceBusiness.getAvailableForUser(user).size());
+    }
+
+    @Test
+    public void associateToAppVersion() throws BusinessException {
+        Application app = new Application("test", "super citation");
+        AppVersion appVersion = new AppVersion("test", "0.1", "blink", "blank", false, false);
+        Resource bis = new Resource("bis");
+
+        appBusiness.add(app);
+        appBusiness.addVersion(appVersion);
+
+        resourceBusiness.add(bis);
+        resourceBusiness.associate(resource, appVersion);
+
+        assertEquals(resource.getName(), resourceBusiness.getByAppVersion(appVersion).get(0).getName());
+        assertEquals(resource.getType(), resourceBusiness.getByAppVersion(appVersion).get(0).getType());
+        assertEquals(resource.getConfiguration(), resourceBusiness.getByAppVersion(appVersion).get(0).getConfiguration());
+        assertEquals(1, resourceBusiness.getByAppVersion(appVersion).size());
+    }
+
+    @Test
+    public void dissociateFromAppVersion() throws BusinessException {
+        Application app = new Application("test", "super citation");
+        AppVersion appVersion = new AppVersion("test", "0.1", "blink", "blank", false, false);
+
+        appBusiness.add(app);
+        appBusiness.addVersion(appVersion);
+
+        resourceBusiness.associate(resource, appVersion);
+
+        assertEquals(resource.getName(), resourceBusiness.getByAppVersion(appVersion).get(0).getName());
+        assertEquals(resource.getType(), resourceBusiness.getByAppVersion(appVersion).get(0).getType());
+        assertEquals(resource.getConfiguration(), resourceBusiness.getByAppVersion(appVersion).get(0).getConfiguration());
+        assertEquals(1, resourceBusiness.getByAppVersion(appVersion).size());
+
+        resourceBusiness.dissociate(resource, appVersion);
+
+        assertTrue(resourceBusiness.getByAppVersion(appVersion).isEmpty());
     }
 }

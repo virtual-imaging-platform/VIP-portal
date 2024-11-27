@@ -52,6 +52,8 @@ import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
 import fr.insalyon.creatis.vip.application.client.bean.AppVersion;
+import fr.insalyon.creatis.vip.application.client.bean.Resource;
+import fr.insalyon.creatis.vip.application.client.bean.Tag;
 import fr.insalyon.creatis.vip.application.client.rpc.ApplicationService;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
@@ -76,7 +78,6 @@ public class VersionsLayout extends VLayout {
     private ListGridRecord rollOverRecord;
 
     public VersionsLayout() {
-
         this.setWidth100();
         this.setHeight100();
         this.setOverflow(Overflow.AUTO);
@@ -102,7 +103,7 @@ public class VersionsLayout extends VLayout {
             public void onClick(ClickEvent event) {
                 ManageApplicationsTab appsTab = (ManageApplicationsTab) Layout.getInstance().
                         getTab(ApplicationConstants.TAB_MANAGE_APPLICATION);
-                appsTab.setVersion(null, null, null, null, true, true);
+                appsTab.setVersion(null, null, null, null, true, true, null, null);
             }
         });
         toolstrip.addMember(addButton);
@@ -121,7 +122,6 @@ public class VersionsLayout extends VLayout {
     }
 
     private void configureGrid() {
-
         grid = new ListGrid() {
             @Override
             protected Canvas getRollOverCanvas(Integer rowNum, Integer colNum) {
@@ -137,12 +137,7 @@ public class VersionsLayout extends VLayout {
                     loadImg.addClickHandler(new ClickHandler() {
                         @Override
                         public void onClick(ClickEvent event) {
-                            edit(rollOverRecord.getAttribute("version"),
-                                    rollOverRecord.getAttribute("lfn"),
-                                    rollOverRecord.getAttribute("jsonLfn"),
-                                    rollOverRecord.getAttribute("doi"),
-                                    rollOverRecord.getAttributeAsBoolean("visible"),
-                                    rollOverRecord.getAttributeAsBoolean("boutiquesForm"));
+                            edit(rollOverRecord);
                         }
                     });
                     ImgButton deleteImg = getImgButton(CoreConstants.ICON_DELETE, "Delete");
@@ -197,18 +192,15 @@ public class VersionsLayout extends VLayout {
                 isVisibleField,
                 isBoutiquesFormField,
                 new ListGridField("version", "Version"),
-                new ListGridField("lfn", "LFN"));
+                new ListGridField("lfn", "LFN"),
+                new ListGridField("resources", "Resources"),
+                new ListGridField("tags", "Tags"));
         grid.setSortField("version");
         grid.setSortDirection(SortDirection.ASCENDING);
         grid.addCellDoubleClickHandler(new CellDoubleClickHandler() {
             @Override
             public void onCellDoubleClick(CellDoubleClickEvent event) {
-                edit(event.getRecord().getAttribute("version"),
-                        event.getRecord().getAttribute("lfn"),
-                        event.getRecord().getAttribute("jsonLfn"),
-                        event.getRecord().getAttribute("doi"),
-                        event.getRecord().getAttributeAsBoolean("visible"),
-                        event.getRecord().getAttributeAsBoolean("boutiquesForm"));
+                edit(event.getRecord());
             }
         });
 
@@ -216,8 +208,7 @@ public class VersionsLayout extends VLayout {
     }
 
     public void loadData() {
-
-        final AsyncCallback<List<AppVersion>> callback = new AsyncCallback<List<AppVersion>>() {
+        final AsyncCallback<List<AppVersion>> callback = new AsyncCallback<>() {
             @Override
             public void onFailure(Throwable caught) {
                 modal.hide();
@@ -231,13 +222,55 @@ public class VersionsLayout extends VLayout {
 
                 for (AppVersion version : result) {
                     dataList.add(new VersionRecord(version.getVersion(), version.getLfn(), version.getJsonLfn(),
-                            version.getDoi(), version.isVisible(), version.isBoutiquesForm()));
+                            version.getDoi(), version.isVisible(), version.isBoutiquesForm(), null, null));
                 }
-                grid.setData(dataList.toArray(new VersionRecord[] {}));
+                grid.setData(dataList.toArray(new VersionRecord[]{}));
+                for (int i = 0; i < result.size(); i++) {
+                    loadResources(result.get(i), i);
+                    loadTags(result.get(i), i);
+                }
             }
         };
         modal.show("Loading versions...", true);
         ApplicationService.Util.getInstance().getVersions(applicationName, callback);
+    }
+
+    public void loadResources(AppVersion appVersion, int i) {
+        final AsyncCallback<List<Resource>> callback = new AsyncCallback<>() {
+            @Override
+            public void onFailure(Throwable caught) {
+                modal.hide();
+                Layout.getInstance().setWarningMessage("Unable to get list of resources:<br />" + caught.getMessage());
+            }
+
+            @Override
+            public void onSuccess(List<Resource> result) {
+                modal.hide();
+                String[] resourceNames = result.stream().map((e) -> e.getName()).toArray(String[]::new);
+                grid.setEditValue(i, "resources", resourceNames);
+            }
+        };
+        modal.show("Loading resources...", true);
+        ApplicationService.Util.getInstance().getResourcesFrom(appVersion, callback);
+    }
+
+    public void loadTags(AppVersion appVersion, int i) {
+        final AsyncCallback<List<Tag>> callback = new AsyncCallback<>() {
+            @Override
+            public void onFailure(Throwable caught) {
+                modal.hide();
+                Layout.getInstance().setWarningMessage("Unable to get list of tags:<br />" + caught.getMessage());
+            }
+
+            @Override
+            public void onSuccess(List<Tag> result) {
+                modal.hide();
+                String[] tagsNames = result.stream().map((e) -> e.getName()).toArray(String[]::new);
+                grid.setEditValue(i, "tags", tagsNames);
+            }
+        };
+        modal.show("Loading tags...", true);
+        ApplicationService.Util.getInstance().getTagsFrom(appVersion, callback);
     }
 
     /**
@@ -251,25 +284,22 @@ public class VersionsLayout extends VLayout {
         loadData();
     }
 
-    /**
-     *
-     * @param version
-     * @param lfn
-     * @param isVisible
-     */
-    private void edit(String version, String lfn, String jsonLfn, String doi, boolean isVisible, boolean isBoutiquesForm) {
-
+    private void edit(ListGridRecord record) {
         ManageApplicationsTab appsTab = (ManageApplicationsTab) Layout.getInstance().
-                getTab(ApplicationConstants.TAB_MANAGE_APPLICATION);
-        appsTab.setVersion(version, lfn, jsonLfn, doi, isVisible, isBoutiquesForm);
+            getTab(ApplicationConstants.TAB_MANAGE_APPLICATION);
+
+        appsTab.setVersion(
+            record.getAttribute("version"),
+            record.getAttribute("lfn"),
+            record.getAttribute("jsonLfn"),
+            record.getAttribute("doi"),
+            record.getAttributeAsBoolean("visible"),
+            record.getAttributeAsBoolean("boutiquesForm"),
+            record.getAttributeAsStringArray("tags"),
+            record.getAttributeAsStringArray("resources"));
     }
 
-    /**
-     *
-     * @param version
-     */
     private void remove(String version) {
-
         final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
             @Override
             public void onFailure(Throwable caught) {
