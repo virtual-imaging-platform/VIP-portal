@@ -151,13 +151,6 @@ public class EditApplicationLayout extends AbstractFormLayout {
         }
     }
 
-    /**
-     * Sets an application to edit or creates a blank form.
-     *
-     * @param name Application name
-     * @param classes Application classes
-     * @param citation Application citation
-     */
     public void setApplication(String name, String owner, String classes, String citation) {
 
         if (name != null) {
@@ -182,10 +175,6 @@ public class EditApplicationLayout extends AbstractFormLayout {
         }
     }
 
-    /**
-     *
-     * @param app
-     */
     private void save(Application app) {
 
         WidgetUtil.setLoadingIButton(saveButton, "Saving...");
@@ -197,22 +186,12 @@ public class EditApplicationLayout extends AbstractFormLayout {
         }
     }
 
-    /**
-     * Removes an application.
-     *
-     * @param name Application name
-     */
     private void remove(String name) {
 
         WidgetUtil.setLoadingIButton(removeButton, "Removing...");
         ApplicationService.Util.getInstance().remove(name, getCallback("remove"));
     }
 
-    /**
-     *
-     * @param text
-     * @return
-     */
     private AsyncCallback<Void> getCallback(final String text) {
 
         return new AsyncCallback<Void>() {
@@ -270,7 +249,6 @@ public class EditApplicationLayout extends AbstractFormLayout {
             public void onFailure(Throwable caught) {
                 Layout.getInstance().setWarningMessage("Unable to load users:<br />" + caught.getMessage());
                 usersPickList.setValues(currentOwner);
-
             }
 
             @Override
@@ -279,10 +257,7 @@ public class EditApplicationLayout extends AbstractFormLayout {
                 LinkedHashMap<String, String> valueMap = new LinkedHashMap<String, String>();
 
                 for (User user : result) {
-
-
                     valueMap.put(user.getEmail(), user.getFirstName() + " " + user.getLastName());
-
                 }
                 usersPickList.setValueMap(valueMap);
                 usersPickList.setValue(currentOwner);

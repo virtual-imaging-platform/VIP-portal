@@ -84,9 +84,9 @@ public interface ApplicationService extends RemoteService {
 
     public void remove(String name) throws ApplicationException;
     
-    public void addVersion(AppVersion version, String[] tags, String[] resources) throws ApplicationException;
+    public void addVersion(AppVersion version) throws ApplicationException;
 
-    public void updateVersion(AppVersion version, String[] tags, String[] resources) throws ApplicationException;
+    public void updateVersion(AppVersion version) throws ApplicationException;
 
     public void removeVersion(String applicationName, String version) throws ApplicationException;
 
@@ -122,11 +122,7 @@ public interface ApplicationService extends RemoteService {
 
     public void updateResource(Resource resource) throws ApplicationException;
 
-    public void updateResourcesReference(String[] select, AppVersion appVersion) throws ApplicationException;
-
     public List<Resource> getResources() throws ApplicationException;
-
-    public List<Resource> getResourcesFrom(AppVersion appVersion) throws ApplicationException;
 
     public void addTag(Tag tag) throws ApplicationException;
 
@@ -134,9 +130,5 @@ public interface ApplicationService extends RemoteService {
 
     public void updateTag(Tag tag, String newName) throws ApplicationException;
 
-    public void updateTagsReference(String[] select, AppVersion appVersion) throws ApplicationException;
-
     public List<Tag> getTags() throws ApplicationException;
-
-    public List<Tag> getTagsFrom(AppVersion appVersion) throws ApplicationException;
 }

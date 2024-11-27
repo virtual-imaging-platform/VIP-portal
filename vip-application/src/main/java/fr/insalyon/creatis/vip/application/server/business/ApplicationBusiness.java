@@ -34,8 +34,12 @@ package fr.insalyon.creatis.vip.application.server.business;
 import fr.insalyon.creatis.vip.application.client.bean.AppClass;
 import fr.insalyon.creatis.vip.application.client.bean.AppVersion;
 import fr.insalyon.creatis.vip.application.client.bean.Application;
+import fr.insalyon.creatis.vip.application.client.bean.Resource;
+import fr.insalyon.creatis.vip.application.client.bean.Tag;
 import fr.insalyon.creatis.vip.application.server.dao.ApplicationDAO;
 import fr.insalyon.creatis.vip.application.server.dao.ClassDAO;
+import fr.insalyon.creatis.vip.application.server.dao.ResourceDAO;
+import fr.insalyon.creatis.vip.application.server.dao.TagDAO;
 import fr.insalyon.creatis.vip.core.client.bean.Group;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
@@ -64,7 +68,12 @@ public class ApplicationBusiness {
     private GroupDAO groupDAO;
 
     @Autowired
-    public ApplicationBusiness(ApplicationDAO applicationDAO, ClassDAO classDAO, GroupDAO groupDAO) {
+    private TagBusiness tagBusiness;
+    @Autowired
+    private ResourceBusiness resourceBusiness;
+
+    @Autowired
+    public ApplicationBusiness(ApplicationDAO applicationDAO, ClassDAO classDAO, GroupDAO groupDAO, TagDAO tagDAO, ResourceDAO resourceDAO) {
         this.applicationDAO = applicationDAO;
         this.classDAO = classDAO;
         this.groupDAO = groupDAO;
@@ -241,7 +250,19 @@ public class ApplicationBusiness {
 
     public void addVersion(AppVersion version) throws BusinessException {
         try {
+            List<Tag> tags = new ArrayList<>();
+            List<Resource> resources = new ArrayList<>();
+
+            for (String tagName : version.getTags()) {
+                tags.add(tagBusiness.getByName(tagName));
+            }
+            for (String resourceName: version.getResources()) {
+                resources.add(resourceBusiness.getByName(resourceName));
+            }
+
             applicationDAO.addVersion(version);
+            tagBusiness.associate(tags, version);
+            resourceBusiness.associate(resources, version);
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }
@@ -249,7 +270,28 @@ public class ApplicationBusiness {
 
     public void updateVersion(AppVersion version) throws BusinessException {
         try {
+            AppVersion before = getVersion(version.getApplicationName(), version.getVersion());
+            List<String> beforeResourceNames = before.getResources();
+            List<String> beforeTagsNames = before.getTags();
+
             applicationDAO.updateVersion(version);
+            for (String resource : version.getResources()) {
+                logger.info("resource name = " + resource);
+                if ( ! beforeResourceNames.removeIf((s) -> s.equals(resource))) {
+                    resourceBusiness.associate(resourceBusiness.getByName(resource), version);
+                }
+            }
+            for (String tag : version.getTags()) {
+                if ( ! beforeTagsNames.removeIf((s) -> s.equals(tag))) {
+                    tagBusiness.associate(tagBusiness.getByName(tag), version);
+                }
+            }
+            for (String e : beforeResourceNames) {
+                resourceBusiness.dissociate(resourceBusiness.getByName(e), version);
+            }
+            for (String e : beforeTagsNames) {
+                tagBusiness.dissociate(tagBusiness.getByName(e), version);
+            }
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }
@@ -285,7 +327,13 @@ public class ApplicationBusiness {
     public List<AppVersion> getVersions(String applicationName)
             throws BusinessException {
         try {
-            return applicationDAO.getVersions(applicationName);
+            List<AppVersion> versions = applicationDAO.getVersions(applicationName);
+
+            for (AppVersion version : versions) {
+                version.setResources(resourceBusiness.getByAppVersion(version).stream().map((e) -> e.getName()).collect(Collectors.toList()));
+                version.setTags(tagBusiness.getTags(version).stream().map((e) -> e.getName()).collect(Collectors.toList()));
+            }
+            return versions;
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }
@@ -294,7 +342,12 @@ public class ApplicationBusiness {
     public AppVersion getVersion(String applicationName, String applicationVersion)
             throws BusinessException {
         try {
-            return applicationDAO.getVersion(applicationName, applicationVersion);
+            AppVersion version = applicationDAO.getVersion(applicationName, applicationVersion);
+
+            version.setResources(resourceBusiness.getByAppVersion(version).stream().map((e) -> e.getName()).collect(Collectors.toList()));
+            version.setTags(tagBusiness.getTags(version).stream().map((e) -> e.getName()).collect(Collectors.toList()));
+
+            return version;
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }

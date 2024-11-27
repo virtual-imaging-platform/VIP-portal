@@ -1,5 +1,8 @@
 package fr.insalyon.creatis.vip.application.client.bean;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.google.gwt.user.client.rpc.IsSerializable;
 
 public class Resource implements IsSerializable {
@@ -8,21 +11,23 @@ public class Resource implements IsSerializable {
     private boolean status;
     private ResourceType type;
     private String configuration;
+    private List<String> engines;
 
-    public Resource(String name, boolean visible, boolean status, ResourceType type, String configuration) {
+    public Resource(String name, boolean visible, boolean status, ResourceType type, String configuration, List<String> engines) {
         this.name = name;
         this.visible = visible;
         this.status = status;
         this.type = type;
         this.configuration = configuration;
+        this.engines = engines;
+    }
+
+    public Resource(String name, boolean visible, boolean status, String type, String configuration, List<String> engines) {
+        this(name, visible, status, ResourceType.fromString(type), configuration, engines);
     }
 
     public Resource(String name) {
-        this(name, false, false, ResourceType.getDefault(), "");
-    }
-
-    public Resource(String name, boolean visible, boolean status, String type, String configuration) {
-        this(name, visible, status, ResourceType.fromString(type), configuration);
+        this(name, false, false, ResourceType.getDefault(), "", new ArrayList<>());
     }
 
     public Resource() {}
@@ -65,5 +70,13 @@ public class Resource implements IsSerializable {
 
     public void setConfiguration(String configuration) {
         this.configuration = configuration;
+    }
+
+    public List<String> getEngines() {
+        return this.engines;
+    }
+
+    public void setEngines(List<String> engines) {
+        this.engines = engines;
     }
 }

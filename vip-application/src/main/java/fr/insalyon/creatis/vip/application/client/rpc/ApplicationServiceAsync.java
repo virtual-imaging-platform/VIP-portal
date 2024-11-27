@@ -39,7 +39,6 @@ import fr.insalyon.creatis.vip.application.client.bean.ApplicationStatus;
 import fr.insalyon.creatis.vip.application.client.bean.Engine;
 import fr.insalyon.creatis.vip.application.client.bean.Resource;
 import fr.insalyon.creatis.vip.application.client.bean.Tag;
-import fr.insalyon.creatis.vip.application.client.view.ApplicationException;
 
 import java.util.HashMap;
 import java.util.List;
@@ -70,9 +69,9 @@ public interface ApplicationServiceAsync {
 
     public void remove(String name, AsyncCallback<Void> asyncCallback);
     
-    public void addVersion(AppVersion version, String[] tags, String[] resources, AsyncCallback<Void> asyncCallback);
+    public void addVersion(AppVersion version, AsyncCallback<Void> asyncCallback);
 
-    public void updateVersion(AppVersion version, String[] tags, String[] resources, AsyncCallback<Void> asyncCallback);
+    public void updateVersion(AppVersion version, AsyncCallback<Void> asyncCallback);
 
     public void removeVersion(String applicationName, String version, AsyncCallback<Void> asyncCallback);
 
@@ -108,11 +107,7 @@ public interface ApplicationServiceAsync {
 
     public void updateResource(Resource resource, AsyncCallback<Void> asyncCallback);
 
-    public void updateResourcesReference(String[] select, AppVersion appVersion, AsyncCallback<Void> asyncCallback) throws ApplicationException;
-
     public void getResources(AsyncCallback<List<Resource>> asyncCallback);
-
-    public void getResourcesFrom(AppVersion appVersion, AsyncCallback<List<Resource>> asyncCallback);
 
     public void addTag(Tag tag, AsyncCallback<Void> asyncCallback);
 
@@ -120,9 +115,5 @@ public interface ApplicationServiceAsync {
 
     public void updateTag(Tag tag, String newName, AsyncCallback<Void> asyncCallback);
 
-    public void updateTagsReference(String[] select, AppVersion appVersion, AsyncCallback<Void> asyncCallback) throws ApplicationException;
-
     public void getTags(AsyncCallback<List<Tag>> asyncCallback);
-
-    public void getTagsFrom(AppVersion appVersion, AsyncCallback<List<Tag>> asyncCallback);
 }

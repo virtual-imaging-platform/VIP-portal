@@ -31,6 +31,7 @@
  */
 package fr.insalyon.creatis.vip.application.client.view.system.applications;
 
+import java.util.Arrays;
 import java.util.List;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -111,16 +112,18 @@ public class EditVersionLayout extends AbstractFormLayout {
         resourcesList.setMultiple(true);
         resourcesList.setWidth(450);
 
-        saveButton = WidgetUtil.getIButton("Save", CoreConstants.ICON_SAVED,
-                new ClickHandler() {
+        saveButton = WidgetUtil.getIButton("Save", CoreConstants.ICON_SAVED, new ClickHandler() {
             @Override
             public void onClick(ClickEvent event) {
                 if (versionField.validate() && lfnField.validate() && jsonLfnField.validate()) {
                     String jsonLfn = jsonLfnField.getValueAsString();
                     if (jsonLfn != null) jsonLfn.trim();
-                    save(new AppVersion(applicationName, versionField.getValueAsString().trim(),
+                    AppVersion toSave = new AppVersion(applicationName, versionField.getValueAsString().trim(),
                             lfnField.getValueAsString().trim(), jsonLfn,
-                            isVisibleField.getValueAsBoolean(), isBoutiquesFormField.getValueAsBoolean()));
+                            isVisibleField.getValueAsBoolean(), isBoutiquesFormField.getValueAsBoolean());
+                    toSave.setResources(Arrays.asList(resourcesList.getValues()));
+                    toSave.setTags(Arrays.asList(tagsList.getValues()));
+                    save(toSave);
                 }
             }
         });
@@ -157,9 +160,9 @@ public class EditVersionLayout extends AbstractFormLayout {
         WidgetUtil.setLoadingIButton(saveButton, "Saving...");
 
         if (newVersion) {
-            ApplicationService.Util.getInstance().addVersion(version, tagsList.getValues(), resourcesList.getValues(), getCallback("add"));
+            ApplicationService.Util.getInstance().addVersion(version, getCallback("add"));
         } else {
-            ApplicationService.Util.getInstance().updateVersion(version, tagsList.getValues(), resourcesList.getValues(), getCallback("update"));
+            ApplicationService.Util.getInstance().updateVersion(version, getCallback("update"));
         }
     }
 
@@ -210,10 +213,10 @@ public class EditVersionLayout extends AbstractFormLayout {
             this.isVisibleField.setValue(isVisible);
             this.isBoutiquesFormField.setValue(isBoutiquesForm);
             this.tagsList.setValues(tags);
-            this.tagsList.setValues(resources);
+            this.resourcesList.setValues(resources);
             this.newVersion = false;
             this.removeButton.setDisabled(false);
-            fetchAssociatedData(new AppVersion(applicationName, version));
+            fetchData();
         } else {
             this.versionField.setValue("");
             this.versionField.setDisabled(false);
@@ -223,21 +226,16 @@ public class EditVersionLayout extends AbstractFormLayout {
             this.isBoutiquesFormField.setValue(true);
             this.newVersion = true;
             this.removeButton.setDisabled(true);
-            fetchAssociatedData(null);
+            fetchData();
         }
     }
 
-    private void fetchAssociatedData(AppVersion appVersion) {
-        loadTagsData(null, false);
-        loadResourcesData(null, false);
-
-        if (appVersion != null) {
-            loadTagsData(appVersion, true);
-            loadResourcesData(appVersion, true);
-        }
+    private void fetchData() {
+        loadTags();
+        loadResources();
     }
 
-    private void loadTagsData(AppVersion appVersion, boolean isAssociated) {
+    private void loadTags() {
         ApplicationServiceAsync service = ApplicationService.Util.getInstance();
         final AsyncCallback<List<Tag>> callback = new AsyncCallback<>() {
             @Override
@@ -248,22 +246,13 @@ public class EditVersionLayout extends AbstractFormLayout {
             @Override
             public void onSuccess(List<Tag> result) {
                 String[] data = result.stream().map(Tag::getName).toArray(String[]::new);
-                if (isAssociated) {
-                    tagsList.setValues(data);
-                } else {
-                    tagsList.setValueMap(data);
-                }
+                tagsList.setValueMap(data);
             }
         };
-    
-        if (isAssociated) {
-            service.getTagsFrom(appVersion, callback);
-        } else {
-            service.getTags(callback);
-        }
+        service.getTags(callback);
     }
 
-    private void loadResourcesData(AppVersion appVersion, boolean isAssociated) {
+    private void loadResources() {
         ApplicationServiceAsync service = ApplicationService.Util.getInstance();
         final AsyncCallback<List<Resource>> callback = new AsyncCallback<>() {
             @Override
@@ -274,18 +263,9 @@ public class EditVersionLayout extends AbstractFormLayout {
             @Override
             public void onSuccess(List<Resource> result) {
                 String[] data = result.stream().map(Resource::getName).toArray(String[]::new);
-                if (isAssociated) {
-                    resourcesList.setValues(data);
-                } else {
-                    resourcesList.setValueMap(data);
-                }
+                resourcesList.setValueMap(data);
             }
         };
-    
-        if (isAssociated) {
-            service.getResourcesFrom(appVersion, callback);
-        } else {
-            service.getResources(callback);
-        }
+        service.getResources(callback);
     }
 }

@@ -153,6 +153,12 @@ public class ResourceBusiness {
         }
     }
 
+    public void associate(List<Resource> resources, AppVersion appVersion) throws BusinessException {
+        for (Resource resource : resources) {
+            associate(resource, appVersion);
+        }
+    }
+
     public void dissociate(Resource resource, AppVersion appVersion) throws BusinessException {
         try {
             resourceDAO.dissociate(resource, appVersion);

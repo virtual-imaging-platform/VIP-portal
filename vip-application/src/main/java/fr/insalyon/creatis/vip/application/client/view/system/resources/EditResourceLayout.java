@@ -1,5 +1,7 @@
 package fr.insalyon.creatis.vip.application.client.view.system.resources;
 
+import java.util.Arrays;
+
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.types.MultipleAppearance;
 import com.smartgwt.client.util.BooleanCallback;
@@ -28,6 +30,7 @@ public class EditResourceLayout extends AbstractFormLayout {
     private BooleanItem statusField;
     private SelectItem typeFieldList;
     private TextItem configurationField;
+    private SelectItem enginesList;
     private IButton saveButton;
     private IButton removeButton;
 
@@ -57,6 +60,11 @@ public class EditResourceLayout extends AbstractFormLayout {
         typeFieldList.setValueMap(ResourceType.getValues());
         typeFieldList.setWidth(350);
 
+        enginesList = new SelectItem();
+        enginesList.setMultiple(true);
+        enginesList.setMultipleAppearance(MultipleAppearance.PICKLIST);
+        enginesList.setWidth(350);
+
         saveButton = WidgetUtil.getIButton("Save", CoreConstants.ICON_SAVED,
                 new ClickHandler() {
                     @Override
@@ -68,7 +76,9 @@ public class EditResourceLayout extends AbstractFormLayout {
                                 visibleField.getValueAsBoolean(),
                                 statusField.getValueAsBoolean(),
                                 typeFieldList.getValueAsString(),
-                                configurationField.getValueAsString().trim()));
+                                configurationField.getValueAsString().trim(),
+                                Arrays.asList(enginesList.getValues())
+                                ));
                         }
                     }
                 });
