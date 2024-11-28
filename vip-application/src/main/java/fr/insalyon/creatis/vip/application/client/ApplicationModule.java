@@ -36,12 +36,10 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.widgets.tab.Tab;
 import com.smartgwt.client.widgets.tab.events.CloseClickHandler;
 import com.smartgwt.client.widgets.tab.events.TabCloseClickEvent;
-import fr.insalyon.creatis.vip.application.client.bean.AppClass;
 import fr.insalyon.creatis.vip.application.client.rpc.ApplicationService;
 import fr.insalyon.creatis.vip.application.client.rpc.WorkflowService;
 import fr.insalyon.creatis.vip.application.client.view.ApplicationHomeParser;
 import fr.insalyon.creatis.vip.application.client.view.ApplicationSystemParser;
-import fr.insalyon.creatis.vip.application.client.view.ApplicationTileGrid;
 import fr.insalyon.creatis.vip.application.client.view.common.AbstractSimulationTab;
 import fr.insalyon.creatis.vip.application.client.view.monitor.timeline.TimelineLayout;
 import fr.insalyon.creatis.vip.application.client.view.system.applications.ManageApplicationsTab;
@@ -53,7 +51,6 @@ import fr.insalyon.creatis.vip.core.client.view.layout.CenterTabSet;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -85,7 +82,8 @@ public class ApplicationModule extends Module {
              reservedClasses=result;
             }
         };
-        ApplicationService.Util.getInstance().getReservedClasses(callback);
+        // changer
+        // ApplicationService.Util.getInstance().getReservedClasses(callback);
           
     }
 
@@ -96,26 +94,6 @@ public class ApplicationModule extends Module {
         CoreModule.addGeneralApplicationParser(new ApplicationHomeParser());
         CoreModule.addSystemApplicationParser(new ApplicationSystemParser());
         CoreModule.addLayoutToHomeTab(TimelineLayout.getInstance());
-
-        // Applications Tile Grid
-        final AsyncCallback<List<AppClass>> callback = new AsyncCallback<List<AppClass>>() {
-            @Override
-            public void onFailure(Throwable caught) {
-                Layout.getInstance().setWarningMessage("Unable to load classes:<br />" + caught.getMessage());
-            }
-
-            @Override
-            public void onSuccess(List<AppClass> result) {
-
-                for (AppClass appClass : result) {
-                    if (!reservedClasses.keySet().contains(appClass.getName())) {
-                        CoreModule.addApplicationsTileGrid(
-                                new ApplicationTileGrid(appClass.getName()));
-                    }
-                }
-            }
-        };
-        ApplicationService.Util.getInstance().getClasses(callback);
 
         // Simulation close tab
         CenterTabSet.getInstance().addCloseClickHandler(new CloseClickHandler() {
@@ -148,7 +126,6 @@ public class ApplicationModule extends Module {
             public void onSuccess(Void result) {
             }
         };
-        ApplicationService.Util.getInstance().signout(callback);
         TimelineLayout.getInstance().terminate();
         for (Tab tab : removedTabs) {
             if (tab instanceof AbstractSimulationTab) {

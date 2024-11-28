@@ -94,8 +94,6 @@ public interface Server {
 
     List<String> getApplicationImporterRequirements();
 
-    HashMap<String, Integer> getReservedClasses();
-
     List<String> getUndesiredMailDomains();
 
     List<String> getUndesiredCountries();

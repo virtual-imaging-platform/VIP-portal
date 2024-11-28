@@ -1,11 +1,9 @@
 package fr.insalyon.creatis.vip.local;
 
-import fr.insalyon.creatis.vip.application.client.bean.AppClass;
 import fr.insalyon.creatis.vip.application.client.bean.AppVersion;
 import fr.insalyon.creatis.vip.application.client.bean.Application;
 import fr.insalyon.creatis.vip.application.client.bean.Engine;
 import fr.insalyon.creatis.vip.application.server.business.ApplicationBusiness;
-import fr.insalyon.creatis.vip.application.server.business.ClassBusiness;
 import fr.insalyon.creatis.vip.application.server.business.EngineBusiness;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
@@ -75,7 +73,6 @@ public class LocalInitializer {
     private Server server;
     private LFCBusiness lfcBusiness;
     private EngineBusiness engineBusiness;
-    private ClassBusiness classBusiness;
     private ApplicationBusiness applicationBusiness;
     private TransferPoolBusiness transferPoolBusiness;
 
@@ -84,7 +81,7 @@ public class LocalInitializer {
             Environment environment, ResourceLoader resourceLoader,
             ConfigurationBusiness configurationBusiness, Server server,
             LFCBusiness lfcBusiness, EngineBusiness engineBusiness,
-            ClassBusiness classBusiness, ApplicationBusiness applicationBusiness,
+            ApplicationBusiness applicationBusiness,
             TransferPoolBusiness transferPoolBusiness) {
         this.environment = environment;
         this.resourceLoader = resourceLoader;
@@ -92,7 +89,6 @@ public class LocalInitializer {
         this.server = server;
         this.lfcBusiness = lfcBusiness;
         this.engineBusiness = engineBusiness;
-        this.classBusiness = classBusiness;
         this.applicationBusiness = applicationBusiness;
         this.transferPoolBusiness = transferPoolBusiness;
     }
@@ -142,7 +138,6 @@ public class LocalInitializer {
 
     private void initData() throws BusinessException {
         initLocalEngine();
-        initLocalClass();
         initApplication();
         initAppVersion();
     }
@@ -160,26 +155,13 @@ public class LocalInitializer {
         engineBusiness.add(newEngine);
     }
 
-    private void initLocalClass() throws BusinessException {
-        if (classBusiness.getClass(className) != null) {
-            logger.info("local class [{}] already exist", className);
-            return;
-        }
-        logger.info("adding local class [{}]", className);
-        AppClass appClass = new AppClass(
-                className,
-                Collections.singletonList(engineName),
-                Collections.singletonList(""));
-        classBusiness.addClass(appClass);
-    }
-
     private void initApplication() throws BusinessException {
         if (applicationBusiness.getApplication(applicationName) != null) {
             logger.info("local application [{}] already exist", applicationName);
             return;
         }
         logger.info("adding application [{}]", applicationName);
-        Application application = new Application(applicationName, Collections.singletonList(className),"");
+        Application application = new Application(applicationName,"");
         applicationBusiness.add(application);
     }
 

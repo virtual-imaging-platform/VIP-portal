@@ -31,9 +31,7 @@
  */
 package fr.insalyon.creatis.vip.application.client.view;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
-import fr.insalyon.creatis.vip.application.client.rpc.ApplicationService;
 import fr.insalyon.creatis.vip.application.client.view.launch.LaunchTab;
 import fr.insalyon.creatis.vip.core.client.view.application.ApplicationsTileGrid;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
@@ -48,11 +46,10 @@ public class ApplicationTileGrid extends ApplicationsTileGrid {
 
     private List<String> applicationNames;
 
-    public ApplicationTileGrid(String className) {
-
-        super(className);
+    public ApplicationTileGrid(String tileName) {
+        super(tileName);
         applicationNames = new ArrayList<String>();
-        loadApplications(className);
+        // loadApplications();
     }
 
     @Override
@@ -68,23 +65,22 @@ public class ApplicationTileGrid extends ApplicationsTileGrid {
         }
     }
 
-    private void loadApplications(String className) {
+    // private void loadApplications() {
+    //     final AsyncCallback<List<Application>> callback = new AsyncCallback<>() {
+    //         @Override
+    //         public void onFailure(Throwable caught) {
+    //             Layout.getInstance().setWarningMessage("Unable to load applications:<br />" + caught.getMessage());
+    //         }
 
-        final AsyncCallback<List<String[]>> callback = new AsyncCallback<List<String[]>>() {
-            @Override
-            public void onFailure(Throwable caught) {
-                Layout.getInstance().setWarningMessage("Unable to load applications:<br />" + caught.getMessage());
-            }
+    //         @Override
+    //         public void onSuccess(List<Application> result) {
 
-            @Override
-            public void onSuccess(List<String[]> result) {
-
-                for (String[] app : result) {
-                    addApplication(app[0], app[1], ApplicationConstants.APP_IMG_APPLICATION);
-                    applicationNames.add(app[0] + " " + app[1]);
-                }
-            }
-        };
-        ApplicationService.Util.getInstance().getApplications(className, callback);
-    }
+    //             for (Application app : result) {
+    //                 addApplication(, app[1], ApplicationConstants.APP_IMG_APPLICATION);
+    //                 applicationNames.add(app[0] + " " + app[1]);
+    //             }
+    //         }
+    //     };
+    //     ApplicationService.Util.getInstance().getApplications(callback);
+    // }
 }

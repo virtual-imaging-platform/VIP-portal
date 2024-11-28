@@ -34,7 +34,6 @@ package fr.insalyon.creatis.vip.application.client.rpc;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.ServiceDefTarget;
-import fr.insalyon.creatis.vip.application.client.bean.AppClass;
 import fr.insalyon.creatis.vip.application.client.bean.AppVersion;
 import fr.insalyon.creatis.vip.application.client.bean.Application;
 import fr.insalyon.creatis.vip.application.client.bean.ApplicationStatus;
@@ -42,7 +41,6 @@ import fr.insalyon.creatis.vip.application.client.bean.Engine;
 import fr.insalyon.creatis.vip.application.client.bean.Resource;
 import fr.insalyon.creatis.vip.application.client.bean.Tag;
 import fr.insalyon.creatis.vip.application.client.view.ApplicationException;
-import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -64,15 +62,9 @@ public interface ApplicationService extends RemoteService {
         }
     }
 
-    public void signout() throws ApplicationException;
-
     List<Application> getPublicApplications() throws ApplicationException;
 
     public List<Application> getApplications() throws ApplicationException;
-    
-    public List<String[]> getApplications(String className) throws ApplicationException;
-
-    public List<String[]> getApplicationsByClass(String className) throws ApplicationException;
     
     public List<AppVersion> getVersions(String applicationName) throws ApplicationException;
     
@@ -92,15 +84,7 @@ public interface ApplicationService extends RemoteService {
 
     public String publishVersion(String applicationName, String version) throws ApplicationException;
 
-    public void addClass(AppClass c) throws ApplicationException;
-
-    public void updateClass(AppClass c) throws ApplicationException;
-
-    public void removeClass(String className) throws ApplicationException;
-
-    public List<AppClass> getClasses() throws ApplicationException;
-    
-    public List<String>[] getApplicationsAndUsers(List<String> reservedClasses) throws ApplicationException;
+    public List<String>[] getApplicationsAndUsers() throws ApplicationException;
     
     public ApplicationStatus getApplicationStatus() throws ApplicationException;
     
@@ -114,8 +98,6 @@ public interface ApplicationService extends RemoteService {
     
     public List<Engine> getEngines() throws ApplicationException;
     
-    public HashMap<String, Integer> getReservedClasses() throws ApplicationException;
-
     public void addResource(Resource resource) throws ApplicationException;
 
     public void removeResource(Resource resource) throws ApplicationException;

@@ -38,7 +38,7 @@ import fr.insalyon.creatis.vip.core.client.VipException;
  *
  * @author Rafael Silva
  */
-public class ApplicationException extends VipException implements IsSerializable {
+public class ApplicationException extends VipException {
 
     /* Reserved codes : 2xxx : vip-application */
     public enum ApplicationError implements VipError {

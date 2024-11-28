@@ -32,7 +32,6 @@
 package fr.insalyon.creatis.vip.application.client.rpc;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import fr.insalyon.creatis.vip.application.client.bean.AppClass;
 import fr.insalyon.creatis.vip.application.client.bean.AppVersion;
 import fr.insalyon.creatis.vip.application.client.bean.Application;
 import fr.insalyon.creatis.vip.application.client.bean.ApplicationStatus;
@@ -49,19 +48,13 @@ import java.util.List;
  */
 public interface ApplicationServiceAsync {
 
-    public void signout(AsyncCallback<Void> asyncCallback);
-
     public void getPublicApplications(AsyncCallback<List<Application>> asyncCallback);
     
     public void getApplications(AsyncCallback<List<Application>> asyncCallback);
     
-    public void getApplications(String className, AsyncCallback<List<String[]>> asyncCallback);
-
-    public void getApplicationsByClass(String className, AsyncCallback<List<String[]>> asyncCallback);
-    
     public void getVersions(String applicationName, AsyncCallback<List<AppVersion>> asyncCallback);
     
-    public  void getVersion(String applicationName, String applicationVersion,AsyncCallback <AppVersion> asyncCallback);
+    public  void getVersion(String applicationName, String applicationVersion, AsyncCallback <AppVersion> asyncCallback);
 
     public void add(Application application, AsyncCallback<Void> asyncCallback);
 
@@ -77,15 +70,7 @@ public interface ApplicationServiceAsync {
 
     public void publishVersion(String applicationName, String version, AsyncCallback<String> asyncCallback);
 
-    public void removeClass(String name, AsyncCallback<Void> asyncCallback);
-
-    public void getClasses(AsyncCallback<List<AppClass>> asyncCallback);
-    
-    public void addClass(AppClass c, AsyncCallback<Void> asyncCallback);
-
-    public void updateClass(AppClass c, AsyncCallback<Void> asyncCallback);
-
-    public void getApplicationsAndUsers(List<String> reservedClasses, AsyncCallback<List<String>[]> asyncCallback);
+    public void getApplicationsAndUsers(AsyncCallback<List<String>[]> asyncCallback);
     
     public void getApplicationStatus(AsyncCallback<ApplicationStatus> asyncCallback);
     
@@ -99,8 +84,6 @@ public interface ApplicationServiceAsync {
     
     public void getEngines(AsyncCallback<List<Engine>> asyncCallback);
     
-    public void getReservedClasses(AsyncCallback <HashMap<String, Integer>> asyncCallback);
-
     public void addResource(Resource resource, AsyncCallback<Void> asyncCallback);
 
     public void removeResource(Resource resource, AsyncCallback<Void> asyncCallback);

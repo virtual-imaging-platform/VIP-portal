@@ -31,11 +31,9 @@
  */
 package fr.insalyon.creatis.vip.application.server.dao.mysql;
 
-import fr.insalyon.creatis.vip.application.client.bean.AppClass;
 import fr.insalyon.creatis.vip.application.client.bean.AppVersion;
 import fr.insalyon.creatis.vip.application.client.bean.Application;
 import fr.insalyon.creatis.vip.application.server.dao.ApplicationDAO;
-import fr.insalyon.creatis.vip.application.server.dao.ClassDAO;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,17 +58,13 @@ public class ApplicationData extends JdbcDaoSupport implements ApplicationDAO {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    private ClassDAO classDAO;
-
     @Autowired
-    public ApplicationData(DataSource dataSource, ClassDAO classDAO) {
+    public ApplicationData(DataSource dataSource) {
         setDataSource(dataSource);
-        this.classDAO = classDAO;
     }
 
     @Override
     public void add(Application application) throws DAOException {
-
         try {
             PreparedStatement ps = getConnection().prepareStatement(
                     "INSERT INTO VIPApplications(name, citation, owner) "
@@ -81,9 +75,6 @@ public class ApplicationData extends JdbcDaoSupport implements ApplicationDAO {
             ps.setString(3, application.getOwner());
             ps.execute();
 
-            for (String className : application.getApplicationClasses()) {
-                addClassToApplication(application.getName(), className);
-            }
             ps.close();
 
         } catch (SQLException ex) {
@@ -111,12 +102,6 @@ public class ApplicationData extends JdbcDaoSupport implements ApplicationDAO {
             ps.setString(3, application.getName());
             ps.executeUpdate();
             ps.close();
-            removeAllClassesFromApplication(application.getName());
-            for (String className : application.getApplicationClasses()) {
-                if (!className.equals("")) {
-                    addClassToApplication(application.getName(), className);
-                }
-            }
 
         } catch (SQLException ex) {
             logger.error("Error updating application {}", application.getName(), ex);
@@ -137,27 +122,6 @@ public class ApplicationData extends JdbcDaoSupport implements ApplicationDAO {
 
         } catch (SQLException ex) {
             logger.error("Error removing application {}", name, ex);
-            throw new DAOException(ex);
-        }
-    }
-
-    @Override
-    public void remove(String email, String name) throws DAOException {
-
-        try {
-            for (AppClass c : classDAO.getUserClasses(email, true)) {
-                PreparedStatement ps = getConnection().prepareStatement("DELETE "
-                        + "FROM VIPApplicationClasses "
-                        + "WHERE class=? AND application=?");
-
-                ps.setString(1, c.getName());
-                ps.setString(2, name);
-                ps.execute();
-                ps.close();
-            }
-
-        } catch (SQLException ex) {
-            logger.error("Error removing application {} for user {}", name, email, ex);
             throw new DAOException(ex);
         }
     }
@@ -210,53 +174,14 @@ public class ApplicationData extends JdbcDaoSupport implements ApplicationDAO {
                 ps3.close();
 
                 String name = rs.getString("name");
-                PreparedStatement ps2 = getConnection().prepareStatement("SELECT "
-                        + "class FROM VIPApplicationClasses WHERE application=?");
-                ps2.setString(1, name);
 
-                ResultSet rs2 = ps2.executeQuery();
-                List<String> classes = new ArrayList<String>();
-
-                while (rs2.next()) {
-                    classes.add(rs2.getString("class"));
-                }
-                ps2.close();
-
-                applications.add(new Application(name, classes, rs.getString("owner"), firstName + " " + lastName, rs.getString("citation")));
+                applications.add(new Application(name, rs.getString("owner"), firstName + " " + lastName, rs.getString("citation")));
             }
             ps.close();
             return applications;
 
         } catch (SQLException ex) {
             logger.error("Error getting all applications", ex);
-            throw new DAOException(ex);
-        }
-    }
-
-    @Override
-    public List<String[]> getApplicationsFromClass(String className) throws DAOException {
-
-        try {
-            PreparedStatement ps = getConnection().prepareStatement("SELECT "
-                    + "name, version FROM "
-                    + "VIPApplications app, VIPAppVersions ver, VIPApplicationClasses appc "
-                    + "WHERE appc.class = ? AND app.name = appc.application AND "
-                    + "app.name = ver.application AND visible = ? "
-                    + "ORDER BY app.name");
-            ps.setString(1, className);
-            ps.setBoolean(2, true);
-
-            ResultSet rs = ps.executeQuery();
-            List<String[]> applications = new ArrayList<String[]>();
-
-            while (rs.next()) {
-                applications.add(new String[]{rs.getString("name"), rs.getString("version")});
-            }
-            ps.close();
-            return applications;
-
-        } catch (SQLException ex) {
-            logger.error("Error getting all applications for class {}", className, ex);
             throw new DAOException(ex);
         }
     }
@@ -271,159 +196,11 @@ public class ApplicationData extends JdbcDaoSupport implements ApplicationDAO {
 
             ResultSet rs = ps.executeQuery();
             if (rs.first()) {
-
-                PreparedStatement ps2 = getConnection().prepareStatement("SELECT "
-                        + "class FROM VIPApplicationClasses WHERE application = ?");
-
-                ps2.setString(1, applicationName);
-
-                ResultSet rs2 = ps2.executeQuery();
-                List<String> appClasses = new ArrayList<String>();
-
-                while (rs2.next()) {
-                    appClasses.add(rs2.getString("class"));
-                }
-                ps2.close();
-                return new Application(rs.getString("name"), appClasses, rs.getString("owner"), rs.getString("citation"));
+                return new Application(rs.getString("name"), rs.getString("owner"), rs.getString("citation"));
             }
             return null;
         } catch (SQLException ex) {
             logger.error("Error getting application {}", applicationName, ex);
-            throw new DAOException(ex);
-        }
-    }
-
-    public List<Application> getApplicationsFromClasses(List<String> classes) throws DAOException {
-
-        try {
-            List<Application> applications = new ArrayList<Application>();
-
-            if (!classes.isEmpty()) {
-                StringBuilder sb = new StringBuilder();
-
-                for (String c : classes) {
-                    if (sb.length() > 0) {
-                        sb.append(" OR ");
-                    }
-                    sb.append("appc.class = '").append(c).append("'");
-                }
-
-                String clause = sb.length() > 0 ? " AND (" + sb.toString() + ")" : "";
-
-                PreparedStatement ps = getConnection().prepareStatement("SELECT DISTINCT "
-                        + "name, owner, citation FROM "
-                        + "VIPApplications app, VIPApplicationClasses appc "
-                        + "WHERE app.name = appc.application " + clause + " "
-                        + "ORDER BY name");
-
-                ResultSet rs = ps.executeQuery();
-
-                while (rs.next()) {
-                    String name = rs.getString("name");
-                    PreparedStatement ps2 = getConnection().prepareStatement("SELECT "
-                            + "class FROM VIPApplicationClasses WHERE application = ?");
-
-                    ps2.setString(1, name);
-
-                    ResultSet rs2 = ps2.executeQuery();
-                    List<String> appClasses = new ArrayList<String>();
-
-                    while (rs2.next()) {
-                        appClasses.add(rs2.getString("class"));
-                    }
-                    ps2.close();
-
-                    String owner = rs.getString("owner");
-                    PreparedStatement ps3 = getConnection().prepareStatement("SELECT "
-                            + "first_name,last_name FROM VIPUsers WHERE email=?");
-                    ps3.setString(1, owner);
-                    ResultSet rs3 = ps3.executeQuery();
-                    String firstName = null;
-                    String lastName = null;
-                    while (rs3.next()) {
-                        firstName = rs3.getString("first_name");
-                        lastName = rs3.getString("last_name");
-                    }
-                    ps3.close();
-
-                    applications.add(new Application(name, appClasses, rs.getString("owner"), firstName + " " + lastName, rs.getString("citation")));
-                }
-                ps.close();
-            }
-            return applications;
-
-        } catch (SQLException ex) {
-            logger.error("Error getting applications for classes {}", classes, ex);
-            throw new DAOException(ex);
-        }
-    }
-
-    @Override
-    public List<String> getApplicationsName(String applicationClass) {
-        try {
-
-            List<String> applications = new ArrayList<String>();
-            PreparedStatement ps = null;
-            if (applicationClass == null) {
-                ps = getConnection().prepareStatement("SELECT name FROM "
-                        + "WorkflowDescriptor ORDER BY name");
-            } else {
-                ps = getConnection().prepareStatement("SELECT name FROM "
-                        + "WorkflowDescriptor wd, WorkflowClasses wc "
-                        + "WHERE (wc.workflow=wd.name AND class=?)");
-                ps.setString(1, applicationClass);
-            }
-
-            ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
-                applications.add(rs.getString("name"));
-            }
-
-            ps.close();
-            return applications;
-
-        } catch (SQLException ex) {
-            logger.error("Error getting applications name {}", applicationClass, ex);
-        }
-        return null;
-    }
-
-    private void addClassToApplication(String applicationName, String className)
-            throws DAOException {
-
-        try {
-            PreparedStatement ps = getConnection().prepareStatement("INSERT INTO "
-                    + "VIPApplicationClasses(application, class) "
-                    + "VALUES(?, ?)");
-
-            ps.setString(1, applicationName);
-            ps.setString(2, className);
-            ps.execute();
-            ps.close();
-
-        } catch (SQLException ex) {
-            if (ex.getMessage().contains("Unique index or primary key violation") || ex.getMessage().contains("Duplicate entry ")) {
-                logger.error("An application named \"" + applicationName + "\" is already associated with clas \"" + className + "\".");
-                throw new DAOException("An application named \"" + applicationName + "\" is already associated with clas \"" + className + "\".", ex);
-            } else {
-                logger.error("Error adding class {} to application {}", className, applicationName, ex);
-                throw new DAOException(ex);
-            }
-        }
-    }
-
-    private void removeAllClassesFromApplication(String workflowName) throws DAOException {
-
-        try {
-            PreparedStatement ps = getConnection().prepareStatement("DELETE FROM "
-                    + "VIPApplicationClasses WHERE application=?");
-
-            ps.setString(1, workflowName);
-            ps.execute();
-            ps.close();
-
-        } catch (SQLException ex) {
-            logger.error("Error removing classes from application {}", workflowName, ex);
             throw new DAOException(ex);
         }
     }

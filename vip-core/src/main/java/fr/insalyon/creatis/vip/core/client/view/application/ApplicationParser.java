@@ -43,7 +43,6 @@ public abstract class ApplicationParser {
     private List<ApplicationTileRecord> applications;
 
     public ApplicationParser() {
-
         applications = new ArrayList<ApplicationTileRecord>();
         loadApplications();
     }
@@ -52,38 +51,18 @@ public abstract class ApplicationParser {
 
     public abstract boolean parse(String applicationName, String applicationVersion);
 
-    /**
-     * Adds an application.
-     *
-     * @param applicationName
-     * @param applicationImage
-     */
     protected void addApplication(String applicationName, String applicationImage) {
-
         applications.add(new ApplicationTileRecord(applicationName,
             applicationImage));
     }
 
-    /**
-     * Adds an application.
-     *
-     * @param applicationName
-     * @param applicationVersion
-     * @param applicationImage
-     */
     protected void addApplication(String applicationName, String applicationVersion, String applicationImage) {
 
         applications.add(new ApplicationTileRecord(applicationName, applicationVersion,
                 applicationImage));
     }
 
-    /**
-     * Gets the list of applications.
-     *
-     * @return
-     */
     public List<ApplicationTileRecord> getApplications() {
-
         return applications;
     }
 }

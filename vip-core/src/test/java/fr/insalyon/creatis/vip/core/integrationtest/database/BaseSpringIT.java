@@ -81,7 +81,6 @@ public abstract class BaseSpringIT {
     protected User admin;
     protected Group group1;
     protected Group group2;
-    protected List<String> applicationClasses = new ArrayList<>();
 
     protected User nonExistentUser = new User("test firstName suffix0",
             "test lastName suffix0", "unexisting_user@test.fr", "institution",

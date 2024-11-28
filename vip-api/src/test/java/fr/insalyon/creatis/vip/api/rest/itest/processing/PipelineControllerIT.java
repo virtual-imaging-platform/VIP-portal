@@ -35,14 +35,10 @@ import fr.insalyon.creatis.grida.client.GRIDAClientException;
 import fr.insalyon.creatis.vip.api.exception.ApiException.ApiError;
 import fr.insalyon.creatis.vip.api.rest.config.BaseWebSpringIT;
 import fr.insalyon.creatis.vip.application.client.bean.AppVersion;
-import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.http.MediaType;
-
-import java.io.File;
-import java.io.IOException;
 
 import static fr.insalyon.creatis.vip.api.data.PipelineTestUtils.*;
 import static fr.insalyon.creatis.vip.api.data.UserTestUtils.*;
@@ -189,12 +185,9 @@ public class PipelineControllerIT extends BaseWebSpringIT {
         createGroup("group2");
         createGroup("group3");
 
-        createClass("class1", "group1");
-        createClass("class2", "group2");
-        createClass("class3", "group3");
-        createAnApplication("app1", "class1");
-        createAnApplication("app2", "class2");
-        createAnApplication("app3", "class3");
+        createAnApplication("app1");
+        createAnApplication("app2");
+        createAnApplication("app3");
 
         AppVersion app11 = createAVersion("app1", "v1", true, null, null);
         createAVersion("app1", "v2", false, null, null);
@@ -202,13 +195,9 @@ public class PipelineControllerIT extends BaseWebSpringIT {
         AppVersion app2 = createAVersion("app2", "v1.1", true, null, null);
         createAVersion("app3", "v4", false, null, null);
 
-        createClass("classA", "group1", "group2");
-        createClass("classB", "group2", "group3");
-        createClass("classC", "group3");
-
-        createAnApplication("appAB", "classA", "classB");
-        createAnApplication("appBC", "classB", "classC");
-        createAnApplication("appC", "classC");
+        createAnApplication("appAB");
+        createAnApplication("appBC");
+        createAnApplication("appC");
 
         AppVersion appAB = createAVersion("appAB", "v1", true, null, null);
         AppVersion appBC = createAVersion("appBC", "v1", true, null, null);

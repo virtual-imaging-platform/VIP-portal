@@ -33,7 +33,6 @@ package fr.insalyon.creatis.vip.application.client.view;
 
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
 import fr.insalyon.creatis.vip.application.client.view.system.applications.ManageApplicationsTab;
-import fr.insalyon.creatis.vip.application.client.view.system.classes.ManageClassesTab;
 import fr.insalyon.creatis.vip.application.client.view.system.engines.ManageEnginesTab;
 import fr.insalyon.creatis.vip.application.client.view.system.resources.ManageResourcesTab;
 import fr.insalyon.creatis.vip.application.client.view.system.tags.ManageTagsTab;
@@ -54,7 +53,6 @@ public class ApplicationSystemParser extends ApplicationParser {
             addApplication(ApplicationConstants.APP_APPLICATION, ApplicationConstants.APP_IMG_APPLICATION);
         }
         if (CoreModule.user.isSystemAdministrator()) {
-            addApplication(ApplicationConstants.APP_CLASSES, ApplicationConstants.APP_IMG_CLASSES);
             addApplication(ApplicationConstants.APP_ENGINE, ApplicationConstants.APP_IMG_ENGINE);
             addApplication(ApplicationConstants.APP_RESOURCE, ApplicationConstants.APP_IMG_RESOURCE);
             addApplication(ApplicationConstants.APP_TAG, ApplicationConstants.APP_IMG_TAG);
@@ -68,11 +66,6 @@ public class ApplicationSystemParser extends ApplicationParser {
                 Layout.getInstance().addTab(
                     ApplicationConstants.TAB_MANAGE_APPLICATION,
                     () -> new ManageApplicationsTab(false));
-                return true;
-
-            case ApplicationConstants.APP_CLASSES:
-                Layout.getInstance().addTab(
-                    ApplicationConstants.TAB_MANAGE_CLASSES, ManageClassesTab::new);
                 return true;
 
             case ApplicationConstants.APP_ENGINE:

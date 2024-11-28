@@ -31,13 +31,9 @@
  */
 package fr.insalyon.creatis.vip.gatelab.client.view;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.smartgwt.client.widgets.tab.Tab;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
-import fr.insalyon.creatis.vip.application.client.rpc.ApplicationService;
 import fr.insalyon.creatis.vip.core.client.view.application.ApplicationsTileGrid;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
-import fr.insalyon.creatis.vip.gatelab.client.GateLabConstants;
 import fr.insalyon.creatis.vip.gatelab.client.view.launch.GateLabLaunchTab;
 import java.util.ArrayList;
 import java.util.List;
@@ -54,28 +50,28 @@ public class GateLabTileGrid extends ApplicationsTileGrid {
 
         super(tileName);
         applicationNames = new ArrayList<String>();
-        loadApplications(tileName);
+        // loadApplications(tileName);
     }
 
-    private void loadApplications(String applicationClass) {
+    // private void loadApplications(String applicationClass) {
 
-        final AsyncCallback<List<String[]>> callback = new AsyncCallback<List<String[]>>() {
-            @Override
-            public void onFailure(Throwable caught) {
-                Layout.getInstance().setWarningMessage("Unable to load gatelab:<br />" + caught.getMessage());
-            }
+    //     final AsyncCallback<List<String[]>> callback = new AsyncCallback<List<String[]>>() {
+    //         @Override
+    //         public void onFailure(Throwable caught) {
+    //             Layout.getInstance().setWarningMessage("Unable to load gatelab:<br />" + caught.getMessage());
+    //         }
 
-            @Override
-            public void onSuccess(List<String[]> result) {
+    //         @Override
+    //         public void onSuccess(List<String[]> result) {
 
-                for (String[] app : result) {
-                    addApplication(app[0], app[1], GateLabConstants.APP_IMG_APPLICATION);
-                    applicationNames.add(app[0] + " " + app[1]);
-                }
-            }
-        };
-        ApplicationService.Util.getInstance().getApplications(applicationClass, callback);
-    }
+    //             for (String[] app : result) {
+    //                 addApplication(app[0], app[1], GateLabConstants.APP_IMG_APPLICATION);
+    //                 applicationNames.add(app[0] + " " + app[1]);
+    //             }
+    //         }
+    //     };
+    //     ApplicationService.Util.getInstance().getApplications(applicationClass, callback);
+    // }
 
     @Override
     public void parse(

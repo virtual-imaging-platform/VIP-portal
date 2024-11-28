@@ -234,8 +234,7 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
 
             String simulationID = workflowBusiness.launch(
                 user, groups,
-                parametersMap, applicationName, applicationVersion,
-                applicationClass, simulationName);
+                parametersMap, applicationName, applicationVersion, simulationName);
 
             trace(logger, "Simulation '" + simulationName + "' launched with ID '" + simulationID + "'.");
 

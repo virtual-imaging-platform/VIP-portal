@@ -32,7 +32,6 @@
 package fr.insalyon.creatis.vip.application.client.view.system.applications;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.smartgwt.client.types.MultipleAppearance;
 import com.smartgwt.client.types.Overflow;
 import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.util.SC;
@@ -43,7 +42,6 @@ import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
-import fr.insalyon.creatis.vip.application.client.bean.AppClass;
 import fr.insalyon.creatis.vip.application.client.bean.Application;
 import fr.insalyon.creatis.vip.application.client.rpc.ApplicationService;
 import fr.insalyon.creatis.vip.core.client.CoreModule;
@@ -54,8 +52,6 @@ import fr.insalyon.creatis.vip.core.client.view.common.AbstractFormLayout;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
 import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 
@@ -67,7 +63,6 @@ public class EditApplicationLayout extends AbstractFormLayout {
 
     private boolean newApplication = true;
     private TextItem nameField;
-    private SelectItem classesPickList;
     private RichTextEditor richTextEditor;
     private IButton saveButton;
     private IButton removeButton;
@@ -79,18 +74,11 @@ public class EditApplicationLayout extends AbstractFormLayout {
         addTitle("Add/Edit Application", ApplicationConstants.ICON_APPLICATION);
 
         configure();
-        loadClasses();
     }
 
     private void configure() {
 
         nameField = FieldUtil.getTextItem(450, null);
-
-        classesPickList = new SelectItem();
-        classesPickList.setShowTitle(false);
-        classesPickList.setMultiple(true);
-        classesPickList.setMultipleAppearance(MultipleAppearance.PICKLIST);
-        classesPickList.setWidth(450);
 
         usersPickList = new SelectItem();
         usersPickList.setShowTitle(false);
@@ -108,14 +96,14 @@ public class EditApplicationLayout extends AbstractFormLayout {
                 new ClickHandler() {
             @Override
             public void onClick(ClickEvent event) {
-                if (nameField.validate() & classesPickList.validate()) {
+                if (nameField.validate()) {
 
                     if (newApplication) {
                         save(new Application(nameField.getValueAsString().trim(),
-                               Arrays.asList(classesPickList.getValues()), richTextEditor.getValue()));
+                                richTextEditor.getValue()));
                     } else {
                         save(new Application(nameField.getValueAsString().trim(),
-                                Arrays.asList(classesPickList.getValues()), usersPickList.getValueAsString(), richTextEditor.getValue()));
+                                usersPickList.getValueAsString(), richTextEditor.getValue()));
 
                     }
                 }
@@ -141,7 +129,6 @@ public class EditApplicationLayout extends AbstractFormLayout {
         addField("Name", nameField);
         this.addMember(WidgetUtil.getLabel("<b>Owner</b>", 15));
         this.addMember(FieldUtil.getForm(usersPickList));
-        addField("Classes", classesPickList);
         this.addMember(WidgetUtil.getLabel("<b>Citation</b>", 15));
         this.addMember(richTextEditor);
         if (CoreModule.user.isDeveloper()){
@@ -151,14 +138,13 @@ public class EditApplicationLayout extends AbstractFormLayout {
         }
     }
 
-    public void setApplication(String name, String owner, String classes, String citation) {
+    public void setApplication(String name, String owner, String citation) {
 
         if (name != null) {
             usersPickList.setCanEdit(true);
             loadUsers(owner);
             this.nameField.setValue(name);
             this.nameField.setDisabled(true);
-            this.classesPickList.setValues(classes.split(", "));
             this.richTextEditor.setValue(citation);
             this.newApplication = false;
             this.removeButton.setDisabled(false);
@@ -168,7 +154,6 @@ public class EditApplicationLayout extends AbstractFormLayout {
             usersPickList.setValue("");
             this.nameField.setValue("");
             this.nameField.setDisabled(false);
-            this.classesPickList.setValues(new String[]{});
             this.richTextEditor.setValue("");
             this.newApplication = true;
             this.removeButton.setDisabled(true);
@@ -206,35 +191,12 @@ public class EditApplicationLayout extends AbstractFormLayout {
             public void onSuccess(Void result) {
                 WidgetUtil.resetIButton(saveButton, "Save", CoreConstants.ICON_SAVED);
                 WidgetUtil.resetIButton(removeButton, "Remove", CoreConstants.ICON_DELETE);
-                setApplication(null, null, null, null);
+                setApplication(null, null, null);
                 ManageApplicationsTab tab = (ManageApplicationsTab) Layout.getInstance().
                         getTab(ApplicationConstants.TAB_MANAGE_APPLICATION);
                 tab.loadApplications();
             }
         };
-    }
-
-    /**
-     * Loads classes list
-     */
-    private void loadClasses() {
-
-        final AsyncCallback<List<AppClass>> callback = new AsyncCallback<List<AppClass>>() {
-            @Override
-            public void onFailure(Throwable caught) {
-                Layout.getInstance().setWarningMessage("Unable to get list of classes:<br />" + caught.getMessage());
-            }
-
-            @Override
-            public void onSuccess(List<AppClass> result) {
-                List<String> dataList = new ArrayList<String>();
-                for (AppClass c : result) {
-                    dataList.add(c.getName());
-                }
-                classesPickList.setValueMap(dataList.toArray(new String[]{}));
-            }
-        };
-        ApplicationService.Util.getInstance().getClasses(callback);
     }
 
     private void loadUsers(final String currentOwner) {

@@ -32,9 +32,6 @@
 package fr.insalyon.creatis.vip.application.client.bean;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
-import org.opensaml.xml.encryption.Public;
-
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -47,43 +44,33 @@ public class Application implements IsSerializable {
     private String citation;
     private String owner;
     private String fullName;
-    private List<String> applicationClasses;
     private List<String> applicationGroups;
 
     public Application() {
     }
 
     public Application(String name, String citation) {
-        this(name, new ArrayList<>(), null, null, citation);
+        this(name, null, null, citation);
     }
 
-    public Application(String name, List<String> applicationClasses, String citation) {
-        this(name, applicationClasses, null, null, citation);
+    public Application(String name, String owner, String fullName, String citation) {
+        this(name, owner, fullName, citation, null);
     }
 
-    public Application(String name, List<String> applicationClasses, String owner, String fullName, String citation) {
-        this(name, applicationClasses, owner, fullName, citation, null);
+    public Application(String name, String owner, String citation) {
+        this(name, owner, null, citation, null);
     }
 
-    public Application(String name, List<String> applicationClasses, String owner, String citation) {
-        this(name, applicationClasses, owner, null, citation, null);
-    }
-
-    public Application(String name, List<String> applicationClasses, String owner, String fullName, String citation, List<String> applicationGroups) {
+    public Application(String name, String owner, String fullName, String citation, List<String> applicationGroups) {
         this.name = name;
         this.citation = citation;
         this.owner = owner;
         this.fullName = fullName;
-        this.applicationClasses = applicationClasses;
         this.applicationGroups = applicationGroups;
     }
 
     public String getName() {
         return name;
-    }
-
-    public List<String> getApplicationClasses() {
-        return applicationClasses;
     }
 
     public String getCitation() {

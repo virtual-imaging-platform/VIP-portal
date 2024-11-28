@@ -102,7 +102,7 @@ public class ApplicationsLayout extends VLayout {
                 public void onClick(ClickEvent event) {
                     ManageApplicationsTab appsTab = (ManageApplicationsTab) Layout.getInstance().
                             getTab(ApplicationConstants.TAB_MANAGE_APPLICATION);
-                    appsTab.setApplication(null, null, null, null);
+                    appsTab.setApplication(null, null, null);
                 }
             });
             toolstrip.addMember(addButton);
@@ -140,7 +140,6 @@ public class ApplicationsLayout extends VLayout {
                         public void onClick(ClickEvent event) {
                             edit(rollOverRecord.getAttribute("name"),
                                     rollOverRecord.getAttribute("owner"),
-                                    rollOverRecord.getAttribute("classes"),
                                     rollOverRecord.getAttribute("citation"));
                         }
                     });
@@ -189,25 +188,21 @@ public class ApplicationsLayout extends VLayout {
         grid.setEmptyMessage("<br>No data available.");
         if (onlyPublicApps){
             grid.setFields(new ListGridField("name", "Application Name"),
-                    new ListGridField("classes", "Classes"),
                     new ListGridField("groups", "Groups"));
         } else {
             ListGridField ownerField = new ListGridField("owner", "Owner");
             ownerField.setHidden(true);
             grid.setFields(new ListGridField("name", "Application Name"),
                     new ListGridField("ownerFullName", "Owner"),
-                    ownerField,
-                    new ListGridField("classes", "Classes"));
+                    ownerField);
         }
         grid.setSortField("name");
         grid.setSortDirection(SortDirection.ASCENDING);
         grid.addCellClickHandler(new CellClickHandler() {
             @Override
             public void onCellClick(CellClickEvent event) {
-
                 edit(event.getRecord().getAttribute("name"),
                         event.getRecord().getAttribute("owner"),
-                        event.getRecord().getAttribute("classes"),
                         event.getRecord().getAttribute("citation"));
             }
         });
@@ -228,16 +223,9 @@ public class ApplicationsLayout extends VLayout {
                 List<ApplicationRecord> dataList = new ArrayList<ApplicationRecord>();
 
                 for (Application app : result) {
-                    StringBuilder sb = new StringBuilder();
                     StringBuilder sbg = new StringBuilder();
-                    for (String className : app.getApplicationClasses()) {
-                        if (sb.length() > 0) {
-                            sb.append(", ");
-                        }
-                        sb.append(className);
-                    }
 
-                    if(onlyPublicApps) {
+                    if (onlyPublicApps) {
                         for (String group : app.getApplicationGroups()) {
                             if (sbg.length() > 0) {
                                 sbg.append(", ");
@@ -245,10 +233,10 @@ public class ApplicationsLayout extends VLayout {
                             sbg.append(group);
                         }
                     }
-                    if(onlyPublicApps) {
-                        dataList.add(new ApplicationRecord(app.getName(), app.getOwner(), app.getFullName(), sb.toString(), app.getCitation(), sbg.toString()));
+                    if (onlyPublicApps) {
+                        dataList.add(new ApplicationRecord(app.getName(), app.getOwner(), app.getFullName(), app.getCitation(), sbg.toString()));
                     } else {
-                        dataList.add(new ApplicationRecord(app.getName(), app.getOwner(), app.getFullName(), sb.toString(), app.getCitation()));
+                        dataList.add(new ApplicationRecord(app.getName(), app.getOwner(), app.getFullName(), app.getCitation()));
                     }
                 }
                 grid.setData(dataList.toArray(new ApplicationRecord[]{}));
@@ -282,12 +270,12 @@ public class ApplicationsLayout extends VLayout {
         ApplicationService.Util.getInstance().remove(name, callback);
     }
 
-    private void edit(String name, String owner, String classes, String citation) {
+    private void edit(String name, String owner, String citation) {
 
         ManageApplicationsTab appsTab = (ManageApplicationsTab) Layout.getInstance().
                 getTab(ApplicationConstants.TAB_MANAGE_APPLICATION);
 
         appsTab.loadVersions(name);
-        appsTab.setApplication(name, owner, classes, citation);
+        appsTab.setApplication(name, owner, citation);
     }
 }

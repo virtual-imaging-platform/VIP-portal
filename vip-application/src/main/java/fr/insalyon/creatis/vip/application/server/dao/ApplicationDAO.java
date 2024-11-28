@@ -48,8 +48,6 @@ public interface ApplicationDAO {
 
     public void remove(String name) throws DAOException;
 
-    public void remove(String email, String name) throws DAOException;
-
     public void addVersion(AppVersion version) throws DAOException;
 
     public void updateVersion(AppVersion version) throws DAOException;
@@ -63,12 +61,6 @@ public interface ApplicationDAO {
     public List<Application> getApplicationsWithOwner(String owner) throws DAOException;
 
     public Application getApplication(String applicationName) throws DAOException;
-
-    public List<String[]> getApplicationsFromClass(String className) throws DAOException;
-
-    public List<Application> getApplicationsFromClasses(List<String> classes) throws DAOException;
-
-    public List<String> getApplicationsName(String applicationClass) throws DAOException;
 
     public String getCitation(String name) throws DAOException;
 

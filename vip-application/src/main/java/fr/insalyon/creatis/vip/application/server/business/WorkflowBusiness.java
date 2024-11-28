@@ -185,8 +185,7 @@ public class WorkflowBusiness {
 
     public synchronized String launch(
             User user, List<String> groups, Map<String, String> parametersMap,
-            String applicationName, String applicationVersion,
-            String applicationClass, String simulationName)
+            String applicationName, String applicationVersion, String simulationName)
             throws BusinessException {
 
         try {
@@ -249,13 +248,14 @@ public class WorkflowBusiness {
             String workflowPath = dataManagerBusiness.getRemoteFile(user, server.useMoteurlite() ? version.getJsonLfn() : version.getLfn());
             
             //selectRandomEngine could also be used; TODO: make this choice configurable
-            Engine engine = selectEngine(applicationClass);
+            // Engine engine = selectEngine(applicationClass);
+            Engine engine = engineBusiness.get().get(0); // changer
             WorkflowExecutionBusiness executionBusiness =
                     getWorkflowExecutionBusiness(engine.getEndpoint());
             Workflow workflow = null;
             try {
                 workflow = executionBusiness.launch(applicationName,
-                        applicationVersion, applicationClass, user, simulationName,
+                        applicationVersion, user, simulationName,
                         workflowPath, parameters);
             } catch (BusinessException be) {
                 logger.error("BusinessException caught on launch workflow, engine {} will be disabled", engine.getName());
@@ -592,7 +592,6 @@ public class WorkflowBusiness {
                 case 1: return simulationStatsDAO.getBySimulationID(workflowIDList);
                 case 2: return simulationStatsDAO.getWorkflowsPerUser(workflowIDList);
                 case 3: return simulationStatsDAO.getApplications(workflowIDList);
-                case 4: return simulationStatsDAO.getClasses(workflowIDList);
                 default:
                     logger.error("Unsupported type to get performance stats : {}", type);
                     throw new BusinessException("Error getting performance stats");

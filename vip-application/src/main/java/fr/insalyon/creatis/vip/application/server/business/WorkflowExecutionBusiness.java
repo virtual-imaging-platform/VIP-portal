@@ -107,8 +107,7 @@ public class WorkflowExecutionBusiness {
 
     }
 
-    public Workflow launch(String applicationName, String applicationVersion,
-            String applicationClass, User user, String simulationName,
+    public Workflow launch(String applicationName, String applicationVersion, User user, String simulationName,
             String workflowPath, List<ParameterSweep> parameters) throws BusinessException {
 
         try {
@@ -119,7 +118,7 @@ public class WorkflowExecutionBusiness {
 
             return new Workflow(workflowID, user.getFullName(),
                     WorkflowStatus.Running,
-                    new Date(), null, simulationName, applicationName, applicationVersion, applicationClass,
+                    new Date(), null, simulationName, applicationName, applicationVersion, "",
                     engine.getAddressWS(), null);
 
         } catch (javax.xml.rpc.ServiceException | java.rmi.RemoteException ex) {

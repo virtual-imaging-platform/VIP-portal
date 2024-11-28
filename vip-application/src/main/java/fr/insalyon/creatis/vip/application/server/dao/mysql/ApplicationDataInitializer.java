@@ -35,7 +35,6 @@ public class ApplicationDataInitializer extends JdbcDaoSupport {
         logger.info("Configuring VIP Application database.");
 
         createEngineTable();
-        createClassesTables();
         createApplicationsTables();
         createResourcesTables();
         createTagsTables();
@@ -91,30 +90,6 @@ public class ApplicationDataInitializer extends JdbcDaoSupport {
         );
     }
 
-    private void createClassesTables() {
-        tableInitializer.createTable("VIPClasses",
-                "name VARCHAR(255), "
-                        + "PRIMARY KEY (name)");
-
-        tableInitializer.createTable("VIPClassesEngines",
-                "class VARCHAR(255), "
-                        + "engine VARCHAR(255), "
-                        + "PRIMARY KEY (class, engine), "
-                        + "FOREIGN KEY (class) REFERENCES VIPClasses(name) "
-                        + "ON DELETE CASCADE ON UPDATE CASCADE, "
-                        + "FOREIGN KEY (engine) REFERENCES VIPEngines(name) "
-                        + "ON DELETE CASCADE ON UPDATE CASCADE");
-
-        tableInitializer.createTable("VIPGroupsClasses",
-                "classname VARCHAR(255), "
-                        + "groupname VARCHAR(50), "
-                        + "PRIMARY KEY (classname, groupname), "
-                        + "FOREIGN KEY (classname) REFERENCES VIPClasses(name) "
-                        + "ON DELETE CASCADE ON UPDATE RESTRICT, "
-                        + "FOREIGN KEY (groupname) REFERENCES VIPGroups(name) "
-                        + "ON DELETE CASCADE ON UPDATE RESTRICT");
-    }
-
     private void createApplicationsTables() {
         tableInitializer.createTable("VIPApplications",
                 "name VARCHAR(255), "
@@ -135,15 +110,6 @@ public class ApplicationDataInitializer extends JdbcDaoSupport {
                         + "PRIMARY KEY (application, version), "
                         + "FOREIGN KEY (application) REFERENCES VIPApplications(name) "
                         + "ON DELETE CASCADE ON UPDATE CASCADE");
-
-        tableInitializer.createTable("VIPApplicationClasses",
-                "class VARCHAR(255), "
-                        + "application VARCHAR(255), "
-                        + "PRIMARY KEY (class, application), "
-                        + "FOREIGN KEY (class) REFERENCES VIPClasses(name) "
-                        + "ON DELETE CASCADE ON UPDATE RESTRICT, "
-                        + "FOREIGN KEY (application) REFERENCES VIPApplications(name) "
-                        + "ON DELETE CASCADE ON UPDATE RESTRICT");
 
         tableInitializer.createTable("VIPAppExamples",
                 "application VARCHAR(255), "

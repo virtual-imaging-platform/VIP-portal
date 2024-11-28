@@ -214,7 +214,7 @@ public class ApplicationImporterBusiness {
         if (app == null) {
             // If application doesn't exist, create it.
             // New applications are not associated with any class (admins may add classes independently).
-            applicationBusiness.add(new Application(vipApplicationName, new ArrayList<String>(), owner, ""));
+            applicationBusiness.add(new Application(vipApplicationName, owner, ""));
         }
         // If version exists, update it
         List<AppVersion> versions =

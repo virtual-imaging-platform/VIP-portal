@@ -3,7 +3,6 @@ package fr.insalyon.creatis.vip.api.rest.itest;
 import fr.insalyon.creatis.vip.api.data.UserTestUtils;
 import fr.insalyon.creatis.vip.api.exception.ApiException;
 import fr.insalyon.creatis.vip.api.rest.config.BaseWebSpringIT;
-import fr.insalyon.creatis.vip.application.client.bean.AppClass;
 import fr.insalyon.creatis.vip.application.client.bean.Application;
 import fr.insalyon.creatis.vip.core.client.bean.Group;
 import fr.insalyon.creatis.vip.core.client.bean.GroupType;
@@ -15,9 +14,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
-
-import java.util.Collections;
-import java.util.List;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -52,10 +48,9 @@ class RegisterUserControllerIT extends BaseWebSpringIT {
 
     @Test
     public void registerEndpointWithAppOk() throws Exception {
-        String appName = "testApp", groupName = "testGroup", className = "testClass";
+        String appName = "testApp", groupName = "testGroup";
         getConfigurationBusiness().addGroup(new Group(groupName, true, GroupType.getDefault()));
-        getClassBusiness().addClass(new AppClass(className, Collections.emptyList(), List.of(groupName)));
-        getApplicationBusiness().add(new Application(appName, List.of(className), "test citation"));
+        getApplicationBusiness().add(new Application(appName, "test citation"));
         UserTestUtils.restUser1.getApplications().add("testApp");
         mockMvc.perform(
                         post("/rest/register").

@@ -260,24 +260,4 @@ public class SimulationStatsData implements SimulationStatsDAO {
         }
         //System.out.println("getApplications, first result is " + result.get(0).toString());
     }
-
-    @Override
-    public List<String> getClasses(List<String> workflowsId) throws WorkflowsDBDAOException {
-        try {
-            Session session = sessionFactory.openSession();
-            session.beginTransaction();
-            Criteria criteria = session.createCriteria(Workflow.class);
-            criteria.add(Restrictions.in("id", workflowsId));
-            criteria.setProjection(Projections.distinct(Projections.property("applicationClass")));
-            @SuppressWarnings("unchecked")
-            List<String> result = (List<String>) criteria.list();
-            session.getTransaction().commit();
-            session.close();
-            return result;
-        } catch (HibernateException ex) {
-            logger.error("Error getting classes for {}", workflowsId, ex);
-            throw new WorkflowsDBDAOException(ex);
-        }
-
-    }
 }

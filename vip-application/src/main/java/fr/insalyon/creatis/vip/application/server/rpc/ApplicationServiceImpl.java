@@ -47,6 +47,7 @@ import org.slf4j.LoggerFactory;
 
 import jakarta.servlet.ServletException;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -59,7 +60,6 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    private ClassBusiness classBusiness;
     private ApplicationBusiness applicationBusiness;
     private EngineBusiness engineBusiness;
     private BoutiquesBusiness boutiquesBusiness;
@@ -73,7 +73,6 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
     public void init() throws ServletException {
         super.init();
         setBeans(
-                getBean(ClassBusiness.class),
                 getBean(ApplicationBusiness.class),
                 getBean(EngineBusiness.class),
                 getBean(BoutiquesBusiness.class),
@@ -86,11 +85,10 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
     }
 
     public void setBeans(
-            ClassBusiness classBusiness, ApplicationBusiness applicationBusiness, EngineBusiness engineBusiness,
+            ApplicationBusiness applicationBusiness, EngineBusiness engineBusiness,
             BoutiquesBusiness boutiquesBusiness, ConfigurationBusiness configurationBusiness,
             WorkflowBusiness workflowBusiness, SimulationBusiness simulationBusiness, 
             ResourceBusiness resourceBusiness, TagBusiness tagBusiness) {
-        this.classBusiness = classBusiness;
         this.applicationBusiness = applicationBusiness;
         this.engineBusiness = engineBusiness;
         this.boutiquesBusiness = boutiquesBusiness;
@@ -99,12 +97,6 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
         this.simulationBusiness = simulationBusiness;
         this.resourceBusiness = resourceBusiness;
         this.tagBusiness = tagBusiness;
-    }
-
-    @Override
-    public void signout() throws ApplicationException {
-
-        getSession().removeAttribute(ApplicationConstants.SESSION_CLASSES);
     }
 
     @Override
@@ -147,10 +139,6 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
                 trace(logger, "Removing application '" + name + "'.");
                 applicationBusiness.remove(name);
 
-            } else {
-                trace(logger, "Removing classes from application '" + name + "'.");
-                applicationBusiness.remove(
-                    getSessionUser().getEmail(), name);
             }
         } catch (BusinessException | CoreException ex) {
             throw new ApplicationException(ex);
@@ -240,80 +228,14 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
                 return applicationBusiness.getApplications();
             } else if (isDeveloper()) {
                 return applicationBusiness.getApplicationsWithOwner(getSessionUser().getEmail());
-            }  else if (isGroupAdministrator()) {
-                List<String> classes = classBusiness.getUserClassesName(
-                    getSessionUser().getEmail(), true);
-                return applicationBusiness.getApplications(classes);
             }
-            List<AppClass> classes = classBusiness.getUserClasses(
-                    getSessionUser().getEmail(), false);
-            List<String> classNames = classes.stream().map(AppClass::getName).collect(Collectors.toList());
-            return applicationBusiness.getApplications(classNames);
-        } catch (BusinessException | CoreException ex) {
-            throw new ApplicationException(ex);
-        }
-    }
-
-    @Override
-    public List<String[]> getApplications(String className) throws ApplicationException {
-        try {
-            return applicationBusiness.getApplications(className);
-        } catch (BusinessException ex) {
-            throw new ApplicationException(ex);
-        }
-    }
-
-    @Override
-    public List<String[]> getApplicationsByClass(String applicationClass) throws ApplicationException {
-        try {
-            return applicationBusiness.getApplications(
-                applicationClass);
-        } catch (BusinessException ex) {
-            throw new ApplicationException(ex);
-        }
-    }
-
-    @Override
-    public void addClass(AppClass c) throws ApplicationException {
-        try {
-            authenticateSystemAdministrator(logger);
-            trace(logger, "Adding class '" + c.getName() + "'.");
-            classBusiness.addClass(c);
-        } catch (BusinessException | CoreException ex) {
-            throw new ApplicationException(ex);
-        }
-    }
-
-    @Override
-    public void updateClass(AppClass c) throws ApplicationException {
-        try {
-            authenticateSystemAdministrator(logger);
-            trace(logger, "Updating class '" + c.getName() + "'.");
-            classBusiness.updateClass(c);
-        } catch (BusinessException | CoreException ex) {
-            throw new ApplicationException(ex);
-        }
-    }
-
-    @Override
-    public void removeClass(String name) throws ApplicationException {
-        try {
-            authenticateSystemAdministrator(logger);
-            trace(logger, "Removing class '" + name + "'.");
-            classBusiness.removeClass(name);
-        } catch (BusinessException | CoreException ex) {
-            throw new ApplicationException(ex);
-        }
-    }
-
-    @Override
-    public List<AppClass> getClasses() throws ApplicationException {
-        try {
-            if (isSystemAdministrator()) {
-                return classBusiness.getClasses();
-            }
-            return classBusiness.getUserClasses(
-                getSessionUser().getEmail(), false);
+            // }  else if (isGroupAdministrator()) {
+            //     List<String> classes = classBusiness.getUserClassesName(
+            //         getSessionUser().getEmail(), true);
+            //     return applicationBusiness.getApplications(classes);
+            // }
+            // return applicationBusiness.getApplications(classNames);
+            return applicationBusiness.getApplications();
         } catch (BusinessException | CoreException ex) {
             throw new ApplicationException(ex);
         }
@@ -321,26 +243,23 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
 
     @SuppressWarnings("unchecked")
     @Override
-    public List<String>[] getApplicationsAndUsers(List<String> reservedClasses) throws ApplicationException {
+    public List<String>[] getApplicationsAndUsers() throws ApplicationException {
         try {
             User user = getSessionUser();
             if (isSystemAdministrator()) {
-                List<String> classes = classBusiness.getClassesName();
                 return new List[]{
                     configurationBusiness.getUserNames(
                         user.getEmail(), false),
                     applicationBusiness.getApplicationNames(),
-                    classes
                 };
             } else {
-                List<String> classes = classBusiness.getUserClassesName(
-                    user.getEmail(), !user.isSystemAdministrator());
-                classes.removeAll(reservedClasses);
+                // List<String> classes = classBusiness.getUserClassesName(
+                    // user.getEmail(), !user.isSystemAdministrator());
+                // classes.removeAll(reservedClasses);
                 return new List[] {
                     configurationBusiness.getUserNames(
                         user.getEmail(), true),
-                    applicationBusiness.getApplicationNames(classes),
-                    classes
+                    applicationBusiness.getApplicationNames()
                 };
             }
         } catch (BusinessException | CoreException ex) {
@@ -434,12 +353,6 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
         } catch (BusinessException | CoreException ex) {
             throw new ApplicationException(ex);
         }
-    }
-
-    @Override
-    public HashMap<String, Integer> getReservedClasses()
-        throws ApplicationException {
-        return server.getReservedClasses();
     }
 
     @Override

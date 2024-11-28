@@ -39,14 +39,13 @@ import com.smartgwt.client.widgets.grid.ListGridRecord;
  */
 public class ApplicationRecord extends ListGridRecord {
 
-    public ApplicationRecord(String name, String owner, String ownerFullName, String classes, String citation, String groups) {
-        this(name, owner,ownerFullName, classes, citation);
+    public ApplicationRecord(String name, String owner, String ownerFullName, String citation, String groups) {
+        this(name, owner,ownerFullName, citation);
         setAttribute("groups", groups);
     }
 
-    public ApplicationRecord(String name, String owner, String ownerFullName, String classes, String citation) {
+    public ApplicationRecord(String name, String owner, String ownerFullName, String citation) {
         setAttribute("name", name);
-        setAttribute("classes", classes);
         setAttribute("owner", owner);
         setAttribute("ownerFullName", ownerFullName);
         setAttribute("citation", citation);

@@ -197,8 +197,7 @@ public class VipLocalConfigurationIT {
                 user,
                 Collections.emptyList(),
                 inputs,
-                applicationName, applicationVersion,
-                className, simulationName);
+                applicationName, applicationVersion, simulationName);
     }
 
     private void assertExecutionFinishWithStatus(

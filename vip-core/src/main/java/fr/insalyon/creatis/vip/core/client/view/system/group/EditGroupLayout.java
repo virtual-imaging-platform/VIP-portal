@@ -95,7 +95,7 @@ public class EditGroupLayout extends AbstractFormLayout {
         nameItem = FieldUtil.getTextItem(350, null);
 
         isPublicField = new CheckboxItem();
-        isPublicField.setTitle("Public");
+        typeFieldList.setShowTitle(false);
         isPublicField.setWidth(350);
 
         typeFieldList = new SelectItem();
@@ -178,8 +178,8 @@ public class EditGroupLayout extends AbstractFormLayout {
         gridModal = new ModalWindow(grid);
 
         addField("Name", nameItem);
-        this.addMember(FieldUtil.getForm(isPublicField));
-        this.addMember(FieldUtil.getForm(typeFieldList));
+        addField("Public", isPublicField);
+        addField("Group Type", typeFieldList);
         this.addMember(WidgetUtil.getLabel("<b>Users</b>", 15));
         this.addMember(grid);
         addButtons(saveButton, removeButton);

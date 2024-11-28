@@ -43,7 +43,6 @@ import fr.insalyon.creatis.vip.application.client.bean.Descriptor;
 import fr.insalyon.creatis.vip.application.client.bean.Source;
 import fr.insalyon.creatis.vip.application.server.business.ApplicationBusiness;
 import fr.insalyon.creatis.vip.application.server.business.BoutiquesBusiness;
-import fr.insalyon.creatis.vip.application.server.business.ClassBusiness;
 import fr.insalyon.creatis.vip.application.server.business.WorkflowBusiness;
 import fr.insalyon.creatis.vip.application.server.model.boutiques.BoutiquesDescriptor;
 import fr.insalyon.creatis.vip.application.server.model.boutiques.Input;
@@ -83,7 +82,6 @@ public class PipelineBusiness {
     private final Supplier<User> currentUserProvider;
     private final WorkflowBusiness workflowBusiness;
     private final ApplicationBusiness applicationBusiness;
-    private final ClassBusiness classBusiness;
     private final BoutiquesBusiness boutiquesBusiness;
     private final DataManagerBusiness dataManagerBusiness;
 
@@ -91,13 +89,12 @@ public class PipelineBusiness {
     public PipelineBusiness(
             Supplier<User> currentUserProvider, Environment env,
             Server server, WorkflowBusiness workflowBusiness, ApplicationBusiness applicationBusiness,
-            ClassBusiness classBusiness, BoutiquesBusiness boutiquesBusiness, DataManagerBusiness dataManagerBusiness) {
+            BoutiquesBusiness boutiquesBusiness, DataManagerBusiness dataManagerBusiness) {
         this.currentUserProvider = currentUserProvider;
         this.env = env;
         this.server = server;
         this.workflowBusiness = workflowBusiness;
         this.applicationBusiness = applicationBusiness;
-        this.classBusiness = classBusiness;
         this.boutiquesBusiness = boutiquesBusiness;
         this.dataManagerBusiness = dataManagerBusiness;
     }
@@ -186,32 +183,32 @@ public class PipelineBusiness {
      * List all the pipeline the user can access
      */
     public List<Pipeline> listPipelines(String studyIdentifier) throws ApiException {
-
-        try {
+        // changer
+        // try {
             if (studyIdentifier != null) {
                 logger.warn("Study identifier ({}) was ignored.", studyIdentifier);
             }
             ArrayList<Pipeline> pipelines = new ArrayList<>();
 
-            List<String> classNames = classBusiness.getUserClassesName(currentUserProvider.get().getEmail(), false);
+            // List<String> classNames = classBusiness.getUserClassesName(currentUserProvider.get().getEmail(), false);
 
-            List<Application> applications = applicationBusiness.getApplications(classNames);
-            for (Application a : applications) {
-                List<AppVersion> versions = applicationBusiness.getVersions(a.getName());
-                for (AppVersion av : versions) {
-                    if (isApplicationVersionUsableInApi(av)) {
-                        pipelines.add(
-                                new Pipeline(getPipelineIdentifier(
-                                        a.getName(), av.getVersion()),
-                                        a.getName(), av.getVersion())
-                        );
-                    }
-                }
-            }
+            // List<Application> applications = applicationBusiness.getApplications(classNames);
+            // for (Application a : applications) {
+            //     List<AppVersion> versions = applicationBusiness.getVersions(a.getName());
+            //     for (AppVersion av : versions) {
+            //         if (isApplicationVersionUsableInApi(av)) {
+            //             pipelines.add(
+            //                     new Pipeline(getPipelineIdentifier(
+            //                             a.getName(), av.getVersion()),
+            //                             a.getName(), av.getVersion())
+            //             );
+            //         }
+            //     }
+            // }
             return pipelines;
-        } catch (BusinessException ex) {
-            throw new ApiException(ex);
-        }
+        // } catch (BusinessException ex) {
+        //     throw new ApiException(ex);
+        // }
     }
 
     // Specific stuff that return in 'Application' class format and not 'Pipeline'
@@ -313,20 +310,22 @@ public class PipelineBusiness {
         }
 
         // check the user can use it through its classes
-        try {
-            List<String> userClassNames = classBusiness.getUserClassesName(currentUserProvider.get().getEmail(), false);
-            List<String> applicationClassNames = applicationBusiness.getApplication(appName).getApplicationClasses();
+        // try {
+            // changer
+            return ;
+            // List<String> userClassNames = classBusiness.getUserClassesName(currentUserProvider.get().getEmail(), false);
+            // List<String> applicationClassNames = applicationBusiness.getApplication(appName).getApplicationClasses();
 
-            for (String applicationClassName : applicationClassNames) {
-                if (userClassNames.contains(applicationClassName)) {
-                    return;
-                }
-            }
-            logger.error("User {} not allowed to access application {}", currentUserProvider.get(), appName);
-            throw new ApiException(NOT_ALLOWED_TO_USE_PIPELINE, getPipelineIdentifier(appName, version));
-        } catch (BusinessException e) {
-            throw new ApiException(e);
-        }
+            // for (String applicationClassName : applicationClassNames) {
+            //     if (userClassNames.contains(applicationClassName)) {
+            //         return;
+            //     }
+            // }
+            // logger.error("User {} not allowed to access application {}", currentUserProvider.get(), appName);
+            // throw new ApiException(NOT_ALLOWED_TO_USE_PIPELINE, getPipelineIdentifier(appName, version));
+        // } catch (BusinessException e) {
+            // throw new ApiException(e);
+        // }
     }
 
     private boolean isApplicationVersionUsableInApi(AppVersion appVersion) {

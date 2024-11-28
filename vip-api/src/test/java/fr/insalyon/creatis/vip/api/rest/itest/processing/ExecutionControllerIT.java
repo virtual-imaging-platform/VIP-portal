@@ -33,40 +33,25 @@ package fr.insalyon.creatis.vip.api.rest.itest.processing;
 
 import fr.insalyon.creatis.grida.common.bean.GridData;
 import fr.insalyon.creatis.moteur.plugins.workflowsdb.bean.*;
-import fr.insalyon.creatis.moteur.plugins.workflowsdb.dao.InputDAO;
-import fr.insalyon.creatis.moteur.plugins.workflowsdb.dao.OutputDAO;
-import fr.insalyon.creatis.moteur.plugins.workflowsdb.dao.WorkflowDAO;
 import fr.insalyon.creatis.moteur.plugins.workflowsdb.dao.WorkflowsDBDAOException;
 import fr.insalyon.creatis.vip.api.exception.ApiException;
 import fr.insalyon.creatis.vip.api.model.Execution;
 import fr.insalyon.creatis.vip.api.model.ExecutionStatus;
 import fr.insalyon.creatis.vip.api.rest.config.BaseWebSpringIT;
 import fr.insalyon.creatis.vip.api.rest.config.RestTestUtils;
-import fr.insalyon.creatis.vip.application.client.bean.AppClass;
-import fr.insalyon.creatis.vip.application.client.bean.AppVersion;
-import fr.insalyon.creatis.vip.application.client.bean.Application;
-import fr.insalyon.creatis.vip.application.client.bean.Engine;
 import fr.insalyon.creatis.vip.application.client.view.monitor.SimulationStatus;
 import fr.insalyon.creatis.vip.application.server.business.simulation.ParameterSweep;
-import fr.insalyon.creatis.vip.application.server.business.simulation.WebServiceEngine;
-import fr.insalyon.creatis.vip.core.client.bean.Group;
 import fr.insalyon.creatis.vip.core.integrationtest.ServerMockConfig;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
-import org.hibernate.jdbc.Work;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
-import org.mockito.ArgumentMatchers;
-import org.mockito.MockedConstruction;
 import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 
 import java.io.File;
-import java.lang.reflect.Parameter;
 import java.util.*;
 
 import static fr.insalyon.creatis.vip.api.data.ExecutionTestUtils.*;
@@ -372,7 +357,6 @@ public class ExecutionControllerIT extends BaseWebSpringIT {
         Date startDate = new Date();
 
         configureGwendiaTestApp(appName,groupName, className, versionName);
-        addEngineToClass(className, engineName, engineEndpoint);
 
         createUserInGroup(baseUser1.getEmail(), groupName);
 
@@ -451,7 +435,6 @@ public class ExecutionControllerIT extends BaseWebSpringIT {
         Date startDate = new Date();
 
         configureBoutiquesTestApp(appName,groupName, className, versionName);
-        addEngineToClass(className, engineName, engineEndpoint);
 
         createUserInGroup(baseUser1.getEmail(), groupName);
 

@@ -31,9 +31,7 @@
  */
 package fr.insalyon.creatis.vip.gatelab.server.business;
 
-import fr.insalyon.creatis.vip.application.client.bean.AppClass;
 import fr.insalyon.creatis.vip.application.server.business.ApplicationBusiness;
-import fr.insalyon.creatis.vip.application.server.dao.ClassDAO;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
@@ -66,18 +64,14 @@ public class GateLabBusiness {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    private ClassDAO classDAO;
     private ApplicationBusiness applicationBusiness;
     private UserDAO userDAO;
-    private UsersGroupsDAO usersGroupsDAO;
     private EmailBusiness emailBusiness;
 
     @Autowired
-    public GateLabBusiness(ClassDAO classDAO, ApplicationBusiness applicationBusiness, UserDAO userDAO, UsersGroupsDAO usersGroupsDAO, EmailBusiness emailBusiness) {
-        this.classDAO = classDAO;
+    public GateLabBusiness(ApplicationBusiness applicationBusiness, UserDAO userDAO, EmailBusiness emailBusiness) {
         this.applicationBusiness = applicationBusiness;
         this.userDAO = userDAO;
-        this.usersGroupsDAO = usersGroupsDAO;
         this.emailBusiness = emailBusiness;
     }
     /*
@@ -102,18 +96,18 @@ public class GateLabBusiness {
         return null;
     }
 
-    public List<String[]> getApplications()
-        throws BusinessException {
-        try {
-            classDAO.add(new AppClass(
-                    GateLabConstants.GATELAB_CLASS, new ArrayList<String>()));
-        } catch (DAOException ex) {
-            if (!ex.getMessage().contains("A class named \"" + GateLabConstants.GATELAB_CLASS + "\" already exists")) {
-                throw new BusinessException(ex);
-            }
-        }
-        return applicationBusiness.getApplications(
-            GateLabConstants.GATELAB_CLASS);
+    public List<String[]> getApplications() throws BusinessException {
+        // try {
+        //     classDAO.add(new AppClass(
+        //             GateLabConstants.GATELAB_CLASS, new ArrayList<String>()));
+        // } catch (DAOException ex) {
+        //     if (!ex.getMessage().contains("A class named \"" + GateLabConstants.GATELAB_CLASS + "\" already exists")) {
+        //         throw new BusinessException(ex);
+        //     }
+        // }
+        // return applicationBusiness.getApplications(
+        //     GateLabConstants.GATELAB_CLASS);
+        return new ArrayList<>();
     }
 
     public Map<String, String> getGatelabWorkflowInputs(

@@ -60,41 +60,41 @@ public class GateLabModule extends Module {
 
     @Override
     public void load() {
-
-        if (CoreModule.user.isSystemAdministrator()
-                || CoreModule.user.hasGroupAccess(GateLabConstants.GROUP_GATELAB)) {
-            for(String GateLabClass:ApplicationModule.reservedClasses.keySet()){
-                if(ApplicationModule.reservedClasses.get(GateLabClass)==0){
-                    CoreModule.addApplicationsTileGrid(new GateLabTileGrid(GateLabClass));
-                }
-            }
-        }
-        if (CoreModule.user.isSystemAdministrator()
-                || CoreModule.user.hasGroupAccess(GateLabConstants.GROUP_GATELABTEST)) {
-            for(String GateLabClass:ApplicationModule.reservedClasses.keySet()){
-                if(ApplicationModule.reservedClasses.get(GateLabClass)==1){
-                    if (GateLabClass.length() == 0)
-                        GateLabClass = "GateLabEmptyName";
-                    CoreModule.addApplicationsTileGrid(new GateLabTileGrid(GateLabClass));
-                }
-            }
-        }
-        TimelineParser.getInstance().addParser(new GateLabTimelineParser());
-        MonitorParser.getInstance().addParser(new GateLabMonitorParser());
-        RelaunchService.getInstance().addApplicationRelauncher(new RelaunchService.ApplicationRelauncher() {
-            @Override
-            public boolean relaunchIfSupported(
-                    String applicationName, String applicationVersion, String applicationClass,
-                    String simulationName, Map<String, String> inputs, String tabId) {
-                if (applicationName.toLowerCase().contains(GateLabConstants.GROUP_GATELAB.toLowerCase())) {
-                    Layout.getInstance().addTab(
-                            tabId,
-                            () -> new GateLabLaunchTab(applicationName, applicationVersion, applicationClass, simulationName, inputs));
-                    return true;
-                }
-                return false;
-            }
-        });
+        // changer
+        // if (CoreModule.user.isSystemAdministrator()
+        //         || CoreModule.user.hasGroupAccess(GateLabConstants.GROUP_GATELAB)) {
+        //     for(String GateLabClass:ApplicationModule.reservedClasses.keySet()){
+        //         if(ApplicationModule.reservedClasses.get(GateLabClass)==0){
+        //             CoreModule.addApplicationsTileGrid(new GateLabTileGrid(GateLabClass));
+        //         }
+        //     }
+        // }
+        // if (CoreModule.user.isSystemAdministrator()
+        //         || CoreModule.user.hasGroupAccess(GateLabConstants.GROUP_GATELABTEST)) {
+        //     for(String GateLabClass:ApplicationModule.reservedClasses.keySet()){
+        //         if(ApplicationModule.reservedClasses.get(GateLabClass)==1){
+        //             if (GateLabClass.length() == 0)
+        //                 GateLabClass = "GateLabEmptyName";
+        //             CoreModule.addApplicationsTileGrid(new GateLabTileGrid(GateLabClass));
+        //         }
+        //     }
+        // }
+        // TimelineParser.getInstance().addParser(new GateLabTimelineParser());
+        // MonitorParser.getInstance().addParser(new GateLabMonitorParser());
+        // RelaunchService.getInstance().addApplicationRelauncher(new RelaunchService.ApplicationRelauncher() {
+        //     @Override
+        //     public boolean relaunchIfSupported(
+        //             String applicationName, String applicationVersion, String applicationClass,
+        //             String simulationName, Map<String, String> inputs, String tabId) {
+        //         if (applicationName.toLowerCase().contains(GateLabConstants.GROUP_GATELAB.toLowerCase())) {
+        //             Layout.getInstance().addTab(
+        //                     tabId,
+        //                     () -> new GateLabLaunchTab(applicationName, applicationVersion, applicationClass, simulationName, inputs));
+        //             return true;
+        //         }
+        //         return false;
+        //     }
+        // });
     }
 
     @Override

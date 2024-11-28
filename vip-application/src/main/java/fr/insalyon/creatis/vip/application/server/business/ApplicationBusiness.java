@@ -31,13 +31,11 @@
  */
 package fr.insalyon.creatis.vip.application.server.business;
 
-import fr.insalyon.creatis.vip.application.client.bean.AppClass;
 import fr.insalyon.creatis.vip.application.client.bean.AppVersion;
 import fr.insalyon.creatis.vip.application.client.bean.Application;
 import fr.insalyon.creatis.vip.application.client.bean.Resource;
 import fr.insalyon.creatis.vip.application.client.bean.Tag;
 import fr.insalyon.creatis.vip.application.server.dao.ApplicationDAO;
-import fr.insalyon.creatis.vip.application.server.dao.ClassDAO;
 import fr.insalyon.creatis.vip.application.server.dao.ResourceDAO;
 import fr.insalyon.creatis.vip.application.server.dao.TagDAO;
 import fr.insalyon.creatis.vip.core.client.bean.Group;
@@ -64,7 +62,6 @@ public class ApplicationBusiness {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private ApplicationDAO applicationDAO;
-    private ClassDAO classDAO;
     private GroupDAO groupDAO;
 
     @Autowired
@@ -73,9 +70,8 @@ public class ApplicationBusiness {
     private ResourceBusiness resourceBusiness;
 
     @Autowired
-    public ApplicationBusiness(ApplicationDAO applicationDAO, ClassDAO classDAO, GroupDAO groupDAO, TagDAO tagDAO, ResourceDAO resourceDAO) {
+    public ApplicationBusiness(ApplicationDAO applicationDAO, GroupDAO groupDAO, TagDAO tagDAO, ResourceDAO resourceDAO) {
         this.applicationDAO = applicationDAO;
-        this.classDAO = classDAO;
         this.groupDAO = groupDAO;
     }
 
@@ -98,10 +94,7 @@ public class ApplicationBusiness {
     }
 
     public List<Application> getPublicApplicationsWithGroups() throws BusinessException {
-
         try {
-            Map<String, AppClass> allClasses = classDAO.getClasses().stream().collect(Collectors.toMap(
-                    AppClass::getName, appClass -> appClass));
             Map<String, Group> allGroups = groupDAO.getGroups().stream().collect(Collectors.toMap(
                     Group::getName, group -> group));
             Set<String> allVisibleApplicationNames = applicationDAO.getAllVisibleVersions().stream()
@@ -111,33 +104,32 @@ public class ApplicationBusiness {
                     .collect(Collectors.toList());
 
             List<Application> applicationsWithGroups = new ArrayList<>();
-            for (Application application : allApplications) {
-                Set<String> currentAppPublicGroups = application.getApplicationClasses().stream()
-                        .map(className -> allClasses.get(className).getGroups())
-                        .flatMap(List::stream) // transform the stream of (List<String>) groupNames in a stream of (String) groupName
-                        .map(groupName -> allGroups.get(groupName))
-                        .filter(group -> group.isPublicGroup())
-                        .map(group -> group.getName())
-                        .collect(Collectors.toSet());
+            // for (Application application : allApplications) {
+            //     Set<String> currentAppPublicGroups = application.getApplicationClasses().stream()
+            //             .map(className -> allClasses.get(className).getGroups())
+            //             .flatMap(List::stream) // transform the stream of (List<String>) groupNames in a stream of (String) groupName
+            //             .map(groupName -> allGroups.get(groupName))
+            //             .filter(group -> group.isPublicGroup())
+            //             .map(group -> group.getName())
+            //             .collect(Collectors.toSet());
 
-                List<String> publicClasses = application.getApplicationClasses().stream()
-                        .filter(className -> allClasses.get(className).getGroups().stream()
-                                .map(groupName -> allGroups.get(groupName))
-                                .anyMatch(Group::isPublicGroup))
-                        .collect(Collectors.toList());
+            //     List<String> publicClasses = application.getApplicationClasses().stream()
+            //             .filter(className -> allClasses.get(className).getGroups().stream()
+            //                     .map(groupName -> allGroups.get(groupName))
+            //                     .anyMatch(Group::isPublicGroup))
+            //             .collect(Collectors.toList());
 
-                if (currentAppPublicGroups.isEmpty() || publicClasses.isEmpty()){
-                    continue;
-                }
+            //     if (currentAppPublicGroups.isEmpty() || publicClasses.isEmpty()){
+            //         continue;
+            //     }
 
-                applicationsWithGroups.add(new Application(
-                        application.getName(),
-                        publicClasses,
-                        application.getOwner(),
-                        application.getFullName(),
-                        application.getCitation(),
-                        new ArrayList<>(currentAppPublicGroups)));
-            }
+            //     applicationsWithGroups.add(new Application(
+            //             application.getName(),
+            //             application.getOwner(),
+            //             application.getFullName(),
+            //             application.getCitation(),
+            //             new ArrayList<>(currentAppPublicGroups)));
+            // }
             return applicationsWithGroups;
         } catch (DAOException ex) {
             throw new BusinessException(ex);
@@ -155,25 +147,15 @@ public class ApplicationBusiness {
             Map<String,Group> allGroups = groupDAO.getGroups().stream().collect(
                     Collectors.toMap(Group::getName, group -> group));
             List<Group> appGroups = new ArrayList<>();
-            for (String className : application.getApplicationClasses()) {
-                // need to fetch the classes to get their groups
-                for (String groupName : classDAO.getClass(className).getGroups()) {
-                    appGroups.add(allGroups.get(groupName));
-                }
-            }
+            // for (String className : application.getApplicationClasses()) {
+            //     // need to fetch the classes to get their groups
+            //     for (String groupName : classDAO.getClass(className).getGroups()) {
+            //         appGroups.add(allGroups.get(groupName));
+            //     }
+            // }
             return appGroups.stream().filter(g -> g.isPublicGroup()).collect(Collectors.toList());
         } catch (DAOException e) {
             throw new BusinessException(e);
-        }
-    }
-
-    public List<String[]> getApplications(String className)
-            throws BusinessException {
-
-        try {
-            return applicationDAO.getApplicationsFromClass(className);
-        } catch (DAOException ex) {
-            throw new BusinessException(ex);
         }
     }
 
@@ -186,30 +168,10 @@ public class ApplicationBusiness {
         }
     }
 
-    public List<Application> getApplications(List<String> classes)
-            throws BusinessException {
-        try {
-            return applicationDAO.getApplicationsFromClasses(classes);
-        } catch (DAOException ex) {
-            throw new BusinessException(ex);
-        }
-    }
-
     public List<String> getApplicationNames() throws BusinessException {
 
         List<String> applicationNames = new ArrayList<String>();
         for (Application application : getApplications()) {
-            applicationNames.add(application.getName());
-        }
-
-        return applicationNames;
-    }
-
-    public List<String> getApplicationNames(List<String> classes)
-            throws BusinessException {
-
-        List<String> applicationNames = new ArrayList<String>();
-        for (Application application : getApplications(classes)) {
             applicationNames.add(application.getName());
         }
 
@@ -235,14 +197,6 @@ public class ApplicationBusiness {
     public void remove(String name) throws BusinessException {
         try {
             applicationDAO.remove(name);
-        } catch (DAOException ex) {
-            throw new BusinessException(ex);
-        }
-    }
-
-    public void remove(String email, String name) throws BusinessException {
-        try {
-            applicationDAO.remove(email, name);
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }
