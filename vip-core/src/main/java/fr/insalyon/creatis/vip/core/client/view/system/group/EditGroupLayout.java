@@ -95,7 +95,7 @@ public class EditGroupLayout extends AbstractFormLayout {
         nameItem = FieldUtil.getTextItem(350, null);
 
         isPublicField = new CheckboxItem();
-        typeFieldList.setShowTitle(false);
+        isPublicField.setShowTitle(false);
         isPublicField.setWidth(350);
 
         typeFieldList = new SelectItem();
@@ -185,11 +185,6 @@ public class EditGroupLayout extends AbstractFormLayout {
         addButtons(saveButton, removeButton);
     }
 
-    /**
-     * Sets a group to edit or creates a blank form.
-     *
-     * @param name Group name
-     */
     public void setGroup(String name, boolean isPublic, String type) {
 
         if (name != null) {

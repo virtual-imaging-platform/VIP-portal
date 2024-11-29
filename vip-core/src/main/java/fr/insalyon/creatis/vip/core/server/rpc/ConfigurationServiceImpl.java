@@ -31,7 +31,6 @@
  */
 package fr.insalyon.creatis.vip.core.server.rpc;
 
-import fr.insalyon.creatis.grida.client.GRIDAClient;
 import fr.insalyon.creatis.vip.core.client.bean.*;
 import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationService;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
@@ -41,6 +40,7 @@ import fr.insalyon.creatis.vip.core.client.view.user.UserLevel;
 import fr.insalyon.creatis.vip.core.client.view.util.CountryCode;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
+import fr.insalyon.creatis.vip.core.server.business.GroupBusiness;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import fr.insalyon.creatis.vip.core.server.dao.UserDAO;
 
@@ -65,15 +65,15 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private ConfigurationBusiness configurationBusiness;
+    private GroupBusiness groupBusiness;
     private UserDAO userDAO;
-    private GRIDAClient gridaClient;
 
     @Override
     public void init() throws ServletException {
         super.init();
         configurationBusiness = getBean(ConfigurationBusiness.class);
         userDAO = getBean(UserDAO.class);
-        gridaClient = getBean(GRIDAClient.class);
+        groupBusiness = getBean(GroupBusiness.class);
     }
     
     @Override
@@ -198,7 +198,7 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
         try {
             authenticateSystemAdministrator(logger);
             trace(logger, "Adding group '" + group + "'.");
-            configurationBusiness.addGroup(group);
+            groupBusiness.add(group);
         } catch (BusinessException ex) {
             throw new CoreException(ex);
         }
@@ -209,7 +209,7 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
         try {
             authenticateSystemAdministrator(logger);
             trace(logger, "Updating group '" + name + "' to '" + group.getName() + "'.");
-            configurationBusiness.updateGroup(name, group);
+            groupBusiness.update(name, group);
         } catch (BusinessException ex) {
             throw new CoreException(ex);
         }
@@ -220,8 +220,7 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
         try {
             authenticateSystemAdministrator(logger);
             trace(logger, "Removing group '" + groupName + "'.");
-            configurationBusiness.removeGroup(
-                    getSessionUser().getEmail(), groupName);
+            groupBusiness.remove(getSessionUser().getEmail(), groupName);
         } catch (BusinessException ex) {
             throw new CoreException(ex);
         }
@@ -231,7 +230,7 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
     public List<Group> getGroups() throws CoreException {
         try {
             authenticateSystemAdministrator(logger);
-            return configurationBusiness.getGroups();
+            return groupBusiness.get();
         } catch (BusinessException ex) {
             throw new CoreException(ex);
         }
@@ -240,7 +239,7 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
     @Override
     public List<Group> getPublicGroups() throws CoreException {
         try {
-            return configurationBusiness.getPublicGroups();
+            return groupBusiness.getPublic();
         } catch (BusinessException ex) {
             throw new CoreException(ex);
         }
@@ -318,7 +317,7 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
         try {
             List<String> list = new ArrayList<>();
             if (getSessionUser().isSystemAdministrator()) {
-                for (Group group : configurationBusiness.getGroups()) {
+                for (Group group : groupBusiness.get()) {
                     list.add(group.getName());
                 }
             } else {

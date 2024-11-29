@@ -147,9 +147,6 @@ public class GroupsLayout extends VLayout {
         });
     }
 
-    /**
-     * Loads list of groups into grid.
-     */
     public void loadData() {
 
         ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();
@@ -173,11 +170,6 @@ public class GroupsLayout extends VLayout {
         service.getGroups(callback);
     }
 
-    /**
-     * Removes a group.
-     *
-     * @param name Group name
-     */
     private void remove(final String name) {
 
         SC.ask("Do you really want to remove \"" + name + "\" group?", new BooleanCallback() {
@@ -205,12 +197,6 @@ public class GroupsLayout extends VLayout {
         });
     }
 
-    /**
-     * Edits a group.
-     *
-     * @param name Group name
-     * @param isPublic Whether the group if public or not
-     */
     private void edit(String name, boolean isPublic, String type) {
 
         ((ManageGroupsTab) Layout.getInstance().getTab(

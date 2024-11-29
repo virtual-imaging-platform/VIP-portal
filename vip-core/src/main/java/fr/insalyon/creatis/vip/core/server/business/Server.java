@@ -1,6 +1,5 @@
 package fr.insalyon.creatis.vip.core.server.business;
 
-import java.util.HashMap;
 import java.util.List;
 
 /*

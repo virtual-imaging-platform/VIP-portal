@@ -206,7 +206,7 @@ public class ResourceData extends JdbcDaoSupport implements ResourceDAO {
     }
 
     @Override
-    public void putInGroup(Resource resource, Group group) throws DAOException {
+    public void associate(Resource resource, Group group) throws DAOException {
         String query = "INSERT INTO VIPGroupsResources (resourcename, groupname) "
         +              "VALUES (?,?)";
         
@@ -226,7 +226,7 @@ public class ResourceData extends JdbcDaoSupport implements ResourceDAO {
     }
 
     @Override
-    public void removeFromGroup(Resource resource, Group group) throws DAOException {
+    public void dissociate(Resource resource, Group group) throws DAOException {
         String query = "DELETE FROM VIPGroupsResources WHERE resourcename = ? AND groupname = ?";
 
         try (PreparedStatement ps = getConnection().prepareStatement(query)) {

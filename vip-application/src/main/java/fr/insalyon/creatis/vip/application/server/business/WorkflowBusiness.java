@@ -47,7 +47,6 @@ import fr.insalyon.creatis.vip.application.server.dao.ApplicationDAO;
 import fr.insalyon.creatis.vip.application.server.dao.EngineDAO;
 import fr.insalyon.creatis.vip.application.server.dao.SimulationStatsDAO;
 import fr.insalyon.creatis.vip.core.client.bean.User;
-import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.business.EmailBusiness;
 import fr.insalyon.creatis.vip.core.server.business.Server;
@@ -249,7 +248,8 @@ public class WorkflowBusiness {
             
             //selectRandomEngine could also be used; TODO: make this choice configurable
             // Engine engine = selectEngine(applicationClass);
-            Engine engine = engineBusiness.get().get(0); // changer
+            Engine engine = new Engine("bla", "blou", "bli");
+            // changer
             WorkflowExecutionBusiness executionBusiness =
                     getWorkflowExecutionBusiness(engine.getEndpoint());
             Workflow workflow = null;

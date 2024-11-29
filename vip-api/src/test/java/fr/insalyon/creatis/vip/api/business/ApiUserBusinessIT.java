@@ -13,7 +13,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
 import org.springframework.test.context.web.WebAppConfiguration;
 
 import java.sql.Timestamp;
@@ -24,14 +23,10 @@ import static fr.insalyon.creatis.vip.core.client.view.user.UserLevel.Beginner;
 
 @WebAppConfiguration
 public class ApiUserBusinessIT extends BaseSpringIT {
-    @Autowired
-    ApiUserBusiness apiUserBusiness;
-    @Autowired
-    private ConfigurationBusiness configurationBusiness;
-    @Autowired
-    private ApplicationBusiness applicationBusiness;
-    @Autowired
-    private Environment env;
+
+    @Autowired ApiUserBusiness apiUserBusiness;
+    @Autowired private ConfigurationBusiness configurationBusiness;
+
     private Group group1;
     private User user1;
 
@@ -41,7 +36,7 @@ public class ApiUserBusinessIT extends BaseSpringIT {
 
         // Create test group
         group1 = new Group("group1", true, GroupType.getDefault());
-        configurationBusiness.addGroup(group1);
+        groupBusiness.add(group1);
 
         // Create test users
         user1 = new User("firstName", "lastName", "email1@test.fr", "test1@test.fr", "institution", "password", false, "code", "folder", "session", new Date(), new Date(), Beginner, CountryCode.fr, 1, new Timestamp(System.currentTimeMillis()), new Timestamp(System.currentTimeMillis()), 0, false);

@@ -137,17 +137,17 @@ public class ResourceBusiness {
         }
     }
 
-    public void putInGroup(Resource resource, Group group) throws BusinessException {
+    public void associate(Resource resource, Group group) throws BusinessException {
         try {
-            resourceDAO.putInGroup(resource, group);
+            resourceDAO.associate(resource, group);
         } catch (DAOException e) {
             throw new BusinessException(e);
         }
     }
 
-    public void removeFromGroup(Resource resource, Group group) throws BusinessException {
+    public void dissociate(Resource resource, Group group) throws BusinessException {
         try {
-            resourceDAO.removeFromGroup(resource, group);
+            resourceDAO.dissociate(resource, group);
         } catch (DAOException e) {
             throw new BusinessException(e);
         }
@@ -160,12 +160,6 @@ public class ResourceBusiness {
             }
         } catch (DAOException e) {
             throw new BusinessException(e);
-        }
-    }
-
-    public void associate(List<Resource> resources, AppVersion appVersion) throws BusinessException {
-        for (Resource resource : resources) {
-            associate(resource, appVersion);
         }
     }
 

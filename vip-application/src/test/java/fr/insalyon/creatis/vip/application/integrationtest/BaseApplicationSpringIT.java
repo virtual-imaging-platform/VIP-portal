@@ -61,7 +61,7 @@ public class BaseApplicationSpringIT extends BaseSpringIT {
         return appVersion;
     }
 
-    protected AppVersion configureAnApplication(String appName, String versionName, String groupName, String className) throws BusinessException {
+    protected AppVersion configureAnApplication(String appName, String versionName, String groupName) throws BusinessException {
         createGroup(groupName);
         createAnApplication(appName);
         return createAVersion(appName, versionName, true, null, null);

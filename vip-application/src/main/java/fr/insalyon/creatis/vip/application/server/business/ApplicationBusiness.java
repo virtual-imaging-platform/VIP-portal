@@ -63,16 +63,16 @@ public class ApplicationBusiness {
 
     private ApplicationDAO applicationDAO;
     private GroupDAO groupDAO;
-
-    @Autowired
     private TagBusiness tagBusiness;
-    @Autowired
     private ResourceBusiness resourceBusiness;
 
     @Autowired
-    public ApplicationBusiness(ApplicationDAO applicationDAO, GroupDAO groupDAO, TagDAO tagDAO, ResourceDAO resourceDAO) {
+    public ApplicationBusiness(ApplicationDAO applicationDAO, GroupDAO groupDAO, TagDAO tagDAO, ResourceDAO resourceDAO,
+            TagBusiness tagBusiness, ResourceBusiness resourceBusiness) {
         this.applicationDAO = applicationDAO;
         this.groupDAO = groupDAO;
+        this.tagBusiness = tagBusiness;
+        this.resourceBusiness = resourceBusiness;
     }
 
     public List<Application> getApplications() throws BusinessException {
@@ -104,6 +104,7 @@ public class ApplicationBusiness {
                     .collect(Collectors.toList());
 
             List<Application> applicationsWithGroups = new ArrayList<>();
+            // changer
             // for (Application application : allApplications) {
             //     Set<String> currentAppPublicGroups = application.getApplicationClasses().stream()
             //             .map(className -> allClasses.get(className).getGroups())
@@ -174,12 +175,14 @@ public class ApplicationBusiness {
         for (Application application : getApplications()) {
             applicationNames.add(application.getName());
         }
-
         return applicationNames;
     }
 
     public void add(Application application) throws BusinessException {
         try {
+            for (String groupName : application.getApplicationGroups()) {
+                associate(application, new Group(groupName));
+            }
             applicationDAO.add(application);
         } catch (DAOException ex) {
             throw new BusinessException(ex);
@@ -188,7 +191,18 @@ public class ApplicationBusiness {
 
     public void update(Application application) throws BusinessException {
         try {
+            Application before = getApplication(application.getName());
+            List<String> beforeGroupsNames = before.getApplicationGroups();
+
             applicationDAO.update(application);
+            for (String group : application.getApplicationGroups()) {
+                if ( ! beforeGroupsNames.removeIf((s) -> s.equals(group))) {
+                    associate(application, new Group(group));
+                }
+            }
+            for (String group : beforeGroupsNames) {
+                dissociate(application, new Group(group));
+            }
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }
@@ -202,21 +216,32 @@ public class ApplicationBusiness {
         }
     }
 
+    public void associate(Application app, Group group) throws BusinessException {
+        try {
+            applicationDAO.associate(app, group);
+        } catch (DAOException e) {
+            throw new BusinessException(e);
+        }
+    }
+
+    public void dissociate(Application app, Group group) throws BusinessException {
+        try {
+            applicationDAO.dissociate(app, group);
+        } catch (DAOException e) {
+            throw new BusinessException(e);
+        }
+    }
+
     public void addVersion(AppVersion version) throws BusinessException {
         try {
-            List<Tag> tags = new ArrayList<>();
-            List<Resource> resources = new ArrayList<>();
+            applicationDAO.addVersion(version);
 
             for (String tagName : version.getTags()) {
-                tags.add(tagBusiness.getByName(tagName));
+                tagBusiness.associate(new Tag(tagName), version);
             }
             for (String resourceName: version.getResources()) {
-                resources.add(resourceBusiness.getByName(resourceName));
+                resourceBusiness.associate(new Resource(resourceName), version);
             }
-
-            applicationDAO.addVersion(version);
-            tagBusiness.associate(tags, version);
-            resourceBusiness.associate(resources, version);
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }
@@ -231,19 +256,19 @@ public class ApplicationBusiness {
             applicationDAO.updateVersion(version);
             for (String resource : version.getResources()) {
                 if ( ! beforeResourceNames.removeIf((s) -> s.equals(resource))) {
-                    resourceBusiness.associate(resourceBusiness.getByName(resource), version);
+                    resourceBusiness.associate(new Resource(resource), version);
                 }
             }
             for (String tag : version.getTags()) {
                 if ( ! beforeTagsNames.removeIf((s) -> s.equals(tag))) {
-                    tagBusiness.associate(tagBusiness.getByName(tag), version);
+                    tagBusiness.associate(new Tag(tag), version);
                 }
             }
-            for (String e : beforeResourceNames) {
-                resourceBusiness.dissociate(resourceBusiness.getByName(e), version);
+            for (String resource : beforeResourceNames) {
+                resourceBusiness.dissociate(new Resource(resource), version);
             }
-            for (String e : beforeTagsNames) {
-                tagBusiness.dissociate(tagBusiness.getByName(e), version);
+            for (String tag : beforeTagsNames) {
+                tagBusiness.dissociate(new Tag(tag), version);
             }
 
         } catch (DAOException ex) {

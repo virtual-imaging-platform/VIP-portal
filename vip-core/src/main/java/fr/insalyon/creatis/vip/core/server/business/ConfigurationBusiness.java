@@ -74,27 +74,26 @@ public class ConfigurationBusiness {
     private EmailBusiness emailBusiness;
     private GRIDAPoolClient gridaPoolClient;
     private GRIDAClient gridaClient;
-
-    private GroupDAO groupDAO;
     private TermsUseDAO termsUseDAO;
     private UserDAO userDAO;
     private UsersGroupsDAO usersGroupsDAO;
+    private GroupBusiness groupBusiness;
 
     @Autowired
     public ConfigurationBusiness(
             Server server, ProxyClient proxyClient, EmailBusiness emailBusiness,
             GRIDAClient gridaClient, GRIDAPoolClient gridaPoolClient,
-            GroupDAO groupDAO, TermsUseDAO termsUseDAO,
+            TermsUseDAO termsUseDAO, GroupBusiness groupBusiness,
             UserDAO userDAO, UsersGroupsDAO usersGroupsDAO) {
         this.server = server;
         this.proxyClient = proxyClient;
         this.emailBusiness = emailBusiness;
         this.gridaClient = gridaClient;
         this.gridaPoolClient = gridaPoolClient;
-        this.groupDAO = groupDAO;
         this.termsUseDAO = termsUseDAO;
         this.userDAO = userDAO;
         this.usersGroupsDAO = usersGroupsDAO;
+        this.groupBusiness = groupBusiness;
     }
 
     private static java.sql.Timestamp getCurrentTimeStamp() {
@@ -662,81 +661,6 @@ public class ConfigurationBusiness {
         }
     }
 
-    public void addGroup(Group group) throws BusinessException {
-        try {
-            gridaClient.createFolder(server.getDataManagerGroupsHome(),
-                    group.getName().replaceAll(" ", "_"));
-
-            groupDAO.add(group);
-        } catch (GRIDAClientException ex) {
-            logger.error("Error adding group : {}", group.getName(), ex);
-            throw new BusinessException(ex);
-        } catch (DAOException ex) {
-            throw new BusinessException(ex);
-        }
-    }
-
-    public void removeGroup(String user, String groupName)
-            throws BusinessException {
-        try {
-            gridaPoolClient.delete(server.getDataManagerGroupsHome() + "/"
-                    + groupName.replaceAll(" ", "_"), user);
-            groupDAO.remove(groupName);
-        } catch (GRIDAClientException ex) {
-            logger.error("Error removing group : {}", groupName, ex);
-            throw new BusinessException(ex);
-        } catch (DAOException ex) {
-            throw new BusinessException(ex);
-        }
-    }
-
-    public void updateGroup(String name, Group group) throws BusinessException {
-        try {
-            if (!name.equals(group.getName())) {
-                gridaClient.rename(
-                        server.getDataManagerGroupsHome() + "/" + name.replaceAll(" ", "_"),
-                        server.getDataManagerGroupsHome() + "/" + group.getName().replaceAll(" ", "_"));
-            }
-            groupDAO.update(name, group);
-        } catch (GRIDAClientException ex) {
-            logger.error("Error updating group : {}", name, ex);
-            throw new BusinessException(ex);
-        } catch (DAOException ex) {
-            throw new BusinessException(ex);
-        }
-    }
-
-    public List<Group> getGroups() throws BusinessException {
-        try {
-            return groupDAO.getGroups();
-        } catch (DAOException ex) {
-            throw new BusinessException(ex);
-        }
-    }
-
-    public Group getGroup(String groupName) throws BusinessException {
-        if (groupName == null) {
-            return null;
-        }
-        return this.getGroups().stream()
-                .filter(g -> groupName.equals(g.getName()))
-                .findAny().orElse(null);
-    }
-
-    public List<Group> getPublicGroups() throws BusinessException {
-        try {
-            List<Group> publicGroups = new ArrayList<>();
-            for (Group g : groupDAO.getGroups()) {
-                if (g.isPublicGroup()) {
-                    publicGroups.add(g);
-                }
-            }
-            return publicGroups;
-        } catch (DAOException ex) {
-            throw new BusinessException(ex);
-        }
-    }
-
     public Map<Group, CoreConstants.GROUP_ROLE> getUserGroups(String email)
             throws BusinessException {
         try {
@@ -975,14 +899,14 @@ public class ConfigurationBusiness {
             user = getNewUser(email, firstName, lastName, institution);
             try {
                 signup(user, "Generated automatically", true, true,
-                        getGroup(groupName));
+                        groupBusiness.get(groupName));
             } catch (BusinessException ex2) {
                 if (ex2.getMessage().contains("existing")) {
                     //try with a different last name
                     lastName += "_" + System.currentTimeMillis();
                     user = getNewUser(email, firstName, lastName, institution);
                     signup(user, "Generated automatically", true,
-                            true, getGroup(groupName));
+                            true, groupBusiness.get(groupName));
                 }
             }
             activateUser(user.getEmail());

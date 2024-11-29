@@ -34,11 +34,11 @@ public class UsersAndGroupsIT extends BaseSpringIT {
 
         // Create test group
         group1 = new Group("group1", true, GroupType.getDefault());
-        configurationBusiness.addGroup(group1);
+        groupBusiness.add(group1);
 
         // Create test group
         group2 = new Group("group2", false, GroupType.getDefault());
-        configurationBusiness.addGroup(group2);
+        groupBusiness.add(group2);
 
         // Create test users
         createUserInGroup(emailUser1, "suffix1", "group1");
@@ -69,7 +69,7 @@ public class UsersAndGroupsIT extends BaseSpringIT {
 
     @Test
     public void testInitialization() throws BusinessException {
-        assertEquals(2, configurationBusiness.getGroups().size(), "incorrect groups number");// group1 + group2
+        assertEquals(2, groupBusiness.get().size(), "incorrect groups number");// group1 + group2
         assertEquals(6, configurationBusiness.getUsers().size(), "incorrect users number");// Created users + admin
         assertEquals(1, user5.getMaxRunningSimulations(), "incorrect max running simulations");// Created users + admin
     }
@@ -107,18 +107,15 @@ public class UsersAndGroupsIT extends BaseSpringIT {
     @Test
     public void testCreateGroup() throws DAOException, BusinessException {
         Group group = new Group("group3", true, GroupType.APPLICATION);
-        configurationBusiness.addGroup(group);
-        assertNotNull(configurationBusiness.getGroup("group3"));
+        groupBusiness.add(group);
+        assertNotNull(groupBusiness.get("group3"));
     }
 
     @Test
     public void testCatchCreateGroupAlreadyExisting() {
         Group group = new Group("group1", true, GroupType.APPLICATION);
 
-        Exception exception = assertThrows(
-                BusinessException.class, () ->
-                        configurationBusiness.addGroup(group)
-        );
+        Exception exception = assertThrows(BusinessException.class, () -> groupBusiness.add(group));
         // INSERT + existing primary key groupName => Unique index or primary key violation
         assertTrue(StringUtils.contains(exception.getMessage(), "A group named group1 already exists"));
     }
@@ -130,14 +127,14 @@ public class UsersAndGroupsIT extends BaseSpringIT {
 
     @Test
     public void testCatchGetGroup() throws BusinessException {
-        Group group = configurationBusiness.getGroup(nameGroup1);
+        Group group = groupBusiness.get(nameGroup1);
         Assertions.assertEquals(nameGroup1, group.getName(), "Incorrect group name");
         assertTrue(group.isPublicGroup(), "Incorrect group privacy");
     }
 
     @Test
     public void testCatchGetNonExistentGroup() throws BusinessException {
-        assertNull(configurationBusiness.getGroup("group3"));
+        assertNull(groupBusiness.get("group3"));
     }
 
     /* ********************************************************************************************************************************************** */
@@ -146,8 +143,8 @@ public class UsersAndGroupsIT extends BaseSpringIT {
 
     @Test
     public void testCatchGetGroups() throws BusinessException {
-        List<Group> groups = configurationBusiness.getGroups();
-        Assertions.assertEquals(2, groups.size(), "Incorrect groups number");// group1, group2 and support
+        List<Group> groups = groupBusiness.get();
+        Assertions.assertEquals(2, groups.size(), "Incorrect groups number");// group1, group2
     }
 
 
@@ -157,12 +154,13 @@ public class UsersAndGroupsIT extends BaseSpringIT {
 
     @Test
     public void testUpdateGroup() throws BusinessException {
-        Group group = configurationBusiness.getGroup(nameGroup1);
+        Group group = groupBusiness.get(nameGroup1);
         group.setPublicGroup(false);
         group.setName("group_name_updated");
         group.setType(GroupType.RESOURCE);
-        configurationBusiness.updateGroup(nameGroup1, group);
-        Group updatedGroup = configurationBusiness.getGroup("group_name_updated");
+        groupBusiness.update(nameGroup1, group);
+
+        Group updatedGroup = groupBusiness.get("group_name_updated");
         assertEquals("group_name_updated", updatedGroup.getName(), "Incorrect group name");
         assertEquals(GroupType.RESOURCE, updatedGroup.getType(), "Incorrect group type");
         assertFalse(updatedGroup.isPublicGroup(), "Incorrect group privacy");
@@ -177,7 +175,7 @@ public class UsersAndGroupsIT extends BaseSpringIT {
         group.setType(GroupType.getDefault());
         // UPDATE + nonExistent primary key group name => no exception
         // We decided not to add an exception because if this occurs, it will not create problem, just no row will be updated
-        configurationBusiness.updateGroup("non existent group", group);
+        groupBusiness.update("non existent group", group);
     }
 
     /* ********************************************************************************************************************************************** */
@@ -188,7 +186,7 @@ public class UsersAndGroupsIT extends BaseSpringIT {
     public void testUpdateNonExistentGroup() throws BusinessException {
         // SELECT + nonExistent foreign key / part of primary key groupName => no exception
         // We decided not to add an exception because if this occurs, it will not create problem, just no row will be selected
-        assertNull(configurationBusiness.getGroup("nonExistent_group"));
+        assertNull(groupBusiness.get("nonExistent_group"));
     }
 
     /* ********************************************************************************************************************************************** */
@@ -261,16 +259,16 @@ public class UsersAndGroupsIT extends BaseSpringIT {
 
     @Test
     public void testRemoveGroup() throws BusinessException {
-        configurationBusiness.removeGroup(emailUser1, nameGroup1);
-        Assertions.assertEquals(1, configurationBusiness.getGroups().size(), "incorrect groups number");
+        groupBusiness.remove(emailUser1, nameGroup1);
+        Assertions.assertEquals(1, groupBusiness.get().size(), "incorrect groups number");
     }
 
     @Test
     public void testCatchRemoveNonExistentGroup() throws BusinessException {
         // DELETE + nonExistent foreign key / part of primary key groupName => no exception
         // We decided not to add an exception because if this occurs, it will not create problem, just no row will be deleted
-        configurationBusiness.removeGroup(emailUser1, "nonExistent group");
-        Assertions.assertEquals(2, configurationBusiness.getGroups().size(), "incorrect groups number");
+        groupBusiness.remove(emailUser1, "nonExistent group");
+        Assertions.assertEquals(2, groupBusiness.get().size(), "incorrect groups number");
     }
 
     /* ********************************************************************************************************************************************** */
@@ -419,7 +417,7 @@ public class UsersAndGroupsIT extends BaseSpringIT {
 
     @Test
     public void testGetPublicGroups() throws BusinessException {
-        List<String> groupsNames = configurationBusiness.getPublicGroups()
+        List<String> groupsNames = groupBusiness.getPublic()
                 .stream()
                 .map(Group::getName)
                 .collect(Collectors.toList());
@@ -456,8 +454,8 @@ public class UsersAndGroupsIT extends BaseSpringIT {
     public void testCatchNonExistentUserRemoveGroup() throws BusinessException {
         // DELETE + nonExistent foreign key user email => no exception
         // We decided not to add an exception because if this occurs, it will not create problem, just no row will be deleted
-        configurationBusiness.removeGroup("nonExistent user", nameGroup1);
-        Assertions.assertEquals(1, configurationBusiness.getGroups().size(), "incorrect groups number");
+        groupBusiness.remove("nonExistent user", nameGroup1);
+        Assertions.assertEquals(1, groupBusiness.get().size(), "incorrect groups number");
     }
 
     /* ********************************************************************************************************************************************** */

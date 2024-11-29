@@ -25,6 +25,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
 public class SocialIT extends BaseSpringIT {
+
     @Autowired
     private MessageBusiness messageBusiness;
 
@@ -34,7 +35,7 @@ public class SocialIT extends BaseSpringIT {
 
         // Create test group
         group1 = new Group(nameGroup1, true, GroupType.APPLICATION);
-        configurationBusiness.addGroup(group1);
+        groupBusiness.add(group1);
 
         // Create test users
         createUserInGroup(emailUser1, "suffix1", nameGroup1);

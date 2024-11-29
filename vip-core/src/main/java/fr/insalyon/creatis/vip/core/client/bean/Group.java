@@ -55,6 +55,10 @@ public class Group implements IsSerializable {
         this.type = type;
     }
 
+    public Group(String name) {
+        this.name = name;
+    }
+
     public String getName() {
         return name;
     }

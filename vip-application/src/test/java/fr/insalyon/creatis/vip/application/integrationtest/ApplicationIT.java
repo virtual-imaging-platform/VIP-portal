@@ -33,7 +33,7 @@ public class ApplicationIT extends BaseSpringIT {
 
         // group test and user test creation
         group1 = new Group("group1", true, GroupType.getDefault());
-        configurationBusiness.addGroup(group1);
+        groupBusiness.add(group1);
         List<String> groups = new ArrayList<>();
         groups.add("group1");
         createUserInGroup("test1@test.fr", "suffix1", "group1");
@@ -67,7 +67,7 @@ public class ApplicationIT extends BaseSpringIT {
         Assertions.assertEquals("Application1", application.getName(), "Incorrect name of application");
         Assertions.assertEquals("test1@test.fr", application.getOwner(), "Incorrect owner of application");
         Assertions.assertNull(application.getFullName(), "getApplication should not fill fullname");
-        Assertions.assertNull(application.getApplicationGroups(), "getApplication should not fill applicationGroups");
+        Assertions.assertTrue(application.getApplicationGroups().isEmpty(), "getApplication should not fill applicationGroups");
         Assertions.assertEquals(1, applicationBusiness.getVersions("Application1").size(), "Incorrect versions number");
 
     }

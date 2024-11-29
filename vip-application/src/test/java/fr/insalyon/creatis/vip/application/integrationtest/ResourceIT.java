@@ -109,11 +109,11 @@ public class ResourceIT extends BaseSpringIT {
     @Test
     public void getDeleteAddWithGroup() throws BusinessException {
         createGroup("resourcetest");
-        Group group = configurationBusiness.getGroup("resourcetest");
+        Group group = groupBusiness.get("resourcetest");
 
-        resourceBusiness.putInGroup(resource, group);
+        resourceBusiness.associate(resource, group);
         assertEquals(1, resourceBusiness.getByGroup(group).size());
-        resourceBusiness.removeFromGroup(resource, group);
+        resourceBusiness.dissociate(resource, group);
         assertEquals(0, resourceBusiness.getByGroup(group).size());
     }
 
@@ -121,10 +121,10 @@ public class ResourceIT extends BaseSpringIT {
     public void getAvailableForUser() throws BusinessException, GRIDAClientException {
         createGroup("resourcetest");
         createUserInGroup("super@test.insa", "resourcetest");
-        Group group = configurationBusiness.getGroup("resourcetest");
+        Group group = groupBusiness.get("resourcetest");
         User user = configurationBusiness.getUser("super@test.insa");
 
-        resourceBusiness.putInGroup(resource, group);
+        resourceBusiness.associate(resource, group);
         assertEquals(0, resourceBusiness.getAvailableForUser(user).size());
 
         resource.setStatus(true);

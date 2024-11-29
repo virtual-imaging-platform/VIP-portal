@@ -76,12 +76,6 @@ public class TagBusiness {
         }
     }
 
-    public void associate(List<Tag> tags, AppVersion appVersion) throws BusinessException {
-        for (Tag tag : tags) {
-            associate(tag, appVersion);
-        }
-    }
-
     public void dissociate(Tag tag, AppVersion appVersion) throws BusinessException {
         try {
             tagDAO.dissociate(tag, appVersion);

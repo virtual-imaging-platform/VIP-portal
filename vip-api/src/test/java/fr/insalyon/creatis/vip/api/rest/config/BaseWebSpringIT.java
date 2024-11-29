@@ -167,12 +167,12 @@ abstract public class BaseWebSpringIT extends BaseApplicationSpringIT {
         }
     }
 
-    protected AppVersion configureGwendiaTestApp(String appName, String groupName, String className, String versionName) throws BusinessException, GRIDAClientException, IOException {
-        return configureTestApp(appName, groupName, className, versionName, true);
+    protected AppVersion configureGwendiaTestApp(String appName, String groupName, String versionName) throws BusinessException, GRIDAClientException, IOException {
+        return configureTestApp(appName, groupName, versionName, true);
     }
 
-    protected AppVersion configureBoutiquesTestApp(String appName, String groupName, String className, String versionName) throws BusinessException, GRIDAClientException, IOException {
-        return configureTestApp(appName, groupName, className, versionName, false);
+    protected AppVersion configureBoutiquesTestApp(String appName, String groupName, String versionName) throws BusinessException, GRIDAClientException, IOException {
+        return configureTestApp(appName, groupName, versionName, false);
     }
 
     protected File getGwendiaTestFile() throws IOException {
@@ -183,8 +183,8 @@ abstract public class BaseWebSpringIT extends BaseApplicationSpringIT {
         return getResourceFromClasspath("boutiques/test-boutiques.json").getFile();
     }
 
-    protected AppVersion configureTestApp(String appName, String groupName, String className, String versionName, boolean gwendia) throws BusinessException, GRIDAClientException, IOException {
-        AppVersion appVersion = configureAnApplication(appName, versionName, groupName, className);
+    protected AppVersion configureTestApp(String appName, String groupName, String versionName, boolean gwendia) throws BusinessException, GRIDAClientException, IOException {
+        AppVersion appVersion = configureAnApplication(appName, versionName, groupName);
         configureVersion(appVersion,
                 gwendia ? "/vip/testGroup (group)/path/to/test.gwendia" : null,
                 gwendia ? null : "/vip/testGroup (group)/path/to/desc-boutiques.json");

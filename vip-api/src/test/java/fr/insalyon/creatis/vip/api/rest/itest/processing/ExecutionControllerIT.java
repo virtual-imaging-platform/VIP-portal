@@ -352,11 +352,11 @@ public class ExecutionControllerIT extends BaseWebSpringIT {
     @Test
     public void testInitGwendiaExecution() throws Exception
     {
-        String appName = "test application", groupName = "testGroup", className = "testClass", versionName = "4.2";
+        String appName = "test application", groupName = "testGroup", versionName = "4.2";
         String engineName = "testEngine", engineEndpoint = "endpoint", worflowId = "test-workflow-id";
         Date startDate = new Date();
 
-        configureGwendiaTestApp(appName,groupName, className, versionName);
+        configureGwendiaTestApp(appName,groupName, versionName);
 
         createUserInGroup(baseUser1.getEmail(), groupName);
 
@@ -371,7 +371,7 @@ public class ExecutionControllerIT extends BaseWebSpringIT {
         Mockito.when(getWebServiceEngine().getStatus(worflowId)).thenReturn(SimulationStatus.Running, (SimulationStatus) null);
         Mockito.when(getWebServiceEngine().getAddressWS()).thenReturn(engineEndpoint, (String) null);
 
-        Workflow w = new Workflow(worflowId, baseUser1.getFullName(), WorkflowStatus.Running, startDate, null, "Exec test 1", appName, versionName, className, engineName, null);
+        Workflow w = new Workflow(worflowId, baseUser1.getFullName(), WorkflowStatus.Running, startDate, null, "Exec test 1", appName, versionName, "", engineName, null);
         when(workflowDAO.get(worflowId)).thenReturn(w, (Workflow) null);
 
         Execution expectedExecution = new Execution(worflowId, "Exec test 1", appName + "/" + versionName, 0, ExecutionStatus.RUNNING, null, null, startDate.getTime(), null, null);
@@ -414,7 +414,6 @@ public class ExecutionControllerIT extends BaseWebSpringIT {
         Workflow workflow = workflowCaptor.getValue();
         Assertions.assertEquals(appName, workflow.getApplication());
         Assertions.assertEquals(versionName, workflow.getApplicationVersion());
-        Assertions.assertEquals(className, workflow.getApplicationClass());
         Assertions.assertEquals(worflowId, workflow.getId());
         Assertions.assertEquals(WorkflowStatus.Running, workflow.getStatus());
         Assertions.assertEquals("Exec test 1", workflow.getDescription());
@@ -430,11 +429,11 @@ public class ExecutionControllerIT extends BaseWebSpringIT {
     @Test
     public void testInitBoutiquesExecution() throws Exception
     {
-        String appName = "test application", groupName = "testGroup", className = "testClass", versionName = "4.2";
+        String appName = "test application", groupName = "testGroup", versionName = "4.2";
         String engineName = "testEngine", engineEndpoint = "endpoint", worflowId = "test-workflow-id";
         Date startDate = new Date();
 
-        configureBoutiquesTestApp(appName,groupName, className, versionName);
+        configureBoutiquesTestApp(appName,groupName, versionName);
 
         createUserInGroup(baseUser1.getEmail(), groupName);
 
@@ -450,7 +449,7 @@ public class ExecutionControllerIT extends BaseWebSpringIT {
         Mockito.when(getWebServiceEngine().getStatus(worflowId)).thenReturn(SimulationStatus.Running, (SimulationStatus) null);
         Mockito.when(getWebServiceEngine().getAddressWS()).thenReturn(engineEndpoint, (String) null);
 
-        Workflow w = new Workflow(worflowId, baseUser1.getFullName(), WorkflowStatus.Running, startDate, null, "Exec test 1", appName, versionName, className, engineName, null);
+        Workflow w = new Workflow(worflowId, baseUser1.getFullName(), WorkflowStatus.Running, startDate, null, "Exec test 1", appName, versionName, "", engineName, null);
         when(workflowDAO.get(worflowId)).thenReturn(w, (Workflow) null);
 
         Execution expectedExecution = new Execution(worflowId, "Exec test 1", appName + "/" + versionName, 0, ExecutionStatus.RUNNING, null, null, startDate.getTime(), null, null);
@@ -491,7 +490,6 @@ public class ExecutionControllerIT extends BaseWebSpringIT {
         Workflow workflow = workflowCaptor.getValue();
         Assertions.assertEquals(appName, workflow.getApplication());
         Assertions.assertEquals(versionName, workflow.getApplicationVersion());
-        Assertions.assertEquals(className, workflow.getApplicationClass());
         Assertions.assertEquals(worflowId, workflow.getId());
         Assertions.assertEquals(WorkflowStatus.Running, workflow.getStatus());
         Assertions.assertEquals("Exec test 1", workflow.getDescription());

@@ -34,6 +34,7 @@ package fr.insalyon.creatis.vip.application.server.dao.mysql;
 import fr.insalyon.creatis.vip.application.client.bean.AppVersion;
 import fr.insalyon.creatis.vip.application.client.bean.Application;
 import fr.insalyon.creatis.vip.application.server.dao.ApplicationDAO;
+import fr.insalyon.creatis.vip.core.client.bean.Group;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -421,4 +422,65 @@ public class ApplicationData extends JdbcDaoSupport implements ApplicationDAO {
         }
     }
 
+    @Override
+    public void associate(Application app, Group group) throws DAOException {
+        String query = "INSERT INTO VIPGroupsApplication (applicationame, groupname) "
+        +              "VALUES (?,?)";
+        
+        try (PreparedStatement ps = getConnection().prepareStatement(query)) {
+            ps.setString(1, app.getName());
+            ps.setString(2, group.getName());
+            ps.executeUpdate();
+
+        } catch (SQLException e) {
+            if (e.getMessage().contains("Unique index or primary key violation")) {
+                logger.error("A application name \"{}\" already exists in this group \"{}\"", app.getName(), group.getName());
+            } else {
+                logger.error("Error adding application " + app.getName() + " to group " + group.getName(), e);
+                throw new DAOException(e);
+            }
+        }
+    }
+
+    @Override
+    public void dissociate(Application app, Group group) throws DAOException {
+        String query = "DELETE FROM VIPGroupsApplication WHERE applicationame = ? AND groupname = ?";
+
+        try (PreparedStatement ps = getConnection().prepareStatement(query)) {
+            ps.setString(1, app.getName());
+            ps.setString(2, group.getName());
+            ps.executeUpdate();
+
+        } catch (SQLException e) {
+            logger.error("Error removing app/group pair " + app.getName() + "/" + group.getName(), e);
+            throw new DAOException(e);
+        }
+    }
+
+    @Override
+    public List<Application> getApplicationByGroup(Group group) throws DAOException {
+        String query =  "SELECT * FROM VIPApplications a "
+        +               "JOIN VIPGroupsApplications ga ON ga.applicationame = a.name "
+        +               "WHERE ga.groupname = ?";
+
+        try (PreparedStatement ps = getConnection().prepareStatement(query)) {
+            ps.setString(1, group.getName());
+
+            ResultSet rs = ps.executeQuery();
+            List<Application> results = new ArrayList<>();
+
+            while (rs.next()) {
+                results.add(new Application(
+                    rs.getString("name"),
+                    rs.getString("owner"),
+                    rs.getString("fullname"),
+                    rs.getString("citation")));
+            }
+            return results;
+
+        } catch (SQLException e) {
+            logger.error("Error getting applications for group " + group.getName(), e);
+            throw new DAOException(e);
+        }
+    }
 }

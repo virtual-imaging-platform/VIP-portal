@@ -32,6 +32,8 @@
 package fr.insalyon.creatis.vip.application.client.bean;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
+
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -54,11 +56,11 @@ public class Application implements IsSerializable {
     }
 
     public Application(String name, String owner, String fullName, String citation) {
-        this(name, owner, fullName, citation, null);
+        this(name, owner, fullName, citation, new ArrayList<>());
     }
 
     public Application(String name, String owner, String citation) {
-        this(name, owner, null, citation, null);
+        this(name, owner, null, citation, new ArrayList<>());
     }
 
     public Application(String name, String owner, String fullName, String citation, List<String> applicationGroups) {

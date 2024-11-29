@@ -32,7 +32,6 @@
 package fr.insalyon.creatis.vip.core.server.dao.mysql;
 
 import fr.insalyon.creatis.vip.core.client.bean.Group;
-import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import fr.insalyon.creatis.vip.core.server.dao.GroupDAO;
 import org.slf4j.Logger;
@@ -65,15 +64,13 @@ public class GroupData extends JdbcDaoSupport implements GroupDAO {
 
     @Override
     public void add(Group group) throws DAOException {
+        String query = "INSERT INTO VIPGroups(name, public, type) VALUES(?, ?, ?)";
 
-        try {
-            PreparedStatement ps = getConnection().prepareStatement(
-                    "INSERT INTO VIPGroups(name, public, type) VALUES(?, ?, ?)");
+        try (PreparedStatement ps = getConnection().prepareStatement(query)) {
             ps.setString(1, group.getName());
             ps.setBoolean(2, group.isPublicGroup());
             ps.setString(3, group.getType().toString());
             ps.execute();
-            ps.close();
 
         } catch (SQLException ex) {
             if (ex.getMessage().contains("Unique index or primary key violation") || ex.getMessage().contains("Duplicate entry ")) {
@@ -88,13 +85,11 @@ public class GroupData extends JdbcDaoSupport implements GroupDAO {
 
     @Override
     public void remove(String groupName) throws DAOException {
-        try {
-            PreparedStatement ps = getConnection().prepareStatement("DELETE "
-                    + "FROM VIPGroups WHERE name=?");
+        String query = "DELETE FROM VIPGroups WHERE name=?";
 
+        try (PreparedStatement ps = getConnection().prepareStatement(query)) {
             ps.setString(1, groupName);
             ps.execute();
-            ps.close();
 
         } catch (SQLException ex) {
             logger.error("Error removing group {}", groupName, ex);
@@ -104,18 +99,14 @@ public class GroupData extends JdbcDaoSupport implements GroupDAO {
 
     @Override
     public void update(String name, Group group) throws DAOException {
-        try {
-            PreparedStatement ps = getConnection().prepareStatement("UPDATE "
-                    + "VIPGroups "
-                    + "SET name=?, public=?, type=? "
-                    + "WHERE name=?");
+        String query = "UPDATE VIPGroups SET name=?, public=?, type=? WHERE name=?";
 
+        try (PreparedStatement ps = getConnection().prepareStatement(query)) {
             ps.setString(1, group.getName());
             ps.setBoolean(2, group.isPublicGroup());
             ps.setString(3, group.getType().toString());
             ps.setString(4, name);
             ps.executeUpdate();
-            ps.close();
 
         } catch (SQLException ex) {
             logger.error("Error updating group {}", group.getName(), ex);
@@ -125,19 +116,16 @@ public class GroupData extends JdbcDaoSupport implements GroupDAO {
 
     @Override
     public List<Group> getGroups() throws DAOException {
-        try {
-
-            List<Group> groups = new ArrayList<Group>();
-            PreparedStatement ps = getConnection().prepareStatement("SELECT "
-                    + "name, public, type FROM "
-                    + "VIPGroups ORDER BY LOWER(name)");
-
+        List<Group> groups = new ArrayList<Group>();
+        String query = "SELECT * FROM VIPGroups ORDER BY LOWER(name)";
+ 
+        try (PreparedStatement ps = getConnection().prepareStatement(query)) {
             ResultSet rs = ps.executeQuery();
+
             while (rs.next()) {
                 groups.add(new Group(rs.getString("name"),
                         rs.getBoolean("public"), rs.getString("type")));
             }
-            ps.close();
             return groups;
 
         } catch (SQLException ex) {

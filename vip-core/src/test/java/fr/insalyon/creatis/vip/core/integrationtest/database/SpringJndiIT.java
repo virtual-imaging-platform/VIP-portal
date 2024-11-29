@@ -11,6 +11,7 @@ import fr.insalyon.creatis.vip.core.server.SpringCoreConfig;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
 import fr.insalyon.creatis.vip.core.server.business.EmailBusiness;
+import fr.insalyon.creatis.vip.core.server.business.GroupBusiness;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
@@ -66,23 +67,13 @@ import static org.mockito.ArgumentMatchers.*;
 @ActiveProfiles({"jndi-db", "test"}) // to use default jndi datasource but avoid default server config
 public class SpringJndiIT {
 
-    @Autowired
-    private ConfigurationBusiness configurationBusiness;
-
-    @Autowired
-    private DataSource dataSource;
-
-    @Autowired
-    private PlatformTransactionManager transactionManager;
-
-    @Autowired
-    private DataSource lazyDataSource;
-
-    @Autowired
-    private EmailBusiness emailBusiness;
-
-    @Autowired
-    private GRIDAClient gridaClient;
+    @Autowired private ConfigurationBusiness configurationBusiness;
+    @Autowired private DataSource dataSource;
+    @Autowired private PlatformTransactionManager transactionManager;
+    @Autowired private DataSource lazyDataSource;
+    @Autowired private EmailBusiness emailBusiness;
+    @Autowired private GRIDAClient gridaClient;
+    @Autowired private GroupBusiness groupBusiness;
 
     /*
         First launch
@@ -92,7 +83,7 @@ public class SpringJndiIT {
     public void testJNDIConfig() throws BusinessException {
         // verify the vip-support group created on init is present
         assertNotNull(configurationBusiness);
-        List<Group> groups = configurationBusiness.getGroups();
+        List<Group> groups = groupBusiness.get();
         assertEquals(0, groups.size());
 
         final Connection[] firstTransactionConnections = new Connection[2];
@@ -119,10 +110,10 @@ public class SpringJndiIT {
     @Test
     @Order(2)
     public void addNewGroup() throws BusinessException {
-        List<Group> groups = configurationBusiness.getGroups();
+        List<Group> groups = groupBusiness.get();
         assertEquals(0, groups.size());
-        configurationBusiness.addGroup(new Group("test group", true, GroupType.RESOURCE));
-        groups = configurationBusiness.getGroups();
+        groupBusiness.add(new Group("test group", true, GroupType.RESOURCE));
+        groups = groupBusiness.get();
         assertEquals(1, groups.size());
     }
 
@@ -133,7 +124,7 @@ public class SpringJndiIT {
     @Test
     @Order(3)
     public void isGroupStillThere() throws BusinessException {
-        List<Group> groups = configurationBusiness.getGroups();
+        List<Group> groups = groupBusiness.get();
         assertEquals(1, groups.size());
     }
 
@@ -144,7 +135,7 @@ public class SpringJndiIT {
     @Order(4)
     @DirtiesContext(methodMode = DirtiesContext.MethodMode.BEFORE_METHOD) // to restart spring
     public void isGroupStillThereAfterRestart() throws BusinessException {
-        List<Group> groups = configurationBusiness.getGroups();
+        List<Group> groups = groupBusiness.get();
         assertEquals(1, groups.size());
     }
 
