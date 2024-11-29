@@ -116,5 +116,7 @@ public interface Server {
 
     boolean useMoteurlite();
 
+    boolean useRestMoteurServer();
+
     String getMoteurServerPassword();
 }

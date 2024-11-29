@@ -35,9 +35,11 @@ import fr.insalyon.creatis.vip.application.client.view.monitor.SimulationStatus;
 import fr.insalyon.creatis.vip.application.server.business.util.FileUtil;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.List;
 
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
+import fr.insalyon.creatis.vip.core.server.business.Server;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -59,11 +61,19 @@ public abstract class WorkflowEngineInstantiator {
     public abstract void kill(String addressWS, String workflowID)
             throws
             java.rmi.RemoteException,
-            javax.xml.rpc.ServiceException;
+            javax.xml.rpc.ServiceException, BusinessException;
 
     public abstract SimulationStatus getStatus(String addressWS, String workflowID)
             throws
             java.rmi.RemoteException,
-            javax.xml.rpc.ServiceException;
+            javax.xml.rpc.ServiceException, BusinessException;
 
+    protected void loadTrustStore(Server server) {
+        // Configuration SSL
+        if (Path.of(server.getTruststoreFile()).toFile().exists()) {
+            System.setProperty("javax.net.ssl.trustStore", server.getTruststoreFile());
+            System.setProperty("javax.net.ssl.trustStorePassword", server.getTruststorePass());
+            System.setProperty("javax.net.ssl.trustStoreType", "JKS");
+        }
+    }
 }

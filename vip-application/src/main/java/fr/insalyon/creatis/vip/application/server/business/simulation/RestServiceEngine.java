@@ -38,15 +38,21 @@ import fr.insalyon.creatis.vip.core.server.business.Server;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.*;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpServerErrorException;
+import org.springframework.web.client.RestClient;
+import org.springframework.web.client.RestClientException;
 
+import javax.xml.rpc.ServiceException;
 import java.nio.charset.StandardCharsets;
+import java.rmi.RemoteException;
 import java.util.Base64;
+import java.util.Map;
+
+import static org.springframework.http.MediaType.APPLICATION_JSON;
 
 /**
  * Communicates with a moteur server through a web service.
- *
  * Each call is relative to a unique endpoint and must create a new instance,
  * so this needs the spring prototype scope.
  *
@@ -56,11 +62,25 @@ public class RestServiceEngine extends WorkflowEngineInstantiator {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    private Server server;
+    private final Server server;
 
     @Autowired
     public RestServiceEngine(Server server) {
         this.server = server;
+    }
+
+    private static class RestWorkflow {
+        String workflow;
+        String inputs;
+        String proxy;
+        String settings;
+
+        public RestWorkflow(String workflow, String inputs, String proxy, String settings) {
+            this.workflow = workflow;
+            this.inputs = inputs;
+            this.proxy = proxy;
+            this.settings = settings;
+        }
     }
 
     /**
@@ -71,119 +91,100 @@ public class RestServiceEngine extends WorkflowEngineInstantiator {
      */
     @Override
     public String launch(String addressWS, String workflow, String inputs, String settings, String proxyFileName)
-            throws java.rmi.RemoteException, javax.xml.rpc.ServiceException, BusinessException {
+            throws RemoteException, ServiceException, BusinessException {
 
-        System.setProperty("javax.net.ssl.trustStore", server.getTruststoreFile());
-        System.setProperty("javax.net.ssl.trustStorePassword", server.getTruststorePass());
-        System.setProperty("javax.net.ssl.trustStoreType", "JKS");
+        loadTrustStore(server);
 
-        String strProxy = ProxyUtil.readAsString(proxyFileName);
-
-        String base64Workflow = Base64.getEncoder().encodeToString(workflow.getBytes(StandardCharsets.UTF_8));
-        String base64Input = Base64.getEncoder().encodeToString(inputs.getBytes(StandardCharsets.UTF_8));
-        String base64Proxy = Base64.getEncoder().encodeToString(strProxy.getBytes(StandardCharsets.UTF_8));
-        String base64Settings = Base64.getEncoder().encodeToString(settings.getBytes(StandardCharsets.UTF_8));
-
-        String jsonInputString = String.format(
-                "{\"workflow\":\"%s\",\"inputs\":\"%s\",\"proxy\":\"%s\",\"settings\":\"%s\"}",
-                base64Workflow, base64Input, base64Proxy, base64Settings
-        );
-
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.setBasicAuth("user", server.getMoteurServerPassword());
-
-        HttpEntity<String> entity = new HttpEntity<>(jsonInputString, headers);
-
-        String url = addressWS + "/submit";
-
-        logger.info("sending rest request to launch workflow");
         try {
-            RestTemplate restTemplate = new RestTemplate();
-            return restTemplate.exchange(url, HttpMethod.POST, entity, String.class).getBody();
-        } catch (Exception e) {
-            logger.error("Error in the rest request on moteur server", e);
-            throw new BusinessException("Error in the rest request on moteur server", e);
+            String strProxy = ProxyUtil.readAsString(proxyFileName);
+
+            String base64Workflow = Base64.getEncoder().encodeToString(workflow.getBytes(StandardCharsets.UTF_8));
+            String base64Input = Base64.getEncoder().encodeToString(inputs.getBytes(StandardCharsets.UTF_8));
+            String base64Proxy = Base64.getEncoder().encodeToString(strProxy != null ? strProxy.getBytes(StandardCharsets.UTF_8) : null);
+            String base64Settings = Base64.getEncoder().encodeToString(settings.getBytes(StandardCharsets.UTF_8));
+
+            RestWorkflow restWorkflow = new RestWorkflow(base64Workflow, base64Input, base64Proxy, base64Settings);
+
+            RestClient restClient = RestClient.builder()
+                    .baseUrl(addressWS)
+                    .defaultHeaders(headers -> headers.setBasicAuth("user", server.getMoteurServerPassword()))
+                    .build();
+
+            return restClient.post()
+                    .uri("/submit")
+                    .contentType(APPLICATION_JSON)
+                    .body(restWorkflow)
+                    .retrieve()
+                    .body(String.class);
+        } catch (HttpServerErrorException | HttpClientErrorException e) {
+            logger.error("Server error while fetching workflow status: {}", e.getResponseBodyAsString(), e);
+            throw new BusinessException("Internal server error while fetching workflow status", e);
+        } catch (RestClientException e) {
+            logger.error("REST client error while fetching workflow status", e);
+            throw new BusinessException("REST client error while fetching workflow status", e);
         }
     }
 
 
     @Override
-    public void kill(String addressWS, String workflowID) {
-        System.setProperty("javax.net.ssl.trustStore", server.getTruststoreFile());
-        System.setProperty("javax.net.ssl.trustStorePassword", server.getTruststorePass());
-        System.setProperty("javax.net.ssl.trustStoreType", "JKS");
+    public void kill(String addressWS, String workflowID) throws BusinessException {
 
-        String url = addressWS + "/kill";
-
-        // Create JSON body
-        String jsonInputString = String.format("{\"workflowID\":\"%s\"}", workflowID);
-
-        // Set headers
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.setBasicAuth("user", server.getMoteurServerPassword());
-
-        // Create HTTP entity
-        HttpEntity<String> entity = new HttpEntity<>(jsonInputString, headers);
+        loadTrustStore(server);
 
         try {
-            // Send POST request
-            RestTemplate restTemplate = new RestTemplate();
-            ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.PUT, entity, String.class);
+            RestClient restClient = RestClient.builder()
+                    .baseUrl(addressWS)
+                    .defaultHeaders(headers -> headers.setBasicAuth("user", server.getMoteurServerPassword()))
+                    .build();
 
-            // Check response status
-            if (response.getStatusCode() != HttpStatus.OK) {
-                throw new RuntimeException("Failed to kill workflow, HTTP response code: " + response.getStatusCodeValue());
-            }
-        } catch (Exception e) {
-            throw new RuntimeException("An error occurred while trying to kill the workflow", e);
+            restClient
+                    .put()
+                    .uri("/kill")
+                    .body(Map.of("workflowID", workflowID))
+                    .contentType(APPLICATION_JSON)
+                    .retrieve()
+                    .body(String.class);
+
+
+            logger.info("Successfully sent kill request for workflow ID: {}", workflowID);
+        } catch (HttpServerErrorException | HttpClientErrorException e) {
+            logger.error("Server error while fetching workflow status: {}", e.getResponseBodyAsString(), e);
+            throw new BusinessException("Internal server error while fetching workflow status", e);
+        } catch (RestClientException e) {
+            logger.error("REST client error while fetching workflow status", e);
+            throw new BusinessException("REST client error while fetching workflow status", e);
         }
     }
 
-
-    @Override
-    public SimulationStatus getStatus(String addressWS, String workflowID) {
-
-        System.setProperty("javax.net.ssl.trustStore", server.getTruststoreFile());
-        System.setProperty("javax.net.ssl.trustStorePassword", server.getTruststorePass());
-        System.setProperty("javax.net.ssl.trustStoreType", "JKS");
-
-        String url = addressWS + "/status/" + workflowID;
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("Accept", "application/json");
-        headers.setBasicAuth("user", server.getMoteurServerPassword());
-
-        // Create HTTP entity with headers
-        HttpEntity<String> entity = new HttpEntity<>(headers);
+    public SimulationStatus getStatus(String addressWS, String workflowID) throws BusinessException {
+        loadTrustStore(server);
 
         try {
-            // Send GET request
-            RestTemplate restTemplate = new RestTemplate();
-            ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
+            RestClient restClient = RestClient.builder()
+                    .baseUrl(addressWS)
+                    .defaultHeaders(headers -> headers.setBasicAuth("user", server.getMoteurServerPassword()))
+                    .build();
 
-            // Check response status
-            if (response.getStatusCode() != HttpStatus.OK) {
-                throw new RuntimeException("Failed to get status, HTTP response code: " + response.getStatusCodeValue());
-            }
+            String workflowStatus = restClient
+                    .get()
+                    .uri("/status/{workflowID}", workflowID)
+                    .retrieve()
+                    .body(String.class);
 
-            // Process response
-            String workflowStatus = response.getBody();
-            RestServiceEngine.MoteurStatus moteurStatus = RestServiceEngine.MoteurStatus.valueOf(workflowStatus);
-            switch (moteurStatus) {
-                case RUNNING:
-                    return SimulationStatus.Running;
-                case COMPLETE:
-                    return SimulationStatus.Completed;
-                case TERMINATED:
-                    return SimulationStatus.Killed;
-                default:
-                    return SimulationStatus.Unknown;
-            }
-        } catch (Exception e) {
-            throw new RuntimeException("An error occurred while getting the workflow status", e);
+            MoteurStatus moteurStatus = MoteurStatus.valueOf(workflowStatus != null ? workflowStatus.toUpperCase() : null);
+            return switch (moteurStatus) {
+                case RUNNING -> SimulationStatus.Running;
+                case COMPLETE -> SimulationStatus.Completed;
+                case TERMINATED -> SimulationStatus.Killed;
+                default -> SimulationStatus.Unknown;
+            };
+        } catch (HttpServerErrorException | HttpClientErrorException e) {
+            logger.error("Server error while fetching workflow status: {}", e.getResponseBodyAsString(), e);
+            throw new BusinessException("Internal server error while fetching workflow status", e);
+        } catch (RestClientException e) {
+            logger.error("REST client error while fetching workflow status", e);
+            throw new BusinessException("REST client error while fetching workflow status", e);
         }
     }
+
 }

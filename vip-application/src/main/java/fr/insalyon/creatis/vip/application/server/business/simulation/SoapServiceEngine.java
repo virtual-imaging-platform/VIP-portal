@@ -69,9 +69,7 @@ public class SoapServiceEngine extends WorkflowEngineInstantiator {
             throws java.rmi.RemoteException, javax.xml.rpc.ServiceException, BusinessException {
         String strProxy = null;
 
-        System.setProperty("javax.net.ssl.trustStore", server.getTruststoreFile());
-        System.setProperty("javax.net.ssl.trustStorePassword", server.getTruststorePass());
-        System.setProperty("javax.net.ssl.trustStoreType", "JKS");
+        loadTrustStore(server);
 
         // String settings = "This is going to contain settings...";
         // Get Proxy from current User's context
@@ -98,9 +96,7 @@ public class SoapServiceEngine extends WorkflowEngineInstantiator {
             java.rmi.RemoteException,
             javax.xml.rpc.ServiceException {
 
-        System.setProperty("javax.net.ssl.trustStore", server.getTruststoreFile());
-        System.setProperty("javax.net.ssl.trustStorePassword", server.getTruststorePass());
-        System.setProperty("javax.net.ssl.trustStoreType", "JKS");
+        loadTrustStore(server);
 
         String resourcename = "moteur-client-config.wsdd";
         InputStream is = this.getClass().getClassLoader().getResourceAsStream(resourcename);
@@ -116,9 +112,7 @@ public class SoapServiceEngine extends WorkflowEngineInstantiator {
             java.rmi.RemoteException,
             javax.xml.rpc.ServiceException {
 
-        System.setProperty("javax.net.ssl.trustStore", server.getTruststoreFile());
-        System.setProperty("javax.net.ssl.trustStorePassword", server.getTruststorePass());
-        System.setProperty("javax.net.ssl.trustStoreType", "JKS");
+        loadTrustStore(server);
 
         String resourcename = "moteur-client-config.wsdd";
         InputStream is = this.getClass().getClassLoader().getResourceAsStream(resourcename);
