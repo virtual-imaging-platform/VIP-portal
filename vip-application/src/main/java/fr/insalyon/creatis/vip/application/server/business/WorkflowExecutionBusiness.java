@@ -86,7 +86,7 @@ public class WorkflowExecutionBusiness {
                     new Date(), null, simulationName, applicationName, applicationVersion, applicationClass,
                     engineEndpoint, null);
 
-        } catch (javax.xml.rpc.ServiceException | java.rmi.RemoteException ex) {
+        } catch (ServiceException | RemoteException ex) {
             logger.error("Error launching simulation {} ({}/{})",
                     simulationName, applicationName, applicationVersion, ex);
             throw new BusinessException(ex);
