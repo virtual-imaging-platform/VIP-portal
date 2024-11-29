@@ -103,21 +103,23 @@ public class RestServiceEngine extends WorkflowEngineInstantiator {
 
         loadTrustStore(server);
 
+        String strProxy = null;
+        if (server.getMyProxyEnabled()) {
+            strProxy = ProxyUtil.readAsString(proxyFileName);
+        }
+
+        String base64Workflow = Base64.getEncoder().encodeToString(workflow.getBytes(StandardCharsets.UTF_8));
+        String base64Input = Base64.getEncoder().encodeToString(inputs.getBytes(StandardCharsets.UTF_8));
+        String base64Proxy = Base64.getEncoder().encodeToString(strProxy != null ? strProxy.getBytes(StandardCharsets.UTF_8) : null);
+        String base64Settings = Base64.getEncoder().encodeToString(settings.getBytes(StandardCharsets.UTF_8));
+
+        RestWorkflow restWorkflow = new RestWorkflow(base64Workflow, base64Input, base64Proxy, base64Settings);
+
         try {
-            String strProxy = ProxyUtil.readAsString(proxyFileName);
-
-            String base64Workflow = Base64.getEncoder().encodeToString(workflow.getBytes(StandardCharsets.UTF_8));
-            String base64Input = Base64.getEncoder().encodeToString(inputs.getBytes(StandardCharsets.UTF_8));
-            String base64Proxy = Base64.getEncoder().encodeToString(strProxy != null ? strProxy.getBytes(StandardCharsets.UTF_8) : null);
-            String base64Settings = Base64.getEncoder().encodeToString(settings.getBytes(StandardCharsets.UTF_8));
-
-            RestWorkflow restWorkflow = new RestWorkflow(base64Workflow, base64Input, base64Proxy, base64Settings);
-
-            RestClient restClient = buildRestClient(addressWS);
-
             ObjectMapper mapper = new ObjectMapper();
             String jsonBody = mapper.writeValueAsString(restWorkflow);
 
+            RestClient restClient = buildRestClient(addressWS);
             return restClient.post()
                     .uri("/submit")
                     .contentType(APPLICATION_JSON)

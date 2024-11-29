@@ -114,7 +114,7 @@ public class WorkflowExecutionBusiness {
         }
     }
 
-    private String getParametersAsXMLInput(List<ParameterSweep> parameters) {
+    public String getParametersAsXMLInput(List<ParameterSweep> parameters) {
 
         //generate the xml input file according to the user input on the GUI
         StringBuilder xml = new StringBuilder("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
