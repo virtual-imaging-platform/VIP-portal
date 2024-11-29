@@ -31,6 +31,8 @@
  */
 package fr.insalyon.creatis.vip.application.server.business.simulation;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.insalyon.creatis.vip.application.client.view.monitor.SimulationStatus;
 import fr.insalyon.creatis.vip.application.server.business.util.ProxyUtil;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
@@ -48,6 +50,8 @@ import java.nio.charset.StandardCharsets;
 import java.rmi.RemoteException;
 import java.util.Base64;
 import java.util.Map;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 
@@ -69,10 +73,18 @@ public class RestServiceEngine extends WorkflowEngineInstantiator {
         this.server = server;
     }
 
+
     private static class RestWorkflow {
+        @JsonProperty("workflow")
         String workflow;
+
+        @JsonProperty("inputs")
         String inputs;
+
+        @JsonProperty("proxy")
         String proxy;
+
+        @JsonProperty("settings")
         String settings;
 
         public RestWorkflow(String workflow, String inputs, String proxy, String settings) {
@@ -110,10 +122,13 @@ public class RestServiceEngine extends WorkflowEngineInstantiator {
                     .defaultHeaders(headers -> headers.setBasicAuth("user", server.getMoteurServerPassword()))
                     .build();
 
+            ObjectMapper mapper = new ObjectMapper();
+            String jsonBody = mapper.writeValueAsString(restWorkflow);
+
             return restClient.post()
                     .uri("/submit")
                     .contentType(APPLICATION_JSON)
-                    .body(restWorkflow)
+                    .body(jsonBody)
                     .retrieve()
                     .body(String.class);
         } catch (HttpServerErrorException | HttpClientErrorException e) {
@@ -122,6 +137,9 @@ public class RestServiceEngine extends WorkflowEngineInstantiator {
         } catch (RestClientException e) {
             logger.error("REST client error while fetching workflow status", e);
             throw new BusinessException("REST client error while fetching workflow status", e);
+        } catch (JsonProcessingException e) {
+            logger.error("Error serializing RestWorkflow to JSON", e);
+            throw new BusinessException("Error serializing RestWorkflow to JSON", e);
         }
     }
 
