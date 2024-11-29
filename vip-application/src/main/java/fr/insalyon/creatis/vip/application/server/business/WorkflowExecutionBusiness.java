@@ -98,7 +98,8 @@ public class WorkflowExecutionBusiness {
         try {
             status = engine.getStatus(engineEndpoint, simulationID);
         } catch (RemoteException | ServiceException e) {
-            throw new RuntimeException(e);
+            logger.error("Error getting status of simulation {} on engine {}", simulationID, engineEndpoint, e);
+            throw new BusinessException(e);
         }
 
         return status;
@@ -107,10 +108,9 @@ public class WorkflowExecutionBusiness {
     public void kill(String engineEndpoint, String simulationID) throws BusinessException {
         try {
             engine.kill(engineEndpoint, simulationID);
-        } catch (RemoteException e) {
-            throw new RuntimeException(e);
-        } catch (ServiceException e) {
-            throw new RuntimeException(e);
+        } catch (RemoteException | ServiceException e) {
+            logger.error("Error killing simulation {} on engine {}", simulationID, engineEndpoint, e);
+            throw new BusinessException(e);
         }
     }
 
