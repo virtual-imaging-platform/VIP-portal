@@ -56,10 +56,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 
 /**
- * Communicates with a moteur server through a web service.
- * Each call is relative to a unique endpoint and must create a new instance,
- * so this needs the spring prototype scope.
- *
  * @author Rafael Ferreira da Silva, Ibrahim kallel
  */
 public class RestServiceEngine extends WorkflowEngineInstantiator {
@@ -117,10 +113,7 @@ public class RestServiceEngine extends WorkflowEngineInstantiator {
 
             RestWorkflow restWorkflow = new RestWorkflow(base64Workflow, base64Input, base64Proxy, base64Settings);
 
-            RestClient restClient = RestClient.builder()
-                    .baseUrl(addressWS)
-                    .defaultHeaders(headers -> headers.setBasicAuth("user", server.getMoteurServerPassword()))
-                    .build();
+            RestClient restClient = buildRestClient(addressWS);
 
             ObjectMapper mapper = new ObjectMapper();
             String jsonBody = mapper.writeValueAsString(restWorkflow);
@@ -150,10 +143,7 @@ public class RestServiceEngine extends WorkflowEngineInstantiator {
         loadTrustStore(server);
 
         try {
-            RestClient restClient = RestClient.builder()
-                    .baseUrl(addressWS)
-                    .defaultHeaders(headers -> headers.setBasicAuth("user", server.getMoteurServerPassword()))
-                    .build();
+            RestClient restClient = buildRestClient(addressWS);
 
             restClient
                     .put()
@@ -178,10 +168,7 @@ public class RestServiceEngine extends WorkflowEngineInstantiator {
         loadTrustStore(server);
 
         try {
-            RestClient restClient = RestClient.builder()
-                    .baseUrl(addressWS)
-                    .defaultHeaders(headers -> headers.setBasicAuth("user", server.getMoteurServerPassword()))
-                    .build();
+            RestClient restClient = buildRestClient(addressWS);
 
             String workflowStatus = restClient
                     .get()
@@ -205,4 +192,10 @@ public class RestServiceEngine extends WorkflowEngineInstantiator {
         }
     }
 
+    private RestClient buildRestClient(String addressWS) {
+        return RestClient.builder()
+                .baseUrl(addressWS)
+                .defaultHeaders(headers -> headers.setBasicAuth("user", server.getMoteurServerPassword()))
+                .build();
+    }
 }

@@ -196,7 +196,7 @@ public class GridaClientLocal extends GRIDAClient {
 
     @Override
     public void createFolder(String path, String folderName) throws GRIDAClientException {
-        while (path.startsWith("\\") || path.startsWith("/")) { // TODO : / ou \
+        while (path.startsWith("/")) {
             path = path.substring(1);
         }
         try {

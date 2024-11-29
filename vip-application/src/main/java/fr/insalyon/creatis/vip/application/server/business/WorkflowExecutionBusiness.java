@@ -97,9 +97,7 @@ public class WorkflowExecutionBusiness {
         SimulationStatus status = SimulationStatus.Unknown;
         try {
             status = engine.getStatus(engineEndpoint, simulationID);
-        } catch (RemoteException e) {
-            throw new RuntimeException(e);
-        } catch (ServiceException e) {
+        } catch (RemoteException | ServiceException e) {
             throw new RuntimeException(e);
         }
 

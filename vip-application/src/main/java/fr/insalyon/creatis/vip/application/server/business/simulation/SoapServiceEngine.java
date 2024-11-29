@@ -42,11 +42,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.io.InputStream;
 
 /**
- * Communicates with a moteur server through a web service.
- * <p>
- * Each call is relative to a unique endpoint and must create a new instance,
- * so this needs the spring prototype scope.
- *
  * @author Rafael Ferreira da Silva, Ibrahim kallel
  */
 public class SoapServiceEngine extends WorkflowEngineInstantiator {
