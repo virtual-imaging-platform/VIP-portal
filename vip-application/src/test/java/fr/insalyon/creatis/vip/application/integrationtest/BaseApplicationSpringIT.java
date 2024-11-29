@@ -5,6 +5,7 @@ import fr.insalyon.creatis.moteur.plugins.workflowsdb.dao.OutputDAO;
 import fr.insalyon.creatis.moteur.plugins.workflowsdb.dao.WorkflowDAO;
 import fr.insalyon.creatis.vip.application.client.bean.AppVersion;
 import fr.insalyon.creatis.vip.application.client.bean.Application;
+import fr.insalyon.creatis.vip.application.server.business.AppVersionBusiness;
 import fr.insalyon.creatis.vip.application.server.business.ApplicationBusiness;
 import fr.insalyon.creatis.vip.application.server.business.EngineBusiness;
 import fr.insalyon.creatis.vip.application.server.business.simulation.WebServiceEngine;
@@ -16,19 +17,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 public class BaseApplicationSpringIT extends BaseSpringIT {
 
-    @Autowired
-    protected WorkflowDAO workflowDAO;
-    @Autowired
-    protected OutputDAO outputDAO;
-    @Autowired
-    protected InputDAO inputDAO;
-    @Autowired
-    protected WebServiceEngine webServiceEngine;
-
-    @Autowired
-    protected ApplicationBusiness applicationBusiness;
-    @Autowired
-    protected EngineBusiness engineBusiness;
+    @Autowired protected WorkflowDAO workflowDAO;
+    @Autowired protected OutputDAO outputDAO;
+    @Autowired protected InputDAO inputDAO;
+    @Autowired protected WebServiceEngine webServiceEngine;
+    @Autowired protected ApplicationBusiness applicationBusiness;
+    @Autowired protected EngineBusiness engineBusiness;
+    @Autowired protected AppVersionBusiness appVersionBusiness;
 
     @BeforeEach
     protected void setUp() throws Exception {
@@ -47,6 +42,10 @@ public class BaseApplicationSpringIT extends BaseSpringIT {
         return engineBusiness;
     }
 
+    protected AppVersionBusiness getAppVersionBusiness() {
+        return appVersionBusiness;
+    }
+
     public WebServiceEngine getWebServiceEngine() {
         return webServiceEngine;
     }
@@ -57,7 +56,7 @@ public class BaseApplicationSpringIT extends BaseSpringIT {
 
     protected AppVersion createAVersion(String appName, String versionName, boolean visible, String gwendiaPath, String jsonPath) throws BusinessException {
         AppVersion appVersion = new AppVersion(appName, versionName, gwendiaPath, jsonPath, visible, true);
-        getApplicationBusiness().addVersion(appVersion);
+        getAppVersionBusiness().add(appVersion);
         return appVersion;
     }
 
@@ -71,6 +70,6 @@ public class BaseApplicationSpringIT extends BaseSpringIT {
         appVersion = new AppVersion(
                 appVersion.getApplicationName(), appVersion.getVersion(), gwendiaPath, jsonPath,
                 appVersion.isVisible(), appVersion.isBoutiquesForm());
-        getApplicationBusiness().updateVersion(appVersion);
+        getAppVersionBusiness().update(appVersion);
     }
 }

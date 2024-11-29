@@ -6,7 +6,6 @@ import fr.insalyon.creatis.vip.application.client.bean.Simulation;
 import fr.insalyon.creatis.vip.application.server.dao.PublicExecutionDAO;
 import fr.insalyon.creatis.vip.core.client.bean.PublicExecution;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
-import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
 import fr.insalyon.creatis.vip.core.server.business.EmailBusiness;
 import fr.insalyon.creatis.vip.core.server.business.Server;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
@@ -33,8 +32,7 @@ public class ReproVipBusiness {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    private final ConfigurationBusiness configurationBusiness;
-    private final ApplicationBusiness applicationBusiness;
+    private final AppVersionBusiness appVersionBusiness;
     private final EmailBusiness emailBusiness;
     private final Server server;
     private final SimulationBusiness simulationBusiness;
@@ -43,11 +41,10 @@ public class ReproVipBusiness {
 
     @Autowired
     public ReproVipBusiness(
-            ConfigurationBusiness configurationBusiness, ApplicationBusiness applicationBusiness,
+            AppVersionBusiness appVersionBusiness,
             EmailBusiness emailBusiness, Server server, SimulationBusiness simulationBusiness,
             PublicExecutionDAO publicExecutionDAO, WorkflowBusiness workflowBusiness) {
-        this.configurationBusiness = configurationBusiness;
-        this.applicationBusiness = applicationBusiness;
+        this.appVersionBusiness = appVersionBusiness;
         this.emailBusiness = emailBusiness;
         this.server = server;
         this.simulationBusiness = simulationBusiness;
@@ -263,7 +260,7 @@ public class ReproVipBusiness {
     }
 
     public String getBoutiquesDescriptorJsonPath(String applicationName, String applicationVersion) throws BusinessException {
-        AppVersion appVersion = applicationBusiness.getVersion(applicationName, applicationVersion);
+        AppVersion appVersion = appVersionBusiness.getVersion(applicationName, applicationVersion);
         if (appVersion != null && appVersion.getJsonLfn() != null) {
             return appVersion.getJsonLfn();
         }

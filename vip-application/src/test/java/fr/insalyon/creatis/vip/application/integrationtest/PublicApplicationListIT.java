@@ -3,13 +3,12 @@ package fr.insalyon.creatis.vip.application.integrationtest;
 import fr.insalyon.creatis.vip.application.client.bean.AppVersion;
 import fr.insalyon.creatis.vip.application.client.bean.Application;
 import fr.insalyon.creatis.vip.application.client.view.ApplicationException;
+import fr.insalyon.creatis.vip.application.server.business.AppVersionBusiness;
 import fr.insalyon.creatis.vip.application.server.business.ApplicationBusiness;
 import fr.insalyon.creatis.vip.core.client.bean.Group;
 import fr.insalyon.creatis.vip.core.client.bean.GroupType;
 import fr.insalyon.creatis.vip.core.integrationtest.database.BaseSpringIT;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
-import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -17,11 +16,8 @@ import java.util.List;
 
 public class PublicApplicationListIT extends BaseSpringIT {
 
-    @Autowired
-    private ApplicationBusiness applicationBusiness;
-
-    @Autowired
-    private ConfigurationBusiness configurationBusiness;
+    @Autowired private ApplicationBusiness applicationBusiness;
+    @Autowired private AppVersionBusiness appVersionBusiness;
 
     @Test
     public void shouldNotIncludePrivateGroupsAndClasses() throws BusinessException, ApplicationException {
@@ -36,7 +32,7 @@ public class PublicApplicationListIT extends BaseSpringIT {
         groupBusiness.add(publicGroup);
         groupBusiness.add(privateGroup);
         applicationBusiness.add(app);
-        applicationBusiness.addVersion(appVersion);
+        appVersionBusiness.add(appVersion);
 
         // verify
         List<Application> publicApplications = applicationBusiness.getPublicApplicationsWithGroups();

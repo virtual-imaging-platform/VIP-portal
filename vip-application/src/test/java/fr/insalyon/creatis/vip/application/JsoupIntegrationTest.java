@@ -20,7 +20,7 @@ public class JsoupIntegrationTest {
         ApplicationServiceImpl applicationService = new ApplicationServiceImpl();
         ApplicationBusiness applicationBusiness = Mockito.mock(ApplicationBusiness.class);
         Mockito.when(applicationBusiness.getCitation(ArgumentMatchers.anyString())).thenReturn(citationOk, emptyCitation);
-        applicationService.setBeans(applicationBusiness, null, null, null, null, null, null, null);
+        applicationService.setBeans(applicationBusiness, null, null, null, null, null, null, null, null);
         Assertions.assertEquals(
                 citationOk,
                 applicationService.getCitation("firstcall"));

@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import fr.insalyon.creatis.vip.application.client.bean.AppVersion;
 import fr.insalyon.creatis.vip.application.client.bean.Application;
 import fr.insalyon.creatis.vip.application.client.bean.Tag;
+import fr.insalyon.creatis.vip.application.server.business.AppVersionBusiness;
 import fr.insalyon.creatis.vip.application.server.business.ApplicationBusiness;
 import fr.insalyon.creatis.vip.application.server.business.TagBusiness;
 import fr.insalyon.creatis.vip.core.integrationtest.database.BaseSpringIT;
@@ -19,11 +20,9 @@ import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 
 public class TagIT extends BaseSpringIT {
 
-    @Autowired
-    private TagBusiness tagBusiness;
-
-    @Autowired 
-    private ApplicationBusiness appBusiness;
+    @Autowired private TagBusiness tagBusiness;
+    @Autowired private ApplicationBusiness appBusiness;
+    @Autowired private AppVersionBusiness appVersionBusiness;
 
     private Tag tag;
 
@@ -77,7 +76,7 @@ public class TagIT extends BaseSpringIT {
         AppVersion appVersion = new AppVersion("test", "0.1", "blink", "blank", false, false);
 
         appBusiness.add(app);
-        appBusiness.addVersion(appVersion);
+        appVersionBusiness.add(appVersion);
         tagBusiness.associate(tag, appVersion);
 
         assertEquals(appVersion.getApplicationName(), tagBusiness.getAssociated(tag).get(0).getApplicationName());
@@ -93,7 +92,7 @@ public class TagIT extends BaseSpringIT {
         AppVersion appVersion = new AppVersion("test", "0.1", "blink", "blank", false, false);
 
         appBusiness.add(app);
-        appBusiness.addVersion(appVersion);
+        appVersionBusiness.add(appVersion);
         tagBusiness.associate(tag, appVersion);
 
         assertEquals(appVersion.getApplicationName(), tagBusiness.getAssociated(tag).get(0).getApplicationName());

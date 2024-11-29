@@ -41,6 +41,7 @@ import fr.insalyon.creatis.vip.application.client.bean.AppVersion;
 import fr.insalyon.creatis.vip.application.client.bean.Application;
 import fr.insalyon.creatis.vip.application.client.bean.Descriptor;
 import fr.insalyon.creatis.vip.application.client.bean.Source;
+import fr.insalyon.creatis.vip.application.server.business.AppVersionBusiness;
 import fr.insalyon.creatis.vip.application.server.business.ApplicationBusiness;
 import fr.insalyon.creatis.vip.application.server.business.BoutiquesBusiness;
 import fr.insalyon.creatis.vip.application.server.business.WorkflowBusiness;
@@ -84,12 +85,14 @@ public class PipelineBusiness {
     private final ApplicationBusiness applicationBusiness;
     private final BoutiquesBusiness boutiquesBusiness;
     private final DataManagerBusiness dataManagerBusiness;
+    private final AppVersionBusiness appVersionBusiness;
 
     @Autowired
     public PipelineBusiness(
             Supplier<User> currentUserProvider, Environment env,
             Server server, WorkflowBusiness workflowBusiness, ApplicationBusiness applicationBusiness,
-            BoutiquesBusiness boutiquesBusiness, DataManagerBusiness dataManagerBusiness) {
+            BoutiquesBusiness boutiquesBusiness, DataManagerBusiness dataManagerBusiness,
+            AppVersionBusiness appVersionBusiness) {
         this.currentUserProvider = currentUserProvider;
         this.env = env;
         this.server = server;
@@ -97,6 +100,7 @@ public class PipelineBusiness {
         this.applicationBusiness = applicationBusiness;
         this.boutiquesBusiness = boutiquesBusiness;
         this.dataManagerBusiness = dataManagerBusiness;
+        this.appVersionBusiness = appVersionBusiness;
     }
 
     //*********************** pipeline id format validation **********************************
@@ -284,7 +288,7 @@ public class PipelineBusiness {
         try {
             String applicationName = getApplicationName(pipelineId);
             String applicationVersion = getApplicationVersion(pipelineId);
-            AppVersion appVersion = applicationBusiness.getVersion(applicationName, applicationVersion);
+            AppVersion appVersion = appVersionBusiness.getVersion(applicationName, applicationVersion);
             if (appVersion == null) {
                 logger.error("Cannot find pipeline {}/{}", applicationName, applicationVersion);
                 throw new ApiException(PIPELINE_NOT_FOUND, pipelineId);

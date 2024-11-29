@@ -36,6 +36,7 @@ import fr.insalyon.creatis.grida.client.GRIDAClientException;
 import fr.insalyon.creatis.vip.application.client.bean.AppVersion;
 import fr.insalyon.creatis.vip.application.client.bean.Application;
 import fr.insalyon.creatis.vip.application.client.bean.boutiquesTools.BoutiquesApplication;
+import fr.insalyon.creatis.vip.application.server.business.AppVersionBusiness;
 import fr.insalyon.creatis.vip.application.server.business.ApplicationBusiness;
 import fr.insalyon.creatis.vip.application.server.business.BoutiquesBusiness;
 import fr.insalyon.creatis.vip.application.server.business.ResourceBusiness;
@@ -72,6 +73,7 @@ public class ApplicationImporterBusiness {
     private VelocityUtils velocityUtils;
     private TargzUtils targzUtils;
     private ApplicationBusiness applicationBusiness;
+    private AppVersionBusiness appVersionBusiness;
     private DataManagerBusiness dataManagerBusiness;
     private ResourceBusiness resourceBusiness;
     private TagBusiness tagBusiness;
@@ -84,7 +86,8 @@ public class ApplicationImporterBusiness {
             ApplicationBusiness applicationBusiness,
             DataManagerBusiness dataManagerBusiness,
             ResourceBusiness resourceBusiness,
-            TagBusiness tagBusiness) {
+            TagBusiness tagBusiness,
+            AppVersionBusiness appVersionBusiness) {
         this.server = server;
         this.lfcPathsBusiness = lfcPathsBusiness;
         this.gridaClient = gridaClient;
@@ -95,6 +98,7 @@ public class ApplicationImporterBusiness {
         this.dataManagerBusiness = dataManagerBusiness;
         this.resourceBusiness = resourceBusiness;
         this.tagBusiness = tagBusiness;
+        this.appVersionBusiness = appVersionBusiness;
     }
 
     public String readAndValidationBoutiquesFile(String fileLFN, User user)
@@ -217,16 +221,15 @@ public class ApplicationImporterBusiness {
             applicationBusiness.add(new Application(vipApplicationName, owner, ""));
         }
         // If version exists, update it
-        List<AppVersion> versions =
-                applicationBusiness.getVersions(vipApplicationName);
+        List<AppVersion> versions = appVersionBusiness.getVersions(vipApplicationName);
         for (AppVersion existingVersion : versions) {
             if (existingVersion.getVersion().equals(newVersion.getVersion())) {
-                applicationBusiness.updateVersion(newVersion);
+                appVersionBusiness.update(newVersion);
                 return;
             }
         }
         // add new version
-        applicationBusiness.addVersion(newVersion);
+        appVersionBusiness.add(newVersion);
         registerResourcesAssociated(newVersion, resources);
         registerTagsAssociated(newVersion, tags);
     }
@@ -247,8 +250,7 @@ public class ApplicationImporterBusiness {
         }
         // Refuse to overwrite an application version silently if the version overwrite parameter is not set.
         if (!overwrite) {
-            List<AppVersion> versions =
-                    applicationBusiness.getVersions(vipApplicationName);
+            List<AppVersion> versions = appVersionBusiness.getVersions(vipApplicationName);
             for (AppVersion v : versions) {
                 if (v.getVersion().equals(vipVersion)) {
                     logger.error("{} tried to overwrite version {} of application {} without setting the overwrite flag.",

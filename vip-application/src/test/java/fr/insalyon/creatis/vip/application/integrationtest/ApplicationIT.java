@@ -3,6 +3,7 @@ package fr.insalyon.creatis.vip.application.integrationtest;
 import fr.insalyon.creatis.vip.application.client.bean.AppVersion;
 import fr.insalyon.creatis.vip.application.client.bean.Application;
 import fr.insalyon.creatis.vip.application.client.bean.Engine;
+import fr.insalyon.creatis.vip.application.server.business.AppVersionBusiness;
 import fr.insalyon.creatis.vip.application.server.business.ApplicationBusiness;
 import fr.insalyon.creatis.vip.application.server.business.EngineBusiness;
 import fr.insalyon.creatis.vip.core.client.bean.Group;
@@ -22,10 +23,10 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class ApplicationIT extends BaseSpringIT {
-    @Autowired
-    private ApplicationBusiness applicationBusiness;
-    @Autowired
-    private EngineBusiness engineBusiness;
+
+    @Autowired private ApplicationBusiness applicationBusiness;
+    @Autowired private EngineBusiness engineBusiness;
+    @Autowired private AppVersionBusiness appVersionBusiness;
 
     @BeforeEach
     public void setUp() throws Exception {
@@ -52,7 +53,7 @@ public class ApplicationIT extends BaseSpringIT {
         applicationBusiness.add(application);
 
         AppVersion appVersion = new AppVersion("Application1", "version 0.0", "lfn", "jsonLfn", true, true);
-        applicationBusiness.addVersion(appVersion);
+        appVersionBusiness.add(appVersion);
 
     }
 
@@ -68,7 +69,7 @@ public class ApplicationIT extends BaseSpringIT {
         Assertions.assertEquals("test1@test.fr", application.getOwner(), "Incorrect owner of application");
         Assertions.assertNull(application.getFullName(), "getApplication should not fill fullname");
         Assertions.assertTrue(application.getApplicationGroups().isEmpty(), "getApplication should not fill applicationGroups");
-        Assertions.assertEquals(1, applicationBusiness.getVersions("Application1").size(), "Incorrect versions number");
+        Assertions.assertEquals(1, appVersionBusiness.getVersions("Application1").size(), "Incorrect versions number");
 
     }
 
@@ -131,8 +132,8 @@ public class ApplicationIT extends BaseSpringIT {
     @Test
     public void testAddVersionApplication() throws BusinessException {
         AppVersion appVersion = new AppVersion("Application1", "version 1.0", "lfn", "jsonLfn", true, true);
-        applicationBusiness.addVersion(appVersion);
-        Assertions.assertEquals(2, applicationBusiness.getVersions("Application1").size(), "Incorrect versions number");
+        appVersionBusiness.add(appVersion);
+        Assertions.assertEquals(2, appVersionBusiness.getVersions("Application1").size(), "Incorrect versions number");
     }
 
     /* ********************************************************************************************************************************************** */
@@ -143,7 +144,7 @@ public class ApplicationIT extends BaseSpringIT {
     public void testUpdateVersionApplication() throws BusinessException {
 
         AppVersion appVersion = new AppVersion("Application1", "version 0.0", "lfn updated", "jsonLfn", true, true);
-        applicationBusiness.updateVersion(appVersion);
-        Assertions.assertEquals("lfn updated", applicationBusiness.getVersions("Application1").get(0).getLfn(), "Incorrect lfn updated");
+        appVersionBusiness.update(appVersion);
+        Assertions.assertEquals("lfn updated", appVersionBusiness.getVersions("Application1").get(0).getLfn(), "Incorrect lfn updated");
     }
 }

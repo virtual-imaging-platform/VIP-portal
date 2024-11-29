@@ -16,6 +16,7 @@ import fr.insalyon.creatis.vip.application.client.bean.Application;
 import fr.insalyon.creatis.vip.application.client.bean.Engine;
 import fr.insalyon.creatis.vip.application.client.bean.Resource;
 import fr.insalyon.creatis.vip.application.client.bean.ResourceType;
+import fr.insalyon.creatis.vip.application.server.business.AppVersionBusiness;
 import fr.insalyon.creatis.vip.application.server.business.ApplicationBusiness;
 import fr.insalyon.creatis.vip.application.server.business.EngineBusiness;
 import fr.insalyon.creatis.vip.application.server.business.ResourceBusiness;
@@ -27,14 +28,10 @@ import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 
 public class ResourceIT extends BaseSpringIT {
     
-    @Autowired
-    private ResourceBusiness resourceBusiness;
-
-    @Autowired 
-    private ApplicationBusiness appBusiness;
-
-    @Autowired
-    private EngineBusiness engineBusiness;
+    @Autowired private ResourceBusiness resourceBusiness;
+    @Autowired private ApplicationBusiness appBusiness;
+    @Autowired private EngineBusiness engineBusiness;
+    @Autowired private AppVersionBusiness appVersionBusiness;
 
     private Resource resource;
 
@@ -140,7 +137,7 @@ public class ResourceIT extends BaseSpringIT {
         Resource bis = new Resource("bis");
 
         appBusiness.add(app);
-        appBusiness.addVersion(appVersion);
+        appVersionBusiness.add(appVersion);
 
         resourceBusiness.add(bis);
         resourceBusiness.associate(resource, appVersion);
@@ -157,7 +154,7 @@ public class ResourceIT extends BaseSpringIT {
         AppVersion appVersion = new AppVersion("test", "0.1", "blink", "blank", false, false);
 
         appBusiness.add(app);
-        appBusiness.addVersion(appVersion);
+        appVersionBusiness.add(appVersion);
 
         resourceBusiness.associate(resource, appVersion);
 

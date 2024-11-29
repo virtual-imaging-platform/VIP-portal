@@ -3,10 +3,10 @@ package fr.insalyon.creatis.vip.local;
 import fr.insalyon.creatis.vip.application.client.bean.AppVersion;
 import fr.insalyon.creatis.vip.application.client.bean.Application;
 import fr.insalyon.creatis.vip.application.client.bean.Engine;
+import fr.insalyon.creatis.vip.application.server.business.AppVersionBusiness;
 import fr.insalyon.creatis.vip.application.server.business.ApplicationBusiness;
 import fr.insalyon.creatis.vip.application.server.business.EngineBusiness;
 import fr.insalyon.creatis.vip.core.client.bean.User;
-import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
 import fr.insalyon.creatis.vip.core.server.business.Server;
@@ -31,7 +31,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.util.Collections;
 
 /**
  * Class that initializes necessary stuff for a local vip instance on startup.
@@ -74,6 +73,7 @@ public class LocalInitializer {
     private LFCBusiness lfcBusiness;
     private EngineBusiness engineBusiness;
     private ApplicationBusiness applicationBusiness;
+    private AppVersionBusiness appVersionBusiness;
     private TransferPoolBusiness transferPoolBusiness;
 
     @Autowired
@@ -82,7 +82,7 @@ public class LocalInitializer {
             ConfigurationBusiness configurationBusiness, Server server,
             LFCBusiness lfcBusiness, EngineBusiness engineBusiness,
             ApplicationBusiness applicationBusiness,
-            TransferPoolBusiness transferPoolBusiness) {
+            TransferPoolBusiness transferPoolBusiness, AppVersionBusiness appVersionBusiness) {
         this.environment = environment;
         this.resourceLoader = resourceLoader;
         this.configurationBusiness = configurationBusiness;
@@ -91,6 +91,7 @@ public class LocalInitializer {
         this.engineBusiness = engineBusiness;
         this.applicationBusiness = applicationBusiness;
         this.transferPoolBusiness = transferPoolBusiness;
+        this.appVersionBusiness = appVersionBusiness;
     }
 
 
@@ -183,7 +184,7 @@ public class LocalInitializer {
             throw new IllegalStateException("Cannot install an application version : information is missing");
         }
 
-        boolean hasVersion = applicationBusiness.getVersions(applicationName)
+        boolean hasVersion = appVersionBusiness.getVersions(applicationName)
                 .stream().anyMatch(version -> applicationVersion.equals(version.getVersion()));
         if (hasVersion) {
             logger.info("Application version [{}/{}] already exist", applicationName, applicationVersion);
@@ -206,7 +207,7 @@ public class LocalInitializer {
         // create AppVersion
         String gwendiaLFN = versionFolder + "/" + Paths.get(gwendiaLocation).getFileName().toString();
         AppVersion appVersion = new AppVersion(applicationName, applicationVersion, gwendiaLFN, null, true, false);
-        applicationBusiness.addVersion(appVersion);
+        appVersionBusiness.add(appVersion);
 
         logger.info("Application version [{}/{}] installed", applicationName, applicationVersion);
 

@@ -31,7 +31,6 @@
  */
 package fr.insalyon.creatis.vip.application.server.rpc;
 
-import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
 import fr.insalyon.creatis.vip.application.client.bean.*;
 import fr.insalyon.creatis.vip.application.client.rpc.ApplicationService;
 import fr.insalyon.creatis.vip.application.client.view.ApplicationException;
@@ -58,6 +57,7 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private ApplicationBusiness applicationBusiness;
+    private AppVersionBusiness appVersionBusiness;
     private EngineBusiness engineBusiness;
     private BoutiquesBusiness boutiquesBusiness;
     private ConfigurationBusiness configurationBusiness;
@@ -77,7 +77,8 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
                 getBean(WorkflowBusiness.class),
                 getBean(SimulationBusiness.class),
                 getBean(ResourceBusiness.class),
-                getBean(TagBusiness.class)
+                getBean(TagBusiness.class),
+                getBean(AppVersionBusiness.class)
         );
     }
 
@@ -85,7 +86,8 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
             ApplicationBusiness applicationBusiness, EngineBusiness engineBusiness,
             BoutiquesBusiness boutiquesBusiness, ConfigurationBusiness configurationBusiness,
             WorkflowBusiness workflowBusiness, SimulationBusiness simulationBusiness, 
-            ResourceBusiness resourceBusiness, TagBusiness tagBusiness) {
+            ResourceBusiness resourceBusiness, TagBusiness tagBusiness,
+            AppVersionBusiness appVersionBusiness) {
         this.applicationBusiness = applicationBusiness;
         this.engineBusiness = engineBusiness;
         this.boutiquesBusiness = boutiquesBusiness;
@@ -94,6 +96,7 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
         this.simulationBusiness = simulationBusiness;
         this.resourceBusiness = resourceBusiness;
         this.tagBusiness = tagBusiness;
+        this.appVersionBusiness = appVersionBusiness;
     }
 
     @Override
@@ -147,7 +150,7 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
         try {
             if (isSystemAdministrator() || isGroupAdministrator()) {
                 trace(logger, "Adding version '" + version.getVersion() + "' ('" + version.getApplicationName() + "').");
-                applicationBusiness.addVersion(version);
+                appVersionBusiness.add(version);
             } else {
                 logger.error("Unauthorized to add version {} to {}",
                         version.getVersion(), version.getApplicationName());
@@ -163,8 +166,7 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
         try {
             if (isSystemAdministrator() || isGroupAdministrator()) {
                 trace(logger, "Updating version '" + version.getVersion() + "' ('" + version.getApplicationName() + "').");
-
-                applicationBusiness.updateVersion(version);
+                appVersionBusiness.add(version);
             } else {
                 logger.error("Unauthorized to update version {}/{}",
                         version.getApplicationName(), version.getVersion());
@@ -180,8 +182,8 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
         try {
             if (isSystemAdministrator() || isGroupAdministrator()) {
                 trace(logger, "Removing application '" + applicationName + "'.");
-                applicationBusiness.removeVersion(
-                    applicationName, version);
+                appVersionBusiness.remove(applicationName, version);
+
             } else {
                 logger.error("Unauthorized to remove version {}/{}",
                         applicationName, version);
@@ -197,8 +199,8 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
         try {
             if (isSystemAdministrator() || isGroupAdministrator()) {
                 trace(logger, "Publishing version " + version + "' ('" + applicationName + "').");
-                return boutiquesBusiness.publishVersion(
-                    getSessionUser(), applicationName, version);
+                return boutiquesBusiness.publishVersion(getSessionUser(), applicationName, version);
+
             } else {
                 logger.error("Unauthorized to publish version {}/{}",
                         applicationName, version);
@@ -303,7 +305,7 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
     @Override
     public List<AppVersion> getVersions(String applicationName) throws ApplicationException {
         try {
-            return applicationBusiness.getVersions(applicationName);
+            return appVersionBusiness.getVersions(applicationName);
         } catch (BusinessException ex) {
             throw new ApplicationException(ex);
         }
@@ -355,8 +357,7 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
     @Override
     public AppVersion getVersion(String applicationName, String applicationVersion) throws ApplicationException {
         try {
-            return applicationBusiness.getVersion(
-                applicationName, applicationVersion);
+            return appVersionBusiness.getVersion(applicationName, applicationVersion);
         } catch (BusinessException ex) {
             throw new ApplicationException(ex);
         }
