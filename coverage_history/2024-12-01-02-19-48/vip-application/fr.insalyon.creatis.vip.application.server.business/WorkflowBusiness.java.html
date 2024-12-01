@@ -1,0 +1,758 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../jacoco-resources/report.gif" type="image/gif"/><title>WorkflowBusiness.java</title><link rel="stylesheet" href="../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../index.html" class="el_report">coverage</a> &gt; <a href="../index.html" class="el_bundle">vip-application</a> &gt; <a href="index.source.html" class="el_package">fr.insalyon.creatis.vip.application.server.business</a> &gt; <span class="el_source">WorkflowBusiness.java</span></div><h1>WorkflowBusiness.java</h1><pre class="source lang-java linenums">/*
+ * Copyright and authors: see LICENSE.txt in base repository.
+ *
+ * This software is a web portal for pipeline execution on distributed systems.
+ *
+ * This software is governed by the CeCILL-B license under French law and
+ * abiding by the rules of distribution of free software.  You can  use,
+ * modify and/ or redistribute the software under the terms of the CeCILL-B
+ * license as circulated by CEA, CNRS and INRIA at the following URL
+ * &quot;http://www.cecill.info&quot;.
+ *
+ * As a counterpart to the access to the source code and  rights to copy,
+ * modify and redistribute granted by the license, users are provided only
+ * with a limited warranty  and the software's author,  the holder of the
+ * economic rights,  and the successive licensors  have only  limited
+ * liability.
+ *
+ * In this respect, the user's attention is drawn to the risks associated
+ * with loading,  using,  modifying and/or developing or reproducing the
+ * software by the user in light of its specific status of free software,
+ * that may mean  that it is complicated to manipulate,  and  that  also
+ * therefore means  that it is reserved for developers  and  experienced
+ * professionals having in-depth computer knowledge. Users are therefore
+ * encouraged to load and test the software's suitability as regards their
+ * requirements in conditions enabling the security of their systems and/or
+ * data to be ensured and,  more generally, to use and operate it in the
+ * same conditions as regards security.
+ *
+ * The fact that you are presently reading this means that you have had
+ * knowledge of the CeCILL-B license and that you accept its terms.
+ */
+package fr.insalyon.creatis.vip.application.server.business;
+
+import fr.insalyon.creatis.grida.client.GRIDAClient;
+import fr.insalyon.creatis.grida.client.GRIDAClientException;
+import fr.insalyon.creatis.grida.client.GRIDAPoolClient;
+import fr.insalyon.creatis.moteur.plugins.workflowsdb.bean.*;
+import fr.insalyon.creatis.moteur.plugins.workflowsdb.dao.*;
+import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
+import fr.insalyon.creatis.vip.application.client.bean.*;
+import fr.insalyon.creatis.vip.application.client.view.monitor.SimulationStatus;
+import fr.insalyon.creatis.vip.application.client.view.monitor.progress.ProcessorStatus;
+import fr.insalyon.creatis.vip.application.server.business.simulation.ParameterSweep;
+import fr.insalyon.creatis.vip.application.server.business.simulation.parser.GwendiaParser;
+import fr.insalyon.creatis.vip.application.server.business.simulation.parser.InputM2Parser;
+import fr.insalyon.creatis.vip.application.server.dao.ApplicationDAO;
+import fr.insalyon.creatis.vip.application.server.dao.EngineDAO;
+import fr.insalyon.creatis.vip.application.server.dao.SimulationStatsDAO;
+import fr.insalyon.creatis.vip.core.client.bean.User;
+import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
+import fr.insalyon.creatis.vip.core.server.business.BusinessException;
+import fr.insalyon.creatis.vip.core.server.business.EmailBusiness;
+import fr.insalyon.creatis.vip.core.server.business.Server;
+import fr.insalyon.creatis.vip.core.server.dao.DAOException;
+import fr.insalyon.creatis.vip.core.server.dao.UsersGroupsDAO;
+import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerException;
+import fr.insalyon.creatis.vip.datamanager.server.DataManagerUtil;
+import fr.insalyon.creatis.vip.datamanager.server.business.DataManagerBusiness;
+import fr.insalyon.creatis.vip.datamanager.server.business.ExternalPlatformBusiness;
+import fr.insalyon.creatis.vip.datamanager.server.business.LfcPathsBusiness;
+import java.util.stream.Collectors;
+import org.apache.commons.io.FileUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Lookup;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.xml.sax.SAXException;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.*;
+
+import static fr.insalyon.creatis.vip.application.client.view.ApplicationException.ApplicationError.*;
+
+/**
+ *
+ * @author Rafael Ferreira da Silva
+ */
+@Service
+@Transactional
+public class WorkflowBusiness {
+
+<span class="fc" id="L85">    private final Logger logger = LoggerFactory.getLogger(getClass());</span>
+
+    private final Server server;
+    private final SimulationStatsDAO simulationStatsDAO;
+    private final WorkflowDAO workflowDAO;
+    private final ProcessorDAO processorDAO;
+    private final OutputDAO outputDAO;
+    private final InputDAO inputDAO;
+    private final StatsDAO statsDAO;
+    private final EngineDAO engineDAO;
+    private final ApplicationDAO applicationDAO;
+    private final UsersGroupsDAO usersGroupsDAO;
+    private final EngineBusiness engineBusiness;
+    private final DataManagerBusiness dataManagerBusiness;
+    private final EmailBusiness emailBusiness;
+    private final LfcPathsBusiness lfcPathsBusiness;
+    private final GRIDAPoolClient gridaPoolClient;
+    private final GRIDAClient gridaClient;
+    private final ExternalPlatformBusiness externalPlatformBusiness;
+
+    @Autowired
+    public WorkflowBusiness(
+            Server server, SimulationStatsDAO simulationStatsDAO,
+            WorkflowDAO workflowDAO, ProcessorDAO processorDAO,
+            OutputDAO outputDAO, InputDAO inputDAO, StatsDAO statsDAO,
+            EngineDAO engineDAO, ApplicationDAO applicationDAO,
+            UsersGroupsDAO usersGroupsDAO, EngineBusiness engineBusiness,
+            DataManagerBusiness dataManagerBusiness, EmailBusiness emailBusiness,
+            LfcPathsBusiness lfcPathsBusiness, GRIDAPoolClient gridaPoolClient,
+<span class="fc" id="L114">            GRIDAClient gridaClient, ExternalPlatformBusiness externalPlatformBusiness) {</span>
+<span class="fc" id="L115">        this.server = server;</span>
+<span class="fc" id="L116">        this.simulationStatsDAO = simulationStatsDAO;</span>
+<span class="fc" id="L117">        this.workflowDAO = workflowDAO;</span>
+<span class="fc" id="L118">        this.processorDAO = processorDAO;</span>
+<span class="fc" id="L119">        this.outputDAO = outputDAO;</span>
+<span class="fc" id="L120">        this.inputDAO = inputDAO;</span>
+<span class="fc" id="L121">        this.statsDAO = statsDAO;</span>
+<span class="fc" id="L122">        this.engineDAO = engineDAO;</span>
+<span class="fc" id="L123">        this.applicationDAO = applicationDAO;</span>
+<span class="fc" id="L124">        this.usersGroupsDAO = usersGroupsDAO;</span>
+<span class="fc" id="L125">        this.engineBusiness = engineBusiness;</span>
+<span class="fc" id="L126">        this.dataManagerBusiness = dataManagerBusiness;</span>
+<span class="fc" id="L127">        this.emailBusiness = emailBusiness;</span>
+<span class="fc" id="L128">        this.lfcPathsBusiness = lfcPathsBusiness;</span>
+<span class="fc" id="L129">        this.gridaPoolClient = gridaPoolClient;</span>
+<span class="fc" id="L130">        this.gridaClient = gridaClient;</span>
+<span class="fc" id="L131">        this.externalPlatformBusiness = externalPlatformBusiness;</span>
+<span class="fc" id="L132">    }</span>
+
+    /*
+    The 4 next dependencies cannot be injected by spring in a classic way as
+    they cannot be singleton (spring default scope). A new instance must be
+    created at each use and so we use the prototype scope with lookup methods
+    to inject them.
+    They need to be injected by spring (and not created with &quot;new&quot;) so spring
+    can handle their own dependencies.
+     */
+    @Lookup
+    protected WorkflowExecutionBusiness getWorkflowExecutionBusiness(String endpoint) {
+        // will be generated by spring to return a new instance each time
+<span class="nc" id="L145">        return null;</span>
+    }
+
+    @Lookup
+    protected GwendiaParser getGwendiaParser() {
+        // will be generated by spring to return a new instance each time
+<span class="nc" id="L151">        return null;</span>
+    }
+
+    @Lookup
+    protected InputM2Parser getInputM2Parser(String currentUserFolder) {
+        // will be generated by spring to return a new instance each time
+<span class="nc" id="L157">        return null;</span>
+    }
+
+    private Engine selectEngine(String applicationClass)
+            throws BusinessException {
+<span class="fc" id="L162">        long min = Integer.MAX_VALUE;</span>
+<span class="fc" id="L163">        Engine engineBean = null;</span>
+        try {
+<span class="fc" id="L165">            List&lt;Engine&gt; availableEngines = engineDAO.getByClass(applicationClass);</span>
+<span class="fc bfc" id="L166" title="All 2 branches covered.">            for (Engine engine : availableEngines) {</span>
+<span class="fc" id="L167">                long runningWorkflows = workflowDAO.getNumberOfRunningPerEngine(engine.getEndpoint());</span>
+<span class="pc bpc" id="L168" title="1 of 2 branches missed.">                if (runningWorkflows &lt; min) {</span>
+<span class="fc" id="L169">                    min = runningWorkflows;</span>
+<span class="fc" id="L170">                    engineBean = engine;</span>
+                }
+<span class="fc" id="L172">            }</span>
+<span class="nc" id="L173">        } catch (DAOException ex) {</span>
+<span class="nc" id="L174">            throw new BusinessException(ex);</span>
+<span class="nc" id="L175">        } catch (WorkflowsDBDAOException ex) {</span>
+<span class="nc" id="L176">            logger.error(&quot;Error finding an engine for {}&quot;, applicationClass, ex);</span>
+<span class="fc" id="L177">        }</span>
+<span class="pc bpc" id="L178" title="2 of 4 branches missed.">        if (engineBean == null || engineBean.getEndpoint().isEmpty()) {</span>
+<span class="nc" id="L179">            logger.error(&quot;No available engines for class {}&quot;, applicationClass);</span>
+<span class="nc" id="L180">            throw new BusinessException(&quot;No available engines for class &quot; + applicationClass);</span>
+        } else {
+<span class="fc" id="L182">            return engineBean;</span>
+        }
+    }
+
+    public synchronized String launch(
+            User user, List&lt;String&gt; groups, Map&lt;String, String&gt; parametersMap,
+            String applicationName, String applicationVersion,
+            String applicationClass, String simulationName)
+            throws BusinessException {
+
+        try {
+<span class="fc" id="L193">            long runningWorkflows = workflowDAO.getNumberOfRunning(user.getFullName());</span>
+<span class="fc" id="L194">            long runningSimulations=workflowDAO.getRunning().size();</span>
+<span class="pc bpc" id="L195" title="1 of 2 branches missed.">            if(runningSimulations &gt;= server.getMaxPlatformRunningSimulations()){</span>
+<span class="nc" id="L196">                logger.warn(&quot;Unable to launch execution '{}': max number of&quot;</span>
+                        + &quot; running workflows reached in the platform : {}&quot;,
+<span class="nc" id="L198">                        simulationName, runningSimulations);</span>
+<span class="nc" id="L199">                throw new BusinessException(PLATFORM_MAX_EXECS);</span>
+            }
+<span class="pc bpc" id="L201" title="1 of 2 branches missed.">            if (runningWorkflows &gt;= user.getMaxRunningSimulations()) {</span>
+
+<span class="nc" id="L203">                logger.warn(&quot;Unable to launch execution '{}': max number of &quot;</span>
+                        + &quot;running workflows reached ({}/{}) for user '{}'.&quot;,
+<span class="nc" id="L205">                        simulationName, runningWorkflows,</span>
+<span class="nc" id="L206">                        user.getMaxRunningSimulations(), user);</span>
+<span class="nc" id="L207">                throw new BusinessException(USER_MAX_EXECS, runningWorkflows);</span>
+            }
+
+<span class="fc" id="L210">            List&lt;ParameterSweep&gt; parameters = new ArrayList&lt;&gt;();</span>
+<span class="fc bfc" id="L211" title="All 2 branches covered.">            for (String name : parametersMap.keySet()) {</span>
+
+<span class="fc" id="L213">                ParameterSweep ps = new ParameterSweep(name);</span>
+<span class="fc" id="L214">                String valuesStr = parametersMap.get(name);</span>
+<span class="pc bpc" id="L215" title="1 of 2 branches missed.">                if (valuesStr.contains(ApplicationConstants.SEPARATOR_INPUT)) {</span>
+
+<span class="nc" id="L217">                    String[] values = valuesStr.split(ApplicationConstants.SEPARATOR_INPUT);</span>
+<span class="nc bnc" id="L218" title="All 2 branches missed.">                    if (values.length != 3) {</span>
+<span class="nc" id="L219">                        throw new fr.insalyon.creatis.vip.core.server.business.BusinessException(&quot;Error in range.&quot;);</span>
+                    }
+
+<span class="nc" id="L222">                    Double start = Double.parseDouble(values[0]);</span>
+<span class="nc" id="L223">                    Double stop = Double.parseDouble(values[1]);</span>
+<span class="nc" id="L224">                    Double step = Double.parseDouble(values[2]);</span>
+<span class="nc bnc" id="L225" title="All 2 branches missed.">                    for (double d = start; d &lt;= stop; d += step) {</span>
+<span class="nc" id="L226">                        ps.addValue(d + &quot;&quot;);</span>
+                    }
+
+<span class="pc bpc" id="L229" title="1 of 2 branches missed.">                } else if (valuesStr.contains(ApplicationConstants.SEPARATOR_LIST)) {</span>
+
+<span class="nc" id="L231">                    String[] values = valuesStr.split(ApplicationConstants.SEPARATOR_LIST);</span>
+<span class="nc bnc" id="L232" title="All 2 branches missed.">                    for (String v : values) {</span>
+
+<span class="nc" id="L234">                        String parsedParameter =</span>
+<span class="nc" id="L235">                            parseParameter(user, groups, name, v);</span>
+<span class="nc" id="L236">                        ps.addValue(parsedParameter);</span>
+                    }
+<span class="nc" id="L238">                } else {</span>
+<span class="fc" id="L239">                    String parsedParameter =</span>
+<span class="fc" id="L240">                        parseParameter(user, groups, name, valuesStr);</span>
+<span class="fc" id="L241">                    ps.addValue(parsedParameter);</span>
+                }
+<span class="fc" id="L243">                parameters.add(ps);</span>
+<span class="fc" id="L244">            }</span>
+
+<span class="fc" id="L246">            AppVersion version = applicationDAO.getVersion(</span>
+                    applicationName, applicationVersion);
+<span class="fc" id="L248">            logger.info( &quot; moteurlite status: &quot; + server.useMoteurlite());</span>
+<span class="fc bfc" id="L249" title="All 2 branches covered.">            String workflowPath = dataManagerBusiness.getRemoteFile(user, server.useMoteurlite() ? version.getJsonLfn() : version.getLfn());</span>
+            
+            //selectRandomEngine could also be used; TODO: make this choice configurable
+<span class="fc" id="L252">            Engine engine = selectEngine(applicationClass);</span>
+<span class="fc" id="L253">            WorkflowExecutionBusiness executionBusiness =</span>
+<span class="fc" id="L254">                    getWorkflowExecutionBusiness(engine.getEndpoint());</span>
+<span class="fc" id="L255">            Workflow workflow = null;</span>
+            try {
+<span class="fc" id="L257">                workflow = executionBusiness.launch(applicationName,</span>
+                        applicationVersion, applicationClass, user, simulationName,
+                        workflowPath, parameters);
+<span class="nc" id="L260">            } catch (BusinessException be) {</span>
+<span class="nc" id="L261">                logger.error(&quot;BusinessException caught on launch workflow, engine {} will be disabled&quot;, engine.getName());</span>
+            } finally {
+<span class="pc bpc" id="L263" title="1 of 2 branches missed.">                if (workflow == null) {</span>
+<span class="nc" id="L264">                    engine.setStatus(&quot;disabled&quot;);</span>
+<span class="nc" id="L265">                    this.engineBusiness.update(engine);</span>
+<span class="nc bnc" id="L266" title="All 2 branches missed.">                    for (User u : usersGroupsDAO</span>
+<span class="nc" id="L267">                            .getUsersFromGroup(CoreConstants.GROUP_SUPPORT)) {</span>
+<span class="nc" id="L268">                        logger.info(&quot;Sending warning email to user &quot; + u.toString() + &quot; having email address &quot; + u.getEmail());</span>
+<span class="nc" id="L269">                        emailBusiness.sendEmail(&quot;Urgent: VIP engine disabled&quot;,</span>
+<span class="nc" id="L270">                                &quot;Engine &quot; + engine.getName() + &quot; has just been disabled. Please check that there is at least one active engine left.&quot;,</span>
+<span class="nc" id="L271">                                new String[]{u.getEmail()}, true, user.getEmail());</span>
+<span class="nc" id="L272">                    }</span>
+<span class="nc" id="L273">                    throw new BusinessException(&quot;Workflow is null, engine &quot; + engine.getName() + &quot; has been disabled&quot;);</span>
+                }else{
+<span class="fc" id="L275">                    logger.info(&quot;Launched workflow &quot;+workflow.toString());</span>
+                }
+            }
+
+<span class="fc" id="L279">            workflowDAO.add(workflow);</span>
+<span class="fc" id="L280">            return workflow.getId();</span>
+
+<span class="nc" id="L282">        } catch (WorkflowsDBDAOException ex) {</span>
+<span class="nc" id="L283">            logger.error(&quot;Error launching simulation {}&quot;, simulationName, ex);</span>
+<span class="nc" id="L284">            throw new BusinessException(ex);</span>
+<span class="nc" id="L285">        } catch (DAOException | DataManagerException ex) {</span>
+<span class="nc" id="L286">            throw new BusinessException(ex);</span>
+        }
+    }
+
+    private String parseParameter(
+            User user, List&lt;String&gt; groups, String parameterName, String parameterValue)
+            throws DataManagerException, BusinessException {
+
+<span class="fc" id="L294">        parameterValue = parameterValue.trim();</span>
+
+<span class="fc" id="L296">        ExternalPlatformBusiness.ParseResult parseResult =</span>
+<span class="fc" id="L297">            externalPlatformBusiness.parseParameter(</span>
+                parameterName, parameterValue, user);
+<span class="pc bpc" id="L299" title="1 of 2 branches missed.">        if (parseResult.isUri) {</span>
+            // The uri has been generated
+<span class="nc" id="L301">            return parseResult.result;</span>
+        }
+        // not an external platform parameter, use legacy format
+<span class="fc" id="L304">        String parsedPath = lfcPathsBusiness.parseBaseDir(</span>
+                user, parameterValue);
+<span class="pc bpc" id="L306" title="1 of 2 branches missed.">        if (!user.isSystemAdministrator()) {</span>
+<span class="fc" id="L307">            checkFolderACL(user, groups, parsedPath);</span>
+        }
+<span class="fc bfc" id="L309" title="All 2 branches covered.">        if ( ! parsedPath.equals(parameterValue) // the parameter is a file path</span>
+<span class="pc bpc" id="L310" title="1 of 2 branches missed.">                &amp;&amp; server.useLocalFilesInInputs()) {</span>
+<span class="nc" id="L311">            parsedPath = &quot;file:&quot; + parsedPath;</span>
+        }
+<span class="fc" id="L313">        return parsedPath;</span>
+    }
+
+    public List&lt;Simulation&gt; getSimulations(User user, Date lastDate)
+            throws BusinessException {
+
+        try {
+<span class="nc bnc" id="L320" title="All 2 branches missed.">            return parseWorkflows(workflowDAO.get(user != null ? user.getFullName() : null, lastDate));</span>
+
+<span class="nc" id="L322">        } catch (WorkflowsDBDAOException ex) {</span>
+<span class="nc" id="L323">            logger.error(&quot;Error getting simulations for {} since {}&quot;, user, lastDate, ex);</span>
+<span class="nc" id="L324">            throw new BusinessException(ex);</span>
+        }
+    }
+
+    /**
+     * Get the simulation information
+     *
+     */
+    public List&lt;Simulation&gt; getSimulations(
+            String userName, String application, String status, String appClass,
+            Date startDate, Date endDate) throws BusinessException {
+
+<span class="fc" id="L336">        return getSimulations(userName, application, status, appClass, startDate, endDate, null);</span>
+    }
+
+    /**
+     * Get the simulation information
+     *
+     */
+    public List&lt;Simulation&gt; getSimulations(
+            String userName, String application, String status, String appClass,
+            Date startDate, Date endDate, String tag) throws BusinessException {
+
+<span class="fc" id="L347">        return getSimulations(</span>
+<span class="pc bpc" id="L348" title="1 of 2 branches missed.">                userName == null ? null : Collections.singletonList(userName),</span>
+                application, status, appClass, startDate, endDate, tag);
+    }
+
+    /**
+     * Get the simulation information
+     */
+    public List&lt;Simulation&gt; getSimulations(
+            List&lt;String&gt; users, String application, String status,
+            String appClass, Date startDate, Date endDate, String tag)
+            throws BusinessException {
+
+        try {
+<span class="pc bpc" id="L361" title="1 of 2 branches missed.">            if (endDate != null) {</span>
+<span class="nc" id="L362">                Calendar calendar = Calendar.getInstance();</span>
+<span class="nc" id="L363">                calendar.setTime(endDate);</span>
+<span class="nc" id="L364">                calendar.add(Calendar.DATE, 1);</span>
+<span class="nc" id="L365">                endDate = calendar.getTime();</span>
+            }
+
+<span class="fc" id="L368">            WorkflowStatus wStatus = null;</span>
+<span class="pc bpc" id="L369" title="1 of 2 branches missed.">            if (status != null) {</span>
+<span class="nc" id="L370">                wStatus = WorkflowStatus.valueOf(status);</span>
+            }
+
+<span class="fc" id="L373">            List&lt;Simulation&gt; simulations = parseWorkflows(</span>
+<span class="fc" id="L374">                    workflowDAO.get(users, application, wStatus, appClass, startDate, endDate, tag));</span>
+<span class="fc" id="L375">            checkRunningSimulations(simulations);</span>
+
+<span class="fc" id="L377">            return simulations;</span>
+
+<span class="nc" id="L379">        } catch (WorkflowsDBDAOException ex) {</span>
+<span class="nc" id="L380">            logger.error(&quot;Error searching simulations for users {}&quot;, users, ex);</span>
+<span class="nc" id="L381">            throw new BusinessException(ex);</span>
+        }
+    }
+
+    public Descriptor getApplicationDescriptor(
+            User user, String applicationName, String applicationVersion)
+            throws BusinessException {
+
+        try {
+<span class="fc" id="L390">            AppVersion version = applicationDAO.getVersion(applicationName, applicationVersion);</span>
+<span class="fc" id="L391">            String workflowPath = dataManagerBusiness.getRemoteFile(user, version.getLfn());</span>
+<span class="pc bpc" id="L392" title="1 of 2 branches missed.">            if ( ! workflowPath.endsWith(&quot;.gwendia&quot;)) {</span>
+<span class="nc" id="L393">                logger.error(&quot;Error : workflow file without gwendia extension : {}&quot;, workflowPath);</span>
+<span class="nc" id="L394">                throw new BusinessException(WRONG_APPLICATION_DESCRIPTOR, applicationName + &quot;/&quot; + applicationVersion);</span>
+            }
+<span class="fc" id="L396">            return getGwendiaParser().parse(workflowPath);</span>
+
+<span class="nc" id="L398">        } catch (SAXException | IOException ex) {</span>
+<span class="nc" id="L399">            logger.error(&quot;Error getting application descriptor for {}/{}&quot;, applicationName, applicationVersion, ex);</span>
+<span class="nc" id="L400">            throw new BusinessException(WRONG_APPLICATION_DESCRIPTOR, ex, applicationName + &quot;/&quot; + applicationVersion);</span>
+<span class="fc" id="L401">        } catch (DAOException | BusinessException ex) {</span>
+<span class="fc" id="L402">            throw new BusinessException(WRONG_APPLICATION_DESCRIPTOR, ex, applicationName + &quot;/&quot; + applicationVersion);</span>
+        }
+    }
+
+    public void kill(String simulationID) throws BusinessException {
+
+        try {
+<span class="fc" id="L409">            Workflow workflow = workflowDAO.get(simulationID);</span>
+<span class="fc" id="L410">            workflow.setStatus(WorkflowStatus.Killed);</span>
+<span class="fc" id="L411">            workflowDAO.update(workflow);</span>
+<span class="fc" id="L412">            WorkflowExecutionBusiness executionBusiness = getWorkflowExecutionBusiness(workflow.getEngine());</span>
+<span class="fc" id="L413">            executionBusiness.kill(simulationID);</span>
+
+<span class="nc" id="L415">        } catch (WorkflowsDBDAOException ex) {</span>
+<span class="nc" id="L416">            logger.error(&quot;Error killing simulation {}&quot;, simulationID, ex);</span>
+<span class="nc" id="L417">            throw new BusinessException(ex);</span>
+<span class="fc" id="L418">        }</span>
+<span class="fc" id="L419">    }</span>
+
+    public void clean(String simulationID, String email, boolean deleteFiles)
+            throws BusinessException {
+
+        try {
+<span class="fc" id="L425">            Workflow workflow = workflowDAO.get(simulationID);</span>
+<span class="fc" id="L426">            workflow.setStatus(WorkflowStatus.Cleaned);</span>
+<span class="fc" id="L427">            workflowDAO.update(workflow);</span>
+<span class="fc bfc" id="L428" title="All 2 branches covered.">            if(deleteFiles){</span>
+<span class="pc bpc" id="L429" title="1 of 2 branches missed.">                for (Output output : outputDAO.get(simulationID)) {</span>
+<span class="nc" id="L430">                    gridaPoolClient.delete(output.getOutputID().getPath(), email);</span>
+<span class="nc" id="L431">                }</span>
+            }
+<span class="fc" id="L433">            inputDAO.removeById(simulationID);</span>
+<span class="fc" id="L434">            outputDAO.removeById(simulationID);</span>
+
+<span class="nc" id="L436">        } catch (WorkflowsDBDAOException | GRIDAClientException ex) {</span>
+<span class="nc" id="L437">            logger.error(&quot;Error cleaning simulation {}&quot;, simulationID, ex);</span>
+<span class="nc" id="L438">            throw new BusinessException(ex);</span>
+<span class="fc" id="L439">        }</span>
+<span class="fc" id="L440">    }</span>
+
+    public void clean(String simulationId, String email) throws BusinessException{
+<span class="nc" id="L443">        clean(simulationId,email,true);</span>
+<span class="nc" id="L444">    }</span>
+
+    public void purge(String simulationID) throws BusinessException {
+
+        try {
+<span class="nc" id="L449">            workflowDAO.removeById(simulationID);</span>
+<span class="nc" id="L450">            processorDAO.removeById(simulationID);</span>
+<span class="nc" id="L451">            inputDAO.removeById(simulationID);</span>
+<span class="nc" id="L452">            outputDAO.removeById(simulationID);</span>
+<span class="nc" id="L453">            statsDAO.removeById(simulationID);</span>
+<span class="nc" id="L454">            String workflowsPath = server.getWorkflowsPath();</span>
+<span class="nc" id="L455">            File workflowDir = new File(workflowsPath, simulationID);</span>
+<span class="nc" id="L456">            FileUtils.deleteQuietly(workflowDir);</span>
+
+<span class="nc" id="L458">        } catch (WorkflowsDBDAOException ex) {</span>
+<span class="nc" id="L459">            logger.error(&quot;Error purging simulation {}&quot;, simulationID, ex);</span>
+<span class="nc" id="L460">            throw new BusinessException(ex);</span>
+<span class="nc" id="L461">        }</span>
+<span class="nc" id="L462">    }</span>
+
+    public Map&lt;String, String&gt; relaunch(String simulationID, String currentUserFolder)
+            throws BusinessException {
+
+        //TODO fix
+<span class="fc" id="L468">        return getInputM2Parser(currentUserFolder).parse(</span>
+<span class="fc" id="L469">            server.getWorkflowsPath() + &quot;/&quot; + simulationID + &quot;/input-m2.xml&quot;);</span>
+    }
+
+    public Simulation getSimulation(String simulationID) throws BusinessException {
+<span class="fc" id="L473">        return getSimulation(simulationID, false);</span>
+    }
+
+    public Simulation getSimulation(String simulationID, boolean refresh)
+            throws BusinessException {
+
+        Simulation simulation;
+        try {
+<span class="fc" id="L481">            Workflow workflow = workflowDAO.get(simulationID);</span>
+<span class="fc bfc" id="L482" title="All 2 branches covered.">            if (workflow == null) {</span>
+<span class="fc" id="L483">                logger.error(&quot;Cannot find execution with id {}&quot;, simulationID);</span>
+<span class="fc" id="L484">                throw new BusinessException(&quot;Cannot find execution with id &quot; + simulationID);</span>
+            }
+<span class="fc" id="L486">            simulation = parseWorkflow(workflow);</span>
+<span class="fc bfc" id="L487" title="All 2 branches covered.">            if (refresh) {</span>
+<span class="fc" id="L488">                checkRunningSimulations(Collections.singletonList(simulation));</span>
+            }
+
+<span class="fc" id="L491">        } catch (WorkflowsDBDAOException ex) {</span>
+<span class="fc" id="L492">            logger.error(&quot;Error getting simulation {}&quot;, simulationID, ex);</span>
+<span class="fc" id="L493">            throw new BusinessException(ex);</span>
+<span class="fc" id="L494">        }</span>
+
+<span class="fc" id="L496">        return simulation;</span>
+    }
+
+
+    public List&lt;InOutData&gt; getOutputData(String simulationID, String currentUserFolder)
+            throws BusinessException {
+<span class="fc" id="L502">        List&lt;InOutData&gt; list = new ArrayList&lt;&gt;();</span>
+        try {
+<span class="fc bfc" id="L504" title="All 2 branches covered.">            for (Output output : outputDAO.get(simulationID)) {</span>
+<span class="fc" id="L505">                String path = lfcPathsBusiness.parseRealDir(output.getOutputID().getPath(), currentUserFolder);</span>
+<span class="fc" id="L506">                list.add(new InOutData(path, output.getOutputID().getProcessor(), output.getType().name()));</span>
+<span class="fc" id="L507">            }</span>
+<span class="nc" id="L508">        } catch (WorkflowsDBDAOException | DataManagerException ex) {</span>
+<span class="nc" id="L509">            logger.error(&quot;Error getting output data for {}&quot;, simulationID, ex);</span>
+<span class="nc" id="L510">            throw new BusinessException(ex);</span>
+<span class="fc" id="L511">        }</span>
+<span class="fc" id="L512">        return list;</span>
+    }
+
+    public List&lt;InOutData&gt; getInputData(
+            String simulationID, String currentUserFolder)
+            throws BusinessException {
+
+        try {
+<span class="fc" id="L520">            List&lt;InOutData&gt; list = new ArrayList&lt;&gt;();</span>
+<span class="pc bpc" id="L521" title="1 of 2 branches missed.">            for (Input input : inputDAO.get(simulationID)) {</span>
+<span class="nc" id="L522">                String path = lfcPathsBusiness.parseRealDir(input.getInputID().getPath(), currentUserFolder);</span>
+<span class="nc" id="L523">                list.add(new InOutData(path, input.getInputID().getProcessor(), input.getType().name()));</span>
+<span class="nc" id="L524">            }</span>
+<span class="fc" id="L525">            return list;</span>
+
+<span class="nc" id="L527">        } catch (WorkflowsDBDAOException ex) {</span>
+<span class="nc" id="L528">            logger.error(&quot;Error getting input data for {}&quot;, simulationID, ex);</span>
+<span class="nc" id="L529">            throw new BusinessException(ex);</span>
+<span class="nc" id="L530">        } catch (DataManagerException ex) {</span>
+<span class="nc" id="L531">            throw new BusinessException(ex);</span>
+        }
+    }
+
+    public void deleteLogData(String path) throws BusinessException {
+        try {
+<span class="nc" id="L537">            File file = new File(server.getWorkflowsPath(), path);</span>
+<span class="nc bnc" id="L538" title="All 2 branches missed.">            if (file.isDirectory()) {</span>
+<span class="nc" id="L539">                FileUtils.deleteDirectory(file);</span>
+<span class="nc bnc" id="L540" title="All 2 branches missed.">            } else if (!file.delete()) {</span>
+<span class="nc" id="L541">                logger.error(&quot;Unable to delete log : {}&quot;, path);</span>
+<span class="nc" id="L542">                throw new BusinessException(&quot;Unable to delete data: &quot; + path);</span>
+            }
+<span class="nc" id="L544">        } catch (java.io.IOException ex) {</span>
+<span class="nc" id="L545">            logger.error(&quot;Error deleting log data for {}&quot;, path, ex);</span>
+<span class="nc" id="L546">            throw new BusinessException(ex);</span>
+<span class="nc" id="L547">        }</span>
+<span class="nc" id="L548">    }</span>
+
+    public List&lt;Activity&gt; getProcessors(String simulationID) throws BusinessException {
+
+        try {
+<span class="nc" id="L553">            List&lt;Activity&gt; list = new ArrayList&lt;&gt;();</span>
+<span class="nc bnc" id="L554" title="All 2 branches missed.">            for (Processor processor : processorDAO.get(simulationID)) {</span>
+
+<span class="nc" id="L556">                ProcessorStatus status = ProcessorStatus.Unstarted;</span>
+
+<span class="nc bnc" id="L558" title="All 2 branches missed.">                if (processor.getCompleted() + processor.getQueued() + processor.getFailed() &gt; 0) {</span>
+//                    if (failed &gt; 0) {
+//                        status = ProcessorStatus.Failed;
+//                    } else
+<span class="nc bnc" id="L562" title="All 2 branches missed.">                    if (processor.getQueued() &gt; 0) {</span>
+<span class="nc" id="L563">                        status = ProcessorStatus.Active;</span>
+                    } else {
+<span class="nc" id="L565">                        status = ProcessorStatus.Completed;</span>
+                    }
+                }
+<span class="nc" id="L568">                list.add(new Activity(processor.getProcessorID().getProcessor(),</span>
+<span class="nc" id="L569">                        status, processor.getCompleted(), processor.getQueued(),</span>
+<span class="nc" id="L570">                        processor.getFailed()));</span>
+<span class="nc" id="L571">            }</span>
+<span class="nc" id="L572">            return list;</span>
+
+<span class="nc" id="L574">        } catch (WorkflowsDBDAOException ex) {</span>
+<span class="nc" id="L575">            logger.error(&quot;Error getting processors for {}&quot;, simulationID, ex);</span>
+<span class="nc" id="L576">            throw new BusinessException(ex);</span>
+        }
+    }
+
+    public List&lt;String&gt; getPerformanceStats(
+            List&lt;Simulation&gt; simulationIDList, int type)
+            throws BusinessException, WorkflowsDBDAOException {
+
+<span class="nc bnc" id="L584" title="All 4 branches missed.">        if (simulationIDList == null || simulationIDList.isEmpty()) {</span>
+<span class="nc" id="L585">            logger.error(&quot;Incorrect call of getPerformanceStats : Execution list is null or empty : {}&quot;, simulationIDList);</span>
+<span class="nc" id="L586">            throw new BusinessException(&quot;Error getting performance stats&quot;);</span>
+        }
+
+<span class="nc" id="L589">        List&lt;String&gt; workflowIDList = simulationIDList.stream().map(Simulation::getID).collect(Collectors.toList());</span>
+
+        try {
+<span class="nc bnc" id="L592" title="All 5 branches missed.">            switch (type) {</span>
+<span class="nc" id="L593">                case 1: return simulationStatsDAO.getBySimulationID(workflowIDList);</span>
+<span class="nc" id="L594">                case 2: return simulationStatsDAO.getWorkflowsPerUser(workflowIDList);</span>
+<span class="nc" id="L595">                case 3: return simulationStatsDAO.getApplications(workflowIDList);</span>
+<span class="nc" id="L596">                case 4: return simulationStatsDAO.getClasses(workflowIDList);</span>
+                default:
+<span class="nc" id="L598">                    logger.error(&quot;Unsupported type to get performance stats : {}&quot;, type);</span>
+<span class="nc" id="L599">                    throw new BusinessException(&quot;Error getting performance stats&quot;);</span>
+            }
+<span class="nc" id="L601">        } catch (DAOException ex) {</span>
+<span class="nc" id="L602">            throw new BusinessException(ex);</span>
+        }
+    }
+
+    public void validateInputs(User user, List&lt;String&gt; inputs)
+            throws BusinessException {
+
+        try {
+
+<span class="nc" id="L611">            StringBuilder sb = new StringBuilder();</span>
+<span class="nc bnc" id="L612" title="All 2 branches missed.">            for (String input : inputs) {</span>
+<span class="nc bnc" id="L613" title="All 2 branches missed.">                if ( ! gridaClient.exist(lfcPathsBusiness.parseBaseDir(user, input))) {</span>
+<span class="nc bnc" id="L614" title="All 2 branches missed.">                    if (sb.length() &gt; 0) {</span>
+<span class="nc" id="L615">                        sb.append(&quot;, &quot;);</span>
+                    }
+<span class="nc" id="L617">                    sb.append(lfcPathsBusiness.parseBaseDir(user, input));</span>
+                }
+<span class="nc" id="L619">            }</span>
+
+<span class="nc bnc" id="L621" title="All 2 branches missed.">            if (sb.length() &gt; 0) {</span>
+<span class="nc" id="L622">                logger.error(&quot;The following data does not exist: &quot; + sb);</span>
+<span class="nc" id="L623">                throw new fr.insalyon.creatis.vip.core.server.business.BusinessException(</span>
+                        &quot;The following data does not exist: &quot; + sb);
+            }
+<span class="nc" id="L626">        } catch (DataManagerException ex) {</span>
+<span class="nc" id="L627">            throw new BusinessException(ex);</span>
+<span class="nc" id="L628">        } catch (GRIDAClientException ex) {</span>
+<span class="nc" id="L629">            logger.error(&quot;Error validating inputs for {}&quot;, user, ex);</span>
+<span class="nc" id="L630">            throw new BusinessException(ex);</span>
+<span class="nc" id="L631">        }</span>
+<span class="nc" id="L632">    }</span>
+
+    public void updateUser(String currentUser, String newUser)
+            throws BusinessException {
+
+        try {
+<span class="nc" id="L638">            workflowDAO.updateUsername(newUser, currentUser);</span>
+
+<span class="nc" id="L640">        } catch (WorkflowsDBDAOException ex) {</span>
+<span class="nc" id="L641">            logger.error(&quot;Error updating username from {} to {}&quot;, currentUser, newUser, ex);</span>
+<span class="nc" id="L642">            throw new BusinessException(ex);</span>
+<span class="nc" id="L643">        }</span>
+<span class="nc" id="L644">    }</span>
+
+    public void updateDescription(String simulationID, String newDescription)
+            throws BusinessException {
+        try {
+<span class="fc" id="L649">            Workflow w= workflowDAO.get(simulationID);</span>
+<span class="fc" id="L650">            w.setDescription(newDescription);</span>
+<span class="fc" id="L651">            workflowDAO.update(w);</span>
+<span class="nc" id="L652">        } catch (WorkflowsDBDAOException ex) {</span>
+<span class="nc" id="L653">            logger.error(&quot;Error updating description for {} to {}&quot;, simulationID, newDescription, ex);</span>
+<span class="nc" id="L654">            throw new BusinessException(ex);</span>
+<span class="fc" id="L655">        }</span>
+<span class="fc" id="L656">    }</span>
+
+    public List&lt;Simulation&gt; getRunningSimulations() throws BusinessException {
+        try {
+<span class="nc" id="L660">            return parseWorkflows(workflowDAO.getRunning());</span>
+
+<span class="nc" id="L662">        } catch (WorkflowsDBDAOException ex) {</span>
+<span class="nc" id="L663">            logger.error(&quot;Error getting all running simulations&quot;, ex);</span>
+<span class="nc" id="L664">            throw new BusinessException(ex);</span>
+        }
+    }
+
+    private void checkFolderACL(User user, List&lt;String&gt; groups, String path)
+            throws BusinessException {
+<span class="fc bfc" id="L670" title="All 2 branches covered.">        if (path.startsWith(server.getDataManagerUsersHome())) {</span>
+
+<span class="fc" id="L672">            path = path.replace(server.getDataManagerUsersHome() + &quot;/&quot;, &quot;&quot;);</span>
+<span class="pc bpc" id="L673" title="1 of 2 branches missed.">            if (!path.startsWith(user.getFolder())) {</span>
+
+<span class="nc" id="L675">                logger.error(&quot;User {} tried to access data from another user: {}&quot;, user, path);</span>
+<span class="nc" id="L676">                throw new BusinessException(&quot;Access denied to another user's home.&quot;);</span>
+            }
+<span class="pc bpc" id="L678" title="1 of 2 branches missed.">        } else if (path.startsWith(server.getDataManagerGroupsHome())) {</span>
+
+<span class="nc" id="L680">            path = path.replace(server.getDataManagerGroupsHome() + &quot;/&quot;, &quot;&quot;);</span>
+<span class="nc bnc" id="L681" title="All 2 branches missed.">            if (path.contains(&quot;/&quot;)) {</span>
+<span class="nc" id="L682">                path = path.substring(0, path.indexOf(&quot;/&quot;));</span>
+            }
+
+<span class="nc bnc" id="L685" title="All 2 branches missed.">            if (!DataManagerUtil.getPaths(groups).contains(path)) {</span>
+<span class="nc" id="L686">                logger.error(&quot;User {} tried to access data from a non-autorized group: {}&quot;, user, path);</span>
+<span class="nc" id="L687">                throw new BusinessException(&quot;Access denied to group '&quot; + path + &quot;'.&quot;);</span>
+            }
+        }
+<span class="fc" id="L690">    }</span>
+
+    private List&lt;Simulation&gt; parseWorkflows(List&lt;Workflow&gt; list) {
+<span class="fc" id="L693">        return list.stream().map(this::parseWorkflow).collect(Collectors.toList());</span>
+    }
+
+    private Simulation parseWorkflow(Workflow workflow) {
+<span class="fc" id="L697">        return new Simulation(</span>
+<span class="fc" id="L698">                    workflow.getApplication(),</span>
+<span class="fc" id="L699">                    workflow.getApplicationVersion(),</span>
+<span class="fc" id="L700">                    workflow.getApplicationClass(),</span>
+<span class="fc" id="L701">                    workflow.getId(),</span>
+<span class="fc" id="L702">                    workflow.getUsername(),</span>
+<span class="fc" id="L703">                    workflow.getStartedTime(),</span>
+<span class="fc" id="L704">                    workflow.getDescription(),</span>
+<span class="fc" id="L705">                    workflow.getStatus().name(),</span>
+<span class="fc" id="L706">                    workflow.getEngine(),</span>
+<span class="fc" id="L707">                    workflow.getTags());</span>
+    }
+
+    private void checkRunningSimulations(List&lt;Simulation&gt; simulations)
+            throws BusinessException, WorkflowsDBDAOException {
+
+<span class="fc bfc" id="L713" title="All 2 branches covered.">        for (Simulation simulation : simulations) {</span>
+
+<span class="fc bfc" id="L715" title="All 2 branches covered.">            if (simulation.getStatus() == SimulationStatus.Running</span>
+<span class="pc bpc" id="L716" title="1 of 2 branches missed.">                    || simulation.getStatus() == SimulationStatus.Unknown) {</span>
+<span class="fc" id="L717">                WorkflowExecutionBusiness executionBusiness = getWorkflowExecutionBusiness(simulation.getEngine());</span>
+<span class="fc" id="L718">                SimulationStatus simulationStatus = executionBusiness.getStatus(simulation.getID());</span>
+
+<span class="pc bpc" id="L720" title="3 of 4 branches missed.">                if (simulationStatus != SimulationStatus.Running</span>
+                        &amp;&amp; simulationStatus != SimulationStatus.Unknown) {
+<span class="nc" id="L722">                    simulation.setStatus(simulationStatus);</span>
+<span class="nc" id="L723">                    Workflow workflow = workflowDAO.get(simulation.getID());</span>
+<span class="nc" id="L724">                    workflow.setStatus(WorkflowStatus.valueOf(simulationStatus.name()));</span>
+<span class="nc" id="L725">                    workflowDAO.update(workflow);</span>
+                }
+            }
+<span class="fc" id="L728">        }</span>
+<span class="fc" id="L729">    }</span>
+
+    public void markCompleted(String simulationID) throws BusinessException {
+        try {
+<span class="nc" id="L733">            Workflow workflow = workflowDAO.get(simulationID);</span>
+<span class="nc" id="L734">            workflow.setStatus(WorkflowStatus.Completed);</span>
+<span class="nc" id="L735">            workflowDAO.update(workflow);</span>
+
+
+<span class="nc" id="L738">        } catch (WorkflowsDBDAOException ex) {</span>
+<span class="nc" id="L739">            logger.error(&quot;Error marking simulation {} completed&quot;, simulationID, ex);</span>
+<span class="nc" id="L740">            throw new BusinessException(ex);</span>
+<span class="nc" id="L741">        }</span>
+<span class="nc" id="L742">    }</span>
+
+    public void changeSimulationUser(String simulationId, String user)
+            throws BusinessException {
+        try {
+<span class="nc" id="L747">            Workflow workflow = workflowDAO.get(simulationId);</span>
+<span class="nc" id="L748">            workflow.setUsername(user);</span>
+<span class="nc" id="L749">            workflowDAO.update(workflow);</span>
+
+
+<span class="nc" id="L752">        } catch (WorkflowsDBDAOException ex) {</span>
+<span class="nc" id="L753">            logger.error(&quot;Error changing simulation {} owner to {}&quot;, simulationId, user, ex);</span>
+<span class="nc" id="L754">            throw new BusinessException(ex);</span>
+<span class="nc" id="L755">        }</span>
+<span class="nc" id="L756">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

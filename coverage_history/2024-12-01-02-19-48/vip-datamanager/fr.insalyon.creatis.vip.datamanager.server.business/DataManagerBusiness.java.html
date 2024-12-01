@@ -1,0 +1,274 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../jacoco-resources/report.gif" type="image/gif"/><title>DataManagerBusiness.java</title><link rel="stylesheet" href="../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../index.html" class="el_report">coverage</a> &gt; <a href="../index.html" class="el_bundle">vip-datamanager</a> &gt; <a href="index.source.html" class="el_package">fr.insalyon.creatis.vip.datamanager.server.business</a> &gt; <span class="el_source">DataManagerBusiness.java</span></div><h1>DataManagerBusiness.java</h1><pre class="source lang-java linenums">/*
+ * Copyright and authors: see LICENSE.txt in base repository.
+ *
+ * This software is a web portal for pipeline execution on distributed systems.
+ *
+ * This software is governed by the CeCILL-B license under French law and
+ * abiding by the rules of distribution of free software.  You can  use,
+ * modify and/ or redistribute the software under the terms of the CeCILL-B
+ * license as circulated by CEA, CNRS and INRIA at the following URL
+ * &quot;http://www.cecill.info&quot;.
+ *
+ * As a counterpart to the access to the source code and  rights to copy,
+ * modify and redistribute granted by the license, users are provided only
+ * with a limited warranty  and the software's author,  the holder of the
+ * economic rights,  and the successive licensors  have only  limited
+ * liability.
+ *
+ * In this respect, the user's attention is drawn to the risks associated
+ * with loading,  using,  modifying and/or developing or reproducing the
+ * software by the user in light of its specific status of free software,
+ * that may mean  that it is complicated to manipulate,  and  that  also
+ * therefore means  that it is reserved for developers  and  experienced
+ * professionals having in-depth computer knowledge. Users are therefore
+ * encouraged to load and test the software's suitability as regards their
+ * requirements in conditions enabling the security of their systems and/or
+ * data to be ensured and,  more generally, to use and operate it in the
+ * same conditions as regards security.
+ *
+ * The fact that you are presently reading this means that you have had
+ * knowledge of the CeCILL-B license and that you accept its terms.
+ */
+package fr.insalyon.creatis.vip.datamanager.server.business;
+
+import fr.insalyon.creatis.devtools.FileUtils;
+import fr.insalyon.creatis.grida.client.GRIDACacheClient;
+import fr.insalyon.creatis.grida.client.GRIDAClient;
+import fr.insalyon.creatis.grida.client.GRIDAClientException;
+import fr.insalyon.creatis.grida.client.GRIDAZombieClient;
+import fr.insalyon.creatis.grida.common.bean.CachedFile;
+import fr.insalyon.creatis.grida.common.bean.ZombieFile;
+import fr.insalyon.creatis.vip.core.client.bean.User;
+import fr.insalyon.creatis.vip.core.server.business.BusinessException;
+import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
+import fr.insalyon.creatis.vip.core.server.business.Server;
+import fr.insalyon.creatis.vip.core.server.dao.DAOException;
+import fr.insalyon.creatis.vip.datamanager.client.bean.DMCachedFile;
+import fr.insalyon.creatis.vip.datamanager.client.bean.DMZombieFile;
+import fr.insalyon.creatis.vip.datamanager.client.bean.SSH;
+import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerException;
+import fr.insalyon.creatis.vip.datamanager.server.dao.SSHDAO;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ *
+ * @author Rafael Silva
+ */
+@Service
+@Transactional
+public class DataManagerBusiness {
+
+<span class="fc" id="L69">    private final Logger logger = LoggerFactory.getLogger(getClass());</span>
+
+    private SSHDAO sshdao;
+    private GRIDAClient gridaClient;
+    private GRIDACacheClient gridaCacheClient;
+    private GRIDAZombieClient gridaZombieClient;
+    private ConfigurationBusiness configurationBusiness;
+    private LfcPathsBusiness lfcPathsBusiness;
+    private Server server;
+
+    @Autowired
+    public DataManagerBusiness(
+            SSHDAO sshdao, GRIDAClient gridaClient, GRIDACacheClient gridaCacheClient,
+<span class="fc" id="L82">            GRIDAZombieClient gridaZombieClient, ConfigurationBusiness configurationBusiness, LfcPathsBusiness lfcPathsBusiness, Server server) {</span>
+<span class="fc" id="L83">        this.sshdao = sshdao;</span>
+<span class="fc" id="L84">        this.gridaClient = gridaClient;</span>
+<span class="fc" id="L85">        this.gridaCacheClient = gridaCacheClient;</span>
+<span class="fc" id="L86">        this.gridaZombieClient = gridaZombieClient;</span>
+<span class="fc" id="L87">        this.configurationBusiness = configurationBusiness;</span>
+<span class="fc" id="L88">        this.lfcPathsBusiness = lfcPathsBusiness;</span>
+<span class="fc" id="L89">        this.server = server;</span>
+<span class="fc" id="L90">    }</span>
+
+    public void deleteLocalFile(String fileName) {
+
+<span class="nc" id="L94">        File file = new File(fileName);</span>
+<span class="nc bnc" id="L95" title="All 2 branches missed.">        if (file.exists()) {</span>
+<span class="nc" id="L96">            file.delete();</span>
+        } else {
+<span class="nc" id="L98">            logger.error(&quot;File '&quot; + fileName + &quot;' does not exist.&quot;);</span>
+        }
+<span class="nc" id="L100">    }</span>
+
+    public List&lt;DMCachedFile&gt; getCachedFiles() throws BusinessException {
+
+        try {
+
+<span class="nc" id="L106">            List&lt;CachedFile&gt; cachedFilesList = gridaCacheClient.getCachedFiles();</span>
+<span class="nc" id="L107">            List&lt;DMCachedFile&gt; dmCachedFiles = new ArrayList&lt;&gt;();</span>
+
+<span class="nc bnc" id="L109" title="All 2 branches missed.">            for (CachedFile cf : cachedFilesList) {</span>
+<span class="nc" id="L110">                dmCachedFiles.add(new DMCachedFile(cf.getPath(),</span>
+<span class="nc" id="L111">                        cf.getName(), FileUtils.parseFileSize((long) cf.getSize()),</span>
+<span class="nc" id="L112">                        cf.getFrequency(), cf.getLastUsage()));</span>
+<span class="nc" id="L113">            }</span>
+
+<span class="nc" id="L115">            return dmCachedFiles;</span>
+
+<span class="nc" id="L117">        } catch (GRIDAClientException ex) {</span>
+<span class="nc" id="L118">            logger.error(&quot;Error getting cached files&quot;, ex);</span>
+<span class="nc" id="L119">            throw new BusinessException(ex);</span>
+        }
+    }
+
+    public void deleteCachedFiles(List&lt;String&gt; cachedFiles) throws BusinessException {
+
+        try {
+<span class="nc bnc" id="L126" title="All 2 branches missed.">            for (String path : cachedFiles) {</span>
+<span class="nc" id="L127">                gridaCacheClient.deleteCachedFile(path);</span>
+<span class="nc" id="L128">            }</span>
+<span class="nc" id="L129">        } catch (GRIDAClientException ex) {</span>
+<span class="nc" id="L130">            logger.error(&quot;Error deleting cached files {}&quot;, cachedFiles, ex);</span>
+<span class="nc" id="L131">            throw new BusinessException(ex);</span>
+<span class="nc" id="L132">        }</span>
+<span class="nc" id="L133">    }</span>
+
+    public String getRemoteFile(User user, String remoteFile)
+            throws BusinessException {
+
+        String remotePath;
+        String localDir;
+        try {
+<span class="fc" id="L141">            remotePath = lfcPathsBusiness.parseBaseDir(user, remoteFile);</span>
+<span class="fc" id="L142">            localDir = lfcPathsBusiness.getLocalDirForGridaFileDownload(remotePath);</span>
+<span class="nc" id="L143">        } catch (DataManagerException ex) {</span>
+<span class="nc" id="L144">            throw new BusinessException(ex);</span>
+<span class="fc" id="L145">        }</span>
+        try {
+<span class="fc" id="L147">            return gridaClient.getRemoteFile(</span>
+                    remotePath,
+                    localDir);
+<span class="fc" id="L150">        } catch (GRIDAClientException ex) {</span>
+<span class="fc" id="L151">            logger.error(&quot;Error getting file {} to {} by {}&quot;,</span>
+                    remoteFile, localDir, user, ex);
+<span class="fc" id="L153">            throw new BusinessException(ex);</span>
+        }
+    }
+
+    /**
+     * Gets the list of zombie files.
+     */
+    public List&lt;DMZombieFile&gt; getZombieFiles() throws BusinessException {
+
+        try {
+<span class="nc" id="L163">            List&lt;DMZombieFile&gt; list = new ArrayList&lt;&gt;();</span>
+<span class="nc bnc" id="L164" title="All 2 branches missed.">            for (ZombieFile zf : gridaZombieClient.getList()) {</span>
+<span class="nc" id="L165">                list.add(new DMZombieFile(zf.getSurl(), zf.getRegistration()));</span>
+<span class="nc" id="L166">            }</span>
+<span class="nc" id="L167">            return list;</span>
+
+<span class="nc" id="L169">        } catch (GRIDAClientException ex) {</span>
+<span class="nc" id="L170">            logger.error(&quot;Error getting zombie files&quot;, ex);</span>
+<span class="nc" id="L171">            throw new BusinessException(ex);</span>
+        }
+    }
+
+    /**
+     * Deletes a list of zombie files.
+     *
+     * @param surls List of zombie SURLs
+     */
+    public void deleteZombieFiles(List&lt;String&gt; surls) throws BusinessException {
+
+        try {
+
+<span class="nc bnc" id="L184" title="All 2 branches missed.">            for (String surl : surls) {</span>
+<span class="nc" id="L185">                gridaZombieClient.delete(surl);</span>
+<span class="nc" id="L186">            }</span>
+<span class="nc" id="L187">        } catch (GRIDAClientException ex) {</span>
+<span class="nc" id="L188">            logger.error(&quot;Error deleting zombie files {}&quot;, surls, ex);</span>
+<span class="nc" id="L189">            throw new BusinessException(ex);</span>
+<span class="nc" id="L190">        }</span>
+<span class="nc" id="L191">    }</span>
+
+    public List&lt;SSH&gt; getSSHConnections() throws BusinessException {
+        try {
+<span class="nc" id="L195">            return sshdao.getSSHConnections();</span>
+<span class="nc" id="L196">        } catch (DAOException ex) {</span>
+<span class="nc" id="L197">            throw new BusinessException(ex);</span>
+        }
+    }
+
+    public void addSSH(SSH ssh) throws BusinessException {
+        try {
+            //create LFC dir
+<span class="nc" id="L204">            User user = configurationBusiness.getUser(ssh.getEmail());</span>
+<span class="nc" id="L205">            ssh.setLfcDir(lfcPathsBusiness.parseBaseDir(user, ssh.getLfcDir()));</span>
+<span class="nc" id="L206">            sshdao.addSSH(ssh);</span>
+<span class="nc" id="L207">        } catch (DAOException | DataManagerException ex) {</span>
+<span class="nc" id="L208">            throw new BusinessException(ex);</span>
+<span class="nc" id="L209">        }</span>
+<span class="nc" id="L210">    }</span>
+
+    public void removeSSH(String email, String name) throws BusinessException {
+        try {
+<span class="nc" id="L214">            String lfcDir = getLFCDir(email, name);</span>
+<span class="nc" id="L215">            sshdao.removeSSH(email, lfcDir);</span>
+<span class="nc" id="L216">        } catch (DAOException ex) {</span>
+<span class="nc" id="L217">            throw new BusinessException(ex);</span>
+<span class="nc" id="L218">        }</span>
+<span class="nc" id="L219">    }</span>
+
+    public void resetSSHs(List&lt;List&lt;String&gt;&gt; sshConnections) throws BusinessException {
+
+        try {
+            // replace ssh name with complete lfc paths
+<span class="nc bnc" id="L225" title="All 2 branches missed.">            for (List&lt;String&gt; sshConnection : sshConnections) {</span>
+<span class="nc" id="L226">                String lfcDir = getLFCDir(sshConnection.get(0), sshConnection.get(1));</span>
+<span class="nc" id="L227">                sshConnection.set(1, lfcDir);</span>
+<span class="nc" id="L228">            }</span>
+<span class="nc" id="L229">            sshdao.resetSSHConnections(sshConnections);</span>
+<span class="nc" id="L230">        } catch (DAOException ex) {</span>
+<span class="nc" id="L231">            throw new BusinessException(ex);</span>
+<span class="nc" id="L232">        }</span>
+<span class="nc" id="L233">    }</span>
+
+    public void updateSSH(SSH ssh) throws BusinessException {
+        try {
+<span class="nc" id="L237">            generateLFCDir(ssh);</span>
+<span class="nc" id="L238">            sshdao.updateSSH(ssh);</span>
+<span class="nc" id="L239">        } catch (DAOException ex) {</span>
+<span class="nc" id="L240">            throw new BusinessException(ex);</span>
+<span class="nc" id="L241">        }</span>
+<span class="nc" id="L242">    }</span>
+
+    public void generateLFCDir(SSH ssh) throws BusinessException {
+<span class="nc" id="L245">        String lfcDir = getLFCDir(ssh.getEmail(), ssh.getName());</span>
+<span class="nc" id="L246">        ssh.setLfcDir(lfcDir);</span>
+<span class="nc" id="L247">    }</span>
+
+    public String getLFCDir(String email, String lfcName) throws BusinessException {
+
+<span class="nc" id="L251">        User user = configurationBusiness.getUser(email);</span>
+<span class="nc" id="L252">        String homeDir = server.getDataManagerUsersHome() + &quot;/&quot; + user.getFolder();</span>
+
+<span class="nc" id="L254">        return (homeDir + &quot;/&quot; + lfcName);</span>
+    }
+
+    public String getUploadRootDirectory(boolean local) {
+
+<span class="nc" id="L259">        String rootDirectory = server.getDataManagerPath()</span>
+                + &quot;/uploads/&quot;;
+
+<span class="nc bnc" id="L262" title="All 2 branches missed.">        if (!local) {</span>
+<span class="nc" id="L263">            rootDirectory += System.nanoTime() + &quot;/&quot;;</span>
+        }
+
+<span class="nc" id="L266">        File dir = new File(rootDirectory);</span>
+<span class="nc bnc" id="L267" title="All 2 branches missed.">        if (!dir.exists()) {</span>
+<span class="nc" id="L268">            dir.mkdirs();</span>
+        }
+<span class="nc" id="L270">        return rootDirectory;</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

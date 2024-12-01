@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../jacoco-resources/report.gif" type="image/gif"/><title>EgiController.java</title><link rel="stylesheet" href="../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../index.html" class="el_report">coverage</a> &gt; <a href="../index.html" class="el_bundle">vip-api</a> &gt; <a href="index.source.html" class="el_package">fr.insalyon.creatis.vip.api.controller</a> &gt; <span class="el_source">EgiController.java</span></div><h1>EgiController.java</h1><pre class="source lang-java linenums">package fr.insalyon.creatis.vip.api.controller;
+
+import fr.insalyon.creatis.vip.api.exception.ApiException;
+import fr.insalyon.creatis.vip.core.client.bean.User;
+import fr.insalyon.creatis.vip.core.client.view.CoreException;
+import fr.insalyon.creatis.vip.core.server.business.BusinessException;
+import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
+import fr.insalyon.creatis.vip.core.server.business.VipSessionBusiness;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.view.RedirectView;
+import org.springframework.web.util.UriUtils;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.security.Principal;
+import java.util.Map;
+
+@RestController
+public class EgiController {
+
+<span class="fc" id="L27">    private final Logger logger = LoggerFactory.getLogger(getClass());</span>
+
+    private final VipSessionBusiness vipSessionBusiness;
+    private final ConfigurationBusiness configurationBusiness;
+
+    @Autowired
+<span class="fc" id="L33">    public EgiController(VipSessionBusiness vipSessionBusiness, ConfigurationBusiness configurationBusiness) {</span>
+<span class="fc" id="L34">        this.vipSessionBusiness = vipSessionBusiness;</span>
+<span class="fc" id="L35">        this.configurationBusiness = configurationBusiness;</span>
+<span class="fc" id="L36">    }</span>
+
+    @GetMapping(&quot;/loginEgi&quot;)
+    public RedirectView getOauth2LoginInfo(
+            HttpServletRequest request, HttpServletResponse response, Principal user)
+            throws ApiException {
+
+<span class="nc bnc" id="L43" title="All 2 branches missed.">        if ( ! (user instanceof OAuth2AuthenticationToken)) {</span>
+<span class="nc" id="L44">            logger.error(&quot;Egi login must only be called after an OIDC login. User [{}]&quot;, user);</span>
+<span class="nc" id="L45">            throw new ApiException(ApiException.ApiError.WRONG_OIDC_LOGIN);</span>
+        }
+<span class="nc" id="L47">        OAuth2AuthenticationToken authToken = ((OAuth2AuthenticationToken) user);</span>
+<span class="nc bnc" id="L48" title="All 2 branches missed.">        if ( ! authToken.isAuthenticated()) {</span>
+<span class="nc" id="L49">            logger.error(&quot;Egi login method called with an anonymous user&quot;);</span>
+<span class="nc" id="L50">            throw new ApiException(ApiException.ApiError.WRONG_OIDC_LOGIN);</span>
+        }
+
+<span class="nc" id="L53">        Map&lt;String, Object&gt; userAttributes = authToken.getPrincipal().getAttributes();</span>
+<span class="nc" id="L54">        Object institution = userAttributes.get(&quot;eduperson_scoped_affiliation&quot;);</span>
+        String domainName;
+<span class="nc bnc" id="L56" title="All 2 branches missed.">        if(institution != null){</span>
+<span class="nc" id="L57">            String institution_string = institution.toString();</span>
+<span class="nc" id="L58">            String temp = institution_string .substring(institution_string .indexOf(&quot;@&quot;) + 1);</span>
+<span class="nc" id="L59">            domainName = temp.substring(0, temp.indexOf(&quot;.&quot;));</span>
+<span class="nc" id="L60">            domainName = domainName.toUpperCase();</span>
+<span class="nc" id="L61">        } else {</span>
+<span class="nc" id="L62">            domainName = &quot;Unknown&quot;;</span>
+        }
+
+        try {
+<span class="nc" id="L66">            User vipUser = configurationBusiness.getOrCreateUser((String) userAttributes.get(&quot;email&quot;), domainName, null);</span>
+<span class="nc" id="L67">            SecurityContextHolder.clearContext(); // destroy spring session and use VIP own session mechanism</span>
+<span class="nc" id="L68">            vipSessionBusiness.setVIPSession(request, response, vipUser); // creates VIP cookies and session</span>
+<span class="nc" id="L69">        } catch (BusinessException | CoreException e) {</span>
+<span class="nc" id="L70">            throw new ApiException(ApiException.ApiError.WRONG_OIDC_LOGIN, e);</span>
+<span class="nc" id="L71">        }</span>
+
+<span class="nc" id="L73">        return new RedirectView(getRootUrl(request)); // redirect on the home page where the VIP cookies will authenticate the user</span>
+    }
+
+    private String getRootUrl(HttpServletRequest request) {
+<span class="nc" id="L77">        String decodedUri = UriUtils.decode(request.getRequestURI(), &quot;UTF-8&quot;);</span>
+<span class="nc" id="L78">        int index = decodedUri.indexOf(&quot;/rest/loginEgi&quot;);</span>
+<span class="nc" id="L79">        return decodedUri.substring(0, index+1); // keep trailing slash</span>
+    }
+}
+
+
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

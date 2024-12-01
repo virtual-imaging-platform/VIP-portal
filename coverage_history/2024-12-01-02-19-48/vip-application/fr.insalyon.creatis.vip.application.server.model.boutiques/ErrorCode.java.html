@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../jacoco-resources/report.gif" type="image/gif"/><title>ErrorCode.java</title><link rel="stylesheet" href="../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../index.html" class="el_report">coverage</a> &gt; <a href="../index.html" class="el_bundle">vip-application</a> &gt; <a href="index.source.html" class="el_package">fr.insalyon.creatis.vip.application.server.model.boutiques</a> &gt; <span class="el_source">ErrorCode.java</span></div><h1>ErrorCode.java</h1><pre class="source lang-java linenums">
+package fr.insalyon.creatis.vip.application.server.model.boutiques;
+
+import javax.annotation.Generated;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyDescription;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+
+@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonPropertyOrder({
+    &quot;code&quot;,
+    &quot;description&quot;
+})
+@Generated(&quot;jsonschema2pojo&quot;)
+<span class="fc" id="L16">public class ErrorCode {</span>
+
+    /**
+     * Value of the exit code
+     * (Required)
+     * 
+     */
+    @JsonProperty(&quot;code&quot;)
+    @JsonPropertyDescription(&quot;Value of the exit code&quot;)
+    private Integer code;
+    /**
+     * Description of the error code.
+     * (Required)
+     * 
+     */
+    @JsonProperty(&quot;description&quot;)
+    @JsonPropertyDescription(&quot;Description of the error code.&quot;)
+    private String description;
+
+    /**
+     * Value of the exit code
+     * (Required)
+     * 
+     */
+    @JsonProperty(&quot;code&quot;)
+    public Integer getCode() {
+<span class="fc" id="L42">        return code;</span>
+    }
+
+    /**
+     * Value of the exit code
+     * (Required)
+     * 
+     */
+    @JsonProperty(&quot;code&quot;)
+    public void setCode(Integer code) {
+<span class="fc" id="L52">        this.code = code;</span>
+<span class="fc" id="L53">    }</span>
+
+    /**
+     * Description of the error code.
+     * (Required)
+     * 
+     */
+    @JsonProperty(&quot;description&quot;)
+    public String getDescription() {
+<span class="fc" id="L62">        return description;</span>
+    }
+
+    /**
+     * Description of the error code.
+     * (Required)
+     * 
+     */
+    @JsonProperty(&quot;description&quot;)
+    public void setDescription(String description) {
+<span class="fc" id="L72">        this.description = description;</span>
+<span class="fc" id="L73">    }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

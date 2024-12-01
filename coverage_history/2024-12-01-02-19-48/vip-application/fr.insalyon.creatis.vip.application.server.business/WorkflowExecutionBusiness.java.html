@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../jacoco-resources/report.gif" type="image/gif"/><title>WorkflowExecutionBusiness.java</title><link rel="stylesheet" href="../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../index.html" class="el_report">coverage</a> &gt; <a href="../index.html" class="el_bundle">vip-application</a> &gt; <a href="index.source.html" class="el_package">fr.insalyon.creatis.vip.application.server.business</a> &gt; <span class="el_source">WorkflowExecutionBusiness.java</span></div><h1>WorkflowExecutionBusiness.java</h1><pre class="source lang-java linenums">/*
+ * Copyright and authors: see LICENSE.txt in base repository.
+ *
+ * This software is a web portal for pipeline execution on distributed systems.
+ *
+ * This software is governed by the CeCILL-B license under French law and
+ * abiding by the rules of distribution of free software.  You can  use,
+ * modify and/ or redistribute the software under the terms of the CeCILL-B
+ * license as circulated by CEA, CNRS and INRIA at the following URL
+ * &quot;http://www.cecill.info&quot;.
+ *
+ * As a counterpart to the access to the source code and  rights to copy,
+ * modify and redistribute granted by the license, users are provided only
+ * with a limited warranty  and the software's author,  the holder of the
+ * economic rights,  and the successive licensors  have only  limited
+ * liability.
+ *
+ * In this respect, the user's attention is drawn to the risks associated
+ * with loading,  using,  modifying and/or developing or reproducing the
+ * software by the user in light of its specific status of free software,
+ * that may mean  that it is complicated to manipulate,  and  that  also
+ * therefore means  that it is reserved for developers  and  experienced
+ * professionals having in-depth computer knowledge. Users are therefore
+ * encouraged to load and test the software's suitability as regards their
+ * requirements in conditions enabling the security of their systems and/or
+ * data to be ensured and,  more generally, to use and operate it in the
+ * same conditions as regards security.
+ *
+ * The fact that you are presently reading this means that you have had
+ * knowledge of the CeCILL-B license and that you accept its terms.
+ */
+package fr.insalyon.creatis.vip.application.server.business;
+
+import fr.insalyon.creatis.moteur.plugins.workflowsdb.bean.Workflow;
+import fr.insalyon.creatis.moteur.plugins.workflowsdb.bean.WorkflowStatus;
+import fr.insalyon.creatis.vip.application.client.view.monitor.SimulationStatus;
+import fr.insalyon.creatis.vip.application.server.business.simulation.ParameterSweep;
+import fr.insalyon.creatis.vip.application.server.business.simulation.WebServiceEngine;
+import fr.insalyon.creatis.vip.core.client.bean.User;
+import fr.insalyon.creatis.vip.core.server.business.BusinessException;
+import fr.insalyon.creatis.vip.core.server.business.Server;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Service;
+
+import javax.annotation.PostConstruct;
+import java.io.File;
+import java.util.Date;
+import java.util.List;
+
+/**
+ * Wrapper on WebServiceEngine to configure it and to create a Workflow object
+ * after a launch.
+ *
+ * WorkflowExecutionBusiness and WebServiceEngine both have spring prototype
+ * scope, so each WorkflowExecutionBusiness use creates a new intance with a
+ * dedicated WebServiceEngine instance that it will wrap.
+ * This is needed as each time an engine is used, the endpoint can be different.
+ *
+ * @author Rafael Ferreira da Silva
+ */
+@Service
+@Scope(&quot;prototype&quot;)
+public class WorkflowExecutionBusiness {
+
+<span class="fc" id="L68">    private final Logger logger = LoggerFactory.getLogger(getClass());</span>
+
+    private Server server;
+    private WebServiceEngine engine;
+    private String engineEndpoint;
+
+    @Autowired
+    public final void setServer(Server server) {
+<span class="fc" id="L76">        this.server = server;</span>
+<span class="fc" id="L77">    }</span>
+
+    /*
+    WebServiceEngine is also prototype scoped, this creates a new instance
+    every time. 
+    */
+    @Autowired
+    public final void setEngine(WebServiceEngine engine) {
+<span class="fc" id="L85">        this.engine = engine;</span>
+<span class="fc" id="L86">    }</span>
+
+<span class="fc" id="L88">    public WorkflowExecutionBusiness(String engineEndpoint) throws BusinessException {</span>
+
+        //HACK for testing while still having simulations launched with VIP 1.16.1; to be removed before getting in production or replaced with a proper constant
+<span class="pc bpc" id="L91" title="1 of 2 branches missed.">        if(engineEndpoint == null){</span>
+<span class="nc" id="L92">            logger.info(&quot;WorkflowExecutionBusiness, endpoint is null, setting it to http://data-manager.grid.creatis.insa-lyon.fr/cgi-bin/m2Server-gasw3.1/moteur_server&quot;);</span>
+<span class="nc" id="L93">            engineEndpoint=&quot;http://data-manager.grid.creatis.insa-lyon.fr/cgi-bin/m2Server-gasw3.1/moteur_server&quot;;</span>
+        }
+<span class="fc" id="L95">        this.engineEndpoint = engineEndpoint;</span>
+<span class="fc" id="L96">    }</span>
+
+    @PostConstruct
+    public final void configureWebServiceEngine() {
+<span class="fc" id="L100">        engine.setAddressWS(engineEndpoint);</span>
+<span class="fc" id="L101">        String settings = &quot;GRID=DIRAC\n&quot;</span>
+                + &quot;SE=ccsrm02.in2p3.fr\n&quot;
+                + &quot;TIMEOUT=100000\n&quot;
+                + &quot;RETRYCOUNT=3\n&quot;
+                + &quot;MULTIJOB=1&quot;;
+<span class="fc" id="L106">        engine.setSettings(settings);</span>
+
+<span class="fc" id="L108">    }</span>
+
+    public Workflow launch(String applicationName, String applicationVersion,
+            String applicationClass, User user, String simulationName,
+            String workflowPath, List&lt;ParameterSweep&gt; parameters) throws BusinessException {
+
+        try {
+<span class="fc" id="L115">            engine.setWorkflow(new File(workflowPath));</span>
+<span class="fc" id="L116">            engine.setInput(parameters);</span>
+<span class="fc" id="L117">            String launchID = engine.launch(server.getServerProxy(server.getVoName()), null);</span>
+<span class="fc" id="L118">            String workflowID = engine.getSimulationId(launchID);</span>
+
+<span class="fc" id="L120">            return new Workflow(workflowID, user.getFullName(),</span>
+                    WorkflowStatus.Running,
+                    new Date(), null, simulationName, applicationName, applicationVersion, applicationClass,
+<span class="fc" id="L123">                    engine.getAddressWS(), null);</span>
+
+<span class="nc" id="L125">        } catch (javax.xml.rpc.ServiceException | java.rmi.RemoteException ex) {</span>
+<span class="nc" id="L126">            logger.error(&quot;Error launching simulation {} ({}/{})&quot;,</span>
+                    simulationName, applicationName, applicationVersion, ex);
+<span class="nc" id="L128">            throw new BusinessException(ex);</span>
+        }
+    }
+
+    public SimulationStatus getStatus(String simulationID) throws BusinessException {
+
+<span class="fc" id="L134">        SimulationStatus status = SimulationStatus.Unknown;</span>
+        try {
+<span class="fc" id="L136">            status = engine.getStatus(simulationID);</span>
+<span class="nc" id="L137">        } catch (javax.xml.rpc.ServiceException ex) {</span>
+<span class="nc" id="L138">            logger.error(&quot;Error getting status for {}&quot;, simulationID, ex);</span>
+<span class="nc" id="L139">            throw new BusinessException(ex);</span>
+<span class="nc" id="L140">        } catch (java.rmi.RemoteException ex) {</span>
+<span class="nc" id="L141">            logger.error(&quot;Error getting status for {}. Ignoring&quot;, simulationID, ex);</span>
+<span class="fc" id="L142">        }</span>
+
+<span class="fc" id="L144">        return status;</span>
+    }
+
+    public void kill(String simulationID) throws BusinessException {
+
+        try {
+<span class="fc" id="L150">            engine.kill(simulationID);</span>
+
+<span class="nc" id="L152">        } catch (javax.xml.rpc.ServiceException ex) {</span>
+<span class="nc" id="L153">            logger.error(&quot;Error killing simulation {}&quot;, simulationID, ex);</span>
+<span class="nc" id="L154">            throw new BusinessException(ex);</span>
+<span class="nc" id="L155">        } catch (java.rmi.RemoteException ex) {</span>
+<span class="nc" id="L156">            logger.error(&quot;Error killing simulation {}. Ignoring&quot;, simulationID, ex);</span>
+<span class="fc" id="L157">        }</span>
+<span class="fc" id="L158">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

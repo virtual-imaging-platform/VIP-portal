@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../jacoco-resources/report.gif" type="image/gif"/><title>LfcPathsBusiness.java</title><link rel="stylesheet" href="../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../index.html" class="el_report">coverage</a> &gt; <a href="../index.html" class="el_bundle">vip-datamanager</a> &gt; <a href="index.source.html" class="el_package">fr.insalyon.creatis.vip.datamanager.server.business</a> &gt; <span class="el_source">LfcPathsBusiness.java</span></div><h1>LfcPathsBusiness.java</h1><pre class="source lang-java linenums">package fr.insalyon.creatis.vip.datamanager.server.business;
+
+import fr.insalyon.creatis.vip.core.client.bean.Group;
+import fr.insalyon.creatis.vip.core.client.bean.User;
+import fr.insalyon.creatis.vip.core.server.business.BusinessException;
+import fr.insalyon.creatis.vip.core.server.business.Server;
+import fr.insalyon.creatis.vip.core.server.dao.DAOException;
+import fr.insalyon.creatis.vip.core.server.dao.GroupDAO;
+import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
+import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.net.URI;
+import java.nio.file.InvalidPathException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
+import static fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants.DOWNLOAD_FOLDER;
+
+/*
+    Utility service to convert user-readable virtual vip paths to real lfn paths
+    back and forth. For instance /vip/Home/file.txt to
+    /prefix/../user_folder/user_name/file.txt
+ */
+@Service
+@Transactional
+public class LfcPathsBusiness {
+
+<span class="fc" id="L33">    private final Logger logger = LoggerFactory.getLogger(getClass());</span>
+
+    private Server server;
+    private GroupDAO groupDAO;
+
+    @Autowired
+<span class="fc" id="L39">    public LfcPathsBusiness(Server server, GroupDAO groupDAO) {</span>
+<span class="fc" id="L40">        this.server = server;</span>
+<span class="fc" id="L41">        this.groupDAO = groupDAO;</span>
+<span class="fc" id="L42">    }</span>
+
+    public String parseBaseDir(User user, String baseDir)
+            throws DataManagerException {
+<span class="fc" id="L46">        baseDir = parsePath(baseDir, DataManagerConstants.USERS_HOME,</span>
+<span class="fc" id="L47">                server.getDataManagerUsersHome()</span>
+<span class="fc" id="L48">                        + &quot;/&quot; + user.getFolder());</span>
+
+<span class="fc" id="L50">        baseDir = parsePath(baseDir, DataManagerConstants.TRASH_HOME,</span>
+<span class="fc" id="L51">                server.getDataManagerUsersHome()</span>
+<span class="fc" id="L52">                        + &quot;/&quot; + user.getFolder()</span>
+                        + &quot;_&quot; + DataManagerConstants.TRASH_HOME);
+
+<span class="fc" id="L55">        baseDir = parsePath(baseDir, DataManagerConstants.USERS_FOLDER,</span>
+<span class="fc" id="L56">                server.getDataManagerUsersHome());</span>
+
+<span class="fc" id="L58">        baseDir = parsePath(baseDir, DataManagerConstants.VO_ROOT_FOLDER,</span>
+<span class="fc" id="L59">                server.getVoRoot());</span>
+
+        try {
+<span class="fc bfc" id="L62" title="All 2 branches covered.">            for (Group group : groupDAO.getGroups()) {</span>
+<span class="fc" id="L63">                String folderName = group.getName().replaceAll(&quot; &quot;, &quot;_&quot;);</span>
+
+<span class="fc" id="L65">                baseDir = parsePath(baseDir, group.getName() + DataManagerConstants.GROUP_APPEND,</span>
+<span class="fc" id="L66">                        server.getDataManagerGroupsHome()</span>
+                                + &quot;/&quot; + folderName);
+
+<span class="fc" id="L69">                baseDir = parsePath(baseDir, group.getName(),</span>
+<span class="fc" id="L70">                        server.getDataManagerGroupsHome()</span>
+                                + &quot;/&quot; + folderName);
+<span class="fc" id="L72">            }</span>
+<span class="nc" id="L73">        } catch (DAOException ex) {</span>
+<span class="nc" id="L74">            throw new DataManagerException(ex);</span>
+<span class="fc" id="L75">        }</span>
+
+<span class="fc" id="L77">        return baseDir;</span>
+    }
+
+    private String parsePath(String baseDir, String pattern, String toReplace) {
+<span class="fc" id="L81">        pattern = DataManagerConstants.ROOT + &quot;/&quot; + pattern;</span>
+<span class="fc bfc" id="L82" title="All 2 branches covered.">        if (baseDir.contains(pattern)) {</span>
+            /* the directory should correspond perfectly, not partially
+             * So either the path ends after the root subdirectory, either there is a slash
+             * and another path element after.
+             * */
+<span class="fc" id="L87">            int nextCharIndex = baseDir.indexOf(pattern) + pattern.length();</span>
+<span class="pc bpc" id="L88" title="1 of 4 branches missed.">            if (baseDir.length() == nextCharIndex || baseDir.charAt(nextCharIndex) == '/') {</span>
+<span class="fc" id="L89">                return baseDir.replace(pattern, toReplace);</span>
+            } else {
+<span class="nc" id="L91">                return baseDir;</span>
+            }
+        }
+<span class="fc" id="L94">        return baseDir;</span>
+    }
+
+    public String parseRealDir(String baseDir, String currentUserFolder)
+            throws DataManagerException {
+
+<span class="pc bpc" id="L100" title="1 of 2 branches missed.">        if (baseDir.startsWith(&quot;lfn://&quot;)) {</span>
+<span class="nc" id="L101">            baseDir = URI.create(baseDir).getPath();</span>
+        }
+
+<span class="fc" id="L104">        baseDir = replaceLfnUserPrefix(</span>
+<span class="fc" id="L105">                baseDir, currentUserFolder, server.getDataManagerUsersHome(),</span>
+<span class="fc" id="L106">                server.getAltDataManagerUsersHome());</span>
+
+        try {
+<span class="fc bfc" id="L109" title="All 2 branches covered.">            for (Group group : groupDAO.getGroups()) {</span>
+<span class="fc" id="L110">                baseDir = replaceLfnGroupPrefix(baseDir, group.getName(),</span>
+<span class="fc" id="L111">                        server.getDataManagerGroupsHome(),</span>
+<span class="fc" id="L112">                        server.getAltDataManagerGroupsHome());</span>
+<span class="fc" id="L113">            }</span>
+<span class="nc" id="L114">        } catch (DAOException ex) {</span>
+<span class="nc" id="L115">            throw new DataManagerException(ex);</span>
+<span class="fc" id="L116">        }</span>
+
+<span class="fc" id="L118">        baseDir = baseDir.replace(</span>
+<span class="fc" id="L119">                server.getVoRoot(),</span>
+                DataManagerConstants.ROOT + &quot;/&quot; + DataManagerConstants.VO_ROOT_FOLDER);
+
+<span class="fc" id="L122">        return baseDir;</span>
+    }
+
+    private String replaceLfnUserPrefix(String path, String currentUserFolder, String... prefixesToReplace) {
+<span class="fc" id="L126">        String prefixToReplace = null;</span>
+<span class="fc bfc" id="L127" title="All 2 branches covered.">        for (String prefixToTest : prefixesToReplace) {</span>
+<span class="pc bpc" id="L128" title="1 of 4 branches missed.">            if (prefixToTest != null &amp;&amp; !prefixToTest.isEmpty()</span>
+<span class="fc bfc" id="L129" title="All 2 branches covered.">                    &amp;&amp; path.contains(prefixToTest)) {</span>
+<span class="fc" id="L130">                prefixToReplace = prefixToTest;</span>
+<span class="fc" id="L131">                break;</span>
+            }
+        }
+<span class="fc bfc" id="L134" title="All 2 branches covered.">        if (prefixToReplace != null) {</span>
+<span class="fc" id="L135">            path = path.replace(prefixToReplace + &quot;/&quot;, &quot;&quot;);</span>
+
+            // sometimes there's still a leading &quot;/&quot; left
+<span class="pc bpc" id="L138" title="1 of 2 branches missed.">            while (path.startsWith(&quot;/&quot;)) {</span>
+<span class="nc" id="L139">                path = path.substring(1);</span>
+            }
+
+<span class="fc" id="L142">            int index = path.indexOf(&quot;/&quot;);</span>
+
+<span class="pc bpc" id="L144" title="1 of 2 branches missed.">            if (index != -1) {</span>
+<span class="fc bfc" id="L145" title="All 2 branches covered.">                if (path.substring(0, index).equals(currentUserFolder)) {</span>
+<span class="fc" id="L146">                    return DataManagerConstants.ROOT + &quot;/&quot;</span>
+                            + DataManagerConstants.USERS_HOME
+<span class="fc" id="L148">                            + path.substring(index);</span>
+                } else {
+<span class="fc" id="L150">                    return DataManagerConstants.ROOT + &quot;/&quot;</span>
+                            + DataManagerConstants.USERS_FOLDER + &quot;/&quot;
+                            + path;
+                }
+            } else {
+<span class="nc" id="L155">                return DataManagerConstants.ROOT + &quot;/&quot;</span>
+                        + DataManagerConstants.USERS_HOME;
+            }
+        } else {
+<span class="fc" id="L159">            return path;</span>
+        }
+    }
+
+    private String replaceLfnGroupPrefix(String path, String groupName, String... prefixesToReplace) {
+<span class="fc bfc" id="L164" title="All 2 branches covered.">        for (String prefixToTest : prefixesToReplace) {</span>
+<span class="pc bpc" id="L165" title="1 of 4 branches missed.">            if (prefixToTest != null &amp;&amp; !prefixToTest.isEmpty()) {</span>
+                // the prefix used in the catalog
+<span class="fc" id="L167">                String realPrefix = prefixToTest + &quot;/&quot; + groupName.replaceAll(&quot; &quot;, &quot;_&quot;);</span>
+                // the prefix shown to the user
+<span class="fc" id="L169">                String userPrefix = DataManagerConstants.ROOT</span>
+                        + &quot;/&quot; + groupName
+                        + DataManagerConstants.GROUP_APPEND;
+
+<span class="fc" id="L173">                path = path.replace(realPrefix, userPrefix);</span>
+            }
+        }
+<span class="fc" id="L176">        return path;</span>
+    }
+
+    public String getLocalDirForGridaMultiFilesDownload(String packageName) {
+        // give a temp folder path. Grida will delete it and create a &quot;*.zip&quot;
+        // archive with the folder name
+<span class="nc" id="L182">        return Paths.get(</span>
+<span class="nc" id="L183">                server.getDataManagerPath(),</span>
+                DOWNLOAD_FOLDER,
+                &quot;file-packages&quot;,
+<span class="nc" id="L186">                packageName).toString();</span>
+    }
+
+    public String getLocalDirForGridaFolderDownload(String remoteFolderPath) throws BusinessException {
+        // give folder itself, grida will delete it and create a &quot;*.zip&quot; archive
+        // with the folder name
+<span class="nc" id="L192">        return getLocalDownloadPath(remoteFolderPath);</span>
+    }
+
+    public String getLocalDirForGridaFileDownload(String remoteFilePath) throws BusinessException {
+        // give parent folder, grida will download the file into it
+<span class="fc" id="L197">        return Paths.get(getLocalDownloadPath(remoteFilePath)).getParent().toString();</span>
+    }
+    /*
+     Transform a full remote path (generally a LFN path) to the local directory
+      path on the machine where it will be downloaded.
+     */
+
+    public String getLocalDownloadPath(String remotePathString) throws BusinessException {
+<span class="fc" id="L205">        remotePathString = remotePathString.replaceAll(&quot; &quot;, &quot;&quot;);</span>
+        Path remotePath;
+        try {
+<span class="fc" id="L208">            remotePath = Paths.get(remotePathString);</span>
+<span class="nc" id="L209">        } catch (InvalidPathException e) {</span>
+<span class="nc" id="L210">            logger.error(&quot;Invalid download path : {}&quot;, remotePathString, e);</span>
+<span class="nc" id="L211">            throw new BusinessException(&quot;Invalid download path&quot;, e);</span>
+<span class="fc" id="L212">        }</span>
+        // verify it is an absolute path
+<span class="pc bpc" id="L214" title="1 of 2 branches missed.">        if ( ! remotePath.isAbsolute()) {</span>
+<span class="nc" id="L215">            logger.error(&quot;Cannot download a relative path : {}&quot;, remotePathString);</span>
+<span class="nc" id="L216">            throw new BusinessException(&quot;Cannot download a relative path&quot;);</span>
+        }
+        // remove &quot;..&quot; and &quot;.&quot; and avoid security issues
+<span class="fc" id="L219">        remotePath = remotePath.normalize();</span>
+        // return full local path, in local root download path
+<span class="fc" id="L221">        return Paths.get(</span>
+<span class="fc" id="L222">                server.getDataManagerPath(),</span>
+                DOWNLOAD_FOLDER,
+<span class="fc" id="L224">                remotePath.toString()).toString();</span>
+    }
+
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

@@ -1,0 +1,704 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../jacoco-resources/report.gif" type="image/gif"/><title>Input.java</title><link rel="stylesheet" href="../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../index.html" class="el_report">coverage</a> &gt; <a href="../index.html" class="el_bundle">vip-application</a> &gt; <a href="index.source.html" class="el_package">fr.insalyon.creatis.vip.application.server.model.boutiques</a> &gt; <span class="el_source">Input.java</span></div><h1>Input.java</h1><pre class="source lang-java linenums">
+package fr.insalyon.creatis.vip.application.server.model.boutiques;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import javax.annotation.Generated;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyDescription;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.fasterxml.jackson.annotation.JsonValue;
+
+@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonPropertyOrder({
+    &quot;id&quot;,
+    &quot;name&quot;,
+    &quot;type&quot;,
+    &quot;description&quot;,
+    &quot;value-key&quot;,
+    &quot;list&quot;,
+    &quot;list-separator&quot;,
+    &quot;optional&quot;,
+    &quot;command-line-flag&quot;,
+    &quot;requires-inputs&quot;,
+    &quot;disables-inputs&quot;,
+    &quot;command-line-flag-separator&quot;,
+    &quot;default-value&quot;,
+    &quot;value-choices&quot;,
+    &quot;value-requires&quot;,
+    &quot;value-disables&quot;,
+    &quot;integer&quot;,
+    &quot;minimum&quot;,
+    &quot;maximum&quot;,
+    &quot;exclusive-minimum&quot;,
+    &quot;exclusive-maximum&quot;,
+    &quot;min-list-entries&quot;,
+    &quot;max-list-entries&quot;,
+    &quot;uses-absolute-path&quot;
+})
+@Generated(&quot;jsonschema2pojo&quot;)
+<span class="fc" id="L44">public class Input {</span>
+
+    /**
+     * A short, unique, informative identifier containing only alphanumeric characters and underscores. Typically used to generate variable names. Example: &quot;data_file&quot;.
+     * (Required)
+     * 
+     */
+    @JsonProperty(&quot;id&quot;)
+    @JsonPropertyDescription(&quot;A short, unique, informative identifier containing only alphanumeric characters and underscores. Typically used to generate variable names. Example: \&quot;data_file\&quot;.&quot;)
+    private String id;
+    /**
+     * A human-readable input name. Example: 'Data file'.
+     * (Required)
+     * 
+     */
+    @JsonProperty(&quot;name&quot;)
+    @JsonPropertyDescription(&quot;A human-readable input name. Example: 'Data file'.&quot;)
+    private String name;
+    /**
+     * Input type.
+     * (Required)
+     * 
+     */
+    @JsonProperty(&quot;type&quot;)
+    @JsonPropertyDescription(&quot;Input type.&quot;)
+    private Input.Type type;
+    /**
+     * Input description.
+     * 
+     */
+    @JsonProperty(&quot;description&quot;)
+    @JsonPropertyDescription(&quot;Input description.&quot;)
+    private String description;
+    /**
+     * A string contained in command-line, substituted by the input value and/or flag at runtime.
+     * 
+     */
+    @JsonProperty(&quot;value-key&quot;)
+    @JsonPropertyDescription(&quot;A string contained in command-line, substituted by the input value and/or flag at runtime.&quot;)
+    private String valueKey;
+    /**
+     * True if input is a list of value. An input of type &quot;Flag&quot; cannot be a list.
+     * 
+     */
+    @JsonProperty(value = &quot;list&quot;)
+    @JsonPropertyDescription(&quot;True if input is a list of value. An input of type \&quot;Flag\&quot; cannot be a list.&quot;)
+    private Boolean list;
+    /**
+     * Separator used between list items. Defaults to a single space.
+     * 
+     */
+    @JsonProperty(&quot;list-separator&quot;)
+    @JsonPropertyDescription(&quot;Separator used between list items. Defaults to a single space.&quot;)
+    private String listSeparator;
+    /**
+     * True if input is optional.
+     * 
+     */
+    @JsonProperty(&quot;optional&quot;)
+    @JsonPropertyDescription(&quot;True if input is optional.&quot;)
+    private Boolean optional;
+    /**
+     * Option flag of the input, involved in the value-key substitution. Inputs of type &quot;Flag&quot; have to have a command-line flag. Examples: -v, --force.
+     * 
+     */
+    @JsonProperty(&quot;command-line-flag&quot;)
+    @JsonPropertyDescription(&quot;Option flag of the input, involved in the value-key substitution. Inputs of type \&quot;Flag\&quot; have to have a command-line flag. Examples: -v, --force.&quot;)
+    private String commandLineFlag;
+    /**
+     * Ids of the inputs or ids of groups whose members must be active for this input to be available.
+     * 
+     */
+<span class="fc" id="L116">    @JsonProperty(&quot;requires-inputs&quot;)</span>
+    @JsonPropertyDescription(&quot;Ids of the inputs or ids of groups whose members must be active for this input to be available.&quot;)
+    private List&lt;String&gt; requiresInputs = new ArrayList&lt;String&gt;();
+    /**
+     * Ids of the inputs that are disabled when this input is active.
+     * 
+     */
+<span class="fc" id="L123">    @JsonProperty(&quot;disables-inputs&quot;)</span>
+    @JsonPropertyDescription(&quot;Ids of the inputs that are disabled when this input is active.&quot;)
+    private List&lt;String&gt; disablesInputs = new ArrayList&lt;String&gt;();
+    /**
+     * Separator used between flags and their arguments. Defaults to a single space.
+     * 
+     */
+    @JsonProperty(&quot;command-line-flag-separator&quot;)
+    @JsonPropertyDescription(&quot;Separator used between flags and their arguments. Defaults to a single space.&quot;)
+    private String commandLineFlagSeparator;
+    /**
+     * Default value of the input. The default value is set when no value is specified, even when the input is optional. If the desired behavior is to omit the input from the command line when no value is specified, then no default value should be used. In this case, the tool might still use a default value internally, but this will remain undocumented in the Boutiques interface.
+     * 
+     */
+    @JsonProperty(&quot;default-value&quot;)
+    @JsonPropertyDescription(&quot;Default value of the input. The default value is set when no value is specified, even when the input is optional. If the desired behavior is to omit the input from the command line when no value is specified, then no default value should be used. In this case, the tool might still use a default value internally, but this will remain undocumented in the Boutiques interface.&quot;)
+    private Object defaultValue;
+    /**
+     * Permitted choices for input value. May not be used with the Flag type.
+     * 
+     */
+<span class="fc" id="L144">    @JsonProperty(&quot;value-choices&quot;)</span>
+    @JsonPropertyDescription(&quot;Permitted choices for input value. May not be used with the Flag type.&quot;)
+    private List&lt;Object&gt; valueChoices = new ArrayList&lt;Object&gt;();
+    /**
+     * Ids of the inputs that are required when the corresponding value choice is selected.
+     * 
+     */
+    @JsonProperty(&quot;value-requires&quot;)
+    @JsonPropertyDescription(&quot;Ids of the inputs that are required when the corresponding value choice is selected.&quot;)
+    private ValueRequires valueRequires;
+    /**
+     * Ids of the inputs that are disabled when the corresponding value choice is selected.
+     * 
+     */
+    @JsonProperty(&quot;value-disables&quot;)
+    @JsonPropertyDescription(&quot;Ids of the inputs that are disabled when the corresponding value choice is selected.&quot;)
+    private ValueDisables valueDisables;
+    /**
+     * Specify whether the input should be an integer. May only be used with Number type inputs.
+     * 
+     */
+    @JsonProperty(&quot;integer&quot;)
+    @JsonPropertyDescription(&quot;Specify whether the input should be an integer. May only be used with Number type inputs.&quot;)
+    private Boolean integer;
+    /**
+     * Specify the minimum value of the input (inclusive). May only be used with Number type inputs.
+     * 
+     */
+    @JsonProperty(&quot;minimum&quot;)
+    @JsonPropertyDescription(&quot;Specify the minimum value of the input (inclusive). May only be used with Number type inputs.&quot;)
+    private Double minimum;
+    /**
+     * Specify the maximum value of the input (inclusive). May only be used with Number type inputs.
+     * 
+     */
+    @JsonProperty(&quot;maximum&quot;)
+    @JsonPropertyDescription(&quot;Specify the maximum value of the input (inclusive). May only be used with Number type inputs.&quot;)
+    private Double maximum;
+    /**
+     * Specify whether the minimum is exclusive or not. May only be used with Number type inputs.
+     * 
+     */
+    @JsonProperty(&quot;exclusive-minimum&quot;)
+    @JsonPropertyDescription(&quot;Specify whether the minimum is exclusive or not. May only be used with Number type inputs.&quot;)
+    private Boolean exclusiveMinimum;
+    /**
+     * Specify whether the maximum is exclusive or not. May only be used with Number type inputs.
+     * 
+     */
+    @JsonProperty(&quot;exclusive-maximum&quot;)
+    @JsonPropertyDescription(&quot;Specify whether the maximum is exclusive or not. May only be used with Number type inputs.&quot;)
+    private Boolean exclusiveMaximum;
+    /**
+     * Specify the minimum number of entries in the list. May only be used with List type inputs.
+     * 
+     */
+    @JsonProperty(&quot;min-list-entries&quot;)
+    @JsonPropertyDescription(&quot;Specify the minimum number of entries in the list. May only be used with List type inputs.&quot;)
+    private Double minListEntries;
+    /**
+     * Specify the maximum number of entries in the list. May only be used with List type inputs.
+     * 
+     */
+    @JsonProperty(&quot;max-list-entries&quot;)
+    @JsonPropertyDescription(&quot;Specify the maximum number of entries in the list. May only be used with List type inputs.&quot;)
+    private Double maxListEntries;
+    /**
+     * Specifies that this input must be given as an absolute path. Only specifiable for File type inputs.
+     * 
+     */
+    @JsonProperty(&quot;uses-absolute-path&quot;)
+    @JsonPropertyDescription(&quot;Specifies that this input must be given as an absolute path. Only specifiable for File type inputs.&quot;)
+    private Boolean usesAbsolutePath;
+
+    /**
+     * A short, unique, informative identifier containing only alphanumeric characters and underscores. Typically used to generate variable names. Example: &quot;data_file&quot;.
+     * (Required)
+     * 
+     */
+    @JsonProperty(&quot;id&quot;)
+    public String getId() {
+<span class="fc" id="L225">        return id;</span>
+    }
+
+    /**
+     * A short, unique, informative identifier containing only alphanumeric characters and underscores. Typically used to generate variable names. Example: &quot;data_file&quot;.
+     * (Required)
+     * 
+     */
+    @JsonProperty(&quot;id&quot;)
+    public void setId(String id) {
+<span class="fc" id="L235">        this.id = id;</span>
+<span class="fc" id="L236">    }</span>
+
+    /**
+     * A human-readable input name. Example: 'Data file'.
+     * (Required)
+     * 
+     */
+    @JsonProperty(&quot;name&quot;)
+    public String getName() {
+<span class="fc" id="L245">        return name;</span>
+    }
+
+    /**
+     * A human-readable input name. Example: 'Data file'.
+     * (Required)
+     * 
+     */
+    @JsonProperty(&quot;name&quot;)
+    public void setName(String name) {
+<span class="fc" id="L255">        this.name = name;</span>
+<span class="fc" id="L256">    }</span>
+
+    /**
+     * Input type.
+     * (Required)
+     * 
+     */
+    @JsonProperty(&quot;type&quot;)
+    public Input.Type getType() {
+<span class="fc" id="L265">        return type;</span>
+    }
+
+    /**
+     * Input type.
+     * (Required)
+     * 
+     */
+    @JsonProperty(&quot;type&quot;)
+    public void setType(Input.Type type) {
+<span class="fc" id="L275">        this.type = type;</span>
+<span class="fc" id="L276">    }</span>
+
+    /**
+     * Input description.
+     * 
+     */
+    @JsonProperty(&quot;description&quot;)
+    public String getDescription() {
+<span class="fc" id="L284">        return description;</span>
+    }
+
+    /**
+     * Input description.
+     * 
+     */
+    @JsonProperty(&quot;description&quot;)
+    public void setDescription(String description) {
+<span class="fc" id="L293">        this.description = description;</span>
+<span class="fc" id="L294">    }</span>
+
+    /**
+     * A string contained in command-line, substituted by the input value and/or flag at runtime.
+     * 
+     */
+    @JsonProperty(&quot;value-key&quot;)
+    public String getValueKey() {
+<span class="fc" id="L302">        return valueKey;</span>
+    }
+
+    /**
+     * A string contained in command-line, substituted by the input value and/or flag at runtime.
+     * 
+     */
+    @JsonProperty(&quot;value-key&quot;)
+    public void setValueKey(String valueKey) {
+<span class="fc" id="L311">        this.valueKey = valueKey;</span>
+<span class="fc" id="L312">    }</span>
+
+    /**
+     * True if input is a list of value. An input of type &quot;Flag&quot; cannot be a list.
+     * 
+     */
+    @JsonProperty(&quot;list&quot;)
+    public Boolean getList() {
+<span class="fc" id="L320">        return list;</span>
+    }
+
+    /**
+     * True if input is a list of value. An input of type &quot;Flag&quot; cannot be a list.
+     * 
+     */
+    @JsonProperty(&quot;list&quot;)
+    public void setList(Boolean list) {
+<span class="nc" id="L329">        this.list = list;</span>
+<span class="nc" id="L330">    }</span>
+
+    /**
+     * Separator used between list items. Defaults to a single space.
+     * 
+     */
+    @JsonProperty(&quot;list-separator&quot;)
+    public String getListSeparator() {
+<span class="fc" id="L338">        return listSeparator;</span>
+    }
+
+    /**
+     * Separator used between list items. Defaults to a single space.
+     * 
+     */
+    @JsonProperty(&quot;list-separator&quot;)
+    public void setListSeparator(String listSeparator) {
+<span class="nc" id="L347">        this.listSeparator = listSeparator;</span>
+<span class="nc" id="L348">    }</span>
+
+    /**
+     * True if input is optional.
+     * 
+     */
+    @JsonProperty(&quot;optional&quot;)
+    public Boolean getOptional() {
+<span class="fc" id="L356">        return optional;</span>
+    }
+
+    /**
+     * True if input is optional.
+     * 
+     */
+    @JsonProperty(&quot;optional&quot;)
+    public void setOptional(Boolean optional) {
+<span class="fc" id="L365">        this.optional = optional;</span>
+<span class="fc" id="L366">    }</span>
+
+    /**
+     * Option flag of the input, involved in the value-key substitution. Inputs of type &quot;Flag&quot; have to have a command-line flag. Examples: -v, --force.
+     * 
+     */
+    @JsonProperty(&quot;command-line-flag&quot;)
+    public String getCommandLineFlag() {
+<span class="fc" id="L374">        return commandLineFlag;</span>
+    }
+
+    /**
+     * Option flag of the input, involved in the value-key substitution. Inputs of type &quot;Flag&quot; have to have a command-line flag. Examples: -v, --force.
+     * 
+     */
+    @JsonProperty(&quot;command-line-flag&quot;)
+    public void setCommandLineFlag(String commandLineFlag) {
+<span class="fc" id="L383">        this.commandLineFlag = commandLineFlag;</span>
+<span class="fc" id="L384">    }</span>
+
+    /**
+     * Ids of the inputs or ids of groups whose members must be active for this input to be available.
+     * 
+     */
+    @JsonProperty(&quot;requires-inputs&quot;)
+    public List&lt;String&gt; getRequiresInputs() {
+<span class="fc" id="L392">        return requiresInputs;</span>
+    }
+
+    /**
+     * Ids of the inputs or ids of groups whose members must be active for this input to be available.
+     * 
+     */
+    @JsonProperty(&quot;requires-inputs&quot;)
+    public void setRequiresInputs(List&lt;String&gt; requiresInputs) {
+<span class="nc" id="L401">        this.requiresInputs = requiresInputs;</span>
+<span class="nc" id="L402">    }</span>
+
+    /**
+     * Ids of the inputs that are disabled when this input is active.
+     * 
+     */
+    @JsonProperty(&quot;disables-inputs&quot;)
+    public List&lt;String&gt; getDisablesInputs() {
+<span class="fc" id="L410">        return disablesInputs;</span>
+    }
+
+    /**
+     * Ids of the inputs that are disabled when this input is active.
+     * 
+     */
+    @JsonProperty(&quot;disables-inputs&quot;)
+    public void setDisablesInputs(List&lt;String&gt; disablesInputs) {
+<span class="nc" id="L419">        this.disablesInputs = disablesInputs;</span>
+<span class="nc" id="L420">    }</span>
+
+    /**
+     * Separator used between flags and their arguments. Defaults to a single space.
+     * 
+     */
+    @JsonProperty(&quot;command-line-flag-separator&quot;)
+    public String getCommandLineFlagSeparator() {
+<span class="fc" id="L428">        return commandLineFlagSeparator;</span>
+    }
+
+    /**
+     * Separator used between flags and their arguments. Defaults to a single space.
+     * 
+     */
+    @JsonProperty(&quot;command-line-flag-separator&quot;)
+    public void setCommandLineFlagSeparator(String commandLineFlagSeparator) {
+<span class="nc" id="L437">        this.commandLineFlagSeparator = commandLineFlagSeparator;</span>
+<span class="nc" id="L438">    }</span>
+
+    /**
+     * Default value of the input. The default value is set when no value is specified, even when the input is optional. If the desired behavior is to omit the input from the command line when no value is specified, then no default value should be used. In this case, the tool might still use a default value internally, but this will remain undocumented in the Boutiques interface.
+     * 
+     */
+    @JsonProperty(&quot;default-value&quot;)
+    public Object getDefaultValue() {
+<span class="fc" id="L446">        return defaultValue;</span>
+    }
+
+    /**
+     * Default value of the input. The default value is set when no value is specified, even when the input is optional. If the desired behavior is to omit the input from the command line when no value is specified, then no default value should be used. In this case, the tool might still use a default value internally, but this will remain undocumented in the Boutiques interface.
+     * 
+     */
+    @JsonProperty(&quot;default-value&quot;)
+    public void setDefaultValue(Object defaultValue) {
+<span class="fc" id="L455">        this.defaultValue = defaultValue;</span>
+<span class="fc" id="L456">    }</span>
+
+    /**
+     * Permitted choices for input value. May not be used with the Flag type.
+     * 
+     */
+    @JsonProperty(&quot;value-choices&quot;)
+    public List&lt;Object&gt; getValueChoices() {
+<span class="fc" id="L464">        return valueChoices;</span>
+    }
+
+    /**
+     * Permitted choices for input value. May not be used with the Flag type.
+     * 
+     */
+    @JsonProperty(&quot;value-choices&quot;)
+    public void setValueChoices(List&lt;Object&gt; valueChoices) {
+<span class="fc" id="L473">        this.valueChoices = valueChoices;</span>
+<span class="fc" id="L474">    }</span>
+
+    /**
+     * Ids of the inputs that are required when the corresponding value choice is selected.
+     * 
+     */
+    @JsonProperty(&quot;value-requires&quot;)
+    public ValueRequires getValueRequires() {
+<span class="fc" id="L482">        return valueRequires;</span>
+    }
+
+    /**
+     * Ids of the inputs that are required when the corresponding value choice is selected.
+     * 
+     */
+    @JsonProperty(&quot;value-requires&quot;)
+    public void setValueRequires(ValueRequires valueRequires) {
+<span class="nc" id="L491">        this.valueRequires = valueRequires;</span>
+<span class="nc" id="L492">    }</span>
+
+    /**
+     * Ids of the inputs that are disabled when the corresponding value choice is selected.
+     * 
+     */
+    @JsonProperty(&quot;value-disables&quot;)
+    public ValueDisables getValueDisables() {
+<span class="fc" id="L500">        return valueDisables;</span>
+    }
+
+    /**
+     * Ids of the inputs that are disabled when the corresponding value choice is selected.
+     * 
+     */
+    @JsonProperty(&quot;value-disables&quot;)
+    public void setValueDisables(ValueDisables valueDisables) {
+<span class="nc" id="L509">        this.valueDisables = valueDisables;</span>
+<span class="nc" id="L510">    }</span>
+
+    /**
+     * Specify whether the input should be an integer. May only be used with Number type inputs.
+     * 
+     */
+    @JsonProperty(&quot;integer&quot;)
+    public Boolean getInteger() {
+<span class="fc" id="L518">        return integer;</span>
+    }
+
+    /**
+     * Specify whether the input should be an integer. May only be used with Number type inputs.
+     * 
+     */
+    @JsonProperty(&quot;integer&quot;)
+    public void setInteger(Boolean integer) {
+<span class="nc" id="L527">        this.integer = integer;</span>
+<span class="nc" id="L528">    }</span>
+
+    /**
+     * Specify the minimum value of the input (inclusive). May only be used with Number type inputs.
+     * 
+     */
+    @JsonProperty(&quot;minimum&quot;)
+    public Double getMinimum() {
+<span class="fc" id="L536">        return minimum;</span>
+    }
+
+    /**
+     * Specify the minimum value of the input (inclusive). May only be used with Number type inputs.
+     * 
+     */
+    @JsonProperty(&quot;minimum&quot;)
+    public void setMinimum(Double minimum) {
+<span class="nc" id="L545">        this.minimum = minimum;</span>
+<span class="nc" id="L546">    }</span>
+
+    /**
+     * Specify the maximum value of the input (inclusive). May only be used with Number type inputs.
+     * 
+     */
+    @JsonProperty(&quot;maximum&quot;)
+    public Double getMaximum() {
+<span class="fc" id="L554">        return maximum;</span>
+    }
+
+    /**
+     * Specify the maximum value of the input (inclusive). May only be used with Number type inputs.
+     * 
+     */
+    @JsonProperty(&quot;maximum&quot;)
+    public void setMaximum(Double maximum) {
+<span class="nc" id="L563">        this.maximum = maximum;</span>
+<span class="nc" id="L564">    }</span>
+
+    /**
+     * Specify whether the minimum is exclusive or not. May only be used with Number type inputs.
+     * 
+     */
+    @JsonProperty(&quot;exclusive-minimum&quot;)
+    public Boolean getExclusiveMinimum() {
+<span class="fc" id="L572">        return exclusiveMinimum;</span>
+    }
+
+    /**
+     * Specify whether the minimum is exclusive or not. May only be used with Number type inputs.
+     * 
+     */
+    @JsonProperty(&quot;exclusive-minimum&quot;)
+    public void setExclusiveMinimum(Boolean exclusiveMinimum) {
+<span class="nc" id="L581">        this.exclusiveMinimum = exclusiveMinimum;</span>
+<span class="nc" id="L582">    }</span>
+
+    /**
+     * Specify whether the maximum is exclusive or not. May only be used with Number type inputs.
+     * 
+     */
+    @JsonProperty(&quot;exclusive-maximum&quot;)
+    public Boolean getExclusiveMaximum() {
+<span class="fc" id="L590">        return exclusiveMaximum;</span>
+    }
+
+    /**
+     * Specify whether the maximum is exclusive or not. May only be used with Number type inputs.
+     * 
+     */
+    @JsonProperty(&quot;exclusive-maximum&quot;)
+    public void setExclusiveMaximum(Boolean exclusiveMaximum) {
+<span class="nc" id="L599">        this.exclusiveMaximum = exclusiveMaximum;</span>
+<span class="nc" id="L600">    }</span>
+
+    /**
+     * Specify the minimum number of entries in the list. May only be used with List type inputs.
+     * 
+     */
+    @JsonProperty(&quot;min-list-entries&quot;)
+    public Double getMinListEntries() {
+<span class="fc" id="L608">        return minListEntries;</span>
+    }
+
+    /**
+     * Specify the minimum number of entries in the list. May only be used with List type inputs.
+     * 
+     */
+    @JsonProperty(&quot;min-list-entries&quot;)
+    public void setMinListEntries(Double minListEntries) {
+<span class="nc" id="L617">        this.minListEntries = minListEntries;</span>
+<span class="nc" id="L618">    }</span>
+
+    /**
+     * Specify the maximum number of entries in the list. May only be used with List type inputs.
+     * 
+     */
+    @JsonProperty(&quot;max-list-entries&quot;)
+    public Double getMaxListEntries() {
+<span class="fc" id="L626">        return maxListEntries;</span>
+    }
+
+    /**
+     * Specify the maximum number of entries in the list. May only be used with List type inputs.
+     * 
+     */
+    @JsonProperty(&quot;max-list-entries&quot;)
+    public void setMaxListEntries(Double maxListEntries) {
+<span class="nc" id="L635">        this.maxListEntries = maxListEntries;</span>
+<span class="nc" id="L636">    }</span>
+
+    /**
+     * Specifies that this input must be given as an absolute path. Only specifiable for File type inputs.
+     * 
+     */
+    @JsonProperty(&quot;uses-absolute-path&quot;)
+    public Boolean getUsesAbsolutePath() {
+<span class="fc" id="L644">        return usesAbsolutePath;</span>
+    }
+
+    /**
+     * Specifies that this input must be given as an absolute path. Only specifiable for File type inputs.
+     * 
+     */
+    @JsonProperty(&quot;uses-absolute-path&quot;)
+    public void setUsesAbsolutePath(Boolean usesAbsolutePath) {
+<span class="nc" id="L653">        this.usesAbsolutePath = usesAbsolutePath;</span>
+<span class="nc" id="L654">    }</span>
+
+
+    /**
+     * Input type.
+     * 
+     */
+<span class="fc" id="L661">    @Generated(&quot;jsonschema2pojo&quot;)</span>
+    public enum Type {
+
+<span class="fc" id="L664">        STRING(&quot;String&quot;),</span>
+<span class="fc" id="L665">        FILE(&quot;File&quot;),</span>
+<span class="fc" id="L666">        FLAG(&quot;Flag&quot;),</span>
+<span class="fc" id="L667">        NUMBER(&quot;Number&quot;);</span>
+        private final String value;
+<span class="fc" id="L669">        private final static Map&lt;String, Input.Type&gt; CONSTANTS = new HashMap&lt;String, Input.Type&gt;();</span>
+
+        static {
+<span class="fc bfc" id="L672" title="All 2 branches covered.">            for (Input.Type c: values()) {</span>
+<span class="fc" id="L673">                CONSTANTS.put(c.value, c);</span>
+            }
+<span class="fc" id="L675">        }</span>
+
+<span class="fc" id="L677">        Type(String value) {</span>
+<span class="fc" id="L678">            this.value = value;</span>
+<span class="fc" id="L679">        }</span>
+
+        @Override
+        public String toString() {
+<span class="nc" id="L683">            return this.value;</span>
+        }
+
+        @JsonValue
+        public String value() {
+<span class="fc" id="L688">            return this.value;</span>
+        }
+
+        @JsonCreator
+        public static Input.Type fromValue(String value) {
+<span class="fc" id="L693">            Input.Type constant = CONSTANTS.get(value);</span>
+<span class="pc bpc" id="L694" title="1 of 2 branches missed.">            if (constant == null) {</span>
+<span class="nc" id="L695">                throw new IllegalArgumentException(value);</span>
+            } else {
+<span class="fc" id="L697">                return constant;</span>
+            }
+        }
+
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>
