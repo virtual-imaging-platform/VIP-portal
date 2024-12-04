@@ -101,11 +101,11 @@ public class ApplicationDataInitializer extends JdbcDaoSupport {
 
         tableInitializer.createTable("VIPGroupsApplications",
                         "groupname VARCHAR(50), "
-                    +   "applicationame VARCHAR(255), "
-                    +   "PRIMARY KEY (groupname, applicationame), "
+                    +   "applicationname VARCHAR(255), "
+                    +   "PRIMARY KEY (groupname, applicationname), "
                     +   "FOREIGN KEY (groupname) REFERENCES VIPGroups(name) "
                     +   "ON DELETE CASCADE ON UPDATE CASCADE, "
-                    +   "FOREIGN KEY (applicationame) REFERENCES VIPApplications(name) "
+                    +   "FOREIGN KEY (applicationname) REFERENCES VIPApplications(name) "
                     +   "ON DELETE CASCADE ON UPDATE CASCADE");
 
         tableInitializer.createTable("VIPAppVersions",

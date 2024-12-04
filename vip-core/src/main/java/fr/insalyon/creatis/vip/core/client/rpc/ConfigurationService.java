@@ -132,7 +132,7 @@ public interface ConfigurationService extends RemoteService {
 
     boolean testLastUpdatePublication() throws CoreException;
 
-    //TermsOfUse
+    // TermsOfUse
     void addTermsUse() throws CoreException;
 
     Timestamp getLastUpdateTermsOfUse() throws CoreException;

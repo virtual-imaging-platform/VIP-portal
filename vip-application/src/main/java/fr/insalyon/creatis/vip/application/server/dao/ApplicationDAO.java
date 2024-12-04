@@ -61,7 +61,7 @@ public interface ApplicationDAO {
 
     public List<Application> getApplicationsWithOwner(String owner) throws DAOException;
 
-    public List<Application> getApplicationByGroup(Group group) throws DAOException;
+    public List<Application> getApplicationsByGroup(Group group) throws DAOException;
 
     public Application getApplication(String applicationName) throws DAOException;
 

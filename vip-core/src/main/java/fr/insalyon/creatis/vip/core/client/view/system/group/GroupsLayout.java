@@ -148,7 +148,6 @@ public class GroupsLayout extends VLayout {
     }
 
     public void loadData() {
-
         ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();
         final AsyncCallback<List<Group>> callback = new AsyncCallback<List<Group>>() {
 
@@ -171,7 +170,6 @@ public class GroupsLayout extends VLayout {
     }
 
     private void remove(final String name) {
-
         SC.ask("Do you really want to remove \"" + name + "\" group?", new BooleanCallback() {
             @Override
             public void execute(Boolean value) {

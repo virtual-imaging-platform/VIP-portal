@@ -29,7 +29,7 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL-B license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.application.client.view.system.applications;
+package fr.insalyon.creatis.vip.application.client.view.system.applications.app;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.types.Alignment;
@@ -102,7 +102,7 @@ public class ApplicationsLayout extends VLayout {
                 public void onClick(ClickEvent event) {
                     ManageApplicationsTab appsTab = (ManageApplicationsTab) Layout.getInstance().
                             getTab(ApplicationConstants.TAB_MANAGE_APPLICATION);
-                    appsTab.setApplication(null, null, null);
+                    appsTab.setApplication(null, null, null, null);
                 }
             });
             toolstrip.addMember(addButton);
@@ -122,6 +122,9 @@ public class ApplicationsLayout extends VLayout {
     }
 
     private void configureGrid() {
+        ListGridField groupsField = new ListGridField("groups", "Groups");
+        ListGridField ownerField = new ListGridField("owner", "Owner");
+        ListGridField nameField = new ListGridField("name", "Application Name");
 
         grid = new ListGrid() {
             @Override
@@ -138,9 +141,7 @@ public class ApplicationsLayout extends VLayout {
                     loadImg.addClickHandler(new ClickHandler() {
                         @Override
                         public void onClick(ClickEvent event) {
-                            edit(rollOverRecord.getAttribute("name"),
-                                    rollOverRecord.getAttribute("owner"),
-                                    rollOverRecord.getAttribute("citation"));
+                            edit(rollOverRecord);
                         }
                     });
                     ImgButton deleteImg = getImgButton(CoreConstants.ICON_DELETE, "Delete");
@@ -187,23 +188,23 @@ public class ApplicationsLayout extends VLayout {
         grid.setShowRowNumbers(true);
         grid.setEmptyMessage("<br>No data available.");
         if (onlyPublicApps){
-            grid.setFields(new ListGridField("name", "Application Name"),
-                    new ListGridField("groups", "Groups"));
+            grid.setFields(
+                nameField,
+                groupsField);
         } else {
-            ListGridField ownerField = new ListGridField("owner", "Owner");
             ownerField.setHidden(true);
-            grid.setFields(new ListGridField("name", "Application Name"),
-                    new ListGridField("ownerFullName", "Owner"),
-                    ownerField);
+            grid.setFields(
+                nameField,
+                new ListGridField("ownerFullName", "Owner"),
+                ownerField,
+                groupsField);
         }
         grid.setSortField("name");
         grid.setSortDirection(SortDirection.ASCENDING);
         grid.addCellClickHandler(new CellClickHandler() {
             @Override
             public void onCellClick(CellClickEvent event) {
-                edit(event.getRecord().getAttribute("name"),
-                        event.getRecord().getAttribute("owner"),
-                        event.getRecord().getAttribute("citation"));
+                edit(event.getRecord());
             }
         });
         this.addMember(grid);
@@ -223,21 +224,7 @@ public class ApplicationsLayout extends VLayout {
                 List<ApplicationRecord> dataList = new ArrayList<ApplicationRecord>();
 
                 for (Application app : result) {
-                    StringBuilder sbg = new StringBuilder();
-
-                    if (onlyPublicApps) {
-                        for (String group : app.getApplicationGroups()) {
-                            if (sbg.length() > 0) {
-                                sbg.append(", ");
-                            }
-                            sbg.append(group);
-                        }
-                    }
-                    if (onlyPublicApps) {
-                        dataList.add(new ApplicationRecord(app.getName(), app.getOwner(), app.getFullName(), app.getCitation(), sbg.toString()));
-                    } else {
-                        dataList.add(new ApplicationRecord(app.getName(), app.getOwner(), app.getFullName(), app.getCitation()));
-                    }
+                    dataList.add(new ApplicationRecord(app));
                 }
                 grid.setData(dataList.toArray(new ApplicationRecord[]{}));
             }
@@ -270,12 +257,15 @@ public class ApplicationsLayout extends VLayout {
         ApplicationService.Util.getInstance().remove(name, callback);
     }
 
-    private void edit(String name, String owner, String citation) {
-
+    private void edit(ListGridRecord record) {
         ManageApplicationsTab appsTab = (ManageApplicationsTab) Layout.getInstance().
                 getTab(ApplicationConstants.TAB_MANAGE_APPLICATION);
 
-        appsTab.loadVersions(name);
-        appsTab.setApplication(name, owner, citation);
+        appsTab.loadVersions(record.getAttribute("name"));
+        appsTab.setApplication(
+            record.getAttribute("name"), 
+            record.getAttribute("owner"), 
+            record.getAttribute("citation"), 
+            record.getAttributeAsStringArray("groups"));
     }
 }

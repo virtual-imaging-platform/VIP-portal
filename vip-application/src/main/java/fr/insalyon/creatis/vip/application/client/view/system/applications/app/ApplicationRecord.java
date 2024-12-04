@@ -29,9 +29,11 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL-B license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.application.client.view.system.applications;
+package fr.insalyon.creatis.vip.application.client.view.system.applications.app;
 
 import com.smartgwt.client.widgets.grid.ListGridRecord;
+
+import fr.insalyon.creatis.vip.application.client.bean.Application;
 
 /**
  *
@@ -39,15 +41,11 @@ import com.smartgwt.client.widgets.grid.ListGridRecord;
  */
 public class ApplicationRecord extends ListGridRecord {
 
-    public ApplicationRecord(String name, String owner, String ownerFullName, String citation, String groups) {
-        this(name, owner,ownerFullName, citation);
-        setAttribute("groups", groups);
-    }
-
-    public ApplicationRecord(String name, String owner, String ownerFullName, String citation) {
-        setAttribute("name", name);
-        setAttribute("owner", owner);
-        setAttribute("ownerFullName", ownerFullName);
-        setAttribute("citation", citation);
+    public ApplicationRecord(Application app) {
+        setAttribute("name", app.getName());
+        setAttribute("owner", app.getOwner());
+        setAttribute("ownerFullName", app.getFullName());
+        setAttribute("citation", app.getCitation());
+        setAttribute("groups", app.getApplicationGroups());
     }
 }

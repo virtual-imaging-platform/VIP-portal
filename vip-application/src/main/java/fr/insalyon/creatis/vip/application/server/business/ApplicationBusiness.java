@@ -106,10 +106,25 @@ public class ApplicationBusiness {
         }
     }
 
-    public List<Application> getApplications() throws BusinessException {
-
+    public Application getApplication(String applicationName) throws BusinessException {
         try {
-            return applicationDAO.getApplications();
+            return mapGroups(applicationDAO.getApplication(applicationName));
+        } catch (DAOException ex) {
+            throw new BusinessException(ex);
+        }
+    }
+
+    public List<Application> getApplications() throws BusinessException {
+        try {
+            return mapGroups(applicationDAO.getApplications());
+        } catch (DAOException ex) {
+            throw new BusinessException(ex);
+        }
+    }
+
+    public List<Application> getApplications(Group group) throws BusinessException {
+        try {
+            return mapGroups(applicationDAO.getApplicationsByGroup(group));
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }
@@ -118,7 +133,7 @@ public class ApplicationBusiness {
     public List<Application> getApplicationsWithOwner(String email) throws BusinessException {
 
         try {
-            return applicationDAO.getApplicationsWithOwner(email);
+            return mapGroups(applicationDAO.getApplicationsWithOwner(email));
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }
@@ -126,7 +141,7 @@ public class ApplicationBusiness {
 
     public List<Application> getPublicApplicationsWithGroups() throws BusinessException {
         try {
-            Map<String, Group> allGroups = groupDAO.getGroups().stream().collect(Collectors.toMap(
+            Map<String, Group> allGroups = groupDAO.get().stream().collect(Collectors.toMap(
                     Group::getName, group -> group));
             Set<String> allVisibleApplicationNames = applicationDAO.getAllVisibleVersions().stream()
                     .map(AppVersion::getApplicationName).collect(Collectors.toSet());
@@ -135,6 +150,7 @@ public class ApplicationBusiness {
                     .collect(Collectors.toList());
 
             List<Application> applicationsWithGroups = new ArrayList<>();
+            // changer
             //
             // for (Application application : allApplications) {
             //     Set<String> currentAppPublicGroups = application.getApplicationClasses().stream()
@@ -176,9 +192,10 @@ public class ApplicationBusiness {
                 throw new BusinessException("Wrong application name");
             }
             // need to fetch all the groups to get their properties
-            Map<String,Group> allGroups = groupDAO.getGroups().stream().collect(
+            Map<String,Group> allGroups = groupDAO.get().stream().collect(
                     Collectors.toMap(Group::getName, group -> group));
             List<Group> appGroups = new ArrayList<>();
+            // changer
             // for (String className : application.getApplicationClasses()) {
             //     // need to fetch the classes to get their groups
             //     for (String groupName : classDAO.getClass(className).getGroups()) {
@@ -188,15 +205,6 @@ public class ApplicationBusiness {
             return appGroups.stream().filter(g -> g.isPublicGroup()).collect(Collectors.toList());
         } catch (DAOException e) {
             throw new BusinessException(e);
-        }
-    }
-
-    public Application getApplication(String applicationName)
-            throws BusinessException {
-        try {
-            return applicationDAO.getApplication(applicationName);
-        } catch (DAOException ex) {
-            throw new BusinessException(ex);
         }
     }
 
@@ -231,5 +239,27 @@ public class ApplicationBusiness {
         } catch (DAOException e) {
             throw new BusinessException(e);
         }
+    }
+
+    private Application mapGroups(Application app) throws BusinessException {
+        if (app == null) {
+            return null;
+        } else {
+            try {
+                List<Group> groups = groupDAO.getByApplication(app.getName());
+    
+                app.setApplicationGroups(groups.stream().map((e) -> e.getName()).collect(Collectors.toList()));
+                return app;
+            } catch (DAOException e) {
+                throw new BusinessException(e);
+            }
+        }
+    }
+
+    private List<Application> mapGroups(List<Application> apps) throws BusinessException {
+        for (Application app : apps) {
+            mapGroups(app);
+        }
+        return apps;
     }
 }

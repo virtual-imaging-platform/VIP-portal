@@ -55,6 +55,10 @@ public class Application implements IsSerializable {
         this(name, null, null, citation);
     }
 
+    public Application(String name, String citation, List<String> applicationGroups) {
+        this(name, null, null, citation, applicationGroups);
+    }
+
     public Application(String name, String owner, String fullName, String citation) {
         this(name, owner, fullName, citation, new ArrayList<>());
     }
@@ -97,5 +101,9 @@ public class Application implements IsSerializable {
 
     public List<String> getApplicationGroups() {
         return applicationGroups;
+    }
+
+    public void setApplicationGroups(List<String> groups) {
+        this.applicationGroups = groups;
     }
 }

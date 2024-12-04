@@ -44,6 +44,7 @@ public class ResourceIT extends BaseSpringIT {
             false, 
             ResourceType.BATCH, 
             "conf.file",
+            new ArrayList<>(),
             new ArrayList<>());
     
         createGroup("test_resource", GroupType.RESOURCE);

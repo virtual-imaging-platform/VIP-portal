@@ -19,6 +19,10 @@ import fr.insalyon.creatis.vip.application.client.bean.Resource;
 import fr.insalyon.creatis.vip.application.client.bean.ResourceType;
 import fr.insalyon.creatis.vip.application.client.rpc.ApplicationService;
 import fr.insalyon.creatis.vip.application.client.rpc.ApplicationServiceAsync;
+import fr.insalyon.creatis.vip.core.client.bean.Group;
+import fr.insalyon.creatis.vip.core.client.bean.GroupType;
+import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationService;
+import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationServiceAsync;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.common.AbstractFormLayout;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
@@ -34,6 +38,7 @@ public class EditResourceLayout extends AbstractFormLayout {
     private SelectItem typeFieldList;
     private TextItem configurationField;
     private SelectItem enginesList;
+    private SelectItem groupsList;
     private IButton saveButton;
     private IButton removeButton;
 
@@ -69,6 +74,12 @@ public class EditResourceLayout extends AbstractFormLayout {
         enginesList.setMultipleAppearance(MultipleAppearance.PICKLIST);
         enginesList.setWidth(350);
 
+        groupsList = new SelectItem();
+        groupsList.setShowTitle(false);
+        groupsList.setMultiple(true);
+        groupsList.setMultipleAppearance(MultipleAppearance.PICKLIST);
+        groupsList.setWidth(350);
+
         saveButton = WidgetUtil.getIButton("Save", CoreConstants.ICON_SAVED,
                 new ClickHandler() {
                     @Override
@@ -81,7 +92,8 @@ public class EditResourceLayout extends AbstractFormLayout {
                                 statusField.getValueAsBoolean(),
                                 typeFieldList.getValueAsString(),
                                 configurationField.getValueAsString().trim(),
-                                Arrays.asList(enginesList.getValues())
+                                Arrays.asList(enginesList.getValues()),
+                                Arrays.asList(groupsList.getValues())
                                 ));
                         }
                     }
@@ -109,10 +121,11 @@ public class EditResourceLayout extends AbstractFormLayout {
         addField("Type", typeFieldList);
         addField("Configuration", configurationField);
         addField("Engines", enginesList);
+        addField("Groups", groupsList);
         addButtons(saveButton, removeButton);
     }
 
-    public void setResource(String name, boolean visible, boolean status, String type, String configuration, String[] engines) {
+    public void setResource(String name, boolean visible, boolean status, String type, String configuration, String[] engines, String[] groups) {
 
         if (name != null) {
             this.nameField.setValue(name);
@@ -122,6 +135,7 @@ public class EditResourceLayout extends AbstractFormLayout {
             this.typeFieldList.setValue(type);
             this.configurationField.setValue(configuration);
             this.enginesList.setValues(engines);
+            this.groupsList.setValues(groups);
             this.newResource = false;
             this.removeButton.setDisabled(false);
         } else {
@@ -166,7 +180,7 @@ public class EditResourceLayout extends AbstractFormLayout {
             public void onSuccess(Void result) {
                 WidgetUtil.resetIButton(saveButton, "Save", CoreConstants.ICON_SAVED);
                 WidgetUtil.resetIButton(removeButton, "Remove", CoreConstants.ICON_DELETE);
-                setResource(null, false, false, null, null, null);
+                setResource(null, false, false, null, null, null, null);
                 ManageResourcesTab tab = (ManageResourcesTab) Layout.getInstance().
                         getTab(ApplicationConstants.TAB_MANAGE_RESOURCE);
                 tab.loadResources();
@@ -175,6 +189,11 @@ public class EditResourceLayout extends AbstractFormLayout {
     }
 
     private void fetchData() {
+        fetchEngines();
+        fetchGroups();
+    }
+
+    private void fetchEngines() {
         ApplicationServiceAsync service = ApplicationService.Util.getInstance();
         final AsyncCallback<List<Engine>> callback = new AsyncCallback<>() {
             @Override
@@ -189,5 +208,25 @@ public class EditResourceLayout extends AbstractFormLayout {
             }
         };
         service.getEngines(callback);
+    }
+
+    private void fetchGroups() {
+        ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();
+        final AsyncCallback<List<Group>> callback = new AsyncCallback<>() {
+            @Override
+            public void onFailure(Throwable caught) {
+                Layout.getInstance().setWarningMessage("Unable to load groups:<br />" + caught.getMessage());
+            }
+    
+            @Override
+            public void onSuccess(List<Group> result) {
+                String[] data = result.stream()
+                    .filter((g) -> g.getType() == GroupType.RESOURCE)
+                    .map(Group::getName)
+                    .toArray(String[]::new);
+                groupsList.setValueMap(data);
+            }
+        };
+        service.getGroups(callback);
     }
 }

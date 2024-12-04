@@ -32,7 +32,7 @@
 package fr.insalyon.creatis.vip.application.client.view;
 
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
-import fr.insalyon.creatis.vip.application.client.view.system.applications.ManageApplicationsTab;
+import fr.insalyon.creatis.vip.application.client.view.system.applications.app.ManageApplicationsTab;
 import fr.insalyon.creatis.vip.application.client.view.system.engines.ManageEnginesTab;
 import fr.insalyon.creatis.vip.application.client.view.system.resources.ManageResourcesTab;
 import fr.insalyon.creatis.vip.application.client.view.system.tags.ManageTagsTab;

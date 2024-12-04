@@ -29,12 +29,15 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL-B license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.application.client.view.system.applications;
+package fr.insalyon.creatis.vip.application.client.view.system.applications.app;
 
 import com.smartgwt.client.widgets.Label;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
+import fr.insalyon.creatis.vip.application.client.view.system.applications.version.EditVersionLayout;
+import fr.insalyon.creatis.vip.application.client.view.system.applications.version.ManageVersionLayout;
+import fr.insalyon.creatis.vip.application.client.view.system.applications.version.VersionsLayout;
 import fr.insalyon.creatis.vip.core.client.view.common.AbstractManageTab;
 import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
 
@@ -48,7 +51,7 @@ public class ManageApplicationsTab extends AbstractManageTab {
     private EditApplicationLayout editLayout;
     private VersionsLayout versionsLayout;
     private EditVersionLayout editVersionLayout;
-    private PublishVersionLayout publishVersionLayout;
+    private ManageVersionLayout manageVersionLayout;
     private Label infoAppText;
 
     public ManageApplicationsTab(boolean onlyPublicApps) {
@@ -68,7 +71,7 @@ public class ManageApplicationsTab extends AbstractManageTab {
             editLayout = new EditApplicationLayout();
             versionsLayout = new VersionsLayout();
             editVersionLayout = new EditVersionLayout();
-            publishVersionLayout = new PublishVersionLayout();
+            manageVersionLayout = new ManageVersionLayout();
             appLayout.addMember(editLayout);
             VLayout versionInfoLayout = new VLayout(5);
 
@@ -77,7 +80,7 @@ public class ManageApplicationsTab extends AbstractManageTab {
             versionLayout.addMember(versionsLayout);
 
             versionInfoLayout.addMember(editVersionLayout);
-            versionInfoLayout.addMember(publishVersionLayout);
+            versionInfoLayout.addMember(manageVersionLayout);
             versionLayout.addMember(versionInfoLayout);
             vLayout.addMember(versionLayout);
         }
@@ -90,16 +93,16 @@ public class ManageApplicationsTab extends AbstractManageTab {
     public void loadVersions(String applicationName) {
         versionsLayout.setApplication(applicationName);
         editVersionLayout.setApplication(applicationName);
-        publishVersionLayout.setApplication(applicationName);
+        manageVersionLayout.setApplication(applicationName);
     }
 
-    public void setApplication(String name, String owner, String citation) {
-        editLayout.setApplication(name, owner, citation);
+    public void setApplication(String name, String owner, String citation, String[] groups) {
+        editLayout.setApplication(name, owner, citation, groups);
     }
 
     public void setVersion(String version, String lfn, String jsonLfn, String doi, boolean isVisible, boolean isBoutiquesForm, String[] tags, String[] resources) {
         editVersionLayout.setVersion(version, lfn, jsonLfn, isVisible, isBoutiquesForm, tags, resources);
-        publishVersionLayout.setVersion(version, jsonLfn, doi);
+        manageVersionLayout.setVersion(version, jsonLfn, doi);
     }
 
     private void titleInfoApp(){

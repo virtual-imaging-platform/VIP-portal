@@ -58,7 +58,7 @@ import java.util.Map;
 
 /**
  *
- * @author Rafael Ferreira da Silva,Nouha boujelben
+ * @author Rafael Ferreira da Silva, Nouha boujelben
  */
 public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet implements ConfigurationService {
 
@@ -642,5 +642,4 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
             throw new CoreException(ex);
         }
     }
-
 }

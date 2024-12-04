@@ -1,4 +1,4 @@
-package fr.insalyon.creatis.vip.application.client.view.system.applications;
+package fr.insalyon.creatis.vip.application.client.view.reprovip;
 
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 import fr.insalyon.creatis.vip.core.client.bean.PublicExecution;

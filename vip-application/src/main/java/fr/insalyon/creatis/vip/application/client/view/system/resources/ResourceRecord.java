@@ -13,5 +13,6 @@ public class ResourceRecord extends ListGridRecord {
         setAttribute("type", resource.getType());
         setAttribute("configuration", resource.getConfiguration());
         setAttribute("engines", resource.getEngines());
+        setAttribute("groups", resource.getGroups());
     }
 }

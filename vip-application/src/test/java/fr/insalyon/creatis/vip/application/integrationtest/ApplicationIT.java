@@ -10,7 +10,6 @@ import fr.insalyon.creatis.vip.core.client.bean.Group;
 import fr.insalyon.creatis.vip.core.client.bean.GroupType;
 import fr.insalyon.creatis.vip.core.integrationtest.database.BaseSpringIT;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
-import org.apache.commons.lang.StringUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -19,8 +18,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class ApplicationIT extends BaseSpringIT {
 
@@ -116,13 +115,8 @@ public class ApplicationIT extends BaseSpringIT {
     }
 
     @Test
-    public void testCatchGetCitationNonExistentApplication() {
-        Exception exception = assertThrows(
-                BusinessException.class, () ->
-                        applicationBusiness.getCitation("NonExistent application")
-        );
-
-        assertTrue(StringUtils.contains(exception.getMessage(), "jdbc.JdbcSQLException: No data is available"));
+    public void testCatchGetCitationNonExistentApplication() throws BusinessException {
+        assertNull(applicationBusiness.getCitation("NonExistent application"));
     }
 
     /* ********************************************************************************************************************************************** */
@@ -146,5 +140,21 @@ public class ApplicationIT extends BaseSpringIT {
         AppVersion appVersion = new AppVersion("Application1", "version 0.0", "lfn updated", "jsonLfn", true, true);
         appVersionBusiness.update(appVersion);
         Assertions.assertEquals("lfn updated", appVersionBusiness.getVersions("Application1").get(0).getLfn(), "Incorrect lfn updated");
+    }
+
+    @Test 
+    public void getApplication() throws BusinessException {
+        Application app = applicationBusiness.getApplication("Application1");
+
+        assertEquals(app.getOwner(), "test1@test.fr");
+    }
+
+    @Test
+    public void getApplications() throws BusinessException {
+        Application appbis = new Application("test", "testeu");
+
+        applicationBusiness.add(appbis);
+        List<Application> apps = applicationBusiness.getApplications();
+        assertEquals(2, apps.size());
     }
 }

@@ -62,7 +62,7 @@ public class ResourceLayout extends VLayout {
             public void onClick(ClickEvent event) {
                 ManageResourcesTab resourceTab = (ManageResourcesTab) Layout.getInstance().
                         getTab(ApplicationConstants.TAB_MANAGE_RESOURCE);
-                        resourceTab.setResource(null, false, false, null, null, null);
+                        resourceTab.setResource(null, false, false, null, null, null, null);
             }
         });
         toolstrip.addMember(addButton);
@@ -147,7 +147,8 @@ public class ResourceLayout extends VLayout {
                 new ListGridField("status", "Status"),
                 new ListGridField("type", "Type"),
                 new ListGridField("configuration", "Configuration"),
-                new ListGridField("engines", "Engines"));
+                new ListGridField("engines", "Engines"),
+                new ListGridField("groups", "Groups"));
         grid.setSortField("name");
         grid.setSortDirection(SortDirection.ASCENDING);
         grid.addCellDoubleClickHandler(new CellDoubleClickHandler() {
@@ -160,7 +161,6 @@ public class ResourceLayout extends VLayout {
     }
 
     public void loadData() {
-
         final AsyncCallback<List<Resource>> callback = new AsyncCallback<>() {
             @Override
             public void onFailure(Throwable caught) {
@@ -213,6 +213,8 @@ public class ResourceLayout extends VLayout {
             record.getAttributeAsBoolean("status"), 
             record.getAttribute("type"), 
             record.getAttribute("configuration"),
-            record.getAttributeAsStringArray("engines"));
+            record.getAttributeAsStringArray("engines"),
+            record.getAttributeAsStringArray("groups")
+            );
     }
 }

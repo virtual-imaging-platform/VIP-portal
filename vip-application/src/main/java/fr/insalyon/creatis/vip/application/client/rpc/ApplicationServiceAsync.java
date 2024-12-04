@@ -39,7 +39,6 @@ import fr.insalyon.creatis.vip.application.client.bean.Engine;
 import fr.insalyon.creatis.vip.application.client.bean.Resource;
 import fr.insalyon.creatis.vip.application.client.bean.Tag;
 
-import java.util.HashMap;
 import java.util.List;
 
 /**

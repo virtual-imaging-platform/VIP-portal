@@ -32,6 +32,7 @@
 package fr.insalyon.creatis.vip.core.server.dao.mysql;
 
 import fr.insalyon.creatis.vip.core.client.bean.Group;
+import fr.insalyon.creatis.vip.core.client.bean.GroupType;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import fr.insalyon.creatis.vip.core.server.dao.GroupDAO;
 import org.slf4j.Logger;
@@ -115,7 +116,7 @@ public class GroupData extends JdbcDaoSupport implements GroupDAO {
     }
 
     @Override
-    public List<Group> getGroups() throws DAOException {
+    public List<Group> get() throws DAOException {
         List<Group> groups = new ArrayList<Group>();
         String query = "SELECT * FROM VIPGroups ORDER BY LOWER(name)";
  
@@ -130,6 +131,73 @@ public class GroupData extends JdbcDaoSupport implements GroupDAO {
 
         } catch (SQLException ex) {
             logger.error("Error getting all groups", ex);
+            throw new DAOException(ex);
+        }
+    }
+
+    @Override
+    public List<Group> getByType(GroupType type) throws DAOException {
+        List<Group> groups = new ArrayList<Group>();
+        String query = "SELECT * FROM VIPGroups ORDER BY LOWER(name) WHERE type = ?";
+ 
+        try (PreparedStatement ps = getConnection().prepareStatement(query)) {
+            ps.setString(1, type.toString());
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                groups.add(new Group(rs.getString("name"),
+                        rs.getBoolean("public"), rs.getString("type")));
+            }
+            return groups;
+
+        } catch (SQLException ex) {
+            logger.error("Error getting group with type " + type, ex);
+            throw new DAOException(ex);
+        }
+    }
+
+    @Override
+    public List<Group> getByApplication(String applicationName) throws DAOException {
+        List<Group> groups = new ArrayList<Group>();
+        String query =  "SELECT * FROM VIPGroups g "
+        +               "JOIN VIPGroupsApplications ga ON ga.groupname = g.name "
+        +               "WHERE ga.applicationname = ?";
+ 
+        try (PreparedStatement ps = getConnection().prepareStatement(query)) {
+            ps.setString(1, applicationName);
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                groups.add(new Group(rs.getString("name"),
+                        rs.getBoolean("public"), rs.getString("type")));
+            }
+            return groups;
+
+        } catch (SQLException ex) {
+            logger.error("Error getting group linked to app " + applicationName, ex);
+            throw new DAOException(ex);
+        }
+    }
+
+    @Override
+    public List<Group> getByRessource(String resourceName) throws DAOException {
+        List<Group> groups = new ArrayList<Group>();
+        String query =  "SELECT * FROM VIPGroups g "
+        +               "JOIN VIPGroupsResources ga ON ga.groupname = g.name "
+        +               "WHERE ga.resourcename = ?";
+ 
+        try (PreparedStatement ps = getConnection().prepareStatement(query)) {
+            ps.setString(1, resourceName);
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                groups.add(new Group(rs.getString("name"),
+                        rs.getBoolean("public"), rs.getString("type")));
+            }
+            return groups;
+
+        } catch (SQLException ex) {
+            logger.error("Error getting group linked to ressource " + resourceName, ex);
             throw new DAOException(ex);
         }
     }

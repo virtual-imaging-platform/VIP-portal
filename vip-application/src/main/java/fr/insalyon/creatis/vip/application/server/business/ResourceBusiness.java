@@ -15,6 +15,7 @@ import fr.insalyon.creatis.vip.application.server.dao.ResourceDAO;
 import fr.insalyon.creatis.vip.core.client.bean.Group;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
+import fr.insalyon.creatis.vip.core.server.business.GroupBusiness;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 
 @Service
@@ -22,13 +23,14 @@ import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 public class ResourceBusiness {
 
     private ResourceDAO resourceDAO;
-    
-    @Autowired
     private EngineBusiness engineBusiness;
+    private GroupBusiness groupBusiness;
 
     @Autowired
-    public ResourceBusiness(ResourceDAO dao) {
+    public ResourceBusiness(ResourceDAO dao, EngineBusiness engineBusiness, GroupBusiness groupBusiness) {
         this.resourceDAO = dao;
+        this.engineBusiness = engineBusiness;
+        this.groupBusiness = groupBusiness;
     }
 
     public void add(Resource resource) throws BusinessException {
@@ -37,6 +39,9 @@ public class ResourceBusiness {
 
             for (String engineName : resource.getEngines()) {
                 resourceDAO.associate(resource, new Engine(engineName));
+            }
+            for (String groupName : resource.getGroups()) {
+                resourceDAO.associate(resource, new Group(groupName));
             }
         } catch (DAOException e){
             throw new BusinessException(e);
@@ -47,6 +52,7 @@ public class ResourceBusiness {
         try {
             Resource before = getByName(resource.getName());
             List<String> beforeEnginesNames = before.getEngines();
+            List<String> beforeGroupsNames = before.getGroups();
 
             resourceDAO.update(resource);
             for (String engine : resource.getEngines()) {
@@ -54,8 +60,16 @@ public class ResourceBusiness {
                     associate(resource, new Engine(engine));
                 }
             }
+            for (String group : resource.getGroups()) {
+                if ( ! beforeGroupsNames.removeIf((s) -> s.equals(group))) {
+                    associate(resource, new Group(group));
+                }
+            }
             for (String engine : beforeEnginesNames) {
                 dissociate(resource, new Engine(engine));
+            }
+            for (String group : beforeGroupsNames) {
+                dissociate(resource, new Group(group));
             }
         } catch (DAOException e){
             throw new BusinessException(e);
@@ -72,7 +86,7 @@ public class ResourceBusiness {
 
     public Resource getByName(String name) throws BusinessException {
         try {
-            return mapEngines(resourceDAO.getAll().stream()
+            return mapAssociated(resourceDAO.getAll().stream()
                 .filter(e -> e.getName().equalsIgnoreCase(name))
                 .findFirst().get());
         } catch (DAOException | NoSuchElementException e){
@@ -82,7 +96,7 @@ public class ResourceBusiness {
 
     public List<Resource> getAll() throws BusinessException {
         try {
-            return mapEngines(resourceDAO.getAll());
+            return mapAssociated(resourceDAO.getAll());
         } catch (DAOException e){
             throw new BusinessException(e);
         }
@@ -104,7 +118,7 @@ public class ResourceBusiness {
 
     public List<Resource> getAvailableForUser(User user) throws BusinessException {
         try {
-            return mapEngines(resourceDAO.getByUser(user)
+            return mapAssociated(resourceDAO.getByUser(user)
                 .stream()
                 .filter(Resource::getStatus)
                 .collect(Collectors.toList()));
@@ -115,7 +129,7 @@ public class ResourceBusiness {
 
     public List<Resource> getByGroup(Group group) throws BusinessException {
         try {
-            return mapEngines(resourceDAO.getByGroup(group));
+            return mapAssociated(resourceDAO.getByGroup(group));
         } catch (DAOException e) {
             throw new BusinessException(e);
         }
@@ -123,7 +137,7 @@ public class ResourceBusiness {
 
     public List<Resource> getByAppVersion(AppVersion appVersion) throws BusinessException {
         try {
-            return mapEngines(resourceDAO.getByAppVersion(appVersion));
+            return mapAssociated(resourceDAO.getByAppVersion(appVersion));
         } catch (DAOException e) {
             throw new BusinessException(e);
         }
@@ -131,7 +145,7 @@ public class ResourceBusiness {
 
     public List<Resource> getByEngine(Engine engine) throws BusinessException {
         try {
-            return mapEngines(resourceDAO.getByEngine(engine));
+            return mapAssociated(resourceDAO.getByEngine(engine));
         } catch (DAOException e) {
             throw new BusinessException(e);
         }
@@ -189,15 +203,16 @@ public class ResourceBusiness {
         }
     }
 
-    private Resource mapEngines(Resource resource) throws BusinessException {
+    private Resource mapAssociated(Resource resource) throws BusinessException {
         resource.setEngines(engineBusiness.getByResource(resource).stream().map((e) -> e.getName()).collect(Collectors.toList()));
+        resource.setGroups(groupBusiness.getByResource(resource.getName()).stream().map((e) -> e.getName()).collect(Collectors.toList()));
 
         return resource;
     }
 
-    private List<Resource> mapEngines(List<Resource> resources) throws BusinessException {
+    private List<Resource> mapAssociated(List<Resource> resources) throws BusinessException {
         for (Resource resource : resources) {
-            resource = mapEngines(resource);
+            resource = mapAssociated(resource);
         }
         return resources;
     }

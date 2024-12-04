@@ -13,6 +13,7 @@ import fr.insalyon.creatis.grida.client.GRIDAClient;
 import fr.insalyon.creatis.grida.client.GRIDAClientException;
 import fr.insalyon.creatis.grida.client.GRIDAPoolClient;
 import fr.insalyon.creatis.vip.core.client.bean.Group;
+import fr.insalyon.creatis.vip.core.client.bean.GroupType;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import fr.insalyon.creatis.vip.core.server.dao.GroupDAO;
 
@@ -82,7 +83,7 @@ public class GroupBusiness {
 
     public List<Group> get() throws BusinessException {
         try {
-            return groupDAO.getGroups();
+            return groupDAO.get();
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }
@@ -100,7 +101,7 @@ public class GroupBusiness {
     public List<Group> getPublic() throws BusinessException {
         try {
             List<Group> publicGroups = new ArrayList<>();
-            for (Group g : groupDAO.getGroups()) {
+            for (Group g : groupDAO.get()) {
                 if (g.isPublicGroup()) {
                     publicGroups.add(g);
                 }
@@ -108,6 +109,30 @@ public class GroupBusiness {
             return publicGroups;
         } catch (DAOException ex) {
             throw new BusinessException(ex);
+        }
+    }
+
+    public List<Group> getByType(GroupType type) throws BusinessException {
+        try {
+            return groupDAO.getByType(type);
+        } catch (DAOException e) {
+            throw new BusinessException(e);
+        }
+    }
+
+    public List<Group> getByApplication(String appName) throws BusinessException {
+        try {
+            return groupDAO.getByApplication(appName);
+        } catch (DAOException e) {
+            throw new BusinessException(e);
+        }
+    }
+
+    public List<Group> getByResource(String ressourceName) throws BusinessException {
+        try {
+            return groupDAO.getByRessource(ressourceName);
+        } catch (DAOException e) {
+            throw new BusinessException(e);
         }
     }
 }

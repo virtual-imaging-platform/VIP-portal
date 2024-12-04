@@ -59,7 +59,7 @@ public class LfcPathsBusiness {
                 server.getVoRoot());
 
         try {
-            for (Group group : groupDAO.getGroups()) {
+            for (Group group : groupDAO.get()) {
                 String folderName = group.getName().replaceAll(" ", "_");
 
                 baseDir = parsePath(baseDir, group.getName() + DataManagerConstants.GROUP_APPEND,
@@ -106,7 +106,7 @@ public class LfcPathsBusiness {
                 server.getAltDataManagerUsersHome());
 
         try {
-            for (Group group : groupDAO.getGroups()) {
+            for (Group group : groupDAO.get()) {
                 baseDir = replaceLfnGroupPrefix(baseDir, group.getName(),
                         server.getDataManagerGroupsHome(),
                         server.getAltDataManagerGroupsHome());

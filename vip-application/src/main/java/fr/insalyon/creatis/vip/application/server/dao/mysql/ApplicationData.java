@@ -35,7 +35,10 @@ import fr.insalyon.creatis.vip.application.client.bean.AppVersion;
 import fr.insalyon.creatis.vip.application.client.bean.Application;
 import fr.insalyon.creatis.vip.application.server.dao.ApplicationDAO;
 import fr.insalyon.creatis.vip.core.client.bean.Group;
+import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
+import fr.insalyon.creatis.vip.core.server.dao.UserDAO;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,24 +62,23 @@ public class ApplicationData extends JdbcDaoSupport implements ApplicationDAO {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
+    private UserDAO userDAO;
+
     @Autowired
-    public ApplicationData(DataSource dataSource) {
+    public ApplicationData(DataSource dataSource, UserDAO userDAO) {
         setDataSource(dataSource);
+        this.userDAO = userDAO;
     }
 
     @Override
     public void add(Application application) throws DAOException {
-        try {
-            PreparedStatement ps = getConnection().prepareStatement(
-                    "INSERT INTO VIPApplications(name, citation, owner) "
-                            + "VALUES (?, ?, ?)");
+        String query = "INSERT INTO VIPApplications(name, citation, owner) VALUES (?,?,?)";
 
+        try (PreparedStatement ps = getConnection().prepareStatement(query)) {
             ps.setString(1, application.getName());
             ps.setString(2, application.getCitation());
             ps.setString(3, application.getOwner());
             ps.execute();
-
-            ps.close();
 
         } catch (SQLException ex) {
             if (ex.getMessage().contains("Unique index or primary key violation") || ex.getMessage().contains("Duplicate entry ")) {
@@ -91,18 +93,13 @@ public class ApplicationData extends JdbcDaoSupport implements ApplicationDAO {
 
     @Override
     public void update(Application application) throws DAOException {
+        String query = "UPDATE VIPApplications SET citation=?, owner=? WHERE name =?";
 
-        try {
-            PreparedStatement ps = getConnection().prepareStatement("UPDATE "
-                    + "VIPApplications "
-                    + "SET citation=?,owner=? "
-                    + "WHERE name=?");
-
+        try (PreparedStatement ps = getConnection().prepareStatement(query)) {
             ps.setString(1, application.getCitation());
             ps.setString(2, application.getOwner());
             ps.setString(3, application.getName());
             ps.executeUpdate();
-            ps.close();
 
         } catch (SQLException ex) {
             logger.error("Error updating application {}", application.getName(), ex);
@@ -112,14 +109,11 @@ public class ApplicationData extends JdbcDaoSupport implements ApplicationDAO {
 
     @Override
     public void remove(String name) throws DAOException {
+        String query = "DELETE FROM VIPApplications WHERE name=?";
 
-        try {
-            PreparedStatement ps = getConnection().prepareStatement("DELETE "
-                    + "FROM VIPApplications WHERE name=?");
-
+        try (PreparedStatement ps = getConnection().prepareStatement(query)) {
             ps.setString(1, name);
             ps.execute();
-            ps.close();
 
         } catch (SQLException ex) {
             logger.error("Error removing application {}", name, ex);
@@ -128,71 +122,10 @@ public class ApplicationData extends JdbcDaoSupport implements ApplicationDAO {
     }
 
     @Override
-    public List<Application> getApplications() throws DAOException {
-        return this.getApplications((String) null);
-
-    }
-
-    @Override
-    public List<Application> getApplicationsWithOwner(String owner) throws DAOException {
-        return this.getApplications(owner);
-    }
-
-    private List<Application> getApplications(String owner) throws DAOException {
-
-        try {
-            String requestSql = null;
-            if (owner != null) {
-                requestSql = "SELECT "
-                        + "name, owner, citation FROM "
-                        + "VIPApplications WHERE owner=? ORDER BY name";
-            } else {
-                requestSql = "SELECT "
-                        + "name, owner, citation FROM "
-                        + "VIPApplications ORDER BY name";
-            }
-
-            PreparedStatement ps = getConnection().prepareStatement(requestSql);
-            if (owner != null) {
-                ps.setString(1, owner);
-            }
-            ResultSet rs = ps.executeQuery();
-            List<Application> applications = new ArrayList<Application>();
-
-            while (rs.next()) {
-
-                String appOwner = rs.getString("owner");
-                PreparedStatement ps3 = getConnection().prepareStatement("SELECT "
-                        + "first_name,last_name FROM VIPUsers WHERE email=?");
-                ps3.setString(1, appOwner);
-                ResultSet rs3 = ps3.executeQuery();
-                String firstName = null;
-                String lastName = null;
-                while (rs3.next()) {
-                    firstName = rs3.getString("first_name");
-                    lastName = rs3.getString("last_name");
-                }
-                ps3.close();
-
-                String name = rs.getString("name");
-
-                applications.add(new Application(name, rs.getString("owner"), firstName + " " + lastName, rs.getString("citation")));
-            }
-            ps.close();
-            return applications;
-
-        } catch (SQLException ex) {
-            logger.error("Error getting all applications", ex);
-            throw new DAOException(ex);
-        }
-    }
-
-    @Override
     public Application getApplication(String applicationName) throws DAOException {
-        try {
-            PreparedStatement ps = getConnection().prepareStatement("SELECT "
-                    + "name, citation, owner FROM VIPApplications "
-                    + "WHERE name = ?");
+        String query = "SELECT name, citation, owner FROM VIPApplications WHERE name = ?";
+
+        try (PreparedStatement ps = getConnection().prepareStatement(query)) {
             ps.setString(1, applicationName);
 
             ResultSet rs = ps.executeQuery();
@@ -207,19 +140,67 @@ public class ApplicationData extends JdbcDaoSupport implements ApplicationDAO {
     }
 
     @Override
-    public String getCitation(String name) throws DAOException {
+    public List<Application> getApplications() throws DAOException {
+        String query = "SELECT * FROM VIPApplications ORDER BY name";
 
-        try {
-            PreparedStatement ps = getConnection().prepareStatement("SELECT citation "
-                    + "FROM VIPApplications WHERE name = ?");
+        try (PreparedStatement ps = getConnection().prepareStatement(query)) {
+            ResultSet rs = ps.executeQuery();
+            List<Application> applications = new ArrayList<Application>();
+
+            while (rs.next()) {
+                applications.add(new Application(
+                    rs.getString("name"), 
+                    rs.getString("owner"),
+                    rs.getString("citation")));
+            }
+            return applications;
+
+        } catch (SQLException ex) {
+            logger.error("Error getting all applications", ex);
+            throw new DAOException(ex);
+        }
+    }
+
+    @Override
+    public List<Application> getApplicationsWithOwner(String owner) throws DAOException {
+        String query = "SELECT * FROM VIPApplications WHERE owner = ? ORDER BY name ";
+
+        try (PreparedStatement ps = getConnection().prepareStatement(query)) {
+            ps.setString(1, owner);
+            ResultSet rs = ps.executeQuery();
+            List<Application> applications = new ArrayList<Application>();
+
+            while (rs.next()) {
+                String appOwner = rs.getString("owner");
+                User user = userDAO.getUser(appOwner);
+
+                applications.add(new Application(
+                    rs.getString("name"), 
+                    rs.getString("owner"), 
+                    user.getFirstName() + " " + user.getLastName(), 
+                    rs.getString("citation")));
+            }
+            return applications;
+
+        } catch (SQLException ex) {
+            logger.error("Error getting all applications", ex);
+            throw new DAOException(ex);
+        }
+    }
+
+    @Override
+    public String getCitation(String name) throws DAOException {
+        String query = "SELECT citation FROM VIPApplications WHERE name = ?";
+
+        try (PreparedStatement ps = getConnection().prepareStatement(query)) {
             ps.setString(1, name);
 
             ResultSet rs = ps.executeQuery();
-            rs.next();
-            String citation = rs.getString("citation");
-            ps.close();
-
-            return citation;
+            if (rs.next()) {
+                return rs.getString("citation");
+            } else {
+                return null;
+            }
 
         } catch (SQLException ex) {
             logger.error("Error getting citation for application {}", name, ex);
@@ -229,13 +210,9 @@ public class ApplicationData extends JdbcDaoSupport implements ApplicationDAO {
 
     @Override
     public List<AppVersion> getVersions(String name) throws DAOException {
+        String query = "SELECT * FROM VIPAppVersions WHERE application = ? ORDER BY version";
 
-        try {
-            PreparedStatement ps = getConnection().prepareStatement("SELECT "
-                    + "version, lfn, json_lfn, doi, visible, useBoutiquesForm FROM "
-                    + "VIPAppVersions "
-                    + "WHERE application = ? "
-                    + "ORDER BY version");
+        try (PreparedStatement ps = getConnection().prepareStatement(query)) {
             ps.setString(1, name);
 
             ResultSet rs = ps.executeQuery();
@@ -251,7 +228,6 @@ public class ApplicationData extends JdbcDaoSupport implements ApplicationDAO {
                         rs.getBoolean("visible"),
                         rs.getBoolean("useBoutiquesForm")));
             }
-            ps.close();
             return versions;
 
         } catch (SQLException ex) {
@@ -262,13 +238,9 @@ public class ApplicationData extends JdbcDaoSupport implements ApplicationDAO {
 
     @Override
     public List<AppVersion> getAllVisibleVersions() throws DAOException {
+        String query = "SELECT * FROM VIPAppVersions WHERE visible = ? ORDER BY version";
 
-        try {
-            PreparedStatement ps = getConnection().prepareStatement("SELECT "
-                    + "application, version, lfn, json_lfn, doi, visible, useBoutiquesForm FROM "
-                    + "VIPAppVersions "
-                    + "WHERE visible = ? "
-                    + "ORDER BY version");
+        try (PreparedStatement ps = getConnection().prepareStatement(query)) {
             ps.setBoolean(1, true);
 
             ResultSet rs = ps.executeQuery();
@@ -284,7 +256,6 @@ public class ApplicationData extends JdbcDaoSupport implements ApplicationDAO {
                         rs.getBoolean("visible"),
                         rs.getBoolean("useBoutiquesForm")));
             }
-            ps.close();
             return versions;
 
         } catch (SQLException ex) {
@@ -295,20 +266,17 @@ public class ApplicationData extends JdbcDaoSupport implements ApplicationDAO {
 
     @Override
     public void addVersion(AppVersion version) throws DAOException {
+        String query =  "INSERT INTO VIPAppVersions(application, version, lfn, json_lfn, visible, useBoutiquesForm) "
+        +               "VALUES (?, ?, ?, ?, ?, ?)";
 
-        try {
-            PreparedStatement ps = getConnection().prepareStatement(
-                    "INSERT INTO VIPAppVersions(application, version, lfn, json_lfn, visible, useBoutiquesForm) "
-                            + "VALUES (?, ?, ?, ?, ?, ?)");
-
+        try (PreparedStatement ps = getConnection().prepareStatement(query)) {
             ps.setString(1, version.getApplicationName());
             ps.setString(2, version.getVersion());
             ps.setString(3, version.getLfn());
             ps.setString(4, version.getJsonLfn());
             ps.setBoolean(5, version.isVisible());
             ps.setBoolean(6, version.isBoutiquesForm());
-            ps.execute();
-            ps.close();
+            ps.executeUpdate();
 
         } catch (SQLException ex) {
             if (ex.getMessage().contains("Unique index or primary key violation") || ex.getMessage().contains("Duplicate entry ")) {
@@ -324,12 +292,10 @@ public class ApplicationData extends JdbcDaoSupport implements ApplicationDAO {
 
     @Override
     public void updateVersion(AppVersion version) throws DAOException {
-        try {
-            PreparedStatement ps = getConnection().prepareStatement("UPDATE "
-                    + "VIPAppVersions "
-                    + "SET lfn=?, json_lfn=?, visible=?, useBoutiquesForm=? "
-                    + "WHERE application=? AND version=?");
+        String query =  "UPDATE VIPAppVersions SET lfn=?, json_lfn=?, visible=?, useBoutiquesForm=? "
+        +               "WHERE application=? AND version=?";
 
+        try (PreparedStatement ps = getConnection().prepareStatement(query)) {
             ps.setString(1, version.getLfn());
             ps.setString(2, version.getJsonLfn());
             ps.setBoolean(3, version.isVisible());
@@ -337,7 +303,6 @@ public class ApplicationData extends JdbcDaoSupport implements ApplicationDAO {
             ps.setString(5, version.getApplicationName());
             ps.setString(6, version.getVersion());
             ps.executeUpdate();
-            ps.close();
 
         } catch (SQLException ex) {
             logger.error("Error adding version {} for {}",
@@ -347,20 +312,14 @@ public class ApplicationData extends JdbcDaoSupport implements ApplicationDAO {
     }
 
     @Override
-    public void updateDoiForVersion(
-            String doi, String applicationName, String version)
-            throws DAOException {
-        try {
-            PreparedStatement ps = getConnection().prepareStatement("UPDATE "
-                    + "VIPAppVersions "
-                    + "SET doi=? "
-                    + "WHERE application=? AND version=?");
+    public void updateDoiForVersion(String doi, String applicationName, String version) throws DAOException {
+        String query = "UPDATE VIPAppVersions SET doi=? WHERE application=? AND version=?";
 
+        try (PreparedStatement ps = getConnection().prepareStatement(query)) {
             ps.setString(1, doi);
             ps.setString(2, applicationName);
             ps.setString(3, version);
             ps.executeUpdate();
-            ps.close();
 
         } catch (SQLException ex) {
             logger.error("Error updating doi {} for {}/{}",
@@ -370,17 +329,13 @@ public class ApplicationData extends JdbcDaoSupport implements ApplicationDAO {
     }
 
     @Override
-    public void removeVersion(String applicationName, String version)
-            throws DAOException {
+    public void removeVersion(String applicationName, String version) throws DAOException {
+        String query = "DELETE FROM VIPAppVersions WHERE application = ? AND version = ?";
 
-        try {
-            PreparedStatement ps = getConnection().prepareStatement("DELETE "
-                    + "FROM VIPAppVersions WHERE application=? AND version=?");
-
+        try (PreparedStatement ps = getConnection().prepareStatement(query)) {
             ps.setString(1, applicationName);
             ps.setString(2, version);
-            ps.execute();
-            ps.close();
+            ps.executeUpdate(query);
 
         } catch (SQLException ex) {
             logger.error("Error removing version {}/{}", applicationName, version, ex);
@@ -389,31 +344,24 @@ public class ApplicationData extends JdbcDaoSupport implements ApplicationDAO {
     }
 
     @Override
-    public AppVersion getVersion(String applicationName, String applicationVersion)
-            throws DAOException {
+    public AppVersion getVersion(String applicationName, String applicationVersion) throws DAOException {
+        String query = "SELECT * FROM VIPAppVersions WHERE application = ? AND version = ?";
 
-        try {
-            PreparedStatement ps = getConnection().prepareStatement("SELECT "
-                    + "application, version, lfn, json_lfn, "
-                    + "doi, visible, useBoutiquesForm "
-                    + "FROM VIPAppVersions WHERE "
-                    + "application = ? AND version = ?");
+        try (PreparedStatement ps = getConnection().prepareStatement(query)) {
             ps.setString(1, applicationName);
             ps.setString(2, applicationVersion);
 
             ResultSet rs = ps.executeQuery();
             if (rs.first()) {
-                AppVersion version = new AppVersion(rs.getString("application"),
+                return new AppVersion(rs.getString("application"),
                         rs.getString("version"),
                         rs.getString("lfn"),
                         rs.getString("json_lfn"),
                         rs.getString("doi"),
                         rs.getBoolean("visible"),
                         rs.getBoolean("useBoutiquesForm"));
-                ps.close();
-
-                return version;
             }
+
             return null;
         } catch (SQLException ex) {
             logger.error("Error getting versions for {}/{}",
@@ -424,7 +372,7 @@ public class ApplicationData extends JdbcDaoSupport implements ApplicationDAO {
 
     @Override
     public void associate(Application app, Group group) throws DAOException {
-        String query = "INSERT INTO VIPGroupsApplication (applicationame, groupname) "
+        String query = "INSERT INTO VIPGroupsApplications (applicationname, groupname) "
         +              "VALUES (?,?)";
         
         try (PreparedStatement ps = getConnection().prepareStatement(query)) {
@@ -444,7 +392,7 @@ public class ApplicationData extends JdbcDaoSupport implements ApplicationDAO {
 
     @Override
     public void dissociate(Application app, Group group) throws DAOException {
-        String query = "DELETE FROM VIPGroupsApplication WHERE applicationame = ? AND groupname = ?";
+        String query = "DELETE FROM VIPGroupsApplications WHERE applicationname = ? AND groupname = ?";
 
         try (PreparedStatement ps = getConnection().prepareStatement(query)) {
             ps.setString(1, app.getName());
@@ -458,9 +406,9 @@ public class ApplicationData extends JdbcDaoSupport implements ApplicationDAO {
     }
 
     @Override
-    public List<Application> getApplicationByGroup(Group group) throws DAOException {
+    public List<Application> getApplicationsByGroup(Group group) throws DAOException {
         String query =  "SELECT * FROM VIPApplications a "
-        +               "JOIN VIPGroupsApplications ga ON ga.applicationame = a.name "
+        +               "JOIN VIPGroupsApplications ga ON ga.applicationname = a.name "
         +               "WHERE ga.groupname = ?";
 
         try (PreparedStatement ps = getConnection().prepareStatement(query)) {

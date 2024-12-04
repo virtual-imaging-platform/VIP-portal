@@ -29,9 +29,11 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL-B license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.application.client.view.system.applications;
+package fr.insalyon.creatis.vip.application.client.view.system.applications.app;
 
+import java.util.Arrays;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.smartgwt.client.types.MultipleAppearance;
 import com.smartgwt.client.types.Overflow;
 import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.util.SC;
@@ -45,8 +47,11 @@ import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
 import fr.insalyon.creatis.vip.application.client.bean.Application;
 import fr.insalyon.creatis.vip.application.client.rpc.ApplicationService;
 import fr.insalyon.creatis.vip.core.client.CoreModule;
+import fr.insalyon.creatis.vip.core.client.bean.Group;
+import fr.insalyon.creatis.vip.core.client.bean.GroupType;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationService;
+import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationServiceAsync;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.common.AbstractFormLayout;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
@@ -64,6 +69,7 @@ public class EditApplicationLayout extends AbstractFormLayout {
     private boolean newApplication = true;
     private TextItem nameField;
     private RichTextEditor richTextEditor;
+    private SelectItem groupsList;
     private IButton saveButton;
     private IButton removeButton;
     private SelectItem usersPickList;
@@ -92,6 +98,12 @@ public class EditApplicationLayout extends AbstractFormLayout {
         richTextEditor.setControlGroups("styleControls", "editControls",
                 "colorControls", "insertControls");
 
+        groupsList = new SelectItem();
+        groupsList.setShowTitle(false);
+        groupsList.setMultiple(true);
+        groupsList.setMultipleAppearance(MultipleAppearance.PICKLIST);
+        groupsList.setWidth(350);
+
         saveButton = WidgetUtil.getIButton("Save", CoreConstants.ICON_SAVED,
                 new ClickHandler() {
             @Override
@@ -99,12 +111,17 @@ public class EditApplicationLayout extends AbstractFormLayout {
                 if (nameField.validate()) {
 
                     if (newApplication) {
-                        save(new Application(nameField.getValueAsString().trim(),
-                                richTextEditor.getValue()));
+                        save(new Application(
+                            nameField.getValueAsString().trim(),
+                            richTextEditor.getValue(),
+                            Arrays.asList(groupsList.getValues())));
                     } else {
-                        save(new Application(nameField.getValueAsString().trim(),
-                                usersPickList.getValueAsString(), richTextEditor.getValue()));
-
+                        save(new Application(
+                            nameField.getValueAsString().trim(),
+                            usersPickList.getValueAsString(), 
+                            null,
+                            richTextEditor.getValue(),
+                            Arrays.asList(groupsList.getValues())));
                     }
                 }
             }
@@ -127,10 +144,12 @@ public class EditApplicationLayout extends AbstractFormLayout {
         removeButton.setDisabled(true);
 
         addField("Name", nameField);
-        this.addMember(WidgetUtil.getLabel("<b>Owner</b>", 15));
-        this.addMember(FieldUtil.getForm(usersPickList));
-        this.addMember(WidgetUtil.getLabel("<b>Citation</b>", 15));
-        this.addMember(richTextEditor);
+        addField("Owner", usersPickList);
+        addField("Groups", groupsList);
+        addMember(WidgetUtil.getLabel("<b>Citation</b>", 15));
+        addMember(richTextEditor);
+        addMember(removeButton);
+
         if (CoreModule.user.isDeveloper()){
             addButtons(saveButton);
         } else {
@@ -138,30 +157,31 @@ public class EditApplicationLayout extends AbstractFormLayout {
         }
     }
 
-    public void setApplication(String name, String owner, String citation) {
+    public void setApplication(String name, String owner, String citation, String[] groups) {
 
         if (name != null) {
             usersPickList.setCanEdit(true);
-            loadUsers(owner);
-            this.nameField.setValue(name);
-            this.nameField.setDisabled(true);
-            this.richTextEditor.setValue(citation);
-            this.newApplication = false;
-            this.removeButton.setDisabled(false);
+            fetchUsers(owner);
+            nameField.setValue(name);
+            nameField.setDisabled(true);
+            groupsList.setValues(groups);
+            richTextEditor.setValue(citation);
+            newApplication = false;
+            removeButton.setDisabled(false);
 
         } else {
             usersPickList.setCanEdit(false);
             usersPickList.setValue("");
-            this.nameField.setValue("");
-            this.nameField.setDisabled(false);
-            this.richTextEditor.setValue("");
-            this.newApplication = true;
-            this.removeButton.setDisabled(true);
+            nameField.setValue("");
+            nameField.setDisabled(false);
+            richTextEditor.setValue("");
+            newApplication = true;
+            removeButton.setDisabled(true);
         }
+        fetchGroups();
     }
 
     private void save(Application app) {
-
         WidgetUtil.setLoadingIButton(saveButton, "Saving...");
 
         if (newApplication) {
@@ -191,7 +211,7 @@ public class EditApplicationLayout extends AbstractFormLayout {
             public void onSuccess(Void result) {
                 WidgetUtil.resetIButton(saveButton, "Save", CoreConstants.ICON_SAVED);
                 WidgetUtil.resetIButton(removeButton, "Remove", CoreConstants.ICON_DELETE);
-                setApplication(null, null, null);
+                setApplication(null, null, null, null);
                 ManageApplicationsTab tab = (ManageApplicationsTab) Layout.getInstance().
                         getTab(ApplicationConstants.TAB_MANAGE_APPLICATION);
                 tab.loadApplications();
@@ -199,8 +219,8 @@ public class EditApplicationLayout extends AbstractFormLayout {
         };
     }
 
-    private void loadUsers(final String currentOwner) {
 
+    private void fetchUsers(final String currentOwner) {
         if ( ! CoreModule.user.isSystemAdministrator()) {
             usersPickList.setValues(currentOwner);
             return;
@@ -215,7 +235,6 @@ public class EditApplicationLayout extends AbstractFormLayout {
 
             @Override
             public void onSuccess(List<User> result) {
-
                 LinkedHashMap<String, String> valueMap = new LinkedHashMap<String, String>();
 
                 for (User user : result) {
@@ -223,9 +242,28 @@ public class EditApplicationLayout extends AbstractFormLayout {
                 }
                 usersPickList.setValueMap(valueMap);
                 usersPickList.setValue(currentOwner);
-
             }
         };
         ConfigurationService.Util.getInstance().getUsers(callback);
+    }
+    
+    private void fetchGroups() {
+                ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();
+        final AsyncCallback<List<Group>> callback = new AsyncCallback<>() {
+            @Override
+            public void onFailure(Throwable caught) {
+                Layout.getInstance().setWarningMessage("Unable to load groups:<br />" + caught.getMessage());
+            }
+    
+            @Override
+            public void onSuccess(List<Group> result) {
+                String[] data = result.stream()
+                    .filter((g) -> g.getType() == GroupType.APPLICATION)
+                    .map(Group::getName)
+                    .toArray(String[]::new);
+                groupsList.setValueMap(data);
+            }
+        };
+        service.getGroups(callback);
     }
 }

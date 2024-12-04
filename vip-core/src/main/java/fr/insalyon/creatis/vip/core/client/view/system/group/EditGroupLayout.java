@@ -186,7 +186,6 @@ public class EditGroupLayout extends AbstractFormLayout {
     }
 
     public void setGroup(String name, boolean isPublic, String type) {
-
         if (name != null) {
             this.oldName = name;
             this.nameItem.setValue(name);
@@ -233,7 +232,6 @@ public class EditGroupLayout extends AbstractFormLayout {
     }
 
     private AsyncCallback<Void> getCallback(final String text) {
-
         return new AsyncCallback<Void>() {
             @Override
             public void onFailure(Throwable caught) {
@@ -246,6 +244,8 @@ public class EditGroupLayout extends AbstractFormLayout {
             public void onSuccess(Void result) {
                 WidgetUtil.resetIButton(saveButton, "Save", CoreConstants.ICON_SAVED);
                 WidgetUtil.resetIButton(removeButton, "Remove", CoreConstants.ICON_DELETE);
+                Layout.getInstance().setNoticeMessage("You successfully " + text + " a group:<br />");
+
                 setGroup(null, false, null);
                 ((ManageGroupsTab) Layout.getInstance().getTab(
                         CoreConstants.TAB_MANAGE_GROUPS)).loadGroups();

@@ -247,6 +247,7 @@ public class ResourceData extends JdbcDaoSupport implements ResourceDAO {
             rs.getBoolean("status"), 
             rs.getString("type"),
             rs.getString("configuration"),
+            null,
             null);
     }
 

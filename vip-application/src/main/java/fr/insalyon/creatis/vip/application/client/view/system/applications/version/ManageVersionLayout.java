@@ -29,13 +29,14 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL-B license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.application.client.view.system.applications;
+package fr.insalyon.creatis.vip.application.client.view.system.applications.version;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.widgets.*;
 import com.smartgwt.client.widgets.events.*;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
 import fr.insalyon.creatis.vip.application.client.rpc.ApplicationService;
+import fr.insalyon.creatis.vip.application.client.view.system.applications.app.ManageApplicationsTab;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.common.AbstractFormLayout;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
@@ -45,7 +46,7 @@ import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
  *
  * @author Axel Bonnet
  */
-public class PublishVersionLayout extends AbstractFormLayout {
+public class ManageVersionLayout extends AbstractFormLayout {
 
     private String applicationName;
     private String applicationVersion;
@@ -54,7 +55,7 @@ public class PublishVersionLayout extends AbstractFormLayout {
     private Label doiLabel;
     private IButton publishButton;
 
-    public PublishVersionLayout() {
+    public ManageVersionLayout() {
 
         super(480, 120);
         addTitle("Publish Version", ApplicationConstants.ICON_APPLICATION);
