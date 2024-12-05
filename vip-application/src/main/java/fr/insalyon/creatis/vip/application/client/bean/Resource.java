@@ -7,16 +7,16 @@ import com.google.gwt.user.client.rpc.IsSerializable;
 
 public class Resource implements IsSerializable {
     private String name;
-    private boolean visible;
+    private boolean isPublic;
     private boolean status;
     private ResourceType type;
     private String configuration;
     private List<String> engines;
     private List<String> groups;
 
-    public Resource(String name, boolean visible, boolean status, ResourceType type, String configuration, List<String> engines, List<String> groups) {
+    public Resource(String name, boolean isPublic, boolean status, ResourceType type, String configuration, List<String> engines, List<String> groups) {
         this.name = name;
-        this.visible = visible;
+        this.isPublic = isPublic;
         this.status = status;
         this.type = type;
         this.configuration = configuration;
@@ -24,8 +24,8 @@ public class Resource implements IsSerializable {
         this.groups = groups;
     }
 
-    public Resource(String name, boolean visible, boolean status, String type, String configuration, List<String> engines, List<String> groups) {
-        this(name, visible, status, ResourceType.fromString(type), configuration, engines, groups);
+    public Resource(String name, boolean isPublic, boolean status, String type, String configuration, List<String> engines, List<String> groups) {
+        this(name, isPublic, status, ResourceType.fromString(type), configuration, engines, groups);
     }
 
     public Resource(String name) {
@@ -42,12 +42,12 @@ public class Resource implements IsSerializable {
         this.name = name;
     }
 
-    public boolean isVisible() {
-        return visible;
+    public boolean isPublic() {
+        return isPublic;
     }
 
-    public void setVisible(boolean visible) {
-        this.visible = visible;
+    public void setPublic(boolean isPublic) {
+        this.isPublic = isPublic;
     }
 
     public boolean getStatus() {

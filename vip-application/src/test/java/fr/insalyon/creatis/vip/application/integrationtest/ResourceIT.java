@@ -90,7 +90,7 @@ public class ResourceIT extends BaseSpringIT {
     @Test
     public void getAllVisible() throws BusinessException {
         resource.setName("resourceB");
-        resource.setVisible(true);
+        resource.setPublic(true);
         resourceBusiness.add(resource);
 
         assertEquals(1, resourceBusiness.getAll(true).size());

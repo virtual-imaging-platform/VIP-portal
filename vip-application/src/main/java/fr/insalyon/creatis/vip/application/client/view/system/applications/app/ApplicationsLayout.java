@@ -104,7 +104,7 @@ public class ApplicationsLayout extends VLayout {
                 public void onClick(ClickEvent event) {
                     ManageApplicationsTab appsTab = (ManageApplicationsTab) Layout.getInstance().
                             getTab(ApplicationConstants.TAB_MANAGE_APPLICATION);
-                    appsTab.setApplication(null, null, null, null);
+                    appsTab.setApplication(null, null, null, null, false);
                 }
             });
             toolstrip.addMember(addButton);
@@ -124,9 +124,10 @@ public class ApplicationsLayout extends VLayout {
     }
 
     private void configureGrid() {
-        ListGridField groupsField = new ListGridField("groups", "Groups");
-        ListGridField ownerField = new ListGridField("owner", "Owner");
         ListGridField nameField = new ListGridField("name", "Application Name");
+        ListGridField ownerField = new ListGridField("owner", "Owner");
+        ListGridField publicField = new ListGridField("public", "Public");
+        ListGridField groupsField = new ListGridField("groups", "Groups");
 
         grid = new ListGrid() {
             @Override
@@ -189,16 +190,16 @@ public class ApplicationsLayout extends VLayout {
         grid.setShowEmptyMessage(true);
         grid.setShowRowNumbers(true);
         grid.setEmptyMessage("<br>No data available.");
+
         if (onlyPublicApps){
-            grid.setFields(
-                nameField,
-                groupsField);
+            grid.setFields(nameField, publicField, groupsField);
         } else {
             ownerField.setHidden(true);
             grid.setFields(
                 nameField,
                 new ListGridField("ownerFullName", "Owner"),
                 ownerField,
+                publicField,
                 groupsField);
         }
         grid.setSortField("name");
@@ -268,6 +269,7 @@ public class ApplicationsLayout extends VLayout {
             record.getAttribute("name"), 
             record.getAttribute("owner"), 
             record.getAttribute("citation"), 
-            record.getAttributeAsStringArray("groups"));
+            record.getAttributeAsStringArray("groups"),
+            record.getAttributeAsBoolean("public"));
     }
 }

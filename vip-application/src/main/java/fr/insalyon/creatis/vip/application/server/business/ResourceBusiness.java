@@ -102,10 +102,10 @@ public class ResourceBusiness {
         }
     }
 
-    public List<Resource> getAll(boolean visible) throws BusinessException {
+    public List<Resource> getAll(boolean isPublic) throws BusinessException {
         return getAll()
             .stream()
-            .filter(r -> r.isVisible() == visible)
+            .filter(r -> r.isPublic() == isPublic)
             .collect(Collectors.toList());
     }
 

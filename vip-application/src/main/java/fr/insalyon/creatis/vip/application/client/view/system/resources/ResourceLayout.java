@@ -143,7 +143,7 @@ public class ResourceLayout extends VLayout {
         grid.setEmptyMessage("<br>No data available.");
         grid.setFields(
                 new ListGridField("name", "Name"),
-                new ListGridField("visible", "Visibility"),
+                new ListGridField("public", "Public"),
                 new ListGridField("status", "Status"),
                 new ListGridField("type", "Type"),
                 new ListGridField("configuration", "Configuration"),
@@ -209,7 +209,7 @@ public class ResourceLayout extends VLayout {
 
         appsTab.setResource(
             record.getAttribute("name"), 
-            record.getAttributeAsBoolean("visible"), 
+            record.getAttributeAsBoolean("public"), 
             record.getAttributeAsBoolean("status"), 
             record.getAttribute("type"), 
             record.getAttribute("configuration"),

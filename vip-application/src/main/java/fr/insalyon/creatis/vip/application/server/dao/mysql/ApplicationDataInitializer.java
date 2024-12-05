@@ -43,16 +43,16 @@ public class ApplicationDataInitializer extends JdbcDaoSupport {
 
     private void createEngineTable() {
         tableInitializer.createTable("VIPEngines",
-                "name VARCHAR(255), "
-                        + "endpoint VARCHAR(255), "
-                        + "status VARCHAR(255) DEFAULT NULL, "
-                        + "PRIMARY KEY (name)");
+                    "name VARCHAR(255), "
+                +   "endpoint VARCHAR(255), "
+                +   "status VARCHAR(255) DEFAULT NULL, "
+                +   "PRIMARY KEY (name)");
     }
 
     private void createResourcesTables() {
         tableInitializer.createTable("VIPResources", 
                     "name VARCHAR(255) NOT NULL, "
-                +   "visible BOOLEAN DEFAULT FALSE, "
+                +   "isPublic BOOLEAN DEFAULT FALSE, "
                 +   "status BOOLEAN DEFAULT FALSE, "
                 +   "type VARCHAR(255), "
                 +   "configuration VARCHAR(255), "
@@ -92,39 +92,40 @@ public class ApplicationDataInitializer extends JdbcDaoSupport {
 
     private void createApplicationsTables() {
         tableInitializer.createTable("VIPApplications",
-                        "name VARCHAR(255), "
-                    +   "citation TEXT, "
-                    +   "owner VARCHAR(255), "
-                    +   "PRIMARY KEY (name), "
-                    +   "FOREIGN KEY (owner) REFERENCES VIPUsers(email) "
-                    +   "ON DELETE SET NULL ON UPDATE CASCADE");
+                    "name VARCHAR(255), "
+                +   "citation TEXT, "
+                +   "owner VARCHAR(255), "
+                +   "isPublic BOOLEAN DEFAULT FALSE, "
+                +   "PRIMARY KEY (name), "
+                +   "FOREIGN KEY (owner) REFERENCES VIPUsers(email) "
+                +   "ON DELETE SET NULL ON UPDATE CASCADE");
 
         tableInitializer.createTable("VIPGroupsApplications",
-                        "groupname VARCHAR(50), "
-                    +   "applicationname VARCHAR(255), "
-                    +   "PRIMARY KEY (groupname, applicationname), "
-                    +   "FOREIGN KEY (groupname) REFERENCES VIPGroups(name) "
-                    +   "ON DELETE CASCADE ON UPDATE CASCADE, "
-                    +   "FOREIGN KEY (applicationname) REFERENCES VIPApplications(name) "
-                    +   "ON DELETE CASCADE ON UPDATE CASCADE");
+                    "groupname VARCHAR(50), "
+                +   "applicationname VARCHAR(255), "
+                +   "PRIMARY KEY (groupname, applicationname), "
+                +   "FOREIGN KEY (groupname) REFERENCES VIPGroups(name) "
+                +   "ON DELETE CASCADE ON UPDATE CASCADE, "
+                +   "FOREIGN KEY (applicationname) REFERENCES VIPApplications(name) "
+                +   "ON DELETE CASCADE ON UPDATE CASCADE");
 
         tableInitializer.createTable("VIPAppVersions",
-                "application VARCHAR(255), "
-                        + "version VARCHAR(255), "
-                        + "lfn VARCHAR(255), "
-                        + "json_lfn VARCHAR(255), "
-                        + "doi VARCHAR(255), "
-                        + "visible BOOLEAN, "
-                        + "useBoutiquesForm BOOLEAN, "
-                        + "PRIMARY KEY (application, version), "
-                        + "FOREIGN KEY (application) REFERENCES VIPApplications(name) "
-                        + "ON DELETE CASCADE ON UPDATE CASCADE");
+                    "application VARCHAR(255), "
+                +   "version VARCHAR(255), "
+                +   "lfn VARCHAR(255), "
+                +   "json_lfn VARCHAR(255), "
+                +   "doi VARCHAR(255), "
+                +   "visible BOOLEAN, "
+                +   "useBoutiquesForm BOOLEAN, "
+                +   "PRIMARY KEY (application, version), "
+                +   "FOREIGN KEY (application) REFERENCES VIPApplications(name) "
+                +   "ON DELETE CASCADE ON UPDATE CASCADE");
 
         tableInitializer.createTable("VIPAppExamples",
-                "application VARCHAR(255), "
-                        + "name VARCHAR(255), "
-                        + "inputs VARCHAR(32000), "
-                        + "PRIMARY KEY (application, name)");
+                    "application VARCHAR(255), "
+                +   "name VARCHAR(255), "
+                +   "inputs VARCHAR(32000), "
+                +   "PRIMARY KEY (application, name)");
     }
 
     private void createTagsTables() {
@@ -145,23 +146,23 @@ public class ApplicationDataInitializer extends JdbcDaoSupport {
 
     private void createOthersTables() {
         tableInitializer.createTable("VIPAppInputs",
-                "email VARCHAR(255), "
-                        + "application VARCHAR(255), "
-                        + "name VARCHAR(255), "
-                        + "inputs VARCHAR(32000), "
-                        + "PRIMARY KEY (email, application, name), "
-                        + "FOREIGN KEY (email) REFERENCES VIPUsers(email) "
-                        + "ON DELETE CASCADE ON UPDATE CASCADE");
+                    "email VARCHAR(255), "
+                +   "application VARCHAR(255), "
+                +   "name VARCHAR(255), "
+                +   "inputs VARCHAR(32000), "
+                +   "PRIMARY KEY (email, application, name), "
+                +   "FOREIGN KEY (email) REFERENCES VIPUsers(email) "
+                +   "ON DELETE CASCADE ON UPDATE CASCADE");
 
         tableInitializer.createTable("VIPPublicExecutions",
-                "execution_ID VARCHAR(255), "
-                        + "simulation_name VARCHAR(255), "
-                        + "application_name VARCHAR(255), "
-                        + "application_version VARCHAR(255), "
-                        + "status  VARCHAR(50), "
-                        + "author VARCHAR(255), "
-                        + "output_names VARCHAR(255), "
-                        + "comments TEXT, "
-                        + "PRIMARY KEY(execution_ID)");
+                    "execution_ID VARCHAR(255), "
+                +   "simulation_name VARCHAR(255), "
+                +   "application_name VARCHAR(255), "
+                +   "application_version VARCHAR(255), "
+                +   "status  VARCHAR(50), "
+                +   "author VARCHAR(255), "
+                +   "output_names VARCHAR(255), "
+                +   "comments TEXT, "
+                +   "PRIMARY KEY(execution_ID)");
     }
 } 

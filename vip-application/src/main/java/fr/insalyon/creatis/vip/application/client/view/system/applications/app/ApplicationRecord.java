@@ -47,5 +47,6 @@ public class ApplicationRecord extends ListGridRecord {
         setAttribute("ownerFullName", app.getFullName());
         setAttribute("citation", app.getCitation());
         setAttribute("groups", app.getApplicationGroups());
+        setAttribute("public", app.isPublic());
     }
 }

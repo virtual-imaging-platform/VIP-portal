@@ -35,12 +35,12 @@ public class ResourceData extends JdbcDaoSupport implements ResourceDAO {
 
     @Override
     public void add(Resource resource) throws DAOException {
-        String query = "INSERT INTO VIPResources (name, visible, status, type, configuration) "
+        String query = "INSERT INTO VIPResources (name, isPublic, status, type, configuration) "
         +              "VALUES (?,?,?,?,?)";
         
         try (PreparedStatement ps = getConnection().prepareStatement(query)) {
             ps.setString(1, resource.getName());
-            ps.setBoolean(2, resource.isVisible());
+            ps.setBoolean(2, resource.isPublic());
             ps.setBoolean(3, resource.getStatus());
             ps.setString(4, resource.getType().toString());
             ps.setString(5, resource.getConfiguration());
@@ -59,11 +59,11 @@ public class ResourceData extends JdbcDaoSupport implements ResourceDAO {
 
     @Override
     public void update(Resource resource) throws DAOException {
-        String query = "UPDATE VIPResources SET visible = ?, status = ?, type = ?, configuration = ? "
+        String query = "UPDATE VIPResources SET isPublic = ?, status = ?, type = ?, configuration = ? "
         +              "WHERE name = ?";
 
         try (PreparedStatement ps = getConnection().prepareStatement(query)) {
-            ps.setBoolean(1, resource.isVisible());
+            ps.setBoolean(1, resource.isPublic());
             ps.setBoolean(2, resource.getStatus());
             ps.setString(3, resource.getType().toString());
             ps.setString(4, resource.getConfiguration());
@@ -243,7 +243,7 @@ public class ResourceData extends JdbcDaoSupport implements ResourceDAO {
     private Resource resultsetToResource(ResultSet rs) throws SQLException {
         return new Resource(
             rs.getString("name"), 
-            rs.getBoolean("visible"),
+            rs.getBoolean("isPublic"),
             rs.getBoolean("status"), 
             rs.getString("type"),
             rs.getString("configuration"),

@@ -8,7 +8,7 @@ public class ResourceRecord extends ListGridRecord {
 
     public ResourceRecord(Resource resource) {
         setAttribute("name", resource.getName());
-        setAttribute("visible", resource.isVisible());
+        setAttribute("public", resource.isPublic());
         setAttribute("status", resource.getStatus());
         setAttribute("type", resource.getType());
         setAttribute("configuration", resource.getConfiguration());

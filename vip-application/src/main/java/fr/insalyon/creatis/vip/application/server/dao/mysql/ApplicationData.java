@@ -72,12 +72,13 @@ public class ApplicationData extends JdbcDaoSupport implements ApplicationDAO {
 
     @Override
     public void add(Application application) throws DAOException {
-        String query = "INSERT INTO VIPApplications(name, citation, owner) VALUES (?,?,?)";
+        String query = "INSERT INTO VIPApplications(name, citation, owner, isPublic) VALUES (?,?,?,?)";
 
         try (PreparedStatement ps = getConnection().prepareStatement(query)) {
             ps.setString(1, application.getName());
             ps.setString(2, application.getCitation());
             ps.setString(3, application.getOwner());
+            ps.setBoolean(4, application.isPublic());
             ps.execute();
 
         } catch (SQLException ex) {
@@ -93,12 +94,13 @@ public class ApplicationData extends JdbcDaoSupport implements ApplicationDAO {
 
     @Override
     public void update(Application application) throws DAOException {
-        String query = "UPDATE VIPApplications SET citation=?, owner=? WHERE name =?";
+        String query = "UPDATE VIPApplications SET citation=?, owner=?, isPublic=? WHERE name=?";
 
         try (PreparedStatement ps = getConnection().prepareStatement(query)) {
             ps.setString(1, application.getCitation());
             ps.setString(2, application.getOwner());
-            ps.setString(3, application.getName());
+            ps.setBoolean(3, application.isPublic());
+            ps.setString(4, application.getName());
             ps.executeUpdate();
 
         } catch (SQLException ex) {
@@ -123,14 +125,14 @@ public class ApplicationData extends JdbcDaoSupport implements ApplicationDAO {
 
     @Override
     public Application getApplication(String applicationName) throws DAOException {
-        String query = "SELECT name, citation, owner FROM VIPApplications WHERE name = ?";
+        String query = "SELECT * FROM VIPApplications WHERE name = ?";
 
         try (PreparedStatement ps = getConnection().prepareStatement(query)) {
             ps.setString(1, applicationName);
 
             ResultSet rs = ps.executeQuery();
             if (rs.first()) {
-                return new Application(rs.getString("name"), rs.getString("owner"), rs.getString("citation"));
+                return applicationFromResultset(rs);
             }
             return null;
         } catch (SQLException ex) {
@@ -148,10 +150,7 @@ public class ApplicationData extends JdbcDaoSupport implements ApplicationDAO {
             List<Application> applications = new ArrayList<Application>();
 
             while (rs.next()) {
-                applications.add(new Application(
-                    rs.getString("name"), 
-                    rs.getString("owner"),
-                    rs.getString("citation")));
+                applications.add(applicationFromResultset(rs));
             }
             return applications;
 
@@ -185,6 +184,29 @@ public class ApplicationData extends JdbcDaoSupport implements ApplicationDAO {
         } catch (SQLException ex) {
             logger.error("Error getting all applications", ex);
             throw new DAOException(ex);
+        }
+    }
+
+    @Override
+    public List<Application> getApplicationsByGroup(Group group) throws DAOException {
+        String query =  "SELECT * FROM VIPApplications a "
+        +               "JOIN VIPGroupsApplications ga ON ga.applicationname = a.name "
+        +               "WHERE ga.groupname = ?";
+
+        try (PreparedStatement ps = getConnection().prepareStatement(query)) {
+            ps.setString(1, group.getName());
+
+            ResultSet rs = ps.executeQuery();
+            List<Application> results = new ArrayList<>();
+
+            while (rs.next()) {
+                results.add(applicationFromResultset(rs));
+            }
+            return results;
+
+        } catch (SQLException e) {
+            logger.error("Error getting applications for group " + group.getName(), e);
+            throw new DAOException(e);
         }
     }
 
@@ -405,29 +427,11 @@ public class ApplicationData extends JdbcDaoSupport implements ApplicationDAO {
         }
     }
 
-    @Override
-    public List<Application> getApplicationsByGroup(Group group) throws DAOException {
-        String query =  "SELECT * FROM VIPApplications a "
-        +               "JOIN VIPGroupsApplications ga ON ga.applicationname = a.name "
-        +               "WHERE ga.groupname = ?";
-
-        try (PreparedStatement ps = getConnection().prepareStatement(query)) {
-            ps.setString(1, group.getName());
-
-            ResultSet rs = ps.executeQuery();
-            List<Application> results = new ArrayList<>();
-
-            while (rs.next()) {
-                results.add(new Application(
-                    rs.getString("name"),
-                    rs.getString("owner"),
-                    rs.getString("citation")));
-            }
-            return results;
-
-        } catch (SQLException e) {
-            logger.error("Error getting applications for group " + group.getName(), e);
-            throw new DAOException(e);
-        }
+    private Application applicationFromResultset(ResultSet rs) throws SQLException {
+        return new Application(
+            rs.getString("name"),
+            rs.getString("owner"),
+            rs.getString("citation"),
+            rs.getBoolean("isPublic"));
     }
 }
