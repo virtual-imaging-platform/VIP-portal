@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -122,7 +123,8 @@ public class ResourceIT extends BaseSpringIT {
         Group group = groupBusiness.get("resourcetest");
         User user = configurationBusiness.getUser("super@test.insa");
 
-        resourceBusiness.associate(resource, group);
+        resource.setGroups(Arrays.asList(group.getName()));
+        resourceBusiness.update(resource);
         assertEquals(0, resourceBusiness.getAvailableForUser(user).size());
 
         resource.setStatus(true);
