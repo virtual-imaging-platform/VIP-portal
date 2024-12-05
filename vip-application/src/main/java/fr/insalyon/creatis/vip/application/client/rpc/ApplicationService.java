@@ -42,6 +42,7 @@ import fr.insalyon.creatis.vip.application.client.bean.Resource;
 import fr.insalyon.creatis.vip.application.client.bean.Tag;
 import fr.insalyon.creatis.vip.application.client.view.ApplicationException;
 import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -62,9 +63,9 @@ public interface ApplicationService extends RemoteService {
         }
     }
 
-    List<Application> getPublicApplications() throws ApplicationException;
+    public Map<Application, List<AppVersion>> getPublicApplications() throws ApplicationException;
 
-    public List<Application> getApplications() throws ApplicationException;
+    public Map<Application, List<AppVersion>> getApplications() throws ApplicationException;
     
     public List<AppVersion> getVersions(String applicationName) throws ApplicationException;
     

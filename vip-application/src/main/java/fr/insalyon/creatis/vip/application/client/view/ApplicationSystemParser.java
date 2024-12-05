@@ -48,7 +48,6 @@ public class ApplicationSystemParser extends ApplicationParser {
 
     @Override
     public void loadApplications() {
-
         if (CoreModule.user.isSystemAdministrator() || CoreModule.user.isGroupAdmin() || CoreModule.user.isDeveloper()) {
             addApplication(ApplicationConstants.APP_APPLICATION, ApplicationConstants.APP_IMG_APPLICATION);
         }

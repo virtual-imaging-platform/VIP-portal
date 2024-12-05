@@ -46,7 +46,10 @@ import org.slf4j.LoggerFactory;
 
 import jakarta.servlet.ServletException;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -212,29 +215,39 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
     }
 
     @Override
-    public List<Application> getPublicApplications() throws ApplicationException {
+    public Map<Application, List<AppVersion>> getPublicApplications() throws ApplicationException {
+        List<Application> apps = new ArrayList<>();
+        Map<Application, List<AppVersion>> map = new HashMap<>();
+
         try {
-            return applicationBusiness.getPublicApplicationsWithGroups();
+            apps = applicationBusiness.getPublicApplicationsWithGroups();
+
+            for (Application app : apps) {
+                map.put(app, appVersionBusiness.getVersions(app.getName()));
+            }
+            return map;
         } catch (BusinessException ex) {
             throw new ApplicationException(ex);
         }
     }
 
     @Override
-    public List<Application> getApplications() throws ApplicationException {
+    public Map<Application, List<AppVersion>> getApplications() throws ApplicationException {
+        List<Application> apps = new ArrayList<>();
+        Map<Application, List<AppVersion>> map = new HashMap<>();
+
         try {
             if (isSystemAdministrator()) {
-                return applicationBusiness.getApplications();
+                apps = applicationBusiness.getApplications();
             } else if (isDeveloper()) {
-                return applicationBusiness.getApplicationsWithOwner(getSessionUser().getEmail());
+                apps = applicationBusiness.getApplicationsWithOwner(getSessionUser().getEmail());
+            } else {
+                apps = applicationBusiness.getApplications(getSessionUser());
             }
-            // }  else if (isGroupAdministrator()) {
-            //     List<String> classes = classBusiness.getUserClassesName(
-            //         getSessionUser().getEmail(), true);
-            //     return applicationBusiness.getApplications(classes);
-            // }
-            // return applicationBusiness.getApplications(classNames);
-            return applicationBusiness.getApplications();
+            for (Application app : apps) {
+                map.put(app, appVersionBusiness.getVersions(app.getName()));
+            }
+            return map;
         } catch (BusinessException | CoreException ex) {
             throw new ApplicationException(ex);
         }
@@ -251,10 +264,7 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
                         user.getEmail(), false),
                     applicationBusiness.getApplicationNames(),
                 };
-            } else {
-                // List<String> classes = classBusiness.getUserClassesName(
-                    // user.getEmail(), !user.isSystemAdministrator());
-                // classes.removeAll(reservedClasses);
+            } else {;
                 return new List[] {
                     configurationBusiness.getUserNames(
                         user.getEmail(), true),

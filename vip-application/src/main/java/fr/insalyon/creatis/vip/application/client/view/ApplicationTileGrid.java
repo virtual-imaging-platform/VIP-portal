@@ -32,11 +32,17 @@
 package fr.insalyon.creatis.vip.application.client.view;
 
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
+import fr.insalyon.creatis.vip.application.client.bean.AppVersion;
+import fr.insalyon.creatis.vip.application.client.bean.Application;
+import fr.insalyon.creatis.vip.application.client.rpc.ApplicationService;
 import fr.insalyon.creatis.vip.application.client.view.launch.LaunchTab;
 import fr.insalyon.creatis.vip.core.client.view.application.ApplicationsTileGrid;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+
+import com.google.gwt.user.client.rpc.AsyncCallback;
 
 /**
  *
@@ -49,12 +55,12 @@ public class ApplicationTileGrid extends ApplicationsTileGrid {
     public ApplicationTileGrid(String tileName) {
         super(tileName);
         applicationNames = new ArrayList<String>();
-        // loadApplications();
+        // changer
+        loadApplications();
     }
 
     @Override
-    public void parse(
-        final String applicationName, final String applicationVersion) {
+    public void parse(final String applicationName, final String applicationVersion) {
 
         String appName = applicationVersion == null ? applicationName : applicationName + " " + applicationVersion;
         if (applicationNames.contains(appName)) {
@@ -65,22 +71,25 @@ public class ApplicationTileGrid extends ApplicationsTileGrid {
         }
     }
 
-    // private void loadApplications() {
-    //     final AsyncCallback<List<Application>> callback = new AsyncCallback<>() {
-    //         @Override
-    //         public void onFailure(Throwable caught) {
-    //             Layout.getInstance().setWarningMessage("Unable to load applications:<br />" + caught.getMessage());
-    //         }
+    private void loadApplications() {
+        final AsyncCallback<Map<Application, List<AppVersion>>> callback = new AsyncCallback<>() {
+            @Override
+            public void onFailure(Throwable caught) {
+                Layout.getInstance().setWarningMessage("Unable to load applications:<br />" + caught.getMessage());
+            }
 
-    //         @Override
-    //         public void onSuccess(List<Application> result) {
+            @Override
+            public void onSuccess(Map<Application, List<AppVersion>> result) {
+                for (var set : result.entrySet()) {
+                    Application app = set.getKey();
 
-    //             for (Application app : result) {
-    //                 addApplication(, app[1], ApplicationConstants.APP_IMG_APPLICATION);
-    //                 applicationNames.add(app[0] + " " + app[1]);
-    //             }
-    //         }
-    //     };
-    //     ApplicationService.Util.getInstance().getApplications(callback);
-    // }
+                    for (var version : set.getValue()) {
+                        addApplication(app.getName(), version.getVersion(), ApplicationConstants.APP_IMG_APPLICATION);
+                        applicationNames.add(app.getName() + " " + version.getVersion());
+                    }
+                }
+            }
+        };
+        ApplicationService.Util.getInstance().getApplications(callback);
+    }
 }

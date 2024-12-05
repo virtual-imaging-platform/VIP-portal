@@ -39,6 +39,7 @@ import com.smartgwt.client.widgets.tab.events.TabCloseClickEvent;
 import fr.insalyon.creatis.vip.application.client.rpc.WorkflowService;
 import fr.insalyon.creatis.vip.application.client.view.ApplicationHomeParser;
 import fr.insalyon.creatis.vip.application.client.view.ApplicationSystemParser;
+import fr.insalyon.creatis.vip.application.client.view.ApplicationTileGrid;
 import fr.insalyon.creatis.vip.application.client.view.common.AbstractSimulationTab;
 import fr.insalyon.creatis.vip.application.client.view.monitor.timeline.TimelineLayout;
 import fr.insalyon.creatis.vip.application.client.view.system.applications.app.ManageApplicationsTab;
@@ -60,28 +61,29 @@ public class ApplicationModule extends Module {
 
     public static HashMap<String, Integer> reservedClasses;
 
-     public ApplicationModule() {
-         CoreModule.getHomePageActions().put(CoreConstants.HOME_ACTION_SHOW_APPLICATIONS, new Runnable() {
-             @Override
-             public void run() {
-                 Layout.getInstance().addTab(
-                         ApplicationConstants.TAB_MANAGE_APPLICATION,
-                         () -> new ManageApplicationsTab(true));
-             }
-         });
-       
-        final AsyncCallback<HashMap<String, Integer>> callback = new AsyncCallback<HashMap<String, Integer>>() {
-            @Override
-            public void onFailure(Throwable caught) {
-                Layout.getInstance().setWarningMessage("Unable to load applet gatelab classes:<br />" + caught.getMessage());
-            }
+    public ApplicationModule() {
+        CoreModule.getHomePageActions().put(CoreConstants.HOME_ACTION_SHOW_APPLICATIONS, new Runnable() {
 
             @Override
-            public void onSuccess(HashMap<String, Integer> result) {
-             reservedClasses=result;
+            public void run() {
+                Layout.getInstance().addTab(
+                    ApplicationConstants.TAB_MANAGE_APPLICATION,
+                    () -> new ManageApplicationsTab(true));
             }
-        };
+        });
+        
         // changer
+        // final AsyncCallback<HashMap<String, Integer>> callback = new AsyncCallback<HashMap<String, Integer>>() {
+        //     @Override
+        //     public void onFailure(Throwable caught) {
+        //         Layout.getInstance().setWarningMessage("Unable to load applet gatelab classes:<br />" + caught.getMessage());
+        //     }
+
+        //     @Override
+        //     public void onSuccess(HashMap<String, Integer> result) {
+        //         reservedClasses=result;
+        //     }
+        // };
         // ApplicationService.Util.getInstance().getReservedClasses(callback);
           
     }
@@ -93,6 +95,7 @@ public class ApplicationModule extends Module {
         CoreModule.addGeneralApplicationParser(new ApplicationHomeParser());
         CoreModule.addSystemApplicationParser(new ApplicationSystemParser());
         CoreModule.addLayoutToHomeTab(TimelineLayout.getInstance());
+        CoreModule.addApplicationsTileGrid(new ApplicationTileGrid(ApplicationConstants.APP_APPLICATION));
 
         // Simulation close tab
         CenterTabSet.getInstance().addCloseClickHandler(new CloseClickHandler() {
@@ -109,8 +112,7 @@ public class ApplicationModule extends Module {
         }
 
     @Override
-    public void postLoading() {
-    }
+    public void postLoading() { }
 
     @Override
     public void terminate(Set<Tab> removedTabs) {
@@ -152,7 +154,7 @@ public class ApplicationModule extends Module {
     @Override
     public void userUpdated(User oldUser, User updatedUser) {
 
-        if (!oldUser.getFullName().equals(updatedUser.getFullName())) {
+        if ( ! oldUser.getFullName().equals(updatedUser.getFullName())) {
             final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
                 @Override
                 public void onFailure(Throwable caught) {

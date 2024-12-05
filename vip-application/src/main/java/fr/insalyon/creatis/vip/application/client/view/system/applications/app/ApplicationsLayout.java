@@ -49,6 +49,7 @@ import com.smartgwt.client.widgets.grid.events.CellClickHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
+import fr.insalyon.creatis.vip.application.client.bean.AppVersion;
 import fr.insalyon.creatis.vip.application.client.bean.Application;
 import fr.insalyon.creatis.vip.application.client.rpc.ApplicationService;
 import fr.insalyon.creatis.vip.core.client.CoreModule;
@@ -60,6 +61,7 @@ import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -211,7 +213,7 @@ public class ApplicationsLayout extends VLayout {
     }
 
     public void loadData() {
-        final AsyncCallback<List<Application>> callback = new AsyncCallback<List<Application>>() {
+        final AsyncCallback<Map<Application, List<AppVersion>>> callback = new AsyncCallback<>() {
             @Override
             public void onFailure(Throwable caught) {
                 modal.hide();
@@ -219,11 +221,11 @@ public class ApplicationsLayout extends VLayout {
             }
 
             @Override
-            public void onSuccess(List<Application> result) {
+            public void onSuccess(Map<Application, List<AppVersion>> result) {
                 modal.hide();
                 List<ApplicationRecord> dataList = new ArrayList<ApplicationRecord>();
 
-                for (Application app : result) {
+                for (Application app : result.keySet()) {
                     dataList.add(new ApplicationRecord(app));
                 }
                 grid.setData(dataList.toArray(new ApplicationRecord[]{}));
