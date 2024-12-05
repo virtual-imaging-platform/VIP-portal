@@ -53,38 +53,63 @@ public class OidcConfig {
             // URISyntaxException in URI() (bad URL syntax), NullPointerException in get().asText() (missing JSON key),
             // and probably more...
             // As long as isOIDCActive(), we do not try to handle them: just let them bubble up, causing a boot-time error.
-            final String basename = "keycloak.json";
-            // read and parse keycloak.json file into one OidcServer config
+            final String basename = "vip-oidc.json";
+
+            // Read and parse vip-oidc.json file into a list of OIDC servers.
+            // The expected file content is:
+            // { "servers": [{"url":"...", "use-resource-role-mapping":false, "resource":"name"}]}
+            // servers: array, mandatory
+            //     List of OIDC servers.
+            // servers[].url: string, mandatory
+            //     Base URL of the OIDC server. Must be unique across servers.
+            // servers[].use-resource-role-map: boolean, optional, default false
+            //     Whether to use realm_access (if false) or resource_access (if true) for roles mapping.
+            // servers[].resource: string, mandatory if use-resource-role-map=true
+            //     Resource name (i.e. Keycloak client ID) to use for roles mapping.
+            //
+            // A note on Keycloak vs OIDC: Keycloak is a specific server software, providing an implementation of OIDC.
+            // In order to favor future compatibility with other OIDC implementations, things that are Keycloak-specific
+            // should be explicitly documented as such:
+            // - A Keycloak URL is typically https://hostname/realms/<realmName>. The concept of "realm" is Keycloak-specific.
+            // - Spring OIDC does an HTTP GET on <url>/.well-known/openid-configuration to get the various OIDC endpoints.
+            //   Since our base url can be anything and does not explicitly involve realms, this is generic OIDC.
+            // - How roles are encoded in the JWT, and the concept of "resource", is Keycloak-specific.
+            // So, currently, our only Keycloak-specific behaviour is how roles are mapped in OIDCResolver.parseAuthorities().
+            // Adding a new "type" field in the OidcServer object, which defaults to type=keycloak and conditions how roles are mapped,
+            // would allow to extend compatibility with other OIDC servers.
             File file = vipConfigFolder.getFile().toPath().resolve(basename).toFile();
             ObjectMapper mapper = new ObjectMapper();
-            JsonNode node = mapper.readTree(file);
-            // mandatory fields: just check for their presence, content will be validated by URI() below
-            String baseURL, realm;
-            if (node.hasNonNull("auth-server-url") && node.hasNonNull("realm")) {
-                baseURL = node.get("auth-server-url").asText();
-                realm = node.get("realm").asText();
-            } else {
-                throw new BusinessException("Failed parsing " + basename + ": missing mandatory fields");
+            JsonNode rootNode = mapper.readTree(file);
+            if (!(rootNode.hasNonNull("servers") && rootNode.get("servers").isArray())) {
+                throw new BusinessException("Failed parsing " + basename + ": missing mandatory field: servers");
             }
-            // optional fields
-            Boolean useResourceRoleMappings;
-            if (node.hasNonNull("use-resource-role-mapping")) {
-                useResourceRoleMappings = node.get("use-resource-role-mapping").asBoolean();
-            } else {
-                useResourceRoleMappings = false;
+            for (JsonNode serverNode : rootNode.get("servers")) {
+                if (!(serverNode.hasNonNull("url"))) {
+                    throw new BusinessException("Failed parsing " + basename + ": missing mandatory field: url");
+                }
+                // url field is mandatory: here we just check for its presence, content will be validated by URI() below
+                String baseURL = serverNode.get("url").asText();
+                // optional fields
+                Boolean useResourceRoleMappings;
+                if (serverNode.hasNonNull("use-resource-role-mapping")) {
+                    useResourceRoleMappings = serverNode.get("use-resource-role-mapping").asBoolean();
+                } else {
+                    useResourceRoleMappings = false;
+                }
+                String resourceName;
+                if (serverNode.hasNonNull("resource")) {
+                    resourceName = serverNode.get("resource").asText();
+                } else {
+                    resourceName = "";
+                }
+                // Add a new OIDC server to our config.
+                URI url = new URI(baseURL);
+                String issuer = url.toASCIIString();
+                if (servers.get(issuer) != null) {
+                    throw new BusinessException("Failed parsing " + basename + ": duplicate issuers");
+                }
+                servers.put(issuer, new OidcServer(issuer, useResourceRoleMappings, resourceName));
             }
-            String resourceName;
-            if (node.hasNonNull("resource")) {
-                resourceName = node.get("resource").asText();
-            } else {
-                resourceName = "";
-            }
-
-            // Build OIDC server URL from auth-server-url + realm name (this is Keycloak-specific).
-            // We use URI.resolve() instead of just concatenation, to correctly handle optional '/' at the end of baseURL.
-            URI url = new URI(baseURL).resolve("realms/" + realm);
-            String issuer = url.toASCIIString();
-            servers.put(issuer, new OidcServer(issuer, useResourceRoleMappings, resourceName));
         }
         this.servers = servers;
     }
