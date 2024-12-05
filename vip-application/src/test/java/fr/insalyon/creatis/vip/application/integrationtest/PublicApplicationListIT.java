@@ -12,6 +12,9 @@ import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import java.util.Arrays;
 import java.util.List;
 
 public class PublicApplicationListIT extends BaseSpringIT {
@@ -21,25 +24,22 @@ public class PublicApplicationListIT extends BaseSpringIT {
 
     @Test
     public void shouldNotIncludePrivateGroupsAndClasses() throws BusinessException, ApplicationException {
-        // prepare test data
         Group publicGroup = new Group("public group", true, GroupType.getDefault());
         Group privateGroup = new Group("private group", false, GroupType.getDefault());
-        // classes are not really public/private, but they are linked to public/private groups
-        // a class is considered private if it is linked only to private groups
-        Application app = new Application("testApp", "");
+
+        Application app = new Application("testApp", "", Arrays.asList(publicGroup.getName()));
         AppVersion appVersion = new AppVersion(app.getName(), "", null, null, true, false);
-        // persist data in database
+
         groupBusiness.add(publicGroup);
         groupBusiness.add(privateGroup);
         applicationBusiness.add(app);
         appVersionBusiness.add(appVersion);
 
-        // verify
         List<Application> publicApplications = applicationBusiness.getPublicApplicationsWithGroups();
-        // Assertions.assertEquals(1, publicApplications.size()); 
-        // changer
-        // Application resultApp = publicApplications.get(0);
-        // Assertions.assertEquals(app.getName(), resultApp.getName());
-        // Assertions.assertEquals(1, resultApp.getApplicationGroups().size());
+        assertEquals(1, publicApplications.size());
+
+        Application resultApp = publicApplications.get(0);
+        assertEquals(app.getName(), resultApp.getName());
+        assertEquals(1, resultApp.getApplicationGroups().size());
     }
 }

@@ -185,19 +185,21 @@ public class PipelineControllerIT extends BaseWebSpringIT {
         createGroup("group2");
         createGroup("group3");
 
-        createAnApplication("app1");
-        createAnApplication("app2");
-        createAnApplication("app3");
+        createAnApplication("app1", "group1");
+        createAnApplication("app2", "group2");
+        createAnApplication("app3", "group3");
 
         AppVersion app11 = createAVersion("app1", "v1", true, null, null);
-        createAVersion("app1", "v2", false, null, null);
+        AppVersion app12 = createAVersion("app1", "v2", false, null, null);
         AppVersion app13 = createAVersion("app1", "v3", true, null, null);
         AppVersion app2 = createAVersion("app2", "v1.1", true, null, null);
-        createAVersion("app3", "v4", false, null, null);
+        AppVersion app34 = createAVersion("app3", "v4", false, null, null);
 
-        createAnApplication("appAB");
-        createAnApplication("appBC");
-        createAnApplication("appC");
+        createAnApplication("appAB", "group1");
+        createAnApplication("appBC", "group2");
+        createAnApplication("appC", "group3");
+        putApplicationInGroup("appAB", "group2");
+        putApplicationInGroup("appBC", "group3");
 
         AppVersion appAB = createAVersion("appAB", "v1", true, null, null);
         AppVersion appBC = createAVersion("appBC", "v1", true, null, null);
@@ -208,48 +210,45 @@ public class PipelineControllerIT extends BaseWebSpringIT {
         createUserInGroup(baseUser3.getEmail(), "test3", "group3");
         createUserInGroups(baseUser4.getEmail(), "test4", "group1", "group2");
 
-        // changer
-        // mockMvc.perform(get("/rest/pipelines").with(baseUser1()))
-        //         .andDo(print())
-        //         .andExpect(status().isOk())
-        //         .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-        //         .andExpect(jsonPath("$[*]", hasSize(3)))
-        //         .andExpect(jsonPath("$[*]", containsInAnyOrder(
-        //                 jsonCorrespondsToPipeline(getPipeline(app11)),
-        //                 jsonCorrespondsToPipeline(getPipeline(app13)),
-        //                 jsonCorrespondsToPipeline(getPipeline(appAB)))));
+        mockMvc.perform(get("/rest/pipelines").with(baseUser1()))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$[*]", hasSize(3)))
+                .andExpect(jsonPath("$[*]", containsInAnyOrder(
+                        jsonCorrespondsToPipeline(getPipeline(app11)),
+                        jsonCorrespondsToPipeline(getPipeline(app13)),
+                        jsonCorrespondsToPipeline(getPipeline(appAB)))));
 
-        // mockMvc.perform(get("/rest/pipelines").with(baseUser2()))
-        //         .andDo(print())
-        //         .andExpect(status().isOk())
-        //         .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-        //         .andExpect(jsonPath("$[*]", hasSize(3)))
-        //         .andExpect(jsonPath("$[*]", containsInAnyOrder(
-        //                 jsonCorrespondsToPipeline(getPipeline(app2)),
-        //                 jsonCorrespondsToPipeline(getPipeline(appAB)),
-        //                 jsonCorrespondsToPipeline(getPipeline(appBC)))));
+        mockMvc.perform(get("/rest/pipelines").with(baseUser2()))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$[*]", hasSize(3)))
+                .andExpect(jsonPath("$[*]", containsInAnyOrder(
+                        jsonCorrespondsToPipeline(getPipeline(app2)),
+                        jsonCorrespondsToPipeline(getPipeline(appAB)),
+                        jsonCorrespondsToPipeline(getPipeline(appBC)))));
 
-        // mockMvc.perform(get("/rest/pipelines").with(baseUser3()))
-        //         .andDo(print())
-        //         .andExpect(status().isOk())
-        //         .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-        //         .andExpect(jsonPath("$[*]", hasSize(3)))
-        //         .andExpect(jsonPath("$[*]", containsInAnyOrder(
-        //                 jsonCorrespondsToPipeline(getPipeline(appAB)),
-        //                 jsonCorrespondsToPipeline(getPipeline(appBC)),
-        //                 jsonCorrespondsToPipeline(getPipeline(appC)))));
+        mockMvc.perform(get("/rest/pipelines").with(baseUser3()))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$[*]", hasSize(2)))
+                .andExpect(jsonPath("$[*]", containsInAnyOrder(
+                        jsonCorrespondsToPipeline(getPipeline(appBC)),
+                        jsonCorrespondsToPipeline(getPipeline(appC)))));
 
-        // mockMvc.perform(get("/rest/pipelines").with(baseUser4()))
-        //         .andDo(print())
-        //         .andExpect(status().isOk())
-        //         .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-        //         .andExpect(jsonPath("$[*]", hasSize(5)))
-        //         .andExpect(jsonPath("$[*]", containsInAnyOrder(
-        //                 jsonCorrespondsToPipeline(getPipeline(app11)),
-        //                 jsonCorrespondsToPipeline(getPipeline(app13)),
-        //                 jsonCorrespondsToPipeline(getPipeline(app2)),
-        //                 jsonCorrespondsToPipeline(getPipeline(appAB)),
-                        // jsonCorrespondsToPipeline(getPipeline(appBC)))));
-
+        mockMvc.perform(get("/rest/pipelines").with(baseUser4()))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$[*]", hasSize(5)))
+                .andExpect(jsonPath("$[*]", containsInAnyOrder(
+                        jsonCorrespondsToPipeline(getPipeline(app11)),
+                        jsonCorrespondsToPipeline(getPipeline(app13)),
+                        jsonCorrespondsToPipeline(getPipeline(app2)),
+                        jsonCorrespondsToPipeline(getPipeline(appAB)),
+                        jsonCorrespondsToPipeline(getPipeline(appBC)))));
     }
 }

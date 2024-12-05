@@ -421,7 +421,6 @@ public class ApplicationData extends JdbcDaoSupport implements ApplicationDAO {
                 results.add(new Application(
                     rs.getString("name"),
                     rs.getString("owner"),
-                    rs.getString("fullname"),
                     rs.getString("citation")));
             }
             return results;

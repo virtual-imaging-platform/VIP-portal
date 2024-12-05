@@ -356,7 +356,7 @@ public class ExecutionControllerIT extends BaseWebSpringIT {
         String engineName = "testEngine", engineEndpoint = "endpoint", worflowId = "test-workflow-id";
         Date startDate = new Date();
 
-        configureGwendiaTestApp(appName,groupName, versionName);
+        configureGwendiaTestApp(appName, groupName, versionName);
 
         createUserInGroup(baseUser1.getEmail(), groupName);
 
@@ -433,7 +433,7 @@ public class ExecutionControllerIT extends BaseWebSpringIT {
         String engineName = "testEngine", engineEndpoint = "endpoint", worflowId = "test-workflow-id";
         Date startDate = new Date();
 
-        configureBoutiquesTestApp(appName,groupName, versionName);
+        configureBoutiquesTestApp(appName, groupName, versionName);
 
         createUserInGroup(baseUser1.getEmail(), groupName);
 

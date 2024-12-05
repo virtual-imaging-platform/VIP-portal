@@ -1,7 +1,7 @@
 package fr.insalyon.creatis.vip.core.server.business;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -93,23 +93,15 @@ public class GroupBusiness {
         if (groupName == null) {
             return null;
         }
-        return this.get().stream()
+        return get().stream()
                 .filter(g -> groupName.equals(g.getName()))
                 .findAny().orElse(null);
     }
 
     public List<Group> getPublic() throws BusinessException {
-        try {
-            List<Group> publicGroups = new ArrayList<>();
-            for (Group g : groupDAO.get()) {
-                if (g.isPublicGroup()) {
-                    publicGroups.add(g);
-                }
-            }
-            return publicGroups;
-        } catch (DAOException ex) {
-            throw new BusinessException(ex);
-        }
+        return get().stream()
+            .filter((g) -> g.isPublicGroup())
+            .collect(Collectors.toList());
     }
 
     public List<Group> getByType(GroupType type) throws BusinessException {

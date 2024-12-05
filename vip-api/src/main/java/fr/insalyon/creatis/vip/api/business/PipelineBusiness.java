@@ -187,32 +187,31 @@ public class PipelineBusiness {
      * List all the pipeline the user can access
      */
     public List<Pipeline> listPipelines(String studyIdentifier) throws ApiException {
-        // changer
-        // try {
+        try {
             if (studyIdentifier != null) {
                 logger.warn("Study identifier ({}) was ignored.", studyIdentifier);
             }
             ArrayList<Pipeline> pipelines = new ArrayList<>();
 
-            // List<String> classNames = classBusiness.getUserClassesName(currentUserProvider.get().getEmail(), false);
+            List<Application> applications = applicationBusiness.getApplications(currentUserProvider.get());
 
-            // List<Application> applications = applicationBusiness.getApplications(classNames);
-            // for (Application a : applications) {
-            //     List<AppVersion> versions = applicationBusiness.getVersions(a.getName());
-            //     for (AppVersion av : versions) {
-            //         if (isApplicationVersionUsableInApi(av)) {
-            //             pipelines.add(
-            //                     new Pipeline(getPipelineIdentifier(
-            //                             a.getName(), av.getVersion()),
-            //                             a.getName(), av.getVersion())
-            //             );
-            //         }
-            //     }
-            // }
+            for (Application a : applications) {
+
+                List<AppVersion> versions = appVersionBusiness.getVersions(a.getName());
+                for (AppVersion av : versions) {
+                    if (isApplicationVersionUsableInApi(av)) {
+                        pipelines.add(
+                                new Pipeline(getPipelineIdentifier(
+                                        a.getName(), av.getVersion()),
+                                        a.getName(), av.getVersion())
+                        );
+                    }
+                }
+            }
             return pipelines;
-        // } catch (BusinessException ex) {
-        //     throw new ApiException(ex);
-        // }
+        } catch (BusinessException ex) {
+            throw new ApiException(ex);
+        }
     }
 
     // Specific stuff that return in 'Application' class format and not 'Pipeline'
@@ -313,23 +312,20 @@ public class PipelineBusiness {
             throw new ApiException(PIPELINE_NOT_FOUND, getPipelineIdentifier(appName, version));
         }
 
-        // check the user can use it through its classes
-        // try {
-            // changer
-            return ;
-            // List<String> userClassNames = classBusiness.getUserClassesName(currentUserProvider.get().getEmail(), false);
-            // List<String> applicationClassNames = applicationBusiness.getApplication(appName).getApplicationClasses();
+        // check the user can use it 
+        try {
+            List<Application> apps = applicationBusiness.getApplications(currentUserProvider.get());
 
-            // for (String applicationClassName : applicationClassNames) {
-            //     if (userClassNames.contains(applicationClassName)) {
-            //         return;
-            //     }
-            // }
-            // logger.error("User {} not allowed to access application {}", currentUserProvider.get(), appName);
-            // throw new ApiException(NOT_ALLOWED_TO_USE_PIPELINE, getPipelineIdentifier(appName, version));
-        // } catch (BusinessException e) {
-            // throw new ApiException(e);
-        // }
+            for (Application app : apps) {
+                if (app.getName().equals(appName)) {
+                    return;
+                }
+            }
+            logger.error("User {} not allowed to access application {}", currentUserProvider.get(), appName);
+            throw new ApiException(NOT_ALLOWED_TO_USE_PIPELINE, getPipelineIdentifier(appName, version));
+        } catch (BusinessException e) {
+            throw new ApiException(e);
+        }
     }
 
     private boolean isApplicationVersionUsableInApi(AppVersion appVersion) {

@@ -9,6 +9,7 @@ import fr.insalyon.creatis.vip.application.server.business.AppVersionBusiness;
 import fr.insalyon.creatis.vip.application.server.business.ApplicationBusiness;
 import fr.insalyon.creatis.vip.application.server.business.EngineBusiness;
 import fr.insalyon.creatis.vip.application.server.business.simulation.WebServiceEngine;
+import fr.insalyon.creatis.vip.core.client.bean.Group;
 import fr.insalyon.creatis.vip.core.integrationtest.database.BaseSpringIT;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import org.junit.jupiter.api.BeforeEach;
@@ -50,8 +51,21 @@ public class BaseApplicationSpringIT extends BaseSpringIT {
         return webServiceEngine;
     }
 
-    protected void createAnApplication(String appName) throws BusinessException {
+    /**
+     * @param appName
+     * @param groupname (can be null to be ignored)
+     * @throws BusinessException
+     */
+    protected void createAnApplication(String appName, String groupname) throws BusinessException {
         getApplicationBusiness().add(new Application(appName, "test citation"));
+
+        if (groupname != null) {
+            putApplicationInGroup(appName, groupname);
+        }
+    }
+
+    protected void putApplicationInGroup(String appName, String groupname) throws BusinessException {
+        getApplicationBusiness().associate(new Application(appName, null), new Group(groupname));
     }
 
     protected AppVersion createAVersion(String appName, String versionName, boolean visible, String gwendiaPath, String jsonPath) throws BusinessException {
@@ -62,7 +76,7 @@ public class BaseApplicationSpringIT extends BaseSpringIT {
 
     protected AppVersion configureAnApplication(String appName, String versionName, String groupName) throws BusinessException {
         createGroup(groupName);
-        createAnApplication(appName);
+        createAnApplication(appName, groupName);
         return createAVersion(appName, versionName, true, null, null);
     }
 
