@@ -35,7 +35,6 @@ import com.smartgwt.client.widgets.tab.Tab;
 import fr.insalyon.creatis.vip.core.client.CoreModule;
 import fr.insalyon.creatis.vip.core.client.Module;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
-import fr.insalyon.creatis.vip.core.client.view.auth.RecoveryTab;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.publication.client.view.PublicationConstants;
 import fr.insalyon.creatis.vip.publication.client.view.PublicationParser;

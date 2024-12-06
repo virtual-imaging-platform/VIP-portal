@@ -48,10 +48,6 @@ public interface ConfigurationServiceAsync {
 
     void configure(String email, String session, AsyncCallback<User> asyncCallback);
 
-    void signup(User user, String comments, AsyncCallback<Void> asyncCallback);
-
-    void signin(String email, String password, AsyncCallback<User> asyncCallback);
-
     void signout(AsyncCallback<Void> asyncCallback);
 
     void activate(String code, AsyncCallback<User> asyncCallback);

@@ -64,10 +64,6 @@ public interface ConfigurationService extends RemoteService {
 
     User configure(String email, String session) throws CoreException;
 
-    void signup(User user, String comments) throws CoreException;
-
-    User signin(String email, String password) throws CoreException;
-
     void signout() throws CoreException;
 
     User activate(String code) throws CoreException;

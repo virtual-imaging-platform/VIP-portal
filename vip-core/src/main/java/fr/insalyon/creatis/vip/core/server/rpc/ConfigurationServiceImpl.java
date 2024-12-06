@@ -100,36 +100,6 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
         }
     }
 
-    /**
-     *
-     * @param user User bean object
-     * @param comments User's comments
-     */
-    @Override
-    public void signup(User user, String comments)
-        throws CoreException {
-        try {
-            logger.info("Sign up request from '" + user.getEmail() + "'.");
-            configurationBusiness.signup(user, comments, (Group) null);
-        } catch (BusinessException ex) {
-            throw new CoreException(ex);
-        }
-    }
-
-    @Override
-    public User signin(String email, String password) throws CoreException {
-        try {
-            logger.info("Authenticating '" + email + "'.");
-            User user = configurationBusiness.signin(email, password);
-            user = setUserInSession(user);
-            configurationBusiness.updateUserLastLogin(email);
-            logger.info("Connected.");
-
-            return user;
-        } catch (BusinessException ex) {
-            throw new CoreException(ex);
-        }
-    }
 
     @Override
     public void signout() throws CoreException {

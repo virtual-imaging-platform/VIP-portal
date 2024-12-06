@@ -155,17 +155,17 @@ public class ConfigurationBusiness {
         }
     }
 
-    public void signup(
-            User user, String comments, boolean automaticCreation,
-            boolean mapPrivateGroups, Group group)
-            throws BusinessException {
-        this.signup(user, comments, automaticCreation, mapPrivateGroups,
-                group == null ? new ArrayList<>() : Collections.singletonList(group));
+    public void signup(User user, String comments, Group group) throws BusinessException {
+        signup(user, comments, false, false, group);
     }
 
-    public void signup(
-            User user, String comments, boolean automaticCreation,
-            boolean mapPrivateGroups, List<Group> groups)
+    public void signup(User user, String comments, boolean automaticCreation, boolean mapPrivateGroups, Group group)
+            throws BusinessException {
+        this.signup(user, comments, automaticCreation, mapPrivateGroups,
+                group == null ? new ArrayList<>() : Arrays.asList(group));
+    }
+
+    public void signup(User user, String comments, boolean automaticCreation, boolean mapPrivateGroups, List<Group> groups)
             throws BusinessException {
 
         verifyEmail(user.getEmail());
@@ -354,15 +354,6 @@ public class ConfigurationBusiness {
                 throw new BusinessException("Error");
             }
         }
-    }
-
-    public void signup(User user, String comments, Group group) throws BusinessException {
-        signup(user, comments, false, false, group);
-    }
-
-    public void signup(User user, String comments, List<Group> groups)
-            throws BusinessException {
-        signup(user, comments, false, false, groups);
     }
 
     public User signin(String email, String password) throws BusinessException {

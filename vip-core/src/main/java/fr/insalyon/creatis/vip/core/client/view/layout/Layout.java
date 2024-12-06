@@ -31,8 +31,6 @@
  */
 package fr.insalyon.creatis.vip.core.client.view.layout;
 
-import com.google.gwt.core.client.Callback;
-import com.google.gwt.core.client.ScriptInjector;
 import com.google.gwt.user.client.Cookies;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -47,24 +45,17 @@ import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationService;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
-import fr.insalyon.creatis.vip.core.client.view.auth.ActivationTab;
-import fr.insalyon.creatis.vip.core.client.view.auth.SignInTab;
 import fr.insalyon.creatis.vip.core.client.view.common.MessageWindow;
 import fr.insalyon.creatis.vip.core.client.view.layout.toolstrip.MainToolStrip;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
+import fr.insalyon.creatis.vip.core.client.view.user.ActivationTab;
+
 import java.util.function.Supplier;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
  * @author Rafael Ferreira da Silva
  */
 public class Layout {
-
-    private static Logger logger = Logger.getLogger(Layout.class.getName());
 
     private static Layout instance;
     private VLayout vLayout;
@@ -144,7 +135,7 @@ public class Layout {
                 setWarningMessage(
                         "Unable to sign in: cookies must be enabled.");
             }
-            addTab(CoreConstants.TAB_SIGNIN, SignInTab::new);
+            Window.Location.assign("home.html");
         }
     }
 
@@ -255,46 +246,6 @@ public class Layout {
     public void hideMessage() {
         messageWindow.hideMessage();
     }
-
-    //-------------------------------------------------------------------- Make
-    // some function for showing messages accessible from code written in
-    // javascript.  Examples:
-    //    window.setWarningMessage(msg)
-    //    window.setNoticeMessage(msg)
-    //    window.hideMessage()
-
-    // The default delay is used, so the warning automatically disappears after
-    // some time.
-    public static void setWarningMessageFromJS(String error) {
-        Layout.getInstance().setWarningMessage(error);
-    }
-
-    // The delay is set to 0, so the message stays until it is overwritten by a
-    // new message or the hideMessage function is called.  This behavior is
-    // different from the warning case.  This is what is currently needed by the
-    // javascript code.
-    public static void setNoticeMessageFromJS(String message) {
-        Layout.getInstance().setNoticeMessage(message, 0);
-    }
-
-    public static void hideMessageFromJS() {
-        Layout.getInstance().hideMessage();
-    }
-
-    public static native void exportMessageFunctionsToJS() /*-{
-        $wnd.setWarningMessage = $entry(
-           @fr.insalyon.creatis.vip.core.client.view.layout.Layout::setWarningMessageFromJS(Ljava/lang/String;));
-        $wnd.setNoticeMessage = $entry(
-           @fr.insalyon.creatis.vip.core.client.view.layout.Layout::setNoticeMessageFromJS(Ljava/lang/String;));
-        $wnd.hideMessage = $entry(
-           @fr.insalyon.creatis.vip.core.client.view.layout.Layout::hideMessageFromJS());
-    }-*/;
-
-    static {
-        Layout.exportMessageFunctionsToJS();
-    }
-
-    //--------------------------------------------------------------------
 
     public static class TabFactoryAndId {
         public final Supplier<Tab> factory;
