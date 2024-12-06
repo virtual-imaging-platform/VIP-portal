@@ -206,8 +206,14 @@ public class ApplicationBusiness {
     }
 
     public void associate(Application app, Group group) throws BusinessException {
+        group = groupBusiness.get(group.getName());
+
         try {
-            applicationDAO.associate(app, group);
+            if (group.isPublicGroup() == app.isPublic()) {
+                applicationDAO.associate(app, group);
+            } else {
+                throw new BusinessException("Item private state must match group state !");
+            }
         } catch (DAOException e) {
             throw new BusinessException(e);
         }

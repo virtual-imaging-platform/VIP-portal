@@ -152,8 +152,14 @@ public class ResourceBusiness {
     }
 
     public void associate(Resource resource, Group group) throws BusinessException {
+        group = groupBusiness.get(group.getName());
+
         try {
-            resourceDAO.associate(resource, group);
+            if (group.isPublicGroup() == resource.isPublic()) {
+                resourceDAO.associate(resource, group);
+            } else {
+                throw new BusinessException("Item private state must match group state !");
+            }
         } catch (DAOException e) {
             throw new BusinessException(e);
         }
