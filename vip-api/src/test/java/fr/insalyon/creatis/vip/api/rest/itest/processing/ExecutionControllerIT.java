@@ -98,11 +98,12 @@ public class ExecutionControllerIT extends BaseWebSpringIT {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     public void shouldListExecutions() throws Exception {
-        when(workflowDAO.get(eq(simulation1.getID()))).thenReturn(w1, null);
-        when(workflowDAO.get(eq(simulation2.getID()))).thenReturn(w2, null);
+        when(workflowDAO.get(eq(simulation1.getID()))).thenReturn(w1, (Workflow) null);
+        when(workflowDAO.get(eq(simulation2.getID()))).thenReturn(w2, (Workflow) null);
         when(workflowDAO.get(Collections.singletonList(baseUser1.getFullName()), null, null, null, null, null, null))
-                .thenReturn(Arrays.asList(w1, w2), null);
+                .thenReturn(Arrays.asList(w1, w2), (List<Workflow>) null);
 
         // perform a getWorkflows()
         mockMvc.perform(
@@ -120,9 +121,10 @@ public class ExecutionControllerIT extends BaseWebSpringIT {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     public void shouldCountExecutions() throws Exception {
         when(workflowDAO.get(Collections.singletonList(baseUser1.getFullName()), null, null, null, null, null, null))
-                .thenReturn(Arrays.asList(w1, w2), null);
+                .thenReturn(Arrays.asList(w1, w2), (List<Workflow>) null);
 
         // perform a getWorkflows()
         mockMvc.perform(
@@ -329,12 +331,13 @@ public class ExecutionControllerIT extends BaseWebSpringIT {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     public void shouldGetExecution2Results() throws Exception {
         String resultPath = "/root/user/user1/path/to/result.res";
 
-        when(workflowDAO.get(eq(simulation2.getID()))).thenReturn(w2, null);
+        when(workflowDAO.get(eq(simulation2.getID()))).thenReturn(w2, (Workflow) null);
         Output output = new Output(new OutputID("workflowID", resultPath, "processor"), DataType.URI, "port");
-        when(outputDAO.get(eq(simulation2.getID()))).thenReturn(Arrays.asList(output), null);
+        when(outputDAO.get(eq(simulation2.getID()))).thenReturn(Arrays.asList(output), (List<Output>) null);
 
         Mockito.when(server.getDataManagerUsersHome()).thenReturn("/root/user");
         Mockito.when(gridaClient.exist(resultPath)).thenReturn(true);
@@ -365,6 +368,7 @@ public class ExecutionControllerIT extends BaseWebSpringIT {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     public void testInitGwendiaExecution() throws Exception
     {
         String appName = "test application", groupName = "testGroup", className = "testClass", versionName = "4.2";
@@ -444,6 +448,7 @@ public class ExecutionControllerIT extends BaseWebSpringIT {
 
     // the difference (at the moment) is that with moteurLite the optional and absent parameters are not included
     @Test
+    @SuppressWarnings("unchecked")
     public void testInitBoutiquesExecution() throws Exception
     {
         String appName = "test application", groupName = "testGroup", className = "testClass", versionName = "4.2";

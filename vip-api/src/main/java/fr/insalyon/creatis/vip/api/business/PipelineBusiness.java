@@ -59,6 +59,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
+import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
 import java.nio.file.Paths;
 import java.util.ArrayList;

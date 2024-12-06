@@ -28,6 +28,7 @@ public class PublicApplicationListIT extends BaseSpringIT {
     private ConfigurationBusiness configurationBusiness;
 
     @Test
+    @SuppressWarnings("unchecked")
     public void shouldNotIncludePrivateGroupsAndClasses() throws BusinessException, ApplicationException {
         // prepare test data
         Group publicGroup = new Group("public group", true, true, true);

@@ -85,6 +85,7 @@ public class FileUploadServiceImpl extends HttpServlet {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException {
 

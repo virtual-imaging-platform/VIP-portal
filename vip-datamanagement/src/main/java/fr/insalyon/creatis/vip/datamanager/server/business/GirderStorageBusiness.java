@@ -51,6 +51,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.IOException;
 import java.net.HttpURLConnection;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.sql.Connection;
 import java.util.Optional;
@@ -154,7 +156,7 @@ public class GirderStorageBusiness {
             ObjectNode node =
                 new ObjectMapper().readValue(res.response, ObjectNode.class);
             return node.get("authToken").get("token").asText();
-        } catch (IOException | NullPointerException ex) {
+        } catch (IOException | NullPointerException | URISyntaxException ex) {
             logger.error("Error getting girder token for {} with key {}",
                     userEmail, key, ex);
             throw new BusinessException("Unable to get token from api key", ex);
@@ -183,7 +185,7 @@ public class GirderStorageBusiness {
 
             // clean filename as in an uploaded file
             return DataManagerUtil.getCleanFilename(name);
-        } catch (IOException ex) {
+        } catch (IOException | URISyntaxException ex) {
             logger.error("Error getting girder filename for {} with token {}",
                     fileId, token, ex);
             throw new BusinessException("Unable to get file info", ex);
@@ -196,9 +198,9 @@ public class GirderStorageBusiness {
         String surl,
         String method,
         Optional<Consumer<HttpURLConnection>> connectionUpdater)
-        throws IOException {
+        throws IOException, URISyntaxException {
 
-        URL url = new URL(surl);
+        URL url = new URI(surl).toURL();
 
         HttpURLConnection con = (HttpURLConnection) url.openConnection();
         con.setRequestMethod(method);

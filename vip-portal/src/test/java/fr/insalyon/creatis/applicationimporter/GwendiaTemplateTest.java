@@ -15,6 +15,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.xml.sax.SAXException;
 
+import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
 
 /*
@@ -79,14 +80,18 @@ public class GwendiaTemplateTest {
                 true, null, null, null, null, null, defaultValue);
     }
 
-    protected Descriptor testGwendiaTemplate(String templateFile, BoutiquesInput... inputs) throws IOException, SAXException {
+    protected Descriptor testGwendiaTemplate(String templateFile, BoutiquesInput... inputs) throws IOException, SAXException  {
         BoutiquesApplication boutiquesApp = new BoutiquesApplication("testApp", "test app desc", "42.43");
         for (BoutiquesInput input : inputs) {
             boutiquesApp.addInput(input);
         }
         VelocityUtils sut = new VelocityUtils();
         String gwendiaString = sut.createDocument(boutiquesApp, "lnf:", templateFile);
-        return new GwendiaParser().parseString(gwendiaString);
+        try {
+            return new GwendiaParser().parseString(gwendiaString);
+        } catch(ParserConfigurationException e) {
+            throw new SAXException(e);
+        }
     }
 
 }

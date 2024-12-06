@@ -51,6 +51,7 @@ public class AuthenticationInfoTestUtils {
         authenticationInfoSuppliers = getAuthenticationInfoSuppliers();
     }
 
+    @SuppressWarnings("unchecked")
     public static Map<String, Function> getAuthenticationInfoSuppliers() {
         return JsonCustomObjectMatcher.formatSuppliers(
                 Arrays.asList("httpHeader", "httpHeaderValue"),

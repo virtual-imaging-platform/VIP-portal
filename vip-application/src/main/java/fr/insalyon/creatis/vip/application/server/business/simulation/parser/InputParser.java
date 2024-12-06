@@ -45,6 +45,9 @@ import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.DefaultHandler;
 import org.xml.sax.helpers.XMLReaderFactory;
 
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.SAXParserFactory;
+
 /**
  * Parse a input file.
  *
@@ -69,13 +72,15 @@ public class InputParser extends DefaultHandler {
 
     public String parse(String fileName) throws BusinessException {
         try {
-            reader = XMLReaderFactory.createXMLReader();
+            SAXParserFactory parserFactory = SAXParserFactory.newInstance();
+            parserFactory.setNamespaceAware(true);
+            reader = parserFactory.newSAXParser().getXMLReader();
             reader.setContentHandler(this);
             reader.parse(new InputSource(new FileReader(fileName)));
 
             return inputs.toString();
 
-        } catch (IOException | SAXException ex) {
+        } catch (IOException | SAXException | ParserConfigurationException ex) {
             logger.error("Error parsing file {}", fileName, ex);
             throw new BusinessException(ex);
         }

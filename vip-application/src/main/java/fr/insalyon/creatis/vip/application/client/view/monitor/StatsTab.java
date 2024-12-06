@@ -127,7 +127,7 @@ public class StatsTab extends Tab {
 
             @Override
             public void onChanged(ChangedEvent event) {
-                int value = new Integer(chartsItem.getValueAsString());
+                int value = Integer.parseInt(chartsItem.getValueAsString());
             }
         });
 

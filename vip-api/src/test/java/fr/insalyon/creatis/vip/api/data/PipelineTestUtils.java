@@ -49,6 +49,7 @@ import java.util.function.Function;
 /**
  * Created by abonnet on 8/3/16.
  */
+@SuppressWarnings("unchecked")
 public class PipelineTestUtils {
 
     public static final Map<String,Function> pipelineSuppliers;

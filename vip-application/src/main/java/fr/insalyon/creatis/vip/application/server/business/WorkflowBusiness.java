@@ -68,6 +68,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.xml.sax.SAXException;
 
+import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
@@ -395,7 +396,7 @@ public class WorkflowBusiness {
             }
             return getGwendiaParser().parse(workflowPath);
 
-        } catch (SAXException | IOException ex) {
+        } catch (SAXException | ParserConfigurationException | IOException ex) {
             logger.error("Error getting application descriptor for {}/{}", applicationName, applicationVersion, ex);
             throw new BusinessException(WRONG_APPLICATION_DESCRIPTOR, ex, applicationName + "/" + applicationVersion);
         } catch (DAOException | BusinessException ex) {

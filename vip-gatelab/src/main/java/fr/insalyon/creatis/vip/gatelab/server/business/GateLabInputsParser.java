@@ -33,6 +33,7 @@ package fr.insalyon.creatis.vip.gatelab.server.business;
 
 import java.io.FileReader;
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -46,6 +47,9 @@ import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.DefaultHandler;
 import org.xml.sax.helpers.XMLReaderFactory;
+
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.SAXParserFactory;
 
 /**
  * Parse a gatelab input file.
@@ -72,13 +76,15 @@ public class GateLabInputsParser extends DefaultHandler {
 
     public Map<String, String> parse(String fileName) {
         try {
-            reader = XMLReaderFactory.createXMLReader();
+            SAXParserFactory parserFactory = SAXParserFactory.newInstance();
+            parserFactory.setNamespaceAware(true);
+            reader = parserFactory.newSAXParser().getXMLReader();
             reader.setContentHandler(this);
             reader.parse(new InputSource(new FileReader(fileName)));
 
             return inputsMap;
 
-        } catch (IOException | SAXException ex) {
+        } catch (IOException | SAXException | ParserConfigurationException ex) {
             logger.error("Error parsing {}", fileName, ex);
         }
         return null;

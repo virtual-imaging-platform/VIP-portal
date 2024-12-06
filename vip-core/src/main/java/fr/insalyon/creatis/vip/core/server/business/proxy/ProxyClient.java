@@ -152,12 +152,20 @@ public class ProxyClient {
         // Voms Extension
         Server serverConf = server;
         long hours = Long.parseLong(serverConf.getMyProxyLifeTime()) / 3600;
-        String command = "voms-proxy-init -voms " + vo
-                + " -cert " + serverConf.getServerProxy()
-                + " -key " + serverConf.getServerProxy()
-                + " -out " + serverConf.getServerProxy(vo)
-                + " -noregen -valid " + hours + ":00";
-        Process process = Runtime.getRuntime().exec(command);
+        List<String> command = new ArrayList<>();
+        command.add("voms-proxy-init");
+        command.add("-voms");
+        command.add(vo);
+        command.add("-cert");
+        command.add(serverConf.getServerProxy());
+        command.add("-key");
+        command.add(serverConf.getServerProxy());
+        command.add("-out");
+        command.add(serverConf.getServerProxy(vo));
+        command.add("-noregen");
+        command.add("-valid");
+        command.add(hours + ":00");
+        Process process = Runtime.getRuntime().exec(command.toArray(new String[]{}));
 
         BufferedReader r = new BufferedReader(new InputStreamReader(process.getInputStream()));
         String s = null;
@@ -301,7 +309,7 @@ public class ProxyClient {
         outFile.delete();
         outFile.createNewFile();
         // set permission
-        String command = "chmod 0600 " + proxyName;
+        String[] command = new String[]{"chmod", "0600", proxyName};
         Runtime.getRuntime().exec(command);
 
         printStream = new PrintStream(new FileOutputStream(outFile));

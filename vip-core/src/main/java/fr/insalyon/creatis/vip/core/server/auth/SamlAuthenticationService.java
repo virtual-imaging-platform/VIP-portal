@@ -37,6 +37,7 @@ import fr.insalyon.creatis.vip.core.server.business.Server;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import java.security.spec.InvalidKeySpecException;
@@ -139,7 +140,7 @@ public class SamlAuthenticationService extends AbstractAuthenticationService {
                 logger.error("Error with SAML assertion {} : audience is not valid", new String(xmlAssertion));
                 throw new BusinessException("Assertion audience is not valid!");
             }
-        } catch (MalformedURLException ex) {
+        } catch (MalformedURLException | URISyntaxException ex) {
             logger.error("Error with SAML assertion {}", new String(xmlAssertion), ex);
             throw new BusinessException(ex);
         }
