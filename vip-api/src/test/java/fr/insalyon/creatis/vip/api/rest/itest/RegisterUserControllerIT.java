@@ -3,9 +3,6 @@ package fr.insalyon.creatis.vip.api.rest.itest;
 import fr.insalyon.creatis.vip.api.data.UserTestUtils;
 import fr.insalyon.creatis.vip.api.exception.ApiException;
 import fr.insalyon.creatis.vip.api.rest.config.BaseWebSpringIT;
-import fr.insalyon.creatis.vip.application.client.bean.Application;
-import fr.insalyon.creatis.vip.core.client.bean.Group;
-import fr.insalyon.creatis.vip.core.client.bean.GroupType;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.user.UserLevel;
 import fr.insalyon.creatis.vip.core.client.view.util.CountryCode;
@@ -44,25 +41,6 @@ class RegisterUserControllerIT extends BaseWebSpringIT {
         Assertions.assertFalse(u.isAccountLocked());
         Assertions.assertNotNull(getConfigurationBusiness().signin(
                 UserTestUtils.restUser1.getEmail(), UserTestUtils.restUser1.getPassword()));
-    }
-
-    @Test
-    public void registerEndpointWithAppOk() throws Exception {
-        String appName = "testApp", groupName = "testGroup";
-        groupBusiness.add(new Group(groupName, true, GroupType.getDefault()));
-        getApplicationBusiness().add(new Application(appName, "test citation"));
-        UserTestUtils.restUser1.getApplications().add("testApp");
-        mockMvc.perform(
-                        post("/rest/register").
-                                content(asJsonString(UserTestUtils.restUser1))
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .accept(MediaType.APPLICATION_JSON))
-                .andDo(print())
-                .andExpect(status().isCreated());
-        User u = getConfigurationBusiness().getUserWithGroups(UserTestUtils.restUser1.getEmail());
-        // changer 
-        // Assertions.assertEquals(1, u.getGroups().size());
-        // Assertions.assertEquals(groupName, u.getGroups().iterator().next().getName());
     }
 
     @Test

@@ -1,7 +1,6 @@
 package fr.insalyon.creatis.vip.api.business;
 
 import fr.insalyon.creatis.vip.api.exception.ApiException;
-import fr.insalyon.creatis.vip.application.server.business.ApplicationBusiness;
 import fr.insalyon.creatis.vip.core.client.bean.Group;
 import fr.insalyon.creatis.vip.core.client.bean.GroupType;
 import fr.insalyon.creatis.vip.core.client.bean.User;
@@ -16,7 +15,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.web.WebAppConfiguration;
 
 import java.sql.Timestamp;
-import java.util.ArrayList;
 import java.util.Date;
 
 import static fr.insalyon.creatis.vip.core.client.view.user.UserLevel.Beginner;
@@ -40,7 +38,7 @@ public class ApiUserBusinessIT extends BaseSpringIT {
 
         // Create test users
         user1 = new User("firstName", "lastName", "email1@test.fr", "test1@test.fr", "institution", "password", false, "code", "folder", "session", new Date(), new Date(), Beginner, CountryCode.fr, 1, new Timestamp(System.currentTimeMillis()), new Timestamp(System.currentTimeMillis()), 0, false);
-        apiUserBusiness.signup(user1, "comment", new ArrayList<>());
+        apiUserBusiness.signup(user1, "comment");
 
     }
 
@@ -52,7 +50,7 @@ public class ApiUserBusinessIT extends BaseSpringIT {
     @Test
     public void testSignup() throws ApiException, BusinessException {
         User user2 = new User("firstName2", "lastName2", "email2@test.fr", "test3@test.fr", "institution", "password", false, "code", "folder", "session", new Date(), new Date(), Beginner, CountryCode.fr, 1, new Timestamp(System.currentTimeMillis()), new Timestamp(System.currentTimeMillis()), 0, false);
-        apiUserBusiness.signup(user2, "comment", new ArrayList<>());
+        apiUserBusiness.signup(user2, "comment");
         Assertions.assertEquals(3, configurationBusiness.getUsers().size(), "Incorrect number of users");
     }
 

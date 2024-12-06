@@ -1,11 +1,11 @@
-async function get_fetch(firstName, lastName, email, institution, password, country, applications){
+async function get_fetch(firstName, lastName, email, institution, password, country){
     const data = await fetch('rest/register', {
         method: 'POST',
         headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ "firstName": firstName, "lastName": lastName, "email": email, "institution": institution, "password": password, "countryCode": country, "applications": applications})
+        body: JSON.stringify({ "firstName": firstName, "lastName": lastName, "email": email, "institution": institution, "password": password, "countryCode": country})
         })
 
 }
@@ -50,10 +50,7 @@ async function createUser(){
     const new_rePassword = document.getElementById("rePassword").value;
     const emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
 
-    const selectedApplications = Array.from(document.querySelectorAll('input[name="applications"]:checked'))
-    .map((checkbox) => checkbox.value);
-
-    if (!new_firstName || !new_lastName || !new_email || !new_reEmail || !new_institution || selectedApplications.length === 0 || new_country === "select your country" || new_country === "select your country" || !new_password || !new_rePassword) {
+    if (!new_firstName || !new_lastName || !new_email || !new_reEmail || !new_institution || new_country === "select your country" || new_country === "select your country" || !new_password || !new_rePassword) {
         isValid = false;
         document.getElementById('emptyFields-failed').style.display = 'block';
         setTimeout(function(){document.getElementById('emptyFields-failed').style.display = 'none'}, 30000);
@@ -80,7 +77,7 @@ async function createUser(){
     }
     if (isValid) {
         try {
-                await get_fetch(new_firstName, new_lastName, new_email, new_institution, new_password, new_country, selectedApplications);
+                await get_fetch(new_firstName, new_lastName, new_email, new_institution, new_password, new_country);
                 const data = await get_fetch_authenticate(new_email, new_password);
                 setCookie(new_email, data.httpHeaderValue, 7);
             } catch (error) {
@@ -90,65 +87,3 @@ async function createUser(){
             }
         }
 }
-
-function createSelectApp(applications) {
-    const selectContainer = document.createElement("div");
-    selectContainer.classList.add("dropdown-menu");
-    selectContainer.setAttribute("aria-labelledby", "application-dropdown");
-
-    applications.forEach((application) => {
-      const label = document.createElement("label");
-      label.classList.add("dropdown-item");
-
-      const checkbox = document.createElement("input");
-      checkbox.type = "checkbox";
-      checkbox.classList.add("form-check-input");
-      checkbox.name = "applications";
-      checkbox.value = application.name;
-
-      label.appendChild(checkbox);
-      label.appendChild(document.createTextNode(" " + application.name));
-      selectContainer.appendChild(label);
-    });
-
-    const dropdownToggle = document.createElement("button");
-    dropdownToggle.classList.add("btn", "btn-primary", "dropdown-toggle", "w-100");
-    dropdownToggle.setAttribute("type", "button");
-    dropdownToggle.setAttribute("id", "select-applications-btn");
-    dropdownToggle.setAttribute("data-bs-toggle", "dropdown");
-    dropdownToggle.setAttribute("aria-expanded", "false");
-    dropdownToggle.textContent = "Select applications ";
-
-    const dropdownMenu = document.createElement("div");
-    dropdownMenu.classList.add("dropdown");
-    dropdownMenu.appendChild(dropdownToggle);
-    dropdownMenu.appendChild(selectContainer);
-
-    dropdownToggle.addEventListener("click", function() {
-      const checkboxes = selectContainer.querySelectorAll("input[name='applications']");
-      const selectedApplications = [];
-      checkboxes.forEach((checkbox) => {
-        if (checkbox.checked) {
-          selectedApplications.push(checkbox.value);
-        }
-      });
-    });
-    return dropdownMenu;
-  }
-
-  fetch('rest/pipelines?public')
-    .then((response_app) => response_app.json())
-    .then((data) => {
-      var application = new Array();
-      data.forEach((item, index) => {
-          let name_groups = item.applicationGroups.toString();
-          application.push({name:item.name,name_groups:name_groups});
-      });
-      return application;
-    })
-    .then((applications) => {
-        const select = createSelectApp(applications);
-
-        const selectAppDiv = document.getElementById("select-app");
-        selectAppDiv.appendChild(select);
-    });
