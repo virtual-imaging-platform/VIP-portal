@@ -156,12 +156,12 @@ public class WorkflowBusiness {
         return null;
     }
 
-    private Engine selectEngine(String applicationClass)
-            throws BusinessException {
+    private Engine selectEngine(String applicationClass) throws BusinessException {
         long min = Integer.MAX_VALUE;
         Engine engineBean = null;
         try {
-            List<Engine> availableEngines = engineDAO.getByClass(applicationClass);
+            // changer
+            List<Engine> availableEngines = new ArrayList<>();
             for (Engine engine : availableEngines) {
                 long runningWorkflows = workflowDAO.getNumberOfRunningPerEngine(engine.getEndpoint());
                 if (runningWorkflows < min) {
@@ -169,8 +169,6 @@ public class WorkflowBusiness {
                     engineBean = engine;
                 }
             }
-        } catch (DAOException ex) {
-            throw new BusinessException(ex);
         } catch (WorkflowsDBDAOException ex) {
             logger.error("Error finding an engine for {}", applicationClass, ex);
         }

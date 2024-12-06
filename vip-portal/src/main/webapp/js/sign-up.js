@@ -141,9 +141,8 @@ function createSelectApp(applications) {
     .then((data) => {
       var application = new Array();
       data.forEach((item, index) => {
-          let name_classes = item.applicationClasses.toString();
           let name_groups = item.applicationGroups.toString();
-          application.push({name:item.name,name_classes:name_classes,name_groups:name_groups});
+          application.push({name:item.name,name_groups:name_groups});
       });
       return application;
     })

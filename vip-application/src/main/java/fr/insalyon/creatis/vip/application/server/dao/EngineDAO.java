@@ -50,7 +50,5 @@ public interface EngineDAO {
     
     public List<Engine> get() throws DAOException;
     
-    public List<Engine> getByClass(String className) throws DAOException;
-
     public List<Engine> getByResource(Resource resource) throws DAOException;
 }

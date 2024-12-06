@@ -160,9 +160,8 @@ async function get_fetch(form_email, form_password){
 function make_table(data) {
     var application = new Array();
     data[0].forEach((item, index) => {
-        let name_classes = item.applicationClasses.toString();
         let name_groups = item.applicationGroups.toString();
-        application.push([index, item.name, name_classes, name_groups])
+        application.push([index, item.name, name_groups])
     });
 
     let tablecontents = createTableHTMLString(application);
@@ -219,5 +218,22 @@ function clickinner(){
     get_fetch(email, password).then(data => setCookie(email, data.httpHeaderValue, 7));
 };
 
+function keypressListener(e) {
+    if (e.key == 'Enter') {
+        clickinner();
+    }
+}
+
+function createEvent() {
+    document.addEventListener('DOMContentLoaded', () => {
+        const email = document.getElementById("floatingEmail");
+        const password = document.getElementById("floatingPassword");
+    
+        email.addEventListener('keypress', keypressListener);
+        password.addEventListener('keypress', keypressListener);
+    });
+}
+
 checkIfCookieExist();
 createGrid();
+createEvent();

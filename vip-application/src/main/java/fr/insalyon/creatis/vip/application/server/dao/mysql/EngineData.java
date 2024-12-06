@@ -139,33 +139,6 @@ public class EngineData extends JdbcDaoSupport implements EngineDAO {
     }
 
     @Override
-    public List<Engine> getByClass(String className) throws DAOException {
-        String query =  "SELECT e.name AS engineName, endpoint, status "
-        +               "FROM VIPEngines e, VIPClassesEngines c "
-        +               "WHERE e.name = c.engine AND "
-        +               "e.status = ? AND "
-        +               "c.class = ?";
-        String status = "enabled";
-
-        try (PreparedStatement ps = getConnection().prepareStatement(query)) {
-            ps.setString(1, status);
-            ps.setString(2, className);
-
-            ResultSet rs = ps.executeQuery();
-            List<Engine> list = new ArrayList<Engine>();
-
-            while (rs.next()) {
-                list.add(new Engine(rs.getString("engineName"), rs.getString("endpoint"), rs.getString("status")));
-            }
-            return list;
-
-        } catch (SQLException ex) {
-            logger.error("Error getting engines by class {}", className, ex);
-            throw new DAOException(ex);
-        }
-    }
-
-    @Override
     public List<Engine> getByResource(Resource resource) throws DAOException {
         String query =  "SELECT * FROM VIPEngines e "
         +               "JOIN VIPResourcesEngines re ON e.name = re.enginename "
