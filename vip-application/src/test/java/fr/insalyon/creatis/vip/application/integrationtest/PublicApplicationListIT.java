@@ -27,7 +27,7 @@ public class PublicApplicationListIT extends BaseSpringIT {
         Group publicGroup = new Group("public group", true, GroupType.getDefault());
         Group privateGroup = new Group("private group", false, GroupType.getDefault());
 
-        Application app = new Application("testApp", "", Arrays.asList(publicGroup.getName()));
+        Application app = new Application("testApp", "", Arrays.asList(publicGroup.getName()), true);
         AppVersion appVersion = new AppVersion(app.getName(), "", null, null, true, false);
 
         groupBusiness.add(publicGroup);

@@ -12,6 +12,7 @@ import fr.insalyon.creatis.vip.application.server.business.simulation.WebService
 import fr.insalyon.creatis.vip.core.client.bean.Group;
 import fr.insalyon.creatis.vip.core.integrationtest.database.BaseSpringIT;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
+import java.util.ArrayList;
 import org.junit.jupiter.api.BeforeEach;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,7 +58,9 @@ public class BaseApplicationSpringIT extends BaseSpringIT {
      * @throws BusinessException
      */
     protected void createAnApplication(String appName, String groupname) throws BusinessException {
-        getApplicationBusiness().add(new Application(appName, "test citation"));
+        Application app = new Application(appName, "test citation", new ArrayList<>(), true);
+
+        getApplicationBusiness().add(app);
 
         if (groupname != null) {
             putApplicationInGroup(appName, groupname);

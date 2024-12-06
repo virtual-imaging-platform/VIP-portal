@@ -41,7 +41,7 @@ public class ResourceIT extends BaseSpringIT {
         super.setUp();
         resource = new Resource(
             "resourceA", 
-            false, 
+            true, 
             false, 
             ResourceType.BATCH, 
             "conf.file",
@@ -93,7 +93,7 @@ public class ResourceIT extends BaseSpringIT {
         resource.setPublic(true);
         resourceBusiness.add(resource);
 
-        assertEquals(1, resourceBusiness.getAll(true).size());
+        assertEquals(2, resourceBusiness.getAll(true).size());
     }
 
     @Test

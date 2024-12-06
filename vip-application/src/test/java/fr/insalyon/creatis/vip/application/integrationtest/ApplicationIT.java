@@ -16,6 +16,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -136,7 +137,6 @@ public class ApplicationIT extends BaseSpringIT {
 
     @Test
     public void testUpdateVersionApplication() throws BusinessException {
-
         AppVersion appVersion = new AppVersion("Application1", "version 0.0", "lfn updated", "jsonLfn", true, true);
         appVersionBusiness.update(appVersion);
         Assertions.assertEquals("lfn updated", appVersionBusiness.getVersions("Application1").get(0).getLfn(), "Incorrect lfn updated");
@@ -156,5 +156,33 @@ public class ApplicationIT extends BaseSpringIT {
         applicationBusiness.add(appbis);
         List<Application> apps = applicationBusiness.getApplications();
         assertEquals(2, apps.size());
+    }
+
+    @Test
+    public void getApplicationsByGroup() throws BusinessException {
+        Application app = applicationBusiness.getApplication("Application1");
+        Group group = new Group("test", false, GroupType.APPLICATION);
+
+        groupBusiness.add(group);
+        app.setApplicationGroups(Arrays.asList(group.getName()));
+        applicationBusiness.update(app);
+
+        assertEquals(1, applicationBusiness.getApplications(group).size());
+    }
+
+    @Test
+    public void getApplicationByGroupNotIn() throws BusinessException {
+        Application app = applicationBusiness.getApplication("Application1");
+        Group group = new Group("test", false, GroupType.APPLICATION);
+
+        groupBusiness.add(group);
+        app.setApplicationGroups(Arrays.asList(group.getName()));
+        applicationBusiness.update(app);
+
+        assertEquals(1, applicationBusiness.getApplications(group).size());  
+        app.setApplicationGroups(new ArrayList<>());
+        applicationBusiness.update(app);
+
+        assertEquals(0, applicationBusiness.getApplications(group).size());  
     }
 }
