@@ -5,61 +5,8 @@
         <link rel="StyleSheet" href="../css/doc_main.css" type="text/css" />
     </head>
     <body>
-        <a name="contents"></a><h1>How to import an application</h1>
-        
-        <h2><a name="docker"></a>Write your application descriptor with Boutiques</h2>
-        <p>Applications are imported into VIP using  <a href="https://github.com/boutiques/boutiques" target="_blank">Boutiques</a>  descriptors.</p>
-        
-        <p>Please do not hesitate to contact us if you need help with writing your application descriptor. 
-        Once the descriptor is ready, VIP admins will import it for you.</p>
-        
-        <p>We recommend that descriptors are versionned and published to Zenodo, similarly to what has been done for the Gate OpenDose application:</p>
-         <ul>
-          <li><a href="https://github.com/CISI-INSERM/OpenDose-Computing/blob/master/Boutiques/gate-opendose-descriptor-docker.json" target="_blank">Example of descriptor on github</a></li>
-          <li><a href="https://zenodo.org/record/2573071" target="_blank">Example of descriptor on Zenodo</a></li>
-        </ul>
-                
-        <p>Note that publising to Zenodo can be done through VIP, once the application is imported with its Boutiques descriptor. In exchange, 
-        you will get a DOI allowing for the proper citation of the application.  </p>       
-        
-        <p>We also recommend that you use containers (such as Docker or Singularity) to facilitate application installation and sharing.</p>
-          
-            
-        <h2><a name="docker"></a>Docker guidelines</h2>
-        <ul>
-          <li>If you are not familiar with Docker, <a href="https://docs.docker.com/engine/getstarted/" target="_blank">read the docs</a> on the Docker website.</li>
-          <li>We recommend to build containers from a <a href="https://docs.docker.com/engine/reference/builder" target="_blank">Dockerfile</a>.</li>
-          <li>For efficient management of containers in VIP, we recommend that containers use the following images if possible:
-            <ul>
-              <li>Linux distribution: <a href="https://hub.docker.com/r/_/centos/" target="_blank">centos7</a> (official).</li>
-              <li>Compiled Matlab applications: <a href="https://hub.docker.com/r/viplatform/matlab-compiler-runtime" target="_blank">viplatform/matlab-compiler-runtime</a> (unofficial).</li>
-              <li>Applications using <a href="https://github.com/MRtrix3/mrtrix3" target="_blank">MRtrix3</a>: <a href="https://hub.docker.com/r/glatard/mrtrix3/" target="_blank">glatard/mrtrix3</a> (unofficial).</li>
-            </ul>
-          </li>
-          <li>Compiled applications: avoid using architecture-specific
-          compilation flags as it will produce non-portable code
-          (<code>Illegal instruction</code> error messages).</li>
-          <li>Your application is supposed to work with a regular user (not as root).</li>
-          </ul>
-        <br/>
-
-
-        <h2><a name="troubleshooting"></a>Troubleshooting tips: compiled Matlab functions</h2>
-          Arguments of compiled Matlab functions will be passed as strings, which may create nasty
-          bugs at runtime. We recommend that numerical arguments are handled using code such as:
-            <pre>
-                <code>
-                if ~isnumeric(parameter)
-                  parameter = str2double(parameter);
-                  if isnan(parameter)
-                    disp('The parameter value is not a number')
-                    return
-                  end
-                end
-                </code>
-            </pre>
-        <br/>
-
-
+        <p>See the <a href="https://github.com/virtual-imaging-platform/VIP-portal/wiki/Packaging-guide" target="_blank">Application packaging guide</a>
+            for instructions on how to get your application packaged, so that it can be imported by VIP admins.</p>
+        <p>Please do not hesitate to contact us if you need help with your application packaging.</p>
     </body>
 </html>
