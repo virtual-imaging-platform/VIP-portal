@@ -1,7 +1,10 @@
 package fr.insalyon.creatis.vip.application.server.business;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -208,6 +211,22 @@ public class ResourceBusiness {
         } catch (DAOException e) {
             throw new BusinessException(e);
         }
+    }
+
+    public List<Resource> getUsableResources(User user, AppVersion appVersion) throws BusinessException {
+        Set<Resource> usableResource = new HashSet<>();
+        List<String> userResources = getAvailableForUser(user)
+            .stream()
+            .map((r) -> r.getName())
+            .collect(Collectors.toList());
+
+        for (String r : userResources) {
+            if (appVersion.getResources().contains(r)) {
+                usableResource.add(getByName(r));
+            }
+        }
+
+        return new ArrayList<>(usableResource);
     }
 
     private Resource mapAssociated(Resource resource) throws BusinessException {

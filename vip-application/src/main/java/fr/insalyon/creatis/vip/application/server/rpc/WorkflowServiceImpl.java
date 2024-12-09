@@ -232,8 +232,7 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
             }
             addTimestampedSubDirectoryIfNecessary(parametersMap);
 
-            String simulationID = workflowBusiness.launch(
-                user, groups,
+            String simulationID = workflowBusiness.launch(user, groups,
                 parametersMap, applicationName, applicationVersion, simulationName);
 
             trace(logger, "Simulation '" + simulationName + "' launched with ID '" + simulationID + "'.");

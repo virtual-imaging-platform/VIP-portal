@@ -444,4 +444,29 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
             throw new ApplicationException(e);
         }
     }
+
+    /**
+     * This fonction will check if ressources/engines are available !
+     */
+    @Override
+    public Boolean isAppUsableWithCurrentUser(String appName, String version) throws ApplicationException {
+        try {
+            AppVersion appVersion = appVersionBusiness.getVersion(appName, version);
+            List<Resource> usableResource = resourceBusiness.getUsableResources(getSessionUser(), appVersion);
+            List<Engine> usableEngines;
+
+            if (usableResource.isEmpty()) {
+                return false;
+            }
+
+            usableEngines = engineBusiness.getUsableEngines(usableResource.get(0)); // changer
+            if (usableEngines.isEmpty()) {
+                return false;
+            }
+            
+            return true;
+        } catch (BusinessException | CoreException e) {
+            throw new ApplicationException(e);
+        }
+    }
 }

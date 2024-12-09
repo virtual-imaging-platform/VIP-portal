@@ -90,10 +90,10 @@ public class WorkflowBusiness {
     private final OutputDAO outputDAO;
     private final InputDAO inputDAO;
     private final StatsDAO statsDAO;
-    private final EngineDAO engineDAO;
     private final ApplicationDAO applicationDAO;
-    private final UsersGroupsDAO usersGroupsDAO;
+    private final AppVersionBusiness appVersionBusiness;
     private final EngineBusiness engineBusiness;
+    private final ResourceBusiness resourceBusiness;
     private final DataManagerBusiness dataManagerBusiness;
     private final EmailBusiness emailBusiness;
     private final LfcPathsBusiness lfcPathsBusiness;
@@ -106,11 +106,11 @@ public class WorkflowBusiness {
             Server server, SimulationStatsDAO simulationStatsDAO,
             WorkflowDAO workflowDAO, ProcessorDAO processorDAO,
             OutputDAO outputDAO, InputDAO inputDAO, StatsDAO statsDAO,
-            EngineDAO engineDAO, ApplicationDAO applicationDAO,
-            UsersGroupsDAO usersGroupsDAO, EngineBusiness engineBusiness,
+            ApplicationDAO applicationDAO, EngineBusiness engineBusiness,
             DataManagerBusiness dataManagerBusiness, EmailBusiness emailBusiness,
             LfcPathsBusiness lfcPathsBusiness, GRIDAPoolClient gridaPoolClient,
-            GRIDAClient gridaClient, ExternalPlatformBusiness externalPlatformBusiness) {
+            GRIDAClient gridaClient, ExternalPlatformBusiness externalPlatformBusiness, 
+            ResourceBusiness resourceBusiness, AppVersionBusiness appVersionBusiness) {
         this.server = server;
         this.simulationStatsDAO = simulationStatsDAO;
         this.workflowDAO = workflowDAO;
@@ -118,9 +118,7 @@ public class WorkflowBusiness {
         this.outputDAO = outputDAO;
         this.inputDAO = inputDAO;
         this.statsDAO = statsDAO;
-        this.engineDAO = engineDAO;
         this.applicationDAO = applicationDAO;
-        this.usersGroupsDAO = usersGroupsDAO;
         this.engineBusiness = engineBusiness;
         this.dataManagerBusiness = dataManagerBusiness;
         this.emailBusiness = emailBusiness;
@@ -128,6 +126,8 @@ public class WorkflowBusiness {
         this.gridaPoolClient = gridaPoolClient;
         this.gridaClient = gridaClient;
         this.externalPlatformBusiness = externalPlatformBusiness;
+        this.resourceBusiness = resourceBusiness;
+        this.appVersionBusiness = appVersionBusiness;
     }
 
     /*
@@ -156,38 +156,36 @@ public class WorkflowBusiness {
         return null;
     }
 
-    private Engine selectEngine(String applicationClass) throws BusinessException {
-        long min = Integer.MAX_VALUE;
-        Engine engineBean = null;
+    private Engine selectEngine(List<Engine> availableEngines) throws BusinessException {
+        long min = Long.MAX_VALUE;
+        Engine selectEngine = null;
+
         try {
-            // changer
-            List<Engine> availableEngines = new ArrayList<>();
             for (Engine engine : availableEngines) {
                 long runningWorkflows = workflowDAO.getNumberOfRunningPerEngine(engine.getEndpoint());
-                if (runningWorkflows < min) {
+                if (runningWorkflows < min && ! engine.getEndpoint().isEmpty()) {
                     min = runningWorkflows;
-                    engineBean = engine;
+                    selectEngine = engine;
                 }
             }
         } catch (WorkflowsDBDAOException ex) {
-            logger.error("Error finding an engine for {}", applicationClass, ex);
+            logger.error("Error selecting an engine !", ex);
         }
-        if (engineBean == null || engineBean.getEndpoint().isEmpty()) {
-            logger.error("No available engines for class {}", applicationClass);
-            throw new BusinessException("No available engines for class " + applicationClass);
+        if (selectEngine == null || availableEngines.isEmpty()) {
+            logger.error("No available engines !");
+            throw new BusinessException("No available engines !");
         } else {
-            return engineBean;
+            return selectEngine;
         }
     }
 
-    public synchronized String launch(
-            User user, List<String> groups, Map<String, String> parametersMap,
-            String applicationName, String applicationVersion, String simulationName)
+    public synchronized String launch(User user, List<String> groups, Map<String, String> parametersMap,
+            String appName, String version, String simulationName)
             throws BusinessException {
 
         try {
             long runningWorkflows = workflowDAO.getNumberOfRunning(user.getFullName());
-            long runningSimulations=workflowDAO.getRunning().size();
+            long runningSimulations = workflowDAO.getRunning().size();
             if(runningSimulations >= server.getMaxPlatformRunningSimulations()){
                 logger.warn("Unable to launch execution '{}': max number of"
                         + " running workflows reached in the platform : {}",
@@ -195,7 +193,6 @@ public class WorkflowBusiness {
                 throw new BusinessException(PLATFORM_MAX_EXECS);
             }
             if (runningWorkflows >= user.getMaxRunningSimulations()) {
-
                 logger.warn("Unable to launch execution '{}': max number of "
                         + "running workflows reached ({}/{}) for user '{}'.",
                         simulationName, runningWorkflows,
@@ -238,23 +235,18 @@ public class WorkflowBusiness {
                 }
                 parameters.add(ps);
             }
-
-            AppVersion version = applicationDAO.getVersion(
-                    applicationName, applicationVersion);
-            logger.info( " moteurlite status: " + server.useMoteurlite());
-            String workflowPath = dataManagerBusiness.getRemoteFile(user, server.useMoteurlite() ? version.getJsonLfn() : version.getLfn());
+            AppVersion appVersion = appVersionBusiness.getVersion(appName, version);
+            logger.info( "Moteurlite status: " + server.useMoteurlite());
+            String workflowPath = dataManagerBusiness.getRemoteFile(user, server.useMoteurlite() ? appVersion.getJsonLfn() : appVersion.getLfn());
             
-            //selectRandomEngine could also be used; TODO: make this choice configurable
-            // Engine engine = selectEngine(applicationClass);
-            Engine engine = new Engine("bla", "blou", "bli");
-            // changer
-            WorkflowExecutionBusiness executionBusiness =
-                    getWorkflowExecutionBusiness(engine.getEndpoint());
+            // changer + throw erreur si pas d'engines / ressources
+            List<Resource> resource = resourceBusiness.getUsableResources(user, appVersion);
+            Engine engine = selectEngine(engineBusiness.getByResource(resource.get(0)));
+
+            WorkflowExecutionBusiness executionBusiness = getWorkflowExecutionBusiness(engine.getEndpoint());
             Workflow workflow = null;
             try {
-                workflow = executionBusiness.launch(applicationName,
-                        applicationVersion, user, simulationName,
-                        workflowPath, parameters);
+                workflow = executionBusiness.launch(appVersion, user, simulationName, workflowPath, parameters);
             } catch (BusinessException be) {
                 logger.error("BusinessException caught on launch workflow, engine {} will be disabled", engine.getName());
             } finally {
@@ -470,10 +462,9 @@ public class WorkflowBusiness {
         return getSimulation(simulationID, false);
     }
 
-    public Simulation getSimulation(String simulationID, boolean refresh)
-            throws BusinessException {
-
+    public Simulation getSimulation(String simulationID, boolean refresh) throws BusinessException {
         Simulation simulation;
+
         try {
             Workflow workflow = workflowDAO.get(simulationID);
             if (workflow == null) {

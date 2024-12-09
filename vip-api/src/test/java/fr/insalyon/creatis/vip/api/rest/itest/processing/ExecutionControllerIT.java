@@ -39,8 +39,14 @@ import fr.insalyon.creatis.vip.api.model.Execution;
 import fr.insalyon.creatis.vip.api.model.ExecutionStatus;
 import fr.insalyon.creatis.vip.api.rest.config.BaseWebSpringIT;
 import fr.insalyon.creatis.vip.api.rest.config.RestTestUtils;
+import fr.insalyon.creatis.vip.application.client.bean.AppVersion;
+import fr.insalyon.creatis.vip.application.client.bean.Engine;
+import fr.insalyon.creatis.vip.application.client.bean.Resource;
+import fr.insalyon.creatis.vip.application.client.bean.ResourceType;
 import fr.insalyon.creatis.vip.application.client.view.monitor.SimulationStatus;
+import fr.insalyon.creatis.vip.application.server.business.ResourceBusiness;
 import fr.insalyon.creatis.vip.application.server.business.simulation.ParameterSweep;
+import fr.insalyon.creatis.vip.core.client.bean.GroupType;
 import fr.insalyon.creatis.vip.core.integrationtest.ServerMockConfig;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
@@ -49,6 +55,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 
 import java.io.File;
@@ -57,6 +64,7 @@ import java.util.*;
 import static fr.insalyon.creatis.vip.api.data.ExecutionTestUtils.*;
 import static fr.insalyon.creatis.vip.api.data.UserTestUtils.baseUser1;
 import static org.hamcrest.Matchers.*;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -73,6 +81,8 @@ public class ExecutionControllerIT extends BaseWebSpringIT {
 
     private Workflow w1;
     private Workflow w2;
+
+    @Autowired ResourceBusiness resourceBusiness;
 
     @BeforeEach
     public void setUp() throws Exception {
@@ -358,7 +368,8 @@ public class ExecutionControllerIT extends BaseWebSpringIT {
 
         configureGwendiaTestApp(appName, groupName, versionName);
 
-        createUserInGroup(baseUser1.getEmail(), groupName);
+        createGroup("testResources", GroupType.RESOURCE);
+        createUserInGroups(baseUser1.getEmail(), "", groupName, "testResources");
 
         ArgumentCaptor<File> workflowFile = ArgumentCaptor.forClass(File.class);
         ArgumentCaptor<List<ParameterSweep>> inputsCaptor = ArgumentCaptor.forClass(List.class);
@@ -376,6 +387,8 @@ public class ExecutionControllerIT extends BaseWebSpringIT {
 
         Execution expectedExecution = new Execution(worflowId, "Exec test 1", appName + "/" + versionName, 0, ExecutionStatus.RUNNING, null, null, startDate.getTime(), null, null);
         expectedExecution.clearReturnedFiles();
+
+        setUpResourceAndEngine(appName, versionName);
 
         mockMvc.perform(
                         post("/rest/executions").contentType("application/json")
@@ -435,7 +448,8 @@ public class ExecutionControllerIT extends BaseWebSpringIT {
 
         configureBoutiquesTestApp(appName, groupName, versionName);
 
-        createUserInGroup(baseUser1.getEmail(), groupName);
+        createGroup("testResources", GroupType.RESOURCE);
+        createUserInGroups(baseUser1.getEmail(), "", groupName, "testResources");
 
         ArgumentCaptor<File> workflowFile = ArgumentCaptor.forClass(File.class);
         ArgumentCaptor<List<ParameterSweep>> inputsCaptor = ArgumentCaptor.forClass(List.class);
@@ -454,6 +468,8 @@ public class ExecutionControllerIT extends BaseWebSpringIT {
 
         Execution expectedExecution = new Execution(worflowId, "Exec test 1", appName + "/" + versionName, 0, ExecutionStatus.RUNNING, null, null, startDate.getTime(), null, null);
         expectedExecution.clearReturnedFiles();
+
+        setUpResourceAndEngine(appName, versionName);
 
         mockMvc.perform(
                         post("/rest/executions").contentType("application/json")
@@ -499,5 +515,22 @@ public class ExecutionControllerIT extends BaseWebSpringIT {
         MatcherAssert.assertThat(workflow.getStartedTime().getTime(),
                 is(both(greaterThan(startDate.getTime())).and(lessThan(new Date().getTime()))));
 
+    }
+
+    public void setUpResourceAndEngine(String appName, String version) throws Exception {
+        Engine engine = new Engine("testEngine", "bla", "enabled");
+        Resource resource = new Resource(
+            "testResource", 
+            true, 
+            true, 
+            ResourceType.BATCH, 
+            "bla", 
+            Arrays.asList(engine.getName()),
+            Arrays.asList("testResources"));
+
+        engineBusiness.add(engine);
+        resourceBusiness.add(resource);
+
+        resourceBusiness.associate(resource, new AppVersion(appName, version));
     }
 }

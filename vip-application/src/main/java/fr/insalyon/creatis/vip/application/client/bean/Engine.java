@@ -50,7 +50,6 @@ public class Engine implements IsSerializable {
     }
 
     public Engine(String name, String endpoint, String status) {
-
         this.name = name;
         this.endpoint = endpoint;
         this.status = status ;

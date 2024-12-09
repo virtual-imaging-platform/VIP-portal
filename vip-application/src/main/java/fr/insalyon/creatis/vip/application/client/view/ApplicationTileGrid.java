@@ -61,14 +61,22 @@ public class ApplicationTileGrid extends ApplicationsTileGrid {
 
     @Override
     public void parse(final String applicationName, final String applicationVersion) {
+        final AsyncCallback<Boolean> callback = new AsyncCallback<>() {
+            @Override
+            public void onFailure(Throwable caught) {
+                Layout.getInstance().setWarningMessage("Unable to check application avaibility:<br />" + caught.getMessage());
+            }
 
-        String appName = applicationVersion == null ? applicationName : applicationName + " " + applicationVersion;
-        if (applicationNames.contains(appName)) {
-            Layout.getInstance().addTab(
-                ApplicationConstants.getLaunchTabID(applicationName),
-                () -> new LaunchTab(
-                    applicationName, applicationVersion, tileName));
-        }
+            @Override
+            public void onSuccess(Boolean result) {
+                if (result) {
+                    display(applicationName, applicationVersion);
+                } else {
+                    Layout.getInstance().setWarningMessage("Sorry, but this application application is temporarily unavailable !");
+                }
+            }
+        };
+        ApplicationService.Util.getInstance().isAppUsableWithCurrentUser(applicationName, applicationVersion, callback);
     }
 
     private void loadApplications() {
@@ -91,5 +99,15 @@ public class ApplicationTileGrid extends ApplicationsTileGrid {
             }
         };
         ApplicationService.Util.getInstance().getApplications(callback);
+    }
+
+    private void display(final String applicationName, final String applicationVersion) {
+        String appName = applicationVersion == null ? applicationName : applicationName + " " + applicationVersion;
+        if (applicationNames.contains(appName)) {
+            Layout.getInstance().addTab(
+                ApplicationConstants.getLaunchTabID(applicationName),
+                () -> new LaunchTab(
+                    applicationName, applicationVersion, tileName));
+        }
     }
 }

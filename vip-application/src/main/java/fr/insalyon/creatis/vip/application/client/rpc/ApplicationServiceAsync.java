@@ -99,4 +99,7 @@ public interface ApplicationServiceAsync {
     public void updateTag(Tag tag, String newName, AsyncCallback<Void> asyncCallback);
 
     public void getTags(AsyncCallback<List<Tag>> asyncCallback);
+
+    public void isAppUsableWithCurrentUser(String appName, String appVersion, AsyncCallback<Boolean> asyncCallback);
+
 }

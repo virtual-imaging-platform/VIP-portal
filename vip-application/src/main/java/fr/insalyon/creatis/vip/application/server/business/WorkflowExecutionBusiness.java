@@ -33,6 +33,7 @@ package fr.insalyon.creatis.vip.application.server.business;
 
 import fr.insalyon.creatis.moteur.plugins.workflowsdb.bean.Workflow;
 import fr.insalyon.creatis.moteur.plugins.workflowsdb.bean.WorkflowStatus;
+import fr.insalyon.creatis.vip.application.client.bean.AppVersion;
 import fr.insalyon.creatis.vip.application.client.view.monitor.SimulationStatus;
 import fr.insalyon.creatis.vip.application.server.business.simulation.ParameterSweep;
 import fr.insalyon.creatis.vip.application.server.business.simulation.WebServiceEngine;
@@ -107,9 +108,7 @@ public class WorkflowExecutionBusiness {
 
     }
 
-    public Workflow launch(String applicationName, String applicationVersion, User user, String simulationName,
-            String workflowPath, List<ParameterSweep> parameters) throws BusinessException {
-
+    public Workflow launch(AppVersion appVersion, User user, String simulationName, String workflowPath, List<ParameterSweep> parameters) throws BusinessException {
         try {
             engine.setWorkflow(new File(workflowPath));
             engine.setInput(parameters);
@@ -118,12 +117,12 @@ public class WorkflowExecutionBusiness {
 
             return new Workflow(workflowID, user.getFullName(),
                     WorkflowStatus.Running,
-                    new Date(), null, simulationName, applicationName, applicationVersion, "",
+                    new Date(), null, simulationName, appVersion.getApplicationName(), appVersion.getVersion(), "",
                     engine.getAddressWS(), null);
 
         } catch (javax.xml.rpc.ServiceException | java.rmi.RemoteException ex) {
             logger.error("Error launching simulation {} ({}/{})",
-                    simulationName, applicationName, applicationVersion, ex);
+                    simulationName, appVersion.getApplicationName(), appVersion.getVersion(), ex);
             throw new BusinessException(ex);
         }
     }

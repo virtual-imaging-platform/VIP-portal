@@ -40,6 +40,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -91,7 +92,21 @@ public class EngineBusiness {
         try {
             return engineDAO.getByResource(resource);
         } catch (DAOException e) {
-            throw new BusinessException(e);
+        throw new BusinessException(e);
         }
+    }
+
+    public List<Engine> getUsableEngines(Resource resource) throws BusinessException {
+        List<Engine> engines = getByResource(resource);
+
+        engines = getByResource(resource);
+
+        if (engines.isEmpty()) {
+            engines = get();
+        }
+        return engines
+            .stream()
+            .filter((e) -> e.getStatus().equals("enabled"))
+            .collect(Collectors.toList());
     }
 }
