@@ -123,13 +123,6 @@ public class StatsTab extends Tab {
         chartsItem.setWidth(250);
         chartsItem.setValueMap(chartsMap);
         chartsItem.setEmptyDisplayValue("Select a chart...");
-        chartsItem.addChangedHandler(new ChangedHandler() {
-
-            @Override
-            public void onChanged(ChangedEvent event) {
-                int value = Integer.parseInt(chartsItem.getValueAsString());
-            }
-        });
 
         generateButton = WidgetUtil.getIButton("Get Stats", null, new ClickHandler() {
 

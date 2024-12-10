@@ -53,7 +53,6 @@ import org.slf4j.LoggerFactory;
 
 import jakarta.servlet.ServletException;
 
-import javax.xml.parsers.ParserConfigurationException;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
