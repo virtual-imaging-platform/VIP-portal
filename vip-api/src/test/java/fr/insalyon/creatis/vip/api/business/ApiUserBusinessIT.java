@@ -22,7 +22,7 @@ import static fr.insalyon.creatis.vip.core.client.view.user.UserLevel.Beginner;
 @WebAppConfiguration
 public class ApiUserBusinessIT extends BaseSpringIT {
 
-    @Autowired ApiUserBusiness apiUserBusiness;
+    @Autowired private ApiUserBusiness apiUserBusiness;
     @Autowired private ConfigurationBusiness configurationBusiness;
 
     private Group group1;
