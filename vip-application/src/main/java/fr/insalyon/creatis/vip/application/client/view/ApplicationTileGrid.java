@@ -55,7 +55,6 @@ public class ApplicationTileGrid extends ApplicationsTileGrid {
     public ApplicationTileGrid(String tileName) {
         super(tileName);
         applicationNames = new ArrayList<String>();
-        // changer
         loadApplications();
     }
 

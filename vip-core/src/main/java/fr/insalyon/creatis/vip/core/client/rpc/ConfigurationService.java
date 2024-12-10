@@ -84,6 +84,10 @@ public interface ConfigurationService extends RemoteService {
 
     List<Group> getPublicGroups() throws CoreException;
 
+    List<String> getItemsGroup(String groupname) throws CoreException;
+
+    void removeItemFromGroup(String item, String groupname) throws CoreException;
+
     User removeUser(String email) throws CoreException;
 
     Map<Group, CoreConstants.GROUP_ROLE> getUserGroups(String email) throws CoreException;

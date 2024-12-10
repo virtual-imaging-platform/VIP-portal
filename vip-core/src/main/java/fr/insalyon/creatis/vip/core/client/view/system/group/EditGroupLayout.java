@@ -33,7 +33,6 @@ package fr.insalyon.creatis.vip.core.client.view.system.group;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.types.MultipleAppearance;
-import com.smartgwt.client.types.SortDirection;
 import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.Canvas;
@@ -76,22 +75,21 @@ public class EditGroupLayout extends AbstractFormLayout {
     private SelectItem typeFieldList;
     private IButton saveButton;
     private IButton removeButton;
-    private ListGrid grid;
-    private ModalWindow gridModal;
+    private ListGrid itemsGrid;
+    private ListGrid usersGrid;
+    private ModalWindow usersGridModal;
+    private ModalWindow itemsGridModal;
     private HLayout rollOverCanvas;
     private ListGridRecord rollOverRecord;
 
     public EditGroupLayout() {
-
         super(380, 450);
         addTitle("Add/Edit Group", CoreConstants.ICON_GROUP);
 
         configure();
-        loadUsers();
     }
 
     private void configure() {
-
         nameItem = FieldUtil.getTextItem(350, null);
 
         isPublicField = new CheckboxItem();
@@ -127,61 +125,18 @@ public class EditGroupLayout extends AbstractFormLayout {
                 });
         removeButton.setDisabled(true);
 
-        grid = new ListGrid() {
-            @Override
-            protected Canvas getRollOverCanvas(Integer rowNum, Integer colNum) {
+        usersGrid = buildUsersGrid();
+        usersGridModal = new ModalWindow(usersGrid);
 
-                rollOverRecord = this.getRecord(rowNum);
-
-                if (rollOverCanvas == null) {
-                    rollOverCanvas = new HLayout(3);
-                    rollOverCanvas.setSnapTo("TR");
-                    rollOverCanvas.setWidth(50);
-                    rollOverCanvas.setHeight(22);
-
-                    rollOverCanvas.addMember(FieldUtil.getImgButton(
-                            CoreConstants.ICON_DELETE, "Remove user from this group",
-                            new ClickHandler() {
-                                @Override
-                                public void onClick(ClickEvent event) {
-                                    final String email = rollOverRecord.getAttribute("email");
-                                    SC.ask("Do you really want to remove the user \""
-                                            + email + "\" from this group?", new BooleanCallback() {
-                                        @Override
-                                        public void execute(Boolean value) {
-                                            if (value) {
-                                                removeUserFromGroup(email);
-                                            }
-                                        }
-                                    });
-                                }
-                            }));
-                }
-                return rollOverCanvas;
-            }
-        };
-        grid.setWidth(350);
-        grid.setHeight100();
-        grid.setShowRollOverCanvas(true);
-        grid.setShowAllRecords(false);
-        grid.setShowEmptyMessage(true);
-        grid.setShowRowNumbers(true);
-        grid.setCanHover(true);
-        grid.setShowHover(true);
-        grid.setShowHoverComponents(true);
-        grid.setEmptyMessage("<br>No data available.");
-        grid.setFields(FieldUtil.getIconGridField("countryCodeIcon"),
-                new ListGridField("username", "Name"));
-        grid.setSortField("username");
-        grid.setSortDirection(SortDirection.ASCENDING);
-
-        gridModal = new ModalWindow(grid);
+        itemsGrid = buildItemsGrid();
+        itemsGridModal = new ModalWindow(itemsGrid);
 
         addField("Name", nameItem);
         addField("Public", isPublicField);
         addField("Group Type", typeFieldList);
         this.addMember(WidgetUtil.getLabel("<b>Users</b>", 15));
-        this.addMember(grid);
+        this.addMember(usersGrid);
+        this.addMember(itemsGrid);
         addButtons(saveButton, removeButton);
     }
 
@@ -194,6 +149,7 @@ public class EditGroupLayout extends AbstractFormLayout {
             this.newGroup = false;
             this.removeButton.setDisabled(false);
             loadUsers();
+            loadItems(name);
 
         } else {
             this.oldName = null;
@@ -201,12 +157,10 @@ public class EditGroupLayout extends AbstractFormLayout {
             this.isPublicField.setValue(true);
             this.newGroup = true;
             this.removeButton.setDisabled(true);
-            this.grid.setData(new ListGridRecord[]{});
         }
     }
 
     private void save(String name, boolean isPublic, String type) {
-
         ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();
         WidgetUtil.setLoadingIButton(saveButton, "Saving...");
 
@@ -218,7 +172,6 @@ public class EditGroupLayout extends AbstractFormLayout {
     }
 
     private void remove(final String name) {
-
         SC.ask("Do you really want to remove \"" + name + "\" group?", new BooleanCallback() {
             @Override
             public void execute(Boolean value) {
@@ -253,48 +206,184 @@ public class EditGroupLayout extends AbstractFormLayout {
         };
     }
 
-    private void loadUsers() {
+    private ListGrid buildUsersGrid() {
+        ListGrid grid = new ListGrid() {
+            @Override
+            protected Canvas getRollOverCanvas(Integer rowNum, Integer colNum) {
 
+                rollOverRecord = this.getRecord(rowNum);
+
+                if (rollOverCanvas == null) {
+                    rollOverCanvas = new HLayout(3);
+                    rollOverCanvas.setSnapTo("TR");
+                    rollOverCanvas.setWidth(50);
+                    rollOverCanvas.setHeight(22);
+
+                    rollOverCanvas.addMember(FieldUtil.getImgButton(
+                            CoreConstants.ICON_DELETE, "Remove user from this group",
+                            new ClickHandler() {
+                                @Override
+                                public void onClick(ClickEvent event) {
+                                    final String email = rollOverRecord.getAttribute("email");
+                                    SC.ask("Do you really want to remove the user \""
+                                            + email + "\" from this group?", new BooleanCallback() {
+                                        @Override
+                                        public void execute(Boolean value) {
+                                            if (value) {
+                                                removeUserFromGroup(email);
+                                            }
+                                        }
+                                    });
+                                }
+                            }));
+                }
+                return rollOverCanvas;
+            }
+        };
+        setGridOptions(
+            grid,
+            "username", 
+            FieldUtil.getIconGridField("countryCodeIcon"),
+            new ListGridField("username", "Name"));
+        return grid;
+    }
+
+    private ListGrid buildItemsGrid() {
+        ListGrid grid = new ListGrid() {
+            @Override
+            protected Canvas getRollOverCanvas(Integer rowNum, Integer colNum) {
+
+                rollOverRecord = this.getRecord(rowNum);
+
+                if (rollOverCanvas == null) {
+                    rollOverCanvas = new HLayout(3);
+                    rollOverCanvas.setSnapTo("TR");
+                    rollOverCanvas.setWidth(50);
+                    rollOverCanvas.setHeight(22);
+
+                    rollOverCanvas.addMember(FieldUtil.getImgButton(
+                            CoreConstants.ICON_DELETE, "Remove item from this group",
+                            new ClickHandler() {
+                                @Override
+                                public void onClick(ClickEvent event) {
+                                    final String item = rollOverRecord.getAttribute("item");
+                                    SC.ask("Do you really want to remove the item \""
+                                            + item + "\" from this group?", new BooleanCallback() {
+                                        @Override
+                                        public void execute(Boolean value) {
+                                            if (value) {
+                                                removeItemFromGroup(item, nameItem.getValueAsString());
+                                            }
+                                        }
+                                    });
+                                }
+                            }));
+                }
+                return rollOverCanvas;
+            }
+        };
+        setGridOptions(
+            grid, 
+            "item",
+            new ListGridField("item", "Item"));
+        return grid;
+    }
+
+    private void setGridOptions(ListGrid grid, String sortfield, ListGridField... fields) {
+        grid.setWidth(350);
+        grid.setHeight100();
+        grid.setShowRollOverCanvas(true);
+        grid.setShowRowNumbers(true);
+        grid.setCanHover(true);
+        grid.setShowHoverComponents(true);
+        grid.setEmptyMessage("<br>No data available.");
+        grid.setFields(fields);
+        grid.setSortField(sortfield);
+    }
+
+    private void loadUsers() {
         ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();
-        final AsyncCallback<List<User>> callback = new AsyncCallback<List<User>>() {
+        final AsyncCallback<List<User>> callback = new AsyncCallback<>() {
             @Override
             public void onFailure(Throwable caught) {
-                gridModal.hide();
+                usersGridModal.hide();
                 Layout.getInstance().setWarningMessage("Unable to load users:<br />" + caught.getMessage());
             }
 
             @Override
             public void onSuccess(List<User> result) {
-                gridModal.hide();
-                List<UserRecord> dataList = new ArrayList<UserRecord>();
+                usersGridModal.hide();
+                List<UserRecord> dataList = new ArrayList<>();
 
                 for (User user : result) {
                     dataList.add(new UserRecord(user));
                 }
-                grid.setData(dataList.toArray(new UserRecord[]{}));
+                usersGrid.setData(dataList.toArray(new UserRecord[]{}));
             }
         };
-        gridModal.show("Loading users from \"" + oldName + "\" group...", true);
+        usersGridModal.show("Loading users from \"" + oldName + "\" group...", true);
         service.getUsersFromGroup(oldName, callback);
     }
 
-    private void removeUserFromGroup(String email) {
-
+    private void loadItems(String groupName) {
         ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();
-        final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
+        final AsyncCallback<List<String>> callback = new AsyncCallback<>() {
             @Override
             public void onFailure(Throwable caught) {
-                gridModal.hide();
+                itemsGridModal.hide();
+                Layout.getInstance().setWarningMessage("Unable to load items:<br />" + caught.getMessage());
+            }
+
+            @Override
+            public void onSuccess(List<String> result) {
+                itemsGridModal.hide();
+                List<ItemGroupRecord> dataList = new ArrayList<>();
+
+                result.forEach((i) -> {
+                    dataList.add(new ItemGroupRecord(i));
+                });
+                itemsGrid.setData(dataList.toArray(new ItemGroupRecord[]{}));
+            }
+        };
+        itemsGridModal.show("Loading items from \"" + groupName + "\" group...", true);
+        service.getItemsGroup(groupName, callback);
+    }
+
+    private void removeItemFromGroup(String item, String groupName) {
+        ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();
+        final AsyncCallback<Void> callback = new AsyncCallback<>() {
+            @Override
+            public void onFailure(Throwable caught) {
+                itemsGridModal.hide();
+                Layout.getInstance().setWarningMessage("Unable to remove item:<br />" + caught.getMessage());
+            }
+
+            @Override
+            public void onSuccess(Void result) {
+                itemsGridModal.hide();
+                loadItems(groupName);
+            }
+        };
+        itemsGridModal.show("Removing \"" + item + "\"<br />from \"" + groupName + "\"...", true);
+        service.removeItemFromGroup(item, groupName, callback);
+    }
+
+    private void removeUserFromGroup(String email) {
+        ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();
+        final AsyncCallback<Void> callback = new AsyncCallback<>() {
+            @Override
+            public void onFailure(Throwable caught) {
+                usersGridModal.hide();
                 Layout.getInstance().setWarningMessage("Unable to remove user:<br />" + caught.getMessage());
             }
 
             @Override
             public void onSuccess(Void result) {
-                gridModal.hide();
+                usersGridModal.hide();
                 loadUsers();
             }
         };
-        gridModal.show("Removing \"" + email + "\"<br />from \"" + oldName + "\"...", true);
+        usersGridModal.show("Removing \"" + email + "\"<br />from \"" + oldName + "\"...", true);
         service.removeUserFromGroup(email, oldName, callback);
     }
 }

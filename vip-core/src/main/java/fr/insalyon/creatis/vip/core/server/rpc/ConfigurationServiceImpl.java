@@ -43,6 +43,7 @@ import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
 import fr.insalyon.creatis.vip.core.server.business.GroupBusiness;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import fr.insalyon.creatis.vip.core.server.dao.UserDAO;
+import fr.insalyon.creatis.vip.core.server.inter.GroupInterface;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -67,6 +68,7 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
     private ConfigurationBusiness configurationBusiness;
     private GroupBusiness groupBusiness;
     private UserDAO userDAO;
+    private GroupInterface groupInterface;
 
     @Override
     public void init() throws ServletException {
@@ -74,6 +76,7 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
         configurationBusiness = getBean(ConfigurationBusiness.class);
         userDAO = getBean(UserDAO.class);
         groupBusiness = getBean(GroupBusiness.class);
+        groupInterface = getBean(GroupInterface.class);
     }
     
     @Override
@@ -82,8 +85,6 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
             logger.debug("Initializing VIP configuration.");
             configurationBusiness.configure();
             logger.debug("VIP successfully configured.");
-
-
 
             if (configurationBusiness.validateSession(email, session)) {
 
@@ -149,10 +150,6 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
         }
     }
 
-    /**
-     * Get list of users.
-     *
-     */
     @Override
     public List<User> getUsers() throws CoreException {
         try {
@@ -212,6 +209,36 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
             return groupBusiness.getPublic();
         } catch (BusinessException ex) {
             throw new CoreException(ex);
+        }
+    }
+
+    @Override
+    public List<String> getItemsGroup(String groupName) throws CoreException {
+        List<String> items = new ArrayList<>();
+
+        try {
+            if (groupInterface != null) {
+                items = groupInterface.getItems(groupName);
+            } else {
+                logger.info("No interface is present for GroupInterface !"); 
+            }
+            
+            return items;
+        } catch (BusinessException e) {
+            throw new CoreException(e);
+        }
+    }
+
+    @Override
+    public void removeItemFromGroup(String item, String groupname) throws CoreException {
+        try {
+            if (groupInterface != null) {
+                groupInterface.delete(item, groupname);
+            } else {
+                logger.info("No interface is present for GroupInterface !"); 
+            }
+        } catch (BusinessException e) {
+            throw new CoreException(e);
         }
     }
 

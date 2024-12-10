@@ -109,24 +109,13 @@ public class ApplicationModule extends Module {
                 }
             }
         });
-        }
+    }
 
     @Override
     public void postLoading() { }
 
     @Override
     public void terminate(Set<Tab> removedTabs) {
-
-        final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
-            @Override
-            public void onFailure(Throwable caught) {
-                Layout.getInstance().setWarningMessage("Unable to signout:<br />" + caught.getMessage());
-            }
-
-            @Override
-            public void onSuccess(Void result) {
-            }
-        };
         TimelineLayout.getInstance().terminate();
         for (Tab tab : removedTabs) {
             if (tab instanceof AbstractSimulationTab) {
