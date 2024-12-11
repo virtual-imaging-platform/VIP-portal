@@ -77,10 +77,10 @@ public class LocalBashEngine {
         }
     }
 
-    public String launch(File workflowFile, List<ParameterSweep> parameters)  {
+    public String launch(String workflowContent, List<ParameterSweep> parameters)  {
         try {
             LocalBashExecution newExecution =
-                    createExecution(workflowFile, parameters);
+                    createExecution(workflowContent, parameters);
             String execId = newExecution.id;
             executionsInfo.put(execId, newExecution);
             newExecution.status = SimulationStatus.Queued;
@@ -130,22 +130,20 @@ public class LocalBashEngine {
         execFuture.cancel(true);
     }
 
-    private LocalBashExecution createExecution(File workflowFile, List<ParameterSweep> parameters) throws IOException {
+    private LocalBashExecution createExecution(String workflowContent, List<ParameterSweep> parameters) throws IOException {
         LocalBashExecution exec = new LocalBashExecution();
-        exec.workflowFile = workflowFile;
         exec.id = createWorkflowId();
         exec.workflowDir = createWorkflowDir(exec.id);
-        exec.gwendiaInputs = getGwendiaInputs(workflowFile);
-        exec.gwendiaOutputs = getGwendiaOutputs(workflowFile);
+        exec.gwendiaInputs = getGwendiaInputs(workflowContent);
+        exec.gwendiaOutputs = getGwendiaOutputs(workflowContent);
         exec.execInputs = getExecInputs(parameters);
-        exec.scriptFileLFN = getGwendiaScriptFile(workflowFile);
+        exec.scriptFileLFN = getGwendiaScriptFile(workflowContent);
         exec.execOutputs = new HashMap<>();
         return exec;
     }
 
     public static class LocalBashExecution {
         String id;
-        File workflowFile;
         Path workflowDir;
         String scriptFileLFN;
         Map<String,String> execInputs;     // name -> value
@@ -167,33 +165,33 @@ public class LocalBashEngine {
         return dir;
     }
 
-    private Map<String,String> getGwendiaInputs(File workflowFile) throws IOException {
+    private Map<String,String> getGwendiaInputs(String workflowContent) throws IOException {
         // <in name="results-directory" type="string/URI" />
         Pattern pattern = Pattern.compile("\\s*<in\\s+"
                 + "name=\"([\\w-]+)\"\\s+"
                 + "type=\"([\\w-]+)\".*/>\\s*");
-        return Files.lines(workflowFile.toPath())
+        return workflowContent.lines()
                 .map(line -> pattern.matcher(line))
                 .filter(matcher -> matcher.find())
                 .collect(Collectors.toMap(matcher -> matcher.group(1), matcher -> matcher.group(2)));
     }
 
-    private Map<String,String> getGwendiaOutputs(File workflowFile) throws IOException {
+    private Map<String,String> getGwendiaOutputs(String workflowContent) throws IOException {
         // <out name="output" type="URI" depth="0"/>
         Pattern pattern = Pattern.compile("\\s*<out\\s+"
                 + "name=\"([\\w-]+)\"\\s+"
                 + "type=\"([\\w-]+)\".*/>\\s*");
-        return Files.lines(workflowFile.toPath())
+        return workflowContent.lines()
                 .map(line -> pattern.matcher(line))
                 .filter(matcher -> matcher.find())
                 .collect(Collectors.toMap(matcher -> matcher.group(1), matcher -> matcher.group(2)));
     }
 
-    private String getGwendiaScriptFile(File workflowFile) throws IOException {
+    private String getGwendiaScriptFile(String workflowContent) throws IOException {
         //  <bash script="/path/to/script.sh"/>
         Pattern pattern = Pattern.compile("\\s*<bash\\s+" +
                 "script=\"([\\w/_.-]+)\"\\s*/>\\s*");
-        List<String> bashScripts = Files.lines(workflowFile.toPath())
+        List<String> bashScripts = workflowContent.lines()
                 .map(line -> pattern.matcher(line))
                 .filter(matcher -> matcher.find())
                 .map(matcher -> matcher.group(1))
