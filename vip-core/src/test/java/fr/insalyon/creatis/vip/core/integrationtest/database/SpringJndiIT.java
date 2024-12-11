@@ -32,6 +32,8 @@ import org.springframework.transaction.support.TransactionTemplate;
 
 import javax.sql.DataSource;
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -217,12 +219,12 @@ public class SpringJndiIT {
 
     @Test
     @Order(8)
-    public void connectionShouldBeLazyInTransaction() throws SQLException, MalformedURLException {
+    public void connectionShouldBeLazyInTransaction() throws SQLException, MalformedURLException, URISyntaxException {
         JdbcTemplate jdbcTemplate = new JdbcTemplate(lazyDataSource);
         // close the datasource to make the next request fail
         try { jdbcTemplate.execute("SHUTDOWN"); } catch (Exception e) {e.printStackTrace();}
         // getConnection throw an exception but should not be called as 'getLoginUrlCas' do not need db access
-        String res = configurationBusiness.getLoginUrlCas(new URL("file:/plop"));
+        String res = configurationBusiness.getLoginUrlCas(new URI("file:/plop").toURL());
         assertEquals(ServerMockConfig.TEST_CAS_URL + "/login?service=file:/plop", res);
     }
 }

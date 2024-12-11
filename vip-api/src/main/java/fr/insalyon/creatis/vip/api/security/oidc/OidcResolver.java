@@ -73,6 +73,7 @@ public class OidcResolver {
 
     // Create authorities list from jwt claims.
     // Parsing realm_access.roles or resource_access.<resourceName>.roles is Keycloak-specific.
+    @SuppressWarnings("unchecked")
     private List<GrantedAuthority> parseAuthorities(User user, Jwt jwt) {
         List<String> roles = new ArrayList<>(); // default to no roles
         // At this point, jwt has already been verified by Spring resource server, so we assume the issuer is known (server != null).

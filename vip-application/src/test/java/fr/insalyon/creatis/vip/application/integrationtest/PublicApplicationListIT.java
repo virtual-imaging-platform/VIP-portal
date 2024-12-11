@@ -34,8 +34,8 @@ public class PublicApplicationListIT extends BaseSpringIT {
         Group privateGroup = new Group("private group", false, true, true);
         // classes are not really public/private, but they are linked to public/private groups
         // a class is considered private if it is linked only to private groups
-        AppClass publicClass = new AppClass("public class", Collections.EMPTY_LIST, Collections.singletonList(publicGroup.getName()));
-        AppClass privateClass = new AppClass("private class", Collections.EMPTY_LIST, Collections.singletonList(privateGroup.getName()));
+        AppClass publicClass = new AppClass("public class", Collections.emptyList(), Collections.singletonList(publicGroup.getName()));
+        AppClass privateClass = new AppClass("private class", Collections.emptyList(), Collections.singletonList(privateGroup.getName()));
         Application app = new Application("testApp", Arrays.asList(publicClass.getName(), privateClass.getName()), "");
         AppVersion appVersion = new AppVersion(app.getName(), "", null, null, true, false);
         // persist data in database

@@ -65,6 +65,7 @@ public class JsonCustomObjectMatcher<T> extends TypeSafeDiagnosingMatcher<Map<St
         this(expectedBean, suppliers, new HashMap<>());
     }
 
+    @SuppressWarnings("unchecked")
     public JsonCustomObjectMatcher(T expectedBean,
                                    Map<String, Function> suppliers,
                                    Map<Class,Map<String,Function>> suppliersRegistry) {
@@ -88,6 +89,7 @@ public class JsonCustomObjectMatcher<T> extends TypeSafeDiagnosingMatcher<Map<St
         nonNullPropertiesCountMatcher = equalTo(propertyMatchers.size());
     }
 
+    @SuppressWarnings("unchecked")
     private static Matcher<?> getGenericMatcher(
             Object expectedValue,
             Map<Class, Map<String, Function>> suppliersRegistry) {
@@ -133,6 +135,7 @@ public class JsonCustomObjectMatcher<T> extends TypeSafeDiagnosingMatcher<Map<St
         }
     }
 
+    @SuppressWarnings("unchecked")
     private static Matcher<Map<String, ?>> getCustomObjectMatcherFromRegistry(
             Object o,
             Map<Class, Map<String, Function>> suppliersRegistry) {
@@ -157,6 +160,7 @@ public class JsonCustomObjectMatcher<T> extends TypeSafeDiagnosingMatcher<Map<St
         return new JsonCustomObjectMatcher<T>(expectedBean, suppliers, suppliersRegistry);
     }
 
+    @SuppressWarnings("unchecked")
     public static <T> Map<String, Function> formatSuppliers(
             List<String> mapKeys, Function<T,?>... suppliers) {
         if (mapKeys.size() != suppliers.length) {
@@ -207,6 +211,7 @@ public class JsonCustomObjectMatcher<T> extends TypeSafeDiagnosingMatcher<Map<St
         private final Matcher<Integer> sizeMatcher;
         private final List<Matcher<?>> mapEntriesMatchers = new ArrayList<>();
 
+        @SuppressWarnings("unchecked")
         private JsonMapMatcher(
                 Map<?, ?> expectedMap,
                 Map<Class, Map<String, Function>> suppliersRegistry) {

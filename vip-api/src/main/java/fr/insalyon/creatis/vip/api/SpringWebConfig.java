@@ -64,15 +64,6 @@ public class SpringWebConfig implements WebMvcConfigurer {
     }
 
     @Override
-    public void configurePathMatch(PathMatchConfigurer configurer) {
-        // Otherwise all that follow a dot in an URL is considered an extension and removed
-        // It's a problem for URL like "/pipelines/gate/3.2
-        // The below will become the default values in Spring 5.3
-        // Safe to use in 5.2 as long as disabling pattern match
-        configurer.setUseSuffixPatternMatch(false);
-    }
-
-    @Override
     public void configureContentNegotiation(ContentNegotiationConfigurer configurer) {
         // necessary in the content negotiation stuff of carmin data
         // this should be the default in Spring 5.3 and may be removed then

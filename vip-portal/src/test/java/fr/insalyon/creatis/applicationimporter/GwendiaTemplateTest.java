@@ -15,6 +15,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.xml.sax.SAXException;
 
+import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
 
 /*
@@ -26,7 +27,7 @@ public class GwendiaTemplateTest {
 
     @ParameterizedTest
     @ValueSource(strings = {STANDALONE_TEMPLATE})
-    public void testTemplateWithNonNullDescription(String template) throws IOException, InvalidBoutiquesDescriptorException, SAXException {
+    public void testTemplateWithNonNullDescription(String template) throws IOException, InvalidBoutiquesDescriptorException, SAXException, ParserConfigurationException {
         String inputDescription = "test input description";
         Descriptor gwendiaDesc = testGwendiaTemplate(
                 template,
@@ -37,7 +38,7 @@ public class GwendiaTemplateTest {
 
     @ParameterizedTest
     @ValueSource(strings = {STANDALONE_TEMPLATE})
-    public void testTemplateWithNullDescription(String template) throws IOException, InvalidBoutiquesDescriptorException, SAXException {
+    public void testTemplateWithNullDescription(String template) throws IOException, InvalidBoutiquesDescriptorException, SAXException, ParserConfigurationException {
         // when the description is not in boutiques, it must be an empty string in gwendia
         Descriptor gwendiaDesc = testGwendiaTemplate(
                 template,
@@ -48,7 +49,7 @@ public class GwendiaTemplateTest {
 
     @ParameterizedTest
     @ValueSource(strings = {STANDALONE_TEMPLATE})
-    public void testTemplateWithAIntegerInput(String template) throws IOException, InvalidBoutiquesDescriptorException, SAXException {
+    public void testTemplateWithAIntegerInput(String template) throws IOException, InvalidBoutiquesDescriptorException, SAXException, ParserConfigurationException {
         Descriptor gwendiaDesc = testGwendiaTemplate(
                 template,
                 getIntegerInput(1, 42.));
@@ -57,7 +58,7 @@ public class GwendiaTemplateTest {
 
     @ParameterizedTest
     @ValueSource(strings = {STANDALONE_TEMPLATE})
-    public void testTemplateWithANumberInput(String template) throws IOException, InvalidBoutiquesDescriptorException, SAXException {
+    public void testTemplateWithANumberInput(String template) throws IOException, InvalidBoutiquesDescriptorException, SAXException, ParserConfigurationException {
         Descriptor gwendiaDesc = testGwendiaTemplate(
                 template,
                 getNumberInput(1, false, 42.));
@@ -79,7 +80,7 @@ public class GwendiaTemplateTest {
                 true, null, null, null, null, null, defaultValue);
     }
 
-    protected Descriptor testGwendiaTemplate(String templateFile, BoutiquesInput... inputs) throws IOException, SAXException {
+    protected Descriptor testGwendiaTemplate(String templateFile, BoutiquesInput... inputs) throws IOException, SAXException, ParserConfigurationException  {
         BoutiquesApplication boutiquesApp = new BoutiquesApplication("testApp", "test app desc", "42.43");
         for (BoutiquesInput input : inputs) {
             boutiquesApp.addInput(input);

@@ -52,6 +52,7 @@ import fr.insalyon.creatis.vip.datamanager.server.business.LFCPermissionBusiness
 import fr.insalyon.creatis.vip.datamanager.server.business.TransferPoolBusiness;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.input.ReaderInputStream;
+import org.apache.commons.io.input.ReaderInputStream.Builder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -391,8 +392,12 @@ public class DataApiBusiness {
     private void writeFileFromBase64(String base64Content, String localFilePath) throws ApiException {
         Base64.Decoder decoder = Base64.getDecoder();
         StringReader stringReader = new StringReader(base64Content);
-        InputStream inputStream = new ReaderInputStream(stringReader, StandardCharsets.UTF_8);
-        try (InputStream base64InputStream = decoder.wrap(inputStream)) {
+        try {
+            InputStream inputStream = ReaderInputStream.builder()
+                    .setReader(new StringReader(base64Content))
+                    .setCharset(StandardCharsets.UTF_8)
+                    .get();
+            InputStream base64InputStream = decoder.wrap(inputStream);
             Files.copy(base64InputStream, Paths.get(localFilePath));
         } catch (IOException e) {
             logger.error("Error writing base64 file in {}", localFilePath, e);
