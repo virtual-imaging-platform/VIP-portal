@@ -182,10 +182,8 @@ public class GateLabBusiness {
                     + "</body>"
                     + "</html>";
 
-            for (String adminEmail : emailBusiness.getAdministratorsEmails()) {
-                emailBusiness.sendEmail("[VIP Contact] GATE-Lab Error", adminsEmailContents,
-                        new String[]{adminEmail}, false, user.getEmail());
-            }
+            emailBusiness.sendEmailToAdmins("[VIP Contact] GATE-Lab Error", adminsEmailContents,
+                    false, user.getEmail());
         } catch (DAOException ex) {
             throw new BusinessException(ex);
         }

@@ -468,7 +468,7 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
                 return false;
             }
 
-            usableEngines = engineBusiness.getUsableEngines(usableResource.get(0)); // changer
+            usableEngines = engineBusiness.getUsableEngines(usableResource.get(0));
             if (usableEngines.isEmpty()) {
                 return false;
             }

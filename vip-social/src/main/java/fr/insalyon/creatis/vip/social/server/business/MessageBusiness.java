@@ -191,59 +191,45 @@ public class MessageBusiness {
             User sender, String[] recipients, String subject, String message)
             throws BusinessException {
 
-        try {
-            String emailContent = "<html>"
-                    + "<head></head>"
-                    + "<body>"
-                    + "<p><b>" + sender.getFullName() + "</b> sent a message to <b>"
-                    + Arrays.asList(recipients) + "</b> on VIP:</p>"
-                    + "<div style=\"background-color: #F2F2F2\">"
-                    + "<br /><b>Subject:</b> " + subject + "<br />"
-                    + "<em>" + message + "</em><br /></div>"
-                    + "</body>"
-                    + "</html>";
+        String emailContent = "<html>"
+                + "<head></head>"
+                + "<body>"
+                + "<p><b>" + sender.getFullName() + "</b> sent a message to <b>"
+                + Arrays.asList(recipients) + "</b> on VIP:</p>"
+                + "<div style=\"background-color: #F2F2F2\">"
+                + "<br /><b>Subject:</b> " + subject + "<br />"
+                + "<em>" + message + "</em><br /></div>"
+                + "</body>"
+                + "</html>";
 
-            // if there is only one receiver, name it in subject, otherwise name the sender
-            String subjectInfo = recipients.length == 1 ?
-                    "to " + recipients[0] : "from " + sender.getFullName();
+        // if there is only one receiver, name it in subject, otherwise name the sender
+        String subjectInfo = recipients.length == 1 ?
+                "to " + recipients[0] : "from " + sender.getFullName();
 
-            for (String adminEmail : emailBusiness.getAdministratorsEmails()) {
-                emailBusiness.sendEmail(
-                    "[VIP Support Copy] " + subject + "(" + subjectInfo + ")",
-                    emailContent,
-                    new String[]{adminEmail}, true, sender.getEmail());
-            }
-        } catch (DAOException ex) {
-            throw new BusinessException(ex);
-        }
+        emailBusiness.sendEmailToAdmins(
+            "[VIP Support Copy] " + subject + "(" + subjectInfo + ")",
+            emailContent, true, sender.getEmail());
     }
 
     public void sendMessageToVipSupport(
             User user, String subject, String message, List<String> workflowIDs,
             List<String> simulationNames) throws BusinessException {
 
-        try {
-            String emailContent = "<html>"
-                    + "<head></head>"
-                    + "<body>"
-                    + "<p><b>" + user.getFullName() + "</b> sent you a message on VIP:</p>"
-                    + "<div style=\"background-color: #F2F2F2\">"
-                    + "<br /><b>Subject:</b> " + subject + "<br />"
-                    + "<em>" + message + "</em><br /></div>"
-                    + "<p>Workflow ID " + workflowIDs + "</p>"
-                    + "<p>Simulation Name " + simulationNames + "</p>"
-                    + "</body>"
-                    + "</html>";
+        String emailContent = "<html>"
+                + "<head></head>"
+                + "<body>"
+                + "<p><b>" + user.getFullName() + "</b> sent you a message on VIP:</p>"
+                + "<div style=\"background-color: #F2F2F2\">"
+                + "<br /><b>Subject:</b> " + subject + "<br />"
+                + "<em>" + message + "</em><br /></div>"
+                + "<p>Workflow ID " + workflowIDs + "</p>"
+                + "<p>Simulation Name " + simulationNames + "</p>"
+                + "</body>"
+                + "</html>";
 
-            for (String adminEmail : emailBusiness.getAdministratorsEmails()) {
-                emailBusiness.sendEmail(
-                    "[VIP Contact] " + subject + " (" + user.getFullName() + ")",
-                    emailContent,
-                    new String[]{adminEmail}, true, user.getEmail());
-            }
-        } catch (DAOException ex) {
-            throw new BusinessException(ex);
-        }
+        emailBusiness.sendEmailToAdmins(
+            "[VIP Contact] " + subject + " (" + user.getFullName() + ")",
+            emailContent, true, user.getEmail());
     }
 
     public void sendGroupMessage(

@@ -31,11 +31,16 @@
  */
 package fr.insalyon.creatis.vip.application.server.business;
 
+import fr.insalyon.creatis.moteur.plugins.workflowsdb.dao.WorkflowDAO;
+import fr.insalyon.creatis.moteur.plugins.workflowsdb.dao.WorkflowsDBDAOException;
 import fr.insalyon.creatis.vip.application.client.bean.Engine;
 import fr.insalyon.creatis.vip.application.client.bean.Resource;
 import fr.insalyon.creatis.vip.application.server.dao.EngineDAO;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -50,7 +55,10 @@ import java.util.stream.Collectors;
 @Transactional
 public class EngineBusiness {
 
+    private final Logger logger = LoggerFactory.getLogger(getClass());
+
     private EngineDAO engineDAO;
+    private WorkflowDAO workflowDAO;
 
     public EngineBusiness(EngineDAO engineDAO) {
         this.engineDAO = engineDAO;
@@ -108,5 +116,28 @@ public class EngineBusiness {
             .stream()
             .filter((e) -> e.getStatus().equals("enabled"))
             .collect(Collectors.toList());
+    }
+
+    public Engine selectEngine(List<Engine> availableEngines) throws BusinessException {
+        long min = Long.MAX_VALUE;
+        Engine selectEngine = null;
+
+        try {
+            for (Engine engine : availableEngines) {
+                long runningWorkflows = workflowDAO.getNumberOfRunningPerEngine(engine.getEndpoint());
+                if (runningWorkflows < min && ! engine.getEndpoint().isEmpty()) {
+                    min = runningWorkflows;
+                    selectEngine = engine;
+                }
+            }
+        } catch (WorkflowsDBDAOException ex) {
+            logger.error("Error selecting an engine !", ex);
+        }
+        if (selectEngine == null || availableEngines.isEmpty()) {
+            logger.error("No available engines !");
+            throw new BusinessException("No available engines !");
+        } else {
+            return selectEngine;
+        }
     }
 }

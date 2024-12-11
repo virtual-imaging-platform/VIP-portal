@@ -270,10 +270,8 @@ public class ConfigurationBusiness {
                         + "<p>VIP Team</p>"
                         + "</body>"
                         + "</html>";
-                for (String email : emailBusiness.getAdministratorsEmails()) {
-                    emailBusiness.sendEmail("[VIP Admin] Account Requested", adminsEmailContents,
-                            new String[]{email}, true, user.getEmail());
-                }
+                emailBusiness.sendEmailToAdmins("[VIP Admin] Account Requested", adminsEmailContents,
+                        true, user.getEmail());
             } else {
                 StringBuilder groupNames = new StringBuilder();
                 for (Group group : groups) {
@@ -300,10 +298,8 @@ public class ConfigurationBusiness {
                         + "</body>"
                         + "</html>";
 
-                for (String email : emailBusiness.getAdministratorsEmails()) {
-                    emailBusiness.sendEmail("[VIP Admin] Automatic Account Creation", adminsEmailContents,
-                            new String[]{email}, false, user.getEmail());
-                }
+                emailBusiness.sendEmailToAdmins("[VIP Admin] Automatic Account Creation", adminsEmailContents,
+                        false, user.getEmail());
             }
         } catch (GRIDAClientException | UnsupportedEncodingException | NoSuchAlgorithmException ex) {
             logger.error("Error signing up user {}", user.getEmail(), ex);
@@ -604,10 +600,8 @@ public class ConfigurationBusiness {
                         + "</body>"
                         + "</html>";
 
-                for (String adminEmail : emailBusiness.getAdministratorsEmails()) {
-                    emailBusiness.sendEmail("[VIP Admin] Account Removed", adminsEmailContents,
-                            new String[]{adminEmail}, true, user.getEmail());
-                }
+                emailBusiness.sendEmailToAdmins("[VIP Admin] Account Removed", adminsEmailContents,
+                        true, user.getEmail());
             }
         } catch (GRIDAClientException ex) {
             logger.error("Error removing user {}", email, ex);
@@ -757,32 +751,24 @@ public class ConfigurationBusiness {
         }
     }
 
-    public void sendContactMail(
-            User user, String category, String subject, String comment)
-            throws BusinessException {
-        try {
-            String emailContent = "<html>"
-                    + "<head></head>"
-                    + "<body>"
-                    + "<p><b>VIP Contact</b></p>"
-                    + "<p><b>User:</b> " + user.getFullName() + "</p>"
-                    + "<p><b>Email:</b> <a href=\"mailto:" + user.getEmail() + "\">" + user.getEmail() + "</a></p>"
-                    + "<p>&nbsp;</p>"
-                    + "<p><b>Category:</b> " + category + "</p>"
-                    + "<p><b>Subject:</b> " + subject + "</p>"
-                    + "<p>&nbsp;</p>"
-                    + "<p><b>Comments:</b></p>"
-                    + "<p>" + comment + "</p>"
-                    + "</body>"
-                    + "</html>";
+    public void sendContactMail(User user, String category, String subject, String comment) throws BusinessException {
+        String emailContent = "<html>"
+            + "<head></head>"
+            + "<body>"
+            + "<p><b>VIP Contact</b></p>"
+            + "<p><b>User:</b> " + user.getFullName() + "</p>"
+            + "<p><b>Email:</b> <a href=\"mailto:" + user.getEmail() + "\">" + user.getEmail() + "</a></p>"
+            + "<p>&nbsp;</p>"
+            + "<p><b>Category:</b> " + category + "</p>"
+            + "<p><b>Subject:</b> " + subject + "</p>"
+            + "<p>&nbsp;</p>"
+            + "<p><b>Comments:</b></p>"
+            + "<p>" + comment + "</p>"
+            + "</body>"
+            + "</html>";
 
-            for (String adminEmail : emailBusiness.getAdministratorsEmails()) {
-                emailBusiness.sendEmail("[VIP Contact] " + category, emailContent,
-                        new String[]{adminEmail}, true, user.getEmail());
-            }
-        } catch (DAOException ex) {
-            throw new BusinessException(ex);
-        }
+        emailBusiness.sendEmailToAdmins("[VIP Contact] " + category, emailContent,
+            true, user.getEmail());
     }
 
     public void updateUserLastLogin(String email) throws BusinessException {
@@ -973,8 +959,7 @@ public class ConfigurationBusiness {
         }
     }
 
-    private void sendErrorEmailToAdmins(
-            String errorMessage, Exception exception, String userEmail) {
+    private void sendErrorEmailToAdmins(String errorMessage, Exception exception, String userEmail) {
         try {
             StringBuilder emailContent = new StringBuilder("<html><head></head><body>");
             emailContent.append("<p>Dear Administrator,</p>");
@@ -994,14 +979,10 @@ public class ConfigurationBusiness {
             emailContent.append("<p>Best Regards,</p><p>VIP Team</p>");
             emailContent.append("</body></html>");
 
-            for (String email : emailBusiness.getAdministratorsEmails()) {
-                emailBusiness.sendEmail("[VIP Admin] VIP error", emailContent.toString(),
-                        new String[]{email}, true, userEmail);
-            }
+            emailBusiness.sendEmailToAdmins("[VIP Admin] VIP error", emailContent.toString(),
+                    true, userEmail);
         } catch (BusinessException e) {
             logger.error("Cannot sent mail to admin. Ignoring", e);
-        } catch (DAOException e) {
-            logger.error("Cannot sent mail to admin : {}. Ignoring", e.getMessage());
         }
     }
 }

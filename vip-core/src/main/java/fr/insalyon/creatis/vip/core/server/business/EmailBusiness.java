@@ -39,6 +39,17 @@ public class EmailBusiness {
         }
     }
 
+    public void sendEmailToAdmins(String subject, String content, boolean direct, String userEmail) throws BusinessException {
+        try {
+            for (String adminEmail : getAdministratorsEmails()) {
+                sendEmail(subject, content, new String[] {adminEmail}, direct, userEmail);
+            }
+        } catch (DAOException e) {
+            logger.error("Error sending {} to admins !", subject, e);
+            throw new BusinessException(e);
+        }
+    }
+
     /**
      * Gets an array of administrator's e-mails
      */

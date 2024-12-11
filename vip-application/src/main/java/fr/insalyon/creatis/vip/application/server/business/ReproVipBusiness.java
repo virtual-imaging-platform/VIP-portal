@@ -76,10 +76,7 @@ public class ReproVipBusiness {
                     + "</body>"
                     + "</html>";
 
-            for (String supportEmail : emailBusiness.getAdministratorsEmails()) {
-                emailBusiness.sendEmail("[VIP Admin] Execution Public Request", adminsEmailContents,
-                        new String[]{supportEmail}, true, publicExecution.getAuthor());
-            }
+            emailBusiness.sendEmailToAdmins("[VIP Admin] Execution Public Request", adminsEmailContents, true, publicExecution.getAuthor());
         } catch (DAOException e) {
             throw new BusinessException(e);
         }
