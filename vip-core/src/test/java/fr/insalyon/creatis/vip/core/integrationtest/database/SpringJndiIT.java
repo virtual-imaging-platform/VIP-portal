@@ -169,7 +169,7 @@ public class SpringJndiIT {
             // but before, verify the user has well been deleted
             assertEquals(1, countUser.get());
             throw exception;
-        }).when(emailBusiness).sendEmail(any(), any(), any(), anyBoolean(), any());
+        }).when(emailBusiness).sendEmailToAdmins(any(), any(), anyBoolean(), any());
 
         Exception exceptionCatched = null;
         try {

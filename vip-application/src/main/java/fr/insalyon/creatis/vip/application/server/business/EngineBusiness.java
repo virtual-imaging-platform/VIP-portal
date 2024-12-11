@@ -60,8 +60,9 @@ public class EngineBusiness {
     private EngineDAO engineDAO;
     private WorkflowDAO workflowDAO;
 
-    public EngineBusiness(EngineDAO engineDAO) {
+    public EngineBusiness(EngineDAO engineDAO, WorkflowDAO workflowDAO) {
         this.engineDAO = engineDAO;
+        this.workflowDAO = workflowDAO;
     }
 
     public void add(Engine engine) throws BusinessException {

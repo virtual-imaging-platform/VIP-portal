@@ -168,12 +168,12 @@ public class WorkflowBusiness {
 
             List<Resource> resource = resourceBusiness.getUsableResources(user, appVersion);
             if (resource.isEmpty()) {
-                throw new BusinessException("There is no ressource available for the moment !");
+                throw new BusinessException("There are no ressources available for the moment !");
             }
 
-            Engine engine = engineBusiness.selectEngine(engineBusiness.getByResource(resource.get(0)));
+            Engine engine = engineBusiness.selectEngine(engineBusiness.getUsableEngines(resource.get(0)));
             if (engine == null) {
-                throw new BusinessException("There is no engine available for the moment !");
+                throw new BusinessException("There are no engines available for the moment !");
             }
             WorkflowExecutionBusiness executionBusiness = getWorkflowExecutionBusiness(engine.getEndpoint());
 

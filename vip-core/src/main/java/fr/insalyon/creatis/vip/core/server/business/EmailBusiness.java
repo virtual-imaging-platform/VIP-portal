@@ -28,9 +28,7 @@ public class EmailBusiness {
         this.userDAO = userDAO;
     }
 
-    public void sendEmail(String subject, String content, String[] recipients,
-                                 boolean direct, String username) throws BusinessException {
-
+    public void sendEmail(String subject, String content, String[] recipients, boolean direct, String username) throws BusinessException {
         try {
             smaClient.sendEmail(subject, content, recipients, direct, username);
         } catch (SMAClientException ex) {

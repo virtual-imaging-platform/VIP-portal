@@ -589,7 +589,6 @@ public class UsersAndGroupsIT extends BaseSpringIT {
         // Check update db
         Assertions.assertNotNull(configurationBusiness.getUser(emailUser2));
         Assertions.assertEquals("newEmail@test.fr", configurationBusiness.getUser(emailUser2).getNextEmail(), "Incorrect user next email");
-
     }
 
 
@@ -597,22 +596,16 @@ public class UsersAndGroupsIT extends BaseSpringIT {
     public void testSendContactEmail() throws BusinessException, DAOException {
         // Reset not to capture the calls to sendEmail in the Setup
         Mockito.reset(emailBusiness);
-        Mockito.doReturn(new String[]{"test-admin@test.com"}).when(emailBusiness).getAdministratorsEmails();
 
         // Capture email content
         ArgumentCaptor<String> emailContent = ArgumentCaptor.forClass(String.class);
-        // Capture email recipient
-        ArgumentCaptor<String[]> emailRecipients = ArgumentCaptor.forClass(String[].class);
 
         configurationBusiness.sendContactMail(user1, "category", "subject", "comment");
-        Mockito.verify(emailBusiness).sendEmail(Mockito.anyString(), emailContent.capture(), emailRecipients.capture(), Mockito.eq(true), Mockito.anyString());
+        Mockito.verify(emailBusiness).sendEmailToAdmins(Mockito.anyString(), emailContent.capture(), Mockito.eq(true), Mockito.anyString());
 
         // Check email content
         Assertions.assertTrue(emailContent.getValue().contains(user1.getFirstName()), "Incorrect user firstname");
         Assertions.assertTrue(emailContent.getValue().contains(user1.getLastName()), "Incorrect user lastname");
-        // Check recipient
-        Assertions.assertEquals(1, emailRecipients.getValue().length, "Incorrect length of recipients");
-        Assertions.assertEquals(adminEmail, emailRecipients.getValue()[0], "Incorrect user recipient");
 
     }
 
