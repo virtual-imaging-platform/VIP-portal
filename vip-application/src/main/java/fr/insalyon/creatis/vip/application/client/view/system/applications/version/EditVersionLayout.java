@@ -79,8 +79,6 @@ public class EditVersionLayout extends AbstractFormLayout {
     }
 
     private void configure() {
-
-        newVersion = true;
         applicationLabel = WidgetUtil.getLabel("", 15);
 
         versionField = FieldUtil.getTextItem(450, null);
@@ -215,8 +213,8 @@ public class EditVersionLayout extends AbstractFormLayout {
             this.isBoutiquesFormField.setValue(isBoutiquesForm);
             this.tagsList.setValues(tags);
             this.resourcesList.setValues(resources);
-            this.newVersion = false;
             this.removeButton.setDisabled(false);
+            this.newVersion = false;
         } else {
             this.versionField.setValue("");
             this.versionField.setDisabled(false);
@@ -224,8 +222,8 @@ public class EditVersionLayout extends AbstractFormLayout {
             this.jsonLfnField.setValue("");
             this.isVisibleField.setValue(true);
             this.isBoutiquesFormField.setValue(true);
-            this.newVersion = true;
             this.removeButton.setDisabled(true);
+            this.newVersion = true;
         }
         fetchData();
     }

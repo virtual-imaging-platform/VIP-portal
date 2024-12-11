@@ -169,7 +169,7 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
         try {
             if (isSystemAdministrator() || isGroupAdministrator()) {
                 trace(logger, "Updating version '" + version.getVersion() + "' ('" + version.getApplicationName() + "').");
-                appVersionBusiness.add(version);
+                appVersionBusiness.update(version);
             } else {
                 logger.error("Unauthorized to update version {}/{}",
                         version.getApplicationName(), version.getVersion());
