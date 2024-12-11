@@ -445,6 +445,15 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
         }
     }
 
+    @Override
+    public List<Tag> getTags(AppVersion appVersion) throws ApplicationException {
+        try {
+            return tagBusiness.getTags(appVersion);
+        } catch (BusinessException e) {
+            throw new ApplicationException(e);
+        }
+    }
+
     /**
      * This fonction will check if ressources/engines are available !
      */

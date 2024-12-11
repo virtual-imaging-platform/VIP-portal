@@ -78,13 +78,11 @@ public class CoreModule extends Module {
     public static List<String> accountTypes;
 
     public CoreModule() {
-
         init();
     }
 
     @Override
     public void load() {
-
         // Add tile grids
         homeTab.addTileGrid(generalTileGrid);
         if (user.isSystemAdministrator() || user.isGroupAdmin() || user.isDeveloper()) {
@@ -144,7 +142,6 @@ public class CoreModule extends Module {
 
     @Override
     public void postLoading() {
-
         // Experiencing problems button
         ToolStripButton helpButton = new ToolStripButton("Experiencing problems?");
         helpButton.setIcon(CoreConstants.ICON_HELP);
@@ -181,7 +178,6 @@ public class CoreModule extends Module {
      * @param parser Application parser
      */
     public static void addSystemApplicationParser(ApplicationParser parser) {
-
         systemTileGrid.addParser(parser);
     }
 
@@ -191,16 +187,9 @@ public class CoreModule extends Module {
      * @param tileGrid
      */
     public static void addApplicationsTileGrid(ApplicationsTileGrid tileGrid) {
-
         homeTab.addTileGrid(tileGrid);
-
     }
 
-    /**
-     * Adds a layout to the home tab.
-     *
-     * @param layout
-     */
     public static void addLayoutToHomeTab(VLayout layout) {
 
         homeTab.addToRightLayout(layout);
@@ -277,6 +266,4 @@ public class CoreModule extends Module {
 
         dialog.draw();
     }
-
-
 }

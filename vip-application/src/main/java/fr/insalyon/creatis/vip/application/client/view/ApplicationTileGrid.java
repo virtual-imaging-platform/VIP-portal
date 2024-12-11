@@ -32,8 +32,11 @@
 package fr.insalyon.creatis.vip.application.client.view;
 
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
+import fr.insalyon.creatis.vip.application.client.ApplicationModule;
 import fr.insalyon.creatis.vip.application.client.bean.AppVersion;
 import fr.insalyon.creatis.vip.application.client.bean.Application;
+import fr.insalyon.creatis.vip.application.client.bean.Tag;
+import fr.insalyon.creatis.vip.application.client.inter.CustomApplicationModule;
 import fr.insalyon.creatis.vip.application.client.rpc.ApplicationService;
 import fr.insalyon.creatis.vip.application.client.view.launch.LaunchTab;
 import fr.insalyon.creatis.vip.core.client.view.application.ApplicationsTileGrid;
@@ -58,26 +61,6 @@ public class ApplicationTileGrid extends ApplicationsTileGrid {
         loadApplications();
     }
 
-    @Override
-    public void parse(final String applicationName, final String applicationVersion) {
-        final AsyncCallback<Boolean> callback = new AsyncCallback<>() {
-            @Override
-            public void onFailure(Throwable caught) {
-                Layout.getInstance().setWarningMessage("Unable to check application avaibility:<br />" + caught.getMessage());
-            }
-
-            @Override
-            public void onSuccess(Boolean result) {
-                if (result) {
-                    display(applicationName, applicationVersion);
-                } else {
-                    Layout.getInstance().setWarningMessage("Sorry, but this application application is temporarily unavailable !");
-                }
-            }
-        };
-        ApplicationService.Util.getInstance().isAppUsableWithCurrentUser(applicationName, applicationVersion, callback);
-    }
-
     private void loadApplications() {
         final AsyncCallback<Map<Application, List<AppVersion>>> callback = new AsyncCallback<>() {
             @Override
@@ -100,13 +83,64 @@ public class ApplicationTileGrid extends ApplicationsTileGrid {
         ApplicationService.Util.getInstance().getApplications(callback);
     }
 
-    private void display(final String applicationName, final String applicationVersion) {
+    @Override
+    public void parse(final String applicationName, final String applicationVersion) {
+        final AsyncCallback<Boolean> callback = new AsyncCallback<>() {
+            @Override
+            public void onFailure(Throwable caught) {
+                Layout.getInstance().setWarningMessage("Unable to check application avaibility:<br />" + caught.getMessage());
+            }
+
+            @Override
+            public void onSuccess(Boolean result) {
+                if (result) {
+                    load(applicationName, applicationVersion);
+                } else {
+                    Layout.getInstance().setWarningMessage("Sorry, but this application application is temporarily unavailable !");
+                }
+            }
+        };
+        ApplicationService.Util.getInstance().isAppUsableWithCurrentUser(applicationName, applicationVersion, callback);
+    }
+
+    private void load(String appName, String appVersion) {
+        final AsyncCallback<List<Tag>> callback = new AsyncCallback<>() {
+            @Override
+            public void onFailure(Throwable caught) {
+                Layout.getInstance().setWarningMessage("Unable to load the application:<br />" + caught.getMessage());
+            }
+
+            @Override
+            public void onSuccess(List<Tag> result) {
+                display(appName, appVersion, result);
+            }
+        };
+        ApplicationService.Util.getInstance().getTags(new AppVersion(appName, appVersion), callback);
+    }
+
+
+    private void display(final String applicationName, final String applicationVersion, final List<Tag> tags) {
         String appName = applicationVersion == null ? applicationName : applicationName + " " + applicationVersion;
+        CustomApplicationModule custom = retrieveView(tags);
+
         if (applicationNames.contains(appName)) {
-            Layout.getInstance().addTab(
-                ApplicationConstants.getLaunchTabID(applicationName),
-                () -> new LaunchTab(
-                    applicationName, applicationVersion, tileName));
+            if (custom != null) {
+                custom.run(applicationName, applicationVersion, tileName);
+            } else {
+                Layout.getInstance().addTab(
+                    ApplicationConstants.getLaunchTabID(applicationName),
+                    () -> new LaunchTab(
+                        applicationName, applicationVersion, tileName));
+            }
         }
+    }
+
+    private CustomApplicationModule retrieveView(List<Tag> tags) {
+        for (CustomApplicationModule custom : ApplicationModule.customModules) {
+            if (custom.doOverride(tags)) {
+                return custom;
+            }
+        }
+        return null;
     }
 }

@@ -93,21 +93,18 @@ public class Modules {
     }
 
     public void finalizeModules(Set<Tab> removedTabs) {
-
         for (Module module : modules) {
             module.terminate(removedTabs);
         }
     }
     
     public void userRemoved(User user) {
-        
         for (Module module : modules) {
             module.userRemoved(user);
         }
     }
     
     public void userUpdated(User oldUser, User updatedUser) {
-        
         for (Module module : modules) {
             module.userUpdated(oldUser, updatedUser);
         }

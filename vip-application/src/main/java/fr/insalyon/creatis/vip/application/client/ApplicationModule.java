@@ -36,6 +36,8 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.widgets.tab.Tab;
 import com.smartgwt.client.widgets.tab.events.CloseClickHandler;
 import com.smartgwt.client.widgets.tab.events.TabCloseClickEvent;
+
+import fr.insalyon.creatis.vip.application.client.inter.CustomApplicationModule;
 import fr.insalyon.creatis.vip.application.client.rpc.WorkflowService;
 import fr.insalyon.creatis.vip.application.client.view.ApplicationHomeParser;
 import fr.insalyon.creatis.vip.application.client.view.ApplicationSystemParser;
@@ -50,7 +52,8 @@ import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.layout.CenterTabSet;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -59,11 +62,12 @@ import java.util.Set;
  */
 public class ApplicationModule extends Module {
 
-    public static HashMap<String, Integer> reservedClasses;
+    public static List<CustomApplicationModule> customModules;
 
     public ApplicationModule() {
-        CoreModule.getHomePageActions().put(CoreConstants.HOME_ACTION_SHOW_APPLICATIONS, new Runnable() {
+        customModules = new ArrayList<>();
 
+        CoreModule.getHomePageActions().put(CoreConstants.HOME_ACTION_SHOW_APPLICATIONS, new Runnable() {
             @Override
             public void run() {
                 Layout.getInstance().addTab(
@@ -71,21 +75,6 @@ public class ApplicationModule extends Module {
                     () -> new ManageApplicationsTab(true));
             }
         });
-        
-        // changer
-        // final AsyncCallback<HashMap<String, Integer>> callback = new AsyncCallback<HashMap<String, Integer>>() {
-        //     @Override
-        //     public void onFailure(Throwable caught) {
-        //         Layout.getInstance().setWarningMessage("Unable to load applet gatelab classes:<br />" + caught.getMessage());
-        //     }
-
-        //     @Override
-        //     public void onSuccess(HashMap<String, Integer> result) {
-        //         reservedClasses=result;
-        //     }
-        // };
-        // ApplicationService.Util.getInstance().getReservedClasses(callback);
-          
     }
 
     @Override
@@ -126,8 +115,7 @@ public class ApplicationModule extends Module {
 
     @Override
     public void userRemoved(User user) {
-
-        final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
+        final AsyncCallback<Void> callback = new AsyncCallback<>() {
             @Override
             public void onFailure(Throwable caught) {
                 Layout.getInstance().setWarningMessage("Unable to anonymize user data:<br />" + caught.getMessage());
@@ -142,9 +130,8 @@ public class ApplicationModule extends Module {
 
     @Override
     public void userUpdated(User oldUser, User updatedUser) {
-
         if ( ! oldUser.getFullName().equals(updatedUser.getFullName())) {
-            final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
+            final AsyncCallback<Void> callback = new AsyncCallback<>() {
                 @Override
                 public void onFailure(Throwable caught) {
                     Layout.getInstance().setWarningMessage("Unable to anonymize user data:<br />" + caught.getMessage());
