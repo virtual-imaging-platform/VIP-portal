@@ -98,6 +98,8 @@ abstract public class BaseWebSpringIT extends BaseApplicationSpringIT {
     protected LFCPermissionBusiness lfcPermissionBusiness;
     @Autowired
     protected GRIDAClient gridaClient;
+    @Autowired
+    protected WorkflowExecutionBusiness workflowExecutionBusiness;
 
     @BeforeEach
     @Override

@@ -310,6 +310,7 @@ public class ReproVipBusiness {
         return outputDataMap;
     }
 
+    @SuppressWarnings("unchecked")
     private Map<String, String> getOutputFilenamesFromProvenanceFile(Path provenanceFilePath) throws BusinessException {
         try {
             Map<?, ?> map = new ObjectMapper().readValue(provenanceFilePath.toFile(), Map.class);

@@ -178,6 +178,8 @@ public class PathTestUtils {
         return pathProperties;
     }
 
+    // [WARNING] VIP-portal/vip-api/src/test/java/fr/insalyon/creatis/vip/api/data/PathTestUtils.java:[182,55] unchecked generic array creation for varargs parameter of type java.util.function.Function<fr.insalyon.creatis.vip.api.model.PathProperties,?>[]
+    @SuppressWarnings("unchecked")
     private static Map<String, Function> getPathSuppliers() {
         return JsonCustomObjectMatcher.formatSuppliers(
                 Arrays.asList("path", "lastModificationDate", "isDirectory", "exists",

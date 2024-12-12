@@ -1,6 +1,10 @@
 package fr.insalyon.creatis.vip.application.server;
 
 import fr.insalyon.creatis.moteur.plugins.workflowsdb.dao.*;
+import fr.insalyon.creatis.vip.application.server.business.simulation.RestServiceEngine;
+import fr.insalyon.creatis.vip.application.server.business.simulation.SoapServiceEngine;
+import fr.insalyon.creatis.vip.application.server.business.simulation.WorkflowEngineInstantiator;
+import fr.insalyon.creatis.vip.core.server.business.Server;
 import org.hibernate.SessionFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -52,6 +56,14 @@ public class SpringApplicationConfig {
     @Bean
     public StatsDAO getStatsDAO() throws WorkflowsDBDAOException {
         return workflowsDBDAOFactory().getStatsDAO();
+    }
+
+    @Bean
+    public WorkflowEngineInstantiator getWorkflowEngineInstantiator(Server server) {
+        if (server.useRestMoteurServer()) {
+            return new RestServiceEngine(server);
+        }
+        return new SoapServiceEngine();
     }
 
 }

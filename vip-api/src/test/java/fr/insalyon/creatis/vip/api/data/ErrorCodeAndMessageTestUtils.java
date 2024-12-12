@@ -53,6 +53,7 @@ public class ErrorCodeAndMessageTestUtils {
         errorCodeAndMessageSuppliers = getErrorCodeAndMessageSuppliers();
     }
 
+    @SuppressWarnings("unchecked")
     public static Map<String,Function> getErrorCodeAndMessageSuppliers() {
         return JsonCustomObjectMatcher.formatSuppliers(
                 Arrays.asList("errorCode", "errorMessage"),

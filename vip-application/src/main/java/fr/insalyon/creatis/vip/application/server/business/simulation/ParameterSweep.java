@@ -48,6 +48,11 @@ public class ParameterSweep {
         this.values = new ArrayList<String>();
     }
 
+    public ParameterSweep(String parameterName, String value) {
+        this(parameterName);
+        addValue(value);
+    }
+
     public String getParameterName() {
         return parameterName;
     }

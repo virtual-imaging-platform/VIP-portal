@@ -31,6 +31,8 @@
  */
 package localhost.moteur_service_wsdl;
 
+import java.net.URISyntaxException;
+
 public class Moteur_ServiceLocator extends org.apache.axis.client.Service implements localhost.moteur_service_wsdl.Moteur_Service {
 
     /**
@@ -71,8 +73,10 @@ public class Moteur_ServiceLocator extends org.apache.axis.client.Service implem
     public localhost.moteur_service_wsdl.Moteur_servicePortType getmoteur_service() throws javax.xml.rpc.ServiceException {
         java.net.URL endpoint;
         try {
-            endpoint = new java.net.URL(moteur_service_address);
+            endpoint = new java.net.URI(moteur_service_address).toURL();
         } catch (java.net.MalformedURLException e) {
+            throw new javax.xml.rpc.ServiceException(e);
+        } catch (URISyntaxException e) {
             throw new javax.xml.rpc.ServiceException(e);
         }
         return getmoteur_service(endpoint);
@@ -100,7 +104,7 @@ public class Moteur_ServiceLocator extends org.apache.axis.client.Service implem
     public java.rmi.Remote getPort(Class serviceEndpointInterface) throws javax.xml.rpc.ServiceException {
         try {
             if (localhost.moteur_service_wsdl.Moteur_servicePortType.class.isAssignableFrom(serviceEndpointInterface)) {
-                localhost.moteur_service_wsdl.Moteur_BindingStub _stub = new localhost.moteur_service_wsdl.Moteur_BindingStub(new java.net.URL(moteur_service_address), this);
+                localhost.moteur_service_wsdl.Moteur_BindingStub _stub = new localhost.moteur_service_wsdl.Moteur_BindingStub(new java.net.URI(moteur_service_address).toURL(), this);
                 _stub.setPortName(getmoteur_serviceWSDDServiceName());
                 return _stub;
             }

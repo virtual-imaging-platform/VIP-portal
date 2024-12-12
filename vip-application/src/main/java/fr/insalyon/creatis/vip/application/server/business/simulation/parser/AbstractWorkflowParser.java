@@ -39,6 +39,8 @@ import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.DefaultHandler;
 import org.xml.sax.helpers.XMLReaderFactory;
 
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.SAXParserFactory;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
@@ -61,16 +63,18 @@ public abstract class AbstractWorkflowParser extends DefaultHandler {
         sources = new ArrayList<Source>();
     }
 
-    public Descriptor parse(String fileName) throws IOException, SAXException {
+    public Descriptor parse(String fileName) throws IOException, SAXException, ParserConfigurationException {
         return parse(new FileReader(fileName));
     }
 
-    public Descriptor parseString(String workflowString) throws IOException, SAXException {
+    public Descriptor parseString(String workflowString) throws IOException, SAXException, ParserConfigurationException {
         return parse(new StringReader(workflowString));
     }
 
-    private Descriptor parse(Reader workflowReader) throws IOException, SAXException {
-        reader = XMLReaderFactory.createXMLReader();
+    private Descriptor parse(Reader workflowReader) throws IOException, SAXException, ParserConfigurationException {
+        SAXParserFactory parserFactory = SAXParserFactory.newInstance();
+        parserFactory.setNamespaceAware(true);
+        reader = parserFactory.newSAXParser().getXMLReader();
         reader.setContentHandler(this);
         reader.parse(new InputSource(workflowReader));
 

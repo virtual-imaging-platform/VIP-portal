@@ -72,7 +72,7 @@ public class VipAuthenticationEntryPoint implements AuthenticationEntryPoint, Au
 
     @Override
     public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
-        // keycloak may already have set it up
+        // OIDC resource server handler may already have set this header
         if ( ! response.containsHeader("WWW-Authenticate")) {
             response.addHeader("WWW-Authenticate", "API-key");
         }

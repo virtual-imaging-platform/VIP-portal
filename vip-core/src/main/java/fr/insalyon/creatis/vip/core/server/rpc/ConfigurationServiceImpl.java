@@ -51,6 +51,8 @@ import org.slf4j.LoggerFactory;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -518,24 +520,24 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
         URL url;
         try {
             url = getBaseURL();
-        } catch (MalformedURLException e) {
+        } catch (MalformedURLException | URISyntaxException e) {
             throw new CoreException(e);
         }
         return configurationBusiness.getLoginUrlCas(url);
     }
 
-    private URL getBaseURL() throws MalformedURLException {
+    private URL getBaseURL() throws MalformedURLException, URISyntaxException {
         URL url;
         HttpServletRequest request = this.getThreadLocalRequest();
         if ((request.getServerPort() == 80)
                 || (request.getServerPort() == 443)) {
-            url = new URL(request.getScheme() + "://"
+            url = new URI(request.getScheme() + "://"
                     + request.getServerName()
-                    + request.getContextPath());
+                    + request.getContextPath()).toURL();
         } else {
-            url = new URL(request.getScheme() + "://"
+            url = new URI(request.getScheme() + "://"
                     + request.getServerName() + ":" + request.getServerPort()
-                    + request.getContextPath());
+                    + request.getContextPath()).toURL();
         }
         return url;
     }

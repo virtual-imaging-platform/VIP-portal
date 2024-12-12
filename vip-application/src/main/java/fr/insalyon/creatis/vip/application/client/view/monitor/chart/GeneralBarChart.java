@@ -135,7 +135,7 @@ public class GeneralBarChart extends AbstractChart {
                             max = localMax;
                         }
                         if (res.length > 4) {
-                            sum += new Integer(res[4]);
+                            sum += Integer.parseInt(res[4]);
                         }
                     }
                 }

@@ -46,6 +46,7 @@ import fr.insalyon.creatis.vip.application.client.bean.ResourceType;
 import fr.insalyon.creatis.vip.application.client.view.monitor.SimulationStatus;
 import fr.insalyon.creatis.vip.application.server.business.ResourceBusiness;
 import fr.insalyon.creatis.vip.application.server.business.simulation.ParameterSweep;
+import fr.insalyon.creatis.vip.application.server.business.util.FileUtil;
 import fr.insalyon.creatis.vip.core.client.bean.GroupType;
 import fr.insalyon.creatis.vip.core.integrationtest.ServerMockConfig;
 import org.hamcrest.MatcherAssert;
@@ -93,11 +94,12 @@ public class ExecutionControllerIT extends BaseWebSpringIT {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     public void shouldListExecutions() throws Exception {
-        when(workflowDAO.get(eq(simulation1.getID()))).thenReturn(w1, null);
-        when(workflowDAO.get(eq(simulation2.getID()))).thenReturn(w2, null);
+        when(workflowDAO.get(eq(simulation1.getID()))).thenReturn(w1, (Workflow) null);
+        when(workflowDAO.get(eq(simulation2.getID()))).thenReturn(w2, (Workflow) null);
         when(workflowDAO.get(Collections.singletonList(baseUser1.getFullName()), null, null, null, null, null, null))
-                .thenReturn(Arrays.asList(w1, w2), null);
+                .thenReturn(Arrays.asList(w1, w2), (List<Workflow>) null);
 
         // perform a getWorkflows()
         mockMvc.perform(
@@ -115,9 +117,10 @@ public class ExecutionControllerIT extends BaseWebSpringIT {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     public void shouldCountExecutions() throws Exception {
         when(workflowDAO.get(Collections.singletonList(baseUser1.getFullName()), null, null, null, null, null, null))
-                .thenReturn(Arrays.asList(w1, w2), null);
+                .thenReturn(Arrays.asList(w1, w2), (List<Workflow>) null);
 
         // perform a getWorkflows()
         mockMvc.perform(
@@ -324,12 +327,13 @@ public class ExecutionControllerIT extends BaseWebSpringIT {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     public void shouldGetExecution2Results() throws Exception {
         String resultPath = "/root/user/user1/path/to/result.res";
 
-        when(workflowDAO.get(eq(simulation2.getID()))).thenReturn(w2, null);
+        when(workflowDAO.get(eq(simulation2.getID()))).thenReturn(w2, (Workflow) null);
         Output output = new Output(new OutputID("workflowID", resultPath, "processor"), DataType.URI, "port");
-        when(outputDAO.get(eq(simulation2.getID()))).thenReturn(Arrays.asList(output), null);
+        when(outputDAO.get(eq(simulation2.getID()))).thenReturn(Arrays.asList(output), (List<Output>) null);
 
         Mockito.when(server.getDataManagerUsersHome()).thenReturn("/root/user");
         Mockito.when(gridaClient.exist(resultPath)).thenReturn(true);
@@ -356,14 +360,15 @@ public class ExecutionControllerIT extends BaseWebSpringIT {
                         put("/rest/executions/" + simulation2.getID() + "/kill").with(baseUser1()))
                 .andDo(print());
 
-        verify(webServiceEngine).kill(simulation2.getID());
+        verify(webServiceEngine).kill(w2.getEngine(), simulation2.getID());
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     public void testInitGwendiaExecution() throws Exception
     {
         String appName = "test application", groupName = "testGroup", versionName = "4.2";
-        String engineName = "testEngine", engineEndpoint = "endpoint", worflowId = "test-workflow-id";
+        String engineEndpoint = "engineURL", workflowId = "test-workflow-id";
         Date startDate = new Date();
 
         configureGwendiaTestApp(appName, groupName, versionName);
@@ -371,24 +376,22 @@ public class ExecutionControllerIT extends BaseWebSpringIT {
         createGroup("testResources", GroupType.RESOURCE);
         createUserInGroups(baseUser1.getEmail(), "", groupName, "testResources");
 
-        ArgumentCaptor<File> workflowFile = ArgumentCaptor.forClass(File.class);
-        ArgumentCaptor<List<ParameterSweep>> inputsCaptor = ArgumentCaptor.forClass(List.class);
+        ArgumentCaptor<String> inputsCaptor = ArgumentCaptor.forClass(String.class);
+        ArgumentCaptor<String> workflowContentCaptor = ArgumentCaptor.forClass(String.class);
         ArgumentCaptor<Workflow> workflowCaptor = ArgumentCaptor.forClass(Workflow.class);
 
         Mockito.when(server.getVoName()).thenReturn("test-vo-name");
         Mockito.when(server.getServerProxy("test-vo-name")).thenReturn("/path/to/proxy");
-        Mockito.when(getWebServiceEngine().launch("/path/to/proxy", null)).thenReturn("full-test-workflow-id", (String) null);
-        Mockito.when(getWebServiceEngine().getSimulationId("full-test-workflow-id")).thenReturn(worflowId, (String) null);
-        Mockito.when(getWebServiceEngine().getStatus(worflowId)).thenReturn(SimulationStatus.Running, (SimulationStatus) null);
-        Mockito.when(getWebServiceEngine().getAddressWS()).thenReturn(engineEndpoint, (String) null);
+        Mockito.when(getWebServiceEngine().launch(eq(engineEndpoint), workflowContentCaptor.capture(), inputsCaptor.capture(), eq(""), eq("/path/to/proxy"))).thenReturn(workflowId, (String) null);
+        Mockito.when(getWebServiceEngine().getStatus(engineEndpoint, workflowId)).thenReturn(SimulationStatus.Running, (SimulationStatus) null);
 
-        Workflow w = new Workflow(worflowId, baseUser1.getFullName(), WorkflowStatus.Running, startDate, null, "Exec test 1", appName, versionName, "", engineName, null);
-        when(workflowDAO.get(worflowId)).thenReturn(w, (Workflow) null);
+        Workflow w = new Workflow(workflowId, baseUser1.getFullName(), WorkflowStatus.Running, startDate, null, "Exec test 1", appName, versionName, "", engineEndpoint, null);
+        when(workflowDAO.get(workflowId)).thenReturn(w, (Workflow) null);
 
-        Execution expectedExecution = new Execution(worflowId, "Exec test 1", appName + "/" + versionName, 0, ExecutionStatus.RUNNING, null, null, startDate.getTime(), null, null);
+        Execution expectedExecution = new Execution(workflowId, "Exec test 1", appName + "/" + versionName, 0, ExecutionStatus.RUNNING, null, null, startDate.getTime(), null, null);
         expectedExecution.clearReturnedFiles();
 
-        setUpResourceAndEngine(appName, versionName);
+        setUpResourceAndEngine(appName, versionName, engineEndpoint);
 
         mockMvc.perform(
                         post("/rest/executions").contentType("application/json")
@@ -402,32 +405,25 @@ public class ExecutionControllerIT extends BaseWebSpringIT {
                 ));
 
         // verify workflow path
-        Mockito.verify(getWebServiceEngine()).setWorkflow(workflowFile.capture());
-        Assertions.assertEquals(getGwendiaTestFile().getAbsolutePath(), workflowFile.getValue().getAbsolutePath());
+        Assertions.assertEquals(FileUtil.read(getGwendiaTestFile()), workflowContentCaptor.getValue());
 
         // verify inputs
-        Mockito.verify(getWebServiceEngine()).setInput(inputsCaptor.capture());
-        List<ParameterSweep> inputs = inputsCaptor.getValue();
-        Assertions.assertEquals(5, inputs.size());
-        MatcherAssert.assertThat(inputs, Matchers.containsInAnyOrder(
-                both(hasProperty("parameterName", is("testFileInput"))).
-                        and(hasProperty("values",  Matchers.contains(ServerMockConfig.TEST_USERS_ROOT + "/" +  baseUser1.getFolder() + "/path/to/input.in"))),
-                both(hasProperty("parameterName", is("testTextInput"))).
-                        and(hasProperty("values",  Matchers.contains("best test text value"))),
-                both(hasProperty("parameterName", is("results-directory"))).
-                        and(hasProperty("values",  Matchers.contains(ServerMockConfig.TEST_USERS_ROOT + "/" +  baseUser1.getFolder()))),
-                both(hasProperty("parameterName", is("testOptionalTextInput"))).
-                        and(hasProperty("values",  Matchers.contains("No_value_provided"))),
-                both(hasProperty("parameterName", is("testFlagInput"))).
-                        and(hasProperty("values",  Matchers.contains("false")))
-        ));
+        String inputs = inputsCaptor.getValue();
+        List<ParameterSweep> expectedParams = new ArrayList<>();
+        expectedParams.add(new ParameterSweep("testFileInput", ServerMockConfig.TEST_USERS_ROOT + "/" +  baseUser1.getFolder() + "/path/to/input.in"));
+        expectedParams.add(new ParameterSweep("testTextInput", "best test text value"));
+        expectedParams.add(new ParameterSweep("testFlagInput", "false"));
+        expectedParams.add(new ParameterSweep("results-directory", ServerMockConfig.TEST_USERS_ROOT + "/" +  baseUser1.getFolder()));
+        expectedParams.add(new ParameterSweep("testOptionalTextInput", "No_value_provided"));
+        String expectedInputs = workflowExecutionBusiness.getParametersAsXMLInput(expectedParams);
+        Assertions.assertEquals(expectedInputs, inputs);
 
         // verify created workflow
         Mockito.verify(workflowDAO).add(workflowCaptor.capture());
         Workflow workflow = workflowCaptor.getValue();
         Assertions.assertEquals(appName, workflow.getApplication());
         Assertions.assertEquals(versionName, workflow.getApplicationVersion());
-        Assertions.assertEquals(worflowId, workflow.getId());
+        Assertions.assertEquals(workflowId, workflow.getId());
         Assertions.assertEquals(WorkflowStatus.Running, workflow.getStatus());
         Assertions.assertEquals("Exec test 1", workflow.getDescription());
         Assertions.assertEquals(engineEndpoint, workflow.getEngine());
@@ -440,10 +436,11 @@ public class ExecutionControllerIT extends BaseWebSpringIT {
 
     // the difference (at the moment) is that with moteurLite the optional and absent parameters are not included
     @Test
+    @SuppressWarnings("unchecked")
     public void testInitBoutiquesExecution() throws Exception
     {
         String appName = "test application", groupName = "testGroup", versionName = "4.2";
-        String engineName = "testEngine", engineEndpoint = "endpoint", worflowId = "test-workflow-id";
+        String engineEndpoint = "endpoint", workflowId = "test-workflow-id";
         Date startDate = new Date();
 
         configureBoutiquesTestApp(appName, groupName, versionName);
@@ -451,25 +448,23 @@ public class ExecutionControllerIT extends BaseWebSpringIT {
         createGroup("testResources", GroupType.RESOURCE);
         createUserInGroups(baseUser1.getEmail(), "", groupName, "testResources");
 
-        ArgumentCaptor<File> workflowFile = ArgumentCaptor.forClass(File.class);
-        ArgumentCaptor<List<ParameterSweep>> inputsCaptor = ArgumentCaptor.forClass(List.class);
+        ArgumentCaptor<String> inputsCaptor = ArgumentCaptor.forClass(String.class);
+        ArgumentCaptor<String> workflowContentCaptor = ArgumentCaptor.forClass(String.class);
         ArgumentCaptor<Workflow> workflowCaptor = ArgumentCaptor.forClass(Workflow.class);
 
         Mockito.when(server.useMoteurlite()).thenReturn(true);
         Mockito.when(server.getVoName()).thenReturn("test-vo-name");
         Mockito.when(server.getServerProxy("test-vo-name")).thenReturn("/path/to/proxy");
-        Mockito.when(getWebServiceEngine().launch("/path/to/proxy", null)).thenReturn("full-test-workflow-id", (String) null);
-        Mockito.when(getWebServiceEngine().getSimulationId("full-test-workflow-id")).thenReturn(worflowId, (String) null);
-        Mockito.when(getWebServiceEngine().getStatus(worflowId)).thenReturn(SimulationStatus.Running, (SimulationStatus) null);
-        Mockito.when(getWebServiceEngine().getAddressWS()).thenReturn(engineEndpoint, (String) null);
+        Mockito.when(getWebServiceEngine().launch(eq(engineEndpoint), workflowContentCaptor.capture(), inputsCaptor.capture(), eq(""), eq("/path/to/proxy"))).thenReturn(workflowId, (String) null);
+        Mockito.when(getWebServiceEngine().getStatus(engineEndpoint, workflowId)).thenReturn(SimulationStatus.Running, (SimulationStatus) null);
 
-        Workflow w = new Workflow(worflowId, baseUser1.getFullName(), WorkflowStatus.Running, startDate, null, "Exec test 1", appName, versionName, "", engineName, null);
-        when(workflowDAO.get(worflowId)).thenReturn(w, (Workflow) null);
+        Workflow w = new Workflow(workflowId, baseUser1.getFullName(), WorkflowStatus.Running, startDate, null, "Exec test 1", appName, versionName, "", engineEndpoint, null);
+        when(workflowDAO.get(workflowId)).thenReturn(w, (Workflow) null);
 
-        Execution expectedExecution = new Execution(worflowId, "Exec test 1", appName + "/" + versionName, 0, ExecutionStatus.RUNNING, null, null, startDate.getTime(), null, null);
+        Execution expectedExecution = new Execution(workflowId, "Exec test 1", appName + "/" + versionName, 0, ExecutionStatus.RUNNING, null, null, startDate.getTime(), null, null);
         expectedExecution.clearReturnedFiles();
 
-        setUpResourceAndEngine(appName, versionName);
+        setUpResourceAndEngine(appName, versionName, engineEndpoint);
 
         mockMvc.perform(
                         post("/rest/executions").contentType("application/json")
@@ -483,30 +478,24 @@ public class ExecutionControllerIT extends BaseWebSpringIT {
                 ));
 
         // verify workflow path
-        Mockito.verify(getWebServiceEngine()).setWorkflow(workflowFile.capture());
-        Assertions.assertEquals(getBoutiquesTestFile().getAbsolutePath(), workflowFile.getValue().getAbsolutePath());
+        Assertions.assertEquals(FileUtil.read(getBoutiquesTestFile()), workflowContentCaptor.getValue());
 
-        // verify inputs
-        Mockito.verify(getWebServiceEngine()).setInput(inputsCaptor.capture());
-        List<ParameterSweep> inputs = inputsCaptor.getValue();
-        Assertions.assertEquals(4, inputs.size());
-        MatcherAssert.assertThat(inputs, Matchers.containsInAnyOrder(
-                both(hasProperty("parameterName", is("testFileInput"))).
-                        and(hasProperty("values",  Matchers.contains(ServerMockConfig.TEST_USERS_ROOT + "/" +  baseUser1.getFolder() + "/path/to/input.in"))),
-                both(hasProperty("parameterName", is("testTextInput"))).
-                        and(hasProperty("values",  Matchers.contains("best test text value"))),
-                both(hasProperty("parameterName", is("results-directory"))).
-                        and(hasProperty("values",  Matchers.contains(ServerMockConfig.TEST_USERS_ROOT + "/" +  baseUser1.getFolder()))),
-                both(hasProperty("parameterName", is("testFlagInput"))).
-                        and(hasProperty("values",  Matchers.contains("false")))
-        ));
+        // verify inputs / same as gwendia without optional one
+        String inputs = inputsCaptor.getValue();
+        List<ParameterSweep> expectedParams = new ArrayList<>();
+        expectedParams.add(new ParameterSweep("testFileInput", ServerMockConfig.TEST_USERS_ROOT + "/" +  baseUser1.getFolder() + "/path/to/input.in"));
+        expectedParams.add(new ParameterSweep("testTextInput", "best test text value"));
+        expectedParams.add(new ParameterSweep("testFlagInput", "false"));
+        expectedParams.add(new ParameterSweep("results-directory", ServerMockConfig.TEST_USERS_ROOT + "/" +  baseUser1.getFolder()));
+        String expectedInputs = workflowExecutionBusiness.getParametersAsXMLInput(expectedParams);
+        Assertions.assertEquals(expectedInputs, inputs);
 
         // verify created workflow
         Mockito.verify(workflowDAO).add(workflowCaptor.capture());
         Workflow workflow = workflowCaptor.getValue();
         Assertions.assertEquals(appName, workflow.getApplication());
         Assertions.assertEquals(versionName, workflow.getApplicationVersion());
-        Assertions.assertEquals(worflowId, workflow.getId());
+        Assertions.assertEquals(workflowId, workflow.getId());
         Assertions.assertEquals(WorkflowStatus.Running, workflow.getStatus());
         Assertions.assertEquals("Exec test 1", workflow.getDescription());
         Assertions.assertEquals(engineEndpoint, workflow.getEngine());
@@ -517,8 +506,8 @@ public class ExecutionControllerIT extends BaseWebSpringIT {
 
     }
 
-    public void setUpResourceAndEngine(String appName, String version) throws Exception {
-        Engine engine = new Engine("testEngine", "bla", "enabled");
+    public void setUpResourceAndEngine(String appName, String version, String endpoint) throws Exception {
+        Engine engine = new Engine("testEngine", endpoint, "enabled");
         Resource resource = new Resource(
             "testResource", 
             true, 

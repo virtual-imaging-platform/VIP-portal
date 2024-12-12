@@ -8,7 +8,7 @@ import fr.insalyon.creatis.vip.application.client.bean.Application;
 import fr.insalyon.creatis.vip.application.server.business.AppVersionBusiness;
 import fr.insalyon.creatis.vip.application.server.business.ApplicationBusiness;
 import fr.insalyon.creatis.vip.application.server.business.EngineBusiness;
-import fr.insalyon.creatis.vip.application.server.business.simulation.WebServiceEngine;
+import fr.insalyon.creatis.vip.application.server.business.simulation.WorkflowEngineInstantiator;
 import fr.insalyon.creatis.vip.core.client.bean.Group;
 import fr.insalyon.creatis.vip.core.integrationtest.database.BaseSpringIT;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
@@ -22,10 +22,10 @@ public class BaseApplicationSpringIT extends BaseSpringIT {
     @Autowired protected WorkflowDAO workflowDAO;
     @Autowired protected OutputDAO outputDAO;
     @Autowired protected InputDAO inputDAO;
-    @Autowired protected WebServiceEngine webServiceEngine;
     @Autowired protected ApplicationBusiness applicationBusiness;
     @Autowired protected EngineBusiness engineBusiness;
     @Autowired protected AppVersionBusiness appVersionBusiness;
+    @Autowired protected WorkflowEngineInstantiator webServiceEngine;
 
     @BeforeEach
     protected void setUp() throws Exception {
@@ -48,7 +48,7 @@ public class BaseApplicationSpringIT extends BaseSpringIT {
         return appVersionBusiness;
     }
 
-    public WebServiceEngine getWebServiceEngine() {
+    public WorkflowEngineInstantiator getWebServiceEngine() {
         return webServiceEngine;
     }
 
