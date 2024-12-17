@@ -114,7 +114,7 @@ public class ResourceData extends JdbcDaoSupport implements ResourceDAO {
         String query = "SELECT * FROM VIPResources r "
         +              "JOIN VIPGroupsResources gr ON r.name = gr.resourcename "
         +              "JOIN VIPUsersGroups ug ON gr.groupname = ug.groupname "
-        +              "WHERE ug.email = ?";
+        +              "WHERE ug.email = ? ORDER BY name";
 
         try (PreparedStatement ps = getConnection().prepareStatement(query)) {
             ps.setString(1, user.getEmail());
@@ -137,7 +137,7 @@ public class ResourceData extends JdbcDaoSupport implements ResourceDAO {
     public List<Resource> getByEngine(Engine engine) throws DAOException {
         String query = "SELECT * FROM VIPResources r "
         +              "JOIN VIPResourcesEngines re ON r.name = re.resourcename "
-        +              "WHERE re.enginename = ?";
+        +              "WHERE re.enginename = ? ORDER BY name";
 
         try (PreparedStatement ps = getConnection().prepareStatement(query)) {
             ps.setString(1, engine.getName());
@@ -160,7 +160,8 @@ public class ResourceData extends JdbcDaoSupport implements ResourceDAO {
     public List<Resource> getByAppVersion(AppVersion appVersion) throws DAOException {
         String query = "SELECT * FROM VIPResources r "
         +              "JOIN VIPResourcesAppVersions rav ON r.name = rav.resourcename "
-        +              "WHERE rav.application = ? AND rav.version = ?";
+        +              "WHERE rav.application = ? AND rav.version = ? "
+        +              "ORDER BY name";
 
         try (PreparedStatement ps = getConnection().prepareStatement(query)) {
             ps.setString(1, appVersion.getApplicationName());
@@ -186,7 +187,7 @@ public class ResourceData extends JdbcDaoSupport implements ResourceDAO {
     public List<Resource> getByGroup(Group group) throws DAOException {
         String query = "SELECT * FROM VIPResources r "
         +              "JOIN VIPGroupsResources gr ON r.name = gr.resourcename "
-        +              "WHERE gr.groupname = ?";
+        +              "WHERE gr.groupname = ? ORDER BY name";
 
         try (PreparedStatement ps = getConnection().prepareStatement(query)) {
             ps.setString(1, group.getName());
