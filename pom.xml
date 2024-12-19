@@ -54,7 +54,7 @@ knowledge of the CeCILL-B license and that you accept its terms.
 
 
         <!-- VIP related dependencies version -->
-        <moteur2-workflowsdb-common.version>1.7.0</moteur2-workflowsdb-common.version>
+        <moteur2-workflowsdb-common.version>1.8.0-SNAPSHOT</moteur2-workflowsdb-common.version>
         <grida.version>2.2.0</grida.version>
         <sma.version>0.3.0</sma.version>
 
@@ -64,7 +64,7 @@ knowledge of the CeCILL-B license and that you accept its terms.
         <springsecurity.version>6.3.4</springsecurity.version>
         <springoauth.version>6.3.4</springoauth.version>
         <jackson.version>2.18.0</jackson.version>
-        <h2database.version>1.3.173</h2database.version>
+        <h2database.version>1.4.196</h2database.version>
     </properties>
 
     <description>VIP</description>

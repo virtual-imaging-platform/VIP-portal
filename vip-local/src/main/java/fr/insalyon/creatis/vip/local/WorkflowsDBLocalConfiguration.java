@@ -4,12 +4,9 @@ import fr.insalyon.creatis.moteur.plugins.workflowsdb.bean.*;
 import fr.insalyon.creatis.moteur.plugins.workflowsdb.dao.*;
 import fr.insalyon.creatis.moteur.plugins.workflowsdb.hibernate.*;
 import org.hibernate.SessionFactory;
+import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.dialect.H2Dialect;
-import org.hibernate.internal.SessionFactoryImpl;
 import org.hibernate.service.ServiceRegistry;
-import org.hibernate.service.ServiceRegistryBuilder;
-import org.hibernate.service.jdbc.connections.internal.DriverManagerConnectionProviderImpl;
-import org.hibernate.service.jdbc.connections.spi.ConnectionProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.BeanInitializationException;
@@ -41,12 +38,12 @@ public class WorkflowsDBLocalConfiguration {
     public void closeWorkflowsDB() {
         logger.info("closing workflowsdb. Already closed : {}", workflowsDbSessionFactory.isClosed());
         // close connection pool to close connections and h2 database
-        if(workflowsDbSessionFactory instanceof SessionFactoryImpl) {
-            SessionFactoryImpl sf = (SessionFactoryImpl)workflowsDbSessionFactory;
-            ConnectionProvider conn = sf.getConnectionProvider();
-            logger.info("ConnectionProvider : {}", conn);
-            ((DriverManagerConnectionProviderImpl) conn).stop();
-        }
+        // if(workflowsDbSessionFactory instanceof SessionFactoryImpl) {
+        //     SessionFactoryImpl sf = (SessionFactoryImpl) workflowsDbSessionFactory;
+        //     ConnectionProvider conn = sf.getConnectionProvider();
+        //     logger.info("ConnectionProvider : {}", conn);
+        //     ((DriverManagerConnectionProviderImpl) conn).stop();
+        // }
         workflowsDbSessionFactory.close();
         logger.info("workflowsdb closed ");
     }
@@ -76,7 +73,7 @@ public class WorkflowsDBLocalConfiguration {
             cfg.addAnnotatedClass(Output.class);
             cfg.addAnnotatedClass(OutputID.class);
             cfg.addAnnotatedClass(Stats.class);
-            ServiceRegistry serviceRegistry = (new ServiceRegistryBuilder()).applySettings(cfg.getProperties()).buildServiceRegistry();
+            ServiceRegistry serviceRegistry = (new StandardServiceRegistryBuilder()).applySettings(cfg.getProperties()).build();
             workflowsDbSessionFactory = cfg.buildSessionFactory(serviceRegistry);
             return workflowsDbSessionFactory;
         } catch (Exception e) {
