@@ -1,0 +1,603 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../jacoco-resources/report.gif" type="image/gif"/><title>DataApiBusiness.java</title><link rel="stylesheet" href="../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../index.html" class="el_report">coverage</a> &gt; <a href="../index.html" class="el_bundle">vip-api</a> &gt; <a href="index.source.html" class="el_package">fr.insalyon.creatis.vip.api.business</a> &gt; <span class="el_source">DataApiBusiness.java</span></div><h1>DataApiBusiness.java</h1><pre class="source lang-java linenums">/*
+ * Copyright and authors: see LICENSE.txt in base repository.
+ *
+ * This software is a web portal for pipeline execution on distributed systems.
+ *
+ * This software is governed by the CeCILL-B license under French law and
+ * abiding by the rules of distribution of free software.  You can  use,
+ * modify and/ or redistribute the software under the terms of the CeCILL-B
+ * license as circulated by CEA, CNRS and INRIA at the following URL
+ * &quot;http://www.cecill.info&quot;.
+ *
+ * As a counterpart to the access to the source code and  rights to copy,
+ * modify and redistribute granted by the license, users are provided only
+ * with a limited warranty  and the software's author,  the holder of the
+ * economic rights,  and the successive licensors  have only  limited
+ * liability.
+ *
+ * In this respect, the user's attention is drawn to the risks associated
+ * with loading,  using,  modifying and/or developing or reproducing the
+ * software by the user in light of its specific status of free software,
+ * that may mean  that it is complicated to manipulate,  and  that  also
+ * therefore means  that it is reserved for developers  and  experienced
+ * professionals having in-depth computer knowledge. Users are therefore
+ * encouraged to load and test the software's suitability as regards their
+ * requirements in conditions enabling the security of their systems and/or
+ * data to be ensured and,  more generally, to use and operate it in the
+ * same conditions as regards security.
+ *
+ * The fact that you are presently reading this means that you have had
+ * knowledge of the CeCILL-B license and that you accept its terms.
+ */
+package fr.insalyon.creatis.vip.api.business;
+
+import fr.insalyon.creatis.vip.api.CarminProperties;
+import fr.insalyon.creatis.vip.api.exception.ApiException;
+import fr.insalyon.creatis.vip.api.exception.ApiException.ApiError;
+import fr.insalyon.creatis.vip.api.model.PathProperties;
+import fr.insalyon.creatis.vip.api.model.UploadData;
+import fr.insalyon.creatis.vip.api.model.UploadDataType;
+import fr.insalyon.creatis.vip.core.client.bean.Group;
+import fr.insalyon.creatis.vip.core.client.bean.User;
+import fr.insalyon.creatis.vip.core.server.business.BusinessException;
+import fr.insalyon.creatis.vip.core.server.business.Server;
+import fr.insalyon.creatis.vip.datamanager.client.bean.Data;
+import fr.insalyon.creatis.vip.datamanager.client.bean.Data.Type;
+import fr.insalyon.creatis.vip.datamanager.client.bean.PoolOperation;
+import fr.insalyon.creatis.vip.datamanager.server.DataManagerUtil;
+import fr.insalyon.creatis.vip.datamanager.server.business.DataManagerBusiness;
+import fr.insalyon.creatis.vip.datamanager.server.business.LFCBusiness;
+import fr.insalyon.creatis.vip.datamanager.server.business.LFCPermissionBusiness;
+import fr.insalyon.creatis.vip.datamanager.server.business.LFCPermissionBusiness.LFCAccessType;
+import fr.insalyon.creatis.vip.datamanager.server.business.TransferPoolBusiness;
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.input.ReaderInputStream;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
+import org.springframework.stereotype.Service;
+
+import javax.annotation.PreDestroy;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Base64;
+import java.util.List;
+import java.util.Locale;
+import java.util.concurrent.*;
+import java.util.function.Supplier;
+
+import static fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants.*;
+
+
+/**
+ * Created by abonnet on 1/18/17.
+ *
+ */
+@Service
+public class DataApiBusiness {
+
+<span class="fc" id="L86">    private final Logger logger = LoggerFactory.getLogger(getClass());</span>
+
+    private final Environment env;
+    private final Supplier&lt;User&gt; currentUserProvider;
+
+    private final LFCBusiness lfcBusiness;
+    private final TransferPoolBusiness transferPoolBusiness;
+    private final LFCPermissionBusiness lfcPermissionBusiness;
+    private final DataManagerBusiness dataManagerBusiness;
+
+    private final ScheduledExecutorService scheduler;
+
+    @Autowired
+    public DataApiBusiness(
+            Environment env, Supplier&lt;User&gt; currentUserProvider,
+            LFCBusiness lfcBusiness, TransferPoolBusiness transferPoolBusiness,
+            LFCPermissionBusiness lfcPermissionBusiness,
+<span class="fc" id="L103">            DataManagerBusiness dataManagerBusiness, Server server) {</span>
+<span class="fc" id="L104">        this.env = env;</span>
+<span class="fc" id="L105">        this.currentUserProvider = currentUserProvider;</span>
+<span class="fc" id="L106">        this.lfcBusiness = lfcBusiness;</span>
+<span class="fc" id="L107">        this.transferPoolBusiness = transferPoolBusiness;</span>
+<span class="fc" id="L108">        this.lfcPermissionBusiness = lfcPermissionBusiness;</span>
+<span class="fc" id="L109">        this.dataManagerBusiness = dataManagerBusiness;</span>
+<span class="fc" id="L110">        int parallelDownloadsNb = server.getApiParallelDownloadNb();</span>
+<span class="fc" id="L111">        logger.info(&quot;Starting threads for {} parallel downloads&quot;, parallelDownloadsNb);</span>
+        // 2 threads are needed for every download
+<span class="fc" id="L113">        this.scheduler = Executors.newScheduledThreadPool(2 * parallelDownloadsNb);</span>
+<span class="fc" id="L114">    }</span>
+
+    @PreDestroy
+    public void close() {
+<span class="fc" id="L118">        logger.info(&quot;shutting down download threads&quot;);</span>
+<span class="fc" id="L119">        scheduler.shutdown();</span>
+        try {
+<span class="pc bpc" id="L121" title="1 of 2 branches missed.">            if (!scheduler.awaitTermination(800, TimeUnit.MILLISECONDS)) {</span>
+<span class="nc" id="L122">                logger.info(&quot;Forcing download threads shutdown&quot;);</span>
+<span class="nc" id="L123">                scheduler.shutdownNow();</span>
+            }
+<span class="nc" id="L125">        } catch (InterruptedException e) {</span>
+<span class="nc" id="L126">            scheduler.shutdownNow();</span>
+<span class="fc" id="L127">        }</span>
+<span class="fc" id="L128">        logger.info(&quot;download threads succesfully shutdown&quot;);</span>
+<span class="fc" id="L129">    }</span>
+
+    public boolean doesFileExist(String path) throws ApiException {
+<span class="nc" id="L132">        checkReadPermission(path);</span>
+<span class="nc bnc" id="L133" title="All 4 branches missed.">        return path.equals(ROOT) || baseDoesFileExist(path);</span>
+    }
+
+    public void deletePath(String path) throws ApiException {
+<span class="nc" id="L137">        checkPermission(path, LFCAccessType.DELETE);</span>
+<span class="nc bnc" id="L138" title="All 2 branches missed.">        if (!baseDoesFileExist(path)) {</span>
+<span class="nc" id="L139">            logger.error(&quot;trying to delete a non-existing file : {}&quot;, path);</span>
+<span class="nc" id="L140">            throw new ApiException(&quot;trying to delete a non-existing dile&quot;);</span>
+        }
+<span class="nc" id="L142">        baseDeletePath(path);</span>
+<span class="nc" id="L143">    }</span>
+
+    public PathProperties getPathProperties(String path ) throws ApiException {
+<span class="fc" id="L146">        checkReadPermission(path);</span>
+<span class="pc bpc" id="L147" title="1 of 2 branches missed.">        if (path.equals(ROOT)) {</span>
+<span class="nc" id="L148">            return getRootPathProperties();</span>
+        }
+<span class="fc" id="L150">        PathProperties pathProperties = new PathProperties();</span>
+<span class="fc" id="L151">        pathProperties.setPath(path);</span>
+<span class="pc bpc" id="L152" title="1 of 2 branches missed.">        if (!baseDoesFileExist(path)) {</span>
+<span class="nc" id="L153">            pathProperties.setExists(false);</span>
+<span class="nc" id="L154">            return pathProperties;</span>
+        }
+<span class="fc" id="L156">        pathProperties.setExists(true);</span>
+<span class="fc" id="L157">        List&lt;Data&gt; fileData = baseGetFileData(path);</span>
+<span class="pc bpc" id="L158" title="1 of 2 branches missed.">        if (doesPathCorrespondsToAFile(path, fileData)) {</span>
+            // this is a file, not a directory
+<span class="fc" id="L160">            Data fileInfo = fileData.get(0);</span>
+<span class="fc" id="L161">            pathProperties.setIsDirectory(false);</span>
+<span class="fc" id="L162">            pathProperties.setSize(fileInfo.getLength());</span>
+<span class="fc" id="L163">            pathProperties.setLastModificationDate(</span>
+<span class="fc" id="L164">                    getTimeStampFromGridaFormatDate(fileInfo.getModificationDate()));</span>
+<span class="fc" id="L165">            pathProperties.setMimeType(getMimeType(path));</span>
+<span class="fc" id="L166">        } else {</span>
+            // its a directory
+<span class="nc" id="L168">            pathProperties.setIsDirectory(true);</span>
+<span class="nc" id="L169">            pathProperties.setSize((long) fileData.size());</span>
+<span class="nc" id="L170">            pathProperties.setLastModificationDate(</span>
+<span class="nc" id="L171">                baseGetFileModificationDate(path) / 1000);</span>
+<span class="nc" id="L172">            pathProperties.setMimeType(env.getProperty(CarminProperties.API_DIRECTORY_MIME_TYPE));</span>
+        }
+<span class="fc" id="L174">        return pathProperties;</span>
+    }
+
+    public List&lt;PathProperties&gt; listDirectory(String path) throws ApiException {
+<span class="nc" id="L178">        checkReadPermission(path);</span>
+<span class="nc bnc" id="L179" title="All 2 branches missed.">        if (path.equals(ROOT)) {</span>
+<span class="nc" id="L180">            return getRootSubDirectoriesPathProps();</span>
+        }
+<span class="nc" id="L182">        List&lt;Data&gt; directoryData = baseGetFileData(path);</span>
+<span class="nc bnc" id="L183" title="All 2 branches missed.">        if (doesPathCorrespondsToAFile(path, directoryData)) {</span>
+<span class="nc" id="L184">            logger.error(&quot;Trying to list {} , but is a file :&quot;, path);</span>
+<span class="nc" id="L185">            throw new ApiException(&quot;Error listing a directory&quot;);</span>
+        }
+<span class="nc" id="L187">        List&lt;PathProperties&gt; res = new ArrayList&lt;&gt;();</span>
+<span class="nc bnc" id="L188" title="All 2 branches missed.">        for (Data fileData : directoryData) {</span>
+<span class="nc" id="L189">            res.add(buildPathFromLfcData(path, fileData));</span>
+<span class="nc" id="L190">        }</span>
+<span class="nc" id="L191">        return res;</span>
+    }
+
+    public File getFile(String path) throws ApiException {
+<span class="nc" id="L195">        checkDownloadPermission(path);</span>
+<span class="nc" id="L196">        String downloadOperationId =</span>
+<span class="nc" id="L197">            downloadFileToLocalStorage(path);</span>
+<span class="nc" id="L198">        return getDownloadFile(downloadOperationId);</span>
+    }
+
+    public void uploadRawFileFromInputStream(String lfcPath, InputStream is)
+            throws ApiException {
+        // TODO : check upload size ?
+<span class="nc" id="L204">        checkPermission(lfcPath, LFCAccessType.UPLOAD);</span>
+<span class="nc" id="L205">        java.nio.file.Path javaPath = Paths.get(lfcPath);</span>
+<span class="nc" id="L206">        String parentLfcPath = javaPath.getParent().toString();</span>
+        // check if parent dir exists
+<span class="nc bnc" id="L208" title="All 2 branches missed.">        if (!baseDoesFileExist(parentLfcPath)) {</span>
+<span class="nc" id="L209">            logger.error(&quot;parent directory of upload {} does not exist :&quot;, lfcPath);</span>
+<span class="nc" id="L210">            throw new ApiException(&quot;Upload Directory doest not exist&quot;);</span>
+        }
+        // TODO : check if it already exists
+        // TODO : support archive upload
+<span class="nc" id="L214">        String uploadDirectory = dataManagerBusiness.getUploadRootDirectory(false);</span>
+        // get file name and clean it as in an upload
+<span class="nc" id="L216">        String fileName = DataManagerUtil.getCleanFilename(</span>
+<span class="nc" id="L217">                Paths.get(lfcPath).getFileName().toString() );</span>
+<span class="nc" id="L218">        String localPath = uploadDirectory + fileName;</span>
+<span class="nc" id="L219">        logger.debug(&quot;storing upload file in :&quot; + localPath);</span>
+<span class="nc" id="L220">        boolean isFileEmpty = saveInputStreamToFile(is, localPath);</span>
+<span class="nc bnc" id="L221" title="All 2 branches missed.">        if (isFileEmpty) {</span>
+<span class="nc" id="L222">            logger.info(&quot;no content in upload, creating dir : &quot; + parentLfcPath + &quot;/&quot; + fileName);</span>
+<span class="nc" id="L223">            baseMkdir(parentLfcPath, fileName);</span>
+        } else {
+<span class="nc" id="L225">            String opId = baseUploadFile(localPath, parentLfcPath);</span>
+            // wait for it to be over
+<span class="nc" id="L227">            waitForOperationOrTimeout(opId);</span>
+        }
+<span class="nc" id="L229">    }</span>
+
+    public void uploadCustomData(String lfcPath, UploadData uploadData)
+            throws ApiException {
+        // TODO : check upload size ?
+        // TODO : factorize with previous method
+<span class="nc" id="L235">        checkPermission(lfcPath, LFCAccessType.UPLOAD);</span>
+<span class="nc" id="L236">        java.nio.file.Path javaPath = Paths.get(lfcPath);</span>
+<span class="nc" id="L237">        String parentLfcPath = javaPath.getParent().toString();</span>
+        // check if parent dir exists
+<span class="nc bnc" id="L239" title="All 2 branches missed.">        if (!baseDoesFileExist(parentLfcPath)) {</span>
+<span class="nc" id="L240">            logger.error(&quot;parent directory of {} does not exist :&quot;, lfcPath);</span>
+<span class="nc" id="L241">            throw new ApiException(&quot;Upload Directory doest not exist&quot;);</span>
+        }
+<span class="nc bnc" id="L243" title="All 2 branches missed.">        if (uploadData.getType().equals(UploadDataType.ARCHIVE)) {</span>
+<span class="nc" id="L244">            logger.error(&quot;archive upload not supported yet for ({})&quot;, lfcPath);</span>
+<span class="nc" id="L245">            throw new ApiException(&quot;archive upload not supported yet&quot;);</span>
+        }
+        // TODO : check if it already exists
+        // TODO : support archive upload
+<span class="nc" id="L249">        String uploadDirectory = dataManagerBusiness.getUploadRootDirectory(false);</span>
+        // get file name and clean it as in an upload
+<span class="nc" id="L251">        String fileName = DataManagerUtil.getCleanFilename(</span>
+<span class="nc" id="L252">                Paths.get(lfcPath).getFileName().toString() );</span>
+<span class="nc" id="L253">        String localPath = uploadDirectory + fileName;</span>
+<span class="nc" id="L254">        logger.debug(&quot;storing upload file in :&quot; + localPath);</span>
+<span class="nc" id="L255">        writeFileFromBase64(uploadData.getBase64Content(), localPath);</span>
+<span class="nc" id="L256">        String opId = baseUploadFile(localPath, parentLfcPath);</span>
+        // wait for it to be over
+<span class="nc" id="L258">        waitForOperationOrTimeout(opId);</span>
+<span class="nc" id="L259">    }</span>
+
+    // #### PERMISSION STUFF
+
+    private void checkReadPermission(String path) throws ApiException {
+<span class="fc" id="L264">        checkPermission(path, LFCAccessType.READ);</span>
+<span class="fc" id="L265">    }</span>
+
+    private void checkDownloadPermission(String path) throws ApiException {
+<span class="nc" id="L268">        checkReadPermission(path);</span>
+<span class="nc bnc" id="L269" title="All 2 branches missed.">        if (path.equals(ROOT)) {</span>
+<span class="nc" id="L270">            logger.error(&quot;cannot download root ({})&quot;, path);</span>
+<span class="nc" id="L271">            throw new ApiException(&quot;Illegal data API access&quot;);</span>
+        }
+<span class="nc" id="L273">        List&lt;Data&gt; fileData = baseGetFileData(path);</span>
+<span class="nc bnc" id="L274" title="All 2 branches missed.">        if (!doesPathCorrespondsToAFile(path, fileData)) {</span>
+            // it works on a directory and return a zip, but we cant check the download size
+<span class="nc" id="L276">            logger.error(&quot;Trying to download a directory ({})&quot;, path);</span>
+<span class="nc" id="L277">            throw new ApiException(&quot;Illegal data API access&quot;);</span>
+        }
+<span class="nc" id="L279">        Long maxSize = env.getRequiredProperty(CarminProperties.API_DATA_TRANSFERT_MAX_SIZE, Long.class);</span>
+<span class="nc bnc" id="L280" title="All 2 branches missed.">        if (fileData.get(0).getLength() &gt; maxSize) {</span>
+<span class="nc" id="L281">            logger.error(&quot;Trying to download a file too big ({})&quot;, path);</span>
+<span class="nc" id="L282">            throw new ApiException(&quot;Illegal data API access&quot;);</span>
+        }
+<span class="nc" id="L284">    }</span>
+
+    private void checkPermission(String path, LFCAccessType accessType)
+            throws ApiException {
+        try {
+<span class="pc bpc" id="L289" title="1 of 2 branches missed.">            if ( ! lfcPermissionBusiness.isLFCPathAllowed(</span>
+<span class="fc" id="L290">                currentUserProvider.get(), path, accessType, true)) {</span>
+<span class="nc" id="L291">                throw new ApiException(ApiError.UNAUTHORIZED_DATA_ACCESS, path);</span>
+            }
+<span class="nc" id="L293">        } catch (BusinessException e) {</span>
+<span class="nc" id="L294">            throw new ApiException(&quot;Error when checking permissions&quot;, e);</span>
+<span class="fc" id="L295">        }</span>
+<span class="fc" id="L296">    }</span>
+
+    // #### DOWNLOAD STUFF
+
+    private String downloadFileToLocalStorage(String path) throws ApiException {
+<span class="nc" id="L301">        String downloadOperationId = baseDownloadFile(path);</span>
+<span class="nc" id="L302">        waitForOperationOrTimeout(downloadOperationId);</span>
+<span class="nc" id="L303">        return downloadOperationId;</span>
+    }
+
+    private File getDownloadFile(String operationId) throws ApiException {
+<span class="nc" id="L307">        PoolOperation operation = baseGetDownloadOperation(operationId);</span>
+<span class="nc" id="L308">        File file = new File(operation.getDest());</span>
+<span class="nc bnc" id="L309" title="All 2 branches missed.">        if (file.isDirectory()) {</span>
+<span class="nc" id="L310">            file = new File(operation.getDest() + &quot;/&quot;</span>
+<span class="nc" id="L311">                    + FilenameUtils.getName(operation.getSource()));</span>
+        }
+<span class="nc" id="L313">        return file;</span>
+    }
+
+    // #### Operation stuff
+
+    private void waitForOperationOrTimeout(String operationId)
+            throws ApiException {
+        // get user in main thread because spring store auth/user information in
+        // thread bound structure and it wont be available in the
+        // 'isDownloadOverCall' thread
+<span class="nc" id="L323">        User user = currentUserProvider.get();</span>
+<span class="nc" id="L324">        Callable&lt;Boolean&gt; isDownloadOverCall =</span>
+<span class="nc" id="L325">            () -&gt; isOperationOver(operationId, user);</span>
+
+        // task that check every x seconds if the operation is over.
+        // return true when OK or goes on indefinitly
+<span class="nc" id="L329">        Callable&lt;Boolean&gt; waitForDownloadCall = () -&gt; {</span>
+            while (true) {
+<span class="nc" id="L331">                Future&lt;Boolean&gt; isDownloadOverFuture =</span>
+<span class="nc" id="L332">                        scheduler.schedule(isDownloadOverCall, getRetryDelay(), TimeUnit.SECONDS);</span>
+<span class="nc bnc" id="L333" title="All 2 branches missed.">                if (isDownloadOverFuture.get()) {</span>
+<span class="nc" id="L334">                    return true;</span>
+                }
+<span class="nc" id="L336">            }</span>
+        };
+        // launch checking task
+<span class="nc" id="L339">        Future&lt;Boolean&gt; completionFuture =</span>
+<span class="nc" id="L340">                scheduler.submit(waitForDownloadCall);</span>
+<span class="nc" id="L341">        timeoutOperationCompletionFuture(operationId, completionFuture, getTimeout());</span>
+<span class="nc" id="L342">    }</span>
+
+    private void timeoutOperationCompletionFuture (
+            String operationId,
+            Future&lt;Boolean&gt; completionFuture, int timeoutInSeconds) throws ApiException {
+        try {
+<span class="nc" id="L348">            completionFuture.get(timeoutInSeconds, TimeUnit.SECONDS);</span>
+<span class="nc" id="L349">        } catch (InterruptedException e) {</span>
+<span class="nc" id="L350">            logger.error(&quot;Waiting for operation completion interrupted : {}&quot;, operationId ,e);</span>
+<span class="nc" id="L351">            throw new ApiException(&quot;Waiting for operation completion interrupted&quot;, e);</span>
+<span class="nc" id="L352">        } catch (ExecutionException e) {</span>
+<span class="nc" id="L353">            logger.error(&quot;Error waiting for operation completion : {}&quot;, operationId ,e);</span>
+<span class="nc" id="L354">            throw new ApiException(&quot;Error waiting for operation completion&quot;, e);</span>
+<span class="nc" id="L355">        } catch (TimeoutException e) {</span>
+<span class="nc" id="L356">            completionFuture.cancel(true);</span>
+<span class="nc" id="L357">            logger.error(&quot;Timeout operation completion : {}&quot;, operationId, e);</span>
+<span class="nc" id="L358">            throw new ApiException(&quot;Aborting operation : too long&quot;, e);</span>
+<span class="nc" id="L359">        }</span>
+<span class="nc" id="L360">    }</span>
+
+    private Integer getRetryDelay() {
+<span class="nc" id="L363">        return env.getProperty(CarminProperties.API_DOWNLOAD_RETRY_IN_SECONDS, Integer.class);</span>
+    }
+
+    private Integer getTimeout() {
+<span class="nc" id="L367">        return env.getProperty(CarminProperties.API_DOWNLOAD_TIMEOUT_IN_SECONDS, Integer.class);</span>
+    }
+
+    private boolean isOperationOver(String operationId, User user)
+            throws ApiException {
+<span class="nc" id="L372">        PoolOperation operation = baseGetPoolOperation(operationId, user);</span>
+
+<span class="nc bnc" id="L374" title="All 3 branches missed.">        switch (operation.getStatus()) {</span>
+            case Queued:
+            case Running:
+<span class="nc" id="L377">                logger.debug(&quot;status of operation {&quot; + operationId + &quot;} : &quot;  + operation.getStatus());</span>
+<span class="nc" id="L378">                return false;</span>
+            case Done:
+<span class="nc" id="L380">                return true;</span>
+            case Failed:
+            case Rescheduled:
+            default:
+<span class="nc" id="L384">                logger.error(&quot;IO LFC Operation failed : {} : {}&quot;, operationId, operation.getStatus());</span>
+<span class="nc" id="L385">                throw new ApiException(&quot;IO LFC Operation operation failed&quot;);</span>
+        }
+    }
+
+    // #### UPLOAD STUFF
+
+    private void writeFileFromBase64(String base64Content, String localFilePath) throws ApiException {
+<span class="nc" id="L392">        Base64.Decoder decoder = Base64.getDecoder();</span>
+<span class="nc" id="L393">        StringReader stringReader = new StringReader(base64Content);</span>
+<span class="nc" id="L394">        InputStream inputStream = new ReaderInputStream(stringReader, StandardCharsets.UTF_8);</span>
+<span class="nc" id="L395">        try (InputStream base64InputStream = decoder.wrap(inputStream)) {</span>
+<span class="nc" id="L396">            Files.copy(base64InputStream, Paths.get(localFilePath));</span>
+<span class="nc" id="L397">        } catch (IOException e) {</span>
+<span class="nc" id="L398">            logger.error(&quot;Error writing base64 file in {}&quot;, localFilePath, e);</span>
+<span class="nc" id="L399">            throw new ApiException(&quot;Error writing base64 file&quot;, e);</span>
+<span class="nc" id="L400">        }</span>
+<span class="nc" id="L401">    }</span>
+
+    private boolean saveInputStreamToFile(InputStream is, String path) throws ApiException {
+<span class="nc" id="L404">        try (FileOutputStream fos = new FileOutputStream(path)) {</span>
+<span class="nc" id="L405">            byte[] buffer = new byte[1024];</span>
+            int bytesRead;
+<span class="nc" id="L407">            boolean isFileEmpty = true;</span>
+<span class="nc bnc" id="L408" title="All 2 branches missed.">            while ((bytesRead = is.read(buffer)) != -1) {</span>
+<span class="nc" id="L409">                isFileEmpty = false;</span>
+<span class="nc" id="L410">                fos.write(buffer, 0, bytesRead);</span>
+            }
+<span class="nc" id="L412">            fos.flush();</span>
+<span class="nc" id="L413">            return isFileEmpty;</span>
+<span class="nc" id="L414">        } catch (FileNotFoundException e) {</span>
+<span class="nc" id="L415">            logger.error(&quot;Error creating new file {}&quot;, path ,e);</span>
+<span class="nc" id="L416">            throw new ApiException(&quot;Upload error&quot;, e);</span>
+<span class="nc" id="L417">        } catch (IOException e) {</span>
+<span class="nc" id="L418">            logger.error(&quot;IO Error storing file {}&quot;, path, e);</span>
+<span class="nc" id="L419">            throw new ApiException(&quot;Upload error&quot;, e);</span>
+        }
+    }
+
+    // #### ROOT folder STUFF
+
+    private PathProperties getRootPathProperties() {
+<span class="nc" id="L426">        PathProperties rootPathProperties = new PathProperties();</span>
+<span class="nc" id="L427">        rootPathProperties.setExists(true);</span>
+<span class="nc" id="L428">        rootPathProperties.setMimeType(env.getProperty(CarminProperties.API_DIRECTORY_MIME_TYPE));</span>
+<span class="nc" id="L429">        rootPathProperties.setIsDirectory(true);</span>
+<span class="nc" id="L430">        rootPathProperties.setSize((long) getRootDirectoriesName().size());</span>
+<span class="nc" id="L431">        rootPathProperties.setPath(ROOT);</span>
+<span class="nc" id="L432">        return rootPathProperties;</span>
+    }
+
+    private List&lt;PathProperties&gt; getRootSubDirectoriesPathProps() {
+<span class="nc" id="L436">        List&lt;PathProperties&gt; directories = new ArrayList&lt;&gt;();</span>
+<span class="nc bnc" id="L437" title="All 2 branches missed.">        for (String dirName : getRootDirectoriesName()) {</span>
+<span class="nc" id="L438">            directories.add(getRootSubDirPathProperties(dirName));</span>
+<span class="nc" id="L439">        }</span>
+<span class="nc" id="L440">        return directories;</span>
+    }
+
+    private List&lt;String&gt; getRootDirectoriesName() {
+        // Home + Trash + users groups
+<span class="nc" id="L445">        List&lt;String&gt; rootDir = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L446">        rootDir.add(USERS_HOME);</span>
+<span class="nc" id="L447">        rootDir.add(TRASH_HOME);</span>
+<span class="nc bnc" id="L448" title="All 2 branches missed.">        for (Group group : currentUserProvider.get().getGroups()) {</span>
+<span class="nc" id="L449">            rootDir.add(group.getName() + GROUP_APPEND);</span>
+<span class="nc" id="L450">        }</span>
+<span class="nc" id="L451">        return rootDir;</span>
+    }
+
+    private PathProperties getRootSubDirPathProperties(String name) {
+<span class="nc" id="L455">        PathProperties rootPathProperties = new PathProperties();</span>
+<span class="nc" id="L456">        rootPathProperties.setExists(true);</span>
+<span class="nc" id="L457">        rootPathProperties.setMimeType(env.getProperty(CarminProperties.API_DIRECTORY_MIME_TYPE));</span>
+<span class="nc" id="L458">        rootPathProperties.setIsDirectory(true);</span>
+        // TODO : size ?
+<span class="nc" id="L460">        rootPathProperties.setPath(ROOT + &quot;/&quot; + name);</span>
+<span class="nc" id="L461">        return rootPathProperties;</span>
+    }
+
+    // #### DATA UTILS
+
+    private boolean doesPathCorrespondsToAFile(String path, List&lt;Data&gt; pathDataList) {
+        // Currently, there is no perfect way to determine that
+        // TODO : add a isDirectory method in grida
+<span class="pc bpc" id="L469" title="1 of 2 branches missed.">        if (pathDataList.size() != 1) {</span>
+<span class="nc" id="L470">            return false;</span>
+        }
+<span class="fc" id="L472">        String fileName = Paths.get(path).getFileName().toString();</span>
+<span class="fc" id="L473">        return fileName.equals(pathDataList.get(0).getName());</span>
+    }
+
+    private PathProperties buildPathFromLfcData(String path, Data lfcData) {
+<span class="nc" id="L477">        PathProperties pathProperties = new PathProperties();</span>
+<span class="nc" id="L478">        pathProperties.setExists(true);</span>
+<span class="nc" id="L479">        pathProperties.setSize(lfcData.getLength());</span>
+<span class="nc" id="L480">        pathProperties.setLastModificationDate(</span>
+<span class="nc" id="L481">                getTimeStampFromGridaFormatDate(lfcData.getModificationDate()));</span>
+<span class="nc bnc" id="L482" title="All 2 branches missed.">        boolean isDirectory = lfcData.getType().equals(Type.folder)</span>
+<span class="nc bnc" id="L483" title="All 2 branches missed.">                || lfcData.getType().equals(Type.folderSync);</span>
+<span class="nc" id="L484">        pathProperties.setIsDirectory(isDirectory);</span>
+<span class="nc bnc" id="L485" title="All 2 branches missed.">        if (isDirectory) {</span>
+<span class="nc" id="L486">            pathProperties.setMimeType(env.getProperty(CarminProperties.API_DIRECTORY_MIME_TYPE));</span>
+        } else {
+<span class="nc" id="L488">            pathProperties.setMimeType(getMimeType(lfcData.getName()));</span>
+        }
+<span class="nc" id="L490">        pathProperties.setPath(path + &quot;/&quot; + lfcData.getName());</span>
+<span class="nc" id="L491">        return pathProperties;</span>
+    }
+
+    /* returns timestamp in seconds from format &quot;Jan 12 2016&quot; */
+    private Long getTimeStampFromGridaFormatDate(String gridaFormatDate) {
+<span class="pc bpc" id="L496" title="2 of 4 branches missed.">        if (gridaFormatDate == null || gridaFormatDate.isEmpty()) return null;</span>
+<span class="fc" id="L497">        DateFormat dateFormat = new SimpleDateFormat(&quot;MMM dd yyyy&quot;, Locale.US);</span>
+        try {
+<span class="nc" id="L499">            return dateFormat.parse(gridaFormatDate).getTime() / 1000;</span>
+<span class="fc" id="L500">        } catch (ParseException e) {</span>
+<span class="fc" id="L501">            logger.warn(&quot;Error with grida date format : {}. Ignoring it&quot;, gridaFormatDate, e);</span>
+<span class="fc" id="L502">            return null;</span>
+        }
+    }
+
+    private String getMimeType(String path) {
+        try {
+<span class="fc" id="L508">            String contentType = Files.probeContentType(Paths.get(path));</span>
+<span class="pc bpc" id="L509" title="1 of 2 branches missed.">            return contentType == null ?</span>
+<span class="fc" id="L510">                    env.getProperty(CarminProperties.API_DEFAULT_MIME_TYPE) :</span>
+<span class="nc" id="L511">                    contentType;</span>
+<span class="nc" id="L512">        } catch (IOException e) {</span>
+<span class="nc" id="L513">            logger.warn(&quot;Cant detect mime type of {}. Ignoring and returning application/octet-stream&quot;,</span>
+                    path, e);
+<span class="nc" id="L515">            return &quot;application/octet-stream&quot;;</span>
+        }
+    }
+
+    // #### LOWER LEVELS CALLS, all prefixed with &quot;base&quot;
+
+    private boolean baseDoesFileExist(String path) throws ApiException {
+        try {
+<span class="fc" id="L523">            return lfcBusiness.exists(currentUserProvider.get(), path);</span>
+<span class="nc" id="L524">        } catch (BusinessException e) {</span>
+<span class="nc" id="L525">            throw new ApiException(&quot;Error testing file existence&quot;, e);</span>
+        }
+    }
+
+    private List&lt;Data&gt; baseGetFileData(String path) throws ApiException {
+        try {
+<span class="fc" id="L531">            return lfcBusiness.listDir(</span>
+<span class="fc" id="L532">                currentUserProvider.get(), path, true);</span>
+<span class="nc" id="L533">        } catch (BusinessException e) {</span>
+<span class="nc" id="L534">            throw new ApiException(&quot;Error getting lfc information&quot;, e);</span>
+        }
+    }
+
+    /* return the operation id */
+    private String baseDownloadFile(String path) throws ApiException {
+        try {
+<span class="nc" id="L541">            return transferPoolBusiness.downloadFile(</span>
+<span class="nc" id="L542">                currentUserProvider.get(), path);</span>
+<span class="nc" id="L543">        } catch (BusinessException e) {</span>
+<span class="nc" id="L544">            throw new ApiException(&quot;Error download LFC file&quot;, e);</span>
+        }
+    }
+
+    private String baseUploadFile(String localPath, String lfcPath)
+            throws ApiException {
+        try {
+<span class="nc" id="L551">            return transferPoolBusiness.uploadFile(</span>
+<span class="nc" id="L552">                currentUserProvider.get(), localPath, lfcPath);</span>
+<span class="nc" id="L553">        } catch (BusinessException e) {</span>
+<span class="nc" id="L554">            throw new ApiException(&quot;Error uploading a lfc file&quot;, e);</span>
+        }
+    }
+
+    private PoolOperation baseGetPoolOperation(String operationId, User user)
+            throws ApiException {
+        // need to specify the user to avoid accessing apiContext from another thread
+        try {
+<span class="nc" id="L562">            return transferPoolBusiness.getOperationById(</span>
+<span class="nc" id="L563">                    operationId, user.getFolder());</span>
+<span class="nc" id="L564">        } catch (BusinessException e) {</span>
+<span class="nc" id="L565">            throw new ApiException(&quot;Error getting download operation&quot;, e);</span>
+        }
+    }
+
+    private PoolOperation baseGetDownloadOperation(String operationId) throws ApiException {
+        try {
+<span class="nc" id="L571">            return transferPoolBusiness.getDownloadPoolOperation(operationId);</span>
+<span class="nc" id="L572">        } catch (BusinessException e) {</span>
+<span class="nc" id="L573">            throw new ApiException(&quot;Error getting download operation&quot;, e);</span>
+        }
+    }
+
+    private Long baseGetFileModificationDate(String path) throws ApiException {
+        try {
+<span class="nc" id="L579">            return lfcBusiness.getModificationDate(</span>
+<span class="nc" id="L580">                currentUserProvider.get(), path);</span>
+<span class="nc" id="L581">        } catch (BusinessException e) {</span>
+<span class="nc" id="L582">            throw new ApiException(&quot;Error getting lfc modification&quot;, e);</span>
+        }
+    }
+
+    private void baseDeletePath(String path) throws ApiException {
+        try {
+<span class="nc" id="L588">            transferPoolBusiness.delete(currentUserProvider.get(), path);</span>
+<span class="nc" id="L589">        } catch (BusinessException e) {</span>
+<span class="nc" id="L590">            throw new ApiException(&quot;Error deleting lfc file&quot;, e);</span>
+<span class="nc" id="L591">        }</span>
+<span class="nc" id="L592">    }</span>
+
+    private void baseMkdir(String path, String dirName) throws ApiException {
+        try {
+<span class="nc" id="L596">            lfcBusiness.createDir(currentUserProvider.get(), path, dirName);</span>
+<span class="nc" id="L597">        } catch (BusinessException e) {</span>
+<span class="nc" id="L598">            throw new ApiException(&quot;Error creating LFC directory&quot;, e);</span>
+<span class="nc" id="L599">        }</span>
+<span class="nc" id="L600">    }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

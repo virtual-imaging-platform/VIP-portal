@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../jacoco-resources/report.gif" type="image/gif"/><title>ExternalPlatformData.java</title><link rel="stylesheet" href="../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../index.html" class="el_report">coverage</a> &gt; <a href="../index.html" class="el_bundle">vip-datamanager</a> &gt; <a href="index.source.html" class="el_package">fr.insalyon.creatis.vip.datamanager.server.dao.mysql</a> &gt; <span class="el_source">ExternalPlatformData.java</span></div><h1>ExternalPlatformData.java</h1><pre class="source lang-java linenums">/*
+ * Copyright and authors: see LICENSE.txt in base repository.
+ *
+ * This software is a web portal for pipeline execution on distributed systems.
+ *
+ * This software is governed by the CeCILL-B license under French law and
+ * abiding by the rules of distribution of free software.  You can  use,
+ * modify and/ or redistribute the software under the terms of the CeCILL-B
+ * license as circulated by CEA, CNRS and INRIA at the following URL
+ * &quot;http://www.cecill.info&quot;.
+ *
+ * As a counterpart to the access to the source code and  rights to copy,
+ * modify and redistribute granted by the license, users are provided only
+ * with a limited warranty  and the software's author,  the holder of the
+ * economic rights,  and the successive licensors  have only  limited
+ * liability.
+ *
+ * In this respect, the user's attention is drawn to the risks associated
+ * with loading,  using,  modifying and/or developing or reproducing the
+ * software by the user in light of its specific status of free software,
+ * that may mean  that it is complicated to manipulate,  and  that  also
+ * therefore means  that it is reserved for developers  and  experienced
+ * professionals having in-depth computer knowledge. Users are therefore
+ * encouraged to load and test the software's suitability as regards their
+ * requirements in conditions enabling the security of their systems and/or
+ * data to be ensured and,  more generally, to use and operate it in the
+ * same conditions as regards security.
+ *
+ * The fact that you are presently reading this means that you have had
+ * knowledge of the CeCILL-B license and that you accept its terms.
+ */
+package fr.insalyon.creatis.vip.datamanager.server.dao.mysql;
+
+import fr.insalyon.creatis.vip.core.server.dao.DAOException;
+import fr.insalyon.creatis.vip.datamanager.client.bean.ExternalPlatform;
+import fr.insalyon.creatis.vip.datamanager.server.dao.ExternalPlatformsDAO;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.support.JdbcDaoSupport;
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
+
+import javax.sql.DataSource;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * Created by abonnet on 9/5/19.
+ */
+@Repository
+@Transactional
+<span class="fc" id="L56">public class ExternalPlatformData extends JdbcDaoSupport implements ExternalPlatformsDAO {</span>
+
+<span class="fc" id="L58">    private final Logger logger = LoggerFactory.getLogger(getClass());</span>
+
+    @Autowired
+    public void useDataSource(DataSource dataSource) {
+<span class="fc" id="L62">        setDataSource(dataSource);</span>
+<span class="fc" id="L63">    }</span>
+
+    @Override
+    public ExternalPlatform getById(String identifier) throws DAOException {
+<span class="nc" id="L67">        try (PreparedStatement ps = getConnection().prepareStatement(</span>
+                    &quot;SELECT * FROM VIPExternalPlatforms &quot; +
+                    &quot;WHERE identifier=?&quot;)) {
+<span class="nc" id="L70">            ps.setString(1, identifier);</span>
+<span class="nc" id="L71">            ResultSet rs = ps.executeQuery();</span>
+
+
+<span class="nc bnc" id="L74" title="All 2 branches missed.">            if (rs.next()) {</span>
+<span class="nc" id="L75">                ExternalPlatform externalPlatform = new ExternalPlatform();</span>
+<span class="nc" id="L76">                externalPlatform.setIdentifier(rs.getString(&quot;identifier&quot;));</span>
+<span class="nc" id="L77">                externalPlatform.setType(</span>
+<span class="nc" id="L78">                        getExternalPlatformTypeFromBDDString(rs.getString(&quot;type&quot;)));</span>
+<span class="nc" id="L79">                externalPlatform.setUrl(rs.getString(&quot;url&quot;));</span>
+<span class="nc" id="L80">                externalPlatform.setDescription(rs.getString(&quot;description&quot;));</span>
+<span class="nc" id="L81">                externalPlatform.setUploadUrl(rs.getString(&quot;upload_url&quot;));</span>
+<span class="nc" id="L82">                externalPlatform.setKeycloakClientId(rs.getString(&quot;keycloak_client_id&quot;));</span>
+<span class="nc" id="L83">                externalPlatform.setRefreshTokenUrl(rs.getString(&quot;refresh_token_url&quot;));</span>
+<span class="nc" id="L84">                return externalPlatform;</span>
+            }
+
+<span class="nc" id="L87">            logger.error(&quot;Cannot find external plaform {&quot; + identifier + &quot;}&quot;);</span>
+<span class="nc" id="L88">            throw new DAOException(&quot;Cannot find an external platform&quot;);</span>
+
+<span class="nc" id="L90">        } catch (SQLException e) {</span>
+<span class="nc" id="L91">            logger.error(&quot;Error getting external platform {} &quot;, identifier, e);</span>
+<span class="nc" id="L92">            throw new DAOException(e);</span>
+        }
+    }
+
+    @Override
+    public List&lt;ExternalPlatform&gt; getAll() throws DAOException {
+<span class="nc" id="L98">        try (PreparedStatement ps = getConnection().prepareStatement(</span>
+                    &quot;SELECT * FROM VIPExternalPlatforms &quot;)) {
+
+<span class="nc" id="L101">            ResultSet rs = ps.executeQuery();</span>
+<span class="nc" id="L102">            List&lt;ExternalPlatform&gt; externalPlatformsList = new ArrayList&lt;&gt;();</span>
+
+<span class="nc bnc" id="L104" title="All 2 branches missed.">            while (rs.next()) {</span>
+<span class="nc" id="L105">                ExternalPlatform externalPlatform = new ExternalPlatform();</span>
+<span class="nc" id="L106">                externalPlatform.setIdentifier(rs.getString(&quot;identifier&quot;));</span>
+<span class="nc" id="L107">                externalPlatform.setType(</span>
+<span class="nc" id="L108">                        getExternalPlatformTypeFromBDDString(rs.getString(&quot;type&quot;)));</span>
+<span class="nc" id="L109">                externalPlatform.setUrl(rs.getString(&quot;url&quot;));</span>
+<span class="nc" id="L110">                externalPlatform.setDescription(rs.getString(&quot;description&quot;));</span>
+<span class="nc" id="L111">                externalPlatform.setUploadUrl(rs.getString(&quot;upload_url&quot;));</span>
+<span class="nc" id="L112">                externalPlatform.setKeycloakClientId(rs.getString(&quot;keycloak_client_id&quot;));</span>
+<span class="nc" id="L113">                externalPlatform.setRefreshTokenUrl(rs.getString(&quot;refresh_token_url&quot;));</span>
+<span class="nc" id="L114">                externalPlatformsList.add(externalPlatform);</span>
+<span class="nc" id="L115">            }</span>
+
+<span class="nc" id="L117">            return externalPlatformsList;</span>
+
+<span class="nc" id="L119">        } catch (SQLException e) {</span>
+<span class="nc" id="L120">            logger.error(&quot;Error getting all external platforms&quot;, e);</span>
+<span class="nc" id="L121">            throw new DAOException(e);</span>
+        }
+    }
+
+    private ExternalPlatform.Type getExternalPlatformTypeFromBDDString(String bddString) throws DAOException {
+        try {
+<span class="nc" id="L127">            return ExternalPlatform.Type.valueOf(bddString.toUpperCase());</span>
+<span class="nc" id="L128">        } catch (IllegalArgumentException e) {</span>
+<span class="nc" id="L129">            logger.error(&quot;External platform type not found {}&quot;, bddString, e);</span>
+<span class="nc" id="L130">            throw new DAOException(e);</span>
+        }
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

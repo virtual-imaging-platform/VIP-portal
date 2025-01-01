@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../jacoco-resources/report.gif" type="image/gif"/><title>Group.java</title><link rel="stylesheet" href="../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../index.html" class="el_report">coverage</a> &gt; <a href="../index.html" class="el_bundle">vip-application</a> &gt; <a href="index.source.html" class="el_package">fr.insalyon.creatis.vip.application.server.model.boutiques</a> &gt; <span class="el_source">Group.java</span></div><h1>Group.java</h1><pre class="source lang-java linenums">
+package fr.insalyon.creatis.vip.application.server.model.boutiques;
+
+import java.util.ArrayList;
+import java.util.List;
+import javax.annotation.Generated;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyDescription;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+
+@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonPropertyOrder({
+    &quot;id&quot;,
+    &quot;name&quot;,
+    &quot;description&quot;,
+    &quot;members&quot;,
+    &quot;mutually-exclusive&quot;,
+    &quot;one-is-required&quot;,
+    &quot;all-or-none&quot;
+})
+@Generated(&quot;jsonschema2pojo&quot;)
+<span class="nc" id="L23">public class Group {</span>
+
+    /**
+     * A short, unique, informative identifier containing only alphanumeric characters and underscores. Typically used to generate variable names. Example: &quot;outfile_group&quot;.
+     * (Required)
+     * 
+     */
+    @JsonProperty(&quot;id&quot;)
+    @JsonPropertyDescription(&quot;A short, unique, informative identifier containing only alphanumeric characters and underscores. Typically used to generate variable names. Example: \&quot;outfile_group\&quot;.&quot;)
+    private String id;
+    /**
+     * A human-readable name for the input group.
+     * (Required)
+     * 
+     */
+    @JsonProperty(&quot;name&quot;)
+    @JsonPropertyDescription(&quot;A human-readable name for the input group.&quot;)
+    private String name;
+    /**
+     * Description of the input group.
+     * 
+     */
+    @JsonProperty(&quot;description&quot;)
+    @JsonPropertyDescription(&quot;Description of the input group.&quot;)
+    private String description;
+    /**
+     * IDs of the inputs belonging to this group.
+     * (Required)
+     * 
+     */
+<span class="nc" id="L53">    @JsonProperty(&quot;members&quot;)</span>
+    @JsonPropertyDescription(&quot;IDs of the inputs belonging to this group.&quot;)
+    private List&lt;String&gt; members = new ArrayList&lt;String&gt;();
+    /**
+     * True if only one input in the group may be active at runtime.
+     * 
+     */
+    @JsonProperty(&quot;mutually-exclusive&quot;)
+    @JsonPropertyDescription(&quot;True if only one input in the group may be active at runtime.&quot;)
+    private Boolean mutuallyExclusive;
+    /**
+     * True if at least one of the inputs in the group must be active at runtime.
+     * 
+     */
+    @JsonProperty(&quot;one-is-required&quot;)
+    @JsonPropertyDescription(&quot;True if at least one of the inputs in the group must be active at runtime.&quot;)
+    private Boolean oneIsRequired;
+    /**
+     * True if members of the group need to be toggled together
+     * 
+     */
+    @JsonProperty(&quot;all-or-none&quot;)
+    @JsonPropertyDescription(&quot;True if members of the group need to be toggled together&quot;)
+    private Boolean allOrNone;
+
+    /**
+     * A short, unique, informative identifier containing only alphanumeric characters and underscores. Typically used to generate variable names. Example: &quot;outfile_group&quot;.
+     * (Required)
+     * 
+     */
+    @JsonProperty(&quot;id&quot;)
+    public String getId() {
+<span class="nc" id="L85">        return id;</span>
+    }
+
+    /**
+     * A short, unique, informative identifier containing only alphanumeric characters and underscores. Typically used to generate variable names. Example: &quot;outfile_group&quot;.
+     * (Required)
+     * 
+     */
+    @JsonProperty(&quot;id&quot;)
+    public void setId(String id) {
+<span class="nc" id="L95">        this.id = id;</span>
+<span class="nc" id="L96">    }</span>
+
+    /**
+     * A human-readable name for the input group.
+     * (Required)
+     * 
+     */
+    @JsonProperty(&quot;name&quot;)
+    public String getName() {
+<span class="nc" id="L105">        return name;</span>
+    }
+
+    /**
+     * A human-readable name for the input group.
+     * (Required)
+     * 
+     */
+    @JsonProperty(&quot;name&quot;)
+    public void setName(String name) {
+<span class="nc" id="L115">        this.name = name;</span>
+<span class="nc" id="L116">    }</span>
+
+    /**
+     * Description of the input group.
+     * 
+     */
+    @JsonProperty(&quot;description&quot;)
+    public String getDescription() {
+<span class="nc" id="L124">        return description;</span>
+    }
+
+    /**
+     * Description of the input group.
+     * 
+     */
+    @JsonProperty(&quot;description&quot;)
+    public void setDescription(String description) {
+<span class="nc" id="L133">        this.description = description;</span>
+<span class="nc" id="L134">    }</span>
+
+    /**
+     * IDs of the inputs belonging to this group.
+     * (Required)
+     * 
+     */
+    @JsonProperty(&quot;members&quot;)
+    public List&lt;String&gt; getMembers() {
+<span class="nc" id="L143">        return members;</span>
+    }
+
+    /**
+     * IDs of the inputs belonging to this group.
+     * (Required)
+     * 
+     */
+    @JsonProperty(&quot;members&quot;)
+    public void setMembers(List&lt;String&gt; members) {
+<span class="nc" id="L153">        this.members = members;</span>
+<span class="nc" id="L154">    }</span>
+
+    /**
+     * True if only one input in the group may be active at runtime.
+     * 
+     */
+    @JsonProperty(&quot;mutually-exclusive&quot;)
+    public Boolean getMutuallyExclusive() {
+<span class="nc" id="L162">        return mutuallyExclusive;</span>
+    }
+
+    /**
+     * True if only one input in the group may be active at runtime.
+     * 
+     */
+    @JsonProperty(&quot;mutually-exclusive&quot;)
+    public void setMutuallyExclusive(Boolean mutuallyExclusive) {
+<span class="nc" id="L171">        this.mutuallyExclusive = mutuallyExclusive;</span>
+<span class="nc" id="L172">    }</span>
+
+    /**
+     * True if at least one of the inputs in the group must be active at runtime.
+     * 
+     */
+    @JsonProperty(&quot;one-is-required&quot;)
+    public Boolean getOneIsRequired() {
+<span class="nc" id="L180">        return oneIsRequired;</span>
+    }
+
+    /**
+     * True if at least one of the inputs in the group must be active at runtime.
+     * 
+     */
+    @JsonProperty(&quot;one-is-required&quot;)
+    public void setOneIsRequired(Boolean oneIsRequired) {
+<span class="nc" id="L189">        this.oneIsRequired = oneIsRequired;</span>
+<span class="nc" id="L190">    }</span>
+
+    /**
+     * True if members of the group need to be toggled together
+     * 
+     */
+    @JsonProperty(&quot;all-or-none&quot;)
+    public Boolean getAllOrNone() {
+<span class="nc" id="L198">        return allOrNone;</span>
+    }
+
+    /**
+     * True if members of the group need to be toggled together
+     * 
+     */
+    @JsonProperty(&quot;all-or-none&quot;)
+    public void setAllOrNone(Boolean allOrNone) {
+<span class="nc" id="L207">        this.allOrNone = allOrNone;</span>
+<span class="nc" id="L208">    }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

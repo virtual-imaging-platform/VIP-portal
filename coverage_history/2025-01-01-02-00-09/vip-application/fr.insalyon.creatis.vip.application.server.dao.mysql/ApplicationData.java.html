@@ -1,0 +1,648 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../jacoco-resources/report.gif" type="image/gif"/><title>ApplicationData.java</title><link rel="stylesheet" href="../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../index.html" class="el_report">coverage</a> &gt; <a href="../index.html" class="el_bundle">vip-application</a> &gt; <a href="index.source.html" class="el_package">fr.insalyon.creatis.vip.application.server.dao.mysql</a> &gt; <span class="el_source">ApplicationData.java</span></div><h1>ApplicationData.java</h1><pre class="source lang-java linenums">/*
+ * Copyright and authors: see LICENSE.txt in base repository.
+ *
+ * This software is a web portal for pipeline execution on distributed systems.
+ *
+ * This software is governed by the CeCILL-B license under French law and
+ * abiding by the rules of distribution of free software.  You can  use,
+ * modify and/ or redistribute the software under the terms of the CeCILL-B
+ * license as circulated by CEA, CNRS and INRIA at the following URL
+ * &quot;http://www.cecill.info&quot;.
+ *
+ * As a counterpart to the access to the source code and  rights to copy,
+ * modify and redistribute granted by the license, users are provided only
+ * with a limited warranty  and the software's author,  the holder of the
+ * economic rights,  and the successive licensors  have only  limited
+ * liability.
+ *
+ * In this respect, the user's attention is drawn to the risks associated
+ * with loading,  using,  modifying and/or developing or reproducing the
+ * software by the user in light of its specific status of free software,
+ * that may mean  that it is complicated to manipulate,  and  that  also
+ * therefore means  that it is reserved for developers  and  experienced
+ * professionals having in-depth computer knowledge. Users are therefore
+ * encouraged to load and test the software's suitability as regards their
+ * requirements in conditions enabling the security of their systems and/or
+ * data to be ensured and,  more generally, to use and operate it in the
+ * same conditions as regards security.
+ *
+ * The fact that you are presently reading this means that you have had
+ * knowledge of the CeCILL-B license and that you accept its terms.
+ */
+package fr.insalyon.creatis.vip.application.server.dao.mysql;
+
+import fr.insalyon.creatis.vip.application.client.bean.AppClass;
+import fr.insalyon.creatis.vip.application.client.bean.AppVersion;
+import fr.insalyon.creatis.vip.application.client.bean.Application;
+import fr.insalyon.creatis.vip.application.server.dao.ApplicationDAO;
+import fr.insalyon.creatis.vip.application.server.dao.ClassDAO;
+import fr.insalyon.creatis.vip.core.server.dao.DAOException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.support.JdbcDaoSupport;
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
+
+import javax.sql.DataSource;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * @author Rafael Ferreira da Silva
+ */
+@Repository
+@Transactional
+public class ApplicationData extends JdbcDaoSupport implements ApplicationDAO {
+
+<span class="fc" id="L61">    private final Logger logger = LoggerFactory.getLogger(getClass());</span>
+
+    private ClassDAO classDAO;
+
+    @Autowired
+<span class="fc" id="L66">    public ApplicationData(DataSource dataSource, ClassDAO classDAO) {</span>
+<span class="fc" id="L67">        setDataSource(dataSource);</span>
+<span class="fc" id="L68">        this.classDAO = classDAO;</span>
+<span class="fc" id="L69">    }</span>
+
+    @Override
+    public void add(Application application) throws DAOException {
+
+        try {
+<span class="fc" id="L75">            PreparedStatement ps = getConnection().prepareStatement(</span>
+                    &quot;INSERT INTO VIPApplications(name, citation, owner) &quot;
+                            + &quot;VALUES (?, ?, ?)&quot;);
+
+<span class="fc" id="L79">            ps.setString(1, application.getName());</span>
+<span class="fc" id="L80">            ps.setString(2, application.getCitation());</span>
+<span class="fc" id="L81">            ps.setString(3, application.getOwner());</span>
+<span class="fc" id="L82">            ps.execute();</span>
+
+<span class="fc bfc" id="L84" title="All 2 branches covered.">            for (String className : application.getApplicationClasses()) {</span>
+<span class="fc" id="L85">                addClassToApplication(application.getName(), className);</span>
+<span class="fc" id="L86">            }</span>
+<span class="fc" id="L87">            ps.close();</span>
+
+<span class="nc" id="L89">        } catch (SQLException ex) {</span>
+<span class="nc bnc" id="L90" title="All 4 branches missed.">            if (ex.getMessage().contains(&quot;Unique index or primary key violation&quot;) || ex.getMessage().contains(&quot;Duplicate entry &quot;)) {</span>
+<span class="nc" id="L91">                logger.error(&quot;An application named \&quot;{}\&quot; already exists.&quot;, application.getName());</span>
+<span class="nc" id="L92">                throw new DAOException(&quot;An application named \&quot;&quot; + application.getName() + &quot;\&quot; already exists.&quot;, ex);</span>
+            } else {
+<span class="nc" id="L94">                logger.error(&quot;Error adding application {}&quot;, application.getName(), ex);</span>
+<span class="nc" id="L95">                throw new DAOException(ex);</span>
+            }
+<span class="fc" id="L97">        }</span>
+<span class="fc" id="L98">    }</span>
+
+    @Override
+    public void update(Application application) throws DAOException {
+
+        try {
+<span class="fc" id="L104">            PreparedStatement ps = getConnection().prepareStatement(&quot;UPDATE &quot;</span>
+                    + &quot;VIPApplications &quot;
+                    + &quot;SET citation=?,owner=? &quot;
+                    + &quot;WHERE name=?&quot;);
+
+<span class="fc" id="L109">            ps.setString(1, application.getCitation());</span>
+<span class="fc" id="L110">            ps.setString(2, application.getOwner());</span>
+<span class="fc" id="L111">            ps.setString(3, application.getName());</span>
+<span class="fc" id="L112">            ps.executeUpdate();</span>
+<span class="fc" id="L113">            ps.close();</span>
+<span class="fc" id="L114">            removeAllClassesFromApplication(application.getName());</span>
+<span class="fc bfc" id="L115" title="All 2 branches covered.">            for (String className : application.getApplicationClasses()) {</span>
+<span class="pc bpc" id="L116" title="1 of 2 branches missed.">                if (!className.equals(&quot;&quot;)) {</span>
+<span class="fc" id="L117">                    addClassToApplication(application.getName(), className);</span>
+                }
+<span class="fc" id="L119">            }</span>
+
+<span class="nc" id="L121">        } catch (SQLException ex) {</span>
+<span class="nc" id="L122">            logger.error(&quot;Error updating application {}&quot;, application.getName(), ex);</span>
+<span class="nc" id="L123">            throw new DAOException(ex);</span>
+<span class="fc" id="L124">        }</span>
+<span class="fc" id="L125">    }</span>
+
+    @Override
+    public void remove(String name) throws DAOException {
+
+        try {
+<span class="fc" id="L131">            PreparedStatement ps = getConnection().prepareStatement(&quot;DELETE &quot;</span>
+                    + &quot;FROM VIPApplications WHERE name=?&quot;);
+
+<span class="fc" id="L134">            ps.setString(1, name);</span>
+<span class="fc" id="L135">            ps.execute();</span>
+<span class="fc" id="L136">            ps.close();</span>
+
+<span class="nc" id="L138">        } catch (SQLException ex) {</span>
+<span class="nc" id="L139">            logger.error(&quot;Error removing application {}&quot;, name, ex);</span>
+<span class="nc" id="L140">            throw new DAOException(ex);</span>
+<span class="fc" id="L141">        }</span>
+<span class="fc" id="L142">    }</span>
+
+    @Override
+    public void remove(String email, String name) throws DAOException {
+
+        try {
+<span class="nc bnc" id="L148" title="All 2 branches missed.">            for (AppClass c : classDAO.getUserClasses(email, true)) {</span>
+<span class="nc" id="L149">                PreparedStatement ps = getConnection().prepareStatement(&quot;DELETE &quot;</span>
+                        + &quot;FROM VIPApplicationClasses &quot;
+                        + &quot;WHERE class=? AND application=?&quot;);
+
+<span class="nc" id="L153">                ps.setString(1, c.getName());</span>
+<span class="nc" id="L154">                ps.setString(2, name);</span>
+<span class="nc" id="L155">                ps.execute();</span>
+<span class="nc" id="L156">                ps.close();</span>
+<span class="nc" id="L157">            }</span>
+
+<span class="nc" id="L159">        } catch (SQLException ex) {</span>
+<span class="nc" id="L160">            logger.error(&quot;Error removing application {} for user {}&quot;, name, email, ex);</span>
+<span class="nc" id="L161">            throw new DAOException(ex);</span>
+<span class="nc" id="L162">        }</span>
+<span class="nc" id="L163">    }</span>
+
+    @Override
+    public List&lt;Application&gt; getApplications() throws DAOException {
+<span class="fc" id="L167">        return this.getApplications((String) null);</span>
+
+    }
+
+    @Override
+    public List&lt;Application&gt; getApplicationsWithOwner(String owner) throws DAOException {
+<span class="nc" id="L173">        return this.getApplications(owner);</span>
+    }
+
+    private List&lt;Application&gt; getApplications(String owner) throws DAOException {
+
+        try {
+<span class="fc" id="L179">            String requestSql = null;</span>
+<span class="pc bpc" id="L180" title="1 of 2 branches missed.">            if (owner != null) {</span>
+<span class="nc" id="L181">                requestSql = &quot;SELECT &quot;</span>
+                        + &quot;name, owner, citation FROM &quot;
+                        + &quot;VIPApplications WHERE owner=? ORDER BY name&quot;;
+            } else {
+<span class="fc" id="L185">                requestSql = &quot;SELECT &quot;</span>
+                        + &quot;name, owner, citation FROM &quot;
+                        + &quot;VIPApplications ORDER BY name&quot;;
+            }
+
+<span class="fc" id="L190">            PreparedStatement ps = getConnection().prepareStatement(requestSql);</span>
+<span class="pc bpc" id="L191" title="1 of 2 branches missed.">            if (owner != null) {</span>
+<span class="nc" id="L192">                ps.setString(1, owner);</span>
+            }
+<span class="fc" id="L194">            ResultSet rs = ps.executeQuery();</span>
+<span class="fc" id="L195">            List&lt;Application&gt; applications = new ArrayList&lt;Application&gt;();</span>
+
+<span class="fc bfc" id="L197" title="All 2 branches covered.">            while (rs.next()) {</span>
+
+<span class="fc" id="L199">                String appOwner = rs.getString(&quot;owner&quot;);</span>
+<span class="fc" id="L200">                PreparedStatement ps3 = getConnection().prepareStatement(&quot;SELECT &quot;</span>
+                        + &quot;first_name,last_name FROM VIPUsers WHERE email=?&quot;);
+<span class="fc" id="L202">                ps3.setString(1, appOwner);</span>
+<span class="fc" id="L203">                ResultSet rs3 = ps3.executeQuery();</span>
+<span class="fc" id="L204">                String firstName = null;</span>
+<span class="fc" id="L205">                String lastName = null;</span>
+<span class="fc bfc" id="L206" title="All 2 branches covered.">                while (rs3.next()) {</span>
+<span class="fc" id="L207">                    firstName = rs3.getString(&quot;first_name&quot;);</span>
+<span class="fc" id="L208">                    lastName = rs3.getString(&quot;last_name&quot;);</span>
+                }
+<span class="fc" id="L210">                ps3.close();</span>
+
+<span class="fc" id="L212">                String name = rs.getString(&quot;name&quot;);</span>
+<span class="fc" id="L213">                PreparedStatement ps2 = getConnection().prepareStatement(&quot;SELECT &quot;</span>
+                        + &quot;class FROM VIPApplicationClasses WHERE application=?&quot;);
+<span class="fc" id="L215">                ps2.setString(1, name);</span>
+
+<span class="fc" id="L217">                ResultSet rs2 = ps2.executeQuery();</span>
+<span class="fc" id="L218">                List&lt;String&gt; classes = new ArrayList&lt;String&gt;();</span>
+
+<span class="fc bfc" id="L220" title="All 2 branches covered.">                while (rs2.next()) {</span>
+<span class="fc" id="L221">                    classes.add(rs2.getString(&quot;class&quot;));</span>
+                }
+<span class="fc" id="L223">                ps2.close();</span>
+
+<span class="fc" id="L225">                applications.add(new Application(name, classes, rs.getString(&quot;owner&quot;), firstName + &quot; &quot; + lastName, rs.getString(&quot;citation&quot;)));</span>
+<span class="fc" id="L226">            }</span>
+<span class="fc" id="L227">            ps.close();</span>
+<span class="fc" id="L228">            return applications;</span>
+
+<span class="nc" id="L230">        } catch (SQLException ex) {</span>
+<span class="nc" id="L231">            logger.error(&quot;Error getting all applications&quot;, ex);</span>
+<span class="nc" id="L232">            throw new DAOException(ex);</span>
+        }
+    }
+
+    @Override
+    public List&lt;String[]&gt; getApplicationsFromClass(String className) throws DAOException {
+
+        try {
+<span class="fc" id="L240">            PreparedStatement ps = getConnection().prepareStatement(&quot;SELECT &quot;</span>
+                    + &quot;name, version FROM &quot;
+                    + &quot;VIPApplications app, VIPAppVersions ver, VIPApplicationClasses appc &quot;
+                    + &quot;WHERE appc.class = ? AND app.name = appc.application AND &quot;
+                    + &quot;app.name = ver.application AND visible = ? &quot;
+                    + &quot;ORDER BY app.name&quot;);
+<span class="fc" id="L246">            ps.setString(1, className);</span>
+<span class="fc" id="L247">            ps.setBoolean(2, true);</span>
+
+<span class="fc" id="L249">            ResultSet rs = ps.executeQuery();</span>
+<span class="fc" id="L250">            List&lt;String[]&gt; applications = new ArrayList&lt;String[]&gt;();</span>
+
+<span class="fc bfc" id="L252" title="All 2 branches covered.">            while (rs.next()) {</span>
+<span class="fc" id="L253">                applications.add(new String[]{rs.getString(&quot;name&quot;), rs.getString(&quot;version&quot;)});</span>
+            }
+<span class="fc" id="L255">            ps.close();</span>
+<span class="fc" id="L256">            return applications;</span>
+
+<span class="nc" id="L258">        } catch (SQLException ex) {</span>
+<span class="nc" id="L259">            logger.error(&quot;Error getting all applications for class {}&quot;, className, ex);</span>
+<span class="nc" id="L260">            throw new DAOException(ex);</span>
+        }
+    }
+
+    @Override
+    public Application getApplication(String applicationName) throws DAOException {
+        try {
+<span class="fc" id="L267">            PreparedStatement ps = getConnection().prepareStatement(&quot;SELECT &quot;</span>
+                    + &quot;name, citation, owner FROM VIPApplications &quot;
+                    + &quot;WHERE name = ?&quot;);
+<span class="fc" id="L270">            ps.setString(1, applicationName);</span>
+
+<span class="fc" id="L272">            ResultSet rs = ps.executeQuery();</span>
+<span class="pc bpc" id="L273" title="1 of 2 branches missed.">            if (rs.first()) {</span>
+
+<span class="fc" id="L275">                PreparedStatement ps2 = getConnection().prepareStatement(&quot;SELECT &quot;</span>
+                        + &quot;class FROM VIPApplicationClasses WHERE application = ?&quot;);
+
+<span class="fc" id="L278">                ps2.setString(1, applicationName);</span>
+
+<span class="fc" id="L280">                ResultSet rs2 = ps2.executeQuery();</span>
+<span class="fc" id="L281">                List&lt;String&gt; appClasses = new ArrayList&lt;String&gt;();</span>
+
+<span class="fc bfc" id="L283" title="All 2 branches covered.">                while (rs2.next()) {</span>
+<span class="fc" id="L284">                    appClasses.add(rs2.getString(&quot;class&quot;));</span>
+                }
+<span class="fc" id="L286">                ps2.close();</span>
+<span class="fc" id="L287">                return new Application(rs.getString(&quot;name&quot;), appClasses, rs.getString(&quot;owner&quot;), rs.getString(&quot;citation&quot;));</span>
+            }
+<span class="nc" id="L289">            return null;</span>
+<span class="nc" id="L290">        } catch (SQLException ex) {</span>
+<span class="nc" id="L291">            logger.error(&quot;Error getting application {}&quot;, applicationName, ex);</span>
+<span class="nc" id="L292">            throw new DAOException(ex);</span>
+        }
+    }
+
+    public List&lt;Application&gt; getApplicationsFromClasses(List&lt;String&gt; classes) throws DAOException {
+
+        try {
+<span class="fc" id="L299">            List&lt;Application&gt; applications = new ArrayList&lt;Application&gt;();</span>
+
+<span class="fc bfc" id="L301" title="All 2 branches covered.">            if (!classes.isEmpty()) {</span>
+<span class="fc" id="L302">                StringBuilder sb = new StringBuilder();</span>
+
+<span class="fc bfc" id="L304" title="All 2 branches covered.">                for (String c : classes) {</span>
+<span class="fc bfc" id="L305" title="All 2 branches covered.">                    if (sb.length() &gt; 0) {</span>
+<span class="fc" id="L306">                        sb.append(&quot; OR &quot;);</span>
+                    }
+<span class="fc" id="L308">                    sb.append(&quot;appc.class = '&quot;).append(c).append(&quot;'&quot;);</span>
+<span class="fc" id="L309">                }</span>
+
+<span class="pc bpc" id="L311" title="1 of 2 branches missed.">                String clause = sb.length() &gt; 0 ? &quot; AND (&quot; + sb.toString() + &quot;)&quot; : &quot;&quot;;</span>
+
+<span class="fc" id="L313">                PreparedStatement ps = getConnection().prepareStatement(&quot;SELECT DISTINCT &quot;</span>
+                        + &quot;name, owner, citation FROM &quot;
+                        + &quot;VIPApplications app, VIPApplicationClasses appc &quot;
+                        + &quot;WHERE app.name = appc.application &quot; + clause + &quot; &quot;
+                        + &quot;ORDER BY name&quot;);
+
+<span class="fc" id="L319">                ResultSet rs = ps.executeQuery();</span>
+
+<span class="fc bfc" id="L321" title="All 2 branches covered.">                while (rs.next()) {</span>
+<span class="fc" id="L322">                    String name = rs.getString(&quot;name&quot;);</span>
+<span class="fc" id="L323">                    PreparedStatement ps2 = getConnection().prepareStatement(&quot;SELECT &quot;</span>
+                            + &quot;class FROM VIPApplicationClasses WHERE application = ?&quot;);
+
+<span class="fc" id="L326">                    ps2.setString(1, name);</span>
+
+<span class="fc" id="L328">                    ResultSet rs2 = ps2.executeQuery();</span>
+<span class="fc" id="L329">                    List&lt;String&gt; appClasses = new ArrayList&lt;String&gt;();</span>
+
+<span class="fc bfc" id="L331" title="All 2 branches covered.">                    while (rs2.next()) {</span>
+<span class="fc" id="L332">                        appClasses.add(rs2.getString(&quot;class&quot;));</span>
+                    }
+<span class="fc" id="L334">                    ps2.close();</span>
+
+<span class="fc" id="L336">                    String owner = rs.getString(&quot;owner&quot;);</span>
+<span class="fc" id="L337">                    PreparedStatement ps3 = getConnection().prepareStatement(&quot;SELECT &quot;</span>
+                            + &quot;first_name,last_name FROM VIPUsers WHERE email=?&quot;);
+<span class="fc" id="L339">                    ps3.setString(1, owner);</span>
+<span class="fc" id="L340">                    ResultSet rs3 = ps3.executeQuery();</span>
+<span class="fc" id="L341">                    String firstName = null;</span>
+<span class="fc" id="L342">                    String lastName = null;</span>
+<span class="pc bpc" id="L343" title="1 of 2 branches missed.">                    while (rs3.next()) {</span>
+<span class="nc" id="L344">                        firstName = rs3.getString(&quot;first_name&quot;);</span>
+<span class="nc" id="L345">                        lastName = rs3.getString(&quot;last_name&quot;);</span>
+                    }
+<span class="fc" id="L347">                    ps3.close();</span>
+
+<span class="fc" id="L349">                    applications.add(new Application(name, appClasses, rs.getString(&quot;owner&quot;), firstName + &quot; &quot; + lastName, rs.getString(&quot;citation&quot;)));</span>
+<span class="fc" id="L350">                }</span>
+<span class="fc" id="L351">                ps.close();</span>
+            }
+<span class="fc" id="L353">            return applications;</span>
+
+<span class="nc" id="L355">        } catch (SQLException ex) {</span>
+<span class="nc" id="L356">            logger.error(&quot;Error getting applications for classes {}&quot;, classes, ex);</span>
+<span class="nc" id="L357">            throw new DAOException(ex);</span>
+        }
+    }
+
+    @Override
+    public List&lt;String&gt; getApplicationsName(String applicationClass) {
+        try {
+
+<span class="nc" id="L365">            List&lt;String&gt; applications = new ArrayList&lt;String&gt;();</span>
+<span class="nc" id="L366">            PreparedStatement ps = null;</span>
+<span class="nc bnc" id="L367" title="All 2 branches missed.">            if (applicationClass == null) {</span>
+<span class="nc" id="L368">                ps = getConnection().prepareStatement(&quot;SELECT name FROM &quot;</span>
+                        + &quot;WorkflowDescriptor ORDER BY name&quot;);
+            } else {
+<span class="nc" id="L371">                ps = getConnection().prepareStatement(&quot;SELECT name FROM &quot;</span>
+                        + &quot;WorkflowDescriptor wd, WorkflowClasses wc &quot;
+                        + &quot;WHERE (wc.workflow=wd.name AND class=?)&quot;);
+<span class="nc" id="L374">                ps.setString(1, applicationClass);</span>
+            }
+
+<span class="nc" id="L377">            ResultSet rs = ps.executeQuery();</span>
+<span class="nc bnc" id="L378" title="All 2 branches missed.">            while (rs.next()) {</span>
+<span class="nc" id="L379">                applications.add(rs.getString(&quot;name&quot;));</span>
+            }
+
+<span class="nc" id="L382">            ps.close();</span>
+<span class="nc" id="L383">            return applications;</span>
+
+<span class="nc" id="L385">        } catch (SQLException ex) {</span>
+<span class="nc" id="L386">            logger.error(&quot;Error getting applications name {}&quot;, applicationClass, ex);</span>
+        }
+<span class="nc" id="L388">        return null;</span>
+    }
+
+    private void addClassToApplication(String applicationName, String className)
+            throws DAOException {
+
+        try {
+<span class="fc" id="L395">            PreparedStatement ps = getConnection().prepareStatement(&quot;INSERT INTO &quot;</span>
+                    + &quot;VIPApplicationClasses(application, class) &quot;
+                    + &quot;VALUES(?, ?)&quot;);
+
+<span class="fc" id="L399">            ps.setString(1, applicationName);</span>
+<span class="fc" id="L400">            ps.setString(2, className);</span>
+<span class="fc" id="L401">            ps.execute();</span>
+<span class="fc" id="L402">            ps.close();</span>
+
+<span class="fc" id="L404">        } catch (SQLException ex) {</span>
+<span class="pc bpc" id="L405" title="2 of 4 branches missed.">            if (ex.getMessage().contains(&quot;Unique index or primary key violation&quot;) || ex.getMessage().contains(&quot;Duplicate entry &quot;)) {</span>
+<span class="nc" id="L406">                logger.error(&quot;An application named \&quot;&quot; + applicationName + &quot;\&quot; is already associated with clas \&quot;&quot; + className + &quot;\&quot;.&quot;);</span>
+<span class="nc" id="L407">                throw new DAOException(&quot;An application named \&quot;&quot; + applicationName + &quot;\&quot; is already associated with clas \&quot;&quot; + className + &quot;\&quot;.&quot;, ex);</span>
+            } else {
+<span class="fc" id="L409">                logger.error(&quot;Error adding class {} to application {}&quot;, className, applicationName, ex);</span>
+<span class="fc" id="L410">                throw new DAOException(ex);</span>
+            }
+<span class="fc" id="L412">        }</span>
+<span class="fc" id="L413">    }</span>
+
+    private void removeAllClassesFromApplication(String workflowName) throws DAOException {
+
+        try {
+<span class="fc" id="L418">            PreparedStatement ps = getConnection().prepareStatement(&quot;DELETE FROM &quot;</span>
+                    + &quot;VIPApplicationClasses WHERE application=?&quot;);
+
+<span class="fc" id="L421">            ps.setString(1, workflowName);</span>
+<span class="fc" id="L422">            ps.execute();</span>
+<span class="fc" id="L423">            ps.close();</span>
+
+<span class="nc" id="L425">        } catch (SQLException ex) {</span>
+<span class="nc" id="L426">            logger.error(&quot;Error removing classes from application {}&quot;, workflowName, ex);</span>
+<span class="nc" id="L427">            throw new DAOException(ex);</span>
+<span class="fc" id="L428">        }</span>
+<span class="fc" id="L429">    }</span>
+
+    @Override
+    public String getCitation(String name) throws DAOException {
+
+        try {
+<span class="fc" id="L435">            PreparedStatement ps = getConnection().prepareStatement(&quot;SELECT citation &quot;</span>
+                    + &quot;FROM VIPApplications WHERE name = ?&quot;);
+<span class="fc" id="L437">            ps.setString(1, name);</span>
+
+<span class="fc" id="L439">            ResultSet rs = ps.executeQuery();</span>
+<span class="fc" id="L440">            rs.next();</span>
+<span class="fc" id="L441">            String citation = rs.getString(&quot;citation&quot;);</span>
+<span class="fc" id="L442">            ps.close();</span>
+
+<span class="fc" id="L444">            return citation;</span>
+
+<span class="fc" id="L446">        } catch (SQLException ex) {</span>
+<span class="fc" id="L447">            logger.error(&quot;Error getting citation for application {}&quot;, name, ex);</span>
+<span class="fc" id="L448">            throw new DAOException(ex);</span>
+        }
+    }
+
+    @Override
+    public List&lt;AppVersion&gt; getVersions(String name) throws DAOException {
+
+        try {
+<span class="fc" id="L456">            PreparedStatement ps = getConnection().prepareStatement(&quot;SELECT &quot;</span>
+                    + &quot;version, lfn, json_lfn, doi, visible, useBoutiquesForm FROM &quot;
+                    + &quot;VIPAppVersions &quot;
+                    + &quot;WHERE application = ? &quot;
+                    + &quot;ORDER BY version&quot;);
+<span class="fc" id="L461">            ps.setString(1, name);</span>
+
+<span class="fc" id="L463">            ResultSet rs = ps.executeQuery();</span>
+<span class="fc" id="L464">            List&lt;AppVersion&gt; versions = new ArrayList&lt;AppVersion&gt;();</span>
+
+<span class="fc bfc" id="L466" title="All 2 branches covered.">            while (rs.next()) {</span>
+<span class="fc" id="L467">                versions.add(new AppVersion(</span>
+                        name,
+<span class="fc" id="L469">                        rs.getString(&quot;version&quot;),</span>
+<span class="fc" id="L470">                        rs.getString(&quot;lfn&quot;),</span>
+<span class="fc" id="L471">                        rs.getString(&quot;json_lfn&quot;),</span>
+<span class="fc" id="L472">                        rs.getString(&quot;doi&quot;),</span>
+<span class="fc" id="L473">                        rs.getBoolean(&quot;visible&quot;),</span>
+<span class="fc" id="L474">                        rs.getBoolean(&quot;useBoutiquesForm&quot;)));</span>
+            }
+<span class="fc" id="L476">            ps.close();</span>
+<span class="fc" id="L477">            return versions;</span>
+
+<span class="nc" id="L479">        } catch (SQLException ex) {</span>
+<span class="nc" id="L480">            logger.error(&quot;Error getting versions for application {}&quot;, name, ex);</span>
+<span class="nc" id="L481">            throw new DAOException(ex);</span>
+        }
+    }
+
+    @Override
+    public List&lt;AppVersion&gt; getAllVisibleVersions() throws DAOException {
+
+        try {
+<span class="fc" id="L489">            PreparedStatement ps = getConnection().prepareStatement(&quot;SELECT &quot;</span>
+                    + &quot;application, version, lfn, json_lfn, doi, visible, useBoutiquesForm FROM &quot;
+                    + &quot;VIPAppVersions &quot;
+                    + &quot;WHERE visible = ? &quot;
+                    + &quot;ORDER BY version&quot;);
+<span class="fc" id="L494">            ps.setBoolean(1, true);</span>
+
+<span class="fc" id="L496">            ResultSet rs = ps.executeQuery();</span>
+<span class="fc" id="L497">            List&lt;AppVersion&gt; versions = new ArrayList&lt;AppVersion&gt;();</span>
+
+<span class="fc bfc" id="L499" title="All 2 branches covered.">            while (rs.next()) {</span>
+<span class="fc" id="L500">                versions.add(new AppVersion(</span>
+<span class="fc" id="L501">                        rs.getString(&quot;application&quot;),</span>
+<span class="fc" id="L502">                        rs.getString(&quot;version&quot;),</span>
+<span class="fc" id="L503">                        rs.getString(&quot;lfn&quot;),</span>
+<span class="fc" id="L504">                        rs.getString(&quot;json_lfn&quot;),</span>
+<span class="fc" id="L505">                        rs.getString(&quot;doi&quot;),</span>
+<span class="fc" id="L506">                        rs.getBoolean(&quot;visible&quot;),</span>
+<span class="fc" id="L507">                        rs.getBoolean(&quot;useBoutiquesForm&quot;)));</span>
+            }
+<span class="fc" id="L509">            ps.close();</span>
+<span class="fc" id="L510">            return versions;</span>
+
+<span class="nc" id="L512">        } catch (SQLException ex) {</span>
+<span class="nc" id="L513">            logger.error(&quot;Error getting all visible versions&quot;, ex);</span>
+<span class="nc" id="L514">            throw new DAOException(ex);</span>
+        }
+    }
+
+    @Override
+    public void addVersion(AppVersion version) throws DAOException {
+
+        try {
+<span class="fc" id="L522">            PreparedStatement ps = getConnection().prepareStatement(</span>
+                    &quot;INSERT INTO VIPAppVersions(application, version, lfn, json_lfn, visible, useBoutiquesForm) &quot;
+                            + &quot;VALUES (?, ?, ?, ?, ?, ?)&quot;);
+
+<span class="fc" id="L526">            ps.setString(1, version.getApplicationName());</span>
+<span class="fc" id="L527">            ps.setString(2, version.getVersion());</span>
+<span class="fc" id="L528">            ps.setString(3, version.getLfn());</span>
+<span class="fc" id="L529">            ps.setString(4, version.getJsonLfn());</span>
+<span class="fc" id="L530">            ps.setBoolean(5, version.isVisible());</span>
+<span class="fc" id="L531">            ps.setBoolean(6, version.isBoutiquesForm());</span>
+<span class="fc" id="L532">            ps.execute();</span>
+<span class="fc" id="L533">            ps.close();</span>
+
+<span class="nc" id="L535">        } catch (SQLException ex) {</span>
+<span class="nc bnc" id="L536" title="All 4 branches missed.">            if (ex.getMessage().contains(&quot;Unique index or primary key violation&quot;) || ex.getMessage().contains(&quot;Duplicate entry &quot;)) {</span>
+<span class="nc" id="L537">                logger.error(&quot;A version named \&quot;&quot; + version.getApplicationName() + &quot;\&quot; already exists.&quot;);</span>
+<span class="nc" id="L538">                throw new DAOException(&quot;A version named \&quot;&quot; + version.getApplicationName() + &quot;\&quot; already exists.&quot;, ex);</span>
+            } else {
+<span class="nc" id="L540">                logger.error(&quot;Error adding version {} for {}&quot;,</span>
+<span class="nc" id="L541">                        version.getVersion(), version.getApplicationName(), ex);</span>
+<span class="nc" id="L542">                throw new DAOException(ex);</span>
+            }
+<span class="fc" id="L544">        }</span>
+<span class="fc" id="L545">    }</span>
+
+    @Override
+    public void updateVersion(AppVersion version) throws DAOException {
+        try {
+<span class="fc" id="L550">            PreparedStatement ps = getConnection().prepareStatement(&quot;UPDATE &quot;</span>
+                    + &quot;VIPAppVersions &quot;
+                    + &quot;SET lfn=?, json_lfn=?, visible=?, useBoutiquesForm=? &quot;
+                    + &quot;WHERE application=? AND version=?&quot;);
+
+<span class="fc" id="L555">            ps.setString(1, version.getLfn());</span>
+<span class="fc" id="L556">            ps.setString(2, version.getJsonLfn());</span>
+<span class="fc" id="L557">            ps.setBoolean(3, version.isVisible());</span>
+<span class="fc" id="L558">            ps.setBoolean(4, version.isBoutiquesForm());</span>
+<span class="fc" id="L559">            ps.setString(5, version.getApplicationName());</span>
+<span class="fc" id="L560">            ps.setString(6, version.getVersion());</span>
+<span class="fc" id="L561">            ps.executeUpdate();</span>
+<span class="fc" id="L562">            ps.close();</span>
+
+<span class="nc" id="L564">        } catch (SQLException ex) {</span>
+<span class="nc" id="L565">            logger.error(&quot;Error adding version {} for {}&quot;,</span>
+<span class="nc" id="L566">                    version.getVersion(), version.getApplicationName(), ex);</span>
+<span class="nc" id="L567">            throw new DAOException(ex);</span>
+<span class="fc" id="L568">        }</span>
+<span class="fc" id="L569">    }</span>
+
+    @Override
+    public void updateDoiForVersion(
+            String doi, String applicationName, String version)
+            throws DAOException {
+        try {
+<span class="nc" id="L576">            PreparedStatement ps = getConnection().prepareStatement(&quot;UPDATE &quot;</span>
+                    + &quot;VIPAppVersions &quot;
+                    + &quot;SET doi=? &quot;
+                    + &quot;WHERE application=? AND version=?&quot;);
+
+<span class="nc" id="L581">            ps.setString(1, doi);</span>
+<span class="nc" id="L582">            ps.setString(2, applicationName);</span>
+<span class="nc" id="L583">            ps.setString(3, version);</span>
+<span class="nc" id="L584">            ps.executeUpdate();</span>
+<span class="nc" id="L585">            ps.close();</span>
+
+<span class="nc" id="L587">        } catch (SQLException ex) {</span>
+<span class="nc" id="L588">            logger.error(&quot;Error updating doi {} for {}/{}&quot;,</span>
+                    doi, applicationName, version, ex);
+<span class="nc" id="L590">            throw new DAOException(ex);</span>
+<span class="nc" id="L591">        }</span>
+<span class="nc" id="L592">    }</span>
+
+    @Override
+    public void removeVersion(String applicationName, String version)
+            throws DAOException {
+
+        try {
+<span class="nc" id="L599">            PreparedStatement ps = getConnection().prepareStatement(&quot;DELETE &quot;</span>
+                    + &quot;FROM VIPAppVersions WHERE application=? AND version=?&quot;);
+
+<span class="nc" id="L602">            ps.setString(1, applicationName);</span>
+<span class="nc" id="L603">            ps.setString(2, version);</span>
+<span class="nc" id="L604">            ps.execute();</span>
+<span class="nc" id="L605">            ps.close();</span>
+
+<span class="nc" id="L607">        } catch (SQLException ex) {</span>
+<span class="nc" id="L608">            logger.error(&quot;Error removing version {}/{}&quot;, applicationName, version, ex);</span>
+<span class="nc" id="L609">            throw new DAOException(ex);</span>
+<span class="nc" id="L610">        }</span>
+<span class="nc" id="L611">    }</span>
+
+    @Override
+    public AppVersion getVersion(String applicationName, String applicationVersion)
+            throws DAOException {
+
+        try {
+<span class="fc" id="L618">            PreparedStatement ps = getConnection().prepareStatement(&quot;SELECT &quot;</span>
+                    + &quot;application, version, lfn, json_lfn, &quot;
+                    + &quot;doi, visible, useBoutiquesForm &quot;
+                    + &quot;FROM VIPAppVersions WHERE &quot;
+                    + &quot;application = ? AND version = ?&quot;);
+<span class="fc" id="L623">            ps.setString(1, applicationName);</span>
+<span class="fc" id="L624">            ps.setString(2, applicationVersion);</span>
+
+<span class="fc" id="L626">            ResultSet rs = ps.executeQuery();</span>
+<span class="pc bpc" id="L627" title="1 of 2 branches missed.">            if (rs.first()) {</span>
+<span class="fc" id="L628">                AppVersion version = new AppVersion(rs.getString(&quot;application&quot;),</span>
+<span class="fc" id="L629">                        rs.getString(&quot;version&quot;),</span>
+<span class="fc" id="L630">                        rs.getString(&quot;lfn&quot;),</span>
+<span class="fc" id="L631">                        rs.getString(&quot;json_lfn&quot;),</span>
+<span class="fc" id="L632">                        rs.getString(&quot;doi&quot;),</span>
+<span class="fc" id="L633">                        rs.getBoolean(&quot;visible&quot;),</span>
+<span class="fc" id="L634">                        rs.getBoolean(&quot;useBoutiquesForm&quot;));</span>
+<span class="fc" id="L635">                ps.close();</span>
+
+<span class="fc" id="L637">                return version;</span>
+            }
+<span class="nc" id="L639">            return null;</span>
+<span class="nc" id="L640">        } catch (SQLException ex) {</span>
+<span class="nc" id="L641">            logger.error(&quot;Error getting versions for {}/{}&quot;,</span>
+                    applicationName, applicationVersion, ex);
+<span class="nc" id="L643">            throw new DAOException(ex);</span>
+        }
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

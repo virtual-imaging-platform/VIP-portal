@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../jacoco-resources/report.gif" type="image/gif"/><title>TestOutputFile.java</title><link rel="stylesheet" href="../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../index.html" class="el_report">coverage</a> &gt; <a href="../index.html" class="el_bundle">vip-application</a> &gt; <a href="index.source.html" class="el_package">fr.insalyon.creatis.vip.application.server.model.boutiques</a> &gt; <span class="el_source">TestOutputFile.java</span></div><h1>TestOutputFile.java</h1><pre class="source lang-java linenums">
+package fr.insalyon.creatis.vip.application.server.model.boutiques;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+import javax.annotation.Generated;
+import com.fasterxml.jackson.annotation.JsonAnyGetter;
+import com.fasterxml.jackson.annotation.JsonAnySetter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyDescription;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+
+@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonPropertyOrder({
+    &quot;id&quot;,
+    &quot;md5-reference&quot;
+})
+@Generated(&quot;jsonschema2pojo&quot;)
+<span class="nc" id="L21">public class TestOutputFile {</span>
+
+    /**
+     * Id referring to an output-file
+     * (Required)
+     * 
+     */
+    @JsonProperty(&quot;id&quot;)
+    @JsonPropertyDescription(&quot;Id referring to an output-file&quot;)
+    private String id;
+    /**
+     * MD5 checksum string to match against the MD5 checksum of the output-file specified by the id object
+     * 
+     */
+    @JsonProperty(&quot;md5-reference&quot;)
+    @JsonPropertyDescription(&quot;MD5 checksum string to match against the MD5 checksum of the output-file specified by the id object&quot;)
+    private String md5Reference;
+<span class="nc" id="L38">    @JsonIgnore</span>
+    private Map&lt;String, Object&gt; additionalProperties = new LinkedHashMap&lt;String, Object&gt;();
+
+    /**
+     * Id referring to an output-file
+     * (Required)
+     * 
+     */
+    @JsonProperty(&quot;id&quot;)
+    public String getId() {
+<span class="nc" id="L48">        return id;</span>
+    }
+
+    /**
+     * Id referring to an output-file
+     * (Required)
+     * 
+     */
+    @JsonProperty(&quot;id&quot;)
+    public void setId(String id) {
+<span class="nc" id="L58">        this.id = id;</span>
+<span class="nc" id="L59">    }</span>
+
+    /**
+     * MD5 checksum string to match against the MD5 checksum of the output-file specified by the id object
+     * 
+     */
+    @JsonProperty(&quot;md5-reference&quot;)
+    public String getMd5Reference() {
+<span class="nc" id="L67">        return md5Reference;</span>
+    }
+
+    /**
+     * MD5 checksum string to match against the MD5 checksum of the output-file specified by the id object
+     * 
+     */
+    @JsonProperty(&quot;md5-reference&quot;)
+    public void setMd5Reference(String md5Reference) {
+<span class="nc" id="L76">        this.md5Reference = md5Reference;</span>
+<span class="nc" id="L77">    }</span>
+
+    @JsonAnyGetter
+    public Map&lt;String, Object&gt; getAdditionalProperties() {
+<span class="nc" id="L81">        return this.additionalProperties;</span>
+    }
+
+    @JsonAnySetter
+    public void setAdditionalProperty(String name, Object value) {
+<span class="nc" id="L86">        this.additionalProperties.put(name, value);</span>
+<span class="nc" id="L87">    }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

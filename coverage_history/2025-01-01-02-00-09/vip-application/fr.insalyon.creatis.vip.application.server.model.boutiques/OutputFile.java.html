@@ -1,0 +1,364 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../jacoco-resources/report.gif" type="image/gif"/><title>OutputFile.java</title><link rel="stylesheet" href="../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../index.html" class="el_report">coverage</a> &gt; <a href="../index.html" class="el_bundle">vip-application</a> &gt; <a href="index.source.html" class="el_package">fr.insalyon.creatis.vip.application.server.model.boutiques</a> &gt; <span class="el_source">OutputFile.java</span></div><h1>OutputFile.java</h1><pre class="source lang-java linenums">
+package fr.insalyon.creatis.vip.application.server.model.boutiques;
+
+import java.util.ArrayList;
+import java.util.List;
+import javax.annotation.Generated;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyDescription;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+
+@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonPropertyOrder({
+    &quot;id&quot;,
+    &quot;name&quot;,
+    &quot;description&quot;,
+    &quot;value-key&quot;,
+    &quot;path-template&quot;,
+    &quot;conditional-path-template&quot;,
+    &quot;path-template-stripped-extensions&quot;,
+    &quot;list&quot;,
+    &quot;optional&quot;,
+    &quot;command-line-flag&quot;,
+    &quot;command-line-flag-separator&quot;,
+    &quot;uses-absolute-path&quot;,
+    &quot;file-template&quot;
+})
+@Generated(&quot;jsonschema2pojo&quot;)
+<span class="fc" id="L29">public class OutputFile {</span>
+
+    /**
+     * A short, unique, informative identifier containing only alphanumeric characters and underscores. Typically used to generate variable names. Example: &quot;data_file&quot;
+     * (Required)
+     * 
+     */
+    @JsonProperty(&quot;id&quot;)
+    @JsonPropertyDescription(&quot;A short, unique, informative identifier containing only alphanumeric characters and underscores. Typically used to generate variable names. Example: \&quot;data_file\&quot;&quot;)
+    private String id;
+    /**
+     * A human-readable output name. Example: 'Data file'
+     * (Required)
+     * 
+     */
+    @JsonProperty(&quot;name&quot;)
+    @JsonPropertyDescription(&quot;A human-readable output name. Example: 'Data file'&quot;)
+    private String name;
+    /**
+     * Output description.
+     * 
+     */
+    @JsonProperty(&quot;description&quot;)
+    @JsonPropertyDescription(&quot;Output description.&quot;)
+    private String description;
+    /**
+     * A string contained in command-line, substituted by the output value and/or flag at runtime.
+     * 
+     */
+    @JsonProperty(&quot;value-key&quot;)
+    @JsonPropertyDescription(&quot;A string contained in command-line, substituted by the output value and/or flag at runtime.&quot;)
+    private String valueKey;
+    /**
+     * Describes the output file path relatively to the execution directory. May contain input value keys and wildcards. Example: &quot;results/[INPUT1]_brain*.mnc&quot;.
+     * 
+     */
+    @JsonProperty(&quot;path-template&quot;)
+    @JsonPropertyDescription(&quot;Describes the output file path relatively to the execution directory. May contain input value keys and wildcards. Example: \&quot;results/[INPUT1]_brain*.mnc\&quot;.&quot;)
+    private String pathTemplate;
+    /**
+     * List of objects containing boolean statement (Limited python syntax: ==, !=, &lt;, &gt;, &lt;=, &gt;=, and, or) and output file paths relative to the execution directory, assign path of first true boolean statement. May contain input value keys, &quot;default&quot; object required if &quot;optional&quot; set to True . Example list: &quot;[{&quot;[PARAM1] &gt; 8&quot;: &quot;outputs/[INPUT1].txt&quot;}, {&quot;default&quot;: &quot;outputs/default.txt&quot;}]&quot;.
+     * 
+     */
+<span class="fc" id="L72">    @JsonProperty(&quot;conditional-path-template&quot;)</span>
+    @JsonPropertyDescription(&quot;List of objects containing boolean statement (Limited python syntax: ==, !=, &lt;, &gt;, &lt;=, &gt;=, and, or) and output file paths relative to the execution directory, assign path of first true boolean statement. May contain input value keys, \&quot;default\&quot; object required if \&quot;optional\&quot; set to True . Example list: \&quot;[{\&quot;[PARAM1] &gt; 8\&quot;: \&quot;outputs/[INPUT1].txt\&quot;}, {\&quot;default\&quot;: \&quot;outputs/default.txt\&quot;}]\&quot;.&quot;)
+    private List&lt;ConditionalPathTemplate&gt; conditionalPathTemplate = new ArrayList&lt;ConditionalPathTemplate&gt;();
+    /**
+     * List of file extensions that will be stripped from the input values before being substituted in the path template. Example: [&quot;.nii&quot;,&quot;.nii.gz&quot;].
+     * 
+     */
+<span class="fc" id="L79">    @JsonProperty(&quot;path-template-stripped-extensions&quot;)</span>
+    @JsonPropertyDescription(&quot;List of file extensions that will be stripped from the input values before being substituted in the path template. Example: [\&quot;.nii\&quot;,\&quot;.nii.gz\&quot;].&quot;)
+    private List&lt;String&gt; pathTemplateStrippedExtensions = new ArrayList&lt;String&gt;();
+    /**
+     * True if output is a list of value.
+     * 
+     */
+    @JsonProperty(&quot;list&quot;)
+    @JsonPropertyDescription(&quot;True if output is a list of value.&quot;)
+    private Boolean list;
+    /**
+     * True if output may not be produced by the tool.
+     * 
+     */
+    @JsonProperty(&quot;optional&quot;)
+    @JsonPropertyDescription(&quot;True if output may not be produced by the tool.&quot;)
+    private Boolean optional;
+    /**
+     * Option flag of the output, involved in the value-key substitution. Examples: -o, --output
+     * 
+     */
+    @JsonProperty(&quot;command-line-flag&quot;)
+    @JsonPropertyDescription(&quot;Option flag of the output, involved in the value-key substitution. Examples: -o, --output&quot;)
+    private String commandLineFlag;
+    /**
+     * Separator used between flags and their arguments. Defaults to a single space.
+     * 
+     */
+    @JsonProperty(&quot;command-line-flag-separator&quot;)
+    @JsonPropertyDescription(&quot;Separator used between flags and their arguments. Defaults to a single space.&quot;)
+    private String commandLineFlagSeparator;
+    /**
+     * Specifies that this output filepath will be given as an absolute path.
+     * 
+     */
+    @JsonProperty(&quot;uses-absolute-path&quot;)
+    @JsonPropertyDescription(&quot;Specifies that this output filepath will be given as an absolute path.&quot;)
+    private Boolean usesAbsolutePath;
+    /**
+     * An array of strings that may contain value keys. Each item will be a line in the configuration file.
+     * 
+     */
+<span class="fc" id="L121">    @JsonProperty(&quot;file-template&quot;)</span>
+    @JsonPropertyDescription(&quot;An array of strings that may contain value keys. Each item will be a line in the configuration file.&quot;)
+    private List&lt;String&gt; fileTemplate = new ArrayList&lt;String&gt;();
+
+    /**
+     * A short, unique, informative identifier containing only alphanumeric characters and underscores. Typically used to generate variable names. Example: &quot;data_file&quot;
+     * (Required)
+     * 
+     */
+    @JsonProperty(&quot;id&quot;)
+    public String getId() {
+<span class="fc" id="L132">        return id;</span>
+    }
+
+    /**
+     * A short, unique, informative identifier containing only alphanumeric characters and underscores. Typically used to generate variable names. Example: &quot;data_file&quot;
+     * (Required)
+     * 
+     */
+    @JsonProperty(&quot;id&quot;)
+    public void setId(String id) {
+<span class="fc" id="L142">        this.id = id;</span>
+<span class="fc" id="L143">    }</span>
+
+    /**
+     * A human-readable output name. Example: 'Data file'
+     * (Required)
+     * 
+     */
+    @JsonProperty(&quot;name&quot;)
+    public String getName() {
+<span class="fc" id="L152">        return name;</span>
+    }
+
+    /**
+     * A human-readable output name. Example: 'Data file'
+     * (Required)
+     * 
+     */
+    @JsonProperty(&quot;name&quot;)
+    public void setName(String name) {
+<span class="fc" id="L162">        this.name = name;</span>
+<span class="fc" id="L163">    }</span>
+
+    /**
+     * Output description.
+     * 
+     */
+    @JsonProperty(&quot;description&quot;)
+    public String getDescription() {
+<span class="fc" id="L171">        return description;</span>
+    }
+
+    /**
+     * Output description.
+     * 
+     */
+    @JsonProperty(&quot;description&quot;)
+    public void setDescription(String description) {
+<span class="fc" id="L180">        this.description = description;</span>
+<span class="fc" id="L181">    }</span>
+
+    /**
+     * A string contained in command-line, substituted by the output value and/or flag at runtime.
+     * 
+     */
+    @JsonProperty(&quot;value-key&quot;)
+    public String getValueKey() {
+<span class="fc" id="L189">        return valueKey;</span>
+    }
+
+    /**
+     * A string contained in command-line, substituted by the output value and/or flag at runtime.
+     * 
+     */
+    @JsonProperty(&quot;value-key&quot;)
+    public void setValueKey(String valueKey) {
+<span class="fc" id="L198">        this.valueKey = valueKey;</span>
+<span class="fc" id="L199">    }</span>
+
+    /**
+     * Describes the output file path relatively to the execution directory. May contain input value keys and wildcards. Example: &quot;results/[INPUT1]_brain*.mnc&quot;.
+     * 
+     */
+    @JsonProperty(&quot;path-template&quot;)
+    public String getPathTemplate() {
+<span class="fc" id="L207">        return pathTemplate;</span>
+    }
+
+    /**
+     * Describes the output file path relatively to the execution directory. May contain input value keys and wildcards. Example: &quot;results/[INPUT1]_brain*.mnc&quot;.
+     * 
+     */
+    @JsonProperty(&quot;path-template&quot;)
+    public void setPathTemplate(String pathTemplate) {
+<span class="fc" id="L216">        this.pathTemplate = pathTemplate;</span>
+<span class="fc" id="L217">    }</span>
+
+    /**
+     * List of objects containing boolean statement (Limited python syntax: ==, !=, &lt;, &gt;, &lt;=, &gt;=, and, or) and output file paths relative to the execution directory, assign path of first true boolean statement. May contain input value keys, &quot;default&quot; object required if &quot;optional&quot; set to True . Example list: &quot;[{&quot;[PARAM1] &gt; 8&quot;: &quot;outputs/[INPUT1].txt&quot;}, {&quot;default&quot;: &quot;outputs/default.txt&quot;}]&quot;.
+     * 
+     */
+    @JsonProperty(&quot;conditional-path-template&quot;)
+    public List&lt;ConditionalPathTemplate&gt; getConditionalPathTemplate() {
+<span class="fc" id="L225">        return conditionalPathTemplate;</span>
+    }
+
+    /**
+     * List of objects containing boolean statement (Limited python syntax: ==, !=, &lt;, &gt;, &lt;=, &gt;=, and, or) and output file paths relative to the execution directory, assign path of first true boolean statement. May contain input value keys, &quot;default&quot; object required if &quot;optional&quot; set to True . Example list: &quot;[{&quot;[PARAM1] &gt; 8&quot;: &quot;outputs/[INPUT1].txt&quot;}, {&quot;default&quot;: &quot;outputs/default.txt&quot;}]&quot;.
+     * 
+     */
+    @JsonProperty(&quot;conditional-path-template&quot;)
+    public void setConditionalPathTemplate(List&lt;ConditionalPathTemplate&gt; conditionalPathTemplate) {
+<span class="nc" id="L234">        this.conditionalPathTemplate = conditionalPathTemplate;</span>
+<span class="nc" id="L235">    }</span>
+
+    /**
+     * List of file extensions that will be stripped from the input values before being substituted in the path template. Example: [&quot;.nii&quot;,&quot;.nii.gz&quot;].
+     * 
+     */
+    @JsonProperty(&quot;path-template-stripped-extensions&quot;)
+    public List&lt;String&gt; getPathTemplateStrippedExtensions() {
+<span class="fc" id="L243">        return pathTemplateStrippedExtensions;</span>
+    }
+
+    /**
+     * List of file extensions that will be stripped from the input values before being substituted in the path template. Example: [&quot;.nii&quot;,&quot;.nii.gz&quot;].
+     * 
+     */
+    @JsonProperty(&quot;path-template-stripped-extensions&quot;)
+    public void setPathTemplateStrippedExtensions(List&lt;String&gt; pathTemplateStrippedExtensions) {
+<span class="nc" id="L252">        this.pathTemplateStrippedExtensions = pathTemplateStrippedExtensions;</span>
+<span class="nc" id="L253">    }</span>
+
+    /**
+     * True if output is a list of value.
+     * 
+     */
+    @JsonProperty(&quot;list&quot;)
+    public Boolean getList() {
+<span class="fc" id="L261">        return list;</span>
+    }
+
+    /**
+     * True if output is a list of value.
+     * 
+     */
+    @JsonProperty(&quot;list&quot;)
+    public void setList(Boolean list) {
+<span class="nc" id="L270">        this.list = list;</span>
+<span class="nc" id="L271">    }</span>
+
+    /**
+     * True if output may not be produced by the tool.
+     * 
+     */
+    @JsonProperty(&quot;optional&quot;)
+    public Boolean getOptional() {
+<span class="fc" id="L279">        return optional;</span>
+    }
+
+    /**
+     * True if output may not be produced by the tool.
+     * 
+     */
+    @JsonProperty(&quot;optional&quot;)
+    public void setOptional(Boolean optional) {
+<span class="fc" id="L288">        this.optional = optional;</span>
+<span class="fc" id="L289">    }</span>
+
+    /**
+     * Option flag of the output, involved in the value-key substitution. Examples: -o, --output
+     * 
+     */
+    @JsonProperty(&quot;command-line-flag&quot;)
+    public String getCommandLineFlag() {
+<span class="fc" id="L297">        return commandLineFlag;</span>
+    }
+
+    /**
+     * Option flag of the output, involved in the value-key substitution. Examples: -o, --output
+     * 
+     */
+    @JsonProperty(&quot;command-line-flag&quot;)
+    public void setCommandLineFlag(String commandLineFlag) {
+<span class="nc" id="L306">        this.commandLineFlag = commandLineFlag;</span>
+<span class="nc" id="L307">    }</span>
+
+    /**
+     * Separator used between flags and their arguments. Defaults to a single space.
+     * 
+     */
+    @JsonProperty(&quot;command-line-flag-separator&quot;)
+    public String getCommandLineFlagSeparator() {
+<span class="fc" id="L315">        return commandLineFlagSeparator;</span>
+    }
+
+    /**
+     * Separator used between flags and their arguments. Defaults to a single space.
+     * 
+     */
+    @JsonProperty(&quot;command-line-flag-separator&quot;)
+    public void setCommandLineFlagSeparator(String commandLineFlagSeparator) {
+<span class="nc" id="L324">        this.commandLineFlagSeparator = commandLineFlagSeparator;</span>
+<span class="nc" id="L325">    }</span>
+
+    /**
+     * Specifies that this output filepath will be given as an absolute path.
+     * 
+     */
+    @JsonProperty(&quot;uses-absolute-path&quot;)
+    public Boolean getUsesAbsolutePath() {
+<span class="fc" id="L333">        return usesAbsolutePath;</span>
+    }
+
+    /**
+     * Specifies that this output filepath will be given as an absolute path.
+     * 
+     */
+    @JsonProperty(&quot;uses-absolute-path&quot;)
+    public void setUsesAbsolutePath(Boolean usesAbsolutePath) {
+<span class="nc" id="L342">        this.usesAbsolutePath = usesAbsolutePath;</span>
+<span class="nc" id="L343">    }</span>
+
+    /**
+     * An array of strings that may contain value keys. Each item will be a line in the configuration file.
+     * 
+     */
+    @JsonProperty(&quot;file-template&quot;)
+    public List&lt;String&gt; getFileTemplate() {
+<span class="fc" id="L351">        return fileTemplate;</span>
+    }
+
+    /**
+     * An array of strings that may contain value keys. Each item will be a line in the configuration file.
+     * 
+     */
+    @JsonProperty(&quot;file-template&quot;)
+    public void setFileTemplate(List&lt;String&gt; fileTemplate) {
+<span class="nc" id="L360">        this.fileTemplate = fileTemplate;</span>
+<span class="nc" id="L361">    }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../jacoco-resources/report.gif" type="image/gif"/><title>ApiException.java</title><link rel="stylesheet" href="../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../index.html" class="el_report">coverage</a> &gt; <a href="../index.html" class="el_bundle">vip-api</a> &gt; <a href="index.source.html" class="el_package">fr.insalyon.creatis.vip.api.exception</a> &gt; <span class="el_source">ApiException.java</span></div><h1>ApiException.java</h1><pre class="source lang-java linenums">/*
+ * Copyright and authors: see LICENSE.txt in base repository.
+ *
+ * This software is a web portal for pipeline execution on distributed systems.
+ *
+ * This software is governed by the CeCILL-B license under French law and
+ * abiding by the rules of distribution of free software.  You can  use, 
+ * modify and/ or redistribute the software under the terms of the CeCILL-B
+ * license as circulated by CEA, CNRS and INRIA at the following URL
+ * &quot;http://www.cecill.info&quot;. 
+ *
+ * As a counterpart to the access to the source code and  rights to copy,
+ * modify and redistribute granted by the license, users are provided only
+ * with a limited warranty  and the software's author,  the holder of the
+ * economic rights,  and the successive licensors  have only  limited
+ * liability. 
+ *
+ * In this respect, the user's attention is drawn to the risks associated
+ * with loading,  using,  modifying and/or developing or reproducing the
+ * software by the user in light of its specific status of free software,
+ * that may mean  that it is complicated to manipulate,  and  that  also
+ * therefore means  that it is reserved for developers  and  experienced
+ * professionals having in-depth computer knowledge. Users are therefore
+ * encouraged to load and test the software's suitability as regards their
+ * requirements in conditions enabling the security of their systems and/or 
+ * data to be ensured and,  more generally, to use and operate it in the 
+ * same conditions as regards security. 
+ *
+ * The fact that you are presently reading this means that you have had
+ * knowledge of the CeCILL-B license and that you accept its terms.
+ */
+package fr.insalyon.creatis.vip.api.exception;
+
+import fr.insalyon.creatis.vip.core.client.VipException;
+import org.springframework.http.HttpStatus;
+
+import java.util.Optional;
+
+/**
+ *
+ * @author Tristan Glatard
+ */
+public class ApiException extends VipException {
+
+    /* Reserved codes : 8xxx : vip-api */
+<span class="fc" id="L46">    public enum ApiError implements VipError {</span>
+<span class="fc" id="L47">        GENERIC_API_ERROR(8000),</span>
+<span class="fc" id="L48">        NOT_IMPLEMENTED(8001),</span>
+<span class="fc" id="L49">        BAD_CREDENTIALS(8002, HttpStatus.UNAUTHORIZED.value()),</span>
+<span class="fc" id="L50">        INSUFFICIENT_AUTH(8003),</span>
+<span class="fc" id="L51">        AUTHENTICATION_ERROR(8004),</span>
+<span class="fc" id="L52">        INVALID_PIPELINE_IDENTIFIER(8005),</span>
+<span class="fc" id="L53">        APPLICATION_NOT_FOUND(8006),</span>
+<span class="fc" id="L54">        PIPELINE_NOT_FOUND(8007),</span>
+<span class="fc" id="L55">        NOT_ALLOWED_TO_USE_PIPELINE(8008),</span>
+<span class="fc" id="L56">        INPUT_FIELD_NOT_VALID(8009),</span>
+<span class="fc" id="L57">        WRONG_DATE_FORMAT(8010),</span>
+<span class="fc" id="L58">        WRONG_STAT_SERVICE(8011),</span>
+<span class="fc" id="L59">        COUNTRY_UNKNOWN(8012),</span>
+<span class="fc" id="L60">        UNAUTHORIZED_DATA_ACCESS(8013),</span>
+<span class="fc" id="L61">        WRONG_OIDC_LOGIN(8014),</span>
+<span class="fc" id="L62">        INVALID_EXECUTION_ID(8015),</span>
+<span class="fc" id="L63">        INVALID_EXAMPLE_ID(8016),</span>
+<span class="fc" id="L64">        NOT_COMPATIBLE_WITH_BOUTIQUES(8017),</span>
+<span class="fc" id="L65">        INPUT_FIELD_MISSING(8018);</span>
+
+        private final Integer code;
+        private final Integer httpStatus;
+
+        ApiError(Integer code) {
+<span class="fc" id="L71">            this(code, null);</span>
+<span class="fc" id="L72">        }</span>
+
+<span class="fc" id="L74">        ApiError(Integer code, Integer httpStatus) {</span>
+<span class="fc" id="L75">            this.code = code;</span>
+<span class="fc" id="L76">            this.httpStatus = httpStatus;</span>
+<span class="fc" id="L77">        }</span>
+
+        @Override
+<span class="fc" id="L80">        public Integer getCode() { return code; }</span>
+
+<span class="fc" id="L82">        public Integer getHttpStatus() {return httpStatus; }</span>
+
+        static private final String GENERIC_ERROR_MESSAGE = &quot;An error has been encountered on the VIP API&quot;;
+
+        static {
+<span class="fc" id="L87">            addMessage(ApiError.GENERIC_API_ERROR, GENERIC_ERROR_MESSAGE, 0);</span>
+<span class="fc" id="L88">            addMessage(ApiError.NOT_IMPLEMENTED, &quot;The {} method is not implemented in the VIP API&quot;, 1);</span>
+<span class="fc" id="L89">            addMessage(ApiError.BAD_CREDENTIALS, &quot;Bad credentials&quot;, 0);</span>
+<span class="fc" id="L90">            addMessage(ApiError.INVALID_PIPELINE_IDENTIFIER, &quot;The {} pipeline identifier is not valid&quot;, 1);</span>
+<span class="fc" id="L91">            addMessage(ApiError.PIPELINE_NOT_FOUND, &quot;The {} pipeline does not exists or cannot be used&quot;, 1);</span>
+<span class="fc" id="L92">            addMessage(ApiError.NOT_ALLOWED_TO_USE_PIPELINE, &quot;Not allowed to access pipeline {}&quot;, 1);</span>
+<span class="fc" id="L93">            addMessage(ApiError.INPUT_FIELD_NOT_VALID, &quot;Input field '{}' is not valid. Cause : {}&quot;, 2);</span>
+<span class="fc" id="L94">            addMessage(ApiError.INPUT_FIELD_MISSING, &quot;Input field '{}' is missing&quot;, 1);</span>
+<span class="fc" id="L95">            addMessage(ApiError.WRONG_DATE_FORMAT, &quot;The date {} have a wrong format (needed : {})&quot;, 2);</span>
+<span class="fc" id="L96">            addMessage(ApiError.WRONG_STAT_SERVICE, &quot;The service {} is unknown, only 'vip' is possible&quot;, 1);</span>
+<span class="fc" id="L97">            addMessage(ApiError.COUNTRY_UNKNOWN, &quot;Country unknown : {}&quot;, 1);</span>
+<span class="fc" id="L98">            addMessage(ApiError.UNAUTHORIZED_DATA_ACCESS, &quot;Unauthorized data access to : {}&quot;, 1);</span>
+<span class="fc" id="L99">            addMessage(ApiError.WRONG_OIDC_LOGIN, &quot;The login process encountered an error&quot;, 0);</span>
+<span class="fc" id="L100">            addMessage(ApiError.INVALID_EXECUTION_ID, &quot;No execution available with this id : {}&quot;, 1);</span>
+<span class="fc" id="L101">            addMessage(ApiError.INVALID_EXAMPLE_ID, &quot;There is no example with the id : {}&quot;, 1);</span>
+<span class="fc" id="L102">            addMessage(ApiError.NOT_COMPATIBLE_WITH_BOUTIQUES, &quot;The pipeline is not compatible with boutiques : {}&quot;, 1);</span>
+<span class="fc" id="L103">        }</span>
+
+        public Optional&lt;String&gt; getMessage() {
+<span class="nc" id="L106">            return getRawMessage(this);</span>
+        }
+
+        public static String getGenericErrorMessage() {
+<span class="fc" id="L110">            return GENERIC_ERROR_MESSAGE;</span>
+        }
+
+        public String formatMessage(Object ...params) {
+<span class="fc" id="L114">            return VipException.formatMessage(this, params);</span>
+        }
+    }
+
+    public Optional&lt;Integer&gt; getHttpStatus() {
+<span class="fc" id="L119">        return getVipError()</span>
+<span class="fc" id="L120">                .filter(ApiError.class::isInstance)</span>
+<span class="fc" id="L121">                .map(ApiError.class::cast)</span>
+<span class="fc" id="L122">                .map(ApiError::getHttpStatus);</span>
+    }
+
+    public ApiException(String message) {
+<span class="fc" id="L126">        super(message);</span>
+<span class="fc" id="L127">    }</span>
+
+    public ApiException(Throwable thrwbl) {
+<span class="fc" id="L130">        super(thrwbl);</span>
+<span class="fc" id="L131">    }</span>
+
+    public ApiException(String message, Throwable cause) {
+<span class="nc" id="L134">        super(message, cause);</span>
+<span class="nc" id="L135">    }</span>
+
+    public ApiException(ApiError apiError, Object... params) {
+<span class="fc" id="L138">        super(apiError, params);</span>
+<span class="fc" id="L139">    }</span>
+
+    public ApiException(ApiError apiError, Throwable cause, Object... params) {
+<span class="nc" id="L142">        super(apiError, cause, params);</span>
+<span class="nc" id="L143">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

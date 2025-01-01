@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../jacoco-resources/report.gif" type="image/gif"/><title>Execution.java</title><link rel="stylesheet" href="../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../index.html" class="el_report">coverage</a> &gt; <a href="../index.html" class="el_bundle">vip-api</a> &gt; <a href="index.source.html" class="el_package">fr.insalyon.creatis.vip.api.model</a> &gt; <span class="el_source">Execution.java</span></div><h1>Execution.java</h1><pre class="source lang-java linenums">/*
+ * Copyright and authors: see LICENSE.txt in base repository.
+ *
+ * This software is a web portal for pipeline execution on distributed systems.
+ *
+ * This software is governed by the CeCILL-B license under French law and
+ * abiding by the rules of distribution of free software.  You can  use,
+ * modify and/ or redistribute the software under the terms of the CeCILL-B
+ * license as circulated by CEA, CNRS and INRIA at the following URL
+ * &quot;http://www.cecill.info&quot;.
+ *
+ * As a counterpart to the access to the source code and  rights to copy,
+ * modify and redistribute granted by the license, users are provided only
+ * with a limited warranty  and the software's author,  the holder of the
+ * economic rights,  and the successive licensors  have only  limited
+ * liability.
+ *
+ * In this respect, the user's attention is drawn to the risks associated
+ * with loading,  using,  modifying and/or developing or reproducing the
+ * software by the user in light of its specific status of free software,
+ * that may mean  that it is complicated to manipulate,  and  that  also
+ * therefore means  that it is reserved for developers  and  experienced
+ * professionals having in-depth computer knowledge. Users are therefore
+ * encouraged to load and test the software's suitability as regards their
+ * requirements in conditions enabling the security of their systems and/or
+ * data to be ensured and,  more generally, to use and operate it in the
+ * same conditions as regards security.
+ *
+ * The fact that you are presently reading this means that you have had
+ * knowledge of the CeCILL-B license and that you accept its terms.
+ */
+package fr.insalyon.creatis.vip.api.model;
+
+import java.util.*;
+import javax.validation.constraints.NotNull;
+
+/**
+ *
+ * @author Tristan Glatard
+ */
+public class Execution {
+
+    private String identifier;
+    @NotNull
+    private String name;
+    @NotNull
+    private String pipelineIdentifier;
+    private int timeout;
+    private ExecutionStatus status;
+    @NotNull
+    private Map&lt;String, java.lang.Object&gt; inputValues;
+    private Map&lt;String, List&lt;java.lang.Object&gt;&gt; returnedFiles;
+
+    // optional arguments
+    private String studyIdentifier;
+    private Integer errorCode;
+    private Long startDate;
+    private Long endDate;
+    private String resultsLocation;
+
+
+<span class="fc" id="L62">    public Execution() {</span>
+<span class="fc" id="L63">        inputValues = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L64">        returnedFiles = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L65">    }</span>
+
+    public Execution(String identifier,
+                     String name,
+                     String pipelineIdentifier,
+                     int timeout,
+                     ExecutionStatus status,
+                     String studyIdentifier,
+                     Integer errorCode,
+                     Long startDate,
+                     Long endDate,
+                     String resultsLocation) {
+<span class="fc" id="L77">        this();</span>
+<span class="fc" id="L78">        this.identifier = identifier;</span>
+<span class="pc bpc" id="L79" title="1 of 2 branches missed.">        this.name = name == null ? identifier : name; // null names sometimes happen due to a race condition in VIP.</span>
+<span class="fc" id="L80">        this.pipelineIdentifier = pipelineIdentifier;</span>
+<span class="fc" id="L81">        this.timeout = timeout;</span>
+<span class="fc" id="L82">        this.status = status;</span>
+<span class="fc" id="L83">        this.studyIdentifier = studyIdentifier;</span>
+<span class="fc" id="L84">        this.errorCode = errorCode;</span>
+<span class="fc" id="L85">        this.startDate = startDate;</span>
+<span class="fc" id="L86">        this.endDate = endDate;</span>
+<span class="fc" id="L87">        this.resultsLocation = resultsLocation;</span>
+<span class="fc" id="L88">    }</span>
+
+    public String getIdentifier() {
+<span class="fc" id="L91">        return identifier;</span>
+    }
+
+    public void setIdentifier(String identifier) {
+<span class="fc" id="L95">        this.identifier = identifier;</span>
+<span class="fc" id="L96">    }</span>
+
+    public String getName() {
+<span class="fc" id="L99">        return name;</span>
+    }
+
+    public void setName(String name) {
+<span class="fc" id="L103">        this.name = name;</span>
+<span class="fc" id="L104">    }</span>
+
+    public String getPipelineIdentifier() {
+<span class="fc" id="L107">        return pipelineIdentifier;</span>
+    }
+
+    public void setPipelineIdentifier(String pipelineIdentifier) {
+<span class="fc" id="L111">        this.pipelineIdentifier = pipelineIdentifier;</span>
+<span class="fc" id="L112">    }</span>
+
+    public int getTimeout() {
+<span class="fc" id="L115">        return timeout;</span>
+    }
+
+    public void setTimeout(int timeout) {
+<span class="nc" id="L119">        this.timeout = timeout;</span>
+<span class="nc" id="L120">    }</span>
+
+    public ExecutionStatus getStatus() {
+<span class="fc" id="L123">        return status;</span>
+    }
+
+    public void setStatus(ExecutionStatus status) {
+<span class="nc" id="L127">        this.status = status;</span>
+<span class="nc" id="L128">    }</span>
+
+    public Map&lt;String, java.lang.Object&gt; getInputValues() {
+<span class="fc" id="L131">        return inputValues;</span>
+    }
+
+    public void setInputValues(Map&lt;String, java.lang.Object&gt; inputValues) {
+<span class="fc" id="L135">        this.inputValues = inputValues;</span>
+<span class="fc" id="L136">    }</span>
+
+    public Map&lt;String, List&lt;java.lang.Object&gt;&gt; getReturnedFiles() {
+<span class="fc" id="L139">        return returnedFiles;</span>
+    }
+
+    public void setReturnedFiles(Map&lt;String, List&lt;java.lang.Object&gt;&gt;  returnedFiles) {
+<span class="fc" id="L143">        this.returnedFiles = returnedFiles;</span>
+<span class="fc" id="L144">    }</span>
+
+    public void clearReturnedFiles() {
+<span class="fc" id="L147">        returnedFiles = null;</span>
+<span class="fc" id="L148">    }</span>
+
+    public String getStudyIdentifier() {
+<span class="fc" id="L151">        return studyIdentifier;</span>
+    }
+
+    public void setStudyIdentifier(String studyIdentifier) {
+<span class="nc" id="L155">        this.studyIdentifier = studyIdentifier;</span>
+<span class="nc" id="L156">    }</span>
+
+    public Integer getErrorCode() {
+<span class="fc" id="L159">        return errorCode;</span>
+    }
+
+    public void setErrorCode(Integer errorCode) {
+<span class="nc" id="L163">        this.errorCode = errorCode;</span>
+<span class="nc" id="L164">    }</span>
+
+    public Long getStartDate() {
+<span class="fc" id="L167">        return startDate;</span>
+    }
+
+    public void setStartDate(Long startDate) {
+<span class="nc" id="L171">        this.startDate = startDate;</span>
+<span class="nc" id="L172">    }</span>
+
+    public Long getEndDate() {
+<span class="fc" id="L175">        return endDate;</span>
+    }
+
+    public void setEndDate(Long endDate) {
+<span class="nc" id="L179">        this.endDate = endDate;</span>
+<span class="nc" id="L180">    }</span>
+
+    public String getResultsLocation() {
+<span class="fc" id="L183">        return resultsLocation;</span>
+    }
+
+    public void setResultsLocation(String resultsLocation) {
+<span class="nc" id="L187">        this.resultsLocation = resultsLocation;</span>
+<span class="nc" id="L188">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../../jacoco-resources/report.gif" type="image/gif"/><title>LFCBusiness.java</title><link rel="stylesheet" href="../../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../../index.html" class="el_report">coverage</a> &gt; <a href="../index.html" class="el_bundle">vip-datamanager</a> &gt; <a href="index.source.html" class="el_package">fr.insalyon.creatis.vip.datamanager.server.business</a> &gt; <span class="el_source">LFCBusiness.java</span></div><h1>LFCBusiness.java</h1><pre class="source lang-java linenums">/*
+ * Copyright and authors: see LICENSE.txt in base repository.
+ *
+ * This software is a web portal for pipeline execution on distributed systems.
+ *
+ * This software is governed by the CeCILL-B license under French law and
+ * abiding by the rules of distribution of free software.  You can  use,
+ * modify and/ or redistribute the software under the terms of the CeCILL-B
+ * license as circulated by CEA, CNRS and INRIA at the following URL
+ * &quot;http://www.cecill.info&quot;.
+ *
+ * As a counterpart to the access to the source code and  rights to copy,
+ * modify and redistribute granted by the license, users are provided only
+ * with a limited warranty  and the software's author,  the holder of the
+ * economic rights,  and the successive licensors  have only  limited
+ * liability.
+ *
+ * In this respect, the user's attention is drawn to the risks associated
+ * with loading,  using,  modifying and/or developing or reproducing the
+ * software by the user in light of its specific status of free software,
+ * that may mean  that it is complicated to manipulate,  and  that  also
+ * therefore means  that it is reserved for developers  and  experienced
+ * professionals having in-depth computer knowledge. Users are therefore
+ * encouraged to load and test the software's suitability as regards their
+ * requirements in conditions enabling the security of their systems and/or
+ * data to be ensured and,  more generally, to use and operate it in the
+ * same conditions as regards security.
+ *
+ * The fact that you are presently reading this means that you have had
+ * knowledge of the CeCILL-B license and that you accept its terms.
+ */
+package fr.insalyon.creatis.vip.datamanager.server.business;
+
+import fr.insalyon.creatis.grida.client.GRIDAClient;
+import fr.insalyon.creatis.grida.client.GRIDAClientException;
+import fr.insalyon.creatis.grida.common.bean.GridData;
+import fr.insalyon.creatis.vip.core.client.bean.User;
+import fr.insalyon.creatis.vip.core.server.business.BusinessException;
+import fr.insalyon.creatis.vip.datamanager.client.bean.Data;
+import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerException;
+
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+/**
+ *
+ * @author Rafael Silva
+ */
+@Service
+@Transactional
+public class LFCBusiness {
+
+<span class="fc" id="L60">    private final Logger logger = LoggerFactory.getLogger(getClass());</span>
+
+    private GRIDAClient gridaClient;
+    private LfcPathsBusiness lfcPathsBusiness;
+
+    @Autowired
+<span class="fc" id="L66">    public LFCBusiness(GRIDAClient gridaClient, LfcPathsBusiness lfcPathsBusiness) {</span>
+<span class="fc" id="L67">        this.gridaClient = gridaClient;</span>
+<span class="fc" id="L68">        this.lfcPathsBusiness = lfcPathsBusiness;</span>
+<span class="fc" id="L69">    }</span>
+
+    public List&lt;Data&gt; listDir(User user, String baseDir, boolean refresh)
+            throws BusinessException {
+
+        try {
+<span class="fc" id="L75">            List&lt;GridData&gt; list = gridaClient.getFolderData(</span>
+<span class="fc" id="L76">                    lfcPathsBusiness.parseBaseDir(user, baseDir), refresh);</span>
+
+<span class="fc" id="L78">            List&lt;Data&gt; dataList = new ArrayList&lt;&gt;();</span>
+<span class="fc bfc" id="L79" title="All 2 branches covered.">            for (GridData data : list) {</span>
+<span class="pc bpc" id="L80" title="1 of 2 branches missed.">                if (data.getType() == GridData.Type.Folder) {</span>
+<span class="nc" id="L81">                    dataList.add(new Data(data.getName(),</span>
+<span class="nc" id="L82">                            Data.Type.valueOf(data.getType().name().toLowerCase()),</span>
+<span class="nc" id="L83">                            data.getPermissions()));</span>
+
+                } else {
+<span class="fc" id="L86">                    dataList.add(new Data(data.getName(),</span>
+<span class="fc" id="L87">                            Data.Type.valueOf(data.getType().name().toLowerCase()),</span>
+<span class="fc" id="L88">                            data.getLength(), data.getModificationDate(),</span>
+<span class="fc" id="L89">                            data.getReplicas(), data.getPermissions()));</span>
+                }
+<span class="fc" id="L91">            }</span>
+<span class="fc" id="L92">            return dataList;</span>
+
+<span class="nc" id="L94">        } catch (DataManagerException ex) {</span>
+<span class="nc" id="L95">            throw new BusinessException(ex);</span>
+<span class="nc" id="L96">        } catch (GRIDAClientException ex) {</span>
+<span class="nc" id="L97">            logger.error(&quot;Error listing directory {} for {}&quot;, baseDir, user,ex);</span>
+<span class="nc" id="L98">            throw new BusinessException(ex);</span>
+        }
+    }
+
+    public void createDir(User user, String baseDir, String name)
+            throws BusinessException {
+
+        try {
+<span class="nc" id="L106">            gridaClient.createFolder(</span>
+<span class="nc" id="L107">                    lfcPathsBusiness.parseBaseDir(user, baseDir), name);</span>
+<span class="nc" id="L108">        } catch (DataManagerException ex) {</span>
+<span class="nc" id="L109">            throw new BusinessException(ex);</span>
+<span class="nc" id="L110">        } catch (GRIDAClientException ex) {</span>
+<span class="nc" id="L111">            logger.error(&quot;Error creating directory {}/{} for {}&quot;,</span>
+                    baseDir, name, user,ex);
+<span class="nc" id="L113">            throw new BusinessException(ex);</span>
+<span class="nc" id="L114">        }</span>
+<span class="nc" id="L115">    }</span>
+
+    public void rename(User user, String oldPath, String newPath, boolean extendPath)
+            throws BusinessException {
+
+        try {
+<span class="nc" id="L121">            gridaClient.rename(</span>
+<span class="nc" id="L122">                    lfcPathsBusiness.parseBaseDir(user, oldPath),</span>
+<span class="nc" id="L123">                    lfcPathsBusiness.parseBaseDir(user, newPath));</span>
+<span class="nc" id="L124">        } catch (GRIDAClientException ex) {</span>
+<span class="nc bnc" id="L125" title="All 4 branches missed.">            if (ex.getMessage().contains(&quot;Can not rename/move&quot;) &amp;&amp; extendPath) {</span>
+<span class="nc" id="L126">                SimpleDateFormat sdf =</span>
+                        new SimpleDateFormat(&quot;-yyyy.MM.dd-HH.mm.ss&quot;);
+<span class="nc" id="L128">                String newExtPath = newPath + sdf.format(new Date());</span>
+<span class="nc" id="L129">                rename(user, oldPath, newExtPath, false);</span>
+<span class="nc" id="L130">            } else {</span>
+<span class="nc" id="L131">                logger.error(&quot;Error renaming path {} to {} for {}&quot;,</span>
+                        oldPath, newPath, user,ex);
+<span class="nc" id="L133">                throw new BusinessException(ex);</span>
+            }
+<span class="nc" id="L135">        } catch (DataManagerException ex) {</span>
+<span class="nc" id="L136">            throw new BusinessException(ex);</span>
+<span class="nc" id="L137">        }</span>
+<span class="nc" id="L138">    }</span>
+
+    public void rename(
+            User user, String baseDir, List&lt;String&gt; paths, String newBaseDir,
+            boolean extendPath) throws BusinessException {
+
+<span class="nc bnc" id="L144" title="All 2 branches missed.">        for (String name : paths) {</span>
+<span class="nc" id="L145">            rename(user, baseDir + &quot;/&quot; + name, newBaseDir + &quot;/&quot; + name, extendPath);</span>
+<span class="nc" id="L146">        }</span>
+<span class="nc" id="L147">    }</span>
+
+    public boolean exists(User user, String path) throws BusinessException {
+
+        try {
+<span class="fc" id="L152">            return gridaClient.exist(lfcPathsBusiness.parseBaseDir(user, path));</span>
+<span class="nc" id="L153">        } catch (GRIDAClientException ex) {</span>
+<span class="nc" id="L154">            logger.error(&quot;Error checking file {} existance for {}&quot;,</span>
+                    path, user,ex);
+<span class="nc" id="L156">            throw new BusinessException(ex);</span>
+<span class="nc" id="L157">        } catch (DataManagerException ex) {</span>
+<span class="nc" id="L158">            throw new BusinessException(ex);</span>
+        }
+    }
+
+    public long getModificationDate(User user, String path) throws BusinessException {
+
+        try {
+<span class="nc" id="L165">            return gridaClient.getModificationDate(</span>
+<span class="nc" id="L166">                    lfcPathsBusiness.parseBaseDir(user, path));</span>
+<span class="nc" id="L167">        } catch (GRIDAClientException ex) {</span>
+<span class="nc" id="L168">            logger.error(&quot;Error getting file {} modification date for {}&quot;,</span>
+                    path, user,ex);
+<span class="nc" id="L170">            throw new BusinessException(ex);</span>
+<span class="nc" id="L171">        } catch (DataManagerException ex) {</span>
+<span class="nc" id="L172">            throw new BusinessException(ex);</span>
+        }
+    }
+
+    public List&lt;Long&gt; getModificationDate(User user, List&lt;String&gt; paths)
+            throws BusinessException {
+        try {
+<span class="nc" id="L179">            List&lt;String&gt; parsedPaths = new ArrayList&lt;&gt;();</span>
+<span class="nc bnc" id="L180" title="All 2 branches missed.">            for (String path : paths) {</span>
+<span class="nc" id="L181">                parsedPaths.add(lfcPathsBusiness.parseBaseDir(user, path));</span>
+<span class="nc" id="L182">            }</span>
+
+<span class="nc" id="L184">            return gridaClient.getModificationDate(parsedPaths);</span>
+<span class="nc" id="L185">        } catch (GRIDAClientException ex) {</span>
+<span class="nc" id="L186">            logger.error(&quot;Error getting files {} modification dates for {}&quot;,</span>
+                    paths, user,ex);
+<span class="nc" id="L188">            throw new BusinessException(ex);</span>
+<span class="nc" id="L189">        } catch (DataManagerException ex) {</span>
+<span class="nc" id="L190">            throw new BusinessException(ex);</span>
+        }
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>
