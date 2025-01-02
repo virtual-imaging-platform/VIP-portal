@@ -121,7 +121,7 @@ public class EditResourceLayout extends AbstractFormLayout {
         addField("Type", typeFieldList);
         addField("Configuration", configurationField);
         addField("Engines", enginesList);
-        addField("Groups", groupsList);
+        addField("Groups Resources", groupsList);
         addButtons(saveButton, removeButton);
     }
 

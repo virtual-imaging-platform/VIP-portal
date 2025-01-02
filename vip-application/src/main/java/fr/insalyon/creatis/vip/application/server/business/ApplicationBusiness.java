@@ -94,6 +94,12 @@ public class ApplicationBusiness {
             Application before = getApplication(application.getName());
             List<String> beforeGroupsNames = before.getApplicationGroups();
 
+            if (before.getApplicationGroups().size() != 0) {
+                if (groupBusiness.get(before.getApplicationGroups().getFirst()).isPublicGroup() != application.isPublic()) {
+                    throw new BusinessException("You cannot set application visibility to " + application.isPublic() + " because you belongs to groups with different visiblity settings. Please leave them first!");
+                }
+            }
+
             applicationDAO.update(application);
             for (String group : application.getApplicationGroups()) {
                 if ( ! beforeGroupsNames.removeIf((s) -> s.equals(group))) {
@@ -213,7 +219,7 @@ public class ApplicationBusiness {
             if (group.isPublicGroup() == app.isPublic()) {
                 applicationDAO.associate(app, group);
             } else {
-                throw new BusinessException("Item private state must match group state ! (app=" + app.isPublic() + ", group=" + group.isPublicGroup() +")");
+                throw new BusinessException("Application visibility must match group visibility! (app-visibility=" + app.isPublic() + ", group-visibility=" + group.isPublicGroup() +")");
             }
         } catch (DAOException e) {
             throw new BusinessException(e);

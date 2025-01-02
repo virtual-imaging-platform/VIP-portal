@@ -57,6 +57,12 @@ public class ResourceBusiness {
             List<String> beforeEnginesNames = before.getEngines();
             List<String> beforeGroupsNames = before.getGroups();
 
+            if (before.getGroups().size() != 0) {
+                if (groupBusiness.get(before.getGroups().getFirst()).isPublicGroup() != resource.isPublic()) {
+                    throw new BusinessException("You cannot set resource visibility to " + resource.isPublic() + " because you belongs to groups with different visiblity settings. Please leave them first!");
+                }
+            }
+
             resourceDAO.update(resource);
             for (String engine : resource.getEngines()) {
                 if ( ! beforeEnginesNames.removeIf((s) -> s.equals(engine))) {
@@ -162,7 +168,7 @@ public class ResourceBusiness {
             if (group.isPublicGroup() == resource.isPublic()) {
                 resourceDAO.associate(resource, group);
             } else {
-                throw new BusinessException("Item private state must match group state ! (resource=" + resource.isPublic() + ", group=" + group.isPublicGroup() +")");
+                throw new BusinessException("Resource visibility must match group visibility! (resource-visibility=" + resource.isPublic() + ", group-visibility=" + group.isPublicGroup() +")");
             }
         } catch (DAOException e) {
             throw new BusinessException(e);

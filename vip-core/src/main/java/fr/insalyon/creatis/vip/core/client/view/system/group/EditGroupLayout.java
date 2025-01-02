@@ -37,6 +37,7 @@ import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.IButton;
+import com.smartgwt.client.widgets.Label;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.fields.CheckboxItem;
@@ -78,6 +79,7 @@ public class EditGroupLayout extends AbstractFormLayout {
     private ListGrid itemsGrid;
     private ListGrid usersGrid;
     private ModalWindow usersGridModal;
+    private Label dynamicLabel;
     private ModalWindow itemsGridModal;
     private HLayout rollOverCanvas;
     private ListGridRecord rollOverRecord;
@@ -131,32 +133,36 @@ public class EditGroupLayout extends AbstractFormLayout {
         itemsGrid = buildItemsGrid();
         itemsGridModal = new ModalWindow(itemsGrid);
 
+        dynamicLabel = WidgetUtil.getLabel("", 15);
+
         addField("Name", nameItem);
         addField("Public", isPublicField);
         addField("Group Type", typeFieldList);
-        this.addMember(WidgetUtil.getLabel("<b>Users</b>", 15));
-        this.addMember(usersGrid);
-        this.addMember(itemsGrid);
+        addMember(WidgetUtil.getLabel("<b>Users</b>", 15));
+        addMember(usersGrid);
+        addMember(dynamicLabel);
+        addMember(itemsGrid);
         addButtons(saveButton, removeButton);
     }
 
     public void setGroup(String name, boolean isPublic, String type) {
         if (name != null) {
-            this.oldName = name;
-            this.nameItem.setValue(name);
-            this.isPublicField.setValue(isPublic);
-            this.typeFieldList.setValue(type);
-            this.newGroup = false;
-            this.removeButton.setDisabled(false);
+            oldName = name;
+            nameItem.setValue(name);
+            isPublicField.setValue(isPublic);
+            typeFieldList.setValue(type);
+            newGroup = false;
+            removeButton.setDisabled(false);
             loadUsers();
             loadItems(name);
+            dynamicLabel.setContents("<b>" + type.substring(0, 1).toUpperCase() + type.substring(1).toLowerCase() + " List" + "</b>");
 
         } else {
-            this.oldName = null;
-            this.nameItem.setValue("");
-            this.isPublicField.setValue(true);
-            this.newGroup = true;
-            this.removeButton.setDisabled(true);
+            oldName = null;
+            nameItem.setValue("");
+            isPublicField.setValue(true);
+            newGroup = true;
+            removeButton.setDisabled(true);
         }
     }
 
@@ -285,7 +291,7 @@ public class EditGroupLayout extends AbstractFormLayout {
         setGridOptions(
             grid, 
             "item",
-            new ListGridField("item", "Item"));
+            new ListGridField("item", "Name"));
         return grid;
     }
 
