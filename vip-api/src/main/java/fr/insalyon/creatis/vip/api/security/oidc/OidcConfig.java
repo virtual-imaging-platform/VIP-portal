@@ -56,16 +56,8 @@ public class OidcConfig {
             final String basename = "vip-oidc.json";
 
             // Read and parse vip-oidc.json file into a list of OIDC servers.
-            // The expected file content is:
-            // { "servers": [{"url":"...", "use-resource-role-mapping":false, "resource":"name"}]}
-            // servers: array, mandatory
-            //     List of OIDC servers.
-            // servers[].url: string, mandatory
-            //     Base URL of the OIDC server. Must be unique across servers.
-            // servers[].use-resource-role-map: boolean, optional, default false
-            //     Whether to use realm_access (if false) or resource_access (if true) for roles mapping.
-            // servers[].resource: string, mandatory if use-resource-role-map=true
-            //     Resource name (i.e. Keycloak client ID) to use for roles mapping.
+            // See https://github.com/virtual-imaging-platform/VIP-portal/wiki/API-authentication
+            // for vip-oidc.json file format.
             //
             // A note on Keycloak vs OIDC: Keycloak is a specific server software, providing an implementation of OIDC.
             // In order to favor future compatibility with other OIDC implementations, things that are Keycloak-specific
@@ -90,22 +82,18 @@ public class OidcConfig {
                 // url field is mandatory: here we just check for its presence, content will be validated by URI() below
                 String baseURL = serverNode.get("url").asText();
                 // optional fields
-                Boolean useResourceRoleMappings;
+                Boolean useResourceRoleMappings = false;
                 if (serverNode.hasNonNull("use-resource-role-mapping")) {
                     useResourceRoleMappings = serverNode.get("use-resource-role-mapping").asBoolean();
-                } else {
-                    useResourceRoleMappings = false;
                 }
-                String resourceName;
+                String resourceName = "";
                 if (serverNode.hasNonNull("resource")) {
                     resourceName = serverNode.get("resource").asText();
-                } else {
-                    resourceName = "";
                 }
                 // Add a new OIDC server to our config.
                 URI url = new URI(baseURL);
                 String issuer = url.toASCIIString();
-                if (servers.get(issuer) != null) {
+                if (servers.containsKey(issuer)) {
                     throw new BusinessException("Failed parsing " + basename + ": duplicate issuers");
                 }
                 servers.put(issuer, new OidcServer(issuer, useResourceRoleMappings, resourceName));

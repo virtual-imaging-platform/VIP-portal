@@ -105,7 +105,9 @@ public class SpringAuthenticationIT extends BaseWebSpringIT {
         mockMvc.perform(get("/rest/wrongUrl")
                         .with(new BearerTokenRequestPostProcessor("invalidToken")))
                 .andExpect(status().isUnauthorized())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE));
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(jsonPath("$.errorCode")
+                        .value(ApiError.INSUFFICIENT_AUTH.getCode()));
     }
 
     @Test
