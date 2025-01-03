@@ -87,23 +87,29 @@ public class DisplayTab extends Tab {
 
         generalLayout = new GeneralLayout("50%", "100%");
 
-        inputsLayout = new InputLayout("50%", "100%");
-        outputsLayout = new OutputLayout("50%", "100%");
+        inputsLayout = new InputLayout("50%", "40%");
+        outputsLayout = new OutputLayout("50%", "40%");
         vipLayout = new VIPLayout("50%", "100%");
 
         HLayout hLayout1 = new HLayout();
         hLayout1.setMembersMargin(10);
         hLayout1.setHeight("50%");
         hLayout1.addMember(generalLayout);
-        hLayout1.addMember(outputsLayout);
+        hLayout1.addMember(vipLayout);
         globalLayout.addMember(hLayout1);
+
+        VLayout vLayout1 = new VLayout();
+        vLayout1.setMembersMargin(10);
+        vLayout1.setWidth("50%");
+        vLayout1.addMember(inputsLayout);
+        vLayout1.addMember(outputsLayout);
 
         HLayout hLayout2 = new HLayout();
         hLayout2.setMembersMargin(10);
         hLayout2.setHeight("50%");
-        hLayout2.addMember(inputsLayout);
-        hLayout2.addMember(vipLayout);
+        hLayout2.addMember(vLayout1);
         globalLayout.addMember(hLayout2);
+
 
         globalLayout.addMember(hLayout2);
         IButton createApplicationButton;
