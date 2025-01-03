@@ -41,6 +41,7 @@ import com.smartgwt.client.widgets.form.fields.CheckboxItem;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.SpinnerItem;
 import fr.insalyon.creatis.vip.core.client.bean.Group;
+import fr.insalyon.creatis.vip.core.client.bean.GroupType;
 import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationService;
 import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationServiceAsync;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
@@ -52,9 +53,11 @@ import fr.insalyon.creatis.vip.core.client.view.util.CountryCode;
 import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
 import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 
 /**
  *
@@ -65,7 +68,8 @@ public class EditUserLayout extends AbstractFormLayout {
     private Label nameLabel;
     private Label emailLabel;
     private SelectItem levelPickList;
-    private SelectItem groupsPickList;
+    private SelectItem groupsAppsPickList;
+    private SelectItem groupsRrcsPickList;
     private SelectItem countryPickList;
     private SpinnerItem maxRunningSimulationsItem;
     private CheckboxItem confirmedField;
@@ -94,11 +98,17 @@ public class EditUserLayout extends AbstractFormLayout {
         levelPickList.setWidth(350);
         levelPickList.setRequired(true);
 
-        groupsPickList = new SelectItem();
-        groupsPickList.setShowTitle(false);
-        groupsPickList.setMultiple(true);
-        groupsPickList.setMultipleAppearance(MultipleAppearance.PICKLIST);
-        groupsPickList.setWidth(350);
+        groupsAppsPickList = new SelectItem();
+        groupsAppsPickList.setShowTitle(false);
+        groupsAppsPickList.setMultiple(true);
+        groupsAppsPickList.setMultipleAppearance(MultipleAppearance.PICKLIST);
+        groupsAppsPickList.setWidth(350);
+
+        groupsRrcsPickList = new SelectItem();
+        groupsRrcsPickList.setShowTitle(false);
+        groupsRrcsPickList.setMultiple(true);
+        groupsRrcsPickList.setMultipleAppearance(MultipleAppearance.PICKLIST);
+        groupsRrcsPickList.setWidth(350);
 
         countryPickList = new SelectItem();
         countryPickList.setShowTitle(false);
@@ -132,7 +142,9 @@ public class EditUserLayout extends AbstractFormLayout {
             public void onClick(ClickEvent event) {
                 if (levelPickList.validate() & countryPickList.validate()) {
 
-                    String[] values = groupsPickList.getValues();
+                    String[] values = Stream.concat(
+                        Arrays.stream(groupsAppsPickList.getValues()),
+                        Arrays.stream(groupsRrcsPickList.getValues())).toArray(String[]::new);
                     Map<String, CoreConstants.GROUP_ROLE> map = new HashMap<String, CoreConstants.GROUP_ROLE>();
 
                     for (String v : values) {
@@ -159,7 +171,8 @@ public class EditUserLayout extends AbstractFormLayout {
         this.addMember(nameLabel);
         this.addMember(emailLabel);
         addField("Level", levelPickList);
-        addField("Groups", groupsPickList);
+        addField("Applications Groups", groupsAppsPickList);
+        addField("Resources Groups", groupsRrcsPickList);
         addField("Country", countryPickList);
         addField("Max Running Simulations", maxRunningSimulationsItem);
         this.addMember(FieldUtil.getForm(confirmedField));
@@ -199,14 +212,20 @@ public class EditUserLayout extends AbstractFormLayout {
             @Override
             public void onSuccess(Map<Group, GROUP_ROLE> result) {
 
-                List<String> userGroups = new ArrayList<String>();
+                List<String> userGroupsRsrc = new ArrayList<>();
+                List<String> userGroupsApps = new ArrayList<>();
 
                 for (Group group : result.keySet()) {
                     if (result.get(group) != CoreConstants.GROUP_ROLE.None) {
-                        userGroups.add(group.getName() + " (" + result.get(group).name() + ")");
+                        if (group.getType().equals(GroupType.APPLICATION)) {
+                            userGroupsApps.add(group.getName() + " (" + result.get(group).name() + ")");
+                        } else {
+                            userGroupsRsrc.add(group.getName() + " (" + result.get(group).name() + ")");
+                        }
                     }
                 }
-                groupsPickList.setValues(userGroups.toArray(new String[]{}));
+                groupsAppsPickList.setValues(userGroupsApps.toArray(new String[]{}));
+                groupsRrcsPickList.setValues(userGroupsRsrc.toArray(new String[]{}));
                 saveButton.setDisabled(false);
             }
         };
@@ -237,7 +256,8 @@ public class EditUserLayout extends AbstractFormLayout {
                 nameLabel.setContents("");
                 emailLabel.setContents("");
                 levelPickList.setValues(new String[]{});
-                groupsPickList.setValues(new String[]{});
+                groupsAppsPickList.setValues(new String[]{});
+                groupsRrcsPickList.setValues(new String[]{});
                 countryPickList.setValues(new String[]{});
                 confirmedField.setValue(false);
                 lockedField.setValue(false);
@@ -266,12 +286,19 @@ public class EditUserLayout extends AbstractFormLayout {
             @Override
             public void onSuccess(List<Group> result) {
 
-                List<String> dataList = new ArrayList<String>();
+                List<String> dataRsrc = new ArrayList<>();
+                List<String> dataApps = new ArrayList<>();
                 for (Group g : result) {
-                    dataList.add(g.getName() + " (" + CoreConstants.GROUP_ROLE.Admin.name() + ")");
-                    dataList.add(g.getName() + " (" + CoreConstants.GROUP_ROLE.User.name() + ")");
+                    if (g.getType().equals(GroupType.APPLICATION)) {
+                        dataApps.add(g.getName() + " (" + CoreConstants.GROUP_ROLE.Admin.name() + ")");
+                        dataApps.add(g.getName() + " (" + CoreConstants.GROUP_ROLE.User.name() + ")");
+                    } else {
+                        dataRsrc.add(g.getName() + " (" + CoreConstants.GROUP_ROLE.Admin.name() + ")");
+                        dataRsrc.add(g.getName() + " (" + CoreConstants.GROUP_ROLE.User.name() + ")");
+                    }
                 }
-                groupsPickList.setValueMap(dataList.toArray(new String[]{}));
+                groupsAppsPickList.setValueMap(dataApps.toArray(new String[]{}));
+                groupsRrcsPickList.setValueMap(dataRsrc.toArray(new String[]{}));
             }
         };
         service.getGroups(callback);
