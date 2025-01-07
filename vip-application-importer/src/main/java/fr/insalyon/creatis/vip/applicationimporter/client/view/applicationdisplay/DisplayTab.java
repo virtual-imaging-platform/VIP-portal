@@ -62,6 +62,7 @@ public class DisplayTab extends Tab {
     private InputLayout inputsLayout;
     private OutputLayout outputsLayout;
     private VIPLayout vipLayout;
+    private TagsLayout tagsLayout;
     private final ModalWindow modal;
     private BoutiquesApplication boutiquesTool;
 
@@ -87,9 +88,10 @@ public class DisplayTab extends Tab {
 
         generalLayout = new GeneralLayout("50%", "100%");
 
-        inputsLayout = new InputLayout("50%", "40%");
-        outputsLayout = new OutputLayout("50%", "40%");
+        inputsLayout = new InputLayout("100%", "45%");
+        outputsLayout = new OutputLayout("100%", "45%");
         vipLayout = new VIPLayout("50%", "100%");
+        tagsLayout = new TagsLayout("50%", "100%", boutiquesTool);
 
         HLayout hLayout1 = new HLayout();
         hLayout1.setMembersMargin(10);
@@ -108,10 +110,11 @@ public class DisplayTab extends Tab {
         hLayout2.setMembersMargin(10);
         hLayout2.setHeight("50%");
         hLayout2.addMember(vLayout1);
+        hLayout2.addMember(tagsLayout);
+
+        globalLayout.addMember(hLayout2);
         globalLayout.addMember(hLayout2);
 
-
-        globalLayout.addMember(hLayout2);
         IButton createApplicationButton;
         createApplicationButton = WidgetUtil.getIButton("Create application", Constants.ICON_LAUNCH, new ClickHandler() {
             @Override
@@ -224,7 +227,7 @@ public class DisplayTab extends Tab {
             vipLayout.getDiracTag(),
             vipLayout.getOverwrite(),
             vipLayout.getFileAccessProtocol(),
-            generalLayout.getSelectedTags(),
+            tagsLayout.getSelectedTags(),
             vipLayout.getSelectedResources(),
             callback);
     }
