@@ -120,6 +120,7 @@ public class ApiSecurityConfig {
                 .exceptionHandling((exceptionHandling) -> exceptionHandling.authenticationEntryPoint(vipAuthenticationEntryPoint))
                 // session must be activated otherwise OIDC auth info will be lost when accessing /loginEgi
                 // .sessionManagement((sessionManagement) -> sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .anonymous((anonymous) -> anonymous.disable())
                 .cors(Customizer.withDefaults())
                 .headers((headers) -> headers.frameOptions((frameOptions) -> frameOptions.sameOrigin()))
                 .csrf((csrf) -> csrf.disable());
