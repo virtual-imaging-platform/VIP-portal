@@ -2,6 +2,7 @@ package fr.insalyon.creatis.vip.applicationimporter.client.view.applicationdispl
 
 import com.smartgwt.client.types.DragDataAction;
 import com.smartgwt.client.types.Overflow;
+import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.ComboBoxItem;
 import com.smartgwt.client.widgets.grid.ListGrid;
@@ -12,6 +13,7 @@ import com.smartgwt.client.widgets.layout.VLayout;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.data.DataSource;
@@ -82,8 +84,8 @@ public class TagsLayout extends AbstractFormLayout {
     private ListGrid createList(String name) {
         ListGrid list = new ListGrid();
 
-        list.setWidth(200);
-        list.setHeight(300);
+        list.setWidth(175);
+        list.setHeight(250);
         list.setDragDataAction(DragDataAction.MOVE);
         list.setCanDragRecordsOut(true);
         list.setCanAcceptDroppedRecords(true);
@@ -96,7 +98,7 @@ public class TagsLayout extends AbstractFormLayout {
     private ListGrid createBoutiquesList() {
         ListGrid list = createList("Boutiques Tags Suggestion");
 
-        list.setWidth(350);
+        list.setWidth(325);
         list.setCanDragRecordsOut(false);
         list.setCanAcceptDroppedRecords(false);
         return list;
@@ -160,6 +162,8 @@ public class TagsLayout extends AbstractFormLayout {
 
         entryForm = new ComboBoxItem("autoComplete", "Search/Add custom Tag");
 
+        entryForm.setWidth(175);
+        entryForm.setTitleOrientation(TitleOrientation.TOP);
         entryForm.setValueField("name");
         entryForm.setOptionDataSource(dataSource);
 
@@ -169,14 +173,16 @@ public class TagsLayout extends AbstractFormLayout {
         entryForm.addKeyPressHandler(event -> {
             if ("Enter".equals(event.getKeyName())) {
                 String inputValue = entryForm.getEnteredValue();
+                Optional<String> matchedValue;
                 Record record = new Record();
-                record.setAttribute("name", inputValue);
-
+                
                 if (inputValue != null && ! inputValue.trim().isEmpty()) {
-                    if (getTags(existingsTags).contains(inputValue)) {
+                    matchedValue = getTags(existingsTags).stream().filter((t) -> t.equalsIgnoreCase(inputValue)).findFirst();
+                    if (matchedValue.isPresent()) {
+                        record.setAttribute("name", matchedValue.get());
                         dataSource.removeData(record);
-                        if (! getTags(selectedTags).contains(inputValue)) {
                     }
+                    if ( ! getTags(selectedTags).contains(inputValue)) {
                         addSelectedTag(inputValue);
                     }
                 }
@@ -191,14 +197,5 @@ public class TagsLayout extends AbstractFormLayout {
      * Must be run before loadDatabaseTags, because the other function filter
      * depending on the result of this one.
      */
-    private void loadBoutiquesTags() {
-        Record record = new Record();
-
-        record.setAttribute("name", "test:suggestion");
-
-        suggestedTags.addData(record);
-        // for (Map.Entry<String, String> entry : boutiques.getTags().entrySet()) {
-            // addTag(entry.getKey() + "_" + entry.getValue(), suggestedTags);
-        // }
-    }
+    private void loadBoutiquesTags() {}
 }

@@ -35,6 +35,7 @@ import fr.insalyon.creatis.grida.client.GRIDAClient;
 import fr.insalyon.creatis.grida.client.GRIDAClientException;
 import fr.insalyon.creatis.vip.application.client.bean.AppVersion;
 import fr.insalyon.creatis.vip.application.client.bean.Application;
+import fr.insalyon.creatis.vip.application.client.bean.Tag;
 import fr.insalyon.creatis.vip.application.client.bean.boutiquesTools.BoutiquesApplication;
 import fr.insalyon.creatis.vip.application.server.business.AppVersionBusiness;
 import fr.insalyon.creatis.vip.application.server.business.ApplicationBusiness;
@@ -263,7 +264,10 @@ public class ApplicationImporterBusiness {
 
     private void registerTagsAssociated(AppVersion appVersion, List<String> tags) throws BusinessException {
         for (String tagName : tags) {
-            tagBusiness.associate(tagBusiness.getByName(tagName), appVersion);
+            if ( ! tagBusiness.exist(tagName)) {
+                tagBusiness.add(new Tag(tagName));
+            }
+            tagBusiness.associate(new Tag(tagName), appVersion);
         }
     }
 

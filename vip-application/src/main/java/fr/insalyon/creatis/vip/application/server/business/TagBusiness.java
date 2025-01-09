@@ -58,6 +58,19 @@ public class TagBusiness {
         }
     }
 
+    public boolean exist(String name) throws BusinessException {
+        try {
+            tagDAO.getAll().stream()
+                .filter((e) -> e.getName().equalsIgnoreCase(name))
+                .findFirst().get();
+            return true;
+        } catch (NoSuchElementException e){
+            return false;
+        } catch (DAOException e) {
+            throw new BusinessException(e);
+        }
+    }
+
     public List<Tag> getAll() throws BusinessException {
         try {
             return tagDAO.getAll();
