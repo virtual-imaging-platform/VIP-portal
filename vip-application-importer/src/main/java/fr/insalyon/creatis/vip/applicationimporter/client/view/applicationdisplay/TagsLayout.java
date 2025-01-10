@@ -13,6 +13,7 @@ import com.smartgwt.client.widgets.layout.VLayout;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -41,12 +42,11 @@ public class TagsLayout extends AbstractFormLayout {
     private DynamicForm entryFormBlock;
     private ComboBoxItem entryForm;
     
-    private final BoutiquesApplication boutiques;
+    private BoutiquesApplication boutiques;
 
-    public TagsLayout(String width, String height, BoutiquesApplication bt) {
+    public TagsLayout(String width, String height) {
         super(width, height);
 
-        boutiques = bt;
         hLayout = new HLayout(10);
         vLayoutLeft = new VLayout(10);
         selectedTags = createList("Selected Tags");
@@ -60,11 +60,16 @@ public class TagsLayout extends AbstractFormLayout {
         getDynamicFormInput();
 
         configure();
-        loadTags();
+        loadDatabaseTags();
     }
 
     public List<String> getSelectedTags() {
         return getTags(selectedTags);
+    }
+
+    public void setBoutiques(BoutiquesApplication boutiquesApplication) {
+        boutiques = boutiquesApplication;
+        loadBoutiquesTags();
     }
 
     private void configure() {
@@ -130,11 +135,6 @@ public class TagsLayout extends AbstractFormLayout {
         return tags;
     }
 
-    private void loadTags() {
-        loadBoutiquesTags();
-        loadDatabaseTags();
-    }
-
     private void loadDatabaseTags() {
         ApplicationServiceAsync service = ApplicationService.Util.getInstance();
         List<String> tags = getTags(suggestedTags);
@@ -157,7 +157,7 @@ public class TagsLayout extends AbstractFormLayout {
         service.getTags(callback);
     }
 
-    public void getDynamicFormInput() {
+    private void getDynamicFormInput() {
         entryFormBlock = new DynamicForm();
 
         entryForm = new ComboBoxItem("autoComplete", "Search/Add custom Tag");
@@ -197,5 +197,14 @@ public class TagsLayout extends AbstractFormLayout {
      * Must be run before loadDatabaseTags, because the other function filter
      * depending on the result of this one.
      */
-    private void loadBoutiquesTags() {}
+    private void loadBoutiquesTags() {
+        Record record;
+
+        for (Map.Entry<String, String> entry : boutiques.getTags().entrySet()) {
+            record = new Record();
+            record.setAttribute("name", entry.getKey() + ":" + entry.getValue());
+
+            suggestedTags.addData(record);
+        }
+    }
 }

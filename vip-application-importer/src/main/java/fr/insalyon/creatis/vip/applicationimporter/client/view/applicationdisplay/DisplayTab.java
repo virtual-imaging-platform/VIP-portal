@@ -91,7 +91,7 @@ public class DisplayTab extends Tab {
         inputsLayout = new InputLayout("100%", "45%");
         outputsLayout = new OutputLayout("100%", "45%");
         vipLayout = new VIPLayout("50%", "100%");
-        tagsLayout = new TagsLayout("50%", "100%", boutiquesTool);
+        tagsLayout = new TagsLayout("50%", "100%");
 
         HLayout hLayout1 = new HLayout();
         hLayout1.setMembersMargin(10);
@@ -155,6 +155,7 @@ public class DisplayTab extends Tab {
         generalLayout.setTool(boutiquesTool);
         inputsLayout.setInputs(boutiquesTool.getInputs());
         outputsLayout.setOutputFiles(boutiquesTool.getOutputFiles());
+        tagsLayout.setBoutiques(boutiquesTool);
     }
 
     private static void verifyBoutiquesTool(BoutiquesApplication boutiquesTool)
