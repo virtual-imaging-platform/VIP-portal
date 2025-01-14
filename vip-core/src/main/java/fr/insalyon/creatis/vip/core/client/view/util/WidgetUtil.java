@@ -34,6 +34,7 @@ package fr.insalyon.creatis.vip.core.client.view.util;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.Cursor;
 import com.smartgwt.client.widgets.IButton;
+import com.smartgwt.client.widgets.ImgButton;
 import com.smartgwt.client.widgets.Label;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.fields.FormItem;
@@ -328,5 +329,19 @@ public class WidgetUtil {
         blankLayout.setWidth100();
         blankLayout.setHeight100();
         return blankLayout;
+    }
+
+    public static ImgButton getImgButton(String imgSrc, String prompt) {
+        ImgButton button = new ImgButton();
+
+        button.setShowDown(false);
+        button.setShowRollOver(false);
+        button.setLayoutAlign(Alignment.CENTER);
+        button.setSrc(imgSrc);
+        button.setPrompt(prompt);
+        button.setHeight(16);
+        button.setWidth(16);
+    
+        return button;
     }
 }
