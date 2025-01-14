@@ -55,7 +55,7 @@ public class TagsLayout extends AbstractFormLayout {
     private ComboBoxItem entryForm;
     private Set<String> newTags;
     
-    private BoutiquesApplication boutiques;
+    private Map<String, String> boutiquesTags;
 
     public TagsLayout(String width, String height) {
         super(width, height);
@@ -81,8 +81,8 @@ public class TagsLayout extends AbstractFormLayout {
         return getTags(selectedTags);
     }
 
-    public void setBoutiques(BoutiquesApplication boutiquesApplication) {
-        boutiques = boutiquesApplication;
+    public void setBoutiquesTags(Map<String,String> tags) {
+        boutiquesTags = tags;
         loadBoutiquesTags();
     }
 
@@ -257,7 +257,7 @@ public class TagsLayout extends AbstractFormLayout {
     private void loadBoutiquesTags() {
         Record record;
 
-        for (Map.Entry<String, String> entry : boutiques.getTags().entrySet()) {
+        for (Map.Entry<String, String> entry : boutiquesTags.entrySet()) {
             record = new Record();
             record.setAttribute("name", entry.getKey() + ":" + entry.getValue());
 

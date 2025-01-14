@@ -32,6 +32,7 @@
 package fr.insalyon.creatis.vip.applicationimporter.client.view.applicationdisplay;
 
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -155,7 +156,6 @@ public class DisplayTab extends Tab {
         generalLayout.setTool(boutiquesTool);
         inputsLayout.setInputs(boutiquesTool.getInputs());
         outputsLayout.setOutputFiles(boutiquesTool.getOutputFiles());
-        tagsLayout.setBoutiques(boutiquesTool);
     }
 
     private static void verifyBoutiquesTool(BoutiquesApplication boutiquesTool)
@@ -231,5 +231,24 @@ public class DisplayTab extends Tab {
             tagsLayout.getSelectedTags(),
             vipLayout.getSelectedResources(),
             callback);
+    }
+
+    public void loadBoutiquesTags(String jsonContent) {
+        final AsyncCallback<Map<String, String>> callback = new AsyncCallback<>() {
+
+            @Override
+            public void onFailure(Throwable caught) {
+                modal.hide();
+                Layout.getInstance().setWarningMessage(caught.getLocalizedMessage());
+            }
+
+            @Override
+            public void onSuccess(Map<String, String> result) {
+                modal.hide();
+                tagsLayout.setBoutiquesTags(result);
+            }
+        };
+        modal.show("Creating application...", true);
+        ApplicationImporterService.Util.getInstance().getBoutiquesTags(jsonContent, callback);
     }
 }

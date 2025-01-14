@@ -32,6 +32,7 @@
 package fr.insalyon.creatis.vip.applicationimporter.server.rpc;
 
 import fr.insalyon.creatis.vip.application.client.bean.boutiquesTools.BoutiquesApplication;
+import fr.insalyon.creatis.vip.application.server.model.boutiques.BoutiquesDescriptor;
 import fr.insalyon.creatis.vip.applicationimporter.client.ApplicationImporterException;
 import fr.insalyon.creatis.vip.applicationimporter.client.rpc.ApplicationImporterService;
 import fr.insalyon.creatis.vip.applicationimporter.server.business.ApplicationImporterBusiness;
@@ -40,8 +41,14 @@ import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import jakarta.servlet.ServletException;
+
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class ApplicationImporterServiceImpl extends fr.insalyon.creatis.vip.core.server.rpc.AbstractRemoteServiceServlet
         implements ApplicationImporterService {
@@ -89,5 +96,26 @@ public class ApplicationImporterServiceImpl extends fr.insalyon.creatis.vip.core
     @Override
     public List<String> getApplicationImporterRequirements() throws ApplicationImporterException {
         return server.getApplicationImporterRequirements();
+    }
+
+    @Override
+    public Map<String, String> getBoutiquesTags(String boutiquesJsonFile) throws ApplicationImporterException {
+        try {
+            Map<String, String> map = new HashMap<>();
+            ObjectMapper objectMapper = new ObjectMapper();
+            BoutiquesDescriptor descriptor = objectMapper.readValue(boutiquesJsonFile, BoutiquesDescriptor.class);
+
+            if (descriptor.getTags() != null) {
+                descriptor.getTags().getAdditionalProperties().forEach((k, v) -> {
+                    String valueString = (v instanceof List) 
+                            ? String.join(",", (List<String>) v) 
+                            : String.valueOf(v);
+                    map.put(k, valueString);
+                });
+            }
+            return map;
+        } catch (JsonProcessingException e) {
+            throw new ApplicationImporterException(e);
+        }
     }
 }

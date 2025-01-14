@@ -144,6 +144,7 @@ public class BoutiquesImportLayout extends AbstractFormLayout {
                                 Constants.TAB_ID_BOUTIQUES_APPLICATION,
                                 Constants.TAB_NAME_BOUTIQUES));
                     displayTab.setBoutiqueTool(boutiquesTool);
+                    displayTab.loadBoutiquesTags(jsonFileContent);
                 } catch (ApplicationImporterException ex) {
                     Layout.getInstance().setWarningMessage(
                         "Unable to parse JSON file :" + ex.getMessage());

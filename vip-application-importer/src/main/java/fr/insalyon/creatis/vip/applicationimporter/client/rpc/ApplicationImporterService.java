@@ -38,6 +38,7 @@ import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.ServiceDefTarget;
 
 import java.util.List;
+import java.util.Map;
 
 public interface ApplicationImporterService extends RemoteService {
 
@@ -60,4 +61,6 @@ public interface ApplicationImporterService extends RemoteService {
     String getApplicationImporterRootFolder() throws ApplicationImporterException;
     
     List<String> getApplicationImporterRequirements() throws ApplicationImporterException;
+
+    Map<String, String> getBoutiquesTags(String boutiquesJsonFile) throws ApplicationImporterException;
 }
