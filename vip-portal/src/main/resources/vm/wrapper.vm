@@ -19,16 +19,6 @@ function error {
   echo [ ERROR - $D ] $* >&2
 }
 
-function configure_apptainer_for_singularity {
-  #APPTAINER_PATH is defined in the configuration (/cvmfs/dirac.egi.eu/container/apptainer/bin/)
-  cat > singularity << EOF
-        #!/bin/bash
-        apptainer "$@"
-EOF
-  chmod a+x singularity
-  export PATH=$APPTAINER_PATH:$PWD:$PATH
-}
-
 function download_udocker {
   #installation of udocker
   info "cloning udocker ${UDOCKER_TAG} "
@@ -180,11 +170,17 @@ then
 fi
 #end
 
+# Check that singularity is in PATH
 
 #if($tool.getContainerType() == "singularity")
 if ! command -v singularity
 then
-    configure_apptainer_for_singularity
+    if test -d "$singularityPath"; then
+        export PATH="$singularityPath:$PATH"
+        info "adding singularityPath to PATH ($singularityPath)"
+    else
+        warning "singularityPath not found ($singularityPath), leaving PATH unchanged"
+    fi
 fi
 #end
 
