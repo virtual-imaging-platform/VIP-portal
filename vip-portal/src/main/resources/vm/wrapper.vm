@@ -173,6 +173,8 @@ fi
 # Check that singularity is in PATH
 
 #if($tool.getContainerType() == "singularity")
+# command -v displays the path to singularity if found
+info "checking for singularity"
 if ! command -v singularity
 then
     if test -d "$singularityPath"; then
