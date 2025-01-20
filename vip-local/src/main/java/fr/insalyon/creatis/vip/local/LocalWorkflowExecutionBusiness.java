@@ -37,7 +37,8 @@ public class LocalWorkflowExecutionBusiness extends WorkflowExecutionBusiness {
     }
 
     @Override
-    public Workflow launch(String engineEndpoint, AppVersion appVersion, User user, String simulationName, String workflowPath, List<ParameterSweep> parameters) throws BusinessException {
+    public Workflow launch(String engineEndpoint, AppVersion appVersion, User user, String simulationName, String workflowPath, 
+            List<ParameterSweep> parameters, String settings, String executorConfig) throws BusinessException {
         String workflowContent;
         try {
             workflowContent = FileUtil.read(new File(workflowPath));

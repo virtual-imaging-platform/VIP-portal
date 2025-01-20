@@ -60,7 +60,7 @@ public class SoapServiceEngine extends WorkflowEngineInstantiator {
      * @return the HTTP link that shows the workflow current status
      */
     @Override
-    public String launch(String addressWS, String workflowContent, String inputs, String settings, String proxyFileName)
+    public String launch(String addressWS, String workflowContent, String inputs, String settings, String executorConfig, String proxyFileName)
             throws java.rmi.RemoteException, javax.xml.rpc.ServiceException, BusinessException {
         String strProxy = null;
 

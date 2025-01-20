@@ -382,7 +382,7 @@ public class ExecutionControllerIT extends BaseWebSpringIT {
 
         Mockito.when(server.getVoName()).thenReturn("test-vo-name");
         Mockito.when(server.getServerProxy("test-vo-name")).thenReturn("/path/to/proxy");
-        Mockito.when(getWebServiceEngine().launch(eq(engineEndpoint), workflowContentCaptor.capture(), inputsCaptor.capture(), eq(""), eq("/path/to/proxy"))).thenReturn(workflowId, (String) null);
+        Mockito.when(getWebServiceEngine().launch(eq(engineEndpoint), workflowContentCaptor.capture(), inputsCaptor.capture(), eq(""), eq(""), eq("/path/to/proxy"))).thenReturn(workflowId, (String) null);
         Mockito.when(getWebServiceEngine().getStatus(engineEndpoint, workflowId)).thenReturn(SimulationStatus.Running, (SimulationStatus) null);
 
         Workflow w = new Workflow(workflowId, baseUser1.getFullName(), WorkflowStatus.Running, startDate, null, "Exec test 1", appName, versionName, "", engineEndpoint, null);
@@ -455,7 +455,7 @@ public class ExecutionControllerIT extends BaseWebSpringIT {
         Mockito.when(server.useMoteurlite()).thenReturn(true);
         Mockito.when(server.getVoName()).thenReturn("test-vo-name");
         Mockito.when(server.getServerProxy("test-vo-name")).thenReturn("/path/to/proxy");
-        Mockito.when(getWebServiceEngine().launch(eq(engineEndpoint), workflowContentCaptor.capture(), inputsCaptor.capture(), eq(""), eq("/path/to/proxy"))).thenReturn(workflowId, (String) null);
+        Mockito.when(getWebServiceEngine().launch(eq(engineEndpoint), workflowContentCaptor.capture(), inputsCaptor.capture(), eq(""), eq(""), eq("/path/to/proxy"))).thenReturn(workflowId, (String) null);
         Mockito.when(getWebServiceEngine().getStatus(engineEndpoint, workflowId)).thenReturn(SimulationStatus.Running, (SimulationStatus) null);
 
         Workflow w = new Workflow(workflowId, baseUser1.getFullName(), WorkflowStatus.Running, startDate, null, "Exec test 1", appName, versionName, "", engineEndpoint, null);

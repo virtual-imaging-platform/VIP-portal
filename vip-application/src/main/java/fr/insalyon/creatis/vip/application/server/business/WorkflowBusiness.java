@@ -164,18 +164,17 @@ public class WorkflowBusiness {
             String workflowPath = dataManagerBusiness.getRemoteFile(user, server.useMoteurlite() ? appVersion.getJsonLfn() : appVersion.getLfn());
             logger.info( "Moteurlite status: " + server.useMoteurlite());
 
-            List<Resource> resource = resourceBusiness.getUsableResources(user, appVersion);
-            if (resource.isEmpty()) {
+            List<Resource> resources = resourceBusiness.getUsableResources(user, appVersion);
+            if (resources.isEmpty()) {
                 throw new BusinessException("There are no ressources available for the moment !");
             }
 
-            Engine engine = engineBusiness.selectEngine(engineBusiness.getUsableEngines(resource.get(0)));
-            if (engine == null) {
-                throw new BusinessException("There are no engines available for the moment !");
-            }
+            Resource resource = resources.get(0);
+            Engine engine = engineBusiness.selectEngine(engineBusiness.getUsableEngines(resource));
 
             try {
-                workflow = workflowExecutionBusiness.launch(engine.getEndpoint(), appVersion, user, simulationName, workflowPath, parameters);
+                workflow = workflowExecutionBusiness.launch(engine.getEndpoint(), appVersion, user, simulationName, workflowPath, parameters, 
+                    resource.getType().toString(), resource.getConfiguration());
             } catch (BusinessException be) {
                 logger.error("BusinessException caught on launch workflow, engine {} will be disabled", engine.getName());
             } finally {
