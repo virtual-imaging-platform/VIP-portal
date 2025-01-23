@@ -463,7 +463,7 @@ public class WorkflowBusiness {
 
         //TODO fix
         return getInputM2Parser(currentUserFolder).parse(
-            server.getWorkflowsPath() + "/" + simulationID + "/input-m2.xml");
+            server.getWorkflowsPath() + "/" + simulationID + "/inputs.xml");
     }
 
     public Simulation getSimulation(String simulationID) throws BusinessException {

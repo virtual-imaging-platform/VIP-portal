@@ -90,7 +90,7 @@ public class GateLabInputs {
     @PostConstruct
     public final void init() {
         inputsMap = new HashMap<String, String>();
-        inputfile = server.getWorkflowsPath() + "/" + workflowID + "/input-m2.xml";
+        inputfile = server.getWorkflowsPath() + "/" + workflowID + "/inputs.xml";
         inputsMap = gateLabInputsParser.parse(inputfile);
     }
 
