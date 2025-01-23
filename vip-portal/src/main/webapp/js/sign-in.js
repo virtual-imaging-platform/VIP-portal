@@ -216,24 +216,18 @@ function clickinner(){
     password = document.getElementById("floatingPassword").value;
     validateEmail(email);
     get_fetch(email, password).then(data => setCookie(email, data.httpHeaderValue, 7));
-};
+}
 
-function keypressListener(e) {
-    if (e.key == 'Enter') {
-        clickinner();
+function onKeyPress(event) {
+    if (event.key === "Enter") {
+        event.preventDefault();
+        clickinner()
     }
 }
 
-function createEvent() {
-    document.addEventListener('DOMContentLoaded', () => {
-        const email = document.getElementById("floatingEmail");
-        const password = document.getElementById("floatingPassword");
-    
-        email.addEventListener('keypress', keypressListener);
-        password.addEventListener('keypress', keypressListener);
-    });
-}
+$(function () {
+ $("#welcome_signin").first().keypress(onKeyPress)
+})
 
 checkIfCookieExist();
 createGrid();
-createEvent();

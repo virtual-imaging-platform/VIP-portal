@@ -113,7 +113,9 @@ public class RestServiceEngine extends WorkflowEngineInstantiator {
 
         String base64Workflow = Base64.getEncoder().encodeToString(workflow.getBytes(StandardCharsets.UTF_8));
         String base64Input = Base64.getEncoder().encodeToString(inputs.getBytes(StandardCharsets.UTF_8));
-        String base64Proxy = Base64.getEncoder().encodeToString(strProxy != null ? strProxy.getBytes(StandardCharsets.UTF_8) : null);
+        String base64Proxy = strProxy != null ?
+                (Base64.getEncoder().encodeToString(strProxy.getBytes(StandardCharsets.UTF_8)))
+                : null;
         String base64Settings = Base64.getEncoder().encodeToString(settings.getBytes(StandardCharsets.UTF_8));
         String base64ExecutorConfig = Base64.getEncoder().encodeToString(executorConfig.getBytes(StandardCharsets.UTF_8));
 

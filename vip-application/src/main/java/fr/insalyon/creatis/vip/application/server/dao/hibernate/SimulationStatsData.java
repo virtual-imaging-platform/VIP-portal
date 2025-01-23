@@ -31,28 +31,25 @@
  */
 package fr.insalyon.creatis.vip.application.server.dao.hibernate;
 
-import fr.insalyon.creatis.moteur.plugins.workflowsdb.bean.Stats;
 import fr.insalyon.creatis.moteur.plugins.workflowsdb.bean.Workflow;
 import fr.insalyon.creatis.moteur.plugins.workflowsdb.dao.WorkflowsDBDAOException;
-import fr.insalyon.creatis.moteur.plugins.workflowsdb.dao.WorkflowsDBDAOFactory;
 import fr.insalyon.creatis.vip.application.server.dao.SimulationStatsDAO;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
-import org.hibernate.Criteria;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Expression;
+import jakarta.persistence.criteria.Root;
+import jakarta.persistence.criteria.Selection;
+
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.criterion.Order;
-import org.hibernate.criterion.ProjectionList;
-import org.hibernate.criterion.Projections;
-import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -73,109 +70,96 @@ public class SimulationStatsData implements SimulationStatsDAO {
 
     @Override
     public List<String> getBySimulationID(List<String> simulationID) throws DAOException {
-        //System.out.println("Calling SimulationStatsData: getBySimuID");
         List<String> result = new ArrayList<String>();
-        try {
-            Session session = sessionFactory.openSession();
+
+        try (Session session = sessionFactory.openSession()) {
             session.beginTransaction();
-            Criteria criteria = session.createCriteria(Stats.class);
 
-            // 'workflowID' is the variable in the class Stats
-            //criteria.add(Restrictions.eq("workflowID", simulationID));
-            criteria.add(Restrictions.in("workflowID", simulationID));
-            //criteria.addOrder(Order.desc("workflowID"));
+            CriteriaBuilder criteriaBuilder = session.getCriteriaBuilder();
+            CriteriaQuery<Object[]> criteriaQuery = criteriaBuilder.createQuery(Object[].class);
+            Root<Workflow> root = criteriaQuery.from(Workflow.class);
+            List<Selection<?>> selections = new ArrayList<>();
 
-            ProjectionList p = Projections.projectionList();
-            //p.add(Projections.sum("completed"));
-            p.add(Projections.alias(Projections.sum("completed"), "sumCompleted"));
-            p.add(Projections.alias(Projections.sum("completedWaitingTime"), "sumCompletedWaitingTime"));
-            p.add(Projections.alias(Projections.sum("completedExecutionTime"), "sumCompletedExecutionTime"));
-            p.add(Projections.alias(Projections.sum("completedInputTime"), "sumCompletedInputTime"));
-            p.add(Projections.alias(Projections.sum("completedOutputTime"), "sumCompletedOutputTime"));
-            p.add(Projections.sum("cancelled"));
-            p.add(Projections.sum("cancelledWaitingTime"));
-            p.add(Projections.sum("cancelledExecutionTime"));
-            p.add(Projections.sum("cancelledInputTime"));
-            p.add(Projections.sum("cancelledOutputTime"));
-            p.add(Projections.sum("failedApplication"));
-            p.add(Projections.sum("failedApplicationWaitingTime"));
-            p.add(Projections.sum("failedApplicationExecutionTime"));
-            p.add(Projections.sum("failedApplicationInputTime"));
-            p.add(Projections.sum("failedApplicationOutputTime"));
-            p.add(Projections.sum("failedInput"));
-            p.add(Projections.sum("failedInputWaitingTime"));
-            p.add(Projections.sum("failedInputExecutionTime"));
-            p.add(Projections.sum("failedInputInputTime"));
-            p.add(Projections.sum("failedInputOutputTime"));
-            p.add(Projections.sum("failedOutput"));
-            p.add(Projections.sum("failedOutputWaitingTime"));
-            p.add(Projections.sum("failedOutputExecutionTime"));
-            p.add(Projections.sum("failedOutputInputTime"));
-            p.add(Projections.sum("failedOutputOutputTime"));
-            p.add(Projections.sum("failedStalled"));
-            p.add(Projections.sum("failedStalledWaitingTime"));
-            p.add(Projections.sum("failedStalledExecutionTime"));
-            p.add(Projections.sum("failedStalledInputTime"));
-            p.add(Projections.sum("failedStalledOutputTime"));
+            criteriaQuery.where(root.get("id").in(simulationID));
 
-            criteria.setProjection(p);
-            List l = criteria.list();
+            selections.add(criteriaBuilder.sum(root.get("completed")).alias("sumCompleted"));
+            selections.add(criteriaBuilder.sum(root.get("completedWaitingTime")).alias("sumCompletedWaitingTime"));
+            selections.add(criteriaBuilder.sum(root.get("completedExecutionTime")).alias("sumCompletedExecutionTime"));
+            selections.add(criteriaBuilder.sum(root.get("completedInputTime")).alias("sumCompletedInputTime"));
+            selections.add(criteriaBuilder.sum(root.get("completedOutputTime")).alias("sumCompletedOutputTime"));
+            selections.add(criteriaBuilder.sum(root.get("cancelled")));
+            selections.add(criteriaBuilder.sum(root.get("cancelled")));
+            selections.add(criteriaBuilder.sum(root.get("cancelledWaitingTime")));
+            selections.add(criteriaBuilder.sum(root.get("cancelledExecutionTime")));
+            selections.add(criteriaBuilder.sum(root.get("cancelledInputTime")));
+            selections.add(criteriaBuilder.sum(root.get("cancelledOutputTime")));
+            selections.add(criteriaBuilder.sum(root.get("failedApplication")));
+            selections.add(criteriaBuilder.sum(root.get("failedApplicationWaitingTime")));
+            selections.add(criteriaBuilder.sum(root.get("failedApplicationExecutionTime")));
+            selections.add(criteriaBuilder.sum(root.get("failedApplicationInputTime")));
+            selections.add(criteriaBuilder.sum(root.get("failedApplicationOutputTime")));
+            selections.add(criteriaBuilder.sum(root.get("failedInput")));
+            selections.add(criteriaBuilder.sum(root.get("failedInputWaitingTime")));
+            selections.add(criteriaBuilder.sum(root.get("failedInputExecutionTime")));
+            selections.add(criteriaBuilder.sum(root.get("failedInputInputTime")));
+            selections.add(criteriaBuilder.sum(root.get("failedInputOutputTime")));
+            selections.add(criteriaBuilder.sum(root.get("failedOutput")));
+            selections.add(criteriaBuilder.sum(root.get("failedOutputWaitingTime")));
+            selections.add(criteriaBuilder.sum(root.get("failedOutputExecutionTime")));
+            selections.add(criteriaBuilder.sum(root.get("failedOutputInputTime")));
+            selections.add(criteriaBuilder.sum(root.get("failedOutputOutputTime")));
+            selections.add(criteriaBuilder.sum(root.get("failedStalled")));
+            selections.add(criteriaBuilder.sum(root.get("failedStalledWaitingTime")));
+            selections.add(criteriaBuilder.sum(root.get("failedStalledExecutionTime")));
+            selections.add(criteriaBuilder.sum(root.get("failedStalledInputTime")));
+            selections.add(criteriaBuilder.sum(root.get("failedStalledOutputTime")));
+            criteriaQuery.multiselect(selections);
+
             session.getTransaction().commit();
-            session.close();
 
-            Iterator it = l.iterator();
-            while (it.hasNext()) {
-                Object ob[] = (Object[]) it.next();
-                /*
-                for (int i = 0; i < ob.length; i++) {
-                System.out.println("Object " + i + " is " + ob[i]);
-                if (ob[i] != null) {
-                result.add(String.valueOf(ob[i]));
-                }
-                }
-                 * 
-                 */
-                if (ob.length >= 30) {
-                    result.add("Completed Jobs##" + String.valueOf(ob[0]) + "");
-                    result.add("CompletedJobs WaitingTime##" + String.valueOf(ob[1]) + "");
-                    result.add("CompletedJobs ExecutionTime##" + String.valueOf(ob[2]) + "");
-                    result.add("CompletedJobs InputTime##" + String.valueOf(ob[3]) + "");
-                    result.add("CompletedJobs OutputTime##" + String.valueOf(ob[4]) + "");
-                    result.add("Cancelled Jobs##" + String.valueOf(ob[5]) + "");
-                    result.add("CancelledJobs WaitingTime##" + String.valueOf(ob[6]) + "");
-                    result.add("CancelledJobs ExecutionTime##" + String.valueOf(ob[7]) + "");
-                    result.add("CancelledJobs InputTime##" + String.valueOf(ob[8]) + "");
-                    result.add("CancelledJobs OutputTime##" + String.valueOf(ob[9]) + "");
-                    result.add("failedApplication Jobs##" + String.valueOf(ob[10]) + "");
-                    result.add("failedApplicationJobs WaitingTime##" + String.valueOf(ob[11]) + "");
-                    result.add("failedApplicationJobs ExecutionTime##" + String.valueOf(ob[12]) + "");
-                    result.add("failedApplicationJobs InputTime##" + String.valueOf(ob[13]) + "");
-                    result.add("failedApplicationJobs OutputTime##" + String.valueOf(ob[14]) + "");
-                    result.add("failedInput Jobs##" + String.valueOf(ob[15]) + "");
-                    result.add("failedInputJobs WaitingTime##" + String.valueOf(ob[16]) + "");
-                    result.add("failedInputJobs ExecutionTime##" + String.valueOf(ob[17]) + "");
-                    result.add("failedInputJobs InputTime##" + String.valueOf(ob[18]) + "");
-                    result.add("failedInputJobs OutputTime##" + String.valueOf(ob[19]) + "");
-                    result.add("failedInput Jobs##" + String.valueOf(ob[15]) + "");
-                    result.add("failedInputJobs WaitingTime##" + String.valueOf(ob[16]) + "");
-                    result.add("failedInputJobs ExecutionTime##" + String.valueOf(ob[17]) + "");
-                    result.add("failedInputJpbs InputTime##" + String.valueOf(ob[18]) + "");
-                    result.add("failedInputJobs OutputTime##" + String.valueOf(ob[19]) + "");
-                    result.add("failedOutput Jobs##" + String.valueOf(ob[20]) + "");
-                    result.add("failedOutputJobs WaitingTime##" + String.valueOf(ob[21]) + "");
-                    result.add("failedOutputJobs ExecutionTime##" + String.valueOf(ob[22]) + "");
-                    result.add("failedOutputJobs InputTime##" + String.valueOf(ob[23]) + "");
-                    result.add("failedOutputJobs OutputTime##" + String.valueOf(ob[24]) + "");
-                    result.add("failedStalled Jobs##" + String.valueOf(ob[25]) + "");
-                    result.add("failedStalledJobs WaitingTime##" + String.valueOf(ob[26]) + "");
-                    result.add("failedStalledJobs ExecutionTime##" + String.valueOf(ob[27]) + "");
-                    result.add("failedStalledJobs InputTime##" + String.valueOf(ob[28]) + "");
-                    result.add("failedStalledJobs OutputTime##" + String.valueOf(ob[29]) + "");
-                }else{
-                    logger.error("getBySimulationID: Not enough data : {}", ob.length);
+            List<Object[]> results = session.createQuery(criteriaQuery).getResultList();
+
+            for (Object[] row : results) {
+                if (row.length >= 30) {
+                    result.add("Completed Jobs##" + String.valueOf(row[0]) + "");
+                    result.add("CompletedJobs WaitingTime##" + String.valueOf(row[1]) + "");
+                    result.add("CompletedJobs ExecutionTime##" + String.valueOf(row[2]) + "");
+                    result.add("CompletedJobs InputTime##" + String.valueOf(row[3]) + "");
+                    result.add("CompletedJobs OutputTime##" + String.valueOf(row[4]) + "");
+                    result.add("Cancelled Jobs##" + String.valueOf(row[5]) + "");
+                    result.add("CancelledJobs WaitingTime##" + String.valueOf(row[6]) + "");
+                    result.add("CancelledJobs ExecutionTime##" + String.valueOf(row[7]) + "");
+                    result.add("CancelledJobs InputTime##" + String.valueOf(row[8]) + "");
+                    result.add("CancelledJobs OutputTime##" + String.valueOf(row[9]) + "");
+                    result.add("failedApplication Jobs##" + String.valueOf(row[10]) + "");
+                    result.add("failedApplicationJobs WaitingTime##" + String.valueOf(row[11]) + "");
+                    result.add("failedApplicationJobs ExecutionTime##" + String.valueOf(row[12]) + "");
+                    result.add("failedApplicationJobs InputTime##" + String.valueOf(row[13]) + "");
+                    result.add("failedApplicationJobs OutputTime##" + String.valueOf(row[14]) + "");
+                    result.add("failedInput Jobs##" + String.valueOf(row[15]) + "");
+                    result.add("failedInputJobs WaitingTime##" + String.valueOf(row[16]) + "");
+                    result.add("failedInputJobs ExecutionTime##" + String.valueOf(row[17]) + "");
+                    result.add("failedInputJobs InputTime##" + String.valueOf(row[18]) + "");
+                    result.add("failedInputJobs OutputTime##" + String.valueOf(row[19]) + "");
+                    result.add("failedInput Jobs##" + String.valueOf(row[15]) + "");
+                    result.add("failedInputJobs WaitingTime##" + String.valueOf(row[16]) + "");
+                    result.add("failedInputJobs ExecutionTime##" + String.valueOf(row[17]) + "");
+                    result.add("failedInputJpbs InputTime##" + String.valueOf(row[18]) + "");
+                    result.add("failedInputJobs OutputTime##" + String.valueOf(row[19]) + "");
+                    result.add("failedOutput Jobs##" + String.valueOf(row[20]) + "");
+                    result.add("failedOutputJobs WaitingTime##" + String.valueOf(row[21]) + "");
+                    result.add("failedOutputJobs ExecutionTime##" + String.valueOf(row[22]) + "");
+                    result.add("failedOutputJobs InputTime##" + String.valueOf(row[23]) + "");
+                    result.add("failedOutputJobs OutputTime##" + String.valueOf(row[24]) + "");
+                    result.add("failedStalled Jobs##" + String.valueOf(row[25]) + "");
+                    result.add("failedStalledJobs WaitingTime##" + String.valueOf(row[26]) + "");
+                    result.add("failedStalledJobs ExecutionTime##" + String.valueOf(row[27]) + "");
+                    result.add("failedStalledJobs InputTime##" + String.valueOf(row[28]) + "");
+                    result.add("failedStalledJobs OutputTime##" + String.valueOf(row[29]) + "");
+                } else {
+                    logger.error("getBySimulationID: Not enough data : {}", row.length);
                     throw new DAOException("getBySimulationID: Not enough data");
                 }
-
             }
 
             return result;
@@ -184,37 +168,36 @@ public class SimulationStatsData implements SimulationStatsDAO {
             throw new DAOException(ex);
 
         }
-
-
     }
 
     @Override
     public List<String> getWorkflowsPerUser(List<String> workflowsId) throws WorkflowsDBDAOException {
         List<String> result = new ArrayList<String>();
-        try {
-            Session session = sessionFactory.openSession();
+        try (Session session = sessionFactory.openSession()) {
             session.beginTransaction();
-            Criteria criteria = session.createCriteria(Workflow.class);
-            criteria.add(Restrictions.in("id", workflowsId));
 
-            ProjectionList p = Projections.projectionList();
-            p.add(Projections.groupProperty("username"));
-            p.add(Projections.property("username"));
-            p.add(Projections.alias(Projections.count("status"), "nbWfls"));
-   
-            //p.add(Projections.count("status"));
-            criteria.setProjection(p);
-            criteria.addOrder(Order.desc("nbWfls"));
-            List l = criteria.list();
-            session.getTransaction().commit();
-            session.close();
+            CriteriaBuilder criteriaBuilder = session.getCriteriaBuilder();
+            CriteriaQuery<Object[]> criteriaQuery = criteriaBuilder.createQuery(Object[].class);
+            Root<Workflow> root = criteriaQuery.from(Workflow.class);
+            List<Selection<?>> selections = new ArrayList<>();
+            Expression<?> expression = criteriaBuilder.count(root.get("status"));
 
-            Iterator it = l.iterator();
-            while (it.hasNext()) {
-                Object ob[] = (Object[]) it.next();
-                if (ob[0] != null && ob[1] != null) {
-                    result.add(String.valueOf(ob[0]) + "##" + String.valueOf(ob[2]));
-                }
+            criteriaQuery.where(root.get("id").in(workflowsId));
+
+            selections.add(root.get("username"));
+            selections.add(expression.alias("nbWfls"));
+            criteriaQuery.multiselect(selections)
+                .groupBy(root.get("username"));
+
+            criteriaQuery.orderBy(criteriaBuilder.desc(expression));
+
+            List<Object[]> results = session.createQuery(criteriaQuery).getResultList();
+
+            for (Object[] row : results) {
+                String username = (String) row[0];
+                Long nbWfls = (Long) row[1];
+
+                result.add(String.valueOf(username) + "##" + String.valueOf(nbWfls));
             }
 
             return result;
@@ -227,37 +210,35 @@ public class SimulationStatsData implements SimulationStatsDAO {
     @Override
     public List<String> getApplications(List<String> workflowsId) throws WorkflowsDBDAOException {
         List<String> result = new ArrayList<String>();
-        try {
-            Session session = sessionFactory.openSession();
+        try (Session session = sessionFactory.openSession()) {
             session.beginTransaction();
-            Criteria criteria = session.createCriteria(Workflow.class);
-            criteria.add(Restrictions.in("id", workflowsId));
 
-            ProjectionList p = Projections.projectionList();
-            p.add(Projections.groupProperty("application"));
-            p.add(Projections.property("application"));
-            p.add(Projections.alias(Projections.count("status"), "nbWfls"));
-            criteria.setProjection(p);
-            criteria.setProjection(p);
-            criteria.addOrder(Order.desc("nbWfls"));
-            List l = criteria.list();
+            CriteriaBuilder criteriaBuilder = session.getCriteriaBuilder();
+            CriteriaQuery<Object[]> criteriaQuery = criteriaBuilder.createQuery(Object[].class);
+            Root<Workflow> root = criteriaQuery.from(Workflow.class);
+            List<Selection<?>> selections = new ArrayList<>();
+            Expression<?> expression = criteriaBuilder.count(root.get("status"));
 
-            session.getTransaction().commit();
-            session.close();
+            criteriaQuery.where(root.get("id").in(workflowsId));
 
-            Iterator it = l.iterator();
-            while (it.hasNext()) {
-                Object ob[] = (Object[]) it.next();
-                if (ob[0] != null && ob[1] != null) {
-                    result.add(String.valueOf(ob[0]) + "##" + String.valueOf(ob[2]));
+            selections.add(root.get("application"));
+            selections.add(expression.alias("nbWfls"));
+            criteriaQuery.multiselect(selections)
+                .groupBy(root.get("application"));
+
+            criteriaQuery.orderBy(criteriaBuilder.desc(expression));
+            
+            List<Object[]> results = session.createQuery(criteriaQuery).getResultList();
+
+            for (Object[] row : results) {
+                if (row[0] != null && row[1] != null) {
+                    result.add(String.valueOf(row[0]) + "##" + String.valueOf(row[1]));
                 }
-
             }
             return result;
         } catch (HibernateException ex) {
             logger.error("Error getting applications for {}", workflowsId, ex);
             throw new WorkflowsDBDAOException(ex);
         }
-        //System.out.println("getApplications, first result is " + result.get(0).toString());
     }
 }

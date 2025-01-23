@@ -177,6 +177,8 @@ public class WorkflowBusiness {
                     resource.getType().toString(), resource.getConfiguration());
             } catch (BusinessException be) {
                 logger.error("BusinessException caught on launch workflow, engine {} will be disabled", engine.getName());
+            } catch (Exception e) {
+                logger.error("Unexpected exception caught on launch workflow, engine {} will be disabled", engine.getName(), e);
             } finally {
                 if (workflow == null) {
                     engine.setStatus("disabled");

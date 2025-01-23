@@ -130,7 +130,7 @@
                         </div>
 
                         <!-- Submit button -->
-                        <a type="button" class="btn btn-primary btn-lg btn-block" onclick="clickinner()" style="background-color: #0095d6;">Sign in</a>
+                        <a type="button" id="signin-button" class="btn btn-primary btn-lg btn-block" onclick="clickinner()" style="background-color: #0095d6;">Sign in</a>
                         <a type="button" class="btn btn-primary btn-lg btn-block" onclick="createAnAccount()" style="background-color: #0095d6;">Create an account</a>
 
                         <!-- divider
@@ -144,7 +144,7 @@
                            role="button">
                             Login with EGI Check-in
                         </a>
-
+                    </div>
                 </form>
             </div>
         </div>
@@ -256,21 +256,67 @@
         </div>
 
         <div class="row justify-content-center">
-            <div class="col-12 col-md-6 col-lg-4">
+            <div class="col-12 col-md-6">
                 <div class="card border-0 shadow-lg pt-5 my-5 position-relative">
                     <div class="card-body p-4">
                         <div class="member-profile position-absolute w-100 text-center">
-                            <img class="rounded-circle mx-auto d-inline-block shadow-sm" src="images/team/sandesh_patil.jpg" alt="">
+                            <img class="rounded-circle mx-auto d-inline-block shadow-sm" src="images/team/hippolyte_blot.jpg" alt="">
                         </div>
                         <div class="card-text pt-1">
-                            <h5 class="member-name mb-0 text-center text-primary font-weight-bold">Sandesh Patil</h5>
+                            <h5 class="member-name mb-0 text-center text-primary font-weight-bold">Hippolyte Blot</h5>
+                            <div class="mb-3 text-center">Apprentice</div>
+                        </div>
+                    </div><!--//card-body-->
+                </div><!--//card-->
+            </div><!--//col-->
+            <div class="col-12 col-md-6">
+                <div class="card border-0 shadow-lg pt-5 my-5 position-relative">
+                    <div class="card-body p-4">
+                        <div class="member-profile position-absolute w-100 text-center">
+                            <img class="rounded-circle mx-auto d-inline-block shadow-sm" src="images/team/ethaniel_billon.jpg" alt="">
+                        </div>
+                        <div class="card-text pt-1">
+                            <h5 class="member-name mb-0 text-center text-primary font-weight-bold">Ethaniel Billon</h5>
+                            <div class="mb-3 text-center">Engineer - PEPR Chronicardio</div>
+                            <p class="infoProject"><a href="https://pepr-santenum.fr/2023/11/08/chronicardio/">More info about Chronicardio project</a></p>
+                        </div>
+                    </div><!--//card-body-->
+                </div><!--//card-->
+            </div><!--//col-->
+        </div>
+
+        <div class="row justify-content-center">
+            <div class="col-12 col-md-6">
+                <div class="card border-0 shadow-lg pt-5 my-5 position-relative">
+                    <div class="card-body p-4">
+                        <div class="member-profile position-absolute w-100 text-center">
+                            <img class="rounded-circle mx-auto d-inline-block shadow-sm" src="images/team/nicolas_georges.png" alt="">
+                        </div>
+                        <div class="card-text pt-1">
+                            <h5 class="member-name mb-0 text-center text-primary font-weight-bold">Nicolas Georges</h5>
+                            <div class="mb-3 text-center">Research Engineer - EUCAIM</div>
+                            <p class="infoProject"><a href="https://www.eibir.org/projects/eucaim/">More info about EUCAIM project</a></p>
+                        </div>
+                    </div><!--//card-body-->
+                </div><!--//card-->
+            </div><!--//col-->
+            <div class="col-12 col-md-6">
+                <div class="card border-0 shadow-lg pt-5 my-5 position-relative">
+                    <div class="card-body p-4">
+                        <div class="member-profile position-absolute w-100 text-center">
+                            <img class="rounded-circle mx-auto d-inline-block shadow-sm" src="images/team/gwenael_ambrosino.jpg" alt="">
+                        </div>
+                        <div class="card-text pt-1">
+                            <h5 class="member-name mb-0 text-center text-primary font-weight-bold">Gwenaël Ambrosino-Ielpo</h5>
                             <div class="mb-3 text-center">Research Engineer - FLI-IAM</div>
                             <p class="infoProject"><a href="https://www.francelifeimaging.fr/">More info about FLI-IAM project</a></p>
                         </div>
                     </div><!--//card-body-->
                 </div><!--//card-->
             </div><!--//col-->
-        </div><!--//row-->
+        </div>
+
+
     </div>
 
     <h2>Former contributors to the projects</h2>
@@ -313,7 +359,7 @@
         </div>
 
         <div class="row justify-content-center">
-            <div class="col-12 col-md-6">
+            <div class="col-12 col-md-6 col-lg-4">
                 <div class="card border-0 shadow-lg pt-5 my-5 position-relative">
                     <div class="card-body p-4">
                         <div class="member-profile position-absolute w-100 text-center">
@@ -327,7 +373,7 @@
                     </div><!--//card-body-->
                 </div><!--//card-->
             </div><!--//col-->
-            <div class="col-12 col-md-6">
+            <div class="col-12 col-md-6 col-lg-4">
                 <div class="card border-0 shadow-lg pt-5 my-5 position-relative">
                     <div class="card-body p-4">
                         <div class="member-profile position-absolute w-100 text-center">
@@ -337,6 +383,20 @@
                             <h5 class="member-name mb-0 text-center text-primary font-weight-bold">Alexandre Cornier</h5>
                             <div class="mb-3 text-center">Research Engineer - EGI-ACE & ReproVIP</div>
                             <p class="infoProject"><a href="https://www.egi.eu/project/egi-ace/">More info about EGI-ACE project</a></p>
+                        </div>
+                    </div><!--//card-body-->
+                </div><!--//card-->
+            </div><!--//col-->
+            <div class="col-12 col-md-6 col-lg-4">
+                <div class="card border-0 shadow-lg pt-5 my-5 position-relative">
+                    <div class="card-body p-4">
+                        <div class="member-profile position-absolute w-100 text-center">
+                            <img class="rounded-circle mx-auto d-inline-block shadow-sm" src="images/team/sandesh_patil.jpg" alt="">
+                        </div>
+                        <div class="card-text pt-1">
+                            <h5 class="member-name mb-0 text-center text-primary font-weight-bold">Sandesh Patil</h5>
+                            <div class="mb-3 text-center">Research Engineer - FLI-IAM</div>
+                            <p class="infoProject"><a href="https://www.francelifeimaging.fr/">More info about FLI-IAM project</a></p>
                         </div>
                     </div><!--//card-body-->
                 </div><!--//card-->
