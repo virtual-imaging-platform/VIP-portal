@@ -53,6 +53,7 @@ public class EditResourceLayout extends AbstractFormLayout {
 
         nameField = FieldUtil.getTextItem(350, null);
         configurationField = FieldUtil.getTextItem(350, null);
+        configurationField.setRequired(false);
 
         publicField = new BooleanItem();
         publicField.setShowTitle(false);
@@ -84,8 +85,7 @@ public class EditResourceLayout extends AbstractFormLayout {
                 new ClickHandler() {
                     @Override
                     public void onClick(ClickEvent event) {
-                        if (nameField.validate() & configurationField.validate()) {
-
+                        if (nameField.validate()) {
                             save(new Resource(
                                 nameField.getValueAsString().trim(),
                                 publicField.getValueAsBoolean(),
