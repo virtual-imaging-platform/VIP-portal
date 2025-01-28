@@ -31,14 +31,21 @@
  */
 package fr.insalyon.creatis.vip.application.server.business;
 
+import fr.insalyon.creatis.moteur.plugins.workflowsdb.dao.WorkflowDAO;
+import fr.insalyon.creatis.moteur.plugins.workflowsdb.dao.WorkflowsDBDAOException;
 import fr.insalyon.creatis.vip.application.client.bean.Engine;
+import fr.insalyon.creatis.vip.application.client.bean.Resource;
 import fr.insalyon.creatis.vip.application.server.dao.EngineDAO;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -48,10 +55,14 @@ import java.util.List;
 @Transactional
 public class EngineBusiness {
 
-    private EngineDAO engineDAO;
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    public EngineBusiness(EngineDAO engineDAO) {
+    private EngineDAO engineDAO;
+    private WorkflowDAO workflowDAO;
+
+    public EngineBusiness(EngineDAO engineDAO, WorkflowDAO workflowDAO) {
         this.engineDAO = engineDAO;
+        this.workflowDAO = workflowDAO;
     }
 
     public void add(Engine engine) throws BusinessException {
@@ -83,6 +94,51 @@ public class EngineBusiness {
             return engineDAO.get();
         } catch (DAOException ex) {
             throw new BusinessException(ex);
+        }
+    }
+
+    public List<Engine> getByResource(Resource resource) throws BusinessException {
+        try {
+            return engineDAO.getByResource(resource);
+        } catch (DAOException e) {
+        throw new BusinessException(e);
+        }
+    }
+
+    public List<Engine> getUsableEngines(Resource resource) throws BusinessException {
+        List<Engine> engines = getByResource(resource);
+
+        engines = getByResource(resource);
+
+        if (engines.isEmpty()) {
+            engines = get();
+        }
+        return engines
+            .stream()
+            .filter((e) -> e.getStatus().equals("enabled"))
+            .collect(Collectors.toList());
+    }
+
+    public Engine selectEngine(List<Engine> availableEngines) throws BusinessException {
+        long min = Long.MAX_VALUE;
+        Engine selectEngine = null;
+
+        try {
+            for (Engine engine : availableEngines) {
+                long runningWorkflows = workflowDAO.getNumberOfRunningPerEngine(engine.getEndpoint());
+                if (runningWorkflows < min && ! engine.getEndpoint().isEmpty()) {
+                    min = runningWorkflows;
+                    selectEngine = engine;
+                }
+            }
+        } catch (WorkflowsDBDAOException ex) {
+            logger.error("Error selecting an engine !", ex);
+        }
+        if (selectEngine == null || availableEngines.isEmpty()) {
+            logger.error("No available engines !");
+            throw new BusinessException("No available engines !");
+        } else {
+            return selectEngine;
         }
     }
 }

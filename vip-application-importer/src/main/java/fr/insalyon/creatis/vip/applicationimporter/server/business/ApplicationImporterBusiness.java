@@ -35,10 +35,13 @@ import fr.insalyon.creatis.grida.client.GRIDAClient;
 import fr.insalyon.creatis.grida.client.GRIDAClientException;
 import fr.insalyon.creatis.vip.application.client.bean.AppVersion;
 import fr.insalyon.creatis.vip.application.client.bean.Application;
+import fr.insalyon.creatis.vip.application.client.bean.Tag;
 import fr.insalyon.creatis.vip.application.client.bean.boutiquesTools.BoutiquesApplication;
+import fr.insalyon.creatis.vip.application.server.business.AppVersionBusiness;
 import fr.insalyon.creatis.vip.application.server.business.ApplicationBusiness;
 import fr.insalyon.creatis.vip.application.server.business.BoutiquesBusiness;
-import fr.insalyon.creatis.vip.applicationimporter.client.view.Constants;
+import fr.insalyon.creatis.vip.application.server.business.ResourceBusiness;
+import fr.insalyon.creatis.vip.application.server.business.TagBusiness;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.business.Server;
@@ -71,7 +74,10 @@ public class ApplicationImporterBusiness {
     private VelocityUtils velocityUtils;
     private TargzUtils targzUtils;
     private ApplicationBusiness applicationBusiness;
+    private AppVersionBusiness appVersionBusiness;
     private DataManagerBusiness dataManagerBusiness;
+    private ResourceBusiness resourceBusiness;
+    private TagBusiness tagBusiness;
 
     @Autowired
     public ApplicationImporterBusiness(
@@ -79,7 +85,10 @@ public class ApplicationImporterBusiness {
             GRIDAClient gridaClient, BoutiquesBusiness boutiquesBusiness,
             VelocityUtils velocityUtils, TargzUtils targzUtils,
             ApplicationBusiness applicationBusiness,
-            DataManagerBusiness dataManagerBusiness) {
+            DataManagerBusiness dataManagerBusiness,
+            ResourceBusiness resourceBusiness,
+            TagBusiness tagBusiness,
+            AppVersionBusiness appVersionBusiness) {
         this.server = server;
         this.lfcPathsBusiness = lfcPathsBusiness;
         this.gridaClient = gridaClient;
@@ -88,6 +97,9 @@ public class ApplicationImporterBusiness {
         this.targzUtils = targzUtils;
         this.applicationBusiness = applicationBusiness;
         this.dataManagerBusiness = dataManagerBusiness;
+        this.resourceBusiness = resourceBusiness;
+        this.tagBusiness = tagBusiness;
+        this.appVersionBusiness = appVersionBusiness;
     }
 
     public String readAndValidationBoutiquesFile(String fileLFN, User user)
@@ -103,8 +115,8 @@ public class ApplicationImporterBusiness {
         }
     }
 
-    public void createApplication(
-            BoutiquesApplication bt, String tag, boolean isRunOnGrid, boolean overwriteApplicationVersion, String fileAccessProtocol, User user)
+    public void createApplication(BoutiquesApplication bt, String tag, boolean overwriteApplicationVersion, String fileAccessProtocol
+        ,List<String> tags, List<String> resources, User user)
             throws BusinessException {
 
         try {
@@ -121,8 +133,8 @@ public class ApplicationImporterBusiness {
 
             // Generate strings
             String gwendiaString = velocityUtils.createDocument(bt, fileAccessProtocol, gwendiaTemplate);
-            String gaswString = velocityUtils.createDocument(tag, bt, isRunOnGrid, fileAccessProtocol, gaswTemplate);
-            String wrapperString = velocityUtils.createDocument(tag, bt, isRunOnGrid, wrapperTemplate);
+            String gaswString = velocityUtils.createDocument(tag, bt, fileAccessProtocol, gaswTemplate);
+            String wrapperString = velocityUtils.createDocument(tag, bt, wrapperTemplate);
 
             // Write files
             String gwendiaFileName = server.getApplicationImporterFileRepository() + bt.getGwendiaLFN();
@@ -162,7 +174,7 @@ public class ApplicationImporterBusiness {
             uploadFile(jsonFileName, bt.getJsonLFN());
         
             // Register application
-            registerApplicationVersion(bt.getName(), bt.getToolVersion(), user.getEmail(), bt.getGwendiaLFN(), bt.getJsonLFN());
+            registerApplicationVersion(bt.getName(), bt.getToolVersion(), user.getEmail(), bt.getGwendiaLFN(), bt.getJsonLFN(), tags, resources);
 
         } catch (IOException ex) {
             logger.error("Error creating app {}/{} from boutiques file", bt.getName(), bt.getToolVersion(), ex);
@@ -200,25 +212,27 @@ public class ApplicationImporterBusiness {
 
     private void registerApplicationVersion(
             String vipApplicationName, String vipVersion, String owner,
-            String lfnGwendiaFile, String lfnJsonFile) throws BusinessException {
+            String lfnGwendiaFile, String lfnJsonFile,
+            List<String> tags, List<String> resources) throws BusinessException {
         Application app = applicationBusiness.getApplication(vipApplicationName);
         AppVersion newVersion = new AppVersion(vipApplicationName, vipVersion, lfnGwendiaFile, lfnJsonFile, true, true);
         if (app == null) {
             // If application doesn't exist, create it.
             // New applications are not associated with any class (admins may add classes independently).
-            applicationBusiness.add(new Application(vipApplicationName, new ArrayList<String>(), owner, ""));
+            applicationBusiness.add(new Application(vipApplicationName, owner));
         }
         // If version exists, update it
-        List<AppVersion> versions =
-                applicationBusiness.getVersions(vipApplicationName);
+        List<AppVersion> versions = appVersionBusiness.getVersions(vipApplicationName);
         for (AppVersion existingVersion : versions) {
             if (existingVersion.getVersion().equals(newVersion.getVersion())) {
-                applicationBusiness.updateVersion(newVersion);
+                appVersionBusiness.update(newVersion);
                 return;
             }
         }
         // add new version
-        applicationBusiness.addVersion(newVersion);
+        appVersionBusiness.add(newVersion);
+        registerResourcesAssociated(newVersion, resources);
+        registerTagsAssociated(newVersion, tags);
     }
 
     private void checkEditionRights(
@@ -237,8 +251,7 @@ public class ApplicationImporterBusiness {
         }
         // Refuse to overwrite an application version silently if the version overwrite parameter is not set.
         if (!overwrite) {
-            List<AppVersion> versions =
-                    applicationBusiness.getVersions(vipApplicationName);
+            List<AppVersion> versions = appVersionBusiness.getVersions(vipApplicationName);
             for (AppVersion v : versions) {
                 if (v.getVersion().equals(vipVersion)) {
                     logger.error("{} tried to overwrite version {} of application {} without setting the overwrite flag.",
@@ -247,6 +260,20 @@ public class ApplicationImporterBusiness {
                 }
             }
         }
+    }
 
+    private void registerTagsAssociated(AppVersion appVersion, List<String> tags) throws BusinessException {
+        for (String tagName : tags) {
+            if ( ! tagBusiness.exist(tagName)) {
+                tagBusiness.add(new Tag(tagName));
+            }
+            tagBusiness.associate(new Tag(tagName), appVersion);
+        }
+    }
+
+    private void registerResourcesAssociated(AppVersion appVersion, List<String> resources) throws BusinessException {
+        for (String resourceName : resources) {
+            resourceBusiness.associate(resourceBusiness.getByName(resourceName), appVersion);
+        }
     }
 }

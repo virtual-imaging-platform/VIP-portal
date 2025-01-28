@@ -1,14 +1,12 @@
 package fr.insalyon.creatis.vip.local;
 
-import fr.insalyon.creatis.vip.application.client.bean.AppClass;
 import fr.insalyon.creatis.vip.application.client.bean.AppVersion;
 import fr.insalyon.creatis.vip.application.client.bean.Application;
 import fr.insalyon.creatis.vip.application.client.bean.Engine;
+import fr.insalyon.creatis.vip.application.server.business.AppVersionBusiness;
 import fr.insalyon.creatis.vip.application.server.business.ApplicationBusiness;
-import fr.insalyon.creatis.vip.application.server.business.ClassBusiness;
 import fr.insalyon.creatis.vip.application.server.business.EngineBusiness;
 import fr.insalyon.creatis.vip.core.client.bean.User;
-import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
 import fr.insalyon.creatis.vip.core.server.business.Server;
@@ -34,7 +32,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.util.Collections;
 
 /**
  * Class that initializes necessary stuff for a local vip instance on startup.
@@ -76,8 +73,8 @@ public class LocalInitializer {
     private Server server;
     private LFCBusiness lfcBusiness;
     private EngineBusiness engineBusiness;
-    private ClassBusiness classBusiness;
     private ApplicationBusiness applicationBusiness;
+    private AppVersionBusiness appVersionBusiness;
     private TransferPoolBusiness transferPoolBusiness;
 
     @Autowired
@@ -85,17 +82,17 @@ public class LocalInitializer {
             Environment environment, ResourceLoader resourceLoader,
             ConfigurationBusiness configurationBusiness, Server server,
             LFCBusiness lfcBusiness, EngineBusiness engineBusiness,
-            ClassBusiness classBusiness, ApplicationBusiness applicationBusiness,
-            TransferPoolBusiness transferPoolBusiness) {
+            ApplicationBusiness applicationBusiness,
+            TransferPoolBusiness transferPoolBusiness, AppVersionBusiness appVersionBusiness) {
         this.environment = environment;
         this.resourceLoader = resourceLoader;
         this.configurationBusiness = configurationBusiness;
         this.server = server;
         this.lfcBusiness = lfcBusiness;
         this.engineBusiness = engineBusiness;
-        this.classBusiness = classBusiness;
         this.applicationBusiness = applicationBusiness;
         this.transferPoolBusiness = transferPoolBusiness;
+        this.appVersionBusiness = appVersionBusiness;
     }
 
 
@@ -115,10 +112,6 @@ public class LocalInitializer {
         createFolderIfNecessary(admin,
                 server.getDataManagerUsersHome() + "/" + admin.getFolder(),
                 "Admin home folder");
-
-        createFolderIfNecessary(admin,
-                server.getDataManagerGroupsHome() + "/" + CoreConstants.GROUP_SUPPORT,
-                "Support group folder");
 
         // applications root folder parent must exist
         String appRootFolder = server.getApplicationImporterRootFolder();
@@ -147,7 +140,6 @@ public class LocalInitializer {
 
     private void initData() throws BusinessException {
         initLocalEngine();
-        initLocalClass();
         initApplication();
         initAppVersion();
     }
@@ -165,26 +157,13 @@ public class LocalInitializer {
         engineBusiness.add(newEngine);
     }
 
-    private void initLocalClass() throws BusinessException {
-        if (classBusiness.getClass(className) != null) {
-            logger.info("local class [{}] already exist", className);
-            return;
-        }
-        logger.info("adding local class [{}]", className);
-        AppClass appClass = new AppClass(
-                className,
-                Collections.singletonList(engineName),
-                Collections.singletonList(CoreConstants.GROUP_SUPPORT));
-        classBusiness.addClass(appClass);
-    }
-
     private void initApplication() throws BusinessException {
         if (applicationBusiness.getApplication(applicationName) != null) {
             logger.info("local application [{}] already exist", applicationName);
             return;
         }
         logger.info("adding application [{}]", applicationName);
-        Application application = new Application(applicationName, Collections.singletonList(className),"");
+        Application application = new Application(applicationName,"");
         applicationBusiness.add(application);
     }
 
@@ -206,7 +185,7 @@ public class LocalInitializer {
             throw new IllegalStateException("Cannot install an application version : information is missing");
         }
 
-        boolean hasVersion = applicationBusiness.getVersions(applicationName)
+        boolean hasVersion = appVersionBusiness.getVersions(applicationName)
                 .stream().anyMatch(version -> applicationVersion.equals(version.getVersion()));
         if (hasVersion) {
             logger.info("Application version [{}/{}] already exist", applicationName, applicationVersion);
@@ -227,18 +206,9 @@ public class LocalInitializer {
         transferPoolBusiness.uploadFile(admin, getPathFromLocation(scriptLocation), versionFolder);
 
         // create AppVersion
-        try{
-            logger.info("getting gwendia file name from [{}]", gwendiaLocation);
-            //String gwendiaLFN = versionFolder + "/" + Paths.get(new URI(gwendiaLocation).getPath()).getFileName().toString();
-            String gwendiaLFN = "localGrepTest.gwendia";
-            logger.info("gwendia file name is [{}]", gwendiaLFN);
-            AppVersion appVersion = new AppVersion(applicationName, applicationVersion, gwendiaLFN, null, true, false);
-            logger.info("adding application version [{}/{}]", applicationName, applicationVersion);
-            applicationBusiness.addVersion(appVersion);
-        } catch (Exception e) {
-            logger.error("cannot get gwendia file name", e);
-            throw new BusinessException(e);
-        }
+        String gwendiaLFN = versionFolder + "/" + Paths.get(gwendiaLocation).getFileName().toString();
+        AppVersion appVersion = new AppVersion(applicationName, applicationVersion, gwendiaLFN, null, true, false);
+        appVersionBusiness.add(appVersion);
 
         logger.info("Application version [{}/{}] installed", applicationName, applicationVersion);
 

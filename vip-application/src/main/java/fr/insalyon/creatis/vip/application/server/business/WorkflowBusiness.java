@@ -44,15 +44,12 @@ import fr.insalyon.creatis.vip.application.server.business.simulation.ParameterS
 import fr.insalyon.creatis.vip.application.server.business.simulation.parser.GwendiaParser;
 import fr.insalyon.creatis.vip.application.server.business.simulation.parser.InputM2Parser;
 import fr.insalyon.creatis.vip.application.server.dao.ApplicationDAO;
-import fr.insalyon.creatis.vip.application.server.dao.EngineDAO;
 import fr.insalyon.creatis.vip.application.server.dao.SimulationStatsDAO;
 import fr.insalyon.creatis.vip.core.client.bean.User;
-import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.business.EmailBusiness;
 import fr.insalyon.creatis.vip.core.server.business.Server;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
-import fr.insalyon.creatis.vip.core.server.dao.UsersGroupsDAO;
 import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerException;
 import fr.insalyon.creatis.vip.datamanager.server.DataManagerUtil;
 import fr.insalyon.creatis.vip.datamanager.server.business.DataManagerBusiness;
@@ -92,10 +89,10 @@ public class WorkflowBusiness {
     private final OutputDAO outputDAO;
     private final InputDAO inputDAO;
     private final StatsDAO statsDAO;
-    private final EngineDAO engineDAO;
     private final ApplicationDAO applicationDAO;
-    private final UsersGroupsDAO usersGroupsDAO;
+    private final AppVersionBusiness appVersionBusiness;
     private final EngineBusiness engineBusiness;
+    private final ResourceBusiness resourceBusiness;
     private final DataManagerBusiness dataManagerBusiness;
     private final EmailBusiness emailBusiness;
     private final LfcPathsBusiness lfcPathsBusiness;
@@ -109,11 +106,11 @@ public class WorkflowBusiness {
             Server server, SimulationStatsDAO simulationStatsDAO,
             WorkflowDAO workflowDAO, ProcessorDAO processorDAO,
             OutputDAO outputDAO, InputDAO inputDAO, StatsDAO statsDAO,
-            EngineDAO engineDAO, ApplicationDAO applicationDAO,
-            UsersGroupsDAO usersGroupsDAO, EngineBusiness engineBusiness,
+            ApplicationDAO applicationDAO, EngineBusiness engineBusiness,
             DataManagerBusiness dataManagerBusiness, EmailBusiness emailBusiness,
             LfcPathsBusiness lfcPathsBusiness, GRIDAPoolClient gridaPoolClient,
-            GRIDAClient gridaClient, ExternalPlatformBusiness externalPlatformBusiness,
+            GRIDAClient gridaClient, ExternalPlatformBusiness externalPlatformBusiness, 
+            ResourceBusiness resourceBusiness, AppVersionBusiness appVersionBusiness,
             WorkflowExecutionBusiness workflowExecutionBusiness) {
         this.server = server;
         this.simulationStatsDAO = simulationStatsDAO;
@@ -122,9 +119,7 @@ public class WorkflowBusiness {
         this.outputDAO = outputDAO;
         this.inputDAO = inputDAO;
         this.statsDAO = statsDAO;
-        this.engineDAO = engineDAO;
         this.applicationDAO = applicationDAO;
-        this.usersGroupsDAO = usersGroupsDAO;
         this.engineBusiness = engineBusiness;
         this.dataManagerBusiness = dataManagerBusiness;
         this.emailBusiness = emailBusiness;
@@ -132,6 +127,8 @@ public class WorkflowBusiness {
         this.gridaPoolClient = gridaPoolClient;
         this.gridaClient = gridaClient;
         this.externalPlatformBusiness = externalPlatformBusiness;
+        this.resourceBusiness = resourceBusiness;
+        this.appVersionBusiness = appVersionBusiness;
         this.workflowExecutionBusiness = workflowExecutionBusiness;
     }
 
@@ -155,104 +152,29 @@ public class WorkflowBusiness {
         return null;
     }
 
-    private Engine selectEngine(String applicationClass)
-            throws BusinessException {
-        long min = Integer.MAX_VALUE;
-        Engine engineBean = null;
-        try {
-            List<Engine> availableEngines = engineDAO.getByClass(applicationClass);
-            for (Engine engine : availableEngines) {
-                long runningWorkflows = workflowDAO.getNumberOfRunningPerEngine(engine.getEndpoint());
-                if (runningWorkflows < min) {
-                    min = runningWorkflows;
-                    engineBean = engine;
-                }
-            }
-        } catch (DAOException ex) {
-            throw new BusinessException(ex);
-        } catch (WorkflowsDBDAOException ex) {
-            logger.error("Error finding an engine for {}", applicationClass, ex);
-        }
-        if (engineBean == null || engineBean.getEndpoint().isEmpty()) {
-            logger.error("No available engines for class {}", applicationClass);
-            throw new BusinessException("No available engines for class " + applicationClass);
-        } else {
-            return engineBean;
-        }
-    }
-
-    public synchronized String launch(
-            User user, List<String> groups, Map<String, String> parametersMap,
-            String applicationName, String applicationVersion,
-            String applicationClass, String simulationName)
-            throws BusinessException {
+    public synchronized String launch(User user, List<String> groups, Map<String, String> parametersMap,
+            String appName, String version, String simulationName) throws BusinessException {
+        Workflow workflow = null;
 
         try {
-            long runningWorkflows = workflowDAO.getNumberOfRunning(user.getFullName());
-            long runningSimulations=workflowDAO.getRunning().size();
-            if(runningSimulations >= server.getMaxPlatformRunningSimulations()){
-                logger.warn("Unable to launch execution '{}': max number of"
-                        + " running workflows reached in the platform : {}",
-                        simulationName, runningSimulations);
-                throw new BusinessException(PLATFORM_MAX_EXECS);
-            }
-            if (runningWorkflows >= user.getMaxRunningSimulations()) {
+            checkVIPCapacities(user, simulationName);
 
-                logger.warn("Unable to launch execution '{}': max number of "
-                        + "running workflows reached ({}/{}) for user '{}'.",
-                        simulationName, runningWorkflows,
-                        user.getMaxRunningSimulations(), user);
-                throw new BusinessException(USER_MAX_EXECS, runningWorkflows);
+            List<ParameterSweep> parameters = getParameters(parametersMap, user, groups);
+            AppVersion appVersion = appVersionBusiness.getVersion(appName, version);
+            String workflowPath = dataManagerBusiness.getRemoteFile(user, server.useMoteurlite() ? appVersion.getJsonLfn() : appVersion.getLfn());
+            logger.info( "Moteurlite status: " + server.useMoteurlite());
+
+            List<Resource> resources = resourceBusiness.getUsableResources(user, appVersion);
+            if (resources.isEmpty()) {
+                throw new BusinessException("There are no ressources available for the moment !");
             }
 
-            List<ParameterSweep> parameters = new ArrayList<>();
-            for (String name : parametersMap.keySet()) {
+            Resource resource = resources.get(0);
+            Engine engine = engineBusiness.selectEngine(engineBusiness.getUsableEngines(resource));
 
-                ParameterSweep ps = new ParameterSweep(name);
-                String valuesStr = parametersMap.get(name);
-                if (valuesStr.contains(ApplicationConstants.SEPARATOR_INPUT)) {
-
-                    String[] values = valuesStr.split(ApplicationConstants.SEPARATOR_INPUT);
-                    if (values.length != 3) {
-                        throw new fr.insalyon.creatis.vip.core.server.business.BusinessException("Error in range.");
-                    }
-
-                    Double start = Double.parseDouble(values[0]);
-                    Double stop = Double.parseDouble(values[1]);
-                    Double step = Double.parseDouble(values[2]);
-                    for (double d = start; d <= stop; d += step) {
-                        ps.addValue(d + "");
-                    }
-
-                } else if (valuesStr.contains(ApplicationConstants.SEPARATOR_LIST)) {
-
-                    String[] values = valuesStr.split(ApplicationConstants.SEPARATOR_LIST);
-                    for (String v : values) {
-
-                        String parsedParameter =
-                            parseParameter(user, groups, name, v);
-                        ps.addValue(parsedParameter);
-                    }
-                } else {
-                    String parsedParameter =
-                        parseParameter(user, groups, name, valuesStr);
-                    ps.addValue(parsedParameter);
-                }
-                parameters.add(ps);
-            }
-
-            AppVersion version = applicationDAO.getVersion(
-                    applicationName, applicationVersion);
-            logger.info( " moteurlite status: " + server.useMoteurlite());
-            String workflowPath = dataManagerBusiness.getRemoteFile(user, server.useMoteurlite() ? version.getJsonLfn() : version.getLfn());
-            
-            //selectRandomEngine could also be used; TODO: make this choice configurable
-            Engine engine = selectEngine(applicationClass);
-            Workflow workflow = null;
             try {
-                workflow = workflowExecutionBusiness.launch(engine.getEndpoint(), applicationName,
-                        applicationVersion, applicationClass, user, simulationName,
-                        workflowPath, parameters);
+                workflow = workflowExecutionBusiness.launch(engine.getEndpoint(), appVersion, user, simulationName, workflowPath, parameters, 
+                    resource.getType().toString(), resource.getConfiguration());
             } catch (BusinessException be) {
                 logger.error("BusinessException caught on launch workflow, engine {} will be disabled", engine.getName());
             } catch (Exception e) {
@@ -260,17 +182,16 @@ public class WorkflowBusiness {
             } finally {
                 if (workflow == null) {
                     engine.setStatus("disabled");
-                    this.engineBusiness.update(engine);
-                    for (User u : usersGroupsDAO
-                            .getUsersFromGroup(CoreConstants.GROUP_SUPPORT)) {
-                        logger.info("Sending warning email to user " + u.toString() + " having email address " + u.getEmail());
-                        emailBusiness.sendEmail("Urgent: VIP engine disabled",
-                                "Engine " + engine.getName() + " has just been disabled. Please check that there is at least one active engine left.",
-                                new String[]{u.getEmail()}, true, user.getEmail());
-                    }
+                    engineBusiness.update(engine);
+
+                    logger.info("Sending warning email to admins !");
+                    emailBusiness.sendEmailToAdmins(
+                        "Urgent: VIP engine disabled", 
+                        "Engine " + engine.getName() + " has just been disabled. Please check that there is at least one active engine left.", 
+                        true, user.getEmail());
                     throw new BusinessException("Workflow is null, engine " + engine.getName() + " has been disabled");
-                }else{
-                    logger.info("Launched workflow "+workflow.toString());
+                } else {
+                    logger.info("Launched workflow " + workflow.toString());
                 }
             }
 
@@ -280,20 +201,71 @@ public class WorkflowBusiness {
         } catch (WorkflowsDBDAOException ex) {
             logger.error("Error launching simulation {}", simulationName, ex);
             throw new BusinessException(ex);
-        } catch (DAOException | DataManagerException ex) {
+        } catch (DataManagerException ex) {
             throw new BusinessException(ex);
         }
     }
 
-    private String parseParameter(
-            User user, List<String> groups, String parameterName, String parameterValue)
+    private void checkVIPCapacities(User user, String simulationName) throws BusinessException, WorkflowsDBDAOException {
+        long runningWorkflows = workflowDAO.getNumberOfRunning(user.getFullName());
+        long runningSimulations = workflowDAO.getRunning().size();
+
+        if (runningSimulations >= server.getMaxPlatformRunningSimulations()) {
+            logger.warn("Unable to launch execution '{}': max number of"
+                    + " running workflows reached in the platform : {}",
+                    simulationName, runningSimulations);
+            throw new BusinessException(PLATFORM_MAX_EXECS);
+        } else if (runningWorkflows >= user.getMaxRunningSimulations()) {
+            logger.warn("Unable to launch execution '{}': max number of "
+                    + "running workflows reached ({}/{}) for user '{}'.",
+                    simulationName, runningWorkflows,
+                    user.getMaxRunningSimulations(), user);
+            throw new BusinessException(USER_MAX_EXECS, runningWorkflows);
+        }
+    }
+
+    private List<ParameterSweep> getParameters(Map<String, String> parametersMap, User user, List<String> groups) 
+            throws DataManagerException, BusinessException {
+        List<ParameterSweep> parameters = new ArrayList<>();
+
+        for (String name : parametersMap.keySet()) {
+            ParameterSweep ps = new ParameterSweep(name);
+            String valuesStr = parametersMap.get(name);
+            if (valuesStr.contains(ApplicationConstants.SEPARATOR_INPUT)) {
+
+                String[] values = valuesStr.split(ApplicationConstants.SEPARATOR_INPUT);
+                if (values.length != 3) {
+                    throw new BusinessException("Error in range.");
+                }
+
+                Double start = Double.parseDouble(values[0]);
+                Double stop = Double.parseDouble(values[1]);
+                Double step = Double.parseDouble(values[2]);
+                for (double d = start; d <= stop; d += step) {
+                    ps.addValue(d + "");
+                }
+
+            } else if (valuesStr.contains(ApplicationConstants.SEPARATOR_LIST)) {
+                String[] values = valuesStr.split(ApplicationConstants.SEPARATOR_LIST);
+
+                for (String v : values) {
+                    ps.addValue(parseParameter(user, groups, name, v));
+                }
+            } else {
+                ps.addValue(parseParameter(user, groups, name, valuesStr));
+            }
+            parameters.add(ps);
+        }
+        return parameters;
+    }
+
+    private String parseParameter(User user, List<String> groups, String parameterName, String parameterValue)
             throws DataManagerException, BusinessException {
 
         parameterValue = parameterValue.trim();
 
-        ExternalPlatformBusiness.ParseResult parseResult =
-            externalPlatformBusiness.parseParameter(
-                parameterName, parameterValue, user);
+        ExternalPlatformBusiness.ParseResult parseResult = externalPlatformBusiness
+            .parseParameter(parameterName, parameterValue, user);
         if (parseResult.isUri) {
             // The uri has been generated
             return parseResult.result;
@@ -441,7 +413,6 @@ public class WorkflowBusiness {
     }
 
     public void purge(String simulationID) throws BusinessException {
-
         try {
             workflowDAO.removeById(simulationID);
             processorDAO.removeById(simulationID);
@@ -458,8 +429,7 @@ public class WorkflowBusiness {
         }
     }
 
-    public Map<String, String> relaunch(String simulationID, String currentUserFolder)
-            throws BusinessException {
+    public Map<String, String> relaunch(String simulationID, String currentUserFolder) throws BusinessException {
 
         //TODO fix
         return getInputM2Parser(currentUserFolder).parse(
@@ -470,10 +440,9 @@ public class WorkflowBusiness {
         return getSimulation(simulationID, false);
     }
 
-    public Simulation getSimulation(String simulationID, boolean refresh)
-            throws BusinessException {
-
+    public Simulation getSimulation(String simulationID, boolean refresh) throws BusinessException {
         Simulation simulation;
+
         try {
             Workflow workflow = workflowDAO.get(simulationID);
             if (workflow == null) {
@@ -509,10 +478,7 @@ public class WorkflowBusiness {
         return list;
     }
 
-    public List<InOutData> getInputData(
-            String simulationID, String currentUserFolder)
-            throws BusinessException {
-
+    public List<InOutData> getInputData(String simulationID, String currentUserFolder) throws BusinessException {
         try {
             List<InOutData> list = new ArrayList<>();
             for (Input input : inputDAO.get(simulationID)) {
@@ -545,7 +511,6 @@ public class WorkflowBusiness {
     }
 
     public List<Activity> getProcessors(String simulationID) throws BusinessException {
-
         try {
             List<Activity> list = new ArrayList<>();
             for (Processor processor : processorDAO.get(simulationID)) {
@@ -590,7 +555,6 @@ public class WorkflowBusiness {
                 case 1: return simulationStatsDAO.getBySimulationID(workflowIDList);
                 case 2: return simulationStatsDAO.getWorkflowsPerUser(workflowIDList);
                 case 3: return simulationStatsDAO.getApplications(workflowIDList);
-                case 4: return simulationStatsDAO.getClasses(workflowIDList);
                 default:
                     logger.error("Unsupported type to get performance stats : {}", type);
                     throw new BusinessException("Error getting performance stats");
@@ -600,11 +564,8 @@ public class WorkflowBusiness {
         }
     }
 
-    public void validateInputs(User user, List<String> inputs)
-            throws BusinessException {
-
+    public void validateInputs(User user, List<String> inputs) throws BusinessException {
         try {
-
             StringBuilder sb = new StringBuilder();
             for (String input : inputs) {
                 if ( ! gridaClient.exist(lfcPathsBusiness.parseBaseDir(user, input))) {
@@ -628,9 +589,7 @@ public class WorkflowBusiness {
         }
     }
 
-    public void updateUser(String currentUser, String newUser)
-            throws BusinessException {
-
+    public void updateUser(String currentUser, String newUser) throws BusinessException {
         try {
             workflowDAO.updateUsername(newUser, currentUser);
 
@@ -704,9 +663,7 @@ public class WorkflowBusiness {
                     workflow.getTags());
     }
 
-    private void checkRunningSimulations(List<Simulation> simulations)
-            throws BusinessException, WorkflowsDBDAOException {
-
+    private void checkRunningSimulations(List<Simulation> simulations) throws BusinessException, WorkflowsDBDAOException {
         for (Simulation simulation : simulations) {
 
             if (simulation.getStatus() == SimulationStatus.Running
@@ -730,20 +687,17 @@ public class WorkflowBusiness {
             workflow.setStatus(WorkflowStatus.Completed);
             workflowDAO.update(workflow);
 
-
         } catch (WorkflowsDBDAOException ex) {
             logger.error("Error marking simulation {} completed", simulationID, ex);
             throw new BusinessException(ex);
         }
     }
 
-    public void changeSimulationUser(String simulationId, String user)
-            throws BusinessException {
+    public void changeSimulationUser(String simulationId, String user) throws BusinessException {
         try {
             Workflow workflow = workflowDAO.get(simulationId);
             workflow.setUsername(user);
             workflowDAO.update(workflow);
-
 
         } catch (WorkflowsDBDAOException ex) {
             logger.error("Error changing simulation {} owner to {}", simulationId, user, ex);

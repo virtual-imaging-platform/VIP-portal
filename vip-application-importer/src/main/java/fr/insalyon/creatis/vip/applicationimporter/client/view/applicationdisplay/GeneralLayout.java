@@ -42,9 +42,7 @@ public class GeneralLayout extends AbstractFormLayout {
     private final LocalTextField name,
             commandLine,
             dockerImage,
-            dockerIndex,
             version,
-            schemaVersion,
             description,
             vipContainer,
             dotInputs;
@@ -59,14 +57,12 @@ public class GeneralLayout extends AbstractFormLayout {
         name = new LocalTextField("Application Name", false, false);
         commandLine = new LocalTextField("Command Line", false, false);
         dockerImage = new LocalTextField("Docker Image", false, false);
-        dockerIndex = new LocalTextField("Docker Index", false, false);
         version = new LocalTextField("Version", false, false);
-        schemaVersion = new LocalTextField("Schema Version", false, false);
         description = new LocalTextField("Description", false, false);
         vipContainer = new LocalTextField("VIP Container", false, false);
         dotInputs = new LocalTextField("DOT Inputs", false, false);
 
-        this.addMembers(name, commandLine, dockerImage, dockerIndex, version, schemaVersion, description, vipContainer, dotInputs);
+        this.addMembers(name, version, description, commandLine, dockerImage, vipContainer, dotInputs);
     }
 
     public void setTool(BoutiquesApplication bt) {
@@ -75,8 +71,6 @@ public class GeneralLayout extends AbstractFormLayout {
         description.setValue(bt.getDescription());
         commandLine.setValue(bt.getCommandLine());
         dockerImage.setValue(bt.getContainerImage());
-        dockerIndex.setValue(bt.getContainerIndex());
-        schemaVersion.setValue(bt.getSchemaVersion());
         vipContainer.setValue(bt.getVipContainer());
         String dotInputsValue = String.join(", ", bt.getVipDotInputIds());
         dotInputs.setValue(dotInputsValue + (bt.getVipDotIncludesResultsDir() ? (dotInputsValue.isEmpty() ? "results-directory" : ", results-directory") : ""));

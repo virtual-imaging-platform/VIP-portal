@@ -32,17 +32,11 @@
 package fr.insalyon.creatis.vip.application.server.business.simulation;
 
 import fr.insalyon.creatis.vip.application.client.view.monitor.SimulationStatus;
-import fr.insalyon.creatis.vip.application.server.business.util.FileUtil;
 
-import java.io.File;
 import java.nio.file.Path;
-import java.util.List;
 
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.business.Server;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
 
 /**
  *
@@ -55,7 +49,7 @@ public abstract class WorkflowEngineInstantiator {
         RUNNING, COMPLETE, TERMINATED, UNKNOWN
     }
 
-    public abstract String launch(String addressWS, String workflowContent, String inputs, String settings, String proxyFileName)
+    public abstract String launch(String addressWS, String workflowContent, String inputs, String settings, String executorConfig, String proxyFileName)
             throws java.rmi.RemoteException, javax.xml.rpc.ServiceException, BusinessException;
 
     public abstract void kill(String addressWS, String workflowID)

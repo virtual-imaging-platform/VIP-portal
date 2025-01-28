@@ -32,6 +32,7 @@
 package fr.insalyon.creatis.vip.applicationimporter.client.view.applicationdisplay;
 
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -62,6 +63,7 @@ public class DisplayTab extends Tab {
     private InputLayout inputsLayout;
     private OutputLayout outputsLayout;
     private VIPLayout vipLayout;
+    private TagsLayout tagsLayout;
     private final ModalWindow modal;
     private BoutiquesApplication boutiquesTool;
 
@@ -87,25 +89,33 @@ public class DisplayTab extends Tab {
 
         generalLayout = new GeneralLayout("50%", "100%");
 
-        inputsLayout = new InputLayout("50%", "100%");
-        outputsLayout = new OutputLayout("50%", "100%");
+        inputsLayout = new InputLayout("100%", "45%");
+        outputsLayout = new OutputLayout("100%", "45%");
         vipLayout = new VIPLayout("50%", "100%");
+        tagsLayout = new TagsLayout("50%", "100%");
 
         HLayout hLayout1 = new HLayout();
         hLayout1.setMembersMargin(10);
         hLayout1.setHeight("50%");
         hLayout1.addMember(generalLayout);
-        hLayout1.addMember(outputsLayout);
+        hLayout1.addMember(vipLayout);
         globalLayout.addMember(hLayout1);
+
+        VLayout vLayout1 = new VLayout();
+        vLayout1.setMembersMargin(10);
+        vLayout1.setWidth("50%");
+        vLayout1.addMember(inputsLayout);
+        vLayout1.addMember(outputsLayout);
 
         HLayout hLayout2 = new HLayout();
         hLayout2.setMembersMargin(10);
         hLayout2.setHeight("50%");
-        hLayout2.addMember(inputsLayout);
-        hLayout2.addMember(vipLayout);
-        globalLayout.addMember(hLayout2);
+        hLayout2.addMember(vLayout1);
+        hLayout2.addMember(tagsLayout);
 
         globalLayout.addMember(hLayout2);
+        globalLayout.addMember(hLayout2);
+
         IButton createApplicationButton;
         createApplicationButton = WidgetUtil.getIButton("Create application", Constants.ICON_LAUNCH, new ClickHandler() {
             @Override
@@ -215,10 +225,30 @@ public class DisplayTab extends Tab {
         modal.show("Creating application...", true);
         ApplicationImporterService.Util.getInstance().createApplication(
             boutiquesTool,
-            vipLayout.getTag(),
-            vipLayout.getIsRunOnGrid(),
+            vipLayout.getDiracTag(),
             vipLayout.getOverwrite(),
             vipLayout.getFileAccessProtocol(),
+            tagsLayout.getSelectedTags(),
+            vipLayout.getSelectedResources(),
             callback);
+    }
+
+    public void loadBoutiquesTags(String jsonContent) {
+        final AsyncCallback<Map<String, String>> callback = new AsyncCallback<>() {
+
+            @Override
+            public void onFailure(Throwable caught) {
+                modal.hide();
+                Layout.getInstance().setWarningMessage(caught.getLocalizedMessage());
+            }
+
+            @Override
+            public void onSuccess(Map<String, String> result) {
+                modal.hide();
+                tagsLayout.setBoutiquesTags(result);
+            }
+        };
+        modal.show("Creating application...", true);
+        ApplicationImporterService.Util.getInstance().getBoutiquesTags(jsonContent, callback);
     }
 }

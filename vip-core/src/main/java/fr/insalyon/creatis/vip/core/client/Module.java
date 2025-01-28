@@ -64,17 +64,4 @@ public abstract class Module {
      */
     public void userUpdated(User oldUser, User updatedUser) {
     }
-    
-    /**
-     * This method returns true when the Module must be displayed only when the User is in at least 1 grid job group
-     * @return 
-     */
-    public boolean requiresGridJob(){ return false; }
-
-     /**
-     * This method returns true when the Module must be displayed only when the User is in at least 1 grid file group
-     * @return 
-     */
-    public boolean requiresGridFile() { return false; }
-    
 }

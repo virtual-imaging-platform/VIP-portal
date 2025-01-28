@@ -32,7 +32,6 @@
 package fr.insalyon.creatis.vip.application.client.view.launch;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.ExpansionMode;
 import com.smartgwt.client.types.SortDirection;
 import com.smartgwt.client.util.BooleanCallback;
@@ -53,6 +52,8 @@ import fr.insalyon.creatis.vip.application.client.rpc.WorkflowService;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
+import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -97,7 +98,7 @@ public class SavedInputsLayout extends AbstractInputsLayout {
                     rollOverCanvas.setWidth(50);
                     rollOverCanvas.setHeight(22);
 
-                    ImgButton loadImg = getImgButton("icon-load.png", "Load Input");
+                    ImgButton loadImg = WidgetUtil.getImgButton("icon-load.png", "Load Input");
                     loadImg.addClickHandler(new ClickHandler() {
                         @Override
                         public void onClick(ClickEvent event) {
@@ -107,7 +108,7 @@ public class SavedInputsLayout extends AbstractInputsLayout {
                         }
                     });
 
-                    ImgButton deleteImg = getImgButton(CoreConstants.ICON_DELETE, "Delete");
+                    ImgButton deleteImg = WidgetUtil.getImgButton(CoreConstants.ICON_DELETE, "Delete");
                     deleteImg.addClickHandler(new ClickHandler() {
                         @Override
                         public void onClick(ClickEvent event) {
@@ -128,18 +129,6 @@ public class SavedInputsLayout extends AbstractInputsLayout {
                     rollOverCanvas.addMember(deleteImg);
                 }
                 return rollOverCanvas;
-            }
-
-            private ImgButton getImgButton(String imgSrc, String prompt) {
-                ImgButton button = new ImgButton();
-                button.setShowDown(false);
-                button.setShowRollOver(false);
-                button.setLayoutAlign(Alignment.CENTER);
-                button.setSrc(imgSrc);
-                button.setPrompt(prompt);
-                button.setHeight(16);
-                button.setWidth(16);
-                return button;
             }
         };
 

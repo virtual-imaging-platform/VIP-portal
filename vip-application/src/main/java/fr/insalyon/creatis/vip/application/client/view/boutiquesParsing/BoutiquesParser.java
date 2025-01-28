@@ -86,19 +86,19 @@ public class BoutiquesParser extends AbstractJsonParser{
             }
         }
         // Tags
-        JSONObject tagsJSONObject = getObjectValue(parsedDescriptor, "tags", true);
-        if (tagsJSONObject != null) {
-            for (String key : tagsJSONObject.keySet()) {
-                String value;
-                try {
-                     value = getStringValue(tagsJSONObject, key);
-                } catch (InvalidBoutiquesDescriptorException exception){
-                    throw new InvalidBoutiquesDescriptorException("Invalid Boutiques descriptor: tag with key '" + key
-                            + "' is not a valid String.", exception);
-                }
-                application.addTag(key, value);
-            }
-        }
+        // JSONObject tagsJSONObject = getObjectValue(parsedDescriptor, "tags", true);
+        // if (tagsJSONObject != null) {
+        //     for (String key : tagsJSONObject.keySet()) {
+        //         String value;
+        //         try {
+        //              value = getStringValue(tagsJSONObject, key);
+        //         } catch (InvalidBoutiquesDescriptorException exception){
+        //             throw new InvalidBoutiquesDescriptorException("Invalid Boutiques descriptor: tag with key '" + key
+        //                     + "' is not a valid String.", exception);
+        //         }
+        //         application.addTag(key, value);
+        //     }
+        // }
         // Container image
         JSONObject containerObject = getObjectValue(parsedDescriptor, "container-image", true);
         if (containerObject != null) {

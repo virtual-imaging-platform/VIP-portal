@@ -1,17 +1,16 @@
 package fr.insalyon.creatis.vip.api.business;
 
 import fr.insalyon.creatis.vip.api.exception.ApiException;
-import fr.insalyon.creatis.vip.application.server.business.ApplicationBusiness;
-import fr.insalyon.creatis.vip.core.client.bean.Group;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
+
+import java.util.ArrayList;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
 
 /**
  * @author khalilkes service to signup a user in VIP
@@ -20,14 +19,10 @@ import java.util.*;
 public class ApiUserBusiness {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    private final Environment env;
     private final ConfigurationBusiness configurationBusiness;
-    private final ApplicationBusiness applicationBusiness;
 
-    public ApiUserBusiness(Environment env, ConfigurationBusiness configurationBusiness, ApplicationBusiness applicationBusiness) {
-        this.env = env;
+    public ApiUserBusiness(ConfigurationBusiness configurationBusiness) {
         this.configurationBusiness = configurationBusiness;
-        this.applicationBusiness = applicationBusiness;
     }
 
     /**
@@ -37,14 +32,14 @@ public class ApiUserBusiness {
      * @param applicationNames
      * @throws ApiException
      */
-    public void signup(User user, String comments, List<String> applicationNames) throws ApiException {
+    public void signup(User user, String comments) throws ApiException {
         try {
-            Set<Group> allGroups = new TreeSet<>(Comparator.comparing(Group::getName));
-            for (String applicationName : applicationNames) {
-                List<Group> appGroups = applicationBusiness.getPublicGroupsForApplication(applicationName);
-                allGroups.addAll(appGroups);
-            }
-            configurationBusiness.signup(user, comments, false, true, new ArrayList<>(allGroups));
+            configurationBusiness.signup(
+                user, 
+                comments,
+                false, 
+                true, 
+                new ArrayList<>());
             logger.info("Signing up with the " + user.getEmail());
         } catch (BusinessException e) {
             throw new ApiException("Signing up Error", e);

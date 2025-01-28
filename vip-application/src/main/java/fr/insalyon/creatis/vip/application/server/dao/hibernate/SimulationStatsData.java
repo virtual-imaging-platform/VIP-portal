@@ -241,26 +241,4 @@ public class SimulationStatsData implements SimulationStatsDAO {
             throw new WorkflowsDBDAOException(ex);
         }
     }
-
-    @Override
-    public List<String> getClasses(List<String> workflowsId) throws WorkflowsDBDAOException {
-        try (Session session = sessionFactory.openSession()) {
-            session.beginTransaction();
-
-            CriteriaBuilder criteriaBuilder = session.getCriteriaBuilder();
-            CriteriaQuery<String> criteriaQuery = criteriaBuilder.createQuery(String.class);
-            Root<Workflow> root = criteriaQuery.from(Workflow.class);
-
-            criteriaQuery.where(root.get("id").in(workflowsId))
-                .select(root.get("applicationClass")).distinct(true);
-
-            List<String> results = session.createQuery(criteriaQuery).getResultList();
-
-            return results;
-        } catch (HibernateException ex) {
-            logger.error("Error getting classes for {}", workflowsId, ex);
-            throw new WorkflowsDBDAOException(ex);
-        }
-
-    }
 }

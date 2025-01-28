@@ -1,6 +1,7 @@
 package fr.insalyon.creatis.vip.social.integrationtest;
 
 import fr.insalyon.creatis.vip.core.client.bean.Group;
+import fr.insalyon.creatis.vip.core.client.bean.GroupType;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.integrationtest.ServerMockConfig;
 import fr.insalyon.creatis.vip.core.integrationtest.database.BaseSpringIT;
@@ -24,6 +25,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
 public class SocialIT extends BaseSpringIT {
+
     @Autowired
     private MessageBusiness messageBusiness;
 
@@ -32,8 +34,8 @@ public class SocialIT extends BaseSpringIT {
         super.setUp();
 
         // Create test group
-        group1 = new Group(nameGroup1, true, true, true);
-        configurationBusiness.addGroup(group1);
+        group1 = new Group(nameGroup1, true, GroupType.APPLICATION);
+        groupBusiness.add(group1);
 
         // Create test users
         createUserInGroup(emailUser1, "suffix1", nameGroup1);

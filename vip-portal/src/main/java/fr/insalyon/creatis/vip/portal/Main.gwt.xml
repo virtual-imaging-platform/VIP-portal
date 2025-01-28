@@ -49,6 +49,5 @@ knowledge of the CeCILL-B license and that you accept its terms.
 
     <!-- Specify the app entry point class.-->
     <entry-point class="fr.insalyon.creatis.vip.portal.client.Main"/>
-<!--         <set-property name="user.agent" value="safari" />-->
-
+    <!-- <set-property name="user.agent" value="safari" /> -->
 </module>

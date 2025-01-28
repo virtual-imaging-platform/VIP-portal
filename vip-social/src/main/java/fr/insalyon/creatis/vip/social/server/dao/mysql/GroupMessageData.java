@@ -72,7 +72,7 @@ public class GroupMessageData extends JdbcDaoSupport implements GroupMessageDAO 
 
         try {
             PreparedStatement ps = getConnection().prepareStatement("INSERT INTO "
-                    + "VIPSocialGroupMessage(sender, groupname, title, message, posted) "
+                    + "VIPSocialGroupMessage(sender, name, title, message, posted) "
                     + "VALUES(?, ?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
             ps.setString(1, sender);
             ps.setString(2, groupName);
@@ -114,9 +114,9 @@ public class GroupMessageData extends JdbcDaoSupport implements GroupMessageDAO 
 
         try {
             PreparedStatement ps = getConnection().prepareStatement("SELECT "
-                    + "id, sender, groupname, title, message, posted "
+                    + "id, sender, name, title, message, posted "
                     + "FROM VIPSocialGroupMessage "
-                    + "WHERE posted < ? AND groupname = ? "
+                    + "WHERE posted < ? AND name = ? "
                     + "ORDER BY posted DESC LIMIT 0," + limit);
             ps.setTimestamp(1, new Timestamp(startDate.getTime()));
             ps.setString(2, groupName);

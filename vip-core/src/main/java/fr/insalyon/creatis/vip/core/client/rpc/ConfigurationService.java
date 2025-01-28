@@ -64,10 +64,6 @@ public interface ConfigurationService extends RemoteService {
 
     User configure(String email, String session) throws CoreException;
 
-    void signup(User user, String comments) throws CoreException;
-
-    User signin(String email, String password) throws CoreException;
-
     void signout() throws CoreException;
 
     User activate(String code) throws CoreException;
@@ -87,6 +83,10 @@ public interface ConfigurationService extends RemoteService {
     List<Group> getGroups() throws CoreException;
 
     List<Group> getPublicGroups() throws CoreException;
+
+    List<String> getItemsGroup(String groupname) throws CoreException;
+
+    void removeItemFromGroup(String item, String groupname) throws CoreException;
 
     User removeUser(String email) throws CoreException;
 
@@ -132,7 +132,7 @@ public interface ConfigurationService extends RemoteService {
 
     boolean testLastUpdatePublication() throws CoreException;
 
-    //TermsOfUse
+    // TermsOfUse
     void addTermsUse() throws CoreException;
 
     Timestamp getLastUpdateTermsOfUse() throws CoreException;

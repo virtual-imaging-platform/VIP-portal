@@ -60,16 +60,16 @@ public class BoutiquesBusiness {
 
     private Server server;
     private DataManagerBusiness dataManagerBusiness;
-    private ApplicationBusiness applicationBusiness;
+    private AppVersionBusiness appVersionBusiness;
     private ObjectMapper objectMapper;
 
     @Autowired
     public BoutiquesBusiness(Server server, DataManagerBusiness dataManagerBusiness,
-                             ApplicationBusiness applicationBusiness, ObjectMapper objectMapper) {
+            ObjectMapper objectMapper, AppVersionBusiness appVersionBusiness) {
         this.server = server;
         this.dataManagerBusiness = dataManagerBusiness;
-        this.applicationBusiness = applicationBusiness;
         this.objectMapper = objectMapper;
+        this.appVersionBusiness = appVersionBusiness;
     }
 
     public String publishVersion(User user, String applicationName, String version)
@@ -111,7 +111,7 @@ public class BoutiquesBusiness {
 
     private String getJsonLfn(String applicationName, String applicationVersion)
             throws BusinessException {
-        AppVersion appVersion = applicationBusiness.getVersion(
+        AppVersion appVersion = appVersionBusiness.getVersion(
             applicationName, applicationVersion);
         if (appVersion.getJsonLfn() == null) {
             logger.error("No json lfn for this application : {} / {}", applicationName, applicationVersion);
@@ -143,12 +143,8 @@ public class BoutiquesBusiness {
         }
     }
 
-    private void saveDoiForVersion(
-            String doi, String applicationName, String applicationVersion)
-            throws BusinessException {
-
-        applicationBusiness.updateDoiForVersion(
-            doi, applicationName, applicationVersion);
+    private void saveDoiForVersion(String doi, String applicationName, String applicationVersion) throws BusinessException {
+        appVersionBusiness.updateDoiForVersion(doi, applicationName, applicationVersion);
     }
 
     private String getDoiFromPublishOutput(List<String> publishOutput) throws BusinessException {

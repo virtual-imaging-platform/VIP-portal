@@ -7,6 +7,8 @@ import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.util.CountryCode;
 import fr.insalyon.creatis.vip.core.server.SpringCoreConfig;
 import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
+import fr.insalyon.creatis.vip.core.server.business.EmailBusiness;
+
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -46,6 +48,7 @@ public class VipWebConfigurationIT {
     private MockMvc mockMvc;
 
     @Autowired private GRIDAClient gridaClient;
+    @Autowired private EmailBusiness emailBusiness;
     @Autowired private ConfigurationBusiness configurationBusiness;
 
     @BeforeEach
@@ -59,6 +62,7 @@ public class VipWebConfigurationIT {
 
     @Test
     public void testGetPipelines() throws Exception {
+        Mockito.doReturn(new String[]{"test@admin.test"}).when(emailBusiness).getAdministratorsEmails();
         User newUser = new User("firstName",
                 "LastName", "testEmail@test.tst", "Test institution",
                 "testPassword", CountryCode.fr,

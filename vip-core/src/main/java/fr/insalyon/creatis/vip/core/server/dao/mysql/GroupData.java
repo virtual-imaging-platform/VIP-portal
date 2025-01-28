@@ -32,6 +32,7 @@
 package fr.insalyon.creatis.vip.core.server.dao.mysql;
 
 import fr.insalyon.creatis.vip.core.client.bean.Group;
+import fr.insalyon.creatis.vip.core.client.bean.GroupType;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import fr.insalyon.creatis.vip.core.server.dao.GroupDAO;
 import org.slf4j.Logger;
@@ -64,16 +65,14 @@ public class GroupData extends JdbcDaoSupport implements GroupDAO {
 
     @Override
     public void add(Group group) throws DAOException {
+        String query = "INSERT INTO VIPGroups(name, public, type, auto) VALUES(?, ?, ?, ?)";
 
-        try {
-            PreparedStatement ps = getConnection().prepareStatement(
-                    "INSERT INTO VIPGroups(groupname, public, gridfile, gridjobs) VALUES(?, ?, ?, ?)");
+        try (PreparedStatement ps = getConnection().prepareStatement(query)) {
             ps.setString(1, group.getName());
             ps.setBoolean(2, group.isPublicGroup());
-            ps.setBoolean(3, group.isGridFile());
-            ps.setBoolean(4, group.isGridJobs());
+            ps.setString(3, group.getType().toString());
+            ps.setBoolean(4, group.isAuto());
             ps.execute();
-            ps.close();
 
         } catch (SQLException ex) {
             if (ex.getMessage().contains("Unique index or primary key violation") || ex.getMessage().contains("Duplicate entry ")) {
@@ -88,13 +87,11 @@ public class GroupData extends JdbcDaoSupport implements GroupDAO {
 
     @Override
     public void remove(String groupName) throws DAOException {
-        try {
-            PreparedStatement ps = getConnection().prepareStatement("DELETE "
-                    + "FROM VIPGroups WHERE groupname=?");
+        String query = "DELETE FROM VIPGroups WHERE name=?";
 
+        try (PreparedStatement ps = getConnection().prepareStatement(query)) {
             ps.setString(1, groupName);
             ps.execute();
-            ps.close();
 
         } catch (SQLException ex) {
             logger.error("Error removing group {}", groupName, ex);
@@ -104,19 +101,15 @@ public class GroupData extends JdbcDaoSupport implements GroupDAO {
 
     @Override
     public void update(String name, Group group) throws DAOException {
-        try {
-            PreparedStatement ps = getConnection().prepareStatement("UPDATE "
-                    + "VIPGroups "
-                    + "SET groupname=?, public=?, gridfile=?, gridjobs=? "
-                    + "WHERE groupname=?");
+        String query = "UPDATE VIPGroups SET name=?, public=?, type=?, auto=? WHERE name=?";
 
+        try (PreparedStatement ps = getConnection().prepareStatement(query)) {
             ps.setString(1, group.getName());
             ps.setBoolean(2, group.isPublicGroup());
-            ps.setBoolean(3, group.isGridFile());
-            ps.setBoolean(4, group.isGridJobs());
+            ps.setString(3, group.getType().toString());
+            ps.setBoolean(4, group.isAuto());
             ps.setString(5, name);
             ps.executeUpdate();
-            ps.close();
 
         } catch (SQLException ex) {
             logger.error("Error updating group {}", group.getName(), ex);
@@ -125,25 +118,90 @@ public class GroupData extends JdbcDaoSupport implements GroupDAO {
     }
 
     @Override
-    public List<Group> getGroups() throws DAOException {
-        try {
-
-            List<Group> groups = new ArrayList<Group>();
-            PreparedStatement ps = getConnection().prepareStatement("SELECT "
-                    + "groupname, public, gridfile, gridjobs FROM "
-                    + "VIPGroups ORDER BY LOWER(groupname)");
-
+    public List<Group> get() throws DAOException {
+        List<Group> groups = new ArrayList<Group>();
+        String query = "SELECT * FROM VIPGroups ORDER BY LOWER(name)";
+ 
+        try (PreparedStatement ps = getConnection().prepareStatement(query)) {
             ResultSet rs = ps.executeQuery();
+
             while (rs.next()) {
-                groups.add(new Group(rs.getString("groupname"),
-                        rs.getBoolean("public"), rs.getBoolean("gridfile"), rs.getBoolean("gridjobs")));
+                groups.add(fromRs(rs));
             }
-            ps.close();
             return groups;
 
         } catch (SQLException ex) {
             logger.error("Error getting all groups", ex);
             throw new DAOException(ex);
         }
+    }
+
+    @Override
+    public List<Group> getByType(GroupType type) throws DAOException {
+        List<Group> groups = new ArrayList<Group>();
+        String query = "SELECT * FROM VIPGroups WHERE type = ? ORDER BY LOWER(name)";
+ 
+        try (PreparedStatement ps = getConnection().prepareStatement(query)) {
+            ps.setString(1, type.toString());
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                groups.add(fromRs(rs));
+            }
+            return groups;
+
+        } catch (SQLException ex) {
+            logger.error("Error getting group with type " + type, ex);
+            throw new DAOException(ex);
+        }
+    }
+
+    @Override
+    public List<Group> getByApplication(String applicationName) throws DAOException {
+        List<Group> groups = new ArrayList<Group>();
+        String query =  "SELECT * FROM VIPGroups g "
+        +               "JOIN VIPGroupsApplications ga ON ga.groupname = g.name "
+        +               "WHERE ga.applicationname = ?";
+ 
+        try (PreparedStatement ps = getConnection().prepareStatement(query)) {
+            ps.setString(1, applicationName);
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                groups.add(fromRs(rs));
+            }
+            return groups;
+
+        } catch (SQLException ex) {
+            logger.error("Error getting group linked to app " + applicationName, ex);
+            throw new DAOException(ex);
+        }
+    }
+
+    @Override
+    public List<Group> getByRessource(String resourceName) throws DAOException {
+        List<Group> groups = new ArrayList<Group>();
+        String query =  "SELECT * FROM VIPGroups g "
+        +               "JOIN VIPGroupsResources ga ON ga.groupname = g.name "
+        +               "WHERE ga.resourcename = ?";
+ 
+        try (PreparedStatement ps = getConnection().prepareStatement(query)) {
+            ps.setString(1, resourceName);
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                groups.add(fromRs(rs));
+            }
+            return groups;
+
+        } catch (SQLException ex) {
+            logger.error("Error getting group linked to ressource " + resourceName, ex);
+            throw new DAOException(ex);
+        }
+    }
+
+    private Group fromRs(ResultSet rs) throws SQLException {
+        return new Group(rs.getString("name"), rs.getBoolean("public"),
+            rs.getString("type"), rs.getBoolean("auto"));
     }
 }

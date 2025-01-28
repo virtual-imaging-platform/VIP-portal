@@ -388,22 +388,6 @@ public class SpringConfigServer implements Server {
     }
 
     @Override
-    public HashMap<String, Integer> getReservedClasses() {
-        HashMap<String, Integer> reservedClasses = new HashMap<>();
-        Stream.of(
-                env.getRequiredProperty(
-                        CoreConstants.APPLET_GATELAB_CLASSES,
-                        String[].class))
-                .forEach(className -> reservedClasses.put(className,0));
-        Stream.of(
-                env.getRequiredProperty(
-                        CoreConstants.APPLET_GATELABTEST_CLASSES,
-                        String[].class))
-                .forEach(className -> reservedClasses.put(className,0));
-        return reservedClasses;
-    }
-
-    @Override
     public List<String> getUndesiredMailDomains() {
         return Arrays.asList(env.getRequiredProperty(CoreConstants.UNDESIRED_MAIL_DOMAINS, String[].class));
     }

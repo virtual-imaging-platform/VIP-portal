@@ -2,8 +2,8 @@ package fr.insalyon.creatis.vip.core.integrationtest.database;
 
 import fr.insalyon.creatis.grida.client.GRIDAClient;
 import fr.insalyon.creatis.grida.client.GRIDAClientException;
-import fr.insalyon.creatis.vip.core.client.bean.Account;
 import fr.insalyon.creatis.vip.core.client.bean.Group;
+import fr.insalyon.creatis.vip.core.client.bean.GroupType;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.util.CountryCode;
 import fr.insalyon.creatis.vip.core.integrationtest.ServerMockConfig;
@@ -11,7 +11,9 @@ import fr.insalyon.creatis.vip.core.server.SpringCoreConfig;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
 import fr.insalyon.creatis.vip.core.server.business.EmailBusiness;
-import org.junit.jupiter.api.Disabled;
+import fr.insalyon.creatis.vip.core.server.business.GroupBusiness;
+import fr.insalyon.creatis.vip.core.server.dao.DAOException;
+
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -67,23 +69,13 @@ import static org.mockito.ArgumentMatchers.*;
 @ActiveProfiles({"jndi-db", "test"}) // to use default jndi datasource but avoid default server config
 public class SpringJndiIT {
 
-    @Autowired
-    private ConfigurationBusiness configurationBusiness;
-
-    @Autowired
-    private DataSource dataSource;
-
-    @Autowired
-    private PlatformTransactionManager transactionManager;
-
-    @Autowired
-    private DataSource lazyDataSource;
-
-    @Autowired
-    private EmailBusiness emailBusiness;
-
-    @Autowired
-    private GRIDAClient gridaClient;
+    @Autowired private ConfigurationBusiness configurationBusiness;
+    @Autowired private DataSource dataSource;
+    @Autowired private PlatformTransactionManager transactionManager;
+    @Autowired private DataSource lazyDataSource;
+    @Autowired private EmailBusiness emailBusiness;
+    @Autowired private GRIDAClient gridaClient;
+    @Autowired private GroupBusiness groupBusiness;
 
     /*
         First launch
@@ -93,8 +85,8 @@ public class SpringJndiIT {
     public void testJNDIConfig() throws BusinessException {
         // verify the vip-support group created on init is present
         assertNotNull(configurationBusiness);
-        List<Group> groups = configurationBusiness.getGroups();
-        assertEquals(1, groups.size());
+        List<Group> groups = groupBusiness.get();
+        assertEquals(0, groups.size());
 
         final Connection[] firstTransactionConnections = new Connection[2];
         // check that a connection is shared in a transaction
@@ -120,11 +112,11 @@ public class SpringJndiIT {
     @Test
     @Order(2)
     public void addNewGroup() throws BusinessException {
-        List<Group> groups = configurationBusiness.getGroups();
+        List<Group> groups = groupBusiness.get();
+        assertEquals(0, groups.size());
+        groupBusiness.add(new Group("test group", true, GroupType.RESOURCE));
+        groups = groupBusiness.get();
         assertEquals(1, groups.size());
-        configurationBusiness.addGroup(new Group("test group", true, true, true));
-        groups = configurationBusiness.getGroups();
-        assertEquals(2, groups.size());
     }
 
 
@@ -134,8 +126,8 @@ public class SpringJndiIT {
     @Test
     @Order(3)
     public void isGroupStillThere() throws BusinessException {
-        List<Group> groups = configurationBusiness.getGroups();
-        assertEquals(2, groups.size());
+        List<Group> groups = groupBusiness.get();
+        assertEquals(1, groups.size());
     }
 
     /*
@@ -145,27 +137,28 @@ public class SpringJndiIT {
     @Order(4)
     @DirtiesContext(methodMode = DirtiesContext.MethodMode.BEFORE_METHOD) // to restart spring
     public void isGroupStillThereAfterRestart() throws BusinessException {
-        List<Group> groups = configurationBusiness.getGroups();
-        assertEquals(2, groups.size());
+        List<Group> groups = groupBusiness.get();
+        assertEquals(1, groups.size());
     }
 
     @Test
     @Order(5)
-    public void shouldRollbackWithRuntimeException() throws BusinessException, GRIDAClientException {
+    public void shouldRollbackWithRuntimeException() throws BusinessException, GRIDAClientException, DAOException {
         testRollbackInTransaction(new RuntimeException(""), true);
     }
 
     @Test
     @Order(6)
-    public void shouldNotRollbackWithCheckedException() throws BusinessException, GRIDAClientException {
+    public void shouldNotRollbackWithCheckedException() throws BusinessException, GRIDAClientException, DAOException {
         testRollbackInTransaction(new BusinessException(""), false);
     }
 
     private void testRollbackInTransaction(
-            Exception exception, boolean shouldRollback) throws BusinessException, GRIDAClientException {
+            Exception exception, boolean shouldRollback) throws BusinessException, GRIDAClientException, DAOException {
+
         JdbcTemplate jdbcTemplate = new JdbcTemplate(lazyDataSource);
-        Supplier<Integer> countUser =
-                () -> JdbcTestUtils.countRowsInTable(jdbcTemplate, "VIPUsers");
+        Supplier<Integer> countUser = () -> JdbcTestUtils.countRowsInTable(jdbcTemplate, "VIPUsers");        
+        Mockito.doReturn(new String[]{"test@admin.test"}).when(emailBusiness).getAdministratorsEmails();
 
         String testEmail = "test@email.fr";
         assertEquals(1, countUser.get());
@@ -178,7 +171,7 @@ public class SpringJndiIT {
             // but before, verify the user has well been deleted
             assertEquals(1, countUser.get());
             throw exception;
-        }).when(emailBusiness).sendEmail(any(), any(), any(), anyBoolean(), any());
+        }).when(emailBusiness).sendEmailToAdmins(any(), any(), anyBoolean(), any());
 
         Exception exceptionCatched = null;
         try {

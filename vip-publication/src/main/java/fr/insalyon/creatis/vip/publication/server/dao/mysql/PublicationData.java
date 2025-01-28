@@ -68,7 +68,7 @@ public class PublicationData extends JdbcDaoSupport implements PublicationDAO {
         PreparedStatement ps = null;
         try {
             ps = getConnection().prepareStatement(
-                    "INSERT INTO VIPPublication(title,date,doi,authors,type,typeName,vipAuthor,vipApplication) "
+                    "INSERT INTO VIPPublications(title,date,doi,authors,type,typeName,vipAuthor,vipApplication) "
                             + "VALUES (?, ?, ?, ?, ?, ?, ?,?)");
 
             ps.setString(1, pub.getTitle());
@@ -92,7 +92,7 @@ public class PublicationData extends JdbcDaoSupport implements PublicationDAO {
         try {
 
             PreparedStatement ps = getConnection().prepareStatement("UPDATE "
-                    + "VIPPublication "
+                    + "VIPPublications "
                     + "SET title=?, date=?, doi=?, authors=?, type=?, typeName=?,vipAuthor=?,vipApplication=? "
                     + "WHERE id=?");
 
@@ -118,7 +118,7 @@ public class PublicationData extends JdbcDaoSupport implements PublicationDAO {
     public void remove(Long id) throws DAOException {
         try {
             PreparedStatement ps = getConnection().prepareStatement("DELETE "
-                    + "FROM VIPPublication WHERE id=?");
+                    + "FROM VIPPublications WHERE id=?");
 
             ps.setLong(1, id);
             ps.execute();
@@ -139,7 +139,7 @@ public class PublicationData extends JdbcDaoSupport implements PublicationDAO {
 
             ps = getConnection().prepareStatement("SELECT "
                     + "id,title,date,doi,authors,type,typeName,VIPAuthor,VipApplication FROM "
-                    + "VIPPublication");
+                    + "VIPPublications");
 
             ResultSet rs = ps.executeQuery();
 
@@ -167,7 +167,7 @@ public class PublicationData extends JdbcDaoSupport implements PublicationDAO {
 
             ps = getConnection().prepareStatement("SELECT "
                     + "id,title,date,doi,authors,type,typeName,VIPAuthor, VIPApplication FROM "
-                    + "VIPPublication where id=?");
+                    + "VIPPublications where id=?");
 
             ps.setLong(1, id);
             ResultSet rs = ps.executeQuery();

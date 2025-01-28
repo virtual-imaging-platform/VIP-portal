@@ -69,13 +69,11 @@ public class GateLabLaunchTab extends LaunchTab {
     public static final String NB_OF_PARTICLES_INPUT_ID = "NumberOfParticles";
     public static final String PHASE_SPACE_INPUT_ID = "phaseSpace";
 
-    public GateLabLaunchTab(String applicationName, String applicationVersion, 
-            String applicationClass) {
+    public GateLabLaunchTab(String applicationName, String applicationVersion, String applicationClass) {
         super(applicationName, applicationVersion, applicationClass);
     }
 
-    public GateLabLaunchTab(
-            String applicationName, String applicationVersion, String applicationClass,
+    public GateLabLaunchTab(String applicationName, String applicationVersion, String applicationClass,
             String simulationName, Map<String, String> inputs) {
         super(applicationName, applicationVersion, applicationClass, simulationName, inputs);
     }

@@ -41,9 +41,7 @@ public class RegisterUserController extends ApiController {
      * @throws ApiException
      */
     @RequestMapping(method = RequestMethod.POST)
-    public ResponseEntity<?> signup(
-            @RequestBody @Valid SignUpUserDTO signUpUser)
-            throws ApiException {
+    public ResponseEntity<?> signup(@RequestBody @Valid SignUpUserDTO signUpUser) throws ApiException {
         logMethodInvocation(logger,"signup", signUpUser.getEmail());
         User user = new User(signUpUser.getFirstName(),
                 signUpUser.getLastName(),
@@ -55,7 +53,7 @@ public class RegisterUserController extends ApiController {
                 );
         user.setRegistration(new Date());
         user.setLastLogin(new Date());
-        this.apiUserBusiness.signup(user, signUpUser.getComments(), signUpUser.getApplications());
+        this.apiUserBusiness.signup(user, signUpUser.getComments());
         return new ResponseEntity(HttpStatus.CREATED);
     }
 

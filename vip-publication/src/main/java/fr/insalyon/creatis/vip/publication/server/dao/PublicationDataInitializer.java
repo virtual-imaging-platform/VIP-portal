@@ -69,7 +69,7 @@ public class PublicationDataInitializer extends JdbcDaoSupport {
         logger.info("Configuring VIP Publication database.");
 
         tableInitializer.createTable(
-                "VIPPublication",
+                "VIPPublications",
                 "id INT(11) NOT NULL AUTO_INCREMENT, "
                         + "title text, "
                         + "date VARCHAR(45), "

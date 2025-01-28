@@ -31,7 +31,6 @@
  */
 package fr.insalyon.creatis.vip.gatelab.client.view.monitor;
 
-import com.smartgwt.client.widgets.tab.Tab;
 import fr.insalyon.creatis.vip.application.client.view.common.AbstractSimulationTab;
 import fr.insalyon.creatis.vip.application.client.view.monitor.MonitorParserInterface;
 import fr.insalyon.creatis.vip.application.client.view.monitor.SimulationStatus;
@@ -45,24 +44,11 @@ import java.util.Date;
  */
 public class GateLabMonitorParser implements MonitorParserInterface {
 
-    /**
-     *
-     * @param applicationName
-     * @return
-     */
     @Override
     public boolean parse(String applicationName) {
-        return applicationName.toLowerCase().contains(GateLabConstants.GROUP_GATELAB.toLowerCase());
+        return applicationName.toLowerCase().contains(GateLabConstants.TAG_GATELAB.toLowerCase());
     }
 
-    /**
-     *
-     * @param simulationId
-     * @param simulatioName
-     * @param status
-     * @param launchedDate
-     * @return
-     */
     @Override
     public Layout.TabFactoryAndId getTab(
         final String simulationId,

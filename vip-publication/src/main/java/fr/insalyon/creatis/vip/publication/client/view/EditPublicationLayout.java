@@ -35,12 +35,12 @@ import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.widgets.IButton;
-import com.smartgwt.client.widgets.events.ClickEvent;
-import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.fields.ComboBoxItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
+
+import fr.insalyon.creatis.vip.application.client.bean.AppVersion;
 import fr.insalyon.creatis.vip.application.client.bean.Application;
 import fr.insalyon.creatis.vip.application.client.rpc.ApplicationService;
 import fr.insalyon.creatis.vip.application.client.rpc.ApplicationServiceAsync;
@@ -223,16 +223,17 @@ public class EditPublicationLayout extends AbstractFormLayout {
     private void loadApplications() {
 
         ApplicationServiceAsync service = ApplicationService.Util.getInstance();
-        final AsyncCallback<List<Application>> callback = new AsyncCallback<List<Application>>() {
+        final AsyncCallback<Map<Application, List<AppVersion>>> callback = new AsyncCallback<>() {
             @Override
             public void onFailure(Throwable caught) {
                 Layout.getInstance().setWarningMessage("Unable to get applications list:<br />" + caught.getMessage());
             }
 
             @Override
-            public void onSuccess(List<Application> result) {
-                Map<String, String> applicationsMap = new LinkedHashMap<String, String>();
-                for (Application a : result) {
+            public void onSuccess(Map<Application, List<AppVersion>> result) {
+                Map<String, String> applicationsMap = new LinkedHashMap<>();
+
+                for (Application a : result.keySet()) {
                     String applicationName = a.getName();
                     applicationsMap.put(applicationName, applicationName);
                 }

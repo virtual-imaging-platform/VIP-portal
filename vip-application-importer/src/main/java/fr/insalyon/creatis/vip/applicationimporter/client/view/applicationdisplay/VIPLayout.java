@@ -32,10 +32,13 @@
 package fr.insalyon.creatis.vip.applicationimporter.client.view.applicationdisplay;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.Overflow;
 import com.smartgwt.client.widgets.form.fields.CheckboxItem;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
+
+import fr.insalyon.creatis.vip.application.client.bean.Resource;
+import fr.insalyon.creatis.vip.application.client.rpc.ApplicationService;
+import fr.insalyon.creatis.vip.application.client.rpc.ApplicationServiceAsync;
 import fr.insalyon.creatis.vip.applicationimporter.client.rpc.ApplicationImporterService;
 import fr.insalyon.creatis.vip.applicationimporter.client.view.Constants;
 import fr.insalyon.creatis.vip.core.client.view.common.AbstractFormLayout;
@@ -43,6 +46,7 @@ import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
 import fr.insalyon.creatis.vip.datamanager.client.view.ValidatorUtil;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -50,30 +54,25 @@ import java.util.Map;
 public class VIPLayout extends AbstractFormLayout {
 
     private final LocalTextField applicationLocation;
-    private final CheckboxItem isRunOnGrid; // And not locally.
     private final CheckboxItem overwriteIfexists;
     private final SelectItem tagsCbItem;
+    private final SelectItem resourcesList;
     private final SelectItem fileAccessProtocolItem;
 
     public VIPLayout(String width, String height) {
         super(width, height);
         addTitle("Executable", Constants.ICON_EXECUTABLE);
-        setMembersMargin(2);
         setOverflow(Overflow.AUTO);
+        setMembersMargin(2);
+        
         // Adds application location
         applicationLocation = new LocalTextField("Application file location", true, true);
         setApplicationLocationValue();
-        this.addMember(applicationLocation);
-
+        
         overwriteIfexists = new CheckboxItem("ckbox_over", "Overwrite application version if it exists");
-        overwriteIfexists.setAlign(Alignment.LEFT);
-
-        isRunOnGrid = new CheckboxItem("ckbox_isRunOnGrid", "Application must run on grid, and not locally");
-        isRunOnGrid.setAlign(Alignment.LEFT);
-
         tagsCbItem = createTagsSelect();
-
-        //select list to choose the execution type
+        
+        // select list to choose the execution type
         fileAccessProtocolItem = new SelectItem();
         fileAccessProtocolItem.setTitle("<br>Select where the application files must be located</b>");
         fileAccessProtocolItem.setType("comboBox");
@@ -81,12 +80,19 @@ public class VIPLayout extends AbstractFormLayout {
         fileAccessProtocolValueMap.put(Constants.APP_IMPORTER_FILE_PROTOCOL, "Local (file)");
         fileAccessProtocolValueMap.put(Constants.APP_IMPORTER_LFN_PROTOCOL, "Grid (lfn)");
         fileAccessProtocolItem.setValueMap(fileAccessProtocolValueMap);
+        
+        // Resources allowed
+        resourcesList = new SelectItem();
+        resourcesList.setTitle("Resource(s) on which the application is authorized to execute");
+        resourcesList.setMultiple(true);
 
-        this.addMember(FieldUtil.getForm(isRunOnGrid));
+        this.addMember(applicationLocation);
+        this.addMember(FieldUtil.getForm(resourcesList));
         this.addMember(FieldUtil.getForm(overwriteIfexists));
         this.addMember(FieldUtil.getForm(tagsCbItem));
         this.addMember(FieldUtil.getForm(fileAccessProtocolItem));
 
+        loadResources();
     }
 
     public void setApplicationLocationValue(){
@@ -111,13 +117,7 @@ public class VIPLayout extends AbstractFormLayout {
         ApplicationImporterService.Util.getInstance().getApplicationImporterRootFolder(callback);
 
     }
-    
 
-    /**
-     * Get the location where to create the application
-     *
-     * @return the location
-     */
     public String getApplicationLocation() {
         return applicationLocation.getValue();
     }
@@ -126,17 +126,13 @@ public class VIPLayout extends AbstractFormLayout {
         return this.overwriteIfexists.getValueAsBoolean();
     }
 
-    public boolean getIsRunOnGrid() {
-        return this.isRunOnGrid.getValueAsBoolean();
-    }
-
     private SelectItem createTagsSelect() {
         // ComboBox to select tags.
         SelectItem tagsCb = new SelectItem();
         tagsCb.setTitle("<b>Dirac tag</b>");
         tagsCb.setType("comboBox");
 
-        final AsyncCallback<List<String>> callback = new AsyncCallback<List<String>>() {
+        final AsyncCallback<List<String>> callback = new AsyncCallback<>() {
             @Override
             public void onFailure(Throwable caught) {
                 Layout.getInstance().setWarningMessage("Unable to retrieve configurated list of requirements, setting it to None:<br />" + caught.getMessage());
@@ -165,11 +161,32 @@ public class VIPLayout extends AbstractFormLayout {
         return tagsCb;
     }
 
-    public String getTag() {
+    public String getDiracTag() {
         return tagsCbItem._getValue().toString();
     }
 
-    public String getFileAccessProtocol(){
+    public String getFileAccessProtocol() {
         return fileAccessProtocolItem._getValue().toString();
+    }
+
+    public List<String> getSelectedResources() {
+        return Arrays.asList(resourcesList.getValues());
+    }
+
+    private void loadResources() {
+        ApplicationServiceAsync service = ApplicationService.Util.getInstance();
+        final AsyncCallback<List<Resource>> callback = new AsyncCallback<>() {
+            @Override
+            public void onFailure(Throwable caught) {
+                Layout.getInstance().setWarningMessage("Unable to load resources:<br />" + caught.getMessage());
+            }
+
+            @Override
+            public void onSuccess(List<Resource> result) {
+                String[] data = result.stream().map((e) -> e.getName()).toArray(String[]::new);
+                resourcesList.setValueMap(data);
+            }
+        };
+        service.getResources(callback);
     }
 }

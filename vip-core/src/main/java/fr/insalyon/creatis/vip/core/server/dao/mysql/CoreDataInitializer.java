@@ -1,11 +1,8 @@
 package fr.insalyon.creatis.vip.core.server.dao.mysql;
 
 import fr.insalyon.creatis.devtools.MD5;
-import fr.insalyon.creatis.vip.core.client.bean.Group;
 import fr.insalyon.creatis.vip.core.client.bean.TermsOfUse;
 import fr.insalyon.creatis.vip.core.client.bean.User;
-import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
-import fr.insalyon.creatis.vip.core.client.view.CoreConstants.GROUP_ROLE;
 import fr.insalyon.creatis.vip.core.client.view.user.UserLevel;
 import fr.insalyon.creatis.vip.core.client.view.util.CountryCode;
 import fr.insalyon.creatis.vip.core.server.business.Server;
@@ -13,7 +10,6 @@ import fr.insalyon.creatis.vip.core.server.dao.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.annotation.Order;
@@ -37,21 +33,17 @@ public class CoreDataInitializer extends JdbcDaoSupport {
 
     private Server server;
     private UserDAO userDAO;
-    private GroupDAO groupDAO;
-    private UsersGroupsDAO usersGroupsDAO;
     private TermsUseDAO termsUseDAO;
 
     @Autowired
     public CoreDataInitializer(
-            GroupDAO groupDAO, DataSource dataSource, TableInitializer tableInitializer,
-            Server server, UserDAO userDAO, UsersGroupsDAO usersGroupsDAO, TermsUseDAO termsUseDAO) {
+            DataSource dataSource, TableInitializer tableInitializer,
+            Server server, UserDAO userDAO, TermsUseDAO termsUseDAO) {
         setDataSource(dataSource);
         this.tableInitializer = tableInitializer;
         this.userDAO = userDAO;
         this.server = server;
-        this.usersGroupsDAO = usersGroupsDAO;
         this.termsUseDAO = termsUseDAO;
-        this.groupDAO = groupDAO;
     }
 
     @EventListener(ContextRefreshedEvent.class)
@@ -112,45 +104,30 @@ public class CoreDataInitializer extends JdbcDaoSupport {
     }
 
     private void initializeGroupTables() {
-        if (tableInitializer.createTable("VIPGroups",
-                "groupname VARCHAR(50), "
+        tableInitializer.createTable("VIPGroups",
+                          "name VARCHAR(50), "
                         + "public BOOLEAN, "
-                        + "gridfile BOOLEAN DEFAULT 0, "
-                        + "gridjobs BOOLEAN DEFAULT 0, "
-                        + "PRIMARY KEY(groupname)")) {
-
-            try {
-                groupDAO.add(new Group(CoreConstants.GROUP_SUPPORT, false, true, true));
-            } catch (DAOException ex) {
-                logger.error("Error creating VIPGroups table", ex);
-            }
-        }
+                        + "type VARCHAR(30), "
+                        + "auto BOOLEAN, "
+                        + "PRIMARY KEY(name)");
 
 
-        if (tableInitializer.createTable("VIPUsersGroups",
+        tableInitializer.createTable("VIPUsersGroups",
                 "email VARCHAR(255), "
-                        + "groupname VARCHAR(100), "
+                        + "groupname VARCHAR(50), "
                         + "role VARCHAR(30), "
                         + "PRIMARY KEY (email, groupname), "
                         + "FOREIGN KEY (email) REFERENCES VIPUsers(email) "
                         + "ON DELETE CASCADE ON UPDATE CASCADE, "
-                        + "FOREIGN KEY (groupname) REFERENCES VIPGroups(groupname) "
-                        + "ON DELETE CASCADE ON UPDATE CASCADE")) {
-            try {
-                usersGroupsDAO.add(server.getAdminEmail(),
-                                CoreConstants.GROUP_SUPPORT,
-                                GROUP_ROLE.Admin);
-            } catch (DAOException ex) {
-                logger.error("Error adding admin user to admin group", ex);
-            }
-        }
+                        + "FOREIGN KEY (groupname) REFERENCES VIPGroups(name) "
+                        + "ON DELETE CASCADE ON UPDATE CASCADE");
     }
 
     private void initializeTermsOfUseTable() {
-        if (tableInitializer.createTable("VIPTermsOfuse",
-                "idTermsOfuse INT(11) NOT NULL AUTO_INCREMENT, "
+        if (tableInitializer.createTable("VIPTermsOfUse",
+                "id INT(11) NOT NULL AUTO_INCREMENT, "
                         + "date TIMESTAMP NULL, "
-                        + "PRIMARY KEY (idTermsOfuse)")) {
+                        + "PRIMARY KEY (id)")) {
             try {
                 java.util.Date today = new java.util.Date();
                 termsUseDAO.add(
@@ -160,5 +137,4 @@ public class CoreDataInitializer extends JdbcDaoSupport {
             }
         }
     }
-
 }

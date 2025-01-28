@@ -55,13 +55,13 @@ public class MessagingDataInitializer extends JdbcDaoSupport {
         tableInitializer.createTable("VIPSocialGroupMessage",
                 "id BIGINT AUTO_INCREMENT PRIMARY KEY, "
                         + "sender VARCHAR(255), "
-                        + "groupname VARCHAR(255), "
+                        + "name VARCHAR(255), "
                         + "title VARCHAR(255), "
                         + "message TEXT, "
                         + "posted TIMESTAMP, "
                         + "FOREIGN KEY (sender) REFERENCES VIPUsers(email) "
                         + "ON DELETE CASCADE ON UPDATE CASCADE, "
-                        + "FOREIGN KEY(groupname) REFERENCES VIPGroups(groupname) "
+                        + "FOREIGN KEY(name) REFERENCES VIPGroups(name) "
                         + "ON DELETE CASCADE ON UPDATE RESTRICT");
     }
 }
