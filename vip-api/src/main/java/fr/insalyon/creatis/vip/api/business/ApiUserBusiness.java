@@ -4,7 +4,8 @@ import fr.insalyon.creatis.vip.api.exception.ApiException;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
-import fr.insalyon.creatis.vip.core.server.business.GroupBusiness;
+
+import java.util.ArrayList;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,11 +20,9 @@ public class ApiUserBusiness {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private final ConfigurationBusiness configurationBusiness;
-    private final GroupBusiness groupBusiness;
 
-    public ApiUserBusiness(ConfigurationBusiness configurationBusiness, GroupBusiness groupBusiness) {
+    public ApiUserBusiness(ConfigurationBusiness configurationBusiness) {
         this.configurationBusiness = configurationBusiness;
-        this.groupBusiness = groupBusiness;
     }
 
     /**
@@ -40,7 +39,7 @@ public class ApiUserBusiness {
                 comments,
                 false, 
                 true, 
-                groupBusiness.getPublic());
+                new ArrayList<>());
             logger.info("Signing up with the " + user.getEmail());
         } catch (BusinessException e) {
             throw new ApiException("Signing up Error", e);
