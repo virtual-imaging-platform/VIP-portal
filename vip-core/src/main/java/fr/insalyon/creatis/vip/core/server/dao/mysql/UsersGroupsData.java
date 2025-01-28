@@ -38,7 +38,6 @@ import fr.insalyon.creatis.vip.core.client.view.user.UserLevel;
 import fr.insalyon.creatis.vip.core.client.view.util.CountryCode;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import fr.insalyon.creatis.vip.core.server.dao.UsersGroupsDAO;
-import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -46,7 +45,6 @@ import java.util.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.core.support.JdbcDaoSupport;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -101,9 +99,12 @@ public class UsersGroupsData extends JdbcDaoSupport implements UsersGroupsDAO {
 
         try {
             PreparedStatement ps = getConnection().prepareStatement(
-                    "SELECT g.name, g.public, g.type, role "
-                    + "FROM VIPGroups g JOIN VIPUsersGroups ug "
-                    + "ON g.name = ug.groupname AND email = ?");
+                        "SELECT g.name, g.public, g.type, g.auto, role "
+                    +   "FROM VIPGroups g JOIN VIPUsersGroups ug "
+                    +   "ON g.name = ug.groupname AND email = ? "
+                    +   "UNION "
+                    +   "SELECT name, public, type, auto, NULL AS role "
+                    +   "FROM VIPGroups WHERE auto = true");
             ps.setString(1, email);
             ResultSet rs = ps.executeQuery();
 
@@ -114,7 +115,7 @@ public class UsersGroupsData extends JdbcDaoSupport implements UsersGroupsDAO {
                 if (role == null || role.isEmpty() || role.equals("null")) {
                     role = "None";
                 }
-                groups.put(new Group(rs.getString("name"), rs.getBoolean("public"), rs.getString("type")),
+                groups.put(new Group(rs.getString("name"), rs.getBoolean("public"), rs.getString("type"), rs.getBoolean("auto")),
                         GROUP_ROLE.valueOf(role));
             }
             ps.close();

@@ -39,9 +39,10 @@ public class GroupBusiness {
 
     public void add(Group group) throws BusinessException {
         try {
+            checkAuto(group);
             gridaClient.createFolder(server.getDataManagerGroupsHome(),
-                    group.getName().replaceAll(" ", "_"));
-
+            group.getName().replaceAll(" ", "_"));
+            
             groupDAO.add(group);
         } catch (GRIDAClientException ex) {
             logger.error("Error adding group : {}", group.getName(), ex);
@@ -67,7 +68,8 @@ public class GroupBusiness {
 
     public void update(String name, Group group) throws BusinessException {
         try {
-            if (!name.equals(group.getName())) {
+            checkAuto(group);
+            if ( ! name.equals(group.getName())) {
                 gridaClient.rename(
                         server.getDataManagerGroupsHome() + "/" + name.replaceAll(" ", "_"),
                         server.getDataManagerGroupsHome() + "/" + group.getName().replaceAll(" ", "_"));
@@ -125,6 +127,16 @@ public class GroupBusiness {
             return groupDAO.getByRessource(ressourceName);
         } catch (DAOException e) {
             throw new BusinessException(e);
+        }
+    }
+
+    public void checkAuto(Group group) throws BusinessException {
+        if (group.isAuto()) {
+            Group existing = getByType(group.getType()).stream().filter((g) -> g.isAuto()).findFirst().orElse(null);
+
+            if (existing != null) {
+                throw new BusinessException("You can't have multiples auto groups of the same type!");
+            }
         }
     }
 }

@@ -111,10 +111,15 @@ public class ResourceData extends JdbcDaoSupport implements ResourceDAO {
 
     @Override
     public List<Resource> getByUser(User user) throws DAOException {
-        String query = "SELECT * FROM VIPResources r "
-        +              "JOIN VIPGroupsResources gr ON r.name = gr.resourcename "
-        +              "JOIN VIPUsersGroups ug ON gr.groupname = ug.groupname "
-        +              "WHERE ug.email = ? ORDER BY name";
+        String query =  "SELECT r.* FROM VIPResources r "
+        +               "JOIN VIPGroupsResources gr ON r.name = gr.resourcename "
+        +               "JOIN VIPUsersGroups ug ON gr.groupname = ug.groupname "
+        +               "WHERE ug.email = ? "
+        +               "UNION "
+        +               "SELECT r.* FROM VIPResources r "
+        +               "JOIN VIPGroupsResources gr ON r.name = gr.resourcename "
+        +               "JOIN VIPGroups g ON gr.groupname = g.name "
+        +               "WHERE g.auto = true ORDER BY name";
 
         try (PreparedStatement ps = getConnection().prepareStatement(query)) {
             ps.setString(1, user.getEmail());

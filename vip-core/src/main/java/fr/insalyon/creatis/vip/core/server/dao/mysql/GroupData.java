@@ -65,12 +65,13 @@ public class GroupData extends JdbcDaoSupport implements GroupDAO {
 
     @Override
     public void add(Group group) throws DAOException {
-        String query = "INSERT INTO VIPGroups(name, public, type) VALUES(?, ?, ?)";
+        String query = "INSERT INTO VIPGroups(name, public, type, auto) VALUES(?, ?, ?, ?)";
 
         try (PreparedStatement ps = getConnection().prepareStatement(query)) {
             ps.setString(1, group.getName());
             ps.setBoolean(2, group.isPublicGroup());
             ps.setString(3, group.getType().toString());
+            ps.setBoolean(4, group.isAuto());
             ps.execute();
 
         } catch (SQLException ex) {
@@ -100,13 +101,14 @@ public class GroupData extends JdbcDaoSupport implements GroupDAO {
 
     @Override
     public void update(String name, Group group) throws DAOException {
-        String query = "UPDATE VIPGroups SET name=?, public=?, type=? WHERE name=?";
+        String query = "UPDATE VIPGroups SET name=?, public=?, type=?, auto=? WHERE name=?";
 
         try (PreparedStatement ps = getConnection().prepareStatement(query)) {
             ps.setString(1, group.getName());
             ps.setBoolean(2, group.isPublicGroup());
             ps.setString(3, group.getType().toString());
-            ps.setString(4, name);
+            ps.setBoolean(4, group.isAuto());
+            ps.setString(5, name);
             ps.executeUpdate();
 
         } catch (SQLException ex) {
@@ -124,8 +126,7 @@ public class GroupData extends JdbcDaoSupport implements GroupDAO {
             ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
-                groups.add(new Group(rs.getString("name"),
-                        rs.getBoolean("public"), rs.getString("type")));
+                groups.add(fromRs(rs));
             }
             return groups;
 
@@ -138,15 +139,14 @@ public class GroupData extends JdbcDaoSupport implements GroupDAO {
     @Override
     public List<Group> getByType(GroupType type) throws DAOException {
         List<Group> groups = new ArrayList<Group>();
-        String query = "SELECT * FROM VIPGroups ORDER BY LOWER(name) WHERE type = ?";
+        String query = "SELECT * FROM VIPGroups WHERE type = ? ORDER BY LOWER(name)";
  
         try (PreparedStatement ps = getConnection().prepareStatement(query)) {
             ps.setString(1, type.toString());
             ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
-                groups.add(new Group(rs.getString("name"),
-                        rs.getBoolean("public"), rs.getString("type")));
+                groups.add(fromRs(rs));
             }
             return groups;
 
@@ -168,8 +168,7 @@ public class GroupData extends JdbcDaoSupport implements GroupDAO {
             ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
-                groups.add(new Group(rs.getString("name"),
-                        rs.getBoolean("public"), rs.getString("type")));
+                groups.add(fromRs(rs));
             }
             return groups;
 
@@ -191,8 +190,7 @@ public class GroupData extends JdbcDaoSupport implements GroupDAO {
             ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
-                groups.add(new Group(rs.getString("name"),
-                        rs.getBoolean("public"), rs.getString("type")));
+                groups.add(fromRs(rs));
             }
             return groups;
 
@@ -200,5 +198,10 @@ public class GroupData extends JdbcDaoSupport implements GroupDAO {
             logger.error("Error getting group linked to ressource " + resourceName, ex);
             throw new DAOException(ex);
         }
+    }
+
+    private Group fromRs(ResultSet rs) throws SQLException {
+        return new Group(rs.getString("name"), rs.getBoolean("public"),
+            rs.getString("type"), rs.getBoolean("auto"));
     }
 }

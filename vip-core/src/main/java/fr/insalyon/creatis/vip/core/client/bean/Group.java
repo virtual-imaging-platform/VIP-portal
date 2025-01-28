@@ -42,17 +42,23 @@ public class Group implements IsSerializable {
     private String name;
     private boolean publicGroup;
     private GroupType type;
+    private boolean auto;
 
     public Group() { }
 
-    public Group(String name, boolean publicGroup, String type) {
-        this(name, publicGroup, GroupType.fromString(type));
+    public Group(String name, boolean publicGroup, String type, boolean auto) {
+        this(name, publicGroup, GroupType.fromString(type), auto);
     }
 
     public Group(String name, boolean publicGroup, GroupType type) {
+        this(name, publicGroup, type, false);
+    }
+
+    public Group(String name, boolean publicGroup, GroupType type, boolean auto) {
         this.name = name;
         this.publicGroup = publicGroup;
         this.type = type;
+        this.auto = auto;
     }
 
     public Group(String name) {
@@ -81,5 +87,13 @@ public class Group implements IsSerializable {
 
     public void setType(GroupType type) {
         this.type = type;
+    }
+
+    public void setAuto(boolean isAuto) {
+        this.auto = isAuto;
+    }
+
+    public boolean isAuto() {
+        return auto;
     }
 }

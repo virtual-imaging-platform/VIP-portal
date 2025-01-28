@@ -71,9 +71,12 @@ public class EditGroupLayout extends AbstractFormLayout {
 
     private String oldName = null;
     private boolean newGroup = true;
+
     private TextItem nameItem;
     private CheckboxItem isPublicField;
     private SelectItem typeFieldList;
+    private CheckboxItem isAutoField;
+
     private IButton saveButton;
     private IButton removeButton;
     private ListGrid itemsGrid;
@@ -104,6 +107,10 @@ public class EditGroupLayout extends AbstractFormLayout {
         typeFieldList.setValueMap(GroupType.getValues());
         typeFieldList.setWidth(350);
 
+        isAutoField = new CheckboxItem();
+        isAutoField.setShowTitle(false);
+        isAutoField.setWidth(350);
+
         saveButton = WidgetUtil.getIButton("Save", CoreConstants.ICON_SAVED,
                 new ClickHandler() {
                     @Override
@@ -111,7 +118,8 @@ public class EditGroupLayout extends AbstractFormLayout {
                         if (nameItem.validate()) {
                             save(nameItem.getValueAsString().trim(),
                                     isPublicField.getValueAsBoolean(),
-                                    typeFieldList.getValueAsString());
+                                    typeFieldList.getValueAsString(),
+                                    isAutoField.getValueAsBoolean());
                         }
                     }
                 });
@@ -138,6 +146,7 @@ public class EditGroupLayout extends AbstractFormLayout {
         addField("Name", nameItem);
         addField("Public", isPublicField);
         addField("Group Type", typeFieldList);
+        addField("Auto", isAutoField);
         addMember(WidgetUtil.getLabel("<b>Users</b>", 15));
         addMember(usersGrid);
         addMember(dynamicLabel);
@@ -145,12 +154,13 @@ public class EditGroupLayout extends AbstractFormLayout {
         addButtons(saveButton, removeButton);
     }
 
-    public void setGroup(String name, boolean isPublic, String type) {
+    public void setGroup(String name, boolean isPublic, String type, boolean auto) {
         if (name != null) {
             oldName = name;
             nameItem.setValue(name);
             isPublicField.setValue(isPublic);
             typeFieldList.setValue(type);
+            isAutoField.setValue(auto);
             newGroup = false;
             removeButton.setDisabled(false);
             loadUsers();
@@ -166,14 +176,14 @@ public class EditGroupLayout extends AbstractFormLayout {
         }
     }
 
-    private void save(String name, boolean isPublic, String type) {
+    private void save(String name, boolean isPublic, String type, boolean auto) {
         ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();
         WidgetUtil.setLoadingIButton(saveButton, "Saving...");
 
         if (newGroup) {
-            service.addGroup(new Group(name, isPublic, type), getCallback("add"));
+            service.addGroup(new Group(name, isPublic, type, auto), getCallback("add"));
         } else {
-            service.updateGroup(oldName, new Group(name, isPublic, type), getCallback("update"));
+            service.updateGroup(oldName, new Group(name, isPublic, type, auto), getCallback("update"));
         }
     }
 
@@ -205,7 +215,7 @@ public class EditGroupLayout extends AbstractFormLayout {
                 WidgetUtil.resetIButton(removeButton, "Remove", CoreConstants.ICON_DELETE);
                 Layout.getInstance().setNoticeMessage("You successfully " + text + " a group:<br />");
 
-                setGroup(null, false, null);
+                setGroup(null, false, null, false);
                 ((ManageGroupsTab) Layout.getInstance().getTab(
                         CoreConstants.TAB_MANAGE_GROUPS)).loadGroups();
             }

@@ -108,6 +108,7 @@ public class CoreDataInitializer extends JdbcDaoSupport {
                           "name VARCHAR(50), "
                         + "public BOOLEAN, "
                         + "type VARCHAR(30), "
+                        + "auto BOOLEAN, "
                         + "PRIMARY KEY(name)");
 
 

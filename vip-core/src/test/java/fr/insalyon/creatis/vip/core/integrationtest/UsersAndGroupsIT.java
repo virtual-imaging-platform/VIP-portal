@@ -120,6 +120,21 @@ public class UsersAndGroupsIT extends BaseSpringIT {
         assertTrue(StringUtils.contains(exception.getMessage(), "A group named group1 already exists"));
     }
 
+    @Test
+    public void testThrowCreateExistingAutoGroup() throws BusinessException {
+        Group group = new Group("test_a", false, GroupType.APPLICATION, true);
+        Group groupBis = new Group("test_ab", false, GroupType.APPLICATION, true);
+        Group groupR = new Group("test_a_R", false, GroupType.RESOURCE, true);
+
+        groupBusiness.add(groupR);
+        groupBusiness.add(group);
+        assertThrows(BusinessException.class, () -> groupBusiness.add(groupBis));
+
+        groupBis.setAuto(false);
+        groupBusiness.add(groupBis);
+        groupBis.setAuto(true);
+        assertThrows(BusinessException.class, () -> groupBusiness.update(groupBis.getName(), groupBis));
+    }
 
     /* ********************************************************************************************************************************************** */
     /* ******************************************************************* get group **************************************************************** */
@@ -177,7 +192,6 @@ public class UsersAndGroupsIT extends BaseSpringIT {
         // We decided not to add an exception because if this occurs, it will not create problem, just no row will be updated
         groupBusiness.update("non existent group", group);
     }
-
     /* ********************************************************************************************************************************************** */
     /* ************************************************************** get group ************************************************************* */
     /* ********************************************************************************************************************************************** */
@@ -424,6 +438,24 @@ public class UsersAndGroupsIT extends BaseSpringIT {
 
         Assertions.assertEquals(1, groupsNames.size(), "incorrect number of public groups");
         Assertions.assertTrue(groupsNames.containsAll(List.of(nameGroup1)), "Incorrect public groups names");
+    }
+
+
+    /* ********************************************************************************************************************************************** */
+    /* *************************************************************** get auto groups ************************************************************ */
+    /* ********************************************************************************************************************************************** */
+
+    @Test
+    public void testGetAutoGroups() throws BusinessException {
+        Group auto = new Group("auto", true, GroupType.APPLICATION, true);
+        Group nonauto = new Group("nonauto", true, GroupType.APPLICATION, false);
+
+        groupBusiness.add(auto);
+        groupBusiness.add(nonauto);
+
+        List<Group> autoGroups = new ArrayList<>(configurationBusiness.getUserGroups(adminEmail).keySet());
+        assertEquals(autoGroups.get(0).getName(), auto.getName());
+
     }
 
 

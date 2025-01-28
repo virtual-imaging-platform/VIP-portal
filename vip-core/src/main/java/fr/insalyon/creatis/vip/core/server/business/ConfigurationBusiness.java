@@ -629,10 +629,6 @@ public class ConfigurationBusiness {
                 List<String> userNames = new ArrayList<>();
                 userNames.add(userDAO.getUser(email).getFullName());
                 return userNames;
-
-//                } else {
-//                    return CoreDAOFactory.getDAOFactory().getUsersGroupsDAO().getUsersFromGroups(groups);
-//                }
             } else {
                 List<String> userNames = new ArrayList<>();
                 for (User user : getUsers()) {

@@ -103,7 +103,8 @@ public class GroupsLayout extends VLayout {
                         public void onClick(ClickEvent event) {
                             edit(rollOverRecord.getAttribute("name"),
                                     rollOverRecord.getAttributeAsBoolean("isPublic"),
-                                    rollOverRecord.getAttributeAsString("type"));
+                                    rollOverRecord.getAttributeAsString("type"),
+                                    rollOverRecord.getAttributeAsBoolean("auto"));
                         }
                     }));
 
@@ -132,8 +133,11 @@ public class GroupsLayout extends VLayout {
 
         ListGridField typeField = new ListGridField("type", "GroupType");
         typeField.setType(ListGridFieldType.TEXT);
+
+        ListGridField autoField = new ListGridField("auto", "Auto");
+        autoField.setType(ListGridFieldType.BOOLEAN);
         
-        grid.setFields(isPublicField, typeField, new ListGridField("name", "Group Name"));
+        grid.setFields(isPublicField, typeField, autoField, new ListGridField("name", "Group Name"));
         grid.setSortField("name");
         grid.setSortDirection(SortDirection.ASCENDING);
         grid.addCellDoubleClickHandler(new CellDoubleClickHandler() {
@@ -142,7 +146,8 @@ public class GroupsLayout extends VLayout {
             public void onCellDoubleClick(CellDoubleClickEvent event) {
                 edit(event.getRecord().getAttribute("name"),
                         event.getRecord().getAttributeAsBoolean("isPublic"),
-                        event.getRecord().getAttributeAsString("type"));
+                        event.getRecord().getAttributeAsString("type"),
+                        event.getRecord().getAttributeAsBoolean("auto"));
             }
         });
     }
@@ -195,9 +200,9 @@ public class GroupsLayout extends VLayout {
         });
     }
 
-    private void edit(String name, boolean isPublic, String type) {
+    private void edit(String name, boolean isPublic, String type, boolean auto) {
 
         ((ManageGroupsTab) Layout.getInstance().getTab(
-                CoreConstants.TAB_MANAGE_GROUPS)).setGroup(name, isPublic, type);
+                CoreConstants.TAB_MANAGE_GROUPS)).setGroup(name, isPublic, type, auto);
     }
 }

@@ -57,6 +57,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -285,9 +286,10 @@ public class EditUserLayout extends AbstractFormLayout {
 
             @Override
             public void onSuccess(List<Group> result) {
-
+                result = result.stream().filter((g) -> ! g.isAuto()).collect(Collectors.toList()); // to avoid admin to manage Automatic groups
                 List<String> dataRsrc = new ArrayList<>();
                 List<String> dataApps = new ArrayList<>();
+
                 for (Group g : result) {
                     if (g.getType().equals(GroupType.APPLICATION)) {
                         dataApps.add(g.getName() + " (" + CoreConstants.GROUP_ROLE.Admin.name() + ")");
