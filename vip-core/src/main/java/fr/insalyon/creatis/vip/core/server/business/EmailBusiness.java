@@ -12,16 +12,28 @@ public class EmailBusiness {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
+    private Server server;
     private SMAClient smaClient;
 
     @Autowired
-    public EmailBusiness(SMAClient smaClient) {
+    public EmailBusiness(Server server, SMAClient smaClient) {
+        this.server = server;
         this.smaClient = smaClient;
     }
 
     public void sendEmail(String subject, String content, String[] recipients,
                                  boolean direct, String username) throws BusinessException {
+        if (server.useSMA()) {
+            sendWithSMA(subject, content, recipients, direct, username);
+        } else {
+            logger.info("SMA disabled, not sending email and logging it");
+            logger.info("subject : {}", subject);
+            logger.info("recipients : {}", recipients);
+            logger.info("content : {}", content);
+        }
+    }
 
+    private void sendWithSMA(String subject, String content, String[] recipients, boolean direct, String username) throws BusinessException {
         try {
             smaClient.sendEmail(subject, content, recipients, direct, username);
         } catch (SMAClientException ex) {

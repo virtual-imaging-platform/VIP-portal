@@ -62,7 +62,9 @@ public class ApiException extends VipException {
         INVALID_EXECUTION_ID(8015),
         INVALID_EXAMPLE_ID(8016),
         NOT_COMPATIBLE_WITH_BOUTIQUES(8017),
-        INPUT_FIELD_MISSING(8018);
+        INPUT_FIELD_MISSING(8018),
+        INVALID_EXECUTION_NAME(8019),
+        INVALID_EXECUTION_INIT(8020);
 
         private final Integer code;
         private final Integer httpStatus;
@@ -100,6 +102,8 @@ public class ApiException extends VipException {
             addMessage(ApiError.INVALID_EXECUTION_ID, "No execution available with this id : {}", 1);
             addMessage(ApiError.INVALID_EXAMPLE_ID, "There is no example with the id : {}", 1);
             addMessage(ApiError.NOT_COMPATIBLE_WITH_BOUTIQUES, "The pipeline is not compatible with boutiques : {}", 1);
+            addMessage(ApiError.INVALID_EXECUTION_NAME, "The execution name is not valid : Cause {}", 1);
+            addMessage(ApiError.INVALID_EXECUTION_INIT, "The execution could not be submitted : Cause {}", 1);
         }
 
         public Optional<String> getMessage() {

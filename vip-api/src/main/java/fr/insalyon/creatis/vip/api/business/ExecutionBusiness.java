@@ -289,11 +289,12 @@ public class ExecutionBusiness {
         }
     }
 
-    public String initExecution(Execution execution)
-        throws ApiException {
+    public String initExecution(Execution execution) throws ApiException {
         Map<String, String> inputMap = new HashMap<>();
+
         for (Entry<String,Object> restInput : execution.getInputValues().entrySet()) {
-            inputMap.put(restInput.getKey(),
+            inputMap.put(
+                    restInput.getKey(),
                     handleRestParameter(restInput.getKey(), restInput.getValue()));
         }
         String resultsLocation = execution.getResultsLocation();
@@ -317,7 +318,7 @@ public class ExecutionBusiness {
                     paramBuilder.append(ApplicationConstants.SEPARATOR_LIST);
                 }
                 String inputValue = listElement.toString();
-                checkInputIsValid(inputValue);
+                checkInputIsValid(parameterName, inputValue);
                 paramBuilder.append(inputValue);
                 isFirst = false;
             }
@@ -325,17 +326,17 @@ public class ExecutionBusiness {
             return paramBuilder.toString();
         } else {
             String inputValue = restParameterValue.toString();
-            checkInputIsValid(inputValue);
+            checkInputIsValid(parameterName, inputValue);
             return restParameterValue.toString();
         }
     }
 
-    private void checkInputIsValid(String input) throws ApiException {
+    private void checkInputIsValid(String inputName, String inputValue) throws ApiException {
         String validChars = INPUT_VALID_CHARS + ADDITIONNAL_INPUT_VALID_CHARS;
-        if( ! input.matches("[" + validChars + "]+")) {
-            logger.error("Input {} is not valid. Authorized characters are {}",
-                    input, validChars);
-            throw new ApiException("Input " + input + " is not valid.");
+        if( ! inputValue.matches("[" + validChars + "]+")) {
+            logger.error("Input {} is not valid. Value : {}, Authorized characters are {}",
+                    inputName, inputValue, validChars);
+            throw new ApiException(ApiException.ApiError.INPUT_FIELD_NOT_VALID, inputName, "Authorized characters are " + validChars);
         }
     }
 
@@ -343,8 +344,7 @@ public class ExecutionBusiness {
         if( ! input.matches("[" + ApplicationConstants.EXEC_NAME_VALID_CHARS + "]+")) {
             logger.error("Execution name {} is not valid. Authorized characters are {}",
                     input, ApplicationConstants.EXEC_NAME_VALID_CHARS);
-            throw new ApiException("Execution name " + input + " is not valid.");
-
+            throw new ApiException(ApiException.ApiError.INVALID_EXECUTION_NAME, "Authorized characters are " + ApplicationConstants.EXEC_NAME_VALID_CHARS);
         }
     }
 
@@ -397,7 +397,7 @@ public class ExecutionBusiness {
 
             if (inputsContainsResultsDirectoryInput && ! pipelineHasResultsDirectoryInput) {
                 logger.error("Missing results-directory for {}", pipelineId);
-                throw new ApiException(
+                throw new ApiException(ApiException.ApiError.INVALID_EXECUTION_INIT,
                     "Input has parameter results-directory but it is not defined in pipeline.");
             }
 
@@ -419,7 +419,8 @@ public class ExecutionBusiness {
                     .getApplicationClasses();
             if (classes.isEmpty()) {
                 logger.error("No class configured for {}", pipelineId);
-                throw new ApiException("Application " + applicationName + " cannot be launched because it doesn't belong to any VIP class.");
+                throw new ApiException(ApiException.ApiError.INVALID_EXECUTION_INIT,
+                        "Application " + applicationName + " cannot be launched because it doesn't belong to any VIP class.");
             }
 
             logger.info("Launching workflow with the following parameters: ");

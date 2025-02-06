@@ -281,6 +281,11 @@ public class SpringConfigServer implements Server {
     }
 
     @Override
+    public boolean useSMA() {
+        return env.getProperty(CoreConstants.LAB_SMA_ENABLED, Boolean.class, true);
+    }
+
+    @Override
     public String getSMAHost() {
         return env.getRequiredProperty(CoreConstants.LAB_SMA_HOST);
     }
