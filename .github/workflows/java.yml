@@ -1,0 +1,27 @@
+# This is the template for the all of the JAVA VIP projects workflow CI integration
+
+name: VIP CI Integration
+env: # beware env value are of string type, not boolean. Need to use fromJSON to convert them to boolean
+  isProduction: ${{ github.event_name == 'push' && github.ref_name == 'master' }}
+  prepareRelease: ${{ github.event_name == 'push' && github.ref_name == 'develop' && contains(github.event.head_commit.message, 'prepare release') }}
+
+on:
+  push:
+    branches: [develop, master]
+  pull_request:
+    branches: [develop]
+  workflow_dispatch:
+
+jobs:
+  all:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Review Code
+        uses: virtual-imaging-platform/vip-github-actions/.github/actions/pmd@develop
+        with:
+          quality: 95
+
+      - name: Maven
+        uses: virtual-imaging-platform/vip-github-actions/.github/actions/maven@develop
+        with:
+          maven_password: ${{ secrets.NEXUS_PSW }}
