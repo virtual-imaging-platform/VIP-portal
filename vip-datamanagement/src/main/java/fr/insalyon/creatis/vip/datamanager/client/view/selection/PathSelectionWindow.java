@@ -80,12 +80,14 @@ public class PathSelectionWindow extends Window {
         this.toRunOnSelection = toRunOnSelection;
 
         this.setTitle("Path Selection");
-        this.setWidth(600);
-        this.setHeight(350);
+        this.setWidth(700);
+        this.setHeight(400);
         this.setShowMinimizeButton(false);
+        this.setShowCloseButton(false);
         this.setIsModal(true);
         this.setShowModalMask(true);
         this.centerInPage();
+        this.setStyleName("curvy-border");
 
         grid = BrowserUtil.getListGrid();
         modal = new ModalWindow(grid);
@@ -154,6 +156,7 @@ public class PathSelectionWindow extends Window {
             public void onClick(ClickEvent event) {
                 name = grid.getSelectedRecord().getAttributeAsString("name");
                 selectValueAndDestroy(toolStrip.getPath() + "/" + name);
+                BrowserUtil.fileType = "all";
             }
         });
         
@@ -163,6 +166,7 @@ public class PathSelectionWindow extends Window {
 
             public void onClick(ClickEvent event) {
                 destroy();
+                BrowserUtil.fileType = "all";
             }
         });
         
