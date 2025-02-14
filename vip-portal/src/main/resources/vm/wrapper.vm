@@ -200,9 +200,9 @@ mkdir -p $TMP_FOLDER
 #set($jsonFile="${tool.getName()}.json")
 
 #if($imagepath)
-PYTHONPATH=".:$PYTHONPATH" $BOSHEXEC exec launch --imagepath $imagepath $jsonFile input_param_file.json -v $PWD/../cache:$PWD/../cache -v $TMP_FOLDER:/tmp
+PYTHONPATH=".:$PYTHONPATH" $BOSHEXEC exec launch --stream --imagepath $imagepath $jsonFile input_param_file.json -v $PWD/../cache:$PWD/../cache -v $TMP_FOLDER:/tmp
 #else
-PYTHONPATH=".:$PYTHONPATH" $BOSHEXEC exec launch $jsonFile input_param_file.json -v $PWD/../cache:$PWD/../cache -v $TMP_FOLDER:/tmp
+PYTHONPATH=".:$PYTHONPATH" $BOSHEXEC exec launch --stream $jsonFile input_param_file.json -v $PWD/../cache:$PWD/../cache -v $TMP_FOLDER:/tmp
 #end
 
 if [ $? != 0 ]
