@@ -74,6 +74,8 @@ public class LogsLayout extends AbstractFormLayout {
 
         DetailViewerField pictureField = new DetailViewerField("picture");
         pictureField.setType("image");
+        pictureField.setImageHeight(48);
+        pictureField.setImageWidth(48);
         DetailViewerField commonNameField = new DetailViewerField("commonName");
 
         tileGrid.setFields(pictureField, commonNameField);
