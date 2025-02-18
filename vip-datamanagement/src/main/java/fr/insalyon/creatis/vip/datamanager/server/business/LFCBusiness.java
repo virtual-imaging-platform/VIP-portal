@@ -159,6 +159,18 @@ public class LFCBusiness {
         }
     }
 
+    public Data.Type getPathInfo(User user, String path) throws BusinessException {
+        try {
+            GridData.Type type = gridaClient.getPathInfo(lfcPathsBusiness.parseBaseDir(user, path));
+            return Data.Type.valueOf(type.name().toLowerCase());
+        } catch (GRIDAClientException ex) {
+            logger.error("Error getting path info {} for {}", path, user, ex);
+            throw new BusinessException(ex);
+        } catch (DataManagerException ex) {
+            throw new BusinessException(ex);
+        }
+    }
+
     public long getModificationDate(User user, String path) throws BusinessException {
 
         try {
