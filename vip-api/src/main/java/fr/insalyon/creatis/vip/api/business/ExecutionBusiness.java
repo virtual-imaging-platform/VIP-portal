@@ -200,7 +200,7 @@ public class ExecutionBusiness {
         try {
 
             List<Simulation> simulations = workflowBusiness.getSimulations(
-                    currentUserProvider.get().getFullName(),
+                    currentUserProvider.get().getEmail(),
                     null, // application
                     null, // status
                     null, // class
@@ -230,10 +230,9 @@ public class ExecutionBusiness {
     public List<Execution> listExamples() throws ApiException {
         try {
             List<Simulation> simulations = workflowBusiness.getSimulations(
-                    (String) null, // User must be null to take examples from other users
+                    null, // User must be null to take examples from other users
                     null, // application
                     WorkflowStatus.Completed.name(), // status
-                    null, // class
                     null, // startDate
                     null, // endDate
                     ApplicationConstants.WORKKFLOW_EXAMPLE_TAG
@@ -252,11 +251,11 @@ public class ExecutionBusiness {
         try {
 
             List<Simulation> simulations = workflowBusiness.getSimulations(
-                    currentUserProvider.get().getFullName(),
+                    currentUserProvider.get().getEmail(),
                     null, // application
                     null, // status
-                    null, // class
                     null, // startDate
+                    null, // endDate
                     null // endDate
             );
             logger.debug("Counting executions, found {} simulations.", simulations.size());
