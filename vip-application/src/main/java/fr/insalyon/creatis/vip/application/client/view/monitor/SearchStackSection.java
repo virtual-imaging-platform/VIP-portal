@@ -62,7 +62,6 @@ public class SearchStackSection extends SectionStackSection {
     private SelectItem userItem;
     private SelectItem simulationItem;
     private SelectItem statusItem;
-    private SelectItem appClassItem;
     private DateItem startDateItem;
     private DateItem endDateItem;
     private IButton searchButton;
@@ -98,7 +97,6 @@ public class SearchStackSection extends SectionStackSection {
         userItem = new SelectItem("userFilter", "User");
         simulationItem = new SelectItem("simualtionFilter", "Application");
         statusItem = new SelectItem("statusFilter", "Status");
-        appClassItem = new SelectItem("classFilter", "Class");
 
         startDateItem = new DateItem("startDateFilter", "Start Date");
         startDateItem.setUseTextField(true);
@@ -121,9 +119,6 @@ public class SearchStackSection extends SectionStackSection {
                 String statusText = statusItem.getValueAsString();
                 simulationsTab.setStatus(statusText == null || statusText.isEmpty() || statusText.equals("All") ? null : statusText);
                 
-                String appClassText = appClassItem.getValueAsString();
-                simulationsTab.setAppClass(appClassText == null || appClassText.isEmpty() || appClassText.equals("All") ? null : appClassText);
-
                 Date startDateValue = startDateItem.getValueAsDate();
                 simulationsTab.setStartDate(startDateValue == null ? null : startDateValue);
 
@@ -140,14 +135,13 @@ public class SearchStackSection extends SectionStackSection {
                 userItem.setValue("All");
                 simulationItem.setValue("All");
                 statusItem.setValue("All");
-                appClassItem.setValue("All");
                 startDateItem.setValue("");
                 endDateItem.setValue("");
             }
         });
 
         form.setFields(userItem, startDateItem, simulationItem,
-                endDateItem, statusItem, appClassItem);
+                endDateItem, statusItem);
     }
 
     private void loadData() {
@@ -190,15 +184,6 @@ public class SearchStackSection extends SectionStackSection {
                 }
                 statusItem.setValueMap(statusMap);
                 statusItem.setValue("All");
-                
-                LinkedHashMap<String, String> appClassMap = new LinkedHashMap<String, String>();
-                appClassMap.put("All", "All");
-                for (String s : result[2]) {
-                    appClassMap.put(s, s);
-                }
-                appClassItem.setValueMap(appClassMap);
-                appClassItem.setValue("All");
-
             }
         };
         WidgetUtil.setLoadingIButton(searchButton, "Searching...");
