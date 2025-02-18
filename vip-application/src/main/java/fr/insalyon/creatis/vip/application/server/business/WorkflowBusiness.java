@@ -49,6 +49,7 @@ import fr.insalyon.creatis.vip.application.server.dao.SimulationStatsDAO;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
+import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
 import fr.insalyon.creatis.vip.core.server.business.EmailBusiness;
 import fr.insalyon.creatis.vip.core.server.business.Server;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
@@ -102,7 +103,9 @@ public class WorkflowBusiness {
     private final GRIDAPoolClient gridaPoolClient;
     private final GRIDAClient gridaClient;
     private final ExternalPlatformBusiness externalPlatformBusiness;
-    private final  WorkflowExecutionBusiness workflowExecutionBusiness;
+    private final WorkflowExecutionBusiness workflowExecutionBusiness;
+    private final ConfigurationBusiness configurationBusiness;
+    private final ClassBusiness classBusiness;
 
     @Autowired
     public WorkflowBusiness(
@@ -114,7 +117,8 @@ public class WorkflowBusiness {
             DataManagerBusiness dataManagerBusiness, EmailBusiness emailBusiness,
             LfcPathsBusiness lfcPathsBusiness, GRIDAPoolClient gridaPoolClient,
             GRIDAClient gridaClient, ExternalPlatformBusiness externalPlatformBusiness,
-            WorkflowExecutionBusiness workflowExecutionBusiness) {
+            WorkflowExecutionBusiness workflowExecutionBusiness, ConfigurationBusiness configurationBusiness,
+            ClassBusiness classBusiness) {
         this.server = server;
         this.simulationStatsDAO = simulationStatsDAO;
         this.workflowDAO = workflowDAO;
@@ -133,6 +137,8 @@ public class WorkflowBusiness {
         this.gridaClient = gridaClient;
         this.externalPlatformBusiness = externalPlatformBusiness;
         this.workflowExecutionBusiness = workflowExecutionBusiness;
+        this.configurationBusiness = configurationBusiness;
+        this.classBusiness = classBusiness;
     }
 
     /*
@@ -311,9 +317,7 @@ public class WorkflowBusiness {
         return parsedPath;
     }
 
-    public List<Simulation> getSimulations(User user, Date lastDate)
-            throws BusinessException {
-
+    public List<Simulation> getSimulations(User user, Date lastDate) throws BusinessException {
         try {
             return parseWorkflows(workflowDAO.get(user != null ? user.getFullName() : null, lastDate));
 
@@ -328,32 +332,43 @@ public class WorkflowBusiness {
      *
      */
     public List<Simulation> getSimulations(
-            String userName, String application, String status, String appClass,
+            String userEmail, String application, String status, String appClass,
             Date startDate, Date endDate) throws BusinessException {
+        
+        return getSimulations(userEmail, application, status, appClass, startDate, endDate, null);
+    }
 
-        return getSimulations(userName, application, status, appClass, startDate, endDate, null);
+    private List<Workflow> getSimulationsAdminGroup(String userEmail, List<String> filterApplications, 
+            WorkflowStatus filterStatus, String filterClass, Date filterStartDate, Date filterEndDate, String filterTag) throws WorkflowsDBDAOException, DAOException, BusinessException {
+        
+        List<String> classes = classBusiness.getUserClassesName(userEmail, true);
+        Set<String> adminApps = new HashSet<>();
+
+        for (Application app : applicationDAO.getApplicationsFromClasses(classes)) {
+            if (filterApplications.isEmpty() || filterApplications.contains(app.getName())) {
+                adminApps.add(app.getName()); 
+            }
+        }
+        if ( ! adminApps.isEmpty()) {
+            return workflowDAO.get(null, new ArrayList<>(adminApps), filterStatus, filterClass, filterStartDate, filterEndDate, filterTag);
+        } else {
+            return Collections.emptyList();
+        }
     }
 
     /**
      * Get the simulation information
-     *
      */
-    public List<Simulation> getSimulations(
-            String userName, String application, String status, String appClass,
-            Date startDate, Date endDate, String tag) throws BusinessException {
-
-        return getSimulations(
-                userName == null ? null : Collections.singletonList(userName),
-                application, status, appClass, startDate, endDate, tag);
-    }
-
-    /**
-     * Get the simulation information
-     */
-    public List<Simulation> getSimulations(
-            List<String> users, String application, String status,
+    public List<Simulation> getSimulations(String userEmail, String application, String status,
             String appClass, Date startDate, Date endDate, String tag)
             throws BusinessException {
+        
+        WorkflowStatus wStatus = (status != null) ? WorkflowStatus.valueOf(status) : null;
+        List<String> users = (userEmail != null) ? configurationBusiness.getUserNames(userEmail, true) : Collections.emptyList();
+        List<String> applications = (application != null) ? Collections.singletonList(application) : new ArrayList<>();
+
+        List<Simulation> simulations = new ArrayList<>();
+        Set<Workflow> workflows = new HashSet<>();
 
         try {
             if (endDate != null) {
@@ -363,18 +378,18 @@ public class WorkflowBusiness {
                 endDate = calendar.getTime();
             }
 
-            WorkflowStatus wStatus = null;
-            if (status != null) {
-                wStatus = WorkflowStatus.valueOf(status);
+            if (userEmail != null) {
+                workflows.addAll(getSimulationsAdminGroup(userEmail, applications, wStatus, appClass, startDate, endDate, tag));
             }
 
-            List<Simulation> simulations = parseWorkflows(
-                    workflowDAO.get(users, application, wStatus, appClass, startDate, endDate, tag));
+            workflows.addAll(workflowDAO.get(users, applications, wStatus, appClass, startDate, endDate, tag));
+
+            simulations = parseWorkflows(new ArrayList<>(workflows));
             checkRunningSimulations(simulations);
 
             return simulations;
 
-        } catch (WorkflowsDBDAOException ex) {
+        } catch (WorkflowsDBDAOException | DAOException ex) {
             logger.error("Error searching simulations for users {}", users, ex);
             throw new BusinessException(ex);
         }

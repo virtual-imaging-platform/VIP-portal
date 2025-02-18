@@ -32,7 +32,6 @@
 package fr.insalyon.creatis.vip.api.controller.processing;
 
 import fr.insalyon.creatis.vip.api.business.ExecutionBusiness;
-import fr.insalyon.creatis.vip.api.business.PipelineBusiness;
 import fr.insalyon.creatis.vip.api.controller.ApiController;
 import fr.insalyon.creatis.vip.api.exception.ApiException;
 import fr.insalyon.creatis.vip.api.exception.ApiException.ApiError;
@@ -59,14 +58,11 @@ public class ExecutionController extends ApiController {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-
     private final ExecutionBusiness executionBusiness;
-    private final PipelineBusiness pipelineBusiness;
 
     @Autowired
-    public ExecutionController(ExecutionBusiness executionBusiness, PipelineBusiness pipelineBusiness) {
+    public ExecutionController(ExecutionBusiness executionBusiness) {
         this.executionBusiness = executionBusiness;
-        this.pipelineBusiness = pipelineBusiness;
     }
 
     @RequestMapping

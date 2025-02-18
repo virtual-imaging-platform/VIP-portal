@@ -42,9 +42,10 @@ import fr.insalyon.creatis.vip.api.rest.config.RestTestUtils;
 import fr.insalyon.creatis.vip.application.client.view.monitor.SimulationStatus;
 import fr.insalyon.creatis.vip.application.server.business.simulation.ParameterSweep;
 import fr.insalyon.creatis.vip.application.server.business.util.FileUtil;
+import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.integrationtest.ServerMockConfig;
+
 import org.hamcrest.MatcherAssert;
-import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -52,12 +53,12 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.springframework.http.MediaType;
 
-import java.io.File;
 import java.util.*;
 
 import static fr.insalyon.creatis.vip.api.data.ExecutionTestUtils.*;
 import static fr.insalyon.creatis.vip.api.data.UserTestUtils.baseUser1;
 import static org.hamcrest.Matchers.*;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -86,9 +87,11 @@ public class ExecutionControllerIT extends BaseWebSpringIT {
     @Test
     @SuppressWarnings("unchecked")
     public void shouldListExecutions() throws Exception {
+        User user = createUser(baseUser1.getEmail());
+    
         when(workflowDAO.get(eq(simulation1.getID()))).thenReturn(w1, (Workflow) null);
         when(workflowDAO.get(eq(simulation2.getID()))).thenReturn(w2, (Workflow) null);
-        when(workflowDAO.get(Collections.singletonList(baseUser1.getFullName()), null, null, null, null, null, null))
+        when(workflowDAO.get(Collections.singletonList(user.getFullName()), new ArrayList<>(), null, null, null, null, null))
                 .thenReturn(Arrays.asList(w1, w2), (List<Workflow>) null);
 
         // perform a getWorkflows()
@@ -109,7 +112,9 @@ public class ExecutionControllerIT extends BaseWebSpringIT {
     @Test
     @SuppressWarnings("unchecked")
     public void shouldCountExecutions() throws Exception {
-        when(workflowDAO.get(Collections.singletonList(baseUser1.getFullName()), null, null, null, null, null, null))
+        User user = createUser(baseUser1.getEmail());
+
+        when(workflowDAO.get(Collections.singletonList(user.getFullName()), new ArrayList<>(), null, null, null, null, null))
                 .thenReturn(Arrays.asList(w1, w2), (List<Workflow>) null);
 
         // perform a getWorkflows()
@@ -238,7 +243,9 @@ public class ExecutionControllerIT extends BaseWebSpringIT {
 
     @Test
     public void shouldReturn500() throws Exception {
-        when(workflowDAO.get(Collections.singletonList(baseUser1.getFullName()), null, null, null, null, null, null)).thenThrow(new RuntimeException("test exception"));
+        User user = createUser(baseUser1.getEmail());
+
+        when(workflowDAO.get(Collections.singletonList(user.getFullName()), new ArrayList<>(), null, null, null, null, null)).thenThrow(new RuntimeException("test exception"));
 
         // perform a getWorkflows() with an undetermined error
         mockMvc.perform(
