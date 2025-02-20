@@ -28,7 +28,7 @@ public class EmailBusiness {
         } else {
             logger.info("SMA disabled, not sending email and logging it");
             logger.info("subject : {}", subject);
-            logger.info("recipients : {}", recipients);
+            logger.info("recipients : {}", (Object[])recipients);
             logger.info("content : {}", content);
         }
     }
