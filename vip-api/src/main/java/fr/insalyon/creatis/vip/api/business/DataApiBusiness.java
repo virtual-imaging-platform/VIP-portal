@@ -52,7 +52,6 @@ import fr.insalyon.creatis.vip.datamanager.server.business.LFCPermissionBusiness
 import fr.insalyon.creatis.vip.datamanager.server.business.TransferPoolBusiness;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.input.ReaderInputStream;
-import org.apache.commons.io.input.ReaderInputStream.Builder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -71,6 +70,7 @@ import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.concurrent.*;
 import java.util.function.Supplier;
 
@@ -150,26 +150,28 @@ public class DataApiBusiness {
         }
         PathProperties pathProperties = new PathProperties();
         pathProperties.setPath(path);
-        Data.Type type = baseGetPathInfo(path);
-        if (type == Data.Type.folder) { // path is a directory
-            pathProperties.setExists(true);
-            List<Data> fileData = baseGetFileData(path);
-            pathProperties.setIsDirectory(true);
-            pathProperties.setSize((long) fileData.size());
-            pathProperties.setLastModificationDate(
-                    baseGetFileModificationDate(path) / 1000);
-            pathProperties.setMimeType(env.getProperty(CarminProperties.API_DIRECTORY_MIME_TYPE));
-        } else if(type == Data.Type.file) { // path is a regular file
-            pathProperties.setExists(true);
-            List<Data> fileData = baseGetFileData(path);
+        Optional<Data.Type> type = baseGetPathInfo(path);
+        if (type.isEmpty()) { // path doesn't exist
+            pathProperties.setExists(false);
+            return pathProperties;
+        }
+        pathProperties.setExists(true);
+        List<Data> fileData = baseGetFileData(path);
+        if (type.get() == Data.Type.file) {
+            // this is a file, not a directory
             Data fileInfo = fileData.get(0);
             pathProperties.setIsDirectory(false);
             pathProperties.setSize(fileInfo.getLength());
             pathProperties.setLastModificationDate(
                     getTimeStampFromGridaFormatDate(fileInfo.getModificationDate()));
             pathProperties.setMimeType(getMimeType(path));
-        } else { // path does not exist
-            pathProperties.setExists(false);
+        } else {
+            // its a directory
+            pathProperties.setIsDirectory(true);
+            pathProperties.setSize((long) fileData.size());
+            pathProperties.setLastModificationDate(
+                baseGetFileModificationDate(path) / 1000);
+            pathProperties.setMimeType(env.getProperty(CarminProperties.API_DIRECTORY_MIME_TYPE));
         }
         return pathProperties;
     }
@@ -521,10 +523,11 @@ public class DataApiBusiness {
     }
 
     private boolean baseIsDirectory(String path) throws ApiException {
-        return baseGetPathInfo(path) == Data.Type.folder;
+        Optional<Type> type = baseGetPathInfo(path);
+        return type.isPresent() && type.get() == Data.Type.folder;
     }
 
-    private Data.Type baseGetPathInfo(String path) throws ApiException {
+    private Optional<Type> baseGetPathInfo(String path) throws ApiException {
         try {
             return lfcBusiness.getPathInfo(currentUserProvider.get(), path);
         } catch (BusinessException e) {

@@ -34,6 +34,7 @@ package fr.insalyon.creatis.vip.datamanager.server.business;
 import fr.insalyon.creatis.grida.client.GRIDAClient;
 import fr.insalyon.creatis.grida.client.GRIDAClientException;
 import fr.insalyon.creatis.grida.common.bean.GridData;
+import fr.insalyon.creatis.grida.common.bean.GridPathInfo;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.datamanager.client.bean.Data;
@@ -43,6 +44,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -159,10 +162,15 @@ public class LFCBusiness {
         }
     }
 
-    public Data.Type getPathInfo(User user, String path) throws BusinessException {
+    public Optional<Data.Type> getPathInfo(User user, String path) throws BusinessException {
         try {
-            GridData.Type type = gridaClient.getPathInfo(lfcPathsBusiness.parseBaseDir(user, path));
-            return Data.Type.valueOf(type.name().toLowerCase());
+            // convert GridPathInfo to an Optional<Data.Type> to avoid a new structure in vip.datamanager
+            GridPathInfo pathInfo = gridaClient.getPathInfo(lfcPathsBusiness.parseBaseDir(user, path));
+            if (pathInfo.exist()) {
+                return Optional.of(Data.Type.valueOf(pathInfo.getType().name().toLowerCase()));
+            } else {
+                return Optional.empty();
+            }
         } catch (GRIDAClientException ex) {
             logger.error("Error getting path info {} for {}", path, user, ex);
             throw new BusinessException(ex);
