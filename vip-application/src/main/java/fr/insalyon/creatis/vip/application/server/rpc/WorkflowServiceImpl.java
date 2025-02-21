@@ -250,7 +250,7 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
             if (parametersMap.containsKey(CoreConstants.RESULTS_DIRECTORY_PARAM_NAME)) {
                 String resultDir = parametersMap.get(CoreConstants.RESULTS_DIRECTORY_PARAM_NAME);
                 if (resultDir.startsWith("/") || resultDir.startsWith("lfn:")) {
-                    DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy_HH:mm:ss");
+                    DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy_HHmmss");
                     resultDir = resultDir + "/" + (dateFormat.format(System.currentTimeMillis()));
                     parametersMap.put(CoreConstants.RESULTS_DIRECTORY_PARAM_NAME, resultDir);
                     logger.info("For MoteurLite : changing results-directory to : {}", resultDir);
