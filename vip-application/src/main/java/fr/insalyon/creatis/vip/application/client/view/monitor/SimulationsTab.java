@@ -182,7 +182,8 @@ public class SimulationsTab extends Tab {
                             || CoreModule.user.isSystemAdministrator()
                             || CoreModule.user.isGroupAdmin()) {
 
-                        dataList.add(new SimulationRecord(
+                        if (user == null || (user == simulation.getUserName())) {
+                            dataList.add(new SimulationRecord(
                                 simulation.getSimulationName(),
                                 simulation.getApplicationName(),
                                 simulation.getApplicationVersion(),
@@ -191,6 +192,7 @@ public class SimulationsTab extends Tab {
                                 simulation.getID(),
                                 simulation.getUserName(),
                                 simulation.getDate()));
+                        }
                     }
                 }
                 grid.setData(dataList.toArray(new SimulationRecord[]{}));
