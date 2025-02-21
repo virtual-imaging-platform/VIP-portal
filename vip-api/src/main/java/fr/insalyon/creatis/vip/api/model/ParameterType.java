@@ -49,12 +49,11 @@ public enum ParameterType {
         if (boutiquesInput.getList() != null && boutiquesInput.getList()) {
             return List;
         }
-        switch (boutiquesInput.getType()) {
-            case FILE: return File;
-            case STRING: return String;
-            case FLAG: return Boolean;
-            case NUMBER: return boutiquesInput.getInteger() ? Int64 : Double;
-        }
-        return null;
+        return switch (boutiquesInput.getType()) {
+            case FILE -> File;
+            case STRING -> String;
+            case FLAG -> Boolean;
+            case NUMBER -> (boutiquesInput.getInteger() != null && boutiquesInput.getInteger()) ? Int64 : Double;
+        };
     }
 }
