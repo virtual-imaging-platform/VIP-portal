@@ -89,10 +89,9 @@ public class ExecutionControllerIT extends BaseWebSpringIT {
     public void shouldListExecutions() throws Exception {
         User user = createUser(baseUser1.getEmail());
     
-        when(workflowDAO.get(eq(simulation1.getID()))).thenReturn(w1, (Workflow) null);
-        when(workflowDAO.get(eq(simulation2.getID()))).thenReturn(w2, (Workflow) null);
         when(workflowDAO.get(Collections.singletonList(user.getFullName()), new ArrayList<>(), null, null, null, null, null))
-                .thenReturn(Arrays.asList(w1, w2), (List<Workflow>) null);
+                .thenReturn(Arrays.asList(w1, w2))
+                .thenReturn(null);
 
         // perform a getWorkflows()
         mockMvc.perform(
