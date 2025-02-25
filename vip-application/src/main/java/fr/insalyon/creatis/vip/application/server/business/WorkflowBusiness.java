@@ -299,9 +299,8 @@ public class WorkflowBusiness {
             return parseResult.result;
         }
         // not an external platform parameter, use legacy format
-        String parsedPath = lfcPathsBusiness.parseBaseDir(
-                user, parameterValue);
-        if (!user.isSystemAdministrator()) {
+        String parsedPath = lfcPathsBusiness.parseBaseDir(user, parameterValue);
+        if ( ! user.isSystemAdministrator()) {
             checkFolderACL(user, groups, parsedPath);
         }
         if ( ! parsedPath.equals(parameterValue) // the parameter is a file path
