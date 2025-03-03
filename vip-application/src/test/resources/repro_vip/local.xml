@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<inputdata>
+    <source name="file" type="String">
+        <array>
+            <item><tag name="Group" value="0" />file:/var/www/html/workflows/SharedData/users/admin_test/API/relaunch-68c215ea/INPUTS/basic-grep-slow-multi.json</item>
+        </array>
+    </source>
+    <source name="text" type="String">
+        <array>
+            <item><tag name="Group" value="0" />out</item>
+        </array>
+    </source>
+    <source name="results-directory" type="String">
+        <array>
+            <item><tag name="Group" value="0" />file:/var/www/html/workflows/SharedData/users/admin_test/API/relaunch-68c215ea/OUTPUTS</item>
+        </array>
+    </source>
+    <source name="int" type="String">
+        <array>
+            <item><tag name="Group" value="0" />1</item>
+        </array>
+    </source>
+</inputdata>

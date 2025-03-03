@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<inputdata>
+    <source name="file" type="String">
+        <array>
+            <item><tag name="Group" value="0" />girder:/examplefile?apiurl=https://example.girder/api/v1&amp;fileId=67a9dbe114e0b189e3412e10&amp;token=ZENYTxee0qi05Anu6crGfB6ydC82noYTZ4Ih18vsCus1QQPLkcZVuXxzi56lYA6k</item>
+            <item><tag name="Group" value="0" />girder:/examplebis?apiurl=https://example.girder/api/v1&amp;fileId=67a9dbe114e0dw89e3412e10&amp;token=ZENYTxee0qi05Anu6crGfB6ydC82noYTZ4Ih18vsCus1QQPLkcZVuXxzi56lYA6k</item>
+        </array>
+    </source>
+    <source name="text" type="String">
+        <array>
+            <item><tag name="Group" value="0" />out</item>
+        </array>
+    </source>
+    <source name="results-directory" type="String">
+        <array>
+            <item><tag name="Group" value="0" />girder:/exampledir?apiurl=https://example.girder/api/v1&amp;fileId=67a9dbe114e0b189e3412e25&amp;token=ZENYTxee0qi05Anu6crGfB6ydC82noYTZ4Ih18vsCus1QQPLkcZVuXxzi56lYA6k</item>
+        </array>
+    </source>
+    <source name="int" type="String">
+        <array>
+            <item><tag name="Group" value="0" />1</item>
+        </array>
+    </source>
+</inputdata>

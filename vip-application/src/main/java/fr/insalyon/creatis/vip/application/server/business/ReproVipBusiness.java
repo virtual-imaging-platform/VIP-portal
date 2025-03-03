@@ -1,8 +1,11 @@
 package fr.insalyon.creatis.vip.application.server.business;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import fr.insalyon.creatis.vip.application.client.bean.AppVersion;
 import fr.insalyon.creatis.vip.application.client.bean.Simulation;
+import fr.insalyon.creatis.vip.application.server.business.simulation.parser.InputM2Parser;
+import fr.insalyon.creatis.vip.application.server.business.util.ReproVipUtils;
 import fr.insalyon.creatis.vip.application.server.dao.PublicExecutionDAO;
 import fr.insalyon.creatis.vip.core.client.bean.PublicExecution;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
@@ -10,6 +13,9 @@ import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
 import fr.insalyon.creatis.vip.core.server.business.EmailBusiness;
 import fr.insalyon.creatis.vip.core.server.business.Server;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
+import fr.insalyon.creatis.vip.datamanager.server.business.ExternalPlatformBusiness;
+import fr.insalyon.creatis.vip.datamanager.server.business.LfcPathsBusiness;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,26 +39,30 @@ public class ReproVipBusiness {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    private final ConfigurationBusiness configurationBusiness;
     private final ApplicationBusiness applicationBusiness;
-    private final EmailBusiness emailBusiness;
     private final Server server;
     private final SimulationBusiness simulationBusiness;
     private final PublicExecutionDAO publicExecutionDAO;
     private final WorkflowBusiness workflowBusiness;
+    private final ConfigurationBusiness configurationBusiness;
+    private final EmailBusiness emailBusiness;
+    private final LfcPathsBusiness lfcPathsBusiness;
+    private final ExternalPlatformBusiness externalPlatformBusiness;
 
     @Autowired
-    public ReproVipBusiness(
-            ConfigurationBusiness configurationBusiness, ApplicationBusiness applicationBusiness,
-            EmailBusiness emailBusiness, Server server, SimulationBusiness simulationBusiness,
-            PublicExecutionDAO publicExecutionDAO, WorkflowBusiness workflowBusiness) {
-        this.configurationBusiness = configurationBusiness;
+    public ReproVipBusiness(ApplicationBusiness applicationBusiness, Server server, SimulationBusiness simulationBusiness,
+            PublicExecutionDAO publicExecutionDAO, WorkflowBusiness workflowBusiness,
+            LfcPathsBusiness lfcPathsBusiness, ExternalPlatformBusiness externalPlatformBusiness,
+            ConfigurationBusiness configurationBusiness, EmailBusiness emailBusiness) {
         this.applicationBusiness = applicationBusiness;
-        this.emailBusiness = emailBusiness;
         this.server = server;
         this.simulationBusiness = simulationBusiness;
         this.publicExecutionDAO = publicExecutionDAO;
         this.workflowBusiness = workflowBusiness;
+        this.lfcPathsBusiness = lfcPathsBusiness;
+        this.externalPlatformBusiness = externalPlatformBusiness;
+        this.configurationBusiness = configurationBusiness;
+        this.emailBusiness = emailBusiness;
     }
 
     public void createPublicExecution(PublicExecution publicExecution) throws BusinessException {
@@ -150,6 +160,8 @@ public class ReproVipBusiness {
             throw new BusinessException("Error creating a reprovip directory", e);
         }
         List<Path> provenanceFiles = copyProvenanceFiles(reproVipDir, publicExecution.getId());
+        
+        generateWorkflowInputJson(executionID, publicExecution.getAuthor());
         return generateReprovipJson(reproVipDir, publicExecution, provenanceFiles);
     }
 
@@ -260,6 +272,19 @@ public class ReproVipBusiness {
             logger.error("Error saving reprovip metadata file for {}", publicExecution.getId(), e);
             throw new BusinessException("Failed to save JSON to file", e);
         }
+    }
+
+    public void generateWorkflowInputJson(String workflow_id, String author) throws BusinessException {
+        ReproVipUtils utils = new ReproVipUtils(externalPlatformBusiness, server.getHostURL());
+        InputM2Parser parser = new InputM2Parser(author);
+        parser.setLfcPathsBusiness(lfcPathsBusiness);
+
+        Map<String, String> inputs = parser.parse(server.getWorkflowsPath() + "/" + workflow_id + "/inputs.xml");
+        Map<String, Object> json = new HashMap<>();
+
+        utils.parse(inputs);
+        json.put("provider", utils.getProviderInformations());
+        json.put("inputs", utils.getSimplifiedInputs());
     }
 
     public String getBoutiquesDescriptorJsonPath(String applicationName, String applicationVersion) throws BusinessException {
