@@ -19,6 +19,8 @@ import fr.insalyon.creatis.vip.datamanager.server.business.LfcPathsBusiness;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -161,7 +163,8 @@ public class ReproVipBusiness {
         }
         List<Path> provenanceFiles = copyProvenanceFiles(reproVipDir, publicExecution.getId());
         
-        generateWorkflowInputJson(executionID, publicExecution.getAuthor());
+        generateWorkflowInputJson(executionID, publicExecution.getAuthor(), reproVipDir);
+        copyReadme(reproVipDir);
         return generateReprovipJson(reproVipDir, publicExecution, provenanceFiles);
     }
 
@@ -274,7 +277,8 @@ public class ReproVipBusiness {
         }
     }
 
-    public void generateWorkflowInputJson(String workflow_id, String author) throws BusinessException {
+    public void generateWorkflowInputJson(String workflow_id, String author, Path reproVipDir) throws BusinessException {
+        ObjectMapper mapper = new ObjectMapper();
         ReproVipUtils utils = new ReproVipUtils(externalPlatformBusiness, server.getHostURL());
         InputM2Parser parser = new InputM2Parser(author);
         parser.setLfcPathsBusiness(lfcPathsBusiness);
@@ -285,6 +289,24 @@ public class ReproVipBusiness {
         utils.parse(inputs);
         json.put("provider", utils.getProviderInformations());
         json.put("inputs", utils.getSimplifiedInputs());
+
+        try {
+            Files.writeString(reproVipDir.resolve("inputs.json"), mapper.writeValueAsString(json));
+        } catch (IOException e) {
+            logger.error("Error saving reprovip inputs file for {}", workflow_id, e);
+            throw new BusinessException("Failed to save inputs JSON to file", e);
+        }
+    }
+
+    public void copyReadme(Path reproVipDir) throws BusinessException {
+        try {
+            Resource resource = new ClassPathResource("repro_vip.md");
+            Path destination = reproVipDir.resolve("README.md");
+
+            Files.copy(resource.getInputStream(), destination);
+        } catch (IOException e) {
+            throw new BusinessException("Cannot copy the README.md", e);
+        }
     }
 
     public String getBoutiquesDescriptorJsonPath(String applicationName, String applicationVersion) throws BusinessException {
