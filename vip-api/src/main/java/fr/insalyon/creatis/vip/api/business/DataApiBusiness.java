@@ -42,7 +42,6 @@ import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.business.Server;
 import fr.insalyon.creatis.vip.datamanager.client.bean.Data;
-import fr.insalyon.creatis.vip.datamanager.client.bean.Data.Type;
 import fr.insalyon.creatis.vip.datamanager.client.bean.PoolOperation;
 import fr.insalyon.creatis.vip.datamanager.server.DataManagerUtil;
 import fr.insalyon.creatis.vip.datamanager.server.business.DataManagerBusiness;
@@ -157,7 +156,7 @@ public class DataApiBusiness {
         }
         pathProperties.setExists(true);
         List<Data> fileData = baseGetFileData(path);
-        if (type.get() == Data.Type.file) {
+        if (type.get().equals(Data.Type.file)) {
             // this is a file, not a directory
             Data fileInfo = fileData.get(0);
             pathProperties.setIsDirectory(false);
@@ -272,11 +271,17 @@ public class DataApiBusiness {
             logger.error("cannot download root ({})", path);
             throw new ApiException("Illegal data API access");
         }
-        if (baseIsDirectory(path)) {
+        Optional<Data.Type> type = baseGetPathInfo(path);
+        if (!type.isPresent()) { // path doesn't exist
+            logger.error("Trying to download a non-existing file ({})", path);
+            throw new ApiException("Illegal data API access");
+        }
+        if (!type.get().equals(Data.Type.folder)) {
             // it works on a directory and return a zip, but we cant check the download size
             logger.error("Trying to download a directory ({})", path);
             throw new ApiException("Illegal data API access");
         }
+        // path exists and is a file: check its size
         List<Data> fileData = baseGetFileData(path);
         Long maxSize = env.getRequiredProperty(CarminProperties.API_DATA_TRANSFERT_MAX_SIZE, Long.class);
         if (fileData.get(0).getLength() > maxSize) {
@@ -475,8 +480,8 @@ public class DataApiBusiness {
         pathProperties.setSize(lfcData.getLength());
         pathProperties.setLastModificationDate(
                 getTimeStampFromGridaFormatDate(lfcData.getModificationDate()));
-        boolean isDirectory = lfcData.getType().equals(Type.folder)
-                || lfcData.getType().equals(Type.folderSync);
+        boolean isDirectory = lfcData.getType().equals(Data.Type.folder)
+                || lfcData.getType().equals(Data.Type.folderSync);
         pathProperties.setIsDirectory(isDirectory);
         if (isDirectory) {
             pathProperties.setMimeType(env.getProperty(CarminProperties.API_DIRECTORY_MIME_TYPE));
@@ -523,11 +528,11 @@ public class DataApiBusiness {
     }
 
     private boolean baseIsDirectory(String path) throws ApiException {
-        Optional<Type> type = baseGetPathInfo(path);
-        return type.isPresent() && type.get() == Data.Type.folder;
+        Optional<Data.Type> type = baseGetPathInfo(path);
+        return type.isPresent() && type.get().equals(Data.Type.folder);
     }
 
-    private Optional<Type> baseGetPathInfo(String path) throws ApiException {
+    private Optional<Data.Type> baseGetPathInfo(String path) throws ApiException {
         try {
             return lfcBusiness.getPathInfo(currentUserProvider.get(), path);
         } catch (BusinessException e) {
