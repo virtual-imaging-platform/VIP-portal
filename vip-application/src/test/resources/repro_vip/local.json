@@ -1,7 +1,7 @@
 {
     "provider": {
-        "vip": "localhost",
-        "type": "LOCAL"
+        "vip_url": "localhost",
+        "storage_type": "LOCAL"
     },
     "inputs": {
         "file": [

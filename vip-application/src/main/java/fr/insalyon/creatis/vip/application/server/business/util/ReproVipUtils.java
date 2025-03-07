@@ -36,7 +36,7 @@ public class ReproVipUtils {
         this.providerInformations = new LinkedHashMap<>();
         this.simplifiedInputs = new LinkedHashMap<>();
 
-        this.providerInformations.put("vip", vipURL);
+        this.providerInformations.put("vip_url", vipURL);
     }
 
     public void parse(Map<String, String> inputs) throws BusinessException {
@@ -44,11 +44,11 @@ public class ReproVipUtils {
 
         Pair<ProviderType, Map<String, List<String>>> type = detectType(expandedInputs);
         
-        providerInformations.put("type", type.getA().toString());
+        providerInformations.put("storage_type", type.getA().toString());
         switch (type.getA()) {
             case GIRDER:
                 providerInformations.putAll(getGirderInformations(type.getB()));
-                simplifiedInputs = getGirderInputs(providerInformations.get("id"), expandedInputs, type.getB().keySet());
+                simplifiedInputs = getGirderInputs(providerInformations.get("storage_id"), expandedInputs, type.getB().keySet());
                 break;
             case LOCAL:
                 providerInformations.putAll(getLocalInformations(type.getB()));
@@ -102,8 +102,8 @@ public class ReproVipUtils {
             uris.add(transformURItoMap(uri));
         }
         
-        result.put("url", getGirderURL(uris.getFirst()));
-        result.put("id", getGirderVIPID(uris.getFirst()));
+        result.put("storage_url", getGirderURL(uris.getFirst()));
+        result.put("storage_id", getGirderVIPID(uris.getFirst()));
         return result;
     }
 

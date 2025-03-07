@@ -1,9 +1,9 @@
 {
     "provider": {
-        "vip": "localhost",
-        "type": "GIRDER",
-        "id": "testGirder",
-        "url": "https://example.girder"
+        "vip_url": "localhost",
+        "storage_type": "GIRDER",
+        "storage_id": "testGirder",
+        "storage_url": "https://example.girder"
     },
     "inputs": {
         "file": [
