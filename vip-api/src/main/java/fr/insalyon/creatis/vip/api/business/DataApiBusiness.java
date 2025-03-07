@@ -180,7 +180,12 @@ public class DataApiBusiness {
         if (path.equals(ROOT)) {
             return getRootSubDirectoriesPathProps();
         }
-        if (!baseIsDirectory(path)) {
+        Optional<Data.Type> type = baseGetPathInfo(path);
+        if (!type.isPresent()) { // path doesn't exist
+            logger.error("Trying to list a non-existing path ({})", path);
+            throw new ApiException("Error listing a directory");
+        }
+        if (!type.get().equals(Data.Type.folder)) {
             logger.error("Trying to list {} , but is a file :", path);
             throw new ApiException("Error listing a directory");
         }
@@ -525,11 +530,6 @@ public class DataApiBusiness {
         } catch (BusinessException e) {
             throw new ApiException("Error testing file existence", e);
         }
-    }
-
-    private boolean baseIsDirectory(String path) throws ApiException {
-        Optional<Data.Type> type = baseGetPathInfo(path);
-        return type.isPresent() && type.get().equals(Data.Type.folder);
     }
 
     private Optional<Data.Type> baseGetPathInfo(String path) throws ApiException {
