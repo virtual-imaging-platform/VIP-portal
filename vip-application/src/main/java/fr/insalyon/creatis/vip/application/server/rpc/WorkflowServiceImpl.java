@@ -218,7 +218,6 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
             for (Map.Entry<String,String> p : parametersMap.entrySet()) {
                 logger.info("received param {} : {}", p.getKey(), p.getValue());
             }
-            addTimestampedSubDirectoryIfNecessary(parametersMap);
 
             String simulationID = workflowBusiness.launch(
                 user, groups,
@@ -229,24 +228,6 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
 
         } catch (BusinessException | CoreException ex) {
             throw new ApplicationException(ex);
-        }
-    }
-
-    private void addTimestampedSubDirectoryIfNecessary(Map<String, String> parametersMap) {
-        if (server.useMoteurlite()) {
-            if (parametersMap.containsKey(CoreConstants.RESULTS_DIRECTORY_PARAM_NAME)) {
-                String resultDir = parametersMap.get(CoreConstants.RESULTS_DIRECTORY_PARAM_NAME);
-                if (resultDir.startsWith("/") || resultDir.startsWith("lfn:")) {
-                    DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy_HH:mm:ss");
-                    resultDir = resultDir + "/" + (dateFormat.format(System.currentTimeMillis()));
-                    parametersMap.put(CoreConstants.RESULTS_DIRECTORY_PARAM_NAME, resultDir);
-                    logger.info("For MoteurLite : changing results-directory to : {}", resultDir);
-                } else {
-                    logger.info("Using MoteurLite but results-directory not a LFN ({})", resultDir);
-                }
-            } else {
-                logger.info("Using MoteurLite but no results-directory given -> no subdirectory added");
-            }
         }
     }
 

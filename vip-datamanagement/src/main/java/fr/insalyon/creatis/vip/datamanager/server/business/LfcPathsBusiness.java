@@ -99,6 +99,8 @@ public class LfcPathsBusiness {
 
         if (baseDir.startsWith("lfn://")) {
             baseDir = URI.create(baseDir).getPath();
+        } else if (baseDir.startsWith("file:")) {
+            baseDir = baseDir.substring(5,  baseDir.length());
         }
 
         baseDir = replaceLfnUserPrefix(
@@ -123,14 +125,15 @@ public class LfcPathsBusiness {
     }
 
     private String replaceLfnUserPrefix(String path, String currentUserFolder, String... prefixesToReplace) {
+
         String prefixToReplace = null;
         for (String prefixToTest : prefixesToReplace) {
-            if (prefixToTest != null && !prefixToTest.isEmpty()
-                    && path.contains(prefixToTest)) {
+            if (prefixToTest != null && !prefixToTest.isEmpty() && path.contains(prefixToTest)) {
                 prefixToReplace = prefixToTest;
                 break;
             }
         }
+
         if (prefixToReplace != null) {
             path = path.replace(prefixToReplace + "/", "");
 

@@ -55,7 +55,7 @@ knowledge of the CeCILL-B license and that you accept its terms.
 
         <!-- VIP related dependencies version -->
         <moteur2-workflowsdb-common.version>1.8.0-SNAPSHOT</moteur2-workflowsdb-common.version>
-        <grida.version>2.2.0</grida.version>
+        <grida.version>2.3.0-SNAPSHOT</grida.version>
         <sma.version>0.3.0</sma.version>
 
         <!-- 3rd party dependencies version -->
