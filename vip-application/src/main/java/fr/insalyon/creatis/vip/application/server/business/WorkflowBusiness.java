@@ -369,7 +369,7 @@ public class WorkflowBusiness {
             }
 
             List<Simulation> simulations = parseWorkflows(
-                    workflowDAO.get(users, application, wStatus, appClass, startDate, endDate, tag));
+                    workflowDAO.get(users, Arrays.asList(application), wStatus, appClass, startDate, endDate, tag));
             checkRunningSimulations(simulations);
 
             return simulations;
