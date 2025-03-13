@@ -89,7 +89,7 @@ public class ExecutionControllerIT extends BaseWebSpringIT {
     public void shouldListExecutions() throws Exception {
         when(workflowDAO.get(eq(simulation1.getID()))).thenReturn(w1, (Workflow) null);
         when(workflowDAO.get(eq(simulation2.getID()))).thenReturn(w2, (Workflow) null);
-        when(workflowDAO.get(Collections.singletonList(baseUser1.getFullName()), null, null, null, null, null, null))
+        when(workflowDAO.get(Collections.singletonList(baseUser1.getFullName()), Arrays.asList((String) null), null, null, null, null, null))
                 .thenReturn(Arrays.asList(w1, w2), (List<Workflow>) null);
 
         // perform a getWorkflows()
@@ -110,7 +110,7 @@ public class ExecutionControllerIT extends BaseWebSpringIT {
     @Test
     @SuppressWarnings("unchecked")
     public void shouldCountExecutions() throws Exception {
-        when(workflowDAO.get(Collections.singletonList(baseUser1.getFullName()), null, null, null, null, null, null))
+        when(workflowDAO.get(Collections.singletonList(baseUser1.getFullName()), Arrays.asList((String) null), null, null, null, null, null))
                 .thenReturn(Arrays.asList(w1, w2), (List<Workflow>) null);
 
         // perform a getWorkflows()
@@ -239,7 +239,7 @@ public class ExecutionControllerIT extends BaseWebSpringIT {
 
     @Test
     public void shouldReturn500() throws Exception {
-        when(workflowDAO.get(Collections.singletonList(baseUser1.getFullName()), null, null, null, null, null, null)).thenThrow(new RuntimeException("test exception"));
+        when(workflowDAO.get(Collections.singletonList(baseUser1.getFullName()), Arrays.asList((String) null), null, null, null, null, null)).thenThrow(new RuntimeException("test exception"));
 
         // perform a getWorkflows() with an undetermined error
         mockMvc.perform(
