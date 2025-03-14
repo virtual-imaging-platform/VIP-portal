@@ -200,7 +200,7 @@ public class ExecutionBusiness {
         try {
 
             List<Simulation> simulations = workflowBusiness.getSimulations(
-                    currentUserProvider.get().getEmail(),
+                    currentUserProvider.get().getFullName(),
                     null, // application
                     null, // status
                     null, // class
@@ -252,7 +252,7 @@ public class ExecutionBusiness {
         try {
 
             List<Simulation> simulations = workflowBusiness.getSimulations(
-                    currentUserProvider.get().getEmail(),
+                    currentUserProvider.get().getFullName(),
                     null, // application
                     null, // status
                     null, // class

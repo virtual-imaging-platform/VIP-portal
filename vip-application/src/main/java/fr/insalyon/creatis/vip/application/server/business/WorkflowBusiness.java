@@ -326,15 +326,35 @@ public class WorkflowBusiness {
         }
     }
 
-    /**
-     * Get the simulation information
-     *
-     */
-    public List<Simulation> getSimulations(
-            String userEmail, String application, String status, String appClass,
+    public List<Simulation> getSimulations(String userName, String application, String status, String appClass,
             Date startDate, Date endDate) throws BusinessException {
         
-        return getSimulations(userEmail, application, status, appClass, startDate, endDate, null);
+        return getSimulations(userName, application, status, appClass, startDate, endDate, null);
+    }
+
+    public List<Simulation> getSimulations(String userName, String application, String status, String appClass, Date startDate, Date endDate, String tag) throws BusinessException {
+        WorkflowStatus wStatus = (status != null) ? WorkflowStatus.valueOf(status) : null;
+        List<String> users = (userName != null) ? Collections.singletonList(userName) : Collections.emptyList();
+        List<String> applications = (application != null) ? Collections.singletonList(application) : new ArrayList<>();
+        List<Simulation> simulations = new ArrayList<>();
+
+        try {
+            if (endDate != null) {
+                Calendar calendar = Calendar.getInstance();
+                calendar.setTime(endDate);
+                calendar.add(Calendar.DATE, 1);
+                endDate = calendar.getTime();
+            }
+
+            simulations = parseWorkflows(workflowDAO.get(users, applications, wStatus, appClass, startDate, endDate, tag));
+            checkRunningSimulations(simulations);
+
+            return simulations;
+
+        } catch (WorkflowsDBDAOException ex) {
+            logger.error("Error searching simulations for users {}", users, ex);
+            throw new BusinessException(ex);
+        }
     }
 
     private List<Workflow> getSimulationsAdminGroup(String userEmail, List<String> filterApplications, 
@@ -355,15 +375,12 @@ public class WorkflowBusiness {
         }
     }
 
-    /**
-     * Get the simulation information
-     */
-    public List<Simulation> getSimulations(String userEmail, String application, String status,
+    public List<Simulation> getSimulationsWithGroupAdminRights(User user, String application, String status,
             String appClass, Date startDate, Date endDate, String tag)
             throws BusinessException {
         
         WorkflowStatus wStatus = (status != null) ? WorkflowStatus.valueOf(status) : null;
-        List<String> users = (userEmail != null) ? configurationBusiness.getUserNames(userEmail, true) : Collections.emptyList();
+        List<String> users = List.of(user.getFullName());
         List<String> applications = (application != null) ? Collections.singletonList(application) : new ArrayList<>();
 
         List<Simulation> simulations = new ArrayList<>();
@@ -377,10 +394,7 @@ public class WorkflowBusiness {
                 endDate = calendar.getTime();
             }
 
-            if (userEmail != null) {
-                workflows.addAll(getSimulationsAdminGroup(userEmail, applications, wStatus, appClass, startDate, endDate, tag));
-            }
-
+            workflows.addAll(getSimulationsAdminGroup(user.getEmail(), applications, wStatus, appClass, startDate, endDate, tag));
             workflows.addAll(workflowDAO.get(users, applications, wStatus, appClass, startDate, endDate, tag));
 
             simulations = parseWorkflows(new ArrayList<>(workflows));

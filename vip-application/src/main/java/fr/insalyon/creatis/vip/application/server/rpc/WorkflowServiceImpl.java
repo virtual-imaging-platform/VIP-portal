@@ -140,14 +140,16 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
      * @throws ApplicationException
      */
     @Override
-    public List<Simulation> getSimulations(String userEmail, String application,
+    public List<Simulation> getSimulations(String userName, String application,
             String status, String appClass, Date startDate, Date endDate) throws ApplicationException {
         try {
             User user = getSessionUser();
-            if (user.isSystemAdministrator()) {
-                return workflowBusiness.getSimulations(userEmail, application, status, appClass, startDate, endDate);
+            if (user.isSystemAdministrator() || (userName != null && userName.equalsIgnoreCase(user.getFullName()))) {
+                return workflowBusiness.getSimulations(userName, application, status, appClass, startDate, endDate);
+            } else if (userName == null) {
+                return workflowBusiness.getSimulationsWithGroupAdminRights(user, application, status, appClass, startDate, endDate, null);
             } else {
-                return workflowBusiness.getSimulations(user.getEmail(), application, status, appClass, startDate, endDate);
+                throw new ApplicationException("You can't see another person's simulation!");
             }
         } catch (BusinessException | CoreException ex) {
             throw new ApplicationException(ex);
