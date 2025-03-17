@@ -183,7 +183,7 @@ public class SimulationsTab extends Tab {
                             || CoreModule.user.isSystemAdministrator()
                             || CoreModule.user.isGroupAdmin()) {
 
-                        if (user == null || (user == simulation.getUserName())) {
+                        if (user == null || (user.equals(simulation.getUserName()))) {
                             dataList.add(new SimulationRecord(
                                 simulation.getSimulationName(),
                                 simulation.getApplicationName(),
