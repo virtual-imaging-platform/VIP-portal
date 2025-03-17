@@ -102,7 +102,7 @@ public class WorkflowBusiness {
     private final GRIDAPoolClient gridaPoolClient;
     private final GRIDAClient gridaClient;
     private final ExternalPlatformBusiness externalPlatformBusiness;
-    private final  WorkflowExecutionBusiness workflowExecutionBusiness;
+    private final WorkflowExecutionBusiness workflowExecutionBusiness;
 
     @Autowired
     public WorkflowBusiness(

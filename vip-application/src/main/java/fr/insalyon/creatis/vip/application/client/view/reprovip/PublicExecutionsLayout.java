@@ -9,7 +9,6 @@ import com.smartgwt.client.widgets.grid.events.RowContextClickEvent;
 import com.smartgwt.client.widgets.grid.events.RowContextClickHandler;
 import com.smartgwt.client.widgets.layout.VLayout;
 import fr.insalyon.creatis.vip.application.client.rpc.ReproVipService;
-import fr.insalyon.creatis.vip.application.client.view.system.application.ExecutionsRecord;
 import fr.insalyon.creatis.vip.core.client.bean.PublicExecution;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
@@ -23,7 +22,6 @@ public class PublicExecutionsLayout extends VLayout {
     private ListGrid grid;
 
     public PublicExecutionsLayout() {
-
         this.setWidth100();
         this.setHeight100();
         this.setOverflow(Overflow.AUTO);
@@ -38,8 +36,8 @@ public class PublicExecutionsLayout extends VLayout {
     }
 
     private void configureGrid() {
-
         grid = new ListGrid();
+
         grid.setWidth100();
         grid.setHeight100();
         grid.setShowAllRecords(false);
@@ -47,27 +45,27 @@ public class PublicExecutionsLayout extends VLayout {
         grid.setShowEmptyMessage(true);
         grid.setEmptyMessage("<br>No data available.");
         grid.setFields(
-                new ListGridField("id", "Execution ID"),
-                new ListGridField("simulation_name", "Execution Simulation Name"),
-                new ListGridField("application_name", "Execution Application Name"),
-                new ListGridField("version", "Version"),
+                new ListGridField("experience_name", "Experience Name"),
+                new ListGridField("workflows_ids", "Workflows IDs"),
+                new ListGridField("applications_names", "Applications Names"),
+                new ListGridField("applications_versions", "Applications Versions"),
                 new ListGridField("status", "Status"),
                 new ListGridField("author", "Author"),
-                new ListGridField("comments", "Comments"));
+                new ListGridField("comments", "Comments"),
+                new ListGridField("doi", "DOI"));
 
         grid.addRowContextClickHandler(new RowContextClickHandler() {
             @Override
             public void onRowContextClick(RowContextClickEvent event) {
                 event.cancel();
                 ListGridRecord selectedRecord = grid.getSelectedRecord();
-                String executionId = selectedRecord.getAttribute("id");
+                String experienceName = selectedRecord.getAttribute("experience_name");
                 PublicExecution.PublicExecutionStatus status =
                         PublicExecution.PublicExecutionStatus.valueOf(selectedRecord.getAttribute("status"));
 
-                new PublicExecutionsContextMenu(modal, executionId, status).showContextMenu();
+                new PublicExecutionsContextMenu(modal, experienceName, status).showContextMenu();
             }
         });
-
     }
 
     public void loadData() {
@@ -81,12 +79,12 @@ public class PublicExecutionsLayout extends VLayout {
             @Override
             public void onSuccess(List<PublicExecution> result) {
                 modal.hide();
-                List<ExecutionsRecord> dataList = new ArrayList<ExecutionsRecord>();
+                List<PublicExecutionRecord> dataList = new ArrayList<PublicExecutionRecord>();
 
-                for (PublicExecution exe : result) {
-                    dataList.add(new ExecutionsRecord(exe.getId(), exe.getSimulationName(), exe.getApplicationName(), exe.getApplicationVersion(), exe.getStatus(), exe.getAuthor(), exe.getComments()));
+                for (PublicExecution execution : result) {
+                    dataList.add(new PublicExecutionRecord(execution));
                 }
-                grid.setData(dataList.toArray(new ExecutionsRecord[]{}));
+                grid.setData(dataList.toArray(new PublicExecutionRecord[]{}));
             }
         };
         modal.show("Loading executions...", true);

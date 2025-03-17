@@ -41,13 +41,14 @@ import fr.insalyon.creatis.vip.application.server.business.InputBusiness;
 import fr.insalyon.creatis.vip.application.server.business.WorkflowBusiness;
 import fr.insalyon.creatis.vip.application.server.dao.ApplicationInputDAO;
 import fr.insalyon.creatis.vip.core.client.bean.Group;
+import fr.insalyon.creatis.vip.core.client.bean.Pair;
 import fr.insalyon.creatis.vip.core.client.bean.User;
-import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.CoreException;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import fr.insalyon.creatis.vip.core.server.rpc.AbstractRemoteServiceServlet;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,8 +58,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -167,13 +166,6 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
         }
     }
 
-    /**
-     *
-     * @param applicationName
-     * @param applicationVersion
-     * @return
-     * @throws ApplicationException
-     */
     @Override
     public Descriptor getApplicationDescriptor(String applicationName, String applicationVersion) throws ApplicationException {
         try {
@@ -186,16 +178,8 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
         }
     }
 
-    /**
-     *
-     * @param applicationName
-     * @param applicationVersion
-     * @return
-     * @throws ApplicationException
-     */
     @Override
-    public String getApplicationDescriptorString(String applicationName, String applicationVersion)
-            throws ApplicationException {
+    public String getApplicationDescriptorString(String applicationName, String applicationVersion) throws ApplicationException {
         try {
             return boutiquesBusiness.getApplicationDescriptorString(getSessionUser(), applicationName,
                                                                     applicationVersion);
@@ -205,15 +189,23 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
     }
 
     /**
-     * Launches a simulation.
-     *
-     * @param parametersMap Simulation parameters map
-     * @param applicationName Application name
-     * @param applicationVersion Application version
-     * @param applicationClass Application class
-     * @param simulationName Simulation name
-     * @throws ApplicationException
+     * Map(ApplicationName, ApplicationVersion)
      */
+    @Override
+    public List<String> getApplicationsDescriptorsString(List<Pair<String, String>> applications) throws ApplicationException {
+        List<String> result = new ArrayList<>();
+
+        try {
+            for (var pair : applications) {
+                result.add(boutiquesBusiness.getApplicationDescriptorString(
+                    getSessionUser(), pair.getFirst(), pair.getSecond()));
+            }
+            return result;
+        } catch (BusinessException | CoreException ex) {
+            throw new ApplicationException(ex);
+        }
+    }
+
     @Override
     public void launchSimulation(Map<String, String> parametersMap,
             String applicationName, String applicationVersion,
