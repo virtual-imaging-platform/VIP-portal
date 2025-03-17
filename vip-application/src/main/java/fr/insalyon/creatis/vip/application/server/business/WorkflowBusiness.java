@@ -49,7 +49,6 @@ import fr.insalyon.creatis.vip.application.server.dao.SimulationStatsDAO;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
-import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
 import fr.insalyon.creatis.vip.core.server.business.EmailBusiness;
 import fr.insalyon.creatis.vip.core.server.business.Server;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
@@ -104,7 +103,6 @@ public class WorkflowBusiness {
     private final GRIDAClient gridaClient;
     private final ExternalPlatformBusiness externalPlatformBusiness;
     private final WorkflowExecutionBusiness workflowExecutionBusiness;
-    private final ConfigurationBusiness configurationBusiness;
     private final ClassBusiness classBusiness;
 
     @Autowired
@@ -117,7 +115,7 @@ public class WorkflowBusiness {
             DataManagerBusiness dataManagerBusiness, EmailBusiness emailBusiness,
             LfcPathsBusiness lfcPathsBusiness, GRIDAPoolClient gridaPoolClient,
             GRIDAClient gridaClient, ExternalPlatformBusiness externalPlatformBusiness,
-            WorkflowExecutionBusiness workflowExecutionBusiness, ConfigurationBusiness configurationBusiness,
+            WorkflowExecutionBusiness workflowExecutionBusiness,
             ClassBusiness classBusiness) {
         this.server = server;
         this.simulationStatsDAO = simulationStatsDAO;
@@ -137,7 +135,6 @@ public class WorkflowBusiness {
         this.gridaClient = gridaClient;
         this.externalPlatformBusiness = externalPlatformBusiness;
         this.workflowExecutionBusiness = workflowExecutionBusiness;
-        this.configurationBusiness = configurationBusiness;
         this.classBusiness = classBusiness;
     }
 
