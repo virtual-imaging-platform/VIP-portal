@@ -6,11 +6,9 @@ import fr.insalyon.creatis.vip.application.client.bean.AppVersion;
 import fr.insalyon.creatis.vip.application.client.bean.Simulation;
 import fr.insalyon.creatis.vip.application.server.business.simulation.parser.InputM2Parser;
 import fr.insalyon.creatis.vip.application.server.business.util.ReproVipUtils;
-import fr.insalyon.creatis.vip.application.server.dao.PublicExecutionDAO;
 import fr.insalyon.creatis.vip.core.client.bean.PublicExecution;
+import fr.insalyon.creatis.vip.core.client.bean.Triplet;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
-import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
-import fr.insalyon.creatis.vip.core.server.business.EmailBusiness;
 import fr.insalyon.creatis.vip.core.server.business.Server;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import fr.insalyon.creatis.vip.datamanager.server.business.ExternalPlatformBusiness;
@@ -41,117 +39,53 @@ public class ReproVipBusiness {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
+    private final PublicExecutionBusiness publicExecutionBusiness;
     private final ApplicationBusiness applicationBusiness;
     private final Server server;
     private final SimulationBusiness simulationBusiness;
-    private final PublicExecutionDAO publicExecutionDAO;
     private final WorkflowBusiness workflowBusiness;
-    private final ConfigurationBusiness configurationBusiness;
-    private final EmailBusiness emailBusiness;
     private final LfcPathsBusiness lfcPathsBusiness;
     private final ExternalPlatformBusiness externalPlatformBusiness;
 
     @Autowired
     public ReproVipBusiness(ApplicationBusiness applicationBusiness, Server server, SimulationBusiness simulationBusiness,
-            PublicExecutionDAO publicExecutionDAO, WorkflowBusiness workflowBusiness,
-            LfcPathsBusiness lfcPathsBusiness, ExternalPlatformBusiness externalPlatformBusiness,
-            ConfigurationBusiness configurationBusiness, EmailBusiness emailBusiness) {
+            WorkflowBusiness workflowBusiness, LfcPathsBusiness lfcPathsBusiness, ExternalPlatformBusiness externalPlatformBusiness,
+            PublicExecutionBusiness publicExecutionBusiness) {
         this.applicationBusiness = applicationBusiness;
         this.server = server;
         this.simulationBusiness = simulationBusiness;
-        this.publicExecutionDAO = publicExecutionDAO;
         this.workflowBusiness = workflowBusiness;
         this.lfcPathsBusiness = lfcPathsBusiness;
         this.externalPlatformBusiness = externalPlatformBusiness;
-        this.configurationBusiness = configurationBusiness;
-        this.emailBusiness = emailBusiness;
+        this.publicExecutionBusiness = publicExecutionBusiness;
     }
 
-    public void createPublicExecution(PublicExecution publicExecution) throws BusinessException {
-        try {
-            publicExecutionDAO.add(publicExecution);
+    public boolean canMakeExecutionPublic(List<String> workflowIds) throws BusinessException {
+        for (String workflow : workflowIds) {
+            // looking for provenance directory
+            Path provenanceDirPath = Paths.get(server.getWorkflowsPath() + "/" + workflow + "/provenance");
 
-            String adminsEmailContents = "<html>"
-                    + "<head></head>"
-                    + "<body>"
-                    + "<p>Dear Administrator,</p>"
-                    + "<p>A new user requested to make an execution public</p>"
-                    + "<p>Details:</p>"
-                    + "<ul>"
-                    + "<li>ID: " + publicExecution.getId() + "</li>"
-                    + "<li>Name: " + publicExecution.getSimulationName() + "</li>"
-                    + "<li>Name: " + publicExecution.getApplicationName() + "</li>"
-                    + "<li>Version: " + publicExecution.getApplicationVersion() + "</li>"
-                    + "<li>Status: " + publicExecution.getStatus() + "</li>"
-                    + "<li>Author: " + publicExecution.getAuthor() + "</li>"
-                    + "<li>Comments: " + publicExecution.getComments() + "</li>"
-                    + "</ul>"
-                    + "<p>Best Regards,</p>"
-                    + "<p>VIP Team</p>"
-                    + "</body>"
-                    + "</html>";
-
-            for (String supportEmail : configurationBusiness.getSupportEmails()) {
-                emailBusiness.sendEmail("[VIP Admin] Execution Public Request", adminsEmailContents,
-                        new String[]{supportEmail}, true, publicExecution.getAuthor());
+            if ( ! Files.exists(provenanceDirPath)) {
+                 return false;
             }
-        } catch (DAOException e) {
-            throw new BusinessException(e);
+            // checking if it is empty
+            if (provenanceDirPath.toFile().listFiles().length == 0) {
+                return false;
+            }
+            // verifying the application has a boutiques file
+            Simulation simulation = workflowBusiness.getSimulation(workflow);
+
+            if (getBoutiquesDescriptorJsonPath(simulation.getApplicationName(), simulation.getApplicationVersion()) == null) {
+                return false;
+            }
         }
+        return true;
     }
 
-    public PublicExecution getPublicExecution(String publicExecutionId)  throws BusinessException {
-        try {
-            return publicExecutionDAO.get(publicExecutionId);
-        } catch (DAOException e) {
-            throw new BusinessException(e);
-        }
-    }
+    public String createReproVipDirectory(String experienceName) throws BusinessException {
+        PublicExecution publicExecution = publicExecutionBusiness.get(experienceName);
+        Path reproVipDir = Paths.get(server.getReproVIPRootDir()).resolve(experienceName);
 
-    public void updatePublicExecutionStatus(String publicExecutionId, PublicExecution.PublicExecutionStatus newStatus)
-            throws BusinessException {
-        try {
-            publicExecutionDAO.update(publicExecutionId, newStatus);
-        } catch (DAOException e) {
-            throw new BusinessException(e);
-        }
-    }
-
-    public List<PublicExecution> getPublicExecutions() throws BusinessException {
-        try {
-            return publicExecutionDAO.getExecutions();
-        } catch (DAOException ex) {
-            throw new BusinessException(ex);
-        }
-    }
-
-    public boolean doesExecutionExist(String executionID) throws BusinessException {
-        try {
-            return publicExecutionDAO.doesExecutionExist(executionID);
-        } catch (DAOException e) {
-            throw new BusinessException(e);
-        }
-    }
-
-    public boolean canMakeExecutionPublic(String executionID) throws BusinessException {
-        // looking for provenance directory
-        Path provenanceDirPath = Paths.get(server.getWorkflowsPath() + "/" + executionID + "/provenance");
-        if ( ! Files.exists(provenanceDirPath)) {
-             return false;
-        }
-        // checking if it is empty
-        if (provenanceDirPath.toFile().listFiles().length == 0) {
-            return false;
-        }
-        // verifying the application has a boutiques file
-        Simulation simulation = workflowBusiness.getSimulation(executionID);
-        String boutiquesPath = getBoutiquesDescriptorJsonPath(simulation.getApplicationName(), simulation.getApplicationVersion());
-        return boutiquesPath != null;
-    }
-
-    public String createReproVipDirectory(String executionID) throws BusinessException {
-        PublicExecution publicExecution = getPublicExecution(executionID);
-        Path reproVipDir = Paths.get(server.getReproVIPRootDir()).resolve(executionID);
         logger.info("Creating reprovip dir : {}", reproVipDir);
         try {
             if ( ! Files.exists(reproVipDir)) {
@@ -161,19 +95,16 @@ public class ReproVipBusiness {
             logger.error("Exception creating the a reprovip directory {}", reproVipDir, e);
             throw new BusinessException("Error creating a reprovip directory", e);
         }
-        List<Path> provenanceFiles = copyProvenanceFiles(reproVipDir, publicExecution.getId());
-        
-        generateWorkflowInputJson(executionID, publicExecution.getAuthor(), reproVipDir);
+
         copyReadme(reproVipDir);
-        return generateReprovipJson(reproVipDir, publicExecution, provenanceFiles);
+        return generateReprovipJson(reproVipDir, publicExecution);
     }
 
     public List<Path> copyProvenanceFiles(Path reproVipDir, String executionID) throws BusinessException {
         try {
             List<Path> copiedProvenanceFiles = new ArrayList<>();
-
-            // directory where provenance files are stored
             Path provenanceDirPath = Paths.get(server.getWorkflowsPath() + "/" + executionID + "/provenance");
+
             if ( ! Files.exists(provenanceDirPath)) {
                 logger.error("Error creating a reprovip directory : no provenance dir for {}", provenanceDirPath);
                 throw new BusinessException("Error creating a reprovip directory : no provenance dir");
@@ -205,85 +136,89 @@ public class ReproVipBusiness {
                 }
             }
             return copiedProvenanceFiles;
+
         } catch (IOException e) {
             logger.error("Error while copying provenance files for {}", executionID, e);
             throw new BusinessException("Error while copying provenance files", e);
         }
     }
 
-    public String generateReprovipJson(Path reproVipDir, PublicExecution publicExecution, List<Path> provenanceFiles)
+    private Map<String, List<String>> getInvocationsOutputs(String executionID, List<Path> provenanceFiles, List<String> outputIds) throws BusinessException, DAOException {
+        Map<String, List<String>> invocationsOutputs = new HashMap<>();
+
+        for (Path provenanceFile : provenanceFiles) {
+            logger.debug("handling provenance file {}", provenanceFile);
+
+            String fileName = provenanceFile.getFileName().toString();
+            String invocationFilename = fileName.substring(0, fileName.indexOf(".sh.provenance.json"));
+            List<String> outputDataPaths = simulationBusiness.getSimulationDAO(executionID).getOutputData(invocationFilename);
+            Map<String, String> provenanceOutputFilenames = getOutputFilenamesFromProvenanceFile(provenanceFile);
+            List<String> outputDataPathToKeep = getOutputPathToDownload(outputDataPaths, provenanceOutputFilenames, outputIds);
+
+            invocationsOutputs.put(invocationFilename, outputDataPathToKeep);
+        }
+        return invocationsOutputs;
+    }
+
+    private Map<String, Object> formatWorkflowData(Path reproVipDir, Triplet<String, String, String> workflowData, PublicExecution execution)
+            throws BusinessException, DAOException {
+        Map<String, Object> data = new HashMap<>();
+        List<Path> provenancesFiles = copyProvenanceFiles(reproVipDir, workflowData.getFirst());
+        List<String> outputIds = execution.getMappedOutputIds().getOrDefault(workflowData.getFirst(), Collections.emptyList());
+
+        // we convert path to string because if there are some caracters like " " by default it encodes it
+        data.put("workflowId", workflowData.getFirst());
+        data.put("directory", reproVipDir.resolve(workflowData.getFirst()).toString());
+        data.put("boutique_descriptor", getBoutiquesDescriptorJsonPath(workflowData.getSecond(), workflowData.getThird()));
+        data.put("provenances_files", provenancesFiles.stream().map(Path::toString).collect(Collectors.toList()));
+        data.put("invocation_outputs", getInvocationsOutputs(workflowData.getFirst(), provenancesFiles, outputIds));
+
+        return data;
+    }
+
+    public String generateReprovipJson(Path reproVipDir, PublicExecution publicExecution)
             throws BusinessException {
-
-        String executionID = publicExecution.getId();
-        String filesToDownload = getBoutiquesDescriptorJsonPath(
-                publicExecution.getApplicationName(), publicExecution.getApplicationVersion());
-
-        List<String> filesToUpload = provenanceFiles.stream()
-                .map(Path::toString)
-                .collect(Collectors.toList());
-
         Map<String, Object> structuredJson = new LinkedHashMap<>();
-        structuredJson.put("path_workflow_directory", reproVipDir);
-        structuredJson.put("descriptor_boutique", filesToDownload);
-        structuredJson.put("files_to_upload", filesToUpload);
+        Map<String, Object> metadata = new LinkedHashMap<>();
+        List<Map<String, Object>> workflowsData = new ArrayList<>();
 
-        Map<String, List<String>> invocationOutputsMap = new LinkedHashMap<>();
+        metadata.put("title", "your title");
+        metadata.put("upload_type", "workflow");
+        metadata.put("description", publicExecution.getComments());
+        metadata.put("creators", List.of(Map.of("name", publicExecution.getAuthor())));
+
         try {
-            for (Path provenanceFile : provenanceFiles) {
-                logger.debug("handling provenance file {}", provenanceFile);
-                String fileName = provenanceFile.getFileName().toString();
-                String invocationFilename = fileName.substring(0, fileName.indexOf(".sh.provenance.json"));
-                List<String> outputDataPaths = simulationBusiness.getSimulationDAO(executionID).getOutputData(invocationFilename);
-                Map<String, String> provenanceOutputFilenames = getOutputFilenamesFromProvenanceFile(provenanceFile);
-                List<String> outputDataPathToKeep = getOutputPathToDownload(
-                        outputDataPaths,
-                        provenanceOutputFilenames,
-                        publicExecution.getOutputNames());
-                invocationOutputsMap.put(invocationFilename, outputDataPathToKeep);
+            for (var data : publicExecution.getWorkflowsData()) {
+                workflowsData.add(formatWorkflowData(reproVipDir, data, publicExecution));
+                generateWorkflowInputJson(data.getFirst(), publicExecution.getAuthor(), reproVipDir);
             }
         } catch (DAOException e) {
             throw new BusinessException(e);
         }
 
-        structuredJson.put("invocation_outputs", invocationOutputsMap);
-
-        Map<String, Object> metadataOuter = new LinkedHashMap<>();
-        Map<String, Object> metadataInner = new LinkedHashMap<>();
-
-        metadataInner.put("title", "your title");
-        metadataInner.put("upload_type", "workflow");
-        metadataInner.put("description", publicExecution.getComments());
-
-        List<Map<String, String>> creators = new ArrayList<>();
-        Map<String, String> creator = new LinkedHashMap<>();
-        creator.put("name", publicExecution.getAuthor());
-        creators.add(creator);
-
-        metadataInner.put("creators", creators);
-        metadataOuter.put("metadata", metadataInner);
-
-        structuredJson.put("metadata", metadataOuter);
+        structuredJson.put("metadata", metadata);
+        structuredJson.put("workflows", workflowsData);
 
         ObjectMapper objectMapper = new ObjectMapper();
         try {
             String jsonContent = objectMapper.writeValueAsString(structuredJson);
-            Path reprovipJsonPath = reproVipDir.resolve("workflowMetadata.json");
+            Path reprovipJsonPath = reproVipDir.resolve("summary.json");
             Files.writeString(reprovipJsonPath, jsonContent);
 
             return jsonContent;
         } catch (IOException e) {
-            logger.error("Error saving reprovip metadata file for {}", publicExecution.getId(), e);
+            logger.error("Error saving reprovip metadata file for {}", publicExecution.getExperienceName(), e);
             throw new BusinessException("Failed to save JSON to file", e);
         }
     }
 
-    public void generateWorkflowInputJson(String workflow_id, String author, Path reproVipDir) throws BusinessException {
+    public void generateWorkflowInputJson(String workflowId, String author, Path reproVipDir) throws BusinessException {
         ObjectMapper mapper = new ObjectMapper();
         ReproVipUtils utils = new ReproVipUtils(externalPlatformBusiness, server.getHostURL());
         InputM2Parser parser = new InputM2Parser(author);
         parser.setLfcPathsBusiness(lfcPathsBusiness);
 
-        Map<String, String> inputs = parser.parse(server.getWorkflowsPath() + "/" + workflow_id + "/inputs.xml");
+        Map<String, String> inputs = parser.parse(server.getWorkflowsPath() + "/" + workflowId + "/inputs.xml");
         Map<String, Object> json = new HashMap<>();
 
         utils.parse(inputs);
@@ -291,9 +226,9 @@ public class ReproVipBusiness {
         json.put("inputs", utils.getSimplifiedInputs());
 
         try {
-            Files.writeString(reproVipDir.resolve("inputs.json"), mapper.writeValueAsString(json));
+            Files.writeString(reproVipDir.resolve(workflowId + ".json"), mapper.writeValueAsString(json));
         } catch (IOException e) {
-            logger.error("Error saving reprovip inputs file for {}", workflow_id, e);
+            logger.error("Error saving reprovip inputs file for {}", workflowId, e);
             throw new BusinessException("Failed to save inputs JSON to file", e);
         }
     }
@@ -301,9 +236,8 @@ public class ReproVipBusiness {
     public void copyReadme(Path reproVipDir) throws BusinessException {
         try {
             Resource resource = new ClassPathResource("repro_vip.md");
-            Path destination = reproVipDir.resolve("README.md");
 
-            Files.copy(resource.getInputStream(), destination);
+            Files.copy(resource.getInputStream(), reproVipDir.resolve("README.md"));
         } catch (IOException e) {
             throw new BusinessException("Cannot copy the README.md", e);
         }
@@ -311,22 +245,23 @@ public class ReproVipBusiness {
 
     public String getBoutiquesDescriptorJsonPath(String applicationName, String applicationVersion) throws BusinessException {
         AppVersion appVersion = applicationBusiness.getVersion(applicationName, applicationVersion);
+
         if (appVersion != null && appVersion.getJsonLfn() != null) {
             return appVersion.getJsonLfn();
+        } else {
+            return null;
         }
-        return null;
     }
 
     /*
-        outputDataPaths is the list of all the results path/URIs produced for a job
-        provenanceOutputFilenames is the mapping between the output id and their filename
+     * outputDataPaths is the list of all the results path/URIs produced for a job
+     * provenanceOutputFilenames is the mapping between the output id and their filename
      */
-    private List<String> getOutputPathToDownload(
-            List<String> outputDataPaths,
-            Map<String, String> provenanceOutputFilenames,
+    private List<String> getOutputPathToDownload(List<String> outputDataPaths, Map<String, String> provenanceOutputFilenames,
             List<String> outputIdsToKeep) throws BusinessException {
         Map<String, String> outputDataPathsByFilenames = mapOutputDataPathsByFilenames(outputDataPaths);
         List<String> results = new ArrayList<>(); // all the path/URIs to keep
+
         for (String outputIdToKeep : outputIdsToKeep) {
             if ( ! provenanceOutputFilenames.containsKey(outputIdToKeep)) {
                 logger.error("Error getting a output path from provenance file : {} output id not found", outputIdToKeep);
@@ -370,19 +305,21 @@ public class ReproVipBusiness {
             Map<String, ?> publicOutputSection = (Map<String, ?>) map.get("public-output");
             Map<String, Map<String,String>> outputFiles = (Map<String, Map<String, String>>) publicOutputSection.get("output-files");
             Map<String, String> outputFilenames = new HashMap<>();
+
             for (String outputId : outputFiles.keySet()) {
                 outputFilenames.put(outputId, outputFiles.get(outputId).get("file-name"));
                 logger.debug("got {} as filename for {} in {}", outputFilenames.get(outputId), outputId, provenanceFilePath);
             }
             return outputFilenames;
+
         } catch (IOException e) {
             logger.error("Error reading a provenance file : {}", provenanceFilePath);
             throw new BusinessException("Error reading a provenance file", e);
         }
     }
 
-    public void deleteReproVipDirectory(String executionID) throws BusinessException {
-        Path reproVipDir = Paths.get(server.getReproVIPRootDir()).resolve(executionID);
+    public void deleteReproVipDirectory(String experienceName) throws BusinessException {
+        Path reproVipDir = Paths.get(server.getReproVIPRootDir()).resolve(experienceName);
         logger.info("Deleting ReproVip directory: {}", reproVipDir);
 
         if (Files.exists(reproVipDir)) {

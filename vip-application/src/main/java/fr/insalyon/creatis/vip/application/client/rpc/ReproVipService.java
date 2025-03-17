@@ -1,7 +1,6 @@
 package fr.insalyon.creatis.vip.application.client.rpc;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.ServiceDefTarget;
 import fr.insalyon.creatis.vip.application.client.view.ApplicationException;
@@ -23,16 +22,18 @@ public interface ReproVipService extends RemoteService {
         }
     }
 
-    void addPublicExecution(PublicExecution publicExecution) throws ApplicationException;
+    void addPublicExecution(PublicExecution PublicExecution) throws ApplicationException;
 
     public List<PublicExecution> getPublicExecutions() throws ApplicationException;
 
-    boolean doesExecutionExist(String executionID) throws ApplicationException;
+    boolean doesExecutionExist(String experienceName) throws ApplicationException;
 
-    boolean canMakeExecutionPublic(String executionID) throws ApplicationException;
+    boolean canMakeExecutionPublic(PublicExecution PublicExecution) throws ApplicationException;
 
-    PublicExecution.PublicExecutionStatus createReproVipDirectory(String executionID) throws ApplicationException;
+    PublicExecution.PublicExecutionStatus createReproVipDirectory(String experienceName) throws ApplicationException;
 
-    PublicExecution.PublicExecutionStatus deleteReproVipDirectory(String executionID) throws ApplicationException;
+    PublicExecution.PublicExecutionStatus deleteReproVipDirectory(String experienceName) throws ApplicationException;
+
+    PublicExecution.PublicExecutionStatus setExecutionPublished(String experienceName, String doi) throws ApplicationException;
 }
 
