@@ -9,12 +9,12 @@ public interface PublicExecutionDAO {
 
     void add(PublicExecution publicExecution) throws DAOException;
 
-    PublicExecution get(String publicExecutionId) throws DAOException;
+    PublicExecution get(String experienceName) throws DAOException;
 
-    void update(String executionId, PublicExecution.PublicExecutionStatus newStatus) throws DAOException;
+    void update(String experienceName, PublicExecution publicExecution) throws DAOException;
 
-    List<PublicExecution> getExecutions() throws DAOException;
+    List<PublicExecution> getAll() throws DAOException;
 
-    boolean doesExecutionExist(String executionId) throws DAOException;
+    boolean exist(String experienceName) throws DAOException;
 }
 
