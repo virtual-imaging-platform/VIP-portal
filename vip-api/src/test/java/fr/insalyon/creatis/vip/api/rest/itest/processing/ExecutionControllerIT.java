@@ -32,6 +32,7 @@
 package fr.insalyon.creatis.vip.api.rest.itest.processing;
 
 import fr.insalyon.creatis.grida.common.bean.GridData;
+import fr.insalyon.creatis.grida.common.bean.GridPathInfo;
 import fr.insalyon.creatis.moteur.plugins.workflowsdb.bean.*;
 import fr.insalyon.creatis.moteur.plugins.workflowsdb.dao.WorkflowsDBDAOException;
 import fr.insalyon.creatis.vip.api.exception.ApiException;
@@ -341,7 +342,7 @@ public class ExecutionControllerIT extends BaseWebSpringIT {
         when(outputDAO.get(eq(simulation2.getID()))).thenReturn(Arrays.asList(output), (List<Output>) null);
 
         Mockito.when(server.getDataManagerUsersHome()).thenReturn("/root/user");
-        Mockito.when(gridaClient.exist(resultPath)).thenReturn(true);
+        Mockito.when(gridaClient.getPathInfo(resultPath)).thenReturn(new GridPathInfo(true, GridData.Type.File));
         Mockito.when(gridaClient.getFolderData(resultPath, true)).thenReturn(Arrays.asList(
                 new GridData("result.res", GridData.Type.File, 42, "modifData", "", "", "")));
 

@@ -161,16 +161,6 @@ public class GridaClientLocal extends GRIDAClient {
     }
 
     @Override
-    public String uploadFileToSE(String localFile, String remoteDir, String storageElement) throws GRIDAClientException {
-        throw new GRIDAClientException("not implemented in local version");
-    }
-
-    @Override
-    public String uploadFileToSE(String localFile, String remoteDir, List<String> storageElementsList) throws GRIDAClientException {
-        throw new GRIDAClientException("not implemented in local version");
-    }
-
-    @Override
     public void replicateToPreferredSEs(String remoteFile) throws GRIDAClientException {
         throw new GRIDAClientException("not implemented in local version");
     }

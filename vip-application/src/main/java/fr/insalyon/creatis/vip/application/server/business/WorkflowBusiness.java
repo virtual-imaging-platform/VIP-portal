@@ -277,9 +277,8 @@ public class WorkflowBusiness {
             return parseResult.result;
         }
         // not an external platform parameter, use legacy format
-        String parsedPath = lfcPathsBusiness.parseBaseDir(
-                user, parameterValue);
-        if (!user.isSystemAdministrator()) {
+        String parsedPath = lfcPathsBusiness.parseBaseDir(user, parameterValue);
+        if ( ! user.isSystemAdministrator()) {
             checkFolderACL(user, groups, parsedPath);
         }
         if ( ! parsedPath.equals(parameterValue) // the parameter is a file path
@@ -448,7 +447,7 @@ public class WorkflowBusiness {
 
         //TODO fix
         return getInputM2Parser(currentUserFolder).parse(
-            server.getWorkflowsPath() + "/" + simulationID + "/input-m2.xml");
+            server.getWorkflowsPath() + "/" + simulationID + "/inputs.xml");
     }
 
     public Simulation getSimulation(String simulationID) throws BusinessException {

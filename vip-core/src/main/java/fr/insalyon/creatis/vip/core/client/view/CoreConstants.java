@@ -74,6 +74,7 @@ public class CoreConstants implements IsSerializable {
     public static final String LAB_DATA_ALT_USERS_HOME = "datamanager.users.home.alternative";
     public static final String LAB_DATA_ALT_GROUPS_HOME = "datamanager.groups.home.alternative";
     public static final String LAB_MOTEUR_HOST = "moteur.host";
+    public static final String LAB_SMA_ENABLED = "sma.enabled";
     public static final String LAB_SMA_HOST = "sma.host";
     public static final String LAB_SMA_PORT = "sma.port";
     public static final String LAB_TRUSTSTORE_FILE = "truststore.file";

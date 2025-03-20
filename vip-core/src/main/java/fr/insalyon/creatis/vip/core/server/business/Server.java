@@ -51,6 +51,8 @@ public interface Server {
 
     int getApacheSSLPort();
 
+    boolean useSMA();
+
     String getSMAHost();
 
     int getSMAPort();
