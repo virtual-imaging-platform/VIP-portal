@@ -381,7 +381,7 @@ public class WorkflowBusiness {
         List<String> applications = (application != null) ? Collections.singletonList(application) : new ArrayList<>();
 
         List<Simulation> simulations = new ArrayList<>();
-        Set<Workflow> workflows = new HashSet<>();
+        List<Workflow> workflows = new ArrayList<>();
 
         try {
             if (endDate != null) {
@@ -394,7 +394,10 @@ public class WorkflowBusiness {
             workflows.addAll(getSimulationsAdminGroup(user.getEmail(), applications, wStatus, appClass, startDate, endDate, tag));
             workflows.addAll(workflowDAO.get(users, applications, wStatus, appClass, startDate, endDate, tag));
 
-            simulations = parseWorkflows(new ArrayList<>(workflows));
+            workflows = new ArrayList<>(workflows.stream().collect(
+                Collectors.toMap(Workflow::toString, w -> w, (e, r) -> e)).values());
+
+            simulations = parseWorkflows(workflows);
             checkRunningSimulations(simulations);
 
             return simulations;
