@@ -144,10 +144,12 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
                                            String status, Date startDate, Date endDate) throws ApplicationException {
         try {
             User user = getSessionUser();
-            if (user.isSystemAdministrator()) {
+            if (user.isSystemAdministrator() || (userName != null && userName.equalsIgnoreCase(user.getFullName()))) {
                 return workflowBusiness.getSimulations(userName, application, status, startDate, endDate);
+            } else if (userName == null) {
+                return workflowBusiness.getSimulationsWithGroupAdminRights(user, application, status, startDate, endDate, null);
             } else {
-                return workflowBusiness.getSimulations(user.getEmail(), application, status, startDate, endDate);
+                throw new ApplicationException("You can't see another person's simulation!");
             }
         } catch (BusinessException | CoreException ex) {
             throw new ApplicationException(ex);

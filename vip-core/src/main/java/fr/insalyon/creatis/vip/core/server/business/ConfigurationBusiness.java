@@ -59,6 +59,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.sql.Timestamp;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author Rafael Ferreira da Silva, Nouha Boujelben
@@ -619,27 +620,8 @@ public class ConfigurationBusiness {
         }
     }
 
-    public List<String> getUserNames(String email, boolean validGroup)
-            throws BusinessException {
-        try {
-            if (validGroup) {
-                // Discarded the effect of validGroups as this has several side effects (see #2669)
-                //List<String> groups = CoreDAOFactory.getDAOFactory().getUsersGroupsDAO().getUserAdminGroups(email);
-                // if (groups.isEmpty()) {
-                List<String> userNames = new ArrayList<>();
-                userNames.add(userDAO.getUser(email).getFullName());
-                return userNames;
-            } else {
-                List<String> userNames = new ArrayList<>();
-                for (User user : getUsers()) {
-                    userNames.add(user.getFullName());
-                }
-
-                return userNames;
-            }
-        } catch (DAOException ex) {
-            throw new BusinessException(ex);
-        }
+    public List<String> getAllUserNames() throws BusinessException {
+        return getUsers().stream().map(User::getFullName).collect(Collectors.toCollection(ArrayList::new));
     }
 
     public Map<Group, CoreConstants.GROUP_ROLE> getUserGroups(String email)

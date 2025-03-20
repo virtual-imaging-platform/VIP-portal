@@ -782,7 +782,7 @@ public class UsersAndGroupsIT extends BaseSpringIT {
 
     @Test
     public void testGetUserNames() throws BusinessException {
-        List<String> userNames = configurationBusiness.getUserNames(emailUser1, true);
+        List<String> userNames = configurationBusiness.getAllUserNames();
         Assertions.assertTrue(userNames.containsAll(List.of("test firstName suffix1 test lastName suffix1")), "Incorrect user names");
     }
 

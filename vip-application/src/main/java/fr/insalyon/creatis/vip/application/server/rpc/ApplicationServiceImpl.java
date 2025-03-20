@@ -47,6 +47,7 @@ import org.slf4j.LoggerFactory;
 import jakarta.servlet.ServletException;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -260,14 +261,12 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
             User user = getSessionUser();
             if (isSystemAdministrator()) {
                 return new List[]{
-                    configurationBusiness.getUserNames(
-                        user.getEmail(), false),
+                    configurationBusiness.getAllUserNames(),
                     applicationBusiness.getApplicationNames(),
                 };
             } else {;
                 return new List[] {
-                    configurationBusiness.getUserNames(
-                        user.getEmail(), true),
+                    new ArrayList<>(Arrays.asList(user.getFullName())),
                     applicationBusiness.getApplicationNames()
                 };
             }
