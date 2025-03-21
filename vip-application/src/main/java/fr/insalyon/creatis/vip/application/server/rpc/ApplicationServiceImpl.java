@@ -46,6 +46,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import jakarta.servlet.ServletException;
+
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -319,8 +322,7 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
             if (isSystemAdministrator()) {
                 List<String> classes = classBusiness.getClassesName();
                 return new List[]{
-                    configurationBusiness.getUserNames(
-                        user.getEmail(), false),
+                    configurationBusiness.getAllUserNames(),
                     applicationBusiness.getApplicationNames(),
                     classes
                 };
@@ -329,8 +331,7 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
                     user.getEmail(), !user.isSystemAdministrator());
                 classes.removeAll(reservedClasses);
                 return new List[] {
-                    configurationBusiness.getUserNames(
-                        user.getEmail(), true),
+                    new ArrayList<>(Arrays.asList(user.getFullName())),
                     applicationBusiness.getApplicationNames(classes),
                     classes
                 };

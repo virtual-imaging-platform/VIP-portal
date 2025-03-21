@@ -99,25 +99,26 @@ public abstract class BaseSpringIT {
         assertEquals(expectedNb, rowsNb);
     }
 
-    protected void createUser(String testEmail) throws GRIDAClientException, BusinessException {
-        createUser(testEmail, "");
+    protected User createUser(String testEmail) throws GRIDAClientException, BusinessException {
+        return createUser(testEmail, "");
     }
 
-    protected void createUserWithPassword(String testEmail, String password) throws GRIDAClientException, BusinessException {
-        createUser(testEmail, "", password);
+    protected User createUserWithPassword(String testEmail, String password) throws GRIDAClientException, BusinessException {
+        return createUser(testEmail, "", password);
     }
 
-    protected void createUser(String testEmail, String nameSuffix) throws GRIDAClientException, BusinessException {
-        createUser(testEmail, nameSuffix, "testPassword");
+    protected User createUser(String testEmail, String nameSuffix) throws GRIDAClientException, BusinessException {
+        return createUser(testEmail, nameSuffix, "testPassword");
     }
 
-    protected void createUser(String testEmail, String nameSuffix, String password) throws GRIDAClientException, BusinessException {
+    protected User createUser(String testEmail, String nameSuffix, String password) throws GRIDAClientException, BusinessException {
         User newUser = new User("test firstName " + nameSuffix,
                 "test lastName " + nameSuffix, testEmail, "test institution",
                 password, CountryCode.fr,
                 null);
         Mockito.when(gridaClient.exist(anyString())).thenReturn(true, false);
         configurationBusiness.signup(newUser, "", (Group) null);
+        return newUser;
     }
 
     protected void createUserInGroup(String userEmail, String groupName) throws BusinessException, GRIDAClientException {
