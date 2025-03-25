@@ -13,7 +13,7 @@ public interface ReproVipServiceAsync {
 
     void doesExecutionExist(String experienceName, AsyncCallback<Boolean> asyncCallback);
 
-    void canMakeExecutionPublic(PublicExecution publicExecution, AsyncCallback<Boolean> asyncCallback);
+    void canMakeExecutionPublic(List<String> workflowsIds, AsyncCallback<Boolean> asyncCallback);
 
     void createReproVipDirectory(String experienceName, AsyncCallback<PublicExecution.PublicExecutionStatus> callback);
 

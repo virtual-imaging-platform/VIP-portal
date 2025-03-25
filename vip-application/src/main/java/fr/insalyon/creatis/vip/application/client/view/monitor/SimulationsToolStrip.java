@@ -54,7 +54,6 @@ import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
 import fr.insalyon.creatis.vip.social.client.view.message.MessageComposerWindow;
 import fr.insalyon.creatis.vip.social.client.view.message.MessageComposerWindowToReportIssue;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -413,7 +412,6 @@ public class SimulationsToolStrip extends ToolStrip {
         ListGridRecord[] records = getSimulationsTab().getGridSelection();
         List<Triplet<String, String, String>> workflowsData = new ArrayList<>();
         List<String> authors = new ArrayList<>();
-        PublicExecution publicExecution;
 
         if (records.length == 0) {
             Layout.getInstance().setWarningMessage("You must select at least 1 workflow!");
@@ -431,9 +429,7 @@ public class SimulationsToolStrip extends ToolStrip {
                         data.getSimulationId(), data.getApplication(), data.getApplicationVersion()));
                 }
             }
-            publicExecution = new PublicExecution("new_experience", workflowsData, 
-                PublicExecution.PublicExecutionStatus.REQUESTED, String.join(", ", authors), "", Collections.emptyList(), "");
-
+            final List<String> workflowsIds = new PublicExecution(workflowsData).getWorkflowsIds();
             final AsyncCallback<Boolean> callback = new AsyncCallback<Boolean>() {
                 @Override
                 public void onFailure(Throwable caught) {
@@ -444,19 +440,19 @@ public class SimulationsToolStrip extends ToolStrip {
                     if ( ! ok) {
                         SC.warn("These execution(s) can not be made public (it may be already public).");
                     } else {
-                        SC.ask("Do you really want to make these execution(s) public: (" + String.join(", ", publicExecution.getWorkflowsIds()) + ")?\n", new BooleanCallback() {
+                        SC.ask("Do you really want to make these execution(s) public: (" + String.join(", ", workflowsIds) + ")?\n", new BooleanCallback() {
                             @Override
                             public void execute(Boolean value) {
                                 if (value) {
                                     Layout.getInstance().addTab(ApplicationConstants.TAB_MAKE_EXECUTION_PUBLIC, 
-                                        () -> new MakeExecutionPublicTab(publicExecution));
+                                        () -> new MakeExecutionPublicTab(workflowsData, String.join(", ", authors)));
                                 }
                             }
                         });
                     }
                 }
             };
-            ReproVipService.Util.getInstance().canMakeExecutionPublic(publicExecution, callback);
+            ReproVipService.Util.getInstance().canMakeExecutionPublic(workflowsIds, callback);
         }
     }
 

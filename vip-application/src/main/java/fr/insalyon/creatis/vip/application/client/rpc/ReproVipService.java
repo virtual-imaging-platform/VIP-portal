@@ -22,13 +22,13 @@ public interface ReproVipService extends RemoteService {
         }
     }
 
-    void addPublicExecution(PublicExecution PublicExecution) throws ApplicationException;
+    void addPublicExecution(PublicExecution publicExecution) throws ApplicationException;
 
     public List<PublicExecution> getPublicExecutions() throws ApplicationException;
 
     boolean doesExecutionExist(String experienceName) throws ApplicationException;
 
-    boolean canMakeExecutionPublic(PublicExecution PublicExecution) throws ApplicationException;
+    boolean canMakeExecutionPublic(List<String> workflowsIds) throws ApplicationException;
 
     PublicExecution.PublicExecutionStatus createReproVipDirectory(String experienceName) throws ApplicationException;
 

@@ -26,6 +26,7 @@ import fr.insalyon.creatis.vip.application.client.view.boutiquesParsing.Boutique
 import fr.insalyon.creatis.vip.application.client.view.boutiquesParsing.InvalidBoutiquesDescriptorException;
 import fr.insalyon.creatis.vip.core.client.bean.Pair;
 import fr.insalyon.creatis.vip.core.client.bean.PublicExecution;
+import fr.insalyon.creatis.vip.core.client.bean.Triplet;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
 import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
@@ -39,7 +40,7 @@ import java.util.stream.IntStream;
 
 public class MakeExecutionPublicTab extends Tab {
 
-    private PublicExecution publicExecution;
+    private List<Triplet<String, String, String>> workflowsData;
     private Set<String> existingsOutputs;
 
     private VLayout makeExecutionPublicLayout;
@@ -53,12 +54,12 @@ public class MakeExecutionPublicTab extends Tab {
     private ListGrid selectedOutputs;
     private ListGrid othersOuputs;
 
-    public MakeExecutionPublicTab(PublicExecution publicExecution) {
+    public MakeExecutionPublicTab(List<Triplet<String, String, String>> workflowsData, String authors) {
         setID(ApplicationConstants.TAB_MAKE_EXECUTION_PUBLIC);
         setTitle("Make execution public");
         setCanClose(true);
 
-        this.publicExecution = publicExecution;
+        this.workflowsData = workflowsData;
         existingsOutputs = new HashSet<>();
 
         VLayout vLayout = new VLayout();
@@ -72,9 +73,9 @@ public class MakeExecutionPublicTab extends Tab {
 
         configureExecutionPublicLayout();
 
-        experienceNameField.setValue(publicExecution.getExperienceName());
-        authorNameField.setValue(publicExecution.getAuthor());
-        commentsItem.setValue(publicExecution.getComments());
+        experienceNameField.setValue("experience_name");
+        authorNameField.setValue(authors);
+        commentsItem.setValue("");
         vLayout.addMember(makeExecutionPublicLayout);
         setPane(vLayout);
 
@@ -94,16 +95,16 @@ public class MakeExecutionPublicTab extends Tab {
         submitButton.addClickHandler(new ClickHandler() {
             public void onClick(ClickEvent event) {
                 if (validate()) {
-                    publicExecution = new PublicExecution(
+                    final PublicExecution execution = new PublicExecution(
                         experienceNameField.getValueAsString(),
-                        publicExecution.getWorkflowsData(),
-                        publicExecution.getStatus(),
+                        workflowsData,
+                        PublicExecution.PublicExecutionStatus.REQUESTED,
                         authorNameField.getValueAsString(),
                         commentsItem.getValueAsString(),
                         getOutputIdsSelected(),
-                        publicExecution.getDoi());
+                        "");
 
-                    ReproVipService.Util.getInstance().addPublicExecution(publicExecution, new AsyncCallback<Void>() {
+                    ReproVipService.Util.getInstance().addPublicExecution(execution, new AsyncCallback<Void>() {
                         public void onFailure(Throwable caught) {
                             SC.warn("Failed to add execution: " + caught.getMessage());
                         }
@@ -186,13 +187,15 @@ public class MakeExecutionPublicTab extends Tab {
     }
 
     private void loadOutputsNames() {
-        List<Pair<String, String>> appsData = IntStream.range(0, publicExecution.getApplicationsNames().size())
+        PublicExecution execution = new PublicExecution(workflowsData);
+        List<Pair<String, String>> appsData = IntStream.range(0, execution.getApplicationsNames().size())
             .boxed()
             .map(i -> new Pair<>(
-                publicExecution.getApplicationsNames().get(i),
-                publicExecution.getApplicationsVersions().get(i)
+                execution.getApplicationsNames().get(i),
+                execution.getApplicationsVersions().get(i)
             ))
             .collect(Collectors.toList());
+
         AsyncCallback<List<String>> descriptorCallback = new AsyncCallback<>() {
             @Override
             public void onFailure(Throwable caught) {
@@ -206,7 +209,7 @@ public class MakeExecutionPublicTab extends Tab {
                         BoutiquesApplication applicationTool = new BoutiquesParser().parseApplication(descriptor);
 
                         for (BoutiquesOutputFile outputFile : applicationTool.getOutputFiles()) {
-                            for (var workflowData : publicExecution.getWorkflowsData()) {
+                            for (var workflowData : workflowsData) {
                                 if (workflowData.getSecond().equals(applicationTool.getName()) && workflowData.getThird().equals(applicationTool.getToolVersion())) {
                                     registerApplicationOutput(workflowData.getFirst(),
                                         applicationTool.getName(), applicationTool.getToolVersion(), outputFile.getName(), outputFile.getId());

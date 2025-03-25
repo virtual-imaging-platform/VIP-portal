@@ -27,7 +27,7 @@ public class ReproVipServiceImpl extends AbstractRemoteServiceServlet implements
     public void addPublicExecution(PublicExecution publicExecution) throws ApplicationException {
         try {
             if (publicExecutionBusiness.exist(publicExecution.getExperienceName())) {
-                throw new BusinessException("This experience name already exist!");
+                throw new ApplicationException("This experience name already exist!");
             } else {
                 publicExecutionBusiness.create(publicExecution);
             }
@@ -55,9 +55,9 @@ public class ReproVipServiceImpl extends AbstractRemoteServiceServlet implements
     }
 
     @Override
-    public boolean canMakeExecutionPublic(PublicExecution publicExecution) throws ApplicationException {
+    public boolean canMakeExecutionPublic(List<String> workflowsIds) throws ApplicationException {
         try {
-            return reproVipBusiness.canMakeExecutionPublic(publicExecution.getWorkflowsIds());
+            return reproVipBusiness.canMakeExecutionPublic(workflowsIds);
         } catch (BusinessException e) {
             throw new ApplicationException(e);
         }

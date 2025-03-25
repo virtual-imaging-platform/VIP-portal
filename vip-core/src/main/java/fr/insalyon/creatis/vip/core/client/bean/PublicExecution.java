@@ -31,6 +31,14 @@ public class PublicExecution implements IsSerializable {
     public PublicExecution() {}
 
     /**
+     * Only use this constructor for parsing workflowsData and having access to 
+     * getWorkflowsIds, getApplicationsNames, getApplicationsVersions
+     */
+    public PublicExecution(List<Triplet<String, String, String>> workflowsData) {
+        this.workflowsData = workflowsData;
+    }
+
+    /**
      * This constructor supposed that workflowsIds, applicationsNames and applicationsVersions are strings
      * that represent the list with SEPARATOR as delimiter.
      * Each string must be aligned to others ones (in the same order).

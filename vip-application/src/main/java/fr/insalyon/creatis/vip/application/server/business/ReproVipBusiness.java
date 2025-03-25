@@ -66,16 +66,19 @@ public class ReproVipBusiness {
             Path provenanceDirPath = Paths.get(server.getWorkflowsPath() + "/" + workflow + "/provenance");
 
             if ( ! Files.exists(provenanceDirPath)) {
-                 return false;
+                logger.warn("Provenance dir " + provenanceDirPath + " do not exist!");
+                return false;
             }
             // checking if it is empty
             if (provenanceDirPath.toFile().listFiles().length == 0) {
+                logger.warn("Provenance dir " + provenanceDirPath + " is empty!");
                 return false;
             }
             // verifying the application has a boutiques file
             Simulation simulation = workflowBusiness.getSimulation(workflow);
 
             if (getBoutiquesDescriptorJsonPath(simulation.getApplicationName(), simulation.getApplicationVersion()) == null) {
+                logger.warn("Boutiques descriptor not found for " + simulation.getApplicationName() + ":" + simulation.getApplicationVersion());
                 return false;
             }
         }

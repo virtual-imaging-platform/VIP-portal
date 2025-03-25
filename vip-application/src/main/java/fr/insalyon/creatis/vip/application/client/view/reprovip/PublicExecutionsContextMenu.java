@@ -33,9 +33,9 @@ public class PublicExecutionsContextMenu extends Menu {
         this.setShadowDepth(10);
         this.setWidth(90);
 
-        MenuItem optionPublicExecutionItem = new MenuItem("Create directory");
-        optionPublicExecutionItem.setIcon(CoreConstants.ICON_SUCCESS);
-        optionPublicExecutionItem.addClickHandler(new ClickHandler() {
+        MenuItem createDirectoryItem = new MenuItem("Create directory");
+        createDirectoryItem.setIcon(CoreConstants.ICON_SUCCESS);
+        createDirectoryItem.addClickHandler(new ClickHandler() {
             @Override
             public void onClick(MenuItemClickEvent event) {
                 createReproVipDirectory(experienceName);
@@ -62,7 +62,7 @@ public class PublicExecutionsContextMenu extends Menu {
 
         switch (status) {
             case REQUESTED:
-                this.setItems(optionPublicExecutionItem);
+                this.setItems(createDirectoryItem);
                 break;
             case DIRECTORY_CREATED:
                 this.setItems(deleteExecutionItem, publish);
@@ -111,24 +111,28 @@ public class PublicExecutionsContextMenu extends Menu {
                         @Override
                         public void execute(Boolean value) {
                             if (value) {
-                                reproVipServiceAsync.setExecutionPublished(experienceName, doi, new AsyncCallback<>() {
-                                    @Override
-                                    public void onFailure(Throwable caught) {
-                                        SC.warn("Error while setting doi: " + caught.getMessage());
-                                    }
-
-                                    @Override
-                                    public void onSuccess(PublicExecutionStatus s) {
-                                        SC.say("Doi successfully defined!");
-                                        refreshPublicExecutions();
-                                    }
-                                });
+                                setExecutionPublished(experienceName, doi);
                             }
                         }
                     });
                 } else {
                     SC.warn("DOI can't be empty!");
                 }
+            }
+        });
+    }
+
+    private void setExecutionPublished(String experienceName, String doi) {
+        reproVipServiceAsync.setExecutionPublished(experienceName, doi, new AsyncCallback<>() {
+            @Override
+            public void onFailure(Throwable caught) {
+                SC.warn("Error while setting doi: " + caught.getMessage());
+            }
+
+            @Override
+            public void onSuccess(PublicExecutionStatus s) {
+                SC.say("Doi successfully defined!");
+                refreshPublicExecutions();
             }
         });
     }
