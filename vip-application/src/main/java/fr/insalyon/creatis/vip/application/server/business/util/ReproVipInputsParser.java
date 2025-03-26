@@ -3,7 +3,6 @@ package fr.insalyon.creatis.vip.application.server.business.util;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -19,7 +18,7 @@ import fr.insalyon.creatis.vip.datamanager.client.bean.ExternalPlatform;
 import fr.insalyon.creatis.vip.datamanager.server.business.ExternalPlatformBusiness;
 
 
-public class ReproVipUtils {
+public class ReproVipInputsParser {
 
     private ExternalPlatformBusiness externalPlatformBusiness;
     private Map<String, String> providerInformations;
@@ -30,28 +29,24 @@ public class ReproVipUtils {
         LOCAL
     }
 
-    public ReproVipUtils(ExternalPlatformBusiness externalPlatformBusiness, String vipURL) {
+    public ReproVipInputsParser(ExternalPlatformBusiness externalPlatformBusiness, String vipURL) throws BusinessException {
         this.externalPlatformBusiness = externalPlatformBusiness;
         this.providerInformations = new LinkedHashMap<>();
-        this.simplifiedInputs = new LinkedHashMap<>();
 
         this.providerInformations.put("vip_url", vipURL);
     }
 
     public void parse(Map<String, String> inputs) throws BusinessException {
-        Map<String, List<String>> expandedInputs = getExpandedInputs(inputs);
-
-        Pair<ProviderType, Map<String, List<String>>> type = detectType(expandedInputs);
+        simplifiedInputs = getExpandedInputs(inputs);
+        Pair<ProviderType, Map<String, List<String>>> type = detectType(simplifiedInputs);
         
         providerInformations.put("storage_type", type.getA().toString());
         switch (type.getA()) {
             case GIRDER:
                 providerInformations.putAll(getGirderInformations(type.getB()));
-                simplifiedInputs = getGirderInputs(providerInformations.get("storage_id"), expandedInputs, type.getB().keySet());
+                handleGirderInputs(providerInformations.get("storage_id"), simplifiedInputs, type.getB().keySet());
                 break;
-            case LOCAL:
-                providerInformations.putAll(getLocalInformations(type.getB()));
-                simplifiedInputs = expandedInputs;
+            default:
                 break;
         }
     }
@@ -85,10 +80,6 @@ public class ReproVipUtils {
             }
         }
         return new Pair<ProviderType, Map<String, List<String>>>(providerType, concernedKeys);
-    }
-
-    private Map<String, String> getLocalInformations(Map<String, List<String>> filteredInputs) {
-        return Collections.emptyMap();
     }
 
     private Map<String, String> getGirderInformations(Map<String, List<String>> filteredInputs) throws BusinessException {
@@ -142,7 +133,7 @@ public class ReproVipUtils {
         }
     }
 
-    private Map<String, List<String>> getGirderInputs(String girderID, Map<String, List<String>> inputs, Set<String> editKeys) throws BusinessException {
+    private void handleGirderInputs(String girderID, Map<String, List<String>> inputs, Set<String> editKeys) throws BusinessException {
         Map<String, String> decomposedUri;
         List<String> uris;
 
@@ -154,6 +145,5 @@ public class ReproVipUtils {
                 uris.set(i, girderID + ":/" + decomposedUri.get("fileId"));
             }
         }
-        return inputs;
     }
 }

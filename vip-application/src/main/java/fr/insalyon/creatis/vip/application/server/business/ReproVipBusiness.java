@@ -7,7 +7,7 @@ import fr.insalyon.creatis.vip.application.client.bean.PublicExecution;
 import fr.insalyon.creatis.vip.application.client.bean.Simulation;
 import fr.insalyon.creatis.vip.application.client.bean.WorkflowData;
 import fr.insalyon.creatis.vip.application.server.business.simulation.parser.InputM2Parser;
-import fr.insalyon.creatis.vip.application.server.business.util.ReproVipUtils;
+import fr.insalyon.creatis.vip.application.server.business.util.ReproVipInputsParser;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.business.Server;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
@@ -182,7 +182,7 @@ public class ReproVipBusiness {
         Map<String, Object> metadata = new LinkedHashMap<>();
         List<Map<String, Object>> workflowsData = new ArrayList<>();
 
-        metadata.put("title", "your title");
+        metadata.put("title", publicExecution.getExperienceName());
         metadata.put("upload_type", "workflow");
         metadata.put("description", publicExecution.getComments());
         metadata.put("creators", List.of(Map.of("name", publicExecution.getAuthor())));
@@ -210,7 +210,7 @@ public class ReproVipBusiness {
 
     public void generateWorkflowInputJson(String workflowId, Path reproVipDir) throws BusinessException {
         ObjectMapper mapper = new ObjectMapper();
-        ReproVipUtils utils = new ReproVipUtils(externalPlatformBusiness, server.getHostURL());
+        ReproVipInputsParser utils = new ReproVipInputsParser(externalPlatformBusiness, server.getHostURL());
         InputM2Parser parser = new InputM2Parser();
 
         Map<String, String> inputs = parser.parse(server.getWorkflowsPath() + "/" + workflowId + "/inputs.xml");
