@@ -10,10 +10,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import fr.insalyon.creatis.vip.application.client.bean.PublicExecution;
+import fr.insalyon.creatis.vip.application.client.bean.PublicExecution.PublicExecutionStatus;
+import fr.insalyon.creatis.vip.application.client.bean.WorkflowData;
 import fr.insalyon.creatis.vip.application.server.business.PublicExecutionBusiness;
-import fr.insalyon.creatis.vip.core.client.bean.PublicExecution;
-import fr.insalyon.creatis.vip.core.client.bean.Triplet;
-import fr.insalyon.creatis.vip.core.client.bean.PublicExecution.PublicExecutionStatus;
 import fr.insalyon.creatis.vip.core.integrationtest.database.BaseSpringIT;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 
@@ -28,7 +28,7 @@ public class PublicExecutionIT extends BaseSpringIT {
     }
 
     private PublicExecution dumbExecution(String name) throws BusinessException {
-        var workflowData = new Triplet<String, String, String>("a", "b", "c");
+        var workflowData = new WorkflowData("a", "b", "c");
 
         PublicExecution execution = new PublicExecution(
             name, 

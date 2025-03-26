@@ -3,7 +3,7 @@ package fr.insalyon.creatis.vip.application.server.rpc;
 import fr.insalyon.creatis.vip.application.client.view.ApplicationException;
 import fr.insalyon.creatis.vip.application.server.business.PublicExecutionBusiness;
 import fr.insalyon.creatis.vip.application.server.business.ReproVipBusiness;
-import fr.insalyon.creatis.vip.core.client.bean.PublicExecution;
+import fr.insalyon.creatis.vip.application.client.bean.PublicExecution;
 import fr.insalyon.creatis.vip.application.client.rpc.ReproVipService;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.rpc.AbstractRemoteServiceServlet;

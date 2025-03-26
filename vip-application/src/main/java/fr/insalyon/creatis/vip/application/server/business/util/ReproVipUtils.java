@@ -2,9 +2,7 @@ package fr.insalyon.creatis.vip.application.server.business.util;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -15,6 +13,7 @@ import java.util.stream.Collectors;
 
 import com.google.web.bindery.requestfactory.server.Pair;
 
+import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.datamanager.client.bean.ExternalPlatform;
 import fr.insalyon.creatis.vip.datamanager.server.business.ExternalPlatformBusiness;
@@ -66,7 +65,7 @@ public class ReproVipUtils {
     }
 
     private Map<String, List<String>> getExpandedInputs(Map<String, String> inputs) {
-        inputs.remove("results-directory");
+        inputs.remove(CoreConstants.RESULTS_DIRECTORY_PARAM_NAME);
 
         return inputs.entrySet().stream()
             .collect(Collectors.toMap(
@@ -94,16 +93,11 @@ public class ReproVipUtils {
 
     private Map<String, String> getGirderInformations(Map<String, List<String>> filteredInputs) throws BusinessException {
         Map<String, String> result = new HashMap<>();
-        List<String> stringUris = filteredInputs.values().stream()
-            .flatMap(Collection::stream).collect(Collectors.toList());
-        List<Map<String, String>> uris = new ArrayList<>();
-
-        for (String uri : stringUris) {
-            uris.add(transformURItoMap(uri));
-        }
+        Map<String, String> transformUri = transformURItoMap(filteredInputs.values().iterator().next().getFirst());
+    
         
-        result.put("storage_url", getGirderURL(uris.getFirst()));
-        result.put("storage_id", getGirderVIPID(uris.getFirst()));
+        result.put("storage_url", getGirderURL(transformUri));
+        result.put("storage_id", getGirderVIPID(transformUri));
         return result;
     }
 
@@ -159,7 +153,6 @@ public class ReproVipUtils {
                 decomposedUri = transformURItoMap(uris.get(i));
                 uris.set(i, girderID + ":/" + decomposedUri.get("fileId"));
             }
-            inputs.replace(key, uris);
         }
         return inputs;
     }

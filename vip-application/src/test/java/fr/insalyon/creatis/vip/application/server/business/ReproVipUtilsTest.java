@@ -18,20 +18,16 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.insalyon.creatis.vip.application.server.business.simulation.parser.InputM2Parser;
 import fr.insalyon.creatis.vip.application.server.business.util.ReproVipUtils;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
-import fr.insalyon.creatis.vip.core.server.business.Server;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import fr.insalyon.creatis.vip.core.server.dao.GroupDAO;
 import fr.insalyon.creatis.vip.datamanager.client.bean.ExternalPlatform;
 import fr.insalyon.creatis.vip.datamanager.server.business.ExternalPlatformBusiness;
-import fr.insalyon.creatis.vip.datamanager.server.business.LfcPathsBusiness;
 
 public class ReproVipUtilsTest {
 
     @Mock private ExternalPlatformBusiness externalPlatformBusiness;
-    @Mock private Server server;
     @Mock private GroupDAO groupDAO;
-    
-    private LfcPathsBusiness lfcPathsBusiness;
+
     private InputM2Parser parser;
     private ReproVipUtils reproVipUtils;
 
@@ -39,9 +35,7 @@ public class ReproVipUtilsTest {
     public void init() throws BusinessException, DAOException {
         mocks();
 
-        lfcPathsBusiness = new LfcPathsBusiness(server, groupDAO);
-        parser = new InputM2Parser("admin_test");
-        parser.setLfcPathsBusiness(lfcPathsBusiness);
+        parser = new InputM2Parser();
 
         reproVipUtils = new ReproVipUtils(externalPlatformBusiness, "localhost");
     }
@@ -55,8 +49,6 @@ public class ReproVipUtilsTest {
 
         when(externalPlatformBusiness.listAll()).thenReturn(Arrays.asList(platform));
         when(groupDAO.getGroups()).thenReturn(Collections.emptyList());
-        when(server.getDataManagerUsersHome()).thenReturn("/var/www/html/workflows/SharedData/users");
-        when(server.getVoRoot()).thenReturn("/var/www/html/workflows/SharedData");
     }
 
     @Test

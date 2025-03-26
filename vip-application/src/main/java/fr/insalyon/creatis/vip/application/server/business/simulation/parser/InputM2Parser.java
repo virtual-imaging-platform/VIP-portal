@@ -83,6 +83,10 @@ public class InputM2Parser extends DefaultHandler {
         this.lfcPathsBusiness = lfcPathsBusiness;
     }
 
+    public InputM2Parser() {
+        this(null);
+    }
+
     public InputM2Parser(String currentUserFolder) {
         this.inputs = new HashMap<String, String>();
         this.parsingItem = false;
@@ -132,7 +136,9 @@ public class InputM2Parser extends DefaultHandler {
             if (values.size() == 1) {
                 String path = values.get(0);
                 try {
-                    path = lfcPathsBusiness.parseRealDir(path, currentUserFolder);
+                    if (lfcPathsBusiness != null) {
+                        path = lfcPathsBusiness.parseRealDir(path, currentUserFolder);
+                    }
                 } catch (DataManagerException ex) {
                     // do nothing
                 }
@@ -173,8 +179,10 @@ public class InputM2Parser extends DefaultHandler {
                             sb.append("; ");
                         }
                         try {
-                            v = lfcPathsBusiness.parseRealDir(
-                                v, currentUserFolder);
+                            if (lfcPathsBusiness != null) {
+                                v = lfcPathsBusiness.parseRealDir(
+                                    v, currentUserFolder);
+                            }
                         } catch (DataManagerException ex) {
                             // do nothing
                         }

@@ -4,7 +4,7 @@ import java.util.Objects;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
 
-public class Triplet<A, B, C> implements IsSerializable {
+public abstract class Triplet<A, B, C> implements IsSerializable {
 
     private A first;
     private B second;
@@ -18,15 +18,15 @@ public class Triplet<A, B, C> implements IsSerializable {
         this.third = third;
     }
 
-    public A getFirst() {
+    protected A getFirst() {
         return first;
     }
 
-    public B getSecond() {
+    protected B getSecond() {
         return second;
     }
 
-    public C getThird() {
+    protected C getThird() {
         return third;
     }
 

@@ -3,16 +3,15 @@ package fr.insalyon.creatis.vip.application.server.business;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import fr.insalyon.creatis.vip.application.client.bean.AppVersion;
+import fr.insalyon.creatis.vip.application.client.bean.PublicExecution;
 import fr.insalyon.creatis.vip.application.client.bean.Simulation;
+import fr.insalyon.creatis.vip.application.client.bean.WorkflowData;
 import fr.insalyon.creatis.vip.application.server.business.simulation.parser.InputM2Parser;
 import fr.insalyon.creatis.vip.application.server.business.util.ReproVipUtils;
-import fr.insalyon.creatis.vip.core.client.bean.PublicExecution;
-import fr.insalyon.creatis.vip.core.client.bean.Triplet;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.business.Server;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import fr.insalyon.creatis.vip.datamanager.server.business.ExternalPlatformBusiness;
-import fr.insalyon.creatis.vip.datamanager.server.business.LfcPathsBusiness;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,18 +43,16 @@ public class ReproVipBusiness {
     private final Server server;
     private final SimulationBusiness simulationBusiness;
     private final WorkflowBusiness workflowBusiness;
-    private final LfcPathsBusiness lfcPathsBusiness;
     private final ExternalPlatformBusiness externalPlatformBusiness;
 
     @Autowired
     public ReproVipBusiness(ApplicationBusiness applicationBusiness, Server server, SimulationBusiness simulationBusiness,
-            WorkflowBusiness workflowBusiness, LfcPathsBusiness lfcPathsBusiness, ExternalPlatformBusiness externalPlatformBusiness,
+            WorkflowBusiness workflowBusiness, ExternalPlatformBusiness externalPlatformBusiness,
             PublicExecutionBusiness publicExecutionBusiness) {
         this.applicationBusiness = applicationBusiness;
         this.server = server;
         this.simulationBusiness = simulationBusiness;
         this.workflowBusiness = workflowBusiness;
-        this.lfcPathsBusiness = lfcPathsBusiness;
         this.externalPlatformBusiness = externalPlatformBusiness;
         this.publicExecutionBusiness = publicExecutionBusiness;
     }
@@ -85,7 +82,7 @@ public class ReproVipBusiness {
         return true;
     }
 
-    public String createReproVipDirectory(String experienceName) throws BusinessException {
+    public void createReproVipDirectory(String experienceName) throws BusinessException {
         PublicExecution publicExecution = publicExecutionBusiness.get(experienceName);
         Path reproVipDir = Paths.get(server.getReproVIPRootDir()).resolve(experienceName);
 
@@ -100,7 +97,7 @@ public class ReproVipBusiness {
         }
 
         copyReadme(reproVipDir);
-        return generateReprovipJson(reproVipDir, publicExecution);
+        generateReprovipJson(reproVipDir, publicExecution);
     }
 
     public List<Path> copyProvenanceFiles(Path reproVipDir, String executionID) throws BusinessException {
@@ -163,23 +160,23 @@ public class ReproVipBusiness {
         return invocationsOutputs;
     }
 
-    private Map<String, Object> formatWorkflowData(Path reproVipDir, Triplet<String, String, String> workflowData, PublicExecution execution)
+    private Map<String, Object> formatWorkflowData(Path reproVipDir, WorkflowData workflowData, PublicExecution execution)
             throws BusinessException, DAOException {
         Map<String, Object> data = new HashMap<>();
-        List<Path> provenancesFiles = copyProvenanceFiles(reproVipDir, workflowData.getFirst());
-        List<String> outputIds = execution.getMappedOutputIds().getOrDefault(workflowData.getFirst(), Collections.emptyList());
+        List<Path> provenancesFiles = copyProvenanceFiles(reproVipDir, workflowData.getWorkflowId());
+        List<String> outputIds = execution.getMappedOutputIds().getOrDefault(workflowData.getWorkflowId(), Collections.emptyList());
 
         // we convert path to string because if there are some caracters like " " by default it encodes it
-        data.put("workflowId", workflowData.getFirst());
-        data.put("directory", reproVipDir.resolve(workflowData.getFirst()).toString());
-        data.put("boutique_descriptor", getBoutiquesDescriptorJsonPath(workflowData.getSecond(), workflowData.getThird()));
+        data.put("workflowId", workflowData.getWorkflowId());
+        data.put("directory", reproVipDir.resolve(workflowData.getWorkflowId()).toString());
+        data.put("boutique_descriptor", getBoutiquesDescriptorJsonPath(workflowData.getAppName(), workflowData.getAppVersion()));
         data.put("provenances_files", provenancesFiles.stream().map(Path::toString).collect(Collectors.toList()));
-        data.put("invocation_outputs", getInvocationsOutputs(workflowData.getFirst(), provenancesFiles, outputIds));
+        data.put("invocation_outputs", getInvocationsOutputs(workflowData.getWorkflowId(), provenancesFiles, outputIds));
 
         return data;
     }
 
-    public String generateReprovipJson(Path reproVipDir, PublicExecution publicExecution)
+    public void generateReprovipJson(Path reproVipDir, PublicExecution publicExecution)
             throws BusinessException {
         Map<String, Object> structuredJson = new LinkedHashMap<>();
         Map<String, Object> metadata = new LinkedHashMap<>();
@@ -193,8 +190,8 @@ public class ReproVipBusiness {
         try {
             for (var data : publicExecution.getWorkflowsData()) {
                 workflowsData.add(formatWorkflowData(reproVipDir, data, publicExecution));
-                generateWorkflowInputJson(data.getFirst(), publicExecution.getAuthor(), reproVipDir);
-            }
+                generateWorkflowInputJson(data.getWorkflowId(), reproVipDir);
+            } 
         } catch (DAOException e) {
             throw new BusinessException(e);
         }
@@ -204,22 +201,17 @@ public class ReproVipBusiness {
 
         ObjectMapper objectMapper = new ObjectMapper();
         try {
-            String jsonContent = objectMapper.writeValueAsString(structuredJson);
-            Path reprovipJsonPath = reproVipDir.resolve("summary.json");
-            Files.writeString(reprovipJsonPath, jsonContent);
-
-            return jsonContent;
+            objectMapper.writeValue(reproVipDir.resolve("summary.json").toFile(), structuredJson);
         } catch (IOException e) {
             logger.error("Error saving reprovip metadata file for {}", publicExecution.getExperienceName(), e);
             throw new BusinessException("Failed to save JSON to file", e);
         }
     }
 
-    public void generateWorkflowInputJson(String workflowId, String author, Path reproVipDir) throws BusinessException {
+    public void generateWorkflowInputJson(String workflowId, Path reproVipDir) throws BusinessException {
         ObjectMapper mapper = new ObjectMapper();
         ReproVipUtils utils = new ReproVipUtils(externalPlatformBusiness, server.getHostURL());
-        InputM2Parser parser = new InputM2Parser(author);
-        parser.setLfcPathsBusiness(lfcPathsBusiness);
+        InputM2Parser parser = new InputM2Parser();
 
         Map<String, String> inputs = parser.parse(server.getWorkflowsPath() + "/" + workflowId + "/inputs.xml");
         Map<String, Object> json = new HashMap<>();
@@ -229,7 +221,7 @@ public class ReproVipBusiness {
         json.put("inputs", utils.getSimplifiedInputs());
 
         try {
-            Files.writeString(reproVipDir.resolve(workflowId + ".json"), mapper.writeValueAsString(json));
+            mapper.writeValue(reproVipDir.resolve(workflowId + ".json").toFile(), json);
         } catch (IOException e) {
             logger.error("Error saving reprovip inputs file for {}", workflowId, e);
             throw new BusinessException("Failed to save inputs JSON to file", e);

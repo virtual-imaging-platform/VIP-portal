@@ -1,7 +1,7 @@
 package fr.insalyon.creatis.vip.application.server.dao.mysql;
 
+import fr.insalyon.creatis.vip.application.client.bean.PublicExecution;
 import fr.insalyon.creatis.vip.application.server.dao.PublicExecutionDAO;
-import fr.insalyon.creatis.vip.core.client.bean.PublicExecution;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

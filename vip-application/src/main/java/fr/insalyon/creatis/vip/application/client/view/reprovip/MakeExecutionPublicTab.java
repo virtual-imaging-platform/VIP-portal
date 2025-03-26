@@ -19,29 +19,26 @@ import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.tab.Tab;
 import com.smartgwt.client.data.Record;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
+import fr.insalyon.creatis.vip.application.client.bean.PublicExecution;
+import fr.insalyon.creatis.vip.application.client.bean.WorkflowData;
 import fr.insalyon.creatis.vip.application.client.bean.boutiquesTools.BoutiquesApplication;
 import fr.insalyon.creatis.vip.application.client.bean.boutiquesTools.BoutiquesOutputFile;
 import fr.insalyon.creatis.vip.application.client.rpc.*;
 import fr.insalyon.creatis.vip.application.client.view.boutiquesParsing.BoutiquesParser;
 import fr.insalyon.creatis.vip.application.client.view.boutiquesParsing.InvalidBoutiquesDescriptorException;
 import fr.insalyon.creatis.vip.core.client.bean.Pair;
-import fr.insalyon.creatis.vip.core.client.bean.PublicExecution;
-import fr.insalyon.creatis.vip.core.client.bean.Triplet;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
 import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
 
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
+import java.util.Map;
 
 public class MakeExecutionPublicTab extends Tab {
 
-    private List<Triplet<String, String, String>> workflowsData;
-    private Set<String> existingsOutputs;
+    private List<WorkflowData> workflowsData;
 
     private VLayout makeExecutionPublicLayout;
 
@@ -54,13 +51,12 @@ public class MakeExecutionPublicTab extends Tab {
     private ListGrid selectedOutputs;
     private ListGrid othersOuputs;
 
-    public MakeExecutionPublicTab(List<Triplet<String, String, String>> workflowsData, String authors) {
+    public MakeExecutionPublicTab(List<WorkflowData> workflowsData, String authors) {
         setID(ApplicationConstants.TAB_MAKE_EXECUTION_PUBLIC);
         setTitle("Make execution public");
         setCanClose(true);
 
         this.workflowsData = workflowsData;
-        existingsOutputs = new HashSet<>();
 
         VLayout vLayout = new VLayout();
         vLayout.setWidth100();
@@ -73,7 +69,7 @@ public class MakeExecutionPublicTab extends Tab {
 
         configureExecutionPublicLayout();
 
-        experienceNameField.setValue("experience_name");
+        experienceNameField.setValue("");
         authorNameField.setValue(authors);
         commentsItem.setValue("");
         vLayout.addMember(makeExecutionPublicLayout);
@@ -102,7 +98,7 @@ public class MakeExecutionPublicTab extends Tab {
                         authorNameField.getValueAsString(),
                         commentsItem.getValueAsString(),
                         getOutputIdsSelected(),
-                        "");
+                        null);
 
                     ReproVipService.Util.getInstance().addPublicExecution(execution, new AsyncCallback<Void>() {
                         public void onFailure(Throwable caught) {
@@ -123,7 +119,7 @@ public class MakeExecutionPublicTab extends Tab {
         makeExecutionPublicLayout = WidgetUtil.getVIPLayout(1000);
         makeExecutionPublicLayout.addMember(
         WidgetUtil.getLabel("<b>Subject to validation by VIP administrators, this functionality allows to push " +
-                "the results and execution traces of the concerned VIP workflow on <a href=\"https://zenodo.org/\">Zenodo</a>." +
+                "the results and execution traces of the concerned VIP workflow(s) on <a href=\"https://zenodo.org/\">Zenodo</a>." +
                 " A DOI is retrieved in exchange, allowing to easily identify and share your results with the community." +
                 "<br/>" +
                 "Please make sure you are allowed to share the output data publicly and do not hesitate to contact " +
@@ -188,14 +184,7 @@ public class MakeExecutionPublicTab extends Tab {
 
     private void loadOutputsNames() {
         PublicExecution execution = new PublicExecution(workflowsData);
-        List<Pair<String, String>> appsData = IntStream.range(0, execution.getApplicationsNames().size())
-            .boxed()
-            .map(i -> new Pair<>(
-                execution.getApplicationsNames().get(i),
-                execution.getApplicationsVersions().get(i)
-            ))
-            .collect(Collectors.toList());
-
+        List<Pair<String, String>> appsData = execution.getAppsAndVersions();
         AsyncCallback<List<String>> descriptorCallback = new AsyncCallback<>() {
             @Override
             public void onFailure(Throwable caught) {
@@ -204,24 +193,31 @@ public class MakeExecutionPublicTab extends Tab {
             }
             @Override
             public void onSuccess(List<String> descriptors) {
-                for (String descriptor : descriptors) {
-                    try {
-                        BoutiquesApplication applicationTool = new BoutiquesParser().parseApplication(descriptor);
+                Map<Pair<String, String>, List<BoutiquesOutputFile>> allOutputs = new HashMap<>();
+                BoutiquesParser parser = new BoutiquesParser();
 
-                        for (BoutiquesOutputFile outputFile : applicationTool.getOutputFiles()) {
-                            for (var workflowData : workflowsData) {
-                                if (workflowData.getSecond().equals(applicationTool.getName()) && workflowData.getThird().equals(applicationTool.getToolVersion())) {
-                                    registerApplicationOutput(workflowData.getFirst(),
-                                        applicationTool.getName(), applicationTool.getToolVersion(), outputFile.getName(), outputFile.getId());
-                                }
-                            }
-                        }
-
-                    } catch (InvalidBoutiquesDescriptorException exception) {
-                        SC.warn("Error when parsing application descriptor: " + exception.getMessage());
-                    } finally {
-                        Layout.getInstance().getModal().hide();
+                try {
+                    for (String descriptor : descriptors) {
+                        BoutiquesApplication app = parser.parseApplication(descriptor);
+    
+                        allOutputs.putIfAbsent(
+                            new Pair<>(app.getName(), app.getToolVersion()),
+                            new ArrayList<>(app.getOutputFiles()));
                     }
+    
+                    for (var workflow : workflowsData) {
+                        var listOutputs = allOutputs.get(new Pair<>(workflow.getAppName(), workflow.getAppVersion()));
+    
+                        for (BoutiquesOutputFile output : listOutputs) {
+                            registerApplicationOutput(
+                                workflow.getWorkflowId(), workflow.getAppName(), workflow.getAppVersion(), 
+                                output.getName(), output.getId());
+                        }
+                    }
+                } catch (InvalidBoutiquesDescriptorException exception) {
+                    SC.warn("Error when parsing application descriptor: " + exception.getMessage());
+                } finally {
+                    Layout.getInstance().getModal().hide();
                 }
             }
         };
@@ -268,10 +264,7 @@ public class MakeExecutionPublicTab extends Tab {
         record.setAttribute("outputName", outputName);
         record.setAttribute("outputId", outputId);
 
-        if ( ! existingsOutputs.contains(recordToString(record))) {
-            othersOuputs.addData(record);
-            existingsOutputs.add(recordToString(record));
-        }
+        othersOuputs.addData(record);
     }
 
     private VLayout listWithTitle(ListGrid list) {
@@ -280,16 +273,5 @@ public class MakeExecutionPublicTab extends Tab {
         vLayout.addMember(WidgetUtil.getLabel("<b>"+list.getTitle()+"</b>", 50));
         vLayout.addMember(list);
         return vLayout;
-    }
-
-    private String recordToString(Record record) {
-        StringBuilder builder = new StringBuilder();
-
-        builder.append(record.getAttribute("workflowId"));
-        builder.append(record.getAttribute("applicationName"));
-        builder.append(record.getAttribute("applicationVersion"));
-        builder.append(record.getAttribute("outputId"));
-
-        return builder.toString();
     }
 }

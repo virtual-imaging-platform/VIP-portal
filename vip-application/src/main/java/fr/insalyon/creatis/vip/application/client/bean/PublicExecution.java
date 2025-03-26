@@ -1,6 +1,8 @@
-package fr.insalyon.creatis.vip.core.client.bean;
+package fr.insalyon.creatis.vip.application.client.bean;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
+
+import fr.insalyon.creatis.vip.core.client.bean.Pair;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -10,13 +12,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class PublicExecution implements IsSerializable {
 
     public final static String SEPARATOR = ", ";
 
     private String experienceName;
-    private List<Triplet<String, String, String>> workflowsData; // struct -> workflowId, appName, appVersion
+    private List<WorkflowData> workflowsData; // struct -> workflowId, appName, appVersion
     private PublicExecutionStatus status;
     private String author;
     private String comments;
@@ -34,7 +37,7 @@ public class PublicExecution implements IsSerializable {
      * Only use this constructor for parsing workflowsData and having access to 
      * getWorkflowsIds, getApplicationsNames, getApplicationsVersions
      */
-    public PublicExecution(List<Triplet<String, String, String>> workflowsData) {
+    public PublicExecution(List<WorkflowData> workflowsData) {
         this.workflowsData = workflowsData;
     }
 
@@ -50,7 +53,7 @@ public class PublicExecution implements IsSerializable {
             status, author, comments, Arrays.asList(outputIds.split(SEPARATOR, -1)), doi);
     }
 
-    public PublicExecution(String experienceName, List<Triplet<String, String, String>> workflowsData,
+    public PublicExecution(String experienceName, List<WorkflowData> workflowsData,
             PublicExecutionStatus status, String author, String comments, List<String> outputIds, String doi) {
         this.experienceName = experienceName;
         this.workflowsData = workflowsData;
@@ -61,7 +64,7 @@ public class PublicExecution implements IsSerializable {
         this.doi = doi;
 
         // to ensure that workflowIds are alphabetical ordered
-        this.workflowsData.sort(Comparator.comparing(Triplet::getFirst));
+        this.workflowsData.sort(Comparator.comparing(WorkflowData::getWorkflowId));
     }
 
     public void setStatus(PublicExecutionStatus status) { this.status = status; }
@@ -73,18 +76,18 @@ public class PublicExecution implements IsSerializable {
     public String getDoi() { return doi; }
     public PublicExecutionStatus getStatus() { return status; }
     public List<String> getOutputIds() { return outputIds; }
-    public List<Triplet<String, String, String>> getWorkflowsData() { return workflowsData; }
+    public List<WorkflowData> getWorkflowsData() { return workflowsData; }
 
     public List<String> getWorkflowsIds() {
-        return workflowsData.stream().map((w) -> w.getFirst()).collect(Collectors.toList());
+        return workflowsData.stream().map((w) -> w.getWorkflowId()).collect(Collectors.toList());
     }
 
     public List<String> getApplicationsNames() {
-        return workflowsData.stream().map((w) -> w.getSecond()).collect(Collectors.toList());
+        return workflowsData.stream().map((w) -> w.getAppName()).collect(Collectors.toList());
     }
 
     public List<String> getApplicationsVersions() {
-        return workflowsData.stream().map((w) -> w.getThird()).collect(Collectors.toList());
+        return workflowsData.stream().map((w) -> w.getAppVersion()).collect(Collectors.toList());
     }
 
     /**
@@ -93,11 +96,13 @@ public class PublicExecution implements IsSerializable {
     public Map<String, List<String>> getMappedOutputIds() {
         Map<String, List<String>> result = new HashMap<>();
         String workflowId, outputId;
+        int startIndex;
 
         for (String output : outputIds) {
             // splitting workflow-xxxxx-outname
-            workflowId = output.substring(0, output.indexOf('-', 10));
-            outputId = output.substring(output.indexOf('-', 10) + 1);
+            startIndex = output.indexOf('-', 0) + 1;
+            workflowId = output.substring(0, output.indexOf('-', startIndex));
+            outputId = output.substring(output.indexOf('-', startIndex) + 1);
 
             if (result.get(workflowId) != null) {
                 result.get(workflowId).add(outputId);
@@ -108,16 +113,28 @@ public class PublicExecution implements IsSerializable {
         return result;
     }
 
-    private static List<Triplet<String, String, String>> getWorkflowsDataFromStrings(String workflowsIds, String applicationsNames, String applicationsVersions) {
-        List<Triplet<String, String, String>> results = new ArrayList<>();
+    public List<Pair<String, String>> getAppsAndVersions() {
+        return IntStream.range(0, getWorkflowsData().size())
+            .boxed()
+            .map(i -> new Pair<>(
+                getApplicationsNames().get(i),
+                getApplicationsVersions().get(i)
+            ))
+            .collect(Collectors.toList());
+    } 
+
+    private static List<WorkflowData> getWorkflowsDataFromStrings(String workflowsIds, String applicationsNames, String applicationsVersions) {
+        List<WorkflowData> results = new ArrayList<>();
         String[] ids = workflowsIds.split(SEPARATOR, -1);
         String[] names = applicationsNames.split(SEPARATOR, -1);
         String[] versions = applicationsVersions.split(SEPARATOR, -1);
 
         if (ids.length == names.length && ids.length == versions.length) {
             for (int i = 0; i < ids.length; i++) {
-                results.add(new Triplet<>(ids[i], names[i], versions[i]));
+                results.add(new WorkflowData(ids[i], names[i], versions[i]));
             }
+        } else {
+            throw new IllegalArgumentException("Each string must have the same number of separators !");
         }
         return results;
     }

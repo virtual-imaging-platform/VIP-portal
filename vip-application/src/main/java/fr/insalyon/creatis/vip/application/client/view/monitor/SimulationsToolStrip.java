@@ -39,14 +39,14 @@ import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
+import fr.insalyon.creatis.vip.application.client.bean.PublicExecution;
+import fr.insalyon.creatis.vip.application.client.bean.WorkflowData;
 import fr.insalyon.creatis.vip.application.client.rpc.ReproVipService;
 import fr.insalyon.creatis.vip.application.client.rpc.WorkflowService;
 import fr.insalyon.creatis.vip.application.client.rpc.WorkflowServiceAsync;
 import fr.insalyon.creatis.vip.application.client.view.monitor.record.SimulationRecord;
 import fr.insalyon.creatis.vip.application.client.view.reprovip.MakeExecutionPublicTab;
 import fr.insalyon.creatis.vip.core.client.CoreModule;
-import fr.insalyon.creatis.vip.core.client.bean.PublicExecution;
-import fr.insalyon.creatis.vip.core.client.bean.Triplet;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
@@ -410,7 +410,7 @@ public class SimulationsToolStrip extends ToolStrip {
 
     private void makeExecutionsPublic() {
         ListGridRecord[] records = getSimulationsTab().getGridSelection();
-        List<Triplet<String, String, String>> workflowsData = new ArrayList<>();
+        List<WorkflowData> workflowsData = new ArrayList<>();
         List<String> authors = new ArrayList<>();
 
         if (records.length == 0) {
@@ -425,7 +425,7 @@ public class SimulationsToolStrip extends ToolStrip {
                     return;
                 } else {
                     authors.add(data.getUser());
-                    workflowsData.add(new Triplet<String,String,String>(
+                    workflowsData.add(new WorkflowData(
                         data.getSimulationId(), data.getApplication(), data.getApplicationVersion()));
                 }
             }
