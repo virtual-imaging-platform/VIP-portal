@@ -42,7 +42,7 @@ import com.google.gwt.user.client.rpc.IsSerializable;
 public class CoreConstants implements IsSerializable {
 
 
-    public static final String VERSION = "v3.0";
+    public static final String VERSION = "v3.1-dev";
     // Configuration Labels
     public static final String VO_NAME = "vo.name";
     public static final String VO_ROOT = "vo.root";
