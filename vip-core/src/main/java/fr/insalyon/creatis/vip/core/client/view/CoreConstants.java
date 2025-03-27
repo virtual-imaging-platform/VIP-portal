@@ -200,6 +200,7 @@ public class CoreConstants implements IsSerializable {
 
     public static final String USE_REST_MOTEUR_SERVER = "moteur.rest.enabled";
     public static final String MOTEUR_REST_PASSWORD = "moteur.rest.password";
+    public static final String HOST_URL = "host.url";
 
 
 

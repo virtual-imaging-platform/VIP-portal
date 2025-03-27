@@ -40,8 +40,6 @@ import com.smartgwt.client.widgets.menu.MenuItemSeparator;
 import com.smartgwt.client.widgets.menu.events.ClickHandler;
 import com.smartgwt.client.widgets.menu.events.MenuItemClickEvent;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
-import fr.insalyon.creatis.vip.application.client.rpc.ReproVipService;
-import fr.insalyon.creatis.vip.application.client.rpc.ReproVipServiceAsync;
 import fr.insalyon.creatis.vip.application.client.rpc.WorkflowService;
 import fr.insalyon.creatis.vip.application.client.view.common.AbstractSimulationTab;
 import fr.insalyon.creatis.vip.application.client.view.launch.RelaunchService;
@@ -49,9 +47,7 @@ import fr.insalyon.creatis.vip.application.client.view.monitor.ChangeSimulationU
 import fr.insalyon.creatis.vip.application.client.view.monitor.SimulationStatus;
 import fr.insalyon.creatis.vip.application.client.view.monitor.SimulationTab;
 import fr.insalyon.creatis.vip.application.client.view.monitor.SimulationsTab;
-import fr.insalyon.creatis.vip.application.client.view.reprovip.MakeExecutionPublicTab;
 import fr.insalyon.creatis.vip.core.client.CoreModule;
-import fr.insalyon.creatis.vip.core.client.bean.PublicExecution;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
@@ -71,7 +67,6 @@ public class SimulationsContextMenu extends Menu {
     private String applicationVersion;
     private String applicationClass;
     private String simulationUser;
-    private ReproVipServiceAsync reproVipServiceAsync = ReproVipService.Util.getInstance();
 
     public SimulationsContextMenu(
             ModalWindow modal, final String simulationID, final String title, final SimulationStatus status,
@@ -186,14 +181,6 @@ public class SimulationsContextMenu extends Menu {
             }
         });
 
-        MenuItem makePublicExecutionItem = new MenuItem("Make this execution public");
-        makePublicExecutionItem.addClickHandler(new ClickHandler() {
-            @Override
-            public void onClick(MenuItemClickEvent event) {
-                makeExecutionPublic();
-            }
-        });
-
         MenuItemSeparator separator = new MenuItemSeparator();
 
         switch (status) {
@@ -207,9 +194,9 @@ public class SimulationsContextMenu extends Menu {
 
             case Completed:
                 if (CoreModule.user.isSystemAdministrator()) {
-                    this.setItems(viewItem, cleanItem, separator, relauchItem, separator, changeUserItem, separator, makePublicExecutionItem);
+                    this.setItems(viewItem, cleanItem, separator, relauchItem, separator, changeUserItem, separator);
                 } else {
-                    this.setItems(viewItem, cleanItem, separator, relauchItem, separator, makePublicExecutionItem);
+                    this.setItems(viewItem, cleanItem, separator, relauchItem, separator);
                 }
                 break;
 
@@ -229,36 +216,6 @@ public class SimulationsContextMenu extends Menu {
                     this.setItems(viewItem, cleanItem, separator, relauchItem);
                 }
         }
-    }
-
-    private void makeExecutionPublic() {
-        final AsyncCallback<Boolean> callback = new AsyncCallback<Boolean>() {
-            @Override
-            public void onFailure(Throwable caught) {
-                SC.warn("Error checking if execution exists: " + caught.getMessage());
-            }
-            @Override
-            public void onSuccess(Boolean ok) {
-                if ( ! ok) {
-                    SC.warn("This execution can not be made public (it may be already public).");
-                } else {
-                    SC.ask("Do you really want to make this execution public: (" + simulationName + ")?", new BooleanCallback() {
-                        @Override
-                        public void execute(Boolean value) {
-                            if (value) {
-                                PublicExecution publicExecution =
-                                        new PublicExecution(simulationID, simulationName, applicationName,
-                                                applicationVersion, simulationUser);
-                                Layout.getInstance().addTab(
-                                        ApplicationConstants.TAB_MAKE_EXECUTION_PUBLIC,
-                                        () -> new MakeExecutionPublicTab(publicExecution));
-                            }
-                        }
-                    });
-                }
-            }
-        };
-        reproVipServiceAsync.canMakeExecutionPublic(simulationID, callback);
     }
 
     /**

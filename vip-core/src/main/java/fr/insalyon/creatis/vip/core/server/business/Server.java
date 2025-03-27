@@ -121,4 +121,6 @@ public interface Server {
     boolean useRestMoteurServer();
 
     String getMoteurServerPassword();
+
+    String getHostURL();
 }

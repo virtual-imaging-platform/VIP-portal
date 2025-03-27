@@ -37,12 +37,15 @@ import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
-import com.smartgwt.client.widgets.tab.Tab;
 import com.smartgwt.client.widgets.toolbar.ToolStrip;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
+import fr.insalyon.creatis.vip.application.client.bean.PublicExecution;
+import fr.insalyon.creatis.vip.application.client.bean.WorkflowData;
+import fr.insalyon.creatis.vip.application.client.rpc.ReproVipService;
 import fr.insalyon.creatis.vip.application.client.rpc.WorkflowService;
 import fr.insalyon.creatis.vip.application.client.rpc.WorkflowServiceAsync;
 import fr.insalyon.creatis.vip.application.client.view.monitor.record.SimulationRecord;
+import fr.insalyon.creatis.vip.application.client.view.reprovip.MakeExecutionPublicTab;
 import fr.insalyon.creatis.vip.core.client.CoreModule;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
@@ -84,7 +87,7 @@ public class SimulationsToolStrip extends ToolStrip {
             }
         }));
 
-        //Kill Executions Button
+        // Kill Executions Button
         this.addButton(WidgetUtil.getToolStripButton("Kill Executions",
                 ApplicationConstants.ICON_KILL, null, new ClickHandler() {
             @Override
@@ -115,17 +118,19 @@ public class SimulationsToolStrip extends ToolStrip {
                 });
             }
         }));
-        //Report issue Button
+
+        // Report issue Button
         this.addButton(WidgetUtil.getToolStripButton("Report Issue About This Execution",
                 ApplicationConstants.ICON_REPORT_ISSUE, null, new ClickHandler() {
             @Override
             public void onClick(ClickEvent event) {
                 ListGridRecord[] records = getSimulationsTab().getGridSelection();
                 List<String> simulationIDs = new ArrayList<String>();
+
                 List<String> simulationNames = new ArrayList<String>();
                 for (ListGridRecord record : records) {
                     SimulationRecord data = (SimulationRecord) record;
-                    SimulationStatus status = SimulationStatus.valueOf(data.getStatus());
+
                     simulationIDs.add(data.getSimulationId());
                     simulationNames.add(data.getSimulationName());
                 }
@@ -133,6 +138,15 @@ public class SimulationsToolStrip extends ToolStrip {
             }
         }));
 
+        // ReproVIP Button
+        this.addSeparator();
+        this.addButton(WidgetUtil.getToolStripButton("Make execution(s) public",
+                ApplicationConstants.APP_REPRO_VIP, null, new ClickHandler() {
+            @Override
+            public void onClick(ClickEvent event) {
+                makeExecutionsPublic();
+            }
+        }));
 
         if (CoreModule.user.isSystemAdministrator()) {
             this.addSeparator();
@@ -183,7 +197,6 @@ public class SimulationsToolStrip extends ToolStrip {
                     });
                 }
             }));
-
 
             // Stats Button
             this.addSeparator();
@@ -284,10 +297,7 @@ public class SimulationsToolStrip extends ToolStrip {
                                     + " I had to kill your " + "\""+ applicationName+ "\"" + " execution "
                                     + "\""+ simulationName+ "\""+ " submitted on " + date
                                     + " because all the jobs were failing with the following error:"
-                                    + "<br /><br /><br /><br />",user);
-
-
-
+                                    + "<br /><br /><br /><br />", user);
                 }
             };
             service.killSimulations(simulationIDs, callback);
@@ -297,7 +307,6 @@ public class SimulationsToolStrip extends ToolStrip {
 
     /**
      * Sends a request to clean the selected completed/killed simulations
-     *
      */
     private void cleanSimulations() {
 
@@ -335,7 +344,6 @@ public class SimulationsToolStrip extends ToolStrip {
 
     /**
      * Sends a request to purge the selected cleaned simulations
-     *
      */
     private void purgeSimulations() {
 
@@ -400,6 +408,54 @@ public class SimulationsToolStrip extends ToolStrip {
         modal.show("Marking selected executions completed...", true);
     }
 
+    private void makeExecutionsPublic() {
+        ListGridRecord[] records = getSimulationsTab().getGridSelection();
+        List<WorkflowData> workflowsData = new ArrayList<>();
+        List<String> authors = new ArrayList<>();
+
+        if (records.length == 0) {
+            Layout.getInstance().setWarningMessage("You must select at least 1 workflow!");
+        } else {
+            for (ListGridRecord record : records) {
+                SimulationRecord data = (SimulationRecord) record;
+                SimulationStatus status = SimulationStatus.valueOf(data.getStatus());
+
+                if (status != SimulationStatus.Completed) {
+                    Layout.getInstance().setWarningMessage("You must select only completed executions!");
+                    return;
+                } else {
+                    authors.add(data.getUser());
+                    workflowsData.add(new WorkflowData(
+                        data.getSimulationId(), data.getApplication(), data.getApplicationVersion()));
+                }
+            }
+            final List<String> workflowsIds = new PublicExecution(workflowsData).getWorkflowsIds();
+            final AsyncCallback<Boolean> callback = new AsyncCallback<Boolean>() {
+                @Override
+                public void onFailure(Throwable caught) {
+                    SC.warn("Error checking if execution exists: " + caught.getMessage());
+                }
+                @Override
+                public void onSuccess(Boolean ok) {
+                    if ( ! ok) {
+                        SC.warn("These execution(s) can not be made public (it may be already public).");
+                    } else {
+                        SC.ask("Do you really want to make these execution(s) public: (" + String.join(", ", workflowsIds) + ")?\n", new BooleanCallback() {
+                            @Override
+                            public void execute(Boolean value) {
+                                if (value) {
+                                    Layout.getInstance().addTab(ApplicationConstants.TAB_MAKE_EXECUTION_PUBLIC, 
+                                        () -> new MakeExecutionPublicTab(workflowsData, String.join(", ", authors)));
+                                }
+                            }
+                        });
+                    }
+                }
+            };
+            ReproVipService.Util.getInstance().canMakeExecutionPublic(workflowsIds, callback);
+        }
+    }
+
     private SimulationsTab getSimulationsTab() {
         return (SimulationsTab) Layout.getInstance().getTab(ApplicationConstants.TAB_MONITOR);
     }
@@ -411,12 +467,9 @@ public class SimulationsToolStrip extends ToolStrip {
         messageWindow.setUsersPickerListValue(userFullName);
         messageWindow.setTextMessage(message);
         messageWindow.setSendCopyToSupport(true);
-
     }
 
     private void sendMailToVIP(List<String> workflowID, List<String> simulationNames) {
-
-
         MessageComposerWindowToReportIssue messageWindow = new MessageComposerWindowToReportIssue(workflowID, simulationNames);
         messageWindow.show();
     }
