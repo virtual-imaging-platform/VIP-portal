@@ -395,9 +395,9 @@ public class WorkflowBusiness {
             workflows.addAll(workflowDAO.get(users, applications, wStatus, appClass, startDate, endDate, tag));
 
             // this is to avoid duplicates
-            workflows = new ArrayList<>(workflows.stream()
-                .sorted(Comparator.comparing(Workflow::getStartedTime).reversed())
-                .collect(Collectors.toMap(Workflow::getId, w -> w, (e, r) -> e)).values());
+            workflows = workflows.stream()
+                .collect(Collectors.toMap(Workflow::getId, w -> w, (e, r) -> e)).values()
+                .stream().sorted(Comparator.comparing(Workflow::getStartedTime).reversed()).toList();
 
             simulations = parseWorkflows(workflows);
             checkRunningSimulations(simulations);
