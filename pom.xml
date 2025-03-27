@@ -43,8 +43,8 @@ knowledge of the CeCILL-B license and that you accept its terms.
     <properties>
         <!-- project version. Only to change it here (and in CoreConstants.java
            Follow this practice : https://maven.apache.org/maven-ci-friendly.html-->
-        <revision>2.8</revision>
-        <changelist>-SNAPSHOT</changelist>
+        <revision>3.0</revision>
+        <changelist/>
         <sha1/>
 
         <!-- other maven config -->
@@ -54,8 +54,8 @@ knowledge of the CeCILL-B license and that you accept its terms.
 
 
         <!-- VIP related dependencies version -->
-        <moteur2-workflowsdb-common.version>1.8.0-SNAPSHOT</moteur2-workflowsdb-common.version>
-        <grida.version>2.3.0-SNAPSHOT</grida.version>
+        <moteur2-workflowsdb-common.version>2.0.0</moteur2-workflowsdb-common.version>
+        <grida.version>3.0.0</grida.version>
         <sma.version>0.3.0</sma.version>
 
         <!-- 3rd party dependencies version -->
