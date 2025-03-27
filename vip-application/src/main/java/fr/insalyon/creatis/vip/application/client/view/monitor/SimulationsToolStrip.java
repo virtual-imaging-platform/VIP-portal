@@ -141,7 +141,7 @@ public class SimulationsToolStrip extends ToolStrip {
         // ReproVIP Button
         this.addSeparator();
         this.addButton(WidgetUtil.getToolStripButton("Make execution(s) public",
-                ApplicationConstants.APP_REPRO_VIP, null, new ClickHandler() {
+                ApplicationConstants.ICON_MAKE_EXEC_PUBLIC, null, new ClickHandler() {
             @Override
             public void onClick(ClickEvent event) {
                 makeExecutionsPublic();
@@ -438,7 +438,7 @@ public class SimulationsToolStrip extends ToolStrip {
                 @Override
                 public void onSuccess(Boolean ok) {
                     if ( ! ok) {
-                        SC.warn("These execution(s) can not be made public (it may be already public).");
+                        SC.warn("These execution(s) can not be made public. Please contact VIP support for further details.");
                     } else {
                         SC.ask("Do you really want to make these execution(s) public: (" + String.join(", ", workflowsIds) + ")?\n", new BooleanCallback() {
                             @Override
