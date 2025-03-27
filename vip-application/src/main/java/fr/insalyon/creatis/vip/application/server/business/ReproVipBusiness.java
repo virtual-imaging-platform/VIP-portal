@@ -210,15 +210,15 @@ public class ReproVipBusiness {
 
     public void generateWorkflowInputJson(String workflowId, Path reproVipDir) throws BusinessException {
         ObjectMapper mapper = new ObjectMapper();
-        ReproVipInputsParser utils = new ReproVipInputsParser(externalPlatformBusiness, server.getHostURL());
-        InputM2Parser parser = new InputM2Parser();
+        ReproVipInputsParser reproParser = new ReproVipInputsParser(externalPlatformBusiness, server.getHostURL());
+        InputM2Parser m2Parser = new InputM2Parser();
 
-        Map<String, String> inputs = parser.parse(server.getWorkflowsPath() + "/" + workflowId + "/inputs.xml");
+        Map<String, String> inputs = m2Parser.parse(server.getWorkflowsPath() + "/" + workflowId + "/inputs.xml");
         Map<String, Object> json = new HashMap<>();
 
-        utils.parse(inputs);
-        json.put("provider", utils.getProviderInformations());
-        json.put("inputs", utils.getSimplifiedInputs());
+        reproParser.parse(inputs);
+        json.put("provider", reproParser.getProviderInformations());
+        json.put("inputs", reproParser.getSimplifiedInputs());
 
         try {
             mapper.writeValue(reproVipDir.resolve(workflowId + ".json").toFile(), json);
