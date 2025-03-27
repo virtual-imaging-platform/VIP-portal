@@ -1,34 +1,36 @@
 package fr.insalyon.creatis.vip.application.server.rpc;
 
 import fr.insalyon.creatis.vip.application.client.view.ApplicationException;
+import fr.insalyon.creatis.vip.application.server.business.PublicExecutionBusiness;
 import fr.insalyon.creatis.vip.application.server.business.ReproVipBusiness;
-import fr.insalyon.creatis.vip.core.client.bean.PublicExecution;
+import fr.insalyon.creatis.vip.application.client.bean.PublicExecution;
 import fr.insalyon.creatis.vip.application.client.rpc.ReproVipService;
-import fr.insalyon.creatis.vip.core.client.bean.User;
-import fr.insalyon.creatis.vip.core.client.view.CoreException;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
-import fr.insalyon.creatis.vip.core.server.dao.DAOException;
-import fr.insalyon.creatis.vip.application.server.dao.PublicExecutionDAO;
 import fr.insalyon.creatis.vip.core.server.rpc.AbstractRemoteServiceServlet;
 
-import javax.servlet.ServletException;
-import java.io.IOException;
+import jakarta.servlet.ServletException;
 import java.util.List;
 
 public class ReproVipServiceImpl extends AbstractRemoteServiceServlet implements ReproVipService {
 
     private ReproVipBusiness reproVipBusiness;
+    private PublicExecutionBusiness publicExecutionBusiness;
 
     @Override
     public void init() throws ServletException {
         super.init();
         reproVipBusiness = getBean(ReproVipBusiness.class);
+        publicExecutionBusiness = getBean(PublicExecutionBusiness.class);
     }
 
     @Override
     public void addPublicExecution(PublicExecution publicExecution) throws ApplicationException {
         try {
-            reproVipBusiness.createPublicExecution(publicExecution);
+            if (publicExecutionBusiness.exist(publicExecution.getExperienceName())) {
+                throw new ApplicationException("This experience name already exist!");
+            } else {
+                publicExecutionBusiness.create(publicExecution);
+            }
         } catch (BusinessException e) {
             throw new ApplicationException(e);
         }
@@ -37,36 +39,35 @@ public class ReproVipServiceImpl extends AbstractRemoteServiceServlet implements
     @Override
     public List<PublicExecution> getPublicExecutions() throws ApplicationException {
         try {
-            return reproVipBusiness.getPublicExecutions();
+            return publicExecutionBusiness.getAll();
         } catch (BusinessException e) {
             throw new ApplicationException(e);
         }
     }
 
     @Override
-    public boolean doesExecutionExist(String executionID) throws ApplicationException {
+    public boolean doesExecutionExist(String experienceName) throws ApplicationException {
         try {
-            return reproVipBusiness.doesExecutionExist(executionID);
+            return publicExecutionBusiness.exist(experienceName);
         } catch (BusinessException e) {
             throw new ApplicationException(e);
         }
     }
 
     @Override
-    public boolean canMakeExecutionPublic(String executionID) throws ApplicationException {
+    public boolean canMakeExecutionPublic(List<String> workflowsIds) throws ApplicationException {
         try {
-            return ! reproVipBusiness.doesExecutionExist(executionID) &&
-                    reproVipBusiness.canMakeExecutionPublic(executionID);
+            return reproVipBusiness.canMakeExecutionPublic(workflowsIds);
         } catch (BusinessException e) {
             throw new ApplicationException(e);
         }
     }
 
     @Override
-    public PublicExecution.PublicExecutionStatus createReproVipDirectory(String executionID) {
+    public PublicExecution.PublicExecutionStatus createReproVipDirectory(String experienceName) {
         try {
-            reproVipBusiness.createReproVipDirectory(executionID);
-            reproVipBusiness. updatePublicExecutionStatus(executionID, PublicExecution.PublicExecutionStatus.DIRECTORY_CREATED);
+            reproVipBusiness.createReproVipDirectory(experienceName);
+            publicExecutionBusiness.updateStatus(experienceName, PublicExecution.PublicExecutionStatus.DIRECTORY_CREATED);
             return PublicExecution.PublicExecutionStatus.DIRECTORY_CREATED;
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -74,11 +75,25 @@ public class ReproVipServiceImpl extends AbstractRemoteServiceServlet implements
     }
 
     @Override
-    public PublicExecution.PublicExecutionStatus deleteReproVipDirectory(String executionID) throws ApplicationException {
+    public PublicExecution.PublicExecutionStatus deleteReproVipDirectory(String experienceName) throws ApplicationException {
         try {
-            reproVipBusiness.deleteReproVipDirectory(executionID);
-            reproVipBusiness. updatePublicExecutionStatus(executionID, PublicExecution.PublicExecutionStatus.REQUESTED);
+            reproVipBusiness.deleteReproVipDirectory(experienceName);
+            publicExecutionBusiness.updateStatus(experienceName, PublicExecution.PublicExecutionStatus.REQUESTED);
             return PublicExecution.PublicExecutionStatus.REQUESTED;
+        } catch (BusinessException e) {
+            throw new ApplicationException(e);
+        }
+    }
+
+    @Override
+    public PublicExecution.PublicExecutionStatus setExecutionPublished(String experienceName, String doi) throws ApplicationException {
+        try {
+            PublicExecution exec = publicExecutionBusiness.get(experienceName);
+
+            exec.setDoi(doi);
+            publicExecutionBusiness.update(experienceName, exec);
+            publicExecutionBusiness.updateStatus(experienceName, PublicExecution.PublicExecutionStatus.PUBLISHED);
+            return PublicExecution.PublicExecutionStatus.PUBLISHED;
         } catch (BusinessException e) {
             throw new ApplicationException(e);
         }

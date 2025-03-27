@@ -42,7 +42,6 @@ import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.business.Server;
 import fr.insalyon.creatis.vip.datamanager.client.bean.Data;
-import fr.insalyon.creatis.vip.datamanager.client.bean.Data.Type;
 import fr.insalyon.creatis.vip.datamanager.client.bean.PoolOperation;
 import fr.insalyon.creatis.vip.datamanager.server.DataManagerUtil;
 import fr.insalyon.creatis.vip.datamanager.server.business.DataManagerBusiness;
@@ -58,7 +57,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.PreDestroy;
+import jakarta.annotation.PreDestroy;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -70,6 +69,7 @@ import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.concurrent.*;
 import java.util.function.Supplier;
 
@@ -149,13 +149,14 @@ public class DataApiBusiness {
         }
         PathProperties pathProperties = new PathProperties();
         pathProperties.setPath(path);
-        if (!baseDoesFileExist(path)) {
+        Optional<Data.Type> type = baseGetPathInfo(path);
+        if (type.isEmpty()) { // path doesn't exist
             pathProperties.setExists(false);
             return pathProperties;
         }
         pathProperties.setExists(true);
         List<Data> fileData = baseGetFileData(path);
-        if (doesPathCorrespondsToAFile(path, fileData)) {
+        if (type.get().equals(Data.Type.file)) {
             // this is a file, not a directory
             Data fileInfo = fileData.get(0);
             pathProperties.setIsDirectory(false);
@@ -179,11 +180,16 @@ public class DataApiBusiness {
         if (path.equals(ROOT)) {
             return getRootSubDirectoriesPathProps();
         }
-        List<Data> directoryData = baseGetFileData(path);
-        if (doesPathCorrespondsToAFile(path, directoryData)) {
+        Optional<Data.Type> type = baseGetPathInfo(path);
+        if (!type.isPresent()) { // path doesn't exist
+            logger.error("Trying to list a non-existing path ({})", path);
+            throw new ApiException("Error listing a directory");
+        }
+        if (!type.get().equals(Data.Type.folder)) {
             logger.error("Trying to list {} , but is a file :", path);
             throw new ApiException("Error listing a directory");
         }
+        List<Data> directoryData = baseGetFileData(path);
         List<PathProperties> res = new ArrayList<>();
         for (Data fileData : directoryData) {
             res.add(buildPathFromLfcData(path, fileData));
@@ -270,12 +276,18 @@ public class DataApiBusiness {
             logger.error("cannot download root ({})", path);
             throw new ApiException("Illegal data API access");
         }
-        List<Data> fileData = baseGetFileData(path);
-        if (!doesPathCorrespondsToAFile(path, fileData)) {
+        Optional<Data.Type> type = baseGetPathInfo(path);
+        if (!type.isPresent()) { // path doesn't exist
+            logger.error("Trying to download a non-existing file ({})", path);
+            throw new ApiException("Illegal data API access");
+        }
+        if (!type.get().equals(Data.Type.folder)) {
             // it works on a directory and return a zip, but we cant check the download size
             logger.error("Trying to download a directory ({})", path);
             throw new ApiException("Illegal data API access");
         }
+        // path exists and is a file: check its size
+        List<Data> fileData = baseGetFileData(path);
         Long maxSize = env.getRequiredProperty(CarminProperties.API_DATA_TRANSFERT_MAX_SIZE, Long.class);
         if (fileData.get(0).getLength() > maxSize) {
             logger.error("Trying to download a file too big ({})", path);
@@ -391,8 +403,12 @@ public class DataApiBusiness {
     private void writeFileFromBase64(String base64Content, String localFilePath) throws ApiException {
         Base64.Decoder decoder = Base64.getDecoder();
         StringReader stringReader = new StringReader(base64Content);
-        InputStream inputStream = new ReaderInputStream(stringReader, StandardCharsets.UTF_8);
-        try (InputStream base64InputStream = decoder.wrap(inputStream)) {
+        try {
+            InputStream inputStream = ReaderInputStream.builder()
+                    .setReader(new StringReader(base64Content))
+                    .setCharset(StandardCharsets.UTF_8)
+                    .get();
+            InputStream base64InputStream = decoder.wrap(inputStream);
             Files.copy(base64InputStream, Paths.get(localFilePath));
         } catch (IOException e) {
             logger.error("Error writing base64 file in {}", localFilePath, e);
@@ -463,24 +479,14 @@ public class DataApiBusiness {
 
     // #### DATA UTILS
 
-    private boolean doesPathCorrespondsToAFile(String path, List<Data> pathDataList) {
-        // Currently, there is no perfect way to determine that
-        // TODO : add a isDirectory method in grida
-        if (pathDataList.size() != 1) {
-            return false;
-        }
-        String fileName = Paths.get(path).getFileName().toString();
-        return fileName.equals(pathDataList.get(0).getName());
-    }
-
     private PathProperties buildPathFromLfcData(String path, Data lfcData) {
         PathProperties pathProperties = new PathProperties();
         pathProperties.setExists(true);
         pathProperties.setSize(lfcData.getLength());
         pathProperties.setLastModificationDate(
                 getTimeStampFromGridaFormatDate(lfcData.getModificationDate()));
-        boolean isDirectory = lfcData.getType().equals(Type.folder)
-                || lfcData.getType().equals(Type.folderSync);
+        boolean isDirectory = lfcData.getType().equals(Data.Type.folder)
+                || lfcData.getType().equals(Data.Type.folderSync);
         pathProperties.setIsDirectory(isDirectory);
         if (isDirectory) {
             pathProperties.setMimeType(env.getProperty(CarminProperties.API_DIRECTORY_MIME_TYPE));
@@ -523,6 +529,14 @@ public class DataApiBusiness {
             return lfcBusiness.exists(currentUserProvider.get(), path);
         } catch (BusinessException e) {
             throw new ApiException("Error testing file existence", e);
+        }
+    }
+
+    private Optional<Data.Type> baseGetPathInfo(String path) throws ApiException {
+        try {
+            return lfcBusiness.getPathInfo(currentUserProvider.get(), path);
+        } catch (BusinessException e) {
+            throw new ApiException("Error getting path info", e);
         }
     }
 

@@ -32,24 +32,20 @@
 package fr.insalyon.creatis.vip.api.controller.processing;
 
 import fr.insalyon.creatis.vip.api.business.ExecutionBusiness;
-import fr.insalyon.creatis.vip.api.business.PipelineBusiness;
 import fr.insalyon.creatis.vip.api.controller.ApiController;
 import fr.insalyon.creatis.vip.api.exception.ApiException;
 import fr.insalyon.creatis.vip.api.exception.ApiException.ApiError;
 import fr.insalyon.creatis.vip.api.model.DeleteExecutionConfiguration;
 import fr.insalyon.creatis.vip.api.model.Execution;
 import fr.insalyon.creatis.vip.api.model.PathProperties;
-import fr.insalyon.creatis.vip.core.client.bean.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 import java.util.List;
-import java.util.function.Supplier;
 
 import static fr.insalyon.creatis.vip.api.CarminProperties.DEFAULT_LIMIT_LIST_EXECUTION;
 
@@ -62,14 +58,11 @@ public class ExecutionController extends ApiController {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-
     private final ExecutionBusiness executionBusiness;
-    private final PipelineBusiness pipelineBusiness;
 
     @Autowired
-    public ExecutionController(ExecutionBusiness executionBusiness, PipelineBusiness pipelineBusiness) {
+    public ExecutionController(ExecutionBusiness executionBusiness) {
         this.executionBusiness = executionBusiness;
-        this.pipelineBusiness = pipelineBusiness;
     }
 
     @RequestMapping

@@ -39,7 +39,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
-import java.net.URL;
+import java.net.URISyntaxException;
+import java.net.URI;
 import java.net.URLDecoder;
 import java.nio.charset.Charset;
 import java.security.KeyFactory;
@@ -174,7 +175,7 @@ public class SamlTokenValidator {
         return true;
     }
 
-    public static boolean isAudienceValid(String server, Assertion assertion) throws MalformedURLException {
+    public static boolean isAudienceValid(String server, Assertion assertion) throws MalformedURLException, URISyntaxException {
         String serverHost = getHost(server);
         if (assertion.getConditions() == null) {
             return true;
@@ -194,7 +195,7 @@ public class SamlTokenValidator {
     }
 
    /// Private methods
-    private static String getHost(String serverURL) throws MalformedURLException {
-        return new URL(serverURL).getHost();
+    private static String getHost(String serverURL) throws MalformedURLException, URISyntaxException {
+        return new URI(serverURL).toURL().getHost();
     }
 }

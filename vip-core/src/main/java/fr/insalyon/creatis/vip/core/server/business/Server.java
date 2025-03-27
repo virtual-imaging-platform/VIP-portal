@@ -52,6 +52,8 @@ public interface Server {
 
     int getApacheSSLPort();
 
+    boolean useSMA();
+
     String getSMAHost();
 
     int getSMAPort();
@@ -115,4 +117,10 @@ public interface Server {
     String getReproVIPRootDir();
 
     boolean useMoteurlite();
+
+    boolean useRestMoteurServer();
+
+    String getMoteurServerPassword();
+
+    String getHostURL();
 }

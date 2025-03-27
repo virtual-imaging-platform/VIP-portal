@@ -57,7 +57,6 @@ knowledge of the CeCILL-B license and that you accept its terms.
       <artifactId>vip-datamanager</artifactId>
       <version>${project.version}</version>
     </dependency>
-
   </dependencies>
   
   <build>

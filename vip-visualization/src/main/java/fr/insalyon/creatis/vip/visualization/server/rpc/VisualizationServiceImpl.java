@@ -42,10 +42,7 @@ import fr.insalyon.creatis.vip.visualization.client.view.VisualizationException;
 import fr.insalyon.creatis.vip.visualization.server.business.VisualizationBusiness;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.ApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
-
-import javax.servlet.ServletException;
+import jakarta.servlet.ServletException;
 
 public class VisualizationServiceImpl extends AbstractRemoteServiceServlet
     implements VisualizationService {

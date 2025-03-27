@@ -1,6 +1,11 @@
 package fr.insalyon.creatis.vip.application.server;
 
+import fr.insalyon.creatis.moteur.plugins.workflowsdb.WorkflowsDBException;
 import fr.insalyon.creatis.moteur.plugins.workflowsdb.dao.*;
+import fr.insalyon.creatis.vip.application.server.business.simulation.RestServiceEngine;
+import fr.insalyon.creatis.vip.application.server.business.simulation.SoapServiceEngine;
+import fr.insalyon.creatis.vip.application.server.business.simulation.WorkflowEngineInstantiator;
+import fr.insalyon.creatis.vip.core.server.business.Server;
 import org.hibernate.SessionFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -20,38 +25,46 @@ import org.springframework.context.annotation.Profile;
 public class SpringApplicationConfig {
 
     @Bean
-    public WorkflowsDBDAOFactory workflowsDBDAOFactory() throws WorkflowsDBDAOException {
+    public WorkflowsDBDAOFactory workflowsDBDAOFactory() throws WorkflowsDBDAOException, WorkflowsDBException {
         return new WorkflowsDBDAOFactory();
     }
 
     @Bean
-    public SessionFactory workflowsDBSessionFactory() throws WorkflowsDBDAOException {
+    public SessionFactory workflowsDBSessionFactory() throws WorkflowsDBDAOException, WorkflowsDBException {
         return workflowsDBDAOFactory().getSessionFactory();
     }
 
     @Bean
-    public WorkflowDAO getWorkflowDAO() throws WorkflowsDBDAOException {
+    public WorkflowDAO getWorkflowDAO() throws WorkflowsDBDAOException, WorkflowsDBException {
         return workflowsDBDAOFactory().getWorkflowDAO();
     }
 
     @Bean
-    public ProcessorDAO getProcessorDAO() throws WorkflowsDBDAOException {
+    public ProcessorDAO getProcessorDAO() throws WorkflowsDBDAOException, WorkflowsDBException {
         return workflowsDBDAOFactory().getProcessorDAO();
     }
 
     @Bean
-    public OutputDAO getOutputDAO() throws WorkflowsDBDAOException {
+    public OutputDAO getOutputDAO() throws WorkflowsDBDAOException, WorkflowsDBException {
         return workflowsDBDAOFactory().getOutputDAO();
     }
 
     @Bean
-    public InputDAO getInputDAO() throws WorkflowsDBDAOException {
+    public InputDAO getInputDAO() throws WorkflowsDBDAOException, WorkflowsDBException {
         return workflowsDBDAOFactory().getInputDAO();
     }
 
     @Bean
-    public StatsDAO getStatsDAO() throws WorkflowsDBDAOException {
+    public StatsDAO getStatsDAO() throws WorkflowsDBDAOException, WorkflowsDBException{
         return workflowsDBDAOFactory().getStatsDAO();
+    }
+
+    @Bean
+    public WorkflowEngineInstantiator getWorkflowEngineInstantiator(Server server) {
+        if (server.useRestMoteurServer()) {
+            return new RestServiceEngine(server);
+        }
+        return new SoapServiceEngine();
     }
 
 }

@@ -35,11 +35,11 @@ public class WrapperTemplateTest {
         VelocityUtils sut = new VelocityUtils();
         // if null
         String wrapperString = sut.createDocument(null, boutiquesApp, false, WRAPPER_TEMPLATE);
-        MatcherAssert.assertThat(wrapperString, containsString("exec launch testApp.json input_param_file.json"));
+        MatcherAssert.assertThat(wrapperString, containsString("exec launch --stream testApp.json input_param_file.json"));
         // if present
         boutiquesApp.setVipContainer("testContainer");
         wrapperString = sut.createDocument(null, boutiquesApp, false, WRAPPER_TEMPLATE);
-        MatcherAssert.assertThat(wrapperString, containsString("exec launch --imagepath testContainer testApp.json input_param_file.json"));
+        MatcherAssert.assertThat(wrapperString, containsString("exec launch --stream --imagepath testContainer testApp.json input_param_file.json"));
     }
 
 }

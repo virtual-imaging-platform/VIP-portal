@@ -217,7 +217,18 @@ function clickinner(){
     password = document.getElementById("floatingPassword").value;
     validateEmail(email);
     get_fetch(email, password).then(data => setCookie(email, data.httpHeaderValue, 7));
-};
+}
+
+function onKeyPress(event) {
+    if (event.key === "Enter") {
+        event.preventDefault();
+        clickinner()
+    }
+}
+
+$(function () {
+ $("#welcome_signin").first().keypress(onKeyPress)
+})
 
 checkIfCookieExist();
 createGrid();

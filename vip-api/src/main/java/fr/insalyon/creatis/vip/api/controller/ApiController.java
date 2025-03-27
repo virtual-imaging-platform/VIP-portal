@@ -7,8 +7,6 @@ import org.springframework.core.env.Environment;
 
 import java.util.function.Supplier;
 
-import static fr.insalyon.creatis.vip.api.CarminProperties.KEYCLOAK_ACTIVATED;
-
 public abstract class ApiController {
 
     protected Supplier<User> currentUserSupplier;
@@ -22,10 +20,6 @@ public abstract class ApiController {
 
     protected User currentUser() {
         return currentUserSupplier.get();
-    }
-
-    protected boolean isKeycloakActive() {
-        return env.getProperty(KEYCLOAK_ACTIVATED, Boolean.class, Boolean.FALSE);
     }
 
     protected void logMethodInvocation(Logger logger, String methodName, Object... parameters) {

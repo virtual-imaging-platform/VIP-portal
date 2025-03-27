@@ -9,7 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Stream;
 
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
@@ -281,6 +281,11 @@ public class SpringConfigServer implements Server {
     }
 
     @Override
+    public boolean useSMA() {
+        return env.getProperty(CoreConstants.LAB_SMA_ENABLED, Boolean.class, true);
+    }
+
+    @Override
     public String getSMAHost() {
         return env.getRequiredProperty(CoreConstants.LAB_SMA_HOST);
     }
@@ -451,5 +456,20 @@ public class SpringConfigServer implements Server {
     @Override
     public boolean useMoteurlite() {
         return env.getProperty(CoreConstants.USE_MOTEURLITE, Boolean.class, false);
+    }
+
+    @Override
+    public boolean useRestMoteurServer() {
+        return env.getProperty(CoreConstants.USE_REST_MOTEUR_SERVER, Boolean.class, false);
+    }
+
+    @Override
+    public String getMoteurServerPassword() {
+        return env.getRequiredProperty(CoreConstants.MOTEUR_REST_PASSWORD);
+    }
+
+    @Override
+    public String getHostURL() {
+        return env.getRequiredProperty(CoreConstants.HOST_URL);
     }
 }

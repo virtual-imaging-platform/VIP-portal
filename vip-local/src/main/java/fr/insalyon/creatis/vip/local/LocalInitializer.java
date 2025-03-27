@@ -29,6 +29,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
+import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -226,9 +227,18 @@ public class LocalInitializer {
         transferPoolBusiness.uploadFile(admin, getPathFromLocation(scriptLocation), versionFolder);
 
         // create AppVersion
-        String gwendiaLFN = versionFolder + "/" + Paths.get(gwendiaLocation).getFileName().toString();
-        AppVersion appVersion = new AppVersion(applicationName, applicationVersion, gwendiaLFN, null, true, false);
-        applicationBusiness.addVersion(appVersion);
+        try{
+            logger.info("getting gwendia file name from [{}]", gwendiaLocation);
+            //String gwendiaLFN = versionFolder + "/" + Paths.get(new URI(gwendiaLocation).getPath()).getFileName().toString();
+            String gwendiaLFN = "localGrepTest.gwendia";
+            logger.info("gwendia file name is [{}]", gwendiaLFN);
+            AppVersion appVersion = new AppVersion(applicationName, applicationVersion, gwendiaLFN, null, true, false);
+            logger.info("adding application version [{}/{}]", applicationName, applicationVersion);
+            applicationBusiness.addVersion(appVersion);
+        } catch (Exception e) {
+            logger.error("cannot get gwendia file name", e);
+            throw new BusinessException(e);
+        }
 
         logger.info("Application version [{}/{}] installed", applicationName, applicationVersion);
 

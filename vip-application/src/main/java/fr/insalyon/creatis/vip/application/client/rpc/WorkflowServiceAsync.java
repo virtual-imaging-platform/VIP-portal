@@ -33,6 +33,8 @@ package fr.insalyon.creatis.vip.application.client.rpc;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import fr.insalyon.creatis.vip.application.client.bean.*;
+import fr.insalyon.creatis.vip.core.client.bean.Pair;
+
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -50,6 +52,8 @@ public interface WorkflowServiceAsync {
     public void getApplicationDescriptor(String applicationName, String applicationVersion, AsyncCallback<Descriptor> asyncCallback);
 
     public void getApplicationDescriptorString(String applicationName, String applicationVersion, AsyncCallback<String> asyncCallback);
+
+    public void getApplicationsDescriptorsString(List<Pair<String, String>> applications, AsyncCallback<List<String>> asyncCallback);
 
     public void launchSimulation(Map<String, String> parameters, String applicationName, String applicationVersion, String applicationClass, String simulationName, AsyncCallback<Void> asyncCallback);
 

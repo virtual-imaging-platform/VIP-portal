@@ -42,7 +42,7 @@ import com.google.gwt.user.client.rpc.IsSerializable;
 public class CoreConstants implements IsSerializable {
 
 
-    public static final String VERSION = "v2.7";
+    public static final String VERSION = "v3.0";
     // Configuration Labels
     public static final String VO_NAME = "vo.name";
     public static final String VO_ROOT = "vo.root";
@@ -74,6 +74,7 @@ public class CoreConstants implements IsSerializable {
     public static final String LAB_DATA_ALT_USERS_HOME = "datamanager.users.home.alternative";
     public static final String LAB_DATA_ALT_GROUPS_HOME = "datamanager.groups.home.alternative";
     public static final String LAB_MOTEUR_HOST = "moteur.host";
+    public static final String LAB_SMA_ENABLED = "sma.enabled";
     public static final String LAB_SMA_HOST = "sma.host";
     public static final String LAB_SMA_PORT = "sma.port";
     public static final String LAB_TRUSTSTORE_FILE = "truststore.file";
@@ -196,6 +197,10 @@ public class CoreConstants implements IsSerializable {
     public static final String REPROVIP_ROOT_DIR = "reprovip.root-dir";
     //moteurlite
     public static final String USE_MOTEURLITE = "moteurlite.enabled";
+
+    public static final String USE_REST_MOTEUR_SERVER = "moteur.rest.enabled";
+    public static final String MOTEUR_REST_PASSWORD = "moteur.rest.password";
+    public static final String HOST_URL = "host.url";
 
 
 

@@ -43,7 +43,7 @@ import org.springframework.core.io.support.ResourcePropertySource;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 import java.io.IOException;
 
 import static fr.insalyon.creatis.vip.api.CarminProperties.*;
@@ -96,12 +96,9 @@ public class ApiPropertiesInitializer {
 
 
         if (env.getProperty(KEYCLOAK_ACTIVATED, Boolean.class, Boolean.FALSE)) {
-            logger.info("Keycloak activated");
-            verifyPropertyNotNull(KEYCLOAK_CLIENT_ID, String.class);
-            verifyPropertyNotNull(KEYCLOAK_CLIENT_SECRET, String.class);
-            verifyPropertyNotNull(KEYCLOAK_REALM_URL, String.class);
+            logger.info("Keycloak/OIDC activated");
         } else {
-            logger.info("Keycloak NOT active");
+            logger.info("Keycloak/OIDC NOT active");
         }
 
         // due to arrays and generics, this verification aren't easy to factorize

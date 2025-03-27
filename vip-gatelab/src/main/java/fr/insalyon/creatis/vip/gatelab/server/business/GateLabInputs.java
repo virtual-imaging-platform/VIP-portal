@@ -46,7 +46,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 
 /**
  * This stores data in fields and this is not threadsafe. So it cannot be used
@@ -90,7 +90,7 @@ public class GateLabInputs {
     @PostConstruct
     public final void init() {
         inputsMap = new HashMap<String, String>();
-        inputfile = server.getWorkflowsPath() + "/" + workflowID + "/input-m2.xml";
+        inputfile = server.getWorkflowsPath() + "/" + workflowID + "/inputs.xml";
         inputsMap = gateLabInputsParser.parse(inputfile);
     }
 

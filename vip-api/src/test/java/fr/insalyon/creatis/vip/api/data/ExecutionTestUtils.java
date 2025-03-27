@@ -158,6 +158,7 @@ public class ExecutionTestUtils {
         return newSimulation;
     }
 
+    @SuppressWarnings("unchecked")
     public static Map<String,Function> getExecutionSuppliers() {
         return JsonCustomObjectMatcher.formatSuppliers(
                 Arrays.asList(

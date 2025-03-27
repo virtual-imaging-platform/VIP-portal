@@ -1,0 +1,20 @@
+{
+    "provider": {
+        "vip_url": "localhost",
+        "storage_type": "GIRDER",
+        "storage_id": "testGirder",
+        "storage_url": "https://example.girder"
+    },
+    "inputs": {
+        "file": [
+            "testGirder:/67a9dbe114e0b189e3412e10",
+            "testGirder:/67a9dbe114e0dw89e3412e10"
+        ],
+        "text": [
+            "out"
+        ],
+        "int": [
+            "1"
+        ]
+    }
+}

@@ -33,10 +33,8 @@ package fr.insalyon.creatis.vip.application.server.business.simulation.parser;
 
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerException;
-import fr.insalyon.creatis.vip.datamanager.server.DataManagerUtil;
 import java.io.FileReader;
 import java.io.IOException;
-import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -48,13 +46,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.DefaultHandler;
-import org.xml.sax.helpers.XMLReaderFactory;
+
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.SAXParserFactory;
 
 /**
  * Parse a m2 input file.
@@ -70,17 +69,22 @@ public class InputM2Parser extends DefaultHandler {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    private Map<String, String> inputs;
-    private String name;
-    private List<String> values;
     private boolean parsingItem;
+    private Map<String, String> inputs;
+    private List<String> values;
     private String currentUserFolder;
+    private String name;
+    private StringBuilder itemContent;
 
     private LfcPathsBusiness lfcPathsBusiness;
 
     @Autowired
     public final void setLfcPathsBusiness(LfcPathsBusiness lfcPathsBusiness) {
         this.lfcPathsBusiness = lfcPathsBusiness;
+    }
+
+    public InputM2Parser() {
+        this(null);
     }
 
     public InputM2Parser(String currentUserFolder) {
@@ -93,13 +97,15 @@ public class InputM2Parser extends DefaultHandler {
             throws BusinessException {
 
         try {
-            XMLReader reader = XMLReaderFactory.createXMLReader();
+            SAXParserFactory parserFactory = SAXParserFactory.newInstance();
+            parserFactory.setNamespaceAware(true);
+            XMLReader reader = parserFactory.newSAXParser().getXMLReader();
             reader.setContentHandler(this);
             reader.parse(new InputSource(new FileReader(fileName)));
 
             return inputs;
 
-        } catch (IOException | SAXException ex) {
+        } catch (IOException | SAXException | ParserConfigurationException ex) {
             logger.error("Error parsing {}", fileName, ex);
             throw new BusinessException(ex);
         }
@@ -110,37 +116,35 @@ public class InputM2Parser extends DefaultHandler {
             Attributes attributes) throws SAXException {
 
         if (localName.equals("source")) {
-
             name = attributes.getValue("name");
             values = new ArrayList<String>();
 
         } else if (localName.equals("item")) {
-
             parsingItem = true;
+            itemContent = new StringBuilder();
         }
     }
 
     @Override
     public void endElement(String uri, String localName, String qName) {
+        boolean isList = false;
+        double step = -1;
+        double firstValue = -1;
+        double lastValue = -1;
 
         if (localName.equals("source")) {
-
             if (values.size() == 1) {
                 String path = values.get(0);
                 try {
-                    path = lfcPathsBusiness.parseRealDir(
-                            path, currentUserFolder);
+                    if (lfcPathsBusiness != null) {
+                        path = lfcPathsBusiness.parseRealDir(path, currentUserFolder);
+                    }
                 } catch (DataManagerException ex) {
                     // do nothing
                 }
                 inputs.put(name, path);
 
             } else {
-                boolean isList = false;
-                double step = -1;
-                double firstValue = -1;
-                double lastValue = -1;
-
                 for (String v : values) {
                     try {
                         double value = Double.valueOf(v);
@@ -175,8 +179,10 @@ public class InputM2Parser extends DefaultHandler {
                             sb.append("; ");
                         }
                         try {
-                            v = lfcPathsBusiness.parseRealDir(
-                                v, currentUserFolder);
+                            if (lfcPathsBusiness != null) {
+                                v = lfcPathsBusiness.parseRealDir(
+                                    v, currentUserFolder);
+                            }
                         } catch (DataManagerException ex) {
                             // do nothing
                         }
@@ -190,16 +196,16 @@ public class InputM2Parser extends DefaultHandler {
                 }
             }
         } else if (localName.equals("item")) {
+            values.add(itemContent.toString().trim());
+            itemContent = null;
             parsingItem = false;
         }
     }
 
     @Override
     public void characters(char[] ch, int start, int length) throws SAXException {
-
         if (parsingItem) {
-            String chars = new String(ch);
-            values.add(chars.substring(start, start + length));
+            itemContent.append(ch, start, length);
         }
     }
 }

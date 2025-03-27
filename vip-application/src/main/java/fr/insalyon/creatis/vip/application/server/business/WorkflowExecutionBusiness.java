@@ -35,18 +35,19 @@ import fr.insalyon.creatis.moteur.plugins.workflowsdb.bean.Workflow;
 import fr.insalyon.creatis.moteur.plugins.workflowsdb.bean.WorkflowStatus;
 import fr.insalyon.creatis.vip.application.client.view.monitor.SimulationStatus;
 import fr.insalyon.creatis.vip.application.server.business.simulation.ParameterSweep;
-import fr.insalyon.creatis.vip.application.server.business.simulation.WebServiceEngine;
+import fr.insalyon.creatis.vip.application.server.business.simulation.WorkflowEngineInstantiator;
+import fr.insalyon.creatis.vip.application.server.business.util.FileUtil;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.business.Server;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
+import javax.xml.rpc.ServiceException;
 import java.io.File;
+import java.rmi.RemoteException;
 import java.util.Date;
 import java.util.List;
 
@@ -54,106 +55,98 @@ import java.util.List;
  * Wrapper on WebServiceEngine to configure it and to create a Workflow object
  * after a launch.
  *
- * WorkflowExecutionBusiness and WebServiceEngine both have spring prototype
- * scope, so each WorkflowExecutionBusiness use creates a new intance with a
- * dedicated WebServiceEngine instance that it will wrap.
- * This is needed as each time an engine is used, the endpoint can be different.
- *
  * @author Rafael Ferreira da Silva
  */
 @Service
-@Scope("prototype")
 public class WorkflowExecutionBusiness {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private Server server;
-    private WebServiceEngine engine;
-    private String engineEndpoint;
+    private WorkflowEngineInstantiator engine;
+
 
     @Autowired
-    public final void setServer(Server server) {
+    public WorkflowExecutionBusiness(Server server, WorkflowEngineInstantiator engine) {
         this.server = server;
-    }
-
-    /*
-    WebServiceEngine is also prototype scoped, this creates a new instance
-    every time. 
-    */
-    @Autowired
-    public final void setEngine(WebServiceEngine engine) {
         this.engine = engine;
     }
 
-    public WorkflowExecutionBusiness(String engineEndpoint) throws BusinessException {
-
-        //HACK for testing while still having simulations launched with VIP 1.16.1; to be removed before getting in production or replaced with a proper constant
-        if(engineEndpoint == null){
-            logger.info("WorkflowExecutionBusiness, endpoint is null, setting it to http://data-manager.grid.creatis.insa-lyon.fr/cgi-bin/m2Server-gasw3.1/moteur_server");
-            engineEndpoint="http://data-manager.grid.creatis.insa-lyon.fr/cgi-bin/m2Server-gasw3.1/moteur_server";
-        }
-        this.engineEndpoint = engineEndpoint;
-    }
-
-    @PostConstruct
-    public final void configureWebServiceEngine() {
-        engine.setAddressWS(engineEndpoint);
-        String settings = "GRID=DIRAC\n"
-                + "SE=ccsrm02.in2p3.fr\n"
-                + "TIMEOUT=100000\n"
-                + "RETRYCOUNT=3\n"
-                + "MULTIJOB=1";
-        engine.setSettings(settings);
-
-    }
-
-    public Workflow launch(String applicationName, String applicationVersion,
+    public Workflow launch(String engineEndpoint, String applicationName, String applicationVersion,
             String applicationClass, User user, String simulationName,
             String workflowPath, List<ParameterSweep> parameters) throws BusinessException {
 
         try {
-            engine.setWorkflow(new File(workflowPath));
-            engine.setInput(parameters);
-            String launchID = engine.launch(server.getServerProxy(server.getVoName()), null);
-            String workflowID = engine.getSimulationId(launchID);
-
+            String workflowContent = FileUtil.read(new File(workflowPath));
+            String inputs = (parameters != null) ? getParametersAsXMLInput(parameters) : null;
+            String proxyFileName = server.getServerProxy(server.getVoName());
+            String workflowID = engine.launch(engineEndpoint, workflowContent, inputs, "", proxyFileName);
             return new Workflow(workflowID, user.getFullName(),
                     WorkflowStatus.Running,
                     new Date(), null, simulationName, applicationName, applicationVersion, applicationClass,
-                    engine.getAddressWS(), null);
+                    engineEndpoint, null);
 
-        } catch (javax.xml.rpc.ServiceException | java.rmi.RemoteException ex) {
+        } catch (ServiceException | RemoteException ex) {
             logger.error("Error launching simulation {} ({}/{})",
                     simulationName, applicationName, applicationVersion, ex);
             throw new BusinessException(ex);
         }
     }
 
-    public SimulationStatus getStatus(String simulationID) throws BusinessException {
-
+    public SimulationStatus getStatus(String engineEndpoint, String simulationID) throws BusinessException {
         SimulationStatus status = SimulationStatus.Unknown;
         try {
-            status = engine.getStatus(simulationID);
-        } catch (javax.xml.rpc.ServiceException ex) {
-            logger.error("Error getting status for {}", simulationID, ex);
-            throw new BusinessException(ex);
-        } catch (java.rmi.RemoteException ex) {
-            logger.error("Error getting status for {}. Ignoring", simulationID, ex);
+            status = engine.getStatus(engineEndpoint, simulationID);
+        } catch (RemoteException | ServiceException e) {
+            logger.error("Error getting status of simulation {} on engine {}", simulationID, engineEndpoint, e);
+            throw new BusinessException(e);
         }
 
         return status;
     }
 
-    public void kill(String simulationID) throws BusinessException {
-
+    public void kill(String engineEndpoint, String simulationID) throws BusinessException {
         try {
-            engine.kill(simulationID);
-
-        } catch (javax.xml.rpc.ServiceException ex) {
-            logger.error("Error killing simulation {}", simulationID, ex);
-            throw new BusinessException(ex);
-        } catch (java.rmi.RemoteException ex) {
-            logger.error("Error killing simulation {}. Ignoring", simulationID, ex);
+            engine.kill(engineEndpoint, simulationID);
+        } catch (RemoteException | ServiceException e) {
+            logger.error("Error killing simulation {} on engine {}", simulationID, engineEndpoint, e);
+            throw new BusinessException(e);
         }
+    }
+
+    public String getParametersAsXMLInput(List<ParameterSweep> parameters) {
+
+        //generate the xml input file according to the user input on the GUI
+        StringBuilder xml = new StringBuilder("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
+        xml.append("<inputdata>\n");
+
+        for (ParameterSweep parameter : parameters) {
+
+            xml.append("\t<source name=\"")
+                    .append(parameter.getParameterName())
+                    .append("\"  type=\"String\">\n")
+                    .append("<array>\n");
+
+            int counter = 0;
+            for (String value : parameter.getValues()) {
+
+
+                xml.append("\t\t<item>")
+                        .append("<tag name=\"Group\" value=\"")
+                        .append(counter)
+                        .append("\"/>")
+                        .append(value)
+                        .append("</item>\n");
+
+                counter++;
+            }
+
+            xml.append("</array>\n");
+            xml.append("\t</source>\n");
+        }
+
+        xml.append("</inputdata>\n");
+
+        return xml.toString();
     }
 }

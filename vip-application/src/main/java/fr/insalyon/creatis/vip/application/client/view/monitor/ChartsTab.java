@@ -123,7 +123,7 @@ public class ChartsTab extends Tab {
         chartsItem.addChangedHandler(new ChangedHandler() {
             @Override
             public void onChanged(ChangedEvent event) {
-                int value = new Integer(chartsItem.getValueAsString());
+                int value = Integer.parseInt(chartsItem.getValueAsString());
                 if (value == 1 || value == 2 || value == 6) {
                     binItem.setDisabled(true);
                 } else {

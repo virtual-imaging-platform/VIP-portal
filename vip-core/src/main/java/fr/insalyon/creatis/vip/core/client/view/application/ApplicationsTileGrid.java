@@ -72,6 +72,11 @@ public abstract class ApplicationsTileGrid extends TileGrid {
 
         DetailViewerField imageField = new DetailViewerField("picture");
         imageField.setType("image");
+        // SmartGWT 13 now sets explicit width and height attributes on <img> tags,
+        // which default to all available space in the tile, causing image distortion.
+        // So we set the explicit width/height of our icons, which are all 48x48.
+        imageField.setImageHeight(48);
+        imageField.setImageWidth(48);
 
         DetailViewerField commonNameField = new DetailViewerField("applicationName");
         commonNameField.setCellStyle("normal");

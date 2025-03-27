@@ -41,23 +41,22 @@ import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerException;
 import fr.insalyon.creatis.vip.datamanager.server.DataManagerUtil;
 import fr.insalyon.creatis.vip.datamanager.server.business.DataManagerBusiness;
 import fr.insalyon.creatis.vip.datamanager.server.business.LfcPathsBusiness;
-import org.apache.commons.fileupload.FileItem;
-import org.apache.commons.fileupload.FileItemFactory;
-import org.apache.commons.fileupload.disk.DiskFileItemFactory;
-import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import org.apache.commons.fileupload2.core.DiskFileItem;
+import org.apache.commons.fileupload2.core.DiskFileItemFactory;
+import org.apache.commons.fileupload2.jakarta.servlet6.JakartaServletDiskFileUpload;
+import org.apache.commons.fileupload2.jakarta.servlet6.JakartaServletFileUpload;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.PrintWriter;
 import java.text.Normalizer;
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -91,14 +90,13 @@ public class FileUploadServiceImpl extends HttpServlet {
         try {
             User user = (User) request.getSession().getAttribute(CoreConstants.SESSION_USER);
             logger.info("upload received from " + user.getEmail());
-            if (user != null && ServletFileUpload.isMultipartContent(request)) {
+            if (user != null && JakartaServletFileUpload.isMultipartContent(request)) {
 
-                FileItemFactory factory = new DiskFileItemFactory();
-                ServletFileUpload upload = new ServletFileUpload(factory);
-                List items = upload.parseRequest(request);
-                Iterator iter = items.iterator();
+                DiskFileItemFactory factory = DiskFileItemFactory.builder().get();
+                JakartaServletDiskFileUpload upload = new JakartaServletDiskFileUpload(factory);
+                List<DiskFileItem> items = upload.parseRequest(request);
                 String fileName = null;
-                FileItem fileItem = null;
+                DiskFileItem fileItem = null;
                 String path = null;
                 String target = "uploadComplete";
                 boolean single = true;
@@ -106,9 +104,7 @@ public class FileUploadServiceImpl extends HttpServlet {
                 boolean usePool = true;
                 String operationID = "no-id";
 
-                while (iter.hasNext()) {
-                    FileItem item = (FileItem) iter.next();
-
+                for (DiskFileItem item : items) {
                     switch (item.getFieldName()) {
                         case "path":
                             path = item.getString();
@@ -143,7 +139,7 @@ public class FileUploadServiceImpl extends HttpServlet {
                     File uploadedFile = new File(rootDirectory + fileName);
 
                     try {
-                        fileItem.write(uploadedFile);
+                        fileItem.write(uploadedFile.toPath());
                         response.getWriter().write(fileName);
 
                         if (!local) {

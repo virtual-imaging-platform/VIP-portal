@@ -33,6 +33,7 @@ package fr.insalyon.creatis.vip.core.client.view.common;
 
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.Cursor;
+import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.Label;
 import com.smartgwt.client.widgets.events.MouseOutEvent;
 import com.smartgwt.client.widgets.events.MouseOutHandler;
@@ -81,7 +82,7 @@ public class LabelButton extends Label {
     }
 
     @Override
-    public void setDisabled(boolean disabled) {
+    public Canvas setDisabled(boolean disabled) {
 
         super.setDisabled(disabled);
         if (disabled) {
@@ -93,6 +94,7 @@ public class LabelButton extends Label {
             this.setBackgroundColor("#F2F2F2");
             this.setCursor(Cursor.HAND);
         }
+        return (this);
     }
 
     public void setSelected(boolean selected) {

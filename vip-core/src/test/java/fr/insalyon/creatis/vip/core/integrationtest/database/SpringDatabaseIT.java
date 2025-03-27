@@ -16,6 +16,8 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -148,10 +150,10 @@ public class SpringDatabaseIT extends BaseSpringIT{
     @Test
     @Order(7)
     @Transactional(propagation = Propagation.NOT_SUPPORTED)
-    public void connectionShouldBeLazyInTransaction() throws SQLException, MalformedURLException {
+    public void connectionShouldBeLazyInTransaction() throws SQLException, MalformedURLException, URISyntaxException {
         // getConnection throw an exception but should not be called as 'getLoginUrlCas' do not need db access
         Mockito.doThrow(SQLException.class).when(dataSource).getConnection();
-        String res = configurationBusiness.getLoginUrlCas(new URL("file:/plop"));
+        String res = configurationBusiness.getLoginUrlCas(new URI("file:/plop").toURL());
         assertEquals(ServerMockConfig.TEST_CAS_URL + "/login?service=file:/plop", res);
         Mockito.reset(dataSource);
     }

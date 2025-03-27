@@ -1,0 +1,17 @@
+{
+    "provider": {
+        "vip_url": "localhost",
+        "storage_type": "LOCAL"
+    },
+    "inputs": {
+        "file": [
+            "file:/var/www/html/workflows/SharedData/users/admin_test/API/relaunch-68c215ea/INPUTS/basic-grep-slow-multi.json"
+        ],
+        "text": [
+            "out"
+        ],
+        "int": [
+            "1"
+        ]
+    }
+}
