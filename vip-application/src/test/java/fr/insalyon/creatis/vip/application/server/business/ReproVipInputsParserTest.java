@@ -23,13 +23,13 @@ import fr.insalyon.creatis.vip.core.server.dao.GroupDAO;
 import fr.insalyon.creatis.vip.datamanager.client.bean.ExternalPlatform;
 import fr.insalyon.creatis.vip.datamanager.server.business.ExternalPlatformBusiness;
 
-public class ReproVipUtilsTest {
+public class ReproVipInputsParserTest {
 
     @Mock private ExternalPlatformBusiness externalPlatformBusiness;
     @Mock private GroupDAO groupDAO;
 
     private InputM2Parser parser;
-    private ReproVipInputsParser reproVipUtils;
+    private ReproVipInputsParser reproVipInputsParser;
 
     @BeforeEach
     public void init() throws BusinessException, DAOException {
@@ -37,7 +37,7 @@ public class ReproVipUtilsTest {
 
         parser = new InputM2Parser();
 
-        reproVipUtils = new ReproVipInputsParser(externalPlatformBusiness, "localhost");
+        reproVipInputsParser = new ReproVipInputsParser(externalPlatformBusiness, "localhost");
     }
 
     public void mocks() throws BusinessException, DAOException {
@@ -60,9 +60,9 @@ public class ReproVipUtilsTest {
         String inputsExample = mapper.readTree(example).get("inputs").toString();
         String providerExample = mapper.readTree(example).get("provider").toString();
         
-        reproVipUtils.parse(values);
-        assertEquals(inputsExample, mapper.writeValueAsString(reproVipUtils.getSimplifiedInputs()));
-        assertEquals(providerExample, mapper.writeValueAsString(reproVipUtils.getProviderInformations()));
+        reproVipInputsParser.parse(values);
+        assertEquals(inputsExample, mapper.writeValueAsString(reproVipInputsParser.getSimplifiedInputs()));
+        assertEquals(providerExample, mapper.writeValueAsString(reproVipInputsParser.getProviderInformations()));
     }
 
     @Test
@@ -74,9 +74,9 @@ public class ReproVipUtilsTest {
         String inputsExample = mapper.readTree(example).get("inputs").toString();
         String providerExample = mapper.readTree(example).get("provider").toString();
 
-        reproVipUtils.parse(values);
+        reproVipInputsParser.parse(values);
 
-        assertEquals(inputsExample, mapper.writeValueAsString(reproVipUtils.getSimplifiedInputs()));
-        assertEquals(providerExample, mapper.writeValueAsString(reproVipUtils.getProviderInformations()));
+        assertEquals(inputsExample, mapper.writeValueAsString(reproVipInputsParser.getSimplifiedInputs()));
+        assertEquals(providerExample, mapper.writeValueAsString(reproVipInputsParser.getProviderInformations()));
     }
 }
