@@ -20,7 +20,7 @@ public class ShanoirStorageBusiness {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     enum UrlKeys{
-        FILE_NAME("shanoir", "^shanoir:/(//)?([^/].*)\\?.*$", 2 ,"fileName"),
+        FILE_NAME("shanoir", "^[^:]+:/(//)?([^/].*)\\?.*$", 2 ,"fileName"),
         RESOURCE_ID("resourceId", "^.*[?&]resourceId=([^&]*)(&.*)?$", 1 ,"resourceId"),
         FORMAT("format", "^.*[?&]format=([^&]*)(&.*)?$", 1 ,"format"),
         TOKEN("token", "^.*[?&]token=([^&]*)(&.*)?$", 1 , "token"),
@@ -104,7 +104,7 @@ public class ShanoirStorageBusiness {
             logger.error("A shanoir external storage must have an URL to generate an URI");
             throw new BusinessException("Cannot generate shanoir uri");
         }
-        if (externalPlatform.getKeycloakClientId() == null || externalPlatform.getRefreshTokenUrl() == null) { 
+        if (externalPlatform.getUploadUrl() == null || externalPlatform.getRefreshTokenUrl() == null) {
             logger.error("Cannot get keycloak informations for shanoir storage from database");
             throw new BusinessException("Cannot generate shanoir uri");
         }
