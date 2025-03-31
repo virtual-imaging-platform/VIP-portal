@@ -39,6 +39,7 @@ import fr.insalyon.creatis.moteur.plugins.workflowsdb.dao.*;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
 import fr.insalyon.creatis.vip.application.client.bean.*;
 import fr.insalyon.creatis.vip.application.client.view.monitor.SimulationStatus;
+import fr.insalyon.creatis.vip.application.client.view.monitor.job.TaskStatus;
 import fr.insalyon.creatis.vip.application.client.view.monitor.progress.ProcessorStatus;
 import fr.insalyon.creatis.vip.application.server.business.simulation.ParameterSweep;
 import fr.insalyon.creatis.vip.application.server.business.simulation.parser.GwendiaParser;
@@ -87,6 +88,7 @@ public class WorkflowBusiness {
 
     private final Server server;
     private final SimulationStatsDAO simulationStatsDAO;
+    private final SimulationBusiness simulationBusiness;
     private final WorkflowDAO workflowDAO;
     private final ProcessorDAO processorDAO;
     private final OutputDAO outputDAO;
@@ -102,11 +104,12 @@ public class WorkflowBusiness {
     private final GRIDAPoolClient gridaPoolClient;
     private final GRIDAClient gridaClient;
     private final ExternalPlatformBusiness externalPlatformBusiness;
-    private final  WorkflowExecutionBusiness workflowExecutionBusiness;
+    private final WorkflowExecutionBusiness workflowExecutionBusiness;
 
     @Autowired
     public WorkflowBusiness(
             Server server, SimulationStatsDAO simulationStatsDAO,
+            SimulationBusiness simulationBusiness,
             WorkflowDAO workflowDAO, ProcessorDAO processorDAO,
             OutputDAO outputDAO, InputDAO inputDAO, StatsDAO statsDAO,
             EngineDAO engineDAO, ApplicationDAO applicationDAO,
@@ -117,6 +120,7 @@ public class WorkflowBusiness {
             WorkflowExecutionBusiness workflowExecutionBusiness) {
         this.server = server;
         this.simulationStatsDAO = simulationStatsDAO;
+        this.simulationBusiness = simulationBusiness;
         this.workflowDAO = workflowDAO;
         this.processorDAO = processorDAO;
         this.outputDAO = outputDAO;
@@ -401,8 +405,12 @@ public class WorkflowBusiness {
     }
 
     public void kill(String simulationID) throws BusinessException {
-
         try {
+            List<Task> tasks = simulationBusiness.getJobsList(simulationID);
+            List<String> tasksIds = tasks.stream().map(Task::getId).toList();
+
+            simulationBusiness.sendSignal(simulationID, tasksIds, TaskStatus.KILL);
+
             Workflow workflow = workflowDAO.get(simulationID);
             workflow.setStatus(WorkflowStatus.Killed);
             workflowDAO.update(workflow);

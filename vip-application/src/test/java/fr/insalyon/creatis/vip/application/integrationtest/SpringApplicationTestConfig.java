@@ -3,6 +3,8 @@ package fr.insalyon.creatis.vip.application.integrationtest;
 import fr.insalyon.creatis.moteur.plugins.workflowsdb.dao.*;
 import fr.insalyon.creatis.vip.application.server.business.simulation.RestServiceEngine;
 import fr.insalyon.creatis.vip.application.server.business.simulation.WorkflowEngineInstantiator;
+import fr.insalyon.creatis.vip.application.server.dao.SimulationDAO;
+
 import org.hibernate.SessionFactory;
 import org.mockito.Mockito;
 import org.springframework.context.annotation.Bean;
@@ -66,4 +68,9 @@ public class SpringApplicationTestConfig {
         return Mockito.mock(WorkflowEngineInstantiator.class);
     }
 
+    @Bean
+    @Primary
+    public SimulationDAO mockSimulationDAO() {
+        return Mockito.mock(SimulationDAO.class);
+    }
 }
