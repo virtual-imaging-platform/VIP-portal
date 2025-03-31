@@ -5,13 +5,13 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.oauth2.jwt.Jwt;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 
-import java.util.List;
+import java.util.Collection;
 
 public class OidcToken extends AbstractAuthenticationToken {
     private final User user;
     private Jwt jwt;
 
-    public OidcToken(User user, Jwt jwt, List<GrantedAuthority> authorities) {
+    public OidcToken(User user, Jwt jwt, Collection<GrantedAuthority> authorities) {
         super(authorities);
         this.user = user;
         this.jwt = jwt;
