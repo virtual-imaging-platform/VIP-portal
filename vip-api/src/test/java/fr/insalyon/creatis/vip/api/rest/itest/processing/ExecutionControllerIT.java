@@ -44,6 +44,7 @@ import fr.insalyon.creatis.vip.application.client.view.monitor.SimulationStatus;
 import fr.insalyon.creatis.vip.application.server.business.simulation.ParameterSweep;
 import fr.insalyon.creatis.vip.application.server.business.util.FileUtil;
 import fr.insalyon.creatis.vip.core.integrationtest.ServerMockConfig;
+
 import org.hamcrest.MatcherAssert;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -88,7 +89,7 @@ public class ExecutionControllerIT extends BaseWebSpringIT {
     public void shouldListExecutions() throws Exception {
         when(workflowDAO.get(eq(simulation1.getID()))).thenReturn(w1, (Workflow) null);
         when(workflowDAO.get(eq(simulation2.getID()))).thenReturn(w2, (Workflow) null);
-        when(workflowDAO.get(Collections.singletonList(baseUser1.getFullName()), Arrays.asList((String) null), null, null, null, null, null))
+        when(workflowDAO.get(Collections.singletonList(baseUser1.getFullName()), new ArrayList<>(), null, null, null, null, null))
                 .thenReturn(Arrays.asList(w1, w2), (List<Workflow>) null);
 
         // perform a getWorkflows()
@@ -109,7 +110,7 @@ public class ExecutionControllerIT extends BaseWebSpringIT {
     @Test
     @SuppressWarnings("unchecked")
     public void shouldCountExecutions() throws Exception {
-        when(workflowDAO.get(Collections.singletonList(baseUser1.getFullName()), Arrays.asList((String) null), null, null, null, null, null))
+        when(workflowDAO.get(Collections.singletonList(baseUser1.getFullName()), new ArrayList<>(), null, null, null, null, null))
                 .thenReturn(Arrays.asList(w1, w2), (List<Workflow>) null);
 
         // perform a getWorkflows()
@@ -238,7 +239,7 @@ public class ExecutionControllerIT extends BaseWebSpringIT {
 
     @Test
     public void shouldReturn500() throws Exception {
-        when(workflowDAO.get(Collections.singletonList(baseUser1.getFullName()), Arrays.asList((String) null), null, null, null, null, null)).thenThrow(new RuntimeException("test exception"));
+        when(workflowDAO.get(Collections.singletonList(baseUser1.getFullName()), new ArrayList<>(), null, null, null, null, null)).thenThrow(new RuntimeException("test exception"));
 
         // perform a getWorkflows() with an undetermined error
         mockMvc.perform(
@@ -326,6 +327,7 @@ public class ExecutionControllerIT extends BaseWebSpringIT {
         when(outputDAO.get(eq(simulation2.getID()))).thenReturn(Arrays.asList(output), (List<Output>) null);
 
         Mockito.when(server.getDataManagerUsersHome()).thenReturn("/root/user");
+        Mockito.when(gridaClient.getPathInfo(resultPath)).thenReturn(new GridPathInfo(true, GridData.Type.File));
         Mockito.when(gridaClient.getPathInfo(resultPath)).thenReturn(new GridPathInfo(true, GridData.Type.File));
         Mockito.when(gridaClient.getFolderData(resultPath, true)).thenReturn(Arrays.asList(
                 new GridData("result.res", GridData.Type.File, 42, "modifData", "", "", "")));

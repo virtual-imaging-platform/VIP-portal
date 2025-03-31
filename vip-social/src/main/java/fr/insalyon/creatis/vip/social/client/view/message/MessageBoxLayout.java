@@ -104,8 +104,9 @@ public class MessageBoxLayout extends HLayout {
         mainLayout.addMember(WidgetUtil.getLabel("<b>" + message.getSender().getFullName()
                 + "</b>: " + message.getTitle(), 15, Cursor.HAND));
 
+        String messageSummary = message.getMessage().substring(0, Math.min(50, message.getMessage().length()));
         mainLayout.addMember(WidgetUtil.getLabel("<font color=\"#666666\">"
-                + message.getMessage().substring(0, 50) + "...</font>", 15, Cursor.HAND));
+                + messageSummary + "...</font>", 15, Cursor.HAND));
 
         mainLayout.addClickHandler(new ClickHandler() {
             @Override

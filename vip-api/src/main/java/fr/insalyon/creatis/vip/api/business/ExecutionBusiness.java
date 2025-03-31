@@ -230,7 +230,7 @@ public class ExecutionBusiness {
     public List<Execution> listExamples() throws ApiException {
         try {
             List<Simulation> simulations = workflowBusiness.getSimulations(
-                    (String) null, // User must be null to take examples from other users
+                    null, // User must be null to take examples from other users
                     null, // application
                     WorkflowStatus.Completed.name(), // status
                     null, // class

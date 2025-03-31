@@ -467,4 +467,9 @@ public class SpringConfigServer implements Server {
     public String getMoteurServerPassword() {
         return env.getRequiredProperty(CoreConstants.MOTEUR_REST_PASSWORD);
     }
+
+    @Override
+    public String getHostURL() {
+        return env.getRequiredProperty(CoreConstants.HOST_URL);
+    }
 }

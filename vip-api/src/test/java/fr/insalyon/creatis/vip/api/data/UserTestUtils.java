@@ -40,7 +40,6 @@ import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequ
 import org.springframework.test.web.servlet.request.RequestPostProcessor;
 
 import java.util.ArrayList;
-import java.util.Collections;
 
 /**
  * Created by abonnet on 7/26/16.
