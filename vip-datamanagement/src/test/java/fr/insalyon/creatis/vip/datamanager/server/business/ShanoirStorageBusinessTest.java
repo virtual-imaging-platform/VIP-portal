@@ -71,4 +71,20 @@ public class ShanoirStorageBusinessTest {
 
         Assertions.assertEquals(expectedUri, uploadUri);
     }
+
+    @Test
+    public void testShanoirInvalidUri() throws BusinessException {
+        ShanoirStorageBusiness shanoirStorageBusiness = new ShanoirStorageBusiness();
+        ExternalPlatform externalPlatform = new ExternalPlatform();
+        externalPlatform.setIdentifier("testShanoir");
+        externalPlatform.setType(ExternalPlatform.Type.SHANOIR);
+        externalPlatform.setUrl("testShanoirUrl");
+        externalPlatform.setRefreshTokenUrl("testRefreshTokenUrl");
+        externalPlatform.setUploadUrl("testUploadUrl");
+
+        String value = " invalid uri://";
+
+        Assertions.assertThrows(BusinessException.class,
+                () -> shanoirStorageBusiness.generateUri(externalPlatform, "paramName", value));
+    }
 }
