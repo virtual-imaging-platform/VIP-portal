@@ -100,14 +100,16 @@ public class PublicExecution implements IsSerializable {
 
         for (String output : outputIds) {
             // splitting workflow-xxxxx-outname
-            startIndex = output.indexOf('-', 0) + 1;
-            workflowId = output.substring(0, output.indexOf('-', startIndex));
-            outputId = output.substring(output.indexOf('-', startIndex) + 1);
-
-            if (result.get(workflowId) != null) {
-                result.get(workflowId).add(outputId);
-            } else {
-                result.put(workflowId, new ArrayList<>(Arrays.asList(outputId)));
+            if ( ! output.isEmpty()) {
+                startIndex = output.indexOf('-', 0) + 1;
+                workflowId = output.substring(0, output.indexOf('-', startIndex));
+                outputId = output.substring(output.indexOf('-', startIndex) + 1);
+    
+                if (result.get(workflowId) != null) {
+                    result.get(workflowId).add(outputId);
+                } else {
+                    result.put(workflowId, new ArrayList<>(Arrays.asList(outputId)));
+                }
             }
         }
         return result;
