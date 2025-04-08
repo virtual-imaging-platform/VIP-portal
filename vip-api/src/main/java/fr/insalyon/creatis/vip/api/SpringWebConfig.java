@@ -64,6 +64,16 @@ public class SpringWebConfig implements WebMvcConfigurer {
     }
 
     @Override
+    @SuppressWarnings("deprecation")
+    public void configurePathMatch(PathMatchConfigurer configurer) {
+        // this is deprecated, but temporary necessary for shanoir
+        // that uses requests like /rest/pipelines/
+        // Shanoir should get rid of the trailing slash and we should
+        // be able to remove this method when spring removes its support
+        configurer.setUseTrailingSlashMatch(true);
+    }
+
+    @Override
     public void configureContentNegotiation(ContentNegotiationConfigurer configurer) {
         // necessary in the content negotiation stuff of carmin data
         // this should be the default in Spring 5.3 and may be removed then
