@@ -123,7 +123,7 @@ public class ApplicationInputData extends JdbcDaoSupport implements ApplicationI
 
     @Override
     public List<SimulationInput> getSimulationInputByUser(String email) throws DAOException {
-        String query =  "SELECT application, name, inputs FROM VIPAppInputs "
+        String query =  "SELECT application, name, inputs FROM VIPAppInputs WHERE email=?"
         +               "ORDER BY application, name";
         List<SimulationInput> inputs = new ArrayList<SimulationInput>();
 
