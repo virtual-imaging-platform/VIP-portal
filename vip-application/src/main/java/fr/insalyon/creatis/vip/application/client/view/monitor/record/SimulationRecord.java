@@ -71,6 +71,10 @@ public class SimulationRecord extends ListGridRecord {
         return getAttributeAsString("application");
     }
 
+    public String getApplicationVersion() {
+        return getAttributeAsString("applicationVersion");
+    }
+
     public String getStatus() {
         return getAttributeAsString("status");
     }

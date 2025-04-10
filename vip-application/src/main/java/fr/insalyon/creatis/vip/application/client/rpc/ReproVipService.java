@@ -1,11 +1,11 @@
 package fr.insalyon.creatis.vip.application.client.rpc;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.ServiceDefTarget;
+
+import fr.insalyon.creatis.vip.application.client.bean.PublicExecution;
 import fr.insalyon.creatis.vip.application.client.view.ApplicationException;
-import fr.insalyon.creatis.vip.core.client.bean.PublicExecution;
 
 import java.util.List;
 
@@ -27,12 +27,14 @@ public interface ReproVipService extends RemoteService {
 
     public List<PublicExecution> getPublicExecutions() throws ApplicationException;
 
-    boolean doesExecutionExist(String executionID) throws ApplicationException;
+    boolean doesExecutionExist(String experienceName) throws ApplicationException;
 
-    boolean canMakeExecutionPublic(String executionID) throws ApplicationException;
+    boolean canMakeExecutionPublic(List<String> workflowsIds) throws ApplicationException;
 
-    PublicExecution.PublicExecutionStatus createReproVipDirectory(String executionID) throws ApplicationException;
+    PublicExecution.PublicExecutionStatus createReproVipDirectory(String experienceName) throws ApplicationException;
 
-    PublicExecution.PublicExecutionStatus deleteReproVipDirectory(String executionID) throws ApplicationException;
+    PublicExecution.PublicExecutionStatus deleteReproVipDirectory(String experienceName) throws ApplicationException;
+
+    PublicExecution.PublicExecutionStatus setExecutionPublished(String experienceName, String doi) throws ApplicationException;
 }
 

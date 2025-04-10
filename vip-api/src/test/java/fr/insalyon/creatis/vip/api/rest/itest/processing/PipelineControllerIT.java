@@ -210,7 +210,8 @@ public class PipelineControllerIT extends BaseWebSpringIT {
         createUserInGroup(baseUser3.getEmail(), "test3", "group3");
         createUserInGroups(baseUser4.getEmail(), "test4", "group1", "group2");
 
-        mockMvc.perform(get("/rest/pipelines").with(baseUser1()))
+        // temp trailing slash for shanoir, see fr.insalyon.creatis.vip.api.SpringWebConfig::configurePathMatch
+        mockMvc.perform(get("/rest/pipelines/").with(baseUser1()))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))

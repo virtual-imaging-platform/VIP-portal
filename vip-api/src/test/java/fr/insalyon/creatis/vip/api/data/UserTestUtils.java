@@ -39,6 +39,7 @@ import fr.insalyon.creatis.vip.core.client.view.util.CountryCode;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.web.servlet.request.RequestPostProcessor;
 
+
 /**
  * Created by abonnet on 7/26/16.
  */

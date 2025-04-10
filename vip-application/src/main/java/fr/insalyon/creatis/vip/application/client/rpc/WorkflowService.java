@@ -36,6 +36,8 @@ import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.ServiceDefTarget;
 import fr.insalyon.creatis.vip.application.client.bean.*;
 import fr.insalyon.creatis.vip.application.client.view.ApplicationException;
+import fr.insalyon.creatis.vip.core.client.bean.Pair;
+
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -63,10 +65,11 @@ public interface WorkflowService extends RemoteService {
     
     public List<Simulation> getSimulations(Date lastDate) throws ApplicationException;
 
-    //
     public Descriptor getApplicationDescriptor(String applicationName, String applicationVersion) throws ApplicationException;
 
     public String getApplicationDescriptorString(String applicationName, String applicationVersion) throws ApplicationException;
+
+    public List<String> getApplicationsDescriptorsString(List<Pair<String, String>> applications) throws ApplicationException;
 
     public void launchSimulation(Map<String, String> parameters, String applicationName, String applicationVersion, String applicationClass, String simulationName) throws ApplicationException;
 
