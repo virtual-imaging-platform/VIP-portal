@@ -159,12 +159,6 @@ public class MessageBusiness {
                 recipients = users.toArray(new String[]{});
             }
 
-            long messageId = messageDAO.add(user.getEmail(), subject, message);
-
-            for (String recipient : recipients) {
-                messageDAO.associateMessageToUser(recipient, messageId);
-            }
-
             String emailContent = "<html>"
                     + "<head></head>"
                     + "<body>"
@@ -181,6 +175,12 @@ public class MessageBusiness {
             for (String email : recipients) {
                 emailBusiness.sendEmail("VIP Message: " + subject + " (" + user.getFullName() + ")",
                         emailContent, new String[]{email}, true, user.getEmail());
+            }
+
+            long messageId = messageDAO.add(user.getEmail(), subject, message);
+
+            for (String recipient : recipients) {
+                messageDAO.associateMessageToUser(recipient, messageId);
             }
         } catch (DAOException ex) {
             throw new BusinessException(ex);
