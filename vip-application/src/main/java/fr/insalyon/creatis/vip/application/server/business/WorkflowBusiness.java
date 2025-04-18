@@ -438,7 +438,9 @@ public class WorkflowBusiness {
     public void kill(String simulationID) throws BusinessException {
         try {
             List<Task> tasks = simulationBusiness.getJobsList(simulationID);
-            List<String> tasksIds = tasks.stream().map(Task::getId).toList();
+            List<String> tasksIds = tasks.stream()
+                .filter((t) -> t.getStatus().isRunningState())
+                .map(Task::getId).toList();
 
             simulationBusiness.sendSignal(simulationID, tasksIds, TaskStatus.KILL);
 
