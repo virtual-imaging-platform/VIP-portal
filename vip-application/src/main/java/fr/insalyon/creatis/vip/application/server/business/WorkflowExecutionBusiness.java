@@ -80,10 +80,10 @@ public class WorkflowExecutionBusiness {
             String workflowContent = FileUtil.read(new File(workflowPath));
             String inputs = (parameters != null) ? getParametersAsXMLInput(parameters) : null;
             String proxyFileName = server.getServerProxy(server.getVoName());
-            String workflowID = engine.launch(engineEndpoint, workflowContent, inputs, "", "", proxyFileName);
+            String workflowID = engine.launch(engineEndpoint, workflowContent, inputs, appVersion.getSettingsAsString(), executorConfig, proxyFileName);
             return new Workflow(workflowID, user.getFullName(),
-                    WorkflowStatus.Running,
-                    new Date(), null, simulationName, appVersion.getApplicationName(), appVersion.getVersion(), "",
+                    WorkflowStatus.Running, new Date(), null, simulationName, 
+                    appVersion.getApplicationName(), appVersion.getVersion(), "",
                     engineEndpoint, null);
 
         } catch (ServiceException | RemoteException ex) {

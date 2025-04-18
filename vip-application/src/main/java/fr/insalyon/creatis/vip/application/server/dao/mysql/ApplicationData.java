@@ -51,7 +51,10 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * @author Rafael Ferreira da Silva
@@ -241,14 +244,7 @@ public class ApplicationData extends JdbcDaoSupport implements ApplicationDAO {
             List<AppVersion> versions = new ArrayList<AppVersion>();
 
             while (rs.next()) {
-                versions.add(new AppVersion(
-                        name,
-                        rs.getString("version"),
-                        rs.getString("lfn"),
-                        rs.getString("json_lfn"),
-                        rs.getString("doi"),
-                        rs.getBoolean("visible"),
-                        rs.getBoolean("useBoutiquesForm")));
+                versions.add(appVersionFromResultset(rs));
             }
             return versions;
 
@@ -269,14 +265,7 @@ public class ApplicationData extends JdbcDaoSupport implements ApplicationDAO {
             List<AppVersion> versions = new ArrayList<AppVersion>();
 
             while (rs.next()) {
-                versions.add(new AppVersion(
-                        rs.getString("application"),
-                        rs.getString("version"),
-                        rs.getString("lfn"),
-                        rs.getString("json_lfn"),
-                        rs.getString("doi"),
-                        rs.getBoolean("visible"),
-                        rs.getBoolean("useBoutiquesForm")));
+                versions.add(appVersionFromResultset(rs));
             }
             return versions;
 
@@ -288,8 +277,8 @@ public class ApplicationData extends JdbcDaoSupport implements ApplicationDAO {
 
     @Override
     public void addVersion(AppVersion version) throws DAOException {
-        String query =  "INSERT INTO VIPAppVersions(application, version, lfn, json_lfn, visible, useBoutiquesForm) "
-        +               "VALUES (?, ?, ?, ?, ?, ?)";
+        String query =  "INSERT INTO VIPAppVersions(application, version, lfn, json_lfn, visible, useBoutiquesForm, settings) "
+        +               "VALUES (?, ?, ?, ?, ?, ?, ?)";
 
         try (PreparedStatement ps = getConnection().prepareStatement(query)) {
             ps.setString(1, version.getApplicationName());
@@ -298,6 +287,7 @@ public class ApplicationData extends JdbcDaoSupport implements ApplicationDAO {
             ps.setString(4, version.getJsonLfn());
             ps.setBoolean(5, version.isVisible());
             ps.setBoolean(6, version.isBoutiquesForm());
+            ps.setString(7, version.getSettingsAsString());
             ps.executeUpdate();
 
         } catch (SQLException ex) {
@@ -314,7 +304,7 @@ public class ApplicationData extends JdbcDaoSupport implements ApplicationDAO {
 
     @Override
     public void updateVersion(AppVersion version) throws DAOException {
-        String query =  "UPDATE VIPAppVersions SET lfn=?, json_lfn=?, visible=?, useBoutiquesForm=? "
+        String query =  "UPDATE VIPAppVersions SET lfn=?, json_lfn=?, visible=?, useBoutiquesForm=?, settings=? "
         +               "WHERE application=? AND version=?";
 
         try (PreparedStatement ps = getConnection().prepareStatement(query)) {
@@ -322,8 +312,9 @@ public class ApplicationData extends JdbcDaoSupport implements ApplicationDAO {
             ps.setString(2, version.getJsonLfn());
             ps.setBoolean(3, version.isVisible());
             ps.setBoolean(4, version.isBoutiquesForm());
-            ps.setString(5, version.getApplicationName());
-            ps.setString(6, version.getVersion());
+            ps.setString(5, version.getSettingsAsString());
+            ps.setString(6, version.getApplicationName());
+            ps.setString(7, version.getVersion());
             ps.executeUpdate();
 
         } catch (SQLException ex) {
@@ -375,13 +366,7 @@ public class ApplicationData extends JdbcDaoSupport implements ApplicationDAO {
 
             ResultSet rs = ps.executeQuery();
             if (rs.first()) {
-                return new AppVersion(rs.getString("application"),
-                        rs.getString("version"),
-                        rs.getString("lfn"),
-                        rs.getString("json_lfn"),
-                        rs.getString("doi"),
-                        rs.getBoolean("visible"),
-                        rs.getBoolean("useBoutiquesForm"));
+                return appVersionFromResultset(rs);
             }
 
             return null;
@@ -433,5 +418,28 @@ public class ApplicationData extends JdbcDaoSupport implements ApplicationDAO {
             rs.getString("owner"),
             rs.getString("citation"),
             rs.getBoolean("isPublic"));
+    }
+
+    public static AppVersion appVersionFromResultset(ResultSet rs) throws SQLException {
+        return new AppVersion(
+            rs.getString("application"),
+            rs.getString("version"),
+            rs.getString("lfn"),
+            rs.getString("json_lfn"),
+            rs.getString("doi"),
+            stringSettingsToMap(rs.getString("settings")),
+            rs.getBoolean("visible"),
+            rs.getBoolean("useBoutiquesForm")
+        );
+    }
+
+    private static Map<String, String> stringSettingsToMap(String str) {
+        return Arrays.stream(str.split(", "))
+            .map(s -> s.split("="))
+            .filter(pair -> pair.length == 2)
+            .collect(Collectors.toMap(
+                pair -> pair[0],
+                pair -> pair[1]
+            ));
     }
 }

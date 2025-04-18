@@ -115,6 +115,7 @@ public class ApplicationDataInitializer extends JdbcDaoSupport {
                 +   "lfn VARCHAR(255), "
                 +   "json_lfn VARCHAR(255), "
                 +   "doi VARCHAR(255), "
+                +   "settings TEXT, "
                 +   "visible BOOLEAN, "
                 +   "useBoutiquesForm BOOLEAN, "
                 +   "PRIMARY KEY (application, version), "

@@ -31,6 +31,8 @@
  */
 package fr.insalyon.creatis.vip.application.client.view.system.applications.app;
 
+import java.util.Map;
+
 import com.smartgwt.client.widgets.Label;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
@@ -100,8 +102,9 @@ public class ManageApplicationsTab extends AbstractManageTab {
         editLayout.setApplication(name, owner, citation, groups, isPublic);
     }
 
-    public void setVersion(String version, String lfn, String jsonLfn, String doi, boolean isVisible, boolean isBoutiquesForm, String[] tags, String[] resources) {
-        editVersionLayout.setVersion(version, lfn, jsonLfn, isVisible, isBoutiquesForm, tags, resources);
+    public void setVersion(String version, String lfn, String jsonLfn, String doi, Map<String, String> settings, 
+            boolean isVisible, boolean isBoutiquesForm, String[] tags, String[] resources) {
+        editVersionLayout.setVersion(version, lfn, jsonLfn, isVisible, isBoutiquesForm, settings, tags, resources);
         manageVersionLayout.setVersion(version, jsonLfn, doi);
     }
 

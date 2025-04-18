@@ -514,7 +514,7 @@ public class ExecutionControllerIT extends BaseWebSpringIT {
             true, 
             true, 
             ResourceType.BATCH, 
-            "bla", 
+            "", 
             Arrays.asList(engine.getName()),
             Arrays.asList("testResources"));
 
