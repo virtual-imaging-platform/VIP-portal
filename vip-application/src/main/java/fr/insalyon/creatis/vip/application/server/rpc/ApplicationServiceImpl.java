@@ -49,6 +49,7 @@ import jakarta.servlet.ServletException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -218,7 +219,7 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
     @Override
     public Map<Application, List<AppVersion>> getPublicApplications() throws ApplicationException {
         List<Application> apps = new ArrayList<>();
-        Map<Application, List<AppVersion>> map = new HashMap<>();
+        Map<Application, List<AppVersion>> map = new LinkedHashMap<>();
 
         try {
             apps = applicationBusiness.getPublicApplicationsWithGroups();
@@ -235,7 +236,7 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
     @Override
     public Map<Application, List<AppVersion>> getApplications() throws ApplicationException {
         List<Application> apps = new ArrayList<>();
-        Map<Application, List<AppVersion>> map = new HashMap<>();
+        Map<Application, List<AppVersion>> map = new LinkedHashMap<>();
 
         try {
             if (isSystemAdministrator()) {
