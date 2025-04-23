@@ -281,7 +281,7 @@ public class DataApiBusiness {
             logger.error("Trying to download a non-existing file ({})", path);
             throw new ApiException("Illegal data API access");
         }
-        if (!type.get().equals(Data.Type.folder)) {
+        if (!type.get().equals(Data.Type.file)) {
             // it works on a directory and return a zip, but we cant check the download size
             logger.error("Trying to download a directory ({})", path);
             throw new ApiException("Illegal data API access");
