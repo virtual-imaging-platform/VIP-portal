@@ -161,10 +161,6 @@ public class MakeExecutionPublicTab extends Tab {
             SC.warn("The form is invalid");
             return false;
         }
-        if (getOutputIdsSelected().isEmpty()) {
-            SC.warn("Please select at least one output");
-            return false;
-        }
         if ( ! experienceNameField.getValueAsString().matches("[a-zA-Z0-9_-]+")) {
             SC.warn("Only alphanumerics characters and (-,_) are authorized!");
             return false;
