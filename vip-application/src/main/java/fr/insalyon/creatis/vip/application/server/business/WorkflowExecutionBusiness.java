@@ -33,6 +33,7 @@ package fr.insalyon.creatis.vip.application.server.business;
 
 import fr.insalyon.creatis.moteur.plugins.workflowsdb.bean.Workflow;
 import fr.insalyon.creatis.moteur.plugins.workflowsdb.bean.WorkflowStatus;
+import fr.insalyon.creatis.vip.application.client.bean.AppVersion;
 import fr.insalyon.creatis.vip.application.client.view.monitor.SimulationStatus;
 import fr.insalyon.creatis.vip.application.server.business.simulation.ParameterSweep;
 import fr.insalyon.creatis.vip.application.server.business.simulation.WorkflowEngineInstantiator;
@@ -72,23 +73,22 @@ public class WorkflowExecutionBusiness {
         this.engine = engine;
     }
 
-    public Workflow launch(String engineEndpoint, String applicationName, String applicationVersion,
-            String applicationClass, User user, String simulationName,
-            String workflowPath, List<ParameterSweep> parameters) throws BusinessException {
+    public Workflow launch(String engineEndpoint, AppVersion appVersion, User user, String simulationName,
+            String workflowPath, List<ParameterSweep> parameters, String settings, String executorConfig) throws BusinessException {
 
         try {
             String workflowContent = FileUtil.read(new File(workflowPath));
             String inputs = (parameters != null) ? getParametersAsXMLInput(parameters) : null;
             String proxyFileName = server.getServerProxy(server.getVoName());
-            String workflowID = engine.launch(engineEndpoint, workflowContent, inputs, "", proxyFileName);
+            String workflowID = engine.launch(engineEndpoint, workflowContent, inputs, appVersion.getSettingsAsString(), executorConfig, proxyFileName);
             return new Workflow(workflowID, user.getFullName(),
-                    WorkflowStatus.Running,
-                    new Date(), null, simulationName, applicationName, applicationVersion, applicationClass,
+                    WorkflowStatus.Running, new Date(), null, simulationName, 
+                    appVersion.getApplicationName(), appVersion.getVersion(), "",
                     engineEndpoint, null);
 
         } catch (ServiceException | RemoteException ex) {
             logger.error("Error launching simulation {} ({}/{})",
-                    simulationName, applicationName, applicationVersion, ex);
+                    simulationName, appVersion.getApplicationName(), appVersion.getVersion(), ex);
             throw new BusinessException(ex);
         }
     }

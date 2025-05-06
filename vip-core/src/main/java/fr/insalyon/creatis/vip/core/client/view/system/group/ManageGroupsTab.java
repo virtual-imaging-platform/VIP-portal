@@ -45,7 +45,6 @@ public class ManageGroupsTab extends AbstractManageTab {
     private EditGroupLayout editLayout;
 
     public ManageGroupsTab() {
-
         super(CoreConstants.ICON_GROUP, CoreConstants.APP_GROUP, CoreConstants.TAB_MANAGE_GROUPS);
 
         groupsLayout = new GroupsLayout();
@@ -62,7 +61,7 @@ public class ManageGroupsTab extends AbstractManageTab {
         groupsLayout.loadData();
     }
 
-    public void setGroup(String name, boolean isPublic,boolean isgridfile,boolean isgridjobs) {
-        editLayout.setGroup(name, isPublic,isgridfile,isgridjobs);
+    public void setGroup(String name, boolean isPublic, String type, boolean auto) {
+        editLayout.setGroup(name, isPublic, type, auto);
     }
 }

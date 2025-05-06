@@ -39,7 +39,6 @@ import fr.insalyon.creatis.vip.core.client.view.util.CountryCode;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.web.servlet.request.RequestPostProcessor;
 
-import java.util.ArrayList;
 
 /**
  * Created by abonnet on 7/26/16.
@@ -75,7 +74,7 @@ public class UserTestUtils {
                 UserLevel.Beginner, null);
         baseUser4.setFolder("user4");
 
-        restUser1 = new SignUpUserDTO("base3", "User3", "baseuser3@test.tst", "test", baseUser2Password, CountryCode.lc, "test comment", new ArrayList<>());
+        restUser1 = new SignUpUserDTO("base3", "User3", "baseuser3@test.tst", "test", baseUser2Password, CountryCode.lc, "test comment");
     }
 
     public static RequestPostProcessor baseUser1() {

@@ -1,42 +1,40 @@
 package fr.insalyon.creatis.vip.application.integrationtest;
 
-import fr.insalyon.creatis.vip.application.client.bean.AppClass;
 import fr.insalyon.creatis.vip.application.client.bean.AppVersion;
 import fr.insalyon.creatis.vip.application.client.bean.Application;
 import fr.insalyon.creatis.vip.application.client.bean.Engine;
+import fr.insalyon.creatis.vip.application.server.business.AppVersionBusiness;
 import fr.insalyon.creatis.vip.application.server.business.ApplicationBusiness;
-import fr.insalyon.creatis.vip.application.server.business.ClassBusiness;
 import fr.insalyon.creatis.vip.application.server.business.EngineBusiness;
 import fr.insalyon.creatis.vip.core.client.bean.Group;
+import fr.insalyon.creatis.vip.core.client.bean.GroupType;
 import fr.insalyon.creatis.vip.core.integrationtest.database.BaseSpringIT;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
-import org.apache.commons.lang.StringUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class ApplicationIT extends BaseSpringIT {
-    @Autowired
-    private ApplicationBusiness applicationBusiness;
-    @Autowired
-    private ClassBusiness classBusiness;
-    @Autowired
-    private EngineBusiness engineBusiness;
+
+    @Autowired private ApplicationBusiness applicationBusiness;
+    @Autowired private EngineBusiness engineBusiness;
+    @Autowired private AppVersionBusiness appVersionBusiness;
 
     @BeforeEach
     public void setUp() throws Exception {
         super.setUp();
 
         // group test and user test creation
-        group1 = new Group("group1", true, true, true);
-        configurationBusiness.addGroup(group1);
+        group1 = new Group("group1", true, GroupType.getDefault());
+        groupBusiness.add(group1);
         List<String> groups = new ArrayList<>();
         groups.add("group1");
         createUserInGroup("test1@test.fr", "suffix1", "group1");
@@ -51,16 +49,11 @@ public class ApplicationIT extends BaseSpringIT {
         engines.add("test engine");
         engineBusiness.add(engine);
 
-        AppClass appClass = new AppClass("class1", engines, groups);
-        classBusiness.addClass(appClass);
-        applicationClasses = new ArrayList<>();
-        applicationClasses.add("class1");
-
-        Application application = new Application("Application1", applicationClasses, "test1@test.fr", "test1", "citation1");
+        Application application = new Application("Application1", "test1@test.fr", "test1", "citation1");
         applicationBusiness.add(application);
 
         AppVersion appVersion = new AppVersion("Application1", "version 0.0", "lfn", "jsonLfn", true, true);
-        applicationBusiness.addVersion(appVersion);
+        appVersionBusiness.add(appVersion);
 
     }
 
@@ -75,12 +68,8 @@ public class ApplicationIT extends BaseSpringIT {
         Assertions.assertEquals("Application1", application.getName(), "Incorrect name of application");
         Assertions.assertEquals("test1@test.fr", application.getOwner(), "Incorrect owner of application");
         Assertions.assertNull(application.getFullName(), "getApplication should not fill fullname");
-        Assertions.assertEquals("class1", application.getApplicationClasses().get(0), "Incorrect class of application");
-        Assertions.assertNull(application.getApplicationGroups(), "getApplication should not fill applicationGroups");
-        Assertions.assertEquals(1, applicationBusiness.getVersions("Application1").size(), "Incorrect versions number");
-
-        // verify that there is no application in the first class
-        Assertions.assertEquals(1, applicationBusiness.getApplications("class1").size(), "Incorrect number of application");
+        Assertions.assertTrue(application.getApplicationGroups().isEmpty(), "getApplication should not fill applicationGroups");
+        Assertions.assertEquals(1, appVersionBusiness.getVersions("Application1").size(), "Incorrect versions number");
 
     }
 
@@ -90,26 +79,10 @@ public class ApplicationIT extends BaseSpringIT {
 
     @Test
     public void testUpdateApplication() throws BusinessException {
-        Application updatedApplication = new Application("Application1", applicationClasses, "test2@test.fr", "test1", "citation1");
+        Application updatedApplication = new Application("Application1", "test2@test.fr", "test1", "citation1");
         applicationBusiness.update(updatedApplication);
 
         Assertions.assertEquals("test2@test.fr", applicationBusiness.getApplication("Application1").getOwner(), "Incorrect owner of updated application");
-    }
-
-    // TODO : corriger
-    @Test
-    public void testCatchUpdateNonExistentApplication() {
-        Application updatedApplication = new Application("NonExistent Application", applicationClasses, "test2@test.fr", "test1", "citation1");
-
-        Exception exception = assertThrows(
-                BusinessException.class, () ->
-                        applicationBusiness.update(updatedApplication)
-        );
-
-        // UPDATE + nonExistent foreign key name for VIPAPPLICATIONCLASSES => violation
-        assertTrue(StringUtils.contains(exception.getMessage(), "JdbcSQLException: Referential integrity constraint violation"));
-
-
     }
 
     /* ********************************************************************************************************************************************** */
@@ -143,13 +116,8 @@ public class ApplicationIT extends BaseSpringIT {
     }
 
     @Test
-    public void testCatchGetCitationNonExistentApplication() {
-        Exception exception = assertThrows(
-                BusinessException.class, () ->
-                        applicationBusiness.getCitation("NonExistent application")
-        );
-
-        assertTrue(StringUtils.contains(exception.getMessage(), "jdbc.JdbcSQLException: No data is available"));
+    public void testCatchGetCitationNonExistentApplication() throws BusinessException {
+        assertNull(applicationBusiness.getCitation("NonExistent application"));
     }
 
     /* ********************************************************************************************************************************************** */
@@ -159,8 +127,8 @@ public class ApplicationIT extends BaseSpringIT {
     @Test
     public void testAddVersionApplication() throws BusinessException {
         AppVersion appVersion = new AppVersion("Application1", "version 1.0", "lfn", "jsonLfn", true, true);
-        applicationBusiness.addVersion(appVersion);
-        Assertions.assertEquals(2, applicationBusiness.getVersions("Application1").size(), "Incorrect versions number");
+        appVersionBusiness.add(appVersion);
+        Assertions.assertEquals(2, appVersionBusiness.getVersions("Application1").size(), "Incorrect versions number");
     }
 
     /* ********************************************************************************************************************************************** */
@@ -169,29 +137,52 @@ public class ApplicationIT extends BaseSpringIT {
 
     @Test
     public void testUpdateVersionApplication() throws BusinessException {
-
         AppVersion appVersion = new AppVersion("Application1", "version 0.0", "lfn updated", "jsonLfn", true, true);
-        applicationBusiness.updateVersion(appVersion);
-        Assertions.assertEquals("lfn updated", applicationBusiness.getVersions("Application1").get(0).getLfn(), "Incorrect lfn updated");
+        appVersionBusiness.update(appVersion);
+        Assertions.assertEquals("lfn updated", appVersionBusiness.getVersions("Application1").get(0).getLfn(), "Incorrect lfn updated");
     }
 
+    @Test 
+    public void getApplication() throws BusinessException {
+        Application app = applicationBusiness.getApplication("Application1");
 
-    /* ********************************************************************************************************************************************** */
-    /* *************************************************************** get applications ************************************************************* */
-    /* ********************************************************************************************************************************************** */
-
+        assertEquals(app.getOwner(), "test1@test.fr");
+    }
 
     @Test
-    public void testGetApplications() throws BusinessException {
-        List<String[]> applications = applicationBusiness.getApplications("class1");
-        Assertions.assertEquals(1, applications.size(), "Incorrect applications number");
-    }
+    public void getApplications() throws BusinessException {
+        Application appbis = new Application("test", "testeu");
 
+        applicationBusiness.add(appbis);
+        List<Application> apps = applicationBusiness.getApplications();
+        assertEquals(2, apps.size());
+    }
 
     @Test
-    public void testCatchGetApplicationsNonExistentClass() throws BusinessException {
-        List<String[]> applications = applicationBusiness.getApplications("nonExistent class");
-        Assertions.assertEquals(0, applications.size(), "Incorrect applications number");
+    public void getApplicationsByGroup() throws BusinessException {
+        Application app = applicationBusiness.getApplication("Application1");
+        Group group = new Group("test", false, GroupType.APPLICATION);
+
+        groupBusiness.add(group);
+        app.setApplicationGroups(Arrays.asList(group.getName()));
+        applicationBusiness.update(app);
+
+        assertEquals(1, applicationBusiness.getApplications(group).size());
     }
 
+    @Test
+    public void getApplicationByGroupNotIn() throws BusinessException {
+        Application app = applicationBusiness.getApplication("Application1");
+        Group group = new Group("test", false, GroupType.APPLICATION);
+
+        groupBusiness.add(group);
+        app.setApplicationGroups(Arrays.asList(group.getName()));
+        applicationBusiness.update(app);
+
+        assertEquals(1, applicationBusiness.getApplications(group).size());  
+        app.setApplicationGroups(new ArrayList<>());
+        applicationBusiness.update(app);
+
+        assertEquals(0, applicationBusiness.getApplications(group).size());  
+    }
 }

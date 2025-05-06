@@ -31,6 +31,12 @@
  */
 package fr.insalyon.creatis.vip.application.client.bean;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 import com.google.gwt.user.client.rpc.IsSerializable;
 
 /**
@@ -44,14 +50,20 @@ public class AppVersion implements IsSerializable {
     private String lfn;
     private String jsonLfn;
     private String doi;
-    private boolean visible;;
+    private boolean visible;
     private boolean boutiquesForm;
+    private List<String> resources;
+    private List<String> tags;
+    private Map<String, String> settings;
 
-    public AppVersion() {
+    public AppVersion() {}
+
+    public AppVersion(String applicationName, String version, String lfn, String jsonLfn, boolean visible, boolean boutiquesForm) {
+        this(applicationName, version, lfn,jsonLfn, new HashMap<>(), visible, boutiquesForm);
     }
 
     public AppVersion(
-            String applicationName, String version, String lfn, String jsonLfn, boolean visible,
+            String applicationName, String version, String lfn, String jsonLfn, Map<String,String> settings, boolean visible,
             boolean boutiquesForm) {
         this.applicationName = applicationName;
         this.version = version;
@@ -59,13 +71,28 @@ public class AppVersion implements IsSerializable {
         this.jsonLfn = jsonLfn;
         this.visible = visible;
         this.boutiquesForm = boutiquesForm;
+        this.resources = new ArrayList<>();
+        this.tags = new ArrayList<>();
+        this.settings = settings;
     }
 
-    public AppVersion(
-            String applicationName, String version, String lfn, String jsonLfn, String doi, boolean visible,
+    public AppVersion(String applicationName, String version, String lfn, String jsonLfn, String doi, Map<String,String> settings, boolean visible,
             boolean boutiquesForm) {
-        this(applicationName, version, lfn, jsonLfn, visible, boutiquesForm);
+        this(applicationName, version, lfn, jsonLfn, settings, visible, boutiquesForm);
         this.doi = doi;
+    }
+
+    public AppVersion(String applicationName, String version, String lfn, String jsonLfn, String doi,
+            boolean visible, boolean boutiquesForm, List<String> resources, List<String> tags) {
+        this(applicationName, version, lfn, jsonLfn, new HashMap<>(), visible, boutiquesForm);
+        this.doi = doi;
+        this.resources = resources;
+        this.tags = tags;
+    }
+
+    public AppVersion(String applicationName, String version) {
+        this.applicationName = applicationName;
+        this.version = version;
     }
 
     public String getApplicationName() {
@@ -88,11 +115,37 @@ public class AppVersion implements IsSerializable {
         return doi;
     }
 
+    public Map<String, String> getSettings() {
+        return settings;
+    }
+
+    public String getSettingsAsString() {
+        return settings.entrySet().stream()
+            .map((e) -> e.getKey() + "=" + e.getValue())
+            .collect(Collectors.joining(", "));
+    }
+
     public boolean isVisible() {
         return visible;
     }
 
     public boolean isBoutiquesForm() {
         return boutiquesForm;
+    }
+
+    public List<String> getResources() {
+        return resources;
+    }
+
+    public List<String> getTags() {
+        return tags;
+    }
+
+    public void setResources(List<String> resources) {
+        this.resources = resources;
+    }
+
+    public void setTags(List<String> tags) {
+        this.tags = tags;
     }
 }

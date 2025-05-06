@@ -41,18 +41,28 @@ public class Group implements IsSerializable {
 
     private String name;
     private boolean publicGroup;
-    private boolean gridFile; 
-    private boolean gridJobs;
+    private GroupType type;
+    private boolean auto;
 
-    public Group() {
+    public Group() { }
+
+    public Group(String name, boolean publicGroup, String type, boolean auto) {
+        this(name, publicGroup, GroupType.fromString(type), auto);
     }
 
-    public Group(String name, boolean publicGroup,boolean gridFile,boolean gridJobs) {
+    public Group(String name, boolean publicGroup, GroupType type) {
+        this(name, publicGroup, type, false);
+    }
+
+    public Group(String name, boolean publicGroup, GroupType type, boolean auto) {
         this.name = name;
         this.publicGroup = publicGroup;
-        this.gridFile=gridFile;
-        this.gridJobs=gridJobs;
-        
+        this.type = type;
+        this.auto = auto;
+    }
+
+    public Group(String name) {
+        this.name = name;
     }
 
     public String getName() {
@@ -70,19 +80,20 @@ public class Group implements IsSerializable {
     public void setPublicGroup(boolean publicGroup) {
         this.publicGroup = publicGroup;
     }
-    public void setGridFile(boolean gridFile) {
-        this.gridFile = gridFile;
+
+    public GroupType getType() {
+        return type;
     }
 
-    public void setGridJobs(boolean gridJobs) {
-        this.gridJobs = gridJobs;
+    public void setType(GroupType type) {
+        this.type = type;
     }
 
-    public boolean isGridFile() {
-        return gridFile;
+    public void setAuto(boolean isAuto) {
+        this.auto = isAuto;
     }
 
-    public boolean isGridJobs() {
-        return gridJobs;
+    public boolean isAuto() {
+        return auto;
     }
 }

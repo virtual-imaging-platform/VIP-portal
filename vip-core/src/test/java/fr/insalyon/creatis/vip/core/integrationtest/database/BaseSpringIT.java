@@ -3,6 +3,7 @@ package fr.insalyon.creatis.vip.core.integrationtest.database;
 import fr.insalyon.creatis.grida.client.GRIDAClient;
 import fr.insalyon.creatis.grida.client.GRIDAClientException;
 import fr.insalyon.creatis.vip.core.client.bean.Group;
+import fr.insalyon.creatis.vip.core.client.bean.GroupType;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.util.CountryCode;
 import fr.insalyon.creatis.vip.core.integrationtest.ServerMockConfig;
@@ -10,6 +11,7 @@ import fr.insalyon.creatis.vip.core.server.SpringCoreConfig;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
 import fr.insalyon.creatis.vip.core.server.business.EmailBusiness;
+import fr.insalyon.creatis.vip.core.server.business.GroupBusiness;
 import fr.insalyon.creatis.vip.core.server.business.Server;
 import org.junit.jupiter.api.BeforeEach;
 import org.mockito.Mockito;
@@ -51,28 +53,23 @@ import static org.mockito.ArgumentMatchers.anyString;
         "vipConfigFolder=classpath:"}) // to find vip-api.conf for vip-api tests
 @Transactional // each test is in a transaction that is rollbacked at the end to always leave a "clean" state
 public abstract class BaseSpringIT {
+    
+    @Autowired @Qualifier("db-datasource") protected DataSource dataSource; // this is a mockito spy wrapping the h2 memory datasource
+    @Autowired protected ConfigurationBusiness configurationBusiness;
+    @Autowired protected ApplicationContext appContext;
+    @Autowired protected DataSource lazyDataSource;
+    @Autowired protected Server server;
+    @Autowired protected EmailBusiness emailBusiness;
+    @Autowired protected GRIDAClient gridaClient;
+    @Autowired protected GroupBusiness groupBusiness;
 
     protected final String emailUser1 = "test1@test.fr";
     protected final String emailUser2 = "test2@test.fr";
     protected final String emailUser3 = "test3@test.fr";
     protected final String emailUser4 = "test4@test.fr";
-    protected final String nameGroup1 = "group1";
-    @Autowired
-    protected ApplicationContext appContext;
-    @Autowired
-    protected ConfigurationBusiness configurationBusiness;
-    @Autowired
-    @Qualifier("db-datasource")
-    protected DataSource dataSource; // this is a mockito spy wrapping the h2 memory datasource
-    @Autowired
-    protected DataSource lazyDataSource;
-    @Autowired
-    protected EmailBusiness emailBusiness;
-    @Autowired
-    protected Server server;
-    @Autowired
-    protected GRIDAClient gridaClient;
+    protected final String nameGroup1 = "group1";    
     protected String adminEmail = "test-admin@test.com";
+
     protected User user1;
     protected User user2;
     protected User user3;
@@ -80,8 +77,6 @@ public abstract class BaseSpringIT {
     protected User admin;
     protected Group group1;
     protected Group group2;
-    protected List<String> applicationClasses = new ArrayList<>();
-
     protected User nonExistentUser = new User("test firstName suffix0",
             "test lastName suffix0", "unexisting_user@test.fr", "institution",
             "testPassword", CountryCode.fr,
@@ -91,6 +86,7 @@ public abstract class BaseSpringIT {
     protected void setUp() throws Exception {
         ServerMockConfig.reset(server);
         Mockito.reset(gridaClient);
+        Mockito.doReturn(new String[]{"test@admin.test"}).when(emailBusiness).getAdministratorsEmails();
     }
 
     protected void assertRowsNbInTable(String tableName, int expectedNb) {
@@ -130,7 +126,11 @@ public abstract class BaseSpringIT {
     }
 
     public void createGroup(String groupName) throws BusinessException {
-        configurationBusiness.addGroup(new Group(groupName, true, true, true));
+        groupBusiness.add(new Group(groupName, true, GroupType.APPLICATION));
+    }
+
+    public void createGroup(String groupName, GroupType type) throws BusinessException {
+        groupBusiness.add(new Group(groupName, true, type));
     }
 
     protected void createUserInGroups(String userEmail, String nameSuffix, String... groupNames) throws BusinessException, GRIDAClientException {
@@ -141,7 +141,7 @@ public abstract class BaseSpringIT {
         Mockito.when(gridaClient.exist(anyString())).thenReturn(true, false);
         List<Group> groups = new ArrayList<>();
         for (String groupName : groupNames) {
-            groups.add(configurationBusiness.getGroup(groupName));
+            groups.add(groupBusiness.get(groupName));
         }
         configurationBusiness.signup(newUser, "", false, true, groups);
     }

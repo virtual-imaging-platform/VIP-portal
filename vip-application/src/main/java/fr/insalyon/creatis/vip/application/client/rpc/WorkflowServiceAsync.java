@@ -93,7 +93,7 @@ public interface WorkflowServiceAsync {
     
     public void relaunchSimulation(String simulationID, AsyncCallback<Map<String, String>> asyncCallback);
 
-    public void getSimulations(String user, String application, String status, String applicationClass, Date startDate, Date endDate, AsyncCallback<List<Simulation>> asyncCallback);
+    public void getSimulations(String user, String application, String status, Date startDate, Date endDate, AsyncCallback<List<Simulation>> asyncCallback);
     
     public void getSimulation(String simulationID, AsyncCallback<Simulation> asyncCallback);
 

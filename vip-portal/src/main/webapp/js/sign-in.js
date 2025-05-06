@@ -160,9 +160,8 @@ async function get_fetch(form_email, form_password){
 function make_table(data) {
     var application = new Array();
     data[0].forEach((item, index) => {
-        let name_classes = item.applicationClasses.toString();
         let name_groups = item.applicationGroups.toString();
-        application.push([index, item.name, name_classes, name_groups])
+        application.push([index, item.name, name_groups])
     });
 
     let tablecontents = createTableHTMLString(application);

@@ -1,6 +1,5 @@
 package fr.insalyon.creatis.vip.core.server.business;
 
-import java.util.HashMap;
 import java.util.List;
 
 /*
@@ -95,8 +94,6 @@ public interface Server {
     String getApplicationImporterRootFolder();
 
     List<String> getApplicationImporterRequirements();
-
-    HashMap<String, Integer> getReservedClasses();
 
     List<String> getUndesiredMailDomains();
 

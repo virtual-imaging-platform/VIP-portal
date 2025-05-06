@@ -57,10 +57,4 @@ public class DocsModule extends Module {
     @Override
     public void terminate(Set<Tab> removedTabs) {
     }
-    
-    @Override
-    public boolean requiresGridFile() { return true; }
-    
-    @Override
-    public boolean requiresGridJob() { return true; }
 }

@@ -41,9 +41,9 @@ import fr.insalyon.creatis.vip.application.client.bean.AppVersion;
 import fr.insalyon.creatis.vip.application.client.bean.Application;
 import fr.insalyon.creatis.vip.application.client.bean.Descriptor;
 import fr.insalyon.creatis.vip.application.client.bean.Source;
+import fr.insalyon.creatis.vip.application.server.business.AppVersionBusiness;
 import fr.insalyon.creatis.vip.application.server.business.ApplicationBusiness;
 import fr.insalyon.creatis.vip.application.server.business.BoutiquesBusiness;
-import fr.insalyon.creatis.vip.application.server.business.ClassBusiness;
 import fr.insalyon.creatis.vip.application.server.business.WorkflowBusiness;
 import fr.insalyon.creatis.vip.application.server.model.boutiques.BoutiquesDescriptor;
 import fr.insalyon.creatis.vip.application.server.model.boutiques.Input;
@@ -83,23 +83,24 @@ public class PipelineBusiness {
     private final Supplier<User> currentUserProvider;
     private final WorkflowBusiness workflowBusiness;
     private final ApplicationBusiness applicationBusiness;
-    private final ClassBusiness classBusiness;
     private final BoutiquesBusiness boutiquesBusiness;
     private final DataManagerBusiness dataManagerBusiness;
+    private final AppVersionBusiness appVersionBusiness;
 
     @Autowired
     public PipelineBusiness(
             Supplier<User> currentUserProvider, Environment env,
             Server server, WorkflowBusiness workflowBusiness, ApplicationBusiness applicationBusiness,
-            ClassBusiness classBusiness, BoutiquesBusiness boutiquesBusiness, DataManagerBusiness dataManagerBusiness) {
+            BoutiquesBusiness boutiquesBusiness, DataManagerBusiness dataManagerBusiness,
+            AppVersionBusiness appVersionBusiness) {
         this.currentUserProvider = currentUserProvider;
         this.env = env;
         this.server = server;
         this.workflowBusiness = workflowBusiness;
         this.applicationBusiness = applicationBusiness;
-        this.classBusiness = classBusiness;
         this.boutiquesBusiness = boutiquesBusiness;
         this.dataManagerBusiness = dataManagerBusiness;
+        this.appVersionBusiness = appVersionBusiness;
     }
 
     //*********************** pipeline id format validation **********************************
@@ -186,18 +187,17 @@ public class PipelineBusiness {
      * List all the pipeline the user can access
      */
     public List<Pipeline> listPipelines(String studyIdentifier) throws ApiException {
-
         try {
             if (studyIdentifier != null) {
                 logger.warn("Study identifier ({}) was ignored.", studyIdentifier);
             }
             ArrayList<Pipeline> pipelines = new ArrayList<>();
 
-            List<String> classNames = classBusiness.getUserClassesName(currentUserProvider.get().getEmail(), false);
+            List<Application> applications = applicationBusiness.getApplications(currentUserProvider.get());
 
-            List<Application> applications = applicationBusiness.getApplications(classNames);
             for (Application a : applications) {
-                List<AppVersion> versions = applicationBusiness.getVersions(a.getName());
+
+                List<AppVersion> versions = appVersionBusiness.getVersions(a.getName());
                 for (AppVersion av : versions) {
                     if (isApplicationVersionUsableInApi(av)) {
                         pipelines.add(
@@ -287,7 +287,7 @@ public class PipelineBusiness {
         try {
             String applicationName = getApplicationName(pipelineId);
             String applicationVersion = getApplicationVersion(pipelineId);
-            AppVersion appVersion = applicationBusiness.getVersion(applicationName, applicationVersion);
+            AppVersion appVersion = appVersionBusiness.getVersion(applicationName, applicationVersion);
             if (appVersion == null) {
                 logger.error("Cannot find pipeline {}/{}", applicationName, applicationVersion);
                 throw new ApiException(PIPELINE_NOT_FOUND, pipelineId);
@@ -312,13 +312,12 @@ public class PipelineBusiness {
             throw new ApiException(PIPELINE_NOT_FOUND, getPipelineIdentifier(appName, version));
         }
 
-        // check the user can use it through its classes
+        // check the user can use it 
         try {
-            List<String> userClassNames = classBusiness.getUserClassesName(currentUserProvider.get().getEmail(), false);
-            List<String> applicationClassNames = applicationBusiness.getApplication(appName).getApplicationClasses();
+            List<Application> apps = applicationBusiness.getApplications(currentUserProvider.get());
 
-            for (String applicationClassName : applicationClassNames) {
-                if (userClassNames.contains(applicationClassName)) {
+            for (Application app : apps) {
+                if (app.getName().equals(appName)) {
                     return;
                 }
             }

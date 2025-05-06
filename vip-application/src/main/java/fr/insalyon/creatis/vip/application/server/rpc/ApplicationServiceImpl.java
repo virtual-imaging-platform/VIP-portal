@@ -31,7 +31,6 @@
  */
 package fr.insalyon.creatis.vip.application.server.rpc;
 
-import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
 import fr.insalyon.creatis.vip.application.client.bean.*;
 import fr.insalyon.creatis.vip.application.client.rpc.ApplicationService;
 import fr.insalyon.creatis.vip.application.client.view.ApplicationException;
@@ -49,9 +48,9 @@ import jakarta.servlet.ServletException;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Map;
 
 /**
  *
@@ -61,45 +60,47 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    private ClassBusiness classBusiness;
     private ApplicationBusiness applicationBusiness;
+    private AppVersionBusiness appVersionBusiness;
     private EngineBusiness engineBusiness;
     private BoutiquesBusiness boutiquesBusiness;
     private ConfigurationBusiness configurationBusiness;
     private WorkflowBusiness workflowBusiness;
     private SimulationBusiness simulationBusiness;
+    private ResourceBusiness resourceBusiness;
+    private TagBusiness tagBusiness;
 
     @Override
     public void init() throws ServletException {
         super.init();
         setBeans(
-                getBean(ClassBusiness.class),
                 getBean(ApplicationBusiness.class),
                 getBean(EngineBusiness.class),
                 getBean(BoutiquesBusiness.class),
                 getBean(ConfigurationBusiness.class),
                 getBean(WorkflowBusiness.class),
-                getBean(SimulationBusiness.class)
+                getBean(SimulationBusiness.class),
+                getBean(ResourceBusiness.class),
+                getBean(TagBusiness.class),
+                getBean(AppVersionBusiness.class)
         );
     }
 
     public void setBeans(
-            ClassBusiness classBusiness, ApplicationBusiness applicationBusiness, EngineBusiness engineBusiness,
+            ApplicationBusiness applicationBusiness, EngineBusiness engineBusiness,
             BoutiquesBusiness boutiquesBusiness, ConfigurationBusiness configurationBusiness,
-            WorkflowBusiness workflowBusiness, SimulationBusiness simulationBusiness) {
-        this.classBusiness = classBusiness;
+            WorkflowBusiness workflowBusiness, SimulationBusiness simulationBusiness, 
+            ResourceBusiness resourceBusiness, TagBusiness tagBusiness,
+            AppVersionBusiness appVersionBusiness) {
         this.applicationBusiness = applicationBusiness;
         this.engineBusiness = engineBusiness;
         this.boutiquesBusiness = boutiquesBusiness;
         this.configurationBusiness = configurationBusiness;
         this.workflowBusiness = workflowBusiness;
         this.simulationBusiness = simulationBusiness;
-    }
-
-    @Override
-    public void signout() throws ApplicationException {
-
-        getSession().removeAttribute(ApplicationConstants.SESSION_CLASSES);
+        this.resourceBusiness = resourceBusiness;
+        this.tagBusiness = tagBusiness;
+        this.appVersionBusiness = appVersionBusiness;
     }
 
     @Override
@@ -142,10 +143,6 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
                 trace(logger, "Removing application '" + name + "'.");
                 applicationBusiness.remove(name);
 
-            } else {
-                trace(logger, "Removing classes from application '" + name + "'.");
-                applicationBusiness.remove(
-                    getSessionUser().getEmail(), name);
             }
         } catch (BusinessException | CoreException ex) {
             throw new ApplicationException(ex);
@@ -157,7 +154,7 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
         try {
             if (isSystemAdministrator() || isGroupAdministrator()) {
                 trace(logger, "Adding version '" + version.getVersion() + "' ('" + version.getApplicationName() + "').");
-                applicationBusiness.addVersion(version);
+                appVersionBusiness.add(version);
             } else {
                 logger.error("Unauthorized to add version {} to {}",
                         version.getVersion(), version.getApplicationName());
@@ -173,8 +170,7 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
         try {
             if (isSystemAdministrator() || isGroupAdministrator()) {
                 trace(logger, "Updating version '" + version.getVersion() + "' ('" + version.getApplicationName() + "').");
-
-                applicationBusiness.updateVersion(version);
+                appVersionBusiness.update(version);
             } else {
                 logger.error("Unauthorized to update version {}/{}",
                         version.getApplicationName(), version.getVersion());
@@ -190,8 +186,8 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
         try {
             if (isSystemAdministrator() || isGroupAdministrator()) {
                 trace(logger, "Removing application '" + applicationName + "'.");
-                applicationBusiness.removeVersion(
-                    applicationName, version);
+                appVersionBusiness.remove(applicationName, version);
+
             } else {
                 logger.error("Unauthorized to remove version {}/{}",
                         applicationName, version);
@@ -207,8 +203,8 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
         try {
             if (isSystemAdministrator() || isGroupAdministrator()) {
                 trace(logger, "Publishing version " + version + "' ('" + applicationName + "').");
-                return boutiquesBusiness.publishVersion(
-                    getSessionUser(), applicationName, version);
+                return boutiquesBusiness.publishVersion(getSessionUser(), applicationName, version);
+
             } else {
                 logger.error("Unauthorized to publish version {}/{}",
                         applicationName, version);
@@ -220,95 +216,39 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
     }
 
     @Override
-    public List<Application> getPublicApplications() throws ApplicationException {
+    public Map<Application, List<AppVersion>> getPublicApplications() throws ApplicationException {
+        List<Application> apps = new ArrayList<>();
+        Map<Application, List<AppVersion>> map = new LinkedHashMap<>();
+
         try {
-            return applicationBusiness.getPublicApplicationsWithGroups();
+            apps = applicationBusiness.getPublicApplicationsWithGroups();
+
+            for (Application app : apps) {
+                map.put(app, appVersionBusiness.getVersions(app.getName()));
+            }
+            return map;
         } catch (BusinessException ex) {
             throw new ApplicationException(ex);
         }
     }
 
     @Override
-    public List<Application> getApplications() throws ApplicationException {
+    public Map<Application, List<AppVersion>> getApplications() throws ApplicationException {
+        List<Application> apps = new ArrayList<>();
+        Map<Application, List<AppVersion>> map = new LinkedHashMap<>();
+
         try {
             if (isSystemAdministrator()) {
-                return applicationBusiness.getApplications();
+                apps = applicationBusiness.getApplications();
             } else if (isDeveloper()) {
-                return applicationBusiness.getApplicationsWithOwner(getSessionUser().getEmail());
-            }  else if (isGroupAdministrator()) {
-                List<String> classes = classBusiness.getUserClassesName(
-                    getSessionUser().getEmail(), true);
-                return applicationBusiness.getApplications(classes);
+                apps = applicationBusiness.getApplicationsWithOwner(getSessionUser().getEmail());
+            } else {
+                apps = applicationBusiness.getApplications(getSessionUser());
             }
-            List<AppClass> classes = classBusiness.getUserClasses(
-                    getSessionUser().getEmail(), false);
-            List<String> classNames = classes.stream().map(AppClass::getName).collect(Collectors.toList());
-            return applicationBusiness.getApplications(classNames);
-        } catch (BusinessException | CoreException ex) {
-            throw new ApplicationException(ex);
-        }
-    }
-
-    @Override
-    public List<String[]> getApplications(String className) throws ApplicationException {
-        try {
-            return applicationBusiness.getApplications(className);
-        } catch (BusinessException ex) {
-            throw new ApplicationException(ex);
-        }
-    }
-
-    @Override
-    public List<String[]> getApplicationsByClass(String applicationClass) throws ApplicationException {
-        try {
-            return applicationBusiness.getApplications(
-                applicationClass);
-        } catch (BusinessException ex) {
-            throw new ApplicationException(ex);
-        }
-    }
-
-    @Override
-    public void addClass(AppClass c) throws ApplicationException {
-        try {
-            authenticateSystemAdministrator(logger);
-            trace(logger, "Adding class '" + c.getName() + "'.");
-            classBusiness.addClass(c);
-        } catch (BusinessException | CoreException ex) {
-            throw new ApplicationException(ex);
-        }
-    }
-
-    @Override
-    public void updateClass(AppClass c) throws ApplicationException {
-        try {
-            authenticateSystemAdministrator(logger);
-            trace(logger, "Updating class '" + c.getName() + "'.");
-            classBusiness.updateClass(c);
-        } catch (BusinessException | CoreException ex) {
-            throw new ApplicationException(ex);
-        }
-    }
-
-    @Override
-    public void removeClass(String name) throws ApplicationException {
-        try {
-            authenticateSystemAdministrator(logger);
-            trace(logger, "Removing class '" + name + "'.");
-            classBusiness.removeClass(name);
-        } catch (BusinessException | CoreException ex) {
-            throw new ApplicationException(ex);
-        }
-    }
-
-    @Override
-    public List<AppClass> getClasses() throws ApplicationException {
-        try {
-            if (isSystemAdministrator()) {
-                return classBusiness.getClasses();
+            for (Application app : apps) {
+                map.put(app, appVersionBusiness.getVersions(app.getName()));
             }
-            return classBusiness.getUserClasses(
-                getSessionUser().getEmail(), false);
+            return map;
         } catch (BusinessException | CoreException ex) {
             throw new ApplicationException(ex);
         }
@@ -316,24 +256,18 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
 
     @SuppressWarnings("unchecked")
     @Override
-    public List<String>[] getApplicationsAndUsers(List<String> reservedClasses) throws ApplicationException {
+    public List<String>[] getApplicationsAndUsers() throws ApplicationException {
         try {
             User user = getSessionUser();
             if (isSystemAdministrator()) {
-                List<String> classes = classBusiness.getClassesName();
                 return new List[]{
                     configurationBusiness.getAllUserNames(),
                     applicationBusiness.getApplicationNames(),
-                    classes
                 };
-            } else {
-                List<String> classes = classBusiness.getUserClassesName(
-                    user.getEmail(), !user.isSystemAdministrator());
-                classes.removeAll(reservedClasses);
+            } else {;
                 return new List[] {
                     new ArrayList<>(Arrays.asList(user.getFullName())),
-                    applicationBusiness.getApplicationNames(classes),
-                    classes
+                    applicationBusiness.getApplicationNames()
                 };
             }
         } catch (BusinessException | CoreException ex) {
@@ -380,7 +314,7 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
     @Override
     public List<AppVersion> getVersions(String applicationName) throws ApplicationException {
         try {
-            return applicationBusiness.getVersions(applicationName);
+            return appVersionBusiness.getVersions(applicationName);
         } catch (BusinessException ex) {
             throw new ApplicationException(ex);
         }
@@ -430,18 +364,117 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
     }
 
     @Override
-    public HashMap<String, Integer> getReservedClasses()
-        throws ApplicationException {
-        return server.getReservedClasses();
+    public AppVersion getVersion(String applicationName, String applicationVersion) throws ApplicationException {
+        try {
+            return appVersionBusiness.getVersion(applicationName, applicationVersion);
+        } catch (BusinessException ex) {
+            throw new ApplicationException(ex);
+        }
     }
 
     @Override
-    public AppVersion getVersion(String applicationName, String applicationVersion) throws ApplicationException {
+    public void addResource(Resource resource) throws ApplicationException {
         try {
-            return applicationBusiness.getVersion(
-                applicationName, applicationVersion);
-        } catch (BusinessException ex) {
-            throw new ApplicationException(ex);
+            resourceBusiness.add(resource);
+        } catch (BusinessException e) {
+            throw new ApplicationException(e);
+        }
+    }
+
+    @Override
+    public void removeResource(Resource resource) throws ApplicationException {
+        try {
+            resourceBusiness.remove(resource);
+        } catch (BusinessException e) {
+            throw new ApplicationException(e);
+        }
+    }
+
+    @Override
+    public void updateResource(Resource resource) throws ApplicationException {
+        try {
+            resourceBusiness.update(resource);
+        } catch (BusinessException e) {
+            throw new ApplicationException(e);
+        }
+    }
+
+    @Override
+    public List<Resource> getResources() throws ApplicationException {
+        try {
+            return resourceBusiness.getAll();
+        } catch (BusinessException e) {
+            throw new ApplicationException(e);
+        }
+    }
+
+    @Override
+    public void addTag(Tag tag) throws ApplicationException {
+        try {
+            tagBusiness.add(tag);
+        } catch (BusinessException e) {
+            throw new ApplicationException(e);
+        }
+    }
+
+    @Override
+    public void removeTag(Tag tag) throws ApplicationException {
+        try {
+            tagBusiness.remove(tag);
+        } catch (BusinessException e) {
+            throw new ApplicationException(e);
+        }
+    }
+
+    @Override
+    public void updateTag(Tag tag, String newName) throws ApplicationException {
+        try {
+            tagBusiness.update(tag, newName);
+        } catch (BusinessException e) {
+            throw new ApplicationException(e);
+        }
+    }
+
+    @Override
+    public List<Tag> getTags() throws ApplicationException {
+        try {
+            return tagBusiness.getAll();
+        } catch (BusinessException e) {
+            throw new ApplicationException(e);
+        }
+    }
+
+    @Override
+    public List<Tag> getTags(AppVersion appVersion) throws ApplicationException {
+        try {
+            return tagBusiness.getTags(appVersion);
+        } catch (BusinessException e) {
+            throw new ApplicationException(e);
+        }
+    }
+
+    /**
+     * This fonction will check if ressources/engines are available !
+     */
+    @Override
+    public Boolean isAppUsableWithCurrentUser(String appName, String version) throws ApplicationException {
+        try {
+            AppVersion appVersion = appVersionBusiness.getVersion(appName, version);
+            List<Resource> usableResource = resourceBusiness.getUsableResources(getSessionUser(), appVersion);
+            List<Engine> usableEngines;
+
+            if (usableResource.isEmpty()) {
+                return false;
+            }
+
+            usableEngines = engineBusiness.getUsableEngines(usableResource.get(0));
+            if (usableEngines.isEmpty()) {
+                return false;
+            }
+            
+            return true;
+        } catch (BusinessException | CoreException e) {
+            throw new ApplicationException(e);
         }
     }
 }

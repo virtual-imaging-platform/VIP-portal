@@ -233,7 +233,6 @@ public class ExecutionBusiness {
                     null, // User must be null to take examples from other users
                     null, // application
                     WorkflowStatus.Completed.name(), // status
-                    null, // class
                     null, // startDate
                     null, // endDate
                     ApplicationConstants.WORKKFLOW_EXAMPLE_TAG
@@ -255,8 +254,8 @@ public class ExecutionBusiness {
                     currentUserProvider.get().getFullName(),
                     null, // application
                     null, // status
-                    null, // class
                     null, // startDate
+                    null, // endDate
                     null // endDate
             );
             logger.debug("Counting executions, found {} simulations.", simulations.size());
@@ -413,15 +412,6 @@ public class ExecutionBusiness {
             String applicationName = pipelineBusiness.getApplicationName(pipelineId);
             String applicationVersion = pipelineBusiness.getApplicationVersion(pipelineId);
 
-            // Get application classes
-            List<String> classes = applicationBusiness
-                    .getApplication(applicationName)
-                    .getApplicationClasses();
-            if (classes.isEmpty()) {
-                logger.error("No class configured for {}", pipelineId);
-                throw new ApiException(ApiException.ApiError.INVALID_EXECUTION_INIT,
-                        "Application " + applicationName + " cannot be launched because it doesn't belong to any VIP class.");
-            }
 
             logger.info("Launching workflow with the following parameters: ");
             logger.info(currentUserProvider.get().toString());
@@ -429,7 +419,6 @@ public class ExecutionBusiness {
             logger.info(inputValues.toString());
             logger.info(applicationName);
             logger.info(applicationVersion);
-            logger.info(classes.get(0));
             logger.info(executionName);
 
             // Launch the workflow
@@ -439,7 +428,6 @@ public class ExecutionBusiness {
                     inputValues,
                     applicationName,
                     applicationVersion,
-                    classes.get(0),
                     executionName);
         } catch (BusinessException ex) {
             throw new ApiException(ex);

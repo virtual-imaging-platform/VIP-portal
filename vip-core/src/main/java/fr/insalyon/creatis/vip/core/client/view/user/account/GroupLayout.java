@@ -93,7 +93,7 @@ public class GroupLayout extends AbstractFormLayout {
             @Override
             public void onSuccess(List<Group> result) {
                 for (Group group : result) {
-                    if(!groups.contains(group.getName()))
+                    if( ! groups.contains(group.getName()) && ! group.isAuto())
                         vLayout.addMember(new GroupBoxLayout(group.getName(),
                                 group.isPublicGroup(), GROUP_ROLE.None));
                 }
@@ -110,21 +110,20 @@ public class GroupLayout extends AbstractFormLayout {
             public void onSuccess(Map<Group, GROUP_ROLE> result) {
                 
                 for (Group group : result.keySet()) {
-                    vLayout.addMember(new GroupBoxLayout(group.getName(),
-                            group.isPublicGroup(), result.get(group)));
-                    groups.add(group.getName());
-                }
-                if(result.isEmpty()){
+                    if ( ! group.isAuto()) {
+                        vLayout.addMember(new GroupBoxLayout(group.getName(),
+                        group.isPublicGroup(), result.get(group)));
+                        groups.add(group.getName());
+                    }
+                } if (result.isEmpty()) {
                     messageLabel.setVisible(true);
                     messageLabel.setContents("You are not a member of any group. The following public groups will grant you access to applications. Please choose a group to be able to access the home tab directly at your next login.");
-                } else
+                } else {
                     messageLabel.setVisible(false);
+                }
                 service.getPublicGroups(cbPublicGroups);
             }
         };
         service.getUserGroups(null, callback);
-        
-        
-        
     }
 }

@@ -330,4 +330,18 @@ public class WidgetUtil {
         blankLayout.setHeight100();
         return blankLayout;
     }
+
+    public static ImgButton getImgButton(String imgSrc, String prompt) {
+        ImgButton button = new ImgButton();
+
+        button.setShowDown(false);
+        button.setShowRollOver(false);
+        button.setLayoutAlign(Alignment.CENTER);
+        button.setSrc(imgSrc);
+        button.setPrompt(prompt);
+        button.setHeight(16);
+        button.setWidth(16);
+    
+        return button;
+    }
 }

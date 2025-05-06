@@ -35,14 +35,10 @@ import fr.insalyon.creatis.grida.client.GRIDAClientException;
 import fr.insalyon.creatis.vip.api.exception.ApiException.ApiError;
 import fr.insalyon.creatis.vip.api.rest.config.BaseWebSpringIT;
 import fr.insalyon.creatis.vip.application.client.bean.AppVersion;
-import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.http.MediaType;
-
-import java.io.File;
-import java.io.IOException;
 
 import static fr.insalyon.creatis.vip.api.data.PipelineTestUtils.*;
 import static fr.insalyon.creatis.vip.api.data.UserTestUtils.*;
@@ -86,9 +82,9 @@ public class PipelineControllerIT extends BaseWebSpringIT {
 
     @Test
     public void shouldReturnErrorOnConfiguredVipException() throws Exception {
-        String appName = "testApp", groupName = "testGroup", className = "testClass";
+        String appName = "testApp", groupName = "testGroup";
         String versionName = "42-test";
-        AppVersion appVersion = configureAnApplication(appName, versionName, groupName, className);
+        AppVersion appVersion = configureAnApplication(appName, versionName, groupName);
         configureVersion(appVersion,
                 "/vip/testGroup (group)/path/to/test.gwendia", null);
 
@@ -112,8 +108,8 @@ public class PipelineControllerIT extends BaseWebSpringIT {
     @Test
     public void userGetAPipelineWithPathParameterNonEncoded() throws Exception {
 
-        String appName = "testGwendiaApp", groupName = "testGroup", className = "testClass", versionName = "42-test";
-        AppVersion appVersion = configureGwendiaTestApp(appName, groupName, className, versionName);
+        String appName = "testGwendiaApp", groupName = "testGroup", versionName = "42-test";
+        AppVersion appVersion = configureGwendiaTestApp(appName, groupName, versionName);
         String pipelineId = appName + "/" + versionName;
 
         createUserInGroup(baseUser1.getEmail(), groupName);
@@ -128,8 +124,8 @@ public class PipelineControllerIT extends BaseWebSpringIT {
 
     @Test
     public void userGetAPipelineWithQueryParameter() throws Exception {
-        String appName = "testGwendiaApp", groupName = "testGroup", className = "testClass", versionName = "42-test";
-        AppVersion appVersion = configureGwendiaTestApp(appName, groupName, className, versionName);
+        String appName = "testGwendiaApp", groupName = "testGroup", versionName = "42-test";
+        AppVersion appVersion = configureGwendiaTestApp(appName, groupName, versionName);
         String pipelineId = appName + "/" + versionName;
 
         createUserInGroup(baseUser1.getEmail(), groupName);
@@ -145,8 +141,8 @@ public class PipelineControllerIT extends BaseWebSpringIT {
     @Test
     public void userGetAPipelineWithBoutiques() throws Exception {
 
-        String appName = "testBoutiquesApp", groupName = "testGroup", className = "testClass", versionName = "v42";
-        AppVersion appVersion = configureBoutiquesTestApp(appName, groupName, className, versionName);
+        String appName = "testBoutiquesApp", groupName = "testGroup", versionName = "v42";
+        AppVersion appVersion = configureBoutiquesTestApp(appName, groupName, versionName);
         String pipelineId = appName + "/" + versionName;
 
         Mockito.when(server.useMoteurlite()).thenReturn(true);
@@ -166,8 +162,8 @@ public class PipelineControllerIT extends BaseWebSpringIT {
     @Test
     public void userGetBoutiquesDescriptor() throws Exception {
 
-        String appName = "testBoutiquesApp", groupName = "testGroup", className = "testClass", versionName = "v42";
-        configureBoutiquesTestApp(appName, groupName, className, versionName);
+        String appName = "testBoutiquesApp", groupName = "testGroup", versionName = "v42";
+        configureBoutiquesTestApp(appName, groupName, versionName);
         String pipelineId = appName + "/" + versionName;
 
         createUserInGroup(baseUser1.getEmail(), groupName);
@@ -189,26 +185,21 @@ public class PipelineControllerIT extends BaseWebSpringIT {
         createGroup("group2");
         createGroup("group3");
 
-        createClass("class1", "group1");
-        createClass("class2", "group2");
-        createClass("class3", "group3");
-        createAnApplication("app1", "class1");
-        createAnApplication("app2", "class2");
-        createAnApplication("app3", "class3");
+        createAnApplication("app1", "group1");
+        createAnApplication("app2", "group2");
+        createAnApplication("app3", "group3");
 
         AppVersion app11 = createAVersion("app1", "v1", true, null, null);
-        createAVersion("app1", "v2", false, null, null);
+        AppVersion app12 = createAVersion("app1", "v2", false, null, null);
         AppVersion app13 = createAVersion("app1", "v3", true, null, null);
         AppVersion app2 = createAVersion("app2", "v1.1", true, null, null);
-        createAVersion("app3", "v4", false, null, null);
+        AppVersion app34 = createAVersion("app3", "v4", false, null, null);
 
-        createClass("classA", "group1", "group2");
-        createClass("classB", "group2", "group3");
-        createClass("classC", "group3");
-
-        createAnApplication("appAB", "classA", "classB");
-        createAnApplication("appBC", "classB", "classC");
-        createAnApplication("appC", "classC");
+        createAnApplication("appAB", "group1");
+        createAnApplication("appBC", "group2");
+        createAnApplication("appC", "group3");
+        putApplicationInGroup("appAB", "group2");
+        putApplicationInGroup("appBC", "group3");
 
         AppVersion appAB = createAVersion("appAB", "v1", true, null, null);
         AppVersion appBC = createAVersion("appBC", "v1", true, null, null);
@@ -244,9 +235,8 @@ public class PipelineControllerIT extends BaseWebSpringIT {
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$[*]", hasSize(3)))
+                .andExpect(jsonPath("$[*]", hasSize(2)))
                 .andExpect(jsonPath("$[*]", containsInAnyOrder(
-                        jsonCorrespondsToPipeline(getPipeline(appAB)),
                         jsonCorrespondsToPipeline(getPipeline(appBC)),
                         jsonCorrespondsToPipeline(getPipeline(appC)))));
 
@@ -261,6 +251,5 @@ public class PipelineControllerIT extends BaseWebSpringIT {
                         jsonCorrespondsToPipeline(getPipeline(app2)),
                         jsonCorrespondsToPipeline(getPipeline(appAB)),
                         jsonCorrespondsToPipeline(getPipeline(appBC)))));
-
     }
 }

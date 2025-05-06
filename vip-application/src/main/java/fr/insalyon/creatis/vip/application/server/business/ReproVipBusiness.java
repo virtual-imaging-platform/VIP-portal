@@ -39,17 +39,17 @@ public class ReproVipBusiness {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private final PublicExecutionBusiness publicExecutionBusiness;
-    private final ApplicationBusiness applicationBusiness;
+    private final AppVersionBusiness appVersionBusiness;
     private final Server server;
     private final SimulationBusiness simulationBusiness;
     private final WorkflowBusiness workflowBusiness;
     private final ExternalPlatformBusiness externalPlatformBusiness;
 
     @Autowired
-    public ReproVipBusiness(ApplicationBusiness applicationBusiness, Server server, SimulationBusiness simulationBusiness,
+    public ReproVipBusiness(AppVersionBusiness appVersionBusiness, Server server, SimulationBusiness simulationBusiness,
             WorkflowBusiness workflowBusiness, ExternalPlatformBusiness externalPlatformBusiness,
             PublicExecutionBusiness publicExecutionBusiness) {
-        this.applicationBusiness = applicationBusiness;
+        this.appVersionBusiness = appVersionBusiness;
         this.server = server;
         this.simulationBusiness = simulationBusiness;
         this.workflowBusiness = workflowBusiness;
@@ -239,7 +239,7 @@ public class ReproVipBusiness {
     }
 
     public String getBoutiquesDescriptorJsonPath(String applicationName, String applicationVersion) throws BusinessException {
-        AppVersion appVersion = applicationBusiness.getVersion(applicationName, applicationVersion);
+        AppVersion appVersion = appVersionBusiness.getVersion(applicationName, applicationVersion);
 
         if (appVersion != null && appVersion.getJsonLfn() != null) {
             return appVersion.getJsonLfn();

@@ -40,14 +40,12 @@ import fr.insalyon.creatis.vip.core.client.bean.Group;
  */
 public class GroupRecord extends ListGridRecord {
 
-    public GroupRecord() {
-    }
+    public GroupRecord() { }
 
     public GroupRecord(Group group) {
-        
         setAttribute("name", group.getName());
         setAttribute("isPublic", group.isPublicGroup());
-        setAttribute("isGridFile", group.isGridFile());
-        setAttribute("isGridJobs", group.isGridJobs());
+        setAttribute("type", group.getType().toString());
+        setAttribute("auto", group.isAuto());
     }
 }

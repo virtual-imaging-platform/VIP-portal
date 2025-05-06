@@ -40,14 +40,14 @@ import fr.insalyon.creatis.vip.core.client.view.common.AbstractFormLayout;
  *
  * @author Tristan Glatard
  */
-public class InputOutputLayout extends AbstractFormLayout{
+public class InputOutputLayout extends AbstractFormLayout {
  
     protected SectionStack stackSection;
     protected int membersMargin = 5;
     
     public InputOutputLayout(String title, String icon, String width, String height) {
         super(width, height);
-        addTitle(title,icon);
+        addTitle(title, icon);
         setOverflow(Overflow.AUTO);
         stackSection = new SectionStack();
         stackSection.setTitle("");

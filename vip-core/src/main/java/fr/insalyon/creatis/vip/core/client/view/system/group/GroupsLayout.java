@@ -103,8 +103,8 @@ public class GroupsLayout extends VLayout {
                         public void onClick(ClickEvent event) {
                             edit(rollOverRecord.getAttribute("name"),
                                     rollOverRecord.getAttributeAsBoolean("isPublic"),
-                                    rollOverRecord.getAttributeAsBoolean("isGridFile"),
-                                    rollOverRecord.getAttributeAsBoolean("isGridJobs"));
+                                    rollOverRecord.getAttributeAsString("type"),
+                                    rollOverRecord.getAttributeAsBoolean("auto"));
                         }
                     }));
 
@@ -130,14 +130,14 @@ public class GroupsLayout extends VLayout {
 
         ListGridField isPublicField = new ListGridField("isPublic", "Public");
         isPublicField.setType(ListGridFieldType.BOOLEAN);
+
+        ListGridField typeField = new ListGridField("type", "GroupType");
+        typeField.setType(ListGridFieldType.TEXT);
+
+        ListGridField autoField = new ListGridField("auto", "Auto");
+        autoField.setType(ListGridFieldType.BOOLEAN);
         
-        ListGridField isGridFileField = new ListGridField("isGridFile", "GridFile");
-        isGridFileField.setType(ListGridFieldType.BOOLEAN);
-        
-        ListGridField isGridJobsField = new ListGridField("isGridJobs", "GridJobs");
-        isGridJobsField.setType(ListGridFieldType.BOOLEAN);
-        
-        grid.setFields(isPublicField,isGridFileField,isGridJobsField, new ListGridField("name", "Group Name"));
+        grid.setFields(isPublicField, typeField, autoField, new ListGridField("name", "Group Name"));
         grid.setSortField("name");
         grid.setSortDirection(SortDirection.ASCENDING);
         grid.addCellDoubleClickHandler(new CellDoubleClickHandler() {
@@ -146,17 +146,13 @@ public class GroupsLayout extends VLayout {
             public void onCellDoubleClick(CellDoubleClickEvent event) {
                 edit(event.getRecord().getAttribute("name"),
                         event.getRecord().getAttributeAsBoolean("isPublic"),
-                        event.getRecord().getAttributeAsBoolean("isGridFile"),
-                        event.getRecord().getAttributeAsBoolean("isGridJobs"));
+                        event.getRecord().getAttributeAsString("type"),
+                        event.getRecord().getAttributeAsBoolean("auto"));
             }
         });
     }
 
-    /**
-     * Loads list of groups into grid.
-     */
     public void loadData() {
-
         ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();
         final AsyncCallback<List<Group>> callback = new AsyncCallback<List<Group>>() {
 
@@ -178,19 +174,8 @@ public class GroupsLayout extends VLayout {
         service.getGroups(callback);
     }
 
-    /**
-     * Removes a group.
-     *
-     * @param name Group name
-     */
     private void remove(final String name) {
-
-        if (name.equals(CoreConstants.GROUP_SUPPORT)) {
-            SC.warn("You cannot remove " + name + " group.");
-            return;
-        }
         SC.ask("Do you really want to remove \"" + name + "\" group?", new BooleanCallback() {
-
             @Override
             public void execute(Boolean value) {
                 if (value) {
@@ -215,19 +200,9 @@ public class GroupsLayout extends VLayout {
         });
     }
 
-    /**
-     * Edits a group.
-     *
-     * @param name Group name
-     * @param isPublic Whether the group if public or not
-     */
-    private void edit(String name, boolean isPublic,boolean isgridfile,boolean isgridjobs) {
+    private void edit(String name, boolean isPublic, String type, boolean auto) {
 
-        if (name.equals(CoreConstants.GROUP_SUPPORT)) {
-            SC.warn("You cannot edit " + name + " group.");
-            return;
-        }
         ((ManageGroupsTab) Layout.getInstance().getTab(
-                CoreConstants.TAB_MANAGE_GROUPS)).setGroup(name, isPublic,isgridfile,isgridjobs);
+                CoreConstants.TAB_MANAGE_GROUPS)).setGroup(name, isPublic, type, auto);
     }
 }

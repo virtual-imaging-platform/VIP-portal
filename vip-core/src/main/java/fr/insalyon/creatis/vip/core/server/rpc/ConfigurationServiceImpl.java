@@ -31,7 +31,6 @@
  */
 package fr.insalyon.creatis.vip.core.server.rpc;
 
-import fr.insalyon.creatis.grida.client.GRIDAClient;
 import fr.insalyon.creatis.vip.core.client.bean.*;
 import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationService;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
@@ -41,8 +40,10 @@ import fr.insalyon.creatis.vip.core.client.view.user.UserLevel;
 import fr.insalyon.creatis.vip.core.client.view.util.CountryCode;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
+import fr.insalyon.creatis.vip.core.server.business.GroupBusiness;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import fr.insalyon.creatis.vip.core.server.dao.UserDAO;
+import fr.insalyon.creatis.vip.core.server.inter.GroupInterface;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,22 +61,24 @@ import java.util.Map;
 
 /**
  *
- * @author Rafael Ferreira da Silva,Nouha boujelben
+ * @author Rafael Ferreira da Silva, Nouha boujelben
  */
 public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet implements ConfigurationService {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private ConfigurationBusiness configurationBusiness;
+    private GroupBusiness groupBusiness;
     private UserDAO userDAO;
-    private GRIDAClient gridaClient;
+    private GroupInterface groupInterface;
 
     @Override
     public void init() throws ServletException {
         super.init();
         configurationBusiness = getBean(ConfigurationBusiness.class);
         userDAO = getBean(UserDAO.class);
-        gridaClient = getBean(GRIDAClient.class);
+        groupBusiness = getBean(GroupBusiness.class);
+        groupInterface = getBean(GroupInterface.class);
     }
     
     @Override
@@ -84,8 +87,6 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
             logger.debug("Initializing VIP configuration.");
             configurationBusiness.configure();
             logger.debug("VIP successfully configured.");
-
-
 
             if (configurationBusiness.validateSession(email, session)) {
 
@@ -102,36 +103,6 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
         }
     }
 
-    /**
-     *
-     * @param user User bean object
-     * @param comments User's comments
-     */
-    @Override
-    public void signup(User user, String comments)
-        throws CoreException {
-        try {
-            logger.info("Sign up request from '" + user.getEmail() + "'.");
-            configurationBusiness.signup(user, comments, (Group) null);
-        } catch (BusinessException ex) {
-            throw new CoreException(ex);
-        }
-    }
-
-    @Override
-    public User signin(String email, String password) throws CoreException {
-        try {
-            logger.info("Authenticating '" + email + "'.");
-            User user = configurationBusiness.signin(email, password);
-            user = setUserInSession(user);
-            configurationBusiness.updateUserLastLogin(email);
-            logger.info("Connected.");
-
-            return user;
-        } catch (BusinessException ex) {
-            throw new CoreException(ex);
-        }
-    }
 
     @Override
     public void signout() throws CoreException {
@@ -181,10 +152,6 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
         }
     }
 
-    /**
-     * Get list of users.
-     *
-     */
     @Override
     public List<User> getUsers() throws CoreException {
         try {
@@ -200,7 +167,7 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
         try {
             authenticateSystemAdministrator(logger);
             trace(logger, "Adding group '" + group + "'.");
-            configurationBusiness.addGroup(group);
+            groupBusiness.add(group);
         } catch (BusinessException ex) {
             throw new CoreException(ex);
         }
@@ -211,7 +178,7 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
         try {
             authenticateSystemAdministrator(logger);
             trace(logger, "Updating group '" + name + "' to '" + group.getName() + "'.");
-            configurationBusiness.updateGroup(name, group);
+            groupBusiness.update(name, group);
         } catch (BusinessException ex) {
             throw new CoreException(ex);
         }
@@ -222,8 +189,7 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
         try {
             authenticateSystemAdministrator(logger);
             trace(logger, "Removing group '" + groupName + "'.");
-            configurationBusiness.removeGroup(
-                    getSessionUser().getEmail(), groupName);
+            groupBusiness.remove(getSessionUser().getEmail(), groupName);
         } catch (BusinessException ex) {
             throw new CoreException(ex);
         }
@@ -233,7 +199,7 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
     public List<Group> getGroups() throws CoreException {
         try {
             authenticateSystemAdministrator(logger);
-            return configurationBusiness.getGroups();
+            return groupBusiness.get();
         } catch (BusinessException ex) {
             throw new CoreException(ex);
         }
@@ -242,9 +208,39 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
     @Override
     public List<Group> getPublicGroups() throws CoreException {
         try {
-            return configurationBusiness.getPublicGroups();
+            return groupBusiness.getPublic();
         } catch (BusinessException ex) {
             throw new CoreException(ex);
+        }
+    }
+
+    @Override
+    public List<String> getItemsGroup(String groupName) throws CoreException {
+        List<String> items = new ArrayList<>();
+
+        try {
+            if (groupInterface != null) {
+                items = groupInterface.getItems(groupName);
+            } else {
+                logger.info("No interface is present for GroupInterface !"); 
+            }
+            
+            return items;
+        } catch (BusinessException e) {
+            throw new CoreException(e);
+        }
+    }
+
+    @Override
+    public void removeItemFromGroup(String item, String groupname) throws CoreException {
+        try {
+            if (groupInterface != null) {
+                groupInterface.delete(item, groupname);
+            } else {
+                logger.info("No interface is present for GroupInterface !"); 
+            }
+        } catch (BusinessException e) {
+            throw new CoreException(e);
         }
     }
 
@@ -320,7 +316,7 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
         try {
             List<String> list = new ArrayList<>();
             if (getSessionUser().isSystemAdministrator()) {
-                for (Group group : configurationBusiness.getGroups()) {
+                for (Group group : groupBusiness.get()) {
                     list.add(group.getName());
                 }
             } else {
@@ -645,5 +641,4 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
             throw new CoreException(ex);
         }
     }
-
 }

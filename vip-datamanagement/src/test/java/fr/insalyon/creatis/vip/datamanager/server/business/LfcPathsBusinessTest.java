@@ -39,7 +39,7 @@ public class LfcPathsBusinessTest {
         when(server.getAltDataManagerUsersHome()).thenReturn("");
         when(server.getAltDataManagerGroupsHome()).thenReturn("");
 
-        when(groupDAO.getGroups()).thenReturn(Collections.emptyList());
+        when(groupDAO.get()).thenReturn(Collections.emptyList());
         when(user.getFolder()).thenReturn("test_user");
 
         lfcPathsBusiness = new LfcPathsBusiness(server, groupDAO);

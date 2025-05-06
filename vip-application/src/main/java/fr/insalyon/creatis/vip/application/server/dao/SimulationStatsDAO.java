@@ -47,6 +47,4 @@ public interface SimulationStatsDAO {
     
     public List<String> getApplications (List<String> workflowsId) throws WorkflowsDBDAOException;
     
-    public List<String> getClasses (List<String> workflowsId) throws WorkflowsDBDAOException;
- 
 }

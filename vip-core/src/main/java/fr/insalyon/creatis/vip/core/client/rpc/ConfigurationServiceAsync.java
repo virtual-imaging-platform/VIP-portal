@@ -34,6 +34,7 @@ package fr.insalyon.creatis.vip.core.client.rpc;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import fr.insalyon.creatis.vip.core.client.bean.*;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
+import fr.insalyon.creatis.vip.core.client.view.CoreException;
 import fr.insalyon.creatis.vip.core.client.view.user.UserLevel;
 import fr.insalyon.creatis.vip.core.client.view.util.CountryCode;
 import java.sql.Timestamp;
@@ -47,10 +48,6 @@ import java.util.Map;
 public interface ConfigurationServiceAsync {
 
     void configure(String email, String session, AsyncCallback<User> asyncCallback);
-
-    void signup(User user, String comments, AsyncCallback<Void> asyncCallback);
-
-    void signin(String email, String password, AsyncCallback<User> asyncCallback);
 
     void signout(AsyncCallback<Void> asyncCallback);
 
@@ -67,6 +64,10 @@ public interface ConfigurationServiceAsync {
     void getGroups(AsyncCallback<List<Group>> asyncCallback);
 
     void getPublicGroups(AsyncCallback<List<Group>> asyncCallback);
+
+    void getItemsGroup(String groupname, AsyncCallback<List<String>> asyncCallback);
+
+    void removeItemFromGroup(String item, String groupname, AsyncCallback<Void> asyncCallback);
 
     void updateGroup(String name, Group group, AsyncCallback<Void> asyncCallback);
 

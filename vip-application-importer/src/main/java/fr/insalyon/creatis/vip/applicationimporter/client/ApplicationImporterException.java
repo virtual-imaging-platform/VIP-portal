@@ -32,7 +32,6 @@
 package fr.insalyon.creatis.vip.applicationimporter.client;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
-import fr.insalyon.creatis.vip.application.client.view.boutiquesParsing.InvalidBoutiquesDescriptorException;
 import fr.insalyon.creatis.vip.core.client.VipException;
 
 /**

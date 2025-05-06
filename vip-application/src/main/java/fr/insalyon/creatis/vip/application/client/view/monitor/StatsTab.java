@@ -36,15 +36,12 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.Cursor;
 import com.smartgwt.client.types.Overflow;
-import com.smartgwt.client.types.SelectionStyle;
 import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
-import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
-import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.grid.CellFormatter;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
@@ -57,12 +54,9 @@ import fr.insalyon.creatis.vip.application.client.bean.Simulation;
 import fr.insalyon.creatis.vip.application.client.rpc.WorkflowService;
 import fr.insalyon.creatis.vip.application.client.rpc.WorkflowServiceAsync;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
-import fr.insalyon.creatis.vip.core.client.view.property.PropertyRecord;
-import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
 import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
 import fr.insalyon.creatis.vip.application.client.view.monitor.chart.WorkflowStatsChart;
 import fr.insalyon.creatis.vip.application.client.view.monitor.chart.JobStatsChart;
-import fr.insalyon.creatis.vip.application.client.view.monitor.chart.GeneralBarChart;
 import java.util.LinkedHashMap;
 import java.util.List;
 
@@ -117,7 +111,6 @@ public class StatsTab extends Tab {
         chartsMap.put("1", "Job Stats");
         chartsMap.put("2", "Workflows per User");
         chartsMap.put("3", "Workflows per Application");
-        chartsMap.put("4", "Application Classes");
         chartsItem = new SelectItem();
         chartsItem.setShowTitle(false);
         chartsItem.setWidth(250);
@@ -194,9 +187,6 @@ public class StatsTab extends Tab {
             case 3:
                 plotApplications();
                 break;
-            case 4:
-                plotApplicationClasses();
-
         }
     }
 
@@ -309,44 +299,6 @@ public class StatsTab extends Tab {
         };
 
         service.getPerformanceStats(simulationsList, 3, callback);
-    }
-
-    private void plotApplicationClasses() {
-
-        WorkflowServiceAsync service = WorkflowService.Util.getInstance();
-        final AsyncCallback<List<String>> callback = new AsyncCallback<List<String>>() {
-
-            @Override
-            public void onFailure(Throwable caught) {
-                //modal.hide();
-                Layout.getInstance().setWarningMessage("Unable to load chart data:<br />" + caught.getMessage());
-            }
-
-            @Override
-            public void onSuccess(List<String> result) {
-                if (result != null) {
-                    if (result.isEmpty()) {
-                        Layout.getInstance().setWarningMessage("Result set is empty!<br />");
-                    } else {
-
-                        //modal.show("Loaded Stats", true);
-                        PropertyRecord[] p=new PropertyRecord[result.size()];
-                        for(int i=0; i< result.size(); i++){
-                            if(result.get(i).compareToIgnoreCase("null")!=0){
-                                p[i]=new PropertyRecord("Application Class", result.get(i) + "");
-                            }
-                            
-                        }
-                        grid.setData(p);
-                        //grid.refreshFields();
-//                VisualizationUtils.loadVisualizationApi(getPieChartRunnable(data), PieChart.PACKAGE);
-                    }
-                }
-            }
-        };
-        //Layout.getInstance().setWarningMessage("plotJobsSummary success:<br />");
-        //modal.show("Loading Job Statuses...", true);
-        service.getPerformanceStats(simulationsList, 4, callback);
     }
 
     private Runnable getPieChartRunnable(final Object[][] data) {

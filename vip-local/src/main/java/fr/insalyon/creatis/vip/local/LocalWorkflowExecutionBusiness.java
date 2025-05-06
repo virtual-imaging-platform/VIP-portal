@@ -2,6 +2,7 @@ package fr.insalyon.creatis.vip.local;
 
 import fr.insalyon.creatis.moteur.plugins.workflowsdb.bean.Workflow;
 import fr.insalyon.creatis.moteur.plugins.workflowsdb.bean.WorkflowStatus;
+import fr.insalyon.creatis.vip.application.client.bean.AppVersion;
 import fr.insalyon.creatis.vip.application.client.view.monitor.SimulationStatus;
 import fr.insalyon.creatis.vip.application.server.business.WorkflowExecutionBusiness;
 import fr.insalyon.creatis.vip.application.server.business.simulation.ParameterSweep;
@@ -36,12 +37,13 @@ public class LocalWorkflowExecutionBusiness extends WorkflowExecutionBusiness {
     }
 
     @Override
-    public Workflow launch(String engineEndpoint, String applicationName, String applicationVersion, String applicationClass, User user, String simulationName, String workflowPath, List<ParameterSweep> parameters) throws BusinessException {
+    public Workflow launch(String engineEndpoint, AppVersion appVersion, User user, String simulationName, String workflowPath, 
+            List<ParameterSweep> parameters, String settings, String executorConfig) throws BusinessException {
         String workflowContent;
         try {
             workflowContent = FileUtil.read(new File(workflowPath));
             String workflowId = localBashEngine.launch(workflowContent, parameters);
-            return new Workflow(workflowId, user.getFullName(), WorkflowStatus.Running, new Date(), null, simulationName, applicationName, applicationVersion, applicationClass, engineEndpoint, null);
+            return new Workflow(workflowId, user.getFullName(), WorkflowStatus.Running, new Date(), null, simulationName, appVersion.getApplicationName(), appVersion.getVersion(), "", engineEndpoint, null);
         } catch (Exception e) {
             throw new BusinessException(e);
         }

@@ -1,18 +1,13 @@
 package fr.insalyon.creatis.vip.application;
 
-import fr.insalyon.creatis.vip.application.client.rpc.ApplicationService;
 import fr.insalyon.creatis.vip.application.client.view.ApplicationException;
 import fr.insalyon.creatis.vip.application.server.business.ApplicationBusiness;
 import fr.insalyon.creatis.vip.application.server.rpc.ApplicationServiceImpl;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
-import org.jsoup.Jsoup;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
-
-import java.util.Arrays;
-import java.util.List;
 
 
 public class JsoupIntegrationTest {
@@ -25,7 +20,7 @@ public class JsoupIntegrationTest {
         ApplicationServiceImpl applicationService = new ApplicationServiceImpl();
         ApplicationBusiness applicationBusiness = Mockito.mock(ApplicationBusiness.class);
         Mockito.when(applicationBusiness.getCitation(ArgumentMatchers.anyString())).thenReturn(citationOk, emptyCitation);
-        applicationService.setBeans(null, applicationBusiness, null, null, null, null, null);
+        applicationService.setBeans(applicationBusiness, null, null, null, null, null, null, null, null);
         Assertions.assertEquals(
                 citationOk,
                 applicationService.getCitation("firstcall"));

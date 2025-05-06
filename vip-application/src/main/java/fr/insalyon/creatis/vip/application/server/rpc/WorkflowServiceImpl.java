@@ -140,13 +140,13 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
      */
     @Override
     public List<Simulation> getSimulations(String userName, String application,
-            String status, String appClass, Date startDate, Date endDate) throws ApplicationException {
+                                           String status, Date startDate, Date endDate) throws ApplicationException {
         try {
             User user = getSessionUser();
             if (user.isSystemAdministrator() || (userName != null && userName.equalsIgnoreCase(user.getFullName()))) {
-                return workflowBusiness.getSimulations(userName, application, status, appClass, startDate, endDate);
+                return workflowBusiness.getSimulations(userName, application, status, startDate, endDate);
             } else if (userName == null) {
-                return workflowBusiness.getSimulationsWithGroupAdminRights(user, application, status, appClass, startDate, endDate, null);
+                return workflowBusiness.getSimulationsWithGroupAdminRights(user, application, status, startDate, endDate, null);
             } else {
                 throw new ApplicationException("You can't see another person's simulation!");
             }
@@ -213,10 +213,8 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
                 logger.info("received param {} : {}", p.getKey(), p.getValue());
             }
 
-            String simulationID = workflowBusiness.launch(
-                user, groups,
-                parametersMap, applicationName, applicationVersion,
-                applicationClass, simulationName);
+            String simulationID = workflowBusiness.launch(user, groups,
+                parametersMap, applicationName, applicationVersion, simulationName);
 
             trace(logger, "Simulation '" + simulationName + "' launched with ID '" + simulationID + "'.");
 
