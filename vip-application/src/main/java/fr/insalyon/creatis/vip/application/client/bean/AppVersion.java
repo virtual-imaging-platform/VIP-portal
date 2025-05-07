@@ -47,51 +47,45 @@ public class AppVersion implements IsSerializable {
 
     private String applicationName;
     private String version;
-    private String lfn;
-    private String jsonLfn;
+    private String descriptor;
     private String doi;
     private boolean visible;
-    private boolean boutiquesForm;
     private List<String> resources;
     private List<String> tags;
     private Map<String, String> settings;
 
     public AppVersion() {}
 
-    public AppVersion(String applicationName, String version, String lfn, String jsonLfn, boolean visible, boolean boutiquesForm) {
-        this(applicationName, version, lfn,jsonLfn, new HashMap<>(), visible, boutiquesForm);
+    public AppVersion(String applicationName, String version, String descriptor, boolean visible) {
+        this(applicationName, version, descriptor, new HashMap<>(), visible);
     }
 
     public AppVersion(
-            String applicationName, String version, String lfn, String jsonLfn, Map<String,String> settings, boolean visible,
-            boolean boutiquesForm) {
+            String applicationName, String version, String descriptor, Map<String,String> settings, boolean visible) {
         this.applicationName = applicationName;
         this.version = version;
-        this.lfn = lfn;
-        this.jsonLfn = jsonLfn;
+        this.descriptor = descriptor;
         this.visible = visible;
-        this.boutiquesForm = boutiquesForm;
         this.resources = new ArrayList<>();
         this.tags = new ArrayList<>();
         this.settings = settings;
     }
 
-    public AppVersion(String applicationName, String version, String lfn, String jsonLfn, String doi, Map<String,String> settings, boolean visible,
-            boolean boutiquesForm) {
-        this(applicationName, version, lfn, jsonLfn, settings, visible, boutiquesForm);
+    public AppVersion(String applicationName, String version, String descriptor, String doi, Map<String,String> settings, boolean visible) {
+        this(applicationName, version, descriptor, settings, visible);
         this.doi = doi;
     }
 
-    public AppVersion(String applicationName, String version, String lfn, String jsonLfn, String doi,
-            boolean visible, boolean boutiquesForm, List<String> resources, List<String> tags) {
-        this(applicationName, version, lfn, jsonLfn, new HashMap<>(), visible, boutiquesForm);
+    public AppVersion(String applicationName, String version, String descriptor, String doi,
+            boolean visible, List<String> resources, List<String> tags) {
+        this(applicationName, version, descriptor, new HashMap<>(), visible);
         this.doi = doi;
         this.resources = resources;
         this.tags = tags;
     }
 
     public AppVersion(String applicationName, String version) {
-        this.applicationName = applicationName;
+        this.applicationName = applicationName; // XXX should merge with helpers above (or remove usage)
         this.version = version;
     }
 
@@ -103,13 +97,7 @@ public class AppVersion implements IsSerializable {
         return version;
     }
 
-    public String getLfn() {
-        return lfn;
-    }
-
-    public String getJsonLfn() {
-        return jsonLfn;
-    }
+    public String getDescriptor() { return descriptor; }
 
     public String getDoi() {
         return doi;
@@ -127,10 +115,6 @@ public class AppVersion implements IsSerializable {
 
     public boolean isVisible() {
         return visible;
-    }
-
-    public boolean isBoutiquesForm() {
-        return boutiquesForm;
     }
 
     public List<String> getResources() {

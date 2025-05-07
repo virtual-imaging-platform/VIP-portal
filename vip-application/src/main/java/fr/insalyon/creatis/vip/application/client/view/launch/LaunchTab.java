@@ -39,7 +39,6 @@ import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.tab.Tab;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
 import fr.insalyon.creatis.vip.application.client.bean.AppVersion;
-import fr.insalyon.creatis.vip.application.client.bean.Descriptor;
 import fr.insalyon.creatis.vip.application.client.bean.SimulationInput;
 import fr.insalyon.creatis.vip.application.client.bean.boutiquesTools.BoutiquesApplication;
 import fr.insalyon.creatis.vip.application.client.bean.boutiquesTools.BoutiquesApplicationExtensions;
@@ -70,7 +69,6 @@ public class LaunchTab extends Tab {
     protected String simulationName;
     protected Map<String, String> inputs;
 
-    protected Boolean mustBeABoutiquesDescriptor = false;
     protected Boolean showExamples = true;
     protected boolean showSeparators = true;
 
@@ -135,15 +133,7 @@ public class LaunchTab extends Tab {
 
             @Override
             public void onSuccess(AppVersion appVersion) {
-                if (mustBeABoutiquesDescriptor && ! appVersion.isBoutiquesForm()) {
-                    modal.hide();
-                    Layout.getInstance().setWarningMessage("This application does not have the right format:<br />", 10);
-                } else if (appVersion.isBoutiquesForm()) {
-                    loadBoutiquesDescriptor();
-                } else {
-                    loadGwendiaDescriptor();
-                }
-
+                loadBoutiquesDescriptor();
             }
         });
     }
@@ -173,24 +163,6 @@ public class LaunchTab extends Tab {
         };
         WorkflowService.Util.getInstance().getApplicationDescriptorString(applicationName, applicationVersion,
                 callback);
-    }
-
-    protected void loadGwendiaDescriptor() {
-        final AsyncCallback<Descriptor> callback = new AsyncCallback<Descriptor>() {
-            @Override
-            public void onFailure(Throwable caught) {
-                modal.hide();
-                Layout.getInstance().setWarningMessage("Unable to download application descriptor:<br />"
-                        + caught.getMessage(), 10);
-            }
-
-            @Override
-            public void onSuccess(Descriptor gwendiaDescriptor) {
-                BoutiquesApplication applicationTool = new DescriptorParser().descriptorToBoutiquesApplication(gwendiaDescriptor, applicationName, applicationVersion);
-                addExtensionAndCreateForm(applicationTool, false, () -> createForm(applicationTool));
-            }
-        };
-        WorkflowService.Util.getInstance().getApplicationDescriptor(applicationName, applicationVersion, callback);
     }
 
     protected void addExtensionAndCreateForm(

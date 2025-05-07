@@ -167,7 +167,6 @@ public class WorkflowBusiness {
 
             List<ParameterSweep> parameters = getParameters(parametersMap, user, groups);
             AppVersion appVersion = appVersionBusiness.getVersion(appName, version);
-            String workflowPath = dataManagerBusiness.getRemoteFile(user, server.useMoteurlite() ? appVersion.getJsonLfn() : appVersion.getLfn());
             logger.info( "Moteurlite status: " + server.useMoteurlite());
 
             List<Resource> resources = resourceBusiness.getUsableResources(user, appVersion);
@@ -179,7 +178,7 @@ public class WorkflowBusiness {
             Engine engine = engineBusiness.selectEngine(engineBusiness.getUsableEngines(resource));
 
             try {
-                workflow = workflowExecutionBusiness.launch(engine.getEndpoint(), appVersion, user, simulationName, workflowPath, parameters, 
+                workflow = workflowExecutionBusiness.launch(engine.getEndpoint(), appVersion, user, simulationName, parameters,
                     resource.getType().toString(), resource.getConfiguration());
             } catch (BusinessException be) {
                 logger.error("BusinessException caught on launch workflow, engine {} will be disabled", engine.getName());
@@ -398,7 +397,7 @@ public class WorkflowBusiness {
 
         try {
             AppVersion version = applicationDAO.getVersion(applicationName, applicationVersion);
-            String workflowPath = dataManagerBusiness.getRemoteFile(user, version.getLfn());
+            String workflowPath = "XXX"; // XXX see if removable - dataManagerBusiness.getRemoteFile(user, version.getLfn());
             if ( ! workflowPath.endsWith(".gwendia")) {
                 logger.error("Error : workflow file without gwendia extension : {}", workflowPath);
                 throw new BusinessException(WRONG_APPLICATION_DESCRIPTOR, applicationName + "/" + applicationVersion);

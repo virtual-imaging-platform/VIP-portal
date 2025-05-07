@@ -238,14 +238,11 @@ public class ReproVipBusiness {
         }
     }
 
-    public String getBoutiquesDescriptorJsonPath(String applicationName, String applicationVersion) throws BusinessException {
+    private String getBoutiquesDescriptorJsonPath(String applicationName, String applicationVersion) throws BusinessException {
         AppVersion appVersion = appVersionBusiness.getVersion(applicationName, applicationVersion);
-
-        if (appVersion != null && appVersion.getJsonLfn() != null) {
-            return appVersion.getJsonLfn();
-        } else {
-            return null;
-        }
+        appVersion.getDescriptor();
+        // XXX appVersion.getJsonLfn() - remove or tmp file
+        return null;
     }
 
     /*

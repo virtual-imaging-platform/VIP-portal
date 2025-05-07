@@ -187,9 +187,7 @@ abstract public class BaseWebSpringIT extends BaseApplicationSpringIT {
 
     protected AppVersion configureTestApp(String appName, String groupName, String versionName, boolean gwendia) throws BusinessException, GRIDAClientException, IOException {
         AppVersion appVersion = configureAnApplication(appName, versionName, groupName);
-        configureVersion(appVersion,
-                gwendia ? "/vip/testGroup (group)/path/to/test.gwendia" : null,
-                gwendia ? null : "/vip/testGroup (group)/path/to/desc-boutiques.json");
+        configureVersion(appVersion, gwendia ? null : "/vip/testGroup (group)/path/to/desc-boutiques.json"); // XXX
 
         Mockito.when(server.getDataManagerPath()).thenReturn("/test/folder");
 

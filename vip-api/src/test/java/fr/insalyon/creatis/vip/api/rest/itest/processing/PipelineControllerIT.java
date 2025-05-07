@@ -85,8 +85,7 @@ public class PipelineControllerIT extends BaseWebSpringIT {
         String appName = "testApp", groupName = "testGroup";
         String versionName = "42-test";
         AppVersion appVersion = configureAnApplication(appName, versionName, groupName);
-        configureVersion(appVersion,
-                "/vip/testGroup (group)/path/to/test.gwendia", null);
+        configureVersion(appVersion, null); // XXX
 
         createUserInGroup(baseUser1.getEmail(), groupName);
 
@@ -189,11 +188,11 @@ public class PipelineControllerIT extends BaseWebSpringIT {
         createAnApplication("app2", "group2");
         createAnApplication("app3", "group3");
 
-        AppVersion app11 = createAVersion("app1", "v1", true, null, null);
-        AppVersion app12 = createAVersion("app1", "v2", false, null, null);
-        AppVersion app13 = createAVersion("app1", "v3", true, null, null);
-        AppVersion app2 = createAVersion("app2", "v1.1", true, null, null);
-        AppVersion app34 = createAVersion("app3", "v4", false, null, null);
+        AppVersion app11 = createAVersion("app1", "v1", true);
+        AppVersion app12 = createAVersion("app1", "v2", false);
+        AppVersion app13 = createAVersion("app1", "v3", true);
+        AppVersion app2 = createAVersion("app2", "v1.1", true);
+        AppVersion app34 = createAVersion("app3", "v4", false);
 
         createAnApplication("appAB", "group1");
         createAnApplication("appBC", "group2");
@@ -201,9 +200,9 @@ public class PipelineControllerIT extends BaseWebSpringIT {
         putApplicationInGroup("appAB", "group2");
         putApplicationInGroup("appBC", "group3");
 
-        AppVersion appAB = createAVersion("appAB", "v1", true, null, null);
-        AppVersion appBC = createAVersion("appBC", "v1", true, null, null);
-        AppVersion appC = createAVersion("appC", "v1", true, null, null);
+        AppVersion appAB = createAVersion("appAB", "v1", true);
+        AppVersion appBC = createAVersion("appBC", "v1", true);
+        AppVersion appC = createAVersion("appC", "v1", true);
 
         createUserInGroup(baseUser1.getEmail(), "test1", "group1");
         createUserInGroup(baseUser2.getEmail(), "test2", "group2");

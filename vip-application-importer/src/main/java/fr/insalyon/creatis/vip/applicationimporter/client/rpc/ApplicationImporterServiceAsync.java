@@ -43,7 +43,7 @@ public interface ApplicationImporterServiceAsync {
 
     public void readAndValidateBoutiquesFile(String fileLFN, AsyncCallback<String> callback);
 
-    public void createApplication(BoutiquesApplication bt, String tag, boolean overwriteVersion, String fileAccessProtocol, List<String> tags, List<String> resources, AsyncCallback<Void> callback);
+    public void createApplication(BoutiquesApplication bt, boolean overwriteVersion, List<String> tags, List<String> resources, AsyncCallback<Void> callback);
     
     public void getApplicationImporterRootFolder(AsyncCallback<String> asyncCallback);
     

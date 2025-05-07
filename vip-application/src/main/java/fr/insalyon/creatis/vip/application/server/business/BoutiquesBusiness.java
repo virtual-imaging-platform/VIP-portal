@@ -76,8 +76,7 @@ public class BoutiquesBusiness {
             throws BusinessException {
 
         // fetch json file
-        String jsonLfn = getJsonLfn(applicationName, version);
-        String localFile = dataManagerBusiness.getRemoteFile(user, jsonLfn);
+        String localFile = "XXX"; // XXX TODO generate descriptor in some tmp dir for bosh publish
 
         // TODO : verify it has an author (refactor boutique parser from application-importer
 
@@ -109,29 +108,12 @@ public class BoutiquesBusiness {
         }
     }
 
-    private String getJsonLfn(String applicationName, String applicationVersion)
-            throws BusinessException {
-        AppVersion appVersion = appVersionBusiness.getVersion(
-            applicationName, applicationVersion);
-        if (appVersion.getJsonLfn() == null) {
-            logger.error("No json lfn for this application : {} / {}", applicationName, applicationVersion);
-            throw new BusinessException("There is no json lfn for this application version.");
-        }
-        return appVersion.getJsonLfn();
-    }
-
     public String getApplicationDescriptorString(
             User user, String applicationName, String applicationVersion)
             throws BusinessException {
-        String descriptorLfn = getJsonLfn(applicationName, applicationVersion);
-        try {
-            String localFilePath =
-                    dataManagerBusiness.getRemoteFile(user, descriptorLfn);
-            return new Scanner(new File(localFilePath)).useDelimiter("\\Z").next();
-        } catch (IOException ex) {
-            logger.error("Error reading boutiques file {}", descriptorLfn, ex);
-            throw new BusinessException(ex);
-        }
+        // XXX check user?
+        AppVersion appVersion = appVersionBusiness.getVersion(applicationName, applicationVersion);
+        return appVersion.getDescriptor();
     }
 
     public BoutiquesDescriptor parseBoutiquesFile(File boutiquesFile) throws BusinessException {
@@ -140,6 +122,15 @@ public class BoutiquesBusiness {
         } catch (IOException e) {
             logger.error("Error reading {} file for boutiques parsing", boutiquesFile, e);
             throw new BusinessException("Error reading boutiques file", e);
+        }
+    }
+
+    public BoutiquesDescriptor parseBoutiquesString(String descriptor) throws BusinessException {
+        try {
+            return objectMapper.readValue(descriptor, BoutiquesDescriptor.class);
+        } catch (IOException e) {
+            logger.error("Error parsing descriptor", e);
+            throw new BusinessException("Error parsing descriptor", e);
         }
     }
 

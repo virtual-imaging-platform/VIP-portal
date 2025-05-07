@@ -68,12 +68,10 @@ public class EditVersionLayout extends AbstractFormLayout {
     private String applicationName;
     private Label applicationLabel;
     private TextItem versionField;
-    private TextItem lfnField;
-    private TextItem jsonLfnField;
+    private TextItem descriptorField;
     private ListGrid settingsGrid;
     private IButton newSettingsButton;
     private CheckboxItem isVisibleField;
-    private CheckboxItem isBoutiquesFormField;
     private SelectItem tagsList;
     private SelectItem resourcesList;
     private IButton saveButton;
@@ -93,12 +91,8 @@ public class EditVersionLayout extends AbstractFormLayout {
         versionField = FieldUtil.getTextItem(450, null);
         versionField.setDisabled(true);
 
-        lfnField = FieldUtil.getTextItem(450, null);
-        lfnField.setDisabled(true);
-
-        jsonLfnField = FieldUtil.getTextItem(450, null);
-        jsonLfnField.setDisabled(true);
-        jsonLfnField.setRequired(false);
+        descriptorField = FieldUtil.getTextItem(450, null);
+        descriptorField.setDisabled(true);
 
         settingsGrid = new ListGrid();
         settingsGrid.setWidth(450);
@@ -124,11 +118,6 @@ public class EditVersionLayout extends AbstractFormLayout {
         isVisibleField.setWidth(450);
         isVisibleField.setValue(true);
 
-        isBoutiquesFormField = new CheckboxItem();
-        isBoutiquesFormField.setTitle("Use Boutiques Form");
-        isBoutiquesFormField.setWidth(450);
-        isBoutiquesFormField.setValue(true);
-
         tagsList = new SelectItem();
         tagsList.setMultiple(true);
         tagsList.setWidth(450);
@@ -140,12 +129,9 @@ public class EditVersionLayout extends AbstractFormLayout {
         saveButton = WidgetUtil.getIButton("Save", CoreConstants.ICON_SAVED, new ClickHandler() {
             @Override
             public void onClick(ClickEvent event) {
-                if (versionField.validate() && lfnField.validate() && jsonLfnField.validate()) {
-                    String jsonLfn = jsonLfnField.getValueAsString();
-                    if (jsonLfn != null) jsonLfn.trim();
+                if (versionField.validate()) {
                     AppVersion toSave = new AppVersion(applicationName, versionField.getValueAsString().trim(),
-                            lfnField.getValueAsString().trim(), jsonLfn, settingsToMap(),
-                            isVisibleField.getValueAsBoolean(), isBoutiquesFormField.getValueAsBoolean());
+                            descriptorField.getValueAsString(), settingsToMap(), isVisibleField.getValueAsBoolean());
                     toSave.setResources(Arrays.asList(resourcesList.getValues()));
                     toSave.setTags(Arrays.asList(tagsList.getValues()));
                     save(toSave);
@@ -172,10 +158,8 @@ public class EditVersionLayout extends AbstractFormLayout {
 
         addMember(applicationLabel);
         addField("Version", versionField);
-        addField("Gwendia LFN", lfnField);
-        addField("JSON LFN", jsonLfnField);
+        addField("Descriptor", descriptorField);
         addMember(FieldUtil.getForm(isVisibleField));
-        addMember(FieldUtil.getForm(isBoutiquesFormField));
         addField("Tags associated", tagsList);
         addField("Resources authorized", resourcesList);
         addMember(WidgetUtil.getLabel("<b>" + "Execution Settings" + "</b>", 15));
@@ -214,7 +198,7 @@ public class EditVersionLayout extends AbstractFormLayout {
             public void onSuccess(Void result) {
                 WidgetUtil.resetIButton(saveButton, "Save", CoreConstants.ICON_SAVED);
                 WidgetUtil.resetIButton(removeButton, "Remove", CoreConstants.ICON_DELETE);
-                setVersion(null, null, null, true, true, null, null, null);
+                setVersion(null, null, true, null, null, null);
                 ManageApplicationsTab tab = (ManageApplicationsTab) Layout.getInstance().
                         getTab(ApplicationConstants.TAB_MANAGE_APPLICATION);
                 tab.loadVersions(applicationName);
@@ -223,24 +207,22 @@ public class EditVersionLayout extends AbstractFormLayout {
     }
 
     public void setApplication(String applicationName) {
-        setVersion(null, null, null, true, true, null, null, null);
+        setVersion(null, null, true, null, null, null);
         this.applicationName = applicationName;
         this.applicationLabel.setContents("<b>Application:</b> " + applicationName);
         this.versionField.setDisabled(false);
-        this.lfnField.setDisabled(false);
-        this.jsonLfnField.setDisabled(false);
+        this.descriptorField.setDisabled(true);
         this.saveButton.setDisabled(false);
     }
 
-    public void setVersion(String version, String lfn, String jsonLfn, boolean isVisible, boolean isBoutiquesForm, 
+    public void setVersion(String version, String descriptor, boolean isVisible,
             Map<String, String> settings, String[] tags, String[] resources) {
         if (version != null) {
             this.versionField.setValue(version);
             this.versionField.setDisabled(true);
-            this.lfnField.setValue(lfn);
-            this.jsonLfnField.setValue(jsonLfn);
+            this.descriptorField.setValue(descriptor);
+            this.descriptorField.setDisabled(true);
             this.isVisibleField.setValue(isVisible);
-            this.isBoutiquesFormField.setValue(isBoutiquesForm);
             this.tagsList.setValues(tags);
             this.resourcesList.setValues(resources);
             this.removeButton.setDisabled(false);
@@ -249,10 +231,9 @@ public class EditVersionLayout extends AbstractFormLayout {
         } else {
             this.versionField.setValue("");
             this.versionField.setDisabled(false);
-            this.lfnField.setValue("");
-            this.jsonLfnField.setValue("");
+            this.descriptorField.setValue("");
+            this.descriptorField.setDisabled(true);
             this.isVisibleField.setValue(true);
-            this.isBoutiquesFormField.setValue(true);
             this.removeButton.setDisabled(true);
             this.newVersion = true;
         }

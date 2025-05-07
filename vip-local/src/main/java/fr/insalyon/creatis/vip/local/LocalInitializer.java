@@ -206,8 +206,7 @@ public class LocalInitializer {
         transferPoolBusiness.uploadFile(admin, getPathFromLocation(scriptLocation), versionFolder);
 
         // create AppVersion
-        String gwendiaLFN = versionFolder + "/" + Paths.get(gwendiaLocation).getFileName().toString();
-        AppVersion appVersion = new AppVersion(applicationName, applicationVersion, gwendiaLFN, null, true, false);
+        AppVersion appVersion = new AppVersion(applicationName, applicationVersion, "{}", true);
         appVersionBusiness.add(appVersion);
 
         logger.info("Application version [{}/{}] installed", applicationName, applicationVersion);

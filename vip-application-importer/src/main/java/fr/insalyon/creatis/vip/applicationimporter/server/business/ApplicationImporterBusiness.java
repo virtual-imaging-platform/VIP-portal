@@ -31,8 +31,6 @@
  */
 package fr.insalyon.creatis.vip.applicationimporter.server.business;
 
-import fr.insalyon.creatis.grida.client.GRIDAClient;
-import fr.insalyon.creatis.grida.client.GRIDAClientException;
 import fr.insalyon.creatis.vip.application.client.bean.AppVersion;
 import fr.insalyon.creatis.vip.application.client.bean.Application;
 import fr.insalyon.creatis.vip.application.client.bean.Tag;
@@ -44,10 +42,7 @@ import fr.insalyon.creatis.vip.application.server.business.ResourceBusiness;
 import fr.insalyon.creatis.vip.application.server.business.TagBusiness;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
-import fr.insalyon.creatis.vip.core.server.business.Server;
-import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerException;
 import fr.insalyon.creatis.vip.datamanager.server.business.DataManagerBusiness;
-import fr.insalyon.creatis.vip.datamanager.server.business.LfcPathsBusiness;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,12 +62,7 @@ public class ApplicationImporterBusiness {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    private Server server;
-    private LfcPathsBusiness lfcPathsBusiness;
-    private GRIDAClient gridaClient;
     private BoutiquesBusiness boutiquesBusiness;
-    private VelocityUtils velocityUtils;
-    private TargzUtils targzUtils;
     private ApplicationBusiness applicationBusiness;
     private AppVersionBusiness appVersionBusiness;
     private DataManagerBusiness dataManagerBusiness;
@@ -81,20 +71,13 @@ public class ApplicationImporterBusiness {
 
     @Autowired
     public ApplicationImporterBusiness(
-            Server server, LfcPathsBusiness lfcPathsBusiness,
-            GRIDAClient gridaClient, BoutiquesBusiness boutiquesBusiness,
-            VelocityUtils velocityUtils, TargzUtils targzUtils,
+            BoutiquesBusiness boutiquesBusiness,
             ApplicationBusiness applicationBusiness,
             DataManagerBusiness dataManagerBusiness,
             ResourceBusiness resourceBusiness,
             TagBusiness tagBusiness,
             AppVersionBusiness appVersionBusiness) {
-        this.server = server;
-        this.lfcPathsBusiness = lfcPathsBusiness;
-        this.gridaClient = gridaClient;
         this.boutiquesBusiness = boutiquesBusiness;
-        this.velocityUtils = velocityUtils;
-        this.targzUtils = targzUtils;
         this.applicationBusiness = applicationBusiness;
         this.dataManagerBusiness = dataManagerBusiness;
         this.resourceBusiness = resourceBusiness;
@@ -115,107 +98,22 @@ public class ApplicationImporterBusiness {
         }
     }
 
-    public void createApplication(BoutiquesApplication bt, String tag, boolean overwriteApplicationVersion, String fileAccessProtocol
-        ,List<String> tags, List<String> resources, User user)
+    public void createApplication(BoutiquesApplication bt, boolean overwriteApplicationVersion,
+            List<String> tags, List<String> resources, User user)
             throws BusinessException {
 
-        try {
-            String wrapperTemplate = "vm/wrapper.vm";
-            String gaswTemplate = "vm/gasw.vm";
-            String gwendiaTemplate = "vm/gwendia-standalone.vm";
+        // Check rights
+        checkEditionRights(bt.getName(), bt.getToolVersion(), overwriteApplicationVersion, user);
 
-            // Check rights
-            checkEditionRights(bt.getName(), bt.getToolVersion(), overwriteApplicationVersion, user);
-            // set the correct LFN
-            bt.setApplicationLFN(
-                lfcPathsBusiness.parseBaseDir(
-                    user, bt.getApplicationLFN()).concat("/").concat(bt.getToolVersion().replaceAll("\\s+","")));
-
-            // Generate strings
-            String gwendiaString = velocityUtils.createDocument(bt, fileAccessProtocol, gwendiaTemplate);
-            String gaswString = velocityUtils.createDocument(tag, bt, fileAccessProtocol, gaswTemplate);
-            String wrapperString = velocityUtils.createDocument(tag, bt, wrapperTemplate);
-
-            // Write files
-            String gwendiaFileName = server.getApplicationImporterFileRepository() + bt.getGwendiaLFN();
-            String gaswFileName = server.getApplicationImporterFileRepository() + bt.getGASWLFN();
-            String wrapperFileName = server.getApplicationImporterFileRepository() + bt.getWrapperLFN();
-
-            System.out.print(gwendiaFileName + "\n");
-            writeString(gwendiaString, gwendiaFileName);
-            uploadFile(gwendiaFileName, bt.getGwendiaLFN());
-            
-            // Write application json descriptor
-            String jsonFileName = server.getApplicationImporterFileRepository() + bt.getJsonLFN();
-            writeString(bt.getJsonFile(), jsonFileName);         
-  
-            String wrapperArchiveName;
-            // Write files for each GASW and script file
-            writeString(gaswString, gaswFileName);
-            writeString(wrapperString, wrapperFileName);
-            wrapperArchiveName = wrapperFileName + ".tar.gz";
-
-            ArrayList<File> dependencies = new ArrayList<File>();
-            dependencies.add(new File(wrapperFileName));
-            //Add json file to archive so that it is downloaded on WN for Boutiques exec
-            dependencies.add(new File(jsonFileName));
-            targzUtils.createTargz(dependencies, wrapperArchiveName);
-
-            // Transfer files
-            System.out.print("gasw : " + gaswFileName + "\n");
-            System.out.print("gasw : " + bt.getGASWLFN() + "\n");
-            uploadFile(gaswFileName, bt.getGASWLFN());
-            System.out.print("wrapper : " + wrapperFileName + "\n");
-            System.out.print("wrapper : " + bt.getWrapperLFN() + "\n");
-            uploadFile(wrapperFileName, bt.getWrapperLFN());
-
-            uploadFile(wrapperArchiveName, bt.getWrapperLFN() + ".tar.gz");
-            //Upload the JSON file at the end, so that it is not deleted before adding it as dependency to wrapperArchiveName
-            uploadFile(jsonFileName, bt.getJsonLFN());
-        
-            // Register application
-            registerApplicationVersion(bt.getName(), bt.getToolVersion(), user.getEmail(), bt.getGwendiaLFN(), bt.getJsonLFN(), tags, resources);
-
-        } catch (IOException ex) {
-            logger.error("Error creating app {}/{} from boutiques file", bt.getName(), bt.getToolVersion(), ex);
-            throw new BusinessException(ex);
-        } catch (DataManagerException ex) {
-            throw new BusinessException(ex);
-        }
-    }
-
-    private void uploadFile(String localFile, String lfn) throws BusinessException {
-        try {
-            logger.info("Uploading file " + localFile + " to " + lfn);
-            if (gridaClient.exist(lfn)) {
-                gridaClient.delete(lfn);
-            }
-            gridaClient.uploadFile(localFile, (new File(lfn)).getParent());
-        } catch (GRIDAClientException ex) {
-            logger.error("Error uploading file {} to {}", localFile, lfn, ex);
-            throw new BusinessException(ex);
-        }
-    }
-
-    private void writeString(String string, String fileName) throws BusinessException, FileNotFoundException, UnsupportedEncodingException {
-        // Check if base file directory exists, otherwise create it.
-        File directory = (new File(fileName)).getParentFile();
-        if (!directory.exists() && !directory.mkdirs()) {
-            logger.error("Error importing an application : Cannot create directory {}", directory);
-            throw new BusinessException("Cannot create directory " + directory.getAbsolutePath());
-        }
-
-        PrintWriter writer = new PrintWriter(fileName, "UTF-8");
-        writer.write(string);
-        writer.close();
+        // Register application
+        registerApplicationVersion(bt.getName(), bt.getToolVersion(), user.getEmail(), bt.getOriginalDescriptor(), tags, resources);
     }
 
     private void registerApplicationVersion(
-            String vipApplicationName, String vipVersion, String owner,
-            String lfnGwendiaFile, String lfnJsonFile,
+            String vipApplicationName, String vipVersion, String owner, String descriptor,
             List<String> tags, List<String> resources) throws BusinessException {
         Application app = applicationBusiness.getApplication(vipApplicationName);
-        AppVersion newVersion = new AppVersion(vipApplicationName, vipVersion, lfnGwendiaFile, lfnJsonFile, true, true);
+        AppVersion newVersion = new AppVersion(vipApplicationName, vipVersion, descriptor, true);
         if (app == null) {
             // If application doesn't exist, create it.
             // New applications are not associated with any class (admins may add classes independently).
