@@ -49,7 +49,6 @@ import fr.insalyon.creatis.vip.application.server.business.ResourceBusiness;
 import fr.insalyon.creatis.vip.application.server.business.simulation.ParameterSweep;
 import fr.insalyon.creatis.vip.application.server.business.util.FileUtil;
 import fr.insalyon.creatis.vip.core.client.bean.GroupType;
-import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.integrationtest.ServerMockConfig;
 
 import org.hamcrest.MatcherAssert;
@@ -365,7 +364,6 @@ public class ExecutionControllerIT extends BaseWebSpringIT {
     }
 
     @Test
-    @SuppressWarnings("unchecked")
     public void testInitGwendiaExecution() throws Exception
     {
         String appName = "test application", groupName = "testGroup", versionName = "4.2";
@@ -437,7 +435,6 @@ public class ExecutionControllerIT extends BaseWebSpringIT {
 
     // the difference (at the moment) is that with moteurLite the optional and absent parameters are not included
     @Test
-    @SuppressWarnings("unchecked")
     public void testInitBoutiquesExecution() throws Exception
     {
         String appName = "test application", groupName = "testGroup", versionName = "4.2";
