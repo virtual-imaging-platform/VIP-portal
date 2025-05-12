@@ -35,6 +35,7 @@ import fr.insalyon.creatis.grida.client.GRIDAClient;
 import fr.insalyon.creatis.grida.client.GRIDAClientException;
 import fr.insalyon.creatis.vip.application.client.bean.AppVersion;
 import fr.insalyon.creatis.vip.application.client.bean.Application;
+import fr.insalyon.creatis.vip.application.client.bean.Resource;
 import fr.insalyon.creatis.vip.application.client.bean.Tag;
 import fr.insalyon.creatis.vip.application.client.bean.boutiquesTools.BoutiquesApplication;
 import fr.insalyon.creatis.vip.application.server.business.AppVersionBusiness;
@@ -116,7 +117,7 @@ public class ApplicationImporterBusiness {
     }
 
     public void createApplication(BoutiquesApplication bt, String tag, boolean overwriteApplicationVersion, String fileAccessProtocol
-        ,List<String> tags, List<String> resources, User user)
+        ,List<Tag> tags, List<String> resources, User user)
             throws BusinessException {
 
         try {
@@ -213,9 +214,12 @@ public class ApplicationImporterBusiness {
     private void registerApplicationVersion(
             String vipApplicationName, String vipVersion, String owner,
             String lfnGwendiaFile, String lfnJsonFile,
-            List<String> tags, List<String> resources) throws BusinessException {
+            List<Tag> tags, List<String> resources) throws BusinessException {
         Application app = applicationBusiness.getApplication(vipApplicationName);
         AppVersion newVersion = new AppVersion(vipApplicationName, vipVersion, lfnGwendiaFile, lfnJsonFile, true, true);
+
+        newVersion.setResources(resources.stream().map(Resource::new).toList());
+        newVersion.setTags(tags);
         if (app == null) {
             // If application doesn't exist, create it.
             // New applications are not associated with any class (admins may add classes independently).
@@ -231,8 +235,6 @@ public class ApplicationImporterBusiness {
         }
         // add new version
         appVersionBusiness.add(newVersion);
-        registerResourcesAssociated(newVersion, resources);
-        registerTagsAssociated(newVersion, tags);
     }
 
     private void checkEditionRights(
@@ -259,21 +261,6 @@ public class ApplicationImporterBusiness {
                     throw new BusinessException("Application version already exists.");
                 }
             }
-        }
-    }
-
-    private void registerTagsAssociated(AppVersion appVersion, List<String> tags) throws BusinessException {
-        for (String tagName : tags) {
-            if ( ! tagBusiness.exist(tagName)) {
-                tagBusiness.add(new Tag(tagName));
-            }
-            tagBusiness.associate(new Tag(tagName), appVersion);
-        }
-    }
-
-    private void registerResourcesAssociated(AppVersion appVersion, List<String> resources) throws BusinessException {
-        for (String resourceName : resources) {
-            resourceBusiness.associate(resourceBusiness.getByName(resourceName), appVersion);
         }
     }
 }

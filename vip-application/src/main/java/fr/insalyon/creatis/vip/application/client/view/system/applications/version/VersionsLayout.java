@@ -62,10 +62,6 @@ import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- *
- * @author Rafael Ferreira da Silva
- */
 public class VersionsLayout extends VLayout {
 
     private String applicationName;
@@ -101,7 +97,7 @@ public class VersionsLayout extends VLayout {
             public void onClick(ClickEvent event) {
                 ManageApplicationsTab appsTab = (ManageApplicationsTab) Layout.getInstance().
                         getTab(ApplicationConstants.TAB_MANAGE_APPLICATION);
-                appsTab.setVersion(null, null, null, null, null, true, true, null, null);
+                appsTab.setVersion(null, null, null, null, null, true, true, null);
             }
         });
         toolstrip.addMember(addButton);
@@ -179,8 +175,7 @@ public class VersionsLayout extends VLayout {
                 isBoutiquesFormField,
                 new ListGridField("version", "Version"),
                 new ListGridField("lfn", "LFN"),
-                new ListGridField("resources", "Resources"),
-                new ListGridField("tags", "Tags"));
+                new ListGridField("resources", "Resources"));
         grid.setSortField("version");
         grid.setSortDirection(SortDirection.ASCENDING);
         grid.addCellDoubleClickHandler(new CellDoubleClickHandler() {
@@ -210,7 +205,7 @@ public class VersionsLayout extends VLayout {
                     dataList.add(new VersionRecord(
                         version.getVersion(), version.getLfn(), version.getJsonLfn(),
                         version.getDoi(), version.isVisible(), version.isBoutiquesForm(), 
-                        version.getSettings(), version.getTags(), version.getResources()));
+                        version.getSettings(), version.getResourcesNames()));
                 }
                 grid.setData(dataList.toArray(new VersionRecord[]{}));
             }
@@ -219,12 +214,7 @@ public class VersionsLayout extends VLayout {
         ApplicationService.Util.getInstance().getVersions(applicationName, callback);
     }
 
-    /**
-     *
-     * @param applicationName
-     */
     public void setApplication(String applicationName) {
-
         this.applicationName = applicationName;
         this.applicationLabel.setContents("<b>Application:</b> " + applicationName);
         loadData();
@@ -242,7 +232,6 @@ public class VersionsLayout extends VLayout {
             record.getAttributeAsMap("settings"),
             record.getAttributeAsBoolean("visible"),
             record.getAttributeAsBoolean("boutiquesForm"),
-            record.getAttributeAsStringArray("tags"),
             record.getAttributeAsStringArray("resources"));
     }
 

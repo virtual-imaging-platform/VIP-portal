@@ -42,10 +42,6 @@ import fr.insalyon.creatis.vip.application.client.bean.Tag;
 import java.util.List;
 import java.util.Map;
 
-/**
- *
- * @author Rafael Ferreira da Silva
- */
 public interface ApplicationServiceAsync {
 
     public void getPublicApplications(AsyncCallback<Map<Application, List<AppVersion>>> asyncCallback);
@@ -96,9 +92,11 @@ public interface ApplicationServiceAsync {
 
     public void removeTag(Tag tag, AsyncCallback<Void> asyncCallback);
 
-    public void updateTag(Tag tag, String newName, AsyncCallback<Void> asyncCallback);
+    public void updateTag(Tag oldTag, Tag newTag, AsyncCallback<Void> asyncCallback);
 
     public void getTags(AsyncCallback<List<Tag>> asyncCallback);
+
+    public void getNonBoutiquesTags(AsyncCallback<List<Tag>> asyncCallback);
 
     public void getTags(AppVersion appVersion, AsyncCallback<List<Tag>> asyncCallback);
 

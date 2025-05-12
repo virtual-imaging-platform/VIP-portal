@@ -200,13 +200,9 @@ public class DisplayTab extends Tab {
             incorrectInputs.removeAll(inputIds);
             String errorMessage = "<b>" + String.join(", ", incorrectInputs) + "</b> appears in vipDotInputIds but not in inputs. Please ensure all ids are correct.";
             throw new ApplicationImporterException(errorMessage);
-    }
+        }
     }
 
-    /**
-     * Creates a standalone application
-     *
-     */
     private void createApplication() {
         final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
 
@@ -228,7 +224,7 @@ public class DisplayTab extends Tab {
             vipLayout.getDiracTag(),
             vipLayout.getOverwrite(),
             vipLayout.getFileAccessProtocol(),
-            tagsLayout.getSelectedTags(),
+            tagsLayout.getSelectedTags(boutiquesTool.getName(), boutiquesTool.getToolVersion()),
             vipLayout.getSelectedResources(),
             callback);
     }
