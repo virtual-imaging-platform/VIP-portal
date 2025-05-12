@@ -10,17 +10,13 @@ public interface TagDAO {
 
     public void add(Tag tag) throws DAOException;
 
-    public void update(Tag tag, String newName) throws DAOException;
+    public void update(Tag oldTag, Tag newTag) throws DAOException;
 
     public void remove(Tag tag) throws DAOException;
 
+    public Tag get(String name, String application, String version) throws DAOException;
+
     public List<Tag> getAll() throws DAOException;
 
-    public void associate(Tag tag, AppVersion appVersion) throws DAOException;
-
-    public void dissociate(Tag tag, AppVersion appVersion) throws DAOException;
-
     public List<Tag> getTags(AppVersion appVersion) throws DAOException;
-
-    public List<AppVersion> getAssociated(Tag tag) throws DAOException;
 }

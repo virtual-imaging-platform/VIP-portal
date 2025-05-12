@@ -36,14 +36,10 @@ import java.util.Map;
 
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 
-/**
- *
- * @author Rafael Ferreira da Silva
- */
 public class VersionRecord extends ListGridRecord {
     
     public VersionRecord(String version, String lfn, String jsonLfn, String doi, boolean isVisible, boolean isBoutiquesForm, 
-            Map<String, String> settings, List<String> tags, List<String> resources) {
+            Map<String, String> settings, List<String> resources) {
         setAttribute("version", version);
         setAttribute("lfn", lfn);
         setAttribute("jsonLfn", jsonLfn);
@@ -51,7 +47,6 @@ public class VersionRecord extends ListGridRecord {
         setAttribute("visible", isVisible);
         setAttribute("boutiquesForm", isBoutiquesForm);
         setAttribute("settings", settings);
-        setAttribute("tags", tags);
         setAttribute("resources", resources);
     }
 }

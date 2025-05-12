@@ -132,16 +132,12 @@ public class ApplicationDataInitializer extends JdbcDaoSupport {
     private void createTagsTables() {
         tableInitializer.createTable("VIPTags",
                     "name VARCHAR(255), "
-                +   "PRIMARY KEY (name)");
-
-        tableInitializer.createTable("VIPTagsAppVersions",
-                    "application VARCHAR(255), "
+                +   "application VARCHAR(255), "
                 +   "version VARCHAR(255), "
-                +   "tagname VARCHAR(255), "
-                +   "PRIMARY KEY (application, version, tagname), "
+                +   "boutiques BOOLEAN, "
+                +   "visible BOOLEAN, "
+                +   "PRIMARY KEY (name, application, version), "
                 +   "FOREIGN KEY (application, version) REFERENCES VIPAppVersions(application, version) "
-                +   "ON DELETE CASCADE ON UPDATE CASCADE, "
-                +   "FOREIGN KEY (tagname) REFERENCES VIPTags(name) "
                 +   "ON DELETE CASCADE ON UPDATE CASCADE");
     }
 

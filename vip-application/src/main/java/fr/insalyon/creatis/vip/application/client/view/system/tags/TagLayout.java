@@ -1,6 +1,7 @@
 package fr.insalyon.creatis.vip.application.client.view.system.tags;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.smartgwt.client.types.ListGridFieldType;
 import com.smartgwt.client.types.Overflow;
 import com.smartgwt.client.types.SortDirection;
 import com.smartgwt.client.util.BooleanCallback;
@@ -30,7 +31,6 @@ import java.util.List;
 
 
 public class TagLayout extends VLayout {
-
     private ModalWindow modal;
     private ListGrid grid;
     private HLayout rollOverCanvas;
@@ -50,20 +50,7 @@ public class TagLayout extends VLayout {
 
     private void configureToolStrip() {
         ToolstripLayout toolstrip = new ToolstripLayout();
-
         toolstrip.addMember(WidgetUtil.getSpaceLabel(15));
-
-        LabelButton addButton = new LabelButton("Add Tag", CoreConstants.ICON_ADD);
-        addButton.setWidth(150);
-        addButton.addClickHandler(new ClickHandler() {
-            @Override
-            public void onClick(ClickEvent event) {
-                ManageTagsTab tagsTab = (ManageTagsTab) Layout.getInstance().
-                        getTab(ApplicationConstants.TAB_MANAGE_TAG);
-                        tagsTab.setTag(null);
-            }
-        });
-        toolstrip.addMember(addButton);
 
         LabelButton refreshButton = new LabelButton("Refresh", CoreConstants.ICON_REFRESH);
         refreshButton.setWidth(150);
@@ -102,13 +89,14 @@ public class TagLayout extends VLayout {
                     deleteImg.addClickHandler(new ClickHandler() {
                         @Override
                         public void onClick(ClickEvent event) {
-                            final String name = rollOverRecord.getAttribute("name");
+                            final Tag tag = tagFromRecord(rollOverRecord);
+
                             SC.ask("Do you really want to remove this tag \""
-                                    + name + "\"?", new BooleanCallback() {
+                                    + tag.getName() + "\"?", new BooleanCallback() {
                                 @Override
                                 public void execute(Boolean value) {
                                     if (value) {
-                                        remove(name);
+                                        remove(tag);
                                     }
                                 }
                             });
@@ -128,7 +116,9 @@ public class TagLayout extends VLayout {
         grid.setShowRowNumbers(true);
         grid.setEmptyMessage("<br>No data available.");
         grid.setFields(
-                new ListGridField("name", "Name"));
+                new ListGridField("name", "Name"),
+                new ListGridField("visible", "Visible").setType(ListGridFieldType.BOOLEAN),
+                new ListGridField("boutiques", "Boutiques").setType(ListGridFieldType.BOOLEAN));
         grid.setSortField("name");
         grid.setSortDirection(SortDirection.ASCENDING);
         grid.addCellDoubleClickHandler(new CellDoubleClickHandler() {
@@ -154,7 +144,7 @@ public class TagLayout extends VLayout {
                 List<TagRecord> dataList = new ArrayList<>();
 
                 for (Tag tag : result) {
-                    dataList.add(new TagRecord(tag.getName()));
+                    dataList.add(new TagRecord(tag));
                 }
                 grid.setData(dataList.toArray(new TagRecord[]{}));
             }
@@ -163,8 +153,7 @@ public class TagLayout extends VLayout {
         ApplicationService.Util.getInstance().getTags(callback);
     }
 
-    private void remove(String name) {
-        final Tag tagToDelete = new Tag(name);
+    private void remove(Tag tag) {
         final AsyncCallback<Void> callback = new AsyncCallback<>() {
             @Override
             public void onFailure(Throwable caught) {
@@ -179,14 +168,24 @@ public class TagLayout extends VLayout {
                 loadData();
             }
         };
-        modal.show("Removing tag '" + name + "'...", true);
-        ApplicationService.Util.getInstance().removeTag(tagToDelete, callback);
+        modal.show("Removing tag '" + tag.getName() + "'...", true);
+        ApplicationService.Util.getInstance().removeTag(tag, callback);
     }
 
     private void edit(ListGridRecord record) {
         ManageTagsTab tagsTab = (ManageTagsTab) Layout.getInstance().
-                getTab(ApplicationConstants.TAB_MANAGE_TAG);
+            getTab(ApplicationConstants.TAB_MANAGE_TAG);
 
-        tagsTab.setTag(record.getAttribute("name"));
+        tagsTab.setTag(tagFromRecord(record));
+    }
+
+    private Tag tagFromRecord(ListGridRecord record) {
+        return new Tag(
+            record.getAttributeAsString("name"),
+            record.getAttributeAsString("application"),
+            record.getAttributeAsString("version"),
+            record.getAttributeAsBoolean("visible"),
+            record.getAttributeAsBoolean("boutiques")
+        );
     }
 }

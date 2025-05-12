@@ -51,11 +51,8 @@ import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
-/**
- *
- * @author Rafael Ferreira da Silva
- */
 public class ApplicationServiceImpl extends AbstractRemoteServiceServlet implements ApplicationService {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
@@ -427,9 +424,9 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
     }
 
     @Override
-    public void updateTag(Tag tag, String newName) throws ApplicationException {
+    public void updateTag(Tag oldTag, Tag newTag) throws ApplicationException {
         try {
-            tagBusiness.update(tag, newName);
+            tagBusiness.update(oldTag, newTag);
         } catch (BusinessException e) {
             throw new ApplicationException(e);
         }
@@ -442,6 +439,22 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
         } catch (BusinessException e) {
             throw new ApplicationException(e);
         }
+    }
+
+    public List<Tag> getNonBoutiquesTags() throws ApplicationException {
+        try {
+            return tagBusiness.getAll().stream()
+                .filter(tag -> ! tag.isBoutiques())
+                .collect(Collectors.toMap(
+                    Tag::getName,
+                    tag -> tag,
+                    (existing, replacement) -> existing,
+                    LinkedHashMap::new
+                )).values().stream()
+                .collect(Collectors.toList());
+        } catch (BusinessException e) {
+            throw new ApplicationException(e);
+        }  
     }
 
     @Override

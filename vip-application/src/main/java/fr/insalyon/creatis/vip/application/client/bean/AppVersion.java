@@ -39,10 +39,6 @@ import java.util.stream.Collectors;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
 
-/**
- *
- * @author Rafael Ferreira da Silva
- */
 public class AppVersion implements IsSerializable {
 
     private String applicationName;
@@ -52,8 +48,8 @@ public class AppVersion implements IsSerializable {
     private String doi;
     private boolean visible;
     private boolean boutiquesForm;
-    private List<String> resources;
-    private List<String> tags;
+    private List<Resource> resources;
+    private List<Tag> tags;
     private Map<String, String> settings;
 
     public AppVersion() {}
@@ -83,7 +79,7 @@ public class AppVersion implements IsSerializable {
     }
 
     public AppVersion(String applicationName, String version, String lfn, String jsonLfn, String doi,
-            boolean visible, boolean boutiquesForm, List<String> resources, List<String> tags) {
+            boolean visible, boolean boutiquesForm, List<Resource> resources, List<Tag> tags) {
         this(applicationName, version, lfn, jsonLfn, new HashMap<>(), visible, boutiquesForm);
         this.doi = doi;
         this.resources = resources;
@@ -133,19 +129,27 @@ public class AppVersion implements IsSerializable {
         return boutiquesForm;
     }
 
-    public List<String> getResources() {
+    public List<Resource> getResources() {
         return resources;
     }
 
-    public List<String> getTags() {
+    public List<String> getResourcesNames() {
+        return resources.stream().map(Resource::getName).collect(Collectors.toList());
+    }
+
+    public List<Tag> getTags() {
         return tags;
     }
 
-    public void setResources(List<String> resources) {
+    public List<String> getTagsNames() {
+        return tags.stream().map(Tag::getName).collect(Collectors.toList());
+    }
+
+    public void setResources(List<Resource> resources) {
         this.resources = resources;
     }
 
-    public void setTags(List<String> tags) {
+    public void setTags(List<Tag> tags) {
         this.tags = tags;
     }
 }

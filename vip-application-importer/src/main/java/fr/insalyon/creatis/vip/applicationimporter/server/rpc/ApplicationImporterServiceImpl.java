@@ -31,6 +31,7 @@
  */
 package fr.insalyon.creatis.vip.applicationimporter.server.rpc;
 
+import fr.insalyon.creatis.vip.application.client.bean.Tag;
 import fr.insalyon.creatis.vip.application.client.bean.boutiquesTools.BoutiquesApplication;
 import fr.insalyon.creatis.vip.application.server.model.boutiques.BoutiquesDescriptor;
 import fr.insalyon.creatis.vip.applicationimporter.client.ApplicationImporterException;
@@ -75,9 +76,8 @@ public class ApplicationImporterServiceImpl extends fr.insalyon.creatis.vip.core
     }
 
     @Override
-    public void createApplication(
-            BoutiquesApplication bt, String tag, boolean overwriteVersion, String fileAccessProtocol,
-            List<String> tags, List<String> resources)
+    public void createApplication(BoutiquesApplication bt, String tag, boolean overwriteVersion, String fileAccessProtocol,
+            List<Tag> tags, List<String> resources)
             throws ApplicationImporterException {
         try {
             trace(logger, "Creating application");

@@ -3,6 +3,7 @@ package fr.insalyon.creatis.vip.application.client.view.system.tags;
 import com.smartgwt.client.widgets.layout.HLayout;
 
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
+import fr.insalyon.creatis.vip.application.client.bean.Tag;
 import fr.insalyon.creatis.vip.core.client.view.common.AbstractManageTab;
 
 public class ManageTagsTab extends AbstractManageTab {
@@ -28,7 +29,7 @@ public class ManageTagsTab extends AbstractManageTab {
         tagLayout.loadData();
     }
 
-    public void setTag(String name) {
-        editLayout.setTag(name);
+    public void setTag(Tag tag) {
+        editLayout.setTag(tag);
     }
 }

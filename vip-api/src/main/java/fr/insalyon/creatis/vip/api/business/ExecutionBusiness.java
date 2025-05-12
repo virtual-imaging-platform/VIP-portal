@@ -38,7 +38,6 @@ import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
 import fr.insalyon.creatis.vip.application.client.bean.InOutData;
 import fr.insalyon.creatis.vip.application.client.bean.Simulation;
 import fr.insalyon.creatis.vip.application.client.view.monitor.SimulationStatus;
-import fr.insalyon.creatis.vip.application.server.business.ApplicationBusiness;
 import fr.insalyon.creatis.vip.application.server.business.SimulationBusiness;
 import fr.insalyon.creatis.vip.application.server.business.WorkflowBusiness;
 import fr.insalyon.creatis.vip.core.client.bean.Group;
@@ -79,21 +78,18 @@ public class ExecutionBusiness {
     private final WorkflowBusiness workflowBusiness;
     private final PipelineBusiness pipelineBusiness;
     private final ConfigurationBusiness configurationBusiness;
-    private final ApplicationBusiness applicationBusiness;
 
     @Autowired
     public ExecutionBusiness(Supplier<User> currentUserProvider,
                              SimulationBusiness simulationBusiness,
                              WorkflowBusiness workflowBusiness,
                              ConfigurationBusiness configurationBusiness,
-                             ApplicationBusiness applicationBusiness,
                              PipelineBusiness pipelineBusiness,
                              DataApiBusiness dataApiBusiness) {
         this.currentUserProvider = currentUserProvider;
         this.simulationBusiness = simulationBusiness;
         this.workflowBusiness = workflowBusiness;
         this.configurationBusiness = configurationBusiness;
-        this.applicationBusiness = applicationBusiness;
         this.pipelineBusiness = pipelineBusiness;
         this.dataApiBusiness = dataApiBusiness;
     }

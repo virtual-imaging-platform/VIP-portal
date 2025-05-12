@@ -31,6 +31,7 @@
  */
 package fr.insalyon.creatis.vip.applicationimporter.client.rpc;
 
+import fr.insalyon.creatis.vip.application.client.bean.Tag;
 import fr.insalyon.creatis.vip.application.client.bean.boutiquesTools.BoutiquesApplication;
 import fr.insalyon.creatis.vip.applicationimporter.client.ApplicationImporterException;
 import com.google.gwt.core.client.GWT;
@@ -56,7 +57,7 @@ public interface ApplicationImporterService extends RemoteService {
 
     String readAndValidateBoutiquesFile(String fileLFN) throws ApplicationImporterException;
 
-    void createApplication(BoutiquesApplication bt, String tag, boolean overwriteVersion, String fileAccessProtocol, List<String> tags, List<String> resources) throws ApplicationImporterException;
+    void createApplication(BoutiquesApplication bt, String tag, boolean overwriteVersion, String fileAccessProtocol, List<Tag> tags, List<String> resources) throws ApplicationImporterException;
 
     String getApplicationImporterRootFolder() throws ApplicationImporterException;
     
