@@ -225,6 +225,7 @@ public class VersionsLayout extends VLayout {
         loadData();
     }
 
+    @SuppressWarnings("unchecked")
     private void edit(ListGridRecord record) {
         ManageApplicationsTab appsTab = (ManageApplicationsTab) Layout.getInstance().
             getTab(ApplicationConstants.TAB_MANAGE_APPLICATION);

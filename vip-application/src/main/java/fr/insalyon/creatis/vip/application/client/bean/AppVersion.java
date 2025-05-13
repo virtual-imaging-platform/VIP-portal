@@ -56,12 +56,8 @@ public class AppVersion implements IsSerializable {
 
     public AppVersion() {}
 
-    public AppVersion(String applicationName, String version, String descriptor, boolean visible) {
-        this(applicationName, version, descriptor, new HashMap<>(), visible);
-    }
-
-    public AppVersion(
-            String applicationName, String version, String descriptor, Map<String,String> settings, boolean visible) {
+    public AppVersion(String applicationName, String version, String descriptor,
+                      Map<String,String> settings, boolean visible) {
         this.applicationName = applicationName;
         this.version = version;
         this.descriptor = descriptor;
@@ -71,22 +67,22 @@ public class AppVersion implements IsSerializable {
         this.settings = settings;
     }
 
-    public AppVersion(String applicationName, String version, String descriptor, String doi, Map<String,String> settings, boolean visible) {
+    public AppVersion(String applicationName, String version, String descriptor, boolean visible) {
+        this(applicationName, version, descriptor, new HashMap<>(), visible);
+    }
+
+    public AppVersion(String applicationName, String version, String descriptor,
+                      String doi, Map<String,String> settings, boolean visible) {
         this(applicationName, version, descriptor, settings, visible);
         this.doi = doi;
     }
 
-    public AppVersion(String applicationName, String version, String descriptor, String doi,
-            boolean visible, List<String> resources, List<String> tags) {
-        this(applicationName, version, descriptor, new HashMap<>(), visible);
+    public AppVersion(String applicationName, String version, String descriptor,
+                      String doi, boolean visible, List<String> resources, List<String> tags) {
+        this(applicationName, version, descriptor, visible);
         this.doi = doi;
         this.resources = resources;
         this.tags = tags;
-    }
-
-    public AppVersion(String applicationName, String version) {
-        this.applicationName = applicationName; // XXX should merge with helpers above (or remove usage)
-        this.version = version;
     }
 
     public String getApplicationName() {

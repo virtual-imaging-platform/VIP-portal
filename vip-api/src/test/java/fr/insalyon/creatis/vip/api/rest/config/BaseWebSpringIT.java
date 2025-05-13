@@ -38,6 +38,7 @@ import fr.insalyon.creatis.vip.api.rest.mockconfig.DataConfigurator;
 import fr.insalyon.creatis.vip.application.client.bean.AppVersion;
 import fr.insalyon.creatis.vip.application.integrationtest.BaseApplicationSpringIT;
 import fr.insalyon.creatis.vip.application.server.business.*;
+import fr.insalyon.creatis.vip.application.server.business.util.FileUtil;
 import fr.insalyon.creatis.vip.core.integrationtest.ServerMockConfig;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
@@ -187,7 +188,7 @@ abstract public class BaseWebSpringIT extends BaseApplicationSpringIT {
 
     protected AppVersion configureTestApp(String appName, String groupName, String versionName, boolean gwendia) throws BusinessException, GRIDAClientException, IOException {
         AppVersion appVersion = configureAnApplication(appName, versionName, groupName);
-        configureVersion(appVersion, gwendia ? null : "/vip/testGroup (group)/path/to/desc-boutiques.json"); // XXX
+        configureVersion(appVersion, gwendia ? null : FileUtil.read(getBoutiquesTestFile()));
 
         Mockito.when(server.getDataManagerPath()).thenReturn("/test/folder");
 

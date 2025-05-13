@@ -115,7 +115,7 @@ public class ApplicationTileGrid extends ApplicationsTileGrid {
                 display(appName, appVersion, result);
             }
         };
-        ApplicationService.Util.getInstance().getTags(new AppVersion(appName, appVersion), callback);
+        ApplicationService.Util.getInstance().getTags(appName, appVersion, callback);
     }
 
 

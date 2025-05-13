@@ -45,6 +45,7 @@ import fr.insalyon.creatis.vip.application.client.bean.Engine;
 import fr.insalyon.creatis.vip.application.client.bean.Resource;
 import fr.insalyon.creatis.vip.application.client.bean.ResourceType;
 import fr.insalyon.creatis.vip.application.client.view.monitor.SimulationStatus;
+import fr.insalyon.creatis.vip.application.server.business.AppVersionBusiness;
 import fr.insalyon.creatis.vip.application.server.business.ResourceBusiness;
 import fr.insalyon.creatis.vip.application.server.business.simulation.ParameterSweep;
 import fr.insalyon.creatis.vip.application.server.business.util.FileUtil;
@@ -85,6 +86,7 @@ public class ExecutionControllerIT extends BaseWebSpringIT {
     private Workflow w2;
 
     @Autowired ResourceBusiness resourceBusiness;
+    @Autowired AppVersionBusiness appVersionBusiness;
 
     @BeforeEach
     public void setUp() throws Exception {
@@ -520,7 +522,6 @@ public class ExecutionControllerIT extends BaseWebSpringIT {
 
         engineBusiness.add(engine);
         resourceBusiness.add(resource);
-
-        resourceBusiness.associate(resource, new AppVersion(appName, version));
+        resourceBusiness.associate(resource, appVersionBusiness.getVersion(appName, version));
     }
 }

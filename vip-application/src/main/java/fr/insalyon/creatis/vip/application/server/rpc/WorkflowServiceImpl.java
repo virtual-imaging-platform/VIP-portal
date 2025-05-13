@@ -156,18 +156,6 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
     }
 
     @Override
-    public Descriptor getApplicationDescriptor(String applicationName, String applicationVersion) throws ApplicationException {
-        try {
-            return workflowBusiness.getApplicationDescriptor(
-                    getSessionUser(),
-                    applicationName,
-                    applicationVersion);
-        } catch (BusinessException | CoreException ex) {
-            throw new ApplicationException(ex);
-        }
-    }
-
-    @Override
     public String getApplicationDescriptorString(String applicationName, String applicationVersion) throws ApplicationException {
         try {
             return boutiquesBusiness.getApplicationDescriptorString(getSessionUser(), applicationName,
@@ -267,21 +255,6 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
             inputBusiness.updateSimulationInput(
                 getSessionUser().getEmail(), simulationInput);
         } catch (BusinessException | CoreException ex) {
-            throw new ApplicationException(ex);
-        }
-    }
-
-    /**
-     *
-     * @param fileName
-     * @return
-     */
-    public String loadSimulationInput(String fileName) throws ApplicationException {
-
-        try {
-            return inputBusiness.loadSimulationInput(fileName);
-
-        } catch (BusinessException ex) {
             throw new ApplicationException(ex);
         }
     }

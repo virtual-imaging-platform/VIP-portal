@@ -93,15 +93,6 @@ public class VipLocalConfigurationIT {
         Assertions.assertEquals(1, applicationBusiness.getApplications().size());
     }
 
-    @Test
-    @Order(7)
-    public void getAppVersionDescriptor() throws BusinessException {
-        Descriptor appDescriptor = workflowBusiness.getApplicationDescriptor(
-                configurationBusiness.getUser(server.getAdminEmail()),
-                applicationName, applicationVersion);
-        Assertions.assertEquals(3, appDescriptor.getSources().size());
-    }
-
     // execution tests
 
     @Test

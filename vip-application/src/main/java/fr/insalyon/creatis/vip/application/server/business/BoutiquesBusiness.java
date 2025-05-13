@@ -45,6 +45,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -74,14 +78,23 @@ public class BoutiquesBusiness {
 
     public String publishVersion(User user, String applicationName, String version)
             throws BusinessException {
+        // get descriptor content
+        AppVersion appVersion = appVersionBusiness.getVersion(applicationName, version);
+        String descriptor = appVersion.getDescriptor();
 
-        // fetch json file
-        String localFile = "XXX"; // XXX TODO generate descriptor in some tmp dir for bosh publish
-
+        // create a temporary json file
+        Path tempFile;
+        try {
+            tempFile = Files.createTempFile("VipPublish", ".json");
+            Files.write(tempFile, descriptor.getBytes(StandardCharsets.UTF_8));
+        } catch (IOException e) {
+            logger.error("Error publishing descriptor", e);
+            throw new BusinessException("Error publishing descriptor", e);
+        }
         // TODO : verify it has an author (refactor boutique parser from application-importer
 
         // call publish command
-        String command = "FILE=" + localFile + "; " + server.getPublicationCommandLine();
+        String command = "FILE=" + tempFile + "; " + server.getPublicationCommandLine();
         List<String> output = runCommandAndFailOnError(command);
 
         // get the doi
@@ -90,6 +103,13 @@ public class BoutiquesBusiness {
 
         // save the doi in database
         saveDoiForVersion(doi, applicationName, version);
+
+        // cleanup
+        try {
+            Files.delete(tempFile);
+        } catch (IOException e) {
+            logger.warn("Failed to delete descriptor temp file after publish", e);
+        }
 
         return doi;
     }

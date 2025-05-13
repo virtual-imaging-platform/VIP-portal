@@ -62,7 +62,7 @@ public class ExecutionBusinessTest {
     public void checkIfAdminCanAccessAnyExecution() throws Exception {
         Supplier<User> userSupplier = () -> prepareTestUser(0, true);
         WorkflowBusiness mockedWb = prepareMockedWorkflowBusiness(EXEC_ID, new Simulation());
-        ExecutionBusiness sut = new ExecutionBusiness(userSupplier, null, mockedWb, null, null, null, null);
+        ExecutionBusiness sut = new ExecutionBusiness(userSupplier, null, mockedWb, null, null, null);
         sut.checkIfUserCanAccessExecution(EXEC_ID);
     }
 
@@ -71,7 +71,7 @@ public class ExecutionBusinessTest {
         Supplier<User> userSupplier = () -> prepareTestUser(0, false);
         Simulation simulation = prepareRunningSimulation(EXEC_ID, 1); // choose a different user
         WorkflowBusiness mockedWb = prepareMockedWorkflowBusiness(EXEC_ID, simulation);
-        ExecutionBusiness sut = new ExecutionBusiness(userSupplier, null, mockedWb, null, null, null, null);
+        ExecutionBusiness sut = new ExecutionBusiness(userSupplier, null, mockedWb, null, null, null);
         ApiException apiException = assertThrows(ApiException.class,
             () -> sut.checkIfUserCanAccessExecution(EXEC_ID)
         );
@@ -83,7 +83,7 @@ public class ExecutionBusinessTest {
         Supplier<User> userSupplier = () -> prepareTestUser(0, false);
         Simulation simulation = prepareRunningSimulation(EXEC_ID, 0); // the creator of the execution is the same user
         WorkflowBusiness mockedWb = prepareMockedWorkflowBusiness(EXEC_ID, simulation);
-        ExecutionBusiness sut = new ExecutionBusiness(userSupplier, null, mockedWb, null, null, null, null);
+        ExecutionBusiness sut = new ExecutionBusiness(userSupplier, null, mockedWb, null, null, null);
         sut.checkIfUserCanAccessExecution(EXEC_ID);
     }
 
@@ -92,7 +92,7 @@ public class ExecutionBusinessTest {
         Supplier<User> userSupplier = () -> prepareTestUser(0, false);
         Simulation simulation = prepareSimulation(EXEC_ID, SimulationStatus.Cleaned, 0); // the creator of the execution is the same user
         WorkflowBusiness mockedWb = prepareMockedWorkflowBusiness(EXEC_ID, simulation);
-        ExecutionBusiness sut = new ExecutionBusiness(userSupplier, null, mockedWb, null, null, null, null);
+        ExecutionBusiness sut = new ExecutionBusiness(userSupplier, null, mockedWb, null, null, null);
         ApiException ex = Assertions.assertThrows(ApiException.class, () -> sut.getExecution(EXEC_ID, false));
         Assertions.assertTrue(ex.getVipErrorCode().isPresent());
         Assertions.assertEquals(ApiException.ApiError.INVALID_EXECUTION_ID.getCode(), ex.getVipErrorCode().get());

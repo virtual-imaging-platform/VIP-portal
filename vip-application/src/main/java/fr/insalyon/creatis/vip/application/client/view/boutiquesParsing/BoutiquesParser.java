@@ -37,7 +37,8 @@ public class BoutiquesParser extends AbstractJsonParser{
         String name = getStringValue(parsedDescriptor, "name");
         String description = getStringValue(parsedDescriptor, "description");
         String version = getStringValue(parsedDescriptor, "tool-version");
-        // XXX alternatively, parsedDescriptor.toString() contains the parsed descriptor
+        // we use the "descriptor" String to preserve the original descriptor JSON content
+        // alternatively, parsedDescriptor.toString() contains the parsed descriptor
         BoutiquesApplication application = new BoutiquesApplication(name, description, version, descriptor);
         // Inputs
         JSONArray inputsArray = getArrayValue(parsedDescriptor, "inputs", false);

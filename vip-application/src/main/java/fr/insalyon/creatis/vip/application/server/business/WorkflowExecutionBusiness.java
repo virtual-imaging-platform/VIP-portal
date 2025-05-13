@@ -76,7 +76,7 @@ public class WorkflowExecutionBusiness {
             List<ParameterSweep> parameters, String settings, String executorConfig) throws BusinessException {
 
         try {
-            String workflowContent = appVersion.getDescriptor(); // XXX
+            String workflowContent = appVersion.getDescriptor();
             String inputs = (parameters != null) ? getParametersAsXMLInput(parameters) : null;
             String proxyFileName = server.getServerProxy(server.getVoName());
             String workflowID = engine.launch(engineEndpoint, workflowContent, inputs, appVersion.getSettingsAsString(), executorConfig, proxyFileName);

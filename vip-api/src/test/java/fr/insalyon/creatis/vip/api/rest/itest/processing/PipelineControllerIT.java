@@ -35,6 +35,7 @@ import fr.insalyon.creatis.grida.client.GRIDAClientException;
 import fr.insalyon.creatis.vip.api.exception.ApiException.ApiError;
 import fr.insalyon.creatis.vip.api.rest.config.BaseWebSpringIT;
 import fr.insalyon.creatis.vip.application.client.bean.AppVersion;
+import fr.insalyon.creatis.vip.application.server.business.util.FileUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -85,7 +86,7 @@ public class PipelineControllerIT extends BaseWebSpringIT {
         String appName = "testApp", groupName = "testGroup";
         String versionName = "42-test";
         AppVersion appVersion = configureAnApplication(appName, versionName, groupName);
-        configureVersion(appVersion, null); // XXX
+        configureVersion(appVersion, FileUtil.read(getBoutiquesTestFile()));
 
         createUserInGroup(baseUser1.getEmail(), groupName);
 

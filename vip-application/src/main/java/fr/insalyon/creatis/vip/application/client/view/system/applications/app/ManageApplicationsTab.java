@@ -105,7 +105,7 @@ public class ManageApplicationsTab extends AbstractManageTab {
     public void setVersion(String version, String descriptor, String doi, Map<String, String> settings,
             boolean isVisible, String[] tags, String[] resources) {
         editVersionLayout.setVersion(version, descriptor, isVisible, settings, tags, resources);
-        manageVersionLayout.setVersion(version, doi);
+        manageVersionLayout.setVersion(version, descriptor, doi);
     }
 
     private void titleInfoApp(){
