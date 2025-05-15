@@ -79,41 +79,6 @@ public class VIPLayout extends AbstractFormLayout {
         return this.overwriteIfexists.getValueAsBoolean();
     }
 
-    private SelectItem createTagsSelect() {
-        // ComboBox to select tags.
-        SelectItem tagsCb = new SelectItem();
-        tagsCb.setTitle("<b>Dirac tag</b>");
-        tagsCb.setType("comboBox");
-
-        final AsyncCallback<List<String>> callback = new AsyncCallback<>() {
-            @Override
-            public void onFailure(Throwable caught) {
-                Layout.getInstance().setWarningMessage("Unable to retrieve configurated list of requirements, setting it to None:<br />" + caught.getMessage());
-                tagsCb.setValueMap("None");
-            }
-
-            @Override
-            public void onSuccess(List<String> result) {
-                result = new ArrayList<>(result); // make a new list because the returned one does not support the add method
-                if(!result.contains("None")){
-                    result.add("None");
-                }
-                
-                Map<String, String> requirementsValues = new LinkedHashMap<>();
-                for (String requirement : result) {
-                    requirementsValues.put(requirement, requirement);
-                }               
-                tagsCb.setValueMap(requirementsValues);
-                
-            }
-        };
-        ApplicationImporterService.Util.getInstance().getApplicationImporterRequirements(callback);
-        
-        tagsCb.setValue("None");
-
-        return tagsCb;
-    }
-
     public List<String> getSelectedResources() {
         return Arrays.asList(resourcesList.getValues());
     }

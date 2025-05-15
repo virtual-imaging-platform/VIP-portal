@@ -88,16 +88,6 @@ public class ApplicationImporterServiceImpl extends fr.insalyon.creatis.vip.core
     }
 
     @Override
-    public String getApplicationImporterRootFolder() throws ApplicationImporterException {
-        return server.getApplicationImporterRootFolder();
-    }
-
-    @Override
-    public List<String> getApplicationImporterRequirements() throws ApplicationImporterException {
-        return server.getApplicationImporterRequirements();
-    }
-
-    @Override
     @SuppressWarnings("unchecked")
     public Map<String, String> getBoutiquesTags(String boutiquesJsonFile) throws ApplicationImporterException {
         try {

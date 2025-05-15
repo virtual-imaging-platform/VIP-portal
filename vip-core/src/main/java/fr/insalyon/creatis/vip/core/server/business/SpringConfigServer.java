@@ -143,9 +143,6 @@ public class SpringConfigServer implements Server {
         assertPropertyIsPresent(CoreConstants.APPLET_GATELAB_CLASSES, List.class);
         assertPropertyIsPresent(CoreConstants.APPLET_GATELABTEST_CLASSES, List.class);
 
-        assertPropertyIsNotEmpty(CoreConstants.APPLICATION_FILES_REPOSITORY);
-        assertPropertyIsNotEmpty(CoreConstants.APP_IMPORTER_ROOT_FOLDER);
-        assertPropertyIsPresent(CoreConstants.APP_REQUIREMENTS, List.class);
         assertPropertyIsNotEmpty(CoreConstants.PUBLICATION_SYSTEM_COMMAND);
 
         assertPropertyIsNotEmpty(CoreConstants.GIRDER_TOKEN_DURATION_IN_DAYS, Float.class);
@@ -375,21 +372,6 @@ public class SpringConfigServer implements Server {
     public String getSAMLDefaultGroup(String issuer) {
         logger.info("Getting default group for issuer "+issuer);
         return env.getRequiredProperty(CoreConstants.SAML_DEFAULT_GROUP +"."+issuer);
-    }
-
-    @Override
-    public String getApplicationImporterFileRepository() {
-        return env.getRequiredProperty(CoreConstants.APPLICATION_FILES_REPOSITORY);
-    }
-
-    @Override
-    public String getApplicationImporterRootFolder() {
-        return env.getRequiredProperty(CoreConstants.APP_IMPORTER_ROOT_FOLDER);
-    }
-
-    @Override
-    public List<String> getApplicationImporterRequirements() {
-        return Arrays.asList(env.getRequiredProperty(CoreConstants.APP_REQUIREMENTS, String[].class));
     }
 
     @Override
