@@ -34,7 +34,6 @@ package fr.insalyon.creatis.vip.applicationimporter.client.rpc;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 import fr.insalyon.creatis.vip.application.client.bean.boutiquesTools.BoutiquesApplication;
-import fr.insalyon.creatis.vip.applicationimporter.client.ApplicationImporterException;
 
 import java.util.List;
 import java.util.Map;
