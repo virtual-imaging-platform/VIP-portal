@@ -254,6 +254,7 @@ knowledge of the CeCILL-B license and that you accept its terms.
                     <compilerArgs>
                         <arg>-parameters</arg>
                         <arg>-Xlint:unchecked</arg>
+                        <arg>-Werror</arg>
                     </compilerArgs>
                 </configuration>
             </plugin>
