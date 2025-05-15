@@ -76,39 +76,53 @@ public class BoutiquesBusiness {
 
     public String publishVersion(User user, String applicationName, String version)
             throws BusinessException {
-        // get descriptor content
         AppVersion appVersion = appVersionBusiness.getVersion(applicationName, version);
-        String descriptor = appVersion.getDescriptor();
 
-        // create a temporary json file
-        Path tempFile;
-        try {
-            tempFile = Files.createTempFile("VipPublish", ".json");
-            Files.write(tempFile, descriptor.getBytes(StandardCharsets.UTF_8));
-        } catch (IOException e) {
-            logger.error("Error publishing descriptor", e);
-            throw new BusinessException("Error publishing descriptor", e);
-        }
-        // TODO : verify it has an author (refactor boutique parser from application-importer
-
-        // call publish command
-        String command = "FILE=" + tempFile + "; " + server.getPublicationCommandLine();
-        List<String> output = runCommandAndFailOnError(command);
-
-        // get the doi
-        // There should be only one line with the DOI
-        String doi = getDoiFromPublishOutput(output);
-
-        // save the doi in database
-        saveDoiForVersion(doi, applicationName, version);
-
-        // cleanup
-        try {
-            Files.delete(tempFile);
-        } catch (IOException e) {
-            logger.warn("Failed to delete descriptor temp file after publish", e);
+        // verify that the descriptor has an author
+        BoutiquesDescriptor descriptor = parseBoutiquesString(appVersion.getDescriptor());
+        String author = descriptor.getAuthor();
+        if (author == null || author.isEmpty()) {
+            logger.error("Can't publish an descriptor with no author");
+            throw new BusinessException("Can't publish an descriptor with no author");
         }
 
+        // The basename of the file used in bosh publish will be visible on zenodo,
+        // so we want a "clean" name, and a unique location on the filesystem to avoid race conditions.
+        Path tempDir, tempFile;
+        try {
+            // create a dedicated unique temporary directory
+            tempDir = Files.createTempDirectory("VipPublish-");
+            // create the descriptor filename inside this dir
+            tempFile = tempDir.resolve(appVersion.getDescriptorFilename());
+            // write the descriptor content to that file
+            Files.write(tempFile, appVersion.getDescriptor().getBytes(StandardCharsets.UTF_8));
+        } catch (IOException e) {
+            logger.error("Failed creating temporary file for publish", e);
+            throw new BusinessException("Failed creating temporary file for publish", e);
+        }
+
+        // do the publishing, and cleanup tempFile+tempDir afterward
+        String doi;
+        try {
+            // call publish command
+            String command = "FILE=" + tempFile + "; " + server.getPublicationCommandLine();
+            List<String> output = runCommandAndFailOnError(command);
+
+            // get the doi
+            // There should be only one line with the DOI
+            doi = getDoiFromPublishOutput(output);
+
+            // save the doi in database
+            saveDoiForVersion(doi, applicationName, version);
+        } finally {
+            // failure to clean up temp files is not fatal
+            try {
+                Files.delete(tempFile);
+                Files.delete(tempDir);
+            } catch (IOException e) {
+                logger.warn("Failed deleting temporary file after publish:" + tempFile, e);
+            }
+        }
         return doi;
     }
 

@@ -93,6 +93,13 @@ public class AppVersion implements IsSerializable {
         return version;
     }
 
+    public String getDescriptorFilename() {
+        // Return the "canonical filename" of the boutiques descriptor for this AppVersion.
+        // Both applicationName and version strings are assumed to be filename-safe already,
+        // except for spaces which are replaced with underscores.
+        return applicationName.replace(' ', '_') + '-' + version.replace(' ','_') + ".json";
+    }
+
     public String getDescriptor() { return descriptor; }
 
     public String getDoi() {
