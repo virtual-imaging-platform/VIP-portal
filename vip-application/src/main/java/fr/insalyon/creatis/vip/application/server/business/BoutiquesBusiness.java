@@ -128,10 +128,8 @@ public class BoutiquesBusiness {
         }
     }
 
-    public String getApplicationDescriptorString(
-            User user, String applicationName, String applicationVersion)
+    public String getApplicationDescriptorString(String applicationName, String applicationVersion)
             throws BusinessException {
-        // XXX check user?
         AppVersion appVersion = appVersionBusiness.getVersion(applicationName, applicationVersion);
         return appVersion.getDescriptor();
     }

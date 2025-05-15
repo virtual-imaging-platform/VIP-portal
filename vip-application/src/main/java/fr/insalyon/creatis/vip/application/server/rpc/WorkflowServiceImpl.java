@@ -158,9 +158,8 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
     @Override
     public String getApplicationDescriptorString(String applicationName, String applicationVersion) throws ApplicationException {
         try {
-            return boutiquesBusiness.getApplicationDescriptorString(getSessionUser(), applicationName,
-                                                                    applicationVersion);
-        } catch (BusinessException | CoreException ex) {
+            return boutiquesBusiness.getApplicationDescriptorString(applicationName, applicationVersion);
+        } catch (BusinessException ex) {
             throw new ApplicationException(ex);
         }
     }
@@ -174,11 +173,10 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
 
         try {
             for (var pair : applications) {
-                result.add(boutiquesBusiness.getApplicationDescriptorString(
-                    getSessionUser(), pair.getFirst(), pair.getSecond()));
+                result.add(boutiquesBusiness.getApplicationDescriptorString(pair.getFirst(), pair.getSecond()));
             }
             return result;
-        } catch (BusinessException | CoreException ex) {
+        } catch (BusinessException ex) {
             throw new ApplicationException(ex);
         }
     }
