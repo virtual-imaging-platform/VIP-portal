@@ -58,9 +58,4 @@ public class SpringApplicationConfig {
         return workflowsDBDAOFactory().getStatsDAO();
     }
 
-    @Bean
-    public WorkflowEngineInstantiator getWorkflowEngineInstantiator(Server server) {
-        return new RestServiceEngine(server);
-    }
-
 }

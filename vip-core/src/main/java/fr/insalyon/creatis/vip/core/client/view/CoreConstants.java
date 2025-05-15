@@ -193,10 +193,7 @@ public class CoreConstants implements IsSerializable {
     public static final String API_PARALLEL_DOWNLOAD_NB = "api.downloads.nb";
     // ReproVIPfiles";
     public static final String REPROVIP_ROOT_DIR = "reprovip.root-dir";
-    // Moteurlite
-    public static final String USE_MOTEURLITE = "moteurlite.enabled";
     // MoteurServerRest
-    public static final String USE_REST_MOTEUR_SERVER = "moteur.rest.enabled";
     public static final String MOTEUR_REST_PASSWORD = "moteur.rest.password";
     public static final String HOST_URL = "host.url";
 

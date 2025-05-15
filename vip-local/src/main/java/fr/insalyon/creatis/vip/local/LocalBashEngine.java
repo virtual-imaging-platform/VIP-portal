@@ -78,6 +78,17 @@ public class LocalBashEngine {
     }
 
     public String launch(String workflowContent, List<ParameterSweep> parameters)  {
+        if (true) {
+            // vip-local executions are based on a gwendia-like file, localGrepTest.gwendia,
+            // which is parsed by various getGwendia*() functions in the present class.
+            // Since gwendia was removed from the rest of VIP-portal, this is no longer representative
+            // of actual executions, and porting vip-local to simulate executions based on boutiques
+            // descriptors is not a priority.
+            // So we just explicitly fail here, while still keeping the existing code for reference.
+            // Ultimately, vip-local should either be removed in favor of full vip+moteur environments,
+            // or ported to simulate execution based on boutiques descriptors.
+            throw new UnsupportedOperationException("vip-local executions are gwendia-based and no longer supported");
+        }
         try {
             LocalBashExecution newExecution =
                     createExecution(workflowContent, parameters);

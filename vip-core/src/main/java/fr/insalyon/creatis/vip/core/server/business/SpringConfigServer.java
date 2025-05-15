@@ -438,16 +438,6 @@ public class SpringConfigServer implements Server {
     }
 
     @Override
-    public boolean useMoteurlite() {
-        return env.getProperty(CoreConstants.USE_MOTEURLITE, Boolean.class, false);
-    }
-
-    @Override
-    public boolean useRestMoteurServer() {
-        return env.getProperty(CoreConstants.USE_REST_MOTEUR_SERVER, Boolean.class, false);
-    }
-
-    @Override
     public String getMoteurServerPassword() {
         return env.getRequiredProperty(CoreConstants.MOTEUR_REST_PASSWORD);
     }

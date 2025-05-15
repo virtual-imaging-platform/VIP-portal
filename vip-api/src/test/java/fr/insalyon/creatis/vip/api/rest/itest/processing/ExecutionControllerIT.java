@@ -384,7 +384,6 @@ public class ExecutionControllerIT extends BaseWebSpringIT {
         ArgumentCaptor<String> workflowContentCaptor = ArgumentCaptor.forClass(String.class);
         ArgumentCaptor<Workflow> workflowCaptor = ArgumentCaptor.forClass(Workflow.class);
 
-        Mockito.when(server.useMoteurlite()).thenReturn(true);
         Mockito.when(server.getVoName()).thenReturn("test-vo-name");
         Mockito.when(server.getServerProxy("test-vo-name")).thenReturn("/path/to/proxy");
         Mockito.when(getWebServiceEngine().launch(eq(engineEndpoint), workflowContentCaptor.capture(), inputsCaptor.capture(), eq(""), eq(""), eq("/path/to/proxy"))).thenReturn(workflowId, (String) null);

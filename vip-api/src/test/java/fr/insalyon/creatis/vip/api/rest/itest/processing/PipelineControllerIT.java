@@ -88,8 +88,6 @@ public class PipelineControllerIT extends BaseWebSpringIT {
         AppVersion appVersion = configureBoutiquesTestApp(appName, groupName, versionName);
         String pipelineId = appName + "/" + versionName;
 
-        Mockito.when(server.useMoteurlite()).thenReturn(true);
-
         createUserInGroup(baseUser1.getEmail(), groupName);
 
         mockMvc.perform(get("/rest/pipelines/" + pipelineId).with(baseUser1()))

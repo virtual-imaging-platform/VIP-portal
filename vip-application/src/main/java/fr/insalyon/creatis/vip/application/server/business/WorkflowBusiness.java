@@ -157,7 +157,6 @@ public class WorkflowBusiness {
 
             List<ParameterSweep> parameters = getParameters(parametersMap, user, groups);
             AppVersion appVersion = appVersionBusiness.getVersion(appName, version);
-            logger.info( "Moteurlite status: " + server.useMoteurlite());
 
             List<Resource> resources = resourceBusiness.getUsableResources(user, appVersion);
             if (resources.isEmpty()) {
