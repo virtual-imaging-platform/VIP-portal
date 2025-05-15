@@ -170,40 +170,25 @@ abstract public class BaseWebSpringIT extends BaseApplicationSpringIT {
         }
     }
 
-    protected AppVersion configureGwendiaTestApp(String appName, String groupName, String versionName) throws BusinessException, GRIDAClientException, IOException {
-        return configureTestApp(appName, groupName, versionName, true);
-    }
-
     protected AppVersion configureBoutiquesTestApp(String appName, String groupName, String versionName) throws BusinessException, GRIDAClientException, IOException {
-        return configureTestApp(appName, groupName, versionName, false);
-    }
-
-    protected File getGwendiaTestFile() throws IOException {
-        return getResourceFromClasspath("gwendia/basic-gwendia.gwendia").getFile();
+        return configureTestApp(appName, groupName, versionName);
     }
 
     protected File getBoutiquesTestFile() throws IOException {
         return getResourceFromClasspath("boutiques/test-boutiques.json").getFile();
     }
 
-    protected AppVersion configureTestApp(String appName, String groupName, String versionName, boolean gwendia) throws BusinessException, GRIDAClientException, IOException {
+    protected AppVersion configureTestApp(String appName, String groupName, String versionName) throws BusinessException, GRIDAClientException, IOException {
         AppVersion appVersion = configureAnApplication(appName, versionName, groupName);
-        configureVersion(appVersion, gwendia ? null : FileUtil.read(getBoutiquesTestFile()));
+        configureVersion(appVersion, FileUtil.read(getBoutiquesTestFile()));
 
         Mockito.when(server.getDataManagerPath()).thenReturn("/test/folder");
 
         // localDir is datamanagerpath + "downloads" + groupRoot + dir(path)
-        File gwendiaFile = getGwendiaTestFile();
         File jsonFile = getBoutiquesTestFile();
-        if (gwendia) {
-            Mockito.when(gridaClient.getRemoteFile(
-                    ServerMockConfig.TEST_GROUP_ROOT + "/testGroup/path/to/test.gwendia",
-                    "/test/folder/downloads"+ ServerMockConfig.TEST_GROUP_ROOT +"/testGroup/path/to")).thenReturn(gwendiaFile.getAbsolutePath());
-        } else {
-            Mockito.when(gridaClient.getRemoteFile(
-                    ServerMockConfig.TEST_GROUP_ROOT + "/testGroup/path/to/desc-boutiques.json",
-                    "/test/folder/downloads"+ ServerMockConfig.TEST_GROUP_ROOT +"/testGroup/path/to")).thenReturn(jsonFile.getAbsolutePath());
-        }
+        Mockito.when(gridaClient.getRemoteFile(
+                ServerMockConfig.TEST_GROUP_ROOT + "/testGroup/path/to/desc-boutiques.json",
+                "/test/folder/downloads" + ServerMockConfig.TEST_GROUP_ROOT + "/testGroup/path/to")).thenReturn(jsonFile.getAbsolutePath());
         return appVersion;
     }
 }

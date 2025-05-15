@@ -82,63 +82,6 @@ public class PipelineControllerIT extends BaseWebSpringIT {
     }
 
     @Test
-    public void shouldReturnErrorOnConfiguredVipException() throws Exception {
-        String appName = "testApp", groupName = "testGroup";
-        String versionName = "42-test";
-        AppVersion appVersion = configureAnApplication(appName, versionName, groupName);
-        configureVersion(appVersion, FileUtil.read(getBoutiquesTestFile()));
-
-        createUserInGroup(baseUser1.getEmail(), groupName);
-
-        Mockito.when(server.getDataManagerPath()).thenReturn("/test/folder");
-        Mockito.when(server.getDataManagerGroupsHome()).thenReturn("/root/group");
-        // localDir is datamanagerpath + "downloads" + groupRoot + dir(path)
-        Mockito.when(gridaClient.getRemoteFile(
-                "/root/group/testGroup/path/to/test.gwendia",
-                "/test/folder/downloads/root/group/testGroup/path/to")).thenThrow(new GRIDAClientException("test exception"));
-
-        String pipelineId = appName + "/" + versionName;
-        mockMvc.perform(get("/rest/pipelines/" + pipelineId).with(baseUser1()))
-                .andDo(print())
-                .andExpect(status().isBadRequest())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.errorCode").value(WRONG_APPLICATION_DESCRIPTOR.getCode()));
-    }
-
-    @Test
-    public void userGetAPipelineWithPathParameterNonEncoded() throws Exception {
-
-        String appName = "testGwendiaApp", groupName = "testGroup", versionName = "42-test";
-        AppVersion appVersion = configureGwendiaTestApp(appName, groupName, versionName);
-        String pipelineId = appName + "/" + versionName;
-
-        createUserInGroup(baseUser1.getEmail(), groupName);
-
-        mockMvc.perform(get("/rest/pipelines/" + pipelineId).with(baseUser1()))
-                .andDo(print())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-                // res-dir should be removed from the description
-                .andExpect(jsonPath("$", jsonCorrespondsToPipeline(
-                        getFullPipeline(appVersion, "Test tool description. Must be similar to the boutiques one", flagParam, textParam, fileParam, optionalTextParamNoValueProvided))));
-    }
-
-    @Test
-    public void userGetAPipelineWithQueryParameter() throws Exception {
-        String appName = "testGwendiaApp", groupName = "testGroup", versionName = "42-test";
-        AppVersion appVersion = configureGwendiaTestApp(appName, groupName, versionName);
-        String pipelineId = appName + "/" + versionName;
-
-        createUserInGroup(baseUser1.getEmail(), groupName);
-
-        mockMvc.perform(get("/rest/pipelines").param("pipelineId", pipelineId).with(baseUser1()))
-                .andDo(print())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-                // res-dir should be removed from the description
-                .andExpect(jsonPath("$", jsonCorrespondsToPipeline(
-                        getFullPipeline(appVersion, "Test tool description. Must be similar to the boutiques one", flagParam, textParam, fileParam, optionalTextParamNoValueProvided))));
-    }
-
-    @Test
     public void userGetAPipelineWithBoutiques() throws Exception {
 
         String appName = "testBoutiquesApp", groupName = "testGroup", versionName = "v42";
@@ -155,7 +98,7 @@ public class PipelineControllerIT extends BaseWebSpringIT {
                 // res-dir should be absent from the description
                 .andExpect(jsonPath("$.name", equalTo(appName)))
                 .andExpect(jsonPath("$", jsonCorrespondsToPipeline(
-                        getFullPipeline(appVersion, "Test app from axel. Must be similar to the gwendia test app", flagParam, textParam, fileParam, optionalTextParam))));
+                        getFullPipeline(appVersion, "Test app from axel", flagParam, textParam, fileParam, optionalTextParam))));
 
     }
 
