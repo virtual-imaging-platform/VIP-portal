@@ -137,9 +137,10 @@ public class ApplicationIT extends BaseSpringIT {
 
     @Test
     public void testUpdateVersionApplication() throws BusinessException {
-        AppVersion appVersion = new AppVersion("Application1", "version 0.0", "{}", true);
+        String descriptor = "{\"some\":\"change\"}";
+        AppVersion appVersion = new AppVersion("Application1", "version 0.0", descriptor, true);
         appVersionBusiness.update(appVersion);
-        Assertions.assertEquals("{}", appVersionBusiness.getVersions("Application1").get(0).getDescriptor(), "Incorrect lfn updated");
+        Assertions.assertEquals(descriptor, appVersionBusiness.getVersions("Application1").get(0).getDescriptor(), "Incorrect descriptor update");
     }
 
     @Test 
