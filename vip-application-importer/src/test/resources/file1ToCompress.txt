@@ -1,2 +1,0 @@
-content from file1ToCompress.txt
-end file1ToCompress.txt

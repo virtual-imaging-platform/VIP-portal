@@ -112,12 +112,10 @@ public class ApplicationDataInitializer extends JdbcDaoSupport {
         tableInitializer.createTable("VIPAppVersions",
                     "application VARCHAR(255), "
                 +   "version VARCHAR(255), "
-                +   "lfn VARCHAR(255), "
-                +   "json_lfn VARCHAR(255), "
+                +   "descriptor " + tableInitializer.getJsonType() + ", " // "JSON" for mysql, "TEXT" for h2
                 +   "doi VARCHAR(255), "
                 +   "settings TEXT, "
                 +   "visible BOOLEAN, "
-                +   "useBoutiquesForm BOOLEAN, "
                 +   "PRIMARY KEY (application, version), "
                 +   "FOREIGN KEY (application) REFERENCES VIPApplications(name) "
                 +   "ON DELETE CASCADE ON UPDATE CASCADE");

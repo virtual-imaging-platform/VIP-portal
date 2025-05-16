@@ -37,9 +37,10 @@ the production one. Do tests on the api.
  */
 @SpringJUnitWebConfig(value = SpringCoreConfig.class)
 @ActiveProfiles({"test-db", "test"}) // to take random h2 database and not the test h2 jndi one
-// to disable the default mysql/innodb engine on database init
-// also configure the vip conf files to be searched in classpath
-@TestPropertySource(properties = {"db.tableEngine=", "vipConfigFolder=classpath:"})
+@TestPropertySource(properties = {
+        "db.tableEngine=",             // to disable the default mysql/innodb engine on database init
+        "db.jsonType=TEXT",            // to workaround h2/mysql differences on JSON type
+        "vipConfigFolder=classpath:"}) // also configure the vip conf files to be searched in classpath
 @Transactional
 public class VipWebConfigurationIT {
 

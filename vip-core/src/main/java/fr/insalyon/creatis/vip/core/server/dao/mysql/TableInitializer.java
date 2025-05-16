@@ -25,6 +25,8 @@ public class TableInitializer extends JdbcDaoSupport {
 
     @Value("${db.tableEngine:InnoDB}")
     private String tableEngine = "InnoDB";
+    @Value("${db.jsonType:JSON}")
+    private String jsonType = "JSON";
 
     @Autowired
     public void useDataSource(DataSource dataSource) {
@@ -48,5 +50,9 @@ public class TableInitializer extends JdbcDaoSupport {
             }
             return false;
         }
+    }
+
+    public String getJsonType() {
+        return jsonType;
     }
 }

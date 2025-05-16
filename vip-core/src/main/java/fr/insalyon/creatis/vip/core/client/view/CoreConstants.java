@@ -175,12 +175,6 @@ public class CoreConstants implements IsSerializable {
     public static final String UNDESIRED_COUNTRIES = "account.undesiredCountries";
     public static final String SAML_TRUSTED_CERTIFICATE = "saml.trustedcertificate";
     public static final String SAML_DEFAULT_GROUP = "saml.defaultgroup";
-    // Boutiques
-    public static final String APP_CLASS = "boutiques.application.class";
-    public static final String APPLICATION_FILES_REPOSITORY = "boutiques.upload.repository";
-    public static final String APP_DELETE_FILES_AFTER_UPLOAD = "boutiques.upload.deleteFile";
-    public static final String APP_IMPORTER_ROOT_FOLDER = "boutiques.application.rootFolder";
-    public static final String APP_REQUIREMENTS = "boutiques.application.requirements";
     // Publication
     public static final String  PUB_MONTHS_UPDATES = "last.publication.update";
     // Zenodo publication
@@ -193,10 +187,7 @@ public class CoreConstants implements IsSerializable {
     public static final String API_PARALLEL_DOWNLOAD_NB = "api.downloads.nb";
     // ReproVIPfiles";
     public static final String REPROVIP_ROOT_DIR = "reprovip.root-dir";
-    // Moteurlite
-    public static final String USE_MOTEURLITE = "moteurlite.enabled";
     // MoteurServerRest
-    public static final String USE_REST_MOTEUR_SERVER = "moteur.rest.enabled";
     public static final String MOTEUR_REST_PASSWORD = "moteur.rest.password";
     public static final String HOST_URL = "host.url";
 

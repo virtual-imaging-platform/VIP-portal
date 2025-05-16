@@ -52,7 +52,7 @@ public class ApplicationIT extends BaseSpringIT {
         Application application = new Application("Application1", "test1@test.fr", "test1", "citation1");
         applicationBusiness.add(application);
 
-        AppVersion appVersion = new AppVersion("Application1", "version 0.0", "lfn", "jsonLfn", true, true);
+        AppVersion appVersion = new AppVersion("Application1", "version 0.0", "{}", true);
         appVersionBusiness.add(appVersion);
 
     }
@@ -126,7 +126,7 @@ public class ApplicationIT extends BaseSpringIT {
 
     @Test
     public void testAddVersionApplication() throws BusinessException {
-        AppVersion appVersion = new AppVersion("Application1", "version 1.0", "lfn", "jsonLfn", true, true);
+        AppVersion appVersion = new AppVersion("Application1", "version 1.0", "{}", true);
         appVersionBusiness.add(appVersion);
         Assertions.assertEquals(2, appVersionBusiness.getVersions("Application1").size(), "Incorrect versions number");
     }
@@ -137,9 +137,10 @@ public class ApplicationIT extends BaseSpringIT {
 
     @Test
     public void testUpdateVersionApplication() throws BusinessException {
-        AppVersion appVersion = new AppVersion("Application1", "version 0.0", "lfn updated", "jsonLfn", true, true);
+        String descriptor = "{\"some\":\"change\"}";
+        AppVersion appVersion = new AppVersion("Application1", "version 0.0", descriptor, true);
         appVersionBusiness.update(appVersion);
-        Assertions.assertEquals("lfn updated", appVersionBusiness.getVersions("Application1").get(0).getLfn(), "Incorrect lfn updated");
+        Assertions.assertEquals(descriptor, appVersionBusiness.getVersions("Application1").get(0).getDescriptor(), "Incorrect descriptor update");
     }
 
     @Test 

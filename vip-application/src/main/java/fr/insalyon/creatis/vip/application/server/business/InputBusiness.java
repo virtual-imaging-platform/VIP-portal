@@ -104,14 +104,6 @@ public class InputBusiness {
         }
     }
 
-    public String loadSimulationInput(String fileName) throws BusinessException {
-
-        fileName = dataManagerBusiness.getUploadRootDirectory(true) + fileName;
-        String inputs = getInputParser().parse(fileName);
-        dataManagerBusiness.deleteLocalFile(fileName);
-        return inputs;
-    }
-
     public void removeSimulationInput(
             String email, String inputName, String applicationName)
             throws BusinessException {

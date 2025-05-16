@@ -75,30 +75,20 @@ public class ApplicationImporterServiceImpl extends fr.insalyon.creatis.vip.core
     }
 
     @Override
-    public void createApplication(
-            BoutiquesApplication bt, String tag, boolean overwriteVersion, String fileAccessProtocol,
+    public void createApplication(BoutiquesApplication bt, boolean overwriteVersion,
             List<String> tags, List<String> resources)
             throws ApplicationImporterException {
         try {
             trace(logger, "Creating application");
             applicationImporterBusiness.createApplication(
-                    bt, tag, overwriteVersion, fileAccessProtocol, tags, resources, getSessionUser());
+                    bt, overwriteVersion, tags, resources, getSessionUser());
         } catch (CoreException | BusinessException ex) {
             throw new ApplicationImporterException(ex);
         }
     }
 
     @Override
-    public String getApplicationImporterRootFolder() throws ApplicationImporterException {
-        return server.getApplicationImporterRootFolder();
-    }
-
-    @Override
-    public List<String> getApplicationImporterRequirements() throws ApplicationImporterException {
-        return server.getApplicationImporterRequirements();
-    }
-
-    @Override
+    @SuppressWarnings("unchecked")
     public Map<String, String> getBoutiquesTags(String boutiquesJsonFile) throws ApplicationImporterException {
         try {
             Map<String, String> map = new HashMap<>();

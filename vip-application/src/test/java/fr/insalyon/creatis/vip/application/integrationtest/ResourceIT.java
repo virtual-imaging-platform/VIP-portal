@@ -136,7 +136,7 @@ public class ResourceIT extends BaseSpringIT {
     @Test
     public void associateToAppVersion() throws BusinessException {
         Application app = new Application("test", "super citation");
-        AppVersion appVersion = new AppVersion("test", "0.1", "blink", "blank", false, false);
+        AppVersion appVersion = new AppVersion("test", "0.1", "{}", false);
         Resource bis = new Resource("bis");
 
         appBusiness.add(app);
@@ -154,7 +154,7 @@ public class ResourceIT extends BaseSpringIT {
     @Test
     public void dissociateFromAppVersion() throws BusinessException {
         Application app = new Application("test", "super citation");
-        AppVersion appVersion = new AppVersion("test", "0.1", "blink", "blank", false, false);
+        AppVersion appVersion = new AppVersion("test", "0.1", "{}", false);
 
         appBusiness.add(app);
         appVersionBusiness.add(appVersion);

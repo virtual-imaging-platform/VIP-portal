@@ -70,8 +70,5 @@ public class Constants {
     public static final String APP_IMG_IMPORTER = IMG_FOLDER + "importer.png";
     //Group
     public static final String APPLICATION_IMPORTER_GROUP = "Application Importer";
-    //Execution type
-    public static final String APP_IMPORTER_FILE_PROTOCOL = "file";
-    public static final String APP_IMPORTER_LFN_PROTOCOL = "lfn";
 
 }

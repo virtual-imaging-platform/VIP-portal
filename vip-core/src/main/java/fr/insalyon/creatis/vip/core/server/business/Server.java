@@ -89,12 +89,6 @@ public interface Server {
 
     String getSAMLDefaultGroup(String issuer);
 
-    String getApplicationImporterFileRepository();
-
-    String getApplicationImporterRootFolder();
-
-    List<String> getApplicationImporterRequirements();
-
     List<String> getUndesiredMailDomains();
 
     List<String> getUndesiredCountries();
@@ -112,10 +106,6 @@ public interface Server {
     int getApiParallelDownloadNb();
 
     String getReproVIPRootDir();
-
-    boolean useMoteurlite();
-
-    boolean useRestMoteurServer();
 
     String getMoteurServerPassword();
 

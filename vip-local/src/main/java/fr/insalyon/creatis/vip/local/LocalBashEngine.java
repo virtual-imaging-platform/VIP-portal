@@ -1,23 +1,17 @@
 package fr.insalyon.creatis.vip.local;
 
 import fr.insalyon.creatis.grida.client.GRIDAClientException;
-import fr.insalyon.creatis.moteur.plugins.workflowsdb.bean.Input;
-import fr.insalyon.creatis.moteur.plugins.workflowsdb.dao.InputDAO;
-import fr.insalyon.creatis.moteur.plugins.workflowsdb.dao.OutputDAO;
 import fr.insalyon.creatis.moteur.plugins.workflowsdb.dao.WorkflowsDBDAOException;
-import fr.insalyon.creatis.moteur.plugins.workflowsdb.hibernate.InputData;
 import fr.insalyon.creatis.vip.application.client.view.monitor.SimulationStatus;
 import fr.insalyon.creatis.vip.application.server.business.simulation.ParameterSweep;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -78,6 +72,17 @@ public class LocalBashEngine {
     }
 
     public String launch(String workflowContent, List<ParameterSweep> parameters)  {
+        if (true) {
+            // vip-local executions are based on a gwendia-like file, localGrepTest.gwendia,
+            // which is parsed by various getGwendia*() functions in the present class.
+            // Since gwendia was removed from the rest of VIP-portal, this is no longer representative
+            // of actual executions, and porting vip-local to simulate executions based on boutiques
+            // descriptors is not a priority.
+            // So we just explicitly fail here, while still keeping the existing code for reference.
+            // Ultimately, vip-local should either be removed in favor of full vip+moteur environments,
+            // or ported to simulate execution based on boutiques descriptors.
+            throw new UnsupportedOperationException("vip-local executions are gwendia-based and no longer supported");
+        }
         try {
             LocalBashExecution newExecution =
                     createExecution(workflowContent, parameters);

@@ -37,7 +37,9 @@ public class BoutiquesParser extends AbstractJsonParser{
         String name = getStringValue(parsedDescriptor, "name");
         String description = getStringValue(parsedDescriptor, "description");
         String version = getStringValue(parsedDescriptor, "tool-version");
-        BoutiquesApplication application = new BoutiquesApplication(name, description, version);
+        // we use the "descriptor" String to preserve the original descriptor JSON content
+        // alternatively, parsedDescriptor.toString() contains the parsed descriptor
+        BoutiquesApplication application = new BoutiquesApplication(name, description, version, descriptor);
         // Inputs
         JSONArray inputsArray = getArrayValue(parsedDescriptor, "inputs", false);
         for(int inputNo = 0; inputNo < inputsArray.size(); inputNo++){
@@ -118,8 +120,6 @@ public class BoutiquesParser extends AbstractJsonParser{
             application.setVipDotInputIds(getArrayValueAsStringSet(customObject, "vip:dot", true));
             application.setVipDotIncludesResultsDir(getBooleanValue(customObject, "vip:dot-with-results-directory", true));
         }
-        // Json descriptor
-        application.setJsonFile(parsedDescriptor.toString());
         return application;
     }
 

@@ -74,7 +74,7 @@ public class ReproVipBusiness {
             // verifying the application has a boutiques file
             Simulation simulation = workflowBusiness.getSimulation(workflow);
 
-            if (getBoutiquesDescriptorJsonPath(simulation.getApplicationName(), simulation.getApplicationVersion()) == null) {
+            if (getBoutiquesDescriptor(simulation.getApplicationName(), simulation.getApplicationVersion()) == null) {
                 logger.warn("Boutiques descriptor not found for " + simulation.getApplicationName() + ":" + simulation.getApplicationVersion());
                 return false;
             }
@@ -169,7 +169,7 @@ public class ReproVipBusiness {
         // we convert path to string because if there are some caracters like " " by default it encodes it
         data.put("workflowId", workflowData.getWorkflowId());
         data.put("directory", reproVipDir.resolve(workflowData.getWorkflowId()).toString());
-        data.put("boutique_descriptor", getBoutiquesDescriptorJsonPath(workflowData.getAppName(), workflowData.getAppVersion()));
+        data.put("boutique_descriptor", getBoutiquesDescriptor(workflowData.getAppName(), workflowData.getAppVersion()));
         data.put("provenances_files", provenancesFiles.stream().map(Path::toString).collect(Collectors.toList()));
         data.put("invocation_outputs", getInvocationsOutputs(workflowData.getWorkflowId(), provenancesFiles, outputIds));
 
@@ -238,14 +238,9 @@ public class ReproVipBusiness {
         }
     }
 
-    public String getBoutiquesDescriptorJsonPath(String applicationName, String applicationVersion) throws BusinessException {
+    private String getBoutiquesDescriptor(String applicationName, String applicationVersion) throws BusinessException {
         AppVersion appVersion = appVersionBusiness.getVersion(applicationName, applicationVersion);
-
-        if (appVersion != null && appVersion.getJsonLfn() != null) {
-            return appVersion.getJsonLfn();
-        } else {
-            return null;
-        }
+        return appVersion.getDescriptor();
     }
 
     /*

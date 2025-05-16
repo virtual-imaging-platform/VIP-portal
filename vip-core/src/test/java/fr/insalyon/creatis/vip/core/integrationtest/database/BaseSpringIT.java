@@ -50,6 +50,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 @ActiveProfiles({"test-db", "test"}) // to take random h2 database and not the test h2 jndi one
 @TestPropertySource(properties = {
         "db.tableEngine=",             // to disable the default mysql/innodb engine on database init
+        "db.jsonType=TEXT",            // to workaround h2/mysql differences on JSON type
         "vipConfigFolder=classpath:"}) // to find vip-api.conf for vip-api tests
 @Transactional // each test is in a transaction that is rollbacked at the end to always leave a "clean" state
 public abstract class BaseSpringIT {
