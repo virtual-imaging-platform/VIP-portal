@@ -48,6 +48,7 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -127,6 +128,14 @@ public class BoutiquesBusiness {
     }
 
     public void validateBoutiqueFile(String localPath) throws BusinessException {
+        // check file size, 100 kiB max
+        try {
+            if (Files.size(Paths.get(localPath)) >= 100 * 1024) {
+                throw new BusinessException("Boutiques file too large");
+            }
+        } catch (IOException e) {
+            throw new BusinessException("Can't get boutiques file size", e);
+        }
         // call validate command
         String command = "bosh validate " + localPath;
         try {
