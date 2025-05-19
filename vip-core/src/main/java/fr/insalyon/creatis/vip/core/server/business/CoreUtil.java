@@ -31,34 +31,24 @@
  */
 package fr.insalyon.creatis.vip.core.server.business;
 
-import fr.insalyon.creatis.grida.client.GRIDACacheClient;
-import fr.insalyon.creatis.grida.client.GRIDAClient;
-import fr.insalyon.creatis.grida.client.GRIDAPoolClient;
-import fr.insalyon.creatis.grida.client.GRIDAZombieClient;
-import fr.insalyon.creatis.sma.client.SMAClient;
-import fr.insalyon.creatis.sma.client.SMAClientException;
-import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.io.File;
 import java.text.Normalizer;
 
-/**
- *
- * @author Rafael Ferreira da Silva
- */
 public class CoreUtil {
 
     /*
         remove accents and non-ascii characters
     */
-    public static String getCleanString(String s) {
-        return getCleanString(s, true, true);
+    public static String getCleanString(String s, String replacement) {
+        return getCleanString(s, true, true, replacement);
     }
 
-    public static String getCleanString(
-            String s, boolean removeAccents, boolean onlyKeepAscii) {
+    public static String getCleanStringAlnum(String s, String replacement) {
+        String result = getCleanString(s, replacement);
+
+        return result.replaceAll("[^a-zA-Z0-9]", replacement);
+    }
+
+    public static String getCleanString(String s, boolean removeAccents, boolean onlyKeepAscii, String replacement) {
         if ( removeAccents) {
             // Normalizer.normalize with NFKD form decompose accentuated
             // letters into separate "accent mark + base letter" characters
@@ -68,12 +58,12 @@ public class CoreUtil {
         if (onlyKeepAscii) {
             // the [^\\p{ASCII}] regex remove all non-ascii characters
             // so also the separated accents char if removeAccents is true
-            return s.replaceAll("[^\\p{ASCII}]", "");
+            return s.replaceAll("[^\\p{ASCII}]", replacement);
         } else if (removeAccents) {
             // the '\p{M}' regex remove all the combining marks (accents and
             // other exotic stuff) and is less strict than onlyKeepAscii
             // for instance it will keep 'œ' '«' '»' '°'
-            return s.replaceAll("\\p{M}", "");
+            return s.replaceAll("\\p{M}", replacement);
         } else {
             // nothing to do
             return s;
