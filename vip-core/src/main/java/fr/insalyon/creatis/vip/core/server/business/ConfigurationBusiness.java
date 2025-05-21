@@ -207,10 +207,9 @@ public class ConfigurationBusiness {
             } else {
                 user.setPassword(MD5.get(user.getPassword()));
             }
-            String folder = user.getFirstName().replaceAll(" ", "_").toLowerCase() + "_"
-                    + user.getLastName().replaceAll(" ", "_").toLowerCase();
-            // normalise user folder : remove accents and non ascii characters
-            folder = CoreUtil.getCleanString(folder);
+            // normalise user folder : replace accents and non ascii characters by _
+            String folder = CoreUtil.getCleanStringAlnum(user.getFirstName().toLowerCase() + "_"
+                    + user.getLastName().toLowerCase(), "_");
 
             while (gridaClient.exist(server.getDataManagerUsersHome() + "/" + folder)) {
                 folder += "_" + new Random().nextInt(10000);
