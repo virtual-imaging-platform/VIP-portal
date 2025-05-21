@@ -38,35 +38,26 @@ public class CoreUtil {
     /*
         remove accents and non-ascii characters
     */
-    public static String getCleanString(String s, String replacement) {
-        return getCleanString(s, true, true, replacement);
+    public static String getCleanStringAscii(String s, String replacement) {
+        return getCleanString(s, replacement, true, false);
     }
 
     public static String getCleanStringAlnum(String s, String replacement) {
-        String result = getCleanString(s, replacement);
-
-        return result.replaceAll("[^a-zA-Z0-9]", replacement);
+        return getCleanString(s, replacement, false, true);
     }
 
-    public static String getCleanString(String s, boolean removeAccents, boolean onlyKeepAscii, String replacement) {
-        if ( removeAccents) {
-            // Normalizer.normalize with NFKD form decompose accentuated
-            // letters into separate "accent mark + base letter" characters
-            s = Normalizer.normalize(s, Normalizer.Form.NFKD);
-        }
+    private static String getCleanString(String s, String replacement, boolean onlyKeepAscii, boolean onlyKeepAlnum) {
+        // Normalizer.normalize with NFKD form decompose accentuated
+        // letters into separate "accent mark + base letter" characters
+        s = Normalizer.normalize(s, Normalizer.Form.NFKD);
 
         if (onlyKeepAscii) {
             // the [^\\p{ASCII}] regex remove all non-ascii characters
             // so also the separated accents char if removeAccents is true
-            return s.replaceAll("[^\\p{ASCII}]", replacement);
-        } else if (removeAccents) {
-            // the '\p{M}' regex remove all the combining marks (accents and
-            // other exotic stuff) and is less strict than onlyKeepAscii
-            // for instance it will keep 'œ' '«' '»' '°'
-            return s.replaceAll("\\p{M}", replacement);
-        } else {
-            // nothing to do
-            return s;
+            s = s.replaceAll("[^\\p{ASCII}]", replacement);
+        } else if (onlyKeepAlnum) {
+            s = s.replaceAll("[^a-zA-Z0-9]", replacement);
         }
+        return s;
     }
 }

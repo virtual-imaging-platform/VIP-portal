@@ -57,6 +57,6 @@ public class DataManagerUtil {
      */
     public static String getCleanFilename(String fileName) {
         fileName = new File(fileName).getName().trim().replaceAll(" ", "_");
-        return CoreUtil.getCleanString(fileName, "");
+        return CoreUtil.getCleanStringAscii(fileName, "");
     }
 }
