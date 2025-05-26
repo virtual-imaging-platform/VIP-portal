@@ -50,6 +50,7 @@ import jakarta.servlet.ServletException;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class ApplicationImporterServiceImpl extends fr.insalyon.creatis.vip.core.server.rpc.AbstractRemoteServiceServlet
         implements ApplicationImporterService {
@@ -109,17 +110,21 @@ public class ApplicationImporterServiceImpl extends fr.insalyon.creatis.vip.core
                 // boutiques tags can be List<String>, String, numbers or booleans
                 // we return into String or List<String>
                 // in case of boolean we precise with ValueType.BOOLEAN
-                descriptor.getTags().getAdditionalProperties().forEach((k, v) -> {
+                for (Map.Entry<String, Object> entry : descriptor.getTags().getAdditionalProperties().entrySet()) {
+                    String k = entry.getKey();
+                    Object v = entry.getClass();
                     if (v instanceof List) {
                         tags.addAll(((List<String>) v).stream().map((sub) -> {
                             return new Tag(k, (String) sub, ValueType.STRING, null, null, true, true);
                         }).toList());
                     } else if (v instanceof Boolean) {
                         tags.add(new Tag(k, String.valueOf(v), ValueType.BOOLEAN, null, null, true, true));
-                    } else {
+                    } else if (v instanceof String) {
                         tags.add(new Tag(k, String.valueOf(v), ValueType.STRING, null, null, true, true));
+                    } else {
+                        throw new ApplicationImporterException("List<String>, String and Boolean are the only types supported in tags values!");
                     }
-                });
+                }
             }
             return tags;
         } catch (JsonProcessingException e) {
