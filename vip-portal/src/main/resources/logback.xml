@@ -73,6 +73,4 @@
     <appender-ref ref="VIP_LOG"/>
     <appender-ref ref="VIP_ERROR"/>
   </root>
-  <!-- add specific log levels -->
-  <!-- <logger name="org.apache.axis" level="DEBUG" /> -->
 </configuration>
