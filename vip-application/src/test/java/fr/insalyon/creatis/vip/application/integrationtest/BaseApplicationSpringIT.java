@@ -71,8 +71,8 @@ public class BaseApplicationSpringIT extends BaseSpringIT {
         getApplicationBusiness().associate(new Application(appName, null), new Group(groupname));
     }
 
-    protected AppVersion createAVersion(String appName, String versionName, boolean visible, String gwendiaPath, String jsonPath) throws BusinessException {
-        AppVersion appVersion = new AppVersion(appName, versionName, gwendiaPath, jsonPath, visible, true);
+    protected AppVersion createAVersion(String appName, String versionName, boolean visible) throws BusinessException {
+        AppVersion appVersion = new AppVersion(appName, versionName, null, visible);
         getAppVersionBusiness().add(appVersion);
         return appVersion;
     }
@@ -80,13 +80,13 @@ public class BaseApplicationSpringIT extends BaseSpringIT {
     protected AppVersion configureAnApplication(String appName, String versionName, String groupName) throws BusinessException {
         createGroup(groupName);
         createAnApplication(appName, groupName);
-        return createAVersion(appName, versionName, true, null, null);
+        return createAVersion(appName, versionName, true);
     }
 
-    protected void configureVersion(AppVersion appVersion, String gwendiaPath, String jsonPath) throws BusinessException {
+    protected void configureVersion(AppVersion appVersion, String descriptor) throws BusinessException {
         appVersion = new AppVersion(
-                appVersion.getApplicationName(), appVersion.getVersion(), gwendiaPath, jsonPath,
-                appVersion.isVisible(), appVersion.isBoutiquesForm());
+                appVersion.getApplicationName(), appVersion.getVersion(), descriptor,
+                appVersion.isVisible());
         getAppVersionBusiness().update(appVersion);
     }
 }

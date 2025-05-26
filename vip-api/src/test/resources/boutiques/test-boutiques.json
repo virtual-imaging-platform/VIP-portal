@@ -1,7 +1,7 @@
 {
     "name": "testBoutiquesApp",
     "tool-version": "v42",
-    "description": "Test app from axel. Must be similar to the gwendia test app",
+    "description": "Test app from axel",
     "schema-version": "0.5",
     "command-line": "echo [testFileInput] [testTextInput] [testOptionalTextInput] [testFlagInput]",
     "author": "Axel ",

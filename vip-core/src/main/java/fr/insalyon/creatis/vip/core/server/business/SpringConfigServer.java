@@ -5,9 +5,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.stream.Stream;
 
 import jakarta.annotation.PostConstruct;
 
@@ -143,9 +141,6 @@ public class SpringConfigServer implements Server {
         assertPropertyIsPresent(CoreConstants.APPLET_GATELAB_CLASSES, List.class);
         assertPropertyIsPresent(CoreConstants.APPLET_GATELABTEST_CLASSES, List.class);
 
-        assertPropertyIsNotEmpty(CoreConstants.APPLICATION_FILES_REPOSITORY);
-        assertPropertyIsNotEmpty(CoreConstants.APP_IMPORTER_ROOT_FOLDER);
-        assertPropertyIsPresent(CoreConstants.APP_REQUIREMENTS, List.class);
         assertPropertyIsNotEmpty(CoreConstants.PUBLICATION_SYSTEM_COMMAND);
 
         assertPropertyIsNotEmpty(CoreConstants.GIRDER_TOKEN_DURATION_IN_DAYS, Float.class);
@@ -378,21 +373,6 @@ public class SpringConfigServer implements Server {
     }
 
     @Override
-    public String getApplicationImporterFileRepository() {
-        return env.getRequiredProperty(CoreConstants.APPLICATION_FILES_REPOSITORY);
-    }
-
-    @Override
-    public String getApplicationImporterRootFolder() {
-        return env.getRequiredProperty(CoreConstants.APP_IMPORTER_ROOT_FOLDER);
-    }
-
-    @Override
-    public List<String> getApplicationImporterRequirements() {
-        return Arrays.asList(env.getRequiredProperty(CoreConstants.APP_REQUIREMENTS, String[].class));
-    }
-
-    @Override
     public List<String> getUndesiredMailDomains() {
         return Arrays.asList(env.getRequiredProperty(CoreConstants.UNDESIRED_MAIL_DOMAINS, String[].class));
     }
@@ -435,16 +415,6 @@ public class SpringConfigServer implements Server {
     @Override
     public String getReproVIPRootDir() {
         return env.getProperty(CoreConstants.REPROVIP_ROOT_DIR, "/vip/ReproVip/");
-    }
-
-    @Override
-    public boolean useMoteurlite() {
-        return env.getProperty(CoreConstants.USE_MOTEURLITE, Boolean.class, false);
-    }
-
-    @Override
-    public boolean useRestMoteurServer() {
-        return env.getProperty(CoreConstants.USE_REST_MOTEUR_SERVER, Boolean.class, false);
     }
 
     @Override
