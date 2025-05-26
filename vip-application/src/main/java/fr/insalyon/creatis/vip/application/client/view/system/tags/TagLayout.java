@@ -92,7 +92,7 @@ public class TagLayout extends VLayout {
                             final Tag tag = tagFromRecord(rollOverRecord);
 
                             SC.ask("Do you really want to remove this tag \""
-                                    + tag.getName() + "\"?", new BooleanCallback() {
+                                    + tag.toString() + "\"?", new BooleanCallback() {
                                 @Override
                                 public void execute(Boolean value) {
                                     if (value) {
@@ -116,7 +116,9 @@ public class TagLayout extends VLayout {
         grid.setShowRowNumbers(true);
         grid.setEmptyMessage("<br>No data available.");
         grid.setFields(
-                new ListGridField("name", "Name"),
+                new ListGridField("key", "Key"),
+                new ListGridField("value", "Value"),
+                new ListGridField("type", "Type"),
                 new ListGridField("visible", "Visible").setType(ListGridFieldType.BOOLEAN),
                 new ListGridField("boutiques", "Boutiques").setType(ListGridFieldType.BOOLEAN));
         grid.setSortField("name");
@@ -168,7 +170,7 @@ public class TagLayout extends VLayout {
                 loadData();
             }
         };
-        modal.show("Removing tag '" + tag.getName() + "'...", true);
+        modal.show("Removing tag '" + tag.toString() + "'...", true);
         ApplicationService.Util.getInstance().removeTag(tag, callback);
     }
 
@@ -181,7 +183,9 @@ public class TagLayout extends VLayout {
 
     private Tag tagFromRecord(ListGridRecord record) {
         return new Tag(
-            record.getAttributeAsString("name"),
+            record.getAttributeAsString("key"),
+            record.getAttributeAsString("value"),
+            Tag.ValueType.valueOf(record.getAttributeAsString("type").toUpperCase()),
             record.getAttributeAsString("application"),
             record.getAttributeAsString("version"),
             record.getAttributeAsBoolean("visible"),

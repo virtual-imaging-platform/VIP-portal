@@ -33,22 +33,24 @@ public class TagData extends JdbcDaoSupport implements TagDAO {
 
     @Override
     public void add(Tag tag) throws DAOException {
-        String query = "INSERT INTO VIPTags (name, application, version, visible, boutiques) VALUES (?, ?, ?, ?, ?)";
+        String query = "INSERT INTO VIPTags (tag_key, tag_value, type, application, version, visible, boutiques) VALUES (?, ?, ?, ?, ?, ?, ?)";
 
         try (PreparedStatement ps = getConnection().prepareStatement(query)) {
-            ps.setString(1, tag.getName());
-            ps.setString(2, tag.getApplication());
-            ps.setString(3, tag.getVersion());
-            ps.setBoolean(4, tag.isVisible());
-            ps.setBoolean(5, tag.isBoutiques());
+            ps.setString(1, tag.getKey());
+            ps.setString(2, tag.getValue());
+            ps.setString(3, tag.getType().toString());
+            ps.setString(4, tag.getApplication());
+            ps.setString(5, tag.getVersion());
+            ps.setBoolean(6, tag.isVisible());
+            ps.setBoolean(7, tag.isBoutiques());
             ps.executeUpdate();
 
         } catch (SQLException e) {
             if (e.getMessage().contains("Unique index or primary key violation") || e.getMessage().contains("Duplicate entry ")) {
-                logger.error("A tag named \"{}\" already exists for {} {}.", tag.getName(), tag.getApplication(), tag.getVersion());
-                throw new DAOException("A tag named " + tag.getName() + " already exists for " + tag.getApplication() + tag.getVersion() + ".");
+                logger.error("A tag named \"{}\" already exists for {} {}.", tag.toString(), tag.getApplication(), tag.getVersion());
+                throw new DAOException("A tag named " + tag.toString() + " already exists for " + tag.getApplication() + tag.getVersion() + ".");
             } else {
-                logger.error("Error adding tag " + tag.getName(), e);
+                logger.error("Error adding tag " + tag.toString(), e);
                 throw new DAOException(e);
             }
         }
@@ -56,26 +58,29 @@ public class TagData extends JdbcDaoSupport implements TagDAO {
 
     @Override
     public void update(Tag oldTag, Tag newTag) throws DAOException {
-        String query = "UPDATE VIPTags SET name = ?, application = ?, version = ?, visible = ?, boutiques = ? "
-        +              "WHERE name = ? AND application = ? AND version = ?";
+        String query = "UPDATE VIPTags SET tag_key = ?, tag_value = ?, type = ?, application = ?, version = ?, visible = ?, boutiques = ? "
+        +              "WHERE tag_key = ? AND tag_value = ? AND application = ? AND version = ?";
 
         try (PreparedStatement ps = getConnection().prepareStatement(query)) {
-            ps.setString(1, newTag.getName());
-            ps.setString(2, newTag.getApplication());
-            ps.setString(3, newTag.getVersion());
-            ps.setBoolean(4, newTag.isVisible());
-            ps.setBoolean(5, newTag.isBoutiques());
-            ps.setString(6, oldTag.getName());
-            ps.setString(7, oldTag.getApplication());
-            ps.setString(8, oldTag.getVersion());
+            ps.setString(1, newTag.getKey());
+            ps.setString(2, newTag.getValue());
+            ps.setString(3, newTag.getType().toString());
+            ps.setString(4, newTag.getApplication());
+            ps.setString(5, newTag.getVersion());
+            ps.setBoolean(6, newTag.isVisible());
+            ps.setBoolean(7, newTag.isBoutiques());
+            ps.setString(8, oldTag.getKey());
+            ps.setString(9, oldTag.getValue());
+            ps.setString(10, oldTag.getApplication());
+            ps.setString(11, oldTag.getVersion());
             ps.executeUpdate();
 
         } catch (SQLException e) {
             if (e.getMessage().contains("Duplicate entry ")) {
-                logger.error("A tag named \"{}\" already exists for {} {}.", newTag.getName(), newTag.getApplication(), newTag.getVersion());
-                throw new DAOException("A tag named " + newTag.getName() + " already exists for " + newTag.getApplication() + newTag.getVersion() + ".");
+                logger.error("A tag named \"{}\" already exists for {} {}.", newTag.toString(), newTag.getApplication(), newTag.getVersion());
+                throw new DAOException("A tag named " + newTag.toString() + " already exists for " + newTag.getApplication() + newTag.getVersion() + ".");
             } else {
-                logger.error("Error updating tag : " + oldTag.getName(), e);
+                logger.error("Error updating tag : " + oldTag.toString(), e);
                 throw new DAOException(e);
             }
         }
@@ -83,28 +88,30 @@ public class TagData extends JdbcDaoSupport implements TagDAO {
 
     @Override
     public void remove(Tag tag) throws DAOException {
-        String query = "DELETE FROM VIPTags WHERE name = ? AND application = ? AND version = ?";
+        String query = "DELETE FROM VIPTags WHERE tag_key = ? AND tag_value = ? AND application = ? AND version = ?";
 
         try (PreparedStatement ps = getConnection().prepareStatement(query)) {
-            ps.setString(1, tag.getName());
-            ps.setString(2, tag.getApplication());
-            ps.setString(3, tag.getVersion());
+            ps.setString(1, tag.getKey());
+            ps.setString(2, tag.getValue());
+            ps.setString(3, tag.getApplication());
+            ps.setString(4, tag.getVersion());
             ps.executeUpdate();
 
         } catch (SQLException e) {
-            logger.error("Error removing tag " + tag.getName(), e);
+            logger.error("Error removing tag " + tag.toString(), e);
             throw new DAOException(e);
         }
     }
 
     @Override
-    public Tag get(String name, String application, String version) throws DAOException {
-        String query = "SELECT * FROM VIPTags WHERE name = ? AND application = ? AND version = ? ORDER BY name";
+    public Tag get(String key, String value, String application, String version) throws DAOException {
+        String query = "SELECT * FROM VIPTags WHERE tag_key = ? AND tag_value = ? AND application = ? AND version = ? ORDER BY tag_key";
 
         try (PreparedStatement ps = getConnection().prepareStatement(query)) {
-            ps.setString(1, name);
-            ps.setString(2, application);
-            ps.setString(3, version);
+            ps.setString(1, key);
+            ps.setString(2, value);
+            ps.setString(3, application);
+            ps.setString(4, version);
 
             ResultSet rs = ps.executeQuery();
 
@@ -114,14 +121,14 @@ public class TagData extends JdbcDaoSupport implements TagDAO {
                 return null;
             }
         } catch (SQLException e) {
-            logger.error("Error retrieving tag " + name + "for " + application + version, e);
+            logger.error("Error retrieving tag " + key + ":" + value + "for " + application + version, e);
             throw new DAOException(e);
         }
     }
 
     @Override
     public List<Tag> getAll() throws DAOException {
-        String query = "SELECT DISTINCT * FROM VIPTags ORDER BY name";
+        String query = "SELECT DISTINCT * FROM VIPTags ORDER BY tag_key";
 
         try (PreparedStatement ps = getConnection().prepareStatement(query)) {
             ResultSet rs = ps.executeQuery();
@@ -141,7 +148,7 @@ public class TagData extends JdbcDaoSupport implements TagDAO {
     @Override
     public List<Tag> getTags(AppVersion appVersion) throws DAOException {
         String query = "SELECT * FROM VIPTags "
-        +              "WHERE application = ? AND version = ? ORDER BY name";
+        +              "WHERE application = ? AND version = ? ORDER BY tag_key";
 
         try (PreparedStatement ps = getConnection().prepareStatement(query)) {
             ps.setString(1, appVersion.getApplicationName());
@@ -165,7 +172,9 @@ public class TagData extends JdbcDaoSupport implements TagDAO {
 
     private Tag fromRs(ResultSet rs) throws SQLException {
         return new Tag(
-            rs.getString("name"),
+            rs.getString("tag_key"),
+            rs.getString("tag_value"),
+            Tag.ValueType.valueOf(rs.getString("type").toUpperCase()),
             rs.getString("application"),
             rs.getString("version"),
             rs.getBoolean("visible"),

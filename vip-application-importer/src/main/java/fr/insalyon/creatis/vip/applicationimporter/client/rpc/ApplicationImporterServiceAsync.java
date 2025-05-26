@@ -37,7 +37,6 @@ import fr.insalyon.creatis.vip.application.client.bean.Tag;
 import fr.insalyon.creatis.vip.application.client.bean.boutiquesTools.BoutiquesApplication;
 
 import java.util.List;
-import java.util.Map;
 
 public interface ApplicationImporterServiceAsync {
 
@@ -49,6 +48,6 @@ public interface ApplicationImporterServiceAsync {
     
     public void getApplicationImporterRequirements(AsyncCallback<List<String>>  asyncCallback);
 
-    public void getBoutiquesTags(String boutiquesJsonFile ,AsyncCallback<Map<String, String>> asyncCallback);
+    public void getBoutiquesTags(String boutiquesJsonFile ,AsyncCallback<List<Tag>> asyncCallback);
 
 }

@@ -4,7 +4,14 @@ import com.google.gwt.user.client.rpc.IsSerializable;
 
 public class Tag implements IsSerializable {
 
-    private String name;
+    public enum ValueType {
+        STRING,
+        BOOLEAN;
+    }
+
+    private String key;
+    private String value;
+    private ValueType type;
     private String application;
     private String version;
     private boolean visible;
@@ -13,32 +20,76 @@ public class Tag implements IsSerializable {
     public Tag() {}
 
     public Tag(Tag other) {
-        this(other.getName(), other.getApplication(), other.getVersion(), other.isVisible(), other.isBoutiques());
+        this(
+            other.getKey(), 
+            other.getValue(), 
+            other.getType(), 
+            other.getApplication(), 
+            other.getVersion(), 
+            other.isVisible(), 
+            other.isBoutiques());
     }
 
-    public Tag(String name, String application, String version) {
-        this(name, application, version, false, false);
-    }
-
-    public Tag(String name, boolean visible, boolean boutiques) {
-        this(name, null, null, visible, boutiques);
-    }
-
-    public Tag(String name, String application, String version, boolean visible, boolean boutiques) {
-        this.name = name;
+    public Tag(String key, String value, ValueType type, String application, String version, boolean visible, boolean boutiques) {
+        this.key = key;
+        this.value = value;
+        this.type = type;
         this.application = application;
         this.version = version;
         this.visible = visible;
         this.boutiques = boutiques;
     }
 
-    public String getName() {
-        return this.name;
+    public Tag(String key, String value, ValueType type, AppVersion appVersion, boolean visible, boolean boutiques) {
+        this(key, value, type, appVersion.getApplicationName(), appVersion.getVersion(), visible, boutiques);
     }
 
-    public void setName(String name) {
-        this.name = name;
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+
+        Tag tag = (Tag) obj;
+        
+        return 
+            key.equals(tag.getKey()) &&
+            value.equals(tag.getValue()) &&
+            type.equals(tag.getType()) &&
+            application.equals(tag.getApplication()) &&
+            version.equals(tag.getVersion()) &&
+            visible == tag.isVisible() &&
+            boutiques == tag.isBoutiques();
     }
+
+    @Override
+    public String toString() {
+        return key + ":" + value;
+    }
+
+    public String getKey() {
+        return key;
+    }
+
+    public void setKey(String key) {
+        this.key = key;
+    }
+
+    public String getValue() {
+        return value;
+    }
+
+    public void setValue(String value) {
+        this.value = value;
+    }
+
+    public ValueType getType() {
+        return type;
+    }
+
+    public void setType(ValueType type) {
+        this.type = type;
+    }
+
 
     public String getApplication() {
         return application;

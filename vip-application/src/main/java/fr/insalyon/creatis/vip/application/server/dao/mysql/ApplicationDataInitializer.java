@@ -131,12 +131,14 @@ public class ApplicationDataInitializer extends JdbcDaoSupport {
 
     private void createTagsTables() {
         tableInitializer.createTable("VIPTags",
-                    "name VARCHAR(255), "
+                    "tag_key VARCHAR(255), "
+                +   "tag_value VARCHAR(255), "
+                +   "type VARCHAR(255), "
                 +   "application VARCHAR(255), "
                 +   "version VARCHAR(255), "
                 +   "boutiques BOOLEAN, "
                 +   "visible BOOLEAN, "
-                +   "PRIMARY KEY (name, application, version), "
+                +   "PRIMARY KEY (tag_key, tag_value, application, version), "
                 +   "FOREIGN KEY (application, version) REFERENCES VIPAppVersions(application, version) "
                 +   "ON DELETE CASCADE ON UPDATE CASCADE");
     }
@@ -152,15 +154,15 @@ public class ApplicationDataInitializer extends JdbcDaoSupport {
                 +   "ON DELETE CASCADE ON UPDATE CASCADE");
 
         tableInitializer.createTable("VIPPublicExecutions",
-                "experience_name VARCHAR(255), "
-                        + "workflows_ids VARCHAR(1000),  "
-                        + "applications_names VARCHAR(1000), "
-                        + "applications_versions VARCHAR(1000), "
-                        + "status  VARCHAR(50), "
-                        + "author VARCHAR(250), "
-                        + "output_ids VARCHAR(1000), "
-                        + "comments TEXT, "
-                        + "doi TEXT, "
-                        + "PRIMARY KEY(experience_name)");
+                    "experience_name VARCHAR(255), "
+                +   "workflows_ids VARCHAR(1000),  "
+                +   "applications_names VARCHAR(1000), "
+                +   "applications_versions VARCHAR(1000), "
+                +   "status  VARCHAR(50), "
+                +   "author VARCHAR(250), "
+                +   "output_ids VARCHAR(1000), "
+                +   "comments TEXT, "
+                +   "doi TEXT, "
+                +   "PRIMARY KEY(experience_name)");
     }
 } 

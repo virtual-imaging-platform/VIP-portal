@@ -32,7 +32,7 @@
 package fr.insalyon.creatis.vip.applicationimporter.client.view.applicationdisplay;
 
 import java.util.HashSet;
-import java.util.Map;
+import java.util.List;
 import java.util.Set;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -44,6 +44,7 @@ import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.tab.Tab;
 
+import fr.insalyon.creatis.vip.application.client.bean.Tag;
 import fr.insalyon.creatis.vip.application.client.bean.boutiquesTools.BoutiquesApplication;
 import fr.insalyon.creatis.vip.application.client.view.boutiquesParsing.BoutiquesParser;
 import fr.insalyon.creatis.vip.application.client.view.boutiquesParsing.InvalidBoutiquesDescriptorException;
@@ -195,7 +196,7 @@ public class DisplayTab extends Tab {
             Layout.getInstance().setWarningMessage(warningMessage);
         }
         // Check if all vipDotInputIds are in inputs
-        if (!inputIds.containsAll(vipDotInputIds)) {
+        if ( ! inputIds.containsAll(vipDotInputIds)) {
             Set<String> incorrectInputs = new HashSet<>(vipDotInputIds);
             incorrectInputs.removeAll(inputIds);
             String errorMessage = "<b>" + String.join(", ", incorrectInputs) + "</b> appears in vipDotInputIds but not in inputs. Please ensure all ids are correct.";
@@ -230,7 +231,7 @@ public class DisplayTab extends Tab {
     }
 
     public void loadBoutiquesTags(String jsonContent) {
-        final AsyncCallback<Map<String, String>> callback = new AsyncCallback<>() {
+        final AsyncCallback<List<Tag>> callback = new AsyncCallback<>() {
 
             @Override
             public void onFailure(Throwable caught) {
@@ -239,12 +240,12 @@ public class DisplayTab extends Tab {
             }
 
             @Override
-            public void onSuccess(Map<String, String> result) {
+            public void onSuccess(List<Tag> result) {
                 modal.hide();
                 tagsLayout.setBoutiquesTags(result);
             }
         };
-        modal.show("Creating application...", true);
+        modal.show("Loading boutiques tags...", true);
         ApplicationImporterService.Util.getInstance().getBoutiquesTags(jsonContent, callback);
     }
 }

@@ -14,7 +14,7 @@ public interface TagDAO {
 
     public void remove(Tag tag) throws DAOException;
 
-    public Tag get(String name, String application, String version) throws DAOException;
+    public Tag get(String key, String value, String application, String version) throws DAOException;
 
     public List<Tag> getAll() throws DAOException;
 

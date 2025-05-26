@@ -2,8 +2,6 @@ package fr.insalyon.creatis.vip.application.server.business;
 
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -49,13 +47,10 @@ public class AppVersionBusiness {
 
     public void update(AppVersion version) throws BusinessException {
         try {
-            final Logger logger = LoggerFactory.getLogger(getClass());
-
-            logger.info("ressource to add " + version.getResourcesNames());
             AppVersion before = getVersion(version.getApplicationName(), version.getVersion());
             List<String> beforeResourceNames = before.getResourcesNames();
-            List<String> deletedTags = before.getTagsNames();
-            deletedTags.removeAll(version.getTagsNames());
+            List<Tag> editedTags = before.getTags();
+            editedTags.removeAll(version.getTags());
 
             applicationDAO.updateVersion(version);
             for (Resource resource : version.getResources()) {
@@ -63,14 +58,14 @@ public class AppVersionBusiness {
                     resourceBusiness.associate(resource, version);
                 }
             }
+            for (Tag tag : editedTags) {
+                tagBusiness.remove(tag);
+            }
             for (Tag tag : version.getTags()) {
                 tagBusiness.addOrUpdate(tag);
             }
             for (String resource : beforeResourceNames) {
                 resourceBusiness.dissociate(new Resource(resource), version);
-            }
-            for (String tag : deletedTags) {
-                tagBusiness.remove(new Tag(tag, version.getApplicationName(), version.getVersion()));
             }
 
         } catch (DAOException ex) {

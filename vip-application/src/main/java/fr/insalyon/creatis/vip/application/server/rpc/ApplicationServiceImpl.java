@@ -446,7 +446,7 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
             return tagBusiness.getAll().stream()
                 .filter(tag -> ! tag.isBoutiques())
                 .collect(Collectors.toMap(
-                    Tag::getName,
+                    Tag::toString,
                     tag -> tag,
                     (existing, replacement) -> existing,
                     LinkedHashMap::new

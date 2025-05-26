@@ -16,23 +16,19 @@ import com.smartgwt.client.widgets.layout.LayoutSpacer;
 import com.smartgwt.client.widgets.layout.VLayout;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.smartgwt.client.data.DataSource;
 import com.smartgwt.client.data.Record;
-import com.smartgwt.client.data.fields.DataSourceTextField;
 
 import fr.insalyon.creatis.vip.application.client.bean.Tag;
+import fr.insalyon.creatis.vip.application.client.bean.Tag.ValueType;
 import fr.insalyon.creatis.vip.application.client.rpc.ApplicationService;
 import fr.insalyon.creatis.vip.application.client.rpc.ApplicationServiceAsync;
 import fr.insalyon.creatis.vip.applicationimporter.client.view.Constants;
 import fr.insalyon.creatis.vip.core.client.view.common.AbstractFormLayout;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
+import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
 
 public class TagsLayout extends AbstractFormLayout {
 
@@ -41,52 +37,45 @@ public class TagsLayout extends AbstractFormLayout {
     private final ListGrid selectedTags;
     private final ListGrid existingsTags;
     private final LayoutSpacer spacer;
-    private final DataSource dataSource;
 
     private DynamicForm entryFormBlock;
     private ComboBoxItem entryForm;
-    private Set<String> manualTags;
     
-    private Map<String, String> boutiquesTags;
-
     public TagsLayout(String width, String height) {
         super(width, height);
 
         hLayout = new HLayout(10);
         vLayoutLeft = new VLayout(10);
-        selectedTags = createList("Selected Tags", true);
+        selectedTags = createList(true);
 
-        dataSource = new DataSource().setClientOnly(true);
-        dataSource.setFields(new DataSourceTextField("name").setPrimaryKey(true));
-
-        existingsTags = createList("VIP Existings Tags", false).setDataSource(dataSource);
+        existingsTags = createList(false);
         spacer = new LayoutSpacer();
-        getDynamicFormInput();
+        setFormInput();
 
         configure();
         loadDatabaseNonBoutiquesTags();
-        manualTags = new HashSet<>();
     }
 
     public List<Tag> getSelectedTags(String application, String version) {
         return getTags(selectedTags, application, version);
     }
 
-    public void setBoutiquesTags(Map<String,String> tags) {
-        boutiquesTags = tags;
-        loadBoutiquesTags();
+    public void setBoutiquesTags(List<Tag> boutiquesTags) {
+        for (Tag tag : boutiquesTags) {
+            selectedTags.addData(createTagRecord(tag.getKey(), tag.getValue(), tag.getType(), tag.isVisible(), tag.isBoutiques()));
+        }
     }
 
     private void configure() {
         addTitle("Tags", Constants.ICON_INFORMATION);
         setOverflow(Overflow.AUTO);
 
-        vLayoutLeft.addMember(selectedTags);
+        vLayoutLeft.addMember(addTitleToList("SelectedTags", selectedTags));
         vLayoutLeft.addMember(entryFormBlock);
 
         hLayout.addMember(vLayoutLeft);
         hLayout.addMember(spacer);
-        hLayout.addMember(existingsTags);
+        hLayout.addMember(addTitleToList("VIP Existings Tags", existingsTags));
         addMember(hLayout);
         setDescription();
         selectedTags.setShowRollOver(true);
@@ -96,7 +85,15 @@ public class TagsLayout extends AbstractFormLayout {
         getMember(0).setPrompt("Please each tags must be an unique string clear for users. For boutiques suggestions you might transform them, for example fsl:true should become fsl as a unique tag.");
     }
 
-    private ListGrid createList(String name, boolean removable) {
+    private VLayout addTitleToList(String name, ListGrid list) {
+        VLayout vLayout = new VLayout();
+
+        vLayout.addMember(WidgetUtil.getLabel("<b>" + name + "</b>", 15));
+        vLayout.addMember(list);
+        return vLayout;
+    }
+
+    private ListGrid createList(boolean removable) {
         ListGrid list = new ListGrid();
 
         list.addRemoveRecordClickHandler(new RemoveRecordClickHandler() {
@@ -104,12 +101,8 @@ public class TagsLayout extends AbstractFormLayout {
             public void onRemoveRecordClick(RemoveRecordClickEvent event) {
                 ListGridRecord record = list.getRecord(event.getRowNum());
 
-                final String name = record.getAttribute("name");
-                if (manualTags.contains(name)) {
-                    addExistingTag(new Tag(name, 
-                        record.getAttributeAsBoolean("visible"), 
-                        record.getAttributeAsBoolean("boutiques")));
-                }
+                existingsTags.addData(record);
+                existingsTags.fetchData();
             }
         });
         list.setCanRemoveRecords(removable);
@@ -122,89 +115,42 @@ public class TagsLayout extends AbstractFormLayout {
         list.setCanAcceptDroppedRecords(true);
         list.setCanReorderRecords(true);
         list.setFields(
-            new ListGridField("name", name).setCanEdit(false),
+            new ListGridField("key", "Key").setCanEdit(true),
+            new ListGridField("value", "Value").setCanEdit(true),
             new ListGridField("visible", "Visible").setType(ListGridFieldType.BOOLEAN).setCanEdit(true),
             new ListGridField("boutiques", "Boutiques").setType(ListGridFieldType.BOOLEAN).setCanEdit(true)
         );
         list.setCanEdit(true);
 
-        list.setCellFormatter((value, record, rowNum, colNum) -> {
-            if (manualTags.contains(value)) {
-                return "<span style='font-weight:bold;'>" + (String) value + "</span>";
-            }
-            return (String) value;
-        });
         return list;
     }
 
     private void addSelectedTag(Tag tag) {
-        Record record = new Record();
-
-        record.setAttribute("name", tag.getName());
-        record.setAttribute("visible", tag.isVisible());
-        record.setAttribute("boutiques", tag.isBoutiques());
-        selectedTags.addData(record);
-    }
-
-    private Record addExistingTag(Tag tag) {
-        Record record = new Record();
-
-        record.setAttribute("name", tag.getName());
-        record.setAttribute("visible", tag.isVisible());
-        record.setAttribute("boutiques", tag.isBoutiques());
-
-        existingsTags.fetchData();
-
-        return record;
+        selectedTags.addData(createTagRecord(tag.getKey(), tag.getValue(), tag.getType(), tag.isVisible(), tag.isBoutiques()));
     }
 
     private List<Tag> getTags(ListGrid list, String application, String version) {
         List<Tag> tags = new ArrayList<>();
 
-        for (Record record : list.getRecordList().toArray()) {
-            tags.add(new Tag(
-                record.getAttribute("name"),
-                application,
-                version,
-                record.getAttributeAsBoolean("visible"),
-                record.getAttributeAsBoolean("boutiques")
-            ));
+        for (Record record : list.getRecords()) {
+            tags.add(createTagFromRecord(record, application, version));
         }
         return tags;
     }
 
-    private void getDynamicFormInput() {
+    private void setFormInput() {
         entryFormBlock = new DynamicForm();
-
-        entryForm = new ComboBoxItem("autoComplete", "Add/Search custom Tag");
+        entryForm = new ComboBoxItem("autoComplete", "Add custom Tag");
 
         entryForm.setWidth(175);
         entryForm.setTitleOrientation(TitleOrientation.TOP);
-        entryForm.setValueField("name");
-        entryForm.setOptionDataSource(dataSource);
-
-        entryForm.setAddUnknownValues(true);
-        entryForm.setFetchMissingValues(false);
 
         entryForm.addKeyPressHandler(event -> {
             if ("Enter".equals(event.getKeyName())) {
                 String inputValue = entryForm.getEnteredValue();
-                Optional<Tag> matchedValue;
-                Record record = new Record();
                 
                 if (inputValue != null && ! inputValue.trim().isEmpty()) {
-                    matchedValue = getTags(existingsTags, "", "")
-                            .stream().filter((t) -> t.getName().equalsIgnoreCase(inputValue)).findFirst();
-                    if (matchedValue.isPresent()) {
-                        record.setAttribute("name", matchedValue.get().getName());
-                        dataSource.removeData(record);
-                        existingsTags.fetchData();
-                    } else {
-                        manualTags.add(inputValue);
-                    }
-                    if ( ! getTags(selectedTags, "", "").stream().anyMatch((t) -> t.getName().equals(inputValue))) {
-                        addSelectedTag(new Tag(inputValue, true, false));
-                    }
+                    addSelectedTag(new Tag(inputValue, "default", Tag.ValueType.STRING, null, null, true, false));
                 }
                 entryForm.clearValue();
             }
@@ -215,7 +161,6 @@ public class TagsLayout extends AbstractFormLayout {
 
     private void loadDatabaseNonBoutiquesTags() {
         ApplicationServiceAsync service = ApplicationService.Util.getInstance();
-        List<Tag> tags = getTags(selectedTags, "", "");
 
         final AsyncCallback<List<Tag>> callback = new AsyncCallback<>() {
             @Override
@@ -226,33 +171,36 @@ public class TagsLayout extends AbstractFormLayout {
             @Override
             public void onSuccess(List<Tag> result) {
                 Record[] data = result.stream()
-                    .filter((t) -> ! tags.stream().anyMatch((e) -> e.getName().equals(t.getName())))
                     .map((t) -> {
-                        manualTags.add(t.getName());
-                        return addExistingTag(t);
+                        return createTagRecord(t.getKey(), t.getValue(), t.getType(), false, t.isBoutiques());
                     })
                     .toArray(Record[]::new);
-
-                dataSource.setCacheData(data);
+            
+                existingsTags.setData(data);
             }
         };
         service.getNonBoutiquesTags(callback);
     }
 
-    /**
-     * Must be run before loadDatabaseTags, because the other function filter
-     * depending on the result of this one.
-     */
-    private void loadBoutiquesTags() {
-        Record record;
+    private Record createTagRecord(String key, String value, ValueType type, boolean visible, boolean boutiques) {
+        Record record = new Record();
 
-        for (Map.Entry<String, String> entry : boutiquesTags.entrySet()) {
-            record = new Record();
-            record.setAttribute("name", entry.getKey() + ":" + entry.getValue());
-            record.setAttribute("visible", true);
-            record.setAttribute("boutiques", true);
+        record.setAttribute("key", key);
+        record.setAttribute("value", value);
+        record.setAttribute("type", ValueType.STRING);
+        record.setAttribute("visible", visible);
+        record.setAttribute("boutiques", boutiques);
+        return record;
+    }
 
-            selectedTags.addData(record);
-        }
+    private Tag createTagFromRecord(Record record, String appName, String appVersion) {
+        return new Tag(
+            record.getAttribute("key"),
+            record.getAttribute("value"),
+            Tag.ValueType.valueOf(record.getAttribute("type")),
+            appName,
+            appVersion,
+            record.getAttributeAsBoolean("visible"),
+            record.getAttributeAsBoolean("boutiques"));
     }
 }

@@ -7,11 +7,13 @@ import fr.insalyon.creatis.vip.application.client.bean.Tag;
 public class TagRecord extends ListGridRecord {
 
     public TagRecord(Tag tag) {
-        this(tag.getName(), tag.getApplication(), tag.getVersion(), tag.isVisible(), tag.isBoutiques());
+        this(tag.getKey(), tag.getValue(), tag.getType().toString(), tag.getApplication(), tag.getVersion(), tag.isVisible(), tag.isBoutiques());
     }
 
-    public TagRecord(String name, String application, String version, boolean visible, boolean boutiques) {
-        setAttribute("name", name);
+    public TagRecord(String key, String value, String type, String application, String version, boolean visible, boolean boutiques) {
+        setAttribute("key", key);
+        setAttribute("value", value);
+        setAttribute("type", type);
         setAttribute("application", application);
         setAttribute("version", version);
         setAttribute("visible", visible);

@@ -1,6 +1,9 @@
 package fr.insalyon.creatis.vip.application.client.view.system.tags;
 
+import java.util.Arrays;
+
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.smartgwt.client.types.MultipleAppearance;
 import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.IButton;
@@ -8,6 +11,7 @@ import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.fields.BooleanItem;
 import com.smartgwt.client.widgets.form.fields.CheckboxItem;
+import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
 import fr.insalyon.creatis.vip.application.client.bean.Tag;
@@ -21,7 +25,9 @@ import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
 public class EditTagLayout extends AbstractFormLayout {
     private Tag actualTag;
 
-    private TextItem nameField;
+    private TextItem keyField;
+    private TextItem valueField;
+    private SelectItem typeField;
     private TextItem applicationField;
     private TextItem versionField;
     private CheckboxItem visibleField;
@@ -38,9 +44,18 @@ public class EditTagLayout extends AbstractFormLayout {
     }
 
     private void configure() {
-        nameField = FieldUtil.getTextItem(350, null);
+        keyField = FieldUtil.getTextItem(350, null);
+        valueField = FieldUtil.getTextItem(350, null);
         visibleField = new BooleanItem().setShowTitle(false).setWidth(350);
         boutiquesField = new BooleanItem().setShowTitle(false).setWidth(350);
+
+        typeField = new SelectItem();
+        typeField.setShowTitle(false);
+        typeField.setMultipleAppearance(MultipleAppearance.PICKLIST);
+        typeField.setValueMap(Arrays.stream(Tag.ValueType.values())
+            .map(v -> v.toString())
+            .toArray(String[]::new));
+        typeField.setWidth(350);
 
         applicationField = FieldUtil.getTextItem(350, null);
         applicationField.setDisabled(true);
@@ -52,7 +67,7 @@ public class EditTagLayout extends AbstractFormLayout {
                 new ClickHandler() {
                     @Override
                     public void onClick(ClickEvent event) {
-                        if (nameField.validate() && applicationField.validate() && versionField.validate()) {
+                        if (keyField.validate() && valueField.validate() && applicationField.validate() && versionField.validate()) {
                             save(tagFromFields());
                         }
                     }
@@ -66,7 +81,7 @@ public class EditTagLayout extends AbstractFormLayout {
                             @Override
                             public void execute(Boolean value) {
                                 if (value) {
-                                    remove(nameField.getValueAsString().trim());
+                                    remove(tagFromFields());
                                 }
                             }
                         });
@@ -74,7 +89,9 @@ public class EditTagLayout extends AbstractFormLayout {
                 });
         removeButton.setDisabled(true);
 
-        addField("Name", nameField);
+        addField("Key", keyField);
+        addField("Value", valueField);
+        addField("Type", typeField);
         addField("Application", applicationField);
         addField("Version", versionField);
         addField("Visible", visibleField);
@@ -85,7 +102,9 @@ public class EditTagLayout extends AbstractFormLayout {
     public void setTag(Tag tag) {
         if (tag != null) {
             this.actualTag = tag;
-            this.nameField.setValue(tag.getName());
+            this.keyField.setValue(tag.getKey());
+            this.valueField.setValue(tag.getValue());
+            this.typeField.setValue(tag.getType().toString());
             this.applicationField.setValue(tag.getApplication());
             this.versionField.setValue(tag.getVersion());
             this.visibleField.setValue(tag.isVisible());
@@ -96,15 +115,12 @@ public class EditTagLayout extends AbstractFormLayout {
 
     private void save(Tag tag) {
         WidgetUtil.setLoadingIButton(saveButton, "Saving...");
-
         ApplicationService.Util.getInstance().updateTag(actualTag, tag, getCallback("update"));
     }
 
-    private void remove(String name) {
-        final Tag tagToDelete = tagFromFields();
-
+    private void remove(Tag tag) {
         WidgetUtil.setLoadingIButton(removeButton, "Removing...");
-        ApplicationService.Util.getInstance().removeTag(tagToDelete, getCallback("remove"));
+        ApplicationService.Util.getInstance().removeTag(tag, getCallback("remove"));
     }
 
     private AsyncCallback<Void> getCallback(final String text) {
@@ -130,9 +146,11 @@ public class EditTagLayout extends AbstractFormLayout {
 
     private Tag tagFromFields() {
         return new Tag(
-            nameField.getValueAsString(),
+            keyField.getValueAsString().trim(),
+            valueField.getValueAsString().trim(),
+            Tag.ValueType.valueOf(typeField.getValueAsString()),
             applicationField.getValueAsString(),
-            versionField.getValueAsString(),
+            versionField.getValueAsString().trim(),
             visibleField.getValueAsBoolean(),
             boutiquesField.getValueAsBoolean()
         );

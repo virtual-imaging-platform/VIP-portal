@@ -57,7 +57,7 @@ public class TagBusiness {
 
     public boolean exist(Tag tag) throws BusinessException {
         try {
-            return tagDAO.get(tag.getName(), tag.getApplication(), tag.getVersion()) != null;
+            return tagDAO.get(tag.getKey(), tag.getValue(), tag.getApplication(), tag.getVersion()) != null;
         } catch (DAOException e) {
             throw new BusinessException(e);
         }

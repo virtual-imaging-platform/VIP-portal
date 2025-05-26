@@ -32,6 +32,7 @@
 package fr.insalyon.creatis.vip.applicationimporter.server.rpc;
 
 import fr.insalyon.creatis.vip.application.client.bean.Tag;
+import fr.insalyon.creatis.vip.application.client.bean.Tag.ValueType;
 import fr.insalyon.creatis.vip.application.client.bean.boutiquesTools.BoutiquesApplication;
 import fr.insalyon.creatis.vip.application.server.model.boutiques.BoutiquesDescriptor;
 import fr.insalyon.creatis.vip.applicationimporter.client.ApplicationImporterException;
@@ -47,9 +48,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import jakarta.servlet.ServletException;
 
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 public class ApplicationImporterServiceImpl extends fr.insalyon.creatis.vip.core.server.rpc.AbstractRemoteServiceServlet
         implements ApplicationImporterService {
@@ -99,21 +99,29 @@ public class ApplicationImporterServiceImpl extends fr.insalyon.creatis.vip.core
     }
 
     @Override
-    public Map<String, String> getBoutiquesTags(String boutiquesJsonFile) throws ApplicationImporterException {
+    public List<Tag> getBoutiquesTags(String boutiquesJsonFile) throws ApplicationImporterException {
         try {
-            Map<String, String> map = new HashMap<>();
+            List<Tag> tags = new ArrayList<>();
             ObjectMapper objectMapper = new ObjectMapper();
             BoutiquesDescriptor descriptor = objectMapper.readValue(boutiquesJsonFile, BoutiquesDescriptor.class);
 
             if (descriptor.getTags() != null) {
+                // boutiques tags can be List<String>, String, numbers or booleans
+                // we return into String or List<String>
+                // in case of boolean we precise with ValueType.BOOLEAN
                 descriptor.getTags().getAdditionalProperties().forEach((k, v) -> {
-                    String valueString = (v instanceof List) 
-                            ? String.join(",", (List<String>) v) 
-                            : String.valueOf(v);
-                    map.put(k, valueString);
+                    if (v instanceof List) {
+                        tags.addAll(((List<String>) v).stream().map((sub) -> {
+                            return new Tag(k, (String) sub, ValueType.STRING, null, null, true, true);
+                        }).toList());
+                    } else if (v instanceof Boolean) {
+                        tags.add(new Tag(k, String.valueOf(v), ValueType.BOOLEAN, null, null, true, true));
+                    } else {
+                        tags.add(new Tag(k, String.valueOf(v), ValueType.STRING, null, null, true, true));
+                    }
                 });
             }
-            return map;
+            return tags;
         } catch (JsonProcessingException e) {
             throw new ApplicationImporterException(e);
         }

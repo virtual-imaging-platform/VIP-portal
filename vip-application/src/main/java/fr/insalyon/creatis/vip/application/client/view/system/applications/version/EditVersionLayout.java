@@ -38,8 +38,6 @@ import java.util.List;
 import java.util.Map;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.smartgwt.client.data.DataSource;
-import com.smartgwt.client.data.fields.DataSourceTextField;
 import com.smartgwt.client.types.ListGridEditEvent;
 import com.smartgwt.client.types.ListGridFieldType;
 import com.smartgwt.client.types.TitleOrientation;
@@ -57,6 +55,7 @@ import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
 import fr.insalyon.creatis.vip.application.client.bean.AppVersion;
 import fr.insalyon.creatis.vip.application.client.bean.Resource;
 import fr.insalyon.creatis.vip.application.client.bean.Tag;
+import fr.insalyon.creatis.vip.application.client.bean.Tag.ValueType;
 import fr.insalyon.creatis.vip.application.client.rpc.ApplicationService;
 import fr.insalyon.creatis.vip.application.client.rpc.ApplicationServiceAsync;
 import fr.insalyon.creatis.vip.application.client.view.system.applications.app.ManageApplicationsTab;
@@ -84,15 +83,10 @@ public class EditVersionLayout extends AbstractFormLayout {
     private IButton saveButton;
     private IButton removeButton;
 
-    private DataSource dataSource;
-
     public EditVersionLayout() {
 
         super(480, 200);
         addTitle("Add/Edit Version", ApplicationConstants.ICON_APPLICATION);
-
-        dataSource = new DataSource().setClientOnly(true);
-        dataSource.setFields(new DataSourceTextField("name").setPrimaryKey(true));
 
         configure();
     }
@@ -146,7 +140,8 @@ public class EditVersionLayout extends AbstractFormLayout {
         tagsGrid.setEditEvent(ListGridEditEvent.CLICK);
         tagsGrid.setHeight(250);
         tagsGrid.setFields(
-            new ListGridField("name", "Name").setCanEdit(false),
+            new ListGridField("key", "Key").setCanEdit(true),
+            new ListGridField("value", "Value").setCanEdit(true),
             new ListGridField("visible", "Visible").setType(ListGridFieldType.BOOLEAN),
             new ListGridField("boutiques", "Boutiques").setType(ListGridFieldType.BOOLEAN)
         );
@@ -208,29 +203,17 @@ public class EditVersionLayout extends AbstractFormLayout {
     private DynamicForm createTagCreationEntry() {
         DynamicForm form = new DynamicForm();
 
-        ComboBoxItem combo = new ComboBoxItem("autoComplete", "Add/Search custom Tag");
+        ComboBoxItem combo = new ComboBoxItem("autoComplete", "Add custom Tag");
 
         combo.setWidth(175);
         combo.setTitleOrientation(TitleOrientation.TOP);
-        combo.setValueField("name");
-        combo.setOptionDataSource(dataSource);
-
-        combo.setAddUnknownValues(true);
-        combo.setFetchMissingValues(false);
 
         combo.addKeyPressHandler(event -> {
             if ("Enter".equals(event.getKeyName())) {
                 String inputValue = combo.getEnteredValue();
-                Record record = new Record();
                 
                 if (inputValue != null && ! inputValue.trim().isEmpty()) {
-                    record.setAttribute("name", inputValue);
-                    record.setAttribute("visible", true);
-                    record.setAttribute("boutiques", false);
-
-                    if (tagsToList("", "").stream().noneMatch((t) -> inputValue.equalsIgnoreCase(t.getName()))) {
-                        tagsGrid.addData(record);
-                    }
+                    tagsGrid.addData(createTagRecord(inputValue, "default", ValueType.STRING, true, false));
                 }
                 combo.clearValue();
             }
@@ -342,7 +325,9 @@ public class EditVersionLayout extends AbstractFormLayout {
 
         for (ListGridRecord record : tagsGrid.getRecords()) {
             result.add(new Tag(
-                record.getAttribute("name"),
+                record.getAttribute("key"),
+                record.getAttribute("value"),
+                Tag.ValueType.valueOf(record.getAttribute("type")),
                 application,
                 version,
                 record.getAttributeAsBoolean("visible"),
@@ -356,14 +341,19 @@ public class EditVersionLayout extends AbstractFormLayout {
         tagsGrid.setData(new ListGridRecord[0]); // cleaning between
 
         tags.forEach((t) -> {
-            ListGridRecord record = new ListGridRecord();
-
-            record.setAttribute("name", t.getName());
-            record.setAttribute("visible", t.isVisible());
-            record.setAttribute("boutiques", t.isBoutiques());
-
-            tagsGrid.addData(record);
+            tagsGrid.addData(createTagRecord(t.getKey(), t.getValue(), t.getType(), t.isVisible(), t.isBoutiques()));
         });
+    }
+
+    private Record createTagRecord(String key, String value, ValueType type, boolean visible, boolean boutiques) {
+        Record record = new Record();
+
+        record.setAttribute("key", key);
+        record.setAttribute("value", value);
+        record.setAttribute("type", type);
+        record.setAttribute("visible", visible);
+        record.setAttribute("boutiques", boutiques);
+        return record;
     }
 
     private List<Resource> resourcesToList(List<String> resources) {
@@ -380,33 +370,6 @@ public class EditVersionLayout extends AbstractFormLayout {
             loadAppVersionTags();
         }
         loadResources();
-        loadSuggestionTags();
-    }
-
-    private void loadSuggestionTags() {
-        ApplicationServiceAsync service = ApplicationService.Util.getInstance();
-        final AsyncCallback<List<Tag>> callback = new AsyncCallback<>() {
-            @Override
-            public void onFailure(Throwable caught) {
-                Layout.getInstance().setWarningMessage("Unable to load tags:<br />" + caught.getMessage());
-            }
-    
-            @Override
-            public void onSuccess(List<Tag> result) {
-                Record[] data = result.stream().map((tag) -> {
-                    Record record = new Record();
-
-                    record.setAttribute("name", tag.getName());
-                    record.setAttribute("visible", tag.isVisible());
-                    record.setAttribute("boutiques", tag.isBoutiques());
-
-                    return record;
-                }).toArray(Record[]::new);
-
-                dataSource.setCacheData(data);
-            }
-        };
-        service.getNonBoutiquesTags(callback);
     }
 
     private void loadAppVersionTags() {

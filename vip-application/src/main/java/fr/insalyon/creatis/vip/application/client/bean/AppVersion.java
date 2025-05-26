@@ -141,10 +141,6 @@ public class AppVersion implements IsSerializable {
         return tags;
     }
 
-    public List<String> getTagsNames() {
-        return tags.stream().map(Tag::getName).collect(Collectors.toList());
-    }
-
     public void setResources(List<Resource> resources) {
         this.resources = resources;
     }
