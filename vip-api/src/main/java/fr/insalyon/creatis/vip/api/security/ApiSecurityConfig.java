@@ -112,6 +112,7 @@ public class ApiSecurityConfig {
                         .requestMatchers(antMatcher("/rest/register")).permitAll()
                         .requestMatchers(antMatcher("/rest/executions/{executionId}/summary")).hasAnyRole("SERVICE")
                         .requestMatchers(antMatcher("/rest/statistics/**")).hasAnyRole("ADVANCED", "ADMINISTRATOR")
+                        .requestMatchers(antMatcher("/rest/admin/**")).hasAnyRole("ADMINISTRATOR")
                         .requestMatchers(antMatcher("/rest/**")).authenticated()
                         .anyRequest().permitAll()
                 )

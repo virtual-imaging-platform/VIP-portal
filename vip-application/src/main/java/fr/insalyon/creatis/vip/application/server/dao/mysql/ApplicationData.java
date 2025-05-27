@@ -344,7 +344,7 @@ public class ApplicationData extends JdbcDaoSupport implements ApplicationDAO {
         try (PreparedStatement ps = getConnection().prepareStatement(query)) {
             ps.setString(1, applicationName);
             ps.setString(2, version);
-            ps.executeUpdate(query);
+            ps.executeUpdate();
 
         } catch (SQLException ex) {
             logger.error("Error removing version {}/{}", applicationName, version, ex);
