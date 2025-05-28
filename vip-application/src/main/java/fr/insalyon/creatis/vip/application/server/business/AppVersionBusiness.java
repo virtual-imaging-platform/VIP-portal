@@ -107,6 +107,9 @@ public class AppVersionBusiness {
             throws BusinessException {
         try {
             AppVersion version = applicationDAO.getVersion(applicationName, applicationVersion);
+            if (version == null) {
+                return null;
+            }
 
             version.setResources(resourceBusiness.getByAppVersion(version).stream().map((e) -> e.getName()).collect(Collectors.toList()));
             version.setTags(tagBusiness.getTags(version).stream().map((e) -> e.getName()).collect(Collectors.toList()));
