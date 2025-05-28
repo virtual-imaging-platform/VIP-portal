@@ -90,20 +90,15 @@ public class AppVersionController extends ApiController {
     }
 
     private AppVersionStrings parseAppVersionId(String appVersionId) throws ApiException {
-        try {
-            int delimiterPos = appVersionId.lastIndexOf("/");
-            if (delimiterPos >= 0) {
-                String appName = appVersionId.substring(0, delimiterPos);
-                String version = appVersionId.substring(delimiterPos + 1);
-                return new AppVersionStrings(appName, version);
-            } else {
-                throw new ApiException("Invalid appVersionId");
-            }
-        } catch (ApiException e) {
-            logger.error("Error decoding appVersionId {}", appVersionId, e);
-            throw new ApiException("cannot decode appVersionId : " + appVersionId);
+        int delimiterPos = appVersionId.lastIndexOf("/");
+        if (delimiterPos >= 0) {
+            String appName = appVersionId.substring(0, delimiterPos);
+            String version = appVersionId.substring(delimiterPos + 1);
+            return new AppVersionStrings(appName, version);
+        } else {
+            logger.error("Error decoding appVersionId {}", appVersionId);
+            throw new ApiException(ApiException.ApiError.INVALID_PIPELINE_IDENTIFIER, appVersionId);
         }
-
     }
 
     @RequestMapping(value = "{appVersionId}", method = RequestMethod.GET)
@@ -113,7 +108,7 @@ public class AppVersionController extends ApiController {
         try {
             AppVersion appVersion = appVersionBusiness.getVersion(input.appName, input.version);
             if (appVersion == null) {
-                throw new ApiException("Not found");
+                throw new ApiException(ApiException.ApiError.INVALID_PIPELINE_IDENTIFIER, appVersionId);
             }
             return appVersion;
         } catch (BusinessException e) {
@@ -132,6 +127,11 @@ public class AppVersionController extends ApiController {
                                                @RequestBody @Valid AppVersion appVersion) throws ApiException {
         logMethodInvocation(logger, "createOrUpdateAppVersion", appVersionId);
         AppVersionStrings input = parseAppVersionId(appVersionId);
+        String appVersionIdBody = appVersion.getApplicationName() + "/" + appVersion.getVersion();
+        if (!appVersionId.equals(appVersionIdBody)) {
+            logger.error("appVersionId mismatch: {}!={}", appVersionId, appVersionIdBody);
+            throw new ApiException(ApiException.ApiError.INPUT_FIELD_NOT_VALID, appVersionId);
+        }
         try {
             AppVersion existingAppVersion = appVersionBusiness.getVersion(input.appName, input.version);
             if (existingAppVersion == null) {

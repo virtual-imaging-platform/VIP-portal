@@ -76,7 +76,7 @@ public class ApplicationController extends ApiController {
         try {
             Application app = applicationBusiness.getApplication(applicationId);
             if (app == null) {
-                throw new ApiException("Not found");
+                throw new ApiException(ApiException.ApiError.APPLICATION_NOT_FOUND, applicationId);
             }
             return app;
         } catch (BusinessException e) {
@@ -88,6 +88,10 @@ public class ApplicationController extends ApiController {
     public Application createOrUpdateApplication(@PathVariable String applicationId,
                                                  @RequestBody @Valid Application app) throws ApiException {
         logMethodInvocation(logger, "createOrUpdateApplication", applicationId);
+        if (!applicationId.equals(app.getName())) {
+            logger.error("applicationId mismatch: {}!={}", applicationId, app.getName());
+            throw new ApiException(ApiException.ApiError.INPUT_FIELD_NOT_VALID, applicationId);
+        }
         try {
             Application existingApp = applicationBusiness.getApplication(applicationId);
             if (existingApp == null) {
