@@ -38,14 +38,12 @@ import com.smartgwt.client.widgets.grid.ListGridRecord;
 
 public class VersionRecord extends ListGridRecord {
     
-    public VersionRecord(String version, String lfn, String jsonLfn, String doi, boolean isVisible, boolean isBoutiquesForm, 
+    public VersionRecord(String version, String descriptor, String doi, boolean isVisible,
             Map<String, String> settings, List<String> resources) {
         setAttribute("version", version);
-        setAttribute("lfn", lfn);
-        setAttribute("jsonLfn", jsonLfn);
+        setAttribute("descriptor", descriptor);
         setAttribute("doi", doi);
         setAttribute("visible", isVisible);
-        setAttribute("boutiquesForm", isBoutiquesForm);
         setAttribute("settings", settings);
         setAttribute("resources", resources);
     }

@@ -1,6 +1,5 @@
 package fr.insalyon.creatis.vip.integrationtest;
 
-import fr.insalyon.creatis.vip.application.client.bean.Descriptor;
 import fr.insalyon.creatis.vip.application.client.view.monitor.SimulationStatus;
 import fr.insalyon.creatis.vip.application.server.business.ApplicationBusiness;
 import fr.insalyon.creatis.vip.application.server.business.WorkflowBusiness;
@@ -91,15 +90,6 @@ public class VipLocalConfigurationIT {
     @Order(1)
     public void testConfig() throws BusinessException {
         Assertions.assertEquals(1, applicationBusiness.getApplications().size());
-    }
-
-    @Test
-    @Order(7)
-    public void getAppVersionDescriptor() throws BusinessException {
-        Descriptor appDescriptor = workflowBusiness.getApplicationDescriptor(
-                configurationBusiness.getUser(server.getAdminEmail()),
-                applicationName, applicationVersion);
-        Assertions.assertEquals(3, appDescriptor.getSources().size());
     }
 
     // execution tests

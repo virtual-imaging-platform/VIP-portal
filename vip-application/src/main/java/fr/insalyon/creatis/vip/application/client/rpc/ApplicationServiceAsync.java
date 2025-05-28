@@ -101,5 +101,4 @@ public interface ApplicationServiceAsync {
     public void getTags(AppVersion appVersion, AsyncCallback<List<Tag>> asyncCallback);
 
     public void isAppUsableWithCurrentUser(String appName, String appVersion, AsyncCallback<Boolean> asyncCallback);
-
 }

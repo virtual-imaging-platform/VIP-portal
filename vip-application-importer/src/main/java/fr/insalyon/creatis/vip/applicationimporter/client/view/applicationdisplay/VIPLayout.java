@@ -39,134 +39,39 @@ import com.smartgwt.client.widgets.form.fields.SelectItem;
 import fr.insalyon.creatis.vip.application.client.bean.Resource;
 import fr.insalyon.creatis.vip.application.client.rpc.ApplicationService;
 import fr.insalyon.creatis.vip.application.client.rpc.ApplicationServiceAsync;
-import fr.insalyon.creatis.vip.applicationimporter.client.rpc.ApplicationImporterService;
 import fr.insalyon.creatis.vip.applicationimporter.client.view.Constants;
 import fr.insalyon.creatis.vip.core.client.view.common.AbstractFormLayout;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
-import fr.insalyon.creatis.vip.datamanager.client.view.ValidatorUtil;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 public class VIPLayout extends AbstractFormLayout {
 
-    private final LocalTextField applicationLocation;
     private final CheckboxItem overwriteIfexists;
-    private final SelectItem tagsCbItem;
     private final SelectItem resourcesList;
-    private final SelectItem fileAccessProtocolItem;
 
     public VIPLayout(String width, String height) {
         super(width, height);
         addTitle("Executable", Constants.ICON_EXECUTABLE);
         setOverflow(Overflow.AUTO);
         setMembersMargin(2);
-        
-        // Adds application location
-        applicationLocation = new LocalTextField("Application file location", true, true);
-        setApplicationLocationValue();
-        
+
         overwriteIfexists = new CheckboxItem("ckbox_over", "Overwrite application version if it exists");
-        tagsCbItem = createTagsSelect();
-        
-        // select list to choose the execution type
-        fileAccessProtocolItem = new SelectItem();
-        fileAccessProtocolItem.setTitle("<br>Select where the application files must be located</b>");
-        fileAccessProtocolItem.setType("comboBox");
-        LinkedHashMap<String, String> fileAccessProtocolValueMap = new LinkedHashMap<>();
-        fileAccessProtocolValueMap.put(Constants.APP_IMPORTER_FILE_PROTOCOL, "Local (file)");
-        fileAccessProtocolValueMap.put(Constants.APP_IMPORTER_LFN_PROTOCOL, "Grid (lfn)");
-        fileAccessProtocolItem.setValueMap(fileAccessProtocolValueMap);
-        
+
         // Resources allowed
         resourcesList = new SelectItem();
         resourcesList.setTitle("Resource(s) on which the application is authorized to execute");
         resourcesList.setMultiple(true);
 
-        this.addMember(applicationLocation);
         this.addMember(FieldUtil.getForm(resourcesList));
         this.addMember(FieldUtil.getForm(overwriteIfexists));
-        this.addMember(FieldUtil.getForm(tagsCbItem));
-        this.addMember(FieldUtil.getForm(fileAccessProtocolItem));
 
         loadResources();
     }
 
-    public void setApplicationLocationValue(){
-        
-        final AsyncCallback<String> callback = new AsyncCallback<String>() {
-            @Override
-            public void onFailure(Throwable caught) {
-                Layout.getInstance().setWarningMessage("Unable to retrieve configurated root folder for application importer, setting it to Home:<br />" + caught.getMessage());
-                applicationLocation.setValue("/vip/Home");
-            }
-
-            @Override
-            public void onSuccess(String result) {
-                if (ValidatorUtil.validateRootPath(result, "create a folder in")
-                        && ValidatorUtil.validateUserLevel(result, "create a folder in")) {
-                    applicationLocation.setValue(result);
-                }else{
-                    applicationLocation.setValue("/vip/Home");
-                }       
-            }
-        };
-        ApplicationImporterService.Util.getInstance().getApplicationImporterRootFolder(callback);
-
-    }
-
-    public String getApplicationLocation() {
-        return applicationLocation.getValue();
-    }
-
     public boolean getOverwrite() {
         return this.overwriteIfexists.getValueAsBoolean();
-    }
-
-    private SelectItem createTagsSelect() {
-        // ComboBox to select tags.
-        SelectItem tagsCb = new SelectItem();
-        tagsCb.setTitle("<b>Dirac tag</b>");
-        tagsCb.setType("comboBox");
-
-        final AsyncCallback<List<String>> callback = new AsyncCallback<>() {
-            @Override
-            public void onFailure(Throwable caught) {
-                Layout.getInstance().setWarningMessage("Unable to retrieve configurated list of requirements, setting it to None:<br />" + caught.getMessage());
-                tagsCb.setValueMap("None");
-            }
-
-            @Override
-            public void onSuccess(List<String> result) {
-                result = new ArrayList<>(result); // make a new list because the returned one does not support the add method
-                if(!result.contains("None")){
-                    result.add("None");
-                }
-                
-                Map<String, String> requirementsValues = new LinkedHashMap<>();
-                for (String requirement : result) {
-                    requirementsValues.put(requirement, requirement);
-                }               
-                tagsCb.setValueMap(requirementsValues);
-                
-            }
-        };
-        ApplicationImporterService.Util.getInstance().getApplicationImporterRequirements(callback);
-        
-        tagsCb.setValue("None");
-
-        return tagsCb;
-    }
-
-    public String getDiracTag() {
-        return tagsCbItem._getValue().toString();
-    }
-
-    public String getFileAccessProtocol() {
-        return fileAccessProtocolItem._getValue().toString();
     }
 
     public List<String> getSelectedResources() {

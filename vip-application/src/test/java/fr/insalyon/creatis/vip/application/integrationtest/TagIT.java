@@ -89,9 +89,9 @@ public class TagIT extends BaseSpringIT {
     @Test
     public void getTags() throws BusinessException {
         Application app1 = new Application("test", "super citation");
-        AppVersion appVersion1 = new AppVersion("test", "0.1", "blink", "blank", false, false);
+        AppVersion appVersion1 = new AppVersion("test", "0.1", "{}", false);
         Application app2 = new Application("applicationC", "super citation");
-        AppVersion appVersion2 = new AppVersion("applicationC", "0.3", "blink", "blank", false, false);
+        AppVersion appVersion2 = new AppVersion("applicationC", "0.3", "{}", false);
         List<Tag> result = new ArrayList<>();
         
         Tag bis = new Tag("bli", "ilb", Tag.ValueType.STRING, appVersion1, false, false);

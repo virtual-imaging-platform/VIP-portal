@@ -458,8 +458,9 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
     }
 
     @Override
-    public List<Tag> getTags(AppVersion appVersion) throws ApplicationException {
+    public List<Tag> getTags(String appName, String version) throws ApplicationException {
         try {
+            AppVersion appVersion = appVersionBusiness.getVersion(appName, version);
             return tagBusiness.getTags(appVersion);
         } catch (BusinessException e) {
             throw new ApplicationException(e);

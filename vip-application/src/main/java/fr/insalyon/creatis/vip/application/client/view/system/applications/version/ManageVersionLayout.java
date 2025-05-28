@@ -98,7 +98,7 @@ public class ManageVersionLayout extends AbstractFormLayout {
                 WidgetUtil.resetIButton(publishButton, "Publish", CoreConstants.ICON_SAVE);
                 Layout.getInstance().setNoticeMessage("Version published with success. DOI : " + doi);
                 // reload all version to avoid cache issues
-                setVersion(null,null, null);
+                setVersion(null,null,null);
                 ManageApplicationsTab tab = (ManageApplicationsTab) Layout.getInstance().
                         getTab(ApplicationConstants.TAB_MANAGE_APPLICATION);
                 tab.loadVersions(applicationName);
@@ -109,15 +109,15 @@ public class ManageVersionLayout extends AbstractFormLayout {
     }
 
     public void setApplication(String applicationName) {
-        setVersion(null,null, null);
+        setVersion(null,null,null);
         this.applicationName = applicationName;
     }
 
-    public void setVersion(String applicationVersion, String jsonLfn, String doi) {
+    public void setVersion(String applicationVersion, String descriptor, String doi) {
         this.applicationVersion = applicationVersion;
 
         boolean isPublished = doi != null;
-        boolean canBePublished = !isPublished && jsonLfn != null;
+        boolean canBePublished = !isPublished && descriptor != null;
         doiLabel.setVisible(isPublished);
         if (isPublished) {
             doiLabel.setContents("<b>DOI:</b> " + doi);

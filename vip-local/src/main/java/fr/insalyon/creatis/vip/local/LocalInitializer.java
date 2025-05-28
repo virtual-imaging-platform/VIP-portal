@@ -27,7 +27,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
-import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -106,6 +105,12 @@ public class LocalInitializer {
         }
     }
 
+    private String getApplicationImporterRootFolder() {
+        // this is a stub for the old "boutiques.application.rootFolder" parameter,
+        // introduced to allow removing this parameter from vip.conf, while keeping vip-local mostly unchanged.
+        return "/vip/Support (group)/Applications";
+    }
+
     private void initFolders() throws BusinessException {
         User admin = configurationBusiness.getUser(server.getAdminEmail());
 
@@ -114,7 +119,7 @@ public class LocalInitializer {
                 "Admin home folder");
 
         // applications root folder parent must exist
-        String appRootFolder = server.getApplicationImporterRootFolder();
+        String appRootFolder = getApplicationImporterRootFolder();
         String appRootFolderParent = Paths.get(appRootFolder).getParent().toString();
         if ( ! lfcBusiness.exists(admin, appRootFolderParent)) {
             logger.error("Application importer parent dir [{}] must exist", appRootFolderParent);
@@ -196,7 +201,7 @@ public class LocalInitializer {
         User admin = configurationBusiness.getUser(server.getAdminEmail());
 
         // create app folders
-        String appFolder = server.getApplicationImporterRootFolder() + "/" + applicationName;
+        String appFolder = getApplicationImporterRootFolder() + "/" + applicationName;
         createFolderIfNecessary(admin, appFolder, applicationName + " application folder");
         String versionFolder = appFolder + "/v" + applicationVersion;
         createFolderIfNecessary(admin, versionFolder, applicationName + " application version folder");
@@ -206,8 +211,7 @@ public class LocalInitializer {
         transferPoolBusiness.uploadFile(admin, getPathFromLocation(scriptLocation), versionFolder);
 
         // create AppVersion
-        String gwendiaLFN = versionFolder + "/" + Paths.get(gwendiaLocation).getFileName().toString();
-        AppVersion appVersion = new AppVersion(applicationName, applicationVersion, gwendiaLFN, null, true, false);
+        AppVersion appVersion = new AppVersion(applicationName, applicationVersion, "{}", true);
         appVersionBusiness.add(appVersion);
 
         logger.info("Application version [{}/{}] installed", applicationName, applicationVersion);

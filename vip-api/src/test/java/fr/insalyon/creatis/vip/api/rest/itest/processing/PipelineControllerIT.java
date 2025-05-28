@@ -31,18 +31,15 @@
  */
 package fr.insalyon.creatis.vip.api.rest.itest.processing;
 
-import fr.insalyon.creatis.grida.client.GRIDAClientException;
 import fr.insalyon.creatis.vip.api.exception.ApiException.ApiError;
 import fr.insalyon.creatis.vip.api.rest.config.BaseWebSpringIT;
 import fr.insalyon.creatis.vip.application.client.bean.AppVersion;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.http.MediaType;
 
 import static fr.insalyon.creatis.vip.api.data.PipelineTestUtils.*;
 import static fr.insalyon.creatis.vip.api.data.UserTestUtils.*;
-import static fr.insalyon.creatis.vip.application.client.view.ApplicationException.ApplicationError.WRONG_APPLICATION_DESCRIPTOR;
 import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -81,71 +78,11 @@ public class PipelineControllerIT extends BaseWebSpringIT {
     }
 
     @Test
-    public void shouldReturnErrorOnConfiguredVipException() throws Exception {
-        String appName = "testApp", groupName = "testGroup";
-        String versionName = "42-test";
-        AppVersion appVersion = configureAnApplication(appName, versionName, groupName);
-        configureVersion(appVersion,
-                "/vip/testGroup (group)/path/to/test.gwendia", null);
-
-        createUserInGroup(baseUser1.getEmail(), groupName);
-
-        Mockito.when(server.getDataManagerPath()).thenReturn("/test/folder");
-        Mockito.when(server.getDataManagerGroupsHome()).thenReturn("/root/group");
-        // localDir is datamanagerpath + "downloads" + groupRoot + dir(path)
-        Mockito.when(gridaClient.getRemoteFile(
-                "/root/group/testGroup/path/to/test.gwendia",
-                "/test/folder/downloads/root/group/testGroup/path/to")).thenThrow(new GRIDAClientException("test exception"));
-
-        String pipelineId = appName + "/" + versionName;
-        mockMvc.perform(get("/rest/pipelines/" + pipelineId).with(baseUser1()))
-                .andDo(print())
-                .andExpect(status().isBadRequest())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.errorCode").value(WRONG_APPLICATION_DESCRIPTOR.getCode()));
-    }
-
-    @Test
-    public void userGetAPipelineWithPathParameterNonEncoded() throws Exception {
-
-        String appName = "testGwendiaApp", groupName = "testGroup", versionName = "42-test";
-        AppVersion appVersion = configureGwendiaTestApp(appName, groupName, versionName);
-        String pipelineId = appName + "/" + versionName;
-
-        createUserInGroup(baseUser1.getEmail(), groupName);
-
-        mockMvc.perform(get("/rest/pipelines/" + pipelineId).with(baseUser1()))
-                .andDo(print())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-                // res-dir should be removed from the description
-                .andExpect(jsonPath("$", jsonCorrespondsToPipeline(
-                        getFullPipeline(appVersion, "Test tool description. Must be similar to the boutiques one", flagParam, textParam, fileParam, optionalTextParamNoValueProvided))));
-    }
-
-    @Test
-    public void userGetAPipelineWithQueryParameter() throws Exception {
-        String appName = "testGwendiaApp", groupName = "testGroup", versionName = "42-test";
-        AppVersion appVersion = configureGwendiaTestApp(appName, groupName, versionName);
-        String pipelineId = appName + "/" + versionName;
-
-        createUserInGroup(baseUser1.getEmail(), groupName);
-
-        mockMvc.perform(get("/rest/pipelines").param("pipelineId", pipelineId).with(baseUser1()))
-                .andDo(print())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-                // res-dir should be removed from the description
-                .andExpect(jsonPath("$", jsonCorrespondsToPipeline(
-                        getFullPipeline(appVersion, "Test tool description. Must be similar to the boutiques one", flagParam, textParam, fileParam, optionalTextParamNoValueProvided))));
-    }
-
-    @Test
     public void userGetAPipelineWithBoutiques() throws Exception {
 
         String appName = "testBoutiquesApp", groupName = "testGroup", versionName = "v42";
         AppVersion appVersion = configureBoutiquesTestApp(appName, groupName, versionName);
         String pipelineId = appName + "/" + versionName;
-
-        Mockito.when(server.useMoteurlite()).thenReturn(true);
 
         createUserInGroup(baseUser1.getEmail(), groupName);
 
@@ -155,7 +92,7 @@ public class PipelineControllerIT extends BaseWebSpringIT {
                 // res-dir should be absent from the description
                 .andExpect(jsonPath("$.name", equalTo(appName)))
                 .andExpect(jsonPath("$", jsonCorrespondsToPipeline(
-                        getFullPipeline(appVersion, "Test app from axel. Must be similar to the gwendia test app", flagParam, textParam, fileParam, optionalTextParam))));
+                        getFullPipeline(appVersion, "Test app from axel", flagParam, textParam, fileParam, optionalTextParam))));
 
     }
 
@@ -189,11 +126,11 @@ public class PipelineControllerIT extends BaseWebSpringIT {
         createAnApplication("app2", "group2");
         createAnApplication("app3", "group3");
 
-        AppVersion app11 = createAVersion("app1", "v1", true, null, null);
-        AppVersion app12 = createAVersion("app1", "v2", false, null, null);
-        AppVersion app13 = createAVersion("app1", "v3", true, null, null);
-        AppVersion app2 = createAVersion("app2", "v1.1", true, null, null);
-        AppVersion app34 = createAVersion("app3", "v4", false, null, null);
+        AppVersion app11 = createAVersion("app1", "v1", true);
+        AppVersion app12 = createAVersion("app1", "v2", false);
+        AppVersion app13 = createAVersion("app1", "v3", true);
+        AppVersion app2 = createAVersion("app2", "v1.1", true);
+        AppVersion app34 = createAVersion("app3", "v4", false);
 
         createAnApplication("appAB", "group1");
         createAnApplication("appBC", "group2");
@@ -201,9 +138,9 @@ public class PipelineControllerIT extends BaseWebSpringIT {
         putApplicationInGroup("appAB", "group2");
         putApplicationInGroup("appBC", "group3");
 
-        AppVersion appAB = createAVersion("appAB", "v1", true, null, null);
-        AppVersion appBC = createAVersion("appBC", "v1", true, null, null);
-        AppVersion appC = createAVersion("appC", "v1", true, null, null);
+        AppVersion appAB = createAVersion("appAB", "v1", true);
+        AppVersion appBC = createAVersion("appBC", "v1", true);
+        AppVersion appC = createAVersion("appC", "v1", true);
 
         createUserInGroup(baseUser1.getEmail(), "test1", "group1");
         createUserInGroup(baseUser2.getEmail(), "test2", "group2");

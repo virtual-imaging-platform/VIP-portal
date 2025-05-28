@@ -97,7 +97,7 @@ public class VersionsLayout extends VLayout {
             public void onClick(ClickEvent event) {
                 ManageApplicationsTab appsTab = (ManageApplicationsTab) Layout.getInstance().
                         getTab(ApplicationConstants.TAB_MANAGE_APPLICATION);
-                appsTab.setVersion(null, null, null, null, null, true, true, null);
+                appsTab.setVersion(null, null, null, null, true, null, null);
             }
         });
         toolstrip.addMember(addButton);
@@ -167,15 +167,9 @@ public class VersionsLayout extends VLayout {
         ListGridField isVisibleField = new ListGridField("visible", "Visible");
         isVisibleField.setType(ListGridFieldType.BOOLEAN);
 
-        ListGridField isBoutiquesFormField = new ListGridField("boutiquesForm", "Use Boutiques Form");
-        isBoutiquesFormField.setType(ListGridFieldType.BOOLEAN);
-
         grid.setFields(
                 isVisibleField,
-                isBoutiquesFormField,
-                new ListGridField("version", "Version"),
-                new ListGridField("lfn", "LFN"),
-                new ListGridField("resources", "Resources"));
+                new ListGridField("version", "Version"));
         grid.setSortField("version");
         grid.setSortDirection(SortDirection.ASCENDING);
         grid.addCellDoubleClickHandler(new CellDoubleClickHandler() {
@@ -203,8 +197,8 @@ public class VersionsLayout extends VLayout {
 
                 for (AppVersion version : result) {
                     dataList.add(new VersionRecord(
-                        version.getVersion(), version.getLfn(), version.getJsonLfn(),
-                        version.getDoi(), version.isVisible(), version.isBoutiquesForm(), 
+                        version.getVersion(), version.getDescriptor(),
+                        version.getDoi(), version.isVisible(),
                         version.getSettings(), version.getResourcesNames()));
                 }
                 grid.setData(dataList.toArray(new VersionRecord[]{}));
@@ -220,18 +214,17 @@ public class VersionsLayout extends VLayout {
         loadData();
     }
 
+    @SuppressWarnings("unchecked")
     private void edit(ListGridRecord record) {
         ManageApplicationsTab appsTab = (ManageApplicationsTab) Layout.getInstance().
             getTab(ApplicationConstants.TAB_MANAGE_APPLICATION);
 
         appsTab.setVersion(
             record.getAttribute("version"),
-            record.getAttribute("lfn"),
-            record.getAttribute("jsonLfn"),
+            record.getAttribute("descriptor"),
             record.getAttribute("doi"),
             record.getAttributeAsMap("settings"),
             record.getAttributeAsBoolean("visible"),
-            record.getAttributeAsBoolean("boutiquesForm"),
             record.getAttributeAsStringArray("resources"));
     }
 

@@ -371,13 +371,11 @@ public class ExecutionBusiness {
                     continue;
                 }
                 // then ok if input has a default value (and we set it)
-                // beware : with gwendia, optional always have an defaultValue (either defined or No_Value_Provided)
                 if (pp.getDefaultValue() != null) {
                     inputValues.put(pp.getName(), pp.getDefaultValue().toString());
                     continue;
                 }
                 // then ok if it is optional
-                // beware, with gwendia it should not be possible to enter this case (see previous condition)
                 if (pp.isOptional()) {
                     continue;
                 }

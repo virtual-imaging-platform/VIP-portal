@@ -42,11 +42,7 @@ public interface ApplicationImporterServiceAsync {
 
     public void readAndValidateBoutiquesFile(String fileLFN, AsyncCallback<String> callback);
 
-    public void createApplication(BoutiquesApplication bt, String tag, boolean overwriteVersion, String fileAccessProtocol, List<Tag> tags, List<String> resources, AsyncCallback<Void> callback);
-    
-    public void getApplicationImporterRootFolder(AsyncCallback<String> asyncCallback);
-    
-    public void getApplicationImporterRequirements(AsyncCallback<List<String>>  asyncCallback);
+    public void createApplication(BoutiquesApplication bt, boolean overwriteVersion, List<Tag> tags, List<String> resources, AsyncCallback<Void> callback);
 
     public void getBoutiquesTags(String boutiquesJsonFile ,AsyncCallback<List<Tag>> asyncCallback);
 

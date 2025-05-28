@@ -37,7 +37,6 @@ import fr.insalyon.creatis.vip.application.client.bean.AppVersion;
 import fr.insalyon.creatis.vip.application.client.view.monitor.SimulationStatus;
 import fr.insalyon.creatis.vip.application.server.business.simulation.ParameterSweep;
 import fr.insalyon.creatis.vip.application.server.business.simulation.WorkflowEngineInstantiator;
-import fr.insalyon.creatis.vip.application.server.business.util.FileUtil;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.business.Server;
@@ -47,7 +46,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.xml.rpc.ServiceException;
-import java.io.File;
 import java.rmi.RemoteException;
 import java.util.Date;
 import java.util.List;
@@ -74,10 +72,10 @@ public class WorkflowExecutionBusiness {
     }
 
     public Workflow launch(String engineEndpoint, AppVersion appVersion, User user, String simulationName,
-            String workflowPath, List<ParameterSweep> parameters, String settings, String executorConfig) throws BusinessException {
+            List<ParameterSweep> parameters, String settings, String executorConfig) throws BusinessException {
 
         try {
-            String workflowContent = FileUtil.read(new File(workflowPath));
+            String workflowContent = appVersion.getDescriptor();
             String inputs = (parameters != null) ? getParametersAsXMLInput(parameters) : null;
             String proxyFileName = server.getServerProxy(server.getVoName());
             String workflowID = engine.launch(engineEndpoint, workflowContent, inputs, appVersion.getSettingsAsString(), executorConfig, proxyFileName);
