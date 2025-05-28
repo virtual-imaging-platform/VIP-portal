@@ -97,7 +97,7 @@ public class VersionsLayout extends VLayout {
             public void onClick(ClickEvent event) {
                 ManageApplicationsTab appsTab = (ManageApplicationsTab) Layout.getInstance().
                         getTab(ApplicationConstants.TAB_MANAGE_APPLICATION);
-                appsTab.setVersion(null, null, null, null, true, null, null);
+                appsTab.setVersion(null, null, null, null, true, null);
             }
         });
         toolstrip.addMember(addButton);

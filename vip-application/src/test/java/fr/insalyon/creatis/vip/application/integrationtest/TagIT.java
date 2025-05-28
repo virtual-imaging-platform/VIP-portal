@@ -34,7 +34,7 @@ public class TagIT extends BaseSpringIT {
     public void setUp() throws Exception {
         super.setUp();
         app = new Application("applicationA", "super citation");
-        appVersion = new AppVersion("applicationA", "0.1", "blink", "blank", false, false);
+        appVersion = new AppVersion("applicationA", "0.1","{}", false);
         tag = new Tag("bla", "blou", Tag.ValueType.STRING, "applicationA", "0.1", true, true);
 
         appBusiness.add(app);

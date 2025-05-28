@@ -146,7 +146,7 @@ public class ApplicationIT extends BaseSpringIT {
 
     @Test
     public void testUpdateAppVersionWithTags() throws BusinessException {
-        AppVersion appVersion = new AppVersion("Application1", "version 0.0", "lfn updated", "jsonLfn", true, true);
+        AppVersion appVersion = new AppVersion("Application1", "version 0.0", "{}", true);
         Tag tagA = new Tag("a", "x", Tag.ValueType.STRING, appVersion, false, false);
         Tag tagB = new Tag("b", "x", Tag.ValueType.STRING, appVersion, false, false);
         appVersion.setTags(List.of(tagA, tagB));

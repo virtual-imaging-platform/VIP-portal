@@ -103,7 +103,7 @@ public class ApplicationImporterServiceImpl extends fr.insalyon.creatis.vip.core
                 // in case of boolean we precise with ValueType.BOOLEAN
                 for (Map.Entry<String, Object> entry : descriptor.getTags().getAdditionalProperties().entrySet()) {
                     String k = entry.getKey();
-                    Object v = entry.getClass();
+                    Object v = entry.getValue();
                     if (v instanceof List) {
                         tags.addAll(((List<String>) v).stream().map((sub) -> {
                             return new Tag(k, (String) sub, ValueType.STRING, null, null, true, true);
@@ -113,7 +113,7 @@ public class ApplicationImporterServiceImpl extends fr.insalyon.creatis.vip.core
                     } else if (v instanceof String) {
                         tags.add(new Tag(k, String.valueOf(v), ValueType.STRING, null, null, true, true));
                     } else {
-                        throw new ApplicationImporterException("List<String>, String and Boolean are the only types supported in tags values!");
+                        throw new ApplicationImporterException("List<String>, String and Boolean are the only types supported in tags values: "+ v.getClass().toString());
                     }
                 }
             }
