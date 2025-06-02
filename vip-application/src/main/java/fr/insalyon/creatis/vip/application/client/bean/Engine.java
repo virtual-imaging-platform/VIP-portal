@@ -31,12 +31,10 @@
  */
 package fr.insalyon.creatis.vip.application.client.bean;
 
+import java.util.Objects;
+
 import com.google.gwt.user.client.rpc.IsSerializable;
 
-/**
- *
- * @author Rafael Ferreira da Silva
- */
 public class Engine implements IsSerializable {
 
     private String name;
@@ -69,5 +67,21 @@ public class Engine implements IsSerializable {
     
     public void setStatus(String status){
         this.status = status;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+    
+        Engine other = (Engine) obj;
+        return Objects.equals(name, other.name) &&
+               Objects.equals(endpoint, other.endpoint) &&
+               Objects.equals(status, other.status);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, endpoint, status);
     }
 }
