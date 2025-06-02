@@ -59,10 +59,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-/**
- *
- * @author Rafael Ferreira da Silva, Nouha boujelben
- */
 public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet implements ConfigurationService {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
@@ -639,6 +635,17 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
                 .generateNewUserApikey(getSessionUser().getEmail());
         } catch (BusinessException ex) {
             throw new CoreException(ex);
+        }
+    }
+
+    @Override
+    public List<String> getMissingGroupsRessources(String email) throws CoreException {
+        try {
+            User user = configurationBusiness.getUser(email);
+
+            return groupInterface.getMissingGroupsRessources(user);
+        } catch (BusinessException e) {
+            throw new CoreException(e);
         }
     }
 }
