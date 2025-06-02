@@ -42,10 +42,6 @@ import fr.insalyon.creatis.vip.application.client.bean.Tag;
 import java.util.List;
 import java.util.Map;
 
-/**
- *
- * @author Rafael Ferreira da Silva
- */
 public interface ApplicationServiceAsync {
 
     public void getPublicApplications(AsyncCallback<Map<Application, List<AppVersion>>> asyncCallback);
@@ -103,5 +99,4 @@ public interface ApplicationServiceAsync {
     public void getTags(String appName, String appVersion, AsyncCallback<List<Tag>> asyncCallback);
 
     public void isAppUsableWithCurrentUser(String appName, String appVersion, AsyncCallback<Boolean> asyncCallback);
-
 }
