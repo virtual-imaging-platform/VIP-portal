@@ -37,6 +37,7 @@ import fr.insalyon.creatis.vip.api.model.*;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
 import fr.insalyon.creatis.vip.application.client.bean.InOutData;
 import fr.insalyon.creatis.vip.application.client.bean.Simulation;
+import fr.insalyon.creatis.vip.application.client.bean.Task;
 import fr.insalyon.creatis.vip.application.client.view.monitor.SimulationStatus;
 import fr.insalyon.creatis.vip.application.server.business.SimulationBusiness;
 import fr.insalyon.creatis.vip.application.server.business.WorkflowBusiness;
@@ -50,6 +51,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -95,22 +99,72 @@ public class ExecutionBusiness {
     }
 
     public String getStdOut(String executionId) throws ApiException {
+        System.out.println("getStdOut called with ID = " + executionId);
         try {
             Simulation s = workflowBusiness.getSimulation(executionId);
-            return simulationBusiness.readFile(s.getID(), "", "workflow", ".out");
+            System.out.println("Simulation found: " + s.getID());
+
+            List<Task> tasks = simulationBusiness.getJobsList(s.getID());
+            System.out.println("Tasks found: " + tasks.size());
+
+            String extension = ".sh.out";
+            String folder = "out";
+            for (Task task : tasks) {
+                String fileName = task.getFileName();
+                System.out.println("Checking task file: " + fileName);
+                if (fileName != null) {
+                    String fullName = fileName + extension;
+                    Path path = Paths.get("/workflows", executionId, folder, fullName);
+                    if (Files.exists(path)) {
+                        return simulationBusiness.readFile(executionId, folder, fileName, extension);
+                    }
+                }
+            }
+            throw new ApiException("No .sh.out log file found in 'out' directory for simulation " + executionId);
         } catch (BusinessException ex) {
-            throw new ApiException(ex);
+            ex.printStackTrace();
+            throw new ApiException("BusinessException: " + ex.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new ApiException("Unexpected error: " + e.getMessage());
         }
     }
 
+
     public String getStdErr(String executionId) throws ApiException {
+        System.out.println("getStdErr called with ID = " + executionId);
         try {
             Simulation s = workflowBusiness.getSimulation(executionId);
-            return simulationBusiness.readFile(s.getID(), "", "workflow", ".err");
+            System.out.println("Simulation found: " + s.getID());
+
+            List<Task> tasks = simulationBusiness.getJobsList(s.getID());
+            System.out.println("Tasks found: " + tasks.size());
+
+            String extension = ".sh.err";
+            String folder = "err";
+            for (Task task : tasks) {
+                String fileName = task.getFileName();
+                System.out.println("Checking task file: " + fileName);
+                if (fileName != null) {
+                    String fullName = fileName + extension;
+                    Path path = Paths.get("/workflows", executionId, folder, fullName);
+                    if (Files.exists(path)) {
+                        return simulationBusiness.readFile(executionId, folder, fileName, extension);
+                    }
+                }
+            }
+            throw new ApiException("No .sh.err log file found in 'err' directory for simulation " + executionId);
         } catch (BusinessException ex) {
-            throw new ApiException(ex);
+            ex.printStackTrace();
+            throw new ApiException("BusinessException: " + ex.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new ApiException("Unexpected error: " + e.getMessage());
         }
     }
+
+
+
 
     public Execution getExample(String executionId) throws ApiException {
         return getExecution(executionId, false, true);
