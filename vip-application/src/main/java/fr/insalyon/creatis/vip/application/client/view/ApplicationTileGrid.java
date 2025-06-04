@@ -39,6 +39,7 @@ import fr.insalyon.creatis.vip.application.client.bean.Tag;
 import fr.insalyon.creatis.vip.application.client.inter.CustomApplicationModule;
 import fr.insalyon.creatis.vip.application.client.rpc.ApplicationService;
 import fr.insalyon.creatis.vip.application.client.view.launch.LaunchTab;
+import fr.insalyon.creatis.vip.core.client.bean.Group;
 import fr.insalyon.creatis.vip.core.client.view.application.ApplicationsTileGrid;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import java.util.ArrayList;
@@ -55,13 +56,13 @@ public class ApplicationTileGrid extends ApplicationsTileGrid {
 
     private List<String> applicationNames;
 
-    public ApplicationTileGrid(String tileName) {
-        super(tileName);
+    public ApplicationTileGrid(Group group) {
+        super(group.getName());
         applicationNames = new ArrayList<String>();
-        loadApplications();
+        loadApplications(group);
     }
 
-    private void loadApplications() {
+    private void loadApplications(Group group) {
         final AsyncCallback<Map<Application, List<AppVersion>>> callback = new AsyncCallback<>() {
             @Override
             public void onFailure(Throwable caught) {
@@ -73,9 +74,11 @@ public class ApplicationTileGrid extends ApplicationsTileGrid {
                 for (var set : result.entrySet()) {
                     Application app = set.getKey();
 
-                    for (var version : set.getValue()) {
-                        addApplication(app.getName(), version.getVersion(), ApplicationConstants.APP_IMG_APPLICATION);
-                        applicationNames.add(app.getName() + " " + version.getVersion());
+                    if (app.getApplicationGroups().contains(group.getName())) {
+                        for (var version : set.getValue()) {
+                            addApplication(app.getName(), version.getVersion(), ApplicationConstants.APP_IMG_APPLICATION);
+                            applicationNames.add(app.getName() + " " + version.getVersion());
+                        }
                     }
                 }
             }

@@ -94,7 +94,7 @@ public interface ConfigurationService extends RemoteService {
 
     List<Boolean> getUserPropertiesGroups() throws CoreException;
 
-    List<String> getUserGroups() throws CoreException;
+    List<Group> getUserGroups() throws CoreException;
 
     void updateUser(String email, UserLevel level, CountryCode countryCode, int maxRunningSimulations, Map<String, CoreConstants.GROUP_ROLE> groups, boolean locked) throws CoreException;
 
