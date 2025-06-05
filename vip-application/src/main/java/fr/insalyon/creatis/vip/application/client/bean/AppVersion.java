@@ -53,33 +53,35 @@ public class AppVersion implements IsSerializable {
     private List<String> resources;
     private List<String> tags;
     private Map<String, String> settings;
+    private String source;
 
     public AppVersion() {}
 
     public AppVersion(String applicationName, String version, String descriptor,
-                      Map<String,String> settings, boolean visible) {
+                      Map<String,String> settings, boolean visible, String source) {
         this.applicationName = applicationName;
         this.version = version;
         this.descriptor = descriptor;
         this.visible = visible;
+        this.source = source;
         this.resources = new ArrayList<>();
         this.tags = new ArrayList<>();
         this.settings = settings;
     }
 
     public AppVersion(String applicationName, String version, String descriptor, boolean visible) {
-        this(applicationName, version, descriptor, new HashMap<>(), visible);
+        this(applicationName, version, descriptor, new HashMap<>(), visible, "");
     }
 
     public AppVersion(String applicationName, String version, String descriptor,
-                      String doi, Map<String,String> settings, boolean visible) {
-        this(applicationName, version, descriptor, settings, visible);
+                      String doi, Map<String,String> settings, boolean visible, String source) {
+        this(applicationName, version, descriptor, settings, visible, source);
         this.doi = doi;
     }
 
     public AppVersion(String applicationName, String version, String descriptor,
-                      String doi, boolean visible, List<String> resources, List<String> tags) {
-        this(applicationName, version, descriptor, visible);
+                      String doi, boolean visible, String source, List<String> resources, List<String> tags) {
+        this(applicationName, version, descriptor, new HashMap<>(), visible, source);
         this.doi = doi;
         this.resources = resources;
         this.tags = tags;
@@ -118,6 +120,10 @@ public class AppVersion implements IsSerializable {
 
     public boolean isVisible() {
         return visible;
+    }
+
+    public String getSource() {
+        return source;
     }
 
     public List<String> getResources() {

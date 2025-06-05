@@ -116,6 +116,7 @@ public class ApplicationDataInitializer extends JdbcDaoSupport {
                 +   "doi VARCHAR(255), "
                 +   "settings TEXT, "
                 +   "visible BOOLEAN, "
+                +   "source TEXT, "
                 +   "PRIMARY KEY (application, version), "
                 +   "FOREIGN KEY (application) REFERENCES VIPApplications(name) "
                 +   "ON DELETE CASCADE ON UPDATE CASCADE");
