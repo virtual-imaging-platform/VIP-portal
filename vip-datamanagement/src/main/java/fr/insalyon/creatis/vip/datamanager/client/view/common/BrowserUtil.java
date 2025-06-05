@@ -31,11 +31,15 @@
  */
 package fr.insalyon.creatis.vip.datamanager.client.view.common;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.types.ListGridFieldType;
 import com.smartgwt.client.types.SortDirection;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
+
 import fr.insalyon.creatis.vip.core.client.CoreModule;
 import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationService;
 import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationServiceAsync;
@@ -47,22 +51,12 @@ import fr.insalyon.creatis.vip.datamanager.client.bean.Data;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerService;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerServiceAsync;
 import fr.insalyon.creatis.vip.datamanager.client.view.browser.DataRecord;
-import java.util.ArrayList;
-import java.util.List;
 
-/**
- *
- * @author Rafael Ferreira da Silva
- */
 public class BrowserUtil {
+    public static String fileType = "all";
+    public static String searchValue = null;
 
-    /**
-     * Creates an elementary browser list grid.
-     *
-     * @return Elementary browser list grid
-     */
     public static ListGrid getListGrid() {
-
         ListGrid grid = new ListGrid();
         grid.setWidth100();
         grid.setHeight100();
@@ -84,20 +78,18 @@ public class BrowserUtil {
         return grid;
     }
 
-    /**
-     * Loads the data from a path to the grid and updates the tool strip.
-     *
-     * @param modal Modal window object
-     * @param grid List grid
-     * @param toolStrip Browser tool strip
-     * @param path Grid path
-     * @param refresh Not to use cached data
-     */
+    public static void fileTypeChanged(String value) {
+        fileType = value;
+    }
+
+    public static void setSearchValue(String value) {
+        searchValue = value;
+    }
+
     public static void loadData(final ModalWindow modal, final ListGrid grid,
-            final BasicBrowserToolStrip toolStrip, final String path, boolean refresh) {
+                                final BasicBrowserToolStrip toolStrip, final String path, boolean refresh) {
 
         if (!path.equals(DataManagerConstants.ROOT)) {
-
             DataManagerServiceAsync service = DataManagerService.Util.getInstance();
             AsyncCallback<List<Data>> callback = new AsyncCallback<List<Data>>() {
 
@@ -110,26 +102,24 @@ public class BrowserUtil {
                 @Override
                 public void onSuccess(List<Data> result) {
                     List<DataRecord> dataList = new ArrayList<DataRecord>();
+                    // Iterate through the result list and filter based on searchValue
                     for (Data data : result) {
-                        String replicas = "";
-                        for (String replica : data.getReplicas()) {
-                            if (!replicas.isEmpty()) {
-                                replicas += ", ";
+                        if (searchValue == null || searchValue.isEmpty() || containsIgnoreCase(data.getName(), searchValue)) {
+                            // Check the value of the fileType flag to filter data accordingly
+                            if ("json".equals(BrowserUtil.fileType) && (data.getType() == Data.Type.folder || data.getName().toLowerCase().endsWith(".json"))) {
+                                dataList.add(new DataRecord(
+                                        data.getType(), data.getName(), data.getLength(), data.getModificationDate(), data.getReplicas().toString(), data.getPermissions()));
+                            } else if ("all".equals(BrowserUtil.fileType)) {
+                                dataList.add(new DataRecord(
+                                        data.getType(), data.getName(), data.getLength(), data.getModificationDate(), data.getReplicas().toString(), data.getPermissions()));
                             }
-                            replicas += replica;
                         }
-                        dataList.add(new DataRecord(
-                                data.getType(),
-                                data.getName(),
-                                (long) data.getLength(),
-                                data.getModificationDate(),
-                                replicas,
-                                data.getPermissions()));
                     }
                     toolStrip.setPath(path);
                     grid.setData(dataList.toArray(new DataRecord[]{}));
                     modal.hide();
                 }
+                
             };
             modal.show("Loading folder " + path + "...", true);
             service.listDir(path, refresh, callback);
@@ -170,5 +160,10 @@ public class BrowserUtil {
             modal.show("Loading " + DataManagerConstants.ROOT + "...", true);
             service.getUserGroups(callback);
         }
+    }
+
+    private static boolean containsIgnoreCase(String str, String searchStr) {
+        if (str == null || searchStr == null) return false;
+        return str.toLowerCase().contains(searchStr.toLowerCase());
     }
 }
