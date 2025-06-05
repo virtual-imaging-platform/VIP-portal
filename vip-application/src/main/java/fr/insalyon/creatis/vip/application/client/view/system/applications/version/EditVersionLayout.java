@@ -238,7 +238,7 @@ public class EditVersionLayout extends AbstractFormLayout {
         } else {
             this.versionField.setValue("");
             this.versionField.setDisabled(false);
-            this.descriptorField.setValue("");
+            this.descriptorField.setValue("{}");
             this.descriptorField.setDisabled(true);
             this.isVisibleField.setValue(true);
             this.sourceField.setValue("");
