@@ -135,7 +135,9 @@ public class GroupBusiness {
         if (group.isAuto()) {
             Group existing = getByType(group.getType()).stream().filter((g) -> g.isAuto()).findFirst().orElse(null);
 
-            if (existing != null) {
+            if ( ! group.isPublicGroup()) {
+                throw new BusinessException("You can only create public auto groups!");
+            } else if (existing != null && ! existing.getName().equals(group.getName())) {
                 throw new BusinessException("You can't have multiples auto groups of the same type!");
             }
         }

@@ -122,9 +122,9 @@ public class UsersAndGroupsIT extends BaseSpringIT {
 
     @Test
     public void testThrowCreateExistingAutoGroup() throws BusinessException {
-        Group group = new Group("test_a", false, GroupType.APPLICATION, true);
-        Group groupBis = new Group("test_ab", false, GroupType.APPLICATION, true);
-        Group groupR = new Group("test_a_R", false, GroupType.RESOURCE, true);
+        Group group = new Group("test_a", true, GroupType.APPLICATION, true);
+        Group groupBis = new Group("test_ab", true, GroupType.APPLICATION, true);
+        Group groupR = new Group("test_a_R", true, GroupType.RESOURCE, true);
 
         groupBusiness.add(groupR);
         groupBusiness.add(group);
