@@ -72,7 +72,10 @@ public class ApplicationBusiness {
 
     public void add(Application application) throws BusinessException {
         try {
+            assertVisibilityMatchBetweenAppAndGroups(application);
+
             applicationDAO.add(application);
+
             for (String groupName : application.getApplicationGroups()) {
                 associate(application, new Group(groupName));
             }
@@ -91,14 +94,10 @@ public class ApplicationBusiness {
 
     public void update(Application application) throws BusinessException {
         try {
+            assertVisibilityMatchBetweenAppAndGroups(application);
+
             Application before = getApplication(application.getName());
             List<String> beforeGroupsNames = before.getApplicationGroups();
-
-            if (before.getApplicationGroups().size() != 0) {
-                if (groupBusiness.get(before.getApplicationGroups().getFirst()).isPublicGroup() != application.isPublic()) {
-                    throw new BusinessException("You cannot set application visibility to " + application.isPublic() + " because you belongs to groups with different visiblity settings. Please leave them first!");
-                }
-            }
 
             applicationDAO.update(application);
             for (String group : application.getApplicationGroups()) {
@@ -219,7 +218,8 @@ public class ApplicationBusiness {
             if (group.isPublicGroup() == app.isPublic()) {
                 applicationDAO.associate(app, group);
             } else {
-                throw new BusinessException("Application visibility must match group visibility! (app-visibility=" + app.isPublic() + ", group-visibility=" + group.isPublicGroup() +")");
+                logger.error("Application visibility must match group visiblity (app-visibility={}, group-visibility={})", app.isPublic(), group.isPublicGroup());
+                throw new BusinessException("Application visibility must match group visibility!");
             }
         } catch (DAOException e) {
             throw new BusinessException(e);
@@ -250,5 +250,18 @@ public class ApplicationBusiness {
             mapGroups(app);
         }
         return apps;
+    }
+
+    private void assertVisibilityMatchBetweenAppAndGroups(Application application) throws BusinessException {
+        List<String> appGroups = application.getApplicationGroups();
+
+        if (appGroups.size() >= 1) {
+            groupBusiness.assertGroupsHaveSameVisibility(appGroups);
+
+            if (groupBusiness.get(appGroups.getFirst()).isPublicGroup() != application.isPublic()) {
+                logger.error("You must make the group(s) and the application visibility match!");
+                throw new BusinessException("You must make the group(s) and the application visibility match!");
+            }
+        }
     }
 }

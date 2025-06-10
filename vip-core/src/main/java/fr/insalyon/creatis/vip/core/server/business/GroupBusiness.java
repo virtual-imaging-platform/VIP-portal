@@ -1,5 +1,6 @@
 package fr.insalyon.creatis.vip.core.server.business;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -137,6 +138,19 @@ public class GroupBusiness {
             if (existing != null) {
                 throw new BusinessException("You can't have multiples auto groups of the same type!");
             }
+        }
+    }
+
+    public void assertGroupsHaveSameVisibility(List<String> groupNames) throws BusinessException {
+        List<Group> groups = new ArrayList<>();
+
+        for (String name : groupNames) {
+            groups.add(get(name));
+        }
+
+        if (groups.stream().map(Group::isPublicGroup).toList().stream().distinct().count() > 1) {
+            logger.error("The choosen groups do not have the same visibility!");
+            throw new BusinessException("The choosen groups do not have the same visibility!");
         }
     }
 }
