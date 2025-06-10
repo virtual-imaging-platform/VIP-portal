@@ -101,7 +101,7 @@ public class VersionsLayout extends VLayout {
             public void onClick(ClickEvent event) {
                 ManageApplicationsTab appsTab = (ManageApplicationsTab) Layout.getInstance().
                         getTab(ApplicationConstants.TAB_MANAGE_APPLICATION);
-                appsTab.setVersion(null, null, null, null, true, null, null);
+                appsTab.setVersion(null, null, null, null, true, null, null, null);
             }
         });
         toolstrip.addMember(addButton);
@@ -204,7 +204,7 @@ public class VersionsLayout extends VLayout {
                 for (AppVersion version : result) {
                     dataList.add(new VersionRecord(
                         version.getVersion(), version.getDescriptor(),
-                        version.getDoi(), version.isVisible(),
+                        version.getDoi(), version.isVisible(), version.getSource(),
                         version.getSettings(), version.getTags(), version.getResources()));
                 }
                 grid.setData(dataList.toArray(new VersionRecord[]{}));
@@ -236,6 +236,7 @@ public class VersionsLayout extends VLayout {
             record.getAttribute("doi"),
             record.getAttributeAsMap("settings"),
             record.getAttributeAsBoolean("visible"),
+            record.getAttribute("source"),
             record.getAttributeAsStringArray("tags"),
             record.getAttributeAsStringArray("resources"));
     }

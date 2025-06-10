@@ -72,6 +72,7 @@ public class EditVersionLayout extends AbstractFormLayout {
     private ListGrid settingsGrid;
     private IButton newSettingsButton;
     private CheckboxItem isVisibleField;
+    private TextItem sourceField;
     private SelectItem tagsList;
     private SelectItem resourcesList;
     private IButton saveButton;
@@ -118,6 +119,9 @@ public class EditVersionLayout extends AbstractFormLayout {
         isVisibleField.setWidth(450);
         isVisibleField.setValue(true);
 
+        sourceField = FieldUtil.getTextItem(450, null);
+        sourceField.setRequired(false);
+
         tagsList = new SelectItem();
         tagsList.setMultiple(true);
         tagsList.setWidth(450);
@@ -131,7 +135,8 @@ public class EditVersionLayout extends AbstractFormLayout {
             public void onClick(ClickEvent event) {
                 if (versionField.validate()) {
                     AppVersion toSave = new AppVersion(applicationName, versionField.getValueAsString().trim(),
-                            descriptorField.getValueAsString(), settingsToMap(), isVisibleField.getValueAsBoolean());
+                            descriptorField.getValueAsString(), settingsToMap(), isVisibleField.getValueAsBoolean(),
+                            sourceField.getValueAsString());
                     toSave.setResources(Arrays.asList(resourcesList.getValues()));
                     toSave.setTags(Arrays.asList(tagsList.getValues()));
                     save(toSave);
@@ -160,6 +165,7 @@ public class EditVersionLayout extends AbstractFormLayout {
         addField("Version", versionField);
         addField("Descriptor", descriptorField);
         addMember(FieldUtil.getForm(isVisibleField));
+        addField("Source", sourceField);
         addField("Tags associated", tagsList);
         addField("Resources authorized", resourcesList);
         addMember(WidgetUtil.getLabel("<b>" + "Execution Settings" + "</b>", 15));
@@ -198,7 +204,7 @@ public class EditVersionLayout extends AbstractFormLayout {
             public void onSuccess(Void result) {
                 WidgetUtil.resetIButton(saveButton, "Save", CoreConstants.ICON_SAVED);
                 WidgetUtil.resetIButton(removeButton, "Remove", CoreConstants.ICON_DELETE);
-                setVersion(null, null, true, null, null, null);
+                setVersion(null, null, true, null, null, null, null);
                 ManageApplicationsTab tab = (ManageApplicationsTab) Layout.getInstance().
                         getTab(ApplicationConstants.TAB_MANAGE_APPLICATION);
                 tab.loadVersions(applicationName);
@@ -207,7 +213,7 @@ public class EditVersionLayout extends AbstractFormLayout {
     }
 
     public void setApplication(String applicationName) {
-        setVersion(null, null, true, null, null, null);
+        setVersion(null, null, true, null, null, null, null);
         this.applicationName = applicationName;
         this.applicationLabel.setContents("<b>Application:</b> " + applicationName);
         this.versionField.setDisabled(false);
@@ -215,7 +221,7 @@ public class EditVersionLayout extends AbstractFormLayout {
         this.saveButton.setDisabled(false);
     }
 
-    public void setVersion(String version, String descriptor, boolean isVisible,
+    public void setVersion(String version, String descriptor, boolean isVisible, String source,
             Map<String, String> settings, String[] tags, String[] resources) {
         if (version != null) {
             this.versionField.setValue(version);
@@ -223,6 +229,7 @@ public class EditVersionLayout extends AbstractFormLayout {
             this.descriptorField.setValue(descriptor);
             this.descriptorField.setDisabled(true);
             this.isVisibleField.setValue(isVisible);
+            this.sourceField.setValue(source);
             this.tagsList.setValues(tags);
             this.resourcesList.setValues(resources);
             this.removeButton.setDisabled(false);
@@ -231,9 +238,10 @@ public class EditVersionLayout extends AbstractFormLayout {
         } else {
             this.versionField.setValue("");
             this.versionField.setDisabled(false);
-            this.descriptorField.setValue("");
+            this.descriptorField.setValue("{}");
             this.descriptorField.setDisabled(true);
             this.isVisibleField.setValue(true);
+            this.sourceField.setValue("");
             this.removeButton.setDisabled(true);
             this.newVersion = true;
         }
