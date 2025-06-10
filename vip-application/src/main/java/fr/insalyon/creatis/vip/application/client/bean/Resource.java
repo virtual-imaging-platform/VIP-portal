@@ -2,6 +2,7 @@ package fr.insalyon.creatis.vip.application.client.bean;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
 
@@ -88,5 +89,25 @@ public class Resource implements IsSerializable {
 
     public void setGroups(List<String> groups) {
         this.groups = groups;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+
+        Resource other = (Resource) obj;
+        return isPublic == other.isPublic &&
+               status == other.status &&
+               type == other.type &&
+               Objects.equals(name, other.name) &&
+               Objects.equals(configuration, other.configuration) &&
+               Objects.equals(engines, other.engines) &&
+               Objects.equals(groups, other.groups);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, configuration, engines, groups, isPublic, status, type);
     }
 }

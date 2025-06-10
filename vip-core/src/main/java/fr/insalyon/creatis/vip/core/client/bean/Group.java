@@ -31,12 +31,10 @@
  */
 package fr.insalyon.creatis.vip.core.client.bean;
 
+import java.util.Objects;
+
 import com.google.gwt.user.client.rpc.IsSerializable;
 
-/**
- *
- * @author Rafael Silva
- */
 public class Group implements IsSerializable {
 
     private String name;
@@ -95,5 +93,22 @@ public class Group implements IsSerializable {
 
     public boolean isAuto() {
         return auto;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+
+        Group other = (Group) obj;
+        return publicGroup == other.publicGroup &&
+               auto == other.auto &&
+               type == other.type &&
+               Objects.equals(name, other.name);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, publicGroup, type, auto);
     }
 }

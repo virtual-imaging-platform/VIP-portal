@@ -43,10 +43,6 @@ import java.sql.Timestamp;
 import java.util.List;
 import java.util.Map;
 
-/**
- *
- * @author Rafael Ferreira da Silva
- */
 public interface ConfigurationService extends RemoteService {
 
     String SERVICE_URI = "/configurationservice";
@@ -146,4 +142,6 @@ public interface ConfigurationService extends RemoteService {
     void deleteUserApikey(String email) throws CoreException;
 
     String generateNewUserApikey(String email) throws CoreException;
+
+    List<String> getMissingGroupsRessources(String email) throws CoreException;
 }

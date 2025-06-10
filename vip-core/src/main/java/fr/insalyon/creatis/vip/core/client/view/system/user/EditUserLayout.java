@@ -32,6 +32,7 @@
 package fr.insalyon.creatis.vip.core.client.view.system.user;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.MultipleAppearance;
 import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.Label;
@@ -40,6 +41,8 @@ import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.fields.CheckboxItem;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.SpinnerItem;
+import com.smartgwt.client.widgets.form.fields.StaticTextItem;
+
 import fr.insalyon.creatis.vip.core.client.bean.Group;
 import fr.insalyon.creatis.vip.core.client.bean.GroupType;
 import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationService;
@@ -75,10 +78,10 @@ public class EditUserLayout extends AbstractFormLayout {
     private SpinnerItem maxRunningSimulationsItem;
     private CheckboxItem confirmedField;
     private CheckboxItem lockedField;
+    private StaticTextItem missingResources;
     private IButton saveButton;
 
     public EditUserLayout() {
-
         super(380, 300);
         addTitle("Edit User", CoreConstants.ICON_PERSONAL);
 
@@ -169,29 +172,23 @@ public class EditUserLayout extends AbstractFormLayout {
         });
         saveButton.setDisabled(true);
 
-        this.addMember(nameLabel);
-        this.addMember(emailLabel);
+        missingResources = new StaticTextItem();
+        missingResources.setTextAlign(Alignment.LEFT);
+        missingResources.setWidth(350);
+
+        addMember(nameLabel);
+        addMember(emailLabel);
         addField("Level", levelPickList);
         addField("Applications Groups", groupsAppsPickList);
         addField("Resources Groups", groupsRrcsPickList);
         addField("Country", countryPickList);
         addField("Max Running Simulations", maxRunningSimulationsItem);
-        this.addMember(FieldUtil.getForm(confirmedField));
-        this.addMember(FieldUtil.getForm(lockedField));
-        this.addMember(saveButton);
+        addMember(FieldUtil.getForm(confirmedField));
+        addMember(FieldUtil.getForm(lockedField));
+        addField("Remarks", missingResources);
+        addMember(saveButton);
     }
 
-    /**
-     * Sets a user to edit.
-     *
-     * @param name User's name
-     * @param email User's email
-     * @param confirmed If the user confirmed his account
-     * @param level User's level
-     * @param countryCode User's country code
-     * @param maxRunningSimulations User's max running simulations
-     * @param locked True if user is locked
-     */
     public void setUser(String name, String email, boolean confirmed,
             String level, String countryCode, int maxRunningSimulations, boolean locked) {
 
@@ -231,14 +228,9 @@ public class EditUserLayout extends AbstractFormLayout {
             }
         };
         service.getUserGroups(email, callback);
+        loadMissingResources(email);
     }
 
-    /**
-     *
-     * @param email User's email
-     * @param level User's level
-     * @param groups List of groups
-     */
     private void save(String email, UserLevel level, CountryCode countryCode,
             int maxRunningSimulations, Map<String, CoreConstants.GROUP_ROLE> groups, boolean locked) {
 
@@ -270,15 +262,11 @@ public class EditUserLayout extends AbstractFormLayout {
         service.updateUser(email, level, countryCode, maxRunningSimulations, groups, locked, callback);
     }
 
-    /**
-     * Loads list of groups.
-     */
     private void loadData() {
-
         levelPickList.setValueMap(UserLevel.toStringArray());
 
         ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();
-        final AsyncCallback<List<Group>> callback = new AsyncCallback<List<Group>>() {
+        final AsyncCallback<List<Group>> callback = new AsyncCallback<>() {
             @Override
             public void onFailure(Throwable caught) {
                 Layout.getInstance().setWarningMessage("Unable to get groups list:<br />" + caught.getMessage());
@@ -304,5 +292,31 @@ public class EditUserLayout extends AbstractFormLayout {
             }
         };
         service.getGroups(callback);
+    }
+
+    private void loadMissingResources(String email) {
+        missingResources.setValue("");
+
+        final ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();
+        final AsyncCallback<List<String>> callback = new AsyncCallback<>() {
+            @Override
+            public void onFailure(Throwable caught) {
+                Layout.getInstance().setWarningMessage("Unable to get groups list:<br />" + caught.getMessage());
+            }
+
+            @Override
+            public void onSuccess(List<String> result) {
+                if (result.size() != 0) {
+                    StringBuilder builder = new StringBuilder();
+                    builder.append("This resources groups might be missing for this user: ");
+                    builder.append(String.join(", ", result));
+
+                    missingResources.setValue(builder.toString());
+                } else {
+                    missingResources.setValue("Everything seems good :)");
+                }
+            }
+        };
+        service.getMissingGroupsRessources(email, callback);
     }
 }
