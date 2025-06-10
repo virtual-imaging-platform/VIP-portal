@@ -46,7 +46,7 @@ import fr.insalyon.creatis.vip.core.server.business.Server;
 public abstract class WorkflowEngineInstantiator {
 
     static enum MoteurStatus {
-        RUNNING, COMPLETE, TERMINATED, UNKNOWN
+        RUNNING, COMPLETE, FAILED, TERMINATED, UNKNOWN
     }
 
     public abstract String launch(String addressWS, String workflowContent, String inputs, String settings, String executorConfig, String proxyFileName)
