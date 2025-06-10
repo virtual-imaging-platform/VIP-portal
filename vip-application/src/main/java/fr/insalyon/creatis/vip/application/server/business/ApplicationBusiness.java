@@ -72,7 +72,7 @@ public class ApplicationBusiness {
 
     public void add(Application application) throws BusinessException {
         try {
-            checkMatchVisibilityAppAndGroup(application);
+            assertVisibilityMatchBetweenAppAndGroups(application);
 
             applicationDAO.add(application);
 
@@ -94,7 +94,7 @@ public class ApplicationBusiness {
 
     public void update(Application application) throws BusinessException {
         try {
-            checkMatchVisibilityAppAndGroup(application);
+            assertVisibilityMatchBetweenAppAndGroups(application);
 
             Application before = getApplication(application.getName());
             List<String> beforeGroupsNames = before.getApplicationGroups();
@@ -252,11 +252,11 @@ public class ApplicationBusiness {
         return apps;
     }
 
-    private void checkMatchVisibilityAppAndGroup(Application application) throws BusinessException {
+    private void assertVisibilityMatchBetweenAppAndGroups(Application application) throws BusinessException {
         List<String> appGroups = application.getApplicationGroups();
 
         if (appGroups.size() >= 1) {
-            groupBusiness.checkGroupsSameVisibility(appGroups);
+            groupBusiness.assertGroupsHaveSameVisibility(appGroups);
 
             if (groupBusiness.get(appGroups.getFirst()).isPublicGroup() != application.isPublic()) {
                 logger.error("You must make the group(s) and the application visibility match!");

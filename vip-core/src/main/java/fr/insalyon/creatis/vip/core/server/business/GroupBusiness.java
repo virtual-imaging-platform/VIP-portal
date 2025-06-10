@@ -141,7 +141,7 @@ public class GroupBusiness {
         }
     }
 
-    public void checkGroupsSameVisibility(List<String> groupNames) throws BusinessException {
+    public void assertGroupsHaveSameVisibility(List<String> groupNames) throws BusinessException {
         List<Group> groups = new ArrayList<>();
 
         for (String name : groupNames) {

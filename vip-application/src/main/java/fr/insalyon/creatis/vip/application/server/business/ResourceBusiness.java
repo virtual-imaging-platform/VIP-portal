@@ -42,7 +42,7 @@ public class ResourceBusiness {
 
     public void add(Resource resource) throws BusinessException {
         try {
-            checkMatchVisibilityAppAndGroup(resource);
+            assertVisibilityMatchBetweenResourceAndGroups(resource);
             resourceDAO.add(resource);
 
             for (String engineName : resource.getEngines()) {
@@ -58,7 +58,7 @@ public class ResourceBusiness {
 
     public void update(Resource resource) throws BusinessException {
         try {
-            checkMatchVisibilityAppAndGroup(resource);
+            assertVisibilityMatchBetweenResourceAndGroups(resource);
             Resource before = getByName(resource.getName());
             List<String> beforeEnginesNames = before.getEngines();
             List<String> beforeGroupsNames = before.getGroups();
@@ -257,11 +257,11 @@ public class ResourceBusiness {
         return resources;
     }
 
-    private void checkMatchVisibilityAppAndGroup(Resource resource) throws BusinessException {
+    private void assertVisibilityMatchBetweenResourceAndGroups(Resource resource) throws BusinessException {
         List<String> resourceGroups = resource.getGroups();
 
         if (resourceGroups.size() >= 1) {
-            groupBusiness.checkGroupsSameVisibility(resourceGroups);
+            groupBusiness.assertGroupsHaveSameVisibility(resourceGroups);
 
             if (groupBusiness.get(resourceGroups.getFirst()).isPublicGroup() != resource.isPublic()) {
                 logger.error("You must make the group(s) and the resource visibility match!");
