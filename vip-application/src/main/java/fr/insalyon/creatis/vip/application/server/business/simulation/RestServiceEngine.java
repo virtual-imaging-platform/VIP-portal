@@ -190,6 +190,7 @@ public class RestServiceEngine extends WorkflowEngineInstantiator {
             return switch (moteurStatus) {
                 case RUNNING -> SimulationStatus.Running;
                 case COMPLETE -> SimulationStatus.Completed;
+                case FAILED -> SimulationStatus.Failed;
                 case TERMINATED -> SimulationStatus.Killed;
                 default -> SimulationStatus.Unknown;
             };
