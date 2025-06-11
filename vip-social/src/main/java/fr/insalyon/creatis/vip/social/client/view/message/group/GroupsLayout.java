@@ -38,6 +38,8 @@ import com.smartgwt.client.widgets.form.fields.events.ChangedEvent;
 import com.smartgwt.client.widgets.form.fields.events.ChangedHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
+
+import fr.insalyon.creatis.vip.core.client.bean.Group;
 import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationService;
 import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationServiceAsync;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
@@ -71,16 +73,15 @@ public class GroupsLayout extends AbstractMainLayout {
 
     @Override
     public void loadData() {
-
         ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();
-        AsyncCallback<List<String>> callback = new AsyncCallback<List<String>>() {
+        AsyncCallback<List<Group>> callback = new AsyncCallback<>() {
 
             public void onFailure(Throwable caught) {
                 Layout.getInstance().setWarningMessage("Unable to get user's groups:<br />" + caught.getMessage());
             }
 
-            public void onSuccess(List<String> result) {
-                groupsItem.setValueMap(result.toArray(new String[]{}));
+            public void onSuccess(List<Group> result) {
+                groupsItem.setValueMap(result.stream().map(Group::getName).toArray(String[]::new));
             }
         };
         service.getUserGroups(callback);

@@ -47,7 +47,10 @@ import fr.insalyon.creatis.vip.application.client.view.monitor.timeline.Timeline
 import fr.insalyon.creatis.vip.application.client.view.system.applications.app.ManageApplicationsTab;
 import fr.insalyon.creatis.vip.core.client.CoreModule;
 import fr.insalyon.creatis.vip.core.client.Module;
+import fr.insalyon.creatis.vip.core.client.bean.Group;
+import fr.insalyon.creatis.vip.core.client.bean.GroupType;
 import fr.insalyon.creatis.vip.core.client.bean.User;
+import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationService;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.layout.CenterTabSet;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
@@ -55,14 +58,13 @@ import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
-/**
- *
- * @author Rafael Ferreira da Silva
- */
 public class ApplicationModule extends Module {
 
     public static List<CustomApplicationModule> customModules;
+    private List<Group> userApplicationGroups;
+
 
     public ApplicationModule() {
         customModules = new ArrayList<>();
@@ -79,12 +81,32 @@ public class ApplicationModule extends Module {
 
     @Override
     public void load() {
+        final AsyncCallback<List<Group>> callback = new AsyncCallback<>() {
+            @Override
+            public void onFailure(Throwable caught) {
+                Layout.getInstance().setWarningMessage("Unable to load users groups:<br />" + caught.getMessage());
+            }
+
+            @Override
+            public void onSuccess(List<Group> groups) {
+                userApplicationGroups = groups.stream()
+                    .filter((g) -> g.getType().equals(GroupType.APPLICATION)).collect(Collectors.toList());
+                render();
+            }
+        };
+        ConfigurationService.Util.getInstance().getUserGroups(callback);
+    }
+
+    private void render() {
         Layout.getInstance().removeTab(ApplicationConstants.TAB_MANAGE_APPLICATION);
         
         CoreModule.addGeneralApplicationParser(new ApplicationHomeParser());
         CoreModule.addSystemApplicationParser(new ApplicationSystemParser());
         CoreModule.addLayoutToHomeTab(TimelineLayout.getInstance());
-        CoreModule.addApplicationsTileGrid(new ApplicationTileGrid(ApplicationConstants.APP_APPLICATION));
+
+        for (Group group : userApplicationGroups) {
+            CoreModule.addApplicationsTileGrid(new ApplicationTileGrid(group));
+        }
 
         // Simulation close tab
         CenterTabSet.getInstance().addCloseClickHandler(new CloseClickHandler() {

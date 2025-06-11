@@ -72,7 +72,7 @@ public interface ConfigurationServiceAsync {
 
     void getUserPropertiesGroups(AsyncCallback<List<Boolean>> asyncCallback);
 
-    void getUserGroups(AsyncCallback<List<String>> asyncCallback);
+    void getUserGroups(AsyncCallback<List<Group>> asyncCallback);
 
     void updateUser(String email, UserLevel level, CountryCode countryCode, int maxRunningSimulations, Map<String, CoreConstants.GROUP_ROLE> groups, boolean locked, AsyncCallback<Void> asyncCallback);
 

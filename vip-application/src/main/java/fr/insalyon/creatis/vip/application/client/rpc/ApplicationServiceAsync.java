@@ -50,7 +50,7 @@ public interface ApplicationServiceAsync {
     
     public void getVersions(String applicationName, AsyncCallback<List<AppVersion>> asyncCallback);
     
-    public  void getVersion(String applicationName, String applicationVersion, AsyncCallback <AppVersion> asyncCallback);
+    public void getVersion(String applicationName, String applicationVersion, AsyncCallback <AppVersion> asyncCallback);
 
     public void add(Application application, AsyncCallback<Void> asyncCallback);
 

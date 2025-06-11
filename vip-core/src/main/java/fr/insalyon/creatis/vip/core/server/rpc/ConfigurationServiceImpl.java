@@ -308,18 +308,18 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
     }
 
     @Override
-    public List<String> getUserGroups() throws CoreException {
+    public List<Group> getUserGroups() throws CoreException {
         try {
-            List<String> list = new ArrayList<>();
+            List<Group> list = new ArrayList<>();
             if (getSessionUser().isSystemAdministrator()) {
                 for (Group group : groupBusiness.get()) {
-                    list.add(group.getName());
+                    list.add(group);
                 }
             } else {
                 Map<Group, GROUP_ROLE> groups = getUserGroupsFromSession();
                 for (Group group : groups.keySet()) {
                     if (groups.get(group) != GROUP_ROLE.None) {
-                        list.add(group.getName());
+                        list.add(group);
                     }
                 }
             }
