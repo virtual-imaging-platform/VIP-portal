@@ -41,7 +41,6 @@ public class ResourceIT extends BaseSpringIT {
         super.setUp();
         resource = new Resource(
             "resourceA", 
-            true, 
             false, 
             ResourceType.BATCH, 
             "conf.file",
@@ -90,7 +89,6 @@ public class ResourceIT extends BaseSpringIT {
     @Test
     public void getAllVisible() throws BusinessException {
         resource.setName("resourceB");
-        resource.setPublic(true);
         resourceBusiness.add(resource);
 
         assertEquals(2, resourceBusiness.getAll(true).size());

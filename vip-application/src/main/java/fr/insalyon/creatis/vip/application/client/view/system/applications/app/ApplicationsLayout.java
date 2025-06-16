@@ -103,7 +103,7 @@ public class ApplicationsLayout extends VLayout {
                 public void onClick(ClickEvent event) {
                     ManageApplicationsTab appsTab = (ManageApplicationsTab) Layout.getInstance().
                             getTab(ApplicationConstants.TAB_MANAGE_APPLICATION);
-                    appsTab.setApplication(null, null, null, null, false);
+                    appsTab.setApplication(null, null, null, null);
                 }
             });
             toolstrip.addMember(addButton);
@@ -125,7 +125,6 @@ public class ApplicationsLayout extends VLayout {
     private void configureGrid() {
         ListGridField nameField = new ListGridField("name", "Application Name");
         ListGridField ownerField = new ListGridField("owner", "Owner");
-        ListGridField publicField = new ListGridField("public", "Public");
         ListGridField groupsField = new ListGridField("groups", "Groups");
 
         grid = new ListGrid() {
@@ -179,14 +178,13 @@ public class ApplicationsLayout extends VLayout {
         grid.setEmptyMessage("<br>No data available.");
 
         if (onlyPublicApps){
-            grid.setFields(nameField, publicField, groupsField);
+            grid.setFields(nameField, groupsField);
         } else {
             ownerField.setHidden(true);
             grid.setFields(
                 nameField,
                 new ListGridField("ownerFullName", "Owner"),
                 ownerField,
-                publicField,
                 groupsField);
         }
         grid.setSortField("name");
@@ -256,7 +254,6 @@ public class ApplicationsLayout extends VLayout {
             record.getAttribute("name"), 
             record.getAttribute("owner"), 
             record.getAttribute("citation"), 
-            record.getAttributeAsStringArray("groups"),
-            record.getAttributeAsBoolean("public"));
+            record.getAttributeAsStringArray("groups"));
     }
 }

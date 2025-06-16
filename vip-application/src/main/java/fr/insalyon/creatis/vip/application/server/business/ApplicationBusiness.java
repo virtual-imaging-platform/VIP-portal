@@ -49,10 +49,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.*;
 import java.util.stream.Collectors;
 
-/**
- *
- * @author Rafael Ferreira da Silva
- */
 @Service
 @Transactional
 public class ApplicationBusiness {
@@ -72,8 +68,6 @@ public class ApplicationBusiness {
 
     public void add(Application application) throws BusinessException {
         try {
-            assertVisibilityMatchBetweenAppAndGroups(application);
-
             applicationDAO.add(application);
 
             for (String groupName : application.getApplicationGroups()) {
@@ -94,8 +88,6 @@ public class ApplicationBusiness {
 
     public void update(Application application) throws BusinessException {
         try {
-            assertVisibilityMatchBetweenAppAndGroups(application);
-
             Application before = getApplication(application.getName());
             List<String> beforeGroupsNames = before.getApplicationGroups();
 
@@ -215,12 +207,7 @@ public class ApplicationBusiness {
         group = groupBusiness.get(group.getName());
 
         try {
-            if (group.isPublicGroup() == app.isPublic()) {
-                applicationDAO.associate(app, group);
-            } else {
-                logger.error("Application visibility must match group visiblity (app-visibility={}, group-visibility={})", app.isPublic(), group.isPublicGroup());
-                throw new BusinessException("Application visibility must match group visibility!");
-            }
+            applicationDAO.associate(app, group);
         } catch (DAOException e) {
             throw new BusinessException(e);
         }
@@ -250,18 +237,5 @@ public class ApplicationBusiness {
             mapGroups(app);
         }
         return apps;
-    }
-
-    private void assertVisibilityMatchBetweenAppAndGroups(Application application) throws BusinessException {
-        List<String> appGroups = application.getApplicationGroups();
-
-        if (appGroups.size() >= 1) {
-            groupBusiness.assertGroupsHaveSameVisibility(appGroups);
-
-            if (groupBusiness.get(appGroups.getFirst()).isPublicGroup() != application.isPublic()) {
-                logger.error("You must make the group(s) and the application visibility match!");
-                throw new BusinessException("You must make the group(s) and the application visibility match!");
-            }
-        }
     }
 }

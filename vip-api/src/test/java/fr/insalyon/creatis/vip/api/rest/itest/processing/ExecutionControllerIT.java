@@ -440,7 +440,6 @@ public class ExecutionControllerIT extends BaseWebSpringIT {
         Resource resource = new Resource(
             "testResource", 
             true, 
-            true, 
             ResourceType.BATCH, 
             "", 
             Arrays.asList(engine.getName()),

@@ -28,7 +28,7 @@ public class ManageResourcesTab extends AbstractManageTab {
         resourceLayout.loadData();
     }
 
-    public void setResource(String name, boolean isPublic, boolean status, String type, String configuration, String[] engines, String[] groups) {
-        editLayout.setResource(name, isPublic, status, type, configuration, engines, groups);
+    public void setResource(String name, boolean status, String type, String configuration, String[] engines, String[] groups) {
+        editLayout.setResource(name, status, type, configuration, engines, groups);
     }
 }

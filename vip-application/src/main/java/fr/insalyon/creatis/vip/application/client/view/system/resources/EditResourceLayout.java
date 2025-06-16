@@ -33,7 +33,6 @@ public class EditResourceLayout extends AbstractFormLayout {
 
     private boolean newResource = true;
     private TextItem nameField;
-    private BooleanItem publicField;
     private BooleanItem statusField;
     private SelectItem typeFieldList;
     private TextItem configurationField;
@@ -54,10 +53,6 @@ public class EditResourceLayout extends AbstractFormLayout {
         nameField = FieldUtil.getTextItem(350, null);
         configurationField = FieldUtil.getTextItem(350, null);
         configurationField.setRequired(false);
-
-        publicField = new BooleanItem();
-        publicField.setShowTitle(false);
-        publicField.setWidth(350);
 
         statusField = new BooleanItem();
         statusField.setShowTitle(false);
@@ -88,7 +83,6 @@ public class EditResourceLayout extends AbstractFormLayout {
                         if (nameField.validate()) {
                             save(new Resource(
                                 nameField.getValueAsString().trim(),
-                                publicField.getValueAsBoolean(),
                                 statusField.getValueAsBoolean(),
                                 typeFieldList.getValueAsString(),
                                 configurationField.getValueAsString().trim(),
@@ -116,7 +110,6 @@ public class EditResourceLayout extends AbstractFormLayout {
         removeButton.setDisabled(true);
 
         addField("Name", nameField);
-        addField("Public", publicField);
         addField("Active", statusField);
         addField("Type", typeFieldList);
         addField("Configuration", configurationField);
@@ -125,12 +118,11 @@ public class EditResourceLayout extends AbstractFormLayout {
         addButtons(saveButton, removeButton);
     }
 
-    public void setResource(String name, boolean isPublic, boolean status, String type, String configuration, String[] engines, String[] groups) {
+    public void setResource(String name, boolean status, String type, String configuration, String[] engines, String[] groups) {
 
         if (name != null) {
             this.nameField.setValue(name);
             this.nameField.setDisabled(true);
-            this.publicField.setValue(isPublic);
             this.statusField.setValue(status);
             this.typeFieldList.setValue(type);
             this.configurationField.setValue(configuration);
@@ -141,7 +133,6 @@ public class EditResourceLayout extends AbstractFormLayout {
         } else {
             this.nameField.setValue("");
             this.nameField.setDisabled(false);
-            this.publicField.setValue(false);
             this.statusField.setValue(false);
             this.typeFieldList.setValue(ResourceType.getDefault());
             this.configurationField.setValue("");
@@ -180,7 +171,7 @@ public class EditResourceLayout extends AbstractFormLayout {
             public void onSuccess(Void result) {
                 WidgetUtil.resetIButton(saveButton, "Save", CoreConstants.ICON_SAVED);
                 WidgetUtil.resetIButton(removeButton, "Remove", CoreConstants.ICON_DELETE);
-                setResource(null, false, false, null, null, null, null);
+                setResource(null, false, null, null, null, null);
                 ManageResourcesTab tab = (ManageResourcesTab) Layout.getInstance().
                         getTab(ApplicationConstants.TAB_MANAGE_RESOURCE);
                 tab.loadResources();

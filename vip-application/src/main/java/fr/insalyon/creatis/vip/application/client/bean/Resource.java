@@ -8,16 +8,14 @@ import com.google.gwt.user.client.rpc.IsSerializable;
 
 public class Resource implements IsSerializable {
     private String name;
-    private boolean isPublic;
     private boolean status;
     private ResourceType type;
     private String configuration;
     private List<String> engines;
     private List<String> groups;
 
-    public Resource(String name, boolean isPublic, boolean status, ResourceType type, String configuration, List<String> engines, List<String> groups) {
+    public Resource(String name, boolean status, ResourceType type, String configuration, List<String> engines, List<String> groups) {
         this.name = name;
-        this.isPublic = isPublic;
         this.status = status;
         this.type = type;
         this.configuration = configuration;
@@ -25,12 +23,12 @@ public class Resource implements IsSerializable {
         this.groups = groups;
     }
 
-    public Resource(String name, boolean isPublic, boolean status, String type, String configuration, List<String> engines, List<String> groups) {
-        this(name, isPublic, status, ResourceType.fromString(type), configuration, engines, groups);
+    public Resource(String name, boolean status, String type, String configuration, List<String> engines, List<String> groups) {
+        this(name, status, ResourceType.fromString(type), configuration, engines, groups);
     }
 
     public Resource(String name) {
-        this(name, false, false, ResourceType.getDefault(), "", new ArrayList<>(), new ArrayList<>());
+        this(name, false, ResourceType.getDefault(), "", new ArrayList<>(), new ArrayList<>());
     }
 
     public Resource() {}
@@ -41,14 +39,6 @@ public class Resource implements IsSerializable {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public boolean isPublic() {
-        return isPublic;
-    }
-
-    public void setPublic(boolean isPublic) {
-        this.isPublic = isPublic;
     }
 
     public boolean getStatus() {
@@ -97,8 +87,7 @@ public class Resource implements IsSerializable {
         if (obj == null || getClass() != obj.getClass()) return false;
 
         Resource other = (Resource) obj;
-        return isPublic == other.isPublic &&
-               status == other.status &&
+        return status == other.status &&
                type == other.type &&
                Objects.equals(name, other.name) &&
                Objects.equals(configuration, other.configuration) &&
@@ -108,6 +97,6 @@ public class Resource implements IsSerializable {
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, configuration, engines, groups, isPublic, status, type);
+        return Objects.hash(name, configuration, engines, groups, status, type);
     }
 }

@@ -36,49 +36,38 @@ import com.google.gwt.user.client.rpc.IsSerializable;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- *
- * @author Rafael Ferreira da Silva,Nouha boujelben
- */
 public class Application implements IsSerializable {
 
     private String name;
     private String citation;
     private String owner;
     private String fullName;
-    private boolean isPublic;
     private List<String> applicationGroups;
 
-    public Application() {
-    }
+    public Application() {}
 
     public Application(String name, String citation) {
         this(name, null, null, citation);
     }
 
     public Application(String name, String citation, List<String> applicationGroups) {
-        this(name, null, null, citation, applicationGroups, false);
-    }
-
-    public Application(String name, String citation, List<String> applicationGroups, boolean isPublic) {
-        this(name, null, null, citation, applicationGroups, isPublic);
+        this(name, null, null, citation, applicationGroups);
     }
 
     public Application(String name, String owner, String fullName, String citation) {
-        this(name, owner, fullName, citation, new ArrayList<>(), false);
+        this(name, owner, fullName, citation, new ArrayList<>());
     }
 
-    public Application(String name, String owner, String citation, boolean isPublic) {
-        this(name, owner, null, citation, new ArrayList<>(), isPublic);
+    public Application(String name, String owner, String citation) {
+        this(name, owner, null, citation, new ArrayList<>());
     }
 
-    public Application(String name, String owner, String fullName, String citation, List<String> applicationGroups, boolean isPublic) {
+    public Application(String name, String owner, String fullName, String citation, List<String> applicationGroups) {
         this.name = name;
         this.citation = citation;
         this.owner = owner;
         this.fullName = fullName;
         this.applicationGroups = applicationGroups;
-        this.isPublic = isPublic;
     }
 
     public String getName() {
@@ -111,13 +100,5 @@ public class Application implements IsSerializable {
 
     public void setApplicationGroups(List<String> groups) {
         this.applicationGroups = groups;
-    }
-
-    public boolean isPublic() {
-        return isPublic;
-    }
-
-    public void setPublic(boolean isPublic) {
-        this.isPublic = isPublic;
     }
 }

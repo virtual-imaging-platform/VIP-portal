@@ -61,7 +61,7 @@ public class ResourceLayout extends VLayout {
             public void onClick(ClickEvent event) {
                 ManageResourcesTab resourceTab = (ManageResourcesTab) Layout.getInstance().
                         getTab(ApplicationConstants.TAB_MANAGE_RESOURCE);
-                        resourceTab.setResource(null, false, false, null, null, null, null);
+                        resourceTab.setResource(null, false, null, null, null, null);
             }
         });
         toolstrip.addMember(addButton);
@@ -130,7 +130,6 @@ public class ResourceLayout extends VLayout {
         grid.setEmptyMessage("<br>No data available.");
         grid.setFields(
                 new ListGridField("name", "Name"),
-                new ListGridField("public", "Public"),
                 new ListGridField("status", "Status"),
                 new ListGridField("type", "Type"),
                 new ListGridField("configuration", "Configuration"),
@@ -196,7 +195,6 @@ public class ResourceLayout extends VLayout {
 
         appsTab.setResource(
             record.getAttribute("name"), 
-            record.getAttributeAsBoolean("public"), 
             record.getAttributeAsBoolean("status"), 
             record.getAttribute("type"), 
             record.getAttribute("configuration"),
