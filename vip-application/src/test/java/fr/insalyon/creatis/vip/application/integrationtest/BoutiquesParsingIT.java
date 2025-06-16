@@ -1,9 +1,9 @@
 package fr.insalyon.creatis.vip.application.integrationtest;
 
+import fr.insalyon.creatis.boutiques.model.BoutiquesDescriptor;
+import fr.insalyon.creatis.boutiques.model.ContainerImage;
+import fr.insalyon.creatis.boutiques.model.Input;
 import fr.insalyon.creatis.vip.application.server.business.BoutiquesBusiness;
-import fr.insalyon.creatis.vip.application.server.model.boutiques.BoutiquesDescriptor;
-import fr.insalyon.creatis.vip.application.server.model.boutiques.ContainerImage;
-import fr.insalyon.creatis.vip.application.server.model.boutiques.Input;
 import fr.insalyon.creatis.vip.core.integrationtest.database.BaseSpringIT;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import org.junit.jupiter.api.Assertions;
