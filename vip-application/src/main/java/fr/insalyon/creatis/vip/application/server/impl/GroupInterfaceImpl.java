@@ -93,7 +93,7 @@ public class GroupInterfaceImpl implements GroupInterface {
             }
         }
         for (Resource resource : missingResources) {
-            result.addAll(resource.getGroups());
+            result.addAll(resource.getGroupsNames());
         }
 
         return new ArrayList<>(result);

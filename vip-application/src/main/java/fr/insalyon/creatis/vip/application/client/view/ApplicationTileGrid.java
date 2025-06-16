@@ -48,10 +48,6 @@ import java.util.Map;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
-/**
- *
- * @author Rafael Ferreira da Silva
- */
 public class ApplicationTileGrid extends ApplicationsTileGrid {
 
     private List<String> applicationNames;
@@ -74,7 +70,7 @@ public class ApplicationTileGrid extends ApplicationsTileGrid {
                 for (var set : result.entrySet()) {
                     Application app = set.getKey();
 
-                    if (app.getApplicationGroups().contains(group.getName())) {
+                    if (app.getGroupsNames().contains(group.getName())) {
                         for (var version : set.getValue()) {
                             addApplication(app.getName(), version.getVersion(), ApplicationConstants.APP_IMG_APPLICATION);
                             applicationNames.add(app.getName() + " " + version.getVersion());

@@ -70,7 +70,7 @@ public class ApplicationBusiness {
         try {
             applicationDAO.add(application);
 
-            for (String groupName : application.getApplicationGroups()) {
+            for (String groupName : application.getGroupsNames()) {
                 associate(application, new Group(groupName));
             }
         } catch (DAOException ex) {
@@ -89,10 +89,10 @@ public class ApplicationBusiness {
     public void update(Application application) throws BusinessException {
         try {
             Application before = getApplication(application.getName());
-            List<String> beforeGroupsNames = before.getApplicationGroups();
+            List<String> beforeGroupsNames = before.getGroupsNames();
 
             applicationDAO.update(application);
-            for (String group : application.getApplicationGroups()) {
+            for (String group : application.getGroupsNames()) {
                 if ( ! beforeGroupsNames.removeIf((s) -> s.equals(group))) {
                     associate(application, new Group(group));
                 }
@@ -225,9 +225,7 @@ public class ApplicationBusiness {
         if (app == null) {
             return null;
         } else {
-            List<Group> groups = groupBusiness.getByApplication(app.getName());
-
-            app.setApplicationGroups(groups.stream().map((e) -> e.getName()).collect(Collectors.toList()));
+            app.setGroups(groupBusiness.getByApplication(app.getName()));
             return app;
         }
     }

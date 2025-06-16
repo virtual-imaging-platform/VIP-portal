@@ -43,7 +43,7 @@ public class ResourceBusiness {
             for (String engineName : resource.getEngines()) {
                 resourceDAO.associate(resource, new Engine(engineName));
             }
-            for (String groupName : resource.getGroups()) {
+            for (String groupName : resource.getGroupsNames()) {
                 resourceDAO.associate(resource, new Group(groupName));
             }
         } catch (DAOException e){
@@ -55,7 +55,7 @@ public class ResourceBusiness {
         try {
             Resource before = getByName(resource.getName());
             List<String> beforeEnginesNames = before.getEngines();
-            List<String> beforeGroupsNames = before.getGroups();
+            List<String> beforeGroupsNames = before.getGroupsNames();
 
             resourceDAO.update(resource);
             for (String engine : resource.getEngines()) {
@@ -63,7 +63,7 @@ public class ResourceBusiness {
                     associate(resource, new Engine(engine));
                 }
             }
-            for (String group : resource.getGroups()) {
+            for (String group : resource.getGroupsNames()) {
                 if ( ! beforeGroupsNames.removeIf((s) -> s.equals(group))) {
                     associate(resource, new Group(group));
                 }
@@ -233,7 +233,7 @@ public class ResourceBusiness {
 
     private Resource mapAssociated(Resource resource) throws BusinessException {
         resource.setEngines(engineBusiness.getByResource(resource).stream().map((e) -> e.getName()).collect(Collectors.toList()));
-        resource.setGroups(groupBusiness.getByResource(resource.getName()).stream().map((e) -> e.getName()).collect(Collectors.toList()));
+        resource.setGroups(groupBusiness.getByResource(resource.getName()));
 
         return resource;
     }

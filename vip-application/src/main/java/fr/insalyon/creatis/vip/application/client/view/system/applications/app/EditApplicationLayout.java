@@ -32,6 +32,8 @@
 package fr.insalyon.creatis.vip.application.client.view.system.applications.app;
 
 import java.util.Arrays;
+import java.util.HashMap;
+
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.types.MultipleAppearance;
 import com.smartgwt.client.types.Overflow;
@@ -46,6 +48,7 @@ import com.smartgwt.client.widgets.form.fields.TextItem;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
 import fr.insalyon.creatis.vip.application.client.bean.Application;
 import fr.insalyon.creatis.vip.application.client.rpc.ApplicationService;
+import fr.insalyon.creatis.vip.application.client.view.system.SystemUtils;
 import fr.insalyon.creatis.vip.core.client.CoreModule;
 import fr.insalyon.creatis.vip.core.client.bean.Group;
 import fr.insalyon.creatis.vip.core.client.bean.GroupType;
@@ -59,6 +62,9 @@ import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
 import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class EditApplicationLayout extends AbstractFormLayout {
 
@@ -69,6 +75,8 @@ public class EditApplicationLayout extends AbstractFormLayout {
     private IButton saveButton;
     private IButton removeButton;
     private SelectItem usersPickList;
+
+    private Map<String, String> groupsMap;
 
     public EditApplicationLayout() {
         super(480, 200);
@@ -104,19 +112,22 @@ public class EditApplicationLayout extends AbstractFormLayout {
             @Override
             public void onClick(ClickEvent event) {
                 if (nameField.validate()) {
+                    List<String> groupsNames = Arrays.asList(groupsList.getValues());
+                    List<Group> groups = groupsNames.stream()
+                        .map((name) -> new Group(groupsMap.get(name), false, GroupType.RESOURCE)).collect(Collectors.toList());
 
                     if (newApplication) {
                         save(new Application(
                             nameField.getValueAsString().trim(),
                             richTextEditor.getValue(),
-                            Arrays.asList(groupsList.getValues())));
+                            groups));
                     } else {
                         save(new Application(
                             nameField.getValueAsString().trim(),
                             usersPickList.getValueAsString(), 
                             null,
                             richTextEditor.getValue(),
-                            Arrays.asList(groupsList.getValues())));
+                            groups));
                     }
                 }
             }
@@ -152,18 +163,17 @@ public class EditApplicationLayout extends AbstractFormLayout {
         }
     }
 
-    public void setApplication(String name, String owner, String citation, String[] groups) {
-
+    public void setApplication(String name, String owner, String citation, Map<String, String> groups) {
         if (name != null) {
             usersPickList.setCanEdit(true);
             fetchUsers(owner);
             nameField.setValue(name);
             nameField.setDisabled(true);
-            groupsList.setValues(groups);
+            groupsList.setValues(groups.keySet().stream().toArray(String[]::new));
             richTextEditor.setValue(citation);
             newApplication = false;
             removeButton.setDisabled(false);
-
+            groupsMap = groups;
         } else {
             usersPickList.setCanEdit(false);
             usersPickList.setValue("");
@@ -172,6 +182,7 @@ public class EditApplicationLayout extends AbstractFormLayout {
             richTextEditor.setValue("");
             newApplication = true;
             removeButton.setDisabled(true);
+            groupsMap = new HashMap<>();
         }
         fetchGroups();
     }
@@ -252,11 +263,15 @@ public class EditApplicationLayout extends AbstractFormLayout {
     
             @Override
             public void onSuccess(List<Group> result) {
-                String[] data = result.stream()
+                List<Group> data = result.stream()
                     .filter((g) -> g.getType() == GroupType.APPLICATION)
-                    .map(Group::getName)
-                    .toArray(String[]::new);
-                groupsList.setValueMap(data);
+                    .collect(Collectors.toList());
+                List<String> formatGroups = SystemUtils.formatGroups(data);
+
+                groupsMap.putAll(IntStream.range(0, Math.min(formatGroups.size(), data.size()))
+                    .boxed()
+                    .collect(Collectors.toMap(formatGroups::get, (i) -> data.get(i).getName())));
+                groupsList.setValueMap(formatGroups.stream().toArray(String[]::new));
             }
         };
         service.getGroups(callback);

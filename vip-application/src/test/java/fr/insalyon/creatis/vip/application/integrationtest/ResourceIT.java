@@ -121,7 +121,7 @@ public class ResourceIT extends BaseSpringIT {
         Group group = groupBusiness.get("resourcetest");
         User user = configurationBusiness.getUser("super@test.insa");
 
-        resource.setGroups(Arrays.asList(group.getName()));
+        resource.setGroups(Arrays.asList(group));
         resourceBusiness.update(resource);
         assertEquals(0, resourceBusiness.getAvailableForUser(user).size());
 

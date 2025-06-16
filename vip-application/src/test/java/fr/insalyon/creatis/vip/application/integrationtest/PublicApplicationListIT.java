@@ -27,7 +27,7 @@ public class PublicApplicationListIT extends BaseSpringIT {
         Group publicGroup = new Group("public group", true, GroupType.getDefault());
         Group privateGroup = new Group("private group", false, GroupType.getDefault());
 
-        Application app = new Application("testApp", "", Arrays.asList(publicGroup.getName()));
+        Application app = new Application("testApp", "", Arrays.asList(publicGroup));
         AppVersion appVersion = new AppVersion(app.getName(), "", "{}", true);
 
         groupBusiness.add(publicGroup);
@@ -40,6 +40,6 @@ public class PublicApplicationListIT extends BaseSpringIT {
 
         Application resultApp = publicApplications.get(0);
         assertEquals(app.getName(), resultApp.getName());
-        assertEquals(1, resultApp.getApplicationGroups().size());
+        assertEquals(1, resultApp.getGroupsNames().size());
     }
 }

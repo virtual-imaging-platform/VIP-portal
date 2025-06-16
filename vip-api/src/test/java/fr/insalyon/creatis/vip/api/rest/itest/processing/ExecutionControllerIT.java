@@ -48,6 +48,7 @@ import fr.insalyon.creatis.vip.application.server.business.AppVersionBusiness;
 import fr.insalyon.creatis.vip.application.server.business.ResourceBusiness;
 import fr.insalyon.creatis.vip.application.server.business.simulation.ParameterSweep;
 import fr.insalyon.creatis.vip.application.server.business.util.FileUtil;
+import fr.insalyon.creatis.vip.core.client.bean.Group;
 import fr.insalyon.creatis.vip.core.client.bean.GroupType;
 import fr.insalyon.creatis.vip.core.integrationtest.ServerMockConfig;
 
@@ -443,7 +444,7 @@ public class ExecutionControllerIT extends BaseWebSpringIT {
             ResourceType.BATCH, 
             "", 
             Arrays.asList(engine.getName()),
-            Arrays.asList("testResources"));
+            Arrays.asList(new Group("testResources", true, GroupType.APPLICATION)));
 
         engineBusiness.add(engine);
         resourceBusiness.add(resource);

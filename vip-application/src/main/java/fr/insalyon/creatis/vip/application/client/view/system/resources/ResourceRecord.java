@@ -3,6 +3,7 @@ package fr.insalyon.creatis.vip.application.client.view.system.resources;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 
 import fr.insalyon.creatis.vip.application.client.bean.Resource;
+import fr.insalyon.creatis.vip.application.client.view.system.SystemUtils;
 
 public class ResourceRecord extends ListGridRecord {
 
@@ -12,6 +13,7 @@ public class ResourceRecord extends ListGridRecord {
         setAttribute("type", resource.getType());
         setAttribute("configuration", resource.getConfiguration());
         setAttribute("engines", resource.getEngines());
-        setAttribute("groups", resource.getGroups());
+        setAttribute("groupsLabel", SystemUtils.formatGroups(resource.getGroups()));
+        setAttribute("groups", resource.getGroupsNames());
     }
 }

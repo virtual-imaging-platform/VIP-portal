@@ -43,10 +43,6 @@ import fr.insalyon.creatis.vip.application.client.view.system.applications.versi
 import fr.insalyon.creatis.vip.core.client.view.common.AbstractManageTab;
 import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
 
-/**
- *
- * @author Rafael Ferreira da Silva
- */
 public class ManageApplicationsTab extends AbstractManageTab {
 
     private ApplicationsLayout appsLayout;
@@ -98,7 +94,7 @@ public class ManageApplicationsTab extends AbstractManageTab {
         manageVersionLayout.setApplication(applicationName);
     }
 
-    public void setApplication(String name, String owner, String citation, String[] groups) {
+    public void setApplication(String name, String owner, String citation, Map<String, String> groups) {
         editLayout.setApplication(name, owner, citation, groups);
     }
 

@@ -3,8 +3,11 @@ package fr.insalyon.creatis.vip.application.client.bean;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
+
+import fr.insalyon.creatis.vip.core.client.bean.Group;
 
 public class Resource implements IsSerializable {
     private String name;
@@ -12,9 +15,9 @@ public class Resource implements IsSerializable {
     private ResourceType type;
     private String configuration;
     private List<String> engines;
-    private List<String> groups;
+    private List<Group> groups;
 
-    public Resource(String name, boolean status, ResourceType type, String configuration, List<String> engines, List<String> groups) {
+    public Resource(String name, boolean status, ResourceType type, String configuration, List<String> engines, List<Group> groups) {
         this.name = name;
         this.status = status;
         this.type = type;
@@ -23,7 +26,7 @@ public class Resource implements IsSerializable {
         this.groups = groups;
     }
 
-    public Resource(String name, boolean status, String type, String configuration, List<String> engines, List<String> groups) {
+    public Resource(String name, boolean status, String type, String configuration, List<String> engines, List<Group> groups) {
         this(name, status, ResourceType.fromString(type), configuration, engines, groups);
     }
 
@@ -73,11 +76,15 @@ public class Resource implements IsSerializable {
         this.engines = engines;
     }
 
-    public List<String> getGroups() {
-        return this.groups;
+    public List<Group> getGroups() {
+        return groups;
     }
 
-    public void setGroups(List<String> groups) {
+    public List<String> getGroupsNames() {
+        return groups.stream().map(Group::getName).collect(Collectors.toList());
+    }
+
+    public void setGroups(List<Group> groups) {
         this.groups = groups;
     }
 
