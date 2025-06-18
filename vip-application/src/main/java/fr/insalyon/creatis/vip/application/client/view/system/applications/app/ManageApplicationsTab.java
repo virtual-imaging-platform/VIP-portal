@@ -103,8 +103,8 @@ public class ManageApplicationsTab extends AbstractManageTab {
     }
 
     public void setVersion(String version, String descriptor, String doi, Map<String, String> settings, 
-            boolean isVisible, String[] resources) {
-        editVersionLayout.setVersion(version, descriptor, isVisible, settings, resources);
+            boolean isVisible, String source, String[] resources) {
+        editVersionLayout.setVersion(version, descriptor, isVisible, source, settings, resources);
         manageVersionLayout.setVersion(version, descriptor, doi);
     }
 

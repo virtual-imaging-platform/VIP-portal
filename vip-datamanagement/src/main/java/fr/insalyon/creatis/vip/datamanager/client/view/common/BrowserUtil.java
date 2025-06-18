@@ -37,6 +37,7 @@ import com.smartgwt.client.types.SortDirection;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import fr.insalyon.creatis.vip.core.client.CoreModule;
+import fr.insalyon.creatis.vip.core.client.bean.Group;
 import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationService;
 import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationServiceAsync;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
@@ -137,7 +138,7 @@ public class BrowserUtil {
         } else {
 
             ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();
-            AsyncCallback<List<String>> callback = new AsyncCallback<List<String>>() {
+            AsyncCallback<List<Group>> callback = new AsyncCallback<>() {
 
                 @Override
                 public void onFailure(Throwable caught) {
@@ -146,15 +147,15 @@ public class BrowserUtil {
                 }
 
                 @Override
-                public void onSuccess(List<String> result) {
+                public void onSuccess(List<Group> result) {
                     toolStrip.setPath(path);
 
                     List<DataRecord> records = new ArrayList<DataRecord>();
                     records.add(new DataRecord(Data.Type.folder, DataManagerConstants.USERS_HOME));
                     records.add(new DataRecord(Data.Type.folder, DataManagerConstants.TRASH_HOME));
 
-                    for (String groupName : result) {
-                        records.add(new DataRecord(Data.Type.folder, groupName
+                    for (Group group : result) {
+                        records.add(new DataRecord(Data.Type.folder, group.getName()
                                 + DataManagerConstants.GROUP_APPEND));
                     }
 

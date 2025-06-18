@@ -7,6 +7,8 @@ import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,6 +27,8 @@ import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 @Transactional
 public class ResourceBusiness {
 
+    private final Logger logger = LoggerFactory.getLogger(getClass());
+
     private ResourceDAO resourceDAO;
     private EngineBusiness engineBusiness;
     private GroupBusiness groupBusiness;
@@ -38,6 +42,7 @@ public class ResourceBusiness {
 
     public void add(Resource resource) throws BusinessException {
         try {
+            assertVisibilityMatchBetweenResourceAndGroups(resource);
             resourceDAO.add(resource);
 
             for (String engineName : resource.getEngines()) {
@@ -53,15 +58,10 @@ public class ResourceBusiness {
 
     public void update(Resource resource) throws BusinessException {
         try {
+            assertVisibilityMatchBetweenResourceAndGroups(resource);
             Resource before = getByName(resource.getName());
             List<String> beforeEnginesNames = before.getEngines();
             List<String> beforeGroupsNames = before.getGroups();
-
-            if (before.getGroups().size() != 0) {
-                if (groupBusiness.get(before.getGroups().getFirst()).isPublicGroup() != resource.isPublic()) {
-                    throw new BusinessException("You cannot set resource visibility to " + resource.isPublic() + " because you belongs to groups with different visiblity settings. Please leave them first!");
-                }
-            }
 
             resourceDAO.update(resource);
             for (String engine : resource.getEngines()) {
@@ -175,6 +175,7 @@ public class ResourceBusiness {
             if (group.isPublicGroup() == resource.isPublic()) {
                 resourceDAO.associate(resource, group);
             } else {
+                logger.error("Resource visibility must match group visibility! (resource-visibility={}, group-visibility={})", resource.isPublic(), group.isPublicGroup());
                 throw new BusinessException("Resource visibility must match group visibility! (resource-visibility=" + resource.isPublic() + ", group-visibility=" + group.isPublicGroup() +")");
             }
         } catch (DAOException e) {
@@ -254,5 +255,18 @@ public class ResourceBusiness {
             resource = mapAssociated(resource);
         }
         return resources;
+    }
+
+    private void assertVisibilityMatchBetweenResourceAndGroups(Resource resource) throws BusinessException {
+        List<String> resourceGroups = resource.getGroups();
+
+        if (resourceGroups.size() >= 1) {
+            groupBusiness.assertGroupsHaveSameVisibility(resourceGroups);
+
+            if (groupBusiness.get(resourceGroups.getFirst()).isPublicGroup() != resource.isPublic()) {
+                logger.error("You must make the group(s) and the resource visibility match!");
+                throw new BusinessException("You must make the group(s) and the resource visibility match!");
+            }
+        }
     }
 }

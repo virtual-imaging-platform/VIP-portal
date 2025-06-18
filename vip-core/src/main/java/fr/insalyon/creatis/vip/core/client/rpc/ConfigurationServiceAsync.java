@@ -34,17 +34,12 @@ package fr.insalyon.creatis.vip.core.client.rpc;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import fr.insalyon.creatis.vip.core.client.bean.*;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
-import fr.insalyon.creatis.vip.core.client.view.CoreException;
 import fr.insalyon.creatis.vip.core.client.view.user.UserLevel;
 import fr.insalyon.creatis.vip.core.client.view.util.CountryCode;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.Map;
 
-/**
- *
- * @author Rafael Ferreira da Silva
- */
 public interface ConfigurationServiceAsync {
 
     void configure(String email, String session, AsyncCallback<User> asyncCallback);
@@ -77,7 +72,7 @@ public interface ConfigurationServiceAsync {
 
     void getUserPropertiesGroups(AsyncCallback<List<Boolean>> asyncCallback);
 
-    void getUserGroups(AsyncCallback<List<String>> asyncCallback);
+    void getUserGroups(AsyncCallback<List<Group>> asyncCallback);
 
     void updateUser(String email, UserLevel level, CountryCode countryCode, int maxRunningSimulations, Map<String, CoreConstants.GROUP_ROLE> groups, boolean locked, AsyncCallback<Void> asyncCallback);
 
@@ -133,4 +128,6 @@ public interface ConfigurationServiceAsync {
     void deleteUserApikey(String email, AsyncCallback<Void> async);
 
     void generateNewUserApikey(String email, AsyncCallback<String> async);
+
+    void getMissingGroupsRessources(String email, AsyncCallback<List<String>> async);
 }

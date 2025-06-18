@@ -277,8 +277,8 @@ public class ApplicationData extends JdbcDaoSupport implements ApplicationDAO {
 
     @Override
     public void addVersion(AppVersion version) throws DAOException {
-        String query =  "INSERT INTO VIPAppVersions(application, version, descriptor, visible, settings) "
-        +               "VALUES (?, ?, ?, ?, ?)";
+        String query =  "INSERT INTO VIPAppVersions(application, version, descriptor, visible, settings, source) "
+        +               "VALUES (?, ?, ?, ?, ?, ?)";
 
         try (PreparedStatement ps = getConnection().prepareStatement(query)) {
             ps.setString(1, version.getApplicationName());
@@ -286,6 +286,7 @@ public class ApplicationData extends JdbcDaoSupport implements ApplicationDAO {
             ps.setString(3, version.getDescriptor());
             ps.setBoolean(4, version.isVisible());
             ps.setString(5, version.getSettingsAsString());
+            ps.setString(6, version.getSource());
             ps.executeUpdate();
 
         } catch (SQLException ex) {
@@ -302,15 +303,16 @@ public class ApplicationData extends JdbcDaoSupport implements ApplicationDAO {
 
     @Override
     public void updateVersion(AppVersion version) throws DAOException {
-        String query =  "UPDATE VIPAppVersions SET descriptor=?, visible=?, settings=? "
+        String query =  "UPDATE VIPAppVersions SET descriptor=?, visible=?, settings=?, source=? "
         +               "WHERE application=? AND version=?";
 
         try (PreparedStatement ps = getConnection().prepareStatement(query)) {
             ps.setString(1, version.getDescriptor());
             ps.setBoolean(2, version.isVisible());
             ps.setString(3, version.getSettingsAsString());
-            ps.setString(4, version.getApplicationName());
-            ps.setString(5, version.getVersion());
+            ps.setString(4, version.getSource());
+            ps.setString(5, version.getApplicationName());
+            ps.setString(6, version.getVersion());
             ps.executeUpdate();
 
         } catch (SQLException ex) {
@@ -344,7 +346,7 @@ public class ApplicationData extends JdbcDaoSupport implements ApplicationDAO {
         try (PreparedStatement ps = getConnection().prepareStatement(query)) {
             ps.setString(1, applicationName);
             ps.setString(2, version);
-            ps.executeUpdate(query);
+            ps.executeUpdate();
 
         } catch (SQLException ex) {
             logger.error("Error removing version {}/{}", applicationName, version, ex);
@@ -423,7 +425,8 @@ public class ApplicationData extends JdbcDaoSupport implements ApplicationDAO {
             rs.getString("descriptor"),
             rs.getString("doi"),
             stringSettingsToMap(rs.getString("settings")),
-            rs.getBoolean("visible")
+            rs.getBoolean("visible"),
+            rs.getString("source")
         );
     }
 

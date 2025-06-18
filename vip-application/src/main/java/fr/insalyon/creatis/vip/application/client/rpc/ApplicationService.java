@@ -41,13 +41,10 @@ import fr.insalyon.creatis.vip.application.client.bean.Engine;
 import fr.insalyon.creatis.vip.application.client.bean.Resource;
 import fr.insalyon.creatis.vip.application.client.bean.Tag;
 import fr.insalyon.creatis.vip.application.client.view.ApplicationException;
+
 import java.util.List;
 import java.util.Map;
 
-/**
- *
- * @author Rafael Ferreira da Silva
- */
 public interface ApplicationService extends RemoteService {
 
     public static final String SERVICE_URI = "/applicationservice";
