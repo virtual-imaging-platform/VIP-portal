@@ -135,7 +135,7 @@ public class ResourceLayout extends VLayout {
         grid.setEmptyMessage("<br>No data available.");
         grid.setFields(
                 new ListGridField("name", "Name"),
-                new ListGridField("status", "Status"),
+                new ListGridField("status", "Active"),
                 new ListGridField("type", "Type"),
                 new ListGridField("configuration", "Configuration"),
                 new ListGridField("engines", "Engines"),
