@@ -37,7 +37,6 @@ import com.google.gwt.user.client.rpc.ServiceDefTarget;
 import fr.insalyon.creatis.vip.datamanager.client.bean.DMCachedFile;
 import fr.insalyon.creatis.vip.datamanager.client.bean.Data;
 import fr.insalyon.creatis.vip.datamanager.client.bean.PoolOperation;
-import fr.insalyon.creatis.vip.datamanager.client.bean.SSH;
 import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerException;
 import java.util.Date;
 import java.util.List;
@@ -98,16 +97,4 @@ public interface DataManagerService extends RemoteService {
     public void uploadFile(String localFile, String remoteFile) throws DataManagerException;
 
     public boolean exists(String remoteFile) throws DataManagerException;
-
-    public List<SSH> getSSHConnections() throws DataManagerException;
-
-    public void addSSH(SSH ssh) throws DataManagerException;
-
-    public void updateSSH(SSH ssh) throws DataManagerException;
-
-    public void removeSSH(String email, String name) throws DataManagerException;
-
-    public void resetSSHConnections(List<List<String>> sshConnections) throws DataManagerException;
-
-    public String getSSHPublicKey();
 }

@@ -31,15 +31,6 @@ public class DataManagerDataInitializer extends JdbcDaoSupport {
     @EventListener(ContextRefreshedEvent.class)
     @Order(20) // DataManager tables references vip-core tables and must be created after
     public void onStartup() {
-        logger.info("Configuring VIP SSH database.");
-        tableInitializer.createTable("VIPSSHAccounts",
-                "email VARCHAR(255), LFCDir VARCHAR(255), "
-                        + "sshUser VARCHAR(255), sshHost VARCHAR(255), sshDir VARCHAR(255), sshPort INT, validated BOOLEAN, "
-                        + "auth_failed BOOLEAN, theEarliestNextSynchronistation TIMESTAMP, numberSynchronizationFailed BIGINT, "
-                        + "transferType VARCHAR(255), deleteFilesFromSource BOOLEAN DEFAULT 0, active BOOLEAN DEFAULT 1, PRIMARY KEY(email,LFCDir), "
-                        + "FOREIGN KEY (email) REFERENCES VIPUsers(email) "
-                        + "ON DELETE CASCADE ON UPDATE CASCADE");
-
         logger.info("Configuring VIP External Platforms database.");
         tableInitializer.createTable("VIPExternalPlatforms",
                 "identifier VARCHAR(50) NOT NULL, "

@@ -41,14 +41,12 @@ import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerService;
 import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerException;
 import fr.insalyon.creatis.vip.datamanager.server.business.DataManagerBusiness;
 import fr.insalyon.creatis.vip.datamanager.server.business.LFCBusiness;
-import fr.insalyon.creatis.vip.datamanager.server.business.LfcPathsBusiness;
 import fr.insalyon.creatis.vip.datamanager.server.business.TransferPoolBusiness;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import jakarta.servlet.ServletException;
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -58,7 +56,6 @@ public class DataManagerServiceImpl extends AbstractRemoteServiceServlet impleme
     private DataManagerBusiness dataManagerBusiness;
     private LFCBusiness lfcBusiness;
     private TransferPoolBusiness transferPoolBusiness;
-    private LfcPathsBusiness lfcPathsBusiness;
     private Server server;
 
     @Override
@@ -67,35 +64,14 @@ public class DataManagerServiceImpl extends AbstractRemoteServiceServlet impleme
         transferPoolBusiness = getBean(TransferPoolBusiness.class);
         lfcBusiness = getBean(LFCBusiness.class);
         dataManagerBusiness = getBean(DataManagerBusiness.class);
-        lfcPathsBusiness = getBean(LfcPathsBusiness.class);
         server = getBean(Server.class);
     }
 
     @Override
     public List<Data> listDir(String baseDir, boolean refresh) throws DataManagerException {
         try {
-            List<SSH> sshs = dataManagerBusiness.getSSHConnections();
-            List<String> LfcDirSSHSynchronization = new ArrayList<>();
-            for (SSH ssh : sshs) {
-                if (ssh.getTransferType().equals(TransferType.Synchronization)) {
-                    LfcDirSSHSynchronization.add(ssh.getLfcDir());
-                }
-            }
             List<Data> data = lfcBusiness.listDir(getSessionUser(), baseDir, refresh);
 
-            String lfcBaseDir = lfcPathsBusiness.parseBaseDir(getSessionUser(), baseDir);
-            for (Data d : data) {
-                String dataPath = lfcBaseDir + "/" + d.getName();
-                for (String s : LfcDirSSHSynchronization) {
-                    if (s.equals(dataPath)) {
-                        d.setType(Data.Type.folderSync);
-                    } else if (dataPath.contains(s+"/") && d.getType().equals(Data.Type.file)) {
-                        d.setType(Data.Type.fileSync);
-                    } else if (dataPath.contains(s+"/") && d.getType().equals(Data.Type.folder)) {
-                        d.setType(Data.Type.folderSync);
-                    }
-                }
-            }
             return data;
         } catch (BusinessException | CoreException ex) {
             throw new DataManagerException(ex);
@@ -327,63 +303,5 @@ public class DataManagerServiceImpl extends AbstractRemoteServiceServlet impleme
         } catch (BusinessException | CoreException ex) {
             throw new DataManagerException(ex);
         }
-    }
-
-    @Override
-    public List<SSH> getSSHConnections() throws DataManagerException {
-        try {
-            trace(logger, "Getting ssh connections");
-
-            return dataManagerBusiness.getSSHConnections();
-        } catch (BusinessException | CoreException ex) {
-            throw new DataManagerException(ex);
-        }
-    }
-
-    @Override
-    public void addSSH(SSH ssh) throws DataManagerException {
-        try {
-            trace(logger, "Adding ssh connection " + ssh.getEmail() + " ; " + ssh.getHost());
-            dataManagerBusiness.addSSH(ssh);
-        } catch (BusinessException | CoreException ex) {
-            throw new DataManagerException(ex);
-        }
-    }
-
-    @Override
-    public void updateSSH(SSH ssh) throws DataManagerException {
-        try {
-            trace(logger, "Updating ssh connection " + ssh.getEmail() + " ; " + ssh.getHost());
-            dataManagerBusiness.updateSSH(ssh);
-        } catch (BusinessException | CoreException ex) {
-            throw new DataManagerException(ex);
-        }
-    }
-
-    @Override
-    public void removeSSH(String email, String name) throws DataManagerException {
-        try {
-            trace(logger, "Removing ssh connection " + email + " ; " + name);
-            dataManagerBusiness.removeSSH(email, name);
-        } catch (BusinessException | CoreException ex) {
-            throw new DataManagerException(ex);
-        }
-    }
-
-    @Override
-    public void resetSSHConnections(List<List<String>> sshConnections) throws DataManagerException {
-        try {
-            for (List<String> sshC : sshConnections) {
-                trace(logger, "Removing ssh connection " + sshC.get(0) + " ; " + sshC.get(1));
-            }
-            dataManagerBusiness.resetSSHs(sshConnections);
-        } catch (BusinessException | CoreException ex) {
-            throw new DataManagerException(ex);
-        }
-    }
-
-    @Override
-    public String getSSHPublicKey() {
-        return server.getSshPublicKey();
     }
 }

@@ -40,11 +40,8 @@ import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
 import fr.insalyon.creatis.vip.core.server.business.Server;
-import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import fr.insalyon.creatis.vip.datamanager.client.bean.DMCachedFile;
-import fr.insalyon.creatis.vip.datamanager.client.bean.SSH;
 import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerException;
-import fr.insalyon.creatis.vip.datamanager.server.dao.SSHDAO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,7 +58,6 @@ public class DataManagerBusiness {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    private SSHDAO sshdao;
     private GRIDAClient gridaClient;
     private GRIDACacheClient gridaCacheClient;
     private ConfigurationBusiness configurationBusiness;
@@ -70,9 +66,8 @@ public class DataManagerBusiness {
 
     @Autowired
     public DataManagerBusiness(
-            SSHDAO sshdao, GRIDAClient gridaClient, GRIDACacheClient gridaCacheClient,
+            GRIDAClient gridaClient, GRIDACacheClient gridaCacheClient,
             ConfigurationBusiness configurationBusiness, LfcPathsBusiness lfcPathsBusiness, Server server) {
-        this.sshdao = sshdao;
         this.gridaClient = gridaClient;
         this.gridaCacheClient = gridaCacheClient;
         this.configurationBusiness = configurationBusiness;
@@ -143,62 +138,6 @@ public class DataManagerBusiness {
                     remoteFile, localDir, user, ex);
             throw new BusinessException(ex);
         }
-    }
-
-    public List<SSH> getSSHConnections() throws BusinessException {
-        try {
-            return sshdao.getSSHConnections();
-        } catch (DAOException ex) {
-            throw new BusinessException(ex);
-        }
-    }
-
-    public void addSSH(SSH ssh) throws BusinessException {
-        try {
-            //create LFC dir
-            User user = configurationBusiness.getUser(ssh.getEmail());
-            ssh.setLfcDir(lfcPathsBusiness.parseBaseDir(user, ssh.getLfcDir()));
-            sshdao.addSSH(ssh);
-        } catch (DAOException | DataManagerException ex) {
-            throw new BusinessException(ex);
-        }
-    }
-
-    public void removeSSH(String email, String name) throws BusinessException {
-        try {
-            String lfcDir = getLFCDir(email, name);
-            sshdao.removeSSH(email, lfcDir);
-        } catch (DAOException ex) {
-            throw new BusinessException(ex);
-        }
-    }
-
-    public void resetSSHs(List<List<String>> sshConnections) throws BusinessException {
-
-        try {
-            // replace ssh name with complete lfc paths
-            for (List<String> sshConnection : sshConnections) {
-                String lfcDir = getLFCDir(sshConnection.get(0), sshConnection.get(1));
-                sshConnection.set(1, lfcDir);
-            }
-            sshdao.resetSSHConnections(sshConnections);
-        } catch (DAOException ex) {
-            throw new BusinessException(ex);
-        }
-    }
-
-    public void updateSSH(SSH ssh) throws BusinessException {
-        try {
-            generateLFCDir(ssh);
-            sshdao.updateSSH(ssh);
-        } catch (DAOException ex) {
-            throw new BusinessException(ex);
-        }
-    }
-
-    public void generateLFCDir(SSH ssh) throws BusinessException {
-        String lfcDir = getLFCDir(ssh.getEmail(), ssh.getName());
-        ssh.setLfcDir(lfcDir);
     }
 
     public String getLFCDir(String email, String lfcName) throws BusinessException {
