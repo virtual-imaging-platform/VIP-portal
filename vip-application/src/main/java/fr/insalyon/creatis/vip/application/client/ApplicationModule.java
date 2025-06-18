@@ -37,7 +37,11 @@ import com.smartgwt.client.widgets.tab.Tab;
 import com.smartgwt.client.widgets.tab.events.CloseClickHandler;
 import com.smartgwt.client.widgets.tab.events.TabCloseClickEvent;
 
+import fr.insalyon.creatis.vip.application.client.bean.AppVersion;
+import fr.insalyon.creatis.vip.application.client.bean.Application;
+import fr.insalyon.creatis.vip.application.client.bean.Tag;
 import fr.insalyon.creatis.vip.application.client.inter.CustomApplicationModule;
+import fr.insalyon.creatis.vip.application.client.rpc.ApplicationService;
 import fr.insalyon.creatis.vip.application.client.rpc.WorkflowService;
 import fr.insalyon.creatis.vip.application.client.view.ApplicationHomeParser;
 import fr.insalyon.creatis.vip.application.client.view.ApplicationSystemParser;
@@ -47,27 +51,25 @@ import fr.insalyon.creatis.vip.application.client.view.monitor.timeline.Timeline
 import fr.insalyon.creatis.vip.application.client.view.system.applications.app.ManageApplicationsTab;
 import fr.insalyon.creatis.vip.core.client.CoreModule;
 import fr.insalyon.creatis.vip.core.client.Module;
-import fr.insalyon.creatis.vip.core.client.bean.Group;
-import fr.insalyon.creatis.vip.core.client.bean.GroupType;
 import fr.insalyon.creatis.vip.core.client.bean.User;
-import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationService;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.layout.CenterTabSet;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 public class ApplicationModule extends Module {
 
     public static List<CustomApplicationModule> customModules;
-    private List<Group> userApplicationGroups;
-
+    private Map<String, List<AppVersion>> userTagApps;
 
     public ApplicationModule() {
         customModules = new ArrayList<>();
+        userTagApps = new HashMap<>();
 
         CoreModule.getHomePageActions().put(CoreConstants.HOME_ACTION_SHOW_APPLICATIONS, new Runnable() {
             @Override
@@ -81,20 +83,29 @@ public class ApplicationModule extends Module {
 
     @Override
     public void load() {
-        final AsyncCallback<List<Group>> callback = new AsyncCallback<>() {
+        final AsyncCallback<Map<Application, List<AppVersion>>> callback = new AsyncCallback<>() {
             @Override
             public void onFailure(Throwable caught) {
                 Layout.getInstance().setWarningMessage("Unable to load users groups:<br />" + caught.getMessage());
             }
 
             @Override
-            public void onSuccess(List<Group> groups) {
-                userApplicationGroups = groups.stream()
-                    .filter((g) -> g.getType().equals(GroupType.APPLICATION)).collect(Collectors.toList());
+            public void onSuccess(Map<Application, List<AppVersion>> apps) {
+                apps.forEach((app, versions) -> {
+                    versions.forEach((version) -> {
+                        String classTag = version.getTags().stream()
+                            .filter(t -> t.getKey().equals("class"))
+                            .findFirst()
+                            .map(Tag::getValue)
+                            .orElse("Others");
+
+                        userTagApps.computeIfAbsent(classTag, k -> new ArrayList<>()).add(version);
+                    });
+                });
                 render();
             }
         };
-        ConfigurationService.Util.getInstance().getUserGroups(callback);
+        ApplicationService.Util.getInstance().getApplications(callback);
     }
 
     private void render() {
@@ -104,9 +115,9 @@ public class ApplicationModule extends Module {
         CoreModule.addSystemApplicationParser(new ApplicationSystemParser());
         CoreModule.addLayoutToHomeTab(TimelineLayout.getInstance());
 
-        for (Group group : userApplicationGroups) {
-            CoreModule.addApplicationsTileGrid(new ApplicationTileGrid(group));
-        }
+        userTagApps.forEach((name, versions) -> {
+            CoreModule.addApplicationsTileGrid(new ApplicationTileGrid(name, versions));
+        });
 
         // Simulation close tab
         CenterTabSet.getInstance().addCloseClickHandler(new CloseClickHandler() {
