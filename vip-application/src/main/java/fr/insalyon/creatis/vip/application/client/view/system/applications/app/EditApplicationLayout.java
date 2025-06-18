@@ -198,14 +198,13 @@ public class EditApplicationLayout extends AbstractFormLayout {
     }
 
     private void remove(String name) {
-
         WidgetUtil.setLoadingIButton(removeButton, "Removing...");
         ApplicationService.Util.getInstance().remove(name, getCallback("remove"));
     }
 
-    private AsyncCallback<Void> getCallback(final String text) {
+    private AsyncCallback<String> getCallback(final String text) {
 
-        return new AsyncCallback<Void>() {
+        return new AsyncCallback<String>() {
             @Override
             public void onFailure(Throwable caught) {
                 WidgetUtil.resetIButton(saveButton, "Save", CoreConstants.ICON_SAVED);
@@ -214,13 +213,17 @@ public class EditApplicationLayout extends AbstractFormLayout {
             }
 
             @Override
-            public void onSuccess(Void result) {
+            public void onSuccess(String result) {
                 WidgetUtil.resetIButton(saveButton, "Save", CoreConstants.ICON_SAVED);
                 WidgetUtil.resetIButton(removeButton, "Remove", CoreConstants.ICON_DELETE);
+
                 setApplication(null, null, null, null);
-                ManageApplicationsTab tab = (ManageApplicationsTab) Layout.getInstance().
-                        getTab(ApplicationConstants.TAB_MANAGE_APPLICATION);
+                ManageApplicationsTab tab = (ManageApplicationsTab) Layout.getInstance().getTab(ApplicationConstants.TAB_MANAGE_APPLICATION);
                 tab.loadApplications();
+                
+                if (result != null) {
+                    Layout.getInstance().setInformationMessage(result);
+                }
             }
         };
     }

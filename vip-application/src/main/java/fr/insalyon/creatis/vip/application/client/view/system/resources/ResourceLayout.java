@@ -176,7 +176,7 @@ public class ResourceLayout extends VLayout {
 
     private void remove(String name) {
         final Resource resourceToDelete = new Resource(name);
-        final AsyncCallback<Void> callback = new AsyncCallback<>() {
+        final AsyncCallback<String> callback = new AsyncCallback<>() {
             @Override
             public void onFailure(Throwable caught) {
                 modal.hide();
@@ -184,7 +184,7 @@ public class ResourceLayout extends VLayout {
             }
 
             @Override
-            public void onSuccess(Void result) {
+            public void onSuccess(String result) {
                 modal.hide();
                 Layout.getInstance().setNoticeMessage("The engine was successfully removed!");
                 loadData();

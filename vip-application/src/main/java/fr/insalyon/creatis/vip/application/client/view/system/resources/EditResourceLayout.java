@@ -146,6 +146,8 @@ public class EditResourceLayout extends AbstractFormLayout {
             this.statusField.setValue(false);
             this.typeFieldList.setValue(ResourceType.getDefault());
             this.configurationField.setValue("");
+            this.enginesList.setValue("");
+            this.groupsList.setValue("");
             this.newResource = true;
             this.removeButton.setDisabled(true);
             this.groupsMap = new HashMap<>();
@@ -169,8 +171,8 @@ public class EditResourceLayout extends AbstractFormLayout {
         ApplicationService.Util.getInstance().removeResource(resourceToDelete, getCallback("remove"));
     }
 
-    private AsyncCallback<Void> getCallback(final String text) {
-        return new AsyncCallback<Void>() {
+    private AsyncCallback<String> getCallback(final String text) {
+        return new AsyncCallback<String>() {
             @Override
             public void onFailure(Throwable caught) {
                 WidgetUtil.resetIButton(saveButton, "Save", CoreConstants.ICON_SAVED);
@@ -179,13 +181,17 @@ public class EditResourceLayout extends AbstractFormLayout {
             }
 
             @Override
-            public void onSuccess(Void result) {
+            public void onSuccess(String result) {
                 WidgetUtil.resetIButton(saveButton, "Save", CoreConstants.ICON_SAVED);
                 WidgetUtil.resetIButton(removeButton, "Remove", CoreConstants.ICON_DELETE);
                 setResource(null, false, null, null, null, null);
                 ManageResourcesTab tab = (ManageResourcesTab) Layout.getInstance().
                         getTab(ApplicationConstants.TAB_MANAGE_RESOURCE);
                 tab.loadResources();
+
+                if (result != null) {
+                    Layout.getInstance().setInformationMessage(result);
+                }
             }
         };
     }

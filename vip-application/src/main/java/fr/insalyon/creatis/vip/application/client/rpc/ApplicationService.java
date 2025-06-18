@@ -68,11 +68,11 @@ public interface ApplicationService extends RemoteService {
     
     public AppVersion getVersion(String applicationName, String applicationVersion) throws ApplicationException;
 
-    public void add(Application application) throws ApplicationException;
+    public String add(Application application) throws ApplicationException;
 
-    public void update(Application application) throws ApplicationException;
+    public String update(Application application) throws ApplicationException;
 
-    public void remove(String name) throws ApplicationException;
+    public String remove(String name) throws ApplicationException;
     
     public void addVersion(AppVersion version) throws ApplicationException;
 
@@ -96,11 +96,11 @@ public interface ApplicationService extends RemoteService {
     
     public List<Engine> getEngines() throws ApplicationException;
     
-    public void addResource(Resource resource) throws ApplicationException;
+    public String addResource(Resource resource) throws ApplicationException;
 
-    public void removeResource(Resource resource) throws ApplicationException;
+    public String removeResource(Resource resource) throws ApplicationException;
 
-    public void updateResource(Resource resource) throws ApplicationException;
+    public String updateResource(Resource resource) throws ApplicationException;
 
     public List<Resource> getResources() throws ApplicationException;
 

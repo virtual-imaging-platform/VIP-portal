@@ -225,8 +225,7 @@ public class ApplicationsLayout extends VLayout {
     }
 
     private void remove(String name) {
-
-        final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
+        final AsyncCallback<String> callback = new AsyncCallback<>() {
             @Override
             public void onFailure(Throwable caught) {
                 modal.hide();
@@ -234,7 +233,7 @@ public class ApplicationsLayout extends VLayout {
             }
 
             @Override
-            public void onSuccess(Void result) {
+            public void onSuccess(String result) {
                 modal.hide();
                 Layout.getInstance().setNoticeMessage("The application was successfully removed!");
                 loadData();
