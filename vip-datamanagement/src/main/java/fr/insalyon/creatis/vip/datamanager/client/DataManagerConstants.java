@@ -31,16 +31,11 @@
  */
 package fr.insalyon.creatis.vip.datamanager.client;
 
-/**
- *
- * @author Rafael Silva
- */
 public class DataManagerConstants {
 
     // Tabs
     public final static String TAB_MANAGE_OPERATIONS = "manage_operations_tab";
     public final static String TAB_MANAGE_CACHED_FILES = "manage_cached_files_tab";
-    public final static String TAB_MANAGE_ZOMBIE_FILES = "manage_zombie_files_tab";
     public final static String TAB_MANAGE_SSH = "manage_ssh_tab";
     // Sections
     public final static String SECTION_FILE_TRANSFER = "file-transfer-section";
@@ -74,13 +69,11 @@ public class DataManagerConstants {
     public final static String APP_CACHED_FILES = "Cached Files";
     public final static String APP_FILE_TRANSFER = "File Transfer";
     public final static String APP_OPERATIONS = "Operations";
-    public final static String APP_ZOMBIE_FILES = "Zombie Files";
     public final static String APP_SSH = "SSH Connections";
     // Application Images
     public static final String APP_IMG_CACHED_FILES = IMG_FOLDER + "app-cache.png";
     public static final String APP_IMG_FILE_TRANSFER = IMG_FOLDER + "app-file-transfer.png";
     public static final String APP_IMG_OPERATIONS = IMG_FOLDER + "app-operation.png";
-    public static final String APP_IMG_ZOMBIE_FILES = IMG_FOLDER + "app-file-zombie.png";
     public static String APP_IMG_SSH = IMG_FOLDER + "app-ssh.png";
     // Operation
     private static final String OP_FOLDER = IMG_FOLDER + "operation/";

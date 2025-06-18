@@ -33,19 +33,12 @@ package fr.insalyon.creatis.vip.datamanager.client.rpc;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import fr.insalyon.creatis.vip.datamanager.client.bean.DMCachedFile;
-import fr.insalyon.creatis.vip.datamanager.client.bean.DMZombieFile;
 import fr.insalyon.creatis.vip.datamanager.client.bean.Data;
 import fr.insalyon.creatis.vip.datamanager.client.bean.PoolOperation;
 import fr.insalyon.creatis.vip.datamanager.client.bean.SSH;
-import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerException;
-import java.net.URL;
 import java.util.Date;
 import java.util.List;
 
-/**
- *
- * @author Rafael Silva
- */
 public interface DataManagerServiceAsync {
 
     public void listDir(String baseDir, boolean refresh, AsyncCallback<List<Data>> asyncCallback);
@@ -89,10 +82,6 @@ public interface DataManagerServiceAsync {
     public void uploadFile(String localFile, String remoteName, String remoteDir, AsyncCallback<Void> asyncCallback);
 
     public void exists(String remoteFile, AsyncCallback<Boolean> asyncCallback);
-
-    public void getZombieFiles(AsyncCallback<List<DMZombieFile>> asyncCallback);
-
-    public void deleteZombieFiles(List<String> surls, AsyncCallback<Void> asyncCallback);
 
     public void getSSHConnections(AsyncCallback<List<SSH>> asyncCallback);
 

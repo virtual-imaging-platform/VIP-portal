@@ -52,10 +52,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-/**
- *
- * @author Rafael Silva
- */
 public class DataManagerServiceImpl extends AbstractRemoteServiceServlet implements DataManagerService {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
@@ -329,29 +325,6 @@ public class DataManagerServiceImpl extends AbstractRemoteServiceServlet impleme
             User user = getSessionUser();
             return lfcBusiness.exists(user, remoteFile);
         } catch (BusinessException | CoreException ex) {
-            throw new DataManagerException(ex);
-        }
-    }
-
-    @Override
-    public List<DMZombieFile> getZombieFiles() throws DataManagerException {
-
-        try {
-            return dataManagerBusiness.getZombieFiles();
-        } catch (BusinessException ex) {
-            throw new DataManagerException(ex);
-        }
-    }
-
-    @Override
-    public void deleteZombieFiles(List<String> surls) throws DataManagerException {
-
-        try {
-            authenticateSystemAdministrator(logger);
-            trace(logger, "Removing zombie files: " + surls);
-            dataManagerBusiness.deleteZombieFiles(surls);
-
-        } catch (CoreException | BusinessException ex) {
             throw new DataManagerException(ex);
         }
     }

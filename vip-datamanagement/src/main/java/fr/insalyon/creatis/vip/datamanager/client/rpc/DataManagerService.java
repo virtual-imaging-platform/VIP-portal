@@ -35,19 +35,13 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.ServiceDefTarget;
 import fr.insalyon.creatis.vip.datamanager.client.bean.DMCachedFile;
-import fr.insalyon.creatis.vip.datamanager.client.bean.DMZombieFile;
 import fr.insalyon.creatis.vip.datamanager.client.bean.Data;
 import fr.insalyon.creatis.vip.datamanager.client.bean.PoolOperation;
 import fr.insalyon.creatis.vip.datamanager.client.bean.SSH;
 import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerException;
-import java.net.URL;
 import java.util.Date;
 import java.util.List;
 
-/**
- *
- * @author Rafael Silva
- */
 public interface DataManagerService extends RemoteService {
 
     public static final String SERVICE_URI = "/datamanagerservice";
@@ -104,10 +98,6 @@ public interface DataManagerService extends RemoteService {
     public void uploadFile(String localFile, String remoteFile) throws DataManagerException;
 
     public boolean exists(String remoteFile) throws DataManagerException;
-
-    public List<DMZombieFile> getZombieFiles() throws DataManagerException;
-
-    public void deleteZombieFiles(List<String> surls) throws DataManagerException;
 
     public List<SSH> getSSHConnections() throws DataManagerException;
 

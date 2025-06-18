@@ -35,16 +35,13 @@ import fr.insalyon.creatis.devtools.FileUtils;
 import fr.insalyon.creatis.grida.client.GRIDACacheClient;
 import fr.insalyon.creatis.grida.client.GRIDAClient;
 import fr.insalyon.creatis.grida.client.GRIDAClientException;
-import fr.insalyon.creatis.grida.client.GRIDAZombieClient;
 import fr.insalyon.creatis.grida.common.bean.CachedFile;
-import fr.insalyon.creatis.grida.common.bean.ZombieFile;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
 import fr.insalyon.creatis.vip.core.server.business.Server;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import fr.insalyon.creatis.vip.datamanager.client.bean.DMCachedFile;
-import fr.insalyon.creatis.vip.datamanager.client.bean.DMZombieFile;
 import fr.insalyon.creatis.vip.datamanager.client.bean.SSH;
 import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerException;
 import fr.insalyon.creatis.vip.datamanager.server.dao.SSHDAO;
@@ -58,10 +55,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- *
- * @author Rafael Silva
- */
 @Service
 @Transactional
 public class DataManagerBusiness {
@@ -71,7 +64,6 @@ public class DataManagerBusiness {
     private SSHDAO sshdao;
     private GRIDAClient gridaClient;
     private GRIDACacheClient gridaCacheClient;
-    private GRIDAZombieClient gridaZombieClient;
     private ConfigurationBusiness configurationBusiness;
     private LfcPathsBusiness lfcPathsBusiness;
     private Server server;
@@ -79,11 +71,10 @@ public class DataManagerBusiness {
     @Autowired
     public DataManagerBusiness(
             SSHDAO sshdao, GRIDAClient gridaClient, GRIDACacheClient gridaCacheClient,
-            GRIDAZombieClient gridaZombieClient, ConfigurationBusiness configurationBusiness, LfcPathsBusiness lfcPathsBusiness, Server server) {
+            ConfigurationBusiness configurationBusiness, LfcPathsBusiness lfcPathsBusiness, Server server) {
         this.sshdao = sshdao;
         this.gridaClient = gridaClient;
         this.gridaCacheClient = gridaCacheClient;
-        this.gridaZombieClient = gridaZombieClient;
         this.configurationBusiness = configurationBusiness;
         this.lfcPathsBusiness = lfcPathsBusiness;
         this.server = server;
@@ -150,42 +141,6 @@ public class DataManagerBusiness {
         } catch (GRIDAClientException ex) {
             logger.error("Error getting file {} to {} by {}",
                     remoteFile, localDir, user, ex);
-            throw new BusinessException(ex);
-        }
-    }
-
-    /**
-     * Gets the list of zombie files.
-     */
-    public List<DMZombieFile> getZombieFiles() throws BusinessException {
-
-        try {
-            List<DMZombieFile> list = new ArrayList<>();
-            for (ZombieFile zf : gridaZombieClient.getList()) {
-                list.add(new DMZombieFile(zf.getSurl(), zf.getRegistration()));
-            }
-            return list;
-
-        } catch (GRIDAClientException ex) {
-            logger.error("Error getting zombie files", ex);
-            throw new BusinessException(ex);
-        }
-    }
-
-    /**
-     * Deletes a list of zombie files.
-     *
-     * @param surls List of zombie SURLs
-     */
-    public void deleteZombieFiles(List<String> surls) throws BusinessException {
-
-        try {
-
-            for (String surl : surls) {
-                gridaZombieClient.delete(surl);
-            }
-        } catch (GRIDAClientException ex) {
-            logger.error("Error deleting zombie files {}", surls, ex);
             throw new BusinessException(ex);
         }
     }
