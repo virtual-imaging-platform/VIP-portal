@@ -3,6 +3,7 @@ package fr.insalyon.creatis.vip.application.integrationtest;
 import fr.insalyon.creatis.vip.application.client.bean.AppVersion;
 import fr.insalyon.creatis.vip.application.client.bean.Application;
 import fr.insalyon.creatis.vip.application.client.bean.Engine;
+import fr.insalyon.creatis.vip.application.client.bean.Tag;
 import fr.insalyon.creatis.vip.application.server.business.AppVersionBusiness;
 import fr.insalyon.creatis.vip.application.server.business.ApplicationBusiness;
 import fr.insalyon.creatis.vip.application.server.business.EngineBusiness;
@@ -141,6 +142,27 @@ public class ApplicationIT extends BaseSpringIT {
         AppVersion appVersion = new AppVersion("Application1", "version 0.0", descriptor, true);
         appVersionBusiness.update(appVersion);
         Assertions.assertEquals(descriptor, appVersionBusiness.getVersions("Application1").get(0).getDescriptor(), "Incorrect descriptor update");
+    }
+
+    @Test
+    public void testUpdateAppVersionWithTags() throws BusinessException {
+        AppVersion appVersion = new AppVersion("Application1", "version 0.0", "{}", true);
+        Tag tagA = new Tag("a", "x", Tag.ValueType.STRING, appVersion, false, false);
+        Tag tagB = new Tag("b", "x", Tag.ValueType.STRING, appVersion, false, false);
+        appVersion.setTags(List.of(tagA, tagB));
+        appVersionBusiness.update(appVersion);
+
+        assertEquals(List.of(tagA, tagB), appVersionBusiness.getVersions("Application1").get(0).getTags());
+        // now try to remove a tag, update one and add a two new ones
+        tagB.setValue("y");
+        tagB.setBoutiques(true);
+        tagB.setVisible(true);
+        Tag tagC = new Tag("c", "x", Tag.ValueType.STRING, appVersion, false, false);
+        Tag tagD = new Tag("d", "x", Tag.ValueType.STRING, appVersion, false, false);
+        appVersion.setTags(List.of(tagB, tagC, tagD));
+        appVersionBusiness.update(appVersion);
+
+        assertEquals(List.of(tagB, tagC, tagD), appVersionBusiness.getVersions("Application1").get(0).getTags());
     }
 
     @Test 

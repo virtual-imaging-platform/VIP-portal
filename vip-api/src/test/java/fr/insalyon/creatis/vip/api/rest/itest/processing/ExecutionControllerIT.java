@@ -410,7 +410,7 @@ public class ExecutionControllerIT extends BaseWebSpringIT {
         // verify workflow path
         Assertions.assertEquals(FileUtil.read(getBoutiquesTestFile()), workflowContentCaptor.getValue());
 
-        // verify inputs
+        // verify inputs / same as gwendia without optional one
         String inputs = inputsCaptor.getValue();
         List<ParameterSweep> expectedParams = new ArrayList<>();
         expectedParams.add(new ParameterSweep("testFileInput", ServerMockConfig.TEST_USERS_ROOT + "/" +  baseUser1.getFolder() + "/path/to/input.in"));

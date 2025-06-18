@@ -128,17 +128,15 @@ public class ApplicationDataInitializer extends JdbcDaoSupport {
 
     private void createTagsTables() {
         tableInitializer.createTable("VIPTags",
-                    "name VARCHAR(255), "
-                +   "PRIMARY KEY (name)");
-
-        tableInitializer.createTable("VIPTagsAppVersions",
-                    "application VARCHAR(255), "
+                    "tag_key VARCHAR(255), "
+                +   "tag_value VARCHAR(255), "
+                +   "type VARCHAR(255), "
+                +   "application VARCHAR(255), "
                 +   "version VARCHAR(255), "
-                +   "tagname VARCHAR(255), "
-                +   "PRIMARY KEY (application, version, tagname), "
+                +   "boutiques BOOLEAN, "
+                +   "visible BOOLEAN, "
+                +   "PRIMARY KEY (tag_key, tag_value, application, version), "
                 +   "FOREIGN KEY (application, version) REFERENCES VIPAppVersions(application, version) "
-                +   "ON DELETE CASCADE ON UPDATE CASCADE, "
-                +   "FOREIGN KEY (tagname) REFERENCES VIPTags(name) "
                 +   "ON DELETE CASCADE ON UPDATE CASCADE");
     }
 
@@ -153,15 +151,15 @@ public class ApplicationDataInitializer extends JdbcDaoSupport {
                 +   "ON DELETE CASCADE ON UPDATE CASCADE");
 
         tableInitializer.createTable("VIPPublicExecutions",
-                "experience_name VARCHAR(255), "
-                        + "workflows_ids VARCHAR(1000),  "
-                        + "applications_names VARCHAR(1000), "
-                        + "applications_versions VARCHAR(1000), "
-                        + "status  VARCHAR(50), "
-                        + "author VARCHAR(250), "
-                        + "output_ids VARCHAR(1000), "
-                        + "comments TEXT, "
-                        + "doi TEXT, "
-                        + "PRIMARY KEY(experience_name)");
+                    "experience_name VARCHAR(255), "
+                +   "workflows_ids VARCHAR(1000),  "
+                +   "applications_names VARCHAR(1000), "
+                +   "applications_versions VARCHAR(1000), "
+                +   "status  VARCHAR(50), "
+                +   "author VARCHAR(250), "
+                +   "output_ids VARCHAR(1000), "
+                +   "comments TEXT, "
+                +   "doi TEXT, "
+                +   "PRIMARY KEY(experience_name)");
     }
 } 

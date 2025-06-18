@@ -1,7 +1,6 @@
 package fr.insalyon.creatis.vip.application.server.business;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -32,9 +31,17 @@ public class TagBusiness {
         }
     }
 
-    public void update(Tag tag, String newName) throws BusinessException {
+    public void addOrUpdate(Tag tag) throws BusinessException {
+        if ( ! exist(tag)) {
+            add(tag);
+        } else {
+            update(tag, tag);
+        }
+    }
+
+    public void update(Tag oldTag, Tag newTag) throws BusinessException {
         try {
-            tagDAO.update(tag, newName);
+            tagDAO.update(oldTag, newTag);
         } catch (DAOException e) {
             throw new BusinessException(e);
         }
@@ -48,24 +55,9 @@ public class TagBusiness {
         }
     }
 
-    public Tag getByName(String name) throws BusinessException {
+    public boolean exist(Tag tag) throws BusinessException {
         try {
-            return tagDAO.getAll().stream()
-                .filter((e) -> e.getName().equalsIgnoreCase(name))
-                .findFirst().get();
-        } catch (DAOException | NoSuchElementException e) {
-            throw new BusinessException(e);
-        }
-    }
-
-    public boolean exist(String name) throws BusinessException {
-        try {
-            tagDAO.getAll().stream()
-                .filter((e) -> e.getName().equalsIgnoreCase(name))
-                .findFirst().get();
-            return true;
-        } catch (NoSuchElementException e){
-            return false;
+            return tagDAO.get(tag.getKey(), tag.getValue(), tag.getApplication(), tag.getVersion()) != null;
         } catch (DAOException e) {
             throw new BusinessException(e);
         }
@@ -79,35 +71,9 @@ public class TagBusiness {
         }
     }
 
-    public void associate(Tag tag, AppVersion appVersion) throws BusinessException {
-        try {
-            if ( ! tagDAO.getTags(appVersion).stream().filter((e) -> e.getName().equals(tag.getName())).findFirst().isPresent()) {
-                tagDAO.associate(tag, appVersion);
-            }
-        } catch (DAOException e) {
-            throw new BusinessException(e);
-        }
-    }
-
-    public void dissociate(Tag tag, AppVersion appVersion) throws BusinessException {
-        try {
-            tagDAO.dissociate(tag, appVersion);
-        } catch (DAOException e) {
-            throw new BusinessException(e);
-        }
-    }
-
     public List<Tag> getTags(AppVersion appVersion) throws BusinessException {
         try {
             return tagDAO.getTags(appVersion);
-        } catch (DAOException e) {
-            throw new BusinessException(e);
-        }
-    }
-
-    public List<AppVersion> getAssociated(Tag tag) throws BusinessException {
-        try {
-            return tagDAO.getAssociated(tag);
         } catch (DAOException e) {
             throw new BusinessException(e);
         }

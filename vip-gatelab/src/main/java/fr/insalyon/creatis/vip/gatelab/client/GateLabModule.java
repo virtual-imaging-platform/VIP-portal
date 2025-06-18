@@ -88,7 +88,7 @@ public class GateLabModule extends Module implements CustomApplicationModule {
     @Override
     public boolean doOverride(List<Tag> tags) {
         for (Tag tag : tags) {
-            if (tag.getName().equalsIgnoreCase(GateLabConstants.TAG_GATELAB)) {
+            if (tag.getKey().equalsIgnoreCase(GateLabConstants.TAG_GATELAB) && tag.getValue().equalsIgnoreCase("True")) {
                 return true;
             }
         }
