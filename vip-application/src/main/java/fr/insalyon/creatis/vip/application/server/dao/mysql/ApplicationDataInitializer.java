@@ -125,7 +125,9 @@ public class ApplicationDataInitializer extends JdbcDaoSupport {
                     "application VARCHAR(255), "
                 +   "name VARCHAR(255), "
                 +   "inputs VARCHAR(32000), "
-                +   "PRIMARY KEY (application, name)");
+                +   "PRIMARY KEY (application, name),"
+                +   "FOREIGN KEY (application) REFERENCES VIPApplications(name) "
+                +   "ON DELETE CASCADE ON UPDATE CASCADE");
     }
 
     private void createTagsTables() {
@@ -152,6 +154,8 @@ public class ApplicationDataInitializer extends JdbcDaoSupport {
                 +   "inputs VARCHAR(32000), "
                 +   "PRIMARY KEY (email, application, name), "
                 +   "FOREIGN KEY (email) REFERENCES VIPUsers(email) "
+                +   "ON DELETE CASCADE ON UPDATE CASCADE,"
+                +   "FOREIGN KEY (application) REFERENCES VIPApplications(name) "
                 +   "ON DELETE CASCADE ON UPDATE CASCADE");
 
         tableInitializer.createTable("VIPPublicExecutions",
