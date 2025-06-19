@@ -31,6 +31,7 @@
  */
 package fr.insalyon.creatis.vip.application.client.view.system.applications.version;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -38,10 +39,14 @@ import java.util.Map;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.types.ListGridEditEvent;
+import com.smartgwt.client.types.ListGridFieldType;
+import com.smartgwt.client.types.TitleOrientation;
 import com.smartgwt.client.util.*;
 import com.smartgwt.client.widgets.*;
 import com.smartgwt.client.widgets.events.*;
+import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.*;
+import com.smartgwt.client.data.Record;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
@@ -50,6 +55,7 @@ import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
 import fr.insalyon.creatis.vip.application.client.bean.AppVersion;
 import fr.insalyon.creatis.vip.application.client.bean.Resource;
 import fr.insalyon.creatis.vip.application.client.bean.Tag;
+import fr.insalyon.creatis.vip.application.client.bean.Tag.ValueType;
 import fr.insalyon.creatis.vip.application.client.rpc.ApplicationService;
 import fr.insalyon.creatis.vip.application.client.rpc.ApplicationServiceAsync;
 import fr.insalyon.creatis.vip.application.client.view.system.applications.app.ManageApplicationsTab;
@@ -58,14 +64,12 @@ import fr.insalyon.creatis.vip.core.client.view.common.AbstractFormLayout;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.core.client.view.util.*;
 
-/**
- *
- * @author Rafael Ferreira da Silva
- */
 public class EditVersionLayout extends AbstractFormLayout {
-
+    
     private boolean newVersion;
     private String applicationName;
+    private String version;
+
     private Label applicationLabel;
     private TextItem versionField;
     private TextItem descriptorField;
@@ -73,7 +77,7 @@ public class EditVersionLayout extends AbstractFormLayout {
     private IButton newSettingsButton;
     private CheckboxItem isVisibleField;
     private TextItem sourceField;
-    private SelectItem tagsList;
+    private ListGrid tagsGrid;
     private SelectItem resourcesList;
     private IButton saveButton;
     private IButton removeButton;
@@ -122,9 +126,21 @@ public class EditVersionLayout extends AbstractFormLayout {
         sourceField = FieldUtil.getTextItem(450, null);
         sourceField.setRequired(false);
 
-        tagsList = new SelectItem();
-        tagsList.setMultiple(true);
-        tagsList.setWidth(450);
+        sourceField = FieldUtil.getTextItem(450, null);
+        sourceField.setRequired(false);
+
+        tagsGrid = new ListGrid();
+        tagsGrid.setWidth(450);
+        tagsGrid.setCanEdit(true);
+        tagsGrid.setCanRemoveRecords(true);
+        tagsGrid.setEditEvent(ListGridEditEvent.CLICK);
+        tagsGrid.setHeight(250);
+        tagsGrid.setFields(
+            new ListGridField("key", "Key").setCanEdit(true),
+            new ListGridField("value", "Value").setCanEdit(true),
+            new ListGridField("visible", "Visible").setType(ListGridFieldType.BOOLEAN),
+            new ListGridField("boutiques", "Boutiques").setType(ListGridFieldType.BOOLEAN)
+        );
   
         resourcesList = new SelectItem();
         resourcesList.setMultiple(true);
@@ -137,8 +153,9 @@ public class EditVersionLayout extends AbstractFormLayout {
                     AppVersion toSave = new AppVersion(applicationName, versionField.getValueAsString().trim(),
                             descriptorField.getValueAsString(), settingsToMap(), isVisibleField.getValueAsBoolean(),
                             sourceField.getValueAsString());
-                    toSave.setResources(Arrays.asList(resourcesList.getValues()));
-                    toSave.setTags(Arrays.asList(tagsList.getValues()));
+
+                    toSave.setResources(resourcesToList(Arrays.asList(resourcesList.getValues())));
+                    toSave.setTags(tagsToList(toSave.getApplicationName(), toSave.getVersion()));
                     save(toSave);
                 }
             }
@@ -166,12 +183,37 @@ public class EditVersionLayout extends AbstractFormLayout {
         addField("Descriptor", descriptorField);
         addMember(FieldUtil.getForm(isVisibleField));
         addField("Source", sourceField);
-        addField("Tags associated", tagsList);
         addField("Resources authorized", resourcesList);
+        addMember(WidgetUtil.getLabel("<b>" + "Tags Settings" + "</b>", 15));
+        addMember(tagsGrid);
+        addMember(createTagCreationEntry());
         addMember(WidgetUtil.getLabel("<b>" + "Execution Settings" + "</b>", 15));
         addMember(settingsGrid);
         addMember(newSettingsButton);
         addButtons(saveButton, removeButton);
+    }
+
+    private DynamicForm createTagCreationEntry() {
+        DynamicForm form = new DynamicForm();
+
+        ComboBoxItem combo = new ComboBoxItem("autoComplete", "Add custom Tag");
+
+        combo.setWidth(175);
+        combo.setTitleOrientation(TitleOrientation.TOP);
+
+        combo.addKeyPressHandler(event -> {
+            if ("Enter".equals(event.getKeyName())) {
+                String inputValue = combo.getEnteredValue();
+                
+                if (inputValue != null && ! inputValue.trim().isEmpty()) {
+                    tagsGrid.addData(createTagRecord(inputValue, "default", ValueType.STRING, true, false));
+                }
+                combo.clearValue();
+            }
+        });
+
+        form.setFields(combo);
+        return form;
     }
 
     private void save(AppVersion version) {
@@ -191,7 +233,6 @@ public class EditVersionLayout extends AbstractFormLayout {
     }
 
     private AsyncCallback<Void> getCallback(final String text) {
-
         return new AsyncCallback<Void>() {
             @Override
             public void onFailure(Throwable caught) {
@@ -204,7 +245,7 @@ public class EditVersionLayout extends AbstractFormLayout {
             public void onSuccess(Void result) {
                 WidgetUtil.resetIButton(saveButton, "Save", CoreConstants.ICON_SAVED);
                 WidgetUtil.resetIButton(removeButton, "Remove", CoreConstants.ICON_DELETE);
-                setVersion(null, null, true, null, null, null, null);
+                setVersion(null, null, true, null, null, null);
                 ManageApplicationsTab tab = (ManageApplicationsTab) Layout.getInstance().
                         getTab(ApplicationConstants.TAB_MANAGE_APPLICATION);
                 tab.loadVersions(applicationName);
@@ -213,7 +254,7 @@ public class EditVersionLayout extends AbstractFormLayout {
     }
 
     public void setApplication(String applicationName) {
-        setVersion(null, null, true, null, null, null, null);
+        setVersion(null, null, true, null, null, null);
         this.applicationName = applicationName;
         this.applicationLabel.setContents("<b>Application:</b> " + applicationName);
         this.versionField.setDisabled(false);
@@ -222,7 +263,7 @@ public class EditVersionLayout extends AbstractFormLayout {
     }
 
     public void setVersion(String version, String descriptor, boolean isVisible, String source,
-            Map<String, String> settings, String[] tags, String[] resources) {
+            Map<String, String> settings, String[] resources) {
         if (version != null) {
             this.versionField.setValue(version);
             this.versionField.setDisabled(true);
@@ -230,10 +271,10 @@ public class EditVersionLayout extends AbstractFormLayout {
             this.descriptorField.setDisabled(true);
             this.isVisibleField.setValue(isVisible);
             this.sourceField.setValue(source);
-            this.tagsList.setValues(tags);
             this.resourcesList.setValues(resources);
             this.removeButton.setDisabled(false);
             this.newVersion = false;
+            this.version = version;
             fillSettingsInGrid(settings);
         } else {
             this.versionField.setValue("");
@@ -271,12 +312,59 @@ public class EditVersionLayout extends AbstractFormLayout {
         });
     }
 
+    private List<Tag> tagsToList(String application, String version) {
+        List<Tag> result = new ArrayList<>();
+
+        for (ListGridRecord record : tagsGrid.getRecords()) {
+            result.add(new Tag(
+                record.getAttribute("key"),
+                record.getAttribute("value"),
+                Tag.ValueType.valueOf(record.getAttribute("type")),
+                application,
+                version,
+                record.getAttributeAsBoolean("visible"),
+                record.getAttributeAsBoolean("boutiques")
+            ));
+        }
+        return result;
+    }
+
+    private void fillTagsInGrid(List<Tag> tags) {
+        tagsGrid.setData(new ListGridRecord[0]); // cleaning between
+
+        tags.forEach((t) -> {
+            tagsGrid.addData(createTagRecord(t.getKey(), t.getValue(), t.getType(), t.isVisible(), t.isBoutiques()));
+        });
+    }
+
+    private Record createTagRecord(String key, String value, ValueType type, boolean visible, boolean boutiques) {
+        Record record = new Record();
+
+        record.setAttribute("key", key);
+        record.setAttribute("value", value);
+        record.setAttribute("type", type);
+        record.setAttribute("visible", visible);
+        record.setAttribute("boutiques", boutiques);
+        return record;
+    }
+
+    private List<Resource> resourcesToList(List<String> resources) {
+        List<Resource> result = new ArrayList<>();
+
+        for (String rsrc : resources) {
+            result.add(new Resource(rsrc));
+        }
+        return result;
+    }
+
     private void fetchData() {
-        loadTags();
+        if (applicationName != null && version != null) {
+            loadAppVersionTags();
+        }
         loadResources();
     }
 
-    private void loadTags() {
+    private void loadAppVersionTags() {
         ApplicationServiceAsync service = ApplicationService.Util.getInstance();
         final AsyncCallback<List<Tag>> callback = new AsyncCallback<>() {
             @Override
@@ -286,11 +374,10 @@ public class EditVersionLayout extends AbstractFormLayout {
     
             @Override
             public void onSuccess(List<Tag> result) {
-                String[] data = result.stream().map(Tag::getName).toArray(String[]::new);
-                tagsList.setValueMap(data);
+                fillTagsInGrid(result);
             }
         };
-        service.getTags(callback);
+        service.getTags(new AppVersion(applicationName, version, "", false), callback);
     }
 
     private void loadResources() {

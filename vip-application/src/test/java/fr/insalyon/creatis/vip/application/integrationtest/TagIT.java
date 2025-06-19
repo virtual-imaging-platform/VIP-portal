@@ -1,9 +1,11 @@
 package fr.insalyon.creatis.vip.application.integrationtest;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -25,17 +27,26 @@ public class TagIT extends BaseSpringIT {
     @Autowired private AppVersionBusiness appVersionBusiness;
 
     private Tag tag;
+    private Application app;
+    private AppVersion appVersion;
 
     @BeforeEach
     public void setUp() throws Exception {
         super.setUp();
-        tag = new Tag("bla");
+        app = new Application("applicationA", "super citation");
+        appVersion = new AppVersion("applicationA", "0.1","{}", false);
+        tag = new Tag("bla", "blou", Tag.ValueType.STRING, "applicationA", "0.1", true, true);
+
+        appBusiness.add(app);
+        appVersionBusiness.add(appVersion);
         tagBusiness.add(tag);
     }
 
     @Test
     public void add() throws BusinessException {
-        assertEquals(1, tagBusiness.getAll().size());
+        List<Tag> result = tagBusiness.getAll();
+
+        assertEquals(1, result.size());
     }
 
     @Test
@@ -45,9 +56,16 @@ public class TagIT extends BaseSpringIT {
 
     @Test
     public void update() throws BusinessException {
-        tagBusiness.update(tag, "blou");
+        Tag copy = new Tag(tag);
+
+        copy.setKey("wow");
+        copy.setValue("bli");
+        copy.setVisible(false);
+
+        tagBusiness.update(tag, copy);
+
         tag = tagBusiness.getAll().get(0);
-        assertEquals("blou", tag.getName());
+        assertEquals(copy, tag);
     }
 
     @Test
@@ -58,51 +76,39 @@ public class TagIT extends BaseSpringIT {
 
     @Test
     public void getAll() throws BusinessException {
-        Tag bis = new Tag("bli");
-        Tag bis2 = new Tag("bleu");
-        Tag bis3 = new Tag("blui");
+        Tag bis = new Tag("bli", "ilb", Tag.ValueType.STRING, appVersion.getApplicationName(), appVersion.getVersion(), false, false);
+        Tag bis2 = new Tag("bleu", "uelb", Tag.ValueType.STRING, appVersion.getApplicationName(), appVersion.getVersion(), false, false);
+        Tag bis3 = new Tag("blui", "iulb", Tag.ValueType.STRING, appVersion.getApplicationName(), appVersion.getVersion(), false, false);
 
         tagBusiness.add(bis);
         tagBusiness.add(bis2);
         tagBusiness.add(bis3);
         assertEquals(4, tagBusiness.getAll().size());
     }
-    
 
     @Test
-    public void associate() throws BusinessException {
-        Tag bis = new Tag("blou");
-        Application app = new Application("test", "super citation");
-        AppVersion appVersion = new AppVersion("test", "0.1", "{}", false);
+    public void getTags() throws BusinessException {
+        Application app1 = new Application("test", "super citation");
+        AppVersion appVersion1 = new AppVersion("test", "0.1", "{}", false);
+        Application app2 = new Application("applicationC", "super citation");
+        AppVersion appVersion2 = new AppVersion("applicationC", "0.3", "{}", false);
+        List<Tag> result = new ArrayList<>();
+        
+        Tag bis = new Tag("bli", "ilb", Tag.ValueType.STRING, appVersion1, false, false);
+        Tag bis2 = new Tag("bleu", "uelb", Tag.ValueType.STRING, appVersion1, true, true);
+        Tag bis3 = new Tag("blui", "iulb", Tag.ValueType.STRING, appVersion2, false, true);
 
-        appBusiness.add(app);
-        appVersionBusiness.add(appVersion);
-        tagBusiness.associate(tag, appVersion);
+        appVersion1.setTags(Arrays.asList(bis, bis2));
 
-        assertEquals(appVersion.getApplicationName(), tagBusiness.getAssociated(tag).get(0).getApplicationName());
-        assertEquals(appVersion.getVersion(), tagBusiness.getAssociated(tag).get(0).getVersion());
-        assertEquals(appVersion.getDescriptor(), tagBusiness.getAssociated(tag).get(0).getDescriptor());
-        assertEquals(tag.getName(), tagBusiness.getTags(appVersion).get(0).getName());
-        assertTrue(tagBusiness.getAssociated(bis).isEmpty());
-    }
+        appBusiness.add(app1);
+        appBusiness.add(app2);
+        appVersionBusiness.add(appVersion1);
+        appVersionBusiness.add(appVersion2);
+        tagBusiness.add(bis3);
 
-    @Test
-    public void dissociate() throws BusinessException {
-        Application app = new Application("test", "super citation");
-        AppVersion appVersion = new AppVersion("test", "0.1", "{}", false);
-
-        appBusiness.add(app);
-        appVersionBusiness.add(appVersion);
-        tagBusiness.associate(tag, appVersion);
-
-        assertEquals(appVersion.getApplicationName(), tagBusiness.getAssociated(tag).get(0).getApplicationName());
-        assertEquals(appVersion.getVersion(), tagBusiness.getAssociated(tag).get(0).getVersion());
-        assertEquals(appVersion.getDescriptor(), tagBusiness.getAssociated(tag).get(0).getDescriptor());
-        assertEquals(tag.getName(), tagBusiness.getTags(appVersion).get(0).getName());
-
-        tagBusiness.dissociate(tag, appVersion);
-
-        assertDoesNotThrow(() -> tagBusiness.dissociate(tag, appVersion));
-        assertTrue(tagBusiness.getTags(appVersion).isEmpty());
+        result = tagBusiness.getTags(appVersion1);
+        assertEquals(2, result.size());
+        assertEquals(bis2, result.get(0));        
+        assertEquals(bis, result.get(1));        
     }
 }

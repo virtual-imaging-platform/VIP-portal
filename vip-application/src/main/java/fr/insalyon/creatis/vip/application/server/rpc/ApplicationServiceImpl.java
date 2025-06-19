@@ -51,6 +51,7 @@ import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class ApplicationServiceImpl extends AbstractRemoteServiceServlet implements ApplicationService {
 
@@ -423,9 +424,9 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
     }
 
     @Override
-    public void updateTag(Tag tag, String newName) throws ApplicationException {
+    public void updateTag(Tag oldTag, Tag newTag) throws ApplicationException {
         try {
-            tagBusiness.update(tag, newName);
+            tagBusiness.update(oldTag, newTag);
         } catch (BusinessException e) {
             throw new ApplicationException(e);
         }
@@ -440,10 +441,25 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
         }
     }
 
-    @Override
-    public List<Tag> getTags(String appName, String version) throws ApplicationException {
+    public List<Tag> getNonBoutiquesTags() throws ApplicationException {
         try {
-            AppVersion appVersion = appVersionBusiness.getVersion(appName, version);
+            return tagBusiness.getAll().stream()
+                .filter(tag -> ! tag.isBoutiques())
+                .collect(Collectors.toMap(
+                    Tag::toString,
+                    tag -> tag,
+                    (existing, replacement) -> existing,
+                    LinkedHashMap::new
+                )).values().stream()
+                .collect(Collectors.toList());
+        } catch (BusinessException e) {
+            throw new ApplicationException(e);
+        }  
+    }
+
+    @Override
+    public List<Tag> getTags(AppVersion appVersion) throws ApplicationException {
+        try {
             return tagBusiness.getTags(appVersion);
         } catch (BusinessException e) {
             throw new ApplicationException(e);

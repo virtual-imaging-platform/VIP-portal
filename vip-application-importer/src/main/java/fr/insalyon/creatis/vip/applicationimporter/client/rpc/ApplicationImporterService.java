@@ -31,6 +31,7 @@
  */
 package fr.insalyon.creatis.vip.applicationimporter.client.rpc;
 
+import fr.insalyon.creatis.vip.application.client.bean.Tag;
 import fr.insalyon.creatis.vip.application.client.bean.boutiquesTools.BoutiquesApplication;
 import fr.insalyon.creatis.vip.applicationimporter.client.ApplicationImporterException;
 import com.google.gwt.core.client.GWT;
@@ -38,7 +39,6 @@ import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.ServiceDefTarget;
 
 import java.util.List;
-import java.util.Map;
 
 public interface ApplicationImporterService extends RemoteService {
 
@@ -56,7 +56,7 @@ public interface ApplicationImporterService extends RemoteService {
 
     String readAndValidateBoutiquesFile(String fileLFN) throws ApplicationImporterException;
 
-    void createApplication(BoutiquesApplication bt, boolean overwriteVersion, List<String> tags, List<String> resources) throws ApplicationImporterException;
+    void createApplication(BoutiquesApplication bt, boolean overwriteVersion, List<Tag> tags, List<String> resources) throws ApplicationImporterException;
 
-    Map<String, String> getBoutiquesTags(String boutiquesJsonFile) throws ApplicationImporterException;
+    List<Tag> getBoutiquesTags(String boutiquesJsonFile) throws ApplicationImporterException;
 }

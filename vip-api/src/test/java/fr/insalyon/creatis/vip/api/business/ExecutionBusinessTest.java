@@ -46,9 +46,6 @@ import java.util.function.Supplier;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-/**
- * Created by abonnet on 7/6/16.
- */
 public class ExecutionBusinessTest {
 
     public static final String[] USER_FIRST_NAME = {"firstName_1", "firstName_2"};

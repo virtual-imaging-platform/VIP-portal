@@ -235,7 +235,7 @@ public class ResourceBusiness {
             .collect(Collectors.toList());
 
         for (String r : userResources) {
-            if (appVersion.getResources().contains(r)) {
+            if (appVersion.getResourcesNames().contains(r)) {
                 usableResource.add(getByName(r));
             }
         }

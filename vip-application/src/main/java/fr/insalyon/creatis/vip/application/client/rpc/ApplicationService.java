@@ -108,11 +108,13 @@ public interface ApplicationService extends RemoteService {
 
     public void removeTag(Tag tag) throws ApplicationException;
 
-    public void updateTag(Tag tag, String newName) throws ApplicationException;
+    public void updateTag(Tag oldTag, Tag newTag) throws ApplicationException;
 
     public List<Tag> getTags() throws ApplicationException;
 
-    public List<Tag> getTags(String appName, String appVersion) throws ApplicationException;
+    public List<Tag> getNonBoutiquesTags() throws ApplicationException;
+
+    public List<Tag> getTags(AppVersion appVersion) throws ApplicationException;
 
     public Boolean isAppUsableWithCurrentUser(String appName, String appVersion) throws ApplicationException;
 }

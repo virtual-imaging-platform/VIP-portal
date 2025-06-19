@@ -39,10 +39,6 @@ import java.util.stream.Collectors;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
 
-/**
- *
- * @author Rafael Ferreira da Silva
- */
 public class AppVersion implements IsSerializable {
 
     private String applicationName;
@@ -50,8 +46,8 @@ public class AppVersion implements IsSerializable {
     private String descriptor;
     private String doi;
     private boolean visible;
-    private List<String> resources;
-    private List<String> tags;
+    private List<Resource> resources;
+    private List<Tag> tags;
     private Map<String, String> settings;
     private String source;
 
@@ -80,7 +76,7 @@ public class AppVersion implements IsSerializable {
     }
 
     public AppVersion(String applicationName, String version, String descriptor,
-                      String doi, boolean visible, String source, List<String> resources, List<String> tags) {
+                      String doi, boolean visible, String source, List<Resource> resources, List<Tag> tags) {
         this(applicationName, version, descriptor, new HashMap<>(), visible, source);
         this.doi = doi;
         this.resources = resources;
@@ -126,19 +122,23 @@ public class AppVersion implements IsSerializable {
         return source;
     }
 
-    public List<String> getResources() {
+    public List<Resource> getResources() {
         return resources;
     }
 
-    public List<String> getTags() {
+    public List<String> getResourcesNames() {
+        return resources.stream().map(Resource::getName).collect(Collectors.toList());
+    }
+
+    public List<Tag> getTags() {
         return tags;
     }
 
-    public void setResources(List<String> resources) {
+    public void setResources(List<Resource> resources) {
         this.resources = resources;
     }
 
-    public void setTags(List<String> tags) {
+    public void setTags(List<Tag> tags) {
         this.tags = tags;
     }
 }

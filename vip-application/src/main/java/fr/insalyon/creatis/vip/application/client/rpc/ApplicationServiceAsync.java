@@ -92,11 +92,13 @@ public interface ApplicationServiceAsync {
 
     public void removeTag(Tag tag, AsyncCallback<Void> asyncCallback);
 
-    public void updateTag(Tag tag, String newName, AsyncCallback<Void> asyncCallback);
+    public void updateTag(Tag oldTag, Tag newTag, AsyncCallback<Void> asyncCallback);
 
     public void getTags(AsyncCallback<List<Tag>> asyncCallback);
 
-    public void getTags(String appName, String appVersion, AsyncCallback<List<Tag>> asyncCallback);
+    public void getNonBoutiquesTags(AsyncCallback<List<Tag>> asyncCallback);
+
+    public void getTags(AppVersion appVersion, AsyncCallback<List<Tag>> asyncCallback);
 
     public void isAppUsableWithCurrentUser(String appName, String appVersion, AsyncCallback<Boolean> asyncCallback);
 }
