@@ -24,6 +24,7 @@ public class ManageResourcesTab extends AbstractManageTab {
         hLayout.addMember(editLayout);
         
         vLayout.addMember(hLayout);
+        setResource(null, false, null, null, null, null);
     }
     
     public void loadResources() {
