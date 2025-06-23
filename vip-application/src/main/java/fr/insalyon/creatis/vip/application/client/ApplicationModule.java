@@ -99,7 +99,9 @@ public class ApplicationModule extends Module {
                             .map(Tag::getValue)
                             .orElse("Others");
 
-                        userTagApps.computeIfAbsent(classTag, k -> new ArrayList<>()).add(version);
+                        if (version.isVisible()) {
+                            userTagApps.computeIfAbsent(classTag, k -> new ArrayList<>()).add(version);
+                        }
                     });
                 });
                 render();
