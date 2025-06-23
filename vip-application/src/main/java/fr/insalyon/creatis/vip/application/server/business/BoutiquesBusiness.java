@@ -32,12 +32,12 @@
 package fr.insalyon.creatis.vip.application.server.business;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import fr.insalyon.creatis.boutiques.model.BoutiquesDescriptor;
 import fr.insalyon.creatis.vip.application.client.bean.AppVersion;
-import fr.insalyon.creatis.vip.application.server.model.boutiques.BoutiquesDescriptor;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.business.Server;
-import fr.insalyon.creatis.vip.datamanager.server.business.DataManagerBusiness;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,15 +62,12 @@ public class BoutiquesBusiness {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private Server server;
-    private DataManagerBusiness dataManagerBusiness;
     private AppVersionBusiness appVersionBusiness;
     private ObjectMapper objectMapper;
 
     @Autowired
-    public BoutiquesBusiness(Server server, DataManagerBusiness dataManagerBusiness,
-            ObjectMapper objectMapper, AppVersionBusiness appVersionBusiness) {
+    public BoutiquesBusiness(Server server, ObjectMapper objectMapper, AppVersionBusiness appVersionBusiness) {
         this.server = server;
-        this.dataManagerBusiness = dataManagerBusiness;
         this.objectMapper = objectMapper;
         this.appVersionBusiness = appVersionBusiness;
     }

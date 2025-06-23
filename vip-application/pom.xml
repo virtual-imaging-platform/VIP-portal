@@ -61,31 +61,31 @@ knowledge of the CeCILL-B license and that you accept its terms.
             <artifactId>vip-social</artifactId>
             <version>${project.version}</version>
         </dependency>
-
         <dependency>
             <groupId>fr.insalyon.creatis</groupId>
             <artifactId>moteur2-workflowsdb-common</artifactId>
             <version>${moteur2-workflowsdb-common.version}</version>
         </dependency>
-
+        <dependency>
+            <groupId>fr.insalyon.creatis</groupId>
+            <artifactId>boutiques-model</artifactId>
+            <version>${boutiques-model.version}</version>
+        </dependency>
         <dependency>
             <groupId>com.googlecode.gflot</groupId>
             <artifactId>gflot</artifactId>
             <version>3.0.2</version>
         </dependency>
-
         <dependency>
             <groupId>globus-common</groupId>
             <artifactId>jaxrpc</artifactId>
             <version>4.2.1</version>
         </dependency>
-
         <dependency>
             <groupId>org.jsoup</groupId>
             <artifactId>jsoup</artifactId>
             <version>1.15.3</version>
         </dependency>
-
         <dependency>
             <groupId>xml-apis</groupId>
             <artifactId>xml-apis</artifactId>
@@ -141,5 +141,4 @@ knowledge of the CeCILL-B license and that you accept its terms.
             </plugin>
         </plugins>
     </build>
-
 </project>

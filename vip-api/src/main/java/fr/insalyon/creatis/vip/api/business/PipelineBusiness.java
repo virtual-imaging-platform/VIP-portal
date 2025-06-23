@@ -31,6 +31,8 @@
  */
 package fr.insalyon.creatis.vip.api.business;
 
+import fr.insalyon.creatis.boutiques.model.BoutiquesDescriptor;
+import fr.insalyon.creatis.boutiques.model.Input;
 import fr.insalyon.creatis.vip.api.CarminProperties;
 import fr.insalyon.creatis.vip.api.exception.ApiException;
 import fr.insalyon.creatis.vip.api.exception.ApiException.ApiError;
@@ -42,13 +44,9 @@ import fr.insalyon.creatis.vip.application.client.bean.Application;
 import fr.insalyon.creatis.vip.application.server.business.AppVersionBusiness;
 import fr.insalyon.creatis.vip.application.server.business.ApplicationBusiness;
 import fr.insalyon.creatis.vip.application.server.business.BoutiquesBusiness;
-import fr.insalyon.creatis.vip.application.server.business.WorkflowBusiness;
-import fr.insalyon.creatis.vip.application.server.model.boutiques.BoutiquesDescriptor;
-import fr.insalyon.creatis.vip.application.server.model.boutiques.Input;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
-import fr.insalyon.creatis.vip.core.server.business.Server;
 import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -73,23 +71,18 @@ public class PipelineBusiness {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private final Environment env;
-    private final Server server;
 
     private final Supplier<User> currentUserProvider;
-    private final WorkflowBusiness workflowBusiness;
     private final ApplicationBusiness applicationBusiness;
     private final BoutiquesBusiness boutiquesBusiness;
     private final AppVersionBusiness appVersionBusiness;
 
     @Autowired
     public PipelineBusiness(
-            Supplier<User> currentUserProvider, Environment env,
-            Server server, WorkflowBusiness workflowBusiness, ApplicationBusiness applicationBusiness,
+            Supplier<User> currentUserProvider, Environment env, ApplicationBusiness applicationBusiness,
             BoutiquesBusiness boutiquesBusiness, AppVersionBusiness appVersionBusiness) {
         this.currentUserProvider = currentUserProvider;
         this.env = env;
-        this.server = server;
-        this.workflowBusiness = workflowBusiness;
         this.applicationBusiness = applicationBusiness;
         this.boutiquesBusiness = boutiquesBusiness;
         this.appVersionBusiness = appVersionBusiness;

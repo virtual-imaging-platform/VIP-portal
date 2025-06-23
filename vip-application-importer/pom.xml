@@ -51,7 +51,6 @@ knowledge of the CeCILL-B license and that you accept its terms.
             <artifactId>vip-core</artifactId>
             <version>${project.version}</version>
         </dependency>
-
         <dependency>
             <groupId>fr.insalyon.creatis</groupId>
             <artifactId>vip-datamanager</artifactId>
@@ -62,13 +61,11 @@ knowledge of the CeCILL-B license and that you accept its terms.
             <artifactId>vip-application</artifactId>
             <version>${project.version}</version>
         </dependency>
-        
         <dependency>
           <groupId>org.apache.commons</groupId>
           <artifactId>commons-compress</artifactId>
           <version>1.21</version>
         </dependency>
-
         <dependency>
             <groupId>org.apache.velocity</groupId>
             <artifactId>velocity</artifactId>
