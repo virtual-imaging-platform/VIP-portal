@@ -172,7 +172,7 @@ public class ApplicationInputData extends JdbcDaoSupport implements ApplicationI
 
     @Override
     public SimulationInput getInputByNameUserApp(String email, String name, String appName) throws DAOException {
-        String query =  "SELECT email, application, name, inputsFROM VIPAppInputs "
+        String query =  "SELECT email, application, name, inputs FROM VIPAppInputs "
         +               "WHERE email = ? AND name = ? AND application = ? "
         +               "ORDER BY name";
 

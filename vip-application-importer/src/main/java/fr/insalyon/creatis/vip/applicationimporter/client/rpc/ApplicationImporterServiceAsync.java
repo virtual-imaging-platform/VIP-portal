@@ -33,17 +33,17 @@ package fr.insalyon.creatis.vip.applicationimporter.client.rpc;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
+import fr.insalyon.creatis.vip.application.client.bean.Tag;
 import fr.insalyon.creatis.vip.application.client.bean.boutiquesTools.BoutiquesApplication;
 
 import java.util.List;
-import java.util.Map;
 
 public interface ApplicationImporterServiceAsync {
 
     public void readAndValidateBoutiquesFile(String fileLFN, AsyncCallback<String> callback);
 
-    public void createApplication(BoutiquesApplication bt, boolean overwriteVersion, List<String> tags, List<String> resources, AsyncCallback<Void> callback);
+    public void createApplication(BoutiquesApplication bt, boolean overwriteVersion, List<Tag> tags, List<String> resources, AsyncCallback<Void> callback);
 
-    public void getBoutiquesTags(String boutiquesJsonFile ,AsyncCallback<Map<String, String>> asyncCallback);
+    public void getBoutiquesTags(String boutiquesJsonFile ,AsyncCallback<List<Tag>> asyncCallback);
 
 }

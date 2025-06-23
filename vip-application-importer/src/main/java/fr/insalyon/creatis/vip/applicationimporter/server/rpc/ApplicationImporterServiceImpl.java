@@ -32,6 +32,8 @@
 package fr.insalyon.creatis.vip.applicationimporter.server.rpc;
 
 import fr.insalyon.creatis.boutiques.model.BoutiquesDescriptor;
+import fr.insalyon.creatis.vip.application.client.bean.Tag;
+import fr.insalyon.creatis.vip.application.client.bean.Tag.ValueType;
 import fr.insalyon.creatis.vip.application.client.bean.boutiquesTools.BoutiquesApplication;
 import fr.insalyon.creatis.vip.applicationimporter.client.ApplicationImporterException;
 import fr.insalyon.creatis.vip.applicationimporter.client.rpc.ApplicationImporterService;
@@ -46,7 +48,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import jakarta.servlet.ServletException;
 
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -76,7 +78,7 @@ public class ApplicationImporterServiceImpl extends fr.insalyon.creatis.vip.core
 
     @Override
     public void createApplication(BoutiquesApplication bt, boolean overwriteVersion,
-            List<String> tags, List<String> resources)
+            List<Tag> tags, List<String> resources)
             throws ApplicationImporterException {
         try {
             trace(logger, "Creating application");
@@ -89,21 +91,33 @@ public class ApplicationImporterServiceImpl extends fr.insalyon.creatis.vip.core
 
     @Override
     @SuppressWarnings("unchecked")
-    public Map<String, String> getBoutiquesTags(String boutiquesJsonFile) throws ApplicationImporterException {
+    public List<Tag> getBoutiquesTags(String boutiquesJsonFile) throws ApplicationImporterException {
         try {
-            Map<String, String> map = new HashMap<>();
+            List<Tag> tags = new ArrayList<>();
             ObjectMapper objectMapper = new ObjectMapper();
             BoutiquesDescriptor descriptor = objectMapper.readValue(boutiquesJsonFile, BoutiquesDescriptor.class);
 
             if (descriptor.getTags() != null) {
-                descriptor.getTags().getAdditionalProperties().forEach((k, v) -> {
-                    String valueString = (v instanceof List) 
-                            ? String.join(",", (List<String>) v) 
-                            : String.valueOf(v);
-                    map.put(k, valueString);
-                });
+                // boutiques tags can be List<String>, String, numbers or booleans
+                // we return into String or List<String>
+                // in case of boolean we precise with ValueType.BOOLEAN
+                for (Map.Entry<String, Object> entry : descriptor.getTags().getAdditionalProperties().entrySet()) {
+                    String k = entry.getKey();
+                    Object v = entry.getValue();
+                    if (v instanceof List) {
+                        tags.addAll(((List<String>) v).stream().map((sub) -> {
+                            return new Tag(k, (String) sub, ValueType.STRING, null, null, true, true);
+                        }).toList());
+                    } else if (v instanceof Boolean) {
+                        tags.add(new Tag(k, String.valueOf(v), ValueType.BOOLEAN, null, null, true, true));
+                    } else if (v instanceof String) {
+                        tags.add(new Tag(k, String.valueOf(v), ValueType.STRING, null, null, true, true));
+                    } else {
+                        throw new ApplicationImporterException("List<String>, String and Boolean are the only types supported in tags values: "+ v.getClass().toString());
+                    }
+                }
             }
-            return map;
+            return tags;
         } catch (JsonProcessingException e) {
             throw new ApplicationImporterException(e);
         }
