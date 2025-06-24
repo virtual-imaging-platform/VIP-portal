@@ -143,7 +143,7 @@ public class GroupBusiness {
         }
     }
 
-    public void assertGroupsHaveSameVisibility(List<String> groupNames) throws BusinessException {
+    public String getWarningSameVisibility(List<String> groupNames) throws BusinessException {
         List<Group> groups = new ArrayList<>();
 
         for (String name : groupNames) {
@@ -151,8 +151,9 @@ public class GroupBusiness {
         }
 
         if (groups.stream().map(Group::isPublicGroup).toList().stream().distinct().count() > 1) {
-            logger.error("The choosen groups do not have the same visibility!");
-            throw new BusinessException("The choosen groups do not have the same visibility!");
+            return "Be careful: the groups that you have chosen do not have the same visibility!";
+        } else {
+            return null;
         }
     }
 }

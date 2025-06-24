@@ -39,6 +39,7 @@ import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.CoreException;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
+import fr.insalyon.creatis.vip.core.server.business.GroupBusiness;
 import fr.insalyon.creatis.vip.core.server.rpc.AbstractRemoteServiceServlet;
 import org.jsoup.Jsoup;
 import org.slf4j.Logger;
@@ -66,6 +67,7 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
     private SimulationBusiness simulationBusiness;
     private ResourceBusiness resourceBusiness;
     private TagBusiness tagBusiness;
+    private GroupBusiness groupBusiness;
 
     @Override
     public void init() throws ServletException {
@@ -79,7 +81,8 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
                 getBean(SimulationBusiness.class),
                 getBean(ResourceBusiness.class),
                 getBean(TagBusiness.class),
-                getBean(AppVersionBusiness.class)
+                getBean(AppVersionBusiness.class),
+                getBean(GroupBusiness.class)
         );
     }
 
@@ -88,7 +91,7 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
             BoutiquesBusiness boutiquesBusiness, ConfigurationBusiness configurationBusiness,
             WorkflowBusiness workflowBusiness, SimulationBusiness simulationBusiness, 
             ResourceBusiness resourceBusiness, TagBusiness tagBusiness,
-            AppVersionBusiness appVersionBusiness) {
+            AppVersionBusiness appVersionBusiness, GroupBusiness groupBusiness) {
         this.applicationBusiness = applicationBusiness;
         this.engineBusiness = engineBusiness;
         this.boutiquesBusiness = boutiquesBusiness;
@@ -98,16 +101,19 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
         this.resourceBusiness = resourceBusiness;
         this.tagBusiness = tagBusiness;
         this.appVersionBusiness = appVersionBusiness;
+        this.groupBusiness = groupBusiness;
     }
 
     @Override
-    public void add(Application application) throws ApplicationException {
+    public String add(Application application) throws ApplicationException {
 
         try {
             if (isSystemAdministrator() || isGroupAdministrator() || isDeveloper()) {
                 trace(logger, "Adding application '" + application.getName() + "'.");
                 application.setOwner(getSessionUser().getEmail());
                 applicationBusiness.add(application);
+
+                return groupBusiness.getWarningSameVisibility(application.getGroupsNames());
             } else {
                 logger.error("Unauthorized to add application {}", application.getName());
                 throw new ApplicationException("You have no administrator rights.");
@@ -118,12 +124,13 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
     }
 
     @Override
-    public void update(Application application) throws ApplicationException {
+    public String update(Application application) throws ApplicationException {
         try {
             if (isSystemAdministrator() || isGroupAdministrator() || isDeveloper()) {
                 trace(logger, "Updating application '" + application.getName() + "'.");
                 applicationBusiness.update(application);
 
+                return groupBusiness.getWarningSameVisibility(application.getGroupsNames());
             } else {
                 logger.error("Unauthorized to update application {}", application.getName());
                 throw new ApplicationException("You have no administrator rights.");
@@ -134,13 +141,14 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
     }
 
     @Override
-    public void remove(String name) throws ApplicationException {
+    public String remove(String name) throws ApplicationException {
         try {
             if (isSystemAdministrator()) {
                 trace(logger, "Removing application '" + name + "'.");
                 applicationBusiness.remove(name);
 
             }
+            return null;
         } catch (BusinessException | CoreException ex) {
             throw new ApplicationException(ex);
         }
@@ -370,27 +378,33 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
     }
 
     @Override
-    public void addResource(Resource resource) throws ApplicationException {
+    public String addResource(Resource resource) throws ApplicationException {
         try {
             resourceBusiness.add(resource);
+    
+            return groupBusiness.getWarningSameVisibility(resource.getGroupsNames());
         } catch (BusinessException e) {
             throw new ApplicationException(e);
         }
     }
 
     @Override
-    public void removeResource(Resource resource) throws ApplicationException {
+    public String removeResource(Resource resource) throws ApplicationException {
         try {
             resourceBusiness.remove(resource);
+
+            return null;
         } catch (BusinessException e) {
             throw new ApplicationException(e);
         }
     }
 
     @Override
-    public void updateResource(Resource resource) throws ApplicationException {
+    public String updateResource(Resource resource) throws ApplicationException {
         try {
             resourceBusiness.update(resource);
+
+            return groupBusiness.getWarningSameVisibility(resource.getGroupsNames());
         } catch (BusinessException e) {
             throw new ApplicationException(e);
         }

@@ -25,8 +25,13 @@ import fr.insalyon.creatis.vip.core.client.view.common.LabelButton;
 import fr.insalyon.creatis.vip.core.client.view.common.ToolstripLayout;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
+
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class ResourceLayout extends VLayout {
 
@@ -61,7 +66,7 @@ public class ResourceLayout extends VLayout {
             public void onClick(ClickEvent event) {
                 ManageResourcesTab resourceTab = (ManageResourcesTab) Layout.getInstance().
                         getTab(ApplicationConstants.TAB_MANAGE_RESOURCE);
-                        resourceTab.setResource(null, false, false, null, null, null, null);
+                        resourceTab.setResource(null, false, null, null, null, null);
             }
         });
         toolstrip.addMember(addButton);
@@ -130,12 +135,11 @@ public class ResourceLayout extends VLayout {
         grid.setEmptyMessage("<br>No data available.");
         grid.setFields(
                 new ListGridField("name", "Name"),
-                new ListGridField("public", "Public"),
-                new ListGridField("status", "Status"),
+                new ListGridField("status", "Active"),
                 new ListGridField("type", "Type"),
                 new ListGridField("configuration", "Configuration"),
                 new ListGridField("engines", "Engines"),
-                new ListGridField("groups", "Groups Resources"));
+                new ListGridField("groupsLabel", "Groups Resources"));
         grid.setSortField("name");
         grid.setSortDirection(SortDirection.ASCENDING);
         grid.addCellDoubleClickHandler(new CellDoubleClickHandler() {
@@ -172,7 +176,7 @@ public class ResourceLayout extends VLayout {
 
     private void remove(String name) {
         final Resource resourceToDelete = new Resource(name);
-        final AsyncCallback<Void> callback = new AsyncCallback<>() {
+        final AsyncCallback<String> callback = new AsyncCallback<>() {
             @Override
             public void onFailure(Throwable caught) {
                 modal.hide();
@@ -180,7 +184,7 @@ public class ResourceLayout extends VLayout {
             }
 
             @Override
-            public void onSuccess(Void result) {
+            public void onSuccess(String result) {
                 modal.hide();
                 Layout.getInstance().setNoticeMessage("The engine was successfully removed!");
                 loadData();
@@ -191,17 +195,21 @@ public class ResourceLayout extends VLayout {
     }
 
     private void edit(ListGridRecord record) {
-        ManageResourcesTab appsTab = (ManageResourcesTab) Layout.getInstance().
-                getTab(ApplicationConstants.TAB_MANAGE_RESOURCE);
+        ManageResourcesTab appsTab = (ManageResourcesTab) Layout.getInstance().getTab(ApplicationConstants.TAB_MANAGE_RESOURCE);
+        List<String> keys = Arrays.asList(record.getAttributeAsStringArray("groupsLabel"));
+        List<String> values = Arrays.asList(record.getAttributeAsStringArray("groups"));
+
+        Map<String, String> groups = IntStream.range(0, Math.min(keys.size(), values.size()))
+            .boxed()
+            .collect(Collectors.toMap(keys::get, values::get));
 
         appsTab.setResource(
             record.getAttribute("name"), 
-            record.getAttributeAsBoolean("public"), 
             record.getAttributeAsBoolean("status"), 
             record.getAttribute("type"), 
             record.getAttribute("configuration"),
             record.getAttributeAsStringArray("engines"),
-            record.getAttributeAsStringArray("groups")
-            );
+            groups
+        );
     }
 }

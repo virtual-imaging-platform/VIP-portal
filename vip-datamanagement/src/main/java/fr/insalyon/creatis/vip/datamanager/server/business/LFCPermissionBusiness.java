@@ -34,8 +34,6 @@ package fr.insalyon.creatis.vip.datamanager.server.business;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.user.UserLevel;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
-import fr.insalyon.creatis.vip.datamanager.client.bean.*;
-import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,26 +41,18 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.nio.file.Paths;
-import java.util.*;
 
 import static fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants.*;
 
-/**
- * Created by abonnet on 5/24/17.
- */
 @Service
 @Transactional
 public class LFCPermissionBusiness {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    private DataManagerBusiness dataManagerBusiness;
-    private LfcPathsBusiness lfcPathsBusiness;
 
     @Autowired
-    public LFCPermissionBusiness(DataManagerBusiness dataManagerBusiness, LfcPathsBusiness lfcPathsBusiness) {
-        this.dataManagerBusiness = dataManagerBusiness;
-        this.lfcPathsBusiness = lfcPathsBusiness;
+    public LFCPermissionBusiness() {
     }
 
     public enum LFCAccessType {
@@ -80,11 +70,6 @@ public class LFCPermissionBusiness {
         // Root is always filtered by user so always permitted
         if (path.equals(ROOT)) return true;
 
-        // do not delete synchronized stuff
-        if (LFCAccessType == LFCPermissionBusiness.LFCAccessType.DELETE
-            && isPathSynchronized(user, path)) {
-            return false;
-        }
         // else it all depends of the first directory
         String firstDir = getFirstDirectoryName(path);
         // always can access its home and its trash
@@ -169,30 +154,4 @@ public class LFCPermissionBusiness {
         }
         return true;
     }
-
-    private boolean isPathSynchronized(User user, String path)
-            throws BusinessException {
-        List<SSH> sshs = dataManagerBusiness.getSSHConnections();
-        List<String> lfcDirSSHSynchronization = new ArrayList<>();
-        for (SSH ssh : sshs) {
-            if (ssh.getTransferType().equals(TransferType.Synchronization)) {
-                lfcDirSSHSynchronization.add(ssh.getLfcDir());
-            }
-        }
-
-        String lfcBaseDir;
-        try {
-            lfcBaseDir = lfcPathsBusiness.parseBaseDir(user, path);
-        } catch (DataManagerException e) {
-            throw new BusinessException("Internal error in data API");
-        }
-        for (String s : lfcDirSSHSynchronization) {
-            if (lfcBaseDir.startsWith(s)) {
-                logger.error("({}) Try to delete  synchronized file '{}'", user.getEmail(), path);
-                return true;
-            }
-        }
-        return false;
-    }
-
 }

@@ -275,7 +275,7 @@ public class WorkflowBusiness {
 
     public List<Simulation> getSimulations(User user, Date lastDate) throws BusinessException {
         try {
-            return parseWorkflows(workflowDAO.get(user != null ? user.getEmail() : null, lastDate));
+            return parseWorkflows(workflowDAO.get(user != null ? user.getFullName() : null, lastDate));
 
         } catch (WorkflowsDBDAOException ex) {
             logger.error("Error getting simulations for {} since {}", user, lastDate, ex);

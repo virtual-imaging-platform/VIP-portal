@@ -32,6 +32,8 @@
 package fr.insalyon.creatis.vip.application.client.view.system.applications.app;
 
 import java.util.Arrays;
+import java.util.HashMap;
+
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.types.MultipleAppearance;
 import com.smartgwt.client.types.Overflow;
@@ -41,12 +43,12 @@ import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.RichTextEditor;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
-import com.smartgwt.client.widgets.form.fields.BooleanItem;
 import com.smartgwt.client.widgets.form.fields.SelectItem;
 import com.smartgwt.client.widgets.form.fields.TextItem;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
 import fr.insalyon.creatis.vip.application.client.bean.Application;
 import fr.insalyon.creatis.vip.application.client.rpc.ApplicationService;
+import fr.insalyon.creatis.vip.application.client.view.system.SystemUtils;
 import fr.insalyon.creatis.vip.core.client.CoreModule;
 import fr.insalyon.creatis.vip.core.client.bean.Group;
 import fr.insalyon.creatis.vip.core.client.bean.GroupType;
@@ -60,21 +62,21 @@ import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
 import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
-/**
- *
- * @author Rafael Ferreira da Silva
- */
 public class EditApplicationLayout extends AbstractFormLayout {
 
     private boolean newApplication = true;
     private TextItem nameField;
     private RichTextEditor richTextEditor;
     private SelectItem groupsList;
-    private BooleanItem publicField;
     private IButton saveButton;
     private IButton removeButton;
     private SelectItem usersPickList;
+
+    private Map<String, String> groupsMap;
 
     public EditApplicationLayout() {
         super(480, 200);
@@ -105,30 +107,27 @@ public class EditApplicationLayout extends AbstractFormLayout {
         groupsList.setMultipleAppearance(MultipleAppearance.PICKLIST);
         groupsList.setWidth(350);
 
-        publicField = new BooleanItem();
-        publicField.setShowTitle(false);
-        publicField.setWidth(350);
-
         saveButton = WidgetUtil.getIButton("Save", CoreConstants.ICON_SAVED,
                 new ClickHandler() {
             @Override
             public void onClick(ClickEvent event) {
                 if (nameField.validate()) {
+                    List<String> groupsNames = Arrays.asList(groupsList.getValues());
+                    List<Group> groups = groupsNames.stream()
+                        .map((name) -> new Group(groupsMap.get(name), false, GroupType.RESOURCE)).collect(Collectors.toList());
 
                     if (newApplication) {
                         save(new Application(
                             nameField.getValueAsString().trim(),
                             richTextEditor.getValue(),
-                            Arrays.asList(groupsList.getValues()),
-                            publicField.getValueAsBoolean()));
+                            groups));
                     } else {
                         save(new Application(
                             nameField.getValueAsString().trim(),
                             usersPickList.getValueAsString(), 
                             null,
                             richTextEditor.getValue(),
-                            Arrays.asList(groupsList.getValues()),
-                            publicField.getValueAsBoolean()));
+                            groups));
                     }
                 }
             }
@@ -153,7 +152,6 @@ public class EditApplicationLayout extends AbstractFormLayout {
         addField("Name", nameField);
         addField("Owner", usersPickList);
         addField("Groups", groupsList);
-        addField("Public", publicField);
         addMember(WidgetUtil.getLabel("<b>Citation</b>", 15));
         addMember(richTextEditor);
         addMember(removeButton);
@@ -165,19 +163,17 @@ public class EditApplicationLayout extends AbstractFormLayout {
         }
     }
 
-    public void setApplication(String name, String owner, String citation, String[] groups, boolean isPublic) {
-
+    public void setApplication(String name, String owner, String citation, Map<String, String> groups) {
         if (name != null) {
             usersPickList.setCanEdit(true);
             fetchUsers(owner);
             nameField.setValue(name);
             nameField.setDisabled(true);
-            groupsList.setValues(groups);
+            groupsList.setValues(groups.keySet().stream().toArray(String[]::new));
             richTextEditor.setValue(citation);
-            publicField.setValue(isPublic);
             newApplication = false;
             removeButton.setDisabled(false);
-
+            groupsMap = groups;
         } else {
             usersPickList.setCanEdit(false);
             usersPickList.setValue("");
@@ -186,6 +182,7 @@ public class EditApplicationLayout extends AbstractFormLayout {
             richTextEditor.setValue("");
             newApplication = true;
             removeButton.setDisabled(true);
+            groupsMap = new HashMap<>();
         }
         fetchGroups();
     }
@@ -201,14 +198,13 @@ public class EditApplicationLayout extends AbstractFormLayout {
     }
 
     private void remove(String name) {
-
         WidgetUtil.setLoadingIButton(removeButton, "Removing...");
         ApplicationService.Util.getInstance().remove(name, getCallback("remove"));
     }
 
-    private AsyncCallback<Void> getCallback(final String text) {
+    private AsyncCallback<String> getCallback(final String text) {
 
-        return new AsyncCallback<Void>() {
+        return new AsyncCallback<String>() {
             @Override
             public void onFailure(Throwable caught) {
                 WidgetUtil.resetIButton(saveButton, "Save", CoreConstants.ICON_SAVED);
@@ -217,13 +213,17 @@ public class EditApplicationLayout extends AbstractFormLayout {
             }
 
             @Override
-            public void onSuccess(Void result) {
+            public void onSuccess(String result) {
                 WidgetUtil.resetIButton(saveButton, "Save", CoreConstants.ICON_SAVED);
                 WidgetUtil.resetIButton(removeButton, "Remove", CoreConstants.ICON_DELETE);
-                setApplication(null, null, null, null, false);
-                ManageApplicationsTab tab = (ManageApplicationsTab) Layout.getInstance().
-                        getTab(ApplicationConstants.TAB_MANAGE_APPLICATION);
+
+                setApplication(null, null, null, null);
+                ManageApplicationsTab tab = (ManageApplicationsTab) Layout.getInstance().getTab(ApplicationConstants.TAB_MANAGE_APPLICATION);
                 tab.loadApplications();
+                
+                if (result != null) {
+                    Layout.getInstance().setInformationMessage(result);
+                }
             }
         };
     }
@@ -266,11 +266,15 @@ public class EditApplicationLayout extends AbstractFormLayout {
     
             @Override
             public void onSuccess(List<Group> result) {
-                String[] data = result.stream()
+                List<Group> data = result.stream()
                     .filter((g) -> g.getType() == GroupType.APPLICATION)
-                    .map(Group::getName)
-                    .toArray(String[]::new);
-                groupsList.setValueMap(data);
+                    .collect(Collectors.toList());
+                List<String> formatGroups = SystemUtils.formatGroups(data);
+
+                groupsMap.putAll(IntStream.range(0, Math.min(formatGroups.size(), data.size()))
+                    .boxed()
+                    .collect(Collectors.toMap(formatGroups::get, (i) -> data.get(i).getName())));
+                groupsList.setValueMap(formatGroups.stream().toArray(String[]::new));
             }
         };
         service.getGroups(callback);

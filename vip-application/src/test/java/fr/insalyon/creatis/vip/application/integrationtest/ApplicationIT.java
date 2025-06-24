@@ -69,7 +69,7 @@ public class ApplicationIT extends BaseSpringIT {
         Assertions.assertEquals("Application1", application.getName(), "Incorrect name of application");
         Assertions.assertEquals("test1@test.fr", application.getOwner(), "Incorrect owner of application");
         Assertions.assertNull(application.getFullName(), "getApplication should not fill fullname");
-        Assertions.assertTrue(application.getApplicationGroups().isEmpty(), "getApplication should not fill applicationGroups");
+        Assertions.assertTrue(application.getGroupsNames().isEmpty(), "getApplication should not fill applicationGroups");
         Assertions.assertEquals(1, appVersionBusiness.getVersions("Application1").size(), "Incorrect versions number");
 
     }
@@ -187,7 +187,7 @@ public class ApplicationIT extends BaseSpringIT {
         Group group = new Group("test", false, GroupType.APPLICATION);
 
         groupBusiness.add(group);
-        app.setApplicationGroups(Arrays.asList(group.getName()));
+        app.setGroups(Arrays.asList(group));
         applicationBusiness.update(app);
 
         assertEquals(1, applicationBusiness.getApplications(group).size());
@@ -199,11 +199,11 @@ public class ApplicationIT extends BaseSpringIT {
         Group group = new Group("test", false, GroupType.APPLICATION);
 
         groupBusiness.add(group);
-        app.setApplicationGroups(Arrays.asList(group.getName()));
+        app.setGroups(Arrays.asList(group));
         applicationBusiness.update(app);
 
         assertEquals(1, applicationBusiness.getApplications(group).size());  
-        app.setApplicationGroups(new ArrayList<>());
+        app.setGroups(new ArrayList<>());
         applicationBusiness.update(app);
 
         assertEquals(0, applicationBusiness.getApplications(group).size());  

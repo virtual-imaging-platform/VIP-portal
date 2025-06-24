@@ -59,13 +59,12 @@ import fr.insalyon.creatis.vip.core.client.view.common.ToolstripLayout;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
-/**
- *
- * @author Rafael Ferreira da Silva
- */
 public class ApplicationsLayout extends VLayout {
 
     private ModalWindow modal;
@@ -103,7 +102,7 @@ public class ApplicationsLayout extends VLayout {
                 public void onClick(ClickEvent event) {
                     ManageApplicationsTab appsTab = (ManageApplicationsTab) Layout.getInstance().
                             getTab(ApplicationConstants.TAB_MANAGE_APPLICATION);
-                    appsTab.setApplication(null, null, null, null, false);
+                    appsTab.setApplication(null, null, null, null);
                 }
             });
             toolstrip.addMember(addButton);
@@ -125,8 +124,7 @@ public class ApplicationsLayout extends VLayout {
     private void configureGrid() {
         ListGridField nameField = new ListGridField("name", "Application Name");
         ListGridField ownerField = new ListGridField("owner", "Owner");
-        ListGridField publicField = new ListGridField("public", "Public");
-        ListGridField groupsField = new ListGridField("groups", "Groups");
+        ListGridField groupsField = new ListGridField("groupsLabel", "Groups");
 
         grid = new ListGrid() {
             @Override
@@ -179,14 +177,13 @@ public class ApplicationsLayout extends VLayout {
         grid.setEmptyMessage("<br>No data available.");
 
         if (onlyPublicApps){
-            grid.setFields(nameField, publicField, groupsField);
+            grid.setFields(nameField, groupsField);
         } else {
             ownerField.setHidden(true);
             grid.setFields(
                 nameField,
                 new ListGridField("ownerFullName", "Owner"),
                 ownerField,
-                publicField,
                 groupsField);
         }
         grid.setSortField("name");
@@ -228,8 +225,7 @@ public class ApplicationsLayout extends VLayout {
     }
 
     private void remove(String name) {
-
-        final AsyncCallback<Void> callback = new AsyncCallback<Void>() {
+        final AsyncCallback<String> callback = new AsyncCallback<>() {
             @Override
             public void onFailure(Throwable caught) {
                 modal.hide();
@@ -237,7 +233,7 @@ public class ApplicationsLayout extends VLayout {
             }
 
             @Override
-            public void onSuccess(Void result) {
+            public void onSuccess(String result) {
                 modal.hide();
                 Layout.getInstance().setNoticeMessage("The application was successfully removed!");
                 loadData();
@@ -248,15 +244,19 @@ public class ApplicationsLayout extends VLayout {
     }
 
     private void edit(ListGridRecord record) {
-        ManageApplicationsTab appsTab = (ManageApplicationsTab) Layout.getInstance().
-                getTab(ApplicationConstants.TAB_MANAGE_APPLICATION);
+        ManageApplicationsTab appsTab = (ManageApplicationsTab) Layout.getInstance().getTab(ApplicationConstants.TAB_MANAGE_APPLICATION);
+        List<String> keys = Arrays.asList(record.getAttributeAsStringArray("groupsLabel"));
+        List<String> values = Arrays.asList(record.getAttributeAsStringArray("groups"));
+
+        Map<String, String> groups = IntStream.range(0, Math.min(keys.size(), values.size()))
+            .boxed()
+            .collect(Collectors.toMap(keys::get, values::get));
 
         appsTab.loadVersions(record.getAttribute("name"));
         appsTab.setApplication(
             record.getAttribute("name"), 
             record.getAttribute("owner"), 
             record.getAttribute("citation"), 
-            record.getAttributeAsStringArray("groups"),
-            record.getAttributeAsBoolean("public"));
+            groups);
     }
 }

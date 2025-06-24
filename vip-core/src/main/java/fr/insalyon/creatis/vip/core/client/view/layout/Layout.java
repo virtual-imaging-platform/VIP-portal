@@ -200,45 +200,26 @@ public class Layout {
         }
     }
 
-    /**
-     *
-     * @param message
-     * @param delay
-     */
     public void setMessage(String message, int delay) {
         messageWindow.setMessage(message, "#FFFFFF", null, delay);
     }
 
-    /**
-     *
-     * @param message
-     */
+    public void setInformationMessage(String message) {
+        messageWindow.setMessage(message, "#F79D5C", CoreConstants.ICON_INFORMATION, 15);
+    }
+
     public void setNoticeMessage(String message) {
         setNoticeMessage(message, 15);
     }
 
-    /**
-     *
-     * @param message
-     * @param delay
-     */
     public void setNoticeMessage(String message, int delay) {
         messageWindow.setMessage(message, "#B3CC99", CoreConstants.ICON_SUCCESS, delay);
     }
 
-    /**
-     *
-     * @param message
-     */
     public void setWarningMessage(String message) {
         setWarningMessage(message, 0);
     }
 
-    /**
-     *
-     * @param message
-     * @param delay
-     */
     public void setWarningMessage(String message, int delay) {
         messageWindow.setMessage(message, "#F79191", CoreConstants.ICON_WARNING, delay);
     }

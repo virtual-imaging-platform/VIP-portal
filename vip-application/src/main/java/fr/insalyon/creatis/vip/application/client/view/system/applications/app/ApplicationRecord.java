@@ -34,11 +34,8 @@ package fr.insalyon.creatis.vip.application.client.view.system.applications.app;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 
 import fr.insalyon.creatis.vip.application.client.bean.Application;
+import fr.insalyon.creatis.vip.application.client.view.system.SystemUtils;
 
-/**
- *
- * @author Rafael Ferreira da Silva
- */
 public class ApplicationRecord extends ListGridRecord {
 
     public ApplicationRecord(Application app) {
@@ -46,7 +43,7 @@ public class ApplicationRecord extends ListGridRecord {
         setAttribute("owner", app.getOwner());
         setAttribute("ownerFullName", app.getFullName());
         setAttribute("citation", app.getCitation());
-        setAttribute("groups", app.getApplicationGroups());
-        setAttribute("public", app.isPublic());
+        setAttribute("groupsLabel", SystemUtils.formatGroups(app.getGroups()));
+        setAttribute("groups", app.getGroupsNames());
     }
 }

@@ -75,13 +75,12 @@ public class ApplicationData extends JdbcDaoSupport implements ApplicationDAO {
 
     @Override
     public void add(Application application) throws DAOException {
-        String query = "INSERT INTO VIPApplications(name, citation, owner, isPublic) VALUES (?,?,?,?)";
+        String query = "INSERT INTO VIPApplications(name, citation, owner) VALUES (?,?,?)";
 
         try (PreparedStatement ps = getConnection().prepareStatement(query)) {
             ps.setString(1, application.getName());
             ps.setString(2, application.getCitation());
             ps.setString(3, application.getOwner());
-            ps.setBoolean(4, application.isPublic());
             ps.execute();
 
         } catch (SQLException ex) {
@@ -97,13 +96,12 @@ public class ApplicationData extends JdbcDaoSupport implements ApplicationDAO {
 
     @Override
     public void update(Application application) throws DAOException {
-        String query = "UPDATE VIPApplications SET citation=?, owner=?, isPublic=? WHERE name=?";
+        String query = "UPDATE VIPApplications SET citation=?, owner=? WHERE name=?";
 
         try (PreparedStatement ps = getConnection().prepareStatement(query)) {
             ps.setString(1, application.getCitation());
             ps.setString(2, application.getOwner());
-            ps.setBoolean(3, application.isPublic());
-            ps.setString(4, application.getName());
+            ps.setString(3, application.getName());
             ps.executeUpdate();
 
         } catch (SQLException ex) {
@@ -414,8 +412,7 @@ public class ApplicationData extends JdbcDaoSupport implements ApplicationDAO {
         return new Application(
             rs.getString("name"),
             rs.getString("owner"),
-            rs.getString("citation"),
-            rs.getBoolean("isPublic"));
+            rs.getString("citation"));
     }
 
     public static AppVersion appVersionFromResultset(ResultSet rs) throws SQLException {
