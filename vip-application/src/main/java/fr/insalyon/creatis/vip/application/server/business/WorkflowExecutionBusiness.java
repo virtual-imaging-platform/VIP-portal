@@ -45,17 +45,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import javax.xml.rpc.ServiceException;
 import java.rmi.RemoteException;
 import java.util.Date;
 import java.util.List;
 
-/**
- * Wrapper on WebServiceEngine to configure it and to create a Workflow object
- * after a launch.
- *
- * @author Rafael Ferreira da Silva
- */
 @Service
 public class WorkflowExecutionBusiness {
 
@@ -78,13 +75,14 @@ public class WorkflowExecutionBusiness {
             String workflowContent = appVersion.getDescriptor();
             String inputs = (parameters != null) ? getParametersAsXMLInput(parameters) : null;
             String proxyFileName = server.getServerProxy(server.getVoName());
-            String workflowID = engine.launch(engineEndpoint, workflowContent, inputs, appVersion.getSettingsAsString(), executorConfig, proxyFileName);
+            String settingsJSON = new ObjectMapper().writeValueAsString(appVersion.getSettings());
+            String workflowID = engine.launch(engineEndpoint, workflowContent, inputs, settingsJSON, executorConfig, proxyFileName);
             return new Workflow(workflowID, user.getFullName(),
                     WorkflowStatus.Running, new Date(), null, simulationName, 
                     appVersion.getApplicationName(), appVersion.getVersion(), "",
                     engineEndpoint, null);
 
-        } catch (ServiceException | RemoteException ex) {
+        } catch (ServiceException | RemoteException | JsonProcessingException ex) {
             logger.error("Error launching simulation {} ({}/{})",
                     simulationName, appVersion.getApplicationName(), appVersion.getVersion(), ex);
             throw new BusinessException(ex);

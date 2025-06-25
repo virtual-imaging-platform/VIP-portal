@@ -46,19 +46,18 @@ import org.springframework.jdbc.core.support.JdbcDaoSupport;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import javax.sql.DataSource;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
-/**
- * @author Rafael Ferreira da Silva
- */
 @Repository
 @Transactional
 public class ApplicationData extends JdbcDaoSupport implements ApplicationDAO {
@@ -283,7 +282,7 @@ public class ApplicationData extends JdbcDaoSupport implements ApplicationDAO {
             ps.setString(2, version.getVersion());
             ps.setString(3, version.getDescriptor());
             ps.setBoolean(4, version.isVisible());
-            ps.setString(5, version.getSettingsAsString());
+            ps.setString(5, mapToSettingsJson(version.getSettings()));
             ps.setString(6, version.getSource());
             ps.executeUpdate();
 
@@ -307,7 +306,7 @@ public class ApplicationData extends JdbcDaoSupport implements ApplicationDAO {
         try (PreparedStatement ps = getConnection().prepareStatement(query)) {
             ps.setString(1, version.getDescriptor());
             ps.setBoolean(2, version.isVisible());
-            ps.setString(3, version.getSettingsAsString());
+            ps.setString(3, mapToSettingsJson(version.getSettings()));
             ps.setString(4, version.getSource());
             ps.setString(5, version.getApplicationName());
             ps.setString(6, version.getVersion());
@@ -415,25 +414,37 @@ public class ApplicationData extends JdbcDaoSupport implements ApplicationDAO {
             rs.getString("citation"));
     }
 
-    public static AppVersion appVersionFromResultset(ResultSet rs) throws SQLException {
+    private AppVersion appVersionFromResultset(ResultSet rs) throws SQLException, DAOException {
         return new AppVersion(
             rs.getString("application"),
             rs.getString("version"),
             rs.getString("descriptor"),
             rs.getString("doi"),
-            stringSettingsToMap(rs.getString("settings")),
+            settingsJsonToMap(rs.getString("settings")),
             rs.getBoolean("visible"),
             rs.getString("source")
         );
     }
 
-    private static Map<String, String> stringSettingsToMap(String str) {
-        return Arrays.stream(str.split(", "))
-            .map(s -> s.split("="))
-            .filter(pair -> pair.length == 2)
-            .collect(Collectors.toMap(
-                pair -> pair[0],
-                pair -> pair[1]
-            ));
+    private Map<String, String> settingsJsonToMap(String json) throws DAOException {
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+
+            return mapper.readValue(json, new TypeReference<Map<String, String>>() {});
+        } catch (JsonProcessingException e) {
+            logger.error("Failed to convert JSON settings to map!", e);
+            throw new DAOException(e);
+        }
+    }
+
+    private String mapToSettingsJson(Map<String, String> map) throws DAOException {
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+
+            return mapper.writeValueAsString(map);
+        } catch (JsonProcessingException e) {
+            logger.error("Failed to convert JSON settings to map!", e);
+            throw new DAOException(e);
+        }
     }
 }
