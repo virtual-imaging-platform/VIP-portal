@@ -413,10 +413,10 @@ public class ExecutionControllerIT extends BaseWebSpringIT {
         // verify inputs / same as gwendia without optional one
         String inputs = inputsCaptor.getValue();
         List<ParameterSweep> expectedParams = new ArrayList<>();
-        expectedParams.add(new ParameterSweep("testFileInput", ServerMockConfig.TEST_USERS_ROOT + "/" +  baseUser1.getFolder() + "/path/to/input.in"));
+        expectedParams.add(new ParameterSweep("testFileInput", "lfn:" + ServerMockConfig.TEST_USERS_ROOT + "/" +  baseUser1.getFolder() + "/path/to/input.in"));
         expectedParams.add(new ParameterSweep("testTextInput", "best test text value"));
         expectedParams.add(new ParameterSweep("testFlagInput", "false"));
-        expectedParams.add(new ParameterSweep("results-directory", ServerMockConfig.TEST_USERS_ROOT + "/" +  baseUser1.getFolder()));
+        expectedParams.add(new ParameterSweep("results-directory", "lfn:" + ServerMockConfig.TEST_USERS_ROOT + "/" +  baseUser1.getFolder()));
         String expectedInputs = workflowExecutionBusiness.getParametersAsXMLInput(expectedParams);
         Assertions.assertEquals(expectedInputs, inputs);
 

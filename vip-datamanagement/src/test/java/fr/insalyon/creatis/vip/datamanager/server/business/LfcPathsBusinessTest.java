@@ -56,4 +56,14 @@ public class LfcPathsBusinessTest {
         assertEquals(relativePath, 
             lfcPathsBusiness.parseRealDir(absolutePath, user.getFolder()));
     }
+
+    @Test
+    public void testLfnTransformation() throws DataManagerException {
+        assertEquals("/vip/Home/path/to/file.txt",
+                lfcPathsBusiness.parseRealDir("lfn:/var/data/users/test_user/path/to/file.txt", user.getFolder()));
+        assertEquals("/vip/Home/path/to/file.txt",
+                lfcPathsBusiness.parseRealDir("lfn://var/data/users/test_user/path/to/file.txt", user.getFolder()));
+        assertEquals("/vip/Home/path/to/file.txt",
+                lfcPathsBusiness.parseRealDir("lfn:///var/data/users/test_user/path/to/file.txt", user.getFolder()));
+    }
 }
