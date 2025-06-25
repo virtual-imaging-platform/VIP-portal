@@ -202,35 +202,18 @@ function getListOfFiles(dataArray, parentFolderId) {
     //Add Wfl config file containing the name of the main Mac file. 
     //Note that the created file has a name and a content, but no path
     var mainMacFileName = dataArray.macFilesArray[0];
-    var configFile = new File([mainMacFileName], "wfl_config.txt", {type: "text/plain"});
-    myListOfFiles.push(configFile);
 
     return myListOfFiles;
 }
 
-function isSimuStatic(dataArray) {
-    if (dataArray.timeSimu === "timeSimu") {
-        return true;
-    }
-    return false;
-}
 function fillInInputs(fileName, dataArray) {
-    //var type = isSimuStatic(dataArray) ? "stat" : "dyn";
-    //force static simulation while waiting for confirmation of dynamic mode removal
-    var type = "stat";
-    //TODO handle phaseSpace use-case
-    var ps = "dummy";
-    var parts = dataArray.totalNumberOfPrimaries;
-    if (parts === "") {
-        parts = "100";
-    }
     if (dataArray.engineSeed !== "auto") {
         throw "SetEngineSeed is not auto. Please set the auto engine seed mode.";
     }
     if (dataArray.visu === "visu") {
         throw "Vizualisation found in the GATE macro files. Please remove any vis commands and start again.";
     }
-    var inputsList = "GateInput = " + fileName + ", ParallelizationType = " + type + ", NumberOfParticles = " + parts + ", phaseSpace = " + ps;
+    var inputsList = "gateInput = " + fileName + ", macfileName = " + mainMacFileName;
     return inputsList;
 }
 

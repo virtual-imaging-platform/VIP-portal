@@ -59,15 +59,12 @@ public class GateLabLaunchTab extends LaunchTab {
 
     private LoadMacWindow loadMacWindow;
     private String baseDir;
-    private String releaseDir;
     private IButton loadMacButton;
 
-    public static final String GATE_RELEASE_INPUT_ID = "GateRelease";
-    public static final String CPU_ESTIMATION_INPUT_ID = "CPUestimation";
-    public static final String PARALLELIZATION_TYPE_INPUT_ID = "ParallelizationType";
-    public static final String GATE_INPUT_INPUT_ID = "GateInput";
-    public static final String NB_OF_PARTICLES_INPUT_ID = "NumberOfParticles";
-    public static final String PHASE_SPACE_INPUT_ID = "phaseSpace";
+    public static final String GATE_INPUT_ID = "gateInput";
+    public static final String NB_JOBS_INPUT_ID = "numberOfJobs";
+    public static final String JOB_NUMBER_INPUT_ID = "jobNumber";
+    public static final String MACFILE_INPUT_ID = "macfileName";
 
     public GateLabLaunchTab(String applicationName, String applicationVersion, String applicationClass) {
         super(applicationName, applicationVersion, applicationClass);
@@ -82,7 +79,6 @@ public class GateLabLaunchTab extends LaunchTab {
     protected void init() {
         super.init();
         baseDir = DataManagerConstants.ROOT + "/Home/myGateSimus/inputs";
-        releaseDir = "/vip/GateLab (group)/releases/";
         this.showExamples = false;
         this.showSeparators = false;
 
@@ -114,21 +110,15 @@ public class GateLabLaunchTab extends LaunchTab {
         applicationTool.setBoutiquesExtensions(extensions);
 
         extensions.addNonListInputs(
-                GATE_RELEASE_INPUT_ID, CPU_ESTIMATION_INPUT_ID, PARALLELIZATION_TYPE_INPUT_ID,
-                GATE_INPUT_INPUT_ID, NB_OF_PARTICLES_INPUT_ID, PHASE_SPACE_INPUT_ID);
-        enrichCPUEstimationInput(applicationTool, extensions);
-        enrichParallelizationType(applicationTool, extensions);
-        // do the asynchronous task last for clarity
-        enrichGateReleasesInput(applicationTool, extensions, launchFormCreator);
+                GATE_INPUT_ID, NB_JOBS_INPUT_ID, JOB_NUMBER_INPUT_ID, MACFILE_INPUT_ID);
+        enrichNumberOfJobsInput(applicationTool, extensions);
     }
 
     private void verifyBoutiquesDescriptor(BoutiquesApplication applicationTool) {
-        verifyBoutiquesInput(applicationTool, GATE_RELEASE_INPUT_ID, BoutiquesInput.InputType.STRING);
-        verifyBoutiquesInput(applicationTool, CPU_ESTIMATION_INPUT_ID, BoutiquesInput.InputType.NUMBER);
-        verifyBoutiquesInput(applicationTool, PARALLELIZATION_TYPE_INPUT_ID, BoutiquesInput.InputType.STRING);
-        verifyBoutiquesInput(applicationTool, GATE_INPUT_INPUT_ID, BoutiquesInput.InputType.FILE);
-        verifyBoutiquesInput(applicationTool, NB_OF_PARTICLES_INPUT_ID, BoutiquesInput.InputType.NUMBER);
-        verifyBoutiquesInput(applicationTool, PHASE_SPACE_INPUT_ID, BoutiquesInput.InputType.STRING);
+        verifyBoutiquesInput(applicationTool, GATE_INPUT_ID, BoutiquesInput.InputType.FILE);
+        verifyBoutiquesInput(applicationTool, NB_JOBS_INPUT_ID, BoutiquesInput.InputType.NUMBER);
+        verifyBoutiquesInput(applicationTool, JOB_NUMBER_INPUT_ID, BoutiquesInput.InputType.NUMBER);
+        verifyBoutiquesInput(applicationTool, MACFILE_INPUT_ID, BoutiquesInput.InputType.STRING);
     }
 
     private void verifyBoutiquesInput(BoutiquesApplication applicationTool, String inputId, BoutiquesInput.InputType type) {
@@ -141,76 +131,22 @@ public class GateLabLaunchTab extends LaunchTab {
                 "Input {" + inputId + "} must have a number type in Gate descriptor");
     }
 
-    private void enrichCPUEstimationInput(
+    private void enrichNumberOfJobsInput(
             BoutiquesApplication applicationTool, BoutiquesApplicationExtensions extensions) {
-        BoutiquesInput cpuEstInput = applicationTool.getInputs().stream()
-                .filter(input -> CPU_ESTIMATION_INPUT_ID.equals(input.getId()))
+        BoutiquesInput numberOfJobs = applicationTool.getInputs().stream()
+                .filter(input -> NB_JOBS_INPUT_ID.equals(input.getId()))
                 .findAny().orElseThrow(IllegalStateException::new);
         Map<String, String> map = new LinkedHashMap<String, String>();
-        map.put("1", "A few minutes");
-        map.put("2", "A few hours");
-        map.put("3", "A few days");
-        map.put("4", "More than a few days");
+        map.put("1", "Short simulation of few minutes");
+        map.put("10", "Simulation of few hours");
+        map.put("100", "Simulation of a few days");
+        map.put("500", "Simulation of more than a few days");
         LaunchFormLayout.assertCondition(
-                cpuEstInput.getPossibleValues() != null && cpuEstInput.getPossibleValues().equals(map.keySet()),
-                "CPU Estimation in Gate descriptor does not have the expected values");
-        extensions.addValueChoiceLabels(CPU_ESTIMATION_INPUT_ID, map);
+                numberOfJobs.getPossibleValues() != null && numberOfJobs.getPossibleValues().equals(map.keySet()),
+                "Number of jobs in Gate descriptor does not have the expected values");
+        extensions.addValueChoiceLabels(NB_JOBS_INPUT_ID, map);
     }
 
-    private void enrichParallelizationType(
-            BoutiquesApplication applicationTool, BoutiquesApplicationExtensions extensions) {
-        BoutiquesInput paraTypeInput = applicationTool.getInputs().stream()
-                .filter(input -> PARALLELIZATION_TYPE_INPUT_ID.equals(input.getId()))
-                .findAny().orElseThrow(IllegalStateException::new);
-        Map<String, String> map = new LinkedHashMap<String, String>();
-        map.put("stat", "Static");
-        map.put("dyn", "Dynamic");
-        LaunchFormLayout.assertCondition(
-                paraTypeInput.getPossibleValues() != null && paraTypeInput.getPossibleValues().equals(map.keySet()),
-                "CPU Estimation in Gate descriptor does not have the expected values");
-        extensions.addValueChoiceLabels(PARALLELIZATION_TYPE_INPUT_ID, map);
-    }
-
-    private void enrichGateReleasesInput(
-            BoutiquesApplication applicationTool, BoutiquesApplicationExtensions extensions, Runnable doNextStep) {
-        BoutiquesInput releaseInput = applicationTool.getInputs().stream()
-                .filter(input -> GATE_RELEASE_INPUT_ID.equals(input.getId()))
-                .findAny().orElseThrow(IllegalStateException::new);
-        //get list of available releases
-        DataManagerServiceAsync service = DataManagerService.Util.getInstance();
-        AsyncCallback<List<Data>> callback = new AsyncCallback<List<Data>>() {
-            @Override
-            public void onFailure(Throwable caught) {
-                modal.hide();
-                Layout.getInstance().setWarningMessage("Unable to list release folder:<br />" + caught.getMessage());
-            }
-
-            @Override
-            public void onSuccess(List<Data> result) {
-                modal.hide();
-                List<Release> releases = new ArrayList<Release>();
-                for (Data d : result) {
-                    releases.add(new Release(d.getName()));
-                }
-                Collections.sort(releases);
-                updateGateReleaseInput(releaseInput, extensions, releases);
-                doNextStep.run();;
-            }
-        };
-        service.listDir(releaseDir, true, callback);
-    }
-
-    private void updateGateReleaseInput(
-            BoutiquesInput releaseInput, BoutiquesApplicationExtensions extensions, List<Release> releases) {
-        Map<String, String> releaseMap = new LinkedHashMap<String, String>();
-        String defaultValue = releaseDir + "/" + releases.get(0).getReleaseName();
-        for (Release r : releases) {
-            releaseMap.put(releaseDir + "/" + r.getReleaseName(), r.getReleaseName());
-        }
-        releaseInput.setPossibleValues(releaseMap.keySet());
-        ((BoutiquesStringInput) releaseInput).setDefaultValue(defaultValue);
-        extensions.addValueChoiceLabels(releaseInput.getId(), releaseMap);
-    }
 
     @Override
     protected void onLaunchFormCreated() {
@@ -227,7 +163,7 @@ public class GateLabLaunchTab extends LaunchTab {
     protected void onLaunchFormReady() {
         super.onLaunchFormReady();
         if (this.inputs != null) {
-            customizeGateForm(this.inputs.get(PARALLELIZATION_TYPE_INPUT_ID));
+            customizeGateForm();
         }
     }
 
@@ -249,7 +185,7 @@ public class GateLabLaunchTab extends LaunchTab {
             loadMacWindow = null;
 
             modal.hide();
-            // we get something like "GateInput = " + fileName + ", ParallelizationType = " + type + ", NumberOfParticles = " + parts + ", phaseSpace = " + ps;
+            // we get something like "gateInput = " + fileName + ", macfileName = " + mainMacFileName;
             String[] inputs = inputList.split(", ");
             Map<String,String> valuesMap = new HashMap<>();
 
@@ -257,29 +193,24 @@ public class GateLabLaunchTab extends LaunchTab {
             String[] it = inputs[0].split(" = ");
             valuesMap.put(it[0], baseDir.concat("/").concat(it[1]));
 
-            for (int i=1 ; i<4 ; i++) {
-                String[] keyAndValue = inputs[i].split(" = ");
-                valuesMap.put(keyAndValue[0], keyAndValue[1]);
-            }
-            valuesMap.put(CPU_ESTIMATION_INPUT_ID,"1");
+            String[] keyAndValue = inputs[1].split(" = ");
+            valuesMap.put(keyAndValue[0], keyAndValue[1]);
+
+            valuesMap.put(NB_JOBS_INPUT_ID,"1");
 
             super.createButtons(); // override "load mac button" with "launch button"
             launchFormLayout.showInputs();
             launchFormLayout.enableErrorsAndWarnings();
             launchFormLayout.loadInputs(launchFormLayout.getSimulationName(), valuesMap, false);
 
-            customizeGateForm(valuesMap.get(PARALLELIZATION_TYPE_INPUT_ID));
+            customizeGateForm();
         }
     }
 
-    public void customizeGateForm(String parallelizationType) {
+    public void customizeGateForm() {
         // hide and disable some inputs
-            launchFormLayout.hideInput(PHASE_SPACE_INPUT_ID);
-            launchFormLayout.makeInputUnmodifiable(GATE_INPUT_INPUT_ID);
-            launchFormLayout.makeInputUnmodifiable(NB_OF_PARTICLES_INPUT_ID);
-            if ("stat".equals(parallelizationType)) {
-                launchFormLayout.makeInputUnmodifiable(PARALLELIZATION_TYPE_INPUT_ID);
-            }
+            launchFormLayout.makeInputUnmodifiable(GATE_INPUT_ID);
+            launchFormLayout.makeInputUnmodifiable(JOB_NUMBER_INPUT_ID);
     }
 
     // called from JS
