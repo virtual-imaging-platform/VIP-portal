@@ -94,7 +94,7 @@ public class ApplicationModule extends Module {
                 apps.forEach((app, versions) -> {
                     versions.forEach((version) -> {
                         String classTag = version.getTags().stream()
-                            .filter(t -> t.getKey().equals("class"))
+                            .filter(t -> t.getKey().equalsIgnoreCase("class"))
                             .findFirst()
                             .map(Tag::getValue)
                             .orElse("Others");

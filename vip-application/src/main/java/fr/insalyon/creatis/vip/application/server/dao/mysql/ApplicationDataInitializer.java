@@ -112,7 +112,7 @@ public class ApplicationDataInitializer extends JdbcDaoSupport {
                 +   "version VARCHAR(255), "
                 +   "descriptor " + tableInitializer.getJsonType() + ", " // "JSON" for mysql, "TEXT" for h2
                 +   "doi VARCHAR(255), "
-                +   "settings TEXT, "
+                +   "settings " + tableInitializer.getJsonType() + ", "
                 +   "visible BOOLEAN, "
                 +   "source TEXT, "
                 +   "PRIMARY KEY (application, version), "

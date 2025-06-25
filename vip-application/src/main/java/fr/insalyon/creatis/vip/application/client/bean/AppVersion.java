@@ -54,7 +54,7 @@ public class AppVersion implements IsSerializable {
     public AppVersion() {}
 
     public AppVersion(String applicationName, String version, String descriptor,
-                      Map<String,String> settings, boolean visible, String source) {
+                      Map<String, String> settings, boolean visible, String source) {
         this.applicationName = applicationName;
         this.version = version;
         this.descriptor = descriptor;
@@ -70,7 +70,7 @@ public class AppVersion implements IsSerializable {
     }
 
     public AppVersion(String applicationName, String version, String descriptor,
-                      String doi, Map<String,String> settings, boolean visible, String source) {
+                      String doi, Map<String, String> settings, boolean visible, String source) {
         this(applicationName, version, descriptor, settings, visible, source);
         this.doi = doi;
     }
@@ -106,12 +106,6 @@ public class AppVersion implements IsSerializable {
 
     public Map<String, String> getSettings() {
         return settings;
-    }
-
-    public String getSettingsAsString() {
-        return settings.entrySet().stream()
-            .map((e) -> e.getKey() + "=" + e.getValue())
-            .collect(Collectors.joining(", "));
     }
 
     public boolean isVisible() {
