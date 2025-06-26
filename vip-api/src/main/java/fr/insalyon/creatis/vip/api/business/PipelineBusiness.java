@@ -57,6 +57,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Supplier;
 
 import static fr.insalyon.creatis.vip.api.exception.ApiException.ApiError.*;
@@ -196,12 +197,20 @@ public class PipelineBusiness {
         Pipeline p = new Pipeline(pipelineId, boutiques.getName(), boutiques.getToolVersion());
         p.setDescription(boutiques.getDescription());
 
+        Map<String, String> overriddenInputs = boutiquesBusiness.getOverriddenInputs(boutiques);
         for (Input input : boutiques.getInputs()) {
+            if (overriddenInputs != null && overriddenInputs.containsKey(input.getId())) {
+                continue; // hide overriddenInputs from pipeline visible parameters
+            }
             ParameterType type = ParameterType.fromBoutiquesInput(input);
             PipelineParameter pp = new PipelineParameter(
                     input.getId(), type, input.getOptional() != null && input.getOptional(),false,
                     input.getDefaultValue(), input.getDescription());
             p.getParameters().add(pp);
+        }
+        // store overriddenInputs in pipeline object to avoid parsing the descriptor again later
+        if (overriddenInputs != null) {
+            p.setOverriddenInputs(overriddenInputs);
         }
         return p;
     }

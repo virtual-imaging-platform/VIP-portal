@@ -384,6 +384,20 @@ public class ExecutionBusiness {
                 throw new ApiException(ApiException.ApiError.INPUT_FIELD_MISSING, pp.getName());
             }
 
+            // fill in overriddenInputs from explicit inputs
+            Map<String, String> overriddenInputs = p.getOverriddenInputs();
+            if (overriddenInputs != null) {
+                for (String key : overriddenInputs.keySet()) {
+                    String value = overriddenInputs.get(key);
+                    if (inputValues.containsKey(value)) {
+                        inputValues.put(key, inputValues.get(value));
+                    } else {
+                        logger.error("Error initialising {}, missing {} parameter", pipelineId, value);
+                        throw new ApiException(ApiException.ApiError.INPUT_FIELD_MISSING, value);
+                    }
+                }
+            }
+
             boolean inputsContainsResultsDirectoryInput = inputValues.containsKey(CoreConstants.RESULTS_DIRECTORY_PARAM_NAME);
             boolean pipelineHasResultsDirectoryInput = p.getParameters().stream().anyMatch(param ->
                         param.getName().equals(CoreConstants.RESULTS_DIRECTORY_PARAM_NAME));

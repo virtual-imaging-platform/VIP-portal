@@ -315,7 +315,11 @@ public class LaunchFormLayout extends AbstractFormLayout {
                 .filter(i -> i.isOptional()).collect(Collectors.toSet());
 
 
+        Map<String, String> overriddenInputs = applicationDescriptor.getVipOverriddenInputs();
         for (BoutiquesInput input : mandatoryInputs) {
+            if (overriddenInputs != null && overriddenInputs.containsKey(input.getId())) {
+                continue; // do not put overridden inputs in the form, they'll be filled in server-side
+            }
             configureInput(applicationDescriptor, input);
         }
         if (optionalInputs.isEmpty()) {

@@ -34,6 +34,7 @@ package fr.insalyon.creatis.vip.application.server.business;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import fr.insalyon.creatis.boutiques.model.BoutiquesDescriptor;
+import fr.insalyon.creatis.boutiques.model.Custom;
 import fr.insalyon.creatis.vip.application.client.bean.AppVersion;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
@@ -50,7 +51,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by abonnet on 2/21/19.
@@ -256,5 +259,28 @@ public class BoutiquesBusiness {
                 logger.error("Error closing {}", c);
             }
         }
+    }
+
+    @SuppressWarnings("unchecked")
+    public Map<String, String> getOverriddenInputs(BoutiquesDescriptor descriptor) {
+        final String customKeyName = "vip:overriddenInputs";
+        Custom custom = descriptor.getCustom();
+        if (custom == null) {
+            return null;
+        }
+        Map<String, Object> customProperties = custom.getAdditionalProperties();
+        if (!customProperties.containsKey(customKeyName)) {
+            return null;
+        }
+        Map<String, String> result = new HashMap<String, String>();
+        Object overriddenInputs = customProperties.get(customKeyName);
+        if (overriddenInputs instanceof Map) {
+            Map<String, String> oi = (Map<String,String>)overriddenInputs;
+            for (String key: oi.keySet()) {
+                String value = oi.get(key);
+                result.put(key, value);
+            }
+        }
+        return result;
     }
 }

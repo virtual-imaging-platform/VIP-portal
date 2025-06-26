@@ -1,5 +1,6 @@
 package fr.insalyon.creatis.vip.application.client.view.boutiquesParsing;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -105,6 +106,15 @@ public class BoutiquesParser extends AbstractJsonParser {
             application.setVipContainer(getStringValue(customObject, "vip:imagepath", true));
             application.setVipDotInputIds(getArrayValueAsStringSet(customObject, "vip:dot", true));
             application.setVipDotIncludesResultsDir(getBooleanValue(customObject, "vip:dot-with-results-directory", true));
+            JSONObject vipOverriddenInputs = getObjectValue(customObject, "vip:overriddenInputs", true);
+            if (vipOverriddenInputs != null) {
+                Map<String, String> overriddenInputs = new HashMap<>();
+                for (String key: vipOverriddenInputs.keySet()) {
+                    String value = getStringValue(vipOverriddenInputs, key);
+                    overriddenInputs.put(key, value);
+                }
+                application.setVipOverriddenInputs(overriddenInputs);
+            }
         }
         return application;
     }
