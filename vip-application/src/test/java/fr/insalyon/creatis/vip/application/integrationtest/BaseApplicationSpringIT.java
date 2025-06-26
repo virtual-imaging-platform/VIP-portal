@@ -58,7 +58,7 @@ public class BaseApplicationSpringIT extends BaseSpringIT {
      * @throws BusinessException
      */
     protected void createAnApplication(String appName, String groupname) throws BusinessException {
-        Application app = new Application(appName, "test citation", new ArrayList<>(), true);
+        Application app = new Application(appName, "test citation", new ArrayList<>());
 
         getApplicationBusiness().add(app);
 

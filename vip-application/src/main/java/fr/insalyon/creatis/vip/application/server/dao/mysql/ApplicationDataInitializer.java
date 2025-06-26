@@ -52,7 +52,6 @@ public class ApplicationDataInitializer extends JdbcDaoSupport {
     private void createResourcesTables() {
         tableInitializer.createTable("VIPResources", 
                     "name VARCHAR(255) NOT NULL, "
-                +   "isPublic BOOLEAN DEFAULT FALSE, "
                 +   "status BOOLEAN DEFAULT FALSE, "
                 +   "type VARCHAR(255), "
                 +   "configuration VARCHAR(255), "
@@ -95,7 +94,6 @@ public class ApplicationDataInitializer extends JdbcDaoSupport {
                     "name VARCHAR(255), "
                 +   "citation TEXT, "
                 +   "owner VARCHAR(255), "
-                +   "isPublic BOOLEAN DEFAULT FALSE, "
                 +   "PRIMARY KEY (name), "
                 +   "FOREIGN KEY (owner) REFERENCES VIPUsers(email) "
                 +   "ON DELETE SET NULL ON UPDATE CASCADE");
@@ -114,7 +112,7 @@ public class ApplicationDataInitializer extends JdbcDaoSupport {
                 +   "version VARCHAR(255), "
                 +   "descriptor " + tableInitializer.getJsonType() + ", " // "JSON" for mysql, "TEXT" for h2
                 +   "doi VARCHAR(255), "
-                +   "settings TEXT, "
+                +   "settings " + tableInitializer.getJsonType() + ", "
                 +   "visible BOOLEAN, "
                 +   "source TEXT, "
                 +   "PRIMARY KEY (application, version), "

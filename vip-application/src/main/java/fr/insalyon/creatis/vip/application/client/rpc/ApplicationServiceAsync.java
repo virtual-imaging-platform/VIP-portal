@@ -52,11 +52,11 @@ public interface ApplicationServiceAsync {
     
     public void getVersion(String applicationName, String applicationVersion, AsyncCallback <AppVersion> asyncCallback);
 
-    public void add(Application application, AsyncCallback<Void> asyncCallback);
+    public void add(Application application, AsyncCallback<String> asyncCallback);
 
-    public void update(Application application, AsyncCallback<Void> asyncCallback);
+    public void update(Application application, AsyncCallback<String> asyncCallback);
 
-    public void remove(String name, AsyncCallback<Void> asyncCallback);
+    public void remove(String name, AsyncCallback<String> asyncCallback);
     
     public void addVersion(AppVersion version, AsyncCallback<Void> asyncCallback);
 
@@ -80,11 +80,11 @@ public interface ApplicationServiceAsync {
     
     public void getEngines(AsyncCallback<List<Engine>> asyncCallback);
     
-    public void addResource(Resource resource, AsyncCallback<Void> asyncCallback);
+    public void addResource(Resource resource, AsyncCallback<String> asyncCallback);
 
-    public void removeResource(Resource resource, AsyncCallback<Void> asyncCallback);
+    public void removeResource(Resource resource, AsyncCallback<String> asyncCallback);
 
-    public void updateResource(Resource resource, AsyncCallback<Void> asyncCallback);
+    public void updateResource(Resource resource, AsyncCallback<String> asyncCallback);
 
     public void getResources(AsyncCallback<List<Resource>> asyncCallback);
 

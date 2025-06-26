@@ -1,5 +1,7 @@
 package fr.insalyon.creatis.vip.application.client.view.system.resources;
 
+import java.util.Map;
+
 import com.smartgwt.client.widgets.layout.HLayout;
 
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
@@ -22,13 +24,14 @@ public class ManageResourcesTab extends AbstractManageTab {
         hLayout.addMember(editLayout);
         
         vLayout.addMember(hLayout);
+        setResource(null, false, null, null, null, null);
     }
     
     public void loadResources() {
         resourceLayout.loadData();
     }
 
-    public void setResource(String name, boolean isPublic, boolean status, String type, String configuration, String[] engines, String[] groups) {
-        editLayout.setResource(name, isPublic, status, type, configuration, engines, groups);
+    public void setResource(String name, boolean status, String type, String configuration, String[] engines, Map<String, String> groups) {
+        editLayout.setResource(name, status, type, configuration, engines, groups);
     }
 }

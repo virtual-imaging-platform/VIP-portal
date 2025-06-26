@@ -48,6 +48,7 @@ import fr.insalyon.creatis.vip.application.server.business.AppVersionBusiness;
 import fr.insalyon.creatis.vip.application.server.business.ResourceBusiness;
 import fr.insalyon.creatis.vip.application.server.business.simulation.ParameterSweep;
 import fr.insalyon.creatis.vip.application.server.business.util.FileUtil;
+import fr.insalyon.creatis.vip.core.client.bean.Group;
 import fr.insalyon.creatis.vip.core.client.bean.GroupType;
 import fr.insalyon.creatis.vip.core.integrationtest.ServerMockConfig;
 
@@ -384,7 +385,7 @@ public class ExecutionControllerIT extends BaseWebSpringIT {
 
         Mockito.when(server.getVoName()).thenReturn("test-vo-name");
         Mockito.when(server.getServerProxy("test-vo-name")).thenReturn("/path/to/proxy");
-        Mockito.when(getWebServiceEngine().launch(eq(engineEndpoint), workflowContentCaptor.capture(), inputsCaptor.capture(), eq(""), eq(""), eq("/path/to/proxy"))).thenReturn(workflowId, (String) null);
+        Mockito.when(getWebServiceEngine().launch(eq(engineEndpoint), workflowContentCaptor.capture(), inputsCaptor.capture(), eq("{}"), eq(""), eq("/path/to/proxy"))).thenReturn(workflowId, (String) null);
         Mockito.when(getWebServiceEngine().getStatus(engineEndpoint, workflowId)).thenReturn(SimulationStatus.Running, (SimulationStatus) null);
 
         Workflow w = new Workflow(workflowId, baseUser1.getFullName(), WorkflowStatus.Running, startDate, null, "Exec test 1", appName, versionName, "", engineEndpoint, null);
@@ -412,10 +413,10 @@ public class ExecutionControllerIT extends BaseWebSpringIT {
         // verify inputs / same as gwendia without optional one
         String inputs = inputsCaptor.getValue();
         List<ParameterSweep> expectedParams = new ArrayList<>();
-        expectedParams.add(new ParameterSweep("testFileInput", ServerMockConfig.TEST_USERS_ROOT + "/" +  baseUser1.getFolder() + "/path/to/input.in"));
+        expectedParams.add(new ParameterSweep("testFileInput", "lfn:" + ServerMockConfig.TEST_USERS_ROOT + "/" +  baseUser1.getFolder() + "/path/to/input.in"));
         expectedParams.add(new ParameterSweep("testTextInput", "best test text value"));
         expectedParams.add(new ParameterSweep("testFlagInput", "false"));
-        expectedParams.add(new ParameterSweep("results-directory", ServerMockConfig.TEST_USERS_ROOT + "/" +  baseUser1.getFolder()));
+        expectedParams.add(new ParameterSweep("results-directory", "lfn:" + ServerMockConfig.TEST_USERS_ROOT + "/" +  baseUser1.getFolder()));
         String expectedInputs = workflowExecutionBusiness.getParametersAsXMLInput(expectedParams);
         Assertions.assertEquals(expectedInputs, inputs);
 
@@ -440,11 +441,10 @@ public class ExecutionControllerIT extends BaseWebSpringIT {
         Resource resource = new Resource(
             "testResource", 
             true, 
-            true, 
             ResourceType.BATCH, 
             "", 
             Arrays.asList(engine.getName()),
-            Arrays.asList("testResources"));
+            Arrays.asList(new Group("testResources", true, GroupType.APPLICATION)));
 
         engineBusiness.add(engine);
         resourceBusiness.add(resource);

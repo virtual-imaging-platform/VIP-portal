@@ -31,6 +31,7 @@
  */
 package fr.insalyon.creatis.vip.application.server.business;
 
+import fr.insalyon.creatis.boutiques.model.BoutiquesDescriptor;
 import fr.insalyon.creatis.grida.client.GRIDAClient;
 import fr.insalyon.creatis.grida.client.GRIDAClientException;
 import fr.insalyon.creatis.grida.client.GRIDAPoolClient;
@@ -47,6 +48,7 @@ import fr.insalyon.creatis.vip.application.server.dao.SimulationStatsDAO;
 import fr.insalyon.creatis.vip.core.client.bean.Group;
 import fr.insalyon.creatis.vip.core.client.bean.GroupType;
 import fr.insalyon.creatis.vip.core.client.bean.User;
+import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants.GROUP_ROLE;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
@@ -99,6 +101,7 @@ public class WorkflowBusiness {
     private final ExternalPlatformBusiness externalPlatformBusiness;
     private final WorkflowExecutionBusiness workflowExecutionBusiness;
     private final ConfigurationBusiness configurationBusiness;
+    private final BoutiquesBusiness boutiquesBusiness;
 
     @Autowired
     public WorkflowBusiness(
@@ -108,9 +111,10 @@ public class WorkflowBusiness {
             ApplicationDAO applicationDAO, EngineBusiness engineBusiness,
             EmailBusiness emailBusiness,
             LfcPathsBusiness lfcPathsBusiness, GRIDAPoolClient gridaPoolClient,
-            GRIDAClient gridaClient, ExternalPlatformBusiness externalPlatformBusiness, 
+            GRIDAClient gridaClient, ExternalPlatformBusiness externalPlatformBusiness,
             ResourceBusiness resourceBusiness, AppVersionBusiness appVersionBusiness,
-            WorkflowExecutionBusiness workflowExecutionBusiness, ConfigurationBusiness configurationBusiness) {
+            WorkflowExecutionBusiness workflowExecutionBusiness, ConfigurationBusiness configurationBusiness,
+            BoutiquesBusiness boutiquesBusiness) {
         this.server = server;
         this.simulationStatsDAO = simulationStatsDAO;
         this.workflowDAO = workflowDAO;
@@ -129,6 +133,7 @@ public class WorkflowBusiness {
         this.appVersionBusiness = appVersionBusiness;
         this.workflowExecutionBusiness = workflowExecutionBusiness;
         this.configurationBusiness = configurationBusiness;
+        this.boutiquesBusiness = boutiquesBusiness;
     }
 
     /*
@@ -152,8 +157,8 @@ public class WorkflowBusiness {
         try {
             checkVIPCapacities(user, simulationName);
 
-            List<ParameterSweep> parameters = getParameters(parametersMap, user, groups);
             AppVersion appVersion = appVersionBusiness.getVersion(appName, version);
+            List<ParameterSweep> parameters = getParameters(appVersion.getDescriptor(), parametersMap, user, groups);
 
             List<Resource> resources = resourceBusiness.getUsableResources(user, appVersion);
             if (resources.isEmpty()) {
@@ -215,9 +220,10 @@ public class WorkflowBusiness {
         }
     }
 
-    private List<ParameterSweep> getParameters(Map<String, String> parametersMap, User user, List<String> groups) 
+    private List<ParameterSweep> getParameters(String boutiquesDescriptor, Map<String, String> parametersMap, User user, List<String> groups)
             throws DataManagerException, BusinessException {
         List<ParameterSweep> parameters = new ArrayList<>();
+        BoutiquesDescriptor boutiques = boutiquesBusiness.parseBoutiquesString(boutiquesDescriptor);
 
         for (String name : parametersMap.keySet()) {
             ParameterSweep ps = new ParameterSweep(name);
@@ -240,20 +246,24 @@ public class WorkflowBusiness {
                 String[] values = valuesStr.split(ApplicationConstants.SEPARATOR_LIST);
 
                 for (String v : values) {
-                    ps.addValue(parseParameter(user, groups, name, v));
+                    ps.addValue(transformParameter(boutiques, user, groups, name, v));
                 }
             } else {
-                ps.addValue(parseParameter(user, groups, name, valuesStr));
+                ps.addValue(transformParameter(boutiques, user, groups, name, valuesStr));
             }
             parameters.add(ps);
         }
         return parameters;
     }
 
-    private String parseParameter(User user, List<String> groups, String parameterName, String parameterValue)
+    private String transformParameter(BoutiquesDescriptor boutiques, User user, List<String> groups, String parameterName, String parameterValue)
             throws DataManagerException, BusinessException {
 
         parameterValue = parameterValue.trim();
+
+        if ( ! isAFileParameter(boutiques, parameterName)) {
+            return parameterValue;
+        }
 
         ExternalPlatformBusiness.ParseResult parseResult = externalPlatformBusiness
             .parseParameter(parameterName, parameterValue, user);
@@ -266,16 +276,23 @@ public class WorkflowBusiness {
         if ( ! user.isSystemAdministrator()) {
             checkFolderACL(user, groups, parsedPath);
         }
-        if ( ! parsedPath.equals(parameterValue) // the parameter is a file path
-                && server.useLocalFilesInInputs()) {
-            parsedPath = "file:" + parsedPath;
+        return (server.useLocalFilesInInputs() ? "file:" : "lfn:") + parsedPath;
+    }
+
+    private boolean isAFileParameter(BoutiquesDescriptor boutiques, String parameterName) {
+        Set<fr.insalyon.creatis.boutiques.model.Input> inputs = boutiques.getInputs();
+
+        if (CoreConstants.RESULTS_DIRECTORY_PARAM_NAME.equals(parameterName)) {
+            return true;
         }
-        return parsedPath;
+        return inputs.stream().anyMatch(input ->
+                parameterName.equals(input.getId())
+                        && fr.insalyon.creatis.boutiques.model.Input.Type.FILE.equals(input.getType()));
     }
 
     public List<Simulation> getSimulations(User user, Date lastDate) throws BusinessException {
         try {
-            return parseWorkflows(workflowDAO.get(user != null ? user.getEmail() : null, lastDate));
+            return parseWorkflows(workflowDAO.get(user != null ? user.getFullName() : null, lastDate));
 
         } catch (WorkflowsDBDAOException ex) {
             logger.error("Error getting simulations for {} since {}", user, lastDate, ex);

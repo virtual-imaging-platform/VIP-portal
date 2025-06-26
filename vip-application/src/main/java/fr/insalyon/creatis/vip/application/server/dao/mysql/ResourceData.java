@@ -35,15 +35,14 @@ public class ResourceData extends JdbcDaoSupport implements ResourceDAO {
 
     @Override
     public void add(Resource resource) throws DAOException {
-        String query = "INSERT INTO VIPResources (name, isPublic, status, type, configuration) "
-        +              "VALUES (?,?,?,?,?)";
+        String query = "INSERT INTO VIPResources (name, status, type, configuration) "
+        +              "VALUES (?,?,?,?)";
         
         try (PreparedStatement ps = getConnection().prepareStatement(query)) {
             ps.setString(1, resource.getName());
-            ps.setBoolean(2, resource.isPublic());
-            ps.setBoolean(3, resource.getStatus());
-            ps.setString(4, resource.getType().toString());
-            ps.setString(5, resource.getConfiguration());
+            ps.setBoolean(2, resource.getStatus());
+            ps.setString(3, resource.getType().toString());
+            ps.setString(4, resource.getConfiguration());
             ps.executeUpdate();
 
         } catch (SQLException e) {
@@ -59,15 +58,14 @@ public class ResourceData extends JdbcDaoSupport implements ResourceDAO {
 
     @Override
     public void update(Resource resource) throws DAOException {
-        String query = "UPDATE VIPResources SET isPublic = ?, status = ?, type = ?, configuration = ? "
+        String query = "UPDATE VIPResources SET status = ?, type = ?, configuration = ? "
         +              "WHERE name = ?";
 
         try (PreparedStatement ps = getConnection().prepareStatement(query)) {
-            ps.setBoolean(1, resource.isPublic());
-            ps.setBoolean(2, resource.getStatus());
-            ps.setString(3, resource.getType().toString());
-            ps.setString(4, resource.getConfiguration());
-            ps.setString(5, resource.getName());
+            ps.setBoolean(1, resource.getStatus());
+            ps.setString(2, resource.getType().toString());
+            ps.setString(3, resource.getConfiguration());
+            ps.setString(4, resource.getName());
             ps.executeUpdate();
 
         } catch (SQLException e) {
@@ -249,7 +247,6 @@ public class ResourceData extends JdbcDaoSupport implements ResourceDAO {
     private Resource resultsetToResource(ResultSet rs) throws SQLException {
         return new Resource(
             rs.getString("name"), 
-            rs.getBoolean("isPublic"),
             rs.getBoolean("status"), 
             rs.getString("type"),
             rs.getString("configuration"),

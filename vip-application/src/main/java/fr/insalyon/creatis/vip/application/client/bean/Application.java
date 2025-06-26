@@ -33,52 +33,44 @@ package fr.insalyon.creatis.vip.application.client.bean;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
 
+import fr.insalyon.creatis.vip.core.client.bean.Group;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
-/**
- *
- * @author Rafael Ferreira da Silva,Nouha boujelben
- */
 public class Application implements IsSerializable {
 
     private String name;
     private String citation;
     private String owner;
     private String fullName;
-    private boolean isPublic;
-    private List<String> applicationGroups;
+    private List<Group> groups;
 
-    public Application() {
-    }
+    public Application() {}
 
     public Application(String name, String citation) {
         this(name, null, null, citation);
     }
 
-    public Application(String name, String citation, List<String> applicationGroups) {
-        this(name, null, null, citation, applicationGroups, false);
-    }
-
-    public Application(String name, String citation, List<String> applicationGroups, boolean isPublic) {
-        this(name, null, null, citation, applicationGroups, isPublic);
+    public Application(String name, String citation, List<Group> groups) {
+        this(name, null, null, citation, groups);
     }
 
     public Application(String name, String owner, String fullName, String citation) {
-        this(name, owner, fullName, citation, new ArrayList<>(), false);
+        this(name, owner, fullName, citation, new ArrayList<>());
     }
 
-    public Application(String name, String owner, String citation, boolean isPublic) {
-        this(name, owner, null, citation, new ArrayList<>(), isPublic);
+    public Application(String name, String owner, String citation) {
+        this(name, owner, null, citation, new ArrayList<>());
     }
 
-    public Application(String name, String owner, String fullName, String citation, List<String> applicationGroups, boolean isPublic) {
+    public Application(String name, String owner, String fullName, String citation, List<Group> groups) {
         this.name = name;
         this.citation = citation;
         this.owner = owner;
         this.fullName = fullName;
-        this.applicationGroups = applicationGroups;
-        this.isPublic = isPublic;
+        this.groups = groups;
     }
 
     public String getName() {
@@ -105,19 +97,15 @@ public class Application implements IsSerializable {
         return fullName;
     }
 
-    public List<String> getApplicationGroups() {
-        return applicationGroups;
+    public List<Group> getGroups() {
+        return groups;
     }
 
-    public void setApplicationGroups(List<String> groups) {
-        this.applicationGroups = groups;
+    public List<String> getGroupsNames() {
+        return groups.stream().map(Group::getName).collect(Collectors.toList());
     }
 
-    public boolean isPublic() {
-        return isPublic;
-    }
-
-    public void setPublic(boolean isPublic) {
-        this.isPublic = isPublic;
+    public void setGroups(List<Group> groups) {
+        this.groups = groups;
     }
 }

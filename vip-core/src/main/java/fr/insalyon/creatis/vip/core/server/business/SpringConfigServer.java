@@ -133,7 +133,6 @@ public class SpringConfigServer implements Server {
         assertPropertyIsPresent(CoreConstants.LAB_APACHE_HOST);
         assertPropertyIsPresent(CoreConstants.LAB_APACHE_SSL_PORT);
         assertPropertyIsPresent(CoreConstants.LAB_CAS_URL);
-        assertPropertyIsPresent(CoreConstants.SSH_PUBLIC_KEY);
 
         assertPropertyIsPresent(CoreConstants.UNDESIRED_MAIL_DOMAINS, List.class);
         assertPropertyIsPresent(CoreConstants.UNDESIRED_COUNTRIES, List.class);
@@ -353,11 +352,6 @@ public class SpringConfigServer implements Server {
     @Override
     public String getCasURL() {
         return env.getRequiredProperty(CoreConstants.LAB_CAS_URL);
-    }
-
-    @Override
-    public String getSshPublicKey() {
-        return env.getRequiredProperty(CoreConstants.SSH_PUBLIC_KEY);
     }
 
     @Override

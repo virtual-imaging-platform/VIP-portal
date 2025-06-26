@@ -5,7 +5,6 @@ import java.util.List;
 /*
     interface for the server configuration to allow several implementations
  */
-
 public interface Server {
 
     String VIP_DIR = "/.vip/";
@@ -82,8 +81,6 @@ public interface Server {
     String getAdminPassword();
 
     String getCasURL();
-
-    String getSshPublicKey();
 
     String getSamlTrustedCertificate(String issuer);
 
