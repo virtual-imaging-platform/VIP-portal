@@ -276,7 +276,7 @@ public class WorkflowBusiness {
         if ( ! user.isSystemAdministrator()) {
             checkFolderACL(user, groups, parsedPath);
         }
-        return server.useLocalFilesInInputs() ? "file:" : "lfn:" + parsedPath;
+        return (server.useLocalFilesInInputs() ? "file:" : "lfn:") + parsedPath;
     }
 
     private boolean isAFileParameter(BoutiquesDescriptor boutiques, String parameterName) {
