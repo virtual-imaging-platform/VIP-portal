@@ -198,11 +198,6 @@ function getListOfFiles(dataArray, parentFolderId) {
         alert(e.toString() + " This shouldn't be an issue for Gate version inferior to 9.2. Please add this file to your data folder for Gate 9.2 and above.");
     }
 
-
-    //Add Wfl config file containing the name of the main Mac file. 
-    //Note that the created file has a name and a content, but no path
-    var mainMacFileName = dataArray.macFilesArray[0];
-
     return myListOfFiles;
 }
 
@@ -213,7 +208,7 @@ function fillInInputs(fileName, dataArray) {
     if (dataArray.visu === "visu") {
         throw "Vizualisation found in the GATE macro files. Please remove any vis commands and start again.";
     }
-    var inputsList = "gateInput = " + fileName + ", macfileName = " + mainMacFileName;
+    var inputsList = "gateInput = " + fileName + ", macfileName = " + dataArray.macFilesArray[0];
     return inputsList;
 }
 

@@ -106,12 +106,13 @@ public class GateLabLaunchTab extends LaunchTab {
     protected void addExtensionAndCreateForm(
             BoutiquesApplication applicationTool, Boolean addResultsDirectoryInput, Runnable launchFormCreator) {
         verifyBoutiquesDescriptor(applicationTool);
-        BoutiquesApplicationExtensions extensions = new BoutiquesApplicationExtensions(false);
+        BoutiquesApplicationExtensions extensions = new BoutiquesApplicationExtensions(true);
         applicationTool.setBoutiquesExtensions(extensions);
 
         extensions.addNonListInputs(
                 GATE_INPUT_ID, NB_JOBS_INPUT_ID, JOB_NUMBER_INPUT_ID, MACFILE_INPUT_ID);
         enrichNumberOfJobsInput(applicationTool, extensions);
+        launchFormCreator.run();
     }
 
     private void verifyBoutiquesDescriptor(BoutiquesApplication applicationTool) {
@@ -196,7 +197,7 @@ public class GateLabLaunchTab extends LaunchTab {
             String[] keyAndValue = inputs[1].split(" = ");
             valuesMap.put(keyAndValue[0], keyAndValue[1]);
 
-            valuesMap.put(NB_JOBS_INPUT_ID,"1");
+            valuesMap.put(JOB_NUMBER_INPUT_ID,"1");
 
             super.createButtons(); // override "load mac button" with "launch button"
             launchFormLayout.showInputs();
@@ -210,7 +211,6 @@ public class GateLabLaunchTab extends LaunchTab {
     public void customizeGateForm() {
         // hide and disable some inputs
             launchFormLayout.makeInputUnmodifiable(GATE_INPUT_ID);
-            launchFormLayout.makeInputUnmodifiable(JOB_NUMBER_INPUT_ID);
     }
 
     // called from JS
