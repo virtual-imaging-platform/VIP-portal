@@ -9,6 +9,7 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import com.google.gwt.json.client.JSONObject;
 import com.google.gwt.user.client.rpc.IsSerializable;
 
 import fr.insalyon.creatis.vip.application.client.bean.boutiquesTools.BoutiquesInput.InputType;
@@ -42,6 +43,7 @@ public class BoutiquesApplication implements IsSerializable {
     private Map<String, String> tags = new HashMap<>();
     private Set<String> vipDotInputIds;
     private boolean vipDotIncludesResultsDir;
+    private Map<String, String> vipOverriddenInputs;
 
     private BoutiquesApplicationExtensions boutiquesExtensions;
 
@@ -228,6 +230,10 @@ public class BoutiquesApplication implements IsSerializable {
         return vipDotIncludesResultsDir;
     }
 
+    public Map<String, String> getVipOverriddenInputs() {
+        return vipOverriddenInputs;
+    }
+
     public void addInput(BoutiquesInput input){
         this.inputs.add(input);
     }
@@ -282,5 +288,9 @@ public class BoutiquesApplication implements IsSerializable {
 
     public void setVipDotIncludesResultsDir(boolean vipDotIncludesResultsDir) {
         this.vipDotIncludesResultsDir = vipDotIncludesResultsDir;
+    }
+
+    public void setVipOverriddenInputs(Map<String, String> vipOverriddenInputs) {
+        this.vipOverriddenInputs = vipOverriddenInputs;
     }
 }

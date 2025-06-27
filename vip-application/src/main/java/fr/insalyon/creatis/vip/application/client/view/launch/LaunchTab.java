@@ -154,6 +154,14 @@ public class LaunchTab extends Tab {
             public void onSuccess(String boutiquesDescriptorString) {
                 try {
                     BoutiquesApplication applicationTool = new BoutiquesParser().parseApplication(boutiquesDescriptorString);
+                    Map<String, String> overriddenInputs = applicationTool.getVipOverriddenInputs();
+                    // when we have both predefined inputs (i.e. on relaunch) and overriddenInputs,
+                    // remove overriddenInputs from the inputs map, so that it matches the form content
+                    if (inputs != null && overriddenInputs != null) {
+                        for (String key: overriddenInputs.keySet()) {
+                            inputs.remove(key);
+                        }
+                    }
                     addExtensionAndCreateForm(applicationTool, true, () -> createForm(applicationTool));
                 } catch (InvalidBoutiquesDescriptorException exception) {
                     Layout.getInstance().setWarningMessage("Unable to parse application descriptor:<br />"

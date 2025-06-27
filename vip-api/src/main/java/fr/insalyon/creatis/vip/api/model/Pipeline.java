@@ -32,8 +32,10 @@
 package fr.insalyon.creatis.vip.api.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.util.ArrayList;
+import java.util.Map;
 
 /**
  *
@@ -47,6 +49,8 @@ public class Pipeline {
     private String version;
     private ArrayList<PipelineParameter> parameters;
     private boolean canExecute;
+    @JsonIgnore
+    private Map<String, String> overriddenInputs;
 
     public Pipeline() {
     }
@@ -86,5 +90,13 @@ public class Pipeline {
     @JsonProperty("canExecute") // jackson only take into account getter by default
     public boolean canExecute(){
         return canExecute;
+    }
+
+    public Map<String, String> getOverriddenInputs() {
+        return overriddenInputs;
+    }
+
+    public void setOverriddenInputs(Map<String, String> overriddenInputs) {
+        this.overriddenInputs = overriddenInputs;
     }
 }

@@ -36,6 +36,8 @@ import fr.insalyon.creatis.moteur.plugins.workflowsdb.dao.WorkflowsDBDAOExceptio
 import fr.insalyon.creatis.vip.application.client.bean.*;
 import fr.insalyon.creatis.vip.application.client.rpc.WorkflowService;
 import fr.insalyon.creatis.vip.application.client.view.ApplicationException;
+import fr.insalyon.creatis.boutiques.model.BoutiquesDescriptor;
+import fr.insalyon.creatis.vip.application.server.business.AppVersionBusiness;
 import fr.insalyon.creatis.vip.application.server.business.BoutiquesBusiness;
 import fr.insalyon.creatis.vip.application.server.business.InputBusiness;
 import fr.insalyon.creatis.vip.application.server.business.WorkflowBusiness;
@@ -76,6 +78,7 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
     private ConfigurationBusiness configurationBusiness;
     private ApplicationInputDAO applicationInputDAO;
     private BoutiquesBusiness boutiquesBusiness;
+    private AppVersionBusiness appVersionBusiness;
 
     @Override
     public void init() throws ServletException {
@@ -85,6 +88,7 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
         configurationBusiness = getBean(ConfigurationBusiness.class);
         workflowBusiness = getBean(WorkflowBusiness.class);
         boutiquesBusiness = getBean(BoutiquesBusiness.class);
+        appVersionBusiness = getBean(AppVersionBusiness.class);
     }
 
     /**
@@ -181,10 +185,34 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
         }
     }
 
+    private void fillInOverriddenInputs(Map<String, String> parametersMap,
+                                        String applicationName, String applicationVersion) throws ApplicationException {
+        try {
+            AppVersion appVersion = appVersionBusiness.getVersion(applicationName, applicationVersion);
+            BoutiquesDescriptor descriptor = boutiquesBusiness.parseBoutiquesString(appVersion.getDescriptor());
+            Map<String, String> overriddenInputs = boutiquesBusiness.getOverriddenInputs(descriptor);
+            if (overriddenInputs != null) {
+                for (String key : overriddenInputs.keySet()) {
+                    String value = overriddenInputs.get(key);
+                    if (parametersMap.containsKey(value)) {
+                        parametersMap.put(key, parametersMap.get(value));
+                    } else {
+                        logger.error("missing parameter {}", value);
+                        throw new ApplicationException("missing parameter " + value);
+                    }
+                }
+            }
+        } catch (BusinessException ex) {
+            throw new ApplicationException(ex);
+        }
+    }
+
     @Override
     public void launchSimulation(Map<String, String> parametersMap,
             String applicationName, String applicationVersion,
             String applicationClass, String simulationName) throws ApplicationException {
+
+        // fill in overriddenInputs from explicit inputs
 
         try {
             trace(logger, "Launching simulation '" + simulationName + "' (" + applicationName + ").");
@@ -198,7 +226,7 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
             for (Map.Entry<String,String> p : parametersMap.entrySet()) {
                 logger.info("received param {} : {}", p.getKey(), p.getValue());
             }
-
+            fillInOverriddenInputs(parametersMap, applicationName, applicationVersion);
             String simulationID = workflowBusiness.launch(user, groups,
                 parametersMap, applicationName, applicationVersion, simulationName);
 

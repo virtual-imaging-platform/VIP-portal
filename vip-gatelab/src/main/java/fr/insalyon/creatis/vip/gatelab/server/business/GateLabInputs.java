@@ -105,12 +105,10 @@ public class GateLabInputs {
 
         String gateInput = inputsMap.get("gateInput");
         String numberOfJobs = inputsMap.get("numberOfJobs");
-        String jobNumber = inputsMap.get("jobNumber");
         String macfileName = inputsMap.get("macfileName");
         Map<String, String> inputMap = new HashMap<String, String>();
         inputMap.put("gateInput", gateInput);
         inputMap.put("numberOfJobs", numberOfJobs);
-        inputMap.put("jobNumber", jobNumber);
         inputMap.put("macfileName", macfileName);
 
         return inputMap;

@@ -63,7 +63,6 @@ public class GateLabLaunchTab extends LaunchTab {
 
     public static final String GATE_INPUT_ID = "gateInput";
     public static final String NB_JOBS_INPUT_ID = "numberOfJobs";
-    public static final String JOB_NUMBER_INPUT_ID = "jobNumber";
     public static final String MACFILE_INPUT_ID = "macfileName";
 
     public GateLabLaunchTab(String applicationName, String applicationVersion, String applicationClass) {
@@ -110,7 +109,7 @@ public class GateLabLaunchTab extends LaunchTab {
         applicationTool.setBoutiquesExtensions(extensions);
 
         extensions.addNonListInputs(
-                GATE_INPUT_ID, NB_JOBS_INPUT_ID, JOB_NUMBER_INPUT_ID, MACFILE_INPUT_ID);
+                GATE_INPUT_ID, NB_JOBS_INPUT_ID, MACFILE_INPUT_ID);
         enrichNumberOfJobsInput(applicationTool, extensions);
         launchFormCreator.run();
     }
@@ -118,7 +117,6 @@ public class GateLabLaunchTab extends LaunchTab {
     private void verifyBoutiquesDescriptor(BoutiquesApplication applicationTool) {
         verifyBoutiquesInput(applicationTool, GATE_INPUT_ID, BoutiquesInput.InputType.FILE);
         verifyBoutiquesInput(applicationTool, NB_JOBS_INPUT_ID, BoutiquesInput.InputType.NUMBER);
-        verifyBoutiquesInput(applicationTool, JOB_NUMBER_INPUT_ID, BoutiquesInput.InputType.NUMBER);
         verifyBoutiquesInput(applicationTool, MACFILE_INPUT_ID, BoutiquesInput.InputType.STRING);
     }
 
@@ -196,8 +194,6 @@ public class GateLabLaunchTab extends LaunchTab {
 
             String[] keyAndValue = inputs[1].split(" = ");
             valuesMap.put(keyAndValue[0], keyAndValue[1]);
-
-            valuesMap.put(JOB_NUMBER_INPUT_ID,"1");
 
             super.createButtons(); // override "load mac button" with "launch button"
             launchFormLayout.showInputs();
