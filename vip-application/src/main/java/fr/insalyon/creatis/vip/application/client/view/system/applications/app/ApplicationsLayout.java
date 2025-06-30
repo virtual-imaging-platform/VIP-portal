@@ -76,8 +76,8 @@ public class ApplicationsLayout extends VLayout {
 
     public ApplicationsLayout(boolean onlyPublicApps) {
 
-        this.setWidth100();
-        this.setHeight100();
+        setWidth100();
+        setHeight100();
         this.setOverflow(Overflow.AUTO);
 
         this.onlyPublicApps = onlyPublicApps;

@@ -33,6 +33,7 @@ package fr.insalyon.creatis.vip.application.client.view.system.applications.app;
 
 import java.util.Map;
 
+import com.smartgwt.client.types.Overflow;
 import com.smartgwt.client.widgets.Label;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
@@ -62,6 +63,8 @@ public class ManageApplicationsTab extends AbstractManageTab {
         HLayout appLayout = new HLayout(5);
         appLayout.setHeight("50%");
         appLayout.addMember(appsLayout);
+        appLayout.setOverflow(Overflow.SCROLL);
+
         vLayout.addMember(infoAppText);
         vLayout.addMember(appLayout);
 
@@ -74,6 +77,7 @@ public class ManageApplicationsTab extends AbstractManageTab {
             VLayout versionInfoLayout = new VLayout(5);
 
             HLayout versionLayout = new HLayout(5);
+            versionLayout.setOverflow(Overflow.SCROLL);
             versionLayout.setHeight("50%");
             versionLayout.addMember(versionsLayout);
 
