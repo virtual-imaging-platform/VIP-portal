@@ -177,7 +177,7 @@ public class ApplicationsLayout extends VLayout {
         grid.setEmptyMessage("<br>No data available.");
 
         if (onlyPublicApps){
-            grid.setFields(nameField, groupsField);
+            grid.setFields(nameField);
         } else {
             ownerField.setHidden(true);
             grid.setFields(
@@ -198,7 +198,8 @@ public class ApplicationsLayout extends VLayout {
     }
 
     public void loadData() {
-        final AsyncCallback<Map<Application, List<AppVersion>>> callback = new AsyncCallback<>() {
+
+        final AsyncCallback<List<Application>> callback = new AsyncCallback<>() {
             @Override
             public void onFailure(Throwable caught) {
                 modal.hide();
@@ -206,11 +207,11 @@ public class ApplicationsLayout extends VLayout {
             }
 
             @Override
-            public void onSuccess(Map<Application, List<AppVersion>> result) {
+            public void onSuccess(List<Application> result) {
                 modal.hide();
-                List<ApplicationRecord> dataList = new ArrayList<ApplicationRecord>();
+                List<ApplicationRecord> dataList = new ArrayList<>();
 
-                for (Application app : result.keySet()) {
+                for (Application app : result) {
                     dataList.add(new ApplicationRecord(app));
                 }
                 grid.setData(dataList.toArray(new ApplicationRecord[]{}));
@@ -220,7 +221,7 @@ public class ApplicationsLayout extends VLayout {
         if (onlyPublicApps) {
             ApplicationService.Util.getInstance().getPublicApplications(callback);
         } else {
-            ApplicationService.Util.getInstance().getApplications(callback);
+            ApplicationService.Util.getInstance().getManageableApplications(callback);
         }
     }
 

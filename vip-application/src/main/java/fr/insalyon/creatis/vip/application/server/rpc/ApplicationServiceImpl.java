@@ -221,17 +221,9 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
     }
 
     @Override
-    public Map<Application, List<AppVersion>> getPublicApplications() throws ApplicationException {
-        List<Application> apps = new ArrayList<>();
-        Map<Application, List<AppVersion>> map = new LinkedHashMap<>();
-
+    public List<Application> getPublicApplications() throws ApplicationException {
         try {
-            apps = applicationBusiness.getPublicApplicationsWithGroups();
-
-            for (Application app : apps) {
-                map.put(app, appVersionBusiness.getVersions(app.getName()));
-            }
-            return map;
+            return applicationBusiness.getPublicApplications();
         } catch (BusinessException ex) {
             throw new ApplicationException(ex);
         }
@@ -245,8 +237,6 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
         try {
             if (isSystemAdministrator()) {
                 apps = applicationBusiness.getApplications();
-            } else if (isDeveloper()) {
-                apps = applicationBusiness.getApplicationsWithOwner(getSessionUser().getEmail());
             } else {
                 apps = applicationBusiness.getApplications(getSessionUser());
             }
@@ -257,6 +247,23 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
         } catch (BusinessException | CoreException ex) {
             throw new ApplicationException(ex);
         }
+    }
+
+    @Override
+    public List<Application> getManageableApplications() throws ApplicationException {
+        try {
+            if (isSystemAdministrator()) {
+                return applicationBusiness.getApplications();
+            } else if (isDeveloper()) {
+                return applicationBusiness.getApplicationsWithOwner(getSessionUser().getEmail());
+            } else {
+                logger.error("Unauthorized to get manageable applications for regular user");
+                throw new ApplicationException("You have no administrator rights.");
+            }
+        } catch (BusinessException | CoreException ex) {
+            throw new ApplicationException(ex);
+        }
+
     }
 
     @SuppressWarnings("unchecked")

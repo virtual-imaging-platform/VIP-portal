@@ -156,7 +156,7 @@ public class ApplicationBusiness {
         }
     }
 
-    public List<Application> getPublicApplicationsWithGroups() throws BusinessException {
+    public List<Application> getPublicApplications() throws BusinessException {
         List<Group> publicAppGroups = groupBusiness.getPublic()
             .stream()
             .filter((g) -> g.getType().equals(GroupType.APPLICATION))
@@ -167,7 +167,9 @@ public class ApplicationBusiness {
             apps.addAll(getApplications(group));
         }
 
-        return apps;
+        // remove doublons + sort
+        return apps.stream().collect(Collectors.toMap(Application::getName, a -> a, (a1, a2) -> a1)).values()
+                .stream().sorted(Comparator.comparing(Application::getName)).collect(Collectors.toList());
     }
 
     public List<Group> getPublicGroupsForApplication(String applicationName) throws BusinessException {

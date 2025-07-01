@@ -60,9 +60,11 @@ public interface ApplicationService extends RemoteService {
         }
     }
 
-    public Map<Application, List<AppVersion>> getPublicApplications() throws ApplicationException;
+    public List<Application> getPublicApplications() throws ApplicationException;
 
     public Map<Application, List<AppVersion>> getApplications() throws ApplicationException;
+
+    public List<Application> getManageableApplications() throws ApplicationException;
     
     public List<AppVersion> getVersions(String applicationName) throws ApplicationException;
     
