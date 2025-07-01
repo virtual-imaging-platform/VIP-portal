@@ -32,12 +32,13 @@
 package fr.insalyon.creatis.vip.application.server.business;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import fr.insalyon.creatis.boutiques.model.BoutiquesDescriptor;
+import fr.insalyon.creatis.boutiques.model.Custom;
 import fr.insalyon.creatis.vip.application.client.bean.AppVersion;
-import fr.insalyon.creatis.vip.application.server.model.boutiques.BoutiquesDescriptor;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.business.Server;
-import fr.insalyon.creatis.vip.datamanager.server.business.DataManagerBusiness;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,9 +46,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Scanner;
+import java.util.Map;
 
 /**
  * Created by abonnet on 2/21/19.
@@ -59,43 +65,77 @@ public class BoutiquesBusiness {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private Server server;
-    private DataManagerBusiness dataManagerBusiness;
-    private ApplicationBusiness applicationBusiness;
+    private AppVersionBusiness appVersionBusiness;
     private ObjectMapper objectMapper;
 
     @Autowired
-    public BoutiquesBusiness(Server server, DataManagerBusiness dataManagerBusiness,
-                             ApplicationBusiness applicationBusiness, ObjectMapper objectMapper) {
+    public BoutiquesBusiness(Server server, ObjectMapper objectMapper, AppVersionBusiness appVersionBusiness) {
         this.server = server;
-        this.dataManagerBusiness = dataManagerBusiness;
-        this.applicationBusiness = applicationBusiness;
         this.objectMapper = objectMapper;
+        this.appVersionBusiness = appVersionBusiness;
     }
 
     public String publishVersion(User user, String applicationName, String version)
             throws BusinessException {
+        AppVersion appVersion = appVersionBusiness.getVersion(applicationName, version);
 
-        // fetch json file
-        String jsonLfn = getJsonLfn(applicationName, version);
-        String localFile = dataManagerBusiness.getRemoteFile(user, jsonLfn);
+        // verify that the descriptor has an author
+        BoutiquesDescriptor descriptor = parseBoutiquesString(appVersion.getDescriptor());
+        String author = descriptor.getAuthor();
+        if (author == null || author.isEmpty()) {
+            logger.error("Can't publish an descriptor with no author");
+            throw new BusinessException("Can't publish an descriptor with no author");
+        }
 
-        // TODO : verify it has an author (refactor boutique parser from application-importer
+        // The basename of the file used in bosh publish will be visible on zenodo,
+        // so we want a "clean" name, and a unique location on the filesystem to avoid race conditions.
+        Path tempDir, tempFile;
+        try {
+            // create a dedicated unique temporary directory
+            tempDir = Files.createTempDirectory("VipPublish-");
+            // create the descriptor filename inside this dir
+            tempFile = tempDir.resolve(appVersion.getDescriptorFilename());
+            // write the descriptor content to that file
+            Files.write(tempFile, appVersion.getDescriptor().getBytes(StandardCharsets.UTF_8));
+        } catch (IOException e) {
+            logger.error("Failed creating temporary file for publish", e);
+            throw new BusinessException("Failed creating temporary file for publish", e);
+        }
 
-        // call publish command
-        String command = "FILE=" + localFile + "; " + server.getPublicationCommandLine();
-        List<String> output = runCommandAndFailOnError(command);
+        // do the publishing, and cleanup tempFile+tempDir afterward
+        String doi;
+        try {
+            // call publish command
+            String command = "FILE=" + tempFile + "; " + server.getPublicationCommandLine();
+            List<String> output = runCommandAndFailOnError(command);
 
-        // get the doi
-        // There should be only one line with the DOI
-        String doi = getDoiFromPublishOutput(output);
+            // get the doi
+            // There should be only one line with the DOI
+            doi = getDoiFromPublishOutput(output);
 
-        // save the doi in database
-        saveDoiForVersion(doi, applicationName, version);
-
+            // save the doi in database
+            saveDoiForVersion(doi, applicationName, version);
+        } finally {
+            // failure to clean up temp files is not fatal
+            try {
+                Files.delete(tempFile);
+                Files.delete(tempDir);
+            } catch (IOException e) {
+                logger.warn("Failed deleting temporary file after publish:" + tempFile, e);
+            }
+        }
         return doi;
     }
 
     public void validateBoutiqueFile(String localPath) throws BusinessException {
+        // check file size, 100 kiB max
+        try {
+            if (Files.size(Paths.get(localPath)) >= 100 * 1024) {
+                throw new BusinessException("Boutiques file too large");
+            }
+        } catch (IOException e) {
+            throw new BusinessException("Can't get boutiques file size", e);
+        }
         // call validate command
         String command = "bosh validate " + localPath;
         try {
@@ -109,29 +149,10 @@ public class BoutiquesBusiness {
         }
     }
 
-    private String getJsonLfn(String applicationName, String applicationVersion)
+    public String getApplicationDescriptorString(String applicationName, String applicationVersion)
             throws BusinessException {
-        AppVersion appVersion = applicationBusiness.getVersion(
-            applicationName, applicationVersion);
-        if (appVersion.getJsonLfn() == null) {
-            logger.error("No json lfn for this application : {} / {}", applicationName, applicationVersion);
-            throw new BusinessException("There is no json lfn for this application version.");
-        }
-        return appVersion.getJsonLfn();
-    }
-
-    public String getApplicationDescriptorString(
-            User user, String applicationName, String applicationVersion)
-            throws BusinessException {
-        String descriptorLfn = getJsonLfn(applicationName, applicationVersion);
-        try {
-            String localFilePath =
-                    dataManagerBusiness.getRemoteFile(user, descriptorLfn);
-            return new Scanner(new File(localFilePath)).useDelimiter("\\Z").next();
-        } catch (IOException ex) {
-            logger.error("Error reading boutiques file {}", descriptorLfn, ex);
-            throw new BusinessException(ex);
-        }
+        AppVersion appVersion = appVersionBusiness.getVersion(applicationName, applicationVersion);
+        return appVersion.getDescriptor();
     }
 
     public BoutiquesDescriptor parseBoutiquesFile(File boutiquesFile) throws BusinessException {
@@ -143,12 +164,17 @@ public class BoutiquesBusiness {
         }
     }
 
-    private void saveDoiForVersion(
-            String doi, String applicationName, String applicationVersion)
-            throws BusinessException {
+    public BoutiquesDescriptor parseBoutiquesString(String descriptor) throws BusinessException {
+        try {
+            return objectMapper.readValue(descriptor, BoutiquesDescriptor.class);
+        } catch (IOException e) {
+            logger.error("Error parsing descriptor", e);
+            throw new BusinessException("Error parsing descriptor", e);
+        }
+    }
 
-        applicationBusiness.updateDoiForVersion(
-            doi, applicationName, applicationVersion);
+    private void saveDoiForVersion(String doi, String applicationName, String applicationVersion) throws BusinessException {
+        appVersionBusiness.updateDoiForVersion(doi, applicationName, applicationVersion);
     }
 
     private String getDoiFromPublishOutput(List<String> publishOutput) throws BusinessException {
@@ -233,5 +259,28 @@ public class BoutiquesBusiness {
                 logger.error("Error closing {}", c);
             }
         }
+    }
+
+    @SuppressWarnings("unchecked")
+    public Map<String, String> getOverriddenInputs(BoutiquesDescriptor descriptor) {
+        final String customKeyName = "vip:overriddenInputs";
+        Custom custom = descriptor.getCustom();
+        if (custom == null) {
+            return null;
+        }
+        Map<String, Object> customProperties = custom.getAdditionalProperties();
+        if (!customProperties.containsKey(customKeyName)) {
+            return null;
+        }
+        Map<String, String> result = new HashMap<String, String>();
+        Object overriddenInputs = customProperties.get(customKeyName);
+        if (overriddenInputs instanceof Map) {
+            Map<String, String> oi = (Map<String,String>)overriddenInputs;
+            for (String key: oi.keySet()) {
+                String value = oi.get(key);
+                result.put(key, value);
+            }
+        }
+        return result;
     }
 }

@@ -1,12 +1,10 @@
 package fr.insalyon.creatis.vip.core.server.business;
 
-import java.util.HashMap;
 import java.util.List;
 
 /*
     interface for the server configuration to allow several implementations
  */
-
 public interface Server {
 
     String VIP_DIR = "/.vip/";
@@ -84,19 +82,9 @@ public interface Server {
 
     String getCasURL();
 
-    String getSshPublicKey();
-
     String getSamlTrustedCertificate(String issuer);
 
     String getSAMLDefaultGroup(String issuer);
-
-    String getApplicationImporterFileRepository();
-
-    String getApplicationImporterRootFolder();
-
-    List<String> getApplicationImporterRequirements();
-
-    HashMap<String, Integer> getReservedClasses();
 
     List<String> getUndesiredMailDomains();
 
@@ -115,10 +103,6 @@ public interface Server {
     int getApiParallelDownloadNb();
 
     String getReproVIPRootDir();
-
-    boolean useMoteurlite();
-
-    boolean useRestMoteurServer();
 
     String getMoteurServerPassword();
 

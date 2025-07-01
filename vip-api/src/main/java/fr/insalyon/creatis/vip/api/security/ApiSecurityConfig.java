@@ -54,8 +54,6 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.authority.mapping.GrantedAuthoritiesMapper;
-import org.springframework.security.core.authority.mapping.SimpleAuthorityMapper;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
@@ -114,6 +112,7 @@ public class ApiSecurityConfig {
                         .requestMatchers(antMatcher("/rest/register")).permitAll()
                         .requestMatchers(antMatcher("/rest/executions/{executionId}/summary")).hasAnyRole("SERVICE")
                         .requestMatchers(antMatcher("/rest/statistics/**")).hasAnyRole("ADVANCED", "ADMINISTRATOR")
+                        .requestMatchers(antMatcher("/rest/admin/**")).hasAnyRole("ADMINISTRATOR")
                         .requestMatchers(antMatcher("/rest/**")).authenticated()
                         .anyRequest().permitAll()
                 )
@@ -184,16 +183,5 @@ public class ApiSecurityConfig {
         firewall.setAllowUrlEncodedSlash(true);
         return firewall;
     }
-
-    /**
-     * customize roles to match keycloak roles without ROLE_
-     */
-    @Bean
-    public GrantedAuthoritiesMapper grantedAuthoritiesMapper() {
-        SimpleAuthorityMapper mapper = new SimpleAuthorityMapper();
-        mapper.setConvertToUpperCase(true);
-        return mapper;
-    }
-
 
 }

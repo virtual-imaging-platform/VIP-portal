@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.insalyon.creatis.grida.client.GRIDACacheClient;
 import fr.insalyon.creatis.grida.client.GRIDAClient;
 import fr.insalyon.creatis.grida.client.GRIDAPoolClient;
-import fr.insalyon.creatis.grida.client.GRIDAZombieClient;
 import fr.insalyon.creatis.sma.client.SMAClient;
 import fr.insalyon.creatis.vip.core.server.business.Server;
 import org.slf4j.Logger;
@@ -28,6 +27,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import javax.sql.DataSource;
 import java.io.IOException;
+import java.net.UnknownHostException;
 
 import static org.springframework.util.ResourceUtils.CLASSPATH_URL_PREFIX;
 
@@ -102,15 +102,7 @@ public class SpringCoreConfig {
     }
 
     @Bean
-    public GRIDAZombieClient gridaZombieClient(Server server) {
-        return new GRIDAZombieClient(
-                server.getGRIDAHost(),
-                server.getGRIDAPort(),
-                server.getServerProxy(server.getVoName()));
-    }
-
-    @Bean
-    public SMAClient smaClient(Server server) {
+    public SMAClient smaClient(Server server) throws UnknownHostException {
         return new SMAClient(server.getSMAHost(), server.getSMAPort());
     }
 

@@ -39,7 +39,7 @@ public class LfcPathsBusinessTest {
         when(server.getAltDataManagerUsersHome()).thenReturn("");
         when(server.getAltDataManagerGroupsHome()).thenReturn("");
 
-        when(groupDAO.getGroups()).thenReturn(Collections.emptyList());
+        when(groupDAO.get()).thenReturn(Collections.emptyList());
         when(user.getFolder()).thenReturn("test_user");
 
         lfcPathsBusiness = new LfcPathsBusiness(server, groupDAO);
@@ -55,5 +55,15 @@ public class LfcPathsBusinessTest {
 
         assertEquals(relativePath, 
             lfcPathsBusiness.parseRealDir(absolutePath, user.getFolder()));
+    }
+
+    @Test
+    public void testLfnTransformation() throws DataManagerException {
+        assertEquals("/vip/Home/path/to/file.txt",
+                lfcPathsBusiness.parseRealDir("lfn:/var/data/users/test_user/path/to/file.txt", user.getFolder()));
+        assertEquals("/vip/Home/path/to/file.txt",
+                lfcPathsBusiness.parseRealDir("lfn://var/data/users/test_user/path/to/file.txt", user.getFolder()));
+        assertEquals("/vip/Home/path/to/file.txt",
+                lfcPathsBusiness.parseRealDir("lfn:///var/data/users/test_user/path/to/file.txt", user.getFolder()));
     }
 }

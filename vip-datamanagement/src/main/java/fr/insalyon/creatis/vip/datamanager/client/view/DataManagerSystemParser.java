@@ -31,20 +31,13 @@
  */
 package fr.insalyon.creatis.vip.datamanager.client.view;
 
-import com.smartgwt.client.widgets.tab.Tab;
 import fr.insalyon.creatis.vip.core.client.CoreModule;
 import fr.insalyon.creatis.vip.core.client.view.application.ApplicationParser;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
-import fr.insalyon.creatis.vip.datamanager.client.view.ssh.ManageSSHTab;
 import fr.insalyon.creatis.vip.datamanager.client.view.system.cache.ManageCachedFilesTab;
 import fr.insalyon.creatis.vip.datamanager.client.view.system.operation.ManageOperationsTab;
-import fr.insalyon.creatis.vip.datamanager.client.view.system.zombie.ManageZombieFilesTab;
 
-/**
- *
- * @author Rafael Ferreira da Silva
- */
 public class DataManagerSystemParser extends ApplicationParser {
 
     @Override
@@ -53,8 +46,6 @@ public class DataManagerSystemParser extends ApplicationParser {
         if (CoreModule.user.isSystemAdministrator()) {
             addApplication(DataManagerConstants.APP_OPERATIONS, DataManagerConstants.APP_IMG_OPERATIONS);
             addApplication(DataManagerConstants.APP_CACHED_FILES, DataManagerConstants.APP_IMG_CACHED_FILES);
-            addApplication(DataManagerConstants.APP_ZOMBIE_FILES, DataManagerConstants.APP_IMG_ZOMBIE_FILES);
-            addApplication(DataManagerConstants.APP_SSH, DataManagerConstants.APP_IMG_SSH);
         }
     }
 
@@ -72,20 +63,6 @@ public class DataManagerSystemParser extends ApplicationParser {
                 DataManagerConstants.TAB_MANAGE_CACHED_FILES,
                 ManageCachedFilesTab::new);
             return true;
-
-        } else if (applicationName.equals(DataManagerConstants.APP_ZOMBIE_FILES)) {
-            Layout.getInstance().addTab(
-                DataManagerConstants.TAB_MANAGE_ZOMBIE_FILES,
-                ManageZombieFilesTab::new);
-            return true;
-
-        }
-
-        else if (applicationName.equals(DataManagerConstants.APP_SSH)) {
-            Layout.getInstance().addTab(
-                DataManagerConstants.TAB_MANAGE_SSH, ManageSSHTab::new);
-            return true;
-
         }
         return false;
     }

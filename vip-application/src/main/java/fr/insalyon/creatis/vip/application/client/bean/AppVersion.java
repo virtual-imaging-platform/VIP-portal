@@ -31,41 +31,56 @@
  */
 package fr.insalyon.creatis.vip.application.client.bean;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 import com.google.gwt.user.client.rpc.IsSerializable;
 
-/**
- *
- * @author Rafael Ferreira da Silva
- */
 public class AppVersion implements IsSerializable {
 
     private String applicationName;
     private String version;
-    private String lfn;
-    private String jsonLfn;
+    private String descriptor;
     private String doi;
-    private boolean visible;;
-    private boolean boutiquesForm;
+    private boolean visible;
+    private List<Resource> resources;
+    private List<Tag> tags;
+    private Map<String, String> settings;
+    private String source;
 
-    public AppVersion() {
-    }
+    public AppVersion() {}
 
-    public AppVersion(
-            String applicationName, String version, String lfn, String jsonLfn, boolean visible,
-            boolean boutiquesForm) {
+    public AppVersion(String applicationName, String version, String descriptor,
+                      Map<String, String> settings, boolean visible, String source) {
         this.applicationName = applicationName;
         this.version = version;
-        this.lfn = lfn;
-        this.jsonLfn = jsonLfn;
+        this.descriptor = descriptor;
         this.visible = visible;
-        this.boutiquesForm = boutiquesForm;
+        this.source = source;
+        this.resources = new ArrayList<>();
+        this.tags = new ArrayList<>();
+        this.settings = settings;
     }
 
-    public AppVersion(
-            String applicationName, String version, String lfn, String jsonLfn, String doi, boolean visible,
-            boolean boutiquesForm) {
-        this(applicationName, version, lfn, jsonLfn, visible, boutiquesForm);
+    public AppVersion(String applicationName, String version, String descriptor, boolean visible) {
+        this(applicationName, version, descriptor, new HashMap<>(), visible, "");
+    }
+
+    public AppVersion(String applicationName, String version, String descriptor,
+                      String doi, Map<String, String> settings, boolean visible, String source) {
+        this(applicationName, version, descriptor, settings, visible, source);
         this.doi = doi;
+    }
+
+    public AppVersion(String applicationName, String version, String descriptor,
+                      String doi, boolean visible, String source, List<Resource> resources, List<Tag> tags) {
+        this(applicationName, version, descriptor, new HashMap<>(), visible, source);
+        this.doi = doi;
+        this.resources = resources;
+        this.tags = tags;
     }
 
     public String getApplicationName() {
@@ -76,23 +91,48 @@ public class AppVersion implements IsSerializable {
         return version;
     }
 
-    public String getLfn() {
-        return lfn;
+    public String getDescriptorFilename() {
+        // Return the "canonical filename" of the boutiques descriptor for this AppVersion.
+        // Both applicationName and version strings are assumed to be filename-safe already,
+        // except for spaces which are replaced with underscores.
+        return applicationName.replace(' ', '_') + '-' + version.replace(' ','_') + ".json";
     }
 
-    public String getJsonLfn() {
-        return jsonLfn;
-    }
+    public String getDescriptor() { return descriptor; }
 
     public String getDoi() {
         return doi;
+    }
+
+    public Map<String, String> getSettings() {
+        return settings;
     }
 
     public boolean isVisible() {
         return visible;
     }
 
-    public boolean isBoutiquesForm() {
-        return boutiquesForm;
+    public String getSource() {
+        return source;
+    }
+
+    public List<Resource> getResources() {
+        return resources;
+    }
+
+    public List<String> getResourcesNames() {
+        return resources.stream().map(Resource::getName).collect(Collectors.toList());
+    }
+
+    public List<Tag> getTags() {
+        return tags;
+    }
+
+    public void setResources(List<Resource> resources) {
+        this.resources = resources;
+    }
+
+    public void setTags(List<Tag> tags) {
+        this.tags = tags;
     }
 }

@@ -39,17 +39,17 @@ public class ReproVipBusiness {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private final PublicExecutionBusiness publicExecutionBusiness;
-    private final ApplicationBusiness applicationBusiness;
+    private final AppVersionBusiness appVersionBusiness;
     private final Server server;
     private final SimulationBusiness simulationBusiness;
     private final WorkflowBusiness workflowBusiness;
     private final ExternalPlatformBusiness externalPlatformBusiness;
 
     @Autowired
-    public ReproVipBusiness(ApplicationBusiness applicationBusiness, Server server, SimulationBusiness simulationBusiness,
+    public ReproVipBusiness(AppVersionBusiness appVersionBusiness, Server server, SimulationBusiness simulationBusiness,
             WorkflowBusiness workflowBusiness, ExternalPlatformBusiness externalPlatformBusiness,
             PublicExecutionBusiness publicExecutionBusiness) {
-        this.applicationBusiness = applicationBusiness;
+        this.appVersionBusiness = appVersionBusiness;
         this.server = server;
         this.simulationBusiness = simulationBusiness;
         this.workflowBusiness = workflowBusiness;
@@ -74,7 +74,7 @@ public class ReproVipBusiness {
             // verifying the application has a boutiques file
             Simulation simulation = workflowBusiness.getSimulation(workflow);
 
-            if (getBoutiquesDescriptorJsonPath(simulation.getApplicationName(), simulation.getApplicationVersion()) == null) {
+            if ( ! isBoutiquesDescriptorAvailable(simulation.getApplicationName(), simulation.getApplicationVersion())) {
                 logger.warn("Boutiques descriptor not found for " + simulation.getApplicationName() + ":" + simulation.getApplicationVersion());
                 return false;
             }
@@ -100,10 +100,11 @@ public class ReproVipBusiness {
         generateReprovipJson(reproVipDir, publicExecution);
     }
 
-    public List<Path> copyProvenanceFiles(Path reproVipDir, String executionID) throws BusinessException {
+    public List<Path> copyProvenanceFiles(Path reproVipDir, String workflowId) throws BusinessException {
         try {
             List<Path> copiedProvenanceFiles = new ArrayList<>();
-            Path provenanceDirPath = Paths.get(server.getWorkflowsPath() + "/" + executionID + "/provenance");
+            Path provenanceDirPath = Paths.get(server.getWorkflowsPath() + "/" + workflowId + "/provenance");
+            Path workflowDir = reproVipDir.resolve(workflowId);
 
             if ( ! Files.exists(provenanceDirPath)) {
                 logger.error("Error creating a reprovip directory : no provenance dir for {}", provenanceDirPath);
@@ -122,7 +123,7 @@ public class ReproVipBusiness {
                     String invocationID = fileName.substring(0, fileName.indexOf(".sh.provenance.json"));
 
                     // Create subfolder named with the invocationID
-                    Path invocationDir = reproVipDir.resolve(invocationID);
+                    Path invocationDir = workflowDir.resolve(invocationID);
                     if ( ! Files.exists(invocationDir)) {
                         Files.createDirectories(invocationDir);
                     }
@@ -138,7 +139,7 @@ public class ReproVipBusiness {
             return copiedProvenanceFiles;
 
         } catch (IOException e) {
-            logger.error("Error while copying provenance files for {}", executionID, e);
+            logger.error("Error while copying provenance files for {}", workflowId, e);
             throw new BusinessException("Error while copying provenance files", e);
         }
     }
@@ -162,6 +163,9 @@ public class ReproVipBusiness {
 
     private Map<String, Object> formatWorkflowData(Path reproVipDir, WorkflowData workflowData, PublicExecution execution)
             throws BusinessException, DAOException {
+        // since boutiques descriptor in now SQL Json field
+        copyBoutiquesDescriptor(workflowData.getAppName(), workflowData.getAppVersion(), reproVipDir, workflowData.getWorkflowId());
+
         Map<String, Object> data = new HashMap<>();
         List<Path> provenancesFiles = copyProvenanceFiles(reproVipDir, workflowData.getWorkflowId());
         List<String> outputIds = execution.getMappedOutputIds().getOrDefault(workflowData.getWorkflowId(), Collections.emptyList());
@@ -169,7 +173,6 @@ public class ReproVipBusiness {
         // we convert path to string because if there are some caracters like " " by default it encodes it
         data.put("workflowId", workflowData.getWorkflowId());
         data.put("directory", reproVipDir.resolve(workflowData.getWorkflowId()).toString());
-        data.put("boutique_descriptor", getBoutiquesDescriptorJsonPath(workflowData.getAppName(), workflowData.getAppVersion()));
         data.put("provenances_files", provenancesFiles.stream().map(Path::toString).collect(Collectors.toList()));
         data.put("invocation_outputs", getInvocationsOutputs(workflowData.getWorkflowId(), provenancesFiles, outputIds));
 
@@ -238,14 +241,26 @@ public class ReproVipBusiness {
         }
     }
 
-    public String getBoutiquesDescriptorJsonPath(String applicationName, String applicationVersion) throws BusinessException {
-        AppVersion appVersion = applicationBusiness.getVersion(applicationName, applicationVersion);
+    private String copyBoutiquesDescriptor(String applicationName, String applicationVersion, Path target, String workflowId) throws BusinessException {
+        // Write the boutiques descriptor to reprovip path
+        AppVersion appVersion = appVersionBusiness.getVersion(applicationName, applicationVersion);
+        Path workflowDir = target.resolve(workflowId);
 
-        if (appVersion != null && appVersion.getJsonLfn() != null) {
-            return appVersion.getJsonLfn();
-        } else {
-            return null;
+        try {
+            if ( ! Files.exists(workflowDir)) {
+                Files.createDirectory(workflowDir);
+            }
+            return Files.writeString(workflowDir.resolve(applicationName + ".json"), appVersion.getDescriptor()).toString();
+        } catch (IOException e) {
+            logger.error("Failed to export descriptor to {}!", target.toAbsolutePath());
+            throw new BusinessException("Failed to export descriptor to reprovip dir!", e);
         }
+    }
+
+    private boolean isBoutiquesDescriptorAvailable(String applicationName, String applicationVersion) throws BusinessException {
+        String descriptor = appVersionBusiness.getVersion(applicationName, applicationVersion).getDescriptor();
+
+        return descriptor != null && ! descriptor.isEmpty();
     }
 
     /*

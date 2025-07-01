@@ -5,9 +5,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.stream.Stream;
 
 import jakarta.annotation.PostConstruct;
 
@@ -135,7 +133,6 @@ public class SpringConfigServer implements Server {
         assertPropertyIsPresent(CoreConstants.LAB_APACHE_HOST);
         assertPropertyIsPresent(CoreConstants.LAB_APACHE_SSL_PORT);
         assertPropertyIsPresent(CoreConstants.LAB_CAS_URL);
-        assertPropertyIsPresent(CoreConstants.SSH_PUBLIC_KEY);
 
         assertPropertyIsPresent(CoreConstants.UNDESIRED_MAIL_DOMAINS, List.class);
         assertPropertyIsPresent(CoreConstants.UNDESIRED_COUNTRIES, List.class);
@@ -143,9 +140,6 @@ public class SpringConfigServer implements Server {
         assertPropertyIsPresent(CoreConstants.APPLET_GATELAB_CLASSES, List.class);
         assertPropertyIsPresent(CoreConstants.APPLET_GATELABTEST_CLASSES, List.class);
 
-        assertPropertyIsNotEmpty(CoreConstants.APPLICATION_FILES_REPOSITORY);
-        assertPropertyIsNotEmpty(CoreConstants.APP_IMPORTER_ROOT_FOLDER);
-        assertPropertyIsPresent(CoreConstants.APP_REQUIREMENTS, List.class);
         assertPropertyIsNotEmpty(CoreConstants.PUBLICATION_SYSTEM_COMMAND);
 
         assertPropertyIsNotEmpty(CoreConstants.GIRDER_TOKEN_DURATION_IN_DAYS, Float.class);
@@ -361,11 +355,6 @@ public class SpringConfigServer implements Server {
     }
 
     @Override
-    public String getSshPublicKey() {
-        return env.getRequiredProperty(CoreConstants.SSH_PUBLIC_KEY);
-    }
-
-    @Override
     public String getSamlTrustedCertificate(String issuer) {
         logger.info("Getting trusted certificate for issuer {}", issuer);
         return env.getRequiredProperty(CoreConstants.SAML_TRUSTED_CERTIFICATE+"."+issuer);
@@ -375,37 +364,6 @@ public class SpringConfigServer implements Server {
     public String getSAMLDefaultGroup(String issuer) {
         logger.info("Getting default group for issuer "+issuer);
         return env.getRequiredProperty(CoreConstants.SAML_DEFAULT_GROUP +"."+issuer);
-    }
-
-    @Override
-    public String getApplicationImporterFileRepository() {
-        return env.getRequiredProperty(CoreConstants.APPLICATION_FILES_REPOSITORY);
-    }
-
-    @Override
-    public String getApplicationImporterRootFolder() {
-        return env.getRequiredProperty(CoreConstants.APP_IMPORTER_ROOT_FOLDER);
-    }
-
-    @Override
-    public List<String> getApplicationImporterRequirements() {
-        return Arrays.asList(env.getRequiredProperty(CoreConstants.APP_REQUIREMENTS, String[].class));
-    }
-
-    @Override
-    public HashMap<String, Integer> getReservedClasses() {
-        HashMap<String, Integer> reservedClasses = new HashMap<>();
-        Stream.of(
-                env.getRequiredProperty(
-                        CoreConstants.APPLET_GATELAB_CLASSES,
-                        String[].class))
-                .forEach(className -> reservedClasses.put(className,0));
-        Stream.of(
-                env.getRequiredProperty(
-                        CoreConstants.APPLET_GATELABTEST_CLASSES,
-                        String[].class))
-                .forEach(className -> reservedClasses.put(className,0));
-        return reservedClasses;
     }
 
     @Override
@@ -451,16 +409,6 @@ public class SpringConfigServer implements Server {
     @Override
     public String getReproVIPRootDir() {
         return env.getProperty(CoreConstants.REPROVIP_ROOT_DIR, "/vip/ReproVip/");
-    }
-
-    @Override
-    public boolean useMoteurlite() {
-        return env.getProperty(CoreConstants.USE_MOTEURLITE, Boolean.class, false);
-    }
-
-    @Override
-    public boolean useRestMoteurServer() {
-        return env.getProperty(CoreConstants.USE_REST_MOTEUR_SERVER, Boolean.class, false);
     }
 
     @Override

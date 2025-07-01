@@ -1,5 +1,6 @@
 package fr.insalyon.creatis.vip.application.client.view.boutiquesParsing;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -21,7 +22,7 @@ import fr.insalyon.creatis.vip.application.client.bean.boutiquesTools.BoutiquesS
  * @author Guillaume Vanel
  * @version %I%, %G%
  */
-public class BoutiquesParser extends AbstractJsonParser{
+public class BoutiquesParser extends AbstractJsonParser {
 
     /**
      * Parse JSON Boutiques descriptor
@@ -37,7 +38,9 @@ public class BoutiquesParser extends AbstractJsonParser{
         String name = getStringValue(parsedDescriptor, "name");
         String description = getStringValue(parsedDescriptor, "description");
         String version = getStringValue(parsedDescriptor, "tool-version");
-        BoutiquesApplication application = new BoutiquesApplication(name, description, version);
+        // we use the "descriptor" String to preserve the original descriptor JSON content
+        // alternatively, parsedDescriptor.toString() contains the parsed descriptor
+        BoutiquesApplication application = new BoutiquesApplication(name, description, version, descriptor);
         // Inputs
         JSONArray inputsArray = getArrayValue(parsedDescriptor, "inputs", false);
         for(int inputNo = 0; inputNo < inputsArray.size(); inputNo++){
@@ -85,20 +88,6 @@ public class BoutiquesParser extends AbstractJsonParser{
                 }
             }
         }
-        // Tags
-        JSONObject tagsJSONObject = getObjectValue(parsedDescriptor, "tags", true);
-        if (tagsJSONObject != null) {
-            for (String key : tagsJSONObject.keySet()) {
-                String value;
-                try {
-                     value = getStringValue(tagsJSONObject, key);
-                } catch (InvalidBoutiquesDescriptorException exception){
-                    throw new InvalidBoutiquesDescriptorException("Invalid Boutiques descriptor: tag with key '" + key
-                            + "' is not a valid String.", exception);
-                }
-                application.addTag(key, value);
-            }
-        }
         // Container image
         JSONObject containerObject = getObjectValue(parsedDescriptor, "container-image", true);
         if (containerObject != null) {
@@ -117,9 +106,16 @@ public class BoutiquesParser extends AbstractJsonParser{
             application.setVipContainer(getStringValue(customObject, "vip:imagepath", true));
             application.setVipDotInputIds(getArrayValueAsStringSet(customObject, "vip:dot", true));
             application.setVipDotIncludesResultsDir(getBooleanValue(customObject, "vip:dot-with-results-directory", true));
+            JSONObject vipOverriddenInputs = getObjectValue(customObject, "vip:overriddenInputs", true);
+            if (vipOverriddenInputs != null) {
+                Map<String, String> overriddenInputs = new HashMap<>();
+                for (String key: vipOverriddenInputs.keySet()) {
+                    String value = getStringValue(vipOverriddenInputs, key);
+                    overriddenInputs.put(key, value);
+                }
+                application.setVipOverriddenInputs(overriddenInputs);
+            }
         }
-        // Json descriptor
-        application.setJsonFile(parsedDescriptor.toString());
         return application;
     }
 

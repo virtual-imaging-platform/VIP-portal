@@ -10,6 +10,7 @@ import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
+import org.springframework.security.core.authority.mapping.SimpleAuthorityMapper;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtDecoders;
 import org.springframework.security.oauth2.jwt.SupplierJwtDecoder;
@@ -25,17 +26,21 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Collection;
 
 @Service
 public class OidcResolver {
     private final Logger logger = LoggerFactory.getLogger(getClass());
     private final ConfigurationBusiness configurationBusiness;
     private final OidcConfig oidcConfig;
+    private final SimpleAuthorityMapper authoritiesMapper;
 
     @Autowired
     public OidcResolver(ConfigurationBusiness configurationBusiness, OidcConfig oidcConfig) {
         this.configurationBusiness = configurationBusiness;
         this.oidcConfig = oidcConfig;
+        this.authoritiesMapper = new SimpleAuthorityMapper();
+        this.authoritiesMapper.setConvertToUpperCase(true);
     }
 
     // Common "Bad credentials" exception for Jwt to User resolution errors
@@ -74,7 +79,7 @@ public class OidcResolver {
     // Create authorities list from jwt claims.
     // Parsing realm_access.roles or resource_access.<resourceName>.roles is Keycloak-specific.
     @SuppressWarnings("unchecked")
-    private List<GrantedAuthority> parseAuthorities(User user, Jwt jwt) {
+    private Collection<GrantedAuthority> parseAuthorities(User user, Jwt jwt) {
         List<String> roles = new ArrayList<>(); // default to no roles
         // At this point, jwt has already been verified by Spring resource server, so we assume the issuer is known (server != null).
         // Also, we only handle Keycloak-generated tokens for now, so we assume realm_access and roles fields to exist.
@@ -95,10 +100,12 @@ public class OidcResolver {
             Map<String, Object> realmAccess = jwt.getClaimAsMap("realm_access");
             roles = (List<String>) realmAccess.get("roles");
         }
-        // here we could also map an authority from user level, as done by Apikey auth:
-        // roles.add("ROLE_" + user.getLevel().name().toUpperCase());
-        // but the existing Keycloak only used JWT-provided authorities
-        return AuthorityUtils.createAuthorityList(roles);
+        // Note that, contrary to Apikey auth, we don't derive any permission from user level here, and only rely on JWT roles.
+        Collection<GrantedAuthority> oidcRoles = AuthorityUtils.createAuthorityList(roles);
+        // Map JWT roles to Spring authorities, with implicit "ROLE_" prefix and uppercase conversion.
+        // For instance, a Keycloak "administrator" role is mapped to the "ROLE_ADMINISTRATOR" authority.
+        Collection<GrantedAuthority> mappedAuthorities = authoritiesMapper.mapAuthorities(oidcRoles);
+        return mappedAuthorities;
     }
 
     // Custom converter class to transform Spring-provided Jwt into our own OidcToken, so that we can resolve and cache
@@ -113,7 +120,7 @@ public class OidcResolver {
             // We could also, but do not, check aud: this is optional in OIDC spec, and wasn't done by previous implementation.
             // Now we have to resolve DB user, and map authorizations.
             User user = oidcResolver.getVipUser(jwt);
-            List<GrantedAuthority> authorities = oidcResolver.parseAuthorities(user, jwt);
+            Collection<GrantedAuthority> authorities = oidcResolver.parseAuthorities(user, jwt);
             return new OidcToken(user, jwt, authorities);
         }
     }

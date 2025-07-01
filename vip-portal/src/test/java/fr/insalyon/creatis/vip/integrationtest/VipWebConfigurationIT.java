@@ -7,6 +7,8 @@ import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.util.CountryCode;
 import fr.insalyon.creatis.vip.core.server.SpringCoreConfig;
 import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
+import fr.insalyon.creatis.vip.core.server.business.EmailBusiness;
+
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -35,9 +37,10 @@ the production one. Do tests on the api.
  */
 @SpringJUnitWebConfig(value = SpringCoreConfig.class)
 @ActiveProfiles({"test-db", "test"}) // to take random h2 database and not the test h2 jndi one
-// to disable the default mysql/innodb engine on database init
-// also configure the vip conf files to be searched in classpath
-@TestPropertySource(properties = {"db.tableEngine=", "vipConfigFolder=classpath:"})
+@TestPropertySource(properties = {
+        "db.tableEngine=",             // to disable the default mysql/innodb engine on database init
+        "db.jsonType=TEXT",            // to workaround h2/mysql differences on JSON type
+        "vipConfigFolder=classpath:"}) // also configure the vip conf files to be searched in classpath
 @Transactional
 public class VipWebConfigurationIT {
 
@@ -46,6 +49,7 @@ public class VipWebConfigurationIT {
     private MockMvc mockMvc;
 
     @Autowired private GRIDAClient gridaClient;
+    @Autowired private EmailBusiness emailBusiness;
     @Autowired private ConfigurationBusiness configurationBusiness;
 
     @BeforeEach
@@ -59,6 +63,7 @@ public class VipWebConfigurationIT {
 
     @Test
     public void testGetPipelines() throws Exception {
+        Mockito.doReturn(new String[]{"test@admin.test"}).when(emailBusiness).getAdministratorsEmails();
         User newUser = new User("firstName",
                 "LastName", "testEmail@test.tst", "Test institution",
                 "testPassword", CountryCode.fr,

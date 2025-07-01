@@ -9,7 +9,6 @@ import org.springframework.transaction.annotation.Transactional;
 import fr.insalyon.creatis.vip.application.client.bean.PublicExecution;
 import fr.insalyon.creatis.vip.application.server.dao.PublicExecutionDAO;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
-import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
 import fr.insalyon.creatis.vip.core.server.business.EmailBusiness;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 
@@ -17,13 +16,11 @@ import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 @Transactional
 public class PublicExecutionBusiness {
     final private PublicExecutionDAO publicExecutionDAO;
-    final private ConfigurationBusiness configurationBusiness;
     final private EmailBusiness emailBusiness;
 
     @Autowired
-    public PublicExecutionBusiness(PublicExecutionDAO publicExecutionDAO, ConfigurationBusiness configurationBusiness, EmailBusiness emailBusiness) {
+    public PublicExecutionBusiness(PublicExecutionDAO publicExecutionDAO, EmailBusiness emailBusiness) {
         this.publicExecutionDAO = publicExecutionDAO;
-        this.configurationBusiness = configurationBusiness;
         this.emailBusiness = emailBusiness;
     }
 
@@ -51,7 +48,7 @@ public class PublicExecutionBusiness {
                     + "</body>"
                     + "</html>";
 
-            for (String supportEmail : configurationBusiness.getSupportEmails()) {
+            for (String supportEmail : emailBusiness.getAdministratorsEmails()) {
                 emailBusiness.sendEmail("[VIP Admin] Execution Public Request", adminsEmailContents,
                         new String[]{supportEmail}, true, publicExecution.getAuthor());
             }

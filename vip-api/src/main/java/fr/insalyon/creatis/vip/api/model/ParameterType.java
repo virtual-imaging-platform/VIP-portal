@@ -31,12 +31,8 @@
  */
 package fr.insalyon.creatis.vip.api.model;
 
-import fr.insalyon.creatis.vip.application.server.model.boutiques.Input;
+import fr.insalyon.creatis.boutiques.model.Input;
 
-/**
- * 
- * @author Tristan Glatard
- */
 public enum ParameterType {
     // TODO improve (de)serialisation (enums should be in capital)
     File, String, Boolean, Int64, Double, List;

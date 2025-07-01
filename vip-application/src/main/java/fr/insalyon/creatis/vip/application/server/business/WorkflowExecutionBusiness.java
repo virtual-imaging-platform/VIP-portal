@@ -33,10 +33,10 @@ package fr.insalyon.creatis.vip.application.server.business;
 
 import fr.insalyon.creatis.moteur.plugins.workflowsdb.bean.Workflow;
 import fr.insalyon.creatis.moteur.plugins.workflowsdb.bean.WorkflowStatus;
+import fr.insalyon.creatis.vip.application.client.bean.AppVersion;
 import fr.insalyon.creatis.vip.application.client.view.monitor.SimulationStatus;
 import fr.insalyon.creatis.vip.application.server.business.simulation.ParameterSweep;
 import fr.insalyon.creatis.vip.application.server.business.simulation.WorkflowEngineInstantiator;
-import fr.insalyon.creatis.vip.application.server.business.util.FileUtil;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.business.Server;
@@ -45,18 +45,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import javax.xml.rpc.ServiceException;
-import java.io.File;
 import java.rmi.RemoteException;
 import java.util.Date;
 import java.util.List;
 
-/**
- * Wrapper on WebServiceEngine to configure it and to create a Workflow object
- * after a launch.
- *
- * @author Rafael Ferreira da Silva
- */
 @Service
 public class WorkflowExecutionBusiness {
 
@@ -72,23 +68,23 @@ public class WorkflowExecutionBusiness {
         this.engine = engine;
     }
 
-    public Workflow launch(String engineEndpoint, String applicationName, String applicationVersion,
-            String applicationClass, User user, String simulationName,
-            String workflowPath, List<ParameterSweep> parameters) throws BusinessException {
+    public Workflow launch(String engineEndpoint, AppVersion appVersion, User user, String simulationName,
+            List<ParameterSweep> parameters, String settings, String executorConfig) throws BusinessException {
 
         try {
-            String workflowContent = FileUtil.read(new File(workflowPath));
+            String workflowContent = appVersion.getDescriptor();
             String inputs = (parameters != null) ? getParametersAsXMLInput(parameters) : null;
             String proxyFileName = server.getServerProxy(server.getVoName());
-            String workflowID = engine.launch(engineEndpoint, workflowContent, inputs, "", proxyFileName);
+            String settingsJSON = new ObjectMapper().writeValueAsString(appVersion.getSettings());
+            String workflowID = engine.launch(engineEndpoint, workflowContent, inputs, settingsJSON, executorConfig, proxyFileName);
             return new Workflow(workflowID, user.getFullName(),
-                    WorkflowStatus.Running,
-                    new Date(), null, simulationName, applicationName, applicationVersion, applicationClass,
+                    WorkflowStatus.Running, new Date(), null, simulationName, 
+                    appVersion.getApplicationName(), appVersion.getVersion(), "",
                     engineEndpoint, null);
 
-        } catch (ServiceException | RemoteException ex) {
+        } catch (ServiceException | RemoteException | JsonProcessingException ex) {
             logger.error("Error launching simulation {} ({}/{})",
-                    simulationName, applicationName, applicationVersion, ex);
+                    simulationName, appVersion.getApplicationName(), appVersion.getVersion(), ex);
             throw new BusinessException(ex);
         }
     }

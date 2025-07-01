@@ -9,6 +9,7 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import com.google.gwt.json.client.JSONObject;
 import com.google.gwt.user.client.rpc.IsSerializable;
 
 import fr.insalyon.creatis.vip.application.client.bean.boutiquesTools.BoutiquesInput.InputType;
@@ -24,11 +25,11 @@ public class BoutiquesApplication implements IsSerializable {
     private String name;
     private String description;
     private String version;
+    private String originalDescriptor;
     private Set<BoutiquesInput> inputs = new HashSet<>();
     // Input dependencies
     private Set<BoutiquesGroup> groups = new HashSet<>();
     // Other properties not used for launch form generation
-    private String applicationLFN;
     private String author;
     private String commandLine;
     private String containerType;
@@ -40,9 +41,9 @@ public class BoutiquesApplication implements IsSerializable {
     private String vipContainer;
     private Set<BoutiquesOutputFile> outputFiles = new HashSet<>();
     private Map<String, String> tags = new HashMap<>();
-    private String jsonFile;
     private Set<String> vipDotInputIds;
     private boolean vipDotIncludesResultsDir;
+    private Map<String, String> vipOverriddenInputs;
 
     private BoutiquesApplicationExtensions boutiquesExtensions;
 
@@ -53,10 +54,11 @@ public class BoutiquesApplication implements IsSerializable {
      * @param description String
      * @param version String
      */
-    public BoutiquesApplication(String name, String description, String version){
+    public BoutiquesApplication(String name, String description, String version, String originalDescriptor) {
         this.name = name;
         this.description = description;
         this.version = version;
+        this.originalDescriptor = originalDescriptor;
     }
 
     public void setBoutiquesExtensions(BoutiquesApplicationExtensions boutiquesExtensions) {
@@ -83,6 +85,8 @@ public class BoutiquesApplication implements IsSerializable {
     public String getDescription(){
         return this.description;
     }
+
+    public String getOriginalDescriptor() { return this.originalDescriptor; }
 
     /**
      * @return Array of BoutiquesInputs representing application inputs
@@ -194,40 +198,8 @@ public class BoutiquesApplication implements IsSerializable {
         return outputFiles;
     }
 
-    public String getJsonFile() {
-        return jsonFile;
-    }
-
-    public void setJsonFile(String jsonFile) {
-        this.jsonFile = jsonFile;
-    }
-
-    public String getApplicationLFN() {
-        return applicationLFN;
-    }
-
-    public String getWrapperLFN() {
-        return this.applicationLFN + "/bin/" + getName() + ".sh";
-    }
-
-    public String getWrapperName() {
-        return getName() + ".sh";
-    }
-
-    public String getGASWLFN() {
-        return this.applicationLFN + "/gasw/" + getName() + ".xml";
-    }
-
-    public String getGwendiaLFN() {
-        return this.applicationLFN + "/workflow/" + getName() + ".gwendia";
-    }
-
     public Map<String, String> getTags() {
         return tags;
-    }
-
-    public String getJsonLFN() {
-        return this.applicationLFN + "/json/" + getName() + ".json";
     }
 
     public String getVipContainer() {
@@ -256,6 +228,10 @@ public class BoutiquesApplication implements IsSerializable {
 
     public boolean getVipDotIncludesResultsDir() {
         return vipDotIncludesResultsDir;
+    }
+
+    public Map<String, String> getVipOverriddenInputs() {
+        return vipOverriddenInputs;
     }
 
     public void addInput(BoutiquesInput input){
@@ -298,10 +274,6 @@ public class BoutiquesApplication implements IsSerializable {
         this.challengerTeam = challengerTeam;
     }
 
-    public void setApplicationLFN(String applicationLFN) {
-        this.applicationLFN = applicationLFN;
-    }
-
     public void addTag(String key, String value) {
         tags.put(key, value);
     }
@@ -316,5 +288,9 @@ public class BoutiquesApplication implements IsSerializable {
 
     public void setVipDotIncludesResultsDir(boolean vipDotIncludesResultsDir) {
         this.vipDotIncludesResultsDir = vipDotIncludesResultsDir;
+    }
+
+    public void setVipOverriddenInputs(Map<String, String> vipOverriddenInputs) {
+        this.vipOverriddenInputs = vipOverriddenInputs;
     }
 }

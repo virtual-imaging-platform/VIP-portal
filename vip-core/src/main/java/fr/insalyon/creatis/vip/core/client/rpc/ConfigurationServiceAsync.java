@@ -40,17 +40,9 @@ import java.sql.Timestamp;
 import java.util.List;
 import java.util.Map;
 
-/**
- *
- * @author Rafael Ferreira da Silva
- */
 public interface ConfigurationServiceAsync {
 
     void configure(String email, String session, AsyncCallback<User> asyncCallback);
-
-    void signup(User user, String comments, AsyncCallback<Void> asyncCallback);
-
-    void signin(String email, String password, AsyncCallback<User> asyncCallback);
 
     void signout(AsyncCallback<Void> asyncCallback);
 
@@ -68,6 +60,10 @@ public interface ConfigurationServiceAsync {
 
     void getPublicGroups(AsyncCallback<List<Group>> asyncCallback);
 
+    void getItemsGroup(String groupname, AsyncCallback<List<String>> asyncCallback);
+
+    void removeItemFromGroup(String item, String groupname, AsyncCallback<Void> asyncCallback);
+
     void updateGroup(String name, Group group, AsyncCallback<Void> asyncCallback);
 
     void removeUser(String email, AsyncCallback<User> asyncCallback);
@@ -76,7 +72,7 @@ public interface ConfigurationServiceAsync {
 
     void getUserPropertiesGroups(AsyncCallback<List<Boolean>> asyncCallback);
 
-    void getUserGroups(AsyncCallback<List<String>> asyncCallback);
+    void getUserGroups(AsyncCallback<List<Group>> asyncCallback);
 
     void updateUser(String email, UserLevel level, CountryCode countryCode, int maxRunningSimulations, Map<String, CoreConstants.GROUP_ROLE> groups, boolean locked, AsyncCallback<Void> asyncCallback);
 
@@ -132,4 +128,6 @@ public interface ConfigurationServiceAsync {
     void deleteUserApikey(String email, AsyncCallback<Void> async);
 
     void generateNewUserApikey(String email, AsyncCallback<String> async);
+
+    void getMissingGroupsRessources(String email, AsyncCallback<List<String>> async);
 }

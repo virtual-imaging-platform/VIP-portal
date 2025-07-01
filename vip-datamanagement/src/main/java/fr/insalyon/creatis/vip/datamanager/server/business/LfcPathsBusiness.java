@@ -59,7 +59,7 @@ public class LfcPathsBusiness {
                 server.getVoRoot());
 
         try {
-            for (Group group : groupDAO.getGroups()) {
+            for (Group group : groupDAO.get()) {
                 String folderName = group.getName().replaceAll(" ", "_");
 
                 baseDir = parsePath(baseDir, group.getName() + DataManagerConstants.GROUP_APPEND,
@@ -97,10 +97,17 @@ public class LfcPathsBusiness {
     public String parseRealDir(String baseDir, String currentUserFolder)
             throws DataManagerException {
 
-        if (baseDir.startsWith("lfn://")) {
-            baseDir = URI.create(baseDir).getPath();
+        if (baseDir.startsWith("lfn:/")) {
+            baseDir = baseDir.substring(4);
         } else if (baseDir.startsWith("file:")) {
-            baseDir = baseDir.substring(5,  baseDir.length());
+            baseDir = baseDir.substring(5);
+        }
+        // only keep 1 slash
+        if  (baseDir.startsWith("/")) {
+            while (baseDir.startsWith("/")) {
+                baseDir = baseDir.substring(1);
+            }
+            baseDir = "/" + baseDir;
         }
 
         baseDir = replaceLfnUserPrefix(
@@ -108,7 +115,7 @@ public class LfcPathsBusiness {
                 server.getAltDataManagerUsersHome());
 
         try {
-            for (Group group : groupDAO.getGroups()) {
+            for (Group group : groupDAO.get()) {
                 baseDir = replaceLfnGroupPrefix(baseDir, group.getName(),
                         server.getDataManagerGroupsHome(),
                         server.getAltDataManagerGroupsHome());

@@ -1,7 +1,6 @@
 package fr.insalyon.creatis.vip.application.integrationtest;
 
 import fr.insalyon.creatis.moteur.plugins.workflowsdb.dao.*;
-import fr.insalyon.creatis.vip.application.server.business.simulation.RestServiceEngine;
 import fr.insalyon.creatis.vip.application.server.business.simulation.WorkflowEngineInstantiator;
 import org.hibernate.SessionFactory;
 import org.mockito.Mockito;

@@ -38,7 +38,6 @@ import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
 import fr.insalyon.creatis.vip.application.client.bean.InOutData;
 import fr.insalyon.creatis.vip.application.client.bean.Simulation;
 import fr.insalyon.creatis.vip.application.client.view.monitor.SimulationStatus;
-import fr.insalyon.creatis.vip.application.server.business.ApplicationBusiness;
 import fr.insalyon.creatis.vip.application.server.business.SimulationBusiness;
 import fr.insalyon.creatis.vip.application.server.business.WorkflowBusiness;
 import fr.insalyon.creatis.vip.core.client.bean.Group;
@@ -79,21 +78,18 @@ public class ExecutionBusiness {
     private final WorkflowBusiness workflowBusiness;
     private final PipelineBusiness pipelineBusiness;
     private final ConfigurationBusiness configurationBusiness;
-    private final ApplicationBusiness applicationBusiness;
 
     @Autowired
     public ExecutionBusiness(Supplier<User> currentUserProvider,
                              SimulationBusiness simulationBusiness,
                              WorkflowBusiness workflowBusiness,
                              ConfigurationBusiness configurationBusiness,
-                             ApplicationBusiness applicationBusiness,
                              PipelineBusiness pipelineBusiness,
                              DataApiBusiness dataApiBusiness) {
         this.currentUserProvider = currentUserProvider;
         this.simulationBusiness = simulationBusiness;
         this.workflowBusiness = workflowBusiness;
         this.configurationBusiness = configurationBusiness;
-        this.applicationBusiness = applicationBusiness;
         this.pipelineBusiness = pipelineBusiness;
         this.dataApiBusiness = dataApiBusiness;
     }
@@ -233,7 +229,6 @@ public class ExecutionBusiness {
                     null, // User must be null to take examples from other users
                     null, // application
                     WorkflowStatus.Completed.name(), // status
-                    null, // class
                     null, // startDate
                     null, // endDate
                     ApplicationConstants.WORKKFLOW_EXAMPLE_TAG
@@ -255,8 +250,8 @@ public class ExecutionBusiness {
                     currentUserProvider.get().getFullName(),
                     null, // application
                     null, // status
-                    null, // class
                     null, // startDate
+                    null, // endDate
                     null // endDate
             );
             logger.debug("Counting executions, found {} simulations.", simulations.size());
@@ -376,19 +371,31 @@ public class ExecutionBusiness {
                     continue;
                 }
                 // then ok if input has a default value (and we set it)
-                // beware : with gwendia, optional always have an defaultValue (either defined or No_Value_Provided)
                 if (pp.getDefaultValue() != null) {
                     inputValues.put(pp.getName(), pp.getDefaultValue().toString());
                     continue;
                 }
                 // then ok if it is optional
-                // beware, with gwendia it should not be possible to enter this case (see previous condition)
                 if (pp.isOptional()) {
                     continue;
                 }
                 // error : pp is an empty input with no default value and it is not optional
                 logger.error("Error initialising {}, missing {} parameter", pipelineId, pp.getName());
                 throw new ApiException(ApiException.ApiError.INPUT_FIELD_MISSING, pp.getName());
+            }
+
+            // fill in overriddenInputs from explicit inputs
+            Map<String, String> overriddenInputs = p.getOverriddenInputs();
+            if (overriddenInputs != null) {
+                for (String key : overriddenInputs.keySet()) {
+                    String value = overriddenInputs.get(key);
+                    if (inputValues.containsKey(value)) {
+                        inputValues.put(key, inputValues.get(value));
+                    } else {
+                        logger.error("Error initialising {}, missing {} parameter", pipelineId, value);
+                        throw new ApiException(ApiException.ApiError.INPUT_FIELD_MISSING, value);
+                    }
+                }
             }
 
             boolean inputsContainsResultsDirectoryInput = inputValues.containsKey(CoreConstants.RESULTS_DIRECTORY_PARAM_NAME);
@@ -413,15 +420,6 @@ public class ExecutionBusiness {
             String applicationName = pipelineBusiness.getApplicationName(pipelineId);
             String applicationVersion = pipelineBusiness.getApplicationVersion(pipelineId);
 
-            // Get application classes
-            List<String> classes = applicationBusiness
-                    .getApplication(applicationName)
-                    .getApplicationClasses();
-            if (classes.isEmpty()) {
-                logger.error("No class configured for {}", pipelineId);
-                throw new ApiException(ApiException.ApiError.INVALID_EXECUTION_INIT,
-                        "Application " + applicationName + " cannot be launched because it doesn't belong to any VIP class.");
-            }
 
             logger.info("Launching workflow with the following parameters: ");
             logger.info(currentUserProvider.get().toString());
@@ -429,7 +427,6 @@ public class ExecutionBusiness {
             logger.info(inputValues.toString());
             logger.info(applicationName);
             logger.info(applicationVersion);
-            logger.info(classes.get(0));
             logger.info(executionName);
 
             // Launch the workflow
@@ -439,7 +436,6 @@ public class ExecutionBusiness {
                     inputValues,
                     applicationName,
                     applicationVersion,
-                    classes.get(0),
                     executionName);
         } catch (BusinessException ex) {
             throw new ApiException(ex);

@@ -11,7 +11,6 @@ import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.Layout;
 import com.smartgwt.client.widgets.layout.VLayout;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
-import fr.insalyon.creatis.vip.application.client.bean.Descriptor;
 import fr.insalyon.creatis.vip.application.client.bean.boutiquesTools.*;
 import fr.insalyon.creatis.vip.application.client.rpc.ApplicationService;
 import fr.insalyon.creatis.vip.application.client.view.boutiquesParsing.InvalidBoutiquesDescriptorException;
@@ -316,7 +315,11 @@ public class LaunchFormLayout extends AbstractFormLayout {
                 .filter(i -> i.isOptional()).collect(Collectors.toSet());
 
 
+        Map<String, String> overriddenInputs = applicationDescriptor.getVipOverriddenInputs();
         for (BoutiquesInput input : mandatoryInputs) {
+            if (overriddenInputs != null && overriddenInputs.containsKey(input.getId())) {
+                continue; // do not put overridden inputs in the form, they'll be filled in server-side
+            }
             configureInput(applicationDescriptor, input);
         }
         if (optionalInputs.isEmpty()) {

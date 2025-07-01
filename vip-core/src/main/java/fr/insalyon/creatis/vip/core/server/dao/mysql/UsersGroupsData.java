@@ -38,7 +38,6 @@ import fr.insalyon.creatis.vip.core.client.view.user.UserLevel;
 import fr.insalyon.creatis.vip.core.client.view.util.CountryCode;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import fr.insalyon.creatis.vip.core.server.dao.UsersGroupsDAO;
-import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -46,7 +45,6 @@ import java.util.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.core.support.JdbcDaoSupport;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -69,7 +67,7 @@ public class UsersGroupsData extends JdbcDaoSupport implements UsersGroupsDAO {
     }
 
     @Override
-    public void add(String email, String groupname, GROUP_ROLE role)
+    public void add(String email, String name, GROUP_ROLE role)
             throws DAOException {
 
         try {
@@ -78,13 +76,13 @@ public class UsersGroupsData extends JdbcDaoSupport implements UsersGroupsDAO {
                     + "VALUES(?, ?, ?)");
 
             ps.setString(1, email);
-            ps.setString(2, groupname);
+            ps.setString(2, name);
             ps.setString(3, role.name());
             ps.execute();
             ps.close();
 
         } catch (SQLException ex) {
-            logger.error("Error adding group {} to {}", groupname, email, ex);
+            logger.error("Error adding group {} to {}", name, email, ex);
             throw new DAOException(ex);
         }
     }
@@ -101,9 +99,12 @@ public class UsersGroupsData extends JdbcDaoSupport implements UsersGroupsDAO {
 
         try {
             PreparedStatement ps = getConnection().prepareStatement(
-                    "SELECT g.groupname, g.public, g.gridfile, g.gridjobs, role "
-                    + "FROM VIPGroups g JOIN VIPUsersGroups ug "
-                    + "ON g.groupname = ug.groupname AND email = ?");
+                        "SELECT g.name, g.public, g.type, g.auto, role "
+                    +   "FROM VIPGroups g JOIN VIPUsersGroups ug "
+                    +   "ON g.name = ug.groupname AND email = ? "
+                    +   "UNION "
+                    +   "SELECT name, public, type, auto, NULL AS role "
+                    +   "FROM VIPGroups WHERE auto = true");
             ps.setString(1, email);
             ResultSet rs = ps.executeQuery();
 
@@ -114,7 +115,7 @@ public class UsersGroupsData extends JdbcDaoSupport implements UsersGroupsDAO {
                 if (role == null || role.isEmpty() || role.equals("null")) {
                     role = "None";
                 }
-                groups.put(new Group(rs.getString("groupname"), rs.getBoolean("public"), rs.getBoolean("gridfile"), rs.getBoolean("gridjobs")),
+                groups.put(new Group(rs.getString("name"), rs.getBoolean("public"), rs.getString("type"), rs.getBoolean("auto")),
                         GROUP_ROLE.valueOf(role));
             }
             ps.close();
@@ -146,7 +147,7 @@ public class UsersGroupsData extends JdbcDaoSupport implements UsersGroupsDAO {
             List<String> groupsName = new ArrayList<String>();
 
             while (rs.next()) {
-                groupsName.add(rs.getString("groupname"));
+                groupsName.add(rs.getString("name"));
             }
             ps.close();
             return groupsName;
@@ -232,35 +233,25 @@ public class UsersGroupsData extends JdbcDaoSupport implements UsersGroupsDAO {
 
         try {
             PreparedStatement ps = getConnection().prepareStatement(
-                    "SELECT public, gridfile, gridjobs "
+                    "SELECT public "
                     + "FROM VIPGroups g, VIPUsersGroups ug "
-                    + "WHERE g.groupname = ug.groupname AND ug.email= ?");
+                    + "WHERE g.name = ug.groupname AND ug.email= ?");
             ps.setString(1, email);
             ResultSet rs = ps.executeQuery();
 
-            List<Boolean> proprties = new ArrayList<Boolean>();
+            List<Boolean> properties = new ArrayList<Boolean>();
             boolean isPublic = false;
-            boolean isGridFile = false;
-            boolean isGridJobs = false;
 
             while (rs.next()) {
-                if (rs.getInt("gridfile") == 1) {
-                    isGridFile = true;
-                }
-                if (rs.getInt("gridjobs") == 1) {
-                    isGridJobs = true;
-                }
                 if (rs.getInt("public") == 1) {
                     isPublic = true;
                 }
             }
-            proprties.add(0, isPublic);
-            proprties.add(1, isGridFile);
-            proprties.add(2, isGridJobs);
+            properties.add(0, isPublic);
 
             ps.close();
 
-            return proprties;
+            return properties;
 
         } catch (SQLException ex) {
             logger.error("Error getting users properties groups for {} ", email, ex);

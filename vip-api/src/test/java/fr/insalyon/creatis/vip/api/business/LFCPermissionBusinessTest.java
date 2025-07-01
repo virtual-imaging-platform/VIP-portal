@@ -2,6 +2,7 @@ package fr.insalyon.creatis.vip.api.business;
 
 import fr.insalyon.creatis.vip.api.data.UserTestUtils;
 import fr.insalyon.creatis.vip.core.client.bean.Group;
+import fr.insalyon.creatis.vip.core.client.bean.GroupType;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.datamanager.server.business.LFCPermissionBusiness;
@@ -27,14 +28,14 @@ public class LFCPermissionBusinessTest {
         Map<Group, CoreConstants.GROUP_ROLE> groups = new HashMap<>();
         UserTestUtils.baseUser1.setGroups(groups);
         UserTestUtils.baseUser2.setGroups(groups);
-        LFCPermissionBusiness sut = new LFCPermissionBusiness(null, null);
+        LFCPermissionBusiness sut = new LFCPermissionBusiness();
 
         // First, test users does not belong to the group
         Assertions.assertFalse(sut.isLFCPathAllowed(UserTestUtils.baseUser1, path, LFCPermissionBusiness.LFCAccessType.UPLOAD, false));
         Assertions.assertFalse(sut.isLFCPathAllowed(UserTestUtils.baseUser2, path, LFCPermissionBusiness.LFCAccessType.UPLOAD, false));
 
         // Then, they belong to the group, but baseUser1 is beginner although baseUser2 is advanced
-        groups.put(new Group(groupName, true, true, true), CoreConstants.GROUP_ROLE.User);
+        groups.put(new Group(groupName, true, GroupType.getDefault()), CoreConstants.GROUP_ROLE.User);
         Assertions.assertFalse(sut.isLFCPathAllowed(UserTestUtils.baseUser1, path, LFCPermissionBusiness.LFCAccessType.UPLOAD, false));
         Assertions.assertTrue(sut.isLFCPathAllowed(UserTestUtils.baseUser2, path, LFCPermissionBusiness.LFCAccessType.UPLOAD, false));
     }

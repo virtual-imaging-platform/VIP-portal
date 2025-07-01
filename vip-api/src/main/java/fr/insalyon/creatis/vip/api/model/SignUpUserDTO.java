@@ -3,7 +3,6 @@ package fr.insalyon.creatis.vip.api.model;
 import fr.insalyon.creatis.vip.core.client.view.util.CountryCode;
 
 import jakarta.validation.constraints.NotNull;
-import java.util.List;
 
 /**
  * @author KhalilKes
@@ -25,13 +24,11 @@ public class SignUpUserDTO {
     @NotNull
     private CountryCode countryCode;
     private String comments;
-    @NotNull
-    private List<String> applications;
 
     public SignUpUserDTO(){
 
     }
-    public SignUpUserDTO(String firstName, String lastName, String email, String institution, String password, CountryCode countryCode, String comments, List<String> applications) {
+    public SignUpUserDTO(String firstName, String lastName, String email, String institution, String password, CountryCode countryCode, String comments) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
@@ -39,7 +36,6 @@ public class SignUpUserDTO {
         this.password = password;
         this.countryCode = countryCode;
         this.comments = comments;
-        this.applications = applications;
     }
 
 
@@ -98,7 +94,4 @@ public class SignUpUserDTO {
     public void setComments(String comments) {
         this.comments = comments;
     }
-
-    public List<String> getApplications() { return applications; }
-
 }

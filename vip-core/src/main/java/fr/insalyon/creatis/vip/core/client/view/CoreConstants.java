@@ -35,14 +35,10 @@ import java.util.Date;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
 
-/**
- *
- * @author Rafael Ferreira da Silva
- */
 public class CoreConstants implements IsSerializable {
 
 
-    public static final String VERSION = "v3.0.1";
+    public static final String VERSION = "v4.0";
     // Configuration Labels
     public static final String VO_NAME = "vo.name";
     public static final String VO_ROOT = "vo.root";
@@ -165,11 +161,7 @@ public class CoreConstants implements IsSerializable {
     public static final String SESSION_USER = "vip-user";
     public static final String SESSION_GROUPS = "vip-groups";
     public static final Date COOKIES_EXPIRATION_DATE = new Date(new Date().getTime() + (1000l * 60 * 60 * 24 * 7)); //cookies are valid for a week
-    // Roles and Groups
-    public static final String GROUP_SUPPORT = "Support";
-    // ssh
-    public static final String SSH_PUBLIC_KEY = "ssh.publickey";
-    //application,Gatelab
+    // application,Gatelab
     public static final String RESULTS_DIRECTORY_PARAM_NAME = "results-directory";
     public static final String APPLET_GATELAB_CLASSES = "appletGatelab.classes";
     public static final String APPLET_GATELABTEST_CLASSES = "appletGatelabTest.classes";
@@ -177,15 +169,9 @@ public class CoreConstants implements IsSerializable {
     public static final String UNDESIRED_COUNTRIES = "account.undesiredCountries";
     public static final String SAML_TRUSTED_CERTIFICATE = "saml.trustedcertificate";
     public static final String SAML_DEFAULT_GROUP = "saml.defaultgroup";
-    //Boutiques
-    public static final String APP_CLASS = "boutiques.application.class";
-    public static final String APPLICATION_FILES_REPOSITORY = "boutiques.upload.repository";
-    public static final String APP_DELETE_FILES_AFTER_UPLOAD = "boutiques.upload.deleteFile";
-    public static final String APP_IMPORTER_ROOT_FOLDER = "boutiques.application.rootFolder";
-    public static final String APP_REQUIREMENTS = "boutiques.application.requirements";
-    //Publication
+    // Publication
     public static final String  PUB_MONTHS_UPDATES = "last.publication.update";
-    //Zenodo publication
+    // Zenodo publication
     public static final String PUBLICATION_SYSTEM_COMMAND = "publication.system-command";
     // External storage, girder.
     public static final String GIRDER_TOKEN_DURATION_IN_DAYS = "girder.token.duration-in-days";
@@ -195,10 +181,7 @@ public class CoreConstants implements IsSerializable {
     public static final String API_PARALLEL_DOWNLOAD_NB = "api.downloads.nb";
     // ReproVIPfiles";
     public static final String REPROVIP_ROOT_DIR = "reprovip.root-dir";
-    //moteurlite
-    public static final String USE_MOTEURLITE = "moteurlite.enabled";
-
-    public static final String USE_REST_MOTEUR_SERVER = "moteur.rest.enabled";
+    // MoteurServerRest
     public static final String MOTEUR_REST_PASSWORD = "moteur.rest.password";
     public static final String HOST_URL = "host.url";
 

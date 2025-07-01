@@ -32,58 +32,49 @@
 package fr.insalyon.creatis.vip.application.client.bean;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
-import org.opensaml.xml.encryption.Public;
+
+import fr.insalyon.creatis.vip.core.client.bean.Group;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
-/**
- *
- * @author Rafael Ferreira da Silva,Nouha boujelben
- */
 public class Application implements IsSerializable {
 
     private String name;
     private String citation;
     private String owner;
     private String fullName;
-    private List<String> applicationClasses;
-    private List<String> applicationGroups;
+    private List<Group> groups;
 
-    public Application() {
-    }
+    public Application() {}
 
     public Application(String name, String citation) {
-        this(name, new ArrayList<>(), null, null, citation);
+        this(name, null, null, citation);
     }
 
-    public Application(String name, List<String> applicationClasses, String citation) {
-        this(name, applicationClasses, null, null, citation);
+    public Application(String name, String citation, List<Group> groups) {
+        this(name, null, null, citation, groups);
     }
 
-    public Application(String name, List<String> applicationClasses, String owner, String fullName, String citation) {
-        this(name, applicationClasses, owner, fullName, citation, null);
+    public Application(String name, String owner, String fullName, String citation) {
+        this(name, owner, fullName, citation, new ArrayList<>());
     }
 
-    public Application(String name, List<String> applicationClasses, String owner, String citation) {
-        this(name, applicationClasses, owner, null, citation, null);
+    public Application(String name, String owner, String citation) {
+        this(name, owner, null, citation, new ArrayList<>());
     }
 
-    public Application(String name, List<String> applicationClasses, String owner, String fullName, String citation, List<String> applicationGroups) {
+    public Application(String name, String owner, String fullName, String citation, List<Group> groups) {
         this.name = name;
         this.citation = citation;
         this.owner = owner;
         this.fullName = fullName;
-        this.applicationClasses = applicationClasses;
-        this.applicationGroups = applicationGroups;
+        this.groups = groups;
     }
 
     public String getName() {
         return name;
-    }
-
-    public List<String> getApplicationClasses() {
-        return applicationClasses;
     }
 
     public String getCitation() {
@@ -106,7 +97,15 @@ public class Application implements IsSerializable {
         return fullName;
     }
 
-    public List<String> getApplicationGroups() {
-        return applicationGroups;
+    public List<Group> getGroups() {
+        return groups;
+    }
+
+    public List<String> getGroupsNames() {
+        return groups.stream().map(Group::getName).collect(Collectors.toList());
+    }
+
+    public void setGroups(List<Group> groups) {
+        this.groups = groups;
     }
 }

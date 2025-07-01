@@ -40,6 +40,7 @@ import fr.insalyon.creatis.vip.core.server.business.Server;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestClient;
@@ -58,6 +59,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON;
 /**
  * @author Rafael Ferreira da Silva, Ibrahim kallel
  */
+@Service
 public class RestServiceEngine extends WorkflowEngineInstantiator {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
@@ -83,11 +85,15 @@ public class RestServiceEngine extends WorkflowEngineInstantiator {
         @JsonProperty("settings")
         String settings;
 
-        public RestWorkflow(String workflow, String inputs, String proxy, String settings) {
+        @JsonProperty("executorConfig")
+        String executorConfig;
+
+        public RestWorkflow(String workflow, String inputs, String proxy, String settings, String executorConfig) {
             this.workflow = workflow;
             this.inputs = inputs;
             this.proxy = proxy;
             this.settings = settings;
+            this.executorConfig = executorConfig;
         }
     }
 
@@ -98,9 +104,8 @@ public class RestServiceEngine extends WorkflowEngineInstantiator {
      * @return the HTTP link that shows the workflow current status
      */
     @Override
-    public String launch(String addressWS, String workflow, String inputs, String settings, String proxyFileName)
+    public String launch(String addressWS, String workflow, String inputs, String settings, String executorConfig, String proxyFileName)
             throws RemoteException, ServiceException, BusinessException {
-
         loadTrustStore(server);
 
         String strProxy = null;
@@ -114,8 +119,9 @@ public class RestServiceEngine extends WorkflowEngineInstantiator {
                 (Base64.getEncoder().encodeToString(strProxy.getBytes(StandardCharsets.UTF_8)))
                 : null;
         String base64Settings = Base64.getEncoder().encodeToString(settings.getBytes(StandardCharsets.UTF_8));
+        String base64ExecutorConfig = Base64.getEncoder().encodeToString(executorConfig.getBytes(StandardCharsets.UTF_8));
 
-        RestWorkflow restWorkflow = new RestWorkflow(base64Workflow, base64Input, base64Proxy, base64Settings);
+        RestWorkflow restWorkflow = new RestWorkflow(base64Workflow, base64Input, base64Proxy, base64Settings, base64ExecutorConfig);
 
         try {
             ObjectMapper mapper = new ObjectMapper();
@@ -184,6 +190,7 @@ public class RestServiceEngine extends WorkflowEngineInstantiator {
             return switch (moteurStatus) {
                 case RUNNING -> SimulationStatus.Running;
                 case COMPLETE -> SimulationStatus.Completed;
+                case FAILED -> SimulationStatus.Failed;
                 case TERMINATED -> SimulationStatus.Killed;
                 default -> SimulationStatus.Unknown;
             };

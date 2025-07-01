@@ -31,6 +31,8 @@
  */
 package fr.insalyon.creatis.vip.api.business;
 
+import fr.insalyon.creatis.boutiques.model.BoutiquesDescriptor;
+import fr.insalyon.creatis.boutiques.model.Input;
 import fr.insalyon.creatis.vip.api.CarminProperties;
 import fr.insalyon.creatis.vip.api.exception.ApiException;
 import fr.insalyon.creatis.vip.api.exception.ApiException.ApiError;
@@ -39,31 +41,23 @@ import fr.insalyon.creatis.vip.api.model.Pipeline;
 import fr.insalyon.creatis.vip.api.model.PipelineParameter;
 import fr.insalyon.creatis.vip.application.client.bean.AppVersion;
 import fr.insalyon.creatis.vip.application.client.bean.Application;
-import fr.insalyon.creatis.vip.application.client.bean.Descriptor;
-import fr.insalyon.creatis.vip.application.client.bean.Source;
+import fr.insalyon.creatis.vip.application.server.business.AppVersionBusiness;
 import fr.insalyon.creatis.vip.application.server.business.ApplicationBusiness;
 import fr.insalyon.creatis.vip.application.server.business.BoutiquesBusiness;
-import fr.insalyon.creatis.vip.application.server.business.ClassBusiness;
-import fr.insalyon.creatis.vip.application.server.business.WorkflowBusiness;
-import fr.insalyon.creatis.vip.application.server.model.boutiques.BoutiquesDescriptor;
-import fr.insalyon.creatis.vip.application.server.model.boutiques.Input;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
-import fr.insalyon.creatis.vip.core.server.business.Server;
 import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
-import fr.insalyon.creatis.vip.datamanager.server.business.DataManagerBusiness;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
-import java.io.File;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Supplier;
 
 import static fr.insalyon.creatis.vip.api.exception.ApiException.ApiError.*;
@@ -78,28 +72,21 @@ public class PipelineBusiness {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private final Environment env;
-    private final Server server;
 
     private final Supplier<User> currentUserProvider;
-    private final WorkflowBusiness workflowBusiness;
     private final ApplicationBusiness applicationBusiness;
-    private final ClassBusiness classBusiness;
     private final BoutiquesBusiness boutiquesBusiness;
-    private final DataManagerBusiness dataManagerBusiness;
+    private final AppVersionBusiness appVersionBusiness;
 
     @Autowired
     public PipelineBusiness(
-            Supplier<User> currentUserProvider, Environment env,
-            Server server, WorkflowBusiness workflowBusiness, ApplicationBusiness applicationBusiness,
-            ClassBusiness classBusiness, BoutiquesBusiness boutiquesBusiness, DataManagerBusiness dataManagerBusiness) {
+            Supplier<User> currentUserProvider, Environment env, ApplicationBusiness applicationBusiness,
+            BoutiquesBusiness boutiquesBusiness, AppVersionBusiness appVersionBusiness) {
         this.currentUserProvider = currentUserProvider;
         this.env = env;
-        this.server = server;
-        this.workflowBusiness = workflowBusiness;
         this.applicationBusiness = applicationBusiness;
-        this.classBusiness = classBusiness;
         this.boutiquesBusiness = boutiquesBusiness;
-        this.dataManagerBusiness = dataManagerBusiness;
+        this.appVersionBusiness = appVersionBusiness;
     }
 
     //*********************** pipeline id format validation **********************************
@@ -132,51 +119,26 @@ public class PipelineBusiness {
      * Returns pipeline + parameters without the results-directory param
      */
     public Pipeline getPipelineWithoutResultsDirectory(String pipelineId) throws ApiException {
-
-        if (server.useMoteurlite()) {
-            return getPipelineFromBoutiquesDescriptor(pipelineId);
-        } else {
-            Pipeline p = getPipelineFromGwendiaDescriptor(pipelineId);
-            p.getParameters().removeIf(
-                    param -> CoreConstants.RESULTS_DIRECTORY_PARAM_NAME.equals(param.getName()));
-            return p;
-        }
+        return getPipelineFromBoutiquesDescriptor(pipelineId);
     }
 
     /**
      * Returns pipeline + parameters with the results-directory param
      */
     public Pipeline getPipelineWithResultsDirectory(String pipelineId) throws ApiException {
-
-        if (server.useMoteurlite()) {
-            // boutiques must not contain it, we always add it
-            Pipeline p = getPipelineFromBoutiquesDescriptor(pipelineId);
-            p.getParameters().add(new PipelineParameter(
-                    CoreConstants.RESULTS_DIRECTORY_PARAM_NAME, ParameterType.File, false, false,
-                    DataManagerConstants.ROOT + "/" + DataManagerConstants.USERS_HOME, "Results directory"));
-            return p;
-        } else {
-            return getPipelineFromGwendiaDescriptor(pipelineId);
-        }
+        // boutiques must not contain it, we always add it
+        Pipeline p = getPipelineFromBoutiquesDescriptor(pipelineId);
+        p.getParameters().add(new PipelineParameter(
+                CoreConstants.RESULTS_DIRECTORY_PARAM_NAME, ParameterType.File, false, false,
+                DataManagerConstants.ROOT + "/" + DataManagerConstants.USERS_HOME, "Results directory"));
+        return p;
     }
 
     public BoutiquesDescriptor getBoutiquesDescriptor(String pipelineId) throws ApiException {
         AppVersion appVersion = getAppVersionFromPipelineId(pipelineId);
 
-        String boutiquesUri = appVersion.getJsonLfn();
-        if (boutiquesUri == null || boutiquesUri.isEmpty()) {
-            logger.error("boutiques lfn not specified for app {}", pipelineId);
-            throw new ApiException(NOT_COMPATIBLE_WITH_BOUTIQUES, pipelineId);
-        }
-
         try {
-            String boutiquesFilePath = dataManagerBusiness.getRemoteFile(currentUserProvider.get(), boutiquesUri);
-            File boutiquesFile = Paths.get(boutiquesFilePath).toFile();
-            if ( ! boutiquesFile.exists()) {
-                logger.error("Boutiques file ({}) absent after download in {}", boutiquesUri, boutiquesFilePath);
-                throw new ApiException(GENERIC_API_ERROR);
-            }
-            return boutiquesBusiness.parseBoutiquesFile(boutiquesFile);
+            return boutiquesBusiness.parseBoutiquesString(appVersion.getDescriptor());
         } catch (BusinessException e) {
             throw new ApiException(e);
         }
@@ -186,18 +148,17 @@ public class PipelineBusiness {
      * List all the pipeline the user can access
      */
     public List<Pipeline> listPipelines(String studyIdentifier) throws ApiException {
-
         try {
             if (studyIdentifier != null) {
                 logger.warn("Study identifier ({}) was ignored.", studyIdentifier);
             }
             ArrayList<Pipeline> pipelines = new ArrayList<>();
 
-            List<String> classNames = classBusiness.getUserClassesName(currentUserProvider.get().getEmail(), false);
+            List<Application> applications = applicationBusiness.getApplications(currentUserProvider.get());
 
-            List<Application> applications = applicationBusiness.getApplications(classNames);
             for (Application a : applications) {
-                List<AppVersion> versions = applicationBusiness.getVersions(a.getName());
+
+                List<AppVersion> versions = appVersionBusiness.getVersions(a.getName());
                 for (AppVersion av : versions) {
                     if (isApplicationVersionUsableInApi(av)) {
                         pipelines.add(
@@ -227,36 +188,6 @@ public class PipelineBusiness {
     // ********************* Basic stuff **************************************
 
     /**
-     *  Get the pipeline parameters from the gwendia file
-     *  Warning : this includes the results-directory parameter
-     */
-    private Pipeline getPipelineFromGwendiaDescriptor(String pipelineId) throws ApiException {
-        try {
-            Pipeline p = getPipelineWithoutParameters(pipelineId);
-
-            // download the gwendia file (can be slow)
-            Descriptor d = workflowBusiness.getApplicationDescriptor(
-                    currentUserProvider.get(), p.getName(), p.getVersion());
-            p.setDescription(d.getDescription());
-
-            for (Source s : d.getSources()) {
-                ParameterType sourceType = ParameterType.fromVipType(s.getType());
-                if ("flag".equalsIgnoreCase(s.getVipTypeRestriction())) {
-                    sourceType = ParameterType.Boolean;
-                }
-                PipelineParameter pp = new PipelineParameter(
-                        s.getName(), sourceType, s.isOptional(),false,
-                        s.getDefaultValue(), s.getDescription());
-                p.getParameters().add(pp);
-            }
-            return p;
-        } catch (BusinessException ex) {
-            throw new ApiException(ex);
-        }
-    }
-
-
-    /**
      *  Get the pipeline parameters from the boutiques file
      *  Warning : this does not include the results-directory parameter
      */
@@ -266,12 +197,20 @@ public class PipelineBusiness {
         Pipeline p = new Pipeline(pipelineId, boutiques.getName(), boutiques.getToolVersion());
         p.setDescription(boutiques.getDescription());
 
+        Map<String, String> overriddenInputs = boutiquesBusiness.getOverriddenInputs(boutiques);
         for (Input input : boutiques.getInputs()) {
+            if (overriddenInputs != null && overriddenInputs.containsKey(input.getId())) {
+                continue; // hide overriddenInputs from pipeline visible parameters
+            }
             ParameterType type = ParameterType.fromBoutiquesInput(input);
             PipelineParameter pp = new PipelineParameter(
                     input.getId(), type, input.getOptional() != null && input.getOptional(),false,
                     input.getDefaultValue(), input.getDescription());
             p.getParameters().add(pp);
+        }
+        // store overriddenInputs in pipeline object to avoid parsing the descriptor again later
+        if (overriddenInputs != null) {
+            p.setOverriddenInputs(overriddenInputs);
         }
         return p;
     }
@@ -287,7 +226,7 @@ public class PipelineBusiness {
         try {
             String applicationName = getApplicationName(pipelineId);
             String applicationVersion = getApplicationVersion(pipelineId);
-            AppVersion appVersion = applicationBusiness.getVersion(applicationName, applicationVersion);
+            AppVersion appVersion = appVersionBusiness.getVersion(applicationName, applicationVersion);
             if (appVersion == null) {
                 logger.error("Cannot find pipeline {}/{}", applicationName, applicationVersion);
                 throw new ApiException(PIPELINE_NOT_FOUND, pipelineId);
@@ -312,13 +251,12 @@ public class PipelineBusiness {
             throw new ApiException(PIPELINE_NOT_FOUND, getPipelineIdentifier(appName, version));
         }
 
-        // check the user can use it through its classes
+        // check the user can use it 
         try {
-            List<String> userClassNames = classBusiness.getUserClassesName(currentUserProvider.get().getEmail(), false);
-            List<String> applicationClassNames = applicationBusiness.getApplication(appName).getApplicationClasses();
+            List<Application> apps = applicationBusiness.getApplications(currentUserProvider.get());
 
-            for (String applicationClassName : applicationClassNames) {
-                if (userClassNames.contains(applicationClassName)) {
+            for (Application app : apps) {
+                if (app.getName().equals(appName)) {
                     return;
                 }
             }

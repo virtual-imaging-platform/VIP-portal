@@ -7,9 +7,12 @@ import fr.insalyon.creatis.vip.datamanager.client.bean.ExternalPlatform.Type;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.util.UriComponentsBuilder;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.net.URISyntaxException;
+import java.net.URI;
+import java.util.List;
 
 /**
  *  Created by Alae Es-saki on 12/04/2022
@@ -19,52 +22,48 @@ public class ShanoirStorageBusiness {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
+    // output URL scheme
+    private final String OUTPUT_SCHEME = "shanoir";
     enum UrlKeys{
-        FILE_NAME("shanoir", "^shanoir:/(//)?([^/].*)\\?.*$", 2 ,"fileName"),
-        RESOURCE_ID("resourceId", "^.*[?&]resourceId=([^&]*)(&.*)?$", 1 ,"resourceId"),
-        FORMAT("format", "^.*[?&]format=([^&]*)(&.*)?$", 1 ,"format"),
-        TOKEN("token", "^.*[?&]token=([^&]*)(&.*)?$", 1 , "token"),
-        REFRESH_TOKEN("refreshToken", "^.*[?&]refreshToken=([^&]*)(&.*)?$", 1 , "refresh token"),
-        MD5("md5","^.*[?&]md5=([^&]*)(&.*)?$", 1, "md5"),
-        TYPE("type", "^.*[?&]type=([^&]*)(&.*)?$", 1, "type"),
-        API_URI("apiUrl", "", 0, "download Url"),
-        UPLOAD_URL("upload_url","",0,"Import endpoint url"),
-        KEYCLOAK_CLIENT_ID("keycloak_client_id", "^.*[?&]clientId=([^&]*)(&.*)?$", 1 ,"clientId"),
-        REFRESH_TOKEN_URL("refresh_token_url","", 0, ""),
-        CONVERTER_ID("converterId", "^.*[?&]converterId=([^&]*)(&.*)?$", 1 ,"converterId", "8");
+        // input/output query parameters
+        RESOURCE_ID("resourceId", "resourceId", "resourceId"),
+        FORMAT("format", "format", "format"),
+        TOKEN("token", "token", "token"),
+        REFRESH_TOKEN("refreshToken", "refreshToken", "refresh token"),
+        MD5("md5", "md5", "md5"),
+        TYPE("type", "type", "type"),
+        KEYCLOAK_CLIENT_ID("keycloak_client_id", "clientId", "clientId"),
+        CONVERTER_ID("converterId", "converterId", "converterId", "8"),
+        // output-only query parameters
+        API_URI("apiUrl", "", "download Url"),
+        UPLOAD_URL("upload_url", "", "Import endpoint url"),
+        REFRESH_TOKEN_URL("refresh_token_url", "", "");
 
         public final String key;
-        public final String regex;
-        public final int regexGroup;
+        public final String paramName;
         public final String errorKey;
         public final String defaultValue;
 
-        UrlKeys(String label, String regex, int regexGroup, String errorKey) {
-            this(label, regex, regexGroup, errorKey, null);
+        UrlKeys(String label, String paramName, String errorKey) {
+            this(label, paramName, errorKey, null);
         }
 
-        UrlKeys(String label, String regex, int regexGroup, String errorKey, String defaultValue) {
+        UrlKeys(String label, String paramName, String errorKey, String defaultValue) {
             this.key = label;
-            this.regex = regex;
-            this.regexGroup = regexGroup;
+            this.paramName = paramName;
             this.errorKey = errorKey;
             this.defaultValue = defaultValue;
         }
     }
 
-    /* GASW regexps in 3.2.0 version
-
-       local token=`echo $URI | sed -r 's/^.*[?&]token=([^&]*)(&.*)?$/\1/i'`
-       local fileName=`echo $URI | sed -r 's#^shanoir:/(//)?([^/].*)\?.*$#\2#i'`
-       local apiUrl=`echo $URI | sed -r 's/^.*[?&]apiurl=([^&]*)(&.*)?$/\1/i'`
-       local refreshToken=`echo $URI | sed -r 's/^.*[?&]refreshToken=([^&]*)(&.*)?$/\1/i'`
-       local format=`echo $URI | sed -r 's/^.*[?&]format=([^&]*)(&.*)?$/\1/i'`
-       local datasetId=`echo $URI | sed -r 's/^.*[?&]datasetId=([^&]*)(&.*)?$/\1/i'`
-       local keycloak_client_id=`echo $URI | sed -r 's/^.*[?&]keycloak_client_id=([^&]*)(&.*)?$/\1/i'`
-       local refresh_token_url=`echo $URI | sed -r 's/^.*[?&]refresh_token_url=([^&]*)(&.*)?$/\1/i'`
-
-       So objective : generate "shanoir:/fileName?apiurl=[...]&resourceId=[...]&format=[...]&token=[...]&refreshToken=[....]&keycloak_client_id=[....]&refresh_token_url=[....]
-    */
+    /* Transform a shanoir input URI into a download or upload URI for a given ExternalPlatform:
+     * - change URI scheme from ExternalPlatform name to "shanoir"
+     * - keep filename/path as is
+     * - copy and add some query string parameters
+     * For all practical purposes, input URI format should verify:
+     * - uri.getScheme().equals(externalPlatform.getIdentifier()): assumed checked in caller
+     * - uri.getAuthority() == null, i.e. single or triple slash without a "host" part
+     */
     public String generateUri(
             ExternalPlatform externalPlatform, String parameterName, String parameterValue) throws BusinessException {
 
@@ -73,24 +72,48 @@ public class ShanoirStorageBusiness {
         String apiUrl = externalPlatform.getUrl();
         String refreshTokenUrl = externalPlatform.getRefreshTokenUrl();
 
-        String keycloakClientId = subString(UrlKeys.KEYCLOAK_CLIENT_ID, parameterValue);
-        String token = subString(UrlKeys.TOKEN, parameterValue);
-        String refreshToken = subString(UrlKeys.REFRESH_TOKEN, parameterValue);
-        String fileName = subString(UrlKeys.FILE_NAME, parameterValue);
-
-        if(CoreConstants.RESULTS_DIRECTORY_PARAM_NAME.equals(parameterName)){
-            String type = subString(UrlKeys.TYPE, parameterValue);
-            String md5 = subString(UrlKeys.MD5, parameterValue);
-            String uploadUrl = externalPlatform.getUploadUrl();
-
-            return buildUploadUri(fileName, uploadUrl, token, refreshToken, type, md5, keycloakClientId, refreshTokenUrl);
+        // parse input URI.
+        URI uri;
+        try {
+            uri = new URI(parameterValue);
+        } catch (URISyntaxException e) {
+            logger.error("Cannot parse uri", e);
+            throw new BusinessException("Cannot parse uri", e);
         }
-        
-        String format = subString(UrlKeys.FORMAT, parameterValue);
-        String resourceId = subString(UrlKeys.RESOURCE_ID, parameterValue);
-        String converterId = subString(UrlKeys.CONVERTER_ID, parameterValue);
 
-        return buildDownloadUri(resourceId, apiUrl, token, refreshToken, format, converterId, fileName, keycloakClientId, refreshTokenUrl);
+        // get filename (including the leading slash)
+        String fileName = uri.getPath();
+        if (fileName == null) {
+            logger.error("Cannot get fileName from the uri");
+            throw new BusinessException("Cannot get fileName from the uri");
+        }
+
+        // parse query string parameters: net.java.URI provides no helper for that,
+        // so we use Spring UriComponentsBuilder, but just for the query string.
+        // Parsing the whole URI with UriComponentsBuilder would be too lax on error cases.
+        MultiValueMap<String, String> queryParams;
+        try {
+            queryParams= UriComponentsBuilder.fromUriString(parameterValue).build().getQueryParams();
+        } catch (IllegalArgumentException e) {
+            logger.error("Cannot parse query string", e);
+            throw new BusinessException("Cannot parse query string", e);
+        }
+
+        String keycloakClientId = getParamValue(UrlKeys.KEYCLOAK_CLIENT_ID, queryParams);
+        String token = getParamValue(UrlKeys.TOKEN, queryParams);
+        String refreshToken = getParamValue(UrlKeys.REFRESH_TOKEN, queryParams);
+
+        if(CoreConstants.RESULTS_DIRECTORY_PARAM_NAME.equals(parameterName)) { // upload
+            String type = getParamValue(UrlKeys.TYPE, queryParams);
+            String md5 = getParamValue(UrlKeys.MD5, queryParams);
+            String uploadUrl = externalPlatform.getUploadUrl();
+            return buildUploadUri(fileName, uploadUrl, token, refreshToken, type, md5, keycloakClientId, refreshTokenUrl);
+        } else { // download
+            String format = getParamValue(UrlKeys.FORMAT, queryParams);
+            String resourceId = getParamValue(UrlKeys.RESOURCE_ID, queryParams);
+            String converterId = getParamValue(UrlKeys.CONVERTER_ID, queryParams);
+            return buildDownloadUri(resourceId, apiUrl, token, refreshToken, format, converterId, fileName, keycloakClientId, refreshTokenUrl);
+        }
     }
 
     private void verifyExternalPlatform(ExternalPlatform externalPlatform)
@@ -104,7 +127,7 @@ public class ShanoirStorageBusiness {
             logger.error("A shanoir external storage must have an URL to generate an URI");
             throw new BusinessException("Cannot generate shanoir uri");
         }
-        if (externalPlatform.getKeycloakClientId() == null || externalPlatform.getRefreshTokenUrl() == null) { 
+        if (externalPlatform.getUploadUrl() == null || externalPlatform.getRefreshTokenUrl() == null) {
             logger.error("Cannot get keycloak informations for shanoir storage from database");
             throw new BusinessException("Cannot generate shanoir uri");
         }
@@ -113,7 +136,7 @@ public class ShanoirStorageBusiness {
     private String buildDownloadUri(
             String resourceId, String apiUrl, String token, String refreshToken,
             String format, String converterId, String fileName, String keycloakClientId, String refreshTokenUrl){
-        return UrlKeys.FILE_NAME.key+":/" +
+        return OUTPUT_SCHEME+":" +
                 fileName +
                 "?"+ UrlKeys.API_URI.key+"=" +
                 apiUrl +
@@ -134,7 +157,7 @@ public class ShanoirStorageBusiness {
     }
 
     private String buildUploadUri(String filePath, String uploadUrl, String token, String refreshToken, String type, String md5 , String keycloakClientId, String refreshTokenUrl){
-        return UrlKeys.FILE_NAME.key+":/" +
+        return OUTPUT_SCHEME+":" +
                 filePath +
                 "?"+ UrlKeys.UPLOAD_URL.key+"=" +
                 uploadUrl +
@@ -152,21 +175,10 @@ public class ShanoirStorageBusiness {
                 refreshToken;
     }
 
-    /**
-     * SubString a text with a key and regex
-     * @param urlKey
-     * @param text
-     * @return
-     */
-    private String subString(UrlKeys urlKey, String text) throws BusinessException {
-        Pattern pattern = Pattern.compile(urlKey.regex);
-        Matcher matcher = pattern.matcher(text);
-        if (matcher.matches()) {
-            if(matcher.group(urlKey.regexGroup) == null){
-                logger.error("Cannot get {} from the uri,", urlKey.errorKey);
-                throw new BusinessException("Cannot get " + urlKey.errorKey + " from shanoir uri");
-            }
-            return matcher.group(urlKey.regexGroup);
+    private String getParamValue(UrlKeys urlKey, MultiValueMap<String, String> queryParams) throws BusinessException {
+        List<String> values = queryParams.get(urlKey.paramName);
+        if (values != null && !values.isEmpty()) {
+            return values.getFirst();
         } else if (urlKey.defaultValue != null) {
             return urlKey.defaultValue;
         } else {
@@ -174,5 +186,4 @@ public class ShanoirStorageBusiness {
             throw new BusinessException("Cannot get " + urlKey.errorKey + " from the uri");
         }
     }
-
 }

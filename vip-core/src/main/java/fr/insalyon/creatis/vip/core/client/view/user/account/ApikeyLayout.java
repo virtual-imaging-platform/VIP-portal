@@ -34,7 +34,6 @@ package fr.insalyon.creatis.vip.core.client.view.user.account;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.widgets.*;
 import com.smartgwt.client.widgets.events.*;
-import com.smartgwt.client.widgets.form.fields.*;
 import fr.insalyon.creatis.vip.core.client.rpc.*;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.common.AbstractFormLayout;
@@ -47,7 +46,11 @@ import fr.insalyon.creatis.vip.core.client.view.util.*;
  */
 public class ApikeyLayout extends AbstractFormLayout {
 
+    private String apikeyValue;
     private Label apikeyText;
+    private IButton showApikey;
+    private final String SHOW_KEY_LABEL = "Show key";
+    private final String HIDE_KEY_LABEL = "Hide key";
     private IButton deleteApikey;
     private IButton generateNewApikey;
 
@@ -61,8 +64,16 @@ public class ApikeyLayout extends AbstractFormLayout {
     private void configure() {
         this.addMember(WidgetUtil.getLabel("<b>Current key</b>", 15));
         this.addMember(apikeyText = WidgetUtil.getLabel("", 15));
-
         apikeyText.setCanSelectText(true);
+
+        showApikey = WidgetUtil.getIButton(
+                SHOW_KEY_LABEL,
+                CoreConstants.ICON_INFO,
+                new ShowApikeyClickHandler());
+        showApikey.setWidth(150);
+        showApikey.disable();
+        addButtons(showApikey);
+
         deleteApikey = WidgetUtil.getIButton(
                 "Delete key",
                 CoreConstants.ICON_DELETE,
@@ -80,6 +91,35 @@ public class ApikeyLayout extends AbstractFormLayout {
         service.getUserApikey(null, new ApikeyReceivedCallback() );
     }
 
+    private void clearApiKey() {
+        apikeyValue = "";
+        apikeyText.setContents("<i>None</i>");
+        showApikey.disable();
+        showApikey.setTitle(SHOW_KEY_LABEL);
+    }
+
+    private void hideApiKey() {
+        apikeyText.setContents("***");
+        showApikey.setTitle(SHOW_KEY_LABEL);
+    }
+
+    private void showApiKey() {
+        apikeyText.setContents(apikeyValue);
+        showApikey.setTitle(HIDE_KEY_LABEL);
+    }
+
+    private void disableButtons() {
+        showApikey.disable();
+        deleteApikey.disable();
+        generateNewApikey.disable();
+    }
+
+    private void enableButtons() {
+        showApikey.enable();
+        deleteApikey.enable();
+        generateNewApikey.enable();
+    }
+
     private class ApikeyReceivedCallback implements AsyncCallback<String> {
         @Override
         public void onFailure(Throwable caught) {
@@ -90,9 +130,11 @@ public class ApikeyLayout extends AbstractFormLayout {
         public void onSuccess(String apikey) {
             generateNewApikey.enable();
             if (apikey == null) {
-                apikeyText.setContents("<i>None</i>");
-            } else {
-                apikeyText.setContents(apikey);
+                clearApiKey();
+            } else { // first page load, and an apikey exists: start in hidden state
+                apikeyValue = apikey;
+                hideApiKey();
+                showApikey.enable();
                 deleteApikey.enable();
             }
         }
@@ -101,8 +143,7 @@ public class ApikeyLayout extends AbstractFormLayout {
     private class DeleteApikeyClickHandler implements ClickHandler {
         @Override
         public void onClick(ClickEvent clickEvent) {
-            deleteApikey.disable();
-            generateNewApikey.disable();
+            disableButtons();
             ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();
             service.deleteUserApikey(null, new DeleteApikeyCallback() );
         }
@@ -112,22 +153,32 @@ public class ApikeyLayout extends AbstractFormLayout {
         @Override
         public void onFailure(Throwable caught) {
             Layout.getInstance().setWarningMessage("Unable to delete new API key:<br />" + caught.getMessage());
-            deleteApikey.enable();
-            generateNewApikey.enable();
+            enableButtons();
         }
 
         @Override
         public void onSuccess(Void result) {
             generateNewApikey.enable();
-            apikeyText.setContents("<i>None</i>");
+            clearApiKey();
+        }
+    }
+
+    private class ShowApikeyClickHandler implements ClickHandler {
+        @Override
+        public void onClick(ClickEvent clickEvent) {
+            // toggle show/hide depending on whether apikeyText already shows apikeyValue
+            if (apikeyText.getContents() == apikeyValue) {
+                hideApiKey();
+            } else {
+                showApiKey();
+            }
         }
     }
 
     private class GenerateNewKeyClickHandler implements ClickHandler {
         @Override
         public void onClick(ClickEvent clickEvent) {
-            deleteApikey.disable();
-            generateNewApikey.disable();
+            disableButtons();
             ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();
             service.generateNewUserApikey(null, new NewApikeyGeneratedCallback() );
         }
@@ -142,9 +193,9 @@ public class ApikeyLayout extends AbstractFormLayout {
 
         @Override
         public void onSuccess(String apikey) {
-            generateNewApikey.enable();
-            deleteApikey.enable();
-            apikeyText.setContents(apikey);
+            enableButtons();
+            apikeyValue = apikey;
+            showApiKey(); // show the key that has just been generated
         }
     }
 }

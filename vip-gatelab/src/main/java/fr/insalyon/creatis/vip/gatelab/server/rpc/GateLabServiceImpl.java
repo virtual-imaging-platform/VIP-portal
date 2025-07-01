@@ -31,7 +31,6 @@
  */
 package fr.insalyon.creatis.vip.gatelab.server.rpc;
 
-import fr.insalyon.creatis.vip.application.server.business.ClassBusiness;
 import fr.insalyon.creatis.vip.core.client.view.CoreException;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.rpc.AbstractRemoteServiceServlet;
@@ -52,13 +51,11 @@ public class GateLabServiceImpl extends AbstractRemoteServiceServlet implements 
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
     private GateLabBusiness gatelabBusiness;
-    private ClassBusiness classBusiness;
 
     @Override
     public void init() throws ServletException {
         super.init();
         gatelabBusiness = getBean(GateLabBusiness.class);
-        classBusiness = getBean(ClassBusiness.class);
     }
 
     @Override

@@ -75,27 +75,26 @@ public class ConfigurationBusiness {
     private EmailBusiness emailBusiness;
     private GRIDAPoolClient gridaPoolClient;
     private GRIDAClient gridaClient;
-
-    private GroupDAO groupDAO;
     private TermsUseDAO termsUseDAO;
     private UserDAO userDAO;
     private UsersGroupsDAO usersGroupsDAO;
+    private GroupBusiness groupBusiness;
 
     @Autowired
     public ConfigurationBusiness(
             Server server, ProxyClient proxyClient, EmailBusiness emailBusiness,
             GRIDAClient gridaClient, GRIDAPoolClient gridaPoolClient,
-            GroupDAO groupDAO, TermsUseDAO termsUseDAO,
+            TermsUseDAO termsUseDAO, GroupBusiness groupBusiness,
             UserDAO userDAO, UsersGroupsDAO usersGroupsDAO) {
         this.server = server;
         this.proxyClient = proxyClient;
         this.emailBusiness = emailBusiness;
         this.gridaClient = gridaClient;
         this.gridaPoolClient = gridaPoolClient;
-        this.groupDAO = groupDAO;
         this.termsUseDAO = termsUseDAO;
         this.userDAO = userDAO;
         this.usersGroupsDAO = usersGroupsDAO;
+        this.groupBusiness = groupBusiness;
     }
 
     private static java.sql.Timestamp getCurrentTimeStamp() {
@@ -157,17 +156,17 @@ public class ConfigurationBusiness {
         }
     }
 
-    public void signup(
-            User user, String comments, boolean automaticCreation,
-            boolean mapPrivateGroups, Group group)
-            throws BusinessException {
-        this.signup(user, comments, automaticCreation, mapPrivateGroups,
-                group == null ? new ArrayList<>() : Collections.singletonList(group));
+    public void signup(User user, String comments, Group group) throws BusinessException {
+        signup(user, comments, false, false, group);
     }
 
-    public void signup(
-            User user, String comments, boolean automaticCreation,
-            boolean mapPrivateGroups, List<Group> groups)
+    public void signup(User user, String comments, boolean automaticCreation, boolean mapPrivateGroups, Group group)
+            throws BusinessException {
+        this.signup(user, comments, automaticCreation, mapPrivateGroups,
+                group == null ? new ArrayList<>() : Arrays.asList(group));
+    }
+
+    public void signup(User user, String comments, boolean automaticCreation, boolean mapPrivateGroups, List<Group> groups)
             throws BusinessException {
 
         verifyEmail(user.getEmail());
@@ -208,10 +207,9 @@ public class ConfigurationBusiness {
             } else {
                 user.setPassword(MD5.get(user.getPassword()));
             }
-            String folder = user.getFirstName().replaceAll(" ", "_").toLowerCase() + "_"
-                    + user.getLastName().replaceAll(" ", "_").toLowerCase();
-            // normalise user folder : remove accents and non ascii characters
-            folder = CoreUtil.getCleanString(folder);
+            // normalise user folder : replace accents and non ascii characters by _
+            String folder = CoreUtil.getCleanStringAlnum(user.getFirstName().toLowerCase() + "_"
+                    + user.getLastName().toLowerCase(), "_");
 
             while (gridaClient.exist(server.getDataManagerUsersHome() + "/" + folder)) {
                 folder += "_" + new Random().nextInt(10000);
@@ -272,11 +270,8 @@ public class ConfigurationBusiness {
                         + "<p>VIP Team</p>"
                         + "</body>"
                         + "</html>";
-
-                for (String email : getAdministratorsEmails()) {
-                    emailBusiness.sendEmail("[VIP Admin] Account Requested", adminsEmailContents,
-                            new String[]{email}, true, user.getEmail());
-                }
+                emailBusiness.sendEmailToAdmins("[VIP Admin] Account Requested", adminsEmailContents,
+                        true, user.getEmail());
             } else {
                 StringBuilder groupNames = new StringBuilder();
                 for (Group group : groups) {
@@ -303,10 +298,8 @@ public class ConfigurationBusiness {
                         + "</body>"
                         + "</html>";
 
-                for (String email : getAdministratorsEmails()) {
-                    emailBusiness.sendEmail("[VIP Admin] Automatic Account Creation", adminsEmailContents,
-                            new String[]{email}, false, user.getEmail());
-                }
+                emailBusiness.sendEmailToAdmins("[VIP Admin] Automatic Account Creation", adminsEmailContents,
+                        false, user.getEmail());
             }
         } catch (GRIDAClientException | UnsupportedEncodingException | NoSuchAlgorithmException ex) {
             logger.error("Error signing up user {}", user.getEmail(), ex);
@@ -357,15 +350,6 @@ public class ConfigurationBusiness {
                 throw new BusinessException("Error");
             }
         }
-    }
-
-    public void signup(User user, String comments, Group group) throws BusinessException {
-        signup(user, comments, false, false, group);
-    }
-
-    public void signup(User user, String comments, List<Group> groups)
-            throws BusinessException {
-        signup(user, comments, false, false, groups);
     }
 
     public User signin(String email, String password) throws BusinessException {
@@ -616,10 +600,8 @@ public class ConfigurationBusiness {
                         + "</body>"
                         + "</html>";
 
-                for (String adminEmail : getAdministratorsEmails()) {
-                    emailBusiness.sendEmail("[VIP Admin] Account Removed", adminsEmailContents,
-                            new String[]{adminEmail}, true, user.getEmail());
-                }
+                emailBusiness.sendEmailToAdmins("[VIP Admin] Account Removed", adminsEmailContents,
+                        true, user.getEmail());
             }
         } catch (GRIDAClientException ex) {
             logger.error("Error removing user {}", email, ex);
@@ -639,81 +621,6 @@ public class ConfigurationBusiness {
 
     public List<String> getAllUserNames() throws BusinessException {
         return getUsers().stream().map(User::getFullName).collect(Collectors.toCollection(ArrayList::new));
-    }
-
-    public void addGroup(Group group) throws BusinessException {
-        try {
-            gridaClient.createFolder(server.getDataManagerGroupsHome(),
-                    group.getName().replaceAll(" ", "_"));
-
-            groupDAO.add(group);
-        } catch (GRIDAClientException ex) {
-            logger.error("Error adding group : {}", group.getName(), ex);
-            throw new BusinessException(ex);
-        } catch (DAOException ex) {
-            throw new BusinessException(ex);
-        }
-    }
-
-    public void removeGroup(String user, String groupName)
-            throws BusinessException {
-        try {
-            gridaPoolClient.delete(server.getDataManagerGroupsHome() + "/"
-                    + groupName.replaceAll(" ", "_"), user);
-            groupDAO.remove(groupName);
-        } catch (GRIDAClientException ex) {
-            logger.error("Error removing group : {}", groupName, ex);
-            throw new BusinessException(ex);
-        } catch (DAOException ex) {
-            throw new BusinessException(ex);
-        }
-    }
-
-    public void updateGroup(String name, Group group) throws BusinessException {
-        try {
-            if (!name.equals(group.getName())) {
-                gridaClient.rename(
-                        server.getDataManagerGroupsHome() + "/" + name.replaceAll(" ", "_"),
-                        server.getDataManagerGroupsHome() + "/" + group.getName().replaceAll(" ", "_"));
-            }
-            groupDAO.update(name, group);
-        } catch (GRIDAClientException ex) {
-            logger.error("Error updating group : {}", name, ex);
-            throw new BusinessException(ex);
-        } catch (DAOException ex) {
-            throw new BusinessException(ex);
-        }
-    }
-
-    public List<Group> getGroups() throws BusinessException {
-        try {
-            return groupDAO.getGroups();
-        } catch (DAOException ex) {
-            throw new BusinessException(ex);
-        }
-    }
-
-    public Group getGroup(String groupName) throws BusinessException {
-        if (groupName == null) {
-            return null;
-        }
-        return this.getGroups().stream()
-                .filter(g -> groupName.equals(g.getName()))
-                .findAny().orElse(null);
-    }
-
-    public List<Group> getPublicGroups() throws BusinessException {
-        try {
-            List<Group> publicGroups = new ArrayList<>();
-            for (Group g : groupDAO.getGroups()) {
-                if (g.isPublicGroup()) {
-                    publicGroups.add(g);
-                }
-            }
-            return publicGroups;
-        } catch (DAOException ex) {
-            throw new BusinessException(ex);
-        }
     }
 
     public Map<Group, CoreConstants.GROUP_ROLE> getUserGroups(String email)
@@ -821,32 +728,24 @@ public class ConfigurationBusiness {
         }
     }
 
-    public void sendContactMail(
-            User user, String category, String subject, String comment)
-            throws BusinessException {
-        try {
-            String emailContent = "<html>"
-                    + "<head></head>"
-                    + "<body>"
-                    + "<p><b>VIP Contact</b></p>"
-                    + "<p><b>User:</b> " + user.getFullName() + "</p>"
-                    + "<p><b>Email:</b> <a href=\"mailto:" + user.getEmail() + "\">" + user.getEmail() + "</a></p>"
-                    + "<p>&nbsp;</p>"
-                    + "<p><b>Category:</b> " + category + "</p>"
-                    + "<p><b>Subject:</b> " + subject + "</p>"
-                    + "<p>&nbsp;</p>"
-                    + "<p><b>Comments:</b></p>"
-                    + "<p>" + comment + "</p>"
-                    + "</body>"
-                    + "</html>";
+    public void sendContactMail(User user, String category, String subject, String comment) throws BusinessException {
+        String emailContent = "<html>"
+            + "<head></head>"
+            + "<body>"
+            + "<p><b>VIP Contact</b></p>"
+            + "<p><b>User:</b> " + user.getFullName() + "</p>"
+            + "<p><b>Email:</b> <a href=\"mailto:" + user.getEmail() + "\">" + user.getEmail() + "</a></p>"
+            + "<p>&nbsp;</p>"
+            + "<p><b>Category:</b> " + category + "</p>"
+            + "<p><b>Subject:</b> " + subject + "</p>"
+            + "<p>&nbsp;</p>"
+            + "<p><b>Comments:</b></p>"
+            + "<p>" + comment + "</p>"
+            + "</body>"
+            + "</html>";
 
-            for (User u : usersGroupsDAO.getUsersFromGroup(CoreConstants.GROUP_SUPPORT)) {
-                emailBusiness.sendEmail("[VIP Contact] " + category, emailContent,
-                        new String[]{u.getEmail()}, true, user.getEmail());
-            }
-        } catch (DAOException ex) {
-            throw new BusinessException(ex);
-        }
+        emailBusiness.sendEmailToAdmins("[VIP Contact] " + category, emailContent,
+            true, user.getEmail());
     }
 
     public void updateUserLastLogin(String email) throws BusinessException {
@@ -916,27 +815,6 @@ public class ConfigurationBusiness {
         }
     }
 
-    public List<String> getSupportEmails() throws BusinessException {
-        try {
-            return usersGroupsDAO.getUsersFromGroup(CoreConstants.GROUP_SUPPORT)
-                    .stream().map(User::getEmail)
-                    .collect(Collectors.toList());
-        } catch (DAOException e) {
-            throw new BusinessException(e);
-        }
-    }
-
-    /**
-     * Gets an array of administrator's e-mails
-     */
-    private String[] getAdministratorsEmails() throws DAOException {
-        List<String> emails = new ArrayList<>();
-        for (User admin : userDAO.getAdministrators()) {
-            emails.add(admin.getEmail());
-        }
-        return emails.toArray(new String[]{});
-    }
-
     public User getUserWithSession(String email) throws DAOException {
 
         String session = UUID.randomUUID().toString();
@@ -975,14 +853,14 @@ public class ConfigurationBusiness {
             user = getNewUser(email, firstName, lastName, institution);
             try {
                 signup(user, "Generated automatically", true, true,
-                        getGroup(groupName));
+                        groupBusiness.get(groupName));
             } catch (BusinessException ex2) {
                 if (ex2.getMessage().contains("existing")) {
                     //try with a different last name
                     lastName += "_" + System.currentTimeMillis();
                     user = getNewUser(email, firstName, lastName, institution);
                     signup(user, "Generated automatically", true,
-                            true, getGroup(groupName));
+                            true, groupBusiness.get(groupName));
                 }
             }
             activateUser(user.getEmail());
@@ -1058,8 +936,7 @@ public class ConfigurationBusiness {
         }
     }
 
-    private void sendErrorEmailToAdmins(
-            String errorMessage, Exception exception, String userEmail) {
+    private void sendErrorEmailToAdmins(String errorMessage, Exception exception, String userEmail) {
         try {
             StringBuilder emailContent = new StringBuilder("<html><head></head><body>");
             emailContent.append("<p>Dear Administrator,</p>");
@@ -1079,14 +956,10 @@ public class ConfigurationBusiness {
             emailContent.append("<p>Best Regards,</p><p>VIP Team</p>");
             emailContent.append("</body></html>");
 
-            for (String email : getAdministratorsEmails()) {
-                emailBusiness.sendEmail("[VIP Admin] VIP error", emailContent.toString(),
-                        new String[]{email}, true, userEmail);
-            }
+            emailBusiness.sendEmailToAdmins("[VIP Admin] VIP error", emailContent.toString(),
+                    true, userEmail);
         } catch (BusinessException e) {
             logger.error("Cannot sent mail to admin. Ignoring", e);
-        } catch (DAOException e) {
-            logger.error("Cannot sent mail to admin : {}. Ignoring", e.getMessage());
         }
     }
 }

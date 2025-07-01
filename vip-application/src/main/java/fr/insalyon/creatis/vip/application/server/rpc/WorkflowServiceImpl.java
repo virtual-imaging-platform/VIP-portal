@@ -36,6 +36,8 @@ import fr.insalyon.creatis.moteur.plugins.workflowsdb.dao.WorkflowsDBDAOExceptio
 import fr.insalyon.creatis.vip.application.client.bean.*;
 import fr.insalyon.creatis.vip.application.client.rpc.WorkflowService;
 import fr.insalyon.creatis.vip.application.client.view.ApplicationException;
+import fr.insalyon.creatis.boutiques.model.BoutiquesDescriptor;
+import fr.insalyon.creatis.vip.application.server.business.AppVersionBusiness;
 import fr.insalyon.creatis.vip.application.server.business.BoutiquesBusiness;
 import fr.insalyon.creatis.vip.application.server.business.InputBusiness;
 import fr.insalyon.creatis.vip.application.server.business.WorkflowBusiness;
@@ -76,6 +78,7 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
     private ConfigurationBusiness configurationBusiness;
     private ApplicationInputDAO applicationInputDAO;
     private BoutiquesBusiness boutiquesBusiness;
+    private AppVersionBusiness appVersionBusiness;
 
     @Override
     public void init() throws ServletException {
@@ -85,6 +88,7 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
         configurationBusiness = getBean(ConfigurationBusiness.class);
         workflowBusiness = getBean(WorkflowBusiness.class);
         boutiquesBusiness = getBean(BoutiquesBusiness.class);
+        appVersionBusiness = getBean(AppVersionBusiness.class);
     }
 
     /**
@@ -140,13 +144,13 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
      */
     @Override
     public List<Simulation> getSimulations(String userName, String application,
-            String status, String appClass, Date startDate, Date endDate) throws ApplicationException {
+                                           String status, Date startDate, Date endDate) throws ApplicationException {
         try {
             User user = getSessionUser();
             if (user.isSystemAdministrator() || (userName != null && userName.equalsIgnoreCase(user.getFullName()))) {
-                return workflowBusiness.getSimulations(userName, application, status, appClass, startDate, endDate);
+                return workflowBusiness.getSimulations(userName, application, status, startDate, endDate);
             } else if (userName == null) {
-                return workflowBusiness.getSimulationsWithGroupAdminRights(user, application, status, appClass, startDate, endDate, null);
+                return workflowBusiness.getSimulationsWithGroupAdminRights(user, application, status, startDate, endDate, null);
             } else {
                 throw new ApplicationException("You can't see another person's simulation!");
             }
@@ -156,23 +160,10 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
     }
 
     @Override
-    public Descriptor getApplicationDescriptor(String applicationName, String applicationVersion) throws ApplicationException {
-        try {
-            return workflowBusiness.getApplicationDescriptor(
-                    getSessionUser(),
-                    applicationName,
-                    applicationVersion);
-        } catch (BusinessException | CoreException ex) {
-            throw new ApplicationException(ex);
-        }
-    }
-
-    @Override
     public String getApplicationDescriptorString(String applicationName, String applicationVersion) throws ApplicationException {
         try {
-            return boutiquesBusiness.getApplicationDescriptorString(getSessionUser(), applicationName,
-                                                                    applicationVersion);
-        } catch (BusinessException | CoreException ex) {
+            return boutiquesBusiness.getApplicationDescriptorString(applicationName, applicationVersion);
+        } catch (BusinessException ex) {
             throw new ApplicationException(ex);
         }
     }
@@ -186,11 +177,32 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
 
         try {
             for (var pair : applications) {
-                result.add(boutiquesBusiness.getApplicationDescriptorString(
-                    getSessionUser(), pair.getFirst(), pair.getSecond()));
+                result.add(boutiquesBusiness.getApplicationDescriptorString(pair.getFirst(), pair.getSecond()));
             }
             return result;
-        } catch (BusinessException | CoreException ex) {
+        } catch (BusinessException ex) {
+            throw new ApplicationException(ex);
+        }
+    }
+
+    private void fillInOverriddenInputs(Map<String, String> parametersMap,
+                                        String applicationName, String applicationVersion) throws ApplicationException {
+        try {
+            AppVersion appVersion = appVersionBusiness.getVersion(applicationName, applicationVersion);
+            BoutiquesDescriptor descriptor = boutiquesBusiness.parseBoutiquesString(appVersion.getDescriptor());
+            Map<String, String> overriddenInputs = boutiquesBusiness.getOverriddenInputs(descriptor);
+            if (overriddenInputs != null) {
+                for (String key : overriddenInputs.keySet()) {
+                    String value = overriddenInputs.get(key);
+                    if (parametersMap.containsKey(value)) {
+                        parametersMap.put(key, parametersMap.get(value));
+                    } else {
+                        logger.error("missing parameter {}", value);
+                        throw new ApplicationException("missing parameter " + value);
+                    }
+                }
+            }
+        } catch (BusinessException ex) {
             throw new ApplicationException(ex);
         }
     }
@@ -199,6 +211,8 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
     public void launchSimulation(Map<String, String> parametersMap,
             String applicationName, String applicationVersion,
             String applicationClass, String simulationName) throws ApplicationException {
+
+        // fill in overriddenInputs from explicit inputs
 
         try {
             trace(logger, "Launching simulation '" + simulationName + "' (" + applicationName + ").");
@@ -212,11 +226,9 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
             for (Map.Entry<String,String> p : parametersMap.entrySet()) {
                 logger.info("received param {} : {}", p.getKey(), p.getValue());
             }
-
-            String simulationID = workflowBusiness.launch(
-                user, groups,
-                parametersMap, applicationName, applicationVersion,
-                applicationClass, simulationName);
+            fillInOverriddenInputs(parametersMap, applicationName, applicationVersion);
+            String simulationID = workflowBusiness.launch(user, groups,
+                parametersMap, applicationName, applicationVersion, simulationName);
 
             trace(logger, "Simulation '" + simulationName + "' launched with ID '" + simulationID + "'.");
 
@@ -269,21 +281,6 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
             inputBusiness.updateSimulationInput(
                 getSessionUser().getEmail(), simulationInput);
         } catch (BusinessException | CoreException ex) {
-            throw new ApplicationException(ex);
-        }
-    }
-
-    /**
-     *
-     * @param fileName
-     * @return
-     */
-    public String loadSimulationInput(String fileName) throws ApplicationException {
-
-        try {
-            return inputBusiness.loadSimulationInput(fileName);
-
-        } catch (BusinessException ex) {
             throw new ApplicationException(ex);
         }
     }

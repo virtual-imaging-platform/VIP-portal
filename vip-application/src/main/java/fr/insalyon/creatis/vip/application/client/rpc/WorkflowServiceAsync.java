@@ -49,8 +49,6 @@ public interface WorkflowServiceAsync {
     
     public void getSimulations(Date lastDate, AsyncCallback<List<Simulation>> asyncCallback);
 
-    public void getApplicationDescriptor(String applicationName, String applicationVersion, AsyncCallback<Descriptor> asyncCallback);
-
     public void getApplicationDescriptorString(String applicationName, String applicationVersion, AsyncCallback<String> asyncCallback);
 
     public void getApplicationsDescriptorsString(List<Pair<String, String>> applications, AsyncCallback<List<String>> asyncCallback);
@@ -62,8 +60,6 @@ public interface WorkflowServiceAsync {
     public void addSimulationInput(SimulationInput simulationInput, AsyncCallback<Void> asyncCallback);
 
     public void updateSimulationInput(SimulationInput simulationInput, AsyncCallback<Void> asyncCallback);
-
-    public void loadSimulationInput(String fileName, AsyncCallback<String> asyncCallback);
 
     public void removeSimulationInput(String inputName, String applicationName, AsyncCallback<Void> asyncCallback);
 
@@ -93,7 +89,7 @@ public interface WorkflowServiceAsync {
     
     public void relaunchSimulation(String simulationID, AsyncCallback<Map<String, String>> asyncCallback);
 
-    public void getSimulations(String user, String application, String status, String applicationClass, Date startDate, Date endDate, AsyncCallback<List<Simulation>> asyncCallback);
+    public void getSimulations(String user, String application, String status, Date startDate, Date endDate, AsyncCallback<List<Simulation>> asyncCallback);
     
     public void getSimulation(String simulationID, AsyncCallback<Simulation> asyncCallback);
 

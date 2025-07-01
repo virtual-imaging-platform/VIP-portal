@@ -43,7 +43,7 @@ knowledge of the CeCILL-B license and that you accept its terms.
     <properties>
         <!-- project version. Only to change it here (and in CoreConstants.java
            Follow this practice : https://maven.apache.org/maven-ci-friendly.html-->
-        <revision>3.0.1</revision>
+        <revision>4.0</revision>
         <changelist/>
         <sha1/>
 
@@ -52,11 +52,11 @@ knowledge of the CeCILL-B license and that you accept its terms.
         <maven.compiler.target>21</maven.compiler.target>
         <maven.compiler.source>21</maven.compiler.source>
 
-
         <!-- VIP related dependencies version -->
-        <moteur2-workflowsdb-common.version>2.0.0</moteur2-workflowsdb-common.version>
-        <grida.version>3.0.0</grida.version>
-        <sma.version>0.3.0</sma.version>
+        <moteur2-workflowsdb-common.version>2.1.0</moteur2-workflowsdb-common.version>
+        <grida.version>3.1.0</grida.version>
+        <sma.version>1.0.1</sma.version>
+        <boutiques-model.version>1.0</boutiques-model.version>
 
         <!-- 3rd party dependencies version -->
         <junit.version>5.11.3</junit.version>
@@ -253,6 +253,8 @@ knowledge of the CeCILL-B license and that you accept its terms.
                 <configuration>
                     <compilerArgs>
                         <arg>-parameters</arg>
+                        <arg>-Xlint:unchecked</arg>
+                        <arg>-Werror</arg>
                     </compilerArgs>
                 </configuration>
             </plugin>

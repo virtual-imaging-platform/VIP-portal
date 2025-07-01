@@ -31,6 +31,9 @@
  */
 package fr.insalyon.creatis.vip.applicationimporter.server.rpc;
 
+import fr.insalyon.creatis.boutiques.model.BoutiquesDescriptor;
+import fr.insalyon.creatis.vip.application.client.bean.Tag;
+import fr.insalyon.creatis.vip.application.client.bean.Tag.ValueType;
 import fr.insalyon.creatis.vip.application.client.bean.boutiquesTools.BoutiquesApplication;
 import fr.insalyon.creatis.vip.applicationimporter.client.ApplicationImporterException;
 import fr.insalyon.creatis.vip.applicationimporter.client.rpc.ApplicationImporterService;
@@ -40,8 +43,14 @@ import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import jakarta.servlet.ServletException;
+
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class ApplicationImporterServiceImpl extends fr.insalyon.creatis.vip.core.server.rpc.AbstractRemoteServiceServlet
         implements ApplicationImporterService {
@@ -68,25 +77,49 @@ public class ApplicationImporterServiceImpl extends fr.insalyon.creatis.vip.core
     }
 
     @Override
-    public void createApplication(
-            BoutiquesApplication bt, String tag, boolean isRunOnGrid, boolean overwriteVersion, String fileAccessProtocol)
+    public void createApplication(BoutiquesApplication bt, boolean overwriteVersion,
+            List<Tag> tags, List<String> resources)
             throws ApplicationImporterException {
         try {
             trace(logger, "Creating application");
             applicationImporterBusiness.createApplication(
-                    bt, tag, isRunOnGrid, overwriteVersion, fileAccessProtocol, getSessionUser());
+                    bt, overwriteVersion, tags, resources, getSessionUser());
         } catch (CoreException | BusinessException ex) {
             throw new ApplicationImporterException(ex);
         }
     }
 
     @Override
-    public String getApplicationImporterRootFolder() throws ApplicationImporterException {
-        return server.getApplicationImporterRootFolder();
-    }
+    @SuppressWarnings("unchecked")
+    public List<Tag> getBoutiquesTags(String boutiquesJsonFile) throws ApplicationImporterException {
+        try {
+            List<Tag> tags = new ArrayList<>();
+            ObjectMapper objectMapper = new ObjectMapper();
+            BoutiquesDescriptor descriptor = objectMapper.readValue(boutiquesJsonFile, BoutiquesDescriptor.class);
 
-    @Override
-    public List<String> getApplicationImporterRequirements() throws ApplicationImporterException {
-        return server.getApplicationImporterRequirements();
+            if (descriptor.getTags() != null) {
+                // boutiques tags can be List<String>, String, numbers or booleans
+                // we return into String or List<String>
+                // in case of boolean we precise with ValueType.BOOLEAN
+                for (Map.Entry<String, Object> entry : descriptor.getTags().getAdditionalProperties().entrySet()) {
+                    String k = entry.getKey();
+                    Object v = entry.getValue();
+                    if (v instanceof List) {
+                        tags.addAll(((List<String>) v).stream().map((sub) -> {
+                            return new Tag(k, (String) sub, ValueType.STRING, null, null, true, true);
+                        }).toList());
+                    } else if (v instanceof Boolean) {
+                        tags.add(new Tag(k, String.valueOf(v), ValueType.BOOLEAN, null, null, true, true));
+                    } else if (v instanceof String) {
+                        tags.add(new Tag(k, String.valueOf(v), ValueType.STRING, null, null, true, true));
+                    } else {
+                        throw new ApplicationImporterException("List<String>, String and Boolean are the only types supported in tags values: "+ v.getClass().toString());
+                    }
+                }
+            }
+            return tags;
+        } catch (JsonProcessingException e) {
+            throw new ApplicationImporterException(e);
+        }
     }
 }

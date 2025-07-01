@@ -147,27 +147,15 @@ public abstract class ApplicationsTileGrid extends TileGrid {
     }
 
     protected void addApplication(String applicationName, String applicationImage) {
-
         addApplication(new ApplicationTileRecord(applicationName, applicationImage));
-        //this.setHeight("100%");
-        //test with redraw
-       // redraw();
-
     }
 
     protected void addApplication(String applicationName, String version, String applicationImage) {
-
         addApplication(new ApplicationTileRecord(applicationName, version, applicationImage));
-       //this.setHeight("100%");
-
-
     }
 
     protected void addApplication(ApplicationTileRecord record) {
-
         this.addData(record);
-         //this.setHeight("100%");
-
     }
 
     public abstract void parse(String applicationName, String version);

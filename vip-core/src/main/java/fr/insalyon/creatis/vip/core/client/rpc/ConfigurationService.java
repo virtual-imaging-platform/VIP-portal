@@ -43,10 +43,6 @@ import java.sql.Timestamp;
 import java.util.List;
 import java.util.Map;
 
-/**
- *
- * @author Rafael Ferreira da Silva
- */
 public interface ConfigurationService extends RemoteService {
 
     String SERVICE_URI = "/configurationservice";
@@ -63,10 +59,6 @@ public interface ConfigurationService extends RemoteService {
     }
 
     User configure(String email, String session) throws CoreException;
-
-    void signup(User user, String comments) throws CoreException;
-
-    User signin(String email, String password) throws CoreException;
 
     void signout() throws CoreException;
 
@@ -88,13 +80,17 @@ public interface ConfigurationService extends RemoteService {
 
     List<Group> getPublicGroups() throws CoreException;
 
+    List<String> getItemsGroup(String groupname) throws CoreException;
+
+    void removeItemFromGroup(String item, String groupname) throws CoreException;
+
     User removeUser(String email) throws CoreException;
 
     Map<Group, CoreConstants.GROUP_ROLE> getUserGroups(String email) throws CoreException;
 
     List<Boolean> getUserPropertiesGroups() throws CoreException;
 
-    List<String> getUserGroups() throws CoreException;
+    List<Group> getUserGroups() throws CoreException;
 
     void updateUser(String email, UserLevel level, CountryCode countryCode, int maxRunningSimulations, Map<String, CoreConstants.GROUP_ROLE> groups, boolean locked) throws CoreException;
 
@@ -132,7 +128,7 @@ public interface ConfigurationService extends RemoteService {
 
     boolean testLastUpdatePublication() throws CoreException;
 
-    //TermsOfUse
+    // TermsOfUse
     void addTermsUse() throws CoreException;
 
     Timestamp getLastUpdateTermsOfUse() throws CoreException;
@@ -146,4 +142,6 @@ public interface ConfigurationService extends RemoteService {
     void deleteUserApikey(String email) throws CoreException;
 
     String generateNewUserApikey(String email) throws CoreException;
+
+    List<String> getMissingGroupsRessources(String email) throws CoreException;
 }

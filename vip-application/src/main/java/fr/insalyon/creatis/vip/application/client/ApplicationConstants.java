@@ -42,8 +42,9 @@ public class ApplicationConstants {
     // Tabs
     public final static String TAB_APPLICATION = "applications_tab";
     public final static String TAB_MANAGE_APPLICATION = "manage_application_tab";
-    public final static String TAB_MANAGE_CLASSES = "manage_classes_tab";
     public final static String TAB_MANAGE_ENGINE = "manage_engine_tab";
+    public final static String TAB_MANAGE_RESOURCE = "manage_resource_tab";
+    public final static String TAB_MANAGE_TAG = "manage_tag_tab";
     public final static String TAB_MONITOR = "monitor_tab";
     public final static String TAB_STATS = "stats_tab";
     public final static String TAB_REPROVIP = "reproVip_tab";
@@ -53,7 +54,6 @@ public class ApplicationConstants {
     public static final String ICON_APPLICATION = IMG_FOLDER + "icon-application.png";
     public static final String ICON_APPLICATION_MONITOR = IMG_FOLDER + "icon-application-monitor.png";
     public static final String ICON_CHART = IMG_FOLDER + "icon-chart.png";
-    public static final String ICON_CLASSES = IMG_FOLDER + "icon-classes.png";
     public static final String ICON_CLEAN = IMG_FOLDER + "icon-clean.png";
     public static final String ICON_GENERAL = IMG_FOLDER + "icon-general.png";
     public static final String ICON_KILL = IMG_FOLDER + "icon-kill.png";
@@ -75,6 +75,8 @@ public class ApplicationConstants {
     public static final String ICON_MONITOR_SIMULATION_COMPLETED = IMG_FOLDER + "monitor/icon-simulation-completed.png";
     public static final String ICON_MARK_COMPLETED = IMG_FOLDER + "icon-mark-completed.png";
     public static final String ICON_USER = IMG_FOLDER + "icon-user.png";
+    public static final String ICON_RESOURCE = IMG_FOLDER + "icon-resource.png";
+    public static final String ICON_TAG = IMG_FOLDER + "icon-tag.png";
     ;
     public static final String ICON_MONITOR_SIMULATION_FAILED = IMG_FOLDER + "monitor/icon-simulation-failed.png";
     public static final String ICON_MONITOR_SIMULATION_KILLED = IMG_FOLDER + "monitor/icon-simulation-killed.png";
@@ -104,26 +106,27 @@ public class ApplicationConstants {
     public static final String ICON_TREE_SIMULATION = IMG_FOLDER + "tree/icon-tree-simulation.png";
     // Application Names
     public static final String APP_APPLICATION = "Applications";
-    public static final String APP_CLASSES = "Classes";
     public static final String APP_MONITOR = "Execution Monitor";
     public static final String APP_ENGINE = "Engines";
     public static final String APP_SIMULATION_ERROR = "Error File";
     public static final String APP_SIMULATION_OUT = "Output File";
     public static final String APP_PUBLIC_APPLICATION = "Applications";
     public static final String APP_REPRO_VIP = "ReproVIP";
+    public static final String APP_RESOURCE = "Resources";
+    public static final String APP_TAG = "Tags";
     // Application Images
     public static final String APP_IMG_APPLICATION = IMG_FOLDER + "app-application.png";
-    public static final String APP_IMG_CLASSES = IMG_FOLDER + "app-classes.png";
     public static final String APP_IMG_MONITOR = IMG_FOLDER + "app-monitor.png";
     public static final String APP_IMG_ENGINE = IMG_FOLDER + "app-engine.png";
+    public static final String APP_IMG_RESOURCE = IMG_FOLDER + "app-resource.png";
     public static final String APP_IMG_SIMULATION_ERROR = IMG_FOLDER + "app-simulation-error.png";
     public static final String APP_IMG_SIMULATION_OUT = IMG_FOLDER + "app-simulation-out.png";
+    public static final String APP_IMG_TAG = IMG_FOLDER + "app-tag.png";
     // Application launch, input without value
     public static final String INPUT_WITHOUT_VALUE = "No_value_provided";
     public static final String INPUT_WITHOUT_VALUE_REQUIRED_MESSAGE = "Either you deselect the field or you fill it in";
     // Configuration
     public static final String WORKKFLOW_EXAMPLE_TAG = "example";
-    public static final String SESSION_CLASSES = "vip-classes";
     public static final String SEPARATOR_INPUT = "##";
     public static final String SEPARATOR_LIST = "@@";
     public static final String INPUT_VALID_CHARS = "0-9.,A-Za-z-+@/_(): ";

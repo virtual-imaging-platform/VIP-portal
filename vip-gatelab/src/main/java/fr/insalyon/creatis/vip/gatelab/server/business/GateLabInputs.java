@@ -103,49 +103,15 @@ public class GateLabInputs {
     public Map<String, String> getWorkflowInputs(String currentUserFolder)
             throws BusinessException {
 
-        try {
-            String input = inputsMap.get("GateInput");
-            /*
-             * int ind = input.lastIndexOf("/"); String inputlink =
-             * input.substring(0, ind);
-             *
-             * String application_name = "unknown";
-             *
-             * if (input.indexOf(".zip") > 0) { application_name =
-             * input.substring(ind + 1, input.indexOf(".zip"));
-             *
-             * } else if (input.indexOf(".tgz") > 0) { application_name =
-             * input.substring(ind + 1, input.indexOf(".tgz"));
-             *
-             * } else if (input.indexOf(".tar.gz") > 0) { application_name =
-             * input.substring(ind + 1, input.indexOf(".tar.gz"));
-             *
-             * } else if (input.indexOf(".zip") > 0) { application_name =
-             * input.substring(ind + 1, input.indexOf(".zip")); }
-             *
-             * String outputlink = inputlink + "/output";
-             */
-            String release = inputsMap.get("GateRelease");
-            String particles = inputsMap.get("NumberOfParticles");
-            String simtype = inputsMap.get("ParallelizationType").equals("dyn") ?
-                    "Dynamic" : "Static";
-            String phaseSpace = inputsMap.get("phaseSpace");
-            Map<String, String> inputMap = new HashMap<String, String>();
-            inputMap.put(
-                "inputlink",
-                    lfcPathsBusiness.parseRealDir(input, currentUserFolder));
-            //inputMap.put("outputlink", DataManagerUtil.parseRealDir(outputlink));
-            inputMap.put(
-                "gate_version",
-                    lfcPathsBusiness.parseRealDir(release, currentUserFolder));
-            inputMap.put("particles", particles);
-            inputMap.put("simulation", simtype);
-            inputMap.put("phaseSpace", phaseSpace);
+        String gateInput = inputsMap.get("gateInput");
+        String numberOfJobs = inputsMap.get("numberOfJobs");
+        String macfileName = inputsMap.get("macfileName");
+        Map<String, String> inputMap = new HashMap<String, String>();
+        inputMap.put("gateInput", gateInput);
+        inputMap.put("numberOfJobs", numberOfJobs);
+        inputMap.put("macfileName", macfileName);
 
-            return inputMap;
+        return inputMap;
 
-        } catch (DataManagerException ex) {
-            throw new BusinessException(ex);
-        }
     }
 }

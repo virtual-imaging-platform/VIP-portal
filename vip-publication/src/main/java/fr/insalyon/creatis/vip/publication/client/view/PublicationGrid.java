@@ -34,7 +34,6 @@ package fr.insalyon.creatis.vip.publication.client.view;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.data.DataSource;
 import com.smartgwt.client.data.Record;
-import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.SortDirection;
 import com.smartgwt.client.util.BooleanCallback;
 import com.smartgwt.client.util.SC;
@@ -54,6 +53,7 @@ import fr.insalyon.creatis.vip.core.client.CoreModule;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.core.client.view.user.UserLevel;
+import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
 import fr.insalyon.creatis.vip.publication.client.rpc.PublicationService;
 
 /**
@@ -82,7 +82,7 @@ public class PublicationGrid extends ListGrid {
                     rollOverCanvas.setWidth(50);
                     rollOverCanvas.setHeight(22);
 
-                    final ImgButton loadImg = getImgButton(CoreConstants.ICON_EDIT, "Edit");
+                    final ImgButton loadImg = WidgetUtil.getImgButton(CoreConstants.ICON_EDIT, "Edit");
                     loadImg.addClickHandler(new ClickHandler() {
                         @Override
                         public void onClick(ClickEvent event) {
@@ -91,7 +91,7 @@ public class PublicationGrid extends ListGrid {
                                     rollOverRecord.getAttribute("typeName"), rollOverRecord.getAttribute("authors"), rollOverRecord.getAttribute("date"), rollOverRecord.getAttribute("doi"), rollOverRecord.getAttribute("vipApplication"));
                         }
                     });
-                    final ImgButton deleteImg = getImgButton(CoreConstants.ICON_DELETE, "Delete");
+                    final ImgButton deleteImg = WidgetUtil.getImgButton(CoreConstants.ICON_DELETE, "Delete");
                     deleteImg.addClickHandler(new ClickHandler() {
                         @Override
                         public void onClick(ClickEvent event) {
@@ -115,18 +115,6 @@ public class PublicationGrid extends ListGrid {
                     
                 }
                 return rollOverCanvas;
-            }
-
-            private ImgButton getImgButton(String imgSrc, String prompt) {
-                ImgButton button = new ImgButton();
-                button.setShowDown(false);
-                button.setShowRollOver(false);
-                button.setLayoutAlign(Alignment.CENTER);
-                button.setSrc(imgSrc);
-                button.setPrompt(prompt);
-                button.setHeight(16);
-                button.setWidth(16);
-                return button;
             }
 
             @Override

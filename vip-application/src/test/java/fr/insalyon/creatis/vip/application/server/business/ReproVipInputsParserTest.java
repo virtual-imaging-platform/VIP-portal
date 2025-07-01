@@ -48,7 +48,7 @@ public class ReproVipInputsParserTest {
         MockitoAnnotations.openMocks(this);
 
         when(externalPlatformBusiness.listAll()).thenReturn(Arrays.asList(platform));
-        when(groupDAO.getGroups()).thenReturn(Collections.emptyList());
+        when(groupDAO.get()).thenReturn(Collections.emptyList());
     }
 
     @Test
