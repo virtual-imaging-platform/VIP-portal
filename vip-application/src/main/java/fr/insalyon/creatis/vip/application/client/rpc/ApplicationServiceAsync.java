@@ -44,9 +44,11 @@ import java.util.Map;
 
 public interface ApplicationServiceAsync {
 
-    public void getPublicApplications(AsyncCallback<Map<Application, List<AppVersion>>> asyncCallback);
+    public void getPublicApplications(AsyncCallback<List<Application>> asyncCallback);
     
     public void getApplications(AsyncCallback<Map<Application, List<AppVersion>>> asyncCallback);
+
+    public void getManageableApplications(AsyncCallback<List<Application>> asyncCallback);
     
     public void getVersions(String applicationName, AsyncCallback<List<AppVersion>> asyncCallback);
     

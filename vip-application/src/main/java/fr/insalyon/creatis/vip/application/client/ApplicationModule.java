@@ -117,9 +117,8 @@ public class ApplicationModule extends Module {
         CoreModule.addSystemApplicationParser(new ApplicationSystemParser());
         CoreModule.addLayoutToHomeTab(TimelineLayout.getInstance());
 
-        userTagApps.forEach((name, versions) -> {
-            CoreModule.addApplicationsTileGrid(new ApplicationTileGrid(name, versions));
-        });
+        userTagApps.keySet().stream().sorted().forEach(name ->
+                CoreModule.addApplicationsTileGrid(new ApplicationTileGrid(name, userTagApps.get(name))));
 
         // Simulation close tab
         CenterTabSet.getInstance().addCloseClickHandler(new CloseClickHandler() {

@@ -179,7 +179,7 @@ public class PipelineBusiness {
     // used for the VIP landing page
     public List<Application> listPublicPipelines() throws ApiException {
         try {
-            return applicationBusiness.getPublicApplicationsWithGroups();
+            return applicationBusiness.getPublicApplications();
         } catch (BusinessException e) {
             throw new ApiException(e);
         }

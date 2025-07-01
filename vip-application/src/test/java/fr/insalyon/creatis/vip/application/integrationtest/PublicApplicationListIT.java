@@ -35,7 +35,7 @@ public class PublicApplicationListIT extends BaseSpringIT {
         applicationBusiness.add(app);
         appVersionBusiness.add(appVersion);
 
-        List<Application> publicApplications = applicationBusiness.getPublicApplicationsWithGroups();
+        List<Application> publicApplications = applicationBusiness.getPublicApplications();
         assertEquals(1, publicApplications.size());
 
         Application resultApp = publicApplications.get(0);
