@@ -17,6 +17,7 @@ import org.springframework.core.io.support.ResourcePropertySource;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -82,8 +83,8 @@ public class LocalConfiguration {
 
         private final Logger logger = LoggerFactory.getLogger(getClass());
 
-        public SmaClientLocal() {
-            super(null, 0);
+        public SmaClientLocal() throws UnknownHostException {
+            super((String) null, 0);
         }
 
         @Override

@@ -27,6 +27,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import javax.sql.DataSource;
 import java.io.IOException;
+import java.net.UnknownHostException;
 
 import static org.springframework.util.ResourceUtils.CLASSPATH_URL_PREFIX;
 
@@ -101,7 +102,7 @@ public class SpringCoreConfig {
     }
 
     @Bean
-    public SMAClient smaClient(Server server) {
+    public SMAClient smaClient(Server server) throws UnknownHostException {
         return new SMAClient(server.getSMAHost(), server.getSMAPort());
     }
 
