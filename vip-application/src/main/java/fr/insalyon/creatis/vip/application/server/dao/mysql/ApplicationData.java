@@ -55,6 +55,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -430,7 +431,12 @@ public class ApplicationData extends JdbcDaoSupport implements ApplicationDAO {
         try {
             ObjectMapper mapper = new ObjectMapper();
 
-            return mapper.readValue(json, new TypeReference<Map<String, String>>() {});
+            if (json == null) {
+                return new HashMap<>();
+            } else {
+                return mapper.readValue(json, new TypeReference<Map<String, String>>() {});
+            }
+
         } catch (JsonProcessingException e) {
             logger.error("Failed to convert JSON settings to map!", e);
             throw new DAOException(e);
