@@ -31,7 +31,7 @@ public class EgiSecurityClientConfig {
     @Bean
     @DependsOn("apiPropertiesInitializer")
     public ClientRegistrationRepository clientRegistrationRepository() {
-        return new InMemoryClientRegistrationRepository(this.egiClientRegistration());
+        return new InMemoryClientRegistrationRepository(this.egiClientRegistration(), this.lsloginClientRegistration());
     }
 
     private ClientRegistration egiClientRegistration() {
@@ -48,6 +48,23 @@ public class EgiSecurityClientConfig {
                 .userNameAttributeName(IdTokenClaimNames.SUB)
                 .jwkSetUri(env.getRequiredProperty(CarminProperties.EGI_JWK_SET_URI))
                 .clientName("EGI")
+                .build();
+    }
+
+    private ClientRegistration lsloginClientRegistration() {
+        return ClientRegistration.withRegistrationId("lslogin")
+                .clientId(env.getRequiredProperty(CarminProperties.LSLOGIN_CLIENT_ID))
+                .clientSecret(env.getRequiredProperty(CarminProperties.LSLOGIN_CLIENT_SECRET))
+                .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
+                .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
+                .redirectUri(env.getRequiredProperty(CarminProperties.LSLOGIN_REDIRECT_URI))
+                .scope("openid", "profile", "email", "voperson_external_id", "eduperson_scoped_affiliation")
+                .authorizationUri(env.getRequiredProperty(CarminProperties.LSLOGIN_AUTHORIZATION_URI))
+                .tokenUri(env.getRequiredProperty(CarminProperties.LSLOGIN_TOKEN_URI))
+                .userInfoUri(env.getRequiredProperty(CarminProperties.LSLOGIN_USER_INFO_URI))
+                .userNameAttributeName(IdTokenClaimNames.SUB)
+                .jwkSetUri(env.getRequiredProperty(CarminProperties.LSLOGIN_JWK_SET_URI))
+                .clientName("LSLOGIN")
                 .build();
     }
 }
