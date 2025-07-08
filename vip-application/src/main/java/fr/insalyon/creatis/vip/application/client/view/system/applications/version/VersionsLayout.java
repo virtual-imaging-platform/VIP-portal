@@ -169,7 +169,8 @@ public class VersionsLayout extends VLayout {
 
         grid.setFields(
                 isVisibleField,
-                new ListGridField("version", "Version"));
+                new ListGridField("version", "Version"),
+                new ListGridField("resources", "Resources"));
         grid.setSortField("version");
         grid.setSortDirection(SortDirection.ASCENDING);
         grid.addCellDoubleClickHandler(new CellDoubleClickHandler() {

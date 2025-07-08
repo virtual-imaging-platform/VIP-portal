@@ -32,6 +32,7 @@
 package fr.insalyon.creatis.vip.core.client.view.common;
 
 import com.smartgwt.client.types.Alignment;
+import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.Label;
 import com.smartgwt.client.widgets.form.fields.FormItem;
@@ -40,10 +41,6 @@ import com.smartgwt.client.widgets.layout.VLayout;
 import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
 import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
 
-/**
- *
- * @author Rafael Ferreira da Silva
- */
 public abstract class AbstractFormLayout extends VLayout {
 
     public AbstractFormLayout(int width, int height) {
@@ -54,7 +51,7 @@ public abstract class AbstractFormLayout extends VLayout {
         this(Integer.toString(width), height);
     }
     
- public AbstractFormLayout() {
+    public AbstractFormLayout() {
         this.setBorder("1px solid #C0C0C0");
         this.setBackgroundColor("#F5F5F5");
         this.setPadding(10);
@@ -72,9 +69,6 @@ public abstract class AbstractFormLayout extends VLayout {
 
     /**
      * Adds a title to the form.
-     * 
-     * @param title
-     * @param icon 
      */
     protected void addTitle(String title, String icon) {
 
@@ -87,31 +81,35 @@ public abstract class AbstractFormLayout extends VLayout {
 
     /**
      * Adds a field to the form.
-     * 
-     * @param title
-     * @param item 
      */
     public void addField(String title, FormItem item) {
-
         this.addMember(WidgetUtil.getLabel("<b>" + title + "</b>", 15));
         this.addMember(FieldUtil.getForm(item));
     }
     
-     public void addField100(String title, FormItem item) {
+    public void addField100(String title, FormItem item) {
 
         this.addMember(WidgetUtil.getLabel("<b>" + title + "</b>", 15));
         this.addMember(FieldUtil.getFormOneColumn(item));
     }
      
-      public void addFieldResponsiveHeight(String title, FormItem item) {
+    public void addFieldResponsiveHeight(String title, FormItem item) {
 
         this.addMember(WidgetUtil.getLabel("<b>" + title + "</b>", 15));
         this.addMember(FieldUtil.getFormOneColumnResponsiveHeight(item));
     }
+
+    public void addInline(Canvas... canvas) {
+        HLayout hLayout = new HLayout(5);
+
+        for (Canvas cv : canvas) {
+            hLayout.addMember(cv);
+        }
+        addMember(hLayout);
+    }
+
     /**
      * Adds a set of buttons displayed in line.
-     * 
-     * @param buttons 
      */
     protected void addButtons(IButton... buttons) {
 

@@ -48,8 +48,8 @@ import com.smartgwt.client.widgets.grid.events.CellClickHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
-import fr.insalyon.creatis.vip.application.client.bean.AppVersion;
 import fr.insalyon.creatis.vip.application.client.bean.Application;
+import fr.insalyon.creatis.vip.application.client.bean.Resource;
 import fr.insalyon.creatis.vip.application.client.rpc.ApplicationService;
 import fr.insalyon.creatis.vip.core.client.CoreModule;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
@@ -62,6 +62,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -123,8 +124,8 @@ public class ApplicationsLayout extends VLayout {
 
     private void configureGrid() {
         ListGridField nameField = new ListGridField("name", "Application Name");
-        ListGridField ownerField = new ListGridField("owner", "Owner");
         ListGridField groupsField = new ListGridField("groupsLabel", "Groups");
+        ListGridField resourceField = new ListGridField("resources", "Resources");
 
         grid = new ListGrid() {
             @Override
@@ -179,12 +180,10 @@ public class ApplicationsLayout extends VLayout {
         if (onlyPublicApps){
             grid.setFields(nameField);
         } else {
-            ownerField.setHidden(true);
             grid.setFields(
                 nameField,
-                new ListGridField("ownerFullName", "Owner"),
-                ownerField,
-                groupsField);
+                groupsField,
+                resourceField);
         }
         grid.setSortField("name");
         grid.setSortDirection(SortDirection.ASCENDING);
@@ -198,7 +197,6 @@ public class ApplicationsLayout extends VLayout {
     }
 
     public void loadData() {
-
         final AsyncCallback<List<Application>> callback = new AsyncCallback<>() {
             @Override
             public void onFailure(Throwable caught) {
@@ -221,8 +219,35 @@ public class ApplicationsLayout extends VLayout {
         if (onlyPublicApps) {
             ApplicationService.Util.getInstance().getPublicApplications(callback);
         } else {
-            ApplicationService.Util.getInstance().getManageableApplications(callback);
+            loadDataWithResources();
         }
+    }
+
+    public void loadDataWithResources() {
+        final AsyncCallback<Map<Application, Set<Resource>>> callback = new AsyncCallback<>() {
+            @Override
+            public void onFailure(Throwable caught) {
+                modal.hide();
+                Layout.getInstance().setWarningMessage("Unable to get list of applications:<br />" + caught.getMessage());
+            }
+
+            @Override
+            public void onSuccess(Map<Application, Set<Resource>> result) {
+                modal.hide();
+                List<ApplicationRecord> dataList = new ArrayList<>();
+
+                result.forEach((app, resources) -> {
+                    dataList.add(new ApplicationRecord(
+                        app,
+                        resources.stream().map(Resource::getName).collect(Collectors.toList())
+                    ));
+                });
+                grid.setData(dataList.toArray(new ApplicationRecord[]{}));
+            }
+        };
+        modal.show("Loading applications...", true);
+
+        ApplicationService.Util.getInstance().getManageableApplications(callback);
     }
 
     private void remove(String name) {

@@ -52,6 +52,7 @@ import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class ApplicationServiceImpl extends AbstractRemoteServiceServlet implements ApplicationService {
@@ -250,16 +251,24 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
     }
 
     @Override
-    public List<Application> getManageableApplications() throws ApplicationException {
+    public Map<Application, Set<Resource>> getManageableApplications() throws ApplicationException {
+        List<Application> apps = new ArrayList<>();
+        Map<Application, Set<Resource>> map = new LinkedHashMap<>();
         try {
             if (isSystemAdministrator()) {
-                return applicationBusiness.getApplications();
+                apps = applicationBusiness.getApplications();
             } else if (isDeveloper()) {
-                return applicationBusiness.getApplicationsWithOwner(getSessionUser().getEmail());
+                apps = applicationBusiness.getApplicationsWithOwner(getSessionUser().getEmail());
             } else {
                 logger.error("Unauthorized to get manageable applications for regular user");
                 throw new ApplicationException("You have no administrator rights.");
             }
+
+            for (Application app : apps) {
+                map.put(app, appVersionBusiness.getVersions(app.getName()).stream()
+                    .flatMap(version -> version.getResources().stream()).collect(Collectors.toSet()));
+            }
+            return map;
         } catch (BusinessException | CoreException ex) {
             throw new ApplicationException(ex);
         }

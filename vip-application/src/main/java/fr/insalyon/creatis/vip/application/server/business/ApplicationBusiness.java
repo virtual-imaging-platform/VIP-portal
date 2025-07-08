@@ -31,6 +31,7 @@
  */
 package fr.insalyon.creatis.vip.application.server.business;
 
+import fr.insalyon.creatis.vip.application.client.bean.AppVersion;
 import fr.insalyon.creatis.vip.application.client.bean.Application;
 import fr.insalyon.creatis.vip.application.server.dao.ApplicationDAO;
 import fr.insalyon.creatis.vip.core.client.bean.Group;
@@ -58,12 +59,14 @@ public class ApplicationBusiness {
     private ApplicationDAO applicationDAO;
     private GroupBusiness groupBusiness;
     private ConfigurationBusiness configurationBusiness;
+    private AppVersionBusiness appVersionBusiness;
 
     @Autowired
-    public ApplicationBusiness(ApplicationDAO applicationDAO, GroupBusiness groupBusiness, ConfigurationBusiness configurationBusiness) {
+    public ApplicationBusiness(ApplicationDAO applicationDAO, GroupBusiness groupBusiness, ConfigurationBusiness configurationBusiness, AppVersionBusiness appVersionBusiness) {
         this.applicationDAO = applicationDAO;
         this.groupBusiness = groupBusiness;
         this.configurationBusiness = configurationBusiness;
+        this.appVersionBusiness = appVersionBusiness;
     }
 
     public void add(Application application) throws BusinessException {
@@ -164,7 +167,12 @@ public class ApplicationBusiness {
         List<Application> apps = new ArrayList<>();
 
         for (Group group : publicAppGroups) {
-            apps.addAll(getApplications(group));
+            for (Application app : getApplications(group)) {
+                // keep application if at least a Version is visible
+                if (appVersionBusiness.getVersions(app.getName()).stream().anyMatch(AppVersion::isVisible)) {
+                    apps.add(app);
+                }
+            }
         }
 
         // remove doublons + sort
