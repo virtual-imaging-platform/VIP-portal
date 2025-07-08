@@ -41,6 +41,7 @@ import fr.insalyon.creatis.vip.application.client.bean.Tag;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public interface ApplicationServiceAsync {
 
@@ -48,7 +49,7 @@ public interface ApplicationServiceAsync {
     
     public void getApplications(AsyncCallback<Map<Application, List<AppVersion>>> asyncCallback);
 
-    public void getManageableApplications(AsyncCallback<List<Application>> asyncCallback);
+    public void getManageableApplications(AsyncCallback<Map<Application, Set<Resource>>> asyncCallback);
     
     public void getVersions(String applicationName, AsyncCallback<List<AppVersion>> asyncCallback);
     
