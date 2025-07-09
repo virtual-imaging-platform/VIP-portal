@@ -38,11 +38,9 @@ public class BoutiquesApplication implements IsSerializable {
     private String schemaVersion;
     private String challengerEmail;
     private String challengerTeam;
-    private String vipContainer;
     private Set<BoutiquesOutputFile> outputFiles = new HashSet<>();
     private Map<String, String> tags = new HashMap<>();
     private Set<String> vipDotInputIds;
-    private boolean vipDotIncludesResultsDir;
     private Map<String, String> vipOverriddenInputs;
 
     private BoutiquesApplicationExtensions boutiquesExtensions;
@@ -202,10 +200,6 @@ public class BoutiquesApplication implements IsSerializable {
         return tags;
     }
 
-    public String getVipContainer() {
-        return vipContainer;
-    }
-
     public Set<String> getVipDotInputIds() {
         if (vipDotInputIds == null) {
             return Collections.emptySet();      
@@ -224,10 +218,6 @@ public class BoutiquesApplication implements IsSerializable {
         return this.getInputs().stream()
                 .map(BoutiquesInput::getId)
                 .collect(Collectors.toSet());
-    }
-
-    public boolean getVipDotIncludesResultsDir() {
-        return vipDotIncludesResultsDir;
     }
 
     public Map<String, String> getVipOverriddenInputs() {
@@ -278,16 +268,8 @@ public class BoutiquesApplication implements IsSerializable {
         tags.put(key, value);
     }
 
-    public void setVipContainer(String vipContainer) {
-        this.vipContainer = vipContainer;
-    }
-
     public void setVipDotInputIds(Set<String> inputIds) {
         this.vipDotInputIds = inputIds;
-    }
-
-    public void setVipDotIncludesResultsDir(boolean vipDotIncludesResultsDir) {
-        this.vipDotIncludesResultsDir = vipDotIncludesResultsDir;
     }
 
     public void setVipOverriddenInputs(Map<String, String> vipOverriddenInputs) {

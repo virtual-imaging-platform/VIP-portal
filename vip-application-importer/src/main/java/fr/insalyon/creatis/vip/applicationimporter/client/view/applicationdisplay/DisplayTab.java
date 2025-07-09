@@ -31,6 +31,7 @@
  */
 package fr.insalyon.creatis.vip.applicationimporter.client.view.applicationdisplay;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -157,45 +158,84 @@ public class DisplayTab extends Tab {
     private static void verifyBoutiquesTool(BoutiquesApplication boutiquesTool)
         throws ApplicationImporterException {
 
-        if (boutiquesTool.getName() == null) {
+        // VIP-specific checks on boutiques descriptor, in addition to "bosh validate".
+        // These rules should be kept similar to those in VIP-python-client/vipapps.py.
+        String toolName = boutiquesTool.getName();
+        if (toolName == null) {
             throw new ApplicationImporterException("Boutiques file must have a name property");
         }
-        if (boutiquesTool.getName().matches(".*\\s.*")) {
-            throw new ApplicationImporterException("Application name should not have a space in it");
+        if (!toolName.matches("[a-zA-Z0-9_\\.@ +-]+")) {
+            throw new ApplicationImporterException("Invalid name '" + toolName + "'");
         }
-        if (boutiquesTool.getToolVersion() == null) {
+        String toolVersion = boutiquesTool.getToolVersion();
+        if (toolVersion == null) {
             throw new ApplicationImporterException("Boutiques file must have a tool-version property");
+        }
+        if (!toolVersion.matches("[a-zA-Z0-9_\\.@ +-]+")) {
+            throw new ApplicationImporterException("Invalid version '" + toolVersion + "'");
         }
         if (boutiquesTool.getAuthor() == null) {
             throw new ApplicationImporterException("Boutiques file must have an author");
         }
-         checkvipdot(boutiquesTool);
+        List<String> warnings = new ArrayList<>();
+        checkvipdot(boutiquesTool, warnings);
+        checkContainerImage(boutiquesTool, warnings);
+        if (warnings.size() > 0) {
+            String message = warnings.size() == 1 ? "Warning: " : "Warnings:<br>- ";
+            message += String.join("<br>- ", warnings);
+            Layout.getInstance().setWarningMessage(message);
+        }
     }
     
-    /**
-     * display warning message if any.
-     *
-     * @param application BoutiquesApplication object to cehck warning message 
-     * @throws ApplicationImporterException 
-     * **/
-    private static void checkvipdot(BoutiquesApplication application) throws ApplicationImporterException {
+    // Consistency checks for the "vip:dot" custom property
+    private static void checkvipdot(BoutiquesApplication application,
+                                    List<String> warnings) throws ApplicationImporterException {
         Set<String> commandLineFlags = application.getCommandLineFlag();
         Set<String> vipDotInputIds = application.getVipDotInputIds();
         Set<String> inputIds = application.getinputIds();
         Set<String> commonValues = new HashSet<>(vipDotInputIds);
-        
+
         commonValues.retainAll(commandLineFlags);
 
         if (!commonValues.isEmpty()) {
-            String warningMessage = "<b>" + String.join(", ", commonValues) + "</b> appears as command-line flag input(s), it should not be included in Dot iteration. Importing it may cause functionality issues, although the application will still be imported.";
-            Layout.getInstance().setWarningMessage(warningMessage);
+            warnings.add("<b>" + String.join(", ", commonValues) + "</b> appears as command-line flag input(s), it should not be included in Dot iteration. Importing it may cause functionality issues, although the application will still be imported.");
         }
+
         // Check if all vipDotInputIds are in inputs
         if ( ! inputIds.containsAll(vipDotInputIds)) {
             Set<String> incorrectInputs = new HashSet<>(vipDotInputIds);
             incorrectInputs.removeAll(inputIds);
             String errorMessage = "<b>" + String.join(", ", incorrectInputs) + "</b> appears in vipDotInputIds but not in inputs. Please ensure all ids are correct.";
             throw new ApplicationImporterException(errorMessage);
+        }
+    }
+
+    // Consistency checks for the "container-image" field
+    private static void checkContainerImage(BoutiquesApplication application,
+                                            List<String> warnings) throws ApplicationImporterException {
+        String containerImage = application.getContainerImage();
+        if (containerImage == null) {
+            warnings.add("No container-image");
+        }
+        String containerIndex = application.getContainerIndex();
+        if (containerIndex != null && containerIndex != "docker://") {
+            warnings.add("Suspicious index '" + containerIndex + "'");
+        }
+        if (!containerImage.contains(":")) {
+            warnings.add("Image name has no tag");
+        } else {
+            String[] imageTag = containerImage.split(":");
+            if (imageTag.length != 2) {
+                warnings.add("Wrong number of ':'");
+            } else if (imageTag[1].equals("latest")) {
+                warnings.add("Tag 'latest' shouldn't be used");
+            }
+        }
+        String[] items = containerImage.split("/");
+        if (items.length < 2 || !items[0].contains(".")) {
+            warnings.add("Image name lacks a host part");
+        } else if (items.length < 3) {
+            warnings.add("Image name lacks an explicit path");
         }
     }
 
