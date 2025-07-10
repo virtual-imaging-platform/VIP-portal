@@ -135,6 +135,20 @@ function checkIfCookieExist(){
     }
 }
 
+async function checkOidcLoginProviders(){
+    const data = await fetch('rest/platform');
+    if (data.ok == true){
+        const json = await data.json();
+        const providers = json.oidcLoginProviders;
+        if (providers != null && providers.includes("egi")) {
+            document.getElementById("egiLoginButton").style.display = "inline-block";
+        }
+        if (providers != null && providers.includes("lslogin")) {
+            document.getElementById("lsloginLoginButton").style.display = "inline-block";
+        }
+    }
+}
+
 function createAnAccount(){
     window.location.href="sign-up.html";
 }
@@ -229,4 +243,5 @@ $(function () {
 })
 
 checkIfCookieExist();
+checkOidcLoginProviders();
 createGrid();

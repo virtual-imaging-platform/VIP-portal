@@ -117,7 +117,7 @@ public class ApiSecurityConfig {
                         .anyRequest().permitAll()
                 )
                 .exceptionHandling((exceptionHandling) -> exceptionHandling.authenticationEntryPoint(vipAuthenticationEntryPoint))
-                // session must be activated otherwise OIDC auth info will be lost when accessing /loginEgi
+                // session must be activated otherwise OIDC auth info will be lost when accessing /rest/loginOIDC
                 // .sessionManagement((sessionManagement) -> sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .anonymous((anonymous) -> anonymous.disable())
                 .cors(Customizer.withDefaults())

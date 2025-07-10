@@ -61,16 +61,13 @@ span{
   }
 
 .button-blue-border {
-  margin: 50px 20px 0px 0px;
-  padding: 15px 10px 15px 80px;
+  margin: 10px 5px;
+  padding: 15px 10px 15px 10px;
   border-style: solid;
   border-width: 2px;
   border-color: #005faa;
   border-radius: 100vw;
   background-color: #fff;
-  background-image: url(https://assets.website-files.com/62e3a5ba3da3705b0a510a42/62e3a82d4c15a67d55b187c6_egi-logo-color.svg);
-  background-position: 30px 43%;
-  background-size: 36px;
   background-repeat: no-repeat;
   -webkit-transition: all 200ms ease-in-out;
   transition: all 200ms ease-in-out;
@@ -82,8 +79,27 @@ span{
 
 .button-blue-border:hover {
   background-color: #005faa;
-  background-image: url(https://assets.website-files.com/62e3a5ba3da3705b0a510a42/62e3a82d3ed11b0ea947266c_egi-logo-white.svg);
   color: #fff;
+}
+
+#egiLoginButton {
+  padding-left: 80px !important;
+  background-image: url(../images/core/egi-logo-color.svg);
+  background-position: 30px 43%;
+  background-size: 36px;
+  display: none;
+}
+
+#egiLoginButton:hover {
+  background-image: url(../images/core/egi-logo-white.svg);
+}
+
+#lsloginLoginButton {
+  padding-right: 150px !important;
+  background-image: url(../images/core/lslogin-logo.svg);
+  background-position: 40px 50%;
+  background-size: 180px 30px !important;
+  display: none;
 }
 
 .table-striped > tbody > tr:nth-child(2n+1) > td, .table-striped > tbody > tr:nth-child(2n+1) > th {
