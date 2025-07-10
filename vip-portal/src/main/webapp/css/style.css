@@ -75,7 +75,6 @@ span{
   color: #005faa;
   font-size: 10px;
   font-weight: 700;
-  display: inline-block;
 }
 
 .button-blue-border:hover {
@@ -83,22 +82,24 @@ span{
   color: #fff;
 }
 
-.egi-logo {
+#egiLoginButton {
   padding-left: 80px !important;
   background-image: url(../images/core/egi-logo-color.svg);
   background-position: 30px 43%;
   background-size: 36px;
+  display: none;
 }
 
-.egi-logo:hover {
+#egiLoginButton:hover {
   background-image: url(../images/core/egi-logo-white.svg);
 }
 
-.lslogin-logo {
+#lsloginLoginButton {
   padding-right: 150px !important;
   background-image: url(../images/core/lslogin-logo.svg);
   background-position: 40px 50%;
   background-size: 180px 30px !important;
+  display: none;
 }
 
 .table-striped > tbody > tr:nth-child(2n+1) > td, .table-striped > tbody > tr:nth-child(2n+1) > th {
