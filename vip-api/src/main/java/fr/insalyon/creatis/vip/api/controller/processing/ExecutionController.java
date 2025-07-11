@@ -161,14 +161,14 @@ public class ExecutionController extends ApiController {
     public String getStdout(@PathVariable String executionId) throws ApiException {
         logMethodInvocation(logger, "getStdout", executionId);
         executionBusiness.checkIfUserCanAccessExecution(executionId);
-        return executionBusiness.getStdOut(executionId);
+        return executionBusiness.getLog(executionId, "out");
     }
 
     @RequestMapping(value= "/{executionId}/stderr", produces = "text/plain;charset=UTF-8")
     public String getStderr(@PathVariable String executionId) throws ApiException {
         logMethodInvocation(logger, "getStderr", executionId);
         executionBusiness.checkIfUserCanAccessExecution(executionId);
-        return executionBusiness.getStdErr(executionId);
+        return executionBusiness.getLog(executionId, "err");
     }
 
     @RequestMapping(value = "/{executionId}/play", method = RequestMethod.PUT)
