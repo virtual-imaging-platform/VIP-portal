@@ -74,7 +74,7 @@ public interface CarminProperties {
     String SHANOIR_HOST_IP = "shanoir.host.ip";
     String KEYCLOAK_ACTIVATED = "keycloak.active";
 
-    // Client secret EGI
+    // EGI OIDC login parameters
     String EGI_CLIENT_ID = "oidc.egi.client_id";
     String EGI_CLIENT_SECRET = "oidc.egi.client_secret";
     String EGI_REDIRECT_URI = "oidc.egi.redirect_uri";
@@ -83,4 +83,12 @@ public interface CarminProperties {
     String EGI_USER_INFO_URI = "oidc.egi.user_info_uri";
     String EGI_JWK_SET_URI = "oidc.egi.jwk_set_uri";
 
+    // LSLOGIN OIDC login parameters
+    String LSLOGIN_CLIENT_ID = "oidc.lslogin.client_id";
+    String LSLOGIN_CLIENT_SECRET = "oidc.lslogin.client_secret";
+    String LSLOGIN_REDIRECT_URI = "oidc.lslogin.redirect_uri";
+    String LSLOGIN_AUTHORIZATION_URI = "oidc.lslogin.authorization_uri";
+    String LSLOGIN_TOKEN_URI = "oidc.lslogin.token_uri";
+    String LSLOGIN_USER_INFO_URI = "oidc.lslogin.user_info_uri";
+    String LSLOGIN_JWK_SET_URI = "oidc.lslogin.jwk_set_uri";
 }
