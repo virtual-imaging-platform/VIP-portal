@@ -31,6 +31,8 @@
  */
 package fr.insalyon.creatis.vip.application.client.view.system.applications.app;
 
+import java.util.List;
+
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 
 import fr.insalyon.creatis.vip.application.client.bean.Application;
@@ -45,5 +47,10 @@ public class ApplicationRecord extends ListGridRecord {
         setAttribute("citation", app.getCitation());
         setAttribute("groupsLabel", SystemUtils.formatGroups(app.getGroups()));
         setAttribute("groups", app.getGroupsNames());
+    }
+
+    public ApplicationRecord(Application app, List<String> resources) {
+        this(app);
+        setAttribute("resources", resources);
     }
 }

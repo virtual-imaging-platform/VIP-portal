@@ -76,6 +76,8 @@ public class ApplicationConstants {
     public static final String ICON_MARK_COMPLETED = IMG_FOLDER + "icon-mark-completed.png";
     public static final String ICON_USER = IMG_FOLDER + "icon-user.png";
     public static final String ICON_RESOURCE = IMG_FOLDER + "icon-resource.png";
+    public static final String ICON_LINK = IMG_FOLDER + "icon-link.png";
+    public static final String ICON_COPY = IMG_FOLDER + "icon-copy.png";
     public static final String ICON_TAG = IMG_FOLDER + "icon-tag.png";
     ;
     public static final String ICON_MONITOR_SIMULATION_FAILED = IMG_FOLDER + "monitor/icon-simulation-failed.png";
