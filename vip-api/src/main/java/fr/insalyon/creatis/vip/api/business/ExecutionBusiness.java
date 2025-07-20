@@ -37,6 +37,7 @@ import fr.insalyon.creatis.vip.api.model.*;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
 import fr.insalyon.creatis.vip.application.client.bean.InOutData;
 import fr.insalyon.creatis.vip.application.client.bean.Simulation;
+import fr.insalyon.creatis.vip.application.client.bean.Task;
 import fr.insalyon.creatis.vip.application.client.view.monitor.SimulationStatus;
 import fr.insalyon.creatis.vip.application.server.business.SimulationBusiness;
 import fr.insalyon.creatis.vip.application.server.business.WorkflowBusiness;
@@ -50,6 +51,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -94,21 +98,32 @@ public class ExecutionBusiness {
         this.dataApiBusiness = dataApiBusiness;
     }
 
-    public String getStdOut(String executionId) throws ApiException {
+    public String getLog(String executionId, String type) throws ApiException {
         try {
             Simulation s = workflowBusiness.getSimulation(executionId);
-            return simulationBusiness.readFile(s.getID(), "", "workflow", ".out");
-        } catch (BusinessException ex) {
-            throw new ApiException(ex);
-        }
-    }
 
-    public String getStdErr(String executionId) throws ApiException {
-        try {
-            Simulation s = workflowBusiness.getSimulation(executionId);
-            return simulationBusiness.readFile(s.getID(), "", "workflow", ".err");
-        } catch (BusinessException ex) {
-            throw new ApiException(ex);
+            List<Task> tasks = simulationBusiness.getJobsList(s.getID());
+            if (tasks.size() > 2) {
+                logger.debug("Warning: more than two tasks found for execution ID = {} ", executionId);
+                return "too many logs found";
+            }
+            if (tasks.isEmpty()) {
+                logger.debug("Warning: no .sh.out log file found for execution ID = {} ", executionId);
+                return "no log found";
+            }
+
+            String extension = ".sh.app." + type;
+
+            String fileName = tasks.getFirst().getFileName();
+            if (fileName != null) {
+                return simulationBusiness.readFile(executionId, type, fileName, extension);
+            }
+            else {
+                logger.error("no file name for task of {} ", executionId);
+                throw new ApiException("no file name for task of " + executionId);
+            }
+        } catch (BusinessException e) {
+            throw new ApiException(e);
         }
     }
 

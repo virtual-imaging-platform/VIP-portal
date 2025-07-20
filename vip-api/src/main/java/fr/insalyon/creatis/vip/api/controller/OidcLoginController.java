@@ -22,7 +22,7 @@ import java.security.Principal;
 import java.util.Map;
 
 @RestController
-public class EgiController {
+public class OidcLoginController {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -30,27 +30,28 @@ public class EgiController {
     private final ConfigurationBusiness configurationBusiness;
 
     @Autowired
-    public EgiController(VipSessionBusiness vipSessionBusiness, ConfigurationBusiness configurationBusiness) {
+    public OidcLoginController(VipSessionBusiness vipSessionBusiness, ConfigurationBusiness configurationBusiness) {
         this.vipSessionBusiness = vipSessionBusiness;
         this.configurationBusiness = configurationBusiness;
     }
 
-    @GetMapping("/loginEgi")
+    @GetMapping("/loginOIDC")
     public RedirectView getOauth2LoginInfo(
             HttpServletRequest request, HttpServletResponse response, Principal user)
             throws ApiException {
 
         if ( ! (user instanceof OAuth2AuthenticationToken)) {
-            logger.error("Egi login must only be called after an OIDC login. User [{}]", user);
+            logger.error("OIDC login error: Principal is not an OAuth2AuthenticationToken. User: [{}]", user);
             throw new ApiException(ApiException.ApiError.WRONG_OIDC_LOGIN);
         }
         OAuth2AuthenticationToken authToken = ((OAuth2AuthenticationToken) user);
         if ( ! authToken.isAuthenticated()) {
-            logger.error("Egi login method called with an anonymous user");
+            logger.error("OIDC login error: anonymous user");
             throw new ApiException(ApiException.ApiError.WRONG_OIDC_LOGIN);
         }
-
         Map<String, Object> userAttributes = authToken.getPrincipal().getAttributes();
+        logger.info("OIDC login success. User attributes: [{}]", userAttributes);
+
         Object institution = userAttributes.get("eduperson_scoped_affiliation");
         String domainName;
         if(institution != null){
@@ -75,7 +76,7 @@ public class EgiController {
 
     private String getRootUrl(HttpServletRequest request) {
         String decodedUri = UriUtils.decode(request.getRequestURI(), "UTF-8");
-        int index = decodedUri.indexOf("/rest/loginEgi");
+        int index = decodedUri.indexOf("/rest/loginOIDC");
         return decodedUri.substring(0, index+1); // keep trailing slash
     }
 }

@@ -61,6 +61,8 @@ public class PlatformProperties {
     private String defaultStudy;
     @NotNull
     private String supportedAPIVersion;
+    @NotNull
+    private List<String> oidcLoginProviders;
 
     public String getPlatformName() {
         return platformName;
@@ -164,5 +166,13 @@ public class PlatformProperties {
 
     public void setSupportedAPIVersion(String supportedAPIVersion) {
         this.supportedAPIVersion = supportedAPIVersion;
+    }
+
+    public List<String> getOidcLoginProviders() {
+        return oidcLoginProviders;
+    }
+
+    public void setOidcLoginProviders(List<String> oidcLoginProviders) {
+        this.oidcLoginProviders = oidcLoginProviders;
     }
 }

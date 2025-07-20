@@ -44,6 +44,7 @@ import fr.insalyon.creatis.vip.application.client.view.ApplicationException;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public interface ApplicationService extends RemoteService {
 
@@ -64,7 +65,7 @@ public interface ApplicationService extends RemoteService {
 
     public Map<Application, List<AppVersion>> getApplications() throws ApplicationException;
 
-    public List<Application> getManageableApplications() throws ApplicationException;
+    public Map<Application, Set<Resource>> getManageableApplications() throws ApplicationException;
     
     public List<AppVersion> getVersions(String applicationName) throws ApplicationException;
     
