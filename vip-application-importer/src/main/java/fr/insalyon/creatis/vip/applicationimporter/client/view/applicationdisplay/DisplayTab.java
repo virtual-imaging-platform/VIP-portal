@@ -216,6 +216,7 @@ public class DisplayTab extends Tab {
         String containerImage = application.getContainerImage();
         if (containerImage == null) {
             warnings.add("No container-image");
+            return;
         }
         String containerIndex = application.getContainerIndex();
         if (containerIndex != null && containerIndex != "docker://") {
