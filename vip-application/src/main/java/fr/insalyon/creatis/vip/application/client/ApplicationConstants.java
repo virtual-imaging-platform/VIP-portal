@@ -124,9 +124,6 @@ public class ApplicationConstants {
     public static final String APP_IMG_SIMULATION_ERROR = IMG_FOLDER + "app-simulation-error.png";
     public static final String APP_IMG_SIMULATION_OUT = IMG_FOLDER + "app-simulation-out.png";
     public static final String APP_IMG_TAG = IMG_FOLDER + "app-tag.png";
-    // Application launch, input without value
-    public static final String INPUT_WITHOUT_VALUE = "No_value_provided";
-    public static final String INPUT_WITHOUT_VALUE_REQUIRED_MESSAGE = "Either you deselect the field or you fill it in";
     // Configuration
     public static final String WORKKFLOW_EXAMPLE_TAG = "example";
     public static final String SEPARATOR_INPUT = "##";

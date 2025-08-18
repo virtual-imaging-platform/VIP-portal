@@ -788,18 +788,27 @@ public class LaunchFormLayout extends AbstractFormLayout {
      */
     public Map<String, String> getParametersMap() {
         Map<String, String> parameterMap = new HashMap<>();
+
         this.getInputValueMap().forEach((inputId, valueSet) -> {
-            if(!inputId.equals(EXECUTION_NAME_ID)) {
-                String inputValue;
+            if( ! inputId.equals(EXECUTION_NAME_ID)) {
+                String inputValue = null;
+
                 if (valueSet instanceof ValueList) {
-                    inputValue = String.join(ApplicationConstants.SEPARATOR_LIST, valueSet.getValuesAsStrings());
+                    List<String> valuesToJoin = valueSet.getValuesAsStrings();
+                    valuesToJoin.removeIf(Objects::isNull); // we do that because String.join transform null into "null"
+
+                    if ( ! valuesToJoin.isEmpty()) {
+                        inputValue = String.join(ApplicationConstants.SEPARATOR_LIST, valueSet.getValuesAsStrings());
+                    }
                 } else {
                     List<Float> startStepStop = ((ValueRange) valueSet).getRangeLimits();
                     inputValue = startStepStop.get(0) + ApplicationConstants.SEPARATOR_INPUT
                             + startStepStop.get(2) + ApplicationConstants.SEPARATOR_INPUT
                             + startStepStop.get(1);
                 }
-                parameterMap.put(inputId, inputValue);
+                if (inputValue != null) {
+                    parameterMap.put(inputId, inputValue);
+                }
             }
         });
         return parameterMap;
