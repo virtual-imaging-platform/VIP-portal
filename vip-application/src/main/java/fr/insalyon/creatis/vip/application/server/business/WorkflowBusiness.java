@@ -41,7 +41,6 @@ import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
 import fr.insalyon.creatis.vip.application.client.bean.*;
 import fr.insalyon.creatis.vip.application.client.view.monitor.SimulationStatus;
 import fr.insalyon.creatis.vip.application.client.view.monitor.progress.ProcessorStatus;
-import fr.insalyon.creatis.vip.application.server.business.simulation.ParameterSweep;
 import fr.insalyon.creatis.vip.application.server.business.simulation.parser.InputM2Parser;
 import fr.insalyon.creatis.vip.application.server.dao.ApplicationDAO;
 import fr.insalyon.creatis.vip.application.server.dao.SimulationStatsDAO;
@@ -69,6 +68,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.*;
 
 import static fr.insalyon.creatis.vip.application.client.view.ApplicationException.ApplicationError.*;
@@ -158,7 +158,7 @@ public class WorkflowBusiness {
             checkVIPCapacities(user, simulationName);
 
             AppVersion appVersion = appVersionBusiness.getVersion(appName, version);
-            List<ParameterSweep> parameters = getParameters(appVersion.getDescriptor(), parametersMap, user, groups);
+            Map<String, List<String>> parameters = getParameters(appVersion.getDescriptor(), parametersMap, user, groups);
 
             List<Resource> resources = resourceBusiness.getUsableResources(user, appVersion);
             if (resources.isEmpty()) {
@@ -220,16 +220,16 @@ public class WorkflowBusiness {
         }
     }
 
-    private List<ParameterSweep> getParameters(String boutiquesDescriptor, Map<String, String> parametersMap, User user, List<String> groups)
+    private Map<String, List<String>> getParameters(String boutiquesDescriptor, Map<String, String> parametersMap, User user, List<String> groups)
             throws DataManagerException, BusinessException {
-        List<ParameterSweep> parameters = new ArrayList<>();
+        Map<String, List<String>> parameters = new HashMap<>();
         BoutiquesDescriptor boutiques = boutiquesBusiness.parseBoutiquesString(boutiquesDescriptor);
 
         for (String name : parametersMap.keySet()) {
-            ParameterSweep ps = new ParameterSweep(name);
+            List<String> data = new ArrayList<>();
             String valuesStr = parametersMap.get(name);
-            if (valuesStr.contains(ApplicationConstants.SEPARATOR_INPUT)) {
 
+            if (valuesStr.contains(ApplicationConstants.SEPARATOR_INPUT)) {
                 String[] values = valuesStr.split(ApplicationConstants.SEPARATOR_INPUT);
                 if (values.length != 3) {
                     throw new BusinessException("Error in range.");
@@ -239,19 +239,24 @@ public class WorkflowBusiness {
                 Double stop = Double.parseDouble(values[1]);
                 Double step = Double.parseDouble(values[2]);
                 for (double d = start; d <= stop; d += step) {
-                    ps.addValue(d + "");
+                    data.add(d + "");
                 }
 
             } else if (valuesStr.contains(ApplicationConstants.SEPARATOR_LIST)) {
                 String[] values = valuesStr.split(ApplicationConstants.SEPARATOR_LIST);
 
                 for (String v : values) {
-                    ps.addValue(transformParameter(boutiques, user, groups, name, v));
+                    data.add(transformParameter(boutiques, user, groups, name, v));
                 }
             } else {
-                ps.addValue(transformParameter(boutiques, user, groups, name, valuesStr));
+                // this is used to filter optional empty values
+                if (valuesStr != null) {
+                    data.add(transformParameter(boutiques, user, groups, name, valuesStr));
+                }
             }
-            parameters.add(ps);
+            if ( ! data.isEmpty()) {
+                parameters.put(name, data);
+            }
         }
         return parameters;
     }
@@ -453,10 +458,7 @@ public class WorkflowBusiness {
     }
 
     public Map<String, String> relaunch(String simulationID, String currentUserFolder) throws BusinessException {
-
-        //TODO fix
-        return getInputM2Parser(currentUserFolder).parse(
-            server.getWorkflowsPath() + "/" + simulationID + "/inputs.xml");
+        return getInputM2Parser(currentUserFolder).parse(Path.of(server.getWorkflowsPath() + "/" + simulationID + "/inputs"));
     }
 
     public Simulation getSimulation(String simulationID) throws BusinessException {

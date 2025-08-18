@@ -216,7 +216,7 @@ public class ReproVipBusiness {
         ReproVipInputsParser reproParser = new ReproVipInputsParser(externalPlatformBusiness, server.getHostURL());
         InputM2Parser m2Parser = new InputM2Parser();
 
-        Map<String, String> inputs = m2Parser.parse(server.getWorkflowsPath() + "/" + workflowId + "/inputs.xml");
+        Map<String, String> inputs = m2Parser.parse(Path.of(server.getWorkflowsPath() + "/" + workflowId + "/inputs"));
         Map<String, Object> json = new HashMap<>();
 
         reproParser.parse(inputs);

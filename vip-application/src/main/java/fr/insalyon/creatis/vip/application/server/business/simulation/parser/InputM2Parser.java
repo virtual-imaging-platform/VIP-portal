@@ -31,16 +31,23 @@
  */
 package fr.insalyon.creatis.vip.application.server.business.simulation.parser;
 
+import fr.insalyon.creatis.vip.core.client.bean.Triplet;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerException;
+
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import fr.insalyon.creatis.vip.datamanager.server.business.LfcPathsBusiness;
+
+import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,6 +59,9 @@ import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.DefaultHandler;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParserFactory;
 
@@ -61,22 +71,16 @@ import javax.xml.parsers.SAXParserFactory;
  * This stores data in fields and this is not threadsafe. So it cannot be used
  * as a spring singleton and this needs prototype scope.
  *
- * @author Rafael Silva
  */
 @Service
 @Scope("prototype")
-public class InputM2Parser extends DefaultHandler {
+public class InputM2Parser {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    private boolean parsingItem;
-    private Map<String, String> inputs;
-    private List<String> values;
     private String currentUserFolder;
-    private String name;
-    private StringBuilder itemContent;
-
     private LfcPathsBusiness lfcPathsBusiness;
+    private Map<String, String> inputs = new HashMap<>();
 
     @Autowired
     public final void setLfcPathsBusiness(LfcPathsBusiness lfcPathsBusiness) {
@@ -88,124 +92,174 @@ public class InputM2Parser extends DefaultHandler {
     }
 
     public InputM2Parser(String currentUserFolder) {
-        this.inputs = new HashMap<String, String>();
-        this.parsingItem = false;
         this.currentUserFolder = currentUserFolder;
     }
 
-    public Map<String, String> parse(String fileName)
-            throws BusinessException {
+    // If the filePath do not contain an extension, then JSON and XML will be tested
+    // the first founded file will be used
+    public Map<String, String> parse(Path path) throws BusinessException {
+        String ext = FilenameUtils.getExtension(path.toString());
 
-        try {
-            SAXParserFactory parserFactory = SAXParserFactory.newInstance();
-            parserFactory.setNamespaceAware(true);
-            XMLReader reader = parserFactory.newSAXParser().getXMLReader();
-            reader.setContentHandler(this);
-            reader.parse(new InputSource(new FileReader(fileName)));
-
-            return inputs;
-
-        } catch (IOException | SAXException | ParserConfigurationException ex) {
-            logger.error("Error parsing {}", fileName, ex);
-            throw new BusinessException(ex);
-        }
-    }
-
-    @Override
-    public void startElement(String uri, String localName, String qName,
-            Attributes attributes) throws SAXException {
-
-        if (localName.equals("source")) {
-            name = attributes.getValue("name");
-            values = new ArrayList<String>();
-
-        } else if (localName.equals("item")) {
-            parsingItem = true;
-            itemContent = new StringBuilder();
-        }
-    }
-
-    @Override
-    public void endElement(String uri, String localName, String qName) {
-        boolean isList = false;
-        double step = -1;
-        double firstValue = -1;
-        double lastValue = -1;
-
-        if (localName.equals("source")) {
-            if (values.size() == 1) {
-                String path = values.get(0);
-                try {
-                    if (lfcPathsBusiness != null) {
-                        path = lfcPathsBusiness.parseRealDir(path, currentUserFolder);
-                    }
-                } catch (DataManagerException ex) {
-                    // do nothing
-                }
-                inputs.put(name, path);
-
-            } else {
-                for (String v : values) {
-                    try {
-                        double value = Double.valueOf(v);
-
-                        if (firstValue == -1) {
-                            firstValue = value;
-
-                        } else if (lastValue == -1) {
-
-                            lastValue = value;
-                            step = lastValue - firstValue;
-
-                        } else {
-                            if (step != (value - lastValue)) {
-                                isList = true;
-                                break;
-                            } else {
-                                step = value - lastValue;
-                                lastValue = value;
-                            }
-                        }
-                    } catch (NumberFormatException ex) {
-                        isList = true;
-                        break;
-                    }
-                }
-
-                if (isList) {
-                    StringBuilder sb = new StringBuilder();
-                    for (String v : values) {
-                        if (sb.length() > 0) {
-                            sb.append("; ");
-                        }
-                        try {
-                            if (lfcPathsBusiness != null) {
-                                v = lfcPathsBusiness.parseRealDir(
-                                    v, currentUserFolder);
-                            }
-                        } catch (DataManagerException ex) {
-                            // do nothing
-                        }
-                        sb.append(v);
-                    }
-                    inputs.put(name, sb.toString());
-
-                } else {
-                    inputs.put(name, "Start: " + firstValue + " - Stop: "
-                            + lastValue + " - Step: " + step);
+        if (ext.isEmpty()) {
+            for (String candidateExt : List.of("json", "xml")) {
+                Path candidate = path.resolveSibling(path.getFileName() + "." + candidateExt);
+                if (candidate.toFile().exists()) {
+                    path = candidate;
+                    ext = candidateExt;
+                    break;
                 }
             }
-        } else if (localName.equals("item")) {
-            values.add(itemContent.toString().trim());
-            itemContent = null;
-            parsingItem = false;
+        }
+
+        switch (ext) {
+            case "xml":
+                return handleXML(path.toFile());
+            case "json":
+                return handleJSON(path.toFile());
+            default:
+                throw new BusinessException("Cannot find inputs file at this location: " + path);
         }
     }
 
-    @Override
-    public void characters(char[] ch, int start, int length) throws SAXException {
-        if (parsingItem) {
-            itemContent.append(ch, start, length);
+    public Map<String, String> handleXML(File file) throws BusinessException {
+        try {
+            XMLHandler handler = new XMLHandler();
+
+            SAXParserFactory parserFactory = SAXParserFactory.newInstance();
+            parserFactory.setNamespaceAware(true);
+
+            XMLReader reader = parserFactory.newSAXParser().getXMLReader();
+            reader.setContentHandler(handler);
+            reader.parse(new InputSource(new FileReader(file)));
+
+            return inputs;
+        } catch (IOException | SAXException | ParserConfigurationException e) {
+            logger.error("Error parsing {}", file.getName(), e);
+            throw new BusinessException(e);
+        }
+    }
+
+    public Map<String, String> handleJSON(File file) throws BusinessException {
+        ObjectMapper mapper = new ObjectMapper();
+
+        try {
+            Map<String, List<String>> data = mapper.readValue(file, new TypeReference<Map<String, List<String>>>() {
+            });
+
+            data.forEach((name, items) -> {
+                if (items.size() == 1) {
+                    String val = items.get(0);
+                    inputs.put(name, pathHandler(val));
+                } else {
+                    handleList(name, items);
+                }
+            });
+        } catch (IOException e) {
+            logger.error("Error parsing {}", file.getName(), e);
+            throw new BusinessException(e);
+        }
+        return inputs;
+    }
+
+    private String pathHandler(String path) {
+        try {
+            if (lfcPathsBusiness != null) {
+                path = lfcPathsBusiness.parseRealDir(path, currentUserFolder);
+            }
+        } catch (DataManagerException ex) {
+            // do nothing
+        }
+        return path;
+    }
+
+    private Triplet<Double, Double, Double> getStartStopStep(List<String> values) {
+        double step = -1;
+        double start = -1;
+        double stop = -1;
+
+        for (String v : values) {
+            try {
+                double value = Double.valueOf(v);
+
+                if (start == -1) {
+                    start = value;
+
+                } else if (stop == -1) {
+                    stop = value;
+                    step = stop - start;
+
+                } else {
+                    if (step != (value - stop)) {
+                        return null;
+                    } else {
+                        stop = value;
+                    }
+                }
+            } catch (NumberFormatException ex) {
+                return null;
+            }
+        }
+        return new Triplet<Double, Double, Double>(start, stop, step);
+    }
+
+    private String formatListString(List<String> items) {
+        return items.stream()
+                .map(this::pathHandler)
+                .collect(Collectors.joining("; "));
+    }
+
+    private void handleList(String name, List<String> items) {
+        Triplet<Double, Double, Double> startStopStep = getStartStopStep(items);
+        if (startStopStep == null) {
+            inputs.put(name, formatListString(items));
+        } else {
+            inputs.put(name, "Start: " + startStopStep.getFirst() + " - Stop: "
+                    + startStopStep.getSecond() + " - Step: " + startStopStep.getThird());
+        }
+    }
+
+    class XMLHandler extends DefaultHandler {
+        private boolean parsingItem = false;
+        private List<String> values;
+        private String name;
+        private StringBuilder itemContent;
+
+        @Override
+        public void startElement(String uri, String localName, String qName,
+                Attributes attributes) throws SAXException {
+
+            if (localName.equals("source")) {
+                name = attributes.getValue("name");
+                values = new ArrayList<String>();
+
+            } else if (localName.equals("item")) {
+                parsingItem = true;
+                itemContent = new StringBuilder();
+            }
+        }
+
+        @Override
+        public void endElement(String uri, String localName, String qName) {
+            if (localName.equals("source")) {
+                if (values.size() == 1) {
+                    String path = values.get(0);
+                    inputs.put(name, pathHandler(path));
+
+                } else {
+                    handleList(name, values);
+                }
+            } else if (localName.equals("item")) {
+                values.add(itemContent.toString().trim());
+                itemContent = null;
+                parsingItem = false;
+            }
+        }
+
+        @Override
+        public void characters(char[] ch, int start, int length) throws SAXException {
+            if (parsingItem) {
+                itemContent.append(ch, start, length);
+            }
         }
     }
 }

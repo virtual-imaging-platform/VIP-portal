@@ -5,6 +5,7 @@ import static org.mockito.Mockito.when;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Collections;
 
@@ -54,7 +55,7 @@ public class ReproVipInputsParserTest {
     @Test
     public void girderWorkflowInput() throws BusinessException, IOException {
         ObjectMapper mapper = new ObjectMapper();
-        var values = parser.parse("src/test/resources/repro_vip/girder.xml");
+        var values = parser.parse(Path.of("src/test/resources/repro_vip/girder.xml"));
         File example = new File("src/test/resources/repro_vip/girder.json");
         
         String inputsExample = mapper.readTree(example).get("inputs").toString();
@@ -68,7 +69,7 @@ public class ReproVipInputsParserTest {
     @Test
     public void localWorkflowInput() throws BusinessException, IOException {
         ObjectMapper mapper = new ObjectMapper();
-        var values = parser.parse("src/test/resources/repro_vip/local.xml");
+        var values = parser.parse(Path.of("src/test/resources/repro_vip/local.xml"));
         File example = new File("src/test/resources/repro_vip/local.json");
 
         String inputsExample = mapper.readTree(example).get("inputs").toString();
