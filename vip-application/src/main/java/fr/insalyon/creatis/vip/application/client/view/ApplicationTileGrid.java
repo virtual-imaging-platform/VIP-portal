@@ -61,18 +61,18 @@ public class ApplicationTileGrid extends ApplicationsTileGrid {
 
     @Override
     public void parse(final String applicationName, final String applicationVersion) {
-        final AsyncCallback<Boolean> callback = new AsyncCallback<>() {
+        final AsyncCallback<String> callback = new AsyncCallback<>() {
             @Override
             public void onFailure(Throwable caught) {
                 Layout.getInstance().setWarningMessage("Unable to check application avaibility:<br />" + caught.getMessage());
             }
 
             @Override
-            public void onSuccess(Boolean result) {
-                if (result) {
+            public void onSuccess(String result) {
+                if (result == null) {
                     load(applicationName, applicationVersion);
                 } else {
-                    Layout.getInstance().setWarningMessage("Sorry, but this application application is temporarily unavailable !");
+                    Layout.getInstance().setWarningMessage(result);
                 }
             }
         };

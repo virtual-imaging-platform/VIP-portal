@@ -119,5 +119,5 @@ public interface ApplicationService extends RemoteService {
 
     public List<Tag> getTags(AppVersion appVersion) throws ApplicationException;
 
-    public Boolean isAppUsableWithCurrentUser(String appName, String appVersion) throws ApplicationException;
+    public String isAppUsableWithCurrentUser(String appName, String appVersion) throws ApplicationException;
 }
