@@ -167,18 +167,27 @@ public class GirderStorageBusiness {
             throws BusinessException {
 
         try {
+            // first try resolving fileId as a file
             HttpResult res = makeHttpRequest(
                 apiUrl + "/file/" + fileId,
                 METHOD_GET,
-                Optional.of(
-                    con -> con.setRequestProperty("Girder-Token", token)));
+                Optional.of(con -> con.setRequestProperty("Girder-Token", token)));
+            // on 4xx error, try resolving fileId as a folder
+            if (res.code >= 400 && res.code < 500) {
+                res = makeHttpRequest(
+                        apiUrl + "/folder/" + fileId,
+                        METHOD_GET,
+                        Optional.of(con -> con.setRequestProperty("Girder-Token", token)));
+            }
 
             if (res.code >= 400) {
-                logger.error("Unable to get girder filename for file {} : {}", fileId, res.response);
+                logger.error("Unable to get girder filename for file {} : HTTP {}, body={}",
+                        fileId, res.code, res.response);
                 throw new BusinessException(
                     "Unable to get file info: " + res.response);
             }
 
+            // get file or folder name
             ObjectNode node =
                 new ObjectMapper().readValue(res.response, ObjectNode.class);
             String name = node.get("name").asText();
