@@ -36,7 +36,7 @@ public class LocalWorkflowExecutionBusiness extends WorkflowExecutionBusiness {
 
     @Override
     public Workflow launch(String engineEndpoint, AppVersion appVersion, User user, String simulationName,
-            List<ParameterSweep> parameters, String settings, String executorConfig) throws BusinessException {
+            List<ParameterSweep> parameters, String executorConfig) throws BusinessException {
         String workflowContent;
         try {
             workflowContent = appVersion.getDescriptor();

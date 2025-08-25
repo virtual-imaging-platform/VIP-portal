@@ -168,9 +168,9 @@ public class WorkflowBusiness {
             Resource resource = resources.get(0);
             Engine engine = engineBusiness.selectEngine(engineBusiness.getUsableEngines(resource));
 
+            appVersion.getSettings().put(ApplicationConstants.DEFAULT_EXECUTOR_GASW, resource.getType().toString());
             try {
-                workflow = workflowExecutionBusiness.launch(engine.getEndpoint(), appVersion, user, simulationName, parameters,
-                    resource.getType().toString(), resource.getConfiguration());
+                workflow = workflowExecutionBusiness.launch(engine.getEndpoint(), appVersion, user, simulationName, parameters, resource.getConfiguration());
             } catch (BusinessException be) {
                 logger.error("BusinessException caught on launch workflow, engine {} will be disabled", engine.getName());
             } catch (Exception e) {
