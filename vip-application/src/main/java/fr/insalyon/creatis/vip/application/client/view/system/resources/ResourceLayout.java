@@ -137,7 +137,7 @@ public class ResourceLayout extends VLayout {
                 new ListGridField("name", "Name"),
                 new ListGridField("status", "Active"),
                 new ListGridField("type", "Type"),
-                new ListGridField("configuration", "Configuration"),
+                new ListGridField("configuration", "Configuration Folder"),
                 new ListGridField("engines", "Engines"),
                 new ListGridField("groupsLabel", "Groups Resources"));
         grid.setSortField("name");

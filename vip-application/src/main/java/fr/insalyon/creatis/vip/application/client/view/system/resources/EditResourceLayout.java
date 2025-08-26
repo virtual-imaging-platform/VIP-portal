@@ -59,7 +59,7 @@ public class EditResourceLayout extends AbstractFormLayout {
 
         nameField = FieldUtil.getTextItem(350, null);
         configurationField = FieldUtil.getTextItem(350, null);
-        configurationField.setRequired(false);
+        configurationField.setRequired(true);
 
         statusField = new BooleanItem();
         statusField.setShowTitle(false);
@@ -90,7 +90,7 @@ public class EditResourceLayout extends AbstractFormLayout {
                         List<String> groupsNames = Arrays.asList(groupsList.getValues());
                         List<Group> groups = groupsNames.stream()
                             .map((name) -> new Group(groupsMap.get(name), false, GroupType.RESOURCE)).collect(Collectors.toList());
-                        if (nameField.validate()) {
+                        if (nameField.validate() && configurationField.validate()) {
                             save(new Resource(
                                 nameField.getValueAsString().trim(),
                                 statusField.getValueAsBoolean(),
@@ -122,7 +122,7 @@ public class EditResourceLayout extends AbstractFormLayout {
         addField("Name", nameField);
         addField("Active", statusField);
         addField("Type", typeFieldList);
-        addField("Configuration", configurationField);
+        addField("Configuration Folder", configurationField);
         addField("Engines", enginesList);
         addField("Groups Resources", groupsList);
         addButtons(saveButton, removeButton);
