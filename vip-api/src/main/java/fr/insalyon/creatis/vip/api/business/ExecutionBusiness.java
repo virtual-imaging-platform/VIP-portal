@@ -99,14 +99,14 @@ public class ExecutionBusiness {
     }
 
     public String getLog(String executionId, String type) throws ApiException {
+        return getLog(executionId, null, type);
+    }
+
+    public String getLog(String executionId, String jobId, String type) throws ApiException {
         try {
             Simulation s = workflowBusiness.getSimulation(executionId);
-
             List<Task> tasks = simulationBusiness.getJobsList(s.getID());
-            if (tasks.size() > 2) {
-                logger.debug("Warning: more than two tasks found for execution ID = {} ", executionId);
-                return "too many logs found";
-            }
+
             if (tasks.isEmpty()) {
                 logger.debug("Warning: no .sh.out log file found for execution ID = {} ", executionId);
                 return "no log found";
@@ -114,18 +114,44 @@ public class ExecutionBusiness {
 
             String extension = ".sh.app." + type;
 
-            String fileName = tasks.getFirst().getFileName();
+            Task targetTask = null;
+
+            if (jobId == null) {
+                if (tasks.size() == 1) {
+                    // prendre l’unique tâche
+                    targetTask = tasks.get(0);
+                    logger.debug("jobId is null, using the only available task with ID = {}", targetTask.getId());
+                } else {
+                    logger.debug("jobId is null but multiple tasks found for execution ID = {}", executionId);
+                    return "jobId is required when multiple tasks exist";
+                }
+            } else {
+                // ici on est sûr que jobId n’est pas null
+                targetTask = tasks.stream()
+                        .filter(t -> jobId.equals(t.getId()))
+                        .findFirst()
+                        .orElse(null);
+            }
+
+
+
+            if (targetTask == null) {
+                logger.debug("No job {} found for execution ID = {}", jobId, executionId);
+                return "no log found for job " + jobId;
+            }
+
+            String fileName = targetTask.getFileName();
             if (fileName != null) {
                 return simulationBusiness.readFile(executionId, type, fileName, extension);
+            } else {
+                throw new ApiException("no file name for job " + jobId + " in execution " + executionId);
             }
-            else {
-                logger.error("no file name for task of {} ", executionId);
-                throw new ApiException("no file name for task of " + executionId);
-            }
+
         } catch (BusinessException e) {
             throw new ApiException(e);
         }
     }
+
 
     public Execution getExample(String executionId) throws ApiException {
         return getExecution(executionId, false, true);
