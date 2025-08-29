@@ -40,14 +40,15 @@ import fr.insalyon.creatis.vip.api.model.Execution;
 import fr.insalyon.creatis.vip.api.model.ExecutionStatus;
 import fr.insalyon.creatis.vip.api.rest.config.BaseWebSpringIT;
 import fr.insalyon.creatis.vip.api.rest.config.RestTestUtils;
-import fr.insalyon.creatis.vip.application.client.bean.Engine;
-import fr.insalyon.creatis.vip.application.client.bean.Resource;
-import fr.insalyon.creatis.vip.application.client.bean.ResourceType;
+import fr.insalyon.creatis.vip.application.client.bean.*;
 import fr.insalyon.creatis.vip.application.client.view.monitor.SimulationStatus;
+import fr.insalyon.creatis.vip.application.client.view.monitor.job.TaskStatus;
 import fr.insalyon.creatis.vip.application.server.business.AppVersionBusiness;
 import fr.insalyon.creatis.vip.application.server.business.ResourceBusiness;
 import fr.insalyon.creatis.vip.application.server.business.simulation.ParameterSweep;
 import fr.insalyon.creatis.vip.application.server.business.util.FileUtil;
+import fr.insalyon.creatis.vip.application.server.dao.SimulationDAO;
+import fr.insalyon.creatis.vip.application.server.dao.h2.SimulationData;
 import fr.insalyon.creatis.vip.core.client.bean.Group;
 import fr.insalyon.creatis.vip.core.client.bean.GroupType;
 import fr.insalyon.creatis.vip.core.integrationtest.ServerMockConfig;
@@ -86,6 +87,7 @@ public class ExecutionControllerIT extends BaseWebSpringIT {
 
     @Autowired ResourceBusiness resourceBusiness;
     @Autowired AppVersionBusiness appVersionBusiness;
+    @Autowired SimulationDAO mockSimulationDao;
 
     @BeforeEach
     public void setUp() throws Exception {
@@ -277,8 +279,12 @@ public class ExecutionControllerIT extends BaseWebSpringIT {
     public void shouldGetExecution2Stderr() throws Exception {
         when(workflowDAO.get(eq(simulation2.getID()))).thenReturn(w2, w2, null);
         when(server.getWorkflowsPath()).thenReturn("src/test/resources/testFolder");
+        Task testTask = new Task(42, TaskStatus.COMPLETED, "testCommand");
+        testTask.setFileName("testjobfilename");
+        when(mockSimulationDao.getJobs()).thenReturn(List.of(testTask));
+        // normally simulationDao is a prototype-scope bean specific to a job, here as it is a singleton mock
 
-        String testOutput = "blablabla\n";
+        String testOutput = "blablablastderr\n";
 
         mockMvc.perform(get("/rest/executions/" + simulation2.getID() + "/stderr").with(baseUser1()))
                 .andDo(print())
@@ -291,8 +297,12 @@ public class ExecutionControllerIT extends BaseWebSpringIT {
     public void shouldGetExecution2Stdout() throws Exception {
         when(workflowDAO.get(eq(simulation2.getID()))).thenReturn(w2);
         when(server.getWorkflowsPath()).thenReturn("src/test/resources/testFolder");
+        Task testTask = new Task(42, TaskStatus.COMPLETED, "testCommand");
+        testTask.setFileName("testjobfilename");
+        when(mockSimulationDao.getJobs()).thenReturn(List.of(testTask));
+        // normally simulationDao is a prototype-scope bean specific to a job, here as it is a singleton mock
 
-        String testOutput = "blablabla\n";
+        String testOutput = "blablablastdout\n";
 
         mockMvc.perform(
                         get("/rest/executions/" + simulation2.getID() + "/stdout").with(baseUser1()))
