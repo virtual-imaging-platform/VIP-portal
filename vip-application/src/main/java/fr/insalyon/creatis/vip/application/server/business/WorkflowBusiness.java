@@ -692,9 +692,10 @@ public class WorkflowBusiness {
             if (simulation.getStatus() == SimulationStatus.Running
                     || simulation.getStatus() == SimulationStatus.Unknown) {
                 SimulationStatus simulationStatus = workflowExecutionBusiness.getStatus(simulation.getEngine(), simulation.getID());
+                logger.debug("Simulation {} : old status : {}, new status : {} ",
+                        simulation.getID(), simulation.getStatus(), simulationStatus);
 
-                if (simulationStatus != SimulationStatus.Running
-                        && simulationStatus != SimulationStatus.Unknown) {
+                if (simulationStatus != simulation.getStatus()) {
                     simulation.setStatus(simulationStatus);
                     Workflow workflow = workflowDAO.get(simulation.getID());
                     workflow.setStatus(WorkflowStatus.valueOf(simulationStatus.name()));
