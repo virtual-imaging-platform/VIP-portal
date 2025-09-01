@@ -45,7 +45,7 @@ public enum ExecutionStatus {
     FINISHED("Finished"),
     INITIALIZATION_FAILED("InitializationFailed"),
     EXECUTION_FAILED("ExecutionFailed"),
-    UNKOWN("Unknown"),
+    UNKNOWN("Unknown"),
     KILLED("Killed");
 
     private String restLabel;
