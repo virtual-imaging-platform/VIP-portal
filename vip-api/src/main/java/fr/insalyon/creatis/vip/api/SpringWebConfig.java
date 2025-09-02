@@ -42,7 +42,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Collections;
 
-import static fr.insalyon.creatis.vip.api.CarminProperties.CORS_AUTHORIZED_DOMAINS;
+import static fr.insalyon.creatis.vip.core.server.CarminProperties.CORS_AUTHORIZED_DOMAINS;
 
 /**
  * Configure the spring mvc DispatcherServlet. Few things to do, as the

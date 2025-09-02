@@ -29,7 +29,7 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL-B license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.api.exception;
+package fr.insalyon.creatis.vip.core.server.exception;
 
 import fr.insalyon.creatis.vip.core.client.VipException;
 import org.springframework.http.HttpStatus;

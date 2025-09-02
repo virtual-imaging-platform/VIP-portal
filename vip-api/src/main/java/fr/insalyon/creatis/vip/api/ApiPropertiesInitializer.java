@@ -46,7 +46,7 @@ import org.springframework.util.Assert;
 import jakarta.annotation.PostConstruct;
 import java.io.IOException;
 
-import static fr.insalyon.creatis.vip.api.CarminProperties.*;
+import static fr.insalyon.creatis.vip.core.server.CarminProperties.*;
 
 /**
  * Add an additional "vip-api.conf" property file to spring environment

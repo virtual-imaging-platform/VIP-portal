@@ -33,6 +33,7 @@ package fr.insalyon.creatis.vip.api.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import fr.insalyon.creatis.vip.core.server.model.ErrorCodeAndMessage;
 import jakarta.validation.constraints.NotNull;
 import java.util.List;
 

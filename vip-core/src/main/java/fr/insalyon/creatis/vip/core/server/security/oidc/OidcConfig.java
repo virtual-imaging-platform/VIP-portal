@@ -1,4 +1,4 @@
-package fr.insalyon.creatis.vip.api.security.oidc;
+package fr.insalyon.creatis.vip.core.server.security.oidc;
 
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import org.slf4j.Logger;
@@ -19,7 +19,7 @@ import java.util.Map;
 import java.util.Collection;
 import java.net.URI;
 
-import fr.insalyon.creatis.vip.api.CarminProperties;
+import fr.insalyon.creatis.vip.core.server.CarminProperties;
 
 /* OidcConfig : defines the list of OIDC bearer token providers,
  * i.e. things that provide a way to generate and validate bearer tokens for authentication on VIP API.

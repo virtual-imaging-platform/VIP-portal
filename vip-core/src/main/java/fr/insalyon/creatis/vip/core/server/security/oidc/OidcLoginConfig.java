@@ -1,6 +1,6 @@
-package fr.insalyon.creatis.vip.api.security.oidc;
+package fr.insalyon.creatis.vip.core.server.security.oidc;
 
-import fr.insalyon.creatis.vip.api.CarminProperties;
+import fr.insalyon.creatis.vip.core.server.CarminProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.core.env.Environment;

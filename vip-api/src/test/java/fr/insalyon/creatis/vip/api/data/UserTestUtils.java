@@ -32,7 +32,7 @@
 package fr.insalyon.creatis.vip.api.data;
 
 import fr.insalyon.creatis.vip.api.model.SignUpUserDTO;
-import fr.insalyon.creatis.vip.api.security.apikey.SpringApiPrincipal;
+import fr.insalyon.creatis.vip.core.server.security.apikey.SpringApiPrincipal;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.user.UserLevel;
 import fr.insalyon.creatis.vip.core.client.view.util.CountryCode;

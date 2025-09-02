@@ -32,7 +32,7 @@
 package fr.insalyon.creatis.vip.integrationtest;
 
 import fr.insalyon.creatis.vip.api.controller.PlatformController;
-import fr.insalyon.creatis.vip.api.exception.ApiException;
+import fr.insalyon.creatis.vip.core.server.exception.ApiException;
 import fr.insalyon.creatis.vip.core.server.SpringCoreConfig;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;

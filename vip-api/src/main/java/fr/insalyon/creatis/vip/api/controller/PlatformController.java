@@ -31,13 +31,13 @@
  */
 package fr.insalyon.creatis.vip.api.controller;
 
-import fr.insalyon.creatis.vip.api.exception.ApiException;
-import fr.insalyon.creatis.vip.api.exception.ApiException.ApiError;
-import fr.insalyon.creatis.vip.api.model.ErrorCodeAndMessage;
+import fr.insalyon.creatis.vip.core.server.exception.ApiException;
+import fr.insalyon.creatis.vip.core.server.exception.ApiException.ApiError;
+import fr.insalyon.creatis.vip.core.server.model.ErrorCodeAndMessage;
 import fr.insalyon.creatis.vip.api.model.Module;
 import fr.insalyon.creatis.vip.api.model.PlatformProperties;
 import fr.insalyon.creatis.vip.api.model.SupportedTransferProtocol;
-import fr.insalyon.creatis.vip.api.security.oidc.OidcLoginConfig;
+import fr.insalyon.creatis.vip.core.server.security.oidc.OidcLoginConfig;
 import fr.insalyon.creatis.vip.application.client.view.ApplicationException.ApplicationError;
 import fr.insalyon.creatis.vip.core.client.VipException;
 import fr.insalyon.creatis.vip.core.client.VipException.VipError;
@@ -51,7 +51,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static fr.insalyon.creatis.vip.api.CarminProperties.*;
+import static fr.insalyon.creatis.vip.core.server.CarminProperties.*;
 
 /**
  * Created by abonnet on 7/13/16.

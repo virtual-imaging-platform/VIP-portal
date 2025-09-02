@@ -29,17 +29,17 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL-B license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.api.security;
+package fr.insalyon.creatis.vip.core.server.security;
 
-import fr.insalyon.creatis.vip.api.CarminProperties;
+import fr.insalyon.creatis.vip.core.server.CarminProperties;
 
-import fr.insalyon.creatis.vip.api.security.apikey.SpringApiPrincipal;
-import fr.insalyon.creatis.vip.api.security.apikey.ApikeyAuthenticationFilter;
-import fr.insalyon.creatis.vip.api.security.apikey.ApikeyAuthenticationProvider;
+import fr.insalyon.creatis.vip.core.server.security.apikey.SpringApiPrincipal;
+import fr.insalyon.creatis.vip.core.server.security.apikey.ApikeyAuthenticationFilter;
+import fr.insalyon.creatis.vip.core.server.security.apikey.ApikeyAuthenticationProvider;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 
-import fr.insalyon.creatis.vip.api.security.oidc.OidcConfig;
-import fr.insalyon.creatis.vip.api.security.oidc.OidcResolver;
+import fr.insalyon.creatis.vip.core.server.security.oidc.OidcConfig;
+import fr.insalyon.creatis.vip.core.server.security.oidc.OidcResolver;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

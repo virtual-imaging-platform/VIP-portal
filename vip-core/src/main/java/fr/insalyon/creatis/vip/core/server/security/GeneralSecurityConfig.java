@@ -1,6 +1,6 @@
-package fr.insalyon.creatis.vip.api.security;
+package fr.insalyon.creatis.vip.core.server.security;
 
-import fr.insalyon.creatis.vip.api.security.oidc.OidcLoginConfig;
+import fr.insalyon.creatis.vip.core.server.security.oidc.OidcLoginConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
