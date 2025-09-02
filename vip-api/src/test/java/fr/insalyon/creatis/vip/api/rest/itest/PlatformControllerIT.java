@@ -32,8 +32,8 @@
 package fr.insalyon.creatis.vip.api.rest.itest;
 
 import fr.insalyon.creatis.vip.core.server.exception.ApiException.ApiError;
-import fr.insalyon.creatis.vip.api.model.Module;
-import fr.insalyon.creatis.vip.api.model.SupportedTransferProtocol;
+import fr.insalyon.creatis.vip.core.server.model.Module;
+import fr.insalyon.creatis.vip.core.server.model.SupportedTransferProtocol;
 import fr.insalyon.creatis.vip.api.rest.config.BaseWebSpringIT;
 import fr.insalyon.creatis.vip.application.client.view.ApplicationException.ApplicationError;
 import org.hamcrest.Matcher;

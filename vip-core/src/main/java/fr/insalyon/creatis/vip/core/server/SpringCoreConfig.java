@@ -53,7 +53,10 @@ import static org.springframework.util.ResourceUtils.CLASSPATH_URL_PREFIX;
 @EnableTransactionManagement
 @ComponentScan(
         basePackages = "fr.insalyon.creatis.vip",
-        excludeFilters = @ComponentScan.Filter(type = FilterType.ANNOTATION, value = RestController.class)
+        excludeFilters = {
+                @ComponentScan.Filter(type=FilterType.REGEX, pattern="fr\\.insalyon\\.creatis\\.vip\\.api\\..*"),
+                @ComponentScan.Filter(type = FilterType.ANNOTATION, value = RestController.class)
+        }
 )
 public class SpringCoreConfig {
 

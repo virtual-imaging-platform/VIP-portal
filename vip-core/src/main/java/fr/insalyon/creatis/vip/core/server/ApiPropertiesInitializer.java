@@ -29,10 +29,10 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL-B license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.api;
+package fr.insalyon.creatis.vip.core.server;
 
-import fr.insalyon.creatis.vip.api.model.Module;
-import fr.insalyon.creatis.vip.api.model.SupportedTransferProtocol;
+import fr.insalyon.creatis.vip.core.server.model.Module;
+import fr.insalyon.creatis.vip.core.server.model.SupportedTransferProtocol;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
