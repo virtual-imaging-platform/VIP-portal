@@ -36,6 +36,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 import org.springframework.web.servlet.config.annotation.*;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.FilterType;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Collections;
 
@@ -52,6 +55,10 @@ import static fr.insalyon.creatis.vip.api.CarminProperties.CORS_AUTHORIZED_DOMAI
  */
 @EnableWebMvc
 @Configuration
+@ComponentScan(
+        basePackages = "fr.insalyon.creatis.vip.api",
+        includeFilters = @ComponentScan.Filter(type = FilterType.ANNOTATION, value = RestController.class)
+)
 public class SpringWebConfig implements WebMvcConfigurer {
 
     private final Environment env;

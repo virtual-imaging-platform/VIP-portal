@@ -159,6 +159,18 @@ knowledge of the CeCILL-B license and that you accept its terms.
         <url-pattern>/fr.insalyon.creatis.vip.portal.Main/applicationimporterservice</url-pattern>
     </servlet-mapping>
     <!--End Application Importer Module-->
+    <!-- root context -->
+    <listener>
+        <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+    </listener>
+    <context-param>
+        <param-name>contextClass</param-name>
+        <param-value>org.springframework.web.context.support.AnnotationConfigWebApplicationContext</param-value>
+    </context-param>
+    <context-param>
+        <param-name>contextConfigLocation</param-name>
+        <param-value>fr.insalyon.creatis.vip.core.server.SpringCoreConfig</param-value>
+    </context-param>
     <!-- REST API -->
     <servlet>
         <servlet-name>RestAPI</servlet-name>
@@ -169,7 +181,7 @@ knowledge of the CeCILL-B license and that you accept its terms.
         </init-param>
          <init-param>
             <param-name>contextConfigLocation</param-name>
-            <param-value>fr.insalyon.creatis.vip.core.server.SpringCoreConfig</param-value>
+            <param-value>fr.insalyon.creatis.vip.api.SpringWebConfig</param-value>
         </init-param>
         <load-on-startup>1</load-on-startup>
     </servlet>

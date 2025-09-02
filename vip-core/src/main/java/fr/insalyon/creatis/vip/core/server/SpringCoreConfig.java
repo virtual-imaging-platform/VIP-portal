@@ -24,6 +24,7 @@ import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.jdbc.datasource.LazyConnectionDataSourceProxy;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.sql.DataSource;
 import java.io.IOException;
@@ -50,7 +51,10 @@ import static org.springframework.util.ResourceUtils.CLASSPATH_URL_PREFIX;
  */
 @Configuration
 @EnableTransactionManagement
-@ComponentScan(basePackages = "fr.insalyon.creatis.vip")
+@ComponentScan(
+        basePackages = "fr.insalyon.creatis.vip",
+        excludeFilters = @ComponentScan.Filter(type = FilterType.ANNOTATION, value = RestController.class)
+)
 public class SpringCoreConfig {
 
     private static final Logger logger = LoggerFactory.getLogger(SpringCoreConfig.class);
