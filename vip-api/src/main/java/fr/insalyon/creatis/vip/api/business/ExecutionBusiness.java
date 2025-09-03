@@ -221,6 +221,15 @@ public class ExecutionBusiness {
             e.getReturnedFiles().get(iod.getProcessor()).add(iod.getPath());
         }
 
+        // Jobs
+        List<Task> tasks = simulationBusiness.getJobsList(s.getID());
+        Map<Integer, String> jobs = new HashMap<>();
+        for (Task t : tasks) {
+            jobs.put(t.getInvocationID(), t.getStatus().toString());
+        }
+        e.setJobs(jobs);
+
+
         if (!(e.getStatus() == ExecutionStatus.FINISHED) && !(e.getStatus() == ExecutionStatus.KILLED) && e.getReturnedFiles().isEmpty()) {
             e.clearReturnedFiles();
         }
