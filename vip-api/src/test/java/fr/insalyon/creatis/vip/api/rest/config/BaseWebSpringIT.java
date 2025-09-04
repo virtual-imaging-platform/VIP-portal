@@ -37,6 +37,7 @@ import fr.insalyon.creatis.grida.client.GRIDAClientException;
 import fr.insalyon.creatis.vip.api.rest.mockconfig.DataConfigurator;
 import fr.insalyon.creatis.vip.application.client.bean.AppVersion;
 import fr.insalyon.creatis.vip.application.integrationtest.BaseApplicationSpringIT;
+import fr.insalyon.creatis.vip.api.SpringRestApiConfig;
 import fr.insalyon.creatis.vip.application.server.business.*;
 import fr.insalyon.creatis.vip.application.server.business.util.FileUtil;
 import fr.insalyon.creatis.vip.core.integrationtest.ServerMockConfig;
@@ -54,7 +55,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers;
-import org.springframework.test.context.web.WebAppConfiguration;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -77,7 +78,7 @@ import java.nio.charset.StandardCharsets;
  * * use {@link WithMockUser} annotation
  * <p>
  */
-@WebAppConfiguration
+@ContextConfiguration(classes = { SpringRestApiConfig.class })
 abstract public class BaseWebSpringIT extends BaseApplicationSpringIT {
 
     @Autowired

@@ -21,7 +21,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
+import org.springframework.test.context.junit.jupiter.web.SpringJUnitWebConfig;
 import org.springframework.test.jdbc.JdbcTestUtils;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -45,7 +45,7 @@ import static org.mockito.ArgumentMatchers.anyString;
  * h2 in-memory database instead
  */
 
-@SpringJUnitConfig(SpringCoreConfig.class)
+@SpringJUnitWebConfig(SpringCoreConfig.class)
 // launch all spring environment for testing, also take test bean though automatic package scan
 @ActiveProfiles({"test-db", "test"}) // to take random h2 database and not the test h2 jndi one
 @TestPropertySource(properties = {

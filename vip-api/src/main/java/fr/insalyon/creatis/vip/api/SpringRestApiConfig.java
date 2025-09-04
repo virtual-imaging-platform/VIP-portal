@@ -55,7 +55,10 @@ import static fr.insalyon.creatis.vip.core.server.CarminProperties.CORS_AUTHORIZ
  */
 @EnableWebMvc
 @Configuration
-@ComponentScan(basePackages = "fr.insalyon.creatis.vip.api")
+@ComponentScan(
+        basePackages = "fr.insalyon.creatis.vip.api",
+        includeFilters = {@ComponentScan.Filter(type = FilterType.ANNOTATION, value = RestController.class)}
+)
 public class SpringRestApiConfig implements WebMvcConfigurer {
 
     private final Environment env;

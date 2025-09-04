@@ -142,10 +142,9 @@ public class ApiSecurityConfig {
         return http.build();
     }
 
-    @Bean
-    public ApikeyAuthenticationFilter apikeyAuthenticationFilter() throws Exception {
+    private ApikeyAuthenticationFilter apikeyAuthenticationFilter() throws Exception {
         return new ApikeyAuthenticationFilter(
-                env.getRequiredProperty(CarminProperties.APIKEY_HEADER_NAME),
+                env.getProperty(CarminProperties.APIKEY_HEADER_NAME, "XXXapikey"), // XXX getRequiredProperty, see vip-api.conf mock in ApiPropertiesInitializer
                 vipAuthenticationEntryPoint, apikeyAuthenticationProvider);
     }
 

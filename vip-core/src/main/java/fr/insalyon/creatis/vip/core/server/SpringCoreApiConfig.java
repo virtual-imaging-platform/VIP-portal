@@ -10,7 +10,6 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 @EnableWebMvc
 @ComponentScan(
         basePackages = "fr.insalyon.creatis.vip.core",
-        excludeFilters = {@ComponentScan.Filter(type= FilterType.REGEX, pattern="fr\\.insalyon\\.creatis\\.vip\\.api\\..*")},
         includeFilters = {@ComponentScan.Filter(type = FilterType.ANNOTATION, value = RestController.class)}
 )
 public class SpringCoreApiConfig {

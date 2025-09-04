@@ -12,14 +12,12 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.web.WebAppConfiguration;
 
 import java.sql.Timestamp;
 import java.util.Date;
 
 import static fr.insalyon.creatis.vip.core.client.view.user.UserLevel.Beginner;
 
-@WebAppConfiguration
 public class ApiUserBusinessIT extends BaseSpringIT {
 
     @Autowired private ApiUserBusiness apiUserBusiness;

@@ -25,6 +25,7 @@ import org.springframework.jdbc.datasource.LazyConnectionDataSourceProxy;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 import javax.sql.DataSource;
 import java.io.IOException;
@@ -51,11 +52,16 @@ import static org.springframework.util.ResourceUtils.CLASSPATH_URL_PREFIX;
  */
 @Configuration
 @EnableTransactionManagement
+// The root context doesn't contain any controller, so at first it doesn't have to be a WebMvc context.
+// However, we do want to have Spring Security in the root context, and Spring mandates that
+// Spring Security & Spring MVC are configured in a shared ApplicationContext.
+// This constraint implies that the root context must also be a WebMvc one.
+@EnableWebMvc
 @ComponentScan(
         basePackages = "fr.insalyon.creatis.vip",
         excludeFilters = {
-                @ComponentScan.Filter(type=FilterType.REGEX, pattern="fr\\.insalyon\\.creatis\\.vip\\.api\\..*"),
-                @ComponentScan.Filter(type = FilterType.ANNOTATION, value = RestController.class)
+                @ComponentScan.Filter(type = FilterType.ANNOTATION, value = RestController.class),
+                @ComponentScan.Filter(type = FilterType.ANNOTATION, value = EnableWebMvc.class)
         }
 )
 public class SpringCoreConfig {

@@ -6,6 +6,7 @@ import fr.insalyon.creatis.vip.core.client.bean.Group;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.util.CountryCode;
 import fr.insalyon.creatis.vip.core.server.SpringCoreConfig;
+import fr.insalyon.creatis.vip.api.SpringRestApiConfig;
 import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
 import fr.insalyon.creatis.vip.core.server.business.EmailBusiness;
 
@@ -35,7 +36,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 Functional test with the vip-portal configuration, so very close from
 the production one. Do tests on the api.
  */
-@SpringJUnitWebConfig(value = SpringCoreConfig.class)
+@SpringJUnitWebConfig(value = { SpringRestApiConfig.class, SpringCoreConfig.class })
 @ActiveProfiles({"test-db", "test"}) // to take random h2 database and not the test h2 jndi one
 @TestPropertySource(properties = {
         "db.tableEngine=",             // to disable the default mysql/innodb engine on database init
