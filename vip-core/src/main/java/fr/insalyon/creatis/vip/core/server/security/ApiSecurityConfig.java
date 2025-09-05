@@ -144,7 +144,10 @@ public class ApiSecurityConfig {
 
     private ApikeyAuthenticationFilter apikeyAuthenticationFilter() throws Exception {
         return new ApikeyAuthenticationFilter(
-                env.getProperty(CarminProperties.APIKEY_HEADER_NAME, "XXXapikey"), // XXX getRequiredProperty, see vip-api.conf mock in ApiPropertiesInitializer
+                // XXX changed from getRequiredProperty so that tests pass,
+                // see optional vip-api.conf in ApiPropertiesInitializer.
+                // We could also make this parameter actually optional and disable API key auth when not set.
+                env.getProperty(CarminProperties.APIKEY_HEADER_NAME, "apikey"),
                 vipAuthenticationEntryPoint, apikeyAuthenticationProvider);
     }
 

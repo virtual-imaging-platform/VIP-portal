@@ -61,6 +61,7 @@ public class ApiPropertiesInitializer {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private final ConfigurableEnvironment env;
+    private boolean gotFile;
 
     @Autowired
     public ApiPropertiesInitializer(
@@ -72,14 +73,23 @@ public class ApiPropertiesInitializer {
                     vipConfigFolder.getFile().toPath().resolve("vip-api.conf"));
             env.getPropertySources().addLast(
                     new ResourcePropertySource(configFileResource));
+            this.gotFile = true;
         } catch (FileNotFoundException e) {
-            // silent ignore - XXX only for tests - should be mocked instead
+            // XXX NOT FOR PRODUCTION:
+            // make vip-api.conf optional: this is only needed for tests to pass,
+            // until we have a better alternative. Possible solutions:
+            // - merge vip-api.conf with vip.conf and use Server getters/mocks
+            // - allow the file to be optional only under some "test" profile condition
+            // - do some mocking of Environment or vip-api.conf file in tests
+            this.gotFile = false;
         }
     }
 
     @PostConstruct
     public void init() throws IOException {
-        // XXX verifyProperties();
+        if (this.gotFile) { // XXX see FileNotFoundException above
+            verifyProperties();
+        }
     }
 
     private void verifyProperties() {
