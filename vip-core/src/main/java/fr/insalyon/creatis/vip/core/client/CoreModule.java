@@ -153,7 +153,18 @@ public class CoreModule extends Module {
             }
         });
 
+        // Documentation button
+        ToolStripButton docButton = new ToolStripButton("Documentation");
+        docButton.setIcon(CoreConstants.ICON_INFO); // Pick an appropriate icon if you have one
+        docButton.addClickHandler(new ClickHandler() {
+            @Override
+            public void onClick(ClickEvent event) {
+                com.google.gwt.user.client.Window.open("https://github.com/virtual-imaging-platform/VIP-portal/wiki", "_blank", "");
+            }
+        });
+
         MainToolStrip.getInstance().addFill();
+        MainToolStrip.getInstance().addMember(docButton);
         MainToolStrip.getInstance().addMember(helpButton);
     }
 
