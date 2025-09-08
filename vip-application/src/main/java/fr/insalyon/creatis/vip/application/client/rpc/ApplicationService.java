@@ -10,6 +10,7 @@ import fr.insalyon.creatis.vip.application.client.bean.Engine;
 import fr.insalyon.creatis.vip.application.client.bean.Resource;
 import fr.insalyon.creatis.vip.application.client.bean.Tag;
 import fr.insalyon.creatis.vip.application.client.view.ApplicationException;
+import fr.insalyon.creatis.vip.core.client.bean.Pair;
 
 import java.util.List;
 import java.util.Map;
@@ -88,5 +89,5 @@ public interface ApplicationService extends RemoteService {
 
     public List<Tag> getTags(AppVersion appVersion) throws ApplicationException;
 
-    public Boolean isAppUsableWithCurrentUser(String appName, String appVersion) throws ApplicationException;
+    public Pair<Boolean, String> isAppUsableWithCurrentUser(String appName, String appVersion) throws ApplicationException;
 }
