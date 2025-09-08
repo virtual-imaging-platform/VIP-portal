@@ -1,5 +1,6 @@
 /*
-* Copyright and authors: see LICENSE.txt in base repository.
+* CREATIS
+* CNRS UMR 5220 -- INSERM U1044 -- Université Lyon 1 -- INSA Lyon
 * 
 * This software is a web portal for pipeline execution on distributed systems.
 * 

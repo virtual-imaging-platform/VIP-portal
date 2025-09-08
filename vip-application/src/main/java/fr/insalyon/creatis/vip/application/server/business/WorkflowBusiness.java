@@ -168,9 +168,9 @@ public class WorkflowBusiness {
             Resource resource = resources.get(0);
             Engine engine = engineBusiness.selectEngine(engineBusiness.getUsableEngines(resource));
 
+            appVersion.getSettings().put(ApplicationConstants.DEFAULT_EXECUTOR_GASW, resource.getType().toString());
             try {
-                workflow = workflowExecutionBusiness.launch(engine.getEndpoint(), appVersion, user, simulationName, parameters,
-                    resource.getType().toString(), resource.getConfiguration());
+                workflow = workflowExecutionBusiness.launch(engine.getEndpoint(), appVersion, user, simulationName, parameters, resource.getConfiguration());
             } catch (BusinessException be) {
                 logger.error("BusinessException caught on launch workflow, engine {} will be disabled", engine.getName());
             } catch (Exception e) {
@@ -694,9 +694,10 @@ public class WorkflowBusiness {
             if (simulation.getStatus() == SimulationStatus.Running
                     || simulation.getStatus() == SimulationStatus.Unknown) {
                 SimulationStatus simulationStatus = workflowExecutionBusiness.getStatus(simulation.getEngine(), simulation.getID());
+                logger.debug("Simulation {} : old status : {}, new status : {} ",
+                        simulation.getID(), simulation.getStatus(), simulationStatus);
 
-                if (simulationStatus != SimulationStatus.Running
-                        && simulationStatus != SimulationStatus.Unknown) {
+                if (simulationStatus != simulation.getStatus()) {
                     simulation.setStatus(simulationStatus);
                     Workflow workflow = workflowDAO.get(simulation.getID());
                     workflow.setStatus(WorkflowStatus.valueOf(simulationStatus.name()));
