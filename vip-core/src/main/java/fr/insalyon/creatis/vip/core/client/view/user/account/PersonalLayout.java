@@ -29,6 +29,7 @@ import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
 public class PersonalLayout extends AbstractFormLayout {
 
     private Label levelLabel;
+    private Label maxSimLabel;
     private Label firstNameField;
     private Label lastNameField;
     private TextItem institutionField;
@@ -46,6 +47,7 @@ public class PersonalLayout extends AbstractFormLayout {
 
     private void configure() {
         levelLabel = WidgetUtil.getLabel("", 15);
+        maxSimLabel = WidgetUtil.getLabel("", 15);
         firstNameField = WidgetUtil.getLabel("", 15);
         lastNameField = WidgetUtil.getLabel("", 15);
         institutionField = FieldUtil.getTextItem(200, null);
@@ -97,6 +99,8 @@ public class PersonalLayout extends AbstractFormLayout {
         saveButton.setWidth(150);
         this.addMember(WidgetUtil.getLabel("<b>Level</b>", 15));
         this.addMember(levelLabel);
+        this.addMember(WidgetUtil.getLabel("<b>Maximum simulatenous simulations</b>", 15));
+        this.addMember(maxSimLabel);
         this.addMember(WidgetUtil.getLabel("<b>First Name</b>", 15));
         this.addMember(firstNameField);
         this.addMember(WidgetUtil.getLabel("<b>Last Name</b>", 15));
@@ -121,6 +125,7 @@ public class PersonalLayout extends AbstractFormLayout {
             levelLabel.setPrompt("Upgrade your Account!");
             levelLabel.setCursor(Cursor.HAND);
         }
+        maxSimLabel.setContents(String.valueOf(user.getMaxRunningSimulations()));
         firstNameField.setContents(user.getFirstName());
         lastNameField.setContents(user.getLastName());
         institutionField.setValue(user.getInstitution());
