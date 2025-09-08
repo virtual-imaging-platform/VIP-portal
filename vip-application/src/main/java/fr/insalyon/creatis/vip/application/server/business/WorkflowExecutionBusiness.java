@@ -76,7 +76,6 @@ public class WorkflowExecutionBusiness {
             String inputs = (parameters != null) ? getParametersAsJSONInput(parameters) : null;
             String proxyFileName = server.getServerProxy(server.getVoName());
             String settingsJSON = new ObjectMapper().writeValueAsString(appVersion.getSettings());
-            System.err.println(settingsJSON);
             String workflowID = engine.launch(engineEndpoint, workflowContent, inputs, settingsJSON, executorConfig, proxyFileName);
             return new Workflow(workflowID, user.getFullName(),
                     WorkflowStatus.Running, new Date(), null, simulationName, 
