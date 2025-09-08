@@ -38,6 +38,7 @@ import fr.insalyon.creatis.vip.application.client.bean.ApplicationStatus;
 import fr.insalyon.creatis.vip.application.client.bean.Engine;
 import fr.insalyon.creatis.vip.application.client.bean.Resource;
 import fr.insalyon.creatis.vip.application.client.bean.Tag;
+import fr.insalyon.creatis.vip.core.client.bean.Pair;
 
 import java.util.List;
 import java.util.Map;
@@ -103,5 +104,5 @@ public interface ApplicationServiceAsync {
 
     public void getTags(AppVersion appVersion, AsyncCallback<List<Tag>> asyncCallback);
 
-    public void isAppUsableWithCurrentUser(String appName, String appVersion, AsyncCallback<String> asyncCallback);
+    public void isAppUsableWithCurrentUser(String appName, String appVersion, AsyncCallback<Pair<Boolean, String>> asyncCallback);
 }

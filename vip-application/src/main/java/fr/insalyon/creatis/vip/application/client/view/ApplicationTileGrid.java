@@ -38,6 +38,7 @@ import fr.insalyon.creatis.vip.application.client.bean.Tag;
 import fr.insalyon.creatis.vip.application.client.inter.CustomApplicationModule;
 import fr.insalyon.creatis.vip.application.client.rpc.ApplicationService;
 import fr.insalyon.creatis.vip.application.client.view.launch.LaunchTab;
+import fr.insalyon.creatis.vip.core.client.bean.Pair;
 import fr.insalyon.creatis.vip.core.client.view.application.ApplicationsTileGrid;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import java.util.ArrayList;
@@ -61,18 +62,18 @@ public class ApplicationTileGrid extends ApplicationsTileGrid {
 
     @Override
     public void parse(final String applicationName, final String applicationVersion) {
-        final AsyncCallback<String> callback = new AsyncCallback<>() {
+        final AsyncCallback<Pair<Boolean, String>> callback = new AsyncCallback<>() {
             @Override
             public void onFailure(Throwable caught) {
                 Layout.getInstance().setWarningMessage("Unable to check application avaibility:<br />" + caught.getMessage());
             }
 
             @Override
-            public void onSuccess(String result) {
-                if (result == null) {
+            public void onSuccess(Pair<Boolean, String> result) {
+                if (result.getFirst()) {
                     load(applicationName, applicationVersion);
                 } else {
-                    Layout.getInstance().setWarningMessage(result);
+                    Layout.getInstance().setWarningMessage(result.getSecond());
                 }
             }
         };

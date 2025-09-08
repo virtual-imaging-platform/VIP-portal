@@ -35,6 +35,7 @@ import fr.insalyon.creatis.vip.application.client.bean.*;
 import fr.insalyon.creatis.vip.application.client.rpc.ApplicationService;
 import fr.insalyon.creatis.vip.application.client.view.ApplicationException;
 import fr.insalyon.creatis.vip.application.server.business.*;
+import fr.insalyon.creatis.vip.core.client.bean.Pair;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.CoreException;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
@@ -500,21 +501,21 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
      * This fonction will check if ressources/engines are available !
      */
     @Override
-    public String isAppUsableWithCurrentUser(String appName, String version) throws ApplicationException {
+    public Pair<Boolean, String> isAppUsableWithCurrentUser(String appName, String version) throws ApplicationException {
         try {
             AppVersion appVersion = appVersionBusiness.getVersion(appName, version);
             List<Resource> usableResource = resourceBusiness.getUsableResources(getSessionUser(), appVersion);
             List<Engine> usableEngines;
 
             if (usableResource.isEmpty()) {
-                return "Sorry, there are no ressources actually availables for this application!";
+                return new Pair<Boolean, String>(false, "Sorry, there are no ressources actually availables for this application!");
             }
 
             usableEngines = engineBusiness.getUsableEngines(usableResource.get(0));
             if (usableEngines.isEmpty()) {
-               return "Sorry, there are no engines actually availables for this application!";
+               return new Pair<Boolean, String>(false, "Sorry, there are no engines actually availables for this application!");
             }
-            return null;
+            return new Pair<Boolean, String>(true, "Application usable!");
         } catch (BusinessException | CoreException e) {
             throw new ApplicationException(e);
         }
