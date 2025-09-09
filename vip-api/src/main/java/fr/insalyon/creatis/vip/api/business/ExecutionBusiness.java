@@ -102,7 +102,7 @@ public class ExecutionBusiness {
         return getLog(executionId, null, type);
     }
 
-    public String getLog(String executionId, String jobId, String type) throws ApiException {
+    public String getLog(String executionId, Integer invocationId, String type) throws ApiException {
         try {
             Simulation s = workflowBusiness.getSimulation(executionId);
             List<Task> tasks = simulationBusiness.getJobsList(s.getID());
@@ -116,7 +116,7 @@ public class ExecutionBusiness {
 
             Task targetTask = null;
 
-            if (jobId == null) {
+            if (invocationId == null) {
                 if (tasks.size() == 1) {
                     // prendre l’unique tâche
                     targetTask = tasks.get(0);
@@ -128,7 +128,7 @@ public class ExecutionBusiness {
             } else {
                 // ici on est sûr que jobId n’est pas null
                 targetTask = tasks.stream()
-                        .filter(t -> jobId.equals(t.getId()))
+                        .filter(t -> invocationId.equals(t.getInvocationID()))
                         .findFirst()
                         .orElse(null);
             }
@@ -136,15 +136,15 @@ public class ExecutionBusiness {
 
 
             if (targetTask == null) {
-                logger.debug("No job {} found for execution ID = {}", jobId, executionId);
-                return "no log found for job " + jobId;
+                logger.debug("No job {} found for execution ID = {}", invocationId, executionId);
+                return "no log found for job " + invocationId;
             }
 
             String fileName = targetTask.getFileName();
             if (fileName != null) {
                 return simulationBusiness.readFile(executionId, type, fileName, extension);
             } else {
-                throw new ApiException("no file name for job " + jobId + " in execution " + executionId);
+                throw new ApiException("no file name for job " + invocationId + " in execution " + executionId);
             }
 
         } catch (BusinessException e) {

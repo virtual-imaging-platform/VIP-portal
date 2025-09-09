@@ -164,11 +164,11 @@ public class ExecutionController extends ApiController {
         return executionBusiness.getLog(executionId, "out");
     }
 
-    @RequestMapping(value = "/{executionId}/jobs/{jobId}/stdout", produces = "text/plain;charset=UTF-8")
-    public String getJobStdout(@PathVariable String executionId, @PathVariable String jobId) throws ApiException {
-        logMethodInvocation(logger, "getJobStdout", executionId, jobId);
+    @RequestMapping(value = "/{executionId}/jobs/{invocationId}/stdout", produces = "text/plain;charset=UTF-8")
+    public String getJobStdout(@PathVariable String executionId, @PathVariable Integer invocationId) throws ApiException {
+        logMethodInvocation(logger, "getJobStdout", executionId, invocationId);
         executionBusiness.checkIfUserCanAccessExecution(executionId);
-        return executionBusiness.getLog(executionId, jobId, "out");
+        return executionBusiness.getLog(executionId, invocationId, "out");
     }
 
     @RequestMapping(value= "/{executionId}/stderr", produces = "text/plain;charset=UTF-8")
@@ -178,11 +178,11 @@ public class ExecutionController extends ApiController {
         return executionBusiness.getLog(executionId, "err");
     }
 
-    @RequestMapping(value = "/{executionId}/jobs/{jobId}/stderr", produces = "text/plain;charset=UTF-8")
-    public String getJobStderr(@PathVariable String executionId, @PathVariable String jobId) throws ApiException {
-        logMethodInvocation(logger, "getJobStderr", executionId, jobId);
+    @RequestMapping(value = "/{executionId}/jobs/{invocationId}/stderr", produces = "text/plain;charset=UTF-8")
+    public String getJobStderr(@PathVariable String executionId,  @PathVariable Integer invocationId) throws ApiException {
+        logMethodInvocation(logger, "getJobStderr", executionId, invocationId);
         executionBusiness.checkIfUserCanAccessExecution(executionId);
-        return executionBusiness.getLog(executionId, jobId, "err");
+        return executionBusiness.getLog(executionId, invocationId, "err");
     }
 
     @RequestMapping(value = "/{executionId}/play", method = RequestMethod.PUT)
