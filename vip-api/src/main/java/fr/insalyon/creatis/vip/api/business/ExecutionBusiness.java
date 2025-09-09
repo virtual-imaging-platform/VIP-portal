@@ -118,7 +118,6 @@ public class ExecutionBusiness {
 
             if (invocationId == null) {
                 if (tasks.size() == 1) {
-                    // prendre l’unique tâche
                     targetTask = tasks.get(0);
                     logger.debug("jobId is null, using the only available task with ID = {}", targetTask.getId());
                 } else {
@@ -126,7 +125,6 @@ public class ExecutionBusiness {
                     return "jobId is required when multiple tasks exist";
                 }
             } else {
-                // ici on est sûr que jobId n’est pas null
                 targetTask = tasks.stream()
                         .filter(t -> invocationId.equals(t.getInvocationID()))
                         .findFirst()
