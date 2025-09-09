@@ -41,7 +41,7 @@ import fr.insalyon.creatis.vip.application.client.view.monitor.job.TaskStatus;
 public class Task implements IsSerializable {
 
     private String id;
-    private String invocationID;
+    private int invocationID;
     private TaskStatus status;
     private int exitCode;
     private String siteName;
@@ -62,7 +62,7 @@ public class Task implements IsSerializable {
         this.command = command;
     }
 
-    public Task(String id, String invocationID, TaskStatus status, String command, String fileName,
+    public Task(String id, int invocationID, TaskStatus status, String command, String fileName,
             int exitCode, String siteName, String nodeName, int minorStatus,
             String... parameters) {
 
@@ -155,10 +155,10 @@ public class Task implements IsSerializable {
     }
 
     public int getInvocationID() {
-        return jobID;
+        return invocationID;
     }
 
     public void setInvocationID(int jobID) {
-        this.jobID = jobID;
+        this.invocationID = invocationID;
     }
 }

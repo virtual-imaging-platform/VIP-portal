@@ -203,7 +203,7 @@ public class SimulationData extends AbstractJobData implements SimulationDAO {
             minorStatus = parseMinorStatus(rs.getString("ms"));
         }
 
-        return new Task(rs.getString("id"), rs.getString("invocation_id"), status,
+        return new Task(rs.getString("id"), rs.getInt("invocation_id"), status,
                 rs.getString("command"), rs.getString("file_name"),
                 rs.getInt("exit_code"), rs.getString("node_site"),
                 rs.getString("node_name"), minorStatus,
@@ -257,7 +257,7 @@ public class SimulationData extends AbstractJobData implements SimulationDAO {
                     minorStatus = parseMinorStatus(rs.getString("ms"));
                 }
 
-                list.add(new Task( rs.getString("id"), rs.getString("invocation_id"), status,
+                list.add(new Task( rs.getString("id"), rs.getInt("invocation_id"), status,
                         rs.getString("command"), rs.getString("file_name"),
                         rs.getInt("exit_code"), rs.getString("node_site"),
                         rs.getString("node_name"), minorStatus,
