@@ -19,7 +19,7 @@ import java.util.*;
 
 
 /*
- To test InputM2Parser, but more importantly to test the prototype injections
+ To test InputFileParser, but more importantly to test the prototype injections
  in spring
  */
 public class ParserIT extends BaseSpringIT {

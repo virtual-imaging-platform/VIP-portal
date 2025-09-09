@@ -16,7 +16,7 @@ import org.mockito.MockitoAnnotations;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import fr.insalyon.creatis.vip.application.server.business.simulation.parser.InputM2Parser;
+import fr.insalyon.creatis.vip.application.server.business.simulation.parser.InputFileParser;
 import fr.insalyon.creatis.vip.application.server.business.util.ReproVipInputsParser;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
@@ -29,14 +29,14 @@ public class ReproVipInputsParserTest {
     @Mock private ExternalPlatformBusiness externalPlatformBusiness;
     @Mock private GroupDAO groupDAO;
 
-    private InputM2Parser parser;
+    private InputFileParser parser;
     private ReproVipInputsParser reproVipInputsParser;
 
     @BeforeEach
     public void init() throws BusinessException, DAOException {
         mocks();
 
-        parser = new InputM2Parser();
+        parser = new InputFileParser();
 
         reproVipInputsParser = new ReproVipInputsParser(externalPlatformBusiness, "localhost");
     }

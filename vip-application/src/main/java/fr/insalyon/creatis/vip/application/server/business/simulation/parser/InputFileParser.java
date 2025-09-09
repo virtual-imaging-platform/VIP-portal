@@ -74,7 +74,7 @@ import javax.xml.parsers.SAXParserFactory;
  */
 @Service
 @Scope("prototype")
-public class InputM2Parser {
+public class InputFileParser {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -87,11 +87,11 @@ public class InputM2Parser {
         this.lfcPathsBusiness = lfcPathsBusiness;
     }
 
-    public InputM2Parser() {
+    public InputFileParser() {
         this(null);
     }
 
-    public InputM2Parser(String currentUserFolder) {
+    public InputFileParser(String currentUserFolder) {
         this.currentUserFolder = currentUserFolder;
     }
 
