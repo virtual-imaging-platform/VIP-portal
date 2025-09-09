@@ -43,10 +43,6 @@ import org.slf4j.LoggerFactory;
 import jakarta.servlet.ServletException;
 import java.util.Map;
 
-/**
- *
- * @author Rafael Ferreira da Silva, Ibrahim Kallel
- */
 public class GateLabServiceImpl extends AbstractRemoteServiceServlet implements GateLabService {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
@@ -61,9 +57,8 @@ public class GateLabServiceImpl extends AbstractRemoteServiceServlet implements 
     @Override
     public Map<String, String> getGatelabWorkflowInputs(String simulationID) throws GateLabException {
         try {
-            return gatelabBusiness.getGatelabWorkflowInputs(
-                simulationID, getSessionUser().getFolder());
-        } catch (BusinessException | CoreException ex) {
+            return gatelabBusiness.getGatelabWorkflowInputs(simulationID);
+        } catch (BusinessException ex) {
             throw new GateLabException(ex);
         }
     }
