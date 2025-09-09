@@ -45,10 +45,8 @@ import fr.insalyon.creatis.vip.application.client.view.monitor.SimulationStatus;
 import fr.insalyon.creatis.vip.application.client.view.monitor.job.TaskStatus;
 import fr.insalyon.creatis.vip.application.server.business.AppVersionBusiness;
 import fr.insalyon.creatis.vip.application.server.business.ResourceBusiness;
-import fr.insalyon.creatis.vip.application.server.business.simulation.ParameterSweep;
 import fr.insalyon.creatis.vip.application.server.business.util.FileUtil;
 import fr.insalyon.creatis.vip.application.server.dao.SimulationDAO;
-import fr.insalyon.creatis.vip.application.server.dao.h2.SimulationData;
 import fr.insalyon.creatis.vip.core.client.bean.Group;
 import fr.insalyon.creatis.vip.core.client.bean.GroupType;
 import fr.insalyon.creatis.vip.core.integrationtest.ServerMockConfig;
@@ -422,12 +420,12 @@ public class ExecutionControllerIT extends BaseWebSpringIT {
 
         // verify inputs / same as gwendia without optional one
         String inputs = inputsCaptor.getValue();
-        List<ParameterSweep> expectedParams = new ArrayList<>();
-        expectedParams.add(new ParameterSweep("testFileInput", "lfn:" + ServerMockConfig.TEST_USERS_ROOT + "/" +  baseUser1.getFolder() + "/path/to/input.in"));
-        expectedParams.add(new ParameterSweep("testTextInput", "best test text value"));
-        expectedParams.add(new ParameterSweep("testFlagInput", "false"));
-        expectedParams.add(new ParameterSweep("results-directory", "lfn:" + ServerMockConfig.TEST_USERS_ROOT + "/" +  baseUser1.getFolder()));
-        String expectedInputs = workflowExecutionBusiness.getParametersAsXMLInput(expectedParams);
+        Map<String, List<String>> expectedParams = new HashMap<>();
+        expectedParams.put("testFileInput", List.of("lfn:" + ServerMockConfig.TEST_USERS_ROOT + "/" +  baseUser1.getFolder() + "/path/to/input.in"));
+        expectedParams.put("testTextInput", List.of("best test text value"));
+        expectedParams.put("testFlagInput", List.of("false"));
+        expectedParams.put("results-directory", List.of("lfn:" + ServerMockConfig.TEST_USERS_ROOT + "/" +  baseUser1.getFolder()));
+        String expectedInputs = workflowExecutionBusiness.getParametersAsJSONInput(expectedParams);
         Assertions.assertEquals(expectedInputs, inputs);
 
         // verify created workflow

@@ -35,7 +35,6 @@ import fr.insalyon.creatis.moteur.plugins.workflowsdb.bean.Workflow;
 import fr.insalyon.creatis.moteur.plugins.workflowsdb.bean.WorkflowStatus;
 import fr.insalyon.creatis.vip.application.client.bean.AppVersion;
 import fr.insalyon.creatis.vip.application.client.view.monitor.SimulationStatus;
-import fr.insalyon.creatis.vip.application.server.business.simulation.ParameterSweep;
 import fr.insalyon.creatis.vip.application.server.business.simulation.WorkflowEngineInstantiator;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
@@ -52,6 +51,7 @@ import javax.xml.rpc.ServiceException;
 import java.rmi.RemoteException;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class WorkflowExecutionBusiness {
@@ -69,14 +69,13 @@ public class WorkflowExecutionBusiness {
     }
 
     public Workflow launch(String engineEndpoint, AppVersion appVersion, User user, String simulationName,
-            List<ParameterSweep> parameters, String executorConfig) throws BusinessException {
+            Map<String, List<String>> parameters, String executorConfig) throws BusinessException {
 
         try {
             String workflowContent = appVersion.getDescriptor();
-            String inputs = (parameters != null) ? getParametersAsXMLInput(parameters) : null;
+            String inputs = (parameters != null) ? getParametersAsJSONInput(parameters) : null;
             String proxyFileName = server.getServerProxy(server.getVoName());
             String settingsJSON = new ObjectMapper().writeValueAsString(appVersion.getSettings());
-            System.err.println(settingsJSON);
             String workflowID = engine.launch(engineEndpoint, workflowContent, inputs, settingsJSON, executorConfig, proxyFileName);
             return new Workflow(workflowID, user.getFullName(),
                     WorkflowStatus.Running, new Date(), null, simulationName, 
@@ -111,39 +110,14 @@ public class WorkflowExecutionBusiness {
         }
     }
 
-    public String getParametersAsXMLInput(List<ParameterSweep> parameters) {
+    public String getParametersAsJSONInput(Map<String, List<String>> parameters) throws BusinessException {
+        try {
+            ObjectMapper mapper = new ObjectMapper();
 
-        //generate the xml input file according to the user input on the GUI
-        StringBuilder xml = new StringBuilder("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
-        xml.append("<inputdata>\n");
-
-        for (ParameterSweep parameter : parameters) {
-
-            xml.append("\t<source name=\"")
-                    .append(parameter.getParameterName())
-                    .append("\"  type=\"String\">\n")
-                    .append("<array>\n");
-
-            int counter = 0;
-            for (String value : parameter.getValues()) {
-
-
-                xml.append("\t\t<item>")
-                        .append("<tag name=\"Group\" value=\"")
-                        .append(counter)
-                        .append("\"/>")
-                        .append(value)
-                        .append("</item>\n");
-
-                counter++;
-            }
-
-            xml.append("</array>\n");
-            xml.append("\t</source>\n");
+            return mapper.writeValueAsString(parameters);
+        } catch (JsonProcessingException e) {
+            logger.error("Failed ot convert execution parameters to JSON string!");
+            throw new BusinessException(e);
         }
-
-        xml.append("</inputdata>\n");
-
-        return xml.toString();
     }
 }

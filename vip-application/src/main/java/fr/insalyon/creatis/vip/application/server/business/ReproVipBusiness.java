@@ -6,7 +6,7 @@ import fr.insalyon.creatis.vip.application.client.bean.AppVersion;
 import fr.insalyon.creatis.vip.application.client.bean.PublicExecution;
 import fr.insalyon.creatis.vip.application.client.bean.Simulation;
 import fr.insalyon.creatis.vip.application.client.bean.WorkflowData;
-import fr.insalyon.creatis.vip.application.server.business.simulation.parser.InputM2Parser;
+import fr.insalyon.creatis.vip.application.server.business.simulation.parser.InputFileParser;
 import fr.insalyon.creatis.vip.application.server.business.util.ReproVipInputsParser;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.business.Server;
@@ -214,9 +214,9 @@ public class ReproVipBusiness {
     public void generateWorkflowInputJson(String workflowId, Path reproVipDir) throws BusinessException {
         ObjectMapper mapper = new ObjectMapper();
         ReproVipInputsParser reproParser = new ReproVipInputsParser(externalPlatformBusiness, server.getHostURL());
-        InputM2Parser m2Parser = new InputM2Parser();
+        InputFileParser m2Parser = new InputFileParser();
 
-        Map<String, String> inputs = m2Parser.parse(server.getWorkflowsPath() + "/" + workflowId + "/inputs.xml");
+        Map<String, String> inputs = m2Parser.parse(Path.of(server.getWorkflowsPath() + "/" + workflowId + "/inputs"));
         Map<String, Object> json = new HashMap<>();
 
         reproParser.parse(inputs);
