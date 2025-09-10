@@ -44,6 +44,8 @@ import fr.insalyon.creatis.vip.core.integrationtest.ServerMockConfig;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
 import fr.insalyon.creatis.vip.core.server.dao.UserDAO;
+import fr.insalyon.creatis.vip.core.server.model.Module;
+import fr.insalyon.creatis.vip.core.server.model.SupportedTransferProtocol;
 import fr.insalyon.creatis.vip.datamanager.server.business.LFCBusiness;
 import fr.insalyon.creatis.vip.datamanager.server.business.LFCPermissionBusiness;
 import fr.insalyon.creatis.vip.datamanager.server.business.TransferPoolBusiness;
@@ -64,6 +66,10 @@ import org.springframework.web.context.WebApplicationContext;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+
+import static fr.insalyon.creatis.vip.api.data.CarminAPITestConstants.*;
+import static fr.insalyon.creatis.vip.core.server.CarminProperties.*;
+import static org.mockito.Mockito.when;
 
 /**
  * Created by abonnet on 7/28/16.
@@ -112,6 +118,19 @@ abstract public class BaseWebSpringIT extends BaseApplicationSpringIT {
                 .defaultRequest(MockMvcRequestBuilders.get("/").servletPath("/rest"))
                 .apply(SecurityMockMvcConfigurers.springSecurity())
                 .build();
+
+        // vip.conf API properties mocks
+        when(server.getEnvProperty(PLATFORM_NAME)).thenReturn(TEST_PLATFORM_NAME);
+        when(server.getEnvProperty(PLATFORM_DESCRIPTION)).thenReturn(TEST_PLATFORM_DESCRIPTION);
+        when(server.getEnvProperty(PLATFORM_EMAIL)).thenReturn(TEST_PLATFORM_EMAIL);
+        when(server.getEnvProperty(SUPPORTED_TRANSFER_PROTOCOLS, SupportedTransferProtocol[].class)).thenReturn(TEST_SUPPORTED_PROTOCOLS);
+        when(server.getEnvProperty(SUPPORTED_MODULES, Module[].class)).thenReturn(TEST_SUPPORTED_MODULES);
+        when(server.getEnvProperty(DEFAULT_LIMIT_LIST_EXECUTION, Long.class)).thenReturn(Long.valueOf(TEST_DEFAULT_LIST_LIMIT));
+        when(server.getEnvProperty(UNSUPPORTED_METHODS, String[].class)).thenReturn(TEST_UNSUPPORTED_METHOD);
+        when(server.getEnvProperty(API_DATA_TRANSFERT_MAX_SIZE, Long.class)).thenReturn(Long.valueOf(TEST_DATA_MAX_SIZE));
+        when(server.getEnvProperty(SUPPORTED_API_VERSION)).thenReturn(TEST_SUPPORTED_API_VERSION);
+        when(server.getEnvProperty(APIKEY_GENERATE_NEW_EACH_TIME, Boolean.class)).thenReturn(false);
+        when(server.getEnvProperty(API_PIPELINE_WHITE_LIST, String[].class)).thenReturn(new String[]{});
     }
 
     protected String getResourceAsString(String pathFromClasspath) throws IOException {

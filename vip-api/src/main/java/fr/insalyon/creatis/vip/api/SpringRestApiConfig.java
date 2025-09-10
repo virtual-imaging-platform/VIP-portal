@@ -34,7 +34,6 @@ package fr.insalyon.creatis.vip.api;
 import fr.insalyon.creatis.vip.api.business.VipConfigurer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.env.Environment;
 import org.springframework.web.servlet.config.annotation.*;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
@@ -42,7 +41,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Collections;
 
-import static fr.insalyon.creatis.vip.core.server.CarminProperties.CORS_AUTHORIZED_DOMAINS;
+import fr.insalyon.creatis.vip.core.server.CarminProperties;
+import fr.insalyon.creatis.vip.core.server.business.Server;
 
 /**
  * Configure the spring mvc DispatcherServlet. Few things to do, as the
@@ -61,12 +61,12 @@ import static fr.insalyon.creatis.vip.core.server.CarminProperties.CORS_AUTHORIZ
 )
 public class SpringRestApiConfig implements WebMvcConfigurer {
 
-    private final Environment env;
+    private final Server server;
     private final VipConfigurer vipConfigurer;
 
     @Autowired
-    public SpringRestApiConfig(Environment env, VipConfigurer vipConfigurer) {
-        this.env = env;
+    public SpringRestApiConfig(Server server, VipConfigurer vipConfigurer) {
+        this.server = server;
         this.vipConfigurer = vipConfigurer;
     }
 
@@ -92,7 +92,7 @@ public class SpringRestApiConfig implements WebMvcConfigurer {
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
             .allowedMethods("GET", "POST", "PUT", "DELETE", "HEAD")
-            .allowedOrigins(env.getRequiredProperty(CORS_AUTHORIZED_DOMAINS, String[].class));
+            .allowedOrigins(server.getEnvProperty(CarminProperties.CORS_AUTHORIZED_DOMAINS, String[].class));
     }
 
     /*

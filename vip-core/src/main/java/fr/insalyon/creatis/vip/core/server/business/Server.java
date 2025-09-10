@@ -107,4 +107,8 @@ public interface Server {
     String getMoteurServerPassword();
 
     String getHostURL();
+
+    String getEnvProperty(String key);
+    <T> T getEnvProperty(String key, Class<T> targetType, T defaultValue);
+    <T> T getEnvProperty(String key, Class<T> targetType);
 }

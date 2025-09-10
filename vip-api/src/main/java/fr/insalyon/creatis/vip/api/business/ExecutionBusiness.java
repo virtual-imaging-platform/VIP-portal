@@ -58,7 +58,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.function.Supplier;
 
-import static fr.insalyon.creatis.vip.core.server.CarminProperties.ADDITIONNAL_INPUT_VALID_CHARS;
+import fr.insalyon.creatis.vip.core.server.CarminProperties;
 import static fr.insalyon.creatis.vip.application.client.ApplicationConstants.INPUT_VALID_CHARS;
 
 /**
@@ -339,7 +339,7 @@ public class ExecutionBusiness {
     }
 
     private void checkInputIsValid(String inputName, String inputValue) throws ApiException {
-        String validChars = INPUT_VALID_CHARS + ADDITIONNAL_INPUT_VALID_CHARS;
+        String validChars = INPUT_VALID_CHARS + CarminProperties.ADDITIONNAL_INPUT_VALID_CHARS;
         if( ! inputValue.matches("[" + validChars + "]+")) {
             logger.error("Input {} is not valid. Value : {}, Authorized characters are {}",
                     inputName, inputValue, validChars);

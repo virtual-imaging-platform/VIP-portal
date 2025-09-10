@@ -6,11 +6,11 @@ import fr.insalyon.creatis.vip.api.model.AuthenticationCredentials;
 import fr.insalyon.creatis.vip.api.model.AuthenticationInfo;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
+import fr.insalyon.creatis.vip.core.server.business.Server;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -18,11 +18,11 @@ public class ApiBusiness {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    private final Environment env;
+    private final Server server;
     private final ConfigurationBusiness configurationBusiness;
 
-    public ApiBusiness(Environment env, ConfigurationBusiness configurationBusiness) {
-        this.env = env;
+    public ApiBusiness(Server server, ConfigurationBusiness configurationBusiness) {
+        this.server = server;
         this.configurationBusiness = configurationBusiness;
     }
 
@@ -45,7 +45,7 @@ public class ApiBusiness {
             authInfo.setHttpHeader(CoreConstants.COOKIES_SESSION);
             authInfo.setHttpHeaderValue(user.getSession());
         } else {
-            authInfo.setHttpHeader(env.getProperty(CarminProperties.APIKEY_HEADER_NAME));
+            authInfo.setHttpHeader(server.getEnvProperty(CarminProperties.APIKEY_HEADER_NAME));
             String apikey = getAnApikeyForUser(username); // the username is an email
             authInfo.setHttpHeaderValue(apikey);
         }
@@ -68,7 +68,7 @@ public class ApiBusiness {
     }
 
     private String getAnApikeyForUser(String email) throws ApiException {
-        boolean generateNewApiKey = env.getRequiredProperty(
+        boolean generateNewApiKey = server.getEnvProperty(
                 CarminProperties.APIKEY_GENERATE_NEW_EACH_TIME, Boolean.class);
         try {
             if (generateNewApiKey) {

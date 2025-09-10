@@ -32,6 +32,7 @@
 package fr.insalyon.creatis.vip.core.server.security;
 
 import fr.insalyon.creatis.vip.core.server.CarminProperties;
+import  fr.insalyon.creatis.vip.core.server.business.Server;
 
 import fr.insalyon.creatis.vip.core.server.security.apikey.SpringApiPrincipal;
 import fr.insalyon.creatis.vip.core.server.security.apikey.ApikeyAuthenticationFilter;
@@ -47,7 +48,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
-import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -76,7 +76,7 @@ public class ApiSecurityConfig {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    private final Environment env;
+    private final Server server;
     private final VipAuthenticationEntryPoint vipAuthenticationEntryPoint;
     private final ApikeyAuthenticationProvider apikeyAuthenticationProvider;
     private final OidcConfig oidcConfig;
@@ -84,10 +84,10 @@ public class ApiSecurityConfig {
 
     @Autowired
     public ApiSecurityConfig(
-            Environment env, ApikeyAuthenticationProvider apikeyAuthenticationProvider,
+            Server server, ApikeyAuthenticationProvider apikeyAuthenticationProvider,
             VipAuthenticationEntryPoint vipAuthenticationEntryPoint,
             OidcConfig oidcConfig, OidcResolver oidcResolver) {
-        this.env = env;
+        this.server = server;
         this.vipAuthenticationEntryPoint = vipAuthenticationEntryPoint;
         this.apikeyAuthenticationProvider = apikeyAuthenticationProvider;
         this.oidcConfig = oidcConfig;
@@ -144,10 +144,7 @@ public class ApiSecurityConfig {
 
     private ApikeyAuthenticationFilter apikeyAuthenticationFilter() throws Exception {
         return new ApikeyAuthenticationFilter(
-                // XXX changed from getRequiredProperty so that tests pass,
-                // see optional vip-api.conf in ApiPropertiesInitializer.
-                // We could also make this parameter actually optional and disable API key auth when not set.
-                env.getProperty(CarminProperties.APIKEY_HEADER_NAME, "apikey"),
+                server.getEnvProperty(CarminProperties.APIKEY_HEADER_NAME),
                 vipAuthenticationEntryPoint, apikeyAuthenticationProvider);
     }
 

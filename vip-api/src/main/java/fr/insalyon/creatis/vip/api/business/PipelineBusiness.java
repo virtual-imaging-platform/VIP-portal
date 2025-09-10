@@ -47,11 +47,11 @@ import fr.insalyon.creatis.vip.application.server.business.BoutiquesBusiness;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
+import fr.insalyon.creatis.vip.core.server.business.Server;
 import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -71,7 +71,7 @@ public class PipelineBusiness {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    private final Environment env;
+    private final Server server;
 
     private final Supplier<User> currentUserProvider;
     private final ApplicationBusiness applicationBusiness;
@@ -80,10 +80,10 @@ public class PipelineBusiness {
 
     @Autowired
     public PipelineBusiness(
-            Supplier<User> currentUserProvider, Environment env, ApplicationBusiness applicationBusiness,
+            Supplier<User> currentUserProvider, Server server, ApplicationBusiness applicationBusiness,
             BoutiquesBusiness boutiquesBusiness, AppVersionBusiness appVersionBusiness) {
         this.currentUserProvider = currentUserProvider;
-        this.env = env;
+        this.server = server;
         this.applicationBusiness = applicationBusiness;
         this.boutiquesBusiness = boutiquesBusiness;
         this.appVersionBusiness = appVersionBusiness;
@@ -275,7 +275,7 @@ public class PipelineBusiness {
             return true;
         }
         List<String> whiteList = Arrays.asList(
-                env.getRequiredProperty(CarminProperties.API_PIPELINE_WHITE_LIST, String[].class));
+                server.getEnvProperty(CarminProperties.API_PIPELINE_WHITE_LIST, String[].class));
         return whiteList.stream().anyMatch(appString -> {
             String[] splitAppString = appString.split("/");
             if (splitAppString.length != 2) {

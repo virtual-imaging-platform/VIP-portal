@@ -1,6 +1,9 @@
 package fr.insalyon.creatis.vip.integrationtest;
 
 import fr.insalyon.creatis.grida.client.GRIDAClient;
+import fr.insalyon.creatis.vip.core.server.business.Server;
+import fr.insalyon.creatis.vip.core.server.model.Module;
+import fr.insalyon.creatis.vip.core.server.model.SupportedTransferProtocol;
 import fr.insalyon.creatis.vip.core.server.security.apikey.SpringApiPrincipal;
 import fr.insalyon.creatis.vip.core.client.bean.Group;
 import fr.insalyon.creatis.vip.core.client.bean.User;
@@ -27,7 +30,9 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
 
+import fr.insalyon.creatis.vip.core.server.CarminProperties;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -49,9 +54,11 @@ public class VipWebConfigurationIT {
     protected WebApplicationContext wac;
     private MockMvc mockMvc;
 
+    @Autowired private Server server;
     @Autowired private GRIDAClient gridaClient;
     @Autowired private EmailBusiness emailBusiness;
     @Autowired private ConfigurationBusiness configurationBusiness;
+
 
     @BeforeEach
     public final void setup() {
@@ -81,6 +88,11 @@ public class VipWebConfigurationIT {
 
     @Test
     public void testGetPlatformProperties() throws Exception {
+        when(server.getEnvProperty(CarminProperties.PLATFORM_NAME)).thenReturn("VIP_TEST");
+        when(server.getEnvProperty(CarminProperties.SUPPORTED_TRANSFER_PROTOCOLS, SupportedTransferProtocol[].class)).thenReturn(new SupportedTransferProtocol[]{SupportedTransferProtocol.HTTPS});
+        when(server.getEnvProperty(CarminProperties.SUPPORTED_MODULES, Module[].class)).thenReturn(new Module[]{Module.PROCESSING});
+        when(server.getEnvProperty(CarminProperties.DEFAULT_LIMIT_LIST_EXECUTION, Long.class)).thenReturn((long)500);
+        when(server.getEnvProperty(CarminProperties.UNSUPPORTED_METHODS, String[].class)).thenReturn(new String[]{"playExecution"});
         mockMvc.perform(get("/rest/platform"))
                 .andDo(print())
                 .andExpect(status().isOk())

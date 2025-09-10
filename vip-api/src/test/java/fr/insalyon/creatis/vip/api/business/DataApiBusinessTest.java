@@ -16,7 +16,6 @@ import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Mockito;
-import org.springframework.core.env.Environment;
 import org.springframework.core.io.ClassPathResource;
 
 import java.io.File;
@@ -39,7 +38,6 @@ public class DataApiBusinessTest {
         LFCBusiness lfcBusiness = Mockito.mock(LFCBusiness.class);
         DataManagerBusiness dataManagerBusiness = Mockito.mock(DataManagerBusiness.class);
         Server server = Mockito.mock(Server.class);
-        Environment env = Mockito.mock(Environment.class);
 
         String lfcParentPath = "/vip/Home";
         String lfcPath = lfcParentPath + "/test_uploaded.txt";
@@ -59,8 +57,8 @@ public class DataApiBusinessTest {
         when(lfcBusiness.exists(baseUser2, lfcParentPath)).thenReturn(true);
         when(dataManagerBusiness.getUploadRootDirectory(false)).thenReturn(tempDir.toAbsolutePath() + "/");
         when(server.getApiParallelDownloadNb()).thenReturn(2);
-        when(env.getProperty(CarminProperties.API_DOWNLOAD_TIMEOUT_IN_SECONDS, Integer.class)).thenReturn(10);
-        when(env.getProperty(CarminProperties.API_DOWNLOAD_RETRY_IN_SECONDS, Integer.class)).thenReturn(1);
+        when(server.getEnvProperty(CarminProperties.API_DOWNLOAD_TIMEOUT_IN_SECONDS, Integer.class)).thenReturn(10);
+        when(server.getEnvProperty(CarminProperties.API_DOWNLOAD_RETRY_IN_SECONDS, Integer.class)).thenReturn(1);
 
         when (transferPoolBusiness.uploadFile(
                 baseUser2, expectedUploadedPath, lfcParentPath))
@@ -70,7 +68,7 @@ public class DataApiBusinessTest {
                 .thenReturn(runningPoolOperation, runningPoolOperation, donePoolOperation);
 
         // Doing it
-        DataApiBusiness sut = new DataApiBusiness(env, () -> baseUser2, lfcBusiness, transferPoolBusiness, lfcPermissionBusiness, dataManagerBusiness, server);
+        DataApiBusiness sut = new DataApiBusiness(server, () -> baseUser2, lfcBusiness, transferPoolBusiness, lfcPermissionBusiness, dataManagerBusiness);
         sut.uploadCustomData(lfcPath, uploadData);
 
         // Verify

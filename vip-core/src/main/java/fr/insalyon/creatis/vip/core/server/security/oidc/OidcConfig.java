@@ -1,12 +1,12 @@
 package fr.insalyon.creatis.vip.core.server.security.oidc;
 
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
+import fr.insalyon.creatis.vip.core.server.business.Server;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
-import org.springframework.core.env.Environment;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -28,7 +28,7 @@ import fr.insalyon.creatis.vip.core.server.CarminProperties;
 @Service
 public class OidcConfig {
     private final Logger logger = LoggerFactory.getLogger(getClass());
-    private final Environment env;
+    private final Server server;
     private final Map<String, OidcServer> servers;
 
     public class OidcServer {
@@ -47,8 +47,8 @@ public class OidcConfig {
     }
 
     @Autowired
-    public OidcConfig(Environment env, Resource vipConfigFolder) throws IOException, URISyntaxException, BusinessException {
-        this.env = env;
+    public OidcConfig(Server server, Resource vipConfigFolder) throws IOException, URISyntaxException, BusinessException {
+        this.server = server;
         // Build the list of OIDC servers from config file. If OIDC is disabled, just create an empty list.
         HashMap<String, OidcServer> servers = new HashMap<>();
         if (isOIDCActive()) {
@@ -107,7 +107,7 @@ public class OidcConfig {
     }
 
     public boolean isOIDCActive() {
-        return env.getProperty(CarminProperties.KEYCLOAK_ACTIVATED, Boolean.class, Boolean.FALSE);
+        return server.getEnvProperty(CarminProperties.KEYCLOAK_ACTIVATED, Boolean.class, Boolean.FALSE);
     }
 
     // list of issuers URLs

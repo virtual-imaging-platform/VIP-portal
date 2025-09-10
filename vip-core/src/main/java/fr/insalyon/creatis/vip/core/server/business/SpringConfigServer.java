@@ -7,6 +7,8 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 
+import fr.insalyon.creatis.vip.core.server.model.Module;
+import fr.insalyon.creatis.vip.core.server.model.SupportedTransferProtocol;
 import jakarta.annotation.PostConstruct;
 
 import org.apache.commons.configuration.ConfigurationException;
@@ -25,6 +27,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
+
+import static fr.insalyon.creatis.vip.core.server.CarminProperties.*;
+import static fr.insalyon.creatis.vip.core.server.CarminProperties.API_PIPELINE_WHITE_LIST;
 
 /**
  * Reads the vip.conf property file from the configured vifConfigFolder
@@ -146,6 +151,44 @@ public class SpringConfigServer implements Server {
         assertPropertyIsNotEmpty(CoreConstants.LAB_SIMULATION_PLATFORM_MAX, Integer.class);
 
         assertOptionalPropertyType(CoreConstants.USE_LOCAL_FILES_AS_INPUTS, Boolean.class);
+        verifyApiProperties();
+    }
+
+    private void verifyApiProperties() {
+        verifyPropertyNotNull(CORS_AUTHORIZED_DOMAINS, String[].class);
+        verifyPropertyNotNull(PLATFORM_NAME, String.class);
+        verifyPropertyNotNull(PLATFORM_DESCRIPTION, String.class);
+        verifyPropertyNotNull(PLATFORM_EMAIL, String.class);
+        verifyPropertyNotNull(DEFAULT_LIMIT_LIST_EXECUTION, Long.class);
+        verifyPropertyNotNull(SUPPORTED_API_VERSION, String.class);
+        verifyPropertyNotNull(APIKEY_HEADER_NAME, String.class);
+        verifyPropertyNotNull(APIKEY_GENERATE_NEW_EACH_TIME, Boolean.class);
+        verifyPropertyNotNull(API_DIRECTORY_MIME_TYPE, String.class);
+        verifyPropertyNotNull(API_DEFAULT_MIME_TYPE, String.class);
+        verifyPropertyNotNull(API_DOWNLOAD_RETRY_IN_SECONDS, Integer.class);
+        verifyPropertyNotNull(API_DOWNLOAD_TIMEOUT_IN_SECONDS, Integer.class);
+        verifyPropertyNotNull(API_DATA_TRANSFERT_MAX_SIZE, Long.class);
+
+        if (env.getProperty(KEYCLOAK_ACTIVATED, Boolean.class, Boolean.FALSE)) {
+            logger.info("Keycloak/OIDC activated");
+        } else {
+            logger.info("Keycloak/OIDC NOT active");
+        }
+
+        // due to arrays and generics, this verification aren't easy to factorize
+        Assert.notEmpty(env.getProperty(SUPPORTED_TRANSFER_PROTOCOLS, SupportedTransferProtocol[].class),
+                SUPPORTED_TRANSFER_PROTOCOLS + " required in api conf file");
+        Assert.notEmpty(env.getProperty(SUPPORTED_MODULES, Module[].class),
+                SUPPORTED_MODULES + " required in api conf file");
+        Assert.isInstanceOf(String[].class, env.getProperty(UNSUPPORTED_METHODS, String[].class),
+                UNSUPPORTED_METHODS + " required in api conf file");
+        Assert.isInstanceOf(String[].class, env.getProperty(API_PIPELINE_WHITE_LIST, String[].class),
+                API_PIPELINE_WHITE_LIST + " required in api conf file");
+    }
+
+    private void verifyPropertyNotNull(String propertyKey, Class<?> targetType) {
+        Assert.notNull(env.getProperty(propertyKey, targetType),
+                propertyKey + " required in api conf file");
     }
 
     private void assertPropertyIsPresent(String property) {
@@ -419,5 +462,19 @@ public class SpringConfigServer implements Server {
     @Override
     public String getHostURL() {
         return env.getRequiredProperty(CoreConstants.HOST_URL);
+    }
+
+    @Override
+    public String getEnvProperty(String key) {
+        // XXX dedicated helpers ?
+        return env.getProperty(key);
+    }
+    @Override
+    public <T> T getEnvProperty(String key, Class<T> targetType, T defaultValue) {
+        return env.getProperty(key, targetType, defaultValue);
+    }
+    @Override
+    public <T> T getEnvProperty(String key, Class<T> targetType) {
+        return env.getProperty(key, targetType);
     }
 }

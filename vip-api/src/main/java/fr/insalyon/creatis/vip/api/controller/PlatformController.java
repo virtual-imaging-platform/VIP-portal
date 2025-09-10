@@ -72,23 +72,23 @@ public class PlatformController extends ApiController{
     public PlatformProperties getPlatformProperties() throws ApiException {
         logMethodInvocation(logger, "getPlatformProperties");
         PlatformProperties platformProperties = new PlatformProperties();
-        platformProperties.setPlatformName(env.getProperty(PLATFORM_NAME));
-        platformProperties.setPlatformDescription(env.getProperty(PLATFORM_DESCRIPTION));
+        platformProperties.setPlatformName(server.getEnvProperty(PLATFORM_NAME));
+        platformProperties.setPlatformDescription(server.getEnvProperty(PLATFORM_DESCRIPTION));
         platformProperties.setSupportedTransferProtocols(Arrays.asList(
-                env.getRequiredProperty(SUPPORTED_TRANSFER_PROTOCOLS, SupportedTransferProtocol[].class)
+                server.getEnvProperty(SUPPORTED_TRANSFER_PROTOCOLS, SupportedTransferProtocol[].class)
         ));
         platformProperties.setSupportedModules(Arrays.asList(
-                env.getRequiredProperty(SUPPORTED_MODULES, Module[].class)
+                server.getEnvProperty(SUPPORTED_MODULES, Module[].class)
         ));
         platformProperties.setDefaultLimitListExecutions(
-                env.getProperty(DEFAULT_LIMIT_LIST_EXECUTION, Long.class));
+                server.getEnvProperty(DEFAULT_LIMIT_LIST_EXECUTION, Long.class));
         platformProperties.setUnsupportedMethods(Arrays.asList(
-                env.getRequiredProperty(UNSUPPORTED_METHODS, String[].class)
+                server.getEnvProperty(UNSUPPORTED_METHODS, String[].class)
         ));
-        platformProperties.setSupportedAPIVersion(env.getProperty(SUPPORTED_API_VERSION));
-        platformProperties.setEmail(env.getProperty(PLATFORM_EMAIL));
+        platformProperties.setSupportedAPIVersion(server.getEnvProperty(SUPPORTED_API_VERSION));
+        platformProperties.setEmail(server.getEnvProperty(PLATFORM_EMAIL));
         platformProperties.setAPIErrorCodesAndMessages(getErrorCodesAndMessages());
-        platformProperties.setMaxSizeDirectTransfer(env.getProperty(API_DATA_TRANSFERT_MAX_SIZE, Long.class));
+        platformProperties.setMaxSizeDirectTransfer(server.getEnvProperty(API_DATA_TRANSFERT_MAX_SIZE, Long.class));
         platformProperties.setOidcLoginProviders(oidcLoginConfig.getLoginProviders());
         return platformProperties;
     }

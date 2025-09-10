@@ -10,6 +10,7 @@ import org.springframework.context.annotation.Profile;
 
 import java.io.IOException;
 
+import fr.insalyon.creatis.vip.core.server.CarminProperties;
 import static org.mockito.Mockito.*;
 
 /**
@@ -52,6 +53,12 @@ public class ServerMockConfig {
         when(server.getDataManagerUsersHome()).thenReturn(TEST_USERS_ROOT);
         when(server.getDataManagerGroupsHome()).thenReturn(TEST_GROUP_ROOT);
         when(server.getVoRoot()).thenReturn("/vo_test/root");
+        // only CarminProperties that are used in vip-core should be mocked here, others should be in vip-api
+        when(server.getEnvProperty(CarminProperties.APIKEY_HEADER_NAME)).thenReturn("testapikey");
+        when(server.getEnvProperty(CarminProperties.KEYCLOAK_ACTIVATED, Boolean.class, Boolean.FALSE)).thenReturn(false);
+        // CORS_AUTHORIZED_DOMAINS is only used in vip-api, but in the SpringRestApiConfig (servlet context),
+        // which uses a Server bean internally. We mock it here, currently lacking a cleaner solution for a higher level mock.
+        when(server.getEnvProperty(CarminProperties.CORS_AUTHORIZED_DOMAINS, String[].class)).thenReturn(new String[]{});
     }
 
     @Bean
