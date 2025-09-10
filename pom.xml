@@ -94,7 +94,6 @@ knowledge of the CeCILL-B license and that you accept its terms.
         <module>vip-social</module>
         <module>vip-api</module>
         <module>vip-visualization</module>
-        <module>vip-local</module>
         <module>coverage</module>
     </modules>
 

@@ -1,7 +1,6 @@
 package fr.insalyon.creatis.vip.application.client.view.launch;
 
 import com.smartgwt.client.widgets.form.DynamicForm;
-import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,15 +18,10 @@ public class ValueRange extends ValueSet {
 
     /**
      * @param value String to convert to float
-     * @return      Float representing value, or null if value is ApplicationConstants.INPUT_WITHOUT_VALUE
-     * @throws NumberFormatException if value is neither ApplicationConstants.INPUT_WITHOUT_VALUE nor a valid
-     *                               representation of a float
+     * @return      Float representing value, or null
      */
     public static Float floatValue(String value) throws NumberFormatException{
-        if(value.equals(ApplicationConstants.INPUT_WITHOUT_VALUE)){
-            return null;
-        }
-        return Float.parseFloat(value);
+        return (value == null) ? null : Float.parseFloat(value);
     }
 
     /**
@@ -58,7 +52,6 @@ public class ValueRange extends ValueSet {
      * @param stop String
      * @param step String
      * @throws NumberFormatException if at least one of the values is neither a float nor
-     * ApplicationConstants.INPUT_WITHOUT_VALUE
      */
     public ValueRange(String start, String stop, String step) throws NumberFormatException{
         this.rangeLimits = new ArrayList<>();
