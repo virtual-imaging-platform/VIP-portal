@@ -71,7 +71,7 @@ import java.util.function.Supplier;
  */
 @Configuration
 @EnableWebSecurity
-public class ApiSecurityConfig {
+public class RestApiSecurityConfig {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -82,7 +82,7 @@ public class ApiSecurityConfig {
     private final OidcResolver oidcResolver;
 
     @Autowired
-    public ApiSecurityConfig(
+    public RestApiSecurityConfig(
             Server server, ApikeyAuthenticationProvider apikeyAuthenticationProvider,
             VipAuthenticationEntryPoint vipAuthenticationEntryPoint,
             OidcConfig oidcConfig, OidcResolver oidcResolver) {
