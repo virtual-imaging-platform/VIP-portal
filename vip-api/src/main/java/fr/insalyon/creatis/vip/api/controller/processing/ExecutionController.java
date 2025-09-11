@@ -47,8 +47,6 @@ import org.springframework.web.bind.annotation.*;
 import jakarta.validation.Valid;
 import java.util.List;
 
-import fr.insalyon.creatis.vip.core.server.CarminProperties;
-
 /**
  * Created by abonnet on 7/13/16.
  */
@@ -80,7 +78,7 @@ public class ExecutionController extends ApiController {
             logger.warn("offset not supportet yet in listExecutions");
             throw new ApiException("offset not supported yet");
         }
-        int executionMaxNb = server.getEnvProperty(CarminProperties.DEFAULT_LIMIT_LIST_EXECUTION, Long.class).intValue();
+        int executionMaxNb = (int)server.getCarminDefaultLimitListExecution();
         if (limit == null) limit = executionMaxNb;
         if (limit > executionMaxNb) {
             logger.warn("limit parameter too high {}", limit);

@@ -1,7 +1,6 @@
 package fr.insalyon.creatis.vip.api.business;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import fr.insalyon.creatis.vip.core.server.CarminProperties;
 import fr.insalyon.creatis.vip.core.server.exception.ApiException;
 import fr.insalyon.creatis.vip.api.model.UploadData;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
@@ -57,8 +56,8 @@ public class DataApiBusinessTest {
         when(lfcBusiness.exists(baseUser2, lfcParentPath)).thenReturn(true);
         when(dataManagerBusiness.getUploadRootDirectory(false)).thenReturn(tempDir.toAbsolutePath() + "/");
         when(server.getApiParallelDownloadNb()).thenReturn(2);
-        when(server.getEnvProperty(CarminProperties.API_DOWNLOAD_TIMEOUT_IN_SECONDS, Integer.class)).thenReturn(10);
-        when(server.getEnvProperty(CarminProperties.API_DOWNLOAD_RETRY_IN_SECONDS, Integer.class)).thenReturn(1);
+        when(server.getCarminApiDownloadTimeoutInSeconds()).thenReturn(10);
+        when(server.getCarminApiDownloadRetryInSeconds()).thenReturn(1);
 
         when (transferPoolBusiness.uploadFile(
                 baseUser2, expectedUploadedPath, lfcParentPath))

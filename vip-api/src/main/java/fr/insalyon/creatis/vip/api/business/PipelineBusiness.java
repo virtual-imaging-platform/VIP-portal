@@ -33,7 +33,6 @@ package fr.insalyon.creatis.vip.api.business;
 
 import fr.insalyon.creatis.boutiques.model.BoutiquesDescriptor;
 import fr.insalyon.creatis.boutiques.model.Input;
-import fr.insalyon.creatis.vip.core.server.CarminProperties;
 import fr.insalyon.creatis.vip.core.server.exception.ApiException;
 import fr.insalyon.creatis.vip.core.server.exception.ApiException.ApiError;
 import fr.insalyon.creatis.vip.api.model.ParameterType;
@@ -274,8 +273,7 @@ public class PipelineBusiness {
         if (appVersion.isVisible()) {
             return true;
         }
-        List<String> whiteList = Arrays.asList(
-                server.getEnvProperty(CarminProperties.API_PIPELINE_WHITE_LIST, String[].class));
+        List<String> whiteList = Arrays.asList(server.getCarminApiPipelineWhiteList());
         return whiteList.stream().anyMatch(appString -> {
             String[] splitAppString = appString.split("/");
             if (splitAppString.length != 2) {

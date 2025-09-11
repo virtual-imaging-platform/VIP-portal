@@ -1,7 +1,7 @@
 package fr.insalyon.creatis.vip.core.server.security.oidc;
 
-import fr.insalyon.creatis.vip.core.server.CarminProperties;
 import fr.insalyon.creatis.vip.core.server.business.Server;
+import fr.insalyon.creatis.vip.core.server.business.Server.OidcLoginProviderConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
@@ -31,10 +31,10 @@ public class OidcLoginConfig {
         this.server = server;
         loginProviders = new ArrayList<>();
         clientRegistrations = new ArrayList<>();
-        addLoginProvider("egi", CarminProperties.EGI_CLIENT_ID,
-                (registrationId,clientId) -> egiClientRegistration(registrationId, clientId) );
-        addLoginProvider("lslogin", CarminProperties.LSLOGIN_CLIENT_ID,
-                (registrationId,clientId) -> lsloginClientRegistration(registrationId, clientId));
+        addLoginProvider("egi", server.getOidcConfigEGI(),
+                (registrationId,conf) -> egiClientRegistration(registrationId, conf) );
+        addLoginProvider("lslogin", server.getOidcConfigLSLOGIN(),
+                (registrationId,conf) -> lsloginClientRegistration(registrationId, conf));
         // creating a clientRegistrationRepository repository is only valid when it has at least one member,
         // leave it null when we have none
         if (clientRegistrations.size() > 0) {
@@ -45,47 +45,46 @@ public class OidcLoginConfig {
     }
 
     private interface OidcLoginClientRegistrationBuilder {
-        ClientRegistration build(String registrationId, String clientId);
+        ClientRegistration build(String registrationId, OidcLoginProviderConfig conf);
     }
-    private void addLoginProvider(String registrationId, String clientIdProperty,
+    private void addLoginProvider(String registrationId, OidcLoginProviderConfig conf,
                                   OidcLoginClientRegistrationBuilder registrationBuilder) {
-        String clientId = server.getEnvProperty(clientIdProperty);
-        if (clientId != null && !clientId.isEmpty()) {
+        if (conf != null) {
             loginProviders.add(registrationId);
-            clientRegistrations.add(registrationBuilder.build(registrationId, clientId));
+            clientRegistrations.add(registrationBuilder.build(registrationId, conf));
         }
     }
 
-    private ClientRegistration egiClientRegistration(String registrationId, String clientId) {
+    private ClientRegistration egiClientRegistration(String registrationId, OidcLoginProviderConfig conf) {
         return ClientRegistration.withRegistrationId(registrationId)
-                .clientId(clientId)
-                .clientSecret(server.getEnvProperty(CarminProperties.EGI_CLIENT_SECRET))
+                .clientId(conf.clientId)
+                .clientSecret(conf.clientSecret)
                 .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
                 .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
-                .redirectUri(server.getEnvProperty(CarminProperties.EGI_REDIRECT_URI))
+                .redirectUri(conf.redirectUri)
                 .scope("openid", "profile", "email", "voperson_id", "eduperson_scoped_affiliation")
-                .authorizationUri(server.getEnvProperty(CarminProperties.EGI_AUTHORIZATION_URI))
-                .tokenUri(server.getEnvProperty(CarminProperties.EGI_TOKEN_URI))
-                .userInfoUri(server.getEnvProperty(CarminProperties.EGI_USER_INFO_URI))
+                .authorizationUri(conf.authorizationUri)
+                .tokenUri(conf.tokenUri)
+                .userInfoUri(conf.userInfoUri)
                 .userNameAttributeName(IdTokenClaimNames.SUB)
-                .jwkSetUri(server.getEnvProperty(CarminProperties.EGI_JWK_SET_URI))
+                .jwkSetUri(conf.jwkSetUri)
                 .clientName(registrationId.toUpperCase())
                 .build();
     }
 
-    private ClientRegistration lsloginClientRegistration(String registrationId, String clientId) {
+    private ClientRegistration lsloginClientRegistration(String registrationId, OidcLoginProviderConfig conf) {
         return ClientRegistration.withRegistrationId(registrationId)
-                .clientId(clientId)
-                .clientSecret(server.getEnvProperty(CarminProperties.LSLOGIN_CLIENT_SECRET))
+                .clientId(conf.clientId)
+                .clientSecret(conf.clientSecret)
                 .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
                 .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
-                .redirectUri(server.getEnvProperty(CarminProperties.LSLOGIN_REDIRECT_URI))
+                .redirectUri(conf.redirectUri)
                 .scope("openid", "profile", "email", "voperson_external_id", "eduperson_scoped_affiliation")
-                .authorizationUri(server.getEnvProperty(CarminProperties.LSLOGIN_AUTHORIZATION_URI))
-                .tokenUri(server.getEnvProperty(CarminProperties.LSLOGIN_TOKEN_URI))
-                .userInfoUri(server.getEnvProperty(CarminProperties.LSLOGIN_USER_INFO_URI))
+                .authorizationUri(conf.authorizationUri)
+                .tokenUri(conf.tokenUri)
+                .userInfoUri(conf.userInfoUri)
                 .userNameAttributeName(IdTokenClaimNames.SUB)
-                .jwkSetUri(server.getEnvProperty(CarminProperties.LSLOGIN_JWK_SET_URI))
+                .jwkSetUri(conf.jwkSetUri)
                 .clientName(registrationId.toUpperCase())
                 .build();
     }

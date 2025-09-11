@@ -31,7 +31,6 @@
  */
 package fr.insalyon.creatis.vip.api.business;
 
-import fr.insalyon.creatis.vip.core.server.CarminProperties;
 import fr.insalyon.creatis.vip.core.server.exception.ApiException;
 import fr.insalyon.creatis.vip.core.server.exception.ApiException.ApiError;
 import fr.insalyon.creatis.vip.api.model.PathProperties;
@@ -169,7 +168,7 @@ public class DataApiBusiness {
             pathProperties.setSize((long) fileData.size());
             pathProperties.setLastModificationDate(
                 baseGetFileModificationDate(path) / 1000);
-            pathProperties.setMimeType(server.getEnvProperty(CarminProperties.API_DIRECTORY_MIME_TYPE));
+            pathProperties.setMimeType(server.getCarminApiDefaultMimeType());
         }
         return pathProperties;
     }
@@ -287,7 +286,7 @@ public class DataApiBusiness {
         }
         // path exists and is a file: check its size
         List<Data> fileData = baseGetFileData(path);
-        Long maxSize = server.getEnvProperty(CarminProperties.API_DATA_TRANSFERT_MAX_SIZE, Long.class);
+        Long maxSize = server.getCarminApiDataTransfertMaxSize();
         if (fileData.get(0).getLength() > maxSize) {
             logger.error("Trying to download a file too big ({})", path);
             throw new ApiException("Illegal data API access");
@@ -371,11 +370,11 @@ public class DataApiBusiness {
     }
 
     private Integer getRetryDelay() {
-        return server.getEnvProperty(CarminProperties.API_DOWNLOAD_RETRY_IN_SECONDS, Integer.class);
+        return server.getCarminApiDownloadRetryInSeconds();
     }
 
     private Integer getTimeout() {
-        return server.getEnvProperty(CarminProperties.API_DOWNLOAD_TIMEOUT_IN_SECONDS, Integer.class);
+        return server.getCarminApiDownloadTimeoutInSeconds();
     }
 
     private boolean isOperationOver(String operationId, User user)
@@ -440,7 +439,7 @@ public class DataApiBusiness {
     private PathProperties getRootPathProperties() {
         PathProperties rootPathProperties = new PathProperties();
         rootPathProperties.setExists(true);
-        rootPathProperties.setMimeType(server.getEnvProperty(CarminProperties.API_DIRECTORY_MIME_TYPE));
+        rootPathProperties.setMimeType(server.getCarminApiDirectoryMimeType());
         rootPathProperties.setIsDirectory(true);
         rootPathProperties.setSize((long) getRootDirectoriesName().size());
         rootPathProperties.setPath(ROOT);
@@ -469,7 +468,7 @@ public class DataApiBusiness {
     private PathProperties getRootSubDirPathProperties(String name) {
         PathProperties rootPathProperties = new PathProperties();
         rootPathProperties.setExists(true);
-        rootPathProperties.setMimeType(server.getEnvProperty(CarminProperties.API_DIRECTORY_MIME_TYPE));
+        rootPathProperties.setMimeType(server.getCarminApiDefaultMimeType());
         rootPathProperties.setIsDirectory(true);
         // TODO : size ?
         rootPathProperties.setPath(ROOT + "/" + name);
@@ -488,7 +487,7 @@ public class DataApiBusiness {
                 || lfcData.getType().equals(Data.Type.folderSync);
         pathProperties.setIsDirectory(isDirectory);
         if (isDirectory) {
-            pathProperties.setMimeType(server.getEnvProperty(CarminProperties.API_DIRECTORY_MIME_TYPE));
+            pathProperties.setMimeType(server.getCarminApiDefaultMimeType());
         } else {
             pathProperties.setMimeType(getMimeType(lfcData.getName()));
         }
@@ -511,9 +510,7 @@ public class DataApiBusiness {
     private String getMimeType(String path) {
         try {
             String contentType = Files.probeContentType(Paths.get(path));
-            return contentType == null ?
-                    server.getEnvProperty(CarminProperties.API_DEFAULT_MIME_TYPE) :
-                    contentType;
+            return contentType == null ? server.getCarminApiDefaultMimeType() : contentType;
         } catch (IOException e) {
             logger.warn("Cant detect mime type of {}. Ignoring and returning application/octet-stream",
                     path, e);

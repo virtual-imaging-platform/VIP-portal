@@ -30,7 +30,6 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
 
-import fr.insalyon.creatis.vip.core.server.CarminProperties;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -88,11 +87,11 @@ public class VipWebConfigurationIT {
 
     @Test
     public void testGetPlatformProperties() throws Exception {
-        when(server.getEnvProperty(CarminProperties.PLATFORM_NAME)).thenReturn("VIP_TEST");
-        when(server.getEnvProperty(CarminProperties.SUPPORTED_TRANSFER_PROTOCOLS, SupportedTransferProtocol[].class)).thenReturn(new SupportedTransferProtocol[]{SupportedTransferProtocol.HTTPS});
-        when(server.getEnvProperty(CarminProperties.SUPPORTED_MODULES, Module[].class)).thenReturn(new Module[]{Module.PROCESSING});
-        when(server.getEnvProperty(CarminProperties.DEFAULT_LIMIT_LIST_EXECUTION, Long.class)).thenReturn((long)500);
-        when(server.getEnvProperty(CarminProperties.UNSUPPORTED_METHODS, String[].class)).thenReturn(new String[]{"playExecution"});
+        when(server.getCarminPlatformName()).thenReturn("VIP_TEST");
+        when(server.getCarminSupportedTransferProtocols()).thenReturn(new SupportedTransferProtocol[]{SupportedTransferProtocol.HTTPS});
+        when(server.getCarminSupportedModules()).thenReturn(new Module[]{Module.PROCESSING});
+        when(server.getCarminDefaultLimitListExecution()).thenReturn((long)500);
+        when(server.getCarminUnsupportedMethods()).thenReturn(new String[]{"playExecution"});
         mockMvc.perform(get("/rest/platform"))
                 .andDo(print())
                 .andExpect(status().isOk())

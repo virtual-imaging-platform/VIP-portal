@@ -51,8 +51,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static fr.insalyon.creatis.vip.core.server.CarminProperties.*;
-
 /**
  * Created by abonnet on 7/13/16.
  */
@@ -72,23 +70,16 @@ public class PlatformController extends ApiController{
     public PlatformProperties getPlatformProperties() throws ApiException {
         logMethodInvocation(logger, "getPlatformProperties");
         PlatformProperties platformProperties = new PlatformProperties();
-        platformProperties.setPlatformName(server.getEnvProperty(PLATFORM_NAME));
-        platformProperties.setPlatformDescription(server.getEnvProperty(PLATFORM_DESCRIPTION));
-        platformProperties.setSupportedTransferProtocols(Arrays.asList(
-                server.getEnvProperty(SUPPORTED_TRANSFER_PROTOCOLS, SupportedTransferProtocol[].class)
-        ));
-        platformProperties.setSupportedModules(Arrays.asList(
-                server.getEnvProperty(SUPPORTED_MODULES, Module[].class)
-        ));
-        platformProperties.setDefaultLimitListExecutions(
-                server.getEnvProperty(DEFAULT_LIMIT_LIST_EXECUTION, Long.class));
-        platformProperties.setUnsupportedMethods(Arrays.asList(
-                server.getEnvProperty(UNSUPPORTED_METHODS, String[].class)
-        ));
-        platformProperties.setSupportedAPIVersion(server.getEnvProperty(SUPPORTED_API_VERSION));
-        platformProperties.setEmail(server.getEnvProperty(PLATFORM_EMAIL));
+        platformProperties.setPlatformName(server.getCarminPlatformName());
+        platformProperties.setPlatformDescription(server.getCarminPlatformDescription());
+        platformProperties.setSupportedTransferProtocols(Arrays.asList(server.getCarminSupportedTransferProtocols()));
+        platformProperties.setSupportedModules(Arrays.asList(server.getCarminSupportedModules()));
+        platformProperties.setDefaultLimitListExecutions(server.getCarminDefaultLimitListExecution());
+        platformProperties.setUnsupportedMethods(Arrays.asList(server.getCarminUnsupportedMethods()));
+        platformProperties.setSupportedAPIVersion(server.getCarminSupportedApiVersion());
+        platformProperties.setEmail(server.getCarminPlatformEmail());
         platformProperties.setAPIErrorCodesAndMessages(getErrorCodesAndMessages());
-        platformProperties.setMaxSizeDirectTransfer(server.getEnvProperty(API_DATA_TRANSFERT_MAX_SIZE, Long.class));
+        platformProperties.setMaxSizeDirectTransfer(server.getCarminApiDataTransfertMaxSize());
         platformProperties.setOidcLoginProviders(oidcLoginConfig.getLoginProviders());
         return platformProperties;
     }

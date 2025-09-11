@@ -19,8 +19,6 @@ import java.util.Map;
 import java.util.Collection;
 import java.net.URI;
 
-import fr.insalyon.creatis.vip.core.server.CarminProperties;
-
 /* OidcConfig : defines the list of OIDC bearer token providers,
  * i.e. things that provide a way to generate and validate bearer tokens for authentication on VIP API.
  * Such providers are typically implemented by Keycloak servers.
@@ -107,7 +105,7 @@ public class OidcConfig {
     }
 
     public boolean isOIDCActive() {
-        return server.getEnvProperty(CarminProperties.KEYCLOAK_ACTIVATED, Boolean.class, Boolean.FALSE);
+        return server.getKeycloakActivated();
     }
 
     // list of issuers URLs

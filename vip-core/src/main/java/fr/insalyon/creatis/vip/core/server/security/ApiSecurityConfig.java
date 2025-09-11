@@ -31,7 +31,6 @@
  */
 package fr.insalyon.creatis.vip.core.server.security;
 
-import fr.insalyon.creatis.vip.core.server.CarminProperties;
 import  fr.insalyon.creatis.vip.core.server.business.Server;
 
 import fr.insalyon.creatis.vip.core.server.security.apikey.SpringApiPrincipal;
@@ -144,7 +143,7 @@ public class ApiSecurityConfig {
 
     private ApikeyAuthenticationFilter apikeyAuthenticationFilter() throws Exception {
         return new ApikeyAuthenticationFilter(
-                server.getEnvProperty(CarminProperties.APIKEY_HEADER_NAME),
+                server.getApikeyHeaderName(),
                 vipAuthenticationEntryPoint, apikeyAuthenticationProvider);
     }
 

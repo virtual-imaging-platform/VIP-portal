@@ -1,6 +1,5 @@
 package fr.insalyon.creatis.vip.api.business;
 
-import fr.insalyon.creatis.vip.core.server.CarminProperties;
 import fr.insalyon.creatis.vip.core.server.exception.ApiException;
 import fr.insalyon.creatis.vip.api.model.AuthenticationCredentials;
 import fr.insalyon.creatis.vip.api.model.AuthenticationInfo;
@@ -45,7 +44,7 @@ public class ApiBusiness {
             authInfo.setHttpHeader(CoreConstants.COOKIES_SESSION);
             authInfo.setHttpHeaderValue(user.getSession());
         } else {
-            authInfo.setHttpHeader(server.getEnvProperty(CarminProperties.APIKEY_HEADER_NAME));
+            authInfo.setHttpHeader(server.getApikeyHeaderName());
             String apikey = getAnApikeyForUser(username); // the username is an email
             authInfo.setHttpHeaderValue(apikey);
         }
@@ -68,8 +67,7 @@ public class ApiBusiness {
     }
 
     private String getAnApikeyForUser(String email) throws ApiException {
-        boolean generateNewApiKey = server.getEnvProperty(
-                CarminProperties.APIKEY_GENERATE_NEW_EACH_TIME, Boolean.class);
+        boolean generateNewApiKey = server.getCarminApikeyGenerateNewEachTime();
         try {
             if (generateNewApiKey) {
                 logger.info("generating a new apikey for " + email);

@@ -41,7 +41,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Collections;
 
-import fr.insalyon.creatis.vip.core.server.CarminProperties;
 import fr.insalyon.creatis.vip.core.server.business.Server;
 
 /**
@@ -92,7 +91,7 @@ public class SpringRestApiConfig implements WebMvcConfigurer {
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
             .allowedMethods("GET", "POST", "PUT", "DELETE", "HEAD")
-            .allowedOrigins(server.getEnvProperty(CarminProperties.CORS_AUTHORIZED_DOMAINS, String[].class));
+            .allowedOrigins(server.getCarminCorsAuthorizedDomains());
     }
 
     /*

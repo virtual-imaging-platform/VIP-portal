@@ -1,5 +1,8 @@
 package fr.insalyon.creatis.vip.core.server.business;
 
+import fr.insalyon.creatis.vip.core.server.model.SupportedTransferProtocol;
+import fr.insalyon.creatis.vip.core.server.model.Module;
+
 import java.util.List;
 
 /*
@@ -108,7 +111,51 @@ public interface Server {
 
     String getHostURL();
 
-    String getEnvProperty(String key);
-    <T> T getEnvProperty(String key, Class<T> targetType, T defaultValue);
-    <T> T getEnvProperty(String key, Class<T> targetType);
+    String getApikeyHeaderName();
+
+    boolean getKeycloakActivated();
+
+    String[] getCarminCorsAuthorizedDomains();
+
+    String getCarminPlatformName();
+
+    String getCarminPlatformDescription();
+
+    String getCarminPlatformEmail();
+
+    long getCarminDefaultLimitListExecution();
+
+    String getCarminSupportedApiVersion();
+
+    boolean getCarminApikeyGenerateNewEachTime();
+
+    String getCarminApiDirectoryMimeType();
+
+    String getCarminApiDefaultMimeType();
+
+    int getCarminApiDownloadRetryInSeconds();
+
+    int getCarminApiDownloadTimeoutInSeconds();
+
+    long getCarminApiDataTransfertMaxSize();
+
+    SupportedTransferProtocol[] getCarminSupportedTransferProtocols();
+
+    Module[] getCarminSupportedModules();
+
+    String[] getCarminUnsupportedMethods();
+
+    String[] getCarminApiPipelineWhiteList();
+
+    class OidcLoginProviderConfig {
+        public String clientId;
+        public String clientSecret;
+        public String redirectUri;
+        public String authorizationUri;
+        public String tokenUri;
+        public String userInfoUri;
+        public String jwkSetUri;
+    }
+    OidcLoginProviderConfig getOidcConfigEGI();
+    OidcLoginProviderConfig getOidcConfigLSLOGIN();
 }
