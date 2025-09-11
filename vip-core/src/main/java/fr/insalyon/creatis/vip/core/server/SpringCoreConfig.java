@@ -55,12 +55,14 @@ import static org.springframework.util.ResourceUtils.CLASSPATH_URL_PREFIX;
 // The root context doesn't contain any controller, so at first it doesn't have to be a WebMvc context.
 // However, we do want to have Spring Security in the root context, and Spring mandates that
 // Spring Security & Spring MVC are configured in a shared ApplicationContext.
-// This constraint implies that the root context must also be a WebMvc one.
+// This implies that the root context must also be a WebMvc one.
 @EnableWebMvc
 @ComponentScan(
         basePackages = "fr.insalyon.creatis.vip",
         excludeFilters = {
                 @ComponentScan.Filter(type = FilterType.ANNOTATION, value = RestController.class),
+                // Bean scanning must exclude other @EnableWebMvc beans, otherwise their own scanning rule
+                // would be recursively triggered, and all beans would end up in the root context.
                 @ComponentScan.Filter(type = FilterType.ANNOTATION, value = EnableWebMvc.class)
         }
 )

@@ -54,6 +54,7 @@ import fr.insalyon.creatis.vip.core.server.business.Server;
  */
 @EnableWebMvc
 @Configuration
+// Scan all controllers in vip-api (other vip-api beans are already scanned by SpringCoreConfig)
 @ComponentScan(
         basePackages = "fr.insalyon.creatis.vip.api",
         includeFilters = {@ComponentScan.Filter(type = FilterType.ANNOTATION, value = RestController.class)}
