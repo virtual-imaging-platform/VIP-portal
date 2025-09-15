@@ -1,22 +1,49 @@
 package fr.insalyon.creatis.vip.core.server.controller;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import fr.insalyon.creatis.vip.core.client.view.user.UserLevel;
+
+import fr.insalyon.creatis.vip.core.server.business.BusinessException;
+import fr.insalyon.creatis.vip.core.server.business.SessionBusiness;
+import fr.insalyon.creatis.vip.core.server.model.AuthenticationCredentials;
+import fr.insalyon.creatis.vip.core.server.model.Session;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 
 @RestController
+@RequestMapping("/session")
 public class SessionController {
-    class Session {
-        public String username;
-        public String password;
-        public UserLevel level;
+
+    private final SessionBusiness sessionBusiness;
+
+    @Autowired
+    public SessionController(SessionBusiness sessionBusiness) {
+        this.sessionBusiness = sessionBusiness;
     }
-    @GetMapping("/session")
+
+    @GetMapping()
     public Session getSession() {
-        Session session = new Session();
-        session.username = "test";
-        session.password = null;
-        session.level = UserLevel.Beginner;
-        return session;
+        return sessionBusiness.getSession();
+    }
+
+    @PostMapping()
+    public void createSession(@RequestBody @Valid AuthenticationCredentials credentials, HttpServletResponse response)
+            throws BusinessException {
+        Cookie cookie = sessionBusiness.signin(credentials);
+
+        response.addCookie(cookie);
+    }
+
+    @DeleteMapping
+    public void deleteSession(HttpServletResponse response) throws BusinessException {
+        Cookie cookie = sessionBusiness.signout();
+
+        response.addCookie(cookie);
     }
 }
