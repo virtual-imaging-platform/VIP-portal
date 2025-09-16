@@ -1,4 +1,4 @@
-package fr.insalyon.creatis.vip.core.server.security;
+package fr.insalyon.creatis.vip.core.server.security.common;
 
 import java.util.function.Supplier;
 
@@ -9,9 +9,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import fr.insalyon.creatis.vip.core.client.bean.User;
-import fr.insalyon.creatis.vip.core.server.security.apikey.SpringApiPrincipal;
 
 // Provide authenticated user after a successful authentification (session, API and OIDC)
+// this class use the SecurityContextHolder defined in AuthenticationProvider classes
 @Service
 public class CurrentUserProvider implements Supplier<User> {
     private final Logger logger = LoggerFactory.getLogger(getClass());
@@ -25,8 +25,8 @@ public class CurrentUserProvider implements Supplier<User> {
         } else {
             Object principal = authentication.getPrincipal();
 
-            if (principal instanceof SpringApiPrincipal) { // API key / Session authentication
-                return ((SpringApiPrincipal) principal).getVipUser();
+            if (principal instanceof SpringPrincipalUser) { // API key / Session authentication
+                return ((SpringPrincipalUser) principal).getVipUser();
             } else if (principal instanceof User) { // OIDC authentication
                 return (User) principal;
             } else { // no resolvable user found (shouldn't happen)

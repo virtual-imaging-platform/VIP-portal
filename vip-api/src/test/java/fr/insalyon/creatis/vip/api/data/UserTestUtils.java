@@ -32,10 +32,11 @@
 package fr.insalyon.creatis.vip.api.data;
 
 import fr.insalyon.creatis.vip.api.model.SignUpUserDTO;
-import fr.insalyon.creatis.vip.core.server.security.apikey.SpringApiPrincipal;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.user.UserLevel;
 import fr.insalyon.creatis.vip.core.client.view.util.CountryCode;
+import fr.insalyon.creatis.vip.core.server.security.common.SpringPrincipalUser;
+
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.web.servlet.request.RequestPostProcessor;
 
@@ -78,18 +79,18 @@ public class UserTestUtils {
     }
 
     public static RequestPostProcessor baseUser1() {
-        return SecurityMockMvcRequestPostProcessors.user(new SpringApiPrincipal(baseUser1));
+        return SecurityMockMvcRequestPostProcessors.user(new SpringPrincipalUser(baseUser1));
     }
 
     public static RequestPostProcessor baseUser2() {
-        return SecurityMockMvcRequestPostProcessors.user(new SpringApiPrincipal(baseUser2));
+        return SecurityMockMvcRequestPostProcessors.user(new SpringPrincipalUser(baseUser2));
     }
 
     public static RequestPostProcessor baseUser3() {
-        return SecurityMockMvcRequestPostProcessors.user(new SpringApiPrincipal(baseUser3));
+        return SecurityMockMvcRequestPostProcessors.user(new SpringPrincipalUser(baseUser3));
     }
 
     public static RequestPostProcessor baseUser4() {
-        return SecurityMockMvcRequestPostProcessors.user(new SpringApiPrincipal(baseUser4));
+        return SecurityMockMvcRequestPostProcessors.user(new SpringPrincipalUser(baseUser4));
     }
 }

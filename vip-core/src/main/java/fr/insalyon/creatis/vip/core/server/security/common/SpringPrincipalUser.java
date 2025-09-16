@@ -29,7 +29,7 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL-B license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.core.server.security.apikey;
+package fr.insalyon.creatis.vip.core.server.security.common;
 
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import org.springframework.security.core.GrantedAuthority;
@@ -44,11 +44,11 @@ import java.util.Collection;
  *
  * Created by abonnet on 7/25/16.
  */
-public class SpringApiPrincipal implements UserDetails, Principal {
+public class SpringPrincipalUser implements UserDetails, Principal {
 
     private final User vipUser;
 
-    public SpringApiPrincipal(User vipUser) {
+    public SpringPrincipalUser(User vipUser) {
         this.vipUser = vipUser;
     }
 
