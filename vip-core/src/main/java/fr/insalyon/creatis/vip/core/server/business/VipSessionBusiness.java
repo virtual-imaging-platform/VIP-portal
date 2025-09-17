@@ -4,6 +4,8 @@ import fr.insalyon.creatis.vip.core.client.bean.Group;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants.GROUP_ROLE;
+import fr.insalyon.creatis.vip.core.server.inter.annotations.VIPCheckRemoval;
+import fr.insalyon.creatis.vip.core.server.inter.annotations.VIPRemoval;
 import fr.insalyon.creatis.vip.core.client.view.CoreException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,6 +35,7 @@ import java.util.function.Supplier;
 
 @Service
 @Transactional
+@VIPRemoval
 public class VipSessionBusiness {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
@@ -46,6 +49,7 @@ public class VipSessionBusiness {
         this.configurationBusiness = configurationBusiness;
     }
 
+    @VIPCheckRemoval
     public void setVIPSession(
             HttpServletRequest request,
             HttpServletResponse response,
@@ -120,6 +124,7 @@ public class VipSessionBusiness {
         throw new CoreException("User has no groups defined.");
     }
 
+    @VIPCheckRemoval
     public User resetSessionFromCookie(HttpServletRequest request)
             throws CoreException {
 
