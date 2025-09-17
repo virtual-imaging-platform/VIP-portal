@@ -51,15 +51,25 @@ public class VipSessionBusiness {
             HttpServletResponse response,
             User user) throws BusinessException, CoreException {
         try {
+            // see explanation in SessionBusiness -> createCookie
+            boolean isSecure = server.getApacheSSLPort() != 80;
             configurationBusiness.updateUserLastLogin(user.getEmail());
             user = setUserInSession(user, request.getSession());
+
             Cookie userCookie = new Cookie(CoreConstants.COOKIES_USER, URLEncoder.encode(user.getEmail(), "UTF-8"));
             userCookie.setMaxAge((int) (CoreConstants.COOKIES_EXPIRATION_DATE.getTime() - new Date().getTime()));
             userCookie.setPath("/");
+            userCookie.setHttpOnly(true);
+            userCookie.setSecure(isSecure);
+
             response.addCookie(userCookie);
+    
             Cookie sessionCookie = new Cookie(CoreConstants.COOKIES_SESSION, user.getSession());
-            userCookie.setMaxAge((int) (CoreConstants.COOKIES_EXPIRATION_DATE.getTime() - new Date().getTime()));
+            sessionCookie.setMaxAge((int) (CoreConstants.COOKIES_EXPIRATION_DATE.getTime() - new Date().getTime()));
             sessionCookie.setPath("/");
+            sessionCookie.setHttpOnly(true);
+            sessionCookie.setSecure(isSecure);
+
             response.addCookie(sessionCookie);
         } catch (UnsupportedEncodingException ex) {
             logger.error("Error setting VIP session for {} ",user, ex);
@@ -110,7 +120,7 @@ public class VipSessionBusiness {
         throw new CoreException("User has no groups defined.");
     }
 
-    protected User resetSessionFromCookie(HttpServletRequest request)
+    public User resetSessionFromCookie(HttpServletRequest request)
             throws CoreException {
 
         try {

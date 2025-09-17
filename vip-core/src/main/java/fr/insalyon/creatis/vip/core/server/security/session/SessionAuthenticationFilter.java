@@ -26,7 +26,7 @@ public class SessionAuthenticationFilter extends OncePerRequestFilter {
     public SessionAuthenticationFilter(AuthenticationProvider authenticationProvider) {
         this.authenticationProvider = authenticationProvider;
     }
-    
+
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {

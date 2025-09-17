@@ -41,6 +41,7 @@ import fr.insalyon.creatis.vip.core.client.view.util.CountryCode;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
 import fr.insalyon.creatis.vip.core.server.business.GroupBusiness;
+import fr.insalyon.creatis.vip.core.server.business.VipSessionBusiness;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import fr.insalyon.creatis.vip.core.server.dao.UserDAO;
 import fr.insalyon.creatis.vip.core.server.inter.GroupInterface;
@@ -67,6 +68,7 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
     private GroupBusiness groupBusiness;
     private UserDAO userDAO;
     private GroupInterface groupInterface;
+    private VipSessionBusiness vipSessionBusiness;
 
     @Override
     public void init() throws ServletException {
@@ -75,19 +77,20 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
         userDAO = getBean(UserDAO.class);
         groupBusiness = getBean(GroupBusiness.class);
         groupInterface = getBean(GroupInterface.class);
+        vipSessionBusiness = getBean(VipSessionBusiness.class);
     }
     
     @Override
     public User configure(String email, String session) throws CoreException {
         try {
+
             logger.debug("Initializing VIP configuration.");
             configurationBusiness.configure();
             logger.debug("VIP successfully configured.");
 
-            if (configurationBusiness.validateSession(email, session)) {
+            User user = vipSessionBusiness.resetSessionFromCookie(getThreadLocalRequest());
 
-                User user = configurationBusiness.getUser(email);
-                user = setUserInSession(user);
+            if (user != null) {
                 configurationBusiness.updateUserLastLogin(email);
                 trace(logger, "Connected.");
 

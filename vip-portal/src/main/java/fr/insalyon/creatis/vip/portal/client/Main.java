@@ -111,6 +111,8 @@ public class Main implements EntryPoint {
         String email = null;
         String session = null;
 
+        // this will actually always return null since we use httpOnly cookies
+        // the actual values are retrieved in the service implementation itself
         if (Cookies.getCookieNames().contains(CoreConstants.COOKIES_USER)) {
             email = Cookies.getCookie(CoreConstants.COOKIES_USER);
             session = Cookies.getCookie(CoreConstants.COOKIES_SESSION);
