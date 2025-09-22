@@ -60,6 +60,7 @@ public class SessionBusiness {
 
         response.addCookie(createCookie(CoreConstants.COOKIES_SESSION, null, 0, true));
         response.addCookie(createCookie(CoreConstants.COOKIES_USER, null, 0, true));
+        response.addCookie(createCookie(CoreConstants.COOKIES_CSRF_TOKEN, null, 0, false));
     }
 
     public Session getSession() {
