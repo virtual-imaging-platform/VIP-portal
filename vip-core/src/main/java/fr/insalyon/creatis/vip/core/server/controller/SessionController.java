@@ -1,10 +1,6 @@
 package fr.insalyon.creatis.vip.core.server.controller;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,6 +12,7 @@ import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.business.SessionBusiness;
 import fr.insalyon.creatis.vip.core.server.model.AuthenticationCredentials;
 import fr.insalyon.creatis.vip.core.server.model.Session;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 
@@ -36,13 +33,13 @@ public class SessionController {
     }
 
     @PostMapping()
-    public Session createSession(@RequestBody @Valid AuthenticationCredentials credentials, HttpServletResponse response)
+    public Session createSession(@RequestBody @Valid AuthenticationCredentials credentials, HttpServletRequest request, HttpServletResponse response)
             throws BusinessException {
-        return sessionBusiness.signin(credentials, response);
+        return sessionBusiness.signin(credentials, request, response);
     }
 
     @DeleteMapping
-    public void deleteSession(HttpServletResponse response) throws BusinessException {
-        sessionBusiness.signout(response);
+    public void deleteSession(HttpServletRequest request, HttpServletResponse response) throws BusinessException {
+        sessionBusiness.signout(request, response);
     }
 }
