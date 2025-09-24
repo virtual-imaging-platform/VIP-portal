@@ -32,7 +32,7 @@ public class SessionAuthenticationProvider extends AbstractAuthenticationProvide
         try {
             user = userDAO.getUserBySession(session);
 
-            if (user == null){
+            if (user == null) {
                 throw new BadCredentialsException("This session do not exist!");
             } else {
                 springUser = new SpringPrincipalUser(user);
@@ -44,6 +44,13 @@ public class SessionAuthenticationProvider extends AbstractAuthenticationProvide
         }
         afterSuccess(springUser);
 
-        return new SessionAuthenticationToken(springUser, session, user.getLevel().name().toUpperCase(), true);
+        return createAuthenticationFromUser(user);
+    }
+
+    public Authentication createAuthenticationFromUser(User user) {
+        SpringPrincipalUser springUser = new SpringPrincipalUser(user);
+
+        return new SessionAuthenticationToken(
+                springUser, user.getSession(), user.getLevel().name().toUpperCase(), true);
     }
 }
