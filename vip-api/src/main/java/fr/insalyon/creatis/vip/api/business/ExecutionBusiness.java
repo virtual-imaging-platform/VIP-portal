@@ -218,15 +218,27 @@ public class ExecutionBusiness {
 
         // Jobs
         List<Task> tasks = simulationBusiness.getJobsList(s.getID());
-        Map<Integer, Map<String, Object>> jobsMap = new HashMap<>();
+        Map<Integer, Task> latestTaskPerInvocation = new HashMap<>();
+
         for (Task t : tasks) {
             int invId = t.getInvocationID();
+            Task current = latestTaskPerInvocation.get(invId);
+
+            if (current == null || t.getCreationDate().after(current.getCreationDate())) {
+                latestTaskPerInvocation.put(invId, t);
+            }
+        }
+
+        Map<Integer, Map<String, Object>> jobsMap = new HashMap<>();
+        for (Map.Entry<Integer, Task> entry : latestTaskPerInvocation.entrySet()) {
+            Task t = entry.getValue();
             Map<String, Object> jobInfo = new HashMap<>();
             jobInfo.put("status", t.getStatus().toString());
             jobInfo.put("exitCode", t.getExitCode());
             jobInfo.put("exitMessage", t.getExitMessage());
-            jobsMap.put(invId, jobInfo);
+            jobsMap.put(entry.getKey(), jobInfo);
         }
+
         e.setJobs(jobsMap);
 
 
