@@ -54,10 +54,7 @@ import org.springframework.stereotype.Service;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
 import java.util.function.Supplier;
 
@@ -127,7 +124,7 @@ public class ExecutionBusiness {
             } else {
                 targetTask = tasks.stream()
                         .filter(t -> invocationId.equals(t.getInvocationID()))
-                        .findFirst()
+                        .max(Comparator.comparing(Task::getCreationDate))
                         .orElse(null);
             }
 
@@ -221,11 +218,16 @@ public class ExecutionBusiness {
 
         // Jobs
         List<Task> tasks = simulationBusiness.getJobsList(s.getID());
-        Map<Integer, String> jobs = new HashMap<>();
+        Map<Integer, Map<String, Object>> jobsMap = new HashMap<>();
         for (Task t : tasks) {
-            jobs.put(t.getInvocationID(), t.getStatus().toString());
+            int invId = t.getInvocationID();
+            Map<String, Object> jobInfo = new HashMap<>();
+            jobInfo.put("status", t.getStatus().toString());
+            jobInfo.put("exitCode", t.getExitCode());
+            jobInfo.put("exitMessage", t.getExitMessage());
+            jobsMap.put(invId, jobInfo);
         }
-        e.setJobs(jobs);
+        e.setJobs(jobsMap);
 
 
         if (!(e.getStatus() == ExecutionStatus.FINISHED) && !(e.getStatus() == ExecutionStatus.KILLED) && e.getReturnedFiles().isEmpty()) {

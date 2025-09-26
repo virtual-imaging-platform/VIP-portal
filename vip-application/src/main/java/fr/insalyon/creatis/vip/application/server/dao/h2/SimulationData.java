@@ -103,7 +103,7 @@ public class SimulationData extends AbstractJobData implements SimulationDAO {
         List<Task> list = new ArrayList<Task>();
         try {
             PreparedStatement ps = connection.prepareStatement(
-                    "SELECT j.id, status, command, file_name, exit_code, node_site, node_name, parameters, "
+                    "SELECT j.id, creation, status, command, file_name, exit_code, node_site, node_name, parameters, "
                     + "ms FROM Jobs AS j LEFT JOIN ("
                     + "  SELECT jm.id, minor_status AS ms FROM JobsMinorStatus AS jm RIGHT JOIN ( "
                     + "    SELECT id, MAX(event_date) AS ed FROM JobsMinorStatus GROUP BY id "
@@ -133,7 +133,7 @@ public class SimulationData extends AbstractJobData implements SimulationDAO {
 
         try {
             PreparedStatement ps = connection.prepareStatement(
-                    "SELECT j.id, status, command, file_name, exit_code, node_site, node_name, parameters, "
+                    "SELECT j.id, creation, status, command, file_name, exit_code, node_site, node_name, parameters, "
                     + "ms FROM Jobs AS j LEFT JOIN ("
                     + "  SELECT jm.id, minor_status AS ms FROM JobsMinorStatus AS jm RIGHT JOIN ( "
                     + "    SELECT id, MAX(event_date) AS ed FROM JobsMinorStatus GROUP BY id "
@@ -203,9 +203,9 @@ public class SimulationData extends AbstractJobData implements SimulationDAO {
             minorStatus = parseMinorStatus(rs.getString("ms"));
         }
 
-        return new Task(rs.getString("id"), rs.getInt("invocation_id"), status,
+        return new Task(rs.getString("id"), rs.getInt("invocation_id"), rs.getTimestamp("creation"), status,
                 rs.getString("command"), rs.getString("file_name"),
-                rs.getInt("exit_code"), rs.getString("node_site"),
+                rs.getInt("exit_code"), Task.GaswExitCode.fromCode(rs.getInt("exit_code")).getMessage(), rs.getString("node_site"),
                 rs.getString("node_name"), minorStatus,
                 rs.getString("parameters").split(" "));
     }
@@ -238,7 +238,7 @@ public class SimulationData extends AbstractJobData implements SimulationDAO {
         try {
             Statement stat = connection.createStatement();
             ResultSet rs = stat.executeQuery(
-                    "SELECT j.id, j.invocation_id, status, command, file_name, exit_code, " +
+                    "SELECT j.id, j.invocation_id, creation, status, command, file_name, exit_code, exit_message, " +
                             "node_site, node_name, parameters, ms " +
                             "FROM Jobs AS j " +
                             "LEFT JOIN ( " +
@@ -257,9 +257,9 @@ public class SimulationData extends AbstractJobData implements SimulationDAO {
                     minorStatus = parseMinorStatus(rs.getString("ms"));
                 }
 
-                list.add(new Task( rs.getString("id"), rs.getInt("invocation_id"), status,
+                list.add(new Task( rs.getString("id"), rs.getInt("invocation_id"), rs.getTimestamp("creation"), status,
                         rs.getString("command"), rs.getString("file_name"),
-                        rs.getInt("exit_code"), rs.getString("node_site"),
+                        rs.getInt("exit_code"), Task.GaswExitCode.fromCode(rs.getInt("exit_code")).getMessage(), rs.getString("node_site"),
                         rs.getString("node_name"), minorStatus,
                         rs.getString("parameters").split(" ")));
             }
