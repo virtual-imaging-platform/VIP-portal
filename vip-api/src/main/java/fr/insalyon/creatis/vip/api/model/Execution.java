@@ -57,11 +57,12 @@ public class Execution {
     private Long startDate;
     private Long endDate;
     private String resultsLocation;
-
+    private Map<Integer, Map<String, Object>> jobs; // jobId -> status
 
     public Execution() {
         inputValues = new HashMap<>();
         returnedFiles = new HashMap<>();
+        jobs = new HashMap<>();
     }
 
     public Execution(String identifier,
@@ -85,6 +86,7 @@ public class Execution {
         this.startDate = startDate;
         this.endDate = endDate;
         this.resultsLocation = resultsLocation;
+
     }
 
     public String getIdentifier() {
@@ -186,4 +188,8 @@ public class Execution {
     public void setResultsLocation(String resultsLocation) {
         this.resultsLocation = resultsLocation;
     }
+
+    public Map<Integer, Map<String, Object>> getJobs() { return jobs; }
+
+    public void setJobs(Map<Integer, Map<String, Object>> jobs) { this.jobs = jobs; }
 }
