@@ -104,6 +104,8 @@ public class BoutiquesParser extends AbstractJsonParser {
         JSONObject customObject = getObjectValue(parsedDescriptor, "custom", true);
         if (customObject != null) {
             application.setVipDotInputIds(getArrayValueAsStringSet(customObject, "vip:dot", true));
+            application.setVipResultsDirectoryDefault(getStringValue(customObject, "vip:resultsDirectoryDefault", true));
+            application.setVipResultsDirectoryDescription(getStringValue(customObject, "vip:resultsDirectoryDescription", true));
             JSONObject vipOverriddenInputs = getObjectValue(customObject, "vip:overriddenInputs", true);
             if (vipOverriddenInputs != null) {
                 Map<String, String> overriddenInputs = new HashMap<>();

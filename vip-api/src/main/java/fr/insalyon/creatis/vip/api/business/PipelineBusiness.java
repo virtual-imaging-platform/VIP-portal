@@ -144,6 +144,23 @@ public class PipelineBusiness {
         }
     }
 
+    private List<Pipeline> appsToPipelines(List<Application> applications) throws BusinessException {
+        List<Pipeline> pipelines = new ArrayList<>();
+        for (Application a : applications) {
+            List<AppVersion> versions = appVersionBusiness.getVersions(a.getName());
+            for (AppVersion av : versions) {
+                if (isApplicationVersionUsableInApi(av)) {
+                    pipelines.add(
+                            new Pipeline(getPipelineIdentifier(
+                                    a.getName(), av.getVersion()),
+                                    a.getName(), av.getVersion())
+                    );
+                }
+            }
+        }
+        return pipelines;
+    }
+
     /**
      * List all the pipeline the user can access
      */
@@ -152,24 +169,9 @@ public class PipelineBusiness {
             if (studyIdentifier != null) {
                 logger.warn("Study identifier ({}) was ignored.", studyIdentifier);
             }
-            ArrayList<Pipeline> pipelines = new ArrayList<>();
 
             List<Application> applications = applicationBusiness.getApplications(currentUserProvider.get());
-
-            for (Application a : applications) {
-
-                List<AppVersion> versions = appVersionBusiness.getVersions(a.getName());
-                for (AppVersion av : versions) {
-                    if (isApplicationVersionUsableInApi(av)) {
-                        pipelines.add(
-                                new Pipeline(getPipelineIdentifier(
-                                        a.getName(), av.getVersion()),
-                                        a.getName(), av.getVersion())
-                        );
-                    }
-                }
-            }
-            return pipelines;
+            return appsToPipelines(applications);
         } catch (BusinessException ex) {
             throw new ApiException(ex);
         }
@@ -177,9 +179,10 @@ public class PipelineBusiness {
 
     // Specific stuff that return in 'Application' class format and not 'Pipeline'
     // used for the VIP landing page
-    public List<Application> listPublicPipelines() throws ApiException {
+    public List<Pipeline> listPublicPipelines() throws ApiException {
         try {
-            return applicationBusiness.getPublicApplications();
+            List<Application> applications = applicationBusiness.getPublicApplications();
+            return appsToPipelines(applications);
         } catch (BusinessException e) {
             throw new ApiException(e);
         }

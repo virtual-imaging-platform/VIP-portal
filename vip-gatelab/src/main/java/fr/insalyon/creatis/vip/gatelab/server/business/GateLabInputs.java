@@ -31,15 +31,13 @@
  */
 package fr.insalyon.creatis.vip.gatelab.server.business;
 
+import fr.insalyon.creatis.vip.application.server.business.simulation.parser.InputFileParser;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.business.Server;
-import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerException;
-import fr.insalyon.creatis.vip.datamanager.server.DataManagerUtil;
-import java.sql.Connection;
-import java.util.HashMap;
+
+import java.nio.file.Path;
 import java.util.Map;
 
-import fr.insalyon.creatis.vip.datamanager.server.business.LfcPathsBusiness;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,8 +49,6 @@ import jakarta.annotation.PostConstruct;
 /**
  * This stores data in fields and this is not threadsafe. So it cannot be used
  * as a spring singleton and this needs prototype scope.
- *
- * @author Ibrahim Kallel, Rafael Silva
  */
 @Component
 @Scope("prototype")
@@ -63,9 +59,8 @@ public class GateLabInputs {
     private String inputfile;
 
     private Server server;
-    private LfcPathsBusiness lfcPathsBusiness;
     private String workflowID;
-    private GateLabInputsParser gateLabInputsParser;
+    private InputFileParser inputFileParser;
 
     @Autowired
     public final void setServer(Server server) {
@@ -73,14 +68,8 @@ public class GateLabInputs {
     }
 
     @Autowired
-    public final void setLfcPathsBusiness(fr.insalyon.creatis.vip.datamanager.server.business.LfcPathsBusiness lfcPathsBusiness) {
-        this.lfcPathsBusiness = lfcPathsBusiness;
-    }
-
-    /* GateLabInputsParser is also prototype based */
-    @Autowired
-    public void setGateLabInputsParser(GateLabInputsParser gateLabInputsParser) {
-        this.gateLabInputsParser = gateLabInputsParser;
+    public void setInputFileParser(InputFileParser inputFileParser) {
+        this.inputFileParser = inputFileParser;
     }
 
     public GateLabInputs(String workflowID) {
@@ -88,30 +77,16 @@ public class GateLabInputs {
     }
 
     @PostConstruct
-    public final void init() {
-        inputsMap = new HashMap<String, String>();
-        inputfile = server.getWorkflowsPath() + "/" + workflowID + "/inputs.xml";
-        inputsMap = gateLabInputsParser.parse(inputfile);
+    public final void init() throws BusinessException {
+        inputfile = server.getWorkflowsPath() + "/" + workflowID + "/inputs.json";
+        inputsMap = inputFileParser.parse(Path.of(inputfile));
     }
 
-    /**
-     *
-     * @param currentUserFolder
-     * @return
-     * @throws BusinessException
-     */
-    public Map<String, String> getWorkflowInputs(String currentUserFolder)
-            throws BusinessException {
-
-        String gateInput = inputsMap.get("gateInput");
-        String numberOfJobs = inputsMap.get("numberOfJobs");
-        String macfileName = inputsMap.get("macfileName");
-        Map<String, String> inputMap = new HashMap<String, String>();
-        inputMap.put("gateInput", gateInput);
-        inputMap.put("numberOfJobs", numberOfJobs);
-        inputMap.put("macfileName", macfileName);
-
-        return inputMap;
-
+    public Map<String, String> getWorkflowInputs() {
+        return Map.of(
+            "gateInput", inputsMap.get("gateInput"),
+            "numberOfJobs", inputsMap.get("numberOfJobs"),
+            "macfileName", inputsMap.get("macfileName")
+        );
     }
 }

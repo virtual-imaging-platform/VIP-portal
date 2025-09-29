@@ -43,7 +43,7 @@ knowledge of the CeCILL-B license and that you accept its terms.
     <properties>
         <!-- project version. Only to change it here (and in CoreConstants.java
            Follow this practice : https://maven.apache.org/maven-ci-friendly.html-->
-        <revision>4.2</revision>
+        <revision>4.3</revision>
         <changelist />
         <sha1/>
 
@@ -94,7 +94,6 @@ knowledge of the CeCILL-B license and that you accept its terms.
         <module>vip-social</module>
         <module>vip-api</module>
         <module>vip-visualization</module>
-        <module>vip-local</module>
         <module>coverage</module>
     </modules>
 

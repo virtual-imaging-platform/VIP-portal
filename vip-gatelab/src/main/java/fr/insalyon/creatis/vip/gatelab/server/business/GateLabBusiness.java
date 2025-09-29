@@ -33,14 +33,10 @@ package fr.insalyon.creatis.vip.gatelab.server.business;
 
 import fr.insalyon.creatis.vip.application.server.business.ApplicationBusiness;
 import fr.insalyon.creatis.vip.core.client.bean.User;
-import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.business.EmailBusiness;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import fr.insalyon.creatis.vip.core.server.dao.UserDAO;
-import fr.insalyon.creatis.vip.core.server.dao.UsersGroupsDAO;
-import fr.insalyon.creatis.vip.gatelab.client.GateLabConstants;
-import fr.insalyon.creatis.vip.gatelab.client.view.GateLabException;
 import fr.insalyon.creatis.vip.gatelab.server.dao.GateLabDAO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,15 +45,10 @@ import org.springframework.beans.factory.annotation.Lookup;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-/**
- *
- * @author Rafael Ferreira da Silva, Ibrahim Kallel
- */
 @Service
 @Transactional
 public class GateLabBusiness {
@@ -110,14 +101,11 @@ public class GateLabBusiness {
         return new ArrayList<>();
     }
 
-    public Map<String, String> getGatelabWorkflowInputs(
-            String workflowID, String currentUserFolder)
-            throws BusinessException {
+    public Map<String, String> getGatelabWorkflowInputs(String workflowID) throws BusinessException {
 
         try {
             GateLabInputs gateinputs = getGateLabInputs(workflowID);
-            Map<String, String> inputMap =
-                gateinputs.getWorkflowInputs(currentUserFolder);
+            Map<String, String> inputMap = gateinputs.getWorkflowInputs();
 
             long nb = getGateLabDAO(workflowID).getNumberParticles();
             inputMap.put("runnedparticles", "" + nb);
@@ -139,11 +127,6 @@ public class GateLabBusiness {
         }
     }
 
-    /**
-     *
-     * @param workflowID
-     * @throws GateLabException
-     */
     public void StopWorkflowSimulation(String workflowID) throws BusinessException {
 
         try {
@@ -154,12 +137,6 @@ public class GateLabBusiness {
         }
     }
 
-    /**
-     *
-     * @param email
-     * @param message
-     * @throws BusinessException
-     */
     public void reportProblem(String email, String message) throws BusinessException {
 
         try {

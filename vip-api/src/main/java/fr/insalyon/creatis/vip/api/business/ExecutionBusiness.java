@@ -515,7 +515,7 @@ public class ExecutionBusiness {
             case Cleaned:
             case Unknown:
             default:
-                return ExecutionStatus.UNKOWN;
+                return ExecutionStatus.UNKNOWN;
         }
     }
 

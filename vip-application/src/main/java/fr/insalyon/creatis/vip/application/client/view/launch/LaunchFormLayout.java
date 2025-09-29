@@ -297,12 +297,19 @@ public class LaunchFormLayout extends AbstractFormLayout {
         }
 
         try {
-            this.createArtificialStringInput("Execution name", EXECUTION_NAME_ID, false, null,
+            this.createArtificialStringInput("Execution name", EXECUTION_NAME_ID, false, null, null,
                     false, "[" + ApplicationConstants.EXEC_NAME_VALID_CHARS + "]");
             if(applicationDescriptor.getBoutiquesExtensions().getAddResultsDirectoryInput()) {
+                String defaultDir = DataManagerConstants.ROOT + "/" + DataManagerConstants.USERS_HOME;
+                if (applicationDescriptor.getVipResultsDirectoryDefault() != null) {
+                    defaultDir = applicationDescriptor.getVipResultsDirectoryDefault();
+                }
+                String description = null;
+                if (applicationDescriptor.getVipResultsDirectoryDescription() != null) {
+                    description = applicationDescriptor.getVipResultsDirectoryDescription();
+                }
                 this.createArtificialStringInput("Results directory", RESULTS_DIRECTORY_PARAM_NAME, true,
-                        DataManagerConstants.ROOT + "/" + DataManagerConstants.USERS_HOME,
-                        true, "[" + ApplicationConstants.INPUT_VALID_CHARS + "]");
+                        defaultDir, description, true, "[" + ApplicationConstants.INPUT_VALID_CHARS + "]");
             }
         } catch (InvalidBoutiquesDescriptorException exception) {
             // This should not happen as parameters provided to createArtificialStringInput should be valid.
@@ -383,10 +390,11 @@ public class LaunchFormLayout extends AbstractFormLayout {
      * @throws InvalidBoutiquesDescriptorException if provided properties are invalid
      */
     private void createArtificialStringInput(String name, String id, boolean isFile,
-                                             String defaultValue, boolean hasAddValueButton, String allowedChar)
+                                             String defaultValue, String description,
+                                             boolean hasAddValueButton, String allowedChar)
             throws InvalidBoutiquesDescriptorException {
         BoutiquesInput.InputType type = isFile ? BoutiquesInput.InputType.FILE : BoutiquesInput.InputType.STRING;
-        BoutiquesStringInput input = new BoutiquesStringInput(id, name, null, type, false,
+        BoutiquesStringInput input = new BoutiquesStringInput(id, name, description, type, false,
                 null, null, null, null,null,
                 defaultValue);
         InputLayout inputLayout = new StringInputLayout(input, this, hasAddValueButton, allowedChar);
@@ -788,18 +796,27 @@ public class LaunchFormLayout extends AbstractFormLayout {
      */
     public Map<String, String> getParametersMap() {
         Map<String, String> parameterMap = new HashMap<>();
+
         this.getInputValueMap().forEach((inputId, valueSet) -> {
-            if(!inputId.equals(EXECUTION_NAME_ID)) {
-                String inputValue;
+            if( ! inputId.equals(EXECUTION_NAME_ID)) {
+                String inputValue = null;
+
                 if (valueSet instanceof ValueList) {
-                    inputValue = String.join(ApplicationConstants.SEPARATOR_LIST, valueSet.getValuesAsStrings());
+                    List<String> valuesToJoin = valueSet.getValuesAsStrings();
+                    valuesToJoin.removeIf(Objects::isNull); // we do that because String.join transform null into "null"
+
+                    if ( ! valuesToJoin.isEmpty()) {
+                        inputValue = String.join(ApplicationConstants.SEPARATOR_LIST, valueSet.getValuesAsStrings());
+                    }
                 } else {
                     List<Float> startStepStop = ((ValueRange) valueSet).getRangeLimits();
                     inputValue = startStepStop.get(0) + ApplicationConstants.SEPARATOR_INPUT
                             + startStepStop.get(2) + ApplicationConstants.SEPARATOR_INPUT
                             + startStepStop.get(1);
                 }
-                parameterMap.put(inputId, inputValue);
+                if (inputValue != null) {
+                    parameterMap.put(inputId, inputValue);
+                }
             }
         });
         return parameterMap;
