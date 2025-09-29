@@ -38,12 +38,12 @@ public class SessionController {
         this.server = server;
     }
 
-    @GetMapping()
+    @GetMapping
     public Session getSession() {
         return sessionBusiness.getSession();
     }
 
-    @PostMapping()
+    @PostMapping
     public Session createSession(@RequestBody @Valid AuthenticationCredentials credentials, HttpServletRequest request,
             HttpServletResponse response)
             throws ApiException {
