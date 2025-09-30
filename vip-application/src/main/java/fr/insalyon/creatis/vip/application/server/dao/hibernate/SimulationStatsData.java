@@ -1,5 +1,6 @@
 package fr.insalyon.creatis.vip.application.server.dao.hibernate;
 
+import fr.insalyon.creatis.moteur.plugins.workflowsdb.bean.Stats;
 import fr.insalyon.creatis.moteur.plugins.workflowsdb.bean.Workflow;
 import fr.insalyon.creatis.moteur.plugins.workflowsdb.dao.WorkflowsDBDAOException;
 import fr.insalyon.creatis.vip.application.server.dao.SimulationStatsDAO;
@@ -21,10 +22,6 @@ import org.springframework.stereotype.Repository;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- *
- * @author Rafael Ferreira da Silva
- */
 @Repository
 public class SimulationStatsData implements SimulationStatsDAO {
 
@@ -46,7 +43,7 @@ public class SimulationStatsData implements SimulationStatsDAO {
 
             CriteriaBuilder criteriaBuilder = session.getCriteriaBuilder();
             CriteriaQuery<Object[]> criteriaQuery = criteriaBuilder.createQuery(Object[].class);
-            Root<Workflow> root = criteriaQuery.from(Workflow.class);
+            Root<Stats> root = criteriaQuery.from(Stats.class);
             List<Selection<?>> selections = new ArrayList<>();
 
             criteriaQuery.where(root.get("id").in(simulationID));
