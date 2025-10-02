@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import fr.insalyon.creatis.vip.api.CarminProperties;
+import fr.insalyon.creatis.vip.core.server.CarminProperties;
 
 import java.time.LocalDateTime;
 

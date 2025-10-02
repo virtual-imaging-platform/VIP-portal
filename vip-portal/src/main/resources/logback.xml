@@ -75,4 +75,6 @@
   </root>
   <!-- add specific log levels -->
   <!-- <logger name="org.springframework.security" level="DEBUG" /> -->
+  <!-- <logger name="org.springframework.web" level="DEBUG" /> -->
+  <!-- <logger name="org.springframework.context.annotation" level="DEBUG" /> -->
 </configuration>

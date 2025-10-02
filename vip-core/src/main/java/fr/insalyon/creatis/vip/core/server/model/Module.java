@@ -1,4 +1,4 @@
-package fr.insalyon.creatis.vip.api.model;
+package fr.insalyon.creatis.vip.core.server.model;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;

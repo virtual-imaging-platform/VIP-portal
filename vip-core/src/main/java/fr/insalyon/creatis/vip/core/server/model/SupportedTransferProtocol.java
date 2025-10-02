@@ -29,42 +29,30 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL-B license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.api.model;
+package fr.insalyon.creatis.vip.core.server.model;
 
-import jakarta.validation.constraints.NotNull;
+import com.fasterxml.jackson.annotation.*;
 
 /**
- * Created by abonnet on 7/19/16.
+ * Created by abonnet on 8/5/16.
  */
-public class ErrorCodeAndMessage {
+public enum SupportedTransferProtocol {
 
-    @NotNull private Integer errorCode;
-    @NotNull private String errorMessage;
+    HTTP,
+    HTTPS,
+    FTP,
+    SFTP,
+    FTPS,
+    SCP,
+    WEBDAV;
 
-    public ErrorCodeAndMessage() {}
-
-    public ErrorCodeAndMessage(Integer errorCode) {
-        this.errorCode = errorCode;
+    @JsonCreator
+    public static SupportedTransferProtocol forValue(String value) {
+        return SupportedTransferProtocol.valueOf(value.toUpperCase());
     }
 
-    public ErrorCodeAndMessage(Integer errorCode, String errorMessage) {
-        this.errorCode = errorCode;
-        this.errorMessage = errorMessage;
-    }
-
-    public Integer getErrorCode() {
-        return errorCode;
-    }
-
-    public void setErrorCode(Integer errorCode) {
-        this.errorCode = errorCode;
-    }
-
-    public String getErrorMessage() {
-        return errorMessage;
-    }
-
-    public void setErrorMessage(String errorMessage) {
-        this.errorMessage = errorMessage;
+    @JsonValue
+    public String toValue() {
+        return this.name().toLowerCase();
     }
 }

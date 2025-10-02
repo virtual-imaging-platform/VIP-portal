@@ -32,7 +32,7 @@
 package fr.insalyon.creatis.vip.api.business;
 
 import fr.insalyon.creatis.moteur.plugins.workflowsdb.bean.WorkflowStatus;
-import fr.insalyon.creatis.vip.api.exception.ApiException;
+import fr.insalyon.creatis.vip.core.server.exception.ApiException;
 import fr.insalyon.creatis.vip.api.model.*;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
 import fr.insalyon.creatis.vip.application.client.bean.InOutData;
@@ -51,9 +51,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -61,7 +58,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.function.Supplier;
 
-import static fr.insalyon.creatis.vip.api.CarminProperties.ADDITIONNAL_INPUT_VALID_CHARS;
+import fr.insalyon.creatis.vip.core.server.CarminProperties;
 import static fr.insalyon.creatis.vip.application.client.ApplicationConstants.INPUT_VALID_CHARS;
 
 /**
@@ -342,7 +339,7 @@ public class ExecutionBusiness {
     }
 
     private void checkInputIsValid(String inputName, String inputValue) throws ApiException {
-        String validChars = INPUT_VALID_CHARS + ADDITIONNAL_INPUT_VALID_CHARS;
+        String validChars = INPUT_VALID_CHARS + CarminProperties.ADDITIONNAL_INPUT_VALID_CHARS;
         if( ! inputValue.matches("[" + validChars + "]+")) {
             logger.error("Input {} is not valid. Value : {}, Authorized characters are {}",
                     inputName, inputValue, validChars);

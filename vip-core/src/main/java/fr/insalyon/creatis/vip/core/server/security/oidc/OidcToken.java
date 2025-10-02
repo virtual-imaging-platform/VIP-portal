@@ -1,4 +1,4 @@
-package fr.insalyon.creatis.vip.api.security.oidc;
+package fr.insalyon.creatis.vip.core.server.security.oidc;
 
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;

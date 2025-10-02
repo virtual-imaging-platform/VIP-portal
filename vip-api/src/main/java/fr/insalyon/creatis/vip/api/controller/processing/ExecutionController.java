@@ -33,8 +33,8 @@ package fr.insalyon.creatis.vip.api.controller.processing;
 
 import fr.insalyon.creatis.vip.api.business.ExecutionBusiness;
 import fr.insalyon.creatis.vip.api.controller.ApiController;
-import fr.insalyon.creatis.vip.api.exception.ApiException;
-import fr.insalyon.creatis.vip.api.exception.ApiException.ApiError;
+import fr.insalyon.creatis.vip.core.server.exception.ApiException;
+import fr.insalyon.creatis.vip.core.server.exception.ApiException.ApiError;
 import fr.insalyon.creatis.vip.api.model.DeleteExecutionConfiguration;
 import fr.insalyon.creatis.vip.api.model.Execution;
 import fr.insalyon.creatis.vip.api.model.PathProperties;
@@ -46,8 +46,6 @@ import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.Valid;
 import java.util.List;
-
-import static fr.insalyon.creatis.vip.api.CarminProperties.DEFAULT_LIMIT_LIST_EXECUTION;
 
 /**
  * Created by abonnet on 7/13/16.
@@ -80,7 +78,7 @@ public class ExecutionController extends ApiController {
             logger.warn("offset not supportet yet in listExecutions");
             throw new ApiException("offset not supported yet");
         }
-        int executionMaxNb = env.getRequiredProperty(DEFAULT_LIMIT_LIST_EXECUTION, Integer.class);
+        int executionMaxNb = (int)server.getCarminDefaultLimitListExecution();
         if (limit == null) limit = executionMaxNb;
         if (limit > executionMaxNb) {
             logger.warn("limit parameter too high {}", limit);

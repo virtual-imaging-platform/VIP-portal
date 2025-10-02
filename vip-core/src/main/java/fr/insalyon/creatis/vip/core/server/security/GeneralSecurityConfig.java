@@ -1,6 +1,6 @@
-package fr.insalyon.creatis.vip.api.security;
+package fr.insalyon.creatis.vip.core.server.security;
 
-import fr.insalyon.creatis.vip.api.security.oidc.OidcLoginConfig;
+import fr.insalyon.creatis.vip.core.server.security.oidc.OidcLoginConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -18,7 +18,7 @@ import org.springframework.security.web.firewall.DefaultHttpFirewall;
  * Spring security configuration.
  *
  * Defines Spring security settings for all inbound requests on paths other than /rest/**,
- * which is handled in {@link ApiSecurityConfig}
+ * which is handled in {@link RestApiSecurityConfig}
  *
  * Created by abonnet on 7/22/16.
  */

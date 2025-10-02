@@ -3,19 +3,19 @@ package fr.insalyon.creatis.vip.api.controller;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
+import fr.insalyon.creatis.vip.core.server.business.Server;
 
 import java.util.function.Supplier;
 
 public abstract class ApiController {
 
     protected Supplier<User> currentUserSupplier;
-    protected Environment env;
+    protected Server server;
 
     @Autowired
-    public void setUpDependencies(Supplier<User> currentUserSupplier, Environment env) {
+    public void setUpDependencies(Supplier<User> currentUserSupplier, Server server) {
         this.currentUserSupplier = currentUserSupplier;
-        this.env = env;
+        this.server = server;
     }
 
     protected User currentUser() {

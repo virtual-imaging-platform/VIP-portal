@@ -29,11 +29,11 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL-B license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.api.controller;
+package fr.insalyon.creatis.vip.core.server.controller;
 
-import fr.insalyon.creatis.vip.api.exception.ApiException;
-import fr.insalyon.creatis.vip.api.exception.ApiException.ApiError;
-import fr.insalyon.creatis.vip.api.model.ErrorCodeAndMessage;
+import fr.insalyon.creatis.vip.core.server.exception.ApiException;
+import fr.insalyon.creatis.vip.core.server.exception.ApiException.ApiError;
+import fr.insalyon.creatis.vip.core.server.model.ErrorCodeAndMessage;
 import fr.insalyon.creatis.vip.core.client.VipException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

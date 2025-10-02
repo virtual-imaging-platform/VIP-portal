@@ -33,7 +33,7 @@ package fr.insalyon.creatis.vip.api.controller.data;
 
 import fr.insalyon.creatis.vip.api.business.DataApiBusiness;
 import fr.insalyon.creatis.vip.api.controller.ApiController;
-import fr.insalyon.creatis.vip.api.exception.ApiException;
+import fr.insalyon.creatis.vip.core.server.exception.ApiException;
 import fr.insalyon.creatis.vip.api.model.ExistsApiResponse;
 import fr.insalyon.creatis.vip.api.model.PathProperties;
 import fr.insalyon.creatis.vip.api.model.UploadData;

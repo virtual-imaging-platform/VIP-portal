@@ -31,9 +31,8 @@
  */
 package fr.insalyon.creatis.vip.api.business;
 
-import fr.insalyon.creatis.vip.api.CarminProperties;
-import fr.insalyon.creatis.vip.api.exception.ApiException;
-import fr.insalyon.creatis.vip.api.exception.ApiException.ApiError;
+import fr.insalyon.creatis.vip.core.server.exception.ApiException;
+import fr.insalyon.creatis.vip.core.server.exception.ApiException.ApiError;
 import fr.insalyon.creatis.vip.api.model.PathProperties;
 import fr.insalyon.creatis.vip.api.model.UploadData;
 import fr.insalyon.creatis.vip.api.model.UploadDataType;
@@ -54,7 +53,6 @@ import org.apache.commons.io.input.ReaderInputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
 import jakarta.annotation.PreDestroy;
@@ -85,7 +83,7 @@ public class DataApiBusiness {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    private final Environment env;
+    private final Server server;
     private final Supplier<User> currentUserProvider;
 
     private final LFCBusiness lfcBusiness;
@@ -97,11 +95,11 @@ public class DataApiBusiness {
 
     @Autowired
     public DataApiBusiness(
-            Environment env, Supplier<User> currentUserProvider,
+            Server server, Supplier<User> currentUserProvider,
             LFCBusiness lfcBusiness, TransferPoolBusiness transferPoolBusiness,
             LFCPermissionBusiness lfcPermissionBusiness,
-            DataManagerBusiness dataManagerBusiness, Server server) {
-        this.env = env;
+            DataManagerBusiness dataManagerBusiness) {
+        this.server = server;
         this.currentUserProvider = currentUserProvider;
         this.lfcBusiness = lfcBusiness;
         this.transferPoolBusiness = transferPoolBusiness;
@@ -170,7 +168,7 @@ public class DataApiBusiness {
             pathProperties.setSize((long) fileData.size());
             pathProperties.setLastModificationDate(
                 baseGetFileModificationDate(path) / 1000);
-            pathProperties.setMimeType(env.getProperty(CarminProperties.API_DIRECTORY_MIME_TYPE));
+            pathProperties.setMimeType(server.getCarminApiDirectoryMimeType());
         }
         return pathProperties;
     }
@@ -288,7 +286,7 @@ public class DataApiBusiness {
         }
         // path exists and is a file: check its size
         List<Data> fileData = baseGetFileData(path);
-        Long maxSize = env.getRequiredProperty(CarminProperties.API_DATA_TRANSFERT_MAX_SIZE, Long.class);
+        Long maxSize = server.getCarminApiDataTransfertMaxSize();
         if (fileData.get(0).getLength() > maxSize) {
             logger.error("Trying to download a file too big ({})", path);
             throw new ApiException("Illegal data API access");
@@ -372,11 +370,11 @@ public class DataApiBusiness {
     }
 
     private Integer getRetryDelay() {
-        return env.getProperty(CarminProperties.API_DOWNLOAD_RETRY_IN_SECONDS, Integer.class);
+        return server.getCarminApiDownloadRetryInSeconds();
     }
 
     private Integer getTimeout() {
-        return env.getProperty(CarminProperties.API_DOWNLOAD_TIMEOUT_IN_SECONDS, Integer.class);
+        return server.getCarminApiDownloadTimeoutInSeconds();
     }
 
     private boolean isOperationOver(String operationId, User user)
@@ -441,7 +439,7 @@ public class DataApiBusiness {
     private PathProperties getRootPathProperties() {
         PathProperties rootPathProperties = new PathProperties();
         rootPathProperties.setExists(true);
-        rootPathProperties.setMimeType(env.getProperty(CarminProperties.API_DIRECTORY_MIME_TYPE));
+        rootPathProperties.setMimeType(server.getCarminApiDirectoryMimeType());
         rootPathProperties.setIsDirectory(true);
         rootPathProperties.setSize((long) getRootDirectoriesName().size());
         rootPathProperties.setPath(ROOT);
@@ -470,7 +468,7 @@ public class DataApiBusiness {
     private PathProperties getRootSubDirPathProperties(String name) {
         PathProperties rootPathProperties = new PathProperties();
         rootPathProperties.setExists(true);
-        rootPathProperties.setMimeType(env.getProperty(CarminProperties.API_DIRECTORY_MIME_TYPE));
+        rootPathProperties.setMimeType(server.getCarminApiDirectoryMimeType());
         rootPathProperties.setIsDirectory(true);
         // TODO : size ?
         rootPathProperties.setPath(ROOT + "/" + name);
@@ -489,7 +487,7 @@ public class DataApiBusiness {
                 || lfcData.getType().equals(Data.Type.folderSync);
         pathProperties.setIsDirectory(isDirectory);
         if (isDirectory) {
-            pathProperties.setMimeType(env.getProperty(CarminProperties.API_DIRECTORY_MIME_TYPE));
+            pathProperties.setMimeType(server.getCarminApiDirectoryMimeType());
         } else {
             pathProperties.setMimeType(getMimeType(lfcData.getName()));
         }
@@ -512,9 +510,7 @@ public class DataApiBusiness {
     private String getMimeType(String path) {
         try {
             String contentType = Files.probeContentType(Paths.get(path));
-            return contentType == null ?
-                    env.getProperty(CarminProperties.API_DEFAULT_MIME_TYPE) :
-                    contentType;
+            return contentType == null ? server.getCarminApiDefaultMimeType() : contentType;
         } catch (IOException e) {
             logger.warn("Cant detect mime type of {}. Ignoring and returning application/octet-stream",
                     path, e);

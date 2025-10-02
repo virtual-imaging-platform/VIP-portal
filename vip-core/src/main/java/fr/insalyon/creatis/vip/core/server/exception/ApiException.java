@@ -1,4 +1,4 @@
-package fr.insalyon.creatis.vip.api.exception;
+package fr.insalyon.creatis.vip.core.server.exception;
 
 import fr.insalyon.creatis.vip.core.client.VipException;
 import org.springframework.http.HttpStatus;

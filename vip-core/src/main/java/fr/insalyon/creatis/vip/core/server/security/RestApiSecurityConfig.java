@@ -29,17 +29,17 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL-B license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.api.security;
+package fr.insalyon.creatis.vip.core.server.security;
 
-import fr.insalyon.creatis.vip.api.CarminProperties;
+import  fr.insalyon.creatis.vip.core.server.business.Server;
 
-import fr.insalyon.creatis.vip.api.security.apikey.SpringApiPrincipal;
-import fr.insalyon.creatis.vip.api.security.apikey.ApikeyAuthenticationFilter;
-import fr.insalyon.creatis.vip.api.security.apikey.ApikeyAuthenticationProvider;
+import fr.insalyon.creatis.vip.core.server.security.apikey.SpringApiPrincipal;
+import fr.insalyon.creatis.vip.core.server.security.apikey.ApikeyAuthenticationFilter;
+import fr.insalyon.creatis.vip.core.server.security.apikey.ApikeyAuthenticationProvider;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 
-import fr.insalyon.creatis.vip.api.security.oidc.OidcConfig;
-import fr.insalyon.creatis.vip.api.security.oidc.OidcResolver;
+import fr.insalyon.creatis.vip.core.server.security.oidc.OidcConfig;
+import fr.insalyon.creatis.vip.core.server.security.oidc.OidcResolver;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,7 +47,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
-import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -72,22 +71,22 @@ import java.util.function.Supplier;
  */
 @Configuration
 @EnableWebSecurity
-public class ApiSecurityConfig {
+public class RestApiSecurityConfig {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    private final Environment env;
+    private final Server server;
     private final VipAuthenticationEntryPoint vipAuthenticationEntryPoint;
     private final ApikeyAuthenticationProvider apikeyAuthenticationProvider;
     private final OidcConfig oidcConfig;
     private final OidcResolver oidcResolver;
 
     @Autowired
-    public ApiSecurityConfig(
-            Environment env, ApikeyAuthenticationProvider apikeyAuthenticationProvider,
+    public RestApiSecurityConfig(
+            Server server, ApikeyAuthenticationProvider apikeyAuthenticationProvider,
             VipAuthenticationEntryPoint vipAuthenticationEntryPoint,
             OidcConfig oidcConfig, OidcResolver oidcResolver) {
-        this.env = env;
+        this.server = server;
         this.vipAuthenticationEntryPoint = vipAuthenticationEntryPoint;
         this.apikeyAuthenticationProvider = apikeyAuthenticationProvider;
         this.oidcConfig = oidcConfig;
@@ -142,10 +141,9 @@ public class ApiSecurityConfig {
         return http.build();
     }
 
-    @Bean
-    public ApikeyAuthenticationFilter apikeyAuthenticationFilter() throws Exception {
+    private ApikeyAuthenticationFilter apikeyAuthenticationFilter() throws Exception {
         return new ApikeyAuthenticationFilter(
-                env.getRequiredProperty(CarminProperties.APIKEY_HEADER_NAME),
+                server.getApikeyHeaderName(),
                 vipAuthenticationEntryPoint, apikeyAuthenticationProvider);
     }
 

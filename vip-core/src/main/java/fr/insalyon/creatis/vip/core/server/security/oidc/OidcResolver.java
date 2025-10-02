@@ -1,4 +1,4 @@
-package fr.insalyon.creatis.vip.api.security.oidc;
+package fr.insalyon.creatis.vip.core.server.security.oidc;
 
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;

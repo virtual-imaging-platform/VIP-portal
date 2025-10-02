@@ -29,30 +29,70 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL-B license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.api.model;
+package fr.insalyon.creatis.vip.core.server.security.apikey;
 
-import com.fasterxml.jackson.annotation.*;
+import fr.insalyon.creatis.vip.core.client.bean.User;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
+import java.security.Principal;
+import java.util.ArrayList;
+import java.util.Collection;
 
 /**
- * Created by abonnet on 8/5/16.
+ * Vip user proxy that is conform to spring security (must implement a specific class)
+ *
+ * Created by abonnet on 7/25/16.
  */
-public enum SupportedTransferProtocol {
+public class SpringApiPrincipal implements UserDetails, Principal {
 
-    HTTP,
-    HTTPS,
-    FTP,
-    SFTP,
-    FTPS,
-    SCP,
-    WEBDAV;
+    private final User vipUser;
 
-    @JsonCreator
-    public static SupportedTransferProtocol forValue(String value) {
-        return SupportedTransferProtocol.valueOf(value.toUpperCase());
+    public SpringApiPrincipal(User vipUser) {
+        this.vipUser = vipUser;
     }
 
-    @JsonValue
-    public String toValue() {
-        return this.name().toLowerCase();
+    public User getVipUser() {
+        return vipUser;
+    }
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return new ArrayList<>(); // not used at the moment
+    }
+
+    @Override
+    public String getPassword() {
+        return vipUser.getPassword();
+    }
+
+    @Override
+    public String getUsername() {
+        return vipUser.getEmail();
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true; // not used at the moment
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return !vipUser.isAccountLocked();
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true; // not used at the moment
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true; // not used at the moment
+    }
+
+    @Override
+    public String getName() {
+        return getUsername();
     }
 }
