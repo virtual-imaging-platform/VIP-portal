@@ -168,7 +168,7 @@ public class DataApiBusiness {
             pathProperties.setSize((long) fileData.size());
             pathProperties.setLastModificationDate(
                 baseGetFileModificationDate(path) / 1000);
-            pathProperties.setMimeType(server.getCarminApiDefaultMimeType());
+            pathProperties.setMimeType(server.getCarminApiDirectoryMimeType());
         }
         return pathProperties;
     }
@@ -468,7 +468,7 @@ public class DataApiBusiness {
     private PathProperties getRootSubDirPathProperties(String name) {
         PathProperties rootPathProperties = new PathProperties();
         rootPathProperties.setExists(true);
-        rootPathProperties.setMimeType(server.getCarminApiDefaultMimeType());
+        rootPathProperties.setMimeType(server.getCarminApiDirectoryMimeType());
         rootPathProperties.setIsDirectory(true);
         // TODO : size ?
         rootPathProperties.setPath(ROOT + "/" + name);
@@ -487,7 +487,7 @@ public class DataApiBusiness {
                 || lfcData.getType().equals(Data.Type.folderSync);
         pathProperties.setIsDirectory(isDirectory);
         if (isDirectory) {
-            pathProperties.setMimeType(server.getCarminApiDefaultMimeType());
+            pathProperties.setMimeType(server.getCarminApiDirectoryMimeType());
         } else {
             pathProperties.setMimeType(getMimeType(lfcData.getName()));
         }
