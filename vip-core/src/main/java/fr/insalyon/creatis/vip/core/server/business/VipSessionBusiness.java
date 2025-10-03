@@ -4,6 +4,8 @@ import fr.insalyon.creatis.vip.core.client.bean.Group;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants.GROUP_ROLE;
+import fr.insalyon.creatis.vip.core.server.inter.annotations.VIPCheckRemoval;
+import fr.insalyon.creatis.vip.core.server.inter.annotations.VIPRemoval;
 import fr.insalyon.creatis.vip.core.client.view.CoreException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,6 +35,7 @@ import java.util.function.Supplier;
 
 @Service
 @Transactional
+@VIPRemoval
 public class VipSessionBusiness {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
@@ -46,20 +49,31 @@ public class VipSessionBusiness {
         this.configurationBusiness = configurationBusiness;
     }
 
+    @VIPCheckRemoval
     public void setVIPSession(
             HttpServletRequest request,
             HttpServletResponse response,
             User user) throws BusinessException, CoreException {
         try {
+            // see explanation in SessionBusiness -> createCookie
+            boolean isSecure = server.getApacheSSLPort() != 80;
             configurationBusiness.updateUserLastLogin(user.getEmail());
             user = setUserInSession(user, request.getSession());
+
             Cookie userCookie = new Cookie(CoreConstants.COOKIES_USER, URLEncoder.encode(user.getEmail(), "UTF-8"));
             userCookie.setMaxAge((int) (CoreConstants.COOKIES_EXPIRATION_DATE.getTime() - new Date().getTime()));
             userCookie.setPath("/");
+            userCookie.setHttpOnly(true);
+            userCookie.setSecure(isSecure);
+
             response.addCookie(userCookie);
+    
             Cookie sessionCookie = new Cookie(CoreConstants.COOKIES_SESSION, user.getSession());
-            userCookie.setMaxAge((int) (CoreConstants.COOKIES_EXPIRATION_DATE.getTime() - new Date().getTime()));
+            sessionCookie.setMaxAge((int) (CoreConstants.COOKIES_EXPIRATION_DATE.getTime() - new Date().getTime()));
             sessionCookie.setPath("/");
+            sessionCookie.setHttpOnly(true);
+            sessionCookie.setSecure(isSecure);
+
             response.addCookie(sessionCookie);
         } catch (UnsupportedEncodingException ex) {
             logger.error("Error setting VIP session for {} ",user, ex);
@@ -110,7 +124,8 @@ public class VipSessionBusiness {
         throw new CoreException("User has no groups defined.");
     }
 
-    protected User resetSessionFromCookie(HttpServletRequest request)
+    @VIPCheckRemoval
+    public User resetSessionFromCookie(HttpServletRequest request)
             throws CoreException {
 
         try {
