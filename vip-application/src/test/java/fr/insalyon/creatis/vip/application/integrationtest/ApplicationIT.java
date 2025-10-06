@@ -32,6 +32,7 @@ public class ApplicationIT extends BaseSpringIT {
     @BeforeEach
     public void setUp() throws Exception {
         super.setUp();
+        setAdminContext();
 
         // group test and user test creation
         group1 = new Group("group1", true, GroupType.getDefault());
