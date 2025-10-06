@@ -38,6 +38,7 @@ public class ResourceIT extends BaseSpringIT {
 
     @BeforeEach
     public void setUp() throws Exception {
+        setAdminContext();
         super.setUp();
         resource = new Resource(
             "resourceA", 

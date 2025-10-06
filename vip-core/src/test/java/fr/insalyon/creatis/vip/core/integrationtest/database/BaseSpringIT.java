@@ -5,6 +5,7 @@ import fr.insalyon.creatis.grida.client.GRIDAClientException;
 import fr.insalyon.creatis.vip.core.client.bean.Group;
 import fr.insalyon.creatis.vip.core.client.bean.GroupType;
 import fr.insalyon.creatis.vip.core.client.bean.User;
+import fr.insalyon.creatis.vip.core.client.view.user.UserLevel;
 import fr.insalyon.creatis.vip.core.client.view.util.CountryCode;
 import fr.insalyon.creatis.vip.core.integrationtest.ServerMockConfig;
 import fr.insalyon.creatis.vip.core.server.SpringCoreConfig;
@@ -13,22 +14,29 @@ import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
 import fr.insalyon.creatis.vip.core.server.business.EmailBusiness;
 import fr.insalyon.creatis.vip.core.server.business.GroupBusiness;
 import fr.insalyon.creatis.vip.core.server.business.Server;
+import fr.insalyon.creatis.vip.core.server.security.common.SpringPrincipalUser;
+import fr.insalyon.creatis.vip.core.server.security.session.SessionAuthenticationProvider;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationContext;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.web.SpringJUnitWebConfig;
 import org.springframework.test.jdbc.JdbcTestUtils;
+import org.springframework.test.web.servlet.request.RequestPostProcessor;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.sql.DataSource;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -95,6 +103,13 @@ public abstract class BaseSpringIT {
         assertEquals(expectedNb, rowsNb);
     }
 
+    protected User createUser(String email, UserLevel level) throws GRIDAClientException, BusinessException {
+        User u = createUser(email, UUID.randomUUID().toString().substring(0, 4));
+
+        configurationBusiness.updateUser(u.getEmail(), level, u.getCountryCode(), u.getMaxRunningSimulations(), false);
+        return configurationBusiness.getUserWithGroups(email);
+    }
+
     protected User createUser(String testEmail) throws GRIDAClientException, BusinessException {
         return createUser(testEmail, "");
     }
@@ -133,6 +148,21 @@ public abstract class BaseSpringIT {
         groupBusiness.add(new Group(groupName, true, type));
     }
 
+    public void createGroup(String groupName, GroupType type, Boolean isPublic) throws BusinessException {
+        groupBusiness.add(new Group(groupName, isPublic, type));
+    }
+
+    public void setAdminContext() throws BusinessException, GRIDAClientException {
+        SessionAuthenticationProvider provider = new SessionAuthenticationProvider();
+        User adminUser = configurationBusiness.getUserWithGroups(adminEmail);
+
+        SecurityContextHolder.getContext().setAuthentication(provider.createAuthenticationFromUser(adminUser));
+    }
+
+    protected RequestPostProcessor getUserSecurityMock(User user) {
+        return SecurityMockMvcRequestPostProcessors.user(new SpringPrincipalUser(user));
+    }
+
     protected void createUserInGroups(String userEmail, String nameSuffix, String... groupNames) throws BusinessException, GRIDAClientException {
         User newUser = new User("test firstName " + nameSuffix,
                 "test lastName " + nameSuffix, userEmail, "test institution",
@@ -149,6 +179,4 @@ public abstract class BaseSpringIT {
     protected Date getNextSecondDate() {
         return new Date(new Date().getTime() + (1000));
     }
-
-
 }

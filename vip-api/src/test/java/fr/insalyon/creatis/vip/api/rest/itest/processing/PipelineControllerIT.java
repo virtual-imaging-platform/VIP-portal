@@ -118,6 +118,7 @@ public class PipelineControllerIT extends BaseWebSpringIT {
 
     @Test
     public void shouldReturnPipelines() throws Exception {
+        setAdminContext();
         createGroup("group1");
         createGroup("group2");
         createGroup("group3");

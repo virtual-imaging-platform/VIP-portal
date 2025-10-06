@@ -196,6 +196,7 @@ abstract public class BaseWebSpringIT extends BaseApplicationSpringIT {
     }
 
     protected AppVersion configureTestApp(String appName, String groupName, String versionName) throws BusinessException, GRIDAClientException, IOException {
+        setAdminContext();
         AppVersion appVersion = configureAnApplication(appName, versionName, groupName);
         configureVersion(appVersion, FileUtil.read(getBoutiquesTestFile()));
 
