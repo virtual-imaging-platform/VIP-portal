@@ -132,12 +132,12 @@ public abstract class BaseSpringIT {
         return newUser;
     }
 
-    protected void createUserInGroup(String userEmail, String groupName) throws BusinessException, GRIDAClientException {
-        createUserInGroup(userEmail, "", groupName);
+    protected User createUserInGroup(String userEmail, String groupName) throws BusinessException, GRIDAClientException {
+        return createUserInGroup(userEmail, "", groupName);
     }
 
-    protected void createUserInGroup(String userEmail, String nameSuffix, String groupName) throws BusinessException, GRIDAClientException {
-        createUserInGroups(userEmail, nameSuffix, groupName);
+    protected User createUserInGroup(String userEmail, String nameSuffix, String groupName) throws BusinessException, GRIDAClientException {
+        return createUserInGroups(userEmail, nameSuffix, groupName);
     }
 
     public void createGroup(String groupName) throws BusinessException {
@@ -163,7 +163,7 @@ public abstract class BaseSpringIT {
         return SecurityMockMvcRequestPostProcessors.user(new SpringPrincipalUser(user));
     }
 
-    protected void createUserInGroups(String userEmail, String nameSuffix, String... groupNames) throws BusinessException, GRIDAClientException {
+    protected User createUserInGroups(String userEmail, String nameSuffix, String... groupNames) throws BusinessException, GRIDAClientException {
         User newUser = new User("test firstName " + nameSuffix,
                 "test lastName " + nameSuffix, userEmail, "test institution",
                 "testPassword", CountryCode.fr,
@@ -174,6 +174,7 @@ public abstract class BaseSpringIT {
             groups.add(groupBusiness.get(groupName));
         }
         configurationBusiness.signup(newUser, "", false, true, groups);
+        return configurationBusiness.getUserWithGroups(userEmail);
     }
 
     protected Date getNextSecondDate() {
