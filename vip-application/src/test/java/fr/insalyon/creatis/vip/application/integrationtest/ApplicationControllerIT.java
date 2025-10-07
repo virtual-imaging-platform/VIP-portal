@@ -215,7 +215,7 @@ public class ApplicationControllerIT extends BaseSpringIT {
 
     @Test
     public void getList() throws Exception {
-                Application app1 = new Application("app1", "wow super app1");
+        Application app1 = new Application("app1", "wow super app1");
         Application app2 = new Application("app2", "wow super app2");
         Application app3 = new Application("app3", "wow super app3");
 
@@ -275,6 +275,13 @@ public class ApplicationControllerIT extends BaseSpringIT {
                 // groups are filtered and only visible user groups are returned into the object
                 // if they belong to it
                 .andExpect(jsonPath("$.data[0].groups.length()").value(1))
+                .andExpect(jsonPath("$.data.length()").value(1));
+        
+        // filtering
+        mockMvc.perform(get("/internal/applications?group=" + group.getName())
+                .with(getUserSecurityMock(adminUser)).with(SecurityMockMvcRequestPostProcessors.csrf()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.total").value(1))
                 .andExpect(jsonPath("$.data.length()").value(1));
     }
 }
