@@ -35,6 +35,8 @@ public class SessionAuthenticationProvider extends AbstractAuthenticationProvide
             if (user == null) {
                 throw new BadCredentialsException("This session do not exist!");
             } else {
+                user.setGroups(usersGroupsDAO.getUserGroups(user.getEmail()));
+
                 springUser = new SpringPrincipalUser(user);
                 checkUserInfo(springUser);
             }
