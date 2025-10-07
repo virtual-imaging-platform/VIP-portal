@@ -1,5 +1,6 @@
 package fr.insalyon.creatis.vip.core.server.business.base;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Supplier;
@@ -46,5 +47,18 @@ public class CorePermissions {
                 throw new BusinessException("You do not have the right to do that!");
             }
         }
+    }
+
+    public List<Group> filterOnlyUserGroups(List<Group> toFilter) {
+        User user = uSupplier.get();
+        List<Group> result = new ArrayList<>();
+        Set<Group> userGroups = user.getGroups();
+
+        if (user.isSystemAdministrator()) {
+            result.addAll(toFilter);
+        } else {
+            result = toFilter.stream().filter((g) -> userGroups.contains(g)).toList();
+        }
+        return result;
     }
 }

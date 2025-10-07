@@ -62,6 +62,10 @@ public class Application implements IsSerializable {
         this.owner = owner;
     }
 
+    public void setCitation(String citation) {
+        this.citation = citation;
+    }
+
     public String getFullName() {
         return fullName;
     }
