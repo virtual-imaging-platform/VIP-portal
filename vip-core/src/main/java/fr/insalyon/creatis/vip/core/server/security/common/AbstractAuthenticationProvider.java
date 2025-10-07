@@ -19,6 +19,7 @@ import org.springframework.util.Assert;
 
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import fr.insalyon.creatis.vip.core.server.dao.UserDAO;
+import fr.insalyon.creatis.vip.core.server.dao.UsersGroupsDAO;
 
 // this class was factorized from the Apikey Security provider 
 // since we have added the Session Security Provider
@@ -30,6 +31,9 @@ public abstract class AbstractAuthenticationProvider implements AuthenticationPr
 
     @Autowired
     protected UserDAO userDAO;
+
+    @Autowired
+    protected UsersGroupsDAO usersGroupsDAO;
 
     public final void afterPropertiesSet() throws Exception {
         Assert.notNull(this.messages, "A message source must be set");
