@@ -14,9 +14,6 @@ import org.springframework.web.bind.annotation.*;
 import jakarta.validation.Valid;
 import java.util.Date;
 
-/**
- * @author KhalilKes
- */
 @RestController
 @RequestMapping("/register")
 public class RegisterUserController extends ApiController {

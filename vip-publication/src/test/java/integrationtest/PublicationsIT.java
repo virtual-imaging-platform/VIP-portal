@@ -1,15 +1,21 @@
 package integrationtest;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import org.apache.commons.lang.StringUtils;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import fr.insalyon.creatis.vip.core.client.VipException;
 import fr.insalyon.creatis.vip.core.integrationtest.database.BaseSpringIT;
-import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import fr.insalyon.creatis.vip.publication.client.bean.Publication;
 import fr.insalyon.creatis.vip.publication.server.business.PublicationBusiness;
-import org.apache.commons.lang.StringUtils;
-import org.junit.jupiter.api.*;
-import org.springframework.beans.factory.annotation.Autowired;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 public class PublicationsIT extends BaseSpringIT {
     @Autowired
@@ -30,7 +36,7 @@ public class PublicationsIT extends BaseSpringIT {
     }
 
     @Test
-    public void testInitialisation() throws BusinessException {
+    public void testInitialisation() throws VipException {
         // verify number publications
         Assertions.assertEquals(1, publicationBusiness.getPublications().size(), "Incorrect number of publications");
 
@@ -47,7 +53,7 @@ public class PublicationsIT extends BaseSpringIT {
     /* ********************************************************************************************************************************************** */
 
     @Test
-    public void testAddPublication() throws BusinessException {
+    public void testAddPublication() throws VipException {
         // With id
         Publication publication = new Publication(idPublicationCreated, "Publication title", "21/06/2023", "01010100", "author1, author2", "type", "typeName", adminEmail, null);
         publicationBusiness.addPublication(publication);
@@ -68,7 +74,7 @@ public class PublicationsIT extends BaseSpringIT {
     }
 
     @Test
-    public void testAddExistingPublication() throws BusinessException {
+    public void testAddExistingPublication() throws VipException {
         Publication publication = new Publication(idPublicationCreated, "Publication title", "21/06/2023", "01010100", "author1, author2", "type", "typeName", adminEmail, null);
 
         // No exception because the id is not taken into account for the object creation
@@ -80,7 +86,7 @@ public class PublicationsIT extends BaseSpringIT {
         Publication publication = new Publication(idPublicationCreated, "Publication title", "21/06/2023", "01010100", "author1, author2", "type", "typeName", "nonExistent_vip_author@test.fr", null);
 
         Exception exception = assertThrows(
-                BusinessException.class, () ->
+                VipException.class, () ->
                         publicationBusiness.addPublication(publication)
         );
 
@@ -94,7 +100,7 @@ public class PublicationsIT extends BaseSpringIT {
     /* ********************************************************************************************************************************************** */
 
     @Test
-    public void testUpdatePublication() throws BusinessException {
+    public void testUpdatePublication() throws VipException {
         Publication publication = new Publication(idPublicationCreated, "Publication title", "21/06/2023", "01010100", "author2, author3", "type", "typeName", adminEmail, null);
         publicationBusiness.updatePublication(publication);
 
@@ -103,7 +109,7 @@ public class PublicationsIT extends BaseSpringIT {
     }
 
     @Test
-    public void testSetAttributesUpdatePublication() throws BusinessException, DAOException {
+    public void testSetAttributesUpdatePublication() throws VipException, DAOException {
         Publication publication = publicationBusiness.getPublication(idPublicationCreated);
 
         configurationBusiness.getOrCreateUser("test1@test.fr", "institution", null);
@@ -131,7 +137,7 @@ public class PublicationsIT extends BaseSpringIT {
     }
 
     @Test
-    public void testCatchUpdateNonExistentPublication() throws BusinessException {
+    public void testCatchUpdateNonExistentPublication() throws VipException {
         Publication publication = new Publication(100L, "Publication title", "21/06/2023", "01010100", "author2, author3", "type", "typeName", adminEmail, null);
         // UPDATE + nonExistent primary key idPublication => no exception
         // We decided not to add an exception because if this occurs, it will not create problem, just no row will be updated
@@ -142,12 +148,12 @@ public class PublicationsIT extends BaseSpringIT {
     }
 
     @Test
-    public void testCatchUpdatePublicationNonExistentVipAuthor() throws BusinessException {
+    public void testCatchUpdatePublicationNonExistentVipAuthor() throws VipException {
         // update vipAuthor from admin@test.fr to nonExistentVipAuthor@test.fr
         Publication publication = new Publication(idPublicationCreated, "Publication title", "21/06/2023", "01010100", "author2, author3", "type", "typeName", "nonExistentVipAuthor@test.fr", null);
 
         Exception exception = assertThrows(
-                BusinessException.class, () ->
+                VipException.class, () ->
                         publicationBusiness.updatePublication(publication)
         );
 
@@ -162,7 +168,7 @@ public class PublicationsIT extends BaseSpringIT {
     /* ********************************************************************************************************************************************** */
 
     @Test
-    public void testGetPublication() throws BusinessException {
+    public void testGetPublication() throws VipException {
         Publication publication = publicationBusiness.getPublication(idPublicationCreated);
 
         // verify publication information
@@ -177,7 +183,7 @@ public class PublicationsIT extends BaseSpringIT {
     }
 
     @Test
-    public void testCatchGetNonExistentPublication() throws BusinessException {
+    public void testCatchGetNonExistentPublication() throws VipException {
         // SELECT + nonExistent primary key publicationId => no exception
         // We decided not to add an exception because if this occurs, it will not create problem, just no row will be selected
         assertNull(publicationBusiness.getPublication(100L));
@@ -188,13 +194,13 @@ public class PublicationsIT extends BaseSpringIT {
     /* ********************************************************************************************************************************************** */
 
     @Test
-    public void testRemovePublication() throws BusinessException {
+    public void testRemovePublication() throws VipException {
         publicationBusiness.removePublication(idPublicationCreated);
         Assertions.assertEquals(0, publicationBusiness.getPublications().size(), "Incorrect number of publications");
     }
 
     @Test
-    public void testCatchRemoveInexistantPublication() throws BusinessException {
+    public void testCatchRemoveInexistantPublication() throws VipException {
         // DELETE + nonExistent primary key publicationId => no exception
         // We decided not to add an exception because if this occurs, it will not create problem, just no row will be deleted
         publicationBusiness.removePublication(100L);

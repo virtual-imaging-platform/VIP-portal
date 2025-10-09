@@ -3,12 +3,6 @@ package fr.insalyon.creatis.vip.application.client.bean.boutiquesTools;
 import java.util.Map;
 import java.util.Set;
 
-/**
- * Representation of a String or File input in an application Boutiques descriptor
- *
- * @author Guillaume Vanel
- * @version %I%, %G%
- */
 public class BoutiquesStringInput extends BoutiquesInput {
     private String defaultValue;
 

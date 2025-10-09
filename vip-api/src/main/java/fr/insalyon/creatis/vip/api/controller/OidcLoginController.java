@@ -14,12 +14,12 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.view.RedirectView;
 import org.springframework.web.util.UriUtils;
 
+import fr.insalyon.creatis.vip.core.client.VipException;
 import fr.insalyon.creatis.vip.core.client.bean.User;
-import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
 import fr.insalyon.creatis.vip.core.server.business.SessionBusiness;
-import fr.insalyon.creatis.vip.core.server.exception.ApiException;
 import fr.insalyon.creatis.vip.core.server.model.Session;
+import fr.insalyon.creatis.vip.core.server.exception.ApiException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -73,9 +73,8 @@ public class OidcLoginController {
             session.email = vipUser.getEmail();
             
             SecurityContextHolder.clearContext(); // destroy spring session and use VIP own session mechanism
-
             sessionBusiness.createLoginCookies(request, response, session); // creates VIP cookies and session
-        } catch (BusinessException | UnsupportedEncodingException e) {
+        } catch (VipException | UnsupportedEncodingException e) {
             throw new ApiException(ApiException.ApiError.WRONG_OIDC_LOGIN, e);
         }
 

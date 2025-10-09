@@ -1,39 +1,26 @@
-/*
- * Copyright and authors: see LICENSE.txt in base repository.
- *
- * This software is a web portal for pipeline execution on distributed systems.
- *
- * This software is governed by the CeCILL-B license under French law and
- * abiding by the rules of distribution of free software.  You can  use,
- * modify and/ or redistribute the software under the terms of the CeCILL-B
- * license as circulated by CEA, CNRS and INRIA at the following URL
- * "http://www.cecill.info".
- *
- * As a counterpart to the access to the source code and  rights to copy,
- * modify and redistribute granted by the license, users are provided only
- * with a limited warranty  and the software's author,  the holder of the
- * economic rights,  and the successive licensors  have only  limited
- * liability.
- *
- * In this respect, the user's attention is drawn to the risks associated
- * with loading,  using,  modifying and/or developing or reproducing the
- * software by the user in light of its specific status of free software,
- * that may mean  that it is complicated to manipulate,  and  that  also
- * therefore means  that it is reserved for developers  and  experienced
- * professionals having in-depth computer knowledge. Users are therefore
- * encouraged to load and test the software's suitability as regards their
- * requirements in conditions enabling the security of their systems and/or
- * data to be ensured and,  more generally, to use and operate it in the
- * same conditions as regards security.
- *
- * The fact that you are presently reading this means that you have had
- * knowledge of the CeCILL-B license and that you accept its terms.
- */
 package fr.insalyon.creatis.vip.api.business;
 
+import static fr.insalyon.creatis.vip.application.client.ApplicationConstants.INPUT_VALID_CHARS;
+
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.function.Supplier;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import fr.insalyon.creatis.moteur.plugins.workflowsdb.bean.WorkflowStatus;
-import fr.insalyon.creatis.vip.core.server.exception.ApiException;
-import fr.insalyon.creatis.vip.api.model.*;
+import fr.insalyon.creatis.vip.api.model.Execution;
+import fr.insalyon.creatis.vip.api.model.ExecutionStatus;
+import fr.insalyon.creatis.vip.api.model.PathProperties;
+import fr.insalyon.creatis.vip.api.model.Pipeline;
+import fr.insalyon.creatis.vip.api.model.PipelineParameter;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
 import fr.insalyon.creatis.vip.application.client.bean.InOutData;
 import fr.insalyon.creatis.vip.application.client.bean.Simulation;
@@ -41,22 +28,13 @@ import fr.insalyon.creatis.vip.application.client.bean.Task;
 import fr.insalyon.creatis.vip.application.client.view.monitor.SimulationStatus;
 import fr.insalyon.creatis.vip.application.server.business.SimulationBusiness;
 import fr.insalyon.creatis.vip.application.server.business.WorkflowBusiness;
+import fr.insalyon.creatis.vip.core.client.VipException;
 import fr.insalyon.creatis.vip.core.client.bean.Group;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
-import fr.insalyon.creatis.vip.core.server.business.BusinessException;
-import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import java.util.*;
-import java.util.Map.Entry;
-import java.util.function.Supplier;
-
 import fr.insalyon.creatis.vip.core.server.CarminProperties;
-import static fr.insalyon.creatis.vip.application.client.ApplicationConstants.INPUT_VALID_CHARS;
+import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
+import fr.insalyon.creatis.vip.core.server.exception.ApiException;
 
 /**
  *
@@ -138,46 +116,42 @@ public class ExecutionBusiness {
             } else {
                 throw new ApiException("no file name for job " + invocationId + " in execution " + executionId);
             }
-
-        } catch (BusinessException e) {
+        } catch (VipException e) {
             throw new ApiException(e);
         }
     }
 
 
-    public Execution getExample(String executionId) throws ApiException {
+
+    public Execution getExample(String executionId) throws VipException {
         return getExecution(executionId, false, true);
     }
 
-    public Execution getExecution(String executionId, boolean summarize) throws ApiException {
+    public Execution getExecution(String executionId, boolean summarize) throws VipException {
         return getExecution(executionId, summarize, false);
     }
 
     public Execution getExecution(String executionId, boolean summarize, boolean onlyExample)
-            throws ApiException {
-        try {
-            // Get simulation object
-            Simulation s = workflowBusiness.getSimulation(executionId, true); // check running execution for update
+            throws VipException {
+        // Get simulation object
+        Simulation s = workflowBusiness.getSimulation(executionId, true); // check running execution for update
 
-            // Return null if execution doesn't exist or is cleaned (cleaned status is not supported in Carmin)
-            if (s == null || s.getStatus() == SimulationStatus.Cleaned) {
-                logger.error("Error accessing invalid execution {}. (is cleaned : {})", executionId, s != null);
-                throw new ApiException(ApiException.ApiError.INVALID_EXECUTION_ID, executionId);
-            }
-
-            if (onlyExample && ! isSimulationAnExample(s)) {
-                logger.error("Error trying to get an non-example execution as example : {}", executionId);
-                throw new ApiException(ApiException.ApiError.INVALID_EXAMPLE_ID, executionId);
-            }
-
-            return getExecutionFromSimulation(s, summarize);
-
-        } catch (BusinessException ex) {
-            throw new ApiException(ex);
+        // Return null if execution doesn't exist or is cleaned (cleaned status is not
+        // supported in Carmin)
+        if (s == null || s.getStatus() == SimulationStatus.Cleaned) {
+            logger.error("Error accessing invalid execution {}. (is cleaned : {})", executionId, s != null);
+            throw new ApiException(ApiException.ApiError.INVALID_EXECUTION_ID, executionId);
         }
+
+        if (onlyExample && !isSimulationAnExample(s)) {
+            logger.error("Error trying to get an non-example execution as example : {}", executionId);
+            throw new ApiException(ApiException.ApiError.INVALID_EXAMPLE_ID, executionId);
+        }
+
+        return getExecutionFromSimulation(s, summarize);
     }
 
-    private Execution getExecutionFromSimulation(Simulation s, boolean summarize) throws BusinessException {
+    private Execution getExecutionFromSimulation(Simulation s, boolean summarize) throws VipException {
         // Build Carmin's execution object
         Execution e = new Execution(
                 s.getID(),
@@ -277,7 +251,7 @@ public class ExecutionBusiness {
             }
             logger.debug("Returning {} executions", executions.size());
             return executions;
-        } catch (BusinessException ex) {
+        } catch (VipException ex) {
             throw new ApiException(ex);
         }
     }
@@ -297,7 +271,7 @@ public class ExecutionBusiness {
                 executions.add(getExecutionFromSimulation(simulation, true));
             }
             return executions;
-        } catch (BusinessException e) {
+        } catch (VipException e) {
             throw new ApiException(e);
         }
     }
@@ -322,7 +296,7 @@ public class ExecutionBusiness {
             }
             logger.debug("After removing null and cleaned, found {}", count);
             return count;
-        } catch (BusinessException ex) {
+        } catch (VipException ex) {
             throw new ApiException(ex);
         }
     }
@@ -338,7 +312,7 @@ public class ExecutionBusiness {
             logger.info("updating execution " + execution.getIdentifier()
                     + " name to " + execution.getName());
             workflowBusiness.updateDescription(execution.getIdentifier(), execution.getName());
-        } catch (BusinessException e) {
+        } catch (VipException e) {
             throw new ApiException(e);
         }
     }
@@ -496,7 +470,7 @@ public class ExecutionBusiness {
                     applicationName,
                     applicationVersion,
                     executionName);
-        } catch (BusinessException ex) {
+        } catch (VipException ex) {
             throw new ApiException(ex);
         }
     }
@@ -504,7 +478,7 @@ public class ExecutionBusiness {
     public void killExecution(String executionId) throws ApiException {
         try {
             workflowBusiness.kill(executionId);
-        } catch (BusinessException ex) {
+        } catch (VipException ex) {
             throw new ApiException(ex);
         }
     }
@@ -520,7 +494,7 @@ public class ExecutionBusiness {
             // Note: this won't delete the intermediate files in case the execution was run locally, which violates the spec.
             // Purge should be called in that case but purge also violates the spec.
             workflowBusiness.clean(executionId, currentUserProvider.get().getEmail(), deleteFiles);
-        } catch (BusinessException ex) {
+        } catch (VipException ex) {
             throw new ApiException(ex);
         }
     }
@@ -533,7 +507,7 @@ public class ExecutionBusiness {
         try {
             outputs = workflowBusiness.getOutputData(
                 executionId, currentUserProvider.get().getFolder());
-        } catch (BusinessException e) {
+        } catch (VipException e) {
             throw new ApiException(e);
         }
         for (InOutData output : outputs) {
@@ -575,8 +549,8 @@ public class ExecutionBusiness {
             }
             logger.error("Permission denied for {} on exec {}", user, executionId);
             throw new ApiException("Permission denied");
-        } catch (BusinessException ex) {
-            throw new ApiException(ex);
+        } catch (VipException ex) {
+            throw new ApiException(ex.getMessage(), ex);
         }
 
     }
