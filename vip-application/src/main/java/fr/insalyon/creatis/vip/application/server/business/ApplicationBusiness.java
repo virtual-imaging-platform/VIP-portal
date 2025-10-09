@@ -1,34 +1,3 @@
-/*
- * Copyright and authors: see LICENSE.txt in base repository.
- *
- * This software is a web portal for pipeline execution on distributed systems.
- *
- * This software is governed by the CeCILL-B license under French law and
- * abiding by the rules of distribution of free software.  You can  use,
- * modify and/ or redistribute the software under the terms of the CeCILL-B
- * license as circulated by CEA, CNRS and INRIA at the following URL
- * "http://www.cecill.info".
- *
- * As a counterpart to the access to the source code and  rights to copy,
- * modify and redistribute granted by the license, users are provided only
- * with a limited warranty  and the software's author,  the holder of the
- * economic rights,  and the successive licensors  have only  limited
- * liability.
- *
- * In this respect, the user's attention is drawn to the risks associated
- * with loading,  using,  modifying and/or developing or reproducing the
- * software by the user in light of its specific status of free software,
- * that may mean  that it is complicated to manipulate,  and  that  also
- * therefore means  that it is reserved for developers  and  experienced
- * professionals having in-depth computer knowledge. Users are therefore
- * encouraged to load and test the software's suitability as regards their
- * requirements in conditions enabling the security of their systems and/or
- * data to be ensured and,  more generally, to use and operate it in the
- * same conditions as regards security.
- *
- * The fact that you are presently reading this means that you have had
- * knowledge of the CeCILL-B license and that you accept its terms.
- */
 package fr.insalyon.creatis.vip.application.server.business;
 
 import java.util.ArrayList;
@@ -47,11 +16,11 @@ import org.springframework.transaction.annotation.Transactional;
 import fr.insalyon.creatis.vip.application.client.bean.AppVersion;
 import fr.insalyon.creatis.vip.application.client.bean.Application;
 import fr.insalyon.creatis.vip.application.server.dao.ApplicationDAO;
+import fr.insalyon.creatis.vip.core.client.VipException;
 import fr.insalyon.creatis.vip.core.client.bean.Group;
 import fr.insalyon.creatis.vip.core.client.bean.GroupType;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.user.UserLevel;
-import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.business.GroupBusiness;
 import fr.insalyon.creatis.vip.core.server.business.PageBuilder;
 import fr.insalyon.creatis.vip.core.server.business.base.CommonBusiness;
@@ -80,7 +49,7 @@ public class ApplicationBusiness extends CommonBusiness {
     }
 
     @VIPExternalSafe
-    public void add(Application app) throws BusinessException {
+    public void add(Application app) throws VipException {
         permissions.checkLevel(UserLevel.Administrator, UserLevel.Developer);
 
         if (userSupplier.get().getLevel().equals(UserLevel.Developer)) {
@@ -95,12 +64,12 @@ public class ApplicationBusiness extends CommonBusiness {
                 associate(app, new Group(groupName));
             }
         } catch (DAOException ex) {
-            throw new BusinessException(ex);
+            throw new VipException(ex);
         }
     }
 
     @VIPExternalSafe
-    public void remove(String name) throws BusinessException {
+    public void remove(String name) throws VipException {
         Application app = getApplication(name); // not safe, do not return to user!
 
         if (app == null) {
@@ -118,12 +87,12 @@ public class ApplicationBusiness extends CommonBusiness {
             logger.trace("Removing application: {}", name);
             applicationDAO.remove(name);
         } catch (DAOException ex) {
-            throw new BusinessException(ex);
+            throw new VipException(ex);
         }
     }
 
     @VIPExternalSafe
-    public void update(Application app) throws BusinessException {
+    public void update(Application app) throws VipException {
         Application existingApp = getApplication(app.getName()); // not safe, do not return to user!
 
         permissions.checkLevel(UserLevel.Administrator, UserLevel.Developer);
@@ -146,12 +115,12 @@ public class ApplicationBusiness extends CommonBusiness {
                 dissociate(app, new Group(group));
             }
         } catch (DAOException ex) {
-            throw new BusinessException(ex);
+            throw new VipException(ex);
         }
     }
 
     @VIPExternalSafe
-    public Application get(String name) throws BusinessException {
+    public Application get(String name) throws VipException {
         List<Application> apps = getUserContextApplications();
 
         return apps.stream().filter((app) -> name.equals(app.getName()))
@@ -159,7 +128,7 @@ public class ApplicationBusiness extends CommonBusiness {
     }
 
     @VIPExternalSafe
-    public PrecisePage<Application> get(int offset, int quantity, String group) throws BusinessException {
+    public PrecisePage<Application> get(int offset, int quantity, String group) throws VipException {
         List<Application> apps;
 
         // permissions
@@ -175,7 +144,7 @@ public class ApplicationBusiness extends CommonBusiness {
     }
 
     @VIPExternalSafe
-    public List<Application> getUserContextApplications() throws BusinessException {
+    public List<Application> getUserContextApplications() throws VipException {
         User user = userSupplier.get();
 
         if (user.isSystemAdministrator()) {
@@ -185,24 +154,24 @@ public class ApplicationBusiness extends CommonBusiness {
         }
     }
 
-    public Application getApplication(String applicationName) throws BusinessException {
+    public Application getApplication(String applicationName) throws VipException {
         try {
             return mapGroups(applicationDAO.getApplication(applicationName));
         } catch (DAOException ex) {
-            throw new BusinessException(ex);
+            throw new VipException(ex);
         }
     }
 
-    public List<Application> getApplications() throws BusinessException {
+    public List<Application> getApplications() throws VipException {
         try {
             return mapGroups(applicationDAO.getApplications());
         } catch (DAOException ex) {
-            throw new BusinessException(ex);
+            throw new VipException(ex);
         }
     }
 
     @VIPExternalSafe
-    public List<Application> getApplications(User user) throws BusinessException {
+    public List<Application> getApplications(User user) throws VipException {
         // this perform permissions filtering based on user group's membership
         // if you perform this function as an Admin you will only get
         // applications of groups you belong to.
@@ -224,23 +193,23 @@ public class ApplicationBusiness extends CommonBusiness {
         return result;
     }
 
-    public List<Application> getApplications(Group group) throws BusinessException {
+    public List<Application> getApplications(Group group) throws VipException {
         try {
             return mapGroups(applicationDAO.getApplicationsByGroup(group));
         } catch (DAOException ex) {
-            throw new BusinessException(ex);
+            throw new VipException(ex);
         }
     }
 
-    public List<Application> getApplicationsWithOwner(String email) throws BusinessException {
+    public List<Application> getApplicationsWithOwner(String email) throws VipException {
         try {
             return mapGroups(applicationDAO.getApplicationsWithOwner(email));
         } catch (DAOException ex) {
-            throw new BusinessException(ex);
+            throw new VipException(ex);
         }
     }
 
-    public List<Application> getPublicApplications() throws BusinessException {
+    public List<Application> getPublicApplications() throws VipException {
         List<Group> publicAppGroups = groupBusiness.getPublic()
             .stream()
             .filter((g) -> g.getType().equals(GroupType.APPLICATION))
@@ -261,7 +230,7 @@ public class ApplicationBusiness extends CommonBusiness {
                 .stream().sorted(Comparator.comparing(Application::getName)).collect(Collectors.toList());
     }
 
-    public List<String> getApplicationNames() throws BusinessException {
+    public List<String> getApplicationNames() throws VipException {
         List<String> applicationNames = new ArrayList<String>();
         for (Application application : getApplications()) {
             applicationNames.add(application.getName());
@@ -269,36 +238,36 @@ public class ApplicationBusiness extends CommonBusiness {
         return applicationNames;
     }
 
-    public String getCitation(String name) throws BusinessException {
+    public String getCitation(String name) throws VipException {
         try {
             return applicationDAO.getCitation(name);
         } catch (DAOException ex) {
-            throw new BusinessException(ex);
+            throw new VipException(ex);
         }
     }
 
-    public void associate(Application app, Group group) throws BusinessException {
+    public void associate(Application app, Group group) throws VipException {
         app = getApplication(app.getName());
         group = groupBusiness.get(group.getName());
 
         try {
             applicationDAO.associate(app, group);
         } catch (DAOException e) {
-            throw new BusinessException(e);
+            throw new VipException(e);
         }
     }
 
-    public void dissociate(Application app, Group group) throws BusinessException {
+    public void dissociate(Application app, Group group) throws VipException {
         try {
             applicationDAO.dissociate(app, group);
         } catch (DAOException e) {
-            throw new BusinessException(e);
+            throw new VipException(e);
         }
     }
 
     // this function need to only map groups that user can see
     // otherwise it will lead to permission leak issues
-    private Application mapGroups(Application app) throws BusinessException {
+    private Application mapGroups(Application app) throws VipException {
         List<Group> appGroups;
 
         if (app == null) {
@@ -311,7 +280,7 @@ public class ApplicationBusiness extends CommonBusiness {
         }
     }
 
-    private List<Application> mapGroups(List<Application> apps) throws BusinessException {
+    private List<Application> mapGroups(List<Application> apps) throws VipException {
         for (Application app : apps) {
             mapGroups(app);
         }

@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import fr.insalyon.creatis.vip.core.client.VipException;
 import fr.insalyon.creatis.vip.core.client.bean.Group;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
@@ -117,7 +118,7 @@ public class VipSessionBusiness {
             }
             return null;
 
-        } catch (BusinessException e) {
+        } catch (VipException e) {
             throw new CoreException(e);
         }
     }
@@ -143,7 +144,7 @@ public class VipSessionBusiness {
         try {
             User user = configurationBusiness.getUser(email);
             return setUserInSession(user, session);
-        } catch (BusinessException e) {
+        } catch (VipException e) {
             throw new CoreException(e);
         }
     }
@@ -159,7 +160,7 @@ public class VipSessionBusiness {
             session.setAttribute(CoreConstants.SESSION_GROUPS, groups);
 
             return user;
-        } catch (BusinessException e) {
+        } catch (VipException e) {
             throw new CoreException(e);
         }
     }

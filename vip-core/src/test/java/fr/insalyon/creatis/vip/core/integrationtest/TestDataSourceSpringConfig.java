@@ -1,5 +1,7 @@
 package fr.insalyon.creatis.vip.core.integrationtest;
 
+import javax.sql.DataSource;
+
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
@@ -7,8 +9,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
-
-import javax.sql.DataSource;
 
 /**
  * h2 memory embedded database for tests, which is erased at the end of a

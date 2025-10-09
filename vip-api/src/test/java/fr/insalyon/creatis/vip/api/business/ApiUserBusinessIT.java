@@ -1,22 +1,23 @@
 package fr.insalyon.creatis.vip.api.business;
 
-import fr.insalyon.creatis.vip.core.server.exception.ApiException;
-import fr.insalyon.creatis.vip.core.client.bean.Group;
-import fr.insalyon.creatis.vip.core.client.bean.GroupType;
-import fr.insalyon.creatis.vip.core.client.bean.User;
-import fr.insalyon.creatis.vip.core.client.view.util.CountryCode;
-import fr.insalyon.creatis.vip.core.integrationtest.database.BaseSpringIT;
-import fr.insalyon.creatis.vip.core.server.business.BusinessException;
-import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
+import static fr.insalyon.creatis.vip.core.client.view.user.UserLevel.Beginner;
+
+import java.sql.Timestamp;
+import java.util.Date;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.sql.Timestamp;
-import java.util.Date;
-
-import static fr.insalyon.creatis.vip.core.client.view.user.UserLevel.Beginner;
+import fr.insalyon.creatis.vip.core.client.VipException;
+import fr.insalyon.creatis.vip.core.client.bean.Group;
+import fr.insalyon.creatis.vip.core.client.bean.GroupType;
+import fr.insalyon.creatis.vip.core.client.bean.User;
+import fr.insalyon.creatis.vip.core.client.view.util.CountryCode;
+import fr.insalyon.creatis.vip.core.integrationtest.database.BaseSpringIT;
+import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
+import fr.insalyon.creatis.vip.core.server.exception.ApiException;
 
 public class ApiUserBusinessIT extends BaseSpringIT {
 
@@ -41,24 +42,24 @@ public class ApiUserBusinessIT extends BaseSpringIT {
     }
 
     @Test
-    public void testInitialization() throws ApiException, BusinessException {
+    public void testInitialization() throws ApiException, VipException {
         Assertions.assertEquals(2, configurationBusiness.getUsers().size(), "Incorrect number of users"); // admin + user1
     }
 
     @Test
-    public void testSignup() throws ApiException, BusinessException {
+    public void testSignup() throws ApiException, VipException {
         User user2 = new User("firstName2", "lastName2", "email2@test.fr", "test3@test.fr", "institution", "password", false, "code", "folder", "session", new Date(), new Date(), Beginner, CountryCode.fr, 1, new Timestamp(System.currentTimeMillis()), new Timestamp(System.currentTimeMillis()), 0, false);
         apiUserBusiness.signup(user2, "comment");
         Assertions.assertEquals(3, configurationBusiness.getUsers().size(), "Incorrect number of users");
     }
 
     @Test
-    public void testResetPassword() throws ApiException, BusinessException {
+    public void testResetPassword() throws ApiException, VipException {
         apiUserBusiness.resetPassword("email1@test.fr", configurationBusiness.getUser("email1@test.fr").getCode(), "test new password");
     }
 
     @Test
-    public void testResetCode() throws ApiException, BusinessException {
+    public void testResetCode() throws ApiException, VipException {
         String oldCode = configurationBusiness.getUser("email1@test.fr").getCode();
         apiUserBusiness.sendResetCode("email1@test.fr");
         String newCode = configurationBusiness.getUser("email1@test.fr").getCode();

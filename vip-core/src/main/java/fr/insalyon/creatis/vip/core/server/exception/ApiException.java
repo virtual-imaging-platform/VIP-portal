@@ -5,10 +5,6 @@ import org.springframework.http.HttpStatus;
 
 import java.util.Optional;
 
-/**
- *
- * @author Tristan Glatard
- */
 public class ApiException extends VipException {
 
     /* Reserved codes : 8xxx : vip-api */
