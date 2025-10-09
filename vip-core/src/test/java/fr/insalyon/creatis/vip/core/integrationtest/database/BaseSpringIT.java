@@ -18,7 +18,6 @@ import fr.insalyon.creatis.vip.core.client.view.util.CountryCode;
 import fr.insalyon.creatis.vip.core.integrationtest.ServerMockConfig;
 import fr.insalyon.creatis.vip.core.integrationtest.TestConfigurer;
 import fr.insalyon.creatis.vip.core.server.SpringCoreConfig;
-import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
 import fr.insalyon.creatis.vip.core.server.business.EmailBusiness;
 import fr.insalyon.creatis.vip.core.server.business.GroupBusiness;
@@ -128,26 +127,26 @@ public abstract class BaseSpringIT {
         assertEquals(expectedNb, rowsNb);
     }
 
-    protected User createUser(String email, UserLevel level) throws GRIDAClientException, BusinessException {
+    protected User createUser(String email, UserLevel level) throws GRIDAClientException, VipException {
         User u = createUser(email, UUID.randomUUID().toString().substring(0, 4));
 
         configurationBusiness.updateUser(u.getEmail(), level, u.getCountryCode(), u.getMaxRunningSimulations(), false);
         return configurationBusiness.getUser(email);
     }
 
-    protected User createUser(String testEmail) throws GRIDAClientException, BusinessException {
+    protected User createUser(String testEmail) throws GRIDAClientException, VipException {
         return createUser(testEmail, "");
     }
 
-    protected User createUserWithPassword(String testEmail, String password) throws GRIDAClientException, BusinessException {
+    protected User createUserWithPassword(String testEmail, String password) throws GRIDAClientException, VipException {
         return createUser(testEmail, "", password);
     }
 
-    protected User createUser(String testEmail, String nameSuffix) throws GRIDAClientException, BusinessException {
+    protected User createUser(String testEmail, String nameSuffix) throws GRIDAClientException, VipException {
         return createUser(testEmail, nameSuffix, "testPassword");
     }
 
-    protected User createUser(String testEmail, String nameSuffix, String password) throws GRIDAClientException, BusinessException {
+    protected User createUser(String testEmail, String nameSuffix, String password) throws GRIDAClientException, VipException {
         User newUser = new User("test firstName " + nameSuffix,
                 "test lastName " + nameSuffix, testEmail, "test institution",
                 password, CountryCode.fr,
@@ -157,27 +156,27 @@ public abstract class BaseSpringIT {
         return newUser;
     }
 
-    protected User createUserInGroup(String userEmail, String groupName) throws BusinessException, GRIDAClientException {
+    protected User createUserInGroup(String userEmail, String groupName) throws VipException, GRIDAClientException {
         return createUserInGroup(userEmail, "", groupName);
     }
 
-    protected User createUserInGroup(String userEmail, String nameSuffix, String groupName) throws BusinessException, GRIDAClientException {
+    protected User createUserInGroup(String userEmail, String nameSuffix, String groupName) throws VipException, GRIDAClientException {
         return createUserInGroups(userEmail, nameSuffix, groupName);
     }
 
-    public void createGroup(String groupName) throws BusinessException {
+    public void createGroup(String groupName) throws VipException {
         groupBusiness.add(new Group(groupName, true, GroupType.APPLICATION));
     }
 
-    public void createGroup(String groupName, GroupType type) throws BusinessException {
+    public void createGroup(String groupName, GroupType type) throws VipException {
         groupBusiness.add(new Group(groupName, true, type));
     }
 
-    public void createGroup(String groupName, GroupType type, Boolean isPublic) throws BusinessException {
+    public void createGroup(String groupName, GroupType type, Boolean isPublic) throws VipException {
         groupBusiness.add(new Group(groupName, isPublic, type));
     }
 
-    public void setAdminContext() throws BusinessException, GRIDAClientException {
+    public void setAdminContext() throws VipException, GRIDAClientException {
         SessionAuthenticationProvider provider = new SessionAuthenticationProvider();
         User adminUser = configurationBusiness.getUserWithGroups(adminEmail);
 
@@ -188,7 +187,7 @@ public abstract class BaseSpringIT {
         return SecurityMockMvcRequestPostProcessors.user(new SpringPrincipalUser(user));
     }
 
-    protected User createUserInGroups(String userEmail, String nameSuffix, String... groupNames) throws BusinessException, GRIDAClientException {
+    protected User createUserInGroups(String userEmail, String nameSuffix, String... groupNames) throws VipException, GRIDAClientException {
         User newUser = new User("test firstName " + nameSuffix,
                 "test lastName " + nameSuffix, userEmail, "test institution",
                 "testPassword", CountryCode.fr,

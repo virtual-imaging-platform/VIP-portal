@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import fr.insalyon.creatis.grida.client.GRIDAClient;
 import fr.insalyon.creatis.grida.client.GRIDAClientException;
 import fr.insalyon.creatis.grida.client.GRIDAPoolClient;
+import fr.insalyon.creatis.vip.core.client.VipException;
 import fr.insalyon.creatis.vip.core.client.bean.Group;
 import fr.insalyon.creatis.vip.core.client.bean.GroupType;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
@@ -39,7 +40,7 @@ public class GroupBusiness {
         this.gridaPoolClient = gridaPoolClient;
     }
 
-    public void add(Group group) throws BusinessException {
+    public void add(Group group) throws VipException {
         try {
             checkAuto(group);
             gridaClient.createFolder(server.getDataManagerGroupsHome(),
@@ -48,27 +49,27 @@ public class GroupBusiness {
             groupDAO.add(group);
         } catch (GRIDAClientException ex) {
             logger.error("Error adding group : {}", group.getName(), ex);
-            throw new BusinessException(ex);
+            throw new VipException(ex);
         } catch (DAOException ex) {
-            throw new BusinessException(ex);
+            throw new VipException(ex);
         }
     }
 
     public void remove(String user, String groupName)
-            throws BusinessException {
+            throws VipException {
         try {
             gridaPoolClient.delete(server.getDataManagerGroupsHome() + "/"
                     + groupName.replaceAll(" ", "_"), user);
             groupDAO.remove(groupName);
         } catch (GRIDAClientException ex) {
             logger.error("Error removing group : {}", groupName, ex);
-            throw new BusinessException(ex);
+            throw new VipException(ex);
         } catch (DAOException ex) {
-            throw new BusinessException(ex);
+            throw new VipException(ex);
         }
     }
 
-    public void update(String name, Group group) throws BusinessException {
+    public void update(String name, Group group) throws VipException {
         try {
             checkAuto(group);
             if ( ! name.equals(group.getName())) {
@@ -79,21 +80,21 @@ public class GroupBusiness {
             groupDAO.update(name, group);
         } catch (GRIDAClientException ex) {
             logger.error("Error updating group : {}", name, ex);
-            throw new BusinessException(ex);
+            throw new VipException(ex);
         } catch (DAOException ex) {
-            throw new BusinessException(ex);
+            throw new VipException(ex);
         }
     }
 
-    public List<Group> get() throws BusinessException {
+    public List<Group> get() throws VipException {
         try {
             return groupDAO.get();
         } catch (DAOException ex) {
-            throw new BusinessException(ex);
+            throw new VipException(ex);
         }
     }
 
-    public Group get(String groupName) throws BusinessException {
+    public Group get(String groupName) throws VipException {
         if (groupName == null) {
             return null;
         }
@@ -102,49 +103,49 @@ public class GroupBusiness {
                 .findAny().orElse(null);
     }
 
-    public List<Group> getPublic() throws BusinessException {
+    public List<Group> getPublic() throws VipException {
         return get().stream()
             .filter((g) -> g.isPublicGroup())
             .collect(Collectors.toList());
     }
 
-    public List<Group> getByType(GroupType type) throws BusinessException {
+    public List<Group> getByType(GroupType type) throws VipException {
         try {
             return groupDAO.getByType(type);
         } catch (DAOException e) {
-            throw new BusinessException(e);
+            throw new VipException(e);
         }
     }
 
-    public List<Group> getByApplication(String appName) throws BusinessException {
+    public List<Group> getByApplication(String appName) throws VipException {
         try {
             return groupDAO.getByApplication(appName);
         } catch (DAOException e) {
-            throw new BusinessException(e);
+            throw new VipException(e);
         }
     }
 
-    public Set<Group> getByResource(String ressourceName) throws BusinessException {
+    public Set<Group> getByResource(String ressourceName) throws VipException {
         try {
             return groupDAO.getByRessource(ressourceName);
         } catch (DAOException e) {
-            throw new BusinessException(e);
+            throw new VipException(e);
         }
     }
 
-    public void checkAuto(Group group) throws BusinessException {
+    public void checkAuto(Group group) throws VipException {
         if (group.isAuto()) {
             Group existing = getByType(group.getType()).stream().filter((g) -> g.isAuto()).findFirst().orElse(null);
 
             if ( ! group.isPublicGroup()) {
-                throw new BusinessException("You can only create public auto groups!");
+                throw new VipException("You can only create public auto groups!");
             } else if (existing != null && ! existing.getName().equals(group.getName())) {
-                throw new BusinessException("You can't have multiples auto groups of the same type!");
+                throw new VipException("You can't have multiples auto groups of the same type!");
             }
         }
     }
 
-    public String getWarningSameVisibility(Set<String> groupNames) throws BusinessException {
+    public String getWarningSameVisibility(Set<String> groupNames) throws VipException {
         List<Group> groups = new ArrayList<>();
 
         for (String name : groupNames) {

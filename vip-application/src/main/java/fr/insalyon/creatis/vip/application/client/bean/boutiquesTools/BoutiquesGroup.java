@@ -4,12 +4,6 @@ import com.google.gwt.user.client.rpc.IsSerializable;
 
 import java.util.Set;
 
-/**
- * Representation of a group in an application Boutiques descriptor
- *
- * @author Guillaume Vanel
- * @version %I%, %G%
- */
 public class BoutiquesGroup implements IsSerializable {
 
     private String id;

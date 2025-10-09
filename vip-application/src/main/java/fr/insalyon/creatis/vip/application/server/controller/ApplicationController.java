@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import fr.insalyon.creatis.vip.application.client.bean.Application;
 import fr.insalyon.creatis.vip.application.server.business.ApplicationBusiness;
-import fr.insalyon.creatis.vip.core.server.business.BusinessException;
+import fr.insalyon.creatis.vip.core.client.VipException;
 import fr.insalyon.creatis.vip.core.server.exception.ApiException;
 import fr.insalyon.creatis.vip.core.server.model.PrecisePage;
 import jakarta.validation.Valid;
@@ -39,7 +39,7 @@ public class ApplicationController {
             @RequestParam(defaultValue = "10") @Positive @Max(value = 50) int quantity, @RequestParam Optional<String> group) throws ApiException {
         try {
             return applicationBusiness.get(offset, quantity, group.orElse(null));
-        } catch (BusinessException e) {
+        } catch (VipException e) {
             throw new ApiException(e);
         }
     }
@@ -54,7 +54,7 @@ public class ApplicationController {
             } else {
                 return app;
             }
-        } catch (BusinessException e) {
+        } catch (VipException e) {
             throw new ApiException(e);
         }
     }
@@ -69,7 +69,7 @@ public class ApplicationController {
             } else {
                 applicationBusiness.remove(id);
             }
-        } catch (BusinessException e) {
+        } catch (VipException e) {
             throw new ApiException(e);
         }
     }
@@ -88,7 +88,7 @@ public class ApplicationController {
                     applicationBusiness.update(app);
                 }
                 return applicationBusiness.getApplication(id);
-            } catch (BusinessException e) {
+            } catch (VipException e) {
                 throw new ApiException(e);
             }
         }

@@ -9,11 +9,11 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import fr.insalyon.creatis.vip.core.client.VipException;
 import fr.insalyon.creatis.vip.core.client.bean.Group;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.user.UserLevel;
-import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 
 @Service
 public class CorePermissions {
@@ -25,7 +25,7 @@ public class CorePermissions {
         this.uSupplier = uSupplier;
     }
 
-    public void checkLevel(UserLevel... authorizedLevels) throws BusinessException {
+    public void checkLevel(UserLevel... authorizedLevels) throws VipException {
         User user = uSupplier.get();
 
         for (UserLevel level: authorizedLevels) {
@@ -33,10 +33,10 @@ public class CorePermissions {
                 return;
             }
         }
-        throw new BusinessException(CoreConstants.NOT_RIGHT);
+        throw new VipException(CoreConstants.NOT_RIGHT);
     }
 
-    public void checkOnlyUserPrivateGroups(Set<Group> groupsToCheck) throws BusinessException {
+    public void checkOnlyUserPrivateGroups(Set<Group> groupsToCheck) throws VipException {
         User user = uSupplier.get();
         Set<Group> userGroups = user.getGroups();
 
@@ -46,7 +46,7 @@ public class CorePermissions {
         for (Group group : groupsToCheck) {
             // check ONLY user groups and ONLY privates groups
             if ( ! userGroups.contains(group) || group.isPublicGroup()) {
-                throw new BusinessException(CoreConstants.NOT_RIGHT);
+                throw new VipException(CoreConstants.NOT_RIGHT);
             }
         }
     }
@@ -64,15 +64,15 @@ public class CorePermissions {
         return result;
     }
 
-    public <T> void checkItemInList(T item, List<T> list) throws BusinessException {
+    public <T> void checkItemInList(T item, List<T> list) throws VipException {
         if ( ! list.contains(item)) {
-            throw new BusinessException(CoreConstants.NOT_RIGHT);
+            throw new VipException(CoreConstants.NOT_RIGHT);
         }
     }
 
-    public <T> void checkUnchanged(T a, T b) throws BusinessException {
+    public <T> void checkUnchanged(T a, T b) throws VipException {
         if (!a.equals(b)) {
-            throw new BusinessException(CoreConstants.NOT_RIGHT); 
+            throw new VipException(CoreConstants.NOT_RIGHT); 
         }
     }
 }

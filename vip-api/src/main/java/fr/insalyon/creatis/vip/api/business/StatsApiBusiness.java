@@ -1,20 +1,5 @@
 package fr.insalyon.creatis.vip.api.business;
 
-import fr.insalyon.creatis.vip.core.server.exception.ApiException;
-import fr.insalyon.creatis.vip.core.server.exception.ApiException.ApiError;
-import fr.insalyon.creatis.vip.api.model.stats.StatUser;
-import fr.insalyon.creatis.vip.api.model.stats.UsersList;
-import fr.insalyon.creatis.vip.api.model.stats.UsersNumber;
-import fr.insalyon.creatis.vip.core.client.bean.User;
-import fr.insalyon.creatis.vip.core.client.view.util.CountryCode;
-import fr.insalyon.creatis.vip.core.server.business.BusinessException;
-import fr.insalyon.creatis.vip.core.server.business.StatsBusiness;
-import fr.insalyon.creatis.vip.core.server.business.StatsBusiness.UserSearchCriteria;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Month;
@@ -23,6 +8,22 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import fr.insalyon.creatis.vip.api.model.stats.StatUser;
+import fr.insalyon.creatis.vip.api.model.stats.UsersList;
+import fr.insalyon.creatis.vip.api.model.stats.UsersNumber;
+import fr.insalyon.creatis.vip.core.client.VipException;
+import fr.insalyon.creatis.vip.core.client.bean.User;
+import fr.insalyon.creatis.vip.core.client.view.util.CountryCode;
+import fr.insalyon.creatis.vip.core.server.business.StatsBusiness;
+import fr.insalyon.creatis.vip.core.server.business.StatsBusiness.UserSearchCriteria;
+import fr.insalyon.creatis.vip.core.server.exception.ApiException;
+import fr.insalyon.creatis.vip.core.server.exception.ApiException.ApiError;
 
 @Service
 public class StatsApiBusiness {
@@ -48,7 +49,7 @@ public class StatsApiBusiness {
         Long usersRegisteredNumber;
         try {
             usersRegisteredNumber = statsBusiness.getUsersRegisteredNumber(searchCriteria);
-        } catch (BusinessException e) {
+        } catch (VipException e) {
             throw new ApiException(e);
         }
         // build response object
@@ -156,7 +157,7 @@ public class StatsApiBusiness {
         List<User> users;
         try {
             users = statsBusiness.getUsersRegistered(searchCriteria);
-        } catch (BusinessException ex) {
+        } catch (VipException ex) {
             throw new ApiException(ex);
         }
         List<StatUser> statUsers = users

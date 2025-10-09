@@ -3,12 +3,6 @@ package fr.insalyon.creatis.vip.application.client.bean.boutiquesTools;
 import java.util.Map;
 import java.util.Set;
 
-/**
- * Representation of an Flag input in an application Boutiques descriptor
- *
- * @author Guillaume Vanel
- * @version %I%, %G%
- */
 public class BoutiquesFlagInput extends BoutiquesInput {
     private boolean defaultValue;
 

@@ -11,9 +11,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import fr.insalyon.creatis.vip.core.client.VipException;
 import fr.insalyon.creatis.vip.core.client.bean.User;
-import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
-import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
 import fr.insalyon.creatis.vip.core.server.business.SessionBusiness;
 import fr.insalyon.creatis.vip.core.server.exception.ApiException;
@@ -49,7 +48,7 @@ public class SessionController {
             configurationBusiness.updateUserLastLogin(user.getEmail());
 
             return session;
-        } catch (UnsupportedEncodingException | BusinessException e) {
+        } catch (UnsupportedEncodingException | VipException e) {
             throw new ApiException("Failed to retrieve user session!", e);
         }
     }
@@ -63,7 +62,7 @@ public class SessionController {
 
             sessionBusiness.createLoginCookies(request, response, session);
             return session;
-        } catch (UnsupportedEncodingException | BusinessException e) {
+        } catch (UnsupportedEncodingException | VipException e) {
             if (e.getMessage().startsWith("Authentication failed")) {
                 throw new ApiException(ApiException.ApiError.BAD_CREDENTIALS);
             }
@@ -77,7 +76,7 @@ public class SessionController {
             sessionBusiness.signout();
             sessionBusiness.clearLoginCookies(response);
 
-        } catch (BusinessException e) {
+        } catch (VipException e) {
             throw new ApiException(e); // change
         }
     }

@@ -1,15 +1,15 @@
 package fr.insalyon.creatis.vip.application.server.rpc;
 
+import java.util.List;
+
+import fr.insalyon.creatis.vip.application.client.bean.PublicExecution;
+import fr.insalyon.creatis.vip.application.client.rpc.ReproVipService;
 import fr.insalyon.creatis.vip.application.client.view.ApplicationException;
 import fr.insalyon.creatis.vip.application.server.business.PublicExecutionBusiness;
 import fr.insalyon.creatis.vip.application.server.business.ReproVipBusiness;
-import fr.insalyon.creatis.vip.application.client.bean.PublicExecution;
-import fr.insalyon.creatis.vip.application.client.rpc.ReproVipService;
-import fr.insalyon.creatis.vip.core.server.business.BusinessException;
+import fr.insalyon.creatis.vip.core.client.VipException;
 import fr.insalyon.creatis.vip.core.server.rpc.AbstractRemoteServiceServlet;
-
 import jakarta.servlet.ServletException;
-import java.util.List;
 
 public class ReproVipServiceImpl extends AbstractRemoteServiceServlet implements ReproVipService {
 
@@ -31,7 +31,7 @@ public class ReproVipServiceImpl extends AbstractRemoteServiceServlet implements
             } else {
                 publicExecutionBusiness.create(publicExecution);
             }
-        } catch (BusinessException e) {
+        } catch (VipException e) {
             throw new ApplicationException(e);
         }
     }
@@ -40,7 +40,7 @@ public class ReproVipServiceImpl extends AbstractRemoteServiceServlet implements
     public List<PublicExecution> getPublicExecutions() throws ApplicationException {
         try {
             return publicExecutionBusiness.getAll();
-        } catch (BusinessException e) {
+        } catch (VipException e) {
             throw new ApplicationException(e);
         }
     }
@@ -49,7 +49,7 @@ public class ReproVipServiceImpl extends AbstractRemoteServiceServlet implements
     public boolean doesExecutionExist(String experienceName) throws ApplicationException {
         try {
             return publicExecutionBusiness.exist(experienceName);
-        } catch (BusinessException e) {
+        } catch (VipException e) {
             throw new ApplicationException(e);
         }
     }
@@ -58,7 +58,7 @@ public class ReproVipServiceImpl extends AbstractRemoteServiceServlet implements
     public boolean canMakeExecutionPublic(List<String> workflowsIds) throws ApplicationException {
         try {
             return reproVipBusiness.canMakeExecutionPublic(workflowsIds);
-        } catch (BusinessException e) {
+        } catch (VipException e) {
             throw new ApplicationException(e);
         }
     }
@@ -80,7 +80,7 @@ public class ReproVipServiceImpl extends AbstractRemoteServiceServlet implements
             reproVipBusiness.deleteReproVipDirectory(experienceName);
             publicExecutionBusiness.updateStatus(experienceName, PublicExecution.PublicExecutionStatus.REQUESTED);
             return PublicExecution.PublicExecutionStatus.REQUESTED;
-        } catch (BusinessException e) {
+        } catch (VipException e) {
             throw new ApplicationException(e);
         }
     }
@@ -94,7 +94,7 @@ public class ReproVipServiceImpl extends AbstractRemoteServiceServlet implements
             publicExecutionBusiness.update(experienceName, exec);
             publicExecutionBusiness.updateStatus(experienceName, PublicExecution.PublicExecutionStatus.PUBLISHED);
             return PublicExecution.PublicExecutionStatus.PUBLISHED;
-        } catch (BusinessException e) {
+        } catch (VipException e) {
             throw new ApplicationException(e);
         }
     }

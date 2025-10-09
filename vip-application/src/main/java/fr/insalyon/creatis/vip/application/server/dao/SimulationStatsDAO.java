@@ -4,10 +4,7 @@ import fr.insalyon.creatis.moteur.plugins.workflowsdb.dao.WorkflowsDBDAOExceptio
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import java.util.List;
 
-/**
- *
- * @author Rafael Ferreira da Silva
- */
+
 public interface SimulationStatsDAO {
 
     public List<String> getBySimulationID(List<String> simulationID) throws DAOException;

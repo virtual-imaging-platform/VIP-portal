@@ -26,8 +26,6 @@ import java.util.List;
  *
  * Defines Spring security settings for all inbound requests on paths other than /rest/**,
  * which is handled in {@link RestApiSecurityConfig}
- *
- * Created by abonnet on 7/22/16.
  */
 
 @Configuration
