@@ -6,7 +6,6 @@ import static fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants.TR
 import static fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants.USERS_HOME;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -55,7 +54,6 @@ import fr.insalyon.creatis.vip.datamanager.server.business.LFCPermissionBusiness
 import fr.insalyon.creatis.vip.datamanager.server.business.LFCPermissionBusiness.LFCAccessType;
 import fr.insalyon.creatis.vip.datamanager.server.business.TransferPoolBusiness;
 import jakarta.annotation.PreDestroy;
-
 
 @Service
 public class DataApiBusiness {

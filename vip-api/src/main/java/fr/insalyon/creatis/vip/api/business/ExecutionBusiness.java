@@ -37,10 +37,6 @@ import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.server.CarminProperties;
 import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
 
-/**
- *
- * @author Tristan Glatard
- */
 @Service
 public class ExecutionBusiness {
 
