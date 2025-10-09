@@ -16,6 +16,22 @@ import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Mockito;
 import org.springframework.core.io.ClassPathResource;
 
+import static fr.insalyon.creatis.vip.api.data.UserTestUtils.baseUser2;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.when;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Path;
+
+import org.apache.commons.io.FileUtils;
+import org.hamcrest.Matchers;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
+import org.mockito.Mockito;
+import org.springframework.core.io.ClassPathResource;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import fr.insalyon.creatis.vip.api.model.UploadData;
