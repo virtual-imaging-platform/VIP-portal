@@ -46,11 +46,7 @@ public class StatsApiBusiness {
 
         // do search
         Long usersRegisteredNumber;
-        try {
-            usersRegisteredNumber = statsBusiness.getUsersRegisteredNumber(searchCriteria);
-        } catch (VipException e) {
-            throw new VipException(e);
-        }
+        usersRegisteredNumber = statsBusiness.getUsersRegisteredNumber(searchCriteria);
         // build response object
         LocalDate startDate = searchCriteria.getRegistrationStart();
         if (startDate == null) {
@@ -154,11 +150,8 @@ public class StatsApiBusiness {
             throws VipException {
 
         List<User> users;
-        try {
-            users = statsBusiness.getUsersRegistered(searchCriteria);
-        } catch (VipException ex) {
-            throw new VipException(ex);
-        }
+        users = statsBusiness.getUsersRegistered(searchCriteria);
+
         List<StatUser> statUsers = users
                 .stream()
                 .map(this::mapVipUserToStatUser)

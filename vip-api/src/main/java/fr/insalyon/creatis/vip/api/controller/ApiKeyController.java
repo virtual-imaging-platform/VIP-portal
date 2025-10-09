@@ -43,11 +43,7 @@ public class ApiKeyController extends ApiController{
     @GetMapping
     public List<UserApiKey> listUserApiKeys() throws VipException {
         logMethodInvocation(logger, "listUserApiKeys");
-        try {
-            return apiKeyBusiness.apiKeysFor(currentUser().getEmail());
-        } catch (VipException e) {
-            throw new VipException(e);
-        }
+        return apiKeyBusiness.apiKeysFor(currentUser().getEmail());
     }
 
     @PutMapping
@@ -55,22 +51,18 @@ public class ApiKeyController extends ApiController{
     public void addOrUpdateApiKey(@RequestBody @Valid KeyInfo keyInfo)
             throws VipException {
         logMethodInvocation(logger, "addOrUpdateApiKey");
-        try {
-            if (externalPlatformBusiness.listAll().stream()
+        if (externalPlatformBusiness.listAll().stream()
                 .noneMatch(ep -> ep.getIdentifier()
-                          .equals(keyInfo.storageIdentifier))) {
-                logger.error("Storage does not exist: {}", keyInfo.storageIdentifier);
-                throw new VipException(
+                        .equals(keyInfo.storageIdentifier))) {
+            logger.error("Storage does not exist: {}", keyInfo.storageIdentifier);
+            throw new VipException(
                     "Storage does not exist: " + keyInfo.storageIdentifier);
-            }
+        }
 
-            apiKeyBusiness.addOrUpdateApiKey(
+        apiKeyBusiness.addOrUpdateApiKey(
                 keyInfo.storageIdentifier,
                 currentUser().getEmail(),
                 keyInfo.apiKey);
-        } catch (VipException e) {
-            throw new VipException(e);
-        }
     }
 
     @RequestMapping(value = "/{storageIdentifier}",
@@ -79,12 +71,8 @@ public class ApiKeyController extends ApiController{
     public void deleteApiKey(@PathVariable String storageIdentifier)
             throws VipException {
         logMethodInvocation(logger, "deleteApiKey");
-        try {
-            apiKeyBusiness.deleteApiKey(
-                storageIdentifier, currentUser().getEmail());
-        } catch (VipException e) {
-            throw new VipException(e);
-        }
+        apiKeyBusiness.deleteApiKey(
+            storageIdentifier, currentUser().getEmail());
     }
 
     public static class KeyInfo {

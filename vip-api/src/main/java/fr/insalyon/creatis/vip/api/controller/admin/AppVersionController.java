@@ -39,16 +39,13 @@ public class AppVersionController extends ApiController {
     @RequestMapping(method = RequestMethod.GET)
     public List<AppVersion> listAppVersions() throws VipException {
         logMethodInvocation(logger, "listAppVersions");
-        try {
-            List<Application> apps = applicationBusiness.getApplications();
-            List<AppVersion> appVersions = new ArrayList<>();
-            for (Application app : apps) {
-                appVersions.addAll(appVersionBusiness.getVersions(app.getName()));
-            }
-            return appVersions;
-        } catch (VipException e) {
-            throw new VipException(e);
+        List<Application> apps = applicationBusiness.getApplications();
+        List<AppVersion> appVersions = new ArrayList<>();
+
+        for (Application app : apps) {
+            appVersions.addAll(appVersionBusiness.getVersions(app.getName()));
         }
+        return appVersions;
     }
 
     private class AppVersionStrings {
@@ -76,15 +73,12 @@ public class AppVersionController extends ApiController {
     public AppVersion getAppVersion(@PathVariable String appVersionId) throws VipException {
         logMethodInvocation(logger, "getAppVersion", appVersionId);
         AppVersionStrings input = parseAppVersionId(appVersionId);
-        try {
-            AppVersion appVersion = appVersionBusiness.getVersion(input.appName, input.version);
-            if (appVersion == null) {
-                throw new VipException(ApiError.INVALID_PIPELINE_IDENTIFIER, appVersionId);
-            }
-            return appVersion;
-        } catch (VipException e) {
-            throw new VipException(e);
+        AppVersion appVersion = appVersionBusiness.getVersion(input.appName, input.version);
+
+        if (appVersion == null) {
+            throw new VipException(ApiError.INVALID_PIPELINE_IDENTIFIER, appVersionId);
         }
+        return appVersion;
     }
 
     @RequestMapping(value = "{appVersionIdFirstPart}/{appVersionIdSecondPart}", method = RequestMethod.GET)
@@ -103,17 +97,13 @@ public class AppVersionController extends ApiController {
             logger.error("appVersionId mismatch: {}!={}", appVersionId, appVersionIdBody);
             throw new VipException(DefaultError.BAD_INPUT_FIELD, appVersionId);
         }
-        try {
-            AppVersion existingAppVersion = appVersionBusiness.getVersion(input.appName, input.version);
-            if (existingAppVersion == null) {
-                appVersionBusiness.add(appVersion);
-            } else {
-                appVersionBusiness.update(appVersion);
-            }
-            return appVersionBusiness.getVersion(input.appName, input.version);
-        } catch (VipException e) {
-            throw new VipException(e);
+        AppVersion existingAppVersion = appVersionBusiness.getVersion(input.appName, input.version);
+        if (existingAppVersion == null) {
+            appVersionBusiness.add(appVersion);
+        } else {
+            appVersionBusiness.update(appVersion);
         }
+        return appVersionBusiness.getVersion(input.appName, input.version);
     }
 
     @RequestMapping(value = "/{appVersionIdFirstPart}/{appVersionIdSecondPart}", method = RequestMethod.PUT)
@@ -132,11 +122,7 @@ public class AppVersionController extends ApiController {
     public void deleteAppVersion(@PathVariable String appVersionId) throws VipException {
         logMethodInvocation(logger, "deleteAppVersion", appVersionId);
         AppVersionStrings input = parseAppVersionId(appVersionId);
-        try {
-            appVersionBusiness.remove(input.appName, input.version);
-        } catch (VipException e) {
-            throw new VipException(e);
-        }
+        appVersionBusiness.remove(input.appName, input.version);
     }
 
     @RequestMapping(value = "/{appVersionIdFirstPart}/{appVersionIdSecondPart}", method = RequestMethod.DELETE)

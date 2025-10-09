@@ -30,36 +30,24 @@ public class ApiUserBusiness {
      * @throws VipException
      */
     public void signup(User user, String comments) throws VipException {
-        try {
-            configurationBusiness.signup(
+        configurationBusiness.signup(
                 user, 
                 comments,
                 false, 
                 true, 
                 new ArrayList<>());
             logger.info("Signing up with the " + user.getEmail());
-        } catch (VipException e) {
-            throw new VipException("Signing up Error", e);
-        }
     }
 
 
 
     public void sendResetCode(String email) throws VipException {
-        try {
-            configurationBusiness.sendResetCode(email);
-            logger.info("Sending reset code for user with email: " + email);
-        } catch (VipException e) {
-            throw new VipException("Error sending reset password", e);
-        }
+        configurationBusiness.sendResetCode(email);
+        logger.info("Sending reset code for user with email: " + email);
     }
 
     public void resetPassword(String email, String code, String password) throws VipException {
-        try {
-            configurationBusiness.resetPassword(email, code, password);
-            logger.info("Resetting password for user with email: " + email);
-        } catch (VipException e) {
-            throw new VipException("Error resetting password", e);
-        }
+        configurationBusiness.resetPassword(email, code, password);
+        logger.info("Resetting password for user with email: " + email);
     }
 }

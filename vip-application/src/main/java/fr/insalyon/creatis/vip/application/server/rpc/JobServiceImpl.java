@@ -38,13 +38,7 @@ public class JobServiceImpl extends AbstractRemoteServiceServlet implements JobS
      */
     @Override
     public List<Job> getList(String simulationID) throws VipException {
-
-        try {
-            return simulationBusiness.getList(simulationID);
-
-        } catch (VipException ex) {
-            throw new VipException(ex);
-        }
+        return simulationBusiness.getList(simulationID);
     }
 
     /**
@@ -57,12 +51,8 @@ public class JobServiceImpl extends AbstractRemoteServiceServlet implements JobS
      */
     @Override
     public List<Task> getTasks(String simulationID, int jobID) throws VipException {
-        try {
-            return simulationBusiness.getTasks(
-                simulationID, jobID, getSessionUser().getFolder());
-        } catch (VipException ex) {
-            throw new VipException(ex);
-        }
+        return simulationBusiness.getTasks(
+            simulationID, jobID, getSessionUser().getFolder());
     }
 
     /**
@@ -77,13 +67,7 @@ public class JobServiceImpl extends AbstractRemoteServiceServlet implements JobS
     @Override
     public String[] readSimulationFile(String simulationID, String taskID,
             SimulationFileType fileType) throws VipException {
-
-        try {
-            return simulationBusiness.readSimulationFile(simulationID, taskID, fileType);
-
-        } catch (VipException ex) {
-            throw new VipException(ex);
-        }
+        return simulationBusiness.readSimulationFile(simulationID, taskID, fileType);
     }
 
     /**
@@ -95,13 +79,7 @@ public class JobServiceImpl extends AbstractRemoteServiceServlet implements JobS
      */
     @Override
     public void sendTaskSignal(String simulationID, String taskID, String status) throws VipException {
-
-        try {
-            simulationBusiness.sendTaskSignal(simulationID, taskID, TaskStatus.valueOf(status));
-
-        } catch (VipException ex) {
-            throw new VipException(ex);
-        }
+        simulationBusiness.sendTaskSignal(simulationID, taskID, TaskStatus.valueOf(status));
     }
 
     /**
@@ -112,13 +90,7 @@ public class JobServiceImpl extends AbstractRemoteServiceServlet implements JobS
      */
     @Override
     public List<Task> getJobsList(String simulationID) throws VipException {
-
-        try {
-            return simulationBusiness.getJobsList(simulationID);
-
-        } catch (VipException ex) {
-            throw new VipException(ex);
-        }
+        return simulationBusiness.getJobsList(simulationID);
     }
 
     /**
@@ -133,13 +105,7 @@ public class JobServiceImpl extends AbstractRemoteServiceServlet implements JobS
     @Override
     public String readFile(String simulationID, String folder, String fileName,
             String extension) throws VipException {
-
-        try {
-            return simulationBusiness.readFile(simulationID, folder, fileName, extension);
-
-        } catch (VipException ex) {
-            throw new VipException(ex);
-        }
+        return simulationBusiness.readFile(simulationID, folder, fileName, extension);
     }
 
     /**
@@ -152,13 +118,7 @@ public class JobServiceImpl extends AbstractRemoteServiceServlet implements JobS
     @Override
     public List<String> getExecutionPerNumberOfJobs(String simulationID,
             int binSize) throws VipException {
-
-        try {
-            return simulationBusiness.getExecutionPerNumberOfJobs(simulationID, binSize);
-
-        } catch (VipException ex) {
-            throw new VipException(ex);
-        }
+        return simulationBusiness.getExecutionPerNumberOfJobs(simulationID, binSize);
     }
 
     /**
@@ -171,13 +131,7 @@ public class JobServiceImpl extends AbstractRemoteServiceServlet implements JobS
     @Override
     public List<String> getDownloadPerNumberOfJobs(String simulationID,
             int binSize) throws VipException {
-
-        try {
-            return simulationBusiness.getDownloadPerNumberOfJobs(simulationID, binSize);
-
-        } catch (VipException ex) {
-            throw new VipException(ex);
-        }
+        return simulationBusiness.getDownloadPerNumberOfJobs(simulationID, binSize);
     }
 
     /**
@@ -190,13 +144,7 @@ public class JobServiceImpl extends AbstractRemoteServiceServlet implements JobS
     @Override
     public List<String> getUploadPerNumberOfJobs(String simulationID,
             int binSize) throws VipException {
-
-        try {
-            return simulationBusiness.getUploadPerNumberOfJobs(simulationID, binSize);
-
-        } catch (VipException ex) {
-            throw new VipException(ex);
-        }
+        return simulationBusiness.getUploadPerNumberOfJobs(simulationID, binSize);
     }
 
     /**
@@ -207,13 +155,7 @@ public class JobServiceImpl extends AbstractRemoteServiceServlet implements JobS
      */
     @Override
     public List<String> getJobFlow(String simulationID) throws VipException {
-
-        try {
-            return simulationBusiness.getJobsPerTime(simulationID);
-
-        } catch (VipException ex) {
-            throw new VipException(ex);
-        }
+        return simulationBusiness.getJobsPerTime(simulationID);
     }
 
     /**
@@ -224,13 +166,7 @@ public class JobServiceImpl extends AbstractRemoteServiceServlet implements JobS
      */
     @Override
     public List<String> getCkptsPerJob(String simulationID) throws VipException {
-
-        try {
-            return simulationBusiness.getCkptsPerJob(simulationID);
-
-        } catch (VipException ex) {
-            throw new VipException(ex);
-        }
+        return simulationBusiness.getCkptsPerJob(simulationID);
     }
 
     /**
@@ -245,12 +181,7 @@ public class JobServiceImpl extends AbstractRemoteServiceServlet implements JobS
     public Node getNode(String simulationID, String siteName, String nodeName)
             throws VipException {
 
-        try {
-            return simulationBusiness.getExecutionNode(simulationID, siteName, nodeName);
-
-        } catch (VipException ex) {
-            throw new VipException(ex);
-        }
+        return simulationBusiness.getExecutionNode(simulationID, siteName, nodeName);
     }
 
     /**
@@ -263,15 +194,9 @@ public class JobServiceImpl extends AbstractRemoteServiceServlet implements JobS
     @Override
     public void sendSignal(String simulationID, String jobID, String status)
             throws VipException {
-
-        try {
-            trace(logger, "Sending '" + status + "' signal to '" + jobID
-                    + "' (" + simulationID + ").");
-            simulationBusiness.sendSignal(simulationID, jobID, TaskStatus.valueOf(status));
-
-        } catch (VipException ex) {
-            throw new VipException(ex);
-        }
+        trace(logger, "Sending '" + status + "' signal to '" + jobID
+                + "' (" + simulationID + ").");
+        simulationBusiness.sendSignal(simulationID, jobID, TaskStatus.valueOf(status));
     }
 
     /**
@@ -282,13 +207,7 @@ public class JobServiceImpl extends AbstractRemoteServiceServlet implements JobS
      */
     @Override
     public List<String> getSiteHistogram(String simulationID) throws VipException {
-
-        try {
-            return simulationBusiness.getSiteHistogram(simulationID);
-
-        } catch (VipException ex) {
-            throw new VipException(ex);
-        }
+        return simulationBusiness.getSiteHistogram(simulationID);
     }
 
     /**
@@ -302,14 +221,10 @@ public class JobServiceImpl extends AbstractRemoteServiceServlet implements JobS
     public void sendSignal(String simulationID, List<String> jobIDs,
             String status) throws VipException {
 
-        try {
-            trace(logger, "Sending '" + status + "' signal to '"
-                    + jobIDs.toString() + "' (" + simulationID + ").");
-            simulationBusiness.sendSignal(simulationID, jobIDs, TaskStatus.valueOf(status));
+        trace(logger, "Sending '" + status + "' signal to '"
+                 + jobIDs.toString() + "' (" + simulationID + ").");
+        simulationBusiness.sendSignal(simulationID, jobIDs, TaskStatus.valueOf(status));
 
-        } catch (VipException ex) {
-            throw new VipException(ex);
-        }
     }
 
     /**
@@ -320,12 +235,6 @@ public class JobServiceImpl extends AbstractRemoteServiceServlet implements JobS
      */
     @Override
     public Map<String, Integer> getCountriesMap(String simulationID) throws VipException {
-
-        try {
-            return simulationBusiness.getCountriesMap(simulationID);
-
-        } catch (VipException ex) {
-            throw new VipException(ex);
-        }
+        return simulationBusiness.getCountriesMap(simulationID);
     }
 }
