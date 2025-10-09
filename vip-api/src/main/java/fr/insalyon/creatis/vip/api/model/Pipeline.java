@@ -6,10 +6,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.ArrayList;
 import java.util.Map;
 
-/**
- *
- * @author Tristan Glatard
- */
 public class Pipeline {
 
     private String identifier;

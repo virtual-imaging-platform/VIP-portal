@@ -21,10 +21,6 @@ import org.springframework.stereotype.Repository;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- *
- * @author Rafael Ferreira da Silva
- */
 @Repository
 public class SimulationStatsData implements SimulationStatsDAO {
 

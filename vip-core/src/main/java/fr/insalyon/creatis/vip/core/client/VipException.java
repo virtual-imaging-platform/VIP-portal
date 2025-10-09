@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-public abstract class VipException extends Exception implements IsSerializable {
+public class VipException extends Exception implements IsSerializable {
 
     /*
         to override to return internal error code
@@ -95,6 +95,7 @@ public abstract class VipException extends Exception implements IsSerializable {
     }
 
     private VipError vipError = null;
+
     protected Optional<VipError> getVipError() {
         return Optional.ofNullable(vipError);
     }
@@ -103,7 +104,6 @@ public abstract class VipException extends Exception implements IsSerializable {
     }
 
     // Allow all exception constructors to be used
-
     public VipException() {
     }
 
@@ -120,7 +120,6 @@ public abstract class VipException extends Exception implements IsSerializable {
     }
 
     // VIP error constructors
-
     public VipException(VipError vipError, Object ...params) {
         super(formatMessage(vipError, params));
         this.vipError = vipError;

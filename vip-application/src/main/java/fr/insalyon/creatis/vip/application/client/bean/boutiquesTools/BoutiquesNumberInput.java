@@ -3,12 +3,6 @@ package fr.insalyon.creatis.vip.application.client.bean.boutiquesTools;
 import java.util.Map;
 import java.util.Set;
 
-/**
- * Representation of a Number input in an application Boutiques descriptor
- *
- * @author Guillaume Vanel
- * @version %I%, %G%
- */
 public class BoutiquesNumberInput extends BoutiquesInput{
     private Double defaultValue;
     private boolean isInteger;

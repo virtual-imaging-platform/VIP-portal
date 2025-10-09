@@ -1,5 +1,11 @@
 package fr.insalyon.creatis.vip.application.integrationtest;
 
+import java.util.ArrayList;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.mockito.Mockito;
+import org.springframework.beans.factory.annotation.Autowired;
+
 import fr.insalyon.creatis.moteur.plugins.workflowsdb.dao.InputDAO;
 import fr.insalyon.creatis.moteur.plugins.workflowsdb.dao.OutputDAO;
 import fr.insalyon.creatis.moteur.plugins.workflowsdb.dao.WorkflowDAO;
@@ -9,13 +15,9 @@ import fr.insalyon.creatis.vip.application.server.business.AppVersionBusiness;
 import fr.insalyon.creatis.vip.application.server.business.ApplicationBusiness;
 import fr.insalyon.creatis.vip.application.server.business.EngineBusiness;
 import fr.insalyon.creatis.vip.application.server.business.simulation.WorkflowEngineInstantiator;
+import fr.insalyon.creatis.vip.core.client.VipException;
 import fr.insalyon.creatis.vip.core.client.bean.Group;
 import fr.insalyon.creatis.vip.core.integrationtest.database.BaseSpringIT;
-import fr.insalyon.creatis.vip.core.server.business.BusinessException;
-import java.util.ArrayList;
-import org.junit.jupiter.api.BeforeEach;
-import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
 
 public class BaseApplicationSpringIT extends BaseSpringIT {
 
@@ -55,9 +57,9 @@ public class BaseApplicationSpringIT extends BaseSpringIT {
     /**
      * @param appName
      * @param groupname (can be null to be ignored)
-     * @throws BusinessException
+     * @throws VipException
      */
-    protected void createAnApplication(String appName, String groupname) throws BusinessException {
+    protected void createAnApplication(String appName, String groupname) throws VipException {
         Application app = new Application(appName, "test citation", new ArrayList<>());
 
         getApplicationBusiness().add(app);
@@ -67,23 +69,23 @@ public class BaseApplicationSpringIT extends BaseSpringIT {
         }
     }
 
-    protected void putApplicationInGroup(String appName, String groupname) throws BusinessException {
+    protected void putApplicationInGroup(String appName, String groupname) throws VipException {
         getApplicationBusiness().associate(new Application(appName, null), new Group(groupname));
     }
 
-    protected AppVersion createAVersion(String appName, String versionName, boolean visible) throws BusinessException {
+    protected AppVersion createAVersion(String appName, String versionName, boolean visible) throws VipException {
         AppVersion appVersion = new AppVersion(appName, versionName, null, visible);
         getAppVersionBusiness().add(appVersion);
         return appVersion;
     }
 
-    protected AppVersion configureAnApplication(String appName, String versionName, String groupName) throws BusinessException {
+    protected AppVersion configureAnApplication(String appName, String versionName, String groupName) throws VipException {
         createGroup(groupName);
         createAnApplication(appName, groupName);
         return createAVersion(appName, versionName, true);
     }
 
-    protected void configureVersion(AppVersion appVersion, String descriptor) throws BusinessException {
+    protected void configureVersion(AppVersion appVersion, String descriptor) throws VipException {
         appVersion = new AppVersion(
                 appVersion.getApplicationName(), appVersion.getVersion(), descriptor,
                 appVersion.isVisible());

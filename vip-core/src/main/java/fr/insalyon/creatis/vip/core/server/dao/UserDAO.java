@@ -9,10 +9,6 @@ import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
 
-/**
- *
- * @author Rafael Ferreira da Silva
- */
 public interface UserDAO {
 
     public void add(User user) throws DAOException;

@@ -6,10 +6,6 @@ import fr.insalyon.creatis.vip.core.client.bean.Group;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import java.util.List;
 
-/**
- *
- * @author Rafael Ferreira da Silva
- */
 public interface ApplicationDAO {
 
     public void add(Application app) throws DAOException;

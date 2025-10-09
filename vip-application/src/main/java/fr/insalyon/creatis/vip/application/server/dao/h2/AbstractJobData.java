@@ -19,8 +19,6 @@ import java.sql.SQLException;
  * The default is to access the h2 database through an h2 server via tcp,
  * but this is changeable to use (for instance) a memory or a local h2
  * database for testing or local use
- *
- * @author Rafael Silva
  */
 public abstract class AbstractJobData {
 

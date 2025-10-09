@@ -1,14 +1,16 @@
 package fr.insalyon.creatis.vip.core.server.business;
 
+import java.time.LocalDate;
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import fr.insalyon.creatis.vip.core.client.VipException;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.util.CountryCode;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import fr.insalyon.creatis.vip.core.server.dao.UserDAO;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.time.LocalDate;
-import java.util.List;
 
 @Service
 @Transactional
@@ -22,20 +24,20 @@ public class StatsBusiness {
 
 
     public Long getUsersRegisteredNumber(UserSearchCriteria searchCriteria)
-            throws BusinessException {
+            throws VipException {
         try {
             return userDAO.countUsers(searchCriteria);
         } catch (DAOException ex) {
-            throw new BusinessException(ex);
+            throw new VipException(ex);
         }
     }
 
     public List<User> getUsersRegistered(UserSearchCriteria searchCriteria)
-            throws BusinessException {
+            throws VipException {
         try {
             return userDAO.searchUsers(searchCriteria);
         } catch (DAOException ex) {
-            throw new BusinessException(ex);
+            throw new VipException(ex);
         }
     }
 

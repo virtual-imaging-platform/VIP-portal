@@ -1,20 +1,17 @@
 package fr.insalyon.creatis.vip.api.business;
 
-import fr.insalyon.creatis.vip.core.server.exception.ApiException;
-import fr.insalyon.creatis.vip.core.client.bean.User;
-import fr.insalyon.creatis.vip.core.server.business.BusinessException;
-import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
-
 import java.util.ArrayList;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import fr.insalyon.creatis.vip.core.client.VipException;
+import fr.insalyon.creatis.vip.core.client.bean.User;
+import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
+import fr.insalyon.creatis.vip.core.server.exception.ApiException;
 
-/**
- * @author khalilkes service to signup a user in VIP
- */
+
 @Service
 public class ApiUserBusiness {
     private final Logger logger = LoggerFactory.getLogger(getClass());
@@ -41,7 +38,7 @@ public class ApiUserBusiness {
                 true, 
                 new ArrayList<>());
             logger.info("Signing up with the " + user.getEmail());
-        } catch (BusinessException e) {
+        } catch (VipException e) {
             throw new ApiException("Signing up Error", e);
         }
     }
@@ -52,7 +49,7 @@ public class ApiUserBusiness {
         try {
             configurationBusiness.sendResetCode(email);
             logger.info("Sending reset code for user with email: " + email);
-        } catch (BusinessException e) {
+        } catch (VipException e) {
             throw new ApiException("Error sending reset password", e);
         }
     }
@@ -61,7 +58,7 @@ public class ApiUserBusiness {
         try {
             configurationBusiness.resetPassword(email, code, password);
             logger.info("Resetting password for user with email: " + email);
-        } catch (BusinessException e) {
+        } catch (VipException e) {
             throw new ApiException("Error resetting password", e);
         }
     }

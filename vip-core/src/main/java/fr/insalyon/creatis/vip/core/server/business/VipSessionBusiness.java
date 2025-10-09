@@ -1,22 +1,5 @@
 package fr.insalyon.creatis.vip.core.server.business;
 
-import fr.insalyon.creatis.vip.core.client.bean.Group;
-import fr.insalyon.creatis.vip.core.client.bean.User;
-import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
-import fr.insalyon.creatis.vip.core.client.view.CoreConstants.GROUP_ROLE;
-import fr.insalyon.creatis.vip.core.server.inter.annotations.VIPCheckRemoval;
-import fr.insalyon.creatis.vip.core.server.inter.annotations.VIPRemoval;
-import fr.insalyon.creatis.vip.core.client.view.CoreException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
@@ -26,6 +9,25 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Supplier;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import fr.insalyon.creatis.vip.core.client.VipException;
+import fr.insalyon.creatis.vip.core.client.bean.Group;
+import fr.insalyon.creatis.vip.core.client.bean.User;
+import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
+import fr.insalyon.creatis.vip.core.client.view.CoreConstants.GROUP_ROLE;
+import fr.insalyon.creatis.vip.core.client.view.CoreException;
+import fr.insalyon.creatis.vip.core.server.inter.annotations.VIPCheckRemoval;
+import fr.insalyon.creatis.vip.core.server.inter.annotations.VIPRemoval;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 /*
     Manages the reads/writes of vip core information in the web session
@@ -53,7 +55,7 @@ public class VipSessionBusiness {
     public void setVIPSession(
             HttpServletRequest request,
             HttpServletResponse response,
-            User user) throws BusinessException, CoreException {
+            User user) throws VipException {
         try {
             // see explanation in SessionBusiness -> createCookie
             boolean isSecure = server.getApacheSSLPort() != 80;
@@ -77,7 +79,7 @@ public class VipSessionBusiness {
             response.addCookie(sessionCookie);
         } catch (UnsupportedEncodingException ex) {
             logger.error("Error setting VIP session for {} ",user, ex);
-            throw new BusinessException(ex);
+            throw new VipException(ex);
         }
     }
 
@@ -146,7 +148,7 @@ public class VipSessionBusiness {
             }
             return null;
 
-        } catch (BusinessException e) {
+        } catch (VipException e) {
             throw new CoreException(e);
         }
     }
@@ -172,7 +174,7 @@ public class VipSessionBusiness {
         try {
             User user = configurationBusiness.getUser(email);
             return setUserInSession(user, session);
-        } catch (BusinessException e) {
+        } catch (VipException e) {
             throw new CoreException(e);
         }
     }
@@ -188,7 +190,7 @@ public class VipSessionBusiness {
             session.setAttribute(CoreConstants.SESSION_GROUPS, groups);
 
             return user;
-        } catch (BusinessException e) {
+        } catch (VipException e) {
             throw new CoreException(e);
         }
     }

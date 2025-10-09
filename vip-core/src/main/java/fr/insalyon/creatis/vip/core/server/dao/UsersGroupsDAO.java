@@ -6,10 +6,6 @@ import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import java.util.List;
 import java.util.Map;
 
-/**
- *
- * @author Rafael Silva
- */
 public interface UsersGroupsDAO {
 
     public void add(String email, String name, CoreConstants.GROUP_ROLE role) throws DAOException;

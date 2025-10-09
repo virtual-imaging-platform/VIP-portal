@@ -1,16 +1,17 @@
 package fr.insalyon.creatis.vip.api.business;
 
-import fr.insalyon.creatis.vip.core.server.exception.ApiException;
-import fr.insalyon.creatis.vip.core.server.model.AuthenticationCredentials;
-import fr.insalyon.creatis.vip.core.server.model.AuthenticationInfo;
-import fr.insalyon.creatis.vip.core.client.bean.User;
-import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
-import fr.insalyon.creatis.vip.core.server.business.Server;
-import fr.insalyon.creatis.vip.core.server.business.BusinessException;
-import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+
+import fr.insalyon.creatis.vip.core.client.VipException;
+import fr.insalyon.creatis.vip.core.client.bean.User;
+import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
+import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
+import fr.insalyon.creatis.vip.core.server.business.Server;
+import fr.insalyon.creatis.vip.core.server.exception.ApiException;
+import fr.insalyon.creatis.vip.core.server.model.AuthenticationCredentials;
+import fr.insalyon.creatis.vip.core.server.model.AuthenticationInfo;
 
 @Service
 public class ApiBusiness {
@@ -58,7 +59,7 @@ public class ApiBusiness {
                     .signin(username, password);
             logger.info("Credentials OK for " + username);
             return user;
-        } catch (BusinessException e) {
+        } catch (VipException e) {
             if (e.getMessage().startsWith("Authentication failed")) {
                 throw new ApiException(ApiException.ApiError.BAD_CREDENTIALS);
             }
@@ -76,7 +77,7 @@ public class ApiBusiness {
                 logger.debug("keeping the current api key for " + email);
                 return configurationBusiness.getUserApikey(email);
             }
-        } catch (BusinessException e) {
+        } catch (VipException e) {
             throw new ApiException(e);
         }
     }
