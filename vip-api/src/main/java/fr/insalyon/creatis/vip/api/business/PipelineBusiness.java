@@ -99,11 +99,7 @@ public class PipelineBusiness {
     public BoutiquesDescriptor getBoutiquesDescriptor(String pipelineId) throws VipException {
         AppVersion appVersion = getAppVersionFromPipelineId(pipelineId);
 
-        try {
-            return boutiquesBusiness.parseBoutiquesString(appVersion.getDescriptor());
-        } catch (VipException e) {
-            throw new VipException(e);
-        }
+        return boutiquesBusiness.parseBoutiquesString(appVersion.getDescriptor());
     }
 
     private List<Pipeline> appsToPipelines(List<Application> applications) throws VipException {
@@ -127,27 +123,19 @@ public class PipelineBusiness {
      * List all the pipeline the user can access
      */
     public List<Pipeline> listPipelines(String studyIdentifier) throws VipException {
-        try {
-            if (studyIdentifier != null) {
-                logger.warn("Study identifier ({}) was ignored.", studyIdentifier);
-            }
-
-            List<Application> applications = applicationBusiness.getApplications(currentUserProvider.get());
-            return appsToPipelines(applications);
-        } catch (VipException ex) {
-            throw new VipException(ex);
+        if (studyIdentifier != null) {
+            logger.warn("Study identifier ({}) was ignored.", studyIdentifier);
         }
+
+        List<Application> applications = applicationBusiness.getApplications(currentUserProvider.get());
+        return appsToPipelines(applications);
     }
 
     // Specific stuff that return in 'Application' class format and not 'Pipeline'
     // used for the VIP landing page
     public List<Pipeline> listPublicPipelines() throws VipException {
-        try {
-            List<Application> applications = applicationBusiness.getPublicApplications();
-            return appsToPipelines(applications);
-        } catch (VipException e) {
-            throw new VipException(e);
-        }
+        List<Application> applications = applicationBusiness.getPublicApplications();
+        return appsToPipelines(applications);
     }
 
     // ********************* Basic stuff **************************************
@@ -188,19 +176,15 @@ public class PipelineBusiness {
     }
 
     private AppVersion getAppVersionFromPipelineId(String pipelineId) throws VipException {
-        try {
-            String applicationName = getApplicationName(pipelineId);
-            String applicationVersion = getApplicationVersion(pipelineId);
-            AppVersion appVersion = appVersionBusiness.getVersion(applicationName, applicationVersion);
-            if (appVersion == null) {
-                logger.error("Cannot find pipeline {}/{}", applicationName, applicationVersion);
-                throw new VipException(ApiError.PIPELINE_NOT_FOUND, pipelineId);
-            }
-            checkAppVersionAccess(appVersion);
-            return appVersion;
-        } catch (VipException e) {
-            throw new VipException(e);
+        String applicationName = getApplicationName(pipelineId);
+        String applicationVersion = getApplicationVersion(pipelineId);
+        AppVersion appVersion = appVersionBusiness.getVersion(applicationName, applicationVersion);
+        if (appVersion == null) {
+            logger.error("Cannot find pipeline {}/{}", applicationName, applicationVersion);
+            throw new VipException(ApiError.PIPELINE_NOT_FOUND, pipelineId);
         }
+        checkAppVersionAccess(appVersion);
+        return appVersion;
     }
 
     // ********************* VERIFICATION STUFF *******************************
@@ -217,19 +201,15 @@ public class PipelineBusiness {
         }
 
         // check the user can use it 
-        try {
-            List<Application> apps = applicationBusiness.getApplications(currentUserProvider.get());
+        List<Application> apps = applicationBusiness.getApplications(currentUserProvider.get());
 
-            for (Application app : apps) {
-                if (app.getName().equals(appName)) {
-                    return;
-                }
+        for (Application app : apps) {
+            if (app.getName().equals(appName)) {
+                return;
             }
-            logger.error("User {} not allowed to access application {}", currentUserProvider.get(), appName);
-            throw new VipException(ApiError.NOT_ALLOWED_TO_USE_PIPELINE, getPipelineIdentifier(appName, version));
-        } catch (VipException e) {
-            throw new VipException(e);
         }
+        logger.error("User {} not allowed to access application {}", currentUserProvider.get(), appName);
+        throw new VipException(ApiError.NOT_ALLOWED_TO_USE_PIPELINE, getPipelineIdentifier(appName, version));
     }
 
     private boolean isApplicationVersionUsableInApi(AppVersion appVersion) {
