@@ -112,8 +112,6 @@ public class ExecutionBusiness {
         }
     }
 
-
-
     public Execution getExample(String executionId) throws VipException {
         return getExecution(executionId, false, true);
     }

@@ -24,49 +24,35 @@ public class ReproVipServiceImpl extends AbstractRemoteServiceServlet implements
 
     @Override
     public void addPublicExecution(PublicExecution publicExecution) throws VipException {
-        try {
-            if (publicExecutionBusiness.exist(publicExecution.getExperienceName())) {
-                throw new VipException("This experience name already exist!");
-            } else {
-                publicExecutionBusiness.create(publicExecution);
-            }
-        } catch (VipException e) {
-            throw new VipException(e);
+        if (publicExecutionBusiness.exist(publicExecution.getExperienceName())) {
+            throw new VipException("This experience name already exist!");
+        } else {
+            publicExecutionBusiness.create(publicExecution);
         }
     }
 
     @Override
     public List<PublicExecution> getPublicExecutions() throws VipException {
-        try {
-            return publicExecutionBusiness.getAll();
-        } catch (VipException e) {
-            throw new VipException(e);
-        }
+        return publicExecutionBusiness.getAll();
     }
 
     @Override
     public boolean doesExecutionExist(String experienceName) throws VipException {
-        try {
-            return publicExecutionBusiness.exist(experienceName);
-        } catch (VipException e) {
-            throw new VipException(e);
-        }
+        return publicExecutionBusiness.exist(experienceName);
     }
 
     @Override
     public boolean canMakeExecutionPublic(List<String> workflowsIds) throws VipException {
-        try {
-            return reproVipBusiness.canMakeExecutionPublic(workflowsIds);
-        } catch (VipException e) {
-            throw new VipException(e);
-        }
+        return reproVipBusiness.canMakeExecutionPublic(workflowsIds);
     }
 
     @Override
     public PublicExecution.PublicExecutionStatus createReproVipDirectory(String experienceName) {
         try {
             reproVipBusiness.createReproVipDirectory(experienceName);
-            publicExecutionBusiness.updateStatus(experienceName, PublicExecution.PublicExecutionStatus.DIRECTORY_CREATED);
+            publicExecutionBusiness.updateStatus(experienceName,
+                    PublicExecution.PublicExecutionStatus.DIRECTORY_CREATED);
+
             return PublicExecution.PublicExecutionStatus.DIRECTORY_CREATED;
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -75,26 +61,19 @@ public class ReproVipServiceImpl extends AbstractRemoteServiceServlet implements
 
     @Override
     public PublicExecution.PublicExecutionStatus deleteReproVipDirectory(String experienceName) throws VipException {
-        try {
-            reproVipBusiness.deleteReproVipDirectory(experienceName);
-            publicExecutionBusiness.updateStatus(experienceName, PublicExecution.PublicExecutionStatus.REQUESTED);
-            return PublicExecution.PublicExecutionStatus.REQUESTED;
-        } catch (VipException e) {
-            throw new VipException(e);
-        }
+        reproVipBusiness.deleteReproVipDirectory(experienceName);
+        publicExecutionBusiness.updateStatus(experienceName, PublicExecution.PublicExecutionStatus.REQUESTED);
+
+        return PublicExecution.PublicExecutionStatus.REQUESTED;
     }
 
     @Override
     public PublicExecution.PublicExecutionStatus setExecutionPublished(String experienceName, String doi) throws VipException {
-        try {
-            PublicExecution exec = publicExecutionBusiness.get(experienceName);
+        PublicExecution exec = publicExecutionBusiness.get(experienceName);
 
-            exec.setDoi(doi);
-            publicExecutionBusiness.update(experienceName, exec);
-            publicExecutionBusiness.updateStatus(experienceName, PublicExecution.PublicExecutionStatus.PUBLISHED);
-            return PublicExecution.PublicExecutionStatus.PUBLISHED;
-        } catch (VipException e) {
-            throw new VipException(e);
-        }
+        exec.setDoi(doi);
+        publicExecutionBusiness.update(experienceName, exec);
+        publicExecutionBusiness.updateStatus(experienceName, PublicExecution.PublicExecutionStatus.PUBLISHED);
+        return PublicExecution.PublicExecutionStatus.PUBLISHED;
     }
 }

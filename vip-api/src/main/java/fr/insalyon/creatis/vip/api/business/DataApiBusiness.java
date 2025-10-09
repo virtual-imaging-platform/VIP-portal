@@ -272,8 +272,8 @@ public class DataApiBusiness {
 
     private void checkPermission(String path, LFCAccessType accessType)
             throws VipException {
-        if (!lfcPermissionBusiness.isLFCPathAllowed(
-                currentUserProvider.get(), path, accessType, true)) {
+        if ( ! lfcPermissionBusiness.isLFCPathAllowed(
+            currentUserProvider.get(), path, accessType, true)) {
             throw new VipException(ApiError.UNAUTHORIZED_DATA_ACCESS, path);
         }
     }
@@ -533,5 +533,4 @@ public class DataApiBusiness {
     private void baseMkdir(String path, String dirName) throws VipException {
         lfcBusiness.createDir(currentUserProvider.get(), path, dirName);
     }
-
 }
