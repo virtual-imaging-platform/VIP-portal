@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import fr.insalyon.creatis.vip.api.controller.ApiController;
-import fr.insalyon.creatis.vip.api.exception.ApiException;
 import fr.insalyon.creatis.vip.core.client.VipException;
 import fr.insalyon.creatis.vip.publication.client.bean.Publication;
 import fr.insalyon.creatis.vip.publication.server.business.PublicationBusiness;
@@ -28,12 +27,12 @@ public class PublicationController extends ApiController {
     }
 
     @RequestMapping
-    public List<Publication> listPublication() throws ApiException {
+    public List<Publication> listPublication() throws VipException {
         logMethodInvocation(logger, "listPublication");
         try {
             return publicationBusiness.getPublications();
         } catch (VipException e) {
-            throw new ApiException(e);
+            throw new VipException(e);
         }
     }
 }

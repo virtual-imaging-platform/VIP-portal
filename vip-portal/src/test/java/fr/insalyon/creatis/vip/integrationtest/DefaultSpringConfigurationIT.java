@@ -41,7 +41,7 @@ import org.springframework.util.Assert;
 
 import fr.insalyon.creatis.vip.api.SpringRestApiConfig;
 import fr.insalyon.creatis.vip.api.controller.PlatformController;
-import fr.insalyon.creatis.vip.api.exception.ApiException;
+import fr.insalyon.creatis.vip.core.client.VipException;
 import fr.insalyon.creatis.vip.core.server.SpringCoreConfig;
 
 /**
@@ -65,7 +65,7 @@ public class DefaultSpringConfigurationIT {
     }
 
     @Test
-    public void propertiesShouldBePresent() throws ApiException {
+    public void propertiesShouldBePresent() throws VipException {
         // test that the platform properties generation does not throw any exception
         Assert.notNull(platformController.getPlatformProperties(), "platform properties should be present");
     }

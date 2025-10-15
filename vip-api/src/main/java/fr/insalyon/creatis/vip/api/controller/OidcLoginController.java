@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.view.RedirectView;
 import org.springframework.web.util.UriUtils;
 
-import fr.insalyon.creatis.vip.api.exception.ApiException;
+import fr.insalyon.creatis.vip.api.exception.ApiError;
 import fr.insalyon.creatis.vip.core.client.VipException;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
@@ -40,16 +40,16 @@ public class OidcLoginController {
     @GetMapping("/loginOIDC")
     public RedirectView getOauth2LoginInfo(
             HttpServletRequest request, HttpServletResponse response, Principal user)
-            throws ApiException {
+            throws VipException {
 
         if ( ! (user instanceof OAuth2AuthenticationToken)) {
             logger.error("OIDC login error: Principal is not an OAuth2AuthenticationToken. User: [{}]", user);
-            throw new ApiException(ApiException.ApiError.WRONG_OIDC_LOGIN);
+            throw new VipException(ApiError.WRONG_OIDC_LOGIN);
         }
         OAuth2AuthenticationToken authToken = ((OAuth2AuthenticationToken) user);
         if ( ! authToken.isAuthenticated()) {
             logger.error("OIDC login error: anonymous user");
-            throw new ApiException(ApiException.ApiError.WRONG_OIDC_LOGIN);
+            throw new VipException(ApiError.WRONG_OIDC_LOGIN);
         }
         Map<String, Object> userAttributes = authToken.getPrincipal().getAttributes();
         logger.info("OIDC login success. User attributes: [{}]", userAttributes);
@@ -75,7 +75,7 @@ public class OidcLoginController {
             SecurityContextHolder.clearContext(); // destroy spring session and use VIP own session mechanism
             sessionBusiness.createLoginCookies(request, response, session); // creates VIP cookies and session
         } catch (VipException | UnsupportedEncodingException e) {
-            throw new ApiException(ApiException.ApiError.WRONG_OIDC_LOGIN, e);
+            throw new VipException(ApiError.WRONG_OIDC_LOGIN, e);
         }
 
         return new RedirectView(getRootUrl(request)); // redirect on the home page where the VIP cookies will authenticate the user

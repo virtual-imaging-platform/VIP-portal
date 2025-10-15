@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import fr.insalyon.creatis.vip.api.exception.ApiException;
 import fr.insalyon.creatis.vip.core.client.VipException;
 import fr.insalyon.creatis.vip.datamanager.client.bean.UserApiKey;
 import fr.insalyon.creatis.vip.datamanager.server.business.ApiKeyBusiness;
@@ -41,26 +40,26 @@ public class ApiKeyController extends ApiController{
     }
 
     @GetMapping
-    public List<UserApiKey> listUserApiKeys() throws ApiException {
+    public List<UserApiKey> listUserApiKeys() throws VipException {
         logMethodInvocation(logger, "listUserApiKeys");
         try {
             return apiKeyBusiness.apiKeysFor(currentUser().getEmail());
         } catch (VipException e) {
-            throw new ApiException(e);
+            throw new VipException(e);
         }
     }
 
     @PutMapping
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void addOrUpdateApiKey(@RequestBody @Valid KeyInfo keyInfo)
-            throws ApiException {
+            throws VipException {
         logMethodInvocation(logger, "addOrUpdateApiKey");
         try {
             if (externalPlatformBusiness.listAll().stream()
                 .noneMatch(ep -> ep.getIdentifier()
                           .equals(keyInfo.storageIdentifier))) {
                 logger.error("Storage does not exist: {}", keyInfo.storageIdentifier);
-                throw new ApiException(
+                throw new VipException(
                     "Storage does not exist: " + keyInfo.storageIdentifier);
             }
 
@@ -69,7 +68,7 @@ public class ApiKeyController extends ApiController{
                 currentUser().getEmail(),
                 keyInfo.apiKey);
         } catch (VipException e) {
-            throw new ApiException(e);
+            throw new VipException(e);
         }
     }
 
@@ -77,13 +76,13 @@ public class ApiKeyController extends ApiController{
                     method = RequestMethod.DELETE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteApiKey(@PathVariable String storageIdentifier)
-            throws ApiException {
+            throws VipException {
         logMethodInvocation(logger, "deleteApiKey");
         try {
             apiKeyBusiness.deleteApiKey(
                 storageIdentifier, currentUser().getEmail());
         } catch (VipException e) {
-            throw new ApiException(e);
+            throw new VipException(e);
         }
     }
 

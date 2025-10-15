@@ -21,7 +21,6 @@ import fr.insalyon.creatis.vip.application.client.bean.InOutData;
 import fr.insalyon.creatis.vip.application.client.bean.Simulation;
 import fr.insalyon.creatis.vip.application.client.bean.SimulationInput;
 import fr.insalyon.creatis.vip.application.client.rpc.WorkflowService;
-import fr.insalyon.creatis.vip.application.client.view.ApplicationException;
 import fr.insalyon.creatis.vip.application.server.business.AppVersionBusiness;
 import fr.insalyon.creatis.vip.application.server.business.BoutiquesBusiness;
 import fr.insalyon.creatis.vip.application.server.business.InputBusiness;
@@ -63,10 +62,10 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
      * Gets a list of recently launched simulations.
      *
      * @return
-     * @throws ApplicationException
+     * @throws VipException
      */
     @Override
-    public List<Simulation> getSimulations() throws ApplicationException {
+    public List<Simulation> getSimulations() throws VipException {
 
         try {
             if (isSystemAdministrator()) {
@@ -75,7 +74,7 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
                 return workflowBusiness.getSimulations(getSessionUser(), null);
             }
         } catch (VipException ex) {
-            throw new ApplicationException(ex);
+            throw new VipException(ex);
         }
     }
 
@@ -84,10 +83,10 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
      *
      * @param lastDate
      * @return
-     * @throws ApplicationException
+     * @throws VipException
      */
     @Override
-    public List<Simulation> getSimulations(Date lastDate) throws ApplicationException {
+    public List<Simulation> getSimulations(Date lastDate) throws VipException {
 
         try {
             if (isSystemAdministrator()) {
@@ -96,7 +95,7 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
                 return workflowBusiness.getSimulations(getSessionUser(), lastDate);
             }
         } catch (VipException ex) {
-            throw new ApplicationException(ex);
+            throw new VipException(ex);
         }
     }
 
@@ -108,11 +107,11 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
      * @param startDate
      * @param endDate
      * @return
-     * @throws ApplicationException
+     * @throws VipException
      */
     @Override
     public List<Simulation> getSimulations(String userName, String application,
-                                           String status, Date startDate, Date endDate) throws ApplicationException {
+                                           String status, Date startDate, Date endDate) throws VipException {
         try {
             User user = getSessionUser();
             if (user.isSystemAdministrator() || (userName != null && userName.equalsIgnoreCase(user.getFullName()))) {
@@ -120,19 +119,19 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
             } else if (userName == null) {
                 return workflowBusiness.getSimulationsWithGroupAdminRights(user, application, status, startDate, endDate, null);
             } else {
-                throw new ApplicationException("You can't see another person's simulation!");
+                throw new VipException("You can't see another person's simulation!");
             }
         } catch (VipException ex) {
-            throw new ApplicationException(ex);
+            throw new VipException(ex);
         }
     }
 
     @Override
-    public String getApplicationDescriptorString(String applicationName, String applicationVersion) throws ApplicationException {
+    public String getApplicationDescriptorString(String applicationName, String applicationVersion) throws VipException {
         try {
             return boutiquesBusiness.getApplicationDescriptorString(applicationName, applicationVersion);
         } catch (VipException ex) {
-            throw new ApplicationException(ex);
+            throw new VipException(ex);
         }
     }
 
@@ -140,7 +139,7 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
      * Map(ApplicationName, ApplicationVersion)
      */
     @Override
-    public List<String> getApplicationsDescriptorsString(List<Pair<String, String>> applications) throws ApplicationException {
+    public List<String> getApplicationsDescriptorsString(List<Pair<String, String>> applications) throws VipException {
         List<String> result = new ArrayList<>();
 
         try {
@@ -149,12 +148,12 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
             }
             return result;
         } catch (VipException ex) {
-            throw new ApplicationException(ex);
+            throw new VipException(ex);
         }
     }
 
     private void fillInOverriddenInputs(Map<String, String> parametersMap,
-                                        String applicationName, String applicationVersion) throws ApplicationException {
+                                        String applicationName, String applicationVersion) throws VipException {
         try {
             AppVersion appVersion = appVersionBusiness.getVersion(applicationName, applicationVersion);
             BoutiquesDescriptor descriptor = boutiquesBusiness.parseBoutiquesString(appVersion.getDescriptor());
@@ -166,19 +165,19 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
                         parametersMap.put(key, parametersMap.get(value));
                     } else {
                         logger.error("missing parameter {}", value);
-                        throw new ApplicationException("missing parameter " + value);
+                        throw new VipException("missing parameter " + value);
                     }
                 }
             }
         } catch (VipException ex) {
-            throw new ApplicationException(ex);
+            throw new VipException(ex);
         }
     }
 
     @Override
     public void launchSimulation(Map<String, String> parametersMap,
             String applicationName, String applicationVersion,
-            String applicationClass, String simulationName) throws ApplicationException {
+            String applicationClass, String simulationName) throws VipException {
 
         // fill in overriddenInputs from explicit inputs
 
@@ -201,7 +200,7 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
             trace(logger, "Simulation '" + simulationName + "' launched with ID '" + simulationID + "'.");
 
         } catch (VipException ex) {
-            throw new ApplicationException(ex);
+            throw new VipException(ex);
         }
     }
 
@@ -210,46 +209,46 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
      * @param name
      * @param appName
      * @return
-     * @throws ApplicationException
+     * @throws VipException
      */
     @Override
     public SimulationInput getInputByNameUserApp(String name, String appName)
-        throws ApplicationException {
+        throws VipException {
         try {
             return inputBusiness.getInputByUserAndName(
                 getSessionUser().getEmail(), name, appName);
         } catch (VipException ex) {
-            throw new ApplicationException(ex);
+            throw new VipException(ex);
         }
     }
 
     /**
      *
      * @param simulationInput
-     * @throws ApplicationException
+     * @throws VipException
      */
     public void addSimulationInput(SimulationInput simulationInput)
-            throws ApplicationException {
+            throws VipException {
         try {
             inputBusiness.addSimulationInput(
                 getSessionUser().getEmail(), simulationInput);
         } catch (VipException ex) {
-            throw new ApplicationException(ex);
+            throw new VipException(ex);
         }
     }
 
     /**
      *
      * @param simulationInput
-     * @throws ApplicationException
+     * @throws VipException
      */
     public void updateSimulationInput(SimulationInput simulationInput)
-            throws ApplicationException {
+            throws VipException {
         try {
             inputBusiness.updateSimulationInput(
                 getSessionUser().getEmail(), simulationInput);
         } catch (VipException ex) {
-            throw new ApplicationException(ex);
+            throw new VipException(ex);
         }
     }
 
@@ -257,15 +256,15 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
      *
      * @param inputName
      * @param applicationName
-     * @throws ApplicationException
+     * @throws VipException
      */
     public void removeSimulationInput(String inputName, String applicationName)
-            throws ApplicationException {
+            throws VipException {
         try {
             inputBusiness.removeSimulationInput(
                 getSessionUser().getEmail(), inputName, applicationName);
         } catch (VipException ex) {
-            throw new ApplicationException(ex);
+            throw new VipException(ex);
         }
     }
 
@@ -273,45 +272,45 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
      *
      * @param inputName
      * @param applicationName
-     * @throws ApplicationException
+     * @throws VipException
      */
     public void removeSimulationInputExample(
         String inputName, String applicationName)
-        throws ApplicationException {
+        throws VipException {
         try {
             inputBusiness.removeSimulationInputExample(
                 inputName, applicationName);
         } catch (VipException ex) {
-            throw new ApplicationException(ex);
+            throw new VipException(ex);
         }
     }
 
     /**
      *
-     * @return @throws ApplicationException
+     * @return @throws VipException
      */
     public List<SimulationInput> getSimulationInputByUser()
-        throws ApplicationException {
+        throws VipException {
         try {
             return inputBusiness.getSimulationInputByUser(
                 getSessionUser().getEmail());
         } catch (VipException ex) {
-            throw new ApplicationException(ex);
+            throw new VipException(ex);
         }
     }
 
     /**
      *
      * @param simulationInput
-     * @throws ApplicationException
+     * @throws VipException
      */
     public void saveInputsAsExamples(SimulationInput simulationInput)
-        throws ApplicationException {
+        throws VipException {
         try {
             inputBusiness.saveSimulationInputAsExample(
                 simulationInput);
         } catch (VipException ex) {
-            throw new ApplicationException(ex);
+            throw new VipException(ex);
         }
     }
 
@@ -319,26 +318,26 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
      *
      * @param applicationName
      * @return
-     * @throws ApplicationException
+     * @throws VipException
      */
     @Override
     public List<SimulationInput> getSimulationInputExamples(
-        String applicationName) throws ApplicationException {
+        String applicationName) throws VipException {
         try {
             return inputBusiness.getSimulationInputExamples(
                 applicationName);
         } catch (VipException ex) {
-            throw new ApplicationException(ex);
+            throw new VipException(ex);
         }
     }
 
     /**
      *
      * @param simulationIDs
-     * @throws ApplicationException
+     * @throws VipException
      */
     @Override
-    public void killSimulations(List<String> simulationIDs) throws ApplicationException {
+    public void killSimulations(List<String> simulationIDs) throws VipException {
 
         try {
             trace(logger, "Killing simulations: " + simulationIDs);
@@ -356,21 +355,21 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
             }
             if (sb.length() > 0) {
                 logger.error("Unable to kill the following simulations: {}", sb.toString());
-                throw new ApplicationException("Unable to kill the following "
+                throw new VipException("Unable to kill the following "
                         + "simulations: " + sb.toString());
             }
         } catch (CoreException ex) {
-            throw new ApplicationException(ex);
+            throw new VipException(ex);
         }
     }
 
     /**
      *
      * @param simulationIDs
-     * @throws ApplicationException
+     * @throws VipException
      */
     @Override
-    public void cleanSimulations(List<String> simulationIDs) throws ApplicationException {
+    public void cleanSimulations(List<String> simulationIDs) throws VipException {
 
         try {
             trace(logger, "Cleaning simulations: " + simulationIDs);
@@ -384,26 +383,26 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
                         sb.append(", ");
                     }
                     sb.append(simulationID);
-                    throw new ApplicationException(ex);
+                    throw new VipException(ex);
                 }
             }
 
             if (sb.length() > 0) {
                 logger.error("Unable to clean the following simulations: {}", sb.toString());
-                throw new ApplicationException("Unable to clean the following "
+                throw new VipException("Unable to clean the following "
                         + "simulations: " + sb.toString());
             }
         } catch (CoreException ex) {
-            throw new ApplicationException(ex);
+            throw new VipException(ex);
         }
     }
 
     /**
      *
      * @param simulationIDs
-     * @throws ApplicationException
+     * @throws VipException
      */
-    public void purgeSimulations(List<String> simulationIDs) throws ApplicationException {
+    public void purgeSimulations(List<String> simulationIDs) throws VipException {
         try {
             authenticateSystemAdministrator(logger);
             trace(logger, "Purging simulations: " + simulationIDs);
@@ -421,54 +420,54 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
 
             if (sb.length() > 0) {
                 logger.error("Unable to purge the following simulations: {}", sb.toString());
-                throw new ApplicationException("Unable to purge the following "
+                throw new VipException("Unable to purge the following "
                         + "simulations: " + sb.toString());
             }
         } catch (CoreException ex) {
-            throw new ApplicationException(ex);
+            throw new VipException(ex);
         }
     }
 
     /**
      *
      * @param simulationID
-     * @throws ApplicationException
+     * @throws VipException
      */
     @Override
-    public void killWorkflow(String simulationID) throws ApplicationException {
+    public void killWorkflow(String simulationID) throws VipException {
 
         try {
             trace(logger, "Killing simulation '" + simulationID + "'.");
             workflowBusiness.kill(simulationID);
 
         } catch (VipException ex) {
-            throw new ApplicationException(ex);
+            throw new VipException(ex);
         }
     }
 
     /**
      *
      * @param simulationID
-     * @throws ApplicationException
+     * @throws VipException
      */
-    public void cleanWorkflow(String simulationID) throws ApplicationException {
+    public void cleanWorkflow(String simulationID) throws VipException {
 
         try {
             trace(logger, "Cleaning simulation '" + simulationID + "'.");
             workflowBusiness.clean(simulationID, getSessionUser().getEmail());
 
         } catch (VipException ex) {
-            throw new ApplicationException(ex);
+            throw new VipException(ex);
         }
     }
 
     /**
      *
      * @param simulationID
-     * @throws ApplicationException
+     * @throws VipException
      */
     @Override
-    public void purgeWorkflow(String simulationID) throws ApplicationException {
+    public void purgeWorkflow(String simulationID) throws VipException {
 
         try {
             authenticateSystemAdministrator(logger);
@@ -476,7 +475,7 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
             workflowBusiness.purge(simulationID);
 
         } catch (VipException ex) {
-            throw new ApplicationException(ex);
+            throw new VipException(ex);
         }
     }
 
@@ -484,16 +483,16 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
      *
      * @param simulationID
      * @return
-     * @throws ApplicationException
+     * @throws VipException
      */
     @Override
-    public Map<String, String> relaunchSimulation(String simulationID) throws ApplicationException {
+    public Map<String, String> relaunchSimulation(String simulationID) throws VipException {
         try {
             trace(logger, "Relaunching simulation '" + simulationID + "'.");
             return workflowBusiness.relaunch(
                 simulationID, getSessionUser().getFolder());
         } catch (VipException ex) {
-            throw new ApplicationException(ex);
+            throw new VipException(ex);
         }
     }
 
@@ -501,15 +500,15 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
      *
      * @param simulationID
      * @return
-     * @throws ApplicationException
+     * @throws VipException
      */
-    public Simulation getSimulation(String simulationID) throws ApplicationException {
+    public Simulation getSimulation(String simulationID) throws VipException {
 
         try {
             return workflowBusiness.getSimulation(simulationID);
 
         } catch (VipException ex) {
-            throw new ApplicationException(ex);
+            throw new VipException(ex);
         }
     }
 
@@ -568,15 +567,15 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
     /**
      *
      * @param path
-     * @throws ApplicationException
+     * @throws VipException
      */
-    public void deleteLogData(String path) throws ApplicationException {
+    public void deleteLogData(String path) throws VipException {
 
         try {
             workflowBusiness.deleteLogData(path);
 
         } catch (VipException ex) {
-            throw new ApplicationException(ex);
+            throw new VipException(ex);
         }
     }
 
@@ -595,17 +594,17 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
      * @param simulationList
      * @param type
      * @return
-     * @throws ApplicationException
+     * @throws VipException
      */
-    public List<String> getPerformanceStats(List<Simulation> simulationList, int type) throws ApplicationException {
+    public List<String> getPerformanceStats(List<Simulation> simulationList, int type) throws VipException {
 
         try {
             return workflowBusiness.getPerformanceStats(simulationList, type);
         } catch (WorkflowsDBDAOException ex) {
             logger.error("Error getting perf stats for {}", simulationList, ex);
-            throw new ApplicationException(ex);
+            throw new VipException(ex);
         } catch (VipException ex) {
-            throw new ApplicationException(ex);
+            throw new VipException(ex);
         }
     }
 
@@ -613,15 +612,15 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
      *
      * @param simulationID
      * @return
-     * @throws ApplicationException
+     * @throws VipException
      */
     @Override
-    public List<InOutData> getOutputData(String simulationID) throws ApplicationException {
+    public List<InOutData> getOutputData(String simulationID) throws VipException {
         try {
             return workflowBusiness.getOutputData(
                 simulationID, getSessionUser().getFolder());
         } catch (VipException ex) {
-            throw new ApplicationException(ex);
+            throw new VipException(ex);
         }
     }
 
@@ -630,15 +629,15 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
      *
      * @param simulationID
      * @return
-     * @throws ApplicationException
+     * @throws VipException
      */
     @Override
-    public List<InOutData> getInputData(String simulationID) throws ApplicationException {
+    public List<InOutData> getInputData(String simulationID) throws VipException {
         try {
             return workflowBusiness.getInputData(
                 simulationID, getSessionUser().getFolder());
         } catch (VipException ex) {
-            throw new ApplicationException(ex);
+            throw new VipException(ex);
         }
     }
 
@@ -646,29 +645,29 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
      *
      * @param simulationID
      * @return
-     * @throws ApplicationException
+     * @throws VipException
      */
-    public List<Activity> getProcessors(String simulationID) throws ApplicationException {
+    public List<Activity> getProcessors(String simulationID) throws VipException {
 
         try {
             return workflowBusiness.getProcessors(simulationID);
 
         } catch (VipException ex) {
-            throw new ApplicationException(ex);
+            throw new VipException(ex);
         }
     }
 
     /**
      *
      * @param inputs
-     * @throws ApplicationException
+     * @throws VipException
      */
     @Override
-    public void validateInputs(List<String> inputs) throws ApplicationException {
+    public void validateInputs(List<String> inputs) throws VipException {
         try {
             workflowBusiness.validateInputs(getSessionUser(), inputs);
         } catch (VipException ex) {
-            throw new ApplicationException(ex);
+            throw new VipException(ex);
         }
     }
 
@@ -676,21 +675,21 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
      *
      * @param currentUser
      * @param newUser
-     * @throws ApplicationException
+     * @throws VipException
      */
-    public void updateUser(String currentUser, String newUser) throws ApplicationException {
+    public void updateUser(String currentUser, String newUser) throws VipException {
 
         try {
             trace(logger, "Updating user '" + currentUser + "' to '" + newUser + "'.");
             workflowBusiness.updateUser(currentUser, newUser);
 
         } catch (VipException ex) {
-            throw new ApplicationException(ex);
+            throw new VipException(ex);
         }
     }
 
     @Override
-    public void markSimulationsCompleted(List<String> simulationIDs) throws ApplicationException {
+    public void markSimulationsCompleted(List<String> simulationIDs) throws VipException {
         try {
             trace(logger, "Marking simulations completed: " + simulationIDs);
             StringBuilder sb = new StringBuilder();
@@ -707,33 +706,33 @@ public class WorkflowServiceImpl extends AbstractRemoteServiceServlet implements
 
             if (sb.length() > 0) {
                 logger.error("Unable to mark completed the following simulations: {}", sb.toString());
-                throw new ApplicationException("Unable to mark completed the following "
+                throw new VipException("Unable to mark completed the following "
                         + "simulations: " + sb.toString());
             }
         } catch (CoreException ex) {
-            throw new ApplicationException(ex);
+            throw new VipException(ex);
         }
     }
 
     @Override
-    public void markWorkflowCompleted(String simulationID) throws ApplicationException {
+    public void markWorkflowCompleted(String simulationID) throws VipException {
          try {
             trace(logger, "Marking simulation '" + simulationID + "' completed.");
             workflowBusiness.markCompleted(simulationID);
 
         } catch (VipException ex) {
-            throw new ApplicationException(ex);
+            throw new VipException(ex);
         }
     }
 
     @Override
-    public void changeSimulationUser(String simulationId, String user) throws ApplicationException {
+    public void changeSimulationUser(String simulationId, String user) throws VipException {
          try {
             trace(logger, "Changing user of simulation '" + simulationId + "' to "+user+".");
             workflowBusiness.changeSimulationUser(simulationId,user);
 
         } catch (VipException ex) {
-            throw new ApplicationException(ex);
+            throw new VipException(ex);
         }
     }
 }
