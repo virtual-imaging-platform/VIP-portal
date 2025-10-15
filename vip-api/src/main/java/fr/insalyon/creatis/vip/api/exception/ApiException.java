@@ -1,9 +1,10 @@
-package fr.insalyon.creatis.vip.core.server.exception;
-
-import fr.insalyon.creatis.vip.core.client.VipException;
-import org.springframework.http.HttpStatus;
+package fr.insalyon.creatis.vip.api.exception;
 
 import java.util.Optional;
+
+import org.springframework.http.HttpStatus;
+
+import fr.insalyon.creatis.vip.core.client.VipException;
 
 public class ApiException extends VipException {
 

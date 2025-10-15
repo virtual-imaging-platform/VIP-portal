@@ -15,7 +15,6 @@ import fr.insalyon.creatis.vip.core.client.VipException;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
 import fr.insalyon.creatis.vip.core.server.business.SessionBusiness;
-import fr.insalyon.creatis.vip.core.server.exception.ApiException;
 import fr.insalyon.creatis.vip.core.server.model.AuthenticationCredentials;
 import fr.insalyon.creatis.vip.core.server.model.Session;
 import jakarta.servlet.http.HttpServletRequest;
@@ -56,25 +55,25 @@ public class SessionController {
     @PostMapping
     public Session createSession(@RequestBody @Valid AuthenticationCredentials credentials, HttpServletRequest request,
             HttpServletResponse response)
-            throws ApiException {
+            throws VipException {
         try {
             Session session = sessionBusiness.signin(credentials);
 
             sessionBusiness.createLoginCookies(request, response, session);
             return session;
         } catch (UnsupportedEncodingException | VipException e) {
-            throw new ApiException("Failed to create user session!", e);
+            throw new VipException("Failed to create user session!", e);
         }
     }
 
     @DeleteMapping
-    public void deleteSession(HttpServletRequest request, HttpServletResponse response) throws ApiException {
+    public void deleteSession(HttpServletRequest request, HttpServletResponse response) throws VipException {
         try {
             sessionBusiness.signout();
             sessionBusiness.clearLoginCookies(response);
 
         } catch (VipException e) {
-            throw new ApiException(e); // change
+            throw new VipException(e); // change
         }
     }
 }
