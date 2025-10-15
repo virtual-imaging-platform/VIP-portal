@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import fr.insalyon.creatis.moteur.plugins.workflowsdb.bean.WorkflowStatus;
+import fr.insalyon.creatis.vip.api.exception.ApiException;
 import fr.insalyon.creatis.vip.api.model.Execution;
 import fr.insalyon.creatis.vip.api.model.ExecutionStatus;
 import fr.insalyon.creatis.vip.api.model.PathProperties;
@@ -34,7 +35,6 @@ import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.server.CarminProperties;
 import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
-import fr.insalyon.creatis.vip.core.server.exception.ApiException;
 
 /**
  *

@@ -1,18 +1,32 @@
 package fr.insalyon.creatis.vip.api.rest.itest.processing;
 
-import fr.insalyon.creatis.vip.core.server.exception.ApiException.ApiError;
-import fr.insalyon.creatis.vip.api.rest.config.BaseWebSpringIT;
-import fr.insalyon.creatis.vip.application.client.bean.AppVersion;
+import static fr.insalyon.creatis.vip.api.data.PipelineTestUtils.fileParam;
+import static fr.insalyon.creatis.vip.api.data.PipelineTestUtils.flagParam;
+import static fr.insalyon.creatis.vip.api.data.PipelineTestUtils.getFullPipeline;
+import static fr.insalyon.creatis.vip.api.data.PipelineTestUtils.getPipeline;
+import static fr.insalyon.creatis.vip.api.data.PipelineTestUtils.jsonCorrespondsToPipeline;
+import static fr.insalyon.creatis.vip.api.data.PipelineTestUtils.optionalTextParam;
+import static fr.insalyon.creatis.vip.api.data.PipelineTestUtils.textParam;
+import static fr.insalyon.creatis.vip.api.data.UserTestUtils.baseUser1;
+import static fr.insalyon.creatis.vip.api.data.UserTestUtils.baseUser2;
+import static fr.insalyon.creatis.vip.api.data.UserTestUtils.baseUser3;
+import static fr.insalyon.creatis.vip.api.data.UserTestUtils.baseUser4;
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasSize;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
 
-import static fr.insalyon.creatis.vip.api.data.PipelineTestUtils.*;
-import static fr.insalyon.creatis.vip.api.data.UserTestUtils.*;
-import static org.hamcrest.Matchers.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import fr.insalyon.creatis.vip.api.exception.ApiException.ApiError;
+import fr.insalyon.creatis.vip.api.rest.config.BaseWebSpringIT;
+import fr.insalyon.creatis.vip.application.client.bean.AppVersion;
 
 public class PipelineControllerIT extends BaseWebSpringIT {
 
