@@ -78,8 +78,8 @@ public class ApplicationControllerIT extends BaseSpringIT {
             .with(SecurityMockMvcRequestPostProcessors.csrf())
             .contentType(MediaType.APPLICATION_JSON)
             .content(mapper.writeValueAsString(app)))
-                .andDo(print())
-                    .andExpect(status().is4xxClientError()); // waiting for good API Exception
+                    .andExpect(jsonPath("$.errorCode").value(1001))
+                    .andExpect(status().is4xxClientError());
 
         // developer not in the private group
         mockMvc.perform(post("/internal/applications")
@@ -87,8 +87,8 @@ public class ApplicationControllerIT extends BaseSpringIT {
             .with(SecurityMockMvcRequestPostProcessors.csrf())
             .contentType(MediaType.APPLICATION_JSON)
             .content(mapper.writeValueAsString(app)))
-                .andDo(print())
-                    .andExpect(status().is4xxClientError()); // waiting for good API Exception
+                    .andExpect(jsonPath("$.errorCode").value(1001))
+                    .andExpect(status().is4xxClientError());
 
         configurationBusiness.addUserToGroup(emailUser2, nameGroup1);
         developperUser = configurationBusiness.getUserWithGroups(emailUser2);
@@ -99,8 +99,7 @@ public class ApplicationControllerIT extends BaseSpringIT {
             .with(SecurityMockMvcRequestPostProcessors.csrf())
             .contentType(MediaType.APPLICATION_JSON)
             .content(mapper.writeValueAsString(app)))
-                .andDo(print())
-                    .andExpect(status().isOk()); // waiting for good API Exception
+                    .andExpect(status().isOk());
 
         // // or admin
         // here it perform an update since application already exist
@@ -109,8 +108,7 @@ public class ApplicationControllerIT extends BaseSpringIT {
             .with(SecurityMockMvcRequestPostProcessors.csrf())
             .contentType(MediaType.APPLICATION_JSON)
             .content(mapper.writeValueAsString(app)))
-                .andDo(print())
-                    .andExpect(status().isOk()); // waiting for good API Exception
+                    .andExpect(status().isOk());
     }
 
     @Test
@@ -124,7 +122,6 @@ public class ApplicationControllerIT extends BaseSpringIT {
             .with(SecurityMockMvcRequestPostProcessors.csrf())
             .contentType(MediaType.APPLICATION_JSON)
             .content(mapper.writeValueAsString(app)))
-                .andDo(print())
                     .andExpect(status().isOk());
 
         // not the rights
@@ -133,8 +130,8 @@ public class ApplicationControllerIT extends BaseSpringIT {
             .with(SecurityMockMvcRequestPostProcessors.csrf())
             .contentType(MediaType.APPLICATION_JSON)
             .content(mapper.writeValueAsString(app.getName())))
-                .andDo(print())
-                    .andExpect(status().is4xxClientError()); // waiting for good API Exception
+                    .andExpect(jsonPath("$.errorCode").value(1001))
+                    .andExpect(status().is4xxClientError());
 
         configurationBusiness.addUserToGroup(emailUser2, nameGroup1);
         developperUser = configurationBusiness.getUserWithGroups(emailUser2);
@@ -145,8 +142,7 @@ public class ApplicationControllerIT extends BaseSpringIT {
             .with(SecurityMockMvcRequestPostProcessors.csrf())
             .contentType(MediaType.APPLICATION_JSON)
             .content(mapper.writeValueAsString(app.getName())))
-                .andDo(print())
-                    .andExpect(status().isOk()); // waiting for good API Exception
+                    .andExpect(status().isOk());
     
         // good one and admin!
         mockMvc.perform(delete("/internal/applications/" + app.getName())
@@ -154,8 +150,7 @@ public class ApplicationControllerIT extends BaseSpringIT {
             .with(SecurityMockMvcRequestPostProcessors.csrf())
             .contentType(MediaType.APPLICATION_JSON)
             .content(mapper.writeValueAsString(app.getName())))
-                .andDo(print())
-                    .andExpect(status().isOk()); // waiting for good API Exception
+                    .andExpect(status().isOk());
     }
 
     @Test
@@ -176,7 +171,6 @@ public class ApplicationControllerIT extends BaseSpringIT {
             .with(SecurityMockMvcRequestPostProcessors.csrf())
             .contentType(MediaType.APPLICATION_JSON)
             .content(mapper.writeValueAsString(app)))
-                .andDo(print())
                     .andExpect(status().isBadRequest())
                     .andExpect(jsonPath("$.errorCode").value(8009));
 
@@ -186,7 +180,6 @@ public class ApplicationControllerIT extends BaseSpringIT {
             .with(SecurityMockMvcRequestPostProcessors.csrf())
             .contentType(MediaType.APPLICATION_JSON)
             .content(mapper.writeValueAsString(app)))
-                .andDo(print())
                     .andExpect(status().isOk());
     }
 
@@ -203,7 +196,8 @@ public class ApplicationControllerIT extends BaseSpringIT {
         // retrieve wrong
         mockMvc.perform(get("/internal/applications/wrong")
                 .with(getUserSecurityMock(adminUser)).with(SecurityMockMvcRequestPostProcessors.csrf()))
-                .andExpect(status().is4xxClientError()); // waiting for good API Exception
+                    .andExpect(jsonPath("$.errorCode").value(1000))
+                    .andExpect(status().is4xxClientError());
 
         // good one
         mockMvc.perform(get("/internal/applications/" + app.getName())
