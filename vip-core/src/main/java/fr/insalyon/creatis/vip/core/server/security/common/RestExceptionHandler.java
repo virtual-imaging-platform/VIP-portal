@@ -22,11 +22,15 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+<<<<<<< HEAD
 <<<<<<<< HEAD:vip-core/src/main/java/fr/insalyon/creatis/vip/core/server/RestExceptionHandler.java
 import fr.insalyon.creatis.vip.core.client.DefaultError;
 import fr.insalyon.creatis.vip.core.client.VipError;
 ========
 >>>>>>>> 96fa24389 (move ApiException):vip-core/src/main/java/fr/insalyon/creatis/vip/core/server/security/common/RestExceptionHandler.java
+=======
+import fr.insalyon.creatis.vip.core.client.DefaultError;
+>>>>>>> 4b75c12f7 (major changes on exceptions)
 import fr.insalyon.creatis.vip.core.client.VipException;
 import fr.insalyon.creatis.vip.core.server.model.ErrorCodeAndMessage;
 
@@ -36,7 +40,11 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @ExceptionHandler(VipException.class)
+<<<<<<< HEAD
     public ResponseEntity<Object> handleVipException(VipException e) {
+=======
+    public ResponseEntity<Object> handleException(VipException e) {
+>>>>>>> 4b75c12f7 (major changes on exceptions)
         // No need to log, VIP errors are logged when they are created
 
         // to find the error message : look for an error code in the vip
@@ -44,10 +52,14 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         ErrorCodeAndMessage codeAndMessage = fetchErrorInException(e);
         // we are now using specific return codes inside the response itself
         // like 8xxx codes
+<<<<<<< HEAD
         HttpStatus status = HttpStatus.resolve(e.getVipError()
                 .map(VipError::getHttpCode)
                 .orElse(400));
 
+=======
+        HttpStatus status = HttpStatus.BAD_REQUEST;
+>>>>>>> 4b75c12f7 (major changes on exceptions)
         return new ResponseEntity<>(codeAndMessage, status);
     }
 
