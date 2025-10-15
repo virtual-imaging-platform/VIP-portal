@@ -61,7 +61,7 @@ public class SessionController {
 
             sessionBusiness.createLoginCookies(request, response, session);
             return session;
-        } catch (UnsupportedEncodingException | VipException e) {
+        } catch (UnsupportedEncodingException e) {
             throw new VipException("Failed to create user session!", e);
         }
     }
