@@ -1,7 +1,7 @@
 package fr.insalyon.creatis.vip.api.business;
 
-import static fr.insalyon.creatis.vip.core.server.exception.ApiException.ApiError.NOT_ALLOWED_TO_USE_PIPELINE;
-import static fr.insalyon.creatis.vip.core.server.exception.ApiException.ApiError.PIPELINE_NOT_FOUND;
+import static fr.insalyon.creatis.vip.api.exception.ApiException.ApiError.NOT_ALLOWED_TO_USE_PIPELINE;
+import static fr.insalyon.creatis.vip.api.exception.ApiException.ApiError.PIPELINE_NOT_FOUND;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -16,6 +16,8 @@ import org.springframework.stereotype.Service;
 
 import fr.insalyon.creatis.boutiques.model.BoutiquesDescriptor;
 import fr.insalyon.creatis.boutiques.model.Input;
+import fr.insalyon.creatis.vip.api.exception.ApiException;
+import fr.insalyon.creatis.vip.api.exception.ApiException.ApiError;
 import fr.insalyon.creatis.vip.api.model.ParameterType;
 import fr.insalyon.creatis.vip.api.model.Pipeline;
 import fr.insalyon.creatis.vip.api.model.PipelineParameter;
@@ -28,8 +30,6 @@ import fr.insalyon.creatis.vip.core.client.VipException;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.server.business.Server;
-import fr.insalyon.creatis.vip.core.server.exception.ApiException;
-import fr.insalyon.creatis.vip.core.server.exception.ApiException.ApiError;
 import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
 
 @Service

@@ -1,10 +1,9 @@
 package fr.insalyon.creatis.vip.api.controller.processing;
 
-import fr.insalyon.creatis.boutiques.model.BoutiquesDescriptor;
-import fr.insalyon.creatis.vip.api.business.PipelineBusiness;
-import fr.insalyon.creatis.vip.api.controller.ApiController;
-import fr.insalyon.creatis.vip.core.server.exception.ApiException;
-import fr.insalyon.creatis.vip.api.model.Pipeline;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,9 +12,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
-import java.util.List;
+import fr.insalyon.creatis.boutiques.model.BoutiquesDescriptor;
+import fr.insalyon.creatis.vip.api.business.PipelineBusiness;
+import fr.insalyon.creatis.vip.api.controller.ApiController;
+import fr.insalyon.creatis.vip.api.exception.ApiException;
+import fr.insalyon.creatis.vip.api.model.Pipeline;
 
 @RestController
 @RequestMapping("pipelines")

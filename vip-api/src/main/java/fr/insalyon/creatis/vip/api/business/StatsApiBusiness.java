@@ -14,6 +14,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import fr.insalyon.creatis.vip.api.exception.ApiException;
+import fr.insalyon.creatis.vip.api.exception.ApiException.ApiError;
 import fr.insalyon.creatis.vip.api.model.stats.StatUser;
 import fr.insalyon.creatis.vip.api.model.stats.UsersList;
 import fr.insalyon.creatis.vip.api.model.stats.UsersNumber;
@@ -22,8 +24,6 @@ import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.util.CountryCode;
 import fr.insalyon.creatis.vip.core.server.business.StatsBusiness;
 import fr.insalyon.creatis.vip.core.server.business.StatsBusiness.UserSearchCriteria;
-import fr.insalyon.creatis.vip.core.server.exception.ApiException;
-import fr.insalyon.creatis.vip.core.server.exception.ApiException.ApiError;
 
 @Service
 public class StatsApiBusiness {

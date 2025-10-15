@@ -1,12 +1,6 @@
 package fr.insalyon.creatis.vip.core.server.security;
 
-import  fr.insalyon.creatis.vip.core.server.business.Server;
-
-import fr.insalyon.creatis.vip.core.server.security.apikey.ApikeyAuthenticationFilter;
-import fr.insalyon.creatis.vip.core.server.security.apikey.ApikeyAuthenticationProvider;
-
-import fr.insalyon.creatis.vip.core.server.security.oidc.OidcConfig;
-import fr.insalyon.creatis.vip.core.server.security.oidc.OidcResolver;
+import static org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,15 +8,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
-
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.security.web.firewall.DefaultHttpFirewall;
-import static org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher;
 import org.springframework.security.web.util.matcher.RegexRequestMatcher;
+
+import fr.insalyon.creatis.vip.core.server.business.Server;
+import fr.insalyon.creatis.vip.core.server.security.apikey.ApikeyAuthenticationFilter;
+import fr.insalyon.creatis.vip.core.server.security.apikey.ApikeyAuthenticationProvider;
+import fr.insalyon.creatis.vip.core.server.security.oidc.OidcConfig;
+import fr.insalyon.creatis.vip.core.server.security.oidc.OidcResolver;
 
 /**
  * VIP API configuration for API key and OIDC authentications.
