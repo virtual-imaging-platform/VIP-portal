@@ -8,6 +8,7 @@ import java.util.function.Supplier;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import fr.insalyon.creatis.vip.core.client.DefaultError;
 import fr.insalyon.creatis.vip.core.client.VipException;
 import fr.insalyon.creatis.vip.core.client.bean.Group;
 import fr.insalyon.creatis.vip.core.client.bean.User;
@@ -31,7 +32,7 @@ public class CorePermissions {
                 return;
             }
         }
-        throw new VipException("You do not have the right to do that!");
+        throw new VipException(DefaultError.ACCESS_DENIED);
     }
 
     public void checkOnlyUserPrivateGroups(List<Group> groupsToCheck) throws VipException {
@@ -44,7 +45,7 @@ public class CorePermissions {
         for (Group group : groupsToCheck) {
             // check ONLY user groups and ONLY privates groups
             if ( ! userGroups.contains(group) || group.isPublicGroup()) {
-                throw new VipException("You do not have the right to do that!");
+                throw new VipException(DefaultError.ACCESS_DENIED);
             }
         }
     }

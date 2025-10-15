@@ -58,22 +58,18 @@ public class SessionController {
                     CoreConstants.COOKIES_CSRF_TOKEN, token.getToken(), CoreConstants.COOKIES_DURATION, false));
 
             return session;
-        } catch (UnsupportedEncodingException | VipException e) {
+        } catch (UnsupportedEncodingException e) {
             throw new VipException("Failed to create user session!", e);
         }
     }
 
     @DeleteMapping
     public void deleteSession(HttpServletRequest request, HttpServletResponse response) throws VipException {
-        try {
-            sessionBusiness.signout();
+        sessionBusiness.signout();
 
-            response.addCookie(createCookie(CoreConstants.COOKIES_SESSION, null, 0, true));
-            response.addCookie(createCookie(CoreConstants.COOKIES_USER, null, 0, true));
-            response.addCookie(createCookie(CoreConstants.COOKIES_CSRF_TOKEN, null, 0, false));
-        } catch (VipException e) {
-            throw new VipException(e); // change
-        }
+        response.addCookie(createCookie(CoreConstants.COOKIES_SESSION, null, 0, true));
+        response.addCookie(createCookie(CoreConstants.COOKIES_USER, null, 0, true));
+        response.addCookie(createCookie(CoreConstants.COOKIES_CSRF_TOKEN, null, 0, false));
     }
 
     private Cookie createCookie(String name, String value, int maxAge, boolean httpOnly) {
