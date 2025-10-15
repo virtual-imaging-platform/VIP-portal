@@ -13,6 +13,7 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
 
+import fr.insalyon.creatis.vip.api.exception.ApiException.ApiError;
 import fr.insalyon.creatis.vip.api.rest.config.BaseWebSpringIT;
 import fr.insalyon.creatis.vip.api.tools.spring.ApikeyRequestPostProcessor;
 import fr.insalyon.creatis.vip.core.client.DefaultError;

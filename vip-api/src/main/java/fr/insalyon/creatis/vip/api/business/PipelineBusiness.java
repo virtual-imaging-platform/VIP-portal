@@ -26,8 +26,6 @@ import fr.insalyon.creatis.vip.core.client.VipException;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.server.business.Server;
-import fr.insalyon.creatis.vip.core.server.exception.ApiException;
-import fr.insalyon.creatis.vip.core.server.exception.ApiException.ApiError;
 import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
 
 @Service
