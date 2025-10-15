@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import fr.insalyon.creatis.vip.core.client.DefaultError;
 import fr.insalyon.creatis.vip.core.client.VipException;
 import fr.insalyon.creatis.vip.core.client.bean.Group;
 import fr.insalyon.creatis.vip.core.client.bean.User;
@@ -33,7 +34,7 @@ public class CorePermissions {
                 return;
             }
         }
-        throw new VipException(CoreConstants.NOT_RIGHT);
+        throw new VipException(DefaultError.ACCESS_DENIED);
     }
 
     public void checkOnlyUserPrivateGroups(Set<Group> groupsToCheck) throws VipException {
@@ -46,7 +47,7 @@ public class CorePermissions {
         for (Group group : groupsToCheck) {
             // check ONLY user groups and ONLY privates groups
             if ( ! userGroups.contains(group) || group.isPublicGroup()) {
-                throw new VipException(CoreConstants.NOT_RIGHT);
+                throw new VipException(DefaultError.ACCESS_DENIED);
             }
         }
     }
@@ -66,13 +67,13 @@ public class CorePermissions {
 
     public <T> void checkItemInList(T item, List<T> list) throws VipException {
         if ( ! list.contains(item)) {
-            throw new VipException(CoreConstants.NOT_RIGHT);
+            throw new VipException(DefaultError.ACCESS_DENIED);
         }
     }
 
     public <T> void checkUnchanged(T a, T b) throws VipException {
         if (!a.equals(b)) {
-            throw new VipException(CoreConstants.NOT_RIGHT); 
+            throw new VipException(DefaultError.ACCESS_DENIED); 
         }
     }
 }

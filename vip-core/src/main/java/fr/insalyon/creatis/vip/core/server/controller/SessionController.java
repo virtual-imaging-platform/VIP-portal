@@ -61,7 +61,7 @@ public class SessionController {
 
             sessionBusiness.createLoginCookies(request, response, session);
             return session;
-        } catch (UnsupportedEncodingException | VipException e) {
+        } catch (UnsupportedEncodingException e) {
             if (e.getMessage().startsWith("Authentication failed")) {
                 throw new ApiException(ApiException.ApiError.BAD_CREDENTIALS);
             }
