@@ -26,6 +26,20 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 )
 public class SpringAuthenticationWithMockedUserDaoIT extends BaseRestApiSpringIT {
 
+import fr.insalyon.creatis.vip.api.exception.ApiException.ApiError;
+import fr.insalyon.creatis.vip.api.rest.config.BaseWebSpringIT;
+import fr.insalyon.creatis.vip.api.tools.spring.ApikeyRequestPostProcessor;
+import fr.insalyon.creatis.vip.core.server.dao.UserDAO;
+
+/**
+ * These tests check the authentication with the spring test tools.
+ * It requests a wrong url that should be secured and expects a 404 when OK
+ * <p>
+ * Use common vip spring test configuration ({@link BaseWebSpringIT}
+ */
+@ContextConfiguration(classes = SpringAuthenticationWithMockedUserDaoIT.TestContextConfiguration.class)
+public class SpringAuthenticationWithMockedUserDaoIT extends BaseWebSpringIT {
+
     static class TestContextConfiguration {
         @Bean
         @Primary
