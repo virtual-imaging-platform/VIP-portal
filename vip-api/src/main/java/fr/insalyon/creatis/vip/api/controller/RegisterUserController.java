@@ -13,8 +13,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import fr.insalyon.creatis.vip.api.business.ApiUserBusiness;
-import fr.insalyon.creatis.vip.api.exception.ApiException;
 import fr.insalyon.creatis.vip.api.model.SignUpUserDTO;
+import fr.insalyon.creatis.vip.core.client.VipException;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import jakarta.validation.Valid;
 
@@ -39,10 +39,10 @@ public class RegisterUserController extends ApiController {
      *
      * @param signUpUser
      * @return ResponseEntity<String>
-     * @throws ApiException
+     * @throws VipException
      */
     @RequestMapping(method = RequestMethod.POST)
-    public ResponseEntity<?> signup(@RequestBody @Valid SignUpUserDTO signUpUser) throws ApiException {
+    public ResponseEntity<?> signup(@RequestBody @Valid SignUpUserDTO signUpUser) throws VipException {
         logMethodInvocation(logger,"signup", signUpUser.getEmail());
         User user = new User(signUpUser.getFirstName(),
                 signUpUser.getLastName(),

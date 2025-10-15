@@ -38,8 +38,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import fr.insalyon.creatis.vip.api.exception.ApiException;
-import fr.insalyon.creatis.vip.api.exception.ApiException.ApiError;
+import fr.insalyon.creatis.vip.api.exception.ApiError;
 import fr.insalyon.creatis.vip.api.model.PathProperties;
 import fr.insalyon.creatis.vip.api.model.UploadData;
 import fr.insalyon.creatis.vip.api.model.UploadDataType;
@@ -106,21 +105,21 @@ public class DataApiBusiness {
         logger.info("download threads succesfully shutdown");
     }
 
-    public boolean doesFileExist(String path) throws ApiException {
+    public boolean doesFileExist(String path) throws VipException {
         checkReadPermission(path);
         return path.equals(ROOT) || baseDoesFileExist(path);
     }
 
-    public void deletePath(String path) throws ApiException {
+    public void deletePath(String path) throws VipException {
         checkPermission(path, LFCAccessType.DELETE);
         if (!baseDoesFileExist(path)) {
             logger.error("trying to delete a non-existing file : {}", path);
-            throw new ApiException("trying to delete a non-existing dile");
+            throw new VipException("trying to delete a non-existing dile");
         }
         baseDeletePath(path);
     }
 
-    public PathProperties getPathProperties(String path ) throws ApiException {
+    public PathProperties getPathProperties(String path ) throws VipException {
         checkReadPermission(path);
         if (path.equals(ROOT)) {
             return getRootPathProperties();
@@ -153,7 +152,7 @@ public class DataApiBusiness {
         return pathProperties;
     }
 
-    public List<PathProperties> listDirectory(String path) throws ApiException {
+    public List<PathProperties> listDirectory(String path) throws VipException {
         checkReadPermission(path);
         if (path.equals(ROOT)) {
             return getRootSubDirectoriesPathProps();
@@ -161,11 +160,11 @@ public class DataApiBusiness {
         Optional<Data.Type> type = baseGetPathInfo(path);
         if (!type.isPresent()) { // path doesn't exist
             logger.error("Trying to list a non-existing path ({})", path);
-            throw new ApiException("Error listing a directory");
+            throw new VipException("Error listing a directory");
         }
         if (!type.get().equals(Data.Type.folder)) {
             logger.error("Trying to list {} , but is a file :", path);
-            throw new ApiException("Error listing a directory");
+            throw new VipException("Error listing a directory");
         }
         List<Data> directoryData = baseGetFileData(path);
         List<PathProperties> res = new ArrayList<>();
@@ -175,7 +174,7 @@ public class DataApiBusiness {
         return res;
     }
 
-    public File getFile(String path) throws ApiException {
+    public File getFile(String path) throws VipException {
         checkDownloadPermission(path);
         String downloadOperationId =
             downloadFileToLocalStorage(path);
@@ -183,7 +182,7 @@ public class DataApiBusiness {
     }
 
     public void uploadRawFileFromInputStream(String lfcPath, InputStream is)
-            throws ApiException {
+            throws VipException {
         // TODO : check upload size ?
         checkPermission(lfcPath, LFCAccessType.UPLOAD);
         java.nio.file.Path javaPath = Paths.get(lfcPath);
@@ -191,7 +190,7 @@ public class DataApiBusiness {
         // check if parent dir exists
         if (!baseDoesFileExist(parentLfcPath)) {
             logger.error("parent directory of upload {} does not exist :", lfcPath);
-            throw new ApiException("Upload Directory doest not exist");
+            throw new VipException("Upload Directory doest not exist");
         }
         // TODO : check if it already exists
         // TODO : support archive upload
@@ -213,7 +212,7 @@ public class DataApiBusiness {
     }
 
     public void uploadCustomData(String lfcPath, UploadData uploadData)
-            throws ApiException {
+            throws VipException {
         // TODO : check upload size ?
         // TODO : factorize with previous method
         checkPermission(lfcPath, LFCAccessType.UPLOAD);
@@ -222,11 +221,11 @@ public class DataApiBusiness {
         // check if parent dir exists
         if (!baseDoesFileExist(parentLfcPath)) {
             logger.error("parent directory of {} does not exist :", lfcPath);
-            throw new ApiException("Upload Directory doest not exist");
+            throw new VipException("Upload Directory doest not exist");
         }
         if (uploadData.getType().equals(UploadDataType.ARCHIVE)) {
             logger.error("archive upload not supported yet for ({})", lfcPath);
-            throw new ApiException("archive upload not supported yet");
+            throw new VipException("archive upload not supported yet");
         }
         // TODO : check if it already exists
         // TODO : support archive upload
@@ -244,56 +243,56 @@ public class DataApiBusiness {
 
     // #### PERMISSION STUFF
 
-    private void checkReadPermission(String path) throws ApiException {
+    private void checkReadPermission(String path) throws VipException {
         checkPermission(path, LFCAccessType.READ);
     }
 
-    private void checkDownloadPermission(String path) throws ApiException {
+    private void checkDownloadPermission(String path) throws VipException {
         checkReadPermission(path);
         if (path.equals(ROOT)) {
             logger.error("cannot download root ({})", path);
-            throw new ApiException("Illegal data API access");
+            throw new VipException("Illegal data API access");
         }
         Optional<Data.Type> type = baseGetPathInfo(path);
         if (!type.isPresent()) { // path doesn't exist
             logger.error("Trying to download a non-existing file ({})", path);
-            throw new ApiException("Illegal data API access");
+            throw new VipException("Illegal data API access");
         }
         if (!type.get().equals(Data.Type.file)) {
             // it works on a directory and return a zip, but we cant check the download size
             logger.error("Trying to download a directory ({})", path);
-            throw new ApiException("Illegal data API access");
+            throw new VipException("Illegal data API access");
         }
         // path exists and is a file: check its size
         List<Data> fileData = baseGetFileData(path);
         Long maxSize = server.getCarminApiDataTransfertMaxSize();
         if (fileData.get(0).getLength() > maxSize) {
             logger.error("Trying to download a file too big ({})", path);
-            throw new ApiException("Illegal data API access");
+            throw new VipException("Illegal data API access");
         }
     }
 
     private void checkPermission(String path, LFCAccessType accessType)
-            throws ApiException {
+            throws VipException {
         try {
             if ( ! lfcPermissionBusiness.isLFCPathAllowed(
                 currentUserProvider.get(), path, accessType, true)) {
-                throw new ApiException(ApiError.UNAUTHORIZED_DATA_ACCESS, path);
+                throw new VipException(ApiError.UNAUTHORIZED_DATA_ACCESS, path);
             }
         } catch (VipException e) {
-            throw new ApiException("Error when checking permissions", e);
+            throw new VipException("Error when checking permissions", e);
         }
     }
 
     // #### DOWNLOAD STUFF
 
-    private String downloadFileToLocalStorage(String path) throws ApiException {
+    private String downloadFileToLocalStorage(String path) throws VipException {
         String downloadOperationId = baseDownloadFile(path);
         waitForOperationOrTimeout(downloadOperationId);
         return downloadOperationId;
     }
 
-    private File getDownloadFile(String operationId) throws ApiException {
+    private File getDownloadFile(String operationId) throws VipException {
         PoolOperation operation = baseGetDownloadOperation(operationId);
         File file = new File(operation.getDest());
         if (file.isDirectory()) {
@@ -306,7 +305,7 @@ public class DataApiBusiness {
     // #### Operation stuff
 
     private void waitForOperationOrTimeout(String operationId)
-            throws ApiException {
+            throws VipException {
         // get user in main thread because spring store auth/user information in
         // thread bound structure and it wont be available in the
         // 'isDownloadOverCall' thread
@@ -333,19 +332,19 @@ public class DataApiBusiness {
 
     private void timeoutOperationCompletionFuture (
             String operationId,
-            Future<Boolean> completionFuture, int timeoutInSeconds) throws ApiException {
+            Future<Boolean> completionFuture, int timeoutInSeconds) throws VipException {
         try {
             completionFuture.get(timeoutInSeconds, TimeUnit.SECONDS);
         } catch (InterruptedException e) {
             logger.error("Waiting for operation completion interrupted : {}", operationId ,e);
-            throw new ApiException("Waiting for operation completion interrupted", e);
+            throw new VipException("Waiting for operation completion interrupted", e);
         } catch (ExecutionException e) {
             logger.error("Error waiting for operation completion : {}", operationId ,e);
-            throw new ApiException("Error waiting for operation completion", e);
+            throw new VipException("Error waiting for operation completion", e);
         } catch (TimeoutException e) {
             completionFuture.cancel(true);
             logger.error("Timeout operation completion : {}", operationId, e);
-            throw new ApiException("Aborting operation : too long", e);
+            throw new VipException("Aborting operation : too long", e);
         }
     }
 
@@ -358,7 +357,7 @@ public class DataApiBusiness {
     }
 
     private boolean isOperationOver(String operationId, User user)
-            throws ApiException {
+            throws VipException {
         PoolOperation operation = baseGetPoolOperation(operationId, user);
 
         switch (operation.getStatus()) {
@@ -372,13 +371,13 @@ public class DataApiBusiness {
             case Rescheduled:
             default:
                 logger.error("IO LFC Operation failed : {} : {}", operationId, operation.getStatus());
-                throw new ApiException("IO LFC Operation operation failed");
+                throw new VipException("IO LFC Operation operation failed");
         }
     }
 
     // #### UPLOAD STUFF
 
-    private void writeFileFromBase64(String base64Content, String localFilePath) throws ApiException {
+    private void writeFileFromBase64(String base64Content, String localFilePath) throws VipException {
         Base64.Decoder decoder = Base64.getDecoder();
         StringReader stringReader = new StringReader(base64Content);
         try {
@@ -390,11 +389,11 @@ public class DataApiBusiness {
             Files.copy(base64InputStream, Paths.get(localFilePath));
         } catch (IOException e) {
             logger.error("Error writing base64 file in {}", localFilePath, e);
-            throw new ApiException("Error writing base64 file", e);
+            throw new VipException("Error writing base64 file", e);
         }
     }
 
-    private boolean saveInputStreamToFile(InputStream is, String path) throws ApiException {
+    private boolean saveInputStreamToFile(InputStream is, String path) throws VipException {
         try (FileOutputStream fos = new FileOutputStream(path)) {
             byte[] buffer = new byte[1024];
             int bytesRead;
@@ -407,10 +406,10 @@ public class DataApiBusiness {
             return isFileEmpty;
         } catch (FileNotFoundException e) {
             logger.error("Error creating new file {}", path ,e);
-            throw new ApiException("Upload error", e);
+            throw new VipException("Upload error", e);
         } catch (IOException e) {
             logger.error("IO Error storing file {}", path, e);
-            throw new ApiException("Upload error", e);
+            throw new VipException("Upload error", e);
         }
     }
 
@@ -500,92 +499,92 @@ public class DataApiBusiness {
 
     // #### LOWER LEVELS CALLS, all prefixed with "base"
 
-    private boolean baseDoesFileExist(String path) throws ApiException {
+    private boolean baseDoesFileExist(String path) throws VipException {
         try {
             return lfcBusiness.exists(currentUserProvider.get(), path);
         } catch (VipException e) {
-            throw new ApiException("Error testing file existence", e);
+            throw new VipException("Error testing file existence", e);
         }
     }
 
-    private Optional<Data.Type> baseGetPathInfo(String path) throws ApiException {
+    private Optional<Data.Type> baseGetPathInfo(String path) throws VipException {
         try {
             return lfcBusiness.getPathInfo(currentUserProvider.get(), path);
         } catch (VipException e) {
-            throw new ApiException("Error getting path info", e);
+            throw new VipException("Error getting path info", e);
         }
     }
 
-    private List<Data> baseGetFileData(String path) throws ApiException {
+    private List<Data> baseGetFileData(String path) throws VipException {
         try {
             return lfcBusiness.listDir(
                 currentUserProvider.get(), path, true);
         } catch (VipException e) {
-            throw new ApiException("Error getting lfc information", e);
+            throw new VipException("Error getting lfc information", e);
         }
     }
 
     /* return the operation id */
-    private String baseDownloadFile(String path) throws ApiException {
+    private String baseDownloadFile(String path) throws VipException {
         try {
             return transferPoolBusiness.downloadFile(
                 currentUserProvider.get(), path);
         } catch (VipException e) {
-            throw new ApiException("Error download LFC file", e);
+            throw new VipException("Error download LFC file", e);
         }
     }
 
     private String baseUploadFile(String localPath, String lfcPath)
-            throws ApiException {
+            throws VipException {
         try {
             return transferPoolBusiness.uploadFile(
                 currentUserProvider.get(), localPath, lfcPath);
         } catch (VipException e) {
-            throw new ApiException("Error uploading a lfc file", e);
+            throw new VipException("Error uploading a lfc file", e);
         }
     }
 
     private PoolOperation baseGetPoolOperation(String operationId, User user)
-            throws ApiException {
+            throws VipException {
         // need to specify the user to avoid accessing apiContext from another thread
         try {
             return transferPoolBusiness.getOperationById(
                     operationId, user.getFolder());
         } catch (VipException e) {
-            throw new ApiException("Error getting download operation", e);
+            throw new VipException("Error getting download operation", e);
         }
     }
 
-    private PoolOperation baseGetDownloadOperation(String operationId) throws ApiException {
+    private PoolOperation baseGetDownloadOperation(String operationId) throws VipException {
         try {
             return transferPoolBusiness.getDownloadPoolOperation(operationId);
         } catch (VipException e) {
-            throw new ApiException("Error getting download operation", e);
+            throw new VipException("Error getting download operation", e);
         }
     }
 
-    private Long baseGetFileModificationDate(String path) throws ApiException {
+    private Long baseGetFileModificationDate(String path) throws VipException {
         try {
             return lfcBusiness.getModificationDate(
                 currentUserProvider.get(), path);
         } catch (VipException e) {
-            throw new ApiException("Error getting lfc modification", e);
+            throw new VipException("Error getting lfc modification", e);
         }
     }
 
-    private void baseDeletePath(String path) throws ApiException {
+    private void baseDeletePath(String path) throws VipException {
         try {
             transferPoolBusiness.delete(currentUserProvider.get(), path);
         } catch (VipException e) {
-            throw new ApiException("Error deleting lfc file", e);
+            throw new VipException("Error deleting lfc file", e);
         }
     }
 
-    private void baseMkdir(String path, String dirName) throws ApiException {
+    private void baseMkdir(String path, String dirName) throws VipException {
         try {
             lfcBusiness.createDir(currentUserProvider.get(), path, dirName);
         } catch (VipException e) {
-            throw new ApiException("Error creating LFC directory", e);
+            throw new VipException("Error creating LFC directory", e);
         }
     }
 

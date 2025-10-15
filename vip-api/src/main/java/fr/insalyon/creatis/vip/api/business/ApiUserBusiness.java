@@ -6,7 +6,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import fr.insalyon.creatis.vip.api.exception.ApiException;
 import fr.insalyon.creatis.vip.core.client.VipException;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
@@ -27,9 +26,9 @@ public class ApiUserBusiness {
      * @param user
      * @param comments
      * @param applicationNames
-     * @throws ApiException
+     * @throws VipException
      */
-    public void signup(User user, String comments) throws ApiException {
+    public void signup(User user, String comments) throws VipException {
         try {
             configurationBusiness.signup(
                 user, 
@@ -39,27 +38,27 @@ public class ApiUserBusiness {
                 new ArrayList<>());
             logger.info("Signing up with the " + user.getEmail());
         } catch (VipException e) {
-            throw new ApiException("Signing up Error", e);
+            throw new VipException("Signing up Error", e);
         }
     }
 
 
 
-    public void sendResetCode(String email) throws ApiException {
+    public void sendResetCode(String email) throws VipException {
         try {
             configurationBusiness.sendResetCode(email);
             logger.info("Sending reset code for user with email: " + email);
         } catch (VipException e) {
-            throw new ApiException("Error sending reset password", e);
+            throw new VipException("Error sending reset password", e);
         }
     }
 
-    public void resetPassword(String email, String code, String password) throws ApiException {
+    public void resetPassword(String email, String code, String password) throws VipException {
         try {
             configurationBusiness.resetPassword(email, code, password);
             logger.info("Resetting password for user with email: " + email);
         } catch (VipException e) {
-            throw new ApiException("Error resetting password", e);
+            throw new VipException("Error resetting password", e);
         }
     }
 }

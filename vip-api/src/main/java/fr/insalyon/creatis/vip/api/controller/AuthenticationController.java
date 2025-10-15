@@ -10,8 +10,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import fr.insalyon.creatis.vip.api.business.ApiBusiness;
 import fr.insalyon.creatis.vip.api.business.ApiUserBusiness;
-import fr.insalyon.creatis.vip.api.exception.ApiException;
 import fr.insalyon.creatis.vip.api.model.ResetPasswordDTO;
+import fr.insalyon.creatis.vip.core.client.VipException;
 import fr.insalyon.creatis.vip.core.server.model.AuthenticationCredentials;
 import fr.insalyon.creatis.vip.core.server.model.AuthenticationInfo;
 import jakarta.validation.Valid;
@@ -33,7 +33,7 @@ public class AuthenticationController extends ApiController{
     @RequestMapping(value = "/authenticate", method = RequestMethod.POST)
     public AuthenticationInfo authenticate(
             @RequestBody @Valid AuthenticationCredentials authenticationCredentials)
-            throws ApiException {
+            throws VipException {
         logMethodInvocation(logger,"authenticate", authenticationCredentials.getUsername());
         return apiBusiness.authenticate(authenticationCredentials);
     }
@@ -41,13 +41,13 @@ public class AuthenticationController extends ApiController{
     @RequestMapping(value = "/session", method = RequestMethod.POST)
     public AuthenticationInfo createSession(
             @RequestBody @Valid AuthenticationCredentials authenticationCredentials)
-            throws ApiException {
+            throws VipException {
         logMethodInvocation(logger,"createSession", authenticationCredentials.getUsername());
         return apiBusiness.authenticateSession(authenticationCredentials);
     }
 
     @RequestMapping(value = "/reset-password", method = RequestMethod.POST)
-    public void sendResetPassword(@RequestBody @Valid ResetPasswordDTO resetPassword) throws ApiException {
+    public void sendResetPassword(@RequestBody @Valid ResetPasswordDTO resetPassword) throws VipException {
         logMethodInvocation(logger, "resetPassword", resetPassword.getEmail());
         if (resetPassword.getActivationCode() == null) {
             apiUserBusiness.sendResetCode(resetPassword.getEmail());

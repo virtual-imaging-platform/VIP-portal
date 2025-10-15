@@ -1,20 +1,21 @@
 package fr.insalyon.creatis.vip.application.client.rpc;
 
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.ServiceDefTarget;
+
 import fr.insalyon.creatis.vip.application.client.bean.AppVersion;
 import fr.insalyon.creatis.vip.application.client.bean.Application;
 import fr.insalyon.creatis.vip.application.client.bean.ApplicationStatus;
 import fr.insalyon.creatis.vip.application.client.bean.Engine;
 import fr.insalyon.creatis.vip.application.client.bean.Resource;
 import fr.insalyon.creatis.vip.application.client.bean.Tag;
-import fr.insalyon.creatis.vip.application.client.view.ApplicationException;
+import fr.insalyon.creatis.vip.core.client.VipException;
 import fr.insalyon.creatis.vip.core.client.bean.Pair;
-
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 public interface ApplicationService extends RemoteService {
 
@@ -31,63 +32,63 @@ public interface ApplicationService extends RemoteService {
         }
     }
 
-    public List<Application> getPublicApplications() throws ApplicationException;
+    public List<Application> getPublicApplications() throws VipException;
 
-    public Map<Application, List<AppVersion>> getApplications() throws ApplicationException;
+    public Map<Application, List<AppVersion>> getApplications() throws VipException;
 
-    public Map<Application, Set<Resource>> getManageableApplications() throws ApplicationException;
+    public Map<Application, Set<Resource>> getManageableApplications() throws VipException;
     
-    public List<AppVersion> getVersions(String applicationName) throws ApplicationException;
+    public List<AppVersion> getVersions(String applicationName) throws VipException;
     
-    public AppVersion getVersion(String applicationName, String applicationVersion) throws ApplicationException;
+    public AppVersion getVersion(String applicationName, String applicationVersion) throws VipException;
 
-    public String add(Application application) throws ApplicationException;
+    public String add(Application application) throws VipException;
 
-    public String update(Application application) throws ApplicationException;
+    public String update(Application application) throws VipException;
 
-    public String remove(String name) throws ApplicationException;
+    public String remove(String name) throws VipException;
     
-    public void addVersion(AppVersion version) throws ApplicationException;
+    public void addVersion(AppVersion version) throws VipException;
 
-    public void updateVersion(AppVersion version) throws ApplicationException;
+    public void updateVersion(AppVersion version) throws VipException;
 
-    public void removeVersion(String applicationName, String version) throws ApplicationException;
+    public void removeVersion(String applicationName, String version) throws VipException;
 
-    public String publishVersion(String applicationName, String version) throws ApplicationException;
+    public String publishVersion(String applicationName, String version) throws VipException;
 
-    public List<String>[] getApplicationsAndUsers() throws ApplicationException;
+    public List<String>[] getApplicationsAndUsers() throws VipException;
     
-    public ApplicationStatus getApplicationStatus() throws ApplicationException;
+    public ApplicationStatus getApplicationStatus() throws VipException;
     
-    public String getCitation(String applicationName) throws ApplicationException;
+    public String getCitation(String applicationName) throws VipException;
     
-    public void addEngine(Engine engine) throws ApplicationException;
+    public void addEngine(Engine engine) throws VipException;
     
-    public void updateEngine(Engine engine) throws ApplicationException;
+    public void updateEngine(Engine engine) throws VipException;
     
-    public void removeEngine(String engineName) throws ApplicationException;
+    public void removeEngine(String engineName) throws VipException;
     
-    public List<Engine> getEngines() throws ApplicationException;
+    public List<Engine> getEngines() throws VipException;
     
-    public String addResource(Resource resource) throws ApplicationException;
+    public String addResource(Resource resource) throws VipException;
 
-    public String removeResource(Resource resource) throws ApplicationException;
+    public String removeResource(Resource resource) throws VipException;
 
-    public String updateResource(Resource resource) throws ApplicationException;
+    public String updateResource(Resource resource) throws VipException;
 
-    public List<Resource> getResources() throws ApplicationException;
+    public List<Resource> getResources() throws VipException;
 
-    public void addTag(Tag tag) throws ApplicationException;
+    public void addTag(Tag tag) throws VipException;
 
-    public void removeTag(Tag tag) throws ApplicationException;
+    public void removeTag(Tag tag) throws VipException;
 
-    public void updateTag(Tag oldTag, Tag newTag) throws ApplicationException;
+    public void updateTag(Tag oldTag, Tag newTag) throws VipException;
 
-    public List<Tag> getTags() throws ApplicationException;
+    public List<Tag> getTags() throws VipException;
 
-    public List<Tag> getNonBoutiquesTags() throws ApplicationException;
+    public List<Tag> getNonBoutiquesTags() throws VipException;
 
-    public List<Tag> getTags(AppVersion appVersion) throws ApplicationException;
+    public List<Tag> getTags(AppVersion appVersion) throws VipException;
 
-    public Pair<Boolean, String> isAppUsableWithCurrentUser(String appName, String appVersion) throws ApplicationException;
+    public Pair<Boolean, String> isAppUsableWithCurrentUser(String appName, String appVersion) throws VipException;
 }

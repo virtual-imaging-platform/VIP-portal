@@ -9,10 +9,11 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-import fr.insalyon.creatis.vip.api.exception.ApiException;
+import fr.insalyon.creatis.vip.api.exception.ApiError;
 import fr.insalyon.creatis.vip.application.client.bean.Simulation;
 import fr.insalyon.creatis.vip.application.client.view.monitor.SimulationStatus;
 import fr.insalyon.creatis.vip.application.server.business.WorkflowBusiness;
+import fr.insalyon.creatis.vip.core.client.VipException;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.user.UserLevel;
 
@@ -37,10 +38,10 @@ public class ExecutionBusinessTest {
         Simulation simulation = prepareRunningSimulation(EXEC_ID, 1); // choose a different user
         WorkflowBusiness mockedWb = prepareMockedWorkflowBusiness(EXEC_ID, simulation);
         ExecutionBusiness sut = new ExecutionBusiness(userSupplier, null, mockedWb, null, null, null);
-        ApiException apiException = assertThrows(ApiException.class,
+        VipException vipException = assertThrows(VipException.class,
             () -> sut.checkIfUserCanAccessExecution(EXEC_ID)
         );
-        assertEquals("Permission denied", apiException.getMessage());
+        assertEquals("Permission denied", vipException.getMessage());
     }
 
     @Test
@@ -58,9 +59,9 @@ public class ExecutionBusinessTest {
         Simulation simulation = prepareSimulation(EXEC_ID, SimulationStatus.Cleaned, 0); // the creator of the execution is the same user
         WorkflowBusiness mockedWb = prepareMockedWorkflowBusiness(EXEC_ID, simulation);
         ExecutionBusiness sut = new ExecutionBusiness(userSupplier, null, mockedWb, null, null, null);
-        ApiException ex = Assertions.assertThrows(ApiException.class, () -> sut.getExecution(EXEC_ID, false));
+        VipException ex = Assertions.assertThrows(VipException.class, () -> sut.getExecution(EXEC_ID, false));
         Assertions.assertTrue(ex.getVipErrorCode().isPresent());
-        Assertions.assertEquals(ApiException.ApiError.INVALID_EXECUTION_ID.getCode(), ex.getVipErrorCode().get());
+        Assertions.assertEquals(ApiError.INVALID_EXECUTION_ID.getCode(), ex.getVipErrorCode().get());
     }
 
 

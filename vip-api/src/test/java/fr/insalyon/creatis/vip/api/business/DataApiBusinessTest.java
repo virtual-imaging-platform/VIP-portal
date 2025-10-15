@@ -18,7 +18,6 @@ import org.springframework.core.io.ClassPathResource;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import fr.insalyon.creatis.vip.api.exception.ApiException;
 import fr.insalyon.creatis.vip.api.model.UploadData;
 import fr.insalyon.creatis.vip.core.client.VipException;
 import fr.insalyon.creatis.vip.core.server.business.Server;
@@ -31,7 +30,7 @@ import fr.insalyon.creatis.vip.datamanager.server.business.TransferPoolBusiness;
 public class DataApiBusinessTest {
 
     @Test
-    public void testBase64Decoder(@TempDir Path tempDir) throws IOException, ApiException, VipException {
+    public void testBase64Decoder(@TempDir Path tempDir) throws IOException, VipException {
 
         // Prepare
         TransferPoolBusiness transferPoolBusiness = Mockito.mock(TransferPoolBusiness.class);

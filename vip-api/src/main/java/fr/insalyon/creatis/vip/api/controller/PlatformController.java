@@ -10,12 +10,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import fr.insalyon.creatis.vip.api.exception.ApiException;
-import fr.insalyon.creatis.vip.api.exception.ApiException.ApiError;
+import fr.insalyon.creatis.vip.api.exception.ApiError;
 import fr.insalyon.creatis.vip.api.model.PlatformProperties;
-import fr.insalyon.creatis.vip.application.client.view.ApplicationException.ApplicationError;
+import fr.insalyon.creatis.vip.core.client.DefaultError;
+import fr.insalyon.creatis.vip.core.client.VipError;
 import fr.insalyon.creatis.vip.core.client.VipException;
-import fr.insalyon.creatis.vip.core.client.VipException.VipError;
 import fr.insalyon.creatis.vip.core.server.model.ErrorCodeAndMessage;
 import fr.insalyon.creatis.vip.core.server.security.oidc.OidcLoginConfig;
 
@@ -32,7 +31,7 @@ public class PlatformController extends ApiController{
     }
 
     @RequestMapping
-    public PlatformProperties getPlatformProperties() throws ApiException {
+    public PlatformProperties getPlatformProperties() throws VipException {
         logMethodInvocation(logger, "getPlatformProperties");
         PlatformProperties platformProperties = new PlatformProperties();
         platformProperties.setPlatformName(server.getCarminPlatformName());
@@ -51,8 +50,8 @@ public class PlatformController extends ApiController{
 
     private List<ErrorCodeAndMessage> getErrorCodesAndMessages() {
         List<ErrorCodeAndMessage> res = new ArrayList<>();
+        res.addAll(getErrorCodesAndMessages(DefaultError.class));
         res.addAll(getErrorCodesAndMessages(ApiError.class));
-        res.addAll(getErrorCodesAndMessages(ApplicationError.class));
         return res;
     }
 
@@ -71,8 +70,7 @@ public class PlatformController extends ApiController{
 
     private ErrorCodeAndMessage getErrorCodeAndMessage(VipError vipError, String errorName) {
         errorName = errorName.replace('_', ' ').toLowerCase();
-        String message = VipException.getRawMessage(vipError)
-                .orElse("The error message for '" + errorName + "' cannot be known in advance");
+        String message = vipError.getMessage();
         return new ErrorCodeAndMessage(vipError.getCode(), message);
     }
 }

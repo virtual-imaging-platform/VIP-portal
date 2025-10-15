@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+import fr.insalyon.creatis.vip.core.client.DefaultError;
 import fr.insalyon.creatis.vip.core.client.VipException;
 import fr.insalyon.creatis.vip.core.server.model.ErrorCodeAndMessage;
 
@@ -26,25 +27,26 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    @ExceptionHandler(ApiException.class)
-    public ResponseEntity<Object> handleApiException(ApiException e) {
+    @ExceptionHandler(VipException.class)
+    public ResponseEntity<Object> handleException(VipException e) {
         // No need to log, VIP errors are logged when they are created
 
         // to find the error message : look for an error code in the vip
         // ancestor exceptions and use that exception message
         ErrorCodeAndMessage codeAndMessage = fetchErrorInException(e);
-        HttpStatus status = e.getHttpStatus().map(HttpStatus::resolve).orElse(HttpStatus.BAD_REQUEST);
+        // we are now using specific return codes inside the response itself
+        // like 8xxx codes
+        HttpStatus status = HttpStatus.BAD_REQUEST;
         return new ResponseEntity<>(codeAndMessage, status);
     }
 
     private ErrorCodeAndMessage fetchErrorInException(Throwable throwable) {
-
         // cast to vipException
         VipException vipException =  Optional.ofNullable(throwable)
                 .filter(VipException.class::isInstance)
                 .map(VipException.class::cast)
                 // stop recursion if no exception or if not a VipException
-                .orElse( new ApiException(ApiError.GENERIC_API_ERROR));
+                .orElse(new VipException(DefaultError.GENERIC_ERROR));
 
         // return code and message if present otherwise call parent
         return vipException.getVipErrorCode()
@@ -55,7 +57,6 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
                 .orElseGet( () ->
                         fetchErrorInException( vipException.getCause() )
                 );
-
     }
 
     private String cleanExceptionMessage(VipException vipException) {
@@ -70,11 +71,8 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
             @NonNull Exception ex, Object body, HttpHeaders headers,
             HttpStatusCode status, @NonNull WebRequest request) {
         logger.error("Internal spring exception catched", ex);
-        ErrorCodeAndMessage codeAndmessage = new ErrorCodeAndMessage(
-                ApiError.GENERIC_API_ERROR.getCode(),
-                ApiError.getGenericErrorMessage()
-        );
-        return new ResponseEntity<>(codeAndmessage, headers, status);
+        return new ResponseEntity<>(
+                fetchErrorInException(new VipException(DefaultError.GENERIC_ERROR)), headers, status);
     }
 
     @Override
@@ -89,13 +87,11 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
             // only take the first one
             FieldError fieldError = ex.getBindingResult().getFieldError();
             logger.error("Spring validation error catched", ex);
-            ErrorCodeAndMessage codeAndmessage = new ErrorCodeAndMessage(
-                    ApiError.INPUT_FIELD_NOT_VALID.getCode(),
-                    ApiError.INPUT_FIELD_NOT_VALID.formatMessage(
-                            fieldError.getField(),
+
+            return new ResponseEntity<>(fetchErrorInException(
+                    new VipException(DefaultError.BAD_INPUT_FIELD, fieldError.getField(),
                             fieldError.getDefaultMessage())
-            );
-            return new ResponseEntity<>(codeAndmessage, headers, status);
+            ), headers, status);
         }
         return super.handleMethodArgumentNotValid(ex, headers, status, request);
     }

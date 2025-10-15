@@ -11,10 +11,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 
-import fr.insalyon.creatis.vip.api.exception.ApiException.ApiError;
 import fr.insalyon.creatis.vip.api.rest.config.BaseWebSpringIT;
 import fr.insalyon.creatis.vip.api.tools.spring.ApikeyRequestPostProcessor;
 import fr.insalyon.creatis.vip.api.tools.spring.BearerTokenRequestPostProcessor;
+import fr.insalyon.creatis.vip.core.client.DefaultError;
 
 /**
  * These tests check the authentication with the spring test tools.
@@ -46,7 +46,7 @@ public class SpringAuthenticationIT extends BaseWebSpringIT {
                 .andExpect(status().isUnauthorized())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.errorCode")
-                        .value(ApiError.INSUFFICIENT_AUTH.getCode()));
+                        .value(DefaultError.INSUFFICIENT_AUTH.getCode()));
     }
 
     @Test
@@ -57,7 +57,7 @@ public class SpringAuthenticationIT extends BaseWebSpringIT {
                 .andExpect(status().isUnauthorized())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.errorCode")
-                        .value(ApiError.BAD_CREDENTIALS.getCode()));
+                        .value(DefaultError.BAD_CREDENTIALS.getCode()));
     }
 
     @Test
@@ -67,7 +67,7 @@ public class SpringAuthenticationIT extends BaseWebSpringIT {
                 .andExpect(status().isUnauthorized())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.errorCode")
-                        .value(ApiError.INSUFFICIENT_AUTH.getCode()));
+                        .value(DefaultError.INSUFFICIENT_AUTH.getCode()));
     }
 
     @Test
@@ -77,7 +77,7 @@ public class SpringAuthenticationIT extends BaseWebSpringIT {
                 .andExpect(status().isUnauthorized())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.errorCode")
-                        .value(ApiError.INSUFFICIENT_AUTH.getCode()));
+                        .value(DefaultError.INSUFFICIENT_AUTH.getCode()));
     }
 
     @Test

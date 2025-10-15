@@ -13,9 +13,9 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
 
-import fr.insalyon.creatis.vip.api.exception.ApiException.ApiError;
 import fr.insalyon.creatis.vip.api.rest.config.BaseWebSpringIT;
 import fr.insalyon.creatis.vip.api.tools.spring.ApikeyRequestPostProcessor;
+import fr.insalyon.creatis.vip.core.client.DefaultError;
 import fr.insalyon.creatis.vip.core.server.dao.UserDAO;
 
 /**
@@ -45,6 +45,6 @@ public class SpringAuthenticationWithMockedUserDaoIT extends BaseWebSpringIT {
                 .andExpect(status().isUnauthorized())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.errorCode")
-                        .value(ApiError.AUTHENTICATION_ERROR.getCode()));
+                        .value(DefaultError.AUTHENTICATION_ERROR.getCode()));
     }
 }

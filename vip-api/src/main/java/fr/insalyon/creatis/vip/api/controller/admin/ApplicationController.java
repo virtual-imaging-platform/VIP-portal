@@ -12,9 +12,10 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import fr.insalyon.creatis.vip.api.controller.ApiController;
-import fr.insalyon.creatis.vip.api.exception.ApiException;
+import fr.insalyon.creatis.vip.api.exception.ApiError;
 import fr.insalyon.creatis.vip.application.client.bean.Application;
 import fr.insalyon.creatis.vip.application.server.business.ApplicationBusiness;
+import fr.insalyon.creatis.vip.core.client.DefaultError;
 import fr.insalyon.creatis.vip.core.client.VipException;
 import jakarta.validation.Valid;
 
@@ -31,36 +32,36 @@ public class ApplicationController extends ApiController {
     }
 
     @RequestMapping(method = RequestMethod.GET)
-    public List<Application> listApplications() throws ApiException {
+    public List<Application> listApplications() throws VipException {
         logMethodInvocation(logger, "listApplications");
         try {
             return applicationBusiness.getApplications();
         } catch (VipException e) {
-            throw new ApiException(e);
+            throw new VipException(e);
         }
     }
 
     @RequestMapping(value = "{applicationId}", method = RequestMethod.GET)
-    public Application getApplication(@PathVariable String applicationId) throws ApiException {
+    public Application getApplication(@PathVariable String applicationId) throws VipException {
         logMethodInvocation(logger, "getApplication", applicationId);
         try {
             Application app = applicationBusiness.getApplication(applicationId);
             if (app == null) {
-                throw new ApiException(ApiException.ApiError.APPLICATION_NOT_FOUND, applicationId);
+                throw new VipException(ApiError.APPLICATION_NOT_FOUND, applicationId);
             }
             return app;
         } catch (VipException e) {
-            throw new ApiException(e);
+            throw new VipException(e);
         }
     }
 
     @RequestMapping(value = "/{applicationId}", method = RequestMethod.PUT)
     public Application createOrUpdateApplication(@PathVariable String applicationId,
-                                                 @RequestBody @Valid Application app) throws ApiException {
+                                                 @RequestBody @Valid Application app) throws VipException {
         logMethodInvocation(logger, "createOrUpdateApplication", applicationId);
         if (!applicationId.equals(app.getName())) {
             logger.error("applicationId mismatch: {}!={}", applicationId, app.getName());
-            throw new ApiException(ApiException.ApiError.INPUT_FIELD_NOT_VALID, applicationId);
+            throw new VipException(DefaultError.BAD_INPUT_FIELD, applicationId);
         }
         try {
             Application existingApp = applicationBusiness.getApplication(applicationId);
@@ -71,22 +72,22 @@ public class ApplicationController extends ApiController {
             }
             return applicationBusiness.getApplication(applicationId);
         } catch (VipException e) {
-            throw new ApiException(e);
+            throw new VipException(e);
         }
     }
 
     @RequestMapping(method = RequestMethod.POST)
-    public Application createApplication(@RequestBody @Valid Application app) throws ApiException {
+    public Application createApplication(@RequestBody @Valid Application app) throws VipException {
         return createOrUpdateApplication(app.getName(), app);
     }
 
     @RequestMapping(value = "/{applicationId}", method = RequestMethod.DELETE)
-    public void deleteApplication(@PathVariable String applicationId) throws ApiException {
+    public void deleteApplication(@PathVariable String applicationId) throws VipException {
         logMethodInvocation(logger, "deleteApplication", applicationId);
         try {
             applicationBusiness.remove(applicationId);
         } catch (VipException e) {
-            throw new ApiException(e);
+            throw new VipException(e);
         }
     }
 }

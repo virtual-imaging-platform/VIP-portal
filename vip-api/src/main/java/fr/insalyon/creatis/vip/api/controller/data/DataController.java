@@ -21,10 +21,10 @@ import org.springframework.web.util.UriUtils;
 
 import fr.insalyon.creatis.vip.api.business.DataApiBusiness;
 import fr.insalyon.creatis.vip.api.controller.ApiController;
-import fr.insalyon.creatis.vip.api.exception.ApiException;
 import fr.insalyon.creatis.vip.api.model.ExistsApiResponse;
 import fr.insalyon.creatis.vip.api.model.PathProperties;
 import fr.insalyon.creatis.vip.api.model.UploadData;
+import fr.insalyon.creatis.vip.core.client.VipException;
 import jakarta.servlet.http.HttpServletRequest;
 
 @RestController
@@ -46,7 +46,7 @@ public class DataController extends ApiController {
     }
 
     @RequestMapping(path = "/**", params = "action=properties")
-    public PathProperties getPathProperties() throws ApiException {
+    public PathProperties getPathProperties() throws VipException {
         String completePath = extractWildcardPath(httpServletRequest);
         logMethodInvocation(logger, "getPathProperties", currentUser().getEmail(), completePath);
         // business call
@@ -54,7 +54,7 @@ public class DataController extends ApiController {
     }
 
     @RequestMapping(path = "/**", params = "action=exists")
-    public ExistsApiResponse doesPathExists() throws ApiException {
+    public ExistsApiResponse doesPathExists() throws VipException {
         String completePath = extractWildcardPath(httpServletRequest);
         logMethodInvocation(logger, "doesPathExists", currentUser().getEmail(), completePath);
             // business call
@@ -62,7 +62,7 @@ public class DataController extends ApiController {
     }
 
     @RequestMapping(path = "/**", params = "action=list")
-    public List<PathProperties> listDirectory() throws ApiException {
+    public List<PathProperties> listDirectory() throws VipException {
         String completePath = extractWildcardPath(httpServletRequest);
         logMethodInvocation(logger, "listDirectory", currentUser().getEmail(), completePath);
         // business call
@@ -70,17 +70,17 @@ public class DataController extends ApiController {
     }
 
     @RequestMapping(path = "/**", params = "action=md5")
-    public void getFileMD5() throws ApiException {
+    public void getFileMD5() throws VipException {
         String completePath = extractWildcardPath(httpServletRequest);
         logMethodInvocation(logger, "getFileMD5", currentUser().getEmail(), completePath);
         // business call
         // TODO implement that
         logger.error("Unsupported getFileMD5 call");
-        throw new ApiException("Not implemented");
+        throw new VipException("Not implemented");
     }
 
     @RequestMapping(path = "/**", params = "action=content")
-    public ResponseEntity<FileSystemResource> downloadRawFile() throws ApiException {
+    public ResponseEntity<FileSystemResource> downloadRawFile() throws VipException {
         String completePath = extractWildcardPath(httpServletRequest);
         logMethodInvocation(logger, "downloadFile", currentUser().getEmail(), completePath);
         // business call
@@ -94,7 +94,7 @@ public class DataController extends ApiController {
 
     @RequestMapping(path = "/**", method = RequestMethod.DELETE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deletePath() throws ApiException {
+    public void deletePath() throws VipException {
         String completePath = extractWildcardPath(httpServletRequest);
         logMethodInvocation(logger, "deletePath", currentUser().getEmail(), completePath);
         // business call
@@ -103,7 +103,7 @@ public class DataController extends ApiController {
 
     @RequestMapping(path = "/**", method = RequestMethod.PUT)
     @ResponseStatus(HttpStatus.CREATED)
-    public void uploadFile(InputStream requestInputStream) throws ApiException {
+    public void uploadFile(InputStream requestInputStream) throws VipException {
         String completePath = extractWildcardPath(httpServletRequest);
         logMethodInvocation(logger, "uploadFile", currentUser().getEmail(), completePath);
         // business call
@@ -114,7 +114,7 @@ public class DataController extends ApiController {
 
     @RequestMapping(path = "/**", method = RequestMethod.PUT, consumes = "application/carmin+json")
     @ResponseStatus(HttpStatus.CREATED)
-    public void uploadCustomData(@RequestBody UploadData uploadData) throws ApiException {
+    public void uploadCustomData(@RequestBody UploadData uploadData) throws VipException {
         String completePath = extractWildcardPath(httpServletRequest);
         logMethodInvocation(logger, "uploadCustomData", currentUser().getEmail(), completePath);
         // business call
