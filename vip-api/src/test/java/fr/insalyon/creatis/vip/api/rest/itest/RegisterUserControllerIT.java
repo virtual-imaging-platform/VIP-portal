@@ -18,8 +18,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
 
 import fr.insalyon.creatis.vip.api.data.UserTestUtils;
-import fr.insalyon.creatis.vip.api.exception.ApiException;
 import fr.insalyon.creatis.vip.api.rest.config.BaseWebSpringIT;
+import fr.insalyon.creatis.vip.core.client.DefaultError;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.user.UserLevel;
 import fr.insalyon.creatis.vip.core.client.view.util.CountryCode;
@@ -60,7 +60,7 @@ class RegisterUserControllerIT extends BaseRestApiSpringIT {
                         .accept(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.errorCode").value(ApiException.ApiError.INPUT_FIELD_NOT_VALID.getCode()))
+                .andExpect(jsonPath("$.errorCode").value(DefaultError.BAD_INPUT_FIELD.getCode()))
                 .andExpect(jsonPath("$.errorMessage").value(Matchers.containsString("'countryCode'")));
     }
 

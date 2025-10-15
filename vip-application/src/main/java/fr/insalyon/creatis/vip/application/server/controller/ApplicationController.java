@@ -16,9 +16,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import fr.insalyon.creatis.vip.api.exception.ApiException;
 import fr.insalyon.creatis.vip.application.client.bean.Application;
 import fr.insalyon.creatis.vip.application.server.business.ApplicationBusiness;
+import fr.insalyon.creatis.vip.core.client.DefaultError;
 import fr.insalyon.creatis.vip.core.client.VipException;
 import fr.insalyon.creatis.vip.core.server.model.PrecisePage;
 import jakarta.validation.constraints.Positive;
@@ -37,66 +37,50 @@ public class ApplicationController {
 
     @GetMapping
     public PrecisePage<Application> listApplications(@RequestParam(defaultValue = "0") @PositiveOrZero int offset,
-            @RequestParam(defaultValue = "10") @Positive @Max(value = 50) int quantity, @RequestParam Optional<String> group) throws ApiException {
-        try {
-            return applicationBusiness.get(offset, quantity, group.orElse(null));
-        } catch (VipException e) {
-            throw new ApiException(e);
-        }
+            @RequestParam(defaultValue = "10") @Positive @Max(value = 50) int quantity, @RequestParam Optional<String> group) throws VipException {
+        return applicationBusiness.get(offset, quantity, group.orElse(null));
     }
 
     @GetMapping(value = "{id}")
-    public Application getApplication(@PathVariable String id) throws ApiException {
-        try {
-            Application app = applicationBusiness.get(id);
+    public Application getApplication(@PathVariable String id) throws VipException {
+        Application app = applicationBusiness.get(id);
 
-            if (app == null) {
-                throw new ApiException(ApiException.ApiError.APPLICATION_NOT_FOUND, id);
-            } else {
-                return app;
-            }
-        } catch (VipException e) {
-            throw new ApiException(e);
+        if (app == null) {
+            throw new VipException(DefaultError.NOT_FOUND, id);
+        } else {
+            return app;
         }
     }
 
     @DeleteMapping(value = "{id}")
-    public void deleteApplication(@PathVariable String id) throws ApiException {
-        try {
+    public void deleteApplication(@PathVariable String id) throws VipException {
             Application app = applicationBusiness.get(id);
 
             if (app == null) {
                 throw new ApiException(ApiException.ApiError.APPLICATION_NOT_FOUND, id);
             } else {
-                applicationBusiness.remove(id);
+            applicationBusiness.remove(id);
             }
-        } catch (VipException e) {
-            throw new ApiException(e);
-        }
     }
 
     @PutMapping(value = "{id}")
     public Application createOrUpdateApplication(@PathVariable String id, @RequestBody @Valid Application app)
-            throws ApiException {
+            throws VipException {
         if ( ! id.equals(app.getName())) {
-            throw new ApiException(ApiException.ApiError.INPUT_FIELD_NOT_VALID, id);
+            throw new VipException(DefaultError.BAD_INPUT_FIELD, id, "Application name do not match!");
         } else {
-            try {
-                Application existingApp = applicationBusiness.getApplication(id);
-                if (existingApp == null) {
-                    applicationBusiness.add(app);
-                } else {
-                    applicationBusiness.update(app);
-                }
-                return applicationBusiness.getApplication(id);
-            } catch (VipException e) {
-                throw new ApiException(e);
+            Application existingApp = applicationBusiness.getApplication(id);
+            if (existingApp == null) {
+                applicationBusiness.add(app);
+            } else {
+                applicationBusiness.update(app);
             }
+            return applicationBusiness.getApplication(id);
         }
     }
 
     @PostMapping()
-    public Application createApplication(@RequestBody @Valid Application app) throws ApiException {
+    public Application createApplication(@RequestBody @Valid Application app) throws VipException {
         return createOrUpdateApplication(app.getName(), app);
     }
 }

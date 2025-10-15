@@ -20,6 +20,7 @@ import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import fr.insalyon.creatis.vip.core.client.DefaultError;
 import fr.insalyon.creatis.vip.core.server.model.ErrorCodeAndMessage;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -57,16 +58,16 @@ public class VipAuthenticationEntryPoint implements AuthenticationEntryPoint, Au
         ErrorCodeAndMessage error = new ErrorCodeAndMessage();
         logger.debug("handling auth error", authException);
         if (authException instanceof BadCredentialsException) {
-            error.setErrorCode(ApiError.BAD_CREDENTIALS.getCode());
+            error.setErrorCode(DefaultError.BAD_CREDENTIALS.getCode());
         } else if (authException instanceof InsufficientAuthenticationException ||
                 authException instanceof AuthenticationCredentialsNotFoundException) {
             // These two exceptions are raised when a request contains no credentials:
             // InsufficientAuthenticationException if anonymous requests are enabled
             // AuthenticationCredentialsNotFoundException if anonymous requests are disabled
             // We map them both to the same API error to preserve historical behaviour.
-            error.setErrorCode(ApiError.INSUFFICIENT_AUTH.getCode());
+            error.setErrorCode(DefaultError.INSUFFICIENT_AUTH.getCode());
         } else {
-            error.setErrorCode(ApiError.AUTHENTICATION_ERROR.getCode());
+            error.setErrorCode(DefaultError.AUTHENTICATION_ERROR.getCode());
         }
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         error.setErrorMessage(authException.getMessage());

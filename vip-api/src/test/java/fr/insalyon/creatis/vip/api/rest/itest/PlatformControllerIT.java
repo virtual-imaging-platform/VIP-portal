@@ -33,9 +33,9 @@ import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
 
-import fr.insalyon.creatis.vip.api.exception.ApiException.ApiError;
+import fr.insalyon.creatis.vip.api.exception.ApiError;
 import fr.insalyon.creatis.vip.api.rest.config.BaseWebSpringIT;
-import fr.insalyon.creatis.vip.application.client.view.ApplicationException.ApplicationError;
+import fr.insalyon.creatis.vip.core.client.DefaultError;
 import fr.insalyon.creatis.vip.core.server.model.Module;
 import fr.insalyon.creatis.vip.core.server.model.SupportedTransferProtocol;
 
@@ -78,14 +78,13 @@ public class PlatformControllerIT extends BaseRestApiSpringIT {
                         .value(Integer.valueOf(TEST_DATA_MAX_SIZE)))
                 // it should be a long, be the test value being small it's actually an int
                 .andExpect(jsonPath("$.APIErrorCodesAndMessages[*]",
-                        hasSize(ApiError.values().length + ApplicationError.values().length)))
+                        hasSize(ApiError.values().length + DefaultError.values().length)))
                 .andExpect(jsonPath("$.APIErrorCodesAndMessages[*]",
                     hasItems(
-                        jsonCorrespondsToErrorCodeAndMessage(ApiError.GENERIC_API_ERROR),
+                        jsonCorrespondsToErrorCodeAndMessage(DefaultError.GENERIC_ERROR),
                         jsonCorrespondsToErrorCodeAndMessage(ApiError.NOT_ALLOWED_TO_USE_PIPELINE),
-                        jsonCorrespondsToErrorCodeAndMessage(ApplicationError.USER_MAX_EXECS),
-                        jsonCorrespondsToErrorCodeAndMessage(ApiError.BAD_CREDENTIALS),
-                        jsonCorrespondsToErrorCodeAndMessage(ApiError.INSUFFICIENT_AUTH.getCode(), "The error message for 'insufficient auth' cannot be known in advance"))));
+                        jsonCorrespondsToErrorCodeAndMessage(DefaultError.BAD_CREDENTIALS),
+                        jsonCorrespondsToErrorCodeAndMessage(DefaultError.INSUFFICIENT_AUTH))));
 
     }
 

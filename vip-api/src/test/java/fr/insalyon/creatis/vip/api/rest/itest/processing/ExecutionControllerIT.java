@@ -48,7 +48,7 @@ import fr.insalyon.creatis.moteur.plugins.workflowsdb.bean.Workflow;
 import fr.insalyon.creatis.moteur.plugins.workflowsdb.bean.WorkflowStatus;
 import fr.insalyon.creatis.moteur.plugins.workflowsdb.dao.WorkflowsDBDAOException;
 import fr.insalyon.creatis.vip.api.data.UserTestUtils;
-import fr.insalyon.creatis.vip.api.exception.ApiException;
+import fr.insalyon.creatis.vip.api.exception.ApiError;
 import fr.insalyon.creatis.vip.api.model.Execution;
 import fr.insalyon.creatis.vip.api.model.ExecutionStatus;
 import fr.insalyon.creatis.vip.api.rest.config.BaseRestApiSpringIT;
@@ -63,6 +63,7 @@ import fr.insalyon.creatis.vip.application.server.business.AppVersionBusiness;
 import fr.insalyon.creatis.vip.application.server.business.ResourceBusiness;
 import fr.insalyon.creatis.vip.application.server.business.util.FileUtil;
 import fr.insalyon.creatis.vip.application.server.dao.SimulationDAO;
+import fr.insalyon.creatis.vip.core.client.DefaultError;
 import fr.insalyon.creatis.vip.core.client.bean.Group;
 import fr.insalyon.creatis.vip.core.client.bean.GroupType;
 import fr.insalyon.creatis.vip.core.integrationtest.ServerMockConfig;
@@ -163,7 +164,7 @@ public class ExecutionControllerIT extends BaseRestApiSpringIT {
                 .andDo(print())
                 .andExpect(status().isBadRequest())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.errorCode").value(ApiException.ApiError.GENERIC_API_ERROR.getCode()));
+                .andExpect(jsonPath("$.errorCode").value(DefaultError.GENERIC_ERROR.getCode()));
     }
 
     @Test
@@ -175,7 +176,7 @@ public class ExecutionControllerIT extends BaseRestApiSpringIT {
                 .andDo(print())
                 .andExpect(status().isBadRequest())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.errorCode").value(ApiException.ApiError.GENERIC_API_ERROR.getCode()));
+                .andExpect(jsonPath("$.errorCode").value(DefaultError.GENERIC_ERROR.getCode()));
     }
 
     @Test
@@ -188,7 +189,7 @@ public class ExecutionControllerIT extends BaseRestApiSpringIT {
                 .andDo(print())
                 .andExpect(status().isInternalServerError())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.errorCode").value(ApiException.ApiError.GENERIC_API_ERROR.getCode()));
+                .andExpect(jsonPath("$.errorCode").value(DefaultError.GENERIC_ERROR.getCode()));
     }
 
     @Test
@@ -222,7 +223,7 @@ public class ExecutionControllerIT extends BaseRestApiSpringIT {
                 .andExpect(status().isBadRequest())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.errorCode")
-                        .value(ApiException.ApiError.INPUT_FIELD_NOT_VALID.getCode())
+                        .value(DefaultError.BAD_INPUT_FIELD.getCode())
                 );
     }
 
@@ -251,7 +252,7 @@ public class ExecutionControllerIT extends BaseRestApiSpringIT {
                 .andDo(print())
                 .andExpect(status().isInternalServerError())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.errorCode").value(ApiException.ApiError.GENERIC_API_ERROR.getCode()));
+                .andExpect(jsonPath("$.errorCode").value(DefaultError.GENERIC_ERROR.getCode()));
     }
 
     @Test
@@ -262,7 +263,7 @@ public class ExecutionControllerIT extends BaseRestApiSpringIT {
                 .andDo(print())
                 .andExpect(status().isBadRequest())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.errorCode").value(ApiException.ApiError.GENERIC_API_ERROR.getCode()));
+                .andExpect(jsonPath("$.errorCode").value(DefaultError.GENERIC_ERROR.getCode()));
     }
 
 
@@ -326,7 +327,7 @@ public class ExecutionControllerIT extends BaseRestApiSpringIT {
                 .andDo(print())
                 .andExpect(status().isBadRequest())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$.errorCode").value(ApiException.ApiError.NOT_IMPLEMENTED.getCode()));
+                .andExpect(jsonPath("$.errorCode").value(ApiError.NOT_IMPLEMENTED.getCode()));
     }
 
     @Test

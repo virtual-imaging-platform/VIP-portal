@@ -4,7 +4,6 @@ import java.util.List;
 
 import fr.insalyon.creatis.vip.application.client.bean.PublicExecution;
 import fr.insalyon.creatis.vip.application.client.rpc.ReproVipService;
-import fr.insalyon.creatis.vip.application.client.view.ApplicationException;
 import fr.insalyon.creatis.vip.application.server.business.PublicExecutionBusiness;
 import fr.insalyon.creatis.vip.application.server.business.ReproVipBusiness;
 import fr.insalyon.creatis.vip.core.client.VipException;
@@ -24,42 +23,42 @@ public class ReproVipServiceImpl extends AbstractRemoteServiceServlet implements
     }
 
     @Override
-    public void addPublicExecution(PublicExecution publicExecution) throws ApplicationException {
+    public void addPublicExecution(PublicExecution publicExecution) throws VipException {
         try {
             if (publicExecutionBusiness.exist(publicExecution.getExperienceName())) {
-                throw new ApplicationException("This experience name already exist!");
+                throw new VipException("This experience name already exist!");
             } else {
                 publicExecutionBusiness.create(publicExecution);
             }
         } catch (VipException e) {
-            throw new ApplicationException(e);
+            throw new VipException(e);
         }
     }
 
     @Override
-    public List<PublicExecution> getPublicExecutions() throws ApplicationException {
+    public List<PublicExecution> getPublicExecutions() throws VipException {
         try {
             return publicExecutionBusiness.getAll();
         } catch (VipException e) {
-            throw new ApplicationException(e);
+            throw new VipException(e);
         }
     }
 
     @Override
-    public boolean doesExecutionExist(String experienceName) throws ApplicationException {
+    public boolean doesExecutionExist(String experienceName) throws VipException {
         try {
             return publicExecutionBusiness.exist(experienceName);
         } catch (VipException e) {
-            throw new ApplicationException(e);
+            throw new VipException(e);
         }
     }
 
     @Override
-    public boolean canMakeExecutionPublic(List<String> workflowsIds) throws ApplicationException {
+    public boolean canMakeExecutionPublic(List<String> workflowsIds) throws VipException {
         try {
             return reproVipBusiness.canMakeExecutionPublic(workflowsIds);
         } catch (VipException e) {
-            throw new ApplicationException(e);
+            throw new VipException(e);
         }
     }
 
@@ -75,18 +74,18 @@ public class ReproVipServiceImpl extends AbstractRemoteServiceServlet implements
     }
 
     @Override
-    public PublicExecution.PublicExecutionStatus deleteReproVipDirectory(String experienceName) throws ApplicationException {
+    public PublicExecution.PublicExecutionStatus deleteReproVipDirectory(String experienceName) throws VipException {
         try {
             reproVipBusiness.deleteReproVipDirectory(experienceName);
             publicExecutionBusiness.updateStatus(experienceName, PublicExecution.PublicExecutionStatus.REQUESTED);
             return PublicExecution.PublicExecutionStatus.REQUESTED;
         } catch (VipException e) {
-            throw new ApplicationException(e);
+            throw new VipException(e);
         }
     }
 
     @Override
-    public PublicExecution.PublicExecutionStatus setExecutionPublished(String experienceName, String doi) throws ApplicationException {
+    public PublicExecution.PublicExecutionStatus setExecutionPublished(String experienceName, String doi) throws VipException {
         try {
             PublicExecution exec = publicExecutionBusiness.get(experienceName);
 
@@ -95,7 +94,7 @@ public class ReproVipServiceImpl extends AbstractRemoteServiceServlet implements
             publicExecutionBusiness.updateStatus(experienceName, PublicExecution.PublicExecutionStatus.PUBLISHED);
             return PublicExecution.PublicExecutionStatus.PUBLISHED;
         } catch (VipException e) {
-            throw new ApplicationException(e);
+            throw new VipException(e);
         }
     }
 }

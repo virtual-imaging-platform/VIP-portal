@@ -16,8 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import fr.insalyon.creatis.vip.api.business.ExecutionBusiness;
 import fr.insalyon.creatis.vip.api.controller.ApiController;
-import fr.insalyon.creatis.vip.api.exception.ApiException;
-import fr.insalyon.creatis.vip.api.exception.ApiException.ApiError;
+import fr.insalyon.creatis.vip.api.exception.ApiError;
 import fr.insalyon.creatis.vip.api.model.DeleteExecutionConfiguration;
 import fr.insalyon.creatis.vip.api.model.Execution;
 import fr.insalyon.creatis.vip.api.model.PathProperties;
@@ -42,27 +41,27 @@ public class ExecutionController extends ApiController {
             @RequestParam(required = false) String studyIdentifier,
             @RequestParam(required = false) Integer offset,
             @RequestParam(required = false) Integer limit
-    ) throws ApiException {
+    ) throws VipException {
         logMethodInvocation(logger, "listExecutions", studyIdentifier, offset, limit);
         if (studyIdentifier != null) {
             logger.warn("studyIdentifier not supportet yet in listExecutions");
-            throw new ApiException("studyIdentifier not supportet yet");
+            throw new VipException("studyIdentifier not supportet yet");
         }
         if (offset != null) {
             logger.warn("offset not supportet yet in listExecutions");
-            throw new ApiException("offset not supported yet");
+            throw new VipException("offset not supported yet");
         }
         int executionMaxNb = (int)server.getCarminDefaultLimitListExecution();
         if (limit == null) limit = executionMaxNb;
         if (limit > executionMaxNb) {
             logger.warn("limit parameter too high {}", limit);
-            throw new ApiException("limit parameter too high");
+            throw new VipException("limit parameter too high");
         }
         return executionBusiness.listExecutions(limit);
     }
 
     @RequestMapping("examples")
-    public List<Execution> listExecutions() throws ApiException {
+    public List<Execution> listExecutions() throws VipException {
         logMethodInvocation(logger, "listExamples");
         return executionBusiness.listExamples();
     }
@@ -76,11 +75,11 @@ public class ExecutionController extends ApiController {
     @RequestMapping(value = "count", produces = "text/plain;charset=UTF-8")
     public String countExecutions(
             @RequestParam(required = false) String studyIdentifier)
-            throws ApiException {
+            throws VipException {
         logMethodInvocation(logger, "countExecutions");
         if (studyIdentifier != null) {
             logger.warn("studyIdentifier not supportet yet in countExecutions");
-            throw new ApiException("studyIdentifier not supportet yet");
+            throw new VipException("studyIdentifier not supportet yet");
         }
         return String.valueOf(executionBusiness.countExecutions());
     }
@@ -123,14 +122,14 @@ public class ExecutionController extends ApiController {
 
     @RequestMapping("/{executionId}/results")
     public List<PathProperties> getExecutionResults(
-            @PathVariable String executionId) throws ApiException {
+            @PathVariable String executionId) throws VipException {
         logMethodInvocation(logger, "getExecutionResults", executionId);
         executionBusiness.checkIfUserCanAccessExecution(executionId);
         return executionBusiness.getExecutionResultsPaths(executionId);
     }
 
     @RequestMapping(value = "/{executionId}/stdout", produces = "text/plain;charset=UTF-8")
-    public String getStdout(@PathVariable String executionId) throws ApiException {
+    public String getStdout(@PathVariable String executionId) throws VipException {
         logMethodInvocation(logger, "getStdout", executionId);
         executionBusiness.checkIfUserCanAccessExecution(executionId);
         return executionBusiness.getLog(executionId, "out");
@@ -144,7 +143,7 @@ public class ExecutionController extends ApiController {
     }
 
     @RequestMapping(value= "/{executionId}/stderr", produces = "text/plain;charset=UTF-8")
-    public String getStderr(@PathVariable String executionId) throws ApiException {
+    public String getStderr(@PathVariable String executionId) throws VipException {
         logMethodInvocation(logger, "getStderr", executionId);
         executionBusiness.checkIfUserCanAccessExecution(executionId);
         return executionBusiness.getLog(executionId, "err");
@@ -159,15 +158,15 @@ public class ExecutionController extends ApiController {
 
     @RequestMapping(value = "/{executionId}/play", method = RequestMethod.PUT)
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void playExecution(@PathVariable String executionId) throws ApiException {
+    public void playExecution(@PathVariable String executionId) throws VipException {
         logMethodInvocation(logger, "playExecution", executionId);
         logger.warn("playExecution should not be used");
-        throw new ApiException(ApiError.NOT_IMPLEMENTED, "playExecution");
+        throw new VipException(ApiError.NOT_IMPLEMENTED, "playExecution");
     }
 
     @RequestMapping(value = "/{executionId}/kill", method = RequestMethod.PUT)
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void killExecution(@PathVariable String executionId) throws ApiException {
+    public void killExecution(@PathVariable String executionId) throws VipException {
         logMethodInvocation(logger, "killExecution", executionId);
         executionBusiness.checkIfUserCanAccessExecution(executionId);
         executionBusiness.killExecution(executionId);
@@ -176,7 +175,7 @@ public class ExecutionController extends ApiController {
     @RequestMapping(value = "/{executionId}/delete", method = RequestMethod.PUT)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteExecution(@PathVariable String executionId,
-                                @RequestBody @Valid DeleteExecutionConfiguration delConfig) throws ApiException {
+                                @RequestBody @Valid DeleteExecutionConfiguration delConfig) throws VipException {
         logMethodInvocation(logger, "deleteExecution", executionId);
         executionBusiness.checkIfUserCanAccessExecution(executionId);
         executionBusiness.deleteExecution(executionId, delConfig.getDeleteFiles());

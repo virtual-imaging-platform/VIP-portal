@@ -13,11 +13,12 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import fr.insalyon.creatis.vip.api.controller.ApiController;
-import fr.insalyon.creatis.vip.api.exception.ApiException;
+import fr.insalyon.creatis.vip.api.exception.ApiError;
 import fr.insalyon.creatis.vip.application.client.bean.AppVersion;
 import fr.insalyon.creatis.vip.application.client.bean.Application;
 import fr.insalyon.creatis.vip.application.server.business.AppVersionBusiness;
 import fr.insalyon.creatis.vip.application.server.business.ApplicationBusiness;
+import fr.insalyon.creatis.vip.core.client.DefaultError;
 import fr.insalyon.creatis.vip.core.client.VipException;
 import jakarta.validation.Valid;
 
@@ -36,7 +37,7 @@ public class AppVersionController extends ApiController {
     }
 
     @RequestMapping(method = RequestMethod.GET)
-    public List<AppVersion> listAppVersions() throws ApiException {
+    public List<AppVersion> listAppVersions() throws VipException {
         logMethodInvocation(logger, "listAppVersions");
         try {
             List<Application> apps = applicationBusiness.getApplications();
@@ -46,7 +47,7 @@ public class AppVersionController extends ApiController {
             }
             return appVersions;
         } catch (VipException e) {
-            throw new ApiException(e);
+            throw new VipException(e);
         }
     }
 
@@ -59,7 +60,7 @@ public class AppVersionController extends ApiController {
         }
     }
 
-    private AppVersionStrings parseAppVersionId(String appVersionId) throws ApiException {
+    private AppVersionStrings parseAppVersionId(String appVersionId) throws VipException {
         int delimiterPos = appVersionId.lastIndexOf("/");
         if (delimiterPos >= 0) {
             String appName = appVersionId.substring(0, delimiterPos);
@@ -67,40 +68,40 @@ public class AppVersionController extends ApiController {
             return new AppVersionStrings(appName, version);
         } else {
             logger.error("Error decoding appVersionId {}", appVersionId);
-            throw new ApiException(ApiException.ApiError.INVALID_PIPELINE_IDENTIFIER, appVersionId);
+            throw new VipException(ApiError.INVALID_PIPELINE_IDENTIFIER, appVersionId);
         }
     }
 
     @RequestMapping(value = "{appVersionId}", method = RequestMethod.GET)
-    public AppVersion getAppVersion(@PathVariable String appVersionId) throws ApiException {
+    public AppVersion getAppVersion(@PathVariable String appVersionId) throws VipException {
         logMethodInvocation(logger, "getAppVersion", appVersionId);
         AppVersionStrings input = parseAppVersionId(appVersionId);
         try {
             AppVersion appVersion = appVersionBusiness.getVersion(input.appName, input.version);
             if (appVersion == null) {
-                throw new ApiException(ApiException.ApiError.INVALID_PIPELINE_IDENTIFIER, appVersionId);
+                throw new VipException(ApiError.INVALID_PIPELINE_IDENTIFIER, appVersionId);
             }
             return appVersion;
         } catch (VipException e) {
-            throw new ApiException(e);
+            throw new VipException(e);
         }
     }
 
     @RequestMapping(value = "{appVersionIdFirstPart}/{appVersionIdSecondPart}", method = RequestMethod.GET)
     public AppVersion getAppVersion(@PathVariable String appVersionIdFirstPart,
-                                    @PathVariable String appVersionIdSecondPart) throws ApiException {
+                                    @PathVariable String appVersionIdSecondPart) throws VipException {
         return getAppVersion(appVersionIdFirstPart + "/" + appVersionIdSecondPart);
     }
 
     @RequestMapping(value = "/{appVersionId}", method = RequestMethod.PUT)
     public AppVersion createOrUpdateAppVersion(@PathVariable String appVersionId,
-                                               @RequestBody @Valid AppVersion appVersion) throws ApiException {
+                                               @RequestBody @Valid AppVersion appVersion) throws VipException {
         logMethodInvocation(logger, "createOrUpdateAppVersion", appVersionId);
         AppVersionStrings input = parseAppVersionId(appVersionId);
         String appVersionIdBody = appVersion.getApplicationName() + "/" + appVersion.getVersion();
         if (!appVersionId.equals(appVersionIdBody)) {
             logger.error("appVersionId mismatch: {}!={}", appVersionId, appVersionIdBody);
-            throw new ApiException(ApiException.ApiError.INPUT_FIELD_NOT_VALID, appVersionId);
+            throw new VipException(DefaultError.BAD_INPUT_FIELD, appVersionId);
         }
         try {
             AppVersion existingAppVersion = appVersionBusiness.getVersion(input.appName, input.version);
@@ -111,36 +112,36 @@ public class AppVersionController extends ApiController {
             }
             return appVersionBusiness.getVersion(input.appName, input.version);
         } catch (VipException e) {
-            throw new ApiException(e);
+            throw new VipException(e);
         }
     }
 
     @RequestMapping(value = "/{appVersionIdFirstPart}/{appVersionIdSecondPart}", method = RequestMethod.PUT)
     public AppVersion createOrUpdateAppVersion(@PathVariable String appVersionIdFirstPart,
                                                @PathVariable String appVersionIdSecondPart,
-                                               @RequestBody @Valid AppVersion appVersion) throws ApiException {
+                                               @RequestBody @Valid AppVersion appVersion) throws VipException {
         return createOrUpdateAppVersion(appVersionIdFirstPart + "/" + appVersionIdSecondPart, appVersion);
     }
 
     @RequestMapping(method = RequestMethod.POST)
-    public AppVersion createAppVersion(@RequestBody @Valid AppVersion appVersion) throws ApiException {
+    public AppVersion createAppVersion(@RequestBody @Valid AppVersion appVersion) throws VipException {
         return createOrUpdateAppVersion(appVersion.getApplicationName(), appVersion.getVersion(), appVersion);
     }
 
     @RequestMapping(value = "/{appVersionId}", method = RequestMethod.DELETE)
-    public void deleteAppVersion(@PathVariable String appVersionId) throws ApiException {
+    public void deleteAppVersion(@PathVariable String appVersionId) throws VipException {
         logMethodInvocation(logger, "deleteAppVersion", appVersionId);
         AppVersionStrings input = parseAppVersionId(appVersionId);
         try {
             appVersionBusiness.remove(input.appName, input.version);
         } catch (VipException e) {
-            throw new ApiException(e);
+            throw new VipException(e);
         }
     }
 
     @RequestMapping(value = "/{appVersionIdFirstPart}/{appVersionIdSecondPart}", method = RequestMethod.DELETE)
     public void deleteAppVersion(@PathVariable String appVersionIdFirstPart,
-                                 @PathVariable String appVersionIdSecondPart) throws ApiException {
+                                 @PathVariable String appVersionIdSecondPart) throws VipException {
         deleteAppVersion(appVersionIdFirstPart + "/" + appVersionIdSecondPart);
     }
 }

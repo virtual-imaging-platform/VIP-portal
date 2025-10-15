@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import fr.insalyon.creatis.vip.api.exception.ApiException;
 import fr.insalyon.creatis.vip.core.client.VipException;
 import fr.insalyon.creatis.vip.datamanager.client.bean.ExternalPlatform;
 import fr.insalyon.creatis.vip.datamanager.server.business.ExternalPlatformBusiness;
@@ -29,12 +28,12 @@ public class ExternalPlatformController extends ApiController {
     }
 
     @GetMapping
-    public List<ExternalPlatform> listExternalPlatforms() throws ApiException {
+    public List<ExternalPlatform> listExternalPlatforms() throws VipException {
         logMethodInvocation(logger,"listExternalPlatforms");
         try{
             return externalPlatformBusiness.listAll();
         } catch (VipException e) {
-            throw new ApiException(e);
+            throw new VipException(e);
         }
     }
 }
