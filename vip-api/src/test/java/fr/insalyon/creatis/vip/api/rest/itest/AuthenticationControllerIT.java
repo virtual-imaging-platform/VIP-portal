@@ -11,8 +11,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
 
-import fr.insalyon.creatis.vip.api.exception.ApiException.ApiError;
 import fr.insalyon.creatis.vip.api.rest.config.BaseWebSpringIT;
+import fr.insalyon.creatis.vip.core.client.DefaultError;
 
 public class AuthenticationControllerIT extends BaseWebSpringIT {
 
@@ -24,10 +24,10 @@ public class AuthenticationControllerIT extends BaseWebSpringIT {
                                 .contentType("application/json")
                                 .content(getResourceAsString("jsonObjects/user-credentials.json")))
                 .andDo(print())
-                .andExpect(status().isUnauthorized())
+                .andExpect(status().isBadRequest())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.errorCode")
-                        .value(ApiError.BAD_CREDENTIALS.getCode()));;
+                        .value(DefaultError.BAD_CREDENTIALS.getCode()));;
     }
 
     @Test
@@ -56,7 +56,7 @@ public class AuthenticationControllerIT extends BaseWebSpringIT {
                 .andExpect(status().isBadRequest())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(jsonPath("$.errorCode")
-                        .value(ApiError.INPUT_FIELD_NOT_VALID.getCode()));;
+                        .value(DefaultError.BAD_INPUT_FIELD.getCode()));;
     }
 
 }

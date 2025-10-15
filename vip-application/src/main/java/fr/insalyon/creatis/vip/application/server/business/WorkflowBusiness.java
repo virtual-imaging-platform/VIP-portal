@@ -1,8 +1,5 @@
 package fr.insalyon.creatis.vip.application.server.business;
 
-import static fr.insalyon.creatis.vip.application.client.view.ApplicationException.ApplicationError.PLATFORM_MAX_EXECS;
-import static fr.insalyon.creatis.vip.application.client.view.ApplicationException.ApplicationError.USER_MAX_EXECS;
-
 import java.io.File;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -48,6 +45,7 @@ import fr.insalyon.creatis.vip.application.client.bean.Engine;
 import fr.insalyon.creatis.vip.application.client.bean.InOutData;
 import fr.insalyon.creatis.vip.application.client.bean.Resource;
 import fr.insalyon.creatis.vip.application.client.bean.Simulation;
+import fr.insalyon.creatis.vip.application.client.view.ApplicationError;
 import fr.insalyon.creatis.vip.application.client.view.monitor.SimulationStatus;
 import fr.insalyon.creatis.vip.application.client.view.monitor.progress.ProcessorStatus;
 import fr.insalyon.creatis.vip.application.server.business.simulation.parser.InputFileParser;
@@ -201,13 +199,13 @@ public class WorkflowBusiness {
             logger.warn("Unable to launch execution '{}': max number of"
                     + " running workflows reached in the platform : {}",
                     simulationName, runningSimulations);
-            throw new VipException(PLATFORM_MAX_EXECS);
+            throw new VipException(ApplicationError.PLATFORM_MAX_EXECS);
         } else if (runningWorkflows >= user.getMaxRunningSimulations()) {
             logger.warn("Unable to launch execution '{}': max number of "
                     + "running workflows reached ({}/{}) for user '{}'.",
                     simulationName, runningWorkflows,
                     user.getMaxRunningSimulations(), user);
-            throw new VipException(USER_MAX_EXECS, runningWorkflows);
+            throw new VipException(ApplicationError.USER_MAX_EXECS, runningWorkflows);
         }
     }
 

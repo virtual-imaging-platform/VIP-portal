@@ -1,15 +1,15 @@
 package fr.insalyon.creatis.vip.api.data;
 
-import fr.insalyon.creatis.vip.core.server.model.ErrorCodeAndMessage;
-import fr.insalyon.creatis.vip.api.tools.spring.JsonCustomObjectMatcher;
-import fr.insalyon.creatis.vip.core.client.VipException;
-import fr.insalyon.creatis.vip.core.client.VipException.VipError;
-import org.hamcrest.Matcher;
-
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
+
+import org.hamcrest.Matcher;
+
+import fr.insalyon.creatis.vip.api.tools.spring.JsonCustomObjectMatcher;
+import fr.insalyon.creatis.vip.core.client.VipError;
+import fr.insalyon.creatis.vip.core.server.model.ErrorCodeAndMessage;
 
 public class ErrorCodeAndMessageTestUtils {
 
@@ -48,7 +48,7 @@ public class ErrorCodeAndMessageTestUtils {
     ) {
         ErrorCodeAndMessage errorCodeAndMessage = new ErrorCodeAndMessage(
                 vipError.getCode(),
-                VipException.getRawMessage(vipError).get()
+                vipError.getMessage()
         );
         Map<Class, Map<String, Function>> suppliersRegistry = new HashMap<>();
         return JsonCustomObjectMatcher.jsonCorrespondsTo(errorCodeAndMessage, errorCodeAndMessageSuppliers, suppliersRegistry);

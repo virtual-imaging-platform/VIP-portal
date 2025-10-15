@@ -1,15 +1,19 @@
 package fr.insalyon.creatis.vip.application.client.rpc;
 
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.user.client.rpc.RemoteService;
-import com.google.gwt.user.client.rpc.ServiceDefTarget;
-import fr.insalyon.creatis.vip.application.client.bean.*;
-import fr.insalyon.creatis.vip.application.client.view.ApplicationException;
-import fr.insalyon.creatis.vip.core.client.bean.Pair;
-
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.user.client.rpc.RemoteService;
+import com.google.gwt.user.client.rpc.ServiceDefTarget;
+
+import fr.insalyon.creatis.vip.application.client.bean.Activity;
+import fr.insalyon.creatis.vip.application.client.bean.InOutData;
+import fr.insalyon.creatis.vip.application.client.bean.Simulation;
+import fr.insalyon.creatis.vip.application.client.bean.SimulationInput;
+import fr.insalyon.creatis.vip.core.client.VipException;
+import fr.insalyon.creatis.vip.core.client.bean.Pair;
 
 /**
  *
@@ -30,53 +34,53 @@ public interface WorkflowService extends RemoteService {
         }
     }
 
-    public List<Simulation> getSimulations() throws ApplicationException;
+    public List<Simulation> getSimulations() throws VipException;
     
-    public List<Simulation> getSimulations(Date lastDate) throws ApplicationException;
+    public List<Simulation> getSimulations(Date lastDate) throws VipException;
 
-    public String getApplicationDescriptorString(String applicationName, String applicationVersion) throws ApplicationException;
+    public String getApplicationDescriptorString(String applicationName, String applicationVersion) throws VipException;
 
-    public List<String> getApplicationsDescriptorsString(List<Pair<String, String>> applications) throws ApplicationException;
+    public List<String> getApplicationsDescriptorsString(List<Pair<String, String>> applications) throws VipException;
 
-    public void launchSimulation(Map<String, String> parameters, String applicationName, String applicationVersion, String applicationClass, String simulationName) throws ApplicationException;
+    public void launchSimulation(Map<String, String> parameters, String applicationName, String applicationVersion, String applicationClass, String simulationName) throws VipException;
 
-    public SimulationInput getInputByNameUserApp(String inputName, String appName) throws ApplicationException;
+    public SimulationInput getInputByNameUserApp(String inputName, String appName) throws VipException;
 
-    public void addSimulationInput(SimulationInput simulationInput) throws ApplicationException;
+    public void addSimulationInput(SimulationInput simulationInput) throws VipException;
 
-    public void updateSimulationInput(SimulationInput simulationInput) throws ApplicationException;
+    public void updateSimulationInput(SimulationInput simulationInput) throws VipException;
 
-    public void removeSimulationInput(String inputName, String applicationName) throws ApplicationException;
+    public void removeSimulationInput(String inputName, String applicationName) throws VipException;
 
-    public List<SimulationInput> getSimulationInputByUser() throws ApplicationException;
+    public List<SimulationInput> getSimulationInputByUser() throws VipException;
 
-    public void saveInputsAsExamples(SimulationInput simulationInput) throws ApplicationException;
+    public void saveInputsAsExamples(SimulationInput simulationInput) throws VipException;
 
-    public List<SimulationInput> getSimulationInputExamples(String applicationName) throws ApplicationException;
+    public List<SimulationInput> getSimulationInputExamples(String applicationName) throws VipException;
 
-    public void removeSimulationInputExample(String inputName, String applicationName) throws ApplicationException;
+    public void removeSimulationInputExample(String inputName, String applicationName) throws VipException;
 
-    public void killSimulations(List<String> simulationIDs) throws ApplicationException;
+    public void killSimulations(List<String> simulationIDs) throws VipException;
 
-    public void cleanSimulations(List<String> simulationIDs) throws ApplicationException;
+    public void cleanSimulations(List<String> simulationIDs) throws VipException;
 
-    public void purgeSimulations(List<String> simulationIDs) throws ApplicationException;
+    public void purgeSimulations(List<String> simulationIDs) throws VipException;
     
-    public void markSimulationsCompleted(List<String> simulationIDs) throws ApplicationException;
+    public void markSimulationsCompleted(List<String> simulationIDs) throws VipException;
 
-    public void killWorkflow(String simulationID) throws ApplicationException;
+    public void killWorkflow(String simulationID) throws VipException;
 
-    public void cleanWorkflow(String simulationID) throws ApplicationException;
+    public void cleanWorkflow(String simulationID) throws VipException;
 
-    public void purgeWorkflow(String simulationID) throws ApplicationException;
+    public void purgeWorkflow(String simulationID) throws VipException;
     
-    public void markWorkflowCompleted(String simulationID) throws ApplicationException;
+    public void markWorkflowCompleted(String simulationID) throws VipException;
 
-    public Map<String, String> relaunchSimulation(String simulationID) throws ApplicationException;
+    public Map<String, String> relaunchSimulation(String simulationID) throws VipException;
 
-    public List<Simulation> getSimulations(String user, String application, String status, Date startDate, Date endDate) throws ApplicationException;
+    public List<Simulation> getSimulations(String user, String application, String status, Date startDate, Date endDate) throws VipException;
 
-    public Simulation getSimulation(String simulationID) throws ApplicationException;
+    public Simulation getSimulation(String simulationID) throws VipException;
 
     public String getFile(String baseDir, String fileName);
 
@@ -84,21 +88,21 @@ public interface WorkflowService extends RemoteService {
 
     public List<String> getLogs(String baseDir);
 
-    public void deleteLogData(String path) throws ApplicationException;
+    public void deleteLogData(String path) throws VipException;
 
     public List<SimulationInput> getWorkflowsInputByUserAndAppName(String user, String appName);
 
-    public List<String> getPerformanceStats(List<Simulation> simulationList, int type) throws ApplicationException;
+    public List<String> getPerformanceStats(List<Simulation> simulationList, int type) throws VipException;
 
-    public List<InOutData> getOutputData(String simulationID) throws ApplicationException;
+    public List<InOutData> getOutputData(String simulationID) throws VipException;
 
-    public List<InOutData> getInputData(String simulationID) throws ApplicationException;
+    public List<InOutData> getInputData(String simulationID) throws VipException;
 
-    public List<Activity> getProcessors(String simulationID) throws ApplicationException;
+    public List<Activity> getProcessors(String simulationID) throws VipException;
 
-    public void validateInputs(List<String> inputs) throws ApplicationException;
+    public void validateInputs(List<String> inputs) throws VipException;
 
-    public void updateUser(String currentUser, String newUser) throws ApplicationException;
+    public void updateUser(String currentUser, String newUser) throws VipException;
     
-    public void changeSimulationUser(String simulationId, String user) throws ApplicationException;
+    public void changeSimulationUser(String simulationId, String user) throws VipException;
 }

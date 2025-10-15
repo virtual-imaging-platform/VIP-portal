@@ -11,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import fr.insalyon.creatis.grida.client.GRIDAClientException;
 import fr.insalyon.creatis.vip.application.client.bean.AppVersion;
 import fr.insalyon.creatis.vip.application.client.bean.Application;
-import fr.insalyon.creatis.vip.application.client.view.ApplicationException;
 import fr.insalyon.creatis.vip.application.server.business.AppVersionBusiness;
 import fr.insalyon.creatis.vip.application.server.business.ApplicationBusiness;
 import fr.insalyon.creatis.vip.core.client.VipException;
@@ -25,7 +24,7 @@ public class PublicApplicationListIT extends BaseSpringIT {
     @Autowired private AppVersionBusiness appVersionBusiness;
 
     @Test
-    public void shouldNotIncludePrivateGroupsAndClasses() throws VipException, ApplicationException, GRIDAClientException {
+    public void shouldNotIncludePrivateGroupsAndClasses() throws VipException, GRIDAClientException {
         setAdminContext();
         Group publicGroup = new Group("public group", true, GroupType.getDefault());
         Group privateGroup = new Group("private group", false, GroupType.getDefault());

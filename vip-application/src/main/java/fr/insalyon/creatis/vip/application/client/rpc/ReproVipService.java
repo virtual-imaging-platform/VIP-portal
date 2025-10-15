@@ -1,13 +1,13 @@
 package fr.insalyon.creatis.vip.application.client.rpc;
 
+import java.util.List;
+
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.ServiceDefTarget;
 
 import fr.insalyon.creatis.vip.application.client.bean.PublicExecution;
-import fr.insalyon.creatis.vip.application.client.view.ApplicationException;
-
-import java.util.List;
+import fr.insalyon.creatis.vip.core.client.VipException;
 
 public interface ReproVipService extends RemoteService {
 
@@ -23,18 +23,18 @@ public interface ReproVipService extends RemoteService {
         }
     }
 
-    void addPublicExecution(PublicExecution publicExecution) throws ApplicationException;
+    void addPublicExecution(PublicExecution publicExecution) throws VipException;
 
-    public List<PublicExecution> getPublicExecutions() throws ApplicationException;
+    public List<PublicExecution> getPublicExecutions() throws VipException;
 
-    boolean doesExecutionExist(String experienceName) throws ApplicationException;
+    boolean doesExecutionExist(String experienceName) throws VipException;
 
-    boolean canMakeExecutionPublic(List<String> workflowsIds) throws ApplicationException;
+    boolean canMakeExecutionPublic(List<String> workflowsIds) throws VipException;
 
-    PublicExecution.PublicExecutionStatus createReproVipDirectory(String experienceName) throws ApplicationException;
+    PublicExecution.PublicExecutionStatus createReproVipDirectory(String experienceName) throws VipException;
 
-    PublicExecution.PublicExecutionStatus deleteReproVipDirectory(String experienceName) throws ApplicationException;
+    PublicExecution.PublicExecutionStatus deleteReproVipDirectory(String experienceName) throws VipException;
 
-    PublicExecution.PublicExecutionStatus setExecutionPublished(String experienceName, String doi) throws ApplicationException;
+    PublicExecution.PublicExecutionStatus setExecutionPublished(String experienceName, String doi) throws VipException;
 }
 
