@@ -29,7 +29,7 @@ public class ManageTagsTab extends AbstractManageTab {
         tagLayout.loadData();
     }
 
-    public void setTag(Tag tag) {
-        editLayout.setTag(tag);
+    public void setTag(Tag tag, String[] appVersions) {
+        editLayout.setTag(tag, appVersions);
     }
 }
