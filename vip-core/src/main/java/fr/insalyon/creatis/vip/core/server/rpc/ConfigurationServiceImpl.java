@@ -1,55 +1,5 @@
-/*
- * Copyright and authors: see LICENSE.txt in base repository.
- *
- * This software is a web portal for pipeline execution on distributed systems.
- *
- * This software is governed by the CeCILL-B license under French law and
- * abiding by the rules of distribution of free software.  You can  use,
- * modify and/ or redistribute the software under the terms of the CeCILL-B
- * license as circulated by CEA, CNRS and INRIA at the following URL
- * "http://www.cecill.info".
- *
- * As a counterpart to the access to the source code and  rights to copy,
- * modify and redistribute granted by the license, users are provided only
- * with a limited warranty  and the software's author,  the holder of the
- * economic rights,  and the successive licensors  have only  limited
- * liability.
- *
- * In this respect, the user's attention is drawn to the risks associated
- * with loading,  using,  modifying and/or developing or reproducing the
- * software by the user in light of its specific status of free software,
- * that may mean  that it is complicated to manipulate,  and  that  also
- * therefore means  that it is reserved for developers  and  experienced
- * professionals having in-depth computer knowledge. Users are therefore
- * encouraged to load and test the software's suitability as regards their
- * requirements in conditions enabling the security of their systems and/or
- * data to be ensured and,  more generally, to use and operate it in the
- * same conditions as regards security.
- *
- * The fact that you are presently reading this means that you have had
- * knowledge of the CeCILL-B license and that you accept its terms.
- */
 package fr.insalyon.creatis.vip.core.server.rpc;
 
-import fr.insalyon.creatis.vip.core.client.bean.*;
-import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationService;
-import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
-import fr.insalyon.creatis.vip.core.client.view.CoreConstants.GROUP_ROLE;
-import fr.insalyon.creatis.vip.core.client.view.CoreException;
-import fr.insalyon.creatis.vip.core.client.view.user.UserLevel;
-import fr.insalyon.creatis.vip.core.client.view.util.CountryCode;
-import fr.insalyon.creatis.vip.core.server.business.BusinessException;
-import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
-import fr.insalyon.creatis.vip.core.server.business.GroupBusiness;
-import fr.insalyon.creatis.vip.core.server.dao.DAOException;
-import fr.insalyon.creatis.vip.core.server.dao.UserDAO;
-import fr.insalyon.creatis.vip.core.server.inter.GroupInterface;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServletRequest;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -59,6 +9,28 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import fr.insalyon.creatis.vip.core.client.VipException;
+import fr.insalyon.creatis.vip.core.client.bean.Group;
+import fr.insalyon.creatis.vip.core.client.bean.UsageStats;
+import fr.insalyon.creatis.vip.core.client.bean.User;
+import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationService;
+import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
+import fr.insalyon.creatis.vip.core.client.view.CoreConstants.GROUP_ROLE;
+import fr.insalyon.creatis.vip.core.client.view.CoreException;
+import fr.insalyon.creatis.vip.core.client.view.user.UserLevel;
+import fr.insalyon.creatis.vip.core.client.view.util.CountryCode;
+import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
+import fr.insalyon.creatis.vip.core.server.business.GroupBusiness;
+import fr.insalyon.creatis.vip.core.server.business.VipSessionBusiness;
+import fr.insalyon.creatis.vip.core.server.dao.DAOException;
+import fr.insalyon.creatis.vip.core.server.dao.UserDAO;
+import fr.insalyon.creatis.vip.core.server.inter.GroupInterface;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+
 public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet implements ConfigurationService {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
@@ -67,6 +39,7 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
     private GroupBusiness groupBusiness;
     private UserDAO userDAO;
     private GroupInterface groupInterface;
+    private VipSessionBusiness vipSessionBusiness;
 
     @Override
     public void init() throws ServletException {
@@ -75,26 +48,27 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
         userDAO = getBean(UserDAO.class);
         groupBusiness = getBean(GroupBusiness.class);
         groupInterface = getBean(GroupInterface.class);
+        vipSessionBusiness = getBean(VipSessionBusiness.class);
     }
     
     @Override
     public User configure(String email, String session) throws CoreException {
         try {
+
             logger.debug("Initializing VIP configuration.");
             configurationBusiness.configure();
             logger.debug("VIP successfully configured.");
 
-            if (configurationBusiness.validateSession(email, session)) {
+            User user = vipSessionBusiness.resetSessionFromCookie(getThreadLocalRequest());
 
-                User user = configurationBusiness.getUser(email);
-                user = setUserInSession(user);
+            if (user != null) {
                 configurationBusiness.updateUserLastLogin(email);
                 trace(logger, "Connected.");
 
                 return user;
             }
             return null;
-        } catch (BusinessException ex) {
+        } catch (VipException ex) {
             throw new CoreException(ex);
         }
     }
@@ -107,7 +81,7 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
             trace(logger, "Signed out.");
             getSession().removeAttribute(CoreConstants.SESSION_USER);
             getSession().removeAttribute(CoreConstants.SESSION_GROUPS);
-        } catch (BusinessException ex) {
+        } catch (VipException ex) {
             throw new CoreException(ex);
         }
     }
@@ -120,7 +94,7 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
             user = configurationBusiness.activate(user.getEmail(), code);
 
             return setUserInSession(user);
-        } catch (BusinessException ex) {
+        } catch (VipException ex) {
             throw new CoreException(ex);
         }
     }
@@ -133,7 +107,7 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
             configurationBusiness.sendActivationCode(user.getEmail());
 
             return user.getEmail();
-        } catch (BusinessException ex) {
+        } catch (VipException ex) {
             throw new CoreException(ex);
         }
     }
@@ -143,7 +117,7 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
         try {
             //do not add a trace here: it should be reachable without authentication (#2632)
             configurationBusiness.sendResetCode(email);
-        } catch (BusinessException ex) {
+        } catch (VipException ex) {
             throw new CoreException(ex);
         }
     }
@@ -153,7 +127,7 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
         try {
             authenticateSystemAdministrator(logger);
             return configurationBusiness.getUsers();
-        } catch (BusinessException ex) {
+        } catch (VipException ex) {
             throw new CoreException(ex);
         }
     }
@@ -164,7 +138,7 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
             authenticateSystemAdministrator(logger);
             trace(logger, "Adding group '" + group + "'.");
             groupBusiness.add(group);
-        } catch (BusinessException ex) {
+        } catch (VipException ex) {
             throw new CoreException(ex);
         }
     }
@@ -175,7 +149,7 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
             authenticateSystemAdministrator(logger);
             trace(logger, "Updating group '" + name + "' to '" + group.getName() + "'.");
             groupBusiness.update(name, group);
-        } catch (BusinessException ex) {
+        } catch (VipException ex) {
             throw new CoreException(ex);
         }
     }
@@ -186,7 +160,7 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
             authenticateSystemAdministrator(logger);
             trace(logger, "Removing group '" + groupName + "'.");
             groupBusiness.remove(getSessionUser().getEmail(), groupName);
-        } catch (BusinessException ex) {
+        } catch (VipException ex) {
             throw new CoreException(ex);
         }
     }
@@ -196,7 +170,7 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
         try {
             authenticateSystemAdministrator(logger);
             return groupBusiness.get();
-        } catch (BusinessException ex) {
+        } catch (VipException ex) {
             throw new CoreException(ex);
         }
     }
@@ -205,7 +179,7 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
     public List<Group> getPublicGroups() throws CoreException {
         try {
             return groupBusiness.getPublic();
-        } catch (BusinessException ex) {
+        } catch (VipException ex) {
             throw new CoreException(ex);
         }
     }
@@ -222,7 +196,7 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
             }
             
             return items;
-        } catch (BusinessException e) {
+        } catch (VipException e) {
             throw new CoreException(e);
         }
     }
@@ -235,7 +209,7 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
             } else {
                 logger.info("No interface is present for GroupInterface !"); 
             }
-        } catch (BusinessException e) {
+        } catch (VipException e) {
             throw new CoreException(e);
         }
     }
@@ -253,7 +227,7 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
             configurationBusiness.removeUser(user.getEmail(), true);
 
             return user;
-        } catch (BusinessException ex) {
+        } catch (VipException ex) {
             throw new CoreException(ex);
         }
     }
@@ -269,7 +243,7 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
                 return configurationBusiness.getUserGroups(
                         getSessionUser().getEmail());
             }
-        } catch (BusinessException ex) {
+        } catch (VipException ex) {
             throw new CoreException(ex);
         }
     }
@@ -302,7 +276,7 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
         try {
             String email = getSessionUser().getEmail();
             return configurationBusiness.getUserPropertiesGroups(email);
-        } catch (BusinessException ex) {
+        } catch (VipException ex) {
             throw new CoreException(ex);
         }
     }
@@ -324,7 +298,7 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
                 }
             }
             return list;
-        } catch (BusinessException ex) {
+        } catch (VipException ex) {
             throw new CoreException(ex);
         }
     }
@@ -345,7 +319,7 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
                 maxRunningSimulations,
                 locked);
             configurationBusiness.setUserGroups(email, groups);
-        } catch (BusinessException ex) {
+        } catch (VipException ex) {
             throw new CoreException(ex);
         }
     }
@@ -354,7 +328,7 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
     public User getUserData() throws CoreException {
         try {
             return configurationBusiness.getUserData(getSessionUser().getEmail());
-        } catch (BusinessException ex) {
+        } catch (VipException ex) {
             throw new CoreException(ex);
         }
     }
@@ -365,7 +339,7 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
             trace(logger, "Updating user data '" + user.getEmail() + "'.");
             user = configurationBusiness.updateUser(user);
             return setUserInSession(user);
-        } catch (BusinessException ex) {
+        } catch (VipException ex) {
             throw new CoreException(ex);
         }
     }
@@ -379,7 +353,7 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
                     getSessionUser().getEmail(),
                 currentPassword,
                 newPassword);
-        } catch (BusinessException ex) {
+        } catch (VipException ex) {
             throw new CoreException(ex);
         }
     }
@@ -395,7 +369,7 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
 
             currentUser = configurationBusiness.getUserData(currentUser.getEmail());
             return setUserInSession(currentUser);
-        } catch (BusinessException ex) {
+        } catch (VipException ex) {
             throw new CoreException(ex);
         }
     }
@@ -417,7 +391,7 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
 
             currentUser = configurationBusiness.getUserData(newEmail);
             return setUserInSession(currentUser);
-        } catch (BusinessException ex) {
+        } catch (VipException ex) {
             throw new CoreException(ex);
         }
     }
@@ -433,7 +407,7 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
 
             currentUser = configurationBusiness.getUserData(currentEmail);
             return setUserInSession(currentUser);
-        } catch (BusinessException ex) {
+        } catch (VipException ex) {
             throw new CoreException(ex);
         }
     }
@@ -445,7 +419,7 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
             configurationBusiness.sendContactMail(
                     getSessionUser(), category, subject, comment);
 
-        } catch (BusinessException ex) {
+        } catch (VipException ex) {
             throw new CoreException(ex);
         }
     }
@@ -456,7 +430,7 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
             authenticateSystemAdministrator(logger);
             trace(logger, "Activating user: " + email);
             configurationBusiness.activateUser(email);
-        } catch (BusinessException ex) {
+        } catch (VipException ex) {
             throw new CoreException(ex);
         }
     }
@@ -467,7 +441,7 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
             trace(logger, "Adding user to group '" + groupName + "'.");
             configurationBusiness.addUserToGroup(
                     getSessionUser().getEmail(), groupName);
-        } catch (BusinessException ex) {
+        } catch (VipException ex) {
             throw new CoreException(ex);
         }
     }
@@ -477,7 +451,7 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
         try {
             authenticateGroupAdministrator(logger, groupName);
             return configurationBusiness.getUsersFromGroup(groupName);
-        } catch (BusinessException ex) {
+        } catch (VipException ex) {
             throw new CoreException(ex);
         }
     }
@@ -495,7 +469,7 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
                 configurationBusiness.removeUserFromGroup(
                         getSessionUser().getEmail(), groupName);
             }
-        } catch (BusinessException ex) {
+        } catch (VipException ex) {
             throw new CoreException(ex);
         }
     }
@@ -506,7 +480,7 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
         try {
             logger.info("(" + email + ") Reseting password.");
             configurationBusiness.resetPassword(email, code, password);
-        } catch (BusinessException ex) {
+        } catch (VipException ex) {
             throw new CoreException(ex);
         }
     }
@@ -556,7 +530,7 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
         User user = getSessionUser();
         try {
             configurationBusiness.updateTermsOfUse(user.getEmail());
-        } catch (BusinessException ex) {
+        } catch (VipException ex) {
             throw new CoreException(ex);
         }
     }
@@ -567,7 +541,7 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
         try {
             authenticateSystemAdministrator(logger);
             configurationBusiness.addTermsUse();
-        } catch (BusinessException ex) {
+        } catch (VipException ex) {
             throw new CoreException(ex);
         }
     }
@@ -576,7 +550,7 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
     public Timestamp getLastUpdateTermsOfUse() throws CoreException {
         try {
             return configurationBusiness.getLastUpdateTermsOfUse();
-        } catch (BusinessException ex) {
+        } catch (VipException ex) {
             throw new CoreException(ex);
         }
     }
@@ -591,7 +565,7 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
         try {
             return configurationBusiness.testLastUpdatePublication(
                     getSessionUser().getEmail());
-        } catch (BusinessException ex) {
+        } catch (VipException ex) {
             throw new CoreException(ex);
         }
     }
@@ -602,7 +576,7 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
         User user = getSessionUser();
         try {
             configurationBusiness.updateLastUpdatePublication(user.getEmail());
-        } catch (BusinessException ex) {
+        } catch (VipException ex) {
             throw new CoreException(ex);
         }
     }
@@ -613,7 +587,7 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
         try {
             return configurationBusiness
                     .getUserApikey(getSessionUser().getEmail());
-        } catch (BusinessException ex) {
+        } catch (VipException ex) {
             throw new CoreException(ex);
         }
     }
@@ -623,7 +597,7 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
         try {
             configurationBusiness
                 .deleteUserApikey(getSessionUser().getEmail());
-        } catch (BusinessException ex) {
+        } catch (VipException ex) {
             throw new CoreException(ex);
         }
     }
@@ -633,7 +607,7 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
         try {
             return configurationBusiness
                 .generateNewUserApikey(getSessionUser().getEmail());
-        } catch (BusinessException ex) {
+        } catch (VipException ex) {
             throw new CoreException(ex);
         }
     }
@@ -644,7 +618,7 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
             User user = configurationBusiness.getUser(email);
 
             return groupInterface.getMissingGroupsRessources(user);
-        } catch (BusinessException e) {
+        } catch (VipException e) {
             throw new CoreException(e);
         }
     }

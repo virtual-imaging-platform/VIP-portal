@@ -31,17 +31,18 @@
  */
 package fr.insalyon.creatis.vip.integrationtest;
 
-import fr.insalyon.creatis.vip.api.controller.PlatformController;
-import fr.insalyon.creatis.vip.core.server.exception.ApiException;
-import fr.insalyon.creatis.vip.core.server.SpringCoreConfig;
-import fr.insalyon.creatis.vip.api.SpringRestApiConfig;
+import java.nio.file.Paths;
+
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.junit.jupiter.web.SpringJUnitWebConfig;
 import org.springframework.util.Assert;
 
-import java.nio.file.Paths;
+import fr.insalyon.creatis.vip.api.SpringRestApiConfig;
+import fr.insalyon.creatis.vip.api.controller.PlatformController;
+import fr.insalyon.creatis.vip.core.client.VipException;
+import fr.insalyon.creatis.vip.core.server.SpringCoreConfig;
 
 /**
  * Created by abonnet on 7/21/16.
@@ -64,7 +65,7 @@ public class DefaultSpringConfigurationIT {
     }
 
     @Test
-    public void propertiesShouldBePresent() throws ApiException {
+    public void propertiesShouldBePresent() throws VipException {
         // test that the platform properties generation does not throw any exception
         Assert.notNull(platformController.getPlatformProperties(), "platform properties should be present");
     }
