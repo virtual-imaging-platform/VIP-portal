@@ -1,4 +1,4 @@
-package fr.insalyon.creatis.vip.core.client.bean;
+package fr.insalyon.creatis.vip.core.models;
 
 public enum GroupType {
     APPLICATION,
