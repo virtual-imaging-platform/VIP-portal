@@ -11,7 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import fr.insalyon.creatis.vip.core.client.VipException;
 import fr.insalyon.creatis.vip.core.models.User;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
-import fr.insalyon.creatis.vip.datamanager.client.bean.ExternalPlatform;
+import fr.insalyon.creatis.vip.datamanager.models.ExternalPlatform;
 import fr.insalyon.creatis.vip.datamanager.server.dao.ExternalPlatformsDAO;
 
 @Service
