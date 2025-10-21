@@ -3,9 +3,10 @@ package fr.insalyon.creatis.vip.api.data;
 import fr.insalyon.creatis.vip.api.model.Execution;
 import fr.insalyon.creatis.vip.api.model.ExecutionStatus;
 import fr.insalyon.creatis.vip.api.tools.spring.JsonCustomObjectMatcher;
-import fr.insalyon.creatis.vip.application.client.bean.InOutData;
-import fr.insalyon.creatis.vip.application.client.bean.Simulation;
 import fr.insalyon.creatis.vip.application.client.view.monitor.SimulationStatus;
+import fr.insalyon.creatis.vip.application.models.InOutData;
+import fr.insalyon.creatis.vip.application.models.Simulation;
+
 import org.hamcrest.Matcher;
 
 import java.util.*;

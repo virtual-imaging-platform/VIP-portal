@@ -2,7 +2,7 @@ package fr.insalyon.creatis.vip.applicationimporter.client.view.applicationdispl
 
 import com.smartgwt.client.types.Overflow;
 
-import fr.insalyon.creatis.vip.application.client.bean.boutiquesTools.BoutiquesApplication;
+import fr.insalyon.creatis.vip.application.models.boutiquesTools.BoutiquesApplication;
 import fr.insalyon.creatis.vip.applicationimporter.client.view.Constants;
 import fr.insalyon.creatis.vip.core.client.view.common.AbstractFormLayout;
 

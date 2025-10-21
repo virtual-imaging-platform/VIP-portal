@@ -1,12 +1,16 @@
 package fr.insalyon.creatis.vip.application.client.rpc;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
-import fr.insalyon.creatis.vip.application.client.bean.*;
-import fr.insalyon.creatis.vip.core.models.Pair;
-
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+
+import com.google.gwt.user.client.rpc.AsyncCallback;
+
+import fr.insalyon.creatis.vip.application.models.Activity;
+import fr.insalyon.creatis.vip.application.models.InOutData;
+import fr.insalyon.creatis.vip.application.models.Simulation;
+import fr.insalyon.creatis.vip.application.models.SimulationInput;
+import fr.insalyon.creatis.vip.core.models.Pair;
 
 /**
  *

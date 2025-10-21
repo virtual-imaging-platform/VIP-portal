@@ -7,10 +7,10 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.ServiceDefTarget;
 
-import fr.insalyon.creatis.vip.application.client.bean.Job;
-import fr.insalyon.creatis.vip.application.client.bean.Node;
-import fr.insalyon.creatis.vip.application.client.bean.Task;
 import fr.insalyon.creatis.vip.application.client.view.monitor.job.SimulationFileType;
+import fr.insalyon.creatis.vip.application.models.Job;
+import fr.insalyon.creatis.vip.application.models.Node;
+import fr.insalyon.creatis.vip.application.models.Task;
 import fr.insalyon.creatis.vip.core.client.VipException;
 
 /**

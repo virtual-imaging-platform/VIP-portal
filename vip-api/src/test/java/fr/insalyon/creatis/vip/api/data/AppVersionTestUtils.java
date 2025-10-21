@@ -1,7 +1,7 @@
 package fr.insalyon.creatis.vip.api.data;
 
-import fr.insalyon.creatis.vip.application.client.bean.AppVersion;
-import fr.insalyon.creatis.vip.application.client.bean.Application;
+import fr.insalyon.creatis.vip.application.models.AppVersion;
+import fr.insalyon.creatis.vip.application.models.Application;
 
 public class AppVersionTestUtils {
 

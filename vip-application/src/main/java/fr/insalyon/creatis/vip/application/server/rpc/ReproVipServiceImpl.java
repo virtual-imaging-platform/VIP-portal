@@ -2,8 +2,8 @@ package fr.insalyon.creatis.vip.application.server.rpc;
 
 import java.util.List;
 
-import fr.insalyon.creatis.vip.application.client.bean.PublicExecution;
 import fr.insalyon.creatis.vip.application.client.rpc.ReproVipService;
+import fr.insalyon.creatis.vip.application.models.PublicExecution;
 import fr.insalyon.creatis.vip.application.server.business.PublicExecutionBusiness;
 import fr.insalyon.creatis.vip.application.server.business.ReproVipBusiness;
 import fr.insalyon.creatis.vip.core.client.VipException;

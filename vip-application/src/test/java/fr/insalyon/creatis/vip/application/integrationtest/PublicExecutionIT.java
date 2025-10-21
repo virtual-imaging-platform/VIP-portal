@@ -10,9 +10,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import fr.insalyon.creatis.vip.application.client.bean.PublicExecution;
-import fr.insalyon.creatis.vip.application.client.bean.PublicExecution.PublicExecutionStatus;
-import fr.insalyon.creatis.vip.application.client.bean.WorkflowData;
+import fr.insalyon.creatis.vip.application.models.PublicExecution;
+import fr.insalyon.creatis.vip.application.models.WorkflowData;
+import fr.insalyon.creatis.vip.application.models.PublicExecution.PublicExecutionStatus;
 import fr.insalyon.creatis.vip.application.server.business.PublicExecutionBusiness;
 import fr.insalyon.creatis.vip.core.client.VipException;
 import fr.insalyon.creatis.vip.core.integrationtest.database.BaseSpringIT;

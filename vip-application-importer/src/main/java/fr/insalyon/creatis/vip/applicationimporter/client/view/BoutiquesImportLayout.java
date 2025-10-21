@@ -41,7 +41,8 @@ import com.smartgwt.client.widgets.form.fields.PickerIcon;
 import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.form.fields.events.FormItemClickHandler;
 import com.smartgwt.client.widgets.form.fields.events.FormItemIconClickEvent;
-import fr.insalyon.creatis.vip.application.client.bean.boutiquesTools.BoutiquesApplication;
+
+import fr.insalyon.creatis.vip.application.models.boutiquesTools.BoutiquesApplication;
 import fr.insalyon.creatis.vip.applicationimporter.client.ApplicationImporterException;
 import fr.insalyon.creatis.vip.applicationimporter.client.rpc.ApplicationImporterService;
 import fr.insalyon.creatis.vip.applicationimporter.client.view.applicationdisplay.DisplayTab;

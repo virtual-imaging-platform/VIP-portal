@@ -1,4 +1,4 @@
-package fr.insalyon.creatis.vip.application.client.bean;
+package fr.insalyon.creatis.vip.application.models;
 
 public enum ResourceType {
     LOCAL,

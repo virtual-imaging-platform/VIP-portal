@@ -1,19 +1,12 @@
 package fr.insalyon.creatis.vip.application.client.view.launch;
 
 import com.smartgwt.client.widgets.Label;
-import com.smartgwt.client.widgets.form.DynamicForm;
 import com.smartgwt.client.widgets.form.fields.CheckboxItem;
 import com.smartgwt.client.widgets.form.fields.FormItem;
-import com.smartgwt.client.widgets.form.fields.SpacerItem;
-import com.smartgwt.client.widgets.form.fields.StaticTextItem;
-import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.LayoutSpacer;
 import com.smartgwt.client.widgets.layout.VLayout;
-import fr.insalyon.creatis.vip.application.client.bean.boutiquesTools.BoutiquesFlagInput;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import fr.insalyon.creatis.vip.application.models.boutiquesTools.BoutiquesFlagInput;
 
 /**
  * Representation of a checkbox input (Flag input type)

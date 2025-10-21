@@ -1,8 +1,12 @@
-package fr.insalyon.creatis.vip.application.client.bean.boutiquesTools;
+package fr.insalyon.creatis.vip.application.models.boutiquesTools;
+
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
-
-import java.util.*;
 
 public class BoutiquesApplicationExtensions implements IsSerializable {
 

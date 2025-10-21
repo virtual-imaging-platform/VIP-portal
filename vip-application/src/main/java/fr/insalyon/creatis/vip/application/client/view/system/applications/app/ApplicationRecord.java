@@ -4,8 +4,8 @@ import java.util.List;
 
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 
-import fr.insalyon.creatis.vip.application.client.bean.Application;
 import fr.insalyon.creatis.vip.application.client.view.system.SystemUtils;
+import fr.insalyon.creatis.vip.application.models.Application;
 
 public class ApplicationRecord extends ListGridRecord {
 

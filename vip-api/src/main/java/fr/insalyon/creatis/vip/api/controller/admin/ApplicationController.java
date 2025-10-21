@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import fr.insalyon.creatis.vip.api.controller.ApiController;
 import fr.insalyon.creatis.vip.api.exception.ApiError;
-import fr.insalyon.creatis.vip.application.client.bean.Application;
+import fr.insalyon.creatis.vip.application.models.Application;
 import fr.insalyon.creatis.vip.application.server.business.ApplicationBusiness;
 import fr.insalyon.creatis.vip.core.client.DefaultError;
 import fr.insalyon.creatis.vip.core.client.VipException;

@@ -1,10 +1,12 @@
 package fr.insalyon.creatis.vip.application.client.rpc;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import fr.insalyon.creatis.vip.application.client.bean.Job;
-import fr.insalyon.creatis.vip.application.client.bean.Node;
-import fr.insalyon.creatis.vip.application.client.bean.Task;
+
 import fr.insalyon.creatis.vip.application.client.view.monitor.job.SimulationFileType;
+import fr.insalyon.creatis.vip.application.models.Job;
+import fr.insalyon.creatis.vip.application.models.Node;
+import fr.insalyon.creatis.vip.application.models.Task;
+
 import java.util.List;
 import java.util.Map;
 

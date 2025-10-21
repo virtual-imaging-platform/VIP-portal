@@ -1,6 +1,12 @@
 package fr.insalyon.creatis.vip.application.client.view.reprovip;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.smartgwt.client.data.Record;
 import com.smartgwt.client.types.Alignment;
 import com.smartgwt.client.types.DragDataAction;
 import com.smartgwt.client.types.Overflow;
@@ -10,31 +16,28 @@ import com.smartgwt.client.widgets.IButton;
 import com.smartgwt.client.widgets.Label;
 import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
-import com.smartgwt.client.widgets.form.fields.*;
+import com.smartgwt.client.widgets.form.fields.TextAreaItem;
+import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.LayoutSpacer;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.tab.Tab;
-import com.smartgwt.client.data.Record;
+
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
-import fr.insalyon.creatis.vip.application.client.bean.PublicExecution;
-import fr.insalyon.creatis.vip.application.client.bean.WorkflowData;
-import fr.insalyon.creatis.vip.application.client.bean.boutiquesTools.BoutiquesApplication;
-import fr.insalyon.creatis.vip.application.client.bean.boutiquesTools.BoutiquesOutputFile;
-import fr.insalyon.creatis.vip.application.client.rpc.*;
+import fr.insalyon.creatis.vip.application.client.rpc.ReproVipService;
+import fr.insalyon.creatis.vip.application.client.rpc.WorkflowService;
 import fr.insalyon.creatis.vip.application.client.view.boutiquesParsing.BoutiquesParser;
 import fr.insalyon.creatis.vip.application.client.view.boutiquesParsing.InvalidBoutiquesDescriptorException;
+import fr.insalyon.creatis.vip.application.models.PublicExecution;
+import fr.insalyon.creatis.vip.application.models.WorkflowData;
+import fr.insalyon.creatis.vip.application.models.boutiquesTools.BoutiquesApplication;
+import fr.insalyon.creatis.vip.application.models.boutiquesTools.BoutiquesOutputFile;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
 import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
 import fr.insalyon.creatis.vip.core.models.Pair;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 public class MakeExecutionPublicTab extends Tab {
 

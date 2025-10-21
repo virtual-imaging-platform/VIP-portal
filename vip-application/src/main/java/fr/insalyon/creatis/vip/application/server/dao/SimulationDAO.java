@@ -1,7 +1,7 @@
 package fr.insalyon.creatis.vip.application.server.dao;
 
-import fr.insalyon.creatis.vip.application.client.bean.Task;
 import fr.insalyon.creatis.vip.application.client.view.monitor.job.TaskStatus;
+import fr.insalyon.creatis.vip.application.models.Task;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import java.util.List;
 import java.util.Map;

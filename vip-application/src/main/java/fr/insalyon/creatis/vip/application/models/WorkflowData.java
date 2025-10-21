@@ -1,4 +1,4 @@
-package fr.insalyon.creatis.vip.application.client.bean;
+package fr.insalyon.creatis.vip.application.models;
 
 import fr.insalyon.creatis.vip.core.models.Triplet;
 

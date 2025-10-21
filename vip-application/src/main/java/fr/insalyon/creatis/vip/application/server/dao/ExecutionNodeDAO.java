@@ -1,6 +1,6 @@
 package fr.insalyon.creatis.vip.application.server.dao;
 
-import fr.insalyon.creatis.vip.application.client.bean.Node;
+import fr.insalyon.creatis.vip.application.models.Node;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 
 public interface ExecutionNodeDAO {
