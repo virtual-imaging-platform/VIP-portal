@@ -1,5 +1,8 @@
 package fr.insalyon.creatis.vip.social.client.view.message;
 
+import java.util.Date;
+import java.util.List;
+
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.types.Cursor;
 import com.smartgwt.client.types.Overflow;
@@ -9,17 +12,16 @@ import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
+
 import fr.insalyon.creatis.vip.core.client.CoreModule;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
 import fr.insalyon.creatis.vip.social.client.SocialConstants;
-import fr.insalyon.creatis.vip.social.client.bean.Message;
 import fr.insalyon.creatis.vip.social.client.rpc.SocialService;
 import fr.insalyon.creatis.vip.social.client.rpc.SocialServiceAsync;
 import fr.insalyon.creatis.vip.social.client.view.common.AbstractMainLayout;
 import fr.insalyon.creatis.vip.social.client.view.common.MoreDataBoxLayout;
-import java.util.Date;
-import java.util.List;
+import fr.insalyon.creatis.vip.social.models.Message;
 
 /**
  *

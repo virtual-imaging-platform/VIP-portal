@@ -1,9 +1,10 @@
 package fr.insalyon.creatis.vip.social.server.dao;
 
-import fr.insalyon.creatis.vip.core.server.dao.DAOException;
-import fr.insalyon.creatis.vip.social.client.bean.Message;
 import java.util.Date;
 import java.util.List;
+
+import fr.insalyon.creatis.vip.core.server.dao.DAOException;
+import fr.insalyon.creatis.vip.social.models.Message;
 
 public interface MessageDAO {
     
