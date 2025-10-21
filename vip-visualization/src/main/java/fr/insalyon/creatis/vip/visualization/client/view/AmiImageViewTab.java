@@ -33,7 +33,8 @@ package fr.insalyon.creatis.vip.visualization.client.view;
 
 import com.google.gwt.core.client.JavaScriptObject;
 import com.smartgwt.client.widgets.HTMLPane;
-import fr.insalyon.creatis.vip.visualization.client.bean.VisualizationItem;
+
+import fr.insalyon.creatis.vip.visualization.models.VisualizationItem;
 
 import java.util.logging.Logger;
 
