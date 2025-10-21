@@ -1,4 +1,4 @@
-package fr.insalyon.creatis.vip.publication.client.bean;
+package fr.insalyon.creatis.vip.publication.models;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
 

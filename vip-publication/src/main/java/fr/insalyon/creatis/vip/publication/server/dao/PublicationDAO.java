@@ -1,7 +1,7 @@
 package fr.insalyon.creatis.vip.publication.server.dao;
 
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
-import fr.insalyon.creatis.vip.publication.client.bean.Publication;
+import fr.insalyon.creatis.vip.publication.models.Publication;
 
 import java.util.List;
 
