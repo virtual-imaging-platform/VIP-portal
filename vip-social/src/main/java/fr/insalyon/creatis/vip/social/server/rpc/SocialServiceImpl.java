@@ -11,10 +11,10 @@ import fr.insalyon.creatis.vip.core.client.VipException;
 import fr.insalyon.creatis.vip.core.models.User;
 import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
 import fr.insalyon.creatis.vip.core.server.rpc.AbstractRemoteServiceServlet;
-import fr.insalyon.creatis.vip.social.client.bean.GroupMessage;
-import fr.insalyon.creatis.vip.social.client.bean.Message;
 import fr.insalyon.creatis.vip.social.client.rpc.SocialService;
 import fr.insalyon.creatis.vip.social.client.view.SocialException;
+import fr.insalyon.creatis.vip.social.models.GroupMessage;
+import fr.insalyon.creatis.vip.social.models.Message;
 import fr.insalyon.creatis.vip.social.server.business.MessageBusiness;
 import jakarta.servlet.ServletException;
 
