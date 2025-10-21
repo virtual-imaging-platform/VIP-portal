@@ -16,8 +16,9 @@ import com.smartgwt.client.widgets.events.ClickEvent;
 import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
-import fr.insalyon.creatis.vip.application.client.bean.Job;
+
 import fr.insalyon.creatis.vip.application.client.rpc.JobService;
+import fr.insalyon.creatis.vip.application.models.Job;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import java.util.HashMap;
 import java.util.List;

@@ -15,8 +15,8 @@ import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.DefaultHandler;
 
-import fr.insalyon.creatis.vip.application.client.bean.Descriptor;
-import fr.insalyon.creatis.vip.application.client.bean.Source;
+import fr.insalyon.creatis.vip.application.models.Descriptor;
+import fr.insalyon.creatis.vip.application.models.Source;
 
 public abstract class AbstractWorkflowParser extends DefaultHandler {
 

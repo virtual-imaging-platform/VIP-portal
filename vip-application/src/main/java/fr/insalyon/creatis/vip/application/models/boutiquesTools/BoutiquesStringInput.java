@@ -1,4 +1,4 @@
-package fr.insalyon.creatis.vip.application.client.bean.boutiquesTools;
+package fr.insalyon.creatis.vip.application.models.boutiquesTools;
 
 import java.util.Map;
 import java.util.Set;
