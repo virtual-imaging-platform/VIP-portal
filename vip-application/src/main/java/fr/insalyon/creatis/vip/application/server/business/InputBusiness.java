@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Lookup;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import fr.insalyon.creatis.vip.application.client.bean.SimulationInput;
+import fr.insalyon.creatis.vip.application.models.SimulationInput;
 import fr.insalyon.creatis.vip.application.server.business.simulation.parser.InputParser;
 import fr.insalyon.creatis.vip.application.server.dao.ApplicationInputDAO;
 import fr.insalyon.creatis.vip.core.client.VipException;

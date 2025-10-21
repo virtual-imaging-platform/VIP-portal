@@ -1,4 +1,4 @@
-package fr.insalyon.creatis.vip.application.client.bean;
+package fr.insalyon.creatis.vip.application.models;
 
 import java.util.ArrayList;
 import java.util.List;

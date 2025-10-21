@@ -4,8 +4,9 @@ import com.smartgwt.client.widgets.form.fields.FormItem;
 import com.smartgwt.client.widgets.form.fields.PickerIcon;
 import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.form.validator.RequiredIfValidator;
-import fr.insalyon.creatis.vip.application.client.bean.boutiquesTools.BoutiquesInput;
-import fr.insalyon.creatis.vip.application.client.bean.boutiquesTools.BoutiquesStringInput;
+
+import fr.insalyon.creatis.vip.application.models.boutiquesTools.BoutiquesInput;
+import fr.insalyon.creatis.vip.application.models.boutiquesTools.BoutiquesStringInput;
 import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
 import fr.insalyon.creatis.vip.core.client.view.util.ValidatorUtil;
 import fr.insalyon.creatis.vip.datamanager.client.view.selection.PathSelectionWindow;

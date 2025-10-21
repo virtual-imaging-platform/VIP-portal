@@ -6,12 +6,12 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import fr.insalyon.creatis.vip.application.client.bean.Job;
-import fr.insalyon.creatis.vip.application.client.bean.Node;
-import fr.insalyon.creatis.vip.application.client.bean.Task;
 import fr.insalyon.creatis.vip.application.client.rpc.JobService;
 import fr.insalyon.creatis.vip.application.client.view.monitor.job.SimulationFileType;
 import fr.insalyon.creatis.vip.application.client.view.monitor.job.TaskStatus;
+import fr.insalyon.creatis.vip.application.models.Job;
+import fr.insalyon.creatis.vip.application.models.Node;
+import fr.insalyon.creatis.vip.application.models.Task;
 import fr.insalyon.creatis.vip.application.server.business.SimulationBusiness;
 import fr.insalyon.creatis.vip.core.client.VipException;
 import fr.insalyon.creatis.vip.core.server.rpc.AbstractRemoteServiceServlet;

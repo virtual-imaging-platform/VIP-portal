@@ -1,4 +1,4 @@
-package fr.insalyon.creatis.vip.application.client.bean.boutiquesTools;
+package fr.insalyon.creatis.vip.application.models.boutiquesTools;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
 
