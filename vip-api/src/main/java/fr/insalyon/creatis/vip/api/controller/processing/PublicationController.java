@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import fr.insalyon.creatis.vip.api.controller.ApiController;
 import fr.insalyon.creatis.vip.core.client.VipException;
-import fr.insalyon.creatis.vip.publication.client.bean.Publication;
+import fr.insalyon.creatis.vip.publication.models.Publication;
 import fr.insalyon.creatis.vip.publication.server.business.PublicationBusiness;
 
 @RestController
