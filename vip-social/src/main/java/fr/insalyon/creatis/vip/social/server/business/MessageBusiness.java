@@ -16,8 +16,8 @@ import fr.insalyon.creatis.vip.core.server.business.EmailBusiness;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import fr.insalyon.creatis.vip.core.server.dao.UsersGroupsDAO;
 import fr.insalyon.creatis.vip.social.client.SocialConstants;
-import fr.insalyon.creatis.vip.social.client.bean.GroupMessage;
-import fr.insalyon.creatis.vip.social.client.bean.Message;
+import fr.insalyon.creatis.vip.social.models.GroupMessage;
+import fr.insalyon.creatis.vip.social.models.Message;
 import fr.insalyon.creatis.vip.social.server.dao.GroupMessageDAO;
 import fr.insalyon.creatis.vip.social.server.dao.MessageDAO;
 

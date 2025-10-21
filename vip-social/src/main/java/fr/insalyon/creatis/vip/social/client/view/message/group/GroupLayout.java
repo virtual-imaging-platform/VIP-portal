@@ -14,10 +14,11 @@ import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.core.client.view.user.UserLevel;
 import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
 import fr.insalyon.creatis.vip.social.client.SocialConstants;
-import fr.insalyon.creatis.vip.social.client.bean.GroupMessage;
 import fr.insalyon.creatis.vip.social.client.rpc.SocialService;
 import fr.insalyon.creatis.vip.social.client.rpc.SocialServiceAsync;
 import fr.insalyon.creatis.vip.social.client.view.common.MoreDataBoxLayout;
+import fr.insalyon.creatis.vip.social.models.GroupMessage;
+
 import java.util.Date;
 import java.util.List;
 
