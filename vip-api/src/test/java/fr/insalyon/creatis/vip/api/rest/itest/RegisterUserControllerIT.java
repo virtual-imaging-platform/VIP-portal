@@ -14,9 +14,9 @@ import org.springframework.http.MediaType;
 import fr.insalyon.creatis.vip.api.data.UserTestUtils;
 import fr.insalyon.creatis.vip.api.rest.config.BaseRestApiSpringIT;
 import fr.insalyon.creatis.vip.core.client.DefaultError;
-import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.user.UserLevel;
 import fr.insalyon.creatis.vip.core.client.view.util.CountryCode;
+import fr.insalyon.creatis.vip.core.models.User;
 
 class RegisterUserControllerIT extends BaseRestApiSpringIT {
 

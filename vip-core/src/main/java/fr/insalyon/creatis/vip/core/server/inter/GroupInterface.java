@@ -3,7 +3,7 @@ package fr.insalyon.creatis.vip.core.server.inter;
 import java.util.List;
 
 import fr.insalyon.creatis.vip.core.client.VipException;
-import fr.insalyon.creatis.vip.core.client.bean.User;
+import fr.insalyon.creatis.vip.core.models.User;
 
 public interface GroupInterface {
 

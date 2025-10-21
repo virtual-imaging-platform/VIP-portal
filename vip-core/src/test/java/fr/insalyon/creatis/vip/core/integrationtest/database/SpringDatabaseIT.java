@@ -27,8 +27,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import fr.insalyon.creatis.grida.client.GRIDAClientException;
 import fr.insalyon.creatis.vip.core.client.VipException;
-import fr.insalyon.creatis.vip.core.client.bean.Group;
 import fr.insalyon.creatis.vip.core.integrationtest.ServerMockConfig;
+import fr.insalyon.creatis.vip.core.models.Group;
 
 /**
  * Integration tests that verify the spring database/transactions configuration

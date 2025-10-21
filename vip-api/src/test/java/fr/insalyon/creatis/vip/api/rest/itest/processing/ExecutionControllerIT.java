@@ -64,9 +64,9 @@ import fr.insalyon.creatis.vip.application.server.business.AppVersionBusiness;
 import fr.insalyon.creatis.vip.application.server.business.ResourceBusiness;
 import fr.insalyon.creatis.vip.application.server.dao.SimulationDAO;
 import fr.insalyon.creatis.vip.core.client.DefaultError;
-import fr.insalyon.creatis.vip.core.client.bean.Group;
-import fr.insalyon.creatis.vip.core.client.bean.GroupType;
 import fr.insalyon.creatis.vip.core.integrationtest.ServerMockConfig;
+import fr.insalyon.creatis.vip.core.models.Group;
+import fr.insalyon.creatis.vip.core.models.GroupType;
 
 /**
  * Test method on platform path

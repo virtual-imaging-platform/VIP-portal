@@ -50,6 +50,9 @@ knowledge of the CeCILL-B license and that you accept its terms.
     <set-property name="gwt.logging.developmentModeHandler" value="DISABLED" />
     <set-property name="gwt.logging.systemHandler" value="DISABLED" />
 
+    <source path="models"/>
+    <source path="client"/>
+
     <!-- Servlets -->
     <servlet class="fr.insalyon.creatis.vip.core.server.rpc.GetFileServiceImpl" path="/getfileservice"/>
     <servlet class="fr.insalyon.creatis.vip.core.server.rpc.ConfigurationServiceImpl" path="/configurationservice"/>

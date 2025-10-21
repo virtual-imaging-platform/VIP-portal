@@ -1,10 +1,10 @@
 package fr.insalyon.creatis.vip.core.server.dao;
 
-import fr.insalyon.creatis.vip.core.client.bean.Group;
-import fr.insalyon.creatis.vip.core.client.bean.GroupType;
-
 import java.util.List;
 import java.util.Set;
+
+import fr.insalyon.creatis.vip.core.models.Group;
+import fr.insalyon.creatis.vip.core.models.GroupType;
 
 public interface GroupDAO {
 

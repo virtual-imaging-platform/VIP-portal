@@ -1,6 +1,6 @@
 package fr.insalyon.creatis.vip.application.client.bean;
 
-import fr.insalyon.creatis.vip.core.client.bean.Triplet;
+import fr.insalyon.creatis.vip.core.models.Triplet;
 
 public class WorkflowData extends Triplet<String, String, String> {
     

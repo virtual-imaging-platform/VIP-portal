@@ -10,6 +10,7 @@ import java.util.Set;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import fr.insalyon.creatis.grida.client.GRIDAClientException;
 import fr.insalyon.creatis.vip.application.client.bean.AppVersion;
@@ -17,12 +18,22 @@ import fr.insalyon.creatis.vip.application.client.bean.Application;
 import fr.insalyon.creatis.vip.application.client.bean.Engine;
 import fr.insalyon.creatis.vip.application.client.bean.Resource;
 import fr.insalyon.creatis.vip.application.client.bean.ResourceType;
+import fr.insalyon.creatis.vip.application.server.business.AppVersionBusiness;
+import fr.insalyon.creatis.vip.application.server.business.ApplicationBusiness;
+import fr.insalyon.creatis.vip.application.server.business.EngineBusiness;
+import fr.insalyon.creatis.vip.application.server.business.ResourceBusiness;
 import fr.insalyon.creatis.vip.core.client.VipException;
-import fr.insalyon.creatis.vip.core.client.bean.Group;
-import fr.insalyon.creatis.vip.core.client.bean.GroupType;
-import fr.insalyon.creatis.vip.core.client.bean.User;
+import fr.insalyon.creatis.vip.core.integrationtest.database.BaseSpringIT;
+import fr.insalyon.creatis.vip.core.models.Group;
+import fr.insalyon.creatis.vip.core.models.GroupType;
+import fr.insalyon.creatis.vip.core.models.User;
 
-public class ResourceIT extends BaseApplicationSpringIT {
+public class ResourceIT extends BaseSpringIT {
+    
+    @Autowired private ResourceBusiness resourceBusiness;
+    @Autowired private ApplicationBusiness appBusiness;
+    @Autowired private EngineBusiness engineBusiness;
+    @Autowired private AppVersionBusiness appVersionBusiness;
 
     private Resource resource;
 

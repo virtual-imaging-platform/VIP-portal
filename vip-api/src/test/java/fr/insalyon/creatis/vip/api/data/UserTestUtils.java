@@ -1,13 +1,13 @@
 package fr.insalyon.creatis.vip.api.data;
 
-import fr.insalyon.creatis.vip.api.model.SignUpUserDTO;
-import fr.insalyon.creatis.vip.core.client.bean.User;
-import fr.insalyon.creatis.vip.core.client.view.user.UserLevel;
-import fr.insalyon.creatis.vip.core.client.view.util.CountryCode;
-import fr.insalyon.creatis.vip.core.server.security.common.SpringPrincipalUser;
-
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.web.servlet.request.RequestPostProcessor;
+
+import fr.insalyon.creatis.vip.api.model.SignUpUserDTO;
+import fr.insalyon.creatis.vip.core.client.view.user.UserLevel;
+import fr.insalyon.creatis.vip.core.client.view.util.CountryCode;
+import fr.insalyon.creatis.vip.core.models.User;
+import fr.insalyon.creatis.vip.core.server.security.common.SpringPrincipalUser;
 
 
 public class UserTestUtils {

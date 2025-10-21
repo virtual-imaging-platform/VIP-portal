@@ -1,8 +1,8 @@
 package fr.insalyon.creatis.vip.core.server.rpc;
 
 import fr.insalyon.creatis.devtools.zip.FolderZipper;
-import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
+import fr.insalyon.creatis.vip.core.models.User;
 import fr.insalyon.creatis.vip.core.server.business.util.FileUtil;
 
 import org.apache.commons.io.FileUtils;
