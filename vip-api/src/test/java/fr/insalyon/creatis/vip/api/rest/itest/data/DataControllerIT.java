@@ -2,9 +2,10 @@ package fr.insalyon.creatis.vip.api.rest.itest.data;
 
 import fr.insalyon.creatis.vip.api.model.PathProperties;
 import fr.insalyon.creatis.vip.api.rest.config.BaseRestApiSpringIT;
-import fr.insalyon.creatis.vip.datamanager.client.bean.PoolOperation;
-import fr.insalyon.creatis.vip.datamanager.client.bean.PoolOperation.Status;
-import fr.insalyon.creatis.vip.datamanager.client.bean.PoolOperation.Type;
+import fr.insalyon.creatis.vip.datamanager.models.PoolOperation;
+import fr.insalyon.creatis.vip.datamanager.models.PoolOperation.Status;
+import fr.insalyon.creatis.vip.datamanager.models.PoolOperation.Type;
+
 import org.apache.commons.io.FileUtils;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Disabled;
