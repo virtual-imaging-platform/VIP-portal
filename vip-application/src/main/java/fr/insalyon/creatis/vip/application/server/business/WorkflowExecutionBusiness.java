@@ -21,7 +21,7 @@ import fr.insalyon.creatis.vip.application.client.bean.AppVersion;
 import fr.insalyon.creatis.vip.application.client.view.monitor.SimulationStatus;
 import fr.insalyon.creatis.vip.application.server.business.simulation.WorkflowEngineInstantiator;
 import fr.insalyon.creatis.vip.core.client.VipException;
-import fr.insalyon.creatis.vip.core.client.bean.User;
+import fr.insalyon.creatis.vip.core.models.User;
 import fr.insalyon.creatis.vip.core.server.business.Server;
 
 @Service

@@ -1,4 +1,4 @@
-package fr.insalyon.creatis.vip.core.client.bean;
+package fr.insalyon.creatis.vip.core.models;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants.GROUP_ROLE;

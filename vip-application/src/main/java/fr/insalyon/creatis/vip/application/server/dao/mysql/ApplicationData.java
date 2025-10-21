@@ -1,12 +1,14 @@
 package fr.insalyon.creatis.vip.application.server.dao.mysql;
 
-import fr.insalyon.creatis.vip.application.client.bean.AppVersion;
-import fr.insalyon.creatis.vip.application.client.bean.Application;
-import fr.insalyon.creatis.vip.application.server.dao.ApplicationDAO;
-import fr.insalyon.creatis.vip.core.client.bean.Group;
-import fr.insalyon.creatis.vip.core.client.bean.User;
-import fr.insalyon.creatis.vip.core.server.dao.DAOException;
-import fr.insalyon.creatis.vip.core.server.dao.UserDAO;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.sql.DataSource;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,14 +21,13 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import javax.sql.DataSource;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import fr.insalyon.creatis.vip.application.client.bean.AppVersion;
+import fr.insalyon.creatis.vip.application.client.bean.Application;
+import fr.insalyon.creatis.vip.application.server.dao.ApplicationDAO;
+import fr.insalyon.creatis.vip.core.models.Group;
+import fr.insalyon.creatis.vip.core.models.User;
+import fr.insalyon.creatis.vip.core.server.dao.DAOException;
+import fr.insalyon.creatis.vip.core.server.dao.UserDAO;
 
 @Repository
 @Transactional

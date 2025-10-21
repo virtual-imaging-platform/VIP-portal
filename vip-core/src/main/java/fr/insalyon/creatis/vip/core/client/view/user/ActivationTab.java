@@ -13,7 +13,7 @@ import com.smartgwt.client.widgets.form.fields.events.KeyPressEvent;
 import com.smartgwt.client.widgets.form.fields.events.KeyPressHandler;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.tab.Tab;
-import fr.insalyon.creatis.vip.core.client.bean.User;
+
 import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationService;
 import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationServiceAsync;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
@@ -21,6 +21,7 @@ import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
 import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
+import fr.insalyon.creatis.vip.core.models.User;
 
 /**
  *

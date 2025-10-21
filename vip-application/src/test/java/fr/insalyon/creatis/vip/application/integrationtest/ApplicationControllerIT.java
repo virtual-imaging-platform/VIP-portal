@@ -25,11 +25,11 @@ import org.springframework.web.context.WebApplicationContext;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import fr.insalyon.creatis.vip.application.client.bean.Application;
-import fr.insalyon.creatis.vip.core.client.bean.Group;
-import fr.insalyon.creatis.vip.core.client.bean.GroupType;
-import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.user.UserLevel;
 import fr.insalyon.creatis.vip.core.integrationtest.database.BaseSpringIT;
+import fr.insalyon.creatis.vip.core.models.Group;
+import fr.insalyon.creatis.vip.core.models.GroupType;
+import fr.insalyon.creatis.vip.core.models.User;
 import fr.insalyon.creatis.vip.core.server.SpringInternalApiConfig;
 
 @ContextConfiguration(classes = { SpringInternalApiConfig.class })

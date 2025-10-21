@@ -7,7 +7,7 @@ import java.util.stream.Collectors;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
 
-import fr.insalyon.creatis.vip.core.client.bean.Group;
+import fr.insalyon.creatis.vip.core.models.Group;
 
 public class Resource implements IsSerializable {
     private String name;

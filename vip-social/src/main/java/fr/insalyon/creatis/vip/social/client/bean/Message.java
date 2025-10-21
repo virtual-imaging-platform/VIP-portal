@@ -1,7 +1,9 @@
 package fr.insalyon.creatis.vip.social.client.bean;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
-import fr.insalyon.creatis.vip.core.client.bean.User;
+
+import fr.insalyon.creatis.vip.core.models.User;
+
 import java.util.Date;
 
 /**

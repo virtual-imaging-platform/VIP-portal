@@ -20,10 +20,10 @@ import fr.insalyon.creatis.vip.application.client.view.monitor.timeline.Timeline
 import fr.insalyon.creatis.vip.application.client.view.system.applications.app.ManageApplicationsTab;
 import fr.insalyon.creatis.vip.core.client.CoreModule;
 import fr.insalyon.creatis.vip.core.client.Module;
-import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.layout.CenterTabSet;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
+import fr.insalyon.creatis.vip.core.models.User;
 
 import java.util.ArrayList;
 import java.util.HashMap;

@@ -10,9 +10,9 @@ import org.springframework.stereotype.Service;
 
 import fr.insalyon.creatis.vip.core.client.DefaultError;
 import fr.insalyon.creatis.vip.core.client.VipException;
-import fr.insalyon.creatis.vip.core.client.bean.Group;
-import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.user.UserLevel;
+import fr.insalyon.creatis.vip.core.models.Group;
+import fr.insalyon.creatis.vip.core.models.User;
 
 @Service
 public class CorePermissions {

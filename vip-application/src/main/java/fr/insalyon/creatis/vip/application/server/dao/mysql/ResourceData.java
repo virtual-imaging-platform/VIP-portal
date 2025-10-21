@@ -17,8 +17,8 @@ import fr.insalyon.creatis.vip.application.client.bean.AppVersion;
 import fr.insalyon.creatis.vip.application.client.bean.Engine;
 import fr.insalyon.creatis.vip.application.client.bean.Resource;
 import fr.insalyon.creatis.vip.application.server.dao.ResourceDAO;
-import fr.insalyon.creatis.vip.core.client.bean.Group;
-import fr.insalyon.creatis.vip.core.client.bean.User;
+import fr.insalyon.creatis.vip.core.models.Group;
+import fr.insalyon.creatis.vip.core.models.User;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import javax.sql.DataSource;
 

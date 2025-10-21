@@ -1,8 +1,9 @@
 package fr.insalyon.creatis.vip.core.server.security.common;
 
-import fr.insalyon.creatis.vip.core.client.bean.User;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+
+import fr.insalyon.creatis.vip.core.models.User;
 
 import java.security.Principal;
 import java.util.ArrayList;

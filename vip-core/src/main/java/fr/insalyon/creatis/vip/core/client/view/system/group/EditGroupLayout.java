@@ -16,9 +16,7 @@ import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 import com.smartgwt.client.widgets.layout.HLayout;
-import fr.insalyon.creatis.vip.core.client.bean.Group;
-import fr.insalyon.creatis.vip.core.client.bean.GroupType;
-import fr.insalyon.creatis.vip.core.client.bean.User;
+
 import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationService;
 import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationServiceAsync;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
@@ -28,6 +26,9 @@ import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.core.client.view.system.user.UserRecord;
 import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
 import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
+import fr.insalyon.creatis.vip.core.models.Group;
+import fr.insalyon.creatis.vip.core.models.GroupType;
+import fr.insalyon.creatis.vip.core.models.User;
 
 import java.util.ArrayList;
 import java.util.List;
