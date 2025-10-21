@@ -31,6 +31,11 @@
  */
 package fr.insalyon.creatis.vip.application.client.view;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import com.google.gwt.user.client.rpc.AsyncCallback;
+
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
 import fr.insalyon.creatis.vip.application.client.ApplicationModule;
 import fr.insalyon.creatis.vip.application.client.bean.AppVersion;
@@ -38,13 +43,9 @@ import fr.insalyon.creatis.vip.application.client.bean.Tag;
 import fr.insalyon.creatis.vip.application.client.inter.CustomApplicationModule;
 import fr.insalyon.creatis.vip.application.client.rpc.ApplicationService;
 import fr.insalyon.creatis.vip.application.client.view.launch.LaunchTab;
-import fr.insalyon.creatis.vip.core.client.bean.Pair;
 import fr.insalyon.creatis.vip.core.client.view.application.ApplicationsTileGrid;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
-import java.util.ArrayList;
-import java.util.List;
-
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import fr.insalyon.creatis.vip.core.models.Pair;
 
 public class ApplicationTileGrid extends ApplicationsTileGrid {
 

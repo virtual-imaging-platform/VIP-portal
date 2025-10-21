@@ -19,8 +19,8 @@ import fr.insalyon.creatis.vip.api.model.stats.StatUser;
 import fr.insalyon.creatis.vip.api.model.stats.UsersList;
 import fr.insalyon.creatis.vip.api.model.stats.UsersNumber;
 import fr.insalyon.creatis.vip.core.client.VipException;
-import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.util.CountryCode;
+import fr.insalyon.creatis.vip.core.models.User;
 import fr.insalyon.creatis.vip.core.server.business.StatsBusiness;
 import fr.insalyon.creatis.vip.core.server.business.StatsBusiness.UserSearchCriteria;
 

@@ -2,7 +2,7 @@ package fr.insalyon.creatis.vip.application.client.bean;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
 
-import fr.insalyon.creatis.vip.core.client.bean.Pair;
+import fr.insalyon.creatis.vip.core.models.Pair;
 
 import java.util.ArrayList;
 import java.util.Arrays;

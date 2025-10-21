@@ -1,7 +1,8 @@
 package fr.insalyon.creatis.vip.core.server.dao;
 
-import fr.insalyon.creatis.vip.core.client.bean.TermsOfUse;
 import java.sql.Timestamp;
+
+import fr.insalyon.creatis.vip.core.models.TermsOfUse;
 
 public interface TermsUseDAO {
 

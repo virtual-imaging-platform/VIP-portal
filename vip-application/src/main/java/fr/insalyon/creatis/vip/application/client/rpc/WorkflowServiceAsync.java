@@ -2,7 +2,7 @@ package fr.insalyon.creatis.vip.application.client.rpc;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import fr.insalyon.creatis.vip.application.client.bean.*;
-import fr.insalyon.creatis.vip.core.client.bean.Pair;
+import fr.insalyon.creatis.vip.core.models.Pair;
 
 import java.util.Date;
 import java.util.List;

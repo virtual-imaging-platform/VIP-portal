@@ -1,12 +1,12 @@
 package fr.insalyon.creatis.vip.application.client.bean;
 
-import com.google.gwt.user.client.rpc.IsSerializable;
-
-import fr.insalyon.creatis.vip.core.client.bean.Group;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import com.google.gwt.user.client.rpc.IsSerializable;
+
+import fr.insalyon.creatis.vip.core.models.Group;
 
 public class Application implements IsSerializable {
 
