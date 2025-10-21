@@ -1,4 +1,4 @@
-package fr.insalyon.creatis.vip.application.client.bean;
+package fr.insalyon.creatis.vip.application.models;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
 import fr.insalyon.creatis.vip.application.client.view.monitor.job.TaskStatus;

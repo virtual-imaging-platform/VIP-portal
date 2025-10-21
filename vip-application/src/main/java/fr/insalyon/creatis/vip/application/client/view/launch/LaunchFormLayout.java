@@ -1,5 +1,18 @@
 package fr.insalyon.creatis.vip.application.client.view.launch;
 
+import static fr.insalyon.creatis.vip.core.client.view.CoreConstants.RESULTS_DIRECTORY_PARAM_NAME;
+
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.function.BiFunction;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.types.Cursor;
 import com.smartgwt.client.types.VerticalAlignment;
@@ -10,21 +23,20 @@ import com.smartgwt.client.widgets.Label;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.Layout;
 import com.smartgwt.client.widgets.layout.VLayout;
+
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
-import fr.insalyon.creatis.vip.application.client.bean.boutiquesTools.*;
 import fr.insalyon.creatis.vip.application.client.rpc.ApplicationService;
 import fr.insalyon.creatis.vip.application.client.view.boutiquesParsing.InvalidBoutiquesDescriptorException;
+import fr.insalyon.creatis.vip.application.models.boutiquesTools.BoutiquesApplication;
+import fr.insalyon.creatis.vip.application.models.boutiquesTools.BoutiquesFlagInput;
+import fr.insalyon.creatis.vip.application.models.boutiquesTools.BoutiquesGroup;
+import fr.insalyon.creatis.vip.application.models.boutiquesTools.BoutiquesInput;
+import fr.insalyon.creatis.vip.application.models.boutiquesTools.BoutiquesNumberInput;
+import fr.insalyon.creatis.vip.application.models.boutiquesTools.BoutiquesStringInput;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.common.AbstractFormLayout;
 import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
 import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
-
-import java.util.*;
-import java.util.function.BiFunction;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-
-import static fr.insalyon.creatis.vip.core.client.view.CoreConstants.RESULTS_DIRECTORY_PARAM_NAME;
 
 /**
  * Launch form automatically generated from a Boutiques descriptor.

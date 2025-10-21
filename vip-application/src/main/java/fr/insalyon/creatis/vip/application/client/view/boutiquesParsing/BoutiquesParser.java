@@ -8,13 +8,13 @@ import com.google.gwt.json.client.JSONArray;
 import com.google.gwt.json.client.JSONObject;
 import com.google.gwt.json.client.JSONParser;
 
-import fr.insalyon.creatis.vip.application.client.bean.boutiquesTools.BoutiquesApplication;
-import fr.insalyon.creatis.vip.application.client.bean.boutiquesTools.BoutiquesFlagInput;
-import fr.insalyon.creatis.vip.application.client.bean.boutiquesTools.BoutiquesGroup;
-import fr.insalyon.creatis.vip.application.client.bean.boutiquesTools.BoutiquesInput;
-import fr.insalyon.creatis.vip.application.client.bean.boutiquesTools.BoutiquesNumberInput;
-import fr.insalyon.creatis.vip.application.client.bean.boutiquesTools.BoutiquesOutputFile;
-import fr.insalyon.creatis.vip.application.client.bean.boutiquesTools.BoutiquesStringInput;
+import fr.insalyon.creatis.vip.application.models.boutiquesTools.BoutiquesApplication;
+import fr.insalyon.creatis.vip.application.models.boutiquesTools.BoutiquesFlagInput;
+import fr.insalyon.creatis.vip.application.models.boutiquesTools.BoutiquesGroup;
+import fr.insalyon.creatis.vip.application.models.boutiquesTools.BoutiquesInput;
+import fr.insalyon.creatis.vip.application.models.boutiquesTools.BoutiquesNumberInput;
+import fr.insalyon.creatis.vip.application.models.boutiquesTools.BoutiquesOutputFile;
+import fr.insalyon.creatis.vip.application.models.boutiquesTools.BoutiquesStringInput;
 
 /**
  * Helper class for parsing JSON objects

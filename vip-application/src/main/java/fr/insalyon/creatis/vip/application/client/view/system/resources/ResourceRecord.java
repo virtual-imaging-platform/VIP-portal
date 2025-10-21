@@ -2,8 +2,8 @@ package fr.insalyon.creatis.vip.application.client.view.system.resources;
 
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 
-import fr.insalyon.creatis.vip.application.client.bean.Resource;
 import fr.insalyon.creatis.vip.application.client.view.system.SystemUtils;
+import fr.insalyon.creatis.vip.application.models.Resource;
 
 public class ResourceRecord extends ListGridRecord {
 

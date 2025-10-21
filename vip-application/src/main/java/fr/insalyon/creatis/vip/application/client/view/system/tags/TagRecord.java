@@ -4,7 +4,7 @@ import java.util.Set;
 
 import com.smartgwt.client.widgets.grid.ListGridRecord;
 
-import fr.insalyon.creatis.vip.application.client.bean.Tag;
+import fr.insalyon.creatis.vip.application.models.Tag;
 
 public class TagRecord extends ListGridRecord {
 
