@@ -34,9 +34,10 @@ package fr.insalyon.creatis.vip.visualization.client.rpc;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.ServiceDefTarget;
-import fr.insalyon.creatis.vip.visualization.client.bean.Image;
-import fr.insalyon.creatis.vip.visualization.client.bean.VisualizationItem;
+
 import fr.insalyon.creatis.vip.visualization.client.view.VisualizationException;
+import fr.insalyon.creatis.vip.visualization.models.Image;
+import fr.insalyon.creatis.vip.visualization.models.VisualizationItem;
 
 public interface VisualizationService extends RemoteService {
 

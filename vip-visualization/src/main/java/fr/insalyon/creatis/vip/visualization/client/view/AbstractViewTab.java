@@ -37,9 +37,9 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.tab.Tab;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
-import fr.insalyon.creatis.vip.visualization.client.bean.VisualizationItem;
 import fr.insalyon.creatis.vip.visualization.client.rpc.VisualizationService;
 import fr.insalyon.creatis.vip.visualization.client.rpc.VisualizationServiceAsync;
+import fr.insalyon.creatis.vip.visualization.models.VisualizationItem;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;

@@ -8,7 +8,7 @@ import fr.insalyon.creatis.vip.core.server.inter.annotations.VIPCheckRemoval;
 
 public class VipException extends Exception implements IsSerializable {
 
-    private final VipError error;
+    private VipError error;
 
     @VIPCheckRemoval
     public VipException() {
