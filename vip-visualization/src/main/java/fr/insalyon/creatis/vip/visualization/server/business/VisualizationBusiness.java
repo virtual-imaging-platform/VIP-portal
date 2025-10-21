@@ -20,8 +20,8 @@ import fr.insalyon.creatis.vip.core.models.User;
 import fr.insalyon.creatis.vip.datamanager.client.view.DataManagerException;
 import fr.insalyon.creatis.vip.datamanager.server.business.DataManagerBusiness;
 import fr.insalyon.creatis.vip.datamanager.server.business.LfcPathsBusiness;
-import fr.insalyon.creatis.vip.visualization.client.bean.Image;
-import fr.insalyon.creatis.vip.visualization.client.bean.VisualizationItem;
+import fr.insalyon.creatis.vip.visualization.models.Image;
+import fr.insalyon.creatis.vip.visualization.models.VisualizationItem;
 
 @Service
 @Transactional
