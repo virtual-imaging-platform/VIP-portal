@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import fr.insalyon.creatis.vip.api.exception.ApiException;
 import fr.insalyon.creatis.vip.core.client.VipException;
-import fr.insalyon.creatis.vip.datamanager.client.bean.UserApiKey;
+import fr.insalyon.creatis.vip.datamanager.models.UserApiKey;
 import fr.insalyon.creatis.vip.datamanager.server.business.ApiKeyBusiness;
 import fr.insalyon.creatis.vip.datamanager.server.business.ExternalPlatformBusiness;
 import jakarta.validation.Valid;
