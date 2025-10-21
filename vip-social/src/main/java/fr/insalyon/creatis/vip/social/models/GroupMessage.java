@@ -1,4 +1,4 @@
-package fr.insalyon.creatis.vip.social.client.bean;
+package fr.insalyon.creatis.vip.social.models;
 
 import java.util.Date;
 
