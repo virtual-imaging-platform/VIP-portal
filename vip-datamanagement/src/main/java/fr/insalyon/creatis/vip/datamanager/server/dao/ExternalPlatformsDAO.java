@@ -1,9 +1,9 @@
 package fr.insalyon.creatis.vip.datamanager.server.dao;
 
-import fr.insalyon.creatis.vip.core.server.dao.DAOException;
-import fr.insalyon.creatis.vip.datamanager.client.bean.*;
-
 import java.util.List;
+
+import fr.insalyon.creatis.vip.core.server.dao.DAOException;
+import fr.insalyon.creatis.vip.datamanager.models.ExternalPlatform;
 
 public interface ExternalPlatformsDAO {
 

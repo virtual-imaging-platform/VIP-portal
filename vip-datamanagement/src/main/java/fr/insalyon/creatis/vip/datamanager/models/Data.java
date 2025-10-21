@@ -1,4 +1,4 @@
-package fr.insalyon.creatis.vip.datamanager.client.bean;
+package fr.insalyon.creatis.vip.datamanager.models;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
 import java.util.ArrayList;

@@ -1,7 +1,8 @@
 package fr.insalyon.creatis.vip.datamanager.client.view.browser;
 
 import com.smartgwt.client.widgets.grid.ListGridRecord;
-import fr.insalyon.creatis.vip.datamanager.client.bean.Data;
+
+import fr.insalyon.creatis.vip.datamanager.models.Data;
 
 /**
  *

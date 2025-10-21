@@ -1,7 +1,7 @@
 package fr.insalyon.creatis.vip.datamanager.server.dao.mysql;
 
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
-import fr.insalyon.creatis.vip.datamanager.client.bean.ExternalPlatform;
+import fr.insalyon.creatis.vip.datamanager.models.ExternalPlatform;
 import fr.insalyon.creatis.vip.datamanager.server.dao.ExternalPlatformsDAO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

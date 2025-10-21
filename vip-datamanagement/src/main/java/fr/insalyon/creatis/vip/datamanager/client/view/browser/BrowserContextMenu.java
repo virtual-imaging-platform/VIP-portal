@@ -43,11 +43,11 @@ import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
-import fr.insalyon.creatis.vip.datamanager.client.bean.Data;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerService;
 import fr.insalyon.creatis.vip.datamanager.client.rpc.DataManagerServiceAsync;
 import fr.insalyon.creatis.vip.datamanager.client.view.ValidatorUtil;
 import fr.insalyon.creatis.vip.datamanager.client.view.operation.OperationLayout;
+import fr.insalyon.creatis.vip.datamanager.models.Data;
 
 import java.util.ArrayList;
 import java.util.Arrays;

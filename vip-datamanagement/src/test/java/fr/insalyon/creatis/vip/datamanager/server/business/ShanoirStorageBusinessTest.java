@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 
 import fr.insalyon.creatis.vip.core.client.VipException;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
-import fr.insalyon.creatis.vip.datamanager.client.bean.ExternalPlatform;
+import fr.insalyon.creatis.vip.datamanager.models.ExternalPlatform;
 
 public class ShanoirStorageBusinessTest {
 
