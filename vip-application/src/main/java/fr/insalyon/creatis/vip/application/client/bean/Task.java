@@ -47,7 +47,6 @@ public class Task implements IsSerializable {
     private Date creationDate;
     private TaskStatus status;
     private int exitCode;
-    private String exitMessage;
     private String siteName;
     private String nodeName;
     private String command;
@@ -67,7 +66,7 @@ public class Task implements IsSerializable {
     }
 
     public Task(String id, int invocationID, Date creationDate, TaskStatus status, String command, String fileName,
-                int exitCode, String exitMessage, String siteName, String nodeName, int minorStatus,
+                int exitCode, String siteName, String nodeName, int minorStatus,
                 String... parameters) {
 
         this.id = id;
@@ -77,7 +76,6 @@ public class Task implements IsSerializable {
         this.command = command;
         this.fileName = fileName;
         this.exitCode = exitCode;
-        this.exitMessage = exitMessage;
         this.siteName = siteName;
         this.nodeName = nodeName;
         this.parameters = parameters;
@@ -236,7 +234,5 @@ public class Task implements IsSerializable {
         this.creationDate = creationDate;
     }
 
-    public String getExitMessage() { return exitMessage; }
-
-    public void setExitMessage(String exitMessage) { this.exitMessage = exitMessage; }
+    public String getExitMessage() { return GaswExitCode.fromCode(this.exitCode).getMessage(); }
 }
