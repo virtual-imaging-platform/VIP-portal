@@ -30,13 +30,13 @@ public class ShanoirStorageBusinessTest {
 
         String expectedUri="shanoir:/path/to/file.txt?" +
                 "apiUrl=testShanoirUrl" +
-                "&amp;resourceId=testResourceId" +
-                "&amp;format=testFormat" +
-                "&amp;converterId=testConverterId" +
-                "&amp;keycloak_client_id=testKeycloakClientId" +
-                "&amp;refresh_token_url=testRefreshTokenUrl" +
-                "&amp;token=testToken" +
-                "&amp;refreshToken=testRefreshToken";
+                "&resourceId=testResourceId" +
+                "&format=testFormat" +
+                "&converterId=testConverterId" +
+                "&keycloak_client_id=testKeycloakClientId" +
+                "&refresh_token_url=testRefreshTokenUrl" +
+                "&token=testToken" +
+                "&refreshToken=testRefreshToken";
 
         Assertions.assertEquals(expectedUri, uri);
     }
@@ -62,12 +62,12 @@ public class ShanoirStorageBusinessTest {
 
         String expectedUri="shanoir:/path/to/dir?" +
                 "upload_url=testUploadUrl" +
-                "&amp;type=File" +
-                "&amp;md5=d41d8cd98f00b204e9800998ecf8427e" +
-                "&amp;keycloak_client_id=testKeycloakClientId" +
-                "&amp;refresh_token_url=testRefreshTokenUrl" +
-                "&amp;token=testToken" +
-                "&amp;refreshToken=testRefreshToken";
+                "&type=File" +
+                "&md5=d41d8cd98f00b204e9800998ecf8427e" +
+                "&keycloak_client_id=testKeycloakClientId" +
+                "&refresh_token_url=testRefreshTokenUrl" +
+                "&token=testToken" +
+                "&refreshToken=testRefreshToken";
 
         Assertions.assertEquals(expectedUri, uploadUri);
     }
