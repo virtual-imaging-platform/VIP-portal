@@ -2,8 +2,8 @@ package fr.insalyon.creatis.vip.api.controller.stats;
 
 import fr.insalyon.creatis.vip.api.business.StatsApiBusiness;
 import fr.insalyon.creatis.vip.api.controller.ApiController;
-import fr.insalyon.creatis.vip.api.exception.ApiException;
-import fr.insalyon.creatis.vip.api.exception.ApiException.ApiError;
+import fr.insalyon.creatis.vip.core.server.exception.ApiException;
+import fr.insalyon.creatis.vip.core.server.exception.ApiException.ApiError;
 import fr.insalyon.creatis.vip.api.model.stats.UsersList;
 import fr.insalyon.creatis.vip.api.model.stats.UsersNumber;
 import org.slf4j.Logger;

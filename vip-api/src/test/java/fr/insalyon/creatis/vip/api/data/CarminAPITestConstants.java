@@ -31,13 +31,13 @@
  */
 package fr.insalyon.creatis.vip.api.data;
 
-import fr.insalyon.creatis.vip.api.model.Module;
-import fr.insalyon.creatis.vip.api.model.SupportedTransferProtocol;
+import fr.insalyon.creatis.vip.core.server.model.Module;
+import fr.insalyon.creatis.vip.core.server.model.SupportedTransferProtocol;
 
-import static fr.insalyon.creatis.vip.api.model.Module.COMMERCIAL;
-import static fr.insalyon.creatis.vip.api.model.Module.DATA;
-import static fr.insalyon.creatis.vip.api.model.SupportedTransferProtocol.HTTP;
-import static fr.insalyon.creatis.vip.api.model.SupportedTransferProtocol.WEBDAV;
+import static fr.insalyon.creatis.vip.core.server.model.Module.COMMERCIAL;
+import static fr.insalyon.creatis.vip.core.server.model.Module.DATA;
+import static fr.insalyon.creatis.vip.core.server.model.SupportedTransferProtocol.HTTP;
+import static fr.insalyon.creatis.vip.core.server.model.SupportedTransferProtocol.WEBDAV;
 
 /**
  * Created by abonnet on 7/21/16.

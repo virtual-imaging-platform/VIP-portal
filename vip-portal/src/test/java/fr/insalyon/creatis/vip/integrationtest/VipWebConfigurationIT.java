@@ -1,11 +1,15 @@
 package fr.insalyon.creatis.vip.integrationtest;
 
 import fr.insalyon.creatis.grida.client.GRIDAClient;
-import fr.insalyon.creatis.vip.api.security.apikey.SpringApiPrincipal;
+import fr.insalyon.creatis.vip.core.server.business.Server;
+import fr.insalyon.creatis.vip.core.server.model.Module;
+import fr.insalyon.creatis.vip.core.server.model.SupportedTransferProtocol;
+import fr.insalyon.creatis.vip.core.server.security.apikey.SpringApiPrincipal;
 import fr.insalyon.creatis.vip.core.client.bean.Group;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.util.CountryCode;
 import fr.insalyon.creatis.vip.core.server.SpringCoreConfig;
+import fr.insalyon.creatis.vip.api.SpringRestApiConfig;
 import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
 import fr.insalyon.creatis.vip.core.server.business.EmailBusiness;
 
@@ -27,6 +31,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
 
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -35,7 +40,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 Functional test with the vip-portal configuration, so very close from
 the production one. Do tests on the api.
  */
-@SpringJUnitWebConfig(value = SpringCoreConfig.class)
+@SpringJUnitWebConfig(value = { SpringRestApiConfig.class, SpringCoreConfig.class })
 @ActiveProfiles({"test-db", "test"}) // to take random h2 database and not the test h2 jndi one
 @TestPropertySource(properties = {
         "db.tableEngine=",             // to disable the default mysql/innodb engine on database init
@@ -48,9 +53,11 @@ public class VipWebConfigurationIT {
     protected WebApplicationContext wac;
     private MockMvc mockMvc;
 
+    @Autowired private Server server;
     @Autowired private GRIDAClient gridaClient;
     @Autowired private EmailBusiness emailBusiness;
     @Autowired private ConfigurationBusiness configurationBusiness;
+
 
     @BeforeEach
     public final void setup() {
@@ -80,6 +87,11 @@ public class VipWebConfigurationIT {
 
     @Test
     public void testGetPlatformProperties() throws Exception {
+        when(server.getCarminPlatformName()).thenReturn("VIP_TEST");
+        when(server.getCarminSupportedTransferProtocols()).thenReturn(new SupportedTransferProtocol[]{SupportedTransferProtocol.HTTPS});
+        when(server.getCarminSupportedModules()).thenReturn(new Module[]{Module.PROCESSING});
+        when(server.getCarminDefaultLimitListExecution()).thenReturn((long)500);
+        when(server.getCarminUnsupportedMethods()).thenReturn(new String[]{"playExecution"});
         mockMvc.perform(get("/rest/platform"))
                 .andDo(print())
                 .andExpect(status().isOk())

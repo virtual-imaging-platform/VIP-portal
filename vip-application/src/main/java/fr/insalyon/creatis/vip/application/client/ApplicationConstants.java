@@ -76,6 +76,8 @@ public class ApplicationConstants {
     public static final String ICON_MARK_COMPLETED = IMG_FOLDER + "icon-mark-completed.png";
     public static final String ICON_USER = IMG_FOLDER + "icon-user.png";
     public static final String ICON_RESOURCE = IMG_FOLDER + "icon-resource.png";
+    public static final String ICON_LINK = IMG_FOLDER + "icon-link.png";
+    public static final String ICON_COPY = IMG_FOLDER + "icon-copy.png";
     public static final String ICON_TAG = IMG_FOLDER + "icon-tag.png";
     ;
     public static final String ICON_MONITOR_SIMULATION_FAILED = IMG_FOLDER + "monitor/icon-simulation-failed.png";
@@ -122,15 +124,13 @@ public class ApplicationConstants {
     public static final String APP_IMG_SIMULATION_ERROR = IMG_FOLDER + "app-simulation-error.png";
     public static final String APP_IMG_SIMULATION_OUT = IMG_FOLDER + "app-simulation-out.png";
     public static final String APP_IMG_TAG = IMG_FOLDER + "app-tag.png";
-    // Application launch, input without value
-    public static final String INPUT_WITHOUT_VALUE = "No_value_provided";
-    public static final String INPUT_WITHOUT_VALUE_REQUIRED_MESSAGE = "Either you deselect the field or you fill it in";
     // Configuration
     public static final String WORKKFLOW_EXAMPLE_TAG = "example";
     public static final String SEPARATOR_INPUT = "##";
     public static final String SEPARATOR_LIST = "@@";
     public static final String INPUT_VALID_CHARS = "0-9.,A-Za-z-+@/_(): ";
     public static final String EXEC_NAME_VALID_CHARS = "0-9A-Za-z-_ ";
+    public static final String DEFAULT_EXECUTOR_GASW = "default.executor";
 
     public static String getLaunchTabID(String applicationName) {
         return "launch_"

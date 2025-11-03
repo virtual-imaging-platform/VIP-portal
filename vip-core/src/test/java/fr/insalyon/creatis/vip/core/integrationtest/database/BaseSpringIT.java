@@ -21,7 +21,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
+import org.springframework.test.context.junit.jupiter.web.SpringJUnitWebConfig;
 import org.springframework.test.jdbc.JdbcTestUtils;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -45,13 +45,12 @@ import static org.mockito.ArgumentMatchers.anyString;
  * h2 in-memory database instead
  */
 
-@SpringJUnitConfig(SpringCoreConfig.class)
+@SpringJUnitWebConfig(SpringCoreConfig.class)
 // launch all spring environment for testing, also take test bean though automatic package scan
 @ActiveProfiles({"test-db", "test"}) // to take random h2 database and not the test h2 jndi one
 @TestPropertySource(properties = {
         "db.tableEngine=",             // to disable the default mysql/innodb engine on database init
-        "db.jsonType=TEXT",            // to workaround h2/mysql differences on JSON type
-        "vipConfigFolder=classpath:"}) // to find vip-api.conf for vip-api tests
+        "db.jsonType=TEXT"})           // to workaround h2/mysql differences on JSON type
 @Transactional // each test is in a transaction that is rollbacked at the end to always leave a "clean" state
 public abstract class BaseSpringIT {
     

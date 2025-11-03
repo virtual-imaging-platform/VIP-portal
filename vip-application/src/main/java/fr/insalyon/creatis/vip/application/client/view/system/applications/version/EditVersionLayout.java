@@ -1,34 +1,3 @@
-/*
- * Copyright and authors: see LICENSE.txt in base repository.
- *
- * This software is a web portal for pipeline execution on distributed systems.
- *
- * This software is governed by the CeCILL-B license under French law and
- * abiding by the rules of distribution of free software.  You can  use, 
- * modify and/ or redistribute the software under the terms of the CeCILL-B
- * license as circulated by CEA, CNRS and INRIA at the following URL
- * "http://www.cecill.info". 
- *
- * As a counterpart to the access to the source code and  rights to copy,
- * modify and redistribute granted by the license, users are provided only
- * with a limited warranty  and the software's author,  the holder of the
- * economic rights,  and the successive licensors  have only  limited
- * liability. 
- *
- * In this respect, the user's attention is drawn to the risks associated
- * with loading,  using,  modifying and/or developing or reproducing the
- * software by the user in light of its specific status of free software,
- * that may mean  that it is complicated to manipulate,  and  that  also
- * therefore means  that it is reserved for developers  and  experienced
- * professionals having in-depth computer knowledge. Users are therefore
- * encouraged to load and test the software's suitability as regards their
- * requirements in conditions enabling the security of their systems and/or 
- * data to be ensured and,  more generally, to use and operate it in the 
- * same conditions as regards security. 
- *
- * The fact that you are presently reading this means that you have had
- * knowledge of the CeCILL-B license and that you accept its terms.
- */
 package fr.insalyon.creatis.vip.application.client.view.system.applications.version;
 
 import java.util.ArrayList;
@@ -37,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.types.ListGridEditEvent;
 import com.smartgwt.client.types.ListGridFieldType;
@@ -180,9 +150,49 @@ public class EditVersionLayout extends AbstractFormLayout {
 
         addMember(applicationLabel);
         addField("Version", versionField);
-        addField("Descriptor", descriptorField);
+
+        Label descriptorLabel = WidgetUtil.getLabel("<b>" + "Descriptor" + "</b>", 15);
+        descriptorLabel.setWidth(24);
+
+        ImgButton descriptorBtn = new ImgButton();
+        descriptorBtn.setSrc(ApplicationConstants.ICON_COPY);
+        descriptorBtn.setWidth(16);
+        descriptorBtn.setHeight(16);
+        descriptorBtn.setShowRollOver(false);
+        descriptorBtn.addClickHandler(new ClickHandler() {
+            @Override
+            public void onClick(ClickEvent event) {
+                Layout.getInstance().setNoticeMessage("Descriptor copied to clipboard!");
+                copyToClipboard(descriptorField.getValueAsString());
+            }
+        });
+        addInline(descriptorLabel, descriptorBtn);
+        addMember(FieldUtil.getForm(descriptorField));
+
         addMember(FieldUtil.getForm(isVisibleField));
-        addField("Source", sourceField);
+
+        Label sourceLabel = WidgetUtil.getLabel("<b>" + "Source" + "</b>", 15);
+        sourceLabel.setWidth(24);
+
+        ImgButton sourceBtn = new ImgButton();
+        sourceBtn.setSrc(ApplicationConstants.ICON_LINK);
+        sourceBtn.setWidth(16);
+        sourceBtn.setHeight(16);
+        sourceBtn.setShowRollOver(false);
+        sourceBtn.addClickHandler(new ClickHandler() {
+            @Override
+            public void onClick(ClickEvent event) {
+                String url = sourceField.getValueAsString();
+
+                if ( ! url.startsWith("http")) {
+                    url = "https://" + url;
+                }
+                Window.open(url, null, null);
+            }
+        });
+        addInline(sourceLabel, sourceBtn);
+        addMember(FieldUtil.getForm(sourceField));
+
         addField("Resources authorized", resourcesList);
         addMember(WidgetUtil.getLabel("<b>" + "Tags Settings" + "</b>", 15));
         addMember(tagsGrid);
@@ -396,4 +406,18 @@ public class EditVersionLayout extends AbstractFormLayout {
         };
         service.getResources(callback);
     }
+
+    public static native void copyToClipboard(String text) /*-{
+        var textarea = document.createElement("textarea");
+        textarea.value = text;
+        textarea.style.position = "fixed";
+        textarea.style.left = "-9999px";
+        document.body.appendChild(textarea);
+        textarea.focus();
+        textarea.select();
+        try {
+            document.execCommand("copy");
+        } catch (e) {}
+        document.body.removeChild(textarea);
+    }-*/;
 }

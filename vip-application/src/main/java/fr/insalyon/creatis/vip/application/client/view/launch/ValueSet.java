@@ -1,7 +1,5 @@
 package fr.insalyon.creatis.vip.application.client.view.launch;
 
-import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,11 +16,10 @@ public abstract class ValueSet {
     /**
      * 
      * @param value Object value to convert to String
-     * @return      String representation of value. null is represented by ApplicationConstants.INPUT_WITHOUT_VALUE
-     * @see ApplicationConstants#INPUT_WITHOUT_VALUE
+     * @return      String representation of value.
      */
-    protected String valueAsString(Object value){
-        return (value == null) ? ApplicationConstants.INPUT_WITHOUT_VALUE : value.toString();
+    protected String valueAsString(Object value) {
+        return (value == null) ? null : value.toString();
     }
 
     /**

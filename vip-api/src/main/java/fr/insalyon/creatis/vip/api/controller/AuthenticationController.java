@@ -33,7 +33,7 @@ package fr.insalyon.creatis.vip.api.controller;
 
 import fr.insalyon.creatis.vip.api.business.ApiBusiness;
 import fr.insalyon.creatis.vip.api.business.ApiUserBusiness;
-import fr.insalyon.creatis.vip.api.exception.ApiException;
+import fr.insalyon.creatis.vip.core.server.exception.ApiException;
 import fr.insalyon.creatis.vip.api.model.AuthenticationCredentials;
 import fr.insalyon.creatis.vip.api.model.AuthenticationInfo;
 import fr.insalyon.creatis.vip.api.model.ResetPasswordDTO;

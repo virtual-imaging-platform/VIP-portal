@@ -172,10 +172,10 @@ async function get_fetch(form_email, form_password){
 }
 
 function make_table(data) {
+    var pipelineNames = data[0].map((item) => item.name); // list of public pipelines names
+    pipelineNames = [...new Set(pipelineNames)]; // remove duplicates
     var application = new Array();
-    data[0].forEach((item, index) => {
-        application.push([index, item.name])
-    });
+    pipelineNames.forEach((name, index) => { application.push([index, name])});
 
     let tablecontents = createTableHTMLString(application);
     document.getElementById("my_tbody_app").innerHTML = tablecontents;

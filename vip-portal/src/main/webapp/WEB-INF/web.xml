@@ -159,6 +159,36 @@ knowledge of the CeCILL-B license and that you accept its terms.
         <url-pattern>/fr.insalyon.creatis.vip.portal.Main/applicationimporterservice</url-pattern>
     </servlet-mapping>
     <!--End Application Importer Module-->
+    <!-- root context -->
+    <listener>
+        <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+    </listener>
+    <context-param>
+        <param-name>contextClass</param-name>
+        <param-value>org.springframework.web.context.support.AnnotationConfigWebApplicationContext</param-value>
+    </context-param>
+    <context-param>
+        <param-name>contextConfigLocation</param-name>
+        <param-value>fr.insalyon.creatis.vip.core.server.SpringCoreConfig</param-value>
+    </context-param>
+    <!-- Internal API -->
+    <servlet>
+        <servlet-name>InternalAPI</servlet-name>
+        <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+        <init-param>
+            <param-name>contextClass</param-name>
+            <param-value>org.springframework.web.context.support.AnnotationConfigWebApplicationContext</param-value>
+        </init-param>
+        <init-param>
+            <param-name>contextConfigLocation</param-name>
+            <param-value>fr.insalyon.creatis.vip.core.server.SpringInternalApiConfig</param-value>
+        </init-param>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>InternalAPI</servlet-name>
+        <url-pattern>/internal/*</url-pattern>
+    </servlet-mapping>
     <!-- REST API -->
     <servlet>
         <servlet-name>RestAPI</servlet-name>
@@ -167,9 +197,9 @@ knowledge of the CeCILL-B license and that you accept its terms.
             <param-name>contextClass</param-name>
             <param-value>org.springframework.web.context.support.AnnotationConfigWebApplicationContext</param-value>
         </init-param>
-         <init-param>
+        <init-param>
             <param-name>contextConfigLocation</param-name>
-            <param-value>fr.insalyon.creatis.vip.core.server.SpringCoreConfig</param-value>
+            <param-value>fr.insalyon.creatis.vip.api.SpringRestApiConfig</param-value>
         </init-param>
         <load-on-startup>1</load-on-startup>
     </servlet>

@@ -35,6 +35,7 @@ import fr.insalyon.creatis.vip.application.client.bean.*;
 import fr.insalyon.creatis.vip.application.client.rpc.ApplicationService;
 import fr.insalyon.creatis.vip.application.client.view.ApplicationException;
 import fr.insalyon.creatis.vip.application.server.business.*;
+import fr.insalyon.creatis.vip.core.client.bean.Pair;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.CoreException;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
@@ -52,6 +53,7 @@ import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class ApplicationServiceImpl extends AbstractRemoteServiceServlet implements ApplicationService {
@@ -250,16 +252,24 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
     }
 
     @Override
-    public List<Application> getManageableApplications() throws ApplicationException {
+    public Map<Application, Set<Resource>> getManageableApplications() throws ApplicationException {
+        List<Application> apps = new ArrayList<>();
+        Map<Application, Set<Resource>> map = new LinkedHashMap<>();
         try {
             if (isSystemAdministrator()) {
-                return applicationBusiness.getApplications();
+                apps = applicationBusiness.getApplications();
             } else if (isDeveloper()) {
-                return applicationBusiness.getApplicationsWithOwner(getSessionUser().getEmail());
+                apps = applicationBusiness.getApplicationsWithOwner(getSessionUser().getEmail());
             } else {
                 logger.error("Unauthorized to get manageable applications for regular user");
                 throw new ApplicationException("You have no administrator rights.");
             }
+
+            for (Application app : apps) {
+                map.put(app, appVersionBusiness.getVersions(app.getName()).stream()
+                    .flatMap(version -> version.getResources().stream()).collect(Collectors.toSet()));
+            }
+            return map;
         } catch (BusinessException | CoreException ex) {
             throw new ApplicationException(ex);
         }
@@ -491,22 +501,21 @@ public class ApplicationServiceImpl extends AbstractRemoteServiceServlet impleme
      * This fonction will check if ressources/engines are available !
      */
     @Override
-    public Boolean isAppUsableWithCurrentUser(String appName, String version) throws ApplicationException {
+    public Pair<Boolean, String> isAppUsableWithCurrentUser(String appName, String version) throws ApplicationException {
         try {
             AppVersion appVersion = appVersionBusiness.getVersion(appName, version);
             List<Resource> usableResource = resourceBusiness.getUsableResources(getSessionUser(), appVersion);
             List<Engine> usableEngines;
 
             if (usableResource.isEmpty()) {
-                return false;
+                return new Pair<Boolean, String>(false, "Sorry, there are no ressources actually availables for this application!");
             }
 
             usableEngines = engineBusiness.getUsableEngines(usableResource.get(0));
             if (usableEngines.isEmpty()) {
-                return false;
+               return new Pair<Boolean, String>(false, "Sorry, there are no engines actually availables for this application!");
             }
-            
-            return true;
+            return new Pair<Boolean, String>(true, "Application usable!");
         } catch (BusinessException | CoreException e) {
             throw new ApplicationException(e);
         }

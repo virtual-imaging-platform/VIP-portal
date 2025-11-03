@@ -33,9 +33,8 @@ package fr.insalyon.creatis.vip.api.business;
 
 import fr.insalyon.creatis.boutiques.model.BoutiquesDescriptor;
 import fr.insalyon.creatis.boutiques.model.Input;
-import fr.insalyon.creatis.vip.api.CarminProperties;
-import fr.insalyon.creatis.vip.api.exception.ApiException;
-import fr.insalyon.creatis.vip.api.exception.ApiException.ApiError;
+import fr.insalyon.creatis.vip.core.server.exception.ApiException;
+import fr.insalyon.creatis.vip.core.server.exception.ApiException.ApiError;
 import fr.insalyon.creatis.vip.api.model.ParameterType;
 import fr.insalyon.creatis.vip.api.model.Pipeline;
 import fr.insalyon.creatis.vip.api.model.PipelineParameter;
@@ -47,11 +46,11 @@ import fr.insalyon.creatis.vip.application.server.business.BoutiquesBusiness;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
+import fr.insalyon.creatis.vip.core.server.business.Server;
 import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -60,7 +59,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
 
-import static fr.insalyon.creatis.vip.api.exception.ApiException.ApiError.*;
+import static fr.insalyon.creatis.vip.core.server.exception.ApiException.ApiError.*;
 
 /**
  *
@@ -71,7 +70,7 @@ public class PipelineBusiness {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    private final Environment env;
+    private final Server server;
 
     private final Supplier<User> currentUserProvider;
     private final ApplicationBusiness applicationBusiness;
@@ -80,10 +79,10 @@ public class PipelineBusiness {
 
     @Autowired
     public PipelineBusiness(
-            Supplier<User> currentUserProvider, Environment env, ApplicationBusiness applicationBusiness,
+            Supplier<User> currentUserProvider, Server server, ApplicationBusiness applicationBusiness,
             BoutiquesBusiness boutiquesBusiness, AppVersionBusiness appVersionBusiness) {
         this.currentUserProvider = currentUserProvider;
-        this.env = env;
+        this.server = server;
         this.applicationBusiness = applicationBusiness;
         this.boutiquesBusiness = boutiquesBusiness;
         this.appVersionBusiness = appVersionBusiness;
@@ -144,6 +143,23 @@ public class PipelineBusiness {
         }
     }
 
+    private List<Pipeline> appsToPipelines(List<Application> applications) throws BusinessException {
+        List<Pipeline> pipelines = new ArrayList<>();
+        for (Application a : applications) {
+            List<AppVersion> versions = appVersionBusiness.getVersions(a.getName());
+            for (AppVersion av : versions) {
+                if (isApplicationVersionUsableInApi(av)) {
+                    pipelines.add(
+                            new Pipeline(getPipelineIdentifier(
+                                    a.getName(), av.getVersion()),
+                                    a.getName(), av.getVersion())
+                    );
+                }
+            }
+        }
+        return pipelines;
+    }
+
     /**
      * List all the pipeline the user can access
      */
@@ -152,24 +168,9 @@ public class PipelineBusiness {
             if (studyIdentifier != null) {
                 logger.warn("Study identifier ({}) was ignored.", studyIdentifier);
             }
-            ArrayList<Pipeline> pipelines = new ArrayList<>();
 
             List<Application> applications = applicationBusiness.getApplications(currentUserProvider.get());
-
-            for (Application a : applications) {
-
-                List<AppVersion> versions = appVersionBusiness.getVersions(a.getName());
-                for (AppVersion av : versions) {
-                    if (isApplicationVersionUsableInApi(av)) {
-                        pipelines.add(
-                                new Pipeline(getPipelineIdentifier(
-                                        a.getName(), av.getVersion()),
-                                        a.getName(), av.getVersion())
-                        );
-                    }
-                }
-            }
-            return pipelines;
+            return appsToPipelines(applications);
         } catch (BusinessException ex) {
             throw new ApiException(ex);
         }
@@ -177,9 +178,10 @@ public class PipelineBusiness {
 
     // Specific stuff that return in 'Application' class format and not 'Pipeline'
     // used for the VIP landing page
-    public List<Application> listPublicPipelines() throws ApiException {
+    public List<Pipeline> listPublicPipelines() throws ApiException {
         try {
-            return applicationBusiness.getPublicApplications();
+            List<Application> applications = applicationBusiness.getPublicApplications();
+            return appsToPipelines(applications);
         } catch (BusinessException e) {
             throw new ApiException(e);
         }
@@ -271,8 +273,7 @@ public class PipelineBusiness {
         if (appVersion.isVisible()) {
             return true;
         }
-        List<String> whiteList = Arrays.asList(
-                env.getRequiredProperty(CarminProperties.API_PIPELINE_WHITE_LIST, String[].class));
+        List<String> whiteList = Arrays.asList(server.getCarminApiPipelineWhiteList());
         return whiteList.stream().anyMatch(appString -> {
             String[] splitAppString = appString.split("/");
             if (splitAppString.length != 2) {

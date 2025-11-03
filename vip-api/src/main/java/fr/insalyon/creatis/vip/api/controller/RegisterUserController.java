@@ -2,7 +2,7 @@ package fr.insalyon.creatis.vip.api.controller;
 
 import fr.insalyon.creatis.vip.api.business.ApiUserBusiness;
 import fr.insalyon.creatis.vip.api.model.SignUpUserDTO;
-import fr.insalyon.creatis.vip.api.exception.ApiException;
+import fr.insalyon.creatis.vip.core.server.exception.ApiException;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

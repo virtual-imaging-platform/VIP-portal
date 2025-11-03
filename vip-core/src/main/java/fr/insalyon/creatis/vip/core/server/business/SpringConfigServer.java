@@ -7,6 +7,8 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 
+import fr.insalyon.creatis.vip.core.server.model.Module;
+import fr.insalyon.creatis.vip.core.server.model.SupportedTransferProtocol;
 import jakarta.annotation.PostConstruct;
 
 import org.apache.commons.configuration.ConfigurationException;
@@ -25,6 +27,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
+import fr.insalyon.creatis.vip.core.server.CarminProperties;
 
 /**
  * Reads the vip.conf property file from the configured vifConfigFolder
@@ -146,6 +149,44 @@ public class SpringConfigServer implements Server {
         assertPropertyIsNotEmpty(CoreConstants.LAB_SIMULATION_PLATFORM_MAX, Integer.class);
 
         assertOptionalPropertyType(CoreConstants.USE_LOCAL_FILES_AS_INPUTS, Boolean.class);
+        verifyApiProperties();
+    }
+
+    private void verifyApiProperties() {
+        verifyPropertyNotNull(CarminProperties.CORS_AUTHORIZED_DOMAINS, String[].class);
+        verifyPropertyNotNull(CarminProperties.PLATFORM_NAME, String.class);
+        verifyPropertyNotNull(CarminProperties.PLATFORM_DESCRIPTION, String.class);
+        verifyPropertyNotNull(CarminProperties.PLATFORM_EMAIL, String.class);
+        verifyPropertyNotNull(CarminProperties.DEFAULT_LIMIT_LIST_EXECUTION, Long.class);
+        verifyPropertyNotNull(CarminProperties.SUPPORTED_API_VERSION, String.class);
+        verifyPropertyNotNull(CarminProperties.APIKEY_HEADER_NAME, String.class);
+        verifyPropertyNotNull(CarminProperties.APIKEY_GENERATE_NEW_EACH_TIME, Boolean.class);
+        verifyPropertyNotNull(CarminProperties.API_DIRECTORY_MIME_TYPE, String.class);
+        verifyPropertyNotNull(CarminProperties.API_DEFAULT_MIME_TYPE, String.class);
+        verifyPropertyNotNull(CarminProperties.API_DOWNLOAD_RETRY_IN_SECONDS, Integer.class);
+        verifyPropertyNotNull(CarminProperties.API_DOWNLOAD_TIMEOUT_IN_SECONDS, Integer.class);
+        verifyPropertyNotNull(CarminProperties.API_DATA_TRANSFERT_MAX_SIZE, Long.class);
+
+        if (getKeycloakActivated()) {
+            logger.info("Keycloak/OIDC activated");
+        } else {
+            logger.info("Keycloak/OIDC NOT active");
+        }
+
+        // due to arrays and generics, this verification aren't easy to factorize
+        Assert.notEmpty(getCarminSupportedTransferProtocols(),
+                CarminProperties.SUPPORTED_TRANSFER_PROTOCOLS + " required in api conf file");
+        Assert.notEmpty(getCarminSupportedModules(),
+                CarminProperties.SUPPORTED_MODULES + " required in api conf file");
+        Assert.isInstanceOf(String[].class, getCarminUnsupportedMethods(),
+                CarminProperties.UNSUPPORTED_METHODS + " required in api conf file");
+        Assert.isInstanceOf(String[].class, getCarminApiPipelineWhiteList(),
+                CarminProperties.API_PIPELINE_WHITE_LIST + " required in api conf file");
+    }
+
+    private void verifyPropertyNotNull(String propertyKey, Class<?> targetType) {
+        Assert.notNull(env.getProperty(propertyKey, targetType),
+                propertyKey + " required in api conf file");
     }
 
     private void assertPropertyIsPresent(String property) {
@@ -420,4 +461,107 @@ public class SpringConfigServer implements Server {
     public String getHostURL() {
         return env.getRequiredProperty(CoreConstants.HOST_URL);
     }
+
+    // vip-core level settings: these are CarminProperties constants, but with a wider scope than the /rest API:
+    // don't prefix their getters with "Carmin"
+
+    @Override
+    public String getApikeyHeaderName() { return env.getRequiredProperty(CarminProperties.APIKEY_HEADER_NAME); }
+
+    @Override
+    public boolean getKeycloakActivated() { return env.getProperty(CarminProperties.KEYCLOAK_ACTIVATED, Boolean.class, Boolean.FALSE); }
+
+    private OidcLoginProviderConfig makeOidcConfig(
+            String clientIdKey, String clientSecretKey, String redirectUriKey,
+            String authorizationUriKey, String tokenUriKey, String userInfoUriKey, String jwkSetUriKey) {
+        String clientId = env.getProperty(clientIdKey);
+        if (clientId == null || clientId.isEmpty()) {
+            return null;
+        }
+        OidcLoginProviderConfig conf = new OidcLoginProviderConfig();
+        conf.clientId = clientId;
+        conf.clientSecret = env.getProperty(clientSecretKey);
+        conf.redirectUri = env.getProperty(redirectUriKey);
+        conf.authorizationUri = env.getProperty(authorizationUriKey);
+        conf.tokenUri = env.getProperty(tokenUriKey);
+        conf.userInfoUri = env.getProperty(userInfoUriKey);;
+        conf.jwkSetUri = env.getProperty(jwkSetUriKey);
+        return conf;
+    }
+
+    @Override
+    public OidcLoginProviderConfig getOidcConfigEGI() {
+        return makeOidcConfig(
+                CarminProperties.EGI_CLIENT_ID,
+                CarminProperties.EGI_CLIENT_SECRET,
+                CarminProperties.EGI_REDIRECT_URI,
+                CarminProperties.EGI_AUTHORIZATION_URI,
+                CarminProperties.EGI_TOKEN_URI,
+                CarminProperties.EGI_USER_INFO_URI,
+                CarminProperties.EGI_JWK_SET_URI
+        );
+    }
+
+    @Override
+    public OidcLoginProviderConfig getOidcConfigLSLOGIN() {
+        return makeOidcConfig(
+                CarminProperties.LSLOGIN_CLIENT_ID,
+                CarminProperties.LSLOGIN_CLIENT_SECRET,
+                CarminProperties.LSLOGIN_REDIRECT_URI,
+                CarminProperties.LSLOGIN_AUTHORIZATION_URI,
+                CarminProperties.LSLOGIN_TOKEN_URI,
+                CarminProperties.LSLOGIN_USER_INFO_URI,
+                CarminProperties.LSLOGIN_JWK_SET_URI
+        );
+    }
+
+    // vip-api level settings: these only apply to the /rest API, prefix them with "Carmin"
+
+    @Override
+    public String[] getCarminCorsAuthorizedDomains() { return env.getRequiredProperty(CarminProperties.CORS_AUTHORIZED_DOMAINS, String[].class); }
+
+    @Override
+    public String getCarminPlatformName() { return env.getRequiredProperty(CarminProperties.PLATFORM_NAME); }
+
+    @Override
+    public String getCarminPlatformDescription() { return env.getRequiredProperty(CarminProperties.PLATFORM_DESCRIPTION); }
+
+    @Override
+    public String getCarminPlatformEmail() { return env.getRequiredProperty(CarminProperties.PLATFORM_EMAIL); }
+
+    @Override
+    public long getCarminDefaultLimitListExecution() { return env.getRequiredProperty(CarminProperties.DEFAULT_LIMIT_LIST_EXECUTION, Long.class); }
+
+    @Override
+    public String getCarminSupportedApiVersion() { return env.getRequiredProperty(CarminProperties.SUPPORTED_API_VERSION); }
+
+    @Override
+    public boolean getCarminApikeyGenerateNewEachTime() { return env.getRequiredProperty(CarminProperties.APIKEY_GENERATE_NEW_EACH_TIME, Boolean.class); }
+
+    @Override
+    public String getCarminApiDirectoryMimeType() { return env.getRequiredProperty(CarminProperties.API_DIRECTORY_MIME_TYPE); }
+
+    @Override
+    public String getCarminApiDefaultMimeType() { return env.getRequiredProperty(CarminProperties.API_DEFAULT_MIME_TYPE); }
+
+    @Override
+    public int getCarminApiDownloadRetryInSeconds() { return env.getRequiredProperty(CarminProperties.API_DOWNLOAD_RETRY_IN_SECONDS, Integer.class); }
+
+    @Override
+    public int getCarminApiDownloadTimeoutInSeconds() { return env.getRequiredProperty(CarminProperties.API_DOWNLOAD_TIMEOUT_IN_SECONDS, Integer.class); }
+
+    @Override
+    public long getCarminApiDataTransfertMaxSize() { return env.getRequiredProperty(CarminProperties.API_DATA_TRANSFERT_MAX_SIZE, Long.class); }
+
+    @Override
+    public SupportedTransferProtocol[] getCarminSupportedTransferProtocols() { return env.getProperty(CarminProperties.SUPPORTED_TRANSFER_PROTOCOLS, SupportedTransferProtocol[].class); }
+
+    @Override
+    public Module[] getCarminSupportedModules() { return env.getProperty(CarminProperties.SUPPORTED_MODULES, Module[].class); }
+
+    @Override
+    public String[] getCarminUnsupportedMethods() { return env.getProperty(CarminProperties.UNSUPPORTED_METHODS, String[].class); }
+
+    @Override
+    public String[] getCarminApiPipelineWhiteList() { return env.getProperty(CarminProperties.API_PIPELINE_WHITE_LIST, String[].class); }
 }

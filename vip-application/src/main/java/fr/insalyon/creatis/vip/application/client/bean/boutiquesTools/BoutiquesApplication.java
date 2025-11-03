@@ -38,6 +38,8 @@ public class BoutiquesApplication implements IsSerializable {
     private String schemaVersion;
     private String challengerEmail;
     private String challengerTeam;
+    private String vipResultsDirectoryDefault;
+    private String vipResultsDirectoryDescription;
     private Set<BoutiquesOutputFile> outputFiles = new HashSet<>();
     private Map<String, String> tags = new HashMap<>();
     private Set<String> vipDotInputIds;
@@ -200,11 +202,19 @@ public class BoutiquesApplication implements IsSerializable {
         return tags;
     }
 
+    public String getVipResultsDirectoryDefault() {
+        return vipResultsDirectoryDefault;
+    }
+
+    public String getVipResultsDirectoryDescription() {
+        return vipResultsDirectoryDescription;
+    }
+
     public Set<String> getVipDotInputIds() {
         if (vipDotInputIds == null) {
-            return Collections.emptySet();      
-            }
-            return vipDotInputIds;
+            return Collections.emptySet();
+        }
+        return vipDotInputIds;
     }
 
     public Set<String> getCommandLineFlag() {
@@ -266,6 +276,14 @@ public class BoutiquesApplication implements IsSerializable {
 
     public void addTag(String key, String value) {
         tags.put(key, value);
+    }
+
+    public void setVipResultsDirectoryDefault(String vipResultsDirectoryDefault) {
+        this.vipResultsDirectoryDefault = vipResultsDirectoryDefault;
+    }
+
+    public void setVipResultsDirectoryDescription(String vipResultsDirectoryDescription) {
+        this.vipResultsDirectoryDescription = vipResultsDirectoryDescription;
     }
 
     public void setVipDotInputIds(Set<String> inputIds) {
