@@ -401,6 +401,11 @@ public class ExecutionControllerIT extends BaseWebSpringIT {
 
         Execution expectedExecution = new Execution(workflowId, "Exec test 1", appName + "/" + versionName, 0, ExecutionStatus.RUNNING, null, null, startDate.getTime(), null, null);
         expectedExecution.clearReturnedFiles();
+        expectedExecution.getJobs().put(0, new HashMap<>() {{
+            put("exitCode", 0);
+            put("exitMessage", "Successfully executed");
+            put("status", "COMPLETED");
+        }});
 
         setUpResourceAndEngine(appName, versionName, engineEndpoint);
 
