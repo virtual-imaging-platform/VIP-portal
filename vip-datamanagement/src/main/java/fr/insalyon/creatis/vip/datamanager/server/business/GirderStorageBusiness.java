@@ -120,9 +120,9 @@ public class GirderStorageBusiness {
                 filename +
                 "?apiurl=" +
                 apiUrl +
-                "&amp;fileId=" +
+                "&fileId=" +
                 fileId +
-                "&amp;token=" +
+                "&token=" +
                 token;
     }
 

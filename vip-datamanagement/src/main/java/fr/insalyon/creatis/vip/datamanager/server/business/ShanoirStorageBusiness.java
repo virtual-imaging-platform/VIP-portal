@@ -140,19 +140,19 @@ public class ShanoirStorageBusiness {
                 fileName +
                 "?"+ UrlKeys.API_URI.key+"=" +
                 apiUrl +
-                "&amp;"+ UrlKeys.RESOURCE_ID.key+"=" +
+                "&"+ UrlKeys.RESOURCE_ID.key+"=" +
                 resourceId +
-                "&amp;"+ UrlKeys.FORMAT.key+"=" +
+                "&"+ UrlKeys.FORMAT.key+"=" +
                 format +
-                "&amp;"+ UrlKeys.CONVERTER_ID.key+"=" +
+                "&"+ UrlKeys.CONVERTER_ID.key+"=" +
                 converterId +
-                "&amp;"+ UrlKeys.KEYCLOAK_CLIENT_ID.key+"=" +
+                "&"+ UrlKeys.KEYCLOAK_CLIENT_ID.key+"=" +
                 keycloakClientId +
-                "&amp;"+ UrlKeys.REFRESH_TOKEN_URL.key+"=" +
+                "&"+ UrlKeys.REFRESH_TOKEN_URL.key+"=" +
                 refreshTokenUrl +
-                "&amp;"+ UrlKeys.TOKEN.key+"=" +
+                "&"+ UrlKeys.TOKEN.key+"=" +
                 token +
-                "&amp;"+ UrlKeys.REFRESH_TOKEN.key+"=" +
+                "&"+ UrlKeys.REFRESH_TOKEN.key+"=" +
                 refreshToken;
     }
 
@@ -161,17 +161,17 @@ public class ShanoirStorageBusiness {
                 filePath +
                 "?"+ UrlKeys.UPLOAD_URL.key+"=" +
                 uploadUrl +
-                "&amp;"+ UrlKeys.TYPE.key+"=" +
+                "&"+ UrlKeys.TYPE.key+"=" +
                 type +
-                "&amp;"+ UrlKeys.MD5.key+"=" +
+                "&"+ UrlKeys.MD5.key+"=" +
                 md5 +
-                "&amp;"+ UrlKeys.KEYCLOAK_CLIENT_ID.key+"=" +
+                "&"+ UrlKeys.KEYCLOAK_CLIENT_ID.key+"=" +
                 keycloakClientId +
-                "&amp;"+ UrlKeys.REFRESH_TOKEN_URL.key+"=" +
+                "&"+ UrlKeys.REFRESH_TOKEN_URL.key+"=" +
                 refreshTokenUrl +
-                "&amp;"+ UrlKeys.TOKEN.key+"=" +
+                "&"+ UrlKeys.TOKEN.key+"=" +
                 token +
-                "&amp;"+ UrlKeys.REFRESH_TOKEN.key+"=" +
+                "&"+ UrlKeys.REFRESH_TOKEN.key+"=" +
                 refreshToken;
     }
 
