@@ -162,11 +162,25 @@ public class ExecutionController extends ApiController {
         return executionBusiness.getLog(executionId, "out");
     }
 
+    @RequestMapping(value = "/{executionId}/jobs/{invocationId}/stdout", produces = "text/plain;charset=UTF-8")
+    public String getJobStdout(@PathVariable String executionId, @PathVariable Integer invocationId) throws ApiException {
+        logMethodInvocation(logger, "getJobStdout", executionId, invocationId);
+        executionBusiness.checkIfUserCanAccessExecution(executionId);
+        return executionBusiness.getLog(executionId, invocationId, "out");
+    }
+
     @RequestMapping(value= "/{executionId}/stderr", produces = "text/plain;charset=UTF-8")
     public String getStderr(@PathVariable String executionId) throws ApiException {
         logMethodInvocation(logger, "getStderr", executionId);
         executionBusiness.checkIfUserCanAccessExecution(executionId);
         return executionBusiness.getLog(executionId, "err");
+    }
+
+    @RequestMapping(value = "/{executionId}/jobs/{invocationId}/stderr", produces = "text/plain;charset=UTF-8")
+    public String getJobStderr(@PathVariable String executionId,  @PathVariable Integer invocationId) throws ApiException {
+        logMethodInvocation(logger, "getJobStderr", executionId, invocationId);
+        executionBusiness.checkIfUserCanAccessExecution(executionId);
+        return executionBusiness.getLog(executionId, invocationId, "err");
     }
 
     @RequestMapping(value = "/{executionId}/play", method = RequestMethod.PUT)
