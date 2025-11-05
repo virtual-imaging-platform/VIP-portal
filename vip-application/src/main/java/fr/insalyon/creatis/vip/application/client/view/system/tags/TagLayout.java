@@ -1,11 +1,16 @@
 package fr.insalyon.creatis.vip.application.client.view.system.tags;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.smartgwt.client.types.ListGridFieldType;
 import com.smartgwt.client.types.Overflow;
 import com.smartgwt.client.types.SortDirection;
-import com.smartgwt.client.util.BooleanCallback;
-import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.Canvas;
 import com.smartgwt.client.widgets.ImgButton;
 import com.smartgwt.client.widgets.events.ClickEvent;
@@ -17,17 +22,17 @@ import com.smartgwt.client.widgets.grid.events.CellDoubleClickEvent;
 import com.smartgwt.client.widgets.grid.events.CellDoubleClickHandler;
 import com.smartgwt.client.widgets.layout.HLayout;
 import com.smartgwt.client.widgets.layout.VLayout;
+
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
 import fr.insalyon.creatis.vip.application.client.bean.Tag;
 import fr.insalyon.creatis.vip.application.client.rpc.ApplicationService;
+import fr.insalyon.creatis.vip.core.client.bean.Pair;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 import fr.insalyon.creatis.vip.core.client.view.common.LabelButton;
 import fr.insalyon.creatis.vip.core.client.view.common.ToolstripLayout;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
 import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
-import java.util.ArrayList;
-import java.util.List;
 
 
 public class TagLayout extends VLayout {
@@ -85,25 +90,7 @@ public class TagLayout extends VLayout {
                             edit(rollOverRecord);
                         }
                     });
-                    ImgButton deleteImg = WidgetUtil.getImgButton(CoreConstants.ICON_DELETE, "Delete");
-                    deleteImg.addClickHandler(new ClickHandler() {
-                        @Override
-                        public void onClick(ClickEvent event) {
-                            final Tag tag = tagFromRecord(rollOverRecord);
-
-                            SC.ask("Do you really want to remove this tag \""
-                                    + tag.toString() + "\"?", new BooleanCallback() {
-                                @Override
-                                public void execute(Boolean value) {
-                                    if (value) {
-                                        remove(tag);
-                                    }
-                                }
-                            });
-                        }
-                    });
                     rollOverCanvas.addMember(loadImg);
-                    rollOverCanvas.addMember(deleteImg);
                 }
                 return rollOverCanvas;
             }
@@ -119,6 +106,7 @@ public class TagLayout extends VLayout {
                 new ListGridField("key", "Key"),
                 new ListGridField("value", "Value"),
                 new ListGridField("type", "Type"),
+                new ListGridField("appVersions", "AppVersions"),
                 new ListGridField("visible", "Visible").setType(ListGridFieldType.BOOLEAN),
                 new ListGridField("boutiques", "Boutiques").setType(ListGridFieldType.BOOLEAN));
         grid.setSortField("name");
@@ -143,11 +131,22 @@ public class TagLayout extends VLayout {
             @Override
             public void onSuccess(List<Tag> result) {
                 modal.hide();
+                // this is to organize tags by unique key value mapped on all AppVersions associated
+                Map<Pair<String, String>, Pair<Tag, Set<String>>> tagsAppsVersions = new HashMap<>();
                 List<TagRecord> dataList = new ArrayList<>();
 
                 for (Tag tag : result) {
-                    dataList.add(new TagRecord(tag));
+                    Pair<String, String> keyValue = new Pair<>(tag.getKey(), tag.getValue());
+                    String appVersion = tag.getApplication() + " (" + tag.getVersion() + ")";
+
+                    if ( ! tagsAppsVersions.containsKey(keyValue)) {
+                        tagsAppsVersions.put(keyValue, new Pair<>(tag, new HashSet<>()));
+                    }
+                    tagsAppsVersions.get(keyValue).getSecond().add(appVersion);
                 }
+                tagsAppsVersions.forEach((k, v) -> {
+                    dataList.add(new TagRecord(v.getFirst(), v.getSecond()));
+                });
                 grid.setData(dataList.toArray(new TagRecord[]{}));
             }
         };
@@ -155,41 +154,23 @@ public class TagLayout extends VLayout {
         ApplicationService.Util.getInstance().getTags(callback);
     }
 
-    private void remove(Tag tag) {
-        final AsyncCallback<Void> callback = new AsyncCallback<>() {
-            @Override
-            public void onFailure(Throwable caught) {
-                modal.hide();
-                Layout.getInstance().setWarningMessage("Unable to remove tag:<br />" + caught.getMessage());
-            }
-
-            @Override
-            public void onSuccess(Void result) {
-                modal.hide();
-                Layout.getInstance().setNoticeMessage("The tag was successfully removed!");
-                loadData();
-            }
-        };
-        modal.show("Removing tag '" + tag.toString() + "'...", true);
-        ApplicationService.Util.getInstance().removeTag(tag, callback);
-    }
-
     private void edit(ListGridRecord record) {
         ManageTagsTab tagsTab = (ManageTagsTab) Layout.getInstance().
             getTab(ApplicationConstants.TAB_MANAGE_TAG);
+        Pair<Tag, String[]> data = tagFromRecord(record);
 
-        tagsTab.setTag(tagFromRecord(record));
+        tagsTab.setTag(data.getFirst(), data.getSecond());
     }
 
-    private Tag tagFromRecord(ListGridRecord record) {
-        return new Tag(
-            record.getAttributeAsString("key"),
-            record.getAttributeAsString("value"),
-            Tag.ValueType.valueOf(record.getAttributeAsString("type").toUpperCase()),
-            record.getAttributeAsString("application"),
-            record.getAttributeAsString("version"),
-            record.getAttributeAsBoolean("visible"),
-            record.getAttributeAsBoolean("boutiques")
-        );
+    private Pair<Tag, String[]> tagFromRecord(ListGridRecord record) {
+        return new Pair<>(new Tag(
+                record.getAttributeAsString("key"),
+                record.getAttributeAsString("value"),
+                Tag.ValueType.valueOf(record.getAttributeAsString("type").toUpperCase()),
+                null,
+                null,
+                record.getAttributeAsBoolean("visible"),
+                record.getAttributeAsBoolean("boutiques")),
+                record.getAttributeAsStringArray("appVersions"));
     }
 }
