@@ -7,6 +7,7 @@ import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import fr.insalyon.creatis.vip.core.server.dao.UserDAO;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -46,7 +47,7 @@ public class EmailBusiness {
         try {
             smaClient.sendEmail(subject, content, recipients, direct, username);
         } catch (SMAClientException ex) {
-            logger.error("Error sending {} email to {}", subject, username, ex);
+            logger.error("Error sending {} email to {}", subject, Arrays.toString(recipients), ex);
             throw new BusinessException(ex);
         }
     }

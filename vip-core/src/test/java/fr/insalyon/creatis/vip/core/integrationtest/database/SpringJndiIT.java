@@ -25,7 +25,7 @@ import org.springframework.jdbc.datasource.DataSourceUtils;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
+import org.springframework.test.context.junit.jupiter.web.SpringJUnitWebConfig;
 import org.springframework.test.jdbc.JdbcTestUtils;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
@@ -62,7 +62,7 @@ import static org.mockito.ArgumentMatchers.*;
     database without jndi, and should be enough to detect most database issues
     in a automatic way
  */
-@SpringJUnitConfig(SpringCoreConfig.class) // launch all spring environment for testing, also take test bean though automatic package scan
+@SpringJUnitWebConfig(SpringCoreConfig.class) // launch all spring environment for testing, also take test bean though automatic package scan
 @TestPropertySource(properties = {
         "db.tableEngine=",     // to disable the default mysql/innodb engine on database init
         "db.jsonType=TEXT" })  // to workaround h2/mysql differences on JSON type

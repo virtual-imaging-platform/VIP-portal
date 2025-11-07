@@ -31,7 +31,7 @@
  */
 package fr.insalyon.creatis.vip.api.data;
 
-import fr.insalyon.creatis.vip.api.model.ErrorCodeAndMessage;
+import fr.insalyon.creatis.vip.core.server.model.ErrorCodeAndMessage;
 import fr.insalyon.creatis.vip.api.tools.spring.JsonCustomObjectMatcher;
 import fr.insalyon.creatis.vip.core.client.VipException;
 import fr.insalyon.creatis.vip.core.client.VipException.VipError;

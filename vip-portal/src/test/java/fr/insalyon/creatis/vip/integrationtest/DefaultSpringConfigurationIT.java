@@ -32,8 +32,9 @@
 package fr.insalyon.creatis.vip.integrationtest;
 
 import fr.insalyon.creatis.vip.api.controller.PlatformController;
-import fr.insalyon.creatis.vip.api.exception.ApiException;
+import fr.insalyon.creatis.vip.core.server.exception.ApiException;
 import fr.insalyon.creatis.vip.core.server.SpringCoreConfig;
+import fr.insalyon.creatis.vip.api.SpringRestApiConfig;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,7 +49,7 @@ import java.nio.file.Paths;
  * Test the the global spring configuration, almost nothing is mocked
  *
  */
-@SpringJUnitWebConfig(SpringCoreConfig.class)
+@SpringJUnitWebConfig(value = { SpringRestApiConfig.class, SpringCoreConfig.class })
 public class DefaultSpringConfigurationIT {
 
     @Autowired

@@ -33,9 +33,8 @@ package fr.insalyon.creatis.vip.api.business;
 
 import fr.insalyon.creatis.boutiques.model.BoutiquesDescriptor;
 import fr.insalyon.creatis.boutiques.model.Input;
-import fr.insalyon.creatis.vip.api.CarminProperties;
-import fr.insalyon.creatis.vip.api.exception.ApiException;
-import fr.insalyon.creatis.vip.api.exception.ApiException.ApiError;
+import fr.insalyon.creatis.vip.core.server.exception.ApiException;
+import fr.insalyon.creatis.vip.core.server.exception.ApiException.ApiError;
 import fr.insalyon.creatis.vip.api.model.ParameterType;
 import fr.insalyon.creatis.vip.api.model.Pipeline;
 import fr.insalyon.creatis.vip.api.model.PipelineParameter;
@@ -47,11 +46,11 @@ import fr.insalyon.creatis.vip.application.server.business.BoutiquesBusiness;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
+import fr.insalyon.creatis.vip.core.server.business.Server;
 import fr.insalyon.creatis.vip.datamanager.client.DataManagerConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -60,7 +59,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
 
-import static fr.insalyon.creatis.vip.api.exception.ApiException.ApiError.*;
+import static fr.insalyon.creatis.vip.core.server.exception.ApiException.ApiError.*;
 
 /**
  *
@@ -71,7 +70,7 @@ public class PipelineBusiness {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    private final Environment env;
+    private final Server server;
 
     private final Supplier<User> currentUserProvider;
     private final ApplicationBusiness applicationBusiness;
@@ -80,10 +79,10 @@ public class PipelineBusiness {
 
     @Autowired
     public PipelineBusiness(
-            Supplier<User> currentUserProvider, Environment env, ApplicationBusiness applicationBusiness,
+            Supplier<User> currentUserProvider, Server server, ApplicationBusiness applicationBusiness,
             BoutiquesBusiness boutiquesBusiness, AppVersionBusiness appVersionBusiness) {
         this.currentUserProvider = currentUserProvider;
-        this.env = env;
+        this.server = server;
         this.applicationBusiness = applicationBusiness;
         this.boutiquesBusiness = boutiquesBusiness;
         this.appVersionBusiness = appVersionBusiness;
@@ -274,8 +273,7 @@ public class PipelineBusiness {
         if (appVersion.isVisible()) {
             return true;
         }
-        List<String> whiteList = Arrays.asList(
-                env.getRequiredProperty(CarminProperties.API_PIPELINE_WHITE_LIST, String[].class));
+        List<String> whiteList = Arrays.asList(server.getCarminApiPipelineWhiteList());
         return whiteList.stream().anyMatch(appString -> {
             String[] splitAppString = appString.split("/");
             if (splitAppString.length != 2) {

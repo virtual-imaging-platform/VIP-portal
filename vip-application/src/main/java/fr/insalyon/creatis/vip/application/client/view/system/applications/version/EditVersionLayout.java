@@ -5,18 +5,28 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.smartgwt.client.data.DataSource;
+import com.smartgwt.client.data.Record;
+import com.smartgwt.client.data.fields.DataSourceTextField;
 import com.smartgwt.client.types.ListGridEditEvent;
 import com.smartgwt.client.types.ListGridFieldType;
 import com.smartgwt.client.types.TitleOrientation;
-import com.smartgwt.client.util.*;
-import com.smartgwt.client.widgets.*;
-import com.smartgwt.client.widgets.events.*;
+import com.smartgwt.client.util.BooleanCallback;
+import com.smartgwt.client.util.SC;
+import com.smartgwt.client.widgets.IButton;
+import com.smartgwt.client.widgets.ImgButton;
+import com.smartgwt.client.widgets.Label;
+import com.smartgwt.client.widgets.events.ClickEvent;
+import com.smartgwt.client.widgets.events.ClickHandler;
 import com.smartgwt.client.widgets.form.DynamicForm;
-import com.smartgwt.client.widgets.form.fields.*;
-import com.smartgwt.client.data.Record;
+import com.smartgwt.client.widgets.form.fields.CheckboxItem;
+import com.smartgwt.client.widgets.form.fields.ComboBoxItem;
+import com.smartgwt.client.widgets.form.fields.SelectItem;
+import com.smartgwt.client.widgets.form.fields.TextItem;
 import com.smartgwt.client.widgets.grid.ListGrid;
 import com.smartgwt.client.widgets.grid.ListGridField;
 import com.smartgwt.client.widgets.grid.ListGridRecord;
@@ -32,7 +42,8 @@ import fr.insalyon.creatis.vip.application.client.view.system.applications.app.M
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.common.AbstractFormLayout;
 import fr.insalyon.creatis.vip.core.client.view.layout.Layout;
-import fr.insalyon.creatis.vip.core.client.view.util.*;
+import fr.insalyon.creatis.vip.core.client.view.util.FieldUtil;
+import fr.insalyon.creatis.vip.core.client.view.util.WidgetUtil;
 
 public class EditVersionLayout extends AbstractFormLayout {
     
@@ -51,6 +62,7 @@ public class EditVersionLayout extends AbstractFormLayout {
     private SelectItem resourcesList;
     private IButton saveButton;
     private IButton removeButton;
+    private DataSource suggestionTags;
 
     public EditVersionLayout() {
 
@@ -115,6 +127,10 @@ public class EditVersionLayout extends AbstractFormLayout {
         resourcesList = new SelectItem();
         resourcesList.setMultiple(true);
         resourcesList.setWidth(450);
+
+        suggestionTags = new DataSource();
+        suggestionTags.setClientOnly(true);
+        suggestionTags.setFields(new DataSourceTextField("key", "Key"));
 
         saveButton = WidgetUtil.getIButton("Save", CoreConstants.ICON_SAVED, new ClickHandler() {
             @Override
@@ -208,6 +224,9 @@ public class EditVersionLayout extends AbstractFormLayout {
 
         ComboBoxItem combo = new ComboBoxItem("autoComplete", "Add custom Tag");
 
+        combo.setOptionDataSource(suggestionTags);
+        combo.setDisplayField("key");
+        combo.setValueField("key");
         combo.setWidth(175);
         combo.setTitleOrientation(TitleOrientation.TOP);
 
@@ -372,6 +391,7 @@ public class EditVersionLayout extends AbstractFormLayout {
             loadAppVersionTags();
         }
         loadResources();
+        loadExistingTagsKeys();
     }
 
     private void loadAppVersionTags() {
@@ -405,6 +425,30 @@ public class EditVersionLayout extends AbstractFormLayout {
             }
         };
         service.getResources(callback);
+    }
+
+    private void loadExistingTagsKeys() {
+                ApplicationServiceAsync service = ApplicationService.Util.getInstance();
+        final AsyncCallback<List<Tag>> callback = new AsyncCallback<>() {
+            @Override
+            public void onFailure(Throwable caught) {
+                Layout.getInstance().setWarningMessage("Unable to load existing tags keys:<br />" + caught.getMessage());
+            }
+    
+            @Override
+            public void onSuccess(List<Tag> result) {
+                List<String> keys = new ArrayList<>(result.stream().map(Tag::getKey).collect(Collectors.toSet()));
+
+                Record[] records = keys.stream().map(key -> {
+                    Record record = new Record();
+                    record.setAttribute("key", key);
+                    return record;
+                }).toArray(Record[]::new);
+
+                suggestionTags.setCacheData(records);
+            }
+        };
+        service.getTags(callback);
     }
 
     public static native void copyToClipboard(String text) /*-{

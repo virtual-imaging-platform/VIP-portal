@@ -1,7 +1,7 @@
 package fr.insalyon.creatis.vip.api.model.stats;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import fr.insalyon.creatis.vip.api.CarminProperties;
+import fr.insalyon.creatis.vip.core.server.CarminProperties;
 
 import java.time.LocalDateTime;
 

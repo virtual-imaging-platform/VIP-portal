@@ -72,7 +72,7 @@ public class SimulationData extends AbstractJobData implements SimulationDAO {
         List<Task> list = new ArrayList<Task>();
         try {
             PreparedStatement ps = connection.prepareStatement(
-                    "SELECT j.id, status, command, file_name, exit_code, node_site, node_name, parameters, "
+                    "SELECT j.id, j.invocation_id, creation, status, command, file_name, exit_code, node_site, node_name, parameters, "
                     + "ms FROM Jobs AS j LEFT JOIN ("
                     + "  SELECT jm.id, minor_status AS ms FROM JobsMinorStatus AS jm RIGHT JOIN ( "
                     + "    SELECT id, MAX(event_date) AS ed FROM JobsMinorStatus GROUP BY id "
@@ -102,7 +102,7 @@ public class SimulationData extends AbstractJobData implements SimulationDAO {
 
         try {
             PreparedStatement ps = connection.prepareStatement(
-                    "SELECT j.id, status, command, file_name, exit_code, node_site, node_name, parameters, "
+                    "SELECT j.id, j.invocation_id, creation, status, command, file_name, exit_code, node_site, node_name, parameters, "
                     + "ms FROM Jobs AS j LEFT JOIN ("
                     + "  SELECT jm.id, minor_status AS ms FROM JobsMinorStatus AS jm RIGHT JOIN ( "
                     + "    SELECT id, MAX(event_date) AS ed FROM JobsMinorStatus GROUP BY id "
@@ -172,7 +172,7 @@ public class SimulationData extends AbstractJobData implements SimulationDAO {
             minorStatus = parseMinorStatus(rs.getString("ms"));
         }
 
-        return new Task(rs.getString("id"), status,
+        return new Task(rs.getString("id"), rs.getInt("invocation_id"), rs.getTimestamp("creation"), status,
                 rs.getString("command"), rs.getString("file_name"),
                 rs.getInt("exit_code"), rs.getString("node_site"),
                 rs.getString("node_name"), minorStatus,
@@ -207,12 +207,16 @@ public class SimulationData extends AbstractJobData implements SimulationDAO {
         try {
             Statement stat = connection.createStatement();
             ResultSet rs = stat.executeQuery(
-                    "SELECT j.id, status, command, file_name, exit_code, node_site, node_name, parameters, "
-                    + "ms FROM Jobs AS j LEFT JOIN ("
-                    + "  SELECT jm.id, minor_status AS ms FROM JobsMinorStatus AS jm RIGHT JOIN ( "
-                    + "    SELECT id, MAX(event_date) AS ed FROM JobsMinorStatus GROUP BY id "
-                    + "  ) AS jm1 ON jm1.id = jm.id AND jm1.ed = jm.event_date "
-                    + ") AS jm2 ON j.id = jm2.id ORDER BY j.id");
+                    "SELECT j.id, j.invocation_id, creation, status, command, file_name, exit_code, " +
+                            "node_site, node_name, parameters, ms " +
+                            "FROM Jobs AS j " +
+                            "LEFT JOIN ( " +
+                            "  SELECT jm.id, minor_status AS ms FROM JobsMinorStatus AS jm " +
+                            "  RIGHT JOIN ( " +
+                            "    SELECT id, MAX(event_date) AS ed FROM JobsMinorStatus GROUP BY id " +
+                            "  ) AS jm1 ON jm1.id = jm.id AND jm1.ed = jm.event_date " +
+                            ") AS jm2 ON j.id = jm2.id " +
+                            "ORDER BY j.id");
 
             while (rs.next()) {
                 TaskStatus status = TaskStatus.valueOf(rs.getString("status"));
@@ -222,7 +226,8 @@ public class SimulationData extends AbstractJobData implements SimulationDAO {
                     minorStatus = parseMinorStatus(rs.getString("ms"));
                 }
 
-                list.add(new Task(rs.getString("id"), status,
+                list.add(new Task( rs.getString("id"), rs.getInt("invocation_id"),
+                        rs.getTimestamp("creation"), status,
                         rs.getString("command"), rs.getString("file_name"),
                         rs.getInt("exit_code"), rs.getString("node_site"),
                         rs.getString("node_name"), minorStatus,

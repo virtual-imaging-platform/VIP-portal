@@ -31,13 +31,13 @@
  */
 package fr.insalyon.creatis.vip.api.controller;
 
-import fr.insalyon.creatis.vip.api.exception.ApiException;
-import fr.insalyon.creatis.vip.api.exception.ApiException.ApiError;
-import fr.insalyon.creatis.vip.api.model.ErrorCodeAndMessage;
-import fr.insalyon.creatis.vip.api.model.Module;
+import fr.insalyon.creatis.vip.core.server.exception.ApiException;
+import fr.insalyon.creatis.vip.core.server.exception.ApiException.ApiError;
+import fr.insalyon.creatis.vip.core.server.model.ErrorCodeAndMessage;
+import fr.insalyon.creatis.vip.core.server.model.Module;
+import fr.insalyon.creatis.vip.core.server.model.SupportedTransferProtocol;
 import fr.insalyon.creatis.vip.api.model.PlatformProperties;
-import fr.insalyon.creatis.vip.api.model.SupportedTransferProtocol;
-import fr.insalyon.creatis.vip.api.security.oidc.OidcLoginConfig;
+import fr.insalyon.creatis.vip.core.server.security.oidc.OidcLoginConfig;
 import fr.insalyon.creatis.vip.application.client.view.ApplicationException.ApplicationError;
 import fr.insalyon.creatis.vip.core.client.VipException;
 import fr.insalyon.creatis.vip.core.client.VipException.VipError;
@@ -50,8 +50,6 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
-import static fr.insalyon.creatis.vip.api.CarminProperties.*;
 
 /**
  * Created by abonnet on 7/13/16.
@@ -72,23 +70,16 @@ public class PlatformController extends ApiController{
     public PlatformProperties getPlatformProperties() throws ApiException {
         logMethodInvocation(logger, "getPlatformProperties");
         PlatformProperties platformProperties = new PlatformProperties();
-        platformProperties.setPlatformName(env.getProperty(PLATFORM_NAME));
-        platformProperties.setPlatformDescription(env.getProperty(PLATFORM_DESCRIPTION));
-        platformProperties.setSupportedTransferProtocols(Arrays.asList(
-                env.getRequiredProperty(SUPPORTED_TRANSFER_PROTOCOLS, SupportedTransferProtocol[].class)
-        ));
-        platformProperties.setSupportedModules(Arrays.asList(
-                env.getRequiredProperty(SUPPORTED_MODULES, Module[].class)
-        ));
-        platformProperties.setDefaultLimitListExecutions(
-                env.getProperty(DEFAULT_LIMIT_LIST_EXECUTION, Long.class));
-        platformProperties.setUnsupportedMethods(Arrays.asList(
-                env.getRequiredProperty(UNSUPPORTED_METHODS, String[].class)
-        ));
-        platformProperties.setSupportedAPIVersion(env.getProperty(SUPPORTED_API_VERSION));
-        platformProperties.setEmail(env.getProperty(PLATFORM_EMAIL));
+        platformProperties.setPlatformName(server.getCarminPlatformName());
+        platformProperties.setPlatformDescription(server.getCarminPlatformDescription());
+        platformProperties.setSupportedTransferProtocols(Arrays.asList(server.getCarminSupportedTransferProtocols()));
+        platformProperties.setSupportedModules(Arrays.asList(server.getCarminSupportedModules()));
+        platformProperties.setDefaultLimitListExecutions(server.getCarminDefaultLimitListExecution());
+        platformProperties.setUnsupportedMethods(Arrays.asList(server.getCarminUnsupportedMethods()));
+        platformProperties.setSupportedAPIVersion(server.getCarminSupportedApiVersion());
+        platformProperties.setEmail(server.getCarminPlatformEmail());
         platformProperties.setAPIErrorCodesAndMessages(getErrorCodesAndMessages());
-        platformProperties.setMaxSizeDirectTransfer(env.getProperty(API_DATA_TRANSFERT_MAX_SIZE, Long.class));
+        platformProperties.setMaxSizeDirectTransfer(server.getCarminApiDataTransfertMaxSize());
         platformProperties.setOidcLoginProviders(oidcLoginConfig.getLoginProviders());
         return platformProperties;
     }

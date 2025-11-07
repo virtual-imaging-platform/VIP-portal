@@ -37,6 +37,7 @@ import fr.insalyon.creatis.grida.client.GRIDAClientException;
 import fr.insalyon.creatis.vip.api.rest.mockconfig.DataConfigurator;
 import fr.insalyon.creatis.vip.application.client.bean.AppVersion;
 import fr.insalyon.creatis.vip.application.integrationtest.BaseApplicationSpringIT;
+import fr.insalyon.creatis.vip.api.SpringRestApiConfig;
 import fr.insalyon.creatis.vip.application.server.business.*;
 import fr.insalyon.creatis.vip.application.server.business.util.FileUtil;
 import fr.insalyon.creatis.vip.core.integrationtest.ServerMockConfig;
@@ -54,7 +55,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers;
-import org.springframework.test.context.web.WebAppConfiguration;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -63,6 +64,9 @@ import org.springframework.web.context.WebApplicationContext;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+
+import static fr.insalyon.creatis.vip.api.data.CarminAPITestConstants.*;
+import static org.mockito.Mockito.when;
 
 /**
  * Created by abonnet on 7/28/16.
@@ -77,7 +81,7 @@ import java.nio.charset.StandardCharsets;
  * * use {@link WithMockUser} annotation
  * <p>
  */
-@WebAppConfiguration
+@ContextConfiguration(classes = { SpringRestApiConfig.class })
 abstract public class BaseWebSpringIT extends BaseApplicationSpringIT {
 
     @Autowired
@@ -111,6 +115,19 @@ abstract public class BaseWebSpringIT extends BaseApplicationSpringIT {
                 .defaultRequest(MockMvcRequestBuilders.get("/").servletPath("/rest"))
                 .apply(SecurityMockMvcConfigurers.springSecurity())
                 .build();
+
+        // vip.conf API properties mocks
+        when(server.getCarminPlatformName()).thenReturn(TEST_PLATFORM_NAME);
+        when(server.getCarminPlatformDescription()).thenReturn(TEST_PLATFORM_DESCRIPTION);
+        when(server.getCarminPlatformEmail()).thenReturn(TEST_PLATFORM_EMAIL);
+        when(server.getCarminSupportedTransferProtocols()).thenReturn(TEST_SUPPORTED_PROTOCOLS);
+        when(server.getCarminSupportedModules()).thenReturn(TEST_SUPPORTED_MODULES);
+        when(server.getCarminDefaultLimitListExecution()).thenReturn(Long.valueOf(TEST_DEFAULT_LIST_LIMIT));
+        when(server.getCarminUnsupportedMethods()).thenReturn(TEST_UNSUPPORTED_METHOD);
+        when(server.getCarminApiDataTransfertMaxSize()).thenReturn(Long.valueOf(TEST_DATA_MAX_SIZE));
+        when(server.getCarminSupportedApiVersion()).thenReturn(TEST_SUPPORTED_API_VERSION);
+        when(server.getCarminApikeyGenerateNewEachTime()).thenReturn(false);
+        when(server.getCarminApiPipelineWhiteList()).thenReturn(new String[]{});
     }
 
     protected String getResourceAsString(String pathFromClasspath) throws IOException {

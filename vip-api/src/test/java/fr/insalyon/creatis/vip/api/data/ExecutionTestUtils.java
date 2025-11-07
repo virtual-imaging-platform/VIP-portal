@@ -164,7 +164,7 @@ public class ExecutionTestUtils {
                 Arrays.asList(
                         "identifier", "name", "pipelineIdentifier", "timeout",
                         "status", "inputValues", "returnedFiles", "studyIdentifier",
-                        "errorCode", "startDate", "endDate"),
+                        "errorCode", "startDate", "endDate", "jobs"),
                 Execution::getIdentifier,
                 Execution::getName,
                 Execution::getPipelineIdentifier,
@@ -175,7 +175,8 @@ public class ExecutionTestUtils {
                 Execution::getStudyIdentifier,
                 Execution::getErrorCode,
                 Execution::getStartDate,
-                Execution::getEndDate
+                Execution::getEndDate,
+                Execution::getJobs
         );
     }
 

@@ -32,7 +32,7 @@
 package fr.insalyon.creatis.vip.api.business;
 
 import fr.insalyon.creatis.moteur.plugins.workflowsdb.bean.WorkflowStatus;
-import fr.insalyon.creatis.vip.api.exception.ApiException;
+import fr.insalyon.creatis.vip.core.server.exception.ApiException;
 import fr.insalyon.creatis.vip.api.model.*;
 import fr.insalyon.creatis.vip.application.client.ApplicationConstants;
 import fr.insalyon.creatis.vip.application.client.bean.InOutData;
@@ -51,17 +51,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
 import java.util.function.Supplier;
 
-import static fr.insalyon.creatis.vip.api.CarminProperties.ADDITIONNAL_INPUT_VALID_CHARS;
+import fr.insalyon.creatis.vip.core.server.CarminProperties;
 import static fr.insalyon.creatis.vip.application.client.ApplicationConstants.INPUT_VALID_CHARS;
 
 /**
@@ -99,14 +93,14 @@ public class ExecutionBusiness {
     }
 
     public String getLog(String executionId, String type) throws ApiException {
+        return getLog(executionId, null, type);
+    }
+
+    public String getLog(String executionId, Integer invocationId, String type) throws ApiException {
         try {
             Simulation s = workflowBusiness.getSimulation(executionId);
-
             List<Task> tasks = simulationBusiness.getJobsList(s.getID());
-            if (tasks.size() > 2) {
-                logger.debug("Warning: more than two tasks found for execution ID = {} ", executionId);
-                return "too many logs found";
-            }
+
             if (tasks.isEmpty()) {
                 logger.debug("Warning: no .sh.out log file found for execution ID = {} ", executionId);
                 return "no log found";
@@ -114,18 +108,42 @@ public class ExecutionBusiness {
 
             String extension = ".sh.app." + type;
 
-            String fileName = tasks.getFirst().getFileName();
+            Task targetTask = null;
+
+            if (invocationId == null) {
+                if (tasks.size() == 1) {
+                    targetTask = tasks.get(0);
+                    logger.debug("jobId is null, using the only available task with ID = {}", targetTask.getId());
+                } else {
+                    logger.debug("jobId is null but multiple tasks found for execution ID = {}", executionId);
+                    return "jobId is required when multiple tasks exist";
+                }
+            } else {
+                targetTask = tasks.stream()
+                        .filter(t -> invocationId.equals(t.getInvocationID()))
+                        .max(Comparator.comparing(Task::getCreationDate))
+                        .orElse(null);
+            }
+
+
+
+            if (targetTask == null) {
+                logger.debug("No job {} found for execution ID = {}", invocationId, executionId);
+                return "no log found for job " + invocationId;
+            }
+
+            String fileName = targetTask.getFileName();
             if (fileName != null) {
                 return simulationBusiness.readFile(executionId, type, fileName, extension);
+            } else {
+                throw new ApiException("no file name for job " + invocationId + " in execution " + executionId);
             }
-            else {
-                logger.error("no file name for task of {} ", executionId);
-                throw new ApiException("no file name for task of " + executionId);
-            }
+
         } catch (BusinessException e) {
             throw new ApiException(e);
         }
     }
+
 
     public Execution getExample(String executionId) throws ApiException {
         return getExecution(executionId, false, true);
@@ -194,6 +212,32 @@ public class ExecutionBusiness {
             }
             e.getReturnedFiles().get(iod.getProcessor()).add(iod.getPath());
         }
+
+        // Jobs
+        List<Task> tasks = simulationBusiness.getJobsList(s.getID());
+        Map<Integer, Task> latestTaskPerInvocation = new HashMap<>();
+
+        for (Task t : tasks) {
+            int invId = t.getInvocationID();
+            Task current = latestTaskPerInvocation.get(invId);
+
+            if (current == null || t.getCreationDate().after(current.getCreationDate())) {
+                latestTaskPerInvocation.put(invId, t);
+            }
+        }
+
+        Map<Integer, Map<String, Object>> jobsMap = new HashMap<>();
+        for (Map.Entry<Integer, Task> entry : latestTaskPerInvocation.entrySet()) {
+            Task t = entry.getValue();
+            Map<String, Object> jobInfo = new HashMap<>();
+            jobInfo.put("status", t.getStatus().toString());
+            jobInfo.put("exitCode", t.getExitCode());
+            jobInfo.put("exitMessage", t.getExitMessage());
+            jobsMap.put(entry.getKey(), jobInfo);
+        }
+
+        e.setJobs(jobsMap);
+
 
         if (!(e.getStatus() == ExecutionStatus.FINISHED) && !(e.getStatus() == ExecutionStatus.KILLED) && e.getReturnedFiles().isEmpty()) {
             e.clearReturnedFiles();
@@ -342,7 +386,7 @@ public class ExecutionBusiness {
     }
 
     private void checkInputIsValid(String inputName, String inputValue) throws ApiException {
-        String validChars = INPUT_VALID_CHARS + ADDITIONNAL_INPUT_VALID_CHARS;
+        String validChars = INPUT_VALID_CHARS + CarminProperties.ADDITIONNAL_INPUT_VALID_CHARS;
         if( ! inputValue.matches("[" + validChars + "]+")) {
             logger.error("Input {} is not valid. Value : {}, Authorized characters are {}",
                     inputName, inputValue, validChars);
