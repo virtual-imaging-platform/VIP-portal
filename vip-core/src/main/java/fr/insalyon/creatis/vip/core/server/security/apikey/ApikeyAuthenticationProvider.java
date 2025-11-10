@@ -38,17 +38,15 @@ import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import fr.insalyon.creatis.vip.core.server.dao.UserDAO;
+import fr.insalyon.creatis.vip.core.server.security.common.AbstractAuthenticationProvider;
+import fr.insalyon.creatis.vip.core.server.security.common.SpringPrincipalUser;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.MessageSource;
-import org.springframework.context.MessageSourceAware;
-import org.springframework.context.support.MessageSourceAccessor;
 import org.springframework.security.authentication.*;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.SpringSecurityMessageSource;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
@@ -62,25 +60,15 @@ import java.util.Map;
  * Automaticaly taken into account by spring security by implementing {@link AuthenticationProvider}
  */
 @Service
-public class ApikeyAuthenticationProvider implements
-        AuthenticationProvider, InitializingBean, MessageSourceAware {
+public class ApikeyAuthenticationProvider extends AbstractAuthenticationProvider {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     // ~ Instance fields
     // ================================================================================================
 
-    protected MessageSourceAccessor messages = SpringSecurityMessageSource.getAccessor();
-
     @Autowired
     private ConfigurationBusiness configurationBusiness;
-
-    @Autowired
-    private UserDAO userDAO;
-
-    public final void afterPropertiesSet() throws Exception {
-        Assert.notNull(this.messages, "A message source must be set");
-    }
 
     @Override
     public boolean supports(Class<?> authentication) {
@@ -119,7 +107,7 @@ public class ApikeyAuthenticationProvider implements
             Map<Group, CoreConstants.GROUP_ROLE> groups =
                 configurationBusiness.getUserGroups(vipUser.getEmail());
             vipUser.setGroups(groups);
-            springUser = new SpringApiPrincipal(vipUser);
+            springUser = new SpringPrincipalUser(vipUser);
         } catch (BusinessException e) {
             logger.error("error when getting user groups for {}. Doing as if there is an auth error",
                     vipUser.getEmail(), e);
@@ -129,52 +117,9 @@ public class ApikeyAuthenticationProvider implements
                     "Bad credentials"));
         }
         checkUserInfo(springUser);
-        try {
-            logger.info(
-                "successful logging for " + springUser.getUsername());
-            userDAO.resetNFailedAuthentications(springUser.getUsername());
-        } catch (DAOException e) {
-            logger.error("Error resetting failed auth attempts. Ignoring", e);
-        }
-            return new ApikeyAuthenticationToken(
+        afterSuccess(springUser);
+        return new ApikeyAuthenticationToken(
                     springUser, apikey,
                     vipUser.getLevel().name().toUpperCase());
-    }
-
-    public void setMessageSource(MessageSource messageSource) {
-        this.messages = new MessageSourceAccessor(messageSource);
-    }
-
-    private void checkUserInfo(UserDetails user) {
-        if (!user.isAccountNonLocked()) {
-            logger.info("User account is locked");
-
-            throw new LockedException(messages.getMessage(
-                    "AbstractUserDetailsAuthenticationProvider.locked",
-                    "User account is locked"));
-        }
-
-        if (!user.isEnabled()) {
-            logger.info("User account is disabled");
-
-            throw new DisabledException(messages.getMessage(
-                    "AbstractUserDetailsAuthenticationProvider.disabled",
-                    "User is disabled"));
-        }
-
-        if (!user.isAccountNonExpired()) {
-            logger.info("User account is expired");
-
-            throw new AccountExpiredException(messages.getMessage(
-                    "AbstractUserDetailsAuthenticationProvider.expired",
-                    "User account has expired"));
-        }
-        if (!user.isCredentialsNonExpired()) {
-            logger.info("User account credentials have expired");
-
-            throw new CredentialsExpiredException(messages.getMessage(
-                    "AbstractUserDetailsAuthenticationProvider.credentialsExpired",
-                    "User credentials have expired"));
-        }
     }
 }

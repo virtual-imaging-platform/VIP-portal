@@ -29,7 +29,7 @@
  * The fact that you are presently reading this means that you have had
  * knowledge of the CeCILL-B license and that you accept its terms.
  */
-package fr.insalyon.creatis.vip.api.model;
+package fr.insalyon.creatis.vip.core.server.model;
 
 /**
  * Created by abonnet on 8/21/17.
