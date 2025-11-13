@@ -260,4 +260,26 @@
         </plugins>
     </build>
 
+    <profiles>
+        <profile>
+            <!-- Just to avoid compiling GWT here-->
+            <id>no-gwt</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>net.ltgt.gwt.maven</groupId>
+                        <artifactId>gwt-maven-plugin</artifactId>
+                        <version>1.0.0</version>
+                        <extensions>true</extensions>
+                        <executions>
+                            <execution>
+                                <id>compile-to-javascript</id>
+                                <phase>none</phase>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>
