@@ -304,4 +304,30 @@
             </plugin>
         </plugins>
     </build>
+
+    <profiles>
+        <profile>
+            <!--
+            In the case of the migration GWT -> "RestAPI"
+            We can test if there are still business methods in actual GWT code
+            This will excludes all **/client/** (normally) and the compilation will fail
+            in case of missing code.
+            -->
+            <id>no-gwt</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-compiler-plugin</artifactId>
+                        <configuration>
+                            <excludes>
+                                <!-- this seems to work globally but sometimes some files ignored by the filter -->
+                                <exclude>**/client/**</exclude>
+                            </excludes>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>
