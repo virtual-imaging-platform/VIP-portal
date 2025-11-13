@@ -302,6 +302,7 @@
                             <excludes>
                                 <!-- this seems to work globally but sometimes some files ignored by the filter -->
                                 <exclude>**/client/**</exclude>
+                                <exclude>**/server/rpc/**</exclude>
                             </excludes>
                         </configuration>
                     </plugin>
