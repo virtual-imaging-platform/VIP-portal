@@ -84,6 +84,7 @@ public class CoreConstants implements IsSerializable {
     public static final String LAB_SIMULATION_EXEC_MODE = "workflows.exec.mode";
     public static final String LAB_APACHE_HOST = "apache.host";
     public static final String LAB_APACHE_SSL_PORT = "apache.ssl.port";
+    public static final String LAB_DEV_MODE = "dev";
     // Tabs
     public static final String TAB_ACCOUNT = "account_tab";
     public static final String TAB_ACTIVATION = "activation_tab";

@@ -1,16 +1,20 @@
 package fr.insalyon.creatis.vip.core.client.rpc;
 
+import java.sql.Timestamp;
+import java.util.List;
+import java.util.Map;
+
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.ServiceDefTarget;
-import fr.insalyon.creatis.vip.core.client.bean.*;
+
+import fr.insalyon.creatis.vip.core.client.bean.Group;
+import fr.insalyon.creatis.vip.core.client.bean.UsageStats;
+import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.CoreException;
 import fr.insalyon.creatis.vip.core.client.view.user.UserLevel;
 import fr.insalyon.creatis.vip.core.client.view.util.CountryCode;
-import java.sql.Timestamp;
-import java.util.List;
-import java.util.Map;
 
 public interface ConfigurationService extends RemoteService {
 
@@ -27,7 +31,7 @@ public interface ConfigurationService extends RemoteService {
         }
     }
 
-    User configure(String email, String session) throws CoreException;
+    User configure() throws CoreException;
 
     void signout() throws CoreException;
 
