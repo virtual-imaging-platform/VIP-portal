@@ -14,7 +14,6 @@ import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.LockedException;
 import org.springframework.security.core.SpringSecurityMessageSource;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
@@ -22,7 +21,6 @@ import fr.insalyon.creatis.vip.core.server.dao.UserDAO;
 
 // this class was factorized from the Apikey Security provider 
 // since we have added the Session Security Provider
-@Service
 public abstract class AbstractAuthenticationProvider implements AuthenticationProvider, InitializingBean, MessageSourceAware {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());

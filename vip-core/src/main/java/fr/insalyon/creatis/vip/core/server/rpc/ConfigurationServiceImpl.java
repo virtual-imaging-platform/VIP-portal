@@ -31,7 +31,21 @@
  */
 package fr.insalyon.creatis.vip.core.server.rpc;
 
-import fr.insalyon.creatis.vip.core.client.bean.*;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import fr.insalyon.creatis.vip.core.client.bean.Group;
+import fr.insalyon.creatis.vip.core.client.bean.UsageStats;
+import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationService;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants.GROUP_ROLE;
@@ -45,20 +59,8 @@ import fr.insalyon.creatis.vip.core.server.business.VipSessionBusiness;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import fr.insalyon.creatis.vip.core.server.dao.UserDAO;
 import fr.insalyon.creatis.vip.core.server.inter.GroupInterface;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
 public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet implements ConfigurationService {
 
@@ -81,7 +83,7 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
     }
     
     @Override
-    public User configure(String email, String session) throws CoreException {
+    public User configure() throws CoreException {
         try {
 
             logger.debug("Initializing VIP configuration.");
@@ -91,7 +93,7 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
             User user = vipSessionBusiness.resetSessionFromCookie(getThreadLocalRequest());
 
             if (user != null) {
-                configurationBusiness.updateUserLastLogin(email);
+                configurationBusiness.updateUserLastLogin(user.getEmail());
                 trace(logger, "Connected.");
 
                 return user;

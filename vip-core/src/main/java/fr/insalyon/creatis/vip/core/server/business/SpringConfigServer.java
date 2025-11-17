@@ -7,10 +7,6 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 
-import fr.insalyon.creatis.vip.core.server.model.Module;
-import fr.insalyon.creatis.vip.core.server.model.SupportedTransferProtocol;
-import jakarta.annotation.PostConstruct;
-
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.configuration.reloading.FileChangedReloadingStrategy;
@@ -28,6 +24,9 @@ import org.springframework.util.Assert;
 
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.server.CarminProperties;
+import fr.insalyon.creatis.vip.core.server.model.Module;
+import fr.insalyon.creatis.vip.core.server.model.SupportedTransferProtocol;
+import jakarta.annotation.PostConstruct;
 
 /**
  * Reads the vip.conf property file from the configured vifConfigFolder
@@ -564,4 +563,7 @@ public class SpringConfigServer implements Server {
 
     @Override
     public String[] getCarminApiPipelineWhiteList() { return env.getProperty(CarminProperties.API_PIPELINE_WHITE_LIST, String[].class); }
+
+    @Override
+    public boolean isDevMode() { return env.getProperty(CoreConstants.LAB_DEV_MODE, boolean.class, false); }
 }
