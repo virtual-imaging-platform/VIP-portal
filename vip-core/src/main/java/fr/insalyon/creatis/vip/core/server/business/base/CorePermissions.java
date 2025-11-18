@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import fr.insalyon.creatis.vip.core.client.bean.Group;
 import fr.insalyon.creatis.vip.core.client.bean.User;
+import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.client.view.user.UserLevel;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
 
@@ -31,20 +32,20 @@ public class CorePermissions {
                 return;
             }
         }
-        throw new BusinessException("You do not have the right to do that!");
+        throw new BusinessException(CoreConstants.NOT_RIGHT);
     }
 
     public void checkOnlyUserPrivateGroups(List<Group> groupsToCheck) throws BusinessException {
         User user = uSupplier.get();
         Set<Group> userGroups = user.getGroups();
 
-        if (user.getLevel().equals(UserLevel.Administrator) || groupsToCheck == null) {
+        if (groupsToCheck == null) {
             return;
         }
         for (Group group : groupsToCheck) {
             // check ONLY user groups and ONLY privates groups
             if ( ! userGroups.contains(group) || group.isPublicGroup()) {
-                throw new BusinessException("You do not have the right to do that!");
+                throw new BusinessException(CoreConstants.NOT_RIGHT);
             }
         }
     }
@@ -60,5 +61,17 @@ public class CorePermissions {
             result = toFilter.stream().filter((g) -> userGroups.contains(g)).toList();
         }
         return result;
+    }
+
+    public <T> void checkItemInList(T item, List<T> list) throws BusinessException {
+        if ( ! list.contains(item)) {
+            throw new BusinessException(CoreConstants.NOT_RIGHT);
+        }
+    }
+
+    public <T> void checkUnchanged(T a, T b) throws BusinessException {
+        if (a != b) {
+            throw new BusinessException(CoreConstants.NOT_RIGHT); 
+        }
     }
 }

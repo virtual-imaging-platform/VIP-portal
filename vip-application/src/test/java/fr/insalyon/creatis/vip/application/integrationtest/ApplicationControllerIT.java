@@ -139,7 +139,7 @@ public class ApplicationControllerIT extends BaseSpringIT {
         configurationBusiness.addUserToGroup(emailUser2, nameGroup1);
         developperUser = configurationBusiness.getUserWithGroups(emailUser2);
 
-        // developer in the group can do that
+        // developer in the private group can do that
         mockMvc.perform(delete("/internal/applications/" + app.getName())
             .with(getUserSecurityMock(developperUser))
             .with(SecurityMockMvcRequestPostProcessors.csrf())
