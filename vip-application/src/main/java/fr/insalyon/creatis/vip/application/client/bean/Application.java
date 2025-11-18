@@ -1,12 +1,13 @@
 package fr.insalyon.creatis.vip.application.client.bean;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
+
 import com.google.gwt.user.client.rpc.IsSerializable;
 
 import fr.insalyon.creatis.vip.core.client.bean.Group;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
 
 public class Application implements IsSerializable {
 
@@ -80,5 +81,23 @@ public class Application implements IsSerializable {
 
     public void setGroups(List<Group> groups) {
         this.groups = groups;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+
+        Application other = (Application) obj;
+        return Objects.equals(name, other.name) &&
+               Objects.equals(citation, other.citation) &&
+               Objects.equals(owner, other.owner) &&
+               Objects.equals(fullName, other.fullName) &&
+               Objects.equals(groups, other.groups);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, citation, owner, fullName, groups);
     }
 }
