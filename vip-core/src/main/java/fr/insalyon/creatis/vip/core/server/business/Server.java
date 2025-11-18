@@ -1,9 +1,9 @@
 package fr.insalyon.creatis.vip.core.server.business;
 
-import fr.insalyon.creatis.vip.core.server.model.SupportedTransferProtocol;
-import fr.insalyon.creatis.vip.core.server.model.Module;
-
 import java.util.List;
+
+import fr.insalyon.creatis.vip.core.server.model.Module;
+import fr.insalyon.creatis.vip.core.server.model.SupportedTransferProtocol;
 
 /*
     interface for the server configuration to allow several implementations
@@ -158,4 +158,6 @@ public interface Server {
     }
     OidcLoginProviderConfig getOidcConfigEGI();
     OidcLoginProviderConfig getOidcConfigLSLOGIN();
+
+    boolean isDevMode();
 }

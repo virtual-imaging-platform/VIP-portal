@@ -1,17 +1,21 @@
 package fr.insalyon.creatis.vip.core.client.rpc;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
-import fr.insalyon.creatis.vip.core.client.bean.*;
-import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
-import fr.insalyon.creatis.vip.core.client.view.user.UserLevel;
-import fr.insalyon.creatis.vip.core.client.view.util.CountryCode;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.Map;
 
+import com.google.gwt.user.client.rpc.AsyncCallback;
+
+import fr.insalyon.creatis.vip.core.client.bean.Group;
+import fr.insalyon.creatis.vip.core.client.bean.UsageStats;
+import fr.insalyon.creatis.vip.core.client.bean.User;
+import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
+import fr.insalyon.creatis.vip.core.client.view.user.UserLevel;
+import fr.insalyon.creatis.vip.core.client.view.util.CountryCode;
+
 public interface ConfigurationServiceAsync {
 
-    void configure(String email, String session, AsyncCallback<User> asyncCallback);
+    void configure(AsyncCallback<User> asyncCallback);
 
     void signout(AsyncCallback<Void> asyncCallback);
 

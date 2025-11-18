@@ -32,15 +32,14 @@
 package fr.insalyon.creatis.vip.portal.client;
 
 import com.google.gwt.core.client.EntryPoint;
-import com.google.gwt.user.client.Cookies;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.smartgwt.client.util.SC;
 import com.smartgwt.client.widgets.Label;
-import fr.insalyon.creatis.vip.applicationimporter.client.ApplicationImporterModule;
-import fr.insalyon.creatis.vip.application.client.ApplicationModule;
 
+import fr.insalyon.creatis.vip.application.client.ApplicationModule;
+import fr.insalyon.creatis.vip.applicationimporter.client.ApplicationImporterModule;
 import fr.insalyon.creatis.vip.core.client.CoreModule;
 import fr.insalyon.creatis.vip.core.client.Modules;
 import fr.insalyon.creatis.vip.core.client.bean.UsageStats;
@@ -106,17 +105,6 @@ public class Main implements EntryPoint {
     }
 
     private void configureVIP() {
-
-        // Cookies
-        String email = null;
-        String session = null;
-
-        if (Cookies.getCookieNames().contains(CoreConstants.COOKIES_USER)) {
-            email = Cookies.getCookie(CoreConstants.COOKIES_USER);
-            session = Cookies.getCookie(CoreConstants.COOKIES_SESSION);
-        }
-        // End-Cookies
-
         final ConfigurationServiceAsync service = ConfigurationService.Util.getInstance();
         final AsyncCallback<User> callback = new AsyncCallback<User>() {
             @Override
@@ -131,7 +119,7 @@ public class Main implements EntryPoint {
                 Layout.getInstance().authenticate(user);
             }
         };
-        service.configure(email, session, callback);
+        service.configure(callback);
     }
 
     private void configureStats() {

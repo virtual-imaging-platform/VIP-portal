@@ -1,8 +1,8 @@
 package fr.insalyon.creatis.vip.api.business;
 
 import fr.insalyon.creatis.vip.core.server.exception.ApiException;
-import fr.insalyon.creatis.vip.api.model.AuthenticationCredentials;
-import fr.insalyon.creatis.vip.api.model.AuthenticationInfo;
+import fr.insalyon.creatis.vip.core.server.model.AuthenticationCredentials;
+import fr.insalyon.creatis.vip.core.server.model.AuthenticationInfo;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.server.business.Server;

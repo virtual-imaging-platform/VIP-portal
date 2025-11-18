@@ -31,25 +31,6 @@
  */
 package fr.insalyon.creatis.vip.core.server.rpc;
 
-import fr.insalyon.creatis.vip.core.client.bean.*;
-import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationService;
-import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
-import fr.insalyon.creatis.vip.core.client.view.CoreConstants.GROUP_ROLE;
-import fr.insalyon.creatis.vip.core.client.view.CoreException;
-import fr.insalyon.creatis.vip.core.client.view.user.UserLevel;
-import fr.insalyon.creatis.vip.core.client.view.util.CountryCode;
-import fr.insalyon.creatis.vip.core.server.business.BusinessException;
-import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
-import fr.insalyon.creatis.vip.core.server.business.GroupBusiness;
-import fr.insalyon.creatis.vip.core.server.dao.DAOException;
-import fr.insalyon.creatis.vip.core.server.dao.UserDAO;
-import fr.insalyon.creatis.vip.core.server.inter.GroupInterface;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServletRequest;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -59,6 +40,28 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import fr.insalyon.creatis.vip.core.client.bean.Group;
+import fr.insalyon.creatis.vip.core.client.bean.UsageStats;
+import fr.insalyon.creatis.vip.core.client.bean.User;
+import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationService;
+import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
+import fr.insalyon.creatis.vip.core.client.view.CoreConstants.GROUP_ROLE;
+import fr.insalyon.creatis.vip.core.client.view.CoreException;
+import fr.insalyon.creatis.vip.core.client.view.user.UserLevel;
+import fr.insalyon.creatis.vip.core.client.view.util.CountryCode;
+import fr.insalyon.creatis.vip.core.server.business.BusinessException;
+import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
+import fr.insalyon.creatis.vip.core.server.business.GroupBusiness;
+import fr.insalyon.creatis.vip.core.server.business.VipSessionBusiness;
+import fr.insalyon.creatis.vip.core.server.dao.DAOException;
+import fr.insalyon.creatis.vip.core.server.dao.UserDAO;
+import fr.insalyon.creatis.vip.core.server.inter.GroupInterface;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+
 public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet implements ConfigurationService {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
@@ -67,6 +70,7 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
     private GroupBusiness groupBusiness;
     private UserDAO userDAO;
     private GroupInterface groupInterface;
+    private VipSessionBusiness vipSessionBusiness;
 
     @Override
     public void init() throws ServletException {
@@ -75,20 +79,21 @@ public class ConfigurationServiceImpl extends AbstractRemoteServiceServlet imple
         userDAO = getBean(UserDAO.class);
         groupBusiness = getBean(GroupBusiness.class);
         groupInterface = getBean(GroupInterface.class);
+        vipSessionBusiness = getBean(VipSessionBusiness.class);
     }
     
     @Override
-    public User configure(String email, String session) throws CoreException {
+    public User configure() throws CoreException {
         try {
+
             logger.debug("Initializing VIP configuration.");
             configurationBusiness.configure();
             logger.debug("VIP successfully configured.");
 
-            if (configurationBusiness.validateSession(email, session)) {
+            User user = vipSessionBusiness.resetSessionFromCookie(getThreadLocalRequest());
 
-                User user = configurationBusiness.getUser(email);
-                user = setUserInSession(user);
-                configurationBusiness.updateUserLastLogin(email);
+            if (user != null) {
+                configurationBusiness.updateUserLastLogin(user.getEmail());
                 trace(logger, "Connected.");
 
                 return user;
