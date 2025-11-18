@@ -31,6 +31,19 @@
  */
 package fr.insalyon.creatis.vip.application.server.business;
 
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import fr.insalyon.creatis.vip.application.client.bean.AppVersion;
 import fr.insalyon.creatis.vip.application.client.bean.Application;
 import fr.insalyon.creatis.vip.application.server.dao.ApplicationDAO;
@@ -45,15 +58,6 @@ import fr.insalyon.creatis.vip.core.server.business.base.CommonBusiness;
 import fr.insalyon.creatis.vip.core.server.dao.DAOException;
 import fr.insalyon.creatis.vip.core.server.inter.annotations.VIPExternalSafe;
 import fr.insalyon.creatis.vip.core.server.model.PrecisePage;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -78,9 +82,12 @@ public class ApplicationBusiness extends CommonBusiness {
     @VIPExternalSafe
     public void add(Application app) throws BusinessException {
         permissions.checkLevel(UserLevel.Administrator, UserLevel.Developer);
-        // this check is supposed to happend rarely since 
-        // we recommand associating groups after application creation (using update)
-        permissions.checkOnlyUserPrivateGroups(app.getGroups());
+
+        if (userSupplier.get().getLevel().equals(UserLevel.Developer)) {
+            // developers can only assign from private groups they belong to
+            // at application creation
+            permissions.checkOnlyUserPrivateGroups(app.getGroups());
+        }
         try {
             applicationDAO.add(app);
 
@@ -94,10 +101,17 @@ public class ApplicationBusiness extends CommonBusiness {
 
     @VIPExternalSafe
     public void remove(String name) throws BusinessException {
+        Application app = getApplication(name); // not safe, do not return to user!
+
+        if (app == null) {
+            return;
+        }
         permissions.checkLevel(UserLevel.Administrator, UserLevel.Developer);
 
-        Application app = getApplication(name); // not safe, do not return to user! 
-        if (app != null) {
+        if (userSupplier.get().getLevel().equals(UserLevel.Developer)) {
+            // this is related to developers
+            // they can only remove application from private groups they belong to
+            permissions.checkItemInList(app, getUserContextApplications());
             permissions.checkOnlyUserPrivateGroups(app.getGroups());
         }
         try {
@@ -113,10 +127,11 @@ public class ApplicationBusiness extends CommonBusiness {
         Application existingApp = getApplication(app.getName()); // not safe, do not return to user!
 
         permissions.checkLevel(UserLevel.Administrator, UserLevel.Developer);
-        // check actual app groups to determine if editable
-        permissions.checkOnlyUserPrivateGroups(existingApp.getGroups());
-        // check edited apps to verify added groups
-        permissions.checkOnlyUserPrivateGroups(app.getGroups());
+
+        if (userSupplier.get().getLevel().equals(UserLevel.Developer)) {
+            // developer can only associate group at CREATION
+            permissions.checkUnchanged(app.getGroups(), existingApp.getGroups());
+        }
         try {
             Application before = getApplication(app.getName());
             List<String> beforeGroupsNames = before.getGroupsNames();
