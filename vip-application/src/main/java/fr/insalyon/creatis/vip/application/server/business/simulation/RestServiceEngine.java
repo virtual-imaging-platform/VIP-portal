@@ -3,11 +3,8 @@ package fr.insalyon.creatis.vip.application.server.business.simulation;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 
 import java.nio.charset.StandardCharsets;
-import java.rmi.RemoteException;
 import java.util.Base64;
 import java.util.Map;
-
-import javax.xml.rpc.ServiceException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -68,12 +65,10 @@ public class RestServiceEngine extends WorkflowEngineInstantiator {
     /**
      * Call the WS that is going to run the workflow and return the HTTP link
      * that can be used to monitor the workflow status.
-     *
-     * @return the HTTP link that shows the workflow current status
      */
     @Override
     public String launch(String addressWS, String workflow, String inputs, String settings, String executorConfig, String proxyFileName)
-            throws RemoteException, ServiceException, VipException {
+            throws VipException, Exception {
         loadTrustStore(server);
 
         String strProxy = null;
@@ -103,8 +98,17 @@ public class RestServiceEngine extends WorkflowEngineInstantiator {
                     .retrieve()
                     .body(String.class);
         } catch (HttpServerErrorException | HttpClientErrorException e) {
-            logger.error("Server error while fetching workflow status: {}", e.getResponseBodyAsString(), e);
-            throw new VipException("Internal server error while fetching workflow status", e);
+            switch (e.getStatusCode().value()) {
+                case 503:
+                    logger.warn("Engine satured!: {}", e.getMessage());
+                    throw new VipException(e.getResponseBodyAsString());
+                case 400:
+                    logger.warn("Application likely misconfigured: {}", e.getMessage());
+                    throw new VipException(e.getResponseBodyAsString());
+                default:
+                    logger.error("Server error while fetching workflow status: {}", e.getResponseBodyAsString(), e);
+                    throw new Exception("Internal server error while fetching workflow status", e);
+            }
         } catch (RestClientException e) {
             logger.error("REST client error while fetching workflow status", e);
             throw new VipException("REST client error while fetching workflow status", e);

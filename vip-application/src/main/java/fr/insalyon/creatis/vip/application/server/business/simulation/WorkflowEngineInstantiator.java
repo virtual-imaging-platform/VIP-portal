@@ -13,17 +13,13 @@ public abstract class WorkflowEngineInstantiator {
     }
 
     public abstract String launch(String addressWS, String workflowContent, String inputs, String settings, String executorConfig, String proxyFileName)
-            throws java.rmi.RemoteException, javax.xml.rpc.ServiceException, VipException;
+            throws VipException, Exception;
 
     public abstract void kill(String addressWS, String workflowID)
-            throws
-            java.rmi.RemoteException,
-            javax.xml.rpc.ServiceException, VipException;
+            throws VipException;
 
     public abstract SimulationStatus getStatus(String addressWS, String workflowID)
-            throws
-            java.rmi.RemoteException,
-            javax.xml.rpc.ServiceException, VipException;
+            throws VipException;
 
     protected void loadTrustStore(Server server) {
         // Configuration SSL

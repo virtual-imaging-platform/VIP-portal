@@ -160,25 +160,22 @@ public class WorkflowBusiness {
             appVersion.getSettings().put(ApplicationConstants.DEFAULT_EXECUTOR_GASW, resource.getType().toString());
             try {
                 workflow = workflowExecutionBusiness.launch(engine.getEndpoint(), appVersion, user, simulationName, parameters, resource.getConfiguration());
-            } catch (VipException be) {
-                logger.error("VipException caught on launch workflow, engine {} will be disabled", engine.getName());
+            } catch (VipException e) {
+                throw e;
             } catch (Exception e) {
                 logger.error("Unexpected exception caught on launch workflow, engine {} will be disabled", engine.getName(), e);
-            } finally {
-                if (workflow == null) {
-                    engine.setStatus("disabled");
-                    engineBusiness.update(engine);
 
-                    logger.info("Sending warning email to admins !");
-                    emailBusiness.sendEmailToAdmins(
-                        "Urgent: VIP engine disabled", 
-                        "Engine " + engine.getName() + " has just been disabled. Please check that there is at least one active engine left.", 
-                        true, user.getEmail());
-                    throw new VipException("Workflow is null, engine " + engine.getName() + " has been disabled");
-                } else {
-                    logger.info("Launched workflow " + workflow.toString());
-                }
+                engine.setStatus("disabled");
+                engineBusiness.update(engine);
+
+                logger.info("Sending warning email to admins !");
+                emailBusiness.sendEmailToAdmins(
+                    "Urgent: VIP engine disabled", 
+                    "Engine " + engine.getName() + " has just been disabled. Please check that there is at least one active engine left.", 
+                    true, user.getEmail());
+                throw new VipException("Failed to launch workflow! Engine " + engine.getName() + " has been disabled");
             }
+            logger.info("Launched workflow " + workflow.toString());
 
             workflowDAO.add(workflow);
             return workflow.getId();
