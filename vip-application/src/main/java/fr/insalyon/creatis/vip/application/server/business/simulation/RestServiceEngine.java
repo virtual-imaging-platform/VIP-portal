@@ -31,12 +31,12 @@
  */
 package fr.insalyon.creatis.vip.application.server.business.simulation;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import fr.insalyon.creatis.vip.application.client.view.monitor.SimulationStatus;
-import fr.insalyon.creatis.vip.application.server.business.util.ProxyUtil;
-import fr.insalyon.creatis.vip.core.server.business.BusinessException;
-import fr.insalyon.creatis.vip.core.server.business.Server;
+import static org.springframework.http.MediaType.APPLICATION_JSON;
+
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,15 +46,14 @@ import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientException;
 
-import javax.xml.rpc.ServiceException;
-import java.nio.charset.StandardCharsets;
-import java.rmi.RemoteException;
-import java.util.Base64;
-import java.util.Map;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
-import static org.springframework.http.MediaType.APPLICATION_JSON;
+import fr.insalyon.creatis.vip.application.client.view.monitor.SimulationStatus;
+import fr.insalyon.creatis.vip.application.server.business.util.ProxyUtil;
+import fr.insalyon.creatis.vip.core.server.business.BusinessException;
+import fr.insalyon.creatis.vip.core.server.business.Server;
 
 /**
  * @author Rafael Ferreira da Silva, Ibrahim kallel
@@ -100,12 +99,10 @@ public class RestServiceEngine extends WorkflowEngineInstantiator {
     /**
      * Call the WS that is going to run the workflow and return the HTTP link
      * that can be used to monitor the workflow status.
-     *
-     * @return the HTTP link that shows the workflow current status
      */
     @Override
     public String launch(String addressWS, String workflow, String inputs, String settings, String executorConfig, String proxyFileName)
-            throws RemoteException, ServiceException, BusinessException {
+            throws BusinessException, Exception {
         loadTrustStore(server);
 
         String strProxy = null;
@@ -135,21 +132,29 @@ public class RestServiceEngine extends WorkflowEngineInstantiator {
                     .retrieve()
                     .body(String.class);
         } catch (HttpServerErrorException | HttpClientErrorException e) {
-            logger.error("Server error while fetching workflow status: {}", e.getResponseBodyAsString(), e);
-            throw new BusinessException("Internal server error while fetching workflow status", e);
+            switch (e.getStatusCode().value()) {
+                case 503:
+                    logger.warn("Engine satured!: {}", e.getMessage());
+                    throw new BusinessException(e.getResponseBodyAsString());
+                case 400:
+                    logger.warn("Application likely misconfigured: {}", e.getMessage());
+                    throw new BusinessException(e.getResponseBodyAsString());
+                default:
+                    logger.error("Server error while fetching workflow status: {}", e.getResponseBodyAsString(), e);
+                    throw new Exception("Internal server error while fetching workflow status", e);
+            }
         } catch (RestClientException e) {
             logger.error("REST client error while fetching workflow status", e);
-            throw new BusinessException("REST client error while fetching workflow status", e);
+            throw new Exception("REST client error while fetching workflow status", e);
         } catch (JsonProcessingException e) {
             logger.error("Error serializing RestWorkflow to JSON", e);
-            throw new BusinessException("Error serializing RestWorkflow to JSON", e);
+            throw new Exception("Error serializing RestWorkflow to JSON", e);
         }
     }
 
 
     @Override
     public void kill(String addressWS, String workflowID) throws BusinessException {
-
         loadTrustStore(server);
 
         try {

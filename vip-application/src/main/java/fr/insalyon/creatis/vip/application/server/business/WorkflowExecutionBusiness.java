@@ -31,14 +31,10 @@
  */
 package fr.insalyon.creatis.vip.application.server.business;
 
-import fr.insalyon.creatis.moteur.plugins.workflowsdb.bean.Workflow;
-import fr.insalyon.creatis.moteur.plugins.workflowsdb.bean.WorkflowStatus;
-import fr.insalyon.creatis.vip.application.client.bean.AppVersion;
-import fr.insalyon.creatis.vip.application.client.view.monitor.SimulationStatus;
-import fr.insalyon.creatis.vip.application.server.business.simulation.WorkflowEngineInstantiator;
-import fr.insalyon.creatis.vip.core.client.bean.User;
-import fr.insalyon.creatis.vip.core.server.business.BusinessException;
-import fr.insalyon.creatis.vip.core.server.business.Server;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,11 +43,14 @@ import org.springframework.stereotype.Service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import javax.xml.rpc.ServiceException;
-import java.rmi.RemoteException;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import fr.insalyon.creatis.moteur.plugins.workflowsdb.bean.Workflow;
+import fr.insalyon.creatis.moteur.plugins.workflowsdb.bean.WorkflowStatus;
+import fr.insalyon.creatis.vip.application.client.bean.AppVersion;
+import fr.insalyon.creatis.vip.application.client.view.monitor.SimulationStatus;
+import fr.insalyon.creatis.vip.application.server.business.simulation.WorkflowEngineInstantiator;
+import fr.insalyon.creatis.vip.core.client.bean.User;
+import fr.insalyon.creatis.vip.core.server.business.BusinessException;
+import fr.insalyon.creatis.vip.core.server.business.Server;
 
 @Service
 public class WorkflowExecutionBusiness {
@@ -69,20 +68,21 @@ public class WorkflowExecutionBusiness {
     }
 
     public Workflow launch(String engineEndpoint, AppVersion appVersion, User user, String simulationName,
-            Map<String, List<String>> parameters, String executorConfig) throws BusinessException {
+            Map<String, List<String>> parameters, String executorConfig) throws BusinessException, Exception {
 
         try {
             String workflowContent = appVersion.getDescriptor();
             String inputs = (parameters != null) ? getParametersAsJSONInput(parameters) : null;
             String proxyFileName = server.getServerProxy(server.getVoName());
             String settingsJSON = new ObjectMapper().writeValueAsString(appVersion.getSettings());
-            String workflowID = engine.launch(engineEndpoint, workflowContent, inputs, settingsJSON, executorConfig, proxyFileName);
-            return new Workflow(workflowID, user.getFullName(),
-                    WorkflowStatus.Running, new Date(), null, simulationName, 
+            String id = engine.launch(engineEndpoint, workflowContent, inputs, settingsJSON, executorConfig, proxyFileName);
+
+            return new Workflow(id, user.getFullName(),
+                    WorkflowStatus.Running, new Date(), null, simulationName,
                     appVersion.getApplicationName(), appVersion.getVersion(), "",
                     engineEndpoint, null);
 
-        } catch (ServiceException | RemoteException | JsonProcessingException ex) {
+        } catch (JsonProcessingException ex) {
             logger.error("Error launching simulation {} ({}/{})",
                     simulationName, appVersion.getApplicationName(), appVersion.getVersion(), ex);
             throw new BusinessException(ex);
@@ -90,24 +90,11 @@ public class WorkflowExecutionBusiness {
     }
 
     public SimulationStatus getStatus(String engineEndpoint, String simulationID) throws BusinessException {
-        SimulationStatus status = SimulationStatus.Unknown;
-        try {
-            status = engine.getStatus(engineEndpoint, simulationID);
-        } catch (RemoteException | ServiceException e) {
-            logger.error("Error getting status of simulation {} on engine {}", simulationID, engineEndpoint, e);
-            throw new BusinessException(e);
-        }
-
-        return status;
+        return engine.getStatus(engineEndpoint, simulationID);
     }
 
     public void kill(String engineEndpoint, String simulationID) throws BusinessException {
-        try {
-            engine.kill(engineEndpoint, simulationID);
-        } catch (RemoteException | ServiceException e) {
-            logger.error("Error killing simulation {} on engine {}", simulationID, engineEndpoint, e);
-            throw new BusinessException(e);
-        }
+        engine.kill(engineEndpoint, simulationID);
     }
 
     public String getParametersAsJSONInput(Map<String, List<String>> parameters) throws BusinessException {
