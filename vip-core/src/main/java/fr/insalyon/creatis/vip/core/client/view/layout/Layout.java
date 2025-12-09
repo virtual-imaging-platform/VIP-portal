@@ -31,6 +31,8 @@
  */
 package fr.insalyon.creatis.vip.core.client.view.layout;
 
+import java.util.function.Supplier;
+
 import com.google.gwt.user.client.Cookies;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -40,6 +42,7 @@ import com.smartgwt.client.widgets.layout.SectionStack;
 import com.smartgwt.client.widgets.layout.SectionStackSection;
 import com.smartgwt.client.widgets.layout.VLayout;
 import com.smartgwt.client.widgets.tab.Tab;
+
 import fr.insalyon.creatis.vip.core.client.Modules;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.rpc.ConfigurationService;
@@ -48,8 +51,6 @@ import fr.insalyon.creatis.vip.core.client.view.ModalWindow;
 import fr.insalyon.creatis.vip.core.client.view.common.MessageWindow;
 import fr.insalyon.creatis.vip.core.client.view.layout.toolstrip.MainToolStrip;
 import fr.insalyon.creatis.vip.core.client.view.user.ActivationTab;
-
-import java.util.function.Supplier;
 
 /**
  *
@@ -116,11 +117,6 @@ public class Layout {
      */
     public void authenticate(User user) {
         if (user != null && Cookies.isCookieEnabled()) {
-            Cookies.setCookie(CoreConstants.COOKIES_USER, user.getEmail(),
-                              CoreConstants.COOKIES_EXPIRATION_DATE, null, "/", false);
-            Cookies.setCookie(CoreConstants.COOKIES_SESSION, user.getSession(),
-                              CoreConstants.COOKIES_EXPIRATION_DATE, null, "/", false);
-
             if (user.isConfirmed()) {
                 Modules.getInstance().initializeModules(user);
             } else {
