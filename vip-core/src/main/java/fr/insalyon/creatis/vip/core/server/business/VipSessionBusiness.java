@@ -55,8 +55,7 @@ public class VipSessionBusiness {
             HttpServletResponse response,
             User user) throws BusinessException, CoreException {
         try {
-            // see explanation in SessionBusiness -> createCookie
-            boolean isSecure = server.getApacheSSLPort() != 80;
+            boolean isSecure = server.isDevMode();
             configurationBusiness.updateUserLastLogin(user.getEmail());
             user = setUserInSession(user, request.getSession());
 

@@ -101,7 +101,7 @@ function resetPassword() {
 
 function checkSession() {
     fetch("/internal/session").then(function (response) {
-        if ( ! response.ok) {
+        if (response.ok) {
             window.location = "home.html";
         }
     });
