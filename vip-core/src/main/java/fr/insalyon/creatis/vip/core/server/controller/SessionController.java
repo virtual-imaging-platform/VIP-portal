@@ -37,7 +37,7 @@ public class SessionController {
     }
 
     @GetMapping
-    public Session getSession(HttpServletRequest request, HttpServletResponse response) throws ApiException {
+    public Session getSession(HttpServletRequest request, HttpServletResponse response) throws VipException {
         User user = userProvider.get();
         Session session = sessionBusiness.getSession(user);
 
@@ -47,8 +47,8 @@ public class SessionController {
             configurationBusiness.updateUserLastLogin(user.getEmail());
 
             return session;
-        } catch (UnsupportedEncodingException | VipException e) {
-            throw new ApiException("Failed to retrieve user session!", e);
+        } catch (UnsupportedEncodingException e) {
+            throw new VipException("Failed to retrieve user session!", e);
         }
     }
 

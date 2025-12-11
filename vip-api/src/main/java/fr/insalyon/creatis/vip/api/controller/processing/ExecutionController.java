@@ -136,7 +136,7 @@ public class ExecutionController extends ApiController {
     }
 
     @RequestMapping(value = "/{executionId}/jobs/{invocationId}/stdout", produces = "text/plain;charset=UTF-8")
-    public String getJobStdout(@PathVariable String executionId, @PathVariable Integer invocationId) throws ApiException {
+    public String getJobStdout(@PathVariable String executionId, @PathVariable Integer invocationId) throws VipException {
         logMethodInvocation(logger, "getJobStdout", executionId, invocationId);
         executionBusiness.checkIfUserCanAccessExecution(executionId);
         return executionBusiness.getLog(executionId, invocationId, "out");
@@ -150,7 +150,7 @@ public class ExecutionController extends ApiController {
     }
 
     @RequestMapping(value = "/{executionId}/jobs/{invocationId}/stderr", produces = "text/plain;charset=UTF-8")
-    public String getJobStderr(@PathVariable String executionId,  @PathVariable Integer invocationId) throws ApiException {
+    public String getJobStderr(@PathVariable String executionId,  @PathVariable Integer invocationId) throws VipException {
         logMethodInvocation(logger, "getJobStderr", executionId, invocationId);
         executionBusiness.checkIfUserCanAccessExecution(executionId);
         return executionBusiness.getLog(executionId, invocationId, "err");
