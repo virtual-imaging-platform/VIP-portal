@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import fr.insalyon.creatis.vip.core.client.bean.User;
 import fr.insalyon.creatis.vip.core.client.view.CoreConstants;
 import fr.insalyon.creatis.vip.core.server.business.BusinessException;
+import fr.insalyon.creatis.vip.core.server.business.ConfigurationBusiness;
 import fr.insalyon.creatis.vip.core.server.business.SessionBusiness;
 import fr.insalyon.creatis.vip.core.server.exception.ApiException;
 import fr.insalyon.creatis.vip.core.server.model.AuthenticationCredentials;
@@ -27,23 +28,28 @@ import jakarta.validation.Valid;
 public class SessionController {
 
     private final SessionBusiness sessionBusiness;
+    private final ConfigurationBusiness configurationBusiness;
     final private Supplier<User> userProvider;
 
     @Autowired
-    public SessionController(SessionBusiness sessionBusiness, Supplier<User> userProvider) {
+    public SessionController(SessionBusiness sessionBusiness, Supplier<User> userProvider, ConfigurationBusiness configurationBusiness) {
         this.sessionBusiness = sessionBusiness;
         this.userProvider = userProvider;
+        this.configurationBusiness = configurationBusiness;
     }
 
     @GetMapping
     public Session getSession(HttpServletRequest request, HttpServletResponse response) throws ApiException {
-        Session session = sessionBusiness.getSession(userProvider.get());
+        User user = userProvider.get();
+        Session session = sessionBusiness.getSession(user);
 
         try {
             // renew existing cookies
             sessionBusiness.createLoginCookies(request, response, session);
+            configurationBusiness.updateUserLastLogin(user.getEmail());
+
             return session;
-        } catch (UnsupportedEncodingException e) {
+        } catch (UnsupportedEncodingException | BusinessException e) {
             throw new ApiException("Failed to retrieve user session!", e);
         }
     }
